@@ -14,7 +14,7 @@ export class ActionsMenu {
         try {
             await this.menu.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
             return true;
-        } catch (error) {
+        } catch {
             return false;
         }
     }

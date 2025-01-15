@@ -8,7 +8,7 @@ export const getClipboardContent = async (page: Page): Promise<string> => {
         try {
             const text = await navigator.clipboard.readText();
             return text;
-        } catch (error) {
+        } catch {
             return null;
         }
     });
@@ -30,7 +30,7 @@ export const getClipboardContent = async (page: Page): Promise<string> => {
             const text = el.textContent || '';
             document.body.removeChild(el);
             return text;
-        } catch (error) {
+        } catch {
             document.body.removeChild(el);
             return '';
         }

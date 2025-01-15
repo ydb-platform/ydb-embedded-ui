@@ -13,7 +13,7 @@ async function warmupApplication(appPage: PageModel) {
             await appPage.goto();
             await appPage.page.waitForLoadState('networkidle');
             await appPage.page.waitForTimeout(retryDelay);
-        } catch (error) {
+        } catch {
             if (i === maxRetries - 1) {
                 throw new Error('Application warmup failed after max retries');
             }

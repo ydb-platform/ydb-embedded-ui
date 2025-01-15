@@ -43,7 +43,7 @@ test.describe('Query Templates', () => {
         try {
             await queryEditor.waitForStatus('Failed');
             // If we reach here, the test passed because execution failed as expected
-        } catch (error) {
+        } catch {
             throw new Error('Update table template should not have executed successfully');
         }
     });
@@ -75,7 +75,7 @@ test.describe('Query Templates', () => {
                 // If not failed, verify it completed successfully
                 expect(status).toBe('Completed');
             }
-        } catch (error) {
+        } catch {
             throw new Error(
                 'Query execution neither completed successfully nor failed with expected error',
             );

@@ -1,8 +1,7 @@
 import React from 'react';
 
-import {DefinitionList, HelpPopover} from '@gravity-ui/components';
-import type {DefinitionListSingleItem} from '@gravity-ui/components/build/esm/components/DefinitionList/types';
-import {ClipboardButton, Flex, Tabs} from '@gravity-ui/uikit';
+import {HelpPopover} from '@gravity-ui/components';
+import {ClipboardButton, DefinitionList, Flex, Tabs} from '@gravity-ui/uikit';
 import qs from 'qs';
 import {Link, useLocation} from 'react-router-dom';
 import {StringParam, useQueryParam} from 'use-query-params';
@@ -155,7 +154,7 @@ export function ObjectSummary({
         }
         const {CreateStep, PathType, PathSubType, PathId, PathVersion} = currentSchemaData;
 
-        const overview: DefinitionListSingleItem[] = [];
+        const overview = [];
 
         const normalizedType = isDomain(path, PathType)
             ? 'Domain'
@@ -224,7 +223,7 @@ export function ObjectSummary({
 
         const getPathTypeOverview: Record<
             EPathType,
-            (() => DefinitionListSingleItem[]) | undefined
+            (() => {name: string; content?: React.ReactNode}[]) | undefined
         > = {
             [EPathType.EPathTypeInvalid]: undefined,
             [EPathType.EPathTypeDir]: undefined,
@@ -335,14 +334,19 @@ export function ObjectSummary({
             .map((el) => ({
                 ...el,
                 content: <div className={b('overview-item-content')}>{el.content}</div>,
-                multilineName: true,
             }));
         return (
             <React.Fragment>
                 <div className={b('overview-title')}>
                     <EntityTitle data={PathDescription} />
                 </div>
-                <DefinitionList items={listItems} responsive nameMaxWidth={150} />
+                <DefinitionList responsive>
+                    {listItems.map((item) => (
+                        <DefinitionList.Item key={item.name} name={item.name}>
+                            {item.content}
+                        </DefinitionList.Item>
+                    ))}
+                </DefinitionList>
             </React.Fragment>
         );
     };

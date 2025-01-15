@@ -19,6 +19,8 @@ export class ObjectSummary {
     private primaryKeys: Locator;
     private actionsMenu: ActionsMenu;
     private aclWrapper: Locator;
+    private aclListWrapper: Locator;
+    private effectiveAclListWrapper: Locator;
     private aclList: Locator;
     private effectiveAclList: Locator;
     private createDirectoryModal: Locator;
@@ -39,8 +41,12 @@ export class ObjectSummary {
         this.primaryKeys = page.locator('.schema-viewer__keys_type_primary');
         this.actionsMenu = new ActionsMenu(page.locator('.g-popup.g-popup_open'));
         this.aclWrapper = page.locator('.ydb-acl');
-        this.aclList = this.aclWrapper.locator('dl.gc-definition-list').first();
-        this.effectiveAclList = this.aclWrapper.locator('dl.gc-definition-list').last();
+        this.aclListWrapper = this.aclWrapper.locator('.gc-definition-list').first();
+        this.aclList = this.aclListWrapper.locator('dl.gc-definition-list__list').first();
+        this.effectiveAclListWrapper = this.aclWrapper.locator('.gc-definition-list').last();
+        this.effectiveAclList = this.effectiveAclListWrapper
+            .locator('dl.gc-definition-list__list')
+            .first();
         this.createDirectoryModal = page.locator('.g-modal.g-modal_open');
         this.createDirectoryInput = page.locator(
             '.g-text-input__control[placeholder="Relative path"]',
@@ -95,7 +101,7 @@ export class ObjectSummary {
                 timeout: VISIBILITY_TIMEOUT,
             });
             return true;
-        } catch (error) {
+        } catch {
             return false;
         }
     }
@@ -184,7 +190,7 @@ export class ObjectSummary {
         try {
             await openPreviewIcon.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
             return true;
-        } catch (error) {
+        } catch {
             return false;
         }
     }
