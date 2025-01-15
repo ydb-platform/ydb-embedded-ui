@@ -110,9 +110,7 @@ export function GravityPaginatedTable<T, F>({
                 <Table
                     table={table}
                     rowVirtualizer={rowVirtualizer}
-                    className={b('table', {
-                        loading: isLoading,
-                    })}
+                    className={b('table')}
                     rowClassName={(row) => {
                         if (!row?.original) {
                             return b('row', {loading: true});
