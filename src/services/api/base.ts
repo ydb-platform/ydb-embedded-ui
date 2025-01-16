@@ -14,7 +14,7 @@ export type AxiosOptions = {
 };
 
 export class BaseYdbAPI extends AxiosWrapper {
-    DEFAULT_RETRIES_COUNT = 3;
+    DEFAULT_RETRIES_COUNT = 0;
 
     constructor(options?: AxiosWrapperOptions) {
         super(options);
