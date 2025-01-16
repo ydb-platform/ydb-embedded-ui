@@ -6,7 +6,7 @@ import type {TabletsApiRequestParams} from '../../types/store/tablets';
 import type {RootState} from '../defaultStore';
 
 import {api} from './api';
-import {selectNodeHostsMap} from './nodesList';
+import {selectNodesMap} from './nodesList';
 
 export const tabletsApi = api.injectEndpoints({
     endpoints: (build) => ({
@@ -42,7 +42,7 @@ const selectGetTabletsInfo = createSelector(
 
 export const selectTabletsWithFqdn = createSelector(
     (state: RootState, params: TabletsApiRequestParams) => selectGetTabletsInfo(state, params),
-    (state: RootState) => selectNodeHostsMap(state),
+    (state: RootState) => selectNodesMap(state),
     (data, nodeHostsMap): (TTabletStateInfo & {fqdn?: string})[] => {
         if (!data?.TabletStateInfo) {
             return [];
@@ -51,7 +51,8 @@ export const selectTabletsWithFqdn = createSelector(
             return data.TabletStateInfo;
         }
         return data.TabletStateInfo.map((tablet) => {
-            const fqdn = tablet.NodeId === undefined ? undefined : nodeHostsMap.get(tablet.NodeId);
+            const fqdn =
+                tablet.NodeId === undefined ? undefined : nodeHostsMap.get(tablet.NodeId)?.Host;
             return {...tablet, fqdn};
         });
     },

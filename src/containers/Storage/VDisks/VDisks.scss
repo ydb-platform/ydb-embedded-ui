@@ -1,0 +1,29 @@
+.ydb-storage-vdisks {
+    &__wrapper {
+        display: flex;
+        justify-content: center;
+
+        min-width: 500px;
+    }
+
+    &__item {
+        flex-grow: 1;
+
+        max-width: 200px;
+        margin-right: 6px;
+
+        &_with-dc-margin {
+            margin-right: 12px;
+        }
+
+        &:last-child {
+            margin-right: 0px;
+        }
+
+        .stack__layer {
+            .data-table__row:hover & {
+                background: var(--ydb-data-table-color-hover);
+            }
+        }
+    }
+}

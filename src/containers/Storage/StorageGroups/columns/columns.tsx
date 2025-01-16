@@ -8,7 +8,6 @@ import {CellWithPopover} from '../../../../components/CellWithPopover/CellWithPo
 import {InternalLink} from '../../../../components/InternalLink';
 import {StatusIcon} from '../../../../components/StatusIcon/StatusIcon';
 import {UsageLabel} from '../../../../components/UsageLabel/UsageLabel';
-import {VDiskWithDonorsStack} from '../../../../components/VDisk/VDiskWithDonorsStack';
 import {getStorageGroupPath} from '../../../../routes';
 import {valueIsDefined} from '../../../../utils';
 import {cn} from '../../../../utils/cn';
@@ -18,7 +17,8 @@ import {getUsageSeverity} from '../../../../utils/generateEvaluator';
 import {formatToMs} from '../../../../utils/timeParsers';
 import {bytesToGB, bytesToSpeed} from '../../../../utils/utils';
 import {Disks} from '../../Disks/Disks';
-import {getDegradedSeverity, isVdiskActive} from '../../utils';
+import {VDisks} from '../../VDisks/VDisks';
+import {getDegradedSeverity} from '../../utils';
 import i18n from '../i18n';
 
 import {
@@ -230,18 +230,7 @@ const getVDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => (
     name: STORAGE_GROUPS_COLUMNS_IDS.VDisks,
     header: STORAGE_GROUPS_COLUMNS_TITLES.VDisks,
     className: b('vdisks-column'),
-    render: ({row}) => (
-        <div className={b('vdisks-wrapper')}>
-            {row.VDisks?.map((vDisk) => (
-                <VDiskWithDonorsStack
-                    key={vDisk.StringifiedId}
-                    data={vDisk}
-                    inactive={!isVdiskActive(vDisk, data?.viewContext)}
-                    className={b('vdisks-item')}
-                />
-            ))}
-        </div>
-    ),
+    render: ({row}) => <VDisks vDisks={row.VDisks} viewContext={data?.viewContext} />,
     align: DataTable.CENTER,
     width: 900,
     resizeable: false,

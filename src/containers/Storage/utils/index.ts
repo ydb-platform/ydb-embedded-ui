@@ -1,7 +1,11 @@
+import React from 'react';
+
+import {selectNodesMap} from '../../../store/reducers/nodesList';
 import type {PreparedStorageGroup} from '../../../store/reducers/storage/types';
 import {valueIsDefined} from '../../../utils';
 import type {PreparedVDisk} from '../../../utils/disks/types';
 import {generateEvaluator} from '../../../utils/generateEvaluator';
+import {useTypedSelector} from '../../../utils/hooks';
 import type {StorageViewContext} from '../types';
 
 const defaultDegradationEvaluator = generateEvaluator(['success', 'warning', 'danger'], 1, 2);
@@ -78,4 +82,24 @@ export function getStorageGroupsInitialEntitiesCount(
     }
 
     return DEFAULT_ENTITIES_COUNT;
+}
+
+export function useVDisksWithDCMargins(vDisks: PreparedVDisk[] = []) {
+    const nodesMap = useTypedSelector(selectNodesMap);
+
+    return React.useMemo(() => {
+        const disksWithMargins: number[] = [];
+
+        // Backend returns disks sorted by DC, so we don't need to apply any additional sorting
+        vDisks.forEach((disk, index) => {
+            const dc1 = nodesMap?.get(Number(disk?.NodeId))?.DC;
+            const dc2 = nodesMap?.get(Number(vDisks[index + 1]?.NodeId))?.DC;
+
+            if (dc1 !== dc2) {
+                disksWithMargins.push(index);
+            }
+        });
+
+        return disksWithMargins;
+    }, [vDisks, nodesMap]);
 }

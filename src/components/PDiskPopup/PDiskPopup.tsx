@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
-import {selectNodeHostsMap} from '../../store/reducers/nodesList';
+import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
 import {valueIsDefined} from '../../utils';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
@@ -17,7 +17,7 @@ const errorColors = [EFlag.Orange, EFlag.Red, EFlag.Yellow];
 
 export const preparePDiskData = (
     data: PreparedPDisk,
-    nodeHost?: string,
+    nodeData?: {Host?: string; DC?: string},
     withDeveloperUILink?: boolean,
 ) => {
     const {
@@ -46,8 +46,11 @@ export const preparePDiskData = (
         pdiskData.push({label: 'Node Id', value: NodeId});
     }
 
-    if (nodeHost) {
-        pdiskData.push({label: 'Host', value: nodeHost});
+    if (nodeData?.Host) {
+        pdiskData.push({label: 'Host', value: nodeData.Host});
+    }
+    if (nodeData?.DC) {
+        pdiskData.push({label: 'DC', value: nodeData.DC});
     }
 
     if (Path) {
@@ -90,11 +93,11 @@ interface PDiskPopupProps {
 
 export const PDiskPopup = ({data}: PDiskPopupProps) => {
     const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
-    const nodeHostsMap = useTypedSelector(selectNodeHostsMap);
-    const nodeHost = valueIsDefined(data.NodeId) ? nodeHostsMap?.get(data.NodeId) : undefined;
+    const nodesMap = useTypedSelector(selectNodesMap);
+    const nodeData = valueIsDefined(data.NodeId) ? nodesMap?.get(data.NodeId) : undefined;
     const info = React.useMemo(
-        () => preparePDiskData(data, nodeHost, isUserAllowedToMakeChanges),
-        [data, nodeHost, isUserAllowedToMakeChanges],
+        () => preparePDiskData(data, nodeData, isUserAllowedToMakeChanges),
+        [data, nodeData, isUserAllowedToMakeChanges],
     );
 
     return <InfoViewer title="PDisk" info={info} size="s" />;

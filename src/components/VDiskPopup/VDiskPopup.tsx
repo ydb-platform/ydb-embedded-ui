@@ -3,7 +3,7 @@ import React from 'react';
 import {Label} from '@gravity-ui/uikit';
 
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
-import {selectNodeHostsMap} from '../../store/reducers/nodesList';
+import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
@@ -188,14 +188,14 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
         [data, isFullData, isUserAllowedToMakeChanges],
     );
 
-    const nodeHostsMap = useTypedSelector(selectNodeHostsMap);
-    const nodeHost = valueIsDefined(data.NodeId) ? nodeHostsMap?.get(data.NodeId) : undefined;
+    const nodesMap = useTypedSelector(selectNodesMap);
+    const nodeData = valueIsDefined(data.NodeId) ? nodesMap?.get(data.NodeId) : undefined;
     const pdiskInfo = React.useMemo(
         () =>
             isFullData &&
             data.PDisk &&
-            preparePDiskData(data.PDisk, nodeHost, isUserAllowedToMakeChanges),
-        [data, nodeHost, isFullData, isUserAllowedToMakeChanges],
+            preparePDiskData(data.PDisk, nodeData, isUserAllowedToMakeChanges),
+        [data, nodeData, isFullData, isUserAllowedToMakeChanges],
     );
 
     const donorsInfo: InfoViewerItem[] = [];
