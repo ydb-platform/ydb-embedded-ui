@@ -58,6 +58,8 @@ export const getStorageNodes: FetchData<
                 limit,
             });
 
+            console.log('loading', limit, offset);
+
             setTimeout(() => res(result), 1000);
         })) as TNodesInfo;
     } else {

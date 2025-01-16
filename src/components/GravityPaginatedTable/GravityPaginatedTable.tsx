@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {Table, useTable} from '@gravity-ui/table';
-import type {ColumnDef} from '@gravity-ui/table/tanstack';
+import type {ColumnDef, SortingState} from '@gravity-ui/table/tanstack';
 import {ErrorBoundary} from 'react-error-boundary';
 
 import {useAutoRefreshInterval} from '../../utils/hooks';
@@ -32,6 +32,7 @@ export function GravityPaginatedTable<T, F>({
 }: GravityPaginatedTableProps<T, F>) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const [tableColumnsWidth, handleColumnResize] = useTableResize(columnsWidthLSKey);
+    const [sorting, setSorting] = React.useState<SortingState>([]);
 
     const containerRef = React.useRef<HTMLDivElement>(null);
 
@@ -46,6 +47,7 @@ export function GravityPaginatedTable<T, F>({
             rowHeight,
             containerRef,
             initialEntitiesCount,
+            sorting,
         });
 
     // Table columns configuration
@@ -77,6 +79,12 @@ export function GravityPaginatedTable<T, F>({
         enableColumnResizing: true,
         columnResizeMode: 'onChange',
         manualPagination: true,
+        enableSorting: true,
+        manualSorting: true,
+        onSortingChange: setSorting,
+        state: {
+            sorting,
+        },
         onColumnSizingChange: (updater) => {
             if (typeof updater === 'function') {
                 const newSizing = updater({});
@@ -84,6 +92,10 @@ export function GravityPaginatedTable<T, F>({
                     handleColumnResize(columnId, width);
                 });
             }
+        },
+        enableFilters: false,
+        filterFns: {
+            fuzzy: () => true,
         },
     });
 

@@ -1,16 +1,32 @@
 import React from 'react';
 
 import {useRowVirtualizer} from '@gravity-ui/table';
+import type {SortingState} from '@gravity-ui/table/tanstack';
 
 import {tableDataApi} from '../../store/reducers/tableData';
 import type {IResponseError} from '../../types/api/error';
 import type {FetchData} from '../PaginatedTable/types';
 
-import {tableReducer} from './tableReducer';
-import type {UseTableDataProps, UseTableDataResult} from './types';
+import {ASCENDING, DEFAULT_VIRTUALIZATION_OVERSCAN, DESCENDING} from './constants';
+import {ChunkState, TableActionType, tableReducer} from './tableReducer';
+import type {SortParams, UseTableDataProps, UseTableDataResult} from './types';
 
 const DEFAULT_CHUNK_SIZE = 50;
-const OVERSCAN_COUNT = 5;
+const TABLE_PADDINGS = 14;
+
+interface UseTableDataPropsWithSorting<T, F> extends UseTableDataProps<T, F> {
+    sorting?: SortingState;
+}
+
+function convertSortingToSortParams(sorting?: SortingState): SortParams | undefined {
+    if (!sorting?.[0]) {
+        return undefined;
+    }
+    return {
+        columnId: sorting[0].id,
+        sortOrder: sorting[0].desc ? DESCENDING : ASCENDING,
+    };
+}
 
 export function useTableData<T, F>({
     fetchData,
@@ -22,59 +38,104 @@ export function useTableData<T, F>({
     initialEntitiesCount = 0,
     rowHeight,
     containerRef,
-}: UseTableDataProps<T, F>): UseTableDataResult<T> {
+    sorting,
+}: UseTableDataPropsWithSorting<T, F>): UseTableDataResult<T> {
+    const initialChunksCount = Math.ceil((initialEntitiesCount || 0) / chunkSize);
     const [state, dispatch] = React.useReducer(tableReducer<T>, {
         rows: [],
         foundEntities: initialEntitiesCount || 0,
         totalEntities: initialEntitiesCount || 0,
+        chunkStates: new Array(initialChunksCount).fill(undefined),
     });
 
     const rowVirtualizer = useRowVirtualizer({
         count: state.foundEntities,
-        estimateSize: () => rowHeight,
-        overscan: OVERSCAN_COUNT,
+        estimateSize: () => rowHeight + TABLE_PADDINGS,
+        overscan: DEFAULT_VIRTUALIZATION_OVERSCAN,
         getScrollElement: () => containerRef.current,
         useScrollendEvent: true,
     });
 
-    const [fetchTableChunk, {error, isLoading}] = tableDataApi.useLazyFetchTableChunkQuery({
+    const startChunk = Math.floor((rowVirtualizer.range?.startIndex ?? 0) / chunkSize);
+    const endChunk = Math.floor((rowVirtualizer.range?.endIndex ?? 0) / chunkSize);
+
+    const [error, setError] = React.useState<IResponseError>();
+    const [fetchTableChunk, {isLoading}] = tableDataApi.useLazyFetchTableChunkQuery({
         pollingInterval: autoRefreshInterval,
     });
 
-    const startChunk =
-        (rowVirtualizer.range?.startIndex ?? 0) -
-        ((rowVirtualizer.range?.startIndex ?? 0) % chunkSize);
-
     React.useEffect(() => {
-        async function fetchChunkData() {
-            const queryParams = {
-                fetchData: fetchData as FetchData<unknown, unknown>,
-                filters,
-                columnsIds: columns.map((col) => col.name),
-                tableName,
-                offset: startChunk,
-                limit: chunkSize,
-            };
+        setError(undefined); // Reset error when dependencies change
+        async function fetchChunksData() {
+            for (let currentChunk = startChunk; currentChunk <= endChunk; currentChunk++) {
+                // Skip if chunk is already loaded or loading
+                if (
+                    state.chunkStates[currentChunk] === ChunkState.LOADED ||
+                    state.chunkStates[currentChunk] === ChunkState.LOADING
+                ) {
+                    continue;
+                }
 
-            try {
-                const {data, found, total} = await fetchTableChunk(queryParams).unwrap();
+                const offset = currentChunk * chunkSize;
+                const queryParams = {
+                    fetchData: fetchData as FetchData<unknown, unknown>,
+                    filters,
+                    columnsIds: columns.map((col) => col.name),
+                    tableName,
+                    offset,
+                    limit: chunkSize,
+                    sortParams: convertSortingToSortParams(sorting),
+                };
+
+                // Mark chunk as loading
                 dispatch({
-                    type: 'UPDATE_DATA',
+                    type: TableActionType.UPDATE_CHUNK_STATE,
                     payload: {
-                        data: data as T[],
-                        found,
-                        total,
-                        offset: queryParams.offset,
+                        chunkIndex: currentChunk,
+                        state: ChunkState.LOADING,
                     },
                 });
-            } catch (e) {
-                // Error is handled by RTK Query and available via error state
-                console.error('Failed to fetch chunk data:', e);
+
+                try {
+                    const {data, found, total} = await fetchTableChunk(queryParams).unwrap();
+                    dispatch({
+                        type: TableActionType.UPDATE_DATA,
+                        payload: {
+                            data: data as T[],
+                            found,
+                            total,
+                            offset,
+                            chunkSize,
+                        },
+                    });
+                } catch (e) {
+                    console.error('Failed to fetch chunk data:', e);
+                    setError(e as IResponseError);
+                    // Reset chunk state on error
+                    dispatch({
+                        type: TableActionType.UPDATE_CHUNK_STATE,
+                        payload: {
+                            chunkIndex: currentChunk,
+                            state: undefined,
+                        },
+                    });
+                }
             }
         }
 
-        fetchChunkData();
-    }, [fetchTableChunk, fetchData, filters, columns, tableName, chunkSize, startChunk]);
+        fetchChunksData();
+    }, [
+        fetchTableChunk,
+        fetchData,
+        filters,
+        columns,
+        tableName,
+        chunkSize,
+        startChunk,
+        endChunk,
+        sorting,
+        state.chunkStates,
+    ]);
 
     return {
         data: state.rows.filter((row: T | undefined): row is T => row !== undefined),
