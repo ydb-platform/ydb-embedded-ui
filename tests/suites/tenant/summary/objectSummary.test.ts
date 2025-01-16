@@ -192,6 +192,7 @@ test.describe('Object Summary', async () => {
                     'WriteAttributes',
                     'CreateDirectory',
                     'CreateTable',
+                    'CreateQueue',
                     'RemoveSchema',
                     'AlterSchema',
                 ],
