@@ -47,7 +47,7 @@ jobs:
 
       - name: Upload Playwright artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: playwright-artifacts
           path: playwright-artifacts
@@ -177,7 +177,7 @@ jobs:
           git --work-tree=gh-pages checkout gh-pages -- .
 
       - name: Download Playwright artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: playwright-artifacts
           path: playwright-artifacts
@@ -219,7 +219,7 @@ jobs:
           fetch-depth: 0
 
       - name: Download Playwright artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: playwright-artifacts
           path: playwright-artifacts
