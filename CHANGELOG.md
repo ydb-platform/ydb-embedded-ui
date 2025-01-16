@@ -1,5 +1,13 @@
 # Changelog
 
+## [8.4.0-hotfix.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.4.0...v8.4.0-hotfix.1) (2025-01-16)
+
+
+### Bug Fixes
+
+* hotfix ([f6167d6](https://github.com/ydb-platform/ydb-embedded-ui/commit/f6167d61772f79e74146c87c148def1c3fa4681e))
+* remove retries ([#1829](https://github.com/ydb-platform/ydb-embedded-ui/issues/1829)) ([2485c56](https://github.com/ydb-platform/ydb-embedded-ui/commit/2485c56fe173ebf02795a6b07405e6bfa9f11495))
+
 ## [8.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.3.0...v8.4.0) (2025-01-13)
 
 
