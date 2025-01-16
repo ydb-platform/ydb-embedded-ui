@@ -1,4 +1,5 @@
 import {Settings} from '@gravity-ui/navigation';
+import {Text} from '@gravity-ui/uikit';
 
 import {Setting} from './Setting';
 import type {YDBEmbeddedUISettings} from './settings';
@@ -32,9 +33,17 @@ export const UserSettings = ({settings: userSettings}: UserSettingsProps) => {
                                                 </Settings.Item>
                                             );
                                         }
+                                        const {description, ...rest} = setting;
                                         return (
-                                            <Settings.Item key={setting.title} {...setting}>
+                                            <Settings.Item
+                                                key={setting.title}
+                                                align="top"
+                                                {...rest}
+                                            >
                                                 <Setting {...setting} />
+                                                <Text color="secondary" as="div">
+                                                    {description}
+                                                </Text>
                                             </Settings.Item>
                                         );
                                     })}
