@@ -85,24 +85,24 @@ export function useTableData<T, F>({
     );
 
     // Load data for visible chunks
-    const {data, isLoading, error, totalCount} = useChunkLoader<T>(
+    const {rows, isLoading, error, totalCount} = useChunkLoader<T>(
         visibleChunks,
         chunkSize,
         fetchChunkData,
     );
 
     // Filter out undefined values for the table
-    const filteredData = React.useMemo(() => {
-        return data.filter((row): row is T => row !== undefined);
-    }, [data]);
+    const data = React.useMemo(() => {
+        return rows.filter((row): row is T => row !== undefined);
+    }, [rows]);
 
     return {
-        data: filteredData,
+        data,
         isLoading,
         error: error as IResponseError | undefined,
         totalEntities: totalCount,
         foundEntities: foundCount,
         rowVirtualizer,
-        rows: data,
+        rows,
     };
 }

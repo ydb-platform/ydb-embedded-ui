@@ -137,7 +137,7 @@ export function useChunkLoader<T>(
     const isLoading = chunks.some((chunk) => state.chunks.get(chunk) === ChunkState.LOADING);
 
     return {
-        data: state.rows,
+        rows: state.rows,
         isLoading,
         error,
         foundCount: state.foundCount,
