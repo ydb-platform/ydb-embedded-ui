@@ -4,18 +4,17 @@ import {Table, useTable} from '@gravity-ui/table';
 import type {ColumnDef} from '@gravity-ui/table/tanstack';
 import {ErrorBoundary} from 'react-error-boundary';
 
-import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {useTableResize} from '../../utils/hooks/useTableResize';
 import {TableWithControlsLayout} from '../TableWithControlsLayout/TableWithControlsLayout';
 
+import {LoadingCell} from './components/LoadingCell';
 import {DEFAULT_TABLE_ROW_HEIGHT} from './constants';
+import {b} from './shared';
 import type {GravityPaginatedTableProps} from './types';
 import {useTableData} from './useTableData';
 
 import './GravityPaginatedTable.scss';
-
-const b = cn('ydb-gravity-paginated-table');
 
 export function GravityPaginatedTable<T, F>({
     columnsWidthLSKey,
@@ -57,7 +56,7 @@ export function GravityPaginatedTable<T, F>({
                 header: () => column.header ?? column.name,
                 cell: ({row}) => {
                     if (!row.original) {
-                        return <div className={b('loading-cell')} />;
+                        return <LoadingCell height={rowHeight} />;
                     }
                     return column.render({
                         row: row.original,
@@ -68,7 +67,7 @@ export function GravityPaginatedTable<T, F>({
                 enableSorting: column.sortable,
                 enableResizing: column.resizeable,
             })),
-        [columns, tableColumnsWidth],
+        [columns, rowHeight, tableColumnsWidth],
     );
 
     // Table configuration
@@ -103,16 +102,13 @@ export function GravityPaginatedTable<T, F>({
                     rowVirtualizer={rowVirtualizer}
                     className={b('table')}
                     rowClassName={(row) => {
-                        if (!row?.original) {
-                            return b('row', {loading: true});
-                        }
-                        if (getRowClassName) {
+                        if (getRowClassName && row?.original) {
                             return getRowClassName(row.original) || '';
                         }
                         return '';
                     }}
                     stickyHeader
-                    size="m"
+                    size="s"
                     emptyContent={() => {
                         if (error && renderErrorMessage) {
                             return (
