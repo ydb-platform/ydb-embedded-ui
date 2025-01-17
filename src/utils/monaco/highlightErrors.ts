@@ -27,18 +27,17 @@ function highlightErrors() {
         return;
     }
 
-    const markers = errors.map((error): editor.IMarkerData => {
-        const markerColumn = error.startColumn + 1;
-        return {
+    const markers = errors.map(
+        (error): editor.IMarkerData => ({
             message: i18n('context_syntax-error'),
             source: error.message,
             severity: MarkerSeverity.Error,
             startLineNumber: error.startLine,
-            startColumn: markerColumn,
+            startColumn: error.startColumn + 1,
             endLineNumber: error.endLine,
-            endColumn: markerColumn,
-        };
-    });
+            endColumn: error.endColumn + 1,
+        }),
+    );
     editor.setModelMarkers(model, owner, markers);
 }
 
