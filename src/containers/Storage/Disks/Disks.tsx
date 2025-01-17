@@ -8,7 +8,7 @@ import {cn} from '../../../utils/cn';
 import type {PreparedVDisk} from '../../../utils/disks/types';
 import {PDisk} from '../PDisk';
 import type {StorageViewContext} from '../types';
-import {isVdiskActive} from '../utils';
+import {isVdiskActive, useVDisksWithDCMargins} from '../utils';
 
 import './Disks.scss';
 
@@ -23,6 +23,8 @@ interface DisksProps {
 
 export function Disks({vDisks = [], viewContext}: DisksProps) {
     const [highlightedVDisk, setHighlightedVDisk] = React.useState<string | undefined>();
+
+    const vDisksWithDCMargins = useVDisksWithDCMargins(vDisks);
 
     const {
         theme: {spaceBaseSize},
@@ -51,12 +53,13 @@ export function Disks({vDisks = [], viewContext}: DisksProps) {
             </Flex>
 
             <div className={b('pdisks-wrapper')}>
-                {vDisks?.map((vDisk) => (
+                {vDisks?.map((vDisk, index) => (
                     <PDiskItem
                         key={vDisk?.PDisk?.StringifiedId}
                         vDisk={vDisk}
                         highlightedVDisk={highlightedVDisk}
                         setHighlightedVDisk={setHighlightedVDisk}
+                        withDCMargin={vDisksWithDCMargins.includes(index)}
                     />
                 ))}
             </div>
@@ -70,6 +73,7 @@ interface DisksItemProps {
     highlightedVDisk: string | undefined;
     setHighlightedVDisk: (id: string | undefined) => void;
     unavailableVDiskWidth?: number;
+    withDCMargin?: boolean;
 }
 
 function VDiskItem({
@@ -103,7 +107,7 @@ function VDiskItem({
     );
 }
 
-function PDiskItem({vDisk, highlightedVDisk, setHighlightedVDisk}: DisksItemProps) {
+function PDiskItem({vDisk, highlightedVDisk, setHighlightedVDisk, withDCMargin}: DisksItemProps) {
     const vDiskId = vDisk.StringifiedId;
 
     if (!vDisk.PDisk) {
@@ -112,7 +116,7 @@ function PDiskItem({vDisk, highlightedVDisk, setHighlightedVDisk}: DisksItemProp
 
     return (
         <PDisk
-            className={b('pdisk-item')}
+            className={b('pdisk-item', {['with-dc-margin']: withDCMargin})}
             progressBarClassName={b('pdisk-progress-bar')}
             data={vDisk.PDisk}
             showPopup={highlightedVDisk === vDiskId}

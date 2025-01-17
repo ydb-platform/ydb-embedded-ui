@@ -5,7 +5,7 @@ import type {ProblemFilterValue} from '../store/reducers/settings/types';
 import {EFlag} from '../types/api/enums';
 import type {TSystemStateInfo} from '../types/api/nodes';
 import type {TNodeInfo} from '../types/api/nodesList';
-import type {NodeHostsMap} from '../types/store/nodesList';
+import type {NodesMap} from '../types/store/nodesList';
 
 import {HOUR_IN_SECONDS} from './constants';
 
@@ -31,10 +31,13 @@ export const isUnavailableNode = <
     node: T,
 ) => !node.SystemState || node.SystemState === EFlag.Grey;
 
-export const prepareNodeHostsMap = (nodesList?: TNodeInfo[]) => {
-    return nodesList?.reduce<NodeHostsMap>((nodeHosts, node) => {
-        if (node.Id && node.Host) {
-            nodeHosts.set(Number(node.Id), node.Host);
+export const prepareNodesMap = (nodesList?: TNodeInfo[]) => {
+    return nodesList?.reduce<NodesMap>((nodeHosts, node) => {
+        if (valueIsDefined(node.Id)) {
+            nodeHosts.set(node.Id, {
+                Host: node.Host,
+                DC: node.PhysicalLocation?.DataCenterId,
+            });
         }
         return nodeHosts;
     }, new Map());

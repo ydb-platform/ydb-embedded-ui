@@ -13,7 +13,7 @@ import {CLUSTER_DEFAULT_TITLE, DEFAULT_CLUSTER_TAB_KEY} from '../../../utils/con
 import {isQueryErrorResponse} from '../../../utils/query';
 import type {RootState} from '../../defaultStore';
 import {api} from '../api';
-import {selectNodeHostsMap} from '../nodesList';
+import {selectNodesMap} from '../nodesList';
 
 import type {ClusterGroupsStats, ClusterState} from './types';
 import {
@@ -181,7 +181,7 @@ export const selectClusterTitle = createSelector(
 
 export const selectClusterTabletsWithFqdn = createSelector(
     (state: RootState, clusterName?: string) => selectClusterInfo(state, clusterName),
-    (state: RootState) => selectNodeHostsMap(state),
+    (state: RootState) => selectNodesMap(state),
     (data, nodeHostsMap): (TTabletStateInfo & {fqdn?: string})[] => {
         const tablets = data?.clusterData?.SystemTablets;
         if (!tablets) {
@@ -191,7 +191,8 @@ export const selectClusterTabletsWithFqdn = createSelector(
             return tablets;
         }
         return tablets.map((tablet) => {
-            const fqdn = tablet.NodeId === undefined ? undefined : nodeHostsMap.get(tablet.NodeId);
+            const fqdn =
+                tablet.NodeId === undefined ? undefined : nodeHostsMap.get(tablet.NodeId)?.Host;
             return {...tablet, fqdn};
         });
     },

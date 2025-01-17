@@ -10,7 +10,6 @@
         display: flex;
         flex-direction: row;
         justify-content: left;
-        gap: 6px;
 
         width: max-content;
     }
@@ -27,6 +26,15 @@
 
     &__pdisk-item {
         min-width: 80px;
+        margin-right: 4px;
+
+        &_with-dc-margin {
+            margin-right: 12px;
+        }
+
+        &:last-child {
+            margin-right: 0;
+        }
     }
     &__pdisk-progress-bar {
         --progress-bar-full-height: 20px;

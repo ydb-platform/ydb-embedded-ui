@@ -4,25 +4,6 @@
         overflow: visible; // to enable stacked disks overflow the row
     }
 
-    &__vdisks-wrapper {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-
-        min-width: 500px;
-    }
-    &__vdisks-item {
-        flex-grow: 1;
-
-        max-width: 200px;
-
-        .stack__layer {
-            .data-table__row:hover & {
-                background: var(--ydb-data-table-color-hover);
-            }
-        }
-    }
-
     &__pool-name-wrapper {
         overflow: hidden;
 
