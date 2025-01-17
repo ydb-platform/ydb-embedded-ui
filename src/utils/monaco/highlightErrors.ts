@@ -1,22 +1,20 @@
 import {parseYqlQueryWithoutCursor} from '@gravity-ui/websql-autocomplete/yql';
 import {MarkerSeverity, editor} from 'monaco-editor';
 
+import i18n from './i18n';
+
 const owner = 'ydb';
 
 let errorsHighlightingTimeoutId: ReturnType<typeof setTimeout>;
 
-export function disableErrorsHighlighting(): void {
+export function updateErrorsHighlighting() {
     unHighlightErrors();
-}
-
-export function updateErrorsHighlighting(): void {
-    disableErrorsHighlighting();
 
     clearTimeout(errorsHighlightingTimeoutId);
     errorsHighlightingTimeoutId = setTimeout(() => highlightErrors(), 500);
 }
 
-function highlightErrors(): void {
+function highlightErrors() {
     const model = window.ydbEditor?.getModel();
     if (!model) {
         console.error('unable to retrieve model when highlighting errors');
@@ -29,26 +27,21 @@ function highlightErrors(): void {
         return;
     }
 
-    const markers = errors.map(
-        (error): editor.IMarkerData => ({
-            message: 'Syntax error',
+    const markers = errors.map((error): editor.IMarkerData => {
+        const markerColumn = error.startColumn + 1;
+        return {
+            message: i18n('context_syntax-error'),
             source: error.message,
             severity: MarkerSeverity.Error,
             startLineNumber: error.startLine,
-            startColumn: convertAutocompleteErrorLocationIndexToMonacoIndex(error.startColumn),
+            startColumn: markerColumn,
             endLineNumber: error.endLine,
-            endColumn: convertAutocompleteErrorLocationIndexToMonacoIndex(error.endColumn),
-        }),
-    );
+            endColumn: markerColumn,
+        };
+    });
     editor.setModelMarkers(model, owner, markers);
 }
 
 function unHighlightErrors(): void {
     editor.removeAllMarkers(owner);
-}
-
-function convertAutocompleteErrorLocationIndexToMonacoIndex(
-    autocompleteLocationIndex: number,
-): number {
-    return autocompleteLocationIndex + 1;
 }
