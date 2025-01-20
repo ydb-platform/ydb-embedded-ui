@@ -31,45 +31,62 @@ type ChunkAction<T> =
     | {type: ChunkActionType.LOAD_ERROR; chunk: number}
     | {type: ChunkActionType.RESET};
 
+export function createInitialState<T>(initialEntitiesCount?: number): ChunkData<T> {
+    const count = initialEntitiesCount ?? 0;
+    return {
+        data: count > 0 ? new Array(count).fill(undefined) : [],
+        chunkStates: new Map(),
+        foundCount: count,
+        totalCount: count,
+    };
+}
+
 export function chunksReducer<T>(state: ChunkData<T>, action: ChunkAction<T>): ChunkData<T> {
+    console.group('ChunksReducer');
+    console.log('Action:', action);
+    console.log('Previous state:', {
+        ...state,
+        chunkStates: Object.fromEntries(state.chunkStates),
+    });
+
+    let result: ChunkData<T> = state;
     switch (action.type) {
         case ChunkActionType.LOAD_START:
-            return {
+            result = {
                 ...state,
                 chunkStates: new Map(state.chunkStates).set(action.chunk, ChunkState.LOADING),
             };
+            break;
         case ChunkActionType.LOAD_SUCCESS: {
             const {data, found, total, offset} = action;
             const newLength = found || state.data.length;
 
-            // Reset rows if length changed
-            if (state.data.length !== newLength) {
-                return {
-                    data: new Array(newLength).fill(undefined),
-                    chunkStates: new Map().set(action.chunk, ChunkState.LOADED),
-                    foundCount: found,
-                    totalCount: total,
-                };
-            }
+            // Create base array - either new or copy of existing
+            const baseArray =
+                state.data.length === newLength
+                    ? state.data.slice()
+                    : new Array(newLength).fill(undefined);
 
-            // Update only the fetched range
-            const newRows = state.data.slice();
+            // Populate with new chunk data
             data.forEach((item, index) => {
                 const virtualIndex = offset + index;
                 if (virtualIndex < newLength) {
-                    newRows[virtualIndex] = item;
+                    baseArray[virtualIndex] = item;
                 }
             });
 
-            return {
-                data: newRows,
-                chunkStates: new Map(state.chunkStates).set(action.chunk, ChunkState.LOADED),
+            result = {
+                data: baseArray,
+                chunkStates: new Map(
+                    state.data.length === newLength ? state.chunkStates : undefined,
+                ).set(action.chunk, ChunkState.LOADED),
                 foundCount: found,
                 totalCount: total,
             };
+            break;
         }
         case ChunkActionType.LOAD_ERROR:
-            return {
+            result = {
                 ...state,
                 chunkStates: (() => {
                     const newChunks = new Map(state.chunkStates);
@@ -77,14 +94,18 @@ export function chunksReducer<T>(state: ChunkData<T>, action: ChunkAction<T>): C
                     return newChunks;
                 })(),
             };
+            break;
         case ChunkActionType.RESET:
-            return {
-                data: [],
-                chunkStates: new Map(),
-                foundCount: 0,
-                totalCount: 0,
-            };
+            result = createInitialState();
+            break;
         default:
-            return state;
+            break;
     }
+
+    console.log('Next state:', {
+        ...result,
+        chunkStates: Object.fromEntries(result.chunkStates),
+    });
+    console.groupEnd();
+    return result;
 }

@@ -1,22 +1,30 @@
 import React from 'react';
 
-import {ChunkActionType, ChunkState, chunksReducer} from '../reducers/chunksReducer';
+import {
+    ChunkActionType,
+    ChunkState,
+    chunksReducer,
+    createInitialState,
+} from '../reducers/chunksReducer';
+
+interface UseChunkLoaderOptions {
+    initialEntitiesCount?: number;
+}
 
 export function useChunkLoader<T>(
     startChunk: number,
     endChunk: number,
     chunkSize: number,
     fetchChunk: (offset: number) => Promise<{data: T[]; found: number; total: number}>,
+    options: UseChunkLoaderOptions = {},
 ) {
-    const [state, dispatch] = React.useReducer(chunksReducer<T>, {
-        data: [],
-        chunkStates: new Map(),
-        foundCount: 0,
-        totalCount: 0,
-    });
+    const {initialEntitiesCount} = options;
+    const [state, dispatch] = React.useReducer(
+        chunksReducer<T>,
+        createInitialState<T>(initialEntitiesCount),
+    );
 
     const [error, setError] = React.useState<Error>();
-
     React.useEffect(() => {
         async function loadChunk(chunk: number) {
             const offset = chunk * chunkSize;
@@ -51,9 +59,9 @@ export function useChunkLoader<T>(
         });
     }, [startChunk, endChunk, chunkSize, fetchChunk, state.chunkStates]);
 
-    const isLoading = state.chunkStates
-        .values()
-        .some((chunkState) => chunkState === ChunkState.LOADING);
+    const isLoading = Array.from(state.chunkStates.values()).some(
+        (chunkState) => chunkState === ChunkState.LOADING,
+    );
 
     return {
         data: state.data,

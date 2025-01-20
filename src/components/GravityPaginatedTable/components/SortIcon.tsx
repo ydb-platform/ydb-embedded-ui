@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {b} from '../shared';
 
 interface SortIconProps {
