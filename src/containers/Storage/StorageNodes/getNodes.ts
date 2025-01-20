@@ -46,6 +46,7 @@ export const getStorageNodes: FetchData<
     let response;
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('mocks')) {
+        console.log(sortField);
         // Get mock configuration from URL parameters or use defaults
         const pdisks = parseInt(urlParams.get('pdisks') || '10', 10);
         const vdisksPerPDisk = parseInt(urlParams.get('vdisksPerPDisk') || '2', 10);
@@ -56,9 +57,15 @@ export const getStorageNodes: FetchData<
                 maxPdisks: pdisks,
                 offset,
                 limit,
+                sort: sortField
+                    ? {
+                          field: sortField,
+                          order: sortOrder || 1,
+                      }
+                    : undefined,
             });
 
-            console.log('loading', limit, offset);
+            console.log('loading', limit, offset, sortField, sortOrder);
 
             setTimeout(() => res(result), 1000);
         })) as TNodesInfo;

@@ -61,13 +61,12 @@ export interface UseTableDataProps<T, F> {
 }
 
 export interface UseTableDataResult<T> {
-    data: T[];
+    data: (T | undefined)[];
     isLoading: boolean;
     error?: IResponseError;
     totalEntities: number;
     foundEntities: number;
     rowVirtualizer: Virtualizer<HTMLDivElement, HTMLTableRowElement>;
-    rows: (T | undefined)[];
 }
 
 export interface ControlsParams {

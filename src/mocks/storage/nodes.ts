@@ -165,6 +165,10 @@ const generateNode = (nodeId: number, options: NodeGeneratorOptions = {}): TNode
 interface GenerateNodesOptions extends NodeGeneratorOptions {
     offset?: number;
     limit?: number;
+    sort?: {
+        field: string;
+        order: number; // 1 for ascending, -1 for descending
+    };
 }
 
 // Keep a cache of generated nodes to maintain consistency between paginated requests
@@ -173,7 +177,7 @@ let currentTotalNodes = 50; // Default number of nodes
 
 export const generateNodes = (count?: number, options: GenerateNodesOptions = {}): TNodesInfo => {
     const totalNodes = count ?? currentTotalNodes;
-    const {offset = 0, limit = totalNodes, maxVdisksPerPDisk, maxPdisks} = options;
+    const {offset = 0, limit = totalNodes, maxVdisksPerPDisk, maxPdisks, sort} = options;
 
     // Reset cache if total nodes count changes
     if (totalNodes !== currentTotalNodes) {
@@ -188,11 +192,72 @@ export const generateNodes = (count?: number, options: GenerateNodesOptions = {}
         );
     }
 
+    // Sort nodes if sort parameters are provided
+    const sortedNodes = [...cachedNodes];
+    console.log('Sorting nodes with params:', sort);
+    if (sort?.field) {
+        console.log('Sorting by field:', sort.field, 'order:', sort.order);
+        sortedNodes.sort((a, b) => {
+            let valueA, valueB;
+
+            // Extract values based on sort field
+            switch (sort.field) {
+                case 'NodeId':
+                    valueA = a.NodeId;
+                    valueB = b.NodeId;
+                    break;
+                case 'Host':
+                    valueA = a.SystemState?.Host;
+                    valueB = b.SystemState?.Host;
+                    break;
+                case 'DC':
+                    valueA = a.SystemState?.Location?.DataCenter;
+                    valueB = b.SystemState?.Location?.DataCenter;
+                    break;
+                case 'Rack':
+                    valueA = a.SystemState?.Location?.Rack;
+                    valueB = b.SystemState?.Location?.Rack;
+                    break;
+                case 'Version':
+                    valueA = a.SystemState?.Version;
+                    valueB = b.SystemState?.Version;
+                    break;
+                case 'Uptime':
+                    valueA = a.UptimeSeconds;
+                    valueB = b.UptimeSeconds;
+                    break;
+                case 'CPU':
+                    valueA = a.CpuUsage;
+                    valueB = b.CpuUsage;
+                    break;
+                case 'DiskSpaceUsage':
+                    valueA = a.DiskSpaceUsage;
+                    valueB = b.DiskSpaceUsage;
+                    break;
+                default:
+                    valueA = 0;
+                    valueB = 0;
+            }
+
+            // Compare values
+            if (valueA === valueB) {
+                return 0;
+            }
+            if (valueA === undefined) {
+                return 1;
+            }
+            if (valueB === undefined) {
+                return -1;
+            }
+            return (valueA < valueB ? -1 : 1) * sort.order;
+        });
+    }
+
     // Calculate MaximumSlotsPerDisk and MaximumDisksPerNode across all nodes
     let maxSlotsPerDisk = 0;
     let maxDisksPerNode = 0;
 
-    cachedNodes.forEach((node) => {
+    sortedNodes.forEach((node) => {
         // Count pdisks per node
         if (node.PDisks) {
             maxDisksPerNode = Math.max(maxDisksPerNode, node.PDisks.length);
@@ -211,8 +276,8 @@ export const generateNodes = (count?: number, options: GenerateNodesOptions = {}
         }
     });
 
-    // Get the requested slice of nodes
-    const paginatedNodes = cachedNodes.slice(offset, offset + limit);
+    // Get the requested slice of sorted nodes
+    const paginatedNodes = sortedNodes.slice(offset, offset + limit);
 
     return {
         TotalNodes: totalNodes.toString(),

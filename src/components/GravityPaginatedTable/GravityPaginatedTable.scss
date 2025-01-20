@@ -1,4 +1,12 @@
 .ydb-gravity-paginated-table {
+    $block: &;
+    $cell-border: 1px solid var(--paginated-table-border-color);
+    --paginated-table-cell-vertical-padding: 5px;
+    --paginated-table-cell-horizontal-padding: 10px;
+
+    --paginated-table-border-color: var(--g-color-base-generic-hover);
+    --paginated-table-hover-color: var(--g-color-base-simple-hover-solid);
+
     &__table {
         position: relative;
 
@@ -190,6 +198,38 @@
                 white-space: nowrap;
                 text-overflow: ellipsis;
             }
+        }
+    }
+
+    &__head-cell-wrapper {
+        position: relative;
+
+        display: table-cell;
+        overflow-x: hidden;
+
+        border-bottom: $cell-border;
+    }
+
+    &__head-cell-content {
+        overflow: hidden;
+
+        width: min-content;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    &__sort-icon-container {
+        color: inherit;
+
+        &_shadow {
+            opacity: 0.15;
+        }
+    }
+
+    &__sort-icon {
+        &_desc {
+            transform: rotate(180deg);
         }
     }
 }

@@ -40,6 +40,7 @@ interface PaginatedStorageNodesTableProps {
     parentRef: React.RefObject<HTMLDivElement>;
     renderControls?: RenderControls;
     renderErrorMessage: (error: IResponseError) => React.ReactNode;
+    initialEntitiesCount?: number;
 }
 
 export const PaginatedStorageNodesTable = ({
