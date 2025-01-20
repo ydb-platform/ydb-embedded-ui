@@ -1,17 +1,17 @@
 import {parseYqlQueryWithoutCursor} from '@gravity-ui/websql-autocomplete/yql';
+import {debounce} from 'lodash';
 import {MarkerSeverity, editor} from 'monaco-editor';
 
 import i18n from './i18n';
 
 const owner = 'ydb';
 
-let errorsHighlightingTimeoutId: ReturnType<typeof setTimeout>;
+const debouncedHighlightErrors = debounce(highlightErrors, 500);
 
 export function updateErrorsHighlighting() {
     unHighlightErrors();
 
-    clearTimeout(errorsHighlightingTimeoutId);
-    errorsHighlightingTimeoutId = setTimeout(() => highlightErrors(), 500);
+    debouncedHighlightErrors();
 }
 
 function highlightErrors() {
