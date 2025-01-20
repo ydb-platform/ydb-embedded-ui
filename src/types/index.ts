@@ -29,4 +29,11 @@ export enum YQLType {
     TzDate = 'TzDate',
     TzDateTime = 'TzDateTime',
     TzTimestamp = 'TzTimestamp',
+    Date32 = 'Date32',
+    Datetime64 = 'Datetime64',
+    Timestamp64 = 'Timestamp64',
+    Interval64 = 'Interval64',
+    TzDate32 = 'TzDate32',
+    TzDatetime64 = 'TzDatetime64',
+    TzTimestamp64 = 'TzTimestamp64',
 }

@@ -126,6 +126,13 @@ export const getColumnType = (type: string) => {
         case YQLType.TzDate:
         case YQLType.TzDateTime:
         case YQLType.TzTimestamp:
+        case YQLType.Date32:
+        case YQLType.Datetime64:
+        case YQLType.Timestamp64:
+        case YQLType.Interval64:
+        case YQLType.TzDate32:
+        case YQLType.TzDatetime64:
+        case YQLType.TzTimestamp64:
             return 'date';
         default:
             return undefined;
