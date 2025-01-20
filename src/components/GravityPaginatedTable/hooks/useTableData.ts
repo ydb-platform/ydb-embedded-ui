@@ -82,11 +82,7 @@ export function useTableData<T, F>({
         {initialEntitiesCount},
     );
 
-    // Combine foundCount with initialEntitiesCount for virtualization
-    const effectiveCount = React.useMemo(
-        () => foundCount ?? initialEntitiesCount ?? 0,
-        [foundCount, initialEntitiesCount],
-    );
+    const foundEntities = foundCount ?? initialEntitiesCount;
 
     // Create throttled onRangeChange
     const throttledOnRangeChange = React.useMemo(
@@ -107,7 +103,7 @@ export function useTableData<T, F>({
 
     // Create virtualizer with effective count
     const rowVirtualizer = useRowVirtualizer({
-        count: effectiveCount,
+        count: foundEntities,
         estimateSize: () => rowHeight + TABLE_PADDINGS,
         overscan: DEFAULT_VIRTUALIZATION_OVERSCAN,
         getScrollElement: () => containerRef.current,
@@ -120,7 +116,7 @@ export function useTableData<T, F>({
         isLoading,
         error: error as IResponseError | undefined,
         totalEntities: totalCount,
-        foundEntities: effectiveCount,
+        foundEntities,
         rowVirtualizer,
     };
 }
