@@ -2,6 +2,7 @@ import React from 'react';
 
 import {useRowVirtualizer} from '@gravity-ui/table';
 import type {SortingState} from '@gravity-ui/table/tanstack';
+import {throttle} from 'lodash';
 
 import {tableDataApi} from '../../../store/reducers/tableData';
 import type {IResponseError} from '../../../types/api/error';
@@ -31,6 +32,8 @@ function convertSortingToSortParams(sorting?: SortingState): SortParams | undefi
         sortOrder: sorting[0].desc ? DESCENDING : ASCENDING,
     };
 }
+
+const THROTTLE_DELAY = 200;
 
 export function useTableData<T, F>({
     fetchData,
@@ -72,13 +75,8 @@ export function useTableData<T, F>({
         [fetchTableChunk, fetchData, filters, columns, tableName, chunkSize, sorting],
     );
 
-    // Initialize chunks state
-    const [chunks, setChunks] = React.useState({start: 0, end: 0});
-
     // Load data for visible chunks
-    const {data, isLoading, error, totalCount, foundCount} = useChunkLoader<T>(
-        chunks.start,
-        chunks.end,
+    const {data, isLoading, error, totalCount, foundCount, onRangeChange} = useChunkLoader<T>(
         chunkSize,
         fetchChunkData,
         {initialEntitiesCount},
@@ -90,6 +88,23 @@ export function useTableData<T, F>({
         [foundCount, initialEntitiesCount],
     );
 
+    // Create throttled onRangeChange
+    const throttledOnRangeChange = React.useMemo(
+        () =>
+            throttle(onRangeChange, THROTTLE_DELAY, {
+                leading: true,
+                trailing: true,
+            }),
+        [onRangeChange],
+    );
+
+    // Cleanup throttle on unmount
+    React.useEffect(() => {
+        return () => {
+            throttledOnRangeChange.cancel();
+        };
+    }, [throttledOnRangeChange]);
+
     // Create virtualizer with effective count
     const rowVirtualizer = useRowVirtualizer({
         count: effectiveCount,
@@ -97,14 +112,8 @@ export function useTableData<T, F>({
         overscan: DEFAULT_VIRTUALIZATION_OVERSCAN,
         getScrollElement: () => containerRef.current,
         useScrollendEvent: true,
+        onChange: throttledOnRangeChange,
     });
-
-    // Update chunks when virtualizer range changes
-    React.useEffect(() => {
-        const start = Math.floor((rowVirtualizer.range?.startIndex ?? 0) / chunkSize);
-        const end = Math.floor((rowVirtualizer.range?.endIndex ?? 0) / chunkSize);
-        setChunks({start, end});
-    }, [rowVirtualizer.range, chunkSize, setChunks]);
 
     return {
         data,

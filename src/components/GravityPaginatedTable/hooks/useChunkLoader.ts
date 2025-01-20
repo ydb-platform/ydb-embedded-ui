@@ -12,8 +12,6 @@ interface UseChunkLoaderOptions {
 }
 
 export function useChunkLoader<T>(
-    startChunk: number,
-    endChunk: number,
     chunkSize: number,
     fetchChunk: (offset: number) => Promise<{data: T[]; found: number; total: number}>,
     options: UseChunkLoaderOptions = {},
@@ -25,8 +23,13 @@ export function useChunkLoader<T>(
     );
 
     const [error, setError] = React.useState<Error>();
-    React.useEffect(() => {
-        async function loadChunk(chunk: number) {
+
+    const loadChunk = React.useCallback(
+        async (chunk: number) => {
+            if (state.chunkStates.has(chunk)) {
+                return;
+            }
+
             const offset = chunk * chunkSize;
             dispatch({type: ChunkActionType.LOAD_START, chunk});
 
@@ -45,19 +48,29 @@ export function useChunkLoader<T>(
                 dispatch({type: ChunkActionType.LOAD_ERROR, chunk});
                 setError(e as Error);
             }
-        }
+        },
+        [chunkSize, fetchChunk, state.chunkStates],
+    );
 
-        const visibleChunkIndices = Array.from(
-            {length: endChunk - startChunk + 1},
-            (_, i) => startChunk + i,
-        );
-
-        visibleChunkIndices.forEach((index) => {
-            if (!state.chunkStates.has(index)) {
-                loadChunk(index);
+    const onRangeChange = React.useCallback(
+        (virtualizerInstance: {range?: {startIndex: number; endIndex: number} | null}) => {
+            if (!virtualizerInstance.range) {
+                return;
             }
-        });
-    }, [startChunk, endChunk, chunkSize, fetchChunk, state.chunkStates]);
+
+            const {startIndex, endIndex} = virtualizerInstance.range;
+            const startChunk = Math.floor(startIndex / chunkSize);
+            const endChunk = Math.floor(endIndex / chunkSize);
+
+            const visibleChunkIndices = Array.from(
+                {length: endChunk - startChunk + 1},
+                (_, i) => startChunk + i,
+            );
+
+            visibleChunkIndices.forEach(loadChunk);
+        },
+        [loadChunk, chunkSize],
+    );
 
     const isLoading = Array.from(state.chunkStates.values()).some(
         (chunkState) => chunkState === ChunkState.LOADING,
@@ -69,5 +82,6 @@ export function useChunkLoader<T>(
         error,
         foundCount: state.foundCount,
         totalCount: state.totalCount,
+        onRangeChange,
     };
 }
