@@ -110,7 +110,8 @@ export function GravityPaginatedTable<T, F>({
                     className={b('table')}
                     headerClassName={b('head')}
                     sortIndicatorClassName={b('sort-indicator')}
-                    headerCellClassName={b('head-cell-wrapper')}
+                    headerCellClassName={b('head-cell')}
+                    cellClassName={b('row-cell')}
                     renderSortIndicator={({header}) => (
                         <SortIcon
                             isSorted={header.column.getIsSorted() !== false}
@@ -118,10 +119,9 @@ export function GravityPaginatedTable<T, F>({
                         />
                     )}
                     rowClassName={(row) => {
-                        if (getRowClassName && row?.original) {
-                            return getRowClassName(row.original) || '';
-                        }
-                        return '';
+                        const customClass =
+                            getRowClassName && row?.original ? getRowClassName(row.original) : '';
+                        return `${b('row')}${customClass ? ' ' + customClass : ''}`;
                     }}
                     stickyHeader
                     size="s"
@@ -159,12 +159,7 @@ export function GravityPaginatedTable<T, F>({
     };
 
     return (
-        <div
-            ref={parentRef}
-            className={b('resizeable-table-container')}
-            role="region"
-            aria-label="Paginated data table"
-        >
+        <div ref={parentRef} className={b()} role="region" aria-label="Paginated data table">
             {renderContent()}
         </div>
     );

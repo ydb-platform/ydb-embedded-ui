@@ -1,73 +1,34 @@
+@use '../../styles/mixins.scss';
+
 .ydb-gravity-paginated-table {
-    $block: &;
-    $cell-border: 1px solid var(--paginated-table-border-color);
     --paginated-table-cell-vertical-padding: 5px;
     --paginated-table-cell-horizontal-padding: 10px;
 
-    --paginated-table-border-color: var(--g-color-base-generic-hover);
     --paginated-table-hover-color: var(--g-color-base-simple-hover-solid);
 
-    &__table {
-        position: relative;
-
-        width: 100%;
-
-        border-collapse: collapse;
-        &_virtualized {
-            display: grid;
-
-            height: auto;
-
-            tbody {
-                position: relative;
-
-                display: grid;
-            }
-
-            tr {
-                position: absolute;
-
-                display: flex;
-
-                width: 100%;
-                height: auto;
-            }
-        }
-
-        thead {
-            position: sticky;
-            z-index: 1;
-            top: 0;
-
-            background: var(--g-color-base-background);
-        }
-
-        tbody {
-            position: relative;
-        }
-
-        tr {
-            display: flex;
-
-            width: 100%;
-        }
-
-        td,
-        th {
-            display: flex;
-            flex: 1;
-            align-items: center;
-
-            min-width: 0;
-        }
-    }
-
-    &__resizeable-table-container {
+    &__head-cell {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
+        align-items: center;
 
         width: 100%;
-        height: 100%;
+        max-width: 100%;
+        padding: var(--paginated-table-cell-vertical-padding)
+            var(--paginated-table-cell-horizontal-padding);
+
+        &_align {
+            &_left {
+                justify-content: left;
+            }
+            &_center {
+                justify-content: center;
+            }
+            &_right {
+                justify-content: right;
+            }
+        }
+
+        @include mixins.body-2-typography();
     }
 
     &__virtualized-content {
@@ -80,134 +41,50 @@
         height: 90vh;
     }
 
-    &__error-message {
-        margin: 16px;
-        padding: 16px;
-
-        text-align: center;
-
-        color: var(--g-color-text-danger);
-        border-radius: 4px;
-        background-color: var(--g-color-danger-light);
-    }
-
-    &__empty-message {
-        padding: 16px;
-
-        text-align: center;
-
-        color: var(--g-color-text-secondary);
-    }
-
-    &__loading,
-    &__loading-more {
-        margin: 16px;
-        padding: 16px;
-
-        text-align: center;
-
-        color: var(--g-color-text-secondary);
-        border-radius: 4px;
-        background-color: var(--g-color-base-generic);
-    }
-
-    &__loading-more {
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-
-        margin: 8px;
-        padding: 8px 16px;
-
-        font-size: 14px;
-
-        border-radius: 16px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-        transform: translateX(-50%);
-    }
-
-    &__loading-cell {
-        display: flex;
-        align-items: center;
-
-        width: 100%;
-        height: 100%;
-        padding: 8px 16px;
-    }
-
     &__row {
-        &_loading {
-            opacity: 0.5;
+        position: relative;
+        z-index: 1;
+
+        // Performance optimization for row hovering.
+        transform: translateZ(0);
+
+        &:hover {
+            background: var(--paginated-table-hover-color);
         }
 
         &_empty {
-            td {
-                justify-content: center;
+            &:hover {
+                background-color: initial;
             }
         }
     }
 
     &__row-cell {
-        overflow: hidden;
+        display: table-cell;
+        overflow-x: hidden;
 
-        padding: 8px 16px;
+        width: 100%;
+        max-width: 100%;
+        padding: var(--paginated-table-cell-vertical-padding)
+            var(--paginated-table-cell-horizontal-padding);
 
+        vertical-align: middle;
         white-space: nowrap;
         text-overflow: ellipsis;
 
         &_align {
             &_left {
-                justify-content: flex-start;
+                text-align: left;
             }
             &_center {
-                justify-content: center;
+                text-align: center;
             }
             &_right {
-                justify-content: flex-end;
+                text-align: right;
             }
         }
-    }
 
-    &__row-skeleton {
-        width: 100%;
-        height: 20px;
-
-        &::after {
-            animation: none !important;
-        }
-    }
-
-    &__head {
-        &-cell {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-
-            width: 100%;
-            height: 100%;
-            padding: 8px 16px;
-
-            font-weight: 500;
-
-            color: var(--g-color-text-secondary);
-
-            &-content {
-                overflow: hidden;
-
-                white-space: nowrap;
-                text-overflow: ellipsis;
-            }
-        }
-    }
-
-    &__head-cell-wrapper {
-        position: relative;
-
-        display: table-cell;
-        overflow-x: hidden;
-
-        border-bottom: $cell-border;
+        @include mixins.body-2-typography();
     }
 
     &__head-cell-content {
