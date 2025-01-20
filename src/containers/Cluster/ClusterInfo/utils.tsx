@@ -78,9 +78,9 @@ export const getInfo = (cluster: TClusterInfo, additionalInfo: InfoItem[]) => {
 /**
  * parses stringified json in format {url: "href"}
  */
-function prepareClusterLink(rawLink?: string) {
+function prepareClusterCoresLink(rawCoresString?: string) {
     try {
-        const linkObject = parseJson(rawLink) as unknown;
+        const linkObject = parseJson(rawCoresString) as unknown;
 
         if (
             linkObject &&
@@ -95,26 +95,56 @@ function prepareClusterLink(rawLink?: string) {
     return undefined;
 }
 
+/**
+ * parses stringified json in format {url: "href", slo_logs_url: "href"}
+ */
+function prepareClusterLoggingLinks(rawLoggingString?: string) {
+    try {
+        const linkObject = parseJson(rawLoggingString) as unknown;
+
+        if (linkObject && typeof linkObject === 'object') {
+            const logsUrl =
+                'url' in linkObject && typeof linkObject.url === 'string'
+                    ? linkObject.url
+                    : undefined;
+            const sloLogsUrl =
+                'slo_logs_url' in linkObject && typeof linkObject.slo_logs_url === 'string'
+                    ? linkObject.slo_logs_url
+                    : undefined;
+            return {logsUrl, sloLogsUrl};
+        }
+    } catch {}
+
+    return {};
+}
+
 export function useClusterLinks() {
     const {cores, logging} = useClusterBaseInfo();
 
     return React.useMemo(() => {
         const result: ClusterLink[] = [];
 
-        const coresLink = prepareClusterLink(cores);
-        const loggingLink = prepareClusterLink(logging);
+        const coresUrl = prepareClusterCoresLink(cores);
+        const {logsUrl, sloLogsUrl} = prepareClusterLoggingLinks(logging);
 
-        if (coresLink) {
+        if (coresUrl) {
             result.push({
                 title: i18n('link_cores'),
-                url: coresLink,
+                url: coresUrl,
             });
         }
 
-        if (loggingLink) {
+        if (logsUrl) {
             result.push({
                 title: i18n('link_logging'),
-                url: loggingLink,
+                url: logsUrl,
+            });
+        }
+
+        if (sloLogsUrl) {
+            result.push({
+                title: i18n('link_slo-logs'),
+                url: sloLogsUrl,
             });
         }
 
