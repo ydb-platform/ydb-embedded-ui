@@ -10,7 +10,8 @@ import type {VersionToColorMap} from '../../../types/versions';
 import i18n from '../i18n';
 
 import {b} from './shared';
-import {getInfo, useClusterLinks} from './utils';
+import {useClusterLinks} from './utils/useClusterLinks';
+import {getInfo} from './utils/utils';
 
 import './ClusterInfo.scss';
 
