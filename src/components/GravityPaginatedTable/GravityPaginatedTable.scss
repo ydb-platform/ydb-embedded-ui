@@ -16,6 +16,8 @@
         padding: var(--paginated-table-cell-vertical-padding)
             var(--paginated-table-cell-horizontal-padding);
 
+        @include mixins.body-2-typography();
+
         &_align {
             &_left {
                 justify-content: left;
@@ -27,8 +29,6 @@
                 justify-content: right;
             }
         }
-
-        @include mixins.body-2-typography();
     }
 
     &__virtualized-content {
@@ -59,9 +59,11 @@
         }
     }
 
-    &__row-cell {
-        display: table-cell;
+    &__row-cell,
+    &__loading-cell {
+        display: flex;
         overflow-x: hidden;
+        align-items: center;
 
         width: 100%;
         max-width: 100%;
@@ -71,6 +73,8 @@
         vertical-align: middle;
         white-space: nowrap;
         text-overflow: ellipsis;
+
+        @include mixins.body-2-typography();
 
         &_align {
             &_left {
@@ -83,8 +87,11 @@
                 text-align: right;
             }
         }
+    }
 
-        @include mixins.body-2-typography();
+    &__row-skeleton {
+        width: 80%;
+        height: 50%;
     }
 
     &__head-cell-content {

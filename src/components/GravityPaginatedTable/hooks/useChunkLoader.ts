@@ -78,7 +78,7 @@ export function useChunkLoader<T>(
 
     const resetTableData = React.useCallback(() => {
         dispatch({type: ChunkActionType.RESET, initialEntitiesCount});
-    }, []);
+    }, [initialEntitiesCount]);
 
     return {
         data: state.data,
