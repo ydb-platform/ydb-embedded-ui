@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {ShieldKeyhole} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
 import {Icon, Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
@@ -60,7 +58,7 @@ const typeColumn: StorageGroupsColumn = {
     resizeMinWidth: 100,
     align: DataTable.LEFT,
     render: ({row}) => (
-        <React.Fragment>
+        <div>
             <Label>{row.MediaType || '—'}</Label>
             {'\u00a0'}
             {row.Encryption && (
@@ -74,7 +72,7 @@ const typeColumn: StorageGroupsColumn = {
                     </Label>
                 </Popover>
             )}
-        </React.Fragment>
+        </div>
     ),
     sortable: false,
 };
