@@ -8,7 +8,7 @@ import i18n from '../../i18n';
 /**
  * parses stringified json in format {url: "href"}
  */
-function prepareClusterCoresLink(rawCoresString?: string) {
+export function prepareClusterCoresLink(rawCoresString?: string) {
     try {
         const linkObject = parseJson(rawCoresString) as unknown;
 
@@ -28,7 +28,7 @@ function prepareClusterCoresLink(rawCoresString?: string) {
 /**
  * parses stringified json in format {url: "href", slo_logs_url: "href"}
  */
-function prepareClusterLoggingLinks(rawLoggingString?: string) {
+export function prepareClusterLoggingLinks(rawLoggingString?: string) {
     try {
         const linkObject = parseJson(rawLoggingString) as unknown;
 
