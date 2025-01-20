@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {Table, useTable} from '@gravity-ui/table';
-import type {SortingState} from '@gravity-ui/table/tanstack';
+import type {SortingState, Updater} from '@gravity-ui/table/tanstack';
 import {ErrorBoundary} from 'react-error-boundary';
 
 import {useAutoRefreshInterval} from '../../utils/hooks';
@@ -39,17 +39,18 @@ export function GravityPaginatedTable<T, F>({
     const containerRef = React.useRef<HTMLDivElement>(null);
 
     // Table data management with virtualizer
-    const {data, isLoading, error, totalEntities, foundEntities, rowVirtualizer} = useTableData({
-        fetchData,
-        filters,
-        tableName,
-        columns,
-        autoRefreshInterval,
-        rowHeight,
-        containerRef,
-        initialEntitiesCount,
-        sorting,
-    });
+    const {data, isLoading, error, totalEntities, foundEntities, rowVirtualizer, resetTableData} =
+        useTableData({
+            fetchData,
+            filters,
+            tableName,
+            columns,
+            autoRefreshInterval,
+            rowHeight,
+            containerRef,
+            initialEntitiesCount,
+            sorting,
+        });
 
     // Table columns configuration
     const tableColumns = React.useMemo(
@@ -62,6 +63,14 @@ export function GravityPaginatedTable<T, F>({
         [columns, rowHeight, tableColumnsWidth],
     );
 
+    const onSortingChange = React.useCallback(
+        (newSorting: Updater<SortingState>) => {
+            resetTableData();
+            setSorting(newSorting);
+        },
+        [resetTableData],
+    );
+
     // Table configuration
     const table = useTable({
         columns: tableColumns,
@@ -71,7 +80,7 @@ export function GravityPaginatedTable<T, F>({
         manualPagination: true,
         enableSorting: true,
         manualSorting: true,
-        onSortingChange: setSorting,
+        onSortingChange,
         state: {
             sorting,
         },

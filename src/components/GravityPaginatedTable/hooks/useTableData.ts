@@ -76,11 +76,8 @@ export function useTableData<T, F>({
     );
 
     // Load data for visible chunks
-    const {data, isLoading, error, totalCount, foundCount, onRangeChange} = useChunkLoader<T>(
-        chunkSize,
-        fetchChunkData,
-        {initialEntitiesCount},
-    );
+    const {data, isLoading, error, totalCount, foundCount, onRangeChange, resetTableData} =
+        useChunkLoader<T>(chunkSize, fetchChunkData, {initialEntitiesCount});
 
     const foundEntities = foundCount ?? initialEntitiesCount;
 
@@ -118,5 +115,6 @@ export function useTableData<T, F>({
         totalEntities: totalCount,
         foundEntities,
         rowVirtualizer,
+        resetTableData,
     };
 }

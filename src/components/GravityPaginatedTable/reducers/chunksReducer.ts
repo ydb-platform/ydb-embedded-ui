@@ -29,7 +29,7 @@ type ChunkAction<T> =
           chunkSize: number;
       }
     | {type: ChunkActionType.LOAD_ERROR; chunk: number}
-    | {type: ChunkActionType.RESET};
+    | {type: ChunkActionType.RESET; initialEntitiesCount: number};
 
 export function createInitialState<T>(initialEntitiesCount?: number): ChunkData<T> {
     const count = initialEntitiesCount ?? 0;
@@ -96,7 +96,7 @@ export function chunksReducer<T>(state: ChunkData<T>, action: ChunkAction<T>): C
             };
             break;
         case ChunkActionType.RESET:
-            result = createInitialState();
+            result = createInitialState(action.initialEntitiesCount);
             break;
         default:
             break;

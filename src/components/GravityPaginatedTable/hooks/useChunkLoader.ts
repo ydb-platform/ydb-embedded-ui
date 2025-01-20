@@ -8,13 +8,13 @@ import {
 } from '../reducers/chunksReducer';
 
 interface UseChunkLoaderOptions {
-    initialEntitiesCount?: number;
+    initialEntitiesCount: number;
 }
 
 export function useChunkLoader<T>(
     chunkSize: number,
     fetchChunk: (offset: number) => Promise<{data: T[]; found: number; total: number}>,
-    options: UseChunkLoaderOptions = {},
+    options: UseChunkLoaderOptions,
 ) {
     const {initialEntitiesCount} = options;
     const [state, dispatch] = React.useReducer(
@@ -76,6 +76,10 @@ export function useChunkLoader<T>(
         (chunkState) => chunkState === ChunkState.LOADING,
     );
 
+    const resetTableData = React.useCallback(() => {
+        dispatch({type: ChunkActionType.RESET, initialEntitiesCount});
+    }, []);
+
     return {
         data: state.data,
         isLoading,
@@ -83,5 +87,6 @@ export function useChunkLoader<T>(
         foundCount: state.foundCount,
         totalCount: state.totalCount,
         onRangeChange,
+        resetTableData,
     };
 }

@@ -67,6 +67,7 @@ export interface UseTableDataResult<T> {
     totalEntities: number;
     foundEntities: number;
     rowVirtualizer: Virtualizer<HTMLDivElement, HTMLTableRowElement>;
+    resetTableData: () => void;
 }
 
 export interface ControlsParams {
