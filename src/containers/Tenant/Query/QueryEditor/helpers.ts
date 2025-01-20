@@ -13,6 +13,7 @@ const EDITOR_OPTIONS: EditorOptions = {
     minimap: {
         enabled: false,
     },
+    fixedOverflowWidgets: true,
 };
 
 export function useEditorOptions() {
