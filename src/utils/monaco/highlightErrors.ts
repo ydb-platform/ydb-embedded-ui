@@ -1,6 +1,10 @@
+import React from 'react';
+
 import {parseYqlQueryWithoutCursor} from '@gravity-ui/websql-autocomplete/yql';
 import {debounce} from 'lodash';
 import {MarkerSeverity, editor} from 'monaco-editor';
+
+import {useCancellableFunction} from '../hooks/useCancellable';
 
 import i18n from './i18n';
 
@@ -8,10 +12,14 @@ const owner = 'ydb';
 
 const debouncedHighlightErrors = debounce(highlightErrors, 500);
 
-export function updateErrorsHighlighting() {
-    unHighlightErrors();
+export function useUpdateErrorsHighlighting() {
+    const highlightErrors = useCancellableFunction(debouncedHighlightErrors);
+    const updateErrorsHighlighting = React.useCallback(() => {
+        unHighlightErrors();
 
-    debouncedHighlightErrors();
+        highlightErrors();
+    }, [highlightErrors]);
+    return updateErrorsHighlighting;
 }
 
 function highlightErrors() {
