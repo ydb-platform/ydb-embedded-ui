@@ -173,7 +173,6 @@ export function useQueryInfoMenuItems({
     }, [queryResultsInfo, hasPlanToSvg, blobUrl, getPlanToSvg, database]);
 
     return {
-        error,
         isLoading,
         items,
     };
