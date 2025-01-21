@@ -28,6 +28,8 @@ export function prepareCommonErrorMessage(err: unknown): string {
         const responseError = err as IResponseError;
         if (responseError.data?.message) {
             return responseError.data.message;
+        } else if (typeof responseError.data === 'string') {
+            return responseError.data;
         }
     }
 

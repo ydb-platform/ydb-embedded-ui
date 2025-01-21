@@ -38,17 +38,15 @@ test.describe('Test Plan to SVG functionality', async () => {
         }).toPass();
 
         // 4. Check if dropdown button appears and click it to open menu
-        const dropdownButton = page.locator('.query-info-switcher-wrapper');
+        const dropdownButton = page.locator('.query-info-dropdown__query-info-switcher-wrapper');
         await expect(dropdownButton).toBeVisible();
         await dropdownButton.click();
 
         // 5. Verify dropdown menu items are visible
         const openInNewTabOption = page.locator('text="Open Execution Plan"');
         const downloadPlanOption = page.locator('text="Download Execution Plan"');
-        const downloadDiagnosticsOption = page.locator('text="Download Diagnostics"');
         await expect(openInNewTabOption).toBeVisible();
         await expect(downloadPlanOption).toBeVisible();
-        await expect(downloadDiagnosticsOption).toBeVisible();
 
         // 6. Click "Open Execution Plan" option
         await openInNewTabOption.click();
@@ -76,7 +74,7 @@ test.describe('Test Plan to SVG functionality', async () => {
         }).toPass();
 
         // 4. Click dropdown button to open menu
-        const dropdownButton = page.locator('.query-info-switcher-wrapper');
+        const dropdownButton = page.locator('.query-info-dropdown__query-info-switcher-wrapper');
         await dropdownButton.click();
 
         // 5. Setup download listener before clicking download
@@ -112,12 +110,12 @@ test.describe('Test Plan to SVG functionality', async () => {
             route.fulfill({
                 status: 500,
                 contentType: 'application/json',
-                body: JSON.stringify({message: 'Failed to generate SVG'}),
+                body: 'Failed to generate SVG',
             });
         });
 
         // 5. Click dropdown button to open menu
-        const dropdownButton = page.locator('.query-info-switcher-wrapper');
+        const dropdownButton = page.locator('.query-info-dropdown__query-info-switcher-wrapper');
         await dropdownButton.click();
 
         // 6. Click "Open Execution Plan" option and wait for error state
@@ -128,21 +126,18 @@ test.describe('Test Plan to SVG functionality', async () => {
         // 7. Close the dropdown
         await page.keyboard.press('Escape');
 
-        // 8. Verify error state
-        await expect(dropdownButton).toHaveClass(/flat-danger/);
+        // 8. Verify error toast appears
+        const errorToast = page.locator('.g-toast.g-toast_theme_danger');
+        await expect(errorToast).toBeVisible();
 
-        // 9. Verify error tooltip
-        await dropdownButton.hover();
-        await page.waitForTimeout(500); // Wait for tooltip animation
-        const tooltipText = await page.textContent('.g-tooltip');
-        expect(tooltipText).toContain('Error');
-        expect(tooltipText).toContain('Failed to generate SVG');
+        // 9. Verify error message in toast
+        const toastTitle = errorToast.locator('.g-toast__title');
+        await expect(toastTitle).toContainText('Error');
 
-        // 10. Verify dropdown is disabled after error
+        // 10. Verify dropdown is still enabled and functional
         await dropdownButton.click();
-        await expect(openExecutionPlanOption).not.toBeVisible();
-        await expect(page.locator('text="Download Execution Plan"')).not.toBeVisible();
-        await expect(page.locator('text="Download Diagnostics"')).not.toBeVisible();
+        await expect(openExecutionPlanOption).toBeVisible();
+        await expect(page.locator('text="Download Execution Plan"')).toBeVisible();
     });
 
     test('Statistics setting becomes disabled when execution plan experiment is enabled', async ({
