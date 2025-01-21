@@ -2,8 +2,8 @@ import {Ellipsis} from '@gravity-ui/icons';
 import type {ButtonProps} from '@gravity-ui/uikit';
 import {Button, DropdownMenu} from '@gravity-ui/uikit';
 
-import type {QueryResultsInfo} from './useQueryInfoMenuItems';
 import {useQueryInfoMenuItems} from './useQueryInfoMenuItems';
+import type {QueryResultsInfo} from './utils';
 
 import './QueryInfoDropdown.scss';
 

@@ -190,9 +190,9 @@ export function QueryResultViewer({
         return (
             <QueryInfoDropdown
                 queryResultsInfo={{
+                    queryText,
                     ast: data.ast,
                     stats: data.stats,
-                    queryText,
                     plan: data.plan,
                 }}
                 error={error}
