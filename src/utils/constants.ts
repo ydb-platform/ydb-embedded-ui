@@ -102,7 +102,6 @@ export const LAST_QUERY_EXECUTION_SETTINGS_KEY = 'last_query_execution_settings'
 export const QUERY_SETTINGS_BANNER_LAST_CLOSED_KEY = 'querySettingsBannerLastClosed';
 
 export const LAST_USED_QUERY_ACTION_KEY = 'last_used_query_action';
-export const LAST_USED_QUERY_TEXT = 'last_used_query_text';
 
 export const PARTITIONS_HIDDEN_COLUMNS_KEY = 'partitionsHiddenColumns';
 
