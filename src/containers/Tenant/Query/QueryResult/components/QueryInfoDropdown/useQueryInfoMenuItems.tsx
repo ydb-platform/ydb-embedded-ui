@@ -7,6 +7,7 @@ import {Text} from '@gravity-ui/uikit';
 import {planToSvgApi} from '../../../../../../store/reducers/planToSvg';
 import type {QueryPlan, ScriptPlan, TKqpStatsQuery} from '../../../../../../types/api/query';
 import {cn} from '../../../../../../utils/cn';
+import createToast from '../../../../../../utils/createToast';
 import {prepareCommonErrorMessage} from '../../../../../../utils/errors';
 import i18n from '../../i18n';
 const b = cn('query-info-dropdown');
@@ -45,7 +46,6 @@ export function useQueryInfoMenuItems({
     database,
     hasPlanToSvg,
 }: UseQueryInfoMenuItemsProps) {
-    const [error, setError] = React.useState<string | null>(null);
     const [blobUrl, setBlobUrl] = React.useState<string | null>(null);
     const [getPlanToSvg, {isLoading}] = planToSvgApi.useLazyPlanToSvgQueryQuery();
 
@@ -73,11 +73,15 @@ export function useQueryInfoMenuItems({
                         const blob = new Blob([result], {type: 'image/svg+xml'});
                         const url = URL.createObjectURL(blob);
                         setBlobUrl(url);
-                        setError(null);
                         return url;
                     })
                     .catch((err) => {
-                        setError(prepareCommonErrorMessage(err));
+                        const errorMessage = prepareCommonErrorMessage(err);
+                        createToast({
+                            title: i18n('text_error-plan-svg', {error: errorMessage}),
+                            name: 'plan-svg-error',
+                            type: 'error',
+                        });
                         return null;
                     });
             };

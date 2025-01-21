@@ -1,8 +1,6 @@
 import {Ellipsis} from '@gravity-ui/icons';
 import type {ButtonProps} from '@gravity-ui/uikit';
-import {Button, DropdownMenu, Tooltip} from '@gravity-ui/uikit';
-
-import i18n from '../../i18n';
+import {Button, DropdownMenu} from '@gravity-ui/uikit';
 
 import type {QueryResultsInfo} from './useQueryInfoMenuItems';
 import {useQueryInfoMenuItems} from './useQueryInfoMenuItems';
@@ -20,7 +18,7 @@ export function QueryInfoDropdown({
     database,
     hasPlanToSvg,
 }: QueryInfoDropdownProps) {
-    const {error, isLoading, items} = useQueryInfoMenuItems({
+    const {isLoading, items} = useQueryInfoMenuItems({
         queryResultsInfo,
         database,
         hasPlanToSvg,
@@ -28,13 +26,11 @@ export function QueryInfoDropdown({
 
     const renderSwitcher = (props: ButtonProps) => {
         return (
-            <Tooltip content={error ? i18n('text_error-plan-svg', {error}) : i18n('text_plan-svg')}>
-                <Button view="flat-secondary" loading={isLoading} disabled={isLoading} {...props}>
-                    <Button.Icon>
-                        <Ellipsis />
-                    </Button.Icon>
-                </Button>
-            </Tooltip>
+            <Button view="flat-secondary" loading={isLoading} disabled={isLoading} {...props}>
+                <Button.Icon>
+                    <Ellipsis />
+                </Button.Icon>
+            </Button>
         );
     };
 
