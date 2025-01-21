@@ -100,6 +100,14 @@ const degradedColumn: StorageGroupsColumn = {
     align: DataTable.LEFT,
     defaultOrder: DataTable.DESCENDING,
 };
+const stateColumn: StorageGroupsColumn = {
+    name: STORAGE_GROUPS_COLUMNS_IDS.State,
+    header: STORAGE_GROUPS_COLUMNS_TITLES.State,
+    width: 150,
+    render: ({row}) => row.State ?? EMPTY_DATA_PLACEHOLDER,
+    align: DataTable.LEFT,
+    defaultOrder: DataTable.DESCENDING,
+};
 
 const usageColumn: StorageGroupsColumn = {
     name: STORAGE_GROUPS_COLUMNS_IDS.Usage,
@@ -273,6 +281,7 @@ export const getStorageGroupsColumns: StorageColumnsGetter = (data) => {
         typeColumn,
         erasureColumn,
         degradedColumn,
+        stateColumn,
         usageColumn,
         diskSpaceUsageColumn,
         usedColumn,
