@@ -12,10 +12,12 @@ export enum ObjectSummaryTab {
     Schema = 'Schema',
 }
 export class ObjectSummary {
+    private page: Page;
     private tabs: Locator;
     private schemaViewer: Locator;
     private tree: Locator;
     private treeRows: Locator;
+    private treeLoaders: Locator;
     private primaryKeys: Locator;
     private actionsMenu: ActionsMenu;
     private aclWrapper: Locator;
@@ -34,8 +36,10 @@ export class ObjectSummary {
     private overviewWrapper: Locator;
 
     constructor(page: Page) {
+        this.page = page;
         this.tree = page.locator('.ydb-object-summary__tree');
         this.treeRows = page.locator('.ydb-tree-view');
+        this.treeLoaders = page.locator('.ydb-navigation-tree-view-loader');
         this.tabs = page.locator('.ydb-object-summary__tabs');
         this.schemaViewer = page.locator('.schema-viewer');
         this.primaryKeys = page.locator('.schema-viewer__keys_type_primary');
@@ -166,6 +170,16 @@ export class ObjectSummary {
         return true;
     }
 
+    async isTreeLoaded() {
+        const loaders = await this.treeLoaders.all();
+
+        for (const loader of loaders) {
+            await loader.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
+        }
+
+        return true;
+    }
+
     async isTreeHidden() {
         await this.tree.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
         return true;
@@ -181,8 +195,61 @@ export class ObjectSummary {
         return true;
     }
 
+    async getTreeItem(text: string) {
+        // Ensure tree is ready for the search
+        await this.isTreeVisible();
+        await this.isTreeLoaded();
+
+        const itemLocator = this.treeRows.filter({hasText: text}).first();
+
+        // Default timeout is too big for such case
+        const timeout = 500;
+
+        if (await itemLocator.isVisible({timeout})) {
+            return itemLocator;
+        }
+
+        // Element could be in not rendered (virtualized) part of the tree
+        // Such element cannot be found by playwright
+        // Scroll 200px * 10 from top to bottom to find element
+        // Firstly scroll to top in case tree was already scrolled down
+        await this.tree.evaluate((e) => {
+            e.scrollTo({top: 0, behavior: 'instant'});
+        });
+
+        // Wait after scroll for elements to become stable
+        await this.page.waitForTimeout(50);
+
+        if (await itemLocator.isVisible({timeout})) {
+            return itemLocator;
+        }
+
+        // Hover element so page.mouse.wheel work for it
+        await this.tree.hover();
+
+        // Start scrolling from top to bottom untill desired element is found
+        let i = 0;
+        while (i < 10) {
+            i++;
+
+            await this.page.mouse.wheel(0, 200);
+
+            // Wait after scroll for elements to become stable
+            await this.page.waitForTimeout(50);
+
+            // Some nested nodes could be loading
+            await this.isTreeLoaded();
+
+            if (await itemLocator.isVisible({timeout})) {
+                return itemLocator;
+            }
+        }
+
+        throw new Error(`Tree item ${text} was not found`);
+    }
+
     async isOpenPreviewIconVisibleOnHover(text: string): Promise<boolean> {
-        const treeItem = this.treeRows.filter({hasText: text}).first();
+        const treeItem = await this.getTreeItem(text);
         await treeItem.hover();
 
         const openPreviewIcon = treeItem.locator('button[title="Open preview"]');
@@ -196,7 +263,7 @@ export class ObjectSummary {
     }
 
     async clickPreviewButton(text: string): Promise<void> {
-        const treeItem = this.treeRows.filter({hasText: text}).first();
+        const treeItem = await this.getTreeItem(text);
         await treeItem.hover();
 
         const openPreviewIcon = treeItem.locator('button[title="Open preview"]');
@@ -204,7 +271,7 @@ export class ObjectSummary {
     }
 
     async clickActionsButton(text: string): Promise<void> {
-        const treeItem = this.treeRows.filter({hasText: text}).first();
+        const treeItem = await this.getTreeItem(text);
         await treeItem.hover();
 
         const actionsIcon = treeItem.locator('.g-dropdown-menu__switcher-button');
