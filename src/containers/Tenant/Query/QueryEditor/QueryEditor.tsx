@@ -31,6 +31,7 @@ import {
     DEFAULT_IS_QUERY_RESULT_COLLAPSED,
     DEFAULT_SIZE_RESULT_PANE_KEY,
     LAST_USED_QUERY_ACTION_KEY,
+    LAST_USED_QUERY_TEXT,
 } from '../../../../utils/constants';
 import {
     useEventHandler,
@@ -104,6 +105,8 @@ export default function QueryEditor(props: QueryEditorProps) {
         LAST_USED_QUERY_ACTION_KEY,
     );
 
+    const [lastUsedQueryText, setLastUsedQueryText] = useSetting<string>(LAST_USED_QUERY_TEXT);
+
     const [sendQuery] = queryApi.useUseSendQueryMutation();
 
     React.useEffect(() => {
@@ -140,6 +143,7 @@ export default function QueryEditor(props: QueryEditorProps) {
         const query = text ?? input;
 
         setLastUsedQueryAction(QUERY_ACTIONS.execute);
+        setLastUsedQueryText(query);
         if (!isEqual(lastQueryExecutionSettings, querySettings)) {
             resetBanner();
             setLastQueryExecutionSettings(querySettings);
@@ -172,7 +176,7 @@ export default function QueryEditor(props: QueryEditorProps) {
 
     const handleGetExplainQueryClick = useEventHandler(() => {
         setLastUsedQueryAction(QUERY_ACTIONS.explain);
-
+        setLastUsedQueryText(input);
         if (!isEqual(lastQueryExecutionSettings, querySettings)) {
             resetBanner();
             setLastQueryExecutionSettings(querySettings);
@@ -368,6 +372,7 @@ export default function QueryEditor(props: QueryEditorProps) {
                         tenantName={tenantName}
                         path={path}
                         showPreview={showPreview}
+                        queryText={lastUsedQueryText}
                     />
                 </div>
             </SplitPane>
@@ -386,6 +391,7 @@ interface ResultProps {
     tenantName: string;
     path: string;
     showPreview?: boolean;
+    queryText: string;
 }
 function Result({
     resultVisibilityState,
@@ -397,6 +403,7 @@ function Result({
     tenantName,
     path,
     showPreview,
+    queryText,
 }: ResultProps) {
     if (showPreview) {
         return <Preview database={tenantName} path={path} type={type} />;
@@ -412,6 +419,7 @@ function Result({
                 isResultsCollapsed={resultVisibilityState.collapsed}
                 onExpandResults={onExpandResultHandler}
                 onCollapseResults={onCollapseResultHandler}
+                queryText={queryText}
             />
         );
     }
