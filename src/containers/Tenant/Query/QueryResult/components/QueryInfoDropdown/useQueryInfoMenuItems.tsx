@@ -9,6 +9,7 @@ import type {QueryPlan, ScriptPlan, TKqpStatsQuery} from '../../../../../../type
 import {cn} from '../../../../../../utils/cn';
 import createToast from '../../../../../../utils/createToast';
 import {prepareCommonErrorMessage} from '../../../../../../utils/errors';
+import {parseQueryError} from '../../../../../../utils/query';
 import i18n from '../../i18n';
 const b = cn('query-info-dropdown');
 
@@ -35,16 +36,24 @@ export interface QueryResultsInfo {
     plan?: QueryPlan | ScriptPlan;
 }
 
-interface UseQueryInfoMenuItemsProps {
+export interface DiagnosticsData extends QueryResultsInfo {
+    database: string;
+    timestamp: string;
+    error?: ReturnType<typeof parseQueryError>;
+}
+
+export interface UseQueryInfoMenuItemsProps {
     queryResultsInfo: QueryResultsInfo;
     database: string;
     hasPlanToSvg: boolean;
+    error?: unknown;
 }
 
 export function useQueryInfoMenuItems({
     queryResultsInfo,
     database,
     hasPlanToSvg,
+    error,
 }: UseQueryInfoMenuItemsProps) {
     const [blobUrl, setBlobUrl] = React.useState<string | null>(null);
     const [getPlanToSvg, {isLoading}] = planToSvgApi.useLazyPlanToSvgQueryQuery();
@@ -135,10 +144,12 @@ export function useQueryInfoMenuItems({
 
         if (queryResultsInfo) {
             const handleDiagnosticsDownload = () => {
-                const diagnosticsData = {
+                const parsedError = error ? parseQueryError(error) : undefined;
+                const diagnosticsData: DiagnosticsData = {
                     ...queryResultsInfo,
                     database,
                     timestamp: new Date().toISOString(),
+                    ...(parsedError && {error: parsedError}),
                 };
 
                 const blob = new Blob([JSON.stringify(diagnosticsData, null, 2)], {

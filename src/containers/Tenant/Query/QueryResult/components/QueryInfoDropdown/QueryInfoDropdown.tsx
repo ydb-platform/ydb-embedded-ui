@@ -7,21 +7,24 @@ import {useQueryInfoMenuItems} from './useQueryInfoMenuItems';
 
 import './QueryInfoDropdown.scss';
 
-interface QueryInfoDropdownProps {
+export interface QueryInfoDropdownProps {
     queryResultsInfo: QueryResultsInfo;
     database: string;
     hasPlanToSvg: boolean;
+    error?: unknown;
 }
 
 export function QueryInfoDropdown({
     queryResultsInfo,
     database,
     hasPlanToSvg,
+    error,
 }: QueryInfoDropdownProps) {
     const {isLoading, items} = useQueryInfoMenuItems({
         queryResultsInfo,
         database,
         hasPlanToSvg,
+        error,
     });
 
     const renderSwitcher = (props: ButtonProps) => {

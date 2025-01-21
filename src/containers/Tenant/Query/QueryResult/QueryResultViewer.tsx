@@ -183,6 +183,10 @@ export function QueryResultViewer({
     };
 
     const renderQueryInfoDropdown = () => {
+        if (isLoading || isQueryCancelledError(error)) {
+            return null;
+        }
+
         return (
             <QueryInfoDropdown
                 queryResultsInfo={{
@@ -191,6 +195,7 @@ export function QueryResultViewer({
                     queryText,
                     plan: data.plan,
                 }}
+                error={error}
                 database={tenantName}
                 hasPlanToSvg={Boolean(data?.plan && useShowPlanToSvg && isExecute)}
             />
