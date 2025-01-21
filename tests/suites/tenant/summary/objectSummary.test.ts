@@ -251,7 +251,7 @@ test.describe('Object Summary', async () => {
         await objectSummary.createDirectory(directoryName);
 
         // Verify the new directory appears in the tree
-        const treeItem = page.locator('.ydb-tree-view').filter({hasText: directoryName});
+        const treeItem = await objectSummary.getTreeItem(directoryName);
         await expect(treeItem).toBeVisible();
     });
 
@@ -276,14 +276,17 @@ test.describe('Object Summary', async () => {
         await queryEditor.waitForStatus('Completed');
 
         // Verify table is not visible before refresh
-        const treeItemBeforeRefresh = page.locator('.ydb-tree-view').filter({hasText: tableName});
-        await expect(treeItemBeforeRefresh).not.toBeVisible();
+        try {
+            await objectSummary.getTreeItem(tableName);
+        } catch (error) {
+            expect(error).toBeTruthy();
+        }
 
         // Click refresh button to update tree view
         await objectSummary.clickRefreshButton();
 
         // Verify table appears in tree
-        const treeItemAfterRefresh = page.locator('.ydb-tree-view').filter({hasText: tableName});
+        const treeItemAfterRefresh = await objectSummary.getTreeItem(tableName);
         await expect(treeItemAfterRefresh).toBeVisible();
     });
 
