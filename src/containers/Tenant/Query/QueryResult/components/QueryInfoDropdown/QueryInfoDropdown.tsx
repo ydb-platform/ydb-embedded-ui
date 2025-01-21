@@ -4,6 +4,7 @@ import {ActionTooltip, Button, DropdownMenu} from '@gravity-ui/uikit';
 
 import i18n from '../../i18n';
 
+import {b} from './shared';
 import type {QueryResultsInfo} from './useQueryInfoMenuItems';
 import {useQueryInfoMenuItems} from './useQueryInfoMenuItems';
 
@@ -50,6 +51,7 @@ export function QueryInfoDropdown({
             popupProps={{
                 placement: ['bottom-end', 'left'],
             }}
+            switcherWrapperClassName={b('query-info-switcher-wrapper')}
             renderSwitcher={renderSwitcher}
             items={items}
             size="xl"

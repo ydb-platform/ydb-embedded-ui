@@ -6,14 +6,13 @@ import {Text} from '@gravity-ui/uikit';
 
 import {planToSvgApi} from '../../../../../../store/reducers/planToSvg';
 import type {QueryPlan, ScriptPlan, TKqpStatsQuery} from '../../../../../../types/api/query';
-import {cn} from '../../../../../../utils/cn';
 import createToast from '../../../../../../utils/createToast';
 import {prepareCommonErrorMessage} from '../../../../../../utils/errors';
 import {parseQueryError} from '../../../../../../utils/query';
 import i18n from '../../i18n';
 
+import {b} from './shared';
 import {downloadFile} from './utils';
-const b = cn('query-info-dropdown');
 
 export interface MenuItemContentProps {
     title: string;
