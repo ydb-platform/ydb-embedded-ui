@@ -1,16 +1,8 @@
-import {StringParam, useQueryParam} from 'use-query-params';
-
 import type {Capability} from '../../../types/api/capabilities';
 import {useTypedSelector} from '../../../utils/hooks';
+import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 
 import {capabilitiesApi, selectCapabilityVersion, selectDatabaseCapabilities} from './capabilities';
-
-function useDatabaseFromQuery() {
-    const [database] = useQueryParam('database', StringParam);
-
-    // Remove null from database type
-    return database ?? undefined;
-}
 
 export function useCapabilitiesQuery() {
     const database = useDatabaseFromQuery();

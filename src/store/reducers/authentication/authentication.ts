@@ -50,9 +50,9 @@ export const {selectIsUserAllowedToMakeChanges, selectUser} = slice.selectors;
 export const authenticationApi = api.injectEndpoints({
     endpoints: (build) => ({
         whoami: build.query({
-            queryFn: async (_, {dispatch}) => {
+            queryFn: async ({database}: {database?: string}, {dispatch}) => {
                 try {
-                    const data = await window.api.viewer.whoami();
+                    const data = await window.api.viewer.whoami({database});
                     dispatch(setUser(data));
                     return {data};
                 } catch (error) {

@@ -15,6 +15,7 @@ import {authenticationApi} from '../../store/reducers/authentication/authenticat
 import {useCapabilitiesLoaded, useCapabilitiesQuery} from '../../store/reducers/capabilities/hooks';
 import {nodesListApi} from '../../store/reducers/nodesList';
 import {cn} from '../../utils/cn';
+import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {lazyComponent} from '../../utils/lazyComponent';
 import Authentication from '../Authentication/Authentication';
 import {getClusterPath} from '../Cluster/utils';
@@ -184,7 +185,8 @@ function DataWrapper({children}: {children: React.ReactNode}) {
 }
 
 function GetUser({children}: {children: React.ReactNode}) {
-    const {isLoading, error} = authenticationApi.useWhoamiQuery(undefined);
+    const database = useDatabaseFromQuery();
+    const {isLoading, error} = authenticationApi.useWhoamiQuery({database});
 
     return (
         <LoaderWrapper loading={isLoading} size="l">
