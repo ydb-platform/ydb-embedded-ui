@@ -5,15 +5,14 @@ import type {DropdownMenuItem} from '@gravity-ui/uikit';
 import {Text} from '@gravity-ui/uikit';
 
 import {planToSvgApi} from '../../../../../../store/reducers/planToSvg';
+import type {QueryPlan, ScriptPlan, TKqpStatsQuery} from '../../../../../../types/api/query';
 import {cn} from '../../../../../../utils/cn';
+import createToast from '../../../../../../utils/createToast';
+import {prepareCommonErrorMessage} from '../../../../../../utils/errors';
+import {parseQueryError} from '../../../../../../utils/query';
 import i18n from '../../i18n';
 
-import {
-    createHandleDiagnosticsDownload,
-    createHandleDownload,
-    createHandleOpenInNewTab,
-} from './utils';
-import type {QueryResultsInfo} from './utils';
+import {downloadFile} from './utils';
 const b = cn('query-info-dropdown');
 
 export interface MenuItemContentProps {
@@ -30,6 +29,18 @@ export function MenuItemContent({title, description}: MenuItemContentProps) {
             </Text>
         </div>
     );
+}
+
+export interface QueryResultsInfo {
+    ast?: string;
+    stats?: TKqpStatsQuery;
+    queryText?: string;
+    plan?: QueryPlan | ScriptPlan;
+}
+
+export interface DiagnosticsData extends QueryResultsInfo {
+    database: string;
+    error?: ReturnType<typeof parseQueryError>;
 }
 
 export interface UseQueryInfoMenuItemsProps {
@@ -61,12 +72,44 @@ export function useQueryInfoMenuItems({
 
         const plan = queryResultsInfo.plan;
         if (plan && hasPlanToSvg) {
-            const handlersParams = {
-                plan,
-                database,
-                blobUrl,
-                getPlanToSvg,
-                setBlobUrl,
+            const handleGetSvg = () => {
+                if (blobUrl) {
+                    return Promise.resolve(blobUrl);
+                }
+
+                return getPlanToSvg({plan, database})
+                    .unwrap()
+                    .then((result) => {
+                        const blob = new Blob([result], {type: 'image/svg+xml'});
+                        const url = URL.createObjectURL(blob);
+                        setBlobUrl(url);
+                        return url;
+                    })
+                    .catch((err) => {
+                        const errorMessage = prepareCommonErrorMessage(err);
+                        createToast({
+                            title: i18n('text_error-plan-svg', {error: errorMessage}),
+                            name: 'plan-svg-error',
+                            type: 'error',
+                        });
+                        return null;
+                    });
+            };
+
+            const handleOpenInNewTab = () => {
+                handleGetSvg().then((url) => {
+                    if (url) {
+                        window.open(url, '_blank');
+                    }
+                });
+            };
+
+            const handleDownload = () => {
+                handleGetSvg().then((url) => {
+                    if (url) {
+                        downloadFile(url, 'query-plan.svg');
+                    }
+                });
             };
 
             menuItems.push([
@@ -78,7 +121,7 @@ export function useQueryInfoMenuItems({
                         />
                     ),
                     icon: <ArrowUpRightFromSquare className={b('icon')} />,
-                    action: createHandleOpenInNewTab(handlersParams),
+                    action: handleOpenInNewTab,
                     className: b('menu-item'),
                 },
                 {
@@ -89,13 +132,29 @@ export function useQueryInfoMenuItems({
                         />
                     ),
                     icon: <ArrowDownToLine className={b('icon')} />,
-                    action: createHandleDownload(handlersParams),
+                    action: handleDownload,
                     className: b('menu-item'),
                 },
             ]);
         }
 
         if (queryResultsInfo) {
+            const handleDiagnosticsDownload = () => {
+                const parsedError = error ? parseQueryError(error) : undefined;
+                const diagnosticsData: DiagnosticsData = {
+                    ...queryResultsInfo,
+                    database,
+                    ...(parsedError && {error: parsedError}),
+                };
+
+                const blob = new Blob([JSON.stringify(diagnosticsData, null, 2)], {
+                    type: 'application/json',
+                });
+                const url = URL.createObjectURL(blob);
+                downloadFile(url, `query-diagnostics-${new Date().getTime()}.json`);
+                URL.revokeObjectURL(url);
+            };
+
             menuItems.push([
                 {
                     text: (
@@ -105,14 +164,14 @@ export function useQueryInfoMenuItems({
                         />
                     ),
                     icon: <ArrowDownToLine className={b('icon')} />,
-                    action: createHandleDiagnosticsDownload({queryResultsInfo, database, error}),
+                    action: handleDiagnosticsDownload,
                     className: b('menu-item'),
                 },
             ]);
         }
 
         return menuItems;
-    }, [queryResultsInfo, hasPlanToSvg, database, blobUrl, getPlanToSvg, error]);
+    }, [queryResultsInfo, hasPlanToSvg, blobUrl, getPlanToSvg, database, error]);
 
     return {
         isLoading,

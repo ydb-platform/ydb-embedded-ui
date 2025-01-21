@@ -11,6 +11,7 @@
   "trace": "Trace",
   "title.truncated": "Truncated",
   "title.result": "Result",
+  "tooltip_actions": "Actions",
   "text_open-execution-plan": "Open Execution Plan",
   "text_open-execution-plan_description": "New tab",
   "text_download": "Download Execution Plan",

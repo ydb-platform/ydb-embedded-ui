@@ -1,9 +1,11 @@
 import {Ellipsis} from '@gravity-ui/icons';
 import type {ButtonProps} from '@gravity-ui/uikit';
-import {Button, DropdownMenu} from '@gravity-ui/uikit';
+import {ActionTooltip, Button, DropdownMenu} from '@gravity-ui/uikit';
 
+import i18n from '../../i18n';
+
+import type {QueryResultsInfo} from './useQueryInfoMenuItems';
 import {useQueryInfoMenuItems} from './useQueryInfoMenuItems';
-import type {QueryResultsInfo} from './utils';
 
 import './QueryInfoDropdown.scss';
 
@@ -29,11 +31,13 @@ export function QueryInfoDropdown({
 
     const renderSwitcher = (props: ButtonProps) => {
         return (
-            <Button view="flat-secondary" loading={isLoading} disabled={isLoading} {...props}>
-                <Button.Icon>
-                    <Ellipsis />
-                </Button.Icon>
-            </Button>
+            <ActionTooltip title={i18n('tooltip_actions')}>
+                <Button view="flat-secondary" loading={isLoading} disabled={isLoading} {...props}>
+                    <Button.Icon>
+                        <Ellipsis />
+                    </Button.Icon>
+                </Button>
+            </ActionTooltip>
         );
     };
 
