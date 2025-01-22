@@ -44,6 +44,7 @@ export function NodeUptime({StartTime, DisconnectTime}: NodeUptimeProps) {
     return (
         <CellWithPopover
             placement={['top', 'auto']}
+            disabled={!content}
             content={<DefinitionList responsive>{content}</DefinitionList>}
         >
             {uptime}
