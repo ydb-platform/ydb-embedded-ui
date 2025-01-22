@@ -112,6 +112,7 @@ export interface TDirEntry {
     PathVersion?: string;
     PathSubType?: EPathSubType;
     Version?: TPathVersion;
+    ChildrenExist?: boolean;
 }
 
 interface TDomainDescription {
