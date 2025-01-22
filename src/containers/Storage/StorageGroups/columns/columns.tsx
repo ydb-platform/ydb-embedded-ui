@@ -238,7 +238,7 @@ const getVDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => (
     className: b('vdisks-column'),
     render: ({row}) => <VDisks vDisks={row.VDisks} viewContext={data?.viewContext} />,
     align: DataTable.CENTER,
-    width: 900,
+    width: 780, // usually 8-9 vdisks, this width corresponds to 8 vdisks, column is expanded if more
     resizeable: false,
     sortable: false,
 });

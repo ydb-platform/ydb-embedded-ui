@@ -1,15 +1,10 @@
 .ydb-storage-vdisks {
     &__wrapper {
         display: flex;
-        justify-content: center;
-
-        min-width: 500px;
     }
 
     &__item {
-        flex-grow: 1;
-
-        max-width: 200px;
+        width: 90px;
         margin-right: 6px;
 
         &_with-dc-margin {
