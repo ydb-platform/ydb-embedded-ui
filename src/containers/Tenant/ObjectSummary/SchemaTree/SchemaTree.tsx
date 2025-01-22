@@ -76,14 +76,14 @@ export function SchemaTree(props: SchemaTreeProps) {
         const {PathDescription: {Children = []} = {}} = schemaData;
 
         const childItems = Children.map((childData) => {
-            const {Name = '', PathType, PathSubType} = childData;
+            const {Name = '', PathType, PathSubType, ChildrenExist} = childData;
 
             return {
                 name: Name,
                 type: mapPathTypeToNavigationTreeType(PathType, PathSubType),
                 // FIXME: should only be explicitly set to true for tables with indexes
                 // at the moment of writing there is no property to determine this, fix later
-                expandable: !isChildlessPathType(PathType, PathSubType),
+                expandable: !isChildlessPathType(PathType, PathSubType) && ChildrenExist,
             };
         });
 
