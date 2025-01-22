@@ -140,6 +140,14 @@ export interface TGroupsStorageGroupInfo {
     ErasureSpecies?: string;
     /** uint64 */
     AllocationUnits?: string;
+    /**
+     * Could be one of:
+     * ok - group is okay
+     * starting:n - group is okay, but n disks are starting
+     * replicating:n - group is okay, all disks are available, but n disks are replicating
+     * degraded:n(m, m...) - group is okay, but n fail realms are not available (with m fail domains)
+     * dead:n - group is not okay, n fail realms are not available
+     */
     State?: string;
     /** uint64 */
     MissingDisks?: string;
@@ -245,17 +253,13 @@ export type StorageV2SortValue =
     // Added them here for types compatibility
     | 'AllocationUnits'
     | 'Latency'
-    | 'DiskSpaceUsage';
+    | 'DiskSpaceUsage'
+    | 'State';
 
 /**
  * Values to sort /storage/groups response
  */
-export type GroupsSortField =
-    | StorageV2SortValue
-    | 'MissingDisks'
-    | 'State'
-    | 'Available'
-    | 'Encryption';
+export type GroupsSortField = StorageV2SortValue | 'MissingDisks' | 'Available' | 'Encryption';
 
 export type StorageV2Sort = BackendSortParam<StorageV2SortValue>;
 export type GroupsSort = BackendSortParam<GroupsSortField>;

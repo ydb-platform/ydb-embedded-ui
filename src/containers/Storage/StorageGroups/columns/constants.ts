@@ -30,6 +30,7 @@ export const STORAGE_GROUPS_COLUMNS_IDS = {
     VDisks: 'VDisks',
     VDisksPDisks: 'VDisksPDisks',
     Degraded: 'Degraded',
+    State: 'State',
 } as const;
 
 export type StorageGroupsColumnId = ValueOf<typeof STORAGE_GROUPS_COLUMNS_IDS>;
@@ -94,6 +95,9 @@ export const STORAGE_GROUPS_COLUMNS_TITLES = {
     },
     get Degraded() {
         return i18n('missing-disks');
+    },
+    get State() {
+        return i18n('state');
     },
 } as const satisfies Record<StorageGroupsColumnId, string>;
 
@@ -181,6 +185,7 @@ export const GROUPS_COLUMNS_TO_DATA_FIELDS: Record<StorageGroupsColumnId, Groups
     VDisks: ['VDisk', 'PDisk', 'Read', 'Write'],
     VDisksPDisks: ['VDisk', 'PDisk', 'Read', 'Write'],
     Degraded: ['MissingDisks'],
+    State: ['State'],
 };
 
 const STORAGE_GROUPS_COLUMNS_TO_SORT_FIELDS: Record<
@@ -203,6 +208,7 @@ const STORAGE_GROUPS_COLUMNS_TO_SORT_FIELDS: Record<
     VDisks: undefined,
     VDisksPDisks: undefined,
     Degraded: 'Degraded',
+    State: 'State',
 };
 
 export function getStorageGroupsColumnSortField(columnId?: string) {
