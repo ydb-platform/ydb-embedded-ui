@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {DefinitionList} from '@gravity-ui/uikit';
 
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
@@ -17,33 +19,33 @@ interface NodeUptimeProps {
 
 export function NodeUptime({StartTime, DisconnectTime}: NodeUptimeProps) {
     let uptime: string | undefined;
+    let content: React.ReactNode = null;
 
     if (DisconnectTime) {
         uptime = getDowntimeFromDateFormatted(DisconnectTime);
+        content = (
+            <DefinitionList.Item key={'DisconnectTime'} name={i18n('disconnect-time')}>
+                {formatDateTime(DisconnectTime, {withTimeZone: true})}
+            </DefinitionList.Item>
+        );
     } else if (StartTime) {
         uptime = getUptimeFromDateFormatted(StartTime);
+        content = (
+            <DefinitionList.Item key={'StartTime'} name={i18n('start-time')}>
+                {formatDateTime(StartTime, {withTimeZone: true})}
+            </DefinitionList.Item>
+        );
     }
 
     if (!uptime) {
         return EMPTY_DATA_PLACEHOLDER;
     }
+
     return (
         <CellWithPopover
             placement={['top', 'auto']}
-            content={
-                <DefinitionList responsive>
-                    {StartTime ? (
-                        <DefinitionList.Item key={'StartTime'} name={i18n('start-time')}>
-                            {formatDateTime(StartTime, {withTimeZone: true})}
-                        </DefinitionList.Item>
-                    ) : null}
-                    {DisconnectTime ? (
-                        <DefinitionList.Item key={'DisconnectTime'} name={i18n('disconnect-time')}>
-                            {formatDateTime(DisconnectTime, {withTimeZone: true})}
-                        </DefinitionList.Item>
-                    ) : null}
-                </DefinitionList>
-            }
+            disabled={!content}
+            content={<DefinitionList responsive>{content}</DefinitionList>}
         >
             {uptime}
         </CellWithPopover>
