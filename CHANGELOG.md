@@ -1,5 +1,28 @@
 # Changelog
 
+## [8.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.4.0...v8.5.0) (2025-01-22)
+
+
+### Features
+
+* **ClusterInfo:** add slo logs link ([#1850](https://github.com/ydb-platform/ydb-embedded-ui/issues/1850)) ([7e0429b](https://github.com/ydb-platform/ydb-embedded-ui/commit/7e0429b632a73a79051a366c94224e7333d84f05))
+* download dump with all info ([#1862](https://github.com/ydb-platform/ydb-embedded-ui/issues/1862)) ([f09cbe9](https://github.com/ydb-platform/ydb-embedded-ui/commit/f09cbe9dce9634cfa1f001d428d48837ba58df1c))
+* move to node 20, update deps ([#1792](https://github.com/ydb-platform/ydb-embedded-ui/issues/1792)) ([33ab5de](https://github.com/ydb-platform/ydb-embedded-ui/commit/33ab5de4c6e0207490a0077ffdd220163714c32b))
+* **QueryEditor:** add error highlighting ([#1833](https://github.com/ydb-platform/ydb-embedded-ui/issues/1833)) ([b89d084](https://github.com/ydb-platform/ydb-embedded-ui/commit/b89d084c5999d82baf080bf1228c4a7ad30b6afc))
+* **Storage:** group disks by DC ([#1823](https://github.com/ydb-platform/ydb-embedded-ui/issues/1823)) ([dec5b95](https://github.com/ydb-platform/ydb-embedded-ui/commit/dec5b9592ed3b491e5073a5b8903eef65be4dc1d))
+* use the same thresholds for all progress bars ([#1820](https://github.com/ydb-platform/ydb-embedded-ui/issues/1820)) ([1b74502](https://github.com/ydb-platform/ydb-embedded-ui/commit/1b74502de4cf91f8babb9349c6740cf11e63a238))
+
+
+### Bug Fixes
+
+* **EntityStatus:** background color for button under hover ([#1842](https://github.com/ydb-platform/ydb-embedded-ui/issues/1842)) ([5c722dd](https://github.com/ydb-platform/ydb-embedded-ui/commit/5c722dd461049a4f4719eadd915f29d063cf2f1d))
+* hide dev ui links for users with viewer rights ([#1824](https://github.com/ydb-platform/ydb-embedded-ui/issues/1824)) ([093e79a](https://github.com/ydb-platform/ydb-embedded-ui/commit/093e79a466104b4dc8c049f705d7f0324a6b79df))
+* **OperationCell:** increase font weight for operation name ([#1825](https://github.com/ydb-platform/ydb-embedded-ui/issues/1825)) ([2e618f4](https://github.com/ydb-platform/ydb-embedded-ui/commit/2e618f42b97f074a1a7b2dcba0d10da186d5b6da))
+* remove retries ([#1829](https://github.com/ydb-platform/ydb-embedded-ui/issues/1829)) ([3cd7364](https://github.com/ydb-platform/ydb-embedded-ui/commit/3cd73641351ad32fb0b8e650386a989a04ff9769))
+* **Storage:** fix encryption label shrink ([#1851](https://github.com/ydb-platform/ydb-embedded-ui/issues/1851)) ([bb6d7be](https://github.com/ydb-platform/ydb-embedded-ui/commit/bb6d7bed75f4cdb7a401022100099d65e855c5e6))
+* update actions ([#1834](https://github.com/ydb-platform/ydb-embedded-ui/issues/1834)) ([e3c2243](https://github.com/ydb-platform/ydb-embedded-ui/commit/e3c224302b0e7492069b00271dcc53f10f9fc68d))
+* **UserSettings:** show description under setting control ([#1827](https://github.com/ydb-platform/ydb-embedded-ui/issues/1827)) ([45ddc7e](https://github.com/ydb-platform/ydb-embedded-ui/commit/45ddc7ea912be8abe38d40cfa0f0578175177fe7))
+
 ## [8.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.3.0...v8.4.0) (2025-01-13)
 
 
