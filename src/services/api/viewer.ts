@@ -434,8 +434,8 @@ export class ViewerAPI extends BaseYdbAPI {
         );
     }
 
-    whoami() {
-        return this.get<TUserToken>(this.getPath('/viewer/json/whoami'), {});
+    whoami({database}: {database?: string}) {
+        return this.get<TUserToken>(this.getPath('/viewer/json/whoami'), {database});
     }
 
     autocomplete(params: {database: string; prefix?: string; limit?: number; table?: string[]}) {
