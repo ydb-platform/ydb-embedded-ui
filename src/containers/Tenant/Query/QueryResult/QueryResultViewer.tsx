@@ -27,7 +27,7 @@ import {isQueryCancelledError} from '../utils/isQueryCancelledError';
 
 import {Ast} from './components/Ast/Ast';
 import {Graph} from './components/Graph/Graph';
-import {PlanToSvgButton} from './components/PlanToSvgButton/PlanToSvgButton';
+import {QueryInfoDropdown} from './components/QueryInfoDropdown/QueryInfoDropdown';
 import {QueryJSONViewer} from './components/QueryJSONViewer/QueryJSONViewer';
 import {QueryResultError} from './components/QueryResultError/QueryResultError';
 import {ResultSetsViewer} from './components/ResultSetsViewer/ResultSetsViewer';
@@ -83,6 +83,7 @@ interface ExecuteResultProps {
     tenantName: string;
     onCollapseResults: VoidFunction;
     onExpandResults: VoidFunction;
+    queryText?: string;
 }
 
 export function QueryResultViewer({
@@ -91,6 +92,7 @@ export function QueryResultViewer({
     isResultsCollapsed,
     theme,
     tenantName,
+    queryText,
     onCollapseResults,
     onExpandResults,
 }: ExecuteResultProps) {
@@ -176,6 +178,26 @@ export function QueryResultViewer({
                 text={copyText}
                 view="flat-secondary"
                 title={i18n('action.copy', {activeSection})}
+            />
+        );
+    };
+
+    const renderQueryInfoDropdown = () => {
+        if (isLoading || isQueryCancelledError(error)) {
+            return null;
+        }
+
+        return (
+            <QueryInfoDropdown
+                queryResultsInfo={{
+                    queryText,
+                    ast: data.ast,
+                    stats: data.stats,
+                    plan: data.plan,
+                }}
+                error={error}
+                database={tenantName}
+                hasPlanToSvg={Boolean(data?.plan && useShowPlanToSvg && isExecute)}
             />
         );
     };
@@ -268,9 +290,6 @@ export function QueryResultViewer({
                 {data?.traceId && isExecute ? (
                     <TraceButton traceId={data.traceId} isTraceReady={result.isTraceReady} />
                 ) : null}
-                {data?.plan && useShowPlanToSvg && isExecute ? (
-                    <PlanToSvgButton plan={data?.plan} database={tenantName} />
-                ) : null}
             </div>
         );
     };
@@ -278,6 +297,7 @@ export function QueryResultViewer({
     const renderRightControls = () => {
         return (
             <div className={b('controls-right')}>
+                {renderQueryInfoDropdown()}
                 {renderClipboardButton()}
                 <EnableFullscreenButton />
                 <PaneVisibilityToggleButtons

@@ -103,6 +103,7 @@ export default function QueryEditor(props: QueryEditorProps) {
     const [lastUsedQueryAction, setLastUsedQueryAction] = useSetting<QueryAction>(
         LAST_USED_QUERY_ACTION_KEY,
     );
+    const [lastExecutedQueryText, setLastExecutedQueryText] = React.useState<string>('');
 
     const [sendQuery] = queryApi.useUseSendQueryMutation();
 
@@ -140,6 +141,7 @@ export default function QueryEditor(props: QueryEditorProps) {
         const query = text ?? input;
 
         setLastUsedQueryAction(QUERY_ACTIONS.execute);
+        setLastExecutedQueryText(query);
         if (!isEqual(lastQueryExecutionSettings, querySettings)) {
             resetBanner();
             setLastQueryExecutionSettings(querySettings);
@@ -172,7 +174,7 @@ export default function QueryEditor(props: QueryEditorProps) {
 
     const handleGetExplainQueryClick = useEventHandler(() => {
         setLastUsedQueryAction(QUERY_ACTIONS.explain);
-
+        setLastExecutedQueryText(input);
         if (!isEqual(lastQueryExecutionSettings, querySettings)) {
             resetBanner();
             setLastQueryExecutionSettings(querySettings);
@@ -368,6 +370,7 @@ export default function QueryEditor(props: QueryEditorProps) {
                         tenantName={tenantName}
                         path={path}
                         showPreview={showPreview}
+                        queryText={lastExecutedQueryText}
                     />
                 </div>
             </SplitPane>
@@ -386,6 +389,7 @@ interface ResultProps {
     tenantName: string;
     path: string;
     showPreview?: boolean;
+    queryText: string;
 }
 function Result({
     resultVisibilityState,
@@ -397,6 +401,7 @@ function Result({
     tenantName,
     path,
     showPreview,
+    queryText,
 }: ResultProps) {
     if (showPreview) {
         return <Preview database={tenantName} path={path} type={type} />;
@@ -412,6 +417,7 @@ function Result({
                 isResultsCollapsed={resultVisibilityState.collapsed}
                 onExpandResults={onExpandResultHandler}
                 onCollapseResults={onCollapseResultHandler}
+                queryText={queryText}
             />
         );
     }
