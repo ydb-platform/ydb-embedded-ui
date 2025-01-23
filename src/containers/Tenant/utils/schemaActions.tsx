@@ -1,7 +1,9 @@
+import {Copy, PlugConnection} from '@gravity-ui/icons';
 import {Flex, Spin} from '@gravity-ui/uikit';
 import copy from 'copy-to-clipboard';
 import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
 
+import type {SnippetParams} from '../../../components/ConnectToDB/types';
 import type {AppDispatch} from '../../../store';
 import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
@@ -40,6 +42,7 @@ interface ActionsAdditionalParams {
     setActivePath: (path: string) => void;
     showCreateDirectoryDialog?: (path: string) => void;
     getConfirmation?: () => Promise<boolean>;
+    getConnectToDBDialog?: (params: SnippetParams) => Promise<boolean>;
     schemaData?: SchemaData[];
     isSchemaDataLoading?: boolean;
 }
@@ -56,8 +59,13 @@ const bindActions = (
     dispatch: AppDispatch,
     additionalEffects: ActionsAdditionalParams,
 ) => {
-    const {setActivePath, showCreateDirectoryDialog, getConfirmation, schemaData} =
-        additionalEffects;
+    const {
+        setActivePath,
+        showCreateDirectoryDialog,
+        getConfirmation,
+        getConnectToDBDialog,
+        schemaData,
+    } = additionalEffects;
 
     const inputQuery = (tmpl: TemplateFn) => () => {
         const applyInsert = () => {
@@ -85,6 +93,7 @@ const bindActions = (
                   showCreateDirectoryDialog(params.path);
               }
             : undefined,
+        getConnectToDBDialog: () => getConnectToDBDialog?.({database: params.path}),
         createTable: inputQuery(createTableTemplate),
         createColumnTable: inputQuery(createColumnTableTemplate),
         createAsyncReplication: inputQuery(createAsyncReplicationTemplate),
@@ -152,26 +161,42 @@ export const getActions =
             dispatch,
             additionalEffects,
         );
-        const copyItem = {text: i18n('actions.copyPath'), action: actions.copyPath};
+        const copyItem: ActionsSet[0] = {
+            text: i18n('actions.copyPath'),
+            action: actions.copyPath,
+            iconEnd: <Copy />,
+        };
+        const connectToDBItem = {
+            text: i18n('actions.connectToDB'),
+            action: actions.getConnectToDBDialog,
+            iconEnd: <PlugConnection />,
+        };
 
-        const DIR_SET: ActionsSet = [
-            [copyItem],
-            [
-                {text: i18n('actions.createTable'), action: actions.createTable},
-                {text: i18n('actions.createColumnTable'), action: actions.createColumnTable},
-                {
-                    text: i18n('actions.createAsyncReplication'),
-                    action: actions.createAsyncReplication,
-                },
-                {text: i18n('actions.createTopic'), action: actions.createTopic},
-                {text: i18n('actions.createView'), action: actions.createView},
-            ],
+        const createEntitiesSet = [
+            {text: i18n('actions.createTable'), action: actions.createTable},
+            {text: i18n('actions.createColumnTable'), action: actions.createColumnTable},
+            {
+                text: i18n('actions.createAsyncReplication'),
+                action: actions.createAsyncReplication,
+            },
+            {text: i18n('actions.createTopic'), action: actions.createTopic},
+            {text: i18n('actions.createView'), action: actions.createView},
         ];
+
+        const DB_SET: ActionsSet = [[copyItem, connectToDBItem], createEntitiesSet];
+
+        const DIR_SET: ActionsSet = [[copyItem], createEntitiesSet];
+
         if (actions.createDirectory) {
-            DIR_SET.splice(1, 0, [
-                {text: i18n('actions.createDirectory'), action: actions.createDirectory},
-            ]);
+            const createDirectoryItem = {
+                text: i18n('actions.createDirectory'),
+                action: actions.createDirectory,
+            };
+
+            DB_SET.splice(1, 0, [createDirectoryItem]);
+            DIR_SET.splice(1, 0, [createDirectoryItem]);
         }
+
         const ROW_TABLE_SET: ActionsSet = [
             [copyItem],
             [
@@ -250,7 +275,8 @@ export const getActions =
         const nodeTypeToActions: Record<NavigationTreeNodeType, ActionsSet> = {
             async_replication: ASYNC_REPLICATION_SET,
 
-            database: DIR_SET,
+            database: DB_SET,
+
             directory: DIR_SET,
 
             table: ROW_TABLE_SET,

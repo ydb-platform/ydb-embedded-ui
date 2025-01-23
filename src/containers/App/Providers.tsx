@@ -35,11 +35,9 @@ export function Providers({
                 <Router history={history}>
                     <QueryParamProvider adapter={ReactRouter5Adapter}>
                         <Theme>
-                            <NiceModal.Provider>
-                                <ComponentsProvider registry={componentsRegistry}>
-                                    {children}
-                                </ComponentsProvider>
-                            </NiceModal.Provider>
+                            <ComponentsProvider registry={componentsRegistry}>
+                                <NiceModal.Provider>{children}</NiceModal.Provider>
+                            </ComponentsProvider>
                         </Theme>
                     </QueryParamProvider>
                 </Router>
