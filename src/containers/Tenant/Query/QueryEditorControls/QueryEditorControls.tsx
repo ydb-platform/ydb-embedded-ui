@@ -3,8 +3,10 @@ import type {ButtonView} from '@gravity-ui/uikit';
 import {Button, Icon, Tooltip} from '@gravity-ui/uikit';
 
 import QuerySettingsDescription from '../../../../components/QuerySettingsDescription/QuerySettingsDescription';
+import {selectUserInput} from '../../../../store/reducers/query/query';
 import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
+import {useTypedSelector} from '../../../../utils/hooks';
 import {useChangedQuerySettings} from '../../../../utils/hooks/useChangedQuerySettings';
 import {NewSQL} from '../NewSQL/NewSQL';
 import {SaveQuery} from '../SaveQuery/SaveQuery';
@@ -56,11 +58,11 @@ const SettingsButton = ({onClick, runIsLoading}: SettingsButtonProps) => {
 
 interface QueryEditorControlsProps {
     isLoading: boolean;
-    disabled: boolean;
+    disabled?: boolean;
     highlightedAction: QueryAction;
 
-    handleGetExplainQueryClick: () => void;
-    handleSendExecuteClick: () => void;
+    handleGetExplainQueryClick: (text: string) => void;
+    handleSendExecuteClick: (text: string) => void;
     onSettingsButtonClick: () => void;
 }
 
@@ -73,24 +75,27 @@ export const QueryEditorControls = ({
     onSettingsButtonClick,
     handleGetExplainQueryClick,
 }: QueryEditorControlsProps) => {
+    const input = useTypedSelector(selectUserInput);
     const runView: ButtonView | undefined = highlightedAction === 'execute' ? 'action' : undefined;
     const explainView: ButtonView | undefined =
         highlightedAction === 'explain' ? 'action' : undefined;
 
     const onRunButtonClick = () => {
-        handleSendExecuteClick();
+        handleSendExecuteClick(input);
     };
 
     const onExplainButtonClick = () => {
-        handleGetExplainQueryClick();
+        handleGetExplainQueryClick(input);
     };
+
+    const controlsDisabled = disabled || !input;
 
     return (
         <div className={b()}>
             <div className={b('left')}>
                 <Button
                     onClick={onRunButtonClick}
-                    disabled={disabled}
+                    disabled={controlsDisabled}
                     loading={isLoading}
                     view={runView}
                     className={b('run-button')}
@@ -100,7 +105,7 @@ export const QueryEditorControls = ({
                 </Button>
                 <Button
                     onClick={onExplainButtonClick}
-                    disabled={disabled}
+                    disabled={controlsDisabled}
                     loading={isLoading}
                     view={explainView}
                 >
