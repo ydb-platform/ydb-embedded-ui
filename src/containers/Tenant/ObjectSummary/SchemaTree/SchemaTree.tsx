@@ -10,6 +10,7 @@ import {selectUserInput} from '../../../../store/reducers/query/query';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
 import {tableSchemaDataApi} from '../../../../store/reducers/tableSchemaData';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
+import {valueIsDefined} from '../../../../utils';
 import {
     useQueryExecutionSettings,
     useTypedDispatch,
@@ -78,12 +79,16 @@ export function SchemaTree(props: SchemaTreeProps) {
         const childItems = Children.map((childData) => {
             const {Name = '', PathType, PathSubType, ChildrenExist} = childData;
 
+            const isChildless =
+                isChildlessPathType(PathType, PathSubType) ||
+                (valueIsDefined(ChildrenExist) && !ChildrenExist);
+
             return {
                 name: Name,
                 type: mapPathTypeToNavigationTreeType(PathType, PathSubType),
                 // FIXME: should only be explicitly set to true for tables with indexes
                 // at the moment of writing there is no property to determine this, fix later
-                expandable: !isChildlessPathType(PathType, PathSubType) && ChildrenExist,
+                expandable: !isChildless,
             };
         });
 
