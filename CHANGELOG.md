@@ -1,5 +1,24 @@
 # Changelog
 
+## [8.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.5.0...v8.6.0) (2025-01-27)
+
+
+### Features
+
+* add connect to DB dialog ([#1838](https://github.com/ydb-platform/ydb-embedded-ui/issues/1838)) ([ba22a39](https://github.com/ydb-platform/ydb-embedded-ui/commit/ba22a39e20f6417a9f24a2c0f5084cb63c4cf759))
+* pass database to whoami ([#1860](https://github.com/ydb-platform/ydb-embedded-ui/issues/1860)) ([1990103](https://github.com/ydb-platform/ydb-embedded-ui/commit/19901033fef639450c729e398fb73c75e4cacc66))
+* **SchemaTree:** do not expand childless nodes ([#1868](https://github.com/ydb-platform/ydb-embedded-ui/issues/1868)) ([ae8aa6d](https://github.com/ydb-platform/ydb-embedded-ui/commit/ae8aa6d0e75b42609e51612a12594d0ab7b2bdcf))
+* **Storage:** add State column ([#1859](https://github.com/ydb-platform/ydb-embedded-ui/issues/1859)) ([cda185b](https://github.com/ydb-platform/ydb-embedded-ui/commit/cda185bb35ec4c860b737bd407dd50af96bb31fe))
+
+
+### Bug Fixes
+
+* **QueryEditor:** dont render Results every time editor input changes ([#1879](https://github.com/ydb-platform/ydb-embedded-ui/issues/1879)) ([4db34be](https://github.com/ydb-platform/ydb-embedded-ui/commit/4db34be1f6a30054feb9674d69ef9f80e57c112f))
+* **SchemaTree:** expand nodes if ChildrenExist is undefined ([#1872](https://github.com/ydb-platform/ydb-embedded-ui/issues/1872)) ([2af9d9e](https://github.com/ydb-platform/ydb-embedded-ui/commit/2af9d9e3ed075d8b457748d8c80e48947c07ca0b))
+* **UptimeViewer:** do not show StartTime if DisconnectTime present ([#1864](https://github.com/ydb-platform/ydb-embedded-ui/issues/1864)) ([36038bc](https://github.com/ydb-platform/ydb-embedded-ui/commit/36038bcfb7a463a32d49c3c20d5ca29ae615a552))
+* use eye icon for preview ([#1873](https://github.com/ydb-platform/ydb-embedded-ui/issues/1873)) ([c11e616](https://github.com/ydb-platform/ydb-embedded-ui/commit/c11e6165791b8c7258aca5ab9f972b2360cbfd21))
+* **VDisks:** use fixed VDisk width ([#1857](https://github.com/ydb-platform/ydb-embedded-ui/issues/1857)) ([613bbf6](https://github.com/ydb-platform/ydb-embedded-ui/commit/613bbf60600bb802aba2338db78b86044e1a0e1c))
+
 ## [8.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.4.0...v8.5.0) (2025-01-22)
 
 
