@@ -1,18 +1,22 @@
 import React from 'react';
 
-import {Breadcrumbs} from '@gravity-ui/uikit';
+import {ArrowUpRightFromSquare, PlugConnection} from '@gravity-ui/icons';
+import {Breadcrumbs, Button, Divider, Flex, Icon} from '@gravity-ui/uikit';
+import {useLocation} from 'react-router-dom';
 
+import {getConnectToDBDialog} from '../../components/ConnectToDB/ConnectToDBDialog';
 import {InternalLink} from '../../components/InternalLink';
-import {LinkWithIcon} from '../../components/LinkWithIcon/LinkWithIcon';
 import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import {cn} from '../../utils/cn';
 import {DEVELOPER_UI_TITLE} from '../../utils/constants';
 import {createDeveloperUIInternalPageHref} from '../../utils/developerUI/developerUI';
 import {useTypedSelector} from '../../utils/hooks';
+import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 
 import type {RawBreadcrumbItem} from './breadcrumbs';
 import {getBreadcrumbs} from './breadcrumbs';
+import {headerKeyset} from './i18n';
 
 import './Header.scss';
 
@@ -27,6 +31,10 @@ function Header({mainPage}: HeaderProps) {
     const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
 
     const clusterInfo = useClusterBaseInfo();
+
+    const database = useDatabaseFromQuery();
+    const location = useLocation();
+    const isDatabasePage = location.pathname === '/tenant';
 
     const clusterName = clusterInfo.title || clusterInfo.name;
 
@@ -51,6 +59,47 @@ function Header({mainPage}: HeaderProps) {
             return {...item, action: () => {}};
         });
     }, [clusterName, mainPage, page, pageBreadcrumbsOptions]);
+
+    const renderRightControls = () => {
+        const elements: React.ReactNode[] = [];
+
+        if (isDatabasePage && database) {
+            elements.push(
+                <Button view={'flat'} onClick={() => getConnectToDBDialog({database})}>
+                    <Icon data={PlugConnection} />
+                    {headerKeyset('connect')}
+                </Button>,
+            );
+        }
+
+        if (isUserAllowedToMakeChanges) {
+            elements.push(
+                <Button view="flat" href={createDeveloperUIInternalPageHref()} target="_blank">
+                    {DEVELOPER_UI_TITLE}
+                    <Icon data={ArrowUpRightFromSquare} />
+                </Button>,
+            );
+        }
+
+        if (elements.length) {
+            return (
+                <Flex direction="row" gap={1}>
+                    {elements.map((el, index) => {
+                        return (
+                            <React.Fragment key={index}>
+                                {el}
+                                {index === elements.length - 1 ? null : (
+                                    <Divider orientation="vertical" />
+                                )}
+                            </React.Fragment>
+                        );
+                    })}
+                </Flex>
+            );
+        }
+
+        return null;
+    };
 
     const renderHeader = () => {
         return (
@@ -80,12 +129,7 @@ function Header({mainPage}: HeaderProps) {
                     }}
                 />
 
-                {isUserAllowedToMakeChanges ? (
-                    <LinkWithIcon
-                        title={DEVELOPER_UI_TITLE}
-                        url={createDeveloperUIInternalPageHref()}
-                    />
-                ) : null}
+                {renderRightControls()}
             </header>
         );
     };

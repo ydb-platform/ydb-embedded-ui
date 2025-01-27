@@ -5,5 +5,7 @@
   "breadcrumbs.vDisk": "VDisk",
   "breadcrumbs.tablet": "Tablet",
   "breadcrumbs.tablets": "Tablets",
-  "breadcrumbs.storageGroup": "Storage Group"
+  "breadcrumbs.storageGroup": "Storage Group",
+
+  "connect": "Connect"
 }

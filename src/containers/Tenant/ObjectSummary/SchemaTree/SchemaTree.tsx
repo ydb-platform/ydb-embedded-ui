@@ -5,6 +5,7 @@ import React from 'react';
 
 import {NavigationTree} from 'ydb-ui-components';
 
+import {getConnectToDBDialog} from '../../../../components/ConnectToDB/ConnectToDBDialog';
 import {useCreateDirectoryFeatureAvailable} from '../../../../store/reducers/capabilities/hooks';
 import {selectUserInput} from '../../../../store/reducers/query/query';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
@@ -26,6 +27,7 @@ import {
 import {getActions} from '../../utils/schemaActions';
 import {CreateDirectoryDialog} from '../CreateDirectoryDialog/CreateDirectoryDialog';
 import {useDispatchTreeKey, useTreeKey} from '../UpdateTreeContext';
+import {isDomain} from '../transformPath';
 
 interface SchemaTreeProps {
     rootPath: string;
@@ -50,6 +52,10 @@ export function SchemaTree(props: SchemaTreeProps) {
     const [parentPath, setParentPath] = React.useState('');
     const setSchemaTreeKey = useDispatchTreeKey();
     const schemaTreeKey = useTreeKey();
+
+    const rootNodeType = isDomain(rootPath, rootType)
+        ? 'database'
+        : mapPathTypeToNavigationTreeType(rootType);
 
     const fetchPath = async (path: string) => {
         let schemaData: TEvDescribeSchemeResult | undefined;
@@ -127,7 +133,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                     ? handleOpenCreateDirectoryDialog
                     : undefined,
                 getConfirmation: input ? getConfirmation : undefined,
-
+                getConnectToDBDialog,
                 schemaData: actionsSchemaData,
                 isSchemaDataLoading: isActionsDataFetching,
             },
@@ -159,7 +165,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                 rootState={{
                     path: rootPath,
                     name: rootName,
-                    type: mapPathTypeToNavigationTreeType(rootType),
+                    type: rootNodeType,
                     collapsed: false,
                 }}
                 fetchPath={fetchPath}
