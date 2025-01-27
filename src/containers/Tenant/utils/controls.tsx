@@ -1,4 +1,3 @@
-import {LayoutHeaderCellsLargeFill} from '@gravity-ui/icons';
 import type {ButtonSize} from '@gravity-ui/uikit';
 import {Button, Icon} from '@gravity-ui/uikit';
 import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
@@ -8,6 +7,8 @@ import {setShowPreview} from '../../../store/reducers/schema/schema';
 import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
 import i18n from '../i18n';
+
+import EyeIcon from '@gravity-ui/icons/svgs/eye.svg';
 
 interface ControlsAdditionalEffects {
     setActivePath: (path: string) => void;
@@ -43,7 +44,7 @@ const getPreviewControl = (options: ReturnType<typeof bindActions>, size?: Butto
             title={i18n('actions.openPreview')}
             size={size || 's'}
         >
-            <Icon data={LayoutHeaderCellsLargeFill} />
+            <Icon data={EyeIcon} />
         </Button>
     );
 };
