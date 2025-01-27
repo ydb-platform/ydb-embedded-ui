@@ -88,12 +88,14 @@ export const QueryEditorControls = ({
         handleGetExplainQueryClick(input);
     };
 
+    const controlsDisabled = disabled || !input;
+
     return (
         <div className={b()}>
             <div className={b('left')}>
                 <Button
                     onClick={onRunButtonClick}
-                    disabled={disabled || !input}
+                    disabled={controlsDisabled}
                     loading={isLoading}
                     view={runView}
                     className={b('run-button')}
@@ -103,7 +105,7 @@ export const QueryEditorControls = ({
                 </Button>
                 <Button
                     onClick={onExplainButtonClick}
-                    disabled={disabled}
+                    disabled={controlsDisabled}
                     loading={isLoading}
                     view={explainView}
                 >
