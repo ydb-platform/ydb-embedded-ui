@@ -55,7 +55,7 @@
   "filter.text.placeholder": "Search by query text...",
 
   "gear.tooltip": "Query execution settings have been changed for ",
-  "banner.query-settings.message": "Query results are displayed for ",
+  "banner.query-settings.message": "Query was executed with modified settings: ",
 
   "history.queryText": "Query text",
   "history.endTime": "End time",
