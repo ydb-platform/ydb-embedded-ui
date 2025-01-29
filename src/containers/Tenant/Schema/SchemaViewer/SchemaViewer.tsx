@@ -71,20 +71,20 @@ export const SchemaViewer = ({type, path, tenantName, extended = false}: SchemaV
 
     const columns = React.useMemo(() => {
         if (isViewType(type)) {
-            return getViewColumns();
+            return getViewColumns(tableData);
         }
         if (isExternalTableType(type)) {
-            return getExternalTableColumns();
+            return getExternalTableColumns(tableData);
         }
         if (isColumnEntityType(type)) {
-            return getColumnTableColumns();
+            return getColumnTableColumns(tableData);
         }
         if (isRowTableType(type)) {
-            return getRowTableColumns(extended, hasAutoIncrement, hasDefaultValue);
+            return getRowTableColumns(tableData, extended, hasAutoIncrement, hasDefaultValue);
         }
 
         return [];
-    }, [type, extended, hasAutoIncrement, hasDefaultValue]);
+    }, [type, extended, hasAutoIncrement, hasDefaultValue, tableData]);
 
     if (loading || isViewSchemaLoading) {
         return <TableSkeleton />;

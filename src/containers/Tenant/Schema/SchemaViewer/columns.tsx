@@ -1,5 +1,7 @@
 import DataTable from '@gravity-ui/react-data-table';
 
+import {getColumnWidth} from '../../../../utils/getColumnWidth';
+
 import i18n from './i18n';
 import type {SchemaColumn, SchemaData} from './types';
 
@@ -108,16 +110,37 @@ const compressionColumn: SchemaColumn = {
     render: ({row}) => row.columnCodec,
 };
 
-export function getViewColumns(): SchemaColumn[] {
-    return [nameColumn, typeColumn];
+const WIDTH_PREDICTION_ROWS_COUNT = 100;
+
+function normalizeColumns(columns: SchemaColumn[], data?: SchemaData[]) {
+    if (!data) {
+        return columns;
+    }
+    const dataSlice = data.slice(0, WIDTH_PREDICTION_ROWS_COUNT);
+    return columns.map((column) => {
+        return {
+            ...column,
+            width: getColumnWidth({
+                data: dataSlice,
+                name: column.name,
+                header: typeof column.header === 'string' ? column.header : undefined,
+                sortable: column.sortable === undefined,
+            }),
+        };
+    });
 }
-export function getExternalTableColumns(): SchemaColumn[] {
-    return [idColumn, nameColumn, typeColumn, notNullColumn];
+
+export function getViewColumns(data?: SchemaData[]): SchemaColumn[] {
+    return normalizeColumns([nameColumn, typeColumn], data);
 }
-export function getColumnTableColumns(): SchemaColumn[] {
-    return [idColumn, nameColumn, typeColumn, notNullColumn];
+export function getExternalTableColumns(data?: SchemaData[]): SchemaColumn[] {
+    return normalizeColumns([idColumn, nameColumn, typeColumn, notNullColumn], data);
+}
+export function getColumnTableColumns(data?: SchemaData[]): SchemaColumn[] {
+    return normalizeColumns([idColumn, nameColumn, typeColumn, notNullColumn], data);
 }
 export function getRowTableColumns(
+    data: SchemaData[] | undefined,
     extended: boolean,
     hasAutoIncrement: boolean,
     hasDefaultValue: boolean,
@@ -136,5 +159,7 @@ export function getRowTableColumns(
         rowTableColumns.push(autoIncrementColumn);
     }
 
-    return rowTableColumns;
+    console.log(normalizeColumns(rowTableColumns, data));
+
+    return normalizeColumns(rowTableColumns, data);
 }

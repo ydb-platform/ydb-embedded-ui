@@ -190,7 +190,7 @@ export interface QueryPlan {
 
 // ==== Common types ====
 
-export type CellValue = string | number | null | undefined;
+export type CellValue = string | number | boolean | null | undefined;
 
 export type KeyValueRow<T = CellValue> = {
     [key: string]: T;
