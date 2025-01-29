@@ -59,7 +59,13 @@ export const PDisk = ({
                             flexGrow: Number(vdisk.AllocatedSize) || 1,
                         }}
                     >
-                        <VDisk data={vdisk} inactive={!isVdiskActive(vdisk, viewContext)} compact />
+                        <VDisk
+                            data={vdisk}
+                            inactive={!isVdiskActive(vdisk, viewContext)}
+                            compact
+                            delayClose={200}
+                            delayOpen={200}
+                        />
                     </div>
                 ))}
             </div>
@@ -77,10 +83,12 @@ export const PDisk = ({
             {renderVDisks()}
             <HoverPopup
                 showPopup={showPopup}
+                offset={[0, 5]}
                 anchorRef={anchorRef}
                 onShowPopup={onShowPopup}
                 onHidePopup={onHidePopup}
                 popupContent={<PDiskPopup data={data} />}
+                delayClose={200}
             >
                 <InternalLink to={pDiskPath} className={b('content')}>
                     <DiskStateProgressBar

@@ -20,6 +20,8 @@ type HoverPopupProps = {
     anchorRef?: React.RefObject<HTMLElement>;
     onShowPopup?: VoidFunction;
     onHidePopup?: VoidFunction;
+    delayOpen?: number;
+    delayClose?: number;
 } & Pick<PopupProps, 'placement' | 'contentClassName'>;
 
 export const HoverPopup = ({
@@ -32,6 +34,8 @@ export const HoverPopup = ({
     onHidePopup,
     placement = ['top', 'bottom'],
     contentClassName,
+    delayClose = DEBOUNCE_TIMEOUT,
+    delayOpen = DEBOUNCE_TIMEOUT,
 }: HoverPopupProps) => {
     const [isPopupVisible, setIsPopupVisible] = React.useState(false);
     const anchor = React.useRef<HTMLDivElement>(null);
@@ -41,8 +45,8 @@ export const HoverPopup = ({
             debounce(() => {
                 setIsPopupVisible(true);
                 onShowPopup?.();
-            }, DEBOUNCE_TIMEOUT),
-        [onShowPopup],
+            }, delayOpen),
+        [onShowPopup, delayOpen],
     );
 
     const hidePopup = React.useCallback(() => {
@@ -51,8 +55,8 @@ export const HoverPopup = ({
     }, [onHidePopup]);
 
     const debouncedHandleHidePopup = React.useMemo(
-        () => debounce(hidePopup, DEBOUNCE_TIMEOUT),
-        [hidePopup],
+        () => debounce(hidePopup, delayClose),
+        [hidePopup, delayClose],
     );
 
     const onMouseEnter = debouncedHandleShowPopup;
