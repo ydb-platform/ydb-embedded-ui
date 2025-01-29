@@ -15,6 +15,8 @@ test.describe('Tenant initial load', () => {
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
 
+        await page.waitForTimeout(2000);
+
         await expect(page.locator('.kv-tenant-diagnostics')).toBeVisible();
     });
 
@@ -36,6 +38,8 @@ test.describe('Tenant initial load', () => {
 
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
+
+        await page.waitForTimeout(2000);
 
         await expect(page.locator('.empty-state')).toBeVisible();
         await expect(page.locator('.empty-state__title')).toHaveText('Access denied');
