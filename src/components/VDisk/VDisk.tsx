@@ -19,6 +19,8 @@ export interface VDiskProps {
     onShowPopup?: VoidFunction;
     onHidePopup?: VoidFunction;
     progressBarClassName?: string;
+    delayOpen?: number;
+    delayClose?: number;
 }
 
 export const VDisk = ({
@@ -29,6 +31,8 @@ export const VDisk = ({
     onShowPopup,
     onHidePopup,
     progressBarClassName,
+    delayClose,
+    delayOpen,
 }: VDiskProps) => {
     const vDiskPath = getVDiskLink(data);
 
@@ -38,6 +42,9 @@ export const VDisk = ({
             onShowPopup={onShowPopup}
             onHidePopup={onHidePopup}
             popupContent={<VDiskPopup data={data} />}
+            offset={[0, 5]}
+            delayClose={delayClose}
+            delayOpen={delayOpen}
         >
             <div className={b()}>
                 <InternalLink to={vDiskPath} className={b('content')}>
