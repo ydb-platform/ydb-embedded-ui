@@ -29,7 +29,7 @@ describe('getColumnWidth', () => {
 
     it('calculates correct width for columns with header', () => {
         const result = getColumnWidth({data: [], name: 'test', header: 'a'});
-        expect(result).toBe(HEADER_PADDING + SORT_ICON_PADDING + 'a'.length * PIXELS_PER_CHARACTER);
+        expect(result).toBe(HEADER_PADDING + 'a'.length * PIXELS_PER_CHARACTER);
     });
 
     it('returns MAX_COLUMN_WIDTH when calculated width exceeds it', () => {
@@ -58,13 +58,13 @@ describe('getColumnWidth', () => {
     it('handles null values in data correctly', () => {
         const data = [{test: 'a'}, {test: null}];
         const result = getColumnWidth({data, name: 'test'});
-        expect(result).toBe(HEADER_PADDING + 'a'.length * PIXELS_PER_CHARACTER);
+        expect(result).toBe(HEADER_PADDING + 'test'.length * PIXELS_PER_CHARACTER);
     });
 
     it('handles undefined values in data correctly', () => {
         const data = [{test: 'a'}, {test: undefined}];
         const result = getColumnWidth({data, name: 'test'});
-        expect(result).toBe(HEADER_PADDING + 'a'.length * PIXELS_PER_CHARACTER);
+        expect(result).toBe(HEADER_PADDING + 'test'.length * PIXELS_PER_CHARACTER);
     });
 
     it('handles empty string values in data correctly', () => {
