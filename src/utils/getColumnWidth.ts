@@ -1,10 +1,10 @@
 import type {SchemaData} from '../containers/Tenant/Schema/SchemaViewer/types';
 import type {KeyValueRow} from '../types/api/query';
 
-const MAX_COLUMN_WIDTH = 600;
-const HEADER_PADDING = 20;
-const SORT_ICON_PADDING = 18;
-const PIXELS_PER_CHARACTER = 10;
+export const MAX_COLUMN_WIDTH = 600;
+export const HEADER_PADDING = 20;
+export const SORT_ICON_PADDING = 18;
+export const PIXELS_PER_CHARACTER = 10;
 
 export function getColumnWidth<T extends KeyValueRow | SchemaData>({
     data,
