@@ -1,6 +1,6 @@
 import type {Column} from '@gravity-ui/react-data-table';
 
-export interface SchemaData {
+export type SchemaData = {
     id?: number;
     name?: string;
     keyColumnIndex?: number;
@@ -12,7 +12,7 @@ export interface SchemaData {
     prefferedPoolKind?: string;
     columnCodec?: string;
     defaultValue?: string | number | boolean;
-}
+};
 
 export interface SchemaColumn extends Column<SchemaData> {
     name: keyof SchemaData;

@@ -6,6 +6,7 @@ import type {Column, Settings} from '@gravity-ui/react-data-table';
 import type {ColumnType, KeyValueRow} from '../../types/api/query';
 import {cn} from '../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
+import {getColumnWidth} from '../../utils/getColumnWidth';
 import {getColumnType, prepareQueryResponse} from '../../utils/query';
 import {isNumeric} from '../../utils/utils';
 import type {ResizeableDataTableProps} from '../ResizeableDataTable/ResizeableDataTable';
@@ -13,7 +14,6 @@ import {ResizeableDataTable} from '../ResizeableDataTable/ResizeableDataTable';
 
 import {Cell} from './Cell';
 import i18n from './i18n';
-import {getColumnWidth} from './utils/getColumnWidth';
 
 import './QueryResultTable.scss';
 
