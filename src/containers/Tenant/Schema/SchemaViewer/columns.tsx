@@ -124,7 +124,7 @@ function normalizeColumns(columns: SchemaColumn[], data?: SchemaData[]) {
                 data: dataSlice,
                 name: column.name,
                 header: typeof column.header === 'string' ? column.header : undefined,
-                sortable: column.sortable === undefined,
+                sortable: column.sortable || column.sortable === undefined,
             }),
         };
     });
@@ -158,8 +158,6 @@ export function getRowTableColumns(
     if (hasAutoIncrement) {
         rowTableColumns.push(autoIncrementColumn);
     }
-
-    console.log(normalizeColumns(rowTableColumns, data));
 
     return normalizeColumns(rowTableColumns, data);
 }

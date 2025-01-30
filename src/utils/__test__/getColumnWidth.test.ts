@@ -26,6 +26,13 @@ describe('getColumnWidth', () => {
             HEADER_PADDING + SORT_ICON_PADDING + 'test'.length * PIXELS_PER_CHARACTER,
         );
     });
+    it('calculates correct width for columns with sorting and column name wider than header', () => {
+        const data = [{test: 'this is a longer string'}];
+        const result = getColumnWidth({data, name: 'test', sortable: true});
+        expect(result).toBe(
+            HEADER_PADDING + 'this is a longer string'.length * PIXELS_PER_CHARACTER,
+        );
+    });
 
     it('calculates correct width for columns with header', () => {
         const result = getColumnWidth({data: [], name: 'test', header: 'a'});
