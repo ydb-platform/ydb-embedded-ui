@@ -1,6 +1,6 @@
 export const MAX_COLUMN_WIDTH = 600;
 export const HEADER_PADDING = 20;
-export const SORT_ICON_PADDING = 18;
+export const SORT_ICON_TO_CHARACTERS = 2;
 export const PIXELS_PER_CHARACTER = 10;
 
 export function getColumnWidth({
@@ -16,7 +16,9 @@ export function getColumnWidth({
 }) {
     const headerContentLength = typeof header === 'string' ? header.length : name.length;
 
-    let maxColumnContentLength = headerContentLength;
+    let maxColumnContentLength = sortable
+        ? headerContentLength + SORT_ICON_TO_CHARACTERS
+        : headerContentLength;
 
     if (data) {
         for (const row of data) {
@@ -27,11 +29,8 @@ export function getColumnWidth({
 
             maxColumnContentLength = Math.max(maxColumnContentLength, cellLength);
 
-            const sortPadding =
-                sortable && maxColumnContentLength <= headerContentLength ? SORT_ICON_PADDING : 0;
-
             if (
-                maxColumnContentLength * PIXELS_PER_CHARACTER + HEADER_PADDING + sortPadding >=
+                maxColumnContentLength * PIXELS_PER_CHARACTER + HEADER_PADDING >=
                 MAX_COLUMN_WIDTH
             ) {
                 return MAX_COLUMN_WIDTH;
@@ -39,8 +38,5 @@ export function getColumnWidth({
         }
     }
 
-    const sortPadding =
-        sortable && maxColumnContentLength <= headerContentLength ? SORT_ICON_PADDING : 0;
-
-    return maxColumnContentLength * PIXELS_PER_CHARACTER + HEADER_PADDING + sortPadding;
+    return maxColumnContentLength * PIXELS_PER_CHARACTER + HEADER_PADDING;
 }

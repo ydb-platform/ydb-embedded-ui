@@ -2,7 +2,7 @@ import {
     HEADER_PADDING,
     MAX_COLUMN_WIDTH,
     PIXELS_PER_CHARACTER,
-    SORT_ICON_PADDING,
+    SORT_ICON_TO_CHARACTERS,
     getColumnWidth,
 } from '../getColumnWidth';
 
@@ -23,7 +23,7 @@ describe('getColumnWidth', () => {
     it('calculates correct width for columns with sorting', () => {
         const result = getColumnWidth({data: [], name: 'test', sortable: true});
         expect(result).toBe(
-            HEADER_PADDING + SORT_ICON_PADDING + 'test'.length * PIXELS_PER_CHARACTER,
+            HEADER_PADDING + ('test'.length + SORT_ICON_TO_CHARACTERS) * PIXELS_PER_CHARACTER,
         );
     });
     it('calculates correct width for columns with sorting and column name wider than header', () => {
