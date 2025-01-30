@@ -8,10 +8,11 @@ import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import SplitPane from '../../components/SplitPane';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {overviewApi} from '../../store/reducers/overview/overview';
+import {selectSchemaObjectData} from '../../store/reducers/schema/schema';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
 import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
-import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
+import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {isAccessError} from '../../utils/response';
 
 import ObjectGeneral from './ObjectGeneral/ObjectGeneral';
@@ -100,8 +101,18 @@ export function Tenant(props: TenantProps) {
             pollingInterval: autoRefreshInterval,
         },
     );
-    const {PathType: currentPathType, PathSubType: currentPathSubType} =
-        currentItem?.PathDescription?.Self || {};
+
+    const preloadedData = useTypedSelector((state) =>
+        selectSchemaObjectData(state, path, tenantName),
+    );
+
+    // Use preloaded data if there is no current item data yet
+    const currentPathType =
+        currentItem?.PathDescription?.Self?.PathType ??
+        preloadedData?.PathDescription?.Self?.PathType;
+    const currentPathSubType =
+        currentItem?.PathDescription?.Self?.PathSubType ??
+        preloadedData?.PathDescription?.Self?.PathSubType;
 
     const showBlockingError = isAccessError(error);
 

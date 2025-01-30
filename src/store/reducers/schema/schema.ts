@@ -1,9 +1,10 @@
 import React from 'react';
 
-import {createSlice} from '@reduxjs/toolkit';
+import {createSelector, createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
 import type {TEvDescribeSchemeResult} from '../../../types/api/schema';
+import type {RootState} from '../../defaultStore';
 import {api} from '../api';
 
 const initialState = {
@@ -110,3 +111,18 @@ export function useGetSchemaQuery({path, database}: {path: string; database: str
 
     return {data, isLoading, error: currentPathError};
 }
+
+const getSchemaSelector = createSelector(
+    (path: string) => path,
+    (_path: string, database: string) => database,
+    (path, database) => schemaApi.endpoints.getSchema.select({path, database}),
+);
+
+export const selectSchemaObjectData = createSelector(
+    (state: RootState) => state,
+    (_state: RootState, path: string) => path,
+    (_state: RootState, path: string, database: string) => getSchemaSelector(path, database),
+    (state, path, selectSchemaData) => {
+        return selectSchemaData(state).data?.[path];
+    },
+);
