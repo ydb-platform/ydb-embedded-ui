@@ -2,6 +2,7 @@ import React from 'react';
 
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../../components/Loader';
+import {useClusterBaseInfo} from '../../../../../store/reducers/cluster/cluster';
 import {cn} from '../../../../../utils/cn';
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 import {useHealthcheck} from '../useHealthcheck';
@@ -19,8 +20,10 @@ interface HealthcheckDetailsProps {
 
 export function HealthcheckDetails({tenantName}: HealthcheckDetailsProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
+    const {name} = useClusterBaseInfo();
     const {issueTrees, loading, error} = useHealthcheck(tenantName, {
-        autorefresh: autoRefreshInterval,
+        //FIXME https://github.com/ydb-platform/ydb-embedded-ui/issues/1889
+        autorefresh: name === 'ydb_ru' ? undefined : autoRefreshInterval,
     });
 
     const renderContent = () => {
