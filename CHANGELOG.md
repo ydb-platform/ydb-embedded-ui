@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.6.0-hotfix.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.6.0...v8.6.0-hotfix.1) (2025-01-30)
+
+
+### Bug Fixes
+
+* disable autorefresh for ydb_ru ([#1890](https://github.com/ydb-platform/ydb-embedded-ui/issues/1890)) ([953139d](https://github.com/ydb-platform/ydb-embedded-ui/commit/953139d464cc59b7786eebe0df99f96b48caeeaf))
+
 ## [8.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.5.0...v8.6.0) (2025-01-27)
 
 
