@@ -97,4 +97,10 @@
 
         border-radius: 4px;
     }
+    &__icon-warn {
+        color: var(--g-color-text-warning);
+    }
+    &__icon-wrapper {
+        display: flex;
+    }
 }
