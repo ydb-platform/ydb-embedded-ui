@@ -1,7 +1,7 @@
 import React from 'react';
 
 import ChartKit, {settings} from '@gravity-ui/chartkit';
-import type {YagrSeriesData, YagrWidgetData} from '@gravity-ui/chartkit/yagr';
+import type {YagrWidgetData} from '@gravity-ui/chartkit/yagr';
 import {YagrPlugin} from '@gravity-ui/chartkit/yagr';
 
 import {cn} from '../../utils/cn';
@@ -29,12 +29,12 @@ const prepareWidgetData = (
     data: PreparedMetricsData,
     options: ChartOptions = {},
 ): YagrWidgetData => {
-    const {dataType, scaleRange} = options;
+    const {dataType, scaleRange, showLegend} = options;
     const defaultDataFormatter = getDefaultDataFormatter(dataType);
 
     const isDataEmpty = !data.metrics.length;
 
-    const graphs: YagrSeriesData[] = data.metrics.map((metric, index) => {
+    const graphs: YagrWidgetData['data']['graphs'] = data.metrics.map((metric, index) => {
         const lineColor = metric.color || colors[index];
         const color = colorToRGBA(lineColor, 0.1);
 
@@ -90,6 +90,9 @@ const prepareWidgetData = (
             tooltip: {
                 show: true,
                 tracking: 'sticky',
+            },
+            legend: {
+                show: showLegend,
             },
         },
     };

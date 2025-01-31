@@ -22,6 +22,7 @@ export const cpuDashboardConfig: ChartConfig[] = [
                 min: 0,
                 max: 1,
             },
+            showLegend: true,
         },
     },
 ];
