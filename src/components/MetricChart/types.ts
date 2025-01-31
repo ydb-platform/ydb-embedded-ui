@@ -38,6 +38,7 @@ export interface ChartOptions {
         min?: number;
         max?: number;
     };
+    showLegend?: boolean;
 }
 
 export type ChartDataStatus = 'loading' | 'success' | 'error';

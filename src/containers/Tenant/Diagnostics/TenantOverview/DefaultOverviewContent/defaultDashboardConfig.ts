@@ -16,31 +16,24 @@ export const defaultDashboardConfig: ChartConfig[] = [
         metrics: [
             {
                 target: 'queries.latencies.p50',
-                title: i18n('charts.transaction-latency', {
-                    percentile: 'p50',
-                }),
+                title: 'p50',
             },
             {
                 target: 'queries.latencies.p75',
-                title: i18n('charts.transaction-latency', {
-                    percentile: 'p75',
-                }),
+                title: 'p75',
             },
             {
                 target: 'queries.latencies.p90',
-                title: i18n('charts.transaction-latency', {
-                    percentile: 'p90',
-                }),
+                title: 'p90',
             },
             {
                 target: 'queries.latencies.p99',
-                title: i18n('charts.transaction-latency', {
-                    percentile: 'p99',
-                }),
+                title: 'p99',
             },
         ],
         options: {
             dataType: 'ms',
+            showLegend: true,
         },
     },
 ];
