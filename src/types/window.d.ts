@@ -37,6 +37,7 @@ interface Window {
     web_version?: boolean;
     custom_backend?: string;
     meta_backend?: string;
+    code_assist_backend?: string;
 
     userSettings?: import('../services/settings').SettingsObject;
     systemSettings?: import('../services/settings').SettingsObject;

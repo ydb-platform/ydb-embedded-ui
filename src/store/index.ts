@@ -5,6 +5,7 @@ export {
     configureStore,
     customBackend,
     metaBackend,
+    codeAssistBackend,
     webVersion,
 } from './configureStore';
 export {rootReducer} from './reducers';
