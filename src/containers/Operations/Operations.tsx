@@ -25,7 +25,7 @@ export function Operations({database}: OperationsProps) {
     const {kind, searchValue, pageSize, pageToken, handleKindChange, handleSearchChange} =
         useOperationsQueryParams();
 
-    const {data, isFetching, error, refetch} = operationsApi.useGetOperationListQuery(
+    const {data, isLoading, error, refetch} = operationsApi.useGetOperationListQuery(
         {database, kind, page_size: pageSize, page_token: pageToken},
         {
             pollingInterval: autoRefreshInterval,
@@ -53,13 +53,13 @@ export function Operations({database}: OperationsProps) {
                     searchValue={searchValue}
                     entitiesCountCurrent={filteredOperations.length}
                     entitiesCountTotal={data?.operations?.length}
-                    entitiesLoading={isFetching}
+                    entitiesLoading={isLoading}
                     handleKindChange={handleKindChange}
                     handleSearchChange={handleSearchChange}
                 />
             </TableWithControlsLayout.Controls>
             {error ? <ResponseError error={error} /> : null}
-            <TableWithControlsLayout.Table loading={isFetching} className={b('table')}>
+            <TableWithControlsLayout.Table loading={isLoading} className={b('table')}>
                 {data ? (
                     <ResizeableDataTable
                         columns={getColumns({database, refreshTable: refetch})}

@@ -91,7 +91,7 @@ export const Configs = ({database}: ConfigsProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {
         currentData = [],
-        isFetching,
+        isLoading,
         error,
     } = tenantApi.useGetClusterConfigQuery({database}, {pollingInterval: autoRefreshInterval});
 
@@ -113,7 +113,7 @@ export const Configs = ({database}: ConfigsProps) => {
                     placeholder={i18n('search-placeholder')}
                 />
             </TableWithControlsLayout.Controls>
-            <TableWithControlsLayout.Table loading={isFetching}>
+            <TableWithControlsLayout.Table loading={isLoading}>
                 {error ? (
                     <ResponseError error={error} />
                 ) : (
