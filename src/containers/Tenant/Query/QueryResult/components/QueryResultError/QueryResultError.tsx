@@ -1,5 +1,6 @@
 import {cn} from '../../../../../../utils/cn';
 import {parseQueryError} from '../../../../../../utils/query';
+import {isNetworkError} from '../../../../../../utils/response';
 import {ResultIssues} from '../../../Issues/Issues';
 import {isQueryCancelledError} from '../../../utils/isQueryCancelledError';
 
@@ -14,6 +15,10 @@ export function QueryResultError({error}: {error: unknown}) {
     // There is no need to display "Query is cancelled" message too
     if (!parsedError || isQueryCancelledError(error)) {
         return null;
+    }
+
+    if (isNetworkError(error)) {
+        return <div className={b('message')}>{error.message}</div>;
     }
 
     if (typeof parsedError === 'object') {
