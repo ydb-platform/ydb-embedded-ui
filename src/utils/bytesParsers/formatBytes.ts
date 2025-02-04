@@ -26,47 +26,23 @@ const sizes = {
         value: TERABYTE,
         label: i18n('tb'),
     },
-};
+} as const;
 
 export type BytesSizes = keyof typeof sizes;
 
-/**
- * This function is needed to keep more than 3 digits of the same size.
- *
- * @param significantDigits - number of digits above 3
- * @returns size to format value to get required number of digits
- *
- * By default value converted to the next size when it's above 1000,
- * so we have 900mb and 1gb. To extend it additional significantDigits could be set
- *
- * significantDigits value added above default 3
- *
- * significantDigits = 1 - 9 000 mb and 10 gb
- *
- * significantDigits = 2 - 90 000 mb and 100 gb
- *
- * significantDigits = 3 - 900 000 mb and 1000 gb
- */
-export const getSizeWithSignificantDigits = (value: number, significantDigits: number) => {
-    const multiplier = 10 ** significantDigits;
-
-    const tbLevel = sizes.tb.value * multiplier;
-    const gbLevel = sizes.gb.value * multiplier;
-    const mbLevel = sizes.mb.value * multiplier;
-    const kbLevel = sizes.kb.value * multiplier;
-
+export const getBytesSizeUnit = (value: number) => {
     let size: BytesSizes = 'b';
 
-    if (value >= kbLevel) {
+    if (value >= sizes.kb.value) {
         size = 'kb';
     }
-    if (value >= mbLevel) {
+    if (value >= sizes.mb.value) {
         size = 'mb';
     }
-    if (value >= gbLevel) {
+    if (value >= sizes.gb.value) {
         size = 'gb';
     }
-    if (value >= tbLevel) {
+    if (value >= sizes.tb.value) {
         size = 'tb';
     }
 
@@ -87,15 +63,11 @@ const addSpeedLabel = (result: string, size: BytesSizes) => {
     return addSizeLabel(result, size) + i18n('perSecond');
 };
 
-/**
- * @param significantDigits - number of digits above 3
- */
 export const formatBytes = ({
     value,
     size,
     withSpeedLabel = false,
     withSizeLabel = true,
-    significantDigits = 0,
     delimiter,
     ...params
 }: FormatValuesArgs<BytesSizes>) => {
@@ -105,7 +77,7 @@ export const formatBytes = ({
 
     const numValue = Number(value);
 
-    const sizeToConvert = size ?? getSizeWithSignificantDigits(numValue, significantDigits);
+    const sizeToConvert = size ?? getBytesSizeUnit(numValue);
 
     const result = formatToSize({value: numValue, size: sizeToConvert, ...params});
 

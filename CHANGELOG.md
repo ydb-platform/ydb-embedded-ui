@@ -1,5 +1,22 @@
 # Changelog
 
+## [8.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.6.0...v8.7.0) (2025-01-31)
+
+
+### Features
+
+* **MetricChart:** add legend to some charts ([#1893](https://github.com/ydb-platform/ydb-embedded-ui/issues/1893)) ([b190e24](https://github.com/ydb-platform/ydb-embedded-ui/commit/b190e2461b6b3edecc272a804597415fbe0742f5))
+* **SchemaViewer:** calculate column width based on data ([#1885](https://github.com/ydb-platform/ydb-embedded-ui/issues/1885)) ([85f19c3](https://github.com/ydb-platform/ydb-embedded-ui/commit/85f19c3d579a2d365056a69be43856a82bd5a9e4))
+
+
+### Bug Fixes
+
+* add additional timeout for flaky tests ([#1884](https://github.com/ydb-platform/ydb-embedded-ui/issues/1884)) ([9a502d2](https://github.com/ydb-platform/ydb-embedded-ui/commit/9a502d27e592522ee93f296be6b9047e7e87032e))
+* avoid confusion with information interpretation ([#1871](https://github.com/ydb-platform/ydb-embedded-ui/issues/1871)) ([54c7091](https://github.com/ydb-platform/ydb-embedded-ui/commit/54c7091184d4cc1993bb735a4df9673fc2c32873))
+* disable autorefresh for ydb_ru ([#1890](https://github.com/ydb-platform/ydb-embedded-ui/issues/1890)) ([a0ba20f](https://github.com/ydb-platform/ydb-embedded-ui/commit/a0ba20f68b288bb8be9fa4a12effeea1d00cd9b6))
+* **Storage:** tune popups for vdisk and pdisk ([#1883](https://github.com/ydb-platform/ydb-embedded-ui/issues/1883)) ([ae115d9](https://github.com/ydb-platform/ydb-embedded-ui/commit/ae115d97dedf4dcb353cf3c53d0418131550bb19))
+* **Tenant:** fix tabs reset on schema object change ([#1881](https://github.com/ydb-platform/ydb-embedded-ui/issues/1881)) ([4dd053d](https://github.com/ydb-platform/ydb-embedded-ui/commit/4dd053deb240823780a0c87aa88d3628631f26da))
+
 ## [8.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.5.0...v8.6.0) (2025-01-27)
 
 

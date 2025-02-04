@@ -1,17 +1,14 @@
 import {dateTimeParse, duration} from '@gravity-ui/date-utils';
 
 import type {TVDiskID, TVSlotId} from '../../types/api/vdisk';
-import {
-    formatBytes as formatBytesCustom,
-    getSizeWithSignificantDigits,
-} from '../bytesParsers/formatBytes';
+import {formatBytes as formatBytesCustom, getBytesSizeUnit} from '../bytesParsers/formatBytes';
 import type {BytesSizes} from '../bytesParsers/formatBytes';
 import {HOUR_IN_SECONDS} from '../constants';
 import {configuredNumeral} from '../numeral';
 import {UNBREAKABLE_GAP, isNumeric} from '../utils';
 
 import {formatValues} from './common';
-import {formatNumberWithDigits, getNumberWithSignificantDigits} from './formatNumber';
+import {formatNumberWithDigits, getNumberSizeUnit} from './formatNumber';
 import type {Digits} from './formatNumber';
 import i18n from './i18n';
 
@@ -114,7 +111,7 @@ export function formatStorageValues(
 ) {
     return formatValues<BytesSizes>(
         formatBytesCustom,
-        getSizeWithSignificantDigits,
+        getBytesSizeUnit,
         value,
         total,
         size,
@@ -132,7 +129,7 @@ export function formatNumericValues(
 ) {
     return formatValues<Digits>(
         formatNumberWithDigits,
-        getNumberWithSignificantDigits,
+        getNumberSizeUnit,
         value,
         total,
         size,

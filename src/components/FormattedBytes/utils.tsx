@@ -11,5 +11,5 @@ export const toFormattedSize = (
         return null;
     }
 
-    return <FormattedBytes value={value} significantDigits={2} {...params} />;
+    return <FormattedBytes value={value} {...params} />;
 };

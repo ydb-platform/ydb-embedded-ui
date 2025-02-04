@@ -33,20 +33,6 @@ describe('formatBytes', () => {
             `100${UNBREAKABLE_GAP}000${UNBREAKABLE_GAP}B/s`,
         );
     });
-    it('should return fixed amount of significant digits', () => {
-        expect(formatBytes({value: 99_000, significantDigits: 2})).toEqual(
-            `99${UNBREAKABLE_GAP}000${UNBREAKABLE_GAP}B`,
-        );
-        expect(formatBytes({value: 100_000, significantDigits: 2})).toEqual(
-            `100${UNBREAKABLE_GAP}KB`,
-        );
-        expect(formatBytes({value: 99_000_000_000_000, significantDigits: 2})).toEqual(
-            `99${UNBREAKABLE_GAP}000${UNBREAKABLE_GAP}GB`,
-        );
-        expect(formatBytes({value: 100_000_000_000_000, significantDigits: 2})).toEqual(
-            `100${UNBREAKABLE_GAP}TB`,
-        );
-    });
     it('should return empty string on invalid data', () => {
         expect(formatBytes({value: undefined})).toEqual('');
         expect(formatBytes({value: null})).toEqual('');
