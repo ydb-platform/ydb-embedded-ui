@@ -6,7 +6,6 @@ import throttle from 'lodash/throttle';
 import type Monaco from 'monaco-editor';
 
 import {MonacoEditor} from '../../../../components/MonacoEditor/MonacoEditor';
-import {codeAssistApi} from '../../../../store/reducers/codeAssist/codeAssist';
 import {
     goToNextQuery,
     goToPreviousQuery,
@@ -26,8 +25,9 @@ import {useUpdateErrorsHighlighting} from '../../../../utils/monaco/highlightErr
 import {QUERY_ACTIONS} from '../../../../utils/query';
 import {SAVE_QUERY_DIALOG} from '../SaveQuery/SaveQuery';
 import i18n from '../i18n';
+import {useSavedQueries} from '../utils/useSavedQueries';
 
-import {useEditorOptions} from './helpers';
+import {useCodeAssist, useEditorOptions} from './helpers';
 import {getKeyBindings} from './keybindings';
 
 const CONTEXT_MENU_GROUP_ID = 'navigation';
@@ -48,6 +48,7 @@ export function YqlEditor({
     const input = useTypedSelector(selectUserInput);
     const dispatch = useTypedDispatch();
     const historyQueries = useTypedSelector(selectQueriesHistory);
+    const savedQueries = useSavedQueries();
     const editorOptions = useEditorOptions();
     const updateErrorsHighlighting = useUpdateErrorsHighlighting();
 
@@ -72,21 +73,24 @@ export function YqlEditor({
         window.ydbEditor = undefined;
     };
 
-    const [sendCodeAssistPrompt] = codeAssistApi.useLazyGetCodeAssistSuggestionsQuery();
+    const {
+        getCodeAssistSuggestions,
+        onCompletionAccept,
+        onCompletionDecline,
+        onCompletionIgnore,
+        prepareUserQueriesCache,
+    } = useCodeAssist();
 
     const {registerMonacoGhost, dispose} = useMonacoGhost({
         api: {
-            getCodeAssistSuggestions: async (prompt) => {
-                try {
-                    return await sendCodeAssistPrompt(prompt).unwrap();
-                } catch {
-                    return {items: []};
-                }
-            },
+            getCodeAssistSuggestions,
         },
         config: {
             language: YQL_LANGUAGE_ID,
         },
+        onCompletionAccept,
+        onCompletionDecline,
+        onCompletionIgnore,
     });
 
     const editorDidMount = React.useCallback(
@@ -105,6 +109,16 @@ export function YqlEditor({
 
             if (window.api.codeAssist) {
                 registerMonacoGhost(editor);
+                prepareUserQueriesCache([
+                    ...historyQueries.map((query, index) => ({
+                        name: `query${index}.yql`,
+                        text: query.queryText,
+                    })),
+                    ...savedQueries.map((query) => ({
+                        name: query.name,
+                        text: query.body,
+                    })),
+                ]);
             }
             initResizeHandler(editor);
             initUserPrompt(editor, getLastQueryText);
@@ -198,7 +212,10 @@ export function YqlEditor({
             getLastQueryText,
             handleSendExecuteClick,
             handleSendQuery,
+            historyQueries,
+            prepareUserQueriesCache,
             registerMonacoGhost,
+            savedQueries,
         ],
     );
 
