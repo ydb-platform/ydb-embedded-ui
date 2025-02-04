@@ -2,7 +2,7 @@ import {DefinitionList} from '@gravity-ui/components';
 
 import {ContentWithPopup} from '../../../../../components/ContentWithPopup/ContentWithPopup';
 import type {DiskErasureGroupsStats} from '../../../../../store/reducers/cluster/types';
-import {formatBytes, getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
+import {formatBytes, getBytesSizeUnit} from '../../../../../utils/bytesParsers';
 import {cn} from '../../../../../utils/cn';
 import i18n from '../../../i18n';
 
@@ -36,7 +36,7 @@ interface GroupsStatsPopupContentProps {
 function GroupsStatsPopupContent({stats}: GroupsStatsPopupContentProps) {
     const {diskType, erasure, allocatedSize, availableSize} = stats;
 
-    const sizeToConvert = getSizeWithSignificantDigits(Math.max(allocatedSize, availableSize), 2);
+    const sizeToConvert = getBytesSizeUnit(Math.max(allocatedSize, availableSize));
 
     const convertedAllocatedSize = formatBytes({value: allocatedSize, size: sizeToConvert});
     const convertedAvailableSize = formatBytes({value: availableSize, size: sizeToConvert});

@@ -10,25 +10,24 @@ export type FormatValuesArgs<T> = Omit<FormatToSizeArgs<T>, 'value'> & {
     value: number | string | undefined | null;
     withSpeedLabel?: boolean;
     withSizeLabel?: boolean;
-    significantDigits?: number;
     delimiter?: string;
 };
 
 export function formatValues<T>(
     formatter: (args: FormatValuesArgs<T>) => string,
-    sizeGetter: (value: number, significantDigits: number) => T,
+    sizeGetter: (value: number) => T,
     value?: number,
     total?: number,
     size?: T,
     delimiter?: string,
     withValueLabel = false,
 ) {
-    let calculatedSize = sizeGetter(Number(value), 0);
+    let calculatedSize = sizeGetter(Number(value));
     let valueWithSizeLabel = true;
     let valuePrecision = 0;
 
     if (isNumeric(total)) {
-        calculatedSize = sizeGetter(Number(total), 0);
+        calculatedSize = sizeGetter(Number(total));
         valueWithSizeLabel = withValueLabel;
         valuePrecision = 1;
     }
