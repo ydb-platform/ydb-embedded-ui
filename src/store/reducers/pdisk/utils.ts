@@ -1,6 +1,7 @@
 import type {TPDiskInfoResponse} from '../../../types/api/pdisk';
 import type {TEvSystemStateResponse} from '../../../types/api/systemState';
 import {getArray, valueIsDefined} from '../../../utils';
+import {getSpaceSeverity} from '../../../utils/disks/helpers';
 import {
     prepareWhiteboardPDiskData,
     prepareWhiteboardVDiskData,
@@ -34,18 +35,20 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
         TotalSize: PDiskTotalSize,
         SystemSize,
         ExpectedSlotCount,
-        EnforcedDynamicSlotSize,
+        SlotSize,
     } = preparedPDisk;
 
     let logSlot: SlotItem<'log'> | undefined;
 
     if (valueIsDefined(LogTotalSize)) {
+        const usagePercent = (Number(LogUsedSize) * 100) / Number(LogTotalSize);
+
         logSlot = {
             SlotType: 'log',
             Used: Number(LogUsedSize),
             Total: Number(LogTotalSize),
-            UsagePercent: (Number(LogUsedSize) * 100) / Number(LogTotalSize),
-            Severity: 1,
+            UsagePercent: usagePercent,
+            Severity: getSpaceSeverity(usagePercent),
             SlotData: {
                 LogUsedSize,
                 LogTotalSize,
@@ -60,11 +63,19 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
     preparedVDisks.sort((disk1, disk2) => Number(disk2.VDiskSlotId) - Number(disk1.VDiskSlotId));
 
     const vdisksSlots: SlotItem<'vDisk'>[] = preparedVDisks.map((preparedVDisk) => {
+        // VDisks do not have strict limits and can be bigger than they should
+        // In most storage views we don't colorize them depending on space usage
+        // Colorize them inside PDiskSpaceDistribution so overused slots will be visible
+        const slotSeverity = Math.max(
+            getSpaceSeverity(preparedVDisk.AllocatedPercent),
+            preparedVDisk.Severity || 0,
+        );
+
         return {
             SlotType: 'vDisk',
             Id: preparedVDisk.VDiskId?.GroupID,
             Title: preparedVDisk.StoragePoolName,
-            Severity: preparedVDisk.Severity,
+            Severity: slotSeverity,
             Used: Number(preparedVDisk.AllocatedSize),
             Total: Number(preparedVDisk.TotalSize),
             UsagePercent: preparedVDisk.AllocatedPercent,
@@ -78,7 +89,7 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
     if (ExpectedSlotCount && ExpectedSlotCount > vdisksSlots.length) {
         const emptySlotsCount = ExpectedSlotCount - vdisksSlots.length;
 
-        let emptySlotSize = Number(EnforcedDynamicSlotSize);
+        let emptySlotSize = Number(SlotSize);
 
         if (isNaN(emptySlotSize)) {
             const vDisksTotalSize = vdisksSlots.reduce((sum, item) => {

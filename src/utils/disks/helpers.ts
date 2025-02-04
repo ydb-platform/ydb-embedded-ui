@@ -1,6 +1,7 @@
 import {valueIsDefined} from '..';
-import type {EFlag} from '../../types/api/enums';
+import {EFlag} from '../../types/api/enums';
 import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
+import {generateEvaluator} from '../generateEvaluator';
 
 import {
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
@@ -14,6 +15,12 @@ export function isFullVDiskData(
 ): disk is PreparedVDisk | TVDiskStateInfo {
     return 'VDiskId' in disk;
 }
+
+const getSpaceFlag = generateEvaluator([EFlag.Green, EFlag.Yellow, EFlag.Red]);
+
+export const getSpaceSeverity = (allocatedPercent?: number) => {
+    return valueIsDefined(allocatedPercent) ? getColorSeverity(getSpaceFlag(allocatedPercent)) : 0;
+};
 
 export function getSeverityColor(severity: number | undefined) {
     if (severity === undefined) {
