@@ -6,7 +6,7 @@ import {CellWithPopover} from '../../../../../components/CellWithPopover/CellWit
 import {LinkToSchemaObject} from '../../../../../components/LinkToSchemaObject/LinkToSchemaObject';
 import {topTablesApi} from '../../../../../store/reducers/tenantOverview/executeTopTables/executeTopTables';
 import type {KeyValueRow} from '../../../../../types/api/query';
-import {formatBytes, getSizeWithSignificantDigits} from '../../../../../utils/bytesParsers';
+import {formatBytes, getBytesSizeUnit} from '../../../../../utils/bytesParsers';
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../../utils/query';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
@@ -35,7 +35,7 @@ export function TopTables({path}: TopTablesProps) {
     const data = currentData?.resultSets?.[0]?.result || [];
 
     const formatSize = (value?: number) => {
-        const size = getSizeWithSignificantDigits(data?.length ? Number(data[0].Size) : 0, 0);
+        const size = getBytesSizeUnit(data?.length ? Number(data[0].Size) : 0);
 
         return formatBytes({value, size, precision: 1});
     };
