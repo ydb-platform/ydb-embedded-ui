@@ -5,6 +5,10 @@ import type {FormatToSizeArgs, FormatValuesArgs} from './common';
 import {formatNumber, roundToPrecision} from './dataFormatters';
 
 const sizes = {
+    noUnit: {
+        value: 1,
+        label: '',
+    },
     thousand: {
         value: 1_000,
         label: i18n('label_thousand'),
@@ -26,9 +30,9 @@ const sizes = {
 export type Digits = keyof typeof sizes;
 
 export const getNumberSizeUnit = (value: number) => {
-    let size: Digits = 'thousand';
+    let size: Digits = 'noUnit';
 
-    if (value > sizes.thousand.value) {
+    if (value >= sizes.thousand.value) {
         size = 'thousand';
     }
     if (value >= sizes.million.value) {
@@ -51,7 +55,12 @@ const formatToSize = ({value, size = 'thousand', precision = 0}: FormatToSizeArg
 };
 
 const addSizeLabel = (result: string, size: Digits, delimiter = UNBREAKABLE_GAP) => {
-    return result + delimiter + sizes[size].label;
+    const label = sizes[size].label;
+    if (!label) {
+        return result;
+    }
+
+    return result + delimiter + label;
 };
 
 export const formatNumberWithDigits = ({

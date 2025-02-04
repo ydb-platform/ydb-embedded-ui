@@ -21,6 +21,12 @@ describe('formatNumericValues', () => {
         const result = formatNumericValues(1024, 2048);
         expect(result).toEqual(['1', `2${UNBREAKABLE_GAP}k`]);
     });
+
+    it('should format values without units (less than 1000)', () => {
+        const result1 = formatNumericValues(10, 20);
+        expect(result1).toEqual(['10', `20`]);
+    });
+
     it('should format value with label if set', () => {
         const result = formatNumericValues(1024, 2048, undefined, undefined, true);
         expect(result).toEqual([`1${UNBREAKABLE_GAP}k`, `2${UNBREAKABLE_GAP}k`]);
