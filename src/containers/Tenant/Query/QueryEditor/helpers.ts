@@ -3,8 +3,8 @@ import React from 'react';
 import type {AcceptEvent, DeclineEvent, IgnoreEvent, PromptFile} from '@ydb-platform/monaco-ghost';
 import type Monaco from 'monaco-editor';
 
-import type {TelemetryOpenTabs} from '../../../../services/api/codeAssist';
 import {codeAssistApi} from '../../../../store/reducers/codeAssist/codeAssist';
+import type {TelemetryOpenTabs} from '../../../../types/api/codeAssist';
 import {AUTOCOMPLETE_ON_ENTER, ENABLE_AUTOCOMPLETE} from '../../../../utils/constants';
 import {useSetting} from '../../../../utils/hooks';
 
@@ -44,11 +44,9 @@ export function useCodeAssist() {
     const [sendUserQueriesData] = codeAssistApi.useLazySendUserQueriesDataQuery();
 
     const getCodeAssistSuggestions = React.useCallback(
-        async (prompt: PromptFile[]) => {
+        async (promptFiles: PromptFile[]) => {
             try {
-                const {items} = await sendCodeAssistPrompt(prompt).unwrap();
-
-                return {items};
+                return sendCodeAssistPrompt(promptFiles).unwrap();
             } catch {
                 return {items: []};
             }
@@ -59,7 +57,7 @@ export function useCodeAssist() {
     const onCompletionAccept = React.useCallback(
         async (event: AcceptEvent) => {
             try {
-                return await acceptSuggestion(event).unwrap();
+                return acceptSuggestion(event).unwrap();
             } catch {
                 return {items: []};
             }
@@ -70,7 +68,7 @@ export function useCodeAssist() {
     const onCompletionDecline = React.useCallback(
         async (event: DeclineEvent) => {
             try {
-                return await discardSuggestion(event).unwrap();
+                return discardSuggestion(event).unwrap();
             } catch {
                 return {items: []};
             }
@@ -81,7 +79,7 @@ export function useCodeAssist() {
     const onCompletionIgnore = React.useCallback(
         async (event: IgnoreEvent) => {
             try {
-                return await ignoreSuggestion(event).unwrap();
+                return ignoreSuggestion(event).unwrap();
             } catch {
                 return {items: []};
             }
@@ -96,7 +94,7 @@ export function useCodeAssist() {
                 Text: query.text,
             }));
             try {
-                return await sendUserQueriesData(preparedData).unwrap();
+                return sendUserQueriesData(preparedData).unwrap();
             } catch {
                 return {items: []};
             }

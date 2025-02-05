@@ -6,16 +6,17 @@ import type {
     Suggestions,
 } from '@ydb-platform/monaco-ghost';
 
-import type {TelemetryOpenTabs} from '../../../services/api/codeAssist';
+import type {TelemetryOpenTabs} from '../../../types/api/codeAssist';
 import {api} from '../api';
 
 export const codeAssistApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getCodeAssistSuggestions: builder.query<Suggestions, PromptFile[]>({
-            queryFn: async (prompt: PromptFile[]) => {
+            queryFn: async (promptFiles: PromptFile[]) => {
                 try {
                     if (window.api.codeAssist) {
-                        const data = await window.api.codeAssist.getCodeAssistSuggestions(prompt);
+                        const data =
+                            await window.api.codeAssist.getCodeAssistSuggestions(promptFiles);
                         return {data};
                     } else {
                         throw new Error('Method is not implemented.');

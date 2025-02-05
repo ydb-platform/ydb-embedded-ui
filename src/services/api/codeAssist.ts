@@ -1,6 +1,12 @@
 import type {PromptFile, Suggestions} from '@ydb-platform/monaco-ghost';
 
 import {codeAssistBackend as CODE_ASSISTANT_BACKEND} from '../../store';
+import type {
+    CodeAssistSuggestionsFiles,
+    CodeAssistSuggestionsResponse,
+    TelemetryEvent,
+    TelemetryOpenTabs,
+} from '../../types/api/codeAssist';
 
 import {BaseYdbAPI} from './base';
 const ideInfo = {
@@ -10,49 +16,41 @@ const ideInfo = {
     PluginVersion: '0.2',
 };
 
-interface AcceptSuggestionEvent {
-    Accepted: {
-        RequestId: string;
-        Timestamp: number;
-        AcceptedText: string;
-        ConvertedText: string;
-    };
-}
-interface DiscardSuggestionEvent {
-    Discarded: {
-        RequestId: string;
-        Timestamp: number;
-        DiscardReason: 'OnCancel';
-        DiscardedText: string;
-        CacheHitCount: number;
-    };
-}
-interface IgnoreSuggestionEvent {
-    Ignored: {
-        RequestId: string;
-        Timestamp: number;
-        IgnoredText: string;
-    };
+function prepareCodeAssistPrompt(promptFiles: PromptFile[]): CodeAssistSuggestionsFiles {
+    return promptFiles.map((file) => ({
+        Fragments: file.fragments.map((fragment) => ({
+            Text: fragment.text,
+            Start: {
+                Ln: fragment.start.lineNumber,
+                Col: fragment.start.column,
+            },
+            End: {
+                Ln: fragment.end.lineNumber,
+                Col: fragment.end.column,
+            },
+        })),
+        Cursor: {
+            Ln: file.cursorPostion.lineNumber,
+            Col: file.cursorPostion.column,
+        },
+        Path: `${file.path}.yql`,
+    }));
 }
 
-type OpenTab = {
-    FileName: string;
-    Text: string;
-};
-
-export type TelemetryOpenTabs = OpenTab[];
-
-export type TelemetryEvent = AcceptSuggestionEvent | DiscardSuggestionEvent | IgnoreSuggestionEvent;
+// In the future code assist api will be provided to ydb-ui component explicitly by consumer service.
+// Current solution is temporary and aimed to satisfy internal puproses.
 export class CodeAssistAPI extends BaseYdbAPI {
     getPath(path: string) {
         return `${CODE_ASSISTANT_BACKEND ?? ''}${path}`;
     }
 
-    getCodeAssistSuggestions(data: PromptFile[]) {
-        return this.post<Suggestions>(
+    async getCodeAssistSuggestions(data: PromptFile[]): Promise<Suggestions> {
+        const request: CodeAssistSuggestionsFiles = prepareCodeAssistPrompt(data);
+
+        const response = await this.post<CodeAssistSuggestionsResponse>(
             this.getPath('/code-assist-suggestion'),
             {
-                Files: data,
+                Files: request,
                 ContextCreateType: 1,
                 IdeInfo: ideInfo,
             },
@@ -62,6 +60,11 @@ export class CodeAssistAPI extends BaseYdbAPI {
                 collectRequest: false,
             },
         );
+
+        return {
+            items: response.Suggests.map((suggestion) => suggestion.Text),
+            requestId: response.RequestId,
+        };
     }
 
     sendCodeAssistTelemetry(data: TelemetryEvent) {
