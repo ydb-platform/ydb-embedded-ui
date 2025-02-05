@@ -11,7 +11,7 @@ import {api} from '../api';
 
 export const codeAssistApi = api.injectEndpoints({
     endpoints: (builder) => ({
-        getCodeAssistSuggestions: builder.query<Suggestions, PromptFile[]>({
+        getCodeAssistSuggestions: builder.mutation<Suggestions, PromptFile[]>({
             queryFn: async (promptFiles: PromptFile[]) => {
                 try {
                     if (window.api.codeAssist) {
@@ -25,10 +25,9 @@ export const codeAssistApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: ['All'],
         }),
 
-        acceptSuggestion: builder.query({
+        acceptSuggestion: builder.mutation({
             queryFn: async (event: AcceptEvent) => {
                 try {
                     if (window.api.codeAssist) {
@@ -48,10 +47,9 @@ export const codeAssistApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: ['All'],
         }),
 
-        discardSuggestion: builder.query({
+        discardSuggestion: builder.mutation({
             queryFn: async (event: DeclineEvent) => {
                 try {
                     if (window.api.codeAssist) {
@@ -72,10 +70,9 @@ export const codeAssistApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: ['All'],
         }),
 
-        ignoreSuggestion: builder.query({
+        ignoreSuggestion: builder.mutation({
             queryFn: async (event: IgnoreEvent) => {
                 try {
                     if (window.api.codeAssist) {
@@ -94,10 +91,9 @@ export const codeAssistApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: ['All'],
         }),
 
-        sendUserQueriesData: builder.query({
+        sendUserQueriesData: builder.mutation({
             queryFn: async (userQueries: TelemetryOpenTabs) => {
                 try {
                     if (window.api.codeAssist) {
@@ -111,7 +107,6 @@ export const codeAssistApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: ['All'],
         }),
     }),
     overrideExisting: 'throw',
