@@ -81,7 +81,7 @@ export function YqlEditor({
         prepareUserQueriesCache,
     } = useCodeAssist();
 
-    const {registerMonacoGhost, dispose} = useMonacoGhost({
+    const {registerMonacoGhost} = useMonacoGhost({
         api: {
             getCodeAssistSuggestions,
         },
@@ -195,12 +195,6 @@ export function YqlEditor({
                 NiceModal.show(SAVE_QUERY_DIALOG);
             },
         });
-
-        return () => {
-            if (window.api.codeAssist) {
-                dispose();
-            }
-        };
     };
 
     const onChange = (newValue: string) => {
