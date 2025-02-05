@@ -38,10 +38,10 @@ export function useEditorOptions() {
 
 export function useCodeAssist() {
     const [sendCodeAssistPrompt] = codeAssistApi.useLazyGetCodeAssistSuggestionsQuery();
-    const [acceptSuggestion] = codeAssistApi.useLazyAcceptSuggestionQuery();
-    const [discardSuggestion] = codeAssistApi.useLazyDiscardSuggestionQuery();
-    const [ignoreSuggestion] = codeAssistApi.useLazyIgnoreSuggestionQuery();
-    const [sendUserQueriesData] = codeAssistApi.useLazySendUserQueriesDataQuery();
+    const [acceptSuggestion] = codeAssistApi.useAcceptSuggestionMutation();
+    const [discardSuggestion] = codeAssistApi.useDiscardSuggestionMutation();
+    const [ignoreSuggestion] = codeAssistApi.useIgnoreSuggestionMutation();
+    const [sendUserQueriesData] = codeAssistApi.useSendUserQueriesDataMutation();
 
     const getCodeAssistSuggestions = React.useCallback(
         async (promptFiles: PromptFile[]) => {

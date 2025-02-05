@@ -11,7 +11,7 @@ import {api} from '../api';
 
 export const codeAssistApi = api.injectEndpoints({
     endpoints: (builder) => ({
-        getCodeAssistSuggestions: builder.mutation<Suggestions, PromptFile[]>({
+        getCodeAssistSuggestions: builder.query<Suggestions, PromptFile[]>({
             queryFn: async (promptFiles: PromptFile[]) => {
                 try {
                     if (window.api.codeAssist) {
