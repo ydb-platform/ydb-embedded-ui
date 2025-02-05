@@ -128,7 +128,7 @@ export const createExternalTableTemplate = (params?: SchemaQueryParams) => {
 };
 
 export const createTopicTemplate = (params?: SchemaQueryParams) => {
-    const path = params?.relativePath ? `\`${params?.relativePath}\`/my_topic` : '${1:my_topic}';
+    const path = params?.relativePath ? `\`${params?.relativePath}/my_topic\`` : '${1:my_topic}';
     return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/create-topic
 CREATE TOPIC ${path} (
     CONSUMER consumer1,
