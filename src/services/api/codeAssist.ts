@@ -30,8 +30,8 @@ function prepareCodeAssistPrompt(promptFiles: PromptFile[]): CodeAssistSuggestio
             },
         })),
         Cursor: {
-            Ln: file.cursorPostion.lineNumber,
-            Col: file.cursorPostion.column,
+            Ln: file.cursorPosition.lineNumber,
+            Col: file.cursorPosition.column,
         },
         Path: `${file.path}.yql`,
     }));
