@@ -44,46 +44,22 @@ export function useCodeAssist() {
     const [sendUserQueriesData] = codeAssistApi.useSendUserQueriesDataMutation();
 
     const getCodeAssistSuggestions = React.useCallback(
-        async (promptFiles: PromptFile[]) => {
-            try {
-                return sendCodeAssistPrompt(promptFiles).unwrap();
-            } catch {
-                return {items: []};
-            }
-        },
+        async (promptFiles: PromptFile[]) => sendCodeAssistPrompt(promptFiles).unwrap(),
         [sendCodeAssistPrompt],
     );
 
     const onCompletionAccept = React.useCallback(
-        async (event: AcceptEvent) => {
-            try {
-                return acceptSuggestion(event).unwrap();
-            } catch {
-                return {items: []};
-            }
-        },
+        async (event: AcceptEvent) => acceptSuggestion(event).unwrap(),
         [acceptSuggestion],
     );
 
     const onCompletionDecline = React.useCallback(
-        async (event: DeclineEvent) => {
-            try {
-                return discardSuggestion(event).unwrap();
-            } catch {
-                return {items: []};
-            }
-        },
+        async (event: DeclineEvent) => discardSuggestion(event).unwrap(),
         [discardSuggestion],
     );
 
     const onCompletionIgnore = React.useCallback(
-        async (event: IgnoreEvent) => {
-            try {
-                return ignoreSuggestion(event).unwrap();
-            } catch {
-                return {items: []};
-            }
-        },
+        async (event: IgnoreEvent) => ignoreSuggestion(event).unwrap(),
         [ignoreSuggestion],
     );
 

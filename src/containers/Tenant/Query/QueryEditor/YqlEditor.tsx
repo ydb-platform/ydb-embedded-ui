@@ -1,5 +1,3 @@
-import React from 'react';
-
 import NiceModal from '@ebay/nice-modal-react';
 import {useMonacoGhost} from '@ydb-platform/monaco-ghost';
 import throttle from 'lodash/throttle';
@@ -73,24 +71,17 @@ export function YqlEditor({
         window.ydbEditor = undefined;
     };
 
-    const {
-        getCodeAssistSuggestions,
-        onCompletionAccept,
-        onCompletionDecline,
-        onCompletionIgnore,
-        prepareUserQueriesCache,
-    } = useCodeAssist();
-
+    const codeAssist = useCodeAssist();
     const {registerMonacoGhost} = useMonacoGhost({
         api: {
-            getCodeAssistSuggestions,
+            getCodeAssistSuggestions: codeAssist.getCodeAssistSuggestions,
         },
         config: {
             language: YQL_LANGUAGE_ID,
         },
-        onCompletionAccept,
-        onCompletionDecline,
-        onCompletionIgnore,
+        onCompletionAccept: codeAssist.onCompletionAccept,
+        onCompletionDecline: codeAssist.onCompletionDecline,
+        onCompletionIgnore: codeAssist.onCompletionIgnore,
     });
 
     const editorDidMount = (editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
@@ -108,7 +99,7 @@ export function YqlEditor({
 
         if (window.api.codeAssist) {
             registerMonacoGhost(editor);
-            prepareUserQueriesCache([
+            codeAssist.prepareUserQueriesCache([
                 ...historyQueries.map((query, index) => ({
                     name: `query${index}.yql`,
                     text: query.queryText,

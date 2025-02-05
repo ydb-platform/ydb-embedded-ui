@@ -21,8 +21,8 @@ export const codeAssistApi = api.injectEndpoints({
                     } else {
                         throw new Error('Method is not implemented.');
                     }
-                } catch (error) {
-                    return {error};
+                } catch {
+                    return {data: {items: []}};
                 }
             },
         }),
