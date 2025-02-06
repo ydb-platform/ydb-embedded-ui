@@ -8,12 +8,7 @@ import {
 } from '../../store/reducers/query/utils';
 import type {Actions, TracingLevel} from '../../types/api/query';
 import type {QuerySyntax, StatisticsMode} from '../../types/store/query';
-import type {
-    QueryResponseChunk,
-    SessionChunk,
-    StreamDataChunk,
-    StreamingChunk,
-} from '../../types/store/streaming';
+import type {QueryResponseChunk, SessionChunk, StreamDataChunk} from '../../types/store/streaming';
 import {BINARY_DATA_IN_PLAIN_TEXT_DISPLAY} from '../../utils/constants';
 import {settingsManager} from '../settings';
 
@@ -48,18 +43,6 @@ export class StreamingAPI extends BaseYdbAPI {
         );
 
         let traceId: string | undefined = '';
-
-        const handleChunk = (chunk: StreamingChunk) => {
-            if (isSessionChunk(chunk)) {
-                const sessionChunk = chunk;
-                sessionChunk.meta.trace_id = traceId;
-                options.onSessionChunk(chunk);
-            } else if (isStreamDataChunk(chunk)) {
-                options.onStreamDataChunk(chunk);
-            } else if (isQueryResponseChunk(chunk)) {
-                options.onQueryResponseChunk(chunk);
-            }
-        };
 
         const queryParams = new URLSearchParams();
         // Add only string/number params
@@ -98,7 +81,16 @@ export class StreamingAPI extends BaseYdbAPI {
         await parseMultipart(response.body, {boundary: 'boundary'}, async (part) => {
             try {
                 const chunk = JSON.parse(await part.text());
-                handleChunk(chunk);
+
+                if (isSessionChunk(chunk)) {
+                    const sessionChunk = chunk;
+                    sessionChunk.meta.trace_id = traceId;
+                    options.onSessionChunk(chunk);
+                } else if (isStreamDataChunk(chunk)) {
+                    options.onStreamDataChunk(chunk);
+                } else if (isQueryResponseChunk(chunk)) {
+                    options.onQueryResponseChunk(chunk);
+                }
             } catch (e) {
                 throw new Error(`Error parsing chunk: ${e}`);
             }
