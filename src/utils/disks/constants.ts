@@ -10,7 +10,7 @@ export const DISK_COLOR_STATE_TO_NUMERIC_SEVERITY: Record<EFlag, number> = {
     Yellow: 3,
     Orange: 4,
     Red: 5,
-};
+} as const;
 
 type SeverityToColor = Record<number, keyof typeof DISK_COLOR_STATE_TO_NUMERIC_SEVERITY>;
 

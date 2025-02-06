@@ -4,7 +4,7 @@
   "node": "Node",
 
   "storage": "Storage",
-  "disk-distribution": "Disk distribution",
+  "space-distribution": "Space distribution",
 
   "empty-slot": "Empty slot",
   "log": "Log",
