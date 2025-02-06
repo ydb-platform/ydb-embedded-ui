@@ -4,7 +4,7 @@ export type SchemaData = {
     id?: number;
     name?: string;
     keyColumnIndex?: number;
-    isPartitioningKeyColumn?: boolean;
+    partitioningColumnIndex?: number;
     type?: string;
     notNull?: boolean;
     autoIncrement?: boolean;
