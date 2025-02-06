@@ -1,14 +1,7 @@
-import {EFlag} from '../../types/api/enums';
 import type {TPDiskState} from '../../types/api/pdisk';
-import {generateEvaluator} from '../generateEvaluator';
 
-import {
-    DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
-    NOT_AVAILABLE_SEVERITY,
-    PDISK_STATE_SEVERITY,
-} from './constants';
-
-const getUsageSeverityForPDisk = generateEvaluator([EFlag.Green, EFlag.Yellow, EFlag.Red]);
+import {NOT_AVAILABLE_SEVERITY, PDISK_STATE_SEVERITY} from './constants';
+import {getSpaceSeverity} from './helpers';
 
 export function calculatePDiskSeverity<
     T extends {
@@ -17,13 +10,13 @@ export function calculatePDiskSeverity<
     },
 >(pDisk: T) {
     const stateSeverity = getStateSeverity(pDisk.State);
-    const spaceSeverityFlag = getUsageSeverityForPDisk(pDisk.AllocatedPercent || 0);
+    const spaceSeverity = getSpaceSeverity(pDisk.AllocatedPercent);
 
-    if (stateSeverity === NOT_AVAILABLE_SEVERITY || !spaceSeverityFlag) {
+    if (stateSeverity === NOT_AVAILABLE_SEVERITY || !spaceSeverity) {
         return stateSeverity;
     }
 
-    return Math.max(stateSeverity, DISK_COLOR_STATE_TO_NUMERIC_SEVERITY[spaceSeverityFlag]);
+    return Math.max(stateSeverity, spaceSeverity);
 }
 
 function getStateSeverity(pDiskState?: TPDiskState) {

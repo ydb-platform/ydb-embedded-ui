@@ -37,15 +37,15 @@ import './PDiskPage.scss';
 const pdiskPageCn = cn('ydb-pdisk-page');
 
 const PDISK_TABS_IDS = {
-    diskDistribution: 'diskDistribution',
+    spaceDistribution: 'spaceDistribution',
     storage: 'storage',
 } as const;
 
 const PDISK_PAGE_TABS = [
     {
-        id: PDISK_TABS_IDS.diskDistribution,
+        id: PDISK_TABS_IDS.spaceDistribution,
         get title() {
-            return pDiskPageKeyset('disk-distribution');
+            return pDiskPageKeyset('space-distribution');
         },
     },
     {
@@ -56,7 +56,7 @@ const PDISK_PAGE_TABS = [
     },
 ];
 
-const pDiskTabSchema = z.nativeEnum(PDISK_TABS_IDS).catch(PDISK_TABS_IDS.diskDistribution);
+const pDiskTabSchema = z.nativeEnum(PDISK_TABS_IDS).catch(PDISK_TABS_IDS.spaceDistribution);
 
 export function PDiskPage() {
     const dispatch = useTypedDispatch();
@@ -237,7 +237,7 @@ export function PDiskPage() {
 
     const renderTabsContent = () => {
         switch (pDiskTab) {
-            case 'diskDistribution': {
+            case 'spaceDistribution': {
                 return pDiskData ? (
                     <div className={pdiskPageCn('disk-distribution')}>
                         <PDiskSpaceDistribution data={pDiskData} />
