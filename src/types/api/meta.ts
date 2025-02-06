@@ -45,7 +45,6 @@ export interface MetaBaseClusterInfo {
     balancer?: string;
     service?: string;
     trace_view?: string;
-    trace_check?: string;
     use_embedded_ui?: boolean;
 }
 
