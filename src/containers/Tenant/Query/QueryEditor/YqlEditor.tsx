@@ -76,12 +76,14 @@ export function YqlEditor({
         api: {
             getCodeAssistSuggestions: codeAssist.getCodeAssistSuggestions,
         },
+        eventHandlers: {
+            onCompletionAccept: codeAssist.onCompletionAccept,
+            onCompletionDecline: codeAssist.onCompletionDecline,
+            onCompletionIgnore: codeAssist.onCompletionIgnore,
+        },
         config: {
             language: YQL_LANGUAGE_ID,
         },
-        onCompletionAccept: codeAssist.onCompletionAccept,
-        onCompletionDecline: codeAssist.onCompletionDecline,
-        onCompletionIgnore: codeAssist.onCompletionIgnore,
     });
 
     const editorDidMount = (editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
