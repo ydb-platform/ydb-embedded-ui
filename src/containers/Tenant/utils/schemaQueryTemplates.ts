@@ -84,6 +84,21 @@ ALTER TABLE ${path}
     -- DROP COLUMN some_existing_column
 \${2:ADD COLUMN numeric_column Int32};`;
 };
+
+export const manageAutoPartitioningTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_table>}';
+
+    return `-- documentation about partitioning https://ydb.tech/docs/en/concepts/datamodel/table#partitioning
+
+ALTER TABLE ${path} SET 
+(
+    AUTO_PARTITIONING_BY_LOAD = ENABLED, -- If a partition consumes more than 50% of the CPU for a few dozens of seconds, it is enqueued for splitting.
+    AUTO_PARTITIONING_BY_SIZE = ENABLED, --  If a partition size exceeds the value specified by the AUTO_PARTITIONING_PARTITION_SIZE_MB  parameter, it is enqueued for splitting.
+    AUTO_PARTITIONING_PARTITION_SIZE_MB = 2048,
+    AUTO_PARTITIONING_MIN_PARTITIONS_COUNT = 10, -- Partitions are merged only if their actual number exceeds the value specified by this parameter.
+    AUTO_PARTITIONING_MAX_PARTITIONS_COUNT = 100 -- Partitions are split only if their number doesn't exceed the value specified by this parameter.
+)`;
+};
 export const selectQueryTemplate = (params?: SchemaQueryParams) => {
     const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${2:<my_table>}';
     const columns =

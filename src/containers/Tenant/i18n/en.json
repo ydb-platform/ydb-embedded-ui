@@ -38,6 +38,8 @@
   "actions.dropTopic": "Drop topic...",
   "actions.dropView": "Drop view...",
   "actions.alterTable": "Alter table...",
+  "actions.manageColumns": "Manage columns...",
+  "actions.manageAutoPartitioning": "Manage auto partitioning...",
   "actions.addTableIndex": "Add index...",
   "actions.createCdcStream": "Create changefeed...",
   "actions.alterTopic": "Alter topic...",

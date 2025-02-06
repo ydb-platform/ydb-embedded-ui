@@ -33,6 +33,7 @@ import {
     dropTableTemplate,
     dropTopicTemplate,
     dropViewTemplate,
+    manageAutoPartitioningTemplate,
     selectQueryTemplate,
     upsertQueryTemplate,
 } from './schemaQueryTemplates';
@@ -101,6 +102,7 @@ const bindActions = (
         dropAsyncReplication: inputQuery(dropAsyncReplicationTemplate),
         alterTable: inputQuery(alterTableTemplate),
         dropTable: inputQuery(dropTableTemplate),
+        manageAutoPartitioning: inputQuery(manageAutoPartitioningTemplate),
         selectQuery: inputQuery(selectQueryTemplate),
         upsertQuery: inputQuery(upsertQueryTemplate),
         createExternalTable: inputQuery(createExternalTableTemplate),
@@ -183,6 +185,16 @@ export const getActions =
             {text: i18n('actions.createView'), action: actions.createView},
         ];
 
+        const alterTableGroupItem = {
+            text: i18n('actions.alterTable'),
+            items: [
+                {text: i18n('actions.manageColumns'), action: actions.alterTable},
+                {
+                    text: i18n('actions.manageAutoPartitioning'),
+                    action: actions.manageAutoPartitioning,
+                },
+            ],
+        };
         const DB_SET: ActionsSet = [[copyItem, connectToDBItem], createEntitiesSet];
 
         const DIR_SET: ActionsSet = [[copyItem], createEntitiesSet];
@@ -200,7 +212,7 @@ export const getActions =
         const ROW_TABLE_SET: ActionsSet = [
             [copyItem],
             [
-                {text: i18n('actions.alterTable'), action: actions.alterTable},
+                alterTableGroupItem,
                 {text: i18n('actions.dropTable'), action: actions.dropTable},
                 getActionWithLoader({
                     text: i18n('actions.selectQuery'),
@@ -219,7 +231,7 @@ export const getActions =
         const COLUMN_TABLE_SET: ActionsSet = [
             [copyItem],
             [
-                {text: i18n('actions.alterTable'), action: actions.alterTable},
+                alterTableGroupItem,
                 {text: i18n('actions.dropTable'), action: actions.dropTable},
                 {text: i18n('actions.selectQuery'), action: actions.selectQuery},
                 {text: i18n('actions.upsertQuery'), action: actions.upsertQuery},
