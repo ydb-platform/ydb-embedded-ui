@@ -287,9 +287,7 @@ export function QueryResultViewer({
                         <CancelQueryButton queryId={queryId} tenantName={tenantName} />
                     </React.Fragment>
                 ) : null}
-                {data?.traceId && isExecute ? (
-                    <TraceButton traceId={data.traceId} isTraceReady={result.isTraceReady} />
-                ) : null}
+                {data?.traceId && isExecute ? <TraceButton traceId={data.traceId} /> : null}
             </div>
         );
     };

@@ -140,17 +140,11 @@ export function useClusterBaseInfo() {
 
     const {currentData} = clusterApi.useGetClusterBaseInfoQuery(clusterName ?? skipToken);
 
-    const {
-        solomon: monitoring,
-        name,
-        trace_check: traceCheck,
-        trace_view: traceView,
-        ...data
-    } = currentData || {};
+    const {solomon: monitoring, name, trace_view: traceView, ...data} = currentData || {};
 
     return {
         ...data,
-        ...parseTraceFields({traceCheck, traceView}),
+        ...parseTraceFields({traceView}),
         name: name ?? clusterName ?? undefined,
         monitoring,
     };

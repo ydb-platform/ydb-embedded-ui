@@ -7,7 +7,6 @@ import {PDiskAPI} from './pdisk';
 import {SchemeAPI} from './scheme';
 import {StorageAPI} from './storage';
 import {TabletsAPI} from './tablets';
-import {TraceAPI} from './trace';
 import {VDiskAPI} from './vdisk';
 import {ViewerAPI} from './viewer';
 
@@ -18,7 +17,6 @@ export class YdbEmbeddedAPI {
     scheme: SchemeAPI;
     storage: StorageAPI;
     tablets: TabletsAPI;
-    trace: TraceAPI;
     vdisk: VDiskAPI;
     viewer: ViewerAPI;
     meta?: MetaAPI;
@@ -33,7 +31,6 @@ export class YdbEmbeddedAPI {
         this.scheme = new SchemeAPI({config});
         this.storage = new StorageAPI({config});
         this.tablets = new TabletsAPI({config});
-        this.trace = new TraceAPI({config});
         this.vdisk = new VDiskAPI({config});
         this.viewer = new ViewerAPI({config});
     }
