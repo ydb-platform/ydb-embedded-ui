@@ -1,4 +1,5 @@
 import type {EColumnCodec, EUnit, TPathID, TStorageSettings, TTypeInfo} from './shared';
+import type {TFamilyDescription} from './table';
 
 export interface TColumnTableDescription {
     Name?: string;
@@ -75,15 +76,14 @@ interface TTtl {
 interface TColumnTableSchema {
     Columns?: TOlapColumnDescription[];
     KeyColumnNames?: string[];
-    KeyColumnIds?: number[];
-    Engine?: EColumnTableEngine;
-    NextColumnId?: number;
 
     /** uint64 */
     Version?: string;
 
     DefaultCompression?: TCompressionOptions;
-    EnableTiering?: boolean;
+    Indexes?: unknown;
+    Options?: TColumnTableSchemeOptions;
+    ColumnFamilies?: TFamilyDescription[];
 }
 
 interface TColumnTableSchemaPreset {
@@ -92,26 +92,33 @@ interface TColumnTableSchemaPreset {
     Schema?: TColumnTableSchema;
 }
 
+interface TColumnTableSchemeOptions {
+    SchemeNeedActualization?: boolean; // default = false
+    ScanReaderPolicyName?: string;
+}
+
 interface TOlapColumnDescription {
     Id?: number;
     Name?: string;
+
     Type?: string;
-    NotNull?: boolean;
     TypeId?: number;
     TypeInfo?: TTypeInfo;
+
+    NotNull?: boolean;
+
+    DictionaryEncoding?: TDictionaryEncodingSettings;
+    Serializer?: unknown;
+    StorageId?: string;
+    DefaultValue?: unknown;
+    DataAccessorConstructor?: unknown;
+    ColumnFamilyId?: number;
+    ColumnFamilyName?: string;
 }
 
 interface TColumnTableSharding {
     /** uint64 */
-    Version?: string;
-
-    /** uint64 */
     ColumnShards?: string[];
-
-    /** uint64 */
-    AdditionalColumnShards?: string[];
-
-    UniquePrimaryKey?: boolean;
 
     RandomSharding?: {};
     HashSharding?: THashSharding;
@@ -120,8 +127,8 @@ interface TColumnTableSharding {
 interface THashSharding {
     Function?: EHashFunction;
     Columns?: string[];
-    UniqueShardKey?: boolean;
     ActiveShardsCount?: number;
+    ModuloPartsCount?: number;
 }
 
 interface TCompressionOptions {
@@ -129,12 +136,11 @@ interface TCompressionOptions {
     CompressionLevel?: number;
 }
 
-enum EHashFunction {
-    HASH_FUNCTION_MODULO_N = 'HASH_FUNCTION_MODULO_N',
-    HASH_FUNCTION_CLOUD_LOGS = 'HASH_FUNCTION_CLOUD_LOGS',
+interface TDictionaryEncodingSettings {
+    Enabled?: boolean;
 }
 
-enum EColumnTableEngine {
-    COLUMN_ENGINE_NONE = 'COLUMN_ENGINE_NONE',
-    COLUMN_ENGINE_REPLACING_TIMESERIES = 'COLUMN_ENGINE_REPLACING_TIMESERIES',
-}
+type EHashFunction =
+    | 'HASH_FUNCTION_MODULO_N'
+    | 'HASH_FUNCTION_CLOUD_LOGS'
+    | 'HASH_FUNCTION_CONSISTENCY_64';

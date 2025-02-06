@@ -103,15 +103,14 @@ function prepareColumnTableSchema(data: TColumnTableDescription = {}): SchemaDat
         const keyColumnIndex =
             KeyColumnNames?.findIndex((keyColumnName) => keyColumnName === Name) ?? -1;
 
-        const isPartitioningKeyColumn = Boolean(
-            HashColumns?.find((hashColumnName) => hashColumnName === Name),
-        );
+        const partitioningColumnIndex =
+            HashColumns?.findIndex((hashColumnName) => hashColumnName === Name) ?? -1;
 
         return {
             id: Id,
             name: Name,
             keyColumnIndex,
-            isPartitioningKeyColumn,
+            partitioningColumnIndex,
             type: Type,
             notNull: NotNull,
         };
