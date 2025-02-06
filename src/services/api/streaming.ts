@@ -1,3 +1,6 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+import {parseMultipart} from '@mjackson/multipart-parser';
+
 import {
     isQueryResponseChunk,
     isSessionChunk,
@@ -12,7 +15,6 @@ import type {
     StreamingChunk,
 } from '../../types/store/streaming';
 import {BINARY_DATA_IN_PLAIN_TEXT_DISPLAY} from '../../utils/constants';
-import {MultipartStreamParser} from '../parsers/parseMultipartStream';
 import {settingsManager} from '../settings';
 
 import {BaseYdbAPI} from './base';
@@ -47,7 +49,7 @@ export class StreamingAPI extends BaseYdbAPI {
 
         let traceId: string | undefined = '';
 
-        const streamParser = new MultipartStreamParser((chunk: StreamingChunk) => {
+        const handleChunk = (chunk: StreamingChunk) => {
             if (isSessionChunk(chunk)) {
                 const sessionChunk = chunk;
                 sessionChunk.meta.trace_id = traceId;
@@ -57,7 +59,7 @@ export class StreamingAPI extends BaseYdbAPI {
             } else if (isQueryResponseChunk(chunk)) {
                 options.onQueryResponseChunk(chunk);
             }
-        });
+        };
 
         const queryParams = new URLSearchParams();
         // Add only string/number params
@@ -91,19 +93,15 @@ export class StreamingAPI extends BaseYdbAPI {
             throw new Error('Empty response body');
         }
 
-        const reader = response.body.getReader();
         traceId = response.headers.get('traceresponse')?.split('-')[1];
 
-        try {
-            for (;;) {
-                const {done, value} = await reader.read();
-                if (done) {
-                    break;
-                }
-                streamParser.processBuffer(value);
+        await parseMultipart(response.body, {boundary: 'boundary'}, async (part) => {
+            try {
+                const chunk = JSON.parse(await part.text());
+                handleChunk(chunk);
+            } catch (e) {
+                throw new Error(`Error parsing chunk: ${e}`);
             }
-        } finally {
-            reader.releaseLock();
-        }
+        });
     }
 }
