@@ -52,14 +52,13 @@ export interface QueryResult {
     type: QueryAction;
     data?: PreparedQueryData;
     error?: unknown;
-    isTraceReady?: true;
     queryId: string;
     isLoading: boolean;
 }
 
 export interface QueryState {
     input: string;
-    result?: QueryResult & {isTraceReady?: boolean};
+    result?: QueryResult;
     history: {
         queries: QueryInHistory[];
         currentIndex: number;

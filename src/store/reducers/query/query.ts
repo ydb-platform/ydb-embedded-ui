@@ -43,11 +43,6 @@ const slice = createSlice({
         changeUserInput: (state, action: PayloadAction<{input: string}>) => {
             state.input = action.payload.input;
         },
-        setQueryTraceReady: (state) => {
-            if (state.result) {
-                state.result.isTraceReady = true;
-            }
-        },
         setQueryResult: (state, action: PayloadAction<QueryResult | undefined>) => {
             state.result = action.payload;
         },
@@ -143,7 +138,6 @@ const slice = createSlice({
 export default slice.reducer;
 export const {
     changeUserInput,
-    setQueryTraceReady,
     setQueryResult,
     saveQueryToHistory,
     updateQueryInHistory,
