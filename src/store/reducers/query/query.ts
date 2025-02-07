@@ -142,7 +142,7 @@ const slice = createSlice({
             state.result.queryId = chunk.meta.query_id;
             state.result.data.traceId = chunk.meta.trace_id;
         },
-        addStreamingChunks: (state, action: PayloadAction<StreamDataChunk[]>) => {
+        addStreamingChunk: (state, action: PayloadAction<StreamDataChunk>) => {
             if (!state.result) {
                 return;
             }
@@ -151,7 +151,6 @@ const slice = createSlice({
                 state.result.data = prepareQueryData(null);
             }
 
-            // Initialize speed metrics if not present
             if (!state.result.speedMetrics) {
                 state.result.speedMetrics = {
                     rowsPerSecond: 0,
@@ -161,37 +160,19 @@ const slice = createSlice({
             }
 
             const currentTime = Date.now();
-            let totalNewRows = 0;
-
-            const mergedStreamDataChunks = new Map<number, StreamDataChunk>();
-            for (const chunk of action.payload) {
-                const currentMergedChunk = mergedStreamDataChunks.get(chunk.meta.result_index);
-                const chunkRowCount = (chunk.result.rows || []).length;
-                totalNewRows += chunkRowCount;
-
-                if (currentMergedChunk) {
-                    if (!currentMergedChunk.result.rows) {
-                        currentMergedChunk.result.rows = [];
-                    }
-                    for (const row of chunk.result.rows || []) {
-                        currentMergedChunk.result.rows.push(row);
-                    }
-                } else {
-                    mergedStreamDataChunks.set(chunk.meta.result_index, chunk);
-                }
-            }
+            const chunk = action.payload;
 
             // Update speed metrics
             const metrics = state.result.speedMetrics;
             metrics.recentChunks.push({
                 timestamp: currentTime,
-                rowCount: totalNewRows,
+                rowCount: chunk.result.rows?.length || 0,
             });
 
             // Keep only chunks from the last 5 seconds
             const WINDOW_SIZE = 5000; // 5 seconds in milliseconds
             metrics.recentChunks = metrics.recentChunks.filter(
-                (chunk) => currentTime - chunk.timestamp <= WINDOW_SIZE,
+                (_chunk) => currentTime - _chunk.timestamp <= WINDOW_SIZE,
             );
 
             // Calculate moving average
@@ -199,7 +180,7 @@ const slice = createSlice({
                 const oldestChunkTime = metrics.recentChunks[0].timestamp;
                 const timeWindow = (currentTime - oldestChunkTime) / 1000; // Convert to seconds
                 const totalRows = metrics.recentChunks.reduce(
-                    (sum, chunk) => sum + chunk.rowCount,
+                    (sum, _chunk) => sum + _chunk.rowCount,
                     0,
                 );
                 metrics.rowsPerSecond = timeWindow > 0 ? totalRows / timeWindow : 0;
@@ -210,40 +191,38 @@ const slice = createSlice({
             if (!state.result.data.resultSets) {
                 state.result.data.resultSets = [];
             }
+            const resultIndex = chunk.meta.result_index;
 
-            for (const [resultIndex, chunk] of mergedStreamDataChunks.entries()) {
-                const {columns, rows} = chunk.result;
+            const {columns, rows} = chunk.result;
 
-                if (!state.result.data.resultSets[resultIndex]) {
-                    state.result.data.resultSets[resultIndex] = {
-                        columns: [],
-                        result: [],
-                    };
+            if (!state.result.data.resultSets[resultIndex]) {
+                state.result.data.resultSets[resultIndex] = {
+                    columns: [],
+                    result: [],
+                };
+            }
+
+            if (columns && !state.result.data.resultSets[resultIndex].columns?.length) {
+                state.result.data.resultSets[resultIndex].columns?.push(INDEX_COLUMN);
+                for (const column of columns) {
+                    state.result.data.resultSets[resultIndex].columns?.push(column);
                 }
+            }
 
-                if (columns && !state.result.data.resultSets[resultIndex].columns?.length) {
-                    state.result.data.resultSets[resultIndex].columns?.push(INDEX_COLUMN);
-                    for (const column of columns) {
-                        state.result.data.resultSets[resultIndex].columns?.push(column);
-                    }
-                }
+            const indexedRows = rows || [];
+            const startIndex = state.result?.data?.resultSets?.[resultIndex].result?.length || 1;
 
-                const indexedRows = rows || [];
-                const startIndex =
-                    state.result?.data?.resultSets?.[resultIndex].result?.length || 1;
+            indexedRows.forEach((row, index) => {
+                row.unshift(startIndex + index);
+            });
 
-                indexedRows.forEach((row, index) => {
-                    row.unshift(startIndex + index);
-                });
+            const formattedRows = parseResult(
+                indexedRows,
+                state.result.data.resultSets[resultIndex].columns || [],
+            );
 
-                const formattedRows = parseResult(
-                    indexedRows,
-                    state.result.data.resultSets[resultIndex].columns || [],
-                );
-
-                for (const row of formattedRows) {
-                    state.result.data.resultSets[resultIndex].result?.push(row);
-                }
+            for (const row of formattedRows) {
+                state.result.data.resultSets[resultIndex].result?.push(row);
             }
         },
         setStreamQueryResponse: (state, action: PayloadAction<QueryResponseChunk>) => {
@@ -302,7 +281,7 @@ export const {
     goToNextQuery,
     setTenantPath,
     setQueryHistoryFilter,
-    addStreamingChunks,
+    addStreamingChunk,
     setStreamQueryResponse,
     setStreamSession,
 } = slice.actions;
@@ -348,17 +327,6 @@ export const queryApi = api.injectEndpoints({
                 );
 
                 try {
-                    let streamDataChunkBatch: StreamDataChunk[] = [];
-                    let batchTimeout: number | null = null;
-
-                    const flushBatch = () => {
-                        if (streamDataChunkBatch.length > 0) {
-                            dispatch(addStreamingChunks(streamDataChunkBatch));
-                            streamDataChunkBatch = [];
-                        }
-                        batchTimeout = null;
-                    };
-
                     await window.api.streaming.streamQuery(
                         {
                             query,
@@ -390,19 +358,10 @@ export const queryApi = api.injectEndpoints({
                                 dispatch(setStreamSession(chunk));
                             },
                             onStreamDataChunk: (chunk) => {
-                                streamDataChunkBatch.push(chunk);
-                                if (!batchTimeout) {
-                                    batchTimeout = window.requestAnimationFrame(flushBatch);
-                                }
+                                dispatch(addStreamingChunk(chunk));
                             },
                         },
                     );
-
-                    // Flush any remaining chunks
-                    if (batchTimeout) {
-                        window.cancelAnimationFrame(batchTimeout);
-                        flushBatch();
-                    }
 
                     return {data: null};
                 } catch (error) {
