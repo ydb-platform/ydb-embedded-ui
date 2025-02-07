@@ -1,4 +1,12 @@
 {
   "pdisk.developer-ui-button-title": "PDisk Developer UI page",
-  "vdisk.developer-ui-button-title": "VDisk Developer UI page"
+  "vdisk.developer-ui-button-title": "VDisk Developer UI page",
+
+  "tabs.storage": "Storage",
+  "tabs.structure": "Structure",
+  "tabs.tablets": "Tablets",
+
+  "node": "Node",
+  "fqdn": "FQDN",
+  "dc": "DC"
 }

@@ -14,13 +14,15 @@ interface PageMetaProps {
     loading?: boolean;
 }
 
+const separator = '\u00a0\u00a0\u00B7\u00a0\u00a0';
+
 export function PageMeta({items, loading}: PageMetaProps) {
     const renderContent = () => {
         if (loading) {
             return <Skeleton className={b('skeleton')} />;
         }
 
-        return items.filter((item) => Boolean(item)).join('\u00a0\u00a0\u00B7\u00a0\u00a0');
+        return items.filter((item) => Boolean(item)).join(separator);
     };
 
     return <div className={b('info')}>{renderContent()}</div>;

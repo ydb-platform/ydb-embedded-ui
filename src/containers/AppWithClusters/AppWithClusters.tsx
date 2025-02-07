@@ -12,7 +12,6 @@ import {App, AppSlots} from '../App';
 import type {YDBEmbeddedUISettings} from '../UserSettings/settings';
 
 import {ExtendedCluster} from './ExtendedCluster/ExtendedCluster';
-import {ExtendedNode} from './ExtendedNode/ExtendedNode';
 import {ExtendedTenant} from './ExtendedTenant/ExtendedTenant';
 
 export interface AppWithClustersProps {
@@ -45,11 +44,6 @@ export function AppWithClusters({
                     );
                 }}
             </AppSlots.ClusterSlot>
-            <AppSlots.NodeSlot>
-                {({component}) => {
-                    return <ExtendedNode component={component} />;
-                }}
-            </AppSlots.NodeSlot>
             <AppSlots.TenantSlot>
                 {({component}) => {
                     return (

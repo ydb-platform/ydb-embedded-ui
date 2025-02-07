@@ -3,15 +3,11 @@
 .full-node-viewer {
     @include mixins.body-2-typography();
 
-    &__common-info {
+    &__section {
         display: flex;
         flex-direction: column;
-        justify-content: flex-start;
-        align-items: stretch;
-    }
 
-    &__section {
-        border-radius: 10px;
+        width: 500px;
 
         &_pools {
             display: grid;
@@ -26,8 +22,6 @@
     }
 
     &__section-title {
-        margin: 15px 0 10px;
-
-        font-weight: 600;
+        @include mixins.info-viewer-title();
     }
 }
