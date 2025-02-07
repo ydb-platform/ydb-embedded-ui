@@ -1,3 +1,8 @@
+// IMPORTANT!
+// In the future code assist api will be provided to ydb-ui component explicitly by consumer service.
+// Current solution is temporary and aimed to satisfy internal puproses.
+// It means this whole file will be moved to customer service
+
 import type {PromptFile, Suggestions} from '@ydb-platform/monaco-ghost';
 
 import {codeAssistBackend as CODE_ASSISTANT_BACKEND} from '../../store';
@@ -76,8 +81,6 @@ function prepareCodeAssistPrompt(promptFiles: PromptFile[]): CodeAssistSuggestio
     });
 }
 
-// In the future code assist api will be provided to ydb-ui component explicitly by consumer service.
-// Current solution is temporary and aimed to satisfy internal puproses.
 export class CodeAssistAPI extends BaseYdbAPI {
     getPath(path: string) {
         return `${CODE_ASSISTANT_BACKEND ?? ''}${path}`;
