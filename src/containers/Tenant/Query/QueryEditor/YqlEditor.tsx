@@ -1,4 +1,5 @@
 import NiceModal from '@ebay/nice-modal-react';
+import {useMonacoGhost} from '@ydb-platform/monaco-ghost';
 import throttle from 'lodash/throttle';
 import type Monaco from 'monaco-editor';
 
@@ -22,8 +23,9 @@ import {useUpdateErrorsHighlighting} from '../../../../utils/monaco/highlightErr
 import {QUERY_ACTIONS} from '../../../../utils/query';
 import {SAVE_QUERY_DIALOG} from '../SaveQuery/SaveQuery';
 import i18n from '../i18n';
+import {useSavedQueries} from '../utils/useSavedQueries';
 
-import {useEditorOptions} from './helpers';
+import {useCodeAssist, useEditorOptions} from './helpers';
 import {getKeyBindings} from './keybindings';
 
 const CONTEXT_MENU_GROUP_ID = 'navigation';
@@ -44,6 +46,7 @@ export function YqlEditor({
     const input = useTypedSelector(selectUserInput);
     const dispatch = useTypedDispatch();
     const historyQueries = useTypedSelector(selectQueriesHistory);
+    const savedQueries = useSavedQueries();
     const editorOptions = useEditorOptions();
     const updateErrorsHighlighting = useUpdateErrorsHighlighting();
 
@@ -68,6 +71,21 @@ export function YqlEditor({
         window.ydbEditor = undefined;
     };
 
+    const codeAssist = useCodeAssist();
+    const {registerMonacoGhost} = useMonacoGhost({
+        api: {
+            getCodeAssistSuggestions: codeAssist.getCodeAssistSuggestions,
+        },
+        eventHandlers: {
+            onCompletionAccept: codeAssist.onCompletionAccept,
+            onCompletionDecline: codeAssist.onCompletionDecline,
+            onCompletionIgnore: codeAssist.onCompletionIgnore,
+        },
+        config: {
+            language: YQL_LANGUAGE_ID,
+        },
+    });
+
     const editorDidMount = (editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
         window.ydbEditor = editor;
         const keybindings = getKeyBindings(monaco);
@@ -80,6 +98,20 @@ export function YqlEditor({
                 contribution.insert(input);
             }
         });
+
+        if (window.api.codeAssist) {
+            registerMonacoGhost(editor);
+            codeAssist.prepareUserQueriesCache([
+                ...historyQueries.map((query, index) => ({
+                    name: `query${index}.yql`,
+                    text: query.queryText,
+                })),
+                ...savedQueries.map((query) => ({
+                    name: query.name,
+                    text: query.body,
+                })),
+            ]);
+        }
         initResizeHandler(editor);
         initUserPrompt(editor, getLastQueryText);
         editor.focus();

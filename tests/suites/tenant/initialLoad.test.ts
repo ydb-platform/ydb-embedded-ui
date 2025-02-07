@@ -15,9 +15,7 @@ test.describe('Tenant initial load', () => {
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
 
-        await page.waitForTimeout(2000);
-
-        await expect(page.locator('.kv-tenant-diagnostics')).toBeVisible();
+        await expect(await tenantPage.isDiagnosticsVisible()).toBeTruthy();
     });
 
     test('Tenant diagnostics page is visible when describe returns no data', async ({page}) => {
@@ -28,7 +26,7 @@ test.describe('Tenant initial load', () => {
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
 
-        await expect(page.locator('.kv-tenant-diagnostics')).toBeVisible();
+        await expect(await tenantPage.isDiagnosticsVisible()).toBeTruthy();
     });
 
     test('Tenant page shows error message when describe returns 401', async ({page}) => {
@@ -39,10 +37,8 @@ test.describe('Tenant initial load', () => {
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
 
-        await page.waitForTimeout(2000);
-
-        await expect(page.locator('.empty-state')).toBeVisible();
-        await expect(page.locator('.empty-state__title')).toHaveText('Access denied');
+        await expect(await tenantPage.isEmptyStateVisible()).toBeTruthy();
+        await expect(await tenantPage.getEmptyStateTitle()).toBe('Access denied');
     });
 
     test('Tenant page shows error message when describe returns 403', async ({page}) => {
@@ -53,7 +49,7 @@ test.describe('Tenant initial load', () => {
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
 
-        await expect(page.locator('.empty-state')).toBeVisible();
-        await expect(page.locator('.empty-state__title')).toHaveText('Access denied');
+        await expect(await tenantPage.isEmptyStateVisible()).toBeTruthy();
+        await expect(await tenantPage.getEmptyStateTitle()).toBe('Access denied');
     });
 });

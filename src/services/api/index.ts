@@ -1,6 +1,7 @@
 import type {AxiosRequestConfig} from 'axios';
 
 import {AuthAPI} from './auth';
+import {CodeAssistAPI} from './codeAssist';
 import {MetaAPI} from './meta';
 import {OperationAPI} from './operation';
 import {PDiskAPI} from './pdisk';
@@ -20,11 +21,13 @@ export class YdbEmbeddedAPI {
     vdisk: VDiskAPI;
     viewer: ViewerAPI;
     meta?: MetaAPI;
+    codeAssist?: CodeAssistAPI;
 
     constructor({config, webVersion}: {config: AxiosRequestConfig; webVersion?: boolean}) {
         this.auth = new AuthAPI({config});
         if (webVersion) {
             this.meta = new MetaAPI({config});
+            this.codeAssist = new CodeAssistAPI({config});
         }
         this.operation = new OperationAPI({config});
         this.pdisk = new PDiskAPI({config});
