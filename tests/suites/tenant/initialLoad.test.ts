@@ -14,7 +14,6 @@ test.describe('Tenant initial load', () => {
     test('Tenant diagnostics page is visible', async ({page}) => {
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
-        await tenantPage.waitForDiagnosticsToLoad();
 
         await expect(await tenantPage.isDiagnosticsVisible()).toBeTruthy();
     });
@@ -26,7 +25,6 @@ test.describe('Tenant initial load', () => {
 
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
-        await tenantPage.waitForDiagnosticsToLoad();
 
         await expect(await tenantPage.isDiagnosticsVisible()).toBeTruthy();
     });

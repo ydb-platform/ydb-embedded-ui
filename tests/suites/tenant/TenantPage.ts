@@ -27,11 +27,6 @@ export class TenantPage extends PageModel {
         this.emptyStateTitle = this.emptyState.locator('.empty-state__title');
     }
 
-    async waitForDiagnosticsToLoad() {
-        await this.diagnosticsContainer.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return true;
-    }
-
     async isDiagnosticsVisible() {
         await this.diagnosticsContainer.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return true;
