@@ -23,8 +23,6 @@ import type {ValueOf} from '../common';
 export interface ParsedResultSet {
     columns?: ColumnType[];
     result?: KeyValueRow[];
-    resultChunks?: KeyValueRow[][];
-    totalCount?: number;
     truncated?: boolean;
 }
 

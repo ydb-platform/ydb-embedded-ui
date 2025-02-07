@@ -215,47 +215,35 @@ const slice = createSlice({
                 const {columns, rows} = chunk.result;
 
                 if (!state.result.data.resultSets[resultIndex]) {
-                    state.result.data.resultSets[resultIndex] = {};
+                    state.result.data.resultSets[resultIndex] = {
+                        columns: [],
+                        result: [],
+                    };
                 }
 
                 if (columns && !state.result.data.resultSets[resultIndex].columns?.length) {
-                    const columnsWithIndex = [INDEX_COLUMN, ...columns];
-                    if (!state.result.data.resultSets) {
-                        state.result.data.resultSets = [];
-                    }
-
-                    if (state.result.data.resultSets[resultIndex]) {
-                        state.result.data.resultSets[resultIndex].columns = columnsWithIndex;
-                    } else {
-                        state.result.data.resultSets[resultIndex] = {
-                            columns: columnsWithIndex,
-                            result: [],
-                        };
+                    state.result.data.resultSets[resultIndex].columns?.push(INDEX_COLUMN);
+                    for (const column of columns) {
+                        state.result.data.resultSets[resultIndex].columns?.push(column);
                     }
                 }
 
-                const indexedRows = (rows || []).map((row, index) => [
-                    (state.result?.data?.resultSets?.[resultIndex].totalCount || 1) + index,
-                    ...row,
-                ]);
+                const indexedRows = rows || [];
+                const startIndex =
+                    state.result?.data?.resultSets?.[resultIndex].result?.length || 1;
+
+                indexedRows.forEach((row, index) => {
+                    row.unshift(startIndex + index);
+                });
 
                 const formattedRows = parseResult(
                     indexedRows,
                     state.result.data.resultSets[resultIndex].columns || [],
                 );
 
-                // Update result set by pushing formatted rows directly
-                if (!state.result.data.resultSets?.[resultIndex].resultChunks) {
-                    // eslint-disable-next-line new-cap
-                    state.result.data.resultSets[resultIndex].resultChunks = [];
+                for (const row of formattedRows) {
+                    state.result.data.resultSets[resultIndex].result?.push(row);
                 }
-
-                state.result.data.resultSets[resultIndex].resultChunks.push(formattedRows);
-                state.result.data.resultSets[resultIndex].totalCount = state.result.data.resultSets[
-                    resultIndex
-                ].totalCount
-                    ? formattedRows.length + state.result.data.resultSets[resultIndex].totalCount
-                    : formattedRows.length;
             }
         },
         setStreamQueryResponse: (state, action: PayloadAction<QueryResponseChunk>) => {
@@ -382,9 +370,7 @@ export const queryApi = api.injectEndpoints({
                                 querySettings.tracingLevel && enableTracingLevel
                                     ? TracingLevelNumber[querySettings.tracingLevel]
                                     : undefined,
-                            limit_rows: isNumeric(querySettings.limitRows)
-                                ? Number(querySettings.limitRows)
-                                : undefined,
+                            limit_rows: 100000000,
                             transaction_mode:
                                 querySettings.transactionMode === 'implicit'
                                     ? undefined

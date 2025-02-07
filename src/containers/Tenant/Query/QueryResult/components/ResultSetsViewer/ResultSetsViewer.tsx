@@ -1,5 +1,4 @@
 import {Tabs, Text} from '@gravity-ui/uikit';
-import {flatten} from 'lodash';
 
 import {QueryResultTable} from '../../../../../../components/QueryResultTable';
 import type {ParsedResultSet} from '../../../../../../types/store/query';
@@ -54,12 +53,12 @@ export function ResultSetsViewer(props: ResultSetsViewerProps) {
                 <Text variant="subheader-3">
                     {currentResult?.truncated ? i18n('title.truncated') : i18n('title.result')}
                 </Text>
-                {currentResult?.resultChunks ? (
+                {currentResult?.result ? (
                     <Text
                         color="secondary"
                         variant="body-2"
                         className={b('row-count')}
-                    >{`(${currentResult?.totalCount})`}</Text>
+                    >{`(${currentResult?.result.length})`}</Text>
                 ) : null}
                 {props.rowsPerSecond ? (
                     <Text
@@ -79,10 +78,7 @@ export function ResultSetsViewer(props: ResultSetsViewerProps) {
             {currentResult ? (
                 <div className={b('result')}>
                     {renderResultHeadWithCount()}
-                    <QueryResultTable
-                        data={flatten(currentResult.resultChunks || [])}
-                        columns={currentResult.columns}
-                    />
+                    <QueryResultTable data={currentResult.result} columns={currentResult.columns} />
                 </div>
             ) : null}
         </div>
