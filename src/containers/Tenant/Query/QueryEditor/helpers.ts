@@ -7,6 +7,11 @@ import {codeAssistApi} from '../../../../store/reducers/codeAssist/codeAssist';
 import type {TelemetryOpenTabs} from '../../../../types/api/codeAssist';
 import {AUTOCOMPLETE_ON_ENTER, ENABLE_AUTOCOMPLETE} from '../../../../utils/constants';
 import {useSetting} from '../../../../utils/hooks';
+import {YQL_LANGUAGE_ID} from '../../../../utils/monaco/constats';
+
+const limitForTab = 10_000;
+const limitBeforeCursor = 8_000;
+const limitAfterCursor = 1_000;
 
 export type EditorOptions = Monaco.editor.IEditorOptions & Monaco.editor.IGlobalEditorOptions;
 
@@ -67,7 +72,7 @@ export function useCodeAssist() {
         async (queries: {text: string; name?: string}[]) => {
             const preparedData: TelemetryOpenTabs = queries.map((query, index) => ({
                 FileName: query.name || `query${index}.yql`,
-                Text: query.text,
+                Text: query.text.slice(0, limitForTab),
             }));
             try {
                 return sendUserQueriesData(preparedData).unwrap();
@@ -78,7 +83,16 @@ export function useCodeAssist() {
         [sendUserQueriesData],
     );
 
+    const config = {
+        language: YQL_LANGUAGE_ID,
+        textLimits: {
+            beforeCursor: limitBeforeCursor,
+            afterCursor: limitAfterCursor,
+        },
+    };
+
     return {
+        config,
         getCodeAssistSuggestions,
         onCompletionAccept,
         onCompletionDecline,
