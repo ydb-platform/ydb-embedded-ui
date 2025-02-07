@@ -16,25 +16,64 @@ const ideInfo = {
     PluginVersion: '0.2',
 };
 
+const limitForTab = 10_000;
+const limitBeforeCursor = 8_000;
+const limitAfterCursor = 1_000;
+
+function prepareCodeAssistTabs(tabs: TelemetryOpenTabs): TelemetryOpenTabs {
+    return tabs.map((tab) => {
+        const text = tab.Text;
+        if (text.length > limitForTab) {
+            return {
+                ...tab,
+                Text: text.slice(0, limitForTab),
+            };
+        }
+
+        return tab;
+    });
+}
+
 function prepareCodeAssistPrompt(promptFiles: PromptFile[]): CodeAssistSuggestionsFiles {
-    return promptFiles.map((file) => ({
-        Fragments: file.fragments.map((fragment) => ({
-            Text: fragment.text,
-            Start: {
-                Ln: fragment.start.lineNumber,
-                Col: fragment.start.column,
+    return promptFiles.map((file) => {
+        const cursorLine = file.cursorPosition.lineNumber;
+        const cursorCol = file.cursorPosition.column;
+
+        return {
+            Fragments: file.fragments.map((fragment) => {
+                let text = fragment.text;
+                const isBeforeCursor =
+                    fragment.end.lineNumber < cursorLine ||
+                    (fragment.end.lineNumber === cursorLine && fragment.end.column <= cursorCol);
+                const isAfterCursor =
+                    fragment.start.lineNumber > cursorLine ||
+                    (fragment.start.lineNumber === cursorLine && fragment.start.column > cursorCol);
+
+                if (isBeforeCursor) {
+                    text = text.slice(-limitBeforeCursor);
+                } else if (isAfterCursor) {
+                    text = text.slice(0, limitAfterCursor);
+                }
+
+                return {
+                    Text: text,
+                    Start: {
+                        Ln: fragment.start.lineNumber,
+                        Col: fragment.start.column,
+                    },
+                    End: {
+                        Ln: fragment.end.lineNumber,
+                        Col: fragment.end.column,
+                    },
+                };
+            }),
+            Cursor: {
+                Ln: cursorLine,
+                Col: cursorCol,
             },
-            End: {
-                Ln: fragment.end.lineNumber,
-                Col: fragment.end.column,
-            },
-        })),
-        Cursor: {
-            Ln: file.cursorPosition.lineNumber,
-            Col: file.cursorPosition.column,
-        },
-        Path: `${file.path}.yql`,
-    }));
+            Path: `${file.path}.yql`,
+        };
+    });
 }
 
 // In the future code assist api will be provided to ydb-ui component explicitly by consumer service.
@@ -77,7 +116,7 @@ export class CodeAssistAPI extends BaseYdbAPI {
     sendCodeAssistOpenTabs(data: TelemetryOpenTabs) {
         return this.post(
             '/code-assist-telemetry',
-            {OpenTabs: {Tabs: data, IdeInfo: ideInfo}},
+            {OpenTabs: {Tabs: prepareCodeAssistTabs(data), IdeInfo: ideInfo}},
             null,
             {
                 concurrentId: 'code-assist-telemetry',

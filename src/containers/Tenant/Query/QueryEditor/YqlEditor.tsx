@@ -81,7 +81,9 @@ export function YqlEditor({
             onCompletionDecline: codeAssist.onCompletionDecline,
             onCompletionIgnore: codeAssist.onCompletionIgnore,
         },
-        config: codeAssist.config,
+        config: {
+            language: YQL_LANGUAGE_ID,
+        },
     });
 
     const editorDidMount = (editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
