@@ -1,5 +1,23 @@
 # Changelog
 
+## [8.8.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.7.0...v8.8.0) (2025-02-07)
+
+
+### Features
+
+* code assistant integration ([#1902](https://github.com/ydb-platform/ydb-embedded-ui/issues/1902)) ([a10a5cd](https://github.com/ydb-platform/ydb-embedded-ui/commit/a10a5cddaba18100bbc23a1b0267fd15417497b9))
+* extend alter table query templates with enable auto split ([#1913](https://github.com/ydb-platform/ydb-embedded-ui/issues/1913)) ([cc81623](https://github.com/ydb-platform/ydb-embedded-ui/commit/cc81623ab9bc73b19ab24ae3d9367ff8d59a0344))
+
+
+### Bug Fixes
+
+* **Configs,Operations:** fix blicks on autorefresh ([#1908](https://github.com/ydb-platform/ydb-embedded-ui/issues/1908)) ([4d9c2b6](https://github.com/ydb-platform/ydb-embedded-ui/commit/4d9c2b6e5dbac9065e46794d96acbdddba66cfbf))
+* create topic template ([#1910](https://github.com/ydb-platform/ydb-embedded-ui/issues/1910)) ([9ab321b](https://github.com/ydb-platform/ydb-embedded-ui/commit/9ab321bca3a3388059eeb7b7da014196bd00227a))
+* **FormattedBytes:** show 1_000 with another unit ([#1901](https://github.com/ydb-platform/ydb-embedded-ui/issues/1901)) ([0e8bdd8](https://github.com/ydb-platform/ydb-embedded-ui/commit/0e8bdd8ea577f82be6d6b775b1f8ab22b771b4d9))
+* **PDiskSpaceDistribution:** update slots severity calculation ([#1907](https://github.com/ydb-platform/ydb-embedded-ui/issues/1907)) ([0a49720](https://github.com/ydb-platform/ydb-embedded-ui/commit/0a497206b578f01af946fb53ebb969e83ebde5c1))
+* remove trace polling ([#1915](https://github.com/ydb-platform/ydb-embedded-ui/issues/1915)) ([5541ca7](https://github.com/ydb-platform/ydb-embedded-ui/commit/5541ca7319a36c67fb9ca93bc5c36d4c2dc6f969))
+* **SchemaViewer:** use partitioning keys order from HashColumns ([#1916](https://github.com/ydb-platform/ydb-embedded-ui/issues/1916)) ([fe3845c](https://github.com/ydb-platform/ydb-embedded-ui/commit/fe3845c2f8203f4d2ca570232f15f23b4622a215))
+
 ## [8.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.6.0...v8.7.0) (2025-01-31)
 
 
