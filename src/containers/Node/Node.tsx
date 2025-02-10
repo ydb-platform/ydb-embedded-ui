@@ -1,6 +1,8 @@
 import React from 'react';
 
+import type {TabsItemProps} from '@gravity-ui/uikit';
 import {Tabs} from '@gravity-ui/uikit';
+import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {useRouteMatch} from 'react-router-dom';
 import {useQueryParams} from 'use-query-params';
@@ -18,6 +20,7 @@ import {
 } from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {nodeApi} from '../../store/reducers/node/node';
+import type {PreparedNode} from '../../store/reducers/node/types';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
@@ -41,8 +44,7 @@ export function Node() {
 
     const match = useRouteMatch<{id: string; activeTab: string}>(routes.node);
 
-    // NodeId is always defined here because the page is wrapped with specific route Router
-    const nodeId = match?.params.id as string;
+    const nodeId = match?.params.id;
     const activeTabIdFromQuery = match?.params.activeTab;
 
     const [{database: tenantNameFromQuery}] = useQueryParams(nodePageQueryParams);
@@ -50,11 +52,13 @@ export function Node() {
     const activeTabId = nodePageTabSchema.parse(activeTabIdFromQuery);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
+
+    const params = nodeId ? {nodeId} : skipToken;
     const {
         currentData: node,
         isLoading,
         error,
-    } = nodeApi.useGetNodeInfoQuery({nodeId}, {pollingInterval: autoRefreshInterval});
+    } = nodeApi.useGetNodeInfoQuery(params, {pollingInterval: autoRefreshInterval});
 
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const isDiskPagesAvailable = useDiskPagesAvailable();
@@ -92,57 +96,113 @@ export function Node() {
         }
     }, [dispatch, tenantName, nodeId, isLoading, isStorageNode]);
 
-    const renderHelmet = () => {
-        const host = node?.Host ? node.Host : i18n('node');
-        return (
-            <Helmet
-                titleTemplate={`%s — ${host} — YDB Monitoring`}
-                defaultTitle={`${host} — YDB Monitoring`}
-            >
-                <title>{activeTab.title}</title>
-            </Helmet>
-        );
-    };
+    return (
+        <div className={b(null)} ref={container}>
+            {<NodePageHelmet node={node} activeTabTitle={activeTab.title} />}
+            {<NodePageMeta node={node} loading={pageLoading} />}
+            {<NodePageTitle node={node} />}
+            {error ? <ResponseError error={error} className={b('error')} /> : null}
+            {<NodePageInfo node={node} loading={pageLoading} />}
+            {nodeId ? (
+                <NodePageContent
+                    nodeId={nodeId}
+                    tenantName={tenantName}
+                    activeTabId={activeTab.id}
+                    tabs={nodeTabs}
+                    parentContainer={container}
+                />
+            ) : null}
+        </div>
+    );
+}
 
-    const renderPageMeta = () => {
-        const hostItem = node?.Host ? `${i18n('fqdn')}: ${node.Host}` : undefined;
-        const dcItem = node?.DC ? `${i18n('dc')}: ${node.DC}` : undefined;
+interface NodePageHelmetProps {
+    node?: PreparedNode;
+    activeTabTitle?: string;
+}
 
-        return (
-            <PageMetaWithAutorefresh
-                loading={pageLoading}
-                items={[hostItem, dcItem]}
-                className={b('meta')}
-            />
-        );
-    };
+function NodePageHelmet({node, activeTabTitle}: NodePageHelmetProps) {
+    const host = node?.Host ? node.Host : i18n('node');
+    return (
+        <Helmet
+            titleTemplate={`%s — ${host} — YDB Monitoring`}
+            defaultTitle={`${host} — YDB Monitoring`}
+        >
+            <title>{activeTabTitle}</title>
+        </Helmet>
+    );
+}
 
-    const renderPageTitle = () => {
-        return (
-            <EntityPageTitle
-                entityName={i18n('node')}
-                status={node?.SystemState}
-                id={node?.NodeId}
-                className={b('title')}
-            />
-        );
-    };
+interface NodePageMetaProps {
+    node?: PreparedNode;
+    loading?: boolean;
+}
 
-    const renderInfo = () => {
-        if (pageLoading) {
-            return <InfoViewerSkeleton className={b('info')} rows={10} />;
-        }
+function NodePageMeta({node, loading}: NodePageMetaProps) {
+    const hostItem = node?.Host ? `${i18n('fqdn')}: ${node.Host}` : undefined;
+    const dcItem = node?.DC ? `${i18n('dc')}: ${node.DC}` : undefined;
 
-        return <FullNodeViewer node={node} className={b('info')} />;
-    };
+    return (
+        <PageMetaWithAutorefresh
+            loading={loading}
+            items={[hostItem, dcItem]}
+            className={b('meta')}
+        />
+    );
+}
 
+interface NodePageTitleProps {
+    node?: PreparedNode;
+}
+
+function NodePageTitle({node}: NodePageTitleProps) {
+    return (
+        <EntityPageTitle
+            entityName={i18n('node')}
+            status={node?.SystemState}
+            id={node?.NodeId}
+            className={b('title')}
+        />
+    );
+}
+
+interface NodePageInfoProps {
+    node?: PreparedNode;
+    loading?: boolean;
+}
+
+function NodePageInfo({node, loading}: NodePageInfoProps) {
+    if (loading) {
+        return <InfoViewerSkeleton className={b('info')} rows={10} />;
+    }
+
+    return <FullNodeViewer node={node} className={b('info')} />;
+}
+
+interface NodePageContentProps {
+    nodeId: string;
+    tenantName?: string;
+
+    activeTabId: NodeTab;
+    tabs: TabsItemProps[];
+
+    parentContainer: React.RefObject<HTMLDivElement>;
+}
+
+function NodePageContent({
+    nodeId,
+    tenantName,
+    activeTabId,
+    tabs,
+    parentContainer,
+}: NodePageContentProps) {
     const renderTabs = () => {
         return (
             <div className={b('tabs')}>
                 <Tabs
                     size="l"
-                    items={nodeTabs}
-                    activeTab={activeTab.id}
+                    items={tabs}
+                    activeTab={activeTabId}
                     wrapTo={({id}, tabNode) => {
                         const path = getDefaultNodePath(
                             nodeId,
@@ -161,14 +221,14 @@ export function Node() {
     };
 
     const renderTabContent = () => {
-        switch (activeTab.id) {
+        switch (activeTabId) {
             case 'storage': {
                 return (
                     <PaginatedStorage
                         nodeId={nodeId}
-                        parentRef={container}
+                        parentRef={parentContainer}
                         viewContext={{
-                            nodeId: nodeId?.toString(),
+                            nodeId: nodeId,
                         }}
                     />
                 );
@@ -186,23 +246,10 @@ export function Node() {
         }
     };
 
-    const renderError = () => {
-        if (!error) {
-            return null;
-        }
-
-        return <ResponseError error={error} className={b('error')} />;
-    };
-
     return (
-        <div className={b(null)} ref={container}>
-            {renderHelmet()}
-            {renderPageMeta()}
-            {renderPageTitle()}
-            {renderError()}
-            {renderInfo()}
+        <React.Fragment>
             {renderTabs()}
             {renderTabContent()}
-        </div>
+        </React.Fragment>
     );
 }
