@@ -111,7 +111,7 @@ export function Node() {
         return (
             <PageMetaWithAutorefresh
                 loading={pageLoading}
-                items={[hostItem, dcItem, ...(node?.Roles ?? [])]}
+                items={[hostItem, dcItem]}
                 className={b('meta')}
             />
         );

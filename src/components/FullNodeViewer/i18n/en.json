@@ -4,6 +4,7 @@
   "version": "Version",
   "dc": "DC",
   "rack": "Rack",
+  "roles": "Roles",
   "links": "Links",
 
   "la-interval-1m": "1 min",

@@ -45,6 +45,18 @@ export const FullNodeViewer = ({node, className}: FullNodeViewerProps) => {
     if (node?.Rack) {
         commonInfo.push({label: i18n('rack'), value: node?.Rack});
     }
+    if (node?.Roles && node?.Roles.length) {
+        commonInfo.push({
+            label: i18n('roles'),
+            value: (
+                <Flex direction={'column'}>
+                    {node.Roles.map((role) => {
+                        return <div key={role}>{role}</div>;
+                    })}
+                </Flex>
+            ),
+        });
+    }
 
     if (developerUIHref) {
         commonInfo.push({
