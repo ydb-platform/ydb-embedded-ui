@@ -25,7 +25,6 @@ const routes = {
     vDisk: `/${VDISK}`,
     storageGroup: `/${STORAGE_GROUP}`,
     tablet: `/${TABLET}/:id`,
-    tabletsFilters: `/tabletsFilters`,
     auth: `/auth`,
 } as const;
 
@@ -58,7 +57,7 @@ type Query = AnyRecord;
 
 export function createHref(
     route: string,
-    params?: Record<string, string | number>,
+    params?: Record<string, string | number | undefined>,
     query: Query = {},
 ) {
     let extendedQuery = query;

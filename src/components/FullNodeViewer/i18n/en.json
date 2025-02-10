@@ -1,0 +1,21 @@
+{
+  "database": "Database",
+  "uptime": "Uptime",
+  "version": "Version",
+  "dc": "DC",
+  "rack": "Rack",
+  "links": "Links",
+
+  "la-interval-1m": "1 min",
+  "la-interval-5m": "5 min",
+  "la-interval-15m": "15 min",
+
+  "developer-ui": "Developer UI",
+  "no-data": "No data",
+
+  "title.common-info": "Common info",
+  "title.endpoints": "Endpoints",
+  "title.roles": "Roles",
+  "title.pools": "Pools",
+  "title.load-average": "Load average"
+}

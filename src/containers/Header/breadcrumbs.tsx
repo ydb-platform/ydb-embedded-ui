@@ -25,7 +25,7 @@ import {
 } from '../../store/reducers/tenant/constants';
 import {CLUSTER_DEFAULT_TITLE, getTabletLabel} from '../../utils/constants';
 import {getClusterPath} from '../Cluster/utils';
-import {TABLETS, getDefaultNodePath} from '../Node/NodePages';
+import {getDefaultNodePath} from '../Node/NodePages';
 import {TenantTabsGroups, getTenantPath} from '../Tenant/TenantPages';
 
 import {headerKeyset} from './i18n';
@@ -78,7 +78,7 @@ const getTenantBreadcrumbs: GetBreadcrumbs<TenantBreadcrumbsOptions> = (options,
 const getNodeBreadcrumbs: GetBreadcrumbs<NodeBreadcrumbsOptions> = (options, query = {}) => {
     const {nodeId, nodeRole, nodeActiveTab, tenantName} = options;
 
-    const tenantQuery = getQueryForTenant(nodeActiveTab === TABLETS ? 'tablets' : 'nodes');
+    const tenantQuery = getQueryForTenant(nodeActiveTab === 'tablets' ? 'tablets' : 'nodes');
 
     const breadcrumbs = tenantName
         ? getTenantBreadcrumbs(options, {...query, ...tenantQuery})

@@ -1,36 +1,47 @@
 import {StringParam} from 'use-query-params';
+import {z} from 'zod';
 
 import type {QueryParamsTypeFromQueryObject} from '../../routes';
 import routes, {createHref} from '../../routes';
+import type {ValueOf} from '../../types/common';
 
-export const STORAGE = 'storage';
-export const TABLETS = 'tablets';
-export const OVERVIEW = 'overview';
-export const STRUCTURE = 'structure';
+import i18n from './i18n';
 
-export type NodeTab = typeof OVERVIEW | typeof STORAGE | typeof STRUCTURE | typeof TABLETS;
+const NODE_TABS_IDS = {
+    storage: 'storage',
+    tablets: 'tablets',
+    structure: 'structure',
+} as const;
 
-export const NODE_PAGES = [
+export type NodeTab = ValueOf<typeof NODE_TABS_IDS>;
+
+export const NODE_TABS = [
     {
-        id: OVERVIEW,
-        name: 'Overview',
+        id: NODE_TABS_IDS.storage,
+        get title() {
+            return i18n('tabs.storage');
+        },
     },
     {
-        id: STORAGE,
-        name: 'Storage',
+        id: NODE_TABS_IDS.structure,
+        get title() {
+            return i18n('tabs.structure');
+        },
     },
     {
-        id: STRUCTURE,
-        name: 'Structure',
-    },
-    {
-        id: TABLETS,
-        name: 'Tablets',
+        id: NODE_TABS_IDS.tablets,
+        get title() {
+            return i18n('tabs.tablets');
+        },
     },
 ];
 
+export const nodePageTabSchema = z.nativeEnum(NODE_TABS_IDS).catch(NODE_TABS_IDS.tablets);
+
 export const nodePageQueryParams = {
     database: StringParam,
+    pdiskId: StringParam,
+    vdiskId: StringParam,
 };
 
 type NodePageQuery = QueryParamsTypeFromQueryObject<typeof nodePageQueryParams>;
@@ -38,7 +49,7 @@ type NodePageQuery = QueryParamsTypeFromQueryObject<typeof nodePageQueryParams>;
 export function getDefaultNodePath(
     nodeId: string | number,
     query: NodePageQuery = {},
-    activeTab: NodeTab = OVERVIEW,
+    activeTab?: NodeTab,
 ) {
     return createHref(
         routes.node,

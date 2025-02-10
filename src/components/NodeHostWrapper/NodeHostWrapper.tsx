@@ -54,9 +54,13 @@ export const NodeHostWrapper = ({
     }
 
     const nodePath = isNodeAvailable
-        ? getDefaultNodePath(node.NodeId, {
-              database: database ?? node.TenantName,
-          })
+        ? getDefaultNodePath(
+              node.NodeId,
+              {
+                  database: database ?? node.TenantName,
+              },
+              node.TenantName ? 'tablets' : 'storage',
+          )
         : undefined;
 
     return (

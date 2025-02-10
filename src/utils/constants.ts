@@ -48,8 +48,6 @@ export const getTabletLabel = (type?: string) => {
     return isTabletType(type) ? TABLET_SYMBOLS[type] : defaultValue;
 };
 
-export const LOAD_AVERAGE_TIME_INTERVALS = ['1 min', '5 min', '15 min'];
-
 export const TENANT_OVERVIEW_TABLES_LIMIT = 5;
 
 export const EMPTY_DATA_PLACEHOLDER = '—';

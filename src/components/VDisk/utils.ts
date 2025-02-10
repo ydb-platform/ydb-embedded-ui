@@ -1,5 +1,5 @@
-import {STRUCTURE} from '../../containers/Node/NodePages';
-import routes, {createHref, getVDiskPagePath} from '../../routes';
+import {getDefaultNodePath} from '../../containers/Node/NodePages';
+import {getVDiskPagePath} from '../../routes';
 import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
 import {valueIsDefined} from '../../utils';
 import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
@@ -18,13 +18,13 @@ export function getVDiskLink(data: TVDiskStateInfo | TVSlotId) {
     ) {
         vDiskPath = getVDiskPagePath(VDiskSlotId, data.PDiskId, data.NodeId);
     } else if (valueIsDefined(data.NodeId) && isFullVDiskData(data)) {
-        vDiskPath = createHref(
-            routes.node,
-            {id: data.NodeId, activeTab: STRUCTURE},
+        vDiskPath = getDefaultNodePath(
+            data.NodeId,
             {
-                pdiskId: data.PDiskId,
+                pdiskId: data.PDiskId?.toString(),
                 vdiskId: stringifyVdiskId(data.VDiskId),
             },
+            'structure',
         );
     }
 

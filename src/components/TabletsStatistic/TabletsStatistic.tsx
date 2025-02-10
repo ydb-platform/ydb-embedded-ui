@@ -1,6 +1,6 @@
 import {Link} from 'react-router-dom';
 
-import {TABLETS, getDefaultNodePath} from '../../containers/Node/NodePages';
+import {getDefaultNodePath} from '../../containers/Node/NodePages';
 import type {TTabletStateInfo} from '../../types/api/tablet';
 import {cn} from '../../utils/cn';
 import {getTabletLabel} from '../../utils/constants';
@@ -31,7 +31,7 @@ interface TabletsStatisticProps {
 
 export const TabletsStatistic = ({tablets = [], database, nodeId}: TabletsStatisticProps) => {
     const renderTabletInfo = (item: ReturnType<typeof prepareTablets>[number], index: number) => {
-        const tabletsPath = getDefaultNodePath(nodeId, {database}, TABLETS);
+        const tabletsPath = getDefaultNodePath(nodeId, {database}, 'tablets');
 
         const label = `${item.label}: ${item.count}`;
         const className = b('tablet', {state: item.state?.toLowerCase()});
