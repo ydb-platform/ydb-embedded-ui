@@ -32,7 +32,7 @@ export function calculateVDiskSeverity<
     let severity = Math.max(DiskSpaceSeverity, VDiskSpaceSeverity, FrontQueuesSeverity);
 
     // donors are always in the not replicated state since they are leftovers
-    if (!Replicated && severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green) {
+    if (Replicated === false && severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green) {
         severity = DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue;
     }
 

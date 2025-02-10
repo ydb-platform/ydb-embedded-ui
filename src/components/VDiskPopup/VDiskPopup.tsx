@@ -124,7 +124,7 @@ const prepareVDiskData = (data: PreparedVDisk, withDeveloperUILink?: boolean) =>
         vdiskData.push({label: 'FrontQueues', value: FrontQueues});
     }
 
-    if (!Replicated) {
+    if (Replicated === false) {
         vdiskData.push({label: 'Replicated', value: 'NO'});
     }
 
