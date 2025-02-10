@@ -46,7 +46,8 @@ export function YqlEditor({
 }: YqlEditorProps) {
     const input = useTypedSelector(selectUserInput);
     const dispatch = useTypedDispatch();
-    const monacoGhostInstanceRef = React.useRef<ReturnType<typeof createMonacoGhostInstance>>();
+    const [monacoGhostInstance, setMonacoGhostInstance] =
+        React.useState<ReturnType<typeof createMonacoGhostInstance>>();
     const historyQueries = useTypedSelector(selectQueriesHistory);
     const [isCodeAssistEnabled] = useSetting(ENABLE_CODE_ASSISTANT);
 
@@ -77,18 +78,15 @@ export function YqlEditor({
     const {monacoGhostConfig, prepareUserQueriesCache} = useCodeAssistHelpers();
 
     React.useEffect(() => {
-        if (monacoGhostInstanceRef.current && window.api.codeAssist) {
-            if (isCodeAssistEnabled) {
-                monacoGhostInstanceRef.current.register(monacoGhostConfig);
-                prepareUserQueriesCache();
-            } else {
-                monacoGhostInstanceRef.current.unregister();
-            }
+        if (monacoGhostInstance && isCodeAssistEnabled) {
+            monacoGhostInstance.register(monacoGhostConfig);
+            prepareUserQueriesCache();
         }
+
         return () => {
-            monacoGhostInstanceRef.current?.unregister();
+            monacoGhostInstance?.unregister();
         };
-    }, [isCodeAssistEnabled, monacoGhostConfig, prepareUserQueriesCache]);
+    }, [isCodeAssistEnabled, monacoGhostConfig, monacoGhostInstance, prepareUserQueriesCache]);
 
     const editorDidMount = (editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
         window.ydbEditor = editor;
@@ -103,7 +101,10 @@ export function YqlEditor({
             }
         });
 
-        monacoGhostInstanceRef.current = createMonacoGhostInstance(editor);
+        if (window.api.codeAssist) {
+            setMonacoGhostInstance(createMonacoGhostInstance(editor));
+        }
+
         initResizeHandler(editor);
         initUserPrompt(editor, getLastQueryText);
         editor.focus();
