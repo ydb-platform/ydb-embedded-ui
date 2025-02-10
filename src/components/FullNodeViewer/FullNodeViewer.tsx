@@ -45,18 +45,6 @@ export const FullNodeViewer = ({node, className}: FullNodeViewerProps) => {
     if (node?.Rack) {
         commonInfo.push({label: i18n('rack'), value: node?.Rack});
     }
-    if (node?.Roles && node?.Roles.length) {
-        commonInfo.push({
-            label: i18n('roles'),
-            value: (
-                <Flex direction={'column'}>
-                    {node.Roles.map((role) => {
-                        return <div key={role}>{role}</div>;
-                    })}
-                </Flex>
-            ),
-        });
-    }
 
     if (developerUIHref) {
         commonInfo.push({
@@ -83,7 +71,7 @@ export const FullNodeViewer = ({node, className}: FullNodeViewerProps) => {
 
     return (
         <div className={b(null, className)}>
-            <Flex wrap gap={2}>
+            <Flex wrap gap={4}>
                 <Flex direction="column" gap={2}>
                     <InfoViewer
                         title={i18n('title.common-info')}
@@ -116,6 +104,19 @@ export const FullNodeViewer = ({node, className}: FullNodeViewerProps) => {
                         info={averageInfo}
                     />
                 </Flex>
+
+                {node.Roles && node.Roles.length ? (
+                    <Flex direction="column" gap={2}>
+                        <div className={b('section')}>
+                            <div className={b('section-title')}>{i18n('title.roles')}</div>
+                            {node?.Roles?.map((role) => (
+                                <div className={b('role')} key={role}>
+                                    {role}
+                                </div>
+                            ))}
+                        </div>
+                    </Flex>
+                ) : null}
             </Flex>
         </div>
     );
