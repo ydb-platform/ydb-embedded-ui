@@ -84,7 +84,11 @@ const prepareStorageGroupData = (
                 AvailableSize: PDiskAvailableSize,
             } = prepareWhiteboardPDiskData(PDisk);
 
-            if (!Replicated || PDiskState !== TPDiskState.Normal || VDiskState !== EVDiskState.OK) {
+            if (
+                Replicated === false ||
+                PDiskState !== TPDiskState.Normal ||
+                VDiskState !== EVDiskState.OK
+            ) {
                 missing += 1;
             }
 

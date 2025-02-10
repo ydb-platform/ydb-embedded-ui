@@ -102,6 +102,15 @@ describe('VDisk state', () => {
         expect(severity2).not.toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue);
     });
 
+    it('Should not display VDisk as replicating if Replicated is undefined', () => {
+        const severity = calculateVDiskSeverity({
+            VDiskState: EVDiskState.OK, // severity 1, green
+            Replicated: undefined,
+        });
+
+        expect(severity).not.toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue);
+    });
+
     it('Should display replicating VDisks in a not-OK state with a regular color', () => {
         const severity1 = calculateVDiskSeverity({
             VDiskState: EVDiskState.Initial, // severity 3, yellow
