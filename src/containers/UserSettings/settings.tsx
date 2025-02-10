@@ -6,6 +6,7 @@ import {
     AUTOCOMPLETE_ON_ENTER,
     BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
     ENABLE_AUTOCOMPLETE,
+    ENABLE_CODE_ASSISTANT,
     ENABLE_NETWORK_TABLE_KEY,
     INVERTED_DISKS_KEY,
     LANGUAGE_KEY,
@@ -121,7 +122,7 @@ export const enableAutocompleteSetting: SettingProps = {
 };
 
 export const enableCodeAssistantSetting: SettingProps = {
-    settingKey: ENABLE_AUTOCOMPLETE,
+    settingKey: ENABLE_CODE_ASSISTANT,
     title: i18n('settings.editor.codeAssistant.title'),
     description: i18n('settings.editor.codeAssistant.description'),
 };
@@ -214,7 +215,7 @@ export function getUserSettings({
     const editor = inlineCompletionsConfigured
         ? editorPage
         : createNextState(editorPage, (draft) => {
-              draft.sections[0].settings.push(enableAutocompleteSetting);
+              draft.sections[0].settings.push(enableCodeAssistantSetting);
           });
 
     const settings: YDBEmbeddedUISettings = [generalPage, editor, experiments, aboutPage];

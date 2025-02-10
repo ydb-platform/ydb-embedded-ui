@@ -11,7 +11,7 @@ import {
     selectUserInput,
 } from '../../../../store/reducers/query/query';
 import type {QueryAction} from '../../../../types/store/query';
-import {LAST_USED_QUERY_ACTION_KEY} from '../../../../utils/constants';
+import {ENABLE_CODE_ASSISTANT, LAST_USED_QUERY_ACTION_KEY} from '../../../../utils/constants';
 import {
     useEventHandler,
     useSetting,
@@ -44,6 +44,7 @@ export function YqlEditor({
     handleGetExplainQueryClick,
 }: YqlEditorProps) {
     const input = useTypedSelector(selectUserInput);
+    const isCodeAssistEnabled = useSetting(ENABLE_CODE_ASSISTANT);
     const dispatch = useTypedDispatch();
     const historyQueries = useTypedSelector(selectQueriesHistory);
     const savedQueries = useSavedQueries();
@@ -99,7 +100,7 @@ export function YqlEditor({
             }
         });
 
-        if (window.api.codeAssist) {
+        if (window.api.codeAssist && isCodeAssistEnabled) {
             registerMonacoGhost(editor);
             codeAssist.prepareUserQueriesCache([
                 ...historyQueries.map((query, index) => ({
