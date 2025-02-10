@@ -1,5 +1,7 @@
+import React from 'react';
+
 import NiceModal from '@ebay/nice-modal-react';
-import {useMonacoGhost} from '@ydb-platform/monaco-ghost';
+import {createMonacoGhostInstance} from '@ydb-platform/monaco-ghost';
 import throttle from 'lodash/throttle';
 import type Monaco from 'monaco-editor';
 
@@ -23,9 +25,8 @@ import {useUpdateErrorsHighlighting} from '../../../../utils/monaco/highlightErr
 import {QUERY_ACTIONS} from '../../../../utils/query';
 import {SAVE_QUERY_DIALOG} from '../SaveQuery/SaveQuery';
 import i18n from '../i18n';
-import {useSavedQueries} from '../utils/useSavedQueries';
 
-import {useCodeAssist, useEditorOptions} from './helpers';
+import {useCodeAssistHelpers, useEditorOptions} from './helpers';
 import {getKeyBindings} from './keybindings';
 
 const CONTEXT_MENU_GROUP_ID = 'navigation';
@@ -44,10 +45,11 @@ export function YqlEditor({
     handleGetExplainQueryClick,
 }: YqlEditorProps) {
     const input = useTypedSelector(selectUserInput);
-    const isCodeAssistEnabled = useSetting(ENABLE_CODE_ASSISTANT);
     const dispatch = useTypedDispatch();
+    const monacoGhostInstanceRef = React.useRef<ReturnType<typeof createMonacoGhostInstance>>();
     const historyQueries = useTypedSelector(selectQueriesHistory);
-    const savedQueries = useSavedQueries();
+    const [isCodeAssistEnabled] = useSetting(ENABLE_CODE_ASSISTANT);
+
     const editorOptions = useEditorOptions();
     const updateErrorsHighlighting = useUpdateErrorsHighlighting();
 
@@ -72,20 +74,21 @@ export function YqlEditor({
         window.ydbEditor = undefined;
     };
 
-    const codeAssist = useCodeAssist();
-    const {registerMonacoGhost} = useMonacoGhost({
-        api: {
-            getCodeAssistSuggestions: codeAssist.getCodeAssistSuggestions,
-        },
-        eventHandlers: {
-            onCompletionAccept: codeAssist.onCompletionAccept,
-            onCompletionDecline: codeAssist.onCompletionDecline,
-            onCompletionIgnore: codeAssist.onCompletionIgnore,
-        },
-        config: {
-            language: YQL_LANGUAGE_ID,
-        },
-    });
+    const {monacoGhostConfig, prepareUserQueriesCache} = useCodeAssistHelpers();
+
+    React.useEffect(() => {
+        if (monacoGhostInstanceRef.current && window.api.codeAssist) {
+            if (isCodeAssistEnabled) {
+                monacoGhostInstanceRef.current.register(monacoGhostConfig);
+                prepareUserQueriesCache();
+            } else {
+                monacoGhostInstanceRef.current.unregister();
+            }
+        }
+        return () => {
+            monacoGhostInstanceRef.current?.unregister();
+        };
+    }, [isCodeAssistEnabled, monacoGhostConfig, prepareUserQueriesCache]);
 
     const editorDidMount = (editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
         window.ydbEditor = editor;
@@ -100,19 +103,7 @@ export function YqlEditor({
             }
         });
 
-        if (window.api.codeAssist && isCodeAssistEnabled) {
-            registerMonacoGhost(editor);
-            codeAssist.prepareUserQueriesCache([
-                ...historyQueries.map((query, index) => ({
-                    name: `query${index}.yql`,
-                    text: query.queryText,
-                })),
-                ...savedQueries.map((query) => ({
-                    name: query.name,
-                    text: query.body,
-                })),
-            ]);
-        }
+        monacoGhostInstanceRef.current = createMonacoGhostInstance(editor);
         initResizeHandler(editor);
         initUserPrompt(editor, getLastQueryText);
         editor.focus();

@@ -4,9 +4,12 @@ import type {AcceptEvent, DeclineEvent, IgnoreEvent, PromptFile} from '@ydb-plat
 import type Monaco from 'monaco-editor';
 
 import {codeAssistApi} from '../../../../store/reducers/codeAssist/codeAssist';
+import {selectQueriesHistory} from '../../../../store/reducers/query/query';
 import type {TelemetryOpenTabs} from '../../../../types/api/codeAssist';
 import {AUTOCOMPLETE_ON_ENTER, ENABLE_AUTOCOMPLETE} from '../../../../utils/constants';
-import {useSetting} from '../../../../utils/hooks';
+import {useSetting, useTypedSelector} from '../../../../utils/hooks';
+import {YQL_LANGUAGE_ID} from '../../../../utils/monaco/constats';
+import {useSavedQueries} from '../utils/useSavedQueries';
 
 export type EditorOptions = Monaco.editor.IEditorOptions & Monaco.editor.IGlobalEditorOptions;
 
@@ -36,12 +39,14 @@ export function useEditorOptions() {
     return options;
 }
 
-export function useCodeAssist() {
+export function useCodeAssistHelpers() {
     const [sendCodeAssistPrompt] = codeAssistApi.useLazyGetCodeAssistSuggestionsQuery();
     const [acceptSuggestion] = codeAssistApi.useAcceptSuggestionMutation();
     const [discardSuggestion] = codeAssistApi.useDiscardSuggestionMutation();
     const [ignoreSuggestion] = codeAssistApi.useIgnoreSuggestionMutation();
     const [sendUserQueriesData] = codeAssistApi.useSendUserQueriesDataMutation();
+    const historyQueries = useTypedSelector(selectQueriesHistory);
+    const savedQueries = useSavedQueries();
 
     const getCodeAssistSuggestions = React.useCallback(
         async (promptFiles: PromptFile[]) => sendCodeAssistPrompt(promptFiles).unwrap(),
@@ -63,26 +68,49 @@ export function useCodeAssist() {
         [ignoreSuggestion],
     );
 
-    const prepareUserQueriesCache = React.useCallback(
-        async (queries: {text: string; name?: string}[]) => {
-            const preparedData: TelemetryOpenTabs = queries.map((query, index) => ({
-                FileName: query.name || `query${index}.yql`,
-                Text: query.text,
-            }));
-            try {
-                return sendUserQueriesData(preparedData).unwrap();
-            } catch {
-                return {items: []};
-            }
-        },
-        [sendUserQueriesData],
-    );
+    const userQueries = React.useMemo(() => {
+        return [
+            ...historyQueries.map((query, index) => ({
+                name: `query${index}.yql`,
+                text: query.queryText,
+            })),
+            ...savedQueries.map((query) => ({
+                name: query.name,
+                text: query.body,
+            })),
+        ];
+    }, [historyQueries, savedQueries]);
+
+    const prepareUserQueriesCache = React.useCallback(async () => {
+        const preparedData: TelemetryOpenTabs = userQueries.map((query, index) => ({
+            FileName: query.name || `query${index}.yql`,
+            Text: query.text,
+        }));
+        try {
+            return await sendUserQueriesData(preparedData).unwrap();
+        } catch {
+            return {items: []};
+        }
+    }, [sendUserQueriesData, userQueries]);
+
+    const monacoGhostConfig = React.useMemo(() => {
+        return {
+            api: {
+                getCodeAssistSuggestions,
+            },
+            eventHandlers: {
+                onCompletionAccept,
+                onCompletionDecline,
+                onCompletionIgnore,
+            },
+            config: {
+                language: YQL_LANGUAGE_ID,
+            },
+        };
+    }, [getCodeAssistSuggestions, onCompletionAccept, onCompletionDecline, onCompletionIgnore]);
 
     return {
-        getCodeAssistSuggestions,
-        onCompletionAccept,
-        onCompletionDecline,
-        onCompletionIgnore,
         prepareUserQueriesCache,
+        monacoGhostConfig,
     };
 }
