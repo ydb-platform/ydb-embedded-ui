@@ -201,10 +201,10 @@ export const aboutPage: SettingsPage = {
 
 export function getUserSettings({
     singleClusterMode,
-    inlineCompletionsConfigured,
+    codeAssistantConfigured,
 }: {
     singleClusterMode: boolean;
-    inlineCompletionsConfigured?: boolean;
+    codeAssistantConfigured?: boolean;
 }) {
     const experiments = singleClusterMode
         ? experimentsPage
@@ -212,7 +212,7 @@ export function getUserSettings({
               draft.sections[0].settings.push(useClusterBalancerAsBackendSetting);
           });
 
-    const editor = inlineCompletionsConfigured
+    const editor = codeAssistantConfigured
         ? editorPage
         : createNextState(editorPage, (draft) => {
               draft.sections[0].settings.push(enableCodeAssistantSetting);
