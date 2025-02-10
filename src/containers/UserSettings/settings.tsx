@@ -120,6 +120,12 @@ export const enableAutocompleteSetting: SettingProps = {
     description: i18n('settings.editor.autocomplete.description'),
 };
 
+export const enableCodeAssistantSetting: SettingProps = {
+    settingKey: ENABLE_AUTOCOMPLETE,
+    title: i18n('settings.editor.codeAssistant.title'),
+    description: i18n('settings.editor.codeAssistant.description'),
+};
+
 export const autocompleteOnEnterSetting: SettingProps = {
     settingKey: AUTOCOMPLETE_ON_ENTER,
     title: i18n('settings.editor.autocomplete-on-enter.title'),
@@ -192,14 +198,26 @@ export const aboutPage: SettingsPage = {
     showTitle: false,
 };
 
-export function getUserSettings({singleClusterMode}: {singleClusterMode: boolean}) {
+export function getUserSettings({
+    singleClusterMode,
+    inlineCompletionsConfigured,
+}: {
+    singleClusterMode: boolean;
+    inlineCompletionsConfigured?: boolean;
+}) {
     const experiments = singleClusterMode
         ? experimentsPage
         : createNextState(experimentsPage, (draft) => {
               draft.sections[0].settings.push(useClusterBalancerAsBackendSetting);
           });
 
-    const settings: YDBEmbeddedUISettings = [generalPage, editorPage, experiments, aboutPage];
+    const editor = inlineCompletionsConfigured
+        ? editorPage
+        : createNextState(editorPage, (draft) => {
+              draft.sections[0].settings.push(enableAutocompleteSetting);
+          });
+
+    const settings: YDBEmbeddedUISettings = [generalPage, editor, experiments, aboutPage];
 
     return settings;
 }
