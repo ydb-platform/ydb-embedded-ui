@@ -213,10 +213,10 @@ export function getUserSettings({
           });
 
     const editor = codeAssistantConfigured
-        ? editorPage
-        : createNextState(editorPage, (draft) => {
+        ? createNextState(editorPage, (draft) => {
               draft.sections[0].settings.push(enableCodeAssistantSetting);
-          });
+          })
+        : editorPage;
 
     const settings: YDBEmbeddedUISettings = [generalPage, editor, experiments, aboutPage];
 
