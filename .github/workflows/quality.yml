@@ -15,7 +15,7 @@ jobs:
 
     services:
       backend:
-        image: ghcr.io/ydb-platform/local-ydb:24.3
+        image: ghcr.io/ydb-platform/local-ydb:nightly
         ports:
           - 2135:2135
           - 8765:8765
