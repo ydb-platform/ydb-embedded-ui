@@ -1,5 +1,19 @@
 # Changelog
 
+## [8.9.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.8.0...v8.9.0) (2025-02-11)
+
+
+### Features
+
+* move autocomplete logic to library ([#1909](https://github.com/ydb-platform/ydb-embedded-ui/issues/1909)) ([58a0f08](https://github.com/ydb-platform/ydb-embedded-ui/commit/58a0f08478f2b6c1a0bcecbbd3612e78c3bf0d80))
+* **Node:** rework page ([#1917](https://github.com/ydb-platform/ydb-embedded-ui/issues/1917)) ([187032b](https://github.com/ydb-platform/ydb-embedded-ui/commit/187032b6cc77ffc60d925663766dd8e830f4d5d4))
+
+
+### Bug Fixes
+
+* code assistant option ([#1922](https://github.com/ydb-platform/ydb-embedded-ui/issues/1922)) ([38ea87f](https://github.com/ydb-platform/ydb-embedded-ui/commit/38ea87fe65e3eb33ee8287b213e65b32d0d20e48))
+* **VDisk:** do not show vdisk as not replicated if no data ([#1921](https://github.com/ydb-platform/ydb-embedded-ui/issues/1921)) ([f648f08](https://github.com/ydb-platform/ydb-embedded-ui/commit/f648f0890b3e308a5875566a141be168302d3924))
+
 ## [8.8.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.7.0...v8.8.0) (2025-02-07)
 
 
