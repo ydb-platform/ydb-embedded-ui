@@ -6,6 +6,7 @@ import {
     AUTOCOMPLETE_ON_ENTER,
     BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
     ENABLE_AUTOCOMPLETE,
+    ENABLE_CODE_ASSISTANT,
     ENABLE_NETWORK_TABLE_KEY,
     INVERTED_DISKS_KEY,
     LANGUAGE_KEY,
@@ -120,6 +121,12 @@ export const enableAutocompleteSetting: SettingProps = {
     description: i18n('settings.editor.autocomplete.description'),
 };
 
+export const enableCodeAssistantSetting: SettingProps = {
+    settingKey: ENABLE_CODE_ASSISTANT,
+    title: i18n('settings.editor.codeAssistant.title'),
+    description: i18n('settings.editor.codeAssistant.description'),
+};
+
 export const autocompleteOnEnterSetting: SettingProps = {
     settingKey: AUTOCOMPLETE_ON_ENTER,
     title: i18n('settings.editor.autocomplete-on-enter.title'),
@@ -192,14 +199,26 @@ export const aboutPage: SettingsPage = {
     showTitle: false,
 };
 
-export function getUserSettings({singleClusterMode}: {singleClusterMode: boolean}) {
+export function getUserSettings({
+    singleClusterMode,
+    codeAssistantConfigured,
+}: {
+    singleClusterMode: boolean;
+    codeAssistantConfigured?: boolean;
+}) {
     const experiments = singleClusterMode
         ? experimentsPage
         : createNextState(experimentsPage, (draft) => {
               draft.sections[0].settings.push(useClusterBalancerAsBackendSetting);
           });
 
-    const settings: YDBEmbeddedUISettings = [generalPage, editorPage, experiments, aboutPage];
+    const editor = codeAssistantConfigured
+        ? createNextState(editorPage, (draft) => {
+              draft.sections[0].settings.push(enableCodeAssistantSetting);
+          })
+        : editorPage;
+
+    const settings: YDBEmbeddedUISettings = [generalPage, editor, experiments, aboutPage];
 
     return settings;
 }
