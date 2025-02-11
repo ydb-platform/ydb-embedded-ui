@@ -228,6 +228,9 @@ export interface TStoragePDisk {
     Whiteboard?: TPDiskStateInfo;
 }
 
+/**
+ * https://ydb.tech/docs/en/concepts/topology#cluster-config
+ */
 export type Erasure = 'none' | 'block-4-2' | 'mirror-3-dc' | 'mirror-3of4';
 
 // ==== Request types ====

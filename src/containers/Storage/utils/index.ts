@@ -86,6 +86,7 @@ export function getStorageGroupsInitialEntitiesCount(
 }
 
 function isErasureWithDifferentDC(erasure?: Erasure) {
+    // These erasure types suppose the data distributed across 3 different DC
     return erasure === 'mirror-3-dc' || erasure === 'mirror-3of4';
 }
 
