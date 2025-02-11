@@ -2,7 +2,7 @@ import {z} from 'zod';
 
 import type {EFlag} from '../../../types/api/enums';
 import type {NodesGroupByField} from '../../../types/api/nodes';
-import type {GroupsGroupByField} from '../../../types/api/storage';
+import type {Erasure, GroupsGroupByField} from '../../../types/api/storage';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import type {NodesUptimeFilterValues, PreparedNodeSystemState} from '../../../utils/nodes';
 
@@ -56,7 +56,7 @@ export interface PreparedStorageGroup {
     PoolName?: string;
     MediaType?: string;
     Encryption?: boolean;
-    ErasureSpecies?: string;
+    ErasureSpecies?: Erasure;
     Degraded: number;
     Overall?: EFlag;
 

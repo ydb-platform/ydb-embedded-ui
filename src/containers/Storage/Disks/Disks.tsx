@@ -3,9 +3,10 @@ import React from 'react';
 import {Flex, useLayoutContext} from '@gravity-ui/uikit';
 
 import {VDisk} from '../../../components/VDisk/VDisk';
-import {valueIsDefined} from '../../../utils';
+import type {Erasure} from '../../../types/api/storage';
 import {cn} from '../../../utils/cn';
 import type {PreparedVDisk} from '../../../utils/disks/types';
+import {isNumeric} from '../../../utils/utils';
 import {PDisk} from '../PDisk';
 import type {StorageViewContext} from '../types';
 import {isVdiskActive, useVDisksWithDCMargins} from '../utils';
@@ -19,12 +20,13 @@ const VDISKS_CONTAINER_WIDTH = 300;
 interface DisksProps {
     vDisks?: PreparedVDisk[];
     viewContext?: StorageViewContext;
+    erasure?: Erasure;
 }
 
-export function Disks({vDisks = [], viewContext}: DisksProps) {
+export function Disks({vDisks = [], viewContext, erasure}: DisksProps) {
     const [highlightedVDisk, setHighlightedVDisk] = React.useState<string | undefined>();
 
-    const vDisksWithDCMargins = useVDisksWithDCMargins(vDisks);
+    const vDisksWithDCMargins = useVDisksWithDCMargins(vDisks, erasure);
 
     const {
         theme: {spaceBaseSize},
@@ -40,9 +42,9 @@ export function Disks({vDisks = [], viewContext}: DisksProps) {
     return (
         <div className={b(null)}>
             <Flex direction={'row'} gap={1} grow style={{width: VDISKS_CONTAINER_WIDTH}}>
-                {vDisks?.map((vDisk) => (
+                {vDisks?.map((vDisk, index) => (
                     <VDiskItem
-                        key={vDisk.StringifiedId}
+                        key={vDisk.StringifiedId || index}
                         vDisk={vDisk}
                         inactive={!isVdiskActive(vDisk, viewContext)}
                         highlightedVDisk={highlightedVDisk}
@@ -55,7 +57,7 @@ export function Disks({vDisks = [], viewContext}: DisksProps) {
             <div className={b('pdisks-wrapper')}>
                 {vDisks?.map((vDisk, index) => (
                     <PDiskItem
-                        key={vDisk?.PDisk?.StringifiedId}
+                        key={vDisk?.PDisk?.StringifiedId || index}
                         vDisk={vDisk}
                         highlightedVDisk={highlightedVDisk}
                         setHighlightedVDisk={setHighlightedVDisk}
@@ -89,7 +91,7 @@ function VDiskItem({
     const vDiskId = vDisk.StringifiedId;
 
     // show vdisks without AllocatedSize as having average width (#1433)
-    const minWidth = valueIsDefined(vDiskToShow.AllocatedSize) ? undefined : unavailableVDiskWidth;
+    const minWidth = isNumeric(vDiskToShow.AllocatedSize) ? undefined : unavailableVDiskWidth;
     const flexGrow = Number(vDiskToShow.AllocatedSize) || 1;
 
     return (
