@@ -8,9 +8,13 @@ export interface SchemaQueryParams {
 
 export type TemplateFn = (params?: SchemaQueryParams) => string;
 
+function normalizeParameter(param: string) {
+    return param.replace(/\$/g, '\\$');
+}
+
 export const createTableTemplate = (params?: SchemaQueryParams) => {
     const tableName = params?.relativePath
-        ? `\`${params?.relativePath}/my_row_table\``
+        ? `\`${normalizeParameter(params.relativePath)}/my_row_table\``
         : '${1:my_row_table}';
     return `-- docs: https://ydb.tech/en/docs/yql/reference/syntax/create_table
 CREATE TABLE ${tableName} (
@@ -46,7 +50,7 @@ WITH (
 };
 export const createColumnTableTemplate = (params?: SchemaQueryParams) => {
     const tableName = params?.relativePath
-        ? `\`${params?.relativePath}/my_column_table\``
+        ? `\`${normalizeParameter(params.relativePath)}/my_column_table\``
         : '${1:my_column_table}';
     return `-- docs: https://ydb.tech/en/docs/yql/reference/syntax/create_table#olap-tables
 CREATE TABLE ${tableName} (
@@ -75,7 +79,9 @@ WITH (
 );`;
 };
 export const alterTableTemplate = (params?: SchemaQueryParams) => {
-    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_table>}';
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_table>}';
 
     return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/alter_table/
 
@@ -86,7 +92,9 @@ ALTER TABLE ${path}
 };
 
 export const manageAutoPartitioningTemplate = (params?: SchemaQueryParams) => {
-    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_table>}';
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_table>}';
 
     return `-- documentation about partitioning https://ydb.tech/docs/en/concepts/datamodel/table#partitioning
 
@@ -100,18 +108,26 @@ ALTER TABLE ${path} SET
 )`;
 };
 export const selectQueryTemplate = (params?: SchemaQueryParams) => {
-    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${2:<my_table>}';
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${2:<my_table>}';
     const columns =
-        params?.schemaData?.map((column) => '`' + column.name + '`').join(', ') || '${1:*}';
+        params?.schemaData
+            ?.map((column) => '`' + normalizeParameter(column.name ?? '') + '`')
+            .join(', ') || '${1:*}';
     const filters = params?.relativePath ? '' : 'WHERE ${3:Key1 = 1}\nORDER BY ${4:Key1}\n';
     return `SELECT ${columns}
 FROM ${path}
 ${filters}LIMIT \${5:10};`;
 };
 export const upsertQueryTemplate = (params?: SchemaQueryParams) => {
-    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_table>}';
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_table>}';
     const columns =
-        params?.schemaData?.map((column) => `\`${column.name}\``).join(', ') || '${2:id, name}';
+        params?.schemaData
+            ?.map((column) => `\`${normalizeParameter(column.name ?? '')}\``)
+            .join(', ') || '${2:id, name}';
     const values = params?.schemaData ? '${3: }' : '${3:1, "foo"}';
     return `UPSERT INTO ${path}
 ( ${columns} )
@@ -119,7 +135,9 @@ VALUES ( ${values} );`;
 };
 
 export const dropExternalTableTemplate = (params?: SchemaQueryParams) => {
-    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:my_table}';
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:my_table}';
     return `DROP EXTERNAL TABLE ${path};`;
 };
 
@@ -128,9 +146,13 @@ export const createExternalTableTemplate = (params?: SchemaQueryParams) => {
     // to create table in the same folder with data source
     const targetPath = params?.relativePath.split('/').slice(0, -1).join('/');
 
-    const target = targetPath ? `\`${targetPath}/my_external_table\`` : '${1:<my_external_table>}';
+    const target = targetPath
+        ? `\`${normalizeParameter(targetPath)}/my_external_table\``
+        : '${1:<my_external_table>}';
 
-    const source = params?.relativePath ? `${params.relativePath}` : '${2:<path_to_data_source>}';
+    const source = params?.relativePath
+        ? `${normalizeParameter(params.relativePath)}`
+        : '${2:<path_to_data_source>}';
     return `CREATE EXTERNAL TABLE ${target} (
     column1 Int,
     column2 Int
@@ -143,7 +165,9 @@ export const createExternalTableTemplate = (params?: SchemaQueryParams) => {
 };
 
 export const createTopicTemplate = (params?: SchemaQueryParams) => {
-    const path = params?.relativePath ? `\`${params?.relativePath}/my_topic\`` : '${1:my_topic}';
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}/my_topic\``
+        : '${1:my_topic}';
     return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/create-topic
 CREATE TOPIC ${path} (
     CONSUMER consumer1,
@@ -165,7 +189,9 @@ CREATE TOPIC ${path} (
 };
 
 export const alterTopicTemplate = (params?: SchemaQueryParams) => {
-    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_topic>}';
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_topic>}';
     return `-- docs: https://ydb.tech/en/docs/yql/reference/syntax/alter_topic
 ALTER TOPIC ${path}
     ADD CONSUMER new_consumer WITH (read_from = Datetime('1970-01-01T00:00:00Z')), -- Sets up the message write time starting from which the consumer will receive data.
@@ -188,44 +214,58 @@ ALTER TOPIC ${path}
 };
 
 export const dropTopicTemplate = (params?: SchemaQueryParams) => {
-    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_topic>}';
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_topic>}';
     return `DROP TOPIC ${path};`;
 };
 
 export const createViewTemplate = (params?: SchemaQueryParams) => {
-    const path = params?.relativePath ? `\`${params?.relativePath}/my_view\`` : '${1:my_view}';
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}/my_view\``
+        : '${1:my_view}';
     return `CREATE VIEW ${path} WITH (security_invoker = TRUE) AS SELECT 1;`;
 };
 
 export const dropViewTemplate = (params?: SchemaQueryParams) => {
-    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_view>}';
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_view>}';
     return `DROP VIEW ${path};`;
 };
 export const dropAsyncReplicationTemplate = (params?: SchemaQueryParams) => {
-    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_replication>}';
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_replication>}';
     return `DROP ASYNC REPLICATION ${path};`;
 };
 
 export const alterAsyncReplicationTemplate = (params?: SchemaQueryParams) => {
-    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_replication>}';
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_replication>}';
     return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/alter-async-replication
 ALTER ASYNC REPLICATION ${path} SET (STATE = "DONE", FAILOVER_MODE = "FORCE");`;
 };
 
 export const addTableIndex = (params?: SchemaQueryParams) => {
-    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_table>}';
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_table>}';
     return `ALTER TABLE ${path} ADD INDEX \${2:index_name} GLOBAL ON (\${3:<column_name>});`;
 };
 
 export const dropTableIndex = (params?: SchemaQueryParams) => {
     const indexName = params?.relativePath.split('/').pop();
     const path = params?.relativePath.split('/').slice(0, -1).join('/');
-    const pathSnippet = path ? `\`${path}\`` : '${1:<my_table>}';
-    return `ALTER TABLE ${pathSnippet} DROP INDEX ${indexName || '${2:<index_name>}'};`;
+    const pathSnippet = path ? `\`${normalizeParameter(path)}\`` : '${1:<my_table>}';
+    return `ALTER TABLE ${pathSnippet} DROP INDEX ${normalizeParameter(indexName ?? '') || '${2:<index_name>}'};`;
 };
 
 export const createCdcStreamTemplate = (params?: SchemaQueryParams) => {
-    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_table>}';
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_table>}';
     return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/alter_table/changefeed
 ALTER TABLE ${path} ADD CHANGEFEED \${2:changefeed_name} WITH (
     MODE = \${3:'UPDATES'}, -- KEYS_ONLY, UPDATES, NEW_IMAGE, OLD_IMAGE, or NEW_AND_OLD_IMAGES
@@ -260,7 +300,9 @@ CREATE USER \${1:user_name} PASSWORD \${2:'password'}
 };
 
 export const deleteRowsTemplate = (params?: SchemaQueryParams) => {
-    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_table>}';
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_table>}';
     return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/delete
 DELETE FROM ${path}
 WHERE \${2:Key1 = 1};`;
@@ -284,7 +326,7 @@ DROP USER \${1:<user_name>}
 
 export const grantPrivilegeTemplate = (params?: SchemaQueryParams) => {
     const path = params?.relativePath
-        ? `\`${params?.relativePath}\``
+        ? `\`${normalizeParameter(params?.relativePath)}\``
         : '${2:<path_to_scheme_object>}';
     return `GRANT \${1:<permission_name>}
 ON ${path}
@@ -301,7 +343,7 @@ TO \${3:<role_name>}
 
 export const revokePrivilegeTemplate = (params?: SchemaQueryParams) => {
     const path = params?.relativePath
-        ? `\`${params?.relativePath}\``
+        ? `\`${normalizeParameter(params?.relativePath)}\``
         : '${2:<path_to_scheme_object>}';
     return `REVOKE \${1:<permission_name>}
 ON ${path}
@@ -316,7 +358,9 @@ FROM \${3:<role_name>}
 };
 
 export const updateTableTemplate = (params?: SchemaQueryParams) => {
-    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_table>}';
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_table>}';
     return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/update
 UPDATE ${path}
 SET \${2:Column1 = 'foo', Column2 = 'bar'}
@@ -324,6 +368,8 @@ WHERE \${3:Key1 = 1};`;
 };
 
 export const dropTableTemplate = (params?: SchemaQueryParams) => {
-    const path = params?.relativePath ? `\`${params?.relativePath}\`` : '${1:<my_table>}';
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_table>}';
     return `DROP TABLE ${path};`;
 };
