@@ -6,40 +6,26 @@ import {api} from '../api';
 
 import type {IssuesTree} from './types';
 
+const healthQueryFn = async (
+    {database, maxLevel}: {database: string; maxLevel?: number; disabled?: boolean},
+    {signal}: {signal: AbortSignal},
+) => {
+    try {
+        const data = await window.api.viewer.getHealthcheckInfo({database, maxLevel}, {signal});
+        return {data};
+    } catch (error) {
+        return {error};
+    }
+};
+
 export const healthcheckApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getHealthcheckInfo: builder.query({
-            queryFn: async (
-                {database, maxLevel}: {database: string; maxLevel?: number; disabled?: boolean},
-                {signal},
-            ) => {
-                try {
-                    const data = await window.api.viewer.getHealthcheckInfo(
-                        {database, maxLevel},
-                        {signal},
-                    );
-                    return {data};
-                } catch (error) {
-                    return {error};
-                }
-            },
+            queryFn: healthQueryFn,
             providesTags: ['All'],
         }),
         getManualHealthcheckInfo: builder.query({
-            queryFn: async (
-                {database, maxLevel}: {database: string; maxLevel?: number; disabled?: boolean},
-                {signal},
-            ) => {
-                try {
-                    const data = await window.api.viewer.getHealthcheckInfo(
-                        {database, maxLevel},
-                        {signal},
-                    );
-                    return {data};
-                } catch (error) {
-                    return {error};
-                }
-            },
+            queryFn: healthQueryFn,
             providesTags: ['ManualRefresh'],
         }),
     }),
