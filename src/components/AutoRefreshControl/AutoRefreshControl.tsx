@@ -13,10 +13,9 @@ const b = cn('auto-refresh-control');
 
 interface AutoRefreshControlProps {
     className?: string;
-    onManualRefresh?: () => void;
 }
 
-export function AutoRefreshControl({className, onManualRefresh}: AutoRefreshControlProps) {
+export function AutoRefreshControl({className}: AutoRefreshControlProps) {
     const dispatch = useTypedDispatch();
     const [autoRefreshInterval, setAutoRefreshInterval] = useAutoRefreshInterval();
     return (
@@ -24,8 +23,7 @@ export function AutoRefreshControl({className, onManualRefresh}: AutoRefreshCont
             <Button
                 view="flat-secondary"
                 onClick={() => {
-                    dispatch(api.util.invalidateTags(['All']));
-                    onManualRefresh?.();
+                    dispatch(api.util.invalidateTags(['All', 'ManualRefresh']));
                 }}
                 extraProps={{'aria-label': i18n('Refresh')}}
             >

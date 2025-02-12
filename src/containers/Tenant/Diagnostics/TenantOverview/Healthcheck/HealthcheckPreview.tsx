@@ -63,26 +63,13 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
         },
     );
 
-    const [getHealthcheckQuery, {currentData: manualData, isFetching: isFetchingManually}] =
-        healthcheckApi.useLazyGetHealthcheckInfoQuery();
-
-    React.useEffect(() => {
-        if (metricsTab === 'healthcheck' && healthcheckPreviewDisabled) {
-            getHealthcheckQuery({database: tenantName});
-        }
-    }, [metricsTab, healthcheckPreviewDisabled, tenantName, getHealthcheckQuery]);
-
-    React.useEffect(() => {
-        const fetchHealthcheck = () => {
-            if (healthcheckPreviewDisabled) {
-                getHealthcheckQuery({database: tenantName});
-            }
-        };
-        document.addEventListener('diagnosticsRefresh', fetchHealthcheck);
-        return () => {
-            document.removeEventListener('diagnosticsRefresh', fetchHealthcheck);
-        };
-    }, [tenantName, healthcheckPreviewDisabled, getHealthcheckQuery]);
+    const {currentData: manualData, isFetching: isFetchingManually} =
+        healthcheckApi.useGetManualHealthcheckInfoQuery(
+            {database: tenantName},
+            {
+                skip: !healthcheckPreviewDisabled || metricsTab !== 'healthcheck',
+            },
+        );
 
     const loading =
         (isFetching && data === undefined) || (isFetchingManually && manualData === undefined);
