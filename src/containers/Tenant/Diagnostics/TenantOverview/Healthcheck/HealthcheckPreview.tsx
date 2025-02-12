@@ -48,7 +48,7 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
 
     const {name} = useClusterBaseInfo();
 
-    const healthcheckPreviewDisabled = name !== 'ydb_ru';
+    const healthcheckPreviewDisabled = name === 'ydb_ru';
 
     const {
         currentData: data,
