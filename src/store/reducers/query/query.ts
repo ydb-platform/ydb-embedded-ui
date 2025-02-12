@@ -4,7 +4,6 @@ import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
 import {settingsManager} from '../../../services/settings';
-import type {ColumnType} from '../../../types/api/query';
 import {TracingLevelNumber} from '../../../types/api/query';
 import type {QueryAction, QueryRequestParams, QuerySettings} from '../../../types/store/query';
 import type {StreamDataChunk} from '../../../types/store/streaming';
@@ -24,7 +23,6 @@ import type {QueryResult, QueryState} from './types';
 import {getActionAndSyntaxFromQueryMode, getQueryInHistory} from './utils';
 
 const MAXIMUM_QUERIES_IN_HISTORY = 20;
-export const INDEX_COLUMN: ColumnType = {name: '#', type: 'Uint64'};
 
 const queriesHistoryInitial = settingsManager.readUserSettingsValue(
     QUERIES_HISTORY_KEY,

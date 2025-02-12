@@ -9,7 +9,6 @@ import {parseResult} from '../../../utils/query';
 
 import {preparePlanData} from './preparePlanData';
 import {prepareQueryData} from './prepareQueryData';
-import {INDEX_COLUMN} from './query';
 import type {QueryState} from './types';
 
 export const setStreamSession = (state: QueryState, action: PayloadAction<SessionChunk>) => {
@@ -131,14 +130,11 @@ export const addStreamingChunks = (state: QueryState, action: PayloadAction<Stre
         });
 
         if (columns && !resultSet.columns?.length) {
-            resultSet.columns = [INDEX_COLUMN, ...columns];
+            resultSet.columns = columns;
         }
 
-        const startIndex = resultSet.result?.length || 1;
         const safeRows = rows || [];
-        const indexedRows = safeRows.map((row, index) => [startIndex + index, ...row]);
-        const formattedRows = parseResult(indexedRows, resultSet.columns || []);
-
-        resultSet.result = [...(resultSet.result || []), ...formattedRows];
+        const formattedRows = parseResult(safeRows, resultSet.columns || []);
+        resultSet.result?.push(...formattedRows);
     }
 };

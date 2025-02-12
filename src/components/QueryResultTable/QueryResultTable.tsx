@@ -3,7 +3,6 @@ import React from 'react';
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column, Settings} from '@gravity-ui/react-data-table';
 
-import {INDEX_COLUMN} from '../../store/reducers/query/query';
 import type {ColumnType, KeyValueRow} from '../../types/api/query';
 import {cn} from '../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
@@ -22,6 +21,7 @@ const TABLE_SETTINGS: Settings = {
     ...DEFAULT_TABLE_SETTINGS,
     stripedRows: true,
     sortable: false,
+    displayIndices: true,
 };
 
 export const b = cn('ydb-query-result-table');
@@ -96,16 +96,11 @@ export const QueryResultTable = (props: QueryResultTableProps) => {
         return <div className={b('message')}>{i18n('empty')}</div>;
     }
 
-    const settings = {
-        ...TABLE_SETTINGS,
-        displayIndices: columns.filter(({name}) => INDEX_COLUMN.name === name).length === 0,
-    };
-
     return (
         <ResizeableDataTable
             data={data}
             columns={columns}
-            settings={settings}
+            settings={TABLE_SETTINGS}
             // prevent accessing row.id in case it is present but is not the PK (i.e. may repeat)
             rowKey={getRowIndex}
             visibleRowIndex={getVisibleRowIndex}
