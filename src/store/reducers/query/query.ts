@@ -7,19 +7,19 @@ import {settingsManager} from '../../../services/settings';
 import type {ColumnType} from '../../../types/api/query';
 import {TracingLevelNumber} from '../../../types/api/query';
 import type {QueryAction, QueryRequestParams, QuerySettings} from '../../../types/store/query';
-import type {
-    QueryResponseChunk,
-    SessionChunk,
-    StreamDataChunk,
-} from '../../../types/store/streaming';
+import type {StreamDataChunk} from '../../../types/store/streaming';
 import {QUERIES_HISTORY_KEY} from '../../../utils/constants';
-import {isQueryErrorResponse, parseResult} from '../../../utils/query';
+import {isQueryErrorResponse} from '../../../utils/query';
 import {isNumeric} from '../../../utils/utils';
 import type {RootState} from '../../defaultStore';
 import {api} from '../api';
 
-import {preparePlanData} from './preparePlanData';
 import {prepareQueryData} from './prepareQueryData';
+import {
+    addStreamingChunks as addStreamingChunksReducer,
+    setStreamQueryResponse as setStreamQueryResponseReducer,
+    setStreamSession as setStreamSessionReducer,
+} from './streamingReducers';
 import type {QueryResult, QueryState} from './types';
 import {getActionAndSyntaxFromQueryMode, getQueryInHistory} from './utils';
 
@@ -128,152 +128,9 @@ const slice = createSlice({
         setQueryHistoryFilter: (state, action: PayloadAction<string>) => {
             state.history.filter = action.payload;
         },
-        setStreamSession: (state, action: PayloadAction<SessionChunk>) => {
-            if (!state.result) {
-                return;
-            }
-
-            if (!state.result.data) {
-                state.result.data = prepareQueryData(null);
-            }
-
-            const chunk = action.payload;
-            state.result.isLoading = true;
-            state.result.queryId = chunk.meta.query_id;
-            state.result.data.traceId = chunk.meta.trace_id;
-        },
-        addStreamingChunks: (state, action: PayloadAction<StreamDataChunk[]>) => {
-            if (!state.result) {
-                return;
-            }
-
-            if (!state.result.data) {
-                state.result.data = prepareQueryData(null);
-            }
-
-            // Initialize speed metrics if not present
-            if (!state.result.speedMetrics) {
-                state.result.speedMetrics = {
-                    rowsPerSecond: 0,
-                    lastUpdateTime: Date.now(),
-                    recentChunks: [],
-                };
-            }
-
-            const currentTime = Date.now();
-            let totalNewRows = 0;
-
-            const mergedStreamDataChunks = new Map<number, StreamDataChunk>();
-            for (const chunk of action.payload) {
-                const currentMergedChunk = mergedStreamDataChunks.get(chunk.meta.result_index);
-                const chunkRowCount = (chunk.result.rows || []).length;
-                totalNewRows += chunkRowCount;
-
-                if (currentMergedChunk) {
-                    if (!currentMergedChunk.result.rows) {
-                        currentMergedChunk.result.rows = [];
-                    }
-                    for (const row of chunk.result.rows || []) {
-                        currentMergedChunk.result.rows.push(row);
-                    }
-                } else {
-                    mergedStreamDataChunks.set(chunk.meta.result_index, chunk);
-                }
-            }
-
-            // Update speed metrics
-            const metrics = state.result.speedMetrics;
-            metrics.recentChunks.push({
-                timestamp: currentTime,
-                rowCount: totalNewRows,
-            });
-
-            // Keep only chunks from the last 5 seconds
-            const WINDOW_SIZE = 5000; // 5 seconds in milliseconds
-            metrics.recentChunks = metrics.recentChunks.filter(
-                (chunk) => currentTime - chunk.timestamp <= WINDOW_SIZE,
-            );
-
-            // Calculate moving average
-            if (metrics.recentChunks.length > 0) {
-                const oldestChunkTime = metrics.recentChunks[0].timestamp;
-                const timeWindow = (currentTime - oldestChunkTime) / 1000; // Convert to seconds
-                const totalRows = metrics.recentChunks.reduce(
-                    (sum, chunk) => sum + chunk.rowCount,
-                    0,
-                );
-                metrics.rowsPerSecond = timeWindow > 0 ? totalRows / timeWindow : 0;
-            }
-
-            metrics.lastUpdateTime = currentTime;
-
-            if (!state.result.data.resultSets) {
-                state.result.data.resultSets = [];
-            }
-
-            for (const [resultIndex, chunk] of mergedStreamDataChunks.entries()) {
-                const {columns, rows} = chunk.result;
-
-                if (!state.result.data.resultSets[resultIndex]) {
-                    state.result.data.resultSets[resultIndex] = {
-                        columns: [],
-                        result: [],
-                    };
-                }
-
-                if (columns && !state.result.data.resultSets[resultIndex].columns?.length) {
-                    state.result.data.resultSets[resultIndex].columns?.push(INDEX_COLUMN);
-                    for (const column of columns) {
-                        state.result.data.resultSets[resultIndex].columns?.push(column);
-                    }
-                }
-
-                const indexedRows = rows || [];
-                const startIndex =
-                    state.result?.data?.resultSets?.[resultIndex].result?.length || 1;
-
-                indexedRows.forEach((row, index) => {
-                    row.unshift(startIndex + index);
-                });
-
-                const formattedRows = parseResult(
-                    indexedRows,
-                    state.result.data.resultSets[resultIndex].columns || [],
-                );
-
-                for (const row of formattedRows) {
-                    state.result.data.resultSets[resultIndex].result?.push(row);
-                }
-            }
-        },
-        setStreamQueryResponse: (state, action: PayloadAction<QueryResponseChunk>) => {
-            if (!state.result) {
-                return;
-            }
-
-            if (!state.result.data) {
-                state.result.data = prepareQueryData(null);
-            }
-
-            state.result.isLoading = false;
-
-            const chunk = action.payload;
-            if ('error' in chunk) {
-                state.result.error = chunk;
-            } else if ('plan' in chunk) {
-                if (!state.result.data) {
-                    state.result.data = prepareQueryData(null);
-                }
-
-                const {plan: rawPlan, stats} = chunk;
-                const {simplifiedPlan, ...planData} = preparePlanData(rawPlan, stats);
-                state.result.data.preparedPlan =
-                    Object.keys(planData).length > 0 ? planData : undefined;
-                state.result.data.simplifiedPlan = simplifiedPlan;
-                state.result.data.plan = chunk.plan;
-                state.result.data.stats = chunk.stats;
-            }
-        },
+        setStreamSession: setStreamSessionReducer,
+        addStreamingChunks: addStreamingChunksReducer,
+        setStreamQueryResponse: setStreamQueryResponseReducer,
     },
     selectors: {
         selectQueriesHistoryFilter: (state) => state.history.filter || '',
