@@ -58,103 +58,87 @@ export const setStreamQueryResponse = (
     }
 };
 
+type SpeedMetrics = NonNullable<NonNullable<QueryState['result']>['speedMetrics']>;
+
+const updateSpeedMetrics = (metrics: SpeedMetrics, totalNewRows: number) => {
+    const currentTime = Date.now();
+    const WINDOW_SIZE = 5000; // 5 seconds in milliseconds
+
+    metrics.recentChunks.push({timestamp: currentTime, rowCount: totalNewRows});
+    metrics.recentChunks = metrics.recentChunks.filter(
+        (chunk) => currentTime - chunk.timestamp <= WINDOW_SIZE,
+    );
+
+    if (metrics.recentChunks.length > 0) {
+        const oldestChunkTime = metrics.recentChunks[0].timestamp;
+        const timeWindow = (currentTime - oldestChunkTime) / 1000;
+        const totalRows = metrics.recentChunks.reduce(
+            (sum: number, chunk) => sum + chunk.rowCount,
+            0,
+        );
+        metrics.rowsPerSecond = timeWindow > 0 ? totalRows / timeWindow : 0;
+    }
+
+    metrics.lastUpdateTime = currentTime;
+};
+
 export const addStreamingChunks = (state: QueryState, action: PayloadAction<StreamDataChunk[]>) => {
     if (!state.result) {
         return;
     }
 
-    if (!state.result.data) {
-        state.result.data = prepareQueryData(null);
-    }
+    state.result.data = state.result.data || prepareQueryData(null);
+    state.result.speedMetrics = state.result.speedMetrics || {
+        rowsPerSecond: 0,
+        lastUpdateTime: Date.now(),
+        recentChunks: [],
+    };
+    state.result.data.resultSets = state.result.data.resultSets || [];
 
-    // Initialize speed metrics if not present
-    if (!state.result.speedMetrics) {
-        state.result.speedMetrics = {
-            rowsPerSecond: 0,
-            lastUpdateTime: Date.now(),
-            recentChunks: [],
-        };
-    }
-
-    const currentTime = Date.now();
-    let totalNewRows = 0;
-
-    const mergedStreamDataChunks = new Map<number, StreamDataChunk>();
-    for (const chunk of action.payload) {
-        const currentMergedChunk = mergedStreamDataChunks.get(chunk.meta.result_index);
-        const chunkRowCount = (chunk.result.rows || []).length;
-        totalNewRows += chunkRowCount;
+    // Merge chunks by result index
+    const mergedChunks = action.payload.reduce((acc: Map<number, StreamDataChunk>, chunk) => {
+        const resultIndex = chunk.meta.result_index;
+        const currentMergedChunk = acc.get(resultIndex);
 
         if (currentMergedChunk) {
-            if (!currentMergedChunk.result.rows) {
-                currentMergedChunk.result.rows = [];
-            }
-            for (const row of chunk.result.rows || []) {
-                currentMergedChunk.result.rows.push(row);
-            }
+            currentMergedChunk.result.rows?.push(...(chunk.result.rows || []));
         } else {
-            mergedStreamDataChunks.set(chunk.meta.result_index, chunk);
+            acc.set(resultIndex, {
+                ...chunk,
+                result: {...chunk.result, rows: chunk.result.rows || []},
+            });
         }
-    }
+        return acc;
+    }, new Map<number, StreamDataChunk>());
 
-    // Update speed metrics
-    const metrics = state.result.speedMetrics;
-    metrics.recentChunks.push({
-        timestamp: currentTime,
-        rowCount: totalNewRows,
-    });
-
-    // Keep only chunks from the last 5 seconds
-    const WINDOW_SIZE = 5000; // 5 seconds in milliseconds
-    metrics.recentChunks = metrics.recentChunks.filter(
-        (chunk) => currentTime - chunk.timestamp <= WINDOW_SIZE,
+    const totalNewRows = action.payload.reduce(
+        (sum: number, chunk) => sum + (chunk.result.rows?.length || 0),
+        0,
     );
 
-    // Calculate moving average
-    if (metrics.recentChunks.length > 0) {
-        const oldestChunkTime = metrics.recentChunks[0].timestamp;
-        const timeWindow = (currentTime - oldestChunkTime) / 1000; // Convert to seconds
-        const totalRows = metrics.recentChunks.reduce((sum, chunk) => sum + chunk.rowCount, 0);
-        metrics.rowsPerSecond = timeWindow > 0 ? totalRows / timeWindow : 0;
+    if (state.result.speedMetrics) {
+        updateSpeedMetrics(state.result.speedMetrics, totalNewRows);
     }
 
-    metrics.lastUpdateTime = currentTime;
-
-    if (!state.result.data.resultSets) {
-        state.result.data.resultSets = [];
-    }
-
-    for (const [resultIndex, chunk] of mergedStreamDataChunks.entries()) {
+    // Process merged chunks
+    for (const [resultIndex, chunk] of mergedChunks.entries()) {
         const {columns, rows} = chunk.result;
-
-        if (!state.result.data.resultSets[resultIndex]) {
-            state.result.data.resultSets[resultIndex] = {
-                columns: [],
-                result: [],
-            };
-        }
-
-        if (columns && !state.result.data.resultSets[resultIndex].columns?.length) {
-            state.result.data.resultSets[resultIndex].columns?.push(INDEX_COLUMN);
-            for (const column of columns) {
-                state.result.data.resultSets[resultIndex].columns?.push(column);
-            }
-        }
-
-        const indexedRows = rows || [];
-        const startIndex = state.result?.data?.resultSets?.[resultIndex].result?.length || 1;
-
-        indexedRows.forEach((row, index) => {
-            row.unshift(startIndex + index);
+        const resultSet = (state.result.data.resultSets[resultIndex] = state.result.data.resultSets[
+            resultIndex
+        ] || {
+            columns: [],
+            result: [],
         });
 
-        const formattedRows = parseResult(
-            indexedRows,
-            state.result.data.resultSets[resultIndex].columns || [],
-        );
-
-        for (const row of formattedRows) {
-            state.result.data.resultSets[resultIndex].result?.push(row);
+        if (columns && !resultSet.columns?.length) {
+            resultSet.columns = [INDEX_COLUMN, ...columns];
         }
+
+        const startIndex = resultSet.result?.length || 1;
+        const safeRows = rows || [];
+        const indexedRows = safeRows.map((row, index) => [startIndex + index, ...row]);
+        const formattedRows = parseResult(indexedRows, resultSet.columns || []);
+
+        resultSet.result = [...(resultSet.result || []), ...formattedRows];
     }
 };
