@@ -48,17 +48,18 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
 
     const {name} = useClusterBaseInfo();
 
-    const healthcheckPreviewDisabled = name === 'ydb_ru';
+    const healthcheckPreviewDisabled = name !== 'ydb_ru';
 
     const {
         currentData: data,
         isFetching,
         error,
     } = healthcheckApi.useGetHealthcheckInfoQuery(
-        {database: tenantName, disabled: healthcheckPreviewDisabled},
+        {database: tenantName},
         {
             //FIXME https://github.com/ydb-platform/ydb-embedded-ui/issues/1889
             pollingInterval: healthcheckPreviewDisabled ? undefined : autoRefreshInterval,
+            skip: healthcheckPreviewDisabled,
         },
     );
 

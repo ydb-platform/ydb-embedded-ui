@@ -10,16 +10,9 @@ export const healthcheckApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getHealthcheckInfo: builder.query({
             queryFn: async (
-                {
-                    database,
-                    maxLevel,
-                    disabled,
-                }: {database: string; maxLevel?: number; disabled?: boolean},
+                {database, maxLevel}: {database: string; maxLevel?: number; disabled?: boolean},
                 {signal},
             ) => {
-                if (disabled) {
-                    return {data: undefined};
-                }
                 try {
                     const data = await window.api.viewer.getHealthcheckInfo(
                         {database, maxLevel},
