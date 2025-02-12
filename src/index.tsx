@@ -9,6 +9,7 @@ import reportWebVitals from './reportWebVitals';
 import {history, store} from './store/defaultStore';
 
 import './styles/themes.scss';
+import './styles/unipika.scss';
 import './index.css';
 
 async function render() {

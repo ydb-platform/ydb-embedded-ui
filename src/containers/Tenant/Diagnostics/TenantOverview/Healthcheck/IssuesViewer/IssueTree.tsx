@@ -3,7 +3,8 @@ import React from 'react';
 import _omit from 'lodash/omit';
 import {TreeView} from 'ydb-ui-components';
 
-import {JSONTree} from '../../../../../../components/JSONTree/JSONTree';
+import {JsonViewer} from '../../../../../../components/JsonViewer/JsonViewer';
+import {unipikaConvert} from '../../../../../../components/JsonViewer/unipika/unipika';
 import type {IssuesTree} from '../../../../../../store/reducers/healthcheckInfo/types';
 import {hcStatusToColorFlag} from '../../../../../../store/reducers/healthcheckInfo/utils';
 import {cn} from '../../../../../../utils/cn';
@@ -28,12 +29,7 @@ const IssueTree = ({issueTree}: IssuesViewerProps) => {
 
         return (
             <div className={b('info-panel')}>
-                <JSONTree
-                    data={info}
-                    search={false}
-                    isExpanded={() => true}
-                    treeClassName={b('inspector')}
-                />
+                <JsonViewer value={unipikaConvert(info)} />
             </div>
         );
     }, []);

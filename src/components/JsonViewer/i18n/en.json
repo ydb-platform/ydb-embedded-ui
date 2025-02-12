@@ -1,0 +1,13 @@
+{
+  "action_collapse-all": "Collapse all",
+  "action_expand-all": "Expand all",
+  "description_search": "Search...",
+  "context_case-sensitive-search": "Case sensitive search enadled",
+  "context_case-sensitive-search-disabled": "Case sensitive search disabled",
+  "context_items-count": [
+    " {{count}} item ",
+    " {{count}} items ",
+    " {{count}} items ",
+    " {{count}} items "
+  ]
+}
