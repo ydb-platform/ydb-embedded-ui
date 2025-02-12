@@ -174,7 +174,13 @@ function Diagnostics(props: DiagnosticsProps) {
                         }}
                         allowNotSelected={true}
                     />
-                    <AutoRefreshControl />
+                    <AutoRefreshControl
+                        onManualRefresh={() => {
+                            //this is needed to collect healthcheck if it is disabled by default https://github.com/ydb-platform/ydb-embedded-ui/issues/1889
+                            const event = new CustomEvent('diagnosticsRefresh');
+                            document.dispatchEvent(event);
+                        }}
+                    />
                 </div>
             </div>
         );

@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {
     CircleCheck,
     CircleInfo,
@@ -15,7 +17,7 @@ import {useClusterBaseInfo} from '../../../../../store/reducers/cluster/cluster'
 import {healthcheckApi} from '../../../../../store/reducers/healthcheckInfo/healthcheckInfo';
 import {SelfCheckResult} from '../../../../../types/api/healthcheck';
 import {cn} from '../../../../../utils/cn';
-import {useAutoRefreshInterval} from '../../../../../utils/hooks';
+import {useAutoRefreshInterval, useTypedSelector} from '../../../../../utils/hooks';
 
 import i18n from './i18n';
 
@@ -42,24 +44,47 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
     const {tenantName, active} = props;
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
+    const {metricsTab} = useTypedSelector((state) => state.tenant);
+
     const {name} = useClusterBaseInfo();
-    const healthcheckPreviewAutorefreshDisabled = name === 'ydb_ru';
+
+    const healthcheckPreviewDisabled = name === 'ydb_ru';
 
     const {
         currentData: data,
         isFetching,
         error,
     } = healthcheckApi.useGetHealthcheckInfoQuery(
-        {database: tenantName},
+        {database: tenantName, disabled: healthcheckPreviewDisabled},
         {
             //FIXME https://github.com/ydb-platform/ydb-embedded-ui/issues/1889
-            pollingInterval: healthcheckPreviewAutorefreshDisabled
-                ? undefined
-                : autoRefreshInterval,
+            pollingInterval: healthcheckPreviewDisabled ? undefined : autoRefreshInterval,
         },
     );
 
-    const loading = isFetching && data === undefined;
+    const [getHealthcheckQuery, {currentData: manualData, isFetching: isFetchingManually}] =
+        healthcheckApi.useLazyGetHealthcheckInfoQuery();
+
+    React.useEffect(() => {
+        if (metricsTab === 'healthcheck' && healthcheckPreviewDisabled) {
+            getHealthcheckQuery({database: tenantName});
+        }
+    }, [metricsTab, healthcheckPreviewDisabled, tenantName, getHealthcheckQuery]);
+
+    React.useEffect(() => {
+        const fetchHealthcheck = () => {
+            if (healthcheckPreviewDisabled) {
+                getHealthcheckQuery({database: tenantName});
+            }
+        };
+        document.addEventListener('diagnosticsRefresh', fetchHealthcheck);
+        return () => {
+            document.removeEventListener('diagnosticsRefresh', fetchHealthcheck);
+        };
+    }, [tenantName, healthcheckPreviewDisabled, getHealthcheckQuery]);
+
+    const loading =
+        (isFetching && data === undefined) || (isFetchingManually && manualData === undefined);
 
     const renderHeader = () => {
         return (
@@ -67,9 +92,9 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
                 <div className={b('preview-title-wrapper')}>
                     <div className={b('preview-title')}>{i18n('title.healthcheck')}</div>
                     {/* FIXME https://github.com/ydb-platform/ydb-embedded-ui/issues/1889 */}
-                    {autoRefreshInterval && healthcheckPreviewAutorefreshDisabled ? (
+                    {healthcheckPreviewDisabled ? (
                         <Popover
-                            content={'Autorefresh is disabled. Please update healthcheck manually.'}
+                            content={'Healthcheck is disabled. Please update healthcheck manually.'}
                             placement={['top']}
                             className={b('icon-wrapper')}
                         >
@@ -96,7 +121,8 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
             return <Loader size="m" />;
         }
 
-        const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
+        const selfCheckResult =
+            data?.self_check_result || manualData?.self_check_result || SelfCheckResult.UNSPECIFIED;
         const modifier = selfCheckResult.toLowerCase();
         return (
             <div className={b('preview-content')}>
