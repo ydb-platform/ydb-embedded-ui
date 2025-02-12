@@ -1,5 +1,17 @@
 # Changelog
 
+## [8.10.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.9.0...v8.10.0) (2025-02-12)
+
+
+### Features
+
+* **HealthcheckPreview:** manual fetch for ydb_ru ([#1937](https://github.com/ydb-platform/ydb-embedded-ui/issues/1937)) ([6b1cac8](https://github.com/ydb-platform/ydb-embedded-ui/commit/6b1cac892e8afa5f06c9cf6437c76fe7ba13ac18))
+
+
+### Bug Fixes
+
+* add monaco-yql-languages to peer deps ([#1932](https://github.com/ydb-platform/ydb-embedded-ui/issues/1932)) ([40b803c](https://github.com/ydb-platform/ydb-embedded-ui/commit/40b803cce83414078a22518ac6183ed0b544099b))
+
 ## [8.9.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.8.0...v8.9.0) (2025-02-11)
 
 
