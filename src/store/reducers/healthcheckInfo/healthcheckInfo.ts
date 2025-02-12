@@ -10,7 +10,7 @@ export const healthcheckApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getHealthcheckInfo: builder.query({
             queryFn: async (
-                {database, maxLevel}: {database: string; maxLevel?: number; disabled?: boolean},
+                {database, maxLevel}: {database: string; maxLevel?: number},
                 {signal},
             ) => {
                 try {
