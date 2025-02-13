@@ -27,6 +27,7 @@ import {cn} from '../../../../utils/cn';
 import {
     DEFAULT_IS_QUERY_RESULT_COLLAPSED,
     DEFAULT_SIZE_RESULT_PANE_KEY,
+    ENABLE_QUERY_STREAMING,
     LAST_USED_QUERY_ACTION_KEY,
 } from '../../../../utils/constants';
 import {
@@ -90,7 +91,8 @@ export default function QueryEditor(props: QueryEditorProps) {
         LAST_USED_QUERY_ACTION_KEY,
     );
     const [lastExecutedQueryText, setLastExecutedQueryText] = React.useState<string>('');
-    const isStreamingSupported = useStreamingAvailable();
+    const [isQueryStreamingEnabled] = useSetting(ENABLE_QUERY_STREAMING);
+    const isStreamingEnabled = useStreamingAvailable() && isQueryStreamingEnabled;
 
     const [sendQuery] = queryApi.useUseSendQueryMutation();
     const [streamQuery] = queryApi.useUseStreamQueryMutation();
@@ -130,7 +132,7 @@ export default function QueryEditor(props: QueryEditorProps) {
         }
         const queryId = uuidv4();
 
-        if (isStreamingSupported) {
+        if (isStreamingEnabled) {
             runningQueryRef.current = streamQuery({
                 actionType: 'execute',
                 query: text,
@@ -190,12 +192,12 @@ export default function QueryEditor(props: QueryEditorProps) {
     });
 
     const handleCancelRunningQuery = React.useCallback(() => {
-        if (isStreamingSupported && runningQueryRef.current) {
+        if (isStreamingEnabled && runningQueryRef.current) {
             runningQueryRef.current.abort();
         } else if (result?.queryId) {
             sendCancelQuery({queryId: result?.queryId, database: tenantName});
         }
-    }, [isStreamingSupported, result?.queryId, sendCancelQuery, tenantName]);
+    }, [isStreamingEnabled, result?.queryId, sendCancelQuery, tenantName]);
 
     const onCollapseResultHandler = () => {
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerCollapse);

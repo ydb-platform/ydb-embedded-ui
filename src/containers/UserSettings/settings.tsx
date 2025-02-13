@@ -8,6 +8,7 @@ import {
     ENABLE_AUTOCOMPLETE,
     ENABLE_CODE_ASSISTANT,
     ENABLE_NETWORK_TABLE_KEY,
+    ENABLE_QUERY_STREAMING,
     INVERTED_DISKS_KEY,
     LANGUAGE_KEY,
     SHOW_DOMAIN_DATABASE_KEY,
@@ -125,6 +126,12 @@ export const enableCodeAssistantSetting: SettingProps = {
     settingKey: ENABLE_CODE_ASSISTANT,
     title: i18n('settings.editor.codeAssistant.title'),
     description: i18n('settings.editor.codeAssistant.description'),
+};
+
+export const enableQueryStreamingSetting: SettingProps = {
+    settingKey: ENABLE_QUERY_STREAMING,
+    title: i18n('settings.editor.queryStreaming.title'),
+    description: i18n('settings.editor.queryStreaming.description'),
 };
 
 export const autocompleteOnEnterSetting: SettingProps = {
