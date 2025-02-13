@@ -1,5 +1,6 @@
 import type {PayloadAction} from '@reduxjs/toolkit';
 
+import type {SpeedMetrics} from '../../../types/store/query';
 import type {
     QueryResponseChunk,
     SessionChunk,
@@ -57,8 +58,6 @@ export const setStreamQueryResponse = (
     }
 };
 
-type SpeedMetrics = NonNullable<NonNullable<QueryState['result']>['speedMetrics']>;
-
 const updateSpeedMetrics = (metrics: SpeedMetrics, totalNewRows: number) => {
     const currentTime = Date.now();
     const WINDOW_SIZE = 5000; // 5 seconds in milliseconds
@@ -87,11 +86,6 @@ export const addStreamingChunks = (state: QueryState, action: PayloadAction<Stre
     }
 
     state.result.data = state.result.data || prepareQueryData(null);
-    state.result.speedMetrics = state.result.speedMetrics || {
-        rowsPerSecond: 0,
-        lastUpdateTime: Date.now(),
-        recentChunks: [],
-    };
     state.result.data.resultSets = state.result.data.resultSets || [];
 
     // Merge chunks by result index
@@ -115,10 +109,6 @@ export const addStreamingChunks = (state: QueryState, action: PayloadAction<Stre
         0,
     );
 
-    if (state.result.speedMetrics) {
-        updateSpeedMetrics(state.result.speedMetrics, totalNewRows);
-    }
-
     // Process merged chunks
     for (const [resultIndex, chunk] of mergedChunks.entries()) {
         const {columns, rows} = chunk.result;
@@ -127,6 +117,11 @@ export const addStreamingChunks = (state: QueryState, action: PayloadAction<Stre
         ] || {
             columns: [],
             result: [],
+            speedMetrics: {
+                rowsPerSecond: 0,
+                lastUpdateTime: Date.now(),
+                recentChunks: [],
+            },
         });
 
         if (columns && !resultSet.columns?.length) {
@@ -136,5 +131,9 @@ export const addStreamingChunks = (state: QueryState, action: PayloadAction<Stre
         const safeRows = rows || [];
         const formattedRows = parseResult(safeRows, resultSet.columns || []);
         resultSet.result?.push(...formattedRows);
+
+        if (resultSet.speedMetrics) {
+            updateSpeedMetrics(resultSet.speedMetrics, totalNewRows);
+        }
     }
 };

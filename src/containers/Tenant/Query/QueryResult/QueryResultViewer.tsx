@@ -114,7 +114,7 @@ export function QueryResultViewer({
     });
     const [useShowPlanToSvg] = useSetting<boolean>(USE_SHOW_PLAN_SVG_KEY);
 
-    const {error, isLoading, data = {}, speedMetrics} = result;
+    const {error, isLoading, data = {}} = result;
     const {preparedPlan, simplifiedPlan, stats, resultSets, ast} = data;
 
     React.useEffect(() => {
@@ -227,7 +227,6 @@ export function QueryResultViewer({
         if (activeSection === RESULT_OPTIONS_IDS.result) {
             return (
                 <ResultSetsViewer
-                    rowsPerSecond={speedMetrics?.rowsPerSecond}
                     resultSets={resultSets}
                     selectedResultSet={selectedResultSet}
                     errorHeader={<QueryResultError error={error} />}

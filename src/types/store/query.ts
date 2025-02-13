@@ -20,10 +20,20 @@ import type {
 } from '../api/query';
 import type {ValueOf} from '../common';
 
+export interface SpeedMetrics {
+    rowsPerSecond: number;
+    lastUpdateTime: number;
+    recentChunks: Array<{
+        timestamp: number;
+        rowCount: number;
+    }>;
+}
+
 export interface ParsedResultSet {
     columns?: ColumnType[];
     result?: KeyValueRow[];
     truncated?: boolean;
+    speedMetrics?: SpeedMetrics;
 }
 
 export interface IQueryResult {

@@ -11,7 +11,6 @@ import './ResultSetsViewer.scss';
 const b = cn('ydb-query-result-sets-viewer');
 
 interface ResultSetsViewerProps {
-    rowsPerSecond?: number;
     resultSets?: ParsedResultSet[];
     selectedResultSet: number;
     errorHeader?: React.ReactNode;
@@ -54,18 +53,13 @@ export function ResultSetsViewer(props: ResultSetsViewerProps) {
                     {currentResult?.truncated ? i18n('title.truncated') : i18n('title.result')}
                 </Text>
                 {currentResult?.result ? (
-                    <Text
-                        color="secondary"
-                        variant="body-2"
-                        className={b('row-count')}
-                    >{`(${currentResult?.result.length})`}</Text>
-                ) : null}
-                {props.rowsPerSecond ? (
-                    <Text
-                        color="secondary"
-                        variant="body-2"
-                        className={b('row-count')}
-                    >{`(${props.rowsPerSecond.toFixed(0)} rows/s)`}</Text>
+                    <Text color="secondary" variant="body-2" className={b('row-count')}>
+                        {`(${currentResult?.result.length}${
+                            currentResult.speedMetrics?.rowsPerSecond
+                                ? `, ${currentResult.speedMetrics.rowsPerSecond.toFixed(0)} rows/s`
+                                : ''
+                        })`}
+                    </Text>
                 ) : null}
             </div>
         );

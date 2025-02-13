@@ -45,7 +45,10 @@ export class StreamingAPI extends BaseYdbAPI {
             true,
         );
 
-        const queryParams = qs.stringify({...params, base64}, {encoder: encodeURIComponent});
+        const queryParams = qs.stringify(
+            {...params, base64, schema: 'multipart'},
+            {encoder: encodeURIComponent},
+        );
 
         const headers = new Headers({
             Accept: 'multipart/x-mixed-replace',
