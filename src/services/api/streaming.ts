@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 import {parseMultipart} from '@mjackson/multipart-parser';
 import qs from 'qs';
 
