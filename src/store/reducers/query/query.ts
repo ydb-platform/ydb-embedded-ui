@@ -1,5 +1,3 @@
-/* eslint-disable complexity */
-/* eslint-disable no-param-reassign */
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
@@ -287,7 +285,6 @@ export const queryApi = api.injectEndpoints({
                 },
                 {signal, dispatch},
             ) => {
-                const timeStart = Date.now();
                 dispatch(setQueryResult({type: actionType, queryId, isLoading: true}));
 
                 const {action, syntax} = getActionAndSyntaxFromQueryMode(
@@ -296,6 +293,7 @@ export const queryApi = api.injectEndpoints({
                 );
 
                 try {
+                    const timeStart = Date.now();
                     const response = await window.api.viewer.sendQuery(
                         {
                             query,

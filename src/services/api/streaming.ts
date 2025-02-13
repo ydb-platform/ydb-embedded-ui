@@ -1,5 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {parseMultipart} from '@mjackson/multipart-parser';
+import qs from 'qs';
 
 import {
     isQueryResponseChunk,
@@ -13,6 +14,8 @@ import {BINARY_DATA_IN_PLAIN_TEXT_DISPLAY} from '../../utils/constants';
 import {settingsManager} from '../settings';
 
 import {BaseYdbAPI} from './base';
+
+const BOUNDARY = 'boundary';
 
 export interface StreamQueryParams {
     query?: string;
@@ -42,17 +45,7 @@ export class StreamingAPI extends BaseYdbAPI {
             true,
         );
 
-        let traceId: string | undefined = '';
-
-        const queryParams = new URLSearchParams();
-        // Add only string/number params
-        Object.entries(params).forEach(([key, value]) => {
-            if (value !== undefined) {
-                queryParams.set(key, String(value));
-            }
-        });
-        queryParams.set('base64', String(base64));
-        queryParams.set('schema', 'multipart');
+        const queryParams = qs.stringify({...params, base64}, {encoder: encodeURIComponent});
 
         const headers = new Headers({
             Accept: 'multipart/x-mixed-replace',
@@ -76,9 +69,9 @@ export class StreamingAPI extends BaseYdbAPI {
             throw new Error('Empty response body');
         }
 
-        traceId = response.headers.get('traceresponse')?.split('-')[1];
+        const traceId = response.headers.get('traceresponse')?.split('-')[1];
 
-        await parseMultipart(response.body, {boundary: 'boundary'}, async (part) => {
+        await parseMultipart(response.body, {boundary: BOUNDARY}, async (part) => {
             try {
                 const chunk = JSON.parse(await part.text());
 
