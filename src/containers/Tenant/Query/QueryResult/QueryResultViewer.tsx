@@ -228,8 +228,8 @@ export function QueryResultViewer({
             return (
                 <ResultSetsViewer
                     resultSets={resultSets}
+                    error={error}
                     selectedResultSet={selectedResultSet}
-                    errorHeader={<QueryResultError error={error} />}
                     setSelectedResultSet={setSelectedResultSet}
                 />
             );

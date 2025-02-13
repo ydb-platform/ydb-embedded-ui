@@ -5,6 +5,7 @@ import type {ParsedResultSet} from '../../../../../../types/store/query';
 import {getArray} from '../../../../../../utils';
 import {cn} from '../../../../../../utils/cn';
 import i18n from '../../i18n';
+import {QueryResultError} from '../QueryResultError/QueryResultError';
 
 import './ResultSetsViewer.scss';
 
@@ -13,12 +14,12 @@ const b = cn('ydb-query-result-sets-viewer');
 interface ResultSetsViewerProps {
     resultSets?: ParsedResultSet[];
     selectedResultSet: number;
-    errorHeader?: React.ReactNode;
+    error?: unknown;
     setSelectedResultSet: (resultSet: number) => void;
 }
 
 export function ResultSetsViewer(props: ResultSetsViewerProps) {
-    const {selectedResultSet, setSelectedResultSet, resultSets} = props;
+    const {selectedResultSet, setSelectedResultSet, resultSets, error} = props;
 
     const resultsSetsCount = resultSets?.length || 0;
     const currentResult = resultSets?.[selectedResultSet];
@@ -68,7 +69,7 @@ export function ResultSetsViewer(props: ResultSetsViewerProps) {
     return (
         <div className={b('result-wrapper')}>
             {renderTabs()}
-            {props.errorHeader ? props.errorHeader : null}
+            {props.error ? <QueryResultError error={error} /> : null}
             {currentResult ? (
                 <div className={b('result')}>
                     {renderResultHeadWithCount()}
