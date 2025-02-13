@@ -46,17 +46,3 @@ export function isStreamDataChunk(content: StreamingChunk): content is StreamDat
 export function isQueryResponseChunk(content: StreamingChunk): content is QueryResponseChunk {
     return content?.meta?.event === 'QueryResponse';
 }
-
-export function convertToKeyValueRows(
-    rows: unknown[],
-    columns: {name: string}[],
-): {[key: string]: string | number | null | undefined}[] {
-    const columnNames = columns.map((col) => col.name);
-    return rows.map((row) => {
-        const keyValueRow: {[key: string]: string | number | null | undefined} = {};
-        (row as any[]).forEach((value, index) => {
-            keyValueRow[columnNames[index]] = value;
-        });
-        return keyValueRow;
-    });
-}

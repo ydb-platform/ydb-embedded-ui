@@ -160,7 +160,7 @@ export const appearanceSection: SettingsSection = {
 export const experimentsSection: SettingsSection = {
     id: 'experimentsSection',
     title: i18n('section.experiments'),
-    settings: [enableNetworkTable, useShowPlanToSvgTables],
+    settings: [enableNetworkTable, useShowPlanToSvgTables, enableQueryStreamingSetting],
 };
 
 export const devSettingsSection: SettingsSection = {
