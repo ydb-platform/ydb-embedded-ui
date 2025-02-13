@@ -18,7 +18,7 @@ export const schemaAclApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: ['All'],
+            providesTags: ['SchemaTree'],
         }),
     }),
     overrideExisting: 'throw',

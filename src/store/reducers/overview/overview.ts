@@ -51,7 +51,7 @@ export const overviewApi = api.injectEndpoints({
                 }
             },
             keepUnusedDataFor: 0,
-            providesTags: ['All'],
+            providesTags: ['All', 'SchemaTree'],
         }),
     }),
 });

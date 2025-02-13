@@ -9,7 +9,16 @@ export const api = createApi({
      */
     endpoints: () => ({}),
     invalidationBehavior: 'immediately',
-    tagTypes: ['All', 'PDiskData', 'PreviewData', 'StorageData', 'Tablet', 'UserData', 'VDiskData'],
+    tagTypes: [
+        'All',
+        'PDiskData',
+        'PreviewData',
+        'SchemaTree',
+        'StorageData',
+        'Tablet',
+        'UserData',
+        'VDiskData',
+    ],
 });
 
 export const _NEVER = Symbol();

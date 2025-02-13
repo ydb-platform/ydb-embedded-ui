@@ -38,20 +38,19 @@ interface SchemaViewerProps {
 
 export const SchemaViewer = ({type, path, tenantName, extended = false}: SchemaViewerProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
+
+    // Refresh table only in Diagnostics
+    const pollingInterval = extended ? autoRefreshInterval : undefined;
+
     const {currentData: schemaData, isLoading: loading} = overviewApi.useGetOverviewQuery(
-        {
-            path,
-            database: tenantName,
-        },
-        {
-            pollingInterval: autoRefreshInterval,
-        },
+        {path, database: tenantName},
+        {pollingInterval},
     );
 
     const viewSchemaRequestParams = isViewType(type) ? {path, database: tenantName} : skipToken;
 
     const {data: viewColumnsData, isLoading: isViewSchemaLoading} =
-        viewSchemaApi.useGetViewSchemaQuery(viewSchemaRequestParams);
+        viewSchemaApi.useGetViewSchemaQuery(viewSchemaRequestParams, {pollingInterval});
 
     const tableData = React.useMemo(() => {
         if (isViewType(type)) {
