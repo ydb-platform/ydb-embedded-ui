@@ -80,6 +80,19 @@ const updateSpeedMetrics = (metrics: SpeedMetrics, totalNewRows: number) => {
     metrics.lastUpdateTime = currentTime;
 };
 
+const getEmptyResultSet = () => {
+    return {
+        columns: [],
+        result: [],
+        truncated: false,
+        speedMetrics: {
+            rowsPerSecond: 0,
+            lastUpdateTime: Date.now(),
+            recentChunks: [],
+        },
+    };
+};
+
 export const addStreamingChunks = (state: QueryState, action: PayloadAction<StreamDataChunk[]>) => {
     if (!state.result) {
         return;
@@ -118,18 +131,12 @@ export const addStreamingChunks = (state: QueryState, action: PayloadAction<Stre
     // Process merged chunks
     for (const [resultIndex, chunk] of mergedChunks.entries()) {
         const {columns, rows} = chunk.result;
-        const resultSet = (state.result.data.resultSets[resultIndex] = state.result.data.resultSets[
-            resultIndex
-        ] || {
-            columns: [],
-            result: [],
-            truncated: false,
-            speedMetrics: {
-                rowsPerSecond: 0,
-                lastUpdateTime: Date.now(),
-                recentChunks: [],
-            },
-        });
+        const resultSets = state.result.data.resultSets;
+
+        if (!resultSets[resultIndex]) {
+            resultSets[resultIndex] = getEmptyResultSet();
+        }
+        const resultSet = resultSets[resultIndex];
 
         if (columns && !resultSet.columns?.length) {
             resultSet.columns = columns;

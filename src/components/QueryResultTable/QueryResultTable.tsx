@@ -104,6 +104,7 @@ export const QueryResultTable = (props: QueryResultTableProps) => {
             // prevent accessing row.id in case it is present but is not the PK (i.e. may repeat)
             rowKey={getRowIndex}
             visibleRowIndex={getVisibleRowIndex}
+            wrapperClassName={b('table-wrapper')}
             {...restProps}
         />
     );
