@@ -82,6 +82,9 @@ interface ExecuteResultProps {
     theme?: string;
     tenantName: string;
     queryText?: string;
+
+    isCancelling: boolean;
+    isCancelError: boolean;
     onCancelRunningQuery?: VoidFunction;
     onCollapseResults: VoidFunction;
     onExpandResults: VoidFunction;
@@ -94,6 +97,8 @@ export function QueryResultViewer({
     theme,
     tenantName,
     queryText,
+    isCancelling,
+    isCancelError,
     onCancelRunningQuery,
     onCollapseResults,
     onExpandResults,
@@ -109,7 +114,7 @@ export function QueryResultViewer({
     });
     const [useShowPlanToSvg] = useSetting<boolean>(USE_SHOW_PLAN_SVG_KEY);
 
-    const {error, isLoading, queryId, data = {}, speedMetrics} = result;
+    const {error, isLoading, data = {}, speedMetrics} = result;
     const {preparedPlan, simplifiedPlan, stats, resultSets, ast} = data;
 
     React.useEffect(() => {
@@ -294,8 +299,8 @@ export function QueryResultViewer({
                     <React.Fragment>
                         <ElapsedTime className={b('elapsed-time')} />
                         <CancelQueryButton
-                            queryId={queryId}
-                            tenantName={tenantName}
+                            isLoading={isCancelling}
+                            isError={isCancelError}
                             onClick={onCancelRunningQuery}
                         />
                     </React.Fragment>

@@ -4,6 +4,7 @@ import {isEqual} from 'lodash';
 import {v4 as uuidv4} from 'uuid';
 
 import SplitPane from '../../../../components/SplitPane';
+import {cancelQueryApi} from '../../../../store/reducers/cancelQuery';
 import {
     useStreamingAvailable,
     useTracingLevelOptionAvailable,
@@ -93,6 +94,7 @@ export default function QueryEditor(props: QueryEditorProps) {
 
     const [sendQuery] = queryApi.useUseSendQueryMutation();
     const [streamQuery] = queryApi.useUseStreamQueryMutation();
+    const [sendCancelQuery, cancelQueryResponse] = cancelQueryApi.useCancelQueryMutation();
 
     const runningQueryRef = React.useRef<{abort: VoidFunction} | null>(null);
 
@@ -188,10 +190,12 @@ export default function QueryEditor(props: QueryEditorProps) {
     });
 
     const handleCancelRunningQuery = React.useCallback(() => {
-        if (runningQueryRef.current) {
+        if (isStreamingSupported && runningQueryRef.current) {
             runningQueryRef.current.abort();
+        } else if (result?.queryId) {
+            sendCancelQuery({queryId: result?.queryId, database: tenantName});
         }
-    }, []);
+    }, [isStreamingSupported, result?.queryId, sendCancelQuery, tenantName]);
 
     const onCollapseResultHandler = () => {
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerCollapse);
@@ -253,6 +257,7 @@ export default function QueryEditor(props: QueryEditorProps) {
                         theme={theme}
                         key={result?.queryId}
                         result={result}
+                        cancelQueryResponse={cancelQueryResponse}
                         tenantName={tenantName}
                         path={path}
                         showPreview={showPreview}
@@ -273,6 +278,7 @@ interface ResultProps {
     type?: EPathType;
     theme: string;
     result?: QueryResult;
+    cancelQueryResponse?: Pick<QueryResult, 'isLoading' | 'error'>;
     tenantName: string;
     path: string;
     showPreview?: boolean;
@@ -281,6 +287,7 @@ interface ResultProps {
 }
 function Result({
     resultVisibilityState,
+    cancelQueryResponse,
     onExpandResultHandler,
     onCollapseResultHandler,
     type,
@@ -304,6 +311,8 @@ function Result({
                 theme={theme}
                 tenantName={tenantName}
                 isResultsCollapsed={resultVisibilityState.collapsed}
+                isCancelError={Boolean(cancelQueryResponse?.isLoading)}
+                isCancelling={Boolean(cancelQueryResponse?.isLoading)}
                 onExpandResults={onExpandResultHandler}
                 onCollapseResults={onCollapseResultHandler}
                 queryText={queryText}
