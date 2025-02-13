@@ -28,6 +28,7 @@ export interface StreamDataChunk {
     result: {
         columns?: ColumnType[];
         rows: ArrayRow[] | null;
+        truncated?: boolean;
     };
 }
 

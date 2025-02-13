@@ -95,10 +95,16 @@ export const addStreamingChunks = (state: QueryState, action: PayloadAction<Stre
 
         if (currentMergedChunk) {
             currentMergedChunk.result.rows?.push(...(chunk.result.rows || []));
+            currentMergedChunk.result.truncated =
+                currentMergedChunk.result.truncated || chunk.result.truncated;
         } else {
             acc.set(resultIndex, {
                 ...chunk,
-                result: {...chunk.result, rows: chunk.result.rows || []},
+                result: {
+                    ...chunk.result,
+                    rows: chunk.result.rows || [],
+                    truncated: chunk.result.truncated,
+                },
             });
         }
         return acc;
@@ -117,6 +123,7 @@ export const addStreamingChunks = (state: QueryState, action: PayloadAction<Stre
         ] || {
             columns: [],
             result: [],
+            truncated: false,
             speedMetrics: {
                 rowsPerSecond: 0,
                 lastUpdateTime: Date.now(),
@@ -130,7 +137,11 @@ export const addStreamingChunks = (state: QueryState, action: PayloadAction<Stre
 
         const safeRows = rows || [];
         const formattedRows = parseResult(safeRows, resultSet.columns || []);
-        resultSet.result?.push(...formattedRows);
+
+        formattedRows.forEach((row) => {
+            resultSet.result?.push(row);
+        });
+        resultSet.truncated = chunk.result.truncated;
 
         if (resultSet.speedMetrics) {
             updateSpeedMetrics(resultSet.speedMetrics, totalNewRows);
