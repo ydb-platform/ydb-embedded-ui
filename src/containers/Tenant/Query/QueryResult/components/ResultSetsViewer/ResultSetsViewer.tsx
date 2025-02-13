@@ -56,8 +56,8 @@ export function ResultSetsViewer(props: ResultSetsViewerProps) {
                 {currentResult?.result ? (
                     <Text color="secondary" variant="body-2" className={b('row-count')}>
                         {`(${currentResult?.result.length}${
-                            currentResult.speedMetrics?.rowsPerSecond
-                                ? `, ${currentResult.speedMetrics.rowsPerSecond.toFixed(0)} rows/s`
+                            currentResult.streamMetrics?.rowsPerSecond
+                                ? `, ${currentResult.streamMetrics.rowsPerSecond.toFixed(0)} rows/s`
                                 : ''
                         })`}
                     </Text>

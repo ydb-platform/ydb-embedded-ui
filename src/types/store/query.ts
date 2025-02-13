@@ -20,7 +20,7 @@ import type {
 } from '../api/query';
 import type {ValueOf} from '../common';
 
-export interface SpeedMetrics {
+export interface StreamMetrics {
     rowsPerSecond: number;
     lastUpdateTime: number;
     recentChunks: Array<{
@@ -33,7 +33,7 @@ export interface ParsedResultSet {
     columns?: ColumnType[];
     result?: KeyValueRow[];
     truncated?: boolean;
-    speedMetrics?: SpeedMetrics;
+    streamMetrics?: StreamMetrics;
 }
 
 export interface IQueryResult {

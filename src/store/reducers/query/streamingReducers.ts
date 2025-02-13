@@ -1,6 +1,6 @@
 import type {PayloadAction} from '@reduxjs/toolkit';
 
-import type {SpeedMetrics} from '../../../types/store/query';
+import type {StreamMetrics} from '../../../types/store/query';
 import type {
     QueryResponseChunk,
     SessionChunk,
@@ -58,7 +58,7 @@ export const setStreamQueryResponse = (
     }
 };
 
-const updateSpeedMetrics = (metrics: SpeedMetrics, totalNewRows: number) => {
+const updateStreamMetrics = (metrics: StreamMetrics, totalNewRows: number) => {
     const currentTime = Date.now();
     const WINDOW_SIZE = 5000; // 5 seconds in milliseconds
 
@@ -85,7 +85,7 @@ const getEmptyResultSet = () => {
         columns: [],
         result: [],
         truncated: false,
-        speedMetrics: {
+        streamMetrics: {
             rowsPerSecond: 0,
             lastUpdateTime: Date.now(),
             recentChunks: [],
@@ -150,8 +150,8 @@ export const addStreamingChunks = (state: QueryState, action: PayloadAction<Stre
         });
         resultSet.truncated = chunk.result.truncated;
 
-        if (resultSet.speedMetrics) {
-            updateSpeedMetrics(resultSet.speedMetrics, totalNewRows);
+        if (resultSet.streamMetrics) {
+            updateStreamMetrics(resultSet.streamMetrics, totalNewRows);
         }
     }
 };
