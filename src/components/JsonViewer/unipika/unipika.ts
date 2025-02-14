@@ -11,6 +11,7 @@ export const defaultUnipikaSettings = {
     escapeWhitespace: true,
     showDecoded: true,
     binaryAsHex: false,
+    indent: 2,
 };
 
 export function unipikaConvert(value: unknown) {

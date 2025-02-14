@@ -36,7 +36,7 @@
         position: absolute;
 
         margin-top: -2px;
-        margin-left: -5ex;
+        margin-left: -3ex;
     }
 
     &__match-counter {
@@ -72,7 +72,7 @@
     }
 
     &__filter {
-        max-width: 300px;
+        width: 300px;
     }
 
     &__filtered {

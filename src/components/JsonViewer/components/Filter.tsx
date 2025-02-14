@@ -53,7 +53,7 @@ export const Filter = React.forwardRef<HTMLInputElement, FilterProps>(function F
                         }
                     >
                         <Button
-                            view="flat"
+                            view="flat-secondary"
                             onClick={() => setCaseSensitiveSearch(!caseSensitiveSearch)}
                             selected={caseSensitiveSearch}
                         >
