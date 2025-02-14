@@ -21,7 +21,7 @@
     "@gravity-ui/icons": "^2.12.0",
     "@gravity-ui/navigation": "^2.30.0",
     "@gravity-ui/paranoid": "^2.0.1",
-    "@gravity-ui/react-data-table": "^2.1.1",
+    "@gravity-ui/react-data-table": "^2.2.1",
     "@gravity-ui/table": "^1.7.0",
     "@gravity-ui/uikit": "^6.40.0",
     "@gravity-ui/websql-autocomplete": "^13.7.0",
@@ -164,10 +164,10 @@
     "typescript": "^5.7.3"
   },
   "peerDependencies": {
+    "monaco-yql-languages": ">=1.3.0",
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "monaco-yql-languages": ">=1.3.0"
+    "react-dom": "^18.3.1"
   },
   "overrides": {
     "fork-ts-checker-webpack-plugin": "^9.0.2",

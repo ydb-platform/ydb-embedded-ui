@@ -21,7 +21,7 @@ const TABLE_SETTINGS: Settings = {
     ...DEFAULT_TABLE_SETTINGS,
     stripedRows: true,
     sortable: false,
-    displayIndices: true,
+    displayIndices: {maxIndex: 100000},
 };
 
 export const b = cn('ydb-query-result-table');
