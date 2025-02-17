@@ -73,7 +73,7 @@ export function Cell(props: CellProps) {
             )}
             {collapsed && depth === undefined && <span className={'unipika'}>...</span>}
             {close && <OpenClose type={close} settings={settings} close />}
-            {hasDelimiter && <SlaveText text={','} />}
+            {hasDelimiter && <AdditionalText text={','} />}
         </div>
     );
 }
@@ -90,7 +90,7 @@ function Key(props: KeyProps) {
     return text ? (
         <React.Fragment>
             {text}
-            <SlaveText text={': '} />
+            <AdditionalText text={': '} />
         </React.Fragment>
     ) : null;
 }
@@ -117,7 +117,8 @@ function renderValueWithFilter(props: ValueProps, className: string) {
 function renderStringWithFilter(props: ValueProps, className: string, maxWidth = Infinity) {
     const {text, settings = defaultUnipikaSettings, matched = [], filter, showFullText} = props;
     const tmp = unipika.format(text, {...settings, asHTML: false});
-    const visible = tmp.substr(1, Math.min(tmp.length - 2, maxWidth));
+    const length = tmp.length;
+    const visible = tmp.substring(1, Math.min(length - 1, maxWidth + 1));
     const truncated = visible.length < tmp.length - 2;
     let hasHiddenMatch = false;
     if (truncated) {
@@ -178,17 +179,17 @@ function renderWithFilter(props: KeyProps, className: string) {
     return res ? res : null;
 }
 
-function SlaveText({text}: {text: string}) {
-    return <span className={''}>{text}</span>;
+function AdditionalText({text}: {text: string}) {
+    return <span>{text}</span>;
 }
 
 function OpenClose(props: {type: BlockType; close?: boolean; settings?: UnipikaSettings}) {
     const {type, close} = props;
     switch (type) {
         case 'array':
-            return <SlaveText text={close ? ']' : '['} />;
+            return <AdditionalText text={close ? ']' : '['} />;
         case 'object':
-            return <SlaveText text={close ? '}' : '{'} />;
+            return <AdditionalText text={close ? '}' : '{'} />;
     }
 }
 

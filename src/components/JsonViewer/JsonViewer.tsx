@@ -198,15 +198,10 @@ export function JsonViewer({
                     data={data}
                     theme={'yson'}
                     settings={normalizedTableSettings}
-                    rowClassName={rowClassName}
+                    rowClassName={() => block('row')}
                 />
             </div>
         );
-    };
-
-    const rowClassName = ({key}: UnipikaFlattenTreeItem) => {
-        const k = key?.$decoded_value ?? '';
-        return block('row', {key: asModifier(k)});
     };
 
     const onExpandAll = () => {
@@ -330,8 +325,4 @@ export function JsonViewer({
             {renderFullValueModal()}
         </div>
     );
-}
-
-function asModifier(path = '') {
-    return path.replace(/[^-\w\d]/g, '_');
 }

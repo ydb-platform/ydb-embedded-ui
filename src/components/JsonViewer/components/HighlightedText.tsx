@@ -14,10 +14,10 @@ interface Props {
 export default function HighlightedText({className, text, start, length, hasComa}: Props) {
     const comma = hasComa ? <React.Fragment>,&nbsp;</React.Fragment> : null;
 
-    if (length! > 0 && start! >= 0 && start! < text.length) {
-        const begin = text.substr(0, start);
-        const highlighted = text.substr(start!, length);
-        const end = text.substr(start! + length!);
+    if (length && typeof start === 'number' && start >= 0 && start < text.length) {
+        const begin = text.substring(0, start);
+        const highlighted = text.substring(start, start + length);
+        const end = text.substring(start + length);
 
         return (
             <React.Fragment>

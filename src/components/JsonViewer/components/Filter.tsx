@@ -66,7 +66,7 @@ export const Filter = React.forwardRef<HTMLInputElement, FilterProps>(function F
                 <Button
                     className={block('match-btn')}
                     view="flat-secondary"
-                    title="Next"
+                    title={i18n('action_next')}
                     onClick={onNextMatch}
                     disabled={!count}
                 >
@@ -75,14 +75,14 @@ export const Filter = React.forwardRef<HTMLInputElement, FilterProps>(function F
                 <Button
                     className={block('match-btn')}
                     view="flat-secondary"
-                    title="Back"
+                    title={i18n('action_back')}
                     onClick={onPrevMatch}
                     disabled={!count}
                 >
                     <Icon data={ChevronUpIcon} />
                 </Button>
             </Flex>
-            <span className={block('match-counter')} title={'Matched rows'}>
+            <span className={block('match-counter')} title={i18n('description_matched-rows')}>
                 {matchPosition} / {count || 0}
             </span>
         </React.Fragment>

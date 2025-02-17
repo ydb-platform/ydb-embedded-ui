@@ -181,7 +181,10 @@ function pushPath(path: string, ctx: FlatContext) {
 function popPath(ctx: FlatContext) {
     const last = ctx.path.pop();
     if (last !== undefined) {
-        ctx.collapsedPath = ctx.collapsedPath.substr(0, ctx.collapsedPath.length - last.length - 1);
+        ctx.collapsedPath = ctx.collapsedPath.substring(
+            0,
+            ctx.collapsedPath.length - last.length - 1,
+        );
     }
 }
 
