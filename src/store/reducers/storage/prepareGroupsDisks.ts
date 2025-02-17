@@ -16,9 +16,7 @@ export function prepareGroupsVDisk(data: TStorageVDisk = {}): PreparedVDisk {
         VDiskId: whiteboardVDisk.VDiskId,
     };
 
-    const preparedPDisk = PDisk
-        ? prepareGroupsPDisk({...PDisk, NodeId: mergedVDiskData.NodeId})
-        : undefined;
+    const preparedPDisk = prepareGroupsPDisk({...PDisk, NodeId: mergedVDiskData.NodeId});
 
     const PDiskId = preparedPDisk?.PDiskId ?? whiteboardVDisk?.PDiskId;
 

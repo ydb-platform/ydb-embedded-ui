@@ -1,4 +1,5 @@
 import type {EFlag} from './enums';
+import type {Erasure} from './storage';
 import type {TTabletStateInfo} from './tablet';
 
 /**
@@ -38,7 +39,7 @@ export interface TClusterInfoV1 {
 
 export interface TStorageStats {
     PDiskFilter?: string;
-    ErasureSpecies?: string;
+    ErasureSpecies?: Erasure;
     CurrentAvailableSize?: string;
     /** uint64 */
     CurrentAllocatedSize?: string;
