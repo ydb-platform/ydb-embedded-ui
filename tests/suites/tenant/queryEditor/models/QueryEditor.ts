@@ -133,7 +133,7 @@ export class QueryEditor {
             case ExplainResultType.Schema:
                 return resultArea.locator('.ydb-query-explain-graph__canvas-container');
             case ExplainResultType.JSON:
-                return resultArea.locator('.ydb-query-json-viewer__inspector');
+                return resultArea.locator('.ydb-query-json-viewer__tree');
             case ExplainResultType.AST:
                 return resultArea.locator('.ydb-query-ast');
         }

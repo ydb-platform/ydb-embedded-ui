@@ -11,6 +11,10 @@
 
     @include mixins.query-data-table;
 
+    & .data-table__box .data-table__table-wrapper {
+        padding-bottom: 0;
+    }
+
     &__monaco {
         position: relative;
 

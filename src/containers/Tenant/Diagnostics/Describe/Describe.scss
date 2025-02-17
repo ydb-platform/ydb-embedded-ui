@@ -9,14 +9,8 @@
         position: relative;
 
         display: flex;
-        overflow: auto;
         flex: 0 0 auto;
 
         padding: 0 20px 20px 0;
-    }
-
-    &__copy {
-        position: absolute;
-        left: 340px;
     }
 }
