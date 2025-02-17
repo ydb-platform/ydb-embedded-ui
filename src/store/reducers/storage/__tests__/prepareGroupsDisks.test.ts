@@ -95,7 +95,19 @@ describe('prepareGroupsVDisk', () => {
             AllocatedPercent: 12,
 
             Donors: undefined,
-            PDisk: undefined,
+
+            PDisk: {
+                AllocatedPercent: NaN,
+                AllocatedSize: NaN,
+                AvailableSize: NaN,
+                NodeId: 224,
+                PDiskId: undefined,
+                Severity: 0,
+                SlotSize: undefined,
+                StringifiedId: undefined,
+                TotalSize: NaN,
+                Type: undefined,
+            },
         };
 
         const preparedData = prepareGroupsVDisk(vDiksDataWithoutPDisk);
@@ -124,6 +136,19 @@ describe('prepareGroupsVDisk', () => {
             AvailableSize: 234461593600,
             TotalSize: 265405071360,
             AllocatedPercent: 12,
+
+            PDisk: {
+                AllocatedPercent: NaN,
+                AllocatedSize: NaN,
+                AvailableSize: NaN,
+                NodeId: 224,
+                PDiskId: undefined,
+                Severity: 0,
+                SlotSize: undefined,
+                StringifiedId: undefined,
+                TotalSize: NaN,
+                Type: undefined,
+            },
         };
 
         const preparedData = prepareGroupsVDisk(vDiksDataWithoutPDisk);
@@ -215,7 +240,19 @@ describe('prepareGroupsVDisk', () => {
             AllocatedPercent: 12,
 
             Donors: undefined,
-            PDisk: undefined,
+
+            PDisk: {
+                AllocatedPercent: NaN,
+                AllocatedSize: NaN,
+                AvailableSize: NaN,
+                NodeId: undefined,
+                PDiskId: undefined,
+                Severity: 0,
+                SlotSize: undefined,
+                StringifiedId: undefined,
+                TotalSize: NaN,
+                Type: undefined,
+            },
         };
 
         const preparedData = prepareGroupsVDisk(vDiksDataWithoutPDisk);

@@ -236,7 +236,9 @@ const getVDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => (
     name: STORAGE_GROUPS_COLUMNS_IDS.VDisks,
     header: STORAGE_GROUPS_COLUMNS_TITLES.VDisks,
     className: b('vdisks-column'),
-    render: ({row}) => <VDisks vDisks={row.VDisks} viewContext={data?.viewContext} />,
+    render: ({row}) => (
+        <VDisks vDisks={row.VDisks} viewContext={data?.viewContext} erasure={row.ErasureSpecies} />
+    ),
     align: DataTable.CENTER,
     width: 780, // usually 8-9 vdisks, this width corresponds to 8 vdisks, column is expanded if more
     resizeable: false,
@@ -248,7 +250,13 @@ const getDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => ({
     header: STORAGE_GROUPS_COLUMNS_TITLES.VDisksPDisks,
     className: b('disks-column'),
     render: ({row}) => {
-        return <Disks vDisks={row.VDisks} viewContext={data?.viewContext} />;
+        return (
+            <Disks
+                vDisks={row.VDisks}
+                viewContext={data?.viewContext}
+                erasure={row.ErasureSpecies}
+            />
+        );
     },
     align: DataTable.CENTER,
     width: 900,

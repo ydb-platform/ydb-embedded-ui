@@ -2,6 +2,7 @@ import React from 'react';
 
 import {selectNodesMap} from '../../../store/reducers/nodesList';
 import type {PreparedStorageGroup} from '../../../store/reducers/storage/types';
+import type {Erasure} from '../../../types/api/storage';
 import {valueIsDefined} from '../../../utils';
 import type {PreparedVDisk} from '../../../utils/disks/types';
 import {generateEvaluator} from '../../../utils/generateEvaluator';
@@ -84,11 +85,21 @@ export function getStorageGroupsInitialEntitiesCount(
     return DEFAULT_ENTITIES_COUNT;
 }
 
-export function useVDisksWithDCMargins(vDisks: PreparedVDisk[] = []) {
+function isErasureWithDifferentDC(erasure?: Erasure) {
+    // These erasure types suppose the data distributed across 3 different DC
+    return erasure === 'mirror-3-dc' || erasure === 'mirror-3of4';
+}
+
+export function useVDisksWithDCMargins(vDisks: PreparedVDisk[] = [], erasure?: Erasure) {
     const nodesMap = useTypedSelector(selectNodesMap);
 
     return React.useMemo(() => {
         const disksWithMargins: number[] = [];
+
+        // If single-dc erasure, all disks are in the same DC
+        if (!isErasureWithDifferentDC(erasure)) {
+            return disksWithMargins;
+        }
 
         // Backend returns disks sorted by DC, so we don't need to apply any additional sorting
         vDisks.forEach((disk, index) => {
@@ -101,5 +112,5 @@ export function useVDisksWithDCMargins(vDisks: PreparedVDisk[] = []) {
         });
 
         return disksWithMargins;
-    }, [vDisks, nodesMap]);
+    }, [erasure, vDisks, nodesMap]);
 }

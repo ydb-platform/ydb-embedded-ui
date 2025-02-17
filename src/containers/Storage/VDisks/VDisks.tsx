@@ -1,4 +1,5 @@
 import {VDiskWithDonorsStack} from '../../../components/VDisk/VDiskWithDonorsStack';
+import type {Erasure} from '../../../types/api/storage';
 import {cn} from '../../../utils/cn';
 import type {PreparedVDisk} from '../../../utils/disks/types';
 import type {StorageViewContext} from '../types';
@@ -11,10 +12,11 @@ const b = cn('ydb-storage-vdisks');
 interface VDisksProps {
     vDisks?: PreparedVDisk[];
     viewContext?: StorageViewContext;
+    erasure?: Erasure;
 }
 
-export function VDisks({vDisks, viewContext}: VDisksProps) {
-    const vDisksWithDCMargins = useVDisksWithDCMargins(vDisks);
+export function VDisks({vDisks, viewContext, erasure}: VDisksProps) {
+    const vDisksWithDCMargins = useVDisksWithDCMargins(vDisks, erasure);
 
     return (
         <div className={b('wrapper')}>

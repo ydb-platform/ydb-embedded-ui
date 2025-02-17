@@ -66,7 +66,7 @@ export type TStorageGroupInfo = TBSGroupStateInfo &
 
 interface TBSGroupStateInfo {
     GroupID?: number;
-    ErasureSpecies?: string;
+    ErasureSpecies?: Erasure;
     VDisks?: TVDiskStateInfo[];
     /** uint64 */
     ChangeTime?: string;
@@ -137,7 +137,7 @@ export interface TGroupsStorageGroupInfo {
     DiskSpace?: EFlag;
     Kind?: string;
     MediaType?: string;
-    ErasureSpecies?: string;
+    ErasureSpecies?: Erasure;
     /** uint64 */
     AllocationUnits?: string;
     /**
@@ -227,6 +227,11 @@ export interface TStoragePDisk {
     SlotSize?: string;
     Whiteboard?: TPDiskStateInfo;
 }
+
+/**
+ * https://ydb.tech/docs/en/concepts/topology#cluster-config
+ */
+export type Erasure = 'none' | 'block-4-2' | 'mirror-3-dc' | 'mirror-3of4';
 
 // ==== Request types ====
 
