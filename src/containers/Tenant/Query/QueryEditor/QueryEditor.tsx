@@ -313,7 +313,7 @@ function Result({
                 theme={theme}
                 tenantName={tenantName}
                 isResultsCollapsed={resultVisibilityState.collapsed}
-                isCancelError={Boolean(cancelQueryResponse?.isLoading)}
+                isCancelError={Boolean(cancelQueryResponse?.error)}
                 isCancelling={Boolean(cancelQueryResponse?.isLoading)}
                 onExpandResults={onExpandResultHandler}
                 onCollapseResults={onCollapseResultHandler}

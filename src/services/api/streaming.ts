@@ -6,32 +6,18 @@ import {
     isSessionChunk,
     isStreamDataChunk,
 } from '../../store/reducers/query/utils';
-import type {Actions, TracingLevel} from '../../types/api/query';
-import type {QuerySyntax, StatisticsMode} from '../../types/store/query';
+import type {Actions, StreamQueryParams} from '../../types/api/query';
 import type {QueryResponseChunk, SessionChunk, StreamDataChunk} from '../../types/store/streaming';
 import {
     BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
     DEV_ENABLE_TRACING_FOR_ALL_REQUESTS,
 } from '../../utils/constants';
+import {isRedirectToAuth} from '../../utils/response';
 import {settingsManager} from '../settings';
 
 import {BaseYdbAPI} from './base';
 
 const BOUNDARY = 'boundary';
-
-export interface StreamQueryParams {
-    query?: string;
-    database?: string;
-    action?: Actions;
-    syntax?: QuerySyntax;
-    stats?: StatisticsMode;
-    tracingLevel?: TracingLevel;
-    transaction_mode?: string;
-    timeout?: number;
-    limit_rows?: number;
-    output_chunk_max_size: number;
-    concurrent_results?: boolean;
-}
 
 export interface StreamQueryOptions {
     signal?: AbortSignal;
@@ -41,7 +27,10 @@ export interface StreamQueryOptions {
 }
 
 export class StreamingAPI extends BaseYdbAPI {
-    async streamQuery(params: StreamQueryParams, options: StreamQueryOptions) {
+    async streamQuery<Action extends Actions>(
+        params: StreamQueryParams<Action>,
+        options: StreamQueryOptions,
+    ) {
         const base64 = !settingsManager.readUserSettingsValue(
             BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
             true,
@@ -78,6 +67,11 @@ export class StreamingAPI extends BaseYdbAPI {
         });
 
         if (!response.ok) {
+            const responseData = await response.json().catch(() => ({}));
+            if (isRedirectToAuth({status: response.status, data: responseData})) {
+                window.location.assign(responseData.authUrl);
+                return;
+            }
             throw new Error(`${response.status}`);
         }
 
