@@ -1,4 +1,5 @@
-import {JSONTree} from '../../../../../../components/JSONTree/JSONTree';
+import {JsonViewer} from '../../../../../../components/JsonViewer/JsonViewer';
+import {useUnipikaConvert} from '../../../../../../components/JsonViewer/unipika/unipika';
 import {cn} from '../../../../../../utils/cn';
 
 import './QueryJSONViewer.scss';
@@ -10,9 +11,12 @@ interface QueryJSONViewerProps {
 }
 
 export function QueryJSONViewer({data}: QueryJSONViewerProps) {
+    const convertedData = useUnipikaConvert(data);
     return (
-        <div className={b('inspector')}>
-            <JSONTree data={data} isExpanded={() => true} />
+        <div className={b()}>
+            <div className={b('tree')}>
+                <JsonViewer value={convertedData} />
+            </div>
         </div>
     );
 }

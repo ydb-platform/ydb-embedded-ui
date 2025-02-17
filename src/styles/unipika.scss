@@ -1,0 +1,12 @@
+.g-root {
+    .unipika {
+        font-family: var(--g-font-family-monospace);
+
+        &-wrapper & {
+            margin: 0;
+            padding: 0;
+
+            border: 0;
+        }
+    }
+}

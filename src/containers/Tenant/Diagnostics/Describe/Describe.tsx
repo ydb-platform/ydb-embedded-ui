@@ -2,7 +2,8 @@ import {ClipboardButton} from '@gravity-ui/uikit';
 import {shallowEqual} from 'react-redux';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
-import {JSONTree} from '../../../../components/JSONTree/JSONTree';
+import {JsonViewer} from '../../../../components/JsonViewer/JsonViewer';
+import {useUnipikaConvert} from '../../../../components/JsonViewer/unipika/unipika';
 import {Loader} from '../../../../components/Loader';
 import {
     selectSchemaMergedChildrenPaths,
@@ -16,8 +17,6 @@ import {isEntityWithMergedImplementation} from '../../utils/schema';
 import './Describe.scss';
 
 const b = cn('ydb-describe');
-
-const expandMap = new Map();
 
 interface IDescribeProps {
     path: string;
@@ -58,6 +57,8 @@ const Describe = ({path, database, type}: IDescribeProps) => {
         }
     }
 
+    const convertedValue = useUnipikaConvert(preparedDescribeData);
+
     if (loading || (isEntityWithMergedImpl && !mergedChildrenPaths)) {
         return <Loader size="m" />;
     }
@@ -71,20 +72,16 @@ const Describe = ({path, database, type}: IDescribeProps) => {
             {error ? <ResponseError error={error} /> : null}
             {preparedDescribeData ? (
                 <div className={b('result')}>
-                    <JSONTree
-                        data={preparedDescribeData}
-                        onClick={({path}) => {
-                            const newValue = !(expandMap.get(path) || false);
-                            expandMap.set(path, newValue);
-                        }}
-                        isExpanded={(keypath) => {
-                            return expandMap.get(keypath) || false;
-                        }}
-                    />
-                    <ClipboardButton
-                        view="flat-secondary"
-                        text={JSON.stringify(preparedDescribeData)}
-                        className={b('copy')}
+                    <JsonViewer
+                        value={convertedValue}
+                        extraTools={
+                            <ClipboardButton
+                                view="flat-secondary"
+                                text={JSON.stringify(preparedDescribeData)}
+                            />
+                        }
+                        search
+                        collapsedInitially
                     />
                 </div>
             ) : null}

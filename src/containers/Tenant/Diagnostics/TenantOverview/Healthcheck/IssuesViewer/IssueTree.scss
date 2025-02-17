@@ -20,38 +20,9 @@
 
         border-radius: 4px;
         background: var(--g-color-base-generic);
-    }
 
-    &__inspector {
-        :not(.json-inspector__leaf_expanded).json-inspector__leaf_composite:before {
-            content: '';
-        }
-        .json-inspector__leaf_expanded.json-inspector__leaf_composite:before {
-            content: '';
-        }
-
-        & .json-inspector {
-            &__line:hover:after {
-                background: transparent;
-            }
-            &__show-original:hover:after,
-            &__show-original:hover:before {
-                color: transparent;
-            }
-
-            &__value_helper {
-                display: none;
-            }
-
-            &__value {
-                overflow: hidden;
-
-                word-break: break-all;
-
-                & > span {
-                    user-select: all;
-                }
-            }
+        .ydb-json-viewer {
+            --toolbar-background-color: var(--g-color-base-simple-hover-solid);
         }
     }
 

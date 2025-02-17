@@ -2,6 +2,7 @@
 @use './themes/light-hc';
 @use './themes/dark';
 @use './themes/dark-hc';
+@use '~@gravity-ui/unipika/styles/unipika.scss';
 
 // Override @gravity-ui/uikit color palette with our own colors
 
@@ -54,6 +55,7 @@
         --g-color-text-link: var(--g-color-private-blue-550-solid);
         --g-color-text-link-hover: var(--g-color-private-blue-700-solid);
         @include dark.colors-private-dark;
+        @include unipika.unipika-dark;
     }
 
     &_theme_dark-hc {
@@ -69,5 +71,6 @@
         --g-color-text-link: var(--g-color-private-blue-650-solid);
         --g-color-text-link-hover: var(--g-color-private-blue-800-solid);
         @include dark-hc.colors-private-dark-hc;
+        @include unipika.unipika-dark;
     }
 }
