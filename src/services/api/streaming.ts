@@ -9,7 +9,10 @@ import {
 import type {Actions, TracingLevel} from '../../types/api/query';
 import type {QuerySyntax, StatisticsMode} from '../../types/store/query';
 import type {QueryResponseChunk, SessionChunk, StreamDataChunk} from '../../types/store/streaming';
-import {BINARY_DATA_IN_PLAIN_TEXT_DISPLAY} from '../../utils/constants';
+import {
+    BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
+    DEV_ENABLE_TRACING_FOR_ALL_REQUESTS,
+} from '../../utils/constants';
 import {settingsManager} from '../settings';
 
 import {BaseYdbAPI} from './base';
@@ -45,22 +48,33 @@ export class StreamingAPI extends BaseYdbAPI {
         );
 
         const queryParams = qs.stringify(
-            {...params, base64, schema: 'multipart'},
+            {timeout: params.timeout, base64, schema: 'multipart'},
             {encoder: encodeURIComponent},
         );
 
+        const body = {...params, base64, schema: 'multipart'};
         const headers = new Headers({
-            Accept: 'multipart/x-mixed-replace',
+            Accept: 'multipart/form-data',
+            'Content-Type': 'application/json',
         });
 
         if (params.tracingLevel) {
             headers.set('X-Trace-Verbosity', String(params.tracingLevel));
         }
 
+        const enableTracing = settingsManager.readUserSettingsValue(
+            DEV_ENABLE_TRACING_FOR_ALL_REQUESTS,
+        );
+
+        if (enableTracing) {
+            headers.set('X-Want-Trace', '1');
+        }
+
         const response = await fetch(`${this.getPath('/viewer/query')}?${queryParams}`, {
-            method: 'GET',
+            method: 'POST',
             signal: options.signal,
             headers,
+            body: JSON.stringify(body),
         });
 
         if (!response.ok) {
