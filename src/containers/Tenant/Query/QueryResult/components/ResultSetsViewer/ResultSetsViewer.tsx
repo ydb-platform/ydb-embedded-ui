@@ -1,3 +1,4 @@
+import type {Settings} from '@gravity-ui/react-data-table';
 import {Tabs, Text} from '@gravity-ui/uikit';
 
 import {QueryResultTable} from '../../../../../../components/QueryResultTable';
@@ -15,6 +16,7 @@ interface ResultSetsViewerProps {
     resultSets?: ParsedResultSet[];
     selectedResultSet: number;
     error?: unknown;
+    tableSettings?: Partial<Settings>;
     setSelectedResultSet: (resultSet: number) => void;
 }
 
@@ -73,7 +75,11 @@ export function ResultSetsViewer(props: ResultSetsViewerProps) {
             {currentResult ? (
                 <div className={b('result')}>
                     {renderResultHeadWithCount()}
-                    <QueryResultTable data={currentResult.result} columns={currentResult.columns} />
+                    <QueryResultTable
+                        settings={props.tableSettings}
+                        data={currentResult.result}
+                        columns={currentResult.columns}
+                    />
                 </div>
             ) : null}
         </div>

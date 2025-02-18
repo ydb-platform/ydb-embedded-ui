@@ -1,5 +1,6 @@
 import React from 'react';
 
+import type {Settings} from '@gravity-ui/react-data-table';
 import type {ControlGroupOption} from '@gravity-ui/uikit';
 import {ClipboardButton, RadioButton} from '@gravity-ui/uikit';
 
@@ -82,6 +83,7 @@ interface ExecuteResultProps {
     theme?: string;
     tenantName: string;
     queryText?: string;
+    tableSettings?: Partial<Settings>;
 
     isCancelling: boolean;
     isCancelError: boolean;
@@ -99,6 +101,7 @@ export function QueryResultViewer({
     queryText,
     isCancelling,
     isCancelError,
+    tableSettings,
     onCancelRunningQuery,
     onCollapseResults,
     onExpandResults,
@@ -230,6 +233,7 @@ export function QueryResultViewer({
                     resultSets={resultSets}
                     error={error}
                     selectedResultSet={selectedResultSet}
+                    tableSettings={tableSettings}
                     setSelectedResultSet={setSelectedResultSet}
                 />
             );

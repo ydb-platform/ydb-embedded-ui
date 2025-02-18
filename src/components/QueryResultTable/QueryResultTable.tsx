@@ -21,7 +21,7 @@ const TABLE_SETTINGS: Settings = {
     ...DEFAULT_TABLE_SETTINGS,
     stripedRows: true,
     sortable: false,
-    displayIndices: {maxIndex: 100000},
+    displayIndices: true,
 };
 
 export const b = cn('ydb-query-result-table');
@@ -77,6 +77,7 @@ interface QueryResultTableProps
     extends Omit<ResizeableDataTableProps<KeyValueRow>, 'data' | 'columns'> {
     data?: KeyValueRow[];
     columns?: ColumnType[];
+    settings?: Partial<Settings>;
 }
 
 export const QueryResultTable = (props: QueryResultTableProps) => {
@@ -100,7 +101,7 @@ export const QueryResultTable = (props: QueryResultTableProps) => {
         <ResizeableDataTable
             data={data}
             columns={columns}
-            settings={TABLE_SETTINGS}
+            settings={{...TABLE_SETTINGS, ...props.settings}}
             // prevent accessing row.id in case it is present but is not the PK (i.e. may repeat)
             rowKey={getRowIndex}
             visibleRowIndex={getVisibleRowIndex}

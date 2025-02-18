@@ -1,5 +1,6 @@
 import React from 'react';
 
+import type {Settings} from '@gravity-ui/react-data-table';
 import {isEqual} from 'lodash';
 import {v4 as uuidv4} from 'uuid';
 
@@ -265,6 +266,11 @@ export default function QueryEditor(props: QueryEditorProps) {
                         showPreview={showPreview}
                         queryText={lastExecutedQueryText}
                         onCancelRunningQuery={handleCancelRunningQuery}
+                        tableSettings={
+                            isStreamingEnabled && querySettings.limitRows
+                                ? {displayIndices: {maxIndex: querySettings.limitRows}}
+                                : undefined
+                        }
                     />
                 </div>
             </SplitPane>
@@ -285,6 +291,7 @@ interface ResultProps {
     path: string;
     showPreview?: boolean;
     queryText: string;
+    tableSettings?: Partial<Settings>;
     onCancelRunningQuery: VoidFunction;
 }
 function Result({
@@ -299,6 +306,7 @@ function Result({
     path,
     showPreview,
     queryText,
+    tableSettings,
     onCancelRunningQuery,
 }: ResultProps) {
     if (showPreview) {
@@ -315,6 +323,7 @@ function Result({
                 isResultsCollapsed={resultVisibilityState.collapsed}
                 isCancelError={Boolean(cancelQueryResponse?.error)}
                 isCancelling={Boolean(cancelQueryResponse?.isLoading)}
+                tableSettings={tableSettings}
                 onExpandResults={onExpandResultHandler}
                 onCollapseResults={onCollapseResultHandler}
                 queryText={queryText}
