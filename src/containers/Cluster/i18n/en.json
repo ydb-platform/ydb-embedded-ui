@@ -11,7 +11,7 @@
   "links": "Links",
   "link_cores": "Coredumps",
   "link_logging": "Logging",
-  "link_slo-logs": "Slo Logs",
+  "link_slo-logs": "SLO Logs",
   "context_cores": "cores",
   "title_cpu": "CPU",
   "title_storage": "Storage",
