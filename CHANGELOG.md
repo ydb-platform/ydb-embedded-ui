@@ -1,5 +1,13 @@
 # Changelog
 
+## [8.11.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.11.0...v8.11.1) (2025-02-18)
+
+
+### Bug Fixes
+
+* **JsonViewer:** handle case sensitive search ([#1966](https://github.com/ydb-platform/ydb-embedded-ui/issues/1966)) ([f2aabb7](https://github.com/ydb-platform/ydb-embedded-ui/commit/f2aabb7041cd6cb445df78490b54df7d1dd0945b))
+* unipika styles in one file ([#1963](https://github.com/ydb-platform/ydb-embedded-ui/issues/1963)) ([ff018a1](https://github.com/ydb-platform/ydb-embedded-ui/commit/ff018a1e90404c2d7600d832723b2c75824aa786))
+
 ## [8.11.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.10.0...v8.11.0) (2025-02-18)
 
 
