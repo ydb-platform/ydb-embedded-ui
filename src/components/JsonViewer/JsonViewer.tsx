@@ -96,7 +96,10 @@ export function JsonViewer({
     extraTools,
     collapsedInitially,
 }: JsonViewerProps) {
-    const [caseSensitiveSearch] = useSetting(CASE_SENSITIVE_JSON_SEARCH, false);
+    const [caseSensitiveSearch, setCaseSensitiveSearch] = useSetting(
+        CASE_SENSITIVE_JSON_SEARCH,
+        false,
+    );
 
     const [collapsedState, setCollapsedState] = React.useState<CollapsedState>(() => {
         if (collapsedInitially) {
@@ -155,13 +158,16 @@ export function JsonViewer({
     };
 
     const updateState = (
-        changedState: Partial<Pick<State, 'collapsedState' | 'filter' | 'matchIndex'>>,
+        changedState: Partial<Pick<State, 'collapsedState' | 'filter' | 'matchIndex'>> & {
+            caseSensitive?: boolean;
+        },
         cb?: () => void,
     ) => {
         const {
             collapsedState: newCollapsedState,
             matchIndex: newMatchIndex,
             filter: newFilter,
+            caseSensitive: newCaseSensitive,
         } = changedState;
 
         if (newCollapsedState !== undefined) {
@@ -173,7 +179,15 @@ export function JsonViewer({
         if (newFilter !== undefined) {
             setFilter(newFilter);
         }
-        setState(calculateState(value, newCollapsedState ?? collapsedState, newFilter ?? filter));
+        const caseSensitive = newCaseSensitive ?? caseSensitiveSearch;
+        setState(
+            calculateState(
+                value,
+                newCollapsedState ?? collapsedState,
+                newFilter ?? filter,
+                caseSensitive,
+            ),
+        );
 
         cb?.();
     };
@@ -254,6 +268,12 @@ export function JsonViewer({
         }
     };
 
+    const handleUpdateCaseSensitive = () => {
+        const newCaseSensitive = !caseSensitiveSearch;
+        setCaseSensitiveSearch(newCaseSensitive);
+        updateState({caseSensitive: newCaseSensitive});
+    };
+
     const renderToolbar = () => {
         return (
             <Flex gap={2} wrap="nowrap" className={block('toolbar')}>
@@ -279,6 +299,8 @@ export function JsonViewer({
                         onKeyDown={onEnterKeyDown}
                         onNextMatch={onNextMatch}
                         onPrevMatch={onPrevMatch}
+                        caseSensitive={caseSensitiveSearch}
+                        onUpdateCaseSensitive={handleUpdateCaseSensitive}
                     />
                 )}
                 <span className={block('extra-tools')}>{extraTools}</span>

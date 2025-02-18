@@ -2,8 +2,6 @@ import React from 'react';
 
 import {ActionTooltip, Button, Flex, Icon, TextInput} from '@gravity-ui/uikit';
 
-import {CASE_SENSITIVE_JSON_SEARCH} from '../../../utils/constants';
-import {useSetting} from '../../../utils/hooks';
 import {block} from '../constants';
 import i18n from '../i18n';
 
@@ -19,16 +17,24 @@ interface FilterProps {
     onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
     onNextMatch?: (_event: unknown, diff?: number) => void;
     onPrevMatch?: (_event: unknown, diff?: number) => void;
+    caseSensitive?: boolean;
+    onUpdateCaseSensitive: VoidFunction;
 }
 
 export const Filter = React.forwardRef<HTMLInputElement, FilterProps>(function Filter(
-    {matchIndex, matchedRows, value, onUpdate, onKeyDown, onNextMatch, onPrevMatch},
+    {
+        matchIndex,
+        matchedRows,
+        value,
+        onUpdate,
+        onKeyDown,
+        onNextMatch,
+        onPrevMatch,
+        caseSensitive,
+        onUpdateCaseSensitive,
+    },
     ref,
 ) {
-    const [caseSensitiveSearch, setCaseSensitiveSearch] = useSetting(
-        CASE_SENSITIVE_JSON_SEARCH,
-        false,
-    );
     const count = matchedRows.length;
     const matchPosition = count ? 1 + (matchIndex % count) : 0;
     return (
@@ -47,15 +53,15 @@ export const Filter = React.forwardRef<HTMLInputElement, FilterProps>(function F
                 endContent={
                     <ActionTooltip
                         title={
-                            caseSensitiveSearch
+                            caseSensitive
                                 ? i18n('context_case-sensitive-search')
                                 : i18n('context_case-sensitive-search-disabled')
                         }
                     >
                         <Button
                             view="flat-secondary"
-                            onClick={() => setCaseSensitiveSearch(!caseSensitiveSearch)}
-                            selected={caseSensitiveSearch}
+                            onClick={onUpdateCaseSensitive}
+                            selected={caseSensitive}
                         >
                             <Icon data={FontCaseIcon} />
                         </Button>
