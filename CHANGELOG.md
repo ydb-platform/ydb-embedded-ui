@@ -1,5 +1,21 @@
 # Changelog
 
+## [8.11.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.10.0...v8.11.0) (2025-02-18)
+
+
+### Features
+
+* add new JsonViewer ([#1951](https://github.com/ydb-platform/ydb-embedded-ui/issues/1951)) ([61a8d48](https://github.com/ydb-platform/ydb-embedded-ui/commit/61a8d4882e2fff38e11bb33c09b3464da8a639fd))
+
+
+### Bug Fixes
+
+* make SLO uppercase ([#1959](https://github.com/ydb-platform/ydb-embedded-ui/issues/1959)) ([53e013c](https://github.com/ydb-platform/ydb-embedded-ui/commit/53e013c027d990100574463d5f9983206405ceef))
+* **ObjectSummary:** refresh tabs with tree refresh, disable autorefresh ([#1946](https://github.com/ydb-platform/ydb-embedded-ui/issues/1946)) ([c28ade6](https://github.com/ydb-platform/ydb-embedded-ui/commit/c28ade6a94d63ff9fdd071d56b9970deff19e91b))
+* **schemaQueryTemplates:** insert $ sign ([#1945](https://github.com/ydb-platform/ydb-embedded-ui/issues/1945)) ([267c445](https://github.com/ydb-platform/ydb-embedded-ui/commit/267c4451a0e1df3221e5db26905836360a9f39fc))
+* **SchemaViewer:** fix sort order and add key icon ([#1957](https://github.com/ydb-platform/ydb-embedded-ui/issues/1957)) ([8b5221a](https://github.com/ydb-platform/ydb-embedded-ui/commit/8b5221a6bd284fb8d10930a1975c16c4d57a5eae))
+* **Storage:** fix disks view for degraded group ([#1930](https://github.com/ydb-platform/ydb-embedded-ui/issues/1930)) ([a2b7d1c](https://github.com/ydb-platform/ydb-embedded-ui/commit/a2b7d1c74cf9933d179181e97885347c3a60d06c))
+
 ## [8.10.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.9.0...v8.10.0) (2025-02-12)
 
 
