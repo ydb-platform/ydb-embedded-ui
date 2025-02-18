@@ -70,10 +70,8 @@ function prepareRowTableSchema(data: TTableDescription = {}): SchemaData[] {
             columnCodec,
         };
     });
-    const keyColumns = preparedColumns?.filter((column) => column.keyColumnIndex !== -1) || [];
-    const otherColumns = preparedColumns?.filter((column) => column.keyColumnIndex === -1) || [];
 
-    return [...keyColumns, ...otherColumns];
+    return preparedColumns ?? [];
 }
 
 function prepareExternalTableSchema(data: TExternalTableDescription = {}): SchemaData[] {
