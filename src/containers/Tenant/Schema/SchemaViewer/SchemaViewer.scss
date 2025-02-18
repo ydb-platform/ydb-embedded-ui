@@ -62,4 +62,19 @@
     &__more-badge {
         margin-left: var(--g-spacing-1);
     }
+    &__key-icon {
+        position: absolute;
+        top: 3.5px;
+
+        margin-left: var(--g-spacing-half);
+
+        vertical-align: baseline;
+    }
+    &__id-wrapper {
+        position: relative;
+
+        display: inline-block;
+
+        padding-right: var(--g-spacing-1);
+    }
 }
