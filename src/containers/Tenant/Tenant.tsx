@@ -12,7 +12,7 @@ import {selectSchemaObjectData} from '../../store/reducers/schema/schema';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
 import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
-import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {isAccessError} from '../../utils/response';
 
 import ObjectGeneral from './ObjectGeneral/ObjectGeneral';
@@ -43,7 +43,6 @@ interface TenantProps {
 }
 
 export function Tenant(props: TenantProps) {
-    const [autoRefreshInterval] = useAutoRefreshInterval();
     const [summaryVisibilityState, dispatchSummaryVisibilityAction] = React.useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_TENANT_SUMMARY_COLLAPSED),
         undefined,
@@ -95,12 +94,7 @@ export function Tenant(props: TenantProps) {
         currentData: currentItem,
         error,
         isLoading,
-    } = overviewApi.useGetOverviewQuery(
-        {path, database: tenantName},
-        {
-            pollingInterval: autoRefreshInterval,
-        },
-    );
+    } = overviewApi.useGetOverviewQuery({path, database: tenantName});
 
     const preloadedData = useTypedSelector((state) =>
         selectSchemaObjectData(state, path, tenantName),

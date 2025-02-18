@@ -1,9 +1,13 @@
 import DataTable from '@gravity-ui/react-data-table';
+import {Icon} from '@gravity-ui/uikit';
 
 import {getColumnWidth} from '../../../../utils/getColumnWidth';
 
 import i18n from './i18n';
+import {b} from './shared';
 import type {SchemaColumn, SchemaData} from './types';
+
+import KeyIcon from '@gravity-ui/icons/svgs/key.svg';
 
 export const SCHEMA_COLUMNS_WIDTH_LS_KEY = 'schemaTableColumnsWidth';
 
@@ -26,7 +30,16 @@ const idColumn: SchemaColumn = {
         return i18n('column-title.id');
     },
     width: 60,
-    render: ({row}) => row.id,
+    align: DataTable.RIGHT,
+    render: ({row}) => {
+        const keyIcon = <Icon className={b('key-icon')} size={12} data={KeyIcon} />;
+        return (
+            <span className={b('id-wrapper')}>
+                {row.id}
+                {row.keyColumnIndex === undefined || row.keyColumnIndex === -1 ? null : keyIcon}
+            </span>
+        );
+    },
 };
 const nameColumn: SchemaColumn = {
     name: SCHEMA_TABLE_COLUMS_IDS.name,

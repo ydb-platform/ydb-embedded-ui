@@ -24,7 +24,7 @@ import {
     formatNumber,
     formatSecondsToHours,
 } from '../../../utils/dataFormatters/dataFormatters';
-import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
+import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {Acl} from '../Acl/Acl';
 import {EntityTitle} from '../EntityTitle/EntityTitle';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
@@ -76,7 +76,6 @@ export function ObjectSummary({
     onExpandSummary,
     isCollapsed,
 }: ObjectSummaryProps) {
-    const [autoRefreshInterval] = useAutoRefreshInterval();
     const dispatch = useTypedDispatch();
     const [, setCurrentPath] = useQueryParam('schema', StringParam);
     const [commonInfoVisibilityState, dispatchCommonInfoVisibilityState] = React.useReducer(
@@ -95,15 +94,10 @@ export function ObjectSummary({
         ignoreQueryPrefix: true,
     });
 
-    const {currentData: currentObjectData} = overviewApi.useGetOverviewQuery(
-        {
-            path,
-            database: tenantName,
-        },
-        {
-            pollingInterval: autoRefreshInterval,
-        },
-    );
+    const {currentData: currentObjectData} = overviewApi.useGetOverviewQuery({
+        path,
+        database: tenantName,
+    });
     const currentSchemaData = currentObjectData?.PathDescription?.Self;
 
     React.useEffect(() => {

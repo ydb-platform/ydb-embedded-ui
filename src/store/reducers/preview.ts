@@ -29,7 +29,7 @@ export const previewApi = api.injectEndpoints({
                     return {error: error || new Error('Unauthorized')};
                 }
             },
-            providesTags: ['All', 'PreviewData'],
+            providesTags: ['PreviewData'],
         }),
     }),
     overrideExisting: 'throw',
