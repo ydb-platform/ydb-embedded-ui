@@ -51,11 +51,15 @@
   "action.next-query": "Next query in history",
   "action.save-query": "Save query",
   "action.stop": "Stop",
+  "action.run": "Run",
+  "action.explain": "Explain",
 
   "filter.text.placeholder": "Search by query text...",
 
   "gear.tooltip": "Query execution settings have been changed for ",
   "banner.query-settings.message": "Query was executed with modified settings: ",
+
+  "toaster.stop-error": "Something went wrong. Unable to stop request processing. Please wait.",
 
   "history.queryText": "Query text",
   "history.endTime": "End time",

@@ -1,0 +1,17 @@
+@use '../../../../styles/mixins.scss';
+
+.ydb-query-editor-button {
+    &__explain-button,
+    &__stop-button,
+    &__run-button {
+        width: 92px;
+    }
+
+    &__stop-button {
+        background-color: var(--g-color-text-danger);
+
+        &_error {
+            @include mixins.query-buttons-animations();
+        }
+    }
+}

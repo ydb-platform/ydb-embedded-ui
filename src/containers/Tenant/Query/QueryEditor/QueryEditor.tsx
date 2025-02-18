@@ -229,6 +229,8 @@ export default function QueryEditor(props: QueryEditorProps) {
                 isLoading={Boolean(result?.isLoading)}
                 handleGetExplainQueryClick={handleGetExplainQueryClick}
                 highlightedAction={lastUsedQueryAction}
+                tenantName={tenantName}
+                queryId={result?.queryId}
             />
         );
     };

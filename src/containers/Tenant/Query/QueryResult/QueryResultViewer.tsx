@@ -20,7 +20,6 @@ import {USE_SHOW_PLAN_SVG_KEY} from '../../../../utils/constants';
 import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
 import {useSetting, useTypedDispatch} from '../../../../utils/hooks';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
-import {CancelQueryButton} from '../CancelQueryButton/CancelQueryButton';
 import {QueryDuration} from '../QueryDuration/QueryDuration';
 import {QuerySettingsBanner} from '../QuerySettingsBanner/QuerySettingsBanner';
 import {getPreparedResult} from '../utils/getPreparedResult';
@@ -85,9 +84,6 @@ interface ExecuteResultProps {
     queryText?: string;
     tableSettings?: Partial<Settings>;
 
-    isCancelling: boolean;
-    isCancelError: boolean;
-    onCancelRunningQuery?: VoidFunction;
     onCollapseResults: VoidFunction;
     onExpandResults: VoidFunction;
 }
@@ -99,10 +95,7 @@ export function QueryResultViewer({
     theme,
     tenantName,
     queryText,
-    isCancelling,
-    isCancelError,
     tableSettings,
-    onCancelRunningQuery,
     onCollapseResults,
     onExpandResults,
 }: ExecuteResultProps) {
@@ -301,11 +294,6 @@ export function QueryResultViewer({
                 {isLoading ? (
                     <React.Fragment>
                         <ElapsedTime className={b('elapsed-time')} />
-                        <CancelQueryButton
-                            isLoading={isCancelling}
-                            isError={isCancelError}
-                            onClick={onCancelRunningQuery}
-                        />
                     </React.Fragment>
                 ) : null}
                 {data?.traceId && isExecute ? <TraceButton traceId={data.traceId} /> : null}
