@@ -37,7 +37,7 @@ export const viewSchemaApi = api.injectEndpoints({
                     return {error: error};
                 }
             },
-            providesTags: ['All'],
+            providesTags: ['All', 'SchemaTree'],
         }),
     }),
     overrideExisting: 'throw',
