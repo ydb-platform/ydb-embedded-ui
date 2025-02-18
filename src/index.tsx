@@ -1,16 +1,11 @@
 /* eslint-disable no-restricted-imports */
-/* eslint-disable import/order */
 import ReactDOM from 'react-dom/client';
-
-import '@gravity-ui/uikit/styles/styles.scss';
 
 import {ErrorBoundary} from './lib';
 import reportWebVitals from './reportWebVitals';
 import {history, store} from './store/defaultStore';
 
-import './styles/themes.scss';
-import './styles/unipika.scss';
-import './index.css';
+import './styles/index.scss';
 
 async function render() {
     let App;

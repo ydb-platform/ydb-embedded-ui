@@ -1,3 +1,7 @@
+@forward '@gravity-ui/uikit/styles/styles.scss';
+@forward './themes.scss';
+@forward './unipika.scss';
+
 body {
     margin: 0;
 
