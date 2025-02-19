@@ -22,6 +22,8 @@ interface QueryEditorControlsProps {
     highlightedAction: QueryAction;
     queryId?: string;
     tenantName: string;
+    isStreamingEnabled?: boolean;
+    runningQueryRef: React.MutableRefObject<{abort: VoidFunction} | null>;
 
     handleGetExplainQueryClick: (text: string) => void;
     handleSendExecuteClick: (text: string) => void;
@@ -37,6 +39,8 @@ export const QueryEditorControls = ({
     highlightedAction,
     queryId,
     tenantName,
+    isStreamingEnabled,
+    runningQueryRef,
 
     handleSendExecuteClick,
     onSettingsButtonClick,
@@ -67,7 +71,11 @@ export const QueryEditorControls = ({
     const onStopButtonClick = React.useCallback(async () => {
         if (queryId) {
             try {
-                await sendCancelQuery({queryId, database: tenantName}).unwrap();
+                if (isStreamingEnabled && runningQueryRef.current) {
+                    runningQueryRef.current.abort();
+                } else if (queryId) {
+                    sendCancelQuery({queryId, database: tenantName}).unwrap();
+                }
             } catch {
                 createToast({
                     name: 'stop-error',
@@ -78,7 +86,8 @@ export const QueryEditorControls = ({
                 });
             }
         }
-    }, [queryId, sendCancelQuery, tenantName]);
+    }, [isStreamingEnabled, queryId, runningQueryRef, sendCancelQuery, tenantName]);
+
     const isRunHighlighted = highlightedAction === 'execute';
     const isExplainHighlighted = highlightedAction === 'explain';
 
