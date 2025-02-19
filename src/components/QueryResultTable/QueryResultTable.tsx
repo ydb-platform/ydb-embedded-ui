@@ -81,11 +81,18 @@ interface QueryResultTableProps
 }
 
 export const QueryResultTable = (props: QueryResultTableProps) => {
-    const {columns: rawColumns, data, ...restProps} = props;
+    const {columns, data, settings: propsSettings} = props;
 
-    const columns = React.useMemo(() => {
-        return rawColumns ? prepareTypedColumns(rawColumns, data) : prepareGenericColumns(data);
-    }, [data, rawColumns]);
+    const preparedColumns = React.useMemo(() => {
+        return columns ? prepareTypedColumns(columns, data) : prepareGenericColumns(data);
+    }, [data, columns]);
+
+    const settings = React.useMemo(() => {
+        return {
+            ...TABLE_SETTINGS,
+            ...propsSettings,
+        };
+    }, [propsSettings]);
 
     // empty data is expected to be be an empty array
     // undefined data is not rendered at all
@@ -93,20 +100,19 @@ export const QueryResultTable = (props: QueryResultTableProps) => {
         return null;
     }
 
-    if (!columns.length) {
+    if (!preparedColumns.length) {
         return <div className={b('message')}>{i18n('empty')}</div>;
     }
 
     return (
         <ResizeableDataTable
             data={data}
-            columns={columns}
-            settings={{...TABLE_SETTINGS, ...props.settings}}
+            columns={preparedColumns}
+            settings={settings}
             // prevent accessing row.id in case it is present but is not the PK (i.e. may repeat)
             rowKey={getRowIndex}
             visibleRowIndex={getVisibleRowIndex}
             wrapperClassName={b('table-wrapper')}
-            {...restProps}
         />
     );
 };

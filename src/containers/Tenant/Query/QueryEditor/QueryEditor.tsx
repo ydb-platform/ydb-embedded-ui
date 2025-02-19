@@ -40,7 +40,7 @@ import {
 } from '../../../../utils/hooks';
 import {useChangedQuerySettings} from '../../../../utils/hooks/useChangedQuerySettings';
 import {useLastQueryExecutionSettings} from '../../../../utils/hooks/useLastQueryExecutionSettings';
-import {QUERY_ACTIONS} from '../../../../utils/query';
+import {DEFAULT_QUERY_SETTINGS, QUERY_ACTIONS} from '../../../../utils/query';
 import type {InitialPaneState} from '../../utils/paneVisibilityToggleHelpers';
 import {
     PaneVisibilityActionTypes,
@@ -100,6 +100,16 @@ export default function QueryEditor(props: QueryEditorProps) {
     const [sendCancelQuery, cancelQueryResponse] = cancelQueryApi.useCancelQueryMutation();
 
     const runningQueryRef = React.useRef<{abort: VoidFunction} | null>(null);
+
+    const tableSettings = React.useMemo(() => {
+        return isStreamingEnabled
+            ? {
+                  displayIndices: {
+                      maxIndex: (querySettings.limitRows || DEFAULT_QUERY_SETTINGS.limitRows) + 1,
+                  },
+              }
+            : undefined;
+    }, [isStreamingEnabled, querySettings.limitRows]);
 
     React.useEffect(() => {
         if (savedPath !== tenantName) {
@@ -266,11 +276,7 @@ export default function QueryEditor(props: QueryEditorProps) {
                         showPreview={showPreview}
                         queryText={lastExecutedQueryText}
                         onCancelRunningQuery={handleCancelRunningQuery}
-                        tableSettings={
-                            isStreamingEnabled && querySettings.limitRows
-                                ? {displayIndices: {maxIndex: querySettings.limitRows}}
-                                : undefined
-                        }
+                        tableSettings={tableSettings}
                     />
                 </div>
             </SplitPane>
