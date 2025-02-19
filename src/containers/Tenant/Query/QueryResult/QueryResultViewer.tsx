@@ -2,10 +2,8 @@ import React from 'react';
 
 import type {Settings} from '@gravity-ui/react-data-table';
 import type {ControlGroupOption} from '@gravity-ui/uikit';
-import {ClipboardButton, RadioButton} from '@gravity-ui/uikit';
+import {ClipboardButton, Loader, RadioButton} from '@gravity-ui/uikit';
 
-import Divider from '../../../../components/Divider/Divider';
-import ElapsedTime from '../../../../components/ElapsedTime/ElapsedTime';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
@@ -273,29 +271,22 @@ export function QueryResultViewer({
     const renderLeftControls = () => {
         return (
             <div className={b('controls-left')}>
-                <QueryExecutionStatus error={error} loading={isLoading} />
                 {!error && !isLoading && (
                     <React.Fragment>
                         {valueIsDefined(stats?.DurationUs) ? (
                             <QueryDuration duration={Number(stats.DurationUs)} />
                         ) : null}
                         {radioButtonOptions.length && activeSection ? (
-                            <React.Fragment>
-                                <Divider />
-                                <RadioButton
-                                    options={radioButtonOptions}
-                                    value={activeSection}
-                                    onUpdate={onSelectSection}
-                                />
-                            </React.Fragment>
+                            <RadioButton
+                                options={radioButtonOptions}
+                                value={activeSection}
+                                onUpdate={onSelectSection}
+                            />
                         ) : null}
                     </React.Fragment>
                 )}
-                {isLoading ? (
-                    <React.Fragment>
-                        <ElapsedTime className={b('elapsed-time')} />
-                    </React.Fragment>
-                ) : null}
+                <QueryExecutionStatus error={error} loading={isLoading} />
+                {isLoading ? <Loader size="s" /> : null}
                 {data?.traceId && isExecute ? <TraceButton traceId={data.traceId} /> : null}
             </div>
         );

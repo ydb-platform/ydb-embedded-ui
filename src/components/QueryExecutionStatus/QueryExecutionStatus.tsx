@@ -1,20 +1,20 @@
 import React from 'react';
 
 import {
-    CircleCheck,
-    CircleInfo,
+    CircleCheckFill,
+    CircleDashed,
     CircleQuestionFill,
     CircleStop,
     CircleXmark,
 } from '@gravity-ui/icons';
-import {Icon, Spin, Tooltip} from '@gravity-ui/uikit';
+import type {LabelProps, TextProps} from '@gravity-ui/uikit';
+import {Icon, Label, Text} from '@gravity-ui/uikit';
 
-import i18n from '../../containers/Tenant/Query/i18n';
 import {isQueryCancelledError} from '../../containers/Tenant/Query/utils/isQueryCancelledError';
 import {cn} from '../../utils/cn';
-import {useChangedQuerySettings} from '../../utils/hooks/useChangedQuerySettings';
 import {isAxiosError} from '../../utils/response';
-import QuerySettingsDescription from '../QuerySettingsDescription/QuerySettingsDescription';
+
+import {useElapsedTime} from './useElapsedTime';
 
 import './QueryExecutionStatus.scss';
 
@@ -26,46 +26,36 @@ interface QueryExecutionStatusProps {
     loading?: boolean;
 }
 
-const QuerySettingsIndicator = () => {
-    const {isIndicatorShown, changedLastExecutionSettingsDescriptions} = useChangedQuerySettings();
-
-    if (!isIndicatorShown) {
-        return null;
-    }
-
-    return (
-        <Tooltip
-            openDelay={0}
-            content={
-                <QuerySettingsDescription
-                    prefix={i18n('banner.query-settings.message')}
-                    querySettings={changedLastExecutionSettingsDescriptions}
-                />
-            }
-        >
-            <Icon data={CircleInfo} className={b('query-settings-icon')} />
-        </Tooltip>
-    );
-};
-
 export const QueryExecutionStatus = ({className, error, loading}: QueryExecutionStatusProps) => {
     let icon: React.ReactNode;
     let label: string;
+    let theme: LabelProps['theme'];
+    let textColor: TextProps['color'];
+
+    const elapsedTime = useElapsedTime(loading);
 
     if (loading) {
-        icon = <Spin size="xs" />;
+        theme = 'info';
+        textColor = 'info-heavy';
+        icon = <Icon data={CircleDashed} />;
         label = 'Running';
     } else if (isAxiosError(error) && error.code === 'ECONNABORTED') {
+        theme = 'danger';
+        textColor = 'danger-heavy';
         icon = <Icon data={CircleQuestionFill} />;
         label = 'Connection aborted';
     } else if (isQueryCancelledError(error)) {
-        icon = <Icon data={CircleStop} />;
+        theme = 'danger';
+        textColor = 'danger-heavy';
+        icon = <Icon data={CircleStop} className={b('result-status-icon', {error: true})} />;
         label = 'Stopped';
     } else {
         const hasError = Boolean(error);
+        theme = hasError ? 'danger' : 'success';
+        textColor = hasError ? 'danger-heavy' : 'positive-heavy';
         icon = (
             <Icon
-                data={hasError ? CircleXmark : CircleCheck}
+                data={hasError ? CircleXmark : CircleCheckFill}
                 className={b('result-status-icon', {error: hasError})}
             />
         );
@@ -73,10 +63,14 @@ export const QueryExecutionStatus = ({className, error, loading}: QueryExecution
     }
 
     return (
-        <div className={b(null, className)}>
-            {icon}
-            {label}
-            {isQueryCancelledError(error) || loading ? null : <QuerySettingsIndicator />}
-        </div>
+        <Label
+            theme={theme}
+            size="m"
+            className={b(null, className)}
+            icon={icon}
+            value={elapsedTime}
+        >
+            <Text color={textColor}>{label}</Text>
+        </Label>
     );
 };
