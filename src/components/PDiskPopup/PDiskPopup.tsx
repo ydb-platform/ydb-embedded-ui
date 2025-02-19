@@ -1,6 +1,5 @@
 import React from 'react';
 
-import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
 import {valueIsDefined} from '../../utils';
@@ -8,6 +7,7 @@ import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {createPDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import type {PreparedPDisk} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
+import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToGB, isNumeric} from '../../utils/utils';
 import {InfoViewer} from '../InfoViewer';
 import type {InfoViewerItem} from '../InfoViewer';
@@ -92,7 +92,7 @@ interface PDiskPopupProps {
 }
 
 export const PDiskPopup = ({data}: PDiskPopupProps) => {
-    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const nodesMap = useTypedSelector(selectNodesMap);
     const nodeData = valueIsDefined(data.NodeId) ? nodesMap?.get(data.NodeId) : undefined;
     const info = React.useMemo(

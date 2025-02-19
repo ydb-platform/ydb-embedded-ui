@@ -1,5 +1,4 @@
 import {useAdditionalNodeProps} from '../../containers/AppWithClusters/useClusterData';
-import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import type {PreparedNode} from '../../store/reducers/node/types';
 import {
@@ -7,12 +6,12 @@ import {
     createDeveloperUILinkWithNodeId,
 } from '../developerUI/developerUI';
 
-import {useTypedSelector} from './useTypedSelector';
+import {useIsUserAllowedToMakeChanges} from './useIsUserAllowedToMakeChanges';
 
 export function useNodeDeveloperUIHref(node?: PreparedNode) {
     const {balancer} = useClusterBaseInfo();
     const {additionalNodesProps} = useAdditionalNodeProps({balancer});
-    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
     if (!isUserAllowedToMakeChanges) {
         return undefined;

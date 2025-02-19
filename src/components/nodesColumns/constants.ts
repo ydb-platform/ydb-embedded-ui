@@ -35,6 +35,13 @@ export const NODES_COLUMNS_IDS = {
 
 export type NodesColumnId = ValueOf<typeof NODES_COLUMNS_IDS>;
 
+// Columns, that should displayed only for users with isMonitoringAllowed:true
+const MONITORING_USER_COLUMNS_IDS: NodesColumnId[] = ['Pools', 'Memory'];
+
+export function isMonitoringUserNodesColumn(columnId: string): boolean {
+    return MONITORING_USER_COLUMNS_IDS.includes(columnId as NodesColumnId);
+}
+
 // This code is running when module is initialized and correct language may not be set yet
 // get functions guarantee that i18n fields will be inited on render with current render language
 export const NODES_COLUMNS_TITLES = {

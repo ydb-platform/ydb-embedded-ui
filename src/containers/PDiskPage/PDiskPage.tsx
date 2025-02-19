@@ -16,7 +16,6 @@ import {PDiskInfo} from '../../components/PDiskInfo/PDiskInfo';
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import {getPDiskPagePath} from '../../routes';
 import {api} from '../../store/reducers/api';
-import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {pDiskApi} from '../../store/reducers/pdisk/pdisk';
@@ -24,7 +23,8 @@ import type {EDecommitStatus} from '../../types/api/pdisk';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {getPDiskId, getSeverityColor} from '../../utils/disks/helpers';
-import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
+import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 
 import {DecommissionButton} from './DecommissionButton/DecommissionButton';
@@ -61,7 +61,7 @@ const pDiskTabSchema = z.nativeEnum(PDISK_TABS_IDS).catch(PDISK_TABS_IDS.spaceDi
 export function PDiskPage() {
     const dispatch = useTypedDispatch();
 
-    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const newDiskApiAvailable = useDiskPagesAvailable();
     const containerRef = React.useRef<HTMLDivElement>(null);
 

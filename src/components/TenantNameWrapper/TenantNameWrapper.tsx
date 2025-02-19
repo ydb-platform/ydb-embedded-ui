@@ -1,10 +1,9 @@
 import {DefinitionList, PopoverBehavior} from '@gravity-ui/uikit';
 
 import {getTenantPath} from '../../containers/Tenant/TenantPages';
-import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import type {AdditionalTenantsProps, NodeAddress} from '../../types/additionalProps';
-import {useTypedSelector} from '../../utils/hooks';
+import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
@@ -34,7 +33,7 @@ const getTenantBackend = (
 };
 
 export function TenantNameWrapper({tenant, additionalTenantsProps}: TenantNameWrapperProps) {
-    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
     const backend = getTenantBackend(tenant, additionalTenantsProps);
     const isExternalLink = Boolean(backend);

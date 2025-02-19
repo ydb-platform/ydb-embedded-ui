@@ -10,12 +10,11 @@ import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
 import {TabletNameWrapper} from '../../components/TabletNameWrapper/TabletNameWrapper';
 import {TabletState} from '../../components/TabletState/TabletState';
 import {TabletUptime} from '../../components/UptimeViewer/UptimeViewer';
-import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {tabletApi} from '../../store/reducers/tablet';
 import {ETabletState} from '../../types/api/tablet';
 import type {TTabletStateInfo} from '../../types/api/tablet';
 import {DEFAULT_TABLE_SETTINGS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {useTypedSelector} from '../../utils/hooks';
+import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {getDefaultNodePath} from '../Node/NodePages';
 
 import i18n from './i18n';
@@ -118,7 +117,7 @@ function getColumns({database}: {database?: string}) {
 
 function TabletActions(tablet: TTabletStateInfo) {
     const isDisabledRestart = tablet.State === ETabletState.Stopped;
-    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const [killTablet] = tabletApi.useKillTabletMutation();
 
     const id = tablet.TabletId;
