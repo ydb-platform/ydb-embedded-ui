@@ -1,5 +1,11 @@
 import type {Actions} from '../../../types/api/query';
 import type {QueryAction, QueryMode, QuerySyntax} from '../../../types/store/query';
+import type {
+    QueryResponseChunk,
+    SessionChunk,
+    StreamDataChunk,
+    StreamingChunk,
+} from '../../../types/store/streaming';
 
 import type {QueryInHistory} from './types';
 
@@ -27,4 +33,16 @@ export function getQueryInHistory(rawQuery: string | QueryInHistory) {
         };
     }
     return rawQuery;
+}
+
+export function isSessionChunk(content: StreamingChunk): content is SessionChunk {
+    return content?.meta?.event === 'SessionCreated';
+}
+
+export function isStreamDataChunk(content: StreamingChunk): content is StreamDataChunk {
+    return content?.meta?.event === 'StreamData';
+}
+
+export function isQueryResponseChunk(content: StreamingChunk): content is QueryResponseChunk {
+    return content?.meta?.event === 'QueryResponse';
 }

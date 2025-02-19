@@ -7,7 +7,8 @@ export const isNetworkError = (error: unknown): error is NetworkError => {
         error &&
             typeof error === 'object' &&
             'message' in error &&
-            error.message === 'Network Error',
+            typeof error.message === 'string' &&
+            error.message.toLowerCase() === 'network error',
     );
 };
 

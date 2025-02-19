@@ -17,6 +17,9 @@
   "settings.editor.codeAssistant.title": "Code Assistant",
   "settings.editor.codeAssistant.description": "Use Code Assistant for autocomplete.",
 
+  "settings.editor.queryStreaming.title": "Query Streaming",
+  "settings.editor.queryStreaming.description": "Use streaming api for query results.",
+
   "settings.editor.autocomplete-on-enter.title": "Accept suggestion on Enter",
   "settings.editor.autocomplete-on-enter.description": "Controls whether suggestions should be accepted on Enter, in addition to Tab. Helps to avoid ambiguity between inserting new lines or accepting suggestions.",
 

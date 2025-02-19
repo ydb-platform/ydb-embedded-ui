@@ -1,5 +1,5 @@
 import {TRACING_LEVELS} from '../../utils/query';
-import type {StatisticsMode} from '../store/query';
+import type {QuerySyntax, StatisticsMode, TransactionMode} from '../store/query';
 
 // ==== types from backend protos ====
 interface Position {
@@ -314,6 +314,24 @@ export type GenericExecuteResponse<Action extends ExecuteActions> = Action exten
 export type CancelResponse = {
     stats?: TKqpStatsQuery;
 };
+
+export interface SendQueryParams<Action extends Actions> {
+    query?: string;
+    database?: string;
+    action?: Action;
+    syntax?: QuerySyntax;
+    stats?: Stats;
+    tracingLevel?: TracingLevel;
+    transaction_mode?: TransactionMode;
+    timeout?: Timeout;
+    query_id?: string;
+    limit_rows?: number;
+}
+
+export interface StreamQueryParams<Action extends Actions> extends SendQueryParams<Action> {
+    output_chunk_max_size?: number;
+    concurrent_results?: boolean;
+}
 
 // ==== Combined API response ====
 export type QueryAPIResponseByAction<Action extends Actions> = Action extends ExplainActions

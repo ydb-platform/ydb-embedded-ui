@@ -64,3 +64,7 @@ export const useFeatureFlagsAvailable = () => {
 export const useClusterDashboardAvailable = () => {
     return useGetFeatureVersion('/viewer/cluster') > 4;
 };
+
+export const useStreamingAvailable = () => {
+    return useGetFeatureVersion('/viewer/query') >= 7;
+};

@@ -9,4 +9,10 @@
     &__message {
         padding: 15px 10px;
     }
+
+    // Must have fixed height for frequent data updates (to avoid interface shaking).
+    // Will be fixed after migration to new @gravity-ui/table.
+    &__table-wrapper {
+        height: 0px;
+    }
 }

@@ -1,10 +1,15 @@
 import React from 'react';
 
+import type {Settings} from '@gravity-ui/react-data-table';
 import {isEqual} from 'lodash';
 import {v4 as uuidv4} from 'uuid';
 
 import SplitPane from '../../../../components/SplitPane';
-import {useTracingLevelOptionAvailable} from '../../../../store/reducers/capabilities/hooks';
+import {cancelQueryApi} from '../../../../store/reducers/cancelQuery';
+import {
+    useStreamingAvailable,
+    useTracingLevelOptionAvailable,
+} from '../../../../store/reducers/capabilities/hooks';
 import {
     queryApi,
     saveQueryToHistory,
@@ -23,6 +28,7 @@ import {cn} from '../../../../utils/cn';
 import {
     DEFAULT_IS_QUERY_RESULT_COLLAPSED,
     DEFAULT_SIZE_RESULT_PANE_KEY,
+    ENABLE_QUERY_STREAMING,
     LAST_USED_QUERY_ACTION_KEY,
 } from '../../../../utils/constants';
 import {
@@ -34,7 +40,7 @@ import {
 } from '../../../../utils/hooks';
 import {useChangedQuerySettings} from '../../../../utils/hooks/useChangedQuerySettings';
 import {useLastQueryExecutionSettings} from '../../../../utils/hooks/useLastQueryExecutionSettings';
-import {QUERY_ACTIONS} from '../../../../utils/query';
+import {DEFAULT_QUERY_SETTINGS, QUERY_ACTIONS} from '../../../../utils/query';
 import type {InitialPaneState} from '../../utils/paneVisibilityToggleHelpers';
 import {
     PaneVisibilityActionTypes,
@@ -86,8 +92,24 @@ export default function QueryEditor(props: QueryEditorProps) {
         LAST_USED_QUERY_ACTION_KEY,
     );
     const [lastExecutedQueryText, setLastExecutedQueryText] = React.useState<string>('');
+    const [isQueryStreamingEnabled] = useSetting(ENABLE_QUERY_STREAMING);
+    const isStreamingEnabled = useStreamingAvailable() && isQueryStreamingEnabled;
 
     const [sendQuery] = queryApi.useUseSendQueryMutation();
+    const [streamQuery] = queryApi.useUseStreamQueryMutation();
+    const [sendCancelQuery, cancelQueryResponse] = cancelQueryApi.useCancelQueryMutation();
+
+    const runningQueryRef = React.useRef<{abort: VoidFunction} | null>(null);
+
+    const tableSettings = React.useMemo(() => {
+        return isStreamingEnabled
+            ? {
+                  displayIndices: {
+                      maxIndex: (querySettings.limitRows || DEFAULT_QUERY_SETTINGS.limitRows) + 1,
+                  },
+              }
+            : undefined;
+    }, [isStreamingEnabled, querySettings.limitRows]);
 
     React.useEffect(() => {
         if (savedPath !== tenantName) {
@@ -121,14 +143,25 @@ export default function QueryEditor(props: QueryEditorProps) {
         }
         const queryId = uuidv4();
 
-        sendQuery({
-            actionType: 'execute',
-            query: text,
-            database: tenantName,
-            querySettings,
-            enableTracingLevel,
-            queryId,
-        });
+        if (isStreamingEnabled) {
+            runningQueryRef.current = streamQuery({
+                actionType: 'execute',
+                query: text,
+                database: tenantName,
+                querySettings,
+                enableTracingLevel,
+                queryId,
+            });
+        } else {
+            runningQueryRef.current = sendQuery({
+                actionType: 'execute',
+                query: text,
+                database: tenantName,
+                querySettings,
+                enableTracingLevel,
+                queryId,
+            });
+        }
 
         dispatch(setShowPreview(false));
 
@@ -155,7 +188,7 @@ export default function QueryEditor(props: QueryEditorProps) {
 
         const queryId = uuidv4();
 
-        sendQuery({
+        runningQueryRef.current = sendQuery({
             actionType: 'explain',
             query: text,
             database: tenantName,
@@ -168,6 +201,14 @@ export default function QueryEditor(props: QueryEditorProps) {
 
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
     });
+
+    const handleCancelRunningQuery = React.useCallback(() => {
+        if (isStreamingEnabled && runningQueryRef.current) {
+            runningQueryRef.current.abort();
+        } else if (result?.queryId) {
+            sendCancelQuery({queryId: result?.queryId, database: tenantName});
+        }
+    }, [isStreamingEnabled, result?.queryId, sendCancelQuery, tenantName]);
 
     const onCollapseResultHandler = () => {
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerCollapse);
@@ -229,10 +270,13 @@ export default function QueryEditor(props: QueryEditorProps) {
                         theme={theme}
                         key={result?.queryId}
                         result={result}
+                        cancelQueryResponse={cancelQueryResponse}
                         tenantName={tenantName}
                         path={path}
                         showPreview={showPreview}
                         queryText={lastExecutedQueryText}
+                        onCancelRunningQuery={handleCancelRunningQuery}
+                        tableSettings={tableSettings}
                     />
                 </div>
             </SplitPane>
@@ -248,13 +292,17 @@ interface ResultProps {
     type?: EPathType;
     theme: string;
     result?: QueryResult;
+    cancelQueryResponse?: Pick<QueryResult, 'isLoading' | 'error'>;
     tenantName: string;
     path: string;
     showPreview?: boolean;
     queryText: string;
+    tableSettings?: Partial<Settings>;
+    onCancelRunningQuery: VoidFunction;
 }
 function Result({
     resultVisibilityState,
+    cancelQueryResponse,
     onExpandResultHandler,
     onCollapseResultHandler,
     type,
@@ -264,6 +312,8 @@ function Result({
     path,
     showPreview,
     queryText,
+    tableSettings,
+    onCancelRunningQuery,
 }: ResultProps) {
     if (showPreview) {
         return <Preview database={tenantName} path={path} type={type} />;
@@ -277,9 +327,13 @@ function Result({
                 theme={theme}
                 tenantName={tenantName}
                 isResultsCollapsed={resultVisibilityState.collapsed}
+                isCancelError={Boolean(cancelQueryResponse?.error)}
+                isCancelling={Boolean(cancelQueryResponse?.isLoading)}
+                tableSettings={tableSettings}
                 onExpandResults={onExpandResultHandler}
                 onCollapseResults={onCollapseResultHandler}
                 queryText={queryText}
+                onCancelRunningQuery={onCancelRunningQuery}
             />
         );
     }

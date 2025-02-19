@@ -1,5 +1,6 @@
 import React from 'react';
 
+import type {Settings} from '@gravity-ui/react-data-table';
 import type {ControlGroupOption} from '@gravity-ui/uikit';
 import {ClipboardButton, RadioButton} from '@gravity-ui/uikit';
 
@@ -81,9 +82,14 @@ interface ExecuteResultProps {
     isResultsCollapsed?: boolean;
     theme?: string;
     tenantName: string;
+    queryText?: string;
+    tableSettings?: Partial<Settings>;
+
+    isCancelling: boolean;
+    isCancelError: boolean;
+    onCancelRunningQuery?: VoidFunction;
     onCollapseResults: VoidFunction;
     onExpandResults: VoidFunction;
-    queryText?: string;
 }
 
 export function QueryResultViewer({
@@ -93,6 +99,10 @@ export function QueryResultViewer({
     theme,
     tenantName,
     queryText,
+    isCancelling,
+    isCancelError,
+    tableSettings,
+    onCancelRunningQuery,
     onCollapseResults,
     onExpandResults,
 }: ExecuteResultProps) {
@@ -107,7 +117,7 @@ export function QueryResultViewer({
     });
     const [useShowPlanToSvg] = useSetting<boolean>(USE_SHOW_PLAN_SVG_KEY);
 
-    const {error, isLoading, queryId, data = {}} = result;
+    const {error, isLoading, data = {}} = result;
     const {preparedPlan, simplifiedPlan, stats, resultSets, ast} = data;
 
     React.useEffect(() => {
@@ -168,6 +178,10 @@ export function QueryResultViewer({
     };
 
     const renderClipboardButton = () => {
+        if (isLoading) {
+            return null;
+        }
+
         const statsToCopy = getStatsToCopy();
         const copyText = getStringifiedData(statsToCopy);
         if (!copyText) {
@@ -213,17 +227,20 @@ export function QueryResultViewer({
     };
 
     const renderResultSection = () => {
-        if (error) {
-            return <QueryResultError error={error} />;
-        }
         if (activeSection === RESULT_OPTIONS_IDS.result) {
             return (
                 <ResultSetsViewer
                     resultSets={resultSets}
+                    error={error}
                     selectedResultSet={selectedResultSet}
+                    tableSettings={tableSettings}
                     setSelectedResultSet={setSelectedResultSet}
                 />
             );
+        }
+
+        if (error) {
+            return <QueryResultError error={error} />;
         }
 
         if (activeSection === RESULT_OPTIONS_IDS.schema) {
@@ -284,7 +301,11 @@ export function QueryResultViewer({
                 {isLoading ? (
                     <React.Fragment>
                         <ElapsedTime className={b('elapsed-time')} />
-                        <CancelQueryButton queryId={queryId} tenantName={tenantName} />
+                        <CancelQueryButton
+                            isLoading={isCancelling}
+                            isError={isCancelError}
+                            onClick={onCancelRunningQuery}
+                        />
                     </React.Fragment>
                 ) : null}
                 {data?.traceId && isExecute ? <TraceButton traceId={data.traceId} /> : null}
@@ -315,7 +336,7 @@ export function QueryResultViewer({
                 {renderRightControls()}
             </div>
             {isLoading || isQueryCancelledError(error) ? null : <QuerySettingsBanner />}
-            <LoaderWrapper loading={isLoading}>
+            <LoaderWrapper loading={isLoading && !data.resultSets}>
                 <Fullscreen className={b('result')}>{renderResultSection()}</Fullscreen>
             </LoaderWrapper>
         </React.Fragment>

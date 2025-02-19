@@ -4,12 +4,19 @@ import type {PayloadAction} from '@reduxjs/toolkit';
 import {settingsManager} from '../../../services/settings';
 import {TracingLevelNumber} from '../../../types/api/query';
 import type {QueryAction, QueryRequestParams, QuerySettings} from '../../../types/store/query';
+import type {StreamDataChunk} from '../../../types/store/streaming';
 import {QUERIES_HISTORY_KEY} from '../../../utils/constants';
 import {isQueryErrorResponse} from '../../../utils/query';
 import {isNumeric} from '../../../utils/utils';
+import type {RootState} from '../../defaultStore';
 import {api} from '../api';
 
 import {prepareQueryData} from './prepareQueryData';
+import {
+    addStreamingChunks as addStreamingChunksReducer,
+    setStreamQueryResponse as setStreamQueryResponseReducer,
+    setStreamSession as setStreamSessionReducer,
+} from './streamingReducers';
 import type {QueryResult, QueryState} from './types';
 import {getActionAndSyntaxFromQueryMode, getQueryInHistory} from './utils';
 
@@ -117,6 +124,9 @@ const slice = createSlice({
         setQueryHistoryFilter: (state, action: PayloadAction<string>) => {
             state.history.filter = action.payload;
         },
+        setStreamSession: setStreamSessionReducer,
+        addStreamingChunks: addStreamingChunksReducer,
+        setStreamQueryResponse: setStreamQueryResponseReducer,
     },
     selectors: {
         selectQueriesHistoryFilter: (state) => state.history.filter || '',
@@ -145,7 +155,11 @@ export const {
     goToNextQuery,
     setTenantPath,
     setQueryHistoryFilter,
+    addStreamingChunks,
+    setStreamQueryResponse,
+    setStreamSession,
 } = slice.actions;
+
 export const {
     selectQueriesHistoryFilter,
     selectQueriesHistoryCurrentIndex,
@@ -169,8 +183,98 @@ interface QueryStats {
     endTime?: string | number;
 }
 
+const DEFAULT_STREAM_CHUNK_SIZE = 1000;
+const DEFAULT_CONCURRENT_RESULTS = false;
+
 export const queryApi = api.injectEndpoints({
     endpoints: (build) => ({
+        useStreamQuery: build.mutation<null, SendQueryParams>({
+            queryFn: async (
+                {query, database, querySettings = {}, enableTracingLevel, queryId},
+                {signal, dispatch, getState},
+            ) => {
+                dispatch(setQueryResult({type: 'execute', queryId, isLoading: true}));
+
+                const {action, syntax} = getActionAndSyntaxFromQueryMode(
+                    'execute',
+                    querySettings?.queryMode,
+                );
+
+                try {
+                    let streamDataChunkBatch: StreamDataChunk[] = [];
+                    let batchTimeout: number | null = null;
+
+                    const flushBatch = () => {
+                        if (streamDataChunkBatch.length > 0) {
+                            dispatch(addStreamingChunks(streamDataChunkBatch));
+                            streamDataChunkBatch = [];
+                        }
+                        batchTimeout = null;
+                    };
+
+                    await window.api.streaming.streamQuery(
+                        {
+                            query,
+                            database,
+                            action,
+                            syntax,
+                            stats: querySettings.statisticsMode,
+                            tracingLevel:
+                                querySettings.tracingLevel && enableTracingLevel
+                                    ? TracingLevelNumber[querySettings.tracingLevel]
+                                    : undefined,
+                            limit_rows: isNumeric(querySettings.limitRows)
+                                ? Number(querySettings.limitRows)
+                                : undefined,
+                            transaction_mode:
+                                querySettings.transactionMode === 'implicit'
+                                    ? undefined
+                                    : querySettings.transactionMode,
+                            timeout: isNumeric(querySettings.timeout)
+                                ? Number(querySettings.timeout) * 1000
+                                : undefined,
+                            output_chunk_max_size: DEFAULT_STREAM_CHUNK_SIZE,
+                            concurrent_results: DEFAULT_CONCURRENT_RESULTS || undefined,
+                        },
+                        {
+                            signal,
+                            onQueryResponseChunk: (chunk) => {
+                                dispatch(setStreamQueryResponse(chunk));
+                            },
+                            onSessionChunk: (chunk) => {
+                                dispatch(setStreamSession(chunk));
+                            },
+                            onStreamDataChunk: (chunk) => {
+                                streamDataChunkBatch.push(chunk);
+                                if (!batchTimeout) {
+                                    batchTimeout = window.requestAnimationFrame(flushBatch);
+                                }
+                            },
+                        },
+                    );
+
+                    // Flush any remaining chunks
+                    if (batchTimeout) {
+                        window.cancelAnimationFrame(batchTimeout);
+                        flushBatch();
+                    }
+
+                    return {data: null};
+                } catch (error) {
+                    const state = getState() as RootState;
+                    dispatch(
+                        setQueryResult({
+                            ...state.query.result,
+                            type: 'execute',
+                            error,
+                            isLoading: false,
+                            queryId,
+                        }),
+                    );
+                    return {error};
+                }
+            },
+        }),
         useSendQuery: build.mutation<null, SendQueryParams>({
             queryFn: async (
                 {

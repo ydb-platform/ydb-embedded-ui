@@ -8,6 +8,7 @@ import {
     ENABLE_AUTOCOMPLETE,
     ENABLE_CODE_ASSISTANT,
     ENABLE_NETWORK_TABLE_KEY,
+    ENABLE_QUERY_STREAMING,
     INVERTED_DISKS_KEY,
     LANGUAGE_KEY,
     SHOW_DOMAIN_DATABASE_KEY,
@@ -127,6 +128,12 @@ export const enableCodeAssistantSetting: SettingProps = {
     description: i18n('settings.editor.codeAssistant.description'),
 };
 
+export const enableQueryStreamingSetting: SettingProps = {
+    settingKey: ENABLE_QUERY_STREAMING,
+    title: i18n('settings.editor.queryStreaming.title'),
+    description: i18n('settings.editor.queryStreaming.description'),
+};
+
 export const autocompleteOnEnterSetting: SettingProps = {
     settingKey: AUTOCOMPLETE_ON_ENTER,
     title: i18n('settings.editor.autocomplete-on-enter.title'),
@@ -153,7 +160,7 @@ export const appearanceSection: SettingsSection = {
 export const experimentsSection: SettingsSection = {
     id: 'experimentsSection',
     title: i18n('section.experiments'),
-    settings: [enableNetworkTable, useShowPlanToSvgTables],
+    settings: [enableNetworkTable, useShowPlanToSvgTables, enableQueryStreamingSetting],
 };
 
 export const devSettingsSection: SettingsSection = {

@@ -1,3 +1,4 @@
+import type {Settings} from '@gravity-ui/react-data-table';
 import {Tabs, Text} from '@gravity-ui/uikit';
 
 import {QueryResultTable} from '../../../../../../components/QueryResultTable';
@@ -5,6 +6,7 @@ import type {ParsedResultSet} from '../../../../../../types/store/query';
 import {getArray} from '../../../../../../utils';
 import {cn} from '../../../../../../utils/cn';
 import i18n from '../../i18n';
+import {QueryResultError} from '../QueryResultError/QueryResultError';
 
 import './ResultSetsViewer.scss';
 
@@ -13,14 +15,14 @@ const b = cn('ydb-query-result-sets-viewer');
 interface ResultSetsViewerProps {
     resultSets?: ParsedResultSet[];
     selectedResultSet: number;
+    error?: unknown;
+    tableSettings?: Partial<Settings>;
     setSelectedResultSet: (resultSet: number) => void;
 }
 
-export function ResultSetsViewer({
-    resultSets,
-    selectedResultSet,
-    setSelectedResultSet,
-}: ResultSetsViewerProps) {
+export function ResultSetsViewer(props: ResultSetsViewerProps) {
+    const {selectedResultSet, setSelectedResultSet, resultSets, error} = props;
+
     const resultsSetsCount = resultSets?.length || 0;
     const currentResult = resultSets?.[selectedResultSet];
 
@@ -54,11 +56,13 @@ export function ResultSetsViewer({
                     {currentResult?.truncated ? i18n('title.truncated') : i18n('title.result')}
                 </Text>
                 {currentResult?.result ? (
-                    <Text
-                        color="secondary"
-                        variant="body-2"
-                        className={b('row-count')}
-                    >{`(${currentResult?.result.length})`}</Text>
+                    <Text color="secondary" variant="body-2" className={b('row-count')}>
+                        {`(${currentResult?.result.length}${
+                            currentResult.streamMetrics?.rowsPerSecond
+                                ? `, ${currentResult.streamMetrics.rowsPerSecond.toFixed(0)} rows/s`
+                                : ''
+                        })`}
+                    </Text>
                 ) : null}
             </div>
         );
@@ -67,10 +71,15 @@ export function ResultSetsViewer({
     return (
         <div className={b('result-wrapper')}>
             {renderTabs()}
+            {props.error ? <QueryResultError error={error} /> : null}
             {currentResult ? (
                 <div className={b('result')}>
                     {renderResultHeadWithCount()}
-                    <QueryResultTable data={currentResult.result} columns={currentResult.columns} />
+                    <QueryResultTable
+                        settings={props.tableSettings}
+                        data={currentResult.result}
+                        columns={currentResult.columns}
+                    />
                 </div>
             ) : null}
         </div>

@@ -15,9 +15,7 @@ import type {
     Actions,
     ErrorResponse,
     QueryAPIResponse,
-    Stats,
-    Timeout,
-    TracingLevel,
+    SendQueryParams,
 } from '../../types/api/query';
 import type {JsonRenderRequestParams, JsonRenderResponse} from '../../types/api/render';
 import type {TEvDescribeSchemeResult} from '../../types/api/schema';
@@ -32,7 +30,6 @@ import type {TTenantInfo, TTenants} from '../../types/api/tenant';
 import type {DescribeTopicResult} from '../../types/api/topic';
 import type {TEvVDiskStateResponse} from '../../types/api/vdisk';
 import type {TUserToken} from '../../types/api/whoami';
-import type {QuerySyntax, TransactionMode} from '../../types/store/query';
 import {BINARY_DATA_IN_PLAIN_TEXT_DISPLAY} from '../../utils/constants';
 import type {Nullable} from '../../utils/typecheckers';
 import {settingsManager} from '../settings';
@@ -329,18 +326,7 @@ export class ViewerAPI extends BaseYdbAPI {
     }
 
     sendQuery<Action extends Actions>(
-        params: {
-            query?: string;
-            database?: string;
-            action?: Action;
-            syntax?: QuerySyntax;
-            stats?: Stats;
-            tracingLevel?: TracingLevel;
-            transaction_mode?: TransactionMode;
-            timeout?: Timeout;
-            query_id?: string;
-            limit_rows?: number;
-        },
+        params: SendQueryParams<Action>,
         {concurrentId, signal, withRetries}: AxiosOptions = {},
     ) {
         const base64 = !settingsManager.readUserSettingsValue(
