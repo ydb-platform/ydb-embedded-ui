@@ -7,12 +7,11 @@ import {LinkWithIcon} from '../../../../components/LinkWithIcon/LinkWithIcon';
 import {TabletState} from '../../../../components/TabletState/TabletState';
 import {TabletUptime} from '../../../../components/UptimeViewer/UptimeViewer';
 import {getTabletPagePath} from '../../../../routes';
-import {selectIsUserAllowedToMakeChanges} from '../../../../store/reducers/authentication/authentication';
 import {ETabletState} from '../../../../types/api/tablet';
 import type {TTabletStateInfo} from '../../../../types/api/tablet';
 import {cn} from '../../../../utils/cn';
 import {createTabletDeveloperUIHref} from '../../../../utils/developerUI/developerUI';
-import {useTypedSelector} from '../../../../utils/hooks';
+import {useIsUserAllowedToMakeChanges} from '../../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {getDefaultNodePath} from '../../../Node/NodePages';
 import {hasHive} from '../../utils';
 
@@ -27,7 +26,7 @@ interface TabletInfoProps {
 }
 
 export const TabletInfo = ({tablet}: TabletInfoProps) => {
-    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
     const {
         ChangeTime,

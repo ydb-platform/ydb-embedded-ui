@@ -1,14 +1,13 @@
 import React from 'react';
 
 import {getVDiskPagePath} from '../../routes';
-import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import {getSeverityColor} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
-import {useTypedSelector} from '../../utils/hooks';
+import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToSpeed} from '../../utils/utils';
 import {InfoViewer} from '../InfoViewer';
 import type {InfoViewerProps} from '../InfoViewer/InfoViewer';
@@ -35,7 +34,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
     withTitle,
     ...infoViewerProps
 }: VDiskInfoProps<T>) {
-    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
     const {
         AllocatedSize,

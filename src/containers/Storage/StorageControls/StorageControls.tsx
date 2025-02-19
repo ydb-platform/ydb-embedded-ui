@@ -6,6 +6,7 @@ import {Select, TableColumnSetup, Text} from '@gravity-ui/uikit';
 import {EntitiesCount} from '../../../components/EntitiesCount/EntitiesCount';
 import {Search} from '../../../components/Search/Search';
 import {UptimeFilter} from '../../../components/UptimeFIlter';
+import {useIsUserAllowedToMakeChanges} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {STORAGE_GROUPS_GROUP_BY_OPTIONS} from '../StorageGroups/columns/constants';
 import {STORAGE_NODES_GROUP_BY_OPTIONS} from '../StorageNodes/columns/constants';
 import {StorageTypeFilter} from '../StorageTypeFilter/StorageTypeFilter';
@@ -48,9 +49,13 @@ export function StorageGroupsControls({
         handleStorageGroupsGroupByParamChange,
     } = useStorageQueryParams();
 
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+
     const handleGroupBySelectUpdate = (value: string[]) => {
         handleStorageGroupsGroupByParamChange(value[0]);
     };
+
+    const displayTypeSelector = withTypeSelector && isUserAllowedToMakeChanges;
 
     return (
         <React.Fragment>
@@ -60,7 +65,7 @@ export function StorageGroupsControls({
                 placeholder={i18n('controls_groups-search-placeholder')}
                 className={b('search')}
             />
-            {withTypeSelector && (
+            {displayTypeSelector && (
                 <StorageTypeFilter value={storageType} onChange={handleStorageTypeChange} />
             )}
             {withGroupBySelect ? null : (

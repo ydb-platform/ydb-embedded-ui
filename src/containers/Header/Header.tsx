@@ -6,13 +6,13 @@ import {useLocation} from 'react-router-dom';
 
 import {getConnectToDBDialog} from '../../components/ConnectToDB/ConnectToDBDialog';
 import {InternalLink} from '../../components/InternalLink';
-import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import {cn} from '../../utils/cn';
 import {DEVELOPER_UI_TITLE} from '../../utils/constants';
 import {createDeveloperUIInternalPageHref} from '../../utils/developerUI/developerUI';
 import {useTypedSelector} from '../../utils/hooks';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
+import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 
 import type {RawBreadcrumbItem} from './breadcrumbs';
 import {getBreadcrumbs} from './breadcrumbs';
@@ -28,7 +28,7 @@ interface HeaderProps {
 
 function Header({mainPage}: HeaderProps) {
     const {page, pageBreadcrumbsOptions} = useTypedSelector((state) => state.header);
-    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
     const clusterInfo = useClusterBaseInfo();
 

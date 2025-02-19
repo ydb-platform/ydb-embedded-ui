@@ -10,7 +10,6 @@ import {PDiskInfo} from '../../../components/PDiskInfo/PDiskInfo';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
 import {StatusIcon} from '../../../components/StatusIcon/StatusIcon';
 import {VDiskInfo} from '../../../components/VDiskInfo/VDiskInfo';
-import {selectIsUserAllowedToMakeChanges} from '../../../store/reducers/authentication/authentication';
 import type {
     PreparedStructurePDisk,
     PreparedStructureVDisk,
@@ -23,7 +22,7 @@ import {cn} from '../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
 import {formatStorageValuesToGb} from '../../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink} from '../../../utils/developerUI/developerUI';
-import {useTypedSelector} from '../../../utils/hooks';
+import {useIsUserAllowedToMakeChanges} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import i18n from '../i18n';
 
 import {PDiskTitleBadge} from './PDiskTitleBadge';
@@ -171,7 +170,7 @@ export function PDisk({
     nodeId,
     unfolded: unfoldedFromProps,
 }: PDiskProps) {
-    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
     const [unfolded, setUnfolded] = React.useState(unfoldedFromProps ?? false);
 
