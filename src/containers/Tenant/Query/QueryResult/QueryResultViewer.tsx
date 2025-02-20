@@ -12,13 +12,11 @@ import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import type {QueryResult} from '../../../../store/reducers/query/types';
 import type {ValueOf} from '../../../../types/common';
 import type {QueryAction} from '../../../../types/store/query';
-import {valueIsDefined} from '../../../../utils';
 import {cn} from '../../../../utils/cn';
 import {USE_SHOW_PLAN_SVG_KEY} from '../../../../utils/constants';
 import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
 import {useSetting, useTypedDispatch} from '../../../../utils/hooks';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
-import {QueryDuration} from '../QueryDuration/QueryDuration';
 import {QuerySettingsBanner} from '../QuerySettingsBanner/QuerySettingsBanner';
 import {getPreparedResult} from '../utils/getPreparedResult';
 import {isQueryCancelledError} from '../utils/isQueryCancelledError';
@@ -273,9 +271,6 @@ export function QueryResultViewer({
             <div className={b('controls-left')}>
                 {!error && (
                     <React.Fragment>
-                        {valueIsDefined(stats?.DurationUs) ? (
-                            <QueryDuration duration={Number(stats.DurationUs)} />
-                        ) : null}
                         {radioButtonOptions.length && activeSection ? (
                             <RadioButton
                                 options={radioButtonOptions}

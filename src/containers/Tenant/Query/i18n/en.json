@@ -43,8 +43,6 @@
   "statistics-mode-description.full": "Collect statistics and query plan",
   "statistics-mode-description.profile": "Collect statistics for individual tasks",
 
-  "query-duration.description": "Duration of server-side query execution",
-
   "action.send-query": "Send query",
   "action.send-selected-query": "Send selected query",
   "action.previous-query": "Previous query in history",
