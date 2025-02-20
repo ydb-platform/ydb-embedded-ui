@@ -1,14 +1,8 @@
 import React from 'react';
 
-import {
-    CircleCheckFill,
-    CircleDashed,
-    CircleQuestionFill,
-    CircleStop,
-    CircleXmark,
-} from '@gravity-ui/icons';
+import {CircleCheckFill, CircleQuestionFill, CircleStop, CircleXmark} from '@gravity-ui/icons';
 import type {LabelProps, TextProps} from '@gravity-ui/uikit';
-import {Icon, Label, Text} from '@gravity-ui/uikit';
+import {Icon, Label, Spin, Text} from '@gravity-ui/uikit';
 
 import {isQueryCancelledError} from '../../containers/Tenant/Query/utils/isQueryCancelledError';
 import {cn} from '../../utils/cn';
@@ -37,7 +31,7 @@ export const QueryExecutionStatus = ({className, error, loading}: QueryExecution
     if (loading) {
         theme = 'info';
         textColor = 'info-heavy';
-        icon = <Icon data={CircleDashed} />;
+        icon = <Spin size="xs" />;
         label = 'Running';
     } else if (isAxiosError(error) && error.code === 'ECONNABORTED') {
         theme = 'danger';

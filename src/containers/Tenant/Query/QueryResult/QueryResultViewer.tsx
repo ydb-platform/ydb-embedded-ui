@@ -2,7 +2,7 @@ import React from 'react';
 
 import type {Settings} from '@gravity-ui/react-data-table';
 import type {ControlGroupOption} from '@gravity-ui/uikit';
-import {ClipboardButton, Loader, RadioButton} from '@gravity-ui/uikit';
+import {ClipboardButton, RadioButton} from '@gravity-ui/uikit';
 
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
@@ -271,7 +271,7 @@ export function QueryResultViewer({
     const renderLeftControls = () => {
         return (
             <div className={b('controls-left')}>
-                {!error && !isLoading && (
+                {!error && (
                     <React.Fragment>
                         {valueIsDefined(stats?.DurationUs) ? (
                             <QueryDuration duration={Number(stats.DurationUs)} />
@@ -286,7 +286,6 @@ export function QueryResultViewer({
                     </React.Fragment>
                 )}
                 <QueryExecutionStatus error={error} loading={isLoading} />
-                {isLoading ? <Loader size="s" /> : null}
                 {data?.traceId && isExecute ? <TraceButton traceId={data.traceId} /> : null}
             </div>
         );
@@ -315,7 +314,7 @@ export function QueryResultViewer({
                 {renderRightControls()}
             </div>
             {isLoading || isQueryCancelledError(error) ? null : <QuerySettingsBanner />}
-            <LoaderWrapper loading={isLoading && !data.resultSets}>
+            <LoaderWrapper loading={isLoading && (!data.resultSets || activeSection !== 'result')}>
                 <Fullscreen className={b('result')}>{renderResultSection()}</Fullscreen>
             </LoaderWrapper>
         </React.Fragment>
