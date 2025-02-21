@@ -1,11 +1,10 @@
 import type {Settings} from '@gravity-ui/react-data-table';
+import type {TabsItemProps} from '@gravity-ui/uikit';
 import {Tabs, Text} from '@gravity-ui/uikit';
 
 import {QueryResultTable} from '../../../../../../components/QueryResultTable';
 import type {ParsedResultSet} from '../../../../../../types/store/query';
-import {getArray} from '../../../../../../utils';
 import {cn} from '../../../../../../utils/cn';
-import i18n from '../../i18n';
 import {QueryResultError} from '../QueryResultError/QueryResultError';
 
 import './ResultSetsViewer.scss';
@@ -23,47 +22,42 @@ interface ResultSetsViewerProps {
 export function ResultSetsViewer(props: ResultSetsViewerProps) {
     const {selectedResultSet, setSelectedResultSet, resultSets, error} = props;
 
-    const resultsSetsCount = resultSets?.length || 0;
     const currentResult = resultSets?.[selectedResultSet];
 
     const renderTabs = () => {
-        if (resultsSetsCount > 1) {
-            const tabsItems = getArray(resultsSetsCount).map((item) => ({
-                id: String(item),
-                title: `Result #${item + 1}${resultSets?.[item]?.truncated ? ' (T)' : ''}`,
-            }));
+        const tabsItems: TabsItemProps[] =
+            resultSets?.map((_, index) => {
+                const resultSet = resultSets?.[index];
+                const rowsPerSecond = resultSet?.streamMetrics?.rowsPerSecond;
+                const rowsPerSecondFormatted =
+                    rowsPerSecond && rowsPerSecond > 1000
+                        ? `${(rowsPerSecond / 1000).toFixed(0)}k`
+                        : rowsPerSecond?.toFixed(0);
+                return {
+                    id: String(index),
+                    title: (
+                        <div className={b('tab-title')}>
+                            <Text>
+                                {`Result ${resultSets.length > 1 ? `#${index + 1}${resultSets?.[index]?.truncated ? ' (T)' : ''}` : ''}`}
+                            </Text>
+                            <Text color="secondary">{resultSet.result?.length || 0}</Text>
+                        </div>
+                    ),
+                    label: {
+                        content: `${rowsPerSecondFormatted} rows/s`,
+                    },
+                };
+            }) || [];
 
-            return (
-                <div>
-                    <Tabs
-                        className={b('tabs')}
-                        size="l"
-                        items={tabsItems}
-                        activeTab={String(selectedResultSet)}
-                        onSelectTab={(tabId) => setSelectedResultSet(Number(tabId))}
-                    />
-                </div>
-            );
-        }
-
-        return null;
-    };
-
-    const renderResultHeadWithCount = () => {
         return (
-            <div className={b('head')}>
-                <Text variant="subheader-3">
-                    {currentResult?.truncated ? i18n('title.truncated') : i18n('title.result')}
-                </Text>
-                {currentResult?.result ? (
-                    <Text color="secondary" variant="body-2" className={b('row-count')}>
-                        {`(${currentResult?.result.length}${
-                            currentResult.streamMetrics?.rowsPerSecond
-                                ? `, ${currentResult.streamMetrics.rowsPerSecond.toFixed(0)} rows/s`
-                                : ''
-                        })`}
-                    </Text>
-                ) : null}
+            <div>
+                <Tabs
+                    className={b('tabs')}
+                    size="l"
+                    items={tabsItems}
+                    activeTab={String(selectedResultSet)}
+                    onSelectTab={(tabId) => setSelectedResultSet(Number(tabId))}
+                />
             </div>
         );
     };
@@ -74,7 +68,6 @@ export function ResultSetsViewer(props: ResultSetsViewerProps) {
             {props.error ? <QueryResultError error={error} /> : null}
             {currentResult ? (
                 <div className={b('result')}>
-                    {renderResultHeadWithCount()}
                     <QueryResultTable
                         settings={props.tableSettings}
                         data={currentResult.result}
