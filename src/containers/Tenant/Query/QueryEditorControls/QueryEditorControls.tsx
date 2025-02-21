@@ -74,7 +74,7 @@ export const QueryEditorControls = ({
                 if (isStreamingEnabled && runningQueryRef.current) {
                     runningQueryRef.current.abort();
                 } else if (queryId) {
-                    sendCancelQuery({queryId, database: tenantName}).unwrap();
+                    await sendCancelQuery({queryId, database: tenantName}).unwrap();
                 }
             } catch {
                 createToast({

@@ -43,9 +43,11 @@ export function ResultSetsViewer(props: ResultSetsViewerProps) {
                             <Text color="secondary">{resultSet.result?.length || 0}</Text>
                         </div>
                     ),
-                    label: {
-                        content: `${rowsPerSecondFormatted} rows/s`,
-                    },
+                    label: rowsPerSecondFormatted
+                        ? {
+                              content: `${rowsPerSecondFormatted} rows/s`,
+                          }
+                        : undefined,
                 };
             }) || [];
 
