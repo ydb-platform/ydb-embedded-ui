@@ -5,6 +5,7 @@ import {useHistory} from 'react-router-dom';
 import routes, {createHref} from '../../../routes';
 import {authenticationApi} from '../../../store/reducers/authentication/authentication';
 import {cn} from '../../../utils/cn';
+import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import i18n from '../i18n';
 
 import './YdbInternalUser.scss';
@@ -13,11 +14,15 @@ const b = cn('kv-ydb-internal-user');
 
 export function YdbInternalUser({login}: {login?: string}) {
     const [logout] = authenticationApi.useLogoutMutation();
+    const database = useDatabaseFromQuery();
 
     const history = useHistory();
     const handleLoginClick = () => {
         history.push(
-            createHref(routes.auth, undefined, {returnUrl: encodeURIComponent(location.href)}),
+            createHref(routes.auth, undefined, {
+                returnUrl: encodeURIComponent(location.href),
+                database,
+            }),
         );
     };
 

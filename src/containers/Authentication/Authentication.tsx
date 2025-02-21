@@ -6,9 +6,10 @@ import {useHistory, useLocation} from 'react-router-dom';
 
 import {parseQuery} from '../../routes';
 import {authenticationApi} from '../../store/reducers/authentication/authentication';
+import {useLoginWithDatabase} from '../../store/reducers/capabilities/hooks';
 import {cn} from '../../utils/cn';
 
-import {isPasswordError, isUserError} from './utils';
+import {isDatabaseError, isPasswordError, isUserError} from './utils';
 
 import ydbLogoIcon from '../../assets/icons/ydb.svg';
 
@@ -24,19 +25,27 @@ function Authentication({closable = false}: AuthenticationProps) {
     const history = useHistory();
     const location = useLocation();
 
+    const needDatabase = useLoginWithDatabase();
+
     const [authenticate, {isLoading}] = authenticationApi.useAuthenticateMutation(undefined);
 
-    const {returnUrl} = parseQuery(location);
+    const {returnUrl, database: databaseFromQuery} = parseQuery(location);
 
     const [login, setLogin] = React.useState('');
+    const [database, setDatabase] = React.useState(databaseFromQuery?.toString() ?? '');
     const [password, setPass] = React.useState('');
     const [loginError, setLoginError] = React.useState('');
     const [passwordError, setPasswordError] = React.useState('');
+    const [databaseError, setDatabaseError] = React.useState('');
     const [showPassword, setShowPassword] = React.useState(false);
 
     const onLoginUpdate = (value: string) => {
         setLogin(value);
         setLoginError('');
+    };
+    const onDatabaseUpdate = (value: string) => {
+        setDatabase(value);
+        setDatabaseError('');
     };
 
     const onPassUpdate = (value: string) => {
@@ -45,7 +54,7 @@ function Authentication({closable = false}: AuthenticationProps) {
     };
 
     const onLoginClick = () => {
-        authenticate({user: login, password})
+        authenticate({user: login, password, database})
             .unwrap()
             .then(() => {
                 if (returnUrl) {
@@ -65,6 +74,9 @@ function Authentication({closable = false}: AuthenticationProps) {
                 }
                 if (isPasswordError(error)) {
                     setPasswordError(error.data.error);
+                }
+                if (isDatabaseError(error)) {
+                    setDatabaseError(error.data.error);
                 }
             });
     };
@@ -125,6 +137,18 @@ function Authentication({closable = false}: AuthenticationProps) {
                         <Icon data={showPassword ? EyeSlash : Eye} size={16} />
                     </Button>
                 </div>
+                {needDatabase && (
+                    <div className={b('field-wrapper')}>
+                        <TextInput
+                            value={database}
+                            onUpdate={onDatabaseUpdate}
+                            placeholder={'Database'}
+                            error={databaseError}
+                            onKeyDown={onEnterClick}
+                            size="l"
+                        />
+                    </div>
+                )}
                 <Button
                     view="action"
                     onClick={onLoginClick}
