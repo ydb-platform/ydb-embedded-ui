@@ -2,10 +2,12 @@ import React from 'react';
 
 import type {Settings} from '@gravity-ui/react-data-table';
 import type {ControlGroupOption} from '@gravity-ui/uikit';
-import {ClipboardButton, RadioButton} from '@gravity-ui/uikit';
+import {ClipboardButton, Flex, RadioButton, Text} from '@gravity-ui/uikit';
 
+import {EmptyState} from '../../../../components/EmptyState';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
+import {Illustration} from '../../../../components/Illustration';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
@@ -25,7 +27,6 @@ import {Ast} from './components/Ast/Ast';
 import {Graph} from './components/Graph/Graph';
 import {QueryInfoDropdown} from './components/QueryInfoDropdown/QueryInfoDropdown';
 import {QueryJSONViewer} from './components/QueryJSONViewer/QueryJSONViewer';
-import {QueryResultError} from './components/QueryResultError/QueryResultError';
 import {ResultSetsViewer} from './components/ResultSetsViewer/ResultSetsViewer';
 import {SimplifiedPlan} from './components/SimplifiedPlan/SimplifiedPlan';
 import {StubMessage} from './components/Stub/Stub';
@@ -229,7 +230,16 @@ export function QueryResultViewer({
         }
 
         if (error) {
-            return <QueryResultError error={error} />;
+            return (
+                <Flex justifyContent="center" alignItems="center" width="100%">
+                    <EmptyState
+                        size="s"
+                        image={<Illustration name="error" />}
+                        title={i18n('error.title')}
+                        description={<Text color="complementary">{i18n('error.description')}</Text>}
+                    />
+                </Flex>
+            );
         }
 
         if (activeSection === RESULT_OPTIONS_IDS.schema) {
@@ -269,17 +279,15 @@ export function QueryResultViewer({
     const renderLeftControls = () => {
         return (
             <div className={b('controls-left')}>
-                {!error && (
-                    <React.Fragment>
-                        {radioButtonOptions.length && activeSection ? (
-                            <RadioButton
-                                options={radioButtonOptions}
-                                value={activeSection}
-                                onUpdate={onSelectSection}
-                            />
-                        ) : null}
-                    </React.Fragment>
-                )}
+                <React.Fragment>
+                    {radioButtonOptions.length && activeSection ? (
+                        <RadioButton
+                            options={radioButtonOptions}
+                            value={activeSection}
+                            onUpdate={onSelectSection}
+                        />
+                    ) : null}
+                </React.Fragment>
                 <QueryExecutionStatus error={error} loading={isLoading} />
                 {data?.traceId && isExecute ? <TraceButton traceId={data.traceId} /> : null}
             </div>

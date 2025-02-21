@@ -64,8 +64,12 @@ export function ResultSetsViewer(props: ResultSetsViewerProps) {
 
     return (
         <div className={b('result-wrapper')}>
+            {props.error ? (
+                <div className={b('error-container')}>
+                    <QueryResultError error={error} />{' '}
+                </div>
+            ) : null}
             {renderTabs()}
-            {props.error ? <QueryResultError error={error} /> : null}
             {currentResult ? (
                 <div className={b('result')}>
                     <QueryResultTable

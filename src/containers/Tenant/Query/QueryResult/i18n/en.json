@@ -18,5 +18,8 @@
   "text_download_description": "SVG",
   "text_diagnostics": "Download Diagnostics",
   "text_diagnostics_description": "JSON",
-  "text_error-plan-svg": "Error: {{error}}"
+  "text_error-plan-svg": "Error: {{error}}",
+
+  "error.title": "Query Failed",
+  "error.description": "An error occurred, please see the Result tab for details"
 }
