@@ -2,7 +2,6 @@ import React from 'react';
 
 import {Label} from '@gravity-ui/uikit';
 
-import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
 import {valueIsDefined} from '../../utils';
@@ -12,6 +11,7 @@ import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
+import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToGB, bytesToSpeed} from '../../utils/utils';
 import type {InfoViewerItem} from '../InfoViewer';
 import {InfoViewer} from '../InfoViewer';
@@ -178,7 +178,7 @@ interface VDiskPopupProps {
 export const VDiskPopup = ({data}: VDiskPopupProps) => {
     const isFullData = isFullVDiskData(data);
 
-    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
     const vdiskInfo = React.useMemo(
         () =>

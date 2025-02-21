@@ -1,14 +1,13 @@
 import {Flex} from '@gravity-ui/uikit';
 
 import {getPDiskPagePath} from '../../routes';
-import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {valueIsDefined} from '../../utils';
 import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
 import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
 import {createPDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import type {PreparedPDisk} from '../../utils/disks/types';
-import {useTypedSelector} from '../../utils/hooks';
+import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import type {InfoViewerItem} from '../InfoViewer';
 import {InfoViewer} from '../InfoViewer/InfoViewer';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
@@ -189,7 +188,7 @@ export function PDiskInfo<T extends PreparedPDisk>({
     withPDiskPageLink,
     className,
 }: PDiskInfoProps<T>) {
-    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
     const [generalInfo, statusInfo, spaceInfo, additionalInfo] = getPDiskInfo({
         pDisk,

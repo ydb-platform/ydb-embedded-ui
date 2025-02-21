@@ -35,6 +35,18 @@ export const STORAGE_GROUPS_COLUMNS_IDS = {
 
 export type StorageGroupsColumnId = ValueOf<typeof STORAGE_GROUPS_COLUMNS_IDS>;
 
+// Columns, that should displayed only for users with isMonitoringAllowed:true
+const MONITORING_USER_COLUMNS_IDS: StorageGroupsColumnId[] = [
+    'DiskSpaceUsage',
+    'Latency',
+    'AllocationUnits',
+    'VDisksPDisks',
+];
+
+export function isMonitoringUserGroupsColumn(columnId: string): boolean {
+    return MONITORING_USER_COLUMNS_IDS.includes(columnId as StorageGroupsColumnId);
+}
+
 export const DEFAULT_STORAGE_GROUPS_COLUMNS: StorageGroupsColumnId[] = [
     'GroupId',
     'PoolName',

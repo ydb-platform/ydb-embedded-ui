@@ -1,3 +1,5 @@
+import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+
 import {PaginatedStorageGroups} from './PaginatedStorageGroups';
 import {PaginatedStorageNodes} from './PaginatedStorageNodes';
 import type {StorageViewContext} from './types';
@@ -19,10 +21,12 @@ export interface PaginatedStorageProps {
 
 export const PaginatedStorage = (props: PaginatedStorageProps) => {
     const {storageType} = useStorageQueryParams();
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
     const isNodes = storageType === 'nodes';
 
-    if (isNodes) {
+    // Hide storage node details for users with only viewer rights
+    if (isNodes && isUserAllowedToMakeChanges) {
         return (
             <PaginatedStorageNodes
                 initialEntitiesCount={getStorageNodesInitialEntitiesCount(props.viewContext)}

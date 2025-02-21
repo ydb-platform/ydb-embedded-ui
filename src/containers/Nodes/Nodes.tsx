@@ -4,7 +4,10 @@ import {ResponseError} from '../../components/Errors/ResponseError';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import type {Column, RenderControls} from '../../components/PaginatedTable';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
-import {NODES_COLUMNS_TITLES} from '../../components/nodesColumns/constants';
+import {
+    NODES_COLUMNS_TITLES,
+    isMonitoringUserNodesColumn,
+} from '../../components/nodesColumns/constants';
 import type {NodesColumnId} from '../../components/nodesColumns/constants';
 import {
     useCapabilitiesLoaded,
@@ -16,6 +19,7 @@ import {useProblemFilter} from '../../store/reducers/settings/hooks';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 import type {NodesGroupByField} from '../../types/api/nodes';
 import {useAutoRefreshInterval} from '../../utils/hooks';
+import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
 import {TableGroup} from '../Storage/TableGroup/TableGroup';
@@ -69,6 +73,14 @@ export function Nodes({
 
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+
+    const preparedColumns = React.useMemo(() => {
+        if (isUserAllowedToMakeChanges) {
+            return columns;
+        }
+        return columns.filter((column) => !isMonitoringUserNodesColumn(column.name));
+    }, [columns, isUserAllowedToMakeChanges]);
 
     // Other filters do not fit with grouping
     // Reset them if grouping available
@@ -96,7 +108,7 @@ export function Nodes({
                     database={database}
                     parentRef={parentRef}
                     withPeerRoleFilter={withPeerRoleFilter}
-                    columns={columns}
+                    columns={preparedColumns}
                     defaultColumnsIds={defaultColumnsIds}
                     requiredColumnsIds={requiredColumnsIds}
                     selectedColumnsKey={selectedColumnsKey}
@@ -111,7 +123,7 @@ export function Nodes({
                 database={database}
                 parentRef={parentRef}
                 withPeerRoleFilter={withPeerRoleFilter}
-                columns={columns}
+                columns={preparedColumns}
                 defaultColumnsIds={defaultColumnsIds}
                 requiredColumnsIds={requiredColumnsIds}
                 selectedColumnsKey={selectedColumnsKey}

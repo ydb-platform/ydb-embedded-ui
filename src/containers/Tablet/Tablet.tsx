@@ -14,7 +14,6 @@ import {InternalLink} from '../../components/InternalLink';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import {getTabletPagePath, tabletPageQueryParams} from '../../routes';
-import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {tabletApi} from '../../store/reducers/tablet';
 import {EFlag} from '../../types/api/enums';
@@ -22,7 +21,8 @@ import type {TTabletStateInfo} from '../../types/api/tablet';
 import type {ITabletPreparedHistoryItem} from '../../types/store/tablet';
 import {cn} from '../../utils/cn';
 import {CLUSTER_DEFAULT_TITLE} from '../../utils/constants';
-import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
+import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 
 import {TabletControls} from './components/TabletControls';
 import {TabletInfo} from './components/TabletInfo';
@@ -163,7 +163,7 @@ function TabletTabs({
     history: ITabletPreparedHistoryItem[];
 }) {
     const [{activeTab, ...restParams}, setParams] = useQueryParams(tabletPageQueryParams);
-    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
     const noAdvancedInfo = !isUserAllowedToMakeChanges || !hasHive(hiveId);
 

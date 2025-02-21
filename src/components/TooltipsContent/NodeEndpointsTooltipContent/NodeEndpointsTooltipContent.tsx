@@ -1,10 +1,9 @@
 import type {DefinitionListItemProps} from '@gravity-ui/uikit';
 import {DefinitionList} from '@gravity-ui/uikit';
 
-import {selectIsUserAllowedToMakeChanges} from '../../../store/reducers/authentication/authentication';
 import type {TSystemStateInfo} from '../../../types/api/nodes';
 import {cn} from '../../../utils/cn';
-import {useTypedSelector} from '../../../utils/hooks';
+import {useIsUserAllowedToMakeChanges} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {LinkWithIcon} from '../../LinkWithIcon/LinkWithIcon';
 
 import i18n from './i18n';
@@ -19,7 +18,7 @@ interface NodeEdpointsTooltipProps {
 }
 
 export const NodeEndpointsTooltipContent = ({data, nodeHref}: NodeEdpointsTooltipProps) => {
-    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const info: (DefinitionListItemProps & {key: string})[] = [];
 
     if (data?.Roles?.length) {

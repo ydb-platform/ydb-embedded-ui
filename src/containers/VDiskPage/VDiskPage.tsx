@@ -13,7 +13,6 @@ import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewer
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import {VDiskInfo} from '../../components/VDiskInfo/VDiskInfo';
 import {api} from '../../store/reducers/api';
-import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
@@ -21,7 +20,8 @@ import type {ModifyDiskResponse} from '../../types/api/modifyDisk';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {getSeverityColor, getVDiskSlotBasedId} from '../../utils/disks/helpers';
-import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
+import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 
 import {vDiskPageKeyset} from './i18n';
@@ -34,7 +34,7 @@ export function VDiskPage() {
     const dispatch = useTypedDispatch();
 
     const containerRef = React.useRef<HTMLDivElement>(null);
-    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const newDiskApiAvailable = useDiskPagesAvailable();
 
     const [{nodeId, pDiskId, vDiskSlotId}] = useQueryParams({

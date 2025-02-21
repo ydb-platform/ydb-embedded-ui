@@ -4,11 +4,10 @@ import {ArrowRotateLeft, StopFill, TriangleRightFill} from '@gravity-ui/icons';
 import {Flex, Icon} from '@gravity-ui/uikit';
 
 import {ButtonWithConfirmDialog} from '../../../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
-import {selectIsUserAllowedToMakeChanges} from '../../../../store/reducers/authentication/authentication';
 import {tabletApi} from '../../../../store/reducers/tablet';
 import {ETabletState} from '../../../../types/api/tablet';
 import type {TTabletStateInfo} from '../../../../types/api/tablet';
-import {useTypedSelector} from '../../../../utils/hooks';
+import {useIsUserAllowedToMakeChanges} from '../../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import i18n from '../../i18n';
 import {hasHive} from '../../utils';
 
@@ -19,7 +18,7 @@ interface TabletControlsProps {
 export const TabletControls = ({tablet}: TabletControlsProps) => {
     const {TabletId, HiveId} = tablet;
 
-    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
     const [killTablet] = tabletApi.useKillTabletMutation();
     const [stopTablet] = tabletApi.useStopTabletMutation();

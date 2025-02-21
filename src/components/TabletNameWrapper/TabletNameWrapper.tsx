@@ -1,9 +1,8 @@
 import {DefinitionList, PopoverBehavior} from '@gravity-ui/uikit';
 
 import {getTabletPagePath} from '../../routes';
-import {selectIsUserAllowedToMakeChanges} from '../../store/reducers/authentication/authentication';
 import {createTabletDeveloperUIHref} from '../../utils/developerUI/developerUI';
-import {useTypedSelector} from '../../utils/hooks';
+import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
@@ -16,7 +15,7 @@ interface TabletNameWrapperProps {
 }
 
 export function TabletNameWrapper({tabletId, database}: TabletNameWrapperProps) {
-    const isUserAllowedToMakeChanges = useTypedSelector(selectIsUserAllowedToMakeChanges);
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
     const tabletPath = getTabletPagePath(tabletId, {database});
 
