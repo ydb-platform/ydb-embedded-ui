@@ -178,6 +178,9 @@ interface SendQueryParams extends QueryRequestParams {
     enableTracingLevel?: boolean;
 }
 
+// Stream query receives queryId from session chunk.
+type StreamQueryParams = Omit<SendQueryParams, 'queryId'>;
+
 interface QueryStats {
     durationUs?: string | number;
     endTime?: string | number;
@@ -188,12 +191,12 @@ const DEFAULT_CONCURRENT_RESULTS = false;
 
 export const queryApi = api.injectEndpoints({
     endpoints: (build) => ({
-        useStreamQuery: build.mutation<null, SendQueryParams>({
+        useStreamQuery: build.mutation<null, StreamQueryParams>({
             queryFn: async (
-                {query, database, querySettings = {}, enableTracingLevel, queryId},
+                {query, database, querySettings = {}, enableTracingLevel},
                 {signal, dispatch, getState},
             ) => {
-                dispatch(setQueryResult({type: 'execute', queryId, isLoading: true}));
+                dispatch(setQueryResult({type: 'execute', queryId: '', isLoading: true}));
 
                 const {action, syntax} = getActionAndSyntaxFromQueryMode(
                     'execute',
@@ -268,7 +271,7 @@ export const queryApi = api.injectEndpoints({
                             type: 'execute',
                             error,
                             isLoading: false,
-                            queryId,
+                            queryId: state.query.result?.queryId || '',
                         }),
                     );
                     return {error};
