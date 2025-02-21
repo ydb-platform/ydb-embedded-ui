@@ -148,6 +148,7 @@ export default function QueryEditor(props: QueryEditorProps) {
                 database: tenantName,
                 querySettings,
                 enableTracingLevel,
+                queryId,
             });
         } else {
             runningQueryRef.current = sendQuery({
@@ -261,7 +262,6 @@ export default function QueryEditor(props: QueryEditorProps) {
                         onCollapseResultHandler={onCollapseResultHandler}
                         type={type}
                         theme={theme}
-                        key={result?.queryId}
                         result={result}
                         tenantName={tenantName}
                         path={path}

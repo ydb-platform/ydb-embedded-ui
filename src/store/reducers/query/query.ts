@@ -72,7 +72,7 @@ const slice = createSlice({
         },
         updateQueryInHistory: (
             state,
-            action: PayloadAction<{queryId?: string; stats: QueryStats}>,
+            action: PayloadAction<{queryId: string; stats: QueryStats}>,
         ) => {
             const {queryId, stats} = action.payload;
 
@@ -171,7 +171,7 @@ export const {
 
 interface SendQueryParams extends QueryRequestParams {
     actionType?: QueryAction;
-    queryId?: string;
+    queryId: string;
     querySettings?: Partial<QuerySettings>;
     // flag whether to send new tracing header or not
     // default: not send
@@ -190,10 +190,10 @@ export const queryApi = api.injectEndpoints({
     endpoints: (build) => ({
         useStreamQuery: build.mutation<null, SendQueryParams>({
             queryFn: async (
-                {query, database, querySettings = {}, enableTracingLevel},
+                {query, database, querySettings = {}, enableTracingLevel, queryId},
                 {signal, dispatch, getState},
             ) => {
-                dispatch(setQueryResult({type: 'execute', isLoading: true}));
+                dispatch(setQueryResult({type: 'execute', queryId, isLoading: true}));
 
                 const {action, syntax} = getActionAndSyntaxFromQueryMode(
                     'execute',
@@ -268,6 +268,7 @@ export const queryApi = api.injectEndpoints({
                             type: 'execute',
                             error,
                             isLoading: false,
+                            queryId,
                         }),
                     );
                     return {error};
