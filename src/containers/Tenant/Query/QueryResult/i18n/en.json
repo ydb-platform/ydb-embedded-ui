@@ -21,5 +21,8 @@
   "text_error-plan-svg": "Error: {{error}}",
 
   "error.title": "Query Failed",
-  "error.description": "An error occurred, please see the Result tab for details"
+  "error.description": "An error occurred, please see the Result tab for details",
+
+  "stopped.title": "Query stopped",
+  "stopped.description": "Query was stopped"
 }

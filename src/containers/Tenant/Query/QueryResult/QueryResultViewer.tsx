@@ -230,13 +230,20 @@ export function QueryResultViewer({
         }
 
         if (error) {
+            const isStopped = isQueryCancelledError(error);
             return (
                 <Flex justifyContent="center" alignItems="center" width="100%">
                     <EmptyState
                         size="s"
                         image={<Illustration name="error" />}
-                        title={i18n('error.title')}
-                        description={<Text color="complementary">{i18n('error.description')}</Text>}
+                        title={isStopped ? i18n('stopped.title') : i18n('error.title')}
+                        description={
+                            <Text color="complementary">
+                                {isStopped
+                                    ? i18n('stopped.description')
+                                    : i18n('error.description')}
+                            </Text>
+                        }
                     />
                 </Flex>
             );
