@@ -52,7 +52,7 @@ export interface QueryResult {
     type: QueryAction;
     data?: PreparedQueryData;
     error?: unknown;
-    queryId?: string;
+    queryId: string;
     isLoading: boolean;
 }
 
