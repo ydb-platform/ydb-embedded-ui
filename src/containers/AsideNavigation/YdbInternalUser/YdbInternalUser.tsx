@@ -4,6 +4,7 @@ import {useHistory} from 'react-router-dom';
 
 import routes, {createHref} from '../../../routes';
 import {authenticationApi} from '../../../store/reducers/authentication/authentication';
+import {useAccessTotallyRestricted} from '../../../store/reducers/capabilities/hooks';
 import {cn} from '../../../utils/cn';
 import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import i18n from '../i18n';
@@ -14,6 +15,7 @@ const b = cn('kv-ydb-internal-user');
 
 export function YdbInternalUser({login}: {login?: string}) {
     const [logout] = authenticationApi.useLogoutMutation();
+    const isForbidded = useAccessTotallyRestricted();
     const database = useDatabaseFromQuery();
 
     const history = useHistory();
@@ -30,6 +32,17 @@ export function YdbInternalUser({login}: {login?: string}) {
         logout(undefined);
     };
 
+    const renderLoginButton = () => {
+        if (isForbidded) {
+            return null;
+        }
+        return (
+            <Button view="flat-secondary" title={i18n('account.login')} onClick={handleLoginClick}>
+                <Icon data={ArrowRightToSquare} />
+            </Button>
+        );
+    };
+
     return (
         <div className={b()}>
             <div className={b('user-info-wrapper')}>
@@ -41,13 +54,7 @@ export function YdbInternalUser({login}: {login?: string}) {
                     <Icon data={ArrowRightFromSquare} />
                 </Button>
             ) : (
-                <Button
-                    view="flat-secondary"
-                    title={i18n('account.login')}
-                    onClick={handleLoginClick}
-                >
-                    <Icon data={ArrowRightToSquare} />
-                </Button>
+                renderLoginButton()
             )}
         </div>
     );

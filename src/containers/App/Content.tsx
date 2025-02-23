@@ -230,18 +230,23 @@ function ContentWrapper(props: ContentWrapperProps) {
     const {singleClusterMode, isAuthenticated} = props;
     const isForbidded = useAccessTotallyRestricted();
 
-    if (isForbidded) {
-        return <AccessDenied />;
-    }
+    const renderNotAuthenticated = () => {
+        if (isForbidded) {
+            return <AccessDenied />;
+        }
+        return <Authentication />;
+    };
 
     return (
         <Switch>
-            <Route path={routes.auth}>
-                <Authentication closable />
-            </Route>
+            {!isForbidded && (
+                <Route path={routes.auth}>
+                    <Authentication closable />
+                </Route>
+            )}
             <Route>
                 <div className={b({embedded: singleClusterMode})}>
-                    {isAuthenticated ? props.children : <Authentication />}
+                    {isAuthenticated ? props.children : renderNotAuthenticated()}
                 </div>
             </Route>
         </Switch>
