@@ -5,10 +5,12 @@ export const simpleQuery = 'SELECT 1;';
 export const longTableSelect = 'SELECT * FROM `.sys/pg_class`';
 
 // 400 is pretty enough
-export const longRunningQuery = `
-$sample = AsList(AsStruct(ListFromRange(1, 100000) AS value, CAST(1 AS Uint32) AS id));
+export const longRunningQuery = new Array(400).fill(simpleQuery).join('');
+export const longRunningStreamQuery = `$sample = AsList(AsStruct(ListFromRange(1, 100000) AS value1, ListFromRange(1, 1000) AS value2, CAST(1 AS Uint32) AS id));
 
-SELECT value, id FROM as_table($sample) FLATTEN BY (value);`;
+SELECT value1, value2, id FROM as_table($sample) FLATTEN BY (value1);
+`;
+export const selectFromMyRowTableQuery = 'select * from `my_row_table`';
 
 export const createTableQuery = `
 CREATE TABLE \`/local/ydb_row_table\` (

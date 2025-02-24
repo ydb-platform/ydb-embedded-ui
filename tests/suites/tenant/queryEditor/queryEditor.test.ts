@@ -5,7 +5,12 @@ import {getClipboardContent} from '../../../utils/clipboard';
 import {tenantName} from '../../../utils/constants';
 import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {NavigationTabs, TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
-import {createTableQuery, longRunningQuery, longTableSelect} from '../constants';
+import {
+    createTableQuery,
+    longRunningQuery,
+    longRunningStreamQuery,
+    longTableSelect,
+} from '../constants';
 
 import {
     ButtonNames,
@@ -107,10 +112,7 @@ test.describe('Test Query Editor', async () => {
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
-        await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeLimitRows(100000);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
-        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.setQuery(longRunningStreamQuery);
         await queryEditor.clickRunButton();
 
         await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
