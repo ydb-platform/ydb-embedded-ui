@@ -8,11 +8,10 @@ import {
     useCapabilitiesLoaded,
     useViewerNodesHandlerHasGrouping,
 } from '../../store/reducers/capabilities/hooks';
-import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import {storageApi} from '../../store/reducers/storage/storage';
 import {useAutoRefreshInterval} from '../../utils/hooks';
+import {useAdditionalNodesProps} from '../../utils/hooks/useAdditionalNodesProps';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
-import {useAdditionalNodeProps} from '../AppWithClusters/useClusterData';
 
 import type {PaginatedStorageProps} from './PaginatedStorage';
 import {StorageNodesControls} from './StorageControls/StorageControls';
@@ -210,8 +209,7 @@ function useStorageNodesColumnsToSelect({
     database?: string;
     viewContext?: StorageViewContext;
 }) {
-    const {balancer} = useClusterBaseInfo();
-    const {additionalNodesProps} = useAdditionalNodeProps({balancer});
+    const additionalNodesProps = useAdditionalNodesProps();
     const {visibleEntities} = useStorageQueryParams();
 
     return useStorageNodesSelectedColumns({

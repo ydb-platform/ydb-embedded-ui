@@ -1,16 +1,14 @@
-import {useAdditionalNodeProps} from '../../containers/AppWithClusters/useClusterData';
-import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import type {PreparedNode} from '../../store/reducers/node/types';
 import {
     createDeveloperUIInternalPageHref,
     createDeveloperUILinkWithNodeId,
 } from '../developerUI/developerUI';
 
+import {useAdditionalNodesProps} from './useAdditionalNodesProps';
 import {useIsUserAllowedToMakeChanges} from './useIsUserAllowedToMakeChanges';
 
 export function useNodeDeveloperUIHref(node?: PreparedNode) {
-    const {balancer} = useClusterBaseInfo();
-    const {additionalNodesProps} = useAdditionalNodeProps({balancer});
+    const additionalNodesProps = useAdditionalNodesProps();
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
     if (!isUserAllowedToMakeChanges) {
