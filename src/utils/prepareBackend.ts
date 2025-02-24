@@ -20,6 +20,7 @@ export const getBackendFromNodeHost = (nodeHost: string, balancer: string) => {
     return https + preparedHost;
 };
 
+/** For multi-cluster version */
 export const getBackendFromRawNodeData = (
     node: NodeAddress,
     balancer: string,
@@ -36,7 +37,7 @@ export const getBackendFromRawNodeData = (
         const nodePort = Endpoints.find((endpoint) => endpoint.Name === 'http-mon')?.Address;
 
         if (!nodePort || !Host) {
-            return null;
+            return undefined;
         }
 
         const hostWithPort = Host + nodePort;
@@ -46,5 +47,5 @@ export const getBackendFromRawNodeData = (
         return getBackendFromNodeHost(hostWithPort, balancer);
     }
 
-    return null;
+    return undefined;
 };

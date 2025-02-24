@@ -6,7 +6,6 @@ import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
 import type {AdditionalClusterProps} from '../../../types/additionalProps';
 import type {TClusterInfo} from '../../../types/api/cluster';
 import type {IResponseError} from '../../../types/api/error';
-import type {VersionToColorMap} from '../../../types/versions';
 import i18n from '../i18n';
 
 import {b} from './shared';
@@ -17,7 +16,6 @@ import './ClusterInfo.scss';
 
 interface ClusterInfoProps {
     cluster?: TClusterInfo;
-    versionToColor?: VersionToColorMap;
     loading?: boolean;
     error?: IResponseError;
     additionalClusterProps?: AdditionalClusterProps;

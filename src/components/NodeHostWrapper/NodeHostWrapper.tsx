@@ -1,7 +1,7 @@
 import {PopoverBehavior} from '@gravity-ui/uikit';
 
 import {getDefaultNodePath} from '../../containers/Node/NodePages';
-import type {NodeAddress} from '../../types/additionalProps';
+import type {GetNodeRefFunc, NodeAddress} from '../../types/additionalProps';
 import type {TNodeInfo, TSystemStateInfo} from '../../types/api/nodes';
 import {
     createDeveloperUIInternalPageHref,
@@ -23,7 +23,7 @@ export type StatusForIcon = 'SystemState' | 'ConnectStatus';
 
 interface NodeHostWrapperProps {
     node: NodeHostData;
-    getNodeRef?: (node?: NodeAddress) => string | null;
+    getNodeRef?: GetNodeRefFunc;
     database?: string;
     statusForIcon?: StatusForIcon;
 }

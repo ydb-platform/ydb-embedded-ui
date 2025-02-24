@@ -24,7 +24,7 @@ export interface AdditionalTenantsProps {
 
 export type NodeAddress = Pick<TSystemStateInfo, 'Host' | 'Endpoints' | 'NodeId'>;
 
-export type GetNodeRefFunc = (node?: NodeAddress) => string | null;
+export type GetNodeRefFunc = (node?: NodeAddress) => string | undefined;
 
 export interface AdditionalNodesProps extends Record<string, unknown> {
     getNodeRef?: GetNodeRefFunc;

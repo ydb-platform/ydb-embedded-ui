@@ -8,7 +8,7 @@ import {
 } from '../prepareDisks';
 
 describe('prepareWhiteboardVDiskData', () => {
-    it('Should correctly parse data', () => {
+    test('Should correctly parse data', () => {
         const data = {
             VDiskId: {
                 GroupID: 0,
@@ -98,7 +98,7 @@ describe('prepareWhiteboardVDiskData', () => {
 
         expect(preparedData).toEqual(expectedResult);
     });
-    it('Should parse unavailable donors', () => {
+    test('Should parse unavailable donors', () => {
         const data = {
             NodeId: 1,
             PDiskId: 2,
@@ -119,7 +119,7 @@ describe('prepareWhiteboardVDiskData', () => {
 });
 
 describe('prepareWhiteboardPDiskData', () => {
-    it('Should correctly parse data', () => {
+    test('Should correctly parse data', () => {
         const data = {
             PDiskId: 1,
             ChangeTime: '1730383540716',
@@ -180,7 +180,7 @@ describe('prepareWhiteboardPDiskData', () => {
 });
 
 describe('prepareVDiskSizeFields', () => {
-    it('Should prepare VDisk size fields', () => {
+    test('Should prepare VDisk size fields', () => {
         expect(
             prepareVDiskSizeFields({
                 AvailableSize: '400',
@@ -193,7 +193,7 @@ describe('prepareVDiskSizeFields', () => {
             AllocatedPercent: 20,
         });
     });
-    it('Returns NaN if on undefined data', () => {
+    test('Returns NaN if on undefined data', () => {
         expect(
             prepareVDiskSizeFields({
                 AvailableSize: undefined,
@@ -209,7 +209,7 @@ describe('prepareVDiskSizeFields', () => {
 });
 
 describe('preparePDiskSizeFields', () => {
-    it('Should prepare PDisk size fields', () => {
+    test('Should prepare PDisk size fields', () => {
         expect(
             preparePDiskSizeFields({
                 AvailableSize: '400',
@@ -222,7 +222,7 @@ describe('preparePDiskSizeFields', () => {
             AllocatedPercent: 20,
         });
     });
-    it('Returns NaN if on undefined data', () => {
+    test('Returns NaN if on undefined data', () => {
         expect(
             preparePDiskSizeFields({
                 AvailableSize: undefined,

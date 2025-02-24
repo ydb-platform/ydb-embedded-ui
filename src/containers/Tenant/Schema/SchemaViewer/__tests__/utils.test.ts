@@ -1,7 +1,7 @@
 import {getPartitioningKeys, getPrimaryKeys} from '../utils';
 
 describe('getPartitioningKeys', () => {
-    it('returns column in the provided order', () => {
+    test('returns column in the provided order', () => {
         const data1 = [
             {
                 id: 1,
@@ -62,7 +62,7 @@ describe('getPartitioningKeys', () => {
 });
 
 describe('getPrimaryKeys', () => {
-    it('returns column in the provided order', () => {
+    test('returns column in the provided order', () => {
         const data = [
             {
                 id: 1,

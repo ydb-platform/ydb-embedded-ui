@@ -13,24 +13,24 @@ const createVDiskId = (id: number): TVDiskID => ({
 });
 
 describe('calculateMaximumSlotsPerDisk', () => {
-    it('should return providedMaximumSlotsPerDisk when it is provided', () => {
+    test('should return providedMaximumSlotsPerDisk when it is provided', () => {
         const nodes: TNodeInfo[] = [];
         const providedMaximumSlotsPerDisk = '5';
 
         expect(calculateMaximumSlotsPerDisk(nodes, providedMaximumSlotsPerDisk)).toBe('5');
     });
 
-    it('should return "1" for empty nodes array', () => {
+    test('should return "1" for empty nodes array', () => {
         const nodes: TNodeInfo[] = [];
 
         expect(calculateMaximumSlotsPerDisk(nodes)).toBe('1');
     });
 
-    it('should return "1" for undefined nodes', () => {
+    test('should return "1" for undefined nodes', () => {
         expect(calculateMaximumSlotsPerDisk(undefined)).toBe('1');
     });
 
-    it('should return "1" for nodes without PDisks or VDisks', () => {
+    test('should return "1" for nodes without PDisks or VDisks', () => {
         const nodes: TNodeInfo[] = [
             {
                 NodeId: 1,
@@ -41,7 +41,7 @@ describe('calculateMaximumSlotsPerDisk', () => {
         expect(calculateMaximumSlotsPerDisk(nodes)).toBe('1');
     });
 
-    it('should calculate maximum slots correctly for single node with one PDisk and multiple VDisks', () => {
+    test('should calculate maximum slots correctly for single node with one PDisk and multiple VDisks', () => {
         const nodes: TNodeInfo[] = [
             {
                 NodeId: 1,
@@ -70,7 +70,7 @@ describe('calculateMaximumSlotsPerDisk', () => {
         expect(calculateMaximumSlotsPerDisk(nodes)).toBe('2');
     });
 
-    it('should calculate maximum slots across multiple nodes', () => {
+    test('should calculate maximum slots across multiple nodes', () => {
         const nodes: TNodeInfo[] = [
             {
                 NodeId: 1,
@@ -121,7 +121,7 @@ describe('calculateMaximumSlotsPerDisk', () => {
         expect(calculateMaximumSlotsPerDisk(nodes)).toBe('3');
     });
 
-    it('should handle nodes with multiple PDisks', () => {
+    test('should handle nodes with multiple PDisks', () => {
         const nodes: TNodeInfo[] = [
             {
                 NodeId: 1,
@@ -159,7 +159,7 @@ describe('calculateMaximumSlotsPerDisk', () => {
         expect(calculateMaximumSlotsPerDisk(nodes)).toBe('2');
     });
 
-    it('should ignore VDisks with non-matching PDiskId', () => {
+    test('should ignore VDisks with non-matching PDiskId', () => {
         const nodes: TNodeInfo[] = [
             {
                 NodeId: 1,

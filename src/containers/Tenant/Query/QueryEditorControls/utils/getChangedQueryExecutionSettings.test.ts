@@ -10,13 +10,13 @@ import {
 import getChangedQueryExecutionSettings from './getChangedQueryExecutionSettings';
 
 describe('getChangedQueryExecutionSettings', () => {
-    it('should return an empty array if no settings have changed', () => {
+    test('should return an empty array if no settings have changed', () => {
         const currentSettings: QuerySettings = {...DEFAULT_QUERY_SETTINGS};
         const result = getChangedQueryExecutionSettings(currentSettings, DEFAULT_QUERY_SETTINGS);
         expect(result).toEqual([]);
     });
 
-    it('should return the keys of settings that have changed', () => {
+    test('should return the keys of settings that have changed', () => {
         const currentSettings: QuerySettings = {
             ...DEFAULT_QUERY_SETTINGS,
             queryMode: QUERY_MODES.data,
@@ -27,7 +27,7 @@ describe('getChangedQueryExecutionSettings', () => {
         expect(result).toEqual(['queryMode', 'timeout']);
     });
 
-    it('should return all keys if all settings have changed', () => {
+    test('should return all keys if all settings have changed', () => {
         const currentSettings: QuerySettings = {
             queryMode: QUERY_MODES.data,
             transactionMode: TRANSACTION_MODES.onlinero,

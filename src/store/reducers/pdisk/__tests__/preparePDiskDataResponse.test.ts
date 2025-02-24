@@ -107,7 +107,7 @@ describe('preparePDiskDataResponse', () => {
         },
     } as unknown as TPDiskInfoResponse;
 
-    it('Should correctly retrieve slots', () => {
+    test('Should correctly retrieve slots', () => {
         const preparedData = preparePDiskDataResponse([rawData, {}]);
 
         expect(preparedData.SlotItems?.length).toEqual(17);
@@ -119,14 +119,14 @@ describe('preparePDiskDataResponse', () => {
             15,
         );
     });
-    it('Should correctly calculate empty slots size if EnforcedDynamicSlotSize is provided', () => {
+    test('Should correctly calculate empty slots size if EnforcedDynamicSlotSize is provided', () => {
         const preparedData = preparePDiskDataResponse([rawData, {}]);
 
         expect(preparedData.SlotItems?.find((slot) => slot.SlotType === 'empty')?.Total).toEqual(
             20_000_000_000,
         );
     });
-    it('Should correctly calculate empty slots size if EnforcedDynamicSlotSize is undefined', () => {
+    test('Should correctly calculate empty slots size if EnforcedDynamicSlotSize is undefined', () => {
         const data: TPDiskInfoResponse = {
             ...rawData,
             Whiteboard: {
@@ -150,7 +150,7 @@ describe('preparePDiskDataResponse', () => {
             1_000_000_000,
         );
     });
-    it('Should return yellow or red severity for log if its size exceeds thresholds', () => {
+    test('Should return yellow or red severity for log if its size exceeds thresholds', () => {
         const dataWarning: TPDiskInfoResponse = {
             ...rawData,
             Whiteboard: {
@@ -185,7 +185,7 @@ describe('preparePDiskDataResponse', () => {
             preparedDataDanger.SlotItems?.find((slot) => slot.SlotType === 'log')?.Severity,
         ).toEqual(5);
     });
-    it('Should return yellow or red severity for vdisk if its size exceeds thresholds', () => {
+    test('Should return yellow or red severity for vdisk if its size exceeds thresholds', () => {
         const dataWarning: TPDiskInfoResponse = {
             ...rawData,
             Whiteboard: {

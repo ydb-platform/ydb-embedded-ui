@@ -2,28 +2,28 @@ import {formatSize, generateTestChangesSummary} from '../utils/format';
 
 describe('format utils', () => {
     describe('formatSize', () => {
-        it('should format size in KB when less than 1024 bytes', () => {
+        test('should format size in KB when less than 1024 bytes', () => {
             const size = 512; // 512 bytes
             expect(formatSize(size)).toBe('0.50 KB');
         });
 
-        it('should format size in MB when greater than or equal to 1024 bytes', () => {
+        test('should format size in MB when greater than or equal to 1024 bytes', () => {
             const size = 2.5 * 1024; // 2.5 KB -> will be shown in MB
             expect(formatSize(size)).toBe('2.50 KB');
         });
 
-        it('should handle small sizes', () => {
+        test('should handle small sizes', () => {
             const size = 100; // 100 bytes
             expect(formatSize(size)).toBe('0.10 KB');
         });
 
-        it('should handle zero', () => {
+        test('should handle zero', () => {
             expect(formatSize(0)).toBe('0.00 KB');
         });
     });
 
     describe('generateTestChangesSummary', () => {
-        it('should generate summary for new tests only', () => {
+        test('should generate summary for new tests only', () => {
             const comparison = {
                 new: ['Test 1 (file1.ts)', 'Test 2 (file2.ts)'],
                 skipped: [],
@@ -38,7 +38,7 @@ describe('format utils', () => {
             expect(summary).not.toContain('🗑️ Deleted Tests');
         });
 
-        it('should generate summary for skipped tests only', () => {
+        test('should generate summary for skipped tests only', () => {
             const comparison = {
                 new: [],
                 skipped: ['Test 1 (file1.ts)', 'Test 2 (file2.ts)'],
@@ -53,7 +53,7 @@ describe('format utils', () => {
             expect(summary).not.toContain('🗑️ Deleted Tests');
         });
 
-        it('should generate summary for deleted tests only', () => {
+        test('should generate summary for deleted tests only', () => {
             const comparison = {
                 new: [],
                 skipped: [],
@@ -68,7 +68,7 @@ describe('format utils', () => {
             expect(summary).not.toContain('⏭️ Skipped Tests');
         });
 
-        it('should generate summary for all types of changes', () => {
+        test('should generate summary for all types of changes', () => {
             const comparison = {
                 new: ['New Test (file1.ts)'],
                 skipped: ['Skipped Test (file2.ts)'],
@@ -84,7 +84,7 @@ describe('format utils', () => {
             expect(summary).toContain('Deleted Test (file3.ts)');
         });
 
-        it('should handle no changes', () => {
+        test('should handle no changes', () => {
             const comparison = {
                 new: [],
                 skipped: [],

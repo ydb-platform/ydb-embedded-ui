@@ -1,7 +1,7 @@
 import {getBackendFromNodeHost, getBackendFromRawNodeData, prepareHost} from '../prepareBackend';
 
 describe('prepareHost', () => {
-    it('should add vm prefix to cloud din nodes', () => {
+    test('should add vm prefix to cloud din nodes', () => {
         const cloudDinNodeInitialHost =
             'vm-cc8mco0j0snqehgh7r2a-ru-central1-c-nlmw-aniq.cc8mco0j0snqehgh7r2a.ydb.mdb.cloud-preprod.net';
         const cloudDinNodeResultHost =
@@ -14,7 +14,7 @@ describe('prepareHost', () => {
     });
 });
 describe('getBackendFromNodeHost', () => {
-    it('should prepare correct backend value from node host', () => {
+    test('should prepare correct backend value from node host', () => {
         const balancer = 'https://viewer.ydb.ru:443/dev02.ydb.net:8765';
         const nodeHost = 'ydb-dev02-001.search.net:31012';
         const result = 'https://viewer.ydb.ru:443/ydb-dev02-001.search.net:31012';
@@ -23,7 +23,7 @@ describe('getBackendFromNodeHost', () => {
     });
 });
 describe('getBackendFromRawNodeData', () => {
-    it('should prepare correct backend value from raw node data', () => {
+    test('should prepare correct backend value from raw node data', () => {
         const balancer = 'https://viewer.ydb.ru:443/dev02.ydb.net:8765';
         const node = {
             Host: 'ydb-dev02-000.search.net',

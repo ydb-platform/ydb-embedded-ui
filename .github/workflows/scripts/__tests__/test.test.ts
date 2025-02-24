@@ -3,7 +3,7 @@ import type {Spec, Suite, TestInfo} from './types';
 
 describe('test utils', () => {
     describe('isTestSkipped', () => {
-        it('should return true for test with skip annotation', () => {
+        test('should return true for test with skip annotation', () => {
             const spec: Spec = {
                 title: 'Test',
                 ok: true,
@@ -27,7 +27,7 @@ describe('test utils', () => {
             expect(isTestSkipped(spec)).toBe(true);
         });
 
-        it('should return true for test with skipped status', () => {
+        test('should return true for test with skipped status', () => {
             const spec: Spec = {
                 title: 'Test',
                 ok: true,
@@ -51,7 +51,7 @@ describe('test utils', () => {
             expect(isTestSkipped(spec)).toBe(true);
         });
 
-        it('should return false for non-skipped test', () => {
+        test('should return false for non-skipped test', () => {
             const spec: Spec = {
                 title: 'Test',
                 ok: true,
@@ -77,7 +77,7 @@ describe('test utils', () => {
     });
 
     describe('extractTestsFromSuite', () => {
-        it('should extract tests from a simple suite', () => {
+        test('should extract tests from a simple suite', () => {
             const suite: Suite = {
                 title: 'Suite 1',
                 file: 'test.spec.ts',
@@ -120,7 +120,7 @@ describe('test utils', () => {
             ]);
         });
 
-        it('should handle nested suites', () => {
+        test('should handle nested suites', () => {
             const suite: Suite = {
                 title: 'Parent Suite',
                 file: 'test.spec.ts',
@@ -174,7 +174,7 @@ describe('test utils', () => {
     });
 
     describe('compareTests', () => {
-        it('should identify new, skipped, and deleted tests', () => {
+        test('should identify new, skipped, and deleted tests', () => {
             const currentTests: TestInfo[] = [
                 {
                     title: 'Test 1',
@@ -210,7 +210,7 @@ describe('test utils', () => {
             });
         });
 
-        it('should handle empty test arrays', () => {
+        test('should handle empty test arrays', () => {
             const result = compareTests([], []);
             expect(result).toEqual({
                 new: [],
