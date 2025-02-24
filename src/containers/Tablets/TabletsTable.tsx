@@ -1,12 +1,17 @@
+import React from 'react';
+
 import {ArrowRotateLeft} from '@gravity-ui/icons';
 import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
 import {Icon, Text} from '@gravity-ui/uikit';
+import {StringParam, useQueryParams} from 'use-query-params';
 
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
+import {ResponseError} from '../../components/Errors/ResponseError';
 import {InternalLink} from '../../components/InternalLink';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
-import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
+import {Search} from '../../components/Search/Search';
+import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TabletNameWrapper} from '../../components/TabletNameWrapper/TabletNameWrapper';
 import {TabletState} from '../../components/TabletState/TabletState';
 import {TabletUptime} from '../../components/UptimeViewer/UptimeViewer';
@@ -156,19 +161,45 @@ interface TabletsTableProps {
     })[];
     className?: string;
     loading?: boolean;
+    error?: unknown;
 }
 
-export function TabletsTable({database, tablets, className, loading}: TabletsTableProps) {
-    if (loading) {
-        return <TableSkeleton />;
-    }
+export function TabletsTable({database, tablets, loading, error}: TabletsTableProps) {
+    const [{tabletsSearch}, setQueryParams] = useQueryParams({
+        tabletsSearch: StringParam,
+    });
+
+    const columns = React.useMemo(() => getColumns({database}), [database]);
+
+    const data = React.useMemo(() => {
+        return tablets.filter((tablet) => {
+            return String(tablet.TabletId).includes(tabletsSearch ?? '');
+        });
+    }, [tablets, tabletsSearch]);
+
+    const handleSearchQueryChange = (value: string) => {
+        setQueryParams({tabletsSearch: value || undefined}, 'replaceIn');
+    };
+
     return (
-        <ResizeableDataTable
-            wrapperClassName={className}
-            columns={getColumns({database})}
-            data={tablets}
-            settings={DEFAULT_TABLE_SETTINGS}
-            emptyDataMessage={i18n('noTabletsData')}
-        />
+        <TableWithControlsLayout>
+            <TableWithControlsLayout.Controls>
+                <Search
+                    placeholder={i18n('controls.search-placeholder')}
+                    onChange={handleSearchQueryChange}
+                    value={tabletsSearch ?? ''}
+                    width={190}
+                />
+            </TableWithControlsLayout.Controls>
+            {error ? <ResponseError error={error} /> : null}
+            <TableWithControlsLayout.Table loading={loading}>
+                <ResizeableDataTable
+                    columns={columns}
+                    data={data}
+                    settings={DEFAULT_TABLE_SETTINGS}
+                    emptyDataMessage={i18n('noTabletsData')}
+                />
+            </TableWithControlsLayout.Table>
+        </TableWithControlsLayout>
     );
 }
