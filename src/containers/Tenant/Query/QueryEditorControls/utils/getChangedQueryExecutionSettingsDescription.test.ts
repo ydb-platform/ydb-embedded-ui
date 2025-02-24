@@ -15,7 +15,7 @@ import {QUERY_SETTINGS_FIELD_SETTINGS} from '../../QuerySettingsDialog/constants
 import getChangedQueryExecutionSettingsDescription from './getChangedQueryExecutionSettingsDescription';
 
 describe('getChangedQueryExecutionSettingsDescription', () => {
-    it('should return an empty object if no settings changed', () => {
+    test('should return an empty object if no settings changed', () => {
         const currentSettings: QuerySettings = {...DEFAULT_QUERY_SETTINGS};
 
         const result = getChangedQueryExecutionSettingsDescription({
@@ -26,7 +26,7 @@ describe('getChangedQueryExecutionSettingsDescription', () => {
         expect(result).toEqual({});
     });
 
-    it('should return the description for changed settings', () => {
+    test('should return the description for changed settings', () => {
         const currentSettings: QuerySettings = {
             ...DEFAULT_QUERY_SETTINGS,
             queryMode: QUERY_MODES.pg,
@@ -49,7 +49,7 @@ describe('getChangedQueryExecutionSettingsDescription', () => {
         });
     });
 
-    it('should return the correct description for all changed settings', () => {
+    test('should return the correct description for all changed settings', () => {
         const currentSettings: QuerySettings = {
             queryMode: QUERY_MODES.data,
             transactionMode: TRANSACTION_MODES.snapshot,

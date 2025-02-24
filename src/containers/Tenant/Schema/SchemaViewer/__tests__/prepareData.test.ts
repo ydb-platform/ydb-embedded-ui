@@ -3,7 +3,7 @@ import {EPathType} from '../../../../../types/api/schema';
 import {prepareSchemaData, prepareViewSchema} from '../prepareData';
 
 describe('prepareSchemaData', () => {
-    it('correctly parses row table data', () => {
+    test('correctly parses row table data', () => {
         const data: TEvDescribeSchemeResult = {
             PathDescription: {
                 Table: {
@@ -131,7 +131,7 @@ describe('prepareSchemaData', () => {
 
         expect(prepareSchemaData(EPathType.EPathTypeTable, data)).toEqual(result);
     });
-    it('correctly parses column table data', () => {
+    test('correctly parses column table data', () => {
         const data: TEvDescribeSchemeResult = {
             PathDescription: {
                 ColumnTableDescription: {
@@ -241,7 +241,7 @@ describe('prepareSchemaData', () => {
         ];
         expect(prepareSchemaData(EPathType.EPathTypeColumnTable, data)).toEqual(result);
     });
-    it('returns empty array if data is undefined, empty or null', () => {
+    test('returns empty array if data is undefined, empty or null', () => {
         expect(prepareSchemaData(EPathType.EPathTypeTable, {})).toEqual([]);
         expect(prepareSchemaData(EPathType.EPathTypeTable, undefined)).toEqual([]);
         expect(prepareSchemaData(EPathType.EPathTypeTable, null)).toEqual([]);
@@ -249,7 +249,7 @@ describe('prepareSchemaData', () => {
 });
 
 describe('prepareViewSchema', () => {
-    it('correctly parses data', () => {
+    test('correctly parses data', () => {
         const data = [
             {name: 'cost', type: 'Int32'},
             {name: 'id', type: 'Int32'},
@@ -265,7 +265,7 @@ describe('prepareViewSchema', () => {
 
         expect(prepareViewSchema(data)).toEqual(result);
     });
-    it('returns empty array if data is undefined or empty', () => {
+    test('returns empty array if data is undefined or empty', () => {
         expect(prepareViewSchema()).toEqual([]);
         expect(prepareViewSchema([])).toEqual([]);
     });

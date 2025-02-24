@@ -4,7 +4,7 @@ import {dateTimeParse} from '@gravity-ui/date-utils';
 import {getdatePickerSize} from '../utils';
 
 describe('getdatePickerSize test', () => {
-    it('should return the correct datepicker size', () => {
+    test('should return the correct datepicker size', () => {
         const datePickerRangeValues = {
             start: {
                 type: 'relative',
@@ -18,7 +18,7 @@ describe('getdatePickerSize test', () => {
         expect(getdatePickerSize(datePickerRangeValues)).toEqual('s');
     });
 
-    it('should return the correct datepicker size', () => {
+    test('should return the correct datepicker size', () => {
         const datePickerRangeValues = {
             start: {
                 type: 'absolute',
@@ -32,7 +32,7 @@ describe('getdatePickerSize test', () => {
         expect(getdatePickerSize(datePickerRangeValues)).toEqual('m');
     });
 
-    it('should return the correct datepicker size', () => {
+    test('should return the correct datepicker size', () => {
         const datePickerRangeValues = {
             start: {
                 type: 'relative',
@@ -46,7 +46,7 @@ describe('getdatePickerSize test', () => {
         expect(getdatePickerSize(datePickerRangeValues)).toEqual('m');
     });
 
-    it('should return the correct datepicker size', () => {
+    test('should return the correct datepicker size', () => {
         const datePickerRangeValues = {
             start: {
                 type: 'absolute',

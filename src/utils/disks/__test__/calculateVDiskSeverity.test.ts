@@ -4,7 +4,7 @@ import {calculateVDiskSeverity} from '../calculateVDiskSeverity';
 import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from '../constants';
 
 describe('VDisk state', () => {
-    it('Should determine severity based on the highest value among VDiskState, DiskSpace and FrontQueues', () => {
+    test('Should determine severity based on the highest value among VDiskState, DiskSpace and FrontQueues', () => {
         const severity1 = calculateVDiskSeverity({
             VDiskState: EVDiskState.OK, // severity 1, green
             DiskSpace: EFlag.Yellow, // severity 3, yellow
@@ -26,7 +26,7 @@ describe('VDisk state', () => {
         expect(severity3).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Orange);
     });
 
-    it('Should not pick the highest severity based on FrontQueues value', () => {
+    test('Should not pick the highest severity based on FrontQueues value', () => {
         const severity1 = calculateVDiskSeverity({
             VDiskState: EVDiskState.OK, // severity 1, green
             DiskSpace: EFlag.Green, // severity 1, green
@@ -43,7 +43,7 @@ describe('VDisk state', () => {
     });
 
     // prettier-ignore
-    it('Should display as unavailable when no VDiskState is provided', () => {
+    test('Should display as unavailable when no VDiskState is provided', () => {
         const severity1 = calculateVDiskSeverity({});
         const severity2 = calculateVDiskSeverity({
             VDiskState: EVDiskState.OK
@@ -78,7 +78,7 @@ describe('VDisk state', () => {
         expect(severity8).not.toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey);
     });
 
-    it('Should display as unavailable when no VDiskState is provided even if DiskSpace or FrontQueues flags are not green', () => {
+    test('Should display as unavailable when no VDiskState is provided even if DiskSpace or FrontQueues flags are not green', () => {
         const severity1 = calculateVDiskSeverity({
             DiskSpace: EFlag.Red,
             FrontQueues: EFlag.Yellow,
@@ -88,7 +88,7 @@ describe('VDisk state', () => {
         expect(severity1).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey);
     });
 
-    it('Should display replicating VDisks in OK state with a distinct color', () => {
+    test('Should display replicating VDisks in OK state with a distinct color', () => {
         const severity1 = calculateVDiskSeverity({
             VDiskState: EVDiskState.OK, // severity 1, green
             Replicated: false,
@@ -102,7 +102,7 @@ describe('VDisk state', () => {
         expect(severity2).not.toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue);
     });
 
-    it('Should not display VDisk as replicating if Replicated is undefined', () => {
+    test('Should not display VDisk as replicating if Replicated is undefined', () => {
         const severity = calculateVDiskSeverity({
             VDiskState: EVDiskState.OK, // severity 1, green
             Replicated: undefined,
@@ -111,7 +111,7 @@ describe('VDisk state', () => {
         expect(severity).not.toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue);
     });
 
-    it('Should display replicating VDisks in a not-OK state with a regular color', () => {
+    test('Should display replicating VDisks in a not-OK state with a regular color', () => {
         const severity1 = calculateVDiskSeverity({
             VDiskState: EVDiskState.Initial, // severity 3, yellow
             Replicated: false,
@@ -125,7 +125,7 @@ describe('VDisk state', () => {
         expect(severity2).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
     });
 
-    it('Should always display donor VDisks with a regular color', () => {
+    test('Should always display donor VDisks with a regular color', () => {
         const severity1 = calculateVDiskSeverity({
             VDiskState: EVDiskState.OK, // severity 1, green
             Replicated: false, // donors are always in the not replicated state since they are leftovers

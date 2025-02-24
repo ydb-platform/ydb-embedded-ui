@@ -113,7 +113,7 @@ describe('updatePRDescription', () => {
         mockGithub.rest.pulls.update.mockResolvedValue({});
     });
 
-    it('should read both current and main test results', async () => {
+    test('should read both current and main test results', async () => {
         await updatePRDescription(mockGithub, mockContext);
 
         expect(readTestResults).toHaveBeenCalledTimes(2);
@@ -121,7 +121,7 @@ describe('updatePRDescription', () => {
         expect(readTestResults).toHaveBeenCalledWith('gh-pages/main/test-results.json');
     });
 
-    it('should format CI section with correct table and details', async () => {
+    test('should format CI section with correct table and details', async () => {
         const mockResults: TestResultsInfo = {
             total: 5,
             passed: 3,
@@ -154,7 +154,7 @@ describe('updatePRDescription', () => {
         expect(body).toContain('</details>');
     });
 
-    it('should handle PR without existing description', async () => {
+    test('should handle PR without existing description', async () => {
         mockGithub.rest.pulls.get.mockResolvedValue({
             data: {
                 body: null,
@@ -168,7 +168,7 @@ describe('updatePRDescription', () => {
         expect(updateCall.body).toContain('## CI Results');
     });
 
-    it('should handle errors in test results', async () => {
+    test('should handle errors in test results', async () => {
         const emptyResults: TestResultsInfo = {
             total: 0,
             passed: 0,
@@ -192,7 +192,7 @@ describe('updatePRDescription', () => {
         expect(updateCall.body).toContain('| 0 | 0 | 0 | 0 | 0 |');
     });
 
-    it('should include report URL in description', async () => {
+    test('should include report URL in description', async () => {
         await updatePRDescription(mockGithub, mockContext);
 
         expect(mockGithub.rest.pulls.update).toHaveBeenCalled();
@@ -201,7 +201,7 @@ describe('updatePRDescription', () => {
         expect(updateCall.body).toContain(expectedUrl);
     });
 
-    it('should handle failed tests status color', async () => {
+    test('should handle failed tests status color', async () => {
         const failedResults: TestResultsInfo = {
             total: 10,
             passed: 8,
@@ -224,7 +224,7 @@ describe('updatePRDescription', () => {
         expect(updateCall.body).toContain('color: red');
     });
 
-    it('should handle flaky tests status color', async () => {
+    test('should handle flaky tests status color', async () => {
         const flakyResults: TestResultsInfo = {
             total: 10,
             passed: 8,

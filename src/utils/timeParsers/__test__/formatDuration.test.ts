@@ -25,26 +25,26 @@ describe('formatDurationToShortTimeFormat', () => {
     // 6 - zero
     const formattedZero = i18n('ms', {seconds: 0, ms: 0});
 
-    it('should return ms on values less than second', () => {
+    test('should return ms on values less than second', () => {
         expect(formatDurationToShortTimeFormat(timeWithMs)).toEqual(formattedTimeWithMs);
     });
-    it('should return seconds and ms', () => {
+    test('should return seconds and ms', () => {
         expect(formatDurationToShortTimeFormat(timeWithSecondsAndMsInMs)).toEqual(
             formattedTimeWithSecondsAndMs,
         );
     });
-    it('should return minutes and seconds', () => {
+    test('should return minutes and seconds', () => {
         expect(formatDurationToShortTimeFormat(timeWithMinutesInMs)).toEqual(
             formattedTimeWithMinutes,
         );
     });
-    it('should return hours and minutes', () => {
+    test('should return hours and minutes', () => {
         expect(formatDurationToShortTimeFormat(timeWithHoursInMs)).toEqual(formattedTimeWithHours);
     });
-    it('should return days and hours', () => {
+    test('should return days and hours', () => {
         expect(formatDurationToShortTimeFormat(timeWithDaysInMs)).toEqual(formattedTimeWithDays);
     });
-    it('should process zero values', () => {
+    test('should process zero values', () => {
         expect(formatDurationToShortTimeFormat(0)).toEqual(formattedZero);
     });
 });

@@ -34,40 +34,40 @@ describe('Protobuf time parsers', () => {
     };
 
     describe('parseProtobufTimeObjectToMs', () => {
-        it('should work with timestamp object values', () => {
+        test('should work with timestamp object values', () => {
             expect(parseProtobufTimeObjectToMs(timeObjectWithDays)).toEqual(timeWithDaysInMs);
         });
-        it('should work with timestamp object without seconds', () => {
+        test('should work with timestamp object without seconds', () => {
             expect(parseProtobufTimeObjectToMs(timeObjectWithNanoseconds)).toEqual(
                 timeWithNanosecondsInMs,
             );
         });
-        it('should work with timestamp object without nanos', () => {
+        test('should work with timestamp object without nanos', () => {
             expect(parseProtobufTimeObjectToMs(timeObjectWithSeconds)).toEqual(timeWithSecondsInMs);
         });
-        it('should work with empty object values', () => {
+        test('should work with empty object values', () => {
             expect(parseProtobufTimeObjectToMs({})).toEqual(0);
         });
     });
     describe('parseProtobufTimestampToMs', () => {
-        it('should work with string date values', () => {
+        test('should work with string date values', () => {
             expect(parseProtobufTimestampToMs(timestamp)).toEqual(timestampInMs);
         });
-        it('should work with timestamp object values', () => {
+        test('should work with timestamp object values', () => {
             expect(parseProtobufTimestampToMs(timestampObject)).toEqual(timestampInMs);
         });
-        it('should work with empty object values', () => {
+        test('should work with empty object values', () => {
             expect(parseProtobufTimestampToMs({})).toEqual(0);
         });
     });
     describe('parseProtobufDurationToMs', () => {
-        it('should work with string values', () => {
+        test('should work with string values', () => {
             expect(parseProtobufDurationToMs(stringDurationSeconds)).toEqual(timeWithSecondsInMs);
         });
-        it('should work with duration object values', () => {
+        test('should work with duration object values', () => {
             expect(parseProtobufDurationToMs(timeObjectWithDays)).toEqual(timeWithDaysInMs);
         });
-        it('should work with empty object values', () => {
+        test('should work with empty object values', () => {
             expect(parseProtobufDurationToMs({})).toEqual(0);
         });
     });

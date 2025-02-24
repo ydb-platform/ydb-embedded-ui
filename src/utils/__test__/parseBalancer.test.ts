@@ -7,7 +7,7 @@ import {
 } from '../parseBalancer';
 
 describe('parseBalancer', () => {
-    it('should parse balancer with viewer proxy', () => {
+    test('should parse balancer with viewer proxy', () => {
         const rawValue =
             'https://viewer.ydb.ru:443/ydb-testing-0000.search.ydb.net:8765/viewer/json';
         const balancer = 'ydb-testing-0000.search.ydb.net:8765';
@@ -18,7 +18,7 @@ describe('parseBalancer', () => {
         expect(parsedBalancerWithViewer.balancer).toBe(balancer);
         expect(parsedBalancerWithViewer.proxy).toBe(proxy);
     });
-    it('should parse balancer with bastion proxy', () => {
+    test('should parse balancer with bastion proxy', () => {
         const rawValue = 'https://ydb.bastion.cloud.ru:443/ydbproxy.ydb.cloud.net:8765/viewer/json';
         const balancer = 'ydbproxy.ydb.cloud.net:8765';
         const proxy = 'ydb.bastion.cloud.ru:443';
@@ -28,7 +28,7 @@ describe('parseBalancer', () => {
         expect(parsedBalancerWithBastion.balancer).toBe(balancer);
         expect(parsedBalancerWithBastion.proxy).toBe(proxy);
     });
-    it('should parse balancer with custom proxy', () => {
+    test('should parse balancer with custom proxy', () => {
         const rawValue =
             'https://proxy.ydb.mdb.cloud-preprod.net:443/ydbproxy-public.ydb.cloud-preprod.net:8765/viewer/json';
         const balancer = 'ydbproxy-public.ydb.cloud-preprod.net:8765';
@@ -39,7 +39,7 @@ describe('parseBalancer', () => {
         expect(parsedBalancerWithCustomProxy.balancer).toBe(balancer);
         expect(parsedBalancerWithCustomProxy.proxy).toBe(proxy);
     });
-    it('should parse balancer without proxy', () => {
+    test('should parse balancer without proxy', () => {
         const rawValue = 'https://ydb-testing-0000.search.net:8765/viewer/json';
         const balancer = 'ydb-testing-0000.search.net:8765';
 
@@ -49,7 +49,7 @@ describe('parseBalancer', () => {
         expect(parsedBalancerWithoutProxy.proxy).toBe(undefined);
     });
 
-    it('should parse pure balancer', () => {
+    test('should parse pure balancer', () => {
         const pureBalancer = 'ydb-testing-0000.search.net:8765';
 
         const parsedPureBalancer = parseBalancer(pureBalancer);
@@ -60,7 +60,7 @@ describe('parseBalancer', () => {
 });
 
 describe('removeViewerPathname', () => {
-    it('should remove pathname', () => {
+    test('should remove pathname', () => {
         const initialValue = 'https://ydb-testing-0000.search.net:8765/viewer/json';
         const result = 'https://ydb-testing-0000.search.net:8765';
 
@@ -68,7 +68,7 @@ describe('removeViewerPathname', () => {
     });
 });
 describe('removeProtocol', () => {
-    it('should remove protocol', () => {
+    test('should remove protocol', () => {
         const initialValue = 'https://ydb-testing-0000.search.net:8765/viewer/json';
         const result = 'ydb-testing-0000.search.net:8765/viewer/json';
 
@@ -76,7 +76,7 @@ describe('removeProtocol', () => {
     });
 });
 describe('removePort', () => {
-    it('should remove port', () => {
+    test('should remove port', () => {
         const initialValue = 'ydb-testing-0000.search.net:8765';
         const result = 'ydb-testing-0000.search.net';
 
@@ -84,7 +84,7 @@ describe('removePort', () => {
     });
 });
 describe('getCleanBalancerValue', () => {
-    it('should return balancer value without protocol, proxy, port and pathname', () => {
+    test('should return balancer value without protocol, proxy, port and pathname', () => {
         const initialValue =
             'https://ydb.bastion.cloud.ru:443/ydbproxy.ydb.cloud.net:8765/viewer/json';
         const result = 'ydbproxy.ydb.cloud.net';

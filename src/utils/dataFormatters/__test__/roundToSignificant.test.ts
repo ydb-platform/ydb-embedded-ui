@@ -1,7 +1,7 @@
 import {roundToPrecision} from '../dataFormatters';
 
 describe('roundToSignificant', () => {
-    it('should work with only value', () => {
+    test('should work with only value', () => {
         expect(roundToPrecision(123)).toBe(123);
         expect(roundToPrecision(123.123)).toBe(123);
         expect(roundToPrecision(12.123)).toBe(12);
@@ -9,7 +9,7 @@ describe('roundToSignificant', () => {
         expect(roundToPrecision(0.123)).toBe(0);
         expect(roundToPrecision(0)).toBe(0);
     });
-    it('should work with precision', () => {
+    test('should work with precision', () => {
         expect(roundToPrecision(123, 2)).toBe(123);
         expect(roundToPrecision(123.123, 2)).toBe(123);
         expect(roundToPrecision(12.123, 2)).toBe(12);
