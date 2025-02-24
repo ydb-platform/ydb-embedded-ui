@@ -80,7 +80,7 @@ const useGetSecuritySetting = (feature: SecuritySetting) => {
     return useTypedSelector((state) => selectSecuritySetting(state, feature, database));
 };
 
-export const useAccessTotallyRestricted = () => {
+export const useClusterWithoutAuthInUI = () => {
     return useGetSecuritySetting('UseLoginProvider') === false;
 };
 

@@ -4,7 +4,7 @@ import {useHistory} from 'react-router-dom';
 
 import routes, {createHref} from '../../../routes';
 import {authenticationApi} from '../../../store/reducers/authentication/authentication';
-import {useAccessTotallyRestricted} from '../../../store/reducers/capabilities/hooks';
+import {useClusterWithoutAuthInUI} from '../../../store/reducers/capabilities/hooks';
 import {cn} from '../../../utils/cn';
 import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import i18n from '../i18n';
@@ -15,7 +15,7 @@ const b = cn('kv-ydb-internal-user');
 
 export function YdbInternalUser({login}: {login?: string}) {
     const [logout] = authenticationApi.useLogoutMutation();
-    const isForbidded = useAccessTotallyRestricted();
+    const authUnavailable = useClusterWithoutAuthInUI();
     const database = useDatabaseFromQuery();
 
     const history = useHistory();
@@ -33,7 +33,7 @@ export function YdbInternalUser({login}: {login?: string}) {
     };
 
     const renderLoginButton = () => {
-        if (isForbidded) {
+        if (authUnavailable) {
             return null;
         }
         return (

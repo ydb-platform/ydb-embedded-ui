@@ -14,9 +14,9 @@ import routes from '../../routes';
 import type {RootState} from '../../store';
 import {authenticationApi} from '../../store/reducers/authentication/authentication';
 import {
-    useAccessTotallyRestricted,
     useCapabilitiesLoaded,
     useCapabilitiesQuery,
+    useClusterWithoutAuthInUI,
 } from '../../store/reducers/capabilities/hooks';
 import {nodesListApi} from '../../store/reducers/nodesList';
 import {cn} from '../../utils/cn';
@@ -228,10 +228,10 @@ interface ContentWrapperProps {
 
 function ContentWrapper(props: ContentWrapperProps) {
     const {singleClusterMode, isAuthenticated} = props;
-    const isForbidded = useAccessTotallyRestricted();
+    const authUnavailable = useClusterWithoutAuthInUI();
 
     const renderNotAuthenticated = () => {
-        if (isForbidded) {
+        if (authUnavailable) {
             return <AccessDenied />;
         }
         return <Authentication />;
@@ -239,7 +239,7 @@ function ContentWrapper(props: ContentWrapperProps) {
 
     return (
         <Switch>
-            {!isForbidded && (
+            {!authUnavailable && (
                 <Route path={routes.auth}>
                     <Authentication closable />
                 </Route>
