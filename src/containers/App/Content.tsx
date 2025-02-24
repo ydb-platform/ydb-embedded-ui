@@ -4,6 +4,7 @@ import {connect} from 'react-redux';
 import type {RedirectProps} from 'react-router-dom';
 import {Redirect, Route, Switch} from 'react-router-dom';
 
+import {AccessDenied} from '../../components/Errors/403';
 import {PageError} from '../../components/Errors/PageError/PageError';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {useSlots} from '../../components/slots';
@@ -12,7 +13,11 @@ import type {SlotComponent} from '../../components/slots/types';
 import routes from '../../routes';
 import type {RootState} from '../../store';
 import {authenticationApi} from '../../store/reducers/authentication/authentication';
-import {useCapabilitiesLoaded, useCapabilitiesQuery} from '../../store/reducers/capabilities/hooks';
+import {
+    useCapabilitiesLoaded,
+    useCapabilitiesQuery,
+    useClusterWithoutAuthInUI,
+} from '../../store/reducers/capabilities/hooks';
 import {nodesListApi} from '../../store/reducers/nodesList';
 import {cn} from '../../utils/cn';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
@@ -177,10 +182,14 @@ export function Content(props: ContentProps) {
 
 function DataWrapper({children}: {children: React.ReactNode}) {
     return (
-        <GetUser>
-            <GetNodesList />
-            <GetCapabilities>{children}</GetCapabilities>
-        </GetUser>
+        // capabilities is going to work without authentication, but not all running systems are supporting this yet
+        <GetCapabilities>
+            <GetUser>
+                <GetNodesList />
+                {/* this GetCapabilities will be removed */}
+                <GetCapabilities>{children}</GetCapabilities>
+            </GetUser>
+        </GetCapabilities>
     );
 }
 
@@ -219,15 +228,25 @@ interface ContentWrapperProps {
 
 function ContentWrapper(props: ContentWrapperProps) {
     const {singleClusterMode, isAuthenticated} = props;
+    const authUnavailable = useClusterWithoutAuthInUI();
+
+    const renderNotAuthenticated = () => {
+        if (authUnavailable) {
+            return <AccessDenied />;
+        }
+        return <Authentication />;
+    };
 
     return (
         <Switch>
-            <Route path={routes.auth}>
-                <Authentication closable />
-            </Route>
+            {!authUnavailable && (
+                <Route path={routes.auth}>
+                    <Authentication closable />
+                </Route>
+            )}
             <Route>
                 <div className={b({embedded: singleClusterMode})}>
-                    {isAuthenticated ? props.children : <Authentication />}
+                    {isAuthenticated ? props.children : renderNotAuthenticated()}
                 </div>
             </Route>
         </Switch>

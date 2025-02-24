@@ -22,3 +22,6 @@ export function isUserError(error: unknown): error is AuthError {
 export function isPasswordError(error: unknown): error is AuthError {
     return isAuthError(error) && error.data.error.includes('password');
 }
+export function isDatabaseError(error: unknown): error is AuthError {
+    return isAuthError(error) && error.data.error.includes('database');
+}

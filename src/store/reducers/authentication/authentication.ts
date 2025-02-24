@@ -65,7 +65,10 @@ export const authenticationApi = api.injectEndpoints({
             providesTags: ['UserData'],
         }),
         authenticate: build.mutation({
-            queryFn: async (params: {user: string; password: string}, {dispatch}) => {
+            queryFn: async (
+                params: {user: string; password: string; database?: string},
+                {dispatch},
+            ) => {
                 try {
                     const data = await window.api.auth.authenticate(params);
                     dispatch(setIsAuthenticated(true));

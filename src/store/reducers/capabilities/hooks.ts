@@ -1,8 +1,13 @@
-import type {Capability} from '../../../types/api/capabilities';
+import type {Capability, SecuritySetting} from '../../../types/api/capabilities';
 import {useTypedSelector} from '../../../utils/hooks';
 import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 
-import {capabilitiesApi, selectCapabilityVersion, selectDatabaseCapabilities} from './capabilities';
+import {
+    capabilitiesApi,
+    selectCapabilityVersion,
+    selectDatabaseCapabilities,
+    selectSecuritySetting,
+} from './capabilities';
 
 export function useCapabilitiesQuery() {
     const database = useDatabaseFromQuery();
@@ -67,4 +72,18 @@ export const useClusterDashboardAvailable = () => {
 
 export const useStreamingAvailable = () => {
     return useGetFeatureVersion('/viewer/query') >= 7;
+};
+
+const useGetSecuritySetting = (feature: SecuritySetting) => {
+    const database = useDatabaseFromQuery();
+
+    return useTypedSelector((state) => selectSecuritySetting(state, feature, database));
+};
+
+export const useClusterWithoutAuthInUI = () => {
+    return useGetSecuritySetting('UseLoginProvider') === false;
+};
+
+export const useLoginWithDatabase = () => {
+    return useGetSecuritySetting('DomainLoginOnly') === false;
 };
