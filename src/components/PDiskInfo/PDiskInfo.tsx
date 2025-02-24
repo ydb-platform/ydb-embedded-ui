@@ -25,6 +25,7 @@ interface GetPDiskInfoOptions<T extends PreparedPDisk> {
     nodeId?: number | string | null;
     withPDiskPageLink?: boolean;
     isUserAllowedToMakeChanges?: boolean;
+    database?: string;
 }
 
 // eslint-disable-next-line complexity
@@ -33,6 +34,7 @@ function getPDiskInfo<T extends PreparedPDisk>({
     nodeId,
     withPDiskPageLink,
     isUserAllowedToMakeChanges,
+    database,
 }: GetPDiskInfoOptions<T>) {
     const {
         PDiskId,
@@ -147,10 +149,11 @@ function getPDiskInfo<T extends PreparedPDisk>({
         valueIsDefined(nodeId);
 
     if (shouldDisplayLinks) {
-        const pDiskPagePath = getPDiskPagePath(PDiskId, nodeId);
+        const pDiskPagePath = getPDiskPagePath(PDiskId, nodeId, {database});
         const pDiskInternalViewerPath = createPDiskDeveloperUILink({
             nodeId,
             pDiskId: PDiskId,
+            database,
         });
 
         additionalInfo.push({
@@ -187,6 +190,7 @@ export function PDiskInfo<T extends PreparedPDisk>({
     nodeId,
     withPDiskPageLink,
     className,
+    database,
 }: PDiskInfoProps<T>) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
@@ -195,6 +199,7 @@ export function PDiskInfo<T extends PreparedPDisk>({
         nodeId,
         withPDiskPageLink,
         isUserAllowedToMakeChanges,
+        database,
     });
 
     return (

@@ -21,9 +21,10 @@ interface DisksProps {
     vDisks?: PreparedVDisk[];
     viewContext?: StorageViewContext;
     erasure?: Erasure;
+    database?: string;
 }
 
-export function Disks({vDisks = [], viewContext, erasure}: DisksProps) {
+export function Disks({vDisks = [], viewContext, erasure, database}: DisksProps) {
     const [highlightedVDisk, setHighlightedVDisk] = React.useState<string | undefined>();
 
     const vDisksWithDCMargins = useVDisksWithDCMargins(vDisks, erasure);
@@ -44,6 +45,7 @@ export function Disks({vDisks = [], viewContext, erasure}: DisksProps) {
             <Flex direction={'row'} gap={1} grow style={{width: VDISKS_CONTAINER_WIDTH}}>
                 {vDisks?.map((vDisk, index) => (
                     <VDiskItem
+                        database={database}
                         key={vDisk.StringifiedId || index}
                         vDisk={vDisk}
                         inactive={!isVdiskActive(vDisk, viewContext)}
@@ -57,6 +59,7 @@ export function Disks({vDisks = [], viewContext, erasure}: DisksProps) {
             <div className={b('pdisks-wrapper')}>
                 {vDisks?.map((vDisk, index) => (
                     <PDiskItem
+                        database={database}
                         key={vDisk?.PDisk?.StringifiedId || index}
                         vDisk={vDisk}
                         highlightedVDisk={highlightedVDisk}
@@ -76,6 +79,7 @@ interface DisksItemProps {
     setHighlightedVDisk: (id: string | undefined) => void;
     unavailableVDiskWidth?: number;
     withDCMargin?: boolean;
+    database?: string;
 }
 
 function VDiskItem({
@@ -84,6 +88,7 @@ function VDiskItem({
     inactive,
     setHighlightedVDisk,
     unavailableVDiskWidth,
+    database,
 }: DisksItemProps) {
     // Do not show PDisk popup for VDisk
     const vDiskToShow = {...vDisk, PDisk: undefined};
@@ -97,6 +102,7 @@ function VDiskItem({
     return (
         <div style={{flexGrow, minWidth}} className={b('vdisk-item')}>
             <VDisk
+                database={database}
                 data={vDiskToShow}
                 compact
                 inactive={inactive}
@@ -109,7 +115,13 @@ function VDiskItem({
     );
 }
 
-function PDiskItem({vDisk, highlightedVDisk, setHighlightedVDisk, withDCMargin}: DisksItemProps) {
+function PDiskItem({
+    vDisk,
+    highlightedVDisk,
+    setHighlightedVDisk,
+    withDCMargin,
+    database,
+}: DisksItemProps) {
     const vDiskId = vDisk.StringifiedId;
 
     if (!vDisk.PDisk) {
@@ -118,6 +130,7 @@ function PDiskItem({vDisk, highlightedVDisk, setHighlightedVDisk, withDCMargin}:
 
     return (
         <PDisk
+            database={database}
             className={b('pdisk-item', {['with-dc-margin']: withDCMargin})}
             progressBarClassName={b('pdisk-progress-bar')}
             data={vDisk.PDisk}

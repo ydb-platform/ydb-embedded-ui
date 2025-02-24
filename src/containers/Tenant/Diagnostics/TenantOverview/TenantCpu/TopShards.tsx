@@ -32,13 +32,14 @@ export const TopShards = ({tenantName, path}: TopShardsProps) => {
     const loading = isFetching && currentData === undefined;
     const data = currentData?.resultSets?.[0]?.result || [];
 
-    const columns = getTopShardsColumns(tenantName, location);
+    const columns = getTopShardsColumns(tenantName, location, tenantName);
 
     const title = getSectionTitle({
         entity: i18n('shards'),
         postfix: i18n('by-cpu-usage'),
         link: getTenantPath({
             ...query,
+            database: tenantName,
             [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.topShards,
         }),
     });

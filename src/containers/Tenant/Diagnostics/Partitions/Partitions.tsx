@@ -59,7 +59,7 @@ export const Partitions = ({path, database}: PartitionsProps) => {
 
     const [hiddenColumns, setHiddenColumns] = useSetting<string[]>(PARTITIONS_HIDDEN_COLUMNS_KEY);
 
-    const [columns, columnsIdsForSelector] = useGetPartitionsColumns(selectedConsumer);
+    const [columns, columnsIdsForSelector] = useGetPartitionsColumns(selectedConsumer, database);
 
     const params = topicLoading ? skipToken : {path, database, consumerName: selectedConsumer};
     const {

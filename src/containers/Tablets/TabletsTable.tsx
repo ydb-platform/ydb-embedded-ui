@@ -66,7 +66,9 @@ function getColumns({database}: {database?: string}) {
             },
             render: ({row}) => {
                 const nodePath =
-                    row.NodeId === undefined ? undefined : getDefaultNodePath(row.NodeId);
+                    row.NodeId === undefined
+                        ? undefined
+                        : getDefaultNodePath(row.NodeId, {database});
                 return <InternalLink to={nodePath}>{row.NodeId}</InternalLink>;
             },
             align: 'right',

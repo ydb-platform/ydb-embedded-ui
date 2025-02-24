@@ -53,7 +53,7 @@ export function Node() {
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    const params = nodeId ? {nodeId} : skipToken;
+    const params = nodeId ? {nodeId, database: tenantNameFromQuery?.toString()} : skipToken;
     const {
         currentData: node,
         isLoading,
@@ -226,6 +226,7 @@ function NodePageContent({
                 return (
                     <PaginatedStorage
                         nodeId={nodeId}
+                        database={tenantName}
                         parentRef={parentContainer}
                         viewContext={{
                             nodeId: nodeId,
@@ -238,7 +239,7 @@ function NodePageContent({
             }
 
             case 'structure': {
-                return <NodeStructure nodeId={nodeId} />;
+                return <NodeStructure nodeId={nodeId} database={tenantName} />;
             }
 
             default:

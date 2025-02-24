@@ -126,6 +126,7 @@ export function ObjectSummary({
                         wrapTo={({id}, node) => {
                             const tabPath = getTenantPath({
                                 ...queryParams,
+                                database: tenantName,
                                 [TenantTabsGroups.summaryTab]: id,
                             });
                             return (

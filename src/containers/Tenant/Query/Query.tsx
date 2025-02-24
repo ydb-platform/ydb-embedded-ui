@@ -62,7 +62,7 @@ export const Query = (props: QueryProps) => {
                     <title>{activeTab.title}</title>
                 </Helmet>
             ) : null}
-            <QueryTabs className={b('tabs')} activeTab={queryTab} />
+            <QueryTabs className={b('tabs')} activeTab={queryTab} database={props.tenantName} />
             <div className={b('content')}>{renderContent()}</div>
         </div>
     );

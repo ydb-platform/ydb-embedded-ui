@@ -25,6 +25,7 @@ interface VDiskInfoProps<T extends PreparedVDisk> extends Omit<InfoViewerProps, 
     data?: T;
     withVDiskPageLink?: boolean;
     withTitle?: boolean;
+    database?: string;
 }
 
 // eslint-disable-next-line complexity
@@ -32,6 +33,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
     data,
     withVDiskPageLink,
     withTitle,
+    database,
     ...infoViewerProps
 }: VDiskInfoProps<T>) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
@@ -152,7 +154,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
         const links: React.ReactNode[] = [];
 
         if (withVDiskPageLink) {
-            const vDiskPagePath = getVDiskPagePath(VDiskSlotId, PDiskId, NodeId);
+            const vDiskPagePath = getVDiskPagePath(VDiskSlotId, PDiskId, NodeId, {database});
             links.push(
                 <LinkWithIcon
                     key={vDiskPagePath}
@@ -168,6 +170,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
                 nodeId: NodeId,
                 pDiskId: PDiskId,
                 vDiskSlotId: VDiskSlotId,
+                database,
             });
 
             links.push(

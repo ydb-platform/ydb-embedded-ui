@@ -23,9 +23,10 @@ function generateId({type, id}: {type: 'pdisk' | 'vdisk'; id: string}) {
 interface NodeStructureProps {
     nodeId: string;
     className?: string;
+    database?: string;
 }
 
-function NodeStructure({nodeId, className}: NodeStructureProps) {
+function NodeStructure({nodeId, className, database}: NodeStructureProps) {
     const nodeStructure = useTypedSelector((state) => selectNodeStructure(state, nodeId));
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
@@ -95,6 +96,7 @@ function NodeStructure({nodeId, className}: NodeStructureProps) {
                       unfolded={pdiskIdFromUrl === pDiskId}
                       selectedVdiskId={vdiskIdFromUrl as string}
                       nodeId={nodeId}
+                      database={database}
                   />
               ))
             : renderStub();

@@ -11,12 +11,12 @@ import {ETabletState} from '../../../../types/api/tablet';
 import type {TTabletStateInfo} from '../../../../types/api/tablet';
 import {cn} from '../../../../utils/cn';
 import {createTabletDeveloperUIHref} from '../../../../utils/developerUI/developerUI';
+import {useDatabaseFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
 import {useIsUserAllowedToMakeChanges} from '../../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {getDefaultNodePath} from '../../../Node/NodePages';
 import {hasHive} from '../../utils';
 
 import {tabletInfoKeyset} from './i18n';
-
 const b = cn('ydb-tablet-info');
 
 import './TabletInfo.scss';
@@ -27,6 +27,7 @@ interface TabletInfoProps {
 
 export const TabletInfo = ({tablet}: TabletInfoProps) => {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const database = useDatabaseFromQuery();
 
     const {
         ChangeTime,
@@ -48,6 +49,7 @@ export const TabletInfo = ({tablet}: TabletInfoProps) => {
         tabletInfo.push({
             label: tabletInfoKeyset('field_hive'),
             value: (
+                //TODO: add database to getTabletPagePath after fix in backend
                 <Link to={getTabletPagePath(HiveId)} className={b('link')}>
                     {HiveId}
                 </Link>
@@ -59,6 +61,7 @@ export const TabletInfo = ({tablet}: TabletInfoProps) => {
         tabletInfo.push({
             label: tabletInfoKeyset('field_scheme-shard'),
             value: (
+                //TODO: add database to getTabletPagePath after fix in backend
                 <Link to={getTabletPagePath(SchemeShard)} className={b('link')}>
                     {SchemeShard}
                 </Link>
@@ -80,7 +83,7 @@ export const TabletInfo = ({tablet}: TabletInfoProps) => {
         {
             label: tabletInfoKeyset('field_node'),
             value: (
-                <Link className={b('link')} to={getDefaultNodePath(String(NodeId))}>
+                <Link className={b('link')} to={getDefaultNodePath(String(NodeId), {database})}>
                     {NodeId}
                 </Link>
             ),
@@ -110,19 +113,19 @@ export const TabletInfo = ({tablet}: TabletInfoProps) => {
                 <Flex direction="column" gap={3}>
                     <LinkWithIcon
                         title={tabletInfoKeyset('field_developer-ui-app')}
-                        url={createTabletDeveloperUIHref(TabletId, 'app')}
+                        url={createTabletDeveloperUIHref(TabletId, database, 'app')}
                     />
                     <LinkWithIcon
                         title={tabletInfoKeyset('field_developer-ui-counters')}
-                        url={createTabletDeveloperUIHref(TabletId, 'counters')}
+                        url={createTabletDeveloperUIHref(TabletId, database, 'counters')}
                     />
                     <LinkWithIcon
                         title={tabletInfoKeyset('field_developer-ui-executor')}
-                        url={createTabletDeveloperUIHref(TabletId, 'executorInternals')}
+                        url={createTabletDeveloperUIHref(TabletId, database, 'executorInternals')}
                     />
                     <LinkWithIcon
                         title={tabletInfoKeyset('field_developer-ui-state')}
-                        url={createTabletDeveloperUIHref(TabletId, undefined, 'SsId')}
+                        url={createTabletDeveloperUIHref(TabletId, database, undefined, 'SsId')}
                     />
                 </Flex>
             </div>

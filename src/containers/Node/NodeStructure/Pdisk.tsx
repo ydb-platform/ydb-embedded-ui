@@ -35,6 +35,7 @@ interface PDiskProps {
     id: string;
     selectedVdiskId?: string;
     nodeId: string | number;
+    database?: string;
 }
 
 enum VDiskTableColumnsIds {
@@ -58,11 +59,13 @@ function getColumns({
     selectedVdiskId,
     nodeId,
     withDeveloperUILink,
+    database,
 }: {
     pDiskId: number | undefined;
     selectedVdiskId?: string;
     nodeId?: string | number;
     withDeveloperUILink?: boolean;
+    database?: string;
 }) {
     const columns: Column<PreparedStructureVDisk>[] = [
         {
@@ -143,7 +146,9 @@ function getColumns({
                 return (
                     <Popover
                         placement={['right']}
-                        content={<VDiskInfo data={row} withTitle withVDiskPageLink />}
+                        content={
+                            <VDiskInfo data={row} withTitle withVDiskPageLink database={database} />
+                        }
                         tooltipContentClassName={b('vdisk-details')}
                     >
                         <Button
@@ -169,6 +174,7 @@ export function PDisk({
     selectedVdiskId,
     nodeId,
     unfolded: unfoldedFromProps,
+    database,
 }: PDiskProps) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
@@ -196,6 +202,7 @@ export function PDisk({
                     pDiskId: PDiskId,
                     selectedVdiskId,
                     withDeveloperUILink: isUserAllowedToMakeChanges,
+                    database,
                 })}
                 settings={{...DEFAULT_TABLE_SETTINGS, dynamicRender: false}}
                 rowClassName={(row) => {
@@ -217,6 +224,7 @@ export function PDisk({
                     nodeId={nodeId}
                     className={b('pdisk-details')}
                     withPDiskPageLink
+                    database={database}
                 />
                 <div className={b('vdisks-container')}>
                     <div className={b('vdisks-header')}>VDisks</div>

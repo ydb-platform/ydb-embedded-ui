@@ -77,6 +77,7 @@ export const TopQueries = ({tenantName}: TopQueriesProps) => {
 
             const queryPath = getTenantPath({
                 ...queryParams,
+                database: tenantName,
                 [TENANT_PAGE]: TENANT_PAGES_IDS.query,
                 [TenantTabsGroups.queryTab]: TENANT_QUERY_TABS_ID.newQuery,
             });

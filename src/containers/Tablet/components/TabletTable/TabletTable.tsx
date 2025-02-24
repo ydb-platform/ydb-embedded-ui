@@ -7,11 +7,12 @@ import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/Re
 import {TabletState} from '../../../../components/TabletState/TabletState';
 import {TabletUptime} from '../../../../components/UptimeViewer/UptimeViewer';
 import type {ITabletPreparedHistoryItem} from '../../../../types/store/tablet';
+import {useDatabaseFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
 import {getDefaultNodePath} from '../../../Node/NodePages';
 
 const TABLET_COLUMNS_WIDTH_LS_KEY = 'tabletTableColumnsWidth';
 
-const columns: Column<ITabletPreparedHistoryItem>[] = [
+const getColumns = (database?: string): Column<ITabletPreparedHistoryItem>[] => [
     {
         name: 'Generation',
         align: DataTable.RIGHT,
@@ -43,7 +44,11 @@ const columns: Column<ITabletPreparedHistoryItem>[] = [
         align: DataTable.RIGHT,
         sortable: false,
         render: ({row}) => {
-            return <InternalLink to={getDefaultNodePath(row.nodeId)}>{row.nodeId}</InternalLink>;
+            return (
+                <InternalLink to={getDefaultNodePath(row.nodeId, {database})}>
+                    {row.nodeId}
+                </InternalLink>
+            );
         },
     },
     {
@@ -68,11 +73,12 @@ interface TabletTableProps {
 }
 
 export const TabletTable = ({history}: TabletTableProps) => {
+    const database = useDatabaseFromQuery();
     return (
         <ResizeableDataTable
             columnsWidthLSKey={TABLET_COLUMNS_WIDTH_LS_KEY}
             data={history}
-            columns={columns}
+            columns={getColumns(database)}
             settings={TABLE_SETTINGS}
             initialSortOrder={{
                 columnId: 'Generation',

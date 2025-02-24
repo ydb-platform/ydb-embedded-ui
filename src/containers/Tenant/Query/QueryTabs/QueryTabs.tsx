@@ -26,9 +26,10 @@ export const queryEditorTabs = [newQuery, history, saved];
 interface QueryEditorTabsProps {
     className?: string;
     activeTab?: TenantQueryTab;
+    database: string;
 }
 
-export const QueryTabs = ({className, activeTab}: QueryEditorTabsProps) => {
+export const QueryTabs = ({className, activeTab, database}: QueryEditorTabsProps) => {
     const location = useLocation();
     const queryParams = parseQuery(location);
 
@@ -41,6 +42,7 @@ export const QueryTabs = ({className, activeTab}: QueryEditorTabsProps) => {
                 items={queryEditorTabs}
                 wrapTo={({id}, node) => {
                     const path = getTenantPath({
+                        database,
                         ...queryParams,
                         [TenantTabsGroups.queryTab]: id,
                     });

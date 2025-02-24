@@ -86,6 +86,7 @@ export function TopNodesByMemory({tenantName, additionalNodesProps}: TopNodesByM
         postfix: i18n('by-memory'),
         link: getTenantPath({
             ...query,
+            database: tenantName,
             [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.nodes,
         }),
     });

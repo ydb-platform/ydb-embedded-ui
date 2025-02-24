@@ -19,8 +19,8 @@ import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';
 
-function getColumns(): [StorageGroupsColumn[], GroupsRequiredField[]] {
-    const preparedColumns = getStorageTopGroupsColumns();
+function getColumns(database?: string): [StorageGroupsColumn[], GroupsRequiredField[]] {
+    const preparedColumns = getStorageTopGroupsColumns({database});
 
     const columnsIds = preparedColumns.map((column) => column.name);
     const dataFieldsRequired = getRequiredDataFields(columnsIds, GROUPS_COLUMNS_TO_DATA_FIELDS);
@@ -39,7 +39,7 @@ export function TopGroups({tenant}: TopGroupsProps) {
     const groupsHandlerAvailable = useStorageGroupsHandlerAvailable();
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    const [columns, fieldsRequired] = getColumns();
+    const [columns, fieldsRequired] = getColumns(tenant);
 
     const {currentData, isFetching, error} = storageApi.useGetStorageGroupsInfoQuery(
         {
@@ -65,6 +65,7 @@ export function TopGroups({tenant}: TopGroupsProps) {
         postfix: i18n('by-usage'),
         link: getTenantPath({
             ...query,
+            database: tenant,
             [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.storage,
         }),
     });

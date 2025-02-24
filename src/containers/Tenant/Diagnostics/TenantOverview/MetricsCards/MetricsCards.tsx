@@ -70,18 +70,22 @@ export function MetricsCards({
     const tabLinks: Record<TenantMetricsTab, string> = {
         [TENANT_METRICS_TABS_IDS.cpu]: getTenantPath({
             ...queryParams,
+            database: tenantName,
             [TenantTabsGroups.metricsTab]: getTabIfNotActive(TENANT_METRICS_TABS_IDS.cpu),
         }),
         [TENANT_METRICS_TABS_IDS.storage]: getTenantPath({
             ...queryParams,
+            database: tenantName,
             [TenantTabsGroups.metricsTab]: getTabIfNotActive(TENANT_METRICS_TABS_IDS.storage),
         }),
         [TENANT_METRICS_TABS_IDS.memory]: getTenantPath({
             ...queryParams,
+            database: tenantName,
             [TenantTabsGroups.metricsTab]: getTabIfNotActive(TENANT_METRICS_TABS_IDS.memory),
         }),
         [TENANT_METRICS_TABS_IDS.healthcheck]: getTenantPath({
             ...queryParams,
+            database: tenantName,
             [TenantTabsGroups.metricsTab]: getTabIfNotActive(TENANT_METRICS_TABS_IDS.healthcheck),
         }),
     };

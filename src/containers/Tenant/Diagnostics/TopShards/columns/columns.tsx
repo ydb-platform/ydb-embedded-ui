@@ -50,30 +50,34 @@ const dataSizeColumn: Column<KeyValueRow> = {
     align: DataTable.RIGHT,
 };
 
-const tabletIdColumn: Column<KeyValueRow> = {
+const getTabletIdColumn = (database?: string): Column<KeyValueRow> => ({
     name: TOP_SHARDS_COLUMNS_IDS.TabletId,
     header: TOP_SHARDS_COLUMNS_TITLES.TabletId,
     render: ({row}) => {
         if (!row.TabletId) {
             return '–';
         }
-        return <TabletNameWrapper tabletId={row.TabletId} />;
+        return <TabletNameWrapper tabletId={row.TabletId} database={database} />;
     },
     sortable: false,
     width: 220,
-};
+});
 
-const nodeIdColumn: Column<KeyValueRow> = {
+const getNodeIdColumn = (database?: string): Column<KeyValueRow> => ({
     name: TOP_SHARDS_COLUMNS_IDS.NodeId,
     header: TOP_SHARDS_COLUMNS_TITLES.NodeId,
     render: ({row}) => {
         if (!row.NodeId) {
             return '–';
         }
-        return <InternalLink to={getDefaultNodePath(row.NodeId)}>{row.NodeId}</InternalLink>;
+        return (
+            <InternalLink to={getDefaultNodePath(row.NodeId, {database})}>
+                {row.NodeId}
+            </InternalLink>
+        );
     },
     align: DataTable.RIGHT,
-};
+});
 
 const topShardsCpuCoresColumn: Column<KeyValueRow> = {
     name: TOP_SHARDS_COLUMNS_IDS.CPUCores,
@@ -99,17 +103,25 @@ const inFlightTxCountColumn: Column<KeyValueRow> = {
     align: DataTable.RIGHT,
 };
 
-export const getShardsWorkloadColumns = (schemaPath: string, location: Location) => {
+export const getShardsWorkloadColumns = (
+    schemaPath: string,
+    location: Location,
+    database?: string,
+) => {
     return [
         getPathColumn(schemaPath, location),
         cpuCoresColumn,
         dataSizeColumn,
-        tabletIdColumn,
-        nodeIdColumn,
+        getTabletIdColumn(database),
+        getNodeIdColumn(database),
         inFlightTxCountColumn,
     ];
 };
 
-export const getTopShardsColumns = (schemaPath: string, location: Location) => {
-    return [tabletIdColumn, getPathColumn(schemaPath, location), topShardsCpuCoresColumn];
+export const getTopShardsColumns = (schemaPath: string, location: Location, database?: string) => {
+    return [
+        getTabletIdColumn(database),
+        getPathColumn(schemaPath, location),
+        topShardsCpuCoresColumn,
+    ];
 };

@@ -141,13 +141,16 @@ const diskSpaceUsageColumn: StorageGroupsColumn = {
     align: DataTable.LEFT,
 };
 
-const groupIdColumn: StorageGroupsColumn = {
+const getGroupIdColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => ({
     name: STORAGE_GROUPS_COLUMNS_IDS.GroupId,
     header: STORAGE_GROUPS_COLUMNS_TITLES.GroupId,
     width: 130,
     render: ({row}) => {
         return row.GroupId ? (
-            <InternalLink className={b('group-id')} to={getStorageGroupPath(row.GroupId)}>
+            <InternalLink
+                className={b('group-id')}
+                to={getStorageGroupPath(row.GroupId, {database: data?.database})}
+            >
                 {row.GroupId}
             </InternalLink>
         ) : (
@@ -156,7 +159,7 @@ const groupIdColumn: StorageGroupsColumn = {
     },
     sortAccessor: (row) => Number(row.GroupId),
     align: DataTable.RIGHT,
-};
+});
 
 const usedColumn: StorageGroupsColumn = {
     name: STORAGE_GROUPS_COLUMNS_IDS.Used,
@@ -237,7 +240,12 @@ const getVDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => (
     header: STORAGE_GROUPS_COLUMNS_TITLES.VDisks,
     className: b('vdisks-column'),
     render: ({row}) => (
-        <VDisks vDisks={row.VDisks} viewContext={data?.viewContext} erasure={row.ErasureSpecies} />
+        <VDisks
+            vDisks={row.VDisks}
+            viewContext={data?.viewContext}
+            erasure={row.ErasureSpecies}
+            database={data?.database}
+        />
     ),
     align: DataTable.CENTER,
     width: 780, // usually 8-9 vdisks, this width corresponds to 8 vdisks, column is expanded if more
@@ -255,6 +263,7 @@ const getDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => ({
                 vDisks={row.VDisks}
                 viewContext={data?.viewContext}
                 erasure={row.ErasureSpecies}
+                database={data?.database}
             />
         );
     },
@@ -264,9 +273,9 @@ const getDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => ({
     sortable: false,
 });
 
-export const getStorageTopGroupsColumns: StorageColumnsGetter = () => {
+export const getStorageTopGroupsColumns: StorageColumnsGetter = (data) => {
     const columns = [
-        groupIdColumn,
+        getGroupIdColumn(data),
         typeColumn,
         erasureColumn,
         usageColumn,
@@ -284,7 +293,7 @@ export const getStorageTopGroupsColumns: StorageColumnsGetter = () => {
 
 export const getStorageGroupsColumns: StorageColumnsGetter = (data) => {
     const columns = [
-        groupIdColumn,
+        getGroupIdColumn(data),
         poolNameColumn,
         typeColumn,
         erasureColumn,

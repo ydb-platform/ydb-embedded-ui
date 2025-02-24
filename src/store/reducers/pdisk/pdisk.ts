@@ -9,13 +9,17 @@ import {preparePDiskDataResponse} from './utils';
 interface PDiskParams {
     nodeId: number | string;
     pDiskId: number | string;
+    database?: string;
 }
 
 export const pDiskApi = api.injectEndpoints({
     endpoints: (build) => ({
         getPdiskInfo: build.query({
-            queryFn: async ({nodeId, pDiskId}: PDiskParams, {signal, getState, dispatch}) => {
-                const pDiskInfoHandlerVersion = await queryCapability('/pdisk/info', undefined, {
+            queryFn: async (
+                {nodeId, pDiskId, database}: PDiskParams,
+                {signal, getState, dispatch},
+            ) => {
+                const pDiskInfoHandlerVersion = await queryCapability('/pdisk/info', database, {
                     getState: getState as GetState,
                     dispatch,
                 });
@@ -23,10 +27,13 @@ export const pDiskApi = api.injectEndpoints({
 
                 let diskInfoPromise: Promise<TPDiskInfoResponse>;
                 if (newApiAvailable) {
-                    diskInfoPromise = window.api.pdisk.getPDiskInfo({nodeId, pDiskId}, {signal});
+                    diskInfoPromise = window.api.pdisk.getPDiskInfo(
+                        {nodeId, pDiskId, database},
+                        {signal},
+                    );
                 } else {
                     diskInfoPromise = window.api.viewer
-                        .getNodeWhiteboardPDiskInfo({nodeId, pDiskId}, {signal})
+                        .getNodeWhiteboardPDiskInfo({nodeId, pDiskId, database}, {signal})
                         .then((result) => {
                             if (result.PDiskStateInfo) {
                                 return {
@@ -45,7 +52,7 @@ export const pDiskApi = api.injectEndpoints({
                 try {
                     const response = await Promise.all([
                         diskInfoPromise,
-                        window.api.viewer.getNodeInfo(nodeId, {signal}),
+                        window.api.viewer.getNodeInfo(nodeId, database, {signal}),
                     ]);
                     const data = preparePDiskDataResponse(response);
                     return {data};

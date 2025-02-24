@@ -18,6 +18,7 @@ const b = cn('pdisk-storage');
 
 interface PDiskProps {
     data?: PreparedPDisk;
+    database?: string;
     vDisks?: PreparedVDisk[];
     showPopup?: boolean;
     onShowPopup?: VoidFunction;
@@ -29,6 +30,7 @@ interface PDiskProps {
 
 export const PDisk = ({
     data = {},
+    database,
     vDisks,
     showPopup,
     onShowPopup,
@@ -60,6 +62,7 @@ export const PDisk = ({
                         }}
                     >
                         <VDisk
+                            database={database}
                             data={vdisk}
                             inactive={!isVdiskActive(vdisk, viewContext)}
                             compact
@@ -75,7 +78,7 @@ export const PDisk = ({
     let pDiskPath: string | undefined;
 
     if (pDiskIdsDefined) {
-        pDiskPath = getPDiskPagePath(PDiskId, NodeId);
+        pDiskPath = getPDiskPagePath(PDiskId, NodeId, {database});
     }
 
     return (
@@ -87,7 +90,7 @@ export const PDisk = ({
                 anchorRef={anchorRef}
                 onShowPopup={onShowPopup}
                 onHidePopup={onHidePopup}
-                popupContent={<PDiskPopup data={data} />}
+                popupContent={<PDiskPopup data={data} database={database} />}
                 delayClose={200}
             >
                 <InternalLink to={pDiskPath} className={b('content')}>

@@ -5,7 +5,7 @@ import {valueIsDefined} from '../../utils';
 import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 
-export function getVDiskLink(data: TVDiskStateInfo | TVSlotId) {
+export function getVDiskLink(data: TVDiskStateInfo | TVSlotId, database?: string) {
     let vDiskPath: string | undefined;
 
     const isFullData = isFullVDiskData(data);
@@ -16,13 +16,14 @@ export function getVDiskLink(data: TVDiskStateInfo | TVSlotId) {
         valueIsDefined(data.PDiskId) &&
         valueIsDefined(data.NodeId)
     ) {
-        vDiskPath = getVDiskPagePath(VDiskSlotId, data.PDiskId, data.NodeId);
+        vDiskPath = getVDiskPagePath(VDiskSlotId, data.PDiskId, data.NodeId, {database});
     } else if (valueIsDefined(data.NodeId) && isFullVDiskData(data)) {
         vDiskPath = getDefaultNodePath(
             data.NodeId,
             {
                 pdiskId: data.PDiskId?.toString(),
                 vdiskId: stringifyVdiskId(data.VDiskId),
+                database,
             },
             'structure',
         );

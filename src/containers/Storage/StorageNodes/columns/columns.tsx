@@ -33,7 +33,10 @@ const b = cn('ydb-storage-nodes-columns');
 const MAX_SLOTS_CSS_VAR = '--maximum-slots';
 const MAX_DISKS_CSS_VAR = '--maximum-disks';
 
-const getPDisksColumn = ({viewContext}: GetStorageNodesColumnsParams): StorageNodesColumn => {
+const getPDisksColumn = ({
+    viewContext,
+    database,
+}: GetStorageNodesColumnsParams): StorageNodesColumn => {
     return {
         name: NODES_COLUMNS_IDS.PDisks,
         header: NODES_COLUMNS_TITLES.PDisks,
@@ -53,7 +56,12 @@ const getPDisksColumn = ({viewContext}: GetStorageNodesColumnsParams): StorageNo
 
                         return (
                             <div className={b('pdisks-item')} key={pDisk.PDiskId}>
-                                <PDisk data={pDisk} vDisks={vDisks} viewContext={viewContext} />
+                                <PDisk
+                                    data={pDisk}
+                                    vDisks={vDisks}
+                                    viewContext={viewContext}
+                                    database={database}
+                                />
                             </div>
                         );
                     })}
@@ -87,7 +95,7 @@ export const getStorageNodesColumns = ({
         getDiskSpaceUsageColumn<PreparedStorageNode>(),
         getVersionColumn<PreparedStorageNode>(),
         getMissingDisksColumn<PreparedStorageNode>(),
-        getPDisksColumn({viewContext}),
+        getPDisksColumn({viewContext, database}),
     ];
 
     const sortableColumns = columns.map((column) => ({
