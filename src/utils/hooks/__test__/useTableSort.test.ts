@@ -5,7 +5,7 @@ import {renderHook} from '@testing-library/react';
 import {useTableSort} from '../useTableSort';
 
 describe('useTableSort', function () {
-    it('It works with single sort', () => {
+    test('It works with single sort', () => {
         const onSortSpy = jest.fn();
         const {result} = renderHook(() =>
             useTableSort({
@@ -76,7 +76,7 @@ describe('useTableSort', function () {
             },
         ]);
     });
-    it('It works with multiple sort', () => {
+    test('It works with multiple sort', () => {
         const onSortSpy = jest.fn();
         const {result} = renderHook(() =>
             useTableSort({
@@ -152,7 +152,7 @@ describe('useTableSort', function () {
             },
         ]);
     });
-    it('Have the same sort order if sort order is fixed', () => {
+    test('Have the same sort order if sort order is fixed', () => {
         const onSortSpy = jest.fn();
         const {result} = renderHook(() =>
             useTableSort({

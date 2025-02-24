@@ -2,14 +2,14 @@ import {UNBREAKABLE_GAP} from '../../utils';
 import {formatBytes} from '../formatBytes';
 
 describe('formatBytes', () => {
-    it('should work with only value', () => {
+    test('should work with only value', () => {
         expect(formatBytes({value: 100})).toBe(`100${UNBREAKABLE_GAP}B`);
         expect(formatBytes({value: 100_000})).toBe(`100${UNBREAKABLE_GAP}KB`);
         expect(formatBytes({value: 100_000_000})).toBe(`100${UNBREAKABLE_GAP}MB`);
         expect(formatBytes({value: 100_000_000_000})).toBe(`100${UNBREAKABLE_GAP}GB`);
         expect(formatBytes({value: 100_000_000_000_000})).toBe(`100${UNBREAKABLE_GAP}TB`);
     });
-    it('should convert to size', () => {
+    test('should convert to size', () => {
         expect(formatBytes({value: 100_000, size: 'b'})).toBe(
             `100${UNBREAKABLE_GAP}000${UNBREAKABLE_GAP}B`,
         );
@@ -17,7 +17,7 @@ describe('formatBytes', () => {
             `100${UNBREAKABLE_GAP}000${UNBREAKABLE_GAP}GB`,
         );
     });
-    it('should convert without labels', () => {
+    test('should convert without labels', () => {
         expect(formatBytes({value: 100_000, size: 'b', withSizeLabel: false})).toBe(
             `100${UNBREAKABLE_GAP}000`,
         );
@@ -25,7 +25,7 @@ describe('formatBytes', () => {
             `100${UNBREAKABLE_GAP}000`,
         );
     });
-    it('should convert to speed', () => {
+    test('should convert to speed', () => {
         expect(formatBytes({value: 100_000, withSpeedLabel: true})).toBe(
             `100${UNBREAKABLE_GAP}KB/s`,
         );
@@ -33,14 +33,14 @@ describe('formatBytes', () => {
             `100${UNBREAKABLE_GAP}000${UNBREAKABLE_GAP}B/s`,
         );
     });
-    it('should return empty string on invalid data', () => {
+    test('should return empty string on invalid data', () => {
         expect(formatBytes({value: undefined})).toEqual('');
         expect(formatBytes({value: null})).toEqual('');
         expect(formatBytes({value: ''})).toEqual('');
         expect(formatBytes({value: 'false'})).toEqual('');
         expect(formatBytes({value: '123qwe'})).toEqual('');
     });
-    it('should work with precision', () => {
+    test('should work with precision', () => {
         expect(formatBytes({value: 123.123, precision: 2})).toBe(`123${UNBREAKABLE_GAP}B`);
         expect(formatBytes({value: 12.123, precision: 2})).toBe(`12${UNBREAKABLE_GAP}B`);
         expect(formatBytes({value: 1.123, precision: 2})).toBe(`1.1${UNBREAKABLE_GAP}B`);

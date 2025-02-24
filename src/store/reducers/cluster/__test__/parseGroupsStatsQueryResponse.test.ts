@@ -136,7 +136,7 @@ describe('parseGroupsStatsQueryResponse', () => {
             },
         },
     };
-    it('should correctly parse data', () => {
+    test('should correctly parse data', () => {
         expect(parseGroupsStatsQueryResponse(dataSet1)).toEqual(parsedDataSet1);
         expect(parseGroupsStatsQueryResponse(dataSet2)).toEqual(parsedDataSet2);
     });

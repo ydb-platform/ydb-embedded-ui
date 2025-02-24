@@ -12,30 +12,30 @@ describe('API utils', () => {
     describe('json/viewer/query', () => {
         describe('parseQueryAPIResponse', () => {
             describe('should handle responses with incorrect format', () => {
-                it('should handle null response', () => {
+                test('should handle null response', () => {
                     expect(parseQueryAPIResponse(null)).toEqual({});
                 });
-                it('should handle undefined response', () => {
+                test('should handle undefined response', () => {
                     expect(parseQueryAPIResponse(undefined)).toEqual({});
                 });
-                it('should handle string response', () => {
+                test('should handle string response', () => {
                     expect(parseQueryAPIResponse('foo')).toEqual({});
                 });
-                it('should handle array response', () => {
+                test('should handle array response', () => {
                     expect(parseQueryAPIResponse([{foo: 'bar'}])).toEqual({});
                 });
-                it('should handle json string in the result field', () => {
+                test('should handle json string in the result field', () => {
                     const json = {foo: 'bar'};
                     const response = {result: JSON.stringify(json)};
                     expect(parseQueryAPIResponse(response)).toEqual({});
                 });
-                it('should handle object with request plan in the result field', () => {
+                test('should handle object with request plan in the result field', () => {
                     const response = {result: {queries: 'some queries'}};
                     expect(parseQueryAPIResponse(response)).toEqual({});
                 });
             });
             describe('should correctly parse data', () => {
-                it('should accept stats without a result', () => {
+                test('should accept stats without a result', () => {
                     const stats = {metric: 'good'} as TKqpStatsQuery;
                     const response = {stats};
                     const actual = parseQueryAPIResponse(response);
@@ -58,7 +58,7 @@ describe('API utils', () => {
                     ['Type:ROT', 'block-4-2', '2000', '1000', 50, 0],
                 ];
 
-                it('should parse a valid ExecuteResponse correctly', () => {
+                test('should parse a valid ExecuteResponse correctly', () => {
                     const input = {
                         result: [
                             {
@@ -101,7 +101,7 @@ describe('API utils', () => {
                     expect(parseQueryAPIResponse(input)).toEqual(expected);
                 });
 
-                it('should handle empty result array', () => {
+                test('should handle empty result array', () => {
                     const input = {
                         result: [],
                         stats: {DurationUs: '1000'},
@@ -115,7 +115,7 @@ describe('API utils', () => {
                     expect(parseQueryAPIResponse(input)).toEqual(expected);
                 });
 
-                it('should handle result with columns but no rows', () => {
+                test('should handle result with columns but no rows', () => {
                     const input = {
                         result: [
                             {
@@ -141,7 +141,7 @@ describe('API utils', () => {
                     expect(parseQueryAPIResponse(input)).toEqual(expected);
                 });
 
-                it('should return empty object for unsupported format', () => {
+                test('should return empty object for unsupported format', () => {
                     const input = {
                         result: 'unsupported',
                     };
@@ -149,7 +149,7 @@ describe('API utils', () => {
                     expect(parseQueryAPIResponse(input)).toEqual({});
                 });
 
-                it('should handle multiple result sets', () => {
+                test('should handle multiple result sets', () => {
                     const input = {
                         result: [
                             {
@@ -202,7 +202,7 @@ describe('API utils', () => {
                     expect(parseQueryAPIResponse(input)).toEqual(expected);
                 });
 
-                it('should handle null values in rows', () => {
+                test('should handle null values in rows', () => {
                     const input = {
                         result: [
                             {
@@ -248,7 +248,7 @@ describe('API utils', () => {
                     expect(parseQueryAPIResponse(input)).toEqual(expected);
                 });
 
-                it('should handle truncated results', () => {
+                test('should handle truncated results', () => {
                     const input = {
                         result: [
                             {
@@ -264,7 +264,7 @@ describe('API utils', () => {
                     expect(result.resultSets?.[0].truncated).toBe(true);
                 });
 
-                it('should handle empty columns and rows', () => {
+                test('should handle empty columns and rows', () => {
                     const input = {
                         result: [
                             {
@@ -291,7 +291,7 @@ describe('API utils', () => {
                 });
             });
             describe('should correctly parse plans', () => {
-                it('should parse explain-scan', () => {
+                test('should parse explain-scan', () => {
                     const plan: PlanNode = {};
                     const tables: PlanTable[] = [];
                     const meta: PlanMeta = {version: '0.2', type: 'script'};
@@ -299,7 +299,7 @@ describe('API utils', () => {
                     const response = {plan: {Plan: plan, tables, meta}, ast};
                     expect(parseQueryAPIResponse(response)).toBe(response);
                 });
-                it('should parse explain-script', () => {
+                test('should parse explain-script', () => {
                     const plan: PlanNode = {};
                     const tables: PlanTable[] = [];
                     const meta: PlanMeta = {version: '0.2', type: 'script'};
@@ -313,7 +313,7 @@ describe('API utils', () => {
         });
 
         describe('parseQueryExplainPlan', () => {
-            it('should parse explain script plan to explain scan', () => {
+            test('should parse explain script plan to explain scan', () => {
                 const plan: PlanNode = {};
                 const simplifiedPlan: SimplifiedNode = {};
                 const tables: PlanTable[] = [];
@@ -335,7 +335,7 @@ describe('API utils', () => {
                 expect(parsedPlan.tables).toBe(tables);
                 expect(parsedPlan.meta).toEqual(meta);
             });
-            it('should left scan plan unchanged', () => {
+            test('should left scan plan unchanged', () => {
                 const plan: PlanNode = {};
                 const tables: PlanTable[] = [];
                 const meta: PlanMeta = {version: '0.2', type: 'script'};

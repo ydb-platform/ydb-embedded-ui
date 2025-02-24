@@ -2,7 +2,7 @@ import type {TStoragePDisk, TStorageVDisk} from '../../../../types/api/storage';
 import {prepareGroupsPDisk, prepareGroupsVDisk} from '../prepareGroupsDisks';
 
 describe('prepareGroupsVDisk', () => {
-    it('Should correctly parse data', () => {
+    test('Should correctly parse data', () => {
         const vDiksDataWithoutPDisk = {
             VDiskId: '2181038134-22-0-0-0',
             NodeId: 224,
@@ -114,7 +114,7 @@ describe('prepareGroupsVDisk', () => {
 
         expect(preparedData).toEqual(expectedResult);
     });
-    it('Should use BSC data when no Whiteboard data', () => {
+    test('Should use BSC data when no Whiteboard data', () => {
         const vDiksDataWithoutPDisk = {
             VDiskId: '2181038134-22-0-0-0',
             NodeId: 224,
@@ -155,7 +155,7 @@ describe('prepareGroupsVDisk', () => {
 
         expect(preparedData).toEqual(expectedResult);
     });
-    it('Should use Whiteboard data when no BSC data', () => {
+    test('Should use Whiteboard data when no BSC data', () => {
         const vDiksDataWithoutPDisk = {
             Whiteboard: {
                 VDiskId: {
@@ -262,7 +262,7 @@ describe('prepareGroupsVDisk', () => {
 });
 
 describe('prepareGroupsPDisk', () => {
-    it('Should correctly parse data', () => {
+    test('Should correctly parse data', () => {
         const pDiskData = {
             PDiskId: '224-1001',
             NodeId: 224,
@@ -339,7 +339,7 @@ describe('prepareGroupsPDisk', () => {
 
         expect(preparedData).toEqual(expectedResult);
     });
-    it('Should use BSC data when no Whiteboard data', () => {
+    test('Should use BSC data when no Whiteboard data', () => {
         const pDiskData = {
             PDiskId: '224-1001',
             NodeId: 224,
@@ -385,7 +385,7 @@ describe('prepareGroupsPDisk', () => {
 
         expect(preparedData).toEqual(expectedResult);
     });
-    it('Should use Whiteboard data when no BSC data', () => {
+    test('Should use Whiteboard data when no BSC data', () => {
         const pDiskData = {
             NodeId: 224,
             Whiteboard: {

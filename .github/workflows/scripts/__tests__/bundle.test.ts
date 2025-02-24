@@ -2,7 +2,7 @@ import {generateBundleSizeSection, getBundleInfo} from '../utils/bundle';
 
 describe('bundle utils', () => {
     describe('generateBundleSizeSection', () => {
-        it('should generate section for increased bundle size', () => {
+        test('should generate section for increased bundle size', () => {
             const bundleInfo = {
                 currentSize: 1024 * 1024 * 2, // 2MB
                 mainSize: 1024 * 1024, // 1MB
@@ -17,7 +17,7 @@ describe('bundle utils', () => {
             expect(result).toContain('⚠️ Bundle size increased. Please review.');
         });
 
-        it('should generate section for decreased bundle size', () => {
+        test('should generate section for decreased bundle size', () => {
             const bundleInfo = {
                 currentSize: 1024 * 1024, // 1MB
                 mainSize: 1024 * 1024 * 2, // 2MB
@@ -32,7 +32,7 @@ describe('bundle utils', () => {
             expect(result).toContain('✅ Bundle size decreased.');
         });
 
-        it('should generate section for unchanged bundle size', () => {
+        test('should generate section for unchanged bundle size', () => {
             const bundleInfo = {
                 currentSize: 1024 * 1024, // 1MB
                 mainSize: 1024 * 1024, // 1MB
@@ -47,7 +47,7 @@ describe('bundle utils', () => {
             expect(result).toContain('✅ Bundle size unchanged.');
         });
 
-        it('should handle N/A percent', () => {
+        test('should handle N/A percent', () => {
             const bundleInfo = {
                 currentSize: 1024 * 1024, // 1MB
                 mainSize: 0,
@@ -75,7 +75,7 @@ describe('bundle utils', () => {
             process.env = originalEnv;
         });
 
-        it('should get bundle info from environment variables', () => {
+        test('should get bundle info from environment variables', () => {
             process.env.CURRENT_SIZE = '2097152'; // 2MB
             process.env.MAIN_SIZE = '1048576'; // 1MB
             process.env.SIZE_DIFF = '1048576'; // 1MB
@@ -90,7 +90,7 @@ describe('bundle utils', () => {
             });
         });
 
-        it('should handle missing environment variables', () => {
+        test('should handle missing environment variables', () => {
             process.env.CURRENT_SIZE = undefined;
             process.env.MAIN_SIZE = undefined;
             process.env.SIZE_DIFF = undefined;

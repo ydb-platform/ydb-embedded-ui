@@ -11,7 +11,7 @@ describe('results utils', () => {
             jest.clearAllMocks();
         });
 
-        it('should handle non-existent file', () => {
+        test('should handle non-existent file', () => {
             (fs.existsSync as jest.Mock).mockReturnValue(false);
 
             const result = readTestResults('nonexistent.json');
@@ -25,7 +25,7 @@ describe('results utils', () => {
             });
         });
 
-        it('should read and process test results correctly', () => {
+        test('should read and process test results correctly', () => {
             const mockTestResults: TestResults = {
                 config: {} as any,
                 suites: [
@@ -87,7 +87,7 @@ describe('results utils', () => {
     });
 
     describe('getTestStatus', () => {
-        it('should return failed status when there are failures', () => {
+        test('should return failed status when there are failures', () => {
             const results: TestResultsInfo = {
                 total: 10,
                 passed: 8,
@@ -102,7 +102,7 @@ describe('results utils', () => {
             expect(result.statusColor).toBe('red');
         });
 
-        it('should return flaky status when there are flaky tests but no failures', () => {
+        test('should return flaky status when there are flaky tests but no failures', () => {
             const results: TestResultsInfo = {
                 total: 10,
                 passed: 8,
@@ -117,7 +117,7 @@ describe('results utils', () => {
             expect(result.statusColor).toBe('orange');
         });
 
-        it('should return passed status when all tests pass', () => {
+        test('should return passed status when all tests pass', () => {
             const results: TestResultsInfo = {
                 total: 10,
                 passed: 10,
