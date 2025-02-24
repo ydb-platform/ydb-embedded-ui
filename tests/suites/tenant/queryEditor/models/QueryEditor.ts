@@ -68,7 +68,7 @@ export class QueryEditor {
         this.explainButton = this.selector.getByRole('button', {name: ButtonNames.Explain});
         this.saveButton = this.selector.getByRole('button', {name: ButtonNames.Save});
         this.gearButton = this.selector.locator('.ydb-query-editor-button__gear-button');
-        this.executionStatus = this.selector.locator('.kv-query-execution-status');
+        this.executionStatus = this.selector.locator('.kv-query-execution-status .g-text');
         this.resultsControls = this.selector.locator('.ydb-query-result__controls');
         this.indicatorIcon = this.selector.locator(
             '.kv-query-execution-status__query-settings-icon',
