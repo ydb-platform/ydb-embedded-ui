@@ -1,8 +1,8 @@
 import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
 import type {ETenantType} from '../../../types/api/tenant';
+import {useAdditionalNodesProps} from '../../../utils/hooks/useAdditionalNodesProps';
 import type {GetMonitoringLink} from '../../../utils/monitoring';
 import type {Tenant} from '../../Tenant/Tenant';
-import {useAdditionalNodeProps} from '../useClusterData';
 
 export interface ExtendedTenantProps {
     component: typeof Tenant;
@@ -13,8 +13,8 @@ export function ExtendedTenant({
     component: TenantComponent,
     getMonitoringLink,
 }: ExtendedTenantProps) {
-    const {balancer, monitoring} = useClusterBaseInfo();
-    const {additionalNodesProps} = useAdditionalNodeProps({balancer});
+    const {monitoring} = useClusterBaseInfo();
+    const additionalNodesProps = useAdditionalNodesProps();
 
     const additionalTenantProps = {
         getMonitoringLink: (dbName?: string, dbType?: ETenantType) => {

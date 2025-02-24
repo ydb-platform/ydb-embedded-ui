@@ -168,7 +168,6 @@ export function Cluster({
                 >
                     <ClusterInfo
                         cluster={cluster}
-                        versionToColor={versionToColor}
                         loading={infoLoading}
                         error={clusterError}
                         additionalClusterProps={additionalClusterProps}

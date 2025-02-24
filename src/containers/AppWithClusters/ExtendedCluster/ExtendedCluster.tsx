@@ -11,11 +11,14 @@ import type {MetaClusterVersion} from '../../../types/api/meta';
 import type {ETenantType} from '../../../types/api/tenant';
 import {getVersionColors, getVersionMap} from '../../../utils/clusterVersionColors';
 import {cn} from '../../../utils/cn';
+import {USE_CLUSTER_BALANCER_AS_BACKEND_KEY} from '../../../utils/constants';
+import {useSetting} from '../../../utils/hooks';
+import {useAdditionalNodesProps} from '../../../utils/hooks/useAdditionalNodesProps';
 import type {GetMonitoringClusterLink, GetMonitoringLink} from '../../../utils/monitoring';
 import {getCleanBalancerValue, removeViewerPathname} from '../../../utils/parseBalancer';
 import {getBackendFromNodeHost, getBackendFromRawNodeData} from '../../../utils/prepareBackend';
 import type {Cluster} from '../../Cluster/Cluster';
-import {useClusterData} from '../useClusterData';
+import {useClusterVersions} from '../useClusterData';
 
 import './ExtendedCluster.scss';
 
@@ -123,9 +126,11 @@ export function ExtendedCluster({
     getMonitoringLink,
     getMonitoringClusterLink,
 }: ExtendedClusterProps) {
-    const {versions, useClusterBalancerAsBackend, additionalNodesProps} = useClusterData();
-
+    const versions = useClusterVersions();
+    const additionalNodesProps = useAdditionalNodesProps();
     const {name, balancer, monitoring} = useClusterBaseInfo();
+
+    const [useClusterBalancerAsBackend] = useSetting<boolean>(USE_CLUSTER_BALANCER_AS_BACKEND_KEY);
 
     return (
         <div className={b()}>

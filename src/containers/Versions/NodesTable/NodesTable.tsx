@@ -10,10 +10,9 @@ import {
     getUptimeColumn,
 } from '../../../components/nodesColumns/columns';
 import type {GetNodesColumnsParams} from '../../../components/nodesColumns/types';
-import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
 import type {NodesPreparedEntity} from '../../../store/reducers/nodes/types';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
-import {useAdditionalNodeProps} from '../../AppWithClusters/useClusterData';
+import {useAdditionalNodesProps} from '../../../utils/hooks/useAdditionalNodesProps';
 
 const VERSIONS_COLUMNS_WIDTH_LS_KEY = 'versionsTableColumnsWidth';
 
@@ -33,10 +32,9 @@ interface NodesTableProps {
 }
 
 export const NodesTable = ({nodes}: NodesTableProps) => {
-    const {balancer} = useClusterBaseInfo();
-    const {additionalNodesProps} = useAdditionalNodeProps({balancer});
+    const additionalNodesProps = useAdditionalNodesProps();
 
-    const columns = getColumns({getNodeRef: additionalNodesProps.getNodeRef});
+    const columns = getColumns({getNodeRef: additionalNodesProps?.getNodeRef});
 
     return (
         <ResizeableDataTable
