@@ -5,7 +5,10 @@ export const simpleQuery = 'SELECT 1;';
 export const longTableSelect = 'SELECT * FROM `.sys/pg_class`';
 
 // 400 is pretty enough
-export const longRunningQuery = new Array(400).fill(simpleQuery).join('');
+export const longRunningQuery = `
+$sample = AsList(AsStruct(ListFromRange(1, 100000) AS value, CAST(1 AS Uint32) AS id));
+
+SELECT value, id FROM as_table($sample) FLATTEN BY (value);`;
 
 export const createTableQuery = `
 CREATE TABLE \`/local/ydb_row_table\` (

@@ -3,6 +3,7 @@ import {expect, test} from '@playwright/test';
 import {QUERY_MODES, STATISTICS_MODES} from '../../../../src/utils/query';
 import {getClipboardContent} from '../../../utils/clipboard';
 import {tenantName} from '../../../utils/constants';
+import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {NavigationTabs, TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 import {createTableQuery, longRunningQuery, longTableSelect} from '../constants';
 
@@ -100,6 +101,19 @@ test.describe('Test Query Editor', async () => {
 
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
         await expect(queryEditor.isElapsedTimeVisible()).resolves.toBe(true);
+    });
+
+    test('Query streaming finishes in reasonable time', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'on', 'Query Streaming');
+
+        await queryEditor.clickGearButton();
+        await queryEditor.settingsDialog.changeLimitRows(100000);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.clickRunButton();
+
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
     });
 
     test('Query execution is terminated when stop button is clicked', async ({page}) => {
