@@ -73,7 +73,7 @@ export class QueryEditor {
         this.indicatorIcon = this.selector.locator(
             '.kv-query-execution-status__query-settings-icon',
         );
-        this.elapsedTimeLabel = this.selector.locator('.ydb-query-elapsed-time');
+        this.elapsedTimeLabel = this.selector.locator('.kv-query-execution-status .g-label__value');
         this.radioButton = this.selector.locator('.query-editor__pane-wrapper .g-radio-button');
         this.banner = this.page.locator('.ydb-query-settings-banner');
 

@@ -38,7 +38,7 @@ export function ResultSetsViewer(props: ResultSetsViewerProps) {
                     title: (
                         <div className={b('tab-title')}>
                             <Text>
-                                {`Result ${resultSets.length > 1 ? `#${index + 1}${resultSets?.[index]?.truncated ? ' (T)' : ''}` : ''}`}
+                                {`Result${resultSets.length > 1 ? ` #${index + 1}` : ''}${resultSets?.[index]?.truncated ? '(T)' : ''}`}
                             </Text>
                             <Text color="secondary">{resultSet.result?.length || 0}</Text>
                         </div>

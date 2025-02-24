@@ -68,11 +68,6 @@ export class ResultTable {
         return true;
     }
 
-    async getResultHeadText() {
-        await this.resultHead.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return this.resultHead.innerText();
-    }
-
     async getResultTabs() {
         const tabs = this.resultWrapper.locator(
             '.ydb-query-result-sets-viewer__tabs .g-tabs__item',
@@ -86,20 +81,17 @@ export class ResultTable {
         return tabs.count();
     }
 
-    async getResultTabTitle(index: number) {
+    async getResultTabTitleText(index: number) {
         const tabs = await this.getResultTabs();
         const tab = tabs.nth(index);
         await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return tab.getAttribute('title');
+        return tab.locator('.g-text').first().textContent();
     }
 
-    async hasMultipleResultTabs() {
-        const tabs = this.resultWrapper.locator('.ydb-query-result-sets-viewer__tabs');
-        try {
-            await tabs.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-            return true;
-        } catch {
-            return false;
-        }
+    async getResultTabTitleCount(index: number) {
+        const tabs = await this.getResultTabs();
+        const tab = tabs.nth(index);
+        await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return tab.locator('.g-text').nth(1).textContent();
     }
 }
