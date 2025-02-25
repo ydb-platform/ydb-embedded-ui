@@ -27,6 +27,7 @@ export const QueryExecutionStatus = ({className, error, loading}: QueryExecution
     let textColor: TextProps['color'];
 
     const elapsedTime = useElapsedTime(loading);
+    const isCancelled = isQueryCancelledError(error);
 
     if (loading) {
         theme = 'info';
@@ -38,9 +39,9 @@ export const QueryExecutionStatus = ({className, error, loading}: QueryExecution
         textColor = 'danger-heavy';
         icon = <Icon data={CircleQuestionFill} />;
         label = 'Connection aborted';
-    } else if (isQueryCancelledError(error)) {
-        theme = 'danger';
-        textColor = 'danger-heavy';
+    } else if (isCancelled) {
+        theme = 'warning';
+        textColor = 'warning-heavy';
         icon = <Icon data={CircleStop} className={b('result-status-icon', {error: true})} />;
         label = 'Stopped';
     } else {

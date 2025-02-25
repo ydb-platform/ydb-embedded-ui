@@ -56,6 +56,8 @@
 
   "gear.tooltip": "Query execution settings have been changed for ",
   "banner.query-settings.message": "Query was executed with modified settings: ",
+  "banner.query-stopped.message": "Data is not up to date because the request was not completed.",
+  "banner.query-stopped.never-show": "Never show again",
 
   "toaster.stop-error": "Something went wrong. Unable to stop request processing. Please wait.",
 

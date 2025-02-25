@@ -20,6 +20,7 @@ import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatter
 import {useSetting, useTypedDispatch} from '../../../../utils/hooks';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 import {QuerySettingsBanner} from '../QuerySettingsBanner/QuerySettingsBanner';
+import {QueryStoppedBanner} from '../QueryStoppedBanner/QueryStoppedBanner';
 import {getPreparedResult} from '../utils/getPreparedResult';
 import {isQueryCancelledError} from '../utils/isQueryCancelledError';
 
@@ -323,13 +324,16 @@ export function QueryResultViewer({
         );
     };
 
+    const isCancelled = isQueryCancelledError(error);
+
     return (
         <React.Fragment>
             <div className={b('controls')}>
                 {renderLeftControls()}
                 {renderRightControls()}
             </div>
-            {isLoading || isQueryCancelledError(error) ? null : <QuerySettingsBanner />}
+            {isLoading || isCancelled ? null : <QuerySettingsBanner />}
+            {isCancelled ? <QueryStoppedBanner /> : null}
             <LoaderWrapper loading={isLoading && (!data.resultSets || activeSection !== 'result')}>
                 <Fullscreen className={b('result')}>{renderResultSection()}</Fullscreen>
             </LoaderWrapper>
