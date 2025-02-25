@@ -1,5 +1,20 @@
 # Changelog
 
+## [8.12.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.11.1...v8.12.0) (2025-02-25)
+
+
+### Features
+
+* add database to authentication process ([#1976](https://github.com/ydb-platform/ydb-embedded-ui/issues/1976)) ([d9067b3](https://github.com/ydb-platform/ydb-embedded-ui/commit/d9067b373f832083c537eb35ca51ab6e56853552))
+* hide some columns and storage nodes for users-viewers ([#1967](https://github.com/ydb-platform/ydb-embedded-ui/issues/1967)) ([249011d](https://github.com/ydb-platform/ydb-embedded-ui/commit/249011d93bff8a20e71ea48504f8c4a4367ff33b))
+* support multipart responses in query ([#1865](https://github.com/ydb-platform/ydb-embedded-ui/issues/1865)) ([99ee997](https://github.com/ydb-platform/ydb-embedded-ui/commit/99ee99713be9165ffd2140e3cab29ec26758b70f))
+* **TabletsTable:** add search by id ([#1981](https://github.com/ydb-platform/ydb-embedded-ui/issues/1981)) ([d68adba](https://github.com/ydb-platform/ydb-embedded-ui/commit/d68adba4d239bbfaf35f006b25e337d1976e1ab5))
+
+
+### Bug Fixes
+
+* **Node:** fix developer ui link in dev mode ([#1979](https://github.com/ydb-platform/ydb-embedded-ui/issues/1979)) ([ad64c8c](https://github.com/ydb-platform/ydb-embedded-ui/commit/ad64c8c8e3aa951ec5f97ce6cbb68e9cb3b3254b))
+
 ## [8.11.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.11.0...v8.11.1) (2025-02-18)
 
 
