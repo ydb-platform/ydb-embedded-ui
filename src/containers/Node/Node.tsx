@@ -24,7 +24,7 @@ import type {PreparedNode} from '../../store/reducers/node/types';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
-import {Tablets} from '../Tablets';
+import {Tablets} from '../Tablets/Tablets';
 
 import type {NodeTab} from './NodePages';
 import {NODE_TABS, getDefaultNodePath, nodePageQueryParams, nodePageTabSchema} from './NodePages';

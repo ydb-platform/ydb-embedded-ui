@@ -9,5 +9,7 @@
   "Uptime": "Uptime",
   "dialog.kill-header": "Restart tablet",
   "dialog.kill-text": "The tablet will be restarted. Do you want to proceed?",
-  "controls.kill-not-allowed": "You don't have enough rights to restart tablet"
+  "controls.kill-not-allowed": "You don't have enough rights to restart tablet",
+  "controls.search-placeholder": "Tablet ID",
+  "controls.entities-count-label": "Tablets"
 }

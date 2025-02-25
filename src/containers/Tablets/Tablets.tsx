@@ -1,48 +1,35 @@
 import {skipToken} from '@reduxjs/toolkit/query';
 
-import {ResponseError} from '../../components/Errors/ResponseError';
 import {selectTabletsWithFqdn, tabletsApi} from '../../store/reducers/tablets';
 import type {TabletsApiRequestParams} from '../../types/store/tablets';
-import {cn} from '../../utils/cn';
+import {valueIsDefined} from '../../utils';
 import {useAutoRefreshInterval, useTypedSelector} from '../../utils/hooks';
 
 import {TabletsTable} from './TabletsTable';
-
-const b = cn('tablets');
 
 interface TabletsProps {
     path?: string;
     database?: string;
     nodeId?: string | number;
-    className?: string;
 }
 
-export function Tablets({nodeId, path, database, className}: TabletsProps) {
+export function Tablets({nodeId, path, database}: TabletsProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     let params: TabletsApiRequestParams = {};
-    const node = nodeId === undefined ? undefined : String(nodeId);
-    if (node !== undefined) {
-        params = {nodeId: node, database};
+    if (valueIsDefined(nodeId)) {
+        params = {nodeId, database};
     } else if (path) {
         params = {path, database};
     }
-    const {currentData, isFetching, error} = tabletsApi.useGetTabletsInfoQuery(
+    const {isLoading, error} = tabletsApi.useGetTabletsInfoQuery(
         Object.keys(params).length === 0 ? skipToken : params,
         {
             pollingInterval: autoRefreshInterval,
         },
     );
 
-    const loading = isFetching && currentData === undefined;
     const tablets = useTypedSelector((state) => selectTabletsWithFqdn(state, params));
 
-    return (
-        <div className={b(null, className)}>
-            {error ? <ResponseError error={error} /> : null}
-            {currentData || loading ? (
-                <TabletsTable tablets={tablets} database={database} loading={loading} />
-            ) : null}
-        </div>
-    );
+    return <TabletsTable tablets={tablets} database={database} loading={isLoading} error={error} />;
 }
