@@ -216,8 +216,30 @@ export function QueryResultViewer({
         );
     };
 
+    const renderErrorView = () => {
+        const isStopped = isQueryCancelledError(error);
+        return (
+            <Flex justifyContent="center" alignItems="center" width="100%">
+                <EmptyState
+                    size="s"
+                    image={<Illustration name="error" />}
+                    title={isStopped ? i18n('stopped.title') : i18n('error.title')}
+                    description={
+                        <Text color="complementary">
+                            {isStopped ? i18n('stopped.description') : i18n('error.description')}
+                        </Text>
+                    }
+                />
+            </Flex>
+        );
+    };
+
     const renderResultSection = () => {
         if (activeSection === RESULT_OPTIONS_IDS.result) {
+            if (error && !resultSets?.length) {
+                return renderErrorView();
+            }
+
             return (
                 <ResultSetsViewer
                     resultSets={resultSets}
@@ -230,23 +252,7 @@ export function QueryResultViewer({
         }
 
         if (error) {
-            const isStopped = isQueryCancelledError(error);
-            return (
-                <Flex justifyContent="center" alignItems="center" width="100%">
-                    <EmptyState
-                        size="s"
-                        image={<Illustration name="error" />}
-                        title={isStopped ? i18n('stopped.title') : i18n('error.title')}
-                        description={
-                            <Text color="complementary">
-                                {isStopped
-                                    ? i18n('stopped.description')
-                                    : i18n('error.description')}
-                            </Text>
-                        }
-                    />
-                </Flex>
-            );
+            return renderErrorView();
         }
 
         if (activeSection === RESULT_OPTIONS_IDS.schema) {
