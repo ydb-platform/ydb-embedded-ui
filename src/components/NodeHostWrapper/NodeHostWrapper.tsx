@@ -4,8 +4,8 @@ import {getDefaultNodePath} from '../../containers/Node/NodePages';
 import type {NodeAddress} from '../../types/additionalProps';
 import type {TNodeInfo, TSystemStateInfo} from '../../types/api/nodes';
 import {
+    createBaseDeveloperUILinkWithNodeId,
     createDeveloperUIInternalPageHref,
-    createDeveloperUILinkWithNodeId,
 } from '../../utils/developerUI/developerUI';
 import {isUnavailableNode} from '../../utils/nodes';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
@@ -46,11 +46,11 @@ export const NodeHostWrapper = ({
     if (getNodeRef) {
         const developerUIHref = getNodeRef(node);
         developerUIInternalHref = developerUIHref
-            ? createDeveloperUIInternalPageHref(developerUIHref)
+            ? createDeveloperUIInternalPageHref(developerUIHref, database)
             : undefined;
     } else if (node.NodeId) {
-        const developerUIHref = createDeveloperUILinkWithNodeId(node.NodeId);
-        developerUIInternalHref = createDeveloperUIInternalPageHref(developerUIHref);
+        const developerUIHref = createBaseDeveloperUILinkWithNodeId(node.NodeId);
+        developerUIInternalHref = createDeveloperUIInternalPageHref(developerUIHref, database);
     }
 
     const nodePath = isNodeAvailable

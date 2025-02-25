@@ -141,13 +141,16 @@ const diskSpaceUsageColumn: StorageGroupsColumn = {
     align: DataTable.LEFT,
 };
 
-const groupIdColumn: StorageGroupsColumn = {
+const getGroupIdColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => ({
     name: STORAGE_GROUPS_COLUMNS_IDS.GroupId,
     header: STORAGE_GROUPS_COLUMNS_TITLES.GroupId,
     width: 130,
     render: ({row}) => {
         return row.GroupId ? (
-            <InternalLink className={b('group-id')} to={getStorageGroupPath(row.GroupId)}>
+            <InternalLink
+                className={b('group-id')}
+                to={getStorageGroupPath(row.GroupId, {database: data?.database})}
+            >
                 {row.GroupId}
             </InternalLink>
         ) : (
@@ -156,7 +159,7 @@ const groupIdColumn: StorageGroupsColumn = {
     },
     sortAccessor: (row) => Number(row.GroupId),
     align: DataTable.RIGHT,
-};
+});
 
 const usedColumn: StorageGroupsColumn = {
     name: STORAGE_GROUPS_COLUMNS_IDS.Used,
@@ -264,9 +267,9 @@ const getDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => ({
     sortable: false,
 });
 
-export const getStorageTopGroupsColumns: StorageColumnsGetter = () => {
+export const getStorageTopGroupsColumns: StorageColumnsGetter = (data) => {
     const columns = [
-        groupIdColumn,
+        getGroupIdColumn(data),
         typeColumn,
         erasureColumn,
         usageColumn,
@@ -284,7 +287,7 @@ export const getStorageTopGroupsColumns: StorageColumnsGetter = () => {
 
 export const getStorageGroupsColumns: StorageColumnsGetter = (data) => {
     const columns = [
-        groupIdColumn,
+        getGroupIdColumn(data),
         poolNameColumn,
         typeColumn,
         erasureColumn,

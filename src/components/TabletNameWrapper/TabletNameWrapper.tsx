@@ -2,6 +2,7 @@ import {DefinitionList, PopoverBehavior} from '@gravity-ui/uikit';
 
 import {getTabletPagePath} from '../../routes';
 import {createTabletDeveloperUIHref} from '../../utils/developerUI/developerUI';
+import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
@@ -11,11 +12,11 @@ import i18n from './i18n';
 
 interface TabletNameWrapperProps {
     tabletId: string | number;
-    database?: string;
 }
 
-export function TabletNameWrapper({tabletId, database}: TabletNameWrapperProps) {
+export function TabletNameWrapper({tabletId}: TabletNameWrapperProps) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const database = useDatabaseFromQuery();
 
     const tabletPath = getTabletPagePath(tabletId, {database});
 
@@ -28,7 +29,7 @@ export function TabletNameWrapper({tabletId, database}: TabletNameWrapperProps) 
                     <DefinitionList.Item name={i18n('field_links')}>
                         <LinkWithIcon
                             title={i18n('context_developer-ui')}
-                            url={createTabletDeveloperUIHref(tabletId)}
+                            url={createTabletDeveloperUIHref(tabletId, database)}
                         />
                     </DefinitionList.Item>
                 </DefinitionList>

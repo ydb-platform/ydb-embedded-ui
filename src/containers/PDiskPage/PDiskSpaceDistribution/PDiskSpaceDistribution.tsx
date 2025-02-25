@@ -17,6 +17,7 @@ import {valueIsDefined} from '../../../utils';
 import {formatBytes} from '../../../utils/bytesParsers';
 import {cn} from '../../../utils/cn';
 import {formatStorageValuesToGb} from '../../../utils/dataFormatters/dataFormatters';
+import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {pDiskPageKeyset} from '../i18n';
 
 import {isEmptySlot, isLogSlot, isVDiskSlot} from './utils';
@@ -75,13 +76,14 @@ interface SlotProps<T extends SlotItemType> {
 }
 
 function Slot<T extends SlotItemType>({item, pDiskId, nodeId}: SlotProps<T>) {
+    const database = useDatabaseFromQuery();
     const renderContent = () => {
         if (isVDiskSlot(item)) {
             const vDiskPagePath =
                 valueIsDefined(item.SlotData?.VDiskSlotId) &&
                 valueIsDefined(pDiskId) &&
                 valueIsDefined(nodeId)
-                    ? getVDiskPagePath(item.SlotData.VDiskSlotId, pDiskId, nodeId)
+                    ? getVDiskPagePath(item.SlotData.VDiskSlotId, pDiskId, nodeId, {database})
                     : undefined;
 
             return (

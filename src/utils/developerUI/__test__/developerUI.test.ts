@@ -49,13 +49,14 @@ describe('Developer UI links generators', () => {
                 ),
             ).toBe('http://ydb-vla-dev02-001.search.yandex.net:8765/node/1');
         });
-        it('should create full link with host with existing node path with nodeId', () => {
+        it('should create full link with host with existing node path with nodeId and database', () => {
             expect(
                 createDeveloperUILinkWithNodeId(
                     1,
                     'http://ydb-vla-dev02-001.search.yandex.net:8765/node/3',
+                    'my_database',
                 ),
-            ).toBe('http://ydb-vla-dev02-001.search.yandex.net:8765/node/1');
+            ).toBe('http://ydb-vla-dev02-001.search.yandex.net:8765/node/1?database=my_database');
         });
     });
     describe('createPDiskDeveloperUILink', () => {

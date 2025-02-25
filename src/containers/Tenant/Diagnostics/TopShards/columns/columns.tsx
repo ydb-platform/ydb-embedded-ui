@@ -63,17 +63,21 @@ const tabletIdColumn: Column<KeyValueRow> = {
     width: 220,
 };
 
-const nodeIdColumn: Column<KeyValueRow> = {
+const getNodeIdColumn = (database?: string): Column<KeyValueRow> => ({
     name: TOP_SHARDS_COLUMNS_IDS.NodeId,
     header: TOP_SHARDS_COLUMNS_TITLES.NodeId,
     render: ({row}) => {
         if (!row.NodeId) {
             return '–';
         }
-        return <InternalLink to={getDefaultNodePath(row.NodeId)}>{row.NodeId}</InternalLink>;
+        return (
+            <InternalLink to={getDefaultNodePath(row.NodeId, {database})}>
+                {row.NodeId}
+            </InternalLink>
+        );
     },
     align: DataTable.RIGHT,
-};
+});
 
 const topShardsCpuCoresColumn: Column<KeyValueRow> = {
     name: TOP_SHARDS_COLUMNS_IDS.CPUCores,
@@ -99,13 +103,17 @@ const inFlightTxCountColumn: Column<KeyValueRow> = {
     align: DataTable.RIGHT,
 };
 
-export const getShardsWorkloadColumns = (schemaPath: string, location: Location) => {
+export const getShardsWorkloadColumns = (
+    schemaPath: string,
+    location: Location,
+    database?: string,
+) => {
     return [
         getPathColumn(schemaPath, location),
         cpuCoresColumn,
         dataSizeColumn,
         tabletIdColumn,
-        nodeIdColumn,
+        getNodeIdColumn(database),
         inFlightTxCountColumn,
     ];
 };

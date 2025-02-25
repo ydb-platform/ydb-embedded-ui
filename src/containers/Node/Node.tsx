@@ -53,7 +53,7 @@ export function Node() {
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    const params = nodeId ? {nodeId} : skipToken;
+    const params = nodeId ? {nodeId, database: tenantNameFromQuery?.toString()} : skipToken;
     const {
         currentData: node,
         isLoading,

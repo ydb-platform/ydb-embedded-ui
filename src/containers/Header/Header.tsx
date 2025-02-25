@@ -74,7 +74,11 @@ function Header({mainPage}: HeaderProps) {
 
         if (isUserAllowedToMakeChanges) {
             elements.push(
-                <Button view="flat" href={createDeveloperUIInternalPageHref()} target="_blank">
+                <Button
+                    view="flat"
+                    href={createDeveloperUIInternalPageHref(undefined, database)}
+                    target="_blank"
+                >
                     {DEVELOPER_UI_TITLE}
                     <Icon data={ArrowUpRightFromSquare} />
                 </Button>,

@@ -7,6 +7,7 @@ import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {createPDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import type {PreparedPDisk} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
+import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToGB, isNumeric} from '../../utils/utils';
 import {InfoViewer} from '../InfoViewer';
@@ -19,6 +20,7 @@ export const preparePDiskData = (
     data: PreparedPDisk,
     nodeData?: {Host?: string; DC?: string},
     withDeveloperUILink?: boolean,
+    database?: string,
 ) => {
     const {
         AvailableSize,
@@ -76,6 +78,7 @@ export const preparePDiskData = (
         const pDiskInternalViewerPath = createPDiskDeveloperUILink({
             nodeId: NodeId,
             pDiskId: PDiskId,
+            database,
         });
 
         pdiskData.push({
@@ -92,12 +95,13 @@ interface PDiskPopupProps {
 }
 
 export const PDiskPopup = ({data}: PDiskPopupProps) => {
+    const database = useDatabaseFromQuery();
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const nodesMap = useTypedSelector(selectNodesMap);
     const nodeData = valueIsDefined(data.NodeId) ? nodesMap?.get(data.NodeId) : undefined;
     const info = React.useMemo(
-        () => preparePDiskData(data, nodeData, isUserAllowedToMakeChanges),
-        [data, nodeData, isUserAllowedToMakeChanges],
+        () => preparePDiskData(data, nodeData, isUserAllowedToMakeChanges, database),
+        [data, nodeData, isUserAllowedToMakeChanges, database],
     );
 
     return <InfoViewer title="PDisk" info={info} size="s" />;

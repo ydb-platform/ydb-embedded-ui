@@ -67,6 +67,12 @@ export function createHref(
         extendedQuery = {...query, backend};
     }
 
+    const locationSearch = new URLSearchParams(window.location.search);
+    const database = locationSearch.get('database');
+    if (database) {
+        extendedQuery = {...extendedQuery, database};
+    }
+
     const isClusterNameInQuery = 'clusterName' in query && Boolean(query.clusterName);
     if (clusterName && !isClusterNameInQuery && webVersion) {
         extendedQuery = {...extendedQuery, clusterName};

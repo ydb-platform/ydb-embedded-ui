@@ -5,6 +5,7 @@ import {
     NODES_COLUMNS_TITLES,
 } from '../../../../components/nodesColumns/constants';
 import {VISIBLE_ENTITIES} from '../../../../store/reducers/storage/constants';
+import {useDatabaseFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 
 import {getStorageNodesColumns} from './columns';
@@ -17,10 +18,10 @@ import type {GetStorageNodesColumnsParams} from './types';
 
 export function useStorageNodesSelectedColumns({
     visibleEntities,
-    database,
     additionalNodesProps,
     viewContext,
 }: GetStorageNodesColumnsParams) {
+    const database = useDatabaseFromQuery();
     const columns = React.useMemo(() => {
         return getStorageNodesColumns({database, additionalNodesProps, viewContext});
     }, [database, additionalNodesProps, viewContext]);

@@ -6,10 +6,12 @@ import {
     createDeveloperUILinkWithNodeId,
 } from '../developerUI/developerUI';
 
+import {useDatabaseFromQuery} from './useDatabaseFromQuery';
 import {useIsUserAllowedToMakeChanges} from './useIsUserAllowedToMakeChanges';
 
 export function useNodeDeveloperUIHref(node?: PreparedNode) {
     const {balancer} = useClusterBaseInfo();
+    const database = useDatabaseFromQuery();
     const {additionalNodesProps} = useAdditionalNodeProps({balancer});
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
@@ -23,7 +25,7 @@ export function useNodeDeveloperUIHref(node?: PreparedNode) {
     }
 
     if (node?.NodeId) {
-        const developerUIHref = createDeveloperUILinkWithNodeId(node.NodeId);
+        const developerUIHref = createDeveloperUILinkWithNodeId(node.NodeId, undefined, database);
         return createDeveloperUIInternalPageHref(developerUIHref);
     }
 

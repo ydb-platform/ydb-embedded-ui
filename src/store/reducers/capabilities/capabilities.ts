@@ -50,5 +50,5 @@ export async function queryCapability(
     const thunk = capabilitiesApi.util.getRunningQueryThunk('getClusterCapabilities', {database});
     await dispatch(thunk);
 
-    return selectCapabilityVersion(getState(), capability) || 0;
+    return selectCapabilityVersion(getState(), capability, database) || 0;
 }

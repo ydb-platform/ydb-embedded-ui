@@ -24,6 +24,7 @@ import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {getPDiskId, getSeverityColor} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
+import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 
@@ -65,6 +66,8 @@ export function PDiskPage() {
     const newDiskApiAvailable = useDiskPagesAvailable();
     const containerRef = React.useRef<HTMLDivElement>(null);
 
+    const database = useDatabaseFromQuery();
+
     const [{nodeId, pDiskId, activeTab}] = useQueryParams({
         activeTab: StringParam,
         nodeId: StringParam,
@@ -80,7 +83,7 @@ export function PDiskPage() {
     }, [dispatch, nodeId, pDiskId]);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const params = pDiskParamsDefined ? {nodeId, pDiskId} : skipToken;
+    const params = pDiskParamsDefined ? {nodeId, pDiskId, database} : skipToken;
     const pdiskDataQuery = pDiskApi.useGetPdiskInfoQuery(params, {
         pollingInterval: autoRefreshInterval,
     });
@@ -222,7 +225,7 @@ export function PDiskPage() {
                     activeTab={pDiskTab}
                     wrapTo={({id}, tabNode) => {
                         const path = pDiskParamsDefined
-                            ? getPDiskPagePath(pDiskId, nodeId, {activeTab: id})
+                            ? getPDiskPagePath(pDiskId, nodeId, {activeTab: id, database})
                             : undefined;
                         return (
                             <InternalLink to={path} key={id}>
@@ -240,13 +243,14 @@ export function PDiskPage() {
             case 'spaceDistribution': {
                 return pDiskData ? (
                     <div className={pdiskPageCn('disk-distribution')}>
-                        <PDiskSpaceDistribution data={pDiskData} />
+                        <PDiskSpaceDistribution data={pDiskData} database={database} />
                     </div>
                 ) : null;
             }
             case 'storage': {
                 return pDiskParamsDefined ? (
                     <PaginatedStorage
+                        database={database}
                         nodeId={nodeId}
                         pDiskId={pDiskId}
                         parentRef={containerRef}

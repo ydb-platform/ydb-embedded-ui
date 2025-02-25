@@ -37,10 +37,11 @@ export function VDiskPage() {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const newDiskApiAvailable = useDiskPagesAvailable();
 
-    const [{nodeId, pDiskId, vDiskSlotId}] = useQueryParams({
+    const [{nodeId, pDiskId, vDiskSlotId, database}] = useQueryParams({
         nodeId: StringParam,
         pDiskId: StringParam,
         vDiskSlotId: StringParam,
+        database: StringParam,
     });
 
     React.useEffect(() => {
@@ -50,7 +51,7 @@ export function VDiskPage() {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const params =
         valueIsDefined(nodeId) && valueIsDefined(pDiskId) && valueIsDefined(vDiskSlotId)
-            ? {nodeId, pDiskId, vDiskSlotId}
+            ? {nodeId, pDiskId, vDiskSlotId, database: database?.toString()}
             : skipToken;
     const {
         currentData: vDiskData = {},
@@ -186,6 +187,8 @@ export function VDiskPage() {
                 <React.Fragment>
                     <div className={vDiskPageCn('storage-title')}>{vDiskPageKeyset('storage')}</div>
                     <PaginatedStorage
+                        // TODO: add database when backend support it
+                        // database={database?.toString()}
                         groupId={GroupID}
                         nodeId={nodeId}
                         pDiskId={pDiskId ?? undefined}

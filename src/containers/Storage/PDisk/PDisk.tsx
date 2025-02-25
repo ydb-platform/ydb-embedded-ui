@@ -9,6 +9,7 @@ import {getPDiskPagePath} from '../../../routes';
 import {valueIsDefined} from '../../../utils';
 import {cn} from '../../../utils/cn';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
+import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import type {StorageViewContext} from '../types';
 import {isVdiskActive} from '../utils';
 
@@ -37,6 +38,7 @@ export const PDisk = ({
     progressBarClassName,
     viewContext,
 }: PDiskProps) => {
+    const database = useDatabaseFromQuery();
     const {NodeId, PDiskId} = data;
     const pDiskIdsDefined = valueIsDefined(NodeId) && valueIsDefined(PDiskId);
 
@@ -75,7 +77,7 @@ export const PDisk = ({
     let pDiskPath: string | undefined;
 
     if (pDiskIdsDefined) {
-        pDiskPath = getPDiskPagePath(PDiskId, NodeId);
+        pDiskPath = getPDiskPagePath(PDiskId, NodeId, {database});
     }
 
     return (

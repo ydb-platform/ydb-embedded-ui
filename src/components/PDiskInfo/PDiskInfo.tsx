@@ -7,6 +7,7 @@ import {cn} from '../../utils/cn';
 import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
 import {createPDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import type {PreparedPDisk} from '../../utils/disks/types';
+import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import type {InfoViewerItem} from '../InfoViewer';
 import {InfoViewer} from '../InfoViewer/InfoViewer';
@@ -25,6 +26,7 @@ interface GetPDiskInfoOptions<T extends PreparedPDisk> {
     nodeId?: number | string | null;
     withPDiskPageLink?: boolean;
     isUserAllowedToMakeChanges?: boolean;
+    database?: string;
 }
 
 // eslint-disable-next-line complexity
@@ -33,6 +35,7 @@ function getPDiskInfo<T extends PreparedPDisk>({
     nodeId,
     withPDiskPageLink,
     isUserAllowedToMakeChanges,
+    database,
 }: GetPDiskInfoOptions<T>) {
     const {
         PDiskId,
@@ -147,10 +150,11 @@ function getPDiskInfo<T extends PreparedPDisk>({
         valueIsDefined(nodeId);
 
     if (shouldDisplayLinks) {
-        const pDiskPagePath = getPDiskPagePath(PDiskId, nodeId);
+        const pDiskPagePath = getPDiskPagePath(PDiskId, nodeId, {database});
         const pDiskInternalViewerPath = createPDiskDeveloperUILink({
             nodeId,
             pDiskId: PDiskId,
+            database,
         });
 
         additionalInfo.push({
@@ -189,12 +193,14 @@ export function PDiskInfo<T extends PreparedPDisk>({
     className,
 }: PDiskInfoProps<T>) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const database = useDatabaseFromQuery();
 
     const [generalInfo, statusInfo, spaceInfo, additionalInfo] = getPDiskInfo({
         pDisk,
         nodeId,
         withPDiskPageLink,
         isUserAllowedToMakeChanges,
+        database,
     });
 
     return (

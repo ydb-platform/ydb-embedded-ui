@@ -8,6 +8,5 @@ export type StorageNodesColumn = Column<PreparedStorageNode>;
 export interface GetStorageNodesColumnsParams {
     additionalNodesProps?: AdditionalNodesProps | undefined;
     visibleEntities?: VisibleEntities;
-    database?: string;
     viewContext?: StorageViewContext;
 }

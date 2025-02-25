@@ -32,7 +32,7 @@ const b = cn('ydb-diagnostics-partitions-columns');
 
 export const PARTITIONS_COLUMNS_WIDTH_LS_KEY = 'partitionsColumnsWidth';
 
-export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
+export const getAllColumns = (database?: string): Column<PreparedPartitionDataWithHosts>[] => [
     {
         name: PARTITIONS_COLUMNS_IDS.PARTITION_ID,
         header: (
@@ -206,7 +206,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
             row.partitionNodeId && row.partitionHost ? (
                 <EntityStatus
                     name={row.partitionHost}
-                    path={getDefaultNodePath(row.partitionNodeId)}
+                    path={getDefaultNodePath(row.partitionNodeId, {database})}
                     showStatus={false}
                     hasClipboardButton
                 />
@@ -227,7 +227,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
             row.connectionNodeId && row.connectionHost ? (
                 <EntityStatus
                     name={row.connectionHost}
-                    path={getDefaultNodePath(row.connectionNodeId)}
+                    path={getDefaultNodePath(row.connectionNodeId, {database})}
                     showStatus={false}
                     hasClipboardButton
                 />
@@ -239,8 +239,9 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
 
 // Topics without consumers have partitions data with no data corresponding to consumers
 // These columns will be empty and should not be displayed
-export const generalColumns = allColumns.filter((column) => {
-    return generalPartitionColumnsIds.includes(
-        column.name as (typeof generalPartitionColumnsIds)[number],
-    );
-});
+export const getGeneralColumns = (database?: string) =>
+    getAllColumns(database).filter((column) => {
+        return generalPartitionColumnsIds.includes(
+            column.name as (typeof generalPartitionColumnsIds)[number],
+        );
+    });

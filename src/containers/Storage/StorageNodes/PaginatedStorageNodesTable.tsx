@@ -6,6 +6,7 @@ import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField} from '../../../types/api/nodes';
 import {cn} from '../../../utils/cn';
+import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {NodesUptimeFilterValues, isUnavailableNode} from '../../../utils/nodes';
 
 import {StorageNodesEmptyDataMessage} from './StorageNodesEmptyDataMessage';
@@ -24,7 +25,6 @@ const getRowUnavailableClassName = (row: PreparedStorageNode) =>
 interface PaginatedStorageNodesTableProps {
     columns: StorageNodesColumn[];
 
-    database?: string;
     nodeId?: string | number;
     groupId?: string | number;
 
@@ -44,7 +44,6 @@ interface PaginatedStorageNodesTableProps {
 
 export const PaginatedStorageNodesTable = ({
     columns,
-    database,
     nodeId,
     groupId,
     filterGroup,
@@ -58,6 +57,7 @@ export const PaginatedStorageNodesTable = ({
     renderErrorMessage,
     initialEntitiesCount,
 }: PaginatedStorageNodesTableProps) => {
+    const database = useDatabaseFromQuery();
     const tableFilters = React.useMemo(() => {
         return {
             searchValue,

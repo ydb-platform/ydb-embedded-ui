@@ -11,6 +11,7 @@ import {
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import {storageApi} from '../../store/reducers/storage/storage';
 import {useAutoRefreshInterval} from '../../utils/hooks';
+import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
 import {useAdditionalNodeProps} from '../AppWithClusters/useClusterData';
 
@@ -57,7 +58,6 @@ export const PaginatedStorageNodes = (props: PaginatedStorageProps) => {
 };
 
 function StorageNodesComponent({
-    database,
     nodeId,
     groupId,
     viewContext,
@@ -70,7 +70,6 @@ function StorageNodesComponent({
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
-        database,
         viewContext,
     });
 
@@ -90,7 +89,6 @@ function StorageNodesComponent({
 
     return (
         <PaginatedStorageNodesTable
-            database={database}
             nodeId={nodeId}
             groupId={groupId}
             searchValue={searchValue}
@@ -107,18 +105,17 @@ function StorageNodesComponent({
 }
 
 function GroupedStorageNodesComponent({
-    database,
     groupId,
     nodeId,
     viewContext,
     parentRef,
 }: PaginatedStorageProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
+    const database = useDatabaseFromQuery();
 
     const {searchValue, storageNodesGroupByParam, handleShowAllNodes} = useStorageQueryParams();
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
-        database,
         viewContext,
     });
 
@@ -170,7 +167,6 @@ function GroupedStorageNodesComponent({
                         onIsExpandedChange={setIsGroupExpanded}
                     >
                         <PaginatedStorageNodesTable
-                            database={database}
                             parentRef={parentRef}
                             nodeId={nodeId}
                             groupId={groupId}
@@ -203,13 +199,7 @@ function GroupedStorageNodesComponent({
     );
 }
 
-function useStorageNodesColumnsToSelect({
-    database,
-    viewContext,
-}: {
-    database?: string;
-    viewContext?: StorageViewContext;
-}) {
+function useStorageNodesColumnsToSelect({viewContext}: {viewContext?: StorageViewContext}) {
     const {balancer} = useClusterBaseInfo();
     const {additionalNodesProps} = useAdditionalNodeProps({balancer});
     const {visibleEntities} = useStorageQueryParams();
@@ -217,7 +207,6 @@ function useStorageNodesColumnsToSelect({
     return useStorageNodesSelectedColumns({
         additionalNodesProps,
         visibleEntities,
-        database,
         viewContext,
     });
 }

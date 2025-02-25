@@ -19,6 +19,7 @@ import {EFlag} from '../../types/api/enums';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
+import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 
 import {storageGroupPageKeyset} from './i18n';
@@ -29,6 +30,7 @@ const storageGroupPageCn = cn('ydb-storage-group-page');
 
 export function StorageGroupPage() {
     const dispatch = useTypedDispatch();
+    const database = useDatabaseFromQuery();
     const containerRef = React.useRef<HTMLDivElement>(null);
 
     const [{groupId}] = useQueryParams({groupId: StringParam});
@@ -42,7 +44,7 @@ export function StorageGroupPage() {
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const groupQuery = storageApi.useGetStorageGroupsInfoQuery(
         valueIsDefined(groupId)
-            ? {groupId, shouldUseGroupsHandler, with: 'all', fieldsRequired: 'all'}
+            ? {groupId, shouldUseGroupsHandler, with: 'all', fieldsRequired: 'all', database}
             : skipToken,
         {
             pollingInterval: autoRefreshInterval,
@@ -112,6 +114,7 @@ export function StorageGroupPage() {
                 </div>
                 <PaginatedStorage
                     groupId={groupId}
+                    database={database}
                     parentRef={containerRef}
                     viewContext={{
                         groupId: groupId?.toString(),

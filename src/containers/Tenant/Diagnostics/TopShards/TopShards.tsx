@@ -127,7 +127,11 @@ export const TopShards = ({tenantName, path, type}: TopShardsProps) => {
     };
 
     const tableColumns = React.useMemo(() => {
-        const rawColumns: Column<KeyValueRow>[] = getShardsWorkloadColumns(tenantName, location);
+        const rawColumns: Column<KeyValueRow>[] = getShardsWorkloadColumns(
+            tenantName,
+            location,
+            tenantName,
+        );
 
         const columns: Column<KeyValueRow>[] = rawColumns.map((column) => ({
             ...column,

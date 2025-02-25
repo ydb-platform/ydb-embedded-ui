@@ -7,6 +7,7 @@ import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters
 import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import {getSeverityColor} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
+import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToSpeed} from '../../utils/utils';
 import {InfoViewer} from '../InfoViewer';
@@ -35,6 +36,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
     ...infoViewerProps
 }: VDiskInfoProps<T>) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const database = useDatabaseFromQuery();
 
     const {
         AllocatedSize,
@@ -152,7 +154,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
         const links: React.ReactNode[] = [];
 
         if (withVDiskPageLink) {
-            const vDiskPagePath = getVDiskPagePath(VDiskSlotId, PDiskId, NodeId);
+            const vDiskPagePath = getVDiskPagePath(VDiskSlotId, PDiskId, NodeId, {database});
             links.push(
                 <LinkWithIcon
                     key={vDiskPagePath}
@@ -168,6 +170,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
                 nodeId: NodeId,
                 pDiskId: PDiskId,
                 vDiskSlotId: VDiskSlotId,
+                database,
             });
 
             links.push(
