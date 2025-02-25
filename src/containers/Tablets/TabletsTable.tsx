@@ -6,6 +6,7 @@ import {Icon, Text} from '@gravity-ui/uikit';
 import {StringParam, useQueryParams} from 'use-query-params';
 
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
+import {EntitiesCount} from '../../components/EntitiesCount';
 import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {InternalLink} from '../../components/InternalLink';
@@ -171,7 +172,7 @@ export function TabletsTable({database, tablets, loading, error}: TabletsTablePr
 
     const columns = React.useMemo(() => getColumns({database}), [database]);
 
-    const data = React.useMemo(() => {
+    const filteredTablets = React.useMemo(() => {
         return tablets.filter((tablet) => {
             return String(tablet.TabletId).includes(tabletsSearch ?? '');
         });
@@ -188,14 +189,20 @@ export function TabletsTable({database, tablets, loading, error}: TabletsTablePr
                     placeholder={i18n('controls.search-placeholder')}
                     onChange={handleSearchQueryChange}
                     value={tabletsSearch ?? ''}
-                    width={190}
+                    width={238}
+                />
+                <EntitiesCount
+                    label={i18n('controls.entities-count-label')}
+                    loading={loading}
+                    total={tablets.length}
+                    current={filteredTablets.length}
                 />
             </TableWithControlsLayout.Controls>
             {error ? <ResponseError error={error} /> : null}
             <TableWithControlsLayout.Table loading={loading}>
                 <ResizeableDataTable
                     columns={columns}
-                    data={data}
+                    data={filteredTablets}
                     settings={DEFAULT_TABLE_SETTINGS}
                     emptyDataMessage={i18n('noTabletsData')}
                 />
