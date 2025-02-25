@@ -106,6 +106,7 @@ export const QueryEditorControls = ({
             loading={cancelQueryResponse.isLoading}
             error={Boolean(cancelQueryResponse.error)}
             onClick={onStopButtonClick}
+            view="action"
         />
     );
 

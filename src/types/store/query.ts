@@ -20,20 +20,10 @@ import type {
 } from '../api/query';
 import type {ValueOf} from '../common';
 
-export interface StreamMetrics {
-    rowsPerSecond: number;
-    lastUpdateTime: number;
-    recentChunks: Array<{
-        timestamp: number;
-        rowCount: number;
-    }>;
-}
-
 export interface ParsedResultSet {
     columns?: ColumnType[];
     result?: KeyValueRow[];
     truncated?: boolean;
-    streamMetrics?: StreamMetrics;
 }
 
 export interface IQueryResult {

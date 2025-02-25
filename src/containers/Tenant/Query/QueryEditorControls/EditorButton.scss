@@ -8,8 +8,6 @@
     }
 
     &__stop-button {
-        color: var(--g-color-text-brand-contrast);
-        background-color: var(--g-color-text-danger);
         &_error {
             @include mixins.query-buttons-animations();
         }

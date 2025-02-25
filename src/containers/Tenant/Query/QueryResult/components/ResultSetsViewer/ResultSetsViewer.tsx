@@ -28,26 +28,16 @@ export function ResultSetsViewer(props: ResultSetsViewerProps) {
         const tabsItems: TabsItemProps[] =
             resultSets?.map((_, index) => {
                 const resultSet = resultSets?.[index];
-                const rowsPerSecond = resultSet?.streamMetrics?.rowsPerSecond;
-                const rowsPerSecondFormatted =
-                    rowsPerSecond && rowsPerSecond > 1000
-                        ? `${(rowsPerSecond / 1000).toFixed(0)}k`
-                        : rowsPerSecond?.toFixed(0);
                 return {
                     id: String(index),
                     title: (
                         <div className={b('tab-title')}>
                             <Text>
-                                {`Result${resultSets.length > 1 ? ` #${index + 1}` : ''}${resultSets?.[index]?.truncated ? '(T)' : ''}`}
+                                {`Result #${index + 1}${resultSets?.[index]?.truncated ? '(T)' : ''}`}
                             </Text>
                             <Text color="secondary">{resultSet.result?.length || 0}</Text>
                         </div>
                     ),
-                    label: rowsPerSecondFormatted
-                        ? {
-                              content: `${rowsPerSecondFormatted} rows/s`,
-                          }
-                        : undefined,
                 };
             }) || [];
 
@@ -64,10 +54,20 @@ export function ResultSetsViewer(props: ResultSetsViewerProps) {
         );
     };
 
+    const renderSingleResult = () => {
+        const result = resultSets?.[0];
+        return (
+            <div className={b('title')}>
+                <Text>{`Result ${result?.truncated ? '(T)' : ''}`}</Text>
+                <Text color="secondary">{result?.result?.length || 0}</Text>
+            </div>
+        );
+    };
+
     return (
         <div className={b('result-wrapper')}>
             {props.error ? <QueryResultError error={error} /> : null}
-            {renderTabs()}
+            {resultSets?.length && resultSets?.length > 1 ? renderTabs() : renderSingleResult()}
             {currentResult ? (
                 <div className={b('result')}>
                     <QueryResultTable
