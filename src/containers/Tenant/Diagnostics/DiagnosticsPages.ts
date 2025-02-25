@@ -133,6 +133,7 @@ const pathTypeToPages: Record<EPathType, Page[] | undefined> = {
     [EPathType.EPathTypeView]: VIEW_PAGES,
 
     [EPathType.EPathTypeReplication]: ASYNC_REPLICATION_PAGES,
+    [EPathType.EPathTypeResourcePool]: DIR_PAGES,
 };
 
 export const getPagesByType = (type?: EPathType) => (type && pathTypeToPages[type]) || DIR_PAGES;
