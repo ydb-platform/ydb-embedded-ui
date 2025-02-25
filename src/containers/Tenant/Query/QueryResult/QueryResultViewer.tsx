@@ -333,7 +333,7 @@ export function QueryResultViewer({
                 {renderRightControls()}
             </div>
             {isLoading || isCancelled ? null : <QuerySettingsBanner />}
-            {isCancelled ? <QueryStoppedBanner /> : null}
+            {isCancelled && data.resultSets?.length ? <QueryStoppedBanner /> : null}
             <LoaderWrapper loading={isLoading && (!data.resultSets || activeSection !== 'result')}>
                 <Fullscreen className={b('result')}>{renderResultSection()}</Fullscreen>
             </LoaderWrapper>
