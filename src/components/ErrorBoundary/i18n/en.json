@@ -1,7 +1,10 @@
 {
-  "error-title": "Something went wrong",
-  "error-description": "We have something broken, but don't worry, it won't last long",
-  "show-details": "Show details",
-  "report-problem": "Report a problem",
-  "button-reset": "Try again"
+  "error-title": "Oops! Something went wrong...",
+  "error-description": "Something seems to be broken. Please contact support for help.",
+  "send-qr-message": "Send QR code to the support",
+  "stack-title": "Trace",
+
+  "ui-version": "UI version",
+  "backend-version": "Backend version",
+  "error": "Error"
 }
