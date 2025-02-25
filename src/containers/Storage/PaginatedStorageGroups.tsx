@@ -65,6 +65,7 @@ function StorageGroupsComponent({
     const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns({
         visibleEntities,
         viewContext,
+        database,
     });
 
     const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {

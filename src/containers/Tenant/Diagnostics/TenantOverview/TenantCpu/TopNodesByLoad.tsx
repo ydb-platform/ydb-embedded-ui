@@ -85,6 +85,7 @@ export function TopNodesByLoad({tenantName, additionalNodesProps}: TopNodesByLoa
         postfix: i18n('by-load'),
         link: getTenantPath({
             ...query,
+            database: tenantName,
             [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.nodes,
         }),
     });

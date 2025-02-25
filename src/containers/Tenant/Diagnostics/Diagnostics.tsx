@@ -163,6 +163,7 @@ function Diagnostics(props: DiagnosticsProps) {
                         wrapTo={({id}, node) => {
                             const path = getTenantPath({
                                 ...queryParams,
+                                database: tenantName,
                                 [TenantTabsGroups.diagnosticsTab]: id,
                             });
 

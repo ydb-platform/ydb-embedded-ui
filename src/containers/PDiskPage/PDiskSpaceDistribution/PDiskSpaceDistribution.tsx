@@ -29,9 +29,10 @@ const SLOT_HEIGHT = 40;
 
 interface PDiskSpaceDistributionProps {
     data: PDiskData;
+    database?: string;
 }
 
-export function PDiskSpaceDistribution({data}: PDiskSpaceDistributionProps) {
+export function PDiskSpaceDistribution({data, database}: PDiskSpaceDistributionProps) {
     const {SlotItems} = data;
 
     const {PDiskId, NodeId} = data;
@@ -40,7 +41,15 @@ export function PDiskSpaceDistribution({data}: PDiskSpaceDistributionProps) {
 
     const renderSlots = () => {
         return SlotItems?.map((item, index) => {
-            return <Slot item={item} pDiskId={PDiskId} nodeId={NodeId} key={index} />;
+            return (
+                <Slot
+                    item={item}
+                    pDiskId={PDiskId}
+                    nodeId={NodeId}
+                    key={index}
+                    database={database}
+                />
+            );
         });
     };
 
@@ -72,21 +81,22 @@ interface SlotProps<T extends SlotItemType> {
 
     pDiskId?: string | number;
     nodeId?: string | number;
+    database?: string;
 }
 
-function Slot<T extends SlotItemType>({item, pDiskId, nodeId}: SlotProps<T>) {
+function Slot<T extends SlotItemType>({item, pDiskId, nodeId, database}: SlotProps<T>) {
     const renderContent = () => {
         if (isVDiskSlot(item)) {
             const vDiskPagePath =
                 valueIsDefined(item.SlotData?.VDiskSlotId) &&
                 valueIsDefined(pDiskId) &&
                 valueIsDefined(nodeId)
-                    ? getVDiskPagePath(item.SlotData.VDiskSlotId, pDiskId, nodeId)
+                    ? getVDiskPagePath(item.SlotData.VDiskSlotId, pDiskId, nodeId, {database})
                     : undefined;
 
             return (
                 <HoverPopup
-                    popupContent={<VDiskInfo data={item.SlotData} withTitle />}
+                    popupContent={<VDiskInfo data={item.SlotData} withTitle database={database} />}
                     contentClassName={b('vdisk-popup')}
                     placement={['right', 'top']}
                 >

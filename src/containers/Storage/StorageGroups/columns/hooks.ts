@@ -18,17 +18,18 @@ import type {GetStorageGroupsColumnsParams} from './types';
 export function useStorageGroupsSelectedColumns({
     visibleEntities,
     viewContext,
+    database,
 }: GetStorageGroupsColumnsParams) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
     const columns = React.useMemo(() => {
-        const allColumns = getStorageGroupsColumns({viewContext});
+        const allColumns = getStorageGroupsColumns({viewContext, database});
 
         if (isUserAllowedToMakeChanges) {
             return allColumns;
         }
         return allColumns.filter((column) => !isMonitoringUserGroupsColumn(column.name));
-    }, [isUserAllowedToMakeChanges, viewContext]);
+    }, [isUserAllowedToMakeChanges, viewContext, database]);
 
     const requiredColumns = React.useMemo(() => {
         if (visibleEntities === VISIBLE_ENTITIES.missing) {

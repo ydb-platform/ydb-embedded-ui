@@ -12,6 +12,7 @@ import './VDisk.scss';
 const b = cn('ydb-vdisk-component');
 
 export interface VDiskProps {
+    database?: string;
     data?: PreparedVDisk;
     compact?: boolean;
     inactive?: boolean;
@@ -25,6 +26,7 @@ export interface VDiskProps {
 
 export const VDisk = ({
     data = {},
+    database,
     compact,
     inactive,
     showPopup,
@@ -34,14 +36,14 @@ export const VDisk = ({
     delayClose,
     delayOpen,
 }: VDiskProps) => {
-    const vDiskPath = getVDiskLink(data);
+    const vDiskPath = getVDiskLink(data, database);
 
     return (
         <HoverPopup
             showPopup={showPopup}
             onShowPopup={onShowPopup}
             onHidePopup={onHidePopup}
-            popupContent={<VDiskPopup data={data} />}
+            popupContent={<VDiskPopup data={data} database={database} />}
             offset={[0, 5]}
             delayClose={delayClose}
             delayOpen={delayOpen}

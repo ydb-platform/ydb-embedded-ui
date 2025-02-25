@@ -80,6 +80,7 @@ export function TopNodesByCpu({tenantName, additionalNodesProps}: TopNodesByCpuP
         postfix: i18n('by-pools-usage'),
         link: getTenantPath({
             ...query,
+            database: tenantName,
             [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.nodes,
         }),
     });

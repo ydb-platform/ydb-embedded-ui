@@ -115,7 +115,9 @@ export function Network({tenantName}: NetworkProps) {
                                         Connectivity of node{' '}
                                         <Link
                                             className={b('link')}
-                                            to={getDefaultNodePath(clickedNode.NodeId)}
+                                            to={getDefaultNodePath(clickedNode.NodeId, {
+                                                database: tenantName,
+                                            })}
                                         >
                                             {clickedNode.NodeId}
                                         </Link>{' '}

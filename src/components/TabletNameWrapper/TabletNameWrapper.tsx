@@ -28,7 +28,7 @@ export function TabletNameWrapper({tabletId, database}: TabletNameWrapperProps) 
                     <DefinitionList.Item name={i18n('field_links')}>
                         <LinkWithIcon
                             title={i18n('context_developer-ui')}
-                            url={createTabletDeveloperUIHref(tabletId)}
+                            url={createTabletDeveloperUIHref(tabletId, database)}
                         />
                     </DefinitionList.Item>
                 </DefinitionList>

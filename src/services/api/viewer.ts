@@ -53,11 +53,16 @@ export class ViewerAPI extends BaseYdbAPI {
         );
     }
 
-    getNodeInfo(id?: string | number, {concurrentId, signal}: AxiosOptions = {}) {
+    getNodeInfo(
+        id?: string | number,
+        database?: string,
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
         return this.get<TEvSystemStateResponse>(
             this.getPath('/viewer/json/sysinfo?enums=true'),
             {
                 node_id: id,
+                database,
             },
             {concurrentId, requestConfig: {signal}},
         );
@@ -449,10 +454,12 @@ export class ViewerAPI extends BaseYdbAPI {
             vDiskSlotId,
             pDiskId,
             nodeId,
+            database,
         }: {
             vDiskSlotId: string | number;
             pDiskId: string | number;
             nodeId: string | number;
+            database?: string;
         },
         {concurrentId, signal}: AxiosOptions = {},
     ) {
@@ -461,19 +468,25 @@ export class ViewerAPI extends BaseYdbAPI {
             {
                 node_id: nodeId,
                 filter: `(PDiskId=${pDiskId};VDiskSlotId=${vDiskSlotId})`,
+                database,
             },
             {concurrentId, requestConfig: {signal}},
         );
     }
 
     getNodeWhiteboardPDiskInfo(
-        {nodeId, pDiskId}: {nodeId: string | number; pDiskId: string | number},
+        {
+            nodeId,
+            pDiskId,
+            database,
+        }: {nodeId: string | number; pDiskId: string | number; database?: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<TEvPDiskStateResponse>(
             this.getPath('/viewer/json/pdiskinfo?enums=true'),
             {
                 filter: `(NodeId=${nodeId}${pDiskId ? `;PDiskId=${pDiskId}` : ''})`,
+                database,
             },
             {concurrentId, requestConfig: {signal}},
         );
