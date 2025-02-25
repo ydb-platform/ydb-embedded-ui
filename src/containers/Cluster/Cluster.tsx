@@ -178,13 +178,7 @@ export function Cluster({
                         getLocationObjectFromHref(getClusterPath(clusterTabsIds.tablets)).pathname
                     }
                 >
-                    <div className={b('tablets')}>
-                        <TabletsTable
-                            loading={infoLoading}
-                            tablets={clusterTablets}
-                            className={b('tablets-table')}
-                        />
-                    </div>
+                    <TabletsTable loading={infoLoading} tablets={clusterTablets} />
                 </Route>
                 <Route
                     path={
