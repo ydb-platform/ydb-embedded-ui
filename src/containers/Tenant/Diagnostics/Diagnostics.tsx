@@ -17,7 +17,7 @@ import {Heatmap} from '../../Heatmap';
 import {Nodes} from '../../Nodes/Nodes';
 import {Operations} from '../../Operations';
 import {PaginatedStorage} from '../../Storage/PaginatedStorage';
-import {Tablets} from '../../Tablets';
+import {Tablets} from '../../Tablets/Tablets';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
 import {TenantTabsGroups, getTenantPath} from '../TenantPages';
 import {isDatabaseEntityType} from '../utils/schema';
