@@ -55,10 +55,10 @@ export function ResultSetsViewer(props: ResultSetsViewerProps) {
     const renderSingleResult = () => {
         const result = resultSets?.[0];
         return (
-            <div className={b('title')}>
-                <Text>{`Result ${result?.truncated ? '(T)' : ''}`}</Text>
+            <Flex gap={2} alignItems="center" className={b('title')}>
+                <Text>{result?.truncated ? 'Truncated' : 'Result'}</Text>
                 <Text color="secondary">{result?.result?.length || 0}</Text>
-            </div>
+            </Flex>
         );
     };
 

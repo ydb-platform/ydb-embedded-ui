@@ -25,11 +25,13 @@ export class ResultTable {
     private preview: Locator;
     private resultHead: Locator;
     private resultWrapper: Locator;
+    private resultTitle: Locator;
 
     constructor(selector: Locator) {
         this.table = selector.locator('.ydb-query-result-sets-viewer__result');
         this.preview = selector.locator('.kv-preview__result');
         this.resultHead = selector.locator('.ydb-query-result-sets-viewer__head');
+        this.resultTitle = selector.locator('.ydb-query-result-sets-viewer__title');
         this.resultWrapper = selector.locator('.ydb-query-result-sets-viewer__result-wrapper');
     }
 
@@ -79,6 +81,16 @@ export class ResultTable {
     async getResultTabsCount() {
         const tabs = await this.getResultTabs();
         return tabs.count();
+    }
+
+    async getResultTitleText() {
+        await this.resultTitle.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return this.resultTitle.locator('.g-text').first().textContent();
+    }
+
+    async getResultTitleCount() {
+        await this.resultTitle.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return this.resultTitle.locator('.g-text').nth(1).textContent();
     }
 
     async getResultTabTitleText(index: number) {
