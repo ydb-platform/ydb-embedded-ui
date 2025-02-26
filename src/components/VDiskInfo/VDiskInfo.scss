@@ -1,10 +1,4 @@
 .ydb-vdisk-info {
-    &__links {
-        display: flex;
-        flex-flow: row wrap;
-        gap: var(--g-spacing-2);
-    }
-
     &__title {
         display: flex;
         flex-direction: row;
