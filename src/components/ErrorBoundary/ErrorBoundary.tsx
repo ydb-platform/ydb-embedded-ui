@@ -105,7 +105,7 @@ function ErrorStack({stack}: {stack?: string}) {
 
     const stackToDisplay = prepareErrorStack(stack, {
         trim: false,
-        maxLength: undefined,
+        maxLines: undefined,
     });
 
     return (

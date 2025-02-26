@@ -1,32 +1,21 @@
+import {prepareErrorMessage} from '../../utils/prepareErrorMessage';
+
 export async function collectDiagnosticsData(error: Error) {
-    return await Promise.all([getUiVersion(), getBackendVersion()]).then(
-        ([uiVersion, backendVersion]) => {
-            return {
-                location: window.location.href,
-                userAgent: navigator.userAgent,
-                error: {
-                    message: prepareErrorMessage(error),
-                    stack: prepareErrorStack(error.stack, {trim: true, maxLength: 10}),
-                },
-                uiVersion,
-                backendVersion,
-            };
-        },
-    );
+    return await getBackendVersion().then((backendVersion) => {
+        return {
+            location: window.location.href,
+            userAgent: navigator.userAgent,
+            error: {
+                message: prepareErrorMessage(error),
+                stack: prepareErrorStack(error.stack, {trim: true, maxLines: 10}),
+            },
+            uiVersion: process.env.UI_VERSION,
+            backendVersion,
+        };
+    });
 }
 
 export type DiagnosticsData = Awaited<ReturnType<typeof collectDiagnosticsData>>;
-
-// Error could happen on app init, while modules not inited
-// Import in try catch blocks to prevent any errors with error data collection
-async function getUiVersion() {
-    try {
-        const packageJson = await import('../../../package.json');
-        return packageJson.version;
-    } catch (error) {
-        return {error: prepareErrorMessage(error)};
-    }
-}
 
 async function getBackendVersion() {
     try {
@@ -40,19 +29,9 @@ async function getBackendVersion() {
     }
 }
 
-function prepareErrorMessage(error: unknown) {
-    if (error) {
-        if (typeof error === 'object' && 'message' in error && typeof error.message === 'string') {
-            return error.message;
-        }
-    }
-
-    return '';
-}
-
 export function prepareErrorStack(
     stack?: string,
-    {trim = true, maxLength}: {trim?: boolean; maxLength?: number} = {},
+    {trim = true, maxLines}: {trim?: boolean; maxLines?: number} = {},
 ) {
     return (
         stack
@@ -73,7 +52,7 @@ export function prepareErrorStack(
                 return preparedLine;
             })
             // Do not slice first row
-            .slice(0, maxLength ? maxLength + 1 : undefined)
+            .slice(0, maxLines ? maxLines + 1 : undefined)
             .join('\n')
     );
 }

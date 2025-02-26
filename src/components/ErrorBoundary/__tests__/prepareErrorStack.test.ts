@@ -36,12 +36,12 @@ describe('prepareErrorStack', () => {
             } as Window & typeof globalThis;
         });
 
-        expect(prepareErrorStack(stack, {trim: false, maxLength: undefined})).toBe(preparedStack);
+        expect(prepareErrorStack(stack, {trim: false, maxLines: undefined})).toBe(preparedStack);
 
         windowSpy.mockRestore();
     });
 
-    test('Limit trace to maxLenght', () => {
+    test('Limit trace to maxLines', () => {
         const stack = `TypeError: Cannot read properties of null (reading 'hello')
     at Content (/static/js/bundle.js:4725:8)
     at renderWithHooks (/static/js/bundle.js:98993:22)
@@ -59,7 +59,7 @@ describe('prepareErrorStack', () => {
     at renderWithHooks (/static/js/bundle.js:98993:22)
     at mountIndeterminateComponent (/static/js/bundle.js:102964:17)`;
 
-        expect(prepareErrorStack(stack, {trim: false, maxLength: 3})).toBe(preparedStack);
+        expect(prepareErrorStack(stack, {trim: false, maxLines: 3})).toBe(preparedStack);
     });
 
     test('Trims data if needed', () => {

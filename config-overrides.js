@@ -2,12 +2,15 @@ const path = require('path');
 
 const MiniCSSExtractPlugin = require('mini-css-extract-plugin');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+const webpack = require('webpack');
 const srcRoot = path.resolve(__dirname, 'src');
 const uiKitRoot = path.resolve(__dirname, 'node_modules/@gravity-ui/uikit');
 const antlr4C3Root = path.resolve(__dirname, 'node_modules/antlr4-c3');
 const websqlRoot = path.resolve(__dirname, 'node_modules/@gravity-ui/websql-autocomplete');
 const antlr4ngRoot = path.resolve(__dirname, 'node_modules/antlr4ng');
 const uiKitIconsRoot = path.resolve(__dirname, 'node_modules/@gravity-ui/icons');
+
+const packageJson = require('./package.json');
 
 module.exports = {
     webpack: (config, env) => {
@@ -42,6 +45,13 @@ module.exports = {
                         entry: 'monaco-yql-languages/build/monaco.contribution',
                     },
                 ],
+            }),
+        );
+
+        // Add DefinePlugin to expose just the version
+        config.plugins.push(
+            new webpack.DefinePlugin({
+                'process.env.UI_VERSION': JSON.stringify(packageJson.version),
             }),
         );
 
