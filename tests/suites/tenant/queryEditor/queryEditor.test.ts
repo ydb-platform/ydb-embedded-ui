@@ -3,8 +3,14 @@ import {expect, test} from '@playwright/test';
 import {QUERY_MODES, STATISTICS_MODES} from '../../../../src/utils/query';
 import {getClipboardContent} from '../../../utils/clipboard';
 import {tenantName} from '../../../utils/constants';
+import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {NavigationTabs, TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
-import {createTableQuery, longRunningQuery, longTableSelect} from '../constants';
+import {
+    createTableQuery,
+    longRunningQuery,
+    longRunningStreamQuery,
+    longTableSelect,
+} from '../constants';
 
 import {
     ButtonNames,
@@ -102,18 +108,14 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isElapsedTimeVisible()).resolves.toBe(true);
     });
 
-    test('Stop button and elapsed time label disappear after query is stopped', async ({page}) => {
+    test('Query streaming finishes in reasonable time', async ({page}) => {
         const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'on', 'Query Streaming');
 
-        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.setQuery(longRunningStreamQuery);
         await queryEditor.clickRunButton();
 
-        await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
-
-        await queryEditor.clickStopButton();
-
-        await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
-        await expect(queryEditor.isElapsedTimeHidden()).resolves.toBe(true);
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
     });
 
     test('Query execution is terminated when stop button is clicked', async ({page}) => {
@@ -215,7 +217,8 @@ test.describe('Test Query Editor', async () => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.setQuery(testQuery);
         await queryEditor.clickRunButton();
-        await expect(queryEditor.resultTable.getResultHeadText()).resolves.toBe('Result(1)');
+        await expect(queryEditor.resultTable.getResultTitleText()).resolves.toBe('Result');
+        await expect(queryEditor.resultTable.getResultTitleCount()).resolves.toBe('1');
     });
 
     test('No result head value for no result', async ({page}) => {
@@ -228,12 +231,27 @@ test.describe('Test Query Editor', async () => {
 
     test('Truncated head value is 1 for 1 row truncated result', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await queryEditor.setQuery(longTableSelect);
+        await queryEditor.setQuery(longTableSelect());
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.changeLimitRows(1);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
         await queryEditor.clickRunButton();
-        await expect(queryEditor.resultTable.getResultHeadText()).resolves.toBe('Truncated(1)');
+        await expect(queryEditor.resultTable.getResultTitleText()).resolves.toBe('Truncated');
+        await expect(queryEditor.resultTable.getResultTitleCount()).resolves.toBe('1');
+    });
+
+    test('Truncated results for multiple tabs', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await queryEditor.setQuery(`${longTableSelect(2)}${longTableSelect(2)}`);
+        await queryEditor.clickGearButton();
+        await queryEditor.settingsDialog.changeLimitRows(3);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await queryEditor.clickRunButton();
+        await expect(queryEditor.resultTable.getResultTabsCount()).resolves.toBe(2);
+        await expect(queryEditor.resultTable.getResultTabTitleText(1)).resolves.toBe(
+            'Result #2(T)',
+        );
+        await expect(queryEditor.resultTable.getResultTabTitleCount(1)).resolves.toBe('1');
     });
 
     test('Query execution status changes correctly', async ({page}) => {
@@ -257,8 +275,8 @@ test.describe('Test Query Editor', async () => {
 
         // Verify there are two result tabs
         await expect(queryEditor.resultTable.getResultTabsCount()).resolves.toBe(2);
-        await expect(queryEditor.resultTable.getResultTabTitle(0)).resolves.toBe('Result #1');
-        await expect(queryEditor.resultTable.getResultTabTitle(1)).resolves.toBe('Result #2');
+        await expect(queryEditor.resultTable.getResultTabTitleText(0)).resolves.toBe('Result #1');
+        await expect(queryEditor.resultTable.getResultTabTitleText(1)).resolves.toBe('Result #2');
 
         // Then verify running only selected part produces one result
         await queryEditor.focusEditor();
@@ -268,8 +286,8 @@ test.describe('Test Query Editor', async () => {
         await executeSelectedQueryWithKeybinding(page);
 
         await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
-        await expect(queryEditor.resultTable.hasMultipleResultTabs()).resolves.toBe(false);
-        await expect(queryEditor.resultTable.getResultHeadText()).resolves.toBe('Result(1)');
+        await expect(queryEditor.resultTable.getResultTitleText()).resolves.toBe('Result');
+        await expect(queryEditor.resultTable.getResultTitleCount()).resolves.toBe('1');
     });
 
     test('Running selected query via context menu executes only selected part', async ({page}) => {
@@ -283,8 +301,8 @@ test.describe('Test Query Editor', async () => {
 
         // Verify there are two result tabs
         await expect(queryEditor.resultTable.getResultTabsCount()).resolves.toBe(2);
-        await expect(queryEditor.resultTable.getResultTabTitle(0)).resolves.toBe('Result #1');
-        await expect(queryEditor.resultTable.getResultTabTitle(1)).resolves.toBe('Result #2');
+        await expect(queryEditor.resultTable.getResultTabTitleText(0)).resolves.toBe('Result #1');
+        await expect(queryEditor.resultTable.getResultTabTitleText(1)).resolves.toBe('Result #2');
 
         // Then verify running only selected part produces one result without tabs
         await queryEditor.focusEditor();
@@ -294,8 +312,8 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.runSelectedQueryViaContextMenu();
 
         await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
-        await expect(queryEditor.resultTable.hasMultipleResultTabs()).resolves.toBe(false);
-        await expect(queryEditor.resultTable.getResultHeadText()).resolves.toBe('Result(1)');
+        await expect(queryEditor.resultTable.getResultTitleText()).resolves.toBe('Result');
+        await expect(queryEditor.resultTable.getResultTitleCount()).resolves.toBe('1');
     });
 
     test('Results controls collapse and expand functionality', async ({page}) => {

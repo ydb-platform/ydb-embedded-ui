@@ -2,16 +2,4 @@
     display: flex;
     align-items: center;
     gap: 4px;
-
-    color: var(--g-color-text-complementary);
-    &__result-status-icon {
-        color: var(--g-color-text-positive);
-        &_error {
-            color: var(--g-color-text-danger);
-        }
-    }
-
-    &__query-settings-icon {
-        color: var(--g-color-text-hint);
-    }
 }

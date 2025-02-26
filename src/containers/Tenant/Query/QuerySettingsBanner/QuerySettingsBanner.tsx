@@ -17,6 +17,7 @@ export function QuerySettingsBanner() {
             className={b()}
             theme="info"
             align="baseline"
+            style={{paddingTop: 11, paddingBottom: 11}}
             message={
                 <QuerySettingsDescription
                     prefix={i18n('banner.query-settings.message')}

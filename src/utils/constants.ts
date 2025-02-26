@@ -98,6 +98,7 @@ export const TENANT_OVERVIEW_TABLES_SETTINGS = {
 export const QUERY_EXECUTION_SETTINGS_KEY = 'queryExecutionSettings';
 export const LAST_QUERY_EXECUTION_SETTINGS_KEY = 'last_query_execution_settings';
 export const QUERY_SETTINGS_BANNER_LAST_CLOSED_KEY = 'querySettingsBannerLastClosed';
+export const QUERY_STOPPED_BANNER_CLOSED_KEY = 'queryStoppedBannerClosed';
 
 export const LAST_USED_QUERY_ACTION_KEY = 'last_used_query_action';
 

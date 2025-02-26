@@ -2,15 +2,15 @@
 
 .ydb-query-result-sets-viewer {
     &__tabs {
-        padding-left: 10px;
+        margin-bottom: var(--g-spacing-1);
+        padding-top: var(--g-spacing-1);
+        padding-left: var(--g-spacing-4);
     }
 
-    &__head {
-        margin-top: var(--g-spacing-4);
-    }
-
-    &__row-count {
-        margin-left: var(--g-spacing-1);
+    &__title {
+        padding-top: var(--g-spacing-4);
+        padding-bottom: var(--g-spacing-4);
+        padding-left: var(--g-spacing-4);
     }
 
     &__result-wrapper {

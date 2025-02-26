@@ -52,7 +52,6 @@ export class QueryEditor {
     private stopButton: Locator;
     private saveButton: Locator;
     private gearButton: Locator;
-    private indicatorIcon: Locator;
     private banner: Locator;
     private executionStatus: Locator;
     private radioButton: Locator;
@@ -67,13 +66,10 @@ export class QueryEditor {
         this.stopButton = this.selector.getByRole('button', {name: ButtonNames.Stop});
         this.explainButton = this.selector.getByRole('button', {name: ButtonNames.Explain});
         this.saveButton = this.selector.getByRole('button', {name: ButtonNames.Save});
-        this.gearButton = this.selector.locator('.ydb-query-editor-controls__gear-button');
-        this.executionStatus = this.selector.locator('.kv-query-execution-status');
+        this.gearButton = this.selector.locator('.ydb-query-editor-button__gear-button');
+        this.executionStatus = this.selector.locator('.kv-query-execution-status .g-text');
         this.resultsControls = this.selector.locator('.ydb-query-result__controls');
-        this.indicatorIcon = this.selector.locator(
-            '.kv-query-execution-status__query-settings-icon',
-        );
-        this.elapsedTimeLabel = this.selector.locator('.ydb-query-elapsed-time');
+        this.elapsedTimeLabel = this.selector.locator('.kv-query-execution-status .g-label__value');
         this.radioButton = this.selector.locator('.query-editor__pane-wrapper .g-radio-button');
         this.banner = this.page.locator('.ydb-query-settings-banner');
 
@@ -292,16 +288,6 @@ export class QueryEditor {
 
     async isBannerHidden() {
         await this.banner.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
-        return true;
-    }
-
-    async isIndicatorIconVisible() {
-        await this.indicatorIcon.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return true;
-    }
-
-    async isIndicatorIconHidden() {
-        await this.indicatorIcon.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
         return true;
     }
 

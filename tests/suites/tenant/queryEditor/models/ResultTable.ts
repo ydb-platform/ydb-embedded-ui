@@ -25,11 +25,13 @@ export class ResultTable {
     private preview: Locator;
     private resultHead: Locator;
     private resultWrapper: Locator;
+    private resultTitle: Locator;
 
     constructor(selector: Locator) {
         this.table = selector.locator('.ydb-query-result-sets-viewer__result');
         this.preview = selector.locator('.kv-preview__result');
         this.resultHead = selector.locator('.ydb-query-result-sets-viewer__head');
+        this.resultTitle = selector.locator('.ydb-query-result-sets-viewer__title');
         this.resultWrapper = selector.locator('.ydb-query-result-sets-viewer__result-wrapper');
     }
 
@@ -68,11 +70,6 @@ export class ResultTable {
         return true;
     }
 
-    async getResultHeadText() {
-        await this.resultHead.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return this.resultHead.innerText();
-    }
-
     async getResultTabs() {
         const tabs = this.resultWrapper.locator(
             '.ydb-query-result-sets-viewer__tabs .g-tabs__item',
@@ -86,20 +83,27 @@ export class ResultTable {
         return tabs.count();
     }
 
-    async getResultTabTitle(index: number) {
+    async getResultTitleText() {
+        await this.resultTitle.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return this.resultTitle.locator('.g-text').first().textContent();
+    }
+
+    async getResultTitleCount() {
+        await this.resultTitle.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return this.resultTitle.locator('.g-text').nth(1).textContent();
+    }
+
+    async getResultTabTitleText(index: number) {
         const tabs = await this.getResultTabs();
         const tab = tabs.nth(index);
         await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return tab.getAttribute('title');
+        return tab.locator('.g-text').first().textContent();
     }
 
-    async hasMultipleResultTabs() {
-        const tabs = this.resultWrapper.locator('.ydb-query-result-sets-viewer__tabs');
-        try {
-            await tabs.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-            return true;
-        } catch {
-            return false;
-        }
+    async getResultTabTitleCount(index: number) {
+        const tabs = await this.getResultTabs();
+        const tab = tabs.nth(index);
+        await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return tab.locator('.g-text').nth(1).textContent();
     }
 }

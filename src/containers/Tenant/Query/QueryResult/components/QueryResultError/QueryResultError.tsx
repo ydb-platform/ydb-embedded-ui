@@ -6,7 +6,7 @@ import {isQueryCancelledError} from '../../../utils/isQueryCancelledError';
 
 import './QueryResultError.scss';
 
-const b = cn('ydb-query-result-error ');
+const b = cn('ydb-query-result-error');
 
 export function QueryResultError({error}: {error: unknown}) {
     const parsedError = parseQueryError(error);
@@ -22,7 +22,11 @@ export function QueryResultError({error}: {error: unknown}) {
     }
 
     if (typeof parsedError === 'object') {
-        return <ResultIssues data={parsedError} />;
+        return (
+            <div className={b('message')}>
+                <ResultIssues data={parsedError} />
+            </div>
+        );
     }
 
     return <div className={b('message')}>{parsedError}</div>;
