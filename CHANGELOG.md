@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.13.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.12.0...v8.13.0) (2025-02-26)
+
+
+### Features
+
+* resource pool – add proper icon ([#1982](https://github.com/ydb-platform/ydb-embedded-ui/issues/1982)) ([9c0c6f8](https://github.com/ydb-platform/ydb-embedded-ui/commit/9c0c6f8ce93e44920c860eb19d961b209d469f7b))
+
 ## [8.12.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.11.1...v8.12.0) (2025-02-25)
 
 
