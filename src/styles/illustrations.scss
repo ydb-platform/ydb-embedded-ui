@@ -1,0 +1,20 @@
+@forward '@gravity-ui/illustrations/styles/styles.scss';
+
+// Replace yellow and orange colors with blue
+
+.g-root {
+    &_theme_light,
+    &_theme_light-hc {
+        --gil-color-object-base: var(--g-color-private-blue-450-solid);
+        --gil-color-object-accent-heavy: var(--g-color-private-blue-850-solid);
+        --gil-color-object-hightlight: var(--g-color-private-blue-350-solid);
+        --gil-color-shadow-over-object: var(--g-color-private-blue-650-solid);
+    }
+    &_theme_dark,
+    &_theme_dark-hc {
+        --gil-color-object-base: var(--g-color-private-blue-450-solid);
+        --gil-color-object-accent-heavy: var(--g-color-private-blue-850-solid);
+        --gil-color-object-hightlight: var(--g-color-private-blue-350-solid);
+        --gil-color-shadow-over-object: var(--g-color-private-blue-650-solid);
+    }
+}

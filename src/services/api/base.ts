@@ -11,6 +11,7 @@ export type AxiosOptions = {
     concurrentId?: string;
     signal?: AbortSignal;
     withRetries?: boolean;
+    timeout?: number;
 };
 
 export class BaseYdbAPI extends AxiosWrapper {

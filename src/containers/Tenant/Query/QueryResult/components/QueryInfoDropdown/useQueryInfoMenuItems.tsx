@@ -7,12 +7,12 @@ import {Text} from '@gravity-ui/uikit';
 import {planToSvgApi} from '../../../../../../store/reducers/planToSvg';
 import type {QueryPlan, ScriptPlan, TKqpStatsQuery} from '../../../../../../types/api/query';
 import createToast from '../../../../../../utils/createToast';
+import {createAndDownloadJsonFile, downloadFile} from '../../../../../../utils/downloadFile';
 import {prepareCommonErrorMessage} from '../../../../../../utils/errors';
 import {parseQueryError} from '../../../../../../utils/query';
 import i18n from '../../i18n';
 
 import {b} from './shared';
-import {downloadFile} from './utils';
 
 export interface MenuItemContentProps {
     title: string;
@@ -146,12 +146,10 @@ export function useQueryInfoMenuItems({
                     ...(parsedError && {error: parsedError}),
                 };
 
-                const blob = new Blob([JSON.stringify(diagnosticsData, null, 2)], {
-                    type: 'application/json',
-                });
-                const url = URL.createObjectURL(blob);
-                downloadFile(url, `query-diagnostics-${new Date().getTime()}.json`);
-                URL.revokeObjectURL(url);
+                createAndDownloadJsonFile(
+                    diagnosticsData,
+                    `query-diagnostics-${new Date().getTime()}`,
+                );
             };
 
             menuItems.push([

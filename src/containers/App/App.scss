@@ -49,6 +49,16 @@ body,
     --ydb-color-status-black: var(--g-color-base-misc-heavy);
 
     --g-popover-max-width: 500px;
+
+    &_theme_light,
+    &_theme_light-hc {
+        --code-background-color: var(--g-color-base-simple-hover);
+    }
+    &_theme_dark,
+    &_theme_dark-hc {
+        // monaco background - vscDarkPlus theme
+        --code-background-color: #1e1e1e;
+    }
 }
 
 :is(#tab, .g-tabs-item_active .g-tabs-item__title) {
