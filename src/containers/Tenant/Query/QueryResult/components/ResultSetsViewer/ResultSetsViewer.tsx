@@ -1,6 +1,6 @@
 import type {Settings} from '@gravity-ui/react-data-table';
 import type {TabsItemProps} from '@gravity-ui/uikit';
-import {Tabs, Text} from '@gravity-ui/uikit';
+import {Flex, Tabs, Text} from '@gravity-ui/uikit';
 
 import {QueryResultTable} from '../../../../../../components/QueryResultTable';
 import type {ParsedResultSet} from '../../../../../../types/store/query';
@@ -31,26 +31,24 @@ export function ResultSetsViewer(props: ResultSetsViewerProps) {
                 return {
                     id: String(index),
                     title: (
-                        <div className={b('tab-title')}>
+                        <Flex gap={2} alignItems="center">
                             <Text>
                                 {`Result #${index + 1}${resultSets?.[index]?.truncated ? '(T)' : ''}`}
                             </Text>
                             <Text color="secondary">{resultSet.result?.length || 0}</Text>
-                        </div>
+                        </Flex>
                     ),
                 };
             }) || [];
 
         return (
-            <div>
-                <Tabs
-                    className={b('tabs')}
-                    size="l"
-                    items={tabsItems}
-                    activeTab={String(selectedResultSet)}
-                    onSelectTab={(tabId) => setSelectedResultSet(Number(tabId))}
-                />
-            </div>
+            <Tabs
+                className={b('tabs')}
+                size="l"
+                items={tabsItems}
+                activeTab={String(selectedResultSet)}
+                onSelectTab={(tabId) => setSelectedResultSet(Number(tabId))}
+            />
         );
     };
 

@@ -17,12 +17,6 @@
         padding-left: var(--g-spacing-4);
     }
 
-    &__tab-title {
-        display: flex;
-        align-items: center;
-        gap: var(--g-spacing-2);
-    }
-
     &__result-wrapper {
         display: flex;
         flex-direction: column;

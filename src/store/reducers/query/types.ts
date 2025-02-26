@@ -54,6 +54,7 @@ export interface QueryResult {
     error?: unknown;
     queryId: string;
     isLoading: boolean;
+    queryDuration?: number;
 }
 
 export interface QueryState {

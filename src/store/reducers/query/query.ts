@@ -53,6 +53,11 @@ const slice = createSlice({
         setQueryResult: (state, action: PayloadAction<QueryResult | undefined>) => {
             state.result = action.payload;
         },
+        setQueryDuration: (state, action: PayloadAction<number>) => {
+            if (state.result) {
+                state.result.queryDuration = action.payload;
+            }
+        },
         saveQueryToHistory: (
             state,
             action: PayloadAction<{queryText: string; queryId: string}>,
@@ -149,6 +154,7 @@ export default slice.reducer;
 export const {
     changeUserInput,
     setQueryResult,
+    setQueryDuration,
     saveQueryToHistory,
     updateQueryInHistory,
     goToPreviousQuery,

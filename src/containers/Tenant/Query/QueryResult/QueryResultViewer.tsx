@@ -108,7 +108,7 @@ export function QueryResultViewer({
     });
     const [useShowPlanToSvg] = useSetting<boolean>(USE_SHOW_PLAN_SVG_KEY);
 
-    const {error, isLoading, data = {}} = result;
+    const {error, isLoading, data = {}, queryDuration} = result;
     const {preparedPlan, simplifiedPlan, stats, resultSets, ast} = data;
 
     React.useEffect(() => {
@@ -293,16 +293,18 @@ export function QueryResultViewer({
     const renderLeftControls = () => {
         return (
             <div className={b('controls-left')}>
-                <React.Fragment>
-                    {radioButtonOptions.length && activeSection ? (
-                        <RadioButton
-                            options={radioButtonOptions}
-                            value={activeSection}
-                            onUpdate={onSelectSection}
-                        />
-                    ) : null}
-                </React.Fragment>
-                <QueryExecutionStatus error={error} loading={isLoading} />
+                {radioButtonOptions.length && activeSection ? (
+                    <RadioButton
+                        options={radioButtonOptions}
+                        value={activeSection}
+                        onUpdate={onSelectSection}
+                    />
+                ) : null}
+                <QueryExecutionStatus
+                    error={error}
+                    loading={isLoading}
+                    queryDuration={queryDuration}
+                />
                 {data?.traceId && isExecute ? <TraceButton traceId={data.traceId} /> : null}
             </div>
         );

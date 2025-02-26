@@ -33,6 +33,41 @@ interface QueryEditorControlsProps {
 const STOP_APPEAR_TIMEOUT = 400;
 const STOP_AUTO_HIDE_TIMEOUT = 5000;
 
+interface ActionButtonProps {
+    type: 'run' | 'explain';
+    isHighlighted: boolean;
+    isLoading: boolean;
+    isStoppable: boolean;
+    controlsDisabled: boolean;
+    onActionClick: () => void;
+    renderStopButton: () => React.ReactNode;
+}
+
+const ActionButton = ({
+    type,
+    isHighlighted,
+    isLoading,
+    isStoppable,
+    controlsDisabled,
+    onActionClick,
+    renderStopButton,
+}: ActionButtonProps) => {
+    if (isStoppable && isLoading && isHighlighted) {
+        return renderStopButton();
+    }
+
+    const ButtonComponent = type === 'run' ? EditorButton.Run : EditorButton.Explain;
+
+    return (
+        <ButtonComponent
+            onClick={onActionClick}
+            disabled={controlsDisabled}
+            loading={isLoading}
+            view={isHighlighted ? 'action' : undefined}
+        />
+    );
+};
+
 export const QueryEditorControls = ({
     disabled,
     isLoading,
@@ -49,17 +84,16 @@ export const QueryEditorControls = ({
     const input = useTypedSelector(selectUserInput);
     const [sendCancelQuery, cancelQueryResponse] = cancelQueryApi.useCancelQueryMutation();
     const stopButtonAppearRef = React.useRef<number>(0);
-    const [isStopButtonVisibilityTimeoutPassed, setIsStopButtonVisibilityTimeoutPassed] =
-        React.useState(false);
+    const [isStoppable, setIsStoppable] = React.useState(false);
 
     React.useEffect(() => {
         if (isLoading) {
             stopButtonAppearRef.current = window.setTimeout(() => {
-                setIsStopButtonVisibilityTimeoutPassed(true);
+                setIsStoppable(true);
             }, STOP_APPEAR_TIMEOUT);
         } else {
             window.clearTimeout(stopButtonAppearRef.current);
-            setIsStopButtonVisibilityTimeoutPassed(false);
+            setIsStoppable(false);
             cancelQueryResponse.reset();
         }
 
@@ -113,28 +147,24 @@ export const QueryEditorControls = ({
     return (
         <div className={b()}>
             <div className={b('left')}>
-                {isStopButtonVisibilityTimeoutPassed && isLoading && isRunHighlighted ? (
-                    renderStopButton()
-                ) : (
-                    <EditorButton.Run
-                        onClick={onRunButtonClick}
-                        disabled={controlsDisabled}
-                        loading={isLoading}
-                        view={isRunHighlighted ? 'action' : undefined}
-                    />
-                )}
-
-                {isStopButtonVisibilityTimeoutPassed && isLoading && isExplainHighlighted ? (
-                    renderStopButton()
-                ) : (
-                    <EditorButton.Explain
-                        onClick={onExplainButtonClick}
-                        disabled={controlsDisabled}
-                        loading={isLoading}
-                        view={isExplainHighlighted ? 'action' : undefined}
-                    />
-                )}
-
+                <ActionButton
+                    type="run"
+                    isHighlighted={isRunHighlighted}
+                    isLoading={isLoading}
+                    isStoppable={isStoppable}
+                    controlsDisabled={controlsDisabled}
+                    onActionClick={onRunButtonClick}
+                    renderStopButton={renderStopButton}
+                />
+                <ActionButton
+                    type="explain"
+                    isHighlighted={isExplainHighlighted}
+                    isLoading={isLoading}
+                    isStoppable={isStoppable}
+                    controlsDisabled={controlsDisabled}
+                    onActionClick={onExplainButtonClick}
+                    renderStopButton={renderStopButton}
+                />
                 <EditorButton.Settings onClick={onSettingsButtonClick} isLoading={isLoading} />
             </div>
             <div className={b('right')}>
