@@ -221,6 +221,7 @@ export function ObjectSummary({
         > = {
             [EPathType.EPathTypeInvalid]: undefined,
             [EPathType.EPathTypeDir]: undefined,
+            [EPathType.EPathTypeResourcePool]: undefined,
             [EPathType.EPathTypeTable]: () => [
                 {
                     name: i18n('field_partitions'),
