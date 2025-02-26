@@ -290,7 +290,7 @@ export const getActions =
             database: DB_SET,
 
             directory: DIR_SET,
-            resource_pool: DIR_SET,
+            resource_pool: JUST_COPY,
 
             table: ROW_TABLE_SET,
             column_table: COLUMN_TABLE_SET,
