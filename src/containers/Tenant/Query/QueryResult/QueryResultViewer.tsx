@@ -108,7 +108,7 @@ export function QueryResultViewer({
     });
     const [useShowPlanToSvg] = useSetting<boolean>(USE_SHOW_PLAN_SVG_KEY);
 
-    const {error, isLoading, data = {}, queryDuration} = result;
+    const {error, isLoading, data = {}} = result;
     const {preparedPlan, simplifiedPlan, stats, resultSets, ast} = data;
 
     React.useEffect(() => {
@@ -217,8 +217,7 @@ export function QueryResultViewer({
         );
     };
 
-    const renderErrorView = () => {
-        const isStopped = isQueryCancelledError(error);
+    const renderCommonErrorView = (isStopped: boolean) => {
         return (
             <Flex justifyContent="center" alignItems="center" width="100%">
                 <EmptyState
@@ -236,9 +235,11 @@ export function QueryResultViewer({
     };
 
     const renderResultSection = () => {
+        const isStopped = isQueryCancelledError(error);
+
         if (activeSection === RESULT_OPTIONS_IDS.result) {
-            if (error && !resultSets?.length) {
-                return renderErrorView();
+            if (error && isStopped) {
+                return renderCommonErrorView(isStopped);
             }
 
             return (
@@ -253,7 +254,7 @@ export function QueryResultViewer({
         }
 
         if (error) {
-            return renderErrorView();
+            return renderCommonErrorView(isStopped);
         }
 
         if (activeSection === RESULT_OPTIONS_IDS.schema) {
@@ -300,11 +301,7 @@ export function QueryResultViewer({
                         onUpdate={onSelectSection}
                     />
                 ) : null}
-                <QueryExecutionStatus
-                    error={error}
-                    loading={isLoading}
-                    queryDuration={queryDuration}
-                />
+                <QueryExecutionStatus error={error} loading={isLoading} />
                 {data?.traceId && isExecute ? <TraceButton traceId={data.traceId} /> : null}
             </div>
         );

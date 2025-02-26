@@ -54,9 +54,7 @@ const slice = createSlice({
             state.result = action.payload;
         },
         setQueryDuration: (state, action: PayloadAction<number>) => {
-            if (state.result) {
-                state.result.queryDuration = action.payload;
-            }
+            state.queryDuration = action.payload;
         },
         saveQueryToHistory: (
             state,
@@ -136,6 +134,7 @@ const slice = createSlice({
     selectors: {
         selectQueriesHistoryFilter: (state) => state.history.filter || '',
         selectTenantPath: (state) => state.tenantPath,
+        selectQueryDuration: (state) => state.queryDuration,
         selectResult: (state) => state.result,
         selectQueriesHistory: (state) => {
             const items = state.history.queries;
@@ -173,6 +172,7 @@ export const {
     selectTenantPath,
     selectResult,
     selectUserInput,
+    selectQueryDuration,
 } = slice.selectors;
 
 interface SendQueryParams extends QueryRequestParams {

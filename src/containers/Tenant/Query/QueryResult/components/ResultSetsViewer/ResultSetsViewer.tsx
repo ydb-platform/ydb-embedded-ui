@@ -62,10 +62,22 @@ export function ResultSetsViewer(props: ResultSetsViewerProps) {
         );
     };
 
+    const renderResults = () => {
+        if (resultSets?.length) {
+            if (resultSets?.length > 1) {
+                return renderTabs();
+            } else {
+                return renderSingleResult();
+            }
+        }
+
+        return null;
+    };
+
     return (
         <div className={b('result-wrapper')}>
             {props.error ? <QueryResultError error={error} /> : null}
-            {resultSets?.length && resultSets?.length > 1 ? renderTabs() : renderSingleResult()}
+            {renderResults()}
             {currentResult ? (
                 <div className={b('result')}>
                     <QueryResultTable

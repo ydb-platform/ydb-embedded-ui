@@ -6,10 +6,10 @@ import type {LabelProps, TextProps} from '@gravity-ui/uikit';
 import {Icon, Label, Spin, Text} from '@gravity-ui/uikit';
 
 import {isQueryCancelledError} from '../../containers/Tenant/Query/utils/isQueryCancelledError';
-import {setQueryDuration} from '../../store/reducers/query/query';
+import {selectQueryDuration, setQueryDuration} from '../../store/reducers/query/query';
 import {cn} from '../../utils/cn';
 import {HOUR_IN_SECONDS, SECOND_IN_MS} from '../../utils/constants';
-import {useTypedDispatch} from '../../utils/hooks';
+import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {isAxiosError} from '../../utils/response';
 
 import './QueryExecutionStatus.scss';
@@ -20,20 +20,15 @@ interface QueryExecutionStatusProps {
     className?: string;
     error?: unknown;
     loading?: boolean;
-    queryDuration?: number;
 }
 
-export const QueryExecutionStatus = ({
-    className,
-    error,
-    loading,
-    queryDuration,
-}: QueryExecutionStatusProps) => {
+export const QueryExecutionStatus = ({className, error, loading}: QueryExecutionStatusProps) => {
     let icon: React.ReactNode;
     let label: string;
     let theme: LabelProps['theme'];
     let textColor: TextProps['color'];
     const dispatch = useTypedDispatch();
+    const queryDuration = useTypedSelector(selectQueryDuration);
 
     const isCancelled = isQueryCancelledError(error);
 
@@ -42,7 +37,7 @@ export const QueryExecutionStatus = ({
         let startTime = Date.now();
 
         if (loading) {
-            setQueryDuration(0);
+            dispatch(setQueryDuration(0));
             startTime = Date.now();
             timerId = setInterval(() => {
                 dispatch(setQueryDuration(Date.now() - startTime));
