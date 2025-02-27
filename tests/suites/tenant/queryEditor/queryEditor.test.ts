@@ -10,6 +10,7 @@ import {
     longRunningQuery,
     longRunningStreamQuery,
     longTableSelect,
+    longerRunningStreamQuery,
 } from '../constants';
 
 import {
@@ -139,6 +140,28 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
         await queryEditor.clickStopButton();
 
+        await expect(queryEditor.waitForStatus('Stopped')).resolves.toBe(true);
+    });
+
+    test('Streaming query shows some results and banner when stop button is clicked', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'on', 'Query Streaming');
+
+        await queryEditor.setQuery(longerRunningStreamQuery);
+        await queryEditor.clickRunButton();
+
+        await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+        await page.waitForTimeout(1000);
+
+        await queryEditor.clickStopButton();
+
+        await expect(queryEditor.isStopBannerVisible()).resolves.toBe(true);
+        await expect(queryEditor.resultTable.getResultTitleText()).resolves.toBe('Result');
+        await expect(
+            Promise.resolve(Number(await queryEditor.resultTable.getResultTitleCount())),
+        ).resolves.toBeGreaterThan(100);
         await expect(queryEditor.waitForStatus('Stopped')).resolves.toBe(true);
     });
 

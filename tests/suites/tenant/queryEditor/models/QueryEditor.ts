@@ -50,6 +50,7 @@ export class QueryEditor {
     private runButton: Locator;
     private explainButton: Locator;
     private stopButton: Locator;
+    private stopBanner: Locator;
     private saveButton: Locator;
     private gearButton: Locator;
     private banner: Locator;
@@ -64,6 +65,7 @@ export class QueryEditor {
         this.editorTextArea = this.selector.locator('.query-editor__monaco textarea');
         this.runButton = this.selector.getByRole('button', {name: ButtonNames.Run});
         this.stopButton = this.selector.getByRole('button', {name: ButtonNames.Stop});
+        this.stopBanner = this.selector.locator('.ydb-query-stopped-banner');
         this.explainButton = this.selector.getByRole('button', {name: ButtonNames.Explain});
         this.saveButton = this.selector.getByRole('button', {name: ButtonNames.Save});
         this.gearButton = this.selector.locator('.ydb-query-editor-button__gear-button');
@@ -230,6 +232,11 @@ export class QueryEditor {
 
     async isStopButtonHidden() {
         await this.stopButton.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
+        return true;
+    }
+
+    async isStopBannerVisible() {
+        await this.stopBanner.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return true;
     }
 

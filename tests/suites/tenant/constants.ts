@@ -11,6 +11,10 @@ export const longRunningStreamQuery = `$sample = AsList(AsStruct(ListFromRange(1
 
 SELECT value1, value2, id FROM as_table($sample) FLATTEN BY (value1);
 `;
+export const longerRunningStreamQuery = `$sample = AsList(AsStruct(ListFromRange(1, 1000000) AS value1, ListFromRange(1, 10000) AS value2, CAST(1 AS Uint32) AS id));
+
+SELECT value1, value2, id FROM as_table($sample) FLATTEN BY (value1);
+`;
 export const selectFromMyRowTableQuery = 'select * from `my_row_table`';
 
 export const createTableQuery = `
