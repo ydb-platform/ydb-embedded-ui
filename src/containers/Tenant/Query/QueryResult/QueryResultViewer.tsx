@@ -4,7 +4,6 @@ import type {Settings} from '@gravity-ui/react-data-table';
 import type {ControlGroupOption} from '@gravity-ui/uikit';
 import {ClipboardButton, Flex, RadioButton, Text} from '@gravity-ui/uikit';
 
-import {EmptyState} from '../../../../components/EmptyState';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {Illustration} from '../../../../components/Illustration';
@@ -220,17 +219,16 @@ export function QueryResultViewer({
 
     const renderCommonErrorView = (isStopped: boolean) => {
         return (
-            <Flex justifyContent="center" alignItems="center" width="100%">
-                <EmptyState
-                    size="s"
-                    image={<Illustration name="error" />}
-                    title={isStopped ? i18n('stopped.title') : i18n('error.title')}
-                    description={
-                        <Text color="complementary">
-                            {isStopped ? i18n('stopped.description') : i18n('error.description')}
-                        </Text>
-                    }
-                />
+            <Flex justifyContent="center" alignItems="center" width="100%" gap={8}>
+                <Illustration name="error" className={b('illustration')} />
+                <Flex direction="column" gap={2}>
+                    <Text variant="subheader-2">
+                        {isStopped ? i18n('stopped.title') : i18n('error.title')}
+                    </Text>
+                    <Text color="complementary">
+                        {isStopped ? i18n('stopped.description') : i18n('error.description')}
+                    </Text>
+                </Flex>
             </Flex>
         );
     };
