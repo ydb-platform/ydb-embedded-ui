@@ -237,7 +237,7 @@ export function QueryResultViewer({
         const isStopped = isQueryCancelledError(error);
 
         if (activeSection === RESULT_OPTIONS_IDS.result) {
-            if (error && isStopped && resultSets?.length === 0) {
+            if (error && isStopped && !resultSets?.length) {
                 return renderCommonErrorView(isStopped);
             }
 
