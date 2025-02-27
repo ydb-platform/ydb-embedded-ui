@@ -21,8 +21,6 @@ import {Lang, defaultLang} from '../../utils/i18n';
 import type {SettingProps, SettingsInfoFieldProps} from './Setting';
 import i18n from './i18n';
 
-import packageJson from '../../../package.json';
-
 export interface SettingsSection {
     id: string;
     title: string;
@@ -143,7 +141,7 @@ export const autocompleteOnEnterSetting: SettingProps = {
 export const interfaceVersionInfoField: SettingsInfoFieldProps = {
     title: i18n('settings.about.interfaceVersionInfoField.title'),
     type: 'info',
-    content: packageJson.version,
+    content: process.env.UI_VERSION,
 };
 
 export const appearanceSection: SettingsSection = {
