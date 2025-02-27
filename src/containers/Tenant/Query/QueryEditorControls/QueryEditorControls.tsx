@@ -68,6 +68,8 @@ const ActionButton = ({
     );
 };
 
+const CANCEL_ERROR_ANIMATION_DURATION = 500;
+
 export const QueryEditorControls = ({
     disabled,
     isLoading,
@@ -84,6 +86,8 @@ export const QueryEditorControls = ({
     const [sendCancelQuery, cancelQueryResponse] = cancelQueryApi.useCancelQueryMutation();
     const [isStoppable, setIsStoppable] = React.useState(isLoading);
     const stopButtonAppearRef = React.useRef<number | null>(null);
+    const cancelErrorAnimationRef = React.useRef<number | null>(null);
+    const [cancelQueryError, setCancelQueryError] = React.useState<boolean>(false);
 
     const onStopButtonClick = React.useCallback(async () => {
         if (queryId) {
@@ -101,6 +105,14 @@ export const QueryEditorControls = ({
                     type: 'error',
                     autoHiding: STOP_AUTO_HIDE_TIMEOUT,
                 });
+                setCancelQueryError(true);
+
+                if (cancelErrorAnimationRef.current) {
+                    window.clearTimeout(cancelErrorAnimationRef.current);
+                }
+                cancelErrorAnimationRef.current = window.setTimeout(() => {
+                    setCancelQueryError(false);
+                }, CANCEL_ERROR_ANIMATION_DURATION);
             }
         }
     }, [isStreamingEnabled, queryId, sendCancelQuery, tenantName]);
@@ -134,6 +146,10 @@ export const QueryEditorControls = ({
             if (stopButtonAppearRef.current) {
                 window.clearTimeout(stopButtonAppearRef.current);
             }
+
+            if (cancelErrorAnimationRef.current) {
+                window.clearTimeout(cancelErrorAnimationRef.current);
+            }
         };
     }, []);
 
@@ -142,7 +158,7 @@ export const QueryEditorControls = ({
     const renderStopButton = () => (
         <EditorButton.Stop
             loading={cancelQueryResponse.isLoading}
-            error={Boolean(cancelQueryResponse.error)}
+            error={cancelQueryError}
             onClick={onStopButtonClick}
             view="action"
         />
