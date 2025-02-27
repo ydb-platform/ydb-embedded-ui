@@ -53,13 +53,14 @@ export interface QueryResult {
     data?: PreparedQueryData;
     error?: unknown;
     queryId: string;
+    startTime?: number;
+    endTime?: number;
     isLoading: boolean;
 }
 
 export interface QueryState {
     input: string;
     result?: QueryResult;
-    queryDuration?: number;
     history: {
         queries: QueryInHistory[];
         currentIndex: number;

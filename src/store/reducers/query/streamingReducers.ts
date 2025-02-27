@@ -55,6 +55,8 @@ export const setStreamQueryResponse = (
         state.result.data.plan = chunk.plan;
         state.result.data.stats = chunk.stats;
     }
+
+    state.result.endTime = Date.now();
 };
 
 const getEmptyResultSet = () => {

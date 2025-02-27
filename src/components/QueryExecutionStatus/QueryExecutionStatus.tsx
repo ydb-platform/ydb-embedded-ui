@@ -6,10 +6,10 @@ import type {LabelProps, TextProps} from '@gravity-ui/uikit';
 import {Icon, Label, Spin, Text} from '@gravity-ui/uikit';
 
 import {isQueryCancelledError} from '../../containers/Tenant/Query/utils/isQueryCancelledError';
-import {selectQueryDuration, setQueryDuration} from '../../store/reducers/query/query';
+import {selectQueryDuration} from '../../store/reducers/query/query';
 import {cn} from '../../utils/cn';
 import {HOUR_IN_SECONDS, SECOND_IN_MS} from '../../utils/constants';
-import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useTypedSelector} from '../../utils/hooks';
 import {isAxiosError} from '../../utils/response';
 
 import './QueryExecutionStatus.scss';
@@ -27,33 +27,36 @@ export const QueryExecutionStatus = ({className, error, loading}: QueryExecution
     let label: string;
     let theme: LabelProps['theme'];
     let textColor: TextProps['color'];
-    const dispatch = useTypedDispatch();
-    const queryDuration = useTypedSelector(selectQueryDuration);
+    const {startTime, endTime} = useTypedSelector(selectQueryDuration);
+
+    const [queryDuration, setQueryDuration] = React.useState<number>(
+        startTime ? (endTime || Date.now()) - startTime : 0,
+    );
 
     const isCancelled = isQueryCancelledError(error);
 
+    const setDuration = React.useCallback(() => {
+        if (startTime) {
+            const actualEndTime = endTime || Date.now();
+            setQueryDuration(actualEndTime - startTime);
+        }
+    }, [endTime, startTime]);
+
     React.useEffect(() => {
         let timerId: ReturnType<typeof setInterval> | undefined;
-        let startTime = Date.now();
+        setDuration();
 
         if (loading) {
-            dispatch(setQueryDuration(0));
-            startTime = Date.now();
-            timerId = setInterval(() => {
-                dispatch(setQueryDuration(Date.now() - startTime));
-            }, SECOND_IN_MS);
+            timerId = setInterval(setDuration, SECOND_IN_MS);
         } else {
             clearInterval(timerId);
         }
         return () => {
             clearInterval(timerId);
         };
-    }, [dispatch, loading]);
+    }, [loading, setDuration]);
 
     const formattedQueryDuration = React.useMemo(() => {
-        if (!queryDuration) {
-            return duration(0).format('mm:ss');
-        }
         return queryDuration > HOUR_IN_SECONDS * SECOND_IN_MS
             ? duration(queryDuration).format('hh:mm:ss')
             : duration(queryDuration).format('mm:ss');

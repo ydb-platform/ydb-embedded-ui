@@ -53,9 +53,6 @@ const slice = createSlice({
         setQueryResult: (state, action: PayloadAction<QueryResult | undefined>) => {
             state.result = action.payload;
         },
-        setQueryDuration: (state, action: PayloadAction<number>) => {
-            state.queryDuration = action.payload;
-        },
         saveQueryToHistory: (
             state,
             action: PayloadAction<{queryText: string; queryId: string}>,
@@ -134,7 +131,10 @@ const slice = createSlice({
     selectors: {
         selectQueriesHistoryFilter: (state) => state.history.filter || '',
         selectTenantPath: (state) => state.tenantPath,
-        selectQueryDuration: (state) => state.queryDuration,
+        selectQueryDuration: (state) => ({
+            startTime: state.result?.startTime,
+            endTime: state.result?.endTime,
+        }),
         selectResult: (state) => state.result,
         selectQueriesHistory: (state) => {
             const items = state.history.queries;
@@ -153,7 +153,6 @@ export default slice.reducer;
 export const {
     changeUserInput,
     setQueryResult,
-    setQueryDuration,
     saveQueryToHistory,
     updateQueryInHistory,
     goToPreviousQuery,
@@ -202,7 +201,15 @@ export const queryApi = api.injectEndpoints({
                 {query, database, querySettings = {}, enableTracingLevel},
                 {signal, dispatch, getState},
             ) => {
-                dispatch(setQueryResult({type: 'execute', queryId: '', isLoading: true}));
+                const startTime = Date.now();
+                dispatch(
+                    setQueryResult({
+                        type: 'execute',
+                        queryId: '',
+                        isLoading: true,
+                        startTime,
+                    }),
+                );
 
                 const {action, syntax} = getActionAndSyntaxFromQueryMode(
                     'execute',
@@ -247,17 +254,20 @@ export const queryApi = api.injectEndpoints({
                         },
                         {
                             signal,
-                            onQueryResponseChunk: (chunk) => {
-                                dispatch(setStreamQueryResponse(chunk));
-                            },
+                            // First chunk is session chunk
                             onSessionChunk: (chunk) => {
                                 dispatch(setStreamSession(chunk));
                             },
+                            // Data chunks follow session chunk
                             onStreamDataChunk: (chunk) => {
                                 streamDataChunkBatch.push(chunk);
                                 if (!batchTimeout) {
                                     batchTimeout = window.requestAnimationFrame(flushBatch);
                                 }
+                            },
+                            // Last chunk is query response chunk
+                            onQueryResponseChunk: (chunk) => {
+                                dispatch(setStreamQueryResponse(chunk));
                             },
                         },
                     );
@@ -277,6 +287,8 @@ export const queryApi = api.injectEndpoints({
                             type: 'execute',
                             error,
                             isLoading: false,
+                            startTime,
+                            endTime: Date.now(),
                             queryId: state.query.result?.queryId || '',
                         }),
                     );
@@ -296,7 +308,15 @@ export const queryApi = api.injectEndpoints({
                 },
                 {signal, dispatch},
             ) => {
-                dispatch(setQueryResult({type: actionType, queryId, isLoading: true}));
+                const startTime = Date.now();
+                dispatch(
+                    setQueryResult({
+                        type: actionType,
+                        queryId,
+                        isLoading: true,
+                        startTime,
+                    }),
+                );
 
                 const {action, syntax} = getActionAndSyntaxFromQueryMode(
                     actionType,
@@ -338,6 +358,8 @@ export const queryApi = api.injectEndpoints({
                                 error: response,
                                 isLoading: false,
                                 queryId,
+                                startTime,
+                                endTime: Date.now(),
                             }),
                         );
                         return {error: response};
@@ -367,6 +389,8 @@ export const queryApi = api.injectEndpoints({
                             data,
                             isLoading: false,
                             queryId,
+                            startTime,
+                            endTime: Date.now(),
                         }),
                     );
                     return {data: null};
@@ -377,6 +401,8 @@ export const queryApi = api.injectEndpoints({
                             error,
                             isLoading: false,
                             queryId,
+                            startTime,
+                            endTime: Date.now(),
                         }),
                     );
                     return {error};

@@ -51,6 +51,7 @@ import {QueryResultViewer} from '../QueryResult/QueryResultViewer';
 import {QuerySettingsDialog} from '../QuerySettingsDialog/QuerySettingsDialog';
 
 import {YqlEditor} from './YqlEditor';
+import {queryManagerInstance} from './helpers';
 
 import './QueryEditor.scss';
 
@@ -97,8 +98,6 @@ export default function QueryEditor(props: QueryEditorProps) {
     const [sendQuery] = queryApi.useUseSendQueryMutation();
     const [streamQuery] = queryApi.useUseStreamQueryMutation();
 
-    const runningQueryRef = React.useRef<{abort: VoidFunction} | null>(null);
-
     const tableSettings = React.useMemo(() => {
         return isStreamingEnabled
             ? {
@@ -142,15 +141,17 @@ export default function QueryEditor(props: QueryEditorProps) {
         const queryId = uuidv4();
 
         if (isStreamingEnabled) {
-            runningQueryRef.current = streamQuery({
+            const query = streamQuery({
                 actionType: 'execute',
                 query: text,
                 database: tenantName,
                 querySettings,
                 enableTracingLevel,
             });
+
+            queryManagerInstance.registerQuery(query);
         } else {
-            runningQueryRef.current = sendQuery({
+            const query = sendQuery({
                 actionType: 'execute',
                 query: text,
                 database: tenantName,
@@ -158,6 +159,8 @@ export default function QueryEditor(props: QueryEditorProps) {
                 enableTracingLevel,
                 queryId,
             });
+
+            queryManagerInstance.registerQuery(query);
         }
 
         dispatch(setShowPreview(false));
@@ -185,7 +188,7 @@ export default function QueryEditor(props: QueryEditorProps) {
 
         const queryId = uuidv4();
 
-        runningQueryRef.current = sendQuery({
+        const query = sendQuery({
             actionType: 'explain',
             query: text,
             database: tenantName,
@@ -193,6 +196,8 @@ export default function QueryEditor(props: QueryEditorProps) {
             enableTracingLevel,
             queryId,
         });
+
+        queryManagerInstance.registerQuery(query);
 
         dispatch(setShowPreview(false));
 
@@ -221,7 +226,6 @@ export default function QueryEditor(props: QueryEditorProps) {
                 tenantName={tenantName}
                 queryId={result?.queryId}
                 isStreamingEnabled={isStreamingEnabled}
-                runningQueryRef={runningQueryRef}
             />
         );
     };

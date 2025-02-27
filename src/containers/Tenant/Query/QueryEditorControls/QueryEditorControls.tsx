@@ -7,6 +7,7 @@ import {cn} from '../../../../utils/cn';
 import createToast from '../../../../utils/createToast';
 import {useTypedSelector} from '../../../../utils/hooks';
 import {NewSQL} from '../NewSQL/NewSQL';
+import {queryManagerInstance} from '../QueryEditor/helpers';
 import {SaveQuery} from '../SaveQuery/SaveQuery';
 import i18n from '../i18n';
 
@@ -23,7 +24,6 @@ interface QueryEditorControlsProps {
     queryId?: string;
     tenantName: string;
     isStreamingEnabled?: boolean;
-    runningQueryRef: React.MutableRefObject<{abort: VoidFunction} | null>;
 
     handleGetExplainQueryClick: (text: string) => void;
     handleSendExecuteClick: (text: string) => void;
@@ -75,7 +75,6 @@ export const QueryEditorControls = ({
     queryId,
     tenantName,
     isStreamingEnabled,
-    runningQueryRef,
 
     handleSendExecuteClick,
     onSettingsButtonClick,
@@ -83,30 +82,14 @@ export const QueryEditorControls = ({
 }: QueryEditorControlsProps) => {
     const input = useTypedSelector(selectUserInput);
     const [sendCancelQuery, cancelQueryResponse] = cancelQueryApi.useCancelQueryMutation();
-    const stopButtonAppearRef = React.useRef<number>(0);
-    const [isStoppable, setIsStoppable] = React.useState(false);
-
-    React.useEffect(() => {
-        if (isLoading) {
-            stopButtonAppearRef.current = window.setTimeout(() => {
-                setIsStoppable(true);
-            }, STOP_APPEAR_TIMEOUT);
-        } else {
-            window.clearTimeout(stopButtonAppearRef.current);
-            setIsStoppable(false);
-            cancelQueryResponse.reset();
-        }
-
-        return () => {
-            window.clearTimeout(stopButtonAppearRef.current);
-        };
-    }, [cancelQueryResponse, isLoading]);
+    const [isStoppable, setIsStoppable] = React.useState(isLoading);
+    const stopButtonAppearRef = React.useRef<number | null>(null);
 
     const onStopButtonClick = React.useCallback(async () => {
         if (queryId) {
             try {
-                if (isStreamingEnabled && runningQueryRef.current) {
-                    runningQueryRef.current.abort();
+                if (isStreamingEnabled) {
+                    queryManagerInstance.abortQuery();
                 } else if (queryId) {
                     await sendCancelQuery({queryId, database: tenantName}).unwrap();
                 }
@@ -120,18 +103,39 @@ export const QueryEditorControls = ({
                 });
             }
         }
-    }, [isStreamingEnabled, queryId, runningQueryRef, sendCancelQuery, tenantName]);
+    }, [isStreamingEnabled, queryId, sendCancelQuery, tenantName]);
 
     const isRunHighlighted = highlightedAction === 'execute';
     const isExplainHighlighted = highlightedAction === 'explain';
 
-    const onRunButtonClick = () => {
-        handleSendExecuteClick(input);
-    };
+    const runSetStoppableTimeout = React.useCallback(() => {
+        if (stopButtonAppearRef.current) {
+            window.clearTimeout(stopButtonAppearRef.current);
+        }
 
-    const onExplainButtonClick = () => {
+        setIsStoppable(false);
+        stopButtonAppearRef.current = window.setTimeout(() => {
+            setIsStoppable(true);
+        }, STOP_APPEAR_TIMEOUT);
+    }, []);
+
+    const onRunButtonClick = React.useCallback(() => {
+        handleSendExecuteClick(input);
+        runSetStoppableTimeout();
+    }, [handleSendExecuteClick, input, runSetStoppableTimeout]);
+
+    const onExplainButtonClick = React.useCallback(() => {
         handleGetExplainQueryClick(input);
-    };
+        runSetStoppableTimeout();
+    }, [handleGetExplainQueryClick, input, runSetStoppableTimeout]);
+
+    React.useEffect(() => {
+        return () => {
+            if (stopButtonAppearRef.current) {
+                window.clearTimeout(stopButtonAppearRef.current);
+            }
+        };
+    }, []);
 
     const controlsDisabled = disabled || !input;
 
