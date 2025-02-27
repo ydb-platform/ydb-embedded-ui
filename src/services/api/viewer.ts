@@ -53,13 +53,14 @@ export class ViewerAPI extends BaseYdbAPI {
         );
     }
 
-    getNodeInfo(id?: string | number, {concurrentId, signal}: AxiosOptions = {}) {
+    /** id=. returns data about node that fullfills request */
+    getNodeInfo(id?: string | number, {concurrentId, timeout, signal}: AxiosOptions = {}) {
         return this.get<TEvSystemStateResponse>(
             this.getPath('/viewer/json/sysinfo?enums=true'),
             {
                 node_id: id,
             },
-            {concurrentId, requestConfig: {signal}},
+            {concurrentId, requestConfig: {signal}, timeout},
         );
     }
 
