@@ -74,12 +74,24 @@ test.describe('Test Query Editor', async () => {
         await expect(explainAST).toBeVisible({timeout: VISIBILITY_TIMEOUT});
     });
 
-    test('Error is displayed for invalid query', async ({page}) => {
+    test('Error is displayed for invalid query for run', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         const invalidQuery = 'Select d';
         await queryEditor.setQuery(invalidQuery);
         await queryEditor.clickRunButton();
+
+        await expect(queryEditor.waitForStatus('Failed')).resolves.toBe(true);
+        const errorMessage = await queryEditor.getErrorMessage();
+        await expect(errorMessage).toContain('Column references are not allowed without FROM');
+    });
+
+    test('Error is displayed for invalid query for explain', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+
+        const invalidQuery = 'Select d';
+        await queryEditor.setQuery(invalidQuery);
+        await queryEditor.clickExplainButton();
 
         await expect(queryEditor.waitForStatus('Failed')).resolves.toBe(true);
         const errorMessage = await queryEditor.getErrorMessage();

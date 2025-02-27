@@ -28,6 +28,7 @@ import {Ast} from './components/Ast/Ast';
 import {Graph} from './components/Graph/Graph';
 import {QueryInfoDropdown} from './components/QueryInfoDropdown/QueryInfoDropdown';
 import {QueryJSONViewer} from './components/QueryJSONViewer/QueryJSONViewer';
+import {QueryResultError} from './components/QueryResultError/QueryResultError';
 import {ResultSetsViewer} from './components/ResultSetsViewer/ResultSetsViewer';
 import {SimplifiedPlan} from './components/SimplifiedPlan/SimplifiedPlan';
 import {StubMessage} from './components/Stub/Stub';
@@ -254,7 +255,11 @@ export function QueryResultViewer({
         }
 
         if (error) {
-            return renderCommonErrorView(isStopped);
+            return isExecute || isStopped ? (
+                renderCommonErrorView(isStopped)
+            ) : (
+                <QueryResultError error={error} />
+            );
         }
 
         if (activeSection === RESULT_OPTIONS_IDS.schema) {
