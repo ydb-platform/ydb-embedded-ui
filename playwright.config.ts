@@ -17,7 +17,10 @@ const config: PlaywrightTestConfig = {
     webServer: baseUrl
         ? undefined
         : {
-              command: 'REACT_APP_DISABLE_CHECKS=true npm run dev',
+              command: 'npm run dev',
+              env: {
+                  REACT_APP_DISABLE_CHECKS: 'true',
+              },
               port: 3000,
               reuseExistingServer: true,
           },
