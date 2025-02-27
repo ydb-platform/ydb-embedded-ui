@@ -297,6 +297,7 @@ export enum EPathType {
     EPathTypeView = 'EPathTypeView',
 
     EPathTypeReplication = 'EPathTypeReplication',
+    EPathTypeResourcePool = 'EPathTypeResourcePool',
 }
 
 export enum EPathSubType {

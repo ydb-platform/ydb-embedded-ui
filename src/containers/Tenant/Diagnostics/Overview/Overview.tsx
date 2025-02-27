@@ -66,6 +66,7 @@ function Overview({type, path, database}: OverviewProps) {
         const pathTypeToComponent: Record<EPathType, (() => React.ReactNode) | undefined> = {
             [EPathType.EPathTypeInvalid]: undefined,
             [EPathType.EPathTypeDir]: undefined,
+            [EPathType.EPathTypeResourcePool]: undefined,
             [EPathType.EPathTypeTable]: undefined,
             [EPathType.EPathTypeSubDomain]: undefined,
             [EPathType.EPathTypeTableIndex]: () => <TableIndexInfo data={data} />,

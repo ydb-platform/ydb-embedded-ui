@@ -39,6 +39,7 @@ const pathTypeToNodeType: Record<EPathType, NavigationTreeNodeType | undefined> 
     [EPathType.EPathTypeView]: 'view',
 
     [EPathType.EPathTypeReplication]: 'async_replication',
+    [EPathType.EPathTypeResourcePool]: 'resource_pool',
 };
 
 export const nodeTableTypeToPathType: Partial<Record<NavigationTreeNodeType, EPathType>> = {
@@ -86,6 +87,7 @@ const pathTypeToEntityName: Record<EPathType, string | undefined> = {
     [EPathType.EPathTypeView]: 'View',
 
     [EPathType.EPathTypeReplication]: 'Async Replication',
+    [EPathType.EPathTypeResourcePool]: 'Resource Pool',
 };
 
 export const mapPathTypeToEntityName = (
@@ -126,6 +128,7 @@ const pathTypeToIsTable: Record<EPathType, boolean> = {
     [EPathType.EPathTypePersQueueGroup]: false,
     [EPathType.EPathTypeExternalDataSource]: false,
     [EPathType.EPathTypeReplication]: false,
+    [EPathType.EPathTypeResourcePool]: false,
 };
 
 //if add entity with tableType, make sure that Schema is available in Diagnostics section
@@ -166,6 +169,7 @@ const pathTypeToIsColumn: Record<EPathType, boolean> = {
     [EPathType.EPathTypeView]: false,
 
     [EPathType.EPathTypeReplication]: false,
+    [EPathType.EPathTypeResourcePool]: false,
 };
 
 export const isColumnEntityType = (type?: EPathType) => (type && pathTypeToIsColumn[type]) ?? false;
@@ -191,6 +195,7 @@ const pathTypeToIsDatabase: Record<EPathType, boolean> = {
     [EPathType.EPathTypeView]: false,
 
     [EPathType.EPathTypeReplication]: false,
+    [EPathType.EPathTypeResourcePool]: false,
 };
 
 export const isDatabaseEntityType = (type?: EPathType) =>
@@ -221,6 +226,7 @@ const pathTypeToEntityWithMergedImplementation: Record<EPathType, boolean> = {
     [EPathType.EPathTypeView]: false,
 
     [EPathType.EPathTypeReplication]: false,
+    [EPathType.EPathTypeResourcePool]: false,
 };
 
 export const isEntityWithMergedImplementation = (type?: EPathType) =>
@@ -244,6 +250,7 @@ const pathTypeToChildless: Record<EPathType, boolean> = {
     [EPathType.EPathTypeExternalTable]: true,
 
     [EPathType.EPathTypeView]: true,
+    [EPathType.EPathTypeResourcePool]: true,
 
     [EPathType.EPathTypeReplication]: true,
 
