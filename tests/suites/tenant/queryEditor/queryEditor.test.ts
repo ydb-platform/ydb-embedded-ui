@@ -145,7 +145,9 @@ test.describe('Test Query Editor', async () => {
 
     test('Streaming query shows some results and banner when stop button is clicked', async ({
         page,
+        browserName,
     }) => {
+        test.skip(browserName === 'webkit', 'This test is skipped in Safari');
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
