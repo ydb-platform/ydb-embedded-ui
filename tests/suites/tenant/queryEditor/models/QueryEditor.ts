@@ -26,8 +26,8 @@ export enum ButtonNames {
 export enum ResultTabNames {
     Result = 'Result',
     Stats = 'Stats',
-    Schema = 'Schema',
-    ExplainPlan = 'Explain Plan',
+    Schema = 'Computation Graph',
+    ExplainPlan = 'Explain',
 }
 
 export enum QueryTabs {
