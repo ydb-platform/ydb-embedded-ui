@@ -10,7 +10,7 @@ import {PaneWrapper, ResultTable} from './ResultTable';
 import {SettingsDialog} from './SettingsDialog';
 
 export enum ExplainResultType {
-    Schema = 'Schema',
+    Schema = 'Computation Graph',
     JSON = 'JSON',
     AST = 'AST',
 }
