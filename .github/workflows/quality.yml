@@ -115,6 +115,8 @@ jobs:
 
       - name: Build bundle (current branch)
         run: npm run build
+        env:
+          CI: true
 
       - name: Get current bundle size
         id: current_size
@@ -132,6 +134,8 @@ jobs:
 
       - name: Build bundle (main branch)
         run: npm run build
+        env:
+          CI: true
 
       - name: Get main bundle size
         id: main_size
