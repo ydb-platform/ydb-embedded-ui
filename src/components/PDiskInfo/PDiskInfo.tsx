@@ -3,7 +3,6 @@ import {Flex} from '@gravity-ui/uikit';
 import {getPDiskPagePath} from '../../routes';
 import {valueIsDefined} from '../../utils';
 import {formatBytes} from '../../utils/bytesParsers';
-import {cn} from '../../utils/cn';
 import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
 import {createPDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import type {PreparedPDisk} from '../../utils/disks/types';
@@ -15,10 +14,6 @@ import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 import {StatusIcon} from '../StatusIcon/StatusIcon';
 
 import {pDiskInfoKeyset} from './i18n';
-
-import './PDiskInfo.scss';
-
-const b = cn('ydb-pdisk-info');
 
 interface GetPDiskInfoOptions<T extends PreparedPDisk> {
     pDisk?: T;
@@ -156,7 +151,7 @@ function getPDiskInfo<T extends PreparedPDisk>({
         additionalInfo.push({
             label: pDiskInfoKeyset('links'),
             value: (
-                <span className={b('links')}>
+                <Flex wrap="wrap" gap={2}>
                     {withPDiskPageLink && (
                         <LinkWithIcon
                             title={pDiskInfoKeyset('pdisk-page')}
@@ -170,7 +165,7 @@ function getPDiskInfo<T extends PreparedPDisk>({
                             url={pDiskInternalViewerPath}
                         />
                     )}
-                </span>
+                </Flex>
             ),
         });
     }
