@@ -147,6 +147,8 @@ test.describe('Test Query Editor', async () => {
         page,
         browserName,
     }) => {
+        // For some reason Safari handles large numbers list bad in Safari
+        // Will be investigated here https://github.com/ydb-platform/ydb-embedded-ui/issues/1989
         test.skip(browserName === 'webkit', 'This test is skipped in Safari');
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
