@@ -114,3 +114,24 @@ export function useCodeAssistHelpers() {
         monacoGhostConfig,
     };
 }
+
+class QueryManager {
+    private query: {abort: VoidFunction} | null;
+
+    constructor() {
+        this.query = null;
+    }
+
+    registerQuery(query: {abort: VoidFunction}) {
+        this.query = query;
+    }
+
+    abortQuery() {
+        if (this.query) {
+            this.query.abort();
+            this.query = null;
+        }
+    }
+}
+
+export const queryManagerInstance = new QueryManager();

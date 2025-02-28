@@ -1,11 +1,10 @@
 import type {Settings} from '@gravity-ui/react-data-table';
-import {Tabs, Text} from '@gravity-ui/uikit';
+import type {TabsItemProps} from '@gravity-ui/uikit';
+import {Flex, Tabs, Text} from '@gravity-ui/uikit';
 
 import {QueryResultTable} from '../../../../../../components/QueryResultTable';
 import type {ParsedResultSet} from '../../../../../../types/store/query';
-import {getArray} from '../../../../../../utils';
 import {cn} from '../../../../../../utils/cn';
-import i18n from '../../i18n';
 import {QueryResultError} from '../QueryResultError/QueryResultError';
 
 import './ResultSetsViewer.scss';
@@ -23,58 +22,64 @@ interface ResultSetsViewerProps {
 export function ResultSetsViewer(props: ResultSetsViewerProps) {
     const {selectedResultSet, setSelectedResultSet, resultSets, error} = props;
 
-    const resultsSetsCount = resultSets?.length || 0;
     const currentResult = resultSets?.[selectedResultSet];
 
     const renderTabs = () => {
-        if (resultsSetsCount > 1) {
-            const tabsItems = getArray(resultsSetsCount).map((item) => ({
-                id: String(item),
-                title: `Result #${item + 1}${resultSets?.[item]?.truncated ? ' (T)' : ''}`,
-            }));
+        const tabsItems: TabsItemProps[] =
+            resultSets?.map((_, index) => {
+                const resultSet = resultSets?.[index];
+                return {
+                    id: String(index),
+                    title: (
+                        <Flex gap={2} alignItems="center">
+                            <Text>
+                                {`Result #${index + 1}${resultSets?.[index]?.truncated ? '(T)' : ''}`}
+                            </Text>
+                            <Text color="secondary">{resultSet.result?.length || 0}</Text>
+                        </Flex>
+                    ),
+                };
+            }) || [];
 
-            return (
-                <div>
-                    <Tabs
-                        className={b('tabs')}
-                        size="l"
-                        items={tabsItems}
-                        activeTab={String(selectedResultSet)}
-                        onSelectTab={(tabId) => setSelectedResultSet(Number(tabId))}
-                    />
-                </div>
-            );
+        return (
+            <Tabs
+                className={b('tabs')}
+                size="l"
+                items={tabsItems}
+                activeTab={String(selectedResultSet)}
+                onSelectTab={(tabId) => setSelectedResultSet(Number(tabId))}
+            />
+        );
+    };
+
+    const renderSingleResult = () => {
+        const result = resultSets?.[0];
+        return (
+            <Flex gap={2} alignItems="center" className={b('title')}>
+                <Text>{result?.truncated ? 'Truncated' : 'Result'}</Text>
+                <Text color="secondary">{result?.result?.length || 0}</Text>
+            </Flex>
+        );
+    };
+
+    const renderResults = () => {
+        if (resultSets?.length) {
+            if (resultSets?.length > 1) {
+                return renderTabs();
+            } else {
+                return renderSingleResult();
+            }
         }
 
         return null;
     };
 
-    const renderResultHeadWithCount = () => {
-        return (
-            <div className={b('head')}>
-                <Text variant="subheader-3">
-                    {currentResult?.truncated ? i18n('title.truncated') : i18n('title.result')}
-                </Text>
-                {currentResult?.result ? (
-                    <Text color="secondary" variant="body-2" className={b('row-count')}>
-                        {`(${currentResult?.result.length}${
-                            currentResult.streamMetrics?.rowsPerSecond
-                                ? `, ${currentResult.streamMetrics.rowsPerSecond.toFixed(0)} rows/s`
-                                : ''
-                        })`}
-                    </Text>
-                ) : null}
-            </div>
-        );
-    };
-
     return (
         <div className={b('result-wrapper')}>
-            {renderTabs()}
             {props.error ? <QueryResultError error={error} /> : null}
+            {renderResults()}
             {currentResult ? (
                 <div className={b('result')}>
-                    {renderResultHeadWithCount()}
                     <QueryResultTable
                         settings={props.tableSettings}
                         data={currentResult.result}

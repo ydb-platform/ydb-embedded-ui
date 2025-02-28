@@ -53,6 +53,8 @@ export interface QueryResult {
     data?: PreparedQueryData;
     error?: unknown;
     queryId: string;
+    startTime?: number;
+    endTime?: number;
     isLoading: boolean;
 }
 

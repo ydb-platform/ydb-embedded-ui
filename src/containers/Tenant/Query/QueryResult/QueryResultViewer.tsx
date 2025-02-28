@@ -2,27 +2,24 @@ import React from 'react';
 
 import type {Settings} from '@gravity-ui/react-data-table';
 import type {ControlGroupOption} from '@gravity-ui/uikit';
-import {ClipboardButton, RadioButton} from '@gravity-ui/uikit';
+import {ClipboardButton, Flex, RadioButton, Text} from '@gravity-ui/uikit';
 
-import Divider from '../../../../components/Divider/Divider';
-import ElapsedTime from '../../../../components/ElapsedTime/ElapsedTime';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
+import {Illustration} from '../../../../components/Illustration';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import type {QueryResult} from '../../../../store/reducers/query/types';
 import type {ValueOf} from '../../../../types/common';
 import type {QueryAction} from '../../../../types/store/query';
-import {valueIsDefined} from '../../../../utils';
 import {cn} from '../../../../utils/cn';
 import {USE_SHOW_PLAN_SVG_KEY} from '../../../../utils/constants';
 import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
 import {useSetting, useTypedDispatch} from '../../../../utils/hooks';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
-import {CancelQueryButton} from '../CancelQueryButton/CancelQueryButton';
-import {QueryDuration} from '../QueryDuration/QueryDuration';
 import {QuerySettingsBanner} from '../QuerySettingsBanner/QuerySettingsBanner';
+import {QueryStoppedBanner} from '../QueryStoppedBanner/QueryStoppedBanner';
 import {getPreparedResult} from '../utils/getPreparedResult';
 import {isQueryCancelledError} from '../utils/isQueryCancelledError';
 
@@ -85,9 +82,6 @@ interface ExecuteResultProps {
     queryText?: string;
     tableSettings?: Partial<Settings>;
 
-    isCancelling: boolean;
-    isCancelError: boolean;
-    onCancelRunningQuery?: VoidFunction;
     onCollapseResults: VoidFunction;
     onExpandResults: VoidFunction;
 }
@@ -99,10 +93,7 @@ export function QueryResultViewer({
     theme,
     tenantName,
     queryText,
-    isCancelling,
-    isCancelError,
     tableSettings,
-    onCancelRunningQuery,
     onCollapseResults,
     onExpandResults,
 }: ExecuteResultProps) {
@@ -226,8 +217,30 @@ export function QueryResultViewer({
         );
     };
 
+    const renderCommonErrorView = (isStopped: boolean) => {
+        return (
+            <Flex justifyContent="center" alignItems="center" width="100%" gap={8}>
+                <Illustration name="error" className={b('illustration')} />
+                <Flex direction="column" gap={2}>
+                    <Text variant="subheader-2">
+                        {isStopped ? i18n('stopped.title') : i18n('error.title')}
+                    </Text>
+                    <Text color="complementary">
+                        {isStopped ? i18n('stopped.description') : i18n('error.description')}
+                    </Text>
+                </Flex>
+            </Flex>
+        );
+    };
+
     const renderResultSection = () => {
+        const isStopped = isQueryCancelledError(error);
+
         if (activeSection === RESULT_OPTIONS_IDS.result) {
+            if (error && isStopped && !resultSets?.length) {
+                return renderCommonErrorView(isStopped);
+            }
+
             return (
                 <ResultSetsViewer
                     resultSets={resultSets}
@@ -240,7 +253,11 @@ export function QueryResultViewer({
         }
 
         if (error) {
-            return <QueryResultError error={error} />;
+            return isExecute || isStopped ? (
+                renderCommonErrorView(isStopped)
+            ) : (
+                <QueryResultError error={error} />
+            );
         }
 
         if (activeSection === RESULT_OPTIONS_IDS.schema) {
@@ -280,34 +297,14 @@ export function QueryResultViewer({
     const renderLeftControls = () => {
         return (
             <div className={b('controls-left')}>
-                <QueryExecutionStatus error={error} loading={isLoading} />
-                {!error && !isLoading && (
-                    <React.Fragment>
-                        {valueIsDefined(stats?.DurationUs) ? (
-                            <QueryDuration duration={Number(stats.DurationUs)} />
-                        ) : null}
-                        {radioButtonOptions.length && activeSection ? (
-                            <React.Fragment>
-                                <Divider />
-                                <RadioButton
-                                    options={radioButtonOptions}
-                                    value={activeSection}
-                                    onUpdate={onSelectSection}
-                                />
-                            </React.Fragment>
-                        ) : null}
-                    </React.Fragment>
-                )}
-                {isLoading ? (
-                    <React.Fragment>
-                        <ElapsedTime className={b('elapsed-time')} />
-                        <CancelQueryButton
-                            isLoading={isCancelling}
-                            isError={isCancelError}
-                            onClick={onCancelRunningQuery}
-                        />
-                    </React.Fragment>
+                {radioButtonOptions.length && activeSection ? (
+                    <RadioButton
+                        options={radioButtonOptions}
+                        value={activeSection}
+                        onUpdate={onSelectSection}
+                    />
                 ) : null}
+                <QueryExecutionStatus error={error} loading={isLoading} />
                 {data?.traceId && isExecute ? <TraceButton traceId={data.traceId} /> : null}
             </div>
         );
@@ -329,14 +326,17 @@ export function QueryResultViewer({
         );
     };
 
+    const isCancelled = isQueryCancelledError(error);
+
     return (
         <React.Fragment>
             <div className={b('controls')}>
                 {renderLeftControls()}
                 {renderRightControls()}
             </div>
-            {isLoading || isQueryCancelledError(error) ? null : <QuerySettingsBanner />}
-            <LoaderWrapper loading={isLoading && !data.resultSets}>
+            {isLoading || isCancelled ? null : <QuerySettingsBanner />}
+            {isCancelled && data.resultSets?.length ? <QueryStoppedBanner /> : null}
+            <LoaderWrapper loading={isLoading && (!data.resultSets || activeSection !== 'result')}>
                 <Fullscreen className={b('result')}>{renderResultSection()}</Fullscreen>
             </LoaderWrapper>
         </React.Fragment>

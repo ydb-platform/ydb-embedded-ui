@@ -131,6 +131,10 @@ const slice = createSlice({
     selectors: {
         selectQueriesHistoryFilter: (state) => state.history.filter || '',
         selectTenantPath: (state) => state.tenantPath,
+        selectQueryDuration: (state) => ({
+            startTime: state.result?.startTime,
+            endTime: state.result?.endTime,
+        }),
         selectResult: (state) => state.result,
         selectQueriesHistory: (state) => {
             const items = state.history.queries;
@@ -167,6 +171,7 @@ export const {
     selectTenantPath,
     selectResult,
     selectUserInput,
+    selectQueryDuration,
 } = slice.selectors;
 
 interface SendQueryParams extends QueryRequestParams {
@@ -178,6 +183,9 @@ interface SendQueryParams extends QueryRequestParams {
     enableTracingLevel?: boolean;
 }
 
+// Stream query receives queryId from session chunk.
+type StreamQueryParams = Omit<SendQueryParams, 'queryId'>;
+
 interface QueryStats {
     durationUs?: string | number;
     endTime?: string | number;
@@ -188,12 +196,20 @@ const DEFAULT_CONCURRENT_RESULTS = false;
 
 export const queryApi = api.injectEndpoints({
     endpoints: (build) => ({
-        useStreamQuery: build.mutation<null, SendQueryParams>({
+        useStreamQuery: build.mutation<null, StreamQueryParams>({
             queryFn: async (
-                {query, database, querySettings = {}, enableTracingLevel, queryId},
+                {query, database, querySettings = {}, enableTracingLevel},
                 {signal, dispatch, getState},
             ) => {
-                dispatch(setQueryResult({type: 'execute', queryId, isLoading: true}));
+                const startTime = Date.now();
+                dispatch(
+                    setQueryResult({
+                        type: 'execute',
+                        queryId: '',
+                        isLoading: true,
+                        startTime,
+                    }),
+                );
 
                 const {action, syntax} = getActionAndSyntaxFromQueryMode(
                     'execute',
@@ -238,17 +254,20 @@ export const queryApi = api.injectEndpoints({
                         },
                         {
                             signal,
-                            onQueryResponseChunk: (chunk) => {
-                                dispatch(setStreamQueryResponse(chunk));
-                            },
+                            // First chunk is session chunk
                             onSessionChunk: (chunk) => {
                                 dispatch(setStreamSession(chunk));
                             },
+                            // Data chunks follow session chunk
                             onStreamDataChunk: (chunk) => {
                                 streamDataChunkBatch.push(chunk);
                                 if (!batchTimeout) {
                                     batchTimeout = window.requestAnimationFrame(flushBatch);
                                 }
+                            },
+                            // Last chunk is query response chunk
+                            onQueryResponseChunk: (chunk) => {
+                                dispatch(setStreamQueryResponse(chunk));
                             },
                         },
                     );
@@ -268,7 +287,9 @@ export const queryApi = api.injectEndpoints({
                             type: 'execute',
                             error,
                             isLoading: false,
-                            queryId,
+                            startTime,
+                            endTime: Date.now(),
+                            queryId: state.query.result?.queryId || '',
                         }),
                     );
                     return {error};
@@ -287,7 +308,15 @@ export const queryApi = api.injectEndpoints({
                 },
                 {signal, dispatch},
             ) => {
-                dispatch(setQueryResult({type: actionType, queryId, isLoading: true}));
+                const startTime = Date.now();
+                dispatch(
+                    setQueryResult({
+                        type: actionType,
+                        queryId,
+                        isLoading: true,
+                        startTime,
+                    }),
+                );
 
                 const {action, syntax} = getActionAndSyntaxFromQueryMode(
                     actionType,
@@ -329,6 +358,8 @@ export const queryApi = api.injectEndpoints({
                                 error: response,
                                 isLoading: false,
                                 queryId,
+                                startTime,
+                                endTime: Date.now(),
                             }),
                         );
                         return {error: response};
@@ -358,6 +389,8 @@ export const queryApi = api.injectEndpoints({
                             data,
                             isLoading: false,
                             queryId,
+                            startTime,
+                            endTime: Date.now(),
                         }),
                     );
                     return {data: null};
@@ -368,6 +401,8 @@ export const queryApi = api.injectEndpoints({
                             error,
                             isLoading: false,
                             queryId,
+                            startTime,
+                            endTime: Date.now(),
                         }),
                     );
                     return {error};

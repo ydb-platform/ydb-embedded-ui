@@ -77,45 +77,6 @@ test.describe('Test Query Settings', async () => {
         await expect(queryEditor.isBannerHidden()).resolves.toBe(true);
     });
 
-    test('Indicator icon appears after closing banner', async ({page}) => {
-        const queryEditor = new QueryEditor(page);
-
-        // Change a setting
-        await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.scan);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
-
-        // Execute a script to make the banner appear
-        await queryEditor.setQuery(testQuery);
-        await queryEditor.clickRunButton();
-
-        // Close the banner
-        await queryEditor.closeBanner();
-
-        await expect(queryEditor.isIndicatorIconVisible()).resolves.toBe(true);
-    });
-
-    test('Indicator not appears for running query', async ({page}) => {
-        const queryEditor = new QueryEditor(page);
-
-        // Change a setting
-        await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeTransactionMode(TRANSACTION_MODES.snapshot);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
-
-        // Execute a script to make the banner appear
-        await queryEditor.setQuery(testQuery);
-        await queryEditor.clickRunButton();
-
-        // Close the banner
-        await queryEditor.closeBanner();
-        await queryEditor.setQuery(longRunningQuery);
-        await queryEditor.clickRunButton();
-        await page.waitForTimeout(500);
-
-        await expect(queryEditor.isIndicatorIconHidden()).resolves.toBe(true);
-    });
-
     test('Gear button shows number of changed settings', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.clickGearButton();

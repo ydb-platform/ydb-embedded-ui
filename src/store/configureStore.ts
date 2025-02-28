@@ -28,13 +28,17 @@ function _configureStore<
         preloadedState,
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
-                immutableCheck: {
-                    ignoredPaths: ['tooltip.currentHoveredRef'],
-                },
-                serializableCheck: {
-                    ignoredPaths: ['tooltip.currentHoveredRef', 'api'],
-                    ignoredActions: [UPDATE_REF, 'api/sendQuery/rejected'],
-                },
+                immutableCheck: process.env.REACT_APP_DISABLE_CHECKS
+                    ? false
+                    : {
+                          ignoredPaths: ['tooltip.currentHoveredRef'],
+                      },
+                serializableCheck: process.env.REACT_APP_DISABLE_CHECKS
+                    ? false
+                    : {
+                          ignoredPaths: ['tooltip.currentHoveredRef', 'api'],
+                          ignoredActions: [UPDATE_REF, 'api/sendQuery/rejected'],
+                      },
             }).concat(locationMiddleware, ...middleware),
     });
 

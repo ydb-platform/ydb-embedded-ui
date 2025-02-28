@@ -1,6 +1,12 @@
 @use '../../../../styles/mixins.scss';
 
-.cancel-query-button {
+.ydb-query-editor-button {
+    &__explain-button,
+    &__stop-button,
+    &__run-button {
+        width: 92px;
+    }
+
     &__stop-button {
         &_error {
             @include mixins.query-buttons-animations();

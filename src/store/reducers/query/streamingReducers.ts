@@ -1,6 +1,5 @@
 import type {PayloadAction} from '@reduxjs/toolkit';
 
-import type {StreamMetrics} from '../../../types/store/query';
 import type {
     QueryResponseChunk,
     SessionChunk,
@@ -56,28 +55,8 @@ export const setStreamQueryResponse = (
         state.result.data.plan = chunk.plan;
         state.result.data.stats = chunk.stats;
     }
-};
 
-const updateStreamMetrics = (metrics: StreamMetrics, totalNewRows: number) => {
-    const currentTime = Date.now();
-    const WINDOW_SIZE = 5000; // 5 seconds in milliseconds
-
-    metrics.recentChunks.push({timestamp: currentTime, rowCount: totalNewRows});
-    metrics.recentChunks = metrics.recentChunks.filter(
-        (chunk) => currentTime - chunk.timestamp <= WINDOW_SIZE,
-    );
-
-    if (metrics.recentChunks.length > 0) {
-        const oldestChunkTime = metrics.recentChunks[0].timestamp;
-        const timeWindow = (currentTime - oldestChunkTime) / 1000;
-        const totalRows = metrics.recentChunks.reduce(
-            (sum: number, chunk) => sum + chunk.rowCount,
-            0,
-        );
-        metrics.rowsPerSecond = timeWindow > 0 ? totalRows / timeWindow : 0;
-    }
-
-    metrics.lastUpdateTime = currentTime;
+    state.result.endTime = Date.now();
 };
 
 const getEmptyResultSet = () => {
@@ -85,11 +64,6 @@ const getEmptyResultSet = () => {
         columns: [],
         result: [],
         truncated: false,
-        streamMetrics: {
-            rowsPerSecond: 0,
-            lastUpdateTime: Date.now(),
-            recentChunks: [],
-        },
     };
 };
 
@@ -123,11 +97,6 @@ export const addStreamingChunks = (state: QueryState, action: PayloadAction<Stre
         return acc;
     }, new Map<number, StreamDataChunk>());
 
-    const totalNewRows = action.payload.reduce(
-        (sum: number, chunk) => sum + (chunk.result.rows?.length || 0),
-        0,
-    );
-
     // Process merged chunks
     for (const [resultIndex, chunk] of mergedChunks.entries()) {
         const {columns, rows} = chunk.result;
@@ -149,9 +118,5 @@ export const addStreamingChunks = (state: QueryState, action: PayloadAction<Stre
             resultSet.result?.push(row);
         });
         resultSet.truncated = chunk.result.truncated;
-
-        if (resultSet.streamMetrics) {
-            updateStreamMetrics(resultSet.streamMetrics, totalNewRows);
-        }
     }
 };
