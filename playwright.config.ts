@@ -22,7 +22,7 @@ const config: PlaywrightTestConfig = {
                   REACT_APP_DISABLE_CHECKS: 'true',
               },
               port: 3000,
-              reuseExistingServer: true,
+              reuseExistingServer: !process.env.CI,
           },
     use: {
         baseURL: baseUrl || 'http://localhost:3000/',
