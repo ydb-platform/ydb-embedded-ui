@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {Flex} from '@gravity-ui/uikit';
+
 import {getVDiskPagePath} from '../../routes';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
@@ -182,7 +184,11 @@ export function VDiskInfo<T extends PreparedVDisk>({
         if (links.length) {
             vdiskInfo.push({
                 label: vDiskInfoKeyset('links'),
-                value: <div className={b('links')}>{links}</div>,
+                value: (
+                    <Flex wrap="wrap" gap={2}>
+                        {links}
+                    </Flex>
+                ),
             });
         }
     }
