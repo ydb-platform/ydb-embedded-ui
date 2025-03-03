@@ -3,6 +3,7 @@ import type {SortOrder} from '@gravity-ui/react-data-table';
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
+import {QUERY_TECHNICAL_MARK} from '../../../utils/constants';
 import {prepareOrderByFromTableSort} from '../../../utils/hooks/useTableSort';
 import {isQueryErrorResponse, parseQueryAPIResponse} from '../../../utils/query';
 import {api} from '../api';
@@ -11,8 +12,6 @@ import type {TopQueriesFilters} from './types';
 import {getFiltersConditions} from './utils';
 
 const initialState: TopQueriesFilters = {};
-
-const QUERY_TECHNICAL_MARK = '/*UI-QUERY-EXCLUDE*/';
 
 const slice = createSlice({
     name: 'executeTopQueries',
@@ -27,13 +26,13 @@ const slice = createSlice({
 export const {setTopQueriesFilters} = slice.actions;
 export default slice.reducer;
 
-const getQueryText = (path: string, filters?: TopQueriesFilters, sortOrder?: SortOrder[]) => {
-    const filterConditions = getFiltersConditions(path, filters);
+const getQueryText = (database: string, filters?: TopQueriesFilters, sortOrder?: SortOrder[]) => {
+    const filterConditions = getFiltersConditions(database, filters);
 
     const orderBy = prepareOrderByFromTableSort(sortOrder);
 
-    return `
-SELECT ${QUERY_TECHNICAL_MARK}
+    return `${QUERY_TECHNICAL_MARK}
+SELECT
     CPUTime as CPUTimeUs,
     QueryText,
     IntervalEnd,
@@ -42,12 +41,35 @@ SELECT ${QUERY_TECHNICAL_MARK}
     ReadBytes,
     UserSID,
     Duration
-FROM \`${path}/.sys/top_queries_by_cpu_time_one_hour\`
+FROM \`${database}/.sys/top_queries_by_cpu_time_one_hour\`
 WHERE ${filterConditions || 'true'} AND QueryText NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
 ${orderBy}
 LIMIT 100
 `;
 };
+
+function getRunningQueriesText(
+    database: string,
+    filters?: TopQueriesFilters,
+    sortOrder?: SortOrder[],
+) {
+    const filterConditions = filters?.text
+        ? `Query ILIKE '%${filters.text}%' OR UserSID ILIKE '%${filters.text}%'`
+        : '';
+
+    const orderBy = prepareOrderByFromTableSort(sortOrder);
+
+    return `${QUERY_TECHNICAL_MARK}
+SELECT
+    UserSID, 
+    QueryStartAt, 
+    Query as QueryText, 
+    ApplicationName
+FROM \`${database}/.sys/query_sessions\`
+WHERE ${filterConditions || 'true'} AND Query NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
+${orderBy}
+LIMIT 100`;
+}
 
 interface TopQueriesRequestParams {
     database: string;
@@ -102,24 +124,9 @@ export const topQueriesApi = api.injectEndpoints({
         getRunningQueries: build.query({
             queryFn: async ({database, filters, sortOrder}: TopQueriesRequestParams, {signal}) => {
                 try {
-                    const filterConditions = filters?.text
-                        ? `Query ILIKE '%${filters.text}%' OR UserSID ILIKE '%${filters.text}%'`
-                        : '';
-
-                    const orderBy = prepareOrderByFromTableSort(sortOrder);
-
-                    const queryText = `SELECT ${QUERY_TECHNICAL_MARK}
-                        UserSID, QueryStartAt, Query as QueryText, ApplicationName
-                    FROM
-                        \`.sys/query_sessions\`
-                    WHERE
-                        ${filterConditions || 'true'} AND Query NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
-                    ${orderBy}
-                    LIMIT 100`;
-
                     const response = await window.api.viewer.sendQuery(
                         {
-                            query: queryText,
+                            query: getRunningQueriesText(database, filters, sortOrder),
                             database,
                             action: 'execute-scan',
                         },

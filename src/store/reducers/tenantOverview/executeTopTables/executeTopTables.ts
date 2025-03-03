@@ -1,27 +1,27 @@
-import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
+import {QUERY_TECHNICAL_MARK, TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
 import {isQueryErrorResponse, parseQueryAPIResponse} from '../../../../utils/query';
 import {api} from '../../api';
 
-const getQueryText = (path: string) => {
-    return `
+const getQueryText = (database: string) => {
+    return `${QUERY_TECHNICAL_MARK}
 SELECT
     Path, SUM(DataSize) as Size
-FROM \`${path}/.sys/partition_stats\`
+FROM \`${database}/.sys/partition_stats\`
 GROUP BY Path
-    ORDER BY Size DESC
-    LIMIT ${TENANT_OVERVIEW_TABLES_LIMIT}
+ORDER BY Size DESC
+LIMIT ${TENANT_OVERVIEW_TABLES_LIMIT}
 `;
 };
 
 export const topTablesApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getTopTables: builder.query({
-            queryFn: async ({path}: {path: string}, {signal}) => {
+            queryFn: async ({database}: {database: string}, {signal}) => {
                 try {
                     const response = await window.api.viewer.sendQuery(
                         {
-                            query: getQueryText(path),
-                            database: path,
+                            query: getQueryText(database),
+                            database,
                             action: 'execute-scan',
                         },
                         {signal, withRetries: true},

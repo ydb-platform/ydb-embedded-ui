@@ -16,18 +16,18 @@ import i18n from '../i18n';
 import '../TenantOverview.scss';
 
 interface TopTablesProps {
-    path: string;
+    database: string;
 }
 
 const TOP_TABLES_COLUMNS_WIDTH_LS_KEY = 'topTablesTableColumnsWidth';
 
-export function TopTables({path}: TopTablesProps) {
+export function TopTables({database}: TopTablesProps) {
     const location = useLocation();
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {currentData, error, isFetching} = topTablesApi.useGetTopTablesQuery(
-        {path},
+        {database},
         {pollingInterval: autoRefreshInterval},
     );
     const loading = isFetching && currentData === undefined;

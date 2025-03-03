@@ -52,6 +52,8 @@ export const TENANT_OVERVIEW_TABLES_LIMIT = 5;
 
 export const EMPTY_DATA_PLACEHOLDER = '—';
 
+export const QUERY_TECHNICAL_MARK = '/*UI-QUERY-EXCLUDE*/';
+
 // ==== Titles ====
 export const DEVELOPER_UI_TITLE = 'Developer UI';
 export const CLUSTER_DEFAULT_TITLE = 'Cluster';
