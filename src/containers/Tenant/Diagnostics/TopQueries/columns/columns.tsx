@@ -137,12 +137,7 @@ export function getTopQueriesColumns() {
 }
 
 export function getTenantOverviewTopQueriesColumns() {
-    const columns = [queryHashColumn, oneLineQueryTextColumn, cpuTimeUsColumn];
-
-    return columns.map((column) => ({
-        ...column,
-        sortable: false,
-    }));
+    return [queryHashColumn, oneLineQueryTextColumn, cpuTimeUsColumn];
 }
 
 export function getRunningQueriesColumns() {
