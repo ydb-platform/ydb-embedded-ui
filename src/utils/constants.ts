@@ -89,10 +89,11 @@ export const DEFAULT_TABLE_SETTINGS: Settings = {
     highlightRows: true,
 } as const;
 
-export const TENANT_OVERVIEW_TABLES_SETTINGS = {
+export const TENANT_OVERVIEW_TABLES_SETTINGS: Settings = {
     ...DEFAULT_TABLE_SETTINGS,
     stickyHead: 'fixed',
     dynamicRender: false,
+    sortable: false,
 } as const;
 
 export const QUERY_EXECUTION_SETTINGS_KEY = 'queryExecutionSettings';

@@ -1,3 +1,4 @@
+import {ResizeableDataTable} from '../../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {
     useCapabilitiesLoaded,
     useStorageGroupsHandlerAvailable,
@@ -5,7 +6,10 @@ import {
 import {storageApi} from '../../../../../store/reducers/storage/storage';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {GroupsRequiredField} from '../../../../../types/api/storage';
-import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../../utils/constants';
+import {
+    TENANT_OVERVIEW_TABLES_LIMIT,
+    TENANT_OVERVIEW_TABLES_SETTINGS,
+} from '../../../../../utils/constants';
 import {useAutoRefreshInterval, useSearchQuery} from '../../../../../utils/hooks';
 import {getRequiredDataFields} from '../../../../../utils/tableUtils/getRequiredDataFields';
 import {getStorageTopGroupsColumns} from '../../../../Storage/StorageGroups/columns/columns';
@@ -71,12 +75,17 @@ export function TopGroups({tenant}: TopGroupsProps) {
 
     return (
         <TenantOverviewTableLayout
-            columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
-            data={groups}
-            columns={columns}
             title={title}
             loading={loading || !capabilitiesLoaded}
             error={error}
-        />
+            withData={Boolean(currentData)}
+        >
+            <ResizeableDataTable
+                columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
+                data={groups}
+                columns={columns}
+                settings={TENANT_OVERVIEW_TABLES_SETTINGS}
+            />
+        </TenantOverviewTableLayout>
     );
 }

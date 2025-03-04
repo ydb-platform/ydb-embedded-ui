@@ -1,34 +1,32 @@
 import React from 'react';
 
+import type {NoStrictEntityMods} from '@bem-react/classname';
+
 import {ResponseError} from '../../../../components/Errors/ResponseError';
-import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
-import type {ResizeableDataTableProps} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
-import {
-    TENANT_OVERVIEW_TABLES_LIMIT,
-    TENANT_OVERVIEW_TABLES_SETTINGS,
-} from '../../../../utils/constants';
+import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
 
 import {b} from './utils';
 
-interface TenantOverviewTableLayoutProps<T> extends ResizeableDataTableProps<T> {
+interface TenantOverviewTableLayoutProps {
     title: React.ReactNode;
     loading?: boolean;
     error?: unknown;
-    tableClassNameModifiers?: {
-        [name: string]: string | boolean | undefined;
-    };
+    tableClassNameModifiers?: NoStrictEntityMods;
+    withData?: boolean;
+    children?: React.ReactNode;
 }
 
-export function TenantOverviewTableLayout<T>({
+export function TenantOverviewTableLayout({
     title,
     error,
     loading,
     tableClassNameModifiers = {},
-    ...props
-}: TenantOverviewTableLayoutProps<T>) {
+    withData,
+    children,
+}: TenantOverviewTableLayoutProps) {
     const renderContent = () => {
-        if (error && props.data.length === 0) {
+        if (error && !withData) {
             return null;
         }
 
@@ -36,7 +34,7 @@ export function TenantOverviewTableLayout<T>({
             return <TableSkeleton rows={TENANT_OVERVIEW_TABLES_LIMIT} />;
         }
 
-        return <ResizeableDataTable settings={TENANT_OVERVIEW_TABLES_SETTINGS} {...props} />;
+        return children;
     };
     return (
         <React.Fragment>

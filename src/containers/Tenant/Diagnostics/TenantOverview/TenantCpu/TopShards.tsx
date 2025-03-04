@@ -1,8 +1,10 @@
 import {useLocation} from 'react-router-dom';
 
+import {ResizeableDataTable} from '../../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {parseQuery} from '../../../../../routes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {topShardsApi} from '../../../../../store/reducers/tenantOverview/topShards/tenantOverviewTopShards';
+import {TENANT_OVERVIEW_TABLES_SETTINGS} from '../../../../../utils/constants';
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../../utils/query';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
@@ -45,12 +47,17 @@ export const TopShards = ({tenantName, path}: TopShardsProps) => {
 
     return (
         <TenantOverviewTableLayout
-            columnsWidthLSKey={TOP_SHARDS_COLUMNS_WIDTH_LS_KEY}
-            data={data || []}
-            columns={columns}
             title={title}
             loading={loading}
             error={parseQueryErrorToString(error)}
-        />
+            withData={Boolean(currentData)}
+        >
+            <ResizeableDataTable
+                columnsWidthLSKey={TOP_SHARDS_COLUMNS_WIDTH_LS_KEY}
+                data={data}
+                columns={columns}
+                settings={TENANT_OVERVIEW_TABLES_SETTINGS}
+            />
+        </TenantOverviewTableLayout>
     );
 };
