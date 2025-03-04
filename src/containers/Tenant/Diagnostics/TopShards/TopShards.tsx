@@ -14,13 +14,11 @@ import {
 import {EShardsWorkloadMode} from '../../../../store/reducers/shardsWorkload/types';
 import type {ShardsWorkloadFilters} from '../../../../store/reducers/shardsWorkload/types';
 import type {CellValue, KeyValueRow} from '../../../../types/api/query';
-import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {formatDateTime} from '../../../../utils/dataFormatters/dataFormatters';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../utils/query';
-import {isColumnEntityType} from '../../utils/schema';
 
 import {Filters} from './Filters';
 import {getShardsWorkloadColumns} from './columns/columns';
@@ -60,10 +58,9 @@ function fillDateRangeFor(value: ShardsWorkloadFilters) {
 interface TopShardsProps {
     tenantName: string;
     path: string;
-    type?: EPathType;
 }
 
-export const TopShards = ({tenantName, path, type}: TopShardsProps) => {
+export const TopShards = ({tenantName, path}: TopShardsProps) => {
     const dispatch = useTypedDispatch();
     const location = useLocation();
 
@@ -161,10 +158,6 @@ export const TopShards = ({tenantName, path, type}: TopShardsProps) => {
     const renderContent = () => {
         if (error && !data) {
             return null;
-        }
-
-        if (!data || isColumnEntityType(type)) {
-            return i18n('no-data');
         }
 
         return (
