@@ -1,4 +1,4 @@
-import type {ValueOf} from '../../../../../types/common';
+import type {ValueOf} from '../../types/common';
 
 import i18n from './i18n';
 
@@ -15,7 +15,7 @@ export const TOP_SHARDS_COLUMNS_IDS = {
     IntervalEnd: 'IntervalEnd',
 } as const;
 
-type TopShardsColumnId = ValueOf<typeof TOP_SHARDS_COLUMNS_IDS>;
+export type TopShardsColumnId = ValueOf<typeof TOP_SHARDS_COLUMNS_IDS>;
 
 export const TOP_SHARDS_COLUMNS_TITLES: Record<TopShardsColumnId, string> = {
     get TabletId() {
@@ -52,7 +52,7 @@ const TOP_SHARDS_COLUMNS_TO_SORT_FIELDS: Record<TopShardsColumnId, string | unde
     NodeId: undefined,
     PeakTime: undefined,
     InFlightTxCount: 'InFlightTxCount',
-    IntervalEnd: undefined,
+    IntervalEnd: 'IntervalEnd',
 } as const;
 
 export function getTopShardsColumnSortField(columnId?: string) {
