@@ -2,8 +2,8 @@ import type {DefinitionListItem} from '@gravity-ui/components';
 import {Flex, Text} from '@gravity-ui/uikit';
 
 import {AsyncReplicationState} from '../../../../../components/AsyncReplicationState';
+import {YqlHighlighter} from '../../../../../components/SyntaxHighlighter/YqlHighlighter';
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
-import {YqlHighlighter} from '../../../../../components/YqlHighlighter/YqlHighlighter';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {getEntityName} from '../../../utils';
 

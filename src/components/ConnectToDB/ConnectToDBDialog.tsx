@@ -5,8 +5,8 @@ import {Dialog, Tabs} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
+import {YDBSyntaxHighlighterLazy} from '../SyntaxHighlighter/lazy';
 
-import {ConnectToDBSyntaxHighlighterLazy} from './ConnectToDBSyntaxHighlighter/lazy';
 import {getDocsLink} from './getDocsLink';
 import i18n from './i18n';
 import {getSnippetCode} from './snippets';
@@ -52,7 +52,12 @@ function ConnectToDBDialog({open, onClose, database, endpoint}: ConnectToDBDialo
                     className={b('dialog-tabs')}
                 />
                 <div className={b('snippet-container')}>
-                    <ConnectToDBSyntaxHighlighterLazy language={activeTab} text={snippet} />
+                    <YDBSyntaxHighlighterLazy
+                        language={activeTab}
+                        text={snippet}
+                        transparentBackground={false}
+                        withCopy
+                    />
                 </div>
                 {docsLink ? (
                     <LinkWithIcon

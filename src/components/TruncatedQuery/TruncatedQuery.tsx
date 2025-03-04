@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {cn} from '../../utils/cn';
-import {YqlHighlighter} from '../YqlHighlighter/YqlHighlighter';
+import {YqlHighlighter} from '../SyntaxHighlighter/YqlHighlighter';
 
 import './TruncatedQuery.scss';
 

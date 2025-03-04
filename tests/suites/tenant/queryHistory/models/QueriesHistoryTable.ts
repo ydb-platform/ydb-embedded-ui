@@ -22,7 +22,7 @@ export class QueriesHistoryTable {
 
     async getQueryRow(query: string) {
         return this.table.locator('.ydb-queries-history__table-row', {
-            has: this.page.locator('.yql-highlighter', {hasText: query}),
+            has: this.page.locator('.ydb-syntax-highlighter', {hasText: query}),
         });
     }
 
@@ -33,7 +33,7 @@ export class QueriesHistoryTable {
 
     async getQueryText(index: number) {
         const row = this.table.locator('.ydb-queries-history__table-row').nth(index);
-        return row.locator('.yql-highlighter').innerText();
+        return row.locator('.ydb-syntax-highlighter').innerText();
     }
 
     async isVisible() {
