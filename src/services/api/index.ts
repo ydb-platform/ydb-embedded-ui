@@ -25,7 +25,9 @@ export class YdbEmbeddedAPI {
     meta?: MetaAPI;
     codeAssist?: CodeAssistAPI;
 
-    constructor({config, webVersion}: {config: AxiosRequestConfig; webVersion?: boolean}) {
+    constructor({webVersion = false, withCredentials = false} = {}) {
+        const config: AxiosRequestConfig = {withCredentials};
+
         this.auth = new AuthAPI({config});
         if (webVersion) {
             this.meta = new MetaAPI({config});
@@ -40,10 +42,4 @@ export class YdbEmbeddedAPI {
         this.vdisk = new VDiskAPI({config});
         this.viewer = new ViewerAPI({config});
     }
-}
-
-export function createApi({webVersion = false, withCredentials = false} = {}) {
-    const config: AxiosRequestConfig = {withCredentials};
-    const api = new YdbEmbeddedAPI({config, webVersion});
-    return api;
 }
