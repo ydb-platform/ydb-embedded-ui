@@ -4,7 +4,7 @@ import type {History} from 'history';
 import {createBrowserHistory} from 'history';
 import {listenForHistoryChange} from 'redux-location-state';
 
-import {createApi} from '../services/api';
+import {YdbEmbeddedAPI} from '../services/api';
 
 import {getUrlData} from './getUrlData';
 import rootReducer from './reducers';
@@ -57,7 +57,7 @@ const isSingleClusterMode = `${metaBackend}` === 'undefined';
 export function configureStore({
     aRootReducer = rootReducer,
     singleClusterMode = isSingleClusterMode,
-    api = createApi({webVersion, withCredentials: !customBackend}),
+    api = new YdbEmbeddedAPI({webVersion, withCredentials: !customBackend}),
 } = {}) {
     ({backend, basename, clusterName} = getUrlData({
         href: window.location.href,
