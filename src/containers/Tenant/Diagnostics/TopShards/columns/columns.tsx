@@ -13,10 +13,6 @@ import {getDefaultNodePath} from '../../../../Node/NodePages';
 
 import {TOP_SHARDS_COLUMNS_IDS, TOP_SHARDS_COLUMNS_TITLES} from './constants';
 
-function prepareCPUWorkloadValue(value: string | number) {
-    return `${roundToPrecision(Number(value) * 100, 2)}%`;
-}
-
 const getPathColumn = (schemaPath: string, location: Location): Column<KeyValueRow> => ({
     name: TOP_SHARDS_COLUMNS_IDS.Path,
     header: TOP_SHARDS_COLUMNS_TITLES.Path,
@@ -31,15 +27,6 @@ const getPathColumn = (schemaPath: string, location: Location): Column<KeyValueR
     sortable: false,
     width: 300,
 });
-
-const cpuCoresColumn: Column<KeyValueRow> = {
-    name: TOP_SHARDS_COLUMNS_IDS.CPUCores,
-    header: TOP_SHARDS_COLUMNS_TITLES.CPUCores,
-    render: ({row}) => {
-        return prepareCPUWorkloadValue(row.CPUCores || 0);
-    },
-    align: DataTable.RIGHT,
-};
 
 const dataSizeColumn: Column<KeyValueRow> = {
     name: TOP_SHARDS_COLUMNS_IDS.DataSize,
@@ -75,21 +62,17 @@ const nodeIdColumn: Column<KeyValueRow> = {
     align: DataTable.RIGHT,
 };
 
-const topShardsCpuCoresColumn: Column<KeyValueRow> = {
+const cpuCoresColumn: Column<KeyValueRow> = {
     name: TOP_SHARDS_COLUMNS_IDS.CPUCores,
     header: TOP_SHARDS_COLUMNS_TITLES.CPUCores,
     render: ({row}) => {
-        return (
-            <UsageLabel
-                value={roundToPrecision(Number(row.CPUCores) * 100, 2)}
-                theme={getUsageSeverity(Number(row.CPUCores) * 100)}
-            />
-        );
+        const usage = Number(row.CPUCores) * 100 || 0;
+
+        return <UsageLabel value={roundToPrecision(usage, 2)} theme={getUsageSeverity(usage)} />;
     },
     align: DataTable.RIGHT,
-    sortable: false,
-    width: 140,
-    resizeMinWidth: 140,
+    width: 110,
+    resizeMinWidth: 110,
 };
 
 const inFlightTxCountColumn: Column<KeyValueRow> = {
@@ -111,5 +94,5 @@ export const getShardsWorkloadColumns = (schemaPath: string, location: Location)
 };
 
 export const getTopShardsColumns = (schemaPath: string, location: Location) => {
-    return [tabletIdColumn, getPathColumn(schemaPath, location), topShardsCpuCoresColumn];
+    return [tabletIdColumn, getPathColumn(schemaPath, location), cpuCoresColumn];
 };
