@@ -107,6 +107,23 @@ export function NewSQL() {
             ],
         },
         {
+            text: i18n('menu.transfer'),
+            items: [
+                {
+                    text: i18n('action.create-transfer'),
+                    action: actions.createTransfer,
+                },
+                {
+                    text: i18n('action.alter-transfer'),
+                    action: actions.alterTransfer,
+                },
+                {
+                    text: i18n('action.drop-transfer'),
+                    action: actions.dropTransfer,
+                },
+            ],
+        },
+        {
             text: i18n('menu.capture'),
             items: [
                 {

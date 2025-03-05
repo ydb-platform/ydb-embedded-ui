@@ -61,6 +61,7 @@ export const getSchemaControls =
 
         const nodeTypeToControls: Record<NavigationTreeNodeType, Controls> = {
             async_replication: undefined,
+            transfer: undefined,
 
             database: undefined,
             directory: undefined,

@@ -39,6 +39,7 @@ const pathTypeToNodeType: Record<EPathType, NavigationTreeNodeType | undefined> 
     [EPathType.EPathTypeView]: 'view',
 
     [EPathType.EPathTypeReplication]: 'async_replication',
+    [EPathType.EPathTypeTransfer]: 'transfer',
     [EPathType.EPathTypeResourcePool]: 'resource_pool',
 };
 
@@ -87,6 +88,7 @@ const pathTypeToEntityName: Record<EPathType, string | undefined> = {
     [EPathType.EPathTypeView]: 'View',
 
     [EPathType.EPathTypeReplication]: 'Async Replication',
+    [EPathType.EPathTypeTransfer]: 'Transfer',
     [EPathType.EPathTypeResourcePool]: 'Resource Pool',
 };
 
@@ -128,6 +130,7 @@ const pathTypeToIsTable: Record<EPathType, boolean> = {
     [EPathType.EPathTypePersQueueGroup]: false,
     [EPathType.EPathTypeExternalDataSource]: false,
     [EPathType.EPathTypeReplication]: false,
+    [EPathType.EPathTypeTransfer]: false,
     [EPathType.EPathTypeResourcePool]: false,
 };
 
@@ -169,6 +172,7 @@ const pathTypeToIsColumn: Record<EPathType, boolean> = {
     [EPathType.EPathTypeView]: false,
 
     [EPathType.EPathTypeReplication]: false,
+    [EPathType.EPathTypeTransfer]: false,
     [EPathType.EPathTypeResourcePool]: false,
 };
 
@@ -195,6 +199,7 @@ const pathTypeToIsDatabase: Record<EPathType, boolean> = {
     [EPathType.EPathTypeView]: false,
 
     [EPathType.EPathTypeReplication]: false,
+    [EPathType.EPathTypeTransfer]: false,
     [EPathType.EPathTypeResourcePool]: false,
 };
 
@@ -226,6 +231,7 @@ const pathTypeToEntityWithMergedImplementation: Record<EPathType, boolean> = {
     [EPathType.EPathTypeView]: false,
 
     [EPathType.EPathTypeReplication]: false,
+    [EPathType.EPathTypeTransfer]: false,
     [EPathType.EPathTypeResourcePool]: false,
 };
 
@@ -253,6 +259,7 @@ const pathTypeToChildless: Record<EPathType, boolean> = {
     [EPathType.EPathTypeResourcePool]: true,
 
     [EPathType.EPathTypeReplication]: true,
+    [EPathType.EPathTypeTransfer]: true,
 
     [EPathType.EPathTypeInvalid]: false,
     [EPathType.EPathTypeColumnStore]: false,

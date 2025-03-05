@@ -16,12 +16,14 @@
   "menu.topics": "Topics",
   "menu.capture": "Change data capture",
   "menu.replication": "Async replication",
+  "menu.transfer": "Transfer",
   "menu.users": "Users",
   "action.create-topic": "Create Topic",
   "action.drop-topic": "Drop Topic",
   "action.alter-topic": "Alter Topic",
   "action.create-cdc-stream": "Create changefeed",
   "action.create-async-replication": "Create async replication",
+  "action.create-transfer": "Create transfer",
   "action.create-user": "Create user",
   "action.create-group": "Create group",
   "action.drop-user": "Drop user",
@@ -29,5 +31,7 @@
   "action.grant-privilege": "Grant privilege",
   "action.revoke-privilege": "Revoke privilege",
   "action.alter-async-replication": "Alter async replication",
-  "action.drop-async-replication": "Drop async replication"
+  "action.drop-async-replication": "Drop async replication",
+  "action.alter-transfer": "Alter transfer",
+  "action.drop-transfer": "Drop transfer"
 }

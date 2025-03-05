@@ -20,18 +20,21 @@ import {
     alterAsyncReplicationTemplate,
     alterTableTemplate,
     alterTopicTemplate,
+    alterTransferTemplate,
     createAsyncReplicationTemplate,
     createCdcStreamTemplate,
     createColumnTableTemplate,
     createExternalTableTemplate,
     createTableTemplate,
     createTopicTemplate,
+    createTransferTemplate,
     createViewTemplate,
     dropAsyncReplicationTemplate,
     dropExternalTableTemplate,
     dropTableIndex,
     dropTableTemplate,
     dropTopicTemplate,
+    dropTransferTemplate,
     dropViewTemplate,
     manageAutoPartitioningTemplate,
     selectQueryTemplate,
@@ -100,6 +103,9 @@ const bindActions = (
         createAsyncReplication: inputQuery(createAsyncReplicationTemplate),
         alterAsyncReplication: inputQuery(alterAsyncReplicationTemplate),
         dropAsyncReplication: inputQuery(dropAsyncReplicationTemplate),
+        createTransfer: inputQuery(createTransferTemplate),
+        alterTransfer: inputQuery(alterTransferTemplate),
+        dropTransfer: inputQuery(dropTransferTemplate),
         alterTable: inputQuery(alterTableTemplate),
         dropTable: inputQuery(dropTableTemplate),
         manageAutoPartitioning: inputQuery(manageAutoPartitioningTemplate),
@@ -180,6 +186,10 @@ export const getActions =
             {
                 text: i18n('actions.createAsyncReplication'),
                 action: actions.createAsyncReplication,
+            },
+            {
+                text: i18n('actions.createTransfer'),
+                action: actions.createTransfer,
             },
             {text: i18n('actions.createTopic'), action: actions.createTopic},
             {text: i18n('actions.createView'), action: actions.createView},
@@ -276,6 +286,14 @@ export const getActions =
             ],
         ];
 
+        const TRANSFER_SET: ActionsSet = [
+            [copyItem],
+            [
+                {text: i18n('actions.alterTransfer'), action: actions.alterTransfer},
+                {text: i18n('actions.dropTransfer'), action: actions.dropTransfer},
+            ],
+        ];
+
         const INDEX_SET: ActionsSet = [
             [copyItem, {text: i18n('actions.dropIndex'), action: actions.dropIndex}],
         ];
@@ -286,6 +304,7 @@ export const getActions =
         // TS will error when a new type is added in the lib but is not mapped here
         const nodeTypeToActions: Record<NavigationTreeNodeType, ActionsSet> = {
             async_replication: ASYNC_REPLICATION_SET,
+            transfer: TRANSFER_SET,
 
             database: DB_SET,
 

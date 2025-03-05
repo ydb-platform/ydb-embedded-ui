@@ -33,6 +33,16 @@ interface TTargetSpecific {
     Targets: TTarget[];
 }
 
+export interface TTransformTarget {
+    SrcPath?: string;
+    DstPath?: string;
+    TransformLambda?: string;
+}
+
+interface TTransformTargetSpecific {
+    Targets: TTransformTarget[];
+}
+
 /**
  * source: https://github.com/ydb-platform/ydb/blob/main/ydb/core/protos/replication.proto
  */
@@ -40,6 +50,7 @@ export interface TReplicationConfig {
     SrcConnectionParams?: TConnectionParams;
     Everything?: TTargetEverything;
     Specific?: TTargetSpecific;
+    TransferSpecific?: TTransformTargetSpecific;
     InitialSync?: boolean;
 }
 
