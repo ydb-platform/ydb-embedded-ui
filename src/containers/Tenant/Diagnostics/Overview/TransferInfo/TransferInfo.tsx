@@ -5,7 +5,6 @@ import {AsyncReplicationState} from '../../../../../components/AsyncReplicationS
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {getEntityName} from '../../../utils';
-import {AsyncReplicationPaths} from '../AsyncReplicationPaths';
 
 import {Credentials} from './Credentials';
 import i18n from './i18n';
@@ -31,7 +30,6 @@ export function TransferInfo({data}: TransferProps) {
     return (
         <Flex direction="column" gap="4">
             <YDBDefinitionList title={entityName} items={transferItems} />
-            <AsyncReplicationPaths config={data.PathDescription?.ReplicationDescription?.Config} />
         </Flex>
     );
 }
@@ -41,6 +39,10 @@ function prepareTransferItems(data: TEvDescribeSchemeResult) {
     const state = transferDescription.State;
     const srcConnectionParams = transferDescription.Config?.SrcConnectionParams || {};
     const {Endpoint, Database} = srcConnectionParams;
+    const target = transferDescription.Config?.TransferSpecific?.Targets[0];
+    const srcPath = target?.SrcPath;
+    const dstPath = target?.DstPath;
+    const transformLambda = target?.TransformLambda;
 
     const info: DefinitionListItem[] = [];
 
@@ -73,6 +75,28 @@ function prepareTransferItems(data: TEvDescribeSchemeResult) {
             content: <Credentials connection={srcConnectionParams} />,
         });
     }
+
+    info.push({
+        name: i18n('srcPath.label'),
+        copyText: srcPath,
+        content: <Text variant="code-inline-2">{srcPath}</Text>,
+    });
+
+    info.push({
+        name: i18n('dstPath.label'),
+        copyText: dstPath,
+        content: <Text variant="code-inline-2">{dstPath}</Text>,
+    });
+
+    info.push({
+        name: i18n('transformLambda.label'),
+        copyText: transformLambda,
+        content: (
+            <Text variant="code-2" whiteSpace="nowrap">
+                <pre>{transformLambda}</pre>
+            </Text>
+        ),
+    });
 
     return info;
 }

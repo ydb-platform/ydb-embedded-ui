@@ -3,5 +3,8 @@
   "noData": "No data for entity:",
   "srcConnection.database.label": "Source Database Path",
   "srcConnection.endpoint.label": "Source Cluster Endpoint",
-  "state.label": "State"
+  "state.label": "State",
+  "srcPath.label": "Source Topic",
+  "dstPath.label": "Destination Table",
+  "transformLambda.label": "Transformation Lambda"
 }
