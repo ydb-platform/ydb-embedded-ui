@@ -88,6 +88,7 @@ function prepareTransferItems(data: TEvDescribeSchemeResult) {
         content: <Text variant="code-inline-2">{dstPath}</Text>,
     });
 
+    // TODO use true pre
     info.push({
         name: i18n('transformLambda.label'),
         copyText: transformLambda,
