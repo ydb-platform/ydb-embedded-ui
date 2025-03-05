@@ -82,17 +82,17 @@ export const createTransferTemplate = () => {
     return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/create-transfer
 CREATE OBJECT secret_name (TYPE SECRET) WITH value="secret_value";
 
-$l = ($x) -> {
+\\$l = (\\$x) -> {
     return [
         <|
-            offset:$x._offset,
-            message:$x._data
+            offset:\\$x._offset,
+            message:\\$x._data
         |>
     ];
 };
 
 CREATE TRANSFER my_transfer
-FROM \${1:<original_topic>} TO \${2:target_table} USING $l
+FROM \${1:<original_topic>} TO \${2:<target_table>} USING \\$l
 WITH (
     CONNECTION_STRING="\${3:grpcs://mydb.ydb.tech:2135/?database=/remote_database}",
     TOKEN_SECRET_NAME = "secret_name"
@@ -285,17 +285,17 @@ export const alterTransferTemplate = (params?: SchemaQueryParams) => {
         : '${1:<my_transfer>}';
     return `-- docs: https://ydb.tech/docs/en/yql/reference/syntax/alter-transfer
 
-$l = ($x) -> {
+\\$l = (\\$x) -> {
     return [
         <|
-            offset:$x._offset,
-            message:$x._data
+            offset:\\$x._offset,
+            message:\\$x._data
         |>
     ];
 };
 
 ALTER TRANSFER ${path} 
-SET USING $l;`;
+SET USING \\$l;`;
 };
 
 export const addTableIndex = (params?: SchemaQueryParams) => {
