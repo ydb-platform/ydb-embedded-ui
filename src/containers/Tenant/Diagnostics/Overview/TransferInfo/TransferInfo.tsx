@@ -3,6 +3,7 @@ import {Flex, Text} from '@gravity-ui/uikit';
 
 import {AsyncReplicationState} from '../../../../../components/AsyncReplicationState';
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
+import {YqlHighlighter} from '../../../../../components/YqlHighlighter/YqlHighlighter';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {getEntityName} from '../../../utils';
 
@@ -88,15 +89,10 @@ function prepareTransferItems(data: TEvDescribeSchemeResult) {
         content: <Text variant="code-inline-2">{dstPath}</Text>,
     });
 
-    // TODO use true pre
     info.push({
         name: i18n('transformLambda.label'),
         copyText: transformLambda,
-        content: (
-            <Text variant="code-2" whiteSpace="nowrap">
-                <pre>{transformLambda}</pre>
-            </Text>
-        ),
+        content: <YqlHighlighter>{transformLambda}</YqlHighlighter>,
     });
 
     return info;
