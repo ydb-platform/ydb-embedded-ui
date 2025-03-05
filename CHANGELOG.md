@@ -1,5 +1,21 @@
 # Changelog
 
+## [8.13.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.12.0...v8.13.0) (2025-02-28)
+
+
+### Features
+
+* **ErrorBoundary:** rework error page ([#1983](https://github.com/ydb-platform/ydb-embedded-ui/issues/1983)) ([4a97195](https://github.com/ydb-platform/ydb-embedded-ui/commit/4a97195befe991b6204752d175519ae2d5afaebd))
+* make links from disk pop-up better ([#1986](https://github.com/ydb-platform/ydb-embedded-ui/issues/1986)) ([336d74b](https://github.com/ydb-platform/ydb-embedded-ui/commit/336d74b95502e5d6f2e508bce979a8d02521a64b))
+* redesign query ([#1974](https://github.com/ydb-platform/ydb-embedded-ui/issues/1974)) ([9ac8cfc](https://github.com/ydb-platform/ydb-embedded-ui/commit/9ac8cfc46c71b38aceae2f1ed8b84113b7fbf90b))
+* resource pool – add proper icon ([#1982](https://github.com/ydb-platform/ydb-embedded-ui/issues/1982)) ([9c0c6f8](https://github.com/ydb-platform/ydb-embedded-ui/commit/9c0c6f8ce93e44920c860eb19d961b209d469f7b))
+
+
+### Bug Fixes
+
+* rename tabs in query result ([#1987](https://github.com/ydb-platform/ydb-embedded-ui/issues/1987)) ([b9d9f0b](https://github.com/ydb-platform/ydb-embedded-ui/commit/b9d9f0be128537b30117922274b16f477d491205))
+* tests ([#1988](https://github.com/ydb-platform/ydb-embedded-ui/issues/1988)) ([519f587](https://github.com/ydb-platform/ydb-embedded-ui/commit/519f5873ffa5eecb031e71b34206140ae1e02859))
+
 ## [8.12.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.11.1...v8.12.0) (2025-02-25)
 
 
