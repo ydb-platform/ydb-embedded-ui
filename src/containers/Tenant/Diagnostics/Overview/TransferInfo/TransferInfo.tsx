@@ -92,7 +92,7 @@ function prepareTransferItems(data: TEvDescribeSchemeResult) {
     info.push({
         name: i18n('transformLambda.label'),
         copyText: transformLambda,
-        content: <YqlHighlighter>{transformLambda}</YqlHighlighter>,
+        content: transformLambda ? <YqlHighlighter>{transformLambda}</YqlHighlighter> : null,
     });
 
     return info;
