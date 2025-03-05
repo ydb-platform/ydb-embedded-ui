@@ -317,6 +317,20 @@ export function ObjectSummary({
                     },
                 ];
             },
+            [EPathType.EPathTypeTransfer]: () => {
+                const state = PathDescription?.ReplicationDescription?.State;
+
+                if (!state) {
+                    return [];
+                }
+
+                return [
+                    {
+                        name: i18n('field_state'),
+                        content: <AsyncReplicationState state={state} />,
+                    },
+                ];
+            },
         };
 
         const pathTypeOverview = (PathType && getPathTypeOverview[PathType]?.()) || [];

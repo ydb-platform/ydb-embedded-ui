@@ -20,6 +20,7 @@ import {AsyncReplicationInfo} from './AsyncReplicationInfo';
 import {ChangefeedInfo} from './ChangefeedInfo';
 import {TableInfo} from './TableInfo';
 import {TopicInfo} from './TopicInfo';
+import {TransferInfo} from './TransferInfo';
 
 interface OverviewProps {
     type?: EPathType;
@@ -94,6 +95,7 @@ function Overview({type, path, database}: OverviewProps) {
             [EPathType.EPathTypeExternalDataSource]: () => <ExternalDataSourceInfo data={data} />,
             [EPathType.EPathTypeView]: () => <ViewInfo data={data} />,
             [EPathType.EPathTypeReplication]: () => <AsyncReplicationInfo data={data} />,
+            [EPathType.EPathTypeTransfer]: () => <TransferInfo data={data} />,
         };
 
         return (type && pathTypeToComponent[type]?.()) || <TableInfo data={data} type={type} />;
