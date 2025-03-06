@@ -39,7 +39,8 @@ interface Window {
     meta_backend?: string;
     code_assist_backend?: string;
 
-    userSettings?: import('../services/settings').SettingsObject;
+    react_app_disable_checks?: boolean;
+
     systemSettings?: import('../services/settings').SettingsObject;
 
     api: import('../services/api/index').YdbEmbeddedAPI;
