@@ -1,8 +1,10 @@
 import React from 'react';
 
+import {
+    TOP_SHARDS_COLUMNS_IDS,
+    getTopShardsColumnSortField,
+} from '../../../../components/ShardsTable/constants';
 import {prepareBackendSortFieldsFromTableSort, useTableSort} from '../../../../utils/hooks';
-
-import {TOP_SHARDS_COLUMNS_IDS, getTopShardsColumnSortField} from './columns/constants';
 
 export function useTopShardSort() {
     const [tableSort, handleTableSort] = useTableSort({

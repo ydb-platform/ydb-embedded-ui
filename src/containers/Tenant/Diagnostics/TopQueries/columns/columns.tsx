@@ -1,8 +1,8 @@
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column} from '@gravity-ui/react-data-table';
 
+import {YqlHighlighter} from '../../../../../components/SyntaxHighlighter/YqlHighlighter';
 import {TruncatedQuery} from '../../../../../components/TruncatedQuery/TruncatedQuery';
-import {YqlHighlighter} from '../../../../../components/YqlHighlighter/YqlHighlighter';
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {cn} from '../../../../../utils/cn';
 import {formatDateTime, formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
@@ -137,12 +137,7 @@ export function getTopQueriesColumns() {
 }
 
 export function getTenantOverviewTopQueriesColumns() {
-    const columns = [queryHashColumn, oneLineQueryTextColumn, cpuTimeUsColumn];
-
-    return columns.map((column) => ({
-        ...column,
-        sortable: false,
-    }));
+    return [queryHashColumn, oneLineQueryTextColumn, cpuTimeUsColumn];
 }
 
 export function getRunningQueriesColumns() {

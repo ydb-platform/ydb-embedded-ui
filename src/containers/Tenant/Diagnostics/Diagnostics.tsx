@@ -98,7 +98,7 @@ function Diagnostics(props: DiagnosticsProps) {
                 return <TopQueries tenantName={tenantName} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.topShards: {
-                return <TopShards tenantName={tenantName} path={path} type={type} />;
+                return <TopShards tenantName={tenantName} path={path} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.nodes: {
                 return (

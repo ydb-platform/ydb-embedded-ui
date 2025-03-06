@@ -265,21 +265,7 @@ const getDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => ({
 });
 
 export const getStorageTopGroupsColumns: StorageColumnsGetter = () => {
-    const columns = [
-        groupIdColumn,
-        typeColumn,
-        erasureColumn,
-        usageColumn,
-        usedColumn,
-        limitColumn,
-    ];
-
-    return columns.map((column) => {
-        return {
-            ...column,
-            sortable: false,
-        };
-    });
+    return [groupIdColumn, typeColumn, erasureColumn, usageColumn, usedColumn, limitColumn];
 };
 
 export const getStorageGroupsColumns: StorageColumnsGetter = (data) => {
