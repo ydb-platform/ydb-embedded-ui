@@ -2,6 +2,7 @@ import React from 'react';
 
 import {useHistory, useLocation} from 'react-router-dom';
 
+import {ResizeableDataTable} from '../../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {parseQuery} from '../../../../../routes';
 import {
     setTopQueriesFilters,
@@ -14,6 +15,7 @@ import {
     TENANT_PAGES_IDS,
     TENANT_QUERY_TABS_ID,
 } from '../../../../../store/reducers/tenant/constants';
+import {TENANT_OVERVIEW_TABLES_SETTINGS} from '../../../../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../../../../utils/hooks';
 import {useChangeInputWithConfirmation} from '../../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {parseQueryErrorToString} from '../../../../../utils/query';
@@ -85,14 +87,19 @@ export function TopQueries({tenantName}: TopQueriesProps) {
 
     return (
         <TenantOverviewTableLayout
-            columnsWidthLSKey={TOP_QUERIES_COLUMNS_WIDTH_LS_KEY}
-            data={data || []}
-            columns={columns}
-            onRowClick={handleRowClick}
             title={title}
             loading={loading}
             error={parseQueryErrorToString(error)}
-            rowClassName={() => b('top-queries-row')}
-        />
+            withData={Boolean(currentData)}
+        >
+            <ResizeableDataTable
+                columnsWidthLSKey={TOP_QUERIES_COLUMNS_WIDTH_LS_KEY}
+                data={data}
+                columns={columns}
+                onRowClick={handleRowClick}
+                rowClassName={() => b('top-queries-row')}
+                settings={TENANT_OVERVIEW_TABLES_SETTINGS}
+            />
+        </TenantOverviewTableLayout>
     );
 }

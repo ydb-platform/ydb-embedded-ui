@@ -1,5 +1,6 @@
 import type {Column} from '@gravity-ui/react-data-table';
 
+import {ResizeableDataTable} from '../../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {
     getHostColumn,
     getNodeIdColumn,
@@ -15,7 +16,10 @@ import type {NodesPreparedEntity} from '../../../../../store/reducers/nodes/type
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import type {NodesRequiredField} from '../../../../../types/api/nodes';
-import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../../utils/constants';
+import {
+    TENANT_OVERVIEW_TABLES_LIMIT,
+    TENANT_OVERVIEW_TABLES_SETTINGS,
+} from '../../../../../utils/constants';
 import {useAutoRefreshInterval, useSearchQuery} from '../../../../../utils/hooks';
 import {getRequiredDataFields} from '../../../../../utils/tableUtils/getRequiredDataFields';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
@@ -34,15 +38,10 @@ function getTopNodesByCpuColumns(
         hostColumn,
     ];
 
-    const preparedColumns = columns.map((column) => ({
-        ...column,
-        sortable: false,
-    }));
-
-    const columnsIds = preparedColumns.map((column) => column.name);
+    const columnsIds = columns.map((column) => column.name);
     const dataFieldsRequired = getRequiredDataFields(columnsIds, NODES_COLUMNS_TO_DATA_FIELDS);
 
-    return [preparedColumns, dataFieldsRequired];
+    return [columns, dataFieldsRequired];
 }
 
 interface TopNodesByCpuProps {
@@ -86,13 +85,18 @@ export function TopNodesByCpu({tenantName, additionalNodesProps}: TopNodesByCpuP
 
     return (
         <TenantOverviewTableLayout
-            columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
-            data={topNodes}
-            columns={columns}
             title={title}
             loading={loading}
             error={error}
-            emptyDataMessage={i18n('top-nodes.empty-data')}
-        />
+            withData={Boolean(currentData)}
+        >
+            <ResizeableDataTable
+                columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
+                data={topNodes}
+                columns={columns}
+                emptyDataMessage={i18n('top-nodes.empty-data')}
+                settings={TENANT_OVERVIEW_TABLES_SETTINGS}
+            />
+        </TenantOverviewTableLayout>
     );
 }

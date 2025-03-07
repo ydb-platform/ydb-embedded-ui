@@ -4,9 +4,11 @@ import {useLocation} from 'react-router-dom';
 
 import {CellWithPopover} from '../../../../../components/CellWithPopover/CellWithPopover';
 import {LinkToSchemaObject} from '../../../../../components/LinkToSchemaObject/LinkToSchemaObject';
+import {ResizeableDataTable} from '../../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {topTablesApi} from '../../../../../store/reducers/tenantOverview/executeTopTables/executeTopTables';
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {formatBytes, getBytesSizeUnit} from '../../../../../utils/bytesParsers';
+import {TENANT_OVERVIEW_TABLES_SETTINGS} from '../../../../../utils/constants';
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../../utils/query';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
@@ -44,14 +46,12 @@ export function TopTables({path}: TopTablesProps) {
         {
             name: 'Size',
             width: 100,
-            sortable: false,
             render: ({row}) => formatSize(Number(row.Size)),
             align: DataTable.RIGHT,
         },
         {
             name: 'Path',
             width: 700,
-            sortable: false,
             render: ({row}) =>
                 row.Path ? (
                     <CellWithPopover content={row.Path}>
@@ -69,12 +69,17 @@ export function TopTables({path}: TopTablesProps) {
 
     return (
         <TenantOverviewTableLayout
-            columnsWidthLSKey={TOP_TABLES_COLUMNS_WIDTH_LS_KEY}
-            data={data || []}
-            columns={columns}
             title={title}
             loading={loading}
             error={parseQueryErrorToString(error)}
-        />
+            withData={Boolean(currentData)}
+        >
+            <ResizeableDataTable
+                columnsWidthLSKey={TOP_TABLES_COLUMNS_WIDTH_LS_KEY}
+                data={data}
+                columns={columns}
+                settings={TENANT_OVERVIEW_TABLES_SETTINGS}
+            />
+        </TenantOverviewTableLayout>
     );
 }
