@@ -48,10 +48,10 @@ module.exports = {
             }),
         );
 
-        // Add DefinePlugin to expose just the version
+        // Add DefinePlugin to expose just the version as a global variable
         config.plugins.push(
             new webpack.DefinePlugin({
-                'process.env.UI_VERSION': JSON.stringify(packageJson.version),
+                __UI_VERSION__: JSON.stringify(packageJson.version),
             }),
         );
 

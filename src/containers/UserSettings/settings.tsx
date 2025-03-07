@@ -141,7 +141,7 @@ export const autocompleteOnEnterSetting: SettingProps = {
 export const interfaceVersionInfoField: SettingsInfoFieldProps = {
     title: i18n('settings.about.interfaceVersionInfoField.title'),
     type: 'info',
-    content: process.env.UI_VERSION,
+    content: __UI_VERSION__,
 };
 
 export const appearanceSection: SettingsSection = {
