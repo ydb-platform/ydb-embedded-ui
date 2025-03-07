@@ -1,11 +1,12 @@
 import type {TClusterInfoV2, TStorageStats} from '../../../types/api/cluster';
 import type {ExecuteQueryResponse, KeyValueRow} from '../../../types/api/query';
+import {QUERY_TECHNICAL_MARK} from '../../../utils/constants';
 import {parseQueryAPIResponse} from '../../../utils/query';
 
 import type {ClusterGroupsStats} from './types';
 
 export const createSelectClusterGroupsQuery = (clusterRoot: string) => {
-    return `
+    return `${QUERY_TECHNICAL_MARK}
 SELECT 
     PDiskFilter,
     ErasureSpecies,
@@ -13,8 +14,8 @@ SELECT
     CurrentAllocatedSize,
     CurrentGroupsCreated,
     AvailableGroupsToCreate
-    FROM \`${clusterRoot}/.sys/ds_storage_stats\`
-    ORDER BY CurrentGroupsCreated DESC;
+FROM \`${clusterRoot}/.sys/ds_storage_stats\`
+ORDER BY CurrentGroupsCreated DESC;
 `;
 };
 
