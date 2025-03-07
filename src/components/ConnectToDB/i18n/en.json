@@ -5,7 +5,6 @@
   "documentation": "Documentation",
 
   "close": "Close",
-  "copy": "Copy",
 
   "docs_bash": "https://ydb.tech/docs/en/concepts/connect",
   "docs_cpp": "https://ydb.tech/docs/en/dev/example-app/example-cpp",

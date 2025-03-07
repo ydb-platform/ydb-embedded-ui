@@ -1,7 +1,7 @@
 import type {DefinitionListItem} from '@gravity-ui/components';
 
+import {YqlHighlighter} from '../../../../components/SyntaxHighlighter/YqlHighlighter';
 import {YDBDefinitionList} from '../../../../components/YDBDefinitionList/YDBDefinitionList';
-import {YqlHighlighter} from '../../../../components/YqlHighlighter/YqlHighlighter';
 import type {TEvDescribeSchemeResult} from '../../../../types/api/schema';
 import {getEntityName} from '../../utils';
 import i18n from '../i18n';
