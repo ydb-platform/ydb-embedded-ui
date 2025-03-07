@@ -68,7 +68,7 @@ function getPDiskInfo<T extends PreparedPDisk>({
             value: SerialNumber,
         });
     }
-    if (valueIsDefined(SharedWithOs)) {
+    if (SharedWithOs) {
         generalInfo.push({
             label: pDiskInfoKeyset('shared-with-os'),
             value: pDiskInfoKeyset('yes'),
