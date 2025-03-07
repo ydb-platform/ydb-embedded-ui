@@ -57,10 +57,16 @@ interface LocationComputeTablet {
     count: number;
 }
 
+interface LocationComputeSchema {
+    type?: string;
+    path?: string;
+}
+
 interface LocationCompute {
-    node: LocationNode;
-    pool: LocationComputePool;
+    node?: LocationNode;
+    pool?: LocationComputePool;
     tablet: LocationComputeTablet;
+    schema?: LocationComputeSchema;
 }
 
 interface LocationDatabase {
