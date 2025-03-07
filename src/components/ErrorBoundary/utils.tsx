@@ -1,5 +1,7 @@
 import {prepareErrorMessage} from '../../utils/prepareErrorMessage';
 
+import packageJson from '../../../package.json';
+
 export async function collectDiagnosticsData(error: Error) {
     return await getBackendVersion().then((backendVersion) => {
         return {
@@ -9,7 +11,7 @@ export async function collectDiagnosticsData(error: Error) {
                 message: prepareErrorMessage(error),
                 stack: prepareErrorStack(error.stack, {trim: true, maxLines: 10}),
             },
-            uiVersion: process.env.UI_VERSION,
+            uiVersion: packageJson.version,
             backendVersion,
         };
     });
