@@ -1,5 +1,22 @@
 # Changelog
 
+## [8.14.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.13.0...v8.14.0) (2025-03-07)
+
+
+### Features
+
+* create Api directly with YdbEmbeddedAPI class ([#1998](https://github.com/ydb-platform/ydb-embedded-ui/issues/1998)) ([b139eb5](https://github.com/ydb-platform/ydb-embedded-ui/commit/b139eb5fe5ac62175227b63dceac8e9889bdb588))
+* support transfer ([#1995](https://github.com/ydb-platform/ydb-embedded-ui/issues/1995)) ([966ff4b](https://github.com/ydb-platform/ydb-embedded-ui/commit/966ff4b6fc5e32ae7fafc4e865949bb02c3a5f01))
+* **TopShards:** colorize usage ([#2003](https://github.com/ydb-platform/ydb-embedded-ui/issues/2003)) ([dde82b0](https://github.com/ydb-platform/ydb-embedded-ui/commit/dde82b0769fa728b4b22f09ce6b40df4a9f86a15))
+
+
+### Bug Fixes
+
+* fix undefined process in package ([#1997](https://github.com/ydb-platform/ydb-embedded-ui/issues/1997)) ([0b6b99d](https://github.com/ydb-platform/ydb-embedded-ui/commit/0b6b99d2bcd0d3d00af40c01beff095ba8ae4d7e))
+* **LinkWithIcon:** make inline ([#2002](https://github.com/ydb-platform/ydb-embedded-ui/issues/2002)) ([290bb18](https://github.com/ydb-platform/ydb-embedded-ui/commit/290bb183a98a21e74b49ae419cd64ed10074728e))
+* **PDiskInfo:** display SharedWithOs only when true ([#1991](https://github.com/ydb-platform/ydb-embedded-ui/issues/1991)) ([7c21d71](https://github.com/ydb-platform/ydb-embedded-ui/commit/7c21d71c6fcf272da2329977be1af9671913372e))
+* **TopShards:** display table for column entities ([#1999](https://github.com/ydb-platform/ydb-embedded-ui/issues/1999)) ([6b28803](https://github.com/ydb-platform/ydb-embedded-ui/commit/6b2880321f437a40be52f0b78207390c9019ad93))
+
 ## [8.13.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.12.0...v8.13.0) (2025-02-28)
 
 
