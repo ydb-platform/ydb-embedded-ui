@@ -9,6 +9,7 @@ import {LinkToSchemaObject} from '../LinkToSchemaObject/LinkToSchemaObject';
 import {TabletNameWrapper} from '../TabletNameWrapper/TabletNameWrapper';
 import {UsageLabel} from '../UsageLabel/UsageLabel';
 
+import type {TopShardsColumnId} from './constants';
 import {TOP_SHARDS_COLUMNS_IDS, TOP_SHARDS_COLUMNS_TITLES} from './constants';
 import type {GetShardsColumn} from './types';
 import {prepareDateTimeValue} from './utils';
@@ -100,7 +101,7 @@ export const getIntervalEndColumn: GetShardsColumn = () => {
     };
 };
 
-export const shardsColumnIdToGetColumn = {
+export const shardsColumnIdToGetColumn: Record<TopShardsColumnId, GetShardsColumn> = {
     [TOP_SHARDS_COLUMNS_IDS.Path]: getPathColumn,
     [TOP_SHARDS_COLUMNS_IDS.DataSize]: getDataSizeColumn,
     [TOP_SHARDS_COLUMNS_IDS.TabletId]: getTabletIdColumn,

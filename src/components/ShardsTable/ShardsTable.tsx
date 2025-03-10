@@ -19,10 +19,10 @@ export function ShardsTable({columnsIds, schemaPath, database, ...props}: Shards
     const columns = React.useMemo(
         () =>
             columnsIds
+                .filter((id) => id in shardsColumnIdToGetColumn)
                 .map((id) => {
-                    return shardsColumnIdToGetColumn[id]({database, schemaPath});
-                })
-                .map((column) => {
+                    const column = shardsColumnIdToGetColumn[id]({database, schemaPath});
+
                     return {
                         ...column,
                         sortable: isSortableTopShardsColumn(column.name),
