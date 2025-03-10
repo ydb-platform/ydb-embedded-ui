@@ -70,7 +70,7 @@ export function YDBSyntaxHighlighter({
     };
 
     return (
-        <div className={b('wrapper', className)}>
+        <div className={b(null, className)}>
             {renderCopyButton()}
 
             <ReactSyntaxHighlighter
