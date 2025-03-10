@@ -1,11 +1,10 @@
 import React from 'react';
 
-import type {Column, Settings} from '@gravity-ui/react-data-table';
-import DataTable from '@gravity-ui/react-data-table';
-import {useLocation} from 'react-router-dom';
+import type {Settings} from '@gravity-ui/react-data-table';
 
+import {useComponent} from '../../../../components/ComponentsProvider/ComponentsProvider';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
-import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
+import type {TopShardsColumnId} from '../../../../components/ShardsTable/constants';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {
     setShardsQueryFilters,
@@ -13,20 +12,12 @@ import {
 } from '../../../../store/reducers/shardsWorkload/shardsWorkload';
 import {EShardsWorkloadMode} from '../../../../store/reducers/shardsWorkload/types';
 import type {ShardsWorkloadFilters} from '../../../../store/reducers/shardsWorkload/types';
-import type {CellValue, KeyValueRow} from '../../../../types/api/query';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
-import {formatDateTime} from '../../../../utils/dataFormatters/dataFormatters';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../utils/query';
 
 import {Filters} from './Filters';
-import {getShardsWorkloadColumns} from './columns/columns';
-import {
-    TOP_SHARDS_COLUMNS_IDS,
-    TOP_SHARDS_COLUMNS_WIDTH_LS_KEY,
-    isSortableTopShardsColumn,
-} from './columns/constants';
 import i18n from './i18n';
 import {useTopShardSort} from './utils';
 
@@ -39,15 +30,8 @@ const TABLE_SETTINGS: Settings = {
     dynamicRender: false, // no more than 20 rows
     externalSort: true,
     disableSortReset: true,
-    defaultOrder: DataTable.DESCENDING,
+    defaultOrder: -1,
 };
-
-function prepareDateTimeValue(value: CellValue) {
-    if (!value) {
-        return '–';
-    }
-    return formatDateTime(new Date(value).getTime());
-}
 
 function fillDateRangeFor(value: ShardsWorkloadFilters) {
     value.to = 'now';
@@ -61,8 +45,9 @@ interface TopShardsProps {
 }
 
 export const TopShards = ({tenantName, path}: TopShardsProps) => {
+    const ShardsTable = useComponent('ShardsTable');
+
     const dispatch = useTypedDispatch();
-    const location = useLocation();
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
@@ -123,33 +108,27 @@ export const TopShards = ({tenantName, path}: TopShardsProps) => {
         setFilters((state) => ({...state, ...newStateValue}));
     };
 
-    const tableColumns = React.useMemo(() => {
-        const rawColumns: Column<KeyValueRow>[] = getShardsWorkloadColumns(tenantName, location);
-
-        const columns: Column<KeyValueRow>[] = rawColumns.map((column) => ({
-            ...column,
-            sortable: isSortableTopShardsColumn(column.name),
-        }));
+    const columnsIds = React.useMemo(() => {
+        let columns: TopShardsColumnId[];
 
         if (filters.mode === EShardsWorkloadMode.History) {
-            // after NodeId
-            columns.splice(5, 0, {
-                name: TOP_SHARDS_COLUMNS_IDS.PeakTime,
-                render: ({row}) => {
-                    return prepareDateTimeValue(row.PeakTime);
-                },
-                sortable: false,
-            });
-            columns.push({
-                name: TOP_SHARDS_COLUMNS_IDS.IntervalEnd,
-                render: ({row}) => {
-                    return prepareDateTimeValue(row.IntervalEnd);
-                },
-            });
+            // Add PeakTime and IntervalEnd columns
+            columns = [
+                'Path',
+                'CPUCores',
+                'DataSize',
+                'TabletId',
+                'NodeId',
+                'PeakTime',
+                'InFlightTxCount',
+                'IntervalEnd',
+            ];
+        } else {
+            columns = ['Path', 'CPUCores', 'DataSize', 'TabletId', 'NodeId', 'InFlightTxCount'];
         }
 
         return columns;
-    }, [filters.mode, location, tenantName]);
+    }, [filters.mode]);
 
     const renderControls = () => {
         return <Filters value={filters} onChange={handleFiltersChange} />;
@@ -161,9 +140,10 @@ export const TopShards = ({tenantName, path}: TopShardsProps) => {
         }
 
         return (
-            <ResizeableDataTable
-                columnsWidthLSKey={TOP_SHARDS_COLUMNS_WIDTH_LS_KEY}
-                columns={tableColumns}
+            <ShardsTable
+                database={tenantName}
+                schemaPath={path}
+                columnsIds={columnsIds}
                 data={data}
                 settings={TABLE_SETTINGS}
                 onSort={handleTableSort}

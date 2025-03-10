@@ -1,6 +1,5 @@
 import type {Column} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
-import {useLocation} from 'react-router-dom';
 
 import {CellWithPopover} from '../../../../../components/CellWithPopover/CellWithPopover';
 import {LinkToSchemaObject} from '../../../../../components/LinkToSchemaObject/LinkToSchemaObject';
@@ -24,8 +23,6 @@ interface TopTablesProps {
 const TOP_TABLES_COLUMNS_WIDTH_LS_KEY = 'topTablesTableColumnsWidth';
 
 export function TopTables({database}: TopTablesProps) {
-    const location = useLocation();
-
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {currentData, error, isFetching} = topTablesApi.useGetTopTablesQuery(
@@ -55,9 +52,7 @@ export function TopTables({database}: TopTablesProps) {
             render: ({row}) =>
                 row.Path ? (
                     <CellWithPopover content={row.Path}>
-                        <LinkToSchemaObject path={String(row.Path)} location={location}>
-                            {row.Path}
-                        </LinkToSchemaObject>
+                        <LinkToSchemaObject path={String(row.Path)}>{row.Path}</LinkToSchemaObject>
                     </CellWithPopover>
                 ) : null,
         },
