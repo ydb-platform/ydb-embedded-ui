@@ -1,13 +1,11 @@
-import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
+import {QUERY_TECHNICAL_MARK, TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
 import {isQueryErrorResponse, parseQueryAPIResponse} from '../../../../utils/query';
 import {api} from '../../api';
 
-function createShardQuery(path: string, tenantName?: string) {
-    const pathSelect = tenantName
-        ? `CAST(SUBSTRING(CAST(Path AS String), ${tenantName.length}) AS Utf8) AS Path`
-        : 'Path';
-
-    return `SELECT
+function createShardQuery(path: string, database: string) {
+    const pathSelect = `CAST(SUBSTRING(CAST(Path AS String), ${database.length}) AS Utf8) AS Path`;
+    return `${QUERY_TECHNICAL_MARK}
+SELECT
     ${pathSelect},
     TabletId,
     CPUCores,

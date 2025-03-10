@@ -3,6 +3,7 @@ import type {SortOrder} from '@gravity-ui/react-data-table';
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
+import {QUERY_TECHNICAL_MARK} from '../../../utils/constants';
 import {prepareOrderByFromTableSort} from '../../../utils/hooks/useTableSort';
 import {isQueryErrorResponse, parseQueryAPIResponse} from '../../../utils/query';
 import {api} from '../api';
@@ -37,13 +38,11 @@ function getFiltersConditions(filters?: ShardsWorkloadFilters) {
 
 function createShardQueryHistorical(
     path: string,
+    database: string,
     filters?: ShardsWorkloadFilters,
     sortOrder?: SortOrder[],
-    tenantName?: string,
 ) {
-    const pathSelect = tenantName
-        ? `CAST(SUBSTRING(CAST(Path AS String), ${tenantName.length}) AS Utf8) AS Path`
-        : 'Path';
+    const pathSelect = `CAST(SUBSTRING(CAST(Path AS String), ${database.length}) AS Utf8) AS Path`;
 
     let where = `Path='${path}' OR Path LIKE '${path}/%'`;
 
@@ -54,7 +53,8 @@ function createShardQueryHistorical(
 
     const orderBy = prepareOrderByFromTableSort(sortOrder);
 
-    return `SELECT
+    return `${QUERY_TECHNICAL_MARK}    
+SELECT
     ${pathSelect},
     TabletId,
     CPUCores,
@@ -69,14 +69,13 @@ ${orderBy}
 LIMIT 20`;
 }
 
-function createShardQueryImmediate(path: string, sortOrder?: SortOrder[], tenantName?: string) {
-    const pathSelect = tenantName
-        ? `CAST(SUBSTRING(CAST(Path AS String), ${tenantName.length}) AS Utf8) AS Path`
-        : 'Path';
+function createShardQueryImmediate(path: string, database: string, sortOrder?: SortOrder[]) {
+    const pathSelect = `CAST(SUBSTRING(CAST(Path AS String), ${database.length}) AS Utf8) AS Path`;
 
     const orderBy = prepareOrderByFromTableSort(sortOrder);
 
-    return `SELECT
+    return `${QUERY_TECHNICAL_MARK}    
+SELECT
     ${pathSelect},
     TabletId,
     CPUCores,
@@ -110,7 +109,7 @@ export const {setShardsQueryFilters} = slice.actions;
 export default slice.reducer;
 
 interface SendShardQueryParams {
-    database?: string;
+    database: string;
     path?: string;
     sortOrder?: SortOrder[];
     filters?: ShardsWorkloadFilters;
@@ -128,12 +127,12 @@ export const shardApi = api.injectEndpoints({
                         {
                             query:
                                 filters?.mode === EShardsWorkloadMode.Immediate
-                                    ? createShardQueryImmediate(path, sortOrder, database)
+                                    ? createShardQueryImmediate(path, database, sortOrder)
                                     : createShardQueryHistorical(
                                           path,
+                                          database,
                                           filters,
                                           sortOrder,
-                                          database,
                                       ),
                             database,
                             action: queryAction,

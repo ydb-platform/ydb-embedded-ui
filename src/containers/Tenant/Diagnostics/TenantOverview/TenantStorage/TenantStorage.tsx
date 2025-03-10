@@ -68,7 +68,7 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
         <React.Fragment>
             <TenantDashboard database={tenantName} charts={storageDashboardConfig} />
             <InfoViewer className={b('storage-info')} title="Storage details" info={info} />
-            <TopTables path={tenantName} />
+            <TopTables database={tenantName} />
             <TopGroups tenant={tenantName} />
         </React.Fragment>
     );
