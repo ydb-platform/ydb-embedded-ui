@@ -1,6 +1,6 @@
 import type {DefinitionListItem} from '@gravity-ui/components';
 
-import {YqlHighlighter} from '../../../../components/SyntaxHighlighter/YqlHighlighter';
+import {YDBSyntaxHighlighter} from '../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
 import {YDBDefinitionList} from '../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {TEvDescribeSchemeResult} from '../../../../types/api/schema';
 import {getEntityName} from '../../utils';
@@ -13,7 +13,7 @@ const prepareViewItems = (data: TEvDescribeSchemeResult): DefinitionListItem[] =
         {
             name: i18n('view.query-text'),
             copyText: queryText,
-            content: queryText ? <YqlHighlighter>{queryText}</YqlHighlighter> : null,
+            content: queryText ? <YDBSyntaxHighlighter language="yql" text={queryText} /> : null,
         },
     ];
 };

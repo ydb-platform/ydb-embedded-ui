@@ -1,7 +1,7 @@
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column} from '@gravity-ui/react-data-table';
 
-import {YqlHighlighter} from '../../../../../components/SyntaxHighlighter/YqlHighlighter';
+import {YDBSyntaxHighlighter} from '../../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
 import {TruncatedQuery} from '../../../../../components/TruncatedQuery/TruncatedQuery';
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {cn} from '../../../../../utils/cn';
@@ -80,7 +80,9 @@ const userSIDColumn: Column<KeyValueRow> = {
 const oneLineQueryTextColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.OneLineQueryText,
     header: TOP_QUERIES_COLUMNS_TITLES.OneLineQueryText,
-    render: ({row}) => <YqlHighlighter>{row.QueryText?.toString() || ''}</YqlHighlighter>,
+    render: ({row}) => (
+        <YDBSyntaxHighlighter language="yql" text={row.QueryText?.toString() || ''} />
+    ),
     sortable: false,
     width: 500,
 };

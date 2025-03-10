@@ -1,13 +1,8 @@
+import React from 'react';
+
 import {ClipboardButton} from '@gravity-ui/uikit';
+import {nanoid} from '@reduxjs/toolkit';
 import {PrismLight as ReactSyntaxHighlighter} from 'react-syntax-highlighter';
-import bash from 'react-syntax-highlighter/dist/esm/languages/prism/bash';
-import cpp from 'react-syntax-highlighter/dist/esm/languages/prism/cpp';
-import csharp from 'react-syntax-highlighter/dist/esm/languages/prism/csharp';
-import go from 'react-syntax-highlighter/dist/esm/languages/prism/go';
-import java from 'react-syntax-highlighter/dist/esm/languages/prism/java';
-import javascript from 'react-syntax-highlighter/dist/esm/languages/prism/javascript';
-import php from 'react-syntax-highlighter/dist/esm/languages/prism/php';
-import python from 'react-syntax-highlighter/dist/esm/languages/prism/python';
 
 import i18n from './i18n';
 import {b} from './shared';
@@ -17,15 +12,16 @@ import {yql} from './yql';
 
 import './YDBSyntaxHighlighter.scss';
 
-ReactSyntaxHighlighter.registerLanguage('bash', bash);
-ReactSyntaxHighlighter.registerLanguage('cpp', cpp);
-ReactSyntaxHighlighter.registerLanguage('csharp', csharp);
-ReactSyntaxHighlighter.registerLanguage('go', go);
-ReactSyntaxHighlighter.registerLanguage('java', java);
-ReactSyntaxHighlighter.registerLanguage('javascript', javascript);
-ReactSyntaxHighlighter.registerLanguage('php', php);
-ReactSyntaxHighlighter.registerLanguage('python', python);
-ReactSyntaxHighlighter.registerLanguage('yql', yql);
+async function registerLanguage(lang: Language) {
+    if (lang === 'yql') {
+        ReactSyntaxHighlighter.registerLanguage('yql', yql);
+    } else {
+        const {default: syntax} = await import(
+            `react-syntax-highlighter/dist/esm/languages/prism/${lang}`
+        );
+        ReactSyntaxHighlighter.registerLanguage(lang, syntax);
+    }
+}
 
 type YDBSyntaxHighlighterProps = {
     text: string;
@@ -39,10 +35,20 @@ export function YDBSyntaxHighlighter({
     text,
     language,
     className,
-    transparentBackground,
+    transparentBackground = true,
     withCopy,
 }: YDBSyntaxHighlighterProps) {
+    const [highlighterKey, setHighlighterKey] = React.useState('');
+
     const style = useSyntaxHighlighterStyle(transparentBackground);
+
+    React.useEffect(() => {
+        async function registerLangAndUpdateKey() {
+            await registerLanguage(language);
+            setHighlighterKey(nanoid());
+        }
+        registerLangAndUpdateKey();
+    }, [language]);
 
     const renderCopyButton = () => {
         if (withCopy) {
@@ -68,6 +74,7 @@ export function YDBSyntaxHighlighter({
             {renderCopyButton()}
 
             <ReactSyntaxHighlighter
+                key={highlighterKey}
                 language={language}
                 style={style}
                 customStyle={{height: '100%'}}
