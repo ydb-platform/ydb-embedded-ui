@@ -1,5 +1,14 @@
 # Changelog
 
+## [8.15.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.14.0...v8.15.0) (2025-03-10)
+
+
+### Features
+
+* add QUERY_TECHNICAL_MARK to all UI queries ([#1992](https://github.com/ydb-platform/ydb-embedded-ui/issues/1992)) ([6d53518](https://github.com/ydb-platform/ydb-embedded-ui/commit/6d535186247307f40b01386a850bf30ffb9ffb93))
+* add ShardsTable to componentsRegistry ([#1993](https://github.com/ydb-platform/ydb-embedded-ui/issues/1993)) ([a390679](https://github.com/ydb-platform/ydb-embedded-ui/commit/a390679234d1085b5e19e1933691a60414a450d8))
+* **YDBSyntaxHighlighter:** separate component, load languages on demand ([#2004](https://github.com/ydb-platform/ydb-embedded-ui/issues/2004)) ([a544def](https://github.com/ydb-platform/ydb-embedded-ui/commit/a544deff6db5539f5622111519f770a2c474377b))
+
 ## [8.14.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.13.0...v8.14.0) (2025-03-07)
 
 
