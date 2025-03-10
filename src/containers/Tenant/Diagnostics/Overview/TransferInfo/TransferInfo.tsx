@@ -2,8 +2,8 @@ import type {DefinitionListItem} from '@gravity-ui/components';
 import {Flex, Text} from '@gravity-ui/uikit';
 
 import {AsyncReplicationState} from '../../../../../components/AsyncReplicationState';
+import {YDBSyntaxHighlighter} from '../../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
-import {YqlHighlighter} from '../../../../../components/YqlHighlighter/YqlHighlighter';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {getEntityName} from '../../../utils';
 
@@ -92,7 +92,9 @@ function prepareTransferItems(data: TEvDescribeSchemeResult) {
     info.push({
         name: i18n('transformLambda.label'),
         copyText: transformLambda,
-        content: transformLambda ? <YqlHighlighter>{transformLambda}</YqlHighlighter> : null,
+        content: transformLambda ? (
+            <YDBSyntaxHighlighter language="yql" text={transformLambda} />
+        ) : null,
     });
 
     return info;

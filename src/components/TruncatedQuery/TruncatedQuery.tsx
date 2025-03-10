@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {cn} from '../../utils/cn';
-import {YqlHighlighter} from '../YqlHighlighter/YqlHighlighter';
+import {YDBSyntaxHighlighter} from '../SyntaxHighlighter/YDBSyntaxHighlighter';
 
 import './TruncatedQuery.scss';
 
@@ -22,10 +22,10 @@ export const TruncatedQuery = ({value = '', maxQueryHeight = 6}: TruncatedQueryP
             '\n...\nThe request was truncated. Click on the line to show the full query on the query tab';
         return (
             <React.Fragment>
-                <YqlHighlighter className={b()}>{content}</YqlHighlighter>
+                <YDBSyntaxHighlighter language="yql" className={b()} text={content} />
                 <span className={b('message', {color: 'secondary'})}>{message}</span>
             </React.Fragment>
         );
     }
-    return <YqlHighlighter>{value}</YqlHighlighter>;
+    return <YDBSyntaxHighlighter language="yql" text={value} />;
 };

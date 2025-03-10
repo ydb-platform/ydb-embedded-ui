@@ -1,12 +1,10 @@
-@use '../../../styles/mixins.scss';
+@use '../../styles/mixins.scss';
 
-.ydb-connect-to-db-syntax-highlighter {
-    &__wrapper {
-        position: relative;
-        z-index: 0;
+.ydb-syntax-highlighter {
+    position: relative;
+    z-index: 0;
 
-        height: 100%;
-    }
+    height: 100%;
 
     &__sticky-container {
         z-index: 1;
