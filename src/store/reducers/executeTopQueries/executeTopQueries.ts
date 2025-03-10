@@ -26,8 +26,8 @@ const slice = createSlice({
 export const {setTopQueriesFilters} = slice.actions;
 export default slice.reducer;
 
-const getQueryText = (database: string, filters?: TopQueriesFilters, sortOrder?: SortOrder[]) => {
-    const filterConditions = getFiltersConditions(database, filters);
+const getQueryText = (filters?: TopQueriesFilters, sortOrder?: SortOrder[]) => {
+    const filterConditions = getFiltersConditions(filters);
 
     const orderBy = prepareOrderByFromTableSort(sortOrder);
 
@@ -41,18 +41,14 @@ SELECT
     ReadBytes,
     UserSID,
     Duration
-FROM \`${database}/.sys/top_queries_by_cpu_time_one_hour\`
+FROM \`.sys/top_queries_by_cpu_time_one_hour\`
 WHERE ${filterConditions || 'true'} AND QueryText NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
 ${orderBy}
 LIMIT 100
 `;
 };
 
-function getRunningQueriesText(
-    database: string,
-    filters?: TopQueriesFilters,
-    sortOrder?: SortOrder[],
-) {
+function getRunningQueriesText(filters?: TopQueriesFilters, sortOrder?: SortOrder[]) {
     const filterConditions = filters?.text
         ? `Query ILIKE '%${filters.text}%' OR UserSID ILIKE '%${filters.text}%'`
         : '';
@@ -65,7 +61,7 @@ SELECT
     QueryStartAt, 
     Query as QueryText, 
     ApplicationName
-FROM \`${database}/.sys/query_sessions\`
+FROM \`.sys/query_sessions\`
 WHERE ${filterConditions || 'true'} AND Query NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
 ${orderBy}
 LIMIT 100`;
@@ -90,7 +86,7 @@ export const topQueriesApi = api.injectEndpoints({
                 try {
                     const response = await window.api.viewer.sendQuery(
                         {
-                            query: getQueryText(database, preparedFilters, sortOrder),
+                            query: getQueryText(preparedFilters, sortOrder),
                             database,
                             action: 'execute-scan',
                         },
@@ -126,7 +122,7 @@ export const topQueriesApi = api.injectEndpoints({
                 try {
                     const response = await window.api.viewer.sendQuery(
                         {
-                            query: getRunningQueriesText(database, filters, sortOrder),
+                            query: getRunningQueriesText(filters, sortOrder),
                             database,
                             action: 'execute-scan',
                         },

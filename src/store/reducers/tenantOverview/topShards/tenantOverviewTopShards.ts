@@ -3,16 +3,13 @@ import {isQueryErrorResponse, parseQueryAPIResponse} from '../../../../utils/que
 import {api} from '../../api';
 
 function createShardQuery(path: string, database: string) {
-    const pathSelect = database
-        ? `CAST(SUBSTRING(CAST(Path AS String), ${database.length}) AS Utf8) AS Path`
-        : 'Path';
-
+    const pathSelect = `CAST(SUBSTRING(CAST(Path AS String), ${database.length}) AS Utf8) AS Path`;
     return `${QUERY_TECHNICAL_MARK}
 SELECT
     ${pathSelect},
     TabletId,
     CPUCores,
-FROM \`${database}/.sys/partition_stats\`
+FROM \`.sys/partition_stats\`
 WHERE
     Path='${path}'
     OR Path LIKE '${path}/%'

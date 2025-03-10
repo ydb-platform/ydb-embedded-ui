@@ -5,7 +5,7 @@ import {parseQueryAPIResponse} from '../../../utils/query';
 
 import type {ClusterGroupsStats} from './types';
 
-export const createSelectClusterGroupsQuery = (clusterRoot: string) => {
+export const createSelectClusterGroupsQuery = () => {
     return `${QUERY_TECHNICAL_MARK}
 SELECT 
     PDiskFilter,
@@ -14,7 +14,7 @@ SELECT
     CurrentAllocatedSize,
     CurrentGroupsCreated,
     AvailableGroupsToCreate
-FROM \`${clusterRoot}/.sys/ds_storage_stats\`
+FROM \`.sys/ds_storage_stats\`
 ORDER BY CurrentGroupsCreated DESC;
 `;
 };

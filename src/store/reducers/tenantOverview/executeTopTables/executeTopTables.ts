@@ -2,11 +2,11 @@ import {QUERY_TECHNICAL_MARK, TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../ut
 import {isQueryErrorResponse, parseQueryAPIResponse} from '../../../../utils/query';
 import {api} from '../../api';
 
-const getQueryText = (database: string) => {
+const getQueryText = () => {
     return `${QUERY_TECHNICAL_MARK}
 SELECT
     Path, SUM(DataSize) as Size
-FROM \`${database}/.sys/partition_stats\`
+FROM \`.sys/partition_stats\`
 GROUP BY Path
 ORDER BY Size DESC
 LIMIT ${TENANT_OVERVIEW_TABLES_LIMIT}
@@ -20,7 +20,7 @@ export const topTablesApi = api.injectEndpoints({
                 try {
                     const response = await window.api.viewer.sendQuery(
                         {
-                            query: getQueryText(database),
+                            query: getQueryText(),
                             database,
                             action: 'execute-scan',
                         },

@@ -42,9 +42,7 @@ function createShardQueryHistorical(
     filters?: ShardsWorkloadFilters,
     sortOrder?: SortOrder[],
 ) {
-    const pathSelect = database
-        ? `CAST(SUBSTRING(CAST(Path AS String), ${database.length}) AS Utf8) AS Path`
-        : 'Path';
+    const pathSelect = `CAST(SUBSTRING(CAST(Path AS String), ${database.length}) AS Utf8) AS Path`;
 
     let where = `Path='${path}' OR Path LIKE '${path}/%'`;
 
@@ -65,16 +63,14 @@ SELECT
     PeakTime,
     InFlightTxCount,
     IntervalEnd
-FROM \`${database}/.sys/top_partitions_one_hour\`
+FROM \`.sys/top_partitions_one_hour\`
 WHERE ${where}
 ${orderBy}
 LIMIT 20`;
 }
 
 function createShardQueryImmediate(path: string, database: string, sortOrder?: SortOrder[]) {
-    const pathSelect = database
-        ? `CAST(SUBSTRING(CAST(Path AS String), ${database.length}) AS Utf8) AS Path`
-        : 'Path';
+    const pathSelect = `CAST(SUBSTRING(CAST(Path AS String), ${database.length}) AS Utf8) AS Path`;
 
     const orderBy = prepareOrderByFromTableSort(sortOrder);
 
@@ -86,7 +82,7 @@ SELECT
     DataSize,
     NodeId,
     InFlightTxCount
-FROM \`${database}/.sys/partition_stats\`
+FROM \`.sys/partition_stats\`
 WHERE
     Path='${path}'
     OR Path LIKE '${path}/%'

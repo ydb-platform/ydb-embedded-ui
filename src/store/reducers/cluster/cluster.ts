@@ -87,7 +87,7 @@ export const clusterApi = api.injectEndpoints({
                     }
 
                     try {
-                        const query = createSelectClusterGroupsQuery(clusterRoot);
+                        const query = createSelectClusterGroupsQuery();
 
                         // Normally query request should be fulfilled within 300-400ms even on very big clusters
                         // Table with stats is supposed to be very small (less than 10 rows)
