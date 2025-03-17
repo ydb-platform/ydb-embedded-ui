@@ -106,11 +106,10 @@ const getAdditionalTenantsProps = (
 
     if (monitoring && getLogsLink) {
         additionalTenantsProps.getLogsLink = (dbName?: string) => {
-            if (dbName) {
+            if (dbName && clusterName) {
                 return getLogsLink({
                     dbName,
                     clusterName,
-                    monitoring,
                 });
             }
 

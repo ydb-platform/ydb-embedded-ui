@@ -1,4 +1,4 @@
-import {DefinitionList, PopoverBehavior} from '@gravity-ui/uikit';
+import {DefinitionList, Flex, PopoverBehavior} from '@gravity-ui/uikit';
 
 import {getTenantPath} from '../../containers/Tenant/TenantPages';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
@@ -49,15 +49,17 @@ export function TenantNameWrapper({tenant, additionalTenantsProps}: TenantNameWr
                 monitoringLink || logsLink ? (
                     <DefinitionList responsive>
                         <DefinitionList.Item name={i18n('field_links')}>
-                            {monitoringLink && (
-                                <LinkWithIcon
-                                    title={i18n('field_monitoring-link')}
-                                    url={monitoringLink}
-                                />
-                            )}
-                            {logsLink && (
-                                <LinkWithIcon title={i18n('field_logs-link')} url={logsLink} />
-                            )}
+                            <Flex gap={2} wrap="wrap">
+                                {monitoringLink && (
+                                    <LinkWithIcon
+                                        title={i18n('field_monitoring-link')}
+                                        url={monitoringLink}
+                                    />
+                                )}
+                                {logsLink && (
+                                    <LinkWithIcon title={i18n('field_logs-link')} url={logsLink} />
+                                )}
+                            </Flex>
                         </DefinitionList.Item>
                     </DefinitionList>
                 ) : null

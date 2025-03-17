@@ -1,4 +1,4 @@
-import {Loader} from '@gravity-ui/uikit';
+import {Flex, Loader} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {LogsButton} from '../../../../components/LogsButton/LogsButton';
@@ -157,11 +157,13 @@ export function TenantOverview({
         <div className={b()}>
             <div className={b('info')}>
                 <div className={b('top-label')}>{tenantType}</div>
-                <div className={b('top')}>
+                <Flex alignItems="center" gap="1" className={b('top')}>
                     {renderName()}
-                    {monitoringLink && <MonitoringButton href={monitoringLink} />}
-                    {logsLink && <LogsButton href={logsLink} />}
-                </div>
+                    <Flex gap="2">
+                        {monitoringLink && <MonitoringButton href={monitoringLink} />}
+                        {logsLink && <LogsButton href={logsLink} />}
+                    </Flex>
+                </Flex>
                 <MetricsCards
                     poolsCpuStats={poolsStats}
                     memoryStats={memoryStats}
