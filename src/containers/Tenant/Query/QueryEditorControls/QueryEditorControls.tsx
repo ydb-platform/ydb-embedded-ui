@@ -90,30 +90,28 @@ export const QueryEditorControls = ({
     const [cancelQueryError, setCancelQueryError] = React.useState<boolean>(false);
 
     const onStopButtonClick = React.useCallback(async () => {
-        if (queryId) {
-            try {
-                if (isStreamingEnabled) {
-                    queryManagerInstance.abortQuery();
-                } else if (queryId) {
-                    await sendCancelQuery({queryId, database: tenantName}).unwrap();
-                }
-            } catch {
-                createToast({
-                    name: 'stop-error',
-                    title: '',
-                    content: i18n('toaster.stop-error'),
-                    type: 'error',
-                    autoHiding: STOP_AUTO_HIDE_TIMEOUT,
-                });
-                setCancelQueryError(true);
-
-                if (cancelErrorAnimationRef.current) {
-                    window.clearTimeout(cancelErrorAnimationRef.current);
-                }
-                cancelErrorAnimationRef.current = window.setTimeout(() => {
-                    setCancelQueryError(false);
-                }, CANCEL_ERROR_ANIMATION_DURATION);
+        try {
+            if (isStreamingEnabled) {
+                queryManagerInstance.abortQuery();
+            } else if (queryId) {
+                await sendCancelQuery({queryId, database: tenantName}).unwrap();
             }
+        } catch {
+            createToast({
+                name: 'stop-error',
+                title: '',
+                content: i18n('toaster.stop-error'),
+                type: 'error',
+                autoHiding: STOP_AUTO_HIDE_TIMEOUT,
+            });
+            setCancelQueryError(true);
+
+            if (cancelErrorAnimationRef.current) {
+                window.clearTimeout(cancelErrorAnimationRef.current);
+            }
+            cancelErrorAnimationRef.current = window.setTimeout(() => {
+                setCancelQueryError(false);
+            }, CANCEL_ERROR_ANIMATION_DURATION);
         }
     }, [isStreamingEnabled, queryId, sendCancelQuery, tenantName]);
 
