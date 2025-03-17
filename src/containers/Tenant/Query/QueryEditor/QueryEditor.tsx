@@ -39,7 +39,7 @@ import {
 } from '../../../../utils/hooks';
 import {useChangedQuerySettings} from '../../../../utils/hooks/useChangedQuerySettings';
 import {useLastQueryExecutionSettings} from '../../../../utils/hooks/useLastQueryExecutionSettings';
-import {DEFAULT_QUERY_SETTINGS, QUERY_ACTIONS} from '../../../../utils/query';
+import {DEFAULT_QUERY_SETTINGS, QUERY_ACTIONS, QUERY_MODES} from '../../../../utils/query';
 import type {InitialPaneState} from '../../utils/paneVisibilityToggleHelpers';
 import {
     PaneVisibilityActionTypes,
@@ -93,7 +93,11 @@ export default function QueryEditor(props: QueryEditorProps) {
     );
     const [lastExecutedQueryText, setLastExecutedQueryText] = React.useState<string>('');
     const [isQueryStreamingEnabled] = useSetting<boolean>(ENABLE_QUERY_STREAMING);
-    const isStreamingEnabled = useStreamingAvailable() && isQueryStreamingEnabled;
+
+    const isStreamingEnabled =
+        useStreamingAvailable() &&
+        isQueryStreamingEnabled &&
+        querySettings.queryMode === QUERY_MODES.query;
 
     const [sendQuery] = queryApi.useUseSendQueryMutation();
     const [streamQuery] = queryApi.useUseStreamQueryMutation();
