@@ -4,12 +4,9 @@ import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
 import type {
     AdditionalClusterProps,
     AdditionalTenantsProps,
-    AdditionalVersionsProps,
     NodeAddress,
 } from '../../../types/additionalProps';
-import type {MetaClusterVersion} from '../../../types/api/meta';
 import type {ETenantType} from '../../../types/api/tenant';
-import {getVersionColors, getVersionMap} from '../../../utils/clusterVersionColors';
 import {cn} from '../../../utils/cn';
 import {USE_CLUSTER_BALANCER_AS_BACKEND_KEY} from '../../../utils/constants';
 import {useSetting} from '../../../utils/hooks';
@@ -18,7 +15,6 @@ import type {GetMonitoringClusterLink, GetMonitoringLink} from '../../../utils/m
 import {getCleanBalancerValue, removeViewerPathname} from '../../../utils/parseBalancer';
 import {getBackendFromNodeHost, getBackendFromRawNodeData} from '../../../utils/prepareBackend';
 import type {Cluster} from '../../Cluster/Cluster';
-import {useClusterVersions} from '../useClusterData';
 
 import './ExtendedCluster.scss';
 
@@ -59,16 +55,6 @@ const getAdditionalClusterProps = (
     }
 
     return additionalClusterProps;
-};
-
-const getAdditionalVersionsProps = (
-    versions: MetaClusterVersion[] = [],
-): AdditionalVersionsProps => {
-    return {
-        getVersionToColorMap: () => {
-            return getVersionColors(getVersionMap(versions));
-        },
-    };
 };
 
 const getAdditionalTenantsProps = (
@@ -126,7 +112,6 @@ export function ExtendedCluster({
     getMonitoringLink,
     getMonitoringClusterLink,
 }: ExtendedClusterProps) {
-    const versions = useClusterVersions();
     const additionalNodesProps = useAdditionalNodesProps();
     const {name, balancer, monitoring} = useClusterBaseInfo();
 
@@ -141,7 +126,6 @@ export function ExtendedCluster({
                     balancer,
                     getMonitoringClusterLink,
                 )}
-                additionalVersionsProps={getAdditionalVersionsProps(versions)}
                 additionalTenantsProps={getAdditionalTenantsProps(
                     name,
                     monitoring,

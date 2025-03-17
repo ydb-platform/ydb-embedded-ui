@@ -1,11 +1,6 @@
 import type {TSystemStateInfo} from './api/nodes';
 import type {ETenantType} from './api/tenant';
 import type {InfoItem} from './components';
-import type {VersionToColorMap} from './versions';
-
-export interface AdditionalVersionsProps {
-    getVersionToColorMap?: () => VersionToColorMap;
-}
 
 export interface ClusterLink {
     title: string;

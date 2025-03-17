@@ -5,7 +5,6 @@ import {Checkbox, RadioButton} from '@gravity-ui/uikit';
 import {Loader} from '../../components/Loader';
 import {nodesApi} from '../../store/reducers/nodes/nodes';
 import type {TClusterInfo} from '../../types/api/cluster';
-import type {VersionToColorMap} from '../../types/versions';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {VersionsBar} from '../Cluster/VersionsBar/VersionsBar';
@@ -14,19 +13,20 @@ import {GroupedNodesTree} from './GroupedNodesTree/GroupedNodesTree';
 import {getGroupedStorageNodes, getGroupedTenantNodes, getOtherNodes} from './groupNodes';
 import i18n from './i18n';
 import {GroupByValue} from './types';
-import {useGetVersionValues} from './utils';
+import {useGetVersionValues, useVersionToColorMap} from './utils';
 
 import './Versions.scss';
 
 const b = cn('ydb-versions');
 
 interface VersionsProps {
-    versionToColor?: VersionToColorMap;
     cluster?: TClusterInfo;
 }
 
-export const Versions = ({versionToColor, cluster}: VersionsProps) => {
+export const Versions = ({cluster}: VersionsProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
+    const versionToColor = useVersionToColorMap();
+
     const versionsValues = useGetVersionValues(cluster, versionToColor);
     const {currentData, isLoading: isNodesLoading} = nodesApi.useGetNodesQuery(
         {tablets: false, fieldsRequired: ['SystemState']},

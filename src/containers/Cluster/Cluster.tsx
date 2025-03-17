@@ -22,11 +22,9 @@ import type {
     AdditionalClusterProps,
     AdditionalNodesProps,
     AdditionalTenantsProps,
-    AdditionalVersionsProps,
 } from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
-import {parseVersionsToVersionToColorMap} from '../../utils/versions';
 import {Nodes} from '../Nodes/Nodes';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 import {TabletsTable} from '../Tablets/TabletsTable';
@@ -46,14 +44,12 @@ interface ClusterProps {
     additionalTenantsProps?: AdditionalTenantsProps;
     additionalNodesProps?: AdditionalNodesProps;
     additionalClusterProps?: AdditionalClusterProps;
-    additionalVersionsProps?: AdditionalVersionsProps;
 }
 
 export function Cluster({
     additionalClusterProps,
     additionalTenantsProps,
     additionalNodesProps,
-    additionalVersionsProps,
 }: ClusterProps) {
     const container = React.useRef<HTMLDivElement>(null);
     const isClusterDashboardAvailable = useClusterDashboardAvailable();
@@ -90,13 +86,6 @@ export function Cluster({
     React.useEffect(() => {
         dispatch(setHeaderBreadcrumbs('cluster', {}));
     }, [dispatch]);
-
-    const versionToColor = React.useMemo(() => {
-        if (additionalVersionsProps?.getVersionToColorMap) {
-            return additionalVersionsProps?.getVersionToColorMap();
-        }
-        return parseVersionsToVersionToColorMap(cluster?.Versions);
-    }, [additionalVersionsProps, cluster]);
 
     const getClusterTitle = () => {
         if (infoLoading) {
@@ -204,7 +193,7 @@ export function Cluster({
                         getLocationObjectFromHref(getClusterPath(clusterTabsIds.versions)).pathname
                     }
                 >
-                    <Versions versionToColor={versionToColor} cluster={cluster} />
+                    <Versions cluster={cluster} />
                 </Route>
                 <Route
                     render={() => (
