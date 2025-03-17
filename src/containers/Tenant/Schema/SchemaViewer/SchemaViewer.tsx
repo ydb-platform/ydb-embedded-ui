@@ -42,14 +42,18 @@ export const SchemaViewer = ({type, path, tenantName, extended = false}: SchemaV
     // Refresh table only in Diagnostics
     const pollingInterval = extended ? autoRefreshInterval : undefined;
 
-    const {currentData: schemaData, isLoading: loading} = overviewApi.useGetOverviewQuery(
+    const {currentData: schemaData, isFetching} = overviewApi.useGetOverviewQuery(
         {path, database: tenantName},
         {pollingInterval},
     );
 
+    // useGetOverviewQuery is called in Tenant, so isLoading will be always false in this component
+    // to show loader properly, we need to check isFetching and currentData
+    const loading = isFetching && schemaData === undefined;
+
     const viewSchemaRequestParams = isViewType(type) ? {path, database: tenantName} : skipToken;
 
-    const {data: viewColumnsData, isLoading: isViewSchemaLoading} =
+    const {currentData: viewColumnsData, isLoading: isViewSchemaLoading} =
         viewSchemaApi.useGetViewSchemaQuery(viewSchemaRequestParams, {pollingInterval});
 
     const tableData = React.useMemo(() => {
