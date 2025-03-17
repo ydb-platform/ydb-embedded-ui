@@ -1,5 +1,6 @@
 {
   "field_links": "Links",
   "field_monitoring-link": "Monitoring",
+  "field_logs-link": "Logs",
   "context_unknown": "unknown database"
 }

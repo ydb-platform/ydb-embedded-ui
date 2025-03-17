@@ -39,19 +39,25 @@ export function TenantNameWrapper({tenant, additionalTenantsProps}: TenantNameWr
     const isExternalLink = Boolean(backend);
 
     const monitoringLink = additionalTenantsProps?.getMonitoringLink?.(tenant.Name, tenant.Type);
+    const logsLink = additionalTenantsProps?.getLogsLink?.(tenant.Name);
 
     return (
         <CellWithPopover
-            disabled={!isUserAllowedToMakeChanges || !monitoringLink}
+            disabled={!isUserAllowedToMakeChanges || (!monitoringLink && !logsLink)}
             delayClosing={200}
             content={
-                monitoringLink ? (
+                monitoringLink || logsLink ? (
                     <DefinitionList responsive>
                         <DefinitionList.Item name={i18n('field_links')}>
-                            <LinkWithIcon
-                                title={i18n('field_monitoring-link')}
-                                url={monitoringLink}
-                            />
+                            {monitoringLink && (
+                                <LinkWithIcon
+                                    title={i18n('field_monitoring-link')}
+                                    url={monitoringLink}
+                                />
+                            )}
+                            {logsLink && (
+                                <LinkWithIcon title={i18n('field_logs-link')} url={logsLink} />
+                            )}
                         </DefinitionList.Item>
                     </DefinitionList>
                 ) : null

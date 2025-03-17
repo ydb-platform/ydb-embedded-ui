@@ -99,3 +99,81 @@ export function parseMonitoringData(monitoring: string): ParsedMonitoringData | 
 
     return undefined;
 }
+
+interface GetLogsLinkProps {
+    dbName: string;
+    clusterName?: string;
+    monitoring: string;
+    project?: string;
+    service?: string;
+    level?: string;
+    from?: string;
+    to?: string;
+    columns?: string[];
+    groupByField?: string;
+    chartType?: string;
+    linesMode?: string;
+}
+
+export type GetLogsLink = typeof getLogsLink;
+
+export function getLogsLink({
+    dbName,
+    clusterName,
+    monitoring,
+    project = 'kikimr',
+    service = 'ydb',
+    level = 'ERROR',
+    from = 'now-1h',
+    to = 'now',
+    columns = ['level', 'time', 'message', 'host'],
+    groupByField = 'level',
+    chartType = 'line',
+    linesMode = 'single',
+}: GetLogsLinkProps): string {
+    try {
+        const data = parseMonitoringData(monitoring);
+
+        if (data) {
+            const finalClusterName = data.cluster_name || clusterName || '';
+
+            const url = new URL(data.monitoring_url);
+
+            url.pathname += '/_______/';
+
+            const queryFilter = {
+                project,
+                service,
+                cluster: finalClusterName,
+                database: dbName,
+                level,
+            };
+
+            url.searchParams.set('from', from);
+            url.searchParams.set('to', to);
+
+            const queryString = Object.entries(queryFilter)
+                .map(([key, value]) => `${key} = "${value}"`)
+                .join(', ');
+            url.searchParams.set('query', `{${queryString}}`);
+
+            url.searchParams.set('columns', columns.join(','));
+
+            if (groupByField) {
+                url.searchParams.set('groupByField', groupByField);
+            }
+
+            if (chartType) {
+                url.searchParams.set('chartType', chartType);
+            }
+
+            if (linesMode) {
+                url.searchParams.set('linesMode', linesMode);
+            }
+
+            return url.toString();
+        }
+    } catch {}
+
+    return '';
+}

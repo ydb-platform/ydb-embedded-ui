@@ -11,7 +11,11 @@ import {cn} from '../../../utils/cn';
 import {USE_CLUSTER_BALANCER_AS_BACKEND_KEY} from '../../../utils/constants';
 import {useSetting} from '../../../utils/hooks';
 import {useAdditionalNodesProps} from '../../../utils/hooks/useAdditionalNodesProps';
-import type {GetMonitoringClusterLink, GetMonitoringLink} from '../../../utils/monitoring';
+import type {
+    GetLogsLink,
+    GetMonitoringClusterLink,
+    GetMonitoringLink,
+} from '../../../utils/monitoring';
 import {getCleanBalancerValue, removeViewerPathname} from '../../../utils/parseBalancer';
 import {getBackendFromNodeHost, getBackendFromRawNodeData} from '../../../utils/prepareBackend';
 import type {Cluster} from '../../Cluster/Cluster';
@@ -63,6 +67,7 @@ const getAdditionalTenantsProps = (
     balancer: string | undefined,
     useClusterBalancerAsBackend: boolean | undefined,
     getMonitoringLink?: GetMonitoringLink,
+    getLogsLink?: GetLogsLink,
 ) => {
     const additionalTenantsProps: AdditionalTenantsProps = {};
 
@@ -99,6 +104,20 @@ const getAdditionalTenantsProps = (
         };
     }
 
+    if (monitoring && getLogsLink) {
+        additionalTenantsProps.getLogsLink = (dbName?: string) => {
+            if (dbName) {
+                return getLogsLink({
+                    dbName,
+                    clusterName,
+                    monitoring,
+                });
+            }
+
+            return null;
+        };
+    }
+
     return additionalTenantsProps;
 };
 
@@ -106,11 +125,13 @@ interface ExtendedClusterProps {
     component: typeof Cluster;
     getMonitoringLink?: GetMonitoringLink;
     getMonitoringClusterLink?: GetMonitoringClusterLink;
+    getLogsLink?: GetLogsLink;
 }
 export function ExtendedCluster({
     component: ClusterComponent,
     getMonitoringLink,
     getMonitoringClusterLink,
+    getLogsLink,
 }: ExtendedClusterProps) {
     const additionalNodesProps = useAdditionalNodesProps();
     const {name, balancer, monitoring} = useClusterBaseInfo();
@@ -132,6 +153,7 @@ export function ExtendedCluster({
                     balancer,
                     useClusterBalancerAsBackend,
                     getMonitoringLink,
+                    getLogsLink,
                 )}
                 additionalNodesProps={additionalNodesProps}
             />
