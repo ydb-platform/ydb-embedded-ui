@@ -12,7 +12,7 @@ import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {parseQuery} from '../../../../routes';
 import {setTopQueriesFilters} from '../../../../store/reducers/executeTopQueries/executeTopQueries';
-import {changeUserInput} from '../../../../store/reducers/query/query';
+import {changeUserInput, setIsDirty} from '../../../../store/reducers/query/query';
 import {
     TENANT_PAGE,
     TENANT_PAGES_IDS,
@@ -71,7 +71,8 @@ export const TopQueries = ({tenantName}: TopQueriesProps) => {
 
     const applyRowClick = React.useCallback(
         (input: string) => {
-            dispatch(changeUserInput({input, isDirty: false}));
+            dispatch(changeUserInput({input}));
+            dispatch(setIsDirty(false));
 
             const queryParams = parseQuery(location);
 

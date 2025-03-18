@@ -66,7 +66,7 @@ const initialTenantCommonInfoState = {
 interface QueryEditorProps {
     tenantName: string;
     path: string;
-    changeUserInput: (arg: {input: string; isDirty?: boolean}) => void;
+    changeUserInput: (arg: {input: string}) => void;
     theme: string;
     type?: EPathType;
 }

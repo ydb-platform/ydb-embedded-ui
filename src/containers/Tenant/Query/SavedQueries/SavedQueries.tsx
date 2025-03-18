@@ -9,6 +9,7 @@ import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/Re
 import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
+import {setIsDirty} from '../../../../store/reducers/query/query';
 import {
     deleteSavedQuery,
     selectSavedQueriesFilter,
@@ -63,7 +64,7 @@ const DeleteDialog = ({visible, queryName, onCancelClick, onConfirmClick}: Delet
 const SAVED_QUERIES_COLUMNS_WIDTH_LS_KEY = 'savedQueriesTableColumnsWidth';
 
 interface SavedQueriesProps {
-    changeUserInput: (value: {input: string; isDirty?: boolean}) => void;
+    changeUserInput: (value: {input: string}) => void;
 }
 
 export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
@@ -91,7 +92,8 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
 
     const applyQueryClick = React.useCallback(
         ({queryText, queryName}: {queryText: string; queryName: string}) => {
-            changeUserInput({input: queryText, isDirty: false});
+            changeUserInput({input: queryText});
+            dispatch(setIsDirty(false));
             dispatch(setQueryNameToEdit(queryName));
             dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
         },

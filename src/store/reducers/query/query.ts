@@ -47,9 +47,11 @@ const slice = createSlice({
     name: 'query',
     initialState,
     reducers: {
-        changeUserInput: (state, action: PayloadAction<{input: string; isDirty?: boolean}>) => {
+        changeUserInput: (state, action: PayloadAction<{input: string}>) => {
             state.input = action.payload.input;
-            state.isDirty = action.payload.isDirty;
+        },
+        setIsDirty: (state, action: PayloadAction<boolean>) => {
+            state.isDirty = action.payload;
         },
         setQueryResult: (state, action: PayloadAction<QueryResult | undefined>) => {
             state.result = action.payload;
@@ -164,6 +166,7 @@ export const {
     addStreamingChunks,
     setStreamQueryResponse,
     setStreamSession,
+    setIsDirty,
 } = slice.actions;
 
 export const {

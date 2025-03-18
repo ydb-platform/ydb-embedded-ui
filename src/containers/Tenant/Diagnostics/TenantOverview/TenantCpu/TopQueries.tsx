@@ -8,7 +8,7 @@ import {
     setTopQueriesFilters,
     topQueriesApi,
 } from '../../../../../store/reducers/executeTopQueries/executeTopQueries';
-import {changeUserInput} from '../../../../../store/reducers/query/query';
+import {changeUserInput, setIsDirty} from '../../../../../store/reducers/query/query';
 import {
     TENANT_DIAGNOSTICS_TABS_IDS,
     TENANT_PAGE,
@@ -56,7 +56,8 @@ export function TopQueries({tenantName}: TopQueriesProps) {
         (row: any) => {
             const {QueryText: input} = row;
 
-            dispatch(changeUserInput({input, isDirty: false}));
+            dispatch(changeUserInput({input}));
+            dispatch(setIsDirty(false));
 
             const queryParams = parseQuery(location);
 

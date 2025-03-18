@@ -7,6 +7,7 @@ import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQue
 import {
     selectQueriesHistory,
     selectQueriesHistoryFilter,
+    setIsDirty,
     setQueryHistoryFilter,
 } from '../../../../store/reducers/query/query';
 import type {QueryInHistory} from '../../../../store/reducers/query/types';
@@ -27,7 +28,7 @@ const b = cn('ydb-queries-history');
 const QUERIES_HISTORY_COLUMNS_WIDTH_LS_KEY = 'queriesHistoryTableColumnsWidth';
 
 interface QueriesHistoryProps {
-    changeUserInput: (value: {input: string; isDirty?: boolean}) => void;
+    changeUserInput: (value: {input: string}) => void;
 }
 
 function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
@@ -38,7 +39,8 @@ function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
     const reversedHistory = [...queriesHistory].reverse();
 
     const applyQueryClick = (query: QueryInHistory) => {
-        changeUserInput({input: query.queryText, isDirty: false});
+        changeUserInput({input: query.queryText});
+        dispatch(setIsDirty(false));
         dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
     };
 

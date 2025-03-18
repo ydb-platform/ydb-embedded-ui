@@ -29,7 +29,7 @@ export const Query = (props: QueryProps) => {
 
     const {queryTab = TENANT_QUERY_TABS_ID.newQuery} = useTypedSelector((state) => state.tenant);
 
-    const handleUserInputChange = (value: {input: string; isDirty?: boolean}) => {
+    const handleUserInputChange = (value: {input: string}) => {
         dispatch(changeUserInput(value));
     };
 
