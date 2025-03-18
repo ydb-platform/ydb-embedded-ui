@@ -70,7 +70,7 @@ LIMIT 20`;
 }
 
 function createShardQueryImmediate(path: string, database: string, sortOrder?: SortOrder[]) {
-    const pathSelect = `CAST(SUBSTRING(CAST(Path AS String), ${database.length}) AS Utf8) AS TablePath`;
+    const pathSelect = `CAST(SUBSTRING(CAST(Path AS String), ${database.length}) AS Utf8) AS RelativePath`;
 
     const orderBy = prepareOrderByFromTableSort(sortOrder);
 

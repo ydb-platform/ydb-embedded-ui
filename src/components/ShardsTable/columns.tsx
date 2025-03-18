@@ -19,10 +19,10 @@ export const getPathColumn: GetShardsColumn = ({schemaPath = ''}) => {
         name: TOP_SHARDS_COLUMNS_IDS.Path,
         header: TOP_SHARDS_COLUMNS_TITLES.Path,
         render: ({row}) => {
-            // row.Path - relative schema path
+            // row.RelativePath - relative schema path
             return (
-                <LinkToSchemaObject path={schemaPath + row.TablePath}>
-                    {row.TablePath}
+                <LinkToSchemaObject path={schemaPath + row.RelativePath}>
+                    {row.RelativePath}
                 </LinkToSchemaObject>
             );
         },
