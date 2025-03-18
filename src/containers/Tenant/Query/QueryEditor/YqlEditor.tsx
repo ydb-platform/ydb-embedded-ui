@@ -93,8 +93,13 @@ export function YqlEditor({
         window.ydbEditor = editor;
         const keybindings = getKeyBindings(monaco);
         monaco.editor.registerCommand('insertSnippetToEditor', (_asessor, input: string) => {
-            changeUserInput({input});
-            dispatch(setIsDirty(false));
+            //suggestController is not properly typed yet in monaco-editor package
+            const contribution = editor.getContribution<any>('snippetController2');
+            if (contribution) {
+                editor.focus();
+                editor.setValue('');
+                contribution.insert(input);
+            }
         });
 
         if (window.api.codeAssist) {
