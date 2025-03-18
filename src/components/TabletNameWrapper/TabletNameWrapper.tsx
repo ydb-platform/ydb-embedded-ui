@@ -11,13 +11,15 @@ import i18n from './i18n';
 
 interface TabletNameWrapperProps {
     tabletId: string | number;
+    followerId?: string | number;
     database?: string;
 }
 
-export function TabletNameWrapper({tabletId, database}: TabletNameWrapperProps) {
+export function TabletNameWrapper({tabletId, followerId, database}: TabletNameWrapperProps) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
     const tabletPath = getTabletPagePath(tabletId, {database});
+    const tabletName = `${tabletId}${followerId ? `.${followerId}` : ''}`;
 
     return (
         <CellWithPopover
@@ -37,7 +39,7 @@ export function TabletNameWrapper({tabletId, database}: TabletNameWrapperProps) 
             behavior={PopoverBehavior.Immediate}
         >
             <EntityStatus
-                name={tabletId.toString()}
+                name={tabletName}
                 path={tabletPath}
                 hasClipboardButton
                 showStatus={false}

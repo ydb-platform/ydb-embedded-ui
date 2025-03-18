@@ -131,7 +131,9 @@ function TabletContent({
     history: ITabletPreparedHistoryItem[];
 }) {
     const isEmpty = !Object.keys(tablet).length;
-    const {Overall, HiveId} = tablet;
+    const {Overall, HiveId, FollowerId} = tablet;
+
+    const tabletName = `${id}${FollowerId ? `.${FollowerId}` : ''}`;
 
     return (
         <EmptyStateWrapper
@@ -143,7 +145,7 @@ function TabletContent({
                 <EntityPageTitle
                     entityName={i18n('tablet.header')}
                     status={Overall ?? EFlag.Grey}
-                    id={id}
+                    id={tabletName}
                 />
                 <TabletControls tablet={tablet} />
                 <TabletInfo tablet={tablet} />

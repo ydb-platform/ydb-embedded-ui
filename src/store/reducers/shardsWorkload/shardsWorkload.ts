@@ -70,18 +70,14 @@ LIMIT 20`;
 }
 
 function createShardQueryImmediate(path: string, database: string, sortOrder?: SortOrder[]) {
-    const pathSelect = `CAST(SUBSTRING(CAST(Path AS String), ${database.length}) AS Utf8) AS Path`;
+    const pathSelect = `CAST(SUBSTRING(CAST(Path AS String), ${database.length}) AS Utf8) AS TablePath`;
 
     const orderBy = prepareOrderByFromTableSort(sortOrder);
 
     return `${QUERY_TECHNICAL_MARK}    
 SELECT
     ${pathSelect},
-    TabletId,
-    CPUCores,
-    DataSize,
-    NodeId,
-    InFlightTxCount
+    \`.sys/partition_stats\`.*
 FROM \`.sys/partition_stats\`
 WHERE
     Path='${path}'
