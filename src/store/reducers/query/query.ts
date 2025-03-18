@@ -31,6 +31,7 @@ const sliceLimit = queriesHistoryInitial.length - MAXIMUM_QUERIES_IN_HISTORY;
 
 const initialState: QueryState = {
     input: '',
+    isDirty: false,
     history: {
         queries: queriesHistoryInitial
             .slice(sliceLimit < 0 ? 0 : sliceLimit)
