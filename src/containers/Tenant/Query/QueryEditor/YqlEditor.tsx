@@ -32,7 +32,7 @@ import {getKeyBindings} from './keybindings';
 const CONTEXT_MENU_GROUP_ID = 'navigation';
 
 interface YqlEditorProps {
-    changeUserInput: (arg: {input: string}) => void;
+    changeUserInput: (arg: {input: string; isDirty?: boolean}) => void;
     theme: string;
     handleGetExplainQueryClick: (text: string) => void;
     handleSendExecuteClick: (text: string, partial?: boolean) => void;
@@ -92,13 +92,7 @@ export function YqlEditor({
         window.ydbEditor = editor;
         const keybindings = getKeyBindings(monaco);
         monaco.editor.registerCommand('insertSnippetToEditor', (_asessor, input: string) => {
-            //suggestController is not properly typed yet in monaco-editor package
-            const contribution = editor.getContribution<any>('snippetController2');
-            if (contribution) {
-                editor.focus();
-                editor.setValue('');
-                contribution.insert(input);
-            }
+            changeUserInput({input, isDirty: false});
         });
 
         if (window.api.codeAssist) {
@@ -185,7 +179,7 @@ export function YqlEditor({
 
     const onChange = (newValue: string) => {
         updateErrorsHighlighting();
-        changeUserInput({input: newValue});
+        changeUserInput({input: newValue, isDirty: true});
     };
     return (
         <MonacoEditor

@@ -47,8 +47,9 @@ const slice = createSlice({
     name: 'query',
     initialState,
     reducers: {
-        changeUserInput: (state, action: PayloadAction<{input: string}>) => {
+        changeUserInput: (state, action: PayloadAction<{input: string; isDirty?: boolean}>) => {
             state.input = action.payload.input;
+            state.isDirty = action.payload.isDirty;
         },
         setQueryResult: (state, action: PayloadAction<QueryResult | undefined>) => {
             state.result = action.payload;
@@ -145,6 +146,7 @@ const slice = createSlice({
                 : items;
         },
         selectUserInput: (state) => state.input,
+        selectIsDirty: (state) => state.isDirty,
         selectQueriesHistoryCurrentIndex: (state) => state.history?.currentIndex,
     },
 });
@@ -172,6 +174,7 @@ export const {
     selectResult,
     selectUserInput,
     selectQueryDuration,
+    selectIsDirty,
 } = slice.selectors;
 
 interface SendQueryParams extends QueryRequestParams {

@@ -63,7 +63,7 @@ const DeleteDialog = ({visible, queryName, onCancelClick, onConfirmClick}: Delet
 const SAVED_QUERIES_COLUMNS_WIDTH_LS_KEY = 'savedQueriesTableColumnsWidth';
 
 interface SavedQueriesProps {
-    changeUserInput: (value: {input: string}) => void;
+    changeUserInput: (value: {input: string; isDirty?: boolean}) => void;
 }
 
 export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
@@ -91,7 +91,7 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
 
     const applyQueryClick = React.useCallback(
         ({queryText, queryName}: {queryText: string; queryName: string}) => {
-            changeUserInput({input: queryText});
+            changeUserInput({input: queryText, isDirty: false});
             dispatch(setQueryNameToEdit(queryName));
             dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
         },

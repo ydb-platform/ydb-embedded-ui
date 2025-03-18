@@ -56,7 +56,7 @@ export function TopQueries({tenantName}: TopQueriesProps) {
         (row: any) => {
             const {QueryText: input} = row;
 
-            dispatch(changeUserInput({input}));
+            dispatch(changeUserInput({input, isDirty: false}));
 
             const queryParams = parseQuery(location);
 

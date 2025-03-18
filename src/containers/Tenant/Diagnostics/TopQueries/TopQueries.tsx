@@ -71,7 +71,7 @@ export const TopQueries = ({tenantName}: TopQueriesProps) => {
 
     const applyRowClick = React.useCallback(
         (input: string) => {
-            dispatch(changeUserInput({input}));
+            dispatch(changeUserInput({input, isDirty: false}));
 
             const queryParams = parseQuery(location);
 
