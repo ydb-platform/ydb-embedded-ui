@@ -15,6 +15,7 @@ export interface AdditionalClusterProps {
 export interface AdditionalTenantsProps {
     prepareTenantBackend?: (backend: string | NodeAddress | undefined) => string | undefined;
     getMonitoringLink?: (name?: string, type?: ETenantType) => string | null;
+    getLogsLink?: (name?: string) => string | null;
 }
 
 export type NodeAddress = Pick<TSystemStateInfo, 'Host' | 'Endpoints' | 'NodeId'>;

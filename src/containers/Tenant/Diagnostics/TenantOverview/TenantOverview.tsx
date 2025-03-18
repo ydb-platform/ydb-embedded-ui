@@ -1,6 +1,7 @@
-import {Loader} from '@gravity-ui/uikit';
+import {Flex, Loader} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
+import {LogsButton} from '../../../../components/LogsButton/LogsButton';
 import {MonitoringButton} from '../../../../components/MonitoringButton/MonitoringButton';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
@@ -150,15 +151,19 @@ export function TenantOverview({
     }
 
     const monitoringLink = additionalTenantProps?.getMonitoringLink?.(Name, Type);
+    const logsLink = additionalTenantProps?.getLogsLink?.(Name);
 
     return (
         <div className={b()}>
             <div className={b('info')}>
                 <div className={b('top-label')}>{tenantType}</div>
-                <div className={b('top')}>
+                <Flex alignItems="center" gap="1" className={b('top')}>
                     {renderName()}
-                    {monitoringLink && <MonitoringButton href={monitoringLink} />}
-                </div>
+                    <Flex gap="2">
+                        {monitoringLink && <MonitoringButton href={monitoringLink} />}
+                        {logsLink && <LogsButton href={logsLink} />}
+                    </Flex>
+                </Flex>
                 <MetricsCards
                     poolsCpuStats={poolsStats}
                     memoryStats={memoryStats}

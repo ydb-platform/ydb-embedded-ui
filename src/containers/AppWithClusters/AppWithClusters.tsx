@@ -3,7 +3,11 @@ import React from 'react';
 import type {Store} from '@reduxjs/toolkit';
 import type {History} from 'history';
 
-import type {GetMonitoringClusterLink, GetMonitoringLink} from '../../utils/monitoring';
+import type {
+    GetLogsLink,
+    GetMonitoringClusterLink,
+    GetMonitoringLink,
+} from '../../utils/monitoring';
 import {
     getMonitoringClusterLink as getMonitoringClusterLinkDefault,
     getMonitoringLink as getMonitoringLinkDefault,
@@ -17,6 +21,7 @@ import {ExtendedTenant} from './ExtendedTenant/ExtendedTenant';
 export interface AppWithClustersProps {
     store: Store;
     history: History;
+    getLogsLink?: GetLogsLink;
     getMonitoringLink?: GetMonitoringLink;
     getMonitoringClusterLink?: GetMonitoringClusterLink;
     userSettings?: YDBEmbeddedUISettings;
@@ -26,6 +31,7 @@ export interface AppWithClustersProps {
 export function AppWithClusters({
     store,
     history,
+    getLogsLink,
     getMonitoringLink = getMonitoringLinkDefault,
     getMonitoringClusterLink = getMonitoringClusterLinkDefault,
     userSettings,
@@ -38,6 +44,7 @@ export function AppWithClusters({
                     return (
                         <ExtendedCluster
                             component={component}
+                            getLogsLink={getLogsLink}
                             getMonitoringLink={getMonitoringLink}
                             getMonitoringClusterLink={getMonitoringClusterLink}
                         />
@@ -49,6 +56,7 @@ export function AppWithClusters({
                     return (
                         <ExtendedTenant
                             component={component}
+                            getLogsLink={getLogsLink}
                             getMonitoringLink={getMonitoringLink}
                         />
                     );
