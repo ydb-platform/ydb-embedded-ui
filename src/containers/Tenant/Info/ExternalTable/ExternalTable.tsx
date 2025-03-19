@@ -15,27 +15,30 @@ import './ExternalTable.scss';
 
 const b = cn('ydb-external-table-info');
 
-const prepareExternalTableSummary = (
-    data: TEvDescribeSchemeResult,
-    pathToDataSource: string,
-): InfoViewerItem[] => {
+const prepareExternalTableSummary = (data: TEvDescribeSchemeResult, pathToDataSource: string) => {
     const {CreateStep} = data.PathDescription?.Self || {};
     const {SourceType, DataSourcePath} = data.PathDescription?.ExternalTableDescription || {};
 
     const dataSourceName = DataSourcePath?.split('/').pop();
 
-    return [
+    const info: InfoViewerItem[] = [
         {label: i18n('external-objects.source-type'), value: SourceType},
-        formatCommonItem('CreateStep', CreateStep),
-        {
-            label: i18n('external-objects.data-source'),
-            value: DataSourcePath && (
-                <span title={DataSourcePath}>
-                    <LinkWithIcon title={dataSourceName || ''} url={pathToDataSource} />
-                </span>
-            ),
-        },
     ];
+
+    if (Number(CreateStep)) {
+        info.push(formatCommonItem('CreateStep', CreateStep));
+    }
+
+    info.push({
+        label: i18n('external-objects.data-source'),
+        value: DataSourcePath && (
+            <span title={DataSourcePath}>
+                <LinkWithIcon title={dataSourceName || ''} url={pathToDataSource} />
+            </span>
+        ),
+    });
+
+    return info;
 };
 
 const prepareExternalTableInfo = (
