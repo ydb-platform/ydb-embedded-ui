@@ -1,7 +1,5 @@
 import React from 'react';
 
-import {skipToken} from '@reduxjs/toolkit/query';
-
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
@@ -42,27 +40,28 @@ export const SchemaViewer = ({type, path, tenantName, extended = false}: SchemaV
     // Refresh table only in Diagnostics
     const pollingInterval = extended ? autoRefreshInterval : undefined;
 
-    const {currentData: schemaData, isFetching} = overviewApi.useGetOverviewQuery(
-        {path, database: tenantName},
-        {pollingInterval},
-    );
+    const {currentData: tableSchemaData, isFetching: isTableSchemaFetching} =
+        overviewApi.useGetOverviewQuery(
+            {path, database: tenantName},
+            {pollingInterval, skip: isViewType(type)},
+        );
+    const {currentData: viewColumnsData, isFetching: isViewSchemaFetching} =
+        viewSchemaApi.useGetViewSchemaQuery(
+            {path, database: tenantName},
+            {pollingInterval, skip: !isViewType(type)},
+        );
 
-    // useGetOverviewQuery is called in Tenant, so isLoading will be always false in this component
-    // to show loader properly, we need to check isFetching and currentData
-    const loading = isFetching && schemaData === undefined;
-
-    const viewSchemaRequestParams = isViewType(type) ? {path, database: tenantName} : skipToken;
-
-    const {currentData: viewColumnsData, isLoading: isViewSchemaLoading} =
-        viewSchemaApi.useGetViewSchemaQuery(viewSchemaRequestParams, {pollingInterval});
+    const loading =
+        (isViewSchemaFetching && viewColumnsData === undefined) ||
+        (isTableSchemaFetching && tableSchemaData === undefined);
 
     const tableData = React.useMemo(() => {
         if (isViewType(type)) {
             return prepareViewSchema(viewColumnsData);
         }
 
-        return prepareSchemaData(type, schemaData);
-    }, [schemaData, type, viewColumnsData]);
+        return prepareSchemaData(type, tableSchemaData);
+    }, [tableSchemaData, type, viewColumnsData]);
 
     const hasAutoIncrement = React.useMemo(() => {
         return tableData.some((i) => i.autoIncrement);
@@ -89,7 +88,7 @@ export const SchemaViewer = ({type, path, tenantName, extended = false}: SchemaV
         return [];
     }, [type, extended, hasAutoIncrement, hasDefaultValue, tableData]);
 
-    if (loading || isViewSchemaLoading) {
+    if (loading) {
         return <TableSkeleton />;
     }
 
