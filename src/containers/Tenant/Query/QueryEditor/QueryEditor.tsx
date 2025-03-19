@@ -16,6 +16,7 @@ import {
     selectQueriesHistoryCurrentIndex,
     selectResult,
     selectTenantPath,
+    setIsDirty,
     setTenantPath,
 } from '../../../../store/reducers/query/query';
 import type {QueryResult} from '../../../../store/reducers/query/types';
@@ -173,6 +174,7 @@ export default function QueryEditor(props: QueryEditorProps) {
         if (!partial) {
             if (text !== historyQueries[historyCurrentIndex]?.queryText) {
                 dispatch(saveQueryToHistory({queryText: text, queryId}));
+                dispatch(setIsDirty(false));
             }
         }
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);

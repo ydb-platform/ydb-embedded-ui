@@ -4,6 +4,7 @@ import NiceModal from '@ebay/nice-modal-react';
 import type {ButtonProps} from '@gravity-ui/uikit';
 import {Button, Dialog, DropdownMenu, TextInput} from '@gravity-ui/uikit';
 
+import {setIsDirty} from '../../../../store/reducers/query/query';
 import {
     clearQueryNameToEdit,
     saveQuery,
@@ -55,6 +56,7 @@ export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
 
     const onEditQueryClick = () => {
         dispatch(saveQuery(queryNameToEdit));
+        dispatch(setIsDirty(false));
         dispatch(clearQueryNameToEdit());
     };
 
@@ -130,6 +132,7 @@ function SaveQueryDialog({onSuccess, onCancel, onClose, open}: SaveQueryDialogPr
 
     const onSaveClick = () => {
         dispatch(saveQuery(queryName));
+        dispatch(setIsDirty(false));
         onCloseDialog();
         onSuccess?.();
     };
