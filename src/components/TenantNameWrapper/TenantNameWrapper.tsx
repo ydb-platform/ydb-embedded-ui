@@ -1,4 +1,4 @@
-import {DefinitionList, PopoverBehavior} from '@gravity-ui/uikit';
+import {DefinitionList, Flex, PopoverBehavior} from '@gravity-ui/uikit';
 
 import {getTenantPath} from '../../containers/Tenant/TenantPages';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
@@ -39,19 +39,27 @@ export function TenantNameWrapper({tenant, additionalTenantsProps}: TenantNameWr
     const isExternalLink = Boolean(backend);
 
     const monitoringLink = additionalTenantsProps?.getMonitoringLink?.(tenant.Name, tenant.Type);
+    const logsLink = additionalTenantsProps?.getLogsLink?.(tenant.Name);
 
     return (
         <CellWithPopover
-            disabled={!isUserAllowedToMakeChanges || !monitoringLink}
+            disabled={!isUserAllowedToMakeChanges || (!monitoringLink && !logsLink)}
             delayClosing={200}
             content={
-                monitoringLink ? (
+                monitoringLink || logsLink ? (
                     <DefinitionList responsive>
                         <DefinitionList.Item name={i18n('field_links')}>
-                            <LinkWithIcon
-                                title={i18n('field_monitoring-link')}
-                                url={monitoringLink}
-                            />
+                            <Flex gap={2} wrap="wrap">
+                                {monitoringLink && (
+                                    <LinkWithIcon
+                                        title={i18n('field_monitoring-link')}
+                                        url={monitoringLink}
+                                    />
+                                )}
+                                {logsLink && (
+                                    <LinkWithIcon title={i18n('field_logs-link')} url={logsLink} />
+                                )}
+                            </Flex>
                         </DefinitionList.Item>
                     </DefinitionList>
                 ) : null

@@ -99,3 +99,10 @@ export function parseMonitoringData(monitoring: string): ParsedMonitoringData | 
 
     return undefined;
 }
+
+interface GetLogsLinkProps {
+    dbName: string;
+    clusterName: string;
+}
+
+export type GetLogsLink = (props: GetLogsLinkProps) => string;
