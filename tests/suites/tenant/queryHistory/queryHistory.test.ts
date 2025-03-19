@@ -4,7 +4,6 @@ import {QUERY_MODES} from '../../../../src/utils/query';
 import {tenantName} from '../../../utils/constants';
 import {TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 import {QueryEditor, QueryTabs} from '../queryEditor/models/QueryEditor';
-import {UnsavedChangesModal} from '../queryEditor/models/UnsavedChangesModal';
 
 import executeQueryWithKeybinding from './utils';
 
@@ -91,9 +90,8 @@ test.describe('Query History', () => {
         await expect(queryRow).toBeVisible();
     });
 
-    test('Can run query from history', async ({page}) => {
+    test('Can run query from history', async () => {
         const testQuery = 'SELECT 42 AS history_run_test;';
-        const unsavedChangesModal = new UnsavedChangesModal(page);
 
         // Execute the query first time
         await queryEditor.run(testQuery, QUERY_MODES.script);
@@ -103,9 +101,6 @@ test.describe('Query History', () => {
 
         // Select query from history to load it into editor
         await queryEditor.historyQueries.selectQuery(testQuery);
-
-        // Handle unsaved changes modal by clicking "Don't save"
-        await unsavedChangesModal.clickDontSave();
 
         // Run the query using the editor
         await queryEditor.clickRunButton();
@@ -143,5 +138,83 @@ test.describe('Query History', () => {
         await expect(firstQueryRow).toBeVisible();
         await expect(secondQueryRow).toBeVisible();
         await expect(otherQueryRow).not.toBeVisible();
+    });
+
+    test('No unsaved changes modal when running a query and selecting from history', async () => {
+        // Run first query
+        const firstQuery = 'SELECT 10 AS first_history_query;';
+        await queryEditor.run(firstQuery, QUERY_MODES.script);
+
+        // Run second query
+        const secondQuery = 'SELECT 20 AS second_history_query;';
+        await queryEditor.run(secondQuery, QUERY_MODES.script);
+
+        // Navigate to history tab
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.isVisible();
+
+        // Select the first query from history
+        await queryEditor.historyQueries.selectQuery(firstQuery);
+
+        // Verify no unsaved changes modal appeared
+        const isModalHidden = await tenantPage.isUnsavedChangesModalHidden();
+        expect(isModalHidden).toBe(true);
+        // Verify query is loaded in editor
+        const editorValue = await queryEditor.editorTextArea.inputValue();
+        expect(editorValue.trim()).toBe(firstQuery.trim());
+    });
+
+    test('Unsaved changes modal appears when modifying a query and selecting from history', async () => {
+        // Run a query
+        const originalQuery = 'SELECT 30 AS original_history_query;';
+        await queryEditor.run(originalQuery, QUERY_MODES.script);
+
+        // Run another query to have something in history
+        const historyQuery = 'SELECT 40 AS history_query_for_selection;';
+        await queryEditor.run(historyQuery, QUERY_MODES.script);
+
+        // Modify the current query without running it
+        const modifiedQuery = 'SELECT 50 AS modified_unsaved_query;';
+        await queryEditor.setQuery(modifiedQuery);
+
+        // Navigate to history tab
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.isVisible();
+
+        // Try to select a query from history - should trigger unsaved changes modal
+        await queryEditor.historyQueries.selectQuery(historyQuery);
+
+        // Verify unsaved changes modal appears
+        const isModalVisible = await tenantPage.isUnsavedChangesModalVisible();
+        expect(isModalVisible).toBe(true);
+
+        // Dismiss the modal
+        await tenantPage.unsavedChangesModal.clickCancel();
+    });
+
+    test('No unsaved changes modal when selecting from history after saving a query', async () => {
+        // Run a query and save it
+        const query = 'SELECT 60 AS query_to_save;';
+        await queryEditor.run(query, QUERY_MODES.script);
+        await tenantPage.saveQuery(query, `Saved History Query ${Date.now()}`);
+
+        // Run another query to have something in history
+        const historyQuery = 'SELECT 70 AS another_history_query;';
+        await queryEditor.run(historyQuery, QUERY_MODES.script);
+
+        // Navigate to history tab
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.isVisible();
+
+        // Select the first query from history
+        await queryEditor.historyQueries.selectQuery(query);
+
+        // Verify no unsaved changes modal appeared
+        const isModalHidden = await tenantPage.isUnsavedChangesModalHidden();
+        expect(isModalHidden).toBe(true);
+
+        // Verify query is loaded in editor
+        const editorValue = await queryEditor.editorTextArea.inputValue();
+        expect(editorValue.trim()).toBe(query.trim());
     });
 });

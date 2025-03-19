@@ -26,7 +26,7 @@ export class SavedQueriesTable {
         });
     }
 
-    async editQuery(name: string) {
+    async selectQuery(name: string) {
         const row = await this.waitForRow(name);
         await row.hover();
         const editButton = row.locator('button:has(svg)').first();
