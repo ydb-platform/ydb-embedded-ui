@@ -215,6 +215,11 @@ export const formatDateTime = (
     value?: number | string,
     {withTimeZone, defaultValue = ''}: {withTimeZone?: boolean; defaultValue?: string} = {},
 ) => {
+    // prevent 1970-01-01 03:00
+    if (!Number(value)) {
+        return defaultValue;
+    }
+
     const tz = withTimeZone ? ' z' : '';
     const formattedData = dateTimeParse(Number(value))?.format(`YYYY-MM-DD HH:mm${tz}`);
 

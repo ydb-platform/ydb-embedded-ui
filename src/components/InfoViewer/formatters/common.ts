@@ -7,7 +7,7 @@ import {createInfoFormatter} from '../utils';
 export const formatCommonItem = createInfoFormatter<TDirEntry>({
     values: {
         PathType: (value) => value?.substring('EPathType'.length),
-        CreateStep: (value) => (Number(value) ? formatDateTime(value) : EMPTY_DATA_PLACEHOLDER),
+        CreateStep: (value) => formatDateTime(value, {defaultValue: EMPTY_DATA_PLACEHOLDER}),
     },
     labels: {
         PathType: i18n('common.type'),
