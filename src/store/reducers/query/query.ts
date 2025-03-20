@@ -31,6 +31,7 @@ const sliceLimit = queriesHistoryInitial.length - MAXIMUM_QUERIES_IN_HISTORY;
 
 const initialState: QueryState = {
     input: '',
+    isDirty: false,
     history: {
         queries: queriesHistoryInitial
             .slice(sliceLimit < 0 ? 0 : sliceLimit)
@@ -49,6 +50,9 @@ const slice = createSlice({
     reducers: {
         changeUserInput: (state, action: PayloadAction<{input: string}>) => {
             state.input = action.payload.input;
+        },
+        setIsDirty: (state, action: PayloadAction<boolean>) => {
+            state.isDirty = action.payload;
         },
         setQueryResult: (state, action: PayloadAction<QueryResult | undefined>) => {
             state.result = action.payload;
@@ -145,6 +149,7 @@ const slice = createSlice({
                 : items;
         },
         selectUserInput: (state) => state.input,
+        selectIsDirty: (state) => state.isDirty,
         selectQueriesHistoryCurrentIndex: (state) => state.history?.currentIndex,
     },
 });
@@ -162,6 +167,7 @@ export const {
     addStreamingChunks,
     setStreamQueryResponse,
     setStreamSession,
+    setIsDirty,
 } = slice.actions;
 
 export const {
@@ -172,6 +178,7 @@ export const {
     selectResult,
     selectUserInput,
     selectQueryDuration,
+    selectIsDirty,
 } = slice.selectors;
 
 interface SendQueryParams extends QueryRequestParams {

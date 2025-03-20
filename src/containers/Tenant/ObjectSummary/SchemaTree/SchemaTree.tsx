@@ -7,7 +7,7 @@ import {NavigationTree} from 'ydb-ui-components';
 
 import {getConnectToDBDialog} from '../../../../components/ConnectToDB/ConnectToDBDialog';
 import {useCreateDirectoryFeatureAvailable} from '../../../../store/reducers/capabilities/hooks';
-import {selectUserInput} from '../../../../store/reducers/query/query';
+import {selectIsDirty, selectUserInput} from '../../../../store/reducers/query/query';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
 import {tableSchemaDataApi} from '../../../../store/reducers/tableSchemaData';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
@@ -42,6 +42,7 @@ export function SchemaTree(props: SchemaTreeProps) {
     const {rootPath, rootName, rootType, currentPath, onActivePathUpdate} = props;
     const dispatch = useTypedDispatch();
     const input = useTypedSelector(selectUserInput);
+    const isDirty = useTypedSelector(selectIsDirty);
     const [
         getTableSchemaDataQuery,
         {currentData: actionsSchemaData, isFetching: isActionsDataFetching},
@@ -132,7 +133,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                 showCreateDirectoryDialog: createDirectoryFeatureAvailable
                     ? handleOpenCreateDirectoryDialog
                     : undefined,
-                getConfirmation: input ? getConfirmation : undefined,
+                getConfirmation: input && isDirty ? getConfirmation : undefined,
                 getConnectToDBDialog,
                 schemaData: actionsSchemaData,
                 isSchemaDataLoading: isActionsDataFetching,

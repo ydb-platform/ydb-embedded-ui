@@ -61,6 +61,7 @@ export interface QueryResult {
 export interface QueryState {
     input: string;
     result?: QueryResult;
+    isDirty?: boolean;
     history: {
         queries: QueryInHistory[];
         currentIndex: number;

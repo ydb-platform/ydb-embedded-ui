@@ -7,6 +7,7 @@ import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQue
 import {
     selectQueriesHistory,
     selectQueriesHistoryFilter,
+    setIsDirty,
     setQueryHistoryFilter,
 } from '../../../../store/reducers/query/query';
 import type {QueryInHistory} from '../../../../store/reducers/query/types';
@@ -39,6 +40,7 @@ function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
 
     const applyQueryClick = (query: QueryInHistory) => {
         changeUserInput({input: query.queryText});
+        dispatch(setIsDirty(false));
         dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
     };
 

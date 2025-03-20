@@ -20,7 +20,12 @@ export enum ButtonNames {
     Explain = 'Explain',
     Cancel = 'Cancel',
     Save = 'Save',
+    Edit = 'Edit',
     Stop = 'Stop',
+}
+
+export enum EditSavedSubMenuNames {
+    SaveAsNew = 'Save as new',
 }
 
 export enum ResultTabNames {
@@ -52,6 +57,8 @@ export class QueryEditor {
     private stopButton: Locator;
     private stopBanner: Locator;
     private saveButton: Locator;
+    private editButton: Locator;
+    private dropdownMenu: Locator;
     private gearButton: Locator;
     private banner: Locator;
     private executionStatus: Locator;
@@ -68,6 +75,8 @@ export class QueryEditor {
         this.stopBanner = this.selector.locator('.ydb-query-stopped-banner');
         this.explainButton = this.selector.getByRole('button', {name: ButtonNames.Explain});
         this.saveButton = this.selector.getByRole('button', {name: ButtonNames.Save});
+        this.editButton = this.selector.getByRole('button', {name: ButtonNames.Edit});
+        this.dropdownMenu = page.locator('.g-dropdown-menu__menu');
         this.gearButton = this.selector.locator('.ydb-query-editor-button__gear-button');
         this.executionStatus = this.selector.locator('.kv-query-execution-status .g-text');
         this.resultsControls = this.selector.locator('.ydb-query-result__controls');
@@ -122,6 +131,20 @@ export class QueryEditor {
     async clickSaveButton() {
         await this.saveButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.saveButton.click();
+    }
+
+    async clickEditButton() {
+        await this.editButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.editButton.click();
+    }
+
+    async clickSaveAsNewEditButton() {
+        const menuItem = this.dropdownMenu
+            .getByRole('menuitem')
+            .filter({hasText: EditSavedSubMenuNames.SaveAsNew});
+
+        await menuItem.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await menuItem.click();
     }
 
     async getExplainResult(type: ExplainResultType) {
@@ -203,9 +226,22 @@ export class QueryEditor {
         await this.gearButton.hover();
     }
 
-    async setQuery(query: string) {
-        await this.editorTextArea.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await this.editorTextArea.clear();
+    async setQuery(query: string, timeout = VISIBILITY_TIMEOUT) {
+        await this.editorTextArea.waitFor({state: 'visible', timeout});
+
+        await this.editorTextArea.evaluate(() => {
+            const editor = window.ydbEditor;
+            if (editor) {
+                editor.setValue('');
+            }
+            return false;
+        });
+
+        const currentValue = await this.editorTextArea.inputValue();
+        if (currentValue !== '') {
+            throw new Error('Failed to clear editor text area');
+        }
+
         await this.editorTextArea.fill(query);
     }
 
