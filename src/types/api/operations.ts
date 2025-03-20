@@ -113,7 +113,7 @@ export interface TOperationList {
     next_page_token?: string;
 }
 
-export type OperationKind = 'ss/backgrounds' | 'import' | 'export' | 'buildindex' | 'scriptexec';
+export type OperationKind = 'ss/backgrounds' | 'import' | 'export/s3' | 'buildindex' | 'scriptexec';
 
 export interface OperationListRequestParams {
     database: string;
