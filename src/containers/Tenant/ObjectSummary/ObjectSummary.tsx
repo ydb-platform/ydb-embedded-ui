@@ -167,10 +167,12 @@ export function ObjectSummary({
 
         overview.push({name: i18n('field_version'), content: PathVersion});
 
-        overview.push({
-            name: i18n('field_created'),
-            content: formatDateTime(CreateStep),
-        });
+        if (Number(CreateStep)) {
+            overview.push({
+                name: i18n('field_created'),
+                content: formatDateTime(CreateStep),
+            });
+        }
 
         const {PathDescription} = currentObjectData;
 
