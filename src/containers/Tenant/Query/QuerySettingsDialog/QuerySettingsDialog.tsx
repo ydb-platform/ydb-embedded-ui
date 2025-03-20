@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Dialog, Link as ExternalLink, Flex, TextInput, Tooltip} from '@gravity-ui/uikit';
+import {Button, Dialog, Flex, TextInput, Tooltip} from '@gravity-ui/uikit';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {Controller, useForm} from 'react-hook-form';
 
@@ -18,9 +18,10 @@ import {
     useTypedDispatch,
     useTypedSelector,
 } from '../../../../utils/hooks';
-import {querySettingsValidationSchema} from '../../../../utils/query';
+import {DEFAULT_QUERY_SETTINGS, querySettingsValidationSchema} from '../../../../utils/query';
 
 import {QuerySettingsSelect} from './QuerySettingsSelect';
+import {QuerySettingsTimeout} from './QuerySettingsTimeout';
 import {QUERY_SETTINGS_FIELD_SETTINGS} from './constants';
 import i18n from './i18n';
 
@@ -100,35 +101,6 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                     onUpdateSetting={field.onChange}
                                     settingOptions={QUERY_SETTINGS_FIELD_SETTINGS.queryMode.options}
                                 />
-                            )}
-                        />
-                    </div>
-                </Flex>
-                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
-                    <label htmlFor="timeout" className={b('field-title')}>
-                        {QUERY_SETTINGS_FIELD_SETTINGS.timeout.title}
-                    </label>
-                    <div className={b('control-wrapper')}>
-                        <Controller
-                            name="timeout"
-                            control={control}
-                            render={({field}) => (
-                                <React.Fragment>
-                                    <TextInput
-                                        id="timeout"
-                                        type="number"
-                                        {...field}
-                                        value={field.value?.toString()}
-                                        className={b('timeout')}
-                                        placeholder="60"
-                                        validationState={errors.timeout ? 'invalid' : undefined}
-                                        errorMessage={errors.timeout?.message}
-                                        errorPlacement="inside"
-                                    />
-                                    <span className={b('timeout-suffix')}>
-                                        {i18n('form.timeout.seconds')}
-                                    </span>
-                                </React.Fragment>
                             )}
                         />
                     </div>
@@ -225,10 +197,34 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                     validationState={errors.limitRows ? 'invalid' : undefined}
                                     errorMessage={errors.limitRows?.message}
                                     errorPlacement="inside"
+                                    endContent={
+                                        <span className={b('postfix')}>
+                                            {i18n('form.limit.rows')}
+                                        </span>
+                                    }
                                 />
                             )}
                         />
                     </div>
+                </Flex>
+                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
+                    <Controller
+                        name="timeout"
+                        control={control}
+                        render={({field}) => (
+                            <QuerySettingsTimeout
+                                id="timeout"
+                                value={field.value}
+                                onChange={field.onChange}
+                                isEnabled={Boolean(field.value)}
+                                onToggle={(enabled) =>
+                                    field.onChange(enabled ? DEFAULT_QUERY_SETTINGS.timeout : '')
+                                }
+                                validationState={errors.timeout ? 'invalid' : undefined}
+                                errorMessage={errors.timeout?.message}
+                            />
+                        )}
+                    />
                 </Flex>
             </Dialog.Body>
             <Dialog.Footer
@@ -240,13 +236,14 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                 }}
                 renderButtons={(buttonApply, buttonCancel) => (
                     <div className={b('buttons-container')}>
-                        <ExternalLink
+                        <Button
                             href="https://ydb.tech/docs"
                             target="_blank"
-                            className={b('documentation-link')}
+                            view="outlined"
+                            size="l"
                         >
                             {i18n('docs')}
-                        </ExternalLink>
+                        </Button>
                         <div className={b('main-buttons')}>
                             {buttonCancel}
                             {buttonApply}

@@ -71,7 +71,7 @@ export const useClusterDashboardAvailable = () => {
 };
 
 export const useStreamingAvailable = () => {
-    return useGetFeatureVersion('/viewer/query') >= 7;
+    return useGetFeatureVersion('/viewer/query') >= 8;
 };
 
 const useGetSecuritySetting = (feature: SecuritySetting) => {

@@ -28,24 +28,13 @@
         flex: 6;
     }
 
-    &__limit-rows,
-    &__timeout {
-        width: 33.3%;
+    &__limit-rows {
+        width: 50%;
         margin-right: var(--g-spacing-2);
     }
 
-    &__timeout-suffix {
-        display: flex;
-        align-items: center;
-
-        color: var(--g-color-text-secondary);
-    }
-
-    &__documentation-link {
-        display: flex;
-        align-items: center;
-
-        margin-left: var(--g-spacing-4);
+    &__postfix {
+        margin-right: var(--g-spacing-2);
 
         color: var(--g-color-text-secondary);
     }
