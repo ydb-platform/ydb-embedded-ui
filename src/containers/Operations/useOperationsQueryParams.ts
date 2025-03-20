@@ -4,7 +4,7 @@ import {z} from 'zod';
 import type {OperationKind} from '../../types/api/operations';
 
 const operationKindSchema = z
-    .enum(['ss/backgrounds', 'export/s3', 'buildindex'])
+    .enum(['ss/backgrounds', 'export/s3', 'export/yt', 'buildindex'])
     .catch('buildindex');
 
 export function useOperationsQueryParams() {
