@@ -174,8 +174,8 @@ export default function QueryEditor(props: QueryEditorProps) {
         if (!partial) {
             if (text !== historyQueries[historyCurrentIndex]?.queryText) {
                 dispatch(saveQueryToHistory({queryText: text, queryId}));
-                dispatch(setIsDirty(false));
             }
+            dispatch(setIsDirty(false));
         }
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
     });

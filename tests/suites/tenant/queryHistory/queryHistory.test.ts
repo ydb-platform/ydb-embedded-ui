@@ -164,6 +164,33 @@ test.describe('Query History', () => {
         expect(editorValue.trim()).toBe(firstQuery.trim());
     });
 
+    test('No unsaved changes modal when running a query that is identical to last in history', async () => {
+        // Run first query
+        const firstQuery = 'SELECT 10 AS first_history_query;';
+        await queryEditor.run(firstQuery, QUERY_MODES.script);
+
+        // Set some other query
+        const secondQuery = 'SELECT 20 AS second_history_query;';
+        await queryEditor.setQuery(secondQuery);
+
+        // Run the first query again
+        await queryEditor.run(firstQuery, QUERY_MODES.script);
+
+        // Navigate to history tab
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.isVisible();
+
+        // Select the first query from history
+        await queryEditor.historyQueries.selectQuery(firstQuery);
+
+        // Verify no unsaved changes modal appeared
+        const isModalHidden = await tenantPage.isUnsavedChangesModalHidden();
+        expect(isModalHidden).toBe(true);
+        // Verify query is loaded in editor
+        const editorValue = await queryEditor.editorTextArea.inputValue();
+        expect(editorValue.trim()).toBe(firstQuery.trim());
+    });
+
     test('Unsaved changes modal appears when modifying a query and selecting from history', async () => {
         // Run a query
         const originalQuery = 'SELECT 30 AS original_history_query;';
