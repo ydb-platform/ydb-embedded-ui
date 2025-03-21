@@ -1,0 +1,27 @@
+.ydb-query-settings-timeout {
+    &__control-wrapper {
+        display: flex;
+        flex: 6;
+        align-items: center;
+    }
+
+    &__input {
+        width: 50%;
+    }
+
+    &__postfix {
+        margin-right: var(--g-spacing-2);
+        color: var(--g-color-text-secondary);
+    }
+
+    &__title {
+        flex: 4;
+
+        margin-right: var(--g-spacing-3);
+
+        font-weight: 500;
+        align-items: center;
+        height: var(--g-text-header-2-line-height);
+        white-space: nowrap;
+    }
+}

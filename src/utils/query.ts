@@ -329,7 +329,7 @@ export const querySettingsRestoreSchema = z
     .object({
         timeout: z.preprocess(
             (val) => (val === '' ? undefined : val),
-            z.coerce.number().positive().optional().catch(DEFAULT_QUERY_SETTINGS.timeout),
+            z.coerce.number().positive().optional(),
         ),
         limitRows: z.preprocess(
             (val) => (val === '' ? undefined : val),
