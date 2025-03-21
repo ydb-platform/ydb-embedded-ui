@@ -63,12 +63,12 @@ export function Tablet() {
 
     const {id} = useParams<{id: string}>();
 
-    const [{database: queryDatabase, clusterName: queryClusterName}] =
+    const [{database: queryDatabase, clusterName: queryClusterName, followerId: queryFollowerId}] =
         useQueryParams(tabletPageQueryParams);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tabletApi.useGetTabletQuery(
-        {id, database: queryDatabase ?? undefined},
+        {id, database: queryDatabase ?? undefined, followerId: queryFollowerId ?? undefined},
         {pollingInterval: autoRefreshInterval},
     );
 

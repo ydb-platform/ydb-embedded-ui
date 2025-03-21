@@ -18,7 +18,7 @@ interface TabletNameWrapperProps {
 export function TabletNameWrapper({tabletId, followerId, database}: TabletNameWrapperProps) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
-    const tabletPath = getTabletPagePath(tabletId, {database});
+    const tabletPath = getTabletPagePath(tabletId, {database, followerId: followerId?.toString()});
     const tabletName = `${tabletId}${followerId ? `.${followerId}` : ''}`;
 
     return (
