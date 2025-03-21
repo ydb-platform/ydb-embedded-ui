@@ -33,14 +33,14 @@ interface TTargetSpecific {
     Targets: TTarget[];
 }
 
-export interface TTransformTarget {
+export interface TTransferTarget {
     SrcPath?: string;
     DstPath?: string;
     TransformLambda?: string;
 }
 
-interface TTransformTargetSpecific {
-    Targets: TTransformTarget[];
+interface TTransferTargetSpecific {
+    Target: TTransferTarget;
 }
 
 /**
@@ -50,7 +50,7 @@ export interface TReplicationConfig {
     SrcConnectionParams?: TConnectionParams;
     Everything?: TTargetEverything;
     Specific?: TTargetSpecific;
-    TransferSpecific?: TTransformTargetSpecific;
+    TransferSpecific?: TTransferTargetSpecific;
     InitialSync?: boolean;
 }
 
