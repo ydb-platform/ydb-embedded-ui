@@ -21,17 +21,21 @@ const prepareChangefeedInfo = (
 
     const {Mode, Format} = streamDescription || {};
 
-    const created = formatCommonItem(
-        'CreateStep',
-        changefeedData?.PathDescription?.Self?.CreateStep,
-    );
     const changefeedInfo = formatObject(formatCdcStreamItem, {
         Mode,
         Format,
     });
     const topicInfo = prepareTopicSchemaInfo(topicData);
 
-    return [created, ...changefeedInfo, ...topicInfo];
+    const info = [...changefeedInfo, ...topicInfo];
+
+    const createStep = changefeedData?.PathDescription?.Self?.CreateStep;
+
+    if (Number(createStep)) {
+        info.unshift(formatCommonItem('CreateStep', createStep));
+    }
+
+    return info;
 };
 
 interface ChangefeedProps {

@@ -5,7 +5,7 @@ import NiceModal from '@ebay/nice-modal-react';
 import {useTypedSelector} from '..';
 import {CONFIRMATION_DIALOG} from '../../../components/ConfirmationDialog/ConfirmationDialog';
 import {SaveQueryButton} from '../../../containers/Tenant/Query/SaveQuery/SaveQuery';
-import {selectUserInput} from '../../../store/reducers/query/query';
+import {selectIsDirty, selectUserInput} from '../../../store/reducers/query/query';
 
 import i18n from './i18n';
 
@@ -66,11 +66,12 @@ export function changeInputWithConfirmation<T>(callback: (args: T) => void) {
 
 export function useChangeInputWithConfirmation<T>(callback: (args: T) => void) {
     const userInput = useTypedSelector(selectUserInput);
+    const isDirty = useTypedSelector(selectIsDirty);
     const callbackWithConfirmation = React.useMemo(
         () => changeInputWithConfirmation<T>(callback),
         [callback],
     );
-    if (!userInput) {
+    if (!userInput || !isDirty) {
         return callback;
     }
     return callbackWithConfirmation;

@@ -11,14 +11,21 @@ import './ExternalDataSource.scss';
 
 const b = cn('ydb-external-data-source-info');
 
-const prepareExternalDataSourceSummary = (data: TEvDescribeSchemeResult): InfoViewerItem[] => {
-    return [
+const prepareExternalDataSourceSummary = (data: TEvDescribeSchemeResult) => {
+    const info: InfoViewerItem[] = [
         {
             label: i18n('external-objects.source-type'),
             value: data.PathDescription?.ExternalDataSourceDescription?.SourceType,
         },
-        formatCommonItem('CreateStep', data.PathDescription?.Self?.CreateStep),
     ];
+
+    const createStep = data.PathDescription?.Self?.CreateStep;
+
+    if (Number(createStep)) {
+        info.push(formatCommonItem('CreateStep', data.PathDescription?.Self?.CreateStep));
+    }
+
+    return info;
 };
 
 const prepareExternalDataSourceInfo = (data: TEvDescribeSchemeResult): InfoViewerItem[] => {
