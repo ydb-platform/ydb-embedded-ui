@@ -55,11 +55,11 @@ export const tabletApi = api.injectEndpoints({
 
                     const {TabletStateInfo = []} = tabletResponseData;
                     const tabletData =
-                        TabletStateInfo.find((t) => t.FollowerId?.toString() === followerId) ||
-                        TabletStateInfo.find((t) => t.Leader) ||
-                        TabletStateInfo[0] ||
-                        {};
-                    const {TabletId} = tabletData;
+                        followerId === undefined
+                            ? TabletStateInfo.find((t) => t.Leader)
+                            : TabletStateInfo.find((t) => t.FollowerId?.toString() === followerId);
+
+                    const {TabletId} = tabletData || {};
 
                     return {data: {id: TabletId, data: tabletData, history: historyData}};
                 } catch (error) {
