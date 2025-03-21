@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.16.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.16.0...v8.16.1) (2025-03-21)
+
+
+### Bug Fixes
+
+* supported changes of the transfer configuration structure ([#2032](https://github.com/ydb-platform/ydb-embedded-ui/issues/2032)) ([78965ed](https://github.com/ydb-platform/ydb-embedded-ui/commit/78965edd4caf013ec4a2aca91614cef7550a9f16))
+
 ## [8.16.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.15.0...v8.16.0) (2025-03-20)
 
 
