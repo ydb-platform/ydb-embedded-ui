@@ -21,9 +21,14 @@ export function getLogsLink({dbName, logging}: GetLogsLinkProps): string {
             if (queryParam) {
                 const decodedQuery = decodeURIComponent(queryParam);
 
+                // gets content between curly braces and replaces with {content, database = dbName}
                 const updatedQuery = decodedQuery.replace(/\{([^}]*)\}/, (_match, contents) => {
                     const trimmedContents = contents.trim();
-                    return `{${trimmedContents}${trimmedContents ? ', ' : ''}database = "${dbName}", level = "ERROR"}`;
+                    if (trimmedContents) {
+                        return `{${trimmedContents}, database = "${dbName}"}`;
+                    } else {
+                        return `{database = "${dbName}"}`;
+                    }
                 });
 
                 url.searchParams.set('query', updatedQuery);
