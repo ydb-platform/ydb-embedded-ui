@@ -15,7 +15,7 @@ export function ExtendedTenant({
     getMonitoringLink,
     getLogsLink,
 }: ExtendedTenantProps) {
-    const {monitoring, name: clusterName} = useClusterBaseInfo();
+    const {monitoring, logging} = useClusterBaseInfo();
     const additionalNodesProps = useAdditionalNodesProps();
 
     const additionalTenantProps = {
@@ -31,10 +31,10 @@ export function ExtendedTenant({
             return null;
         },
         getLogsLink: (dbName?: string) => {
-            if (clusterName && dbName && getLogsLink) {
+            if (logging && dbName && getLogsLink) {
                 return getLogsLink({
                     dbName,
-                    clusterName,
+                    logging,
                 });
             }
 
