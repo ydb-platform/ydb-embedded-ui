@@ -11,6 +11,7 @@ import {
     goToPreviousQuery,
     selectQueriesHistory,
     selectUserInput,
+    setIsDirty,
 } from '../../../../store/reducers/query/query';
 import type {QueryAction} from '../../../../types/store/query';
 import {ENABLE_CODE_ASSISTANT, LAST_USED_QUERY_ACTION_KEY} from '../../../../utils/constants';
@@ -186,6 +187,7 @@ export function YqlEditor({
     const onChange = (newValue: string) => {
         updateErrorsHighlighting();
         changeUserInput({input: newValue});
+        dispatch(setIsDirty(true));
     };
     return (
         <MonacoEditor

@@ -40,7 +40,7 @@ function prepareTransferItems(data: TEvDescribeSchemeResult) {
     const state = transferDescription.State;
     const srcConnectionParams = transferDescription.Config?.SrcConnectionParams || {};
     const {Endpoint, Database} = srcConnectionParams;
-    const target = transferDescription.Config?.TransferSpecific?.Targets[0];
+    const target = transferDescription.Config?.TransferSpecific?.Target;
     const srcPath = target?.SrcPath;
     const dstPath = target?.DstPath;
     const transformLambda = target?.TransformLambda;

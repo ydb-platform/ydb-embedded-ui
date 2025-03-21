@@ -1,5 +1,23 @@
 # Changelog
 
+## [8.16.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.15.0...v8.16.0) (2025-03-20)
+
+
+### Features
+
+* add database hyperlink to logging service ([#2021](https://github.com/ydb-platform/ydb-embedded-ui/issues/2021)) ([dbab46b](https://github.com/ydb-platform/ydb-embedded-ui/commit/dbab46b2d688b25669f07b2aa7294598eb5443d2))
+* query streaming only for queryService ([#2015](https://github.com/ydb-platform/ydb-embedded-ui/issues/2015)) ([105fd2c](https://github.com/ydb-platform/ydb-embedded-ui/commit/105fd2c5a706bf886c6457a78a805e374df6a67c))
+* request clusters handler only on Versions tab ([#2008](https://github.com/ydb-platform/ydb-embedded-ui/issues/2008)) ([7aacdfe](https://github.com/ydb-platform/ydb-embedded-ui/commit/7aacdfe8e939e730d2a1dbc10a7c7fa785f54bbb))
+
+
+### Bug Fixes
+
+* kind export operations type ([#2030](https://github.com/ydb-platform/ydb-embedded-ui/issues/2030)) ([3b47eb5](https://github.com/ydb-platform/ydb-embedded-ui/commit/3b47eb59b5444f3f3bff5425f08f3d132c251446))
+* **ObjectSummary:** do not display CreateTime if CreateStep is 0 ([#2018](https://github.com/ydb-platform/ydb-embedded-ui/issues/2018)) ([7af1ed3](https://github.com/ydb-platform/ydb-embedded-ui/commit/7af1ed377fe47fb38498dd7540f8c273a8a9b0be))
+* **ShemaViewer:** show loader correctly ([#2019](https://github.com/ydb-platform/ydb-embedded-ui/issues/2019)) ([29ae340](https://github.com/ydb-platform/ydb-embedded-ui/commit/29ae340156be237a7e01ff429bc62fa38408c63a))
+* unsaved changes in query editor ([#2026](https://github.com/ydb-platform/ydb-embedded-ui/issues/2026)) ([d1d64f7](https://github.com/ydb-platform/ydb-embedded-ui/commit/d1d64f7792842abf42de9c72de3b50c8c3bde1ec))
+* **VDiskInfo:** lowercase vdisk page ([#2014](https://github.com/ydb-platform/ydb-embedded-ui/issues/2014)) ([577c9aa](https://github.com/ydb-platform/ydb-embedded-ui/commit/577c9aa2f545e4792fac6fd299dea9f8653a9082))
+
 ## [8.15.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.14.0...v8.15.0) (2025-03-10)
 
 

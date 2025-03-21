@@ -9,6 +9,7 @@ import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/Re
 import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
+import {setIsDirty} from '../../../../store/reducers/query/query';
 import {
     deleteSavedQuery,
     selectSavedQueriesFilter,
@@ -92,6 +93,7 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
     const applyQueryClick = React.useCallback(
         ({queryText, queryName}: {queryText: string; queryName: string}) => {
             changeUserInput({input: queryText});
+            dispatch(setIsDirty(false));
             dispatch(setQueryNameToEdit(queryName));
             dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
         },
