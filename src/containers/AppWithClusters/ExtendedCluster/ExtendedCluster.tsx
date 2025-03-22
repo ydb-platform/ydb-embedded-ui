@@ -38,12 +38,19 @@ const getAdditionalBalancerInfo = (balancer: string) => {
     };
 };
 
-const getAdditionalClusterProps = (
-    clusterName: string | undefined,
-    monitoring: string | undefined,
-    balancer: string | undefined,
-    getMonitoringClusterLink?: GetMonitoringClusterLink,
-) => {
+interface GetAdditionalClusterProps {
+    clusterName: string | undefined;
+    monitoring: string | undefined;
+    balancer: string | undefined;
+    getMonitoringClusterLink?: GetMonitoringClusterLink;
+}
+
+const getAdditionalClusterProps = ({
+    clusterName,
+    monitoring,
+    balancer,
+    getMonitoringClusterLink,
+}: GetAdditionalClusterProps) => {
     const additionalClusterProps: AdditionalClusterProps = {};
 
     if (monitoring && getMonitoringClusterLink) {
@@ -61,14 +68,25 @@ const getAdditionalClusterProps = (
     return additionalClusterProps;
 };
 
-const getAdditionalTenantsProps = (
-    clusterName: string | undefined,
-    monitoring: string | undefined,
-    balancer: string | undefined,
-    useClusterBalancerAsBackend: boolean | undefined,
-    getMonitoringLink?: GetMonitoringLink,
-    getLogsLink?: GetLogsLink,
-) => {
+interface GetAdditionalTenantsProps {
+    clusterName: string | undefined;
+    monitoring: string | undefined;
+    balancer: string | undefined;
+    logging: string | undefined;
+    useClusterBalancerAsBackend: boolean | undefined;
+    getMonitoringLink?: GetMonitoringLink;
+    getLogsLink?: GetLogsLink;
+}
+
+const getAdditionalTenantsProps = ({
+    clusterName,
+    monitoring,
+    balancer,
+    logging,
+    useClusterBalancerAsBackend,
+    getMonitoringLink,
+    getLogsLink,
+}: GetAdditionalTenantsProps) => {
     const additionalTenantsProps: AdditionalTenantsProps = {};
 
     additionalTenantsProps.prepareTenantBackend = (
@@ -104,12 +122,12 @@ const getAdditionalTenantsProps = (
         };
     }
 
-    if (clusterName && getLogsLink) {
+    if (logging && getLogsLink) {
         additionalTenantsProps.getLogsLink = (dbName?: string) => {
             if (dbName) {
                 return getLogsLink({
                     dbName,
-                    clusterName,
+                    logging,
                 });
             }
 
@@ -133,27 +151,28 @@ export function ExtendedCluster({
     getLogsLink,
 }: ExtendedClusterProps) {
     const additionalNodesProps = useAdditionalNodesProps();
-    const {name, balancer, monitoring} = useClusterBaseInfo();
+    const {name, balancer, monitoring, logging} = useClusterBaseInfo();
 
     const [useClusterBalancerAsBackend] = useSetting<boolean>(USE_CLUSTER_BALANCER_AS_BACKEND_KEY);
 
     return (
         <div className={b()}>
             <ClusterComponent
-                additionalClusterProps={getAdditionalClusterProps(
-                    name,
+                additionalClusterProps={getAdditionalClusterProps({
+                    clusterName: name,
                     monitoring,
                     balancer,
                     getMonitoringClusterLink,
-                )}
-                additionalTenantsProps={getAdditionalTenantsProps(
-                    name,
+                })}
+                additionalTenantsProps={getAdditionalTenantsProps({
+                    clusterName: name,
                     monitoring,
                     balancer,
+                    logging,
                     useClusterBalancerAsBackend,
                     getMonitoringLink,
                     getLogsLink,
-                )}
+                })}
                 additionalNodesProps={additionalNodesProps}
             />
         </div>

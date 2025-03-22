@@ -102,7 +102,7 @@ export function parseMonitoringData(monitoring: string): ParsedMonitoringData | 
 
 interface GetLogsLinkProps {
     dbName: string;
-    clusterName: string;
+    logging: string;
 }
 
 export type GetLogsLink = (props: GetLogsLinkProps) => string;
