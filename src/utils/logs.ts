@@ -21,15 +21,9 @@ export function getLogsLink({dbName, logging}: GetLogsLinkProps): string {
             if (queryParam) {
                 const decodedQuery = decodeURIComponent(queryParam);
 
-                // Gets content between curly braces and replaces with {content, database = "dbName"}
-                const updatedQuery = decodedQuery.replace(/\{([^}]*)\}/, (_match, contents) => {
-                    const trimmedContents = contents.trim();
-                    if (trimmedContents) {
-                        return `{${trimmedContents}, database = "${dbName}"}`;
-                    } else {
-                        return `{database = "${dbName}"}`;
-                    }
-                });
+                const queryBetweenBraces = decodedQuery.slice(1, -1);
+                const witComma = queryBetweenBraces.length > 0;
+                const updatedQuery = `{${queryBetweenBraces}${witComma ? ', ' : ''}database = "${dbName}"}`;
 
                 url.searchParams.set('query', updatedQuery);
             }
