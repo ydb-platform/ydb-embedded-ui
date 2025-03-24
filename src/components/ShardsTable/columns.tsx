@@ -19,8 +19,12 @@ export const getPathColumn: GetShardsColumn = ({schemaPath = ''}) => {
         name: TOP_SHARDS_COLUMNS_IDS.Path,
         header: TOP_SHARDS_COLUMNS_TITLES.Path,
         render: ({row}) => {
-            // row.Path - relative schema path
-            return <LinkToSchemaObject path={schemaPath + row.Path}>{row.Path}</LinkToSchemaObject>;
+            // row.RelativePath - relative schema path
+            return (
+                <LinkToSchemaObject path={schemaPath + row.RelativePath}>
+                    {row.RelativePath}
+                </LinkToSchemaObject>
+            );
         },
         width: 300,
     };
@@ -43,7 +47,12 @@ export const getTabletIdColumn: GetShardsColumn = () => {
             if (!row.TabletId) {
                 return EMPTY_DATA_PLACEHOLDER;
             }
-            return <TabletNameWrapper tabletId={row.TabletId} />;
+            return (
+                <TabletNameWrapper
+                    tabletId={row.TabletId}
+                    followerId={row.FollowerId || undefined}
+                />
+            );
         },
         width: 220,
     };

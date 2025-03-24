@@ -124,6 +124,7 @@ export const tabletPageQueryParams = {
     database: StringParam,
     clusterName: StringParam,
     activeTab: StringParam,
+    followerId: StringParam,
 } as const;
 
 type TabletPageQuery = QueryParamsTypeFromQueryObject<typeof tabletPageQueryParams>;
