@@ -11,17 +11,18 @@
 
     &__postfix {
         margin-right: var(--g-spacing-2);
+
         color: var(--g-color-text-secondary);
     }
 
     &__title {
         flex: 4;
+        align-items: center;
 
+        height: var(--g-text-header-2-line-height);
         margin-right: var(--g-spacing-3);
 
         font-weight: 500;
-        align-items: center;
-        height: var(--g-text-header-2-line-height);
         white-space: nowrap;
     }
 }
