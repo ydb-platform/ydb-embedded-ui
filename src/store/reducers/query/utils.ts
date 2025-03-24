@@ -46,3 +46,7 @@ export function isStreamDataChunk(content: StreamingChunk): content is StreamDat
 export function isQueryResponseChunk(content: StreamingChunk): content is QueryResponseChunk {
     return content?.meta?.event === 'QueryResponse';
 }
+
+export function isKeepAliveChunk(content: StreamingChunk): content is SessionChunk {
+    return content?.meta?.event === 'KeepAlive';
+}

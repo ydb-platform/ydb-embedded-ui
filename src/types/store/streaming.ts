@@ -19,6 +19,12 @@ export interface SessionChunk {
     };
 }
 
+export interface KeepAliveChunk {
+    meta: {
+        event: 'KeepAlive';
+    };
+}
+
 export interface StreamDataChunk {
     meta: {
         event: 'StreamData';
@@ -51,4 +57,4 @@ export interface BaseQueryResponseChunk {
 export type QueryResponseChunk = BaseQueryResponseChunk &
     (SuccessQueryResponseData | ErrorQueryResponseData);
 
-export type StreamingChunk = SessionChunk | StreamDataChunk | QueryResponseChunk;
+export type StreamingChunk = SessionChunk | StreamDataChunk | QueryResponseChunk | KeepAliveChunk;
