@@ -12,7 +12,7 @@ export const getUrlData = ({
         const backend = urlSearchParams.get('backend') ?? undefined;
         const clusterName = urlSearchParams.get('clusterName') ?? undefined;
         return {
-            basename: '/',
+            basename: 'ui',
             backend,
             clusterName,
         };

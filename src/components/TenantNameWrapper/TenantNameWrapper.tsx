@@ -66,10 +66,13 @@ export function TenantNameWrapper({tenant, additionalTenantsProps}: TenantNameWr
                 withLeftTrim={true}
                 status={tenant.Overall}
                 hasClipboardButton
-                path={getTenantPath({
-                    database: tenant.Name,
-                    backend,
-                })}
+                path={
+                    '/ui' +
+                    getTenantPath({
+                        database: tenant.Name,
+                        backend,
+                    })
+                }
             />
         </CellWithPopover>
     );
