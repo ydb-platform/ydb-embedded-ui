@@ -4,6 +4,7 @@ import {Flex, Text} from '@gravity-ui/uikit';
 import {AsyncReplicationState} from '../../../../../components/AsyncReplicationState';
 import {YDBSyntaxHighlighter} from '../../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
+import {replicationApi} from '../../../../../store/reducers/replication';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {getEntityName} from '../../../utils';
 
@@ -11,11 +12,13 @@ import {Credentials} from './Credentials';
 import i18n from './i18n';
 
 interface TransferProps {
+    path: string;
+    database: string;
     data?: TEvDescribeSchemeResult;
 }
 
 /** Displays overview for Transfer EPathType */
-export function TransferInfo({data}: TransferProps) {
+export function TransferInfo({path, database, data}: TransferProps) {
     const entityName = getEntityName(data?.PathDescription);
 
     if (!data) {
@@ -26,7 +29,7 @@ export function TransferInfo({data}: TransferProps) {
         );
     }
 
-    const transferItems = prepareTransferItems(data);
+    const transferItems = prepareTransferItems(path, database, data);
 
     return (
         <Flex direction="column" gap="4">
@@ -35,7 +38,29 @@ export function TransferInfo({data}: TransferProps) {
     );
 }
 
-function prepareTransferItems(data: TEvDescribeSchemeResult) {
+function prepareErrors(path: string, database: string) {
+    const {data, error} = replicationApi.useGetReplicationQuery({path, database}, {});
+
+    if (data?.error?.issues) {
+        return (
+            <Text variant="code-inline-2" color="danger">
+                {data.error.issues[0].message}
+            </Text>
+        );
+    }
+
+    if (error) {
+        return (
+            <Text variant="code-inline-2" color="danger">
+                Error
+            </Text>
+        );
+    }
+
+    return '';
+}
+
+function prepareTransferItems(path: string, database: string, data: TEvDescribeSchemeResult) {
     const transferDescription = data.PathDescription?.ReplicationDescription || {};
     const state = transferDescription.State;
     const srcConnectionParams = transferDescription.Config?.SrcConnectionParams || {};
@@ -44,6 +69,7 @@ function prepareTransferItems(data: TEvDescribeSchemeResult) {
     const srcPath = target?.SrcPath;
     const dstPath = target?.DstPath;
     const transformLambda = target?.TransformLambda;
+    const errors = prepareErrors(path, database);
 
     const info: DefinitionListItem[] = [];
 
@@ -51,6 +77,13 @@ function prepareTransferItems(data: TEvDescribeSchemeResult) {
         info.push({
             name: i18n('state.label'),
             content: <AsyncReplicationState state={state} />,
+        });
+    }
+
+    if (errors) {
+        info.push({
+            name: i18n('state.error'),
+            content: errors,
         });
     }
 

@@ -95,7 +95,9 @@ function Overview({type, path, database}: OverviewProps) {
             [EPathType.EPathTypeExternalDataSource]: () => <ExternalDataSourceInfo data={data} />,
             [EPathType.EPathTypeView]: () => <ViewInfo data={data} />,
             [EPathType.EPathTypeReplication]: () => <AsyncReplicationInfo data={data} />,
-            [EPathType.EPathTypeTransfer]: () => <TransferInfo data={data} />,
+            [EPathType.EPathTypeTransfer]: () => (
+                <TransferInfo path={path} database={database} data={data} />
+            ),
         };
 
         return (type && pathTypeToComponent[type]?.()) || <TableInfo data={data} type={type} />;
