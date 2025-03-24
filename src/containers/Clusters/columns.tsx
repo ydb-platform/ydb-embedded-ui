@@ -34,7 +34,7 @@ export const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
             const clusterPath =
                 useEmbeddedUi && backend
                     ? createDeveloperUIMonitoringPageHref(backend)
-                    : getClusterPath(undefined, {backend, clusterName});
+                    : '/ui' + getClusterPath(undefined, {backend, clusterName});
 
             const clusterStatus = row.cluster?.Overall;
 
