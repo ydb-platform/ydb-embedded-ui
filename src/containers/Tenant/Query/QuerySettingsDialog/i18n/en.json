@@ -11,6 +11,7 @@
   "button-cancel": "Cancel",
   "form.timeout.seconds": "sec",
   "form.limit.rows": "rows",
+  "form.timeout.disabled": "Not available to turn off in this query type",
   "form.validation.timeout": "Must be positive",
   "form.validation.limitRows": "Must be between 1 and 100000",
   "description.default": " (default)",

@@ -7,7 +7,6 @@ import type {SnippetParams} from '../../../components/ConnectToDB/types';
 import type {AppDispatch} from '../../../store';
 import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
-import type {QuerySettings} from '../../../types/store/query';
 import createToast from '../../../utils/createToast';
 import {insertSnippetToEditor} from '../../../utils/monaco/insertSnippet';
 import {transformPath} from '../ObjectSummary/transformPath';
@@ -42,7 +41,6 @@ import {
 } from './schemaQueryTemplates';
 
 interface ActionsAdditionalParams {
-    updateQueryExecutionSettings: (settings?: Partial<QuerySettings>) => void;
     setActivePath: (path: string) => void;
     showCreateDirectoryDialog?: (path: string) => void;
     getConfirmation?: () => Promise<boolean>;

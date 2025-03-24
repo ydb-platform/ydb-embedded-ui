@@ -18,7 +18,7 @@ import {
     useTypedDispatch,
     useTypedSelector,
 } from '../../../../utils/hooks';
-import {DEFAULT_QUERY_SETTINGS, querySettingsValidationSchema} from '../../../../utils/query';
+import {QUERY_MODES, querySettingsValidationSchema} from '../../../../utils/query';
 
 import {QuerySettingsSelect} from './QuerySettingsSelect';
 import {QuerySettingsTimeout} from './QuerySettingsTimeout';
@@ -74,6 +74,8 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
     const {
         control,
         handleSubmit,
+        setValue,
+        watch,
         formState: {errors},
     } = useForm<QuerySettings>({
         defaultValues: initialValues,
@@ -82,6 +84,9 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
 
     const [useShowPlanToSvg] = useSetting<boolean>(USE_SHOW_PLAN_SVG_KEY);
     const enableTracingLevel = useTracingLevelOptionAvailable();
+
+    const timeout = watch('timeout');
+    const queryMode = watch('queryMode');
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -98,7 +103,15 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                 <QuerySettingsSelect
                                     id="queryMode"
                                     setting={field.value}
-                                    onUpdateSetting={field.onChange}
+                                    onUpdateSetting={(mode) => {
+                                        field.onChange(mode);
+
+                                        if (mode !== 'query' && timeout === null) {
+                                            setValue('timeout', '');
+                                        } else if (mode === 'query') {
+                                            setValue('timeout', null);
+                                        }
+                                    }}
                                     settingOptions={QUERY_SETTINGS_FIELD_SETTINGS.queryMode.options}
                                 />
                             )}
@@ -214,14 +227,12 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                         render={({field}) => (
                             <QuerySettingsTimeout
                                 id="timeout"
-                                value={field.value}
+                                value={typeof field.value === 'string' ? undefined : field.value}
                                 onChange={field.onChange}
-                                isEnabled={Boolean(field.value)}
-                                onToggle={(enabled) =>
-                                    field.onChange(enabled ? DEFAULT_QUERY_SETTINGS.timeout : '')
-                                }
+                                onToggle={(enabled) => field.onChange(enabled ? '' : null)}
                                 validationState={errors.timeout ? 'invalid' : undefined}
                                 errorMessage={errors.timeout?.message}
+                                isDisabled={queryMode !== QUERY_MODES.query}
                             />
                         )}
                     />

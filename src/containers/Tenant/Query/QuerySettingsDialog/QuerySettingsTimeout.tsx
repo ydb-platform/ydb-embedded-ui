@@ -1,6 +1,7 @@
 import React from 'react';
 
-import {Switch, TextInput} from '@gravity-ui/uikit';
+import {CircleQuestion} from '@gravity-ui/icons';
+import {Icon, Popover, Switch, TextInput} from '@gravity-ui/uikit';
 
 import {cn} from '../../../../utils/cn';
 
@@ -13,22 +14,22 @@ const b = cn('ydb-query-settings-timeout');
 
 interface QuerySettingsTimeoutProps {
     id?: string;
-    value: number | undefined;
+    value: number | null | undefined;
     onChange: (value: number | undefined) => void;
-    isEnabled: boolean;
     onToggle: (enabled: boolean) => void;
     validationState?: 'invalid';
     errorMessage?: string;
+    isDisabled?: boolean;
 }
 
 export function QuerySettingsTimeout({
     id,
     value,
     onChange,
-    isEnabled,
     onToggle,
     validationState,
     errorMessage,
+    isDisabled,
 }: QuerySettingsTimeoutProps) {
     const handleValueChange = React.useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,12 +39,30 @@ export function QuerySettingsTimeout({
         [onChange],
     );
 
+    const isChecked = value !== null;
+
     return (
         <React.Fragment>
-            <Switch checked={isEnabled} onUpdate={onToggle} className={b('title')}>
-                {QUERY_SETTINGS_FIELD_SETTINGS.timeout.title}
-            </Switch>
-            {isEnabled ? (
+            <div className={b('title')}>
+                <Switch
+                    disabled={isDisabled}
+                    checked={isChecked}
+                    onUpdate={onToggle}
+                    className={b('switch')}
+                    content={QUERY_SETTINGS_FIELD_SETTINGS.timeout.title}
+                />
+                {isDisabled ? (
+                    <Popover
+                        content={i18n('form.timeout.disabled')}
+                        placement={'bottom-start'}
+                        hasArrow={false}
+                        size="s"
+                    >
+                        <Icon className={b('question-icon')} data={CircleQuestion} />
+                    </Popover>
+                ) : null}
+            </div>
+            {isChecked && (
                 <div className={b('control-wrapper')}>
                     <TextInput
                         id={id}
@@ -60,7 +79,7 @@ export function QuerySettingsTimeout({
                         }
                     />
                 </div>
-            ) : null}
+            )}
         </React.Fragment>
     );
 }
