@@ -63,12 +63,12 @@ export function Tablet() {
 
     const {id} = useParams<{id: string}>();
 
-    const [{database: queryDatabase, clusterName: queryClusterName}] =
+    const [{database: queryDatabase, clusterName: queryClusterName, followerId: queryFollowerId}] =
         useQueryParams(tabletPageQueryParams);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tabletApi.useGetTabletQuery(
-        {id, database: queryDatabase ?? undefined},
+        {id, database: queryDatabase ?? undefined, followerId: queryFollowerId ?? undefined},
         {pollingInterval: autoRefreshInterval},
     );
 
@@ -131,7 +131,9 @@ function TabletContent({
     history: ITabletPreparedHistoryItem[];
 }) {
     const isEmpty = !Object.keys(tablet).length;
-    const {Overall, HiveId} = tablet;
+    const {Overall, HiveId, FollowerId} = tablet;
+
+    const tabletName = `${id}${FollowerId ? `.${FollowerId}` : ''}`;
 
     return (
         <EmptyStateWrapper
@@ -143,7 +145,7 @@ function TabletContent({
                 <EntityPageTitle
                     entityName={i18n('tablet.header')}
                     status={Overall ?? EFlag.Grey}
-                    id={id}
+                    id={tabletName}
                 />
                 <TabletControls tablet={tablet} />
                 <TabletInfo tablet={tablet} />

@@ -8,7 +8,11 @@ export const tabletApi = api.injectEndpoints({
     endpoints: (build) => ({
         getTablet: build.query({
             queryFn: async (
-                {id, database}: {id: string; database?: string; nodeId?: string},
+                {
+                    id,
+                    database,
+                    followerId,
+                }: {id: string; database?: string; nodeId?: string; followerId?: string},
                 {signal},
             ) => {
                 try {
@@ -50,8 +54,12 @@ export const tabletApi = api.injectEndpoints({
                     }, []);
 
                     const {TabletStateInfo = []} = tabletResponseData;
-                    const [tabletData = {}] = TabletStateInfo;
-                    const {TabletId} = tabletData;
+                    const tabletData =
+                        followerId === undefined
+                            ? TabletStateInfo.find((t) => t.Leader)
+                            : TabletStateInfo.find((t) => t.FollowerId?.toString() === followerId);
+
+                    const {TabletId} = tabletData || {};
 
                     return {data: {id: TabletId, data: tabletData, history: historyData}};
                 } catch (error) {

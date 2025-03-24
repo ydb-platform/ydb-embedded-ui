@@ -53,7 +53,13 @@ function getColumns({database}: {database?: string}) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
 
-                return <TabletNameWrapper tabletId={row.TabletId} database={database} />;
+                return (
+                    <TabletNameWrapper
+                        tabletId={row.TabletId}
+                        database={database}
+                        followerId={row.FollowerId || undefined}
+                    />
+                );
             },
         },
         {
