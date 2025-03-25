@@ -1,6 +1,6 @@
 import {ShieldKeyhole} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
-import {Icon, Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
+import {ClipboardButton, Icon, Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
 
 import {CellWithPopover} from '../../../../components/CellWithPopover/CellWithPopover';
 import {InternalLink} from '../../../../components/InternalLink';
@@ -144,12 +144,20 @@ const diskSpaceUsageColumn: StorageGroupsColumn = {
 const groupIdColumn: StorageGroupsColumn = {
     name: STORAGE_GROUPS_COLUMNS_IDS.GroupId,
     header: STORAGE_GROUPS_COLUMNS_TITLES.GroupId,
-    width: 130,
+    width: 140,
     render: ({row}) => {
         return row.GroupId ? (
-            <InternalLink className={b('group-id')} to={getStorageGroupPath(row.GroupId)}>
-                {row.GroupId}
-            </InternalLink>
+            <div className={b('group-id-wrapper')}>
+                <InternalLink className={b('group-id')} to={getStorageGroupPath(row.GroupId)}>
+                    {row.GroupId}
+                </InternalLink>
+                <ClipboardButton
+                    text={String(row.GroupId)}
+                    className={b('clipboard-button')}
+                    size="xs"
+                    view="normal"
+                />
+            </div>
         ) : (
             '-'
         );

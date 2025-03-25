@@ -16,6 +16,7 @@
         margin-right: var(--g-spacing-2);
     }
 
+    &__info-icon,
     &__clipboard-button {
         color: var(--g-color-text-secondary);
 
@@ -26,13 +27,29 @@
         }
     }
 
+    &__info-icon {
+        &:hover {
+            color: var(--g-color-text-primary);
+        }
+    }
+
     &__wrapper {
         position: relative;
 
         overflow: hidden;
 
-        &_with-button {
+        &_with-clipboard-button {
             padding-right: var(--button-width);
+        }
+
+        &_with-info-button {
+            padding-right: var(--button-width);
+        }
+
+        &_with-clipboard-button {
+            &.entity-status__wrapper_with-info-button {
+                padding-right: calc(2 * var(--button-width));
+            }
         }
     }
 
@@ -51,6 +68,8 @@
         &_visible {
             width: min-content;
             padding: var(--g-spacing-1);
+
+            background-color: var(--g-color-base-background);
         }
 
         .data-table__row:hover &,
