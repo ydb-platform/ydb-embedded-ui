@@ -4,6 +4,8 @@ import {CircleQuestion} from '@gravity-ui/icons';
 import {Icon, Popover, Switch, TextInput} from '@gravity-ui/uikit';
 
 import {cn} from '../../../../utils/cn';
+import {ENABLE_QUERY_STREAMING} from '../../../../utils/constants';
+import {useSetting} from '../../../../utils/hooks';
 
 import {QUERY_SETTINGS_FIELD_SETTINGS} from './constants';
 import i18n from './i18n';
@@ -31,6 +33,8 @@ export function QuerySettingsTimeout({
     errorMessage,
     isDisabled,
 }: QuerySettingsTimeoutProps) {
+    const [isQueryStreamingEnabled] = useSetting(ENABLE_QUERY_STREAMING);
+
     const handleValueChange = React.useCallback(
         (event: React.ChangeEvent<HTMLInputElement>) => {
             const newValue = event.target.value ? Number(event.target.value) : undefined;
@@ -41,27 +45,35 @@ export function QuerySettingsTimeout({
 
     const isChecked = value !== null;
 
+    const queryStreamingLabel = isQueryStreamingEnabled ? (
+        <div className={b('switch-title')}>
+            <Switch
+                disabled={isDisabled}
+                checked={isChecked}
+                onUpdate={onToggle}
+                className={b('switch')}
+                content={QUERY_SETTINGS_FIELD_SETTINGS.timeout.title}
+            />
+            {isDisabled ? (
+                <Popover
+                    content={i18n('form.timeout.disabled')}
+                    placement={'bottom-start'}
+                    hasArrow={false}
+                    size="s"
+                >
+                    <Icon className={b('question-icon')} data={CircleQuestion} />
+                </Popover>
+            ) : null}
+        </div>
+    ) : (
+        <label htmlFor="timeout" className={b('label-title')}>
+            {QUERY_SETTINGS_FIELD_SETTINGS.timeout.title}
+        </label>
+    );
+
     return (
         <React.Fragment>
-            <div className={b('title')}>
-                <Switch
-                    disabled={isDisabled}
-                    checked={isChecked}
-                    onUpdate={onToggle}
-                    className={b('switch')}
-                    content={QUERY_SETTINGS_FIELD_SETTINGS.timeout.title}
-                />
-                {isDisabled ? (
-                    <Popover
-                        content={i18n('form.timeout.disabled')}
-                        placement={'bottom-start'}
-                        hasArrow={false}
-                        size="s"
-                    >
-                        <Icon className={b('question-icon')} data={CircleQuestion} />
-                    </Popover>
-                ) : null}
-            </div>
+            {queryStreamingLabel}
             {isChecked && (
                 <div className={b('control-wrapper')}>
                     <TextInput
