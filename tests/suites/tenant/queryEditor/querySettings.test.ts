@@ -218,6 +218,10 @@ test.describe('Test Query Settings', async () => {
         const hintText = await queryEditor.settingsDialog.getTimeoutHintText();
         expect(hintText).toBeTruthy(); // Should have some text content
 
+        // Hover some other input to remove the hint
+        await queryEditor.settingsDialog.hoverStatisticsSelect();
+        await page.waitForTimeout(500);
+
         // Close dialog
         await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
         await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
