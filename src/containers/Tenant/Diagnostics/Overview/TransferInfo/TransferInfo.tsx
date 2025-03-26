@@ -4,6 +4,8 @@ import {Flex, Text} from '@gravity-ui/uikit';
 import {AsyncReplicationState} from '../../../../../components/AsyncReplicationState';
 import {YDBSyntaxHighlighter} from '../../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
+import {replicationApi} from '../../../../../store/reducers/replication';
+import type {DescribeReplicationResult} from '../../../../../types/api/replication';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {getEntityName} from '../../../utils';
 
@@ -11,11 +13,13 @@ import {Credentials} from './Credentials';
 import i18n from './i18n';
 
 interface TransferProps {
+    path: string;
+    database: string;
     data?: TEvDescribeSchemeResult;
 }
 
 /** Displays overview for Transfer EPathType */
-export function TransferInfo({data}: TransferProps) {
+export function TransferInfo({path, database, data}: TransferProps) {
     const entityName = getEntityName(data?.PathDescription);
 
     if (!data) {
@@ -26,7 +30,8 @@ export function TransferInfo({data}: TransferProps) {
         );
     }
 
-    const transferItems = prepareTransferItems(data);
+    const {data: replicationData} = replicationApi.useGetReplicationQuery({path, database}, {});
+    const transferItems = prepareTransferItems(data, replicationData);
 
     return (
         <Flex direction="column" gap="4">
@@ -35,7 +40,10 @@ export function TransferInfo({data}: TransferProps) {
     );
 }
 
-function prepareTransferItems(data: TEvDescribeSchemeResult) {
+function prepareTransferItems(
+    data: TEvDescribeSchemeResult,
+    replicationData: DescribeReplicationResult | undefined,
+) {
     const transferDescription = data.PathDescription?.ReplicationDescription || {};
     const state = transferDescription.State;
     const srcConnectionParams = transferDescription.Config?.SrcConnectionParams || {};
@@ -51,6 +59,18 @@ function prepareTransferItems(data: TEvDescribeSchemeResult) {
         info.push({
             name: i18n('state.label'),
             content: <AsyncReplicationState state={state} />,
+        });
+    }
+
+    if (replicationData?.error?.issues && replicationData.error.issues[0]?.message) {
+        info.push({
+            name: i18n('state.error'),
+            copyText: replicationData.error.issues[0].message,
+            content: (
+                <Text variant="code-inline-2" color="danger">
+                    {replicationData.error.issues[0].message}
+                </Text>
+            ),
         });
     }
 
