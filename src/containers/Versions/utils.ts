@@ -22,7 +22,7 @@ export const useGetVersionValues = (cluster?: TClusterInfo, versionToColor?: Ver
             ? skipToken
             : {
                   tablets: false,
-                  fieldsRequired: ['SystemState'],
+                  fieldsRequired: ['SystemState', 'SubDomainKey'],
                   group: 'Version',
               },
     );

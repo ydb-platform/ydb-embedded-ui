@@ -72,7 +72,7 @@ export function Cluster({
     const clusterTitle = metaClusterTitle ?? viewerClusterTitle;
 
     const {
-        data: {clusterData: cluster = {}, groupsStats} = {},
+        data: {clusterData: cluster, groupsStats} = {},
         isLoading: infoLoading,
         error,
     } = clusterApi.useGetClusterInfoQuery(clusterName ?? undefined);
@@ -121,7 +121,7 @@ export function Cluster({
             </div>
             {isClusterDashboardAvailable && (
                 <ClusterDashboard
-                    cluster={cluster}
+                    cluster={cluster ?? {}}
                     groupStats={groupsStats}
                     loading={infoLoading}
                     error={clusterError || cluster?.error}
@@ -193,7 +193,7 @@ export function Cluster({
                         getLocationObjectFromHref(getClusterPath(clusterTabsIds.versions)).pathname
                     }
                 >
-                    <Versions cluster={cluster} />
+                    {cluster && <Versions cluster={cluster} />}
                 </Route>
                 <Route
                     render={() => (
