@@ -116,12 +116,14 @@ export function EntityStatus({
                                 <Popover
                                     className={b('info-popover')}
                                     content={infoPopoverContent}
+                                    tooltipOffset={[-4, 4]}
                                     placement={['top-start', 'bottom-start']}
                                     onOpenChange={(visible) => setInfoIconHovered(visible)}
                                 >
                                     <Button view="normal" size="xs">
                                         <Icon
                                             data={CircleInfo}
+                                            size="12"
                                             className={b('info-icon', {
                                                 visible:
                                                     clipboardButtonAlwaysVisible || infoIconHovered,
