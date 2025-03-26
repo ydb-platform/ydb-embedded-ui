@@ -38,10 +38,10 @@ export class SettingsDialog {
         this.limitRowsErrorPopover = this.page.locator('.g-popover__tooltip-content');
         this.selectPopup = page.locator('.ydb-query-settings-select__popup');
         this.timeoutInput = this.dialog.locator('.ydb-query-settings-timeout__input');
-        this.timeoutSwitch = this.dialog.locator('.ydb-query-settings-timeout__switch');
-        this.timeoutSwitchHint = this.dialog.locator('.ydb-query-settings-timeout__question-icon');
+        this.timeoutSwitch = this.dialog.locator('.ydb-timeout-label__switch');
+        this.timeoutSwitchHint = this.dialog.locator('.ydb-timeout-label__question-icon');
         this.timeoutHintPopover = this.page.locator('.g-popover__tooltip-content');
-        this.timeoutLabel = this.dialog.locator('.ydb-query-settings-timeout__label-title');
+        this.timeoutLabel = this.dialog.locator('.ydb-timeout-label__label-title');
 
         // Define distinct locators for selects
         this.queryModeSelect = this.dialog.locator(
