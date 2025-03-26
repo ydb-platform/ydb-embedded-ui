@@ -1,5 +1,3 @@
-/* eslint-disable camelcase */
-
 import {api} from './api';
 
 export const replicationApi = api.injectEndpoints({

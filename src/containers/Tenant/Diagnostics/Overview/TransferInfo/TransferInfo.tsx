@@ -5,6 +5,7 @@ import {AsyncReplicationState} from '../../../../../components/AsyncReplicationS
 import {YDBSyntaxHighlighter} from '../../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {replicationApi} from '../../../../../store/reducers/replication';
+import type {DescribeReplicationResult} from '../../../../../types/api/replication';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {getEntityName} from '../../../utils';
 
@@ -29,7 +30,8 @@ export function TransferInfo({path, database, data}: TransferProps) {
         );
     }
 
-    const transferItems = prepareTransferItems(path, database, data);
+    const {data: replicationData} = replicationApi.useGetReplicationQuery({path, database}, {});
+    const transferItems = prepareTransferItems(data, replicationData);
 
     return (
         <Flex direction="column" gap="4">
@@ -38,29 +40,10 @@ export function TransferInfo({path, database, data}: TransferProps) {
     );
 }
 
-function prepareErrors(path: string, database: string) {
-    const {data, error} = replicationApi.useGetReplicationQuery({path, database}, {});
-
-    if (data?.error?.issues) {
-        return (
-            <Text variant="code-inline-2" color="danger">
-                {data.error.issues[0].message}
-            </Text>
-        );
-    }
-
-    if (error) {
-        return (
-            <Text variant="code-inline-2" color="danger">
-                Error
-            </Text>
-        );
-    }
-
-    return '';
-}
-
-function prepareTransferItems(path: string, database: string, data: TEvDescribeSchemeResult) {
+function prepareTransferItems(
+    data: TEvDescribeSchemeResult,
+    replicationData: DescribeReplicationResult | undefined,
+) {
     const transferDescription = data.PathDescription?.ReplicationDescription || {};
     const state = transferDescription.State;
     const srcConnectionParams = transferDescription.Config?.SrcConnectionParams || {};
@@ -69,7 +52,6 @@ function prepareTransferItems(path: string, database: string, data: TEvDescribeS
     const srcPath = target?.SrcPath;
     const dstPath = target?.DstPath;
     const transformLambda = target?.TransformLambda;
-    const errors = prepareErrors(path, database);
 
     const info: DefinitionListItem[] = [];
 
@@ -80,10 +62,15 @@ function prepareTransferItems(path: string, database: string, data: TEvDescribeS
         });
     }
 
-    if (errors) {
+    if (replicationData?.error?.issues && replicationData.error.issues[0]?.message) {
         info.push({
             name: i18n('state.error'),
-            content: errors,
+            copyText: replicationData.error.issues[0].message,
+            content: (
+                <Text variant="code-inline-2" color="danger">
+                    {replicationData.error.issues[0].message}
+                </Text>
+            ),
         });
     }
 
