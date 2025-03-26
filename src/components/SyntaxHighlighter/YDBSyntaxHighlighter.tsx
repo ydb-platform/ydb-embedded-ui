@@ -23,12 +23,20 @@ async function registerLanguage(lang: Language) {
     }
 }
 
+interface ClipboardButtonOptions {
+    alwaysVisible?: boolean;
+    copyText?: string;
+    withLabel?: boolean;
+}
+
+export type WithClipboardButtonProp = ClipboardButtonOptions | boolean;
+
 type YDBSyntaxHighlighterProps = {
     text: string;
     language: Language;
     className?: string;
     transparentBackground?: boolean;
-    withCopy?: boolean;
+    withClipboardButton?: WithClipboardButtonProp;
 };
 
 export function YDBSyntaxHighlighter({
@@ -36,7 +44,7 @@ export function YDBSyntaxHighlighter({
     language,
     className,
     transparentBackground = true,
-    withCopy,
+    withClipboardButton,
 }: YDBSyntaxHighlighterProps) {
     const [highlighterKey, setHighlighterKey] = React.useState('');
 
@@ -51,16 +59,27 @@ export function YDBSyntaxHighlighter({
     }, [language]);
 
     const renderCopyButton = () => {
-        if (withCopy) {
+        if (withClipboardButton) {
             return (
-                <div className={b('sticky-container')}>
+                <div className={b('sticky-container')} onClick={(e) => e.stopPropagation()}>
                     <ClipboardButton
                         view="flat-secondary"
                         size="s"
-                        className={b('copy')}
-                        text={text}
+                        className={b('copy', {
+                            visible:
+                                typeof withClipboardButton === 'object' &&
+                                withClipboardButton.alwaysVisible,
+                        })}
+                        text={
+                            (typeof withClipboardButton === 'object' &&
+                                withClipboardButton.copyText) ||
+                            text
+                        }
                     >
-                        {i18n('copy')}
+                        {typeof withClipboardButton === 'object' &&
+                        withClipboardButton.withLabel === false
+                            ? null
+                            : i18n('copy')}
                     </ClipboardButton>
                 </div>
             );

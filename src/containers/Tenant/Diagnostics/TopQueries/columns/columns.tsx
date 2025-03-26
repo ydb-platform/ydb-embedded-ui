@@ -36,7 +36,11 @@ const queryTextColumn: Column<KeyValueRow> = {
     sortAccessor: (row) => Number(row.CPUTimeUs),
     render: ({row}) => (
         <div className={b('query')}>
-            <TruncatedQuery value={row.QueryText?.toString()} maxQueryHeight={MAX_QUERY_HEIGHT} />
+            <TruncatedQuery
+                value={row.QueryText?.toString()}
+                maxQueryHeight={MAX_QUERY_HEIGHT}
+                hasClipboardButton
+            />
         </div>
     ),
     sortable: false,
@@ -81,7 +85,13 @@ const oneLineQueryTextColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.OneLineQueryText,
     header: TOP_QUERIES_COLUMNS_TITLES.OneLineQueryText,
     render: ({row}) => (
-        <YDBSyntaxHighlighter language="yql" text={row.QueryText?.toString() || ''} />
+        <YDBSyntaxHighlighter
+            language="yql"
+            text={row.QueryText?.toString() || ''}
+            withClipboardButton={{
+                withLabel: false,
+            }}
+        />
     ),
     sortable: false,
     width: 500,
