@@ -1,5 +1,19 @@
 # Changelog
 
+## [8.18.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.17.0...v8.18.0) (2025-03-27)
+
+
+### Features
+
+* show transfer errors in UI ([#2043](https://github.com/ydb-platform/ydb-embedded-ui/issues/2043)) ([cb5a755](https://github.com/ydb-platform/ydb-embedded-ui/commit/cb5a755a553b1eaa946f69d5f7a9e1b24700863d))
+* turn streaming on by default ([#2028](https://github.com/ydb-platform/ydb-embedded-ui/issues/2028)) ([bc5d59d](https://github.com/ydb-platform/ydb-embedded-ui/commit/bc5d59d09d577b2bfc6661a1a667ffbb1f2ffa95))
+
+
+### Bug Fixes
+
+* **Versions:** loading state ([#2050](https://github.com/ydb-platform/ydb-embedded-ui/issues/2050)) ([66cbd6f](https://github.com/ydb-platform/ydb-embedded-ui/commit/66cbd6f3a05a519df0afe0dd591cd310999d1280))
+* whole tablet family for tabletPage ([#2054](https://github.com/ydb-platform/ydb-embedded-ui/issues/2054)) ([98bfb54](https://github.com/ydb-platform/ydb-embedded-ui/commit/98bfb540ff20f473d9a565c91811d07b2ef398d5))
+
 ## [8.17.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.16.0...v8.17.0) (2025-03-26)
 
 
