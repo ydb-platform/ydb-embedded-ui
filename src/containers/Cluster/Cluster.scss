@@ -3,8 +3,10 @@
 .ydb-cluster {
     position: relative;
 
+    display: flex;
     overflow: auto;
     flex-grow: 1;
+    flex-direction: column;
 
     height: 100%;
     padding: 0 20px;
@@ -46,14 +48,14 @@
     &__sticky-wrapper {
         position: sticky;
         z-index: 4;
-        top: 66px;
+        top: 74px;
         left: 0;
     }
 
     &__auto-refresh-control {
         float: right;
 
-        margin-top: -46px;
+        margin-top: -54px;
 
         background-color: var(--g-color-base-background);
     }

@@ -29,7 +29,7 @@ import {Nodes} from '../Nodes/Nodes';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 import {TabletsTable} from '../Tablets/TabletsTable';
 import {Tenants} from '../Tenants/Tenants';
-import {Versions} from '../Versions/Versions';
+import {VersionsContainer} from '../Versions/Versions';
 
 import {ClusterDashboard} from './ClusterDashboard/ClusterDashboard';
 import {ClusterInfo} from './ClusterInfo/ClusterInfo';
@@ -193,7 +193,7 @@ export function Cluster({
                         getLocationObjectFromHref(getClusterPath(clusterTabsIds.versions)).pathname
                     }
                 >
-                    {cluster && <Versions cluster={cluster} />}
+                    <VersionsContainer cluster={cluster} loading={infoLoading} />
                 </Route>
                 <Route
                     render={() => (
