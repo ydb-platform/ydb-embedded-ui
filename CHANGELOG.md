@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.19.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.18.0...v8.19.0) (2025-03-27)
+
+
+### Features
+
+* add new popup menu icon ([#2045](https://github.com/ydb-platform/ydb-embedded-ui/issues/2045)) ([21de77f](https://github.com/ydb-platform/ydb-embedded-ui/commit/21de77faad169cb1a2890e480a3b860d8d2ef8aa))
+
 ## [8.18.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.17.0...v8.18.0) (2025-03-27)
 
 
