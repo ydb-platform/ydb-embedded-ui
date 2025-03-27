@@ -72,6 +72,7 @@ const getColumns: (props: {
 
 const TABLE_SETTINGS = {
     displayIndices: false,
+    highlightRows: true,
 };
 
 interface TabletTableProps {
