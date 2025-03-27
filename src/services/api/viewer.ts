@@ -288,7 +288,7 @@ export class ViewerAPI extends BaseYdbAPI {
             {
                 enums: true,
                 database,
-                filter: `(TabletId=${id};FollowerId=${followerId || 0};State!=Dead)`,
+                filter: `(TabletId=${id};FollowerId=${followerId || 0})`,
             },
             {
                 concurrentId,
@@ -307,7 +307,7 @@ export class ViewerAPI extends BaseYdbAPI {
                 enums: true,
                 merge: false,
                 database,
-                filter: `(TabletId=${id})`,
+                filter: `(TabletId=${id};State!=Dead)`,
             },
             {
                 concurrentId,
