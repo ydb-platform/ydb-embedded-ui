@@ -98,11 +98,25 @@
         display: inline-block;
         overflow: hidden;
 
-        width: calc(100% + var(--button-width));
+        width: 100%;
         margin-top: 5px;
 
         white-space: nowrap;
         text-overflow: ellipsis;
+    }
+
+    &__wrapper_with-clipboard-button &__link {
+        width: calc(100% + var(--button-width));
+    }
+
+    &__wrapper_with-info-button &__link {
+        width: calc(100% + var(--button-width));
+    }
+
+    &__wrapper_with-clipboard-button {
+        &.entity-status__wrapper_with-info-button .entity-status__link {
+            width: calc(100% + 2 * var(--button-width));
+        }
     }
 
     &__link_with-left-trim {

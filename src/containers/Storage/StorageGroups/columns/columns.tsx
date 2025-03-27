@@ -1,9 +1,9 @@
 import {ShieldKeyhole} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
-import {ClipboardButton, Icon, Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
+import {Icon, Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
 
 import {CellWithPopover} from '../../../../components/CellWithPopover/CellWithPopover';
-import {InternalLink} from '../../../../components/InternalLink';
+import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {StatusIcon} from '../../../../components/StatusIcon/StatusIcon';
 import {UsageLabel} from '../../../../components/UsageLabel/UsageLabel';
 import {getStorageGroupPath} from '../../../../routes';
@@ -147,23 +147,18 @@ const groupIdColumn: StorageGroupsColumn = {
     width: 140,
     render: ({row}) => {
         return row.GroupId ? (
-            <div className={b('group-id-wrapper')}>
-                <InternalLink className={b('group-id')} to={getStorageGroupPath(row.GroupId)}>
-                    {row.GroupId}
-                </InternalLink>
-                <ClipboardButton
-                    text={String(row.GroupId)}
-                    className={b('clipboard-button')}
-                    size="xs"
-                    view="normal"
-                />
-            </div>
+            <EntityStatus
+                name={String(row.GroupId)}
+                path={getStorageGroupPath(row.GroupId)}
+                hasClipboardButton
+                showStatus={false}
+            />
         ) : (
             '-'
         );
     },
     sortAccessor: (row) => Number(row.GroupId),
-    align: DataTable.RIGHT,
+    align: DataTable.LEFT,
 };
 
 const usedColumn: StorageGroupsColumn = {
