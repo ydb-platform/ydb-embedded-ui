@@ -20,7 +20,7 @@ import './Versions.scss';
 const b = cn('ydb-versions');
 
 interface VersionsProps {
-    cluster?: TClusterInfo;
+    cluster: TClusterInfo;
 }
 
 export const Versions = ({cluster}: VersionsProps) => {
@@ -29,7 +29,7 @@ export const Versions = ({cluster}: VersionsProps) => {
 
     const versionsValues = useGetVersionValues(cluster, versionToColor);
     const {currentData, isLoading: isNodesLoading} = nodesApi.useGetNodesQuery(
-        {tablets: false, fieldsRequired: ['SystemState']},
+        {tablets: false, fieldsRequired: ['SystemState', 'SubDomainKey']},
         {pollingInterval: autoRefreshInterval},
     );
 

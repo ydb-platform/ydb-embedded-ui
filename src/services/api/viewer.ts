@@ -18,6 +18,7 @@ import type {
     SendQueryParams,
 } from '../../types/api/query';
 import type {JsonRenderRequestParams, JsonRenderResponse} from '../../types/api/render';
+import type {DescribeReplicationResult} from '../../types/api/replication';
 import type {TEvDescribeSchemeResult} from '../../types/api/schema';
 import type {StorageRequestParams, TStorageInfo} from '../../types/api/storage';
 import type {TEvSystemStateResponse} from '../../types/api/systemState';
@@ -222,6 +223,22 @@ export class ViewerAPI extends BaseYdbAPI {
             this.getPath('/viewer/json/netinfo'),
             {
                 enums: true,
+                database,
+                path,
+            },
+            {concurrentId, requestConfig: {signal}},
+        );
+    }
+
+    getReplication(
+        {path, database}: {path: string; database: string},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
+        return this.get<DescribeReplicationResult>(
+            this.getPath('/viewer/json/describe_replication'),
+            {
+                enums: true,
+                include_stats: true,
                 database,
                 path,
             },

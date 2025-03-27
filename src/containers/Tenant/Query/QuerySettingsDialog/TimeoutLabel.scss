@@ -1,0 +1,23 @@
+.ydb-timeout-label {
+    &__switch {
+        align-items: center;
+
+        height: var(--g-text-header-2-line-height);
+        margin-right: var(--g-spacing-1);
+    }
+
+    &__label-title,
+    &__switch-title {
+        flex: 4;
+        align-items: center;
+
+        margin-right: var(--g-spacing-3);
+
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    &__label-title {
+        line-height: var(--g-text-header-2-line-height);
+    }
+}
