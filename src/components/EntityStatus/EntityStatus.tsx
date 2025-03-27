@@ -1,4 +1,7 @@
-import {ClipboardButton, Link as UIKitLink} from '@gravity-ui/uikit';
+import React from 'react';
+
+import {CircleInfo} from '@gravity-ui/icons';
+import {Button, ClipboardButton, Icon, Popover, Link as UIKitLink} from '@gravity-ui/uikit';
 
 import {EFlag} from '../../types/api/enums';
 import {cn} from '../../utils/cn';
@@ -25,6 +28,7 @@ interface EntityStatusProps {
     withLeftTrim?: boolean;
 
     hasClipboardButton?: boolean;
+    infoPopoverContent?: React.ReactNode;
     clipboardButtonAlwaysVisible?: boolean;
 
     className?: string;
@@ -45,10 +49,13 @@ export function EntityStatus({
     withLeftTrim = false,
 
     hasClipboardButton,
+    infoPopoverContent,
     clipboardButtonAlwaysVisible = false,
 
     className,
 }: EntityStatusProps) {
+    const [infoIconHovered, setInfoIconHovered] = React.useState(false);
+
     const renderIcon = () => {
         if (!showStatus) {
             return null;
@@ -90,24 +97,51 @@ export function EntityStatus({
                 </span>
             )}
             {(path || name) && (
-                <div className={b('wrapper', {'with-button': hasClipboardButton})}>
+                <div
+                    className={b('wrapper', {
+                        'with-clipboard-button': hasClipboardButton,
+                        'with-info-button': Boolean(infoPopoverContent),
+                    })}
+                >
                     <span className={b('link', {'with-left-trim': withLeftTrim})} title={name}>
                         {renderLink()}
                     </span>
-                    {hasClipboardButton && (
+                    {(hasClipboardButton || infoPopoverContent) && (
                         <div
                             className={b('controls-wrapper', {
-                                visible: clipboardButtonAlwaysVisible,
+                                visible: clipboardButtonAlwaysVisible || infoIconHovered,
                             })}
                         >
-                            <ClipboardButton
-                                text={name}
-                                size="xs"
-                                view="normal"
-                                className={b('clipboard-button', {
-                                    visible: clipboardButtonAlwaysVisible,
-                                })}
-                            />
+                            {infoPopoverContent && (
+                                <Popover
+                                    className={b('info-popover')}
+                                    content={infoPopoverContent}
+                                    tooltipOffset={[-4, 4]}
+                                    placement={['top-start', 'bottom-start']}
+                                    onOpenChange={(visible) => setInfoIconHovered(visible)}
+                                >
+                                    <Button view="normal" size="xs">
+                                        <Icon
+                                            data={CircleInfo}
+                                            size="12"
+                                            className={b('info-icon', {
+                                                visible:
+                                                    clipboardButtonAlwaysVisible || infoIconHovered,
+                                            })}
+                                        />
+                                    </Button>
+                                </Popover>
+                            )}
+                            {hasClipboardButton && (
+                                <ClipboardButton
+                                    text={name}
+                                    size="xs"
+                                    view="normal"
+                                    className={b('clipboard-button', {
+                                        visible: clipboardButtonAlwaysVisible || infoIconHovered,
+                                    })}
+                                />
+                            )}
                         </div>
                     )}
                 </div>

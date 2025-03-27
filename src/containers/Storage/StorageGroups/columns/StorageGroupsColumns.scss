@@ -1,3 +1,5 @@
+@use '../../../../styles/mixins.scss';
+
 .ydb-storage-groups-columns {
     &__vdisks-column,
     &__disks-column {
@@ -17,6 +19,8 @@
     }
 
     &__group-id {
+        margin-right: var(--g-spacing-1);
+
         font-weight: 500;
     }
 }

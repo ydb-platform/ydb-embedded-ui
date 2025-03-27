@@ -3,7 +3,7 @@ import DataTable from '@gravity-ui/react-data-table';
 import {Icon, Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
 
 import {CellWithPopover} from '../../../../components/CellWithPopover/CellWithPopover';
-import {InternalLink} from '../../../../components/InternalLink';
+import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {StatusIcon} from '../../../../components/StatusIcon/StatusIcon';
 import {UsageLabel} from '../../../../components/UsageLabel/UsageLabel';
 import {getStorageGroupPath} from '../../../../routes';
@@ -144,18 +144,21 @@ const diskSpaceUsageColumn: StorageGroupsColumn = {
 const groupIdColumn: StorageGroupsColumn = {
     name: STORAGE_GROUPS_COLUMNS_IDS.GroupId,
     header: STORAGE_GROUPS_COLUMNS_TITLES.GroupId,
-    width: 130,
+    width: 140,
     render: ({row}) => {
         return row.GroupId ? (
-            <InternalLink className={b('group-id')} to={getStorageGroupPath(row.GroupId)}>
-                {row.GroupId}
-            </InternalLink>
+            <EntityStatus
+                name={String(row.GroupId)}
+                path={getStorageGroupPath(row.GroupId)}
+                hasClipboardButton
+                showStatus={false}
+            />
         ) : (
             '-'
         );
     },
     sortAccessor: (row) => Number(row.GroupId),
-    align: DataTable.RIGHT,
+    align: DataTable.LEFT,
 };
 
 const usedColumn: StorageGroupsColumn = {

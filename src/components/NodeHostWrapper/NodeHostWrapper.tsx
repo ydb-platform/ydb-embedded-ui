@@ -1,5 +1,3 @@
-import {PopoverBehavior} from '@gravity-ui/uikit';
-
 import {getDefaultNodePath} from '../../containers/Node/NodePages';
 import type {GetNodeRefFunc, NodeAddress} from '../../types/additionalProps';
 import type {TNodeInfo, TSystemStateInfo} from '../../types/api/nodes';
@@ -8,7 +6,6 @@ import {
     createDeveloperUILinkWithNodeId,
 } from '../../utils/developerUI/developerUI';
 import {isUnavailableNode} from '../../utils/nodes';
-import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
 import {NodeEndpointsTooltipContent} from '../TooltipsContent';
 
@@ -64,14 +61,16 @@ export const NodeHostWrapper = ({
         : undefined;
 
     return (
-        <CellWithPopover
-            disabled={!isNodeAvailable}
-            content={<NodeEndpointsTooltipContent data={node} nodeHref={developerUIInternalHref} />}
-            placement={['top', 'bottom']}
-            behavior={PopoverBehavior.Immediate}
-            delayClosing={200}
-        >
-            <EntityStatus name={node.Host} status={status} path={nodePath} hasClipboardButton />
-        </CellWithPopover>
+        <EntityStatus
+            name={node.Host}
+            status={status}
+            path={nodePath}
+            hasClipboardButton
+            infoPopoverContent={
+                isNodeAvailable ? (
+                    <NodeEndpointsTooltipContent data={node} nodeHref={developerUIInternalHref} />
+                ) : null
+            }
+        />
     );
 };
