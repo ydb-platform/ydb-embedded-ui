@@ -16,9 +16,19 @@ import {
     parseVersionsToVersionToColorMap,
 } from '../../utils/versions';
 
-export const useGetVersionValues = (cluster?: TClusterInfo, versionToColor?: VersionToColorMap) => {
+interface UseGetVersionValuesProps {
+    cluster?: TClusterInfo;
+    versionToColor?: VersionToColorMap;
+    clusterLoading?: boolean;
+}
+
+export const useGetVersionValues = ({
+    cluster,
+    versionToColor,
+    clusterLoading,
+}: UseGetVersionValuesProps) => {
     const {currentData} = nodesApi.useGetNodesQuery(
-        isClusterInfoV2(cluster)
+        isClusterInfoV2(cluster) || clusterLoading
             ? skipToken
             : {
                   tablets: false,
