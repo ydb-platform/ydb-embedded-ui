@@ -2,9 +2,11 @@ import React from 'react';
 
 import {Checkbox, RadioButton} from '@gravity-ui/uikit';
 
-import {Loader} from '../../components/Loader';
+import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {nodesApi} from '../../store/reducers/nodes/nodes';
+import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import type {TClusterInfo} from '../../types/api/cluster';
+import type {VersionToColorMap, VersionValue} from '../../types/versions';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {VersionsBar} from '../Cluster/VersionsBar/VersionsBar';
@@ -19,21 +21,39 @@ import './Versions.scss';
 
 const b = cn('ydb-versions');
 
-interface VersionsProps {
-    cluster: TClusterInfo;
+interface VersionsContainerProps {
+    cluster?: TClusterInfo;
+    loading?: boolean;
 }
 
-export const Versions = ({cluster}: VersionsProps) => {
+export function VersionsContainer({cluster, loading}: VersionsContainerProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const versionToColor = useVersionToColorMap();
-
-    const versionsValues = useGetVersionValues(cluster, versionToColor);
     const {currentData, isLoading: isNodesLoading} = nodesApi.useGetNodesQuery(
         {tablets: false, fieldsRequired: ['SystemState', 'SubDomainKey']},
         {pollingInterval: autoRefreshInterval},
     );
+    const versionToColor = useVersionToColorMap();
 
-    const nodes = currentData?.Nodes;
+    const versionsValues = useGetVersionValues({cluster, versionToColor, clusterLoading: loading});
+
+    return (
+        <LoaderWrapper loading={loading || isNodesLoading}>
+            <Versions
+                versionsValues={versionsValues}
+                nodes={currentData?.Nodes}
+                versionToColor={versionToColor}
+            />
+        </LoaderWrapper>
+    );
+}
+
+interface VersionsProps {
+    nodes?: NodesPreparedEntity[];
+    versionsValues: VersionValue[];
+    versionToColor?: VersionToColorMap;
+}
+
+function Versions({versionsValues, nodes, versionToColor}: VersionsProps) {
     const [groupByValue, setGroupByValue] = React.useState<GroupByValue>(GroupByValue.VERSION);
     const [expanded, setExpanded] = React.useState(false);
 
@@ -70,10 +90,6 @@ export const Versions = ({cluster}: VersionsProps) => {
             </div>
         );
     };
-
-    if (isNodesLoading) {
-        return <Loader />;
-    }
 
     const tenantNodes = getGroupedTenantNodes(nodes, versionToColor, groupByValue);
     const storageNodes = getGroupedStorageNodes(nodes, versionToColor);
@@ -146,4 +162,4 @@ export const Versions = ({cluster}: VersionsProps) => {
             {otherNodesContent}
         </div>
     );
-};
+}
