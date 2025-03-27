@@ -280,7 +280,7 @@ export class ViewerAPI extends BaseYdbAPI {
     }
 
     getTablet(
-        {id, database}: {id: string; database?: string},
+        {id, database, followerId}: {id: string; database?: string; followerId?: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<TEvTabletStateResponse>(
@@ -288,7 +288,7 @@ export class ViewerAPI extends BaseYdbAPI {
             {
                 enums: true,
                 database,
-                filter: `(TabletId=${id})`,
+                filter: `(TabletId=${id};FollowerId=${followerId || 0};State!=Dead)`,
             },
             {
                 concurrentId,
