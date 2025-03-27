@@ -2,6 +2,7 @@ import {expect, test} from '@playwright/test';
 
 import {QUERY_MODES, TRANSACTION_MODES} from '../../../../src/utils/query';
 import {tenantName} from '../../../utils/constants';
+import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 import {longRunningQuery} from '../constants';
 
@@ -151,5 +152,104 @@ test.describe('Test Query Settings', async () => {
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
+    });
+
+    test('Timeout input is invisible by default', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+
+        // Open settings dialog
+        await queryEditor.clickGearButton();
+        await expect(queryEditor.settingsDialog.isVisible()).resolves.toBe(true);
+
+        // Check that timeout input is invisible
+        await expect(queryEditor.settingsDialog.isTimeoutInputVisible()).resolves.toBe(false);
+
+        // Close dialog
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
+        await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
+    });
+
+    test('Clicking timeout switch makes timeout input visible', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+
+        // Open settings dialog
+        await queryEditor.clickGearButton();
+        await expect(queryEditor.settingsDialog.isVisible()).resolves.toBe(true);
+
+        // Initially timeout input should be invisible
+        await expect(queryEditor.settingsDialog.isTimeoutInputVisible()).resolves.toBe(false);
+
+        // Click the timeout switch
+        await queryEditor.settingsDialog.clickTimeoutSwitch();
+
+        // Check that timeout input is now visible
+        await expect(queryEditor.settingsDialog.isTimeoutInputVisible()).resolves.toBe(true);
+        await expect(queryEditor.settingsDialog.isTimeoutSwitchChecked()).resolves.toBe(true);
+
+        // Close dialog
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
+        await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
+    });
+
+    test('Timeout switch is checked, disabled, and has hint when non-query mode is selected', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+
+        // Open settings dialog
+        await queryEditor.clickGearButton();
+        await expect(queryEditor.settingsDialog.isVisible()).resolves.toBe(true);
+
+        // Initially timeout switch should be enabled and unchecked
+        await expect(queryEditor.settingsDialog.isTimeoutSwitchDisabled()).resolves.toBe(false);
+        await expect(queryEditor.settingsDialog.isTimeoutSwitchChecked()).resolves.toBe(false);
+
+        // Change to a non-query mode
+        await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.scan);
+
+        // Verify timeout switch is checked and disabled
+        await expect(queryEditor.settingsDialog.isTimeoutSwitchChecked()).resolves.toBe(true);
+        await expect(queryEditor.settingsDialog.isTimeoutSwitchDisabled()).resolves.toBe(true);
+
+        // Verify hint is visible and has correct text
+        await expect(queryEditor.settingsDialog.isTimeoutHintVisible()).resolves.toBe(true);
+
+        // Verify the hint text content
+        const hintText = await queryEditor.settingsDialog.getTimeoutHintText();
+        expect(hintText).toBeTruthy(); // Should have some text content
+
+        // Hover some other input to remove the hint
+        await queryEditor.settingsDialog.hoverStatisticsSelect();
+        await page.waitForTimeout(500);
+
+        // Close dialog
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
+        await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
+    });
+
+    test('When Query Streaming is off, timeout has label and input is visible by default', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+
+        // Turn off Query Streaming experiment
+        await toggleExperiment(page, 'off', 'Query Streaming');
+
+        // Open settings dialog
+        await queryEditor.clickGearButton();
+        await expect(queryEditor.settingsDialog.isVisible()).resolves.toBe(true);
+
+        // Verify there's a label instead of a switch
+        await expect(queryEditor.settingsDialog.isTimeoutLabelVisible()).resolves.toBe(true);
+
+        // Verify timeout input is visible by default
+        await expect(queryEditor.settingsDialog.isTimeoutInputVisible()).resolves.toBe(true);
+
+        // Close dialog
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
+        await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
+
+        // Restore Query Streaming experiment
+        await toggleExperiment(page, 'on', 'Query Streaming');
     });
 });

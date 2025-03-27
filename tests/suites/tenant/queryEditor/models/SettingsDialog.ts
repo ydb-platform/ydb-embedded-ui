@@ -16,6 +16,11 @@ export class SettingsDialog {
     private limitRowsInput: Locator;
     private limitRowsErrorIcon: Locator;
     private limitRowsErrorPopover: Locator;
+    private timeoutInput: Locator;
+    private timeoutSwitch: Locator;
+    private timeoutSwitchHint: Locator;
+    private timeoutHintPopover: Locator;
+    private timeoutLabel: Locator;
 
     private queryModeSelect: Locator;
     private transactionModeSelect: Locator;
@@ -32,6 +37,11 @@ export class SettingsDialog {
         );
         this.limitRowsErrorPopover = this.page.locator('.g-popover__tooltip-content');
         this.selectPopup = page.locator('.ydb-query-settings-select__popup');
+        this.timeoutInput = this.dialog.locator('.ydb-query-settings-timeout__input');
+        this.timeoutSwitch = this.dialog.locator('.ydb-timeout-label__switch');
+        this.timeoutSwitchHint = this.dialog.locator('.ydb-timeout-label__question-icon');
+        this.timeoutHintPopover = this.page.locator('.g-popover__tooltip-content');
+        this.timeoutLabel = this.dialog.locator('.ydb-timeout-label__label-title');
 
         // Define distinct locators for selects
         this.queryModeSelect = this.dialog.locator(
@@ -123,6 +133,38 @@ export class SettingsDialog {
     async isHidden() {
         await this.dialog.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
         return true;
+    }
+
+    async isTimeoutInputVisible() {
+        return await this.timeoutInput.isVisible();
+    }
+
+    async clickTimeoutSwitch() {
+        await this.timeoutSwitch.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.timeoutSwitch.click();
+        await this.page.waitForTimeout(500);
+    }
+
+    async isTimeoutSwitchChecked() {
+        return await this.timeoutSwitch.locator('input[type="checkbox"]').isChecked();
+    }
+
+    async isTimeoutSwitchDisabled() {
+        return await this.timeoutSwitch.locator('input[type="checkbox"][disabled]').isVisible();
+    }
+
+    async isTimeoutHintVisible() {
+        return await this.timeoutSwitchHint.isVisible();
+    }
+
+    async getTimeoutHintText() {
+        await this.timeoutSwitchHint.hover();
+        await this.timeoutHintPopover.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return await this.timeoutHintPopover.textContent();
+    }
+
+    async isTimeoutLabelVisible() {
+        return await this.timeoutLabel.isVisible();
     }
 
     async isStatisticsSelectDisabled() {

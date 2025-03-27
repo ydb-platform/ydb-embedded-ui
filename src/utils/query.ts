@@ -300,7 +300,7 @@ export const parseQueryErrorToString = (error: unknown) => {
 export const DEFAULT_QUERY_SETTINGS = {
     queryMode: QUERY_MODES.query,
     transactionMode: TRANSACTION_MODES.implicit,
-    timeout: 60,
+    timeout: null,
     limitRows: 10000,
     statisticsMode: STATISTICS_MODES.none,
     tracingLevel: TRACING_LEVELS.off,
@@ -310,11 +310,15 @@ export const queryModeSchema = z.nativeEnum(QUERY_MODES);
 export const transactionModeSchema = z.nativeEnum(TRANSACTION_MODES);
 export const statisticsModeSchema = z.nativeEnum(STATISTICS_MODES);
 export const tracingLevelSchema = z.nativeEnum(TRACING_LEVELS);
+
+// timeout = null is for timeout switched off state
 export const querySettingsValidationSchema = z.object({
-    timeout: z.preprocess(
-        (val) => (val === '' ? undefined : val),
-        z.coerce.number().positive().or(z.undefined()),
-    ),
+    timeout: z
+        .preprocess(
+            (val) => (val === '' ? undefined : val),
+            z.coerce.number().positive().or(z.undefined()).or(z.null()),
+        )
+        .or(z.literal('')),
     limitRows: z.preprocess(
         (val) => (val === '' ? undefined : val),
         z.coerce.number().gt(0).lte(100_000).or(z.undefined()),
@@ -329,7 +333,7 @@ export const querySettingsRestoreSchema = z
     .object({
         timeout: z.preprocess(
             (val) => (val === '' ? undefined : val),
-            z.coerce.number().positive().optional().catch(DEFAULT_QUERY_SETTINGS.timeout),
+            z.coerce.number().positive().or(z.null()).optional(),
         ),
         limitRows: z.preprocess(
             (val) => (val === '' ? undefined : val),

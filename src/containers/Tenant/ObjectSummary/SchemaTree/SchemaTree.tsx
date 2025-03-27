@@ -48,7 +48,7 @@ export function SchemaTree(props: SchemaTreeProps) {
         {currentData: actionsSchemaData, isFetching: isActionsDataFetching},
     ] = tableSchemaDataApi.useLazyGetTableSchemaDataQuery();
 
-    const [querySettings, setQueryExecutionSettings] = useQueryExecutionSettings();
+    const [querySettings] = useQueryExecutionSettings();
     const [createDirectoryOpen, setCreateDirectoryOpen] = React.useState(false);
     const [parentPath, setParentPath] = React.useState('');
     const setSchemaTreeKey = useDispatchTreeKey();
@@ -128,8 +128,6 @@ export function SchemaTree(props: SchemaTreeProps) {
             dispatch,
             {
                 setActivePath: onActivePathUpdate,
-                updateQueryExecutionSettings: (settings) =>
-                    setQueryExecutionSettings({...querySettings, ...settings}),
                 showCreateDirectoryDialog: createDirectoryFeatureAvailable
                     ? handleOpenCreateDirectoryDialog
                     : undefined,
@@ -149,7 +147,6 @@ export function SchemaTree(props: SchemaTreeProps) {
         onActivePathUpdate,
         querySettings,
         rootPath,
-        setQueryExecutionSettings,
     ]);
 
     return (

@@ -2,6 +2,7 @@ import {parseMultipart} from '@mjackson/multipart-parser';
 import qs from 'qs';
 
 import {
+    isKeepAliveChunk,
     isQueryResponseChunk,
     isSessionChunk,
     isStreamDataChunk,
@@ -93,6 +94,9 @@ export class StreamingAPI extends BaseYdbAPI {
                     options.onStreamDataChunk(chunk);
                 } else if (isQueryResponseChunk(chunk)) {
                     options.onQueryResponseChunk(chunk);
+                } else if (isKeepAliveChunk(chunk)) {
+                    // Logging for debug purposes
+                    console.log('Received keep alive chunk');
                 }
             } catch (e) {
                 throw new Error(`Error parsing chunk: ${e}`);

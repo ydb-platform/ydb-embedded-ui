@@ -1,4 +1,4 @@
-import {createSlice} from '@reduxjs/toolkit';
+import {createSelector, createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
 import {settingsManager} from '../../../services/settings';
@@ -135,11 +135,9 @@ const slice = createSlice({
     selectors: {
         selectQueriesHistoryFilter: (state) => state.history.filter || '',
         selectTenantPath: (state) => state.tenantPath,
-        selectQueryDuration: (state) => ({
-            startTime: state.result?.startTime,
-            endTime: state.result?.endTime,
-        }),
         selectResult: (state) => state.result,
+        selectStartTime: (state) => state.result?.startTime,
+        selectEndTime: (state) => state.result?.endTime,
         selectQueriesHistory: (state) => {
             const items = state.history.queries;
             const filter = state.history.filter?.toLowerCase();
@@ -153,6 +151,17 @@ const slice = createSlice({
         selectQueriesHistoryCurrentIndex: (state) => state.history?.currentIndex,
     },
 });
+
+export const selectQueryDuration = createSelector(
+    slice.selectors.selectStartTime,
+    slice.selectors.selectEndTime,
+    (startTime, endTime) => {
+        return {
+            startTime,
+            endTime,
+        };
+    },
+);
 
 export default slice.reducer;
 export const {
@@ -177,7 +186,6 @@ export const {
     selectTenantPath,
     selectResult,
     selectUserInput,
-    selectQueryDuration,
     selectIsDirty,
 } = slice.selectors;
 

@@ -10,6 +10,8 @@
   "button-done": "Готово",
   "button-cancel": "Отменить",
   "form.timeout.seconds": "сек",
+  "form.limit.rows": "строк",
+  "form.timeout.disabled": "Невозможно выключить для текущего типа запроса",
   "form.validation.timeout": "Таймаут должен быть положительным",
   "form.validation.limitRows": "Лимит строк должен быть между 1 и 100000",
   "description.default": " (default)",
