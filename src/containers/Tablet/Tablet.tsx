@@ -115,7 +115,9 @@ export function Tablet() {
             <PageMetaWithAutorefresh items={metaItems} />
             <LoaderWrapper loading={loading} size="l">
                 {error ? <ResponseError error={error} /> : null}
-                {currentData ? <TabletContent id={id} tablet={tablet} history={history} /> : null}
+                {currentData ? (
+                    <TabletContent id={id} tablet={tablet} history={history} database={database} />
+                ) : null}
             </LoaderWrapper>
         </Flex>
     );
@@ -125,10 +127,12 @@ function TabletContent({
     id,
     tablet,
     history,
+    database,
 }: {
     id: string;
     tablet: TTabletStateInfo;
     history: ITabletPreparedHistoryItem[];
+    database?: string;
 }) {
     const isEmpty = !Object.keys(tablet).length;
     const {Overall, HiveId, FollowerId} = tablet;
@@ -150,7 +154,7 @@ function TabletContent({
                 <TabletControls tablet={tablet} />
                 <TabletInfo tablet={tablet} />
             </Flex>
-            <TabletTabs id={id} hiveId={HiveId} history={history} />
+            <TabletTabs id={id} hiveId={HiveId} history={history} database={database} />
         </EmptyStateWrapper>
     );
 }
@@ -159,9 +163,11 @@ function TabletTabs({
     id,
     hiveId,
     history,
+    database,
 }: {
     id: string;
     hiveId?: string;
+    database?: string;
     history: ITabletPreparedHistoryItem[];
 }) {
     const [{activeTab, ...restParams}, setParams] = useQueryParams(tabletPageQueryParams);
@@ -200,7 +206,9 @@ function TabletTabs({
                     }}
                 />
             </div>
-            {tabletTab === 'history' ? <TabletTable history={history} /> : null}
+            {tabletTab === 'history' ? (
+                <TabletTable history={history} tabletId={id} database={database} />
+            ) : null}
             {tabletTab === 'channels' && !noAdvancedInfo ? (
                 <Channels id={id} hiveId={hiveId} />
             ) : null}

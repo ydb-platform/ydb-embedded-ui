@@ -17,7 +17,7 @@ export const tabletApi = api.injectEndpoints({
             ) => {
                 try {
                     const [tabletResponseData, historyResponseData, nodesList] = await Promise.all([
-                        window.api.viewer.getTablet({id, database}, {signal}),
+                        window.api.viewer.getTablet({id, database, followerId}, {signal}),
                         window.api.viewer.getTabletHistory({id, database}, {signal}),
                         window.api.viewer.getNodesList({signal}),
                     ]);
@@ -27,29 +27,25 @@ export const tabletApi = api.injectEndpoints({
                         ITabletPreparedHistoryItem[]
                     >((list, nodeId) => {
                         const tabletInfo = historyResponseData[nodeId]?.TabletStateInfo;
-                        if (tabletInfo && tabletInfo.length) {
-                            const leaderTablet = tabletInfo.find((t) => t.Leader) || tabletInfo[0];
 
-                            const {ChangeTime, Generation, State, Leader, FollowerId} =
-                                leaderTablet;
+                        tabletInfo?.forEach((tablet) => {
+                            const {ChangeTime, Generation, State, Leader, FollowerId} = tablet;
 
                             const fqdn =
                                 nodeHostsMap && nodeId
                                     ? nodeHostsMap.get(Number(nodeId))?.Host
                                     : undefined;
 
-                            if (State !== 'Dead') {
-                                list.push({
-                                    nodeId,
-                                    generation: Generation,
-                                    changeTime: ChangeTime,
-                                    state: State,
-                                    leader: Leader,
-                                    followerId: FollowerId,
-                                    fqdn,
-                                });
-                            }
-                        }
+                            list.push({
+                                nodeId,
+                                generation: Generation,
+                                changeTime: ChangeTime,
+                                state: State,
+                                leader: Leader,
+                                followerId: FollowerId,
+                                fqdn,
+                            });
+                        });
                         return list;
                     }, []);
 
