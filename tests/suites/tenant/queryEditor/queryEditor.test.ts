@@ -143,9 +143,16 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.waitForStatus('Stopped')).resolves.toBe(true);
     });
 
-    test.only('Streaming query shows some results and banner when stop button is clicked', async ({
+    test('Streaming query shows some results and banner when stop button is clicked', async ({
         page,
     }) => {
+        // Safari in playwright has problem with drawing an array
+        // of million values for frequently appearing rows.
+        // But still need them for heavy responses to simulate
+        // long running queries. Setting their display to none resolves the issue.
+        await page.addStyleTag({
+            content: '.ydb-query-result-sets-viewer__result tr td:nth-child(3n) { display: none; }',
+        });
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
