@@ -146,7 +146,7 @@ test.describe('Test Query Editor', async () => {
     test('Streaming query shows some results and banner when stop button is clicked', async ({
         page,
     }) => {
-        // Safari in playwright has problem with drawing an array
+        // Safari in playwright has problem with painting an array
         // of million values for frequently appearing rows.
         // But still need them for heavy responses to simulate
         // long running queries. Setting their display to none resolves the issue.
