@@ -1,9 +1,4 @@
-import type {TIssueMessage} from './operations';
-
-// TODO: extend with other error types
-type ResponseErrorData = TIssueMessage;
-
-export interface IResponseError<T = ResponseErrorData> {
+export interface IResponseError<T = unknown> {
     data?: T;
     status?: number;
     statusText?: string;

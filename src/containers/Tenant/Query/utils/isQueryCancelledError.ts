@@ -1,5 +1,5 @@
-import type {IResponseError} from '../../../../types/api/error';
 import {isQueryErrorResponse, parseQueryError} from '../../../../utils/query';
+import {isResponseError} from '../../../../utils/response';
 
 function isAbortError(error: unknown): error is {name: string} {
     return (
@@ -8,10 +8,6 @@ function isAbortError(error: unknown): error is {name: string} {
         'name' in error &&
         error.name === 'AbortError'
     );
-}
-
-function isResponseError(error: unknown): error is IResponseError {
-    return typeof error === 'object' && error !== null && 'isCancelled' in error;
 }
 
 export function isQueryCancelledError(error: unknown): boolean {

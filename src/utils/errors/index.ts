@@ -1,5 +1,4 @@
-import type {IResponseError} from '../../types/api/error';
-import {isNetworkError} from '../response';
+import {isNetworkError, isResponseError} from '../response';
 
 import i18n from './i18n';
 
@@ -24,12 +23,16 @@ export function prepareCommonErrorMessage(err: unknown): string {
         return err.message;
     }
 
-    if (typeof err === 'object' && 'data' in err) {
-        const responseError = err as IResponseError;
-        if (responseError.data?.message) {
-            return responseError.data.message;
-        } else if (typeof responseError.data === 'string') {
-            return responseError.data;
+    if (isResponseError(err)) {
+        if (
+            err.data &&
+            typeof err.data === 'object' &&
+            'message' in err.data &&
+            typeof err.data.message === 'string'
+        ) {
+            return err.data.message;
+        } else if (typeof err.data === 'string') {
+            return err.data;
         }
     }
 
