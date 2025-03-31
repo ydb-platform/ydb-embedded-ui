@@ -1,5 +1,13 @@
 # Changelog
 
+## [8.18.0-hotfix.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.18.0...v8.18.0-hotfix.1) (2025-03-31)
+
+
+### Bug Fixes
+
+* shards table dissapeared ([#2072](https://github.com/ydb-platform/ydb-embedded-ui/issues/2072)) ([92b1b74](https://github.com/ydb-platform/ydb-embedded-ui/commit/92b1b7475219b27901e07727b4a6ecfd90542750))
+* update tag ([6d092e5](https://github.com/ydb-platform/ydb-embedded-ui/commit/6d092e5edb056168873abcb9e6ce9d1a816e71d7))
+
 ## [8.18.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.17.0...v8.18.0) (2025-03-27)
 
 
