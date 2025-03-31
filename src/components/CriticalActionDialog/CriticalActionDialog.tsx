@@ -6,6 +6,7 @@ import {Checkbox, Dialog, Icon} from '@gravity-ui/uikit';
 import {ResultIssues} from '../../containers/Tenant/Query/Issues/Issues';
 import type {IResponseError} from '../../types/api/error';
 import {cn} from '../../utils/cn';
+import {isResponseError, isResponseErrorWithIssues} from '../../utils/response';
 
 import {criticalActionDialogKeyset} from './i18n';
 
@@ -13,15 +14,20 @@ import './CriticalActionDialog.scss';
 
 const b = cn('ydb-critical-dialog');
 
-const parseError = (error: IResponseError) => {
-    if (error.data && 'issues' in error.data && error.data.issues) {
-        return <ResultIssues hideSeverity data={error.data} />;
-    }
-    if (error.status === 403) {
-        return criticalActionDialogKeyset('no-rights-error');
-    }
-    if (error.statusText) {
-        return error.statusText;
+const parseError = (error: unknown) => {
+    if (isResponseError(error)) {
+        if (error.status === 403) {
+            return criticalActionDialogKeyset('no-rights-error');
+        }
+        if (typeof error.data === 'string') {
+            return error.data;
+        }
+        if (isResponseErrorWithIssues(error) && error.data) {
+            return <ResultIssues hideSeverity data={error.data} />;
+        }
+        if (error.statusText) {
+            return error.statusText;
+        }
     }
 
     return criticalActionDialogKeyset('default-error');
