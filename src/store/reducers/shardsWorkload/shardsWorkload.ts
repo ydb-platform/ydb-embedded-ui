@@ -42,7 +42,7 @@ function createShardQueryHistorical(
     filters?: ShardsWorkloadFilters,
     sortOrder?: SortOrder[],
 ) {
-    const pathSelect = `CAST(SUBSTRING(CAST(Path AS String), ${database.length}) AS Utf8) AS Path`;
+    const pathSelect = `CAST(SUBSTRING(CAST(Path AS String), ${database.length}) AS Utf8) AS RelativePath`;
 
     let where = `Path='${path}' OR Path LIKE '${path}/%'`;
 
@@ -56,13 +56,7 @@ function createShardQueryHistorical(
     return `${QUERY_TECHNICAL_MARK}    
 SELECT
     ${pathSelect},
-    TabletId,
-    CPUCores,
-    DataSize,
-    NodeId,
-    PeakTime,
-    InFlightTxCount,
-    IntervalEnd
+    \`.sys/top_partitions_one_hour\`.*
 FROM \`.sys/top_partitions_one_hour\`
 WHERE ${where}
 ${orderBy}
