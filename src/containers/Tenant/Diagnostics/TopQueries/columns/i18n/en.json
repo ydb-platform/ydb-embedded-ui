@@ -1,13 +1,13 @@
 {
-  "cpu-time": "CPUTime",
-  "read-rows": "ReadRows",
-  "read-bytes": "ReadBytes",
-  "query-hash": "QueryHash",
+  "cpu-time": "CPU Time",
+  "read-rows": "Read Rows",
+  "read-bytes": "Read Bytes",
+  "query-hash": "Query Hash",
   "user": "User",
   "start-time": "Start time",
   "end-time": "End time",
   "duration": "Duration",
   "query-text": "Query text",
   "application": "Application",
-  "request-units": "RequestUnits"
+  "request-units": "Request Units"
 }
