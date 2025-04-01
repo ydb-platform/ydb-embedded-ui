@@ -17,9 +17,10 @@
         top: 13px;
         right: 14px;
 
+        pointer-events: all;
+
         opacity: 0;
 
-        pointer-events: all;
         &_visible {
             opacity: 1;
         }
