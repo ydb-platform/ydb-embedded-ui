@@ -1,11 +1,11 @@
 import React from 'react';
 
 import {Flex} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
 import {getPDiskPagePath} from '../../routes';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
-import {valueIsDefined} from '../../utils';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {createPDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import type {PreparedPDisk} from '../../utils/disks/types';
@@ -76,7 +76,7 @@ export const preparePDiskData = (
         pdiskData.push({label: 'Device', value: Device});
     }
 
-    if (withDeveloperUILink && valueIsDefined(NodeId) && valueIsDefined(PDiskId)) {
+    if (withDeveloperUILink && !isNil(NodeId) && !isNil(PDiskId)) {
         const pDiskInternalViewerPath = createPDiskDeveloperUILink({
             nodeId: NodeId,
             pDiskId: PDiskId,
@@ -111,7 +111,7 @@ interface PDiskPopupProps {
 export const PDiskPopup = ({data}: PDiskPopupProps) => {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const nodesMap = useTypedSelector(selectNodesMap);
-    const nodeData = valueIsDefined(data.NodeId) ? nodesMap?.get(data.NodeId) : undefined;
+    const nodeData = !isNil(data.NodeId) ? nodesMap?.get(data.NodeId) : undefined;
     const info = React.useMemo(
         () => preparePDiskData(data, nodeData, isUserAllowedToMakeChanges),
         [data, nodeData, isUserAllowedToMakeChanges],

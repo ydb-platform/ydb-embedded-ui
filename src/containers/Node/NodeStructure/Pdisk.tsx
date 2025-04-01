@@ -4,6 +4,7 @@ import {ArrowUpRightFromSquare, CircleInfoFill} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column} from '@gravity-ui/react-data-table';
 import {ArrowToggle, Button, Icon, Popover} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 import isEmpty from 'lodash/isEmpty';
 
 import {PDiskInfo} from '../../../components/PDiskInfo/PDiskInfo';
@@ -17,7 +18,6 @@ import type {
 import {EFlag} from '../../../types/api/enums';
 import {EVDiskState} from '../../../types/api/vdisk';
 import type {ValueOf} from '../../../types/common';
-import {valueIsDefined} from '../../../utils';
 import {cn} from '../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
 import {formatStorageValuesToGb} from '../../../utils/dataFormatters/dataFormatters';
@@ -73,11 +73,7 @@ function getColumns({
                 const vDiskSlotId = row.VDiskSlotId;
                 let vdiskInternalViewerLink = null;
 
-                if (
-                    valueIsDefined(nodeId) &&
-                    valueIsDefined(pDiskId) &&
-                    valueIsDefined(vDiskSlotId)
-                ) {
+                if (!isNil(nodeId) && !isNil(pDiskId) && !isNil(vDiskSlotId)) {
                     vdiskInternalViewerLink = createVDiskDeveloperUILink({
                         nodeId,
                         pDiskId,

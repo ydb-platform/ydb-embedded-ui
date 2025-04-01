@@ -1,4 +1,5 @@
 import {Flex, Text} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {Tags} from '../../../components/Tags';
@@ -6,7 +7,6 @@ import type {ClusterGroupsStats} from '../../../store/reducers/cluster/types';
 import {isClusterInfoV2} from '../../../types/api/cluster';
 import type {TClusterInfo} from '../../../types/api/cluster';
 import type {IResponseError} from '../../../types/api/error';
-import {valueIsDefined} from '../../../utils';
 import {formatNumber} from '../../../utils/dataFormatters/dataFormatters';
 import i18n from '../i18n';
 
@@ -29,7 +29,7 @@ interface AmountProps {
 }
 
 function Amount({value}: AmountProps) {
-    if (!valueIsDefined(value)) {
+    if (isNil(value)) {
         return null;
     }
     return (
@@ -72,20 +72,20 @@ function ClusterDoughnuts({cluster, loading}: ClusterDashboardProps) {
     if (isClusterInfoV2(cluster)) {
         const {CoresUsed, NumberOfCpus, CoresTotal} = cluster;
         const total = CoresTotal ?? NumberOfCpus;
-        if (valueIsDefined(CoresUsed) && valueIsDefined(total)) {
+        if (!isNil(CoresUsed) && !isNil(total)) {
             metricsCards.push(
                 <ClusterMetricsCores value={CoresUsed} capacity={total} key="cores" />,
             );
         }
     }
     const {StorageTotal, StorageUsed} = cluster;
-    if (valueIsDefined(StorageTotal) && valueIsDefined(StorageUsed)) {
+    if (!isNil(StorageTotal) && !isNil(StorageUsed)) {
         metricsCards.push(
             <ClusterMetricsStorage key="storage" value={StorageUsed} capacity={StorageTotal} />,
         );
     }
     const {MemoryTotal, MemoryUsed} = cluster;
-    if (valueIsDefined(MemoryTotal) && valueIsDefined(MemoryUsed)) {
+    if (!isNil(MemoryTotal) && !isNil(MemoryUsed)) {
         metricsCards.push(
             <ClusterMetricsMemory key="memory" value={MemoryUsed} capacity={MemoryTotal} />,
         );

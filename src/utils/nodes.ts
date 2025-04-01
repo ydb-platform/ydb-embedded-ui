@@ -1,3 +1,4 @@
+import {isNil} from 'lodash';
 import {z} from 'zod';
 
 import {ProblemFilterValues} from '../store/reducers/settings/settings';
@@ -8,8 +9,6 @@ import type {TNodeInfo} from '../types/api/nodesList';
 import type {NodesMap} from '../types/store/nodesList';
 
 import {HOUR_IN_SECONDS} from './constants';
-
-import {valueIsDefined} from '.';
 
 export enum NodesUptimeFilterValues {
     'All' = 'All',
@@ -33,7 +32,7 @@ export const isUnavailableNode = <
 
 export const prepareNodesMap = (nodesList?: TNodeInfo[]) => {
     return nodesList?.reduce<NodesMap>((nodeHosts, node) => {
-        if (valueIsDefined(node.Id)) {
+        if (!isNil(node.Id)) {
             nodeHosts.set(node.Id, {
                 Host: node.Host,
                 DC: node.PhysicalLocation?.DataCenterId,
@@ -46,7 +45,7 @@ export const prepareNodesMap = (nodesList?: TNodeInfo[]) => {
 export function calculateLoadAveragePercents(node: TSystemStateInfo = {}) {
     const {LoadAverage, NumberOfCpus} = node;
 
-    if (!valueIsDefined(LoadAverage) || !valueIsDefined(NumberOfCpus)) {
+    if (isNil(LoadAverage) || isNil(NumberOfCpus)) {
         return undefined;
     }
 
@@ -76,7 +75,7 @@ export function prepareNodeSystemState(
 
     // 0 limit means that limit is not set, so it should be undefined
     const SharedCacheLimit = Number(systemState.SharedCacheStats?.LimitBytes) || undefined;
-    const SharedCacheUsed = valueIsDefined(systemState.SharedCacheStats?.UsedBytes)
+    const SharedCacheUsed = !isNil(systemState.SharedCacheStats?.UsedBytes)
         ? Number(systemState.SharedCacheStats?.UsedBytes)
         : undefined;
 

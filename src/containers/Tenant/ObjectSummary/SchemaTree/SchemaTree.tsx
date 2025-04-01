@@ -3,6 +3,7 @@
 // In this case we can store state of tree - uploaded entities, opened nodes, selected entity and so on
 import React from 'react';
 
+import {isNil} from 'lodash';
 import {NavigationTree} from 'ydb-ui-components';
 
 import {getConnectToDBDialog} from '../../../../components/ConnectToDB/ConnectToDBDialog';
@@ -11,7 +12,6 @@ import {selectIsDirty, selectUserInput} from '../../../../store/reducers/query/q
 import {schemaApi} from '../../../../store/reducers/schema/schema';
 import {tableSchemaDataApi} from '../../../../store/reducers/tableSchemaData';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
-import {valueIsDefined} from '../../../../utils';
 import {
     useQueryExecutionSettings,
     useTypedDispatch,
@@ -85,10 +85,9 @@ export function SchemaTree(props: SchemaTreeProps) {
 
         const childItems = Children.map((childData) => {
             const {Name = '', PathType, PathSubType, ChildrenExist} = childData;
-
             const isChildless =
                 isChildlessPathType(PathType, PathSubType) ||
-                (valueIsDefined(ChildrenExist) && !ChildrenExist);
+                (!isNil(ChildrenExist) && !ChildrenExist);
 
             return {
                 name: Name,

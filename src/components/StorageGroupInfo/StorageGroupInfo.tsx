@@ -1,7 +1,7 @@
 import {Flex} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
 import type {PreparedStorageGroup} from '../../store/reducers/storage/types';
-import {valueIsDefined} from '../../utils';
 import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
 import {formatToMs} from '../../utils/timeParsers';
 import {bytesToSpeed} from '../../utils/utils';
@@ -43,40 +43,40 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
 
     const storageGroupInfoFirstColumn = [];
 
-    if (valueIsDefined(GroupGeneration)) {
+    if (!isNil(GroupGeneration)) {
         storageGroupInfoFirstColumn.push({
             label: storageGroupInfoKeyset('group-generation'),
             value: GroupGeneration,
         });
     }
-    if (valueIsDefined(ErasureSpecies)) {
+    if (!isNil(ErasureSpecies)) {
         storageGroupInfoFirstColumn.push({
             label: storageGroupInfoKeyset('erasure-species'),
             value: ErasureSpecies,
         });
     }
-    if (valueIsDefined(MediaType)) {
+    if (!isNil(MediaType)) {
         storageGroupInfoFirstColumn.push({
             label: storageGroupInfoKeyset('media-type'),
             value: MediaType,
         });
     }
-    if (valueIsDefined(Encryption)) {
+    if (!isNil(Encryption)) {
         storageGroupInfoFirstColumn.push({
             label: storageGroupInfoKeyset('encryption'),
             value: Encryption ? storageGroupInfoKeyset('yes') : storageGroupInfoKeyset('no'),
         });
     }
-    if (valueIsDefined(Overall)) {
+    if (!isNil(Overall)) {
         storageGroupInfoFirstColumn.push({
             label: storageGroupInfoKeyset('overall'),
             value: <StatusIcon status={Overall} />,
         });
     }
-    if (valueIsDefined(State)) {
+    if (!isNil(State)) {
         storageGroupInfoFirstColumn.push({label: storageGroupInfoKeyset('state'), value: State});
     }
-    if (valueIsDefined(MissingDisks)) {
+    if (!isNil(MissingDisks)) {
         storageGroupInfoFirstColumn.push({
             label: storageGroupInfoKeyset('missing-disks'),
             value: MissingDisks,
@@ -85,7 +85,7 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
 
     const storageGroupInfoSecondColumn = [];
 
-    if (valueIsDefined(Used) && valueIsDefined(Limit)) {
+    if (!isNil(Used) && !isNil(Limit)) {
         storageGroupInfoSecondColumn.push({
             label: storageGroupInfoKeyset('used-space'),
             value: (
@@ -98,61 +98,61 @@ export function StorageGroupInfo({data, className, ...infoViewerProps}: StorageG
             ),
         });
     }
-    if (valueIsDefined(Available)) {
+    if (!isNil(Available)) {
         storageGroupInfoSecondColumn.push({
             label: storageGroupInfoKeyset('available'),
             value: formatStorageValuesToGb(Number(Available)),
         });
     }
-    if (valueIsDefined(Usage)) {
+    if (!isNil(Usage)) {
         storageGroupInfoSecondColumn.push({
             label: storageGroupInfoKeyset('usage'),
             value: `${Usage.toFixed(2)}%`,
         });
     }
-    if (valueIsDefined(DiskSpace)) {
+    if (!isNil(DiskSpace)) {
         storageGroupInfoSecondColumn.push({
             label: storageGroupInfoKeyset('disk-space'),
             value: <StatusIcon status={DiskSpace} />,
         });
     }
-    if (valueIsDefined(Latency)) {
+    if (!isNil(Latency)) {
         storageGroupInfoSecondColumn.push({
             label: storageGroupInfoKeyset('latency'),
             value: <StatusIcon status={Latency} />,
         });
     }
-    if (valueIsDefined(LatencyPutTabletLogMs)) {
+    if (!isNil(LatencyPutTabletLogMs)) {
         storageGroupInfoSecondColumn.push({
             label: storageGroupInfoKeyset('latency-put-tablet-log'),
             value: formatToMs(LatencyPutTabletLogMs),
         });
     }
-    if (valueIsDefined(LatencyPutUserDataMs)) {
+    if (!isNil(LatencyPutUserDataMs)) {
         storageGroupInfoSecondColumn.push({
             label: storageGroupInfoKeyset('latency-put-user-data'),
             value: formatToMs(LatencyPutUserDataMs),
         });
     }
-    if (valueIsDefined(LatencyGetFastMs)) {
+    if (!isNil(LatencyGetFastMs)) {
         storageGroupInfoSecondColumn.push({
             label: storageGroupInfoKeyset('latency-get-fast'),
             value: formatToMs(LatencyGetFastMs),
         });
     }
-    if (valueIsDefined(AllocationUnits)) {
+    if (!isNil(AllocationUnits)) {
         storageGroupInfoSecondColumn.push({
             label: storageGroupInfoKeyset('allocation-units'),
             value: AllocationUnits,
         });
     }
-    if (valueIsDefined(Read)) {
+    if (!isNil(Read)) {
         storageGroupInfoSecondColumn.push({
             label: storageGroupInfoKeyset('read-throughput'),
             value: bytesToSpeed(Number(Read)),
         });
     }
-    if (valueIsDefined(Write)) {
+    if (!isNil(Write)) {
         storageGroupInfoSecondColumn.push({
             label: storageGroupInfoKeyset('write-throughput'),
             value: bytesToSpeed(Number(Write)),

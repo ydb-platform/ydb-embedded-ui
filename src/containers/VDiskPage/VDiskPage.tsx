@@ -3,6 +3,7 @@ import React from 'react';
 import {ArrowsOppositeToDots} from '@gravity-ui/icons';
 import {Icon} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
+import {isNil} from 'lodash';
 import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
 
@@ -17,7 +18,6 @@ import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
 import type {ModifyDiskResponse} from '../../types/api/modifyDisk';
-import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {getSeverityColor, getVDiskSlotBasedId} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
@@ -49,7 +49,7 @@ export function VDiskPage() {
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const params =
-        valueIsDefined(nodeId) && valueIsDefined(pDiskId) && valueIsDefined(vDiskSlotId)
+        !isNil(nodeId) && !isNil(pDiskId) && !isNil(vDiskSlotId)
             ? {nodeId, pDiskId, vDiskSlotId}
             : skipToken;
     const {
@@ -63,11 +63,11 @@ export function VDiskPage() {
     const {NodeHost, NodeId, NodeType, NodeDC, PDiskId, PDiskType, Severity, VDiskId} = vDiskData;
     const {GroupID, GroupGeneration, Ring, Domain, VDisk} = VDiskId || {};
     const vDiskIdParamsDefined =
-        valueIsDefined(GroupID) &&
-        valueIsDefined(GroupGeneration) &&
-        valueIsDefined(Ring) &&
-        valueIsDefined(Domain) &&
-        valueIsDefined(VDisk);
+        !isNil(GroupID) &&
+        !isNil(GroupGeneration) &&
+        !isNil(Ring) &&
+        !isNil(Domain) &&
+        !isNil(VDisk);
 
     const handleEvictVDisk = async (isRetry?: boolean) => {
         if (vDiskIdParamsDefined) {
@@ -181,7 +181,7 @@ export function VDiskPage() {
     };
 
     const renderStorageInfo = () => {
-        if (valueIsDefined(GroupID) && valueIsDefined(nodeId)) {
+        if (!isNil(GroupID) && !isNil(nodeId)) {
             return (
                 <React.Fragment>
                     <div className={vDiskPageCn('storage-title')}>{vDiskPageKeyset('storage')}</div>

@@ -1,9 +1,9 @@
 import DataTable from '@gravity-ui/react-data-table';
 import {DefinitionList} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
 import type {TMemoryStats, TPoolStats} from '../../types/api/nodes';
 import type {TTabletStateInfo} from '../../types/api/tablet';
-import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {
@@ -313,7 +313,7 @@ export function getDiskSpaceUsageColumn<T extends {DiskSpaceUsage?: number}>(): 
         name: NODES_COLUMNS_IDS.DiskSpaceUsage,
         header: NODES_COLUMNS_TITLES.DiskSpaceUsage,
         render: ({row}) => {
-            return valueIsDefined(row.DiskSpaceUsage) ? (
+            return !isNil(row.DiskSpaceUsage) ? (
                 <UsageLabel
                     value={Math.floor(row.DiskSpaceUsage)}
                     theme={getUsageSeverity(row.DiskSpaceUsage)}

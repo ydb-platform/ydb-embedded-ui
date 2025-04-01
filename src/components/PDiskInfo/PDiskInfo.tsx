@@ -1,7 +1,7 @@
 import {Flex} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
 import {getPDiskPagePath} from '../../routes';
-import {valueIsDefined} from '../../utils';
 import {formatBytes} from '../../utils/bytesParsers';
 import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
 import {createPDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
@@ -52,13 +52,13 @@ function getPDiskInfo<T extends PreparedPDisk>({
 
     const generalInfo: InfoViewerItem[] = [];
 
-    if (valueIsDefined(Category)) {
+    if (!isNil(Category)) {
         generalInfo.push({label: pDiskInfoKeyset('type'), value: Type});
     }
-    if (valueIsDefined(Path)) {
+    if (!isNil(Path)) {
         generalInfo.push({label: pDiskInfoKeyset('path'), value: Path});
     }
-    if (valueIsDefined(Guid)) {
+    if (!isNil(Guid)) {
         generalInfo.push({label: pDiskInfoKeyset('guid'), value: Guid});
     }
     // SerialNumber could be an empty string ""
@@ -77,19 +77,19 @@ function getPDiskInfo<T extends PreparedPDisk>({
 
     const statusInfo: InfoViewerItem[] = [];
 
-    if (valueIsDefined(StatusV2)) {
+    if (!isNil(StatusV2)) {
         statusInfo.push({label: pDiskInfoKeyset('drive-status'), value: StatusV2});
     }
-    if (valueIsDefined(State)) {
+    if (!isNil(State)) {
         statusInfo.push({label: pDiskInfoKeyset('state'), value: State});
     }
-    if (valueIsDefined(Device)) {
+    if (!isNil(Device)) {
         statusInfo.push({
             label: pDiskInfoKeyset('device'),
             value: <StatusIcon status={Device} />,
         });
     }
-    if (valueIsDefined(Realtime)) {
+    if (!isNil(Realtime)) {
         statusInfo.push({
             label: pDiskInfoKeyset('realtime'),
             value: <StatusIcon status={Realtime} />,
@@ -109,13 +109,13 @@ function getPDiskInfo<T extends PreparedPDisk>({
             />
         ),
     });
-    if (valueIsDefined(NumActiveSlots) && valueIsDefined(ExpectedSlotCount)) {
+    if (!isNil(NumActiveSlots) && !isNil(ExpectedSlotCount)) {
         spaceInfo.push({
             label: pDiskInfoKeyset('slots'),
             value: <ProgressViewer value={NumActiveSlots} capacity={ExpectedSlotCount} />,
         });
     }
-    if (valueIsDefined(LogUsedSize) && valueIsDefined(LogTotalSize)) {
+    if (!isNil(LogUsedSize) && !isNil(LogTotalSize)) {
         spaceInfo.push({
             label: pDiskInfoKeyset('log-size'),
             value: (
@@ -127,7 +127,7 @@ function getPDiskInfo<T extends PreparedPDisk>({
             ),
         });
     }
-    if (valueIsDefined(SystemSize)) {
+    if (!isNil(SystemSize)) {
         spaceInfo.push({
             label: pDiskInfoKeyset('system-size'),
             value: formatBytes({value: SystemSize}),
@@ -135,12 +135,8 @@ function getPDiskInfo<T extends PreparedPDisk>({
     }
 
     const additionalInfo: InfoViewerItem[] = [];
-
     const shouldDisplayLinks =
-        (withPDiskPageLink || isUserAllowedToMakeChanges) &&
-        valueIsDefined(PDiskId) &&
-        valueIsDefined(nodeId);
-
+        (withPDiskPageLink || isUserAllowedToMakeChanges) && !isNil(PDiskId) && !isNil(nodeId);
     if (shouldDisplayLinks) {
         const pDiskPagePath = getPDiskPagePath(PDiskId, nodeId);
         const pDiskInternalViewerPath = createPDiskDeveloperUILink({

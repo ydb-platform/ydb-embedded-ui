@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {skipToken} from '@reduxjs/toolkit/query';
+import {isNil} from 'lodash';
 import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
 
@@ -16,7 +17,6 @@ import {
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {storageApi} from '../../store/reducers/storage/storage';
 import {EFlag} from '../../types/api/enums';
-import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
@@ -41,7 +41,7 @@ export function StorageGroupPage() {
     const shouldUseGroupsHandler = useStorageGroupsHandlerAvailable();
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const groupQuery = storageApi.useGetStorageGroupsInfoQuery(
-        valueIsDefined(groupId)
+        !isNil(groupId)
             ? {groupId, shouldUseGroupsHandler, with: 'all', fieldsRequired: 'all'}
             : skipToken,
         {

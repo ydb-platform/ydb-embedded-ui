@@ -1,9 +1,9 @@
 import React from 'react';
 
 import {Flex} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
 import {getVDiskPagePath} from '../../routes';
-import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
@@ -61,13 +61,13 @@ export function VDiskInfo<T extends PreparedVDisk>({
 
     const vdiskInfo = [];
 
-    if (valueIsDefined(VDiskSlotId)) {
+    if (!isNil(VDiskSlotId)) {
         vdiskInfo.push({label: vDiskInfoKeyset('slot-id'), value: VDiskSlotId});
     }
-    if (valueIsDefined(StoragePoolName)) {
+    if (!isNil(StoragePoolName)) {
         vdiskInfo.push({label: vDiskInfoKeyset('pool-name'), value: StoragePoolName});
     }
-    if (valueIsDefined(VDiskState)) {
+    if (!isNil(VDiskState)) {
         vdiskInfo.push({
             label: vDiskInfoKeyset('state-status'),
             value: VDiskState,
@@ -86,69 +86,68 @@ export function VDiskInfo<T extends PreparedVDisk>({
             ),
         });
     }
-    if (valueIsDefined(Kind)) {
+    if (!isNil(Kind)) {
         vdiskInfo.push({label: vDiskInfoKeyset('kind'), value: Kind});
     }
-    if (valueIsDefined(Guid)) {
+    if (!isNil(Guid)) {
         vdiskInfo.push({label: vDiskInfoKeyset('guid'), value: Guid});
     }
-    if (valueIsDefined(IncarnationGuid)) {
+    if (!isNil(IncarnationGuid)) {
         vdiskInfo.push({label: vDiskInfoKeyset('incarnation-guid'), value: IncarnationGuid});
     }
-    if (valueIsDefined(InstanceGuid)) {
+    if (!isNil(InstanceGuid)) {
         vdiskInfo.push({label: vDiskInfoKeyset('instance-guid'), value: InstanceGuid});
     }
-    if (valueIsDefined(Replicated)) {
+    if (!isNil(Replicated)) {
         vdiskInfo.push({
             label: vDiskInfoKeyset('replication-status'),
             value: Replicated ? vDiskInfoKeyset('yes') : vDiskInfoKeyset('no'),
         });
     }
-    if (valueIsDefined(DiskSpace)) {
+    if (!isNil(DiskSpace)) {
         vdiskInfo.push({
             label: vDiskInfoKeyset('space-status'),
             value: <StatusIcon status={DiskSpace} />,
         });
     }
-    if (valueIsDefined(SatisfactionRank?.FreshRank?.Flag)) {
+    if (!isNil(SatisfactionRank?.FreshRank?.Flag)) {
         vdiskInfo.push({
             label: vDiskInfoKeyset('fresh-rank-satisfaction'),
             value: <StatusIcon status={SatisfactionRank?.FreshRank?.Flag} />,
         });
     }
-    if (valueIsDefined(SatisfactionRank?.LevelRank?.Flag)) {
+    if (!isNil(SatisfactionRank?.LevelRank?.Flag)) {
         vdiskInfo.push({
             label: vDiskInfoKeyset('level-rank-satisfaction'),
             value: <StatusIcon status={SatisfactionRank?.LevelRank?.Flag} />,
         });
     }
-    if (valueIsDefined(FrontQueues)) {
+    if (!isNil(FrontQueues)) {
         vdiskInfo.push({
             label: vDiskInfoKeyset('front-queues'),
             value: <StatusIcon status={FrontQueues} />,
         });
     }
-    if (valueIsDefined(HasUnreadableBlobs)) {
+    if (!isNil(HasUnreadableBlobs)) {
         vdiskInfo.push({
             label: vDiskInfoKeyset('has-unreadable-blobs'),
             value: HasUnreadableBlobs ? vDiskInfoKeyset('yes') : vDiskInfoKeyset('no'),
         });
     }
-    if (valueIsDefined(ReadThroughput)) {
+    if (!isNil(ReadThroughput)) {
         vdiskInfo.push({
             label: vDiskInfoKeyset('read-throughput'),
             value: bytesToSpeed(ReadThroughput),
         });
     }
-    if (valueIsDefined(WriteThroughput)) {
+    if (!isNil(WriteThroughput)) {
         vdiskInfo.push({
             label: vDiskInfoKeyset('write-throughput'),
             value: bytesToSpeed(WriteThroughput),
         });
     }
 
-    const diskParamsDefined =
-        valueIsDefined(PDiskId) && valueIsDefined(NodeId) && valueIsDefined(VDiskSlotId);
+    const diskParamsDefined = !isNil(PDiskId) && !isNil(NodeId) && !isNil(VDiskSlotId);
 
     if (diskParamsDefined) {
         const links: React.ReactNode[] = [];

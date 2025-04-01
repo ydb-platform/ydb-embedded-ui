@@ -1,11 +1,11 @@
 import React from 'react';
 
 import {Flex, Label} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
 import {getVDiskPagePath} from '../../routes';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
-import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
@@ -41,12 +41,7 @@ const prepareUnavailableVDiskData = (data: UnavailableDonor, withDeveloperUILink
         {label: 'VSlotId', value: VSlotId ?? EMPTY_DATA_PLACEHOLDER},
     );
 
-    if (
-        withDeveloperUILink &&
-        valueIsDefined(NodeId) &&
-        valueIsDefined(PDiskId) &&
-        valueIsDefined(VSlotId)
-    ) {
+    if (withDeveloperUILink && !isNil(NodeId) && !isNil(PDiskId) && !isNil(VSlotId)) {
         const vDiskInternalViewerPath = createVDiskDeveloperUILink({
             nodeId: NodeId,
             pDiskId: PDiskId,
@@ -152,12 +147,7 @@ const prepareVDiskData = (data: PreparedVDisk, withDeveloperUILink?: boolean) =>
         });
     }
 
-    if (
-        withDeveloperUILink &&
-        valueIsDefined(NodeId) &&
-        valueIsDefined(PDiskId) &&
-        valueIsDefined(VDiskSlotId)
-    ) {
+    if (withDeveloperUILink && !isNil(NodeId) && !isNil(PDiskId) && !isNil(VDiskSlotId)) {
         const vDiskInternalViewerPath = createVDiskDeveloperUILink({
             nodeId: NodeId,
             pDiskId: PDiskId,
@@ -205,7 +195,7 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
     );
 
     const nodesMap = useTypedSelector(selectNodesMap);
-    const nodeData = valueIsDefined(data.NodeId) ? nodesMap?.get(data.NodeId) : undefined;
+    const nodeData = !isNil(data.NodeId) ? nodesMap?.get(data.NodeId) : undefined;
     const pdiskInfo = React.useMemo(
         () =>
             isFullData &&

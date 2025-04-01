@@ -32,5 +32,6 @@
             },
         ],
         "curly": ["error", "all"],
+        "no-negated-condition": "off",
     },
 }

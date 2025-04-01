@@ -4,12 +4,12 @@ import {DefinitionList} from '@gravity-ui/components';
 import type {DefinitionListItem} from '@gravity-ui/components';
 import {SquareCheck} from '@gravity-ui/icons';
 import {Icon} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {Loader} from '../../../components/Loader';
 import {schemaAclApi} from '../../../store/reducers/schemaAcl/schemaAcl';
 import type {TACE} from '../../../types/api/acl';
-import {valueIsDefined} from '../../../utils';
 import {cn} from '../../../utils/cn';
 
 import i18n from './i18n';
@@ -113,7 +113,7 @@ function getAclListItems(acl?: TACE[]): DefinitionListItem[] {
                     }
                     return undefined;
                 })
-                .filter(valueIsDefined),
+                .filter((value) => !isNil(value)),
         };
     });
 }

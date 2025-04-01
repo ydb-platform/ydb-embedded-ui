@@ -1,7 +1,8 @@
+import {isNil} from 'lodash';
+
 import {getDefaultNodePath} from '../../containers/Node/NodePages';
 import {getVDiskPagePath} from '../../routes';
 import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
-import {valueIsDefined} from '../../utils';
 import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 
@@ -11,13 +12,9 @@ export function getVDiskLink(data: TVDiskStateInfo | TVSlotId) {
     const isFullData = isFullVDiskData(data);
     const VDiskSlotId = isFullData ? data.VDiskSlotId : data.VSlotId;
 
-    if (
-        valueIsDefined(VDiskSlotId) &&
-        valueIsDefined(data.PDiskId) &&
-        valueIsDefined(data.NodeId)
-    ) {
+    if (!isNil(VDiskSlotId) && !isNil(data.PDiskId) && !isNil(data.NodeId)) {
         vDiskPath = getVDiskPagePath(VDiskSlotId, data.PDiskId, data.NodeId);
-    } else if (valueIsDefined(data.NodeId) && isFullVDiskData(data)) {
+    } else if (!isNil(data.NodeId) && isFullVDiskData(data)) {
         vDiskPath = getDefaultNodePath(
             data.NodeId,
             {

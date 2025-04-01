@@ -3,6 +3,7 @@ import React from 'react';
 import {ArrowRotateLeft} from '@gravity-ui/icons';
 import {Icon, Tabs} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
+import {isNil} from 'lodash';
 import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
 import {z} from 'zod';
@@ -20,7 +21,6 @@ import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {pDiskApi} from '../../store/reducers/pdisk/pdisk';
 import type {EDecommitStatus} from '../../types/api/pdisk';
-import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {getPDiskId, getSeverityColor} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
@@ -70,8 +70,7 @@ export function PDiskPage() {
         nodeId: StringParam,
         pDiskId: StringParam,
     });
-
-    const pDiskParamsDefined = valueIsDefined(nodeId) && valueIsDefined(pDiskId);
+    const pDiskParamsDefined = !isNil(nodeId) && !isNil(pDiskId);
 
     const pDiskTab = pDiskTabSchema.parse(activeTab);
 

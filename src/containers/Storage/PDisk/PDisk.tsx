@@ -1,12 +1,13 @@
 import React from 'react';
 
+import {isNil} from 'lodash';
+
 import {DiskStateProgressBar} from '../../../components/DiskStateProgressBar/DiskStateProgressBar';
 import {HoverPopup} from '../../../components/HoverPopup/HoverPopup';
 import {InternalLink} from '../../../components/InternalLink';
 import {PDiskPopup} from '../../../components/PDiskPopup/PDiskPopup';
 import {VDisk} from '../../../components/VDisk/VDisk';
 import {getPDiskPagePath} from '../../../routes';
-import {valueIsDefined} from '../../../utils';
 import {cn} from '../../../utils/cn';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import type {StorageViewContext} from '../types';
@@ -38,7 +39,7 @@ export const PDisk = ({
     viewContext,
 }: PDiskProps) => {
     const {NodeId, PDiskId} = data;
-    const pDiskIdsDefined = valueIsDefined(NodeId) && valueIsDefined(PDiskId);
+    const pDiskIdsDefined = !isNil(NodeId) && !isNil(PDiskId);
 
     const anchorRef = React.useRef<HTMLDivElement>(null);
 

@@ -1,6 +1,8 @@
+import {isNil} from 'lodash';
+
 import type {TPDiskInfoResponse} from '../../../types/api/pdisk';
 import type {TEvSystemStateResponse} from '../../../types/api/systemState';
-import {getArray, valueIsDefined} from '../../../utils';
+import {getArray} from '../../../utils';
 import {getSpaceSeverity} from '../../../utils/disks/helpers';
 import {
     prepareWhiteboardPDiskData,
@@ -39,8 +41,7 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
     } = preparedPDisk;
 
     let logSlot: SlotItem<'log'> | undefined;
-
-    if (valueIsDefined(LogTotalSize)) {
+    if (!isNil(LogTotalSize)) {
         const usagePercent = (Number(LogUsedSize) * 100) / Number(LogTotalSize);
 
         logSlot = {

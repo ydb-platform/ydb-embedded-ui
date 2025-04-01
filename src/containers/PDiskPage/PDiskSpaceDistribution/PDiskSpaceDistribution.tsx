@@ -1,3 +1,5 @@
+import {isNil} from 'lodash';
+
 import {DiskStateProgressBar} from '../../../components/DiskStateProgressBar/DiskStateProgressBar';
 import {HoverPopup} from '../../../components/HoverPopup/HoverPopup';
 import type {InfoViewerItem} from '../../../components/InfoViewer';
@@ -13,7 +15,6 @@ import type {
     SlotItem,
     SlotItemType,
 } from '../../../store/reducers/pdisk/types';
-import {valueIsDefined} from '../../../utils';
 import {formatBytes} from '../../../utils/bytesParsers';
 import {cn} from '../../../utils/cn';
 import {formatStorageValuesToGb} from '../../../utils/dataFormatters/dataFormatters';
@@ -78,9 +79,7 @@ function Slot<T extends SlotItemType>({item, pDiskId, nodeId}: SlotProps<T>) {
     const renderContent = () => {
         if (isVDiskSlot(item)) {
             const vDiskPagePath =
-                valueIsDefined(item.SlotData?.VDiskSlotId) &&
-                valueIsDefined(pDiskId) &&
-                valueIsDefined(nodeId)
+                !isNil(item.SlotData?.VDiskSlotId) && !isNil(pDiskId) && !isNil(nodeId)
                     ? getVDiskPagePath(item.SlotData.VDiskSlotId, pDiskId, nodeId)
                     : undefined;
 
@@ -185,7 +184,7 @@ function SlotContent({id, title, used, total}: SlotContentProps) {
     return (
         <div className={b('slot-content')}>
             <span>
-                {valueIsDefined(id) ? <span className={b('slot-id')}>{id}</span> : null}
+                {!isNil(id) ? <span className={b('slot-id')}>{id}</span> : null}
                 {title}
             </span>
             <span className={b('slot-size')}>{renderSize()}</span>
@@ -213,7 +212,7 @@ function LogInfo({data}: LogInfoProps) {
         },
     ];
 
-    if (valueIsDefined(SystemSize)) {
+    if (!isNil(SystemSize)) {
         info.push({
             label: pDiskPageKeyset('label.system-size'),
             value: formatBytes({value: SystemSize}),
