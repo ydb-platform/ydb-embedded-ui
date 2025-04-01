@@ -47,7 +47,7 @@ export function calculateLoadAveragePercents(node: TSystemStateInfo = {}) {
     const {LoadAverage, NumberOfCpus, RealNumberOfCpus} = node;
     const cpuCount = RealNumberOfCpus ?? NumberOfCpus;
 
-    if (!valueIsDefined(LoadAverage) || !valueIsDefined(cpuCount)) {
+    if (!valueIsDefined(LoadAverage) || !valueIsDefined(cpuCount) || cpuCount === 0) {
         return undefined;
     }
 
