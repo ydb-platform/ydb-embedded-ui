@@ -13,6 +13,7 @@ export interface TClusterInfoV1 {
     NodesTotal?: number;
     NodesAlive?: number;
     NumberOfCpus?: number;
+    RealNumberOfCpus?: number;
     /** double */
     LoadAverage?: number;
     /** uint64 */

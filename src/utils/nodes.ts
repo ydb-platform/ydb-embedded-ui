@@ -44,14 +44,15 @@ export const prepareNodesMap = (nodesList?: TNodeInfo[]) => {
 };
 
 export function calculateLoadAveragePercents(node: TSystemStateInfo = {}) {
-    const {LoadAverage, NumberOfCpus} = node;
+    const {LoadAverage, NumberOfCpus, RealNumberOfCpus} = node;
+    const cpuCount = RealNumberOfCpus || NumberOfCpus;
 
-    if (!valueIsDefined(LoadAverage) || !valueIsDefined(NumberOfCpus)) {
+    if (!valueIsDefined(LoadAverage) || !valueIsDefined(cpuCount)) {
         return undefined;
     }
 
     return LoadAverage.map((value) => {
-        return (value * 100) / NumberOfCpus;
+        return (value * 100) / cpuCount;
     });
 }
 

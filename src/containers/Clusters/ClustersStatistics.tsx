@@ -18,6 +18,7 @@ export const ClustersStatistics = ({count, stats}: ClustersStatisticsProps) => {
         Tenants,
         LoadAverage,
         NumberOfCpus,
+        RealNumberOfCpus,
         StorageUsed,
         StorageTotal,
     } = stats;
@@ -51,7 +52,7 @@ export const ClustersStatistics = ({count, stats}: ClustersStatisticsProps) => {
                 <ProgressViewer
                     size="ns"
                     value={LoadAverage}
-                    capacity={NumberOfCpus}
+                    capacity={RealNumberOfCpus || NumberOfCpus}
                     colorizeProgress={true}
                 />
             </div>

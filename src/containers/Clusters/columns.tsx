@@ -176,13 +176,20 @@ export const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
             return cluster?.NumberOfCpus;
         },
         render: ({row}) => {
-            const {LoadAverage = 0, NumberOfCpus = 0, Overall} = row.cluster || {};
+            const {
+                LoadAverage = 0,
+                NumberOfCpus = 0,
+                RealNumberOfCpus,
+                Overall,
+            } = row.cluster || {};
 
             if (!Overall) {
                 return EMPTY_CELL;
             }
 
-            return <ProgressViewer value={LoadAverage} capacity={NumberOfCpus} />;
+            return (
+                <ProgressViewer value={LoadAverage} capacity={RealNumberOfCpus ?? NumberOfCpus} />
+            );
         },
     },
     {
