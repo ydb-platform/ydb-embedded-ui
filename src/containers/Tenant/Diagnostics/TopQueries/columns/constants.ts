@@ -4,6 +4,8 @@ import i18n from './i18n';
 
 export const TOP_QUERIES_COLUMNS_WIDTH_LS_KEY = 'topQueriesColumnsWidth';
 export const RUNNING_QUERIES_COLUMNS_WIDTH_LS_KEY = 'runningQueriesColumnsWidth';
+export const TOP_QUERIES_SELECTED_COLUMNS_LS_KEY = 'topQueriesSelectedColumns';
+export const RUNNING_QUERIES_SELECTED_COLUMNS_LS_KEY = 'runningQueriesSelectedColumns';
 
 export const TOP_QUERIES_COLUMNS_IDS = {
     CPUTime: 'CPUTime',
@@ -17,9 +19,32 @@ export const TOP_QUERIES_COLUMNS_IDS = {
     Duration: 'Duration',
     QueryStartAt: 'QueryStartAt',
     ApplicationName: 'ApplicationName',
+    RequestUnits: 'RequestUnits',
 } as const;
+export type TopQueriesColumnId = ValueOf<typeof TOP_QUERIES_COLUMNS_IDS>;
 
-type TopQueriesColumnId = ValueOf<typeof TOP_QUERIES_COLUMNS_IDS>;
+export const DEFAULT_TOP_QUERIES_COLUMNS: TopQueriesColumnId[] = [
+    'QueryHash',
+    'CPUTime',
+    'QueryText',
+    'EndTime',
+    'Duration',
+    'ReadRows',
+    'ReadBytes',
+    'RequestUnits',
+    'UserSID',
+];
+export const REQUIRED_TOP_QUERIES_COLUMNS: TopQueriesColumnId[] = ['CPUTime', 'QueryText'];
+
+export const DEFAULT_RUNNING_QUERIES_COLUMNS: TopQueriesColumnId[] = [
+    'UserSID',
+    'QueryStartAt',
+    'QueryText',
+    'ApplicationName',
+];
+
+// Required columns that must always be displayed for running queries
+export const REQUIRED_RUNNING_QUERIES_COLUMNS: TopQueriesColumnId[] = ['QueryStartAt', 'QueryText'];
 
 export const TOP_QUERIES_COLUMNS_TITLES: Record<TopQueriesColumnId, string> = {
     get CPUTime() {
@@ -55,20 +80,24 @@ export const TOP_QUERIES_COLUMNS_TITLES: Record<TopQueriesColumnId, string> = {
     get ApplicationName() {
         return i18n('application');
     },
+    get RequestUnits() {
+        return i18n('request-units');
+    },
 } as const;
 
 const TOP_QUERIES_COLUMNS_TO_SORT_FIELDS: Record<TopQueriesColumnId, string | undefined> = {
     CPUTime: 'CPUTimeUs',
     QueryText: undefined,
-    EndTime: 'EndTime',
-    ReadRows: 'ReadRows',
+    EndTime: undefined,
+    ReadRows: undefined,
     ReadBytes: 'ReadBytes',
-    UserSID: 'UserSID',
+    UserSID: undefined,
     OneLineQueryText: undefined,
     QueryHash: undefined,
     Duration: 'Duration',
-    QueryStartAt: 'QueryStartAt',
-    ApplicationName: 'ApplicationName',
+    QueryStartAt: undefined,
+    ApplicationName: undefined,
+    RequestUnits: 'RequestUnits',
 } as const;
 
 export function getTopQueriesColumnSortField(columnId?: string) {

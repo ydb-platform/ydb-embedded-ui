@@ -8,7 +8,8 @@ import {prepareOrderByFromTableSort} from '../../../utils/hooks/useTableSort';
 import {isQueryErrorResponse, parseQueryAPIResponse} from '../../../utils/query';
 import {api} from '../api';
 
-import type {TopQueriesFilters} from './types';
+import {TOP_QUERIES_TABLES} from './constants';
+import type {TimeFrame, TopQueriesFilters} from './types';
 import {getFiltersConditions} from './utils';
 
 const initialState: TopQueriesFilters = {};
@@ -26,22 +27,46 @@ const slice = createSlice({
 export const {setTopQueriesFilters} = slice.actions;
 export default slice.reducer;
 
-const getQueryText = (filters?: TopQueriesFilters, sortOrder?: SortOrder[]) => {
-    const filterConditions = getFiltersConditions(filters);
-
+const getQueryText = (
+    timeFrame: TimeFrame,
+    filters?: TopQueriesFilters,
+    sortOrder?: SortOrder[],
+) => {
     const orderBy = prepareOrderByFromTableSort(sortOrder);
 
+    // Determine the metric type based on sort field
+    let metricType = TOP_QUERIES_TABLES.CPU_TIME; // Default to CPU_TIME
+
+    if (sortOrder && sortOrder.length > 0) {
+        const primarySortField = sortOrder[0].columnId;
+
+        if (primarySortField === 'Duration') {
+            metricType = TOP_QUERIES_TABLES.DURATION;
+        } else if (primarySortField === 'ReadBytes') {
+            metricType = TOP_QUERIES_TABLES.READ_BYTES;
+        } else if (primarySortField === 'RequestUnits') {
+            metricType = TOP_QUERIES_TABLES.REQUEST_UNITS;
+        } else if (primarySortField === 'CPUTime') {
+            metricType = TOP_QUERIES_TABLES.CPU_TIME;
+        }
+    }
+
+    // Select the appropriate table based on timeFrame filter
+    const tableName = timeFrame === 'minute' ? metricType.ONE_MINUTE : metricType.ONE_HOUR;
+    const filterConditions = getFiltersConditions(tableName, filters);
+
     return `${QUERY_TECHNICAL_MARK}
-SELECT
-    CPUTime as CPUTimeUs,
-    QueryText,
-    IntervalEnd,
-    EndTime,
-    ReadRows,
-    ReadBytes,
-    UserSID,
-    Duration
-FROM \`.sys/top_queries_by_cpu_time_one_hour\`
+    SELECT
+        CPUTime as CPUTimeUs,
+        QueryText,
+        IntervalEnd,
+        EndTime,
+        ReadRows,
+        ReadBytes,
+        UserSID,
+        Duration,
+        RequestUnits
+FROM \`${tableName}\`
 WHERE ${filterConditions || 'true'} AND QueryText NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
 ${orderBy}
 LIMIT 100
@@ -67,26 +92,33 @@ ${orderBy}
 LIMIT 100`;
 }
 
-interface TopQueriesRequestParams {
+interface QueriesRequestParams {
     database: string;
     filters?: TopQueriesFilters;
     sortOrder?: SortOrder[];
 }
 
+type TopQueriesRequestParams = QueriesRequestParams & {timeFrame: TimeFrame};
+
+type RunningQueriesRequestParams = QueriesRequestParams;
+
 export const topQueriesApi = api.injectEndpoints({
     endpoints: (build) => ({
         getTopQueries: build.query({
-            queryFn: async ({database, filters, sortOrder}: TopQueriesRequestParams, {signal}) => {
+            queryFn: async (
+                {database, filters, sortOrder, timeFrame}: TopQueriesRequestParams,
+                {signal},
+            ) => {
                 const preparedFilters = {
                     ...filters,
-                    from: filters?.from || 'now-1h',
+                    from: filters?.from || 'now-6h',
                     to: filters?.to || 'now',
                 };
 
                 try {
                     const response = await window.api.viewer.sendQuery(
                         {
-                            query: getQueryText(preparedFilters, sortOrder),
+                            query: getQueryText(timeFrame, preparedFilters, sortOrder),
                             database,
                             action: 'execute-scan',
                         },
@@ -118,7 +150,10 @@ export const topQueriesApi = api.injectEndpoints({
             providesTags: ['All'],
         }),
         getRunningQueries: build.query({
-            queryFn: async ({database, filters, sortOrder}: TopQueriesRequestParams, {signal}) => {
+            queryFn: async (
+                {database, filters, sortOrder}: RunningQueriesRequestParams,
+                {signal},
+            ) => {
                 try {
                     const response = await window.api.viewer.sendQuery(
                         {

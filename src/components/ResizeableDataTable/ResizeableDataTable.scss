@@ -5,4 +5,9 @@
 
     // padding for easier resize of the last column
     padding-right: 20px;
+
+    &__row-skeleton {
+        width: 100%;
+        height: 50%;
+    }
 }

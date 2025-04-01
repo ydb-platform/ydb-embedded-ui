@@ -45,7 +45,7 @@ export function TopQueries({tenantName}: TopQueriesProps) {
     }, []);
 
     const {currentData, isFetching, error} = topQueriesApi.useGetTopQueriesQuery(
-        {database: tenantName},
+        {database: tenantName, timeFrame: 'hour'},
         {pollingInterval: autoRefreshInterval},
     );
 

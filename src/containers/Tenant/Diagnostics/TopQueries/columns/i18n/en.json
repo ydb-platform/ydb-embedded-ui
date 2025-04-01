@@ -8,5 +8,6 @@
   "end-time": "End time",
   "duration": "Duration",
   "query-text": "Query text",
-  "application": "Application"
+  "application": "Application",
+  "request-units": "RequestUnits"
 }

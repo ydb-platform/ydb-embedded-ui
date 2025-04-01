@@ -27,7 +27,7 @@ const cpuTimeUsColumn: Column<KeyValueRow> = {
     render: ({row}) => formatToMs(parseUsToMs(row.CPUTimeUs ?? undefined)),
     width: 120,
     align: DataTable.RIGHT,
-    sortable: false,
+    sortable: true,
 };
 
 const queryTextColumn: Column<KeyValueRow> = {
@@ -43,7 +43,6 @@ const queryTextColumn: Column<KeyValueRow> = {
             />
         </div>
     ),
-    sortable: false,
     width: 500,
 };
 
@@ -71,13 +70,13 @@ const readBytesColumn: Column<KeyValueRow> = {
     sortAccessor: (row) => Number(row.ReadBytes),
     align: DataTable.RIGHT,
     width: 150,
+    sortable: true,
 };
 
 const userSIDColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.UserSID,
     header: TOP_QUERIES_COLUMNS_TITLES.UserSID,
     render: ({row}) => <div className={b('user-sid')}>{row.UserSID || '–'}</div>,
-    sortAccessor: (row) => String(row.UserSID),
     align: DataTable.LEFT,
 };
 
@@ -93,7 +92,6 @@ const oneLineQueryTextColumn: Column<KeyValueRow> = {
             }}
         />
     ),
-    sortable: false,
     width: 500,
 };
 
@@ -102,7 +100,6 @@ const queryHashColumn: Column<KeyValueRow> = {
     header: TOP_QUERIES_COLUMNS_TITLES.QueryHash,
     render: ({row}) => generateHash(String(row.QueryText)),
     width: 130,
-    sortable: false,
 };
 
 const durationColumn: Column<KeyValueRow> = {
@@ -112,22 +109,31 @@ const durationColumn: Column<KeyValueRow> = {
     sortAccessor: (row) => Number(row.Duration),
     align: DataTable.RIGHT,
     width: 150,
+    sortable: true,
 };
 
 const queryStartColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.QueryStartAt,
     header: TOP_QUERIES_COLUMNS_TITLES.QueryStartAt,
     render: ({row}) => formatDateTime(new Date(row.QueryStartAt as string).getTime()),
-    sortable: true,
     resizeable: false,
     defaultOrder: DataTable.DESCENDING,
+};
+
+const requestUnitsColumn: Column<KeyValueRow> = {
+    name: TOP_QUERIES_COLUMNS_IDS.RequestUnits,
+    header: TOP_QUERIES_COLUMNS_TITLES.RequestUnits,
+    render: ({row}) => formatNumber(row.RequestUnits),
+    sortAccessor: (row) => Number(row.RequestUnits),
+    align: DataTable.RIGHT,
+    width: 150,
+    sortable: true,
 };
 
 const applicationColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.ApplicationName,
     header: TOP_QUERIES_COLUMNS_TITLES.ApplicationName,
     render: ({row}) => <div className={b('user-sid')}>{row.ApplicationName || '–'}</div>,
-    sortable: true,
 };
 
 export function getTopQueriesColumns() {
@@ -139,6 +145,7 @@ export function getTopQueriesColumns() {
         durationColumn,
         readRowsColumn,
         readBytesColumn,
+        requestUnitsColumn,
         userSIDColumn,
     ];
 
