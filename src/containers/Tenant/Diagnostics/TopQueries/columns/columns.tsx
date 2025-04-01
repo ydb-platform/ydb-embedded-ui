@@ -117,7 +117,7 @@ const applicationColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.ApplicationName,
     header: TOP_QUERIES_COLUMNS_TITLES.ApplicationName,
     render: ({row}) => <div className={b('user-sid')}>{row.ApplicationName || '–'}</div>,
-    sortable: false,
+    sortable: true,
 };
 
 export function getTopQueriesColumns() {
