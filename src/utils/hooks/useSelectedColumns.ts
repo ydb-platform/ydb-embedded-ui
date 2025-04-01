@@ -15,6 +15,13 @@ export const useSelectedColumns = <T extends {name: string}>(
         return settingsManager.readUserSettingsValue(storageKey, defaultColumnsIds) as string[];
     });
 
+    // Need to update selectedColumnsIds when passed storageKey changes.
+    React.useEffect(() => {
+        setSelectedColumnsIds(
+            settingsManager.readUserSettingsValue(storageKey, defaultColumnsIds) as string[],
+        );
+    }, [defaultColumnsIds, storageKey]);
+
     const columnsToShow = React.useMemo(() => {
         return columns.filter((column) => {
             const columnId = column.name;
