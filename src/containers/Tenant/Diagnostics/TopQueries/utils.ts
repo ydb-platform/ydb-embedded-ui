@@ -17,6 +17,7 @@ function useQueriesSort(initialSortColumn: string) {
         initialSortColumn: initialSortColumn,
         initialSortOrder: -1,
         multiple: true,
+        fixedOrderType: -1,
     });
 
     const backendSort = React.useMemo(
