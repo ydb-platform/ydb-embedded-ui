@@ -63,13 +63,12 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
     preparedVDisks.sort((disk1, disk2) => Number(disk2.VDiskSlotId) - Number(disk1.VDiskSlotId));
 
     const vdisksSlots: SlotItem<'vDisk'>[] = preparedVDisks.map((preparedVDisk) => {
-        // VDisks do not have strict limits and can be bigger than they should
-        // In most storage views we don't colorize them depending on space usage
-        // Colorize them inside PDiskSpaceDistribution so overused slots will be visible
-        const slotSeverity = Math.max(
-            getSpaceSeverity(preparedVDisk.AllocatedPercent),
-            preparedVDisk.Severity || 0,
-        );
+        // Use only space severity for VDisks inside PDiskSpaceDistribution
+        // Motivation - PDiskSpaceDistribution is needed to see how PDisk space is distributed among slots
+        // Other vdisks statuses make distribution harder to read
+        // Moreover, slots are named with Group ID and pool name, so we don't know actual vdisk before hovering or clicking
+        // VDisks with their full statuses can be seen in popup on hover, in Storage table and on vdisks pages
+        const slotSeverity = getSpaceSeverity(preparedVDisk.AllocatedPercent);
 
         return {
             SlotType: 'vDisk',

@@ -1,4 +1,6 @@
+import {EFlag} from '../../../../types/api/enums';
 import type {TPDiskInfoResponse} from '../../../../types/api/pdisk';
+import {EVDiskState} from '../../../../types/api/vdisk';
 import {preparePDiskDataResponse} from '../utils';
 
 describe('preparePDiskDataResponse', () => {
@@ -164,6 +166,7 @@ describe('preparePDiskDataResponse', () => {
         };
         const preparedDataWarning = preparePDiskDataResponse([dataWarning, {}]);
 
+        // Yellow severity
         expect(
             preparedDataWarning.SlotItems?.find((slot) => slot.SlotType === 'log')?.Severity,
         ).toEqual(3);
@@ -181,6 +184,7 @@ describe('preparePDiskDataResponse', () => {
         };
         const preparedDataDanger = preparePDiskDataResponse([dataDanger, {}]);
 
+        // Red severity
         expect(
             preparedDataDanger.SlotItems?.find((slot) => slot.SlotType === 'log')?.Severity,
         ).toEqual(5);
@@ -201,6 +205,7 @@ describe('preparePDiskDataResponse', () => {
         };
         const preparedDataWarning = preparePDiskDataResponse([dataWarning, {}]);
 
+        // Yellow severity
         expect(
             preparedDataWarning.SlotItems?.find((slot) => slot.SlotType === 'vDisk')?.Severity,
         ).toEqual(3);
@@ -220,8 +225,34 @@ describe('preparePDiskDataResponse', () => {
         };
         const preparedDataDanger = preparePDiskDataResponse([dataDanger, {}]);
 
+        // Red severity
         expect(
             preparedDataDanger.SlotItems?.find((slot) => slot.SlotType === 'vDisk')?.Severity,
         ).toEqual(5);
+    });
+
+    test('Should not use VDisk statuses for severity calculation', () => {
+        const data: TPDiskInfoResponse = {
+            ...rawData,
+            Whiteboard: {
+                ...rawData.Whiteboard,
+                VDisks: [
+                    {
+                        ...rawData.Whiteboard?.VDisks?.[0],
+                        DiskSpace: EFlag.Yellow,
+                        FrontQueues: EFlag.Orange,
+                        VDiskState: EVDiskState.SyncGuidRecoveryError,
+                        AllocatedSize: '10',
+                        AvailableSize: '90',
+                    },
+                ],
+            },
+        };
+        const preparedData = preparePDiskDataResponse([data, {}]);
+
+        // Green severity
+        expect(preparedData.SlotItems?.find((slot) => slot.SlotType === 'vDisk')?.Severity).toEqual(
+            1,
+        );
     });
 });
