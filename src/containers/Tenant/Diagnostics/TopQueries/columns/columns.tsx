@@ -140,12 +140,12 @@ export function getTopQueriesColumns() {
     const columns = [
         queryHashColumn,
         cpuTimeUsColumn,
-        queryTextColumn,
-        endTimeColumn,
         durationColumn,
-        readRowsColumn,
         readBytesColumn,
         requestUnitsColumn,
+        queryTextColumn,
+        endTimeColumn,
+        readRowsColumn,
         userSIDColumn,
     ];
 
