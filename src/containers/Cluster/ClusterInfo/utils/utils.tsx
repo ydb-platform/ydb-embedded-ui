@@ -63,12 +63,7 @@ export const getInfo = (cluster: TClusterInfo, additionalInfo: InfoItem[]) => {
 
     info.push({
         label: i18n('label_load'),
-        value: (
-            <ProgressViewer
-                value={cluster?.LoadAverage}
-                capacity={cluster?.RealNumberOfCpus ?? cluster?.NumberOfCpus}
-            />
-        ),
+        value: <ProgressViewer value={cluster?.LoadAverage} capacity={cluster?.NumberOfCpus} />,
     });
 
     info.push(...additionalInfo);

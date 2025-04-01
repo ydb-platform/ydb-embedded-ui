@@ -89,7 +89,6 @@ export function aggregateClustersInfo(clusters: PreparedCluster[]): ClusterDataA
         NodesAlive = 0,
         LoadAverage = 0,
         NumberOfCpus = 0,
-        RealNumberOfCpus = 0,
         StorageUsed = 0,
         StorageTotal = 0,
         Tenants = 0;
@@ -104,7 +103,6 @@ export function aggregateClustersInfo(clusters: PreparedCluster[]): ClusterDataA
         Tenants += Number(cluster?.Tenants) || 0;
         LoadAverage += Number(cluster?.LoadAverage) || 0;
         NumberOfCpus += cluster?.NumberOfCpus || 0;
-        RealNumberOfCpus += cluster?.RealNumberOfCpus || 0;
         StorageUsed += cluster?.StorageUsed ? Math.floor(parseInt(cluster.StorageUsed, 10)) : 0;
         StorageTotal += cluster?.StorageTotal ? Math.floor(parseInt(cluster.StorageTotal, 10)) : 0;
     });
@@ -116,7 +114,6 @@ export function aggregateClustersInfo(clusters: PreparedCluster[]): ClusterDataA
         Tenants,
         LoadAverage,
         NumberOfCpus,
-        RealNumberOfCpus,
         StorageUsed,
         StorageTotal,
     };

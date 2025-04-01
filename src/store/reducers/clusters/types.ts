@@ -12,7 +12,6 @@ export interface ClusterDataAggregation {
     Tenants: number;
     LoadAverage: number;
     NumberOfCpus: number;
-    RealNumberOfCpus?: number;
     StorageUsed: number;
     StorageTotal: number;
 }
