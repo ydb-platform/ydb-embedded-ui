@@ -1,8 +1,10 @@
 import React from 'react';
 
+import {CirclePlus, TrashBin} from '@gravity-ui/icons';
 import type {Column} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
-import {Button} from '@gravity-ui/uikit';
+import type {DropdownMenuItem} from '@gravity-ui/uikit';
+import {Button, DropdownMenu, Icon} from '@gravity-ui/uikit';
 
 import {EntitiesCount} from '../../components/EntitiesCount';
 import {ResponseError} from '../../components/Errors/ResponseError';
@@ -13,7 +15,10 @@ import {ResizeableDataTable} from '../../components/ResizeableDataTable/Resizeab
 import {Search} from '../../components/Search';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TenantNameWrapper} from '../../components/TenantNameWrapper/TenantNameWrapper';
-import {clusterName} from '../../store';
+import {
+    useCreateDatabaseFeatureAvailable,
+    useDeleteDatabaseFeatureAvailable,
+} from '../../store/reducers/capabilities/hooks';
 import {
     ProblemFilterValues,
     changeFilter,
@@ -28,6 +33,7 @@ import {
 import {setSearchValue, tenantsApi} from '../../store/reducers/tenants/tenants';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import type {AdditionalTenantsProps} from '../../types/additionalProps';
+import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {
@@ -36,6 +42,9 @@ import {
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useClusterNameFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
+
+import i18n from './i18n';
 
 import './Tenants.scss';
 
@@ -50,12 +59,19 @@ interface TenantsProps {
 export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
     const dispatch = useTypedDispatch();
 
+    const clusterName = useClusterNameFromQuery();
+
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tenantsApi.useGetTenantsInfoQuery(
         {clusterName},
         {pollingInterval: autoRefreshInterval},
     );
     const loading = isFetching && currentData === undefined;
+
+    const isCreateDBAvailable =
+        useCreateDatabaseFeatureAvailable() && uiFactory.onCreateDB !== undefined;
+    const isDeleteDBAvailable =
+        useDeleteDatabaseFeatureAvailable() && uiFactory.onDeleteDB !== undefined;
 
     const tenants = useTypedSelector((state) => selectTenants(state, clusterName));
     const searchValue = useTypedSelector(selectTenantsSearchValue);
@@ -68,6 +84,23 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
 
     const handleSearchChange = (value: string) => {
         dispatch(setSearchValue(value));
+    };
+
+    const renderCreateDBButton = () => {
+        if (isCreateDBAvailable && clusterName) {
+            return (
+                <Button
+                    view="action"
+                    onClick={() => uiFactory.onCreateDB?.({clusterName})}
+                    className={b('create-database')}
+                >
+                    <Icon data={CirclePlus} />
+                    {i18n('create-database')}
+                </Button>
+            );
+        }
+
+        return null;
     };
 
     const renderControls = () => {
@@ -86,6 +119,7 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
                     label={'Databases'}
                     loading={loading}
                 />
+                {renderCreateDBButton()}
             </React.Fragment>
         );
     };
@@ -202,6 +236,53 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
             },
         ];
 
+        if (isDeleteDBAvailable) {
+            columns.push({
+                name: 'actions',
+                header: '',
+                width: 40,
+                resizeable: false,
+                align: DataTable.CENTER,
+                render: ({row}) => {
+                    const databaseId = row.UserAttributes?.database_id;
+                    const databaseName = row.Name;
+
+                    let menuItems: (DropdownMenuItem | DropdownMenuItem[])[] = [];
+
+                    if (clusterName && databaseName && databaseId) {
+                        menuItems = [
+                            {
+                                text: i18n('remove'),
+                                iconStart: <TrashBin />,
+                                action: () => {
+                                    uiFactory.onDeleteDB?.({
+                                        clusterName,
+                                        databaseId,
+                                        databaseName,
+                                    });
+                                },
+                                className: b('remove-db'),
+                            },
+                        ];
+                    }
+
+                    if (!menuItems.length) {
+                        return null;
+                    }
+                    return (
+                        <DropdownMenu
+                            defaultSwitcherProps={{
+                                view: 'flat',
+                                size: 's',
+                                pin: 'brick-brick',
+                            }}
+                            items={menuItems}
+                        />
+                    );
+                },
+            });
+        }
+
         if (filteredTenants.length === 0 && problemFilter !== ProblemFilterValues.ALL) {
             return <Illustration name="thumbsUp" width="200" />;
         }
@@ -218,12 +299,16 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
     };
 
     return (
-        <TableWithControlsLayout>
-            <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
-            {error ? <ResponseError error={error} /> : null}
-            <TableWithControlsLayout.Table loading={loading}>
-                {currentData ? renderTable() : null}
-            </TableWithControlsLayout.Table>
-        </TableWithControlsLayout>
+        <div className={b('table-wrapper')}>
+            <TableWithControlsLayout>
+                <TableWithControlsLayout.Controls className={b('controls')}>
+                    {renderControls()}
+                </TableWithControlsLayout.Controls>
+                {error ? <ResponseError error={error} /> : null}
+                <TableWithControlsLayout.Table loading={loading}>
+                    {currentData ? renderTable() : null}
+                </TableWithControlsLayout.Table>
+            </TableWithControlsLayout>
+        </div>
     );
 };

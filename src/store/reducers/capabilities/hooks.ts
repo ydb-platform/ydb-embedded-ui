@@ -1,4 +1,4 @@
-import type {Capability, SecuritySetting} from '../../../types/api/capabilities';
+import type {Capability, MetaCapability, SecuritySetting} from '../../../types/api/capabilities';
 import {useTypedSelector} from '../../../utils/hooks';
 import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 
@@ -6,6 +6,8 @@ import {
     capabilitiesApi,
     selectCapabilityVersion,
     selectDatabaseCapabilities,
+    selectMetaCapabilities,
+    selectMetaCapabilityVersion,
     selectSecuritySetting,
 } from './capabilities';
 
@@ -86,4 +88,26 @@ export const useClusterWithoutAuthInUI = () => {
 
 export const useLoginWithDatabase = () => {
     return useGetSecuritySetting('DomainLoginOnly') === false;
+};
+
+export function useMetaCapabilitiesQuery() {
+    capabilitiesApi.useGetMetaCapabilitiesQuery({});
+}
+
+export function useMetaCapabilitiesLoaded() {
+    const {data, error} = useTypedSelector(selectMetaCapabilities);
+
+    return Boolean(data || error);
+}
+
+const useGetMetaFeatureVersion = (feature: MetaCapability) => {
+    return useTypedSelector((state) => selectMetaCapabilityVersion(state, feature) || 0);
+};
+
+export const useCreateDatabaseFeatureAvailable = () => {
+    return useGetMetaFeatureVersion('/meta/create_database') >= 1;
+};
+
+export const useDeleteDatabaseFeatureAvailable = () => {
+    return useGetMetaFeatureVersion('/meta/delete_database') >= 1;
 };

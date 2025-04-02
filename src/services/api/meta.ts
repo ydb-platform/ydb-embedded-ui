@@ -1,4 +1,5 @@
 import {metaBackend as META_BACKEND} from '../../store';
+import type {MetaCapabilitiesResponse} from '../../types/api/capabilities';
 import type {
     MetaBaseClusterInfo,
     MetaBaseClusters,
@@ -13,6 +14,14 @@ import {BaseYdbAPI} from './base';
 export class MetaAPI extends BaseYdbAPI {
     getPath(path: string) {
         return `${META_BACKEND ?? ''}${path}`;
+    }
+
+    getMetaCapabilities() {
+        return this.get<MetaCapabilitiesResponse>(
+            this.getPath('/capabilities'),
+            {},
+            {timeout: 1000},
+        );
     }
 
     getClustersList(_?: never, {signal}: {signal?: AbortSignal} = {}) {

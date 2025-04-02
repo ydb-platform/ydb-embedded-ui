@@ -36,7 +36,7 @@ export interface TTenant {
     Owner?: string;
     Users?: string[];
     PoolStats?: TPoolStats[];
-    UserAttributes?: Record<string, string>;
+    UserAttributes?: UserAttributes;
     Overall?: EFlag;
     SystemTablets?: TTabletStateInfo[];
     ResourceId?: string;
@@ -127,6 +127,14 @@ export interface TTenantResource {
 /** incomplete */
 export interface ControlPlane {
     name?: string;
+    id?: string;
+    endpoint?: string;
+    folder_id?: string;
+}
+/** incomplete */
+interface UserAttributes {
+    database_id?: string;
+    folder_id?: string;
 }
 
 export type ETenantType = 'UnknownTenantType' | 'Domain' | 'Dedicated' | 'Shared' | 'Serverless';

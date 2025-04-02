@@ -7,17 +7,19 @@ interface CreateToastProps {
     title?: string;
     content?: string;
     type: 'error' | 'success';
-    autoHiding?: number;
+    autoHiding?: number | false;
+    className?: string;
 }
 
-function createToast({name, title, type, content, autoHiding}: CreateToastProps) {
+function createToast({name, title, type, content, autoHiding, className}: CreateToastProps) {
     return toaster.add({
         name: name ?? 'Request succeeded',
         title: title ?? 'Request succeeded',
         theme: type === 'error' ? 'danger' : 'success',
         content: content,
         isClosable: true,
-        autoHiding: autoHiding || (type === 'success' ? 5000 : false),
+        autoHiding: autoHiding ?? (type === 'success' ? 5000 : false),
+        className,
     });
 }
 

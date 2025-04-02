@@ -1,6 +1,6 @@
 import {createSelector} from '@reduxjs/toolkit';
 
-import type {Capability, SecuritySetting} from '../../../types/api/capabilities';
+import type {Capability, MetaCapability, SecuritySetting} from '../../../types/api/capabilities';
 import type {AppDispatch, RootState} from '../../defaultStore';
 
 import {api} from './../api';
@@ -11,6 +11,21 @@ export const capabilitiesApi = api.injectEndpoints({
             queryFn: async (params: {database?: string}) => {
                 try {
                     const data = await window.api.viewer.getClusterCapabilities(params);
+                    return {data};
+                } catch (error) {
+                    // If capabilities endpoint is not available, there will be an error
+                    // That means no new features are available
+                    return {error};
+                }
+            },
+        }),
+        getMetaCapabilities: build.query({
+            queryFn: async () => {
+                try {
+                    if (!window.api.meta) {
+                        throw new Error('Method is not implemented.');
+                    }
+                    const data = await window.api.meta.getMetaCapabilities();
                     return {data};
                 } catch (error) {
                     // If capabilities endpoint is not available, there will be an error
@@ -60,3 +75,13 @@ export async function queryCapability(
 
     return selectCapabilityVersion(getState(), capability, database) || 0;
 }
+
+export const selectMetaCapabilities = capabilitiesApi.endpoints.getMetaCapabilities.select({});
+
+export const selectMetaCapabilityVersion = createSelector(
+    (state: RootState) => state,
+    (_state: RootState, capability: MetaCapability) => capability,
+    (state, capability) => {
+        return selectMetaCapabilities(state).data?.Capabilities?.[capability];
+    },
+);
