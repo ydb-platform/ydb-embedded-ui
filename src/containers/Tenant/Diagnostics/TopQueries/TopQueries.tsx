@@ -91,7 +91,7 @@ export const TopQueries = ({tenantName}: TopQueriesProps) => {
     };
 
     const handleTimeFrameChange = (value: string[]) => {
-        setTimeFrame(value[0] as TimeFrame);
+        setTimeFrame(value[0] as TimeFrame, 'replaceIn');
     };
 
     const handleDateRangeChange = (value: DateRangeValues) => {
