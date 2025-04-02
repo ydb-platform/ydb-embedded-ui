@@ -31,6 +31,7 @@ const getQueryText = (
     timeFrame: TimeFrame,
     filters?: TopQueriesFilters,
     sortOrder?: SortOrder[],
+    limit?: number,
 ) => {
     const orderBy = prepareOrderByFromTableSort(sortOrder);
 
@@ -69,11 +70,15 @@ const getQueryText = (
 FROM \`${tableName}\`
 WHERE ${filterConditions || 'true'} AND QueryText NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
 ${orderBy}
-LIMIT 100
+LIMIT ${limit || 100}
 `;
 };
 
-function getRunningQueriesText(filters?: TopQueriesFilters, sortOrder?: SortOrder[]) {
+function getRunningQueriesText(
+    filters?: TopQueriesFilters,
+    sortOrder?: SortOrder[],
+    limit?: number,
+) {
     const filterConditions = filters?.text
         ? `Query ILIKE '%${filters.text}%' OR UserSID ILIKE '%${filters.text}%'`
         : '';
@@ -89,13 +94,14 @@ SELECT
 FROM \`.sys/query_sessions\`
 WHERE ${filterConditions || 'true'} AND Query NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
 ${orderBy}
-LIMIT 100`;
+LIMIT ${limit || 100}`;
 }
 
 interface QueriesRequestParams {
     database: string;
     filters?: TopQueriesFilters;
     sortOrder?: SortOrder[];
+    limit?: number;
 }
 
 type TopQueriesRequestParams = QueriesRequestParams & {timeFrame: TimeFrame};
@@ -106,7 +112,7 @@ export const topQueriesApi = api.injectEndpoints({
     endpoints: (build) => ({
         getTopQueries: build.query({
             queryFn: async (
-                {database, filters, sortOrder, timeFrame}: TopQueriesRequestParams,
+                {database, filters, sortOrder, timeFrame, limit}: TopQueriesRequestParams,
                 {signal},
             ) => {
                 const preparedFilters = {
@@ -118,7 +124,7 @@ export const topQueriesApi = api.injectEndpoints({
                 try {
                     const response = await window.api.viewer.sendQuery(
                         {
-                            query: getQueryText(timeFrame, preparedFilters, sortOrder),
+                            query: getQueryText(timeFrame, preparedFilters, sortOrder, limit),
                             database,
                             action: 'execute-scan',
                         },
@@ -151,13 +157,13 @@ export const topQueriesApi = api.injectEndpoints({
         }),
         getRunningQueries: build.query({
             queryFn: async (
-                {database, filters, sortOrder}: RunningQueriesRequestParams,
+                {database, filters, sortOrder, limit}: RunningQueriesRequestParams,
                 {signal},
             ) => {
                 try {
                     const response = await window.api.viewer.sendQuery(
                         {
-                            query: getRunningQueriesText(filters, sortOrder),
+                            query: getRunningQueriesText(filters, sortOrder, limit),
                             database,
                             action: 'execute-scan',
                         },

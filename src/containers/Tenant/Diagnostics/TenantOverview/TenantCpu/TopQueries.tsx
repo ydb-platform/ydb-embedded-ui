@@ -15,7 +15,10 @@ import {
     TENANT_PAGES_IDS,
     TENANT_QUERY_TABS_ID,
 } from '../../../../../store/reducers/tenant/constants';
-import {TENANT_OVERVIEW_TABLES_SETTINGS} from '../../../../../utils/constants';
+import {
+    TENANT_OVERVIEW_TABLES_LIMIT,
+    TENANT_OVERVIEW_TABLES_SETTINGS,
+} from '../../../../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../../../../utils/hooks';
 import {useChangeInputWithConfirmation} from '../../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {parseQueryErrorToString} from '../../../../../utils/query';
@@ -45,7 +48,7 @@ export function TopQueries({tenantName}: TopQueriesProps) {
     }, []);
 
     const {currentData, isFetching, error} = topQueriesApi.useGetTopQueriesQuery(
-        {database: tenantName, timeFrame: 'hour'},
+        {database: tenantName, timeFrame: 'hour', limit: TENANT_OVERVIEW_TABLES_LIMIT},
         {pollingInterval: autoRefreshInterval},
     );
 
