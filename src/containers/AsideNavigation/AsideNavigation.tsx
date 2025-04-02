@@ -6,6 +6,8 @@ import {AsideHeader, FooterItem} from '@gravity-ui/navigation';
 import type {IconData} from '@gravity-ui/uikit';
 import {useHistory} from 'react-router-dom';
 
+import {HelpCenterContent} from '../../components/HelpCenter';
+import type {FooterItem as HelpCenterFooterItem} from '../../components/HelpCenter/types';
 import {settingsManager} from '../../services/settings';
 import {cn} from '../../utils/cn';
 import {ASIDE_HEADER_COMPACT_KEY, LANGUAGE_KEY} from '../../utils/constants';
@@ -62,9 +64,11 @@ export interface AsideNavigationProps {
 
 enum Panel {
     UserSettings = 'UserSettings',
+    Documentation = 'Documentation',
 }
 
-function getDocumentationLink() {
+// Get documentation link based on language settings
+function getDocumentationLink(): string {
     // Use saved language from settings if it's present, otherwise use browser language
     const lang = settingsManager.readUserSettingsValue(LANGUAGE_KEY, navigator.language);
 
@@ -75,12 +79,59 @@ function getDocumentationLink() {
     return 'https://ydb.tech/docs/en/';
 }
 
+// Documentation links for the help menu
+const DOCUMENTATION_LINKS = [
+    {
+        text: 'Documentation',
+        url: getDocumentationLink(),
+    },
+];
+
+// Footer items for the help menu
+const FOOTER_ITEMS: HelpCenterFooterItem[] = [
+    {
+        id: 'aboutService',
+        text: 'About YDB',
+        url: 'https://ydb.tech/',
+    },
+    {
+        id: 'telegram',
+        text: 'Chat',
+        url: 'https://t.me/ydb_en',
+    },
+    {
+        id: 'stackoverflow',
+        text: 'Stack Overflow',
+        url: 'https://stackoverflow.com/questions/tagged/ydb',
+    },
+];
+
 export function AsideNavigation(props: AsideNavigationProps) {
     const history = useHistory();
 
     const [visiblePanel, setVisiblePanel] = React.useState<Panel>();
+    const [documentationPopupVisible, setDocumentationPopupVisible] = React.useState(false);
 
     const [compact, setIsCompact] = useSetting<boolean>(ASIDE_HEADER_COMPACT_KEY);
+
+    const toggleDocumentationPopup = React.useCallback(
+        () => setDocumentationPopupVisible(!documentationPopupVisible),
+        [documentationPopupVisible],
+    );
+
+    const closeDocumentationPopup = React.useCallback(
+        () => setDocumentationPopupVisible(false),
+        [],
+    );
+
+    const renderHelpMenu = () => (
+        <HelpCenterContent
+            view="single"
+            installationType="internal"
+            docsItems={DOCUMENTATION_LINKS}
+            footerItems={FOOTER_ITEMS}
+        />
+    );
 
     return (
         <React.Fragment>
@@ -103,10 +154,13 @@ export function AsideNavigation(props: AsideNavigationProps) {
                                 id: 'documentation',
                                 title: i18n('navigation-item.documentation'),
                                 icon: CircleQuestion,
-                                onItemClick: () => {
-                                    window.open(getDocumentationLink(), '_blank', 'noreferrer');
-                                },
+                                current: documentationPopupVisible,
+                                onItemClick: toggleDocumentationPopup,
                             }}
+                            enableTooltip={!documentationPopupVisible}
+                            popupVisible={documentationPopupVisible}
+                            onClosePopup={closeDocumentationPopup}
+                            renderPopupContent={renderHelpMenu}
                         />
 
                         <FooterItem
@@ -136,6 +190,11 @@ export function AsideNavigation(props: AsideNavigationProps) {
                         id: 'user-settings',
                         visible: visiblePanel === Panel.UserSettings,
                         content: props.settings,
+                    },
+                    {
+                        id: 'documentation',
+                        visible: visiblePanel === Panel.Documentation,
+                        content: renderHelpMenu(),
                     },
                 ]}
                 onClosePanel={() => {
