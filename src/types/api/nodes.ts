@@ -105,6 +105,7 @@ export interface TSystemStateInfo {
     /** double */
     LoadAverage?: number[];
     NumberOfCpus?: number;
+    RealNumberOfCpus?: number;
     SystemState?: EFlag;
     MessageBusState?: EFlag;
     GRpcState?: EFlag;
