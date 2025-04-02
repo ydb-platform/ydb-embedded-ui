@@ -23,17 +23,14 @@ const b = cn('kv-top-queries');
 const cpuTimeUsColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.CPUTime,
     header: TOP_QUERIES_COLUMNS_TITLES.CPUTime,
-    sortAccessor: (row) => Number(row.CPUTimeUs),
     render: ({row}) => formatToMs(parseUsToMs(row.CPUTimeUs ?? undefined)),
     width: 120,
     align: DataTable.RIGHT,
-    sortable: true,
 };
 
 const queryTextColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.QueryText,
     header: TOP_QUERIES_COLUMNS_TITLES.QueryText,
-    sortAccessor: (row) => Number(row.CPUTimeUs),
     render: ({row}) => (
         <div className={b('query')}>
             <TruncatedQuery
@@ -58,7 +55,6 @@ const readRowsColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.ReadRows,
     header: TOP_QUERIES_COLUMNS_TITLES.ReadRows,
     render: ({row}) => formatNumber(row.ReadRows),
-    sortAccessor: (row) => Number(row.ReadRows),
     align: DataTable.RIGHT,
     width: 150,
 };
@@ -67,10 +63,8 @@ const readBytesColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.ReadBytes,
     header: TOP_QUERIES_COLUMNS_TITLES.ReadBytes,
     render: ({row}) => formatNumber(row.ReadBytes),
-    sortAccessor: (row) => Number(row.ReadBytes),
     align: DataTable.RIGHT,
     width: 150,
-    sortable: true,
 };
 
 const userSIDColumn: Column<KeyValueRow> = {
@@ -106,10 +100,8 @@ const durationColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.Duration,
     header: TOP_QUERIES_COLUMNS_TITLES.Duration,
     render: ({row}) => formatToMs(parseUsToMs(row.Duration ?? undefined)),
-    sortAccessor: (row) => Number(row.Duration),
     align: DataTable.RIGHT,
     width: 150,
-    sortable: true,
 };
 
 const queryStartColumn: Column<KeyValueRow> = {
@@ -124,10 +116,8 @@ const requestUnitsColumn: Column<KeyValueRow> = {
     name: TOP_QUERIES_COLUMNS_IDS.RequestUnits,
     header: TOP_QUERIES_COLUMNS_TITLES.RequestUnits,
     render: ({row}) => formatNumber(row.RequestUnits),
-    sortAccessor: (row) => Number(row.RequestUnits),
     align: DataTable.RIGHT,
     width: 150,
-    sortable: true,
 };
 
 const applicationColumn: Column<KeyValueRow> = {
