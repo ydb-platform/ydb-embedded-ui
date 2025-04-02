@@ -1,5 +1,21 @@
 # Changelog
 
+## [8.19.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.18.0...v8.19.0) (2025-04-02)
+
+
+### Features
+
+* add new popup menu icon ([#2045](https://github.com/ydb-platform/ydb-embedded-ui/issues/2045)) ([21de77f](https://github.com/ydb-platform/ydb-embedded-ui/commit/21de77faad169cb1a2890e480a3b860d8d2ef8aa))
+* add support for RealNumberOfCpus for load average ([#2082](https://github.com/ydb-platform/ydb-embedded-ui/issues/2082)) ([0bad262](https://github.com/ydb-platform/ydb-embedded-ui/commit/0bad262ff3befee4039956f2588bc0a61a22b03c))
+
+
+### Bug Fixes
+
+* **PDiskPage:** fix error boundary on failed restart ([#2069](https://github.com/ydb-platform/ydb-embedded-ui/issues/2069)) ([4624845](https://github.com/ydb-platform/ydb-embedded-ui/commit/4624845577d32d8617221892bb9d5e79871315de))
+* **PDiskSpaceDistribution:** use only space severity for slots ([#2070](https://github.com/ydb-platform/ydb-embedded-ui/issues/2070)) ([4ea21a1](https://github.com/ydb-platform/ydb-embedded-ui/commit/4ea21a156f07fb206629a82bfc143394a3ebe8aa))
+* shards table dissapeared ([#2072](https://github.com/ydb-platform/ydb-embedded-ui/issues/2072)) ([6ea6cd5](https://github.com/ydb-platform/ydb-embedded-ui/commit/6ea6cd55f71e6cd7837409c41ffec64d68622773))
+* stream test in safari ([#2059](https://github.com/ydb-platform/ydb-embedded-ui/issues/2059)) ([74355a4](https://github.com/ydb-platform/ydb-embedded-ui/commit/74355a430712c7970b56dd18852673075e692d7d))
+
 ## [8.18.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.17.0...v8.18.0) (2025-03-27)
 
 
