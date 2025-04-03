@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.20.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.19.1...v8.20.0) (2025-04-03)
+
+
+### Features
+
+* allow pass create and delete DB funcs to UI ([#2087](https://github.com/ydb-platform/ydb-embedded-ui/issues/2087)) ([810f60b](https://github.com/ydb-platform/ydb-embedded-ui/commit/810f60b46ad75ad184c43d61ce4fa65504f29ee2))
+
 ## [8.19.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.19.0...v8.19.1) (2025-04-03)
 
 
