@@ -127,10 +127,51 @@ export enum QueriesSwitch {
     Running = 'Running',
 }
 
+export enum QueryPeriod {
+    PerHour = 'Per hour',
+    PerMinute = 'Per minute',
+}
+
 export enum TopShardsMode {
     Immediate = 'Immediate',
     Historical = 'Historical',
 }
+
+// Column names as they appear in the UI (based on TOP_QUERIES_COLUMNS_TITLES)
+export const QUERY_COLUMNS_IDS = {
+    QueryHash: 'Query Hash',
+    CPUTime: 'CPU Time',
+    Duration: 'Duration',
+    QueryText: 'Query text',
+    EndTime: 'End time',
+    StartTime: 'Start time',
+    ReadRows: 'Read Rows',
+    ReadBytes: 'Read Bytes',
+    RequestUnits: 'Request Units',
+    User: 'User',
+    Application: 'Application',
+} as const;
+
+// Default columns for the Top Queries mode (based on DEFAULT_TOP_QUERIES_COLUMNS)
+export const QueryTopColumns = [
+    QUERY_COLUMNS_IDS.QueryHash,
+    QUERY_COLUMNS_IDS.CPUTime,
+    QUERY_COLUMNS_IDS.Duration,
+    QUERY_COLUMNS_IDS.QueryText,
+    QUERY_COLUMNS_IDS.EndTime,
+    QUERY_COLUMNS_IDS.ReadRows,
+    QUERY_COLUMNS_IDS.ReadBytes,
+    QUERY_COLUMNS_IDS.RequestUnits,
+    QUERY_COLUMNS_IDS.User,
+];
+
+// Default columns for the Running Queries mode (based on DEFAULT_RUNNING_QUERIES_COLUMNS)
+export const QueryRunningColumns = [
+    QUERY_COLUMNS_IDS.User,
+    QUERY_COLUMNS_IDS.StartTime,
+    QUERY_COLUMNS_IDS.QueryText,
+    QUERY_COLUMNS_IDS.Application,
+];
 
 const TOP_SHARDS_COLUMNS_IDS = {
     TabletId: 'TabletId',
@@ -304,8 +345,28 @@ export class Diagnostics {
         await option.evaluate((el) => (el as HTMLElement).click());
     }
 
-    async getSelectedTopShardsMode(): Promise<string> {
+    async getSelectedTableMode(): Promise<string> {
         const checkedOption = this.tableRadioButton.locator('.g-radio-button__option_checked');
         return (await checkedOption.textContent())?.trim() || '';
+    }
+
+    async selectQueryPeriod(period: QueryPeriod): Promise<void> {
+        // Click on the dropdown to open it
+        const periodSelect = this.tableControls.locator('.g-select');
+        await periodSelect.click();
+
+        // Select the specified period option
+        const optionLocator = periodSelect
+            .page()
+            .locator(`.g-select-list__option-default-label:has-text("${period}")`);
+        await optionLocator.click();
+    }
+
+    async getSelectedQueryPeriod(): Promise<string> {
+        const periodSelect = this.tableControls.locator('.g-select');
+        const selectedText = await periodSelect
+            .locator('.g-select-control__option-text')
+            .textContent();
+        return selectedText?.trim() || '';
     }
 }
