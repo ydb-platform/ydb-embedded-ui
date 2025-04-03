@@ -216,6 +216,7 @@ function GetCapabilities({children}: {children: React.ReactNode}) {
     const capabilitiesLoaded = useCapabilitiesLoaded();
 
     useMetaCapabilitiesQuery();
+    // It is always true if there is no meta, since request finishes with an error
     const metaCapabilitiesLoaded = useMetaCapabilitiesLoaded();
 
     return (

@@ -22,6 +22,8 @@ export function useCapabilitiesLoaded() {
 
     const {data, error} = useTypedSelector((state) => selectDatabaseCapabilities(state, database));
 
+    // If capabilities endpoint is not available, request finishes with error
+    // That means no new features are available
     return Boolean(data || error);
 }
 
@@ -97,6 +99,8 @@ export function useMetaCapabilitiesQuery() {
 export function useMetaCapabilitiesLoaded() {
     const {data, error} = useTypedSelector(selectMetaCapabilities);
 
+    // If capabilities endpoint is not available, request finishes with error
+    // That means no new features are available
     return Boolean(data || error);
 }
 
