@@ -62,7 +62,7 @@ test.describe('Memory Viewer Widget', () => {
 
         const memTable = await memoryViewer.getMemTableInfo();
         expect(memTable.status).toBe('good');
-        expect(memTable.text).toMatch(/\d+ \/ \d+\s*GB/);
+        expect(memTable.text).toMatch(/\d+(\.\d+)? \/ \d+(\.\d+)?\s*GB/);
 
         // Check simple metrics
         const allocatorCaches = await memoryViewer.getAllocatorCachesInfo();
