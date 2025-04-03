@@ -52,4 +52,23 @@
     &__name {
         overflow: hidden;
     }
+
+    &__controls {
+        width: 100%;
+    }
+
+    &__table-wrapper {
+        width: max-content;
+    }
+
+    &__create-database {
+        position: sticky;
+        right: 0;
+
+        margin: 0 0 0 auto;
+    }
+
+    &__remove-db {
+        color: var(--ydb-color-status-red);
+    }
 }

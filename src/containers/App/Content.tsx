@@ -17,6 +17,8 @@ import {
     useCapabilitiesLoaded,
     useCapabilitiesQuery,
     useClusterWithoutAuthInUI,
+    useMetaCapabilitiesLoaded,
+    useMetaCapabilitiesQuery,
 } from '../../store/reducers/capabilities/hooks';
 import {nodesListApi} from '../../store/reducers/nodesList';
 import {cn} from '../../utils/cn';
@@ -213,8 +215,12 @@ function GetCapabilities({children}: {children: React.ReactNode}) {
     useCapabilitiesQuery();
     const capabilitiesLoaded = useCapabilitiesLoaded();
 
+    useMetaCapabilitiesQuery();
+    // It is always true if there is no meta, since request finishes with an error
+    const metaCapabilitiesLoaded = useMetaCapabilitiesLoaded();
+
     return (
-        <LoaderWrapper loading={!capabilitiesLoaded} size="l">
+        <LoaderWrapper loading={!capabilitiesLoaded || !metaCapabilitiesLoaded} size="l">
             {children}
         </LoaderWrapper>
     );
