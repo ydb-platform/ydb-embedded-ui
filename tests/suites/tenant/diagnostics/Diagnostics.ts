@@ -78,7 +78,6 @@ export class Table {
         }
         return headerNames;
     }
-
     async getCellValueByHeader(row: number, header: string) {
         const headers = await this.getHeaders();
         const colIndex = headers.indexOf(header);
@@ -89,6 +88,18 @@ export class Table {
             `tr.data-table__row:nth-child(${row}) td:nth-child(${colIndex + 1})`,
         );
         return cell.innerText();
+    }
+
+    async verifyHeaders(expectedHeaders: string[]) {
+        const actualHeaders = await this.getHeaders();
+        for (const header of expectedHeaders) {
+            if (!actualHeaders.includes(header)) {
+                throw new Error(
+                    `Expected header "${header}" not found in actual headers: ${actualHeaders.join(', ')}`,
+                );
+            }
+        }
+        return true;
     }
 
     async waitForCellValueByHeader(row: number, header: string, value: string) {
@@ -116,6 +127,42 @@ export enum QueriesSwitch {
     Running = 'Running',
 }
 
+export enum TopShardsMode {
+    Immediate = 'Immediate',
+    Historical = 'Historical',
+}
+
+const TOP_SHARDS_COLUMNS_IDS = {
+    TabletId: 'TabletId',
+    CPUCores: 'CPUCores',
+    DataSize: 'DataSize (B)',
+    Path: 'Path',
+    NodeId: 'NodeId',
+    PeakTime: 'PeakTime',
+    InFlightTxCount: 'InFlightTxCount',
+    IntervalEnd: 'IntervalEnd',
+} as const;
+
+export const TopShardsImmediateColumns = [
+    TOP_SHARDS_COLUMNS_IDS.Path,
+    TOP_SHARDS_COLUMNS_IDS.CPUCores,
+    TOP_SHARDS_COLUMNS_IDS.DataSize,
+    TOP_SHARDS_COLUMNS_IDS.TabletId,
+    TOP_SHARDS_COLUMNS_IDS.NodeId,
+    TOP_SHARDS_COLUMNS_IDS.InFlightTxCount,
+];
+
+export const TopShardsHistoricalColumns = [
+    TOP_SHARDS_COLUMNS_IDS.Path,
+    TOP_SHARDS_COLUMNS_IDS.CPUCores,
+    TOP_SHARDS_COLUMNS_IDS.DataSize,
+    TOP_SHARDS_COLUMNS_IDS.TabletId,
+    TOP_SHARDS_COLUMNS_IDS.NodeId,
+    TOP_SHARDS_COLUMNS_IDS.PeakTime,
+    TOP_SHARDS_COLUMNS_IDS.InFlightTxCount,
+    TOP_SHARDS_COLUMNS_IDS.IntervalEnd,
+];
+
 export class Diagnostics {
     table: Table;
     storage: StoragePage;
@@ -133,6 +180,7 @@ export class Diagnostics {
     private storageCard: Locator;
     private memoryCard: Locator;
     private healthcheckCard: Locator;
+    private tableRadioButton: Locator;
 
     constructor(page: Page) {
         this.storage = new StoragePage(page);
@@ -146,6 +194,9 @@ export class Diagnostics {
         this.refreshButton = page.locator('button[aria-label="Refresh"]');
         this.autoRefreshSelect = page.locator('.g-select');
         this.table = new Table(page.locator('.object-general'));
+        this.tableRadioButton = page.locator(
+            '.ydb-table-with-controls-layout__controls .g-radio-button',
+        );
 
         // Info tab cards
         this.cpuCard = page.locator('.metrics-cards__tab:has-text("CPU")');
@@ -246,5 +297,15 @@ export class Diagnostics {
             '.healthcheck__self-check-status-indicator',
         );
         return (await statusElement.textContent())?.trim() || '';
+    }
+
+    async selectTopShardsMode(mode: TopShardsMode): Promise<void> {
+        const option = this.tableRadioButton.locator(`.g-radio-button__option:has-text("${mode}")`);
+        await option.evaluate((el) => (el as HTMLElement).click());
+    }
+
+    async getSelectedTopShardsMode(): Promise<string> {
+        const checkedOption = this.tableRadioButton.locator('.g-radio-button__option_checked');
+        return (await checkedOption.textContent())?.trim() || '';
     }
 }
