@@ -1,5 +1,7 @@
 import escapeRegExp from 'lodash/escapeRegExp';
 
+import {isNumeric} from '../../../utils/utils';
+
 import type {
     ClusterDataAggregation,
     ClustersFilters,
@@ -102,7 +104,10 @@ export function aggregateClustersInfo(clusters: PreparedCluster[]): ClusterDataA
         Object.keys(hosts).forEach((host) => Hosts.add(host));
         Tenants += Number(cluster?.Tenants) || 0;
         LoadAverage += Number(cluster?.LoadAverage) || 0;
-        NumberOfCpus += cluster?.NumberOfCpus || 0;
+        NumberOfCpus += isNumeric(cluster?.RealNumberOfCpus)
+            ? cluster?.RealNumberOfCpus
+            : cluster?.NumberOfCpus || 0;
+
         StorageUsed += cluster?.StorageUsed ? Math.floor(parseInt(cluster.StorageUsed, 10)) : 0;
         StorageTotal += cluster?.StorageTotal ? Math.floor(parseInt(cluster.StorageTotal, 10)) : 0;
     });
