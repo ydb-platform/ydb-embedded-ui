@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.19.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.19.0...v8.19.1) (2025-04-03)
+
+
+### Bug Fixes
+
+* fake commit for release to build ([#2088](https://github.com/ydb-platform/ydb-embedded-ui/issues/2088)) ([3b97fa7](https://github.com/ydb-platform/ydb-embedded-ui/commit/3b97fa77c06a7bfb2a71ed18ebbb8b7e397ffe52))
+
 ## [8.19.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.18.0...v8.19.0) (2025-04-02)
 
 
