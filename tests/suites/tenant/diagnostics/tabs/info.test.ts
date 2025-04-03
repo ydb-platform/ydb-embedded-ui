@@ -4,7 +4,7 @@ import {tenantName} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
 import {Diagnostics, DiagnosticsTab} from '../Diagnostics';
 
-test.describe('Diagnostics tab', async () => {
+test.describe('Diagnostics Info tab', async () => {
     test('Info tab shows main page elements', async ({page}) => {
         const pageQueryParams = {
             schema: tenantName,

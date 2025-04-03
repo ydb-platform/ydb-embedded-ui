@@ -10,7 +10,7 @@ import {
 } from '../Diagnostics';
 import {setupTopShardsHistoryMock} from '../mocks';
 
-test.describe('Diagnostics tab', async () => {
+test.describe('Diagnostics TopShards tab', async () => {
     test('TopShards tab defaults to Immediate mode', async ({page}) => {
         const pageQueryParams = {
             schema: tenantName,

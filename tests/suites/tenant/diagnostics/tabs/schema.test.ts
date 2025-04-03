@@ -4,7 +4,7 @@ import {dsVslotsSchema, tenantName} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
 import {Diagnostics, DiagnosticsTab} from '../Diagnostics';
 
-test.describe('Diagnostics tab', async () => {
+test.describe('Diagnostics Schema tab', async () => {
     test('Primary keys header is visible in Schema tab', async ({page}) => {
         const pageQueryParams = {
             schema: dsVslotsSchema,

@@ -13,7 +13,7 @@ import {
     QueryTopColumns,
 } from '../Diagnostics';
 
-test.describe('Diagnostics tab', async () => {
+test.describe('Diagnostics Queries tab', async () => {
     test('No runnning queries in Queries if no queries are running', async ({page}) => {
         const pageQueryParams = {
             schema: tenantName,

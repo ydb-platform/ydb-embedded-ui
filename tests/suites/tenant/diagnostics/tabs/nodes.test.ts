@@ -5,7 +5,7 @@ import {DiagnosticsNodesTable} from '../../../paginatedTable/paginatedTable';
 import {TenantPage} from '../../TenantPage';
 import {Diagnostics, DiagnosticsTab} from '../Diagnostics';
 
-test.describe('Diagnostics tab', async () => {
+test.describe('Diagnostics Nodes tab', async () => {
     test('Nodes tab shows nodes table with memory viewer', async ({page}) => {
         const pageQueryParams = {
             schema: tenantName,
