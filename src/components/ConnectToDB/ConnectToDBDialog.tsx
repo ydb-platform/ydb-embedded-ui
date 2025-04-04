@@ -56,7 +56,7 @@ function ConnectToDBDialog({open, onClose, database, endpoint}: ConnectToDBDialo
                         language={activeTab}
                         text={snippet}
                         transparentBackground={false}
-                        withCopy
+                        withClipboardButton={{alwaysVisible: true}}
                     />
                 </div>
                 {docsLink ? (

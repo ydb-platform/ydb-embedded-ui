@@ -1,5 +1,6 @@
-import type {DataTableProps, Settings} from '@gravity-ui/react-data-table';
+import type {Column, DataTableProps, Settings} from '@gravity-ui/react-data-table';
 import DataTable, {updateColumnsWidth} from '@gravity-ui/react-data-table';
+import {Skeleton} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 import {useTableResize} from '../../utils/hooks/useTableResize';
@@ -11,6 +12,7 @@ const b = cn('ydb-resizeable-data-table');
 export interface ResizeableDataTableProps<T> extends Omit<DataTableProps<T>, 'theme' | 'onResize'> {
     columnsWidthLSKey?: string;
     wrapperClassName?: string;
+    loading?: boolean;
 }
 
 export function ResizeableDataTable<T>({
@@ -18,11 +20,20 @@ export function ResizeableDataTable<T>({
     columns,
     settings,
     wrapperClassName,
+    loading,
     ...props
 }: ResizeableDataTableProps<T>) {
     const [tableColumnsWidth, setTableColumnsWidth] = useTableResize(columnsWidthLSKey);
 
-    const updatedColumns = updateColumnsWidth(columns, tableColumnsWidth);
+    // If loading is true, override the render method of each column to display a Skeleton
+    const processedColumns = loading
+        ? columns.map((column: Column<T>) => ({
+              ...column,
+              render: () => <Skeleton className={b('row-skeleton')} />,
+          }))
+        : columns;
+
+    const updatedColumns = updateColumnsWidth(processedColumns, tableColumnsWidth);
 
     const newSettings: Settings = {
         ...settings,
