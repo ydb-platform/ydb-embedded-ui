@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.20.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.20.0...v8.20.1) (2025-04-04)
+
+
+### Bug Fixes
+
+* add RealNumberOfCpus to aggregates ([#2095](https://github.com/ydb-platform/ydb-embedded-ui/issues/2095)) ([b0453d5](https://github.com/ydb-platform/ydb-embedded-ui/commit/b0453d56ff19e61a4a0c003249aa89a46586071c))
+
 ## [8.20.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.19.1...v8.20.0) (2025-04-03)
 
 
