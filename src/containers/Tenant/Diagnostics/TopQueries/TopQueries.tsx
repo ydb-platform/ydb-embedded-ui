@@ -20,8 +20,8 @@ import {useTypedDispatch} from '../../../../utils/hooks';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {TenantTabsGroups, getTenantPath} from '../../TenantPages';
 
-import {RunningQueriesContent} from './RunningQueriesContent';
-import {TopQueriesContent} from './TopQueriesContent';
+import {RunningQueriesData} from './RunningQueriesData';
+import {TopQueriesData} from './TopQueriesData';
 import {TimeFrameIds} from './constants';
 import i18n from './i18n';
 
@@ -105,7 +105,7 @@ export const TopQueries = ({tenantName}: TopQueriesProps) => {
     }, [queryMode, setQueryMode]);
 
     return isTopQueries ? (
-        <TopQueriesContent
+        <TopQueriesData
             tenantName={tenantName}
             timeFrame={timeFrame}
             renderQueryModeControl={renderQueryModeControl}
@@ -115,7 +115,7 @@ export const TopQueries = ({tenantName}: TopQueriesProps) => {
             handleTextSearchUpdate={handleTextSearchUpdate}
         />
     ) : (
-        <RunningQueriesContent
+        <RunningQueriesData
             tenantName={tenantName}
             renderQueryModeControl={renderQueryModeControl}
             onRowClick={onRowClick}

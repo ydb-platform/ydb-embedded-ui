@@ -31,7 +31,7 @@ import {TOP_QUERIES_TABLE_SETTINGS, useTopQueriesSort} from './utils';
 
 const b = cn('kv-top-queries');
 
-interface TopQueriesContentProps {
+interface TopQueriesDataProps {
     tenantName: string;
     timeFrame: TimeFrame;
     renderQueryModeControl: () => React.ReactNode;
@@ -41,7 +41,7 @@ interface TopQueriesContentProps {
     handleTextSearchUpdate: (text: string) => void;
 }
 
-export const TopQueriesContent = ({
+export const TopQueriesData = ({
     tenantName,
     timeFrame,
     renderQueryModeControl,
@@ -49,7 +49,7 @@ export const TopQueriesContent = ({
     handleTimeFrameChange,
     handleDateRangeChange,
     handleTextSearchUpdate,
-}: TopQueriesContentProps) => {
+}: TopQueriesDataProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const filters = useTypedSelector((state) => state.executeTopQueries);
 

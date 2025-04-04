@@ -27,19 +27,19 @@ import {TOP_QUERIES_TABLE_SETTINGS, useRunningQueriesSort} from './utils';
 
 const b = cn('kv-top-queries');
 
-interface RunningQueriesContentProps {
+interface RunningQueriesDataProps {
     tenantName: string;
     renderQueryModeControl: () => React.ReactNode;
     onRowClick: (query: string) => void;
     handleTextSearchUpdate: (text: string) => void;
 }
 
-export const RunningQueriesContent = ({
+export const RunningQueriesData = ({
     tenantName,
     renderQueryModeControl,
     onRowClick,
     handleTextSearchUpdate,
-}: RunningQueriesContentProps) => {
+}: RunningQueriesDataProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const filters = useTypedSelector((state) => state.executeTopQueries);
 
