@@ -137,7 +137,7 @@ export enum TopShardsMode {
     Historical = 'Historical',
 }
 
-// Column names as they appear in the UI (based on TOP_QUERIES_COLUMNS_TITLES)
+// Column names as they appear in the UI (based on QUERIES_COLUMNS_TITLES)
 export const QUERY_COLUMNS_IDS = {
     QueryHash: 'Query Hash',
     CPUTime: 'CPU Time',

@@ -93,7 +93,7 @@ SELECT
     ApplicationName
 FROM \`.sys/query_sessions\`
 WHERE ${filterConditions || 'true'} AND Query NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
-${orderBy}
+AND QueryStartAt is not null ${orderBy}
 LIMIT ${limit || 100}`;
 }
 

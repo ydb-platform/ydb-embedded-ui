@@ -17,10 +17,10 @@ import {parseQueryErrorToString} from '../../../../utils/query';
 import {getRunningQueriesColumns} from './columns/columns';
 import {
     DEFAULT_RUNNING_QUERIES_COLUMNS,
+    QUERIES_COLUMNS_TITLES,
     REQUIRED_RUNNING_QUERIES_COLUMNS,
     RUNNING_QUERIES_COLUMNS_WIDTH_LS_KEY,
     RUNNING_QUERIES_SELECTED_COLUMNS_LS_KEY,
-    TOP_QUERIES_COLUMNS_TITLES,
 } from './columns/constants';
 import i18n from './i18n';
 import {TOP_QUERIES_TABLE_SETTINGS, useRunningQueriesSort} from './utils';
@@ -52,7 +52,7 @@ export const RunningQueriesData = ({
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
         columns,
         RUNNING_QUERIES_SELECTED_COLUMNS_LS_KEY,
-        TOP_QUERIES_COLUMNS_TITLES,
+        QUERIES_COLUMNS_TITLES,
         DEFAULT_RUNNING_QUERIES_COLUMNS,
         REQUIRED_RUNNING_QUERIES_COLUMNS,
     );

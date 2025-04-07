@@ -20,8 +20,8 @@ import {parseQueryErrorToString} from '../../../../utils/query';
 import {getTopQueriesColumns} from './columns/columns';
 import {
     DEFAULT_TOP_QUERIES_COLUMNS,
+    QUERIES_COLUMNS_TITLES,
     REQUIRED_TOP_QUERIES_COLUMNS,
-    TOP_QUERIES_COLUMNS_TITLES,
     TOP_QUERIES_COLUMNS_WIDTH_LS_KEY,
     TOP_QUERIES_SELECTED_COLUMNS_LS_KEY,
 } from './columns/constants';
@@ -62,7 +62,7 @@ export const TopQueriesData = ({
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
         columns,
         TOP_QUERIES_SELECTED_COLUMNS_LS_KEY,
-        TOP_QUERIES_COLUMNS_TITLES,
+        QUERIES_COLUMNS_TITLES,
         DEFAULT_TOP_QUERIES_COLUMNS,
         REQUIRED_TOP_QUERIES_COLUMNS,
     );
