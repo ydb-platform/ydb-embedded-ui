@@ -16,5 +16,18 @@
         position: absolute;
         top: 13px;
         right: 14px;
+
+        pointer-events: all;
+
+        opacity: 0;
+
+        &_visible {
+            opacity: 1;
+        }
+    }
+
+    .data-table__row:hover &__copy,
+    .ydb-paginated-table__row:hover &__copy {
+        opacity: 1;
     }
 }

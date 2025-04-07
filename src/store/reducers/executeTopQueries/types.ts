@@ -1,3 +1,5 @@
+export type TimeFrame = 'minute' | 'hour';
+
 export interface TopQueriesFilters {
     /** ms from epoch */
     from?: string;

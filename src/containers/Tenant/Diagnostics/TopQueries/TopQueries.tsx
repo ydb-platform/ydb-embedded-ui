@@ -7,29 +7,25 @@ import {StringParam, useQueryParam} from 'use-query-params';
 import {z} from 'zod';
 
 import type {DateRangeValues} from '../../../../components/DateRange';
-import {DateRange} from '../../../../components/DateRange';
-import {Search} from '../../../../components/Search';
-import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {parseQuery} from '../../../../routes';
 import {setTopQueriesFilters} from '../../../../store/reducers/executeTopQueries/executeTopQueries';
+import type {TimeFrame} from '../../../../store/reducers/executeTopQueries/types';
 import {changeUserInput, setIsDirty} from '../../../../store/reducers/query/query';
 import {
     TENANT_PAGE,
     TENANT_PAGES_IDS,
     TENANT_QUERY_TABS_ID,
 } from '../../../../store/reducers/tenant/constants';
-import {cn} from '../../../../utils/cn';
-import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useTypedDispatch} from '../../../../utils/hooks';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {TenantTabsGroups, getTenantPath} from '../../TenantPages';
 
 import {RunningQueriesData} from './RunningQueriesData';
 import {TopQueriesData} from './TopQueriesData';
+import {TimeFrameIds} from './constants';
 import i18n from './i18n';
 
 import './TopQueries.scss';
-
-const b = cn('kv-top-queries');
 
 const QueryModeIds = {
     top: 'top',
@@ -52,6 +48,7 @@ const QUERY_MODE_OPTIONS: RadioButtonOption[] = [
 ];
 
 const queryModeSchema = z.nativeEnum(QueryModeIds).catch(QueryModeIds.top);
+const timeFrameSchema = z.nativeEnum(TimeFrameIds).catch(TimeFrameIds.hour);
 
 interface TopQueriesProps {
     tenantName: string;
@@ -62,12 +59,12 @@ export const TopQueries = ({tenantName}: TopQueriesProps) => {
     const location = useLocation();
     const history = useHistory();
     const [_queryMode = QueryModeIds.top, setQueryMode] = useQueryParam('queryMode', StringParam);
+    const [_timeFrame = TimeFrameIds.hour, setTimeFrame] = useQueryParam('timeFrame', StringParam);
 
     const queryMode = queryModeSchema.parse(_queryMode);
+    const timeFrame = timeFrameSchema.parse(_timeFrame);
 
     const isTopQueries = queryMode === QueryModeIds.top;
-
-    const filters = useTypedSelector((state) => state.executeTopQueries);
 
     const applyRowClick = React.useCallback(
         (input: string) => {
@@ -93,35 +90,36 @@ export const TopQueries = ({tenantName}: TopQueriesProps) => {
         dispatch(setTopQueriesFilters({text}));
     };
 
+    const handleTimeFrameChange = (value: string[]) => {
+        setTimeFrame(value[0] as TimeFrame, 'replaceIn');
+    };
+
     const handleDateRangeChange = (value: DateRangeValues) => {
         dispatch(setTopQueriesFilters(value));
     };
 
-    const DataComponent = isTopQueries ? TopQueriesData : RunningQueriesData;
+    const renderQueryModeControl = React.useCallback(() => {
+        return (
+            <RadioButton options={QUERY_MODE_OPTIONS} value={queryMode} onUpdate={setQueryMode} />
+        );
+    }, [queryMode, setQueryMode]);
 
-    return (
-        <TableWithControlsLayout>
-            <TableWithControlsLayout.Controls>
-                <RadioButton
-                    options={QUERY_MODE_OPTIONS}
-                    value={queryMode}
-                    onUpdate={setQueryMode}
-                />
-                <Search
-                    value={filters.text}
-                    onChange={handleTextSearchUpdate}
-                    placeholder={i18n('filter.text.placeholder')}
-                    className={b('search')}
-                />
-                {isTopQueries ? (
-                    <DateRange
-                        from={filters.from}
-                        to={filters.to}
-                        onChange={handleDateRangeChange}
-                    />
-                ) : null}
-            </TableWithControlsLayout.Controls>
-            <DataComponent database={tenantName} onRowClick={onRowClick} rowClassName={b('row')} />
-        </TableWithControlsLayout>
+    return isTopQueries ? (
+        <TopQueriesData
+            tenantName={tenantName}
+            timeFrame={timeFrame}
+            renderQueryModeControl={renderQueryModeControl}
+            onRowClick={onRowClick}
+            handleTimeFrameChange={handleTimeFrameChange}
+            handleDateRangeChange={handleDateRangeChange}
+            handleTextSearchUpdate={handleTextSearchUpdate}
+        />
+    ) : (
+        <RunningQueriesData
+            tenantName={tenantName}
+            renderQueryModeControl={renderQueryModeControl}
+            onRowClick={onRowClick}
+            handleTextSearchUpdate={handleTextSearchUpdate}
+        />
     );
 };

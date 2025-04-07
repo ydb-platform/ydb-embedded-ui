@@ -1,6 +1,9 @@
 import React from 'react';
 
-import type {RelativeRangeDatePickerProps} from '@gravity-ui/date-components';
+import type {
+    RelativeRangeDatePickerProps,
+    RelativeRangeDatePickerValue,
+} from '@gravity-ui/date-components';
 import {RelativeRangeDatePicker} from '@gravity-ui/date-components';
 
 import {cn} from '../../utils/cn';
@@ -19,23 +22,13 @@ export interface DateRangeValues {
     to?: string;
 }
 
-const DEFAULT_VALUE = {
-    start: {
-        value: 'now-1h',
-        type: 'relative',
-    },
-    end: {
-        value: 'now',
-        type: 'relative',
-    },
-} as const;
-
 interface DateRangeProps extends DateRangeValues {
     className?: string;
+    defaultValue?: RelativeRangeDatePickerValue;
     onChange?: (value: DateRangeValues) => void;
 }
 
-export const DateRange = ({from, to, className, onChange}: DateRangeProps) => {
+export const DateRange = ({from, to, className, defaultValue, onChange}: DateRangeProps) => {
     const handleUpdate = React.useCallback<NonNullable<RelativeRangeDatePickerProps['onUpdate']>>(
         (pickerValue) => onChange?.(toDateRangeValues(pickerValue)),
         [onChange],
@@ -50,13 +43,14 @@ export const DateRange = ({from, to, className, onChange}: DateRangeProps) => {
 
     // eslint-disable-next-line new-cap
     const timeZoneString = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const currentValue = value || defaultValue;
     return (
         <div className={b(null, className)}>
             <RelativeRangeDatePicker
                 withPresets
-                className={b('range-input', {[getdatePickerSize(value)]: true})}
+                className={b('range-input', {[getdatePickerSize(currentValue)]: true})}
                 timeZone={timeZoneString}
-                value={value || DEFAULT_VALUE}
+                value={currentValue}
                 allowNullableValues
                 size="m"
                 format={i18n('date-time-format')}

@@ -4,8 +4,10 @@ import i18n from './i18n';
 
 export const TOP_QUERIES_COLUMNS_WIDTH_LS_KEY = 'topQueriesColumnsWidth';
 export const RUNNING_QUERIES_COLUMNS_WIDTH_LS_KEY = 'runningQueriesColumnsWidth';
+export const TOP_QUERIES_SELECTED_COLUMNS_LS_KEY = 'topQueriesSelectedColumns';
+export const RUNNING_QUERIES_SELECTED_COLUMNS_LS_KEY = 'runningQueriesSelectedColumns';
 
-export const TOP_QUERIES_COLUMNS_IDS = {
+export const QUERIES_COLUMNS_IDS = {
     CPUTime: 'CPUTime',
     QueryText: 'QueryText',
     EndTime: 'EndTime',
@@ -17,11 +19,34 @@ export const TOP_QUERIES_COLUMNS_IDS = {
     Duration: 'Duration',
     QueryStartAt: 'QueryStartAt',
     ApplicationName: 'ApplicationName',
+    RequestUnits: 'RequestUnits',
 } as const;
+export type QueriesColumnId = ValueOf<typeof QUERIES_COLUMNS_IDS>;
 
-type TopQueriesColumnId = ValueOf<typeof TOP_QUERIES_COLUMNS_IDS>;
+export const DEFAULT_TOP_QUERIES_COLUMNS: QueriesColumnId[] = [
+    'QueryHash',
+    'CPUTime',
+    'QueryText',
+    'EndTime',
+    'Duration',
+    'ReadRows',
+    'ReadBytes',
+    'RequestUnits',
+    'UserSID',
+];
+export const REQUIRED_TOP_QUERIES_COLUMNS: QueriesColumnId[] = ['CPUTime', 'QueryText'];
 
-export const TOP_QUERIES_COLUMNS_TITLES: Record<TopQueriesColumnId, string> = {
+export const DEFAULT_RUNNING_QUERIES_COLUMNS: QueriesColumnId[] = [
+    'UserSID',
+    'QueryStartAt',
+    'QueryText',
+    'ApplicationName',
+];
+
+// Required columns that must always be displayed for running queries
+export const REQUIRED_RUNNING_QUERIES_COLUMNS: QueriesColumnId[] = ['QueryStartAt', 'QueryText'];
+
+export const QUERIES_COLUMNS_TITLES: Record<QueriesColumnId, string> = {
     get CPUTime() {
         return i18n('cpu-time');
     },
@@ -55,26 +80,53 @@ export const TOP_QUERIES_COLUMNS_TITLES: Record<TopQueriesColumnId, string> = {
     get ApplicationName() {
         return i18n('application');
     },
+    get RequestUnits() {
+        return i18n('request-units');
+    },
 } as const;
 
-const TOP_QUERIES_COLUMNS_TO_SORT_FIELDS: Record<TopQueriesColumnId, string | undefined> = {
+const TOP_QUERIES_COLUMNS_TO_SORT_FIELDS: Record<QueriesColumnId, string | undefined> = {
     CPUTime: 'CPUTimeUs',
     QueryText: undefined,
-    EndTime: 'EndTime',
-    ReadRows: 'ReadRows',
+    EndTime: undefined,
+    ReadRows: undefined,
     ReadBytes: 'ReadBytes',
-    UserSID: 'UserSID',
+    UserSID: undefined,
     OneLineQueryText: undefined,
     QueryHash: undefined,
     Duration: 'Duration',
-    QueryStartAt: 'QueryStartAt',
-    ApplicationName: 'ApplicationName',
+    QueryStartAt: undefined,
+    ApplicationName: undefined,
+    RequestUnits: 'RequestUnits',
 } as const;
 
+// Define sort fields specifically for running queries
+const RUNNING_QUERIES_COLUMNS_TO_SORT_FIELDS: Record<QueriesColumnId, string | undefined> = {
+    CPUTime: undefined,
+    QueryText: undefined,
+    EndTime: undefined,
+    ReadRows: undefined,
+    ReadBytes: undefined,
+    UserSID: 'UserSID',
+    OneLineQueryText: undefined,
+    QueryHash: undefined,
+    Duration: undefined,
+    QueryStartAt: 'QueryStartAt',
+    ApplicationName: 'ApplicationName',
+    RequestUnits: undefined,
+} as const;
 export function getTopQueriesColumnSortField(columnId?: string) {
-    return TOP_QUERIES_COLUMNS_TO_SORT_FIELDS[columnId as TopQueriesColumnId];
+    return TOP_QUERIES_COLUMNS_TO_SORT_FIELDS[columnId as QueriesColumnId];
+}
+
+export function getRunningQueriesColumnSortField(columnId?: string) {
+    return RUNNING_QUERIES_COLUMNS_TO_SORT_FIELDS[columnId as QueriesColumnId];
 }
 
 export function isSortableTopQueriesColumn(columnId: string) {
     return Boolean(getTopQueriesColumnSortField(columnId));
+}
+
+export function isSortableRunningQueriesColumn(columnId: string) {
+    return Boolean(getRunningQueriesColumnSortField(columnId));
 }

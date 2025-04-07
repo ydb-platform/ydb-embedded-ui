@@ -15,6 +15,17 @@ interface FiltersProps {
     className?: string;
 }
 
+const DEFAULT_TIME_FILTER_VALUE = {
+    start: {
+        value: 'now-1h',
+        type: 'relative',
+    },
+    end: {
+        value: 'now',
+        type: 'relative',
+    },
+} as const;
+
 export const Filters = ({value, onChange}: FiltersProps) => {
     const handleModeChange = (mode: string) => {
         if (!isEnumMember(EShardsWorkloadMode, mode)) {
@@ -45,7 +56,12 @@ export const Filters = ({value, onChange}: FiltersProps) => {
                     {i18n('filters.mode.history')}
                 </RadioButton.Option>
             </RadioButton>
-            <DateRange from={from} to={to} onChange={handleDateRangeChange} />
+            <DateRange
+                from={from}
+                to={to}
+                onChange={handleDateRangeChange}
+                defaultValue={DEFAULT_TIME_FILTER_VALUE}
+            />
         </React.Fragment>
     );
 };
