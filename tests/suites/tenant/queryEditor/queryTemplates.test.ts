@@ -82,13 +82,19 @@ test.describe('Query Templates', () => {
         }
     });
 
-    test('Unsaved changes modal appears when switching between templates', async ({page}) => {
+    test('Unsaved changes modal appears when switching between templates if query was edited', async ({
+        page,
+    }) => {
         const objectSummary = new ObjectSummary(page);
         const unsavedChangesModal = new UnsavedChangesModal(page);
+        const queryEditor = new QueryEditor(page);
 
         // First action - Add index
         await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.AddIndex);
         await page.waitForTimeout(500);
+
+        // First set some content
+        await queryEditor.setQuery('SELECT 1;');
 
         // Try to switch to Select query
         await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.SelectQuery);
@@ -107,8 +113,7 @@ test.describe('Query Templates', () => {
         await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.AddIndex);
         await page.waitForTimeout(500);
 
-        // Store initial editor content
-        const initialContent = await queryEditor.editorTextArea.inputValue();
+        await queryEditor.setQuery('SELECT 1;');
 
         // Try to switch to Select query
         await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.SelectQuery);
@@ -118,7 +123,7 @@ test.describe('Query Templates', () => {
         await unsavedChangesModal.clickCancel();
 
         // Verify editor content remains unchanged
-        await expect(queryEditor.editorTextArea).toHaveValue(initialContent);
+        await expect(queryEditor.editorTextArea).toHaveValue('SELECT 1;');
     });
 
     test('Dont save button in unsaved changes modal allows to change text', async ({page}) => {
@@ -130,6 +135,7 @@ test.describe('Query Templates', () => {
         await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.AddIndex);
         await page.waitForTimeout(500);
 
+        await queryEditor.setQuery('SELECT 1;');
         // Store initial editor content
         const initialContent = await queryEditor.editorTextArea.inputValue();
 
@@ -156,6 +162,8 @@ test.describe('Query Templates', () => {
         // First action - Add index
         await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.AddIndex);
         await page.waitForTimeout(500);
+
+        await queryEditor.setQuery('SELECT 1;');
 
         // Try to switch to Select query
         await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.SelectQuery);
