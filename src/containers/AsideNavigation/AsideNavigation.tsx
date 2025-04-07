@@ -1,18 +1,20 @@
 import React from 'react';
 
-import {CircleQuestion, Gear, Person} from '@gravity-ui/icons';
+import {CircleQuestion, Gear, Keyboard, Person} from '@gravity-ui/icons';
 import type {MenuItem} from '@gravity-ui/navigation';
-import {AsideHeader, FooterItem} from '@gravity-ui/navigation';
+import {AsideHeader, FooterItem, HotkeysPanel} from '@gravity-ui/navigation';
+import {Hotkey, Icon} from '@gravity-ui/uikit';
 import type {IconData} from '@gravity-ui/uikit';
+import hotkeys from 'hotkeys-js';
 import {useHistory} from 'react-router-dom';
 
-import {HelpCenterContent} from '../../components/HelpCenter';
-import type {FooterItem as HelpCenterFooterItem} from '../../components/HelpCenter/types';
-import {settingsManager} from '../../services/settings';
 import {cn} from '../../utils/cn';
-import {ASIDE_HEADER_COMPACT_KEY, LANGUAGE_KEY} from '../../utils/constants';
+import {ASIDE_HEADER_COMPACT_KEY} from '../../utils/constants';
 import {useSetting} from '../../utils/hooks';
 
+import {HelpCenterContent} from './HelpCenter';
+import type {FooterItem as HelpCenterFooterItem} from './HelpCenter/types';
+import {HOTKEYS, SHORTCUTS_HOTKEY} from './constants';
 import i18n from './i18n';
 
 import userSecret from '../../assets/icons/user-secret.svg';
@@ -65,44 +67,16 @@ export interface AsideNavigationProps {
 enum Panel {
     UserSettings = 'UserSettings',
     Documentation = 'Documentation',
+    Hotkeys = 'Hotkeys',
 }
-
-// Get documentation link based on language settings
-function getDocumentationLink(): string {
-    // Use saved language from settings if it's present, otherwise use browser language
-    const lang = settingsManager.readUserSettingsValue(LANGUAGE_KEY, navigator.language);
-
-    if (lang === 'ru') {
-        return 'https://ydb.tech/docs/ru/';
-    }
-
-    return 'https://ydb.tech/docs/en/';
-}
-
-// Documentation links for the help menu
-const DOCUMENTATION_LINKS = [
-    {
-        text: 'Documentation',
-        url: getDocumentationLink(),
-    },
-];
 
 // Footer items for the help menu
 const FOOTER_ITEMS: HelpCenterFooterItem[] = [
     {
-        id: 'aboutService',
-        text: 'About YDB',
-        url: 'https://ydb.tech/',
-    },
-    {
-        id: 'telegram',
-        text: 'Chat',
-        url: 'https://t.me/ydb_en',
-    },
-    {
-        id: 'stackoverflow',
-        text: 'Stack Overflow',
-        url: 'https://stackoverflow.com/questions/tagged/ydb',
+        id: 'shortCuts',
+        text: 'Keyboard shortcuts',
+        icon: <Icon data={Keyboard} />,
+        rightContent: <Hotkey value={SHORTCUTS_HOTKEY} />,
     },
 ];
 
@@ -111,7 +85,6 @@ export function AsideNavigation(props: AsideNavigationProps) {
 
     const [visiblePanel, setVisiblePanel] = React.useState<Panel>();
     const [documentationPopupVisible, setDocumentationPopupVisible] = React.useState(false);
-
     const [compact, setIsCompact] = useSetting<boolean>(ASIDE_HEADER_COMPACT_KEY);
 
     const toggleDocumentationPopup = React.useCallback(
@@ -124,14 +97,39 @@ export function AsideNavigation(props: AsideNavigationProps) {
         [],
     );
 
-    const renderHelpMenu = () => (
-        <HelpCenterContent
-            view="single"
-            installationType="internal"
-            docsItems={DOCUMENTATION_LINKS}
-            footerItems={FOOTER_ITEMS}
-        />
-    );
+    const openHotkeysPanel = React.useCallback(() => {
+        closeDocumentationPopup();
+        setVisiblePanel(Panel.Hotkeys);
+    }, [closeDocumentationPopup]);
+
+    const closePanel = React.useCallback(() => {
+        setVisiblePanel(undefined);
+    }, []);
+
+    const renderHelpMenu = () => {
+        // Create a modified copy of FOOTER_ITEMS with the shortCuts onClick handler properly set
+        const footerItemsWithHandlers: HelpCenterFooterItem[] = FOOTER_ITEMS.map((item) => {
+            if (item.id === 'shortCuts') {
+                return {
+                    ...item,
+                    onClick: openHotkeysPanel,
+                };
+            }
+            return item;
+        });
+
+        return <HelpCenterContent view="single" footerItems={footerItemsWithHandlers} />;
+    };
+
+    React.useEffect(() => {
+        hotkeys(SHORTCUTS_HOTKEY, (event) => {
+            event.preventDefault();
+            setVisiblePanel(Panel.Hotkeys);
+        });
+        return () => {
+            hotkeys.unbind(SHORTCUTS_HOTKEY);
+        };
+    });
 
     return (
         <React.Fragment>
@@ -196,10 +194,26 @@ export function AsideNavigation(props: AsideNavigationProps) {
                         visible: visiblePanel === Panel.Documentation,
                         content: renderHelpMenu(),
                     },
+                    {
+                        id: 'hotkeys',
+                        visible: visiblePanel === Panel.Hotkeys,
+                        content: (
+                            <HotkeysPanel
+                                visible={visiblePanel === Panel.Hotkeys}
+                                hotkeys={HOTKEYS}
+                                className={b('hotkeys-panel')}
+                                title={
+                                    <div className={b('hotkeys-panel-title')}>
+                                        Keyboard Shortcuts
+                                        <Hotkey value={SHORTCUTS_HOTKEY} />
+                                    </div>
+                                }
+                                onClose={closePanel}
+                            />
+                        ),
+                    },
                 ]}
-                onClosePanel={() => {
-                    setVisiblePanel(undefined);
-                }}
+                onClosePanel={closePanel}
             />
         </React.Fragment>
     );
