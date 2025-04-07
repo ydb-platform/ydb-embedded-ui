@@ -111,6 +111,20 @@ describe('VDisk state', () => {
         expect(severity).not.toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue);
     });
 
+    test('Should not display VDisk as replicating if DiskSpace or FrontQueues are blue', () => {
+        const severity1 = calculateVDiskSeverity({
+            VDiskState: EVDiskState.OK,
+            FrontQueues: EFlag.Blue,
+        });
+        const severity2 = calculateVDiskSeverity({
+            VDiskState: EVDiskState.OK,
+            DiskSpace: EFlag.Blue,
+        });
+
+        expect(severity1).not.toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue);
+        expect(severity2).not.toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue);
+    });
+
     test('Should display replicating VDisks in a not-OK state with a regular color', () => {
         const severity1 = calculateVDiskSeverity({
             VDiskState: EVDiskState.Initial, // severity 3, yellow

@@ -1,4 +1,4 @@
-import type {EFlag} from '../../types/api/enums';
+import {EFlag} from '../../types/api/enums';
 import type {EVDiskState} from '../../types/api/vdisk';
 
 import {
@@ -50,6 +50,11 @@ function getStateSeverity(vDiskState?: EVDiskState) {
 function getColorSeverity(color?: EFlag) {
     if (!color) {
         return NOT_AVAILABLE_SEVERITY;
+    }
+
+    // Blue is reserved for not replicated VDisks
+    if (color === EFlag.Blue) {
+        return DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green;
     }
 
     return DISK_COLOR_STATE_TO_NUMERIC_SEVERITY[color] ?? NOT_AVAILABLE_SEVERITY;
