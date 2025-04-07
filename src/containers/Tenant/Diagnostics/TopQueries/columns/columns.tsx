@@ -73,6 +73,7 @@ const userSIDColumn: Column<KeyValueRow> = {
     header: QUERIES_COLUMNS_TITLES.UserSID,
     render: ({row}) => <div className={b('user-sid')}>{row.UserSID || '–'}</div>,
     align: DataTable.LEFT,
+    width: 120,
 };
 
 const oneLineQueryTextColumn: Column<KeyValueRow> = {
@@ -110,6 +111,7 @@ const queryStartColumn: Column<KeyValueRow> = {
     header: QUERIES_COLUMNS_TITLES.QueryStartAt,
     render: ({row}) => formatDateTime(new Date(row.QueryStartAt as string).getTime()),
     resizeable: false,
+    width: 160,
 };
 
 const requestUnitsColumn: Column<KeyValueRow> = {
