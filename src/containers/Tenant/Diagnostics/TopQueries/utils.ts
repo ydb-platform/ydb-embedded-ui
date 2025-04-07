@@ -1,38 +1,54 @@
 import React from 'react';
 
 import type {Settings} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
 
 import {prepareBackendSortFieldsFromTableSort, useTableSort} from '../../../../utils/hooks';
 import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
 
-import {TOP_QUERIES_COLUMNS_IDS, getTopQueriesColumnSortField} from './columns/constants';
+import {
+    QUERIES_COLUMNS_IDS,
+    getRunningQueriesColumnSortField,
+    getTopQueriesColumnSortField,
+} from './columns/constants';
 
 export const TOP_QUERIES_TABLE_SETTINGS: Settings = {
     ...QUERY_TABLE_SETTINGS,
     disableSortReset: true,
 };
 
-function useQueriesSort(initialSortColumn: string) {
+export function useTopQueriesSort() {
     const [tableSort, handleTableSort] = useTableSort({
-        initialSortColumn: initialSortColumn,
-        initialSortOrder: -1,
+        initialSortColumn: QUERIES_COLUMNS_IDS.CPUTime,
+        initialSortOrder: DataTable.DESCENDING,
         multiple: true,
+        fixedOrderType: DataTable.DESCENDING,
     });
-
-    const backendSort = React.useMemo(
-        () => prepareBackendSortFieldsFromTableSort(tableSort, getTopQueriesColumnSortField),
-        [tableSort],
-    );
 
     return {
         tableSort,
         handleTableSort,
-        backendSort,
+        backendSort: React.useMemo(
+            () => prepareBackendSortFieldsFromTableSort(tableSort, getTopQueriesColumnSortField),
+            [tableSort],
+        ),
     };
 }
-export function useTopQueriesSort() {
-    return useQueriesSort(TOP_QUERIES_COLUMNS_IDS.CPUTime);
-}
+
 export function useRunningQueriesSort() {
-    return useQueriesSort(TOP_QUERIES_COLUMNS_IDS.QueryStartAt);
+    const [tableSort, handleTableSort] = useTableSort({
+        initialSortColumn: QUERIES_COLUMNS_IDS.QueryStartAt,
+        initialSortOrder: DataTable.DESCENDING,
+        multiple: true,
+    });
+
+    return {
+        tableSort,
+        handleTableSort,
+        backendSort: React.useMemo(
+            () =>
+                prepareBackendSortFieldsFromTableSort(tableSort, getRunningQueriesColumnSortField),
+            [tableSort],
+        ),
+    };
 }

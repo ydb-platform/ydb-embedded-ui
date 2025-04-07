@@ -5,13 +5,13 @@ import type {TopQueriesFilters} from './types';
 const endTimeColumn = 'EndTime';
 const intervalEndColumn = 'IntervalEnd';
 
-const getMaxIntervalSubquery = () => `(
+const getMaxIntervalSubquery = (tableName: string) => `(
     SELECT
         MAX(${intervalEndColumn})
-    FROM \`.sys/top_queries_by_cpu_time_one_hour\`
+    FROM \`${tableName}\`
 )`;
 
-export function getFiltersConditions(filters?: TopQueriesFilters) {
+export function getFiltersConditions(tableName: string, filters?: TopQueriesFilters) {
     const conditions: string[] = [];
     const to = dateTimeParse(Number(filters?.to) || filters?.to)?.valueOf();
     const from = dateTimeParse(Number(filters?.from) || filters?.from)?.valueOf();
@@ -33,7 +33,7 @@ export function getFiltersConditions(filters?: TopQueriesFilters) {
 
     // If there is no filters, return queries, that were executed in the last hour
     if (!from && !to) {
-        conditions.push(`${intervalEndColumn} IN ${getMaxIntervalSubquery()}`);
+        conditions.push(`${intervalEndColumn} IN ${getMaxIntervalSubquery(tableName)}`);
     }
 
     if (filters?.text) {
