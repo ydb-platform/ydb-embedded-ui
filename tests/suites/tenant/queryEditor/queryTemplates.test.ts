@@ -82,13 +82,19 @@ test.describe('Query Templates', () => {
         }
     });
 
-    test('Unsaved changes modal appears when switching between templates', async ({page}) => {
+    test('Unsaved changes modal appears when switching between templates if query was edited', async ({
+        page,
+    }) => {
         const objectSummary = new ObjectSummary(page);
         const unsavedChangesModal = new UnsavedChangesModal(page);
+        const queryEditor = new QueryEditor(page);
 
         // First action - Add index
         await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.AddIndex);
         await page.waitForTimeout(500);
+
+        // First set some content
+        await queryEditor.setQuery('SELECT 1;');
 
         // Try to switch to Select query
         await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.SelectQuery);
@@ -107,8 +113,7 @@ test.describe('Query Templates', () => {
         await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.AddIndex);
         await page.waitForTimeout(500);
 
-        // Store initial editor content
-        const initialContent = await queryEditor.editorTextArea.inputValue();
+        await queryEditor.setQuery('SELECT 1;');
 
         // Try to switch to Select query
         await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.SelectQuery);
@@ -118,7 +123,7 @@ test.describe('Query Templates', () => {
         await unsavedChangesModal.clickCancel();
 
         // Verify editor content remains unchanged
-        await expect(queryEditor.editorTextArea).toHaveValue(initialContent);
+        await expect(queryEditor.editorTextArea).toHaveValue('SELECT 1;');
     });
 
     test('Dont save button in unsaved changes modal allows to change text', async ({page}) => {
@@ -130,6 +135,7 @@ test.describe('Query Templates', () => {
         await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.AddIndex);
         await page.waitForTimeout(500);
 
+        await queryEditor.setQuery('SELECT 1;');
         // Store initial editor content
         const initialContent = await queryEditor.editorTextArea.inputValue();
 
@@ -156,6 +162,8 @@ test.describe('Query Templates', () => {
         // First action - Add index
         await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.AddIndex);
         await page.waitForTimeout(500);
+
+        await queryEditor.setQuery('SELECT 1;');
 
         // Try to switch to Select query
         await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.SelectQuery);
@@ -213,5 +221,55 @@ test.describe('Query Templates', () => {
 
         // Verify unsaved changes modal appears
         await expect(unsavedChangesModal.isVisible()).resolves.toBe(true);
+    });
+    test('Switching between templates does not trigger unsaved changes modal', async ({page}) => {
+        const objectSummary = new ObjectSummary(page);
+        const tenantPage = new TenantPage(page);
+
+        // First select a template (Add Index)
+        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.AddIndex);
+        await page.waitForTimeout(500);
+
+        // Without editing the template, switch to another template (Select Query)
+        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.SelectQuery);
+        await page.waitForTimeout(500);
+
+        // Verify unsaved changes modal does not appear
+        const isModalHidden = await tenantPage.isUnsavedChangesModalHidden();
+        expect(isModalHidden).toBe(true);
+    });
+
+    test('Selecting a template and then opening history query does not trigger unsaved changes modal', async ({
+        page,
+    }) => {
+        const objectSummary = new ObjectSummary(page);
+        const queryEditor = new QueryEditor(page);
+        const tenantPage = new TenantPage(page);
+
+        // First, run a query to ensure we have history to select from
+        const testQuery = 'SELECT 1 AS test_column;';
+        await queryEditor.setQuery(testQuery);
+        await queryEditor.clickRunButton();
+        await page.waitForTimeout(1000); // Wait for the query to complete
+
+        // Next, select a template
+        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.AddIndex);
+        await page.waitForTimeout(500);
+
+        // Navigate to history tab
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.isVisible();
+
+        // Select the query from history
+        await queryEditor.historyQueries.selectQuery(testQuery);
+        await page.waitForTimeout(500);
+
+        // Verify no unsaved changes modal appeared
+        const isModalHidden = await tenantPage.isUnsavedChangesModalHidden();
+        expect(isModalHidden).toBe(true);
+
+        // Verify the query was loaded into the editor
+        const editorValue = await queryEditor.editorTextArea.inputValue();
+        expect(editorValue.trim()).toBe(testQuery.trim());
     });
 });

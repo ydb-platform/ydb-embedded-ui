@@ -98,6 +98,7 @@ export function YqlEditor({
                 editor.focus();
                 editor.setValue('');
                 contribution.insert(input);
+                dispatch(setIsDirty(false));
             }
         });
 
