@@ -120,16 +120,28 @@ export function AsideNavigation(props: AsideNavigationProps) {
 
         return <HelpCenterContent view="single" footerItems={footerItemsWithHandlers} />;
     };
-
     React.useEffect(() => {
+        // Register hotkey for keyboard shortcuts
         hotkeys(SHORTCUTS_HOTKEY, (event) => {
             event.preventDefault();
             setVisiblePanel(Panel.Hotkeys);
         });
+
+        // Add listener for custom event from Monaco editor
+        const handleOpenKeyboardShortcutsPanel = () => {
+            setVisiblePanel(Panel.Hotkeys);
+        };
+
+        window.addEventListener('openKeyboardShortcutsPanel', handleOpenKeyboardShortcutsPanel);
+
         return () => {
             hotkeys.unbind(SHORTCUTS_HOTKEY);
+            window.removeEventListener(
+                'openKeyboardShortcutsPanel',
+                handleOpenKeyboardShortcutsPanel,
+            );
         };
-    });
+    }, []);
 
     return (
         <React.Fragment>

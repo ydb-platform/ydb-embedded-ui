@@ -13,5 +13,6 @@ export function getKeyBindings(monaco: typeof Monaco) {
         selectNextQuery: ctrlKey | KeyCode.DownArrow,
         saveQuery: ctrlKey | KeyCode.KeyS,
         saveSelectedQuery: ctrlKey | KeyMod.Shift | KeyCode.KeyS,
+        shortcutsHotkey: ctrlKey | KeyCode.KeyK,
     };
 }

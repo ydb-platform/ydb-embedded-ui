@@ -88,7 +88,6 @@ export function YqlEditor({
             monacoGhostInstance?.unregister();
         };
     }, [isCodeAssistEnabled, monacoGhostConfig, monacoGhostInstance, prepareUserQueriesCache]);
-
     const editorDidMount = (editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
         window.ydbEditor = editor;
         const keybindings = getKeyBindings(monaco);
@@ -100,6 +99,17 @@ export function YqlEditor({
                 editor.setValue('');
                 contribution.insert(input);
             }
+        });
+
+        editor.addAction({
+            id: 'openKeyboardShortcutsPanel',
+            label: 'Open Keyboard Shortcuts Panel',
+            keybindings: [keybindings.shortcutsHotkey],
+            run: () => {
+                // Dispatch an event that can be caught by the AsideNavigation component
+                const event = new CustomEvent('openKeyboardShortcutsPanel');
+                window.dispatchEvent(event);
+            },
         });
 
         if (window.api.codeAssist) {

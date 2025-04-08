@@ -1,6 +1,6 @@
 import {isMac} from './utils';
 
-export const SHORTCUTS_HOTKEY = 'Shift+K';
+export const SHORTCUTS_HOTKEY = isMac() ? 'cmd+K' : 'ctrl+K';
 
 // Hotkeys configuration for the keyboard shortcuts panel
 export const HOTKEYS = [
