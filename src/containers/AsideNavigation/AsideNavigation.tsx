@@ -101,18 +101,11 @@ export function AsideNavigation(props: AsideNavigationProps) {
         hotkeys(SHORTCUTS_HOTKEY, openHotkeysPanel);
 
         // Add listener for custom event from Monaco editor
-        const handleOpenKeyboardShortcutsPanel = () => {
-            openHotkeysPanel();
-        };
-
-        window.addEventListener('openKeyboardShortcutsPanel', handleOpenKeyboardShortcutsPanel);
+        window.addEventListener('openKeyboardShortcutsPanel', openHotkeysPanel);
 
         return () => {
             hotkeys.unbind(SHORTCUTS_HOTKEY);
-            window.removeEventListener(
-                'openKeyboardShortcutsPanel',
-                handleOpenKeyboardShortcutsPanel,
-            );
+            window.removeEventListener('openKeyboardShortcutsPanel', openHotkeysPanel);
         };
     }, [openHotkeysPanel]);
 
