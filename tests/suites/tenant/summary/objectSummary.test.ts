@@ -11,7 +11,6 @@ import {
 } from '../../../utils/constants';
 import {TenantPage} from '../TenantPage';
 import {QueryEditor} from '../queryEditor/models/QueryEditor';
-import {UnsavedChangesModal} from '../queryEditor/models/UnsavedChangesModal';
 
 import {ObjectSummary, ObjectSummaryTab} from './ObjectSummary';
 import {RowTableAction} from './types';
@@ -140,7 +139,6 @@ test.describe('Object Summary', async () => {
     test('Different tables show different column lists in Monaco editor', async ({page}) => {
         const objectSummary = new ObjectSummary(page);
         const queryEditor = new QueryEditor(page);
-        const unsavedChangesModal = new UnsavedChangesModal(page);
 
         // Get columns for first table
         await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.SelectQuery);
@@ -153,8 +151,6 @@ test.describe('Object Summary', async () => {
         );
 
         await page.waitForTimeout(500);
-        // Click Don't save in the modal
-        await unsavedChangesModal.clickDontSave();
 
         const storagePoolsColumns = await queryEditor.editorTextArea.inputValue();
 
