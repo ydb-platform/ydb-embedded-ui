@@ -14,11 +14,9 @@ const b = cn('information-popup');
 export interface InformationPopupProps {
     /** The keyboard shortcuts action handler */
     onKeyboardShortcutsClick?: () => void;
-    /** Class for the component */
-    className?: string;
 }
 
-export function InformationPopup({onKeyboardShortcutsClick, className}: InformationPopupProps) {
+export function InformationPopup({onKeyboardShortcutsClick}: InformationPopupProps) {
     // Get documentation link based on language settings
     const getDocumentationLink = () => {
         const lang = settingsManager.readUserSettingsValue(LANGUAGE_KEY, navigator.language);
@@ -26,7 +24,7 @@ export function InformationPopup({onKeyboardShortcutsClick, className}: Informat
     };
 
     return (
-        <div className={b('content', {}, className)}>
+        <div className={b('content', {})}>
             {/* Documentation section */}
             <div className={b('docs')}>
                 <Text variant="subheader-3" color="primary" className={b('title')}>
