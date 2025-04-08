@@ -12,12 +12,10 @@ import './InformationPopup.scss';
 const b = cn('information-popup');
 
 export interface InformationPopupProps {
-    /** The keyboard shortcuts action handler */
     onKeyboardShortcutsClick?: () => void;
 }
 
 export function InformationPopup({onKeyboardShortcutsClick}: InformationPopupProps) {
-    // Get documentation link based on language settings
     const getDocumentationLink = () => {
         const lang = settingsManager.readUserSettingsValue(LANGUAGE_KEY, navigator.language);
         return lang === 'ru' ? 'https://ydb.tech/docs/ru/' : 'https://ydb.tech/docs/en/';
@@ -25,7 +23,6 @@ export function InformationPopup({onKeyboardShortcutsClick}: InformationPopupPro
 
     return (
         <div className={b('content', {})}>
-            {/* Documentation section */}
             <div className={b('docs')}>
                 <Text variant="subheader-3" color="primary" className={b('title')}>
                     Documentation
