@@ -42,21 +42,17 @@ export function InformationPopup({onKeyboardShortcutsClick, className}: Informat
                         ]}
                         filterable={false}
                         virtualized={false}
-                        renderItem={({text, url}) =>
-                            url ? (
-                                <Link
-                                    className={b('docs-link')}
-                                    rel="noopener"
-                                    target="_blank"
-                                    href={url}
-                                    title={typeof text === 'string' ? text : undefined}
-                                >
-                                    {text}
-                                </Link>
-                            ) : (
-                                text
-                            )
-                        }
+                        renderItem={({text, url}) => (
+                            <Link
+                                className={b('docs-link')}
+                                rel="noopener"
+                                target="_blank"
+                                href={url}
+                                title={typeof text === 'string' ? text : undefined}
+                            >
+                                {text}
+                            </Link>
+                        )}
                         itemClassName={b('item')}
                     />
                 </div>
