@@ -1,10 +1,5 @@
 import type React from 'react';
 
-export interface DocsItem {
-    text: string | React.ReactNode;
-    url?: string;
-}
-
 export interface FooterItem {
     id: string;
     text: string;
@@ -15,8 +10,4 @@ export interface FooterItem {
     disableClickHandler?: boolean;
 }
 
-export type LimitedFooterItemsArray = FooterItem[];
-
-export interface DisplayFooterItem extends Omit<FooterItem, 'id'> {
-    id: string;
-}
+export type FooterItemsArray = FooterItem[];

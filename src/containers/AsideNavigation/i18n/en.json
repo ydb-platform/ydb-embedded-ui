@@ -1,7 +1,11 @@
 {
-  "navigation-item.documentation": "Documentation",
+  "navigation-item.information": "information",
   "navigation-item.settings": "Settings",
   "navigation-item.account": "Account",
+
+  "help-center.header.title": "Documentation",
+  "help-center.item.documentation": "View documentation",
+  "help-center.footer.shortcuts": "Keyboard shortcuts",
 
   "account.user": "YDB User",
 

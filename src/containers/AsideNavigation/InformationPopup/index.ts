@@ -1,0 +1,1 @@
+export {InformationPopup} from './InformationPopup';

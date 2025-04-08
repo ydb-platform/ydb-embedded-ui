@@ -51,6 +51,7 @@
   "action.stop": "Stop",
   "action.run": "Run",
   "action.explain": "Explain",
+  "action.open-shortcuts": "Open Keyboard Shortcuts Panel",
 
   "filter.text.placeholder": "Search by query text...",
 

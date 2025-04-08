@@ -104,7 +104,7 @@ export function YqlEditor({
 
         editor.addAction({
             id: 'openKeyboardShortcutsPanel',
-            label: 'Open Keyboard Shortcuts Panel',
+            label: i18n('action.open-shortcuts'),
             keybindings: [keybindings.shortcutsHotkey],
             run: () => {
                 // Dispatch an event that can be caught by the AsideNavigation component

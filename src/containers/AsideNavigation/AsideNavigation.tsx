@@ -1,9 +1,9 @@
 import React from 'react';
 
-import {CircleQuestion, Gear, Keyboard, Person} from '@gravity-ui/icons';
+import {CircleQuestion, Gear, Person} from '@gravity-ui/icons';
 import type {MenuItem} from '@gravity-ui/navigation';
 import {AsideHeader, FooterItem, HotkeysPanel} from '@gravity-ui/navigation';
-import {Hotkey, Icon} from '@gravity-ui/uikit';
+import {Hotkey} from '@gravity-ui/uikit';
 import type {IconData} from '@gravity-ui/uikit';
 import hotkeys from 'hotkeys-js';
 import {useHistory} from 'react-router-dom';
@@ -12,8 +12,7 @@ import {cn} from '../../utils/cn';
 import {ASIDE_HEADER_COMPACT_KEY} from '../../utils/constants';
 import {useSetting} from '../../utils/hooks';
 
-import {HelpCenterContent} from './HelpCenter';
-import type {FooterItem as HelpCenterFooterItem} from './HelpCenter/types';
+import {InformationPopup} from './InformationPopup';
 import {HOTKEYS, SHORTCUTS_HOTKEY} from './constants';
 import i18n from './i18n';
 
@@ -66,60 +65,37 @@ export interface AsideNavigationProps {
 
 enum Panel {
     UserSettings = 'UserSettings',
-    Documentation = 'Documentation',
+    Information = 'Information',
     Hotkeys = 'Hotkeys',
 }
-
-// Footer items for the help menu
-const FOOTER_ITEMS: HelpCenterFooterItem[] = [
-    {
-        id: 'shortCuts',
-        text: 'Keyboard shortcuts',
-        icon: <Icon data={Keyboard} />,
-        rightContent: <Hotkey value={SHORTCUTS_HOTKEY} />,
-    },
-];
 
 export function AsideNavigation(props: AsideNavigationProps) {
     const history = useHistory();
 
     const [visiblePanel, setVisiblePanel] = React.useState<Panel>();
-    const [documentationPopupVisible, setDocumentationPopupVisible] = React.useState(false);
+    const [informationPopupVisible, setInformationPopupVisible] = React.useState(false);
     const [compact, setIsCompact] = useSetting<boolean>(ASIDE_HEADER_COMPACT_KEY);
 
-    const toggleDocumentationPopup = React.useCallback(
-        () => setDocumentationPopupVisible(!documentationPopupVisible),
-        [documentationPopupVisible],
+    const toggleInformationPopup = React.useCallback(
+        () => setInformationPopupVisible(!informationPopupVisible),
+        [informationPopupVisible],
     );
 
-    const closeDocumentationPopup = React.useCallback(
-        () => setDocumentationPopupVisible(false),
-        [],
-    );
+    const closeInformationPopup = React.useCallback(() => setInformationPopupVisible(false), []);
 
     const openHotkeysPanel = React.useCallback(() => {
-        closeDocumentationPopup();
+        closeInformationPopup();
         setVisiblePanel(Panel.Hotkeys);
-    }, [closeDocumentationPopup]);
+    }, [closeInformationPopup]);
 
     const closePanel = React.useCallback(() => {
         setVisiblePanel(undefined);
     }, []);
 
-    const renderHelpMenu = () => {
-        // Create a modified copy of FOOTER_ITEMS with the shortCuts onClick handler properly set
-        const footerItemsWithHandlers: HelpCenterFooterItem[] = FOOTER_ITEMS.map((item) => {
-            if (item.id === 'shortCuts') {
-                return {
-                    ...item,
-                    onClick: openHotkeysPanel,
-                };
-            }
-            return item;
-        });
-
-        return <HelpCenterContent view="single" footerItems={footerItemsWithHandlers} />;
+    const renderInformationPopup = () => {
+        return <InformationPopup onKeyboardShortcutsClick={openHotkeysPanel} />;
     };
+
     React.useEffect(() => {
         // Register hotkey for keyboard shortcuts
         hotkeys(SHORTCUTS_HOTKEY, (event) => {
@@ -161,16 +137,16 @@ export function AsideNavigation(props: AsideNavigationProps) {
                         <FooterItem
                             compact={compact}
                             item={{
-                                id: 'documentation',
-                                title: i18n('navigation-item.documentation'),
+                                id: 'information',
+                                title: i18n('navigation-item.information'),
                                 icon: CircleQuestion,
-                                current: documentationPopupVisible,
-                                onItemClick: toggleDocumentationPopup,
+                                current: informationPopupVisible,
+                                onItemClick: toggleInformationPopup,
                             }}
-                            enableTooltip={!documentationPopupVisible}
-                            popupVisible={documentationPopupVisible}
-                            onClosePopup={closeDocumentationPopup}
-                            renderPopupContent={renderHelpMenu}
+                            enableTooltip={!informationPopupVisible}
+                            popupVisible={informationPopupVisible}
+                            onClosePopup={closeInformationPopup}
+                            renderPopupContent={renderInformationPopup}
                         />
 
                         <FooterItem
@@ -202,9 +178,8 @@ export function AsideNavigation(props: AsideNavigationProps) {
                         content: props.settings,
                     },
                     {
-                        id: 'documentation',
-                        visible: visiblePanel === Panel.Documentation,
-                        content: renderHelpMenu(),
+                        id: 'information',
+                        visible: visiblePanel === Panel.Information,
                     },
                     {
                         id: 'hotkeys',
@@ -216,7 +191,7 @@ export function AsideNavigation(props: AsideNavigationProps) {
                                 className={b('hotkeys-panel')}
                                 title={
                                     <div className={b('hotkeys-panel-title')}>
-                                        Keyboard Shortcuts
+                                        {i18n('help-center.footer.shortcuts')}
                                         <Hotkey value={SHORTCUTS_HOTKEY} />
                                     </div>
                                 }
