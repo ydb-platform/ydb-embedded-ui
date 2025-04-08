@@ -174,6 +174,7 @@ export function AsideNavigation(props: AsideNavigationProps) {
                     {
                         id: 'hotkeys',
                         visible: visiblePanel === Panel.Hotkeys,
+                        keepMounted: true,
                         content: (
                             <HotkeysPanel
                                 visible={visiblePanel === Panel.Hotkeys}
