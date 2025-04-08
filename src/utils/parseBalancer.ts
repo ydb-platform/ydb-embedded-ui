@@ -1,8 +1,11 @@
+const protocolRegex = /^http[s]?:\/\//;
+const viewerPathnameRegex = /\/viewer\/json$/;
+
 export const removeViewerPathname = (value: string) => {
-    return value.replace(/\/viewer\/json/, '');
+    return value.replace(viewerPathnameRegex, '');
 };
 export const removeProtocol = (value: string) => {
-    return value.replace(/http[s]?:\/\//, '');
+    return value.replace(protocolRegex, '');
 };
 
 export const removePort = (value: string) => {
@@ -47,3 +50,23 @@ export const parseBalancer = (rawBalancer: string): ParsedBalancer => {
 export const getCleanBalancerValue = (rawBalancer: string) => {
     return removePort(parseBalancer(rawBalancer).balancer);
 };
+
+export function prepareBackendFromBalancer(rawBalancer: string) {
+    const preparedBalancer = removeViewerPathname(rawBalancer);
+
+    // Test if balancer starts with protocol
+    // It means it is a full url and it can be used as it is
+    // Otherwise it is a relative path to the current meta backend
+    if (protocolRegex.test(rawBalancer)) {
+        return preparedBalancer;
+    }
+
+    // Use meta_backend if it is defined to form backend url
+    if (window.meta_backend) {
+        const path = window.meta_backend + '/' + preparedBalancer;
+        // Prevent multiple slashes in case meta_backend ends with slash or balancer starts with slash
+        return path.replaceAll(/([^:])(\/\/+)/g, '$1/');
+    }
+
+    return preparedBalancer;
+}

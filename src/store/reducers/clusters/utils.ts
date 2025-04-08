@@ -4,6 +4,7 @@ import {
     getVersionMap,
     prepareClusterVersions,
 } from '../../../utils/clusterVersionColors';
+import {prepareBackendFromBalancer} from '../../../utils/parseBalancer';
 
 import type {PreparedCluster} from './types';
 
@@ -24,5 +25,8 @@ export const prepareClustersData = (data: MetaClusters): PreparedCluster[] => {
     return clusters.map((cluster) => ({
         ...cluster,
         preparedVersions: prepareClusterVersions(cluster.versions, versionToColor),
+        preparedBackend: cluster.balancer
+            ? prepareBackendFromBalancer(cluster.balancer)
+            : undefined,
     }));
 };

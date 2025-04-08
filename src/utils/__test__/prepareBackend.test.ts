@@ -1,7 +1,7 @@
 import {getBackendFromNodeHost, getBackendFromRawNodeData, prepareHost} from '../prepareBackend';
 
 describe('prepareHost', () => {
-    test('should add vm prefix to cloud din nodes', () => {
+    test('should add u- prefix to cloud din nodes', () => {
         const cloudDinNodeInitialHost =
             'vm-cc8mco0j0snqehgh7r2a-ru-central1-c-nlmw-aniq.cc8mco0j0snqehgh7r2a.ydb.mdb.cloud-preprod.net';
         const cloudDinNodeResultHost =
