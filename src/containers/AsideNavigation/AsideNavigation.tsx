@@ -105,7 +105,7 @@ export function AsideNavigation(props: AsideNavigationProps) {
 
         // Add listener for custom event from Monaco editor
         const handleOpenKeyboardShortcutsPanel = () => {
-            setVisiblePanel(Panel.Hotkeys);
+            openHotkeysPanel();
         };
 
         window.addEventListener('openKeyboardShortcutsPanel', handleOpenKeyboardShortcutsPanel);
@@ -117,7 +117,7 @@ export function AsideNavigation(props: AsideNavigationProps) {
                 handleOpenKeyboardShortcutsPanel,
             );
         };
-    }, []);
+    }, [openHotkeysPanel]);
 
     return (
         <React.Fragment>
