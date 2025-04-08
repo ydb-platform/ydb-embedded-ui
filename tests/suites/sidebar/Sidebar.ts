@@ -5,18 +5,24 @@ export class Sidebar {
     private logoButton: Locator;
     private footer: Locator;
     private settingsButton: Locator;
-    private documentationButton: Locator;
+    private informationButton: Locator;
     private accountButton: Locator;
     private collapseButton: Locator;
     private drawer: Locator;
     private drawerMenu: Locator;
     private experimentsSection: Locator;
+    private popupContent: Locator;
+    private hotkeysButton: Locator;
+    private hotkeysPanel: Locator;
 
     constructor(page: Page) {
         this.sidebarContainer = page.locator('.gn-aside-header__aside-content');
         this.logoButton = this.sidebarContainer.locator('.gn-logo__btn-logo');
         this.footer = this.sidebarContainer.locator('.gn-aside-header__footer');
         this.drawer = page.locator('.gn-drawer');
+        this.popupContent = page.locator('.g-popup__content');
+        this.hotkeysButton = this.popupContent.locator('text=Keyboard shortcuts');
+        this.hotkeysPanel = page.locator('.gn-hotkeys-panel__drawer-item');
         this.drawerMenu = page.locator('.gn-settings-menu');
         this.experimentsSection = this.drawerMenu
             .locator('.gn-settings-menu__item')
@@ -24,7 +30,7 @@ export class Sidebar {
 
         // Footer buttons with specific icons
         const footerItems = this.sidebarContainer.locator('.gn-footer-item');
-        this.documentationButton = footerItems.filter({hasText: 'Documentation'});
+        this.informationButton = footerItems.filter({hasText: 'Information'});
         this.settingsButton = footerItems
             .filter({hasText: 'Settings'})
             .locator('.gn-composite-bar-item__btn-icon');
@@ -49,8 +55,8 @@ export class Sidebar {
         return this.settingsButton.isVisible();
     }
 
-    async isDocumentationButtonVisible() {
-        return this.documentationButton.isVisible();
+    async isInformationButtonVisible() {
+        return this.informationButton.isVisible();
     }
 
     async isAccountButtonVisible() {
@@ -65,8 +71,34 @@ export class Sidebar {
         await this.settingsButton.click();
     }
 
-    async clickDocumentation() {
-        await this.documentationButton.click();
+    async clickInformation() {
+        await this.informationButton.click();
+    }
+
+    async isPopupVisible() {
+        return this.popupContent.isVisible();
+    }
+
+    async hasHotkeysButtonInPopup() {
+        return this.hotkeysButton.isVisible();
+    }
+
+    async clickHotkeysButton() {
+        await this.hotkeysButton.click();
+    }
+
+    async isHotkeysPanelVisible() {
+        return this.hotkeysPanel.isVisible();
+    }
+
+    async hasHotkeysPanelTitle() {
+        const panelTitle = this.hotkeysPanel.locator('.kv-navigation__hotkeys-panel-title');
+        return panelTitle.isVisible();
+    }
+
+    async hasDocumentationInPopup() {
+        const documentationElement = this.popupContent.locator('text=View documentation');
+        return documentationElement.isVisible();
     }
 
     async clickAccount() {
