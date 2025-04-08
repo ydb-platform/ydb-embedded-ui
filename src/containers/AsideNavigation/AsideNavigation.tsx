@@ -98,10 +98,7 @@ export function AsideNavigation(props: AsideNavigationProps) {
 
     React.useEffect(() => {
         // Register hotkey for keyboard shortcuts
-        hotkeys(SHORTCUTS_HOTKEY, (event) => {
-            event.preventDefault();
-            setVisiblePanel(Panel.Hotkeys);
-        });
+        hotkeys(SHORTCUTS_HOTKEY, openHotkeysPanel);
 
         // Add listener for custom event from Monaco editor
         const handleOpenKeyboardShortcutsPanel = () => {
