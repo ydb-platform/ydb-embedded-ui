@@ -1,14 +1,10 @@
 import {backend} from '../store';
-import type {AdditionalNodesProps, NodeAddress} from '../types/additionalProps';
+import type {AdditionalNodesProps} from '../types/additionalProps';
 
-import {getBackendFromRawNodeData} from './prepareBackend';
+import {getBackendFromBalancerAndNodeId} from './prepareBackend';
 
-export const getAdditionalNodesProps = (
-    balancer = backend,
-    useClusterBalancerAsBackend?: boolean,
-): AdditionalNodesProps => {
+export const getAdditionalNodesProps = (balancer = backend): AdditionalNodesProps => {
     return {
-        getNodeRef: (node: NodeAddress = {}) =>
-            getBackendFromRawNodeData(node, balancer ?? '', useClusterBalancerAsBackend),
+        getNodeRef: (node) => getBackendFromBalancerAndNodeId(node?.NodeId, balancer ?? ''),
     };
 };

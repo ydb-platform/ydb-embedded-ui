@@ -1,50 +1,17 @@
-import type {NodeAddress} from '../types/additionalProps';
+import {prepareBackendFromBalancer} from './parseBalancer';
 
-import {parseBalancer, removeViewerPathname} from './parseBalancer';
-
-const https = 'https://';
+import {valueIsDefined} from '.';
 
 export const prepareHost = (host?: string) => {
     // add "u-" prefix to cloud din nodes
     return host?.startsWith('vm-') ? `u-${host}` : host;
 };
 
-export const getBackendFromNodeHost = (nodeHost: string, balancer: string) => {
-    const preparedHost = prepareHost(nodeHost);
-    const proxy = parseBalancer(balancer).proxy;
-
-    if (proxy) {
-        return https + proxy + '/' + preparedHost;
-    }
-
-    return https + preparedHost;
-};
-
 /** For multi-cluster version */
-export const getBackendFromRawNodeData = (
-    node: NodeAddress,
-    balancer: string,
-    useBalancerAsBackend?: boolean,
-) => {
-    const {Host, Endpoints, NodeId} = node;
-
-    if (useBalancerAsBackend && NodeId) {
-        const preparedBalancer = removeViewerPathname(balancer);
-        return `${preparedBalancer}/node/${NodeId}`;
-    }
-
-    if (Host && Endpoints) {
-        const nodePort = Endpoints.find((endpoint) => endpoint.Name === 'http-mon')?.Address;
-
-        if (!nodePort || !Host) {
-            return undefined;
-        }
-
-        const hostWithPort = Host + nodePort;
-
-        // Currently this func is used to get link to developerUI for specific node
-        // It's expected with / at the end (code in embedded version)
-        return getBackendFromNodeHost(hostWithPort, balancer);
+export const getBackendFromBalancerAndNodeId = (nodeId?: string | number, balancer?: string) => {
+    if (valueIsDefined(nodeId) && valueIsDefined(balancer)) {
+        const preparedBalancer = prepareBackendFromBalancer(balancer);
+        return `${preparedBalancer}/node/${nodeId}`;
     }
 
     return undefined;

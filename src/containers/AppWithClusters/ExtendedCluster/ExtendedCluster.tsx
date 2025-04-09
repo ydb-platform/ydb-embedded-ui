@@ -1,11 +1,8 @@
 import {ClipboardButton} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
 import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
-import type {
-    AdditionalClusterProps,
-    AdditionalTenantsProps,
-    NodeAddress,
-} from '../../../types/additionalProps';
+import type {AdditionalClusterProps, AdditionalTenantsProps} from '../../../types/additionalProps';
 import type {ETenantType} from '../../../types/api/tenant';
 import {cn} from '../../../utils/cn';
 import {USE_CLUSTER_BALANCER_AS_BACKEND_KEY} from '../../../utils/constants';
@@ -16,8 +13,8 @@ import type {
     GetMonitoringClusterLink,
     GetMonitoringLink,
 } from '../../../utils/monitoring';
-import {getCleanBalancerValue, removeViewerPathname} from '../../../utils/parseBalancer';
-import {getBackendFromNodeHost, getBackendFromRawNodeData} from '../../../utils/prepareBackend';
+import {getCleanBalancerValue, prepareBackendFromBalancer} from '../../../utils/parseBalancer';
+import {getBackendFromBalancerAndNodeId} from '../../../utils/prepareBackend';
 import type {Cluster} from '../../Cluster/Cluster';
 
 import './ExtendedCluster.scss';
@@ -89,27 +86,21 @@ const getAdditionalTenantsProps = ({
 }: GetAdditionalTenantsProps) => {
     const additionalTenantsProps: AdditionalTenantsProps = {};
 
-    additionalTenantsProps.prepareTenantBackend = (
-        nodeHostOrAddress: string | NodeAddress | undefined,
-    ) => {
-        // Proxy received from balancer value, so it's necessary
+    additionalTenantsProps.prepareTenantBackend = (nodeId) => {
+        // Balancer value is used to create path, so it's necessary
         if (!balancer) {
             return undefined;
         }
 
         if (useClusterBalancerAsBackend) {
-            return removeViewerPathname(balancer);
+            return prepareBackendFromBalancer(balancer);
         }
 
-        if (!nodeHostOrAddress) {
+        if (isNil(nodeId)) {
             return undefined;
         }
 
-        if (typeof nodeHostOrAddress === 'string') {
-            return getBackendFromNodeHost(nodeHostOrAddress, balancer);
-        }
-
-        return getBackendFromRawNodeData(nodeHostOrAddress, balancer, true) ?? undefined;
+        return getBackendFromBalancerAndNodeId(nodeId, balancer) ?? undefined;
     };
 
     if (monitoring && getMonitoringLink) {
