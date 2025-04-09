@@ -102,17 +102,6 @@ export function YqlEditor({
             }
         });
 
-        editor.addAction({
-            id: 'openKeyboardShortcutsPanel',
-            label: i18n('action.open-shortcuts'),
-            keybindings: [keybindings.shortcutsHotkey],
-            run: () => {
-                // Dispatch an event that can be caught by the AsideNavigation component
-                const event = new CustomEvent('openKeyboardShortcutsPanel');
-                window.dispatchEvent(event);
-            },
-        });
-
         if (window.api.codeAssist) {
             setMonacoGhostInstance(createMonacoGhostInstance(editor));
         }
@@ -191,6 +180,18 @@ export function YqlEditor({
             keybindings: [keybindings.saveQuery],
             run: () => {
                 NiceModal.show(SAVE_QUERY_DIALOG);
+            },
+        });
+        editor.addAction({
+            id: 'openKeyboardShortcutsPanel',
+            label: i18n('action.open-shortcuts'),
+            keybindings: [keybindings.shortcutsHotkey],
+            contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
+            contextMenuOrder: 4,
+            run: () => {
+                // Dispatch an event that can be caught by the AsideNavigation component
+                const event = new CustomEvent('openKeyboardShortcutsPanel');
+                window.dispatchEvent(event);
             },
         });
     };

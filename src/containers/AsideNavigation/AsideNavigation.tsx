@@ -76,10 +76,7 @@ export function AsideNavigation(props: AsideNavigationProps) {
     const [informationPopupVisible, setInformationPopupVisible] = React.useState(false);
     const [compact, setIsCompact] = useSetting<boolean>(ASIDE_HEADER_COMPACT_KEY);
 
-    const toggleInformationPopup = React.useCallback(
-        () => setInformationPopupVisible(!informationPopupVisible),
-        [informationPopupVisible],
-    );
+    const toggleInformationPopup = () => setInformationPopupVisible((prev) => !prev);
 
     const closeInformationPopup = React.useCallback(() => setInformationPopupVisible(false), []);
 
