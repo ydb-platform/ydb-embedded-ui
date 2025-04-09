@@ -38,6 +38,7 @@
     "copy-to-clipboard": "^3.3.3",
     "crc-32": "^1.2.2",
     "history": "^4.10.1",
+    "hotkeys-js": "^3.13.9",
     "lodash": "^4.17.21",
     "monaco-editor": "^0.52.2",
     "numeral": "^2.0.6",
