@@ -69,6 +69,45 @@ enum Panel {
     Hotkeys = 'Hotkeys',
 }
 
+/**
+ * HotkeysPanelWrapper creates a render cycle separation between mounting and visibility change.
+ * This is necessary for smooth animations as HotkeysPanel uses CSSTransition internally.
+ *
+ * When a component is both mounted and set to visible at once, CSSTransition can't
+ * properly sequence its transition classes (panel → panel-active) because it's already active when mounted
+ * and counts transition as it has already happened.
+ * This wrapper ensures the component mounts first, then sets visible=true in a subsequent render cycle
+ * to make transition actually happen.
+ */
+function HotkeysPanelWrapper({
+    visiblePanel,
+    closePanel,
+}: {
+    visiblePanel?: Panel;
+    closePanel: () => void;
+}) {
+    const [visible, setVisible] = React.useState(false);
+
+    React.useEffect(() => {
+        setVisible(visiblePanel === Panel.Hotkeys);
+    }, [visiblePanel]);
+
+    return (
+        <HotkeysPanel
+            visible={visible}
+            hotkeys={HOTKEYS}
+            className={b('hotkeys-panel')}
+            title={
+                <div className={b('hotkeys-panel-title')}>
+                    {i18n('help-center.footer.shortcuts')}
+                    <Hotkey value={SHORTCUTS_HOTKEY} />
+                </div>
+            }
+            onClose={closePanel}
+        />
+    );
+}
+
 export function AsideNavigation(props: AsideNavigationProps) {
     const history = useHistory();
 
@@ -173,17 +212,9 @@ export function AsideNavigation(props: AsideNavigationProps) {
                         visible: visiblePanel === Panel.Hotkeys,
                         keepMounted: true,
                         content: (
-                            <HotkeysPanel
-                                visible={visiblePanel === Panel.Hotkeys}
-                                hotkeys={HOTKEYS}
-                                className={b('hotkeys-panel')}
-                                title={
-                                    <div className={b('hotkeys-panel-title')}>
-                                        {i18n('help-center.footer.shortcuts')}
-                                        <Hotkey value={SHORTCUTS_HOTKEY} />
-                                    </div>
-                                }
-                                onClose={closePanel}
+                            <HotkeysPanelWrapper
+                                visiblePanel={visiblePanel}
+                                closePanel={closePanel}
                             />
                         ),
                     },
