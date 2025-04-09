@@ -50,6 +50,10 @@ export const overviewApi = api.injectEndpoints({
                     return {error};
                 }
             },
+            serializeQueryArgs: ({queryArgs}) => {
+                const {database, path} = queryArgs;
+                return {database, path};
+            },
             keepUnusedDataFor: 0,
             providesTags: ['All', 'SchemaTree'],
         }),

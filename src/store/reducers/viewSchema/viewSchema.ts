@@ -37,6 +37,10 @@ export const viewSchemaApi = api.injectEndpoints({
                     return {error: error};
                 }
             },
+            serializeQueryArgs: ({queryArgs}) => {
+                const {database, path} = queryArgs;
+                return {database, path};
+            },
             providesTags: ['All', 'SchemaTree'],
         }),
     }),
