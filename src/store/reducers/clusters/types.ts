@@ -3,6 +3,7 @@ import type {ExtendedMetaClusterVersion} from '../../../utils/clusterVersionColo
 
 export interface PreparedCluster extends MetaExtendedClusterInfo {
     preparedVersions: ExtendedMetaClusterVersion[];
+    preparedBackend?: string;
 }
 
 export interface ClusterDataAggregation {
