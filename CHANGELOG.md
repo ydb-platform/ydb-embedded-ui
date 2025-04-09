@@ -1,5 +1,22 @@
 # Changelog
 
+## [8.21.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.20.1...v8.21.0) (2025-04-09)
+
+
+### Features
+
+* **Clusters:** correct links with relative path in balancer ([#2121](https://github.com/ydb-platform/ydb-embedded-ui/issues/2121)) ([4776c0c](https://github.com/ydb-platform/ydb-embedded-ui/commit/4776c0c118df42ef11d6790c8f8348d5dabe937c))
+* design query tab ([#2077](https://github.com/ydb-platform/ydb-embedded-ui/issues/2077)) ([06d243d](https://github.com/ydb-platform/ydb-embedded-ui/commit/06d243dfa5aefdb46001f2d9a78be2218a929869))
+* do not automatically refresh content when browser tab is inactive ([#2122](https://github.com/ydb-platform/ydb-embedded-ui/issues/2122)) ([341c0d8](https://github.com/ydb-platform/ydb-embedded-ui/commit/341c0d8c337a944d582649d8aee1b9f6e34fd757))
+* make keyboard shortcuts help page ([#2116](https://github.com/ydb-platform/ydb-embedded-ui/issues/2116)) ([b401559](https://github.com/ydb-platform/ydb-embedded-ui/commit/b401559355a51f18d14203e146c59af90aad25d6))
+
+
+### Bug Fixes
+
+* reuse table schema for select template for current table ([#2127](https://github.com/ydb-platform/ydb-embedded-ui/issues/2127)) ([b577ee5](https://github.com/ydb-platform/ydb-embedded-ui/commit/b577ee5fe60f220d322948a43d17568a19e36596))
+* try no unsaved for templates ([#2117](https://github.com/ydb-platform/ydb-embedded-ui/issues/2117)) ([e7d4a50](https://github.com/ydb-platform/ydb-embedded-ui/commit/e7d4a50f4ebf9f46567d48a9ef56683b9395e8b7))
+* use blue color only for not replicated vdisks ([#2110](https://github.com/ydb-platform/ydb-embedded-ui/issues/2110)) ([2e6051b](https://github.com/ydb-platform/ydb-embedded-ui/commit/2e6051bc4448951945594f0982d6899d338c004a))
+
 ## [8.20.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.20.0...v8.20.1) (2025-04-04)
 
 
