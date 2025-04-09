@@ -10,7 +10,7 @@ import {UserCard} from '../../components/User/User';
 import type {PreparedCluster} from '../../store/reducers/clusters/types';
 import {formatStorageValuesToTb} from '../../utils/dataFormatters/dataFormatters';
 import {createDeveloperUIMonitoringPageHref} from '../../utils/developerUI/developerUI';
-import {getCleanBalancerValue, removeViewerPathname} from '../../utils/parseBalancer';
+import {getCleanBalancerValue} from '../../utils/parseBalancer';
 import {clusterTabsIds, getClusterPath} from '../Cluster/utils';
 
 import {COLUMNS_NAMES, COLUMNS_TITLES} from './constants';
@@ -27,9 +27,11 @@ export const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
         header: COLUMNS_TITLES[COLUMNS_NAMES.TITLE],
         width: 230,
         render: ({row}) => {
-            const {balancer, name: clusterName, use_embedded_ui: useEmbeddedUi} = row;
-
-            const backend = balancer && removeViewerPathname(balancer);
+            const {
+                name: clusterName,
+                use_embedded_ui: useEmbeddedUi,
+                preparedBackend: backend,
+            } = row;
 
             const clusterPath =
                 useEmbeddedUi && backend
@@ -81,7 +83,12 @@ export const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
             return versions[0] || undefined;
         },
         render: ({row}) => {
-            const {preparedVersions, versions = [], balancer, name: clusterName} = row;
+            const {
+                preparedVersions,
+                versions = [],
+                name: clusterName,
+                preparedBackend: backend,
+            } = row;
 
             const hasErrors = !versions.length || versions.some((item) => !item.version);
 
@@ -98,8 +105,6 @@ export const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
                     )?.color,
                 };
             });
-
-            const backend = balancer && removeViewerPathname(balancer);
 
             return (
                 preparedVersions.length > 0 && (
