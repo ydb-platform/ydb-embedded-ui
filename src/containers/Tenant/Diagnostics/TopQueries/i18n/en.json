@@ -4,5 +4,19 @@
   "mode_top": "Top",
   "mode_running": "Running",
   "timeframe_hour": "Per hour",
-  "timeframe_minute": "Per minute"
+  "timeframe_minute": "Per minute",
+  "query-details.title": "Query Details",
+  "query-details.open-in-editor": "Open in Editor",
+  "query-details.close": "Close",
+  "query-details.query-hash": "Query Hash",
+  "query-details.cpu-time": "CPU Time",
+  "query-details.duration": "Duration",
+  "query-details.read-bytes": "Read Bytes",
+  "query-details.request-units": "Request Units",
+  "query-details.end-time": "End Time",
+  "query-details.read-rows": "Read Rows",
+  "query-details.user-sid": "User SID",
+  "query-details.application-name": "Application Name",
+  "query-details.query-start-at": "Query Start Time",
+  "query-details.query.title": "Query Text"
 }

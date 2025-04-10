@@ -1,0 +1,81 @@
+@import '../../../../styles/mixins.scss';
+
+.kv-query-details {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: var(--g-color-base-background-dark);
+    color: var(--g-color-text-primary-invert);
+    padding: var(--g-spacing-5) var(--g-spacing-6);
+
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    &__title {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    &__actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    &__content {
+        flex: 1;
+        padding-top: var(--g-spacing-5);
+        overflow: auto;
+    }
+
+    &__query-section {
+        margin-top: 20px;
+    }
+
+    &__query-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    &__query-title {
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    &__query-content {
+        background-color: #1e1e1e;
+        border-radius: 4px;
+        overflow: hidden;
+        position: relative;
+
+        pre {
+            margin: 0 !important;
+            max-height: 100%;
+            background-color: transparent !important;
+        }
+    }
+
+    &__close-button {
+        color: var(--g-color-text-secondary-invert);
+
+        &:hover {
+            color: var(--g-color-text-primary-invert);
+        }
+    }
+
+    &__editor-button {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--g-color-text-secondary-invert);
+
+        &:hover {
+            color: var(--g-color-text-primary-invert);
+        }
+    }
+}

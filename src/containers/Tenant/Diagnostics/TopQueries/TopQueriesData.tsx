@@ -35,7 +35,7 @@ interface TopQueriesDataProps {
     tenantName: string;
     timeFrame: TimeFrame;
     renderQueryModeControl: () => React.ReactNode;
-    onRowClick: (query: string) => void;
+    handleRowClick: (row: KeyValueRow) => void;
     handleTimeFrameChange: (value: string[]) => void;
     handleDateRangeChange: (value: DateRangeValues) => void;
     handleTextSearchUpdate: (text: string) => void;
@@ -45,7 +45,7 @@ export const TopQueriesData = ({
     tenantName,
     timeFrame,
     renderQueryModeControl,
-    onRowClick,
+    handleRowClick,
     handleTimeFrameChange,
     handleDateRangeChange,
     handleTextSearchUpdate,
@@ -78,10 +78,6 @@ export const TopQueriesData = ({
         },
         {pollingInterval: autoRefreshInterval},
     );
-
-    const handleRowClick = (row: KeyValueRow) => {
-        return onRowClick(row.QueryText as string);
-    };
 
     return (
         <TableWithControlsLayout>
