@@ -32,4 +32,13 @@
 
         text-overflow: ellipsis;
     }
+
+    &__drawer-item {
+        z-index: 4;
+
+        height: calc(100% + var(--g-spacing-4));
+        // Because of tabs padding it is needed to move drawer item a little higher
+        // to make it stick to bottom of tabs
+        margin-top: calc(-1 * var(--g-spacing-4));
+    }
 }

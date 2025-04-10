@@ -30,14 +30,14 @@ const b = cn('kv-top-queries');
 interface RunningQueriesDataProps {
     tenantName: string;
     renderQueryModeControl: () => React.ReactNode;
-    onRowClick: (query: string) => void;
+    handleRowClick: (row: KeyValueRow) => void;
     handleTextSearchUpdate: (text: string) => void;
 }
 
 export const RunningQueriesData = ({
     tenantName,
     renderQueryModeControl,
-    onRowClick,
+    handleRowClick,
     handleTextSearchUpdate,
 }: RunningQueriesDataProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
@@ -68,10 +68,6 @@ export const RunningQueriesData = ({
             },
             {pollingInterval: autoRefreshInterval},
         );
-
-    const handleRowClick = (row: KeyValueRow) => {
-        return onRowClick(row.QueryText as string);
-    };
 
     return (
         <TableWithControlsLayout>
