@@ -194,8 +194,10 @@ function Diagnostics(props: DiagnosticsProps) {
                 </Helmet>
             ) : null}
             {renderTabs()}
-            <div className={b('page-wrapper')} ref={containerRef}>
-                {renderTabContent()}
+            <div className={b('drawer-container')}>
+                <div className={b('page-wrapper')} ref={containerRef}>
+                    {renderTabContent()}
+                </div>
             </div>
         </div>
     );

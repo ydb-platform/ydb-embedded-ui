@@ -34,6 +34,12 @@
         }
     }
 
+    &__drawer-container {
+        position: relative;
+
+        height: 100%;
+    }
+
     &__page-wrapper {
         overflow: auto;
         flex-grow: 1;
