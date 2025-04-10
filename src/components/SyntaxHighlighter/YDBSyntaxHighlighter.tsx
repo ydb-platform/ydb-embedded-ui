@@ -88,6 +88,20 @@ export function YDBSyntaxHighlighter({
         return null;
     };
 
+    let paddingStyles = {};
+
+    if (
+        withClipboardButton &&
+        typeof withClipboardButton === 'object' &&
+        withClipboardButton.alwaysVisible
+    ) {
+        if (withClipboardButton.withLabel) {
+            paddingStyles = {paddingRight: 80};
+        } else {
+            paddingStyles = {paddingRight: 40};
+        }
+    }
+
     return (
         <div className={b(null, className)}>
             {renderCopyButton()}
@@ -96,7 +110,7 @@ export function YDBSyntaxHighlighter({
                 key={highlighterKey}
                 language={language}
                 style={style}
-                customStyle={{height: '100%'}}
+                customStyle={{height: '100%', ...paddingStyles}}
             >
                 {text}
             </ReactSyntaxHighlighter>

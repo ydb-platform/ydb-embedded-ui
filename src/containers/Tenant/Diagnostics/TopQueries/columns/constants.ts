@@ -37,6 +37,7 @@ export const DEFAULT_TOP_QUERIES_COLUMNS: QueriesColumnId[] = [
 export const REQUIRED_TOP_QUERIES_COLUMNS: QueriesColumnId[] = ['CPUTime', 'QueryText'];
 
 export const DEFAULT_RUNNING_QUERIES_COLUMNS: QueriesColumnId[] = [
+    'QueryHash',
     'UserSID',
     'QueryStartAt',
     'QueryText',

@@ -1,0 +1,15 @@
+.ydb-drawer {
+    &__drawer-container {
+        position: relative;
+
+        overflow: hidden;
+
+        height: 100%;
+    }
+
+    &__item {
+        z-index: 4;
+
+        height: 100%;
+    }
+}

@@ -8,7 +8,7 @@
     height: 100%;
 
     &__header-wrapper {
-        padding: 0 20px 16px;
+        padding: 0 var(--g-spacing-5);
 
         background-color: var(--g-color-base-background);
     }
@@ -39,7 +39,8 @@
         flex-grow: 1;
 
         width: 100%;
-        padding: 0 20px;
+        height: 100%;
+        margin: var(--g-spacing-4) var(--g-spacing-5) 0 var(--g-spacing-5);
 
         .ydb-table-with-controls-layout {
             &__controls {
