@@ -4,7 +4,6 @@ import type {ValueOf} from '../../../types/common';
 import type {METRIC_STATUS} from './contants';
 
 export interface PreparedTenant extends TTenant {
-    backend: string | undefined;
     sharedTenantName: string | undefined;
     sharedNodeIds: number[] | undefined;
     controlPlaneName: string;

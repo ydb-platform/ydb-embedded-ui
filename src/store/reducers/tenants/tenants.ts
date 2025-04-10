@@ -1,7 +1,6 @@
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
-import type {RootState} from '../../defaultStore';
 import {api} from '../api';
 
 import type {PreparedTenant, TenantsState} from './types';
@@ -25,15 +24,14 @@ export default slice.reducer;
 export const tenantsApi = api.injectEndpoints({
     endpoints: (build) => ({
         getTenantsInfo: build.query({
-            queryFn: async ({clusterName}: {clusterName?: string}, {signal, getState}) => {
+            queryFn: async ({clusterName}: {clusterName?: string}, {signal}) => {
                 try {
                     const response = window.api.meta
                         ? await window.api.meta.getTenants(clusterName, {signal})
                         : await window.api.viewer.getTenants(clusterName, {signal});
                     let data: PreparedTenant[];
                     if (Array.isArray(response.TenantInfo)) {
-                        const {singleClusterMode} = getState() as RootState;
-                        data = prepareTenants(response.TenantInfo, singleClusterMode);
+                        data = prepareTenants(response.TenantInfo);
                     } else {
                         data = [];
                     }

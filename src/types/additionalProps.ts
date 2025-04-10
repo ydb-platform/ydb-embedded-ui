@@ -13,7 +13,7 @@ export interface AdditionalClusterProps {
 }
 
 export interface AdditionalTenantsProps {
-    prepareTenantBackend?: (backend: string | NodeAddress | undefined) => string | undefined;
+    prepareTenantBackend?: (nodeId?: string | number) => string | undefined;
     getMonitoringLink?: (name?: string, type?: ETenantType) => string | null;
     getLogsLink?: (name?: string) => string | null;
 }

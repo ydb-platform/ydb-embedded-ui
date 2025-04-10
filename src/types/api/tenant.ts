@@ -1,5 +1,5 @@
 import type {EFlag} from './enums';
-import type {TMemoryStats, TPoolStats, TSystemStateInfo} from './nodes';
+import type {TMemoryStats, TPoolStats} from './nodes';
 import type {TTabletStateInfo} from './tablet';
 
 /**
@@ -45,7 +45,6 @@ export interface TTenant {
     StorageAllocatedSize?: string; // Actual database size
     /** uint64 */
     StorageMinAvailableSize?: string;
-    Nodes?: TSystemStateInfo[];
     /** uint64 */
     MemoryUsed?: string; // Actual memory consumption
     /** uint64 */
@@ -56,7 +55,6 @@ export interface TTenant {
     /** uint64 */
     StorageGroups?: string;
 
-    MonitoringEndpoint?: string; // additional
     ControlPlane?: ControlPlane; // additional
 
     StorageAllocatedLimit?: string;

@@ -1,4 +1,4 @@
-import {getBackendFromNodeHost, getBackendFromRawNodeData, prepareHost} from '../prepareBackend';
+import {getBackendFromBalancerAndNodeId, prepareHost} from '../prepareBackend';
 
 describe('prepareHost', () => {
     test('should add u- prefix to cloud din nodes', () => {
@@ -13,37 +13,12 @@ describe('prepareHost', () => {
         expect(prepareHost(commonNodeHost)).toBe(commonNodeHost);
     });
 });
-describe('getBackendFromNodeHost', () => {
-    test('should prepare correct backend value from node host', () => {
+describe('getBackendFromBalancerAndNodeId', () => {
+    test('should prepare correct backend from balancer and node id', () => {
         const balancer = 'https://viewer.ydb.ru:443/dev02.ydb.net:8765';
-        const nodeHost = 'ydb-dev02-001.search.net:31012';
-        const result = 'https://viewer.ydb.ru:443/ydb-dev02-001.search.net:31012';
+        const nodeId = '50016';
+        const result = 'https://viewer.ydb.ru:443/dev02.ydb.net:8765/node/50016';
 
-        expect(getBackendFromNodeHost(nodeHost, balancer)).toBe(result);
-    });
-});
-describe('getBackendFromRawNodeData', () => {
-    test('should prepare correct backend value from raw node data', () => {
-        const balancer = 'https://viewer.ydb.ru:443/dev02.ydb.net:8765';
-        const node = {
-            Host: 'ydb-dev02-000.search.net',
-            Endpoints: [
-                {
-                    Name: 'http-mon',
-                    Address: ':8765',
-                },
-                {
-                    Name: 'ic',
-                    Address: ':19001',
-                },
-                {
-                    Name: 'grpc',
-                    Address: ':2135',
-                },
-            ],
-        };
-        const result = 'https://viewer.ydb.ru:443/ydb-dev02-000.search.net:8765';
-
-        expect(getBackendFromRawNodeData(node, balancer)).toBe(result);
+        expect(getBackendFromBalancerAndNodeId(nodeId, balancer)).toBe(result);
     });
 });

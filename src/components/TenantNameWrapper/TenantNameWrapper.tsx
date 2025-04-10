@@ -2,7 +2,7 @@ import {DefinitionList, Flex} from '@gravity-ui/uikit';
 
 import {getTenantPath} from '../../containers/Tenant/TenantPages';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
-import type {AdditionalTenantsProps, NodeAddress} from '../../types/additionalProps';
+import type {AdditionalTenantsProps} from '../../types/additionalProps';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
@@ -22,13 +22,13 @@ const getTenantBackend = (
         return undefined;
     }
 
-    let backend: string | NodeAddress | undefined = tenant.MonitoringEndpoint ?? tenant.backend;
+    let nodeId: string | undefined;
     const nodeIds = tenant.NodeIds ?? tenant.sharedNodeIds;
-    if (!backend && nodeIds && nodeIds.length > 0) {
+    if (nodeIds && nodeIds.length > 0) {
         const index = Math.floor(Math.random() * nodeIds.length);
-        backend = {NodeId: nodeIds[index]};
+        nodeId = nodeIds[index].toString();
     }
-    return additionalTenantsProps.prepareTenantBackend(backend);
+    return additionalTenantsProps.prepareTenantBackend(nodeId);
 };
 
 export function TenantNameWrapper({tenant, additionalTenantsProps}: TenantNameWrapperProps) {

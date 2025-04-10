@@ -15,15 +15,6 @@ const getControlPlaneValue = (tenant: TTenant) => {
     return controlPlaneName ?? defaultValue;
 };
 
-const getTenantBackend = (tenant: TTenant) => {
-    const node = tenant.Nodes ? tenant.Nodes[0] : {};
-    const address =
-        node.Host && node.Endpoints
-            ? node.Endpoints.find((endpoint) => endpoint.Name === 'http-mon')?.Address
-            : undefined;
-    return node.Host ? `${node.Host}${address ? address : ''}` : undefined;
-};
-
 export interface TenantMetricStats<T = string> {
     name: T;
     usage?: number;
@@ -174,9 +165,8 @@ const calculateTenantEntities = (tenant: TTenant) => {
     return {nodesCount, groupsCount};
 };
 
-export const prepareTenants = (tenants: TTenant[], useNodeAsBackend: boolean): PreparedTenant[] => {
+export const prepareTenants = (tenants: TTenant[]): PreparedTenant[] => {
     return tenants.map((tenant) => {
-        const backend = useNodeAsBackend ? getTenantBackend(tenant) : undefined;
         const sharedDatabase = tenants.find((item) => item.Id === tenant.ResourceId);
         const sharedTenantName = sharedDatabase?.Name;
         const sharedNodeIds = sharedDatabase?.NodeIds;
@@ -187,7 +177,6 @@ export const prepareTenants = (tenants: TTenant[], useNodeAsBackend: boolean): P
         return {
             ...tenant,
 
-            backend,
             sharedTenantName,
             sharedNodeIds,
             controlPlaneName,
