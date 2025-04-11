@@ -82,7 +82,7 @@ export const TopShards = ({tenantName, path}: TopShardsProps) => {
             sortOrder: backendSort,
             filters,
         },
-        {pollingInterval: autoRefreshInterval},
+        {pollingInterval: autoRefreshInterval, skipPollingIfUnfocused: true},
     );
     const loading = isFetching && result === undefined;
     const data = result?.resultSets?.[0]?.result || [];

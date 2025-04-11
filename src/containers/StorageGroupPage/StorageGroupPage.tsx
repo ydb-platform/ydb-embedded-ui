@@ -46,6 +46,7 @@ export function StorageGroupPage() {
             : skipToken,
         {
             pollingInterval: autoRefreshInterval,
+            skipPollingIfUnfocused: true,
             skip: !capabilitiesLoaded,
         },
     );

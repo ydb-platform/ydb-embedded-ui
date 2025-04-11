@@ -27,7 +27,7 @@ export function TopTables({database}: TopTablesProps) {
 
     const {currentData, error, isFetching} = topTablesApi.useGetTopTablesQuery(
         {database},
-        {pollingInterval: autoRefreshInterval},
+        {pollingInterval: autoRefreshInterval, skipPollingIfUnfocused: true},
     );
     const loading = isFetching && currentData === undefined;
 

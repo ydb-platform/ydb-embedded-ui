@@ -111,6 +111,7 @@ export function useGetMultiOverviewQuery({
         },
         {
             pollingInterval: autoRefreshInterval,
+            skipPollingIfUnfocused: true,
         },
     );
 
@@ -122,6 +123,7 @@ export function useGetMultiOverviewQuery({
         additionalPaths.length ? {paths: additionalPaths, database} : skipToken,
         {
             pollingInterval: autoRefreshInterval,
+            skipPollingIfUnfocused: true,
         },
     );
 

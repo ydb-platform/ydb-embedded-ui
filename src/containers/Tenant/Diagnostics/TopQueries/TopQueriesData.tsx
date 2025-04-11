@@ -76,7 +76,7 @@ export const TopQueriesData = ({
             sortOrder: backendSort,
             timeFrame,
         },
-        {pollingInterval: autoRefreshInterval},
+        {pollingInterval: autoRefreshInterval, skipPollingIfUnfocused: true},
     );
 
     const handleRowClick = (row: KeyValueRow) => {

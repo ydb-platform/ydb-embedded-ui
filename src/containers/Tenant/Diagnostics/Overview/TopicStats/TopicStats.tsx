@@ -75,7 +75,7 @@ export const TopicStats = ({path, database}: {path: string; database: string}) =
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = topicApi.useGetTopicQuery(
         {path, database},
-        {pollingInterval: autoRefreshInterval},
+        {pollingInterval: autoRefreshInterval, skipPollingIfUnfocused: true},
     );
     const loading = isFetching && currentData === undefined;
     const data = useTypedSelector((state) => selectPreparedTopicStats(state, path, database));

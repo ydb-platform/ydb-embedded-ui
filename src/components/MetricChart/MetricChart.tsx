@@ -146,7 +146,7 @@ export const MetricChart = ({
             timeFrame,
             maxDataPoints: width / 2,
         },
-        {pollingInterval: autorefresh},
+        {pollingInterval: autorefresh, skipPollingIfUnfocused: true},
     );
 
     const loading = isFetching && !currentData;

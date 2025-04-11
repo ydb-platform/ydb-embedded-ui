@@ -40,6 +40,7 @@ export function Clusters() {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const query = clustersApi.useGetClustersListQuery(undefined, {
         pollingInterval: autoRefreshInterval,
+        skipPollingIfUnfocused: true,
     });
 
     const dispatch = useTypedDispatch();

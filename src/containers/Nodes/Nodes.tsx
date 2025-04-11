@@ -235,6 +235,7 @@ function GroupedNodesComponent({
         },
         {
             pollingInterval: autoRefreshInterval,
+            skipPollingIfUnfocused: true,
         },
     );
 

@@ -69,7 +69,7 @@ export function Tablet() {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tabletApi.useGetTabletQuery(
         {id, database: queryDatabase ?? undefined, followerId: queryFollowerId ?? undefined},
-        {pollingInterval: autoRefreshInterval},
+        {pollingInterval: autoRefreshInterval, skipPollingIfUnfocused: true},
     );
 
     const loading = isFetching && currentData === undefined;
@@ -222,6 +222,7 @@ function Channels({id, hiveId}: {id: string; hiveId: string}) {
         {id, hiveId},
         {
             pollingInterval: autoRefreshInterval,
+            skipPollingIfUnfocused: true,
         },
     );
 

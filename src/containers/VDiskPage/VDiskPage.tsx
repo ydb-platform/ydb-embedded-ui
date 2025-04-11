@@ -58,6 +58,7 @@ export function VDiskPage() {
         error,
     } = vDiskApi.useGetVDiskDataQuery(params, {
         pollingInterval: autoRefreshInterval,
+        skipPollingIfUnfocused: true,
     });
     const loading = isFetching && vDiskData === undefined;
     const {NodeHost, NodeId, NodeType, NodeDC, PDiskId, PDiskType, Severity, VDiskId} = vDiskData;

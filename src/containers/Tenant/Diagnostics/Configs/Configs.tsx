@@ -93,7 +93,10 @@ export const Configs = ({database}: ConfigsProps) => {
         currentData = [],
         isLoading,
         error,
-    } = tenantApi.useGetClusterConfigQuery({database}, {pollingInterval: autoRefreshInterval});
+    } = tenantApi.useGetClusterConfigQuery(
+        {database},
+        {pollingInterval: autoRefreshInterval, skipPollingIfUnfocused: true},
+    );
 
     const onChange = (value: string) => {
         setSearch(value || undefined, 'replaceIn');

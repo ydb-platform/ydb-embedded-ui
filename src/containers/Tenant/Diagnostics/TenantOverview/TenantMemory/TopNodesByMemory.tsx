@@ -73,7 +73,7 @@ export function TopNodesByMemory({tenantName, additionalNodesProps}: TopNodesByM
             limit: TENANT_OVERVIEW_TABLES_LIMIT,
             fieldsRequired,
         },
-        {pollingInterval: autoRefreshInterval},
+        {pollingInterval: autoRefreshInterval, skipPollingIfUnfocused: true},
     );
 
     const loading = isFetching && currentData === undefined;

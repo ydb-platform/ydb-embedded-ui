@@ -41,6 +41,7 @@ export function Network({tenantName}: NetworkProps) {
 
     const {currentData, isFetching, error} = networkApi.useGetNetworkInfoQuery(tenantName, {
         pollingInterval: autoRefreshInterval,
+        skipPollingIfUnfocused: true,
     });
     const loading = isFetching && currentData === undefined;
 
