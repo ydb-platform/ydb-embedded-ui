@@ -1,8 +1,7 @@
 import React from 'react';
 
-import {TextInput} from '@gravity-ui/uikit';
-
 import {cn} from '../../utils/cn';
+import {DebouncedInput} from '../DebouncedInput/DebouncedInput';
 
 import './Search.scss';
 
@@ -23,43 +22,21 @@ export const Search = ({
     value = '',
     width,
     className,
-    debounce = 200,
+    debounce,
     placeholder,
     inputRef,
 }: SearchProps) => {
-    const [searchValue, setSearchValue] = React.useState<string>(value);
-
-    const timer = React.useRef<number>();
-
-    React.useEffect(() => {
-        setSearchValue((prevValue) => {
-            if (prevValue !== value) {
-                return value;
-            }
-
-            return prevValue;
-        });
-    }, [value]);
-
-    const onSearchValueChange = (newValue: string) => {
-        setSearchValue(newValue);
-
-        window.clearTimeout(timer.current);
-        timer.current = window.setTimeout(() => {
-            onChange?.(newValue);
-        }, debounce);
-    };
-
     return (
-        <TextInput
+        <DebouncedInput
+            debounce={debounce}
             hasClear
             autoFocus
             controlRef={inputRef}
             style={{width}}
             className={b(null, className)}
             placeholder={placeholder}
-            value={searchValue}
-            onUpdate={onSearchValueChange}
+            value={value}
+            onUpdate={onChange}
         />
     );
 };
