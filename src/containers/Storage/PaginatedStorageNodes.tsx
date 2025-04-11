@@ -13,6 +13,7 @@ import type {NodesGroupByField} from '../../types/api/nodes';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {useAdditionalNodesProps} from '../../utils/hooks/useAdditionalNodesProps';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
+import {renderPaginatedTableErrorMessage} from '../../utils/renderPaginatedTableErrorMessage';
 
 import type {PaginatedStorageProps} from './PaginatedStorage';
 import {StorageNodesControls} from './StorageControls/StorageControls';
@@ -22,7 +23,7 @@ import type {StorageNodesColumnsSettings} from './StorageNodes/columns/types';
 import {TableGroup} from './TableGroup/TableGroup';
 import {useExpandedGroups} from './TableGroup/useExpandedTableGroups';
 import i18n from './i18n';
-import {b, renderPaginatedTableErrorMessage} from './shared';
+import {b} from './shared';
 import type {StorageViewContext} from './types';
 import {useStorageQueryParams} from './useStorageQueryParams';
 import {useStorageColumnsSettings} from './utils';
