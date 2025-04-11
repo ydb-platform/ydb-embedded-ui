@@ -31,7 +31,7 @@ export const TopShards = ({tenantName, path}: TopShardsProps) => {
 
     const {currentData, isFetching, error} = topShardsApi.useGetTopShardsQuery(
         {database: tenantName, path},
-        {pollingInterval: autoRefreshInterval},
+        {pollingInterval: autoRefreshInterval, skipPollingIfUnfocused: true},
     );
 
     const loading = isFetching && currentData === undefined;

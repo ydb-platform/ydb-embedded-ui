@@ -129,6 +129,7 @@ function GroupedStorageGroupsComponent({
         },
         {
             pollingInterval: autoRefreshInterval,
+            skipPollingIfUnfocused: true,
         },
     );
 

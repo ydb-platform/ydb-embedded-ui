@@ -64,7 +64,7 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tenantsApi.useGetTenantsInfoQuery(
         {clusterName},
-        {pollingInterval: autoRefreshInterval},
+        {pollingInterval: autoRefreshInterval, skipPollingIfUnfocused: true},
     );
     const loading = isFetching && currentData === undefined;
 

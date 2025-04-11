@@ -132,6 +132,7 @@ function GroupedStorageNodesComponent({
         },
         {
             pollingInterval: autoRefreshInterval,
+            skipPollingIfUnfocused: true,
         },
     );
 

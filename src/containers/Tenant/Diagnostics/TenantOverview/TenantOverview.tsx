@@ -40,6 +40,7 @@ export function TenantOverview({
         {path: tenantName},
         {
             pollingInterval: autoRefreshInterval,
+            skipPollingIfUnfocused: true,
         },
     );
     const tenantLoading = isFetching && tenant === undefined;
@@ -54,6 +55,7 @@ export function TenantOverview({
         },
         {
             pollingInterval: autoRefreshInterval,
+            skipPollingIfUnfocused: true,
         },
     );
     const {Tables, Topics} =

@@ -30,6 +30,7 @@ export const useHealthcheck = (
         {database: tenantName},
         {
             pollingInterval: autorefresh,
+            skipPollingIfUnfocused: true,
         },
     );
     const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;

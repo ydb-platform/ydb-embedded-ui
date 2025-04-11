@@ -66,7 +66,10 @@ export const Partitions = ({path, database}: PartitionsProps) => {
         currentData: partitionsData,
         isFetching: partitionsIsFetching,
         error: partitionsError,
-    } = partitionsApi.useGetPartitionsQuery(params, {pollingInterval: autoRefreshInterval});
+    } = partitionsApi.useGetPartitionsQuery(params, {
+        pollingInterval: autoRefreshInterval,
+        skipPollingIfUnfocused: true,
+    });
     const partitionsLoading = partitionsIsFetching && partitionsData === undefined;
     const rawPartitions = partitionsData;
 

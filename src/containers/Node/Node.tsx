@@ -58,7 +58,10 @@ export function Node() {
         currentData: node,
         isLoading,
         error,
-    } = nodeApi.useGetNodeInfoQuery(params, {pollingInterval: autoRefreshInterval});
+    } = nodeApi.useGetNodeInfoQuery(params, {
+        pollingInterval: autoRefreshInterval,
+        skipPollingIfUnfocused: true,
+    });
 
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const isDiskPagesAvailable = useDiskPagesAvailable();

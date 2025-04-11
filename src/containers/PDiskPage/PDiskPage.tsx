@@ -83,6 +83,7 @@ export function PDiskPage() {
     const params = pDiskParamsDefined ? {nodeId, pDiskId} : skipToken;
     const pdiskDataQuery = pDiskApi.useGetPdiskInfoQuery(params, {
         pollingInterval: autoRefreshInterval,
+        skipPollingIfUnfocused: true,
     });
     const pDiskLoading = pdiskDataQuery.isFetching && pdiskDataQuery.currentData === undefined;
     const pDiskData = pdiskDataQuery.currentData;

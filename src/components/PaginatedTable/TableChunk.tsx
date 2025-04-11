@@ -73,6 +73,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     tableDataApi.useFetchTableChunkQuery(queryParams, {
         skip: isTimeoutActive || !isActive,
         pollingInterval: autoRefreshInterval,
+        skipPollingIfUnfocused: true,
     });
 
     const {currentData, error} = tableDataApi.endpoints.fetchTableChunk.useQueryState(queryParams);

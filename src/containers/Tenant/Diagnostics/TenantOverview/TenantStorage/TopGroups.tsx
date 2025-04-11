@@ -56,6 +56,7 @@ export function TopGroups({tenant}: TopGroupsProps) {
         },
         {
             pollingInterval: autoRefreshInterval,
+            skipPollingIfUnfocused: true,
             skip: !capabilitiesLoaded,
         },
     );

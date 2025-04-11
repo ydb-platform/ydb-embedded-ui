@@ -31,7 +31,7 @@ function NodeStructure({nodeId, className}: NodeStructureProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = nodeApi.useGetNodeStructureQuery(
         {nodeId},
-        {pollingInterval: autoRefreshInterval},
+        {pollingInterval: autoRefreshInterval, skipPollingIfUnfocused: true},
     );
 
     const loadingStructure = isFetching && currentData === undefined;

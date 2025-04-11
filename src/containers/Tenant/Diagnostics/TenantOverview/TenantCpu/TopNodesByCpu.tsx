@@ -67,7 +67,7 @@ export function TopNodesByCpu({tenantName, additionalNodesProps}: TopNodesByCpuP
             tablets: false,
             fieldsRequired,
         },
-        {pollingInterval: autoRefreshInterval},
+        {pollingInterval: autoRefreshInterval, skipPollingIfUnfocused: true},
     );
 
     const loading = isFetching && currentData === undefined;

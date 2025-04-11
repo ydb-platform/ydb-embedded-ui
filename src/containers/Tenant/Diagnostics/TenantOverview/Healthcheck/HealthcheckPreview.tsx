@@ -59,6 +59,7 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
         {
             //FIXME https://github.com/ydb-platform/ydb-embedded-ui/issues/1889
             pollingInterval: healthcheckPreviewDisabled ? undefined : autoRefreshInterval,
+            skipPollingIfUnfocused: true,
             skip: healthcheckPreviewDisabled,
         },
     );

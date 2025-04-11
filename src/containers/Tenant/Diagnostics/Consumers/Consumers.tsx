@@ -39,7 +39,7 @@ export const Consumers = ({path, database, type}: ConsumersProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = topicApi.useGetTopicQuery(
         {path, database},
-        {pollingInterval: autoRefreshInterval},
+        {pollingInterval: autoRefreshInterval, skipPollingIfUnfocused: true},
     );
     const loading = isFetching && currentData === undefined;
     const consumers = useTypedSelector((state) =>

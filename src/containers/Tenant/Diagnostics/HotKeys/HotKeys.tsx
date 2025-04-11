@@ -69,6 +69,7 @@ export function HotKeys({path, database}: HotKeysProps) {
         },
         {
             pollingInterval: autoRefreshInterval,
+            skipPollingIfUnfocused: true,
         },
     );
     const keyColumnsIds = schemaData?.PathDescription?.Table?.KeyColumnNames;

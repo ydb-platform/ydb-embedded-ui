@@ -29,6 +29,7 @@ export function Operations({database}: OperationsProps) {
         {database, kind, page_size: pageSize, page_token: pageToken},
         {
             pollingInterval: autoRefreshInterval,
+            skipPollingIfUnfocused: true,
         },
     );
 

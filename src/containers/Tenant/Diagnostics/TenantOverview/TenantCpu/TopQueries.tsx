@@ -49,7 +49,7 @@ export function TopQueries({tenantName}: TopQueriesProps) {
 
     const {currentData, isFetching, error} = topQueriesApi.useGetTopQueriesQuery(
         {database: tenantName, timeFrame: 'hour', limit: TENANT_OVERVIEW_TABLES_LIMIT},
-        {pollingInterval: autoRefreshInterval},
+        {pollingInterval: autoRefreshInterval, skipPollingIfUnfocused: true},
     );
 
     const loading = isFetching && currentData === undefined;

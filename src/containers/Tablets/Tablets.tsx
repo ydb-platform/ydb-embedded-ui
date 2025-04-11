@@ -26,6 +26,7 @@ export function Tablets({nodeId, path, database}: TabletsProps) {
         Object.keys(params).length === 0 ? skipToken : params,
         {
             pollingInterval: autoRefreshInterval,
+            skipPollingIfUnfocused: true,
         },
     );
 

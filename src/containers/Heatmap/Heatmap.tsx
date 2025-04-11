@@ -34,7 +34,7 @@ export const Heatmap = ({path, database}: HeatmapProps) => {
 
     const {currentData, isFetching, error} = heatmapApi.useGetHeatmapTabletsInfoQuery(
         {path, database},
-        {pollingInterval: autoRefreshInterval},
+        {pollingInterval: autoRefreshInterval, skipPollingIfUnfocused: true},
     );
 
     const loading = isFetching && currentData === undefined;
