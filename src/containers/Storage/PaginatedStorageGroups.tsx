@@ -10,6 +10,7 @@ import {
 } from '../../store/reducers/capabilities/hooks';
 import {storageApi} from '../../store/reducers/storage/storage';
 import {useAutoRefreshInterval} from '../../utils/hooks';
+import {renderPaginatedTableErrorMessage} from '../../utils/renderPaginatedTableErrorMessage';
 
 import type {PaginatedStorageProps} from './PaginatedStorage';
 import {StorageGroupsControls} from './StorageControls/StorageControls';
@@ -18,7 +19,7 @@ import {useStorageGroupsSelectedColumns} from './StorageGroups/columns/hooks';
 import {TableGroup} from './TableGroup/TableGroup';
 import {useExpandedGroups} from './TableGroup/useExpandedTableGroups';
 import i18n from './i18n';
-import {b, renderPaginatedTableErrorMessage} from './shared';
+import {b} from './shared';
 import {useStorageQueryParams} from './useStorageQueryParams';
 
 import './Storage.scss';
