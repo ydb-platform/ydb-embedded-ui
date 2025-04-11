@@ -25,6 +25,7 @@ export type HandleTableColumnsResize = (columnId: string, width: number) => void
 
 export interface Column<T> {
     name: string;
+    note?: string;
     header?: React.ReactNode;
     className?: string;
     sortable?: boolean;
