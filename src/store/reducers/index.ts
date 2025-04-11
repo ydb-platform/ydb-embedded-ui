@@ -18,6 +18,7 @@ import singleClusterMode from './singleClusterMode';
 import tenant from './tenant/tenant';
 import tenants from './tenants/tenants';
 import tooltip from './tooltip';
+import topic from './topic/topic';
 
 export const rootReducer = {
     [api.reducerPath]: api.reducer,
@@ -38,6 +39,7 @@ export const rootReducer = {
     queryActions,
     fullscreen,
     clusters,
+    topic,
 };
 
 const combinedReducer = combineReducers({

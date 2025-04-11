@@ -10,6 +10,7 @@ interface EmptyFilterProps {
     message?: string;
     showAll?: string;
     onShowAll?: VoidFunction;
+    image?: React.ReactNode;
 }
 
 export const EmptyFilter = ({
@@ -17,9 +18,10 @@ export const EmptyFilter = ({
     message = i18n('default_message'),
     showAll = i18n('default_button_label'),
     onShowAll,
+    image = <Illustration name="thumbsUp" />,
 }: EmptyFilterProps) => (
     <EmptyState
-        image={<Illustration name="thumbsUp" />}
+        image={image}
         position="left"
         title={title}
         description={message}

@@ -210,6 +210,8 @@ export const isDatabaseEntityType = (type?: EPathType) =>
 
 export const isCdcStreamEntityType = (type?: EPathType) => type === EPathType.EPathTypeCdcStream;
 
+export const isTopicEntityType = (type?: EPathType) => type === EPathType.EPathTypePersQueueGroup;
+
 // ====================
 
 const pathTypeToEntityWithMergedImplementation: Record<EPathType, boolean> = {

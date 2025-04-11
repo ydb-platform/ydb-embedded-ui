@@ -1,5 +1,6 @@
 import type {Action, Reducer, UnknownAction} from '@reduxjs/toolkit';
 import type {History, Location} from 'history';
+import {isNil} from 'lodash';
 import each from 'lodash/each';
 import keys from 'lodash/keys';
 import merge from 'lodash/merge';
@@ -11,8 +12,11 @@ import {getMatchingDeclaredPath} from 'redux-location-state/lib/helpers';
 import {parseQuery} from 'redux-location-state/lib/parseQuery';
 import {stateToParams} from 'redux-location-state/lib/stateToParams';
 
+import {convertToNumber, isNumeric} from '../utils/utils';
+
 import {initialState as initialHeatmapState} from './reducers/heatmap';
 import {initialState as initialSettingsState} from './reducers/settings/settings';
+import {isValidTopicDataFilterValue} from './reducers/topic/types';
 
 export const paramSetup = {
     global: {
@@ -68,6 +72,41 @@ export const paramSetup = {
         },
         selectedConsumer: {
             stateKey: 'partitions.selectedConsumer',
+        },
+        selectedPartition: {
+            stateKey: 'topic.selectedPartition',
+        },
+        topicDataFilter: {
+            stateKey: 'topic.topicDataFilter',
+            options: {
+                parse: (param?: string) => {
+                    return param && isValidTopicDataFilterValue(param) ? param : 'TIMESTAMP';
+                },
+            },
+        },
+        topicDataSelectedOffset: {
+            stateKey: 'topic.selectedOffset',
+            type: 'number',
+            options: {
+                parse: (param?: string) => {
+                    if (isNil(param)) {
+                        return undefined;
+                    }
+                    return convertToNumber(param);
+                },
+            },
+        },
+        topicDataStartTimestamp: {
+            stateKey: 'topic.startTimestamp',
+            type: 'number',
+            options: {
+                parse: (param?: string) => {
+                    if (isNumeric(param)) {
+                        return Number(param);
+                    }
+                    return undefined;
+                },
+            },
         },
     },
     '/cluster/tenants': {

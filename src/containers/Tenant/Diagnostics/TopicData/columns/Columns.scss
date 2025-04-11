@@ -1,0 +1,18 @@
+.ydb-diagnostics-topic-data-columns {
+    &__lags-header {
+        text-align: center;
+    }
+
+    &__timestamp-ms {
+        color: var(--g-color-text-secondary);
+    }
+
+    &__ts-diff_danger {
+        color: var(--g-color-text-danger);
+    }
+    &__message_clickable {
+        cursor: pointer;
+
+        color: var(--g-color-text-info);
+    }
+}

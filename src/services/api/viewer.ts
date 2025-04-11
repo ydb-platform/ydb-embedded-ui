@@ -28,7 +28,7 @@ import type {
     UnmergedTEvTabletStateResponse,
 } from '../../types/api/tablet';
 import type {TTenantInfo, TTenants} from '../../types/api/tenant';
-import type {DescribeTopicResult} from '../../types/api/topic';
+import type {DescribeTopicResult, TopicDataRequest, TopicDataResponse} from '../../types/api/topic';
 import type {TEvVDiskStateResponse} from '../../types/api/vdisk';
 import type {TUserToken} from '../../types/api/whoami';
 import {BINARY_DATA_IN_PLAIN_TEXT_DISPLAY} from '../../utils/constants';
@@ -260,6 +260,13 @@ export class ViewerAPI extends BaseYdbAPI {
             },
             {concurrentId, requestConfig: {signal}},
         );
+    }
+
+    getTopicData(params: TopicDataRequest, {concurrentId, signal}: AxiosOptions = {}) {
+        return this.get<TopicDataResponse>(this.getPath('/viewer/json/topic_data'), params, {
+            concurrentId,
+            requestConfig: {signal},
+        });
     }
 
     getConsumer(

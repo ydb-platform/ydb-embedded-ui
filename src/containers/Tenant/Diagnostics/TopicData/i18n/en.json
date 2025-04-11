@@ -1,0 +1,21 @@
+{
+  "label_offset": "Offset",
+  "label_timestamp-create": "Timestamp Create",
+  "label_timestamp-write": "Timestamp Write",
+  "label_ts_diff": "TS Diff",
+  "label_key": "Key",
+  "label_metadata": "Metadata",
+  "label_message": "Message",
+  "label_size": "Size",
+  "label_original-size": "Original Size",
+  "label_codec": "Codec",
+  "label_producerid": "ProducerID",
+  "label_seqno": "SeqNo",
+  "label_partition-id": "Partition ID: ",
+  "context_ts-diff": "Timestamp Write - Timestamp Create, ms",
+  "label_full-value": "Full value",
+  "label_from": "From: ",
+  "label_nothing-found": "Nothing found",
+  "description_nothing-found": "Make the filter less strict or start over",
+  "action_show-all": "Reset filter"
+}
