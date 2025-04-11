@@ -162,3 +162,131 @@ enum MeteringMode {
     /** Metering based on actual consumption. Default. */
     METERING_MODE_REQUEST_UNITS = 'METERING_MODE_REQUEST_UNITS',
 }
+
+export interface TopicDataRequest {
+    /** path of topic */
+    path: string;
+    /** database name */
+    database?: string;
+    /** partition to read from */
+    partition: string;
+    /** start offset to read from */
+    offset?: number;
+    /** min message timestamp to read from */
+    read_timestamp?: number;
+    /** max number of messages to read (default = 10) */
+    limit?: number;
+    /** timeout in ms */
+    timeout?: number;
+}
+
+export interface TopicDataResponse {
+    /**
+     * uint64
+     *
+     * Start offset of the returned data range
+     */
+    StartOffset?: string;
+
+    /**
+     * uint64
+     *
+     * End offset of the returned data range
+     */
+    EndOffset?: string;
+
+    /**
+     * Array of messages
+     */
+    Messages?: TopicMessage[];
+
+    /**
+     * Whether the response was truncated due to size limits
+     */
+    Truncated?: boolean;
+}
+
+export interface TopicMessage {
+    /**
+     * uint64
+     *
+     * Message offset in the partition
+     */
+    Offset?: string;
+
+    /**
+     * uint64
+     *
+     * Timestamp when the message was created
+     */
+    CreateTimestamp?: string;
+
+    /**
+     * uint64
+     *
+     * Timestamp when the message was written
+     */
+    WriteTimestamp?: string;
+
+    /**
+     * uint64
+     *
+     * Difference between write and create timestamps
+     */
+    TimestampDiff?: string;
+
+    /**
+     * Message content
+     */
+    Message?: string;
+
+    /**
+     * uint32
+     *
+     * Size of the message in storage
+     */
+    StorageSize?: number;
+
+    /**
+     * uint32
+     *
+     * Original size of the message before compression
+     */
+    OriginalSize?: number;
+
+    /**
+     * uint32
+     *
+     * Codec used for message compression
+     */
+    Codec?: number;
+
+    /**
+     * ID of the producer that created the message
+     */
+    ProducerId?: string;
+
+    /**
+     * uint64
+     *
+     * Sequence number
+     */
+    SeqNo?: string;
+
+    /**
+     * Message metadata
+     */
+    MessageMetadata?: TopicMessageMetadataItem[];
+}
+
+export interface TopicMessageMetadataItem {
+    /**
+     * Metadata key
+     */
+    Key?: string;
+
+    /**
+     * Metadata value
+     */
+    Value?: string;
+}

@@ -1,11 +1,43 @@
 /* eslint-disable camelcase */
-import {createSelector} from '@reduxjs/toolkit';
+import type {PayloadAction} from '@reduxjs/toolkit';
+import {createSelector, createSlice} from '@reduxjs/toolkit';
 
-import {convertBytesObjectToSpeed} from '../../utils/bytesParsers';
-import {parseLag, parseTimestampToIdleTime} from '../../utils/timeParsers';
-import type {RootState} from '../defaultStore';
+import {convertBytesObjectToSpeed} from '../../../utils/bytesParsers';
+import {parseLag, parseTimestampToIdleTime} from '../../../utils/timeParsers';
+import type {RootState} from '../../defaultStore';
+import {api} from '../api';
 
-import {api} from './api';
+import type {TopicDataFilterValue} from './types';
+
+const initialState: {
+    selectedPartition?: string;
+    topicDataFilter: TopicDataFilterValue;
+    selectedOffset?: number;
+    startTimestamp?: number;
+} = {topicDataFilter: 'TIMESTAMP'};
+
+const slice = createSlice({
+    name: 'topic',
+    initialState,
+    reducers: {
+        setSelectedPartition: (state, action: PayloadAction<string | undefined>) => {
+            state.selectedPartition = action.payload;
+        },
+        setTopicDataFilter: (state, action: PayloadAction<TopicDataFilterValue>) => {
+            state.topicDataFilter = action.payload;
+        },
+        setSelectedOffset: (state, action: PayloadAction<number | undefined>) => {
+            state.selectedOffset = action.payload;
+        },
+        setStartTimestamp: (state, action: PayloadAction<number | undefined>) => {
+            state.startTimestamp = action.payload;
+        },
+    },
+});
+
+export const {setSelectedPartition, setTopicDataFilter, setSelectedOffset, setStartTimestamp} =
+    slice.actions;
+export default slice.reducer;
 
 export const topicApi = api.injectEndpoints({
     endpoints: (build) => ({

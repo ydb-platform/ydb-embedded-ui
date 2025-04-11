@@ -1,6 +1,13 @@
+import React from 'react';
+
+import {StringParam, useQueryParams} from 'use-query-params';
+
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import type {TenantDiagnosticsTab} from '../../../store/reducers/tenant/types';
 import {EPathType} from '../../../types/api/schema';
+import type {TenantQuery} from '../TenantPages';
+import {TenantTabsGroups, getTenantPath} from '../TenantPages';
+import {isDatabaseEntityType, isTopicEntityType} from '../utils/schema';
 
 type Page = {
     id: TenantDiagnosticsTab;
@@ -69,6 +76,10 @@ const partitions = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.partitions,
     title: 'Partitions',
 };
+const topicData = {
+    id: TENANT_DIAGNOSTICS_TABS_IDS.topicData,
+    title: 'Data',
+};
 
 const configs = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.configs,
@@ -103,7 +114,7 @@ const COLUMN_TABLE_PAGES = [overview, schema, topShards, nodes, tablets, describ
 const DIR_PAGES = [overview, topShards, nodes, describe];
 
 const CDC_STREAM_PAGES = [overview, consumers, partitions, nodes, tablets, describe];
-const TOPIC_PAGES = [overview, consumers, partitions, nodes, tablets, describe];
+const TOPIC_PAGES = [overview, consumers, partitions, topicData, nodes, tablets, describe];
 
 const EXTERNAL_DATA_SOURCE_PAGES = [overview, describe];
 const EXTERNAL_TABLE_PAGES = [overview, schema, describe];
@@ -139,10 +150,44 @@ const pathTypeToPages: Record<EPathType, Page[] | undefined> = {
     [EPathType.EPathTypeResourcePool]: DIR_PAGES,
 };
 
-export const getPagesByType = (type?: EPathType) => (type && pathTypeToPages[type]) || DIR_PAGES;
+export const getPagesByType = (
+    type?: EPathType,
+    options?: {hasFeatureFlags?: boolean; hasTopicData?: boolean; isTopLevel?: boolean},
+) => {
+    if (!type || !pathTypeToPages[type]) {
+        return DIR_PAGES;
+    }
+    let pages = pathTypeToPages[type];
+    if (isTopicEntityType(type) && !options?.hasTopicData) {
+        return pages?.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.topicData);
+    }
+    if (isDatabaseEntityType(type) || options?.isTopLevel) {
+        pages = DATABASE_PAGES;
+        if (!options?.hasFeatureFlags) {
+            return pages.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.configs);
+        }
+    }
+    return pages;
+};
 
-export const getDataBasePages = ({hasFeatureFlags}: {hasFeatureFlags?: boolean}) => {
-    return hasFeatureFlags
-        ? DATABASE_PAGES
-        : DATABASE_PAGES.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.configs);
+export const useDiagnosticsPageLinkGetter = () => {
+    const [queryParams] = useQueryParams({
+        database: StringParam,
+        schema: StringParam,
+        backend: StringParam,
+        clusterName: StringParam,
+    });
+
+    const getLink = React.useCallback(
+        (tab: string, params?: TenantQuery) => {
+            return getTenantPath({
+                ...queryParams,
+                [TenantTabsGroups.diagnosticsTab]: tab,
+                ...params,
+            });
+        },
+        [queryParams],
+    );
+
+    return getLink;
 };

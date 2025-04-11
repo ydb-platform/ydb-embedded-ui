@@ -14,7 +14,7 @@ type AdditionalQueryParams = {
     backend?: string;
 };
 
-type TenantQuery = TenantQueryParams | AdditionalQueryParams;
+export type TenantQuery = TenantQueryParams | AdditionalQueryParams;
 
 export const TenantTabsGroups = {
     summaryTab: 'summaryTab',

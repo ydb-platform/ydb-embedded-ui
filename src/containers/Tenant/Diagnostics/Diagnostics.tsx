@@ -3,11 +3,13 @@ import React from 'react';
 import {Tabs} from '@gravity-ui/uikit';
 import {Helmet} from 'react-helmet-async';
 import {Link} from 'react-router-dom';
-import {StringParam, useQueryParams} from 'use-query-params';
 
 import {AutoRefreshControl} from '../../../components/AutoRefreshControl/AutoRefreshControl';
 import {DrawerContextProvider} from '../../../components/Drawer/DrawerContext';
-import {useFeatureFlagsAvailable} from '../../../store/reducers/capabilities/hooks';
+import {
+    useFeatureFlagsAvailable,
+    useTopicDataAvailable,
+} from '../../../store/reducers/capabilities/hooks';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../types/additionalProps';
@@ -20,19 +22,19 @@ import {Operations} from '../../Operations';
 import {PaginatedStorage} from '../../Storage/PaginatedStorage';
 import {Tablets} from '../../Tablets/Tablets';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
-import {TenantTabsGroups, getTenantPath} from '../TenantPages';
 import {isDatabaseEntityType} from '../utils/schema';
 
 import {Configs} from './Configs/Configs';
 import {Consumers} from './Consumers';
 import Describe from './Describe/Describe';
 import DetailedOverview from './DetailedOverview/DetailedOverview';
-import {getDataBasePages, getPagesByType} from './DiagnosticsPages';
+import {getPagesByType, useDiagnosticsPageLinkGetter} from './DiagnosticsPages';
 import {HotKeys} from './HotKeys/HotKeys';
 import {NetworkWrapper} from './Network/NetworkWrapper';
 import {Partitions} from './Partitions/Partitions';
 import {TopQueries} from './TopQueries';
 import {TopShards} from './TopShards';
+import {TopicData} from './TopicData/TopicData';
 
 import './Diagnostics.scss';
 
@@ -54,18 +56,17 @@ function Diagnostics(props: DiagnosticsProps) {
         (state) => state.tenant,
     );
 
-    const [queryParams] = useQueryParams({
-        database: StringParam,
-        schema: StringParam,
-        backend: StringParam,
-        clusterName: StringParam,
-    });
+    const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
 
     const tenantName = isDatabaseEntityType(props.type) ? props.path : props.tenantName;
-    const isDatabase = isDatabaseEntityType(props.type) || props.path === props.tenantName;
 
     const hasFeatureFlags = useFeatureFlagsAvailable();
-    const pages = isDatabase ? getDataBasePages({hasFeatureFlags}) : getPagesByType(props.type);
+    const hasTopicData = useTopicDataAvailable();
+    const pages = getPagesByType(props.type, {
+        hasFeatureFlags,
+        hasTopicData,
+        isTopLevel: props.path === props.tenantName,
+    });
     let activeTab = pages.find((el) => el.id === diagnosticsTab);
     if (!activeTab) {
         activeTab = pages[0];
@@ -142,6 +143,9 @@ function Diagnostics(props: DiagnosticsProps) {
             case TENANT_DIAGNOSTICS_TABS_IDS.partitions: {
                 return <Partitions path={path} database={tenantName} />;
             }
+            case TENANT_DIAGNOSTICS_TABS_IDS.topicData: {
+                return <TopicData path={path} database={tenantName} parentRef={containerRef} />;
+            }
             case TENANT_DIAGNOSTICS_TABS_IDS.configs: {
                 return <Configs database={tenantName} />;
             }
@@ -162,10 +166,7 @@ function Diagnostics(props: DiagnosticsProps) {
                         items={pages}
                         activeTab={activeTab?.id}
                         wrapTo={({id}, node) => {
-                            const path = getTenantPath({
-                                ...queryParams,
-                                [TenantTabsGroups.diagnosticsTab]: id,
-                            });
+                            const path = getDiagnosticsPageLink(id);
 
                             return (
                                 <Link to={path} key={id} className={b('tab')}>
