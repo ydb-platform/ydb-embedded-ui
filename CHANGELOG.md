@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.22.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.21.0...v8.22.0) (2025-04-11)
+
+
+### Features
+
+* **Tenants:** correct links with relative path in balancer ([#2125](https://github.com/ydb-platform/ydb-embedded-ui/issues/2125)) ([f427375](https://github.com/ydb-platform/ydb-embedded-ui/commit/f42737575b20f3cdf80af98e80f43666443bedd3))
+
 ## [8.21.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.20.1...v8.21.0) (2025-04-09)
 
 
