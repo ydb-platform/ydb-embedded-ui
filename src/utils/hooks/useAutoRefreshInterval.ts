@@ -13,35 +13,36 @@ export function useAutoRefreshInterval(): [number, (value: number) => void] {
 
     const lastHiddenTimeRef = React.useRef<number | null>(null);
 
-    const handleVisibilityChange = React.useCallback(() => {
-        const isVisible = document.visibilityState === 'visible';
-
-        if (isVisible) {
-            // If more than settingValue milliseconds have passed since the page was hidden,
-            // trigger an immediate update
-            const shouldTriggerImmediate =
-                lastHiddenTimeRef.current &&
-                settingValue !== DISABLED_INTERVAL &&
-                Date.now() - lastHiddenTimeRef.current >= settingValue;
-
-            if (shouldTriggerImmediate) {
-                setEffectiveInterval(IMMEDIATE_UPDATE_INTERVAL);
-
-                setTimeout(() => {
-                    setEffectiveInterval(settingValue);
-                }, 0);
-            }
-
-            lastHiddenTimeRef.current = null;
-        } else {
-            lastHiddenTimeRef.current = Date.now();
-        }
-    }, [settingValue]);
-
     React.useEffect(() => {
+        setEffectiveInterval(settingValue);
+
+        const handleVisibilityChange = () => {
+            const isVisible = document.visibilityState === 'visible';
+            if (isVisible) {
+                // If more than settingValue milliseconds have passed since the page was hidden,
+                // trigger an immediate update
+                const shouldTriggerImmediate =
+                    lastHiddenTimeRef.current &&
+                    settingValue !== DISABLED_INTERVAL &&
+                    Date.now() - lastHiddenTimeRef.current >= settingValue;
+
+                if (shouldTriggerImmediate) {
+                    setEffectiveInterval(IMMEDIATE_UPDATE_INTERVAL);
+
+                    setTimeout(() => {
+                        setEffectiveInterval(settingValue);
+                    }, 0);
+                }
+
+                lastHiddenTimeRef.current = null;
+            } else {
+                lastHiddenTimeRef.current = Date.now();
+            }
+        };
+
         document.addEventListener('visibilitychange', handleVisibilityChange);
         return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-    }, [handleVisibilityChange]);
+    }, [settingValue]);
 
     return [effectiveInterval, setSettingValue];
 }
