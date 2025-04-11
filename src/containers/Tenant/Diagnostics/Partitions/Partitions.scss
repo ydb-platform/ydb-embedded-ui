@@ -5,11 +5,12 @@
     flex-grow: 1;
 
     height: 100%;
+    margin-right: -20px;
 
     @include mixins.flex-container();
 
     &__controls {
-        @include mixins.controls();
+        width: 100%;
     }
 
     &__consumer-select {
@@ -28,17 +29,6 @@
         &_general {
             width: 280px;
         }
-    }
-
-    &__table-wrapper {
-        overflow: auto;
-        @include mixins.flex-container();
-    }
-
-    &__table-content {
-        overflow: auto;
-
-        height: 100%;
     }
 
     &__table {

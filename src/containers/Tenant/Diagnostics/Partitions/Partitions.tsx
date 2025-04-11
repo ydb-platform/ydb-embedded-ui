@@ -5,9 +5,10 @@ import {skipToken} from '@reduxjs/toolkit/query';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
+import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {nodesListApi, selectNodesMap} from '../../../../store/reducers/nodesList';
 import {partitionsApi, setSelectedConsumer} from '../../../../store/reducers/partitions/partitions';
-import {selectConsumersNames, topicApi} from '../../../../store/reducers/topic';
+import {selectConsumersNames, topicApi} from '../../../../store/reducers/topic/topic';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS, PARTITIONS_HIDDEN_COLUMNS_KEY} from '../../../../utils/constants';
 import {
@@ -136,12 +137,15 @@ export const Partitions = ({path, database}: PartitionsProps) => {
     };
 
     return (
-        <div className={b()}>
-            <div className={b('controls')}>{renderControls()}</div>
-            {error ? <ResponseError error={error} /> : null}
-            <div className={b('table-wrapper')}>
-                <div className={b('table-content')}>{partitionsData ? renderContent() : null}</div>
-            </div>
-        </div>
+        <TableWithControlsLayout className={b()}>
+            <TableWithControlsLayout.Controls className={b('controls')}>
+                {renderControls()}
+            </TableWithControlsLayout.Controls>
+
+            <TableWithControlsLayout.Table>
+                {error ? <ResponseError error={error} /> : null}
+                {partitionsData ? renderContent() : null}
+            </TableWithControlsLayout.Table>
+        </TableWithControlsLayout>
     );
 };
