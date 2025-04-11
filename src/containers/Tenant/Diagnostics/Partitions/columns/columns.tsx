@@ -2,13 +2,16 @@ import type {Column} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
 
 import {EntityStatus} from '../../../../../components/EntityStatus/EntityStatus';
+import {MultilineTableHeader} from '../../../../../components/MultilineTableHeader/MultilineTableHeader';
 import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
+import {useTopicDataAvailable} from '../../../../../store/reducers/capabilities/hooks';
+import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {cn} from '../../../../../utils/cn';
 import {formatBytes, formatMsToUptime} from '../../../../../utils/dataFormatters/dataFormatters';
 import {isNumeric} from '../../../../../utils/utils';
 import {getDefaultNodePath} from '../../../../Node/NodePages';
+import {useDiagnosticsPageLinkGetter} from '../../DiagnosticsPages';
 import {
-    MultilineHeader,
     ReadLagsHeader,
     ReadSessionHeader,
     UncommitedMessagesHeader,
@@ -36,19 +39,22 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
     {
         name: PARTITIONS_COLUMNS_IDS.PARTITION_ID,
         header: (
-            <MultilineHeader
+            <MultilineTableHeader
                 title={PARTITIONS_COLUMNS_TITLES[PARTITIONS_COLUMNS_IDS.PARTITION_ID]}
             />
         ),
         sortAccessor: (row) => isNumeric(row.partitionId) && Number(row.partitionId),
         align: DataTable.LEFT,
-        render: ({row}) => row.partitionId,
+        render: ({row}) => <PartitionId id={row.partitionId} />,
     },
     {
         name: PARTITIONS_COLUMNS_IDS.STORE_SIZE,
         header: (
-            <MultilineHeader title={PARTITIONS_COLUMNS_TITLES[PARTITIONS_COLUMNS_IDS.STORE_SIZE]} />
+            <MultilineTableHeader
+                title={PARTITIONS_COLUMNS_TITLES[PARTITIONS_COLUMNS_IDS.STORE_SIZE]}
+            />
         ),
+        sortAccessor: (row) => isNumeric(row.storeSize) && Number(row.storeSize),
         align: DataTable.RIGHT,
         render: ({row}) => formatBytes(row.storeSize),
     },
@@ -137,7 +143,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
     {
         name: PARTITIONS_COLUMNS_IDS.START_OFFSET,
         header: (
-            <MultilineHeader
+            <MultilineTableHeader
                 title={PARTITIONS_COLUMNS_TITLES[PARTITIONS_COLUMNS_IDS.START_OFFSET]}
             />
         ),
@@ -148,7 +154,9 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
     {
         name: PARTITIONS_COLUMNS_IDS.END_OFFSET,
         header: (
-            <MultilineHeader title={PARTITIONS_COLUMNS_TITLES[PARTITIONS_COLUMNS_IDS.END_OFFSET]} />
+            <MultilineTableHeader
+                title={PARTITIONS_COLUMNS_TITLES[PARTITIONS_COLUMNS_IDS.END_OFFSET]}
+            />
         ),
         sortAccessor: (row) => isNumeric(row.endOffset) && Number(row.endOffset),
         align: DataTable.RIGHT,
@@ -157,7 +165,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
     {
         name: PARTITIONS_COLUMNS_IDS.COMMITED_OFFSET,
         header: (
-            <MultilineHeader
+            <MultilineTableHeader
                 title={PARTITIONS_COLUMNS_TITLES[PARTITIONS_COLUMNS_IDS.COMMITED_OFFSET]}
             />
         ),
@@ -180,7 +188,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
     {
         name: PARTITIONS_COLUMNS_IDS.READER_NAME,
         header: (
-            <MultilineHeader
+            <MultilineTableHeader
                 title={PARTITIONS_COLUMNS_TITLES[PARTITIONS_COLUMNS_IDS.READER_NAME]}
             />
         ),
@@ -196,7 +204,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
     {
         name: PARTITIONS_COLUMNS_IDS.PARTITION_HOST,
         header: (
-            <MultilineHeader
+            <MultilineTableHeader
                 title={PARTITIONS_COLUMNS_TITLES[PARTITIONS_COLUMNS_IDS.PARTITION_HOST]}
             />
         ),
@@ -217,7 +225,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
     {
         name: PARTITIONS_COLUMNS_IDS.CONNECTION_HOST,
         header: (
-            <MultilineHeader
+            <MultilineTableHeader
                 title={PARTITIONS_COLUMNS_TITLES[PARTITIONS_COLUMNS_IDS.CONNECTION_HOST]}
             />
         ),
@@ -244,3 +252,26 @@ export const generalColumns = allColumns.filter((column) => {
         column.name as (typeof generalPartitionColumnsIds)[number],
     );
 });
+
+interface PartitionIdProps {
+    id: string;
+}
+
+function PartitionId({id}: PartitionIdProps) {
+    const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
+    const topicDataAvailable = useTopicDataAvailable();
+
+    return (
+        <EntityStatus
+            name={id}
+            path={
+                topicDataAvailable
+                    ? getDiagnosticsPageLink(TENANT_DIAGNOSTICS_TABS_IDS.topicData, {
+                          selectedPartition: id,
+                      })
+                    : undefined
+            }
+            showStatus={false}
+        />
+    );
+}
