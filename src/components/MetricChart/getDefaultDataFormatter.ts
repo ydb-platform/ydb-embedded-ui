@@ -2,7 +2,7 @@ import {formatBytes} from '../../utils/bytesParsers';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {roundToPrecision} from '../../utils/dataFormatters/dataFormatters';
 import {formatToMs} from '../../utils/timeParsers';
-import {isNumeric} from '../../utils/utils';
+import {convertToNumber} from '../../utils/utils';
 
 import type {ChartDataType, ChartValue} from './types';
 
@@ -42,13 +42,4 @@ function formatChartValueToPercent(value: ChartValue) {
         return EMPTY_DATA_PLACEHOLDER;
     }
     return Math.round(convertToNumber(value) * 100) + '%';
-}
-
-// Numeric values expected, not numeric value should be displayd as 0
-function convertToNumber(value: unknown): number {
-    if (isNumeric(value)) {
-        return Number(value);
-    }
-
-    return 0;
 }
