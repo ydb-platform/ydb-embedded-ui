@@ -53,7 +53,7 @@ const ColumnSortIcon = ({sortOrder, sortable, defaultSortOrder}: ColumnSortIconP
     }
 };
 
-const columnAlignToHelpMarkPlacement: Record<AlignType, HelpMarkProps['placement']> = {
+const columnAlignToHelpMarkPlacement: Record<AlignType, Required<HelpMarkProps['placement']>> = {
     left: 'right',
     right: 'left',
     center: 'right',

@@ -2,7 +2,7 @@ import {cn} from '../../utils/cn';
 
 import './MultilineTableHeader.scss';
 
-const b = cn('ydb-mulitiline-table-header');
+const b = cn('ydb-multiline-table-header');
 
 interface MultilineTableHeaderProps {
     title?: string;
