@@ -5,24 +5,19 @@ import {RelativeDatePicker} from '@gravity-ui/date-components';
 import {dateTimeParse} from '@gravity-ui/date-utils';
 import type {TableColumnSetupItem} from '@gravity-ui/uikit';
 import {RadioButton, Select, TableColumnSetup} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
 import {DebouncedInput} from '../../../../../components/DebouncedInput/DebouncedInput';
 import {EntitiesCount} from '../../../../../components/EntitiesCount';
 import type {PreparedPartitionData} from '../../../../../store/reducers/partitions/types';
-import {
-    setSelectedOffset,
-    setSelectedPartition,
-    setStartTimestamp,
-    setTopicDataFilter,
-} from '../../../../../store/reducers/topic/topic';
-import {TopicDataFilterValues} from '../../../../../store/reducers/topic/types';
-import type {TopicDataFilterValue} from '../../../../../store/reducers/topic/types';
 import {formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
-import {useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
 import {prepareErrorMessage} from '../../../../../utils/prepareErrorMessage';
 import {convertToNumber} from '../../../../../utils/utils';
 import i18n from '../i18n';
+import {useTopicDataQueryParams} from '../useTopicDataQueryParams';
 import {b} from '../utils/constants';
+import {TopicDataFilterValues} from '../utils/types';
+import type {TopicDataFilterValue} from '../utils/types';
 
 interface TopicDataControlsProps {
     columnsToSelect: TableColumnSetupItem[];
@@ -46,9 +41,8 @@ export function TopicDataControls({
     partitionsLoading,
     partitionsError,
 }: TopicDataControlsProps) {
-    const dispatch = useTypedDispatch();
-
-    const {selectedPartition} = useTypedSelector((state) => state.topic);
+    const {selectedPartition, handleSelectedPartitionChange: handleSelectedPartitionParamChange} =
+        useTopicDataQueryParams();
 
     const partitionsToSelect = partitions?.map(({partitionId}) => ({
         content: partitionId,
@@ -57,13 +51,13 @@ export function TopicDataControls({
 
     const handleSelectedPartitionChange = React.useCallback(
         (value: string[]) => {
-            dispatch(setSelectedPartition(value[0]));
+            handleSelectedPartitionParamChange(value[0]);
         },
-        [dispatch],
+        [handleSelectedPartitionParamChange],
     );
 
     React.useEffect(() => {
-        if (partitions && partitions.length && selectedPartition === undefined) {
+        if (partitions && partitions.length && isNil(selectedPartition)) {
             handleSelectedPartitionChange([partitions[0].partitionId]);
         }
     }, [partitions, selectedPartition, handleSelectedPartitionChange]);
@@ -100,22 +94,26 @@ export function TopicDataControls({
 }
 
 function TopicDataStartControls() {
-    const dispatch = useTypedDispatch();
-    const {selectedOffset, startTimestamp, topicDataFilter} = useTypedSelector(
-        (state) => state.topic,
-    );
+    const {
+        selectedOffset,
+        startTimestamp,
+        topicDataFilter,
+        handleSelectedOffsetChange,
+        handleStartTimestampChange,
+        handleTopicDataFilterChange,
+    } = useTopicDataQueryParams();
 
     const onFilterChange = React.useCallback(
         (value: TopicDataFilterValue) => {
-            dispatch(setTopicDataFilter(value));
+            handleTopicDataFilterChange(value);
         },
-        [dispatch],
+        [handleTopicDataFilterChange],
     );
     const onStartOffsetChange = React.useCallback(
         (value: string) => {
-            dispatch(setSelectedOffset(convertToNumber(value)));
+            handleSelectedOffsetChange(convertToNumber(value));
         },
-        [dispatch],
+        [handleSelectedOffsetChange],
     );
     const handleFromTimestampChange = React.useCallback(
         (data: Value | null) => {
@@ -130,9 +128,9 @@ function TopicDataStartControls() {
                     newValue = absoluteValue ? absoluteValue.valueOf() : undefined;
                 }
             }
-            dispatch(setStartTimestamp(newValue));
+            handleStartTimestampChange(newValue);
         },
-        [dispatch],
+        [handleStartTimestampChange],
     );
 
     const startDateTime = dateTimeParse(Number(startTimestamp));
@@ -154,6 +152,8 @@ function TopicDataStartControls() {
                     label={i18n('label_from')}
                     placeholder={i18n('label_offset')}
                     type="number"
+                    debounce={600}
+                    autoFocus
                 />
             )}
             {topicDataFilter === 'TIMESTAMP' && (

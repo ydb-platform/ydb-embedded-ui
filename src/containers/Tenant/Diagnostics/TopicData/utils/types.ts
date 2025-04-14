@@ -1,4 +1,5 @@
-import type {TopicDataFilterValue} from '../../../../../store/reducers/topic/types';
+import {createEnumParam, withDefault} from 'use-query-params';
+
 import type {ValueOf} from '../../../../../types/common';
 
 export const TOPIC_DATA_COLUMNS_IDS = {
@@ -26,3 +27,20 @@ export interface TopicDataFilters {
     database: string;
     path: string;
 }
+
+export const TopicDataFilterValues = {
+    TIMESTAMP: 'By Timestamp',
+    OFFSET: 'By Offset',
+} as const;
+
+export type TopicDataFilterValue = keyof typeof TopicDataFilterValues;
+
+export const isValidTopicDataFilterValue = (value: string): value is TopicDataFilterValue => {
+    return Object.keys(TopicDataFilterValues).some((v) => v === value);
+};
+
+export const TopicDataFilterValueEnum = createEnumParam(['TIMESTAMP', 'OFFSET']);
+export const TopicDataFilterValueParam = withDefault<
+    TopicDataFilterValue | undefined | null,
+    'TIMESTAMP'
+>(TopicDataFilterValueEnum, 'TIMESTAMP');
