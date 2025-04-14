@@ -7,7 +7,7 @@ import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
 import {LagPopoverContent} from '../../../../../components/LagPopoverContent';
 import {Loader} from '../../../../../components/Loader';
 import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
-import {selectPreparedTopicStats, topicApi} from '../../../../../store/reducers/topic/topic';
+import {selectPreparedTopicStats, topicApi} from '../../../../../store/reducers/topic';
 import type {IPreparedTopicStats} from '../../../../../types/store/topic';
 import {cn} from '../../../../../utils/cn';
 import {formatBps, formatBytes} from '../../../../../utils/dataFormatters/dataFormatters';

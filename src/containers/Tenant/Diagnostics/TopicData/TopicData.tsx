@@ -5,9 +5,8 @@ import {NoSearchResults} from '@gravity-ui/illustrations';
 import type {RenderControls} from '../../../../components/PaginatedTable';
 import {ResizeablePaginatedTable} from '../../../../components/PaginatedTable';
 import {partitionsApi} from '../../../../store/reducers/partitions/partitions';
-import {setSelectedOffset, setStartTimestamp} from '../../../../store/reducers/topic/topic';
 import type {TopicMessageMetadataItem} from '../../../../types/api/topic';
-import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useAutoRefreshInterval} from '../../../../utils/hooks';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 import {renderPaginatedTableErrorMessage} from '../../../../utils/renderPaginatedTableErrorMessage';
 import {convertToNumber} from '../../../../utils/utils';
@@ -22,6 +21,7 @@ import {
 } from './columns/columns';
 import {generateTopicDataGetter} from './getData';
 import i18n from './i18n';
+import {useTopicDataQueryParams} from './useTopicDataQueryParams';
 import {
     TOPIC_DATA_COLUMNS_TITLES,
     TOPIC_DATA_COLUMNS_WIDTH_LS_KEY,
@@ -37,7 +37,6 @@ interface TopicDataProps {
 }
 
 export function TopicData({parentRef, path, database}: TopicDataProps) {
-    const dispatch = useTypedDispatch();
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const [startOffset, setStartOffset] = React.useState<number | undefined>(undefined);
     const [endOffset, setEndOffset] = React.useState<number | undefined>(undefined);
@@ -46,9 +45,14 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
     >(undefined);
     const [controlsKey, setControlsKey] = React.useState(0);
 
-    const {selectedPartition, selectedOffset, startTimestamp, topicDataFilter} = useTypedSelector(
-        (state) => state.topic,
-    );
+    const {
+        selectedPartition,
+        selectedOffset,
+        startTimestamp,
+        topicDataFilter,
+        handleSelectedOffsetChange,
+        handleStartTimestampChange,
+    } = useTopicDataQueryParams();
 
     const {
         data: partitions,
@@ -123,9 +127,12 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
         const hasFilters = selectedOffset || startTimestamp;
 
         const resetFilter = () => {
-            dispatch(setSelectedOffset(undefined));
-            dispatch(setStartTimestamp(undefined));
-            setControlsKey((prev) => prev + 1);
+            if (topicDataFilter === 'OFFSET') {
+                handleSelectedOffsetChange(undefined);
+            } else if (topicDataFilter === 'TIMESTAMP') {
+                handleStartTimestampChange(undefined);
+                setControlsKey((prev) => prev + 1);
+            }
         };
 
         return (

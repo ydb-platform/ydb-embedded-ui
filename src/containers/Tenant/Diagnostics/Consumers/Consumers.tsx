@@ -10,7 +10,7 @@ import {
     selectPreparedConsumersData,
     selectPreparedTopicStats,
     topicApi,
-} from '../../../../store/reducers/topic/topic';
+} from '../../../../store/reducers/topic';
 import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';

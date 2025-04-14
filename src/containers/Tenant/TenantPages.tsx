@@ -11,6 +11,7 @@ type AdditionalQueryParams = {
     database?: string;
     name?: string;
     backend?: string;
+    selectedPartition?: string;
 };
 
 export type TenantQuery = TenantQueryParams | AdditionalQueryParams;
