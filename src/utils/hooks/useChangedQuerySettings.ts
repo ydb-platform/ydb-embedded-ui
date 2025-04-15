@@ -14,7 +14,7 @@ export const useChangedQuerySettings = () => {
     const [lastQuerySettings] = useLastQueryExecutionSettings();
     const [currentQuerySettings] = useQueryExecutionSettings();
 
-    const changedLastExucutionSettings = lastQuerySettings
+    const changedLastExecutionSettings = lastQuerySettings
         ? getChangedQueryExecutionSettings(lastQuerySettings, DEFAULT_QUERY_SETTINGS)
         : [];
 
@@ -22,7 +22,9 @@ export const useChangedQuerySettings = () => {
         ? getChangedQueryExecutionSettings(currentQuerySettings, DEFAULT_QUERY_SETTINGS)
         : [];
 
-    const hasChangedLastExucutionSettings = changedLastExucutionSettings.length > 0;
+    const hasChangedImportantSettings =
+        changedLastExecutionSettings.includes('transactionMode') ||
+        changedLastExecutionSettings.includes('queryMode');
 
     const changedLastExecutionSettingsDescriptions = lastQuerySettings
         ? getChangedQueryExecutionSettingsDescription({
@@ -42,8 +44,7 @@ export const useChangedQuerySettings = () => {
         bannerLastClosedTimestamp &&
         Date.now() - bannerLastClosedTimestamp < WEEK_IN_SECONDS * 1000;
 
-    const isBannerShown = hasChangedLastExucutionSettings && !isClosedRecently;
-    const isIndicatorShown = hasChangedLastExucutionSettings && isClosedRecently;
+    const isBannerShown = hasChangedImportantSettings && !isClosedRecently;
 
     const closeBanner = () => setBannerLastClosedTimestamp(Date.now());
 
@@ -51,14 +52,13 @@ export const useChangedQuerySettings = () => {
 
     return {
         isBannerShown,
-        isIndicatorShown,
         closeBanner,
         resetBanner,
 
         changedCurrentSettings,
         changedCurrentSettingsDescriptions,
 
-        changedLastExucutionSettings,
+        changedLastExecutionSettings,
         changedLastExecutionSettingsDescriptions,
     };
 };
