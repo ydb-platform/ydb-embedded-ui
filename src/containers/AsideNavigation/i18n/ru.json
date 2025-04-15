@@ -12,7 +12,7 @@
   "account.login": "Войти",
   "account.logout": "Выйти",
 
-  "hotkeys.title": "Редактор запросов",
+  "hotkeys.title": "Быстрые клавиши",
   "hotkeys.execute-query": "Выполнить запрос",
   "hotkeys.execute-selected-query": "Выполнить выбранный запрос",
   "hotkeys.previous-query": "Предыдущий запрос",
