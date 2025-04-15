@@ -4,7 +4,7 @@ import {Flex, Hotkey, Icon, Link, List, Text} from '@gravity-ui/uikit';
 import {settingsManager} from '../../../services/settings';
 import {cn} from '../../../utils/cn';
 import {LANGUAGE_KEY} from '../../../utils/constants';
-import {SHORTCUTS_HOTKEY} from '../constants';
+import {SHORTCUTS_HOTKEY} from '../hooks/useHotkeysPanel';
 import i18n from '../i18n';
 
 import './InformationPopup.scss';

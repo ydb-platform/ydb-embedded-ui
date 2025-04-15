@@ -2,10 +2,8 @@ import React from 'react';
 
 import {CircleQuestion, Gear, Person} from '@gravity-ui/icons';
 import type {MenuItem} from '@gravity-ui/navigation';
-import {AsideHeader, FooterItem, HotkeysPanel} from '@gravity-ui/navigation';
-import {Hotkey} from '@gravity-ui/uikit';
+import {AsideHeader, FooterItem} from '@gravity-ui/navigation';
 import type {IconData} from '@gravity-ui/uikit';
-import hotkeys from 'hotkeys-js';
 import {useHistory} from 'react-router-dom';
 
 import {cn} from '../../utils/cn';
@@ -13,7 +11,7 @@ import {ASIDE_HEADER_COMPACT_KEY} from '../../utils/constants';
 import {useSetting} from '../../utils/hooks';
 
 import {InformationPopup} from './InformationPopup';
-import {HOTKEYS, SHORTCUTS_HOTKEY} from './constants';
+import {useHotkeysPanel} from './hooks/useHotkeysPanel';
 import i18n from './i18n';
 
 import userSecret from '../../assets/icons/user-secret.svg';
@@ -69,45 +67,6 @@ enum Panel {
     Hotkeys = 'Hotkeys',
 }
 
-/**
- * HotkeysPanelWrapper creates a render cycle separation between mounting and visibility change.
- * This is necessary for smooth animations as HotkeysPanel uses CSSTransition internally.
- *
- * When a component is both mounted and set to visible at once, CSSTransition can't
- * properly sequence its transition classes (panel → panel-active) because it's already active when mounted
- * and counts transition as it has already happened.
- * This wrapper ensures the component mounts first, then sets visible=true in a subsequent render cycle
- * to make transition actually happen.
- */
-function HotkeysPanelWrapper({
-    visiblePanel,
-    closePanel,
-}: {
-    visiblePanel?: Panel;
-    closePanel: () => void;
-}) {
-    const [visible, setVisible] = React.useState(false);
-
-    React.useEffect(() => {
-        setVisible(visiblePanel === Panel.Hotkeys);
-    }, [visiblePanel]);
-
-    return (
-        <HotkeysPanel
-            visible={visible}
-            hotkeys={HOTKEYS}
-            className={b('hotkeys-panel')}
-            title={
-                <div className={b('hotkeys-panel-title')}>
-                    {i18n('help-center.footer.shortcuts')}
-                    <Hotkey value={SHORTCUTS_HOTKEY} />
-                </div>
-            }
-            onClose={closePanel}
-        />
-    );
-}
-
 export function AsideNavigation(props: AsideNavigationProps) {
     const history = useHistory();
 
@@ -128,22 +87,15 @@ export function AsideNavigation(props: AsideNavigationProps) {
         setVisiblePanel(undefined);
     }, []);
 
+    const {renderPanel: renderHotkeysPanel} = useHotkeysPanel({
+        isPanelVisible: visiblePanel === Panel.Hotkeys,
+        closePanel,
+        openPanel: openHotkeysPanel,
+    });
+
     const renderInformationPopup = () => {
         return <InformationPopup onKeyboardShortcutsClick={openHotkeysPanel} />;
     };
-
-    React.useEffect(() => {
-        // Register hotkey for keyboard shortcuts
-        hotkeys(SHORTCUTS_HOTKEY, openHotkeysPanel);
-
-        // Add listener for custom event from Monaco editor
-        window.addEventListener('openKeyboardShortcutsPanel', openHotkeysPanel);
-
-        return () => {
-            hotkeys.unbind(SHORTCUTS_HOTKEY);
-            window.removeEventListener('openKeyboardShortcutsPanel', openHotkeysPanel);
-        };
-    }, [openHotkeysPanel]);
 
     return (
         <React.Fragment>
@@ -211,12 +163,7 @@ export function AsideNavigation(props: AsideNavigationProps) {
                         id: 'hotkeys',
                         visible: visiblePanel === Panel.Hotkeys,
                         keepMounted: true,
-                        content: (
-                            <HotkeysPanelWrapper
-                                visiblePanel={visiblePanel}
-                                closePanel={closePanel}
-                            />
-                        ),
+                        content: renderHotkeysPanel(),
                     },
                 ]}
                 onClosePanel={closePanel}
