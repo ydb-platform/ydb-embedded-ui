@@ -1,5 +1,13 @@
 # Changelog
 
+## [8.22.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.22.0...v8.22.1) (2025-04-15)
+
+
+### Bug Fixes
+
+* update autorefresh if more that autorefresh in inactive tab passed ([#2140](https://github.com/ydb-platform/ydb-embedded-ui/issues/2140)) ([c5bd2ac](https://github.com/ydb-platform/ydb-embedded-ui/commit/c5bd2ac759ae4729497106b258b20f529a471b7c))
+* useHotkeysPanel hook ([#2151](https://github.com/ydb-platform/ydb-embedded-ui/issues/2151)) ([08b39d1](https://github.com/ydb-platform/ydb-embedded-ui/commit/08b39d11d1d7b5a66993001867c7e4fb6df93fcb))
+
 ## [8.22.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.21.0...v8.22.0) (2025-04-11)
 
 
