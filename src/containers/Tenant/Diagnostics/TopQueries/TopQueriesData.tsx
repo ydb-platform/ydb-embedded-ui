@@ -17,6 +17,7 @@ import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks'
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 import {parseQueryErrorToString} from '../../../../utils/query';
 
+import {QueryDetailsDrawer} from './QueryDetailsDrawer';
 import {getTopQueriesColumns} from './columns/columns';
 import {
     DEFAULT_TOP_QUERIES_COLUMNS,
@@ -35,7 +36,6 @@ interface TopQueriesDataProps {
     tenantName: string;
     timeFrame: TimeFrame;
     renderQueryModeControl: () => React.ReactNode;
-    handleRowClick: (row: KeyValueRow) => void;
     handleTimeFrameChange: (value: string[]) => void;
     handleDateRangeChange: (value: DateRangeValues) => void;
     handleTextSearchUpdate: (text: string) => void;
@@ -45,11 +45,11 @@ export const TopQueriesData = ({
     tenantName,
     timeFrame,
     renderQueryModeControl,
-    handleRowClick,
     handleTimeFrameChange,
     handleDateRangeChange,
     handleTextSearchUpdate,
 }: TopQueriesDataProps) => {
+    const [selectedRow, setSelectedRow] = React.useState<KeyValueRow | null>(null);
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const filters = useTypedSelector((state) => state.executeTopQueries);
 
@@ -79,51 +79,62 @@ export const TopQueriesData = ({
         {pollingInterval: autoRefreshInterval},
     );
 
-    return (
-        <TableWithControlsLayout>
-            <TableWithControlsLayout.Controls>
-                {renderQueryModeControl()}
-                <Select
-                    options={TIME_FRAME_OPTIONS}
-                    value={[timeFrame]}
-                    onUpdate={handleTimeFrameChange}
-                />
-                <DateRange
-                    from={filters.from}
-                    to={filters.to}
-                    onChange={handleDateRangeChange}
-                    defaultValue={DEFAULT_TIME_FILTER_VALUE}
-                />
-                <Search
-                    value={filters.text}
-                    onChange={handleTextSearchUpdate}
-                    placeholder={i18n('filter.text.placeholder')}
-                    className={b('search')}
-                />
-                <TableColumnSetup
-                    popupWidth={200}
-                    items={columnsToSelect}
-                    showStatus
-                    onUpdate={setColumns}
-                    sortable={false}
-                />
-            </TableWithControlsLayout.Controls>
+    const handleRowClick = (row: KeyValueRow) => {
+        setSelectedRow(row);
+    };
 
-            {error ? <ResponseError error={parseQueryErrorToString(error)} /> : null}
-            <TableWithControlsLayout.Table loading={isLoading}>
-                <ResizeableDataTable
-                    emptyDataMessage={i18n('no-data')}
-                    columnsWidthLSKey={TOP_QUERIES_COLUMNS_WIDTH_LS_KEY}
-                    columns={columnsToShow}
-                    data={data?.resultSets?.[0].result || []}
-                    loading={isFetching && currentData === undefined}
-                    settings={TOP_QUERIES_TABLE_SETTINGS}
-                    onRowClick={handleRowClick}
-                    rowClassName={() => b('row')}
-                    sortOrder={tableSort}
-                    onSort={handleTableSort}
-                />
-            </TableWithControlsLayout.Table>
-        </TableWithControlsLayout>
+    const handleCloseDetails = () => {
+        setSelectedRow(null);
+    };
+
+    return (
+        <React.Fragment>
+            <TableWithControlsLayout>
+                <TableWithControlsLayout.Controls>
+                    {renderQueryModeControl()}
+                    <Select
+                        options={TIME_FRAME_OPTIONS}
+                        value={[timeFrame]}
+                        onUpdate={handleTimeFrameChange}
+                    />
+                    <DateRange
+                        from={filters.from}
+                        to={filters.to}
+                        onChange={handleDateRangeChange}
+                        defaultValue={DEFAULT_TIME_FILTER_VALUE}
+                    />
+                    <Search
+                        value={filters.text}
+                        onChange={handleTextSearchUpdate}
+                        placeholder={i18n('filter.text.placeholder')}
+                        className={b('search')}
+                    />
+                    <TableColumnSetup
+                        popupWidth={200}
+                        items={columnsToSelect}
+                        showStatus
+                        onUpdate={setColumns}
+                        sortable={false}
+                    />
+                </TableWithControlsLayout.Controls>
+
+                {error ? <ResponseError error={parseQueryErrorToString(error)} /> : null}
+                <TableWithControlsLayout.Table loading={isLoading}>
+                    <ResizeableDataTable
+                        emptyDataMessage={i18n('no-data')}
+                        columnsWidthLSKey={TOP_QUERIES_COLUMNS_WIDTH_LS_KEY}
+                        columns={columnsToShow}
+                        data={data?.resultSets?.[0].result || []}
+                        loading={isFetching && currentData === undefined}
+                        settings={TOP_QUERIES_TABLE_SETTINGS}
+                        onRowClick={handleRowClick}
+                        rowClassName={() => b('row')}
+                        sortOrder={tableSort}
+                        onSort={handleTableSort}
+                    />
+                </TableWithControlsLayout.Table>
+            </TableWithControlsLayout>
+            <QueryDetailsDrawer row={selectedRow} onClose={handleCloseDetails} />
+        </React.Fragment>
     );
 };

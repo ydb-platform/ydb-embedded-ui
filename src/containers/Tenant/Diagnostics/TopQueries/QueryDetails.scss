@@ -5,15 +5,16 @@
     flex-direction: column;
 
     height: 100%;
-    padding: var(--g-spacing-5) var(--g-spacing-6);
 
-    color: var(--g-color-text-primary-invert);
+    color: var(--g-color-text-primary);
     background-color: var(--g-color-base-background-dark);
 
     &__header {
         display: flex;
         justify-content: space-between;
         align-items: center;
+
+        padding: var(--g-spacing-5) var(--g-spacing-6) 0 var(--g-spacing-6);
     }
 
     &__title {
@@ -32,11 +33,7 @@
         overflow: auto;
         flex: 1;
 
-        padding-top: var(--g-spacing-5);
-    }
-
-    &__query-section {
-        margin-top: 20px;
+        padding: var(--g-spacing-5) var(--g-spacing-4) var(--g-spacing-5) var(--g-spacing-6);
     }
 
     &__query-header {
@@ -44,7 +41,9 @@
         justify-content: space-between;
         align-items: center;
 
-        margin-bottom: 12px;
+        padding: var(--g-spacing-2) var(--g-spacing-3);
+
+        border-bottom: 1px solid var(--g-color-line-generic);
     }
 
     &__query-title {
@@ -57,6 +56,8 @@
 
         overflow: hidden;
 
+        margin-top: 20px;
+
         border-radius: 4px;
         background-color: var(--code-background-color);
 
@@ -65,26 +66,6 @@
             margin: 0 !important;
 
             background-color: transparent !important;
-        }
-    }
-
-    &__close-button {
-        color: var(--g-color-text-secondary-invert);
-
-        &:hover {
-            color: var(--g-color-text-primary-invert);
-        }
-    }
-
-    &__editor-button {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-
-        color: var(--g-color-text-secondary-invert);
-
-        &:hover {
-            color: var(--g-color-text-primary-invert);
         }
     }
 }
