@@ -5,7 +5,7 @@ import qs from 'qs';
 import type {QueryParamConfig} from 'use-query-params';
 import {StringParam} from 'use-query-params';
 
-import {backend, clusterName, webVersion} from './store';
+import {backend, basename, clusterName, webVersion} from './store';
 
 export const CLUSTERS = 'clusters';
 export const CLUSTER = 'cluster';
@@ -55,10 +55,15 @@ const prepareRoute = (route: string) => {
 
 type Query = AnyRecord;
 
+export interface CreateHrefOptions {
+    withBasename?: boolean;
+}
+
 export function createHref(
     route: string,
     params?: Record<string, string | number | undefined>,
     query: Query = {},
+    options: CreateHrefOptions = {},
 ) {
     let extendedQuery = query;
 
@@ -78,7 +83,14 @@ export function createHref(
 
     const preparedRoute = prepareRoute(route);
 
-    return `${compile(preparedRoute)(params)}${search}`;
+    const compiledRoute = `${compile(preparedRoute)(params)}${search}`;
+
+    if (options.withBasename) {
+        // For SPA links react-router adds basename itself
+        // It is needed for external links - <a> or uikit <Link>
+        return basename + compiledRoute;
+    }
+    return compiledRoute;
 }
 
 // embedded version could be located in some folder (e.g. host/some_folder/app_router_path)

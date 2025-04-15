@@ -67,10 +67,13 @@ export function TenantNameWrapper({tenant, additionalTenantsProps}: TenantNameWr
             status={tenant.Overall}
             infoPopoverContent={infoPopoverContent}
             hasClipboardButton
-            path={getTenantPath({
-                database: tenant.Name,
-                backend,
-            })}
+            path={getTenantPath(
+                {
+                    database: tenant.Name,
+                    backend,
+                },
+                {withBasename: isExternalLink},
+            )}
         />
     );
 }

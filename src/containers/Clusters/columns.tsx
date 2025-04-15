@@ -36,7 +36,7 @@ export const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
             const clusterPath =
                 useEmbeddedUi && backend
                     ? createDeveloperUIMonitoringPageHref(backend)
-                    : getClusterPath(undefined, {backend, clusterName});
+                    : getClusterPath(undefined, {backend, clusterName}, {withBasename: true});
 
             const clusterStatus = row.cluster?.Overall;
 
@@ -110,7 +110,11 @@ export const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
                 preparedVersions.length > 0 && (
                     <ExternalLink
                         className={b('cluster-versions')}
-                        href={getClusterPath(clusterTabsIds.versions, {backend, clusterName})}
+                        href={getClusterPath(
+                            clusterTabsIds.versions,
+                            {backend, clusterName},
+                            {withBasename: true},
+                        )}
                     >
                         <React.Fragment>
                             {preparedVersions.map((item, index) => (
