@@ -13,6 +13,6 @@ export async function wait<T = unknown>(time: number, value?: T): Promise<T | un
 }
 
 export function normalizePathSlashes(path: string) {
-    // Prevent multiple slashes when concatinating path parts
+    // Prevent multiple slashes when concatenating path parts
     return path.replaceAll(/([^:])(\/\/+)/g, '$1/');
 }
