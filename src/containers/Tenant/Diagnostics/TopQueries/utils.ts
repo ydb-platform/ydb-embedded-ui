@@ -16,7 +16,7 @@ import {
     getRunningQueriesColumnSortField,
     getTopQueriesColumnSortField,
 } from './columns/constants';
-import i18n from './i18n';
+import columnsI18n from './columns/i18n';
 
 export const TOP_QUERIES_TABLE_SETTINGS: Settings = {
     ...QUERY_TABLE_SETTINGS,
@@ -46,70 +46,70 @@ export function createQueryInfoItems(data: KeyValueRow): InfoViewerItem[] {
 
     if (data.QueryText) {
         items.push({
-            label: i18n('query-details.query-hash'),
+            label: columnsI18n('query-hash'),
             value: generateHash(String(data.QueryText)),
         });
     }
 
     if (data.CPUTimeUs !== undefined) {
         items.push({
-            label: i18n('query-details.cpu-time'),
+            label: columnsI18n('cpu-time'),
             value: formatToMs(parseUsToMs(data.CPUTimeUs ?? undefined)),
         });
     }
 
     if (data.Duration !== undefined) {
         items.push({
-            label: i18n('query-details.duration'),
+            label: columnsI18n('duration'),
             value: formatToMs(parseUsToMs(data.Duration ?? undefined)),
         });
     }
 
     if (data.ReadBytes !== undefined) {
         items.push({
-            label: i18n('query-details.read-bytes'),
+            label: columnsI18n('read-bytes'),
             value: formatNumber(data.ReadBytes),
         });
     }
 
     if (data.RequestUnits !== undefined) {
         items.push({
-            label: i18n('query-details.request-units'),
+            label: columnsI18n('request-units'),
             value: formatNumber(data.RequestUnits),
         });
     }
 
     if (data.EndTime) {
         items.push({
-            label: i18n('query-details.end-time'),
+            label: columnsI18n('end-time'),
             value: formatDateTime(new Date(data.EndTime as string).getTime()),
         });
     }
 
     if (data.ReadRows !== undefined) {
         items.push({
-            label: i18n('query-details.read-rows'),
+            label: columnsI18n('read-rows'),
             value: formatNumber(data.ReadRows),
         });
     }
 
     if (data.UserSID) {
         items.push({
-            label: i18n('query-details.user-sid'),
+            label: columnsI18n('user'),
             value: data.UserSID,
         });
     }
 
     if (data.ApplicationName) {
         items.push({
-            label: i18n('query-details.application-name'),
+            label: columnsI18n('application'),
             value: data.ApplicationName,
         });
     }
 
     if (data.QueryStartAt) {
         items.push({
-            label: i18n('query-details.query-start-at'),
+            label: columnsI18n('start-time'),
             value: formatDateTime(new Date(data.QueryStartAt as string).getTime()),
         });
     }
