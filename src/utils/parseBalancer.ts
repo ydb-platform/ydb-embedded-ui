@@ -1,3 +1,5 @@
+import {normalizePathSlashes} from '.';
+
 const protocolRegex = /^http[s]?:\/\//;
 const viewerPathnameRegex = /\/viewer\/json$/;
 
@@ -63,9 +65,7 @@ export function prepareBackendFromBalancer(rawBalancer: string) {
 
     // Use meta_backend if it is defined to form backend url
     if (window.meta_backend) {
-        const path = window.meta_backend + '/' + preparedBalancer;
-        // Prevent multiple slashes in case meta_backend ends with slash or balancer starts with slash
-        return path.replaceAll(/([^:])(\/\/+)/g, '$1/');
+        return normalizePathSlashes(`${window.meta_backend}/${preparedBalancer}`);
     }
 
     return preparedBalancer;

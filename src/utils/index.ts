@@ -11,3 +11,8 @@ export async function wait<T = unknown>(time: number, value?: T): Promise<T | un
         setTimeout(() => resolve(value), time);
     });
 }
+
+export function normalizePathSlashes(path: string) {
+    // Prevent multiple slashes when concatinating path parts
+    return path.replaceAll(/([^:])(\/\/+)/g, '$1/');
+}

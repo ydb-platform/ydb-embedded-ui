@@ -1,9 +1,9 @@
+import {normalizePathSlashes} from '../utils';
+
 export const getUrlData = ({
-    href,
     singleClusterMode,
     customBackend,
 }: {
-    href: string;
     singleClusterMode: boolean;
     customBackend?: string;
 }) => {
@@ -14,11 +14,13 @@ export const getUrlData = ({
 
     let basename = '';
 
-    if (basenamePrefix || folder) {
-        basename = basenamePrefix + '/' + folder;
+    if (folder && !basenamePrefix) {
+        basename = normalizePathSlashes(`/${folder}`);
+    } else if (folder && basenamePrefix) {
+        basename = normalizePathSlashes(`${basenamePrefix}/${folder}`);
     }
 
-    const urlSearchParams = new URL(href).searchParams;
+    const urlSearchParams = new URL(window.location.href).searchParams;
     const backend = urlSearchParams.get('backend') ?? undefined;
     const clusterName = urlSearchParams.get('clusterName') ?? undefined;
 

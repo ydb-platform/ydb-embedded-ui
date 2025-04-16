@@ -6,6 +6,7 @@ import type {QueryParamConfig} from 'use-query-params';
 import {StringParam} from 'use-query-params';
 
 import {backend, basename, clusterName, webVersion} from './store';
+import {normalizePathSlashes} from './utils';
 
 export const CLUSTERS = 'clusters';
 export const CLUSTER = 'cluster';
@@ -88,7 +89,7 @@ export function createHref(
     if (options.withBasename) {
         // For SPA links react-router adds basename itself
         // It is needed for external links - <a> or uikit <Link>
-        return basename + compiledRoute;
+        return normalizePathSlashes(`${basename}/${compiledRoute}`);
     }
     return compiledRoute;
 }

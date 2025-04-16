@@ -60,7 +60,6 @@ export function configureStore({
     api = new YdbEmbeddedAPI({webVersion, withCredentials: !customBackend}),
 } = {}) {
     ({backend, basename, clusterName} = getUrlData({
-        href: window.location.href,
         singleClusterMode,
         customBackend,
     }));
