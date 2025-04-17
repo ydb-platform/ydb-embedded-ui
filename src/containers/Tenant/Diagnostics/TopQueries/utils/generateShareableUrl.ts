@@ -1,3 +1,5 @@
+import type {SortOrder} from '@gravity-ui/react-data-table';
+
 import type {KeyValueRow} from '../../../../../types/api/query';
 
 import {getTopQueryRowQueryParams} from './getTopQueryRowQueryParams';
@@ -5,9 +7,10 @@ import {getTopQueryRowQueryParams} from './getTopQueryRowQueryParams';
 /**
  * Generates a shareable URL with query parameters for a top query row
  * @param row The top query row data
- * @returns A shareable URL string with the row's parameters encoded in the URL
+ * @param tableSort Optional sort configuration to include in the URL
+ * @returns A shareable URL string with the row's parameters and sort order encoded in the URL
  */
-export function generateShareableUrl(row: KeyValueRow): string {
+export function generateShareableUrl(row: KeyValueRow, tableSort?: SortOrder[]): string {
     const params = getTopQueryRowQueryParams(row);
 
     // Get current URL without query parameters
@@ -25,6 +28,7 @@ export function generateShareableUrl(row: KeyValueRow): string {
             intervalEnd: params.intervalEnd || undefined,
             endTime: params.endTime || undefined,
             queryHash: params.queryHash || undefined,
+            tableSort: tableSort || undefined, // Include the table sort order
         }),
     );
 

@@ -29,6 +29,7 @@ import {
     TOP_QUERIES_SELECTED_COLUMNS_LS_KEY,
 } from './columns/constants';
 import {DEFAULT_TIME_FILTER_VALUE, TIME_FRAME_OPTIONS} from './constants';
+import {useGetSelectedRowTableSort} from './hooks/useGetSelectedRowTableSort';
 import {useSetSelectedTopQueryRowFromParams} from './hooks/useSetSelectedTopQueryRowFromParams';
 import i18n from './i18n';
 import {TOP_QUERIES_TABLE_SETTINGS, useTopQueriesSort} from './utils';
@@ -73,7 +74,8 @@ export const TopQueriesData = ({
         REQUIRED_TOP_QUERIES_COLUMNS,
     );
 
-    const {tableSort, handleTableSort, backendSort} = useTopQueriesSort();
+    const initialTableSort = useGetSelectedRowTableSort();
+    const {tableSort, handleTableSort, backendSort} = useTopQueriesSort(initialTableSort);
     const {currentData, isFetching, isLoading, error} = topQueriesApi.useGetTopQueriesQuery(
         {
             database: tenantName,
@@ -95,10 +97,10 @@ export const TopQueriesData = ({
 
     const onCopyLink = React.useCallback(() => {
         if (selectedRow) {
-            const shareableUrl = generateShareableUrl(selectedRow);
+            const shareableUrl = generateShareableUrl(selectedRow, tableSort);
             navigator.clipboard.writeText(shareableUrl);
         }
-    }, [selectedRow]);
+    }, [selectedRow, tableSort]);
 
     const renderDrawerContent = React.useCallback(() => {
         if (!isDrawerVisible) {
