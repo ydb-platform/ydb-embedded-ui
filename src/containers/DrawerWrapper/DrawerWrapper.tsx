@@ -55,9 +55,9 @@ export const DrawerContentWrapper = ({
             }
         };
 
-        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('click', handleClickOutside);
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('click', handleClickOutside);
         };
     }, [isVisible, onClose, detectClickOutside]);
 
@@ -114,6 +114,11 @@ export const DrawerWrapper = ({
     className,
     detectClickOutside,
 }: DrawerWrapperProps) => {
+    React.useEffect(() => {
+        return () => {
+            onCloseDrawer();
+        };
+    }, [onCloseDrawer]);
     return (
         <React.Fragment>
             {children}

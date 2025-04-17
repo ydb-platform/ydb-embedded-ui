@@ -73,11 +73,6 @@ export const RunningQueriesData = ({
     const rows = data?.resultSets?.[0]?.result;
     const {handleRowSelect, selectedRow, hasSearchParams} = useRunningQueriesRowSelection(rows);
 
-    const handleRowClick = (row: KeyValueRow) => {
-        // Simply pass the row to handleRowSelect
-        handleRowSelect(row);
-    };
-
     const handleCloseDetails = React.useCallback(() => {
         handleRowSelect(null);
     }, [handleRowSelect]);
@@ -127,7 +122,7 @@ export const RunningQueriesData = ({
                         data={rows || []}
                         loading={isFetching && currentData === undefined}
                         settings={TOP_QUERIES_TABLE_SETTINGS}
-                        onRowClick={handleRowClick}
+                        onRowClick={handleRowSelect}
                         rowClassName={(row) => b('row', {active: row === selectedRow})}
                         sortOrder={tableSort}
                         onSort={handleTableSort}

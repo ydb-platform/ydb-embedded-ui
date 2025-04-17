@@ -54,7 +54,13 @@ export function useTopQueriesRowSelection(rows?: KeyValueRow[] | null) {
     const matchedRow = findMatchedQueryRow();
 
     const handleRowSelect = React.useCallback(
-        (row: KeyValueRow | null) => {
+        (
+            row: KeyValueRow | null,
+            _index?: number,
+            event?: React.MouseEvent<HTMLTableRowElement>,
+        ) => {
+            event?.stopPropagation();
+
             if (!row) {
                 setQueryParams(
                     {
