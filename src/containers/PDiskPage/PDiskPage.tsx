@@ -128,7 +128,7 @@ export function PDiskPage() {
     const handleAfterAction = () => {
         if (pDiskParamsDefined) {
             dispatch(
-                api.util.invalidateTags([{type: 'PDiskData', id: getPDiskId(nodeId, pDiskId)}]),
+                api.util.invalidateTags([{type: 'PDiskData', id: getPDiskId({nodeId, pDiskId})}]),
                 'StorageData',
             );
         }
@@ -168,7 +168,7 @@ export function PDiskPage() {
                 <EntityPageTitle
                     entityName={pDiskPageKeyset('pdisk')}
                     status={getSeverityColor(Severity)}
-                    id={getPDiskId(nodeId, pDiskId)}
+                    id={getPDiskId({nodeId, pDiskId})}
                 />
                 <DecommissionLabel decommission={DecommitStatus} />
             </div>
