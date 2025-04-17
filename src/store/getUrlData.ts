@@ -8,6 +8,7 @@ export const getUrlData = ({
     customBackend?: string;
 }) => {
     // UI could be located in "monitoring" or "ui" folders
+    // my-host:8765/some/path/monitoring/react-router-path or my-host:8765/some/path/ui/react-router-path
     const parsedPrefix = window.location.pathname.match(/.*(?=\/(monitoring|ui)\/)/) || [];
     const basenamePrefix = parsedPrefix.length > 0 ? parsedPrefix[0] : '';
     const folder = parsedPrefix.length > 1 ? parsedPrefix[1] : '';
