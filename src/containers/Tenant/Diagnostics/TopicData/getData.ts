@@ -2,7 +2,7 @@ import {isNil} from 'lodash';
 
 import type {FetchData} from '../../../../components/PaginatedTable';
 import type {TopicDataRequest, TopicMessage} from '../../../../types/api/topic';
-import {convertToNumber} from '../../../../utils/utils';
+import {safeParseNumber} from '../../../../utils/utils';
 
 import type {TopicDataFilters} from './utils/types';
 
@@ -71,19 +71,19 @@ export const generateTopicDataGetter = ({
 
         const {StartOffset, EndOffset, Messages = []} = response;
 
-        const start = convertToNumber(StartOffset);
-        const end = convertToNumber(EndOffset);
+        const start = safeParseNumber(StartOffset);
+        const end = safeParseNumber(EndOffset);
         //need to update start and end offsets every time data is fetched to show fresh data in parent component
         setStartOffset(start);
         setEndOffset(end);
 
         if (isNil(fromOffset)) {
-            fromOffset = Messages.length ? convertToNumber(Messages[0].Offset) : end;
+            fromOffset = Messages.length ? safeParseNumber(Messages[0].Offset) : end;
         }
 
         const normalizedOffset = fromOffset + tableOffset + lostOffsets;
         const lastMessageOffset = Messages.length
-            ? convertToNumber(Messages[Messages.length - 1].Offset)
+            ? safeParseNumber(Messages[Messages.length - 1].Offset)
             : 0;
 
         const quantity = end - fromOffset - lostOffsets;

@@ -1,6 +1,7 @@
 import {createEnumParam, withDefault} from 'use-query-params';
 
 import type {ValueOf} from '../../../../../types/common';
+import i18n from '../i18n';
 
 export const TOPIC_DATA_COLUMNS_IDS = {
     OFFSET: 'offset',
@@ -29,9 +30,13 @@ export interface TopicDataFilters {
 }
 
 export const TopicDataFilterValues = {
-    TIMESTAMP: 'By Timestamp',
-    OFFSET: 'By Offset',
-} as const;
+    get TIMESTAMP() {
+        return i18n('label_by-timestamp');
+    },
+    get OFFSET() {
+        return i18n('label_by-offset');
+    },
+};
 
 export type TopicDataFilterValue = keyof typeof TopicDataFilterValues;
 

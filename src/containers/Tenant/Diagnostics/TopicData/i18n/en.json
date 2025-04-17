@@ -17,5 +17,7 @@
   "label_from": "From: ",
   "label_nothing-found": "Nothing found",
   "description_nothing-found": "Make the filter less strict or start over",
-  "action_show-all": "Reset filter"
+  "action_show-all": "Reset filter",
+  "label_by-offset": "By offset",
+  "label_by-timestamp": "By timestamp"
 }

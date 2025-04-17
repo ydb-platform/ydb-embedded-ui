@@ -138,10 +138,7 @@ export const Partitions = ({path, database}: PartitionsProps) => {
 
     return (
         <TableWithControlsLayout className={b()}>
-            <TableWithControlsLayout.Controls className={b('controls')}>
-                {renderControls()}
-            </TableWithControlsLayout.Controls>
-
+            <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
             <TableWithControlsLayout.Table>
                 {error ? <ResponseError error={error} /> : null}
                 {partitionsData ? renderContent() : null}

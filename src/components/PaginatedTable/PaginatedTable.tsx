@@ -46,7 +46,7 @@ export const PaginatedTable = <T, F>({
     limit: chunkSize = DEFAULT_PAGINATION_LIMIT,
     initialEntitiesCount,
     fetchData,
-    filters,
+    filters: rawFilters,
     tableName,
     columns,
     getRowClassName,
@@ -78,6 +78,13 @@ export const PaginatedTable = <T, F>({
         chunkSize,
     });
 
+    // this prevent situation when filters are new, but active chunks is not yet recalculated (it will be done to the next rendrer, so we bring filters change on the next render too)
+    const [filters, setFilters] = React.useState(rawFilters);
+
+    React.useEffect(() => {
+        setFilters(rawFilters);
+    }, [rawFilters]);
+
     const lastChunkSize = React.useMemo(() => {
         // If foundEntities = 0, there will only first chunk
         // Display it with 1 row, to display empty data message
@@ -107,7 +114,7 @@ export const PaginatedTable = <T, F>({
         if (parentRef?.current) {
             parentRef.current.scrollTo(0, 0);
         }
-    }, [filters, initialFound, initialTotal, parentRef]);
+    }, [rawFilters, initialFound, initialTotal, parentRef]);
 
     const renderChunks = () => {
         return activeChunks.map((isActive, index) => (
