@@ -65,6 +65,7 @@ export enum TPDiskState {
     OpenFileError = 'OpenFileError',
     ChunkQuotaError = 'ChunkQuotaError',
     DeviceIoError = 'DeviceIoError',
+    Stopped = 'Stopped',
 
     // these can't be sent to UI
     Missing = 'Missing',

@@ -34,9 +34,9 @@ export const VDISK_STATE_SEVERITY: Record<EVDiskState, number> = {
 };
 
 export const PDISK_STATE_SEVERITY = {
-    [TPDiskState.Initial]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey,
     [TPDiskState.Normal]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green,
 
+    [TPDiskState.Initial]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
     [TPDiskState.InitialFormatRead]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
     [TPDiskState.InitialSysLogRead]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
     [TPDiskState.InitialCommonLogRead]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
@@ -50,4 +50,5 @@ export const PDISK_STATE_SEVERITY = {
     [TPDiskState.OpenFileError]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
     [TPDiskState.ChunkQuotaError]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
     [TPDiskState.DeviceIoError]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
+    [TPDiskState.Stopped]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
 };
