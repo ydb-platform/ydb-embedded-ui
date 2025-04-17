@@ -7,6 +7,7 @@ import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
+import {DrawerWrapper} from '../../../../containers/DrawerWrapper';
 import {topQueriesApi} from '../../../../store/reducers/executeTopQueries/executeTopQueries';
 import type {KeyValueRow} from '../../../../types/api/query';
 import {cn} from '../../../../utils/cn';
@@ -14,7 +15,7 @@ import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks'
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 import {parseQueryErrorToString} from '../../../../utils/query';
 
-import {QueryDetailsDrawer} from './QueryDetailsDrawer';
+import {QueryDetailsDrawerContent} from './QueryDetailsDrawerContent';
 import {getRunningQueriesColumns} from './columns/columns';
 import {
     DEFAULT_RUNNING_QUERIES_COLUMNS,
@@ -23,6 +24,7 @@ import {
     RUNNING_QUERIES_COLUMNS_WIDTH_LS_KEY,
     RUNNING_QUERIES_SELECTED_COLUMNS_LS_KEY,
 } from './columns/constants';
+import {useRunningQueriesRowSelection} from './hooks/useRunningQueriesRowSelection';
 import i18n from './i18n';
 import {TOP_QUERIES_TABLE_SETTINGS, useRunningQueriesSort} from './utils';
 
@@ -39,7 +41,6 @@ export const RunningQueriesData = ({
     renderQueryModeControl,
     handleTextSearchUpdate,
 }: RunningQueriesDataProps) => {
-    const [selectedRow, setSelectedRow] = React.useState<KeyValueRow | null>(null);
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const filters = useTypedSelector((state) => state.executeTopQueries);
 
@@ -69,16 +70,36 @@ export const RunningQueriesData = ({
             {pollingInterval: autoRefreshInterval},
         );
 
+    const rows = data?.resultSets?.[0]?.result;
+    const {handleRowSelect, selectedRow, hasSearchParams} = useRunningQueriesRowSelection(rows);
+
     const handleRowClick = (row: KeyValueRow) => {
-        setSelectedRow(row);
+        // Simply pass the row to handleRowSelect
+        handleRowSelect(row);
     };
 
-    const handleCloseDetails = () => {
-        setSelectedRow(null);
-    };
+    const handleCloseDetails = React.useCallback(() => {
+        handleRowSelect(null);
+    }, [handleRowSelect]);
+
+    const renderDrawerContent = React.useCallback(() => {
+        if (!hasSearchParams) {
+            return null;
+        }
+        return <QueryDetailsDrawerContent row={selectedRow} onClose={handleCloseDetails} />;
+    }, [hasSearchParams, selectedRow, handleCloseDetails]);
 
     return (
-        <React.Fragment>
+        <DrawerWrapper
+            isDrawerVisible={hasSearchParams && !isFetching}
+            onCloseDrawer={handleCloseDetails}
+            renderDrawerContent={renderDrawerContent}
+            drawerId="running-query-details"
+            storageKey="running-queries-drawer-width"
+            defaultWidth={600}
+            detectClickOutside
+            className={b('drawer-container')}
+        >
             <TableWithControlsLayout>
                 <TableWithControlsLayout.Controls>
                     {renderQueryModeControl()}
@@ -103,17 +124,16 @@ export const RunningQueriesData = ({
                         emptyDataMessage={i18n('no-data')}
                         columnsWidthLSKey={RUNNING_QUERIES_COLUMNS_WIDTH_LS_KEY}
                         columns={columnsToShow}
-                        data={data?.resultSets?.[0].result || []}
+                        data={rows || []}
                         loading={isFetching && currentData === undefined}
                         settings={TOP_QUERIES_TABLE_SETTINGS}
                         onRowClick={handleRowClick}
-                        rowClassName={() => b('row')}
+                        rowClassName={(row) => b('row', {active: row === selectedRow})}
                         sortOrder={tableSort}
                         onSort={handleTableSort}
                     />
                 </TableWithControlsLayout.Table>
             </TableWithControlsLayout>
-            <QueryDetailsDrawer row={selectedRow} onClose={handleCloseDetails} />
-        </React.Fragment>
+        </DrawerWrapper>
     );
 };
