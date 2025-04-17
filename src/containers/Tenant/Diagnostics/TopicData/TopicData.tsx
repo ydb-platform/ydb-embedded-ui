@@ -9,7 +9,7 @@ import type {TopicMessageMetadataItem} from '../../../../types/api/topic';
 import {useAutoRefreshInterval} from '../../../../utils/hooks';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 import {renderPaginatedTableErrorMessage} from '../../../../utils/renderPaginatedTableErrorMessage';
-import {convertToNumber} from '../../../../utils/utils';
+import {safeParseNumber} from '../../../../utils/utils';
 import {EmptyFilter} from '../../../Storage/EmptyFilter/EmptyFilter';
 
 import {FullValue} from './FullValue';
@@ -69,35 +69,21 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
         );
 
         if (selectedPartitionData) {
-            setStartOffset(convertToNumber(selectedPartitionData.startOffset));
-            setEndOffset(convertToNumber(selectedPartitionData.endOffset));
+            setStartOffset(safeParseNumber(selectedPartitionData.startOffset));
+            setEndOffset(safeParseNumber(selectedPartitionData.endOffset));
         }
     }, [selectedPartition, partitions]);
-
-    const numericSelectedOffset = React.useMemo(() => {
-        return convertToNumber(selectedOffset);
-    }, [selectedOffset]);
-    const numericStartTimestamp = React.useMemo(() => {
-        return convertToNumber(startTimestamp);
-    }, [startTimestamp]);
 
     const tableFilters = React.useMemo(() => {
         return {
             path,
             database,
             partition: selectedPartition ?? '',
-            selectedOffset: numericSelectedOffset,
-            startTimestamp: numericStartTimestamp,
+            selectedOffset: safeParseNumber(selectedOffset),
+            startTimestamp: safeParseNumber(startTimestamp),
             topicDataFilter,
         };
-    }, [
-        path,
-        database,
-        selectedPartition,
-        numericSelectedOffset,
-        numericStartTimestamp,
-        topicDataFilter,
-    ]);
+    }, [path, database, selectedPartition, selectedOffset, startTimestamp, topicDataFilter]);
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
         getAllColumns(setFullValue),
@@ -150,8 +136,6 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
         <React.Fragment>
             <FullValue value={fullValue} onClose={() => setFullValue(undefined)} />
             <ResizeablePaginatedTable
-                //if any filter change, we need to initiate a new table component to ensure correct start offset calculations in generateTopicDataGetter
-                key={topicDataFilter + selectedOffset + startTimestamp + selectedPartition}
                 columnsWidthLSKey={TOPIC_DATA_COLUMNS_WIDTH_LS_KEY}
                 parentRef={parentRef}
                 columns={columnsToShow}

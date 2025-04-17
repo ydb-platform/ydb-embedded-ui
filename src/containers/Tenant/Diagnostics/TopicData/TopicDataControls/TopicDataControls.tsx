@@ -12,7 +12,7 @@ import {EntitiesCount} from '../../../../../components/EntitiesCount';
 import type {PreparedPartitionData} from '../../../../../store/reducers/partitions/types';
 import {formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {prepareErrorMessage} from '../../../../../utils/prepareErrorMessage';
-import {convertToNumber} from '../../../../../utils/utils';
+import {safeParseNumber} from '../../../../../utils/utils';
 import i18n from '../i18n';
 import {useTopicDataQueryParams} from '../useTopicDataQueryParams';
 import {b} from '../utils/constants';
@@ -41,8 +41,12 @@ export function TopicDataControls({
     partitionsLoading,
     partitionsError,
 }: TopicDataControlsProps) {
-    const {selectedPartition, handleSelectedPartitionChange: handleSelectedPartitionParamChange} =
-        useTopicDataQueryParams();
+    const {
+        selectedPartition,
+        handleSelectedPartitionChange: handleSelectedPartitionParamChange,
+        handleSelectedOffsetChange,
+        handleStartTimestampChange,
+    } = useTopicDataQueryParams();
 
     const partitionsToSelect = partitions?.map(({partitionId}) => ({
         content: partitionId,
@@ -52,8 +56,14 @@ export function TopicDataControls({
     const handleSelectedPartitionChange = React.useCallback(
         (value: string[]) => {
             handleSelectedPartitionParamChange(value[0]);
+            handleSelectedOffsetChange(undefined);
+            handleStartTimestampChange(undefined);
         },
-        [handleSelectedPartitionParamChange],
+        [
+            handleSelectedPartitionParamChange,
+            handleStartTimestampChange,
+            handleSelectedOffsetChange,
+        ],
     );
 
     React.useEffect(() => {
@@ -87,7 +97,7 @@ export function TopicDataControls({
             />
             <EntitiesCount
                 label={i18n('label_offset')}
-                current={`${formatNumber(initialOffset)}—${formatNumber(endOffset)}`}
+                current={`${formatNumber(initialOffset)}—${formatNumber(endOffset - 1)}`}
             />
         </React.Fragment>
     );
@@ -111,7 +121,7 @@ function TopicDataStartControls() {
     );
     const onStartOffsetChange = React.useCallback(
         (value: string) => {
-            handleSelectedOffsetChange(convertToNumber(value));
+            handleSelectedOffsetChange(safeParseNumber(value));
         },
         [handleSelectedOffsetChange],
     );

@@ -99,10 +99,10 @@ export function toExponential(value: number, precision?: number) {
 export const UNBREAKABLE_GAP = '\xa0';
 
 // Numeric values expected, not numeric value should be displayd as 0
-export function convertToNumber(value: unknown): number {
+export function safeParseNumber(value: unknown, defaultValue = 0): number {
     if (isNumeric(value)) {
         return Number(value);
     }
 
-    return 0;
+    return defaultValue;
 }

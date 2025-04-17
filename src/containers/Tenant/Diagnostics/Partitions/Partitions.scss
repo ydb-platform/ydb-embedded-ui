@@ -5,13 +5,8 @@
     flex-grow: 1;
 
     height: 100%;
-    margin-right: -20px;
 
     @include mixins.flex-container();
-
-    &__controls {
-        width: 100%;
-    }
 
     &__consumer-select {
         width: 220px;
@@ -33,5 +28,6 @@
 
     &__table {
         @include mixins.freeze-nth-column(1);
+        // padding-right: 0;
     }
 }

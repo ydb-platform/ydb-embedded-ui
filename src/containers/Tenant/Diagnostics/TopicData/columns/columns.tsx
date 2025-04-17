@@ -3,6 +3,7 @@ import React from 'react';
 import DataTable from '@gravity-ui/react-data-table';
 import {isNil} from 'lodash';
 
+import {EntityStatus} from '../../../../../components/EntityStatus/EntityStatus';
 import {MultilineTableHeader} from '../../../../../components/MultilineTableHeader/MultilineTableHeader';
 import type {Column} from '../../../../../components/PaginatedTable';
 import type {TopicMessage, TopicMessageMetadataItem} from '../../../../../types/api/topic';
@@ -10,7 +11,7 @@ import {cn} from '../../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {formatBytes, formatTimestamp} from '../../../../../utils/dataFormatters/dataFormatters';
 import {formatToMs} from '../../../../../utils/timeParsers';
-import {convertToNumber} from '../../../../../utils/utils';
+import {safeParseNumber} from '../../../../../utils/utils';
 import i18n from '../i18n';
 import {TOPIC_DATA_COLUMNS_TITLES, codecNumberToName} from '../utils/constants';
 import type {TopicDataColumnId} from '../utils/types';
@@ -56,7 +57,7 @@ export function getAllColumns(setFullValue: (value: string | TopicMessageMetadat
             header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.TS_DIFF],
             align: DataTable.RIGHT,
             render: ({row}) => {
-                const numericValue = convertToNumber(row.TimestampDiff);
+                const numericValue = safeParseNumber(row.TimestampDiff);
                 return (
                     <span className={b('ts-diff', {danger: numericValue >= 100_000})}>
                         {formatToMs(numericValue)}
@@ -147,7 +148,9 @@ export function getAllColumns(setFullValue: (value: string | TopicMessageMetadat
             name: TOPIC_DATA_COLUMNS_IDS.PRODUCERID,
             header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.PRODUCERID],
             align: DataTable.LEFT,
-            render: ({row}) => valueOrPlaceholder(row.ProducerId),
+            render: ({row}) => (
+                <EntityStatus showStatus={false} name={row.ProducerId} hasClipboardButton />
+            ),
             width: 100,
         },
         {
