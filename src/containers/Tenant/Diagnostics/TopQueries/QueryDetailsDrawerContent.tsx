@@ -26,9 +26,14 @@ const b = cn('kv-top-queries');
 interface QueryDetailsDrawerContentProps {
     row: KeyValueRow | null;
     onClose: () => void;
+    onCopyLink?: () => void;
 }
 
-export const QueryDetailsDrawerContent = ({row, onClose}: QueryDetailsDrawerContentProps) => {
+export const QueryDetailsDrawerContent = ({
+    row,
+    onClose,
+    onCopyLink,
+}: QueryDetailsDrawerContentProps) => {
     const dispatch = useTypedDispatch();
     const location = useLocation();
     const history = useHistory();
@@ -58,6 +63,7 @@ export const QueryDetailsDrawerContent = ({row, onClose}: QueryDetailsDrawerCont
                 infoItems={createQueryInfoItems(row)}
                 onClose={onClose}
                 onOpenInEditor={handleOpenInEditor}
+                onCopyLink={onCopyLink}
             />
         );
     }

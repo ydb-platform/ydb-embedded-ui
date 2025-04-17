@@ -24,7 +24,6 @@ import {
     RUNNING_QUERIES_COLUMNS_WIDTH_LS_KEY,
     RUNNING_QUERIES_SELECTED_COLUMNS_LS_KEY,
 } from './columns/constants';
-import {useRunningQueriesRowSelection} from './hooks/useRunningQueriesRowSelection';
 import i18n from './i18n';
 import {TOP_QUERIES_TABLE_SETTINGS, useRunningQueriesSort} from './utils';
 
@@ -43,6 +42,9 @@ export const RunningQueriesData = ({
 }: RunningQueriesDataProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const filters = useTypedSelector((state) => state.executeTopQueries);
+    // Internal state for selected row
+    // null is reserved for not found state
+    const [selectedRow, setSelectedRow] = React.useState<KeyValueRow | null | undefined>(undefined);
 
     // Get columns for running queries
     const columns: Column<KeyValueRow>[] = React.useMemo(() => {
@@ -71,22 +73,35 @@ export const RunningQueriesData = ({
         );
 
     const rows = data?.resultSets?.[0]?.result;
-    const {handleRowSelect, selectedRow, hasSearchParams} = useRunningQueriesRowSelection(rows);
+
+    const isDrawerVisible = selectedRow !== undefined;
 
     const handleCloseDetails = React.useCallback(() => {
-        handleRowSelect(null);
-    }, [handleRowSelect]);
+        setSelectedRow(null);
+    }, [setSelectedRow]);
 
     const renderDrawerContent = React.useCallback(() => {
-        if (!hasSearchParams) {
+        if (!isDrawerVisible) {
             return null;
         }
         return <QueryDetailsDrawerContent row={selectedRow} onClose={handleCloseDetails} />;
-    }, [hasSearchParams, selectedRow, handleCloseDetails]);
+    }, [isDrawerVisible, selectedRow, handleCloseDetails]);
+
+    const onRowClick = React.useCallback(
+        (
+            row: KeyValueRow | null,
+            _index?: number,
+            event?: React.MouseEvent<HTMLTableRowElement>,
+        ) => {
+            event?.stopPropagation();
+            setSelectedRow(row);
+        },
+        [setSelectedRow],
+    );
 
     return (
         <DrawerWrapper
-            isDrawerVisible={hasSearchParams && !isFetching}
+            isDrawerVisible={isDrawerVisible && !isFetching}
             onCloseDrawer={handleCloseDetails}
             renderDrawerContent={renderDrawerContent}
             drawerId="running-query-details"
@@ -122,7 +137,7 @@ export const RunningQueriesData = ({
                         data={rows || []}
                         loading={isFetching && currentData === undefined}
                         settings={TOP_QUERIES_TABLE_SETTINGS}
-                        onRowClick={handleRowSelect}
+                        onRowClick={onRowClick}
                         rowClassName={(row) => b('row', {active: row === selectedRow})}
                         sortOrder={tableSort}
                         onSort={handleTableSort}

@@ -2,6 +2,7 @@ import React from 'react';
 
 import type {Column} from '@gravity-ui/react-data-table';
 import {Select, TableColumnSetup} from '@gravity-ui/uikit';
+import {isEqual} from 'lodash';
 
 import type {DateRangeValues} from '../../../../components/DateRange';
 import {DateRange} from '../../../../components/DateRange';
@@ -28,9 +29,10 @@ import {
     TOP_QUERIES_SELECTED_COLUMNS_LS_KEY,
 } from './columns/constants';
 import {DEFAULT_TIME_FILTER_VALUE, TIME_FRAME_OPTIONS} from './constants';
-import {useTopQueriesRowSelection} from './hooks/useTopQueriesRowSelection';
+import {useSetSelectedTopQueryRowFromParams} from './hooks/useSetSelectedTopQueryRowFromParams';
 import i18n from './i18n';
 import {TOP_QUERIES_TABLE_SETTINGS, useTopQueriesSort} from './utils';
+import {generateShareableUrl} from './utils/generateShareableUrl';
 
 const b = cn('kv-top-queries');
 
@@ -53,6 +55,9 @@ export const TopQueriesData = ({
 }: TopQueriesDataProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const filters = useTypedSelector((state) => state.executeTopQueries);
+    // Internal state for selected row
+    // null is reserved for not found state
+    const [selectedRow, setSelectedRow] = React.useState<KeyValueRow | null | undefined>(undefined);
 
     // Get columns for top queries
     const columns: Column<KeyValueRow>[] = React.useMemo(() => {
@@ -69,7 +74,7 @@ export const TopQueriesData = ({
     );
 
     const {tableSort, handleTableSort, backendSort} = useTopQueriesSort();
-    const {currentData, data, isFetching, isLoading, error} = topQueriesApi.useGetTopQueriesQuery(
+    const {currentData, isFetching, isLoading, error} = topQueriesApi.useGetTopQueriesQuery(
         {
             database: tenantName,
             filters,
@@ -79,23 +84,50 @@ export const TopQueriesData = ({
         {pollingInterval: autoRefreshInterval},
     );
 
-    const rows = data?.resultSets?.[0]?.result;
-    const {handleRowSelect, selectedRow, hasSearchParams} = useTopQueriesRowSelection(rows);
+    const rows = currentData?.resultSets?.[0]?.result;
+    useSetSelectedTopQueryRowFromParams(setSelectedRow, rows);
 
     const handleCloseDetails = React.useCallback(() => {
-        handleRowSelect(null);
-    }, [handleRowSelect]);
+        setSelectedRow(undefined);
+    }, [setSelectedRow]);
+
+    const isDrawerVisible = selectedRow !== undefined;
+
+    const onCopyLink = React.useCallback(() => {
+        if (selectedRow) {
+            const shareableUrl = generateShareableUrl(selectedRow);
+            navigator.clipboard.writeText(shareableUrl);
+        }
+    }, [selectedRow]);
 
     const renderDrawerContent = React.useCallback(() => {
-        if (!hasSearchParams) {
+        if (!isDrawerVisible) {
             return null;
         }
-        return <QueryDetailsDrawerContent row={selectedRow} onClose={handleCloseDetails} />;
-    }, [hasSearchParams, selectedRow, handleCloseDetails]);
+        return (
+            <QueryDetailsDrawerContent
+                row={selectedRow}
+                onClose={handleCloseDetails}
+                onCopyLink={onCopyLink}
+            />
+        );
+    }, [isDrawerVisible, selectedRow, handleCloseDetails, onCopyLink]);
+
+    const onRowClick = React.useCallback(
+        (
+            row: KeyValueRow | null,
+            _index?: number,
+            event?: React.MouseEvent<HTMLTableRowElement>,
+        ) => {
+            event?.stopPropagation();
+            setSelectedRow(row);
+        },
+        [setSelectedRow],
+    );
 
     return (
         <DrawerWrapper
-            isDrawerVisible={Boolean(hasSearchParams && !isFetching)}
+            isDrawerVisible={isDrawerVisible && !isFetching}
             onCloseDrawer={handleCloseDetails}
             renderDrawerContent={renderDrawerContent}
             drawerId="query-details"
@@ -142,8 +174,8 @@ export const TopQueriesData = ({
                         data={rows || []}
                         loading={isFetching && currentData === undefined}
                         settings={TOP_QUERIES_TABLE_SETTINGS}
-                        onRowClick={handleRowSelect}
-                        rowClassName={(row) => b('row', {active: row === selectedRow})}
+                        onRowClick={onRowClick}
+                        rowClassName={(row) => b('row', {active: isEqual(row, selectedRow)})}
                         sortOrder={tableSort}
                         onSort={handleTableSort}
                     />

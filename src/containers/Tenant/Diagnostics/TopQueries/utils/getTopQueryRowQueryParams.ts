@@ -1,6 +1,6 @@
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {generateHash} from '../../../../../utils/generateHash';
-import type {SearchParamsQueryParams} from '../hooks/useTopQueriesRowSelection';
+import type {SearchParamsQueryParams} from '../hooks/useSetSelectedTopQueryRowFromParams';
 
 /**
  * Extract query parameters from a row for use in URL search params

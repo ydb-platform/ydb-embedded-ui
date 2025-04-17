@@ -19,6 +19,7 @@ interface QueryDetailsProps {
     infoItems: InfoViewerItem[];
     onClose: () => void;
     onOpenInEditor: () => void;
+    onCopyLink?: () => void;
 }
 
 export const QueryDetails = ({
@@ -26,15 +27,33 @@ export const QueryDetails = ({
     infoItems,
     onClose,
     onOpenInEditor,
+    onCopyLink,
 }: QueryDetailsProps) => {
+    // Function to copy current URL to clipboard
+    const copyLinkToClipboard = (e: React.MouseEvent) => {
+        e.stopPropagation();
+
+        // If onCopyLink is provided, call it to generate and copy a shareable URL
+        // The actual copy to clipboard is handled in the parent component
+        if (onCopyLink) {
+            onCopyLink();
+        }
+    };
+
     return (
         <div className={b()}>
             <div className={b('header')}>
                 <div className={b('title')}>Query</div>
                 <div className={b('actions')}>
-                    <Button view="flat-secondary" onClick={onClose}>
-                        <Icon data={Link} size={16} />
-                    </Button>
+                    {onCopyLink && (
+                        <Button
+                            view="flat-secondary"
+                            onClick={copyLinkToClipboard}
+                            title={i18n('query-details.copy-link')}
+                        >
+                            <Icon data={Link} size={16} />
+                        </Button>
+                    )}
                     <EnableFullscreenButton />
                     <Button view="flat-secondary" onClick={onClose}>
                         <Icon data={Xmark} size={16} />
