@@ -87,7 +87,7 @@ export function prepareWhiteboardPDiskData(pdiskState: TPDiskStateInfo = {}): Pr
         ...restPDiskFields
     } = pdiskState;
 
-    const StringifiedId = getPDiskId(PDiskId, NodeId);
+    const StringifiedId = getPDiskId({nodeId: NodeId, pDiskId: PDiskId});
 
     const Type = getPDiskType(Category);
 

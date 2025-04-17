@@ -34,7 +34,13 @@ export function getColorSeverity(color?: EFlag) {
     return color ? DISK_COLOR_STATE_TO_NUMERIC_SEVERITY[color] : 0;
 }
 
-export function getPDiskId(nodeId?: string | number | null, pDiskId?: string | number | null) {
+export function getPDiskId({
+    nodeId,
+    pDiskId,
+}: {
+    nodeId?: string | number | null;
+    pDiskId?: string | number | null;
+}) {
     if (valueIsDefined(nodeId) && valueIsDefined(pDiskId)) {
         return `${nodeId}-${pDiskId}`;
     }

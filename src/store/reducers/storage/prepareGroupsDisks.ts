@@ -57,7 +57,8 @@ export function prepareGroupsPDisk(data: TStoragePDisk & {NodeId?: number} = {})
     };
 
     const StringifiedId =
-        bscPDisk.PDiskId || getPDiskId(mergedPDiskData.NodeId, mergedPDiskData.PDiskId);
+        bscPDisk.PDiskId ||
+        getPDiskId({nodeId: mergedPDiskData.NodeId, pDiskId: mergedPDiskData.PDiskId});
 
     const {AllocatedPercent, AllocatedSize, AvailableSize, TotalSize} = preparePDiskSizeFields({
         AvailableSize: mergedPDiskData.AvailableSize,

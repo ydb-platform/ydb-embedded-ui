@@ -57,7 +57,7 @@ export const pDiskApi = api.injectEndpoints({
                 'All',
                 {
                     type: 'PDiskData',
-                    id: getPDiskId(arg.nodeId, arg.pDiskId),
+                    id: getPDiskId({nodeId: arg.nodeId, pDiskId: arg.pDiskId}),
                 },
             ],
         }),
