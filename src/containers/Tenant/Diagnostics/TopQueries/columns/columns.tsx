@@ -152,7 +152,13 @@ export function getTenantOverviewTopQueriesColumns() {
     return [queryHashColumn, oneLineQueryTextColumn, cpuTimeUsColumn];
 }
 export function getRunningQueriesColumns() {
-    const columns = [userSIDColumn, queryStartColumn, queryTextColumn, applicationColumn];
+    const columns = [
+        queryHashColumn,
+        userSIDColumn,
+        queryStartColumn,
+        queryTextColumn,
+        applicationColumn,
+    ];
 
     return columns.map((column) => ({
         ...column,

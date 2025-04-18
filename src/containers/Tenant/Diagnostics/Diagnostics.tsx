@@ -13,6 +13,7 @@ import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../types/
 import type {EPathType} from '../../../types/api/schema';
 import {cn} from '../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
+import {Drawer} from '../../Drawer/Drawer';
 import {Heatmap} from '../../Heatmap';
 import {Nodes} from '../../Nodes/Nodes';
 import {Operations} from '../../Operations';
@@ -194,9 +195,11 @@ function Diagnostics(props: DiagnosticsProps) {
                 </Helmet>
             ) : null}
             {renderTabs()}
-            <div className={b('page-wrapper')} ref={containerRef}>
-                {renderTabContent()}
-            </div>
+            <Drawer.Container>
+                <div className={b('page-wrapper')} ref={containerRef}>
+                    {renderTabContent()}
+                </div>
+            </Drawer.Container>
         </div>
     );
 }

@@ -66,7 +66,8 @@ const getQueryText = (
         ReadBytes,
         UserSID,
         Duration,
-        RequestUnits
+        RequestUnits,
+        Rank
 FROM \`${tableName}\`
 WHERE ${filterConditions || 'true'} AND QueryText NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
 ${orderBy}
@@ -90,7 +91,8 @@ SELECT
     UserSID, 
     QueryStartAt, 
     Query as QueryText, 
-    ApplicationName
+    ApplicationName,
+    SessionId
 FROM \`.sys/query_sessions\`
 WHERE ${filterConditions || 'true'} AND Query NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
 AND QueryStartAt is not null ${orderBy}
