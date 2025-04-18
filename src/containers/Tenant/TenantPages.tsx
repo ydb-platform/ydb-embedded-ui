@@ -1,3 +1,4 @@
+import type {CreateHrefOptions} from '../../routes';
 import routes, {createHref} from '../../routes';
 import {TENANT_SUMMARY_TABS_IDS} from '../../store/reducers/tenant/constants';
 import type {paramSetup} from '../../store/state-url-mapping';
@@ -40,6 +41,6 @@ export const TENANT_SCHEMA_TAB = [
     },
 ];
 
-export const getTenantPath = (query: TenantQuery) => {
-    return createHref(routes.tenant, undefined, query);
+export const getTenantPath = (query: TenantQuery, options?: CreateHrefOptions) => {
+    return createHref(routes.tenant, undefined, query, options);
 };

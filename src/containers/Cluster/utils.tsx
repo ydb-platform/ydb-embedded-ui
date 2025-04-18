@@ -1,3 +1,4 @@
+import type {CreateHrefOptions} from '../../routes';
 import routes, {createHref} from '../../routes';
 import type {ValueOf} from '../../types/common';
 
@@ -44,6 +45,6 @@ export function isClusterTab(tab: any): tab is ClusterTab {
     return Object.values(clusterTabsIds).includes(tab);
 }
 
-export const getClusterPath = (activeTab?: ClusterTab, query = {}) => {
-    return createHref(routes.cluster, activeTab ? {activeTab} : undefined, query);
+export const getClusterPath = (activeTab?: ClusterTab, query = {}, options?: CreateHrefOptions) => {
+    return createHref(routes.cluster, activeTab ? {activeTab} : undefined, query, options);
 };
