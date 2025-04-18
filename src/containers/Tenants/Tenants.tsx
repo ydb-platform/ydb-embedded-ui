@@ -87,7 +87,9 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
     };
 
     const renderCreateDBButton = () => {
-        if (isCreateDBAvailable && clusterName) {
+        const buttonAvailable = isCreateDBAvailable && clusterName;
+
+        if (buttonAvailable && !loading) {
             return (
                 <Button
                     view="action"
