@@ -1,5 +1,21 @@
 # Changelog
 
+## [8.23.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.22.1...v8.23.0) (2025-04-18)
+
+
+### Features
+
+* enable basename for multi cluster version ([#2153](https://github.com/ydb-platform/ydb-embedded-ui/issues/2153)) ([91963b9](https://github.com/ydb-platform/ydb-embedded-ui/commit/91963b9e256be20682fbb0cbe9ae26b8d8f567a9))
+
+
+### Bug Fixes
+
+* display query settings banner for non-default api call or txmode ([#2152](https://github.com/ydb-platform/ydb-embedded-ui/issues/2152)) ([395efc7](https://github.com/ydb-platform/ydb-embedded-ui/commit/395efc718645762bf4b0ddf2b419035790bb94a1))
+* fix wrong pdisk id order ([#2170](https://github.com/ydb-platform/ydb-embedded-ui/issues/2170)) ([c840b21](https://github.com/ydb-platform/ydb-embedded-ui/commit/c840b21d3d95441202ac7a97472fc556c7b50d04))
+* **TableGroup:** prevent content border overflow ([#2166](https://github.com/ydb-platform/ydb-embedded-ui/issues/2166)) ([7cefb6d](https://github.com/ydb-platform/ydb-embedded-ui/commit/7cefb6d025c84cc3669cfa7704f7aaa199f6c077))
+* **Tenants:** show create DB button only when table is loaded ([#2175](https://github.com/ydb-platform/ydb-embedded-ui/issues/2175)) ([b82e029](https://github.com/ydb-platform/ydb-embedded-ui/commit/b82e029c9040fc2ead47353e3992ce2d35179970))
+* update PDisk errors colors ([#2171](https://github.com/ydb-platform/ydb-embedded-ui/issues/2171)) ([2bb7b2d](https://github.com/ydb-platform/ydb-embedded-ui/commit/2bb7b2dac480b080c4e730ebde6d50b0c930b5f0))
+
 ## [8.22.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.22.0...v8.22.1) (2025-04-15)
 
 
