@@ -77,7 +77,7 @@ export const RunningQueriesData = ({
     const isDrawerVisible = selectedRow !== undefined;
 
     const handleCloseDetails = React.useCallback(() => {
-        setSelectedRow(null);
+        setSelectedRow(undefined);
     }, [setSelectedRow]);
 
     const renderDrawerContent = React.useCallback(() => {

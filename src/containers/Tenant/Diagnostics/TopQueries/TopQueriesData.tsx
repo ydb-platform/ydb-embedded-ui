@@ -95,11 +95,11 @@ export const TopQueriesData = ({
 
     const isDrawerVisible = selectedRow !== undefined;
 
-    const onCopyLink = React.useCallback(() => {
+    const getTopQueryUrl = React.useCallback(() => {
         if (selectedRow) {
-            const shareableUrl = generateShareableUrl(selectedRow, tableSort);
-            navigator.clipboard.writeText(shareableUrl);
+            return generateShareableUrl(selectedRow, tableSort);
         }
+        return '';
     }, [selectedRow, tableSort]);
 
     const renderDrawerContent = React.useCallback(() => {
@@ -110,10 +110,10 @@ export const TopQueriesData = ({
             <QueryDetailsDrawerContent
                 row={selectedRow}
                 onClose={handleCloseDetails}
-                onCopyLink={onCopyLink}
+                getTopQueryUrl={getTopQueryUrl}
             />
         );
-    }, [isDrawerVisible, selectedRow, handleCloseDetails, onCopyLink]);
+    }, [isDrawerVisible, selectedRow, handleCloseDetails, getTopQueryUrl]);
 
     const onRowClick = React.useCallback(
         (
