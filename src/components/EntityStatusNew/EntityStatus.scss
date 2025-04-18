@@ -1,0 +1,10 @@
+.ydb-entity-status-new {
+    .g-help-mark__button {
+        color: inherit;
+    }
+
+    &_orange.g-label {
+        color: var(--g-color-private-orange-500);
+        background-color: var(--g-color-private-orange-100);
+    }
+}

@@ -74,10 +74,24 @@ export interface TClusterInfoV2 extends TClusterInfoV1 {
     CoresTotal?: number;
 }
 
-export type TClusterInfo = TClusterInfoV1 | TClusterInfoV2;
+export interface TClusterInfoV5 extends TClusterInfoV2 {
+    /** value is float */
+    NetworkUtilization?: number;
+    /** value is uint64 */
+    NetworkWriteThroughput?: string;
+}
+
+export type TClusterInfo = TClusterInfoV1 | TClusterInfoV2 | TClusterInfoV5;
 
 export function isClusterInfoV2(info?: TClusterInfo): info is TClusterInfoV2 {
-    return info
-        ? 'Version' in info && typeof info.Version === 'number' && info.Version >= 2
-        : false;
+    return isClusterParticularVersionOrHigher(info, 2);
+}
+export function isClusterInfoV5(info?: TClusterInfo): info is TClusterInfoV5 {
+    return isClusterParticularVersionOrHigher(info, 5);
+}
+
+function isClusterParticularVersionOrHigher(info: TClusterInfo | undefined, version: number) {
+    return Boolean(
+        info && 'Version' in info && typeof info.Version === 'number' && info.Version >= version,
+    );
 }

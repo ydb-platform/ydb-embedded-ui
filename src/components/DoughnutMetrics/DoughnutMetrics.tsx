@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type {TextProps} from '@gravity-ui/uikit';
-import {Text} from '@gravity-ui/uikit';
+import {Flex, HelpMark, Text} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 import type {ProgressStatus} from '../../utils/progress';
@@ -13,18 +13,23 @@ const b = cn('ydb-doughnut-metrics');
 interface LegendProps {
     children?: React.ReactNode;
     variant?: TextProps['variant'];
+    color?: TextProps['color'];
+    note?: React.ReactNode;
 }
 
-function Legend({children, variant = 'subheader-3'}: LegendProps) {
+function Legend({children, variant = 'subheader-3', color = 'primary', note}: LegendProps) {
     return (
-        <Text variant={variant} color="secondary" className={b('legend')}>
-            {children}
-        </Text>
+        <Flex gap={1} alignItems="center">
+            <Text variant={variant} color={color} className={b('legend')} as="div">
+                {children}
+            </Text>
+            {note && <HelpMark className={b('legend-note')}>{note}</HelpMark>}
+        </Flex>
     );
 }
 function Value({children, variant = 'subheader-2'}: LegendProps) {
     return (
-        <Text variant={variant} color="secondary" className={b('value')}>
+        <Text variant={variant} className={b('value')}>
             {children}
         </Text>
     );
@@ -38,19 +43,21 @@ interface DoughnutProps {
 }
 
 export function DoughnutMetrics({status, fillWidth, children, className}: DoughnutProps) {
-    let gradientFill = 'var(--g-color-line-generic-solid)';
-    let filledDegrees = fillWidth * 3.6 - 90;
+    let filledDegrees = fillWidth * 3.6;
+    let doughnutFillVar = 'var(--doughnut-color)';
+    let doughnutBackdropVar = 'var(--doughnut-backdrop-color)';
 
-    if (fillWidth > 50) {
-        gradientFill = 'var(--doughnut-color)';
-        filledDegrees = fillWidth * 3.6 + 90;
+    if (filledDegrees > 360) {
+        filledDegrees -= 360;
+        doughnutBackdropVar = 'var(--doughnut-color)';
+        doughnutFillVar = 'var(--doughnut-overlap-color)';
     }
-    const gradientDegrees = filledDegrees;
+
     return (
         <div className={b(null, className)}>
             <div
                 style={{
-                    backgroundImage: `linear-gradient(${gradientDegrees}deg, transparent 50%, ${gradientFill} 50%), linear-gradient(-90deg, var(--g-color-line-generic-solid) 50%, transparent 50%)`,
+                    background: `conic-gradient(${doughnutFillVar} 0deg ${filledDegrees}deg, ${doughnutBackdropVar} ${filledDegrees}deg 360deg)`,
                 }}
                 className={b('doughnut', {status})}
             >
