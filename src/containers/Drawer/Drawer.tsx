@@ -1,16 +1,34 @@
 import React from 'react';
 
-import {Drawer, DrawerItem} from '@gravity-ui/navigation';
+import {DrawerItem, Drawer as GravityDrawer} from '@gravity-ui/navigation';
 
 import {cn} from '../../utils/cn';
 
 const DEFAULT_DRAWER_WIDTH = 600;
 const DRAWER_WIDTH_KEY = 'drawer-width';
-const b = cn('ydb-drawer-wrapper');
+const b = cn('ydb-drawer');
 
-import './DrawerWrapper.scss';
+import './Drawer.scss';
 
-interface DrawerContentWrapperProps {
+interface ContainerProps {
+    children: React.ReactNode;
+    className?: string;
+}
+
+interface WrapperProps {
+    children: React.ReactNode;
+    renderDrawerContent: () => React.ReactNode;
+    isDrawerVisible: boolean;
+    onCloseDrawer: () => void;
+    drawerId?: string;
+    storageKey?: string;
+    defaultWidth?: number;
+    direction?: 'left' | 'right';
+    className?: string;
+    detectClickOutside?: boolean;
+}
+
+interface ContentWrapperProps {
     isVisible: boolean;
     onClose: () => void;
     children: React.ReactNode;
@@ -22,7 +40,7 @@ interface DrawerContentWrapperProps {
     detectClickOutside?: boolean;
 }
 
-export const DrawerContentWrapper = ({
+const ContentWrapper = ({
     isVisible,
     onClose,
     children,
@@ -32,7 +50,7 @@ export const DrawerContentWrapper = ({
     direction = 'right',
     className,
     detectClickOutside = false,
-}: DrawerContentWrapperProps) => {
+}: ContentWrapperProps) => {
     const [drawerWidth, setDrawerWidth] = React.useState(() => {
         const savedWidth = localStorage.getItem(storageKey);
         return savedWidth ? Number(savedWidth) : defaultWidth;
@@ -67,7 +85,7 @@ export const DrawerContentWrapper = ({
     };
 
     return (
-        <Drawer
+        <GravityDrawer
             onEscape={onClose}
             onVeilClick={onClose}
             hideVeil
@@ -85,55 +103,48 @@ export const DrawerContentWrapper = ({
             >
                 {children}
             </DrawerItem>
-        </Drawer>
+        </GravityDrawer>
     );
 };
 
-interface DrawerWrapperProps {
-    children: React.ReactNode;
-    renderDrawerContent: () => React.ReactNode;
-    isDrawerVisible: boolean;
-    onCloseDrawer: () => void;
-    drawerId?: string;
-    storageKey?: string;
-    defaultWidth?: number;
-    direction?: 'left' | 'right';
-    className?: string;
-    detectClickOutside?: boolean;
-}
+export const Drawer = {
+    Container: ({children, className}: ContainerProps) => {
+        return <div className={b('drawer-container', className)}>{children}</div>;
+    },
 
-export const DrawerWrapper = ({
-    children,
-    renderDrawerContent,
-    isDrawerVisible,
-    onCloseDrawer,
-    drawerId,
-    storageKey,
-    defaultWidth,
-    direction,
-    className,
-    detectClickOutside,
-}: DrawerWrapperProps) => {
-    React.useEffect(() => {
-        return () => {
-            onCloseDrawer();
-        };
-    }, [onCloseDrawer]);
-    return (
-        <React.Fragment>
-            {children}
-            <DrawerContentWrapper
-                isVisible={isDrawerVisible}
-                onClose={onCloseDrawer}
-                drawerId={drawerId}
-                storageKey={storageKey}
-                defaultWidth={defaultWidth}
-                direction={direction}
-                className={className}
-                detectClickOutside={detectClickOutside}
-            >
-                {renderDrawerContent()}
-            </DrawerContentWrapper>
-        </React.Fragment>
-    );
+    Wrapper: ({
+        children,
+        renderDrawerContent,
+        isDrawerVisible,
+        onCloseDrawer,
+        drawerId,
+        storageKey,
+        defaultWidth,
+        direction,
+        className,
+        detectClickOutside,
+    }: WrapperProps) => {
+        React.useEffect(() => {
+            return () => {
+                onCloseDrawer();
+            };
+        }, [onCloseDrawer]);
+        return (
+            <React.Fragment>
+                {children}
+                <ContentWrapper
+                    isVisible={isDrawerVisible}
+                    onClose={onCloseDrawer}
+                    drawerId={drawerId}
+                    storageKey={storageKey}
+                    defaultWidth={defaultWidth}
+                    direction={direction}
+                    className={className}
+                    detectClickOutside={detectClickOutside}
+                >
+                    {renderDrawerContent()}
+                </ContentWrapper>
+            </React.Fragment>
+        );
+    },
 };

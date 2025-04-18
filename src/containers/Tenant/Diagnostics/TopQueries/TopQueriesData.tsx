@@ -10,7 +10,6 @@ import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
-import {DrawerWrapper} from '../../../../containers/DrawerWrapper';
 import {topQueriesApi} from '../../../../store/reducers/executeTopQueries/executeTopQueries';
 import type {TimeFrame} from '../../../../store/reducers/executeTopQueries/types';
 import type {KeyValueRow} from '../../../../types/api/query';
@@ -18,6 +17,7 @@ import {cn} from '../../../../utils/cn';
 import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 import {parseQueryErrorToString} from '../../../../utils/query';
+import {Drawer} from '../../../Drawer/Drawer';
 
 import {QueryDetailsDrawerContent} from './QueryDetailsDrawerContent';
 import {getTopQueriesColumns} from './columns/columns';
@@ -128,7 +128,7 @@ export const TopQueriesData = ({
     );
 
     return (
-        <DrawerWrapper
+        <Drawer.Wrapper
             isDrawerVisible={isDrawerVisible}
             onCloseDrawer={handleCloseDetails}
             renderDrawerContent={renderDrawerContent}
@@ -136,7 +136,6 @@ export const TopQueriesData = ({
             storageKey="kv-top-queries-drawer-width"
             defaultWidth={600}
             detectClickOutside
-            className={b('drawer-container')}
         >
             <TableWithControlsLayout>
                 <TableWithControlsLayout.Controls>
@@ -183,6 +182,6 @@ export const TopQueriesData = ({
                     />
                 </TableWithControlsLayout.Table>
             </TableWithControlsLayout>
-        </DrawerWrapper>
+        </Drawer.Wrapper>
     );
 };
