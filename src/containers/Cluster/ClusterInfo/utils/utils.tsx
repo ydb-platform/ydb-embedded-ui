@@ -2,6 +2,7 @@ import React from 'react';
 
 import {Flex} from '@gravity-ui/uikit';
 
+import {EntityStatus} from '../../../../components/EntityStatusNew/EntityStatus';
 import {ProgressViewer} from '../../../../components/ProgressViewer/ProgressViewer';
 import {Tags} from '../../../../components/Tags';
 import {isClusterInfoV2} from '../../../../types/api/cluster';
@@ -10,7 +11,6 @@ import type {EFlag} from '../../../../types/api/enums';
 import type {InfoItem} from '../../../../types/components';
 import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
 import i18n from '../../i18n';
-import {NodesState} from '../components/NodesState/NodesState';
 import {b} from '../shared';
 
 const COLORS_PRIORITY: Record<EFlag, number> = {
@@ -26,7 +26,7 @@ const getDCInfo = (cluster: TClusterInfo) => {
     if (isClusterInfoV2(cluster) && cluster.MapDataCenters) {
         return Object.entries(cluster.MapDataCenters).map(([dc, count]) => (
             <React.Fragment key={dc}>
-                {dc}: {formatNumber(count)}
+                {dc} : {formatNumber(count)}
             </React.Fragment>
         ));
     }
@@ -42,9 +42,14 @@ export const getInfo = (cluster: TClusterInfo, additionalInfo: InfoItem[]) => {
         arrayNodesStates.sort((a, b) => COLORS_PRIORITY[b[0]] - COLORS_PRIORITY[a[0]]);
         const nodesStates = arrayNodesStates.map(([state, count]) => {
             return (
-                <NodesState state={state as EFlag} key={state}>
+                <EntityStatus.Label
+                    withStatusName={false}
+                    status={state as EFlag}
+                    size="s"
+                    key={state}
+                >
                     {formatNumber(count)}
-                </NodesState>
+                </EntityStatus.Label>
             );
         });
         info.push({

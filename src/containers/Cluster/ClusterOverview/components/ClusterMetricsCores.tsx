@@ -2,9 +2,9 @@ import {DoughnutMetrics} from '../../../../components/DoughnutMetrics/DoughnutMe
 import {formatNumber, formatNumericValues} from '../../../../utils/dataFormatters/dataFormatters';
 import i18n from '../../i18n';
 import type {ClusterMetricsCommonProps} from '../shared';
-import {useDiagramValues} from '../utils';
+import {getDiagramValues} from '../utils';
 
-import {ClusterMetricsCardDoughnut} from './ClusterMetricsCard';
+import {ClusterMetricsCardContent} from './ClusterMetricsCard';
 
 interface ClusterMetricsCoresProps extends ClusterMetricsCommonProps {}
 
@@ -15,20 +15,35 @@ function formatCoresLegend({value, capacity}: {value: number; capacity: number})
     } else {
         formatted = formatNumericValues(value, capacity, undefined, '', true);
     }
-    return `${formatted[0]} / ${formatted[1]}\n${i18n('context_cores')}`;
+    return `${formatted[0]} ${i18n('context_of')} ${formatted[1]} ${i18n('context_cores')}`;
 }
 
-export function ClusterMetricsCores({value, capacity, ...rest}: ClusterMetricsCoresProps) {
-    const {status, percents, legend, fill} = useDiagramValues({
+export function ClusterMetricsCores({
+    collapsed,
+    value,
+    capacity,
+    ...rest
+}: ClusterMetricsCoresProps) {
+    const {status, percents, legend, fill} = getDiagramValues({
         value,
         capacity,
         legendFormatter: formatCoresLegend,
         ...rest,
     });
+
     return (
-        <ClusterMetricsCardDoughnut status={status} fillWidth={fill} title={i18n('title_cpu')}>
-            <DoughnutMetrics.Legend>{legend}</DoughnutMetrics.Legend>
+        <ClusterMetricsCardContent
+            collapsed={collapsed}
+            status={status}
+            fillWidth={fill}
+            title={i18n('title_cpu')}
+            legend={{
+                main: legend,
+                secondary: i18n('context_cpu'),
+                note: i18n('context_cpu-description'),
+            }}
+        >
             <DoughnutMetrics.Value>{percents}</DoughnutMetrics.Value>
-        </ClusterMetricsCardDoughnut>
+        </ClusterMetricsCardContent>
     );
 }

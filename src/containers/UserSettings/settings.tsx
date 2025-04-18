@@ -12,6 +12,7 @@ import {
     INVERTED_DISKS_KEY,
     LANGUAGE_KEY,
     SHOW_DOMAIN_DATABASE_KEY,
+    SHOW_NETWORK_UTILIZATION,
     THEME_KEY,
     USE_CLUSTER_BALANCER_AS_BACKEND_KEY,
     USE_SHOW_PLAN_SVG_KEY,
@@ -134,6 +135,11 @@ export const enableQueryStreamingSetting: SettingProps = {
     description: i18n('settings.editor.queryStreaming.description'),
 };
 
+export const showNetworkUtilizationSetting: SettingProps = {
+    settingKey: SHOW_NETWORK_UTILIZATION,
+    title: i18n('settings.showNetworkUtilization.title'),
+};
+
 export const autocompleteOnEnterSetting: SettingProps = {
     settingKey: AUTOCOMPLETE_ON_ENTER,
     title: i18n('settings.editor.autocomplete-on-enter.title'),
@@ -160,7 +166,12 @@ export const appearanceSection: SettingsSection = {
 export const experimentsSection: SettingsSection = {
     id: 'experimentsSection',
     title: i18n('section.experiments'),
-    settings: [enableNetworkTable, useShowPlanToSvgTables, enableQueryStreamingSetting],
+    settings: [
+        enableNetworkTable,
+        useShowPlanToSvgTables,
+        enableQueryStreamingSetting,
+        showNetworkUtilizationSetting,
+    ],
 };
 
 export const devSettingsSection: SettingsSection = {
