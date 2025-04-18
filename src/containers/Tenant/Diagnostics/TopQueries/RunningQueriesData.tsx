@@ -101,7 +101,7 @@ export const RunningQueriesData = ({
 
     return (
         <DrawerWrapper
-            isDrawerVisible={isDrawerVisible && !isFetching}
+            isDrawerVisible={isDrawerVisible}
             onCloseDrawer={handleCloseDetails}
             renderDrawerContent={renderDrawerContent}
             drawerId="running-query-details"

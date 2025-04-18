@@ -129,7 +129,7 @@ export const TopQueriesData = ({
 
     return (
         <DrawerWrapper
-            isDrawerVisible={isDrawerVisible && !isFetching}
+            isDrawerVisible={isDrawerVisible}
             onCloseDrawer={handleCloseDetails}
             renderDrawerContent={renderDrawerContent}
             drawerId="query-details"
