@@ -1,39 +1,27 @@
 import React from 'react';
 
 import {Link} from '@gravity-ui/icons';
-import type {ButtonProps, CopyToClipboardProps, CopyToClipboardStatus} from '@gravity-ui/uikit';
+import type {ButtonProps, CopyToClipboardStatus} from '@gravity-ui/uikit';
 import {ActionTooltip, Button, CopyToClipboard, Icon} from '@gravity-ui/uikit';
 
-import {cn} from '../../../../utils/cn';
-
-import i18n from './i18n';
+import {cn} from '../../../../../utils/cn';
+import i18n from '../i18n';
 
 import './QueryDetails.scss';
 
 const b = cn('kv-query-details');
 
-export interface ClipboardButtonProps
-    extends Omit<CopyToClipboardProps, 'children'>,
-        Omit<ClipboardButtonComponentProps, 'status' | 'closeDelay' | 'onClick'> {}
-
-interface ClipboardButtonComponentProps
-    extends Omit<ButtonProps, 'href' | 'component' | 'target' | 'rel' | 'loading'> {
-    status: CopyToClipboardStatus;
-    closeDelay: number | undefined;
-    /** Disable tooltip. Tooltip won't be shown */
+interface LinkButtonComponentProps extends ButtonProps {
+    size?: ButtonProps['size'];
     hasTooltip?: boolean;
-    /** Text shown before copy */
-    tooltipInitialText?: string;
-    /** Text shown after copy */
-    tooltipSuccessText?: string;
-    /** Position of clipboard icon */
-    iconPosition?: 'start' | 'end';
+    status: CopyToClipboardStatus;
+    closeDelay?: number;
 }
 
 const DEFAULT_TIMEOUT = 1200;
 const TOOLTIP_ANIMATION = 200;
 
-const LinkButtonComponent = (props: ClipboardButtonComponentProps) => {
+const LinkButtonComponent = (props: LinkButtonComponentProps) => {
     const {size = 'm', hasTooltip = true, status, closeDelay, ...rest} = props;
 
     return (
@@ -55,7 +43,11 @@ const LinkButtonComponent = (props: ClipboardButtonComponentProps) => {
     );
 };
 
-export function CopyLinkButton(props: ClipboardButtonProps) {
+export interface CopyLinkButtonProps extends ButtonProps {
+    text: string;
+}
+
+export function CopyLinkButton(props: CopyLinkButtonProps) {
     const {text, ...buttonProps} = props;
 
     const timerIdRef = React.useRef<number>();

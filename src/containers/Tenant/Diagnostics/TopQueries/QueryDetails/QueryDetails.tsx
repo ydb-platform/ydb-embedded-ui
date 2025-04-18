@@ -3,14 +3,14 @@ import React from 'react';
 import {Code, Xmark} from '@gravity-ui/icons';
 import {Button, Icon} from '@gravity-ui/uikit';
 
-import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
-import type {InfoViewerItem} from '../../../../components/InfoViewer';
-import {InfoViewer} from '../../../../components/InfoViewer';
-import {YDBSyntaxHighlighter} from '../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
-import {cn} from '../../../../utils/cn';
+import Fullscreen from '../../../../../components/Fullscreen/Fullscreen';
+import type {InfoViewerItem} from '../../../../../components/InfoViewer';
+import {InfoViewer} from '../../../../../components/InfoViewer';
+import {YDBSyntaxHighlighter} from '../../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
+import {cn} from '../../../../../utils/cn';
+import i18n from '../i18n';
 
 import {CopyLinkButton} from './CopyLinkButton';
-import i18n from './i18n';
 
 import './QueryDetails.scss';
 

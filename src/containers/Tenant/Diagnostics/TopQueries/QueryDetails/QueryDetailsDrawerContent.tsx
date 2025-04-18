@@ -3,23 +3,23 @@ import React from 'react';
 import {Button, Icon, Text} from '@gravity-ui/uikit';
 import {useHistory, useLocation} from 'react-router-dom';
 
-import {parseQuery} from '../../../../routes';
-import {changeUserInput, setIsDirty} from '../../../../store/reducers/query/query';
+import {parseQuery} from '../../../../../routes';
+import {changeUserInput, setIsDirty} from '../../../../../store/reducers/query/query';
 import {
     TENANT_PAGE,
     TENANT_PAGES_IDS,
     TENANT_QUERY_TABS_ID,
-} from '../../../../store/reducers/tenant/constants';
-import type {KeyValueRow} from '../../../../types/api/query';
-import {cn} from '../../../../utils/cn';
-import {useTypedDispatch} from '../../../../utils/hooks';
-import {TenantTabsGroups, getTenantPath} from '../../TenantPages';
+} from '../../../../../store/reducers/tenant/constants';
+import type {KeyValueRow} from '../../../../../types/api/query';
+import {cn} from '../../../../../utils/cn';
+import {useTypedDispatch} from '../../../../../utils/hooks';
+import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
+import i18n from '../i18n';
+import {createQueryInfoItems} from '../utils';
 
 import {QueryDetails} from './QueryDetails';
-import i18n from './i18n';
-import {createQueryInfoItems} from './utils';
 
-import CryCatIcon from '../../../../assets/icons/cry-cat.svg';
+import CryCatIcon from '../../../../../assets/icons/cry-cat.svg';
 
 const b = cn('kv-top-queries');
 

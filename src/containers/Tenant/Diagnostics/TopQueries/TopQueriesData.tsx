@@ -19,7 +19,7 @@ import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 import {parseQueryErrorToString} from '../../../../utils/query';
 import {Drawer} from '../../../Drawer/Drawer';
 
-import {QueryDetailsDrawerContent} from './QueryDetailsDrawerContent';
+import {QueryDetailsDrawerContent} from './QueryDetails/QueryDetailsDrawerContent';
 import {getTopQueriesColumns} from './columns/columns';
 import {
     DEFAULT_TOP_QUERIES_COLUMNS,
