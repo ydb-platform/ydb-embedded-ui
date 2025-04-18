@@ -6,7 +6,8 @@ import {Redirect, Route, Switch, useRouteMatch} from 'react-router-dom';
 import {StringParam, useQueryParams} from 'use-query-params';
 
 import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
-import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
+import {EntityStatus} from '../../components/EntityStatusNew/EntityStatus';
+import {EFlagToDescription} from '../../components/EntityStatusNew/utils';
 import {InternalLink} from '../../components/InternalLink';
 import routes, {getLocationObjectFromHref} from '../../routes';
 import {useClusterDashboardAvailable} from '../../store/reducers/capabilities/hooks';
@@ -23,6 +24,7 @@ import type {
     AdditionalNodesProps,
     AdditionalTenantsProps,
 } from '../../types/additionalProps';
+import {EFlag} from '../../types/api/enums';
 import {cn} from '../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {Nodes} from '../Nodes/Nodes';
@@ -31,8 +33,7 @@ import {TabletsTable} from '../Tablets/TabletsTable';
 import {Tenants} from '../Tenants/Tenants';
 import {VersionsContainer} from '../Versions/Versions';
 
-import {ClusterDashboard} from './ClusterDashboard/ClusterDashboard';
-import {ClusterInfo} from './ClusterInfo/ClusterInfo';
+import {ClusterOverview} from './ClusterOverview/ClusterOverview';
 import type {ClusterTab} from './utils';
 import {clusterTabs, clusterTabsIds, getClusterPath, isClusterTab} from './utils';
 
@@ -91,14 +92,16 @@ export function Cluster({
         if (infoLoading) {
             return <Skeleton className={b('title-skeleton')} />;
         }
+        const clusterStatus = cluster?.Overall || EFlag.Grey;
 
         return (
-            <EntityStatus
-                size="m"
-                status={cluster?.Overall}
-                name={clusterTitle}
-                className={b('title')}
-            />
+            <EntityStatus className={b('title')}>
+                {clusterTitle}
+                <EntityStatus.Label
+                    status={clusterStatus}
+                    note={EFlagToDescription[clusterStatus]}
+                />
+            </EntityStatus>
         );
     };
 
@@ -120,11 +123,12 @@ export function Cluster({
                 <AutoRefreshControl className={b('auto-refresh-control')} />
             </div>
             {isClusterDashboardAvailable && (
-                <ClusterDashboard
+                <ClusterOverview
                     cluster={cluster ?? {}}
                     groupStats={groupsStats}
                     loading={infoLoading}
                     error={clusterError || cluster?.error}
+                    additionalClusterProps={additionalClusterProps}
                 />
             )}
             <div className={b('tabs-sticky-wrapper')}>
@@ -150,18 +154,6 @@ export function Cluster({
                 />
             </div>
             <Switch>
-                <Route
-                    path={
-                        getLocationObjectFromHref(getClusterPath(clusterTabsIds.overview)).pathname
-                    }
-                >
-                    <ClusterInfo
-                        cluster={cluster}
-                        loading={infoLoading}
-                        error={clusterError}
-                        additionalClusterProps={additionalClusterProps}
-                    />
-                </Route>
                 <Route
                     path={
                         getLocationObjectFromHref(getClusterPath(clusterTabsIds.tablets)).pathname

@@ -17,7 +17,7 @@ import './ClusterInfo.scss';
 interface ClusterInfoProps {
     cluster?: TClusterInfo;
     loading?: boolean;
-    error?: IResponseError;
+    error?: IResponseError | string;
     additionalClusterProps?: AdditionalClusterProps;
 }
 
@@ -40,36 +40,25 @@ export const ClusterInfo = ({
         }
 
         return (
-            <div>
-                <div className={b('section-title')}>{i18n('title_info')}</div>
-                <DefinitionList nameMaxWidth={200}>
-                    {clusterInfo.map(({label, value}) => {
-                        return (
-                            <DefinitionList.Item key={label} name={label}>
-                                {value}
-                            </DefinitionList.Item>
-                        );
-                    })}
-                </DefinitionList>
-            </div>
+            <DefinitionList nameMaxWidth={200}>
+                {clusterInfo.map(({label, value}) => {
+                    return (
+                        <DefinitionList.Item key={label} name={label}>
+                            {value}
+                        </DefinitionList.Item>
+                    );
+                })}
+                {linksList.length > 0 && (
+                    <DefinitionList.Item name={i18n('title_links')}>
+                        <Flex direction="column" gap={1}>
+                            {linksList.map(({title, url}) => {
+                                return <LinkWithIcon key={title} title={title} url={url} />;
+                            })}
+                        </Flex>
+                    </DefinitionList.Item>
+                )}
+            </DefinitionList>
         );
-    };
-
-    const renderLinks = () => {
-        if (linksList.length) {
-            return (
-                <div>
-                    <div className={b('section-title')}>{i18n('title_links')}</div>
-                    <Flex direction="column" gap={4}>
-                        {linksList.map(({title, url}) => {
-                            return <LinkWithIcon key={title} title={title} url={url} />;
-                        })}
-                    </Flex>
-                </div>
-            );
-        }
-
-        return null;
     };
 
     const renderContent = () => {
@@ -77,12 +66,7 @@ export const ClusterInfo = ({
             return <InfoViewerSkeleton className={b('skeleton')} rows={4} />;
         }
 
-        return (
-            <Flex gap={10} wrap="nowrap">
-                {renderInfo()}
-                {renderLinks()}
-            </Flex>
-        );
+        return renderInfo();
     };
 
     return (

@@ -3,7 +3,6 @@ import routes, {createHref} from '../../routes';
 import type {ValueOf} from '../../types/common';
 
 export const clusterTabsIds = {
-    overview: 'overview',
     tenants: 'tenants',
     nodes: 'nodes',
     storage: 'storage',
@@ -12,11 +11,6 @@ export const clusterTabsIds = {
 } as const;
 
 export type ClusterTab = ValueOf<typeof clusterTabsIds>;
-
-const overview = {
-    id: clusterTabsIds.overview,
-    title: 'Overview',
-};
 
 const tenants = {
     id: clusterTabsIds.tenants,
@@ -39,7 +33,7 @@ const tablets = {
     title: 'Tablets',
 };
 
-export const clusterTabs = [overview, tenants, nodes, storage, tablets, versions];
+export const clusterTabs = [tenants, nodes, storage, tablets, versions];
 
 export function isClusterTab(tab: any): tab is ClusterTab {
     return Object.values(clusterTabsIds).includes(tab);
