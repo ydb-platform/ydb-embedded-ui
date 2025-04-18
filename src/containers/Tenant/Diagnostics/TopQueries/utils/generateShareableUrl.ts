@@ -23,13 +23,15 @@ export function generateShareableUrl(row: KeyValueRow, tableSort?: SortOrder[]):
     // Set a single selectedRow parameter with all query parameters
     searchParams.set(
         'selectedRow',
-        JSON.stringify({
-            rank: params.rank || undefined,
-            intervalEnd: params.intervalEnd || undefined,
-            endTime: params.endTime || undefined,
-            queryHash: params.queryHash || undefined,
-            tableSort: tableSort || undefined, // Include the table sort order
-        }),
+        encodeURIComponent(
+            JSON.stringify({
+                rank: params.rank || undefined,
+                intervalEnd: params.intervalEnd || undefined,
+                endTime: params.endTime || undefined,
+                queryHash: params.queryHash || undefined,
+                tableSort: tableSort || undefined, // Include the table sort order
+            }),
+        ),
     );
 
     // Update URL search params

@@ -23,7 +23,9 @@ export function useSetSelectedTopQueryRowFromParams(
     // Handle initialization from URL params
     React.useEffect(() => {
         if (rows && queryParams.selectedRow) {
-            const searchParamsQuery: SearchParamsQueryParams = JSON.parse(queryParams.selectedRow);
+            const searchParamsQuery: SearchParamsQueryParams = JSON.parse(
+                decodeURIComponent(queryParams.selectedRow),
+            );
             const matchedRow = rows.find((row) => {
                 const params = getTopQueryRowQueryParams(row);
                 return (

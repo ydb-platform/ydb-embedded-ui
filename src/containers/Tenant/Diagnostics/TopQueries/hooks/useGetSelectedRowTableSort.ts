@@ -6,7 +6,7 @@ export function useGetSelectedRowTableSort(): SortOrder[] | undefined {
         selectedRow: StringParam,
     });
     const searchParamsQuery: {tableSort?: SortOrder[]} = queryParams.selectedRow
-        ? JSON.parse(queryParams.selectedRow)
+        ? JSON.parse(decodeURIComponent(queryParams.selectedRow))
         : {};
 
     return searchParamsQuery.tableSort;
