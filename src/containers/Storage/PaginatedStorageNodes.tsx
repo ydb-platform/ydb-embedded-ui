@@ -12,6 +12,7 @@ import {storageApi} from '../../store/reducers/storage/storage';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {useAdditionalNodesProps} from '../../utils/hooks/useAdditionalNodesProps';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
+import {renderPaginatedTableErrorMessage} from '../../utils/renderPaginatedTableErrorMessage';
 
 import type {PaginatedStorageProps} from './PaginatedStorage';
 import {StorageNodesControls} from './StorageControls/StorageControls';
@@ -20,7 +21,7 @@ import {useStorageNodesSelectedColumns} from './StorageNodes/columns/hooks';
 import {TableGroup} from './TableGroup/TableGroup';
 import {useExpandedGroups} from './TableGroup/useExpandedTableGroups';
 import i18n from './i18n';
-import {b, renderPaginatedTableErrorMessage} from './shared';
+import {b} from './shared';
 import type {StorageViewContext} from './types';
 import {useStorageQueryParams} from './useStorageQueryParams';
 

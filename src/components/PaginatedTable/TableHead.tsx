@@ -1,5 +1,8 @@
 import React from 'react';
 
+import type {HelpMarkProps} from '@gravity-ui/uikit';
+import {HelpMark} from '@gravity-ui/uikit';
+
 import {ResizeHandler} from './ResizeHandler';
 import {
     ASCENDING,
@@ -9,7 +12,14 @@ import {
     DESCENDING,
 } from './constants';
 import {b} from './shared';
-import type {Column, HandleTableColumnsResize, OnSort, SortOrderType, SortParams} from './types';
+import type {
+    AlignType,
+    Column,
+    HandleTableColumnsResize,
+    OnSort,
+    SortOrderType,
+    SortParams,
+} from './types';
 
 // Icon similar to original DataTable icons to keep the same tables across diferent pages and tabs
 const SortIcon = ({order}: {order?: SortOrderType}) => {
@@ -41,6 +51,12 @@ const ColumnSortIcon = ({sortOrder, sortable, defaultSortOrder}: ColumnSortIconP
     } else {
         return null;
     }
+};
+
+const columnAlignToHelpMarkPlacement: Record<AlignType, Required<HelpMarkProps['placement']>> = {
+    left: 'right',
+    right: 'left',
+    center: 'right',
 };
 
 interface TableHeadCellProps<T> {
@@ -115,7 +131,17 @@ export const TableHeadCell = <T,>({
                     }
                 }}
             >
-                <div className={b('head-cell-content')}>{content}</div>
+                <div className={b('head-cell-content-container')}>
+                    <div className={b('head-cell-content')}>{content}</div>
+                    {column.note && (
+                        <HelpMark
+                            placement={columnAlignToHelpMarkPlacement[column.align]}
+                            className={b('head-cell-note')}
+                        >
+                            {column.note}
+                        </HelpMark>
+                    )}
+                </div>
                 <ColumnSortIcon
                     sortOrder={sortOrder}
                     sortable={column.sortable}

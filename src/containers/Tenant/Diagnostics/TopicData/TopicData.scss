@@ -1,0 +1,15 @@
+.ydb-diagnostics-topic-data {
+    &__partition-select {
+        min-width: 150px;
+    }
+
+    &__full-value {
+        max-width: 70vw;
+        max-height: 80vh;
+
+        word-break: break-all;
+    }
+    &__date-picker {
+        min-width: 265px;
+    }
+}

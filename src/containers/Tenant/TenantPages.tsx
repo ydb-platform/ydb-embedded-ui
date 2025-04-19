@@ -12,9 +12,10 @@ type AdditionalQueryParams = {
     database?: string;
     name?: string;
     backend?: string;
+    selectedPartition?: string;
 };
 
-type TenantQuery = TenantQueryParams | AdditionalQueryParams;
+export type TenantQuery = TenantQueryParams | AdditionalQueryParams;
 
 export const TenantTabsGroups = {
     summaryTab: 'summaryTab',

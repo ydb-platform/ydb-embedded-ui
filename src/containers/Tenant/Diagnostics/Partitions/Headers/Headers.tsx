@@ -8,14 +8,6 @@ import './Headers.scss';
 
 const b = cn('ydb-diagnostics-partitions-columns-header');
 
-interface MultilineHeaderProps {
-    title: string;
-}
-
-export const MultilineHeader = ({title}: MultilineHeaderProps) => (
-    <div className={b('multiline')}>{title}</div>
-);
-
 export const ReadSessionHeader = () => (
     <div className={b('read-session')}>
         {PARTITIONS_COLUMNS_TITLES[PARTITIONS_COLUMNS_IDS.READ_SESSION_ID]}

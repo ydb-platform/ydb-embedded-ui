@@ -25,6 +25,7 @@ export const TENANT_DIAGNOSTICS_TABS_IDS = {
     graph: 'graph',
     consumers: 'consumers',
     partitions: 'partitions',
+    topicData: 'topicData',
     configs: 'configs',
     operations: 'operations',
 } as const;

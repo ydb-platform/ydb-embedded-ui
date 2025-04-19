@@ -2,7 +2,7 @@ import {formatBytes} from '../../utils/bytesParsers';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {roundToPrecision} from '../../utils/dataFormatters/dataFormatters';
 import {formatToMs} from '../../utils/timeParsers';
-import {isNumeric} from '../../utils/utils';
+import {safeParseNumber} from '../../utils/utils';
 
 import type {ChartDataType, ChartValue} from './types';
 
@@ -28,27 +28,18 @@ function formatChartValueToMs(value: ChartValue) {
     if (value === null) {
         return EMPTY_DATA_PLACEHOLDER;
     }
-    return formatToMs(roundToPrecision(convertToNumber(value), 2));
+    return formatToMs(roundToPrecision(safeParseNumber(value), 2));
 }
 
 function formatChartValueToSize(value: ChartValue) {
     if (value === null) {
         return EMPTY_DATA_PLACEHOLDER;
     }
-    return formatBytes({value: convertToNumber(value), precision: 3});
+    return formatBytes({value: safeParseNumber(value), precision: 3});
 }
 function formatChartValueToPercent(value: ChartValue) {
     if (value === null) {
         return EMPTY_DATA_PLACEHOLDER;
     }
-    return Math.round(convertToNumber(value) * 100) + '%';
-}
-
-// Numeric values expected, not numeric value should be displayd as 0
-function convertToNumber(value: unknown): number {
-    if (isNumeric(value)) {
-        return Number(value);
-    }
-
-    return 0;
+    return Math.round(safeParseNumber(value) * 100) + '%';
 }
