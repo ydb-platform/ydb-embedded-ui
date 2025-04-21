@@ -22,11 +22,9 @@ export type TopicDataColumnId = ValueOf<typeof TOPIC_DATA_COLUMNS_IDS>;
 
 export interface TopicDataFilters {
     partition?: string;
-    topicDataFilter?: TopicDataFilterValue;
-    startTimestamp?: number;
-    selectedOffset?: number;
     database: string;
     path: string;
+    isEmpty: boolean;
 }
 
 export const TopicDataFilterValues = {

@@ -3,9 +3,17 @@ import React from 'react';
 import type {Value} from '@gravity-ui/date-components';
 import {RelativeDatePicker} from '@gravity-ui/date-components';
 import {dateTimeParse} from '@gravity-ui/date-utils';
+import {ArrowDownToLine, ArrowUpToLine} from '@gravity-ui/icons';
 import type {TableColumnSetupItem} from '@gravity-ui/uikit';
-import {RadioButton, Select, TableColumnSetup} from '@gravity-ui/uikit';
-import {isNil} from 'lodash';
+import {
+    ActionTooltip,
+    Button,
+    Flex,
+    Icon,
+    RadioButton,
+    Select,
+    TableColumnSetup,
+} from '@gravity-ui/uikit';
 
 import {DebouncedInput} from '../../../../../components/DebouncedInput/DebouncedInput';
 import {EntitiesCount} from '../../../../../components/EntitiesCount';
@@ -29,6 +37,8 @@ interface TopicDataControlsProps {
 
     initialOffset?: number;
     endOffset?: number;
+    scrollToStartOffset: VoidFunction;
+    scrollToEndOffset: VoidFunction;
 }
 
 export function TopicDataControls({
@@ -40,6 +50,8 @@ export function TopicDataControls({
     partitions,
     partitionsLoading,
     partitionsError,
+    scrollToStartOffset,
+    scrollToEndOffset,
 }: TopicDataControlsProps) {
     const {
         selectedPartition,
@@ -65,12 +77,6 @@ export function TopicDataControls({
             handleSelectedOffsetChange,
         ],
     );
-
-    React.useEffect(() => {
-        if (partitions && partitions.length && isNil(selectedPartition)) {
-            handleSelectedPartitionChange([partitions[0].partitionId]);
-        }
-    }, [partitions, selectedPartition, handleSelectedPartitionChange]);
 
     return (
         <React.Fragment>
@@ -99,6 +105,18 @@ export function TopicDataControls({
                 label={i18n('label_offset')}
                 current={`${formatNumber(initialOffset)}—${formatNumber(endOffset - 1)}`}
             />
+            <Flex gap={1}>
+                <ActionTooltip title={i18n('action_scroll-down')}>
+                    <Button onClick={scrollToEndOffset}>
+                        <Icon size={14} data={ArrowDownToLine} />
+                    </Button>
+                </ActionTooltip>
+                <ActionTooltip title={i18n('action_scroll-up')}>
+                    <Button onClick={scrollToStartOffset}>
+                        <Icon size={14} data={ArrowUpToLine} />
+                    </Button>
+                </ActionTooltip>
+            </Flex>
         </React.Fragment>
     );
 }
@@ -115,9 +133,14 @@ function TopicDataStartControls() {
 
     const onFilterChange = React.useCallback(
         (value: TopicDataFilterValue) => {
+            if (value === 'TIMESTAMP') {
+                handleSelectedOffsetChange(undefined);
+            } else {
+                handleStartTimestampChange(undefined);
+            }
             handleTopicDataFilterChange(value);
         },
-        [handleTopicDataFilterChange],
+        [handleTopicDataFilterChange, handleSelectedOffsetChange, handleStartTimestampChange],
     );
     const onStartOffsetChange = React.useCallback(
         (value: string) => {

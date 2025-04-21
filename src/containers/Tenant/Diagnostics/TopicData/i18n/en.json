@@ -19,5 +19,7 @@
   "description_nothing-found": "Make the filter less strict or start over",
   "action_show-all": "Reset filter",
   "label_by-offset": "By offset",
-  "label_by-timestamp": "By timestamp"
+  "label_by-timestamp": "By timestamp",
+  "action_scroll-down": "Scroll to the end",
+  "action_scroll-up": "Scroll to the start"
 }

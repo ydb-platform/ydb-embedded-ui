@@ -31,6 +31,7 @@ interface TableChunkProps<T, F> {
     sortParams?: SortParams;
     isActive: boolean;
     tableName: string;
+    startOffset: number;
 
     fetchData: FetchData<T, F>;
     getRowClassName?: GetRowClassName<T>;
@@ -54,6 +55,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     renderErrorMessage,
     renderEmptyDataMessage,
     onDataFetched,
+    startOffset,
     isActive,
 }: TableChunkProps<T, F>) {
     const [isTimeoutActive, setIsTimeoutActive] = React.useState(true);
@@ -62,7 +64,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     const columnsIds = columns.map((column) => column.name);
 
     const queryParams = {
-        offset: id * chunkSize,
+        offset: startOffset + id * chunkSize,
         limit: chunkSize,
         fetchData: fetchData as FetchData<T, unknown>,
         filters,

@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import {createSelector} from '@reduxjs/toolkit';
 
+import type {TopicDataRequest} from '../../types/api/topic';
 import {convertBytesObjectToSpeed} from '../../utils/bytesParsers';
 import {parseLag, parseTimestampToIdleTime} from '../../utils/timeParsers';
 import type {RootState} from '../defaultStore';
@@ -17,6 +18,17 @@ export const topicApi = api.injectEndpoints({
                     if (typeof data !== 'object') {
                         return {error: {}};
                     }
+                    return {data};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: ['All'],
+        }),
+        getTopicData: build.query({
+            queryFn: async (params: TopicDataRequest) => {
+                try {
+                    const data = await window.api.viewer.getTopicData(params);
                     return {data};
                 } catch (error) {
                     return {error};

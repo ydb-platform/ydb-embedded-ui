@@ -6,40 +6,14 @@ import {safeParseNumber} from '../../../../utils/utils';
 
 import type {TopicDataFilters} from './utils/types';
 
-const getInitialOffset = ({
-    topicDataFilter,
-    selectedOffset = 0,
-    initialOffset = 0,
-    fromOffset,
-}: Pick<TopicDataFilters, 'topicDataFilter' | 'selectedOffset'> & {
-    initialOffset?: number;
-    fromOffset?: number;
-}) => {
-    if (!isNil(fromOffset)) {
-        return fromOffset;
-    }
-    if (topicDataFilter === 'TIMESTAMP') {
-        return undefined;
-    }
-    return Math.max(selectedOffset, initialOffset);
-};
+const emptyData = {data: [], total: 0, found: 0};
 
 interface GetTopicDataProps {
     setStartOffset: (offset: number) => void;
     setEndOffset: (offset: number) => void;
-    initialOffset?: number;
 }
 
-const emptyData = {data: [], total: 0, found: 0};
-
-export const generateTopicDataGetter = ({
-    initialOffset = 0,
-    setStartOffset,
-    setEndOffset,
-}: GetTopicDataProps) => {
-    let lostOffsets = 0;
-    let fromOffset: number | undefined;
-
+export const generateTopicDataGetter = ({setStartOffset, setEndOffset}: GetTopicDataProps) => {
     const getTopicData: FetchData<TopicMessage, TopicDataFilters> = async ({
         limit,
         offset: tableOffset,
@@ -49,23 +23,14 @@ export const generateTopicDataGetter = ({
             return emptyData;
         }
 
-        const {partition, selectedOffset, startTimestamp, topicDataFilter, ...rest} = filters;
+        const {partition, isEmpty, ...rest} = filters;
 
-        if (isNil(partition)) {
+        if (isNil(partition) || isEmpty) {
             return emptyData;
         }
 
         const queryParams: TopicDataRequest = {...rest, partition, limit};
-
-        fromOffset = getInitialOffset({topicDataFilter, selectedOffset, initialOffset, fromOffset});
-
-        if (topicDataFilter === 'TIMESTAMP' && isNil(fromOffset)) {
-            // get data from timestamp only the very first time. Next fetch we will already know offset
-            queryParams.read_timestamp = startTimestamp;
-        } else {
-            const normalizedOffset = (fromOffset ?? 0) + tableOffset + lostOffsets;
-            queryParams.offset = normalizedOffset;
-        }
+        queryParams.offset = tableOffset;
 
         const response = await window.api.viewer.getTopicData(queryParams);
 
@@ -73,22 +38,12 @@ export const generateTopicDataGetter = ({
 
         const start = safeParseNumber(StartOffset);
         const end = safeParseNumber(EndOffset);
+
         //need to update start and end offsets every time data is fetched to show fresh data in parent component
         setStartOffset(start);
         setEndOffset(end);
 
-        if (isNil(fromOffset)) {
-            fromOffset = Messages.length ? safeParseNumber(Messages[0].Offset) : end;
-        }
-
-        const normalizedOffset = fromOffset + tableOffset + lostOffsets;
-        const lastMessageOffset = Messages.length
-            ? safeParseNumber(Messages[Messages.length - 1].Offset)
-            : 0;
-
-        const quantity = end - fromOffset - lostOffsets;
-
-        lostOffsets += normalizedOffset + limit - lastMessageOffset - 1;
+        const quantity = end - start;
 
         return {
             data: Messages,
@@ -96,5 +51,6 @@ export const generateTopicDataGetter = ({
             found: quantity,
         };
     };
+
     return getTopicData;
 };
