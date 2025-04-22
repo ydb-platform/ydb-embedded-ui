@@ -16,6 +16,9 @@ describe('normalizePathSlashes', () => {
     test('should handle paths with multiple trailing slashes', () => {
         expect(normalizePathSlashes('path////')).toBe('path/');
     });
+    test('should handle paths with multiple leading slashes', () => {
+        expect(normalizePathSlashes('////path')).toBe('/path');
+    });
     test('should handle full paths with normal slashes', () => {
         expect(normalizePathSlashes('http://example.com/path/to/resource')).toBe(
             'http://example.com/path/to/resource',
@@ -26,9 +29,14 @@ describe('normalizePathSlashes', () => {
             'http://example.com/path/to/resource',
         );
     });
+    test('should not replace double slashes near protocols (after a colon)', () => {
+        expect(normalizePathSlashes('http://host.ydb.com')).toBe('http://host.ydb.com');
+        expect(normalizePathSlashes('https://host.ydb.com')).toBe('https://host.ydb.com');
+        expect(normalizePathSlashes('grpc://host.ydb.com')).toBe('grpc://host.ydb.com');
+    });
     test('should replace slashes more than two slashes after a colon', () => {
-        expect(normalizePathSlashes('http://///example.com/path/to/resource')).toBe(
-            'http://example.com/path/to/resource',
-        );
+        expect(normalizePathSlashes('http:////host.ydb.com')).toBe('http://host.ydb.com');
+        expect(normalizePathSlashes('https://///host.ydb.com')).toBe('https://host.ydb.com');
+        expect(normalizePathSlashes('grpc://///host.ydb.com')).toBe('grpc://host.ydb.com');
     });
 });
