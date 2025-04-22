@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.24.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.23.0...v8.24.0) (2025-04-22)
+
+
+### Features
+
+* add possibility to pass external columns ([#2187](https://github.com/ydb-platform/ydb-embedded-ui/issues/2187)) ([65b2e72](https://github.com/ydb-platform/ydb-embedded-ui/commit/65b2e72bd0516609257120b1b44d38f4336e368e))
+
 ## [8.23.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.22.1...v8.23.0) (2025-04-22)
 
 
