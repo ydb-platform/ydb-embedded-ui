@@ -86,7 +86,7 @@ export function createHref(
 
     const compiledRoute = `${compile(preparedRoute)(params)}${search}`;
 
-    if (options.withBasename) {
+    if (options.withBasename && basename) {
         // For SPA links react-router adds basename itself
         // It is needed for external links - <a> or uikit <Link>
         return normalizePathSlashes(`${basename}/${compiledRoute}`);
