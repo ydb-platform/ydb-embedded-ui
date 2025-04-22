@@ -43,7 +43,7 @@ export function parseNodeGroupsToVersionsValues(
         return {
             title: group.name,
             version: group.name,
-            color: versionsToColor?.get(group.name),
+            color: versionsToColor?.get(getMinorVersion(group.name)),
             value: value < MIN_VALUE ? MIN_VALUE : value,
         };
     });
