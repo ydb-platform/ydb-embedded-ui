@@ -29,7 +29,7 @@ describe('normalizePathSlashes', () => {
             'http://example.com/path/to/resource',
         );
     });
-    test('shoudl not replace double slashes near protocols (after a colon)', () => {
+    test('should not replace double slashes near protocols (after a colon)', () => {
         expect(normalizePathSlashes('http://host.ydb.com')).toBe('http://host.ydb.com');
         expect(normalizePathSlashes('https://host.ydb.com')).toBe('https://host.ydb.com');
         expect(normalizePathSlashes('grpc://host.ydb.com')).toBe('grpc://host.ydb.com');
