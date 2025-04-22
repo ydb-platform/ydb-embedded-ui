@@ -15,6 +15,7 @@ import {
 export const TOP_QUERIES_TABLE_SETTINGS: Settings = {
     ...QUERY_TABLE_SETTINGS,
     disableSortReset: true,
+    externalSort: true,
 };
 
 export function useTopQueriesSort() {
