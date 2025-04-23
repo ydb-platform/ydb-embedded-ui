@@ -3,7 +3,7 @@ import {isQueryErrorResponse, parseQueryAPIResponse} from '../../../../utils/que
 import {api} from '../../api';
 
 function createShardQuery(path: string, database: string) {
-    const pathSelect = `CAST(SUBSTRING(CAST(Path AS String), ${database.length}) AS Utf8) AS Path`;
+    const pathSelect = `CAST(SUBSTRING(CAST(Path AS String), ${database.length}) AS Utf8) AS RelativePath`;
     return `${QUERY_TECHNICAL_MARK}
 SELECT
     ${pathSelect},
