@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.24.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.24.0...v8.24.1) (2025-04-23)
+
+
+### Bug Fixes
+
+* fix top shards path column and better overriding for advisor ([#2197](https://github.com/ydb-platform/ydb-embedded-ui/issues/2197)) ([57df88b](https://github.com/ydb-platform/ydb-embedded-ui/commit/57df88b27fc1e3315f1a901dd4ec7eaecbaf6fae))
+
 ## [8.24.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.23.0...v8.24.0) (2025-04-22)
 
 
