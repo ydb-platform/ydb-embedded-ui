@@ -1,4 +1,5 @@
 import type {SnippetLanguage, SnippetParams} from './types';
+import {prepareEndpoint} from './utils';
 
 export function getBashSnippetCode({database, endpoint}: SnippetParams) {
     return `ydb -e ${endpoint || '<endpoint>'} --token-file ~/my_token
@@ -198,7 +199,12 @@ with ydb.Driver(driver_config) as driver:
         print(driver.discovery_debug_details())`;
 }
 
-export function getSnippetCode(lang: SnippetLanguage, params: SnippetParams) {
+export function getSnippetCode(lang: SnippetLanguage, rawParams: SnippetParams) {
+    const params = {
+        ...rawParams,
+        endpoint: prepareEndpoint(rawParams.endpoint),
+    };
+
     switch (lang) {
         case 'cpp': {
             return getCPPSnippetCode(params);

@@ -65,7 +65,7 @@ export class ViewerAPI extends BaseYdbAPI {
         );
     }
 
-    getTenants(clusterName?: string, {concurrentId, signal}: AxiosOptions = {}) {
+    getTenants({clusterName}: {clusterName?: string}, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<TTenantInfo>(
             this.getPath('/viewer/json/tenantinfo'),
             {

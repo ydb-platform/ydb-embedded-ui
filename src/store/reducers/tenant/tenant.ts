@@ -2,6 +2,7 @@ import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
 import {DEFAULT_USER_SETTINGS, settingsManager} from '../../../services/settings';
+import type {TTenantInfo} from '../../../types/api/tenant';
 import {TENANT_INITIAL_PAGE_KEY} from '../../../utils/constants';
 import {api} from '../api';
 
@@ -52,9 +53,20 @@ export const {setTenantPage, setQueryTab, setDiagnosticsTab, setSummaryTab, setM
 export const tenantApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getTenantInfo: builder.query({
-            queryFn: async ({path}: {path: string}, {signal}) => {
+            queryFn: async (
+                {path, clusterName}: {path: string; clusterName?: string},
+                {signal},
+            ) => {
                 try {
-                    const tenantData = await window.api.viewer.getTenantInfo({path}, {signal});
+                    let tenantData: TTenantInfo;
+                    if (window.api.meta && clusterName) {
+                        tenantData = await window.api.meta.getTenants(
+                            {databaseName: path, clusterName},
+                            {signal},
+                        );
+                    } else {
+                        tenantData = await window.api.viewer.getTenantInfo({path}, {signal});
+                    }
                     return {data: tenantData.TenantInfo?.[0] ?? null};
                 } catch (error) {
                     return {error};
