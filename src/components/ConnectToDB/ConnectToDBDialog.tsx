@@ -48,7 +48,7 @@ function ConnectToDBDialog({
     const clusterName = useClusterNameFromQuery();
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
 
-    // If there is enpdoint from props, we don't need to request tenant data
+    // If there is endpoint from props, we don't need to request tenant data
     // Also we should not request tenant data if we are in single cluster mode
     // Since there is no ControlPlane data in this case
     const shouldRequestTenantData = database && !endpointFromProps && !singleClusterMode;
