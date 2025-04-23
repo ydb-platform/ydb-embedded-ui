@@ -13,7 +13,7 @@ export interface ShardsTableProps
     extends Omit<ResizeableDataTableProps<KeyValueRow>, 'columnsWidthLSKey' | 'columns'> {
     columnsIds: TopShardsColumnId[];
     database: string;
-    columns?: ShardsColumn[];
+    overrideColumns?: ShardsColumn[];
     schemaPath?: string;
 }
 
@@ -21,17 +21,18 @@ export function ShardsTable({
     columnsIds,
     schemaPath,
     database,
-    columns: propsColumns,
+    overrideColumns = [],
     ...props
 }: ShardsTableProps) {
     const columns = React.useMemo(() => {
-        if (propsColumns) {
-            return propsColumns;
-        }
-
         return columnsIds
             .filter((id) => id in shardsColumnIdToGetColumn)
             .map((id) => {
+                const overridedColumn = overrideColumns.find((column) => column.name === id);
+                if (overridedColumn) {
+                    return overridedColumn;
+                }
+
                 const column = shardsColumnIdToGetColumn[id]({database, schemaPath});
 
                 return {
@@ -39,7 +40,7 @@ export function ShardsTable({
                     sortable: isSortableTopShardsColumn(column.name),
                 };
             });
-    }, [columnsIds, database, propsColumns, schemaPath]);
+    }, [columnsIds, database, overrideColumns, schemaPath]);
 
     return (
         <ResizeableDataTable
