@@ -181,6 +181,6 @@
     }
 
     &__row-skeleton::after {
-        animation: none !important;
+        display: none !important;
     }
 }

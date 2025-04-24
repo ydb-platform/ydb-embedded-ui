@@ -83,7 +83,7 @@ export function NodesTable({
             parentRef={parentRef}
             columns={columns}
             fetchData={getNodes}
-            limit={50}
+            limit={30}
             initialEntitiesCount={initialEntitiesCount}
             renderControls={renderControls}
             renderErrorMessage={renderPaginatedTableErrorMessage}

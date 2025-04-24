@@ -29,7 +29,7 @@ export interface Column<T> {
     className?: string;
     sortable?: boolean;
     resizeable?: boolean;
-    render: (props: {row: T; index: number}) => React.ReactNode;
+    render: (props: {row: T}) => React.ReactNode;
     width?: number;
     resizeMaxWidth?: number;
     resizeMinWidth?: number;

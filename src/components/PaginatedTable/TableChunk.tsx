@@ -119,12 +119,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
                 );
             } else {
                 return getArray(dataLength).map((value) => (
-                    <LoadingTableRow
-                        key={value}
-                        columns={columns}
-                        height={rowHeight}
-                        index={value}
-                    />
+                    <LoadingTableRow key={value} columns={columns} height={rowHeight} />
                 ));
             }
         }
@@ -141,7 +136,6 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
         return currentData.data.map((rowData, index) => (
             <TableRow
                 key={index}
-                index={index}
                 row={rowData as T}
                 columns={columns}
                 height={rowHeight}
