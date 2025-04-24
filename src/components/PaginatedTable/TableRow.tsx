@@ -50,7 +50,7 @@ export const LoadingTableRow = typedMemo(function <T>({columns, height}: Loading
 
                 return (
                     <TableRowCell
-                        key={`${column.name}`}
+                        key={column.name}
                         height={height}
                         width={column.width}
                         align={column.align}
@@ -85,7 +85,7 @@ export const TableRow = <T,>({row, columns, getRowClassName, height}: TableRowPr
 
                 return (
                     <TableRowCell
-                        key={`${column.name}`}
+                        key={column.name}
                         height={height}
                         width={column.width}
                         align={column.align}
