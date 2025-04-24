@@ -1,4 +1,10 @@
-import {CircleExclamationFill, CircleInfoFill, TriangleExclamationFill} from '@gravity-ui/icons';
+import {
+    CircleCheckFill,
+    CircleExclamationFill,
+    CircleInfoFill,
+    CircleQuestionFill,
+    TriangleExclamationFill,
+} from '@gravity-ui/icons';
 import {Icon} from '@gravity-ui/uikit';
 
 import {EFlag} from '../../types/api/enums';
@@ -9,6 +15,8 @@ import './StatusIcon.scss';
 const b = cn('ydb-status-icon');
 
 const icons = {
+    [EFlag.Grey]: CircleQuestionFill,
+    [EFlag.Green]: CircleCheckFill,
     [EFlag.Blue]: CircleInfoFill,
     [EFlag.Yellow]: CircleExclamationFill,
     [EFlag.Orange]: TriangleExclamationFill,
