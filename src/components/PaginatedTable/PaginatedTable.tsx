@@ -17,11 +17,12 @@ import type {
     SortParams,
 } from './types';
 import {useScrollBasedChunks} from './useScrollBasedChunks';
+import {useViewportChunkSize} from './useViewportChunkSize';
 
 import './PaginatedTable.scss';
 
 export interface PaginatedTableProps<T, F> {
-    limit: number;
+    limit: number | 'viewport';
     initialEntitiesCount?: number;
     fetchData: FetchData<T, F>;
     filters?: F;
@@ -39,7 +40,7 @@ export interface PaginatedTableProps<T, F> {
 }
 
 export const PaginatedTable = <T, F>({
-    limit: chunkSize,
+    limit,
     initialEntitiesCount,
     fetchData,
     filters,
@@ -64,6 +65,13 @@ export const PaginatedTable = <T, F>({
     const [isInitialLoad, setIsInitialLoad] = React.useState(true);
 
     const tableRef = React.useRef<HTMLDivElement>(null);
+
+    // Use the custom hook for viewport-based chunk size calculation
+    const chunkSize = useViewportChunkSize({
+        limit,
+        parentRef,
+        rowHeight,
+    });
 
     const activeChunks = useScrollBasedChunks({
         parentRef,
