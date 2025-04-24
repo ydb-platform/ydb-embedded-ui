@@ -100,7 +100,7 @@ export function MemoryViewer({
 
     return (
         <HoverPopup
-            popupContent={
+            renderPopupContent={() => (
                 <DefinitionList responsive>
                     {memorySegments.map(
                         ({label, value: segmentSize, capacity: segmentCapacity, key}) => (
@@ -132,7 +132,7 @@ export function MemoryViewer({
                         ),
                     )}
                 </DefinitionList>
-            }
+            )}
         >
             <div className={b({theme, status}, className)}>
                 <div className={b('progress-container')}>
