@@ -21,7 +21,7 @@ import {useScrollBasedChunks} from './useScrollBasedChunks';
 import './PaginatedTable.scss';
 
 export interface PaginatedTableProps<T, F> {
-    limit: number;
+    limit?: number;
     initialEntitiesCount?: number;
     fetchData: FetchData<T, F>;
     filters?: F;
@@ -38,8 +38,10 @@ export interface PaginatedTableProps<T, F> {
     containerClassName?: string;
 }
 
+const DEFAULT_PAGINATION_LIMIT = 20;
+
 export const PaginatedTable = <T, F>({
-    limit: chunkSize,
+    limit: chunkSize = DEFAULT_PAGINATION_LIMIT,
     initialEntitiesCount,
     fetchData,
     filters,

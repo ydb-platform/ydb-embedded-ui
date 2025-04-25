@@ -101,7 +101,6 @@ export const PaginatedStorageGroupsTable = ({
                 parentRef={parentRef}
                 columns={columns}
                 fetchData={fetchData}
-                limit={20}
                 initialEntitiesCount={initialEntitiesCount}
                 renderControls={renderControls}
                 renderErrorMessage={renderErrorMessage}

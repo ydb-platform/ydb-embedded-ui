@@ -104,7 +104,6 @@ export const PaginatedStorageNodesTable = ({
             columns={columns}
             fetchData={getStorageNodes}
             rowHeight={51}
-            limit={20}
             initialEntitiesCount={initialEntitiesCount}
             renderControls={renderControls}
             renderErrorMessage={renderErrorMessage}
