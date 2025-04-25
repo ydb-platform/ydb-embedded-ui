@@ -26,7 +26,7 @@ export function prepareResponse(response: TopicDataResponse, offset: number) {
     const result = [];
     for (let i = 0; i < Math.min(TOPIC_DATA_FETCH_LIMIT, removedMessagesCount); i++) {
         result.push({
-            Offset: `Offset ${offset + i} removed`,
+            Offset: `<removed> ${offset + i}`,
         });
     }
     for (

@@ -53,8 +53,8 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
     const [controlsKey, setControlsKey] = React.useState(0);
     const [emptyData, setEmptyData] = React.useState(false);
 
-    const [baseOffset, setBaseOffset] = React.useState<number>(0);
-    const [baseEndOffset, setBaseEndOffset] = React.useState<number>(0);
+    const [baseOffset, setBaseOffset] = React.useState<number>();
+    const [baseEndOffset, setBaseEndOffset] = React.useState<number>();
 
     const startRef = React.useRef<number>();
     startRef.current = startOffset;
@@ -242,20 +242,22 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
     return (
         <React.Fragment>
             <FullValue value={fullValue} onClose={() => setFullValue(undefined)} />
-            <ResizeablePaginatedTable
-                columnsWidthLSKey={TOPIC_DATA_COLUMNS_WIDTH_LS_KEY}
-                parentRef={parentRef}
-                columns={columnsToShow}
-                fetchData={getTopicData}
-                initialEntitiesCount={baseEndOffset - baseOffset}
-                limit={TOPIC_DATA_FETCH_LIMIT}
-                renderControls={renderControls}
-                renderErrorMessage={renderPaginatedTableErrorMessage}
-                renderEmptyDataMessage={renderEmptyDataMessage}
-                filters={tableFilters}
-                tableName="topicData"
-                rowHeight={DEFAULT_TABLE_ROW_HEIGHT}
-            />
+            {!isNil(baseOffset) && !isNil(baseEndOffset) && (
+                <ResizeablePaginatedTable
+                    columnsWidthLSKey={TOPIC_DATA_COLUMNS_WIDTH_LS_KEY}
+                    parentRef={parentRef}
+                    columns={columnsToShow}
+                    fetchData={getTopicData}
+                    initialEntitiesCount={baseEndOffset - baseOffset}
+                    limit={TOPIC_DATA_FETCH_LIMIT}
+                    renderControls={renderControls}
+                    renderErrorMessage={renderPaginatedTableErrorMessage}
+                    renderEmptyDataMessage={renderEmptyDataMessage}
+                    filters={tableFilters}
+                    tableName="topicData"
+                    rowHeight={DEFAULT_TABLE_ROW_HEIGHT}
+                />
+            )}
         </React.Fragment>
     );
 }
