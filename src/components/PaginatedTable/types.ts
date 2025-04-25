@@ -36,7 +36,14 @@ export interface Column<T> {
     align: AlignType;
 }
 
-export interface PaginatedTableData<T> {
+interface StorageNodesTableDataExtension {
+    columnSettings?: {
+        maxSlotsPerDisk: number;
+        maxDisksPerNode: number;
+    };
+}
+
+export interface PaginatedTableData<T> extends StorageNodesTableDataExtension {
     data: T[];
     total: number;
     found: number;

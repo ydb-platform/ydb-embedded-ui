@@ -3,12 +3,15 @@ import React from 'react';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import type {RenderControls} from '../../components/PaginatedTable';
+import type {PaginatedTableData} from '../../components/PaginatedTable/types';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {
     useCapabilitiesLoaded,
     useViewerNodesHandlerHasGrouping,
 } from '../../store/reducers/capabilities/hooks';
 import {storageApi} from '../../store/reducers/storage/storage';
+import type {PreparedStorageNode} from '../../store/reducers/storage/types';
+import type {NodesGroupByField} from '../../types/api/nodes';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {useAdditionalNodesProps} from '../../utils/hooks/useAdditionalNodesProps';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
@@ -17,6 +20,7 @@ import type {PaginatedStorageProps} from './PaginatedStorage';
 import {StorageNodesControls} from './StorageControls/StorageControls';
 import {PaginatedStorageNodesTable} from './StorageNodes/PaginatedStorageNodesTable';
 import {useStorageNodesSelectedColumns} from './StorageNodes/columns/hooks';
+import type {StorageNodesColumn} from './StorageNodes/columns/types';
 import {TableGroup} from './TableGroup/TableGroup';
 import {useExpandedGroups} from './TableGroup/useExpandedTableGroups';
 import i18n from './i18n';
@@ -55,6 +59,9 @@ export const PaginatedStorageNodes = (props: PaginatedStorageProps) => {
     return <LoaderWrapper loading={!capabilitiesLoaded}>{renderContent()}</LoaderWrapper>;
 };
 
+const MAX_SLOTS_CSS_VAR = '--maximum-slots';
+const MAX_DISKS_CSS_VAR = '--maximum-disks';
+
 function StorageNodesComponent({
     database,
     nodeId,
@@ -72,6 +79,18 @@ function StorageNodesComponent({
         database,
         viewContext,
     });
+
+    const [tableStyle, setTableStyle] = React.useState<React.CSSProperties>({});
+
+    const handleDataFetched = React.useCallback((data: any) => {
+        if (data?.columnSettings) {
+            const {maxSlotsPerDisk, maxDisksPerNode} = data.columnSettings;
+            setTableStyle({
+                [MAX_SLOTS_CSS_VAR]: maxSlotsPerDisk,
+                [MAX_DISKS_CSS_VAR]: maxDisksPerNode,
+            } as React.CSSProperties);
+        }
+    }, []);
 
     const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
         return (
@@ -101,6 +120,8 @@ function StorageNodesComponent({
             renderErrorMessage={renderPaginatedTableErrorMessage}
             columns={columnsToShow}
             initialEntitiesCount={initialEntitiesCount}
+            tableStyle={tableStyle}
+            onDataFetched={handleDataFetched}
         />
     );
 }
@@ -168,18 +189,15 @@ function GroupedStorageNodesComponent({
                         expanded={isExpanded}
                         onIsExpandedChange={setIsGroupExpanded}
                     >
-                        <PaginatedStorageNodesTable
+                        <StorageNodesTableGroupContent
                             database={database}
                             parentRef={parentRef}
                             nodeId={nodeId}
                             groupId={groupId}
                             searchValue={searchValue}
-                            visibleEntities={'all'}
-                            nodesUptimeFilter={NodesUptimeFilterValues.All}
-                            onShowAll={handleShowAllNodes}
+                            handleShowAllNodes={handleShowAllNodes}
                             filterGroup={name}
                             filterGroupBy={storageNodesGroupByParam}
-                            renderErrorMessage={renderPaginatedTableErrorMessage}
                             columns={columnsToShow}
                             initialEntitiesCount={count}
                         />
@@ -203,6 +221,64 @@ function GroupedStorageNodesComponent({
                 </TableWithControlsLayout.Table>
             </TableWithControlsLayout>
         </React.Fragment>
+    );
+}
+
+interface StorageNodesTableGroupContentProps {
+    database?: string;
+    parentRef: React.RefObject<HTMLElement>;
+    nodeId?: string | number;
+    groupId?: string | number;
+    searchValue: string;
+    handleShowAllNodes: VoidFunction;
+    filterGroup: string;
+    filterGroupBy?: NodesGroupByField;
+    columns: StorageNodesColumn[];
+    initialEntitiesCount: number;
+}
+
+function StorageNodesTableGroupContent({
+    database,
+    parentRef,
+    nodeId,
+    groupId,
+    searchValue,
+    handleShowAllNodes,
+    filterGroup,
+    filterGroupBy,
+    columns,
+    initialEntitiesCount,
+}: StorageNodesTableGroupContentProps) {
+    const [tableStyle, setTableStyle] = React.useState<React.CSSProperties>({});
+
+    const handleDataFetched = React.useCallback((data: PaginatedTableData<PreparedStorageNode>) => {
+        if (data?.columnSettings) {
+            const {maxSlotsPerDisk, maxDisksPerNode} = data.columnSettings;
+            setTableStyle({
+                [MAX_SLOTS_CSS_VAR]: maxSlotsPerDisk,
+                [MAX_DISKS_CSS_VAR]: maxDisksPerNode,
+            } as React.CSSProperties);
+        }
+    }, []);
+
+    return (
+        <PaginatedStorageNodesTable
+            database={database}
+            parentRef={parentRef}
+            nodeId={nodeId}
+            groupId={groupId}
+            searchValue={searchValue}
+            visibleEntities={'all'}
+            nodesUptimeFilter={NodesUptimeFilterValues.All}
+            onShowAll={handleShowAllNodes}
+            filterGroup={filterGroup}
+            filterGroupBy={filterGroupBy}
+            renderErrorMessage={renderPaginatedTableErrorMessage}
+            columns={columns}
+            initialEntitiesCount={initialEntitiesCount}
+            tableStyle={tableStyle}
+            onDataFetched={handleDataFetched}
+        />
     );
 }
 

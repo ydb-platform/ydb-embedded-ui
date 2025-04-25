@@ -3,6 +3,12 @@
 .ydb-storage-nodes-columns {
     &__pdisks-column {
         overflow: visible; // to enable stacked disks overflow the row
+
+        @include calculate-storage-nodes-pdisk-variables();
+
+        & .ydb-paginated-table__row-skeleton {
+            width: var(--pdisks-container-width) !important;
+        }
     }
 
     &__pdisks-wrapper {
@@ -11,8 +17,6 @@
 
         width: var(--pdisks-container-width);
         height: 40px;
-
-        @include calculate-storage-nodes-pdisk-variables();
     }
 
     &__pdisks-item {

@@ -16,6 +16,7 @@ function updateColumnsWidth<T>(columns: Column<T>[], columnsWidthSetup: ColumnWi
 interface ResizeablePaginatedTableProps<T, F>
     extends Omit<PaginatedTableProps<T, F>, 'onColumnsResize'> {
     columnsWidthLSKey: string;
+    tableStyle?: React.CSSProperties;
 }
 
 export function ResizeablePaginatedTable<T, F>({

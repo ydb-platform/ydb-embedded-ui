@@ -1,6 +1,10 @@
 import React from 'react';
 
-import type {RenderControls, RenderErrorMessage} from '../../../components/PaginatedTable';
+import type {
+    PaginatedTableData,
+    RenderControls,
+    RenderErrorMessage,
+} from '../../../components/PaginatedTable';
 import {ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
@@ -40,6 +44,8 @@ interface PaginatedStorageNodesTableProps {
     renderControls?: RenderControls;
     renderErrorMessage: RenderErrorMessage;
     initialEntitiesCount?: number;
+    tableStyle?: React.CSSProperties;
+    onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
 }
 
 export const PaginatedStorageNodesTable = ({
@@ -57,6 +63,8 @@ export const PaginatedStorageNodesTable = ({
     renderControls,
     renderErrorMessage,
     initialEntitiesCount,
+    tableStyle,
+    onDataFetched,
 }: PaginatedStorageNodesTableProps) => {
     const tableFilters = React.useMemo(() => {
         return {
@@ -111,6 +119,8 @@ export const PaginatedStorageNodesTable = ({
             getRowClassName={getRowUnavailableClassName}
             filters={tableFilters}
             tableName="storage-nodes"
+            tableStyle={tableStyle}
+            onDataFetched={onDataFetched}
         />
     );
 };

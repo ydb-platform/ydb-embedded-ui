@@ -194,8 +194,8 @@ const prepareStorageGroups = (
 
 const prepareStorageNodeData = (
     node: TNodeInfo,
-    maximumSlotsPerDisk: string,
-    maximumDisksPerNode: string,
+    maximumSlotsPerDisk: number,
+    maximumDisksPerNode: number,
 ): PreparedStorageNode => {
     const missing =
         node.PDisks?.filter((pDisk) => {
@@ -234,9 +234,9 @@ const prepareStorageNodeData = (
 export const calculateMaximumSlotsPerDisk = (
     nodes: TNodeInfo[] | undefined,
     providedMaximumSlotsPerDisk?: string,
-): string => {
+): number => {
     if (providedMaximumSlotsPerDisk) {
-        return providedMaximumSlotsPerDisk;
+        return Number(providedMaximumSlotsPerDisk);
     }
 
     const safeNodes = nodes || [];
@@ -251,7 +251,7 @@ export const calculateMaximumSlotsPerDisk = (
     });
 
     const maxSlots = Math.max(1, ...slotsPerDiskCounts);
-    return String(maxSlots);
+    return maxSlots;
 };
 
 /**
@@ -260,15 +260,15 @@ export const calculateMaximumSlotsPerDisk = (
 export const calculateMaximumDisksPerNode = (
     nodes: TNodeInfo[] | undefined,
     providedMaximumDisksPerNode?: string,
-): string => {
+): number => {
     if (providedMaximumDisksPerNode) {
-        return providedMaximumDisksPerNode;
+        return Number(providedMaximumDisksPerNode);
     }
 
     const safeNodes = nodes || [];
     const disksPerNodeCounts = safeNodes.map((node) => node.PDisks?.length || 0);
     const maxDisks = Math.max(1, ...disksPerNodeCounts);
-    return String(maxDisks);
+    return maxDisks;
 };
 
 // ==== Prepare responses ====
@@ -298,6 +298,10 @@ export const prepareStorageNodesResponse = (data: TNodesInfo): PreparedStorageRe
         total: Number(TotalNodes) || preparedNodes?.length,
         found: Number(FoundNodes),
         tableGroups,
+        columnSettings: {
+            maxSlotsPerDisk: Number(maximumSlots),
+            maxDisksPerNode: Number(maximumDisks),
+        },
     };
 };
 

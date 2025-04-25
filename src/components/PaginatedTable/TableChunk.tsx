@@ -12,6 +12,7 @@ import type {
     Column,
     FetchData,
     GetRowClassName,
+    PaginatedTableData,
     RenderEmptyDataMessage,
     RenderErrorMessage,
     SortParams,
@@ -35,7 +36,7 @@ interface TableChunkProps<T, F> {
     getRowClassName?: GetRowClassName<T>;
     renderErrorMessage?: RenderErrorMessage;
     renderEmptyDataMessage?: RenderEmptyDataMessage;
-    onDataFetched: (total: number, found: number) => void;
+    onDataFetched: (data?: PaginatedTableData<T>) => void;
 }
 
 // Memoisation prevents chunks rerenders that could cause perfomance issues on big tables
@@ -93,8 +94,12 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
 
     React.useEffect(() => {
         if (currentData && isActive) {
-            const {total = 0, found = 0} = currentData;
-            onDataFetched(total, found);
+            onDataFetched({
+                ...currentData,
+                data: currentData.data as T[],
+                found: currentData.found || 0,
+                total: currentData.total || 0,
+            } as PaginatedTableData<T>);
         }
     }, [currentData, isActive, onDataFetched]);
 
