@@ -1,7 +1,7 @@
 import {isNil} from 'lodash';
 
 import type {FetchData} from '../../../../components/PaginatedTable';
-import type {TopicDataRequest, TopicMessage} from '../../../../types/api/topic';
+import type {TopicDataRequest, TopicDataResponse, TopicMessage} from '../../../../types/api/topic';
 import {safeParseNumber} from '../../../../utils/utils';
 
 import {TOPIC_DATA_FETCH_LIMIT} from './utils/constants';
@@ -13,6 +13,35 @@ interface GetTopicDataProps {
     setStartOffset: (offset: number) => void;
     setEndOffset: (offset: number) => void;
     baseOffset?: number;
+}
+
+export function prepareResponse(response: TopicDataResponse, offset: number) {
+    const {StartOffset, EndOffset, Messages = []} = response;
+
+    const start = safeParseNumber(StartOffset);
+    const end = safeParseNumber(EndOffset);
+
+    const removedMessagesCount = start - offset;
+
+    const result = [];
+    for (let i = 0; i < Math.min(TOPIC_DATA_FETCH_LIMIT, removedMessagesCount); i++) {
+        result.push({
+            Offset: `Offset ${offset + i} removed`,
+        });
+    }
+    for (
+        let i = 0;
+        i <
+        Math.min(
+            TOPIC_DATA_FETCH_LIMIT,
+            TOPIC_DATA_FETCH_LIMIT - removedMessagesCount,
+            Messages.length,
+        );
+        i++
+    ) {
+        result.push(Messages[i]);
+    }
+    return {start, end, messages: result};
 }
 
 export const generateTopicDataGetter = ({
@@ -42,31 +71,7 @@ export const generateTopicDataGetter = ({
 
         const response = await window.api.viewer.getTopicData(queryParams);
 
-        const {StartOffset, EndOffset, Messages = []} = response;
-
-        const start = safeParseNumber(StartOffset);
-        const end = safeParseNumber(EndOffset);
-
-        const removedMessagesCount = start - normalizedOffset;
-
-        const result = [];
-        for (let i = 0; i < Math.min(TOPIC_DATA_FETCH_LIMIT, removedMessagesCount); i++) {
-            result.push({
-                Offset: `Offset ${normalizedOffset + i} removed`,
-            });
-        }
-        for (
-            let i = 0;
-            i <
-            Math.min(
-                TOPIC_DATA_FETCH_LIMIT,
-                TOPIC_DATA_FETCH_LIMIT - removedMessagesCount,
-                Messages.length,
-            );
-            i++
-        ) {
-            result.push(Messages[i]);
-        }
+        const {start, end, messages} = prepareResponse(response, normalizedOffset);
 
         //need to update start and end offsets every time data is fetched to show fresh data in parent component
         setStartOffset(start);
@@ -75,7 +80,7 @@ export const generateTopicDataGetter = ({
         const quantity = end - baseOffset;
 
         return {
-            data: result,
+            data: messages,
             total: quantity,
             found: quantity,
         };
