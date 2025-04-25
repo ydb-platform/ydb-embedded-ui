@@ -38,7 +38,7 @@ export function ClusterMetricsNetwork({
         <ClusterMetricsCardContent
             status={status}
             fillWidth={fill}
-            title={i18n('title_storage')}
+            title={i18n('title_network')}
             collapsed={collapsed}
             legend={{
                 main: legend,

@@ -1,5 +1,4 @@
 {
-  "disk-type": "Disk Type",
   "erasure": "Erasure",
   "allocated": "Allocated",
   "available": "Available",
@@ -13,8 +12,11 @@
   "context_cores": "cores",
   "title_cpu": "CPU",
   "title_storage": "Storage",
+  "title_storage-groups": "Storage Groups",
   "title_memory": "Memory",
+  "title_network": "Network",
   "title_links": "Links",
+  "title_details": "Details",
   "label_overview": "Overview",
   "label_load": "Load",
   "context_of": "of",

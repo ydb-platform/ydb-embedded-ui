@@ -12,6 +12,7 @@ import {EXPAND_CLUSTER_DASHBOARD} from '../../../utils/constants';
 import {useSetting} from '../../../utils/hooks/useSetting';
 import {ClusterInfo} from '../ClusterInfo/ClusterInfo';
 import i18n from '../i18n';
+import {getTotalStorageGroupsUsed} from '../utils';
 
 import {ClusterDashboardSkeleton} from './components/ClusterMetricsCard';
 import {ClusterMetricsCores} from './components/ClusterMetricsCores';
@@ -19,7 +20,6 @@ import {ClusterMetricsMemory} from './components/ClusterMetricsMemory';
 import {ClusterMetricsNetwork} from './components/ClusterMetricsNetwork';
 import {ClusterMetricsStorage} from './components/ClusterMetricsStorage';
 import {b} from './shared';
-import {getTotalStorageGroupsUsed} from './utils';
 
 import overviewIcon from '../../../assets/icons/overview.svg';
 

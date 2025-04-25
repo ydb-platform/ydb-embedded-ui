@@ -1,5 +1,6 @@
 import type {CreateHrefOptions} from '../../routes';
 import routes, {createHref} from '../../routes';
+import type {ClusterGroupsStats} from '../../store/reducers/cluster/types';
 import type {ValueOf} from '../../types/common';
 
 export const clusterTabsIds = {
@@ -41,4 +42,14 @@ export function isClusterTab(tab: any): tab is ClusterTab {
 
 export const getClusterPath = (activeTab?: ClusterTab, query = {}, options?: CreateHrefOptions) => {
     return createHref(routes.cluster, activeTab ? {activeTab} : undefined, query, options);
+};
+
+export const getTotalStorageGroupsUsed = (groupStats: ClusterGroupsStats) => {
+    return Object.values(groupStats).reduce((acc, data) => {
+        Object.values(data).forEach((erasureStats) => {
+            acc += erasureStats.createdGroups;
+        });
+
+        return acc;
+    }, 0);
 };

@@ -1,10 +1,8 @@
 @use '../../../styles/mixins';
 
 .cluster-info {
-    --g-definition-list-item-gap: var(--g-spacing-2);
-    padding: var(--g-spacing-5) 0 var(--g-spacing-2);
-
-    @include mixins.body-2-typography();
+    --g-definition-list-item-gap: var(--g-spacing-3);
+    padding: var(--g-spacing-4) 0 var(--g-spacing-2);
 
     &__skeleton {
         margin-top: 5px;

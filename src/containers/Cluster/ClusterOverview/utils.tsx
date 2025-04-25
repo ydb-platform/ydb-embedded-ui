@@ -1,4 +1,3 @@
-import type {ClusterGroupsStats} from '../../../store/reducers/cluster/types';
 import {formatPercent} from '../../../utils/dataFormatters/dataFormatters';
 import {calculateProgressStatus} from '../../../utils/progress';
 
@@ -11,7 +10,7 @@ export function calculateBaseDiagramValues({
     inverseColorize = false,
     fillWidth,
 }: ClusterMetricsBaseProps & {fillWidth: number}) {
-    const normalizedFillWidth = fillWidth < 1 ? 0.5 : fillWidth;
+    const normalizedFillWidth = Math.max(fillWidth, 0.5);
     const status = calculateProgressStatus({
         fillWidth,
         warningThreshold,
@@ -50,13 +49,3 @@ export function getDiagramValues({
         legend,
     };
 }
-
-export const getTotalStorageGroupsUsed = (groupStats: ClusterGroupsStats) => {
-    return Object.values(groupStats).reduce((acc, data) => {
-        Object.values(data).forEach((erasureStats) => {
-            acc += erasureStats.createdGroups;
-        });
-
-        return acc;
-    }, 0);
-};

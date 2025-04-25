@@ -1,0 +1,14 @@
+.ydb-disk-groups-stats {
+    --g-definition-list-item-gap: var(--g-spacing-2);
+    width: 287px;
+    padding: var(--g-spacing-3) var(--g-spacing-4);
+
+    border-radius: var(--g-border-radius-s);
+    background-color: var(--g-color-base-generic-ultralight);
+
+    &__progress {
+        display: inline-block;
+
+        width: 60px;
+    }
+}
