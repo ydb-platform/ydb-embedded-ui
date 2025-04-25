@@ -5,7 +5,10 @@ import {skipToken} from '@reduxjs/toolkit/query';
 import {isNil} from 'lodash';
 
 import type {RenderControls} from '../../../../components/PaginatedTable';
-import {ResizeablePaginatedTable} from '../../../../components/PaginatedTable';
+import {
+    DEFAULT_TABLE_ROW_HEIGHT,
+    ResizeablePaginatedTable,
+} from '../../../../components/PaginatedTable';
 import {partitionsApi} from '../../../../store/reducers/partitions/partitions';
 import {topicApi} from '../../../../store/reducers/topic';
 import type {TopicDataRequest, TopicMessageMetadataItem} from '../../../../types/api/topic';
@@ -28,6 +31,7 @@ import {useTopicDataQueryParams} from './useTopicDataQueryParams';
 import {
     TOPIC_DATA_COLUMNS_TITLES,
     TOPIC_DATA_COLUMNS_WIDTH_LS_KEY,
+    TOPIC_DATA_FETCH_LIMIT,
     TOPIC_DATA_SELECTED_COLUMNS_LS_KEY,
 } from './utils/constants';
 
@@ -41,12 +45,19 @@ interface TopicDataProps {
 
 export function TopicData({parentRef, path, database}: TopicDataProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const [startOffset, setStartOffset] = React.useState(0);
-    const [endOffset, setEndOffset] = React.useState(0);
+    const [startOffset, setStartOffset] = React.useState<number>();
+    const [endOffset, setEndOffset] = React.useState<number>();
     const [fullValue, setFullValue] = React.useState<
         string | TopicMessageMetadataItem[] | undefined
     >(undefined);
     const [controlsKey, setControlsKey] = React.useState(0);
+    const [emptyData, setEmptyData] = React.useState(false);
+
+    const [baseOffset, setBaseOffset] = React.useState<number>(0);
+    const [baseEndOffset, setBaseEndOffset] = React.useState<number>(0);
+
+    const startRef = React.useRef<number>();
+    startRef.current = startOffset;
 
     const {
         selectedPartition,
@@ -58,6 +69,14 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
         handleSelectedPartitionChange,
     } = useTopicDataQueryParams();
 
+    React.useEffect(() => {
+        return () => {
+            handleSelectedPartitionChange(undefined);
+            handleSelectedOffsetChange(undefined);
+            handleStartTimestampChange(undefined);
+        };
+    }, [handleSelectedPartitionChange, handleSelectedOffsetChange, handleStartTimestampChange]);
+
     const queryParams = React.useMemo(() => {
         if (isNil(selectedPartition)) {
             return skipToken;
@@ -66,12 +85,12 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
         if (startTimestamp) {
             params.read_timestamp = startTimestamp;
         } else {
-            params.offset = selectedOffset ?? 0;
+            params.offset = safeParseNumber(selectedOffset);
         }
         return params;
     }, [selectedPartition, selectedOffset, startTimestamp, database, path]);
 
-    const {currentData, isFetching} = topicApi.useGetTopicDataQuery(queryParams);
+    const {currentData, error, isFetching} = topicApi.useGetTopicDataQuery(queryParams);
 
     const {
         data: partitions,
@@ -86,26 +105,21 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
         const selectedPartitionData = partitions?.find(
             ({partitionId}) => partitionId === selectedPartition,
         );
-
         if (selectedPartitionData) {
-            setStartOffset(safeParseNumber(selectedPartitionData.startOffset));
-            setEndOffset(safeParseNumber(selectedPartitionData.endOffset));
+            if (!baseOffset) {
+                setBaseOffset(safeParseNumber(selectedPartitionData.startOffset));
+            }
+            if (!baseEndOffset) {
+                setBaseEndOffset(safeParseNumber(selectedPartitionData.endOffset));
+            }
         }
-    }, [selectedPartition, partitions]);
+    }, [selectedPartition, partitions, baseOffset, baseEndOffset, startOffset, endOffset]);
 
     React.useEffect(() => {
         if (partitions && partitions.length && isNil(selectedPartition)) {
             handleSelectedPartitionChange(partitions[0].partitionId);
-            handleSelectedOffsetChange(undefined);
-            handleStartTimestampChange(undefined);
         }
-    }, [
-        partitions,
-        selectedPartition,
-        handleSelectedPartitionChange,
-        handleSelectedOffsetChange,
-        handleStartTimestampChange,
-    ]);
+    }, [partitions, selectedPartition, handleSelectedPartitionChange]);
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
         getAllColumns(setFullValue),
@@ -115,27 +129,42 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
         REQUIRED_TOPIC_DATA_COLUMNS,
     );
 
-    const emptyData = React.useMemo(() => !currentData?.Messages?.length, [currentData]);
+    React.useEffect(() => {
+        //values should be recalculated only when data is fetched
+        if (isFetching || (!currentData && !error)) {
+            return;
+        }
+        if (currentData?.Messages?.length || (!currentData && !error)) {
+            setEmptyData(false);
+        } else if (!(currentData && currentData.Messages?.length) || error) {
+            setEmptyData(true);
+        }
+        if (currentData) {
+            setStartOffset(safeParseNumber(currentData.StartOffset));
+            setEndOffset(safeParseNumber(currentData.EndOffset));
+        }
+    }, [isFetching, currentData, error]);
 
-    const tableFilters = React.useMemo(() => {
-        return {
+    const tableFilters = React.useMemo(
+        () => ({
             path,
             database,
             partition: selectedPartition ?? '',
             isEmpty: emptyData,
-        };
-    }, [path, database, selectedPartition, emptyData]);
+        }),
+        [path, database, selectedPartition, emptyData],
+    );
 
     const scrollToOffset = React.useCallback(
         (newOffset: number) => {
-            const scrollTop = (newOffset - (startOffset ?? 0)) * 41;
+            const scrollTop = (newOffset - (baseOffset ?? 0)) * DEFAULT_TABLE_ROW_HEIGHT;
             const normalizedScrollTop = Math.max(0, scrollTop);
             parentRef.current?.scrollTo({
                 top: normalizedScrollTop,
                 behavior: 'instant',
             });
         },
-        [startOffset, parentRef],
+        [baseOffset, parentRef],
     );
 
     React.useEffect(() => {
@@ -153,20 +182,16 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
     }, [currentData, isFetching, scrollToOffset]);
 
     const scrollToStartOffset = React.useCallback(() => {
-        parentRef.current?.scrollTo({
-            top: 0,
-            behavior: 'smooth',
-        });
-    }, [parentRef]);
+        if (startOffset) {
+            scrollToOffset(startOffset);
+        }
+    }, [startOffset, scrollToOffset]);
 
     const scrollToEndOffset = React.useCallback(() => {
-        if (parentRef.current) {
-            parentRef.current.scrollTo({
-                top: parentRef.current.scrollHeight - parentRef.current.clientHeight,
-                behavior: 'smooth',
-            });
+        if (endOffset) {
+            scrollToOffset(endOffset);
         }
-    }, [parentRef]);
+    }, [endOffset, scrollToOffset]);
 
     const renderControls: RenderControls = () => {
         return (
@@ -210,8 +235,8 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
     };
 
     const getTopicData = React.useMemo(
-        () => generateTopicDataGetter({setEndOffset, setStartOffset}),
-        [],
+        () => generateTopicDataGetter({setEndOffset, setStartOffset, baseOffset}),
+        [baseOffset],
     );
 
     return (
@@ -222,14 +247,14 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
                 parentRef={parentRef}
                 columns={columnsToShow}
                 fetchData={getTopicData}
-                initialEntitiesCount={endOffset - startOffset}
-                limit={50}
-                startOffset={startOffset}
+                initialEntitiesCount={baseEndOffset - baseOffset}
+                limit={TOPIC_DATA_FETCH_LIMIT}
                 renderControls={renderControls}
                 renderErrorMessage={renderPaginatedTableErrorMessage}
                 renderEmptyDataMessage={renderEmptyDataMessage}
                 filters={tableFilters}
                 tableName="topicData"
+                rowHeight={DEFAULT_TABLE_ROW_HEIGHT}
             />
         </React.Fragment>
     );

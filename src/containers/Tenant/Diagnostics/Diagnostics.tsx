@@ -144,7 +144,14 @@ function Diagnostics(props: DiagnosticsProps) {
                 return <Partitions path={path} database={tenantName} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.topicData: {
-                return <TopicData path={path} database={tenantName} parentRef={containerRef} />;
+                return (
+                    <TopicData
+                        key={path}
+                        path={path}
+                        database={tenantName}
+                        parentRef={containerRef}
+                    />
+                );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.configs: {
                 return <Configs database={tenantName} />;

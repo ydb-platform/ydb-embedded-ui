@@ -9,20 +9,20 @@ export function useTopicDataQueryParams() {
     const [{selectedPartition, selectedOffset, startTimestamp, topicDataFilter}, setQueryParams] =
         useQueryParams({
             selectedPartition: StringParam,
-            selectedOffset: NumberParam,
+            selectedOffset: StringParam,
             startTimestamp: NumberParam,
             topicDataFilter: TopicDataFilterValueParam,
         });
 
     const handleSelectedPartitionChange = React.useCallback(
-        (value: string) => {
+        (value?: string) => {
             setQueryParams({selectedPartition: value}, 'replaceIn');
         },
         [setQueryParams],
     );
 
     const handleSelectedOffsetChange = React.useCallback(
-        (value?: number) => {
+        (value?: string) => {
             setQueryParams({selectedOffset: value}, 'replaceIn');
         },
         [setQueryParams],

@@ -1,14 +1,15 @@
 import React from 'react';
 
-import type {TextInputProps} from '@gravity-ui/uikit';
-import {TextInput} from '@gravity-ui/uikit';
-
-interface SearchProps extends TextInputProps {
+export function useDebouncedValue<T extends string | number>({
+    value,
+    onUpdate,
+    debounce = 200,
+}: {
+    value: T;
+    onUpdate?: (value: T) => void;
     debounce?: number;
-}
-
-export const DebouncedInput = ({onUpdate, value = '', debounce = 200, ...rest}: SearchProps) => {
-    const [currentValue, setCurrentValue] = React.useState<string>(value);
+}) {
+    const [currentValue, setCurrentValue] = React.useState<T>(value);
 
     const timer = React.useRef<number>();
 
@@ -22,7 +23,7 @@ export const DebouncedInput = ({onUpdate, value = '', debounce = 200, ...rest}: 
         });
     }, [value]);
 
-    const onSearchValueChange = (newValue: string) => {
+    const handleUpdate = (newValue: T) => {
         setCurrentValue(newValue);
 
         window.clearTimeout(timer.current);
@@ -30,6 +31,5 @@ export const DebouncedInput = ({onUpdate, value = '', debounce = 200, ...rest}: 
             onUpdate?.(newValue);
         }, debounce);
     };
-
-    return <TextInput value={currentValue} onUpdate={onSearchValueChange} {...rest} />;
-};
+    return [currentValue, handleUpdate] as const;
+}

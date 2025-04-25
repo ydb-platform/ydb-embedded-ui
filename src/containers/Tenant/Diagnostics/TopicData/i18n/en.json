@@ -21,5 +21,6 @@
   "label_by-offset": "By offset",
   "label_by-timestamp": "By timestamp",
   "action_scroll-down": "Scroll to the end",
-  "action_scroll-up": "Scroll to the start"
+  "action_scroll-up": "Scroll to the start",
+  "action_show-message": "Show message content"
 }

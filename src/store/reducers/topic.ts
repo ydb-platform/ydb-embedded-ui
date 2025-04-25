@@ -34,7 +34,7 @@ export const topicApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: ['All'],
+            keepUnusedDataFor: 0,
         }),
     }),
     overrideExisting: 'throw',

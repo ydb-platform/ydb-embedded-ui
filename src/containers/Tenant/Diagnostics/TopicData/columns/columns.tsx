@@ -94,23 +94,11 @@ export function getAllColumns(setFullValue: (value: string | TopicMessageMetadat
             name: TOPIC_DATA_COLUMNS_IDS.MESSAGE,
             header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.MESSAGE],
             align: DataTable.LEFT,
-            render: ({row: {Message}}) => {
-                if (isNil(Message)) {
+            render: ({row: {Message: message}}) => {
+                if (isNil(message)) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
-                let message = Message;
-                try {
-                    message = atob(Message);
-                } catch {}
-                const longMessage = message.length > 50;
-                return (
-                    <span
-                        className={b('message', {clickable: longMessage})}
-                        onClick={longMessage ? () => setFullValue(message) : undefined}
-                    >
-                        {message}
-                    </span>
-                );
+                return <Message setFullValue={setFullValue} message={message} />;
             },
             width: 500,
         },
@@ -193,4 +181,38 @@ function TopicDataTimestamp({timestamp}: TopicDataTimestampProps) {
 
 function valueOrPlaceholder(value: string | undefined, placeholder = EMPTY_DATA_PLACEHOLDER) {
     return isNil(value) ? placeholder : value;
+}
+
+interface MessageProps {
+    setFullValue: (value: string) => void;
+    message: string;
+}
+
+function Message({setFullValue, message}: MessageProps) {
+    const longMessage = message.length > 200;
+
+    let encryptedMessage: string | undefined;
+
+    if (!longMessage) {
+        try {
+            encryptedMessage = atob(message);
+        } catch {}
+    }
+
+    const handleClick = () => {
+        try {
+            if (!encryptedMessage) {
+                encryptedMessage = atob(message);
+            }
+            setFullValue(encryptedMessage);
+        } catch {}
+    };
+    return (
+        <span
+            className={b('message', {clickable: longMessage})}
+            onClick={longMessage ? handleClick : undefined}
+        >
+            {encryptedMessage ?? i18n('action_show-message')}
+        </span>
+    );
 }

@@ -53,3 +53,5 @@ export const codecNumberToName: Record<number, string> = {
     2: 'LZOP',
     3: 'ZSTD',
 };
+
+export const TOPIC_DATA_FETCH_LIMIT = 20;

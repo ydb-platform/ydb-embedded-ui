@@ -14,13 +14,13 @@ import {
     Select,
     TableColumnSetup,
 } from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
-import {DebouncedInput} from '../../../../../components/DebouncedInput/DebouncedInput';
+import {DebouncedInput} from '../../../../../components/DebouncedInput/DebouncedTextInput';
 import {EntitiesCount} from '../../../../../components/EntitiesCount';
 import type {PreparedPartitionData} from '../../../../../store/reducers/partitions/types';
 import {formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {prepareErrorMessage} from '../../../../../utils/prepareErrorMessage';
-import {safeParseNumber} from '../../../../../utils/utils';
 import i18n from '../i18n';
 import {useTopicDataQueryParams} from '../useTopicDataQueryParams';
 import {b} from '../utils/constants';
@@ -45,8 +45,8 @@ export function TopicDataControls({
     columnsToSelect,
     handleSelectedColumnsUpdate,
 
-    initialOffset = 0,
-    endOffset = 0,
+    initialOffset,
+    endOffset,
     partitions,
     partitionsLoading,
     partitionsError,
@@ -101,22 +101,35 @@ export function TopicDataControls({
                 onUpdate={handleSelectedColumnsUpdate}
                 sortable={false}
             />
-            <EntitiesCount
-                label={i18n('label_offset')}
-                current={`${formatNumber(initialOffset)}—${formatNumber(endOffset - 1)}`}
-            />
-            <Flex gap={1}>
-                <ActionTooltip title={i18n('action_scroll-down')}>
-                    <Button onClick={scrollToEndOffset}>
-                        <Icon size={14} data={ArrowDownToLine} />
-                    </Button>
-                </ActionTooltip>
-                <ActionTooltip title={i18n('action_scroll-up')}>
-                    <Button onClick={scrollToStartOffset}>
-                        <Icon size={14} data={ArrowUpToLine} />
-                    </Button>
-                </ActionTooltip>
-            </Flex>
+            {!isNil(initialOffset) && !isNil(endOffset) && (
+                <Flex gap={0.5}>
+                    <ActionTooltip title={i18n('action_scroll-up')}>
+                        <Button
+                            onClick={scrollToStartOffset}
+                            view="flat-info"
+                            selected
+                            pin="round-brick"
+                        >
+                            <Icon size={14} data={ArrowUpToLine} />
+                        </Button>
+                    </ActionTooltip>
+                    <EntitiesCount
+                        label={i18n('label_offset')}
+                        current={`${formatNumber(initialOffset)}—${formatNumber(endOffset - 1)}`}
+                        className={b('offsets-count')}
+                    />
+                    <ActionTooltip title={i18n('action_scroll-down')}>
+                        <Button
+                            onClick={scrollToEndOffset}
+                            view="flat-info"
+                            selected
+                            pin="brick-round"
+                        >
+                            <Icon size={14} data={ArrowDownToLine} />
+                        </Button>
+                    </ActionTooltip>
+                </Flex>
+            )}
         </React.Fragment>
     );
 }
@@ -144,7 +157,7 @@ function TopicDataStartControls() {
     );
     const onStartOffsetChange = React.useCallback(
         (value: string) => {
-            handleSelectedOffsetChange(safeParseNumber(value));
+            handleSelectedOffsetChange(value);
         },
         [handleSelectedOffsetChange],
     );

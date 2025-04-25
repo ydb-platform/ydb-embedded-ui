@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {cn} from '../../utils/cn';
-import {DebouncedInput} from '../DebouncedInput/DebouncedInput';
+import {DebouncedInput} from '../DebouncedInput/DebouncedTextInput';
 
 import './Search.scss';
 
