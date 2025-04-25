@@ -7,17 +7,17 @@ describe('calculateMaximumDisksPerNode', () => {
         const nodes: TNodeInfo[] = [];
         const providedMaximumDisksPerNode = '5';
 
-        expect(calculateMaximumDisksPerNode(nodes, providedMaximumDisksPerNode)).toBe('5');
+        expect(calculateMaximumDisksPerNode(nodes, providedMaximumDisksPerNode)).toBe(5);
     });
 
     test('should return "1" for empty nodes array', () => {
         const nodes: TNodeInfo[] = [];
 
-        expect(calculateMaximumDisksPerNode(nodes)).toBe('1');
+        expect(calculateMaximumDisksPerNode(nodes)).toBe(1);
     });
 
     test('should return "1" for undefined nodes', () => {
-        expect(calculateMaximumDisksPerNode(undefined)).toBe('1');
+        expect(calculateMaximumDisksPerNode(undefined)).toBe(1);
     });
 
     test('should return "1" for nodes without PDisks', () => {
@@ -28,7 +28,7 @@ describe('calculateMaximumDisksPerNode', () => {
             },
         ];
 
-        expect(calculateMaximumDisksPerNode(nodes)).toBe('1');
+        expect(calculateMaximumDisksPerNode(nodes)).toBe(1);
     });
 
     test('should calculate maximum disks correctly for single node with multiple PDisks', () => {
@@ -53,7 +53,7 @@ describe('calculateMaximumDisksPerNode', () => {
             },
         ];
 
-        expect(calculateMaximumDisksPerNode(nodes)).toBe('3');
+        expect(calculateMaximumDisksPerNode(nodes)).toBe(3);
     });
 
     test('should calculate maximum disks across multiple nodes', () => {
@@ -106,7 +106,7 @@ describe('calculateMaximumDisksPerNode', () => {
             },
         ];
 
-        expect(calculateMaximumDisksPerNode(nodes)).toBe('4');
+        expect(calculateMaximumDisksPerNode(nodes)).toBe(4);
     });
 
     test('should handle nodes with empty PDisks array', () => {
@@ -132,6 +132,6 @@ describe('calculateMaximumDisksPerNode', () => {
             },
         ];
 
-        expect(calculateMaximumDisksPerNode(nodes)).toBe('2');
+        expect(calculateMaximumDisksPerNode(nodes)).toBe(2);
     });
 });
