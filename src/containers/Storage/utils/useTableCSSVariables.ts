@@ -1,7 +1,6 @@
 import React from 'react';
 
-import type {PaginatedTableData} from '../../../components/PaginatedTable/types';
-import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
+import type {StorageNodesPaginatedTableData} from '../../../components/PaginatedTable/types';
 
 // Constants moved from PaginatedStorageNodes.tsx
 const MAX_SLOTS_CSS_VAR = '--maximum-slots';
@@ -15,7 +14,7 @@ const MAX_DISKS_CSS_VAR = '--maximum-disks';
 export function useTableCSSVariables() {
     const [tableStyle, setTableStyle] = React.useState<React.CSSProperties | undefined>(undefined);
 
-    const handleDataFetched = React.useCallback((data: PaginatedTableData<PreparedStorageNode>) => {
+    const handleDataFetched = React.useCallback((data: StorageNodesPaginatedTableData) => {
         if (data?.columnSettings) {
             const {maxSlotsPerDisk, maxDisksPerNode} = data.columnSettings;
             setTableStyle({

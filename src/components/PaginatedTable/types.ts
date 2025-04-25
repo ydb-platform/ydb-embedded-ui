@@ -1,3 +1,4 @@
+import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import type {IResponseError} from '../../types/api/error';
 
 import type {ASCENDING, CENTER, DESCENDING, LEFT, RIGHT} from './constants';
@@ -36,18 +37,18 @@ export interface Column<T> {
     align: AlignType;
 }
 
-interface StorageNodesTableDataExtension {
-    columnSettings?: {
-        maxSlotsPerDisk: number;
-        maxDisksPerNode: number;
-    };
-}
-
-export interface PaginatedTableData<T> extends StorageNodesTableDataExtension {
+export interface PaginatedTableData<T> {
     data: T[];
     total: number;
     found: number;
 }
+
+export type StorageNodesPaginatedTableData = PaginatedTableData<PreparedStorageNode> & {
+    columnSettings?: {
+        maxSlotsPerDisk: number;
+        maxDisksPerNode: number;
+    };
+};
 
 type FetchDataParams<F, E = {}> = {
     limit: number;
