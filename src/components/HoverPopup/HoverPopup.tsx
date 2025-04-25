@@ -14,7 +14,7 @@ const DEBOUNCE_TIMEOUT = 100;
 
 type HoverPopupProps = {
     children: React.ReactNode;
-    popupContent: React.ReactNode;
+    renderPopupContent: () => React.ReactNode;
     showPopup?: boolean;
     offset?: [number, number];
     anchorRef?: React.RefObject<HTMLElement>;
@@ -26,7 +26,7 @@ type HoverPopupProps = {
 
 export const HoverPopup = ({
     children,
-    popupContent,
+    renderPopupContent,
     showPopup,
     offset,
     anchorRef,
@@ -98,22 +98,24 @@ export const HoverPopup = ({
             <span ref={anchor} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
                 {children}
             </span>
-            <Popup
-                contentClassName={b(null, contentClassName)}
-                anchorRef={anchorRef || anchor}
-                open={open}
-                onMouseEnter={onPopupMouseEnter}
-                onMouseLeave={onPopupMouseLeave}
-                onEscapeKeyDown={onPopupEscapeKeyDown}
-                onBlur={onPopupBlur}
-                placement={placement}
-                hasArrow
-                // bigger offset for easier switching to neighbour nodes
-                // matches the default offset for popup with arrow out of a sense of beauty
-                offset={offset || [0, 12]}
-            >
-                <div onContextMenu={onPopupContextMenu}>{popupContent}</div>
-            </Popup>
+            {open ? (
+                <Popup
+                    contentClassName={b(null, contentClassName)}
+                    anchorRef={anchorRef || anchor}
+                    onMouseEnter={onPopupMouseEnter}
+                    onMouseLeave={onPopupMouseLeave}
+                    onEscapeKeyDown={onPopupEscapeKeyDown}
+                    onBlur={onPopupBlur}
+                    placement={placement}
+                    hasArrow
+                    open
+                    // bigger offset for easier switching to neighbour nodes
+                    // matches the default offset for popup with arrow out of a sense of beauty
+                    offset={offset || [0, 12]}
+                >
+                    <div onContextMenu={onPopupContextMenu}>{renderPopupContent()}</div>
+                </Popup>
+            ) : null}
         </React.Fragment>
     );
 };

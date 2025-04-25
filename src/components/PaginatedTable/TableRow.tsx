@@ -3,6 +3,7 @@ import {Skeleton} from '@gravity-ui/uikit';
 import {DEFAULT_ALIGN, DEFAULT_RESIZEABLE} from './constants';
 import {b} from './shared';
 import type {AlignType, Column, GetRowClassName} from './types';
+import {typedMemo} from './utils';
 
 interface TableCellProps {
     height: number;
@@ -38,11 +39,10 @@ const TableRowCell = ({
 
 interface LoadingTableRowProps<T> {
     columns: Column<T>[];
-    index: number;
     height: number;
 }
 
-export const LoadingTableRow = <T,>({index, columns, height}: LoadingTableRowProps<T>) => {
+export const LoadingTableRow = typedMemo(function <T>({columns, height}: LoadingTableRowProps<T>) {
     return (
         <tr className={b('row', {loading: true})}>
             {columns.map((column) => {
@@ -50,7 +50,7 @@ export const LoadingTableRow = <T,>({index, columns, height}: LoadingTableRowPro
 
                 return (
                     <TableRowCell
-                        key={`${column.name}${index}`}
+                        key={column.name}
                         height={height}
                         width={column.width}
                         align={column.align}
@@ -66,17 +66,16 @@ export const LoadingTableRow = <T,>({index, columns, height}: LoadingTableRowPro
             })}
         </tr>
     );
-};
+});
 
 interface TableRowProps<T> {
     columns: Column<T>[];
-    index: number;
     row: T;
     height: number;
     getRowClassName?: GetRowClassName<T>;
 }
 
-export const TableRow = <T,>({row, index, columns, getRowClassName, height}: TableRowProps<T>) => {
+export const TableRow = <T,>({row, columns, getRowClassName, height}: TableRowProps<T>) => {
     const additionalClassName = getRowClassName?.(row);
 
     return (
@@ -86,14 +85,14 @@ export const TableRow = <T,>({row, index, columns, getRowClassName, height}: Tab
 
                 return (
                     <TableRowCell
-                        key={`${column.name}${index}`}
+                        key={column.name}
                         height={height}
                         width={column.width}
                         align={column.align}
                         className={column.className}
                         resizeable={resizeable}
                     >
-                        {column.render({row, index})}
+                        {column.render({row})}
                     </TableRowCell>
                 );
             })}

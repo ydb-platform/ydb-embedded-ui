@@ -86,7 +86,7 @@ function Slot<T extends SlotItemType>({item, pDiskId, nodeId}: SlotProps<T>) {
 
             return (
                 <HoverPopup
-                    popupContent={<VDiskInfo data={item.SlotData} withTitle />}
+                    renderPopupContent={() => <VDiskInfo data={item.SlotData} withTitle />}
                     contentClassName={b('vdisk-popup')}
                     placement={['right', 'top']}
                 >
@@ -111,7 +111,7 @@ function Slot<T extends SlotItemType>({item, pDiskId, nodeId}: SlotProps<T>) {
         if (isLogSlot(item)) {
             return (
                 <HoverPopup
-                    popupContent={<LogInfo data={item.SlotData} />}
+                    renderPopupContent={() => <LogInfo data={item.SlotData} />}
                     contentClassName={b('vdisk-popup')}
                     placement={['right', 'top']}
                 >
@@ -134,7 +134,7 @@ function Slot<T extends SlotItemType>({item, pDiskId, nodeId}: SlotProps<T>) {
         if (isEmptySlot(item)) {
             return (
                 <HoverPopup
-                    popupContent={<EmptySlotInfo data={item.SlotData} />}
+                    renderPopupContent={() => <EmptySlotInfo data={item.SlotData} />}
                     contentClassName={b('vdisk-popup')}
                     placement={['right', 'top']}
                 >

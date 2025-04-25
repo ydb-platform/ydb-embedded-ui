@@ -87,7 +87,7 @@ export const PDisk = ({
                 anchorRef={anchorRef}
                 onShowPopup={onShowPopup}
                 onHidePopup={onHidePopup}
-                popupContent={<PDiskPopup data={data} />}
+                renderPopupContent={() => <PDiskPopup data={data} />}
                 delayClose={200}
             >
                 <InternalLink to={pDiskPath} className={b('content')}>
