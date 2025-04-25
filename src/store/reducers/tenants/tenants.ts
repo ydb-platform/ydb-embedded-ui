@@ -27,8 +27,8 @@ export const tenantsApi = api.injectEndpoints({
             queryFn: async ({clusterName}: {clusterName?: string}, {signal}) => {
                 try {
                     const response = window.api.meta
-                        ? await window.api.meta.getTenants(clusterName, {signal})
-                        : await window.api.viewer.getTenants(clusterName, {signal});
+                        ? await window.api.meta.getTenants({clusterName}, {signal})
+                        : await window.api.viewer.getTenants({clusterName}, {signal});
                     let data: PreparedTenant[];
                     if (Array.isArray(response.TenantInfo)) {
                         data = prepareTenants(response.TenantInfo);

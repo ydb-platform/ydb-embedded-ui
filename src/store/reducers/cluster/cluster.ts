@@ -1,7 +1,6 @@
 import {createSelector, createSlice} from '@reduxjs/toolkit';
 import type {Dispatch, PayloadAction} from '@reduxjs/toolkit';
 import {skipToken} from '@reduxjs/toolkit/query';
-import {StringParam, useQueryParam} from 'use-query-params';
 
 import type {ClusterTab} from '../../../containers/Cluster/utils';
 import {clusterTabsIds, isClusterTab} from '../../../containers/Cluster/utils';
@@ -10,6 +9,7 @@ import {isClusterInfoV2} from '../../../types/api/cluster';
 import type {TClusterInfo} from '../../../types/api/cluster';
 import type {TTabletStateInfo} from '../../../types/api/tablet';
 import {CLUSTER_DEFAULT_TITLE, DEFAULT_CLUSTER_TAB_KEY} from '../../../utils/constants';
+import {useClusterNameFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {isQueryErrorResponse} from '../../../utils/query';
 import type {RootState} from '../../defaultStore';
 import {api} from '../api';
@@ -136,16 +136,24 @@ export const clusterApi = api.injectEndpoints({
 });
 
 export function useClusterBaseInfo() {
-    const [clusterName] = useQueryParam('clusterName', StringParam);
+    const clusterNameFromQuery = useClusterNameFromQuery();
 
-    const {currentData} = clusterApi.useGetClusterBaseInfoQuery(clusterName ?? skipToken);
+    const {currentData} = clusterApi.useGetClusterBaseInfoQuery(clusterNameFromQuery ?? skipToken);
 
-    const {solomon: monitoring, name, trace_view: traceView, ...data} = currentData || {};
+    const {solomon: monitoring, name, title, trace_view: traceView, ...data} = currentData || {};
+
+    // name is used for requests, title is used for display
+    // Example:
+    // Name: ydb_vla_dev02
+    // Title: YDB DEV VLA02
+    const clusterName = name ?? clusterNameFromQuery ?? undefined;
+    const clusterTitle = title ?? clusterName;
 
     return {
         ...data,
         ...parseTraceFields({traceView}),
-        name: name ?? clusterName ?? undefined,
+        name: clusterName,
+        title: clusterTitle,
         monitoring,
     };
 }

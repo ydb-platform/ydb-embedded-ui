@@ -30,11 +30,15 @@ export class MetaAPI extends BaseYdbAPI {
         });
     }
 
-    getTenants(clusterName?: string, {signal}: AxiosOptions = {}) {
+    getTenants(
+        {clusterName, databaseName}: {clusterName?: string; databaseName?: string},
+        {signal}: AxiosOptions = {},
+    ) {
         return this.get<MetaTenants>(
             this.getPath('/meta/cp_databases'),
             {
                 cluster_name: clusterName,
+                database_name: databaseName,
             },
             {requestConfig: {signal}},
         ).then(parseMetaTenants);

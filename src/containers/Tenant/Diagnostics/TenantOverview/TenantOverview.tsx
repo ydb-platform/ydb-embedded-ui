@@ -10,6 +10,7 @@ import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../../types/additionalProps';
 import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
 import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
+import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
 
 import {DefaultOverviewContent} from './DefaultOverviewContent/DefaultOverviewContent';
@@ -35,12 +36,11 @@ export function TenantOverview({
 }: TenantOverviewProps) {
     const {metricsTab} = useTypedSelector((state) => state.tenant);
     const [autoRefreshInterval] = useAutoRefreshInterval();
+    const clusterName = useClusterNameFromQuery();
 
     const {currentData: tenant, isFetching} = tenantApi.useGetTenantInfoQuery(
-        {path: tenantName},
-        {
-            pollingInterval: autoRefreshInterval,
-        },
+        {path: tenantName, clusterName},
+        {pollingInterval: autoRefreshInterval},
     );
     const tenantLoading = isFetching && tenant === undefined;
     const {Name, Type, Overall} = tenant || {};

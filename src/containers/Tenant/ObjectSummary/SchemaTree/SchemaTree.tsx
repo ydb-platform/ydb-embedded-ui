@@ -12,11 +12,7 @@ import {schemaApi} from '../../../../store/reducers/schema/schema';
 import {tableSchemaDataApi} from '../../../../store/reducers/tableSchemaData';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
 import {valueIsDefined} from '../../../../utils';
-import {
-    useQueryExecutionSettings,
-    useTypedDispatch,
-    useTypedSelector,
-} from '../../../../utils/hooks';
+import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {getConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {getSchemaControls} from '../../utils/controls';
 import {
@@ -48,7 +44,6 @@ export function SchemaTree(props: SchemaTreeProps) {
         {currentData: actionsSchemaData, isFetching: isActionsDataFetching},
     ] = tableSchemaDataApi.useLazyGetTableSchemaDataQuery();
 
-    const [querySettings] = useQueryExecutionSettings();
     const [createDirectoryOpen, setCreateDirectoryOpen] = React.useState(false);
     const [parentPath, setParentPath] = React.useState('');
     const setSchemaTreeKey = useDispatchTreeKey();
@@ -144,8 +139,8 @@ export function SchemaTree(props: SchemaTreeProps) {
         dispatch,
         input,
         isActionsDataFetching,
+        isDirty,
         onActivePathUpdate,
-        querySettings,
         rootPath,
     ]);
 

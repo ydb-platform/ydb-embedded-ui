@@ -30,13 +30,11 @@ function Header({mainPage}: HeaderProps) {
     const {page, pageBreadcrumbsOptions} = useTypedSelector((state) => state.header);
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
-    const clusterInfo = useClusterBaseInfo();
+    const {title: clusterTitle} = useClusterBaseInfo();
 
     const database = useDatabaseFromQuery();
     const location = useLocation();
     const isDatabasePage = location.pathname === '/tenant';
-
-    const clusterName = clusterInfo.title || clusterInfo.name;
 
     const breadcrumbItems = React.useMemo(() => {
         const rawBreadcrumbs: RawBreadcrumbItem[] = [];
@@ -46,10 +44,10 @@ function Header({mainPage}: HeaderProps) {
             rawBreadcrumbs.push(mainPage);
         }
 
-        if (clusterName) {
+        if (clusterTitle) {
             options = {
                 ...options,
-                clusterName,
+                clusterName: clusterTitle,
             };
         }
 
@@ -58,7 +56,7 @@ function Header({mainPage}: HeaderProps) {
         return breadcrumbs.map((item) => {
             return {...item, action: () => {}};
         });
-    }, [clusterName, mainPage, page, pageBreadcrumbsOptions]);
+    }, [clusterTitle, mainPage, page, pageBreadcrumbsOptions]);
 
     const renderRightControls = () => {
         const elements: React.ReactNode[] = [];

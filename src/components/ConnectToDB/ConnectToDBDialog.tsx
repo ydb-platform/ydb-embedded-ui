@@ -2,9 +2,14 @@ import React from 'react';
 
 import NiceModal from '@ebay/nice-modal-react';
 import {Dialog, Tabs} from '@gravity-ui/uikit';
+import {skipToken} from '@reduxjs/toolkit/query';
 
+import {tenantApi} from '../../store/reducers/tenant/tenant';
 import {cn} from '../../utils/cn';
+import {useTypedSelector} from '../../utils/hooks';
+import {useClusterNameFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
+import {LoaderWrapper} from '../LoaderWrapper/LoaderWrapper';
 import {YDBSyntaxHighlighterLazy} from '../SyntaxHighlighter/lazy';
 
 import {getDocsLink} from './getDocsLink';
@@ -32,8 +37,25 @@ interface ConnectToDBDialogProps extends SnippetParams {
     onClose: VoidFunction;
 }
 
-function ConnectToDBDialog({open, onClose, database, endpoint}: ConnectToDBDialogProps) {
+function ConnectToDBDialog({
+    open,
+    onClose,
+    database,
+    endpoint: endpointFromProps,
+}: ConnectToDBDialogProps) {
     const [activeTab, setActiveTab] = React.useState<SnippetLanguage>('bash');
+
+    const clusterName = useClusterNameFromQuery();
+    const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
+
+    // If there is endpoint from props, we don't need to request tenant data
+    // Also we should not request tenant data if we are in single cluster mode
+    // Since there is no ControlPlane data in this case
+    const shouldRequestTenantData = database && !endpointFromProps && !singleClusterMode;
+    const params = shouldRequestTenantData ? {path: database, clusterName} : skipToken;
+    const {currentData: tenantData, isLoading: isTenantDataLoading} =
+        tenantApi.useGetTenantInfoQuery(params);
+    const endpoint = endpointFromProps ?? tenantData?.ControlPlane?.endpoint;
 
     const snippet = getSnippetCode(activeTab, {database, endpoint});
     const docsLink = getDocsLink(activeTab);
@@ -52,12 +74,14 @@ function ConnectToDBDialog({open, onClose, database, endpoint}: ConnectToDBDialo
                     className={b('dialog-tabs')}
                 />
                 <div className={b('snippet-container')}>
-                    <YDBSyntaxHighlighterLazy
-                        language={activeTab}
-                        text={snippet}
-                        transparentBackground={false}
-                        withClipboardButton={{alwaysVisible: true}}
-                    />
+                    <LoaderWrapper loading={isTenantDataLoading}>
+                        <YDBSyntaxHighlighterLazy
+                            language={activeTab}
+                            text={snippet}
+                            transparentBackground={false}
+                            withClipboardButton={{alwaysVisible: true}}
+                        />
+                    </LoaderWrapper>
                 </div>
                 {docsLink ? (
                     <LinkWithIcon
