@@ -155,6 +155,14 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
         [path, database, selectedPartition, emptyData],
     );
 
+    const resetFilters = React.useCallback(() => {
+        handleSelectedOffsetChange(undefined);
+        handleStartTimestampChange(undefined);
+        if (topicDataFilter === 'TIMESTAMP') {
+            setControlsKey((prev) => prev + 1);
+        }
+    }, [handleSelectedOffsetChange, handleStartTimestampChange, topicDataFilter]);
+
     const scrollToOffset = React.useCallback(
         (newOffset: number) => {
             const scrollTop = (newOffset - (baseOffset ?? 0)) * DEFAULT_TABLE_ROW_HEIGHT;
@@ -183,15 +191,17 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
 
     const scrollToStartOffset = React.useCallback(() => {
         if (startOffset) {
+            resetFilters();
             scrollToOffset(startOffset);
         }
-    }, [startOffset, scrollToOffset]);
+    }, [startOffset, scrollToOffset, resetFilters]);
 
     const scrollToEndOffset = React.useCallback(() => {
         if (endOffset) {
+            resetFilters();
             scrollToOffset(endOffset);
         }
-    }, [endOffset, scrollToOffset]);
+    }, [endOffset, scrollToOffset, resetFilters]);
 
     const renderControls: RenderControls = () => {
         return (
@@ -214,20 +224,11 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
     const renderEmptyDataMessage = () => {
         const hasFilters = selectedOffset || startTimestamp;
 
-        const resetFilter = () => {
-            if (topicDataFilter === 'OFFSET') {
-                handleSelectedOffsetChange(undefined);
-            } else if (topicDataFilter === 'TIMESTAMP') {
-                handleStartTimestampChange(undefined);
-                setControlsKey((prev) => prev + 1);
-            }
-        };
-
         return (
             <EmptyFilter
                 title={i18n('label_nothing-found')}
                 message={i18n('description_nothing-found')}
-                onShowAll={hasFilters ? resetFilter : undefined}
+                onShowAll={hasFilters ? resetFilters : undefined}
                 showAll={i18n('action_show-all')}
                 image={<NoSearchResults width={230} height={230} />}
             />
