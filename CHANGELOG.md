@@ -1,5 +1,17 @@
 # Changelog
 
+## [8.25.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.24.1...v8.25.0) (2025-04-25)
+
+
+### Features
+
+* add endpoint to connect to db code snippets ([#2198](https://github.com/ydb-platform/ydb-embedded-ui/issues/2198)) ([6e45802](https://github.com/ydb-platform/ydb-embedded-ui/commit/6e45802dc05baf3fe9ff5cef26e396964b8d827a))
+
+
+### Bug Fixes
+
+* find out performance issue with big tables of nodes ([#2206](https://github.com/ydb-platform/ydb-embedded-ui/issues/2206)) ([5c22404](https://github.com/ydb-platform/ydb-embedded-ui/commit/5c2240477ef132c9b58ca96b2ae1549f6e410e3b))
+
 ## [8.24.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.24.0...v8.24.1) (2025-04-23)
 
 
