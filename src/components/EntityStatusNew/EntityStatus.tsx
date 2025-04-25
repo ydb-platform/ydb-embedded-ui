@@ -50,6 +50,7 @@ interface EntityStatusLabelProps {
     children?: React.ReactNode;
     withStatusName?: boolean;
     size?: LabelProps['size'];
+    iconSize?: number;
 }
 
 function EntityStatusLabel({
@@ -58,13 +59,14 @@ function EntityStatusLabel({
     withStatusName = true,
     note,
     size = 'm',
+    iconSize = 14,
 }: EntityStatusLabelProps) {
     const theme = EFlagToLabelTheme[status];
     return (
         <ActionTooltip title={EFlagToDescription[status]} disabled={Boolean(note)}>
             <Label
                 theme={theme === 'orange' ? undefined : theme}
-                icon={<StatusIcon status={status} />}
+                icon={<StatusIcon size={iconSize} status={status} />}
                 size={size}
                 className={b({orange: theme === 'orange'})}
             >

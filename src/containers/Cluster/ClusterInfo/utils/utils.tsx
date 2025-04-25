@@ -55,8 +55,9 @@ export const getInfo = (cluster: TClusterInfo, additionalInfo: InfoItem[]) => {
                 <EntityStatus.Label
                     withStatusName={false}
                     status={state as EFlag}
-                    size="s"
+                    size="xs"
                     key={state}
+                    iconSize={12}
                 >
                     {formatNumber(count)}
                 </EntityStatus.Label>
