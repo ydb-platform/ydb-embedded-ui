@@ -3,14 +3,12 @@ import React from 'react';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import type {RenderControls} from '../../components/PaginatedTable';
-import type {PaginatedTableData} from '../../components/PaginatedTable/types';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {
     useCapabilitiesLoaded,
     useViewerNodesHandlerHasGrouping,
 } from '../../store/reducers/capabilities/hooks';
 import {storageApi} from '../../store/reducers/storage/storage';
-import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import type {NodesGroupByField} from '../../types/api/nodes';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {useAdditionalNodesProps} from '../../utils/hooks/useAdditionalNodesProps';
@@ -27,6 +25,7 @@ import i18n from './i18n';
 import {b, renderPaginatedTableErrorMessage} from './shared';
 import type {StorageViewContext} from './types';
 import {useStorageQueryParams} from './useStorageQueryParams';
+import {useTableCSSVariables} from './utils';
 
 import './Storage.scss';
 
@@ -59,9 +58,6 @@ export const PaginatedStorageNodes = (props: PaginatedStorageProps) => {
     return <LoaderWrapper loading={!capabilitiesLoaded}>{renderContent()}</LoaderWrapper>;
 };
 
-const MAX_SLOTS_CSS_VAR = '--maximum-slots';
-const MAX_DISKS_CSS_VAR = '--maximum-disks';
-
 function StorageNodesComponent({
     database,
     nodeId,
@@ -80,20 +76,7 @@ function StorageNodesComponent({
         viewContext,
     });
 
-    const [tableStyle, setTableStyle] = React.useState<React.CSSProperties | undefined>(undefined);
-
-    const handleDataFetched = React.useCallback(
-        (data: PaginatedTableData<PreparedStorageNode>) => {
-            if (data?.columnSettings && !tableStyle) {
-                const {maxSlotsPerDisk, maxDisksPerNode} = data.columnSettings;
-                setTableStyle({
-                    [MAX_SLOTS_CSS_VAR]: maxSlotsPerDisk,
-                    [MAX_DISKS_CSS_VAR]: maxDisksPerNode,
-                } as React.CSSProperties);
-            }
-        },
-        [tableStyle],
-    );
+    const {tableStyle, handleDataFetched} = useTableCSSVariables();
 
     const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
         return (
@@ -124,7 +107,7 @@ function StorageNodesComponent({
             columns={columnsToShow}
             initialEntitiesCount={initialEntitiesCount}
             tableStyle={tableStyle}
-            onDataFetched={handleDataFetched}
+            onDataFetched={tableStyle ? undefined : handleDataFetched}
         />
     );
 }
@@ -252,20 +235,7 @@ function StorageNodesTableGroupContent({
     columns,
     initialEntitiesCount,
 }: StorageNodesTableGroupContentProps) {
-    const [tableStyle, setTableStyle] = React.useState<React.CSSProperties | undefined>(undefined);
-
-    const handleDataFetched = React.useCallback(
-        (data: PaginatedTableData<PreparedStorageNode>) => {
-            if (data?.columnSettings && !tableStyle) {
-                const {maxSlotsPerDisk, maxDisksPerNode} = data.columnSettings;
-                setTableStyle({
-                    [MAX_SLOTS_CSS_VAR]: maxSlotsPerDisk,
-                    [MAX_DISKS_CSS_VAR]: maxDisksPerNode,
-                } as React.CSSProperties);
-            }
-        },
-        [tableStyle],
-    );
+    const {tableStyle, handleDataFetched} = useTableCSSVariables();
 
     return (
         <PaginatedStorageNodesTable
@@ -283,7 +253,7 @@ function StorageNodesTableGroupContent({
             columns={columns}
             initialEntitiesCount={initialEntitiesCount}
             tableStyle={tableStyle}
-            onDataFetched={handleDataFetched}
+            onDataFetched={tableStyle ? undefined : handleDataFetched}
         />
     );
 }

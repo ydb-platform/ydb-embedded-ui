@@ -114,3 +114,5 @@ export function useVDisksWithDCMargins(vDisks: PreparedVDisk[] = [], erasure?: E
         return disksWithMargins;
     }, [erasure, vDisks, nodesMap]);
 }
+
+export {useTableCSSVariables} from './useTableCSSVariables';
