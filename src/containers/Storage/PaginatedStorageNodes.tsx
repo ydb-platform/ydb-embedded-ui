@@ -80,17 +80,20 @@ function StorageNodesComponent({
         viewContext,
     });
 
-    const [tableStyle, setTableStyle] = React.useState<React.CSSProperties>({});
+    const [tableStyle, setTableStyle] = React.useState<React.CSSProperties | undefined>(undefined);
 
-    const handleDataFetched = React.useCallback((data: any) => {
-        if (data?.columnSettings) {
-            const {maxSlotsPerDisk, maxDisksPerNode} = data.columnSettings;
-            setTableStyle({
-                [MAX_SLOTS_CSS_VAR]: maxSlotsPerDisk,
-                [MAX_DISKS_CSS_VAR]: maxDisksPerNode,
-            } as React.CSSProperties);
-        }
-    }, []);
+    const handleDataFetched = React.useCallback(
+        (data: PaginatedTableData<PreparedStorageNode>) => {
+            if (data?.columnSettings && !tableStyle) {
+                const {maxSlotsPerDisk, maxDisksPerNode} = data.columnSettings;
+                setTableStyle({
+                    [MAX_SLOTS_CSS_VAR]: maxSlotsPerDisk,
+                    [MAX_DISKS_CSS_VAR]: maxDisksPerNode,
+                } as React.CSSProperties);
+            }
+        },
+        [tableStyle],
+    );
 
     const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
         return (
@@ -249,17 +252,20 @@ function StorageNodesTableGroupContent({
     columns,
     initialEntitiesCount,
 }: StorageNodesTableGroupContentProps) {
-    const [tableStyle, setTableStyle] = React.useState<React.CSSProperties>({});
+    const [tableStyle, setTableStyle] = React.useState<React.CSSProperties | undefined>(undefined);
 
-    const handleDataFetched = React.useCallback((data: PaginatedTableData<PreparedStorageNode>) => {
-        if (data?.columnSettings) {
-            const {maxSlotsPerDisk, maxDisksPerNode} = data.columnSettings;
-            setTableStyle({
-                [MAX_SLOTS_CSS_VAR]: maxSlotsPerDisk,
-                [MAX_DISKS_CSS_VAR]: maxDisksPerNode,
-            } as React.CSSProperties);
-        }
-    }, []);
+    const handleDataFetched = React.useCallback(
+        (data: PaginatedTableData<PreparedStorageNode>) => {
+            if (data?.columnSettings && !tableStyle) {
+                const {maxSlotsPerDisk, maxDisksPerNode} = data.columnSettings;
+                setTableStyle({
+                    [MAX_SLOTS_CSS_VAR]: maxSlotsPerDisk,
+                    [MAX_DISKS_CSS_VAR]: maxDisksPerNode,
+                } as React.CSSProperties);
+            }
+        },
+        [tableStyle],
+    );
 
     return (
         <PaginatedStorageNodesTable
