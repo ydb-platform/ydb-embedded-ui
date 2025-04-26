@@ -13,6 +13,13 @@ interface UseScrollBasedChunksProps {
     overscanCount?: number;
 }
 
+export interface VisibleRange {
+    startChunk: number;
+    endChunk: number;
+    startRow: number;
+    endRow: number;
+}
+
 const DEFAULT_OVERSCAN_COUNT = 1;
 const THROTTLE_DELAY = 100;
 
@@ -23,7 +30,7 @@ export const useScrollBasedChunks = ({
     rowHeight,
     chunkSize,
     overscanCount = DEFAULT_OVERSCAN_COUNT,
-}: UseScrollBasedChunksProps): boolean[] => {
+}: UseScrollBasedChunksProps): [boolean[], VisibleRange] => {
     const chunksCount = React.useMemo(
         () => Math.ceil(totalItems / chunkSize),
         [chunkSize, totalItems],
@@ -32,6 +39,12 @@ export const useScrollBasedChunks = ({
     const [startChunk, setStartChunk] = React.useState(0);
     const [endChunk, setEndChunk] = React.useState(
         Math.min(overscanCount, Math.max(chunksCount - 1, 0)),
+    );
+
+    // Track exact visible rows (not just chunks)
+    const [startRow, setStartRow] = React.useState(0);
+    const [endRow, setEndRow] = React.useState(
+        Math.min(overscanCount * chunkSize, Math.max(totalItems - 1, 0)),
     );
 
     const calculateVisibleRange = React.useCallback(() => {
@@ -46,13 +59,29 @@ export const useScrollBasedChunks = ({
         const visibleStart = Math.max(containerScroll - tableOffset, 0);
         const visibleEnd = visibleStart + container.clientHeight;
 
-        const start = Math.max(Math.floor(visibleStart / rowHeight / chunkSize) - overscanCount, 0);
-        const end = Math.min(
+        // Calculate visible chunks (with overscan)
+        const startChunk = Math.max(
+            Math.floor(visibleStart / rowHeight / chunkSize) - overscanCount,
+            0,
+        );
+        const endChunk = Math.min(
             Math.floor(visibleEnd / rowHeight / chunkSize) + overscanCount,
             Math.max(chunksCount - 1, 0),
         );
 
-        return {start, end};
+        // Calculate visible rows (more precise)
+        const startRowIndex = Math.max(Math.floor(visibleStart / rowHeight), 0);
+        const endRowIndex = Math.min(
+            Math.floor(visibleEnd / rowHeight),
+            Math.max(totalItems - 1, 0),
+        );
+
+        return {
+            start: startChunk,
+            end: endChunk,
+            startRow: startRowIndex,
+            endRow: endRowIndex,
+        };
     }, [parentRef, tableRef, rowHeight, chunkSize, overscanCount, chunksCount]);
 
     const handleScroll = React.useCallback(() => {
@@ -60,6 +89,8 @@ export const useScrollBasedChunks = ({
         if (newRange) {
             setStartChunk(newRange.start);
             setEndChunk(newRange.end);
+            setStartRow(newRange.startRow);
+            setEndRow(newRange.endRow);
         }
     }, [calculateVisibleRange]);
 
@@ -81,12 +112,24 @@ export const useScrollBasedChunks = ({
         };
     }, [handleScroll, parentRef]);
 
-    return React.useMemo(() => {
+    // Create the visibility information
+    const activeChunks = React.useMemo(() => {
         // boolean array that represents active chunks
-        const activeChunks = Array(chunksCount).fill(false);
+        const chunks = Array(chunksCount).fill(false);
         for (let i = startChunk; i <= endChunk; i++) {
-            activeChunks[i] = true;
+            chunks[i] = true;
         }
-        return activeChunks;
+        return chunks;
     }, [chunksCount, startChunk, endChunk]);
+
+    const visibleRange = React.useMemo(() => {
+        return {
+            startChunk,
+            endChunk,
+            startRow,
+            endRow,
+        };
+    }, [startChunk, endChunk, startRow, endRow]);
+
+    return [activeChunks, visibleRange];
 };

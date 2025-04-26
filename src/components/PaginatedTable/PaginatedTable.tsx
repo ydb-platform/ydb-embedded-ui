@@ -38,7 +38,7 @@ export interface PaginatedTableProps<T, F> {
     containerClassName?: string;
 }
 
-const DEFAULT_PAGINATION_LIMIT = 20;
+const DEFAULT_PAGINATION_LIMIT = 200;
 
 export const PaginatedTable = <T, F>({
     limit: chunkSize = DEFAULT_PAGINATION_LIMIT,
@@ -67,7 +67,7 @@ export const PaginatedTable = <T, F>({
 
     const tableRef = React.useRef<HTMLDivElement>(null);
 
-    const activeChunks = useScrollBasedChunks({
+    const [activeChunks, visibleRange] = useScrollBasedChunks({
         parentRef,
         tableRef,
         totalItems: foundEntities,
@@ -118,6 +118,7 @@ export const PaginatedTable = <T, F>({
                 renderEmptyDataMessage={renderEmptyDataMessage}
                 onDataFetched={handleDataFetched}
                 isActive={isActive}
+                visibleRange={visibleRange}
             />
         ));
     };

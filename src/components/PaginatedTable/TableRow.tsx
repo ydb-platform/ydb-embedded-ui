@@ -42,7 +42,15 @@ interface LoadingTableRowProps<T> {
     height: number;
 }
 
-export const LoadingTableRow = typedMemo(function <T>({columns, height}: LoadingTableRowProps<T>) {
+interface VisibilityProps {
+    isVisible?: boolean;
+}
+
+export const LoadingTableRow = typedMemo(function <T>({
+    columns,
+    height,
+    isVisible = true,
+}: LoadingTableRowProps<T> & VisibilityProps) {
     return (
         <tr className={b('row', {loading: true})}>
             {columns.map((column) => {
@@ -57,16 +65,43 @@ export const LoadingTableRow = typedMemo(function <T>({columns, height}: Loading
                         className={column.className}
                         resizeable={resizeable}
                     >
-                        <Skeleton
-                            className={b('row-skeleton')}
-                            style={{width: '80%', height: '50%'}}
-                        />
+                        {isVisible ? (
+                            <Skeleton
+                                className={b('row-skeleton')}
+                                style={{width: '80%', height: '50%'}}
+                            />
+                        ) : null}
                     </TableRowCell>
                 );
             })}
         </tr>
     );
 });
+
+interface TableRowColumnProps<T> {
+    column: Column<T>;
+    row: T;
+    height: number;
+}
+
+export const TableRowColumn = typedMemo(
+    <T,>({row, column, height, isVisible = true}: TableRowColumnProps<T> & VisibilityProps) => {
+        const resizeable = column.resizeable ?? DEFAULT_RESIZEABLE;
+
+        return (
+            <TableRowCell
+                key={column.name}
+                height={height}
+                width={column.width}
+                align={column.align}
+                className={column.className}
+                resizeable={resizeable}
+            >
+                {isVisible ? column.render({row}) : null}
+            </TableRowCell>
+        );
+    },
+);
 
 interface TableRowProps<T> {
     columns: Column<T>[];
@@ -75,27 +110,26 @@ interface TableRowProps<T> {
     getRowClassName?: GetRowClassName<T>;
 }
 
-export const TableRow = <T,>({row, columns, getRowClassName, height}: TableRowProps<T>) => {
+export const TableRow = <T,>({
+    row,
+    columns,
+    getRowClassName,
+    height,
+    isVisible = true,
+}: TableRowProps<T> & VisibilityProps) => {
     const additionalClassName = getRowClassName?.(row);
 
     return (
         <tr className={b('row', additionalClassName)}>
-            {columns.map((column) => {
-                const resizeable = column.resizeable ?? DEFAULT_RESIZEABLE;
-
-                return (
-                    <TableRowCell
-                        key={column.name}
-                        height={height}
-                        width={column.width}
-                        align={column.align}
-                        className={column.className}
-                        resizeable={resizeable}
-                    >
-                        {column.render({row})}
-                    </TableRowCell>
-                );
-            })}
+            {columns.map((column) => (
+                <TableRowColumn
+                    key={column.name}
+                    column={column}
+                    row={row}
+                    height={height}
+                    isVisible={isVisible}
+                />
+            ))}
         </tr>
     );
 };

@@ -16,6 +16,7 @@ import type {
     RenderErrorMessage,
     SortParams,
 } from './types';
+import type {VisibleRange} from './useScrollBasedChunks';
 import {typedMemo} from './utils';
 
 const DEBOUNCE_TIMEOUT = 200;
@@ -30,6 +31,7 @@ interface TableChunkProps<T, F> {
     sortParams?: SortParams;
     isActive: boolean;
     tableName: string;
+    visibleRange: VisibleRange;
 
     fetchData: FetchData<T, F>;
     getRowClassName?: GetRowClassName<T>;
@@ -54,6 +56,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     renderEmptyDataMessage,
     onDataFetched,
     isActive,
+    visibleRange,
 }: TableChunkProps<T, F>) {
     const [isTimeoutActive, setIsTimeoutActive] = React.useState(true);
     const [autoRefreshInterval] = useAutoRefreshInterval();
@@ -100,6 +103,15 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
 
     const dataLength = currentData?.data?.length || calculatedCount;
 
+    // Check if a row is within the visible range
+    const isRowVisible = (rowIndex: number): boolean => {
+        // Calculate the absolute row index within the entire table
+        const absoluteRowIndex = id * chunkSize + rowIndex;
+
+        // Check if the row is within the visible range (including overscan)
+        return absoluteRowIndex >= visibleRange.startRow && absoluteRowIndex <= visibleRange.endRow;
+    };
+
     const renderContent = () => {
         if (!isActive) {
             return null;
@@ -119,7 +131,12 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
                 );
             } else {
                 return getArray(dataLength).map((value) => (
-                    <LoadingTableRow key={value} columns={columns} height={rowHeight} />
+                    <LoadingTableRow
+                        key={value}
+                        columns={columns}
+                        height={rowHeight}
+                        isVisible={isRowVisible(value)}
+                    />
                 ));
             }
         }
@@ -140,6 +157,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
                 columns={columns}
                 height={rowHeight}
                 getRowClassName={getRowClassName}
+                isVisible={isRowVisible(index)}
             />
         ));
     };
