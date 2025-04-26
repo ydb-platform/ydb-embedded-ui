@@ -164,15 +164,18 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
     }, [handleSelectedOffsetChange, handleStartTimestampChange, topicDataFilter]);
 
     const scrollToOffset = React.useCallback(
-        (newOffset: number) => {
+        (newOffset: number, reset?: boolean) => {
             const scrollTop = (newOffset - (baseOffset ?? 0)) * DEFAULT_TABLE_ROW_HEIGHT;
             const normalizedScrollTop = Math.max(0, scrollTop);
             parentRef.current?.scrollTo({
                 top: normalizedScrollTop,
                 behavior: 'instant',
             });
+            if (reset) {
+                resetFilters();
+            }
         },
-        [baseOffset, parentRef],
+        [baseOffset, parentRef, resetFilters],
     );
 
     React.useEffect(() => {
@@ -189,20 +192,6 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
         }
     }, [currentData, isFetching, scrollToOffset]);
 
-    const scrollToStartOffset = React.useCallback(() => {
-        if (startOffset) {
-            resetFilters();
-            scrollToOffset(startOffset);
-        }
-    }, [startOffset, scrollToOffset, resetFilters]);
-
-    const scrollToEndOffset = React.useCallback(() => {
-        if (endOffset) {
-            resetFilters();
-            scrollToOffset(endOffset);
-        }
-    }, [endOffset, scrollToOffset, resetFilters]);
-
     const renderControls: RenderControls = () => {
         return (
             <TopicDataControls
@@ -213,10 +202,9 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
                 partitions={partitions}
                 partitionsLoading={partitionsLoading}
                 partitionsError={partitionsError}
-                initialOffset={startOffset}
+                startOffset={startOffset}
                 endOffset={endOffset}
-                scrollToStartOffset={scrollToStartOffset}
-                scrollToEndOffset={scrollToEndOffset}
+                scrollToOffset={scrollToOffset}
             />
         );
     };

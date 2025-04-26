@@ -3,7 +3,7 @@ import React from 'react';
 import type {Value} from '@gravity-ui/date-components';
 import {RelativeDatePicker} from '@gravity-ui/date-components';
 import {dateTimeParse} from '@gravity-ui/date-utils';
-import {ArrowDownToLine, ArrowUpToLine} from '@gravity-ui/icons';
+import {ArrowDownToLine, ArrowUpToLine, CircleChevronDownFill} from '@gravity-ui/icons';
 import type {TableColumnSetupItem} from '@gravity-ui/uikit';
 import {
     ActionTooltip,
@@ -21,6 +21,7 @@ import {EntitiesCount} from '../../../../../components/EntitiesCount';
 import type {PreparedPartitionData} from '../../../../../store/reducers/partitions/types';
 import {formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {prepareErrorMessage} from '../../../../../utils/prepareErrorMessage';
+import {safeParseNumber} from '../../../../../utils/utils';
 import i18n from '../i18n';
 import {useTopicDataQueryParams} from '../useTopicDataQueryParams';
 import {b} from '../utils/constants';
@@ -35,23 +36,21 @@ interface TopicDataControlsProps {
     partitionsLoading: boolean;
     partitionsError: unknown;
 
-    initialOffset?: number;
+    startOffset?: number;
     endOffset?: number;
-    scrollToStartOffset: VoidFunction;
-    scrollToEndOffset: VoidFunction;
+    scrollToOffset: (start: number, reset?: boolean) => void;
 }
 
 export function TopicDataControls({
     columnsToSelect,
     handleSelectedColumnsUpdate,
 
-    initialOffset,
+    startOffset,
     endOffset,
     partitions,
     partitionsLoading,
     partitionsError,
-    scrollToStartOffset,
-    scrollToEndOffset,
+    scrollToOffset,
 }: TopicDataControlsProps) {
     const {
         selectedPartition,
@@ -78,6 +77,18 @@ export function TopicDataControls({
         ],
     );
 
+    const scrollToStartOffset = React.useCallback(() => {
+        if (startOffset) {
+            scrollToOffset(startOffset, true);
+        }
+    }, [startOffset, scrollToOffset]);
+
+    const scrollToEndOffset = React.useCallback(() => {
+        if (endOffset) {
+            scrollToOffset(endOffset, true);
+        }
+    }, [endOffset, scrollToOffset]);
+
     return (
         <React.Fragment>
             <Select
@@ -93,7 +104,7 @@ export function TopicDataControls({
                 error={Boolean(partitionsError)}
                 loading={partitionsLoading}
             />
-            <TopicDataStartControls />
+            <TopicDataStartControls scrollToOffset={scrollToOffset} />
             <TableColumnSetup
                 popupWidth={242}
                 items={columnsToSelect}
@@ -101,7 +112,7 @@ export function TopicDataControls({
                 onUpdate={handleSelectedColumnsUpdate}
                 sortable={false}
             />
-            {!isNil(initialOffset) && !isNil(endOffset) && (
+            {!isNil(startOffset) && !isNil(endOffset) && (
                 <Flex gap={0.5}>
                     <ActionTooltip title={i18n('action_scroll-up')}>
                         <Button
@@ -115,7 +126,7 @@ export function TopicDataControls({
                     </ActionTooltip>
                     <EntitiesCount
                         label={i18n('label_offset')}
-                        current={`${formatNumber(initialOffset)}—${formatNumber(endOffset - 1)}`}
+                        current={`${formatNumber(startOffset)}—${formatNumber(endOffset - 1)}`}
                         className={b('offsets-count')}
                     />
                     <ActionTooltip title={i18n('action_scroll-down')}>
@@ -134,7 +145,11 @@ export function TopicDataControls({
     );
 }
 
-function TopicDataStartControls() {
+interface TopicDataStartControlsProps {
+    scrollToOffset: (start: number, reset?: boolean) => void;
+}
+
+function TopicDataStartControls({scrollToOffset}: TopicDataStartControlsProps) {
     const {
         selectedOffset,
         startTimestamp,
@@ -199,12 +214,29 @@ function TopicDataStartControls() {
                     placeholder={i18n('label_offset')}
                     type="number"
                     debounce={600}
+                    endContent={
+                        <ActionTooltip title={i18n('action_scroll-selected')}>
+                            <Button
+                                disabled={isNil(selectedOffset) || selectedOffset === ''}
+                                view="flat-action"
+                                size="xs"
+                                onClick={() => {
+                                    if (selectedOffset) {
+                                        scrollToOffset(safeParseNumber(selectedOffset));
+                                    }
+                                }}
+                            >
+                                <Icon size={14} data={CircleChevronDownFill} />
+                            </Button>
+                        </ActionTooltip>
+                    }
                     autoFocus
                 />
             )}
             {topicDataFilter === 'TIMESTAMP' && (
                 <RelativeDatePicker
                     format="YYYY-MM-DD HH:mm:ss"
+                    placeholder="YYYY-MM-DD HH:mm:ss"
                     hasClear
                     isDateUnavailable={(value) => value.isAfter(dateTimeParse())}
                     label={i18n('label_from')}
