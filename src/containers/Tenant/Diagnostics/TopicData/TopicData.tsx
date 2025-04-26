@@ -164,18 +164,15 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
     }, [handleSelectedOffsetChange, handleStartTimestampChange, topicDataFilter]);
 
     const scrollToOffset = React.useCallback(
-        (newOffset: number, reset?: boolean) => {
+        (newOffset: number) => {
             const scrollTop = (newOffset - (baseOffset ?? 0)) * DEFAULT_TABLE_ROW_HEIGHT;
             const normalizedScrollTop = Math.max(0, scrollTop);
             parentRef.current?.scrollTo({
                 top: normalizedScrollTop,
                 behavior: 'instant',
             });
-            if (reset) {
-                resetFilters();
-            }
         },
-        [baseOffset, parentRef, resetFilters],
+        [baseOffset, parentRef],
     );
 
     React.useEffect(() => {

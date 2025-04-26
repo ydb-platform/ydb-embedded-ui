@@ -38,7 +38,7 @@ interface TopicDataControlsProps {
 
     startOffset?: number;
     endOffset?: number;
-    scrollToOffset: (start: number, reset?: boolean) => void;
+    scrollToOffset: (offset: number) => void;
 }
 
 export function TopicDataControls({
@@ -79,13 +79,13 @@ export function TopicDataControls({
 
     const scrollToStartOffset = React.useCallback(() => {
         if (startOffset) {
-            scrollToOffset(startOffset, true);
+            scrollToOffset(startOffset);
         }
     }, [startOffset, scrollToOffset]);
 
     const scrollToEndOffset = React.useCallback(() => {
         if (endOffset) {
-            scrollToOffset(endOffset, true);
+            scrollToOffset(endOffset);
         }
     }, [endOffset, scrollToOffset]);
 
@@ -146,7 +146,7 @@ export function TopicDataControls({
 }
 
 interface TopicDataStartControlsProps {
-    scrollToOffset: (start: number, reset?: boolean) => void;
+    scrollToOffset: (offset: number) => void;
 }
 
 function TopicDataStartControls({scrollToOffset}: TopicDataStartControlsProps) {
