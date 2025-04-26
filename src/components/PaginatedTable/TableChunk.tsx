@@ -6,7 +6,7 @@ import {getArray} from '../../utils';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {ResponseError} from '../Errors/ResponseError';
 
-import {EmptyTableRow, LoadingTableRow, TableRow} from './TableRow';
+import {EmptyTableRow, TableRow} from './TableRow';
 import i18n from './i18n';
 import type {
     Column,
@@ -117,32 +117,21 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
             return null;
         }
 
-        if (!currentData) {
-            if (error) {
-                const errorData = error as IResponseError;
-                return (
-                    <EmptyTableRow columns={columns}>
-                        {renderErrorMessage ? (
-                            renderErrorMessage(errorData)
-                        ) : (
-                            <ResponseError error={errorData} />
-                        )}
-                    </EmptyTableRow>
-                );
-            } else {
-                return getArray(dataLength).map((value) => (
-                    <LoadingTableRow
-                        key={value}
-                        columns={columns}
-                        height={rowHeight}
-                        isVisible={isRowVisible(value)}
-                    />
-                ));
-            }
+        if (!currentData && error) {
+            const errorData = error as IResponseError;
+            return (
+                <EmptyTableRow columns={columns}>
+                    {renderErrorMessage ? (
+                        renderErrorMessage(errorData)
+                    ) : (
+                        <ResponseError error={errorData} />
+                    )}
+                </EmptyTableRow>
+            );
         }
 
         // Data is loaded, but there are no entities in the chunk
-        if (!currentData.data?.length) {
+        if (currentData?.data && !currentData.data?.length) {
             return (
                 <EmptyTableRow columns={columns}>
                     {renderEmptyDataMessage ? renderEmptyDataMessage() : i18n('empty')}
@@ -150,7 +139,9 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
             );
         }
 
-        return currentData.data.map((rowData, index) => (
+        const data = currentData?.data || getArray(dataLength);
+
+        return data.map((rowData, index) => (
             <TableRow
                 key={index}
                 row={rowData as T}

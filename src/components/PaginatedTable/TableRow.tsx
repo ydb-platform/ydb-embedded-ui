@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {Skeleton} from '@gravity-ui/uikit';
 
 import {DEFAULT_ALIGN, DEFAULT_RESIZEABLE} from './constants';
@@ -37,56 +39,26 @@ const TableRowCell = ({
     );
 };
 
-interface LoadingTableRowProps<T> {
-    columns: Column<T>[];
-    height: number;
-}
-
 interface VisibilityProps {
     isVisible?: boolean;
 }
 
-export const LoadingTableRow = typedMemo(function <T>({
-    columns,
-    height,
-    isVisible = true,
-}: LoadingTableRowProps<T> & VisibilityProps) {
-    return (
-        <tr className={b('row', {loading: true})}>
-            {columns.map((column) => {
-                const resizeable = column.resizeable ?? DEFAULT_RESIZEABLE;
-
-                return (
-                    <TableRowCell
-                        key={column.name}
-                        height={height}
-                        width={column.width}
-                        align={column.align}
-                        className={column.className}
-                        resizeable={resizeable}
-                    >
-                        {isVisible ? (
-                            <Skeleton
-                                className={b('row-skeleton')}
-                                style={{width: '80%', height: '50%'}}
-                            />
-                        ) : null}
-                    </TableRowCell>
-                );
-            })}
-        </tr>
-    );
-});
-
 interface TableRowColumnProps<T> {
     column: Column<T>;
-    row: T;
+    row?: T;
     height: number;
 }
 
 export const TableRowColumn = typedMemo(
     <T,>({row, column, height, isVisible = true}: TableRowColumnProps<T> & VisibilityProps) => {
         const resizeable = column.resizeable ?? DEFAULT_RESIZEABLE;
+
+        const renderedCell = React.useMemo(() => {
+            if (row) {
+                return column.render({row});
+            }
+            return null;
+        }, [column, row]);
 
         return (
             <TableRowCell
@@ -97,7 +69,11 @@ export const TableRowColumn = typedMemo(
                 className={column.className}
                 resizeable={resizeable}
             >
-                {isVisible ? column.render({row}) : null}
+                {isVisible && row ? (
+                    renderedCell
+                ) : (
+                    <Skeleton className={b('row-skeleton')} style={{width: '80%', height: '50%'}} />
+                )}
             </TableRowCell>
         );
     },
@@ -105,7 +81,7 @@ export const TableRowColumn = typedMemo(
 
 interface TableRowProps<T> {
     columns: Column<T>[];
-    row: T;
+    row?: T;
     height: number;
     getRowClassName?: GetRowClassName<T>;
 }
@@ -117,7 +93,7 @@ export const TableRow = <T,>({
     height,
     isVisible = true,
 }: TableRowProps<T> & VisibilityProps) => {
-    const additionalClassName = getRowClassName?.(row);
+    const additionalClassName = row ? getRowClassName?.(row) : undefined;
 
     return (
         <tr className={b('row', additionalClassName)}>

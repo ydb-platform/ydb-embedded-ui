@@ -1,5 +1,5 @@
-export const getArray = (arrayLength: number) => {
-    return [...Array(arrayLength).keys()];
+export const getArray = (arrayLength: number): undefined[] => {
+    return Array.from({length: arrayLength});
 };
 
 export function valueIsDefined<T>(value: T | null | undefined): value is T {
