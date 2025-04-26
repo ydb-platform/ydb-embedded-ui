@@ -257,6 +257,7 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
                     filters={tableFilters}
                     tableName="topicData"
                     rowHeight={DEFAULT_TABLE_ROW_HEIGHT}
+                    keepCache={false}
                 />
             )}
         </React.Fragment>

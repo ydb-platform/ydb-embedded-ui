@@ -37,6 +37,8 @@ interface TableChunkProps<T, F> {
     renderErrorMessage?: RenderErrorMessage;
     renderEmptyDataMessage?: RenderEmptyDataMessage;
     onDataFetched: (data?: PaginatedTableData<T>) => void;
+
+    keepCache?: boolean;
 }
 
 // Memoisation prevents chunks rerenders that could cause perfomance issues on big tables
@@ -55,6 +57,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     renderEmptyDataMessage,
     onDataFetched,
     isActive,
+    keepCache,
 }: TableChunkProps<T, F>) {
     const [isTimeoutActive, setIsTimeoutActive] = React.useState(true);
     const [autoRefreshInterval] = useAutoRefreshInterval();
@@ -74,6 +77,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     tableDataApi.useFetchTableChunkQuery(queryParams, {
         skip: isTimeoutActive || !isActive,
         pollingInterval: autoRefreshInterval,
+        refetchOnMountOrArgChange: !keepCache,
     });
 
     const {currentData, error} = tableDataApi.endpoints.fetchTableChunk.useQueryState(queryParams);

@@ -38,6 +38,7 @@ export interface PaginatedTableProps<T, F> {
     renderErrorMessage?: RenderErrorMessage;
     containerClassName?: string;
     onDataFetched?: (data: PaginatedTableData<T>) => void;
+    keepCache?: boolean;
 }
 
 const DEFAULT_PAGINATION_LIMIT = 20;
@@ -59,6 +60,7 @@ export const PaginatedTable = <T, F>({
     renderEmptyDataMessage,
     containerClassName,
     onDataFetched,
+    keepCache = true,
 }: PaginatedTableProps<T, F>) => {
     const initialTotal = initialEntitiesCount || 0;
     const initialFound = initialEntitiesCount || 1;
@@ -134,6 +136,7 @@ export const PaginatedTable = <T, F>({
                 renderEmptyDataMessage={renderEmptyDataMessage}
                 onDataFetched={handleDataFetched}
                 isActive={isActive}
+                keepCache={keepCache}
             />
         ));
     };
