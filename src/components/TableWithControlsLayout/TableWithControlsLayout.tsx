@@ -8,6 +8,7 @@ const b = cn('ydb-table-with-controls-layout');
 interface TableWithControlsLayoutItemProps {
     children: React.ReactNode;
     className?: string;
+    wrapperClassName?: string;
 }
 
 interface TableProps extends TableWithControlsLayoutItemProps {
@@ -24,9 +25,10 @@ export const TableWithControlsLayout = ({
 TableWithControlsLayout.Controls = function TableControls({
     children,
     className,
+    wrapperClassName,
 }: TableWithControlsLayoutItemProps) {
     return (
-        <div className={b('controls-wrapper')}>
+        <div className={b('controls-wrapper', wrapperClassName)}>
             <div className={b('controls', className)}>{children}</div>
         </div>
     );

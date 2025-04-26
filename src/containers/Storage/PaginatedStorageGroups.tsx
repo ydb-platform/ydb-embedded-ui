@@ -189,12 +189,16 @@ function GroupedStorageGroupsComponent({
     };
 
     return (
-        <TableWithControlsLayout>
-            <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
-            {error ? <ResponseError error={error} /> : null}
-            <TableWithControlsLayout.Table loading={isLoading} className={b('groups-wrapper')}>
-                {renderGroups()}
-            </TableWithControlsLayout.Table>
-        </TableWithControlsLayout>
+        <React.Fragment>
+            <TableWithControlsLayout.Controls wrapperClassName={b('controls')}>
+                {renderControls()}
+            </TableWithControlsLayout.Controls>
+            <TableWithControlsLayout>
+                {error ? <ResponseError error={error} /> : null}
+                <TableWithControlsLayout.Table loading={isLoading} className={b('groups-wrapper')}>
+                    {renderGroups()}
+                </TableWithControlsLayout.Table>
+            </TableWithControlsLayout>
+        </React.Fragment>
     );
 }
