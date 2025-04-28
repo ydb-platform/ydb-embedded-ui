@@ -5,9 +5,15 @@ import type {StorageViewContext} from '../../types';
 
 export type StorageNodesColumn = Column<PreparedStorageNode>;
 
+export interface StorageNodesColumnsSettings {
+    pDiskWidth?: number;
+    pDiskContainerWidth?: number;
+}
+
 export interface GetStorageNodesColumnsParams {
     additionalNodesProps?: AdditionalNodesProps | undefined;
     visibleEntities?: VisibleEntities;
     database?: string;
     viewContext?: StorageViewContext;
+    columnsSettings?: StorageNodesColumnsSettings;
 }

@@ -44,7 +44,6 @@ interface PaginatedStorageNodesTableProps {
     renderControls?: RenderControls;
     renderErrorMessage: RenderErrorMessage;
     initialEntitiesCount?: number;
-    tableStyle?: React.CSSProperties;
     onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
 }
 
@@ -63,7 +62,6 @@ export const PaginatedStorageNodesTable = ({
     renderControls,
     renderErrorMessage,
     initialEntitiesCount,
-    tableStyle,
     onDataFetched,
 }: PaginatedStorageNodesTableProps) => {
     const tableFilters = React.useMemo(() => {
@@ -119,7 +117,6 @@ export const PaginatedStorageNodesTable = ({
             getRowClassName={getRowUnavailableClassName}
             filters={tableFilters}
             tableName="storage-nodes"
-            tableStyle={tableStyle}
             onDataFetched={onDataFetched}
         />
     );

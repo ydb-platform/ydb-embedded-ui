@@ -18,14 +18,14 @@ import type {PaginatedStorageProps} from './PaginatedStorage';
 import {StorageNodesControls} from './StorageControls/StorageControls';
 import {PaginatedStorageNodesTable} from './StorageNodes/PaginatedStorageNodesTable';
 import {useStorageNodesSelectedColumns} from './StorageNodes/columns/hooks';
-import type {StorageNodesColumn} from './StorageNodes/columns/types';
+import type {StorageNodesColumnsSettings} from './StorageNodes/columns/types';
 import {TableGroup} from './TableGroup/TableGroup';
 import {useExpandedGroups} from './TableGroup/useExpandedTableGroups';
 import i18n from './i18n';
 import {b, renderPaginatedTableErrorMessage} from './shared';
 import type {StorageViewContext} from './types';
 import {useStorageQueryParams} from './useStorageQueryParams';
-import {useTableCSSVariables} from './utils';
+import {useStorageColumnsSettings} from './utils';
 
 import './Storage.scss';
 
@@ -71,12 +71,13 @@ function StorageNodesComponent({
 
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
 
+    const {handleDataFetched, columnsSettings} = useStorageColumnsSettings();
+
     const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
         database,
         viewContext,
+        columnsSettings,
     });
-
-    const {tableStyle, handleDataFetched} = useTableCSSVariables();
 
     const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
         return (
@@ -106,8 +107,7 @@ function StorageNodesComponent({
             renderErrorMessage={renderPaginatedTableErrorMessage}
             columns={columnsToShow}
             initialEntitiesCount={initialEntitiesCount}
-            tableStyle={tableStyle}
-            onDataFetched={tableStyle ? undefined : handleDataFetched}
+            onDataFetched={handleDataFetched}
         />
     );
 }
@@ -123,7 +123,7 @@ function GroupedStorageNodesComponent({
 
     const {searchValue, storageNodesGroupByParam, handleShowAllNodes} = useStorageQueryParams();
 
-    const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
+    const {columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
         database,
         viewContext,
     });
@@ -184,7 +184,6 @@ function GroupedStorageNodesComponent({
                             handleShowAllNodes={handleShowAllNodes}
                             filterGroup={name}
                             filterGroupBy={storageNodesGroupByParam}
-                            columns={columnsToShow}
                             initialEntitiesCount={count}
                         />
                     </TableGroup>
@@ -219,7 +218,7 @@ interface StorageNodesTableGroupContentProps {
     handleShowAllNodes: VoidFunction;
     filterGroup: string;
     filterGroupBy?: NodesGroupByField;
-    columns: StorageNodesColumn[];
+    viewContext?: StorageViewContext;
     initialEntitiesCount: number;
 }
 
@@ -232,10 +231,15 @@ function StorageNodesTableGroupContent({
     handleShowAllNodes,
     filterGroup,
     filterGroupBy,
-    columns,
+    viewContext,
     initialEntitiesCount,
 }: StorageNodesTableGroupContentProps) {
-    const {tableStyle, handleDataFetched} = useTableCSSVariables();
+    const {handleDataFetched, columnsSettings} = useStorageColumnsSettings();
+    const {columnsToShow} = useStorageNodesColumnsToSelect({
+        database,
+        viewContext,
+        columnsSettings,
+    });
 
     return (
         <PaginatedStorageNodesTable
@@ -250,10 +254,9 @@ function StorageNodesTableGroupContent({
             filterGroup={filterGroup}
             filterGroupBy={filterGroupBy}
             renderErrorMessage={renderPaginatedTableErrorMessage}
-            columns={columns}
+            columns={columnsToShow}
             initialEntitiesCount={initialEntitiesCount}
-            tableStyle={tableStyle}
-            onDataFetched={tableStyle ? undefined : handleDataFetched}
+            onDataFetched={handleDataFetched}
         />
     );
 }
@@ -261,9 +264,11 @@ function StorageNodesTableGroupContent({
 function useStorageNodesColumnsToSelect({
     database,
     viewContext,
+    columnsSettings,
 }: {
     database?: string;
     viewContext?: StorageViewContext;
+    columnsSettings?: StorageNodesColumnsSettings;
 }) {
     const additionalNodesProps = useAdditionalNodesProps();
     const {visibleEntities} = useStorageQueryParams();
@@ -273,5 +278,6 @@ function useStorageNodesColumnsToSelect({
         visibleEntities,
         database,
         viewContext,
+        columnsSettings,
     });
 }

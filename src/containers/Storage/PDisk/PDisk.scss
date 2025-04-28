@@ -1,11 +1,15 @@
+@import '../../../styles/mixins.scss';
+
 .pdisk-storage {
+    --pdisk-vdisk-width: 3px;
+    --pdisk-gap-width: 2px;
+
     position: relative;
 
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
 
-    width: var(--pdisk-width);
     min-width: var(--pdisk-min-width);
 
     &__content {

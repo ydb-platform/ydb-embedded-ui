@@ -115,4 +115,4 @@ export function useVDisksWithDCMargins(vDisks: PreparedVDisk[] = [], erasure?: E
     }, [erasure, vDisks, nodesMap]);
 }
 
-export {useTableCSSVariables} from './useTableCSSVariables';
+export {useStorageColumnsSettings} from './useStorageColumnsSettings';

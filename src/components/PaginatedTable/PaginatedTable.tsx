@@ -37,7 +37,6 @@ export interface PaginatedTableProps<T, F> {
     renderEmptyDataMessage?: RenderEmptyDataMessage;
     renderErrorMessage?: RenderErrorMessage;
     containerClassName?: string;
-    tableStyle?: React.CSSProperties;
     onDataFetched?: (data: PaginatedTableData<T>) => void;
 }
 
@@ -59,7 +58,6 @@ export const PaginatedTable = <T, F>({
     renderErrorMessage,
     renderEmptyDataMessage,
     containerClassName,
-    tableStyle,
     onDataFetched,
 }: PaginatedTableProps<T, F>) => {
     const initialTotal = initialEntitiesCount || 0;
@@ -156,7 +154,7 @@ export const PaginatedTable = <T, F>({
     };
 
     return (
-        <div ref={tableRef} className={b(null, containerClassName)} style={tableStyle}>
+        <div ref={tableRef} className={b(null, containerClassName)}>
             {renderContent()}
         </div>
     );

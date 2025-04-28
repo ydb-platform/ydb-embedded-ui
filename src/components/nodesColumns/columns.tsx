@@ -370,6 +370,7 @@ export function getMissingDisksColumn<T extends {Missing?: number}>(): Column<T>
         render: ({row}) => row.Missing,
         align: DataTable.CENTER,
         defaultOrder: DataTable.DESCENDING,
+        width: 100,
     };
 }
 

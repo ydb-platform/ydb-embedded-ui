@@ -24,17 +24,27 @@ import type {PreparedStorageNode} from '../../../../store/reducers/storage/types
 import {cn} from '../../../../utils/cn';
 import {PDisk} from '../../PDisk/PDisk';
 
-import type {GetStorageNodesColumnsParams, StorageNodesColumn} from './types';
+import type {
+    GetStorageNodesColumnsParams,
+    StorageNodesColumn,
+    StorageNodesColumnsSettings,
+} from './types';
 
 import './StorageNodesColumns.scss';
 
 const b = cn('ydb-storage-nodes-columns');
 
-const getPDisksColumn = ({viewContext}: GetStorageNodesColumnsParams): StorageNodesColumn => {
+const getPDisksColumn = ({
+    viewContext,
+    columnsSettings,
+}: GetStorageNodesColumnsParams & {
+    columnsSettings?: StorageNodesColumnsSettings;
+}): StorageNodesColumn => {
     return {
         name: NODES_COLUMNS_IDS.PDisks,
         header: NODES_COLUMNS_TITLES.PDisks,
         className: b('pdisks-column'),
+        width: columnsSettings?.pDiskContainerWidth,
         render: ({row}) => {
             return (
                 <div className={b('pdisks-wrapper')}>
@@ -45,7 +55,12 @@ const getPDisksColumn = ({viewContext}: GetStorageNodesColumnsParams): StorageNo
 
                         return (
                             <div className={b('pdisks-item')} key={pDisk.PDiskId}>
-                                <PDisk data={pDisk} vDisks={vDisks} viewContext={viewContext} />
+                                <PDisk
+                                    data={pDisk}
+                                    vDisks={vDisks}
+                                    viewContext={viewContext}
+                                    width={columnsSettings?.pDiskWidth}
+                                />
                             </div>
                         );
                     })}
@@ -62,6 +77,7 @@ export const getStorageNodesColumns = ({
     database,
     additionalNodesProps,
     viewContext,
+    columnsSettings,
 }: GetStorageNodesColumnsParams): StorageNodesColumn[] => {
     const getNodeRef = additionalNodesProps?.getNodeRef;
 
@@ -79,7 +95,7 @@ export const getStorageNodesColumns = ({
         getDiskSpaceUsageColumn<PreparedStorageNode>(),
         getVersionColumn<PreparedStorageNode>(),
         getMissingDisksColumn<PreparedStorageNode>(),
-        getPDisksColumn({viewContext}),
+        getPDisksColumn({viewContext, columnsSettings}),
     ];
 
     const sortableColumns = columns.map((column) => ({
