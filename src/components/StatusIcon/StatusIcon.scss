@@ -21,6 +21,12 @@
     }
 
     &__status-icon {
+        &_state_grey {
+            color: var(--ydb-color-status-grey);
+        }
+        &_state_green {
+            color: var(--ydb-color-status-green);
+        }
         &_state_blue {
             color: var(--ydb-color-status-blue);
         }
