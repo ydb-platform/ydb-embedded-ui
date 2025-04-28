@@ -1,23 +1,18 @@
 import React from 'react';
 
 import type {FlexProps} from '@gravity-ui/uikit';
-import {Flex} from '@gravity-ui/uikit';
-
-import type {TagType} from '../Tag';
-import {Tag} from '../Tag';
+import {Flex, Label} from '@gravity-ui/uikit';
 
 interface TagsProps {
     tags: React.ReactNode[];
-    tagsType?: TagType;
     className?: string;
     gap?: FlexProps['gap'];
 }
 
-export const Tags = ({tags, tagsType, className = '', gap = 1}: TagsProps) => {
+export const Tags = ({tags, className = '', gap = 1}: TagsProps) => {
     return (
         <Flex className={className} gap={gap} wrap="wrap" alignItems="center">
-            {tags &&
-                tags.map((tag, tagIndex) => <Tag text={tag} key={tagIndex} type={tagsType}></Tag>)}
+            {tags && tags.map((tag, tagIndex) => <Label key={tagIndex}>{tag}</Label>)}
         </Flex>
     );
 };

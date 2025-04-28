@@ -1,9 +1,9 @@
 import type {CreateHrefOptions} from '../../routes';
 import routes, {createHref} from '../../routes';
+import type {ClusterGroupsStats} from '../../store/reducers/cluster/types';
 import type {ValueOf} from '../../types/common';
 
 export const clusterTabsIds = {
-    overview: 'overview',
     tenants: 'tenants',
     nodes: 'nodes',
     storage: 'storage',
@@ -12,11 +12,6 @@ export const clusterTabsIds = {
 } as const;
 
 export type ClusterTab = ValueOf<typeof clusterTabsIds>;
-
-const overview = {
-    id: clusterTabsIds.overview,
-    title: 'Overview',
-};
 
 const tenants = {
     id: clusterTabsIds.tenants,
@@ -39,7 +34,7 @@ const tablets = {
     title: 'Tablets',
 };
 
-export const clusterTabs = [overview, tenants, nodes, storage, tablets, versions];
+export const clusterTabs = [tenants, nodes, storage, tablets, versions];
 
 export function isClusterTab(tab: any): tab is ClusterTab {
     return Object.values(clusterTabsIds).includes(tab);
@@ -47,4 +42,14 @@ export function isClusterTab(tab: any): tab is ClusterTab {
 
 export const getClusterPath = (activeTab?: ClusterTab, query = {}, options?: CreateHrefOptions) => {
     return createHref(routes.cluster, activeTab ? {activeTab} : undefined, query, options);
+};
+
+export const getTotalStorageGroupsUsed = (groupStats: ClusterGroupsStats) => {
+    return Object.values(groupStats).reduce((acc, data) => {
+        Object.values(data).forEach((erasureStats) => {
+            acc += erasureStats.createdGroups;
+        });
+
+        return acc;
+    }, 0);
 };

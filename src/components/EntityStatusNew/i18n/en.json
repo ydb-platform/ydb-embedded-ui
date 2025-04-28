@@ -1,0 +1,14 @@
+{
+  "title_red": "Failed",
+  "title_blue": "Normal",
+  "title_green": "Good",
+  "title_grey": "Unknown",
+  "title_orange": "Caution",
+  "title_yellow": "Warning",
+  "context_red": "Some systems are failed and not available",
+  "context_yellow": "There are minor issues",
+  "context_orange": "Critical state, requires immediate attention",
+  "context_green": "Everything is working as expected",
+  "context_grey": "The condition cannot be determined",
+  "context_blue": "All good, some parts of the system are restoring"
+}

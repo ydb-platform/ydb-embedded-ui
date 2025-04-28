@@ -29,7 +29,7 @@ let defaultClusterTab: ClusterTab;
 if (isClusterTab(defaultClusterTabLS)) {
     defaultClusterTab = defaultClusterTabLS;
 } else {
-    defaultClusterTab = clusterTabsIds.overview;
+    defaultClusterTab = clusterTabsIds.tenants;
 }
 
 const initialState: ClusterState = {
