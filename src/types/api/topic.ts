@@ -172,12 +172,16 @@ export interface TopicDataRequest {
     partition: string;
     /** start offset to read from */
     offset?: number;
+    /** last offset that can possibly be read */
+    last_offset?: number;
     /** min message timestamp to read from */
     read_timestamp?: number;
     /** max number of messages to read (default = 10) */
     limit?: number;
     /** timeout in ms */
     timeout?: number;
+    /** max size of single message (default = 1_000_000 (1 MB)) */
+    message_size_limit?: number;
 }
 
 export interface TopicDataResponse {

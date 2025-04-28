@@ -263,10 +263,14 @@ export class ViewerAPI extends BaseYdbAPI {
     }
 
     getTopicData(params: TopicDataRequest, {concurrentId, signal}: AxiosOptions = {}) {
-        return this.get<TopicDataResponse>(this.getPath('/viewer/json/topic_data'), params, {
-            concurrentId,
-            requestConfig: {signal},
-        });
+        return this.get<TopicDataResponse>(
+            this.getPath('/viewer/json/topic_data'),
+            {message_size_limit: '5000', ...params},
+            {
+                concurrentId,
+                requestConfig: {signal},
+            },
+        );
     }
 
     getConsumer(

@@ -66,7 +66,12 @@ export const generateTopicDataGetter = ({
 
         const normalizedOffset = baseOffset + tableOffset;
 
-        const queryParams: TopicDataRequest = {...rest, partition, limit};
+        const queryParams: TopicDataRequest = {
+            ...rest,
+            partition,
+            limit,
+            last_offset: normalizedOffset + limit,
+        };
         queryParams.offset = normalizedOffset;
 
         const response = await window.api.viewer.getTopicData(queryParams);
