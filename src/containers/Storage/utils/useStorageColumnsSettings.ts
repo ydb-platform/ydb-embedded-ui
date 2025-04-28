@@ -1,7 +1,7 @@
 import React from 'react';
 
-import type {StorageNodesPaginatedTableData} from '../../../components/PaginatedTable/types';
 import type {StorageNodesColumnsSettings} from '../StorageNodes/columns/types';
+import type {StorageNodesPaginatedTableData} from '../types';
 
 const PDISK_VDISK_WIDTH = 3;
 const PDISK_GAP_WIDTH = 2;

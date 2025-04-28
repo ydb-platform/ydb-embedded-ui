@@ -99,7 +99,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
                 data: currentData.data as T[],
                 found: currentData.found || 0,
                 total: currentData.total || 0,
-            } as PaginatedTableData<T>);
+            });
         }
     }, [currentData, isActive, onDataFetched]);
 
