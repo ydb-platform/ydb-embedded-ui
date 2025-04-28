@@ -9,7 +9,7 @@ export type StorageViewContext = {
 };
 
 export type StorageNodesPaginatedTableData = PaginatedTableData<PreparedStorageNode> & {
-    columnSettings?: {
+    columnsSettings?: {
         maxSlotsPerDisk: number;
         maxDisksPerNode: number;
     };

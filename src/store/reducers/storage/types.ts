@@ -107,7 +107,7 @@ export interface PreparedStorageResponse {
     found: number | undefined;
     total: number | undefined;
     tableGroups?: TableGroup[];
-    columnSettings?: {
+    columnsSettings?: {
         maxSlotsPerDisk: number;
         maxDisksPerNode: number;
     };

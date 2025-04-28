@@ -18,8 +18,8 @@ export function useStorageColumnsSettings() {
 
     const handleDataFetched = React.useCallback(
         (data: StorageNodesPaginatedTableData) => {
-            if (data?.columnSettings && !pDiskWidth) {
-                const {maxSlotsPerDisk, maxDisksPerNode} = data.columnSettings;
+            if (data?.columnsSettings && !pDiskWidth) {
+                const {maxSlotsPerDisk, maxDisksPerNode} = data.columnsSettings;
                 const maxSlots = maxSlotsPerDisk || MAX_SLOTS_DEFAULT;
                 const maxDisks = maxDisksPerNode || MAX_SLOTS_DEFAULT;
 

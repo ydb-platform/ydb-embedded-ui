@@ -298,7 +298,7 @@ export const prepareStorageNodesResponse = (data: TNodesInfo): PreparedStorageRe
         total: Number(TotalNodes) || preparedNodes?.length,
         found: Number(FoundNodes),
         tableGroups,
-        columnSettings: {maxSlotsPerDisk, maxDisksPerNode},
+        columnsSettings: {maxSlotsPerDisk, maxDisksPerNode},
     };
 };
 
