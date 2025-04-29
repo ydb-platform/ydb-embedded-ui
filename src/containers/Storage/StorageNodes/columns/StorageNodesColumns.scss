@@ -7,12 +7,9 @@
 
     &__pdisks-wrapper {
         display: flex;
-        gap: var(--pdisk-margin);
+        gap: 10px;
 
-        width: var(--pdisks-container-width);
         height: 40px;
-
-        @include calculate-storage-nodes-pdisk-variables();
     }
 
     &__pdisks-item {

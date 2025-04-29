@@ -9,6 +9,7 @@ import {
     useViewerNodesHandlerHasGrouping,
 } from '../../store/reducers/capabilities/hooks';
 import {storageApi} from '../../store/reducers/storage/storage';
+import type {NodesGroupByField} from '../../types/api/nodes';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {useAdditionalNodesProps} from '../../utils/hooks/useAdditionalNodesProps';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
@@ -17,12 +18,14 @@ import type {PaginatedStorageProps} from './PaginatedStorage';
 import {StorageNodesControls} from './StorageControls/StorageControls';
 import {PaginatedStorageNodesTable} from './StorageNodes/PaginatedStorageNodesTable';
 import {useStorageNodesSelectedColumns} from './StorageNodes/columns/hooks';
+import type {StorageNodesColumnsSettings} from './StorageNodes/columns/types';
 import {TableGroup} from './TableGroup/TableGroup';
 import {useExpandedGroups} from './TableGroup/useExpandedTableGroups';
 import i18n from './i18n';
 import {b, renderPaginatedTableErrorMessage} from './shared';
 import type {StorageViewContext} from './types';
 import {useStorageQueryParams} from './useStorageQueryParams';
+import {useStorageColumnsSettings} from './utils';
 
 import './Storage.scss';
 
@@ -68,9 +71,12 @@ function StorageNodesComponent({
 
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
 
+    const {handleDataFetched, columnsSettings} = useStorageColumnsSettings();
+
     const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
         database,
         viewContext,
+        columnsSettings,
     });
 
     const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
@@ -101,6 +107,7 @@ function StorageNodesComponent({
             renderErrorMessage={renderPaginatedTableErrorMessage}
             columns={columnsToShow}
             initialEntitiesCount={initialEntitiesCount}
+            onDataFetched={handleDataFetched}
         />
     );
 }
@@ -116,7 +123,7 @@ function GroupedStorageNodesComponent({
 
     const {searchValue, storageNodesGroupByParam, handleShowAllNodes} = useStorageQueryParams();
 
-    const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
+    const {columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
         database,
         viewContext,
     });
@@ -168,19 +175,15 @@ function GroupedStorageNodesComponent({
                         expanded={isExpanded}
                         onIsExpandedChange={setIsGroupExpanded}
                     >
-                        <PaginatedStorageNodesTable
+                        <StorageNodesTableGroupContent
                             database={database}
                             parentRef={parentRef}
                             nodeId={nodeId}
                             groupId={groupId}
                             searchValue={searchValue}
-                            visibleEntities={'all'}
-                            nodesUptimeFilter={NodesUptimeFilterValues.All}
-                            onShowAll={handleShowAllNodes}
+                            handleShowAllNodes={handleShowAllNodes}
                             filterGroup={name}
                             filterGroupBy={storageNodesGroupByParam}
-                            renderErrorMessage={renderPaginatedTableErrorMessage}
-                            columns={columnsToShow}
                             initialEntitiesCount={count}
                         />
                     </TableGroup>
@@ -206,12 +209,66 @@ function GroupedStorageNodesComponent({
     );
 }
 
+interface StorageNodesTableGroupContentProps {
+    database?: string;
+    parentRef: React.RefObject<HTMLElement>;
+    nodeId?: string | number;
+    groupId?: string | number;
+    searchValue: string;
+    handleShowAllNodes: VoidFunction;
+    filterGroup: string;
+    filterGroupBy?: NodesGroupByField;
+    viewContext?: StorageViewContext;
+    initialEntitiesCount: number;
+}
+
+function StorageNodesTableGroupContent({
+    database,
+    parentRef,
+    nodeId,
+    groupId,
+    searchValue,
+    handleShowAllNodes,
+    filterGroup,
+    filterGroupBy,
+    viewContext,
+    initialEntitiesCount,
+}: StorageNodesTableGroupContentProps) {
+    const {handleDataFetched, columnsSettings} = useStorageColumnsSettings();
+    const {columnsToShow} = useStorageNodesColumnsToSelect({
+        database,
+        viewContext,
+        columnsSettings,
+    });
+
+    return (
+        <PaginatedStorageNodesTable
+            database={database}
+            parentRef={parentRef}
+            nodeId={nodeId}
+            groupId={groupId}
+            searchValue={searchValue}
+            visibleEntities={'all'}
+            nodesUptimeFilter={NodesUptimeFilterValues.All}
+            onShowAll={handleShowAllNodes}
+            filterGroup={filterGroup}
+            filterGroupBy={filterGroupBy}
+            renderErrorMessage={renderPaginatedTableErrorMessage}
+            columns={columnsToShow}
+            initialEntitiesCount={initialEntitiesCount}
+            onDataFetched={handleDataFetched}
+        />
+    );
+}
+
 function useStorageNodesColumnsToSelect({
     database,
     viewContext,
+    columnsSettings,
 }: {
     database?: string;
     viewContext?: StorageViewContext;
+    columnsSettings?: StorageNodesColumnsSettings;
 }) {
     const additionalNodesProps = useAdditionalNodesProps();
     const {visibleEntities} = useStorageQueryParams();
@@ -221,5 +278,6 @@ function useStorageNodesColumnsToSelect({
         visibleEntities,
         database,
         viewContext,
+        columnsSettings,
     });
 }

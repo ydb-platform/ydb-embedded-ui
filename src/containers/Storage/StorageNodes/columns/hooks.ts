@@ -20,10 +20,16 @@ export function useStorageNodesSelectedColumns({
     database,
     additionalNodesProps,
     viewContext,
+    columnsSettings,
 }: GetStorageNodesColumnsParams) {
     const columns = React.useMemo(() => {
-        return getStorageNodesColumns({database, additionalNodesProps, viewContext});
-    }, [database, additionalNodesProps, viewContext]);
+        return getStorageNodesColumns({
+            database,
+            additionalNodesProps,
+            viewContext,
+            columnsSettings,
+        });
+    }, [database, additionalNodesProps, viewContext, columnsSettings]);
 
     const requiredColumns = React.useMemo(() => {
         if (visibleEntities === VISIBLE_ENTITIES.missing) {

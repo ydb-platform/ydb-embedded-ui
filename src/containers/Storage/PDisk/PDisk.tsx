@@ -25,6 +25,7 @@ interface PDiskProps {
     className?: string;
     progressBarClassName?: string;
     viewContext?: StorageViewContext;
+    width?: number;
 }
 
 export const PDisk = ({
@@ -36,6 +37,7 @@ export const PDisk = ({
     className,
     progressBarClassName,
     viewContext,
+    width,
 }: PDiskProps) => {
     const {NodeId, PDiskId} = data;
     const pDiskIdsDefined = valueIsDefined(NodeId) && valueIsDefined(PDiskId);
@@ -79,7 +81,7 @@ export const PDisk = ({
     }
 
     return (
-        <div className={b(null, className)} ref={anchorRef}>
+        <div className={b(null, className)} ref={anchorRef} style={{width}}>
             {renderVDisks()}
             <HoverPopup
                 showPopup={showPopup}

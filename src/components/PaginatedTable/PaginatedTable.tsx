@@ -11,6 +11,7 @@ import type {
     FetchData,
     GetRowClassName,
     HandleTableColumnsResize,
+    PaginatedTableData,
     RenderControls,
     RenderEmptyDataMessage,
     RenderErrorMessage,
@@ -36,6 +37,7 @@ export interface PaginatedTableProps<T, F> {
     renderEmptyDataMessage?: RenderEmptyDataMessage;
     renderErrorMessage?: RenderErrorMessage;
     containerClassName?: string;
+    onDataFetched?: (data: PaginatedTableData<T>) => void;
 }
 
 const DEFAULT_PAGINATION_LIMIT = 20;
@@ -56,6 +58,7 @@ export const PaginatedTable = <T, F>({
     renderErrorMessage,
     renderEmptyDataMessage,
     containerClassName,
+    onDataFetched,
 }: PaginatedTableProps<T, F>) => {
     const initialTotal = initialEntitiesCount || 0;
     const initialFound = initialEntitiesCount || 1;
@@ -84,11 +87,17 @@ export const PaginatedTable = <T, F>({
         return foundEntities % chunkSize || chunkSize;
     }, [foundEntities, chunkSize]);
 
-    const handleDataFetched = React.useCallback((total: number, found: number) => {
-        setTotalEntities(total);
-        setFoundEntities(found);
-        setIsInitialLoad(false);
-    }, []);
+    const handleDataFetched = React.useCallback(
+        (data?: PaginatedTableData<T>) => {
+            if (data) {
+                setTotalEntities(data.total);
+                setFoundEntities(data.found);
+                setIsInitialLoad(false);
+                onDataFetched?.(data);
+            }
+        },
+        [onDataFetched],
+    );
 
     // reset table on filters change
     React.useLayoutEffect(() => {

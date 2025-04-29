@@ -35,8 +35,8 @@ export interface PreparedStorageNode extends PreparedNodeSystemState {
     VDisks?: PreparedVDisk[];
 
     Missing: number;
-    MaximumSlotsPerDisk: string;
-    MaximumDisksPerNode: string;
+    MaximumSlotsPerDisk: number;
+    MaximumDisksPerNode: number;
 }
 
 export interface PreparedStorageGroupFilters {
@@ -107,4 +107,8 @@ export interface PreparedStorageResponse {
     found: number | undefined;
     total: number | undefined;
     tableGroups?: TableGroup[];
+    columnsSettings?: {
+        maxSlotsPerDisk: number;
+        maxDisksPerNode: number;
+    };
 }

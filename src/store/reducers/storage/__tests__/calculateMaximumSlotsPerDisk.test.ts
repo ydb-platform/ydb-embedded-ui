@@ -17,17 +17,17 @@ describe('calculateMaximumSlotsPerDisk', () => {
         const nodes: TNodeInfo[] = [];
         const providedMaximumSlotsPerDisk = '5';
 
-        expect(calculateMaximumSlotsPerDisk(nodes, providedMaximumSlotsPerDisk)).toBe('5');
+        expect(calculateMaximumSlotsPerDisk(nodes, providedMaximumSlotsPerDisk)).toBe(5);
     });
 
     test('should return "1" for empty nodes array', () => {
         const nodes: TNodeInfo[] = [];
 
-        expect(calculateMaximumSlotsPerDisk(nodes)).toBe('1');
+        expect(calculateMaximumSlotsPerDisk(nodes)).toBe(1);
     });
 
     test('should return "1" for undefined nodes', () => {
-        expect(calculateMaximumSlotsPerDisk(undefined)).toBe('1');
+        expect(calculateMaximumSlotsPerDisk(undefined)).toBe(1);
     });
 
     test('should return "1" for nodes without PDisks or VDisks', () => {
@@ -38,7 +38,7 @@ describe('calculateMaximumSlotsPerDisk', () => {
             },
         ];
 
-        expect(calculateMaximumSlotsPerDisk(nodes)).toBe('1');
+        expect(calculateMaximumSlotsPerDisk(nodes)).toBe(1);
     });
 
     test('should calculate maximum slots correctly for single node with one PDisk and multiple VDisks', () => {
@@ -67,7 +67,7 @@ describe('calculateMaximumSlotsPerDisk', () => {
             },
         ];
 
-        expect(calculateMaximumSlotsPerDisk(nodes)).toBe('2');
+        expect(calculateMaximumSlotsPerDisk(nodes)).toBe(2);
     });
 
     test('should calculate maximum slots across multiple nodes', () => {
@@ -118,7 +118,7 @@ describe('calculateMaximumSlotsPerDisk', () => {
             },
         ];
 
-        expect(calculateMaximumSlotsPerDisk(nodes)).toBe('3');
+        expect(calculateMaximumSlotsPerDisk(nodes)).toBe(3);
     });
 
     test('should handle nodes with multiple PDisks', () => {
@@ -156,7 +156,7 @@ describe('calculateMaximumSlotsPerDisk', () => {
             },
         ];
 
-        expect(calculateMaximumSlotsPerDisk(nodes)).toBe('2');
+        expect(calculateMaximumSlotsPerDisk(nodes)).toBe(2);
     });
 
     test('should ignore VDisks with non-matching PDiskId', () => {
@@ -185,6 +185,6 @@ describe('calculateMaximumSlotsPerDisk', () => {
             },
         ];
 
-        expect(calculateMaximumSlotsPerDisk(nodes)).toBe('1');
+        expect(calculateMaximumSlotsPerDisk(nodes)).toBe(1);
     });
 });
