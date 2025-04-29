@@ -23,8 +23,11 @@ export function useStorageColumnsSettings() {
                 const maxSlots = maxSlotsPerDisk || MAX_SLOTS_DEFAULT;
                 const maxDisks = maxDisksPerNode || MAX_SLOTS_DEFAULT;
 
-                const calculatedPDiskWidth =
-                    maxSlots * PDISK_VDISK_WIDTH + (maxSlots - 1) * PDISK_GAP_WIDTH;
+                const calculatedPDiskWidth = Math.max(
+                    maxSlots * PDISK_VDISK_WIDTH + (maxSlots - 1) * PDISK_GAP_WIDTH,
+                    PDISK_MIN_WIDTH,
+                );
+
                 const calculatedPDiskContainerWidth =
                     maxDisks * calculatedPDiskWidth +
                     (maxDisks - 1) * PDISK_MARGIN +
