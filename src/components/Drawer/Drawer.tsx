@@ -3,6 +3,7 @@ import React from 'react';
 import {DrawerItem, Drawer as GravityDrawer} from '@gravity-ui/navigation';
 
 import {cn} from '../../utils/cn';
+import {isNumeric} from '../../utils/utils';
 
 import {useDrawerContext} from './DrawerContext';
 
@@ -40,7 +41,7 @@ const DrawerPaneContentWrapper = ({
 }: DrawerPaneContentWrapperProps) => {
     const [drawerWidth, setDrawerWidth] = React.useState(() => {
         const savedWidth = localStorage.getItem(storageKey);
-        return savedWidth ? Number(savedWidth) : defaultWidth;
+        return isNumeric(savedWidth) ? Number(savedWidth) : defaultWidth;
     });
 
     const drawerRef = React.useRef<HTMLDivElement>(null);
