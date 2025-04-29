@@ -303,7 +303,7 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
     return (
         <div className={b('table-wrapper')}>
             <TableWithControlsLayout>
-                <TableWithControlsLayout.Controls className={b('controls')}>
+                <TableWithControlsLayout.Controls>
                     {renderControls()}
                 </TableWithControlsLayout.Controls>
                 {error ? <ResponseError error={error} /> : null}
