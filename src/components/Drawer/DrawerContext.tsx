@@ -2,6 +2,8 @@ import React from 'react';
 
 import {cn} from '../../utils/cn';
 
+import './Drawer.scss';
+
 const b = cn('ydb-drawer');
 
 export interface DrawerContextType {
