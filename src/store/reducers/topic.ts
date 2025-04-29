@@ -8,6 +8,8 @@ import type {RootState} from '../defaultStore';
 
 import {api} from './api';
 
+export const TOPIC_MESSAGE_SIZE_LIMIT = 1000;
+
 export const topicApi = api.injectEndpoints({
     endpoints: (build) => ({
         getTopic: build.query({
@@ -28,7 +30,10 @@ export const topicApi = api.injectEndpoints({
         getTopicData: build.query({
             queryFn: async (params: TopicDataRequest) => {
                 try {
-                    const data = await window.api.viewer.getTopicData(params);
+                    const data = await window.api.viewer.getTopicData({
+                        message_size_limit: TOPIC_MESSAGE_SIZE_LIMIT,
+                        ...params,
+                    });
                     return {data};
                 } catch (error) {
                     return {error};

@@ -1,7 +1,12 @@
 import {isNil} from 'lodash';
 
 import type {FetchData} from '../../../../components/PaginatedTable';
-import type {TopicDataRequest, TopicDataResponse, TopicMessage} from '../../../../types/api/topic';
+import type {
+    TopicDataRequest,
+    TopicDataResponse,
+    TopicMessage,
+    TopicMessageEnhanced,
+} from '../../../../types/api/topic';
 import {safeParseNumber} from '../../../../utils/utils';
 
 import {TOPIC_DATA_FETCH_LIMIT} from './utils/constants';
@@ -23,10 +28,11 @@ export function prepareResponse(response: TopicDataResponse, offset: number) {
 
     const removedMessagesCount = start - offset;
 
-    const result = [];
+    const result: TopicMessageEnhanced[] = [];
     for (let i = 0; i < Math.min(TOPIC_DATA_FETCH_LIMIT, removedMessagesCount); i++) {
         result.push({
-            Offset: `<removed> ${offset + i}`,
+            Offset: String(offset + i),
+            removed: true,
         });
     }
     for (

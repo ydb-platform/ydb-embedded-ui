@@ -12,7 +12,17 @@
     &__date-picker {
         min-width: 265px;
     }
-    &__offsets-count {
-        border-radius: unset;
+    &__column-setup {
+        margin-left: auto;
+    }
+
+    &__row {
+        &_active {
+            background-color: var(--g-color-base-selection);
+
+            &:hover {
+                background: var(--g-color-base-selection-hover) !important;
+            }
+        }
     }
 }

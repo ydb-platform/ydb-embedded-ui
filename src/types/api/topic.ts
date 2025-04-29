@@ -216,7 +216,7 @@ export interface TopicMessage {
      *
      * Message offset in the partition
      */
-    Offset?: string;
+    Offset?: string | number;
 
     /**
      * uint64
@@ -281,6 +281,10 @@ export interface TopicMessage {
      * Message metadata
      */
     MessageMetadata?: TopicMessageMetadataItem[];
+}
+
+export interface TopicMessageEnhanced extends TopicMessage {
+    removed?: boolean;
 }
 
 export interface TopicMessageMetadataItem {

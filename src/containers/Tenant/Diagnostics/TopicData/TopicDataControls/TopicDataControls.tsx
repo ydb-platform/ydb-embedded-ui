@@ -3,21 +3,20 @@ import React from 'react';
 import type {Value} from '@gravity-ui/date-components';
 import {RelativeDatePicker} from '@gravity-ui/date-components';
 import {dateTimeParse} from '@gravity-ui/date-utils';
-import {ArrowDownToLine, ArrowUpToLine, CircleChevronDownFill} from '@gravity-ui/icons';
+import {CircleChevronDownFill} from '@gravity-ui/icons';
 import type {TableColumnSetupItem} from '@gravity-ui/uikit';
 import {
     ActionTooltip,
     Button,
-    Flex,
     Icon,
     RadioButton,
     Select,
     TableColumnSetup,
+    Text,
 } from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
 import {DebouncedInput} from '../../../../../components/DebouncedInput/DebouncedTextInput';
-import {EntitiesCount} from '../../../../../components/EntitiesCount';
 import type {PreparedPartitionData} from '../../../../../store/reducers/partitions/types';
 import {formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {prepareErrorMessage} from '../../../../../utils/prepareErrorMessage';
@@ -77,18 +76,6 @@ export function TopicDataControls({
         ],
     );
 
-    const scrollToStartOffset = React.useCallback(() => {
-        if (startOffset) {
-            scrollToOffset(startOffset);
-        }
-    }, [startOffset, scrollToOffset]);
-
-    const scrollToEndOffset = React.useCallback(() => {
-        if (endOffset) {
-            scrollToOffset(endOffset);
-        }
-    }, [endOffset, scrollToOffset]);
-
     return (
         <React.Fragment>
             <Select
@@ -105,42 +92,20 @@ export function TopicDataControls({
                 loading={partitionsLoading}
             />
             <TopicDataStartControls scrollToOffset={scrollToOffset} />
+
+            {!isNil(startOffset) && !isNil(endOffset) && (
+                <Text color="secondary" whiteSpace="nowrap">
+                    {formatNumber(startOffset)}—{formatNumber(endOffset - 1)}
+                </Text>
+            )}
             <TableColumnSetup
+                className={b('column-setup')}
                 popupWidth={242}
                 items={columnsToSelect}
                 showStatus
                 onUpdate={handleSelectedColumnsUpdate}
                 sortable={false}
             />
-            {!isNil(startOffset) && !isNil(endOffset) && (
-                <Flex gap={0.5}>
-                    <ActionTooltip title={i18n('action_scroll-up')}>
-                        <Button
-                            onClick={scrollToStartOffset}
-                            view="flat-info"
-                            selected
-                            pin="round-brick"
-                        >
-                            <Icon size={14} data={ArrowUpToLine} />
-                        </Button>
-                    </ActionTooltip>
-                    <EntitiesCount
-                        label={i18n('label_offset')}
-                        current={`${formatNumber(startOffset)}—${formatNumber(endOffset - 1)}`}
-                        className={b('offsets-count')}
-                    />
-                    <ActionTooltip title={i18n('action_scroll-down')}>
-                        <Button
-                            onClick={scrollToEndOffset}
-                            view="flat-info"
-                            selected
-                            pin="brick-round"
-                        >
-                            <Icon size={14} data={ArrowDownToLine} />
-                        </Button>
-                    </ActionTooltip>
-                </Flex>
-            )}
         </React.Fragment>
     );
 }

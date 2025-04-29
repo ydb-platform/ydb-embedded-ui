@@ -36,11 +36,11 @@ describe('prepareResponse', () => {
         expect(result.messages.length).toBe(8); // 5 removed + 3 actual
 
         // Check removed messages
-        expect(result.messages[0]).toEqual({Offset: '<removed> 100'});
-        expect(result.messages[1]).toEqual({Offset: '<removed> 101'});
-        expect(result.messages[2]).toEqual({Offset: '<removed> 102'});
-        expect(result.messages[3]).toEqual({Offset: '<removed> 103'});
-        expect(result.messages[4]).toEqual({Offset: '<removed> 104'});
+        expect(result.messages[0]).toEqual({Offset: '100', removed: true});
+        expect(result.messages[1]).toEqual({Offset: '101', removed: true});
+        expect(result.messages[2]).toEqual({Offset: '102', removed: true});
+        expect(result.messages[3]).toEqual({Offset: '103', removed: true});
+        expect(result.messages[4]).toEqual({Offset: '104', removed: true});
 
         // Check actual messages
         expect(result.messages[5]).toEqual({Offset: '105'});
@@ -64,7 +64,7 @@ describe('prepareResponse', () => {
 
         // All messages should be "removed" placeholders since there are more than the limit
         for (let i = 0; i < TOPIC_DATA_FETCH_LIMIT; i++) {
-            expect(result.messages[i]).toEqual({Offset: `<removed> ${100 + i}`});
+            expect(result.messages[i]).toEqual({Offset: `${100 + i}`, removed: true});
         }
     });
 

@@ -11,14 +11,13 @@ import {
 } from '../../../../components/PaginatedTable';
 import {partitionsApi} from '../../../../store/reducers/partitions/partitions';
 import {topicApi} from '../../../../store/reducers/topic';
-import type {TopicDataRequest, TopicMessageMetadataItem} from '../../../../types/api/topic';
+import type {TopicDataRequest} from '../../../../types/api/topic';
 import {useAutoRefreshInterval} from '../../../../utils/hooks';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 import {renderPaginatedTableErrorMessage} from '../../../../utils/renderPaginatedTableErrorMessage';
 import {safeParseNumber} from '../../../../utils/utils';
 import {EmptyFilter} from '../../../Storage/EmptyFilter/EmptyFilter';
 
-import {FullValue} from './FullValue';
 import {TopicDataControls} from './TopicDataControls/TopicDataControls';
 import {
     DEFAULT_TOPIC_DATA_COLUMNS,
@@ -33,6 +32,7 @@ import {
     TOPIC_DATA_COLUMNS_WIDTH_LS_KEY,
     TOPIC_DATA_FETCH_LIMIT,
     TOPIC_DATA_SELECTED_COLUMNS_LS_KEY,
+    b,
 } from './utils/constants';
 
 import './TopicData.scss';
@@ -47,9 +47,6 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const [startOffset, setStartOffset] = React.useState<number>();
     const [endOffset, setEndOffset] = React.useState<number>();
-    const [fullValue, setFullValue] = React.useState<
-        string | TopicMessageMetadataItem[] | undefined
-    >(undefined);
     const [controlsKey, setControlsKey] = React.useState(0);
     const [emptyData, setEmptyData] = React.useState(false);
 
@@ -122,7 +119,7 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
     }, [partitions, selectedPartition, handleSelectedPartitionChange]);
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
-        getAllColumns(setFullValue),
+        getAllColumns(),
         TOPIC_DATA_SELECTED_COLUMNS_LS_KEY,
         TOPIC_DATA_COLUMNS_TITLES,
         DEFAULT_TOPIC_DATA_COLUMNS,
@@ -226,25 +223,28 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
     );
 
     return (
-        <React.Fragment>
-            <FullValue value={fullValue} onClose={() => setFullValue(undefined)} />
-            {!isNil(baseOffset) && !isNil(baseEndOffset) && (
-                <ResizeablePaginatedTable
-                    columnsWidthLSKey={TOPIC_DATA_COLUMNS_WIDTH_LS_KEY}
-                    parentRef={parentRef}
-                    columns={columnsToShow}
-                    fetchData={getTopicData}
-                    initialEntitiesCount={baseEndOffset - baseOffset}
-                    limit={TOPIC_DATA_FETCH_LIMIT}
-                    renderControls={renderControls}
-                    renderErrorMessage={renderPaginatedTableErrorMessage}
-                    renderEmptyDataMessage={renderEmptyDataMessage}
-                    filters={tableFilters}
-                    tableName="topicData"
-                    rowHeight={DEFAULT_TABLE_ROW_HEIGHT}
-                    keepCache={false}
-                />
-            )}
-        </React.Fragment>
+        !isNil(baseOffset) &&
+        !isNil(baseEndOffset) && (
+            <ResizeablePaginatedTable
+                columnsWidthLSKey={TOPIC_DATA_COLUMNS_WIDTH_LS_KEY}
+                parentRef={parentRef}
+                columns={columnsToShow}
+                fetchData={getTopicData}
+                initialEntitiesCount={baseEndOffset - baseOffset}
+                limit={TOPIC_DATA_FETCH_LIMIT}
+                renderControls={renderControls}
+                renderErrorMessage={renderPaginatedTableErrorMessage}
+                renderEmptyDataMessage={renderEmptyDataMessage}
+                filters={tableFilters}
+                tableName="topicData"
+                rowHeight={DEFAULT_TABLE_ROW_HEIGHT}
+                keepCache={false}
+                getRowClassName={(row) => {
+                    return b('row', {
+                        active: Boolean(selectedOffset && String(row.Offset) === selectedOffset),
+                    });
+                }}
+            />
+        )
     );
 }

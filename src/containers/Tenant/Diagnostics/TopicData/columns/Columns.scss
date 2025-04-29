@@ -11,4 +11,12 @@
 
         color: var(--g-color-text-info);
     }
+    &__offset_removed {
+        text-decoration: line-through;
+    }
+
+    &__message_invalid,
+    &__truncated {
+        font-style: italic;
+    }
 }

@@ -1,12 +1,14 @@
 import React from 'react';
 
 import DataTable from '@gravity-ui/react-data-table';
+import {Text} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
 import {EntityStatus} from '../../../../../components/EntityStatus/EntityStatus';
 import {MultilineTableHeader} from '../../../../../components/MultilineTableHeader/MultilineTableHeader';
 import type {Column} from '../../../../../components/PaginatedTable';
-import type {TopicMessage, TopicMessageMetadataItem} from '../../../../../types/api/topic';
+import {TOPIC_MESSAGE_SIZE_LIMIT} from '../../../../../store/reducers/topic';
+import type {TopicMessageEnhanced} from '../../../../../types/api/topic';
 import {cn} from '../../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {formatBytes, formatTimestamp} from '../../../../../utils/dataFormatters/dataFormatters';
@@ -21,13 +23,24 @@ import './Columns.scss';
 
 const b = cn('ydb-diagnostics-topic-data-columns');
 
-export function getAllColumns(setFullValue: (value: string | TopicMessageMetadataItem[]) => void) {
-    const columns: Column<TopicMessage>[] = [
+export function getAllColumns() {
+    const columns: Column<TopicMessageEnhanced>[] = [
         {
             name: TOPIC_DATA_COLUMNS_IDS.OFFSET,
             header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.OFFSET],
             align: DataTable.LEFT,
-            render: ({row}) => valueOrPlaceholder(row.Offset),
+            render: ({row}) => {
+                const {Offset, removed} = row;
+                return (
+                    <Text
+                        className={b('offset', {removed})}
+                        variant="body-2"
+                        color={removed ? 'secondary' : 'primary'}
+                    >
+                        {valueOrPlaceholder(Offset)}
+                    </Text>
+                );
+            },
             width: 100,
         },
         {
@@ -78,15 +91,7 @@ export function getAllColumns(setFullValue: (value: string | TopicMessageMetadat
                 const prepared = MessageMetadata.map(
                     ({Key = '', Value = ''}) => `${Key}: ${Value}`,
                 );
-                const isTruncated = prepared.length > 0;
-                return (
-                    <span
-                        className={b('message', {clickable: isTruncated})}
-                        onClick={isTruncated ? () => setFullValue(MessageMetadata) : undefined}
-                    >
-                        {prepared.join(', ')}
-                    </span>
-                );
+                return prepared.join(', ');
             },
             width: 200,
         },
@@ -94,11 +99,35 @@ export function getAllColumns(setFullValue: (value: string | TopicMessageMetadat
             name: TOPIC_DATA_COLUMNS_IDS.MESSAGE,
             header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.MESSAGE],
             align: DataTable.LEFT,
-            render: ({row: {Message: message}}) => {
-                if (isNil(message)) {
+            render: ({row: {Message, OriginalSize}}) => {
+                if (isNil(Message)) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
-                return <Message setFullValue={setFullValue} message={message} />;
+                let encryptedMessage;
+                let invalid = false;
+                try {
+                    encryptedMessage = atob(Message);
+                } catch {
+                    encryptedMessage = i18n('description_failed-decode');
+                    invalid = true;
+                }
+
+                const truncated = safeParseNumber(OriginalSize) > TOPIC_MESSAGE_SIZE_LIMIT;
+                return (
+                    <Text
+                        variant="body-2"
+                        color={invalid ? 'secondary' : 'primary'}
+                        className={b('message', {invalid})}
+                    >
+                        {encryptedMessage}
+                        {truncated && (
+                            <Text color="secondary" className={b('truncated')}>
+                                {' '}
+                                {i18n('description_truncated')}
+                            </Text>
+                        )}
+                    </Text>
+                );
             },
             width: 500,
         },
@@ -179,40 +208,9 @@ function TopicDataTimestamp({timestamp}: TopicDataTimestampProps) {
     );
 }
 
-function valueOrPlaceholder(value: string | undefined, placeholder = EMPTY_DATA_PLACEHOLDER) {
+function valueOrPlaceholder(
+    value: string | number | undefined,
+    placeholder = EMPTY_DATA_PLACEHOLDER,
+) {
     return isNil(value) ? placeholder : value;
-}
-
-interface MessageProps {
-    setFullValue: (value: string) => void;
-    message: string;
-}
-
-function Message({setFullValue, message}: MessageProps) {
-    const longMessage = message.length > 200;
-
-    let encryptedMessage: string | undefined;
-
-    if (!longMessage) {
-        try {
-            encryptedMessage = atob(message);
-        } catch {}
-    }
-
-    const handleClick = () => {
-        try {
-            if (!encryptedMessage) {
-                encryptedMessage = atob(message);
-            }
-            setFullValue(encryptedMessage);
-        } catch {}
-    };
-    return (
-        <span
-            className={b('message', {clickable: longMessage})}
-            onClick={longMessage ? handleClick : undefined}
-        >
-            {encryptedMessage ?? i18n('action_show-message')}
-        </span>
-    );
 }
