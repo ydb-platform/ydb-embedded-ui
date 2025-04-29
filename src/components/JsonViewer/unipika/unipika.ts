@@ -15,7 +15,14 @@ export const defaultUnipikaSettings = {
 };
 
 export function unipikaConvert(value: unknown) {
-    return unipika.converters.yson(value, defaultUnipikaSettings);
+    let result;
+    try {
+        result = unipika.converters.yson(value, defaultUnipikaSettings);
+    } catch (e) {
+        console.error(e);
+        result = {_error: 'JSON is invalid'};
+    }
+    return result;
 }
 
 export function useUnipikaConvert(value: unknown) {

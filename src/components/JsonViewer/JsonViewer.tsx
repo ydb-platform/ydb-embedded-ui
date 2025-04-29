@@ -27,13 +27,20 @@ import ArrowUpFromLineIcon from '@gravity-ui/icons/svgs/arrow-up-from-line.svg';
 
 import './JsonViewer.scss';
 
-interface JsonViewerProps {
-    value: UnipikaValue;
+interface JsonViewerCommonProps {
     unipikaSettings?: UnipikaSettings;
     extraTools?: React.ReactNode;
     tableSettings?: DT100.Settings;
     search?: boolean;
     collapsedInitially?: boolean;
+}
+
+interface JsonViewerProps extends JsonViewerCommonProps {
+    value: UnipikaValue | {_error: string};
+}
+
+interface JsonViewerComponentProps extends JsonViewerCommonProps {
+    value: UnipikaValue;
 }
 
 interface State {
@@ -88,14 +95,26 @@ function calculateState(
     );
 }
 
-export function JsonViewer({
+function isUnipikaValue(value: UnipikaValue | {_error: string}): value is UnipikaValue {
+    return !('_error' in value);
+}
+
+export function JsonViewer(props: JsonViewerProps) {
+    const {value} = props;
+    if (!isUnipikaValue(value)) {
+        return value._error;
+    }
+    return <JsonViewerComponent {...props} value={value} />;
+}
+
+function JsonViewerComponent({
     tableSettings,
     value,
     unipikaSettings,
     search = true,
     extraTools,
     collapsedInitially,
-}: JsonViewerProps) {
+}: JsonViewerComponentProps) {
     const [caseSensitiveSearch, setCaseSensitiveSearch] = useSetting(
         CASE_SENSITIVE_JSON_SEARCH,
         false,
