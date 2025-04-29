@@ -6,6 +6,7 @@ import {Link} from 'react-router-dom';
 import {StringParam, useQueryParams} from 'use-query-params';
 
 import {AutoRefreshControl} from '../../../components/AutoRefreshControl/AutoRefreshControl';
+import {DrawerContextProvider} from '../../../components/Drawer/DrawerContext';
 import {useFeatureFlagsAvailable} from '../../../store/reducers/capabilities/hooks';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
@@ -194,9 +195,11 @@ function Diagnostics(props: DiagnosticsProps) {
                 </Helmet>
             ) : null}
             {renderTabs()}
-            <div className={b('page-wrapper')} ref={containerRef}>
-                {renderTabContent()}
-            </div>
+            <DrawerContextProvider>
+                <div className={b('page-wrapper')} ref={containerRef}>
+                    {renderTabContent()}
+                </div>
+            </DrawerContextProvider>
         </div>
     );
 }

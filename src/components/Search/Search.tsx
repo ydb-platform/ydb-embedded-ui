@@ -15,6 +15,7 @@ interface SearchProps {
     className?: string;
     debounce?: number;
     placeholder?: string;
+    inputRef?: React.RefObject<HTMLInputElement>;
 }
 
 export const Search = ({
@@ -24,6 +25,7 @@ export const Search = ({
     className,
     debounce = 200,
     placeholder,
+    inputRef,
 }: SearchProps) => {
     const [searchValue, setSearchValue] = React.useState<string>(value);
 
@@ -52,6 +54,7 @@ export const Search = ({
         <TextInput
             hasClear
             autoFocus
+            controlRef={inputRef}
             style={{width}}
             className={b(null, className)}
             placeholder={placeholder}

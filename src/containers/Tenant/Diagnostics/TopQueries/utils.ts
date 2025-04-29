@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type {Settings} from '@gravity-ui/react-data-table';
+import type {Settings, SortOrder} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
 
 import {prepareBackendSortFieldsFromTableSort, useTableSort} from '../../../../utils/hooks';
@@ -18,10 +18,10 @@ export const TOP_QUERIES_TABLE_SETTINGS: Settings = {
     externalSort: true,
 };
 
-export function useTopQueriesSort() {
+export function useTopQueriesSort(initialSort?: SortOrder[]) {
     const [tableSort, handleTableSort] = useTableSort({
-        initialSortColumn: QUERIES_COLUMNS_IDS.CPUTime,
-        initialSortOrder: DataTable.DESCENDING,
+        initialSortColumn: initialSort?.[0]?.columnId || QUERIES_COLUMNS_IDS.CPUTime,
+        initialSortOrder: initialSort?.[0]?.order || DataTable.DESCENDING,
         multiple: true,
         fixedOrderType: DataTable.DESCENDING,
     });
