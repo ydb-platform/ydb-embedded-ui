@@ -39,8 +39,12 @@
         flex-grow: 1;
 
         width: 100%;
-        height: 100%;
-        margin: var(--g-spacing-4) var(--g-spacing-5) 0 var(--g-spacing-5);
+
+        // Margin is not counted in height
+        // thats why we need to subtract it.
+        height: calc(100% - var(--g-spacing-4));
+        margin-top: var(--g-spacing-4);
+        padding: 0 var(--g-spacing-5);
 
         .ydb-table-with-controls-layout {
             &__controls {
