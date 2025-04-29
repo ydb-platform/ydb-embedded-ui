@@ -1,6 +1,7 @@
 @use '../../../styles/mixins.scss';
 
 .kv-tenant-diagnostics {
+    --diagnostics-margin-top: var(--g-spacing-4);
     display: flex;
     overflow: hidden;
     flex-direction: column;
@@ -42,8 +43,8 @@
 
         // Margin is not counted in height
         // thats why we need to subtract it.
-        height: calc(100% - var(--g-spacing-4));
-        margin-top: var(--g-spacing-4);
+        height: calc(100% - var(--diagnostics-margin-top));
+        margin-top: var(--diagnostics-margin-top);
         padding: 0 var(--g-spacing-5);
 
         .ydb-table-with-controls-layout {
