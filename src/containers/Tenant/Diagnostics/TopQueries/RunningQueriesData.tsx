@@ -14,9 +14,7 @@ import {cn} from '../../../../utils/cn';
 import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 import {parseQueryErrorToString} from '../../../../utils/query';
-import {Drawer} from '../../../Drawer/Drawer';
 
-import {QueryDetailsDrawerContent} from './QueryDetails/QueryDetailsDrawerContent';
 import {getRunningQueriesColumns} from './columns/columns';
 import {
     DEFAULT_RUNNING_QUERIES_COLUMNS,
@@ -77,17 +75,6 @@ export const RunningQueriesData = ({
 
     const isDrawerVisible = selectedRow !== undefined;
 
-    const handleCloseDetails = React.useCallback(() => {
-        setSelectedRow(undefined);
-    }, [setSelectedRow]);
-
-    const renderDrawerContent = React.useCallback(() => {
-        if (!isDrawerVisible) {
-            return null;
-        }
-        return <QueryDetailsDrawerContent row={selectedRow} onClose={handleCloseDetails} />;
-    }, [isDrawerVisible, selectedRow, handleCloseDetails]);
-
     const onRowClick = React.useCallback(
         (
             row: KeyValueRow | null,
@@ -109,50 +96,40 @@ export const RunningQueriesData = ({
     }, [isDrawerVisible]);
 
     return (
-        <Drawer.ItemWrapper
-            isDrawerVisible={isDrawerVisible}
-            onCloseDrawer={handleCloseDetails}
-            renderDrawerContent={renderDrawerContent}
-            drawerId="running-query-details"
-            storageKey="running-queries-drawer-width"
-            detectClickOutside
-            isPercentageWidth
-        >
-            <TableWithControlsLayout>
-                <TableWithControlsLayout.Controls>
-                    {renderQueryModeControl()}
-                    <Search
-                        value={filters.text}
-                        onChange={handleTextSearchUpdate}
-                        placeholder={i18n('filter.text.placeholder')}
-                        className={b('search')}
-                        inputRef={inputRef}
-                    />
-                    <TableColumnSetup
-                        popupWidth={200}
-                        items={columnsToSelect}
-                        showStatus
-                        onUpdate={setColumns}
-                        sortable={false}
-                    />
-                </TableWithControlsLayout.Controls>
+        <TableWithControlsLayout>
+            <TableWithControlsLayout.Controls>
+                {renderQueryModeControl()}
+                <Search
+                    value={filters.text}
+                    onChange={handleTextSearchUpdate}
+                    placeholder={i18n('filter.text.placeholder')}
+                    className={b('search')}
+                    inputRef={inputRef}
+                />
+                <TableColumnSetup
+                    popupWidth={200}
+                    items={columnsToSelect}
+                    showStatus
+                    onUpdate={setColumns}
+                    sortable={false}
+                />
+            </TableWithControlsLayout.Controls>
 
-                {error ? <ResponseError error={parseQueryErrorToString(error)} /> : null}
-                <TableWithControlsLayout.Table loading={isLoading}>
-                    <ResizeableDataTable
-                        emptyDataMessage={i18n('no-data')}
-                        columnsWidthLSKey={RUNNING_QUERIES_COLUMNS_WIDTH_LS_KEY}
-                        columns={columnsToShow}
-                        data={rows || []}
-                        loading={isFetching && currentData === undefined}
-                        settings={TOP_QUERIES_TABLE_SETTINGS}
-                        onRowClick={onRowClick}
-                        rowClassName={(row) => b('row', {active: isEqual(row, selectedRow)})}
-                        sortOrder={tableSort}
-                        onSort={handleTableSort}
-                    />
-                </TableWithControlsLayout.Table>
-            </TableWithControlsLayout>
-        </Drawer.ItemWrapper>
+            {error ? <ResponseError error={parseQueryErrorToString(error)} /> : null}
+            <TableWithControlsLayout.Table loading={isLoading}>
+                <ResizeableDataTable
+                    emptyDataMessage={i18n('no-data')}
+                    columnsWidthLSKey={RUNNING_QUERIES_COLUMNS_WIDTH_LS_KEY}
+                    columns={columnsToShow}
+                    data={rows || []}
+                    loading={isFetching && currentData === undefined}
+                    settings={TOP_QUERIES_TABLE_SETTINGS}
+                    onRowClick={onRowClick}
+                    rowClassName={(row) => b('row', {active: isEqual(row, selectedRow)})}
+                    sortOrder={tableSort}
+                    onSort={handleTableSort}
+                />
+            </TableWithControlsLayout.Table>
+        </TableWithControlsLayout>
     );
 };

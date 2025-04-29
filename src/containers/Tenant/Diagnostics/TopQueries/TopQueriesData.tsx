@@ -17,9 +17,7 @@ import {cn} from '../../../../utils/cn';
 import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 import {parseQueryErrorToString} from '../../../../utils/query';
-import {Drawer} from '../../../Drawer/Drawer';
 
-import {QueryDetailsDrawerContent} from './QueryDetails/QueryDetailsDrawerContent';
 import {getTopQueriesColumns} from './columns/columns';
 import {
     DEFAULT_TOP_QUERIES_COLUMNS,
@@ -29,11 +27,8 @@ import {
     TOP_QUERIES_SELECTED_COLUMNS_LS_KEY,
 } from './columns/constants';
 import {DEFAULT_TIME_FILTER_VALUE, TIME_FRAME_OPTIONS} from './constants';
-import {useGetSelectedRowTableSort} from './hooks/useGetSelectedRowTableSort';
-import {useSetSelectedTopQueryRowFromParams} from './hooks/useSetSelectedTopQueryRowFromParams';
 import i18n from './i18n';
 import {TOP_QUERIES_TABLE_SETTINGS, useTopQueriesSort} from './utils';
-import {generateShareableUrl} from './utils/generateShareableUrl';
 
 const b = cn('kv-top-queries');
 
@@ -74,8 +69,7 @@ export const TopQueriesData = ({
         REQUIRED_TOP_QUERIES_COLUMNS,
     );
 
-    const initialTableSort = useGetSelectedRowTableSort();
-    const {tableSort, handleTableSort, backendSort} = useTopQueriesSort(initialTableSort);
+    const {tableSort, handleTableSort, backendSort} = useTopQueriesSort();
     const {currentData, isFetching, isLoading, error} = topQueriesApi.useGetTopQueriesQuery(
         {
             database: tenantName,
@@ -87,33 +81,6 @@ export const TopQueriesData = ({
     );
 
     const rows = currentData?.resultSets?.[0]?.result;
-    useSetSelectedTopQueryRowFromParams(setSelectedRow, rows);
-
-    const handleCloseDetails = React.useCallback(() => {
-        setSelectedRow(undefined);
-    }, [setSelectedRow]);
-
-    const isDrawerVisible = selectedRow !== undefined;
-
-    const getTopQueryUrl = React.useCallback(() => {
-        if (selectedRow) {
-            return generateShareableUrl(selectedRow, tableSort);
-        }
-        return '';
-    }, [selectedRow, tableSort]);
-
-    const renderDrawerContent = React.useCallback(() => {
-        if (!isDrawerVisible) {
-            return null;
-        }
-        return (
-            <QueryDetailsDrawerContent
-                row={selectedRow}
-                onClose={handleCloseDetails}
-                getTopQueryUrl={getTopQueryUrl}
-            />
-        );
-    }, [isDrawerVisible, selectedRow, handleCloseDetails, getTopQueryUrl]);
 
     const onRowClick = React.useCallback(
         (
@@ -129,68 +96,52 @@ export const TopQueriesData = ({
 
     const inputRef = React.useRef<HTMLInputElement>(null);
 
-    React.useEffect(() => {
-        if (isDrawerVisible) {
-            inputRef.current?.blur();
-        }
-    }, [isDrawerVisible]);
-
     return (
-        <Drawer.ItemWrapper
-            isDrawerVisible={isDrawerVisible}
-            onCloseDrawer={handleCloseDetails}
-            renderDrawerContent={renderDrawerContent}
-            drawerId="query-details"
-            storageKey="kv-top-queries-drawer-width"
-            detectClickOutside
-            isPercentageWidth
-        >
-            <TableWithControlsLayout>
-                <TableWithControlsLayout.Controls>
-                    {renderQueryModeControl()}
-                    <Select
-                        options={TIME_FRAME_OPTIONS}
-                        value={[timeFrame]}
-                        onUpdate={handleTimeFrameChange}
-                    />
-                    <DateRange
-                        from={filters.from}
-                        to={filters.to}
-                        onChange={handleDateRangeChange}
-                        defaultValue={DEFAULT_TIME_FILTER_VALUE}
-                    />
-                    <Search
-                        value={filters.text}
-                        inputRef={inputRef}
-                        onChange={handleTextSearchUpdate}
-                        placeholder={i18n('filter.text.placeholder')}
-                        className={b('search')}
-                    />
-                    <TableColumnSetup
-                        popupWidth={200}
-                        items={columnsToSelect}
-                        showStatus
-                        onUpdate={setColumns}
-                        sortable={false}
-                    />
-                </TableWithControlsLayout.Controls>
+        <TableWithControlsLayout>
+            <TableWithControlsLayout.Controls>
+                {renderQueryModeControl()}
+                <Select
+                    options={TIME_FRAME_OPTIONS}
+                    value={[timeFrame]}
+                    onUpdate={handleTimeFrameChange}
+                />
+                <DateRange
+                    from={filters.from}
+                    to={filters.to}
+                    onChange={handleDateRangeChange}
+                    defaultValue={DEFAULT_TIME_FILTER_VALUE}
+                />
+                <Search
+                    value={filters.text}
+                    inputRef={inputRef}
+                    onChange={handleTextSearchUpdate}
+                    placeholder={i18n('filter.text.placeholder')}
+                    className={b('search')}
+                />
+                <TableColumnSetup
+                    popupWidth={200}
+                    items={columnsToSelect}
+                    showStatus
+                    onUpdate={setColumns}
+                    sortable={false}
+                />
+            </TableWithControlsLayout.Controls>
 
-                {error ? <ResponseError error={parseQueryErrorToString(error)} /> : null}
-                <TableWithControlsLayout.Table loading={isLoading}>
-                    <ResizeableDataTable
-                        emptyDataMessage={i18n('no-data')}
-                        columnsWidthLSKey={TOP_QUERIES_COLUMNS_WIDTH_LS_KEY}
-                        columns={columnsToShow}
-                        data={rows || []}
-                        loading={isFetching && currentData === undefined}
-                        settings={TOP_QUERIES_TABLE_SETTINGS}
-                        onRowClick={onRowClick}
-                        rowClassName={(row) => b('row', {active: isEqual(row, selectedRow)})}
-                        sortOrder={tableSort}
-                        onSort={handleTableSort}
-                    />
-                </TableWithControlsLayout.Table>
-            </TableWithControlsLayout>
-        </Drawer.ItemWrapper>
+            {error ? <ResponseError error={parseQueryErrorToString(error)} /> : null}
+            <TableWithControlsLayout.Table loading={isLoading}>
+                <ResizeableDataTable
+                    emptyDataMessage={i18n('no-data')}
+                    columnsWidthLSKey={TOP_QUERIES_COLUMNS_WIDTH_LS_KEY}
+                    columns={columnsToShow}
+                    data={rows || []}
+                    loading={isFetching && currentData === undefined}
+                    settings={TOP_QUERIES_TABLE_SETTINGS}
+                    onRowClick={onRowClick}
+                    rowClassName={(row) => b('row', {active: isEqual(row, selectedRow)})}
+                    sortOrder={tableSort}
+                    onSort={handleTableSort}
+                />
+            </TableWithControlsLayout.Table>
+        </TableWithControlsLayout>
     );
 };
