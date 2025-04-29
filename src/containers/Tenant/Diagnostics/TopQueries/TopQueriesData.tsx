@@ -2,7 +2,6 @@ import React from 'react';
 
 import type {Column} from '@gravity-ui/react-data-table';
 import {Select, TableColumnSetup} from '@gravity-ui/uikit';
-import {isEqual} from 'lodash';
 
 import type {DateRangeValues} from '../../../../components/DateRange';
 import {DateRange} from '../../../../components/DateRange';
@@ -36,6 +35,7 @@ interface TopQueriesDataProps {
     tenantName: string;
     timeFrame: TimeFrame;
     renderQueryModeControl: () => React.ReactNode;
+    onRowClick: (query: string) => void;
     handleTimeFrameChange: (value: string[]) => void;
     handleDateRangeChange: (value: DateRangeValues) => void;
     handleTextSearchUpdate: (text: string) => void;
@@ -45,15 +45,13 @@ export const TopQueriesData = ({
     tenantName,
     timeFrame,
     renderQueryModeControl,
+    onRowClick,
     handleTimeFrameChange,
     handleDateRangeChange,
     handleTextSearchUpdate,
 }: TopQueriesDataProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const filters = useTypedSelector((state) => state.executeTopQueries);
-    // Internal state for selected row
-    // null is reserved for not found state
-    const [selectedRow, setSelectedRow] = React.useState<KeyValueRow | null | undefined>(undefined);
 
     // Get columns for top queries
     const columns: Column<KeyValueRow>[] = React.useMemo(() => {
@@ -70,7 +68,8 @@ export const TopQueriesData = ({
     );
 
     const {tableSort, handleTableSort, backendSort} = useTopQueriesSort();
-    const {currentData, isFetching, isLoading, error} = topQueriesApi.useGetTopQueriesQuery(
+
+    const {currentData, data, isFetching, isLoading, error} = topQueriesApi.useGetTopQueriesQuery(
         {
             database: tenantName,
             filters,
@@ -80,21 +79,9 @@ export const TopQueriesData = ({
         {pollingInterval: autoRefreshInterval},
     );
 
-    const rows = currentData?.resultSets?.[0]?.result;
-
-    const onRowClick = React.useCallback(
-        (
-            row: KeyValueRow | null,
-            _index?: number,
-            event?: React.MouseEvent<HTMLTableRowElement>,
-        ) => {
-            event?.stopPropagation();
-            setSelectedRow(row);
-        },
-        [setSelectedRow],
-    );
-
-    const inputRef = React.useRef<HTMLInputElement>(null);
+    const handleRowClick = (row: KeyValueRow) => {
+        return onRowClick(row.QueryText as string);
+    };
 
     return (
         <TableWithControlsLayout>
@@ -113,7 +100,6 @@ export const TopQueriesData = ({
                 />
                 <Search
                     value={filters.text}
-                    inputRef={inputRef}
                     onChange={handleTextSearchUpdate}
                     placeholder={i18n('filter.text.placeholder')}
                     className={b('search')}
@@ -133,11 +119,11 @@ export const TopQueriesData = ({
                     emptyDataMessage={i18n('no-data')}
                     columnsWidthLSKey={TOP_QUERIES_COLUMNS_WIDTH_LS_KEY}
                     columns={columnsToShow}
-                    data={rows || []}
+                    data={data?.resultSets?.[0].result || []}
                     loading={isFetching && currentData === undefined}
                     settings={TOP_QUERIES_TABLE_SETTINGS}
-                    onRowClick={onRowClick}
-                    rowClassName={(row) => b('row', {active: isEqual(row, selectedRow)})}
+                    onRowClick={handleRowClick}
+                    rowClassName={() => b('row')}
                     sortOrder={tableSort}
                     onSort={handleTableSort}
                 />

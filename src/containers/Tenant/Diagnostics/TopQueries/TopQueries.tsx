@@ -1,91 +1,133 @@
 import React from 'react';
 
-import type {RadioButtonOption} from '@gravity-ui/uikit';
-import {RadioButton} from '@gravity-ui/uikit';
-import {StringParam, useQueryParam} from 'use-query-params';
-import {z} from 'zod';
+import type {Column} from '@gravity-ui/react-data-table';
+import {Select, TableColumnSetup} from '@gravity-ui/uikit';
 
 import type {DateRangeValues} from '../../../../components/DateRange';
-import {setTopQueriesFilters} from '../../../../store/reducers/executeTopQueries/executeTopQueries';
+import {DateRange} from '../../../../components/DateRange';
+import {ResponseError} from '../../../../components/Errors/ResponseError';
+import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
+import {Search} from '../../../../components/Search';
+import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
+import {topQueriesApi} from '../../../../store/reducers/executeTopQueries/executeTopQueries';
 import type {TimeFrame} from '../../../../store/reducers/executeTopQueries/types';
-import {useTypedDispatch} from '../../../../utils/hooks';
+import type {KeyValueRow} from '../../../../types/api/query';
+import {cn} from '../../../../utils/cn';
+import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
+import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
+import {parseQueryErrorToString} from '../../../../utils/query';
 
-import {RunningQueriesData} from './RunningQueriesData';
-import {TopQueriesData} from './TopQueriesData';
-import {TimeFrameIds} from './constants';
+import {getTopQueriesColumns} from './columns/columns';
+import {
+    DEFAULT_TOP_QUERIES_COLUMNS,
+    QUERIES_COLUMNS_TITLES,
+    REQUIRED_TOP_QUERIES_COLUMNS,
+    TOP_QUERIES_COLUMNS_WIDTH_LS_KEY,
+    TOP_QUERIES_SELECTED_COLUMNS_LS_KEY,
+} from './columns/constants';
+import {DEFAULT_TIME_FILTER_VALUE, TIME_FRAME_OPTIONS} from './constants';
 import i18n from './i18n';
+import {TOP_QUERIES_TABLE_SETTINGS, useTopQueriesSort} from './utils';
 
-import './TopQueries.scss';
+const b = cn('kv-top-queries');
 
-const QueryModeIds = {
-    top: 'top',
-    running: 'running',
-} as const;
-
-const QUERY_MODE_OPTIONS: RadioButtonOption[] = [
-    {
-        value: QueryModeIds.top,
-        get content() {
-            return i18n('mode_top');
-        },
-    },
-    {
-        value: QueryModeIds.running,
-        get content() {
-            return i18n('mode_running');
-        },
-    },
-];
-
-const queryModeSchema = z.nativeEnum(QueryModeIds).catch(QueryModeIds.top);
-const timeFrameSchema = z.nativeEnum(TimeFrameIds).catch(TimeFrameIds.hour);
-
-interface TopQueriesProps {
+interface TopQueriesDataProps {
     tenantName: string;
+    timeFrame: TimeFrame;
+    renderQueryModeControl: () => React.ReactNode;
+    onRowClick: (query: string) => void;
+    handleTimeFrameChange: (value: string[]) => void;
+    handleDateRangeChange: (value: DateRangeValues) => void;
+    handleTextSearchUpdate: (text: string) => void;
 }
 
-export const TopQueries = ({tenantName}: TopQueriesProps) => {
-    const dispatch = useTypedDispatch();
-    const [_queryMode = QueryModeIds.top, setQueryMode] = useQueryParam('queryMode', StringParam);
-    const [_timeFrame = TimeFrameIds.hour, setTimeFrame] = useQueryParam('timeFrame', StringParam);
+export const TopQueriesData = ({
+    tenantName,
+    timeFrame,
+    renderQueryModeControl,
+    onRowClick,
+    handleTimeFrameChange,
+    handleDateRangeChange,
+    handleTextSearchUpdate,
+}: TopQueriesDataProps) => {
+    const [autoRefreshInterval] = useAutoRefreshInterval();
+    const filters = useTypedSelector((state) => state.executeTopQueries);
 
-    const queryMode = queryModeSchema.parse(_queryMode);
-    const timeFrame = timeFrameSchema.parse(_timeFrame);
+    // Get columns for top queries
+    const columns: Column<KeyValueRow>[] = React.useMemo(() => {
+        return getTopQueriesColumns();
+    }, []);
 
-    const isTopQueries = queryMode === QueryModeIds.top;
+    // Use selected columns hook
+    const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
+        columns,
+        TOP_QUERIES_SELECTED_COLUMNS_LS_KEY,
+        QUERIES_COLUMNS_TITLES,
+        DEFAULT_TOP_QUERIES_COLUMNS,
+        REQUIRED_TOP_QUERIES_COLUMNS,
+    );
 
-    const handleTextSearchUpdate = (text: string) => {
-        dispatch(setTopQueriesFilters({text}));
+    const {tableSort, handleTableSort, backendSort} = useTopQueriesSort();
+
+    const {currentData, data, isFetching, isLoading, error} = topQueriesApi.useGetTopQueriesQuery(
+        {
+            database: tenantName,
+            filters,
+            sortOrder: backendSort,
+            timeFrame,
+        },
+        {pollingInterval: autoRefreshInterval},
+    );
+
+    const handleRowClick = (row: KeyValueRow) => {
+        return onRowClick(row.QueryText as string);
     };
 
-    const handleTimeFrameChange = (value: string[]) => {
-        setTimeFrame(value[0] as TimeFrame, 'replaceIn');
-    };
+    return (
+        <TableWithControlsLayout>
+            <TableWithControlsLayout.Controls>
+                {renderQueryModeControl()}
+                <Select
+                    options={TIME_FRAME_OPTIONS}
+                    value={[timeFrame]}
+                    onUpdate={handleTimeFrameChange}
+                />
+                <DateRange
+                    from={filters.from}
+                    to={filters.to}
+                    onChange={handleDateRangeChange}
+                    defaultValue={DEFAULT_TIME_FILTER_VALUE}
+                />
+                <Search
+                    value={filters.text}
+                    onChange={handleTextSearchUpdate}
+                    placeholder={i18n('filter.text.placeholder')}
+                    className={b('search')}
+                />
+                <TableColumnSetup
+                    popupWidth={200}
+                    items={columnsToSelect}
+                    showStatus
+                    onUpdate={setColumns}
+                    sortable={false}
+                />
+            </TableWithControlsLayout.Controls>
 
-    const handleDateRangeChange = (value: DateRangeValues) => {
-        dispatch(setTopQueriesFilters(value));
-    };
-
-    const renderQueryModeControl = React.useCallback(() => {
-        return (
-            <RadioButton options={QUERY_MODE_OPTIONS} value={queryMode} onUpdate={setQueryMode} />
-        );
-    }, [queryMode, setQueryMode]);
-
-    return isTopQueries ? (
-        <TopQueriesData
-            tenantName={tenantName}
-            timeFrame={timeFrame}
-            renderQueryModeControl={renderQueryModeControl}
-            handleTimeFrameChange={handleTimeFrameChange}
-            handleDateRangeChange={handleDateRangeChange}
-            handleTextSearchUpdate={handleTextSearchUpdate}
-        />
-    ) : (
-        <RunningQueriesData
-            tenantName={tenantName}
-            renderQueryModeControl={renderQueryModeControl}
-            handleTextSearchUpdate={handleTextSearchUpdate}
-        />
+            {error ? <ResponseError error={parseQueryErrorToString(error)} /> : null}
+            <TableWithControlsLayout.Table loading={isLoading}>
+                <ResizeableDataTable
+                    emptyDataMessage={i18n('no-data')}
+                    columnsWidthLSKey={TOP_QUERIES_COLUMNS_WIDTH_LS_KEY}
+                    columns={columnsToShow}
+                    data={data?.resultSets?.[0].result || []}
+                    loading={isFetching && currentData === undefined}
+                    settings={TOP_QUERIES_TABLE_SETTINGS}
+                    onRowClick={handleRowClick}
+                    rowClassName={() => b('row')}
+                    sortOrder={tableSort}
+                    onSort={handleTableSort}
+                />
+            </TableWithControlsLayout.Table>
+        </TableWithControlsLayout>
     );
 };
