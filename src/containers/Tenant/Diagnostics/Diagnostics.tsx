@@ -6,6 +6,7 @@ import {Link} from 'react-router-dom';
 import {StringParam, useQueryParams} from 'use-query-params';
 
 import {AutoRefreshControl} from '../../../components/AutoRefreshControl/AutoRefreshControl';
+import {DrawerContextProvider} from '../../../components/Drawer/DrawerContext';
 import {useFeatureFlagsAvailable} from '../../../store/reducers/capabilities/hooks';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
@@ -13,7 +14,6 @@ import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../types/
 import type {EPathType} from '../../../types/api/schema';
 import {cn} from '../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
-import {Drawer} from '../../Drawer/Drawer';
 import {Heatmap} from '../../Heatmap';
 import {Nodes} from '../../Nodes/Nodes';
 import {Operations} from '../../Operations';
@@ -195,11 +195,11 @@ function Diagnostics(props: DiagnosticsProps) {
                 </Helmet>
             ) : null}
             {renderTabs()}
-            <Drawer.Container>
+            <DrawerContextProvider>
                 <div className={b('page-wrapper')} ref={containerRef}>
                     {renderTabContent()}
                 </div>
-            </Drawer.Container>
+            </DrawerContextProvider>
         </div>
     );
 }

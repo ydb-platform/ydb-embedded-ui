@@ -4,6 +4,8 @@ import {DrawerItem, Drawer as GravityDrawer} from '@gravity-ui/navigation';
 
 import {cn} from '../../utils/cn';
 
+import {useDrawerContext} from './DrawerContext';
+
 const DEFAULT_DRAWER_WIDTH_PERCENTS = 60;
 const DEFAULT_DRAWER_WIDTH = 600;
 const DRAWER_WIDTH_KEY = 'drawer-width';
@@ -11,24 +13,7 @@ const b = cn('ydb-drawer');
 
 import './Drawer.scss';
 
-// Create a context for sharing container dimensions
-interface DrawerContextType {
-    containerWidth: number;
-    setContainerWidth: React.Dispatch<React.SetStateAction<number>>;
-}
-
-const DrawerContext = React.createContext<DrawerContextType | undefined>(undefined);
-
-// Custom hook to use the drawer context
-const useDrawerContext = () => {
-    const context = React.useContext(DrawerContext);
-    if (context === undefined) {
-        return {containerWidth: 0, setContainerWidth: () => {}};
-    }
-    return context;
-};
-
-interface ContentWrapperProps {
+interface DrawerPaneContentWrapperProps {
     isVisible: boolean;
     onClose: () => void;
     children: React.ReactNode;
@@ -41,7 +26,7 @@ interface ContentWrapperProps {
     isPercentageWidth?: boolean;
 }
 
-const ContentWrapper = ({
+const DrawerPaneContentWrapper = ({
     isVisible,
     onClose,
     children,
@@ -52,7 +37,7 @@ const ContentWrapper = ({
     className,
     detectClickOutside = false,
     isPercentageWidth,
-}: ContentWrapperProps) => {
+}: DrawerPaneContentWrapperProps) => {
     const [drawerWidth, setDrawerWidth] = React.useState(() => {
         const savedWidth = localStorage.getItem(storageKey);
         return savedWidth ? Number(savedWidth) : defaultWidth;
@@ -126,12 +111,7 @@ const ContentWrapper = ({
     );
 };
 
-interface ContainerProps {
-    children: React.ReactNode;
-    className?: string;
-}
-
-interface ItemWrapperProps {
+interface DrawerPaneProps {
     children: React.ReactNode;
     renderDrawerContent: () => React.ReactNode;
     isDrawerVisible: boolean;
@@ -145,80 +125,40 @@ interface ItemWrapperProps {
     isPercentageWidth?: boolean;
 }
 
-export const Drawer = {
-    Container: ({children, className}: ContainerProps) => {
-        const [containerWidth, setContainerWidth] = React.useState(0);
-        const containerRef = React.useRef<HTMLDivElement>(null);
-
-        React.useEffect(() => {
-            if (!containerRef.current) {
-                return undefined;
-            }
-
-            const updateWidth = () => {
-                if (containerRef.current) {
-                    setContainerWidth(containerRef.current.clientWidth);
-                }
-            };
-
-            // Set initial width
-            updateWidth();
-
-            // Update width on resize
-            const resizeObserver = new ResizeObserver(updateWidth);
-            resizeObserver.observe(containerRef.current);
-
-            return () => {
-                if (containerRef.current) {
-                    resizeObserver.disconnect();
-                }
-            };
-        }, []);
-
-        return (
-            <DrawerContext.Provider value={{containerWidth, setContainerWidth}}>
-                <div ref={containerRef} className={b('drawer-container', className)}>
-                    {children}
-                </div>
-            </DrawerContext.Provider>
-        );
-    },
-
-    ItemWrapper: ({
-        children,
-        renderDrawerContent,
-        isDrawerVisible,
-        onCloseDrawer,
-        drawerId,
-        storageKey,
-        defaultWidth,
-        direction,
-        className,
-        detectClickOutside,
-        isPercentageWidth,
-    }: ItemWrapperProps) => {
-        React.useEffect(() => {
-            return () => {
-                onCloseDrawer();
-            };
-        }, [onCloseDrawer]);
-        return (
-            <React.Fragment>
-                {children}
-                <ContentWrapper
-                    isVisible={isDrawerVisible}
-                    onClose={onCloseDrawer}
-                    drawerId={drawerId}
-                    storageKey={storageKey}
-                    defaultWidth={defaultWidth}
-                    direction={direction}
-                    className={className}
-                    detectClickOutside={detectClickOutside}
-                    isPercentageWidth={isPercentageWidth}
-                >
-                    {renderDrawerContent()}
-                </ContentWrapper>
-            </React.Fragment>
-        );
-    },
+export const DrawerWrapper = ({
+    children,
+    renderDrawerContent,
+    isDrawerVisible,
+    onCloseDrawer,
+    drawerId,
+    storageKey,
+    defaultWidth,
+    direction,
+    className,
+    detectClickOutside,
+    isPercentageWidth,
+}: DrawerPaneProps) => {
+    React.useEffect(() => {
+        return () => {
+            onCloseDrawer();
+        };
+    }, [onCloseDrawer]);
+    return (
+        <React.Fragment>
+            {children}
+            <DrawerPaneContentWrapper
+                isVisible={isDrawerVisible}
+                onClose={onCloseDrawer}
+                drawerId={drawerId}
+                storageKey={storageKey}
+                defaultWidth={defaultWidth}
+                direction={direction}
+                className={className}
+                detectClickOutside={detectClickOutside}
+                isPercentageWidth={isPercentageWidth}
+            >
+                {renderDrawerContent()}
+            </DrawerPaneContentWrapper>
+        </React.Fragment>
+    );
 };
