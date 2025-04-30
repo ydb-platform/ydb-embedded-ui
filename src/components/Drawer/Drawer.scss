@@ -16,4 +16,23 @@
     &__controls {
         margin-left: auto;
     }
+
+    &__header-wrapper {
+        position: sticky;
+        z-index: 3;
+        top: 0;
+        left: 0;
+
+        padding: var(--g-spacing-4) var(--g-spacing-4) 0 var(--g-spacing-6);
+
+        background-color: var(--g-color-base-background);
+    }
+
+    &__content-wrapper {
+        display: flex;
+        overflow: auto;
+        flex-direction: column;
+
+        height: 100%;
+    }
 }
