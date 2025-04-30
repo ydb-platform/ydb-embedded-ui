@@ -62,7 +62,7 @@ const getTenantBreadcrumbs: GetBreadcrumbs<TenantBreadcrumbsOptions> = (options,
 
     const breadcrumbs = getClusterBreadcrumbs(options, query);
 
-    const text = tenantName ? tenantName : headerKeyset('breadcrumbs.tenant');
+    const text = tenantName || headerKeyset('breadcrumbs.tenant');
     const link = tenantName ? getTenantPath({...query, database: tenantName}) : undefined;
 
     const lastItem = {text, link, icon: <DatabaseIcon />};
