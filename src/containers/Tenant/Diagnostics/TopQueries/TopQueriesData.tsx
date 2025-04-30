@@ -26,8 +26,9 @@ import {
     TOP_QUERIES_SELECTED_COLUMNS_LS_KEY,
 } from './columns/constants';
 import {DEFAULT_TIME_FILTER_VALUE, TIME_FRAME_OPTIONS} from './constants';
+import {useTopQueriesSort} from './hooks/useTopQueriesSort';
 import i18n from './i18n';
-import {TOP_QUERIES_TABLE_SETTINGS, useTopQueriesSort} from './utils';
+import {TOP_QUERIES_TABLE_SETTINGS} from './utils';
 
 const b = cn('kv-top-queries');
 
@@ -67,6 +68,7 @@ export const TopQueriesData = ({
         REQUIRED_TOP_QUERIES_COLUMNS,
     );
 
+    // Use the sort params from URL in the hook
     const {tableSort, handleTableSort, backendSort} = useTopQueriesSort();
 
     const {currentData, data, isFetching, isLoading, error} = topQueriesApi.useGetTopQueriesQuery(
