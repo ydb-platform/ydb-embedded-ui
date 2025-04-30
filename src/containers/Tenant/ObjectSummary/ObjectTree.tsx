@@ -12,6 +12,14 @@ interface ObjectTreeProps {
     path?: string;
 }
 
+function prepareSchemaRootName(name: string | undefined, fallback: string): string {
+    if (name) {
+        return name.startsWith('/') ? name : `/${name}`;
+    }
+
+    return fallback.startsWith('/') ? fallback : `/${fallback}`;
+}
+
 export function ObjectTree({tenantName, path}: ObjectTreeProps) {
     const {data: tenantData = {}, isLoading} = useGetSchemaQuery({
         path: tenantName,
@@ -38,8 +46,8 @@ export function ObjectTree({tenantName, path}: ObjectTreeProps) {
                     <SchemaTree
                         rootPath={tenantName}
                         // for the root pathData.Name contains the same string as tenantName,
-                        // but without the leading slash
-                        rootName={pathData.Name || tenantName}
+                        // but without the leading slash - ensure it has one
+                        rootName={prepareSchemaRootName(pathData.Name, tenantName)}
                         rootType={pathData.PathType}
                         currentPath={path}
                         onActivePathUpdate={setCurrentPath}
