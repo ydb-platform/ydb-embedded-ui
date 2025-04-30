@@ -22,8 +22,9 @@ import {
     RUNNING_QUERIES_COLUMNS_WIDTH_LS_KEY,
     RUNNING_QUERIES_SELECTED_COLUMNS_LS_KEY,
 } from './columns/constants';
+import {useRunningQueriesSort} from './hooks/useRunningQueriesSort';
 import i18n from './i18n';
-import {TOP_QUERIES_TABLE_SETTINGS, useRunningQueriesSort} from './utils';
+import {TOP_QUERIES_TABLE_SETTINGS} from './utils';
 
 const b = cn('kv-top-queries');
 
