@@ -1,15 +1,14 @@
 @use '../../styles/mixins.scss';
 
 .ydb-cluster {
+    --cluster-side-padding: var(--g-spacing-5);
     position: relative;
 
-    display: flex;
     overflow: auto;
-    flex-grow: 1;
-    flex-direction: column;
 
+    width: 100%;
     height: 100%;
-    padding: 0 20px;
+    padding: 0 var(--cluster-side-padding);
 
     &__header {
         position: sticky;
@@ -33,11 +32,11 @@
         z-index: 3;
 
         margin-top: 20px;
-        margin-right: -40px;
-        padding-right: 40px;
-        padding-left: 20px;
+        margin-right: calc(var(--cluster-side-padding) * -2);
+        padding-right: calc(var(--cluster-side-padding) * 2);
+        padding-left: var(--cluster-side-padding);
 
-        transform: translateX(-20px);
+        transform: translateX(calc(var(--cluster-side-padding) * -1));
         @include mixins.sticky-top();
     }
     &__tabs {
