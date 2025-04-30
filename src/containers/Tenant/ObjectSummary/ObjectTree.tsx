@@ -46,7 +46,7 @@ export function ObjectTree({tenantName, path}: ObjectTreeProps) {
                     <SchemaTree
                         rootPath={tenantName}
                         // for the root pathData.Name contains the same string as tenantName,
-                        // ensure it has slash in the beginning
+                        // ensure it has the leading slash
                         rootName={prepareSchemaRootName(pathData.Name, tenantName)}
                         rootType={pathData.PathType}
                         currentPath={path}
