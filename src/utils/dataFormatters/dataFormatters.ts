@@ -226,7 +226,7 @@ export const formatDateTime = (
     return formattedData ?? defaultValue;
 };
 export const formatTimestamp = (value?: string | number, defaultValue = '') => {
-    const formattedData = dateTimeParse(value)?.format('YYYY-MM-DD HH:mm:ss.SSS');
+    const formattedData = dateTimeParse(value)?.format('YYYY-MM-DD, HH:mm:ss.SSS');
 
     return formattedData ?? defaultValue;
 };

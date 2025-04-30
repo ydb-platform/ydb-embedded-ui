@@ -8,10 +8,6 @@
 
     @include mixins.flex-container();
 
-    &__controls {
-        @include mixins.controls();
-    }
-
     &__consumer-select {
         width: 220px;
     }
@@ -30,18 +26,8 @@
         }
     }
 
-    &__table-wrapper {
-        overflow: auto;
-        @include mixins.flex-container();
-    }
-
-    &__table-content {
-        overflow: auto;
-
-        height: 100%;
-    }
-
     &__table {
         @include mixins.freeze-nth-column(1);
+        // padding-right: 0;
     }
 }

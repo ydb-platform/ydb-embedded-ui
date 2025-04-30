@@ -8,11 +8,12 @@ import type {NodesFilters, NodesPreparedEntity} from '../../store/reducers/nodes
 import type {ProblemFilterValue} from '../../store/reducers/settings/types';
 import type {NodesGroupByField, NodesPeerRole} from '../../types/api/nodes';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
+import {renderPaginatedTableErrorMessage} from '../../utils/renderPaginatedTableErrorMessage';
 import type {Column} from '../../utils/tableUtils/types';
 
 import {getNodes} from './getNodes';
 import i18n from './i18n';
-import {getRowClassName, renderPaginatedTableErrorMessage} from './shared';
+import {getRowClassName} from './shared';
 
 interface NodesTableProps {
     path?: string;

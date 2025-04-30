@@ -1,0 +1,22 @@
+.ydb-diagnostics-topic-data-columns {
+    &__timestamp-ms {
+        color: var(--g-color-text-secondary);
+    }
+
+    &__ts-diff_danger {
+        color: var(--g-color-text-danger);
+    }
+    &__message_clickable {
+        cursor: pointer;
+
+        color: var(--g-color-text-info);
+    }
+    &__offset_removed {
+        text-decoration: line-through;
+    }
+
+    &__message_invalid,
+    &__truncated {
+        font-style: italic;
+    }
+}

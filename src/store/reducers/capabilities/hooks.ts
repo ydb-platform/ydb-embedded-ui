@@ -78,6 +78,10 @@ export const useStreamingAvailable = () => {
     return useGetFeatureVersion('/viewer/query') >= 8;
 };
 
+export const useTopicDataAvailable = () => {
+    return useGetFeatureVersion('/viewer/topic_data') >= 1;
+};
+
 const useGetSecuritySetting = (feature: SecuritySetting) => {
     const database = useDatabaseFromQuery();
 

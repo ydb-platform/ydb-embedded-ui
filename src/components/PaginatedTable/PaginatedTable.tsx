@@ -38,6 +38,7 @@ export interface PaginatedTableProps<T, F> {
     renderErrorMessage?: RenderErrorMessage;
     containerClassName?: string;
     onDataFetched?: (data: PaginatedTableData<T>) => void;
+    keepCache?: boolean;
 }
 
 const DEFAULT_PAGINATION_LIMIT = 20;
@@ -46,7 +47,7 @@ export const PaginatedTable = <T, F>({
     limit: chunkSize = DEFAULT_PAGINATION_LIMIT,
     initialEntitiesCount,
     fetchData,
-    filters,
+    filters: rawFilters,
     tableName,
     columns,
     getRowClassName,
@@ -59,6 +60,7 @@ export const PaginatedTable = <T, F>({
     renderEmptyDataMessage,
     containerClassName,
     onDataFetched,
+    keepCache = true,
 }: PaginatedTableProps<T, F>) => {
     const initialTotal = initialEntitiesCount || 0;
     const initialFound = initialEntitiesCount || 1;
@@ -77,6 +79,13 @@ export const PaginatedTable = <T, F>({
         rowHeight,
         chunkSize,
     });
+
+    // this prevent situation when filters are new, but active chunks is not yet recalculated (it will be done to the next rendrer, so we bring filters change on the next render too)
+    const [filters, setFilters] = React.useState(rawFilters);
+
+    React.useEffect(() => {
+        setFilters(rawFilters);
+    }, [rawFilters]);
 
     const lastChunkSize = React.useMemo(() => {
         // If foundEntities = 0, there will only first chunk
@@ -107,7 +116,7 @@ export const PaginatedTable = <T, F>({
         if (parentRef?.current) {
             parentRef.current.scrollTo(0, 0);
         }
-    }, [filters, initialFound, initialTotal, parentRef]);
+    }, [rawFilters, initialFound, initialTotal, parentRef]);
 
     const renderChunks = () => {
         return activeChunks.map((isActive, index) => (
@@ -127,6 +136,7 @@ export const PaginatedTable = <T, F>({
                 renderEmptyDataMessage={renderEmptyDataMessage}
                 onDataFetched={handleDataFetched}
                 isActive={isActive}
+                keepCache={keepCache}
             />
         ));
     };

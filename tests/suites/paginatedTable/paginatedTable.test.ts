@@ -20,8 +20,7 @@ test.describe('PaginatedTable', () => {
 
         // Get initial row count (should be first chunk)
         const initialVisibleRows = await paginatedTable.getRowCount();
-        expect(initialVisibleRows).toBeGreaterThan(0);
-        expect(initialVisibleRows).toBeLessThan(100); // Should not show all rows initially
+        expect(initialVisibleRows).toEqual(40); // Should not show all rows initially
 
         // Get data from first visible row to verify initial chunk
         const firstRowData = await paginatedTable.getRowData(0);

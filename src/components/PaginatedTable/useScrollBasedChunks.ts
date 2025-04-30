@@ -51,9 +51,17 @@ export const useScrollBasedChunks = ({
             Math.floor(visibleEnd / rowHeight / chunkSize) + overscanCount,
             Math.max(chunksCount - 1, 0),
         );
-
         return {start, end};
     }, [parentRef, tableRef, rowHeight, chunkSize, overscanCount, chunksCount]);
+
+    React.useEffect(() => {
+        const newRange = calculateVisibleRange();
+
+        if (newRange) {
+            setStartChunk(newRange.start);
+            setEndChunk(newRange.end);
+        }
+    }, [chunksCount, calculateVisibleRange]);
 
     const handleScroll = React.useCallback(() => {
         const newRange = calculateVisibleRange();
