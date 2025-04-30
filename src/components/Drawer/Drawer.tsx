@@ -1,9 +1,12 @@
 import React from 'react';
 
+import {Xmark} from '@gravity-ui/icons';
 import {DrawerItem, Drawer as GravityDrawer} from '@gravity-ui/navigation';
+import {ActionTooltip, Button, Flex, Icon} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 import {isNumeric} from '../../utils/utils';
+import {CopyLinkButton} from '../CopyLinkButton/CopyLinkButton';
 
 import {useDrawerContext} from './DrawerContext';
 
@@ -112,6 +115,11 @@ const DrawerPaneContentWrapper = ({
     );
 };
 
+type DrawerControl =
+    | {type: 'close'}
+    | {type: 'copyLink'; link: string}
+    | {type: 'custom'; node: React.ReactNode; key: string};
+
 interface DrawerPaneProps {
     children: React.ReactNode;
     renderDrawerContent: () => React.ReactNode;
@@ -124,6 +132,9 @@ interface DrawerPaneProps {
     className?: string;
     detectClickOutside?: boolean;
     isPercentageWidth?: boolean;
+    drawerControls?: DrawerControl[];
+    title?: React.ReactNode;
+    headerClassName?: string;
 }
 
 export const DrawerWrapper = ({
@@ -138,12 +149,48 @@ export const DrawerWrapper = ({
     className,
     detectClickOutside,
     isPercentageWidth,
+    drawerControls = [],
+    title,
+    headerClassName,
 }: DrawerPaneProps) => {
     React.useEffect(() => {
         return () => {
             onCloseDrawer();
         };
     }, [onCloseDrawer]);
+
+    const renderDrawerHeader = () => {
+        const controls = [];
+        for (const control of drawerControls) {
+            switch (control.type) {
+                case 'close':
+                    controls.push(
+                        <ActionTooltip title="Close" key="close">
+                            <Button view="flat" onClick={onCloseDrawer}>
+                                <Icon data={Xmark} size={16} />
+                            </Button>
+                        </ActionTooltip>,
+                    );
+                    break;
+                case 'copyLink':
+                    controls.push(<CopyLinkButton text={control.link} key="copyLink" />);
+                    break;
+                case 'custom':
+                    controls.push(
+                        <React.Fragment key={control.key}>{control.node}</React.Fragment>,
+                    );
+                    break;
+            }
+        }
+
+        return (
+            <Flex justifyContent="space-between" className={headerClassName}>
+                {title}
+                <Flex className={b('controls')}>{controls}</Flex>
+            </Flex>
+        );
+    };
+
     return (
         <React.Fragment>
             {children}
@@ -158,6 +205,7 @@ export const DrawerWrapper = ({
                 detectClickOutside={detectClickOutside}
                 isPercentageWidth={isPercentageWidth}
             >
+                {renderDrawerHeader()}
                 {renderDrawerContent()}
             </DrawerPaneContentWrapper>
         </React.Fragment>

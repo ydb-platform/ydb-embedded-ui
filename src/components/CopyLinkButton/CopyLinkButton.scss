@@ -1,0 +1,6 @@
+.ydb-copy-link-button {
+    &__icon {
+        // prevent button icon from firing onMouseEnter/onFocus through parent button's handler
+        pointer-events: none;
+    }
+}
