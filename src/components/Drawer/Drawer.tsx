@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Xmark} from '@gravity-ui/icons';
 import {DrawerItem, Drawer as GravityDrawer} from '@gravity-ui/navigation';
-import {ActionTooltip, Button, Flex, Icon} from '@gravity-ui/uikit';
+import {ActionTooltip, Button, Flex, Icon, Text} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 import {isNumeric} from '../../utils/utils';
@@ -184,8 +184,8 @@ export const DrawerWrapper = ({
         }
 
         return (
-            <Flex justifyContent="space-between" className={headerClassName}>
-                {title}
+            <Flex justifyContent="space-between" className={b('header-wrapper', headerClassName)}>
+                <Text variant="subheader-2">{title}</Text>
                 <Flex className={b('controls')}>{controls}</Flex>
             </Flex>
         );
@@ -205,8 +205,10 @@ export const DrawerWrapper = ({
                 detectClickOutside={detectClickOutside}
                 isPercentageWidth={isPercentageWidth}
             >
-                {renderDrawerHeader()}
-                {renderDrawerContent()}
+                <div className={b('content-wrapper')}>
+                    {renderDrawerHeader()}
+                    {renderDrawerContent()}
+                </div>
             </DrawerPaneContentWrapper>
         </React.Fragment>
     );
