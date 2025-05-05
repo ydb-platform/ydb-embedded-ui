@@ -1,5 +1,27 @@
 # Changelog
 
+## [8.26.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.25.0...v8.26.0) (2025-05-05)
+
+
+### Features
+
+* **Cluster:** redesign cluster dashboard ([#2176](https://github.com/ydb-platform/ydb-embedded-ui/issues/2176)) ([714e7c7](https://github.com/ydb-platform/ydb-embedded-ui/commit/714e7c7982e4a775ee8b4253f0ca39c7929a4cc1))
+* **Drawer:** add utility to render header ([#2235](https://github.com/ydb-platform/ydb-embedded-ui/issues/2235)) ([c01b536](https://github.com/ydb-platform/ydb-embedded-ui/commit/c01b53625ddf92a325ed9eab5ca72f8fae0b07cb))
+* save sorting columns in queries ([#2234](https://github.com/ydb-platform/ydb-embedded-ui/issues/2234)) ([dea22d1](https://github.com/ydb-platform/ydb-embedded-ui/commit/dea22d130ba568376692be67343a701b6d2615b2))
+* **TopicData:** add tab for topic data ([#2145](https://github.com/ydb-platform/ydb-embedded-ui/issues/2145)) ([4c25054](https://github.com/ydb-platform/ydb-embedded-ui/commit/4c25054a2e20afe94d611dd788fdabac7c789f25))
+
+
+### Bug Fixes
+
+* **Cluster:** layout for tabs content ([#2219](https://github.com/ydb-platform/ydb-embedded-ui/issues/2219)) ([cc454d6](https://github.com/ydb-platform/ydb-embedded-ui/commit/cc454d65f56dcac67d7e9e2e52163965a0f7a084))
+* columns width ([#2229](https://github.com/ydb-platform/ydb-embedded-ui/issues/2229)) ([c0b3efe](https://github.com/ydb-platform/ydb-embedded-ui/commit/c0b3efecf7c1e7bf4602d4ee3f24c002dda860f2))
+* count pdisk-vdisk column width for skeletons ([#2214](https://github.com/ydb-platform/ydb-embedded-ui/issues/2214)) ([5727c21](https://github.com/ydb-platform/ydb-embedded-ui/commit/5727c218c0b62040eb8724bfbfe392d335971fac))
+* **Drawer:** header styles ([#2242](https://github.com/ydb-platform/ydb-embedded-ui/issues/2242)) ([12214a8](https://github.com/ydb-platform/ydb-embedded-ui/commit/12214a8bb8698304e809557c99a765892040208a))
+* fallback if unipika convert json failed ([#2227](https://github.com/ydb-platform/ydb-embedded-ui/issues/2227)) ([7887369](https://github.com/ydb-platform/ydb-embedded-ui/commit/788736938681153ec177007dc89ddd32741bbf0b))
+* fix slashes everywhere ([#2244](https://github.com/ydb-platform/ydb-embedded-ui/issues/2244)) ([7535dbf](https://github.com/ydb-platform/ydb-embedded-ui/commit/7535dbf00183d8dfa630089a6607bb08f4e22e62))
+* **PaginatedStorage:** controls should be fixed ([#2217](https://github.com/ydb-platform/ydb-embedded-ui/issues/2217)) ([c12fed4](https://github.com/ydb-platform/ydb-embedded-ui/commit/c12fed49d6a8687212f8a9382fe4dcf0242b5430))
+* **StatusIcon:** add icons for grey and green statuses ([#2203](https://github.com/ydb-platform/ydb-embedded-ui/issues/2203)) ([9c77257](https://github.com/ydb-platform/ydb-embedded-ui/commit/9c7725767977464b01970e06bc2b068144ec483c))
+
 ## [8.25.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.24.1...v8.25.0) (2025-04-25)
 
 
