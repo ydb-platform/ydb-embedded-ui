@@ -59,7 +59,7 @@ export function DiskStateProgressBar({
         }
 
         if (!compact && diskAllocatedPercent >= 0) {
-            return <div className={b('title')}>{`${Math.round(diskAllocatedPercent)}%`}</div>;
+            return <div className={b('title')}>{`${Math.floor(diskAllocatedPercent)}%`}</div>;
         }
 
         return null;

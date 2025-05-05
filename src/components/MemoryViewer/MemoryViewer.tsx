@@ -59,7 +59,7 @@ export function MemoryViewer({
 
     const theme = useTheme();
     let fillWidth =
-        Math.round((parseFloat(String(memoryUsage)) / parseFloat(String(capacity))) * 100) || 0;
+        Math.floor((parseFloat(String(memoryUsage)) / parseFloat(String(capacity))) * 100) || 0;
     fillWidth = fillWidth > 100 ? 100 : fillWidth;
     let valueText: number | string | undefined = memoryUsage,
         capacityText: number | string | undefined = capacity,

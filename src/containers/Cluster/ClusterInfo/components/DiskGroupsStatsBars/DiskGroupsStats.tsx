@@ -32,7 +32,7 @@ export function DiskGroupsStats({stats, storageType}: GroupsStatsPopupContentPro
     const convertedAllocatedSize = formatBytes({value: allocatedSize, size: sizeToConvert});
     const convertedAvailableSize = formatBytes({value: availableSize, size: sizeToConvert});
 
-    const usage = Math.round((allocatedSize / (allocatedSize + availableSize)) * 100);
+    const usage = Math.floor((allocatedSize / (allocatedSize + availableSize)) * 100);
 
     const info = [
         {
