@@ -116,6 +116,7 @@ export interface TOperationList {
 export type OperationKind =
     | 'ss/backgrounds'
     | 'import'
+    | 'import/s3'
     | 'export/s3'
     | 'export/yt'
     | 'buildindex'
