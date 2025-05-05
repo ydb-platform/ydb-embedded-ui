@@ -30,10 +30,6 @@ import {TenantTabsGroups, getTenantPath} from '../Tenant/TenantPages';
 
 import {headerKeyset} from './i18n';
 
-const prepareTenantName = (tenantName: string) => {
-    return tenantName.startsWith('/') ? tenantName.slice(1) : tenantName;
-};
-
 export interface RawBreadcrumbItem {
     text: string;
     link?: string;
@@ -66,7 +62,7 @@ const getTenantBreadcrumbs: GetBreadcrumbs<TenantBreadcrumbsOptions> = (options,
 
     const breadcrumbs = getClusterBreadcrumbs(options, query);
 
-    const text = tenantName ? prepareTenantName(tenantName) : headerKeyset('breadcrumbs.tenant');
+    const text = tenantName || headerKeyset('breadcrumbs.tenant');
     const link = tenantName ? getTenantPath({...query, database: tenantName}) : undefined;
 
     const lastItem = {text, link, icon: <DatabaseIcon />};
