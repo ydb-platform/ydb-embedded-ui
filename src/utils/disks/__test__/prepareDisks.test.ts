@@ -91,7 +91,7 @@ describe('prepareWhiteboardVDiskData', () => {
             AvailableSize: 188523479040,
             AllocatedSize: 8996782080,
             TotalSize: 197520261120,
-            AllocatedPercent: 5,
+            AllocatedPercent: 4,
         };
 
         const preparedData = prepareWhiteboardVDiskData(data);
@@ -162,7 +162,7 @@ describe('prepareWhiteboardPDiskData', () => {
             AvailableSize: 3107979264000,
             TotalSize: 3199556648960,
             AllocatedSize: 91577384960,
-            AllocatedPercent: 3,
+            AllocatedPercent: 2,
 
             ExpectedSlotCount: 16,
             NumActiveSlots: 10,

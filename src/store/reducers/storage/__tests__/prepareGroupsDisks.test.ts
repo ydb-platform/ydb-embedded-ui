@@ -92,7 +92,7 @@ describe('prepareGroupsVDisk', () => {
             AllocatedSize: 30943477760,
             AvailableSize: 234461593600,
             TotalSize: 265405071360,
-            AllocatedPercent: 12,
+            AllocatedPercent: 11,
 
             Donors: undefined,
 
@@ -135,7 +135,7 @@ describe('prepareGroupsVDisk', () => {
             AllocatedSize: 30943477760,
             AvailableSize: 234461593600,
             TotalSize: 265405071360,
-            AllocatedPercent: 12,
+            AllocatedPercent: 11,
 
             PDisk: {
                 AllocatedPercent: NaN,
@@ -237,7 +237,7 @@ describe('prepareGroupsVDisk', () => {
             AllocatedSize: 30943477760,
             AvailableSize: 234461593600,
             TotalSize: 265405071360,
-            AllocatedPercent: 12,
+            AllocatedPercent: 11,
 
             Donors: undefined,
 
