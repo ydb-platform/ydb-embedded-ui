@@ -28,9 +28,13 @@ interface ClusterMetricsCommonCardProps {
     collapsed?: boolean;
 }
 
-export function ClusterMetricsCard({children, className}: ClusterMetricsCommonCardProps) {
+export function ClusterMetricsCard({
+    children,
+    className,
+    collapsed,
+}: ClusterMetricsCommonCardProps) {
     return (
-        <Flex gap="6" alignItems="center" className={b('card', className)}>
+        <Flex gap="6" alignItems="center" className={b('card', {collapsed}, className)}>
             {children}
         </Flex>
     );
@@ -70,20 +74,24 @@ export function ClusterMetricsCardContent({
     );
 }
 
-function ClusterMetricsCardSkeleton() {
+interface ClusterMetricsCardSkeletonProps {
+    collapsed?: boolean;
+}
+
+function ClusterMetricsCardSkeleton({collapsed}: ClusterMetricsCardSkeletonProps) {
     return (
-        <ClusterMetricsCard className={b('skeleton-wrapper')}>
+        <ClusterMetricsCard className={b('skeleton-wrapper')} collapsed={collapsed}>
             <Skeleton className={b('skeleton')} />
         </ClusterMetricsCard>
     );
 }
 
-export function ClusterDashboardSkeleton() {
+export function ClusterDashboardSkeleton({collapsed}: ClusterMetricsCardSkeletonProps) {
     return (
         <React.Fragment>
-            <ClusterMetricsCardSkeleton />
-            <ClusterMetricsCardSkeleton />
-            <ClusterMetricsCardSkeleton />
+            <ClusterMetricsCardSkeleton collapsed={collapsed} />
+            <ClusterMetricsCardSkeleton collapsed={collapsed} />
+            <ClusterMetricsCardSkeleton collapsed={collapsed} />
         </React.Fragment>
     );
 }

@@ -91,7 +91,7 @@ function ClusterDashboard({collapsed, ...props}: ClusterDashboardProps) {
 
 function ClusterDoughnuts({cluster, groupStats = {}, loading, collapsed}: ClusterOverviewProps) {
     if (loading) {
-        return <ClusterDashboardSkeleton />;
+        return <ClusterDashboardSkeleton collapsed={collapsed} />;
     }
     const metricsCards = [];
     if (isClusterInfoV2(cluster)) {
