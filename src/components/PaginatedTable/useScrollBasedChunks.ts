@@ -1,8 +1,6 @@
 import React from 'react';
 
-import {throttle} from 'lodash';
-
-import {calculateElementOffsetTop} from './utils';
+import {calculateElementOffsetTop, rafThrottle} from './utils';
 
 interface UseScrollBasedChunksProps {
     parentRef: React.RefObject<HTMLElement>;
@@ -14,7 +12,6 @@ interface UseScrollBasedChunksProps {
 }
 
 const DEFAULT_OVERSCAN_COUNT = 1;
-const THROTTLE_DELAY = 100;
 
 export const useScrollBasedChunks = ({
     parentRef,
@@ -54,16 +51,7 @@ export const useScrollBasedChunks = ({
         return {start, end};
     }, [parentRef, tableRef, rowHeight, chunkSize, overscanCount, chunksCount]);
 
-    React.useEffect(() => {
-        const newRange = calculateVisibleRange();
-
-        if (newRange) {
-            setStartChunk(newRange.start);
-            setEndChunk(newRange.end);
-        }
-    }, [chunksCount, calculateVisibleRange]);
-
-    const handleScroll = React.useCallback(() => {
+    const updateVisibleChunks = React.useCallback(() => {
         const newRange = calculateVisibleRange();
         if (newRange) {
             setStartChunk(newRange.start);
@@ -72,20 +60,36 @@ export const useScrollBasedChunks = ({
     }, [calculateVisibleRange]);
 
     React.useEffect(() => {
+        updateVisibleChunks();
+    }, [chunksCount, updateVisibleChunks]);
+
+    const handleScroll = React.useCallback(() => {
+        updateVisibleChunks();
+    }, [updateVisibleChunks]);
+
+    React.useEffect(() => {
+        const throttledHandleZoom = rafThrottle(() => {
+            updateVisibleChunks();
+        });
+
+        window.addEventListener('resize', throttledHandleZoom);
+
+        return () => {
+            window.removeEventListener('resize', throttledHandleZoom);
+        };
+    }, [updateVisibleChunks]);
+
+    React.useEffect(() => {
         const container = parentRef?.current;
         if (!container) {
             return undefined;
         }
 
-        const throttledHandleScroll = throttle(handleScroll, THROTTLE_DELAY, {
-            leading: true,
-            trailing: true,
-        });
+        const throttledHandleScroll = rafThrottle(handleScroll);
 
         container.addEventListener('scroll', throttledHandleScroll);
         return () => {
             container.removeEventListener('scroll', throttledHandleScroll);
-            throttledHandleScroll.cancel();
         };
     }, [handleScroll, parentRef]);
 
