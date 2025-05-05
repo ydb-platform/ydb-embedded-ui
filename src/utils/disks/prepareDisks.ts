@@ -125,7 +125,7 @@ export function prepareVDiskSizeFields({
     const available = Number(AvailableSize);
     const allocated = Number(AllocatedSize);
     const total = allocated + available;
-    const allocatedPercent = Math.round((allocated * 100) / total);
+    const allocatedPercent = Math.floor((allocated * 100) / total);
 
     return {
         AvailableSize: available,
@@ -145,7 +145,7 @@ export function preparePDiskSizeFields({
     const available = Number(AvailableSize);
     const total = Number(TotalSize);
     const allocated = total - available;
-    const allocatedPercent = Math.round((allocated * 100) / total);
+    const allocatedPercent = Math.floor((allocated * 100) / total);
 
     return {
         AvailableSize: available,

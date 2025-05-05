@@ -67,7 +67,7 @@ export function ProgressViewer({
     const theme = useTheme();
 
     let fillWidth =
-        Math.round((parseFloat(String(value)) / parseFloat(String(capacity))) * 100) || 0;
+        Math.floor((parseFloat(String(value)) / parseFloat(String(capacity))) * 100) || 0;
     fillWidth = fillWidth > 100 ? 100 : fillWidth;
     let valueText: number | string | undefined = value,
         capacityText: number | string | undefined = capacity,
