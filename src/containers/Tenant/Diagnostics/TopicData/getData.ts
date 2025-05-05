@@ -1,6 +1,7 @@
 import {isNil} from 'lodash';
 
 import type {FetchData} from '../../../../components/PaginatedTable';
+import {TOPIC_MESSAGE_SIZE_LIMIT} from '../../../../store/reducers/topic';
 import type {
     TopicDataRequest,
     TopicDataResponse,
@@ -26,28 +27,34 @@ export function prepareResponse(response: TopicDataResponse, offset: number) {
     const start = safeParseNumber(StartOffset);
     const end = safeParseNumber(EndOffset);
 
-    const removedMessagesCount = start - offset;
+    const normalizedMessages: TopicMessageEnhanced[] = [];
 
-    const result: TopicMessageEnhanced[] = [];
-    for (let i = 0; i < Math.min(TOPIC_DATA_FETCH_LIMIT, removedMessagesCount); i++) {
-        result.push({
-            Offset: String(offset + i),
-            removed: true,
-        });
+    const limit = Math.min(TOPIC_DATA_FETCH_LIMIT, Math.max(end - offset, 0));
+    let i = 0;
+    let j = 0;
+    while (j < limit) {
+        const currentOffset = offset + j;
+        const currentMessage = Messages[i];
+        if (currentOffset < start) {
+            normalizedMessages.push({
+                Offset: currentOffset,
+                removed: true,
+            });
+        } else if (
+            !isNil(currentMessage?.Offset) &&
+            String(currentMessage.Offset) === String(currentOffset)
+        ) {
+            normalizedMessages.push(currentMessage);
+            i++;
+        } else {
+            normalizedMessages.push({
+                Offset: currentOffset,
+                removed: true,
+            });
+        }
+        j++;
     }
-    for (
-        let i = 0;
-        i <
-        Math.min(
-            TOPIC_DATA_FETCH_LIMIT,
-            TOPIC_DATA_FETCH_LIMIT - removedMessagesCount,
-            Messages.length,
-        );
-        i++
-    ) {
-        result.push(Messages[i]);
-    }
-    return {start, end, messages: result};
+    return {start, end, messages: normalizedMessages};
 }
 
 export const generateTopicDataGetter = ({
@@ -77,6 +84,7 @@ export const generateTopicDataGetter = ({
             partition,
             limit,
             last_offset: normalizedOffset + limit,
+            message_size_limit: TOPIC_MESSAGE_SIZE_LIMIT,
         };
         queryParams.offset = normalizedOffset;
 
