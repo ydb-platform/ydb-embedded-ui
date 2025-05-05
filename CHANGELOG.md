@@ -1,5 +1,13 @@
 # Changelog
 
+## [8.26.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.26.1...v8.26.2) (2025-05-05)
+
+
+### Bug Fixes
+
+* **ClusterOverview:** loading state ([#2250](https://github.com/ydb-platform/ydb-embedded-ui/issues/2250)) ([1ad2ef1](https://github.com/ydb-platform/ydb-embedded-ui/commit/1ad2ef1c8772bcd73663f7c6912ed27335bdafe1))
+* paginatedTable - calculate visible range on resize ([#2248](https://github.com/ydb-platform/ydb-embedded-ui/issues/2248)) ([e196fae](https://github.com/ydb-platform/ydb-embedded-ui/commit/e196fae039118054c24e5c7b9b1f54f5fe673648))
+
 ## [8.26.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.26.0...v8.26.1) (2025-05-05)
 
 
