@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.26.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.26.0...v8.26.1) (2025-05-05)
+
+
+### Bug Fixes
+
+* add cry cat svg ([#2246](https://github.com/ydb-platform/ydb-embedded-ui/issues/2246)) ([3f32315](https://github.com/ydb-platform/ydb-embedded-ui/commit/3f3231584e4736e3f4199884d5390c911607eebf))
+
 ## [8.26.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.25.0...v8.26.0) (2025-05-05)
 
 
