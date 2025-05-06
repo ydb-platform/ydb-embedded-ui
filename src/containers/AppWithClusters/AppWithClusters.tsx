@@ -3,7 +3,6 @@ import React from 'react';
 import type {Store} from '@reduxjs/toolkit';
 import type {History} from 'history';
 
-import {getLogsLink as getLogsLinkDefault} from '../../utils/logs';
 import type {
     GetLogsLink,
     GetMonitoringClusterLink,
@@ -32,7 +31,7 @@ export interface AppWithClustersProps {
 export function AppWithClusters({
     store,
     history,
-    getLogsLink = getLogsLinkDefault,
+    getLogsLink,
     getMonitoringLink = getMonitoringLinkDefault,
     getMonitoringClusterLink = getMonitoringClusterLinkDefault,
     userSettings,
