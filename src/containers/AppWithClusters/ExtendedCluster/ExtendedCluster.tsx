@@ -8,11 +8,8 @@ import {cn} from '../../../utils/cn';
 import {USE_CLUSTER_BALANCER_AS_BACKEND_KEY} from '../../../utils/constants';
 import {useSetting} from '../../../utils/hooks';
 import {useAdditionalNodesProps} from '../../../utils/hooks/useAdditionalNodesProps';
-import type {
-    GetLogsLink,
-    GetMonitoringClusterLink,
-    GetMonitoringLink,
-} from '../../../utils/monitoring';
+import type {GetLogsLink} from '../../../utils/logs';
+import type {GetMonitoringClusterLink, GetMonitoringLink} from '../../../utils/monitoring';
 import {getCleanBalancerValue, prepareBackendFromBalancer} from '../../../utils/parseBalancer';
 import {getBackendFromBalancerAndNodeId} from '../../../utils/prepareBackend';
 import type {Cluster} from '../../Cluster/Cluster';
