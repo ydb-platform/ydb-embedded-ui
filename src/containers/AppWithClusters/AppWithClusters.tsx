@@ -3,11 +3,8 @@ import React from 'react';
 import type {Store} from '@reduxjs/toolkit';
 import type {History} from 'history';
 
-import type {
-    GetLogsLink,
-    GetMonitoringClusterLink,
-    GetMonitoringLink,
-} from '../../utils/monitoring';
+import type {GetLogsLink} from '../../utils/logs';
+import type {GetMonitoringClusterLink, GetMonitoringLink} from '../../utils/monitoring';
 import {
     getMonitoringClusterLink as getMonitoringClusterLinkDefault,
     getMonitoringLink as getMonitoringLinkDefault,
