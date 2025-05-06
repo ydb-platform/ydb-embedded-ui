@@ -6,6 +6,7 @@
   "kind_ssBackgrounds": "SS/Backgrounds",
   "kind_export_s3": "Export/S3",
   "kind_export_yt": "Export/YT",
+  "kind_import_s3": "Import/S3",
   "kind_buildIndex": "Build Index",
 
   "column_operationId": "Operation ID",
