@@ -14,7 +14,7 @@ export interface PaginatedStorageProps {
 
     viewContext?: StorageViewContext;
 
-    parentRef: React.RefObject<HTMLElement>;
+    scrollContainerRef: React.RefObject<HTMLElement>;
 
     initialEntitiesCount?: number;
 }

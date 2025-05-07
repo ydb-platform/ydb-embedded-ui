@@ -1,7 +1,11 @@
+import React from 'react';
+
 import {Flex} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 import {TableSkeleton} from '../TableSkeleton/TableSkeleton';
+
+import {useTableScroll} from './useTableScroll';
 
 import './TableWithControlsLayout.scss';
 
@@ -11,17 +15,21 @@ interface TableWithControlsLayoutItemProps {
     children: React.ReactNode;
     renderExtraControls?: () => React.ReactNode;
     className?: string;
+    fullHeight?: boolean;
 }
 
-interface TableProps extends TableWithControlsLayoutItemProps {
+export interface TableProps extends TableWithControlsLayoutItemProps {
     loading?: boolean;
+    scrollContainerRef?: React.RefObject<HTMLElement>;
+    scrollDependencies?: any[];
 }
 
 export const TableWithControlsLayout = ({
     children,
     className,
+    fullHeight,
 }: TableWithControlsLayoutItemProps) => {
-    return <div className={b(null, className)}>{children}</div>;
+    return <div className={b({fullHeight}, className)}>{children}</div>;
 };
 
 TableWithControlsLayout.Controls = function TableControls({
@@ -42,10 +50,30 @@ TableWithControlsLayout.Controls = function TableControls({
     );
 };
 
-TableWithControlsLayout.Table = function Table({children, loading, className}: TableProps) {
+TableWithControlsLayout.Table = function Table({
+    children,
+    loading,
+    className,
+    scrollContainerRef,
+    scrollDependencies = [],
+}: TableProps) {
+    // Create an internal ref for the table container
+    const tableContainerRef = React.useRef<HTMLDivElement>(null);
+
+    // Use the internal ref for scrolling
+    useTableScroll({
+        tableContainerRef,
+        scrollContainerRef,
+        dependencies: scrollDependencies,
+    });
+
     if (loading) {
         return <TableSkeleton className={b('loader')} />;
     }
 
-    return <div className={b('table', className)}>{children}</div>;
+    return (
+        <div ref={tableContainerRef} className={b('table', className)}>
+            {children}
+        </div>
+    );
 };

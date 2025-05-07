@@ -12,12 +12,12 @@ import {
 } from '../../../../../utils/constants';
 import {useAutoRefreshInterval, useSearchQuery} from '../../../../../utils/hooks';
 import {getRequiredDataFields} from '../../../../../utils/tableUtils/getRequiredDataFields';
-import {getStorageTopGroupsColumns} from '../../../../Storage/StorageGroups/columns/columns';
+import {getStorageTopGroupsColumns} from '../../../../Storage/PaginatedStorageGroupsTable/columns/columns';
 import {
     GROUPS_COLUMNS_TO_DATA_FIELDS,
     STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY,
-} from '../../../../Storage/StorageGroups/columns/constants';
-import type {StorageGroupsColumn} from '../../../../Storage/StorageGroups/columns/types';
+} from '../../../../Storage/PaginatedStorageGroupsTable/columns/constants';
+import type {StorageGroupsColumn} from '../../../../Storage/PaginatedStorageGroupsTable/columns/types';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 import {getSectionTitle} from '../getSectionTitle';

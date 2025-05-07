@@ -226,7 +226,7 @@ function NodePageContent({
                 return (
                     <PaginatedStorage
                         nodeId={nodeId}
-                        parentRef={parentContainer}
+                        scrollContainerRef={parentContainer}
                         viewContext={{
                             nodeId: nodeId,
                         }}
@@ -234,7 +234,14 @@ function NodePageContent({
                 );
             }
             case 'tablets': {
-                return <Tablets nodeId={nodeId} database={tenantName} onlyActive />;
+                return (
+                    <Tablets
+                        scrollContainerRef={parentContainer}
+                        nodeId={nodeId}
+                        database={tenantName}
+                        onlyActive
+                    />
+                );
             }
 
             case 'structure': {

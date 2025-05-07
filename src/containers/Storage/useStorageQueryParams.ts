@@ -4,8 +4,8 @@ import type {StorageType, VisibleEntities} from '../../store/reducers/storage/ty
 import {storageTypeSchema, visibleEntitiesSchema} from '../../store/reducers/storage/types';
 import {NodesUptimeFilterValues, nodesUptimeFilterValuesSchema} from '../../utils/nodes';
 
-import {storageGroupsGroupByParamSchema} from './StorageGroups/columns/constants';
-import {storageNodesGroupByParamSchema} from './StorageNodes/columns/constants';
+import {storageGroupsGroupByParamSchema} from './PaginatedStorageGroupsTable/columns/constants';
+import {storageNodesGroupByParamSchema} from './PaginatedStorageNodesTable/columns/constants';
 
 export function useStorageQueryParams() {
     const [queryParams, setQueryParams] = useQueryParams({

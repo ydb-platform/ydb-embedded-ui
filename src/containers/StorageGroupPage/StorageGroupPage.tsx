@@ -112,7 +112,7 @@ export function StorageGroupPage() {
                 </div>
                 <PaginatedStorage
                     groupId={groupId}
-                    parentRef={containerRef}
+                    scrollContainerRef={containerRef}
                     viewContext={{
                         groupId: groupId?.toString(),
                     }}

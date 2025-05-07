@@ -18,14 +18,14 @@ import {
 } from './NetworkTable/constants';
 
 interface NetworkWrapperProps
-    extends Pick<NodesProps, 'path' | 'parentRef' | 'additionalNodesProps'> {
+    extends Pick<NodesProps, 'path' | 'scrollContainerRef' | 'additionalNodesProps'> {
     database: string;
 }
 
 export function NetworkWrapper({
     database,
     path,
-    parentRef,
+    scrollContainerRef,
     additionalNodesProps,
 }: NetworkWrapperProps) {
     const capabilitiesLoaded = useCapabilitiesLoaded();
@@ -40,7 +40,7 @@ export function NetworkWrapper({
                 <Nodes
                     path={path}
                     database={database}
-                    parentRef={parentRef}
+                    scrollContainerRef={scrollContainerRef}
                     withPeerRoleFilter
                     additionalNodesProps={additionalNodesProps}
                     columns={getNetworkTableNodesColumns({

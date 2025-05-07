@@ -1,9 +1,12 @@
 import React from 'react';
 
+import type {TableColumnSetupItem} from '@gravity-ui/uikit';
+
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
-import type {Column, RenderControls} from '../../components/PaginatedTable';
-import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
+import type {Column} from '../../components/PaginatedTable';
+import {usePaginatedTableState} from '../../components/PaginatedTable/PaginatedTableContext';
+import {PaginatedTableWithLayout} from '../../components/PaginatedTable/PaginatedTableWithLayout';
 import {
     NODES_COLUMNS_TITLES,
     isMonitoringUserNodesColumn,
@@ -17,7 +20,7 @@ import {nodesApi} from '../../store/reducers/nodes/nodes';
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import {useProblemFilter} from '../../store/reducers/settings/hooks';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
-import type {NodesGroupByField} from '../../types/api/nodes';
+import type {NodesGroupByField, NodesPeerRole} from '../../types/api/nodes';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
@@ -43,7 +46,7 @@ import './Nodes.scss';
 export interface NodesProps {
     path?: string;
     database?: string;
-    parentRef: React.RefObject<HTMLElement>;
+    scrollContainerRef: React.RefObject<HTMLElement>;
     additionalNodesProps?: AdditionalNodesProps;
 
     withPeerRoleFilter?: boolean;
@@ -58,7 +61,7 @@ export interface NodesProps {
 export function Nodes({
     path,
     database,
-    parentRef,
+    scrollContainerRef,
     additionalNodesProps,
     withPeerRoleFilter,
     columns = getNodesColumns({database, getNodeRef: additionalNodesProps?.getNodeRef}),
@@ -106,7 +109,7 @@ export function Nodes({
                 <GroupedNodesComponent
                     path={path}
                     database={database}
-                    parentRef={parentRef}
+                    scrollContainerRef={scrollContainerRef}
                     withPeerRoleFilter={withPeerRoleFilter}
                     columns={preparedColumns}
                     defaultColumnsIds={defaultColumnsIds}
@@ -121,7 +124,7 @@ export function Nodes({
             <NodesComponent
                 path={path}
                 database={database}
-                parentRef={parentRef}
+                scrollContainerRef={scrollContainerRef}
                 withPeerRoleFilter={withPeerRoleFilter}
                 columns={preparedColumns}
                 defaultColumnsIds={defaultColumnsIds}
@@ -138,7 +141,7 @@ export function Nodes({
 interface NodesComponentProps {
     path?: string;
     database?: string;
-    parentRef: React.RefObject<HTMLElement>;
+    scrollContainerRef: React.RefObject<HTMLElement>;
 
     withPeerRoleFilter?: boolean;
 
@@ -152,7 +155,7 @@ interface NodesComponentProps {
 function NodesComponent({
     path,
     database,
-    parentRef,
+    scrollContainerRef,
     withPeerRoleFilter,
     columns,
     defaultColumnsIds,
@@ -172,40 +175,125 @@ function NodesComponent({
         requiredColumnsIds,
     );
 
-    const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
-        return (
-            <NodesControls
-                withGroupBySelect={viewerNodesHandlerHasGrouping}
-                groupByParams={groupByParams}
-                withPeerRoleFilter={withPeerRoleFilter}
-                columnsToSelect={columnsToSelect}
-                handleSelectedColumnsUpdate={setColumns}
-                entitiesCountCurrent={foundEntities}
-                entitiesCountTotal={totalEntities}
-                entitiesLoading={!inited}
-            />
-        );
-    };
-
     return (
-        <NodesTable
-            path={path}
-            database={database}
-            searchValue={searchValue}
-            problemFilter={problemFilter}
-            uptimeFilter={uptimeFilter}
-            peerRoleFilter={peerRoleFilter}
-            columns={columnsToShow}
-            parentRef={parentRef}
-            renderControls={renderControls}
+        <PaginatedTableWithLayout
+            controls={
+                <NodesControlsWithTableState
+                    withGroupBySelect={viewerNodesHandlerHasGrouping}
+                    groupByParams={groupByParams}
+                    withPeerRoleFilter={withPeerRoleFilter}
+                    columnsToSelect={columnsToSelect}
+                    handleSelectedColumnsUpdate={setColumns}
+                />
+            }
+            table={
+                <NodesTable
+                    path={path}
+                    database={database}
+                    searchValue={searchValue}
+                    problemFilter={problemFilter}
+                    uptimeFilter={uptimeFilter}
+                    peerRoleFilter={peerRoleFilter}
+                    columns={columnsToShow}
+                    scrollContainerRef={scrollContainerRef}
+                />
+            }
+            tableProps={{
+                scrollContainerRef,
+                scrollDependencies: [searchValue, problemFilter, uptimeFilter, peerRoleFilter],
+            }}
+            fullHeight
         />
     );
 }
 
+// Wrapper component to connect NodesControls with the PaginatedTable state
+function NodesControlsWithTableState({
+    withGroupBySelect,
+    groupByParams,
+    withPeerRoleFilter,
+    columnsToSelect,
+    handleSelectedColumnsUpdate,
+}: {
+    withGroupBySelect: boolean;
+    groupByParams: NodesGroupByField[];
+    withPeerRoleFilter?: boolean;
+    columnsToSelect: TableColumnSetupItem[];
+    handleSelectedColumnsUpdate: (updated: TableColumnSetupItem[]) => void;
+}) {
+    const {tableState} = usePaginatedTableState();
+
+    return (
+        <NodesControls
+            withGroupBySelect={withGroupBySelect}
+            groupByParams={groupByParams}
+            withPeerRoleFilter={withPeerRoleFilter}
+            columnsToSelect={columnsToSelect}
+            handleSelectedColumnsUpdate={handleSelectedColumnsUpdate}
+            entitiesCountCurrent={tableState.foundEntities}
+            entitiesCountTotal={tableState.totalEntities}
+            entitiesLoading={tableState.isInitialLoad}
+        />
+    );
+}
+
+interface NodeGroupProps {
+    name: string;
+    count: number;
+    isExpanded: boolean;
+    path?: string;
+    database?: string;
+    searchValue: string;
+    peerRoleFilter?: NodesPeerRole;
+    groupByParam?: NodesGroupByField;
+    columns: Column<NodesPreparedEntity>[];
+    scrollContainerRef: React.RefObject<HTMLElement>;
+    onIsExpandedChange: (name: string, isExpanded: boolean) => void;
+}
+
+const NodeGroup = React.memo(function NodeGroup({
+    name,
+    count,
+    isExpanded,
+    path,
+    database,
+    searchValue,
+    peerRoleFilter,
+    groupByParam,
+    columns,
+    scrollContainerRef,
+    onIsExpandedChange,
+}: NodeGroupProps) {
+    return (
+        <TableGroup
+            key={name}
+            title={name}
+            count={count}
+            entityName={i18n('nodes')}
+            expanded={isExpanded}
+            onIsExpandedChange={onIsExpandedChange}
+        >
+            <NodesTable
+                path={path}
+                database={database}
+                searchValue={searchValue}
+                problemFilter={'All'}
+                uptimeFilter={NodesUptimeFilterValues.All}
+                peerRoleFilter={peerRoleFilter}
+                filterGroup={name}
+                filterGroupBy={groupByParam}
+                initialEntitiesCount={count}
+                columns={columns}
+                scrollContainerRef={scrollContainerRef}
+            />
+        </TableGroup>
+    );
+});
+
 function GroupedNodesComponent({
     path,
     database,
-    parentRef,
+    scrollContainerRef,
     withPeerRoleFilter,
     columns,
     defaultColumnsIds,
@@ -247,20 +335,16 @@ function GroupedNodesComponent({
 
     const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
 
-    const renderControls = () => {
-        return (
-            <NodesControls
-                withGroupBySelect
-                groupByParams={groupByParams}
-                withPeerRoleFilter={withPeerRoleFilter}
-                columnsToSelect={columnsToSelect}
-                handleSelectedColumnsUpdate={setColumns}
-                entitiesCountCurrent={found}
-                entitiesCountTotal={total}
-                entitiesLoading={isLoading}
-            />
-        );
-    };
+    // Initialize the table state with the API data
+    const initialState = React.useMemo(
+        () => ({
+            foundEntities: found,
+            totalEntities: total,
+            isInitialLoad: isLoading,
+            sortParams: undefined,
+        }),
+        [found, total, isLoading],
+    );
 
     const renderGroups = () => {
         if (tableGroups?.length) {
@@ -268,28 +352,20 @@ function GroupedNodesComponent({
                 const isExpanded = expandedGroups[name];
 
                 return (
-                    <TableGroup
+                    <NodeGroup
                         key={name}
-                        title={name}
+                        name={name}
                         count={count}
-                        entityName={i18n('nodes')}
-                        expanded={isExpanded}
+                        isExpanded={isExpanded}
+                        path={path}
+                        database={database}
+                        searchValue={searchValue}
+                        peerRoleFilter={peerRoleFilter}
+                        groupByParam={groupByParam}
+                        columns={columnsToShow}
+                        scrollContainerRef={scrollContainerRef}
                         onIsExpandedChange={setIsGroupExpanded}
-                    >
-                        <NodesTable
-                            path={path}
-                            database={database}
-                            searchValue={searchValue}
-                            problemFilter={'All'}
-                            uptimeFilter={NodesUptimeFilterValues.All}
-                            peerRoleFilter={peerRoleFilter}
-                            filterGroup={name}
-                            filterGroupBy={groupByParam}
-                            initialEntitiesCount={count}
-                            columns={columnsToShow}
-                            parentRef={parentRef}
-                        />
-                    </TableGroup>
+                    />
                 );
             });
         }
@@ -298,12 +374,26 @@ function GroupedNodesComponent({
     };
 
     return (
-        <TableWithControlsLayout>
-            <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
-            {error ? <ResponseError error={error} /> : null}
-            <TableWithControlsLayout.Table loading={isLoading} className={b('groups-wrapper')}>
-                {renderGroups()}
-            </TableWithControlsLayout.Table>
-        </TableWithControlsLayout>
+        <PaginatedTableWithLayout
+            initialState={initialState}
+            controls={
+                <NodesControlsWithTableState
+                    withGroupBySelect={true}
+                    groupByParams={groupByParams}
+                    withPeerRoleFilter={withPeerRoleFilter}
+                    columnsToSelect={columnsToSelect}
+                    handleSelectedColumnsUpdate={setColumns}
+                />
+            }
+            error={error ? <ResponseError error={error} /> : null}
+            table={renderGroups()}
+            tableProps={{
+                scrollContainerRef,
+                scrollDependencies: [searchValue, groupByParam],
+                loading: isLoading,
+                className: b('groups-wrapper'),
+            }}
+            fullHeight
+        />
     );
 }

@@ -75,6 +75,8 @@
     }
 
     .ydb-table-with-controls-layout {
-        --data-table-sticky-top-offset: 102px;
+        --sticky-tabs-height: 40px;
+        // Total height of all fixed elements above table for sticky header positioning
+        --data-table-sticky-header-offset: 102px;
     }
 }

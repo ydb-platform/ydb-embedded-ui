@@ -1,12 +1,17 @@
 @use '../../styles/mixins.scss';
 
 .ydb-table-with-controls-layout {
-    --data-table-sticky-top-offset: 62px;
+    // Total height of all fixed elements above table for sticky header positioning
+    --data-table-sticky-header-offset: 62px;
 
     display: inline-block;
 
     box-sizing: border-box;
     min-width: 100%;
+
+    &_fullHeight {
+        min-height: calc(100% - var(--sticky-tabs-height, 0px));
+    }
 
     &__controls-wrapper {
         z-index: 3;
@@ -33,11 +38,11 @@
     }
 
     .ydb-paginated-table__head {
-        top: var(--data-table-sticky-top-offset, 62px);
+        top: var(--data-table-sticky-header-offset, 62px);
     }
 
     .data-table__sticky_moving {
         // Place table head right after controls
-        top: var(--data-table-sticky-top-offset, 62px) !important;
+        top: var(--data-table-sticky-header-offset, 62px) !important;
     }
 }

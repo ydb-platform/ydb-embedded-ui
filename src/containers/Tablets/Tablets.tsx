@@ -16,9 +16,10 @@ interface TabletsProps {
      * hidden in pages that already display multiple tablet generations to reduce visual noise.
      */
     onlyActive?: boolean;
+    scrollContainerRef: React.RefObject<HTMLElement>;
 }
 
-export function Tablets({nodeId, path, database, onlyActive}: TabletsProps) {
+export function Tablets({nodeId, path, database, onlyActive, scrollContainerRef}: TabletsProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     let params: TabletsApiRequestParams = {};
@@ -38,5 +39,13 @@ export function Tablets({nodeId, path, database, onlyActive}: TabletsProps) {
 
     const tablets = useTypedSelector((state) => selectTabletsWithFqdn(state, params));
 
-    return <TabletsTable tablets={tablets} database={database} loading={isLoading} error={error} />;
+    return (
+        <TabletsTable
+            scrollContainerRef={scrollContainerRef}
+            tablets={tablets}
+            database={database}
+            loading={isLoading}
+            error={error}
+        />
+    );
 }

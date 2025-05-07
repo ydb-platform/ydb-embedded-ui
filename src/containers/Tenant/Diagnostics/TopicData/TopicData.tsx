@@ -7,11 +7,11 @@ import {isNil} from 'lodash';
 import {DrawerWrapper} from '../../../../components/Drawer';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
-import type {RenderControls} from '../../../../components/PaginatedTable';
 import {
     DEFAULT_TABLE_ROW_HEIGHT,
     ResizeablePaginatedTable,
 } from '../../../../components/PaginatedTable';
+import {PaginatedTableWithLayout} from '../../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {partitionsApi} from '../../../../store/reducers/partitions/partitions';
 import {topicApi} from '../../../../store/reducers/topic';
 import type {TopicDataRequest} from '../../../../types/api/topic';
@@ -44,13 +44,13 @@ import './TopicData.scss';
 interface TopicDataProps {
     path: string;
     database: string;
-    parentRef: React.RefObject<HTMLElement>;
+    scrollContainerRef: React.RefObject<HTMLElement>;
 }
 const PAGINATED_TABLE_LIMIT = 50_000;
 
 const columns = getAllColumns();
 
-export function TopicData({parentRef, path, database}: TopicDataProps) {
+export function TopicData({scrollContainerRef, path, database}: TopicDataProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const [startOffset, setStartOffset] = React.useState<number>();
     const [endOffset, setEndOffset] = React.useState<number>();
@@ -196,12 +196,12 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
         (newOffset: number) => {
             const scrollTop = (newOffset - (baseOffset ?? 0)) * DEFAULT_TABLE_ROW_HEIGHT;
             const normalizedScrollTop = Math.max(0, scrollTop);
-            parentRef.current?.scrollTo({
+            scrollContainerRef.current?.scrollTo({
                 top: normalizedScrollTop,
                 behavior: 'instant',
             });
         },
-        [baseOffset, parentRef],
+        [baseOffset, scrollContainerRef],
     );
 
     //this variable is used to scroll to active offset the very first time on open page
@@ -227,7 +227,7 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
         }
     }, [currentData, isFetching, scrollToOffset]);
 
-    const renderControls: RenderControls = () => {
+    const renderControls = React.useCallback(() => {
         return (
             <TopicDataControls
                 // component has uncontrolled components inside, so it should be rerendered on filters reset
@@ -243,7 +243,18 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
                 scrollToOffset={scrollToOffset}
             />
         );
-    };
+    }, [
+        columnsToSelect,
+        controlsKey,
+        endOffset,
+        partitions,
+        partitionsError,
+        partitionsLoading,
+        scrollToOffset,
+        setColumns,
+        startOffset,
+        truncated,
+    ]);
 
     const renderEmptyDataMessage = () => {
         const hasFilters = selectedOffset || startTimestamp;
@@ -299,29 +310,38 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
                 title={i18n('label_message')}
                 headerClassName={b('drawer-header')}
             >
-                <ResizeablePaginatedTable
-                    columnsWidthLSKey={TOPIC_DATA_COLUMNS_WIDTH_LS_KEY}
-                    parentRef={parentRef}
-                    columns={columnsToShow}
-                    fetchData={getTopicData}
-                    initialEntitiesCount={baseEndOffset - baseOffset}
-                    limit={TOPIC_DATA_FETCH_LIMIT}
-                    renderControls={renderControls}
-                    renderErrorMessage={renderPaginatedTableErrorMessage}
-                    renderEmptyDataMessage={renderEmptyDataMessage}
-                    filters={tableFilters}
-                    tableName="topicData"
-                    rowHeight={DEFAULT_TABLE_ROW_HEIGHT}
-                    keepCache={false}
-                    getRowClassName={(row) => {
-                        return b('row', {
-                            active: Boolean(
-                                String(row.Offset) === selectedOffset ||
-                                    String(row.Offset) === activeOffset,
-                            ),
-                            removed: row.removed,
-                        });
+                <PaginatedTableWithLayout
+                    controls={renderControls()}
+                    table={
+                        <ResizeablePaginatedTable
+                            columnsWidthLSKey={TOPIC_DATA_COLUMNS_WIDTH_LS_KEY}
+                            scrollContainerRef={scrollContainerRef}
+                            columns={columnsToShow}
+                            fetchData={getTopicData}
+                            initialEntitiesCount={baseEndOffset - baseOffset}
+                            limit={TOPIC_DATA_FETCH_LIMIT}
+                            renderErrorMessage={renderPaginatedTableErrorMessage}
+                            renderEmptyDataMessage={renderEmptyDataMessage}
+                            filters={tableFilters}
+                            tableName="topicData"
+                            rowHeight={DEFAULT_TABLE_ROW_HEIGHT}
+                            keepCache={false}
+                            getRowClassName={(row) => {
+                                return b('row', {
+                                    active: Boolean(
+                                        String(row.Offset) === selectedOffset ||
+                                            String(row.Offset) === activeOffset,
+                                    ),
+                                    removed: row.removed,
+                                });
+                            }}
+                        />
+                    }
+                    tableProps={{
+                        scrollContainerRef,
+                        scrollDependencies: [baseOffset, baseEndOffset, tableFilters],
                     }}
+                    fullHeight
                 />
             </DrawerWrapper>
         )
