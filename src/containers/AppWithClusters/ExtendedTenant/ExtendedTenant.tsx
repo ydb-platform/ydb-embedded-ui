@@ -1,7 +1,8 @@
 import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
 import type {ETenantType} from '../../../types/api/tenant';
 import {useAdditionalNodesProps} from '../../../utils/hooks/useAdditionalNodesProps';
-import type {GetLogsLink, GetMonitoringLink} from '../../../utils/monitoring';
+import type {GetLogsLink} from '../../../utils/logs';
+import type {GetMonitoringLink} from '../../../utils/monitoring';
 import type {Tenant} from '../../Tenant/Tenant';
 
 export interface ExtendedTenantProps {
