@@ -2,7 +2,6 @@ import React from 'react';
 
 import {Flex, Label} from '@gravity-ui/uikit';
 
-import {getVDiskPagePath} from '../../routes';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
 import {valueIsDefined} from '../../utils';
@@ -156,32 +155,38 @@ const prepareVDiskData = (data: PreparedVDisk, withDeveloperUILink?: boolean) =>
         withDeveloperUILink &&
         valueIsDefined(NodeId) &&
         valueIsDefined(PDiskId) &&
-        valueIsDefined(VDiskSlotId)
+        (valueIsDefined(VDiskSlotId) || valueIsDefined(StringifiedId))
     ) {
-        const vDiskInternalViewerPath = createVDiskDeveloperUILink({
-            nodeId: NodeId,
-            pDiskId: PDiskId,
-            vDiskSlotId: VDiskSlotId,
-        });
+        const vDiskInternalViewerPath = valueIsDefined(VDiskSlotId)
+            ? createVDiskDeveloperUILink({
+                  nodeId: NodeId,
+                  pDiskId: PDiskId,
+                  vDiskSlotId: VDiskSlotId,
+              })
+            : undefined;
 
-        const vDiskPagePath = getVDiskPagePath(VDiskSlotId, PDiskId, NodeId);
-        vdiskData.push({
-            label: 'Links',
-            value: (
-                <Flex wrap="wrap" gap={2}>
-                    <LinkWithIcon
-                        key={vDiskPagePath}
-                        title={vDiskInfoKeyset('vdisk-page')}
-                        url={vDiskPagePath}
-                        external={false}
-                    />
-                    <LinkWithIcon
-                        title={vDiskInfoKeyset('developer-ui')}
-                        url={vDiskInternalViewerPath}
-                    />
-                </Flex>
-            ),
-        });
+        const vDiskPagePath = getVDiskLink({VDiskSlotId, PDiskId, NodeId, StringifiedId});
+        if (vDiskPagePath) {
+            vdiskData.push({
+                label: 'Links',
+                value: (
+                    <Flex wrap="wrap" gap={2}>
+                        <LinkWithIcon
+                            key={vDiskPagePath}
+                            title={vDiskInfoKeyset('vdisk-page')}
+                            url={vDiskPagePath}
+                            external={false}
+                        />
+                        {vDiskInternalViewerPath ? (
+                            <LinkWithIcon
+                                title={vDiskInfoKeyset('developer-ui')}
+                                url={vDiskInternalViewerPath}
+                            />
+                        ) : null}
+                    </Flex>
+                ),
+            });
+        }
     }
 
     return vdiskData;
