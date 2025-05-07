@@ -1,5 +1,24 @@
 # Changelog
 
+## [9.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.26.2...v9.0.0) (2025-05-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove internal-specific solution ([#2261](https://github.com/ydb-platform/ydb-embedded-ui/issues/2261))
+
+### Features
+
+* add import/s3 to operations ([#2256](https://github.com/ydb-platform/ydb-embedded-ui/issues/2256)) ([fb07e1c](https://github.com/ydb-platform/ydb-embedded-ui/commit/fb07e1c55896f632394e97c79afe5c9a9dbe496f))
+
+
+### Bug Fixes
+
+* floor disk usage values ([#2253](https://github.com/ydb-platform/ydb-embedded-ui/issues/2253)) ([c10b3ff](https://github.com/ydb-platform/ydb-embedded-ui/commit/c10b3ff6eeaad8b78d5e4519def4d39b8031f4d5))
+* handle gaps in offsets ([#2252](https://github.com/ydb-platform/ydb-embedded-ui/issues/2252)) ([5e75a0b](https://github.com/ydb-platform/ydb-embedded-ui/commit/5e75a0bd93b996b32063791aa6a6048200677111))
+* missed schema value ([#2259](https://github.com/ydb-platform/ydb-embedded-ui/issues/2259)) ([33a4973](https://github.com/ydb-platform/ydb-embedded-ui/commit/33a497356740b53f07babd5c1ab1cc5c4647b7a6))
+* remove internal-specific solution ([#2261](https://github.com/ydb-platform/ydb-embedded-ui/issues/2261)) ([816a712](https://github.com/ydb-platform/ydb-embedded-ui/commit/816a7125635006c4a7efb2c0e6c0c92af872c8f8))
+
 ## [8.26.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.26.1...v8.26.2) (2025-05-05)
 
 
