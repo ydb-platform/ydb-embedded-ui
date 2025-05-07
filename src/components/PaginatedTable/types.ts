@@ -58,6 +58,13 @@ export type FetchData<T, F = undefined, E = {}> = (
 
 export type OnError = (error?: IResponseError) => void;
 
+export interface PaginatedTableState {
+    sortParams?: SortParams;
+    totalEntities: number;
+    foundEntities: number;
+    isInitialLoad: boolean;
+}
+
 interface ControlsParams {
     totalEntities: number;
     foundEntities: number;

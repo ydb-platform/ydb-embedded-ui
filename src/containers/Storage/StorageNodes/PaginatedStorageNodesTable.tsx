@@ -1,10 +1,6 @@
 import React from 'react';
 
-import type {
-    PaginatedTableData,
-    RenderControls,
-    RenderErrorMessage,
-} from '../../../components/PaginatedTable';
+import type {PaginatedTableData, RenderErrorMessage} from '../../../components/PaginatedTable';
 import {ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
@@ -41,7 +37,7 @@ interface PaginatedStorageNodesTableProps {
     onShowAll: VoidFunction;
 
     parentRef: React.RefObject<HTMLElement>;
-    renderControls?: RenderControls;
+    tableContainerRef: React.RefObject<HTMLDivElement>;
     renderErrorMessage: RenderErrorMessage;
     initialEntitiesCount?: number;
     onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
@@ -59,7 +55,7 @@ export const PaginatedStorageNodesTable = ({
     nodesUptimeFilter,
     onShowAll,
     parentRef,
-    renderControls,
+    tableContainerRef,
     renderErrorMessage,
     initialEntitiesCount,
     onDataFetched,
@@ -107,11 +103,11 @@ export const PaginatedStorageNodesTable = ({
         <ResizeablePaginatedTable
             columnsWidthLSKey={STORAGE_NODES_COLUMNS_WIDTH_LS_KEY}
             parentRef={parentRef}
+            tableContainerRef={tableContainerRef}
             columns={columns}
             fetchData={getStorageNodes}
             rowHeight={51}
             initialEntitiesCount={initialEntitiesCount}
-            renderControls={renderControls}
             renderErrorMessage={renderErrorMessage}
             renderEmptyDataMessage={renderEmptyDataMessage}
             getRowClassName={getRowUnavailableClassName}

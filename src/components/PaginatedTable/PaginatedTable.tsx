@@ -1,7 +1,6 @@
 import React from 'react';
 
-import {TableWithControlsLayout} from '../TableWithControlsLayout/TableWithControlsLayout';
-
+import {usePaginatedTableState} from './PaginatedTableContext';
 import {TableChunk} from './TableChunk';
 import {TableHead} from './TableHead';
 import {DEFAULT_TABLE_ROW_HEIGHT} from './constants';
@@ -12,7 +11,6 @@ import type {
     GetRowClassName,
     HandleTableColumnsResize,
     PaginatedTableData,
-    RenderControls,
     RenderEmptyDataMessage,
     RenderErrorMessage,
     SortParams,
@@ -31,9 +29,9 @@ export interface PaginatedTableProps<T, F> {
     getRowClassName?: GetRowClassName<T>;
     rowHeight?: number;
     parentRef: React.RefObject<HTMLElement>;
+    tableContainerRef: React.RefObject<HTMLDivElement>;
     initialSortParams?: SortParams;
     onColumnsResize?: HandleTableColumnsResize;
-    renderControls?: RenderControls;
     renderEmptyDataMessage?: RenderEmptyDataMessage;
     renderErrorMessage?: RenderErrorMessage;
     containerClassName?: string;
@@ -53,22 +51,38 @@ export const PaginatedTable = <T, F>({
     getRowClassName,
     rowHeight = DEFAULT_TABLE_ROW_HEIGHT,
     parentRef,
+    tableContainerRef,
     initialSortParams,
     onColumnsResize,
-    renderControls,
     renderErrorMessage,
     renderEmptyDataMessage,
     containerClassName,
     onDataFetched,
     keepCache = true,
 }: PaginatedTableProps<T, F>) => {
-    const initialTotal = initialEntitiesCount || 0;
-    const initialFound = initialEntitiesCount || 1;
+    // Get state and setters from context
+    const {tableState, setSortParams, setTotalEntities, setFoundEntities, setIsInitialLoad} =
+        usePaginatedTableState();
 
-    const [sortParams, setSortParams] = React.useState<SortParams | undefined>(initialSortParams);
-    const [totalEntities, setTotalEntities] = React.useState(initialTotal);
-    const [foundEntities, setFoundEntities] = React.useState(initialFound);
-    const [isInitialLoad, setIsInitialLoad] = React.useState(true);
+    const {sortParams, foundEntities} = tableState;
+
+    // Initialize state with props if available
+    React.useEffect(() => {
+        if (initialSortParams) {
+            setSortParams(initialSortParams);
+        }
+
+        if (initialEntitiesCount) {
+            setTotalEntities(initialEntitiesCount);
+            setFoundEntities(initialEntitiesCount);
+        }
+    }, [
+        setSortParams,
+        setTotalEntities,
+        setFoundEntities,
+        initialSortParams,
+        initialEntitiesCount,
+    ]);
 
     const tableRef = React.useRef<HTMLDivElement>(null);
 
@@ -105,18 +119,34 @@ export const PaginatedTable = <T, F>({
                 onDataFetched?.(data);
             }
         },
-        [onDataFetched],
+        [onDataFetched, setFoundEntities, setIsInitialLoad, setTotalEntities],
     );
 
     // reset table on filters change
     React.useLayoutEffect(() => {
-        setTotalEntities(initialTotal);
-        setFoundEntities(initialFound);
+        const defaultTotal = initialEntitiesCount || 0;
+        const defaultFound = initialEntitiesCount || 1;
+
+        setTotalEntities(defaultTotal);
+        setFoundEntities(defaultFound);
         setIsInitialLoad(true);
-        if (parentRef?.current) {
-            parentRef.current.scrollTo(0, 0);
+
+        if (tableContainerRef.current && parentRef.current) {
+            // Scroll the parent container to the position of the table container
+            const tableRect = tableContainerRef.current.getBoundingClientRect();
+            const parentRect = parentRef.current.getBoundingClientRect();
+            const scrollTop = tableRect.top - parentRect.top + parentRef.current.scrollTop;
+            parentRef.current.scrollTo(0, scrollTop);
         }
-    }, [rawFilters, initialFound, initialTotal, parentRef]);
+    }, [
+        rawFilters,
+        initialEntitiesCount,
+        tableContainerRef,
+        setTotalEntities,
+        setFoundEntities,
+        setIsInitialLoad,
+        parentRef,
+    ]);
 
     const renderChunks = () => {
         return activeChunks.map((isActive, index) => (
@@ -148,24 +178,9 @@ export const PaginatedTable = <T, F>({
         </table>
     );
 
-    const renderContent = () => {
-        if (renderControls) {
-            return (
-                <TableWithControlsLayout>
-                    <TableWithControlsLayout.Controls>
-                        {renderControls({inited: !isInitialLoad, totalEntities, foundEntities})}
-                    </TableWithControlsLayout.Controls>
-                    <TableWithControlsLayout.Table>{renderTable()}</TableWithControlsLayout.Table>
-                </TableWithControlsLayout>
-            );
-        }
-
-        return renderTable();
-    };
-
     return (
         <div ref={tableRef} className={b(null, containerClassName)}>
-            {renderContent()}
+            {renderTable()}
         </div>
     );
 };
