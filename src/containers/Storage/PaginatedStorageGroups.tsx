@@ -2,7 +2,10 @@ import React from 'react';
 
 import {ResponseError} from '../../components/Errors/ResponseError/ResponseError';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
-import type {RenderControls} from '../../components/PaginatedTable';
+import {
+    PaginatedTableProvider,
+    usePaginatedTableState,
+} from '../../components/PaginatedTable/PaginatedTableContext';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {
     useCapabilitiesLoaded,
@@ -23,6 +26,33 @@ import {b} from './shared';
 import {useStorageQueryParams} from './useStorageQueryParams';
 
 import './Storage.scss';
+
+// Wrapper component to connect StorageGroupsControls with the PaginatedTable state
+function StorageGroupsControlsWithTableState({
+    withTypeSelector,
+    withGroupBySelect,
+    columnsToSelect,
+    handleSelectedColumnsUpdate,
+}: {
+    withTypeSelector?: boolean;
+    withGroupBySelect?: boolean;
+    columnsToSelect: any[];
+    handleSelectedColumnsUpdate: (updated: any[]) => void;
+}) {
+    const {tableState} = usePaginatedTableState();
+
+    return (
+        <StorageGroupsControls
+            withTypeSelector={withTypeSelector}
+            withGroupBySelect={withGroupBySelect}
+            entitiesCountCurrent={tableState.foundEntities}
+            entitiesCountTotal={tableState.totalEntities}
+            entitiesLoading={tableState.isInitialLoad}
+            columnsToSelect={columnsToSelect}
+            handleSelectedColumnsUpdate={handleSelectedColumnsUpdate}
+        />
+    );
+}
 
 export function PaginatedStorageGroups(props: PaginatedStorageProps) {
     const {storageGroupsGroupByParam, visibleEntities, handleShowAllGroups} =
@@ -68,35 +98,34 @@ function StorageGroupsComponent({
         viewContext,
     });
 
-    const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
-        return (
-            <StorageGroupsControls
-                withTypeSelector
-                withGroupBySelect={storageGroupsHandlerHasGroupping}
-                entitiesCountCurrent={foundEntities}
-                entitiesCountTotal={totalEntities}
-                entitiesLoading={!inited}
-                columnsToSelect={columnsToSelect}
-                handleSelectedColumnsUpdate={setColumns}
-            />
-        );
-    };
-
     return (
-        <PaginatedStorageGroupsTable
-            database={database}
-            nodeId={nodeId}
-            groupId={groupId}
-            pDiskId={pDiskId}
-            searchValue={searchValue}
-            visibleEntities={visibleEntities}
-            onShowAll={handleShowAllGroups}
-            parentRef={parentRef}
-            renderControls={renderControls}
-            renderErrorMessage={renderPaginatedTableErrorMessage}
-            columns={columnsToShow}
-            initialEntitiesCount={initialEntitiesCount}
-        />
+        <PaginatedTableProvider>
+            <TableWithControlsLayout>
+                <TableWithControlsLayout.Controls>
+                    <StorageGroupsControlsWithTableState
+                        withTypeSelector
+                        withGroupBySelect={storageGroupsHandlerHasGroupping}
+                        columnsToSelect={columnsToSelect}
+                        handleSelectedColumnsUpdate={setColumns}
+                    />
+                </TableWithControlsLayout.Controls>
+                <TableWithControlsLayout.Table>
+                    <PaginatedStorageGroupsTable
+                        database={database}
+                        nodeId={nodeId}
+                        groupId={groupId}
+                        pDiskId={pDiskId}
+                        searchValue={searchValue}
+                        visibleEntities={visibleEntities}
+                        onShowAll={handleShowAllGroups}
+                        parentRef={parentRef}
+                        renderErrorMessage={renderPaginatedTableErrorMessage}
+                        columns={columnsToShow}
+                        initialEntitiesCount={initialEntitiesCount}
+                    />
+                </TableWithControlsLayout.Table>
+            </TableWithControlsLayout>
+        </PaginatedTableProvider>
     );
 }
 
@@ -138,19 +167,16 @@ function GroupedStorageGroupsComponent({
 
     const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
 
-    const renderControls = () => {
-        return (
-            <StorageGroupsControls
-                withTypeSelector
-                withGroupBySelect
-                entitiesCountCurrent={found}
-                entitiesCountTotal={total}
-                entitiesLoading={isLoading}
-                columnsToSelect={columnsToSelect}
-                handleSelectedColumnsUpdate={setColumns}
-            />
-        );
-    };
+    // Initialize the table state with the API data
+    const initialState = React.useMemo(
+        () => ({
+            foundEntities: found,
+            totalEntities: total,
+            isInitialLoad: isLoading,
+            sortParams: undefined,
+        }),
+        [found, total, isLoading],
+    );
 
     const renderGroups = () => {
         if (tableGroups?.length) {
@@ -190,12 +216,21 @@ function GroupedStorageGroupsComponent({
     };
 
     return (
-        <TableWithControlsLayout>
-            <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
-            {error ? <ResponseError error={error} /> : null}
-            <TableWithControlsLayout.Table loading={isLoading} className={b('groups-wrapper')}>
-                {renderGroups()}
-            </TableWithControlsLayout.Table>
-        </TableWithControlsLayout>
+        <PaginatedTableProvider initialState={initialState}>
+            <TableWithControlsLayout>
+                <TableWithControlsLayout.Controls>
+                    <StorageGroupsControlsWithTableState
+                        withTypeSelector
+                        withGroupBySelect
+                        columnsToSelect={columnsToSelect}
+                        handleSelectedColumnsUpdate={setColumns}
+                    />
+                </TableWithControlsLayout.Controls>
+                {error ? <ResponseError error={error} /> : null}
+                <TableWithControlsLayout.Table loading={isLoading} className={b('groups-wrapper')}>
+                    {renderGroups()}
+                </TableWithControlsLayout.Table>
+            </TableWithControlsLayout>
+        </PaginatedTableProvider>
     );
 }
