@@ -11,16 +11,19 @@ interface TabletsProps {
     path?: string;
     database?: string;
     nodeId?: string | number;
+    onlyActive?: boolean;
 }
 
-export function Tablets({nodeId, path, database}: TabletsProps) {
+export function Tablets({nodeId, path, database, onlyActive}: TabletsProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     let params: TabletsApiRequestParams = {};
+    const filter = onlyActive ? `(State!=Dead)` : undefined;
+
     if (valueIsDefined(nodeId)) {
-        params = {nodeId, database};
+        params = {nodeId, database, filter};
     } else if (path) {
-        params = {path, database};
+        params = {path, database, filter};
     }
     const {isLoading, error} = tabletsApi.useGetTabletsInfoQuery(
         Object.keys(params).length === 0 ? skipToken : params,
