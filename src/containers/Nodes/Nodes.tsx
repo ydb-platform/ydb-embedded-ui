@@ -23,7 +23,7 @@ import {nodesApi} from '../../store/reducers/nodes/nodes';
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import {useProblemFilter} from '../../store/reducers/settings/hooks';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
-import type {NodesGroupByField} from '../../types/api/nodes';
+import type {NodesGroupByField, NodesPeerRole} from '../../types/api/nodes';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
@@ -169,6 +169,7 @@ function NodesComponent({
     const {searchValue, uptimeFilter, peerRoleFilter} = useNodesPageQueryParams(groupByParams);
     const {problemFilter} = useProblemFilter();
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
+    const tableContainerRef = React.useRef<HTMLDivElement>(null);
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
         columns,
@@ -190,7 +191,7 @@ function NodesComponent({
                         handleSelectedColumnsUpdate={setColumns}
                     />
                 </TableWithControlsLayout.Controls>
-                <TableWithControlsLayout.Table>
+                <TableWithControlsLayout.Table ref={tableContainerRef}>
                     <NodesTable
                         path={path}
                         database={database}
@@ -200,6 +201,7 @@ function NodesComponent({
                         peerRoleFilter={peerRoleFilter}
                         columns={columnsToShow}
                         parentRef={parentRef}
+                        tableContainerRef={tableContainerRef}
                     />
                 </TableWithControlsLayout.Table>
             </TableWithControlsLayout>
@@ -237,6 +239,63 @@ function NodesControlsWithTableState({
     );
 }
 
+interface NodeGroupProps {
+    name: string;
+    count: number;
+    isExpanded: boolean;
+    path?: string;
+    database?: string;
+    searchValue: string;
+    peerRoleFilter?: NodesPeerRole;
+    groupByParam?: NodesGroupByField;
+    columns: Column<NodesPreparedEntity>[];
+    parentRef: React.RefObject<HTMLElement>;
+    onIsExpandedChange: (name: string, isExpanded: boolean) => void;
+}
+
+const NodeGroup = React.memo(function NodeGroup({
+    name,
+    count,
+    isExpanded,
+    path,
+    database,
+    searchValue,
+    peerRoleFilter,
+    groupByParam,
+    columns,
+    parentRef,
+    onIsExpandedChange,
+}: NodeGroupProps) {
+    const tableContainerRef = React.useRef<HTMLDivElement>(null);
+
+    return (
+        <TableGroup
+            key={name}
+            title={name}
+            count={count}
+            entityName={i18n('nodes')}
+            expanded={isExpanded}
+            onIsExpandedChange={onIsExpandedChange}
+            ref={tableContainerRef}
+        >
+            <NodesTable
+                path={path}
+                database={database}
+                searchValue={searchValue}
+                problemFilter={'All'}
+                uptimeFilter={NodesUptimeFilterValues.All}
+                peerRoleFilter={peerRoleFilter}
+                filterGroup={name}
+                filterGroupBy={groupByParam}
+                initialEntitiesCount={count}
+                columns={columns}
+                parentRef={parentRef}
+                tableContainerRef={tableContainerRef}
+            />
+        </TableGroup>
+    );
+});
+
 function GroupedNodesComponent({
     path,
     database,
@@ -250,6 +309,7 @@ function GroupedNodesComponent({
 }: NodesComponentProps) {
     const {searchValue, peerRoleFilter, groupByParam} = useNodesPageQueryParams(groupByParams);
     const [autoRefreshInterval] = useAutoRefreshInterval();
+    const tableContainerRef = React.useRef<HTMLDivElement>(null);
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
         columns,
@@ -299,28 +359,20 @@ function GroupedNodesComponent({
                 const isExpanded = expandedGroups[name];
 
                 return (
-                    <TableGroup
+                    <NodeGroup
                         key={name}
-                        title={name}
+                        name={name}
                         count={count}
-                        entityName={i18n('nodes')}
-                        expanded={isExpanded}
+                        isExpanded={isExpanded}
+                        path={path}
+                        database={database}
+                        searchValue={searchValue}
+                        peerRoleFilter={peerRoleFilter}
+                        groupByParam={groupByParam}
+                        columns={columnsToShow}
+                        parentRef={parentRef}
                         onIsExpandedChange={setIsGroupExpanded}
-                    >
-                        <NodesTable
-                            path={path}
-                            database={database}
-                            searchValue={searchValue}
-                            problemFilter={'All'}
-                            uptimeFilter={NodesUptimeFilterValues.All}
-                            peerRoleFilter={peerRoleFilter}
-                            filterGroup={name}
-                            filterGroupBy={groupByParam}
-                            initialEntitiesCount={count}
-                            columns={columnsToShow}
-                            parentRef={parentRef}
-                        />
-                    </TableGroup>
+                    />
                 );
             });
         }
@@ -341,7 +393,11 @@ function GroupedNodesComponent({
                     />
                 </TableWithControlsLayout.Controls>
                 {error ? <ResponseError error={error} /> : null}
-                <TableWithControlsLayout.Table loading={isLoading} className={b('groups-wrapper')}>
+                <TableWithControlsLayout.Table
+                    ref={tableContainerRef}
+                    loading={isLoading}
+                    className={b('groups-wrapper')}
+                >
                     {renderGroups()}
                 </TableWithControlsLayout.Table>
             </TableWithControlsLayout>

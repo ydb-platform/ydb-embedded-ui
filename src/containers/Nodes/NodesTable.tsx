@@ -29,6 +29,7 @@ interface NodesTableProps {
 
     columns: Column<NodesPreparedEntity>[];
     parentRef: React.RefObject<HTMLElement>;
+    tableContainerRef: React.RefObject<HTMLDivElement>;
 
     initialEntitiesCount?: number;
     onStateChange?: (state: PaginatedTableState) => void;
@@ -45,6 +46,7 @@ export function NodesTable({
     filterGroupBy,
     columns,
     parentRef,
+    tableContainerRef,
     initialEntitiesCount,
     onStateChange,
 }: NodesTableProps) {
@@ -82,6 +84,7 @@ export function NodesTable({
         <ResizeablePaginatedTable
             columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
             parentRef={parentRef}
+            tableContainerRef={tableContainerRef}
             columns={columns}
             fetchData={getNodes}
             initialEntitiesCount={initialEntitiesCount}

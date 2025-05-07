@@ -22,6 +22,7 @@ interface ResizeablePaginatedTableProps<T, F>
 export function ResizeablePaginatedTable<T, F>({
     columnsWidthLSKey,
     columns,
+    tableContainerRef,
     ...props
 }: ResizeablePaginatedTableProps<T, F>) {
     const [tableColumnsWidth, setTableColumnsWidth] = useTableResize(columnsWidthLSKey);
@@ -30,6 +31,7 @@ export function ResizeablePaginatedTable<T, F>({
 
     return (
         <PaginatedTable
+            tableContainerRef={tableContainerRef}
             columns={updatedColumns}
             onColumnsResize={setTableColumnsWidth}
             containerClassName={b('resizeable-table-container')}

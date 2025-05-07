@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {cn} from '../../utils/cn';
 import {TableSkeleton} from '../TableSkeleton/TableSkeleton';
 
@@ -32,10 +34,17 @@ TableWithControlsLayout.Controls = function TableControls({
     );
 };
 
-TableWithControlsLayout.Table = function Table({children, loading, className}: TableProps) {
+TableWithControlsLayout.Table = React.forwardRef<HTMLDivElement, TableProps>(function Table(
+    {children, loading, className},
+    ref,
+) {
     if (loading) {
         return <TableSkeleton className={b('loader')} />;
     }
 
-    return <div className={b('table', className)}>{children}</div>;
-};
+    return (
+        <div ref={ref} className={b('table', className)}>
+            {children}
+        </div>
+    );
+});

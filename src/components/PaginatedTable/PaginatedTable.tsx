@@ -29,6 +29,7 @@ export interface PaginatedTableProps<T, F> {
     getRowClassName?: GetRowClassName<T>;
     rowHeight?: number;
     parentRef: React.RefObject<HTMLElement>;
+    tableContainerRef: React.RefObject<HTMLDivElement>;
     initialSortParams?: SortParams;
     onColumnsResize?: HandleTableColumnsResize;
     renderEmptyDataMessage?: RenderEmptyDataMessage;
@@ -50,6 +51,7 @@ export const PaginatedTable = <T, F>({
     getRowClassName,
     rowHeight = DEFAULT_TABLE_ROW_HEIGHT,
     parentRef,
+    tableContainerRef,
     initialSortParams,
     onColumnsResize,
     renderErrorMessage,
@@ -128,16 +130,22 @@ export const PaginatedTable = <T, F>({
         setTotalEntities(defaultTotal);
         setFoundEntities(defaultFound);
         setIsInitialLoad(true);
-        if (parentRef?.current) {
-            parentRef.current.scrollTo(0, 0);
+
+        if (tableContainerRef.current && parentRef.current) {
+            // Scroll the parent container to the position of the table container
+            const tableRect = tableContainerRef.current.getBoundingClientRect();
+            const parentRect = parentRef.current.getBoundingClientRect();
+            const scrollTop = tableRect.top - parentRect.top + parentRef.current.scrollTop;
+            parentRef.current.scrollTo(0, scrollTop);
         }
     }, [
         rawFilters,
         initialEntitiesCount,
-        parentRef,
+        tableContainerRef,
         setTotalEntities,
         setFoundEntities,
         setIsInitialLoad,
+        parentRef,
     ]);
 
     const renderChunks = () => {

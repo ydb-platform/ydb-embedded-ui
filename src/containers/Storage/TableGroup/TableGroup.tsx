@@ -18,46 +18,47 @@ interface TableGroupProps {
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
 }
 
-export function TableGroup({
-    children,
-    title,
-    entityName,
-    count,
-    expanded = false,
-    onIsExpandedChange,
-}: TableGroupProps) {
-    const toggleCollapsed = () => {
-        onIsExpandedChange(title, !expanded);
-    };
+export const TableGroup = React.forwardRef<HTMLDivElement, TableGroupProps>(
+    ({children, title, entityName, count, expanded = false, onIsExpandedChange}, ref) => {
+        const toggleCollapsed = () => {
+            onIsExpandedChange(title, !expanded);
+        };
 
-    const renderTitle = () => {
-        return (
-            <button onClick={toggleCollapsed} className={b('button')} title={title}>
-                <div className={b('title-wrapper')}>
-                    <ArrowToggle direction={expanded ? 'top' : 'bottom'} />
-                    <div className={b('title')}>
-                        <Text variant="subheader-2">{title}</Text>
-                        <Text variant="body-2" color="secondary" className={b('count')}>
-                            {entityName}: <Label theme="normal">{count}</Label>
-                        </Text>
+        const renderTitle = () => {
+            return (
+                <button onClick={toggleCollapsed} className={b('button')} title={title}>
+                    <div className={b('title-wrapper')}>
+                        <ArrowToggle direction={expanded ? 'top' : 'bottom'} />
+                        <div className={b('title')}>
+                            <Text variant="subheader-2">{title}</Text>
+                            <Text variant="body-2" color="secondary" className={b('count')}>
+                                {entityName}: <Label theme="normal">{count}</Label>
+                            </Text>
+                        </div>
                     </div>
-                </div>
-            </button>
+                </button>
+            );
+        };
+
+        const renderContent = () => {
+            if (expanded) {
+                return (
+                    <div ref={ref} className={b('content')}>
+                        {children}
+                    </div>
+                );
+            }
+
+            return null;
+        };
+
+        return (
+            <div className={b(null)}>
+                {renderTitle()}
+                {renderContent()}
+            </div>
         );
-    };
+    },
+);
 
-    const renderContent = () => {
-        if (expanded) {
-            return <div className={b('content')}>{children}</div>;
-        }
-
-        return null;
-    };
-
-    return (
-        <div className={b(null)}>
-            {renderTitle()}
-            {renderContent()}
-        </div>
-    );
-}
+TableGroup.displayName = 'TableGroup';
