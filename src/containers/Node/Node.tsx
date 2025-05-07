@@ -234,7 +234,7 @@ function NodePageContent({
                 );
             }
             case 'tablets': {
-                return <Tablets nodeId={nodeId} database={tenantName} />;
+                return <Tablets nodeId={nodeId} database={tenantName} onlyActive />;
             }
 
             case 'structure': {
