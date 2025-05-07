@@ -17,6 +17,7 @@ import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
 import type {ModifyDiskResponse} from '../../types/api/modifyDisk';
+import type {TVDiskID} from '../../types/api/vdisk';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {getSeverityColor, getVDiskSlotBasedId} from '../../utils/disks/helpers';
@@ -37,10 +38,11 @@ export function VDiskPage() {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const newDiskApiAvailable = useDiskPagesAvailable();
 
-    const [{nodeId, pDiskId, vDiskSlotId}] = useQueryParams({
+    const [{nodeId, pDiskId, vDiskSlotId, vDiskId: vDiskIdParam}] = useQueryParams({
         nodeId: StringParam,
         pDiskId: StringParam,
         vDiskSlotId: StringParam,
+        vDiskId: StringParam,
     });
 
     React.useEffect(() => {
@@ -61,7 +63,9 @@ export function VDiskPage() {
     });
     const loading = isFetching && vDiskData === undefined;
     const {NodeHost, NodeId, NodeType, NodeDC, PDiskId, PDiskType, Severity, VDiskId} = vDiskData;
-    const {GroupID, GroupGeneration, Ring, Domain, VDisk} = VDiskId || {};
+
+    const {GroupID, GroupGeneration, Ring, Domain, VDisk} =
+        VDiskId || getVDiskIdFromString(vDiskIdParam) || {};
     const vDiskIdParamsDefined =
         valueIsDefined(GroupID) &&
         valueIsDefined(GroupGeneration) &&
@@ -149,7 +153,7 @@ export function VDiskPage() {
                 className={vDiskPageCn('title')}
                 entityName={vDiskPageKeyset('vdisk')}
                 status={getSeverityColor(Severity)}
-                id={vDiskData?.StringifiedId}
+                id={vDiskData?.StringifiedId ?? vDiskIdParam}
             />
         );
     };
@@ -227,4 +231,20 @@ export function VDiskPage() {
             {renderContent()}
         </div>
     );
+}
+
+function getVDiskIdFromString(input: string | null | undefined): TVDiskID | undefined {
+    const match = /^(\d+)-(\d+)-(\d+)-(\d+)-(\d+)$/.exec(input ?? '');
+    if (!match) {
+        return undefined;
+    }
+
+    const [, GroupID, GroupGeneration, Ring, Domain, VDisk] = match;
+    return {
+        GroupID: Number(GroupID),
+        GroupGeneration: Number(GroupGeneration),
+        Ring: Number(Ring),
+        Domain: Number(Domain),
+        VDisk: Number(VDisk),
+    };
 }

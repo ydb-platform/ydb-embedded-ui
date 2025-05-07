@@ -56,6 +56,13 @@ export function prepareGroupsPDisk(data: TStoragePDisk & {NodeId?: number} = {})
         PDiskId: whiteboardPDisk?.PDiskId,
     };
 
+    if (mergedPDiskData.PDiskId === undefined && bscPDisk.PDiskId) {
+        const id = Number(bscPDisk.PDiskId.split('-')[1]);
+        if (!isNaN(id)) {
+            mergedPDiskData.PDiskId = id;
+        }
+    }
+
     const StringifiedId =
         bscPDisk.PDiskId ||
         getPDiskId({nodeId: mergedPDiskData.NodeId, pDiskId: mergedPDiskData.PDiskId});
