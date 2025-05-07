@@ -5,7 +5,7 @@ import {useTableResize} from '../../utils/hooks/useTableResize';
 import type {PaginatedTableProps} from './PaginatedTable';
 import {PaginatedTable} from './PaginatedTable';
 import {b} from './shared';
-import type {Column} from './types';
+import type {Column, PaginatedTableState} from './types';
 
 function updateColumnsWidth<T>(columns: Column<T>[], columnsWidthSetup: ColumnWidthByName) {
     return columns.map((column) => {
@@ -16,6 +16,7 @@ function updateColumnsWidth<T>(columns: Column<T>[], columnsWidthSetup: ColumnWi
 interface ResizeablePaginatedTableProps<T, F>
     extends Omit<PaginatedTableProps<T, F>, 'onColumnsResize'> {
     columnsWidthLSKey: string;
+    onStateChange?: (state: PaginatedTableState) => void;
 }
 
 export function ResizeablePaginatedTable<T, F>({

@@ -2,7 +2,10 @@ import React from 'react';
 
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
-import type {RenderControls} from '../../components/PaginatedTable';
+import {
+    PaginatedTableProvider,
+    usePaginatedTableState,
+} from '../../components/PaginatedTable/PaginatedTableContext';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {
     useCapabilitiesLoaded,
@@ -80,36 +83,35 @@ function StorageNodesComponent({
         columnsSettings,
     });
 
-    const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
-        return (
-            <StorageNodesControls
-                withTypeSelector
-                withGroupBySelect={viewerNodesHandlerHasGrouping}
-                entitiesCountCurrent={foundEntities}
-                entitiesCountTotal={totalEntities}
-                entitiesLoading={!inited}
-                columnsToSelect={columnsToSelect}
-                handleSelectedColumnsUpdate={setColumns}
-            />
-        );
-    };
-
     return (
-        <PaginatedStorageNodesTable
-            database={database}
-            nodeId={nodeId}
-            groupId={groupId}
-            searchValue={searchValue}
-            visibleEntities={visibleEntities}
-            nodesUptimeFilter={nodesUptimeFilter}
-            onShowAll={handleShowAllNodes}
-            parentRef={parentRef}
-            renderControls={renderControls}
-            renderErrorMessage={renderPaginatedTableErrorMessage}
-            columns={columnsToShow}
-            initialEntitiesCount={initialEntitiesCount}
-            onDataFetched={handleDataFetched}
-        />
+        <PaginatedTableProvider>
+            <TableWithControlsLayout>
+                <TableWithControlsLayout.Controls>
+                    <StorageNodesControlsWithTableState
+                        withTypeSelector
+                        withGroupBySelect={viewerNodesHandlerHasGrouping}
+                        columnsToSelect={columnsToSelect}
+                        handleSelectedColumnsUpdate={setColumns}
+                    />
+                </TableWithControlsLayout.Controls>
+                <TableWithControlsLayout.Table>
+                    <PaginatedStorageNodesTable
+                        database={database}
+                        nodeId={nodeId}
+                        groupId={groupId}
+                        searchValue={searchValue}
+                        visibleEntities={visibleEntities}
+                        nodesUptimeFilter={nodesUptimeFilter}
+                        onShowAll={handleShowAllNodes}
+                        parentRef={parentRef}
+                        renderErrorMessage={renderPaginatedTableErrorMessage}
+                        columns={columnsToShow}
+                        initialEntitiesCount={initialEntitiesCount}
+                        onDataFetched={handleDataFetched}
+                    />
+                </TableWithControlsLayout.Table>
+            </TableWithControlsLayout>
+        </PaginatedTableProvider>
     );
 }
 
@@ -148,19 +150,16 @@ function GroupedStorageNodesComponent({
 
     const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
 
-    const renderControls = () => {
-        return (
-            <StorageNodesControls
-                withTypeSelector
-                withGroupBySelect
-                entitiesCountCurrent={found}
-                entitiesCountTotal={total}
-                entitiesLoading={isLoading}
-                columnsToSelect={columnsToSelect}
-                handleSelectedColumnsUpdate={setColumns}
-            />
-        );
-    };
+    // Initialize the table state with the API data
+    const initialState = React.useMemo(
+        () => ({
+            foundEntities: found,
+            totalEntities: total,
+            isInitialLoad: isLoading,
+            sortParams: undefined,
+        }),
+        [found, total, isLoading],
+    );
 
     const renderGroups = () => {
         if (tableGroups?.length) {
@@ -196,13 +195,22 @@ function GroupedStorageNodesComponent({
     };
 
     return (
-        <TableWithControlsLayout>
-            <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
-            {error ? <ResponseError error={error} /> : null}
-            <TableWithControlsLayout.Table loading={isLoading} className={b('groups-wrapper')}>
-                {renderGroups()}
-            </TableWithControlsLayout.Table>
-        </TableWithControlsLayout>
+        <PaginatedTableProvider initialState={initialState}>
+            <TableWithControlsLayout>
+                <TableWithControlsLayout.Controls>
+                    <StorageNodesControlsWithTableState
+                        withTypeSelector
+                        withGroupBySelect
+                        columnsToSelect={columnsToSelect}
+                        handleSelectedColumnsUpdate={setColumns}
+                    />
+                </TableWithControlsLayout.Controls>
+                {error ? <ResponseError error={error} /> : null}
+                <TableWithControlsLayout.Table loading={isLoading} className={b('groups-wrapper')}>
+                    {renderGroups()}
+                </TableWithControlsLayout.Table>
+            </TableWithControlsLayout>
+        </PaginatedTableProvider>
     );
 }
 
@@ -277,4 +285,31 @@ function useStorageNodesColumnsToSelect({
         viewContext,
         columnsSettings,
     });
+}
+
+// Wrapper component to connect StorageNodesControls with the PaginatedTable state
+function StorageNodesControlsWithTableState({
+    withTypeSelector,
+    withGroupBySelect,
+    columnsToSelect,
+    handleSelectedColumnsUpdate,
+}: {
+    withTypeSelector?: boolean;
+    withGroupBySelect?: boolean;
+    columnsToSelect: any[];
+    handleSelectedColumnsUpdate: (updated: any[]) => void;
+}) {
+    const {tableState} = usePaginatedTableState();
+
+    return (
+        <StorageNodesControls
+            withTypeSelector={withTypeSelector}
+            withGroupBySelect={withGroupBySelect}
+            entitiesCountCurrent={tableState.foundEntities}
+            entitiesCountTotal={tableState.totalEntities}
+            entitiesLoading={tableState.isInitialLoad}
+            columnsToSelect={columnsToSelect}
+            handleSelectedColumnsUpdate={handleSelectedColumnsUpdate}
+        />
+    );
 }

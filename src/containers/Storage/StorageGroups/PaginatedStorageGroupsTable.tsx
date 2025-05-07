@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {LoaderWrapper} from '../../../components/LoaderWrapper/LoaderWrapper';
-import type {RenderControls, RenderErrorMessage} from '../../../components/PaginatedTable';
+import type {RenderErrorMessage} from '../../../components/PaginatedTable';
 import {ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import {
     useCapabilitiesLoaded,
@@ -33,7 +33,6 @@ interface PaginatedStorageGroupsTableProps {
     onShowAll: VoidFunction;
 
     parentRef: React.RefObject<HTMLElement>;
-    renderControls?: RenderControls;
     renderErrorMessage: RenderErrorMessage;
     initialEntitiesCount?: number;
 }
@@ -50,7 +49,6 @@ export const PaginatedStorageGroupsTable = ({
     visibleEntities,
     onShowAll,
     parentRef,
-    renderControls,
     renderErrorMessage,
     initialEntitiesCount,
 }: PaginatedStorageGroupsTableProps) => {
@@ -102,7 +100,6 @@ export const PaginatedStorageGroupsTable = ({
                 columns={columns}
                 fetchData={fetchData}
                 initialEntitiesCount={initialEntitiesCount}
-                renderControls={renderControls}
                 renderErrorMessage={renderErrorMessage}
                 renderEmptyDataMessage={renderEmptyDataMessage}
                 filters={tableFilters}

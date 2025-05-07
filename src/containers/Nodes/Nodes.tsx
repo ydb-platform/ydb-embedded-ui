@@ -1,8 +1,14 @@
 import React from 'react';
 
+import type {TableColumnSetupItem} from '@gravity-ui/uikit';
+
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
-import type {Column, RenderControls} from '../../components/PaginatedTable';
+import type {Column} from '../../components/PaginatedTable';
+import {
+    PaginatedTableProvider,
+    usePaginatedTableState,
+} from '../../components/PaginatedTable/PaginatedTableContext';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {
     NODES_COLUMNS_TITLES,
@@ -172,32 +178,61 @@ function NodesComponent({
         requiredColumnsIds,
     );
 
-    const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
-        return (
-            <NodesControls
-                withGroupBySelect={viewerNodesHandlerHasGrouping}
-                groupByParams={groupByParams}
-                withPeerRoleFilter={withPeerRoleFilter}
-                columnsToSelect={columnsToSelect}
-                handleSelectedColumnsUpdate={setColumns}
-                entitiesCountCurrent={foundEntities}
-                entitiesCountTotal={totalEntities}
-                entitiesLoading={!inited}
-            />
-        );
-    };
+    return (
+        <PaginatedTableProvider>
+            <TableWithControlsLayout>
+                <TableWithControlsLayout.Controls>
+                    <NodesControlsWithTableState
+                        withGroupBySelect={viewerNodesHandlerHasGrouping}
+                        groupByParams={groupByParams}
+                        withPeerRoleFilter={withPeerRoleFilter}
+                        columnsToSelect={columnsToSelect}
+                        handleSelectedColumnsUpdate={setColumns}
+                    />
+                </TableWithControlsLayout.Controls>
+                <TableWithControlsLayout.Table>
+                    <NodesTable
+                        path={path}
+                        database={database}
+                        searchValue={searchValue}
+                        problemFilter={problemFilter}
+                        uptimeFilter={uptimeFilter}
+                        peerRoleFilter={peerRoleFilter}
+                        columns={columnsToShow}
+                        parentRef={parentRef}
+                    />
+                </TableWithControlsLayout.Table>
+            </TableWithControlsLayout>
+        </PaginatedTableProvider>
+    );
+}
+
+// Wrapper component to connect NodesControls with the PaginatedTable state
+function NodesControlsWithTableState({
+    withGroupBySelect,
+    groupByParams,
+    withPeerRoleFilter,
+    columnsToSelect,
+    handleSelectedColumnsUpdate,
+}: {
+    withGroupBySelect: boolean;
+    groupByParams: NodesGroupByField[];
+    withPeerRoleFilter?: boolean;
+    columnsToSelect: TableColumnSetupItem[];
+    handleSelectedColumnsUpdate: (updated: TableColumnSetupItem[]) => void;
+}) {
+    const {tableState} = usePaginatedTableState();
 
     return (
-        <NodesTable
-            path={path}
-            database={database}
-            searchValue={searchValue}
-            problemFilter={problemFilter}
-            uptimeFilter={uptimeFilter}
-            peerRoleFilter={peerRoleFilter}
-            columns={columnsToShow}
-            parentRef={parentRef}
-            renderControls={renderControls}
+        <NodesControls
+            withGroupBySelect={withGroupBySelect}
+            groupByParams={groupByParams}
+            withPeerRoleFilter={withPeerRoleFilter}
+            columnsToSelect={columnsToSelect}
+            handleSelectedColumnsUpdate={handleSelectedColumnsUpdate}
+            entitiesCountCurrent={tableState.foundEntities}
+            entitiesCountTotal={tableState.totalEntities}
+            entitiesLoading={tableState.isInitialLoad}
         />
     );
 }
@@ -247,20 +282,16 @@ function GroupedNodesComponent({
 
     const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
 
-    const renderControls = () => {
-        return (
-            <NodesControls
-                withGroupBySelect
-                groupByParams={groupByParams}
-                withPeerRoleFilter={withPeerRoleFilter}
-                columnsToSelect={columnsToSelect}
-                handleSelectedColumnsUpdate={setColumns}
-                entitiesCountCurrent={found}
-                entitiesCountTotal={total}
-                entitiesLoading={isLoading}
-            />
-        );
-    };
+    // Initialize the table state with the API data
+    const initialState = React.useMemo(
+        () => ({
+            foundEntities: found,
+            totalEntities: total,
+            isInitialLoad: isLoading,
+            sortParams: undefined,
+        }),
+        [found, total, isLoading],
+    );
 
     const renderGroups = () => {
         if (tableGroups?.length) {
@@ -298,12 +329,22 @@ function GroupedNodesComponent({
     };
 
     return (
-        <TableWithControlsLayout>
-            <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
-            {error ? <ResponseError error={error} /> : null}
-            <TableWithControlsLayout.Table loading={isLoading} className={b('groups-wrapper')}>
-                {renderGroups()}
-            </TableWithControlsLayout.Table>
-        </TableWithControlsLayout>
+        <PaginatedTableProvider initialState={initialState}>
+            <TableWithControlsLayout>
+                <TableWithControlsLayout.Controls>
+                    <NodesControlsWithTableState
+                        withGroupBySelect={true}
+                        groupByParams={groupByParams}
+                        withPeerRoleFilter={withPeerRoleFilter}
+                        columnsToSelect={columnsToSelect}
+                        handleSelectedColumnsUpdate={setColumns}
+                    />
+                </TableWithControlsLayout.Controls>
+                {error ? <ResponseError error={error} /> : null}
+                <TableWithControlsLayout.Table loading={isLoading} className={b('groups-wrapper')}>
+                    {renderGroups()}
+                </TableWithControlsLayout.Table>
+            </TableWithControlsLayout>
+        </PaginatedTableProvider>
     );
 }
