@@ -5,7 +5,6 @@ import {TOPIC_MESSAGE_SIZE_LIMIT} from '../../../../store/reducers/topic';
 import type {
     TopicDataRequest,
     TopicDataResponse,
-    TopicMessage,
     TopicMessageEnhanced,
 } from '../../../../types/api/topic';
 import {safeParseNumber} from '../../../../utils/utils';
@@ -62,7 +61,7 @@ export const generateTopicDataGetter = ({
     setEndOffset,
     baseOffset = 0,
 }: GetTopicDataProps) => {
-    const getTopicData: FetchData<TopicMessage, TopicDataFilters> = async ({
+    const getTopicData: FetchData<TopicMessageEnhanced, TopicDataFilters> = async ({
         limit,
         offset: tableOffset,
         filters,

@@ -1,3 +1,5 @@
+@use '../../../../styles/mixins.scss';
+
 .ydb-diagnostics-topic-data {
     &__partition-select {
         min-width: 150px;
@@ -23,6 +25,9 @@
             &:hover {
                 background: var(--g-color-base-selection-hover) !important;
             }
+        }
+        &_removed {
+            color: var(--g-color-text-secondary);
         }
     }
 }

@@ -59,8 +59,8 @@ export function TopicDataControls({
     } = useTopicDataQueryParams();
 
     const partitionsToSelect = partitions?.map(({partitionId}) => ({
-        content: partitionId,
-        value: partitionId,
+        content: String(partitionId),
+        value: String(partitionId),
     }));
 
     const handleSelectedPartitionChange = React.useCallback(

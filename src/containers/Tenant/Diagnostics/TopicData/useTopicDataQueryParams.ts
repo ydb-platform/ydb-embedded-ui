@@ -6,13 +6,16 @@ import type {TopicDataFilterValue} from './utils/types';
 import {TopicDataFilterValueParam} from './utils/types';
 
 export function useTopicDataQueryParams() {
-    const [{selectedPartition, selectedOffset, startTimestamp, topicDataFilter}, setQueryParams] =
-        useQueryParams({
-            selectedPartition: StringParam,
-            selectedOffset: StringParam,
-            startTimestamp: NumberParam,
-            topicDataFilter: TopicDataFilterValueParam,
-        });
+    const [
+        {selectedPartition, selectedOffset, startTimestamp, topicDataFilter, activeOffset},
+        setQueryParams,
+    ] = useQueryParams({
+        selectedPartition: StringParam,
+        selectedOffset: StringParam,
+        startTimestamp: NumberParam,
+        topicDataFilter: TopicDataFilterValueParam,
+        activeOffset: StringParam,
+    });
 
     const handleSelectedPartitionChange = React.useCallback(
         (value?: string) => {
@@ -24,6 +27,13 @@ export function useTopicDataQueryParams() {
     const handleSelectedOffsetChange = React.useCallback(
         (value?: string) => {
             setQueryParams({selectedOffset: value}, 'replaceIn');
+        },
+        [setQueryParams],
+    );
+
+    const handleActiveOffsetChange = React.useCallback(
+        (value?: string) => {
+            setQueryParams({activeOffset: value}, 'replaceIn');
         },
         [setQueryParams],
     );
@@ -47,9 +57,11 @@ export function useTopicDataQueryParams() {
         selectedOffset,
         startTimestamp,
         topicDataFilter,
+        activeOffset,
         handleSelectedPartitionChange,
         handleSelectedOffsetChange,
         handleStartTimestampChange,
         handleTopicDataFilterChange,
+        handleActiveOffsetChange,
     };
 }
