@@ -23,6 +23,7 @@ interface CellProps {
     filter?: string;
     index: number;
     showFullText: (index: number) => void;
+    maxValueWidth?: number;
 }
 
 export function Cell(props: CellProps) {
@@ -69,6 +70,7 @@ export function Cell(props: CellProps) {
                     matched={matched?.valueMatch}
                     filter={filter}
                     showFullText={handleShowFullText}
+                    maxValueWidth={props.maxValueWidth}
                 />
             )}
             {collapsed && depth === undefined && <span className={'unipika'}>...</span>}
@@ -97,6 +99,7 @@ function Key(props: KeyProps) {
 
 interface ValueProps extends KeyProps {
     showFullText?: () => void;
+    maxValueWidth?: number;
 }
 
 function Value(props: ValueProps) {
@@ -109,16 +112,24 @@ function Value(props: ValueProps) {
 
 function renderValueWithFilter(props: ValueProps, className: string) {
     if ('string' === props.text?.$type) {
-        return renderStringWithFilter(props, className, 100);
+        return renderStringWithFilter(props, className);
     }
     return renderWithFilter(props, block('value'));
 }
 
-function renderStringWithFilter(props: ValueProps, className: string, maxWidth = Infinity) {
-    const {text, settings = defaultUnipikaSettings, matched = [], filter, showFullText} = props;
-    const tmp = unipika.format(text, {...settings, asHTML: false});
+function renderStringWithFilter(props: ValueProps, className: string) {
+    const {
+        text,
+        settings = defaultUnipikaSettings,
+        matched = [],
+        filter,
+        showFullText,
+        maxValueWidth = Infinity,
+    } = props;
+
+    const tmp = unipika.format(text, {...settings, maxStringSize: 10, asHTML: false});
     const length = tmp.length;
-    const visible = tmp.substring(1, Math.min(length - 1, maxWidth + 1));
+    const visible = tmp.substring(1, Math.min(length - 1, maxValueWidth + 1));
     const truncated = visible.length < tmp.length - 2;
     let hasHiddenMatch = false;
     if (truncated) {

@@ -4,6 +4,7 @@ import type {ValueOf} from '../../../../../types/common';
 import i18n from '../i18n';
 
 export const TOPIC_DATA_COLUMNS_IDS = {
+    PARTITION: 'partition',
     OFFSET: 'offset',
     TIMESTAMP_CREATE: 'timestampCreate',
     TIMESTAMP_WRITE: 'timestampWrite',

@@ -56,7 +56,7 @@ export const PartitionsControls = ({
                 connectionHost,
             } = partition;
 
-            const isPartitionIdMatch = partitionIdRe.test(partitionId);
+            const isPartitionIdMatch = partitionIdRe.test(String(partitionId));
 
             const otherValues = [
                 readerName,

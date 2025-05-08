@@ -79,7 +79,7 @@ export const useStreamingAvailable = () => {
 };
 
 export const useTopicDataAvailable = () => {
-    return useGetFeatureVersion('/viewer/topic_data') >= 1;
+    return useGetFeatureVersion('/viewer/topic_data') >= 2;
 };
 
 const useGetSecuritySetting = (feature: SecuritySetting) => {
