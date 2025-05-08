@@ -17,6 +17,10 @@ const b = cn('ydb-drawer');
 
 import './Drawer.scss';
 
+type DrawerEvent = MouseEvent & {
+    _capturedInsideDrawer?: boolean;
+};
+
 interface DrawerPaneContentWrapperProps {
     isVisible: boolean;
     onClose: () => void;
@@ -64,7 +68,11 @@ const DrawerPaneContentWrapper = ({
             return undefined;
         }
 
-        const handleClickOutside = (event: MouseEvent) => {
+        const handleClickOutside = (event: DrawerEvent) => {
+            //skip if event is captured inside drawer or not triggered by user
+            if (event._capturedInsideDrawer || !event.isTrusted) {
+                return;
+            }
             if (
                 isVisible &&
                 drawerRef.current &&
@@ -91,6 +99,10 @@ const DrawerPaneContentWrapper = ({
         }
     };
 
+    const handleClickInsideDrawer = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        (event.nativeEvent as DrawerEvent)._capturedInsideDrawer = true;
+    };
+
     return (
         <GravityDrawer
             onEscape={onClose}
@@ -109,7 +121,9 @@ const DrawerPaneContentWrapper = ({
                 className={b('item')}
                 ref={detectClickOutside ? drawerRef : undefined}
             >
-                {children}
+                <div className={b('click-handler')} onClickCapture={handleClickInsideDrawer}>
+                    {children}
+                </div>
             </DrawerItem>
         </GravityDrawer>
     );
@@ -184,7 +198,11 @@ export const DrawerWrapper = ({
         }
 
         return (
-            <Flex justifyContent="space-between" className={b('header-wrapper', headerClassName)}>
+            <Flex
+                justifyContent="space-between"
+                alignItems="center"
+                className={b('header-wrapper', headerClassName)}
+            >
                 <Text variant="subheader-2">{title}</Text>
                 <Flex className={b('controls')}>{controls}</Flex>
             </Flex>
