@@ -31,7 +31,7 @@ export function bytesToSize(bytes: number) {
     return val.toPrecision(3) + sizes[i];
 }
 
-function bytesToMB(bytes?: number | string) {
+export function bytesToMB(bytes?: number | string) {
     const bytesNumber = Number(bytes);
     if (isNaN(bytesNumber)) {
         return '';

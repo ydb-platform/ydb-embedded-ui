@@ -1,5 +1,6 @@
 {
   "label_offset": "Offset",
+  "label_partition": "Partition ID",
   "label_timestamp-create": "Timestamp Create",
   "label_timestamp-write": "Timestamp Write",
   "label_ts_diff": "TS Diff",
@@ -24,5 +25,9 @@
   "action_scroll-selected": "Scroll to selected offset",
   "action_scroll-up": "Scroll to the start",
   "description_failed-decode": "Failed to decode message",
-  "description_truncated": "[truncated]"
+  "description_truncated": "[truncated]",
+  "context_message-not-found": "Message not found",
+  "context_get-data-error": "Failed to get message",
+  "label_download": "Save message to file",
+  "label_truncated": "Truncated {{size}}"
 }

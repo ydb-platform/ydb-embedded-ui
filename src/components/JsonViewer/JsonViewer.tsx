@@ -33,6 +33,8 @@ interface JsonViewerCommonProps {
     tableSettings?: DT100.Settings;
     search?: boolean;
     collapsedInitially?: boolean;
+    maxValueWidth?: number;
+    toolbarClassName?: string;
 }
 
 interface JsonViewerProps extends JsonViewerCommonProps {
@@ -60,7 +62,7 @@ const SETTINGS: DT100.Settings = {
     displayIndices: false,
     dynamicRender: true,
     sortable: false,
-    dynamicRenderMinSize: 100,
+    dynamicRenderMinSize: 50,
 };
 
 function getCollapsedState(value: UnipikaValue) {
@@ -114,6 +116,8 @@ function JsonViewerComponent({
     search = true,
     extraTools,
     collapsedInitially,
+    maxValueWidth = 100,
+    toolbarClassName,
 }: JsonViewerComponentProps) {
     const [caseSensitiveSearch, setCaseSensitiveSearch] = useSetting(
         CASE_SENSITIVE_JSON_SEARCH,
@@ -162,6 +166,7 @@ function JsonViewerComponent({
                 filter={filter}
                 showFullText={onShowFullText}
                 index={index}
+                maxValueWidth={maxValueWidth}
             />
         );
     };
@@ -295,7 +300,7 @@ function JsonViewerComponent({
 
     const renderToolbar = () => {
         return (
-            <Flex gap={2} wrap="nowrap" className={block('toolbar')}>
+            <Flex gap={2} wrap="nowrap" className={block('toolbar', toolbarClassName)}>
                 <Flex gap={1} wrap="nowrap">
                     <ActionTooltip title={i18n('action_expand-all')}>
                         <Button onClick={onExpandAll} view="flat-secondary">
