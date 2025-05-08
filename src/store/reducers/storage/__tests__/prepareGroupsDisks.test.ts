@@ -359,6 +359,7 @@ describe('prepareGroupsPDisk', () => {
 
         const expectedResult = {
             NodeId: 224,
+            PDiskId: 1001,
             StringifiedId: '224-1001',
 
             Path: '/dev/disk/by-partlabel/kikimr_nvme_04',
