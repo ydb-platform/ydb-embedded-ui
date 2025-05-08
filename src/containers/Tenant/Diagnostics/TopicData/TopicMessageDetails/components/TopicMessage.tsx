@@ -14,7 +14,7 @@ import {MESSAGE_SIZE_LIMIT, b} from '../shared';
 
 import {TopicDataSection} from './TopicDataSection';
 
-const UNIPIKA_MAX_SIZE = 100_000;
+const UNIPIKA_MAX_SIZE = 1_000_000;
 
 interface TopicMessageProps {
     message: string;
@@ -47,6 +47,8 @@ export function TopicMessage({offset, size, message}: TopicMessageProps) {
         let convertedMessage;
         if (typeof preparedMessage === 'object' && safeParseNumber(size) <= UNIPIKA_MAX_SIZE) {
             convertedMessage = unipikaConvert(preparedMessage);
+        } else if (preparedMessage && typeof preparedMessage === 'object') {
+            preparedMessage = JSON.stringify(preparedMessage, null, 2);
         }
 
         return {preparedMessage, decodedMessage, convertedMessage};
@@ -66,11 +68,7 @@ export function TopicMessage({offset, size, message}: TopicMessageProps) {
     ) : (
         <div className={b('string-message')}>
             {/* key is used to reset string's state when toggle fullscreen: otherwise if very long string is expanded, it may be performance issues on open fullscreen mode https://github.com/ydb-platform/ydb-embedded-ui/issues/2265  */}
-            <ShortyString
-                key={String(isFullscreen)}
-                value={JSON.stringify(preparedMessage, null, 2)}
-                limit={1000}
-            />
+            <ShortyString key={String(isFullscreen)} value={preparedMessage} limit={1000} />
         </div>
     );
 

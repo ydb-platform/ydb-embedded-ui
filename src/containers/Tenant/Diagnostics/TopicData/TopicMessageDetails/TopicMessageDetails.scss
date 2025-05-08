@@ -39,6 +39,7 @@
     &__string-message {
         overflow: hidden;
 
+        white-space: pre-wrap;
         word-break: break-all;
     }
 }
