@@ -29,7 +29,7 @@ using var driver = new Driver(
 await driver.Initialize();`;
 }
 
-export function getGoSnippetCode({database, endpoint}: SnippetParams) {
+export function getGoNativeSdkSnippetCode({database, endpoint}: SnippetParams) {
     return `package main
 
 import (
@@ -224,7 +224,7 @@ export function getSnippetCode(lang: SnippetLanguage, rawParams: SnippetParams) 
             return getCSharpSnippetCode(params);
         }
         case 'go_native_sdk': {
-            return getGoSnippetCode(params);
+            return getGoNativeSdkSnippetCode(params);
         }
         case 'go_database_sql': {
             return getGoDatabaseSqlSnippetCode(params);
