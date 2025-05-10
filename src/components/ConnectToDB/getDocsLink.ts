@@ -15,8 +15,6 @@ export function getDocsLink(snippetLang: SnippetLanguage) {
         case 'go': {
             return i18n('docs_go');
         }
-            return i18n('docs_go');
-        }
         case 'java': {
             return i18n('docs_java');
         }

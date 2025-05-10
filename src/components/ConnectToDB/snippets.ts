@@ -226,7 +226,6 @@ export function getSnippetCode(lang: SnippetLanguage, rawParams: SnippetParams) 
         case 'go': {
             return getGoNativeSdkSnippetCode(params);
         }
-        }
         case 'java': {
             return getJavaSnippetCode(params);
         }
