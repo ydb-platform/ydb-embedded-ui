@@ -12,10 +12,9 @@ export function getDocsLink(snippetLang: SnippetLanguage) {
         case 'csharp': {
             return i18n('docs_dotnet');
         }
-        case 'go_native_sdk': {
+        case 'go': {
             return i18n('docs_go');
         }
-        case 'go_database_sql': {
             return i18n('docs_go');
         }
         case 'java': {

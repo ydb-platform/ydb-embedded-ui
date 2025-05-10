@@ -223,11 +223,9 @@ export function getSnippetCode(lang: SnippetLanguage, rawParams: SnippetParams) 
         case 'csharp': {
             return getCSharpSnippetCode(params);
         }
-        case 'go_native_sdk': {
+        case 'go': {
             return getGoNativeSdkSnippetCode(params);
         }
-        case 'go_database_sql': {
-            return getGoDatabaseSqlSnippetCode(params);
         }
         case 'java': {
             return getJavaSnippetCode(params);
