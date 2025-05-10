@@ -33,54 +33,65 @@ export function getGoSnippetCode({database, endpoint}: SnippetParams) {
     return `package main
 
 import (
-    "context"
-    "os"
+	"context"
+	"os"
 
-    "github.com/ydb-platform/ydb-go-sdk/v3"
-    "github.com/ydb-platform/ydb-go-sdk/v3/table"
+	"github.com/ydb-platform/ydb-go-sdk/v3"
 )
 
 func main() {
-    ctx, cancel := context.WithCancel(context.Background())
-    defer cancel()
-    db, err := ydb.Open(ctx,
-        "${endpoint ?? '<endpoint>'}${database ?? '/<database>'}",
-        ydb.WithAccessTokenCredentials(os.Getenv("YDB_ACCESS_TOKEN_CREDENTIALS")),
-    )
-    if err != nil {
-        panic(err)
-    }
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	
+	db, err := ydb.Open(context.Background(),
+		"${endpoint ?? '<endpoint>'}${database ?? '/<database>'}",
+		ydb.WithAccessTokenCredentials(os.Getenv("YDB_ACCESS_TOKEN_CREDENTIALS")),
+	)
+	if err != nil {
+		panic(err)
+	}
 
-    defer db.Close(ctx)
+	defer db.Close(ctx)
 
-    err = db.Table().Do(ctx,
-        func(ctx context.Context, s table.Session) error {
-            _, res, err := s.Execute(
-                ctx,
-                table.TxControl(table.BeginTx(table.WithOnlineReadOnly()), table.CommitTx()),
-                "SELECT 'Hello, world!'",
-                nil,
-            )
-            if err != nil {
-                return err
-            }
-            defer res.Close()
-            var val string
+	row, err := db.Query().QueryRow(ctx, "SELECT 'Hello, world!'")
+	if err != nil {
+		panic(err)
+	}
 
-            for res.NextResultSet(ctx) {
-                for res.NextRow() {
-                    err = res.Scan(&val)
-                    if err != nil {
-                        return err
-                    }
-                    println(val)
-                }
-            }
-            return res.Err()
-        })
-    if err != nil {
-        panic(err)
-    }
+	var val string
+	if err := row.Scan(&val); err != nil {
+		panic(err)
+	}
+
+	println(val)
+}`;
+}
+
+export function getGoDatabaseSqlSnippetCode({database, endpoint}: SnippetParams) {
+    return `package main
+
+import (
+	"context"
+	"database/sql"
+	"os"
+
+	_ "github.com/ydb-platform/ydb-go-sdk/v3"
+)
+
+func main() {
+	db, err := sql.Open("ydb", "${endpoint ?? '<endpoint>'}${database ?? '/<database>'}"+"?token="+os.Getenv("YDB_ACCESS_TOKEN_CREDENTIALS"))
+	if err != nil {
+		panic(err)
+	}
+
+	row := db.QueryRowContext(context.Background(), "SELECT 'Hello, world!'")
+
+	var val string
+	if err := row.Scan(&val); err != nil {
+		panic(err)
+	}
+
+	println(val)
 }`;
 }
 
@@ -212,8 +223,11 @@ export function getSnippetCode(lang: SnippetLanguage, rawParams: SnippetParams) 
         case 'csharp': {
             return getCSharpSnippetCode(params);
         }
-        case 'go': {
+        case 'go (native SDK)': {
             return getGoSnippetCode(params);
+        }
+        case 'go (database/sql)': {
+            return getGoDatabaseSqlSnippetCode(params);
         }
         case 'java': {
             return getJavaSnippetCode(params);
