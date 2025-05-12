@@ -25,7 +25,7 @@ const b = cn('kv-top-queries');
 
 interface QueryDetailsDrawerContentProps {
     row: KeyValueRow | null;
-    onClose: () => void; // Needed for the "not found" case
+    onClose: () => void;
 }
 
 export const QueryDetailsDrawerContent = ({row, onClose}: QueryDetailsDrawerContentProps) => {

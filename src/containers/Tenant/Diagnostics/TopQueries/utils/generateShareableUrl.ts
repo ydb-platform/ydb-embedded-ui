@@ -13,14 +13,10 @@ import {getTopQueryRowQueryParams} from './getTopQueryRowQueryParams';
 export function generateShareableUrl(row: KeyValueRow, tableSort?: SortOrder[]): string {
     const params = getTopQueryRowQueryParams(row);
 
-    // Get current URL without query parameters
     const url = new URL(window.location.href);
 
-    // Create URLSearchParams object from current search params
     const searchParams = new URLSearchParams(url.search);
 
-    // Add our parameters
-    // Set a single selectedRow parameter with all query parameters
     searchParams.set(
         'selectedRow',
         encodeURIComponent(
@@ -29,12 +25,11 @@ export function generateShareableUrl(row: KeyValueRow, tableSort?: SortOrder[]):
                 intervalEnd: params.intervalEnd || undefined,
                 endTime: params.endTime || undefined,
                 queryHash: params.queryHash || undefined,
-                tableSort: tableSort || undefined, // Include the table sort order
+                tableSort: tableSort || undefined,
             }),
         ),
     );
 
-    // Update URL search params
     url.search = searchParams.toString();
 
     return url.toString();
