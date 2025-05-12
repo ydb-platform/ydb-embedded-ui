@@ -129,10 +129,16 @@ const DrawerPaneContentWrapper = ({
     );
 };
 
+export enum DrawerControlType {
+    CLOSE = 'close',
+    COPY_LINK = 'copyLink',
+    CUSTOM = 'custom',
+}
+
 type DrawerControl =
-    | {type: 'close'}
-    | {type: 'copyLink'; link: string}
-    | {type: 'custom'; node: React.ReactNode; key: string};
+    | {type: DrawerControlType.CLOSE}
+    | {type: DrawerControlType.COPY_LINK; link: string}
+    | {type: DrawerControlType.CUSTOM; node: React.ReactNode; key: string};
 
 interface DrawerPaneProps {
     children: React.ReactNode;
