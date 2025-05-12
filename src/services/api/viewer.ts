@@ -316,6 +316,10 @@ export class ViewerAPI extends BaseYdbAPI {
                 enums: true,
                 merge: false,
                 database,
+                /**
+                 * Show/hide dead tablets: shown in pages needing complete statistics,
+                 * hidden in pages that already display multiple tablet generations to reduce visual noise.
+                 */
                 filter: `(TabletId=${id};State!=Dead)`,
             },
             {

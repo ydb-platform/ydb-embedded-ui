@@ -11,6 +11,10 @@ interface TabletsProps {
     path?: string;
     database?: string;
     nodeId?: string | number;
+    /**
+     * Show/hide dead tablets: shown in pages needing complete statistics,
+     * hidden in pages that already display multiple tablet generations to reduce visual noise.
+     */
     onlyActive?: boolean;
 }
 
