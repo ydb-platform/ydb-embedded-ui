@@ -18,8 +18,8 @@
         &_active {
             background-color: var(--g-color-base-selection);
 
-            &:hover {
-                background: var(--g-color-base-selection-hover) !important;
+            &:hover.kv-top-queries__row_active {
+                background: var(--g-color-base-selection-hover);
             }
         }
     }

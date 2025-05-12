@@ -10,12 +10,12 @@ import {CopyLinkButton} from '../CopyLinkButton/CopyLinkButton';
 
 import {useDrawerContext} from './DrawerContext';
 
+import './Drawer.scss';
+
 const DEFAULT_DRAWER_WIDTH_PERCENTS = 60;
 const DEFAULT_DRAWER_WIDTH = 600;
 const DRAWER_WIDTH_KEY = 'drawer-width';
 const b = cn('ydb-drawer');
-
-import './Drawer.scss';
 
 type DrawerEvent = MouseEvent & {
     _capturedInsideDrawer?: boolean;

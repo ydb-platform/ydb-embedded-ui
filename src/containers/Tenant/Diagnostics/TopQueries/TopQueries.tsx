@@ -46,11 +46,14 @@ interface TopQueriesProps {
 
 export const TopQueries = ({tenantName}: TopQueriesProps) => {
     const dispatch = useTypedDispatch();
-    const [_queryMode = QueryModeIds.top, setQueryMode] = useQueryParam('queryMode', StringParam);
-    const [_timeFrame = TimeFrameIds.hour, setTimeFrame] = useQueryParam('timeFrame', StringParam);
+    const [rawQueryMode = QueryModeIds.top, setQueryMode] = useQueryParam('queryMode', StringParam);
+    const [rawTimeFrame = TimeFrameIds.hour, setTimeFrame] = useQueryParam(
+        'timeFrame',
+        StringParam,
+    );
 
-    const queryMode = queryModeSchema.parse(_queryMode);
-    const timeFrame = timeFrameSchema.parse(_timeFrame);
+    const queryMode = queryModeSchema.parse(rawQueryMode);
+    const timeFrame = timeFrameSchema.parse(rawTimeFrame);
 
     const isTopQueries = queryMode === QueryModeIds.top;
 

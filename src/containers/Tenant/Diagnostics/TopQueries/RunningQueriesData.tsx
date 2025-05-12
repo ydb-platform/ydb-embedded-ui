@@ -65,17 +65,16 @@ export const RunningQueriesData = ({
 
     const {tableSort, handleTableSort, backendSort} = useRunningQueriesSort();
 
-    const {currentData, data, isFetching, isLoading, error} =
-        topQueriesApi.useGetRunningQueriesQuery(
-            {
-                database: tenantName,
-                filters,
-                sortOrder: backendSort,
-            },
-            {pollingInterval: autoRefreshInterval},
-        );
+    const {currentData, isFetching, isLoading, error} = topQueriesApi.useGetRunningQueriesQuery(
+        {
+            database: tenantName,
+            filters,
+            sortOrder: backendSort,
+        },
+        {pollingInterval: autoRefreshInterval},
+    );
 
-    const rows = data?.resultSets?.[0]?.result;
+    const rows = currentData?.resultSets?.[0]?.result;
 
     const isDrawerVisible = selectedRow !== undefined;
 
