@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type {Settings, SortOrder} from '@gravity-ui/react-data-table';
+import type {Settings} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
 
 import type {InfoViewerItem} from '../../../../components/InfoViewer';
@@ -11,11 +11,7 @@ import {prepareBackendSortFieldsFromTableSort, useTableSort} from '../../../../u
 import {formatToMs, parseUsToMs} from '../../../../utils/timeParsers';
 import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
 
-import {
-    QUERIES_COLUMNS_IDS,
-    getRunningQueriesColumnSortField,
-    getTopQueriesColumnSortField,
-} from './columns/constants';
+import {QUERIES_COLUMNS_IDS, getRunningQueriesColumnSortField} from './columns/constants';
 import columnsI18n from './columns/i18n';
 
 export const TOP_QUERIES_TABLE_SETTINGS: Settings = {
@@ -23,24 +19,6 @@ export const TOP_QUERIES_TABLE_SETTINGS: Settings = {
     disableSortReset: true,
     externalSort: true,
 };
-
-export function useTopQueriesSort(initialSort?: SortOrder[]) {
-    const [tableSort, handleTableSort] = useTableSort({
-        initialSortColumn: initialSort?.[0]?.columnId || QUERIES_COLUMNS_IDS.CPUTime,
-        initialSortOrder: initialSort?.[0]?.order || DataTable.DESCENDING,
-        multiple: true,
-        fixedOrderType: DataTable.DESCENDING,
-    });
-
-    return {
-        tableSort,
-        handleTableSort,
-        backendSort: React.useMemo(
-            () => prepareBackendSortFieldsFromTableSort(tableSort, getTopQueriesColumnSortField),
-            [tableSort],
-        ),
-    };
-}
 
 export function createQueryInfoItems(data: KeyValueRow): InfoViewerItem[] {
     const items: InfoViewerItem[] = [];

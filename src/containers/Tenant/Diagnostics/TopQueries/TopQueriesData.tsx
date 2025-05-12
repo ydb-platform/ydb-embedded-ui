@@ -2,7 +2,6 @@ import React from 'react';
 
 import type {Column} from '@gravity-ui/react-data-table';
 import {Select, TableColumnSetup} from '@gravity-ui/uikit';
-import {isEqual} from 'lodash';
 
 import type {DateRangeValues} from '../../../../components/DateRange';
 import {DateRange} from '../../../../components/DateRange';
@@ -30,10 +29,10 @@ import {
     TOP_QUERIES_SELECTED_COLUMNS_LS_KEY,
 } from './columns/constants';
 import {DEFAULT_TIME_FILTER_VALUE, TIME_FRAME_OPTIONS} from './constants';
-import {useGetSelectedRowTableSort} from './hooks/useGetSelectedRowTableSort';
 import {useSetSelectedTopQueryRowFromParams} from './hooks/useSetSelectedTopQueryRowFromParams';
+import {useTopQueriesSort} from './hooks/useTopQueriesSort';
 import i18n from './i18n';
-import {TOP_QUERIES_TABLE_SETTINGS, useTopQueriesSort} from './utils';
+import {TOP_QUERIES_TABLE_SETTINGS} from './utils';
 import {generateShareableUrl} from './utils/generateShareableUrl';
 
 const b = cn('kv-top-queries');
@@ -75,8 +74,7 @@ export const TopQueriesData = ({
         REQUIRED_TOP_QUERIES_COLUMNS,
     );
 
-    const initialTableSort = useGetSelectedRowTableSort();
-    const {tableSort, handleTableSort, backendSort} = useTopQueriesSort(initialTableSort);
+    const {tableSort, handleTableSort, backendSort} = useTopQueriesSort();
     const {currentData, isFetching, isLoading, error} = topQueriesApi.useGetTopQueriesQuery(
         {
             database: tenantName,
@@ -98,10 +96,10 @@ export const TopQueriesData = ({
 
     const getTopQueryUrl = React.useCallback(() => {
         if (selectedRow) {
-            return generateShareableUrl(selectedRow, tableSort);
+            return generateShareableUrl(selectedRow);
         }
         return '';
-    }, [selectedRow, tableSort]);
+    }, [selectedRow]);
 
     const renderDrawerContent = React.useCallback(() => {
         if (!isDrawerVisible) {
@@ -190,7 +188,7 @@ export const TopQueriesData = ({
                         loading={isFetching && currentData === undefined}
                         settings={TOP_QUERIES_TABLE_SETTINGS}
                         onRowClick={onRowClick}
-                        rowClassName={(row) => b('row', {active: isEqual(row, selectedRow)})}
+                        rowClassName={(row) => b('row', {active: row === selectedRow})}
                         sortOrder={tableSort}
                         onSort={handleTableSort}
                     />
