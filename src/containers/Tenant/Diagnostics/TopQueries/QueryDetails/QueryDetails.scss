@@ -8,31 +8,11 @@
     color: var(--g-color-text-primary);
     background-color: var(--g-color-base-background-dark);
 
-    &__header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        padding: var(--g-spacing-5) var(--g-spacing-6) 0 var(--g-spacing-6);
-    }
-
-    &__title {
-        margin: 0;
-
-        font-size: 16px;
-        font-weight: 500;
-    }
-
-    &__actions {
-        display: flex;
-        gap: var(--g-spacing-2);
-    }
-
     &__content {
         overflow: auto;
         flex: 1;
 
-        padding: var(--g-spacing-5) var(--g-spacing-4) var(--g-spacing-5) var(--g-spacing-6);
+        padding: var(--g-spacing-5) var(--g-spacing-4) var(--g-spacing-5) var(--g-spacing-4);
     }
 
     &__query-header {
@@ -61,10 +41,5 @@
 
         border-radius: 4px;
         background-color: var(--code-background-color);
-    }
-
-    &__icon {
-        // prevent button icon from firing onMouseEnter/onFocus through parent button's handler
-        pointer-events: none;
     }
 }
