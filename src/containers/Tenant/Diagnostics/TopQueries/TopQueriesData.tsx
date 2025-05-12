@@ -2,6 +2,7 @@ import React from 'react';
 
 import type {Column} from '@gravity-ui/react-data-table';
 import {Select, TableColumnSetup} from '@gravity-ui/uikit';
+import {isEqual} from 'lodash';
 
 import type {DateRangeValues} from '../../../../components/DateRange';
 import {DateRange} from '../../../../components/DateRange';
@@ -188,7 +189,7 @@ export const TopQueriesData = ({
                         loading={isFetching && currentData === undefined}
                         settings={TOP_QUERIES_TABLE_SETTINGS}
                         onRowClick={onRowClick}
-                        rowClassName={(row) => b('row', {active: row === selectedRow})}
+                        rowClassName={(row) => b('row', {active: isEqual(row, selectedRow)})}
                         sortOrder={tableSort}
                         onSort={handleTableSort}
                     />
