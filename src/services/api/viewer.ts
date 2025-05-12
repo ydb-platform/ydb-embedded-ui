@@ -31,6 +31,7 @@ import type {TTenantInfo, TTenants} from '../../types/api/tenant';
 import type {DescribeTopicResult, TopicDataRequest, TopicDataResponse} from '../../types/api/topic';
 import type {TEvVDiskStateResponse} from '../../types/api/vdisk';
 import type {TUserToken} from '../../types/api/whoami';
+import type {TabletsApiRequestParams} from '../../types/store/tablets';
 import {BINARY_DATA_IN_PLAIN_TEXT_DISPLAY} from '../../utils/constants';
 import type {Nullable} from '../../utils/typecheckers';
 import {settingsManager} from '../settings';
@@ -128,7 +129,7 @@ export class ViewerAPI extends BaseYdbAPI {
     }
 
     getTabletsInfo(
-        {nodeId, path, database}: {nodeId?: string | number; path?: string; database?: string},
+        {nodeId, path, database, filter}: TabletsApiRequestParams,
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<TEvTabletStateResponse>(
@@ -138,6 +139,7 @@ export class ViewerAPI extends BaseYdbAPI {
                 node_id: nodeId,
                 path,
                 enums: true,
+                filter,
             },
             {concurrentId, requestConfig: {signal}},
         );
