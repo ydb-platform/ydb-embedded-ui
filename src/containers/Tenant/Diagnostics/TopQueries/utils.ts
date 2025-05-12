@@ -1,17 +1,12 @@
-import React from 'react';
-
 import type {Settings} from '@gravity-ui/react-data-table';
-import DataTable from '@gravity-ui/react-data-table';
 
 import type {InfoViewerItem} from '../../../../components/InfoViewer';
 import type {KeyValueRow} from '../../../../types/api/query';
 import {formatDateTime, formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
 import {generateHash} from '../../../../utils/generateHash';
-import {prepareBackendSortFieldsFromTableSort, useTableSort} from '../../../../utils/hooks';
 import {formatToMs, parseUsToMs} from '../../../../utils/timeParsers';
 import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
 
-import {QUERIES_COLUMNS_IDS, getRunningQueriesColumnSortField} from './columns/constants';
 import columnsI18n from './columns/i18n';
 
 export const TOP_QUERIES_TABLE_SETTINGS: Settings = {
@@ -94,22 +89,4 @@ export function createQueryInfoItems(data: KeyValueRow): InfoViewerItem[] {
     }
 
     return items;
-}
-
-export function useRunningQueriesSort() {
-    const [tableSort, handleTableSort] = useTableSort({
-        initialSortColumn: QUERIES_COLUMNS_IDS.QueryStartAt,
-        initialSortOrder: DataTable.DESCENDING,
-        multiple: true,
-    });
-
-    return {
-        tableSort,
-        handleTableSort,
-        backendSort: React.useMemo(
-            () =>
-                prepareBackendSortFieldsFromTableSort(tableSort, getRunningQueriesColumnSortField),
-            [tableSort],
-        ),
-    };
 }
