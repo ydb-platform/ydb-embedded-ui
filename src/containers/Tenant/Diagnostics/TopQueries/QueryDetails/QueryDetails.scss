@@ -2,9 +2,8 @@
 
 .kv-query-details {
     display: flex;
+    flex: 1;
     flex-direction: column;
-
-    height: 100%;
 
     color: var(--g-color-text-primary);
     background-color: var(--g-color-base-background-dark);
