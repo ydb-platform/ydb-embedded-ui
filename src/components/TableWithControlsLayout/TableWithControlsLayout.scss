@@ -20,7 +20,7 @@
     &__controls {
         z-index: 3;
 
-        width: max-content;
+        width: 100%;
         height: 62px;
 
         @include mixins.controls();
