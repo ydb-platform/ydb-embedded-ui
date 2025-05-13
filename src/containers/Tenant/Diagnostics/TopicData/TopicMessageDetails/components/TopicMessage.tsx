@@ -6,7 +6,7 @@ import {ActionTooltip, Button, ClipboardButton, Flex, Icon, Text} from '@gravity
 import {JsonViewer} from '../../../../../../components/JsonViewer/JsonViewer';
 import {unipikaConvert} from '../../../../../../components/JsonViewer/unipika/unipika';
 import ShortyString from '../../../../../../components/ShortyString/ShortyString';
-import {createAndDownloadStringifiedJsonFile} from '../../../../../../utils/downloadFile';
+import {createAndDownloadFile} from '../../../../../../utils/downloadFile';
 import {useTypedSelector} from '../../../../../../utils/hooks';
 import {bytesToMB, safeParseNumber} from '../../../../../../utils/utils';
 import i18n from '../../i18n';
@@ -80,13 +80,13 @@ export function TopicMessage({offset, size, message}: TopicMessageProps) {
                         view="flat-secondary"
                         onClick={(e) => {
                             e.stopPropagation();
-                            createAndDownloadStringifiedJsonFile(
+                            createAndDownloadFile(
                                 decodedMessage,
                                 `topic-message-${offset ?? 'unknown-offset'}`,
                             );
                         }}
                     >
-                        JSON <Icon data={ArrowDownToLine} />
+                        <Icon data={ArrowDownToLine} />
                     </Button>
                 </ActionTooltip>
                 <ClipboardButton view="flat-secondary" text={decodedMessage} />

@@ -14,6 +14,9 @@
     &__date-picker {
         min-width: 265px;
     }
+    &__offset-input {
+        width: max-content;
+    }
     &__column-setup {
         margin-left: auto;
     }

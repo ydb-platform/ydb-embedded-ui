@@ -40,7 +40,9 @@ export function TopicMessageDetails({database, path}: TopicMessageDetailsProps) 
             limit: 1,
             message_size_limit: MESSAGE_SIZE_LIMIT,
         };
-        params.offset = safeParseNumber(activeOffset);
+        const parsedOffset = safeParseNumber(activeOffset);
+        params.offset = parsedOffset;
+        params.last_offset = parsedOffset;
         return params;
     }, [selectedPartition, activeOffset, database, path]);
 
@@ -94,7 +96,9 @@ export function TopicMessageDetails({database, path}: TopicMessageDetailsProps) 
                     justifyContent="center"
                     height="100%"
                 >
-                    <Text variant="subheader-1">{i18n('context_message-not-found')}</Text>
+                    <Text variant="subheader-1">
+                        {i18n('context_message-not-found', {offset: activeOffset})}
+                    </Text>
                     <Icon data={cryCatIcon} size={100} />
                 </Flex>
             );

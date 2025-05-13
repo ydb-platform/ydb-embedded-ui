@@ -184,7 +184,7 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
     );
 
     //this variable is used to scroll to active offset the very first time on open page
-    const initialActiveOffset = React.useMemo(() => activeOffset, []);
+    const initialActiveOffset = React.useRef(activeOffset);
 
     React.useEffect(() => {
         if (isFetching) {
@@ -192,19 +192,19 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
         }
 
         let currentOffset: number | undefined;
-
-        if (isNil(initialActiveOffset)) {
+        if (isNil(initialActiveOffset.current)) {
             const messages = currentData?.Messages;
             if (messages?.length) {
                 currentOffset = safeParseNumber(messages[0].Offset);
             }
         } else {
-            currentOffset = safeParseNumber(initialActiveOffset);
+            currentOffset = safeParseNumber(initialActiveOffset.current);
+            initialActiveOffset.current = undefined;
         }
         if (!isNil(currentOffset)) {
             scrollToOffset(currentOffset);
         }
-    }, [currentData, isFetching, scrollToOffset, initialActiveOffset]);
+    }, [currentData, isFetching, scrollToOffset]);
 
     const renderControls: RenderControls = () => {
         return (

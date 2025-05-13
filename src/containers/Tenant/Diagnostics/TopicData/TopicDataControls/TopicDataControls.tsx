@@ -119,10 +119,21 @@ function TopicDataStartControls({scrollToOffset}: TopicDataStartControlsProps) {
         selectedOffset,
         startTimestamp,
         topicDataFilter,
+        activeOffset,
         handleSelectedOffsetChange,
         handleStartTimestampChange,
         handleTopicDataFilterChange,
     } = useTopicDataQueryParams();
+
+    const inputRef = React.useRef<HTMLInputElement>(null);
+
+    const isDrawerVisible = !isNil(activeOffset);
+
+    React.useEffect(() => {
+        if (isDrawerVisible) {
+            inputRef.current?.blur();
+        }
+    }, [isDrawerVisible]);
 
     const onFilterChange = React.useCallback(
         (value: TopicDataFilterValue) => {
@@ -173,6 +184,8 @@ function TopicDataStartControls({scrollToOffset}: TopicDataStartControlsProps) {
             </RadioButton>
             {topicDataFilter === 'OFFSET' && (
                 <DebouncedInput
+                    controlRef={inputRef}
+                    className={b('offset-input')}
                     value={selectedOffset ? String(selectedOffset) : ''}
                     onUpdate={onStartOffsetChange}
                     label={i18n('label_from')}
