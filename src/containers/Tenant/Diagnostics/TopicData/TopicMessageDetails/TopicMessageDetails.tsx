@@ -96,7 +96,7 @@ export function TopicMessageDetails({database, path}: TopicMessageDetailsProps) 
                     justifyContent="center"
                     height="100%"
                 >
-                    <Text variant="subheader-1">
+                    <Text variant="subheader-2">
                         {i18n('context_message-not-found', {offset: activeOffset})}
                     </Text>
                     <Icon data={cryCatIcon} size={100} />
