@@ -1,6 +1,14 @@
+import {
+    getMonitoringClusterLink as getMonitoringClusterLinkDefault,
+    getMonitoringLink as getMonitoringLinkDefault,
+} from '../utils/monitoring';
+
 import type {UIFactory} from './types';
 
-const uiFactoryBase: UIFactory = {};
+const uiFactoryBase: UIFactory = {
+    getMonitoringLink: getMonitoringLinkDefault,
+    getMonitoringClusterLink: getMonitoringClusterLinkDefault,
+};
 
 export function configureUIFactory(overrides: UIFactory) {
     Object.assign(uiFactoryBase, overrides);
