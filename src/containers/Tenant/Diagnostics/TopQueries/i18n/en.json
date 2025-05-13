@@ -10,9 +10,5 @@
   "query-details.close": "Close",
   "query-details.query.title": "Query Text",
   "query-details.not-found.title": "Not found",
-  "query-details.not-found.description": "This query no longer exists",
-  "query-not-found": "Query Not Found",
-  "query-not-found.description": "The selected query is no longer available in the current dataset",
-  "query-details.copy-link": "Copy link to query",
-  "query-details.link-copied": "Copied to clipboard"
+  "query-details.not-found.description": "This query no longer exists"
 }

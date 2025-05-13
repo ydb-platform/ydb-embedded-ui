@@ -1,4 +1,4 @@
-import {Button, Icon, Text} from '@gravity-ui/uikit';
+import {Button, Flex, Icon, Text} from '@gravity-ui/uikit';
 
 import {cn} from '../../../../../utils/cn';
 import i18n from '../i18n';
@@ -13,7 +13,12 @@ interface NotFoundContainerProps {
 
 export const NotFoundContainer = ({onClose}: NotFoundContainerProps) => {
     return (
-        <div className={b('not-found-container')}>
+        <Flex
+            justifyContent="center"
+            alignItems="center"
+            direction="column"
+            className={b('not-found-container')}
+        >
             <Icon data={CryCatIcon} size={100} />
             <Text variant="subheader-2" className={b('not-found-title')}>
                 {i18n('query-details.not-found.title')}
@@ -24,6 +29,6 @@ export const NotFoundContainer = ({onClose}: NotFoundContainerProps) => {
             <Button size="m" view="normal" className={b('not-found-close')} onClick={onClose}>
                 {i18n('query-details.close')}
             </Button>
-        </div>
+        </Flex>
     );
 };

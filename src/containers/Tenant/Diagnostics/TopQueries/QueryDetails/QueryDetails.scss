@@ -1,9 +1,7 @@
 @import '../../../../../styles/mixins.scss';
 
-.kv-query-details {
-    display: flex;
+.ydb-query-details {
     flex: 1;
-    flex-direction: column;
 
     color: var(--g-color-text-primary);
     background-color: var(--g-color-base-background-dark);

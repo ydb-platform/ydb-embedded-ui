@@ -5,7 +5,7 @@ import {TableColumnSetup} from '@gravity-ui/uikit';
 import {isEqual} from 'lodash';
 
 import {DrawerWrapper} from '../../../../components/Drawer';
-import {DrawerControlType} from '../../../../components/Drawer/Drawer';
+import type {DrawerControl} from '../../../../components/Drawer/Drawer';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
@@ -82,12 +82,10 @@ export const RunningQueriesData = ({
         setSelectedRow(undefined);
     }, [setSelectedRow]);
 
-    const renderDrawerContent = React.useCallback(() => {
-        if (!isDrawerVisible) {
-            return null;
-        }
-        return <QueryDetailsDrawerContent row={selectedRow} onClose={handleCloseDetails} />;
-    }, [isDrawerVisible, selectedRow, handleCloseDetails]);
+    const renderDrawerContent = React.useCallback(
+        () => <QueryDetailsDrawerContent row={selectedRow} onClose={handleCloseDetails} />,
+        [selectedRow, handleCloseDetails],
+    );
 
     const onRowClick = React.useCallback(
         (
@@ -109,7 +107,7 @@ export const RunningQueriesData = ({
         }
     }, [isDrawerVisible]);
 
-    const drawerControls = React.useMemo(() => [{type: DrawerControlType.CLOSE} as const], []);
+    const drawerControls: DrawerControl[] = React.useMemo(() => [{type: 'close'}], []);
 
     return (
         <DrawerWrapper

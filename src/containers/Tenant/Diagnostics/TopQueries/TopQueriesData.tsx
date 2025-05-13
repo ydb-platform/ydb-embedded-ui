@@ -7,7 +7,7 @@ import {isEqual} from 'lodash';
 import type {DateRangeValues} from '../../../../components/DateRange';
 import {DateRange} from '../../../../components/DateRange';
 import {DrawerWrapper} from '../../../../components/Drawer';
-import {DrawerControlType} from '../../../../components/Drawer/Drawer';
+import type {DrawerControl} from '../../../../components/Drawer/Drawer';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
@@ -102,12 +102,10 @@ export const TopQueriesData = ({
         return '';
     }, [selectedRow]);
 
-    const renderDrawerContent = React.useCallback(() => {
-        if (!isDrawerVisible) {
-            return null;
-        }
-        return <QueryDetailsDrawerContent row={selectedRow} onClose={handleCloseDetails} />;
-    }, [isDrawerVisible, selectedRow, handleCloseDetails]);
+    const renderDrawerContent = React.useCallback(
+        () => <QueryDetailsDrawerContent row={selectedRow} onClose={handleCloseDetails} />,
+        [selectedRow, handleCloseDetails],
+    );
 
     const onRowClick = React.useCallback(
         (
@@ -129,11 +127,8 @@ export const TopQueriesData = ({
         }
     }, [isDrawerVisible]);
 
-    const drawerControls = React.useMemo(
-        () => [
-            {type: DrawerControlType.COPY_LINK, link: getTopQueryUrl()} as const,
-            {type: DrawerControlType.CLOSE} as const,
-        ],
+    const drawerControls: DrawerControl[] = React.useMemo(
+        () => [{type: 'copyLink', link: getTopQueryUrl()}, {type: 'close'}],
         [getTopQueryUrl],
     );
 

@@ -9,7 +9,7 @@ import i18n from '../i18n';
 
 import './QueryDetails.scss';
 
-const b = cn('kv-query-details');
+const b = cn('ydb-query-details');
 
 interface QueryDetailsProps {
     queryText: string;
@@ -19,7 +19,7 @@ interface QueryDetailsProps {
 
 export const QueryDetails = ({queryText, infoItems, onOpenInEditor}: QueryDetailsProps) => {
     return (
-        <div className={b()}>
+        <Flex direction="column" className={b()}>
             <Flex direction="column" className={b('content')}>
                 <InfoViewer info={infoItems} />
 
@@ -43,6 +43,6 @@ export const QueryDetails = ({queryText, infoItems, onOpenInEditor}: QueryDetail
                     />
                 </div>
             </Flex>
-        </div>
+        </Flex>
     );
 };

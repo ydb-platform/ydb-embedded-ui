@@ -18,7 +18,11 @@ import {NotFoundContainer} from './NotFoundContainer';
 import {QueryDetails} from './QueryDetails';
 
 interface QueryDetailsDrawerContentProps {
-    row: KeyValueRow | null;
+    // Three cases:
+    // 1. row is KeyValueRow and we can show it.
+    // 2. row is null and we can show not found container.
+    // 3. row is undefined and we can show nothing.
+    row?: KeyValueRow | null;
     onClose: () => void;
 }
 
