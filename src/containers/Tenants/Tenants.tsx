@@ -175,7 +175,7 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
             },
             {
                 name: 'State',
-                width: 90,
+                width: 150,
                 render: ({row}) => (row.State ? row.State.toLowerCase() : '—'),
                 customStyle: () => ({textTransform: 'capitalize'}),
             },
