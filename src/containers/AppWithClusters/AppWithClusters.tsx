@@ -3,12 +3,7 @@ import React from 'react';
 import type {Store} from '@reduxjs/toolkit';
 import type {History} from 'history';
 
-import type {GetLogsLink} from '../../utils/logs';
-import type {GetMonitoringClusterLink, GetMonitoringLink} from '../../utils/monitoring';
-import {
-    getMonitoringClusterLink as getMonitoringClusterLinkDefault,
-    getMonitoringLink as getMonitoringLinkDefault,
-} from '../../utils/monitoring';
+import {uiFactory} from '../../uiFactory/uiFactory';
 import {App, AppSlots} from '../App';
 import type {YDBEmbeddedUISettings} from '../UserSettings/settings';
 
@@ -18,22 +13,11 @@ import {ExtendedTenant} from './ExtendedTenant/ExtendedTenant';
 export interface AppWithClustersProps {
     store: Store;
     history: History;
-    getLogsLink?: GetLogsLink;
-    getMonitoringLink?: GetMonitoringLink;
-    getMonitoringClusterLink?: GetMonitoringClusterLink;
     userSettings?: YDBEmbeddedUISettings;
     children?: React.ReactNode;
 }
 
-export function AppWithClusters({
-    store,
-    history,
-    getLogsLink,
-    getMonitoringLink = getMonitoringLinkDefault,
-    getMonitoringClusterLink = getMonitoringClusterLinkDefault,
-    userSettings,
-    children,
-}: AppWithClustersProps) {
+export function AppWithClusters({store, history, userSettings, children}: AppWithClustersProps) {
     return (
         <App store={store} history={history} userSettings={userSettings}>
             <AppSlots.ClusterSlot>
@@ -41,9 +25,9 @@ export function AppWithClusters({
                     return (
                         <ExtendedCluster
                             component={component}
-                            getLogsLink={getLogsLink}
-                            getMonitoringLink={getMonitoringLink}
-                            getMonitoringClusterLink={getMonitoringClusterLink}
+                            getLogsLink={uiFactory.getLogsLink}
+                            getMonitoringLink={uiFactory.getMonitoringLink}
+                            getMonitoringClusterLink={uiFactory.getMonitoringClusterLink}
                         />
                     );
                 }}
@@ -53,8 +37,8 @@ export function AppWithClusters({
                     return (
                         <ExtendedTenant
                             component={component}
-                            getLogsLink={getLogsLink}
-                            getMonitoringLink={getMonitoringLink}
+                            getLogsLink={uiFactory.getLogsLink}
+                            getMonitoringLink={uiFactory.getMonitoringLink}
                         />
                     );
                 }}
