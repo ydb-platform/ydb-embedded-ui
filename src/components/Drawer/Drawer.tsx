@@ -223,10 +223,12 @@ export const DrawerWrapper = ({
                 detectClickOutside={detectClickOutside}
                 isPercentageWidth={isPercentageWidth}
             >
-                <div className={b('content-wrapper')}>
-                    {renderDrawerHeader()}
-                    {renderDrawerContent()}
-                </div>
+                {isDrawerVisible ? (
+                    <div className={b('content-wrapper')}>
+                        {renderDrawerHeader()}
+                        {renderDrawerContent()}
+                    </div>
+                ) : null}
             </DrawerPaneContentWrapper>
         </React.Fragment>
     );
