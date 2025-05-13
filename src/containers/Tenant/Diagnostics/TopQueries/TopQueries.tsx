@@ -2,23 +2,13 @@ import React from 'react';
 
 import type {RadioButtonOption} from '@gravity-ui/uikit';
 import {RadioButton} from '@gravity-ui/uikit';
-import {useHistory, useLocation} from 'react-router-dom';
 import {StringParam, useQueryParam} from 'use-query-params';
 import {z} from 'zod';
 
 import type {DateRangeValues} from '../../../../components/DateRange';
-import {parseQuery} from '../../../../routes';
 import {setTopQueriesFilters} from '../../../../store/reducers/executeTopQueries/executeTopQueries';
 import type {TimeFrame} from '../../../../store/reducers/executeTopQueries/types';
-import {changeUserInput, setIsDirty} from '../../../../store/reducers/query/query';
-import {
-    TENANT_PAGE,
-    TENANT_PAGES_IDS,
-    TENANT_QUERY_TABS_ID,
-} from '../../../../store/reducers/tenant/constants';
 import {useTypedDispatch} from '../../../../utils/hooks';
-import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
-import {TenantTabsGroups, getTenantPath} from '../../TenantPages';
 
 import {RunningQueriesData} from './RunningQueriesData';
 import {TopQueriesData} from './TopQueriesData';
@@ -56,35 +46,16 @@ interface TopQueriesProps {
 
 export const TopQueries = ({tenantName}: TopQueriesProps) => {
     const dispatch = useTypedDispatch();
-    const location = useLocation();
-    const history = useHistory();
-    const [_queryMode = QueryModeIds.top, setQueryMode] = useQueryParam('queryMode', StringParam);
-    const [_timeFrame = TimeFrameIds.hour, setTimeFrame] = useQueryParam('timeFrame', StringParam);
-
-    const queryMode = queryModeSchema.parse(_queryMode);
-    const timeFrame = timeFrameSchema.parse(_timeFrame);
-
-    const isTopQueries = queryMode === QueryModeIds.top;
-
-    const applyRowClick = React.useCallback(
-        (input: string) => {
-            dispatch(changeUserInput({input}));
-            dispatch(setIsDirty(false));
-
-            const queryParams = parseQuery(location);
-
-            const queryPath = getTenantPath({
-                ...queryParams,
-                [TENANT_PAGE]: TENANT_PAGES_IDS.query,
-                [TenantTabsGroups.queryTab]: TENANT_QUERY_TABS_ID.newQuery,
-            });
-
-            history.push(queryPath);
-        },
-        [dispatch, history, location],
+    const [rawQueryMode = QueryModeIds.top, setQueryMode] = useQueryParam('queryMode', StringParam);
+    const [rawTimeFrame = TimeFrameIds.hour, setTimeFrame] = useQueryParam(
+        'timeFrame',
+        StringParam,
     );
 
-    const onRowClick = useChangeInputWithConfirmation(applyRowClick);
+    const queryMode = queryModeSchema.parse(rawQueryMode);
+    const timeFrame = timeFrameSchema.parse(rawTimeFrame);
+
+    const isTopQueries = queryMode === QueryModeIds.top;
 
     const handleTextSearchUpdate = (text: string) => {
         dispatch(setTopQueriesFilters({text}));
@@ -109,7 +80,6 @@ export const TopQueries = ({tenantName}: TopQueriesProps) => {
             tenantName={tenantName}
             timeFrame={timeFrame}
             renderQueryModeControl={renderQueryModeControl}
-            onRowClick={onRowClick}
             handleTimeFrameChange={handleTimeFrameChange}
             handleDateRangeChange={handleDateRangeChange}
             handleTextSearchUpdate={handleTextSearchUpdate}
@@ -118,7 +88,6 @@ export const TopQueries = ({tenantName}: TopQueriesProps) => {
         <RunningQueriesData
             tenantName={tenantName}
             renderQueryModeControl={renderQueryModeControl}
-            onRowClick={onRowClick}
             handleTextSearchUpdate={handleTextSearchUpdate}
         />
     );

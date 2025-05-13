@@ -10,12 +10,12 @@ import {CopyLinkButton} from '../CopyLinkButton/CopyLinkButton';
 
 import {useDrawerContext} from './DrawerContext';
 
+import './Drawer.scss';
+
 const DEFAULT_DRAWER_WIDTH_PERCENTS = 60;
 const DEFAULT_DRAWER_WIDTH = 600;
 const DRAWER_WIDTH_KEY = 'drawer-width';
 const b = cn('ydb-drawer');
-
-import './Drawer.scss';
 
 type DrawerEvent = MouseEvent & {
     _capturedInsideDrawer?: boolean;
@@ -129,7 +129,7 @@ const DrawerPaneContentWrapper = ({
     );
 };
 
-type DrawerControl =
+export type DrawerControl =
     | {type: 'close'}
     | {type: 'copyLink'; link: string}
     | {type: 'custom'; node: React.ReactNode; key: string};
@@ -223,10 +223,12 @@ export const DrawerWrapper = ({
                 detectClickOutside={detectClickOutside}
                 isPercentageWidth={isPercentageWidth}
             >
-                <div className={b('content-wrapper')}>
-                    {renderDrawerHeader()}
-                    {renderDrawerContent()}
-                </div>
+                {isDrawerVisible ? (
+                    <div className={b('content-wrapper')}>
+                        {renderDrawerHeader()}
+                        {renderDrawerContent()}
+                    </div>
+                ) : null}
             </DrawerPaneContentWrapper>
         </React.Fragment>
     );
