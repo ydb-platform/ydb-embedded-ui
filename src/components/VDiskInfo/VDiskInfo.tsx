@@ -154,7 +154,11 @@ export function VDiskInfo<T extends PreparedVDisk>({
         const links: React.ReactNode[] = [];
 
         if (withVDiskPageLink) {
-            const vDiskPagePath = getVDiskPagePath(VDiskSlotId, PDiskId, NodeId);
+            const vDiskPagePath = getVDiskPagePath({
+                vDiskSlotId: VDiskSlotId,
+                pDiskId: PDiskId,
+                nodeId: NodeId,
+            });
             links.push(
                 <LinkWithIcon
                     key={vDiskPagePath}

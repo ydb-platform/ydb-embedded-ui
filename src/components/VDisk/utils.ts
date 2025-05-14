@@ -10,16 +10,17 @@ export function getVDiskLink(data: PreparedVDisk) {
         valueIsDefined(data.PDiskId) &&
         valueIsDefined(data.NodeId)
     ) {
-        vDiskPath = getVDiskPagePath(data.VDiskSlotId, data.PDiskId, data.NodeId);
+        vDiskPath = getVDiskPagePath({
+            vDiskSlotId: data.VDiskSlotId,
+            pDiskId: data.PDiskId,
+            nodeId: data.NodeId,
+        });
     } else if (valueIsDefined(data.StringifiedId)) {
-        vDiskPath = getVDiskPagePath(
-            undefined as unknown as string,
-            data.PDiskId as number,
-            data.NodeId as number,
-            {
-                vDiskId: data.StringifiedId,
-            },
-        );
+        vDiskPath = getVDiskPagePath({
+            vDiskId: data.StringifiedId,
+            pDiskId: data.PDiskId,
+            nodeId: data.NodeId,
+        });
     }
 
     return vDiskPath;

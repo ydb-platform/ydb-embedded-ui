@@ -81,7 +81,7 @@ function Slot<T extends SlotItemType>({item, pDiskId, nodeId}: SlotProps<T>) {
                 valueIsDefined(item.SlotData?.VDiskSlotId) &&
                 valueIsDefined(pDiskId) &&
                 valueIsDefined(nodeId)
-                    ? getVDiskPagePath(item.SlotData.VDiskSlotId, pDiskId, nodeId)
+                    ? getVDiskPagePath({vDiskSlotId: item.SlotData.VDiskSlotId, pDiskId, nodeId})
                     : undefined;
 
             return (
