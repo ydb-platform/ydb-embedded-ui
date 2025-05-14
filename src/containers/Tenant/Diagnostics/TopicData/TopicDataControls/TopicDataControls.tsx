@@ -99,7 +99,6 @@ export function TopicDataControls({
                 </Text>
             )}
             <TableColumnSetup
-                className={b('column-setup')}
                 popupWidth={242}
                 items={columnsToSelect}
                 showStatus
@@ -196,6 +195,7 @@ function TopicDataStartControls({scrollToOffset}: TopicDataStartControlsProps) {
                         <ActionTooltip title={i18n('action_scroll-selected')}>
                             <Button
                                 disabled={isNil(selectedOffset) || selectedOffset === ''}
+                                className={b('scroll-button')}
                                 view="flat-action"
                                 size="xs"
                                 onClick={() => {

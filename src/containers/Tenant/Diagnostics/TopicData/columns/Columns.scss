@@ -1,10 +1,6 @@
 @use '../../../../../styles/mixins.scss';
 
 .ydb-diagnostics-topic-data-columns {
-    &__timestamp-ms {
-        color: var(--g-color-text-secondary);
-    }
-
     &__ts-diff_danger {
         color: var(--g-color-text-danger);
     }
@@ -12,6 +8,20 @@
         cursor: pointer;
 
         color: var(--g-color-text-info);
+    }
+    &__offset {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--g-spacing-1);
+        .g-help-mark,
+        .g-help-mark__button {
+            display: flex;
+        }
+    }
+    &__offset_link {
+        width: 100%;
+        height: 100%;
+        @extend .link;
     }
     &__offset_removed {
         text-decoration: line-through;
@@ -21,7 +31,7 @@
     &__truncated {
         font-style: italic;
     }
-    &__offset-link {
-        @extend .link;
+    &__help {
+        white-space: pre-wrap;
     }
 }

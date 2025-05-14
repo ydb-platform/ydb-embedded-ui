@@ -1,13 +1,12 @@
 import type {TopicMessageEnhanced} from '../../../../../../types/api/topic';
 import {
+    TopicDataTimestamp,
     codecColumn,
     messageColumn,
     metadataColumn,
     originalSizeColumn,
     seqNoColumn,
     sizeColumn,
-    timestampCreateColumn,
-    timestampWriteColumn,
     tsDiffColumn,
     valueOrPlaceholder,
 } from '../../columns/columns';
@@ -34,6 +33,17 @@ const offsetColumn: TopicMessageDetailsField = {
     render: ({row}) => {
         return valueOrPlaceholder(row.Offset);
     },
+};
+
+const timestampCreateColumn: TopicMessageDetailsField = {
+    name: TOPIC_DATA_COLUMNS_IDS.TIMESTAMP_CREATE,
+    header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.TIMESTAMP_CREATE],
+    render: ({row}) => <TopicDataTimestamp timestamp={row.CreateTimestamp} />,
+};
+const timestampWriteColumn: TopicMessageDetailsField = {
+    name: TOPIC_DATA_COLUMNS_IDS.TIMESTAMP_WRITE,
+    header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.TIMESTAMP_WRITE],
+    render: ({row}) => <TopicDataTimestamp timestamp={row.WriteTimestamp} />,
 };
 
 const producerIdColumn: TopicMessageDetailsField = {

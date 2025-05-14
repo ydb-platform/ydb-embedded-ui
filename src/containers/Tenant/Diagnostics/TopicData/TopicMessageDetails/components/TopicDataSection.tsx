@@ -16,18 +16,18 @@ export function TopicDataSection({
     renderToolbar,
 }: TopicDataSectionProps) {
     return (
-        <div className={b('section', className)}>
+        <Flex direction="column" className={b('section', className)}>
             <Flex
                 className={b('section-title-wrapper')}
                 justifyContent="space-between"
                 alignItems="center"
             >
-                <Flex gap={4}>
-                    {title}
-                    {renderToolbar?.()}
-                </Flex>
+                {title}
+                {renderToolbar?.()}
             </Flex>
-            <div className={b('section-content')}>{children}</div>
-        </div>
+            <div className={b('section-content')}>
+                <div className={b('section-scroll-container')}>{children}</div>
+            </div>
+        </Flex>
     );
 }

@@ -285,6 +285,7 @@ export interface TopicMessage {
 
 export interface TopicMessageEnhanced extends TopicMessage {
     removed?: boolean;
+    notLoaded?: boolean;
 }
 
 export interface TopicMessageMetadataItem {

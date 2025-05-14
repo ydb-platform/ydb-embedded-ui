@@ -1,7 +1,7 @@
 import React from 'react';
 
 import DataTable from '@gravity-ui/react-data-table';
-import {Text} from '@gravity-ui/uikit';
+import {HelpMark, Text} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 import {Link} from 'react-router-dom';
 
@@ -32,9 +32,9 @@ export const offsetColumn: Column<TopicMessageEnhanced> = {
     header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.OFFSET],
     align: DataTable.LEFT,
     render: ({row}) => {
-        const {Offset: offset, removed} = row;
+        const {Offset: offset, removed, notLoaded} = row;
 
-        return <Offset offset={offset} removed={removed} />;
+        return <Offset offset={offset} removed={removed} notLoaded={notLoaded} />;
     },
     width: 100,
 };
@@ -47,7 +47,17 @@ export const timestampCreateColumn: Column<TopicMessageEnhanced> = {
         />
     ),
     align: DataTable.LEFT,
-    render: ({row}) => <TopicDataTimestamp timestamp={row.CreateTimestamp} />,
+    render: ({row: {CreateTimestamp}}) =>
+        CreateTimestamp ? (
+            <EntityStatus
+                showStatus={false}
+                renderName={() => <TopicDataTimestamp timestamp={CreateTimestamp} />}
+                name={formatTimestamp(CreateTimestamp)}
+                hasClipboardButton
+            />
+        ) : (
+            EMPTY_DATA_PLACEHOLDER
+        ),
     width: 220,
 };
 
@@ -59,7 +69,17 @@ export const timestampWriteColumn: Column<TopicMessageEnhanced> = {
         />
     ),
     align: DataTable.LEFT,
-    render: ({row}) => <TopicDataTimestamp timestamp={row.WriteTimestamp} />,
+    render: ({row: {WriteTimestamp}}) =>
+        WriteTimestamp ? (
+            <EntityStatus
+                showStatus={false}
+                renderName={() => <TopicDataTimestamp timestamp={WriteTimestamp} />}
+                name={formatTimestamp(WriteTimestamp)}
+                hasClipboardButton
+            />
+        ) : (
+            EMPTY_DATA_PLACEHOLDER
+        ),
     width: 220,
 };
 
@@ -167,7 +187,12 @@ export const producerIdColumn: Column<TopicMessageEnhanced> = {
     name: TOPIC_DATA_COLUMNS_IDS.PRODUCERID,
     header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.PRODUCERID],
     align: DataTable.LEFT,
-    render: ({row}) => <EntityStatus showStatus={false} name={row.ProducerId} hasClipboardButton />,
+    render: ({row}) =>
+        row.ProducerId ? (
+            <EntityStatus showStatus={false} name={row.ProducerId} hasClipboardButton />
+        ) : (
+            EMPTY_DATA_PLACEHOLDER
+        ),
     width: 100,
 };
 
@@ -208,7 +233,7 @@ export const REQUIRED_TOPIC_DATA_COLUMNS: TopicDataColumnId[] = ['offset'];
 interface TopicDataTimestampProps {
     timestamp?: string;
 }
-function TopicDataTimestamp({timestamp}: TopicDataTimestampProps) {
+export function TopicDataTimestamp({timestamp}: TopicDataTimestampProps) {
     if (!timestamp) {
         return EMPTY_DATA_PLACEHOLDER;
     }
@@ -216,10 +241,12 @@ function TopicDataTimestamp({timestamp}: TopicDataTimestampProps) {
     const splitted = formatted.split('.');
     const ms = splitted.pop();
     return (
-        <React.Fragment>
+        <Text variant="body-2">
             {splitted.join('.')}
-            <span className={b('timestamp-ms')}>.{ms}</span>
-        </React.Fragment>
+            <Text color="secondary" variant="body-2">
+                .{ms}
+            </Text>
+        </Text>
     );
 }
 
@@ -233,9 +260,10 @@ export function valueOrPlaceholder(
 interface PartitionIdProps {
     offset?: string | number;
     removed?: boolean;
+    notLoaded?: boolean;
 }
 
-function Offset({offset, removed}: PartitionIdProps) {
+function Offset({offset, removed, notLoaded}: PartitionIdProps) {
     const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
     const {handleActiveOffsetChange} = useTopicDataQueryParams();
 
@@ -247,6 +275,7 @@ function Offset({offset, removed}: PartitionIdProps) {
         return (
             <Text className={b('offset', {removed: true})} variant="body-2">
                 {offset}
+                <HelpMark>{i18n('description_removed-message')}</HelpMark>
             </Text>
         );
     }
@@ -265,10 +294,15 @@ function Offset({offset, removed}: PartitionIdProps) {
     };
 
     return (
-        <Link to={offsetLink} onClick={handleClick} className={b('offset-link')}>
+        <Link to={offsetLink} onClick={handleClick} className={b('offset', {link: true})}>
             <Text variant="body-2" color="info">
                 {offset}
             </Text>
+            {notLoaded && (
+                <HelpMark>
+                    <Text className={b('help')}>{i18n('description_not-loaded-message')}</Text>
+                </HelpMark>
+            )}
         </Link>
     );
 }

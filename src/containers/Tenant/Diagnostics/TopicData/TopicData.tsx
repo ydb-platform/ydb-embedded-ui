@@ -46,6 +46,7 @@ interface TopicDataProps {
     database: string;
     parentRef: React.RefObject<HTMLElement>;
 }
+const PAGINATED_TABLE_LIMIT = 50_000;
 
 const columns = getAllColumns();
 
@@ -106,19 +107,45 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
         {pollingInterval: autoRefreshInterval},
     );
 
+    const calculateBoundOffsets = React.useCallback(
+        ({startOffset, endOffset}: {startOffset: number; endOffset: number}) => {
+            const normolizedNewStartOffset = Math.max(
+                endOffset - PAGINATED_TABLE_LIMIT,
+                safeParseNumber(startOffset),
+            );
+            return {newStartOffset: normolizedNewStartOffset, newEndOffset: endOffset};
+        },
+        [],
+    );
+
     React.useEffect(() => {
         const selectedPartitionData = partitions?.find(
             ({partitionId}) => partitionId === selectedPartition,
         );
         if (selectedPartitionData) {
-            if (!baseOffset) {
-                setBaseOffset(safeParseNumber(selectedPartitionData.startOffset));
-            }
+            let endOffset = baseEndOffset;
             if (!baseEndOffset) {
-                setBaseEndOffset(safeParseNumber(selectedPartitionData.endOffset));
+                endOffset = safeParseNumber(selectedPartitionData.endOffset);
+                setBaseEndOffset(endOffset);
+            }
+            if (!baseOffset) {
+                const {newStartOffset} = calculateBoundOffsets({
+                    startOffset: safeParseNumber(selectedPartitionData.startOffset),
+                    endOffset: endOffset ?? 0,
+                });
+
+                setBaseOffset(newStartOffset);
             }
         }
-    }, [selectedPartition, partitions, baseOffset, baseEndOffset, startOffset, endOffset]);
+    }, [
+        selectedPartition,
+        partitions,
+        baseOffset,
+        baseEndOffset,
+        startOffset,
+        endOffset,
+        calculateBoundOffsets,
+    ]);
 
     React.useEffect(() => {
         if (partitions && partitions.length && isNil(selectedPartition)) {
@@ -137,6 +164,22 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
         REQUIRED_TOPIC_DATA_COLUMNS,
     );
 
+    const setBoundOffsets = React.useCallback(
+        ({startOffset, endOffset}: {startOffset: number; endOffset: number}) => {
+            const {newStartOffset, newEndOffset} = calculateBoundOffsets({
+                startOffset,
+                endOffset,
+            });
+            const normolizedNewStartOffset = Math.max(
+                newEndOffset - PAGINATED_TABLE_LIMIT,
+                safeParseNumber(newStartOffset),
+            );
+            setStartOffset(normolizedNewStartOffset);
+            setEndOffset(newEndOffset);
+        },
+        [calculateBoundOffsets],
+    );
+
     React.useEffect(() => {
         //values should be recalculated only when data is fetched
         if (isFetching || (!currentData && !error)) {
@@ -148,10 +191,12 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
             setEmptyData(true);
         }
         if (currentData) {
-            setStartOffset(safeParseNumber(currentData.StartOffset));
-            setEndOffset(safeParseNumber(currentData.EndOffset));
+            setBoundOffsets({
+                startOffset: safeParseNumber(currentData.StartOffset),
+                endOffset: safeParseNumber(currentData.EndOffset),
+            });
         }
-    }, [isFetching, currentData, error]);
+    }, [isFetching, currentData, error, setBoundOffsets]);
 
     const tableFilters = React.useMemo(
         () => ({
@@ -238,8 +283,8 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
     };
 
     const getTopicData = React.useMemo(
-        () => generateTopicDataGetter({setEndOffset, setStartOffset, baseOffset}),
-        [baseOffset],
+        () => generateTopicDataGetter({setBoundOffsets, baseOffset}),
+        [baseOffset, setBoundOffsets],
     );
 
     const closeDrawer = React.useCallback(() => {

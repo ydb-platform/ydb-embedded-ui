@@ -17,9 +17,6 @@
     &__offset-input {
         width: max-content;
     }
-    &__column-setup {
-        margin-left: auto;
-    }
 
     &__row {
         &_active {
@@ -32,5 +29,8 @@
         &_removed {
             color: var(--g-color-text-secondary);
         }
+    }
+    &__scroll-button {
+        margin-right: var(--g-spacing-half);
     }
 }

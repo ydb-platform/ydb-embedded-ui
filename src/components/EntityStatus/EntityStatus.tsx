@@ -16,6 +16,7 @@ const b = cn('entity-status');
 interface EntityStatusProps {
     status?: EFlag;
     name?: string;
+    renderName?: (name?: string) => React.ReactNode;
     label?: string;
     path?: string;
     iconPath?: string;
@@ -34,9 +35,14 @@ interface EntityStatusProps {
     className?: string;
 }
 
+function defaultRenderName(name?: string) {
+    return name ?? '';
+}
+
 export function EntityStatus({
     status = EFlag.Grey,
     name = '',
+    renderName = defaultRenderName,
     label,
     path,
     iconPath,
@@ -75,14 +81,14 @@ export function EntityStatus({
             if (externalLink) {
                 return (
                     <UIKitLink className={b('name')} href={path}>
-                        {name}
+                        {renderName(name)}
                     </UIKitLink>
                 );
             }
 
             return (
                 <InternalLink className={b('name')} to={path}>
-                    {name}
+                    {renderName(name)}
                 </InternalLink>
             );
         }

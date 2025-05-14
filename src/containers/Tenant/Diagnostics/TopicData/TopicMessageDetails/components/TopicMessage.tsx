@@ -68,7 +68,7 @@ export function TopicMessage({offset, size, message}: TopicMessageProps) {
     ) : (
         <div className={b('string-message')}>
             {/* key is used to reset string's state when toggle fullscreen: otherwise if very long string is expanded, it may be performance issues on open fullscreen mode https://github.com/ydb-platform/ydb-embedded-ui/issues/2265  */}
-            <ShortyString key={String(isFullscreen)} value={preparedMessage} limit={1000} />
+            <ShortyString key={String(isFullscreen)} value={preparedMessage} limit={2000} />
         </div>
     );
 
@@ -100,7 +100,7 @@ export function TopicMessage({offset, size, message}: TopicMessageProps) {
         <TopicDataSection
             title={<MessageTitle truncated={truncated} />}
             renderToolbar={renderToolbar}
-            className={b('message', {json: isJson})}
+            className={b('message')}
         >
             {messageContent}
         </TopicDataSection>

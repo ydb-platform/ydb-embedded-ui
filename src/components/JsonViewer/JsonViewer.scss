@@ -4,6 +4,8 @@
     --data-table-row-height: 20px;
     --toolbar-background-color: var(--g-color-base-background);
 
+    width: max-content;
+
     &__toolbar {
         position: sticky;
         z-index: 2;

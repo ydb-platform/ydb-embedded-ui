@@ -1,27 +1,38 @@
 import {DefinitionList, Flex} from '@gravity-ui/uikit';
 
 import type {TopicMessage} from '../../../../../../types/api/topic';
+import type {ValueOf} from '../../../../../../types/common';
+import {formatTimestamp} from '../../../../../../utils/dataFormatters/dataFormatters';
 import {TOPIC_DATA_COLUMNS_IDS} from '../../utils/types';
 import {b} from '../shared';
 
 import {fields} from './fields';
 
-const dataGroups = [
+const dataGroups: {
+    name: ValueOf<typeof TOPIC_DATA_COLUMNS_IDS>;
+    copy?: (row: TopicMessage) => string | undefined;
+}[][] = [
     [
-        {name: TOPIC_DATA_COLUMNS_IDS.PARTITION, copy: false},
-        {name: TOPIC_DATA_COLUMNS_IDS.OFFSET, copy: false},
-        {name: TOPIC_DATA_COLUMNS_IDS.SIZE, copy: false},
+        {name: TOPIC_DATA_COLUMNS_IDS.PARTITION},
+        {name: TOPIC_DATA_COLUMNS_IDS.OFFSET},
+        {name: TOPIC_DATA_COLUMNS_IDS.SIZE},
     ],
     [
-        {name: TOPIC_DATA_COLUMNS_IDS.TIMESTAMP_CREATE, copy: false},
-        {name: TOPIC_DATA_COLUMNS_IDS.TIMESTAMP_WRITE, copy: false},
-        {name: TOPIC_DATA_COLUMNS_IDS.TS_DIFF, copy: false},
+        {
+            name: TOPIC_DATA_COLUMNS_IDS.TIMESTAMP_CREATE,
+            copy: (row) => formatTimestamp(row.CreateTimestamp),
+        },
+        {
+            name: TOPIC_DATA_COLUMNS_IDS.TIMESTAMP_WRITE,
+            copy: (row) => formatTimestamp(row.WriteTimestamp),
+        },
+        {name: TOPIC_DATA_COLUMNS_IDS.TS_DIFF},
     ],
     [
-        {name: TOPIC_DATA_COLUMNS_IDS.ORIGINAL_SIZE, copy: false},
-        {name: TOPIC_DATA_COLUMNS_IDS.CODEC, copy: false},
-        {name: TOPIC_DATA_COLUMNS_IDS.PRODUCERID, copy: true},
-        {name: TOPIC_DATA_COLUMNS_IDS.SEQNO, copy: false},
+        {name: TOPIC_DATA_COLUMNS_IDS.ORIGINAL_SIZE},
+        {name: TOPIC_DATA_COLUMNS_IDS.CODEC},
+        {name: TOPIC_DATA_COLUMNS_IDS.PRODUCERID, copy: (row) => row.ProducerId},
+        {name: TOPIC_DATA_COLUMNS_IDS.SEQNO},
     ],
 ];
 
@@ -35,12 +46,13 @@ export function TopicMessageGeneralInfo({messageData}: TopicMessageGeneralInfoPr
             {dataGroups.map((group, index) => (
                 <DefinitionList className={b('list')} nameMaxWidth={200} key={index}>
                     {group.map((item) => {
-                        const column = fields.find((c) => c.name === item.name);
+                        const column = fields.find((f) => f.name === item.name);
+                        const copyText = item.copy?.(messageData);
                         return (
                             <DefinitionList.Item
                                 key={item.name}
                                 name={column?.header}
-                                copyText={item.copy ? item.name : undefined}
+                                copyText={copyText}
                             >
                                 {column?.render?.({row: messageData})}
                             </DefinitionList.Item>

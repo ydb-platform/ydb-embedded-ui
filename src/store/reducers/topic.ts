@@ -8,7 +8,7 @@ import type {RootState} from '../defaultStore';
 
 import {api} from './api';
 
-export const TOPIC_MESSAGE_SIZE_LIMIT = 1000;
+export const TOPIC_MESSAGE_SIZE_LIMIT = 100;
 
 export const topicApi = api.injectEndpoints({
     endpoints: (build) => ({
