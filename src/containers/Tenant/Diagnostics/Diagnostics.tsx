@@ -13,7 +13,7 @@ import {
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../types/additionalProps';
-import type {EPathType} from '../../../types/api/schema';
+import type {EPathSubType, EPathType} from '../../../types/api/schema';
 import {cn} from '../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {Heatmap} from '../../Heatmap';
@@ -40,6 +40,7 @@ import './Diagnostics.scss';
 
 interface DiagnosticsProps {
     type?: EPathType;
+    subType?: EPathSubType;
     tenantName: string;
     path: string;
     additionalTenantProps?: AdditionalTenantsProps;
@@ -62,7 +63,7 @@ function Diagnostics(props: DiagnosticsProps) {
 
     const hasFeatureFlags = useFeatureFlagsAvailable();
     const hasTopicData = useTopicDataAvailable();
-    const pages = getPagesByType(props.type, {
+    const pages = getPagesByType(props.type, props.subType, {
         hasFeatureFlags,
         hasTopicData,
         isTopLevel: props.path === props.tenantName,
@@ -129,7 +130,7 @@ function Diagnostics(props: DiagnosticsProps) {
                 );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.describe: {
-                return <Describe path={path} database={tenantName} type={type} />;
+                return <Describe path={path} database={tenantName} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.hotKeys: {
                 return <HotKeys path={path} database={tenantName} />;
