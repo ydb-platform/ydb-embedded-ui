@@ -121,12 +121,16 @@ export function getPDiskPagePath(
 }
 
 export function getVDiskPagePath(
-    vDiskSlotId: string | number,
-    pDiskId: string | number,
-    nodeId: string | number,
+    params:
+        | {
+              vDiskSlotId: string | number;
+              pDiskId: string | number;
+              nodeId: string | number;
+          }
+        | {vDiskId: string; pDiskId?: string | number; nodeId?: string | number},
     query: Query = {},
 ) {
-    return createHref(routes.vDisk, undefined, {...query, nodeId, pDiskId, vDiskSlotId});
+    return createHref(routes.vDisk, undefined, {...query, ...params});
 }
 
 export function getStorageGroupPath(groupId: string | number, query: Query = {}) {

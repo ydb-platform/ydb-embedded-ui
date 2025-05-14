@@ -1,31 +1,26 @@
-import {getDefaultNodePath} from '../../containers/Node/NodePages';
 import {getVDiskPagePath} from '../../routes';
-import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
 import {valueIsDefined} from '../../utils';
-import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
-import {isFullVDiskData} from '../../utils/disks/helpers';
+import type {PreparedVDisk} from '../../utils/disks/types';
 
-export function getVDiskLink(data: TVDiskStateInfo | TVSlotId) {
+export function getVDiskLink(data: PreparedVDisk) {
     let vDiskPath: string | undefined;
 
-    const isFullData = isFullVDiskData(data);
-    const VDiskSlotId = isFullData ? data.VDiskSlotId : data.VSlotId;
-
     if (
-        valueIsDefined(VDiskSlotId) &&
+        valueIsDefined(data.VDiskSlotId) &&
         valueIsDefined(data.PDiskId) &&
         valueIsDefined(data.NodeId)
     ) {
-        vDiskPath = getVDiskPagePath(VDiskSlotId, data.PDiskId, data.NodeId);
-    } else if (valueIsDefined(data.NodeId) && isFullVDiskData(data)) {
-        vDiskPath = getDefaultNodePath(
-            data.NodeId,
-            {
-                pdiskId: data.PDiskId?.toString(),
-                vdiskId: stringifyVdiskId(data.VDiskId),
-            },
-            'structure',
-        );
+        vDiskPath = getVDiskPagePath({
+            vDiskSlotId: data.VDiskSlotId,
+            pDiskId: data.PDiskId,
+            nodeId: data.NodeId,
+        });
+    } else if (valueIsDefined(data.StringifiedId)) {
+        vDiskPath = getVDiskPagePath({
+            vDiskId: data.StringifiedId,
+            pDiskId: data.PDiskId,
+            nodeId: data.NodeId,
+        });
     }
 
     return vDiskPath;
