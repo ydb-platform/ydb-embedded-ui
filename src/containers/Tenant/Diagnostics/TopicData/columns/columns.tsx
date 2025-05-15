@@ -200,8 +200,13 @@ export const seqNoColumn: Column<TopicMessageEnhanced> = {
     name: TOPIC_DATA_COLUMNS_IDS.SEQNO,
     header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.SEQNO],
     align: DataTable.RIGHT,
-    render: ({row}) => valueOrPlaceholder(row.SeqNo),
-    width: 70,
+    render: ({row}) =>
+        row.SeqNo ? (
+            <EntityStatus showStatus={false} name={row.SeqNo} hasClipboardButton />
+        ) : (
+            EMPTY_DATA_PLACEHOLDER
+        ),
+    width: 100,
 };
 
 export function getAllColumns() {
@@ -248,13 +253,6 @@ export function TopicDataTimestamp({timestamp}: TopicDataTimestampProps) {
             </Text>
         </Text>
     );
-}
-
-export function valueOrPlaceholder(
-    value: string | number | undefined,
-    placeholder = EMPTY_DATA_PLACEHOLDER,
-) {
-    return isNil(value) ? placeholder : value;
 }
 
 interface PartitionIdProps {

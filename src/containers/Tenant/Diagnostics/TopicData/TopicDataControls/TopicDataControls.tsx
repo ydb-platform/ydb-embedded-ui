@@ -8,6 +8,8 @@ import type {TableColumnSetupItem} from '@gravity-ui/uikit';
 import {
     ActionTooltip,
     Button,
+    Flex,
+    HelpMark,
     Icon,
     RadioButton,
     Select,
@@ -37,6 +39,7 @@ interface TopicDataControlsProps {
 
     startOffset?: number;
     endOffset?: number;
+    truncatedData?: boolean;
     scrollToOffset: (offset: number) => void;
 }
 
@@ -50,6 +53,7 @@ export function TopicDataControls({
     partitionsLoading,
     partitionsError,
     scrollToOffset,
+    truncatedData,
 }: TopicDataControlsProps) {
     const {
         selectedPartition,
@@ -94,9 +98,12 @@ export function TopicDataControls({
             <TopicDataStartControls scrollToOffset={scrollToOffset} />
 
             {!isNil(startOffset) && !isNil(endOffset) && (
-                <Text color="secondary" whiteSpace="nowrap">
-                    {formatNumber(startOffset)}—{formatNumber(endOffset - 1)}
-                </Text>
+                <Flex gap={1}>
+                    <Text color="secondary" whiteSpace="nowrap">
+                        {formatNumber(startOffset)}—{formatNumber(endOffset - 1)}
+                    </Text>
+                    {truncatedData && <HelpMark>{i18n('description_last-messages')}</HelpMark>}
+                </Flex>
             )}
             <TableColumnSetup
                 popupWidth={242}

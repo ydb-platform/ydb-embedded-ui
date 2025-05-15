@@ -58,6 +58,7 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
     const [emptyData, setEmptyData] = React.useState(false);
 
     const [baseOffset, setBaseOffset] = React.useState<number>();
+    const [truncated, setTruncated] = React.useState(false);
     const [baseEndOffset, setBaseEndOffset] = React.useState<number>();
 
     const startRef = React.useRef<number>();
@@ -107,17 +108,6 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
         {pollingInterval: autoRefreshInterval},
     );
 
-    const calculateBoundOffsets = React.useCallback(
-        ({startOffset, endOffset}: {startOffset: number; endOffset: number}) => {
-            const normolizedNewStartOffset = Math.max(
-                endOffset - PAGINATED_TABLE_LIMIT,
-                safeParseNumber(startOffset),
-            );
-            return {newStartOffset: normolizedNewStartOffset, newEndOffset: endOffset};
-        },
-        [],
-    );
-
     React.useEffect(() => {
         const selectedPartitionData = partitions?.find(
             ({partitionId}) => partitionId === selectedPartition,
@@ -129,23 +119,17 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
                 setBaseEndOffset(endOffset);
             }
             if (!baseOffset) {
-                const {newStartOffset} = calculateBoundOffsets({
-                    startOffset: safeParseNumber(selectedPartitionData.startOffset),
-                    endOffset: endOffset ?? 0,
-                });
+                const partitionStartOffset = safeParseNumber(selectedPartitionData.startOffset);
+                const newStartOffset = Math.max(
+                    (endOffset ?? 0) - PAGINATED_TABLE_LIMIT,
+                    partitionStartOffset,
+                );
 
+                setTruncated(newStartOffset !== partitionStartOffset);
                 setBaseOffset(newStartOffset);
             }
         }
-    }, [
-        selectedPartition,
-        partitions,
-        baseOffset,
-        baseEndOffset,
-        startOffset,
-        endOffset,
-        calculateBoundOffsets,
-    ]);
+    }, [selectedPartition, partitions, baseOffset, baseEndOffset, startOffset, endOffset]);
 
     React.useEffect(() => {
         if (partitions && partitions.length && isNil(selectedPartition)) {
@@ -166,18 +150,10 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
 
     const setBoundOffsets = React.useCallback(
         ({startOffset, endOffset}: {startOffset: number; endOffset: number}) => {
-            const {newStartOffset, newEndOffset} = calculateBoundOffsets({
-                startOffset,
-                endOffset,
-            });
-            const normolizedNewStartOffset = Math.max(
-                newEndOffset - PAGINATED_TABLE_LIMIT,
-                safeParseNumber(newStartOffset),
-            );
-            setStartOffset(normolizedNewStartOffset);
-            setEndOffset(newEndOffset);
+            setStartOffset(startOffset);
+            setEndOffset(endOffset);
         },
-        [calculateBoundOffsets],
+        [],
     );
 
     React.useEffect(() => {
@@ -263,6 +239,7 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
                 partitionsError={partitionsError}
                 startOffset={startOffset}
                 endOffset={endOffset}
+                truncatedData={truncated}
                 scrollToOffset={scrollToOffset}
             />
         );

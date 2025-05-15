@@ -1,18 +1,26 @@
+import {isNil} from 'lodash';
+
 import type {TopicMessageEnhanced} from '../../../../../../types/api/topic';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../../../utils/constants';
 import {
     TopicDataTimestamp,
     codecColumn,
     messageColumn,
     metadataColumn,
     originalSizeColumn,
-    seqNoColumn,
     sizeColumn,
     tsDiffColumn,
-    valueOrPlaceholder,
 } from '../../columns/columns';
 import {useTopicDataQueryParams} from '../../useTopicDataQueryParams';
 import {TOPIC_DATA_COLUMNS_TITLES} from '../../utils/constants';
 import {TOPIC_DATA_COLUMNS_IDS} from '../../utils/types';
+
+function valueOrPlaceholder(
+    value: string | number | undefined,
+    placeholder = EMPTY_DATA_PLACEHOLDER,
+) {
+    return isNil(value) ? placeholder : value;
+}
 
 type TopicMessageDetailsField = {
     name: string;
@@ -51,6 +59,13 @@ const producerIdColumn: TopicMessageDetailsField = {
     header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.PRODUCERID],
     render: ({row}) => {
         return valueOrPlaceholder(row.ProducerId);
+    },
+};
+const seqNoColumn: TopicMessageDetailsField = {
+    name: TOPIC_DATA_COLUMNS_IDS.SEQNO,
+    header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.SEQNO],
+    render: ({row}) => {
+        return valueOrPlaceholder(row.SeqNo);
     },
 };
 
