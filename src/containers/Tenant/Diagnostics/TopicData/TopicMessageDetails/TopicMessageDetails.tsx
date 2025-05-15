@@ -42,7 +42,7 @@ export function TopicMessageDetails({database, path}: TopicMessageDetailsProps) 
         };
         const parsedOffset = safeParseNumber(activeOffset);
         params.offset = parsedOffset;
-        params.last_offset = parsedOffset;
+        params.last_offset = parsedOffset + 1;
         return params;
     }, [selectedPartition, activeOffset, database, path]);
 
