@@ -226,7 +226,7 @@ function NodePageContent({
                 return (
                     <PaginatedStorage
                         nodeId={nodeId}
-                        parentRef={parentContainer}
+                        scrollContainerRef={parentContainer}
                         viewContext={{
                             nodeId: nodeId,
                         }}

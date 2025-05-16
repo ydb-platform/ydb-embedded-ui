@@ -1,8 +1,8 @@
 import React from 'react';
 
 import {Illustration} from '../../components/Illustration';
-import type {RenderControls} from '../../components/PaginatedTable';
 import {ResizeablePaginatedTable} from '../../components/PaginatedTable';
+import type {PaginatedTableState} from '../../components/PaginatedTable/types';
 import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../components/nodesColumns/constants';
 import type {NodesFilters, NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import type {ProblemFilterValue} from '../../store/reducers/settings/types';
@@ -28,10 +28,11 @@ interface NodesTableProps {
     filterGroupBy?: NodesGroupByField;
 
     columns: Column<NodesPreparedEntity>[];
-    parentRef: React.RefObject<HTMLElement>;
+    scrollContainerRef: React.RefObject<HTMLElement>;
+    tableContainerRef: React.RefObject<HTMLDivElement>;
 
-    renderControls?: RenderControls;
     initialEntitiesCount?: number;
+    onStateChange?: (state: PaginatedTableState) => void;
 }
 
 export function NodesTable({
@@ -44,9 +45,10 @@ export function NodesTable({
     filterGroup,
     filterGroupBy,
     columns,
-    parentRef,
-    renderControls,
+    scrollContainerRef,
+    tableContainerRef,
     initialEntitiesCount,
+    onStateChange,
 }: NodesTableProps) {
     const tableFilters: NodesFilters = React.useMemo(() => {
         return {
@@ -81,11 +83,12 @@ export function NodesTable({
     return (
         <ResizeablePaginatedTable
             columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
-            parentRef={parentRef}
+            scrollContainerRef={scrollContainerRef}
+            tableContainerRef={tableContainerRef}
             columns={columns}
             fetchData={getNodes}
             initialEntitiesCount={initialEntitiesCount}
-            renderControls={renderControls}
+            onStateChange={onStateChange}
             renderErrorMessage={renderPaginatedTableErrorMessage}
             renderEmptyDataMessage={renderEmptyDataMessage}
             getRowClassName={getRowClassName}

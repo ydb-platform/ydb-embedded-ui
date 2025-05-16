@@ -18,14 +18,14 @@ interface TableGroupProps {
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
 }
 
-export function TableGroup({
+export const TableGroup = ({
     children,
     title,
     entityName,
     count,
     expanded = false,
     onIsExpandedChange,
-}: TableGroupProps) {
+}: TableGroupProps) => {
     const toggleCollapsed = () => {
         onIsExpandedChange(title, !expanded);
     };
@@ -60,4 +60,6 @@ export function TableGroup({
             {renderContent()}
         </div>
     );
-}
+};
+
+TableGroup.displayName = 'TableGroup';

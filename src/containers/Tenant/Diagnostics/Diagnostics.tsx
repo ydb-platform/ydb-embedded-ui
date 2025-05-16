@@ -108,7 +108,7 @@ function Diagnostics(props: DiagnosticsProps) {
                         path={path}
                         database={tenantName}
                         additionalNodesProps={props.additionalNodesProps}
-                        parentRef={containerRef}
+                        scrollContainerRef={containerRef}
                     />
                 );
             }
@@ -116,7 +116,7 @@ function Diagnostics(props: DiagnosticsProps) {
                 return <Tablets path={path} database={tenantName} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.storage: {
-                return <PaginatedStorage database={tenantName} parentRef={containerRef} />;
+                return <PaginatedStorage database={tenantName} scrollContainerRef={containerRef} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.network: {
                 return (
@@ -124,7 +124,7 @@ function Diagnostics(props: DiagnosticsProps) {
                         path={path}
                         database={tenantName}
                         additionalNodesProps={props.additionalNodesProps}
-                        parentRef={containerRef}
+                        scrollContainerRef={containerRef}
                     />
                 );
             }
@@ -149,7 +149,7 @@ function Diagnostics(props: DiagnosticsProps) {
                         key={path}
                         path={path}
                         database={tenantName}
-                        parentRef={containerRef}
+                        scrollContainerRef={containerRef}
                     />
                 );
             }

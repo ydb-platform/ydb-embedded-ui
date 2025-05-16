@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {LoaderWrapper} from '../../../components/LoaderWrapper/LoaderWrapper';
-import type {RenderControls, RenderErrorMessage} from '../../../components/PaginatedTable';
+import type {RenderErrorMessage} from '../../../components/PaginatedTable';
 import {ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import {
     useCapabilitiesLoaded,
@@ -32,8 +32,8 @@ interface PaginatedStorageGroupsTableProps {
     visibleEntities: VisibleEntities;
     onShowAll: VoidFunction;
 
-    parentRef: React.RefObject<HTMLElement>;
-    renderControls?: RenderControls;
+    scrollContainerRef: React.RefObject<HTMLElement>;
+    tableContainerRef: React.RefObject<HTMLDivElement>;
     renderErrorMessage: RenderErrorMessage;
     initialEntitiesCount?: number;
 }
@@ -49,8 +49,8 @@ export const PaginatedStorageGroupsTable = ({
     searchValue,
     visibleEntities,
     onShowAll,
-    parentRef,
-    renderControls,
+    scrollContainerRef,
+    tableContainerRef,
     renderErrorMessage,
     initialEntitiesCount,
 }: PaginatedStorageGroupsTableProps) => {
@@ -98,11 +98,11 @@ export const PaginatedStorageGroupsTable = ({
         <LoaderWrapper loading={!capabilitiesLoaded}>
             <ResizeablePaginatedTable
                 columnsWidthLSKey={STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY}
-                parentRef={parentRef}
+                scrollContainerRef={scrollContainerRef}
+                tableContainerRef={tableContainerRef}
                 columns={columns}
                 fetchData={fetchData}
                 initialEntitiesCount={initialEntitiesCount}
-                renderControls={renderControls}
                 renderErrorMessage={renderErrorMessage}
                 renderEmptyDataMessage={renderEmptyDataMessage}
                 filters={tableFilters}

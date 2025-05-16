@@ -2,7 +2,10 @@ import React from 'react';
 
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
-import type {RenderControls} from '../../components/PaginatedTable';
+import {
+    PaginatedTableProvider,
+    usePaginatedTableState,
+} from '../../components/PaginatedTable/PaginatedTableContext';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {
     useCapabilitiesLoaded,
@@ -30,7 +33,34 @@ import {useStorageColumnsSettings} from './utils';
 
 import './Storage.scss';
 
-export const PaginatedStorageNodes = (props: PaginatedStorageProps) => {
+// Wrapper component to connect StorageNodesControls with the PaginatedTable state
+function StorageNodesControlsWithTableState({
+    withTypeSelector,
+    withGroupBySelect,
+    columnsToSelect,
+    handleSelectedColumnsUpdate,
+}: {
+    withTypeSelector?: boolean;
+    withGroupBySelect?: boolean;
+    columnsToSelect: any[];
+    handleSelectedColumnsUpdate: (updated: any[]) => void;
+}) {
+    const {tableState} = usePaginatedTableState();
+
+    return (
+        <StorageNodesControls
+            withTypeSelector={withTypeSelector}
+            withGroupBySelect={withGroupBySelect}
+            entitiesCountCurrent={tableState.foundEntities}
+            entitiesCountTotal={tableState.totalEntities}
+            entitiesLoading={tableState.isInitialLoad}
+            columnsToSelect={columnsToSelect}
+            handleSelectedColumnsUpdate={handleSelectedColumnsUpdate}
+        />
+    );
+}
+
+export function PaginatedStorageNodes(props: PaginatedStorageProps) {
     const {storageNodesGroupByParam, visibleEntities, nodesUptimeFilter, handleShowAllNodes} =
         useStorageQueryParams();
 
@@ -57,18 +87,83 @@ export const PaginatedStorageNodes = (props: PaginatedStorageProps) => {
     };
 
     return <LoaderWrapper loading={!capabilitiesLoaded}>{renderContent()}</LoaderWrapper>;
-};
+}
+
+interface StorageNodeGroupProps {
+    name: string;
+    count: number;
+    isExpanded: boolean;
+    database?: string;
+    nodeId?: string | number;
+    groupId?: string | number;
+    searchValue: string;
+    visibleEntities: 'all';
+    filterGroupBy?: NodesGroupByField;
+    columns: any[];
+    tableContainerRef: React.RefObject<HTMLDivElement>;
+    scrollContainerRef: React.RefObject<HTMLElement>;
+    onIsExpandedChange: (name: string, isExpanded: boolean) => void;
+    handleShowAllNodes: VoidFunction;
+    onDataFetched: (data: any) => void;
+}
+
+const StorageNodeGroup = React.memo(function StorageNodeGroup({
+    name,
+    count,
+    isExpanded,
+    database,
+    nodeId,
+    groupId,
+    searchValue,
+    scrollContainerRef,
+    filterGroupBy,
+    columns,
+    tableContainerRef,
+    onIsExpandedChange,
+    handleShowAllNodes,
+    onDataFetched,
+}: StorageNodeGroupProps) {
+    return (
+        <TableGroup
+            key={name}
+            title={name}
+            count={count}
+            entityName={i18n('nodes')}
+            expanded={isExpanded}
+            onIsExpandedChange={onIsExpandedChange}
+        >
+            <PaginatedStorageNodesTable
+                database={database}
+                scrollContainerRef={scrollContainerRef}
+                tableContainerRef={tableContainerRef}
+                nodeId={nodeId}
+                groupId={groupId}
+                filterGroup={name}
+                filterGroupBy={filterGroupBy}
+                searchValue={searchValue}
+                visibleEntities={'all'}
+                nodesUptimeFilter={NodesUptimeFilterValues.All}
+                onShowAll={handleShowAllNodes}
+                renderErrorMessage={renderPaginatedTableErrorMessage}
+                columns={columns}
+                initialEntitiesCount={count}
+                onDataFetched={onDataFetched}
+            />
+        </TableGroup>
+    );
+});
 
 function StorageNodesComponent({
     database,
     nodeId,
     groupId,
     viewContext,
-    parentRef,
+    scrollContainerRef,
     initialEntitiesCount,
 }: PaginatedStorageProps) {
     const {searchValue, visibleEntities, nodesUptimeFilter, handleShowAllNodes} =
         useStorageQueryParams();
+    const tableContainerRef = React.useRef<HTMLDivElement>(null);
 
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
 
@@ -80,36 +175,36 @@ function StorageNodesComponent({
         columnsSettings,
     });
 
-    const renderControls: RenderControls = ({totalEntities, foundEntities, inited}) => {
-        return (
-            <StorageNodesControls
-                withTypeSelector
-                withGroupBySelect={viewerNodesHandlerHasGrouping}
-                entitiesCountCurrent={foundEntities}
-                entitiesCountTotal={totalEntities}
-                entitiesLoading={!inited}
-                columnsToSelect={columnsToSelect}
-                handleSelectedColumnsUpdate={setColumns}
-            />
-        );
-    };
-
     return (
-        <PaginatedStorageNodesTable
-            database={database}
-            nodeId={nodeId}
-            groupId={groupId}
-            searchValue={searchValue}
-            visibleEntities={visibleEntities}
-            nodesUptimeFilter={nodesUptimeFilter}
-            onShowAll={handleShowAllNodes}
-            parentRef={parentRef}
-            renderControls={renderControls}
-            renderErrorMessage={renderPaginatedTableErrorMessage}
-            columns={columnsToShow}
-            initialEntitiesCount={initialEntitiesCount}
-            onDataFetched={handleDataFetched}
-        />
+        <PaginatedTableProvider>
+            <TableWithControlsLayout>
+                <TableWithControlsLayout.Controls>
+                    <StorageNodesControlsWithTableState
+                        withTypeSelector
+                        withGroupBySelect={viewerNodesHandlerHasGrouping}
+                        columnsToSelect={columnsToSelect}
+                        handleSelectedColumnsUpdate={setColumns}
+                    />
+                </TableWithControlsLayout.Controls>
+                <TableWithControlsLayout.Table ref={tableContainerRef}>
+                    <PaginatedStorageNodesTable
+                        tableContainerRef={tableContainerRef}
+                        database={database}
+                        nodeId={nodeId}
+                        groupId={groupId}
+                        searchValue={searchValue}
+                        visibleEntities={visibleEntities}
+                        nodesUptimeFilter={nodesUptimeFilter}
+                        onShowAll={handleShowAllNodes}
+                        scrollContainerRef={scrollContainerRef}
+                        renderErrorMessage={renderPaginatedTableErrorMessage}
+                        columns={columnsToShow}
+                        initialEntitiesCount={initialEntitiesCount}
+                        onDataFetched={handleDataFetched}
+                    />
+                </TableWithControlsLayout.Table>
+            </TableWithControlsLayout>
+        </PaginatedTableProvider>
     );
 }
 
@@ -118,15 +213,18 @@ function GroupedStorageNodesComponent({
     groupId,
     nodeId,
     viewContext,
-    parentRef,
+    scrollContainerRef,
 }: PaginatedStorageProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
+    const tableContainerRef = React.useRef<HTMLDivElement>(null);
 
     const {searchValue, storageNodesGroupByParam, handleShowAllNodes} = useStorageQueryParams();
 
-    const {columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
+    const {handleDataFetched, columnsSettings} = useStorageColumnsSettings();
+    const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
         database,
         viewContext,
+        columnsSettings,
     });
 
     const {currentData, isFetching, error} = storageApi.useGetStorageNodesInfoQuery(
@@ -148,19 +246,16 @@ function GroupedStorageNodesComponent({
 
     const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
 
-    const renderControls = () => {
-        return (
-            <StorageNodesControls
-                withTypeSelector
-                withGroupBySelect
-                entitiesCountCurrent={found}
-                entitiesCountTotal={total}
-                entitiesLoading={isLoading}
-                columnsToSelect={columnsToSelect}
-                handleSelectedColumnsUpdate={setColumns}
-            />
-        );
-    };
+    // Initialize the table state with the API data
+    const initialState = React.useMemo(
+        () => ({
+            foundEntities: found,
+            totalEntities: total,
+            isInitialLoad: isLoading,
+            sortParams: undefined,
+        }),
+        [found, total, isLoading],
+    );
 
     const renderGroups = () => {
         if (tableGroups?.length) {
@@ -168,26 +263,24 @@ function GroupedStorageNodesComponent({
                 const isExpanded = expandedGroups[name];
 
                 return (
-                    <TableGroup
+                    <StorageNodeGroup
                         key={name}
-                        title={name}
+                        name={name}
                         count={count}
-                        entityName={i18n('nodes')}
-                        expanded={isExpanded}
+                        isExpanded={isExpanded}
+                        database={database}
+                        nodeId={nodeId}
+                        groupId={groupId}
+                        searchValue={searchValue}
+                        visibleEntities="all"
+                        filterGroupBy={storageNodesGroupByParam}
+                        scrollContainerRef={scrollContainerRef}
                         onIsExpandedChange={setIsGroupExpanded}
-                    >
-                        <StorageNodesTableGroupContent
-                            database={database}
-                            parentRef={parentRef}
-                            nodeId={nodeId}
-                            groupId={groupId}
-                            searchValue={searchValue}
-                            handleShowAllNodes={handleShowAllNodes}
-                            filterGroup={name}
-                            filterGroupBy={storageNodesGroupByParam}
-                            initialEntitiesCount={count}
-                        />
-                    </TableGroup>
+                        handleShowAllNodes={handleShowAllNodes}
+                        columns={columnsToShow}
+                        tableContainerRef={tableContainerRef}
+                        onDataFetched={handleDataFetched}
+                    />
                 );
             });
         }
@@ -196,65 +289,26 @@ function GroupedStorageNodesComponent({
     };
 
     return (
-        <TableWithControlsLayout>
-            <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
-            {error ? <ResponseError error={error} /> : null}
-            <TableWithControlsLayout.Table loading={isLoading} className={b('groups-wrapper')}>
-                {renderGroups()}
-            </TableWithControlsLayout.Table>
-        </TableWithControlsLayout>
-    );
-}
-
-interface StorageNodesTableGroupContentProps {
-    database?: string;
-    parentRef: React.RefObject<HTMLElement>;
-    nodeId?: string | number;
-    groupId?: string | number;
-    searchValue: string;
-    handleShowAllNodes: VoidFunction;
-    filterGroup: string;
-    filterGroupBy?: NodesGroupByField;
-    viewContext?: StorageViewContext;
-    initialEntitiesCount: number;
-}
-
-function StorageNodesTableGroupContent({
-    database,
-    parentRef,
-    nodeId,
-    groupId,
-    searchValue,
-    handleShowAllNodes,
-    filterGroup,
-    filterGroupBy,
-    viewContext,
-    initialEntitiesCount,
-}: StorageNodesTableGroupContentProps) {
-    const {handleDataFetched, columnsSettings} = useStorageColumnsSettings();
-    const {columnsToShow} = useStorageNodesColumnsToSelect({
-        database,
-        viewContext,
-        columnsSettings,
-    });
-
-    return (
-        <PaginatedStorageNodesTable
-            database={database}
-            parentRef={parentRef}
-            nodeId={nodeId}
-            groupId={groupId}
-            searchValue={searchValue}
-            visibleEntities={'all'}
-            nodesUptimeFilter={NodesUptimeFilterValues.All}
-            onShowAll={handleShowAllNodes}
-            filterGroup={filterGroup}
-            filterGroupBy={filterGroupBy}
-            renderErrorMessage={renderPaginatedTableErrorMessage}
-            columns={columnsToShow}
-            initialEntitiesCount={initialEntitiesCount}
-            onDataFetched={handleDataFetched}
-        />
+        <PaginatedTableProvider initialState={initialState}>
+            <TableWithControlsLayout>
+                <TableWithControlsLayout.Controls>
+                    <StorageNodesControlsWithTableState
+                        withTypeSelector
+                        withGroupBySelect
+                        columnsToSelect={columnsToSelect}
+                        handleSelectedColumnsUpdate={setColumns}
+                    />
+                </TableWithControlsLayout.Controls>
+                {error ? <ResponseError error={error} /> : null}
+                <TableWithControlsLayout.Table
+                    ref={tableContainerRef}
+                    loading={isLoading}
+                    className={b('groups-wrapper')}
+                >
+                    {renderGroups()}
+                </TableWithControlsLayout.Table>
+            </TableWithControlsLayout>
+        </PaginatedTableProvider>
     );
 }
 
