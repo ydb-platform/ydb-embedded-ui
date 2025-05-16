@@ -1,5 +1,18 @@
 # Changelog
 
+## [9.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.0.0...v9.1.0) (2025-05-16)
+
+
+### Features
+
+* **TopicData:** add topic message details in Drawer ([#2266](https://github.com/ydb-platform/ydb-embedded-ui/issues/2266)) ([025d5ff](https://github.com/ydb-platform/ydb-embedded-ui/commit/025d5ffcf1a3c7a11528a63ad22d9b923469af77))
+* **vDisk:** allow evict vDisk by id ([#2267](https://github.com/ydb-platform/ydb-embedded-ui/issues/2267)) ([410d4d4](https://github.com/ydb-platform/ydb-embedded-ui/commit/410d4d4d6f1168b9ae405de88e9753b9c7807626))
+
+
+### Bug Fixes
+
+* **Tenants:** do not add empty search to query ([#2287](https://github.com/ydb-platform/ydb-embedded-ui/issues/2287)) ([2664ec7](https://github.com/ydb-platform/ydb-embedded-ui/commit/2664ec7d96bc0352a62b3ef201f8710a35c499e1))
+
 ## [9.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v8.26.2...v9.0.0) (2025-05-13)
 
 
