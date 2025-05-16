@@ -50,7 +50,7 @@ export function DiskGroupsStats({stats, storageType}: GroupsStatsPopupContentPro
         {
             name: i18n('usage'),
             content: (
-                <Flex gap={1} alignItems="center">
+                <Flex gap={2} alignItems="center">
                     <Progress
                         theme={
                             calculatedStatusToProgressTheme[
@@ -67,10 +67,10 @@ export function DiskGroupsStats({stats, storageType}: GroupsStatsPopupContentPro
         },
     ];
     return (
-        <Flex direction="column" gap={2} className={b()}>
-            <Text>
+        <Flex direction="column" gap={3} className={b()}>
+            <Text variant="body-2">
                 {storageType}{' '}
-                <Text color="secondary">
+                <Text color="secondary" variant="body-2">
                     {`${formatNumber(stats.createdGroups)} ${i18n('context_of')} ${formatNumber(stats.totalGroups)}`}
                 </Text>
             </Text>
