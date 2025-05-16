@@ -46,7 +46,7 @@ import {
     PaneVisibilityActionTypes,
     paneVisibilityToggleReducerCreator,
 } from '../../utils/paneVisibilityToggleHelpers';
-import {Preview} from '../Preview/Preview';
+import {PreviewContainer} from '../Preview/Preview';
 import {QueryEditorControls} from '../QueryEditorControls/QueryEditorControls';
 import {QueryResultViewer} from '../QueryResult/QueryResultViewer';
 import {QuerySettingsDialog} from '../QuerySettingsDialog/QuerySettingsDialog';
@@ -313,7 +313,7 @@ function Result({
     tableSettings,
 }: ResultProps) {
     if (showPreview) {
-        return <Preview database={tenantName} path={path} type={type} />;
+        return <PreviewContainer database={tenantName} path={path} type={type} />;
     }
 
     if (result) {

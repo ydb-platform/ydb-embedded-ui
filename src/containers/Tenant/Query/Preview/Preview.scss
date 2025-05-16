@@ -1,6 +1,6 @@
 @use '../../../../styles/mixins.scss';
 
-.kv-preview {
+.ydb-preview {
     height: 100%;
     @include mixins.flex-container();
     @include mixins.query-data-table();
@@ -8,21 +8,13 @@
         position: sticky;
         top: 0;
 
-        display: flex;
         flex-shrink: 0;
-        justify-content: space-between;
-        align-items: center;
 
         height: 53px;
-        padding: 0 20px;
+        padding: 0 var(--g-spacing-6);
 
         border-bottom: 1px solid var(--g-color-line-generic);
         background-color: var(--g-color-base-background);
-    }
-
-    &__title {
-        display: flex;
-        gap: var(--g-spacing-1);
     }
 
     &__table-name {
@@ -39,18 +31,15 @@
         padding: 15px 20px;
     }
 
-    &__loader-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
-        height: 100%;
-    }
-
     &__result {
         overflow: auto;
 
         width: 100%;
-        padding-left: 10px;
+        padding-left: var(--g-spacing-5);
+    }
+
+    &__partition-info {
+        height: 36px;
+        padding-left: var(--g-spacing-1);
     }
 }

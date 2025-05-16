@@ -71,7 +71,7 @@ export const getSchemaControls =
             column_table: openPreview,
 
             index_table: undefined,
-            topic: undefined,
+            topic: openPreview,
             stream: undefined,
 
             index: undefined,
