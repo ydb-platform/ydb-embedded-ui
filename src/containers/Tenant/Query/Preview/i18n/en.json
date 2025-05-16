@@ -1,0 +1,4 @@
+{
+  "label_partition-id": "Partition ID: {{id}}",
+  "label_offsets-range": "offsets: {{start}} - {{end}}"
+}

@@ -2,6 +2,7 @@ import React from 'react';
 
 import {TriangleExclamation} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
+import type {TextProps} from '@gravity-ui/uikit';
 import {ActionTooltip, Icon, Popover, Text} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 import {Link} from 'react-router-dom';
@@ -88,18 +89,8 @@ export const tsDiffColumn: Column<TopicMessageEnhanced> = {
     name: TOPIC_DATA_COLUMNS_IDS.TS_DIFF,
     header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.TS_DIFF],
     align: DataTable.RIGHT,
-    render: ({row}) => {
-        if (isNil(row.TimestampDiff)) {
-            return EMPTY_DATA_PLACEHOLDER;
-        }
-        const numericValue = safeParseNumber(row.TimestampDiff);
-        return (
-            <span className={b('ts-diff', {danger: numericValue >= 100_000})}>
-                {formatToMs(numericValue)}
-            </span>
-        );
-    },
-    width: 90,
+    render: ({row: {TimestampDiff}}) => <TopicDataTsDiff value={TimestampDiff} />,
+    width: 110,
     note: i18n('context_ts-diff'),
 };
 
@@ -121,36 +112,9 @@ export const messageColumn: Column<TopicMessageEnhanced> = {
     name: TOPIC_DATA_COLUMNS_IDS.MESSAGE,
     header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.MESSAGE],
     align: DataTable.LEFT,
-    render: ({row: {Message, OriginalSize}}) => {
-        if (isNil(Message)) {
-            return EMPTY_DATA_PLACEHOLDER;
-        }
-        let encryptedMessage;
-        let invalid = false;
-        try {
-            encryptedMessage = atob(Message);
-        } catch {
-            encryptedMessage = i18n('description_failed-decode');
-            invalid = true;
-        }
-
-        const truncated = safeParseNumber(OriginalSize) > TOPIC_MESSAGE_SIZE_LIMIT;
-        return (
-            <Text
-                variant="body-2"
-                color={invalid ? 'secondary' : 'primary'}
-                className={b('message', {invalid})}
-            >
-                {encryptedMessage}
-                {truncated && (
-                    <Text color="secondary" className={b('truncated')}>
-                        {' '}
-                        {i18n('description_truncated')}
-                    </Text>
-                )}
-            </Text>
-        );
-    },
+    render: ({row: {Message, OriginalSize}}) => (
+        <TopicDataMessage message={Message} size={OriginalSize} />
+    ),
     width: 500,
 };
 
@@ -158,7 +122,7 @@ export const sizeColumn: Column<TopicMessageEnhanced> = {
     name: TOPIC_DATA_COLUMNS_IDS.SIZE,
     header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.SIZE],
     align: DataTable.RIGHT,
-    render: ({row}) => formatBytes(row.StorageSize),
+    render: ({row: {StorageSize}}) => <TopicDataSize size={StorageSize} />,
     width: 100,
 };
 
@@ -315,4 +279,69 @@ function Offset({offset, removed, notLoaded}: PartitionIdProps) {
             )}
         </Link>
     );
+}
+interface TopicDataTsDiffProps {
+    value?: string;
+    baseColor?: TextProps['color'];
+    variant?: TextProps['variant'];
+}
+
+export function TopicDataTsDiff({
+    value,
+    baseColor = 'primary',
+    variant = 'body-2',
+}: TopicDataTsDiffProps) {
+    if (isNil(value)) {
+        return EMPTY_DATA_PLACEHOLDER;
+    }
+    const numericValue = safeParseNumber(value);
+    return (
+        <Text variant={variant} color={numericValue >= 100_000 ? 'danger' : baseColor}>
+            {formatToMs(numericValue)}
+        </Text>
+    );
+}
+
+interface TopicDataMessageProps {
+    message?: string;
+    size?: number;
+}
+
+export function TopicDataMessage({message, size}: TopicDataMessageProps) {
+    if (isNil(message)) {
+        return EMPTY_DATA_PLACEHOLDER;
+    }
+    let encryptedMessage;
+    let invalid = false;
+    try {
+        encryptedMessage = atob(message);
+    } catch {
+        encryptedMessage = i18n('description_failed-decode');
+        invalid = true;
+    }
+
+    const truncated = safeParseNumber(size) > TOPIC_MESSAGE_SIZE_LIMIT;
+    return (
+        <Text
+            variant="body-2"
+            color={invalid ? 'secondary' : 'primary'}
+            className={b('message', {invalid})}
+        >
+            {encryptedMessage}
+            {truncated && (
+                <Text color="secondary" className={b('truncated')}>
+                    {' '}
+                    {i18n('description_truncated')}
+                </Text>
+            )}
+        </Text>
+    );
+}
+
+interface TopicDataSizeProps {
+    size?: number;
+}
+
+export function TopicDataSize({size}: TopicDataSizeProps) {
+    return formatBytes(size);
 }
