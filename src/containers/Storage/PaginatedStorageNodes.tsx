@@ -33,7 +33,34 @@ import {useStorageColumnsSettings} from './utils';
 
 import './Storage.scss';
 
-export const PaginatedStorageNodes = (props: PaginatedStorageProps) => {
+// Wrapper component to connect StorageNodesControls with the PaginatedTable state
+function StorageNodesControlsWithTableState({
+    withTypeSelector,
+    withGroupBySelect,
+    columnsToSelect,
+    handleSelectedColumnsUpdate,
+}: {
+    withTypeSelector?: boolean;
+    withGroupBySelect?: boolean;
+    columnsToSelect: any[];
+    handleSelectedColumnsUpdate: (updated: any[]) => void;
+}) {
+    const {tableState} = usePaginatedTableState();
+
+    return (
+        <StorageNodesControls
+            withTypeSelector={withTypeSelector}
+            withGroupBySelect={withGroupBySelect}
+            entitiesCountCurrent={tableState.foundEntities}
+            entitiesCountTotal={tableState.totalEntities}
+            entitiesLoading={tableState.isInitialLoad}
+            columnsToSelect={columnsToSelect}
+            handleSelectedColumnsUpdate={handleSelectedColumnsUpdate}
+        />
+    );
+}
+
+export function PaginatedStorageNodes(props: PaginatedStorageProps) {
     const {storageNodesGroupByParam, visibleEntities, nodesUptimeFilter, handleShowAllNodes} =
         useStorageQueryParams();
 
@@ -60,7 +87,71 @@ export const PaginatedStorageNodes = (props: PaginatedStorageProps) => {
     };
 
     return <LoaderWrapper loading={!capabilitiesLoaded}>{renderContent()}</LoaderWrapper>;
-};
+}
+
+interface StorageNodeGroupProps {
+    name: string;
+    count: number;
+    isExpanded: boolean;
+    database?: string;
+    nodeId?: string | number;
+    groupId?: string | number;
+    searchValue: string;
+    visibleEntities: 'all';
+    filterGroupBy?: NodesGroupByField;
+    columns: any[];
+    tableContainerRef: React.RefObject<HTMLDivElement>;
+    parentRef: React.RefObject<HTMLElement>;
+    onIsExpandedChange: (name: string, isExpanded: boolean) => void;
+    handleShowAllNodes: VoidFunction;
+    onDataFetched: (data: any) => void;
+}
+
+const StorageNodeGroup = React.memo(function StorageNodeGroup({
+    name,
+    count,
+    isExpanded,
+    database,
+    nodeId,
+    groupId,
+    searchValue,
+    parentRef,
+    filterGroupBy,
+    columns,
+    tableContainerRef,
+    onIsExpandedChange,
+    handleShowAllNodes,
+    onDataFetched,
+}: StorageNodeGroupProps) {
+    return (
+        <TableGroup
+            key={name}
+            title={name}
+            count={count}
+            entityName={i18n('nodes')}
+            expanded={isExpanded}
+            onIsExpandedChange={onIsExpandedChange}
+        >
+            <PaginatedStorageNodesTable
+                database={database}
+                parentRef={parentRef}
+                tableContainerRef={tableContainerRef}
+                nodeId={nodeId}
+                groupId={groupId}
+                filterGroup={name}
+                filterGroupBy={filterGroupBy}
+                searchValue={searchValue}
+                visibleEntities={'all'}
+                nodesUptimeFilter={NodesUptimeFilterValues.All}
+                onShowAll={handleShowAllNodes}
+                renderErrorMessage={renderPaginatedTableErrorMessage}
+                columns={columns}
+                initialEntitiesCount={count}
+                onDataFetched={onDataFetched}
+            />
+        </TableGroup>
+    );
+});
 
 function StorageNodesComponent({
     database,
@@ -129,9 +220,11 @@ function GroupedStorageNodesComponent({
 
     const {searchValue, storageNodesGroupByParam, handleShowAllNodes} = useStorageQueryParams();
 
-    const {columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
+    const {handleDataFetched, columnsSettings} = useStorageColumnsSettings();
+    const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
         database,
         viewContext,
+        columnsSettings,
     });
 
     const {currentData, isFetching, error} = storageApi.useGetStorageNodesInfoQuery(
@@ -152,73 +245,6 @@ function GroupedStorageNodesComponent({
     const {tableGroups, found = 0, total = 0} = currentData || {};
 
     const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
-
-    // Get columns for this context
-    const {handleDataFetched, columnsSettings} = useStorageColumnsSettings();
-    const {columnsToShow} = useStorageNodesColumnsToSelect({
-        database,
-        viewContext,
-        columnsSettings,
-    });
-
-    // Storage node group component
-    const StorageNodeGroup = React.memo(function StorageNodeGroup({
-        name,
-        count,
-        isExpanded,
-        database,
-        nodeId,
-        groupId,
-        searchValue,
-        filterGroupBy,
-        parentRef,
-        onIsExpandedChange,
-        handleShowAllNodes,
-    }: {
-        name: string;
-        count: number;
-        isExpanded: boolean;
-        database?: string;
-        nodeId?: string | number;
-        groupId?: string | number;
-        searchValue: string;
-        filterGroupBy?: NodesGroupByField;
-        parentRef: React.RefObject<HTMLElement>;
-        onIsExpandedChange: (name: string, isExpanded: boolean) => void;
-        handleShowAllNodes: VoidFunction;
-    }) {
-        const tableContainerRef = React.useRef<HTMLDivElement>(null);
-
-        return (
-            <TableGroup
-                key={name}
-                title={name}
-                count={count}
-                entityName={i18n('nodes')}
-                expanded={isExpanded}
-                onIsExpandedChange={onIsExpandedChange}
-                ref={tableContainerRef}
-            >
-                <PaginatedStorageNodesTable
-                    database={database}
-                    parentRef={parentRef}
-                    tableContainerRef={tableContainerRef}
-                    nodeId={nodeId}
-                    groupId={groupId}
-                    searchValue={searchValue}
-                    visibleEntities={'all'}
-                    nodesUptimeFilter={NodesUptimeFilterValues.All}
-                    onShowAll={handleShowAllNodes}
-                    renderErrorMessage={renderPaginatedTableErrorMessage}
-                    filterGroup={name}
-                    filterGroupBy={filterGroupBy}
-                    initialEntitiesCount={count}
-                    columns={columnsToShow}
-                    onDataFetched={handleDataFetched}
-                />
-            </TableGroup>
-        );
-    });
 
     // Initialize the table state with the API data
     const initialState = React.useMemo(
@@ -246,10 +272,14 @@ function GroupedStorageNodesComponent({
                         nodeId={nodeId}
                         groupId={groupId}
                         searchValue={searchValue}
+                        visibleEntities="all"
                         filterGroupBy={storageNodesGroupByParam}
                         parentRef={parentRef}
                         onIsExpandedChange={setIsGroupExpanded}
                         handleShowAllNodes={handleShowAllNodes}
+                        columns={columnsToShow}
+                        tableContainerRef={tableContainerRef}
+                        onDataFetched={handleDataFetched}
                     />
                 );
             });
@@ -301,31 +331,4 @@ function useStorageNodesColumnsToSelect({
         viewContext,
         columnsSettings,
     });
-}
-
-// Wrapper component to connect StorageNodesControls with the PaginatedTable state
-function StorageNodesControlsWithTableState({
-    withTypeSelector,
-    withGroupBySelect,
-    columnsToSelect,
-    handleSelectedColumnsUpdate,
-}: {
-    withTypeSelector?: boolean;
-    withGroupBySelect?: boolean;
-    columnsToSelect: any[];
-    handleSelectedColumnsUpdate: (updated: any[]) => void;
-}) {
-    const {tableState} = usePaginatedTableState();
-
-    return (
-        <StorageNodesControls
-            withTypeSelector={withTypeSelector}
-            withGroupBySelect={withGroupBySelect}
-            entitiesCountCurrent={tableState.foundEntities}
-            entitiesCountTotal={tableState.totalEntities}
-            entitiesLoading={tableState.isInitialLoad}
-            columnsToSelect={columnsToSelect}
-            handleSelectedColumnsUpdate={handleSelectedColumnsUpdate}
-        />
-    );
 }

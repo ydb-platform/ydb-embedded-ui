@@ -250,6 +250,7 @@ interface NodeGroupProps {
     groupByParam?: NodesGroupByField;
     columns: Column<NodesPreparedEntity>[];
     parentRef: React.RefObject<HTMLElement>;
+    tableContainerRef: React.RefObject<HTMLDivElement>;
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
 }
 
@@ -264,10 +265,9 @@ const NodeGroup = React.memo(function NodeGroup({
     groupByParam,
     columns,
     parentRef,
+    tableContainerRef,
     onIsExpandedChange,
 }: NodeGroupProps) {
-    const tableContainerRef = React.useRef<HTMLDivElement>(null);
-
     return (
         <TableGroup
             key={name}
@@ -276,7 +276,6 @@ const NodeGroup = React.memo(function NodeGroup({
             entityName={i18n('nodes')}
             expanded={isExpanded}
             onIsExpandedChange={onIsExpandedChange}
-            ref={tableContainerRef}
         >
             <NodesTable
                 path={path}
@@ -371,6 +370,7 @@ function GroupedNodesComponent({
                         groupByParam={groupByParam}
                         columns={columnsToShow}
                         parentRef={parentRef}
+                        tableContainerRef={tableContainerRef}
                         onIsExpandedChange={setIsGroupExpanded}
                     />
                 );

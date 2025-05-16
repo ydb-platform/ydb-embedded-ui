@@ -94,6 +94,7 @@ interface StorageGroupGroupProps {
     visibleEntities: 'all';
     filterGroupBy?: GroupsGroupByField;
     columns: StorageGroupsColumn[];
+    tableContainerRef: React.RefObject<HTMLDivElement>;
     parentRef: React.RefObject<HTMLElement>;
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
     handleShowAllGroups: VoidFunction;
@@ -111,11 +112,10 @@ const StorageGroupGroup = React.memo(function StorageGroupGroup({
     parentRef,
     filterGroupBy,
     columns,
+    tableContainerRef,
     onIsExpandedChange,
     handleShowAllGroups,
 }: StorageGroupGroupProps) {
-    const tableContainerRef = React.useRef<HTMLDivElement>(null);
-
     return (
         <TableGroup
             key={name}
@@ -124,7 +124,6 @@ const StorageGroupGroup = React.memo(function StorageGroupGroup({
             entityName={i18n('groups')}
             expanded={isExpanded}
             onIsExpandedChange={onIsExpandedChange}
-            ref={tableContainerRef}
         >
             <PaginatedStorageGroupsTable
                 database={database}
@@ -269,6 +268,7 @@ function GroupedStorageGroupsComponent({
                         onIsExpandedChange={setIsGroupExpanded}
                         handleShowAllGroups={handleShowAllGroups}
                         columns={columnsToShow}
+                        tableContainerRef={tableContainerRef}
                     />
                 );
             });

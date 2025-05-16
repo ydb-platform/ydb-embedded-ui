@@ -16,6 +16,7 @@ import type {
     SortParams,
 } from './types';
 import {useScrollBasedChunks} from './useScrollBasedChunks';
+import {useTableScroll} from './useTableScroll';
 
 import './PaginatedTable.scss';
 
@@ -122,7 +123,15 @@ export const PaginatedTable = <T, F>({
         [onDataFetched, setFoundEntities, setIsInitialLoad, setTotalEntities],
     );
 
-    // reset table on filters change
+    // Use the extracted table scroll hook
+    // The hook handles scrolling internally based on dependencies
+    useTableScroll({
+        tableContainerRef,
+        parentRef,
+        dependencies: [rawFilters], // Add filters as a dependency to trigger scroll when they change
+    });
+
+    // Reset table on filters change
     React.useLayoutEffect(() => {
         const defaultTotal = initialEntitiesCount || 0;
         const defaultFound = initialEntitiesCount || 1;
@@ -130,23 +139,7 @@ export const PaginatedTable = <T, F>({
         setTotalEntities(defaultTotal);
         setFoundEntities(defaultFound);
         setIsInitialLoad(true);
-
-        if (tableContainerRef.current && parentRef.current) {
-            // Scroll the parent container to the position of the table container
-            const tableRect = tableContainerRef.current.getBoundingClientRect();
-            const parentRect = parentRef.current.getBoundingClientRect();
-            const scrollTop = tableRect.top - parentRect.top + parentRef.current.scrollTop;
-            parentRef.current.scrollTo(0, scrollTop);
-        }
-    }, [
-        rawFilters,
-        initialEntitiesCount,
-        tableContainerRef,
-        setTotalEntities,
-        setFoundEntities,
-        setIsInitialLoad,
-        parentRef,
-    ]);
+    }, [initialEntitiesCount, setTotalEntities, setFoundEntities, setIsInitialLoad]);
 
     const renderChunks = () => {
         return activeChunks.map((isActive, index) => (
