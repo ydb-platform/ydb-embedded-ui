@@ -7,11 +7,16 @@ export function downloadFile(url: string, filename: string) {
     document.body.removeChild(link);
 }
 
-export const createAndDownloadJsonFile = (data: unknown, fileName: string) => {
-    const blob = new Blob([JSON.stringify(data, null, 2)], {
-        type: 'application/json',
+export const createAndDownloadFile = (data: string, fileName: string, type?: string) => {
+    const blob = new Blob([data], {
+        type,
     });
     const url = URL.createObjectURL(blob);
-    downloadFile(url, `${fileName}.json`);
+    downloadFile(url, fileName);
     URL.revokeObjectURL(url);
+};
+
+export const createAndDownloadJsonFile = (data: unknown, fileName: string) => {
+    const preparedData = JSON.stringify(data, null, 2);
+    createAndDownloadFile(preparedData, `${fileName}.json`, 'application/json');
 };

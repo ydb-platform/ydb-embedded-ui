@@ -14,8 +14,12 @@ interface FullValueDialogProps {
 }
 
 export function FullValueDialog({onClose, text, starts, length}: FullValueDialogProps) {
+    //if dialog opens from Drawer, outside click should not close Drawer
+    const handleClickOutside = (e: MouseEvent) => {
+        e.stopPropagation();
+    };
     return (
-        <Dialog open={true} onClose={onClose}>
+        <Dialog open={true} onClose={onClose} onOutsideClick={handleClickOutside}>
             <Dialog.Header caption={i18n('description_full-value')} />
             <Dialog.Divider />
             <Dialog.Body>

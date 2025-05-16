@@ -3,7 +3,7 @@ import {prepareResponse} from '../getData';
 import {TOPIC_DATA_FETCH_LIMIT} from '../utils/constants';
 
 describe('prepareResponse', () => {
-    test('should handle case with some removed messages', () => {
+    test('should handle case with some notLoaded messages', () => {
         const response: TopicDataResponse = {
             StartOffset: '105',
             EndOffset: '120',
@@ -24,11 +24,11 @@ describe('prepareResponse', () => {
         expect(result.messages[5]).toEqual({Offset: '105'});
         expect(result.messages[6]).toEqual({Offset: '106'});
         expect(result.messages[7]).toEqual({Offset: '107'});
-        expect(result.messages[8]).toEqual({Offset: 108, removed: true});
-        expect(result.messages[19]).toEqual({Offset: 119, removed: true});
+        expect(result.messages[8]).toEqual({Offset: 108, notLoaded: true});
+        expect(result.messages[19]).toEqual({Offset: 119, notLoaded: true});
     });
 
-    test('should handle case with more removed messages than the limit', () => {
+    test('should handle case with more notLoaded messages than the limit', () => {
         const response: TopicDataResponse = {
             StartOffset: '150',
             EndOffset: '170',
@@ -77,9 +77,9 @@ describe('prepareResponse', () => {
         expect(result.end).toBe(120);
         // Should have placeholders for all offsets in range
         expect(result.messages.length).toBe(TOPIC_DATA_FETCH_LIMIT);
-        // All should be marked as removed
-        expect(result.messages[0]).toEqual({Offset: 100, removed: true});
-        expect(result.messages[19]).toEqual({Offset: 119, removed: true});
+        // All should be marked as notLoaded
+        expect(result.messages[0]).toEqual({Offset: 100, notLoaded: true});
+        expect(result.messages[19]).toEqual({Offset: 119, notLoaded: true});
     });
 
     test('should handle case with more messages than the limit', () => {
@@ -109,7 +109,7 @@ describe('prepareResponse', () => {
         expect(result.messages[2]).toEqual({Offset: '102'});
     });
 
-    test('should handle case with both removed and actual messages within limit', () => {
+    test('should handle case with both notLoaded and actual messages within limit', () => {
         const response: TopicDataResponse = {
             StartOffset: '110',
             EndOffset: '130',
@@ -159,13 +159,13 @@ describe('prepareResponse', () => {
         expect(result.messages[5]).toEqual({Offset: '105'});
         expect(result.messages[9]).toEqual({Offset: '109'});
 
-        // Check removed messages (gaps)
-        expect(result.messages[1]).toEqual({Offset: 101, removed: true});
-        expect(result.messages[3]).toEqual({Offset: 103, removed: true});
-        expect(result.messages[4]).toEqual({Offset: 104, removed: true});
-        expect(result.messages[6]).toEqual({Offset: 106, removed: true});
-        expect(result.messages[7]).toEqual({Offset: 107, removed: true});
-        expect(result.messages[8]).toEqual({Offset: 108, removed: true});
+        // Check notLoaded messages (gaps)
+        expect(result.messages[1]).toEqual({Offset: 101, notLoaded: true});
+        expect(result.messages[3]).toEqual({Offset: 103, notLoaded: true});
+        expect(result.messages[4]).toEqual({Offset: 104, notLoaded: true});
+        expect(result.messages[6]).toEqual({Offset: 106, notLoaded: true});
+        expect(result.messages[7]).toEqual({Offset: 107, notLoaded: true});
+        expect(result.messages[8]).toEqual({Offset: 108, notLoaded: true});
     });
 
     test('should handle case with offset greater than EndOffset', () => {
@@ -211,9 +211,9 @@ describe('prepareResponse', () => {
         expect(result.end).toBe(110);
         // Should have placeholders for all offsets in range
         expect(result.messages.length).toBe(10);
-        // All should be marked as removed
+        // All should be marked as notLoaded
         for (let i = 0; i < 10; i++) {
-            expect(result.messages[i]).toEqual({Offset: 100 + i, removed: true});
+            expect(result.messages[i]).toEqual({Offset: 100 + i, notLoaded: true});
         }
     });
 
@@ -234,7 +234,7 @@ describe('prepareResponse', () => {
         expect(result.messages[0]).toEqual({Offset: '0'});
         expect(result.messages[1]).toEqual({Offset: '1'});
         expect(result.messages[2]).toEqual({Offset: '2'});
-        expect(result.messages[3]).toEqual({Offset: 3, removed: true});
-        expect(result.messages[9]).toEqual({Offset: 9, removed: true});
+        expect(result.messages[3]).toEqual({Offset: 3, notLoaded: true});
+        expect(result.messages[9]).toEqual({Offset: 9, notLoaded: true});
     });
 });

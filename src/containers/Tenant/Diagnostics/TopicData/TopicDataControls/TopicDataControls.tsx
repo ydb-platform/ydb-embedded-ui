@@ -8,6 +8,8 @@ import type {TableColumnSetupItem} from '@gravity-ui/uikit';
 import {
     ActionTooltip,
     Button,
+    Flex,
+    HelpMark,
     Icon,
     RadioButton,
     Select,
@@ -37,6 +39,7 @@ interface TopicDataControlsProps {
 
     startOffset?: number;
     endOffset?: number;
+    truncatedData?: boolean;
     scrollToOffset: (offset: number) => void;
 }
 
@@ -50,6 +53,7 @@ export function TopicDataControls({
     partitionsLoading,
     partitionsError,
     scrollToOffset,
+    truncatedData,
 }: TopicDataControlsProps) {
     const {
         selectedPartition,
@@ -59,8 +63,8 @@ export function TopicDataControls({
     } = useTopicDataQueryParams();
 
     const partitionsToSelect = partitions?.map(({partitionId}) => ({
-        content: partitionId,
-        value: partitionId,
+        content: String(partitionId),
+        value: String(partitionId),
     }));
 
     const handleSelectedPartitionChange = React.useCallback(
@@ -94,12 +98,14 @@ export function TopicDataControls({
             <TopicDataStartControls scrollToOffset={scrollToOffset} />
 
             {!isNil(startOffset) && !isNil(endOffset) && (
-                <Text color="secondary" whiteSpace="nowrap">
-                    {formatNumber(startOffset)}—{formatNumber(endOffset - 1)}
-                </Text>
+                <Flex gap={1}>
+                    <Text color="secondary" whiteSpace="nowrap">
+                        {formatNumber(startOffset)}—{formatNumber(endOffset - 1)}
+                    </Text>
+                    {truncatedData && <HelpMark>{i18n('description_last-messages')}</HelpMark>}
+                </Flex>
             )}
             <TableColumnSetup
-                className={b('column-setup')}
                 popupWidth={242}
                 items={columnsToSelect}
                 showStatus
@@ -119,10 +125,21 @@ function TopicDataStartControls({scrollToOffset}: TopicDataStartControlsProps) {
         selectedOffset,
         startTimestamp,
         topicDataFilter,
+        activeOffset,
         handleSelectedOffsetChange,
         handleStartTimestampChange,
         handleTopicDataFilterChange,
     } = useTopicDataQueryParams();
+
+    const inputRef = React.useRef<HTMLInputElement>(null);
+
+    const isDrawerVisible = !isNil(activeOffset);
+
+    React.useEffect(() => {
+        if (isDrawerVisible) {
+            inputRef.current?.blur();
+        }
+    }, [isDrawerVisible]);
 
     const onFilterChange = React.useCallback(
         (value: TopicDataFilterValue) => {
@@ -173,6 +190,8 @@ function TopicDataStartControls({scrollToOffset}: TopicDataStartControlsProps) {
             </RadioButton>
             {topicDataFilter === 'OFFSET' && (
                 <DebouncedInput
+                    controlRef={inputRef}
+                    className={b('offset-input')}
                     value={selectedOffset ? String(selectedOffset) : ''}
                     onUpdate={onStartOffsetChange}
                     label={i18n('label_from')}
@@ -183,6 +202,7 @@ function TopicDataStartControls({scrollToOffset}: TopicDataStartControlsProps) {
                         <ActionTooltip title={i18n('action_scroll-selected')}>
                             <Button
                                 disabled={isNil(selectedOffset) || selectedOffset === ''}
+                                className={b('scroll-button')}
                                 view="flat-action"
                                 size="xs"
                                 onClick={() => {

@@ -45,7 +45,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
         ),
         sortAccessor: (row) => isNumeric(row.partitionId) && Number(row.partitionId),
         align: DataTable.LEFT,
-        render: ({row}) => <PartitionId id={row.partitionId} />,
+        render: ({row}) => <PartitionId id={String(row.partitionId)} />,
     },
     {
         name: PARTITIONS_COLUMNS_IDS.STORE_SIZE,
