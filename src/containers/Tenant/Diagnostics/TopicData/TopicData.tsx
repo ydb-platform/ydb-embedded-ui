@@ -4,11 +4,12 @@ import {NoSearchResults} from '@gravity-ui/illustrations';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {isNil} from 'lodash';
 
-import type {RenderControls} from '../../../../components/PaginatedTable';
 import {
     DEFAULT_TABLE_ROW_HEIGHT,
     ResizeablePaginatedTable,
 } from '../../../../components/PaginatedTable';
+import {PaginatedTableProvider} from '../../../../components/PaginatedTable/PaginatedTableContext';
+import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {partitionsApi} from '../../../../store/reducers/partitions/partitions';
 import {topicApi} from '../../../../store/reducers/topic';
 import type {TopicDataRequest} from '../../../../types/api/topic';
@@ -52,6 +53,8 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
 
     const [baseOffset, setBaseOffset] = React.useState<number>();
     const [baseEndOffset, setBaseEndOffset] = React.useState<number>();
+
+    const tableContainerRef = React.useRef<HTMLDivElement>(null);
 
     const startRef = React.useRef<number>();
     startRef.current = startOffset;
@@ -186,22 +189,20 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
         }
     }, [currentData, isFetching, scrollToOffset]);
 
-    const renderControls: RenderControls = () => {
-        return (
-            <TopicDataControls
-                // component has uncontrolled components inside, so it should be rerendered on filters reset
-                key={controlsKey}
-                columnsToSelect={columnsToSelect}
-                handleSelectedColumnsUpdate={setColumns}
-                partitions={partitions}
-                partitionsLoading={partitionsLoading}
-                partitionsError={partitionsError}
-                startOffset={startOffset}
-                endOffset={endOffset}
-                scrollToOffset={scrollToOffset}
-            />
-        );
-    };
+    const renderControls = (
+        <TopicDataControls
+            // component has uncontrolled components inside, so it should be rerendered on filters reset
+            key={controlsKey}
+            columnsToSelect={columnsToSelect}
+            handleSelectedColumnsUpdate={setColumns}
+            partitions={partitions}
+            partitionsLoading={partitionsLoading}
+            partitionsError={partitionsError}
+            startOffset={startOffset}
+            endOffset={endOffset}
+            scrollToOffset={scrollToOffset}
+        />
+    );
 
     const renderEmptyDataMessage = () => {
         const hasFilters = selectedOffset || startTimestamp;
@@ -225,26 +226,37 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
     return (
         !isNil(baseOffset) &&
         !isNil(baseEndOffset) && (
-            <ResizeablePaginatedTable
-                columnsWidthLSKey={TOPIC_DATA_COLUMNS_WIDTH_LS_KEY}
-                parentRef={parentRef}
-                columns={columnsToShow}
-                fetchData={getTopicData}
-                initialEntitiesCount={baseEndOffset - baseOffset}
-                limit={TOPIC_DATA_FETCH_LIMIT}
-                renderControls={renderControls}
-                renderErrorMessage={renderPaginatedTableErrorMessage}
-                renderEmptyDataMessage={renderEmptyDataMessage}
-                filters={tableFilters}
-                tableName="topicData"
-                rowHeight={DEFAULT_TABLE_ROW_HEIGHT}
-                keepCache={false}
-                getRowClassName={(row) => {
-                    return b('row', {
-                        active: Boolean(selectedOffset && String(row.Offset) === selectedOffset),
-                    });
-                }}
-            />
+            <PaginatedTableProvider>
+                <TableWithControlsLayout>
+                    <TableWithControlsLayout.Controls>
+                        {renderControls}
+                    </TableWithControlsLayout.Controls>
+                    <TableWithControlsLayout.Table ref={tableContainerRef}>
+                        <ResizeablePaginatedTable
+                            columnsWidthLSKey={TOPIC_DATA_COLUMNS_WIDTH_LS_KEY}
+                            parentRef={parentRef}
+                            tableContainerRef={tableContainerRef}
+                            columns={columnsToShow}
+                            fetchData={getTopicData}
+                            initialEntitiesCount={baseEndOffset - baseOffset}
+                            limit={TOPIC_DATA_FETCH_LIMIT}
+                            renderErrorMessage={renderPaginatedTableErrorMessage}
+                            renderEmptyDataMessage={renderEmptyDataMessage}
+                            filters={tableFilters}
+                            tableName="topicData"
+                            rowHeight={DEFAULT_TABLE_ROW_HEIGHT}
+                            keepCache={false}
+                            getRowClassName={(row) => {
+                                return b('row', {
+                                    active: Boolean(
+                                        selectedOffset && String(row.Offset) === selectedOffset,
+                                    ),
+                                });
+                            }}
+                        />
+                    </TableWithControlsLayout.Table>
+                </TableWithControlsLayout>
+            </PaginatedTableProvider>
         )
     );
 }
