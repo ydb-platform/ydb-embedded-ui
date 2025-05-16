@@ -29,7 +29,7 @@ export class ResultTable {
 
     constructor(selector: Locator) {
         this.table = selector.locator('.ydb-query-result-sets-viewer__result');
-        this.preview = selector.locator('.kv-preview__result');
+        this.preview = selector.locator('.ydb-preview__result');
         this.resultHead = selector.locator('.ydb-query-result-sets-viewer__head');
         this.resultTitle = selector.locator('.ydb-query-result-sets-viewer__title');
         this.resultWrapper = selector.locator('.ydb-query-result-sets-viewer__result-wrapper');
