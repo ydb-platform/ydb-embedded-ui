@@ -1,24 +1,11 @@
 @use '../../../../../styles/mixins.scss';
 
 .ydb-diagnostics-topic-data-columns {
-    &__ts-diff_danger {
-        color: var(--g-color-text-danger);
-    }
-    &__message_clickable {
-        cursor: pointer;
-
-        color: var(--g-color-text-info);
-    }
     &__offset {
         display: inline-flex;
         align-items: center;
         gap: var(--g-spacing-1);
-        .g-help-mark,
-        .g-help-mark__button {
-            display: flex;
-        }
-    }
-    &__offset {
+
         width: 100%;
         height: 100%;
     }
