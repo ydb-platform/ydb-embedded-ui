@@ -1,7 +1,8 @@
 import React from 'react';
 
+import {TriangleExclamation} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
-import {HelpMark, Text} from '@gravity-ui/uikit';
+import {ActionTooltip, Icon, Popover, Text} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 import {Link} from 'react-router-dom';
 
@@ -88,6 +89,9 @@ export const tsDiffColumn: Column<TopicMessageEnhanced> = {
     header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.TS_DIFF],
     align: DataTable.RIGHT,
     render: ({row}) => {
+        if (isNil(row.TimestampDiff)) {
+            return EMPTY_DATA_PLACEHOLDER;
+        }
         const numericValue = safeParseNumber(row.TimestampDiff);
         return (
             <span className={b('ts-diff', {danger: numericValue >= 100_000})}>
@@ -271,10 +275,11 @@ function Offset({offset, removed, notLoaded}: PartitionIdProps) {
 
     if (removed) {
         return (
-            <Text className={b('offset', {removed: true})} variant="body-2">
-                {offset}
-                <HelpMark>{i18n('description_removed-message')}</HelpMark>
-            </Text>
+            <ActionTooltip title={i18n('description_removed-message')} placement={'right'}>
+                <Text className={b('offset', {removed: true})} variant="body-2">
+                    {offset}
+                </Text>
+            </ActionTooltip>
         );
     }
 
@@ -297,9 +302,16 @@ function Offset({offset, removed, notLoaded}: PartitionIdProps) {
                 {offset}
             </Text>
             {notLoaded && (
-                <HelpMark>
-                    <Text className={b('help')}>{i18n('description_not-loaded-message')}</Text>
-                </HelpMark>
+                <Popover
+                    content={
+                        <Text className={b('help')}>{i18n('description_not-loaded-message')}</Text>
+                    }
+                    className={b('help-popover')}
+                >
+                    <Text color="secondary" className={b('help-popover')}>
+                        <Icon data={TriangleExclamation} />
+                    </Text>
+                </Popover>
             )}
         </Link>
     );
