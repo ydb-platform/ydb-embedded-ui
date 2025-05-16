@@ -21,6 +21,7 @@ const columns: Column<TopicMessage>[] = [
         name: TOPIC_DATA_COLUMNS_IDS.OFFSET,
         header: TOPIC_DATA_COLUMNS_TITLES[TOPIC_DATA_COLUMNS_IDS.OFFSET],
         render: ({row: {Offset}}) => (isNil(Offset) ? EMPTY_DATA_PLACEHOLDER : Offset),
+        sortable: false,
     },
     {
         name: TOPIC_DATA_COLUMNS_IDS.TIMESTAMP_CREATE,
@@ -33,6 +34,7 @@ const columns: Column<TopicMessage>[] = [
             </React.Fragment>
         ),
         width: 200,
+        sortable: false,
     },
     {
         name: TOPIC_DATA_COLUMNS_IDS.MESSAGE,
@@ -41,6 +43,7 @@ const columns: Column<TopicMessage>[] = [
             <TopicDataMessage message={Message} size={OriginalSize} />
         ),
         width: 500,
+        sortable: false,
     },
     {
         name: TOPIC_DATA_COLUMNS_IDS.SIZE,
@@ -48,6 +51,7 @@ const columns: Column<TopicMessage>[] = [
         render: ({row: {StorageSize}}) => <TopicDataSize size={StorageSize} />,
         align: 'right',
         width: 100,
+        sortable: false,
     },
 ];
 
