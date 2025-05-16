@@ -28,7 +28,7 @@ interface NodesTableProps {
     filterGroupBy?: NodesGroupByField;
 
     columns: Column<NodesPreparedEntity>[];
-    parentRef: React.RefObject<HTMLElement>;
+    scrollContainerRef: React.RefObject<HTMLElement>;
     tableContainerRef: React.RefObject<HTMLDivElement>;
 
     initialEntitiesCount?: number;
@@ -45,7 +45,7 @@ export function NodesTable({
     filterGroup,
     filterGroupBy,
     columns,
-    parentRef,
+    scrollContainerRef,
     tableContainerRef,
     initialEntitiesCount,
     onStateChange,
@@ -83,7 +83,7 @@ export function NodesTable({
     return (
         <ResizeablePaginatedTable
             columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
-            parentRef={parentRef}
+            scrollContainerRef={scrollContainerRef}
             tableContainerRef={tableContainerRef}
             columns={columns}
             fetchData={getNodes}

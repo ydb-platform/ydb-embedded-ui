@@ -95,7 +95,7 @@ interface StorageGroupGroupProps {
     filterGroupBy?: GroupsGroupByField;
     columns: StorageGroupsColumn[];
     tableContainerRef: React.RefObject<HTMLDivElement>;
-    parentRef: React.RefObject<HTMLElement>;
+    scrollContainerRef: React.RefObject<HTMLElement>;
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
     handleShowAllGroups: VoidFunction;
 }
@@ -109,7 +109,7 @@ const StorageGroupGroup = React.memo(function StorageGroupGroup({
     groupId,
     pDiskId,
     searchValue,
-    parentRef,
+    scrollContainerRef,
     filterGroupBy,
     columns,
     tableContainerRef,
@@ -127,7 +127,7 @@ const StorageGroupGroup = React.memo(function StorageGroupGroup({
         >
             <PaginatedStorageGroupsTable
                 database={database}
-                parentRef={parentRef}
+                scrollContainerRef={scrollContainerRef}
                 tableContainerRef={tableContainerRef}
                 nodeId={nodeId}
                 groupId={groupId}
@@ -151,7 +151,7 @@ function StorageGroupsComponent({
     groupId,
     pDiskId,
     viewContext,
-    parentRef,
+    scrollContainerRef,
     initialEntitiesCount,
 }: PaginatedStorageProps) {
     const {searchValue, visibleEntities, handleShowAllGroups} = useStorageQueryParams();
@@ -184,7 +184,7 @@ function StorageGroupsComponent({
                         searchValue={searchValue}
                         visibleEntities={visibleEntities}
                         onShowAll={handleShowAllGroups}
-                        parentRef={parentRef}
+                        scrollContainerRef={scrollContainerRef}
                         tableContainerRef={tableContainerRef}
                         renderErrorMessage={renderPaginatedTableErrorMessage}
                         columns={columnsToShow}
@@ -201,7 +201,7 @@ function GroupedStorageGroupsComponent({
     nodeId,
     groupId,
     pDiskId,
-    parentRef,
+    scrollContainerRef,
     viewContext,
 }: PaginatedStorageProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
@@ -264,7 +264,7 @@ function GroupedStorageGroupsComponent({
                         filterGroupBy={storageGroupsGroupByParam}
                         searchValue={searchValue}
                         visibleEntities={'all'}
-                        parentRef={parentRef}
+                        scrollContainerRef={scrollContainerRef}
                         onIsExpandedChange={setIsGroupExpanded}
                         handleShowAllGroups={handleShowAllGroups}
                         columns={columnsToShow}

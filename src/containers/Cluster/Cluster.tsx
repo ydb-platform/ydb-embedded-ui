@@ -171,14 +171,17 @@ export function Cluster({
                 <Route
                     path={getLocationObjectFromHref(getClusterPath(clusterTabsIds.nodes)).pathname}
                 >
-                    <Nodes parentRef={container} additionalNodesProps={additionalNodesProps} />
+                    <Nodes
+                        scrollContainerRef={container}
+                        additionalNodesProps={additionalNodesProps}
+                    />
                 </Route>
                 <Route
                     path={
                         getLocationObjectFromHref(getClusterPath(clusterTabsIds.storage)).pathname
                     }
                 >
-                    <PaginatedStorage parentRef={container} />
+                    <PaginatedStorage scrollContainerRef={container} />
                 </Route>
                 <Route
                     path={

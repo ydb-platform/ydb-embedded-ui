@@ -29,7 +29,7 @@ export interface PaginatedTableProps<T, F> {
     columns: Column<T>[];
     getRowClassName?: GetRowClassName<T>;
     rowHeight?: number;
-    parentRef: React.RefObject<HTMLElement>;
+    scrollContainerRef: React.RefObject<HTMLElement>;
     tableContainerRef: React.RefObject<HTMLDivElement>;
     initialSortParams?: SortParams;
     onColumnsResize?: HandleTableColumnsResize;
@@ -51,7 +51,7 @@ export const PaginatedTable = <T, F>({
     columns,
     getRowClassName,
     rowHeight = DEFAULT_TABLE_ROW_HEIGHT,
-    parentRef,
+    scrollContainerRef,
     tableContainerRef,
     initialSortParams,
     onColumnsResize,
@@ -88,7 +88,7 @@ export const PaginatedTable = <T, F>({
     const tableRef = React.useRef<HTMLDivElement>(null);
 
     const activeChunks = useScrollBasedChunks({
-        parentRef,
+        scrollContainerRef,
         tableRef,
         totalItems: foundEntities,
         rowHeight,
@@ -127,7 +127,7 @@ export const PaginatedTable = <T, F>({
     // The hook handles scrolling internally based on dependencies
     useTableScroll({
         tableContainerRef,
-        parentRef,
+        scrollContainerRef,
         dependencies: [rawFilters], // Add filters as a dependency to trigger scroll when they change
     });
 

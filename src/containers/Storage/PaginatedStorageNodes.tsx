@@ -101,7 +101,7 @@ interface StorageNodeGroupProps {
     filterGroupBy?: NodesGroupByField;
     columns: any[];
     tableContainerRef: React.RefObject<HTMLDivElement>;
-    parentRef: React.RefObject<HTMLElement>;
+    scrollContainerRef: React.RefObject<HTMLElement>;
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
     handleShowAllNodes: VoidFunction;
     onDataFetched: (data: any) => void;
@@ -115,7 +115,7 @@ const StorageNodeGroup = React.memo(function StorageNodeGroup({
     nodeId,
     groupId,
     searchValue,
-    parentRef,
+    scrollContainerRef,
     filterGroupBy,
     columns,
     tableContainerRef,
@@ -134,7 +134,7 @@ const StorageNodeGroup = React.memo(function StorageNodeGroup({
         >
             <PaginatedStorageNodesTable
                 database={database}
-                parentRef={parentRef}
+                scrollContainerRef={scrollContainerRef}
                 tableContainerRef={tableContainerRef}
                 nodeId={nodeId}
                 groupId={groupId}
@@ -158,7 +158,7 @@ function StorageNodesComponent({
     nodeId,
     groupId,
     viewContext,
-    parentRef,
+    scrollContainerRef,
     initialEntitiesCount,
 }: PaginatedStorageProps) {
     const {searchValue, visibleEntities, nodesUptimeFilter, handleShowAllNodes} =
@@ -196,7 +196,7 @@ function StorageNodesComponent({
                         visibleEntities={visibleEntities}
                         nodesUptimeFilter={nodesUptimeFilter}
                         onShowAll={handleShowAllNodes}
-                        parentRef={parentRef}
+                        scrollContainerRef={scrollContainerRef}
                         renderErrorMessage={renderPaginatedTableErrorMessage}
                         columns={columnsToShow}
                         initialEntitiesCount={initialEntitiesCount}
@@ -213,7 +213,7 @@ function GroupedStorageNodesComponent({
     groupId,
     nodeId,
     viewContext,
-    parentRef,
+    scrollContainerRef,
 }: PaginatedStorageProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const tableContainerRef = React.useRef<HTMLDivElement>(null);
@@ -274,7 +274,7 @@ function GroupedStorageNodesComponent({
                         searchValue={searchValue}
                         visibleEntities="all"
                         filterGroupBy={storageNodesGroupByParam}
-                        parentRef={parentRef}
+                        scrollContainerRef={scrollContainerRef}
                         onIsExpandedChange={setIsGroupExpanded}
                         handleShowAllNodes={handleShowAllNodes}
                         columns={columnsToShow}

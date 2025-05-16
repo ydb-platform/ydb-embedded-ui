@@ -41,10 +41,10 @@ import './TopicData.scss';
 interface TopicDataProps {
     path: string;
     database: string;
-    parentRef: React.RefObject<HTMLElement>;
+    scrollContainerRef: React.RefObject<HTMLElement>;
 }
 
-export function TopicData({parentRef, path, database}: TopicDataProps) {
+export function TopicData({scrollContainerRef, path, database}: TopicDataProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const [startOffset, setStartOffset] = React.useState<number>();
     const [endOffset, setEndOffset] = React.useState<number>();
@@ -167,12 +167,12 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
         (newOffset: number) => {
             const scrollTop = (newOffset - (baseOffset ?? 0)) * DEFAULT_TABLE_ROW_HEIGHT;
             const normalizedScrollTop = Math.max(0, scrollTop);
-            parentRef.current?.scrollTo({
+            scrollContainerRef.current?.scrollTo({
                 top: normalizedScrollTop,
                 behavior: 'instant',
             });
         },
-        [baseOffset, parentRef],
+        [baseOffset, scrollContainerRef],
     );
 
     React.useEffect(() => {
@@ -234,7 +234,7 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
                     <TableWithControlsLayout.Table ref={tableContainerRef}>
                         <ResizeablePaginatedTable
                             columnsWidthLSKey={TOPIC_DATA_COLUMNS_WIDTH_LS_KEY}
-                            parentRef={parentRef}
+                            scrollContainerRef={scrollContainerRef}
                             tableContainerRef={tableContainerRef}
                             columns={columnsToShow}
                             fetchData={getTopicData}

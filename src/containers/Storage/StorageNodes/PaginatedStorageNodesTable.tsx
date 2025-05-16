@@ -36,7 +36,7 @@ interface PaginatedStorageNodesTableProps {
     nodesUptimeFilter: NodesUptimeFilterValues;
     onShowAll: VoidFunction;
 
-    parentRef: React.RefObject<HTMLElement>;
+    scrollContainerRef: React.RefObject<HTMLElement>;
     tableContainerRef: React.RefObject<HTMLDivElement>;
     renderErrorMessage: RenderErrorMessage;
     initialEntitiesCount?: number;
@@ -54,7 +54,7 @@ export const PaginatedStorageNodesTable = ({
     visibleEntities,
     nodesUptimeFilter,
     onShowAll,
-    parentRef,
+    scrollContainerRef,
     tableContainerRef,
     renderErrorMessage,
     initialEntitiesCount,
@@ -102,7 +102,7 @@ export const PaginatedStorageNodesTable = ({
     return (
         <ResizeablePaginatedTable
             columnsWidthLSKey={STORAGE_NODES_COLUMNS_WIDTH_LS_KEY}
-            parentRef={parentRef}
+            scrollContainerRef={scrollContainerRef}
             tableContainerRef={tableContainerRef}
             columns={columns}
             fetchData={getStorageNodes}

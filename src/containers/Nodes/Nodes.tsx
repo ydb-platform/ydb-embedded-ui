@@ -49,7 +49,7 @@ import './Nodes.scss';
 export interface NodesProps {
     path?: string;
     database?: string;
-    parentRef: React.RefObject<HTMLElement>;
+    scrollContainerRef: React.RefObject<HTMLElement>;
     additionalNodesProps?: AdditionalNodesProps;
 
     withPeerRoleFilter?: boolean;
@@ -64,7 +64,7 @@ export interface NodesProps {
 export function Nodes({
     path,
     database,
-    parentRef,
+    scrollContainerRef,
     additionalNodesProps,
     withPeerRoleFilter,
     columns = getNodesColumns({database, getNodeRef: additionalNodesProps?.getNodeRef}),
@@ -112,7 +112,7 @@ export function Nodes({
                 <GroupedNodesComponent
                     path={path}
                     database={database}
-                    parentRef={parentRef}
+                    scrollContainerRef={scrollContainerRef}
                     withPeerRoleFilter={withPeerRoleFilter}
                     columns={preparedColumns}
                     defaultColumnsIds={defaultColumnsIds}
@@ -127,7 +127,7 @@ export function Nodes({
             <NodesComponent
                 path={path}
                 database={database}
-                parentRef={parentRef}
+                scrollContainerRef={scrollContainerRef}
                 withPeerRoleFilter={withPeerRoleFilter}
                 columns={preparedColumns}
                 defaultColumnsIds={defaultColumnsIds}
@@ -144,7 +144,7 @@ export function Nodes({
 interface NodesComponentProps {
     path?: string;
     database?: string;
-    parentRef: React.RefObject<HTMLElement>;
+    scrollContainerRef: React.RefObject<HTMLElement>;
 
     withPeerRoleFilter?: boolean;
 
@@ -158,7 +158,7 @@ interface NodesComponentProps {
 function NodesComponent({
     path,
     database,
-    parentRef,
+    scrollContainerRef,
     withPeerRoleFilter,
     columns,
     defaultColumnsIds,
@@ -200,7 +200,7 @@ function NodesComponent({
                         uptimeFilter={uptimeFilter}
                         peerRoleFilter={peerRoleFilter}
                         columns={columnsToShow}
-                        parentRef={parentRef}
+                        scrollContainerRef={scrollContainerRef}
                         tableContainerRef={tableContainerRef}
                     />
                 </TableWithControlsLayout.Table>
@@ -249,7 +249,7 @@ interface NodeGroupProps {
     peerRoleFilter?: NodesPeerRole;
     groupByParam?: NodesGroupByField;
     columns: Column<NodesPreparedEntity>[];
-    parentRef: React.RefObject<HTMLElement>;
+    scrollContainerRef: React.RefObject<HTMLElement>;
     tableContainerRef: React.RefObject<HTMLDivElement>;
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
 }
@@ -264,7 +264,7 @@ const NodeGroup = React.memo(function NodeGroup({
     peerRoleFilter,
     groupByParam,
     columns,
-    parentRef,
+    scrollContainerRef,
     tableContainerRef,
     onIsExpandedChange,
 }: NodeGroupProps) {
@@ -288,7 +288,7 @@ const NodeGroup = React.memo(function NodeGroup({
                 filterGroupBy={groupByParam}
                 initialEntitiesCount={count}
                 columns={columns}
-                parentRef={parentRef}
+                scrollContainerRef={scrollContainerRef}
                 tableContainerRef={tableContainerRef}
             />
         </TableGroup>
@@ -298,7 +298,7 @@ const NodeGroup = React.memo(function NodeGroup({
 function GroupedNodesComponent({
     path,
     database,
-    parentRef,
+    scrollContainerRef,
     withPeerRoleFilter,
     columns,
     defaultColumnsIds,
@@ -369,7 +369,7 @@ function GroupedNodesComponent({
                         peerRoleFilter={peerRoleFilter}
                         groupByParam={groupByParam}
                         columns={columnsToShow}
-                        parentRef={parentRef}
+                        scrollContainerRef={scrollContainerRef}
                         tableContainerRef={tableContainerRef}
                         onIsExpandedChange={setIsGroupExpanded}
                     />
