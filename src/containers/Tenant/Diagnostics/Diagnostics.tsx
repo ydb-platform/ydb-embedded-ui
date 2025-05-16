@@ -124,7 +124,7 @@ function Diagnostics(props: DiagnosticsProps) {
                         path={path}
                         database={tenantName}
                         additionalNodesProps={props.additionalNodesProps}
-                        parentRef={containerRef}
+                        scrollContainerRef={containerRef}
                     />
                 );
             }
