@@ -214,44 +214,16 @@ export const isTopicEntityType = (type?: EPathType) => type === EPathType.EPathT
 
 // ====================
 
-const pathTypeToEntityWithMergedImplementation: Record<EPathType, boolean> = {
-    [EPathType.EPathTypeCdcStream]: true,
-
-    [EPathType.EPathTypePersQueueGroup]: false,
-    [EPathType.EPathTypeInvalid]: false,
-    [EPathType.EPathTypeColumnStore]: false,
-    [EPathType.EPathTypeColumnTable]: false,
-    [EPathType.EPathTypeDir]: false,
-    [EPathType.EPathTypeTable]: false,
-    [EPathType.EPathTypeSubDomain]: false,
-    [EPathType.EPathTypeTableIndex]: false,
-    [EPathType.EPathTypeExtSubDomain]: false,
-
-    [EPathType.EPathTypeExternalDataSource]: false,
-    [EPathType.EPathTypeExternalTable]: false,
-
-    [EPathType.EPathTypeView]: false,
-
-    [EPathType.EPathTypeReplication]: false,
-    [EPathType.EPathTypeTransfer]: false,
-    [EPathType.EPathTypeResourcePool]: false,
-};
-
-export const isEntityWithMergedImplementation = (type?: EPathType) =>
-    (type && pathTypeToEntityWithMergedImplementation[type]) ?? false;
-
-// ====================
-
 const pathSubTypeToChildless: Record<EPathSubType, boolean> = {
     [EPathSubType.EPathSubTypeSyncIndexImplTable]: true,
     [EPathSubType.EPathSubTypeAsyncIndexImplTable]: true,
+    [EPathSubType.EPathSubTypeStreamImpl]: true,
 
-    [EPathSubType.EPathSubTypeStreamImpl]: false,
     [EPathSubType.EPathSubTypeEmpty]: false,
 };
 
 const pathTypeToChildless: Record<EPathType, boolean> = {
-    [EPathType.EPathTypeCdcStream]: true,
+    [EPathType.EPathTypeCdcStream]: false,
     [EPathType.EPathTypePersQueueGroup]: true,
 
     [EPathType.EPathTypeExternalDataSource]: true,

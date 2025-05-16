@@ -4,7 +4,7 @@ import {StringParam, useQueryParams} from 'use-query-params';
 
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import type {TenantDiagnosticsTab} from '../../../store/reducers/tenant/types';
-import {EPathType} from '../../../types/api/schema';
+import {EPathSubType, EPathType} from '../../../types/api/schema';
 import type {TenantQuery} from '../TenantPages';
 import {TenantTabsGroups, getTenantPath} from '../TenantPages';
 import {isDatabaseEntityType, isTopicEntityType} from '../utils/schema';
@@ -113,7 +113,8 @@ const COLUMN_TABLE_PAGES = [overview, schema, topShards, nodes, tablets, describ
 
 const DIR_PAGES = [overview, topShards, nodes, describe];
 
-const CDC_STREAM_PAGES = [overview, consumers, partitions, nodes, tablets, describe];
+const CDC_STREAM_PAGES = [overview, consumers, partitions, nodes, describe];
+const CDC_STREAM_IMPL_PAGES = [overview, nodes, tablets, describe];
 const TOPIC_PAGES = [overview, consumers, partitions, topicData, nodes, tablets, describe];
 
 const EXTERNAL_DATA_SOURCE_PAGES = [overview, describe];
@@ -149,15 +150,23 @@ const pathTypeToPages: Record<EPathType, Page[] | undefined> = {
     [EPathType.EPathTypeTransfer]: TRANSFER_PAGES,
     [EPathType.EPathTypeResourcePool]: DIR_PAGES,
 };
+const pathSubTypeToPages: Record<EPathSubType, Page[] | undefined> = {
+    [EPathSubType.EPathSubTypeStreamImpl]: CDC_STREAM_IMPL_PAGES,
+
+    [EPathSubType.EPathSubTypeSyncIndexImplTable]: undefined,
+    [EPathSubType.EPathSubTypeAsyncIndexImplTable]: undefined,
+    [EPathSubType.EPathSubTypeEmpty]: undefined,
+};
 
 export const getPagesByType = (
     type?: EPathType,
+    subType?: EPathSubType,
     options?: {hasFeatureFlags?: boolean; hasTopicData?: boolean; isTopLevel?: boolean},
 ) => {
-    if (!type || !pathTypeToPages[type]) {
-        return DIR_PAGES;
-    }
-    let pages = pathTypeToPages[type];
+    const subTypePages = subType ? pathSubTypeToPages[subType] : undefined;
+    const typePages = type ? pathTypeToPages[type] : undefined;
+    let pages = subTypePages || typePages || DIR_PAGES;
+
     if (isTopicEntityType(type) && !options?.hasTopicData) {
         return pages?.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.topicData);
     }
