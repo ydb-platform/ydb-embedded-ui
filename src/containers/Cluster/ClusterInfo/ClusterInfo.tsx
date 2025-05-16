@@ -57,7 +57,7 @@ export const ClusterInfo = ({
                 })}
                 {linksList.length > 0 && (
                     <DefinitionList.Item name={i18n('title_links')}>
-                        <Flex direction="column" gap={1}>
+                        <Flex direction="column" gap={2}>
                             {linksList.map(({title, url}) => {
                                 return <LinkWithIcon key={title} title={title} url={url} />;
                             })}
@@ -79,7 +79,7 @@ export const ClusterInfo = ({
     const renderDetailSection = () => {
         return (
             <InfoSection>
-                <Text as="div" variant="subheader-1" className={b('section-title')}>
+                <Text as="div" variant="subheader-2" className={b('section-title')}>
                     {i18n('title_details')}
                 </Text>
                 {renderDetailsContent()}
@@ -96,9 +96,9 @@ export const ClusterInfo = ({
         }
         return (
             <InfoSection>
-                <Text as="div" variant="subheader-1" className={b('section-title')}>
+                <Text as="div" variant="subheader-2" className={b('section-title')}>
                     {i18n('title_storage-groups')}{' '}
-                    <Text variant="subheader-1" color="secondary">
+                    <Text variant="subheader-2" color="secondary">
                         {formatNumber(total)}
                     </Text>
                 </Text>
