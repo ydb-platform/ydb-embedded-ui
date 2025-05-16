@@ -73,6 +73,7 @@ export const paramSetup = {
     '/cluster/tenants': {
         search: {
             stateKey: 'tenants.searchValue',
+            initialState: '',
         },
     },
 } as const;
