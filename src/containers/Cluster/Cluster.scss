@@ -8,13 +8,27 @@
 
     width: 100%;
     height: 100%;
-    padding: 0 var(--cluster-side-padding);
+
+    &__sticky-wrapper {
+        padding: 0 var(--cluster-side-padding);
+    }
+
+    &__dashboard {
+        position: sticky;
+        left: 0;
+
+        padding: 0 var(--cluster-side-padding);
+    }
+
+    &__content {
+        padding: 0 var(--cluster-side-padding);
+    }
 
     &__header {
         position: sticky;
         left: 0;
 
-        padding: 20px 0;
+        padding: var(--g-spacing-5) var(--cluster-side-padding);
     }
 
     &__title {
@@ -31,13 +45,8 @@
     &__tabs-sticky-wrapper {
         z-index: 3;
 
-        width: calc(100% + var(--cluster-side-padding) * 2);
         margin-top: 20px;
-        margin-right: calc(var(--cluster-side-padding) * -2);
-        padding-right: calc(var(--cluster-side-padding) * 1);
-        padding-left: var(--cluster-side-padding);
-
-        transform: translateX(calc(var(--cluster-side-padding) * -1));
+        padding: 0 var(--cluster-side-padding);
         @include mixins.sticky-top();
     }
     &__tabs {
