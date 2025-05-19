@@ -155,6 +155,7 @@ export function Tenant(props: TenantProps) {
                         <div className={b('main')}>
                             <ObjectGeneral
                                 type={currentPathType}
+                                subType={currentPathSubType}
                                 additionalTenantProps={props.additionalTenantProps}
                                 additionalNodesProps={props.additionalNodesProps}
                                 tenantName={tenantName}
