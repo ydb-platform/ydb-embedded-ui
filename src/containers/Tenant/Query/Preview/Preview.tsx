@@ -1,3 +1,4 @@
+import {useTopicDataAvailable} from '../../../../store/reducers/capabilities/hooks';
 import {EPathType} from '../../../../types/api/schema';
 import {isTableType} from '../../utils/schema';
 import i18n from '../i18n';
@@ -14,11 +15,12 @@ export function PreviewContainer(props: PreviewContainerProps) {
     const {type} = props;
     const isTable = isTableType(type);
     const isTopic = type === EPathType.EPathTypePersQueueGroup;
+    const isTopicPreviewAvailable = useTopicDataAvailable();
 
     if (isTable) {
         return <TablePreview {...props} />;
     }
-    if (isTopic) {
+    if (isTopic && isTopicPreviewAvailable) {
         return <TopicPreview {...props} />;
     }
 
