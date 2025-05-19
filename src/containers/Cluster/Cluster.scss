@@ -31,9 +31,10 @@
     &__tabs-sticky-wrapper {
         z-index: 3;
 
+        width: calc(100% + var(--cluster-side-padding) * 2);
         margin-top: 20px;
         margin-right: calc(var(--cluster-side-padding) * -2);
-        padding-right: calc(var(--cluster-side-padding) * 2);
+        padding-right: calc(var(--cluster-side-padding) * 1);
         padding-left: var(--cluster-side-padding);
 
         transform: translateX(calc(var(--cluster-side-padding) * -1));
