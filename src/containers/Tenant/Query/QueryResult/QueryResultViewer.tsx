@@ -71,7 +71,7 @@ const RESULT_OPTIONS_TITLES: Record<SectionID, string> = {
 };
 
 const EXECUTE_SECTIONS: SectionID[] = ['result', 'schema', 'simplified', 'stats'];
-const EXPLAIN_SECTIONS: SectionID[] = ['schema', 'json', 'simplified', 'ast'];
+const EXPLAIN_SECTIONS: SectionID[] = ['schema', 'simplified', 'json', 'ast'];
 
 interface ExecuteResultProps {
     result: QueryResult;
