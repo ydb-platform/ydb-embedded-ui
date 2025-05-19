@@ -6,7 +6,10 @@ import React from 'react';
 import {NavigationTree} from 'ydb-ui-components';
 
 import {getConnectToDBDialog} from '../../../../components/ConnectToDB/ConnectToDBDialog';
-import {useCreateDirectoryFeatureAvailable} from '../../../../store/reducers/capabilities/hooks';
+import {
+    useCreateDirectoryFeatureAvailable,
+    useTopicDataAvailable,
+} from '../../../../store/reducers/capabilities/hooks';
 import {selectIsDirty, selectUserInput} from '../../../../store/reducers/query/query';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
 import {tableSchemaDataApi} from '../../../../store/reducers/tableSchemaData';
@@ -43,6 +46,8 @@ export function SchemaTree(props: SchemaTreeProps) {
         getTableSchemaDataQuery,
         {currentData: actionsSchemaData, isFetching: isActionsDataFetching},
     ] = tableSchemaDataApi.useLazyGetTableSchemaDataQuery();
+
+    const isTopicPreviewAvailable = useTopicDataAvailable();
 
     const [createDirectoryOpen, setCreateDirectoryOpen] = React.useState(false);
     const [parentPath, setParentPath] = React.useState('');
@@ -171,9 +176,14 @@ export function SchemaTree(props: SchemaTreeProps) {
 
                     return [];
                 }}
-                renderAdditionalNodeElements={getSchemaControls(dispatch, {
-                    setActivePath: onActivePathUpdate,
-                })}
+                renderAdditionalNodeElements={getSchemaControls(
+                    dispatch,
+                    {
+                        setActivePath: onActivePathUpdate,
+                    },
+                    undefined,
+                    isTopicPreviewAvailable,
+                )}
                 activePath={currentPath}
                 onActivePathUpdate={onActivePathUpdate}
                 cache={false}

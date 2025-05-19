@@ -54,6 +54,7 @@ export const getSchemaControls =
         dispatch: React.Dispatch<any>,
         additionalEffects: ControlsAdditionalEffects,
         size?: ButtonSize,
+        isTopicPreviewAvailable?: boolean,
     ) =>
     (path: string, type: NavigationTreeNodeType) => {
         const options = bindActions(path, dispatch, additionalEffects);
@@ -71,7 +72,7 @@ export const getSchemaControls =
             column_table: openPreview,
 
             index_table: undefined,
-            topic: openPreview,
+            topic: isTopicPreviewAvailable ? openPreview : undefined,
             stream: undefined,
 
             index: undefined,
