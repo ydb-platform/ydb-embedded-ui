@@ -116,6 +116,10 @@ export const useCreateDatabaseFeatureAvailable = () => {
     return useGetMetaFeatureVersion('/meta/create_database') >= 1;
 };
 
+export const useEditDatabaseFeatureAvailable = () => {
+    return useGetMetaFeatureVersion('/meta/update_database') >= 1;
+};
+
 export const useDeleteDatabaseFeatureAvailable = () => {
     return useGetMetaFeatureVersion('/meta/delete_database') >= 1;
 };
