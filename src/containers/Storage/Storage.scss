@@ -15,10 +15,4 @@
     .entity-status {
         justify-content: center;
     }
-
-    &__groups-wrapper {
-        --nodes-side-padding: var(--g-spacing-5);
-        width: calc(100% + var(--nodes-side-padding));
-        padding-right: var(--nodes-side-padding);
-    }
 }

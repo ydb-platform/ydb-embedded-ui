@@ -21,7 +21,9 @@
     }
 
     &__content {
-        padding: 0 var(--cluster-side-padding);
+        width: calc(100% - var(--cluster-side-padding));
+        //allows controls of TableWithControlsLayout to stick properly
+        transform: translateX(var(--cluster-side-padding));
     }
 
     &__header {
