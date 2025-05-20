@@ -60,26 +60,23 @@ export function Preview({
     };
 
     const renderContent = () => {
-        let message;
-
         if (error) {
-            message = (
+            return (
                 <div className={b('message-container', 'error')}>
                     {parseQueryErrorToString(error)}
                 </div>
             );
         }
-        if (message) {
-            return message;
-        }
-        return <div className={b('result')}>{renderResult?.()}</div>;
+        return renderResult?.();
     };
 
     return (
         <LoaderWrapper loading={loading}>
             <div className={b()}>
                 {renderHeader()}
-                <Fullscreen>{renderContent()}</Fullscreen>
+                <Fullscreen>
+                    <div className={b('result')}>{renderContent()}</div>
+                </Fullscreen>
             </div>
         </LoaderWrapper>
     );

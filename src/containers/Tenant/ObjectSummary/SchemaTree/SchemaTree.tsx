@@ -24,6 +24,7 @@ import {
     nodeTableTypeToPathType,
 } from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
+import type {DropdownItem, TreeNodeMeta} from '../../utils/types';
 import {CreateDirectoryDialog} from '../CreateDirectoryDialog/CreateDirectoryDialog';
 import {useDispatchTreeKey, useTreeKey} from '../UpdateTreeContext';
 import {isDomain} from '../transformPath';
@@ -96,6 +97,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                 // FIXME: should only be explicitly set to true for tables with indexes
                 // at the moment of writing there is no property to determine this, fix later
                 expandable: !isChildless,
+                meta: {subType: PathSubType},
             };
         });
 
@@ -158,7 +160,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                 parentPath={parentPath}
                 onSuccess={handleSuccessSubmit}
             />
-            <NavigationTree
+            <NavigationTree<DropdownItem, TreeNodeMeta>
                 key={schemaTreeKey}
                 rootState={{
                     path: rootPath,

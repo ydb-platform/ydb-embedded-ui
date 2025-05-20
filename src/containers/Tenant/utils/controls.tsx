@@ -1,12 +1,14 @@
 import type {ButtonSize} from '@gravity-ui/uikit';
 import {Button, Icon} from '@gravity-ui/uikit';
-import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
+import type {NavigationTreeNodeType} from 'ydb-ui-components';
 
 import {api} from '../../../store/reducers/api';
 import {setShowPreview} from '../../../store/reducers/schema/schema';
 import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
 import i18n from '../i18n';
+
+import type {YdbNavigationTreeProps} from './types';
 
 import EyeIcon from '@gravity-ui/icons/svgs/eye.svg';
 
@@ -32,7 +34,7 @@ const bindActions = (
     };
 };
 
-type Controls = ReturnType<Required<NavigationTreeProps>['renderAdditionalNodeElements']>;
+type Controls = ReturnType<Required<YdbNavigationTreeProps>['renderAdditionalNodeElements']>;
 
 type SummaryType = 'preview';
 
@@ -55,8 +57,8 @@ export const getSchemaControls =
         additionalEffects: ControlsAdditionalEffects,
         size?: ButtonSize,
         isTopicPreviewAvailable?: boolean,
-    ) =>
-    (path: string, type: NavigationTreeNodeType) => {
+    ): YdbNavigationTreeProps['renderAdditionalNodeElements'] =>
+    (path, type, meta) => {
         const options = bindActions(path, dispatch, additionalEffects);
         const openPreview = getPreviewControl(options, size);
 
@@ -72,7 +74,7 @@ export const getSchemaControls =
             column_table: openPreview,
 
             index_table: undefined,
-            topic: isTopicPreviewAvailable ? openPreview : undefined,
+            topic: isTopicPreviewAvailable && !meta?.subType ? openPreview : undefined,
             stream: undefined,
 
             index: undefined,

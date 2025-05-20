@@ -1,7 +1,7 @@
 import {Copy, PlugConnection} from '@gravity-ui/icons';
 import {Flex, Spin} from '@gravity-ui/uikit';
 import copy from 'copy-to-clipboard';
-import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
+import type {NavigationTreeNodeType} from 'ydb-ui-components';
 
 import type {SnippetParams} from '../../../components/ConnectToDB/types';
 import type {AppDispatch} from '../../../store';
@@ -39,6 +39,7 @@ import {
     selectQueryTemplate,
     upsertQueryTemplate,
 } from './schemaQueryTemplates';
+import type {YdbNavigationTreeProps} from './types';
 
 interface ActionsAdditionalParams {
     setActivePath: (path: string) => void;
@@ -139,7 +140,7 @@ const bindActions = (
     };
 };
 
-type ActionsSet = ReturnType<Required<NavigationTreeProps>['getActions']>;
+type ActionsSet = ReturnType<Required<YdbNavigationTreeProps>['getActions']>;
 
 interface ActionConfig {
     text: string;
