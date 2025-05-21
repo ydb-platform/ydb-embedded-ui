@@ -59,7 +59,7 @@
 
     &__create-database {
         position: sticky;
-        right: 0;
+        right: calc(var(--cluster-side-padding) * 2);
 
         margin: 0 0 0 auto;
     }
