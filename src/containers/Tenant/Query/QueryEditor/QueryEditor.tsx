@@ -22,7 +22,7 @@ import {
 import type {QueryResult} from '../../../../store/reducers/query/types';
 import {setQueryAction} from '../../../../store/reducers/queryActions/queryActions';
 import {selectShowPreview, setShowPreview} from '../../../../store/reducers/schema/schema';
-import type {EPathType} from '../../../../types/api/schema';
+import type {EPathSubType, EPathType} from '../../../../types/api/schema';
 import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {
@@ -70,11 +70,12 @@ interface QueryEditorProps {
     changeUserInput: (arg: {input: string}) => void;
     theme: string;
     type?: EPathType;
+    subType?: EPathSubType;
 }
 
 export default function QueryEditor(props: QueryEditorProps) {
     const dispatch = useTypedDispatch();
-    const {tenantName, path, type, theme, changeUserInput} = props;
+    const {tenantName, path, type, theme, changeUserInput, subType} = props;
     const savedPath = useTypedSelector(selectTenantPath);
     const result = useTypedSelector(selectResult);
     const historyQueries = useTypedSelector(selectQueriesHistory);
@@ -270,6 +271,7 @@ export default function QueryEditor(props: QueryEditorProps) {
                         onExpandResultHandler={onExpandResultHandler}
                         onCollapseResultHandler={onCollapseResultHandler}
                         type={type}
+                        subType={subType}
                         theme={theme}
                         key={result?.queryId}
                         result={result}
@@ -291,6 +293,7 @@ interface ResultProps {
     onExpandResultHandler: VoidFunction;
     onCollapseResultHandler: VoidFunction;
     type?: EPathType;
+    subType?: EPathSubType;
     theme: string;
     result?: QueryResult;
     tenantName: string;
@@ -304,6 +307,7 @@ function Result({
     onExpandResultHandler,
     onCollapseResultHandler,
     type,
+    subType,
     theme,
     result,
     tenantName,
@@ -313,7 +317,7 @@ function Result({
     tableSettings,
 }: ResultProps) {
     if (showPreview) {
-        return <PreviewContainer database={tenantName} path={path} type={type} />;
+        return <PreviewContainer database={tenantName} path={path} type={type} subType={subType} />;
     }
 
     if (result) {

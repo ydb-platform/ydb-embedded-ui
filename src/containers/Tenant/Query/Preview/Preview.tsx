@@ -12,7 +12,7 @@ import type {PreviewContainerProps} from './types';
 import './Preview.scss';
 
 export function PreviewContainer(props: PreviewContainerProps) {
-    const {type} = props;
+    const {type, subType} = props;
     const isTable = isTableType(type);
     const isTopic = type === EPathType.EPathTypePersQueueGroup;
     const isTopicPreviewAvailable = useTopicDataAvailable();
@@ -20,7 +20,9 @@ export function PreviewContainer(props: PreviewContainerProps) {
     if (isTable) {
         return <TablePreview {...props} />;
     }
-    if (isTopic && isTopicPreviewAvailable) {
+
+    // preview is not available for topics inside CDC (has subtype)
+    if (isTopic && !subType && isTopicPreviewAvailable) {
         return <TopicPreview {...props} />;
     }
 
