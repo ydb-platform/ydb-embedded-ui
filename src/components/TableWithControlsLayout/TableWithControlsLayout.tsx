@@ -37,7 +37,7 @@ TableWithControlsLayout.Controls = function TableControls({
             gap={2}
         >
             <div className={b('controls', className)}>{children}</div>
-            {renderExtraControls()}
+            {renderExtraControls?.()}
         </Flex>
     );
 };
