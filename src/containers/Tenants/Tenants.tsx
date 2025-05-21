@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {CirclePlus, TrashBin} from '@gravity-ui/icons';
+import {CirclePlus, Pencil, TrashBin} from '@gravity-ui/icons';
 import type {Column} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
 import type {DropdownMenuItem} from '@gravity-ui/uikit';
@@ -18,6 +18,7 @@ import {TenantNameWrapper} from '../../components/TenantNameWrapper/TenantNameWr
 import {
     useCreateDatabaseFeatureAvailable,
     useDeleteDatabaseFeatureAvailable,
+    useEditDatabaseFeatureAvailable,
 } from '../../store/reducers/capabilities/hooks';
 import {
     ProblemFilterValues,
@@ -70,6 +71,7 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
 
     const isCreateDBAvailable =
         useCreateDatabaseFeatureAvailable() && uiFactory.onCreateDB !== undefined;
+    const isEditDBAvailable = useEditDatabaseFeatureAvailable() && uiFactory.onEditDB !== undefined;
     const isDeleteDBAvailable =
         useDeleteDatabaseFeatureAvailable() && uiFactory.onDeleteDB !== undefined;
 
@@ -238,51 +240,14 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
             },
         ];
 
-        if (isDeleteDBAvailable) {
-            columns.push({
-                name: 'actions',
-                header: '',
-                width: 40,
-                resizeable: false,
-                align: DataTable.CENTER,
-                render: ({row}) => {
-                    const databaseId = row.UserAttributes?.database_id;
-                    const databaseName = row.Name;
-
-                    let menuItems: (DropdownMenuItem | DropdownMenuItem[])[] = [];
-
-                    if (clusterName && databaseName && databaseId) {
-                        menuItems = [
-                            {
-                                text: i18n('remove'),
-                                iconStart: <TrashBin />,
-                                action: () => {
-                                    uiFactory.onDeleteDB?.({
-                                        clusterName,
-                                        databaseId,
-                                        databaseName,
-                                    });
-                                },
-                                className: b('remove-db'),
-                            },
-                        ];
-                    }
-
-                    if (!menuItems.length) {
-                        return null;
-                    }
-                    return (
-                        <DropdownMenu
-                            defaultSwitcherProps={{
-                                view: 'flat',
-                                size: 's',
-                                pin: 'brick-brick',
-                            }}
-                            items={menuItems}
-                        />
-                    );
-                },
+        if (clusterName && (isDeleteDBAvailable || isEditDBAvailable)) {
+            const actionsColumn = getDBActionsColumn({
+                clusterName,
+                isDeleteDBAvailable,
+                isEditDBAvailable,
             });
+
+            columns.push(actionsColumn);
         }
 
         if (filteredTenants.length === 0 && problemFilter !== ProblemFilterValues.ALL) {
@@ -314,3 +279,60 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
         </div>
     );
 };
+
+function getDBActionsColumn({
+    clusterName,
+    isEditDBAvailable,
+    isDeleteDBAvailable,
+}: {
+    clusterName: string;
+    isEditDBAvailable?: boolean;
+    isDeleteDBAvailable?: boolean;
+}) {
+    return {
+        name: 'actions',
+        header: '',
+        width: 40,
+        resizeable: false,
+        align: DataTable.CENTER,
+        render: ({row}) => {
+            const menuItems: (DropdownMenuItem | DropdownMenuItem[])[] = [];
+
+            const databaseId = row.UserAttributes?.database_id;
+            const databaseName = row.Name;
+
+            if (clusterName && isEditDBAvailable) {
+                menuItems.push({
+                    text: i18n('edit'),
+                    iconStart: <Pencil />,
+                    action: () => {
+                        uiFactory.onEditDB?.({
+                            clusterName,
+                            databaseData: row,
+                        });
+                    },
+                });
+            }
+            if (clusterName && isDeleteDBAvailable && databaseName && databaseId) {
+                menuItems.push({
+                    text: i18n('remove'),
+                    iconStart: <TrashBin />,
+                    action: () => {
+                        uiFactory.onDeleteDB?.({
+                            clusterName,
+                            databaseId,
+                            databaseName,
+                        });
+                    },
+                    className: b('remove-db'),
+                });
+            }
+
+            if (!menuItems.length) {
+                return null;
+            }
+
+            return <DropdownMenu items={menuItems} />;
+        },
+    } satisfies Column<PreparedTenant>;
+}

@@ -1,4 +1,5 @@
 {
   "create-database": "Create database",
-  "remove": "Remove"
+  "remove": "Remove",
+  "edit": "Edit"
 }
