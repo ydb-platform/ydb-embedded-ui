@@ -4,6 +4,8 @@
     --g-definition-list-item-gap: var(--g-spacing-3);
     padding: var(--g-spacing-4) 0 var(--g-spacing-2);
 
+    @include mixins.body-2-typography();
+
     &__skeleton {
         margin-top: 5px;
     }

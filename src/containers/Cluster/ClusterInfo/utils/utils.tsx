@@ -42,7 +42,7 @@ export const getInfo = (cluster: TClusterInfo, additionalInfo: InfoItem[]) => {
     if (dataCenters?.length) {
         info.push({
             label: i18n('label_dc'),
-            value: <Tags tags={dataCenters} gap={1} className={b('dc')} />,
+            value: <Tags tags={dataCenters} gap={2} className={b('dc')} />,
         });
     }
 
@@ -55,7 +55,7 @@ export const getInfo = (cluster: TClusterInfo, additionalInfo: InfoItem[]) => {
                 <EntityStatus.Label
                     withStatusName={false}
                     status={state as EFlag}
-                    size="xs"
+                    size="s"
                     key={state}
                     iconSize={12}
                 >
@@ -65,7 +65,7 @@ export const getInfo = (cluster: TClusterInfo, additionalInfo: InfoItem[]) => {
         });
         info.push({
             label: i18n('label_nodes-state'),
-            value: <Flex gap={1}>{nodesStates}</Flex>,
+            value: <Flex gap={2}>{nodesStates}</Flex>,
         });
     }
 
