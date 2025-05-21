@@ -123,13 +123,15 @@ export function Cluster({
                 <AutoRefreshControl className={b('auto-refresh-control')} />
             </div>
             {isClusterDashboardAvailable && (
-                <ClusterOverview
-                    cluster={cluster ?? {}}
-                    groupStats={groupsStats}
-                    loading={infoLoading}
-                    error={clusterError || cluster?.error}
-                    additionalClusterProps={additionalClusterProps}
-                />
+                <div className={b('dashboard')}>
+                    <ClusterOverview
+                        cluster={cluster ?? {}}
+                        groupStats={groupsStats}
+                        loading={infoLoading}
+                        error={clusterError || cluster?.error}
+                        additionalClusterProps={additionalClusterProps}
+                    />
+                </div>
             )}
             <div className={b('tabs-sticky-wrapper')}>
                 <Tabs
@@ -153,46 +155,54 @@ export function Cluster({
                     }}
                 />
             </div>
-            <Switch>
-                <Route
-                    path={
-                        getLocationObjectFromHref(getClusterPath(clusterTabsIds.tablets)).pathname
-                    }
-                >
-                    <TabletsTable loading={infoLoading} tablets={clusterTablets} />
-                </Route>
-                <Route
-                    path={
-                        getLocationObjectFromHref(getClusterPath(clusterTabsIds.tenants)).pathname
-                    }
-                >
-                    <Tenants additionalTenantsProps={additionalTenantsProps} />
-                </Route>
-                <Route
-                    path={getLocationObjectFromHref(getClusterPath(clusterTabsIds.nodes)).pathname}
-                >
-                    <Nodes parentRef={container} additionalNodesProps={additionalNodesProps} />
-                </Route>
-                <Route
-                    path={
-                        getLocationObjectFromHref(getClusterPath(clusterTabsIds.storage)).pathname
-                    }
-                >
-                    <PaginatedStorage parentRef={container} />
-                </Route>
-                <Route
-                    path={
-                        getLocationObjectFromHref(getClusterPath(clusterTabsIds.versions)).pathname
-                    }
-                >
-                    <VersionsContainer cluster={cluster} loading={infoLoading} />
-                </Route>
-                <Route
-                    render={() => (
-                        <Redirect to={getLocationObjectFromHref(getClusterPath(activeTabId))} />
-                    )}
-                />
-            </Switch>
+            <div className={b('content')}>
+                <Switch>
+                    <Route
+                        path={
+                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.tablets))
+                                .pathname
+                        }
+                    >
+                        <TabletsTable loading={infoLoading} tablets={clusterTablets} />
+                    </Route>
+                    <Route
+                        path={
+                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.tenants))
+                                .pathname
+                        }
+                    >
+                        <Tenants additionalTenantsProps={additionalTenantsProps} />
+                    </Route>
+                    <Route
+                        path={
+                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.nodes)).pathname
+                        }
+                    >
+                        <Nodes parentRef={container} additionalNodesProps={additionalNodesProps} />
+                    </Route>
+                    <Route
+                        path={
+                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.storage))
+                                .pathname
+                        }
+                    >
+                        <PaginatedStorage parentRef={container} />
+                    </Route>
+                    <Route
+                        path={
+                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.versions))
+                                .pathname
+                        }
+                    >
+                        <VersionsContainer cluster={cluster} loading={infoLoading} />
+                    </Route>
+                    <Route
+                        render={() => (
+                            <Redirect to={getLocationObjectFromHref(getClusterPath(activeTabId))} />
+                        )}
+                    />
+                </Switch>
+            </div>
         </div>
     );
 }

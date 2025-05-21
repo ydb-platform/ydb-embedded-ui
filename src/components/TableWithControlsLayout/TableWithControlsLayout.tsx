@@ -1,3 +1,5 @@
+import {Flex} from '@gravity-ui/uikit';
+
 import {cn} from '../../utils/cn';
 import {TableSkeleton} from '../TableSkeleton/TableSkeleton';
 
@@ -7,6 +9,7 @@ const b = cn('ydb-table-with-controls-layout');
 
 interface TableWithControlsLayoutItemProps {
     children: React.ReactNode;
+    renderExtraControls?: () => React.ReactNode;
     className?: string;
 }
 
@@ -23,12 +26,19 @@ export const TableWithControlsLayout = ({
 
 TableWithControlsLayout.Controls = function TableControls({
     children,
+    renderExtraControls,
     className,
 }: TableWithControlsLayoutItemProps) {
     return (
-        <div className={b('controls-wrapper')}>
+        <Flex
+            justifyContent="space-between"
+            alignItems="center"
+            className={b('controls-wrapper')}
+            gap={2}
+        >
             <div className={b('controls', className)}>{children}</div>
-        </div>
+            {renderExtraControls?.()}
+        </Flex>
     );
 };
 

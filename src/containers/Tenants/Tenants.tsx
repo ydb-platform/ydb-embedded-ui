@@ -123,7 +123,6 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
                     label={'Databases'}
                     loading={loading}
                 />
-                {renderCreateDBButton()}
             </React.Fragment>
         );
     };
@@ -268,7 +267,7 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
     return (
         <div className={b('table-wrapper')}>
             <TableWithControlsLayout>
-                <TableWithControlsLayout.Controls>
+                <TableWithControlsLayout.Controls renderExtraControls={renderCreateDBButton}>
                     {renderControls()}
                 </TableWithControlsLayout.Controls>
                 {error ? <ResponseError error={error} /> : null}
