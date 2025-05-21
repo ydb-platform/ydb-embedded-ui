@@ -332,16 +332,7 @@ function getDBActionsColumn({
                 return null;
             }
 
-            return (
-                <DropdownMenu
-                    defaultSwitcherProps={{
-                        view: 'flat',
-                        size: 's',
-                        pin: 'brick-brick',
-                    }}
-                    items={menuItems}
-                />
-            );
+            return <DropdownMenu items={menuItems} />;
         },
     } satisfies Column<PreparedTenant>;
 }
