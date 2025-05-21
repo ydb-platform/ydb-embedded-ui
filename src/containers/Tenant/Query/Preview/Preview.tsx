@@ -1,5 +1,5 @@
 import {useTopicDataAvailable} from '../../../../store/reducers/capabilities/hooks';
-import {EPathType} from '../../../../types/api/schema';
+import {EPathSubType, EPathType} from '../../../../types/api/schema';
 import {isTableType} from '../../utils/schema';
 import i18n from '../i18n';
 
@@ -15,14 +15,14 @@ export function PreviewContainer(props: PreviewContainerProps) {
     const {type, subType} = props;
     const isTable = isTableType(type);
     const isTopic = type === EPathType.EPathTypePersQueueGroup;
+    const isCdcTopic = subType === EPathSubType.EPathSubTypeStreamImpl;
     const isTopicPreviewAvailable = useTopicDataAvailable();
 
     if (isTable) {
         return <TablePreview {...props} />;
     }
 
-    // preview is not available for topics inside CDC (has subtype)
-    if (isTopic && !subType && isTopicPreviewAvailable) {
+    if (isTopic && !isCdcTopic && isTopicPreviewAvailable) {
         return <TopicPreview {...props} />;
     }
 
