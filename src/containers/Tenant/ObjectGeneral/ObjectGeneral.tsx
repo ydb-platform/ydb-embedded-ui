@@ -32,7 +32,15 @@ function ObjectGeneral(props: ObjectGeneralProps) {
             props;
         switch (tenantPage) {
             case TENANT_PAGES_IDS.query: {
-                return <Query tenantName={tenantName} path={path} theme={theme} type={type} />;
+                return (
+                    <Query
+                        tenantName={tenantName}
+                        path={path}
+                        theme={theme}
+                        type={type}
+                        subType={subType}
+                    />
+                );
             }
             default: {
                 return (

@@ -92,7 +92,7 @@ export function EntityStatus({
                 </InternalLink>
             );
         }
-        return name && <span className={b('name')}>{name}</span>;
+        return name && <span className={b('name')}>{renderName(name)}</span>;
     };
     return (
         <div className={b(null, className)}>

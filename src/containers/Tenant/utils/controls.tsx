@@ -1,12 +1,15 @@
 import type {ButtonSize} from '@gravity-ui/uikit';
 import {Button, Icon} from '@gravity-ui/uikit';
-import type {NavigationTreeNodeType, NavigationTreeProps} from 'ydb-ui-components';
+import type {NavigationTreeNodeType} from 'ydb-ui-components';
 
 import {api} from '../../../store/reducers/api';
 import {setShowPreview} from '../../../store/reducers/schema/schema';
 import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
+import {EPathSubType} from '../../../types/api/schema';
 import i18n from '../i18n';
+
+import type {YdbNavigationTreeProps} from './types';
 
 import EyeIcon from '@gravity-ui/icons/svgs/eye.svg';
 
@@ -32,7 +35,7 @@ const bindActions = (
     };
 };
 
-type Controls = ReturnType<Required<NavigationTreeProps>['renderAdditionalNodeElements']>;
+type Controls = ReturnType<Required<YdbNavigationTreeProps>['renderAdditionalNodeElements']>;
 
 type SummaryType = 'preview';
 
@@ -54,10 +57,13 @@ export const getSchemaControls =
         dispatch: React.Dispatch<any>,
         additionalEffects: ControlsAdditionalEffects,
         size?: ButtonSize,
-    ) =>
-    (path: string, type: NavigationTreeNodeType) => {
+        isTopicPreviewAvailable?: boolean,
+    ): YdbNavigationTreeProps['renderAdditionalNodeElements'] =>
+    (path, type, meta) => {
         const options = bindActions(path, dispatch, additionalEffects);
         const openPreview = getPreviewControl(options, size);
+
+        const isCdcTopic = meta?.subType === EPathSubType.EPathSubTypeStreamImpl;
 
         const nodeTypeToControls: Record<NavigationTreeNodeType, Controls> = {
             async_replication: undefined,
@@ -71,7 +77,7 @@ export const getSchemaControls =
             column_table: openPreview,
 
             index_table: undefined,
-            topic: undefined,
+            topic: isTopicPreviewAvailable && !isCdcTopic ? openPreview : undefined,
             stream: undefined,
 
             index: undefined,

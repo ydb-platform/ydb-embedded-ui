@@ -6,7 +6,10 @@ import React from 'react';
 import {NavigationTree} from 'ydb-ui-components';
 
 import {getConnectToDBDialog} from '../../../../components/ConnectToDB/ConnectToDBDialog';
-import {useCreateDirectoryFeatureAvailable} from '../../../../store/reducers/capabilities/hooks';
+import {
+    useCreateDirectoryFeatureAvailable,
+    useTopicDataAvailable,
+} from '../../../../store/reducers/capabilities/hooks';
 import {selectIsDirty, selectUserInput} from '../../../../store/reducers/query/query';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
 import {tableSchemaDataApi} from '../../../../store/reducers/tableSchemaData';
@@ -21,6 +24,7 @@ import {
     nodeTableTypeToPathType,
 } from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
+import type {DropdownItem, TreeNodeMeta} from '../../utils/types';
 import {CreateDirectoryDialog} from '../CreateDirectoryDialog/CreateDirectoryDialog';
 import {useDispatchTreeKey, useTreeKey} from '../UpdateTreeContext';
 import {isDomain} from '../transformPath';
@@ -43,6 +47,8 @@ export function SchemaTree(props: SchemaTreeProps) {
         getTableSchemaDataQuery,
         {currentData: actionsSchemaData, isFetching: isActionsDataFetching},
     ] = tableSchemaDataApi.useLazyGetTableSchemaDataQuery();
+
+    const isTopicPreviewAvailable = useTopicDataAvailable();
 
     const [createDirectoryOpen, setCreateDirectoryOpen] = React.useState(false);
     const [parentPath, setParentPath] = React.useState('');
@@ -91,6 +97,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                 // FIXME: should only be explicitly set to true for tables with indexes
                 // at the moment of writing there is no property to determine this, fix later
                 expandable: !isChildless,
+                meta: {subType: PathSubType},
             };
         });
 
@@ -153,7 +160,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                 parentPath={parentPath}
                 onSuccess={handleSuccessSubmit}
             />
-            <NavigationTree
+            <NavigationTree<DropdownItem, TreeNodeMeta>
                 key={schemaTreeKey}
                 rootState={{
                     path: rootPath,
@@ -171,9 +178,14 @@ export function SchemaTree(props: SchemaTreeProps) {
 
                     return [];
                 }}
-                renderAdditionalNodeElements={getSchemaControls(dispatch, {
-                    setActivePath: onActivePathUpdate,
-                })}
+                renderAdditionalNodeElements={getSchemaControls(
+                    dispatch,
+                    {
+                        setActivePath: onActivePathUpdate,
+                    },
+                    undefined,
+                    isTopicPreviewAvailable,
+                )}
                 activePath={currentPath}
                 onActivePathUpdate={onActivePathUpdate}
                 cache={false}
