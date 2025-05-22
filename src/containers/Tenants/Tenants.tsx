@@ -54,10 +54,11 @@ const b = cn('tenants');
 const DATABASES_COLUMNS_WIDTH_LS_KEY = 'databasesTableColumnsWidth';
 
 interface TenantsProps {
+    scrollContainerRef: React.RefObject<HTMLElement>;
     additionalTenantsProps?: AdditionalTenantsProps;
 }
 
-export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
+export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsProps) => {
     const dispatch = useTypedDispatch();
 
     const clusterName = useClusterNameFromQuery();
@@ -266,12 +267,16 @@ export const Tenants = ({additionalTenantsProps}: TenantsProps) => {
 
     return (
         <div className={b('table-wrapper')}>
-            <TableWithControlsLayout>
+            <TableWithControlsLayout fullHeight>
                 <TableWithControlsLayout.Controls renderExtraControls={renderCreateDBButton}>
                     {renderControls()}
                 </TableWithControlsLayout.Controls>
                 {error ? <ResponseError error={error} /> : null}
-                <TableWithControlsLayout.Table loading={loading}>
+                <TableWithControlsLayout.Table
+                    scrollContainerRef={scrollContainerRef}
+                    loading={loading}
+                    scrollDependencies={[searchValue, problemFilter]}
+                >
                     {currentData ? renderTable() : null}
                 </TableWithControlsLayout.Table>
             </TableWithControlsLayout>

@@ -249,7 +249,7 @@ export function PDiskPage() {
                     <PaginatedStorage
                         nodeId={nodeId}
                         pDiskId={pDiskId}
-                        parentRef={containerRef}
+                        scrollContainerRef={containerRef}
                         viewContext={{
                             nodeId: nodeId?.toString(),
                             pDiskId: pDiskId?.toString(),

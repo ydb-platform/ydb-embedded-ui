@@ -1,7 +1,6 @@
 import React from 'react';
 
 import {Illustration} from '../../components/Illustration';
-import type {RenderControls} from '../../components/PaginatedTable';
 import {ResizeablePaginatedTable} from '../../components/PaginatedTable';
 import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../components/nodesColumns/constants';
 import type {NodesFilters, NodesPreparedEntity} from '../../store/reducers/nodes/types';
@@ -28,9 +27,8 @@ interface NodesTableProps {
     filterGroupBy?: NodesGroupByField;
 
     columns: Column<NodesPreparedEntity>[];
-    parentRef: React.RefObject<HTMLElement>;
+    scrollContainerRef: React.RefObject<HTMLElement>;
 
-    renderControls?: RenderControls;
     initialEntitiesCount?: number;
 }
 
@@ -44,8 +42,7 @@ export function NodesTable({
     filterGroup,
     filterGroupBy,
     columns,
-    parentRef,
-    renderControls,
+    scrollContainerRef,
     initialEntitiesCount,
 }: NodesTableProps) {
     const tableFilters: NodesFilters = React.useMemo(() => {
@@ -81,11 +78,10 @@ export function NodesTable({
     return (
         <ResizeablePaginatedTable
             columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
-            parentRef={parentRef}
+            scrollContainerRef={scrollContainerRef}
             columns={columns}
             fetchData={getNodes}
             initialEntitiesCount={initialEntitiesCount}
-            renderControls={renderControls}
             renderErrorMessage={renderPaginatedTableErrorMessage}
             renderEmptyDataMessage={renderEmptyDataMessage}
             getRowClassName={getRowClassName}

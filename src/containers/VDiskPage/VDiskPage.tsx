@@ -193,7 +193,7 @@ export function VDiskPage() {
                         groupId={GroupID}
                         nodeId={nodeId}
                         pDiskId={pDiskId ?? undefined}
-                        parentRef={containerRef}
+                        scrollContainerRef={containerRef}
                         viewContext={{
                             groupId: GroupID?.toString(),
                             nodeId: nodeId?.toString(),

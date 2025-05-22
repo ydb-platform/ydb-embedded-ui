@@ -169,9 +169,16 @@ interface TabletsTableProps {
     className?: string;
     loading?: boolean;
     error?: unknown;
+    scrollContainerRef: React.RefObject<HTMLElement>;
 }
 
-export function TabletsTable({database, tablets, loading, error}: TabletsTableProps) {
+export function TabletsTable({
+    database,
+    tablets,
+    loading,
+    error,
+    scrollContainerRef,
+}: TabletsTableProps) {
     const [{tabletsSearch}, setQueryParams] = useQueryParams({
         tabletsSearch: StringParam,
     });
@@ -189,7 +196,7 @@ export function TabletsTable({database, tablets, loading, error}: TabletsTablePr
     };
 
     return (
-        <TableWithControlsLayout>
+        <TableWithControlsLayout fullHeight>
             <TableWithControlsLayout.Controls>
                 <Search
                     placeholder={i18n('controls.search-placeholder')}
@@ -205,7 +212,11 @@ export function TabletsTable({database, tablets, loading, error}: TabletsTablePr
                 />
             </TableWithControlsLayout.Controls>
             {error ? <ResponseError error={error} /> : null}
-            <TableWithControlsLayout.Table loading={loading}>
+            <TableWithControlsLayout.Table
+                scrollContainerRef={scrollContainerRef}
+                scrollDependencies={[tabletsSearch]}
+                loading={loading}
+            >
                 <ResizeableDataTable
                     columns={columns}
                     data={filteredTablets}

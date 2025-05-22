@@ -167,7 +167,11 @@ export function Cluster({
                                 .pathname
                         }
                     >
-                        <TabletsTable loading={infoLoading} tablets={clusterTablets} />
+                        <TabletsTable
+                            loading={infoLoading}
+                            tablets={clusterTablets}
+                            scrollContainerRef={container}
+                        />
                     </Route>
                     <Route
                         path={
@@ -175,14 +179,20 @@ export function Cluster({
                                 .pathname
                         }
                     >
-                        <Tenants additionalTenantsProps={additionalTenantsProps} />
+                        <Tenants
+                            additionalTenantsProps={additionalTenantsProps}
+                            scrollContainerRef={container}
+                        />
                     </Route>
                     <Route
                         path={
                             getLocationObjectFromHref(getClusterPath(clusterTabsIds.nodes)).pathname
                         }
                     >
-                        <Nodes parentRef={container} additionalNodesProps={additionalNodesProps} />
+                        <Nodes
+                            scrollContainerRef={container}
+                            additionalNodesProps={additionalNodesProps}
+                        />
                     </Route>
                     <Route
                         path={
@@ -190,7 +200,7 @@ export function Cluster({
                                 .pathname
                         }
                     >
-                        <PaginatedStorage parentRef={container} />
+                        <PaginatedStorage scrollContainerRef={container} />
                     </Route>
                     <Route
                         path={

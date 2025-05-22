@@ -2,6 +2,7 @@
 
 .ydb-cluster {
     --cluster-side-padding: var(--g-spacing-5);
+    --sticky-tabs-height: 40px;
     position: relative;
 
     overflow: auto;
@@ -22,6 +23,7 @@
 
     &__content {
         width: calc(100% - var(--cluster-side-padding));
+        min-height: calc(100% - var(--sticky-tabs-height, 0px));
         //allows controls of TableWithControlsLayout to stick properly
         transform: translateX(var(--cluster-side-padding));
     }
@@ -75,6 +77,7 @@
     }
 
     .ydb-table-with-controls-layout {
-        --data-table-sticky-top-offset: 102px;
+        // Total height of all fixed elements above table for sticky header positioning
+        --data-table-sticky-header-offset: 102px;
     }
 }

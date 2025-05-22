@@ -3,7 +3,7 @@ import React from 'react';
 import {calculateElementOffsetTop, rafThrottle} from './utils';
 
 interface UseScrollBasedChunksProps {
-    parentRef: React.RefObject<HTMLElement>;
+    scrollContainerRef: React.RefObject<HTMLElement>;
     tableRef: React.RefObject<HTMLElement>;
     totalItems: number;
     rowHeight: number;
@@ -14,7 +14,7 @@ interface UseScrollBasedChunksProps {
 const DEFAULT_OVERSCAN_COUNT = 1;
 
 export const useScrollBasedChunks = ({
-    parentRef,
+    scrollContainerRef,
     tableRef,
     totalItems,
     rowHeight,
@@ -32,7 +32,7 @@ export const useScrollBasedChunks = ({
     );
 
     const calculateVisibleRange = React.useCallback(() => {
-        const container = parentRef?.current;
+        const container = scrollContainerRef?.current;
         const table = tableRef.current;
         if (!container || !table) {
             return null;
@@ -49,7 +49,7 @@ export const useScrollBasedChunks = ({
             Math.max(chunksCount - 1, 0),
         );
         return {start, end};
-    }, [parentRef, tableRef, rowHeight, chunkSize, overscanCount, chunksCount]);
+    }, [scrollContainerRef, tableRef, rowHeight, chunkSize, overscanCount, chunksCount]);
 
     const updateVisibleChunks = React.useCallback(() => {
         const newRange = calculateVisibleRange();
@@ -80,7 +80,7 @@ export const useScrollBasedChunks = ({
     }, [updateVisibleChunks]);
 
     React.useEffect(() => {
-        const container = parentRef?.current;
+        const container = scrollContainerRef?.current;
         if (!container) {
             return undefined;
         }
@@ -91,7 +91,7 @@ export const useScrollBasedChunks = ({
         return () => {
             container.removeEventListener('scroll', throttledHandleScroll);
         };
-    }, [handleScroll, parentRef]);
+    }, [handleScroll, scrollContainerRef]);
 
     return React.useMemo(() => {
         // boolean array that represents active chunks
