@@ -12,7 +12,7 @@ import './TableWithControlsLayout.scss';
 const b = cn('ydb-table-with-controls-layout');
 
 interface TableWithControlsLayoutItemProps {
-    children: React.ReactNode;
+    children?: React.ReactNode;
     renderExtraControls?: () => React.ReactNode;
     className?: string;
     fullHeight?: boolean;
