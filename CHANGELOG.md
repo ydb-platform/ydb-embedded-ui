@@ -1,5 +1,19 @@
 # Changelog
 
+## [9.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.1.0...v9.2.0) (2025-05-22)
+
+
+### Features
+
+* **Preview:** add preview for topics ([#2292](https://github.com/ydb-platform/ydb-embedded-ui/issues/2292)) ([c4a4abf](https://github.com/ydb-platform/ydb-embedded-ui/commit/c4a4abf6119728abadad0a958afaaea4bba40309))
+* **Tenants:** add onEditDB to uiFactory, add edit button ([#2305](https://github.com/ydb-platform/ydb-embedded-ui/issues/2305)) ([21c7126](https://github.com/ydb-platform/ydb-embedded-ui/commit/21c7126f147631b9c75362efa72f749a51d91d8b))
+
+
+### Bug Fixes
+
+* **Cluster:** autorefresh cluster data ([#2307](https://github.com/ydb-platform/ydb-embedded-ui/issues/2307)) ([713315c](https://github.com/ydb-platform/ydb-embedded-ui/commit/713315c9029f108024503a9089b47dcc7b2d0608))
+* **Cluster:** side paddings ([#2301](https://github.com/ydb-platform/ydb-embedded-ui/issues/2301)) ([478c9e8](https://github.com/ydb-platform/ydb-embedded-ui/commit/478c9e8a5775ef1cc327dc46afe9402879721013))
+
 ## [9.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.0.0...v9.1.0) (2025-05-21)
 
 
