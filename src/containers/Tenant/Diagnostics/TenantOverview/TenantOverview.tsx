@@ -1,6 +1,7 @@
-import {Flex, Loader} from '@gravity-ui/uikit';
+import {Flex} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
+import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {LogsButton} from '../../../../components/LogsButton/LogsButton';
 import {MonitoringButton} from '../../../../components/MonitoringButton/MonitoringButton';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
@@ -142,37 +143,31 @@ export function TenantOverview({
         }
     };
 
-    if (tenantLoading) {
-        return (
-            <div className={b('loader')}>
-                <Loader size="m" />
-            </div>
-        );
-    }
-
     const monitoringLink = additionalTenantProps?.getMonitoringLink?.(Name, Type);
     const logsLink = additionalTenantProps?.getLogsLink?.(Name);
 
     return (
-        <div className={b()}>
-            <div className={b('info')}>
-                <div className={b('top-label')}>{tenantType}</div>
-                <Flex alignItems="center" gap="1" className={b('top')}>
-                    {renderName()}
-                    <Flex gap="2">
-                        {monitoringLink && <MonitoringButton href={monitoringLink} />}
-                        {logsLink && <LogsButton href={logsLink} />}
+        <LoaderWrapper loading={tenantLoading}>
+            <div className={b()}>
+                <div className={b('info')}>
+                    <div className={b('top-label')}>{tenantType}</div>
+                    <Flex alignItems="center" gap="1" className={b('top')}>
+                        {renderName()}
+                        <Flex gap="2">
+                            {monitoringLink && <MonitoringButton href={monitoringLink} />}
+                            {logsLink && <LogsButton href={logsLink} />}
+                        </Flex>
                     </Flex>
-                </Flex>
-                <MetricsCards
-                    poolsCpuStats={poolsStats}
-                    memoryStats={memoryStats}
-                    blobStorageStats={blobStorageStats}
-                    tabletStorageStats={tabletStorageStats}
-                    tenantName={tenantName}
-                />
+                    <MetricsCards
+                        poolsCpuStats={poolsStats}
+                        memoryStats={memoryStats}
+                        blobStorageStats={blobStorageStats}
+                        tabletStorageStats={tabletStorageStats}
+                        tenantName={tenantName}
+                    />
+                </div>
+                {renderTabContent()}
             </div>
-            {renderTabContent()}
-        </div>
+        </LoaderWrapper>
     );
 }
