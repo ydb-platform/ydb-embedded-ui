@@ -26,7 +26,7 @@ import type {
 } from '../../types/additionalProps';
 import {EFlag} from '../../types/api/enums';
 import {cn} from '../../utils/cn';
-import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {Nodes} from '../Nodes/Nodes';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 import {TabletsTable} from '../Tablets/TabletsTable';
@@ -55,6 +55,8 @@ export function Cluster({
     const container = React.useRef<HTMLDivElement>(null);
     const isClusterDashboardAvailable = useClusterDashboardAvailable();
 
+    const [autoRefreshInterval] = useAutoRefreshInterval();
+
     const dispatch = useTypedDispatch();
 
     const activeTabId = useClusterTab();
@@ -76,7 +78,9 @@ export function Cluster({
         data: {clusterData: cluster, groupsStats} = {},
         isLoading: infoLoading,
         error,
-    } = clusterApi.useGetClusterInfoQuery(clusterName ?? undefined);
+    } = clusterApi.useGetClusterInfoQuery(clusterName ?? undefined, {
+        pollingInterval: autoRefreshInterval,
+    });
 
     const clusterError = error && typeof error === 'object' ? error : undefined;
 
