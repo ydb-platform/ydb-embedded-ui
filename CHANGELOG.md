@@ -1,5 +1,13 @@
 # Changelog
 
+## [9.2.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.2.0...v9.2.1) (2025-05-22)
+
+
+### Bug Fixes
+
+* paginated table in groups scrolled to top on refresh ([#2291](https://github.com/ydb-platform/ydb-embedded-ui/issues/2291)) ([f4971ee](https://github.com/ydb-platform/ydb-embedded-ui/commit/f4971eeb4846ba9468094fe039d4c4acb5ceb74d))
+* reset base offsets on selected partition change ([#2314](https://github.com/ydb-platform/ydb-embedded-ui/issues/2314)) ([6119f14](https://github.com/ydb-platform/ydb-embedded-ui/commit/6119f1490a0bb4c5f3e21ceb87dcf289a644d8b6))
+
 ## [9.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.1.0...v9.2.0) (2025-05-22)
 
 
