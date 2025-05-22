@@ -108,17 +108,20 @@ export function TopicData({scrollContainerRef, path, database}: TopicDataProps) 
         {pollingInterval: autoRefreshInterval},
     );
 
+    const prevSelectedPartition = React.useRef(selectedPartition);
+
     React.useEffect(() => {
+        const selectedPartitionChanged = selectedPartition !== prevSelectedPartition.current;
         const selectedPartitionData = partitions?.find(
             ({partitionId}) => partitionId === selectedPartition,
         );
         if (selectedPartitionData) {
             let endOffset = baseEndOffset;
-            if (!baseEndOffset) {
+            if (!baseEndOffset || selectedPartitionChanged) {
                 endOffset = safeParseNumber(selectedPartitionData.endOffset);
                 setBaseEndOffset(endOffset);
             }
-            if (!baseOffset) {
+            if (!baseOffset || selectedPartitionChanged) {
                 const partitionStartOffset = safeParseNumber(selectedPartitionData.startOffset);
                 const newStartOffset = Math.max(
                     (endOffset ?? 0) - PAGINATED_TABLE_LIMIT,
@@ -129,7 +132,10 @@ export function TopicData({scrollContainerRef, path, database}: TopicDataProps) 
                 setBaseOffset(newStartOffset);
             }
         }
-    }, [selectedPartition, partitions, baseOffset, baseEndOffset, startOffset, endOffset]);
+        if (selectedPartitionChanged) {
+            prevSelectedPartition.current = selectedPartition;
+        }
+    }, [selectedPartition, partitions, baseEndOffset, baseOffset]);
 
     React.useEffect(() => {
         if (partitions && partitions.length && isNil(selectedPartition)) {
