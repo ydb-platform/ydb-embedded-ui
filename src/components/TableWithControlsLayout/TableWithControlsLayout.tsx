@@ -29,7 +29,7 @@ export const TableWithControlsLayout = ({
     className,
     fullHeight,
 }: TableWithControlsLayoutItemProps) => {
-    return <div className={b({fullHeight}, className)}>{children}</div>;
+    return <div className={b({'full-height': fullHeight}, className)}>{children}</div>;
 };
 
 TableWithControlsLayout.Controls = function TableControls({

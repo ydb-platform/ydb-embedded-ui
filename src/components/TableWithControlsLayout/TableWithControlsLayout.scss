@@ -9,7 +9,7 @@
     box-sizing: border-box;
     min-width: 100%;
 
-    &_fullHeight {
+    &_full-height {
         min-height: calc(100% - var(--sticky-tabs-height, 0px));
     }
 
