@@ -16,7 +16,7 @@ import {b} from '../shared';
 import {useStorageQueryParams} from '../useStorageQueryParams';
 import {useStorageColumnsSettings} from '../utils';
 
-import {StorageNodesControlsWithTableState} from './StorageNodesControls';
+import {StorageNodesControls} from './StorageNodesControls';
 import {useStorageNodesColumnsToSelect} from './useStorageNodesColumnsToSelect';
 
 interface StorageNodeGroupProps {
@@ -161,9 +161,12 @@ export function GroupedStorageNodesComponent({
     return (
         <PaginatedTableWithLayout
             controls={
-                <StorageNodesControlsWithTableState
+                <StorageNodesControls
                     withTypeSelector
                     withGroupBySelect
+                    entitiesCountCurrent={found}
+                    entitiesCountTotal={found}
+                    entitiesLoading={isLoading}
                     columnsToSelect={columnsToSelect}
                     handleSelectedColumnsUpdate={setColumns}
                 />
