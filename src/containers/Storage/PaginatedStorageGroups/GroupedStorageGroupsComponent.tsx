@@ -16,7 +16,7 @@ import i18n from '../i18n';
 import {b} from '../shared';
 import {useStorageQueryParams} from '../useStorageQueryParams';
 
-import {StorageGroupsControlsWithTableState} from './StorageGroupsControls';
+import {StorageGroupsControls} from './StorageGroupsControls';
 
 interface StorageGroupGroupProps {
     name: string;
@@ -160,9 +160,12 @@ export function GroupedStorageGroupsComponent({
     return (
         <PaginatedTableWithLayout
             controls={
-                <StorageGroupsControlsWithTableState
+                <StorageGroupsControls
                     withTypeSelector
                     withGroupBySelect
+                    entitiesCountCurrent={found}
+                    entitiesCountTotal={total}
+                    entitiesLoading={isLoading}
                     columnsToSelect={columnsToSelect}
                     handleSelectedColumnsUpdate={setColumns}
                 />

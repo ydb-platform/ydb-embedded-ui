@@ -13,12 +13,11 @@ import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
 import {TableGroup} from '../../Storage/TableGroup/TableGroup';
 import {useExpandedGroups} from '../../Storage/TableGroup/useExpandedTableGroups';
+import {NodesControls} from '../NodesControls/NodesControls';
 import {NodesTable} from '../NodesTable';
 import i18n from '../i18n';
 import {b} from '../shared';
 import {useNodesPageQueryParams} from '../useNodesPageQueryParams';
-
-import {NodesControlsWithTableState} from './NodesControlsWithTableState';
 
 interface NodeGroupProps {
     name: string;
@@ -172,12 +171,15 @@ export function GroupedNodesComponent({
         <PaginatedTableWithLayout
             initialState={initialState}
             controls={
-                <NodesControlsWithTableState
-                    withGroupBySelect={true}
+                <NodesControls
                     groupByParams={groupByParams}
                     withPeerRoleFilter={withPeerRoleFilter}
                     columnsToSelect={columnsToSelect}
                     handleSelectedColumnsUpdate={setColumns}
+                    entitiesCountCurrent={found}
+                    entitiesCountTotal={total}
+                    entitiesLoading={isLoading}
+                    withGroupBySelect
                 />
             }
             error={error ? <ResponseError error={error} /> : null}
