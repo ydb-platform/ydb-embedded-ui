@@ -165,7 +165,7 @@ export function GroupedStorageNodesComponent({
                     withTypeSelector
                     withGroupBySelect
                     entitiesCountCurrent={found}
-                    entitiesCountTotal={found}
+                    entitiesCountTotal={total}
                     entitiesLoading={isLoading}
                     columnsToSelect={columnsToSelect}
                     handleSelectedColumnsUpdate={setColumns}
