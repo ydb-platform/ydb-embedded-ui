@@ -202,4 +202,16 @@
     &__row-skeleton::after {
         display: none !important;
     }
+
+    // Virtual row container for row-level virtualization
+    &__virtual-row-container {
+        // Performance optimizations for virtualized rows
+        backface-visibility: hidden;
+
+        // Ensure smooth animations
+        transition: transform 0ms;
+
+        // Ensure the container takes full width
+        width: 100%;
+    }
 }

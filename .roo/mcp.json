@@ -1,0 +1,46 @@
+{
+  "mcpServers": {
+    "conport": {
+      "command": "/Users/astandrik/workspace/ydb-embedded-ui/.venv/bin/python",
+      "args": [
+        "-m",
+        "context_portal_mcp.main",
+        "--mode",
+        "stdio",
+        "--workspace_id",
+        "${workspaceFolder}"
+      ],
+      "alwaysAllow": [
+        "update_product_context",
+        "update_active_context",
+        "log_system_pattern",
+        "log_custom_data",
+        "batch_log_items",
+        "log_progress",
+        "log_decision",
+        "link_conport_items",
+        "get_recent_activity_summary",
+        "get_product_context",
+        "get_active_context",
+        "get_progress",
+        "get_system_patterns",
+        "update_progress",
+        "get_decisions",
+        "get_custom_data",
+        "delete_progress_by_id",
+        "delete_custom_data",
+        "search_project_glossary_fts",
+        "export_conport_to_markdown",
+        "import_markdown_to_conport",
+        "get_linked_items",
+        "search_custom_data_value_fts",
+        "get_item_history",
+        "delete_decision_by_id",
+        "delete_system_pattern_by_id",
+        "get_conport_schema",
+        "semantic_search_conport",
+        "search_decisions_fts"
+      ]
+    }
+  }
+}

@@ -73,13 +73,22 @@ interface TableRowProps<T> {
     row: T;
     height: number;
     getRowClassName?: GetRowClassName<T>;
+    style?: React.CSSProperties;
+    'data-index'?: number;
 }
 
-export const TableRow = <T,>({row, columns, getRowClassName, height}: TableRowProps<T>) => {
+export const TableRow = <T,>({
+    row,
+    columns,
+    getRowClassName,
+    height,
+    style,
+    'data-index': dataIndex,
+}: TableRowProps<T>) => {
     const additionalClassName = getRowClassName?.(row);
 
     return (
-        <tr className={b('row', additionalClassName)}>
+        <tr className={b('row', additionalClassName)} style={style} data-index={dataIndex}>
             {columns.map((column) => {
                 const resizeable = column.resizeable ?? DEFAULT_RESIZEABLE;
 

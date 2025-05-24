@@ -1,8 +1,8 @@
 import React from 'react';
 
 import {usePaginatedTableState} from './PaginatedTableContext';
-import {TableChunk} from './TableChunk';
 import {TableHead} from './TableHead';
+import {VirtualizedTableContent} from './VirtualizedTableContent';
 import {DEFAULT_TABLE_ROW_HEIGHT} from './constants';
 import {b} from './shared';
 import type {
@@ -15,7 +15,8 @@ import type {
     RenderErrorMessage,
     SortParams,
 } from './types';
-import {useScrollBasedChunks} from './useScrollBasedChunks';
+import {useChunkFetcher} from './useChunkFetcher';
+import {useVirtualRows} from './useVirtualRows';
 
 import './PaginatedTable.scss';
 
@@ -45,7 +46,6 @@ export const PaginatedTable = <T, F>({
     initialEntitiesCount,
     fetchData,
     filters: rawFilters,
-    tableName,
     columns,
     getRowClassName,
     rowHeight = DEFAULT_TABLE_ROW_HEIGHT,
@@ -56,7 +56,6 @@ export const PaginatedTable = <T, F>({
     renderEmptyDataMessage,
     containerClassName,
     onDataFetched,
-    keepCache = true,
 }: PaginatedTableProps<T, F>) => {
     // Get state and setters from context
     const {tableState, setSortParams, setTotalEntities, setFoundEntities, setIsInitialLoad} =
@@ -83,42 +82,12 @@ export const PaginatedTable = <T, F>({
     ]);
 
     const tableRef = React.useRef<HTMLDivElement>(null);
-
-    const activeChunks = useScrollBasedChunks({
-        scrollContainerRef,
-        tableRef,
-        totalItems: foundEntities,
-        rowHeight,
-        chunkSize,
-    });
-
-    // this prevent situation when filters are new, but active chunks is not yet recalculated (it will be done to the next rendrer, so we bring filters change on the next render too)
     const [filters, setFilters] = React.useState(rawFilters);
 
+    // Update filters when they change
     React.useEffect(() => {
         setFilters(rawFilters);
     }, [rawFilters]);
-
-    const lastChunkSize = React.useMemo(() => {
-        // If foundEntities = 0, there will only first chunk
-        // Display it with 1 row, to display empty data message
-        if (!foundEntities) {
-            return 1;
-        }
-        return foundEntities % chunkSize || chunkSize;
-    }, [foundEntities, chunkSize]);
-
-    const handleDataFetched = React.useCallback(
-        (data?: PaginatedTableData<T>) => {
-            if (data) {
-                setTotalEntities(data.total);
-                setFoundEntities(data.found);
-                setIsInitialLoad(false);
-                onDataFetched?.(data);
-            }
-        },
-        [onDataFetched, setFoundEntities, setIsInitialLoad, setTotalEntities],
-    );
 
     // Reset table on filters change
     React.useLayoutEffect(() => {
@@ -130,39 +99,53 @@ export const PaginatedTable = <T, F>({
         setIsInitialLoad(true);
     }, [initialEntitiesCount, setTotalEntities, setFoundEntities, setIsInitialLoad]);
 
-    const renderChunks = () => {
-        return activeChunks.map((isActive, index) => (
-            <TableChunk<T, F>
-                key={index}
-                id={index}
-                calculatedCount={index === activeChunks.length - 1 ? lastChunkSize : chunkSize}
-                chunkSize={chunkSize}
-                rowHeight={rowHeight}
-                columns={columns}
-                fetchData={fetchData}
-                filters={filters}
-                tableName={tableName}
-                sortParams={sortParams}
-                getRowClassName={getRowClassName}
-                renderErrorMessage={renderErrorMessage}
-                renderEmptyDataMessage={renderEmptyDataMessage}
-                onDataFetched={handleDataFetched}
-                isActive={isActive}
-                keepCache={keepCache}
-            />
-        ));
-    };
+    // Use our new virtualization hook
+    const {virtualRows, totalHeight, visibleRange} = useVirtualRows({
+        scrollContainerRef,
+        tableRef,
+        totalItems: foundEntities,
+        rowHeight,
+    });
 
-    const renderTable = () => (
-        <table className={b('table')}>
-            <TableHead columns={columns} onSort={setSortParams} onColumnsResize={onColumnsResize} />
-            {renderChunks()}
-        </table>
-    );
+    // Use our chunk fetcher hook
+    const columnsIds = columns.map((column) => column.name);
+    const {rowData, isLoading, error} = useChunkFetcher<T, F>({
+        fetchData,
+        filters,
+        sortParams,
+        columnsIds,
+        chunkSize,
+        visibleRange,
+        onDataFetched: (data) => {
+            setTotalEntities(data.total);
+            setFoundEntities(data.found);
+            setIsInitialLoad(false);
+            onDataFetched?.(data);
+        },
+    });
 
     return (
         <div ref={tableRef} className={b(null, containerClassName)}>
-            {renderTable()}
+            <table className={b('table')}>
+                <TableHead
+                    columns={columns}
+                    onSort={setSortParams}
+                    onColumnsResize={onColumnsResize}
+                />
+                <VirtualizedTableContent
+                    columns={columns}
+                    rowData={rowData}
+                    isLoading={isLoading}
+                    error={error}
+                    virtualRows={virtualRows}
+                    totalHeight={totalHeight}
+                    rowHeight={rowHeight}
+                    getRowClassName={getRowClassName}
+                    renderEmptyDataMessage={renderEmptyDataMessage}
+                    renderErrorMessage={renderErrorMessage}
+                    chunkSize={chunkSize}
+                />
+            </table>
         </div>
     );
 };

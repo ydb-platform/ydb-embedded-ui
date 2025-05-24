@@ -1,0 +1,183 @@
+import React from 'react';
+
+import type {FetchData, PaginatedTableData, SortParams} from './types';
+
+interface UseChunkFetcherProps<T, F> {
+    fetchData: FetchData<T, F>;
+    filters?: F;
+    sortParams?: SortParams;
+    columnsIds: string[];
+    chunkSize: number;
+    visibleRange?: {startIndex: number; endIndex: number};
+    onDataFetched?: (data: PaginatedTableData<T>) => void;
+}
+
+interface UseChunkFetcherResult<T> {
+    rowData: T[];
+    isLoading: boolean;
+    error: any;
+    totalEntities: number;
+    foundEntities: number;
+}
+
+/**
+ * Hook for fetching data chunks based on visible rows
+ * This hook handles fetching data for visible chunks and manages loading/error states
+ * Uses a cache-based approach without useEffect to avoid unnecessary renders
+ */
+export const useChunkFetcher = <T, F>({
+    fetchData,
+    filters,
+    sortParams,
+    columnsIds,
+    chunkSize,
+    visibleRange,
+    onDataFetched,
+}: UseChunkFetcherProps<T, F>): UseChunkFetcherResult<T> => {
+    const [rowData, setRowData] = React.useState<T[]>([]);
+    const [isLoading, setIsLoading] = React.useState(false);
+    const [error, setError] = React.useState<any>(null);
+    const [totalEntities, setTotalEntities] = React.useState(0);
+    const [foundEntities, setFoundEntities] = React.useState(0);
+
+    // Cache for request parameters to avoid duplicate requests
+    const requestCacheRef = React.useRef(new Map<string, boolean>());
+
+    // Timeout reference for debouncing
+    const timeoutRef = React.useRef<number | null>(null);
+
+    // Calculate which chunks we need to fetch based on visible rows
+    const chunksToFetch = React.useMemo(() => {
+        if (!visibleRange) {
+            return [];
+        }
+
+        const startChunk = Math.floor(visibleRange.startIndex / chunkSize);
+        const endChunk = Math.floor(visibleRange.endIndex / chunkSize);
+
+        const chunks = [];
+        for (let i = startChunk; i <= endChunk; i++) {
+            chunks.push(i);
+        }
+
+        return chunks;
+    }, [visibleRange, chunkSize]);
+
+    // Create a request key for caching
+    const requestKey = React.useMemo(() => {
+        return JSON.stringify({
+            chunks: chunksToFetch,
+            filters,
+            sortParams,
+            columnsIds,
+        });
+    }, [chunksToFetch, filters, sortParams, columnsIds]);
+
+    // Function to fetch data - called only when needed
+    const fetchChunksData = React.useCallback(async () => {
+        // If we've already made this exact request, don't repeat it
+        if (requestCacheRef.current.has(requestKey)) {
+            return;
+        }
+
+        // If there are no chunks to fetch, don't do anything
+        if (chunksToFetch.length === 0) {
+            return;
+        }
+
+        // Clear any pending timeout
+        if (timeoutRef.current !== null) {
+            clearTimeout(timeoutRef.current);
+        }
+
+        // Set a new timeout for debouncing
+        timeoutRef.current = window.setTimeout(async () => {
+            try {
+                // Mark this request as in progress
+                requestCacheRef.current.set(requestKey, true);
+
+                setIsLoading(true);
+                setError(null);
+
+                const allData: T[] = [];
+                let total = 0;
+                let found = 0;
+
+                // Fetch data for each chunk
+                for (const chunkId of chunksToFetch) {
+                    const offset = chunkId * chunkSize;
+
+                    const result = await fetchData({
+                        offset,
+                        limit: chunkSize,
+                        filters,
+                        sortParams,
+                        columnsIds,
+                    });
+
+                    if (result.data) {
+                        allData.push(...result.data);
+                        total = result.total;
+                        found = result.found;
+                    }
+                }
+
+                setRowData(allData);
+                setTotalEntities(total);
+                setFoundEntities(found);
+
+                if (onDataFetched) {
+                    onDataFetched({
+                        data: allData,
+                        total,
+                        found,
+                    });
+                }
+            } catch (err) {
+                setError(err);
+            } finally {
+                setIsLoading(false);
+                timeoutRef.current = null;
+            }
+        }, 200); // 200ms debounce
+    }, [
+        requestKey,
+        chunksToFetch,
+        chunkSize,
+        fetchData,
+        filters,
+        sortParams,
+        columnsIds,
+        onDataFetched,
+    ]);
+
+    // Trigger the fetch when the request key changes
+    React.useLayoutEffect(() => {
+        fetchChunksData();
+
+        // Cleanup function to clear timeout if component unmounts
+        return () => {
+            if (timeoutRef.current !== null) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, [fetchChunksData]);
+
+    // Limit the cache size to prevent memory leaks
+    React.useEffect(() => {
+        if (requestCacheRef.current.size > 50) {
+            // Keep only the 20 most recent entries
+            const entries = Array.from(requestCacheRef.current.entries());
+            const recentEntries = entries.slice(-20);
+            requestCacheRef.current = new Map(recentEntries);
+        }
+    }, [requestKey]);
+
+    return {
+        rowData,
+        isLoading,
+        error,
+        totalEntities,
+        foundEntities,
+    };
+};
