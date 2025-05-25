@@ -13,7 +13,7 @@ interface UseChunkFetcherProps<T, F> {
 }
 
 interface UseChunkFetcherResult<T> {
-    rowData: T[];
+    dataMap: Map<number, T>;
     isLoading: boolean;
     error: any;
     totalEntities: number;
@@ -24,7 +24,7 @@ interface UseChunkFetcherResult<T> {
 /**
  * Hook for fetching data chunks based on visible rows
  * This hook handles fetching data for visible chunks and manages loading/error states
- * Uses a cache-based approach without useEffect to avoid unnecessary renders
+ * Uses a sparse data map to properly handle virtualized data
  */
 export const useChunkFetcher = <T, F>({
     fetchData,
@@ -35,7 +35,7 @@ export const useChunkFetcher = <T, F>({
     visibleRange,
     onDataFetched,
 }: UseChunkFetcherProps<T, F>): UseChunkFetcherResult<T> => {
-    const [rowData, setRowData] = React.useState<T[]>([]);
+    const [dataMap, setDataMap] = React.useState<Map<number, T>>(new Map());
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState<any>(null);
     const [totalEntities, setTotalEntities] = React.useState(0);
@@ -75,6 +75,21 @@ export const useChunkFetcher = <T, F>({
         });
     }, [chunksToFetch, filters, sortParams, columnsIds]);
 
+    // Clear data when filters or sorting changes
+    const clearDataKey = React.useMemo(() => {
+        return JSON.stringify({
+            filters,
+            sortParams,
+            columnsIds,
+        });
+    }, [filters, sortParams, columnsIds]);
+
+    React.useEffect(() => {
+        // Clear all data when filters/sorting changes
+        setDataMap(new Map());
+        requestCacheRef.current.clear();
+    }, [clearDataKey]);
+
     // Function to fetch data - called only when needed
     const fetchChunksData = React.useCallback(async () => {
         // If we've already made this exact request, don't repeat it
@@ -83,6 +98,12 @@ export const useChunkFetcher = <T, F>({
         }
 
         // If there are no chunks to fetch, don't do anything
+        if (chunksToFetch.length === 0) {
+            return;
+        }
+
+        // With sparse data map, we can fetch all requested chunks
+        // The data map will handle duplicates naturally
         if (chunksToFetch.length === 0) {
             return;
         }
@@ -104,11 +125,11 @@ export const useChunkFetcher = <T, F>({
                 // Mark chunks as loading
                 setLoadingChunks(new Set(chunksToFetch));
 
-                const allData: T[] = [];
                 let total = 0;
                 let found = 0;
+                const newDataMap = new Map<number, T>();
 
-                // Fetch data for each chunk
+                // Fetch data for each chunk sequentially
                 for (const chunkId of chunksToFetch) {
                     const offset = chunkId * chunkSize;
 
@@ -121,17 +142,32 @@ export const useChunkFetcher = <T, F>({
                     });
 
                     if (result.data) {
-                        allData.push(...result.data);
+                        // Add data to map with proper row indices
+                        result.data.forEach((item, index) => {
+                            const rowIndex = offset + index;
+                            newDataMap.set(rowIndex, item);
+                        });
+
                         total = result.total;
                         found = result.found;
                     }
                 }
 
-                setRowData(allData);
+                // Update state with new data
+                setDataMap((prevDataMap) => {
+                    const updatedMap = new Map(prevDataMap);
+                    newDataMap.forEach((value, key) => {
+                        updatedMap.set(key, value);
+                    });
+                    return updatedMap;
+                });
+
                 setTotalEntities(total);
                 setFoundEntities(found);
 
                 if (onDataFetched) {
+                    // For backward compatibility, create array from new data
+                    const allData = Array.from(newDataMap.values());
                     onDataFetched({
                         data: allData,
                         total,
@@ -180,7 +216,7 @@ export const useChunkFetcher = <T, F>({
     }, [requestKey]);
 
     return {
-        rowData,
+        dataMap,
         isLoading,
         error,
         totalEntities,

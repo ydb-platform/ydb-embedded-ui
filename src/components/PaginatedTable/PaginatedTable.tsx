@@ -109,7 +109,7 @@ export const PaginatedTable = <T, F>({
 
     // Use our chunk fetcher hook
     const columnsIds = columns.map((column) => column.name);
-    const {rowData, isLoading, error, loadingChunks} = useChunkFetcher<T, F>({
+    const {dataMap, isLoading, error, loadingChunks} = useChunkFetcher<T, F>({
         fetchData,
         filters,
         sortParams,
@@ -134,7 +134,7 @@ export const PaginatedTable = <T, F>({
                 />
                 <VirtualizedTableContent
                     columns={columns}
-                    rowData={rowData}
+                    dataMap={dataMap}
                     isLoading={isLoading}
                     error={error}
                     virtualRows={virtualRows}

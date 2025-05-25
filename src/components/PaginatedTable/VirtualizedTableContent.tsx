@@ -9,7 +9,7 @@ import type {Column, GetRowClassName, RenderEmptyDataMessage, RenderErrorMessage
 
 interface VirtualizedTableContentProps<T> {
     columns: Column<T>[];
-    rowData: T[];
+    dataMap: Map<number, T>;
     isLoading: boolean;
     error: any;
     virtualRows: {index: number; top: number}[];
@@ -28,7 +28,7 @@ interface VirtualizedTableContentProps<T> {
  */
 export const VirtualizedTableContent = <T,>({
     columns,
-    rowData,
+    dataMap,
     isLoading,
     error,
     virtualRows,
@@ -40,7 +40,7 @@ export const VirtualizedTableContent = <T,>({
     chunkSize = 20,
     loadingChunks = new Set(),
 }: VirtualizedTableContentProps<T>) => {
-    if (isLoading && !rowData.length) {
+    if (isLoading && dataMap.size === 0) {
         // Show loading state
         return (
             <tbody style={{position: 'relative'}}>
@@ -73,7 +73,7 @@ export const VirtualizedTableContent = <T,>({
         );
     }
 
-    if (!rowData.length) {
+    if (dataMap.size === 0) {
         // Show empty state
         return (
             <tbody>
@@ -111,14 +111,13 @@ export const VirtualizedTableContent = <T,>({
                     );
                 }
 
-                const dataIndex = rowIndex % rowData.length;
+                // Direct lookup in the sparse data map - this eliminates the "old rows then new rows" issue
+                const row = dataMap.get(rowIndex);
 
-                // Check if we have data for this row
-                if (dataIndex >= rowData.length) {
+                // If we don't have data for this row, don't render it
+                if (!row) {
                     return null;
                 }
-
-                const row = rowData[dataIndex];
 
                 return (
                     <VirtualizedRow
