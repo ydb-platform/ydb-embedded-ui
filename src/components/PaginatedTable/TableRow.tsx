@@ -27,7 +27,6 @@ const VirtualCell = ({
                 height: `${height}px`,
                 width: `${width}px`,
                 minWidth: `${width}px`,
-                maxWidth: `${width}px`,
             }}
         >
             {children}
@@ -39,7 +38,7 @@ interface LoadingTableRowProps<T> {
     columns: Column<T>[];
     height: number;
     'data-index'?: number;
-    top?: number;
+    top: number;
 }
 
 export const LoadingTableRow = typedMemo(function <T>({
@@ -48,10 +47,12 @@ export const LoadingTableRow = typedMemo(function <T>({
     'data-index': dataIndex,
     top,
 }: LoadingTableRowProps<T>) {
-    const style = top !== undefined ? {transform: `translateY(${top}px)`} : undefined;
-
     return (
-        <div className={b('virtual-row', {loading: true})} style={style} data-index={dataIndex}>
+        <div
+            className={b('virtual-row', {loading: true})}
+            style={{transform: `translateY(${top}px)`, height}}
+            data-index={dataIndex}
+        >
             {columns.map((column) => {
                 const width = column.width || 150;
 
@@ -80,7 +81,7 @@ interface TableRowProps<T> {
     height: number;
     getRowClassName?: GetRowClassName<T>;
     'data-index'?: number;
-    top?: number;
+    top: number;
 }
 
 export const TableRow = <T,>({
@@ -92,10 +93,12 @@ export const TableRow = <T,>({
     top,
 }: TableRowProps<T>) => {
     const additionalClassName = getRowClassName?.(row);
-    const style = top !== undefined ? {transform: `translateY(${top}px)`} : undefined;
-
     return (
-        <div className={b('virtual-row', additionalClassName)} style={style} data-index={dataIndex}>
+        <div
+            className={b('virtual-row', additionalClassName)}
+            style={{transform: `translateY(${top}px)`, height}}
+            data-index={dataIndex}
+        >
             {columns.map((column) => {
                 const width = column.width || 150;
 
@@ -118,14 +121,22 @@ export const TableRow = <T,>({
 interface EmptyTableRowProps {
     children?: React.ReactNode;
     'data-index'?: number;
-    top?: number;
+    height: number;
+    top: number;
 }
 
-export const EmptyTableRow = ({children, 'data-index': dataIndex, top}: EmptyTableRowProps) => {
-    const style = top !== undefined ? {transform: `translateY(${top}px)`} : undefined;
-
+export const EmptyTableRow = ({
+    children,
+    'data-index': dataIndex,
+    top,
+    height,
+}: EmptyTableRowProps) => {
     return (
-        <div className={b('virtual-row', {empty: true})} style={style} data-index={dataIndex}>
+        <div
+            className={b('virtual-row', {empty: true})}
+            style={{transform: `translateY(${top}px)`, height}}
+            data-index={dataIndex}
+        >
             <div className={b('virtual-cell', {empty: true})} style={{width: '100%'}}>
                 {children}
             </div>
