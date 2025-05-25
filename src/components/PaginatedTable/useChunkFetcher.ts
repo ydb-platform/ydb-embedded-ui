@@ -41,6 +41,7 @@ export const useChunkFetcher = <T, F>({
     const [totalEntities, setTotalEntities] = React.useState(0);
     const [foundEntities, setFoundEntities] = React.useState(0);
     const [loadingChunks, setLoadingChunks] = React.useState<Set<number>>(new Set());
+    const [fetchedChunks, setFetchedChunks] = React.useState<Set<number>>(new Set());
 
     // Cache for request parameters to avoid duplicate requests
     const requestCacheRef = React.useRef(new Map<string, boolean>());
@@ -59,11 +60,14 @@ export const useChunkFetcher = <T, F>({
 
         const chunks = [];
         for (let i = startChunk; i <= endChunk; i++) {
-            chunks.push(i);
+            // Only include chunks that haven't been fetched yet and aren't currently loading
+            if (!fetchedChunks.has(i) && !loadingChunks.has(i)) {
+                chunks.push(i);
+            }
         }
 
         return chunks;
-    }, [visibleRange, chunkSize]);
+    }, [visibleRange, chunkSize, fetchedChunks, loadingChunks]);
 
     // Create a request key for caching
     const requestKey = React.useMemo(() => {
@@ -87,6 +91,7 @@ export const useChunkFetcher = <T, F>({
     React.useEffect(() => {
         // Clear all data when filters/sorting changes
         setDataMap(new Map());
+        setFetchedChunks(new Set());
         requestCacheRef.current.clear();
     }, [clearDataKey]);
 
@@ -128,6 +133,7 @@ export const useChunkFetcher = <T, F>({
                 let total = 0;
                 let found = 0;
                 const newDataMap = new Map<number, T>();
+                const successfullyFetchedChunks = new Set<number>();
 
                 // Fetch data for each chunk sequentially
                 for (const chunkId of chunksToFetch) {
@@ -150,6 +156,7 @@ export const useChunkFetcher = <T, F>({
 
                         total = result.total;
                         found = result.found;
+                        successfullyFetchedChunks.add(chunkId);
                     }
                 }
 
@@ -164,6 +171,9 @@ export const useChunkFetcher = <T, F>({
 
                 setTotalEntities(total);
                 setFoundEntities(found);
+
+                // Mark chunks as successfully fetched
+                setFetchedChunks((prev) => new Set([...prev, ...successfullyFetchedChunks]));
 
                 if (onDataFetched) {
                     // For backward compatibility, create array from new data

@@ -104,6 +104,84 @@ style={{
 - Valid HTML table structure
 - Cross-browser compatibility
 
+## Critical Bug Fixes and Optimizations (Latest Updates)
+
+### 1. Scrolling Data Mapping Bug Fix
+
+**Problem**: Users experienced "old rows then new rows" behavior when scrolling to new areas due to incorrect data indexing.
+
+**Root Cause**: The virtualization system used flawed modulo logic in `VirtualizedTableContent.tsx`:
+
+```typescript
+// ❌ Broken approach
+const dataIndex = rowIndex % rowData.length;
+const row = rowData[dataIndex];
+```
+
+**Solution**: Implemented sparse data mapping using `Map<number, T>`:
+
+```typescript
+// ✅ Fixed approach
+interface ChunkFetcherResult<T> {
+  dataMap: Map<number, T>; // Direct row index to data mapping
+  // ... other properties
+}
+
+// In VirtualizedTableContent.tsx
+const row = dataMap.get(rowIndex); // Direct lookup, no modulo
+```
+
+**Benefits**:
+
+- Eliminates incorrect data display during chunk transitions
+- Direct mapping between virtual row indices and actual data
+- Maintains data consistency across all scrolling scenarios
+
+### 2. Redundant API Calls Optimization
+
+**Problem**: The `chunksToFetch` calculation was requesting already-loaded chunks, causing unnecessary network traffic.
+
+**Root Cause**: Missing tracking of successfully fetched chunks:
+
+```typescript
+// ❌ Previous approach - always recalculated all visible chunks
+const chunksToFetch = visibleChunks.filter((chunk) => !loadingChunks.has(chunk));
+```
+
+**Solution**: Added `fetchedChunks` tracking with proper state management:
+
+```typescript
+// ✅ Optimized approach
+const [fetchedChunks, setFetchedChunks] = useState<Set<number>>(new Set());
+
+const chunksToFetch = visibleChunks.filter((i) => !fetchedChunks.has(i) && !loadingChunks.has(i));
+
+// Track successful fetches
+setFetchedChunks((prev) => new Set([...prev, ...successfullyFetchedChunks]));
+```
+
+**Benefits**:
+
+- Prevents redundant network requests during scrolling
+- Reduces server load and bandwidth usage
+- Improves performance under network latency conditions
+- Maintains smooth scrolling experience
+
+### 3. Testing Infrastructure
+
+**Added Artificial Latency**: Modified `getStorageNodes` to include 500ms delay for realistic testing:
+
+```typescript
+// In getNodes.ts
+await new Promise((resolve) => setTimeout(resolve, 500));
+```
+
+This allows validation of:
+
+- Scrolling behavior during data fetching
+- Chunk optimization effectiveness
+- User experience under real network conditions
+
 ## Performance Improvements
 
 ### Before (Chunk-Based)

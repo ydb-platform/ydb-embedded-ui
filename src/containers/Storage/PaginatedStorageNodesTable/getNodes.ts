@@ -20,6 +20,9 @@ export const getStorageNodes: FetchData<
     PreparedStorageNodeFilters,
     Pick<NodesRequestParams, 'type' | 'storage'>
 > = async (params) => {
+    // Simulate network latency for testing scrolling behavior
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const {
         type = 'static',
         storage = true,
