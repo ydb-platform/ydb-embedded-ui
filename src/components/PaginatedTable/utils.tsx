@@ -55,3 +55,41 @@ export function calculateElementOffsetTop(element: HTMLElement, container?: HTML
 
     return offsetTop;
 }
+
+/**
+ * Calculate the visible range of rows based on scroll position
+ */
+export const calculateVisibleRange = (
+    scrollContainerRef: React.RefObject<HTMLElement>,
+    tableRef: React.RefObject<HTMLElement>,
+    rowHeight: number,
+    overscanCount: number,
+    totalItems: number,
+) => {
+    const container = scrollContainerRef?.current;
+    const table = tableRef.current;
+
+    if (!container || !table) {
+        return null;
+    }
+
+    // Calculate the offset of the table relative to the scroll container
+    let tableOffset = 0;
+    let element: HTMLElement | null = table;
+
+    while (element && element !== container) {
+        tableOffset += element.offsetTop;
+        element = element.offsetParent as HTMLElement;
+    }
+
+    // Calculate the visible range
+    const scrollTop = container.scrollTop;
+    const visibleStart = Math.max(scrollTop - tableOffset, 0);
+    const visibleEnd = visibleStart + container.clientHeight;
+
+    // Convert scroll position to row indices
+    const startIndex = Math.max(Math.floor(visibleStart / rowHeight) - overscanCount, 0);
+    const endIndex = Math.min(Math.ceil(visibleEnd / rowHeight) + overscanCount, totalItems - 1);
+
+    return {startIndex, endIndex};
+};
