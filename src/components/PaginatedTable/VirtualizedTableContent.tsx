@@ -2,7 +2,7 @@ import React from 'react';
 
 import {ResponseError} from '../Errors/ResponseError';
 
-import {EmptyTableRow, LoadingTableRow} from './TableRow';
+import {EmptyTableRow} from './TableRow';
 import {VirtualizedRow} from './VirtualizedRow';
 import i18n from './i18n';
 import type {Column, GetRowClassName, RenderEmptyDataMessage, RenderErrorMessage} from './types';
@@ -19,6 +19,7 @@ interface VirtualizedTableContentProps<T> {
     renderEmptyDataMessage?: RenderEmptyDataMessage;
     renderErrorMessage?: RenderErrorMessage;
     chunkSize?: number;
+    loadingChunks?: Set<number>;
 }
 
 /**
@@ -37,13 +38,21 @@ export const VirtualizedTableContent = <T,>({
     renderEmptyDataMessage,
     renderErrorMessage,
     chunkSize = 20,
+    loadingChunks = new Set(),
 }: VirtualizedTableContentProps<T>) => {
     if (isLoading && !rowData.length) {
         // Show loading state
         return (
-            <tbody>
+            <tbody style={{position: 'relative'}}>
                 {Array.from({length: Math.min(chunkSize, 10)}).map((_, index) => (
-                    <LoadingTableRow key={index} columns={columns} height={rowHeight} />
+                    <VirtualizedRow
+                        key={index}
+                        index={index}
+                        top={index * rowHeight}
+                        columns={columns}
+                        rowHeight={rowHeight}
+                        isLoading={true}
+                    />
                 ))}
             </tbody>
         );
@@ -86,6 +95,22 @@ export const VirtualizedTableContent = <T,>({
 
             {virtualRows.map((virtualRow) => {
                 const rowIndex = virtualRow.index;
+                const chunkIndex = Math.floor(rowIndex / chunkSize);
+
+                // Check if this chunk is currently loading
+                if (loadingChunks.has(chunkIndex)) {
+                    return (
+                        <VirtualizedRow
+                            key={rowIndex}
+                            index={rowIndex}
+                            top={virtualRow.top}
+                            columns={columns}
+                            rowHeight={rowHeight}
+                            isLoading={true}
+                        />
+                    );
+                }
+
                 const dataIndex = rowIndex % rowData.length;
 
                 // Check if we have data for this row

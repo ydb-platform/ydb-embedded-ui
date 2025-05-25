@@ -18,6 +18,7 @@ interface UseChunkFetcherResult<T> {
     error: any;
     totalEntities: number;
     foundEntities: number;
+    loadingChunks: Set<number>;
 }
 
 /**
@@ -39,6 +40,7 @@ export const useChunkFetcher = <T, F>({
     const [error, setError] = React.useState<any>(null);
     const [totalEntities, setTotalEntities] = React.useState(0);
     const [foundEntities, setFoundEntities] = React.useState(0);
+    const [loadingChunks, setLoadingChunks] = React.useState<Set<number>>(new Set());
 
     // Cache for request parameters to avoid duplicate requests
     const requestCacheRef = React.useRef(new Map<string, boolean>());
@@ -99,6 +101,9 @@ export const useChunkFetcher = <T, F>({
                 setIsLoading(true);
                 setError(null);
 
+                // Mark chunks as loading
+                setLoadingChunks(new Set(chunksToFetch));
+
                 const allData: T[] = [];
                 let total = 0;
                 let found = 0;
@@ -137,6 +142,7 @@ export const useChunkFetcher = <T, F>({
                 setError(err);
             } finally {
                 setIsLoading(false);
+                setLoadingChunks(new Set()); // Clear loading chunks
                 timeoutRef.current = null;
             }
         }, 200); // 200ms debounce
@@ -179,5 +185,6 @@ export const useChunkFetcher = <T, F>({
         error,
         totalEntities,
         foundEntities,
+        loadingChunks,
     };
 };

@@ -109,7 +109,7 @@ export const PaginatedTable = <T, F>({
 
     // Use our chunk fetcher hook
     const columnsIds = columns.map((column) => column.name);
-    const {rowData, isLoading, error} = useChunkFetcher<T, F>({
+    const {rowData, isLoading, error, loadingChunks} = useChunkFetcher<T, F>({
         fetchData,
         filters,
         sortParams,
@@ -144,6 +144,7 @@ export const PaginatedTable = <T, F>({
                     renderEmptyDataMessage={renderEmptyDataMessage}
                     renderErrorMessage={renderErrorMessage}
                     chunkSize={chunkSize}
+                    loadingChunks={loadingChunks}
                 />
             </table>
         </div>

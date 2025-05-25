@@ -40,11 +40,20 @@ const TableRowCell = ({
 interface LoadingTableRowProps<T> {
     columns: Column<T>[];
     height: number;
+    'data-index'?: number;
+    top?: number;
 }
 
-export const LoadingTableRow = typedMemo(function <T>({columns, height}: LoadingTableRowProps<T>) {
+export const LoadingTableRow = typedMemo(function <T>({
+    columns,
+    height,
+    'data-index': dataIndex,
+    top,
+}: LoadingTableRowProps<T>) {
+    const style = top !== undefined ? {transform: `translateY(${top}px)`} : undefined;
+
     return (
-        <tr className={b('row', {loading: true})}>
+        <tr className={b('row', {loading: true})} style={style} data-index={dataIndex}>
             {columns.map((column) => {
                 const resizeable = column.resizeable ?? DEFAULT_RESIZEABLE;
 
@@ -73,8 +82,8 @@ interface TableRowProps<T> {
     row: T;
     height: number;
     getRowClassName?: GetRowClassName<T>;
-    style?: React.CSSProperties;
     'data-index'?: number;
+    top?: number;
 }
 
 export const TableRow = <T,>({
@@ -82,10 +91,11 @@ export const TableRow = <T,>({
     columns,
     getRowClassName,
     height,
-    style,
     'data-index': dataIndex,
+    top,
 }: TableRowProps<T>) => {
     const additionalClassName = getRowClassName?.(row);
+    const style = top !== undefined ? {transform: `translateY(${top}px)`} : undefined;
 
     return (
         <tr className={b('row', additionalClassName)} style={style} data-index={dataIndex}>
@@ -112,11 +122,20 @@ export const TableRow = <T,>({
 interface EmptyTableRowProps<T> {
     columns: Column<T>[];
     children?: React.ReactNode;
+    'data-index'?: number;
+    top?: number;
 }
 
-export const EmptyTableRow = <T,>({columns, children}: EmptyTableRowProps<T>) => {
+export const EmptyTableRow = <T,>({
+    columns,
+    children,
+    'data-index': dataIndex,
+    top,
+}: EmptyTableRowProps<T>) => {
+    const style = top !== undefined ? {transform: `translateY(${top}px)`} : undefined;
+
     return (
-        <tr className={b('row', {empty: true})}>
+        <tr className={b('row', {empty: true})} style={style} data-index={dataIndex}>
             <td colSpan={columns.length} className={b('td')}>
                 {children}
             </td>

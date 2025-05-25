@@ -1,21 +1,22 @@
 import React from 'react';
 
-import {TableRow} from './TableRow';
+import {EmptyTableRow, LoadingTableRow, TableRow} from './TableRow';
 import type {Column, GetRowClassName} from './types';
 
 interface VirtualizedRowProps<T> {
-    row: T;
+    row?: T;
     index: number;
     top: number;
     columns: Column<T>[];
     rowHeight: number;
     getRowClassName?: GetRowClassName<T>;
-    style?: React.CSSProperties;
+    isLoading?: boolean;
+    emptyContent?: React.ReactNode;
 }
 
 /**
- * A wrapper component that adds virtualization to the existing TableRow
- * This component handles absolute positioning and DOM recycling
+ * A wrapper component that adds virtualization to TableRow, LoadingTableRow, or EmptyTableRow
+ * This component handles absolute positioning and can render data rows, loading skeletons, or empty rows
  */
 export const VirtualizedRow = <T,>({
     row,
@@ -24,30 +25,33 @@ export const VirtualizedRow = <T,>({
     columns,
     rowHeight,
     getRowClassName,
-    style,
+    isLoading = false,
+    emptyContent,
 }: VirtualizedRowProps<T>) => {
-    // Apply styles directly to the TableRow component
-    const rowStyle: React.CSSProperties = {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        width: '100%',
-        transform: `translateY(${top}px)`, // Use translateY for positioning - GPU accelerated
-        contain: 'layout style paint', // CSS containment for performance isolation
-        willChange: 'transform', // Hint to the browser that this element will change
-        ...style,
-    };
+    // Render loading skeleton
+    if (isLoading) {
+        return (
+            <LoadingTableRow columns={columns} height={rowHeight} data-index={index} top={top} />
+        );
+    }
 
-    // Pass the style directly to TableRow to avoid DOM nesting issues
+    // For data rows, row is required
+    if (!row) {
+        return (
+            <EmptyTableRow columns={columns} data-index={index} top={top}>
+                {emptyContent}
+            </EmptyTableRow>
+        );
+    }
+
     return (
         <TableRow
             row={row}
             columns={columns}
             height={rowHeight}
             getRowClassName={getRowClassName}
-            style={rowStyle}
             data-index={index}
+            top={top}
         />
     );
 };

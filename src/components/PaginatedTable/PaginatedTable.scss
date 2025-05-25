@@ -26,8 +26,18 @@
     }
 
     &__row {
-        position: relative;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
         z-index: 1;
+
+        // GPU-accelerated positioning
+        will-change: transform;
+
+        // CSS containment for performance isolation
+        contain: layout style paint;
 
         // Performance optimization for row hovering.
         // it actually works.
