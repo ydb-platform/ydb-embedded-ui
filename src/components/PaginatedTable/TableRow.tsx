@@ -1,39 +1,37 @@
 import {Skeleton} from '@gravity-ui/uikit';
 
-import {DEFAULT_ALIGN, DEFAULT_RESIZEABLE} from './constants';
+import {DEFAULT_ALIGN} from './constants';
 import {b} from './shared';
 import type {AlignType, Column, GetRowClassName} from './types';
 import {typedMemo} from './utils';
 
-interface TableCellProps {
+interface VirtualCellProps {
     height: number;
-    width?: number;
+    width: number;
     align?: AlignType;
     children: React.ReactNode;
     className?: string;
-    resizeable?: boolean;
 }
 
-const TableRowCell = ({
+const VirtualCell = ({
     children,
     className,
     height,
     width,
     align = DEFAULT_ALIGN,
-    resizeable,
-}: TableCellProps) => {
+}: VirtualCellProps) => {
     return (
-        <td
-            className={b('row-cell', {align: align}, className)}
+        <div
+            className={b('virtual-cell', {align: align}, className)}
             style={{
                 height: `${height}px`,
                 width: `${width}px`,
-                // Additional maxWidth for resizeable columns to ensure overflow hidden for <td>
-                maxWidth: resizeable ? `${width}px` : undefined,
+                minWidth: `${width}px`,
+                maxWidth: `${width}px`,
             }}
         >
             {children}
-        </td>
+        </div>
     );
 };
 
@@ -53,27 +51,26 @@ export const LoadingTableRow = typedMemo(function <T>({
     const style = top !== undefined ? {transform: `translateY(${top}px)`} : undefined;
 
     return (
-        <tr className={b('row', {loading: true})} style={style} data-index={dataIndex}>
+        <div className={b('virtual-row', {loading: true})} style={style} data-index={dataIndex}>
             {columns.map((column) => {
-                const resizeable = column.resizeable ?? DEFAULT_RESIZEABLE;
+                const width = column.width || 150;
 
                 return (
-                    <TableRowCell
+                    <VirtualCell
                         key={column.name}
                         height={height}
-                        width={column.width}
+                        width={width}
                         align={column.align}
                         className={column.className}
-                        resizeable={resizeable}
                     >
                         <Skeleton
                             className={b('row-skeleton')}
                             style={{width: '80%', height: '50%'}}
                         />
-                    </TableRowCell>
+                    </VirtualCell>
                 );
             })}
-        </tr>
+        </div>
     );
 });
 
@@ -98,47 +95,40 @@ export const TableRow = <T,>({
     const style = top !== undefined ? {transform: `translateY(${top}px)`} : undefined;
 
     return (
-        <tr className={b('row', additionalClassName)} style={style} data-index={dataIndex}>
+        <div className={b('virtual-row', additionalClassName)} style={style} data-index={dataIndex}>
             {columns.map((column) => {
-                const resizeable = column.resizeable ?? DEFAULT_RESIZEABLE;
+                const width = column.width || 150;
 
                 return (
-                    <TableRowCell
+                    <VirtualCell
                         key={column.name}
                         height={height}
-                        width={column.width}
+                        width={width}
                         align={column.align}
                         className={column.className}
-                        resizeable={resizeable}
                     >
                         {column.render({row})}
-                    </TableRowCell>
+                    </VirtualCell>
                 );
             })}
-        </tr>
+        </div>
     );
 };
 
-interface EmptyTableRowProps<T> {
-    columns: Column<T>[];
+interface EmptyTableRowProps {
     children?: React.ReactNode;
     'data-index'?: number;
     top?: number;
 }
 
-export const EmptyTableRow = <T,>({
-    columns,
-    children,
-    'data-index': dataIndex,
-    top,
-}: EmptyTableRowProps<T>) => {
+export const EmptyTableRow = ({children, 'data-index': dataIndex, top}: EmptyTableRowProps) => {
     const style = top !== undefined ? {transform: `translateY(${top}px)`} : undefined;
 
     return (
-        <tr className={b('row', {empty: true})} style={style} data-index={dataIndex}>
-            <td colSpan={columns.length} className={b('td')}>
+        <div className={b('virtual-row', {empty: true})} style={style} data-index={dataIndex}>
+            <div className={b('virtual-cell', {empty: true})} style={{width: '100%'}}>
                 {children}
-            </td>
-        </tr>
+            </div>
+        </div>
     );
 };

@@ -67,7 +67,7 @@ const getPDisksColumn = ({
                 </div>
             );
         },
-        align: DataTable.CENTER,
+        align: DataTable.LEFT,
         sortable: false,
         resizeable: false,
     };

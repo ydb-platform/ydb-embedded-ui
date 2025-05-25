@@ -1,8 +1,7 @@
 import React from 'react';
 
 import {usePaginatedTableState} from './PaginatedTableContext';
-import {TableHead} from './TableHead';
-import {VirtualizedTableContent} from './VirtualizedTableContent';
+import {VirtualizedTableContainer} from './VirtualizedTableContainer';
 import {DEFAULT_TABLE_ROW_HEIGHT} from './constants';
 import {b} from './shared';
 import type {
@@ -39,7 +38,7 @@ export interface PaginatedTableProps<T, F> {
     keepCache?: boolean;
 }
 
-const DEFAULT_PAGINATION_LIMIT = 20;
+const DEFAULT_PAGINATION_LIMIT = 50;
 
 export const PaginatedTable = <T, F>({
     limit: chunkSize = DEFAULT_PAGINATION_LIMIT,
@@ -126,27 +125,22 @@ export const PaginatedTable = <T, F>({
 
     return (
         <div ref={tableRef} className={b(null, containerClassName)}>
-            <table className={b('table')}>
-                <TableHead
-                    columns={columns}
-                    onSort={setSortParams}
-                    onColumnsResize={onColumnsResize}
-                />
-                <VirtualizedTableContent
-                    columns={columns}
-                    dataMap={dataMap}
-                    isLoading={isLoading}
-                    error={error}
-                    virtualRows={virtualRows}
-                    totalHeight={totalHeight}
-                    rowHeight={rowHeight}
-                    getRowClassName={getRowClassName}
-                    renderEmptyDataMessage={renderEmptyDataMessage}
-                    renderErrorMessage={renderErrorMessage}
-                    chunkSize={chunkSize}
-                    loadingChunks={loadingChunks}
-                />
-            </table>
+            <VirtualizedTableContainer
+                columns={columns}
+                dataMap={dataMap}
+                isLoading={isLoading}
+                error={error}
+                virtualRows={virtualRows}
+                totalHeight={totalHeight}
+                rowHeight={rowHeight}
+                onSort={setSortParams}
+                onColumnsResize={onColumnsResize}
+                getRowClassName={getRowClassName}
+                renderEmptyDataMessage={renderEmptyDataMessage}
+                renderErrorMessage={renderErrorMessage}
+                chunkSize={chunkSize}
+                loadingChunks={loadingChunks}
+            />
         </div>
     );
 };

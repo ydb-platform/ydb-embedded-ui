@@ -12,6 +12,117 @@
     width: 100%;
     @include mixins.body-2-typography();
 
+    // Hybrid table-div container
+    &__container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        width: 100%;
+    }
+
+    // Fixed header table styles
+    &__header-container {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: var(--g-color-base-background);
+        border-bottom: $cell-border;
+    }
+
+    &__header-table {
+        width: max-content;
+        max-width: 100%;
+        table-layout: fixed;
+        border-spacing: 0;
+        border-collapse: separate;
+
+        th {
+            padding: 0;
+        }
+    }
+
+    // Virtualized body container styles
+    &__body-container {
+        position: relative;
+        flex: 1;
+        overflow: auto;
+        width: 100%;
+    }
+
+    &__body-content {
+        position: relative;
+        width: 100%;
+
+        &_error,
+        &_empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+        }
+    }
+
+    // Virtual row styles (for div-based rows)
+    &__virtual-row {
+        position: absolute;
+        left: 0;
+        right: 0;
+        display: flex;
+        width: 100%;
+        z-index: 1;
+
+        // GPU-accelerated positioning
+        will-change: transform;
+        contain: layout style paint;
+        transform: translateZ(0);
+
+        &:hover {
+            background: var(--paginated-table-hover-color);
+        }
+
+        &_empty,
+        &_loading {
+            &:hover {
+                background-color: initial;
+            }
+        }
+    }
+
+    // Virtual cell styles (for div-based cells)
+    &__virtual-cell {
+        display: flex;
+        align-items: center;
+        padding: var(--paginated-table-cell-vertical-padding)
+            var(--paginated-table-cell-horizontal-padding);
+        border-bottom: $cell-border;
+
+        flex-shrink: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        &_align {
+            &_left {
+                justify-content: flex-start;
+                text-align: left;
+            }
+            &_center {
+                justify-content: center;
+                text-align: center;
+            }
+            &_right {
+                justify-content: flex-end;
+                text-align: right;
+            }
+        }
+
+        &_empty {
+            justify-content: center;
+            text-align: center;
+        }
+    }
+
+    // Legacy table styles (for backward compatibility)
     &__table {
         width: max-content;
         max-width: 100%;
@@ -213,7 +324,20 @@
         display: none !important;
     }
 
-    // Virtual row container for row-level virtualization
+    // Error and empty state styles
+    &__error-row,
+    &__empty-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--g-spacing-6);
+        min-height: 200px;
+        width: 100%;
+        text-align: center;
+        color: var(--g-color-text-secondary);
+    }
+
+    // Virtual row container for row-level virtualization (legacy)
     &__virtual-row-container {
         // Performance optimizations for virtualized rows
         backface-visibility: hidden;

@@ -21,10 +21,23 @@ interface UseChunkFetcherResult<T> {
     loadingChunks: Set<number>;
 }
 
+interface ChunkFetchResult<T> {
+    chunkId: number;
+    result?: PaginatedTableData<T>;
+    error?: any;
+    success?: boolean;
+    cancelled?: boolean;
+}
+
+const THROTTLE_INTERVAL = 100; // ms - faster response than debouncing
+
 /**
- * Hook for fetching data chunks based on visible rows
- * This hook handles fetching data for visible chunks and manages loading/error states
- * Uses a sparse data map to properly handle virtualized data
+ * Hook for fetching data chunks with throttling and cancellation
+ * Features:
+ * - Throttling instead of debouncing for immediate response
+ * - Request cancellation for out-of-view chunks
+ * - Parallel chunk fetching for better performance
+ * - Proper cleanup and error handling
  */
 export const useChunkFetcher = <T, F>({
     fetchData,
@@ -43,11 +56,15 @@ export const useChunkFetcher = <T, F>({
     const [loadingChunks, setLoadingChunks] = React.useState<Set<number>>(new Set());
     const [fetchedChunks, setFetchedChunks] = React.useState<Set<number>>(new Set());
 
+    // Throttling state
+    const lastExecutionRef = React.useRef<number>(0);
+    const throttleTimeoutRef = React.useRef<number | null>(null);
+
+    // Track active requests for cancellation
+    const activeRequestsRef = React.useRef<Map<number, AbortController>>(new Map());
+
     // Cache for request parameters to avoid duplicate requests
     const requestCacheRef = React.useRef(new Map<string, boolean>());
-
-    // Timeout reference for debouncing
-    const timeoutRef = React.useRef<number | null>(null);
 
     // Calculate which chunks we need to fetch based on visible rows
     const chunksToFetch = React.useMemo(() => {
@@ -68,6 +85,62 @@ export const useChunkFetcher = <T, F>({
 
         return chunks;
     }, [visibleRange, chunkSize, fetchedChunks, loadingChunks]);
+
+    // Cancel requests for chunks that are no longer visible
+    const cancelOutOfViewChunks = React.useCallback((currentVisibleChunks: number[]) => {
+        const visibleChunkSet = new Set(currentVisibleChunks);
+
+        activeRequestsRef.current.forEach((controller, chunkId) => {
+            if (!visibleChunkSet.has(chunkId)) {
+                controller.abort();
+                activeRequestsRef.current.delete(chunkId);
+
+                // Remove from loading chunks
+                setLoadingChunks((prev) => {
+                    const newSet = new Set(prev);
+                    newSet.delete(chunkId);
+                    return newSet;
+                });
+            }
+        });
+    }, []);
+
+    // Fetch multiple chunks concurrently
+    const fetchChunksConcurrently = React.useCallback(
+        async (chunks: number[]) => {
+            // Cancel any out-of-view chunks first
+            cancelOutOfViewChunks(chunks);
+
+            const fetchPromises = chunks.map(async (chunkId): Promise<ChunkFetchResult<T>> => {
+                const controller = new AbortController();
+                activeRequestsRef.current.set(chunkId, controller);
+
+                try {
+                    const offset = chunkId * chunkSize;
+                    const result = await fetchData({
+                        offset,
+                        limit: chunkSize,
+                        filters,
+                        sortParams,
+                        columnsIds,
+                        signal: controller.signal,
+                    });
+
+                    return {chunkId, result, success: true};
+                } catch (error: any) {
+                    if (error?.name === 'AbortError') {
+                        return {chunkId, cancelled: true};
+                    }
+                    return {chunkId, error, success: false};
+                } finally {
+                    activeRequestsRef.current.delete(chunkId);
+                }
+            });
+
+            return Promise.allSettled(fetchPromises);
+        },
+        [fetchData, chunkSize, filters, sortParams, columnsIds, cancelOutOfViewChunks],
+    );
 
     // Create a request key for caching
     const requestKey = React.useMemo(() => {
@@ -92,11 +165,18 @@ export const useChunkFetcher = <T, F>({
         // Clear all data when filters/sorting changes
         setDataMap(new Map());
         setFetchedChunks(new Set());
+        setLoadingChunks(new Set());
         requestCacheRef.current.clear();
+
+        // Cancel all active requests
+        activeRequestsRef.current.forEach((controller) => {
+            controller.abort();
+        });
+        activeRequestsRef.current.clear();
     }, [clearDataKey]);
 
-    // Function to fetch data - called only when needed
-    const fetchChunksData = React.useCallback(async () => {
+    // Main fetch function
+    const executeChunkFetch = React.useCallback(async () => {
         // If we've already made this exact request, don't repeat it
         if (requestCacheRef.current.has(requestKey)) {
             return;
@@ -107,113 +187,132 @@ export const useChunkFetcher = <T, F>({
             return;
         }
 
-        // With sparse data map, we can fetch all requested chunks
-        // The data map will handle duplicates naturally
-        if (chunksToFetch.length === 0) {
-            return;
-        }
+        try {
+            // Mark this request as in progress
+            requestCacheRef.current.set(requestKey, true);
 
-        // Clear any pending timeout
-        if (timeoutRef.current !== null) {
-            clearTimeout(timeoutRef.current);
-        }
+            setIsLoading(true);
+            setError(null);
 
-        // Set a new timeout for debouncing
-        timeoutRef.current = window.setTimeout(async () => {
-            try {
-                // Mark this request as in progress
-                requestCacheRef.current.set(requestKey, true);
+            // Mark chunks as loading
+            setLoadingChunks(new Set(chunksToFetch));
 
-                setIsLoading(true);
-                setError(null);
+            const results = await fetchChunksConcurrently(chunksToFetch);
 
-                // Mark chunks as loading
-                setLoadingChunks(new Set(chunksToFetch));
+            let total = 0;
+            let found = 0;
+            let rawResult: PaginatedTableData<T> | null = null;
+            const newDataMap = new Map<number, T>();
+            const successfullyFetchedChunks = new Set<number>();
+            let hasErrors = false;
+            let lastError: any = null;
 
-                let total = 0;
-                let found = 0;
-                const newDataMap = new Map<number, T>();
-                const successfullyFetchedChunks = new Set<number>();
+            // Process results
+            results.forEach((settledResult) => {
+                if (settledResult.status === 'fulfilled') {
+                    const result = settledResult.value as ChunkFetchResult<T>;
 
-                // Fetch data for each chunk sequentially
-                for (const chunkId of chunksToFetch) {
-                    const offset = chunkId * chunkSize;
-
-                    const result = await fetchData({
-                        offset,
-                        limit: chunkSize,
-                        filters,
-                        sortParams,
-                        columnsIds,
-                    });
-
-                    if (result.data) {
+                    if (result.success && result.result) {
                         // Add data to map with proper row indices
-                        result.data.forEach((item, index) => {
+                        const offset = result.chunkId * chunkSize;
+                        result.result.data.forEach((item, index) => {
                             const rowIndex = offset + index;
                             newDataMap.set(rowIndex, item);
                         });
 
-                        total = result.total;
-                        found = result.found;
-                        successfullyFetchedChunks.add(chunkId);
+                        total = result.result.total;
+                        found = result.result.found;
+                        rawResult = result.result;
+                        successfullyFetchedChunks.add(result.chunkId);
+                    } else if (result.error && !result.cancelled) {
+                        hasErrors = true;
+                        lastError = result.error;
                     }
+                    // Ignore cancelled requests
                 }
+            });
 
-                // Update state with new data
-                setDataMap((prevDataMap) => {
-                    const updatedMap = new Map(prevDataMap);
-                    newDataMap.forEach((value, key) => {
-                        updatedMap.set(key, value);
-                    });
-                    return updatedMap;
+            // Update state with new data
+            setDataMap((prevDataMap) => {
+                const updatedMap = new Map(prevDataMap);
+                newDataMap.forEach((value, key) => {
+                    updatedMap.set(key, value);
                 });
+                return updatedMap;
+            });
 
-                setTotalEntities(total);
-                setFoundEntities(found);
+            setTotalEntities(total);
+            setFoundEntities(found);
 
-                // Mark chunks as successfully fetched
-                setFetchedChunks((prev) => new Set([...prev, ...successfullyFetchedChunks]));
+            // Mark chunks as successfully fetched
+            setFetchedChunks((prev) => new Set([...prev, ...successfullyFetchedChunks]));
 
-                if (onDataFetched) {
-                    // For backward compatibility, create array from new data
-                    const allData = Array.from(newDataMap.values());
-                    onDataFetched({
-                        data: allData,
-                        total,
-                        found,
-                    });
-                }
-            } catch (err) {
-                setError(err);
-            } finally {
-                setIsLoading(false);
-                setLoadingChunks(new Set()); // Clear loading chunks
-                timeoutRef.current = null;
+            // Set error only if we have actual errors (not cancellations)
+            if (hasErrors) {
+                setError(lastError);
             }
-        }, 200); // 200ms debounce
-    }, [
-        requestKey,
-        chunksToFetch,
-        chunkSize,
-        fetchData,
-        filters,
-        sortParams,
-        columnsIds,
-        onDataFetched,
-    ]);
+
+            if (onDataFetched && rawResult) {
+                // For backward compatibility, create array from new data
+                const allData = Array.from(newDataMap.values());
+                onDataFetched({
+                    ...(rawResult as PaginatedTableData<T>),
+                    data: allData,
+                    total,
+                    found,
+                });
+            }
+        } catch (err) {
+            setError(err);
+        } finally {
+            setIsLoading(false);
+            setLoadingChunks(new Set()); // Clear loading chunks
+        }
+    }, [requestKey, chunksToFetch, fetchChunksConcurrently, chunkSize, onDataFetched]);
+
+    // Throttled execution function
+    const throttledExecute = React.useCallback(() => {
+        const now = Date.now();
+        const timeSinceLastExecution = now - lastExecutionRef.current;
+
+        if (timeSinceLastExecution >= THROTTLE_INTERVAL) {
+            // Execute immediately
+            lastExecutionRef.current = now;
+            executeChunkFetch();
+        } else {
+            // Schedule execution for remaining time
+            if (throttleTimeoutRef.current) {
+                clearTimeout(throttleTimeoutRef.current);
+            }
+
+            const remainingTime = THROTTLE_INTERVAL - timeSinceLastExecution;
+            throttleTimeoutRef.current = window.setTimeout(() => {
+                lastExecutionRef.current = Date.now();
+                executeChunkFetch();
+            }, remainingTime);
+        }
+    }, [executeChunkFetch]);
 
     // Trigger the fetch when the request key changes
     React.useLayoutEffect(() => {
-        fetchChunksData();
+        throttledExecute();
+    }, [throttledExecute]);
 
-        // Cleanup function to clear timeout if component unmounts
+    // Cleanup on unmount
+    React.useEffect(() => {
         return () => {
-            if (timeoutRef.current !== null) {
-                clearTimeout(timeoutRef.current);
+            // Clear throttle timeout
+            if (throttleTimeoutRef.current) {
+                clearTimeout(throttleTimeoutRef.current);
             }
+
+            // Cancel all active requests
+            activeRequestsRef.current.forEach((controller) => {
+                controller.abort();
+            });
+            activeRequestsRef.current.clear();
         };
-    }, [fetchChunksData]);
+    }, []);
 
     // Limit the cache size to prevent memory leaks
     React.useEffect(() => {
