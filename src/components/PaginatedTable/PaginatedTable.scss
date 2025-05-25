@@ -122,49 +122,6 @@
         }
     }
 
-    // Legacy table styles (for backward compatibility)
-    &__table {
-        width: max-content;
-        max-width: 100%;
-
-        table-layout: fixed;
-        border-spacing: 0;
-        border-collapse: separate;
-
-        th {
-            padding: 0;
-        }
-    }
-
-    &__row {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        z-index: 1;
-
-        // GPU-accelerated positioning
-        will-change: transform;
-
-        // CSS containment for performance isolation
-        contain: layout style paint;
-
-        // Performance optimization for row hovering.
-        // it actually works.
-        transform: translateZ(0);
-
-        &:hover {
-            background: var(--paginated-table-hover-color);
-        }
-
-        &_empty {
-            &:hover {
-                background-color: initial;
-            }
-        }
-    }
-
     &__head {
         z-index: 2;
         @include mixins.sticky-top();
@@ -263,34 +220,6 @@
         }
     }
 
-    &__row-cell {
-        display: table-cell;
-        overflow-x: hidden;
-
-        width: 100%;
-        max-width: 100%;
-        padding: var(--paginated-table-cell-vertical-padding)
-            var(--paginated-table-cell-horizontal-padding);
-
-        vertical-align: middle;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-
-        border-bottom: $cell-border;
-
-        &_align {
-            &_left {
-                text-align: left;
-            }
-            &_center {
-                text-align: center;
-            }
-            &_right {
-                text-align: right;
-            }
-        }
-    }
-
     &__resize-handler {
         position: absolute;
         top: 0;
@@ -335,17 +264,5 @@
         width: 100%;
         text-align: center;
         color: var(--g-color-text-secondary);
-    }
-
-    // Virtual row container for row-level virtualization (legacy)
-    &__virtual-row-container {
-        // Performance optimizations for virtualized rows
-        backface-visibility: hidden;
-
-        // Ensure smooth animations
-        transition: transform 0ms;
-
-        // Ensure the container takes full width
-        width: 100%;
     }
 }
