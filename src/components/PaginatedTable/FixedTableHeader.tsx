@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {TableHead} from './TableHead';
 import {b} from './shared';
 import type {Column, HandleTableColumnsResize, OnSort} from './types';
