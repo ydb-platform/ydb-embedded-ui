@@ -1,5 +1,14 @@
 # Changelog
 
+## [9.2.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.2.1...v9.2.2) (2025-05-26)
+
+
+### Bug Fixes
+
+* incorrect group numbers ([#2319](https://github.com/ydb-platform/ydb-embedded-ui/issues/2319)) ([a2e9cce](https://github.com/ydb-platform/ydb-embedded-ui/commit/a2e9cce5aed6840fc7e926dff0ffc8ac0a02d434))
+* initial params in useEffect ([#2321](https://github.com/ydb-platform/ydb-embedded-ui/issues/2321)) ([28a51ed](https://github.com/ydb-platform/ydb-embedded-ui/commit/28a51ed39ff4d15fba01376b89c2dec95f573e79))
+* update acl tests ([#2324](https://github.com/ydb-platform/ydb-embedded-ui/issues/2324)) ([84f0eee](https://github.com/ydb-platform/ydb-embedded-ui/commit/84f0eeeed3fb8490437cf9be8aa50476246afd33))
+
 ## [9.2.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.2.0...v9.2.1) (2025-05-22)
 
 
