@@ -13,7 +13,6 @@ import type {
     PaginatedTableData,
     RenderEmptyDataMessage,
     RenderErrorMessage,
-    SortParams,
 } from './types';
 import {useScrollBasedChunks} from './useScrollBasedChunks';
 
@@ -29,7 +28,6 @@ export interface PaginatedTableProps<T, F> {
     getRowClassName?: GetRowClassName<T>;
     rowHeight?: number;
     scrollContainerRef: React.RefObject<HTMLElement>;
-    initialSortParams?: SortParams;
     onColumnsResize?: HandleTableColumnsResize;
     renderEmptyDataMessage?: RenderEmptyDataMessage;
     renderErrorMessage?: RenderErrorMessage;
@@ -50,7 +48,6 @@ export const PaginatedTable = <T, F>({
     getRowClassName,
     rowHeight = DEFAULT_TABLE_ROW_HEIGHT,
     scrollContainerRef,
-    initialSortParams,
     onColumnsResize,
     renderErrorMessage,
     renderEmptyDataMessage,
@@ -63,24 +60,6 @@ export const PaginatedTable = <T, F>({
         usePaginatedTableState();
 
     const {sortParams, foundEntities} = tableState;
-
-    // Initialize state with props if available
-    React.useEffect(() => {
-        if (initialSortParams) {
-            setSortParams(initialSortParams);
-        }
-
-        if (initialEntitiesCount) {
-            setTotalEntities(initialEntitiesCount);
-            setFoundEntities(initialEntitiesCount);
-        }
-    }, [
-        setSortParams,
-        setTotalEntities,
-        setFoundEntities,
-        initialSortParams,
-        initialEntitiesCount,
-    ]);
 
     const tableRef = React.useRef<HTMLDivElement>(null);
 
@@ -120,7 +99,7 @@ export const PaginatedTable = <T, F>({
         [onDataFetched, setFoundEntities, setIsInitialLoad, setTotalEntities],
     );
 
-    // Reset table on filters change
+    // Reset table on initialization and filters change
     React.useLayoutEffect(() => {
         const defaultTotal = initialEntitiesCount || 0;
         const defaultFound = initialEntitiesCount || 1;
