@@ -178,23 +178,8 @@ test.describe('Object Summary', async () => {
         // Check Effective Access Rights
         const effectiveRights = await objectSummary.getEffectiveAccessRights();
         expect(effectiveRights).toEqual([
-            {group: 'USERS', permissions: ['ConnectDatabase']},
-            {group: 'METADATA-READERS', permissions: ['List']},
-            {group: 'DATA-READERS', permissions: ['SelectRow']},
-            {group: 'DATA-WRITERS', permissions: ['UpdateRow', 'EraseRow']},
-            {
-                group: 'DDL-ADMINS',
-                permissions: [
-                    'WriteAttributes',
-                    'CreateDirectory',
-                    'CreateTable',
-                    'CreateQueue',
-                    'RemoveSchema',
-                    'AlterSchema',
-                ],
-            },
-            {group: 'ACCESS-ADMINS', permissions: ['GrantAccessRights']},
-            {group: 'DATABASE-ADMINS', permissions: ['Manage']},
+            {group: 'Access', permissions: ['Manage']},
+            {group: 'Inheritance type', permissions: ['Inherit']},
         ]);
     });
 
