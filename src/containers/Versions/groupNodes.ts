@@ -24,9 +24,7 @@ export const getGroupedTenantNodes = (
 
         return Object.keys(dividedByVersion)
             .map<GroupedNodesItem | null>((version) => {
-                const filteredNodes = dividedByVersion[version].filter(({Tenants}) =>
-                    Boolean(Tenants),
-                );
+                const filteredNodes = dividedByVersion[version].filter(isTenantNode);
                 const dividedByTenant = groupBy(filteredNodes, 'Tenants');
 
                 const items = Object.keys(dividedByTenant)
@@ -50,7 +48,7 @@ export const getGroupedTenantNodes = (
             })
             .filter((item): item is GroupedNodesItem => Boolean(item));
     } else {
-        const filteredNodes = nodes.filter(({Tenants}) => Boolean(Tenants));
+        const filteredNodes = nodes.filter(isTenantNode);
         const dividedByTenant = groupBy(filteredNodes, 'Tenants');
 
         return Object.keys(dividedByTenant)
@@ -92,7 +90,7 @@ export const getGroupedStorageNodes = (
         return undefined;
     }
 
-    const storageNodes = nodes.filter(({Roles}) => Roles?.includes('Storage'));
+    const storageNodes = nodes.filter(isStorageNode);
     const storageNodesDividedByVersion = groupBy(storageNodes, 'Version');
 
     return Object.keys(storageNodesDividedByVersion).map((version) => {
@@ -112,7 +110,10 @@ export const getOtherNodes = (
         return undefined;
     }
 
-    const otherNodes = nodes.filter(({Roles, Version}) => !Roles && Version);
+    // Nodes that are not included in other groups
+    const otherNodes = nodes.filter(
+        (node) => !isStorageNode(node) && !isTenantNode(node) && node.Version,
+    );
     const otherNodesDividedByVersion = groupBy(otherNodes, 'Version');
 
     return Object.keys(otherNodesDividedByVersion).map((version) => {
@@ -123,3 +124,11 @@ export const getOtherNodes = (
         };
     });
 };
+
+function isStorageNode(node: NodesPreparedEntity) {
+    return Boolean(node.Roles?.includes('Storage'));
+}
+
+function isTenantNode(node: NodesPreparedEntity) {
+    return Boolean(node.Tenants);
+}
