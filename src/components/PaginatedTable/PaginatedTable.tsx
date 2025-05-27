@@ -1,7 +1,6 @@
 import React from 'react';
 
 import {usePaginatedTableState} from './PaginatedTableContext';
-import {TableChunk} from './TableChunk';
 import {TableHead} from './TableHead';
 import {DEFAULT_TABLE_ROW_HEIGHT} from './constants';
 import {b} from './shared';
@@ -15,6 +14,7 @@ import type {
     RenderErrorMessage,
 } from './types';
 import {useScrollBasedChunks} from './useScrollBasedChunks';
+import {useVirtualizedTbodies} from './useVirtualizedTbodies';
 
 import './PaginatedTable.scss';
 
@@ -120,63 +120,22 @@ export const PaginatedTable = <T, F>({
         setIsInitialLoad(true);
     }, [initialEntitiesCount, setTotalEntities, setFoundEntities, setIsInitialLoad]);
 
-    const renderChunks = () => {
-        const chunks: React.ReactElement[] = [];
-        let i = 0;
-
-        while (i < activeChunks.length) {
-            const isActive = activeChunks[i];
-
-            if (isActive) {
-                // Render active chunk normally
-                chunks.push(
-                    <TableChunk<T, F>
-                        key={i}
-                        id={i}
-                        calculatedCount={i === activeChunks.length - 1 ? lastChunkSize : chunkSize}
-                        chunkSize={chunkSize}
-                        rowHeight={rowHeight}
-                        columns={columns}
-                        fetchData={fetchData}
-                        filters={filters}
-                        tableName={tableName}
-                        sortParams={sortParams}
-                        getRowClassName={getRowClassName}
-                        renderErrorMessage={renderErrorMessage}
-                        renderEmptyDataMessage={renderEmptyDataMessage}
-                        onDataFetched={handleDataFetched}
-                        isActive={isActive}
-                        keepCache={keepCache}
-                    />,
-                );
-                i++;
-            } else {
-                // Find consecutive inactive chunks and merge them
-                const startIndex = i;
-                let totalHeight = 0;
-
-                while (i < activeChunks.length && !activeChunks[i]) {
-                    const currentChunkSize =
-                        i === activeChunks.length - 1 ? lastChunkSize : chunkSize;
-                    totalHeight += currentChunkSize * rowHeight;
-                    i++;
-                }
-
-                // Render merged empty tbody for consecutive inactive chunks
-                chunks.push(
-                    <tbody
-                        key={`merged-${startIndex}-${i - 1}`}
-                        style={{
-                            height: `${totalHeight}px`,
-                            display: 'block',
-                        }}
-                    />,
-                );
-            }
-        }
-
-        return chunks;
-    };
+    const {renderChunks} = useVirtualizedTbodies({
+        activeChunks,
+        chunkSize,
+        lastChunkSize,
+        rowHeight,
+        columns,
+        fetchData,
+        filters,
+        tableName,
+        sortParams,
+        getRowClassName,
+        renderErrorMessage,
+        renderEmptyDataMessage,
+        onDataFetched: handleDataFetched,
+        keepCache,
+    });
 
     const renderTable = () => (
         <table className={b('table')}>
