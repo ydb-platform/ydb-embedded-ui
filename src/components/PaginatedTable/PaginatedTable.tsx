@@ -15,6 +15,7 @@ import type {
     RenderErrorMessage,
 } from './types';
 import {useScrollBasedChunks} from './useScrollBasedChunks';
+import {calculateElementOffsetTop} from './utils';
 
 import './PaginatedTable.scss';
 
@@ -62,13 +63,15 @@ export const PaginatedTable = <T, F>({
     const {sortParams, foundEntities} = tableState;
 
     const tableRef = React.useRef<HTMLDivElement>(null);
+    const [tableOffset, setTableOffset] = React.useState(0);
 
-    const activeChunks = useScrollBasedChunks({
+    const chunkStates = useScrollBasedChunks({
         scrollContainerRef,
         tableRef,
         totalItems: foundEntities,
         rowHeight,
         chunkSize,
+        tableOffset,
     });
 
     // this prevent situation when filters are new, but active chunks is not yet recalculated (it will be done to the next rendrer, so we bring filters change on the next render too)
@@ -99,6 +102,14 @@ export const PaginatedTable = <T, F>({
         [onDataFetched, setFoundEntities, setIsInitialLoad, setTotalEntities],
     );
 
+    React.useLayoutEffect(() => {
+        const scrollContainer = scrollContainerRef.current;
+        const table = tableRef.current;
+        if (table && scrollContainer) {
+            setTableOffset(calculateElementOffsetTop(table, scrollContainer));
+        }
+    }, [scrollContainerRef.current, tableRef.current, foundEntities]);
+
     // Set will-change: transform on scroll container if not already set
     React.useLayoutEffect(() => {
         const scrollContainer = scrollContainerRef.current;
@@ -124,8 +135,11 @@ export const PaginatedTable = <T, F>({
         const chunks: React.ReactElement[] = [];
         let i = 0;
 
-        while (i < activeChunks.length) {
-            const isActive = activeChunks[i];
+        while (i < chunkStates.length) {
+            const chunkState = chunkStates[i];
+            const shouldRender = chunkState.shouldRender;
+            const shouldFetch = chunkState.shouldFetch;
+            const isActive = shouldRender || shouldFetch;
 
             if (isActive) {
                 // Render active chunk normally
@@ -133,7 +147,7 @@ export const PaginatedTable = <T, F>({
                     <TableChunk<T, F>
                         key={i}
                         id={i}
-                        calculatedCount={i === activeChunks.length - 1 ? lastChunkSize : chunkSize}
+                        calculatedCount={i === chunkStates.length - 1 ? lastChunkSize : chunkSize}
                         chunkSize={chunkSize}
                         rowHeight={rowHeight}
                         columns={columns}
@@ -145,7 +159,8 @@ export const PaginatedTable = <T, F>({
                         renderErrorMessage={renderErrorMessage}
                         renderEmptyDataMessage={renderEmptyDataMessage}
                         onDataFetched={handleDataFetched}
-                        isActive={isActive}
+                        shouldFetch={chunkState.shouldFetch}
+                        shouldRender={chunkState.shouldRender}
                         keepCache={keepCache}
                     />,
                 );
@@ -155,9 +170,13 @@ export const PaginatedTable = <T, F>({
                 const startIndex = i;
                 let totalHeight = 0;
 
-                while (i < activeChunks.length && !activeChunks[i]) {
+                while (
+                    i < chunkStates.length &&
+                    !chunkStates[i].shouldRender &&
+                    !chunkStates[i].shouldFetch
+                ) {
                     const currentChunkSize =
-                        i === activeChunks.length - 1 ? lastChunkSize : chunkSize;
+                        i === chunkStates.length - 1 ? lastChunkSize : chunkSize;
                     totalHeight += currentChunkSize * rowHeight;
                     i++;
                 }

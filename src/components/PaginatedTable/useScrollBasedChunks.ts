@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {calculateElementOffsetTop, rafThrottle} from './utils';
+import {rafThrottle} from './utils';
 
 interface UseScrollBasedChunksProps {
     scrollContainerRef: React.RefObject<HTMLElement>;
@@ -8,10 +8,21 @@ interface UseScrollBasedChunksProps {
     totalItems: number;
     rowHeight: number;
     chunkSize: number;
-    overscanCount?: number;
+    renderOverscan?: number;
+    fetchOverscan?: number;
+    tableOffset: number;
 }
 
-const DEFAULT_OVERSCAN_COUNT = 2;
+interface ChunkState {
+    shouldRender: boolean;
+    shouldFetch: boolean;
+}
+
+const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+// Bad performance in Safari - reduce overscan counts
+const DEFAULT_RENDER_OVERSCAN = isSafari ? 1 : 2;
+const DEFAULT_FETCH_OVERSCAN = isSafari ? 2 : 4;
 
 export const useScrollBasedChunks = ({
     scrollContainerRef,
@@ -19,17 +30,17 @@ export const useScrollBasedChunks = ({
     totalItems,
     rowHeight,
     chunkSize,
-    overscanCount = DEFAULT_OVERSCAN_COUNT,
-}: UseScrollBasedChunksProps): boolean[] => {
+    tableOffset,
+    renderOverscan = DEFAULT_RENDER_OVERSCAN,
+    fetchOverscan = DEFAULT_FETCH_OVERSCAN,
+}: UseScrollBasedChunksProps): ChunkState[] => {
     const chunksCount = React.useMemo(
         () => Math.ceil(totalItems / chunkSize),
         [chunkSize, totalItems],
     );
 
-    const [startChunk, setStartChunk] = React.useState(0);
-    const [endChunk, setEndChunk] = React.useState(
-        Math.min(overscanCount, Math.max(chunksCount - 1, 0)),
-    );
+    const [visibleStartChunk, setVisibleStartChunk] = React.useState(0);
+    const [visibleEndChunk, setVisibleEndChunk] = React.useState(0);
 
     const calculateVisibleRange = React.useCallback(() => {
         const container = scrollContainerRef?.current;
@@ -38,24 +49,23 @@ export const useScrollBasedChunks = ({
             return null;
         }
 
-        const tableOffset = calculateElementOffsetTop(table, container);
         const containerScroll = container.scrollTop;
         const visibleStart = Math.max(containerScroll - tableOffset, 0);
         const visibleEnd = visibleStart + container.clientHeight;
 
-        const start = Math.max(Math.floor(visibleStart / rowHeight / chunkSize) - overscanCount, 0);
+        const start = Math.max(Math.floor(visibleStart / rowHeight / chunkSize), 0);
         const end = Math.min(
-            Math.floor(visibleEnd / rowHeight / chunkSize) + overscanCount,
+            Math.floor(visibleEnd / rowHeight / chunkSize),
             Math.max(chunksCount - 1, 0),
         );
         return {start, end};
-    }, [scrollContainerRef, tableRef, rowHeight, chunkSize, overscanCount, chunksCount]);
+    }, [scrollContainerRef, tableRef, tableOffset, rowHeight, chunkSize, chunksCount]);
 
     const updateVisibleChunks = React.useCallback(() => {
         const newRange = calculateVisibleRange();
         if (newRange) {
-            setStartChunk(newRange.start);
-            setEndChunk(newRange.end);
+            setVisibleStartChunk(newRange.start);
+            setVisibleEndChunk(newRange.end);
         }
     }, [calculateVisibleRange]);
 
@@ -94,11 +104,28 @@ export const useScrollBasedChunks = ({
     }, [handleScroll, scrollContainerRef]);
 
     return React.useMemo(() => {
-        // boolean array that represents active chunks
-        const activeChunks = Array(chunksCount).fill(false);
-        for (let i = startChunk; i <= endChunk; i++) {
-            activeChunks[i] = true;
-        }
-        return activeChunks;
-    }, [chunksCount, startChunk, endChunk]);
+        // Calculate render range (visible + render overscan)
+        const renderStartChunk = Math.max(visibleStartChunk - renderOverscan, 0);
+        const renderEndChunk = Math.min(
+            visibleEndChunk + renderOverscan,
+            Math.max(chunksCount - 1, 0),
+        );
+
+        // Calculate fetch range (visible + fetch overscan)
+        const fetchStartChunk = Math.max(visibleStartChunk - fetchOverscan, 0);
+        const fetchEndChunk = Math.min(
+            visibleEndChunk + fetchOverscan,
+            Math.max(chunksCount - 1, 0),
+        );
+
+        // Create chunk states array
+        const chunkStates: ChunkState[] = Array(chunksCount)
+            .fill(null)
+            .map((_, index) => ({
+                shouldRender: index >= renderStartChunk && index <= renderEndChunk,
+                shouldFetch: index >= fetchStartChunk && index <= fetchEndChunk,
+            }));
+
+        return chunkStates;
+    }, [chunksCount, visibleStartChunk, visibleEndChunk, renderOverscan, fetchOverscan]);
 };

@@ -29,7 +29,8 @@ interface TableChunkProps<T, F> {
     columns: Column<T>[];
     filters?: F;
     sortParams?: SortParams;
-    isActive: boolean;
+    shouldFetch: boolean;
+    shouldRender: boolean;
     tableName: string;
 
     fetchData: FetchData<T, F>;
@@ -56,7 +57,8 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     renderErrorMessage,
     renderEmptyDataMessage,
     onDataFetched,
-    isActive,
+    shouldFetch,
+    shouldRender,
     keepCache,
 }: TableChunkProps<T, F>) {
     const [isTimeoutActive, setIsTimeoutActive] = React.useState(true);
@@ -75,7 +77,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     };
 
     tableDataApi.useFetchTableChunkQuery(queryParams, {
-        skip: isTimeoutActive || !isActive,
+        skip: isTimeoutActive || !shouldFetch,
         pollingInterval: autoRefreshInterval,
         refetchOnMountOrArgChange: !keepCache,
     });
@@ -85,7 +87,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     React.useEffect(() => {
         let timeout = 0;
 
-        if (isActive && isTimeoutActive) {
+        if (shouldFetch && isTimeoutActive) {
             timeout = window.setTimeout(() => {
                 setIsTimeoutActive(false);
             }, DEBOUNCE_TIMEOUT);
@@ -94,10 +96,10 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
         return () => {
             window.clearTimeout(timeout);
         };
-    }, [isActive, isTimeoutActive]);
+    }, [shouldFetch, isTimeoutActive]);
 
     React.useEffect(() => {
-        if (currentData && isActive) {
+        if (currentData) {
             onDataFetched({
                 ...currentData,
                 data: currentData.data as T[],
@@ -105,12 +107,12 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
                 total: currentData.total || 0,
             });
         }
-    }, [currentData, isActive, onDataFetched]);
+    }, [currentData, onDataFetched]);
 
     const dataLength = currentData?.data?.length || calculatedCount;
 
     const renderContent = () => {
-        if (!isActive) {
+        if (!shouldRender) {
             return null;
         }
 
@@ -161,7 +163,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
                 // Default display: table-row-group doesn't work in Safari and breaks the table
                 // display: block works in Safari, but disconnects thead and tbody cell grids
                 // Hack to make it work in all cases
-                display: isActive ? 'table-row-group' : 'block',
+                display: shouldRender ? 'table-row-group' : 'block',
             }}
         >
             {renderContent()}
