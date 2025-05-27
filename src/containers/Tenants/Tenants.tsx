@@ -302,10 +302,7 @@ function getDBActionsColumn({
         render: ({row}) => {
             const menuItems: (DropdownMenuItem | DropdownMenuItem[])[] = [];
 
-            const databaseId = row.UserAttributes?.database_id;
-            const databaseName = row.Name;
-
-            if (clusterName && isEditDBAvailable) {
+            if (isEditDBAvailable) {
                 menuItems.push({
                     text: i18n('edit'),
                     iconStart: <Pencil />,
@@ -317,15 +314,14 @@ function getDBActionsColumn({
                     },
                 });
             }
-            if (clusterName && isDeleteDBAvailable && databaseName && databaseId) {
+            if (isDeleteDBAvailable) {
                 menuItems.push({
                     text: i18n('remove'),
                     iconStart: <TrashBin />,
                     action: () => {
                         uiFactory.onDeleteDB?.({
                             clusterName,
-                            databaseId,
-                            databaseName,
+                            databaseData: row,
                         });
                     },
                     className: b('remove-db'),

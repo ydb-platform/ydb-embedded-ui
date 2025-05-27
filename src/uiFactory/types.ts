@@ -21,6 +21,5 @@ export type HandleEditDB = (params: {
 
 export type HandleDeleteDB = (params: {
     clusterName: string;
-    databaseName: string;
-    databaseId: string;
+    databaseData: PreparedTenant;
 }) => Promise<boolean>;
