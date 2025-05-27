@@ -89,7 +89,6 @@ export const useVirtualizedTbodies = <T, F>({
                     renderErrorMessage={renderErrorMessage}
                     renderEmptyDataMessage={renderEmptyDataMessage}
                     onDataFetched={onDataFetched}
-                    isActive={true}
                     keepCache={keepCache}
                 />,
             );
