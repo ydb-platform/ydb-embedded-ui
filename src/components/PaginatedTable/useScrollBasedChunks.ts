@@ -11,7 +11,7 @@ interface UseScrollBasedChunksProps {
     overscanCount?: number;
 }
 
-const DEFAULT_OVERSCAN_COUNT = 2;
+const DEFAULT_OVERSCAN_COUNT = 15;
 
 export const useScrollBasedChunks = ({
     scrollContainerRef,
@@ -20,15 +20,18 @@ export const useScrollBasedChunks = ({
     rowHeight,
     chunkSize,
     overscanCount = DEFAULT_OVERSCAN_COUNT,
-}: UseScrollBasedChunksProps): boolean[] => {
+}: UseScrollBasedChunksProps): {
+    visibleRowRange: {start: number; end: number};
+    totalItems: number;
+} => {
     const chunksCount = React.useMemo(
         () => Math.ceil(totalItems / chunkSize),
         [chunkSize, totalItems],
     );
 
-    const [startChunk, setStartChunk] = React.useState(0);
-    const [endChunk, setEndChunk] = React.useState(
-        Math.min(overscanCount, Math.max(chunksCount - 1, 0)),
+    const [startRow, setStartRow] = React.useState(0);
+    const [endRow, setEndRow] = React.useState(
+        Math.min(overscanCount, Math.max(totalItems - 1, 0)),
     );
 
     const calculateVisibleRange = React.useCallback(() => {
@@ -43,19 +46,30 @@ export const useScrollBasedChunks = ({
         const visibleStart = Math.max(containerScroll - tableOffset, 0);
         const visibleEnd = visibleStart + container.clientHeight;
 
-        const start = Math.max(Math.floor(visibleStart / rowHeight / chunkSize) - overscanCount, 0);
-        const end = Math.min(
-            Math.floor(visibleEnd / rowHeight / chunkSize) + overscanCount,
-            Math.max(chunksCount - 1, 0),
-        );
-        return {start, end};
-    }, [scrollContainerRef, tableRef, rowHeight, chunkSize, overscanCount, chunksCount]);
+        // Calculate row range first
+        const rowStart = Math.max(Math.floor(visibleStart / rowHeight) - overscanCount, 0);
+        const rowEnd = Math.min(Math.floor(visibleEnd / rowHeight) + overscanCount, totalItems - 1);
+
+        // Calculate chunk range from row range
+        const start = Math.max(Math.floor(rowStart / chunkSize), 0);
+        const end = Math.min(Math.floor(rowEnd / chunkSize), Math.max(chunksCount - 1, 0));
+
+        return {start, end, rowStart, rowEnd};
+    }, [
+        scrollContainerRef,
+        tableRef,
+        rowHeight,
+        chunkSize,
+        overscanCount,
+        chunksCount,
+        totalItems,
+    ]);
 
     const updateVisibleChunks = React.useCallback(() => {
         const newRange = calculateVisibleRange();
         if (newRange) {
-            setStartChunk(newRange.start);
-            setEndChunk(newRange.end);
+            setStartRow(newRange.rowStart);
+            setEndRow(newRange.rowEnd);
         }
     }, [calculateVisibleRange]);
 
@@ -94,11 +108,9 @@ export const useScrollBasedChunks = ({
     }, [handleScroll, scrollContainerRef]);
 
     return React.useMemo(() => {
-        // boolean array that represents active chunks
-        const activeChunks = Array(chunksCount).fill(false);
-        for (let i = startChunk; i <= endChunk; i++) {
-            activeChunks[i] = true;
-        }
-        return activeChunks;
-    }, [chunksCount, startChunk, endChunk]);
+        return {
+            visibleRowRange: {start: startRow, end: endRow},
+            totalItems,
+        };
+    }, [startRow, endRow, totalItems]);
 };

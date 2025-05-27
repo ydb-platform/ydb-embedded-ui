@@ -36,7 +36,7 @@ export interface PaginatedTableProps<T, F> {
     keepCache?: boolean;
 }
 
-const DEFAULT_PAGINATION_LIMIT = 20;
+const DEFAULT_PAGINATION_LIMIT = 50;
 
 export const PaginatedTable = <T, F>({
     limit: chunkSize = DEFAULT_PAGINATION_LIMIT,
@@ -63,7 +63,7 @@ export const PaginatedTable = <T, F>({
 
     const tableRef = React.useRef<HTMLDivElement>(null);
 
-    const activeChunks = useScrollBasedChunks({
+    const {visibleRowRange, totalItems} = useScrollBasedChunks({
         scrollContainerRef,
         tableRef,
         totalItems: foundEntities,
@@ -77,15 +77,6 @@ export const PaginatedTable = <T, F>({
     React.useEffect(() => {
         setFilters(rawFilters);
     }, [rawFilters]);
-
-    const lastChunkSize = React.useMemo(() => {
-        // If foundEntities = 0, there will only first chunk
-        // Display it with 1 row, to display empty data message
-        if (!foundEntities) {
-            return 1;
-        }
-        return foundEntities % chunkSize || chunkSize;
-    }, [foundEntities, chunkSize]);
 
     const handleDataFetched = React.useCallback(
         (data?: PaginatedTableData<T>) => {
@@ -121,9 +112,9 @@ export const PaginatedTable = <T, F>({
     }, [initialEntitiesCount, setTotalEntities, setFoundEntities, setIsInitialLoad]);
 
     const {renderChunks} = useVirtualizedTbodies({
-        activeChunks,
+        visibleRowRange,
+        totalItems,
         chunkSize,
-        lastChunkSize,
         rowHeight,
         columns,
         fetchData,

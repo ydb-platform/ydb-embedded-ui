@@ -30,6 +30,8 @@ interface TableChunkProps<T, F> {
     filters?: F;
     sortParams?: SortParams;
     tableName: string;
+    startRow: number;
+    endRow: number;
 
     fetchData: FetchData<T, F>;
     getRowClassName?: GetRowClassName<T>;
@@ -56,6 +58,8 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     renderEmptyDataMessage,
     onDataFetched,
     keepCache,
+    startRow,
+    endRow,
 }: TableChunkProps<T, F>) {
     const [isTimeoutActive, setIsTimeoutActive] = React.useState(true);
     const [autoRefreshInterval] = useAutoRefreshInterval();
@@ -111,41 +115,59 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
         if (!currentData) {
             if (error) {
                 const errorData = error as IResponseError;
-                return (
-                    <EmptyTableRow columns={columns}>
+                return [
+                    <EmptyTableRow key="empty" columns={columns}>
                         {renderErrorMessage ? (
                             renderErrorMessage(errorData)
                         ) : (
                             <ResponseError error={errorData} />
                         )}
-                    </EmptyTableRow>
-                );
+                    </EmptyTableRow>,
+                ];
             } else {
-                return getArray(dataLength).map((value) => (
-                    <LoadingTableRow key={value} columns={columns} height={rowHeight} />
-                ));
+                return getArray(dataLength)
+                    .map((value, index) => {
+                        const globalRowIndex = id * chunkSize + index;
+
+                        if (globalRowIndex < startRow || globalRowIndex > endRow) {
+                            return null;
+                        }
+
+                        return <LoadingTableRow key={value} columns={columns} height={rowHeight} />;
+                    })
+                    .filter(Boolean);
             }
         }
 
         // Data is loaded, but there are no entities in the chunk
         if (!currentData.data?.length) {
-            return (
-                <EmptyTableRow columns={columns}>
+            return [
+                <EmptyTableRow key="empty" columns={columns}>
                     {renderEmptyDataMessage ? renderEmptyDataMessage() : i18n('empty')}
-                </EmptyTableRow>
-            );
+                </EmptyTableRow>,
+            ];
         }
 
-        return currentData.data.map((rowData, index) => (
-            <TableRow
-                key={index}
-                row={rowData as T}
-                columns={columns}
-                height={rowHeight}
-                getRowClassName={getRowClassName}
-            />
-        ));
+        return currentData.data
+            .map((rowData, index) => {
+                const globalRowIndex = id * chunkSize + index;
+
+                if (globalRowIndex < startRow || globalRowIndex > endRow) {
+                    return null;
+                }
+
+                return (
+                    <TableRow
+                        key={index}
+                        row={rowData as T}
+                        columns={columns}
+                        height={rowHeight}
+                        getRowClassName={getRowClassName}
+                    />
+                );
+            })
+            .filter(Boolean);
     };
 
-    return <React.Fragment>{renderContent()}</React.Fragment>;
+    return renderContent();
 });

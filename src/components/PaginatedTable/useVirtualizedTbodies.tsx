@@ -12,9 +12,9 @@ import type {
 } from './types';
 
 interface UseVirtualizedTbodiesProps<T, F> {
-    activeChunks: boolean[];
+    visibleRowRange: {start: number; end: number};
+    totalItems: number;
     chunkSize: number;
-    lastChunkSize: number;
     rowHeight: number;
     columns: Column<T>[];
     fetchData: FetchData<T, F>;
@@ -29,9 +29,9 @@ interface UseVirtualizedTbodiesProps<T, F> {
 }
 
 export const useVirtualizedTbodies = <T, F>({
-    activeChunks,
+    visibleRowRange,
+    totalItems,
     chunkSize,
-    lastChunkSize,
     rowHeight,
     columns,
     fetchData,
@@ -44,35 +44,36 @@ export const useVirtualizedTbodies = <T, F>({
     onDataFetched,
     keepCache = true,
 }: UseVirtualizedTbodiesProps<T, F>) => {
+    const startRow = visibleRowRange.start;
+    const endRow = visibleRowRange.end;
+
     const renderChunks = React.useCallback(() => {
         const chunks: React.ReactElement[] = [];
 
-        // Count empty start chunks
-        let startEmptyCount = 0;
-        while (startEmptyCount < activeChunks.length && !activeChunks[startEmptyCount]) {
-            startEmptyCount++;
-        }
+        // Calculate which chunks contain visible rows
+        const totalChunks = Math.ceil(totalItems / chunkSize);
+        const startChunk = Math.max(0, Math.floor(startRow / chunkSize));
+        const endChunk = Math.min(totalChunks - 1, Math.floor(endRow / chunkSize));
 
-        // Push start spacer if needed
-        if (startEmptyCount > 0) {
+        // Push start spacer for rows before visible range
+        const startSpacerHeight = startRow * rowHeight;
+        if (startSpacerHeight > 0) {
             chunks.push(
                 <tbody
                     key="spacer-start"
                     style={{
-                        height: `${startEmptyCount * chunkSize * rowHeight}px`,
+                        height: `${startSpacerHeight}px`,
                         display: 'block',
                     }}
                 />,
             );
         }
 
-        // Collect active chunks and calculate total height
+        // Collect active chunks and calculate height for visible rows only
         const activeChunkElements: React.ReactElement[] = [];
-        let totalActiveHeight = 0;
 
-        for (let i = startEmptyCount; i < activeChunks.length && activeChunks[i]; i++) {
-            const chunkRowCount = i === activeChunks.length - 1 ? lastChunkSize : chunkSize;
-            totalActiveHeight += chunkRowCount * rowHeight;
+        for (let i = startChunk; i <= endChunk; i++) {
+            const chunkRowCount = i === totalChunks - 1 ? totalItems - i * chunkSize : chunkSize;
 
             activeChunkElements.push(
                 <TableChunk<T, F>
@@ -91,13 +92,18 @@ export const useVirtualizedTbodies = <T, F>({
                     renderEmptyDataMessage={renderEmptyDataMessage}
                     onDataFetched={onDataFetched}
                     keepCache={keepCache}
+                    startRow={startRow}
+                    endRow={endRow}
                 />,
             );
-            startEmptyCount = i + 1;
         }
 
-        // Wrap active chunks in a single tbody with calculated height
+        // Wrap active chunks in a single tbody
         if (activeChunkElements.length > 0) {
+            // Calculate height based on visible rows only
+            const visibleRowCount = endRow - startRow + 1;
+            const totalActiveHeight = visibleRowCount * rowHeight;
+
             chunks.push(
                 <tbody
                     key="active-chunks"
@@ -111,16 +117,15 @@ export const useVirtualizedTbodies = <T, F>({
             );
         }
 
-        // Count empty end chunks
-        const endEmptyCount = activeChunks.length - startEmptyCount;
+        // Add end spacer for rows after visible range
+        const endSpacerHeight = Math.max(0, (totalItems - startRow - 1) * rowHeight);
 
-        // Push end spacer if needed
-        if (endEmptyCount > 0) {
+        if (endSpacerHeight > 0) {
             chunks.push(
                 <tbody
                     key="spacer-end"
                     style={{
-                        height: `${endEmptyCount * chunkSize * rowHeight}px`,
+                        height: `${endSpacerHeight}px`,
                         display: 'block',
                     }}
                 />,
@@ -129,9 +134,10 @@ export const useVirtualizedTbodies = <T, F>({
 
         return chunks;
     }, [
-        activeChunks,
+        startRow,
+        endRow,
+        totalItems,
         chunkSize,
-        lastChunkSize,
         rowHeight,
         columns,
         fetchData,
