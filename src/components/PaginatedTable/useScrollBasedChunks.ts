@@ -11,7 +11,7 @@ interface UseScrollBasedChunksProps {
     overscanCount?: number;
 }
 
-const DEFAULT_OVERSCAN_COUNT = 1;
+const DEFAULT_OVERSCAN_COUNT = 2;
 
 export const useScrollBasedChunks = ({
     scrollContainerRef,

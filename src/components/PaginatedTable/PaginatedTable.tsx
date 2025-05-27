@@ -99,6 +99,17 @@ export const PaginatedTable = <T, F>({
         [onDataFetched, setFoundEntities, setIsInitialLoad, setTotalEntities],
     );
 
+    // Set will-change: transform on scroll container if not already set
+    React.useLayoutEffect(() => {
+        const scrollContainer = scrollContainerRef.current;
+        if (scrollContainer) {
+            const computedStyle = window.getComputedStyle(scrollContainer);
+            if (computedStyle.willChange !== 'transform') {
+                scrollContainer.style.willChange = 'transform';
+            }
+        }
+    }, [scrollContainerRef.current]);
+
     // Reset table on initialization and filters change
     React.useLayoutEffect(() => {
         const defaultTotal = initialEntitiesCount || 0;
@@ -110,26 +121,61 @@ export const PaginatedTable = <T, F>({
     }, [initialEntitiesCount, setTotalEntities, setFoundEntities, setIsInitialLoad]);
 
     const renderChunks = () => {
-        return activeChunks.map((isActive, index) => (
-            <TableChunk<T, F>
-                key={index}
-                id={index}
-                calculatedCount={index === activeChunks.length - 1 ? lastChunkSize : chunkSize}
-                chunkSize={chunkSize}
-                rowHeight={rowHeight}
-                columns={columns}
-                fetchData={fetchData}
-                filters={filters}
-                tableName={tableName}
-                sortParams={sortParams}
-                getRowClassName={getRowClassName}
-                renderErrorMessage={renderErrorMessage}
-                renderEmptyDataMessage={renderEmptyDataMessage}
-                onDataFetched={handleDataFetched}
-                isActive={isActive}
-                keepCache={keepCache}
-            />
-        ));
+        const chunks: React.ReactElement[] = [];
+        let i = 0;
+
+        while (i < activeChunks.length) {
+            const isActive = activeChunks[i];
+
+            if (isActive) {
+                // Render active chunk normally
+                chunks.push(
+                    <TableChunk<T, F>
+                        key={i}
+                        id={i}
+                        calculatedCount={i === activeChunks.length - 1 ? lastChunkSize : chunkSize}
+                        chunkSize={chunkSize}
+                        rowHeight={rowHeight}
+                        columns={columns}
+                        fetchData={fetchData}
+                        filters={filters}
+                        tableName={tableName}
+                        sortParams={sortParams}
+                        getRowClassName={getRowClassName}
+                        renderErrorMessage={renderErrorMessage}
+                        renderEmptyDataMessage={renderEmptyDataMessage}
+                        onDataFetched={handleDataFetched}
+                        isActive={isActive}
+                        keepCache={keepCache}
+                    />,
+                );
+                i++;
+            } else {
+                // Find consecutive inactive chunks and merge them
+                const startIndex = i;
+                let totalHeight = 0;
+
+                while (i < activeChunks.length && !activeChunks[i]) {
+                    const currentChunkSize =
+                        i === activeChunks.length - 1 ? lastChunkSize : chunkSize;
+                    totalHeight += currentChunkSize * rowHeight;
+                    i++;
+                }
+
+                // Render merged empty tbody for consecutive inactive chunks
+                chunks.push(
+                    <tbody
+                        key={`merged-${startIndex}-${i - 1}`}
+                        style={{
+                            height: `${totalHeight}px`,
+                            display: 'block',
+                        }}
+                    />,
+                );
+            }
+        }
+
+        return chunks;
     };
 
     const renderTable = () => (
