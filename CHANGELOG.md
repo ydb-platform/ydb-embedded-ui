@@ -1,5 +1,17 @@
 # Changelog
 
+## [9.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.2.2...v9.3.0) (2025-05-27)
+
+
+### Features
+
+* **Tenants:** pass full db data to onDelete ([#2328](https://github.com/ydb-platform/ydb-embedded-ui/issues/2328)) ([b966aaa](https://github.com/ydb-platform/ydb-embedded-ui/commit/b966aaaa8abeb55cea2f579da0f99dd5f458ef0b))
+
+
+### Bug Fixes
+
+* **Versions:** properly include nodes with defined roles in other group ([#2327](https://github.com/ydb-platform/ydb-embedded-ui/issues/2327)) ([3f3a543](https://github.com/ydb-platform/ydb-embedded-ui/commit/3f3a543a688fe2370053d95aa0c051da625055c9))
+
 ## [9.2.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.2.1...v9.2.2) (2025-05-26)
 
 
