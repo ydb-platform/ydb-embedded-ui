@@ -48,28 +48,12 @@ export const useVirtualizedTbodies = <T, F>({
     const endRow = visibleRowRange.end;
 
     const renderChunks = React.useCallback(() => {
-        const chunks: React.ReactElement[] = [];
-
         // Calculate which chunks contain visible rows
         const totalChunks = Math.ceil(totalItems / chunkSize);
         const startChunk = Math.max(0, Math.floor(startRow / chunkSize));
         const endChunk = Math.min(totalChunks - 1, Math.floor(endRow / chunkSize));
 
-        // Push start spacer for rows before visible range
-        const startSpacerHeight = startRow * rowHeight;
-        if (startSpacerHeight > 0) {
-            chunks.push(
-                <tbody
-                    key="spacer-start"
-                    style={{
-                        height: `${startSpacerHeight}px`,
-                        display: 'block',
-                    }}
-                />,
-            );
-        }
-
-        // Collect active chunks and calculate height for visible rows only
+        // Collect active chunks
         const activeChunkElements: React.ReactElement[] = [];
 
         for (let i = startChunk; i <= endChunk; i++) {
@@ -98,41 +82,19 @@ export const useVirtualizedTbodies = <T, F>({
             );
         }
 
-        // Wrap active chunks in a single tbody
-        if (activeChunkElements.length > 0) {
-            // Calculate height based on visible rows only
-            const visibleRowCount = endRow - startRow + 1;
-            const totalActiveHeight = visibleRowCount * rowHeight;
+        const activeChunksTopOffset = startRow * rowHeight;
 
-            chunks.push(
-                <tbody
-                    key="active-chunks"
-                    style={{
-                        height: `${totalActiveHeight}px`,
-                        display: 'table-row-group',
-                    }}
-                >
-                    {activeChunkElements}
-                </tbody>,
-            );
-        }
-
-        // Add end spacer for rows after visible range
-        const endSpacerHeight = Math.max(0, (totalItems - startRow - 1) * rowHeight);
-
-        if (endSpacerHeight > 0) {
-            chunks.push(
-                <tbody
-                    key="spacer-end"
-                    style={{
-                        height: `${endSpacerHeight}px`,
-                        display: 'block',
-                    }}
-                />,
-            );
-        }
-
-        return chunks;
+        return (
+            <tbody
+                style={{
+                    position: 'absolute',
+                    transform: `translateY(${activeChunksTopOffset}px)`,
+                    willChange: 'transform',
+                }}
+            >
+                {activeChunkElements}
+            </tbody>
+        );
     }, [
         startRow,
         endRow,

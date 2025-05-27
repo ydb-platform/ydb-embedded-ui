@@ -131,7 +131,9 @@ export const PaginatedTable = <T, F>({
     const renderTable = () => (
         <table className={b('table')}>
             <TableHead columns={columns} onSort={setSortParams} onColumnsResize={onColumnsResize} />
-            {renderChunks()}
+            <div className={b('table-body')} style={{height: totalItems * rowHeight}}>
+                {renderChunks()}
+            </div>
         </table>
     );
 
