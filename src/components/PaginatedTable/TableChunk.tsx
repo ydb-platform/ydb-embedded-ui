@@ -147,15 +147,5 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
         ));
     };
 
-    return (
-        <tbody
-            id={id.toString()}
-            style={{
-                height: `${dataLength * rowHeight}px`,
-                display: 'table-row-group',
-            }}
-        >
-            {renderContent()}
-        </tbody>
-    );
+    return <React.Fragment>{renderContent()}</React.Fragment>;
 });

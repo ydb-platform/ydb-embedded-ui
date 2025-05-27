@@ -71,13 +71,19 @@ export const useVirtualizedTbodies = <T, F>({
             );
         }
 
-        // Collect and push active chunks
+        // Collect active chunks and calculate total height
+        const activeChunkElements: React.ReactElement[] = [];
+        let totalActiveHeight = 0;
+
         for (let i = startEmptyCount; i < activeChunks.length && activeChunks[i]; i++) {
-            chunks.push(
+            const chunkRowCount = i === activeChunks.length - 1 ? lastChunkSize : chunkSize;
+            totalActiveHeight += chunkRowCount * rowHeight;
+
+            activeChunkElements.push(
                 <TableChunk<T, F>
                     key={i}
                     id={i}
-                    calculatedCount={i === activeChunks.length - 1 ? lastChunkSize : chunkSize}
+                    calculatedCount={chunkRowCount}
                     chunkSize={chunkSize}
                     rowHeight={rowHeight}
                     columns={columns}
@@ -93,6 +99,21 @@ export const useVirtualizedTbodies = <T, F>({
                 />,
             );
             startEmptyCount = i + 1;
+        }
+
+        // Wrap active chunks in a single tbody with calculated height
+        if (activeChunkElements.length > 0) {
+            chunks.push(
+                <tbody
+                    key="active-chunks"
+                    style={{
+                        height: `${totalActiveHeight}px`,
+                        display: 'table-row-group',
+                    }}
+                >
+                    {activeChunkElements}
+                </tbody>,
+            );
         }
 
         // Count empty end chunks
