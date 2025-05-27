@@ -44,10 +44,6 @@ export const useVirtualizedTbodies = <T, F>({
     onDataFetched,
     keepCache = true,
 }: UseVirtualizedTbodiesProps<T, F>) => {
-    // Reusable spacer tbody elements (max 2: before and after active chunks)
-    const beforeSpacerRef = React.useRef<HTMLTableSectionElement>(null);
-    const afterSpacerRef = React.useRef<HTMLTableSectionElement>(null);
-
     const renderChunks = React.useCallback(() => {
         const chunks: React.ReactElement[] = [];
 
@@ -62,7 +58,6 @@ export const useVirtualizedTbodies = <T, F>({
             chunks.push(
                 <tbody
                     key="spacer-start"
-                    ref={beforeSpacerRef}
                     style={{
                         height: `${startEmptyCount * chunkSize * rowHeight}px`,
                         display: 'block',
@@ -124,7 +119,6 @@ export const useVirtualizedTbodies = <T, F>({
             chunks.push(
                 <tbody
                     key="spacer-end"
-                    ref={afterSpacerRef}
                     style={{
                         height: `${endEmptyCount * chunkSize * rowHeight}px`,
                         display: 'block',
