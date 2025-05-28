@@ -183,13 +183,11 @@ export const PaginatedTable = <T, F>({
 
                 // Render merged empty tbody for consecutive inactive chunks
                 chunks.push(
-                    <tbody
-                        key={`merged-${startIndex}-${i - 1}`}
-                        style={{
-                            height: `${totalHeight}px`,
-                            display: 'block',
-                        }}
-                    />,
+                    <tbody key={`merged-${startIndex}-${i - 1}`}>
+                        <tr style={{height: `${totalHeight}px`}}>
+                            <td colSpan={columns.length} style={{padding: 0, border: 'none'}} />
+                        </tr>
+                    </tbody>,
                 );
             }
         }

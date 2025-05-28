@@ -160,13 +160,16 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
             id={id.toString()}
             style={{
                 height: `${dataLength * rowHeight}px`,
-                // Default display: table-row-group doesn't work in Safari and breaks the table
-                // display: block works in Safari, but disconnects thead and tbody cell grids
-                // Hack to make it work in all cases
-                display: shouldRender ? 'table-row-group' : 'block',
+                display: 'table-row-group',
             }}
         >
-            {renderContent()}
+            {shouldRender ? (
+                renderContent()
+            ) : (
+                <tr style={{height: `${dataLength * rowHeight}px`}}>
+                    <td colSpan={columns.length} style={{padding: 0, border: 'none'}} />
+                </tr>
+            )}
         </tbody>
     );
 });
