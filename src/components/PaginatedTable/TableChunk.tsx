@@ -112,15 +112,11 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     const dataLength = currentData?.data?.length || calculatedCount;
 
     const renderContent = () => {
-        if (!shouldRender) {
-            return null;
-        }
-
         if (!currentData) {
             if (error) {
                 const errorData = error as IResponseError;
                 return (
-                    <EmptyTableRow columns={columns}>
+                    <EmptyTableRow columns={columns} height={dataLength * rowHeight}>
                         {renderErrorMessage ? (
                             renderErrorMessage(errorData)
                         ) : (
@@ -138,7 +134,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
         // Data is loaded, but there are no entities in the chunk
         if (!currentData.data?.length) {
             return (
-                <EmptyTableRow columns={columns}>
+                <EmptyTableRow columns={columns} height={dataLength * rowHeight}>
                     {renderEmptyDataMessage ? renderEmptyDataMessage() : i18n('empty')}
                 </EmptyTableRow>
             );
@@ -155,21 +151,11 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
         ));
     };
 
-    return (
-        <tbody
-            id={id.toString()}
-            style={{
-                height: `${dataLength * rowHeight}px`,
-                display: 'table-row-group',
-            }}
-        >
-            {shouldRender ? (
-                renderContent()
-            ) : (
-                <tr style={{height: `${dataLength * rowHeight}px`}}>
-                    <td colSpan={columns.length} style={{padding: 0, border: 'none'}} />
-                </tr>
-            )}
-        </tbody>
+    return shouldRender ? (
+        renderContent()
+    ) : (
+        <tr style={{height: `${dataLength * rowHeight}px`}}>
+            <td colSpan={columns.length} style={{padding: 0, border: 'none'}} />
+        </tr>
     );
 });
