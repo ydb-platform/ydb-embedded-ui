@@ -1,5 +1,3 @@
-import type {BaseQueryFn} from '@reduxjs/toolkit/query';
-
 import type {FetchData, PaginatedTableData, SortParams} from './types';
 
 interface PaginatedTableParams<T, F> {
@@ -156,6 +154,7 @@ class RequestBatcher {
             const chunkData = batchResponse.data.slice(startIndex, endIndex);
 
             const chunkResponse: PaginatedTableData<T> = {
+                ...batchResponse,
                 data: chunkData,
                 total: batchResponse.total,
                 found: batchResponse.found,
@@ -181,17 +180,3 @@ class RequestBatcher {
 
 // Singleton instance
 export const requestBatcher = new RequestBatcher();
-
-// Enhanced base query that uses batching
-export const createBatchedBaseQuery = <T, F>(originalBaseQuery: BaseQueryFn): BaseQueryFn => {
-    return async (args, api, extraOptions) => {
-        // Check if this is a fetchTableChunk request
-        if (typeof args === 'object' && args && 'fetchData' in args) {
-            const params = args as PaginatedTableParams<T, F>;
-            return await requestBatcher.queueRequest(params);
-        }
-
-        // For non-batchable requests, use original base query
-        return originalBaseQuery(args, api, extraOptions);
-    };
-};
