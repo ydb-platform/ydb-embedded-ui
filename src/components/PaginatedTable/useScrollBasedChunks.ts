@@ -97,7 +97,7 @@ export const useScrollBasedChunks = ({
 
         const throttledHandleScroll = rafThrottle(handleScroll);
 
-        container.addEventListener('scroll', throttledHandleScroll);
+        container.addEventListener('scroll', throttledHandleScroll, {passive: true});
         return () => {
             container.removeEventListener('scroll', throttledHandleScroll);
         };
