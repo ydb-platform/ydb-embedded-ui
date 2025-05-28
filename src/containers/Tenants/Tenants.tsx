@@ -302,6 +302,11 @@ function getDBActionsColumn({
         render: ({row}) => {
             const menuItems: (DropdownMenuItem | DropdownMenuItem[])[] = [];
 
+            // Do not show edit and delete actions for domain
+            if (row.Type === 'Domain') {
+                return null;
+            }
+
             if (isEditDBAvailable) {
                 menuItems.push({
                     text: i18n('edit'),
