@@ -37,7 +37,7 @@ export interface PaginatedTableProps<T, F> {
     keepCache?: boolean;
 }
 
-const DEFAULT_PAGINATION_LIMIT = 20;
+const DEFAULT_PAGINATION_LIMIT = 10;
 
 export const PaginatedTable = <T, F>({
     limit: chunkSize = DEFAULT_PAGINATION_LIMIT,
@@ -142,7 +142,6 @@ export const PaginatedTable = <T, F>({
             const isActive = shouldRender || shouldFetch;
 
             if (isActive) {
-                // Render active chunk normally
                 chunks.push(
                     <TableChunk<T, F>
                         key={i}
@@ -164,26 +163,28 @@ export const PaginatedTable = <T, F>({
                         keepCache={keepCache}
                     />,
                 );
+            }
+
+            if (shouldRender) {
                 i++;
             } else {
                 // Find consecutive inactive chunks and merge them
                 const startIndex = i;
                 let totalHeight = 0;
 
-                while (
-                    i < chunkStates.length &&
-                    !chunkStates[i].shouldRender &&
-                    !chunkStates[i].shouldFetch
-                ) {
+                while (i < chunkStates.length && !chunkStates[i].shouldRender) {
                     const currentChunkSize =
                         i === chunkStates.length - 1 ? lastChunkSize : chunkSize;
                     totalHeight += currentChunkSize * rowHeight;
                     i++;
                 }
 
-                // Render merged empty tbody for consecutive inactive chunks
+                // Render merged separator for consecutive inactive chunks
                 chunks.push(
-                    <tr style={{height: `${totalHeight}px`}} key={`merged-${startIndex}-${i - 1}`}>
+                    <tr
+                        style={{height: `${totalHeight}px`}}
+                        key={`separator-${startIndex}-${i - 1}`}
+                    >
                         <td colSpan={columns.length} style={{padding: 0, border: 'none'}} />
                     </tr>,
                 );

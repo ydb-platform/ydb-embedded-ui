@@ -21,7 +21,7 @@ interface ChunkState {
 const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
 // Bad performance in Safari - reduce overscan counts
-const DEFAULT_RENDER_OVERSCAN = isSafari ? 1 : 2;
+const DEFAULT_RENDER_OVERSCAN = isSafari ? 0 : 0;
 const DEFAULT_FETCH_OVERSCAN = 4;
 
 export const useScrollBasedChunks = ({

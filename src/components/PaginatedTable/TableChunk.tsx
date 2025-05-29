@@ -151,11 +151,5 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
         ));
     };
 
-    return shouldRender ? (
-        renderContent()
-    ) : (
-        <tr style={{height: `${dataLength * rowHeight}px`}}>
-            <td colSpan={columns.length} style={{padding: 0, border: 'none'}} />
-        </tr>
-    );
+    return shouldRender ? renderContent() : null;
 });
