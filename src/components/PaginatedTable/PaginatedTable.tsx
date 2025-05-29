@@ -37,7 +37,7 @@ export interface PaginatedTableProps<T, F> {
     keepCache?: boolean;
 }
 
-const DEFAULT_PAGINATION_LIMIT = 10;
+const DEFAULT_PAGINATION_LIMIT = 20;
 
 export const PaginatedTable = <T, F>({
     limit: chunkSize = DEFAULT_PAGINATION_LIMIT,
@@ -183,6 +183,7 @@ export const PaginatedTable = <T, F>({
                 chunks.push(
                     <tr
                         style={{height: `${totalHeight}px`}}
+                        className="separator"
                         key={`separator-${startIndex}-${i - 1}`}
                     >
                         <td colSpan={columns.length} style={{padding: 0, border: 'none'}} />
