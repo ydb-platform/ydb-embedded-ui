@@ -20,7 +20,10 @@ test.describe('PaginatedTable', () => {
 
         // Get initial row count (should be first chunk)
         const initialVisibleRows = await paginatedTable.getRowCount();
-        expect(initialVisibleRows).toEqual(40); // Should not show all rows initially
+
+        // Safari shows 40 rows initially (1 + 1 overscan), other browsers show 60 (1 + 2 overscan)
+        const expectedRows = page.context().browser()?.browserType().name() === 'webkit' ? 40 : 60;
+        expect(initialVisibleRows).toEqual(expectedRows); // Should not show all rows initially
 
         // Get data from first visible row to verify initial chunk
         const firstRowData = await paginatedTable.getRowData(0);
