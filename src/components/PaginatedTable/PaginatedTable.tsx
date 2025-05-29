@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {usePaginatedTableState} from './PaginatedTableContext';
-import {TableChunk} from './TableChunk';
+import {TableChunksRenderer} from './TableChunksRenderer';
 import {TableHead} from './TableHead';
 import {DEFAULT_TABLE_ROW_HEIGHT} from './constants';
 import {b} from './shared';
@@ -14,7 +14,6 @@ import type {
     RenderEmptyDataMessage,
     RenderErrorMessage,
 } from './types';
-import {useScrollBasedChunks} from './useScrollBasedChunks';
 import {calculateElementOffsetTop} from './utils';
 
 import './PaginatedTable.scss';
@@ -65,30 +64,12 @@ export const PaginatedTable = <T, F>({
     const tableRef = React.useRef<HTMLDivElement>(null);
     const [tableOffset, setTableOffset] = React.useState(0);
 
-    const chunkStates = useScrollBasedChunks({
-        scrollContainerRef,
-        tableRef,
-        totalItems: foundEntities,
-        rowHeight,
-        chunkSize,
-        tableOffset,
-    });
-
     // this prevent situation when filters are new, but active chunks is not yet recalculated (it will be done to the next rendrer, so we bring filters change on the next render too)
     const [filters, setFilters] = React.useState(rawFilters);
 
     React.useEffect(() => {
         setFilters(rawFilters);
     }, [rawFilters]);
-
-    const lastChunkSize = React.useMemo(() => {
-        // If foundEntities = 0, there will only first chunk
-        // Display it with 1 row, to display empty data message
-        if (!foundEntities) {
-            return 1;
-        }
-        return foundEntities % chunkSize || chunkSize;
-    }, [foundEntities, chunkSize]);
 
     const handleDataFetched = React.useCallback(
         (data?: PaginatedTableData<T>) => {
@@ -131,74 +112,29 @@ export const PaginatedTable = <T, F>({
         setIsInitialLoad(true);
     }, [initialEntitiesCount, setTotalEntities, setFoundEntities, setIsInitialLoad]);
 
-    const renderChunks = () => {
-        const chunks: React.ReactElement[] = [];
-        let i = 0;
-
-        while (i < chunkStates.length) {
-            const chunkState = chunkStates[i];
-            const shouldRender = chunkState.shouldRender;
-            const shouldFetch = chunkState.shouldFetch;
-            const isActive = shouldRender || shouldFetch;
-
-            if (isActive) {
-                chunks.push(
-                    <TableChunk<T, F>
-                        key={i}
-                        id={i}
-                        calculatedCount={i === chunkStates.length - 1 ? lastChunkSize : chunkSize}
-                        chunkSize={chunkSize}
-                        rowHeight={rowHeight}
-                        columns={columns}
-                        fetchData={fetchData}
-                        filters={filters}
-                        tableName={tableName}
-                        sortParams={sortParams}
-                        getRowClassName={getRowClassName}
-                        renderErrorMessage={renderErrorMessage}
-                        renderEmptyDataMessage={renderEmptyDataMessage}
-                        onDataFetched={handleDataFetched}
-                        shouldFetch={chunkState.shouldFetch}
-                        shouldRender={chunkState.shouldRender}
-                        keepCache={keepCache}
-                    />,
-                );
-            }
-
-            if (shouldRender) {
-                i++;
-            } else {
-                // Find consecutive inactive chunks and merge them
-                const startIndex = i;
-                let totalHeight = 0;
-
-                while (i < chunkStates.length && !chunkStates[i].shouldRender) {
-                    const currentChunkSize =
-                        i === chunkStates.length - 1 ? lastChunkSize : chunkSize;
-                    totalHeight += currentChunkSize * rowHeight;
-                    i++;
-                }
-
-                // Render merged separator for consecutive inactive chunks
-                chunks.push(
-                    <tr
-                        style={{height: `${totalHeight}px`}}
-                        className="separator"
-                        key={`separator-${startIndex}-${i - 1}`}
-                    >
-                        <td colSpan={columns.length} style={{padding: 0, border: 'none'}} />
-                    </tr>,
-                );
-            }
-        }
-
-        return chunks;
-    };
-
     const renderTable = () => (
         <table className={b('table')}>
             <TableHead columns={columns} onSort={setSortParams} onColumnsResize={onColumnsResize} />
-            <tbody>{renderChunks()}</tbody>
+            <tbody>
+                <TableChunksRenderer
+                    scrollContainerRef={scrollContainerRef}
+                    tableRef={tableRef}
+                    foundEntities={foundEntities}
+                    tableOffset={tableOffset}
+                    chunkSize={chunkSize}
+                    rowHeight={rowHeight}
+                    columns={columns}
+                    fetchData={fetchData}
+                    filters={filters}
+                    tableName={tableName}
+                    sortParams={sortParams}
+                    getRowClassName={getRowClassName}
+                    renderErrorMessage={renderErrorMessage}
+                    renderEmptyDataMessage={renderEmptyDataMessage}
+                    onDataFetched={handleDataFetched}
+                    keepCache={keepCache}
+                />
+            </tbody>
         </table>
     );
 
