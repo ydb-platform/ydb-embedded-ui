@@ -150,7 +150,7 @@ export const TableChunksRenderer = <T, F>({
     );
 
     const renderChunks = React.useCallback(() => {
-        // Chunk states are distrubuted like [fetch, fetch, render/fetch, render/fetch, fetch, fetch]
+        // Chunk states are distrubuted like [null, null, fetch, fetch, render+fetch, render+fetch, fetch, fetch, null, null]
         // i.e. fetched chunks include rendered chunks
         const {firstFetchIndex, lastFetchIndex} = findFetchChunkRange();
         const {firstRenderIndex, lastRenderIndex} = findRenderChunkRange();

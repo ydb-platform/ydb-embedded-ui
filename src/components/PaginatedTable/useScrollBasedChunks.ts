@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {throttle} from 'lodash';
+
 import {rafThrottle} from './utils';
 
 interface UseScrollBasedChunksProps {
@@ -23,6 +25,7 @@ const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 // Bad performance in Safari - reduce overscan counts
 const DEFAULT_RENDER_OVERSCAN = isSafari ? 1 : 2;
 const DEFAULT_FETCH_OVERSCAN = 4;
+const THROTTLE_DELAY = 200;
 
 export const useScrollBasedChunks = ({
     scrollContainerRef,
@@ -95,7 +98,10 @@ export const useScrollBasedChunks = ({
             return undefined;
         }
 
-        const throttledHandleScroll = rafThrottle(handleScroll);
+        const throttledHandleScroll = throttle(handleScroll, THROTTLE_DELAY, {
+            trailing: true,
+            leading: true,
+        });
 
         container.addEventListener('scroll', throttledHandleScroll, {passive: true});
         return () => {
