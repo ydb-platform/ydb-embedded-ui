@@ -22,6 +22,8 @@ export interface TableProps extends Omit<TableWithControlsLayoutItemProps, 'chil
     loading?: boolean;
     scrollContainerRef?: React.RefObject<HTMLElement>;
     scrollDependencies?: any[];
+
+    // onSort is called with the table's sort parameters and triggers auto-scrolling.
     onSort?: (params: any) => void;
     children?: React.ReactNode | ((props: {onSort: (params: any) => void}) => React.ReactNode);
 }
