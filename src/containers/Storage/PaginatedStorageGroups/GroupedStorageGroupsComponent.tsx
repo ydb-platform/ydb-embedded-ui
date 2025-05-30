@@ -59,20 +59,28 @@ export const StorageGroupGroup = React.memo(function StorageGroupGroup({
             expanded={isExpanded}
             onIsExpandedChange={onIsExpandedChange}
         >
-            <PaginatedStorageGroupsTable
-                database={database}
-                scrollContainerRef={scrollContainerRef}
-                nodeId={nodeId}
-                groupId={groupId}
-                pDiskId={pDiskId}
-                filterGroup={name}
-                filterGroupBy={filterGroupBy}
-                searchValue={searchValue}
-                visibleEntities={'all'}
-                onShowAll={handleShowAllGroups}
-                renderErrorMessage={renderPaginatedTableErrorMessage}
-                columns={columns}
-                initialEntitiesCount={count}
+            <PaginatedTableWithLayout
+                initialState={{sortParams: undefined}}
+                table={
+                    <PaginatedStorageGroupsTable
+                        database={database}
+                        scrollContainerRef={scrollContainerRef}
+                        nodeId={nodeId}
+                        groupId={groupId}
+                        pDiskId={pDiskId}
+                        filterGroup={name}
+                        filterGroupBy={filterGroupBy}
+                        searchValue={searchValue}
+                        visibleEntities={'all'}
+                        onShowAll={handleShowAllGroups}
+                        renderErrorMessage={renderPaginatedTableErrorMessage}
+                        columns={columns}
+                        initialEntitiesCount={count}
+                    />
+                }
+                tableProps={{
+                    scrollContainerRef: scrollContainerRef,
+                }}
             />
         </TableGroup>
     );

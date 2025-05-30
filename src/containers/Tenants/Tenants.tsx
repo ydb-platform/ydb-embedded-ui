@@ -128,7 +128,7 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
         );
     };
 
-    const renderTable = () => {
+    const renderTable = (onSort?: (params: any) => void) => {
         const columns: Column<PreparedTenant>[] = [
             {
                 name: 'Name',
@@ -261,6 +261,7 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
                 columns={columns}
                 settings={DEFAULT_TABLE_SETTINGS}
                 emptyDataMessage="No such tenants"
+                onSort={onSort}
             />
         );
     };
@@ -277,7 +278,7 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
                     loading={loading}
                     scrollDependencies={[searchValue, problemFilter]}
                 >
-                    {currentData ? renderTable() : null}
+                    {({onSort}) => (currentData ? renderTable(onSort) : null)}
                 </TableWithControlsLayout.Table>
             </TableWithControlsLayout>
         </div>
