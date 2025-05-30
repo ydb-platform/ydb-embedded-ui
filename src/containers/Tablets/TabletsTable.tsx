@@ -217,12 +217,15 @@ export function TabletsTable({
                 scrollDependencies={[tabletsSearch]}
                 loading={loading}
             >
-                <ResizeableDataTable
-                    columns={columns}
-                    data={filteredTablets}
-                    settings={DEFAULT_TABLE_SETTINGS}
-                    emptyDataMessage={i18n('noTabletsData')}
-                />
+                {({onSort}) => (
+                    <ResizeableDataTable
+                        columns={columns}
+                        data={filteredTablets}
+                        settings={DEFAULT_TABLE_SETTINGS}
+                        emptyDataMessage={i18n('noTabletsData')}
+                        onSort={onSort}
+                    />
+                )}
             </TableWithControlsLayout.Table>
         </TableWithControlsLayout>
     );

@@ -55,18 +55,26 @@ const NodeGroup = React.memo(function NodeGroup({
             expanded={isExpanded}
             onIsExpandedChange={onIsExpandedChange}
         >
-            <NodesTable
-                path={path}
-                database={database}
-                searchValue={searchValue}
-                problemFilter={'All'}
-                uptimeFilter={NodesUptimeFilterValues.All}
-                peerRoleFilter={peerRoleFilter}
-                filterGroup={name}
-                filterGroupBy={groupByParam}
-                initialEntitiesCount={count}
-                columns={columns}
-                scrollContainerRef={scrollContainerRef}
+            <PaginatedTableWithLayout
+                initialState={{sortParams: undefined}}
+                table={
+                    <NodesTable
+                        path={path}
+                        database={database}
+                        searchValue={searchValue}
+                        problemFilter={'All'}
+                        uptimeFilter={NodesUptimeFilterValues.All}
+                        peerRoleFilter={peerRoleFilter}
+                        filterGroup={name}
+                        filterGroupBy={groupByParam}
+                        initialEntitiesCount={count}
+                        columns={columns}
+                        scrollContainerRef={scrollContainerRef}
+                    />
+                }
+                tableProps={{
+                    scrollContainerRef: scrollContainerRef,
+                }}
             />
         </TableGroup>
     );

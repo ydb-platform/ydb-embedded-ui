@@ -18,10 +18,12 @@ interface TableWithControlsLayoutItemProps {
     fullHeight?: boolean;
 }
 
-export interface TableProps extends TableWithControlsLayoutItemProps {
+export interface TableProps extends Omit<TableWithControlsLayoutItemProps, 'children'> {
     loading?: boolean;
     scrollContainerRef?: React.RefObject<HTMLElement>;
     scrollDependencies?: any[];
+    onSort?: (params: any) => void;
+    children?: React.ReactNode | ((props: {onSort: (params: any) => void}) => React.ReactNode);
 }
 
 export const TableWithControlsLayout = ({
@@ -56,16 +58,26 @@ TableWithControlsLayout.Table = function Table({
     className,
     scrollContainerRef,
     scrollDependencies = [],
+    onSort,
 }: TableProps) {
     // Create an internal ref for the table container
     const tableContainerRef = React.useRef<HTMLDivElement>(null);
 
     // Use the internal ref for scrolling
-    useTableScroll({
+    const {handleTableScroll} = useTableScroll({
         tableContainerRef,
         scrollContainerRef,
         dependencies: scrollDependencies,
     });
+
+    // Create a wrapper function that triggers scroll on sort
+    const handleSort = React.useCallback(
+        (params: any) => {
+            onSort?.(params); // Call original callback if provided
+            handleTableScroll(); // Trigger scroll to top
+        },
+        [onSort, handleTableScroll],
+    );
 
     if (loading) {
         return <TableSkeleton className={b('loader')} />;
@@ -73,7 +85,7 @@ TableWithControlsLayout.Table = function Table({
 
     return (
         <div ref={tableContainerRef} className={b('table', className)}>
-            {children}
+            {typeof children === 'function' ? children({onSort: handleSort}) : children}
         </div>
     );
 };
