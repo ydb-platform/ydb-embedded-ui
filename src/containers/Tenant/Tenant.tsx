@@ -1,7 +1,6 @@
 import React from 'react';
 
 import {Helmet} from 'react-helmet-async';
-import {StringParam, useQueryParams} from 'use-query-params';
 
 import {PageError} from '../../components/Errors/PageError/PageError';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
@@ -17,7 +16,9 @@ import {isAccessError} from '../../utils/response';
 
 import ObjectGeneral from './ObjectGeneral/ObjectGeneral';
 import {ObjectSummary} from './ObjectSummary/ObjectSummary';
+import {TenantDrawerWrapper} from './TenantDrawerWrappers';
 import i18n from './i18n';
+import {useTenantQueryParams} from './useTenantQueryParams';
 import {
     PaneVisibilityActionTypes,
     paneVisibilityToggleReducerCreator,
@@ -49,55 +50,41 @@ export function Tenant(props: TenantProps) {
         getTenantSummaryState,
     );
 
-    // TODO: name is used together with database to keep old links valid
-    // Remove it after some time - 1-2 weeks
-    const [{database, name, schema}, setQuery] = useQueryParams({
-        database: StringParam,
-        name: StringParam,
-        schema: StringParam,
-    });
+    const {database, schema} = useTenantQueryParams();
 
-    React.useEffect(() => {
-        if (name && !database) {
-            setQuery({database: name, name: undefined}, 'replaceIn');
-        }
-    }, [database, name, setQuery]);
-
-    const tenantName = database ?? name;
-
-    if (!tenantName) {
+    if (!database) {
         throw new Error('Tenant name is not defined');
     }
 
     const previousTenant = React.useRef<string>();
     React.useEffect(() => {
-        if (previousTenant.current !== tenantName) {
+        if (previousTenant.current !== database) {
             const register = async () => {
                 const {registerYQLCompletionItemProvider} = await import(
                     '../../utils/monaco/yql/yql.completionItemProvider'
                 );
-                registerYQLCompletionItemProvider(tenantName);
+                registerYQLCompletionItemProvider(database);
             };
             register().catch(console.error);
-            previousTenant.current = tenantName;
+            previousTenant.current = database;
         }
-    }, [tenantName]);
+    }, [database]);
 
     const dispatch = useTypedDispatch();
     React.useEffect(() => {
-        dispatch(setHeaderBreadcrumbs('tenant', {tenantName}));
-    }, [tenantName, dispatch]);
+        dispatch(setHeaderBreadcrumbs('tenant', {tenantName: database}));
+    }, [database, dispatch]);
 
-    const path = schema ?? tenantName;
+    const path = schema ?? database;
 
     const {
         currentData: currentItem,
         error,
         isLoading,
-    } = overviewApi.useGetOverviewQuery({path, database: tenantName});
+    } = overviewApi.useGetOverviewQuery({path, database: database});
 
     const preloadedData = useTypedSelector((state) =>
-        selectSchemaObjectData(state, path, tenantName),
+        selectSchemaObjectData(state, path, database),
     );
 
     // Use preloaded data if there is no current item data yet
@@ -135,34 +122,36 @@ export function Tenant(props: TenantProps) {
             />
             <LoaderWrapper loading={initialLoading}>
                 <PageError error={showBlockingError ? error : undefined}>
-                    <SplitPane
-                        defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
-                        defaultSizes={[25, 75]}
-                        triggerCollapse={summaryVisibilityState.triggerCollapse}
-                        triggerExpand={summaryVisibilityState.triggerExpand}
-                        minSize={[36, 200]}
-                        onSplitStartDragAdditional={onSplitStartDragAdditional}
-                    >
-                        <ObjectSummary
-                            type={currentPathType}
-                            subType={currentPathSubType}
-                            tenantName={tenantName}
-                            path={path}
-                            onCollapseSummary={onCollapseSummaryHandler}
-                            onExpandSummary={onExpandSummaryHandler}
-                            isCollapsed={summaryVisibilityState.collapsed}
-                        />
-                        <div className={b('main')}>
-                            <ObjectGeneral
+                    <TenantDrawerWrapper database={database}>
+                        <SplitPane
+                            defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
+                            defaultSizes={[25, 75]}
+                            triggerCollapse={summaryVisibilityState.triggerCollapse}
+                            triggerExpand={summaryVisibilityState.triggerExpand}
+                            minSize={[36, 200]}
+                            onSplitStartDragAdditional={onSplitStartDragAdditional}
+                        >
+                            <ObjectSummary
                                 type={currentPathType}
                                 subType={currentPathSubType}
-                                additionalTenantProps={props.additionalTenantProps}
-                                additionalNodesProps={props.additionalNodesProps}
-                                tenantName={tenantName}
+                                tenantName={database}
                                 path={path}
+                                onCollapseSummary={onCollapseSummaryHandler}
+                                onExpandSummary={onExpandSummaryHandler}
+                                isCollapsed={summaryVisibilityState.collapsed}
                             />
-                        </div>
-                    </SplitPane>
+                            <div className={b('main')}>
+                                <ObjectGeneral
+                                    type={currentPathType}
+                                    subType={currentPathSubType}
+                                    additionalTenantProps={props.additionalTenantProps}
+                                    additionalNodesProps={props.additionalNodesProps}
+                                    tenantName={database}
+                                    path={path}
+                                />
+                            </div>
+                        </SplitPane>
+                    </TenantDrawerWrapper>
                 </PageError>
             </LoaderWrapper>
         </div>

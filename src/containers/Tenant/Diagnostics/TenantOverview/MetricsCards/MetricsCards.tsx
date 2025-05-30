@@ -18,7 +18,6 @@ import {cn} from '../../../../../utils/cn';
 import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
 import {useTypedSelector} from '../../../../../utils/hooks';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
-import {HealthcheckPreview} from '../Healthcheck/HealthcheckPreview';
 import i18n from '../i18n';
 
 import type {DiagnosticsCardMetric} from './MetricCard/MetricCard';
@@ -42,7 +41,6 @@ interface MetricsCardsProps {
     memoryStats?: TenantMetricStats[];
     blobStorageStats?: TenantStorageStats[];
     tabletStorageStats?: TenantStorageStats[];
-    tenantName: string;
 }
 
 export function MetricsCards({
@@ -50,7 +48,6 @@ export function MetricsCards({
     memoryStats,
     blobStorageStats,
     tabletStorageStats,
-    tenantName,
 }: MetricsCardsProps) {
     const location = useLocation();
 
@@ -80,10 +77,6 @@ export function MetricsCards({
             ...queryParams,
             [TenantTabsGroups.metricsTab]: getTabIfNotActive(TENANT_METRICS_TABS_IDS.memory),
         }),
-        [TENANT_METRICS_TABS_IDS.healthcheck]: getTenantPath({
-            ...queryParams,
-            [TenantTabsGroups.metricsTab]: getTabIfNotActive(TENANT_METRICS_TABS_IDS.healthcheck),
-        }),
     };
 
     return (
@@ -105,12 +98,6 @@ export function MetricsCards({
                 <MemoryCard
                     memoryStats={memoryStats}
                     active={metricsTab === TENANT_METRICS_TABS_IDS.memory}
-                />
-            </Link>
-            <Link to={tabLinks.healthcheck} className={b('tab')}>
-                <HealthcheckPreview
-                    tenantName={tenantName}
-                    active={metricsTab === TENANT_METRICS_TABS_IDS.healthcheck}
                 />
             </Link>
         </div>

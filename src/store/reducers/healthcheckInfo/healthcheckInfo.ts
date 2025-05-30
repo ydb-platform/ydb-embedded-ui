@@ -4,7 +4,7 @@ import type {IssueLog, StatusFlag} from '../../../types/api/healthcheck';
 import type {RootState} from '../../defaultStore';
 import {api} from '../api';
 
-import type {IssuesTree} from './types';
+import {getLeavesFromTree} from './utils';
 
 export const healthcheckApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -18,7 +18,9 @@ export const healthcheckApi = api.injectEndpoints({
                         {database, maxLevel},
                         {signal},
                     );
-                    return {data};
+                    return {
+                        data,
+                    };
                 } catch (error) {
                     return {error};
                 }
@@ -46,10 +48,6 @@ const sortIssues = (data: IssueLog[]): IssueLog[] => {
     });
 };
 
-const getReasonsForIssue = ({issue, data}: {issue: IssueLog; data: IssueLog[]}) => {
-    return sortIssues(data.filter((item) => issue.reason && issue.reason.indexOf(item.id) !== -1));
-};
-
 const getRoots = (data: IssueLog[]): IssueLog[] => {
     return sortIssues(
         data.filter((item) => {
@@ -58,49 +56,15 @@ const getRoots = (data: IssueLog[]): IssueLog[] => {
     );
 };
 
-const getInvertedConsequencesTree = ({
-    data,
-    roots,
-}: {
-    data: IssueLog[];
-    roots?: IssueLog[];
-}): IssuesTree[] => {
-    return roots
-        ? roots.map((issue) => {
-              const reasonsItems = getInvertedConsequencesTree({
-                  roots: getReasonsForIssue({issue, data}),
-                  data,
-              });
-
-              return {
-                  ...issue,
-                  reasonsItems,
-              };
-          })
-        : [];
-};
-
-const getIssuesStatistics = (data: IssueLog[]): [StatusFlag, number][] => {
-    const issuesMap = {} as Record<StatusFlag, number>;
-
-    for (const issue of data) {
-        if (!issuesMap[issue.status]) {
-            issuesMap[issue.status] = 0;
-        }
-        issuesMap[issue.status]++;
-    }
-
-    return (Object.entries(issuesMap) as [StatusFlag, number][]).sort(([aStatus], [bStatus]) => {
-        const bPriority = mapStatusToPriority[bStatus] || 0;
-        const aPriority = mapStatusToPriority[aStatus] || 0;
-
-        return aPriority - bPriority;
-    });
-};
-
 const createGetHealthcheckInfoSelector = createSelector(
     (database: string) => database,
     (database) => healthcheckApi.endpoints.getHealthcheckInfo.select({database}),
+);
+
+export const selectCheckStatus = createSelector(
+    (state: RootState) => state,
+    (_state: RootState, database: string) => createGetHealthcheckInfoSelector(database),
+    (state: RootState, selectGetPost) => selectGetPost(state).data?.self_check_result,
 );
 
 const getIssuesLog = createSelector(
@@ -111,13 +75,15 @@ const getIssuesLog = createSelector(
 
 const selectIssuesTreesRoots = createSelector(getIssuesLog, (issues = []) => getRoots(issues));
 
-export const selectIssuesTrees = createSelector(
+export const selectLeavesIssues = createSelector(
     [getIssuesLog, selectIssuesTreesRoots],
     (data = [], roots = []) => {
-        return getInvertedConsequencesTree({data, roots});
+        return roots.map((root) => getLeavesFromTree(data, root)).flat();
     },
 );
 
-export const selectIssuesStatistics = createSelector(getIssuesLog, (issues = []) =>
-    getIssuesStatistics(issues),
+export const selectAllHealthcheckInfo = createSelector(
+    (state: RootState) => state,
+    (_state: RootState, database: string) => createGetHealthcheckInfoSelector(database),
+    (state: RootState, selectGetPost) => selectGetPost(state).data,
 );

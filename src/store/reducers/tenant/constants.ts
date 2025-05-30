@@ -40,5 +40,4 @@ export const TENANT_METRICS_TABS_IDS = {
     cpu: 'cpu',
     storage: 'storage',
     memory: 'memory',
-    healthcheck: 'healthcheck',
 } as const;
