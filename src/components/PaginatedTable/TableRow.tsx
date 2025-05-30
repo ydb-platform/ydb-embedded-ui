@@ -44,7 +44,7 @@ interface LoadingTableRowProps<T> {
 
 export const LoadingTableRow = typedMemo(function <T>({columns, height}: LoadingTableRowProps<T>) {
     return (
-        <tr className={b('row', {loading: true})}>
+        <tr className={b('row', {loading: true})} style={{height}}>
             {columns.map((column) => {
                 const resizeable = column.resizeable ?? DEFAULT_RESIZEABLE;
 
@@ -79,7 +79,7 @@ export const TableRow = <T,>({row, columns, getRowClassName, height}: TableRowPr
     const additionalClassName = getRowClassName?.(row);
 
     return (
-        <tr className={b('row', additionalClassName)}>
+        <tr className={b('row', additionalClassName)} style={{height}}>
             {columns.map((column) => {
                 const resizeable = column.resizeable ?? DEFAULT_RESIZEABLE;
 
@@ -103,11 +103,12 @@ export const TableRow = <T,>({row, columns, getRowClassName, height}: TableRowPr
 interface EmptyTableRowProps<T> {
     columns: Column<T>[];
     children?: React.ReactNode;
+    height: number;
 }
 
-export const EmptyTableRow = <T,>({columns, children}: EmptyTableRowProps<T>) => {
+export const EmptyTableRow = <T,>({columns, children, height}: EmptyTableRowProps<T>) => {
     return (
-        <tr className={b('row', {empty: true})}>
+        <tr className={b('row', {empty: true})} style={{height}}>
             <td colSpan={columns.length} className={b('td')}>
                 {children}
             </td>
