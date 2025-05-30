@@ -1,4 +1,9 @@
 import {
+    countHealthcheckIssuesByType,
+    getHealthcheckViewsOrder,
+    getHealthckechViewTitles,
+} from '../containers/Tenant/Healthcheck/shared';
+import {
     getMonitoringClusterLink as getMonitoringClusterLinkDefault,
     getMonitoringLink as getMonitoringLinkDefault,
 } from '../utils/monitoring';
@@ -8,6 +13,9 @@ import type {UIFactory} from './types';
 const uiFactoryBase: UIFactory = {
     getMonitoringLink: getMonitoringLinkDefault,
     getMonitoringClusterLink: getMonitoringClusterLinkDefault,
+    getHealthckechViewTitles: getHealthckechViewTitles,
+    getHealthcheckViewsOrder: getHealthcheckViewsOrder,
+    countHealthcheckIssuesByType: countHealthcheckIssuesByType,
 };
 
 export function configureUIFactory(overrides: UIFactory) {

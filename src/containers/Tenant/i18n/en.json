@@ -58,5 +58,12 @@
   "schema.tree.dialog.header": "Create directory",
   "schema.tree.dialog.description": "Inside",
   "schema.tree.dialog.buttonCancel": "Cancel",
-  "schema.tree.dialog.buttonApply": "Create"
+  "schema.tree.dialog.buttonApply": "Create",
+  "label_healthcheck-dashboard": "Healthcheck Dashboard",
+
+  "description_ok": "Everything is working fine.",
+  "description_degraded": "Some issues, but still working.",
+  "description_maintenance": "Working, but needs urgent attention to avoid failure.",
+  "description_emergency": "Something is broken and not working.",
+  "label_download": "Download healthcheck data"
 }

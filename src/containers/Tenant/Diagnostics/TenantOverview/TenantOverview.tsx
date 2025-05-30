@@ -15,7 +15,7 @@ import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQu
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
 
 import {DefaultOverviewContent} from './DefaultOverviewContent/DefaultOverviewContent';
-import {HealthcheckDetails} from './Healthcheck/HealthcheckDetails';
+import {HealthcheckPreview} from './Healthcheck/HealthcheckPreview';
 import {MetricsCards} from './MetricsCards/MetricsCards';
 import {TenantCpu} from './TenantCpu/TenantCpu';
 import {TenantMemory} from './TenantMemory/TenantMemory';
@@ -134,9 +134,6 @@ export function TenantOverview({
                     />
                 );
             }
-            case TENANT_METRICS_TABS_IDS.healthcheck: {
-                return <HealthcheckDetails tenantName={tenantName} />;
-            }
             default: {
                 return <DefaultOverviewContent database={tenantName} />;
             }
@@ -158,13 +155,15 @@ export function TenantOverview({
                             {logsLink && <LogsButton href={logsLink} />}
                         </Flex>
                     </Flex>
-                    <MetricsCards
-                        poolsCpuStats={poolsStats}
-                        memoryStats={memoryStats}
-                        blobStorageStats={blobStorageStats}
-                        tabletStorageStats={tabletStorageStats}
-                        tenantName={tenantName}
-                    />
+                    <Flex direction="column" gap={3}>
+                        <HealthcheckPreview tenantName={tenantName} />
+                        <MetricsCards
+                            poolsCpuStats={poolsStats}
+                            memoryStats={memoryStats}
+                            blobStorageStats={blobStorageStats}
+                            tabletStorageStats={tabletStorageStats}
+                        />
+                    </Flex>
                 </div>
                 {renderTabContent()}
             </div>

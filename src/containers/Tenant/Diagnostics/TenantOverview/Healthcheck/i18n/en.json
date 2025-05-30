@@ -1,8 +1,10 @@
 {
-  "title.healthcheck": "Healthcheck",
-  "label.update": "Update",
-  "label.show-details": "Show details",
-  "label.issues": "Issues:",
-  "status_message.ok": "No issues",
-  "no-data": "no healthcheck data"
+  "description_problems": [
+    "There is {{count}} issues.",
+    "There are {{count}} issues.",
+    "There are {{count}} issues.",
+    "There are {{count}} issues."
+  ],
+  "action_review-issues": "Review issues",
+  "description_no-data": "No healthcheck data"
 }
