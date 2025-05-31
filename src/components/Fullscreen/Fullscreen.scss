@@ -6,7 +6,7 @@
         // should expand to fill the content area, keeping aside navigation visible
         // counts on .gn-aside-header__content to have position: relative, it is set in App.scss
         position: absolute;
-        z-index: calc(var(--ydb-drawer-veil-z-index) + 3);
+        z-index: 10;
         inset: 0;
 
         background-color: var(--g-color-base-background);

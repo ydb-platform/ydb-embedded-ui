@@ -243,7 +243,7 @@ export class Diagnostics {
         this.cpuCard = page.locator('.metrics-cards__tab:has-text("CPU")');
         this.storageCard = page.locator('.metrics-cards__tab:has-text("Storage")');
         this.memoryCard = page.locator('.metrics-cards__tab:has-text("Memory")');
-        this.healthcheckCard = page.locator('.metrics-cards__tab:has-text("Healthcheck")');
+        this.healthcheckCard = page.locator('.ydb-healthcheck-preview');
     }
 
     async isSchemaViewerVisible() {
@@ -334,9 +334,7 @@ export class Diagnostics {
     }
 
     async getHealthcheckStatus() {
-        const statusElement = this.healthcheckCard.locator(
-            '.healthcheck__self-check-status-indicator',
-        );
+        const statusElement = this.healthcheckCard.locator('.ydb-healthcheck-preview__icon');
         return (await statusElement.textContent())?.trim() || '';
     }
 
