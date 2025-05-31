@@ -8,7 +8,7 @@
     }
 
     &__item {
-        z-index: calc(var(--ydb-drawer-veil-z-index) + 1);
+        z-index: 11;
 
         height: 100%;
     }
