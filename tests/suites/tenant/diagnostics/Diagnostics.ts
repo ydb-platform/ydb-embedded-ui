@@ -335,7 +335,7 @@ export class Diagnostics {
 
     async getHealthcheckStatus() {
         const statusElement = this.healthcheckCard.locator('.ydb-healthcheck-preview__icon');
-        return (await statusElement.textContent())?.trim() || '';
+        return await statusElement.isVisible();
     }
 
     async hasHealthcheckStatusClass(className: string) {
