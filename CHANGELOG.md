@@ -1,5 +1,14 @@
 # Changelog
 
+## [9.3.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.3.0...v9.3.1) (2025-05-31)
+
+
+### Bug Fixes
+
+* drawer is broken ([#2351](https://github.com/ydb-platform/ydb-embedded-ui/issues/2351)) ([ce13b7f](https://github.com/ydb-platform/ydb-embedded-ui/commit/ce13b7fca36d1e77f31221156ce09d1b6f35c418))
+* scrolling performance optimizations for table ([#2335](https://github.com/ydb-platform/ydb-embedded-ui/issues/2335)) ([6c72cce](https://github.com/ydb-platform/ydb-embedded-ui/commit/6c72ccedc206bc3b18f8d20f41d7be3a60f64829))
+* **Tenants:** do not show actions for domain ([#2336](https://github.com/ydb-platform/ydb-embedded-ui/issues/2336)) ([828724d](https://github.com/ydb-platform/ydb-embedded-ui/commit/828724daf3ab8f0aa7ab6b6fd86c837e99be59d5))
+
 ## [9.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.2.2...v9.3.0) (2025-05-27)
 
 
