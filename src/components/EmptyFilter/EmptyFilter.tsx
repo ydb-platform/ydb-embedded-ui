@@ -1,7 +1,7 @@
 import {Button} from '@gravity-ui/uikit';
 
-import {EmptyState} from '../../../components/EmptyState';
-import {Illustration} from '../../../components/Illustration';
+import {EmptyState} from '../EmptyState';
+import {Illustration} from '../Illustration';
 
 import i18n from './i18n';
 

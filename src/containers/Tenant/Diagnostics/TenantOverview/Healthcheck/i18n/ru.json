@@ -1,8 +1,0 @@
-{
-  "title.healthcheck": "Healthcheck",
-  "label.update": "Обновить",
-  "label.show-details": "Посмотреть подробности",
-  "label.issues": "Проблемы:",
-  "status_message.ok": "Нет проблем",
-  "no-data": "нет данных healthcheck"
-}
