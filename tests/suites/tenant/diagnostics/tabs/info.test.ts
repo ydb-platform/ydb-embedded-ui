@@ -52,6 +52,11 @@ test.describe('Diagnostics Info tab', async () => {
         await diagnostics.clickTab(DiagnosticsTab.Info);
 
         const status = await diagnostics.getHealthcheckStatus();
-        expect(status).toBe('GOOD');
+        expect(status).toBeTruthy();
+
+        const isGood = await diagnostics.hasHealthcheckStatusClass(
+            'ydb-healthcheck-preview__icon_good',
+        );
+        expect(isGood).toBe(true);
     });
 });
