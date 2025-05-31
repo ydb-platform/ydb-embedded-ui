@@ -67,6 +67,7 @@ export const DrawerContextProvider = ({children, className}: DrawerContextProvid
         <DrawerContext.Provider value={value}>
             <div ref={containerRef} className={b('drawer-container', className)}>
                 {children}
+                {/* Children styles should not affect drawer container behaviour so we mount it out of children */}
                 <div ref={itemContainerRef} className={b('item-container')} />
             </div>
         </DrawerContext.Provider>
