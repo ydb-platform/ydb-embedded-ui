@@ -338,6 +338,12 @@ export class Diagnostics {
         return (await statusElement.textContent())?.trim() || '';
     }
 
+    async hasHealthcheckStatusClass(className: string) {
+        const statusElement = this.healthcheckCard.locator('.ydb-healthcheck-preview__icon');
+        const classList = await statusElement.evaluate((el) => Array.from(el.classList));
+        return classList.includes(className);
+    }
+
     async selectTopShardsMode(mode: TopShardsMode): Promise<void> {
         const option = this.tableRadioButton.locator(`.g-radio-button__option:has-text("${mode}")`);
         await option.evaluate((el) => (el as HTMLElement).click());
