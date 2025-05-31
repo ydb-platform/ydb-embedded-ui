@@ -8,11 +8,13 @@ const b = cn('ydb-drawer');
 
 export interface DrawerContextType {
     containerWidth: number;
+    itemContainerRef: React.RefObject<HTMLDivElement> | null;
     setContainerWidth: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const DrawerContext = React.createContext<DrawerContextType>({
     containerWidth: 0,
+    itemContainerRef: null,
     setContainerWidth: () => {},
 });
 
@@ -24,6 +26,7 @@ interface DrawerContextProviderProps {
 export const DrawerContextProvider = ({children, className}: DrawerContextProviderProps) => {
     const [containerWidth, setContainerWidth] = React.useState(0);
     const containerRef = React.useRef<HTMLDivElement>(null);
+    const itemContainerRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
         if (!containerRef.current) {
@@ -55,6 +58,7 @@ export const DrawerContextProvider = ({children, className}: DrawerContextProvid
         () => ({
             containerWidth,
             setContainerWidth,
+            itemContainerRef,
         }),
         [containerWidth],
     );
@@ -63,6 +67,7 @@ export const DrawerContextProvider = ({children, className}: DrawerContextProvid
         <DrawerContext.Provider value={value}>
             <div ref={containerRef} className={b('drawer-container', className)}>
                 {children}
+                <div ref={itemContainerRef} className={b('item-container')} />
             </div>
         </DrawerContext.Provider>
     );
