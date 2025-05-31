@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Xmark} from '@gravity-ui/icons';
 import {DrawerItem, Drawer as GravityDrawer} from '@gravity-ui/navigation';
-import {ActionTooltip, Button, Flex, Icon, Text} from '@gravity-ui/uikit';
+import {ActionTooltip, Button, Flex, Icon, Portal, Text} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 import {isNumeric} from '../../utils/utils';
@@ -52,7 +52,7 @@ const DrawerPaneContentWrapper = ({
     });
 
     const drawerRef = React.useRef<HTMLDivElement>(null);
-    const {containerWidth} = useDrawerContext();
+    const {containerWidth, itemContainerRef} = useDrawerContext();
     // Calculate drawer width based on container width percentage if specified
     const calculatedWidth = React.useMemo(() => {
         if (isPercentageWidth && containerWidth > 0) {
@@ -103,29 +103,36 @@ const DrawerPaneContentWrapper = ({
         (event.nativeEvent as DrawerEvent)._capturedInsideDrawer = true;
     };
 
+    const itemContainer = itemContainerRef?.current;
+    if (!itemContainer) {
+        return null;
+    }
+
     return (
-        <GravityDrawer
-            onEscape={onClose}
-            onVeilClick={onClose}
-            hideVeil
-            className={b('container', className)}
-        >
-            <DrawerItem
-                id={drawerId}
-                visible={isVisible}
-                resizable
-                maxResizeWidth={containerWidth}
-                width={isPercentageWidth ? calculatedWidth : drawerWidth}
-                onResize={handleResizeDrawer}
-                direction={direction}
-                className={b('item')}
-                ref={detectClickOutside ? drawerRef : undefined}
+        <Portal container={itemContainer}>
+            <GravityDrawer
+                onEscape={onClose}
+                onVeilClick={onClose}
+                hideVeil
+                className={b('container', className)}
             >
-                <div className={b('click-handler')} onClickCapture={handleClickInsideDrawer}>
-                    {children}
-                </div>
-            </DrawerItem>
-        </GravityDrawer>
+                <DrawerItem
+                    id={drawerId}
+                    visible={isVisible}
+                    resizable
+                    maxResizeWidth={containerWidth}
+                    width={isPercentageWidth ? calculatedWidth : drawerWidth}
+                    onResize={handleResizeDrawer}
+                    direction={direction}
+                    className={b('item')}
+                    ref={detectClickOutside ? drawerRef : undefined}
+                >
+                    <div className={b('click-handler')} onClickCapture={handleClickInsideDrawer}>
+                        {children}
+                    </div>
+                </DrawerItem>
+            </GravityDrawer>
+        </Portal>
     );
 };
 
