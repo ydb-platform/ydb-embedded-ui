@@ -1,3 +1,5 @@
+import {Flex, HelpMark} from '@gravity-ui/uikit';
+
 import {DiagnosticCard} from '../../../../../../components/DiagnosticCard/DiagnosticCard';
 import {ProgressViewer} from '../../../../../../components/ProgressViewer/ProgressViewer';
 import type {ProgressViewerProps} from '../../../../../../components/ProgressViewer/ProgressViewer';
@@ -36,9 +38,11 @@ interface MetricCardProps {
     label?: string;
     status?: MetricStatus;
     metrics: DiagnosticsCardMetric[];
+    interactive?: boolean;
+    note?: string;
 }
 
-export function MetricCard({active, label, status, metrics}: MetricCardProps) {
+export function MetricCard({active, label, status, metrics, interactive, note}: MetricCardProps) {
     const renderContent = () => {
         return metrics.map(({title, ...progressViewerProps}, index) => {
             return (
@@ -49,10 +53,25 @@ export function MetricCard({active, label, status, metrics}: MetricCardProps) {
             );
         });
     };
+    const renderNote = () => {
+        if (!note) {
+            return null;
+        }
+        return (
+            <HelpMark placement="top" className={b('note')}>
+                {note}
+            </HelpMark>
+        );
+    };
     return (
-        <DiagnosticCard className={b({active})} active={active}>
+        <DiagnosticCard className={b({active})} active={active} interactive={interactive}>
             <div className={b('header')}>
-                {label && <div className={b('label')}>{label}</div>}
+                {label && (
+                    <Flex gap={1} alignItems="center" className={b('label')}>
+                        {label}
+                        {renderNote()}
+                    </Flex>
+                )}
                 {getStatusIcon(status)}
             </div>
             <div className={b('content')}>{renderContent()}</div>

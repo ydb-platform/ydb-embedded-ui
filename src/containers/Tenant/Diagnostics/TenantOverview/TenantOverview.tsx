@@ -86,6 +86,7 @@ export function TenantOverview({
 
         poolsStats,
         memoryStats,
+        networkStats,
         blobStorageStats,
         tabletStorageStats,
     } = calculateTenantMetrics(tenantData);
@@ -162,6 +163,7 @@ export function TenantOverview({
                             memoryStats={memoryStats}
                             blobStorageStats={blobStorageStats}
                             tabletStorageStats={tabletStorageStats}
+                            networkStats={networkStats}
                         />
                     </Flex>
                 </div>
