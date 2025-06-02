@@ -6,6 +6,7 @@ import {getArray} from '../../utils';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {ResponseError} from '../Errors/ResponseError';
 
+import {usePaginatedTableState} from './PaginatedTableContext';
 import {EmptyTableRow, LoadingTableRow, TableRow} from './TableRow';
 import i18n from './i18n';
 import type {
@@ -63,6 +64,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
 }: TableChunkProps<T, F>) {
     const [isTimeoutActive, setIsTimeoutActive] = React.useState(true);
     const [autoRefreshInterval] = useAutoRefreshInterval();
+    const {noBatching} = usePaginatedTableState();
 
     const columnsIds = columns.map((column) => column.name);
 
@@ -74,6 +76,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
         sortParams,
         columnsIds,
         tableName,
+        noBatching,
     };
 
     tableDataApi.useFetchTableChunkQuery(queryParams, {
