@@ -13,35 +13,49 @@ interface PaginatedTableParams<T, F> {
     sortParams?: SortParams;
     columnsIds: string[];
     tableName: string;
+    noBatching?: boolean;
 }
 
 function endpoints<T, F>(build: EndpointBuilder<BaseQueryFn, string, string>) {
     return {
         fetchTableChunk: build.query<PaginatedTableData<T>, PaginatedTableParams<T, F>>({
             queryFn: async (
-                {offset, limit, sortParams, filters, columnsIds, fetchData, tableName},
+                {offset, limit, sortParams, filters, columnsIds, fetchData, tableName, noBatching},
                 {signal},
             ) => {
                 try {
-                    // Use the request batcher for potential merging
-                    const result = await requestBatcher.queueRequest(
-                        {
-                            offset,
+                    if (noBatching) {
+                        const response = await fetchData({
                             limit,
-                            sortParams,
+                            offset,
                             filters,
+                            sortParams,
                             columnsIds,
-                            fetchData,
-                            tableName,
-                        },
-                        signal,
-                    );
 
-                    if ('error' in result) {
-                        return {error: result.error};
+                            signal,
+                        });
+                        return {data: response};
+                    } else {
+                        // Use the request batcher for potential merging
+                        const result = await requestBatcher.queueRequest(
+                            {
+                                offset,
+                                limit,
+                                sortParams,
+                                filters,
+                                columnsIds,
+                                fetchData,
+                                tableName,
+                            },
+                            signal,
+                        );
+
+                        if ('error' in result) {
+                            return {error: result.error};
+                        }
+
+                        return result;
                     }
-
-                    return result;
                 } catch (error) {
                     return {error: error};
                 }

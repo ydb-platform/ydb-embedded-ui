@@ -13,6 +13,7 @@ export interface PaginatedTableWithLayoutProps {
     error?: React.ReactNode;
     initialState?: Partial<PaginatedTableState>;
     fullHeight?: boolean;
+    noBatching?: boolean;
 }
 
 export const PaginatedTableWithLayout = ({
@@ -21,9 +22,10 @@ export const PaginatedTableWithLayout = ({
     tableProps,
     error,
     initialState,
+    noBatching,
     fullHeight = true,
 }: PaginatedTableWithLayoutProps) => (
-    <PaginatedTableProvider initialState={initialState}>
+    <PaginatedTableProvider initialState={initialState} noBatching={noBatching}>
         <TableWithControlsLayout fullHeight={fullHeight}>
             <TableWithControlsLayout.Controls>{controls}</TableWithControlsLayout.Controls>
             {error}

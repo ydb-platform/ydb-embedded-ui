@@ -348,6 +348,7 @@ export function TopicData({scrollContainerRef, path, database}: TopicDataProps) 
                         scrollDependencies: [baseOffset, baseEndOffset, tableFilters],
                     }}
                     fullHeight
+                    noBatching
                 />
             </DrawerWrapper>
         )

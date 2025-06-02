@@ -14,6 +14,7 @@ const defaultTableState: PaginatedTableState = {
 interface PaginatedTableStateContextType {
     // State
     tableState: PaginatedTableState;
+    noBatching?: boolean;
 
     // Granular setters
     setSortParams: (params: PaginatedTableState['sortParams']) => void;
@@ -35,12 +36,14 @@ export const PaginatedTableStateContext = React.createContext<PaginatedTableStat
 interface PaginatedTableStateProviderProps {
     children: React.ReactNode;
     initialState?: Partial<PaginatedTableState>;
+    noBatching?: boolean;
 }
 
 // Provider component
 export const PaginatedTableProvider = ({
     children,
     initialState = {},
+    noBatching,
 }: PaginatedTableStateProviderProps) => {
     // Use individual state variables for each field
     const [sortParams, setSortParams] = React.useState<PaginatedTableState['sortParams']>(
@@ -71,12 +74,13 @@ export const PaginatedTableProvider = ({
     const contextValue = React.useMemo(
         () => ({
             tableState,
+            noBatching,
             setSortParams,
             setTotalEntities,
             setFoundEntities,
             setIsInitialLoad,
         }),
-        [tableState, setSortParams, setTotalEntities, setFoundEntities, setIsInitialLoad],
+        [tableState, noBatching],
     );
 
     return (
