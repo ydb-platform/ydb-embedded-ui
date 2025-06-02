@@ -9,7 +9,7 @@ import type {PaginatedTableState} from './types';
 export interface PaginatedTableWithLayoutProps {
     controls?: React.ReactNode;
     table: React.ReactNode;
-    tableWrapperProps?: TableWrapperProps;
+    tableWrapperProps?: Omit<TableWrapperProps, 'children'>;
     error?: React.ReactNode;
     initialState?: Partial<PaginatedTableState>;
     fullHeight?: boolean;
@@ -21,7 +21,7 @@ const TableWrapper = ({
     tableWrapperProps,
 }: {
     table: React.ReactNode;
-    tableWrapperProps?: TableWrapperProps;
+    tableWrapperProps?: Omit<TableWrapperProps, 'children'>;
 }) => {
     const {tableState} = usePaginatedTableState();
     const {sortParams} = tableState;

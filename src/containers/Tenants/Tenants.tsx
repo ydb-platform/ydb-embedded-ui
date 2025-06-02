@@ -70,6 +70,9 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
     );
     const loading = isFetching && currentData === undefined;
 
+    // Track sort state for scroll dependencies
+    const [sortParams, setSortParams] = React.useState<any>();
+
     const isCreateDBAvailable =
         useCreateDatabaseFeatureAvailable() && uiFactory.onCreateDB !== undefined;
     const isEditDBAvailable = useEditDatabaseFeatureAvailable() && uiFactory.onEditDB !== undefined;
@@ -128,7 +131,7 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
         );
     };
 
-    const renderTable = (onSort?: (params: any) => void) => {
+    const renderTable = () => {
         const columns: Column<PreparedTenant>[] = [
             {
                 name: 'Name',
@@ -261,7 +264,7 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
                 columns={columns}
                 settings={DEFAULT_TABLE_SETTINGS}
                 emptyDataMessage="No such tenants"
-                onSort={onSort}
+                onSortChange={setSortParams}
             />
         );
     };
@@ -276,9 +279,9 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
                 <TableWithControlsLayout.Table
                     scrollContainerRef={scrollContainerRef}
                     loading={loading}
-                    scrollDependencies={[searchValue, problemFilter]}
+                    scrollDependencies={[searchValue, problemFilter, sortParams]}
                 >
-                    {({onSort}) => (currentData ? renderTable(onSort) : null)}
+                    {currentData ? renderTable() : null}
                 </TableWithControlsLayout.Table>
             </TableWithControlsLayout>
         </div>

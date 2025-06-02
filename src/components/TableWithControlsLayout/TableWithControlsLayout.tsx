@@ -12,7 +12,7 @@ import './TableWithControlsLayout.scss';
 const b = cn('ydb-table-with-controls-layout');
 
 interface TableWithControlsLayoutItemProps {
-    children?: React.ReactNode;
+    children: React.ReactNode;
     renderExtraControls?: () => React.ReactNode;
     className?: string;
     fullHeight?: boolean;
@@ -22,10 +22,7 @@ export interface TableWrapperProps extends Omit<TableWithControlsLayoutItemProps
     loading?: boolean;
     scrollContainerRef?: React.RefObject<HTMLElement>;
     scrollDependencies?: any[];
-
-    // onSort is called with the table's sort parameters and triggers auto-scrolling.
-    onSort?: (params: any) => void;
-    children?: React.ReactNode | ((props: {onSort: (params: any) => void}) => React.ReactNode);
+    children: React.ReactNode;
 }
 
 export const TableWithControlsLayout = ({
@@ -60,26 +57,16 @@ TableWithControlsLayout.Table = function Table({
     className,
     scrollContainerRef,
     scrollDependencies = [],
-    onSort,
 }: TableWrapperProps) {
     // Create an internal ref for the table container
     const tableContainerRef = React.useRef<HTMLDivElement>(null);
 
     // Use the internal ref for scrolling
-    const {handleTableScroll} = useTableScroll({
+    useTableScroll({
         tableContainerRef,
         scrollContainerRef,
         dependencies: scrollDependencies,
     });
-
-    // Create a wrapper function that triggers scroll on sort
-    const handleSort = React.useCallback(
-        (params: any) => {
-            onSort?.(params); // Call original callback if provided
-            handleTableScroll(); // Trigger scroll to top
-        },
-        [onSort, handleTableScroll],
-    );
 
     if (loading) {
         return <TableSkeleton className={b('loader')} />;
@@ -87,7 +74,7 @@ TableWithControlsLayout.Table = function Table({
 
     return (
         <div ref={tableContainerRef} className={b('table', className)}>
-            {typeof children === 'function' ? children({onSort: handleSort}) : children}
+            {children}
         </div>
     );
 };

@@ -183,6 +183,9 @@ export function TabletsTable({
         tabletsSearch: StringParam,
     });
 
+    // Track sort state for scroll dependencies
+    const [sortParams, setSortParams] = React.useState<any>();
+
     const columns = React.useMemo(() => getColumns({database}), [database]);
 
     const filteredTablets = React.useMemo(() => {
@@ -214,18 +217,16 @@ export function TabletsTable({
             {error ? <ResponseError error={error} /> : null}
             <TableWithControlsLayout.Table
                 scrollContainerRef={scrollContainerRef}
-                scrollDependencies={[tabletsSearch]}
+                scrollDependencies={[tabletsSearch, sortParams]}
                 loading={loading}
             >
-                {({onSort}) => (
-                    <ResizeableDataTable
-                        columns={columns}
-                        data={filteredTablets}
-                        settings={DEFAULT_TABLE_SETTINGS}
-                        emptyDataMessage={i18n('noTabletsData')}
-                        onSort={onSort}
-                    />
-                )}
+                <ResizeableDataTable
+                    columns={columns}
+                    data={filteredTablets}
+                    settings={DEFAULT_TABLE_SETTINGS}
+                    emptyDataMessage={i18n('noTabletsData')}
+                    onSortChange={setSortParams}
+                />
             </TableWithControlsLayout.Table>
         </TableWithControlsLayout>
     );
