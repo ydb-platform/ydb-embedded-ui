@@ -16,30 +16,6 @@ export interface PaginatedTableWithLayoutProps {
     noBatching?: boolean;
 }
 
-/**
- * Hook to enhance table wrapper props with sort-dependent scroll behavior
- */
-const useTableWrapperPropsWithSortDependency = (
-    tableWrapperProps?: TableWrapperProps,
-): TableWrapperProps => {
-    const {tableState} = usePaginatedTableState();
-    const {sortParams} = tableState;
-
-    return React.useMemo(() => {
-        const existingScrollDependencies = tableWrapperProps?.scrollDependencies || [];
-
-        return {
-            ...tableWrapperProps,
-            scrollDependencies: [...existingScrollDependencies, sortParams],
-        };
-    }, [tableWrapperProps, sortParams]);
-};
-
-/**
- * Internal component that wraps the table with sort-dependent scrolling behavior.
- * This component has access to the paginated table context and automatically
- * scrolls to top when sort parameters change.
- */
 const TableWrapper = ({
     table,
     tableWrapperProps,
@@ -47,7 +23,17 @@ const TableWrapper = ({
     table: React.ReactNode;
     tableWrapperProps?: TableWrapperProps;
 }) => {
-    const enhancedTableWrapperProps = useTableWrapperPropsWithSortDependency(tableWrapperProps);
+    const {tableState} = usePaginatedTableState();
+    const {sortParams} = tableState;
+
+    const enhancedTableWrapperProps = React.useMemo(() => {
+        const existingScrollDependencies = tableWrapperProps?.scrollDependencies || [];
+
+        return {
+            ...tableWrapperProps,
+            scrollDependencies: [...existingScrollDependencies, sortParams],
+        };
+    }, [tableWrapperProps, sortParams]);
 
     return (
         <TableWithControlsLayout.Table {...enhancedTableWrapperProps}>
@@ -56,9 +42,6 @@ const TableWrapper = ({
     );
 };
 
-/**
- * Renders the controls section if controls are provided
- */
 const ControlsSection = ({controls}: {controls?: React.ReactNode}) => {
     if (!controls) {
         return null;
@@ -67,9 +50,6 @@ const ControlsSection = ({controls}: {controls?: React.ReactNode}) => {
     return <TableWithControlsLayout.Controls>{controls}</TableWithControlsLayout.Controls>;
 };
 
-/**
- * Renders the error section if an error is provided
- */
 const ErrorSection = ({error}: {error?: React.ReactNode}) => {
     if (!error) {
         return null;
@@ -78,16 +58,6 @@ const ErrorSection = ({error}: {error?: React.ReactNode}) => {
     return <React.Fragment>{error}</React.Fragment>;
 };
 
-/**
- * A complete table layout component that provides pagination context and
- * integrates with TableWithControlsLayout for consistent styling and behavior.
- *
- * Features:
- * - Provides pagination context to child components
- * - Automatic scroll-to-top on sort changes
- * - Optional controls and error display
- * - Configurable height behavior
- */
 export const PaginatedTableWithLayout = ({
     controls,
     table,
