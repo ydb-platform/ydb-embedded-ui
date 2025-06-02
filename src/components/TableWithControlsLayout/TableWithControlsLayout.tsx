@@ -18,7 +18,7 @@ interface TableWithControlsLayoutItemProps {
     fullHeight?: boolean;
 }
 
-export interface TableProps extends Omit<TableWithControlsLayoutItemProps, 'children'> {
+export interface TableWrapperProps extends Omit<TableWithControlsLayoutItemProps, 'children'> {
     loading?: boolean;
     scrollContainerRef?: React.RefObject<HTMLElement>;
     scrollDependencies?: any[];
@@ -61,7 +61,7 @@ TableWithControlsLayout.Table = function Table({
     scrollContainerRef,
     scrollDependencies = [],
     onSort,
-}: TableProps) {
+}: TableWrapperProps) {
     // Create an internal ref for the table container
     const tableContainerRef = React.useRef<HTMLDivElement>(null);
 

@@ -72,7 +72,7 @@ const NodeGroup = React.memo(function NodeGroup({
                         scrollContainerRef={scrollContainerRef}
                     />
                 }
-                tableProps={{
+                tableWrapperProps={{
                     scrollContainerRef: scrollContainerRef,
                 }}
             />
@@ -192,13 +192,12 @@ export function GroupedNodesComponent({
             }
             error={error ? <ResponseError error={error} /> : null}
             table={renderGroups()}
-            tableProps={{
+            tableWrapperProps={{
                 scrollContainerRef,
                 scrollDependencies: [searchValue, groupByParam, tableGroups, peerRoleFilter],
                 loading: isLoading,
                 className: b('groups-wrapper'),
             }}
-            fullHeight
         />
     );
 }

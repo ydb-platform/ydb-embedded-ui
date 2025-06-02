@@ -51,11 +51,10 @@ export function StorageGroupsComponent({
                     initialEntitiesCount={initialEntitiesCount}
                 />
             }
-            tableProps={{
+            tableWrapperProps={{
                 scrollContainerRef,
                 scrollDependencies: [searchValue, visibleEntities],
             }}
-            fullHeight
         />
     );
 }

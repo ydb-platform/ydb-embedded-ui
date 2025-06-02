@@ -56,11 +56,10 @@ export function StorageNodesComponent({
                     onDataFetched={handleDataFetched}
                 />
             }
-            tableProps={{
+            tableWrapperProps={{
                 scrollContainerRef,
                 scrollDependencies: [searchValue, visibleEntities, nodesUptimeFilter],
             }}
-            fullHeight
         />
     );
 }

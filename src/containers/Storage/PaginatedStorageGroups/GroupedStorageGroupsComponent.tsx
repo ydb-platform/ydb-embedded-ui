@@ -78,7 +78,7 @@ export const StorageGroupGroup = React.memo(function StorageGroupGroup({
                         initialEntitiesCount={count}
                     />
                 }
-                tableProps={{
+                tableWrapperProps={{
                     scrollContainerRef: scrollContainerRef,
                 }}
             />
@@ -181,7 +181,7 @@ export function GroupedStorageGroupsComponent({
             error={error ? <ResponseError error={error} /> : null}
             table={renderGroups()}
             initialState={initialState}
-            tableProps={{
+            tableWrapperProps={{
                 scrollContainerRef,
                 scrollDependencies: [searchValue, storageGroupsGroupByParam, tableGroups],
                 loading: isLoading,

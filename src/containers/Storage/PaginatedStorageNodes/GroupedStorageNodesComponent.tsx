@@ -80,7 +80,7 @@ export const StorageNodeGroup = React.memo(function StorageNodeGroup({
                         onDataFetched={onDataFetched}
                     />
                 }
-                tableProps={{
+                tableWrapperProps={{
                     scrollContainerRef: scrollContainerRef,
                 }}
             />
@@ -182,7 +182,7 @@ export function GroupedStorageNodesComponent({
             error={error ? <ResponseError error={error} /> : null}
             table={renderGroups()}
             initialState={initialState}
-            tableProps={{
+            tableWrapperProps={{
                 scrollContainerRef,
                 scrollDependencies: [searchValue, storageNodesGroupByParam, tableGroups],
                 loading: isLoading,

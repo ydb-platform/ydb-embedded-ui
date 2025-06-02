@@ -72,11 +72,10 @@ export function NodesComponent({
                     scrollContainerRef={scrollContainerRef}
                 />
             }
-            tableProps={{
+            tableWrapperProps={{
                 scrollContainerRef,
                 scrollDependencies: [searchValue, problemFilter, uptimeFilter, peerRoleFilter],
             }}
-            fullHeight
         />
     );
 }
