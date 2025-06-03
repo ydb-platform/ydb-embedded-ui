@@ -158,6 +158,8 @@ export function useClusterBaseInfo() {
     };
 }
 
+export type ClusterInfo = ReturnType<typeof useClusterBaseInfo> & Record<string, unknown>;
+
 const createClusterInfoSelector = createSelector(
     (clusterName?: string) => clusterName,
     (clusterName) => clusterApi.endpoints.getClusterInfo.select(clusterName),

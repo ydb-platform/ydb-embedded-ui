@@ -28,6 +28,8 @@ export function AppWithClusters({store, history, userSettings, children}: AppWit
                             getLogsLink={uiFactory.getLogsLink}
                             getMonitoringLink={uiFactory.getMonitoringLink}
                             getMonitoringClusterLink={uiFactory.getMonitoringClusterLink}
+                            getDatabaseLinks={uiFactory.getDatabaseLinks}
+                            getClusterLinks={uiFactory.getClusterLinks}
                         />
                     );
                 }}
@@ -39,6 +41,7 @@ export function AppWithClusters({store, history, userSettings, children}: AppWit
                             component={component}
                             getLogsLink={uiFactory.getLogsLink}
                             getMonitoringLink={uiFactory.getMonitoringLink}
+                            getDatabaseLinks={uiFactory.getDatabaseLinks}
                         />
                     );
                 }}
