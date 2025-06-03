@@ -6,6 +6,7 @@ import {Helmet} from 'react-helmet-async';
 import {connect} from 'react-redux';
 
 import {ErrorBoundary} from '../../components/ErrorBoundary/ErrorBoundary';
+import {ChatPanel, ChatToggleButton} from '../../features/chat';
 import type {RootState} from '../../store';
 import {Navigation} from '../AsideNavigation/Navigation';
 import ReduxTooltip from '../ReduxTooltip/ReduxTooltip';
@@ -42,6 +43,8 @@ function App({
                         <div id="fullscreen-root"></div>
                     </ErrorBoundary>
                 </Navigation>
+                <ChatPanel />
+                <ChatToggleButton className="chat-toggle-button--floating" />
             </ContentWrapper>
             <ReduxTooltip />
         </Providers>

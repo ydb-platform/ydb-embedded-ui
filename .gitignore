@@ -2,6 +2,8 @@
 
 # dependencies
 /node_modules
+/chat-server/node_modules
+/chat-server/dist
 /.pnp
 .pnp.js
 

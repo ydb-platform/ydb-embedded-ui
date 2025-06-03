@@ -2,6 +2,7 @@ import {combineReducers} from '@reduxjs/toolkit';
 
 import {api} from './api';
 import authentication from './authentication/authentication';
+import {chatReducer} from '../../features/chat';
 import cluster from './cluster/cluster';
 import clusters from './clusters/clusters';
 import executeTopQueries from './executeTopQueries/executeTopQueries';
@@ -38,6 +39,7 @@ export const rootReducer = {
     queryActions,
     fullscreen,
     clusters,
+    chat: chatReducer,
 };
 
 const combinedReducer = combineReducers({
