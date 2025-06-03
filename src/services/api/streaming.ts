@@ -1,4 +1,3 @@
-import type {AxiosWrapperOptions} from '@gravity-ui/axios-wrapper';
 import {parseMultipart} from '@mjackson/multipart-parser';
 import qs from 'qs';
 
@@ -29,14 +28,6 @@ export interface StreamQueryOptions {
 }
 
 export class StreamingAPI extends BaseYdbAPI {
-    withCredentials?: boolean;
-
-    constructor(options: AxiosWrapperOptions) {
-        super(options);
-
-        this.withCredentials = options.config?.withCredentials;
-    }
-
     async streamQuery<Action extends Actions>(
         params: StreamQueryParams<Action>,
         options: StreamQueryOptions,
@@ -73,7 +64,7 @@ export class StreamingAPI extends BaseYdbAPI {
             method: 'POST',
             signal: options.signal,
             headers,
-            credentials: this.withCredentials ? 'include' : 'same-origin',
+            credentials: this._axios.defaults.withCredentials ? 'include' : 'same-origin',
             body: JSON.stringify(body),
         });
 
