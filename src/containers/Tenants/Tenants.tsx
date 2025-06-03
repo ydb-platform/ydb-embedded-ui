@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {CirclePlus, Pencil, TrashBin} from '@gravity-ui/icons';
-import type {Column} from '@gravity-ui/react-data-table';
+import type {Column, SortOrder} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
 import type {DropdownMenuItem} from '@gravity-ui/uikit';
 import {Button, DropdownMenu, Icon} from '@gravity-ui/uikit';
@@ -69,6 +69,9 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
         {pollingInterval: autoRefreshInterval},
     );
     const loading = isFetching && currentData === undefined;
+
+    // Track sort state for scroll dependencies
+    const [sortParams, setSortParams] = React.useState<SortOrder | SortOrder[] | undefined>();
 
     const isCreateDBAvailable =
         useCreateDatabaseFeatureAvailable() && uiFactory.onCreateDB !== undefined;
@@ -261,6 +264,7 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
                 columns={columns}
                 settings={DEFAULT_TABLE_SETTINGS}
                 emptyDataMessage="No such tenants"
+                onSortChange={setSortParams}
             />
         );
     };
@@ -275,7 +279,7 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
                 <TableWithControlsLayout.Table
                     scrollContainerRef={scrollContainerRef}
                     loading={loading}
-                    scrollDependencies={[searchValue, problemFilter]}
+                    scrollDependencies={[searchValue, problemFilter, sortParams]}
                 >
                     {currentData ? renderTable() : null}
                 </TableWithControlsLayout.Table>

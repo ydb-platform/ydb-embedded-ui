@@ -60,21 +60,29 @@ export const StorageNodeGroup = React.memo(function StorageNodeGroup({
             expanded={isExpanded}
             onIsExpandedChange={onIsExpandedChange}
         >
-            <PaginatedStorageNodesTable
-                database={database}
-                scrollContainerRef={scrollContainerRef}
-                nodeId={nodeId}
-                groupId={groupId}
-                filterGroup={name}
-                filterGroupBy={filterGroupBy}
-                searchValue={searchValue}
-                visibleEntities={'all'}
-                nodesUptimeFilter={NodesUptimeFilterValues.All}
-                onShowAll={handleShowAllNodes}
-                renderErrorMessage={renderPaginatedTableErrorMessage}
-                columns={columns}
-                initialEntitiesCount={count}
-                onDataFetched={onDataFetched}
+            <PaginatedTableWithLayout
+                initialState={{sortParams: undefined}}
+                table={
+                    <PaginatedStorageNodesTable
+                        database={database}
+                        scrollContainerRef={scrollContainerRef}
+                        nodeId={nodeId}
+                        groupId={groupId}
+                        filterGroup={name}
+                        filterGroupBy={filterGroupBy}
+                        searchValue={searchValue}
+                        visibleEntities={'all'}
+                        nodesUptimeFilter={NodesUptimeFilterValues.All}
+                        onShowAll={handleShowAllNodes}
+                        renderErrorMessage={renderPaginatedTableErrorMessage}
+                        columns={columns}
+                        initialEntitiesCount={count}
+                        onDataFetched={onDataFetched}
+                    />
+                }
+                tableWrapperProps={{
+                    scrollContainerRef: scrollContainerRef,
+                }}
             />
         </TableGroup>
     );
@@ -174,7 +182,7 @@ export function GroupedStorageNodesComponent({
             error={error ? <ResponseError error={error} /> : null}
             table={renderGroups()}
             initialState={initialState}
-            tableProps={{
+            tableWrapperProps={{
                 scrollContainerRef,
                 scrollDependencies: [searchValue, storageNodesGroupByParam, tableGroups],
                 loading: isLoading,

@@ -59,20 +59,28 @@ export const StorageGroupGroup = React.memo(function StorageGroupGroup({
             expanded={isExpanded}
             onIsExpandedChange={onIsExpandedChange}
         >
-            <PaginatedStorageGroupsTable
-                database={database}
-                scrollContainerRef={scrollContainerRef}
-                nodeId={nodeId}
-                groupId={groupId}
-                pDiskId={pDiskId}
-                filterGroup={name}
-                filterGroupBy={filterGroupBy}
-                searchValue={searchValue}
-                visibleEntities={'all'}
-                onShowAll={handleShowAllGroups}
-                renderErrorMessage={renderPaginatedTableErrorMessage}
-                columns={columns}
-                initialEntitiesCount={count}
+            <PaginatedTableWithLayout
+                initialState={{sortParams: undefined}}
+                table={
+                    <PaginatedStorageGroupsTable
+                        database={database}
+                        scrollContainerRef={scrollContainerRef}
+                        nodeId={nodeId}
+                        groupId={groupId}
+                        pDiskId={pDiskId}
+                        filterGroup={name}
+                        filterGroupBy={filterGroupBy}
+                        searchValue={searchValue}
+                        visibleEntities={'all'}
+                        onShowAll={handleShowAllGroups}
+                        renderErrorMessage={renderPaginatedTableErrorMessage}
+                        columns={columns}
+                        initialEntitiesCount={count}
+                    />
+                }
+                tableWrapperProps={{
+                    scrollContainerRef: scrollContainerRef,
+                }}
             />
         </TableGroup>
     );
@@ -173,7 +181,7 @@ export function GroupedStorageGroupsComponent({
             error={error ? <ResponseError error={error} /> : null}
             table={renderGroups()}
             initialState={initialState}
-            tableProps={{
+            tableWrapperProps={{
                 scrollContainerRef,
                 scrollDependencies: [searchValue, storageGroupsGroupByParam, tableGroups],
                 loading: isLoading,

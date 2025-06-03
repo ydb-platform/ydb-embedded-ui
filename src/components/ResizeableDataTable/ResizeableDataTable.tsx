@@ -1,4 +1,6 @@
-import type {Column, DataTableProps, Settings} from '@gravity-ui/react-data-table';
+import React from 'react';
+
+import type {Column, DataTableProps, Settings, SortOrder} from '@gravity-ui/react-data-table';
 import DataTable, {updateColumnsWidth} from '@gravity-ui/react-data-table';
 import {Skeleton} from '@gravity-ui/uikit';
 
@@ -13,6 +15,7 @@ export interface ResizeableDataTableProps<T> extends Omit<DataTableProps<T>, 'th
     columnsWidthLSKey?: string;
     wrapperClassName?: string;
     loading?: boolean;
+    onSortChange?: (params: SortOrder | SortOrder[] | undefined) => void;
 }
 
 export function ResizeableDataTable<T>({
@@ -21,9 +24,19 @@ export function ResizeableDataTable<T>({
     settings,
     wrapperClassName,
     loading,
+    onSort,
+    onSortChange,
     ...props
 }: ResizeableDataTableProps<T>) {
     const [tableColumnsWidth, setTableColumnsWidth] = useTableResize(columnsWidthLSKey);
+
+    const handleSort = React.useCallback(
+        (params: SortOrder | SortOrder[] | undefined) => {
+            onSort?.(params); // Original onSort if provided
+            onSortChange?.(params); // Expose sort params to parent
+        },
+        [onSort, onSortChange],
+    );
 
     // If loading is true, override the render method of each column to display a Skeleton
     const processedColumns = loading
@@ -46,6 +59,7 @@ export function ResizeableDataTable<T>({
                 theme="yandex-cloud"
                 columns={updatedColumns}
                 onResize={setTableColumnsWidth}
+                onSort={handleSort}
                 settings={newSettings}
                 {...props}
             />

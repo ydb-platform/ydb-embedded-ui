@@ -12,16 +12,17 @@ import './TableWithControlsLayout.scss';
 const b = cn('ydb-table-with-controls-layout');
 
 interface TableWithControlsLayoutItemProps {
-    children?: React.ReactNode;
+    children: React.ReactNode;
     renderExtraControls?: () => React.ReactNode;
     className?: string;
     fullHeight?: boolean;
 }
 
-export interface TableProps extends TableWithControlsLayoutItemProps {
+export interface TableWrapperProps extends Omit<TableWithControlsLayoutItemProps, 'children'> {
     loading?: boolean;
     scrollContainerRef?: React.RefObject<HTMLElement>;
     scrollDependencies?: any[];
+    children: React.ReactNode;
 }
 
 export const TableWithControlsLayout = ({
@@ -56,7 +57,7 @@ TableWithControlsLayout.Table = function Table({
     className,
     scrollContainerRef,
     scrollDependencies = [],
-}: TableProps) {
+}: TableWrapperProps) {
     // Create an internal ref for the table container
     const tableContainerRef = React.useRef<HTMLDivElement>(null);
 
