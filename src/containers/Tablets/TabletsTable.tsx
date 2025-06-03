@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {ArrowRotateLeft} from '@gravity-ui/icons';
-import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
+import type {Column as DataTableColumn, SortOrder} from '@gravity-ui/react-data-table';
 import {Icon, Text} from '@gravity-ui/uikit';
 import {StringParam, useQueryParams} from 'use-query-params';
 
@@ -184,7 +184,7 @@ export function TabletsTable({
     });
 
     // Track sort state for scroll dependencies
-    const [sortParams, setSortParams] = React.useState<any>();
+    const [sortParams, setSortParams] = React.useState<SortOrder | SortOrder[] | undefined>();
 
     const columns = React.useMemo(() => getColumns({database}), [database]);
 

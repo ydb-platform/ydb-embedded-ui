@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {CirclePlus, Pencil, TrashBin} from '@gravity-ui/icons';
-import type {Column} from '@gravity-ui/react-data-table';
+import type {Column, SortOrder} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
 import type {DropdownMenuItem} from '@gravity-ui/uikit';
 import {Button, DropdownMenu, Icon} from '@gravity-ui/uikit';
@@ -71,7 +71,7 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
     const loading = isFetching && currentData === undefined;
 
     // Track sort state for scroll dependencies
-    const [sortParams, setSortParams] = React.useState<any>();
+    const [sortParams, setSortParams] = React.useState<SortOrder | SortOrder[] | undefined>();
 
     const isCreateDBAvailable =
         useCreateDatabaseFeatureAvailable() && uiFactory.onCreateDB !== undefined;
