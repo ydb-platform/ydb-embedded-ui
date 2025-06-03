@@ -1,0 +1,91 @@
+.chat-input {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+
+    &__field {
+        flex: 1;
+        position: relative;
+    }
+
+    &__textarea {
+        resize: none;
+        min-height: 40px;
+        max-height: 200px;
+        font-size: 14px;
+        line-height: 1.4;
+        
+        &:focus {
+            outline: none;
+        }
+    }
+
+    &__actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    &__send-button,
+    &__stop-button {
+        min-width: 80px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    &__send-button {
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    }
+
+    &__stop-button {
+        background: var(--g-color-base-danger);
+        border-color: var(--g-color-line-danger);
+        color: var(--g-color-text-danger);
+
+        &:hover:not(:disabled) {
+            background: var(--g-color-base-danger-hover);
+        }
+    }
+}
+
+// Auto-resize textarea behavior
+.chat-input__textarea {
+    transition: height 0.1s ease;
+    overflow-y: hidden;
+}
+
+// Focus states
+.chat-input:focus-within {
+    .chat-input__send-button:not(:disabled) {
+        background: var(--g-color-base-brand);
+        border-color: var(--g-color-line-brand);
+    }
+}
+
+// Mobile responsive
+@media (max-width: 768px) {
+    .chat-input {
+        flex-direction: column;
+        gap: 8px;
+
+        &__actions {
+            flex-direction: row;
+            justify-content: flex-end;
+        }
+
+        &__send-button,
+        &__stop-button {
+            min-width: 60px;
+            height: 36px;
+            font-size: 13px;
+        }
+    }
+}
