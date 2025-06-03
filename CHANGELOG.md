@@ -1,5 +1,17 @@
 # Changelog
 
+## [9.3.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.3.0...v9.3.1) (2025-06-03)
+
+
+### Bug Fixes
+
+* credentials for multipart for cross-origin ([#2361](https://github.com/ydb-platform/ydb-embedded-ui/issues/2361)) ([97dfc75](https://github.com/ydb-platform/ydb-embedded-ui/commit/97dfc750ef8a086303caba6452511e3d996215ab))
+* drawer is broken ([#2351](https://github.com/ydb-platform/ydb-embedded-ui/issues/2351)) ([ce13b7f](https://github.com/ydb-platform/ydb-embedded-ui/commit/ce13b7fca36d1e77f31221156ce09d1b6f35c418))
+* scrolling performance optimizations for table ([#2335](https://github.com/ydb-platform/ydb-embedded-ui/issues/2335)) ([6c72cce](https://github.com/ydb-platform/ydb-embedded-ui/commit/6c72ccedc206bc3b18f8d20f41d7be3a60f64829))
+* table is broken because of batching ([#2356](https://github.com/ydb-platform/ydb-embedded-ui/issues/2356)) ([7f3ea8c](https://github.com/ydb-platform/ydb-embedded-ui/commit/7f3ea8ca82581de6f2c10e473704cc30cf9697a7))
+* table is not scrolled to top on sorting ([#2347](https://github.com/ydb-platform/ydb-embedded-ui/issues/2347)) ([7bde143](https://github.com/ydb-platform/ydb-embedded-ui/commit/7bde143c44535cc78f87b366e72f3213d584e0a9))
+* **Tenants:** do not show actions for domain ([#2336](https://github.com/ydb-platform/ydb-embedded-ui/issues/2336)) ([828724d](https://github.com/ydb-platform/ydb-embedded-ui/commit/828724daf3ab8f0aa7ab6b6fd86c837e99be59d5))
+
 ## [9.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.2.2...v9.3.0) (2025-05-27)
 
 
