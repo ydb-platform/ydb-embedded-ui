@@ -64,6 +64,7 @@ export class StreamingAPI extends BaseYdbAPI {
             method: 'POST',
             signal: options.signal,
             headers,
+            credentials: this._axios.defaults.withCredentials ? 'include' : 'same-origin',
             body: JSON.stringify(body),
         });
 
