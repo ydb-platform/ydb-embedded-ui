@@ -151,10 +151,15 @@ export class ChatService extends EventEmitter {
                 if (delta.tool_calls) {
                     for (const toolCall of delta.tool_calls) {
                         if (toolCall.function) {
+                            // Find the server that provides this tool
+                            const toolWithServer = availableTools.find(t => t.name === toolCall.function.name);
+                            const serverName = toolWithServer?.serverName || 'ydb-mcp-server';
+
                             accumulatedToolCalls.push({
                                 id: toolCall.id,
                                 name: toolCall.function.name,
                                 arguments: JSON.parse(toolCall.function.arguments || '{}'),
+                                serverName,
                             });
 
                             yield {
@@ -196,7 +201,7 @@ export class ChatService extends EventEmitter {
 
                     try {
                         const result = await this.mcpService.callTool(
-                            toolCall.serverName || 'default',
+                            toolCall.serverName,
                             toolCall.name,
                             toolCall.arguments
                         );
@@ -273,6 +278,9 @@ export class ChatService extends EventEmitter {
             // Stream the completion
             const stream = await this.llmService.createStreamingChatCompletion(request, availableTools);
 
+            let accumulatedContent = '';
+            let accumulatedToolCalls: any[] = [];
+
             for await (const response of stream) {
                 // Convert StreamingChatResponse to ChatDelta
                 if (response.choices && response.choices.length > 0) {
@@ -281,6 +289,7 @@ export class ChatService extends EventEmitter {
                         const delta = choice.delta;
                         
                         if (delta.content) {
+                            accumulatedContent += delta.content;
                             yield {
                                 type: 'content',
                                 content: delta.content
@@ -288,13 +297,61 @@ export class ChatService extends EventEmitter {
                         }
                         
                         if (delta.tool_calls) {
-                            yield {
-                                type: 'tool_call',
-                                tool_calls: delta.tool_calls
-                            };
+                            for (const toolCall of delta.tool_calls) {
+                                if (toolCall.function) {
+                                    // Find the server that provides this tool
+                                    const toolWithServer = availableTools.find(t => t.name === toolCall.function.name);
+                                    const serverName = toolWithServer?.serverName || 'ydb-mcp-server';
+
+                                    accumulatedToolCalls.push({
+                                        id: toolCall.id,
+                                        name: toolCall.function.name,
+                                        arguments: JSON.parse(toolCall.function.arguments || '{}'),
+                                        serverName,
+                                    });
+
+                                    yield {
+                                        type: 'tool_call',
+                                        tool_calls: [toolCall]
+                                    };
+                                }
+                            }
                         }
                         
                         if (choice.finish_reason) {
+                            // Execute tool calls if any
+                            if (accumulatedToolCalls.length > 0) {
+                                for (const toolCall of accumulatedToolCalls) {
+                                    yield {
+                                        type: 'tool_executing',
+                                        tool_name: toolCall.name,
+                                        tool_id: toolCall.id,
+                                    };
+
+                                    try {
+                                        const result = await this.mcpService.callTool(
+                                            toolCall.serverName,
+                                            toolCall.name,
+                                            toolCall.arguments
+                                        );
+
+                                        yield {
+                                            type: 'tool_result',
+                                            tool_id: toolCall.id,
+                                            result,
+                                        };
+                                    } catch (error) {
+                                        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+                                        
+                                        yield {
+                                            type: 'tool_error',
+                                            tool_id: toolCall.id,
+                                            error: errorMessage,
+                                        };
+                                    }
+                                }
+                            }
+
                             yield {
                                 type: 'done'
                             };

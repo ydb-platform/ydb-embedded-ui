@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events';
-import { spawn } from 'child_process';
 import { createComponentLogger } from '../utils/logger';
 import { MCPConnectionError } from '../utils/errors';
 import {
@@ -68,9 +67,7 @@ export class MCPService extends EventEmitter {
         try {
             logger.info('Connecting to MCP server', { name: serverName, type: server.config.type });
 
-            if (server.config.type === 'stdio') {
-                await this.connectStdioServer(server);
-            } else if (server.config.type === 'sse') {
+            if (server.config.type === 'sse') {
                 await this.connectSSEServer(server);
             } else {
                 throw new Error(`Unsupported server type: ${server.config.type}`);
@@ -94,39 +91,6 @@ export class MCPService extends EventEmitter {
     }
 
     /**
-     * Connect to a stdio-based MCP server
-     */
-    private async connectStdioServer(server: MCPServer): Promise<void> {
-        const config = server.config;
-        if (!config.command) {
-            throw new Error('Command is required for stdio servers');
-        }
-
-        const childProcess = spawn(config.command, config.args || [], {
-            stdio: ['pipe', 'pipe', 'pipe'],
-            env: { ...process.env, ...config.env },
-            cwd: config.cwd,
-        });
-
-        server.connection = {
-            type: 'stdio',
-            process: childProcess,
-        };
-
-        // Handle process events
-        childProcess.on('error', (error: Error) => {
-            logger.error('MCP server process error', { name: server.name, error });
-            this.handleConnectionError(server.name, error);
-        });
-
-        childProcess.on('exit', (code: number | null, signal: string | null) => {
-            logger.warn('MCP server process exited', { name: server.name, code, signal });
-            server.status = 'disconnected';
-            this.emit('serverDisconnected', server);
-        });
-    }
-
-    /**
      * Connect to an SSE-based MCP server
      */
     private async connectSSEServer(server: MCPServer): Promise<void> {
@@ -135,13 +99,32 @@ export class MCPService extends EventEmitter {
             throw new Error('URL is required for SSE servers');
         }
 
-        // For now, we'll simulate SSE connection
-        // In a real implementation, you'd use EventSource or similar
-        server.connection = {
-            type: 'sse',
-            url: config.url,
-            eventSource: null, // Would be actual EventSource instance
-        };
+        try {
+            // Test connection by making a simple HTTP request
+            const response = await fetch(config.url, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'text/event-stream',
+                    'Cache-Control': 'no-cache',
+                    ...config.headers,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
+            server.connection = {
+                type: 'sse',
+                url: config.url,
+                eventSource: null, // We'll use fetch for requests instead of EventSource
+            };
+
+            logger.info('SSE MCP server connected', { name: server.name, url: config.url });
+        } catch (error) {
+            logger.error('Failed to connect to SSE MCP server', { name: server.name, url: config.url, error });
+            throw error;
+        }
     }
 
     /**
@@ -339,21 +322,22 @@ export class MCPService extends EventEmitter {
 
         try {
             logger.debug('Sending MCP request', {
-                serverName, 
+                serverName,
                 method: request.method,
                 id: request.id,
             });
 
-            // For now, simulate the response
-            // In a real implementation, you'd send the request via the appropriate transport
-            const response: MCPResponse = {
-                jsonrpc: '2.0',
-                id: request.id || `req_${Date.now()}`,
-                result: await this.simulateMethodCall(server, request),
-            };
+            let response: MCPResponse;
+
+            if (server.connection?.type === 'sse') {
+                // Send HTTP request to SSE server
+                response = await this.sendSSERequest(server, request);
+            } else {
+                throw new Error(`Unsupported connection type: ${server.connection?.type}`);
+            }
 
             logger.debug('MCP request completed', {
-                serverName, 
+                serverName,
                 requestId: request.id,
                 success: !response.error,
             });
@@ -373,84 +357,82 @@ export class MCPService extends EventEmitter {
     }
 
     /**
-     * Simulate method calls for development/testing
+     * Send request to SSE-based MCP server
      */
-    private async simulateMethodCall(server: MCPServer, request: MCPRequest): Promise<any> {
-        // This is a simulation for development purposes
-        // In a real implementation, this would send actual requests to MCP servers
-        
-        switch (request.method) {
-            case 'initialize':
-                return {
-                    protocolVersion: '2024-11-05',
-                    capabilities: {
-                        logging: {},
-                        tools: {
-                            listChanged: true,
-                        },
-                        resources: {
-                            subscribe: true,
-                            listChanged: true,
-                        },
-                    },
-                    serverInfo: {
-                        name: server.name,
-                        version: '1.0.0',
-                    },
-                };
+    private async sendSSERequest(server: MCPServer, request: MCPRequest): Promise<MCPResponse> {
+        if (!server.connection || server.connection.type !== 'sse') {
+            throw new Error('Server is not an SSE connection');
+        }
 
-            case 'tools/list':
-                return {
-                    tools: [
-                        {
-                            name: 'example_tool',
-                            description: 'An example tool for demonstration',
-                            inputSchema: {
-                                type: 'object',
-                                properties: {
-                                    message: { type: 'string' },
-                                },
-                                required: ['message'],
-                            },
-                        },
-                    ],
-                };
+        const url = server.connection.url;
+        if (!url) {
+            throw new Error('SSE server URL is not configured');
+        }
 
-            case 'resources/list':
-                return {
-                    resources: [
-                        {
-                            uri: 'file://example.txt',
-                            name: 'Example Resource',
-                            description: 'An example resource',
-                            mimeType: 'text/plain',
-                        },
-                    ],
-                };
+        const config = server.config;
+        const requestBody = JSON.stringify(request);
 
-            case 'tools/call':
-                return {
-                    content: [
-                        {
-                            type: 'text',
-                            text: `Tool executed with arguments: ${JSON.stringify(request.params)}`,
-                        },
-                    ],
-                };
+        logger.info('Sending MCP SSE request', {
+            serverName: server.name,
+            url,
+            method: request.method,
+            requestId: request.id,
+            requestBody,
+        });
 
-            case 'resources/read':
-                return {
-                    contents: [
-                        {
-                            uri: request.params?.uri,
-                            mimeType: 'text/plain',
-                            text: 'Example resource content',
-                        },
-                    ],
-                };
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    ...config.headers,
+                },
+                body: requestBody,
+            });
 
-            default:
-                throw new Error(`Unsupported method: ${request.method}`);
+            logger.info('MCP SSE response received', {
+                serverName: server.name,
+                status: response.status,
+                statusText: response.statusText,
+                headers: Object.fromEntries(response.headers.entries()),
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                logger.error('MCP SSE request failed with HTTP error', {
+                    serverName: server.name,
+                    status: response.status,
+                    statusText: response.statusText,
+                    errorBody: errorText,
+                });
+                throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
+            }
+
+            const responseText = await response.text();
+            logger.info('MCP SSE response body', {
+                serverName: server.name,
+                responseBody: responseText,
+            });
+
+            const result = JSON.parse(responseText);
+            logger.info('MCP SSE request completed successfully', {
+                serverName: server.name,
+                requestId: request.id,
+                responseId: result.id,
+                hasError: !!result.error,
+            });
+
+            return result as MCPResponse;
+        } catch (error) {
+            logger.error('SSE request failed', {
+                serverName: server.name,
+                url,
+                method: request.method,
+                error: error instanceof Error ? error.message : String(error),
+                stack: error instanceof Error ? error.stack : undefined,
+            });
+            throw error;
         }
     }
 
@@ -568,9 +550,7 @@ export class MCPService extends EventEmitter {
             logger.info('Disconnecting from MCP server', { name: serverName });
 
             // Close connection based on type
-            if (server.connection?.type === 'stdio' && server.connection.process) {
-                server.connection.process.kill();
-            } else if (server.connection?.type === 'sse' && server.connection.eventSource) {
+            if (server.connection?.type === 'sse' && server.connection.eventSource) {
                 server.connection.eventSource.close();
             }
 

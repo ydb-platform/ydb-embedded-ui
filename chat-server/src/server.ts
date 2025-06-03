@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { appConfig } from './utils/config';
+import { appConfig, getMCPConfig } from './utils/config';
 import { logger, requestLogger } from './utils/logger';
 import { ChatService } from './services/chat.service';
 import { getMCPService } from './services/mcp.service';
@@ -17,6 +17,29 @@ app.use(requestLogger);
 // Initialize services
 const mcpService = getMCPService();
 const chatService = new ChatService();
+
+// Register YDB MCP server
+async function initializeMCPServers() {
+    try {
+        const mcpConfig = getMCPConfig();
+        
+        await mcpService.registerServer({
+            name: 'ydb-mcp-server',
+            type: 'sse',
+            url: mcpConfig.serverUrl,
+        });
+        
+        // Connect to the server
+        await mcpService.connectServer('ydb-mcp-server');
+        
+        logger.info('YDB MCP server registered and connected', { url: mcpConfig.serverUrl });
+    } catch (error) {
+        logger.error('Failed to initialize MCP servers', { error: error instanceof Error ? error.message : String(error) });
+    }
+}
+
+// Initialize MCP servers
+initializeMCPServers();
 
 // Health check endpoint
 app.get('/health', (_req, res) => {
