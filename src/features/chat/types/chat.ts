@@ -42,6 +42,8 @@ export interface ChatState {
     sessionId: string | null;
     availableTools: MCPTool[];
     isOpen: boolean;
+    needsNewAssistantMessage?: boolean;
+    currentStreamingMessageId?: string;
 }
 
 export interface MCPTool {

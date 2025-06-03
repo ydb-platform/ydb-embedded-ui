@@ -74,7 +74,7 @@ app.get('/health', (_req, res) => {
 // Simple stateless chat endpoint
 app.post('/api/chat', async (req, res) => {
     try {
-        const { messages, model, temperature, maxTokens } = req.body;
+        const { messages, model, temperature, maxTokens, context } = req.body;
 
         if (!messages || !Array.isArray(messages)) {
             return res.status(400).json({ error: 'Messages array is required' });
@@ -93,13 +93,19 @@ app.post('/api/chat', async (req, res) => {
             return;
         }
 
-        logger.info('Chat request received', { messageCount: messages.length });
+        logger.info('Chat request received', { 
+            messageCount: messages.length,
+            context: context ? {
+                url: context.url,
+                pathname: context.pathname
+            } : 'none'
+        });
 
         // Process chat with callback for streaming
         await chatService.processChat(
             messages,
             (data) => res.write(data),
-            { model, temperature, maxTokens }
+            { model, temperature, maxTokens, context }
         );
 
         res.end();

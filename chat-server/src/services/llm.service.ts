@@ -24,6 +24,7 @@ export class LLMService {
                 // Override the authorization header for each request
                 const headers = new Headers(init?.headers);
                 headers.set('Authorization', `OAuth ${this.config.apiKey}`);
+                headers.set('Ya-Pool', 'gravity-ai')
                 
                 return fetch(url, {
                     ...init,

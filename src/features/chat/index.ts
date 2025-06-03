@@ -3,6 +3,7 @@ export { ChatPanel } from './components/ChatPanel/ChatPanel';
 export { ChatMessage } from './components/ChatMessage/ChatMessage';
 export { ChatInput } from './components/ChatInput/ChatInput';
 export { ChatToggleButton } from './components/ChatToggleButton/ChatToggleButton';
+export { ToolCallBlock } from './components/ToolCallBlock/ToolCallBlock';
 
 // Hooks
 export { useChat } from './hooks/useChat';
@@ -22,3 +23,7 @@ export type {
 
 // API
 export { ChatAPI } from './api/chatApi';
+
+// Utils
+export { usePageContext, extractPageContextFromLocation } from './utils/pageContext';
+export type { PageContext } from './utils/pageContext';

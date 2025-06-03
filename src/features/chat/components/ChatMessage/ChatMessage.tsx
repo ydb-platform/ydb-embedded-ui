@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Icon } from '@gravity-ui/uikit';
 import { ChatMessage as ChatMessageType } from '../../types/chat';
+import { ToolCallBlock } from '../ToolCallBlock/ToolCallBlock';
 import './ChatMessage.scss';
 
 // Icons - these would need to be imported from your icon library
@@ -146,30 +147,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
     const renderToolCalls = () => {
         if (!message.toolCalls || message.toolCalls.length === 0) return null;
 
-        return (
-            <div className="chat-message__tool-calls">
-                {message.toolCalls.map((toolCall) => {
-                    const parsedArgs = safeParseJSON(toolCall.function.arguments);
-                    
-                    return (
-                        <div key={toolCall.id} className="chat-message__tool-call">
-                            <div className="chat-message__tool-header">
-                                <Icon data={ToolIcon} />
-                                <span className="chat-message__tool-name">
-                                    {toolCall.function.name}
-                                </span>
-                            </div>
-                            <div className="chat-message__tool-args">
-                                <details>
-                                    <summary>Arguments</summary>
-                                    <pre>{JSON.stringify(parsedArgs, null, 2)}</pre>
-                                </details>
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
-        );
+        return <ToolCallBlock toolCalls={message.toolCalls} />;
     };
 
     const renderFormattedText = (text: string) => {

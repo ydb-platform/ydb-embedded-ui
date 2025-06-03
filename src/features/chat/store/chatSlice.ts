@@ -39,6 +39,8 @@ const chatSlice = createSlice({
         clearMessages: (state) => {
             state.messages = [];
             state.error = null;
+            state.needsNewAssistantMessage = false;
+            state.currentStreamingMessageId = undefined;
         },
 
         // Streaming state
@@ -46,10 +48,13 @@ const chatSlice = createSlice({
             state.isStreaming = true;
             state.isLoading = true;
             state.error = null;
+            // Mark that we need a new assistant message for this streaming session
+            state.needsNewAssistantMessage = true;
         },
         stopStreaming: (state) => {
             state.isStreaming = false;
             state.isLoading = false;
+            state.needsNewAssistantMessage = false;
         },
         
         // Handle streaming deltas
@@ -59,20 +64,34 @@ const chatSlice = createSlice({
             
             switch (delta.type) {
                 case 'content':
-                    // Find the last assistant message that's being streamed
-                    // We look for the most recent assistant message when streaming is active
-                    let assistantMessage = state.isStreaming
-                        ? state.messages.filter(msg => msg.role === 'assistant').pop()
-                        : undefined;
-
-                    if (!assistantMessage) {
+                    // Find or create the current streaming assistant message
+                    let assistantMessage: ChatMessage | undefined;
+                    
+                    // If we need a new assistant message or there's no current streaming message
+                    if (state.needsNewAssistantMessage || !state.currentStreamingMessageId) {
                         assistantMessage = {
-                            id: `msg-${Date.now()}`,
+                            id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                             role: 'assistant',
                             content: '',
                             timestamp: Date.now(),
                         };
                         state.messages.push(assistantMessage);
+                        state.currentStreamingMessageId = assistantMessage.id;
+                        state.needsNewAssistantMessage = false;
+                    } else {
+                        // Find the current streaming message
+                        assistantMessage = state.messages.find(msg => msg.id === state.currentStreamingMessageId);
+                        if (!assistantMessage) {
+                            // Fallback: create new message if current streaming message not found
+                            assistantMessage = {
+                                id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                                role: 'assistant',
+                                content: '',
+                                timestamp: Date.now(),
+                            };
+                            state.messages.push(assistantMessage);
+                            state.currentStreamingMessageId = assistantMessage.id;
+                        }
                     }
 
                     // Update content
@@ -139,6 +158,8 @@ const chatSlice = createSlice({
                 case 'done':
                     state.isStreaming = false;
                     state.isLoading = false;
+                    state.currentStreamingMessageId = undefined;
+                    state.needsNewAssistantMessage = false;
                     break;
 
                 case 'error':

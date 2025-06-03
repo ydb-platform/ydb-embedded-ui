@@ -7,7 +7,15 @@ export class ChatAPI {
         messages: ChatMessage[],
         onDelta: (delta: ChatDelta) => void,
         onError: (error: Error) => void,
-        signal?: AbortSignal
+        signal?: AbortSignal,
+        context?: {
+            url?: string;
+            pathname?: string;
+            search?: string;
+            hash?: string;
+            params?: Record<string, string>;
+            description?: string;
+        }
     ): Promise<void> {
         try {
             const requestBody = {
@@ -18,6 +26,7 @@ export class ChatAPI {
                     tool_call_id: msg.toolCallId,
                 })),
                 model: 'gpt-4.1',
+                ...(context && { context }),
             };
 
             const response = await fetch(this.baseUrl, {
