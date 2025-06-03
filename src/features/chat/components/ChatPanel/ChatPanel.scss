@@ -1,0 +1,143 @@
+.ydb-chat-drawer {
+    &__item {
+        z-index: 10000;
+
+        display: flex;
+        overflow: hidden;
+        flex-direction: column;
+
+        height: 100%;
+    }
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+
+        height: 100%;
+
+        background: var(--g-color-base-background);
+    }
+
+    &__header {
+        display: flex;
+        flex-shrink: 0;
+        justify-content: space-between;
+        align-items: center;
+
+        padding: 16px;
+
+        border-bottom: 1px solid var(--g-color-line-generic);
+        background: var(--g-color-base-float);
+    }
+
+    &__header-left {
+        display: flex;
+        flex: 1;
+        align-items: center;
+        gap: 12px;
+
+        min-width: 0; // Allow text to truncate if needed
+    }
+
+    &__controls {
+        display: flex;
+        gap: 8px;
+    }
+
+    &__messages {
+        display: flex;
+        overflow: hidden auto;
+        flex: 1;
+        flex-direction: column;
+        gap: 16px;
+
+        min-height: 0; // Ensures flex child can shrink
+        padding: 16px;
+        scroll-behavior: smooth;
+    }
+
+    &__welcome {
+        padding: 32px 16px;
+
+        text-align: center;
+
+        color: var(--g-color-text-secondary);
+
+        h4 {
+            margin: 0 0 8px;
+
+            font-size: 18px;
+            font-weight: 600;
+
+            color: var(--g-color-text-primary);
+        }
+
+        p {
+            margin: 0 0 24px;
+
+            line-height: 1.5;
+        }
+    }
+
+    &__suggestions {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+    &__error {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        padding: 12px;
+
+        font-size: 14px;
+
+        color: var(--g-color-text-danger);
+        border: 1px solid var(--g-color-line-danger);
+        border-radius: 8px;
+        background: var(--g-color-base-danger-light);
+    }
+
+    &__error-icon {
+        font-size: 16px;
+    }
+
+    &__quota {
+        flex-shrink: 0;
+
+        padding: 0 16px;
+    }
+
+    &__input {
+        flex-shrink: 0;
+
+        padding: 16px;
+
+        border-top: 1px solid var(--g-color-line-generic);
+        background: var(--g-color-base-float);
+    }
+}
+
+// Scrollbar styling
+
+.ydb-chat-drawer__messages {
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        border-radius: 3px;
+        background: var(--g-color-base-generic);
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: var(--g-color-base-generic-hover);
+    }
+}

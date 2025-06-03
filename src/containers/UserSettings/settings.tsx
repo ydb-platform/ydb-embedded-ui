@@ -5,6 +5,7 @@ import {createNextState} from '@reduxjs/toolkit';
 import {
     AUTOCOMPLETE_ON_ENTER,
     BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
+    ENABLE_AI_ASSISTANT,
     ENABLE_AUTOCOMPLETE,
     ENABLE_CODE_ASSISTANT,
     ENABLE_NETWORK_TABLE_KEY,
@@ -129,6 +130,12 @@ export const enableCodeAssistantSetting: SettingProps = {
     description: i18n('settings.editor.codeAssistant.description'),
 };
 
+export const enableAiAssistantSetting: SettingProps = {
+    settingKey: ENABLE_AI_ASSISTANT,
+    title: i18n('settings.editor.aiAssistant.title'),
+    description: i18n('settings.editor.aiAssistant.title'),
+};
+
 export const enableQueryStreamingSetting: SettingProps = {
     settingKey: ENABLE_QUERY_STREAMING,
     title: i18n('settings.editor.queryStreaming.title'),
@@ -220,15 +227,23 @@ export const aboutPage: SettingsPage = {
 export function getUserSettings({
     singleClusterMode,
     codeAssistantConfigured,
+    aiAssistantConfigured,
 }: {
     singleClusterMode: boolean;
     codeAssistantConfigured?: boolean;
+    aiAssistantConfigured?: boolean;
 }) {
-    const experiments = singleClusterMode
+    let experiments = singleClusterMode
         ? experimentsPage
         : createNextState(experimentsPage, (draft) => {
               draft.sections[0].settings.push(useClusterBalancerAsBackendSetting);
           });
+
+    experiments = aiAssistantConfigured
+        ? createNextState(experiments, (draft) => {
+              draft.sections[0].settings.push(enableAiAssistantSetting);
+          })
+        : experiments;
 
     const editor = codeAssistantConfigured
         ? createNextState(editorPage, (draft) => {

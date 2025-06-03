@@ -1,0 +1,278 @@
+.chat-message {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 8px;
+    background: var(--g-color-base-float);
+    border: 1px solid var(--g-color-line-generic);
+
+    &--user {
+        background: var(--g-color-base-info-light);
+        border-color: var(--g-color-line-info);
+        margin-left: 32px;
+    }
+
+    &--assistant {
+        background: var(--g-color-base-float);
+        border-color: var(--g-color-line-generic);
+        margin-right: 32px;
+    }
+
+    &--tool {
+        background: var(--g-color-base-warning-light);
+        border-color: var(--g-color-line-warning);
+        margin-right: 32px;
+    }
+
+    &__header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    &__avatar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--g-color-base-generic);
+        font-size: 12px;
+    }
+
+    &__meta {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    &__role {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--g-color-text-primary);
+    }
+
+    &__timestamp {
+        font-size: 11px;
+        color: var(--g-color-text-hint);
+    }
+
+    &__actions {
+        display: flex;
+        gap: 4px;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    &:hover &__actions {
+        opacity: 1;
+    }
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    &__text {
+        color: var(--g-color-text-primary);
+        line-height: 1.5;
+        font-size: 14px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    &__tool-calls {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    &__tool-call {
+        background: var(--g-color-base-background);
+        border: 1px solid var(--g-color-line-generic);
+        border-radius: 6px;
+        padding: 8px;
+    }
+
+    &__tool-header {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--g-color-text-secondary);
+    }
+
+    &__tool-name {
+        color: var(--g-color-text-primary);
+    }
+
+    &__tool-args {
+        font-family: var(--g-text-code-font-family);
+        font-size: 11px;
+        background: var(--g-color-base-generic);
+        border-radius: 4px;
+        padding: 6px;
+        overflow-x: auto;
+
+        pre {
+            margin: 0;
+            color: var(--g-color-text-primary);
+        }
+    }
+
+    &__usage {
+        font-size: 11px;
+        color: var(--g-color-text-hint);
+        text-align: right;
+        padding-top: 4px;
+        border-top: 1px solid var(--g-color-line-generic);
+    }
+
+    &__tool-result {
+        background: var(--g-color-base-background);
+        border: 1px solid var(--g-color-line-generic);
+        border-radius: 6px;
+        padding: 12px;
+    }
+
+    &__tool-result-summary {
+        font-size: 14px;
+        line-height: 1.6;
+        color: var(--g-color-text-primary);
+    }
+
+    &__result-header {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--g-color-text-primary);
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--g-color-line-generic);
+    }
+
+    &__result-section {
+        margin-bottom: 12px;
+    }
+
+    &__result-item {
+        margin-bottom: 12px;
+        padding: 8px;
+        background: var(--g-color-base-float);
+        border-radius: 6px;
+        border-left: 3px solid var(--g-color-line-info);
+    }
+
+    &__result-item-title {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--g-color-text-primary);
+        margin-bottom: 4px;
+
+        strong {
+            font-weight: 600;
+            color: var(--g-color-text-primary);
+        }
+    }
+
+    &__result-item-details {
+        margin-left: 16px;
+    }
+
+    &__result-detail {
+        font-size: 13px;
+        color: var(--g-color-text-secondary);
+        margin-left: 16px;
+        margin-bottom: 2px;
+        
+        &:before {
+            content: "  ";
+            white-space: pre;
+        }
+    }
+
+    &__result-line {
+        font-size: 14px;
+        color: var(--g-color-text-primary);
+        margin-bottom: 4px;
+    }
+
+    &__tool-result-details {
+        margin-top: 8px;
+        
+        summary {
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--g-color-text-secondary);
+            padding: 4px 0;
+            border-bottom: 1px solid var(--g-color-line-generic);
+            margin-bottom: 8px;
+            
+            &:hover {
+                color: var(--g-color-text-primary);
+            }
+        }
+
+        pre {
+            font-family: var(--g-text-code-font-family);
+            font-size: 11px;
+            background: var(--g-color-base-generic);
+            border-radius: 4px;
+            padding: 8px;
+            overflow-x: auto;
+            margin: 0;
+            color: var(--g-color-text-primary);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    }
+}
+
+// Code blocks styling
+.chat-message__text {
+    code {
+        background: var(--g-color-base-generic);
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-family: var(--g-text-code-font-family);
+        font-size: 13px;
+    }
+
+    pre {
+        background: var(--g-color-base-generic);
+        padding: 8px;
+        border-radius: 6px;
+        overflow-x: auto;
+        font-family: var(--g-text-code-font-family);
+        font-size: 13px;
+        margin: 8px 0;
+
+        code {
+            background: none;
+            padding: 0;
+        }
+    }
+}
+
+// Animation for streaming messages
+.chat-message--assistant .chat-message__text::after {
+    content: '▋';
+    animation: blink 1s infinite;
+    color: var(--g-color-text-hint);
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+// Remove cursor when message is complete
+.chat-message--assistant.chat-message--complete .chat-message__text::after {
+    display: none;
+}

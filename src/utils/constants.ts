@@ -123,6 +123,8 @@ export const ENABLE_AUTOCOMPLETE = 'enableAutocomplete';
 
 export const ENABLE_CODE_ASSISTANT = 'enableCodeAssistant';
 
+export const ENABLE_AI_ASSISTANT = 'enableAIAssistant';
+
 export const ENABLE_QUERY_STREAMING = 'enableQueryStreaming';
 
 export const AUTOCOMPLETE_ON_ENTER = 'autocompleteOnEnter';
