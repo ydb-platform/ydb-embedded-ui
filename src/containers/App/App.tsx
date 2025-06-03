@@ -6,6 +6,7 @@ import {Helmet} from 'react-helmet-async';
 import {connect} from 'react-redux';
 
 import {ErrorBoundary} from '../../components/ErrorBoundary/ErrorBoundary';
+import {ChatPanel} from '../../features/chat';
 import type {RootState} from '../../store';
 import {Navigation} from '../AsideNavigation/Navigation';
 import ReduxTooltip from '../ReduxTooltip/ReduxTooltip';
@@ -43,6 +44,7 @@ function App({
                     </ErrorBoundary>
                 </Navigation>
             </ContentWrapper>
+            <ChatPanel />
             <ReduxTooltip />
         </Providers>
     );

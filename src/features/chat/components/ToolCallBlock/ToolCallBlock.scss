@@ -1,0 +1,69 @@
+.tool-call-block {
+    margin: 8px 0;
+
+    &__item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--g-color-base-generic);
+        border: 1px solid var(--g-color-line-generic);
+        border-radius: 6px;
+        padding: 4px 8px;
+        margin: 2px 4px 2px 0;
+        font-size: 13px;
+        color: var(--g-color-text-secondary);
+    }
+
+    &__content {
+        flex: 1;
+
+        code {
+            font-family: var(
+                --g-text-code-font-family,
+                'SF Mono',
+                Monaco,
+                'Cascadia Code',
+                'Roboto Mono',
+                Consolas,
+                'Courier New',
+                monospace
+            );
+            color: var(--g-color-text-primary);
+            background: none;
+            padding: 0;
+            font-size: 12px;
+        }
+    }
+
+    &__duration {
+        font-family: var(
+            --g-text-code-font-family,
+            'SF Mono',
+            Monaco,
+            'Cascadia Code',
+            'Roboto Mono',
+            Consolas,
+            'Courier New',
+            monospace
+        );
+        font-size: 11px;
+        color: var(--g-color-text-hint);
+        margin-left: auto;
+    }
+
+    &__status {
+        margin-left: 4px;
+    }
+
+    &__loader {
+        margin-left: 4px;
+    }
+}
+
+// Dark theme adjustments
+[data-theme='dark'] .tool-call-block {
+    &__item {
+        background: var(--g-color-base-generic-accent);
+        border-color: var(--g-color-line-generic);
+    }
+}

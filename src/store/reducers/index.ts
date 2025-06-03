@@ -1,5 +1,7 @@
 import {combineReducers} from '@reduxjs/toolkit';
 
+import {chatReducer} from '../../features/chat/store/chatSlice';
+
 import {api} from './api';
 import authentication from './authentication/authentication';
 import cluster from './cluster/cluster';
@@ -38,6 +40,7 @@ export const rootReducer = {
     queryActions,
     fullscreen,
     clusters,
+    chat: chatReducer,
 };
 
 const combinedReducer = combineReducers({

@@ -1,0 +1,61 @@
+.ydb-quota-display {
+    margin-bottom: 8px;
+    padding: 8px 12px;
+
+    border: 1px solid var(--g-color-line-generic);
+    border-radius: 6px;
+    background-color: var(--g-color-base-background);
+
+    &_compact {
+        margin-bottom: 0;
+        padding: 4px 8px;
+
+        border: none;
+        background-color: transparent;
+    }
+
+    &__header {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        margin-bottom: 8px;
+    }
+
+    &__periods {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    &__period {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    &__period-header {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    &__period-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        padding-left: 14px; // Align with header text
+    }
+
+    &__progress {
+        width: 100%;
+        max-width: 120px;
+    }
+
+    &__compact-content {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+}

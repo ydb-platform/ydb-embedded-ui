@@ -6,13 +6,14 @@ import {useLocation} from 'react-router-dom';
 
 import {getConnectToDBDialog} from '../../components/ConnectToDB/ConnectToDBDialog';
 import {InternalLink} from '../../components/InternalLink';
+import {AIAssistantButton} from '../../features/chat/components/AIAssistantButton/AIAssistantButton';
 import {useAddClusterFeatureAvailable} from '../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
-import {DEVELOPER_UI_TITLE} from '../../utils/constants';
+import {DEVELOPER_UI_TITLE, ENABLE_AI_ASSISTANT} from '../../utils/constants';
 import {createDeveloperUIInternalPageHref} from '../../utils/developerUI/developerUI';
-import {useTypedSelector} from '../../utils/hooks';
+import {useSetting, useTypedSelector} from '../../utils/hooks';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 
@@ -27,6 +28,7 @@ function Header() {
     const {page, pageBreadcrumbsOptions} = useTypedSelector((state) => state.header);
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const [isAiAssistantEnabled] = useSetting(ENABLE_AI_ASSISTANT);
 
     const {title: clusterTitle} = useClusterBaseInfo();
 
@@ -74,6 +76,10 @@ function Header() {
                     {headerKeyset('connect')}
                 </Button>,
             );
+        }
+
+        if (isAiAssistantEnabled) {
+            elements.push(<AIAssistantButton />);
         }
 
         if (!isClustersPage && isUserAllowedToMakeChanges) {

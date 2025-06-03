@@ -17,6 +17,9 @@
   "settings.editor.codeAssistant.title": "Code Assistant",
   "settings.editor.codeAssistant.description": "Use Code Assistant for autocomplete.",
 
+  "settings.editor.aiAssistant.title": "AI Assistant",
+  "settings.editor.aiAssistant.description": "Show AI Assistant.",
+
   "settings.editor.queryStreaming.title": "Query Streaming",
   "settings.editor.queryStreaming.description": "Use streaming api for query results.",
 
