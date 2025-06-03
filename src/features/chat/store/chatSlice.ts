@@ -58,10 +58,11 @@ const chatSlice = createSlice({
             
             switch (delta.type) {
                 case 'content':
-                    // Find or create the assistant message being streamed
-                    let assistantMessage = state.messages.find(
-                        msg => msg.role === 'assistant' && !msg.content && !msg.toolCalls
-                    );
+                    // Find the last assistant message that's being streamed
+                    // We look for the most recent assistant message when streaming is active
+                    let assistantMessage = state.isStreaming
+                        ? state.messages.filter(msg => msg.role === 'assistant').pop()
+                        : undefined;
 
                     if (!assistantMessage) {
                         assistantMessage = {
@@ -80,10 +81,10 @@ const chatSlice = createSlice({
                     break;
 
                 case 'tool_call':
-                    // Find the current assistant message or create one
-                    let toolMessage = state.messages.find(
-                        msg => msg.role === 'assistant' && !msg.content
-                    );
+                    // Find the last assistant message that's being streamed
+                    let toolMessage = state.isStreaming
+                        ? state.messages.filter(msg => msg.role === 'assistant').pop()
+                        : undefined;
 
                     if (!toolMessage) {
                         toolMessage = {

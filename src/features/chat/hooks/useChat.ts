@@ -6,7 +6,7 @@ import { ChatMessage, ChatDelta } from '../types/chat';
 
 export function useChat() {
     const dispatch = useDispatch();
-    const { messages, isLoading, isStreaming, error } = useSelector(
+    const { messages, isLoading, isStreaming, error, isOpen } = useSelector(
         (state: any) => state.chat
     );
     const abortControllerRef = useRef<AbortController | null>(null);
@@ -101,6 +101,7 @@ export function useChat() {
         isLoading,
         isStreaming,
         error,
+        isOpen,
         sendMessage,
         stopGeneration,
         clearHistory,

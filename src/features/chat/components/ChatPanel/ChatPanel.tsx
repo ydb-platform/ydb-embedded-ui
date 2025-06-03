@@ -1,15 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { Button, Icon } from '@gravity-ui/uikit';
+import { Button } from '@gravity-ui/uikit';
 import { ChatMessage } from '../ChatMessage/ChatMessage';
 import { ChatInput } from '../ChatInput/ChatInput';
 import { useChat } from '../../hooks/useChat';
 import { ChatState } from '../../types/chat';
 import './ChatPanel.scss';
-
-// Icons - these would need to be imported from your icon library
-const CloseIcon = () => <span>✕</span>;
-const ClearIcon = () => <span>🗑</span>;
 
 interface ChatPanelProps {
     className?: string;
@@ -59,10 +55,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ className }) => {
         return;
     }, [isOpen]);
 
-    if (!isOpen) return null;
-
     return (
-        <div className={`chat-panel ${className || ''}`}>
+        <div className={`chat-panel ${isOpen ? 'chat-panel--open' : ''} ${className || ''}`}>
             <div className="chat-panel__header">
                 <h3 className="chat-panel__title">
                     AI Assistant
@@ -75,7 +69,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ className }) => {
                         disabled={messages.length === 0}
                         title="Clear history (⌘K)"
                     >
-                        <Icon data={ClearIcon} />
+                        🗑
                     </Button>
                     <Button
                         view="flat"
@@ -83,7 +77,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ className }) => {
                         onClick={closeChat}
                         title="Close"
                     >
-                        <Icon data={CloseIcon} />
+                        ✕
                     </Button>
                 </div>
             </div>

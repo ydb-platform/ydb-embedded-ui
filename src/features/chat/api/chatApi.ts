@@ -1,7 +1,7 @@
 import { ChatMessage, ChatDelta, MCPTool, ChatRequest } from '../types/chat';
 
 export class ChatAPI {
-    private static baseUrl = '/chat';
+    private static baseUrl = '/api/chat';
 
     static async sendMessage(
         messages: ChatMessage[],

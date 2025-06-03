@@ -13,14 +13,29 @@ export class LLMService {
 
     constructor() {
         this.config = getElizaConfig();
+        
         this.client = new OpenAI({
-            apiKey: this.config.apiKey,
+            apiKey: 'dummy-key', // We'll override the auth header
             baseURL: this.config.baseURL,
+            defaultHeaders: {
+                'Authorization': `OAuth ${this.config.apiKey}`
+            },
+            fetch: async (url: string | URL | Request, init?: RequestInit) => {
+                // Override the authorization header for each request
+                const headers = new Headers(init?.headers);
+                headers.set('Authorization', `OAuth ${this.config.apiKey}`);
+                
+                return fetch(url, {
+                    ...init,
+                    headers,
+                });
+            }
         });
         
         logger.info('LLM service initialized', {
             baseURL: this.config.baseURL,
             model: this.config.model,
+            sslValidation: process.env['NODE_TLS_REJECT_UNAUTHORIZED'] !== '0'
         });
     }
 

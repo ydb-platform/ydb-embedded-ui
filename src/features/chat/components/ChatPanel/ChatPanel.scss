@@ -1,12 +1,23 @@
 .chat-panel {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    background: var(--g-color-base-background);
-    border-left: 1px solid var(--g-color-line-generic);
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
     width: 400px;
     min-width: 300px;
     max-width: 600px;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    background: var(--g-color-base-background);
+    border-left: 1px solid var(--g-color-line-generic);
+    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+
+    &--open {
+        transform: translateX(0);
+    }
 
     &__header {
         display: flex;
