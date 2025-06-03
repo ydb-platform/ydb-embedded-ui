@@ -34,9 +34,16 @@ export function IssueDetails({issue}: HealthcheckIssueDetailsProps) {
         if (issue.type === 'STORAGE_POOL') {
             fields.push({
                 value: issue.location?.storage?.pool?.name,
-                title: `${i18n('label_pool')} ${i18n('label_pool-name')}`,
+                title: i18n('label_pool-name'),
             });
             hiddenStorageFields.push('pool');
+        }
+        if (issue.type === 'COMPUTE_POOL') {
+            fields.push({
+                value: issue.location?.compute?.pool?.name,
+                title: i18n('label_pool-name'),
+            });
+            hiddenComputeFields.push('pool');
         }
         if (issue.type === 'TABLET') {
             const tablet = issue.location?.compute?.tablet;
@@ -52,15 +59,15 @@ export function IssueDetails({issue}: HealthcheckIssueDetailsProps) {
                             )}
                         />
                     ) : undefined,
-                    title: `${i18n('label_tablet')} ${i18n('label_tablet-id')}`,
+                    title: i18n('label_tablet-id'),
                 },
                 {
                     value: tablet?.type,
-                    title: `${i18n('label_tablet')} ${i18n('label_tablet-type')}`,
+                    title: i18n('label_tablet-type'),
                 },
                 {
                     value: tablet?.count,
-                    title: `${i18n('label_tablet')} ${i18n('label_tablet-count')}`,
+                    title: i18n('label_tablet-count'),
                 },
             );
             hiddenComputeFields.push('tablet');
@@ -70,32 +77,16 @@ export function IssueDetails({issue}: HealthcheckIssueDetailsProps) {
 
     return (
         <Flex direction="column" gap={4}>
-            <LocationDetails title={i18n('label_details')} fields={detailsFields} />
-            <SectionWithTitle titleVariant="subheader-2" title={i18n('label_location')} gap={3}>
-                <StorageLocation location={location.storage} hiddenFields={hiddenStorageFields} />
-                <ComputeLocation location={location.compute} hiddenFields={hiddenComputeFields} />
-                <DatabaseLocation location={location.database} />
-                <NodeLocation location={location.node} />
-                <PeerLocation location={location.peer} />
-            </SectionWithTitle>
+            <LocationDetails
+                title={i18n('label_details')}
+                fields={detailsFields}
+                titleVariant="subheader-2"
+            />
+            <StorageLocation location={location.storage} hiddenFields={hiddenStorageFields} />
+            <ComputeLocation location={location.compute} hiddenFields={hiddenComputeFields} />
+            <NodeLocation location={location.node} />
+            <PeerLocation location={location.peer} />
         </Flex>
-    );
-}
-
-interface DatabaseLocationProps {
-    location: Location['database'];
-}
-
-function DatabaseLocation({location}: DatabaseLocationProps) {
-    if (!location || !location.name) {
-        return null;
-    }
-
-    return (
-        <LocationDetails
-            title={i18n('label_database_location')}
-            fields={[{value: location.name, title: i18n('label_database')}]}
-        />
     );
 }
 
@@ -126,7 +117,7 @@ function PeerLocation({location}: PeerLocationProps) {
 
     return (
         <SectionWithTitle title={i18n('label_peer_location')}>
-            <NodeInfo node={location} title={i18n('label_peer')} />
+            <NodeInfo node={location} />
         </SectionWithTitle>
     );
 }

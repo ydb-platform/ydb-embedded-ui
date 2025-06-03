@@ -54,7 +54,12 @@ export function HealthcheckIssue({issue}: HealthcheckIssueProps) {
                                         </div>
                                     )}
                                 </Flex>
-                                <Flex wrap="nowrap" gap={2}>
+                                <Flex
+                                    wrap="nowrap"
+                                    gap={2}
+                                    alignItems="center"
+                                    height="max-content"
+                                >
                                     <Divider
                                         className={b('issue-divider')}
                                         orientation="vertical"

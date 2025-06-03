@@ -63,7 +63,7 @@ export function StorageLocation({location, hiddenFields = []}: StorageLocationPr
     }
 
     return (
-        <SectionWithTitle title={i18n('label_storage_location')}>
+        <SectionWithTitle title={i18n('label_storage_location')} titleVariant="subheader-2">
             <Flex direction="column" gap={2}>
                 {fields.map((field) => LocationFieldRenderer[field](location))}
             </Flex>
@@ -87,7 +87,6 @@ function GroupInfo({location}: StorageSectionProps) {
 
     return (
         <LocationDetails
-            title={i18n('label_group')}
             fields={[
                 {
                     value: ids?.length ? <IdList ids={ids} /> : undefined,
@@ -111,7 +110,6 @@ function VDiskInfo({location}: StorageSectionProps) {
 
     return (
         <LocationDetails
-            title={i18n('label_vdisk')}
             fields={[
                 {
                     value: ids?.length ? (
@@ -148,7 +146,6 @@ function PDiskInfo({location}: StorageSectionProps) {
     return pdisk.map((el: {id: string; path: string}) => (
         <LocationDetails
             key={el.id}
-            title={i18n('label_pdisk')}
             fields={[
                 {
                     value:

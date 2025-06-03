@@ -27,9 +27,10 @@ export function SectionWithTitle({
 interface LocationDetailsProps {
     title?: string;
     fields: {value?: React.ReactNode; title: string; copy?: string}[];
+    titleVariant?: TextProps['variant'];
 }
 
-export function LocationDetails({title, fields}: LocationDetailsProps) {
+export function LocationDetails({title, fields, titleVariant}: LocationDetailsProps) {
     const filteredFields = fields.filter((f) => f.value);
 
     if (filteredFields.length === 0) {
@@ -37,7 +38,7 @@ export function LocationDetails({title, fields}: LocationDetailsProps) {
     }
 
     return (
-        <SectionWithTitle title={title}>
+        <SectionWithTitle title={title} titleVariant={titleVariant}>
             <DefinitionList nameMaxWidth={200}>
                 {filteredFields.map((field) => (
                     <DefinitionList.Item name={field.title} key={field.title} copyText={field.copy}>

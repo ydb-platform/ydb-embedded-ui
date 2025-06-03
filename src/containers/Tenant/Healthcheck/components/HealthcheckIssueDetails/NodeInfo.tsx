@@ -11,7 +11,7 @@ interface NodeInfoProps {
     title?: string;
 }
 
-export function NodeInfo({node, title = i18n('label_node')}: NodeInfoProps) {
+export function NodeInfo({node, title}: NodeInfoProps) {
     const {database} = useTenantQueryParams();
     if (!node) {
         return null;

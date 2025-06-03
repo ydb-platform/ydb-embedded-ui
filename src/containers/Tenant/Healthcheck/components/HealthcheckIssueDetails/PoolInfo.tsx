@@ -15,10 +15,5 @@ export function PoolInfo({location}: PoolInfoProps) {
         return null;
     }
 
-    return (
-        <LocationDetails
-            title={i18n('label_pool')}
-            fields={[{value: name, title: i18n('label_pool-name')}]}
-        />
-    );
+    return <LocationDetails fields={[{value: name, title: i18n('label_pool-name')}]} />;
 }

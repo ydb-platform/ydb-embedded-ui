@@ -57,7 +57,7 @@ export function ComputeLocation({location, hiddenFields = []}: ComputeLocationPr
     }
 
     return (
-        <SectionWithTitle title={i18n('label_compute_location')}>
+        <SectionWithTitle title={i18n('label_compute_location')} titleVariant="subheader-2">
             <Flex direction="column" gap={2}>
                 {fields.map((field) => LocationFieldRenderer[field](location))}
             </Flex>
@@ -79,7 +79,6 @@ function TabletInfo({location}: ComputeSectionProps) {
 
     return (
         <LocationDetails
-            title={i18n('label_tablet')}
             fields={[
                 {
                     value: tablet.id?.length ? (
@@ -110,7 +109,6 @@ function SchemaInfo({location}: ComputeSectionProps) {
 
     return (
         <LocationDetails
-            title={i18n('label_schema')}
             fields={[
                 {value: schema.type, title: i18n('label_schema-type')},
                 {value: schema.path, title: i18n('label_schema-path')},
