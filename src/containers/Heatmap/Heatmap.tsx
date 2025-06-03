@@ -88,7 +88,9 @@ export const Heatmap = ({path, database}: HeatmapProps) => {
         const {min, max} = getCurrentMetricLimits(currentMetric, tablets);
 
         const preparedTablets = tablets.map((tablet) => {
-            const value = currentMetric && Number(tablet.metrics?.[currentMetric]);
+            const value =
+                currentMetric &&
+                Number(tablet.metrics?.[currentMetric as keyof typeof tablet.metrics]);
             const colorIndex = getColorIndex(value, min, max);
             const color = COLORS_RANGE[colorIndex];
 

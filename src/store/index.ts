@@ -11,3 +11,4 @@ export {
 export {rootReducer} from './reducers';
 
 export type {AppDispatch, GetState, RootState} from './defaultStore';
+export type {ConfigureStoreOptions} from './configureStore';

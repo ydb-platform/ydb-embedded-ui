@@ -1,4 +1,4 @@
-import {configureStore as configureReduxStore} from '@reduxjs/toolkit';
+import {combineReducers, configureStore as configureReduxStore} from '@reduxjs/toolkit';
 import type {Action, Dispatch, Middleware, Reducer, UnknownAction} from '@reduxjs/toolkit';
 import type {History} from 'history';
 import {createBrowserHistory} from 'history';
@@ -7,7 +7,7 @@ import {listenForHistoryChange} from 'redux-location-state';
 import {YdbEmbeddedAPI} from '../services/api';
 
 import {getUrlData} from './getUrlData';
-import rootReducer from './reducers';
+import combinedRootReducer, {rootReducer} from './reducers';
 import {api as storeApi} from './reducers/api';
 import {syncUserSettingsFromLS} from './reducers/settings/settings';
 import {UPDATE_REF} from './reducers/tooltip';
@@ -54,18 +54,43 @@ export const codeAssistBackend = window.code_assist_backend;
 
 const isSingleClusterMode = `${metaBackend}` === 'undefined';
 
+export interface ConfigureStoreOptions {
+    aRootReducer?: Reducer;
+    singleClusterMode?: boolean;
+    api?: YdbEmbeddedAPI;
+    additionalReducers?: Record<string, Reducer>;
+}
+
 export function configureStore({
-    aRootReducer = rootReducer,
+    aRootReducer,
     singleClusterMode = isSingleClusterMode,
     api = new YdbEmbeddedAPI({webVersion, withCredentials: !customBackend}),
-} = {}) {
+    additionalReducers = {},
+}: ConfigureStoreOptions = {}) {
     ({backend, basename, clusterName} = getUrlData({
         singleClusterMode,
         customBackend,
     }));
     const history = createBrowserHistory({basename});
 
-    const store = _configureStore(aRootReducer, history, {singleClusterMode}, [
+    // Create the final reducer
+    let finalReducer: Reducer;
+
+    if (aRootReducer) {
+        // If custom root reducer is provided, use it
+        finalReducer = aRootReducer;
+    } else if (Object.keys(additionalReducers).length > 0) {
+        // If additional reducers are provided, combine them with the default ones
+        finalReducer = combineReducers({
+            ...rootReducer,
+            ...additionalReducers,
+        });
+    } else {
+        // Otherwise use the default combined reducer
+        finalReducer = combinedRootReducer;
+    }
+
+    const store = _configureStore(finalReducer, history, {singleClusterMode}, [
         storeApi.middleware,
     ]);
     listenForHistoryChange(store, history);
