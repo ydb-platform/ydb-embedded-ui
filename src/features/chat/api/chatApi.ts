@@ -1,4 +1,4 @@
-import { ChatMessage, ChatDelta, MCPTool, ChatRequest } from '../types/chat';
+import { ChatMessage, ChatDelta, MCPTool } from '../types/chat';
 
 export class ChatAPI {
     private static baseUrl = '/api/chat';
@@ -10,15 +10,14 @@ export class ChatAPI {
         signal?: AbortSignal
     ): Promise<void> {
         try {
-            const requestBody: ChatRequest = {
+            const requestBody = {
                 messages: messages.map(msg => ({
                     role: msg.role,
                     content: msg.content,
                     tool_calls: msg.toolCalls,
                     tool_call_id: msg.toolCallId,
                 })),
-                stream: true,
-                model: 'gpt-4o-mini',
+                model: 'gpt-4.1',
             };
 
             const response = await fetch(this.baseUrl, {

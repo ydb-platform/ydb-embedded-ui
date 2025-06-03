@@ -13,7 +13,7 @@ const configSchema = z.object({
     // Eliza API Configuration
     ELIZA_KEY: z.string().min(1, 'ELIZA_KEY is required'),
     ELIZA_BASE_URL: z.string().url().default('https://api.eliza.yandex.net/raw/openai/v1'),
-    MODEL_NAME: z.string().default('gpt-4o-mini'),
+    MODEL_NAME: z.string().default('gpt-4.1'),
 
     // MCP Server Configuration
     MCP_SERVER_URL: z.string().url().default('http://ui-dev-0.ydb.yandex.net:8784/meta/mcp'),

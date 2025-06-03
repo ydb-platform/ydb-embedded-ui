@@ -1,129 +1,50 @@
-import { EventEmitter } from 'events';
-import { createComponentLogger, logChatInteraction } from '../utils/logger';
-import { ValidationError, StreamingError } from '../utils/errors';
+import { createComponentLogger } from '../utils/logger';
+import { ValidationError } from '../utils/errors';
 import { getLLMService } from './llm.service';
 import { getMCPService } from './mcp';
-import {
-    ChatMessage,
-    ChatSession,
-    ChatCompletionRequest,
-    ChatDelta
-} from '../types/chat';
+import { ChatMessage } from '../types/chat';
 import { MCPTool } from '../types/mcp';
 
 const logger = createComponentLogger('ChatService');
 
-export class ChatService extends EventEmitter {
-    private sessions: Map<string, ChatSession> = new Map();
+export class ChatService {
     private llmService = getLLMService();
     private mcpService = getMCPService();
 
     constructor() {
-        super();
-        logger.info('Chat service initialized');
-        
-        // MCP service is initialized without event listeners in the new implementation
+        logger.info('Simple stateless chat service initialized');
     }
 
     /**
-     * Create a new chat session
+     * Process chat messages and stream response (stateless)
      */
-    createSession(userId?: string): ChatSession {
-        const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        
-        const session: ChatSession = {
-            id: sessionId,
-            userId,
-            messages: [],
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
-            metadata: {},
-        };
-
-        this.sessions.set(sessionId, session);
-        
-        logger.info('Chat session created', { sessionId, userId });
-        logChatInteraction('session_created', { sessionId, userId });
-        
-        this.emit('sessionCreated', session);
-        return session;
-    }
-
-    /**
-     * Get a chat session by ID
-     */
-    getSession(sessionId: string): ChatSession | undefined {
-        return this.sessions.get(sessionId);
-    }
-
-    /**
-     * Add a message to a chat session
-     */
-    addMessage(sessionId: string, messageData: Omit<ChatMessage, 'id' | 'timestamp'>): ChatMessage {
-        const session = this.getSession(sessionId);
-        if (!session) {
-            throw new ValidationError('Session not found');
-        }
-
-        const message: ChatMessage = {
-            id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            timestamp: Date.now(),
-            ...messageData,
-        };
-
-        session.messages.push(message);
-        session.updatedAt = Date.now();
-
-        logger.info('Message added to session', { 
-            sessionId, 
-            messageId: message.id, 
-            role: message.role 
-        });
-        
-        logChatInteraction('message_added', {
-            sessionId,
-            messageId: message.id,
-            role: message.role,
-            contentLength: message.content.length,
-        });
-
-        this.emit('messageAdded', { session, message });
-        return message;
-    }
-
-    /**
-     * Stream chat completion for a session
-     */
-    async* streamChatCompletion(sessionId: string, options: any = {}): AsyncGenerator<ChatDelta, void, unknown> {
-        const session = this.getSession(sessionId);
-        if (!session) {
-            throw new ValidationError('Session not found');
-        }
-
+    async processChat(
+        messages: ChatMessage[],
+        onData: (data: string) => void,
+        options: { model?: string; temperature?: number; maxTokens?: number } = {}
+    ): Promise<void> {
         try {
-            // Get available tools
-            const availableTools = this.getAvailableTools();
+            // Validate messages
+            this.validateMessages(messages);
 
-            logger.info('Available tools for chat completion', {
-                sessionId,
+            const availableTools = this.getAvailableTools();
+            
+            logger.info('Processing chat request', {
+                messageCount: messages.length,
                 toolCount: availableTools.length,
-                tools: availableTools.map(t => ({ name: t.name, server: t.serverName }))
             });
 
-            // Prepare request for LLM
-            const request: ChatCompletionRequest = {
-                messages: session.messages,
+            // Format messages for LLM
+            const formattedMessages = this.formatMessagesForLLM(messages);
+
+            // Create completion request
+            const request = {
+                messages: formattedMessages,
+                stream: true,
                 ...(options.model && { model: options.model }),
                 ...(options.temperature !== undefined && { temperature: options.temperature }),
                 ...(options.maxTokens !== undefined && { max_tokens: options.maxTokens }),
             };
-
-            logChatInteraction('request', {
-                sessionId,
-                messageCount: session.messages.length,
-                model: options.model,
-                toolsAvailable: availableTools.length,
-            });
 
             // Stream response from LLM
             const stream = await this.llmService.createStreamingChatCompletion(request, availableTools);
@@ -138,238 +59,75 @@ export class ChatService extends EventEmitter {
                 // Handle content delta
                 if (delta.content) {
                     accumulatedContent += delta.content;
-                    yield {
+                    onData(`data: ${JSON.stringify({
                         type: 'content',
                         content: delta.content,
-                    };
+                    })}\n\n`);
                 }
 
                 // Handle tool calls delta
                 if (delta.tool_calls) {
                     for (const toolCall of delta.tool_calls) {
                         if (toolCall.function) {
-                            // Find the server that provides this tool
-                            const toolWithServer = availableTools.find(t => t.name === toolCall.function.name);
-                            const serverName = toolWithServer?.serverName || 'ydb-mcp-server';
+                            accumulatedToolCalls.push(toolCall);
 
-                            accumulatedToolCalls.push({
-                                id: toolCall.id,
-                                name: toolCall.function.name,
-                                arguments: JSON.parse(toolCall.function.arguments || '{}'),
-                                serverName,
-                            });
-
-                            yield {
+                            onData(`data: ${JSON.stringify({
                                 type: 'tool_call',
                                 tool_calls: [toolCall],
-                            };
+                            })}\n\n`);
                         }
                     }
                 }
-            }
-
-            // Add accumulated message to session
-            if (accumulatedContent || accumulatedToolCalls.length > 0) {
-                const messageData: any = {
-                    role: 'assistant',
-                    content: accumulatedContent,
-                };
-                if (accumulatedToolCalls.length > 0) {
-                    messageData.toolCalls = accumulatedToolCalls.map(tc => ({
-                        id: tc.id,
-                        type: 'function' as const,
-                        function: {
-                            name: tc.name,
-                            arguments: JSON.stringify(tc.arguments),
-                        },
-                    }));
-                }
-                this.addMessage(sessionId, messageData);
             }
 
             // Execute tool calls if any
             if (accumulatedToolCalls.length > 0) {
                 for (const toolCall of accumulatedToolCalls) {
-                    yield {
+                    // Find the server that provides this tool
+                    const toolWithServer = availableTools.find(t => t.name === toolCall.function.name);
+                    const serverName = toolWithServer?.serverName || 'ydb-mcp-server';
+
+                    onData(`data: ${JSON.stringify({
                         type: 'tool_executing',
-                        tool_name: toolCall.name,
+                        tool_name: toolCall.function.name,
                         tool_id: toolCall.id,
-                    };
+                    })}\n\n`);
 
                     try {
                         const result = await this.mcpService.callTool(
-                            toolCall.serverName,
-                            toolCall.name,
-                            toolCall.arguments
+                            serverName,
+                            toolCall.function.name,
+                            JSON.parse(toolCall.function.arguments || '{}')
                         );
 
-                        // Add tool result message
-                        this.addMessage(sessionId, {
-                            role: 'tool',
-                            content: JSON.stringify(result),
-                            toolCallId: toolCall.id,
-                        });
-
-                        yield {
+                        onData(`data: ${JSON.stringify({
                             type: 'tool_result',
                             tool_id: toolCall.id,
                             result,
-                        };
+                        })}\n\n`);
                     } catch (error) {
                         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
                         
-                        this.addMessage(sessionId, {
-                            role: 'tool',
-                            content: JSON.stringify({ error: errorMessage }),
-                            toolCallId: toolCall.id,
-                        });
-
-                        yield {
+                        onData(`data: ${JSON.stringify({
                             type: 'tool_error',
                             tool_id: toolCall.id,
                             error: errorMessage,
-                        };
+                        })}\n\n`);
                     }
                 }
             }
 
-            yield { type: 'done' };
+            // Send completion
+            onData(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
 
         } catch (error) {
-            logger.error('Error in streaming chat completion', { sessionId, error });
-            yield {
+            logger.error('Error processing chat', { error });
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            onData(`data: ${JSON.stringify({
                 type: 'error',
-                error: error instanceof Error ? error.message : 'Unknown error',
-            };
-            throw new StreamingError('Failed to stream chat completion');
-        }
-    }
-
-    /**
-     * Stream completion for a chat session (alias for compatibility)
-     */
-    async* streamCompletion(sessionId: string, options: any = {}): AsyncGenerator<ChatDelta, void, unknown> {
-        yield* this.streamChatCompletion(sessionId, options);
-    }
-
-    /**
-     * Stream chat completion directly with messages (no session required)
-     */
-    async* streamDirectChatCompletion(messages: ChatMessage[], options: any = {}): AsyncGenerator<ChatDelta, void, unknown> {
-        try {
-            logger.debug('Starting direct chat completion', {
-                messageCount: messages.length,
-                options
-            });
-
-            // Get available tools
-            const availableTools = this.getAvailableTools();
-
-            // Create completion request
-            const request: ChatCompletionRequest = {
-                messages,
-                stream: true,
-                ...options
-            };
-
-            // Stream the completion
-            const stream = await this.llmService.createStreamingChatCompletion(request, availableTools);
-
-            let accumulatedContent = '';
-            let accumulatedToolCalls: any[] = [];
-
-            for await (const response of stream) {
-                // Convert StreamingChatResponse to ChatDelta
-                if (response.choices && response.choices.length > 0) {
-                    const choice = response.choices[0];
-                    if (choice) {
-                        const delta = choice.delta;
-                        
-                        if (delta.content) {
-                            accumulatedContent += delta.content;
-                            yield {
-                                type: 'content',
-                                content: delta.content
-                            };
-                        }
-                        
-                        if (delta.tool_calls) {
-                            for (const toolCall of delta.tool_calls) {
-                                if (toolCall.function) {
-                                    // Find the server that provides this tool
-                                    const toolWithServer = availableTools.find(t => t.name === toolCall.function.name);
-                                    const serverName = toolWithServer?.serverName || 'ydb-mcp-server';
-
-                                    accumulatedToolCalls.push({
-                                        id: toolCall.id,
-                                        name: toolCall.function.name,
-                                        arguments: JSON.parse(toolCall.function.arguments || '{}'),
-                                        serverName,
-                                    });
-
-                                    yield {
-                                        type: 'tool_call',
-                                        tool_calls: [toolCall]
-                                    };
-                                }
-                            }
-                        }
-                        
-                        if (choice.finish_reason) {
-                            // Execute tool calls if any
-                            if (accumulatedToolCalls.length > 0) {
-                                for (const toolCall of accumulatedToolCalls) {
-                                    yield {
-                                        type: 'tool_executing',
-                                        tool_name: toolCall.name,
-                                        tool_id: toolCall.id,
-                                    };
-
-                                    try {
-                                        const result = await this.mcpService.callTool(
-                                            toolCall.serverName,
-                                            toolCall.name,
-                                            toolCall.arguments
-                                        );
-
-                                        yield {
-                                            type: 'tool_result',
-                                            tool_id: toolCall.id,
-                                            result,
-                                        };
-                                    } catch (error) {
-                                        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-                                        
-                                        yield {
-                                            type: 'tool_error',
-                                            tool_id: toolCall.id,
-                                            error: errorMessage,
-                                        };
-                                    }
-                                }
-                            }
-
-                            yield {
-                                type: 'done'
-                            };
-                        }
-                    }
-                }
-            }
-
-            logger.debug('Direct chat completion finished');
-
-        } catch (error) {
-            logger.error('Direct chat completion failed', {
-                error: error instanceof Error ? error.message : String(error),
-                messageCount: messages.length
-            });
-
-            yield {
-                type: 'error',
-                error: error instanceof Error ? error.message : 'Unknown error',
-            };
-            throw new StreamingError('Failed to stream direct chat completion');
+                error: errorMessage,
+            })}\n\n`);
+            throw error;
         }
     }
 
@@ -381,100 +139,83 @@ export class ChatService extends EventEmitter {
     }
 
     /**
-     * Get available resources from all connected MCP servers
-     */
-    getAvailableResources(): Array<{ uri: string; name: string; serverName: string }> {
-        return this.mcpService.getAllResources();
-    }
-
-    /**
-     * Delete a chat session
-     */
-    deleteSession(sessionId: string): boolean {
-        const deleted = this.sessions.delete(sessionId);
-        if (deleted) {
-            logger.info('Chat session deleted', { sessionId });
-            this.emit('sessionDeleted', sessionId);
-        }
-        return deleted;
-    }
-
-    /**
-     * Clear old sessions
-     */
-    clearOldSessions(olderThanDays: number = 30): number {
-        const cutoffTime = Date.now() - (olderThanDays * 24 * 60 * 60 * 1000);
-        let deletedCount = 0;
-
-        for (const [sessionId, session] of this.sessions) {
-            if (session.updatedAt < cutoffTime) {
-                this.sessions.delete(sessionId);
-                deletedCount++;
-            }
-        }
-
-        if (deletedCount > 0) {
-            logger.info('Old sessions cleared', { deletedCount, olderThanDays });
-        }
-
-        return deletedCount;
-    }
-
-    /**
-     * Get health status of the chat service
+     * Get health status
      */
     async getHealthStatus(): Promise<{
-        chatService: { status: 'healthy' | 'degraded' | 'unhealthy'; sessionsCount: number };
+        chatService: { status: 'healthy' | 'degraded' | 'unhealthy' };
         llmService: { available: boolean; model: string; error?: string };
-        mcpService: { [serverName: string]: { status: string; lastHeartbeat: number | null } };
+        mcpService: { [serverName: string]: { status: string; toolCount: number; resourceCount: number } };
     }> {
         const llmHealth = await this.llmService.healthCheck();
         const mcpServers = this.mcpService.getServers();
-        const mcpHealth: { [serverName: string]: { status: string; lastHeartbeat: number | null } } = {};
+        const mcpHealth: { [serverName: string]: { status: string; toolCount: number; resourceCount: number } } = {};
         
         mcpServers.forEach(server => {
             mcpHealth[server.name] = {
                 status: server.status,
-                lastHeartbeat: Date.now(), // Current timestamp as we don't track heartbeats in new implementation
+                toolCount: server.toolCount,
+                resourceCount: server.resourceCount,
             };
         });
 
         return {
-            chatService: {
-                status: 'healthy',
-                sessionsCount: this.sessions.size,
-            },
+            chatService: { status: 'healthy' },
             llmService: llmHealth,
             mcpService: mcpHealth,
         };
     }
 
     /**
-     * Get service statistics
+     * Validate message data
      */
-    getStatistics(): {
-        totalSessions: number;
-        activeSessions: number;
-        totalMessages: number;
-        averageMessagesPerSession: number;
-    } {
-        const totalSessions = this.sessions.size;
-        const recentThreshold = Date.now() - (24 * 60 * 60 * 1000); // 24 hours
-        let activeSessions = 0;
-        let totalMessages = 0;
-
-        for (const session of this.sessions.values()) {
-            if (session.updatedAt > recentThreshold) {
-                activeSessions++;
-            }
-            totalMessages += session.messages.length;
+    private validateMessages(messages: ChatMessage[]): void {
+        if (!Array.isArray(messages)) {
+            throw new ValidationError('Messages must be an array');
         }
 
-        return {
-            totalSessions,
-            activeSessions,
-            totalMessages,
-            averageMessagesPerSession: totalSessions > 0 ? totalMessages / totalSessions : 0,
-        };
+        if (messages.length === 0) {
+            throw new ValidationError('Messages array cannot be empty');
+        }
+
+        for (const [index, message] of messages.entries()) {
+            if (!message.role || !message.content) {
+                throw new ValidationError(`Invalid message at index ${index}: role and content are required`);
+            }
+
+            if (!['user', 'assistant', 'system', 'tool'].includes(message.role)) {
+                throw new ValidationError(`Invalid role at index ${index}: ${message.role}`);
+            }
+
+            if (typeof message.content !== 'string') {
+                throw new ValidationError(`Message content at index ${index} must be a string`);
+            }
+        }
+    }
+
+    /**
+     * Format messages for LLM API
+     */
+    private formatMessagesForLLM(messages: ChatMessage[]): Array<{
+        role: string;
+        content: string;
+        tool_calls?: any[];
+        tool_call_id?: string;
+    }> {
+        return messages.map(msg => {
+            const formatted: any = {
+                role: msg.role,
+                content: msg.content,
+            };
+
+            if (msg.toolCalls) {
+                formatted.tool_calls = msg.toolCalls;
+            }
+
+            if (msg.toolCallId) {
+                formatted.tool_call_id = msg.toolCallId;
+            }
+
+            return formatted;
+        });
     }
 }

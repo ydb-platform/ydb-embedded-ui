@@ -71,137 +71,86 @@ app.get('/health', (_req, res) => {
     });
 });
 
-// Chat endpoints
-app.post('/api/chat/sessions', async (req, res) => {
+// Simple stateless chat endpoint
+app.post('/api/chat', async (req, res) => {
     try {
-        const { userId } = req.body;
-        const session = await chatService.createSession(userId);
-        res.json(session);
-    } catch (error) {
-        logger.error('Failed to create chat session', { error: error instanceof Error ? error.message : String(error) });
-        res.status(500).json({ error: 'Failed to create session' });
-    }
-});
-app.get('/api/chat/sessions/:sessionId', async (req, res) => {
-    try {
-        const { sessionId } = req.params;
-        const session = await chatService.getSession(sessionId);
-        
-        if (!session) {
-            return res.status(404).json({ error: 'Session not found' });
+        const { messages, model, temperature, maxTokens } = req.body;
+
+        if (!messages || !Array.isArray(messages)) {
+            return res.status(400).json({ error: 'Messages array is required' });
         }
-        
-        return res.json(session);
-    } catch (error) {
-        logger.error('Failed to get chat session', { error: error instanceof Error ? error.message : String(error), sessionId: req.params.sessionId });
-        return res.status(500).json({ error: 'Failed to get session' });
-    }
-});
-app.post('/api/chat/sessions/:sessionId/messages', async (req, res) => {
-    try {
-        const { sessionId } = req.params;
-        const { content, role = 'user' } = req.body;
-
-        if (!content) {
-            return res.status(400).json({ error: 'Message content is required' });
-        }
-
-        const message = await chatService.addMessage(sessionId, {
-            role,
-            content,
-        });
-
-        return res.json(message);
-    } catch (error) {
-        logger.error('Failed to add message', { error: error instanceof Error ? error.message : String(error), sessionId: req.params.sessionId });
-        return res.status(500).json({ error: 'Failed to add message' });
-    }
-});
-
-app.post('/api/chat/sessions/:sessionId/complete', async (req, res) => {
-    try {
-        const { sessionId } = req.params;
-        const options: ChatCompletionOptions = req.body;
 
         // Set response headers for streaming
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
         res.setHeader('Access-Control-Allow-Origin', '*');
-
-        const stream = chatService.streamCompletion(sessionId, options);
-
-        for await (const delta of stream) {
-            res.write(`data: ${JSON.stringify(delta)}\n\n`);
-        }
-
-        res.write('data: [DONE]\n\n');
-        res.end();
-    } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        logger.error('Failed to complete chat', { error: errorMessage, sessionId: req.params.sessionId });
-        
-        if (!res.headersSent) {
-            res.status(500).json({ error: 'Failed to complete chat' });
-        } else {
-            res.write(`data: ${JSON.stringify({ type: 'error', error: errorMessage })}\n\n`);
-            res.end();
-        }
-    }
-});
-
-// Direct chat endpoint (compatible with setupProxy.js pattern)
-app.post('/api/chat', async (req, res) => {
-    try {
-        // Set SSE headers
-        res.setHeader('Content-Type', 'text/event-stream');
-        res.setHeader('Cache-Control', 'no-cache');
-        res.setHeader('Connection', 'keep-alive');
-        res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-        
+
         if (req.method === 'OPTIONS') {
             res.status(200).end();
             return;
         }
 
-        const { messages } = req.body;
-        
-        if (!messages || !Array.isArray(messages)) {
-            res.write(`data: ${JSON.stringify({
-                type: 'error',
-                error: 'Invalid messages format'
-            })}\n\n`);
-            res.end();
-            return;
-        }
+        logger.info('Chat request received', { messageCount: messages.length });
 
-        logger.info('Direct chat request received', { messageCount: messages.length });
+        // Process chat with callback for streaming
+        await chatService.processChat(
+            messages,
+            (data) => res.write(data),
+            { model, temperature, maxTokens }
+        );
 
-        // Use the chat service to handle the request
-        const stream = chatService.streamDirectChatCompletion(messages);
-
-        for await (const delta of stream) {
-            res.write(`data: ${JSON.stringify(delta)}\n\n`);
-        }
-
-        // Send completion
-        res.write(`data: ${JSON.stringify({
-            type: 'done'
-        })}\n\n`);
         res.end();
-
     } catch (error) {
         logger.error('Chat error:', error);
         const errorMessage = error instanceof Error ? error.message : 'Internal server error';
-        res.write(`data: ${JSON.stringify({
-            type: 'error',
-            error: errorMessage
-        })}\n\n`);
-        res.end();
+        
+        if (!res.headersSent) {
+            res.status(500).json({ error: errorMessage });
+        } else {
+            res.write(`data: ${JSON.stringify({
+                type: 'error',
+                error: errorMessage
+            })}\n\n`);
+            res.end();
+        }
     }
 });
+
+// Chat health endpoint
+app.get('/api/chat/health', async (_req, res) => {
+    try {
+        const health = await chatService.getHealthStatus();
+        const tools = chatService.getAvailableTools();
+        
+        res.json({
+            status: health.chatService.status,
+            mcpConnected: health.llmService.available,
+            toolsAvailable: tools.length
+        });
+    } catch (error) {
+        logger.error('Chat health check failed', { error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({
+            status: 'error',
+            mcpConnected: false,
+            toolsAvailable: 0
+        });
+    }
+});
+
+// Chat tools endpoint
+app.get('/api/chat/tools', async (_req, res) => {
+    try {
+        const tools = chatService.getAvailableTools();
+        res.json(tools);
+    } catch (error) {
+        logger.error('Failed to get chat tools', { error: error instanceof Error ? error.message : String(error) });
+        res.status(500).json({ error: 'Failed to get tools' });
+    }
+});
+
 
 // MCP endpoints
 app.get('/api/mcp/servers', async (_req, res) => {
