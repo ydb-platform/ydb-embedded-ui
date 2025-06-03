@@ -22,24 +22,235 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
         return new Date(timestamp).toLocaleTimeString();
     };
 
+    const safeParseJSON = (jsonString: string) => {
+        try {
+            // If it's already an object, return it
+            if (typeof jsonString === 'object' && jsonString !== null) {
+                return jsonString;
+            }
+            
+            // If it's an empty string, return empty object
+            if (!jsonString || jsonString.trim() === '') {
+                return {};
+            }
+            
+            // Try to parse the JSON string
+            return JSON.parse(jsonString);
+        } catch (error) {
+            // If parsing fails, return the raw string for display
+            console.warn('Failed to parse tool call arguments as JSON:', error);
+            return { raw: jsonString };
+        }
+    };
+
+    const formatToolResult = (content: string) => {
+        try {
+            const parsed = JSON.parse(content);
+            
+            // Handle MCP tool result format with content array
+            let actualData = parsed;
+            if (parsed.content && Array.isArray(parsed.content) && parsed.content.length > 0) {
+                const contentItem = parsed.content[0];
+                if (contentItem.text) {
+                    try {
+                        actualData = JSON.parse(contentItem.text);
+                    } catch {
+                        actualData = contentItem.text;
+                    }
+                }
+            }
+            
+            // Special formatting for different types of results
+            if (actualData.clusters && Array.isArray(actualData.clusters)) {
+                return {
+                    type: 'clusters',
+                    data: actualData,
+                    formatted: `🏢 Found ${actualData.clusters.length} clusters:\n\n${actualData.clusters.map((cluster: any) => 
+                        `• **${cluster.title || cluster.name}**\n  Environment: ${cluster.environment || 'unknown'}\n  Status: ${cluster.status || 'unknown'}\n  Owner: ${cluster.owner || 'unknown'}`
+                    ).join('\n\n')}`
+                };
+            }
+            
+            if (actualData.databases && Array.isArray(actualData.databases)) {
+                return {
+                    type: 'databases',
+                    data: actualData,
+                    formatted: `🗄️ Found ${actualData.databases.length} databases:\n\n${actualData.databases.map((db: any) => 
+                        `• **${db.name}**\n  Type: ${db.type || 'unknown'}\n  Status: ${db.status || 'unknown'}`
+                    ).join('\n\n')}`
+                };
+            }
+            
+            if (actualData.nodes && Array.isArray(actualData.nodes)) {
+                return {
+                    type: 'nodes',
+                    data: actualData,
+                    formatted: `🖥️ Found ${actualData.nodes.length} nodes:\n\n${actualData.nodes.map((node: any) => 
+                        `• **${node.host || node.id}**\n  Status: ${node.status || 'unknown'}\n  Load: ${node.load || 'unknown'}`
+                    ).join('\n\n')}`
+                };
+            }
+            
+            // Handle error responses
+            if (parsed.isError === false && parsed.content) {
+                return {
+                    type: 'success',
+                    data: parsed,
+                    formatted: '✅ Tool executed successfully'
+                };
+            }
+            
+            if (parsed.isError === true) {
+                return {
+                    type: 'error',
+                    data: parsed,
+                    formatted: '❌ Tool execution failed'
+                };
+            }
+            
+            // For other structured data, show a summary
+            if (typeof actualData === 'object' && actualData !== null) {
+                const keys = Object.keys(actualData);
+                if (keys.length > 0) {
+                    return {
+                        type: 'object',
+                        data: actualData,
+                        formatted: `📋 Result contains: ${keys.join(', ')}`
+                    };
+                }
+            }
+            
+            // If it's a string, show it directly
+            if (typeof actualData === 'string') {
+                return {
+                    type: 'text',
+                    data: actualData,
+                    formatted: actualData
+                };
+            }
+            
+            return {
+                type: 'json',
+                data: actualData,
+                formatted: JSON.stringify(actualData, null, 2)
+            };
+        } catch (error) {
+            return {
+                type: 'text',
+                data: content,
+                formatted: content
+            };
+        }
+    };
+
     const renderToolCalls = () => {
         if (!message.toolCalls || message.toolCalls.length === 0) return null;
 
         return (
             <div className="chat-message__tool-calls">
-                {message.toolCalls.map((toolCall) => (
-                    <div key={toolCall.id} className="chat-message__tool-call">
-                        <div className="chat-message__tool-header">
-                            <Icon data={ToolIcon} />
-                            <span className="chat-message__tool-name">
-                                {toolCall.function.name}
-                            </span>
+                {message.toolCalls.map((toolCall) => {
+                    const parsedArgs = safeParseJSON(toolCall.function.arguments);
+                    
+                    return (
+                        <div key={toolCall.id} className="chat-message__tool-call">
+                            <div className="chat-message__tool-header">
+                                <Icon data={ToolIcon} />
+                                <span className="chat-message__tool-name">
+                                    {toolCall.function.name}
+                                </span>
+                            </div>
+                            <div className="chat-message__tool-args">
+                                <details>
+                                    <summary>Arguments</summary>
+                                    <pre>{JSON.stringify(parsedArgs, null, 2)}</pre>
+                                </details>
+                            </div>
                         </div>
-                        <div className="chat-message__tool-args">
-                            <pre>{JSON.stringify(JSON.parse(toolCall.function.arguments), null, 2)}</pre>
-                        </div>
+                    );
+                })}
+            </div>
+        );
+    };
+
+    const renderFormattedText = (text: string) => {
+        // Split by double newlines to create paragraphs
+        const paragraphs = text.split('\n\n');
+        
+        return paragraphs.map((paragraph, index) => {
+            // Check if it's a header line (starts with emoji)
+            if (paragraph.match(/^[🏢🗄️🖥️📋✅❌]/)) {
+                return (
+                    <div key={index} className="chat-message__result-header">
+                        {paragraph}
                     </div>
-                ))}
+                );
+            }
+            
+            // Process bullet points and bold text
+            const lines = paragraph.split('\n');
+            return (
+                <div key={index} className="chat-message__result-section">
+                    {lines.map((line, lineIndex) => {
+                        if (line.startsWith('• **') && line.includes('**')) {
+                            // Extract the bold part and the rest
+                            const match = line.match(/^• \*\*(.*?)\*\*(.*)$/);
+                            if (match) {
+                                return (
+                                    <div key={lineIndex} className="chat-message__result-item">
+                                        <div className="chat-message__result-item-title">
+                                            • <strong>{match[1]}</strong>
+                                        </div>
+                                        {match[2] && (
+                                            <div className="chat-message__result-item-details">
+                                                {match[2]}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            }
+                        }
+                        
+                        // Handle regular lines with indentation
+                        if (line.trim().startsWith('Environment:') || 
+                            line.trim().startsWith('Status:') || 
+                            line.trim().startsWith('Owner:') ||
+                            line.trim().startsWith('Type:') ||
+                            line.trim().startsWith('Load:')) {
+                            return (
+                                <div key={lineIndex} className="chat-message__result-detail">
+                                    {line.trim()}
+                                </div>
+                            );
+                        }
+                        
+                        return line.trim() ? (
+                            <div key={lineIndex} className="chat-message__result-line">
+                                {line}
+                            </div>
+                        ) : null;
+                    })}
+                </div>
+            );
+        });
+    };
+
+    const renderToolResults = () => {
+        // Look for tool result messages that follow this message
+        if (message.role !== 'tool') return null;
+
+        const result = formatToolResult(message.content);
+        
+        return (
+            <div className="chat-message__tool-result">
+                <div className="chat-message__tool-result-summary">
+                    {renderFormattedText(result.formatted)}
+                </div>
+                {result.type !== 'text' && (
+                    <details className="chat-message__tool-result-details">
+                        <summary>Raw Data</summary>
+                        <pre>{JSON.stringify(result.data, null, 2)}</pre>
+                    </details>
+                )}
             </div>
         );
     };
@@ -100,15 +311,19 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
             </div>
 
             <div className="chat-message__content">
-                {message.content && (
-                    <div className="chat-message__text">
-                        {message.content.split('\n').map((line, index) => (
-                            <React.Fragment key={index}>
-                                {line}
-                                {index < message.content.split('\n').length - 1 && <br />}
-                            </React.Fragment>
-                        ))}
-                    </div>
+                {message.role === 'tool' ? (
+                    renderToolResults()
+                ) : (
+                    message.content && (
+                        <div className="chat-message__text">
+                            {message.content.split('\n').map((line, index) => (
+                                <React.Fragment key={index}>
+                                    {line}
+                                    {index < message.content.split('\n').length - 1 && <br />}
+                                </React.Fragment>
+                            ))}
+                        </div>
+                    )
                 )}
 
                 {renderToolCalls()}

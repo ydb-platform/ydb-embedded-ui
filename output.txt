@@ -18,24 +18,24 @@
 [1] > ydb-embedded-ui@9.3.0 start
 [1] > react-app-rewired start
 [1] 
-[0] {"baseURL":"https://api.eliza.yandex.net/raw/openai/v1","component":"LLMService","level":"info","message":"LLM service initialized","model":"gpt-4.1","sslValidation":false,"timestamp":"2025-06-03T13:30:18.996Z"}
-[0] {"component":"ChatService","level":"info","message":"Chat service initialized","timestamp":"2025-06-03T13:30:18.996Z"}
-[0] {"level":"info","message":"Starting MCP server initialization","serverUrl":"http://ui-dev-0.ydb.yandex.net:8784/meta/mcp","timeout":5000,"timestamp":"2025-06-03T13:30:18.997Z"}
-[0] {"level":"info","message":"MCP server registered","name":"ydb-mcp-server","timestamp":"2025-06-03T13:30:18.997Z","type":"sse"}
-[0] {"level":"info","message":"MCP server registered, attempting connection...","timestamp":"2025-06-03T13:30:18.998Z"}
-[0] {"level":"info","message":"Connecting to SSE MCP server","name":"ydb-mcp-server","timestamp":"2025-06-03T13:30:18.998Z","url":"http://ui-dev-0.ydb.yandex.net:8784/meta/mcp"}
-[0] {"environment":"development","level":"info","logLevel":"info","message":"Chat server started on port 3001","timestamp":"2025-06-03T13:30:19.010Z"}
-[0] {"level":"info","message":"SSE MCP server connected successfully","name":"ydb-mcp-server","timestamp":"2025-06-03T13:30:19.107Z","url":"http://ui-dev-0.ydb.yandex.net:8784/meta/mcp"}
-[0] {"level":"info","message":"Retrieved all tools","timestamp":"2025-06-03T13:30:19.164Z","toolNames":["ydb-get-clusters","ydb-get-clusters-info","ydb-get-cluster-health-check","ydb-get-database-health-check","ydb-get-acl","ydb-post-acl","ydb-post-render","ydb-post-database","ydb-get-describe","ydb-get-config","ydb-get-cluster","ydb-get-databases","ydb-get-database-info","ydb-get-whoami","ydb-post-query","ydb-get-nodes","ydb-get-autocomplete","ydb-get-feature_flags","ydb-get-pdisk-info","ydb-post-pdisk-restart","ydb-post-vdisk-evict","ydb-get-storage-groups","ydb-get-scheme-directory"],"toolsByServer":{"ydb-mcp-server":23},"totalTools":23}
-[0] {"level":"info","message":"YDB MCP server registered and connected","timestamp":"2025-06-03T13:30:19.164Z","tools":["ydb-get-clusters","ydb-get-clusters-info","ydb-get-cluster-health-check","ydb-get-database-health-check","ydb-get-acl","ydb-post-acl","ydb-post-render","ydb-post-database","ydb-get-describe","ydb-get-config","ydb-get-cluster","ydb-get-databases","ydb-get-database-info","ydb-get-whoami","ydb-post-query","ydb-get-nodes","ydb-get-autocomplete","ydb-get-feature_flags","ydb-get-pdisk-info","ydb-post-pdisk-restart","ydb-post-vdisk-evict","ydb-get-storage-groups","ydb-get-scheme-directory"],"toolsDiscovered":23,"url":"http://ui-dev-0.ydb.yandex.net:8784/meta/mcp"}
+[0] {"baseURL":"https://api.eliza.yandex.net/raw/openai/v1","component":"LLMService","level":"info","message":"LLM service initialized","model":"gpt-4.1","sslValidation":false,"timestamp":"2025-06-03T13:52:02.207Z"}
+[0] {"component":"ChatService","level":"info","message":"Chat service initialized","timestamp":"2025-06-03T13:52:02.208Z"}
+[0] {"level":"info","message":"Starting MCP server initialization","serverUrl":"http://ui-dev-0.ydb.yandex.net:8784/meta/mcp","timeout":5000,"timestamp":"2025-06-03T13:52:02.208Z"}
+[0] {"level":"info","message":"MCP server registered","name":"ydb-mcp-server","timestamp":"2025-06-03T13:52:02.208Z","type":"sse"}
+[0] {"level":"info","message":"MCP server registered, attempting connection...","timestamp":"2025-06-03T13:52:02.209Z"}
+[0] {"level":"info","message":"Connecting to SSE MCP server","name":"ydb-mcp-server","timestamp":"2025-06-03T13:52:02.209Z","url":"http://ui-dev-0.ydb.yandex.net:8784/meta/mcp"}
+[0] {"environment":"development","level":"info","logLevel":"info","message":"Chat server started on port 3001","timestamp":"2025-06-03T13:52:02.222Z"}
+[0] {"level":"info","message":"SSE MCP server connected successfully","name":"ydb-mcp-server","timestamp":"2025-06-03T13:52:02.318Z","url":"http://ui-dev-0.ydb.yandex.net:8784/meta/mcp"}
+[0] {"level":"info","message":"Retrieved all tools","timestamp":"2025-06-03T13:52:02.364Z","toolNames":["ydb-get-clusters","ydb-get-clusters-info","ydb-get-cluster-health-check","ydb-get-database-health-check","ydb-get-acl","ydb-post-acl","ydb-post-render","ydb-post-database","ydb-get-describe","ydb-get-config","ydb-get-cluster","ydb-get-databases","ydb-get-database-info","ydb-get-whoami","ydb-post-query","ydb-get-nodes","ydb-get-autocomplete","ydb-get-feature_flags","ydb-get-pdisk-info","ydb-post-pdisk-restart","ydb-post-vdisk-evict","ydb-get-storage-groups","ydb-get-scheme-directory"],"toolsByServer":{"ydb-mcp-server":23},"totalTools":23}
+[0] {"level":"info","message":"YDB MCP server registered and connected","timestamp":"2025-06-03T13:52:02.364Z","tools":["ydb-get-clusters","ydb-get-clusters-info","ydb-get-cluster-health-check","ydb-get-database-health-check","ydb-get-acl","ydb-post-acl","ydb-post-render","ydb-post-database","ydb-get-describe","ydb-get-config","ydb-get-cluster","ydb-get-databases","ydb-get-database-info","ydb-get-whoami","ydb-post-query","ydb-get-nodes","ydb-get-autocomplete","ydb-get-feature_flags","ydb-get-pdisk-info","ydb-post-pdisk-restart","ydb-post-vdisk-evict","ydb-get-storage-groups","ydb-get-scheme-directory"],"toolsDiscovered":23,"url":"http://ui-dev-0.ydb.yandex.net:8784/meta/mcp"}
 [1] Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
 [1]   npx update-browserslist-db@latest
 [1]   Why you should do it regularly: https://github.com/browserslist/update-db#readme
 [1] [HPM] Proxy created: /  -> http://localhost:3001
 [1] [HPM] Proxy rewrite rule created: "^/api/chat" ~> "/api/chat"
-[1] (node:24105) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+[1] (node:28469) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
 [1] (Use `node --trace-deprecation ...` to show where the warning was created)
-[1] (node:24105) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+[1] (node:28469) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
 [1] Starting the development server...
 [1] 
 [1] Compiled with warnings.
@@ -44,6 +44,13 @@
 [1] 
 [1] Search for the keywords to learn more about each warning.
 [1] To ignore, add // eslint-disable-next-line to the line before.
+[1] 
+[1] LOG from ./node_modules/sass-loader/dist/cjs.js sass-loader ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[9].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[9].use[2]!./node_modules/resolve-url-loader/index.js??ruleSet[1].rules[1].oneOf[9].use[3]!./node_modules/sass-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[9].use[4]!./src/features/chat/components/ChatMessage/ChatMessage.scss
+[1] <w> Deprecation The legacy JS API is deprecated and will be removed in Dart Sass 2.0.0.
+[1] <w> 
+[1] <w> More info: https://sass-lang.com/d/legacy-js-api
+[1] <w> 
+[1] <w> null
 [1] 
 [1] WARNING in ./node_modules/monaco-editor/esm/vs/base/common/marked/marked.js
 [1] Module Warning (from ./node_modules/source-map-loader/dist/cjs.js):
@@ -54,24 +61,16 @@
 [1] Type-checking in progress...
 [1] No errors found.
 [1] [Chat Proxy] POST /api/chat -> http://localhost:3001/api/chat
-[0] {"ip":"::1","level":"info","message":"Request started","method":"POST","requestId":"req_1748957433941_nu8ojjqmy","timestamp":"2025-06-03T13:30:33.941Z","url":"/api/chat","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 YaBrowser/25.2.0.0 Safari/537.36"}
-[0] {"level":"info","message":"Direct chat request received","messageCount":1,"timestamp":"2025-06-03T13:30:33.941Z"}
-[0] {"level":"info","message":"Retrieved all tools","timestamp":"2025-06-03T13:30:33.942Z","toolNames":["ydb-get-clusters","ydb-get-clusters-info","ydb-get-cluster-health-check","ydb-get-database-health-check","ydb-get-acl","ydb-post-acl","ydb-post-render","ydb-post-database","ydb-get-describe","ydb-get-config","ydb-get-cluster","ydb-get-databases","ydb-get-database-info","ydb-get-whoami","ydb-post-query","ydb-get-nodes","ydb-get-autocomplete","ydb-get-feature_flags","ydb-get-pdisk-info","ydb-post-pdisk-restart","ydb-post-vdisk-evict","ydb-get-storage-groups","ydb-get-scheme-directory"],"toolsByServer":{"ydb-mcp-server":23},"totalTools":23}
-[0] (node:24106) Warning: Setting the NODE_TLS_REJECT_UNAUTHORIZED environment variable to '0' makes TLS connections and HTTPS requests insecure by disabling certificate verification.
+[0] {"ip":"::1","level":"info","message":"Request started","method":"POST","requestId":"req_1748958737599_4vojq8ge1","timestamp":"2025-06-03T13:52:17.599Z","url":"/api/chat","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 YaBrowser/25.2.0.0 Safari/537.36"}
+[0] {"level":"info","message":"Direct chat request received","messageCount":1,"timestamp":"2025-06-03T13:52:17.600Z"}
+[0] {"level":"info","message":"Retrieved all tools","timestamp":"2025-06-03T13:52:17.600Z","toolNames":["ydb-get-clusters","ydb-get-clusters-info","ydb-get-cluster-health-check","ydb-get-database-health-check","ydb-get-acl","ydb-post-acl","ydb-post-render","ydb-post-database","ydb-get-describe","ydb-get-config","ydb-get-cluster","ydb-get-databases","ydb-get-database-info","ydb-get-whoami","ydb-post-query","ydb-get-nodes","ydb-get-autocomplete","ydb-get-feature_flags","ydb-get-pdisk-info","ydb-post-pdisk-restart","ydb-post-vdisk-evict","ydb-get-storage-groups","ydb-get-scheme-directory"],"toolsByServer":{"ydb-mcp-server":23},"totalTools":23}
+[0] (node:28470) Warning: Setting the NODE_TLS_REJECT_UNAUTHORIZED environment variable to '0' makes TLS connections and HTTPS requests insecure by disabling certificate verification.
 [0] (Use `node --trace-warnings ...` to show where the warning was created)
-[0] {"component":"LLMService","level":"info","message":"Streaming chat completion started","timestamp":"2025-06-03T13:30:36.120Z"}
-[0] {"arguments":{},"level":"info","message":"Calling MCP tool","serverName":"ydb-mcp-server","timestamp":"2025-06-03T13:30:36.128Z","toolName":"ydb-get-clusters"}
-[0] {"level":"info","message":"Tool call completed","serverName":"ydb-mcp-server","timestamp":"2025-06-03T13:30:36.204Z","toolName":"ydb-get-clusters"}
-[0] {"duration":2266,"level":"info","message":"Request completed","method":"POST","requestId":"req_1748957433941_nu8ojjqmy","statusCode":200,"timestamp":"2025-06-03T13:30:36.207Z","url":"/api/chat"}
-[1] [Chat Proxy] POST /api/chat -> http://localhost:3001/api/chat
-[0] {"ip":"::1","level":"info","message":"Request started","method":"POST","requestId":"req_1748957456909_048029rji","timestamp":"2025-06-03T13:30:56.909Z","url":"/api/chat","userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 YaBrowser/25.2.0.0 Safari/537.36"}
-[0] {"level":"info","message":"Direct chat request received","messageCount":1,"timestamp":"2025-06-03T13:30:56.910Z"}
-[0] {"level":"info","message":"Retrieved all tools","timestamp":"2025-06-03T13:30:56.910Z","toolNames":["ydb-get-clusters","ydb-get-clusters-info","ydb-get-cluster-health-check","ydb-get-database-health-check","ydb-get-acl","ydb-post-acl","ydb-post-render","ydb-post-database","ydb-get-describe","ydb-get-config","ydb-get-cluster","ydb-get-databases","ydb-get-database-info","ydb-get-whoami","ydb-post-query","ydb-get-nodes","ydb-get-autocomplete","ydb-get-feature_flags","ydb-get-pdisk-info","ydb-post-pdisk-restart","ydb-post-vdisk-evict","ydb-get-storage-groups","ydb-get-scheme-directory"],"toolsByServer":{"ydb-mcp-server":23},"totalTools":23}
-[0] {"component":"LLMService","level":"info","message":"Streaming chat completion started","timestamp":"2025-06-03T13:30:58.558Z"}
-[0] {"arguments":{},"level":"info","message":"Calling MCP tool","serverName":"ydb-mcp-server","timestamp":"2025-06-03T13:30:58.560Z","toolName":"ydb-get-clusters"}
-[0] {"level":"info","message":"Tool call completed","serverName":"ydb-mcp-server","timestamp":"2025-06-03T13:30:58.603Z","toolName":"ydb-get-clusters"}
-[0] {"duration":1695,"level":"info","message":"Request completed","method":"POST","requestId":"req_1748957456909_048029rji","statusCode":200,"timestamp":"2025-06-03T13:30:58.604Z","url":"/api/chat"}
-[0] {"level":"info","message":"SIGINT received, shutting down gracefully","timestamp":"2025-06-03T13:31:13.190Z"}
-[0] 4:31:13 pm [tsx] Previous process hasn't exited yet. Force killing...
+[0] {"component":"LLMService","level":"info","message":"Streaming chat completion started","timestamp":"2025-06-03T13:52:20.257Z"}
+[0] {"arguments":{},"level":"info","message":"Calling MCP tool","serverName":"ydb-mcp-server","timestamp":"2025-06-03T13:52:20.262Z","toolName":"ydb-get-clusters"}
+[0] {"level":"info","message":"Tool call completed","serverName":"ydb-mcp-server","timestamp":"2025-06-03T13:52:20.309Z","toolName":"ydb-get-clusters"}
+[0] {"duration":2712,"level":"info","message":"Request completed","method":"POST","requestId":"req_1748958737599_4vojq8ge1","statusCode":200,"timestamp":"2025-06-03T13:52:20.311Z","url":"/api/chat"}
+[0] {"level":"info","message":"SIGINT received, shutting down gracefully","timestamp":"2025-06-03T13:52:43.490Z"}
+[0] 4:52:43 pm [tsx] Previous process hasn't exited yet. Force killing...
 [0] npm run dev:chat-server exited with code 0
 [1] npm run dev:app exited with code SIGINT

@@ -133,6 +133,105 @@
         padding-top: 4px;
         border-top: 1px solid var(--g-color-line-generic);
     }
+
+    &__tool-result {
+        background: var(--g-color-base-background);
+        border: 1px solid var(--g-color-line-generic);
+        border-radius: 6px;
+        padding: 12px;
+    }
+
+    &__tool-result-summary {
+        font-size: 14px;
+        line-height: 1.6;
+        color: var(--g-color-text-primary);
+    }
+
+    &__result-header {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--g-color-text-primary);
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--g-color-line-generic);
+    }
+
+    &__result-section {
+        margin-bottom: 12px;
+    }
+
+    &__result-item {
+        margin-bottom: 12px;
+        padding: 8px;
+        background: var(--g-color-base-float);
+        border-radius: 6px;
+        border-left: 3px solid var(--g-color-line-info);
+    }
+
+    &__result-item-title {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--g-color-text-primary);
+        margin-bottom: 4px;
+
+        strong {
+            font-weight: 600;
+            color: var(--g-color-text-primary);
+        }
+    }
+
+    &__result-item-details {
+        margin-left: 16px;
+    }
+
+    &__result-detail {
+        font-size: 13px;
+        color: var(--g-color-text-secondary);
+        margin-left: 16px;
+        margin-bottom: 2px;
+        
+        &:before {
+            content: "  ";
+            white-space: pre;
+        }
+    }
+
+    &__result-line {
+        font-size: 14px;
+        color: var(--g-color-text-primary);
+        margin-bottom: 4px;
+    }
+
+    &__tool-result-details {
+        margin-top: 8px;
+        
+        summary {
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--g-color-text-secondary);
+            padding: 4px 0;
+            border-bottom: 1px solid var(--g-color-line-generic);
+            margin-bottom: 8px;
+            
+            &:hover {
+                color: var(--g-color-text-primary);
+            }
+        }
+
+        pre {
+            font-family: var(--g-text-code-font-family);
+            font-size: 11px;
+            background: var(--g-color-base-generic);
+            border-radius: 4px;
+            padding: 8px;
+            overflow-x: auto;
+            margin: 0;
+            color: var(--g-color-text-primary);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    }
 }
 
 // Code blocks styling

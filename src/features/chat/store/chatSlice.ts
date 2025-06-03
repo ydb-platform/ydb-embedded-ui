@@ -55,6 +55,7 @@ const chatSlice = createSlice({
         // Handle streaming deltas
         processDelta: (state, action: PayloadAction<ChatDelta>) => {
             const delta = action.payload;
+            console.log('Processing delta:', delta);
             
             switch (delta.type) {
                 case 'content':
@@ -104,9 +105,15 @@ const chatSlice = createSlice({
                     }
                     break;
 
+                case 'tool_executing':
+                    // Just log that tool is executing, don't add a message
+                    console.log('Tool executing:', delta.tool_name, delta.tool_id);
+                    break;
+
                 case 'tool_result':
                     // Add tool result as a separate message
                     if (delta.tool_id && delta.result) {
+                        console.log('Adding tool result message:', delta.tool_id, delta.result);
                         state.messages.push({
                             id: `tool-result-${Date.now()}`,
                             role: 'tool',
