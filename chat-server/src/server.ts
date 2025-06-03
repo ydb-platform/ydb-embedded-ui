@@ -1,9 +1,13 @@
 import express from 'express';
 import cors from 'cors';
+// Polyfill EventSource for Node.js environment
+import { EventSource } from 'eventsource';
+(global as any).EventSource = EventSource;
+
 import { appConfig, getMCPConfig } from './utils/config';
 import { logger, requestLogger } from './utils/logger';
 import { ChatService } from './services/chat.service';
-import { getMCPService } from './services/mcp.service';
+import { getMCPService } from './services/mcp';
 import { ChatCompletionOptions } from './types/chat';
 import { AppError } from './utils/errors';
 
@@ -23,18 +27,35 @@ async function initializeMCPServers() {
     try {
         const mcpConfig = getMCPConfig();
         
+        logger.info('Starting MCP server initialization', {
+            serverUrl: mcpConfig.serverUrl,
+            timeout: mcpConfig.timeout
+        });
+        
         await mcpService.registerServer({
             name: 'ydb-mcp-server',
             type: 'sse',
             url: mcpConfig.serverUrl,
         });
         
+        logger.info('MCP server registered, attempting connection...');
+        
         // Connect to the server
         await mcpService.connectServer('ydb-mcp-server');
         
-        logger.info('YDB MCP server registered and connected', { url: mcpConfig.serverUrl });
+        // Get available tools to verify connection
+        const tools = mcpService.getAllTools();
+        
+        logger.info('YDB MCP server registered and connected', {
+            url: mcpConfig.serverUrl,
+            toolsDiscovered: tools.length,
+            tools: tools.map(t => t.name)
+        });
     } catch (error) {
-        logger.error('Failed to initialize MCP servers', { error: error instanceof Error ? error.message : String(error) });
+        logger.error('Failed to initialize MCP servers', {
+            error: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined
+        });
     }
 }
 

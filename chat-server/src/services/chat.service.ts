@@ -2,7 +2,7 @@ import { EventEmitter } from 'events';
 import { createComponentLogger, logChatInteraction } from '../utils/logger';
 import { ValidationError, StreamingError } from '../utils/errors';
 import { getLLMService } from './llm.service';
-import { getMCPService } from './mcp.service';
+import { getMCPService } from './mcp';
 import {
     ChatMessage,
     ChatSession,
@@ -22,16 +22,7 @@ export class ChatService extends EventEmitter {
         super();
         logger.info('Chat service initialized');
         
-        // Listen to MCP events
-        this.mcpService.on('serverConnected', (server) => {
-            logger.info('MCP server connected', { serverName: server.name });
-            this.emit('mcpServerConnected', server);
-        });
-
-        this.mcpService.on('serverDisconnected', (server) => {
-            logger.info('MCP server disconnected', { serverName: server.name });
-            this.emit('mcpServerDisconnected', server);
-        });
+        // MCP service is initialized without event listeners in the new implementation
     }
 
     /**
@@ -112,6 +103,12 @@ export class ChatService extends EventEmitter {
         try {
             // Get available tools
             const availableTools = this.getAvailableTools();
+
+            logger.info('Available tools for chat completion', {
+                sessionId,
+                toolCount: availableTools.length,
+                tools: availableTools.map(t => ({ name: t.name, server: t.serverName }))
+            });
 
             // Prepare request for LLM
             const request: ChatCompletionRequest = {
@@ -432,7 +429,15 @@ export class ChatService extends EventEmitter {
         mcpService: { [serverName: string]: { status: string; lastHeartbeat: number | null } };
     }> {
         const llmHealth = await this.llmService.healthCheck();
-        const mcpHealth = await this.mcpService.healthCheck();
+        const mcpServers = this.mcpService.getServers();
+        const mcpHealth: { [serverName: string]: { status: string; lastHeartbeat: number | null } } = {};
+        
+        mcpServers.forEach(server => {
+            mcpHealth[server.name] = {
+                status: server.status,
+                lastHeartbeat: Date.now(), // Current timestamp as we don't track heartbeats in new implementation
+            };
+        });
 
         return {
             chatService: {

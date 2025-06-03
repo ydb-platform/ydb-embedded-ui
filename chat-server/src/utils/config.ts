@@ -22,7 +22,7 @@ const configSchema = z.object({
     ALLOWED_ORIGINS: z.string().default('http://localhost:3000,http://localhost:3001'),
 
     // Logging Configuration
-    LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),
+    LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('debug'),
     LOG_FORMAT: z.enum(['json', 'simple']).default('json'),
 
     // Security
