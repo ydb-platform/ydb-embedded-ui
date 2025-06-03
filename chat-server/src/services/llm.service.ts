@@ -43,14 +43,41 @@ export class LLMService {
      * Convert MCP tools to OpenAI function format
      */
     private convertMCPToolsToFunctions(tools: MCPTool[]): OpenAI.Chat.ChatCompletionTool[] {
-        return tools.map(tool => ({
-            type: 'function' as const,
-            function: {
-                name: tool.name,
-                description: tool.description,
-                parameters: tool.inputSchema,
-            },
-        }));
+        const convertedTools = tools.map(tool => {
+            // Clean up the input schema - remove MCP-specific fields
+            const cleanSchema = {
+                type: tool.inputSchema?.type || 'object',
+                properties: tool.inputSchema?.properties || {},
+                required: tool.inputSchema?.required || []
+            };
+
+            const converted = {
+                type: 'function' as const,
+                function: {
+                    name: tool.name,
+                    description: tool.description,
+                    parameters: cleanSchema,
+                },
+            };
+
+            logger.debug('Converted MCP tool to OpenAI format', {
+                originalTool: {
+                    name: tool.name,
+                    description: tool.description,
+                    inputSchema: tool.inputSchema
+                },
+                convertedTool: converted
+            });
+
+            return converted;
+        });
+
+        logger.info('Converted all MCP tools to OpenAI format', {
+            toolCount: convertedTools.length,
+            toolNames: convertedTools.map(t => t.function.name)
+        });
+
+        return convertedTools;
     }
 
     /**
@@ -107,11 +134,6 @@ export class LLMService {
         availableTools: MCPTool[] = []
     ): Promise<AsyncIterable<StreamingChatResponse>> {
         try {
-            logger.debug('Creating streaming chat completion', {
-                messageCount: request.messages.length,
-                model: request.model || this.config.model,
-                toolsCount: availableTools.length,
-            });
 
             const tools = availableTools.length > 0 
                 ? this.convertMCPToolsToFunctions(availableTools)
@@ -129,6 +151,9 @@ export class LLMService {
                 streamParams.tools = tools;
                 streamParams.tool_choice = 'auto';
             }
+
+            console.log('-------'.repeat(10));
+            console.log(JSON.stringify(streamParams));
 
             const stream = await this.client.chat.completions.create(streamParams);
 

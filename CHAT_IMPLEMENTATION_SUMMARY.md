@@ -1,4 +1,4 @@
-# YDB Embedded UI Chat Feature - Simplified Stateless Architecture
+# YDB Embedded UI Chat Feature - Agent Loop Architecture
 
 ## System Architecture
 
@@ -6,9 +6,9 @@
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │   React UI      │◄──►│  Chat Server     │◄──►│   Eliza API     │
 │                 │    │                  │    │                 │
-│ - ChatPanel     │    │ - ChatService    │    │ - OpenAI Compat │
-│ - ChatMessage   │    │ - Stateless      │    │ - Streaming     │
-│ - Redux State   │    │ - Simple         │    │ - Tool Calls    │
+│ - ChatPanel     │    │ - Agent Loop     │    │ - OpenAI Compat │
+│ - ChatMessage   │    │ - Tool Execution │    │ - Streaming     │
+│ - Redux State   │    │ - Iterative      │    │ - Tool Calls    │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
                                 │
                                 ▼
@@ -20,68 +20,135 @@
                        └─────────────────┘
 ```
 
-## Simplified ChatService Architecture
+## Agent Loop Architecture
 
 ### Core Principle
-**Frontend manages all state, backend is purely stateless and processes requests**
+**LLM autonomously decides when to call tools and when to stop**
 
-### Single Service Design
-
-```
-ChatService (Stateless Processor)
-├── processChat()           # Main processing method
-├── validateMessages()      # Input validation
-├── formatMessagesForLLM()  # Message formatting
-├── getAvailableTools()     # Tool discovery
-└── getHealthStatus()       # Health monitoring
-```
-
-### Dependencies
-- **LLMService** - Eliza API communication
-- **MCPService** - YDB tool integration
-
-## Request Flow
-
-### Stateless Chat Processing
+### Agent Loop Flow
 
 ```
-1. Frontend → POST /api/chat { messages: [...] }
-2. ChatService.processChat(messages, onData, options)
-3. Validate messages
-4. Get available MCP tools
-5. Format messages for LLM
-6. LLMService.createStreamingChatCompletion()
-7. For each chunk:
-   - Content → stream { type: 'content', content }
-   - Tool calls → execute via MCPService
-   - Results → stream { type: 'tool_result', result }
-8. Stream { type: 'done' }
+for iteration in range(maxIterations):
+    1. LLM analyzes conversation + available tools
+    2. LLM decides: call tools OR give final answer
+    3. If tools called:
+       - Execute all tools
+       - Add results to conversation
+       - Continue to next iteration
+    4. If no tools called:
+       - LLM gave final answer
+       - Stop loop
 ```
 
-## Tool Execution Flow
+## Request Flow Example
+
+### User: "Проверь здоровье всех баз данных в кластере prod"
+
+#### Iteration 1:
+```
+LLM: "Сначала получу список кластеров, чтобы найти prod"
+→ Calls: ydb-get-clusters
+→ Result: [prod, dev, test]
+→ Continue to iteration 2
+```
+
+#### Iteration 2:
+```
+LLM: "Теперь получу базы данных в кластере prod"
+→ Calls: ydb-get-databases(cluster="prod")
+→ Result: [db1, db2, db3]
+→ Continue to iteration 3
+```
+
+#### Iteration 3:
+```
+LLM: "Проверю здоровье каждой базы данных"
+→ Calls: ydb-get-database-health(cluster="prod", database="db1")
+→ Calls: ydb-get-database-health(cluster="prod", database="db2")
+→ Calls: ydb-get-database-health(cluster="prod", database="db3")
+→ Results: [healthy, warning, error]
+→ Continue to iteration 4
+```
+
+#### Iteration 4:
+```
+LLM: "У меня есть вся информация. Вот отчет о здоровье баз данных..."
+→ No tool calls - gives final comprehensive answer
+→ Loop stops
+```
+
+## Implementation Details
+
+### ChatService.processChat()
+
+```typescript
+async processChat(messages, onData, options) {
+  const maxIterations = options.maxIterations || 5;
+  const conversationHistory = [systemPrompt, ...cleanedMessages];
+  
+  for (let iteration = 0; iteration < maxIterations; iteration++) {
+    // 1. LLM call with streaming
+    const stream = await llmService.createStreamingChatCompletion({
+      messages: conversationHistory,
+      tools: availableTools
+    });
+    
+    // 2. Process streaming response
+    let toolCalls = [];
+    for await (const chunk of stream) {
+      if (chunk.content) {
+        // Stream content to frontend
+        onData(contentDelta);
+      }
+      if (chunk.tool_calls) {
+        // Accumulate tool calls
+        toolCalls.push(...chunk.tool_calls);
+      }
+    }
+    
+    // 3. Add assistant message to history
+    conversationHistory.push({
+      role: 'assistant',
+      content: accumulatedContent,
+      tool_calls: toolCalls
+    });
+    
+    // 4. Check if loop should stop
+    if (toolCalls.length === 0) {
+      break; // LLM gave final answer
+    }
+    
+    // 5. Execute tools and add results
+    for (const toolCall of toolCalls) {
+      const result = await mcpService.callTool(toolCall);
+      conversationHistory.push({
+        role: 'tool',
+        content: JSON.stringify(result),
+        tool_call_id: toolCall.id
+      });
+    }
+    
+    // 6. Continue to next iteration
+  }
+}
+```
+
+### System Prompt
 
 ```
-1. LLM Response → tool_calls: [{ id, function: { name, arguments } }]
-2. For each tool call:
-   a. Stream { type: 'tool_executing', tool_name, tool_id }
-   b. MCPService.callTool(serverName, toolName, arguments)
-   c. Stream { type: 'tool_result', tool_id, result }
-   d. Handle errors → { type: 'tool_error', tool_id, error }
+Ты - помощник для работы с YDB (базой данных).
+
+ВАЖНЫЕ ПРАВИЛА:
+1. ВСЕГДА объясняй что ты собираешься делать ДО вызова инструментов
+2. Анализируй результаты инструментов и решай нужны ли дополнительные вызовы
+3. Когда у тебя есть вся необходимая информация, дай финальный ответ БЕЗ вызова инструментов
+4. Используй дружелюбный тон и объясняй техническую информацию простым языком
+
+У тебя есть доступ к инструментам для работы с YDB - используй их по необходимости.
+Отвечай на русском языке.
 ```
 
 ## Data Flow Types
-
-### ChatMessage (Input)
-```typescript
-interface ChatMessage {
-  id: string
-  role: 'user' | 'assistant' | 'system' | 'tool'
-  content: string
-  timestamp: number
-  toolCalls?: ToolCall[]
-  toolCallId?: string
-}
-```
 
 ### ChatDelta (Streaming Output)
 ```typescript
@@ -96,138 +163,106 @@ type ChatDelta = {
 }
 ```
 
+### Agent Loop Options
+```typescript
+interface AgentOptions {
+  model?: string
+  temperature?: number
+  maxTokens?: number
+  maxIterations?: number  // Default: 5
+}
+```
+
 ## API Design
 
 ### Single Endpoint
 ```
 POST /api/chat
 {
-  "messages": [
-    {"role": "user", "content": "Show me cluster status"},
-    {"role": "assistant", "content": "I'll check that for you..."},
-    {"role": "user", "content": "What about database health?"}
-  ],
-  "model": "gpt-4.1"
+  "messages": [conversation history],
+  "model": "gpt-4.1",
+  "maxIterations": 5
 }
 ```
 
 ### Response Format (SSE)
 ```
-data: {"type":"content","content":"Hello"}
-data: {"type":"tool_executing","tool_name":"get_cluster_info","tool_id":"call_123"}
-data: {"type":"tool_result","tool_id":"call_123","result":{"status":"healthy"}}
+data: {"type":"content","content":"Сначала получу список кластеров..."}
+data: {"type":"tool_call","tool_calls":[{"name":"ydb-get-clusters"}]}
+data: {"type":"tool_executing","tool_name":"ydb-get-clusters"}
+data: {"type":"tool_result","result":[...]}
+data: {"type":"content","content":"Теперь получу базы данных..."}
+data: {"type":"tool_call","tool_calls":[{"name":"ydb-get-databases"}]}
+data: {"type":"tool_executing","tool_name":"ydb-get-databases"}
+data: {"type":"tool_result","result":[...]}
+data: {"type":"content","content":"Вот полный отчет о здоровье..."}
 data: {"type":"done"}
 ```
 
-### Additional Endpoints
+## Benefits of Agent Loop
+
+### Intelligence
+- **Autonomous Planning**: LLM decides what tools to call and in what order
+- **Context Awareness**: Each iteration builds on previous results
+- **Natural Stopping**: LLM knows when it has enough information
+
+### User Experience
+- **Transparent Process**: Users see the thinking process
+- **Progressive Disclosure**: Information revealed step by step
+- **Comprehensive Answers**: Multi-step queries handled automatically
+
+### Technical
+- **Stateless**: No server-side session management
+- **Streaming**: Real-time feedback during execution
+- **Error Recovery**: Failed tools don't break the conversation
+- **Bounded Execution**: maxIterations prevents infinite loops
+
+## Comparison with Previous Architecture
+
+### Before (Two-Phase)
 ```
-GET  /api/chat/health    # Health status
-GET  /api/chat/tools     # Available MCP tools
-GET  /health             # Server health
+1. LLM → Tool calls
+2. Execute ALL tools
+3. Follow-up LLM call for explanation
 ```
+**Limitations**: No iterative planning, fixed execution pattern
 
-## Frontend Implementation
-
-### ChatAPI (Simplified)
-```typescript
-class ChatAPI {
-  static async sendMessage(
-    messages: ChatMessage[],
-    onDelta: (delta: ChatDelta) => void,
-    onError: (error: Error) => void
-  ): Promise<void>
-  
-  static async getAvailableTools(): Promise<MCPTool[]>
-  static async getHealth(): Promise<HealthStatus>
-}
+### After (Agent Loop)
 ```
-
-### State Management
-- **Redux manages conversation history** - No server-side sessions
-- **Frontend sends full context** - Each request includes complete conversation
-- **Optimistic UI updates** - Immediate feedback with streaming updates
-
-## Error Handling
-
-### Graceful Degradation
-- **MCP Server Down** → Tools unavailable, chat continues without tools
-- **LLM Service Down** → Error response, health check fails
-- **Tool Execution Fails** → Error message in stream, conversation continues
-- **Network Issues** → Frontend retry logic
-
-### Error Response Format
+1. LLM → Decides what to do
+2. Execute tools if needed
+3. LLM → Analyzes results, decides next steps
+4. Repeat until complete
 ```
-data: {"type":"error","error":"Tool execution failed: Connection timeout"}
-```
+**Advantages**: Intelligent planning, adaptive execution, natural conversation flow
 
-## Configuration
+## Safety & Limits
 
-### Environment Variables
-```bash
-# LLM Service
-ELIZA_KEY=oauth-token
-ELIZA_BASE_URL=https://api.eliza.yandex.net/raw/openai/v1
-MODEL_NAME=gpt-4.1
+### Iteration Limits
+- **Default**: 5 iterations maximum
+- **Configurable**: Can be adjusted per request
+- **Logging**: Each iteration logged for debugging
 
-# MCP Integration
-MCP_SERVER_URL=http://ui-dev-0.ydb.yandex.net:8784/meta/mcp
+### Error Handling
+- **Tool Failures**: Added to conversation, LLM can adapt
+- **Network Issues**: Graceful degradation
+- **Infinite Loops**: Prevented by iteration limit
 
-# Server
-PORT=3001
-LOG_LEVEL=info
-```
-
-## Benefits of Stateless Architecture
-
-### Simplicity
-- **No session management** - Eliminates complexity of session storage, cleanup, expiration
-- **No state synchronization** - Frontend and backend don't need to stay in sync
-- **Fewer failure modes** - No session-related errors or edge cases
-
-### Scalability
-- **Horizontal scaling** - Easy to load balance across multiple instances
-- **Stateless services** - Each request is independent
-- **No memory leaks** - No accumulating session data
-
-### Development
-- **Easier testing** - Pure functions, no state dependencies
-- **Simpler debugging** - Each request is self-contained
-- **Faster development** - Less boilerplate and infrastructure code
-
-### Frontend Control
-- **Redux owns state** - Conversation history managed where it belongs
-- **Flexible UX** - Frontend can implement any conversation flow
-- **Offline capability** - Conversation history persists in browser
-
-## Implementation Comparison
-
-### Before (Session-Based)
-- 5 modular components (SessionManager, MessageManager, etc.)
-- Complex generator-based streaming
-- Session storage and cleanup
-- Multi-endpoint API
-- ~800 lines of code
-
-### After (Stateless)
-- Single ChatService class
-- Simple callback-based streaming
-- No server-side state
-- Single endpoint API
-- ~200 lines of code
+### Resource Management
+- **Streaming**: Immediate feedback, no buffering
+- **Memory**: Conversation history grows but bounded
+- **Timeouts**: Each LLM call has timeout protection
 
 ## Tool Integration
 
-### YDB MCP Tools Available
-- Cluster status and health monitoring
-- Database operations and queries
-- Node management and diagnostics
-- Storage operations and metrics
-- Administrative functions
+### YDB MCP Tools
+- **Auto-discovery**: Tools loaded from MCP server
+- **Rich Schemas**: Full parameter descriptions for LLM
+- **Error Handling**: Tool failures handled gracefully
 
 ### Tool Execution
-- **Automatic discovery** - Tools loaded from MCP server on startup
-- **Real-time execution** - Tools called during conversation as needed
-- **Error handling** - Tool failures don't break conversation flow
-- **Streaming feedback** - Users see tool execution progress
+- **Parallel**: Multiple tools can be called in one iteration
+- **Sequential**: Results available for next iteration
+- **Contextual**: LLM sees all previous tool results
 
-This simplified architecture provides all the functionality of the original complex system while being much easier to understand, maintain, and scale.
+This Agent Loop architecture provides intelligent, autonomous interaction with YDB while maintaining simplicity and transparency for users.
