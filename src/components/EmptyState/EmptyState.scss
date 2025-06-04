@@ -19,7 +19,7 @@
             width: 321px;
             height: 100px;
             #{$block}__image {
-                margin-right: 20px;
+                margin-right: var(--g-spacing-5);
             }
         }
         &_size_s {

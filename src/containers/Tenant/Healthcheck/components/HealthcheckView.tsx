@@ -20,8 +20,8 @@ interface HealthcheckViewProps<T extends string = CommonIssueType> {
 
 export function HealthcheckView({
     issuesCount,
-    viewTitles = uiFactory.getHealthckechViewTitles(),
-    sortOrder = uiFactory.getHealthcheckViewsOrder(),
+    viewTitles = uiFactory.healthcheck.getHealthckechViewTitles(),
+    sortOrder = uiFactory.healthcheck.getHealthcheckViewsOrder(),
 }: HealthcheckViewProps) {
     const {view, handleHealthcheckViewChange, handleIssuesFilterChange} = useTenantQueryParams();
 

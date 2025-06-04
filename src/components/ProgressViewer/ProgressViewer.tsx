@@ -35,7 +35,7 @@ Props description:
 6) inverseColorize - invert the colors of the progress bar
 7) warningThreshold - the percentage of fullness at which the color of the progress bar changes to yellow
 8) dangerThreshold - the percentage of fullness at which the color of the progress bar changes to red
-9) overflow - parcents may be more that 100%
+9) withOverflow - percents may be more that 100%
 */
 
 export interface ProgressViewerProps {
@@ -50,7 +50,7 @@ export interface ProgressViewerProps {
     warningThreshold?: number;
     dangerThreshold?: number;
     hideCapacity?: boolean;
-    overflow?: boolean;
+    withOverflow?: boolean;
 }
 
 export function ProgressViewer({
@@ -58,7 +58,7 @@ export function ProgressViewer({
     capacity,
     formatValues = defaultFormatValues,
     percents,
-    overflow,
+    withOverflow,
     className,
     size = 'xs',
     colorizeProgress,
@@ -77,7 +77,7 @@ export function ProgressViewer({
         capacityText: number | string | undefined = capacity,
         divider = '/';
     if (percents) {
-        valueText = (overflow ? rawFillWidth : fillWidth) + '%';
+        valueText = (withOverflow ? rawFillWidth : fillWidth) + '%';
         capacityText = '';
         divider = '';
     } else if (formatValues) {

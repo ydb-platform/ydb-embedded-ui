@@ -143,22 +143,22 @@ function PDiskInfo({location}: StorageSectionProps) {
         return null;
     }
 
-    return pdisk.map((el: {id: string; path: string}) => (
+    return pdisk.map((disk: {id: string; path: string}) => (
         <LocationDetails
-            key={el.id}
+            key={disk.id}
             fields={[
                 {
                     value:
-                        el.id && node?.id ? (
-                            <InternalLink to={getPDiskPagePath(el.id, node.id)}>
-                                {el.id}
+                        disk.id && node?.id ? (
+                            <InternalLink to={getPDiskPagePath(disk.id, node.id)}>
+                                {disk.id}
                             </InternalLink>
                         ) : (
-                            el.id
+                            disk.id
                         ),
                     title: i18n('label_pdisk-id'),
                 },
-                {value: el.path, title: i18n('label_pdisk-path')},
+                {value: disk.path, title: i18n('label_pdisk-path')},
             ]}
         />
     ));

@@ -12,9 +12,10 @@ import {HealthcheckIssueTabs} from './HealthcheckIssueTabs';
 
 interface HealthcheckIssueProps {
     issue: IssuesTree;
+    expanded?: boolean;
 }
 
-export function HealthcheckIssue({issue}: HealthcheckIssueProps) {
+export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
     const [selectedTab, setSelectedTab] = React.useState(issue.id);
     const parents = React.useMemo(() => {
         const parents = [];
@@ -32,7 +33,7 @@ export function HealthcheckIssue({issue}: HealthcheckIssueProps) {
 
     return (
         <Flex className={b('issue-wrapper')}>
-            <Disclosure className={b('issue-content')}>
+            <Disclosure className={b('issue-content')} defaultExpanded={expanded}>
                 <Disclosure.Summary>
                     {(props) => (
                         <div {...props}>

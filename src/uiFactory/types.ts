@@ -17,8 +17,10 @@ export interface UIFactory {
     getMonitoringLink?: GetMonitoringLink;
     getMonitoringClusterLink?: GetMonitoringClusterLink;
 
-    getHealthckechViewTitles: GetHealthcheckViewTitles<CommonIssueType>;
-    getHealthcheckViewsOrder: GetHealthcheckViewsOrder<CommonIssueType>;
+    healthcheck: {
+        getHealthckechViewTitles: GetHealthcheckViewTitles<CommonIssueType>;
+        getHealthcheckViewsOrder: GetHealthcheckViewsOrder<CommonIssueType>;
+    };
     countHealthcheckIssuesByType: (
         issueTrees: IssuesTree[],
     ) => Record<CommonIssueType, number> & Record<string, number>;

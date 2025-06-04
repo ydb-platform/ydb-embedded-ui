@@ -239,7 +239,7 @@ function NetworkCard({networkStats}: NetworkCardProps) {
             value: used,
             capacity: limit,
             percents: true,
-            overflow: true,
+            withOverflow: true,
         };
     });
 

@@ -40,7 +40,7 @@ export function Issues({issues}: IssuesProps) {
         () =>
             view
                 ? filteredIssues.filter((issue) => {
-                      const type = issue.upperType || issue.type;
+                      const type = issue.firstParentType || issue.type;
                       return type.toLowerCase().startsWith(view);
                   })
                 : [],
@@ -62,6 +62,10 @@ export function Issues({issues}: IssuesProps) {
     }
 
     return filteredIssuesCurrentView.map((issue) => (
-        <HealthcheckIssue issue={issue} key={issue.id} />
+        <HealthcheckIssue
+            issue={issue}
+            key={issue.id + Boolean(issuesFilter)}
+            expanded={Boolean(issuesFilter)}
+        />
     ));
 }

@@ -13,8 +13,10 @@ import type {UIFactory} from './types';
 const uiFactoryBase: UIFactory = {
     getMonitoringLink: getMonitoringLinkDefault,
     getMonitoringClusterLink: getMonitoringClusterLinkDefault,
-    getHealthckechViewTitles: getHealthckechViewTitles,
-    getHealthcheckViewsOrder: getHealthcheckViewsOrder,
+    healthcheck: {
+        getHealthckechViewTitles,
+        getHealthcheckViewsOrder,
+    },
     countHealthcheckIssuesByType: countHealthcheckIssuesByType,
 };
 

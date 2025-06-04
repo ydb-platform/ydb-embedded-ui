@@ -32,7 +32,7 @@ interface DrawerPaneContentWrapperProps {
     detectClickOutside?: boolean;
     defaultWidth?: number;
     isPercentageWidth?: boolean;
-    showVeil?: boolean;
+    hideVeil?: boolean;
 }
 
 const DrawerPaneContentWrapper = ({
@@ -46,7 +46,7 @@ const DrawerPaneContentWrapper = ({
     className,
     detectClickOutside = false,
     isPercentageWidth,
-    showVeil,
+    hideVeil = true,
 }: DrawerPaneContentWrapperProps) => {
     const [drawerWidth, setDrawerWidth] = React.useState(() => {
         const savedWidth = localStorage.getItem(storageKey);
@@ -115,7 +115,7 @@ const DrawerPaneContentWrapper = ({
             <GravityDrawer
                 onEscape={onClose}
                 onVeilClick={onClose}
-                hideVeil={!showVeil}
+                hideVeil={hideVeil}
                 className={b('container', className)}
             >
                 <DrawerItem
@@ -158,7 +158,7 @@ interface DrawerPaneProps {
     drawerControls?: DrawerControl[];
     title?: React.ReactNode;
     headerClassName?: string;
-    showVeil?: boolean;
+    hideVeil?: boolean;
 }
 
 export const DrawerWrapper = ({
@@ -176,7 +176,7 @@ export const DrawerWrapper = ({
     drawerControls = [],
     title,
     headerClassName,
-    showVeil,
+    hideVeil,
 }: DrawerPaneProps) => {
     React.useEffect(() => {
         return () => {
@@ -224,7 +224,7 @@ export const DrawerWrapper = ({
         <React.Fragment>
             {children}
             <DrawerPaneContentWrapper
-                showVeil={showVeil}
+                hideVeil={hideVeil}
                 isVisible={isDrawerVisible}
                 onClose={onCloseDrawer}
                 drawerId={drawerId}

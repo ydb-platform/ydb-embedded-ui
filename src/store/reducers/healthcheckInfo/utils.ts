@@ -43,7 +43,11 @@ export function getLeavesFromTree(issues: IssueLog[], root: IssueLog): IssuesTre
                 if (!child) {
                     continue;
                 }
-                const extendedChild = {...child, parent: currentNode, upperType: directChildType};
+                const extendedChild = {
+                    ...child,
+                    parent: currentNode,
+                    firstParentType: directChildType,
+                };
                 stack.push(extendedChild);
             }
         }
