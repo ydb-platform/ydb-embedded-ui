@@ -7,9 +7,6 @@
 
     // Target the YDBSyntaxHighlighter wrapper
     > div {
-        display: box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: var(--line-clamp, 4);
         overflow: hidden;
 
         height: 100%;
@@ -18,14 +15,15 @@
 
         // Target the ReactSyntaxHighlighter pre element
         pre {
-            display: box !important;
+            // stylelint-disable-next-line value-no-vendor-prefix
+            display: -webkit-box !important;
             -webkit-box-orient: vertical !important;
             -webkit-line-clamp: var(--line-clamp, 4) !important;
             overflow: hidden !important;
 
             height: 100% !important;
             margin: 0 !important;
-            padding: 8px !important;
+            padding: var(--g-spacing-2) !important;
 
             white-space: pre-wrap !important;
             text-overflow: ellipsis !important;
@@ -34,9 +32,6 @@
 
         // Target code elements within
         code {
-            display: box !important;
-            -webkit-box-orient: vertical !important;
-            -webkit-line-clamp: var(--line-clamp, 4) !important;
             overflow: hidden !important;
 
             white-space: pre-wrap !important;
