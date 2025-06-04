@@ -18,15 +18,17 @@
 
         // Target the ReactSyntaxHighlighter pre element
         pre {
-            display: flex !important;
+            display: box !important;
+            -webkit-box-orient: vertical !important;
+            -webkit-line-clamp: var(--line-clamp, 4) !important;
             overflow: hidden !important;
-            align-items: center !important;
 
             height: 100% !important;
             margin: 0 !important;
             padding: 8px !important;
 
             white-space: pre-wrap !important;
+            text-overflow: ellipsis !important;
             word-break: break-word !important;
         }
 

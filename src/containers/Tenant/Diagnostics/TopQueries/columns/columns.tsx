@@ -33,7 +33,7 @@ const queryTextColumn: Column<KeyValueRow> = {
     header: QUERIES_COLUMNS_TITLES.QueryText,
     render: ({row}) => (
         <div className={b('query')}>
-            <FixedHeightQuery value={row.QueryText?.toString()} lines={4} hasClipboardButton />
+            <FixedHeightQuery value={row.QueryText?.toString()} lines={3} hasClipboardButton />
         </div>
     ),
     width: 500,
