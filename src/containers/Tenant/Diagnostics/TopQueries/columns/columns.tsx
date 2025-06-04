@@ -1,14 +1,13 @@
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column, OrderType} from '@gravity-ui/react-data-table';
 
+import {FixedHeightQuery} from '../../../../../components/FixedHeightQuery/FixedHeightQuery';
 import {YDBSyntaxHighlighter} from '../../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
-import {TruncatedQuery} from '../../../../../components/TruncatedQuery/TruncatedQuery';
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {cn} from '../../../../../utils/cn';
 import {formatDateTime, formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {generateHash} from '../../../../../utils/generateHash';
 import {formatToMs, parseUsToMs} from '../../../../../utils/timeParsers';
-import {MAX_QUERY_HEIGHT} from '../../../utils/constants';
 
 import {
     QUERIES_COLUMNS_IDS,
@@ -34,11 +33,7 @@ const queryTextColumn: Column<KeyValueRow> = {
     header: QUERIES_COLUMNS_TITLES.QueryText,
     render: ({row}) => (
         <div className={b('query')}>
-            <TruncatedQuery
-                value={row.QueryText?.toString()}
-                maxQueryHeight={MAX_QUERY_HEIGHT}
-                hasClipboardButton
-            />
+            <FixedHeightQuery value={row.QueryText?.toString()} lines={4} hasClipboardButton />
         </div>
     ),
     width: 500,
