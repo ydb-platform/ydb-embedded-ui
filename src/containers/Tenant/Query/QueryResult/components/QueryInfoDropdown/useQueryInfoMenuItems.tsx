@@ -89,7 +89,7 @@ export function useQueryInfoMenuItems({
                         createToast({
                             title: i18n('text_error-plan-svg', {error: errorMessage}),
                             name: 'plan-svg-error',
-                            type: 'error',
+                            theme: 'danger',
                         });
                         return null;
                     });

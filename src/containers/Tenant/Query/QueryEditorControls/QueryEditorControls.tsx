@@ -101,7 +101,7 @@ export const QueryEditorControls = ({
                 name: 'stop-error',
                 title: '',
                 content: i18n('toaster.stop-error'),
-                type: 'error',
+                theme: 'danger',
                 autoHiding: STOP_AUTO_HIDE_TIMEOUT,
             });
             setCancelQueryError(true);
