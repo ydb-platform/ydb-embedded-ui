@@ -37,14 +37,8 @@ export function useScrollToSelected({selectedRow, rows, reactListRef}: UseScroll
                     const isVisible = selectedIndex >= firstVisible && selectedIndex <= lastVisible;
 
                     if (!isVisible) {
-                        // Only scroll if not visible - position in middle of viewport
-                        const visibleCount = lastVisible - firstVisible + 1;
-                        const middleOffset = Math.floor(visibleCount / 2);
-                        const targetIndex = Math.max(0, selectedIndex - middleOffset);
-
-                        reactList.scrollTo(targetIndex);
+                        reactList.scrollTo(selectedIndex - 1);
                     }
-                    // If already visible, don't scroll (better UX)
                 } catch {
                     // Fallback to scrollAround if getVisibleRange fails
                     reactList.scrollAround(selectedIndex);
