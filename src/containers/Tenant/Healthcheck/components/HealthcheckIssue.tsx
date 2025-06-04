@@ -71,14 +71,16 @@ export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
                         </div>
                     )}
                 </Disclosure.Summary>
-                <Flex className={b('issue-details')} direction="column" gap={3} grow={1}>
-                    <HealthcheckIssueTabs
-                        parents={parents}
-                        selectedTab={selectedTab}
-                        setSelectedTab={setSelectedTab}
-                    />
-                    {currentIssue && <IssueDetails issue={currentIssue} />}
-                </Flex>
+                <div className={b('animation-container')}>
+                    <Flex className={b('issue-details')} direction="column" gap={3} grow={1}>
+                        <HealthcheckIssueTabs
+                            parents={parents}
+                            selectedTab={selectedTab}
+                            setSelectedTab={setSelectedTab}
+                        />
+                        {currentIssue && <IssueDetails issue={currentIssue} />}
+                    </Flex>
+                </div>
             </Disclosure>
         </Flex>
     );

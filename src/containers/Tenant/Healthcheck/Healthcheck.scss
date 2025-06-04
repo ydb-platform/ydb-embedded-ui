@@ -21,21 +21,24 @@
     &__issues {
         padding: 0 var(--g-spacing-4) var(--g-spacing-4) var(--g-spacing-4);
     }
+
+    &__animation-container {
+        overflow: hidden;
+
+        min-height: 0;
+    }
     &__issue-wrapper {
         border: 1px solid var(--g-color-line-generic);
         border-radius: var(--g-border-radius-s);
-
         .g-disclosure_enter_active {
             display: grid;
 
-            animation-name: disclosure-expanded;
-            animation-duration: 0.2s;
+            animation: disclosure-expanded 0.4s cubic-bezier(0.23, 1, 0.32, 1) forwards;
         }
         .g-disclosure_exit_active {
             display: grid;
 
-            animation-name: disclosure-collapsed;
-            animation-duration: 0.1s;
+            animation: disclosure-collapsed 0.4s cubic-bezier(0.23, 1, 0.32, 1) forwards;
         }
     }
     &__issue-summary {
@@ -86,8 +89,6 @@
         background-color: var(--g-color-text-danger);
     }
     &__issue-details {
-        overflow: hidden;
-
         padding: 0 var(--g-spacing-4) var(--g-spacing-4) var(--g-spacing-4);
     }
 }

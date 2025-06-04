@@ -57,7 +57,7 @@ export function TenantDrawerWrapper({children, database}: TenantDrawerWrapperPro
                 drawerId="tenant-healthcheck-details"
                 storageKey="tenant-healthcheck-details-drawer-width"
                 detectClickOutside
-                showVeil
+                hideVeil={false}
                 isPercentageWidth
                 drawerControls={[
                     {
