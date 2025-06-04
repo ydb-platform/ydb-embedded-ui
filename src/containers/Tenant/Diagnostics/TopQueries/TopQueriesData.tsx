@@ -30,6 +30,8 @@ import {
     TOP_QUERIES_SELECTED_COLUMNS_LS_KEY,
 } from './columns/constants';
 import {DEFAULT_TIME_FILTER_VALUE, TIME_FRAME_OPTIONS} from './constants';
+import type {ReactList} from './hooks/useScrollToSelected';
+import {useScrollToSelected} from './hooks/useScrollToSelected';
 import {useSetSelectedTopQueryRowFromParams} from './hooks/useSetSelectedTopQueryRowFromParams';
 import {useTopQueriesSort} from './hooks/useTopQueriesSort';
 import i18n from './i18n';
@@ -61,6 +63,9 @@ export const TopQueriesData = ({
     // null is reserved for not found state
     const [selectedRow, setSelectedRow] = React.useState<KeyValueRow | null | undefined>(undefined);
 
+    // Ref for react-list component to enable scrolling to selected row
+    const reactListRef = React.useRef<ReactList>(null);
+
     // Get columns for top queries
     const columns: Column<KeyValueRow>[] = React.useMemo(() => {
         return getTopQueriesColumns();
@@ -88,6 +93,19 @@ export const TopQueriesData = ({
 
     const rows = currentData?.resultSets?.[0]?.result;
     useSetSelectedTopQueryRowFromParams(setSelectedRow, rows);
+
+    // Enhanced table settings with dynamicInnerRef for scrolling
+    const tableSettings = React.useMemo(
+        () => ({
+            ...TOP_QUERIES_TABLE_SETTINGS,
+            dynamicInnerRef: reactListRef,
+            // Using 'uniform' type - react-list automatically calculates size from first item
+        }),
+        [],
+    );
+
+    // Use custom hook to handle scrolling to selected row
+    useScrollToSelected({selectedRow, rows, reactListRef});
 
     const handleCloseDetails = React.useCallback(() => {
         setSelectedRow(undefined);
@@ -182,7 +200,7 @@ export const TopQueriesData = ({
                         columns={columnsToShow}
                         data={rows || []}
                         loading={isFetching && currentData === undefined}
-                        settings={TOP_QUERIES_TABLE_SETTINGS}
+                        settings={tableSettings}
                         onRowClick={onRowClick}
                         rowClassName={(row) => b('row', {active: isEqual(row, selectedRow)})}
                         sortOrder={tableSort}
