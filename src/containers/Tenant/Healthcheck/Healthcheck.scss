@@ -86,6 +86,8 @@
         background-color: var(--g-color-text-danger);
     }
     &__issue-details {
+        overflow: hidden;
+
         padding: 0 var(--g-spacing-4) var(--g-spacing-4) var(--g-spacing-4);
     }
 }
