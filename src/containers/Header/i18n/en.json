@@ -1,4 +1,5 @@
 {
+  "breadcrumbs.clusters": "All clusters",
   "breadcrumbs.tenant": "Tenant",
   "breadcrumbs.node": "Node",
   "breadcrumbs.pDisk": "PDisk",
@@ -7,5 +8,6 @@
   "breadcrumbs.tablets": "Tablets",
   "breadcrumbs.storageGroup": "Storage Group",
 
-  "connect": "Connect"
+  "connect": "Connect",
+  "add-cluster": "Add Cluster"
 }

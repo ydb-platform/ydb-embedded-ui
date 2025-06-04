@@ -1,7 +1,7 @@
 import React from 'react';
 
 import DataTable from '@gravity-ui/react-data-table';
-import {Select, TableColumnSetup} from '@gravity-ui/uikit';
+import {Flex, Select, TableColumnSetup, Text} from '@gravity-ui/uikit';
 import {Helmet} from 'react-helmet-async';
 
 import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
@@ -9,22 +9,26 @@ import {ResponseError} from '../../components/Errors/ResponseError';
 import {Loader} from '../../components/Loader';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../components/Search';
+import {
+    useDeleteClusterFeatureAvailable,
+    useEditClusterFeatureAvailable,
+} from '../../store/reducers/capabilities/hooks';
 import {changeClustersFilters, clustersApi} from '../../store/reducers/clusters/clusters';
 import {
-    aggregateClustersInfo,
     filterClusters,
     selectClusterNameFilter,
     selectServiceFilter,
     selectStatusFilter,
     selectVersionFilter,
 } from '../../store/reducers/clusters/selectors';
+import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
+import {uiFactory} from '../../uiFactory/uiFactory';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getMinorVersion} from '../../utils/versions';
 
-import {ClustersStatistics} from './ClustersStatistics';
-import {CLUSTERS_COLUMNS, CLUSTERS_COLUMNS_WIDTH_LS_KEY} from './columns';
+import {CLUSTERS_COLUMNS_WIDTH_LS_KEY, getClustersColumns} from './columns';
 import {
     CLUSTERS_SELECTED_COLUMNS_KEY,
     COLUMNS_NAMES,
@@ -44,6 +48,15 @@ export function Clusters() {
 
     const dispatch = useTypedDispatch();
 
+    React.useEffect(() => {
+        dispatch(setHeaderBreadcrumbs('clusters', {}));
+    }, [dispatch]);
+
+    const isEditClusterAvailable =
+        useEditClusterFeatureAvailable() && uiFactory.onEditCluster !== undefined;
+    const isDeleteClusterAvailable =
+        useDeleteClusterFeatureAvailable() && uiFactory.onDeleteCluster !== undefined;
+
     const clusterName = useTypedSelector(selectClusterNameFilter);
     const status = useTypedSelector(selectStatusFilter);
     const service = useTypedSelector(selectServiceFilter);
@@ -62,8 +75,12 @@ export function Clusters() {
         dispatch(changeClustersFilters({version: value}));
     };
 
+    const rawColumns = React.useMemo(() => {
+        return getClustersColumns({isEditClusterAvailable, isDeleteClusterAvailable});
+    }, [isDeleteClusterAvailable, isEditClusterAvailable]);
+
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
-        CLUSTERS_COLUMNS,
+        rawColumns,
         CLUSTERS_SELECTED_COLUMNS_KEY,
         COLUMNS_TITLES,
         DEFAULT_COLUMNS,
@@ -99,11 +116,6 @@ export function Clusters() {
         return filterClusters(clusters ?? [], {clusterName, status, service, version});
     }, [clusterName, clusters, service, status, version]);
 
-    const aggregation = React.useMemo(
-        () => aggregateClustersInfo(filteredClusters),
-        [filteredClusters],
-    );
-
     const statuses = React.useMemo(() => {
         return Array.from(
             new Set(
@@ -114,14 +126,29 @@ export function Clusters() {
             .map((el) => ({value: el, content: el}));
     }, [clusters]);
 
+    const renderPageTitle = () => {
+        return (
+            <Flex justifyContent="space-between">
+                <Flex gap={2}>
+                    <Text variant="header-1">{i18n('page_title')}</Text>
+                    <Text variant="header-1" color="secondary">
+                        {clusters?.length}
+                    </Text>
+                </Flex>
+                <AutoRefreshControl className={b('autorefresh')} />
+            </Flex>
+        );
+    };
+
     return (
         <div className={b()}>
             <Helmet>
                 <title>{i18n('page_title')}</title>
             </Helmet>
 
-            <ClustersStatistics stats={aggregation} count={filteredClusters.length} />
-            <div className={b('controls')}>
+            {renderPageTitle()}
+
+            <Flex>
                 <div className={b('control', {wide: true})}>
                     <Search
                         placeholder={i18n('controls_search-placeholder')}
@@ -178,8 +205,7 @@ export function Clusters() {
                         sortable={false}
                     />
                 </div>
-                <AutoRefreshControl className={b('autorefresh')} />
-            </div>
+            </Flex>
             {query.isError ? <ResponseError error={query.error} className={b('error')} /> : null}
             {query.isLoading ? <Loader size="l" /> : null}
             {query.fulfilledTimeStamp ? (
