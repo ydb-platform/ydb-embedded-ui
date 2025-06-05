@@ -16,7 +16,6 @@ export type {
     ChatMessage as ChatMessageType,
     ChatDelta,
     ChatState,
-    MCPTool,
     ToolCall,
     ChatRequest,
 } from './types/chat';

@@ -23,26 +23,6 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
         return new Date(timestamp).toLocaleTimeString();
     };
 
-    const safeParseJSON = (jsonString: string) => {
-        try {
-            // If it's already an object, return it
-            if (typeof jsonString === 'object' && jsonString !== null) {
-                return jsonString;
-            }
-            
-            // If it's an empty string, return empty object
-            if (!jsonString || jsonString.trim() === '') {
-                return {};
-            }
-            
-            // Try to parse the JSON string
-            return JSON.parse(jsonString);
-        } catch (error) {
-            // If parsing fails, return the raw string for display
-            console.warn('Failed to parse tool call arguments as JSON:', error);
-            return { raw: jsonString };
-        }
-    };
 
     const formatToolResult = (content: string) => {
         try {

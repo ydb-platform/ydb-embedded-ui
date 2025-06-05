@@ -71,11 +71,23 @@ The YDB AI Chat is a real-time assistant that helps users interact with YDB clus
 - **State Management**: Redux-based message history and session control
 - **Design System Integration**: Uses standard YDB UI components and class naming conventions
 
-### Middleware Layer
+### Backend Layer (Simplified Architecture)
 
-- **Chat Server**: Node.js service handling AI communication
-- **Agent Loop**: Multi-iteration processing with tool integration
-- **Proxy Integration**: Development-friendly routing and production deployment
+- **Chat Server**: Minimal Node.js Express service with only essential endpoints
+  - `GET /health` - Basic health check with version info
+  - `POST /api/chat` - Streaming chat with Server-Sent Events (SSE)
+- **ChatService**: Stateless message processing with agent loop
+  - Multi-iteration processing (max 5 iterations)
+  - Context-aware system prompts with page information
+  - Tool call execution and result formatting
+- **LLMService**: OpenAI API client for Eliza communication
+  - Streaming chat completions with tool support
+  - MCP tool conversion to OpenAI function format
+  - OAuth authentication with Ya-Pool headers
+- **MCPService**: Model Context Protocol client
+  - Server-Sent Events (SSE) transport for YDB MCP server
+  - Tool discovery and execution
+  - Connection management and health monitoring
 
 ### AI Service Layer
 
@@ -160,6 +172,48 @@ Handle Tools → Complete Response → End Session
 - **Development Friendly**: Integrated proxy for seamless local development
 - **Production Ready**: Standalone server for enterprise deployment
 - **Flexible Scaling**: Can scale independently from main YDB UI
+
+## Technical Implementation
+
+### Configuration
+
+**Server Configuration:**
+- `PORT` - Server port (default: 3001)
+- `NODE_ENV` - Environment mode
+- `LOG_LEVEL` - Logging verbosity
+
+**Eliza API Configuration:**
+- `ELIZA_API_KEY` - OAuth token for authentication
+- `ELIZA_BASE_URL` - API endpoint URL
+- `ELIZA_MODEL` - LLM model identifier
+
+**MCP Configuration:**
+- `MCP_SERVER_URL` - YDB MCP server endpoint
+- `MCP_TIMEOUT` - Connection timeout in milliseconds
+
+### API Endpoints
+
+**Health Check:**
+```
+GET /health
+Response: { status: 'ok', timestamp: ISO8601, version: string }
+```
+
+**Chat Streaming:**
+```
+POST /api/chat
+Content-Type: application/json
+Body: {
+  messages: ChatMessage[],
+  model?: string,
+  temperature?: number,
+  maxTokens?: number,
+  context?: PageContext
+}
+
+Response: text/event-stream (SSE)
+Events: content, tool_call, tool_executing, tool_result, done, error
+```
 
 ## Technical Characteristics
 
