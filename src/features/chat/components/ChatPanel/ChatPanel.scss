@@ -1,41 +1,30 @@
-.chat-panel {
-    position: fixed;
-    top: 0;
-    right: 0;
-    height: 100vh;
-    width: 400px;
-    min-width: 300px;
-    max-width: 600px;
-    z-index: 1001;
-    display: flex;
-    flex-direction: column;
-    background: var(--g-color-base-background);
-    border-left: 1px solid var(--g-color-line-generic);
-    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.15);
-    transform: translateX(100%);
-    transition: transform 0.3s ease-in-out;
+.ydb-chat-drawer {
+    &__item {
+        z-index: 10000;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
 
-    &--open {
-        transform: translateX(0);
+    &__content {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background: var(--g-color-base-background);
     }
 
     &__header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
         padding: 16px;
         border-bottom: 1px solid var(--g-color-line-generic);
         background: var(--g-color-base-float);
+        flex-shrink: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
-    &__title {
-        margin: 0;
-        font-size: 16px;
-        font-weight: 600;
-        color: var(--g-color-text-primary);
-    }
-
-    &__actions {
+    &__controls {
         display: flex;
         gap: 8px;
     }
@@ -43,10 +32,13 @@
     &__messages {
         flex: 1;
         overflow-y: auto;
+        overflow-x: hidden;
         padding: 16px;
         display: flex;
         flex-direction: column;
         gap: 16px;
+        scroll-behavior: smooth;
+        min-height: 0; // Ensures flex child can shrink
     }
 
     &__welcome {
@@ -94,11 +86,12 @@
         border-top: 1px solid var(--g-color-line-generic);
         background: var(--g-color-base-float);
         padding: 16px;
+        flex-shrink: 0;
     }
 }
 
 // Scrollbar styling
-.chat-panel__messages {
+.ydb-chat-drawer__messages {
     &::-webkit-scrollbar {
         width: 6px;
     }
@@ -114,14 +107,5 @@
 
     &::-webkit-scrollbar-thumb:hover {
         background: var(--g-color-base-generic-hover);
-    }
-}
-
-// Responsive design
-@media (max-width: 768px) {
-    .chat-panel {
-        width: 100%;
-        max-width: none;
-        min-width: none;
     }
 }

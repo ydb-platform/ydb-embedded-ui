@@ -43,9 +43,9 @@ function App({
                         <div id="fullscreen-root"></div>
                     </ErrorBoundary>
                 </Navigation>
-                <ChatPanel />
-                <ChatToggleButton className="chat-toggle-button--floating" />
             </ContentWrapper>
+            <ChatPanel />
+            <ChatToggleButton className="chat-toggle-button--floating" />
             <ReduxTooltip />
         </Providers>
     );

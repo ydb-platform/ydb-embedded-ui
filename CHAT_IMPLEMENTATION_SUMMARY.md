@@ -66,9 +66,10 @@ The YDB AI Chat is a real-time assistant that helps users interact with YDB clus
 
 ### Frontend Layer
 
-- **Chat Interface**: Real-time messaging UI with streaming responses
+- **Chat Interface**: Real-time messaging UI with streaming responses using @gravity-ui/navigation Drawer component
 - **Context Awareness**: Automatically detects current page (cluster, node, database)
 - **State Management**: Redux-based message history and session control
+- **Design System Integration**: Uses standard YDB UI components and class naming conventions
 
 ### Middleware Layer
 
@@ -161,6 +162,13 @@ Handle Tools → Complete Response → End Session
 - **Flexible Scaling**: Can scale independently from main YDB UI
 
 ## Technical Characteristics
+
+### UI Architecture
+
+- **Drawer Component**: Uses @gravity-ui/navigation Drawer and DrawerItem for consistent UI behavior
+- **Class Naming**: Follows YDB UI conventions with `cn` utility and BEM methodology (`ydb-chat-drawer`)
+- **Responsive Design**: Resizable drawer with localStorage persistence (default 400px width)
+- **Smooth Scrolling**: Optimized scroll behavior without layout jumps
 
 ### Performance
 

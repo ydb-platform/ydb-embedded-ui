@@ -34,8 +34,8 @@
         "curly": ["error", "all"],
     },
     "import/no-extraneous-dependencies": [
-    "error", {
-       "packageDir": "./"
-    }
-]
+        "error", {
+        "packageDir": "./"
+        }
+    ]
 }
