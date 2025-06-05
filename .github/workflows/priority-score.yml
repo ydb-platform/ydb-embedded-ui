@@ -11,7 +11,7 @@ jobs:
       - name: Update CalculatedPriority field
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.BOT_TOKEN }}
+          github-token: ${{ secrets.YDBOT_TOKEN }}
           script: |
             const labelWeights = {
               "prio/high": 1000,
