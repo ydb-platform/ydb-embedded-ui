@@ -5,6 +5,7 @@ import {skipToken} from '@reduxjs/toolkit/query';
 import {isNil} from 'lodash';
 
 import {DrawerWrapper} from '../../../../components/Drawer';
+import {EmptyFilter} from '../../../../components/EmptyFilter/EmptyFilter';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {
@@ -19,7 +20,6 @@ import {useAutoRefreshInterval} from '../../../../utils/hooks';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 import {renderPaginatedTableErrorMessage} from '../../../../utils/renderPaginatedTableErrorMessage';
 import {safeParseNumber} from '../../../../utils/utils';
-import {EmptyFilter} from '../../../Storage/EmptyFilter/EmptyFilter';
 
 import {TopicDataControls} from './TopicDataControls/TopicDataControls';
 import {TopicMessageDetails} from './TopicMessageDetails/TopicMessageDetails';

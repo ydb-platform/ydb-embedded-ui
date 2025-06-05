@@ -243,7 +243,7 @@ export class Diagnostics {
         this.cpuCard = page.locator('.metrics-cards__tab:has-text("CPU")');
         this.storageCard = page.locator('.metrics-cards__tab:has-text("Storage")');
         this.memoryCard = page.locator('.metrics-cards__tab:has-text("Memory")');
-        this.healthcheckCard = page.locator('.metrics-cards__tab:has-text("Healthcheck")');
+        this.healthcheckCard = page.locator('.ydb-healthcheck-preview');
     }
 
     async isSchemaViewerVisible() {
@@ -334,10 +334,14 @@ export class Diagnostics {
     }
 
     async getHealthcheckStatus() {
-        const statusElement = this.healthcheckCard.locator(
-            '.healthcheck__self-check-status-indicator',
-        );
-        return (await statusElement.textContent())?.trim() || '';
+        const statusElement = this.healthcheckCard.locator('.ydb-healthcheck-preview__icon');
+        return await statusElement.isVisible();
+    }
+
+    async hasHealthcheckStatusClass(className: string) {
+        const statusElement = this.healthcheckCard.locator('.ydb-healthcheck-preview__icon');
+        const classList = await statusElement.evaluate((el) => Array.from(el.classList));
+        return classList.includes(className);
     }
 
     async selectTopShardsMode(mode: TopShardsMode): Promise<void> {

@@ -1,6 +1,7 @@
-import {Flex, Loader} from '@gravity-ui/uikit';
+import {Flex} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
+import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {LogsButton} from '../../../../components/LogsButton/LogsButton';
 import {MonitoringButton} from '../../../../components/MonitoringButton/MonitoringButton';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
@@ -14,7 +15,7 @@ import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQu
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
 
 import {DefaultOverviewContent} from './DefaultOverviewContent/DefaultOverviewContent';
-import {HealthcheckDetails} from './Healthcheck/HealthcheckDetails';
+import {HealthcheckPreview} from './Healthcheck/HealthcheckPreview';
 import {MetricsCards} from './MetricsCards/MetricsCards';
 import {TenantCpu} from './TenantCpu/TenantCpu';
 import {TenantMemory} from './TenantMemory/TenantMemory';
@@ -85,6 +86,7 @@ export function TenantOverview({
 
         poolsStats,
         memoryStats,
+        networkStats,
         blobStorageStats,
         tabletStorageStats,
     } = calculateTenantMetrics(tenantData);
@@ -133,46 +135,40 @@ export function TenantOverview({
                     />
                 );
             }
-            case TENANT_METRICS_TABS_IDS.healthcheck: {
-                return <HealthcheckDetails tenantName={tenantName} />;
-            }
             default: {
                 return <DefaultOverviewContent database={tenantName} />;
             }
         }
     };
 
-    if (tenantLoading) {
-        return (
-            <div className={b('loader')}>
-                <Loader size="m" />
-            </div>
-        );
-    }
-
     const monitoringLink = additionalTenantProps?.getMonitoringLink?.(Name, Type);
     const logsLink = additionalTenantProps?.getLogsLink?.(Name);
 
     return (
-        <div className={b()}>
-            <div className={b('info')}>
-                <div className={b('top-label')}>{tenantType}</div>
-                <Flex alignItems="center" gap="1" className={b('top')}>
-                    {renderName()}
-                    <Flex gap="2">
-                        {monitoringLink && <MonitoringButton href={monitoringLink} />}
-                        {logsLink && <LogsButton href={logsLink} />}
+        <LoaderWrapper loading={tenantLoading}>
+            <div className={b()}>
+                <div className={b('info')}>
+                    <div className={b('top-label')}>{tenantType}</div>
+                    <Flex alignItems="center" gap="1" className={b('top')}>
+                        {renderName()}
+                        <Flex gap="2">
+                            {monitoringLink && <MonitoringButton href={monitoringLink} />}
+                            {logsLink && <LogsButton href={logsLink} />}
+                        </Flex>
                     </Flex>
-                </Flex>
-                <MetricsCards
-                    poolsCpuStats={poolsStats}
-                    memoryStats={memoryStats}
-                    blobStorageStats={blobStorageStats}
-                    tabletStorageStats={tabletStorageStats}
-                    tenantName={tenantName}
-                />
+                    <Flex direction="column" gap={3}>
+                        <HealthcheckPreview tenantName={tenantName} />
+                        <MetricsCards
+                            poolsCpuStats={poolsStats}
+                            memoryStats={memoryStats}
+                            blobStorageStats={blobStorageStats}
+                            tabletStorageStats={tabletStorageStats}
+                            networkStats={networkStats}
+                        />
+                    </Flex>
+                </div>
+                {renderTabContent()}
             </div>
-            {renderTabContent()}
-        </div>
+        </LoaderWrapper>
     );
 }
