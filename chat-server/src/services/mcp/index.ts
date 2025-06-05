@@ -1,5 +1,5 @@
 import { logger } from '../../utils/logger';
-import { MCPTool, MCPResource } from '../../types/mcp';
+import { MCPTool } from '../../types/mcp';
 import { MCPServer, MCPServerConfig } from './types';
 import { MCPClient } from './client';
 
@@ -37,15 +37,13 @@ export class MCPService {
 
         await this.client.connect(server, server.config);
         
-        // Fetch available tools and resources
+        // Fetch available tools
         try {
             server.tools = await this.client.getTools(name);
-            server.resources = await this.client.getResources(name);
             
             logger.debug('Server capabilities loaded', {
                 serverName: name,
-                toolsCount: server.tools.length,
-                resourcesCount: server.resources.length
+                toolsCount: server.tools.length
             });
         } catch (error) {
             logger.error('Failed to load server capabilities', {
@@ -67,7 +65,6 @@ export class MCPService {
         await this.client.disconnect(name);
         server.status = 'disconnected';
         server.tools = [];
-        server.resources = [];
     }
 
     /**
@@ -110,26 +107,6 @@ export class MCPService {
     }
 
     /**
-     * Get all available resources from all connected servers
-     */
-    getAllResources(): Array<MCPResource & { serverName: string }> {
-        const resources: Array<MCPResource & { serverName: string }> = [];
-        
-        for (const [serverName, server] of this.servers) {
-            if (server.status === 'connected' && server.resources) {
-                for (const resource of server.resources) {
-                    resources.push({
-                        ...resource,
-                        serverName,
-                    });
-                }
-            }
-        }
-
-        return resources;
-    }
-
-    /**
      * Call a tool on a specific server
      */
     async callTool(serverName: string, toolName: string, arguments_: any): Promise<any> {
@@ -156,27 +133,6 @@ export class MCPService {
     }
 
     /**
-     * Access a resource on a specific server
-     */
-    async accessResource(serverName: string, uri: string): Promise<any> {
-        const server = this.servers.get(serverName);
-        if (!server) {
-            throw new Error(`Server ${serverName} is not registered`);
-        }
-
-        if (server.status !== 'connected') {
-            throw new Error(`Server ${serverName} is not connected`);
-        }
-
-        logger.info('Accessing MCP resource', { serverName, uri });
-
-        const response = await this.client.readResource(serverName, uri);
-
-        logger.info('Resource access completed', { serverName, uri });
-        return response;
-    }
-
-    /**
      * Get server status
      */
     getServerStatus(name: string): string | undefined {
@@ -186,12 +142,11 @@ export class MCPService {
     /**
      * Get all servers
      */
-    getServers(): Array<{ name: string; status: string; toolCount: number; resourceCount: number }> {
+    getServers(): Array<{ name: string; status: string; toolCount: number }> {
         return Array.from(this.servers.entries()).map(([name, server]) => ({
             name,
             status: server.status,
             toolCount: server.tools?.length || 0,
-            resourceCount: server.resources?.length || 0,
         }));
     }
 

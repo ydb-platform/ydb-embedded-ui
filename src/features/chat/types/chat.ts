@@ -40,20 +40,9 @@ export interface ChatState {
     isStreaming: boolean;
     error: string | null;
     sessionId: string | null;
-    availableTools: MCPTool[];
     isOpen: boolean;
     needsNewAssistantMessage?: boolean;
     currentStreamingMessageId?: string;
-}
-
-export interface MCPTool {
-    name: string;
-    description: string;
-    inputSchema: {
-        type: string;
-        properties: Record<string, any>;
-        required?: string[];
-    };
 }
 
 export interface ChatRequest {

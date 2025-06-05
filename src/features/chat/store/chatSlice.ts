@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ChatMessage, ChatState, MCPTool, ChatDelta } from '../types/chat';
+import { ChatMessage, ChatState, ChatDelta } from '../types/chat';
 
 const initialState: ChatState = {
     messages: [],
@@ -7,7 +7,6 @@ const initialState: ChatState = {
     isStreaming: false,
     error: null,
     sessionId: null,
-    availableTools: [],
     isOpen: false,
 };
 
@@ -180,10 +179,6 @@ const chatSlice = createSlice({
             state.error = null;
         },
 
-        // Tools
-        setAvailableTools: (state, action: PayloadAction<MCPTool[]>) => {
-            state.availableTools = action.payload;
-        },
 
         // Session
         setSessionId: (state, action: PayloadAction<string>) => {

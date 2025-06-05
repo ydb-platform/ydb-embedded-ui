@@ -1,4 +1,4 @@
-import { ChatMessage, ChatDelta, MCPTool } from '../types/chat';
+import { ChatMessage, ChatDelta } from '../types/chat';
 
 export class ChatAPI {
     private static baseUrl = '/api/chat';
@@ -84,29 +84,4 @@ export class ChatAPI {
         }
     }
 
-    static async getAvailableTools(): Promise<MCPTool[]> {
-        try {
-            const response = await fetch(`${this.baseUrl}/tools`);
-            if (!response.ok) {
-                throw new Error(`Failed to fetch tools: ${response.statusText}`);
-            }
-            return response.json();
-        } catch (error) {
-            console.error('Failed to fetch available tools:', error);
-            return [];
-        }
-    }
-
-    static async getHealth(): Promise<{status: string; mcpConnected: boolean; toolsAvailable: number}> {
-        try {
-            const response = await fetch(`${this.baseUrl}/health`);
-            if (!response.ok) {
-                throw new Error(`Health check failed: ${response.statusText}`);
-            }
-            return response.json();
-        } catch (error) {
-            console.error('Health check failed:', error);
-            return { status: 'error', mcpConnected: false, toolsAvailable: 0 };
-        }
-    }
 }

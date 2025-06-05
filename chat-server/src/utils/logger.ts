@@ -29,33 +29,14 @@ const consoleFormat = winston.format.combine(
     })
 );
 
-const jsonFormat = winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.errors({ stack: true }),
-    winston.format.json()
-);
 
 // Create transports
 const transports: winston.transport[] = [
     new winston.transports.Console({
-        format: appConfig.LOG_FORMAT === 'json' ? jsonFormat : consoleFormat,
+        format: consoleFormat,
     }),
 ];
 
-// Add file transport in production
-if (appConfig.isProduction) {
-    transports.push(
-        new winston.transports.File({
-            filename: 'logs/error.log',
-            level: 'error',
-            format: jsonFormat,
-        }),
-        new winston.transports.File({
-            filename: 'logs/combined.log',
-            format: jsonFormat,
-        })
-    );
-}
 
 // Create logger instance
 export const logger = winston.createLogger({
@@ -65,19 +46,6 @@ export const logger = winston.createLogger({
     exitOnError: false,
 });
 
-// Create specialized loggers for different components
-export const createComponentLogger = (component: string) => {
-    return {
-        error: (message: string, meta?: any) => 
-            logger.error(message, { component, ...meta }),
-        warn: (message: string, meta?: any) => 
-            logger.warn(message, { component, ...meta }),
-        info: (message: string, meta?: any) => 
-            logger.info(message, { component, ...meta }),
-        debug: (message: string, meta?: any) => 
-            logger.debug(message, { component, ...meta }),
-    };
-};
 
 // Request logging middleware
 export const requestLogger = (req: any, res: any, next: any) => {
@@ -108,32 +76,5 @@ export const requestLogger = (req: any, res: any, next: any) => {
     next();
 };
 
-// Error logging helper
-export const logError = (error: Error, context?: Record<string, any>) => {
-    logger.error('Error occurred', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name,
-        ...context,
-    });
-};
-
-// Performance logging helper
-export const logPerformance = (operation: string, duration: number, context?: Record<string, any>) => {
-    logger.info('Performance metric', {
-        operation,
-        duration,
-        ...context,
-    });
-};
-
-// Chat interaction logging
-export const logChatInteraction = (type: 'request' | 'response' | 'tool_call' | 'error' | 'session_created' | 'message_added', data: any) => {
-    logger.info('Chat interaction', {
-        type,
-        timestamp: new Date().toISOString(),
-        ...data,
-    });
-};
 
 export default logger;

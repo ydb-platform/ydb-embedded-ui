@@ -72,26 +72,6 @@ export class MCPClient {
         }
     }
 
-    /**
-     * Get available resources from a server
-     */
-    async getResources(serverName: string): Promise<any[]> {
-        const client = this.clients.get(serverName);
-        if (!client) {
-            throw new Error(`Server ${serverName} is not connected`);
-        }
-
-        try {
-            const response = await client.listResources();
-            return response.resources || [];
-        } catch (error) {
-            logger.error('Failed to get resources from MCP server', {
-                serverName,
-                error: error instanceof Error ? error.message : String(error)
-            });
-            throw error;
-        }
-    }
 
     /**
      * Call a tool on an MCP server
@@ -131,39 +111,6 @@ export class MCPClient {
         }
     }
 
-    /**
-     * Read a resource from an MCP server
-     */
-    async readResource(serverName: string, uri: string): Promise<any> {
-        const client = this.clients.get(serverName);
-        if (!client) {
-            throw new Error(`Server ${serverName} is not connected`);
-        }
-
-        logger.debug('Reading MCP resource', {
-            serverName,
-            uri
-        });
-
-        try {
-            const response = await client.readResource({ uri });
-
-            logger.debug('MCP resource read completed', {
-                serverName,
-                uri,
-                hasContent: !!(response.contents && response.contents.length > 0)
-            });
-
-            return response;
-        } catch (error) {
-            logger.error('Failed to read MCP resource', {
-                serverName,
-                uri,
-                error: error instanceof Error ? error.message : String(error)
-            });
-            throw error;
-        }
-    }
 
     /**
      * Disconnect from a server

@@ -1,11 +1,16 @@
-import { createComponentLogger } from '../utils/logger';
+import { logger } from '../utils/logger';
 import { ValidationError } from '../utils/errors';
 import { getLLMService } from './llm.service';
 import { getMCPService } from './mcp';
-import { ChatMessage } from '../types/chat';
 import { MCPTool } from '../types/mcp';
 
-const logger = createComponentLogger('ChatService');
+// Simple interface for internal use
+interface ChatMessage {
+    role: 'user' | 'assistant' | 'system' | 'tool';
+    content: string;
+    toolCalls?: any[];
+    toolCallId?: string;
+}
 
 export class ChatService {
     private llmService = getLLMService();
@@ -40,7 +45,7 @@ export class ChatService {
             // Validate messages
             this.validateMessages(messages);
 
-            const availableTools = this.getAvailableTools();
+            const availableTools = this.mcpService.getAllTools();
             const maxIterations = options.maxIterations || 5;
             
             logger.info('Starting agent loop', {
@@ -51,7 +56,7 @@ export class ChatService {
 
             // Log available tools for debugging
             logger.info('Available tools for LLM', {
-                tools: availableTools.map(tool => ({
+                tools: availableTools.map((tool: MCPTool & { serverName: string }) => ({
                     name: tool.name,
                     description: tool.description,
                     inputSchema: tool.inputSchema,
@@ -246,7 +251,7 @@ export class ChatService {
 
                 // Execute tool calls
                 for (const toolCall of completeToolCalls) {
-                    const toolWithServer = availableTools.find(t => t.name === toolCall.function.name);
+                    const toolWithServer = availableTools.find((t: MCPTool & { serverName: string }) => t.name === toolCall.function.name);
                     const serverName = toolWithServer?.serverName || 'ydb-mcp-server';
 
                     // Don't send tool_executing events - LLM will explain in text
@@ -336,39 +341,7 @@ export class ChatService {
         }
     }
 
-    /**
-     * Get available tools from all connected MCP servers
-     */
-    getAvailableTools(): Array<MCPTool & { serverName: string }> {
-        return this.mcpService.getAllTools();
-    }
 
-    /**
-     * Get health status
-     */
-    async getHealthStatus(): Promise<{
-        chatService: { status: 'healthy' | 'degraded' | 'unhealthy' };
-        llmService: { available: boolean; model: string; error?: string };
-        mcpService: { [serverName: string]: { status: string; toolCount: number; resourceCount: number } };
-    }> {
-        const llmHealth = await this.llmService.healthCheck();
-        const mcpServers = this.mcpService.getServers();
-        const mcpHealth: { [serverName: string]: { status: string; toolCount: number; resourceCount: number } } = {};
-        
-        mcpServers.forEach(server => {
-            mcpHealth[server.name] = {
-                status: server.status,
-                toolCount: server.toolCount,
-                resourceCount: server.resourceCount,
-            };
-        });
-
-        return {
-            chatService: { status: 'healthy' },
-            llmService: llmHealth,
-            mcpService: mcpHealth,
-        };
-    }
 
     /**
      * Validate message data

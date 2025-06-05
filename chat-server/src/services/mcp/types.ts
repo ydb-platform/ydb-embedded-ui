@@ -1,4 +1,4 @@
-import { MCPTool, MCPResource } from '../../types/mcp';
+import { MCPTool } from '../../types/mcp';
 
 export interface MCPServerConfig {
     name: string;
@@ -20,7 +20,6 @@ export interface MCPServer {
     connection?: MCPConnection;
     status: 'disconnected' | 'connecting' | 'connected' | 'error';
     tools?: MCPTool[];
-    resources?: MCPResource[];
     lastError?: string;
 }
 

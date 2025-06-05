@@ -8,8 +8,6 @@ import { appConfig, getMCPConfig } from './utils/config';
 import { logger, requestLogger } from './utils/logger';
 import { ChatService } from './services/chat.service';
 import { getMCPService } from './services/mcp';
-import { ChatCompletionOptions } from './types/chat';
-import { AppError } from './utils/errors';
 
 const app = express();
 
@@ -125,76 +123,9 @@ app.post('/api/chat', async (req, res) => {
     }
 });
 
-// Chat health endpoint
-app.get('/api/chat/health', async (_req, res) => {
-    try {
-        const health = await chatService.getHealthStatus();
-        const tools = chatService.getAvailableTools();
-        
-        res.json({
-            status: health.chatService.status,
-            mcpConnected: health.llmService.available,
-            toolsAvailable: tools.length
-        });
-    } catch (error) {
-        logger.error('Chat health check failed', { error: error instanceof Error ? error.message : String(error) });
-        res.status(500).json({
-            status: 'error',
-            mcpConnected: false,
-            toolsAvailable: 0
-        });
-    }
-});
-
-// Chat tools endpoint
-app.get('/api/chat/tools', async (_req, res) => {
-    try {
-        const tools = chatService.getAvailableTools();
-        res.json(tools);
-    } catch (error) {
-        logger.error('Failed to get chat tools', { error: error instanceof Error ? error.message : String(error) });
-        res.status(500).json({ error: 'Failed to get tools' });
-    }
-});
-
-
-// MCP endpoints
-app.get('/api/mcp/servers', async (_req, res) => {
-    try {
-        const servers = mcpService.getServers();
-        res.json(servers);
-    } catch (error) {
-        logger.error('Failed to list MCP servers', { error: error instanceof Error ? error.message : String(error) });
-        res.status(500).json({ error: 'Failed to list servers' });
-    }
-});
-
-app.post('/api/mcp/servers/:serverId/tools/:toolName', async (req, res) => {
-    try {
-        const { serverId, toolName } = req.params;
-        const { arguments: args } = req.body;
-
-        const result = await mcpService.callTool(serverId, toolName, args);
-        res.json(result);
-    } catch (error) {
-        logger.error('Failed to call MCP tool', {
-            error: error instanceof Error ? error.message : String(error),
-            serverId: req.params.serverId,
-            toolName: req.params.toolName
-        });
-        res.status(500).json({ error: 'Failed to call tool' });
-    }
-});
 
 // Error handling middleware
 app.use((error: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
-    if (error instanceof AppError) {
-        return res.status(error.statusCode).json({
-            error: error.message,
-            code: error.code,
-        });
-    }
-
     logger.error('Unhandled error', {
         error: error.message,
         stack: error.stack,
