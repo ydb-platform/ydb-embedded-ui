@@ -176,7 +176,7 @@ function OperationsActions({operation, database, refreshTable}: OperationsAction
                                     createToast({
                                         name: 'Forgotten',
                                         title: i18n('text_forgotten', {id}),
-                                        type: 'success',
+                                        theme: 'success',
                                     });
                                     refreshTable();
                                 })
@@ -200,7 +200,7 @@ function OperationsActions({operation, database, refreshTable}: OperationsAction
                                     createToast({
                                         name: 'Cancelled',
                                         title: i18n('text_cancelled', {id}),
-                                        type: 'success',
+                                        theme: 'success',
                                     });
                                     refreshTable();
                                 })

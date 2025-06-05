@@ -1,0 +1,41 @@
+.ydb-healthcheck-preview {
+    $block: &;
+
+    &__icon-wrapper {
+        display: inline-flex;
+
+        color: var(--g-color-text-warning);
+    }
+
+    &__skeleton {
+        width: 100%;
+        height: 60px;
+    }
+
+    &__alert-message {
+        height: 30px;
+    }
+
+    &__icon {
+        display: flex;
+
+        height: 100%;
+        margin: auto;
+
+        &_good {
+            color: var(--g-color-text-positive);
+        }
+        &_degraded {
+            color: var(--g-color-text-info);
+        }
+        &_emergency {
+            color: var(--g-color-text-danger);
+        }
+        &_unspecified {
+            color: var(--g-color-text-misc);
+        }
+        &_maintenance_required {
+            color: var(--g-color-text-warning-heavy);
+        }
+    }
+}

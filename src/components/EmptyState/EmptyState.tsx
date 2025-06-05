@@ -9,6 +9,7 @@ import './EmptyState.scss';
 const block = cn('empty-state');
 
 const sizes = {
+    xs: 100,
     s: 150,
     m: 250,
     l: 350,

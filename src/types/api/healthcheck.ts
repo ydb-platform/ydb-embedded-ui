@@ -1,3 +1,4 @@
+// Matches proto3 definition from Ydb.Monitoring package
 export enum SelfCheckResult {
     UNSPECIFIED = 'UNSPECIFIED',
     GOOD = 'GOOD',
@@ -28,12 +29,12 @@ interface LocationStoragePDisk {
 }
 
 interface LocationStorageVDisk {
-    id: string;
-    pdisk: LocationStoragePDisk;
+    id: string[];
+    pdisk: LocationStoragePDisk[];
 }
 
 interface LocationStorageGroup {
-    id: string;
+    id: string[];
     vdisk: LocationStorageVDisk;
 }
 
@@ -53,30 +54,32 @@ interface LocationComputePool {
 
 interface LocationComputeTablet {
     type: string;
-    id?: string[];
+    id: string[];
     count: number;
 }
 
 interface LocationComputeSchema {
-    type?: string;
-    path?: string;
+    type: string;
+    path: string;
 }
 
 interface LocationCompute {
-    node?: LocationNode;
-    pool?: LocationComputePool;
+    node: LocationNode;
+    pool: LocationComputePool;
     tablet: LocationComputeTablet;
-    schema?: LocationComputeSchema;
+    schema: LocationComputeSchema;
 }
 
 interface LocationDatabase {
     name: string;
 }
 
-interface Location {
-    storage: LocationStorage;
-    compute: LocationCompute;
-    database: LocationDatabase;
+export interface Location {
+    storage?: LocationStorage;
+    compute?: LocationCompute;
+    database?: LocationDatabase;
+    node?: LocationNode;
+    peer?: LocationNode;
 }
 
 export interface IssueLog {
@@ -87,6 +90,80 @@ export interface IssueLog {
     reason?: string[];
     type: string;
     level: number;
+    listed?: number;
+    count?: number;
+}
+
+interface StoragePDiskStatus {
+    id: string;
+    overall: StatusFlag;
+}
+
+interface StorageVDiskStatus {
+    id: string;
+    overall: StatusFlag;
+    vdisk_status: StatusFlag;
+    pdisk: StoragePDiskStatus;
+}
+
+interface StorageGroupStatus {
+    id: string;
+    overall: StatusFlag;
+    vdisks: StorageVDiskStatus[];
+}
+
+interface StoragePoolStatus {
+    id: string;
+    overall: StatusFlag;
+    groups: StorageGroupStatus[];
+}
+
+interface StorageStatus {
+    overall: StatusFlag;
+    pools: StoragePoolStatus[];
+}
+
+interface ComputeTabletStatus {
+    overall: StatusFlag;
+    type: string;
+    state: string;
+    count: number;
+    id: string[];
+}
+
+interface ThreadPoolStatus {
+    overall: StatusFlag;
+    name: string;
+    usage: number;
+}
+
+interface LoadAverageStatus {
+    overall: StatusFlag;
+    load: number;
+    cores: number;
+}
+
+interface ComputeNodeStatus {
+    id: string;
+    overall: StatusFlag;
+    tablets: ComputeTabletStatus[];
+    pools: ThreadPoolStatus[];
+    load: LoadAverageStatus;
+}
+
+interface ComputeStatus {
+    overall: StatusFlag;
+    nodes: ComputeNodeStatus[];
+    tablets: ComputeTabletStatus[];
+    paths_quota_usage: number;
+    shards_quota_usage: number;
+}
+
+interface DatabaseStatus {
+    name: string;
+    overall: StatusFlag;
+    storage: StorageStatus;
+    compute: ComputeStatus;
 }
 
 export interface HealthCheckAPIResponse {
@@ -94,4 +171,7 @@ export interface HealthCheckAPIResponse {
     self_check_result: SelfCheckResult;
     // eslint-disable-next-line camelcase
     issue_log?: IssueLog[];
+    // eslint-disable-next-line camelcase
+    database_status?: DatabaseStatus[];
+    location?: LocationNode;
 }

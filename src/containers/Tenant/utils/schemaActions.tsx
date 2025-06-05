@@ -127,13 +127,13 @@ const bindActions = (
                 createToast({
                     name: 'Copied',
                     title: i18n('actions.copied'),
-                    type: 'success',
+                    theme: 'success',
                 });
             } catch {
                 createToast({
                     name: 'Not copied',
                     title: i18n('actions.notCopied'),
-                    type: 'error',
+                    theme: 'danger',
                 });
             }
         },

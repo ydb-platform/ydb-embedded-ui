@@ -24,6 +24,8 @@
   "cards.cpu-label": "CPU",
   "cards.storage-label": "Storage",
   "cards.memory-label": "Memory",
+  "cards.network-label": "Network",
+  "cards.network-note": "Network usage is the average outgoing bandwidth usage across all nodes in the database",
 
   "charts.queries-per-second": "Queries per second",
   "charts.transaction-latency": "Transactions latencies {{percentile}}",

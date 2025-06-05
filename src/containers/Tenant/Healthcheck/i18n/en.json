@@ -1,0 +1,41 @@
+{
+  "description_no-data": "No healthcheck data",
+  "label_storage": "Storage",
+  "label_compute": "Compute",
+  "description_search-issue": "Search issue...",
+  "action_refresh": "Refresh",
+  "description_minutes": "{{count}} min ago",
+  "description_hours": [
+    "{{count}} hour ago",
+    "{{count}} hours ago",
+    "{{count}} hours ago",
+    "{{count}} hours ago"
+  ],
+  "description_days": [
+    "{{count}} day ago",
+    "{{count}} days ago",
+    "{{count}} days ago",
+    "{{count}} days ago"
+  ],
+  "label_no-issues": "No issues",
+  "description_no-issues": "Here you will see issues that require your attention",
+  "label_details": "Details",
+  "label_storage_location": "Storage Location",
+  "label_compute_location": "Compute Location",
+  "label_description": "Description",
+  "label_node-id": "Node ID",
+  "label_node-host": "Node Host",
+  "label_node-port": "Node Port",
+  "label_pool-name": "Pool Name",
+  "label_tablet-id": "Tablet ID",
+  "label_tablet-type": "Tablet Type",
+  "label_tablet-count": "Tablets Count",
+  "label_schema-type": "Schema Type",
+  "label_schema-path": "Schema Path",
+  "label_group-id": "Group ID",
+  "label_vdisk-id": "VDisk ID",
+  "label_pdisk-id": "Pdisk ID",
+  "label_pdisk-path": "PDisk Path",
+  "label_node_location": "Node Location",
+  "label_peer_location": "Peer Node Location"
+}

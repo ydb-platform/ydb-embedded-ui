@@ -14,11 +14,12 @@ import type {
     TenantStorageStats,
 } from '../../../../../store/reducers/tenants/utils';
 import {getMetricStatusFromUsage} from '../../../../../store/reducers/tenants/utils';
+import {formatBytes} from '../../../../../utils/bytesParsers';
 import {cn} from '../../../../../utils/cn';
+import {SHOW_NETWORK_UTILIZATION} from '../../../../../utils/constants';
 import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
-import {useTypedSelector} from '../../../../../utils/hooks';
+import {useSetting, useTypedSelector} from '../../../../../utils/hooks';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
-import {HealthcheckPreview} from '../Healthcheck/HealthcheckPreview';
 import i18n from '../i18n';
 
 import type {DiagnosticsCardMetric} from './MetricCard/MetricCard';
@@ -42,7 +43,7 @@ interface MetricsCardsProps {
     memoryStats?: TenantMetricStats[];
     blobStorageStats?: TenantStorageStats[];
     tabletStorageStats?: TenantStorageStats[];
-    tenantName: string;
+    networkStats?: TenantMetricStats[];
 }
 
 export function MetricsCards({
@@ -50,7 +51,7 @@ export function MetricsCards({
     memoryStats,
     blobStorageStats,
     tabletStorageStats,
-    tenantName,
+    networkStats,
 }: MetricsCardsProps) {
     const location = useLocation();
 
@@ -80,10 +81,6 @@ export function MetricsCards({
             ...queryParams,
             [TenantTabsGroups.metricsTab]: getTabIfNotActive(TENANT_METRICS_TABS_IDS.memory),
         }),
-        [TENANT_METRICS_TABS_IDS.healthcheck]: getTenantPath({
-            ...queryParams,
-            [TenantTabsGroups.metricsTab]: getTabIfNotActive(TENANT_METRICS_TABS_IDS.healthcheck),
-        }),
     };
 
     return (
@@ -107,12 +104,7 @@ export function MetricsCards({
                     active={metricsTab === TENANT_METRICS_TABS_IDS.memory}
                 />
             </Link>
-            <Link to={tabLinks.healthcheck} className={b('tab')}>
-                <HealthcheckPreview
-                    tenantName={tenantName}
-                    active={metricsTab === TENANT_METRICS_TABS_IDS.healthcheck}
-                />
-            </Link>
+            <NetworkCard networkStats={networkStats} />
         </div>
     );
 }
@@ -218,6 +210,44 @@ function MemoryCard({active, memoryStats = []}: MemoryCardProps) {
         <MetricCard
             label={i18n('cards.memory-label')}
             active={active}
+            metrics={metrics}
+            status={status}
+        />
+    );
+}
+interface NetworkCardProps {
+    networkStats?: TenantMetricStats[];
+}
+
+function NetworkCard({networkStats}: NetworkCardProps) {
+    const [showNetworkUtilization] = useSetting<boolean>(SHOW_NETWORK_UTILIZATION);
+    if (!showNetworkUtilization || !networkStats) {
+        return null;
+    }
+    let status: MetricStatus = METRIC_STATUS.Unspecified;
+
+    const metrics: DiagnosticsCardMetric[] = networkStats.map((metric) => {
+        const {used, limit, usage} = metric;
+
+        const metricStatus = getMetricStatusFromUsage(usage);
+        if (MetricStatusToSeverity[metricStatus] > MetricStatusToSeverity[status]) {
+            status = metricStatus;
+        }
+
+        return {
+            title: formatBytes({value: limit, withSpeedLabel: true}),
+            value: used,
+            capacity: limit,
+            percents: true,
+            withOverflow: true,
+        };
+    });
+
+    return (
+        <MetricCard
+            interactive={false}
+            label={i18n('cards.network-label')}
+            note={i18n('cards.network-note')}
             metrics={metrics}
             status={status}
         />

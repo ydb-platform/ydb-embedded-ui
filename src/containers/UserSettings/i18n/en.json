@@ -38,7 +38,7 @@
 
   "settings.enableNetworkTable.title": "Enable network table",
 
-  "settings.showNetworkUtilization.title": "Show cluster network utilization",
+  "settings.showNetworkUtilization.title": "Show network utilization",
 
   "settings.useShowPlanToSvg.title": "Execution plan",
   "settings.useShowPlanToSvg.description": " Show \"Execution plan\" button in query result widow. Opens svg with execution plan in a new window.",

@@ -1,6 +1,7 @@
 @use '../../styles/mixins.scss';
 
 .empty-state {
+    $block: &;
     padding: 20px;
 
     &_size_m {
@@ -13,6 +14,14 @@
             'image title'
             'image description'
             'image actions';
+
+        &_size_xs {
+            width: 321px;
+            height: 100px;
+            #{$block}__image {
+                margin-right: var(--g-spacing-5);
+            }
+        }
         &_size_s {
             width: 460px;
             height: 120px;

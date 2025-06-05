@@ -1,52 +1,45 @@
 import React from 'react';
 
-import {
-    CircleCheck,
-    CircleInfo,
-    CircleQuestion,
-    CircleXmark,
-    TriangleExclamationFill,
-} from '@gravity-ui/icons';
-import type {IconData} from '@gravity-ui/uikit';
-import {Icon, Popover} from '@gravity-ui/uikit';
+import type {AlertProps} from '@gravity-ui/uikit';
+import {Alert, Button, Flex, Icon, Popover, Skeleton} from '@gravity-ui/uikit';
 
-import {DiagnosticCard} from '../../../../../components/DiagnosticCard/DiagnosticCard';
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
-import {Loader} from '../../../../../components/Loader';
 import {useClusterBaseInfo} from '../../../../../store/reducers/cluster/cluster';
 import {healthcheckApi} from '../../../../../store/reducers/healthcheckInfo/healthcheckInfo';
 import {SelfCheckResult} from '../../../../../types/api/healthcheck';
 import {cn} from '../../../../../utils/cn';
-import {useAutoRefreshInterval, useTypedSelector} from '../../../../../utils/hooks';
+import {useAutoRefreshInterval} from '../../../../../utils/hooks';
+import {HEALTHCHECK_RESULT_TO_ICON, HEALTHCHECK_RESULT_TO_TEXT} from '../../../constants';
+import {useTenantQueryParams} from '../../../useTenantQueryParams';
 
 import i18n from './i18n';
 
 import CircleExclamationIcon from '@gravity-ui/icons/svgs/circle-exclamation.svg';
 
-import './Healthcheck.scss';
+import './HealthcheckPreview.scss';
 
-const b = cn('healthcheck');
+const b = cn('ydb-healthcheck-preview');
 
 interface HealthcheckPreviewProps {
     tenantName: string;
     active?: boolean;
 }
 
-const icons: Record<SelfCheckResult, IconData> = {
-    [SelfCheckResult.UNSPECIFIED]: CircleQuestion,
-    [SelfCheckResult.GOOD]: CircleCheck,
-    [SelfCheckResult.DEGRADED]: CircleInfo,
-    [SelfCheckResult.MAINTENANCE_REQUIRED]: CircleXmark,
-    [SelfCheckResult.EMERGENCY]: TriangleExclamationFill,
+const checkResultToAlertTheme: Record<SelfCheckResult, AlertProps['theme']> = {
+    [SelfCheckResult.UNSPECIFIED]: 'normal',
+    [SelfCheckResult.GOOD]: 'success',
+    [SelfCheckResult.DEGRADED]: 'info',
+    [SelfCheckResult.MAINTENANCE_REQUIRED]: 'warning',
+    [SelfCheckResult.EMERGENCY]: 'danger',
 };
 
 export function HealthcheckPreview(props: HealthcheckPreviewProps) {
-    const {tenantName, active} = props;
+    const {tenantName} = props;
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    const {metricsTab} = useTypedSelector((state) => state.tenant);
-
     const {name} = useClusterBaseInfo();
+
+    const {handleShowHealthcheckChange} = useTenantQueryParams();
 
     const healthcheckPreviewDisabled = name === 'ydb_ru';
 
@@ -67,10 +60,10 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
         healthcheckApi.useLazyGetHealthcheckInfoQuery();
 
     React.useEffect(() => {
-        if (metricsTab === 'healthcheck' && healthcheckPreviewDisabled) {
+        if (healthcheckPreviewDisabled) {
             getHealthcheckQuery({database: tenantName});
         }
-    }, [metricsTab, healthcheckPreviewDisabled, tenantName, getHealthcheckQuery]);
+    }, [healthcheckPreviewDisabled, tenantName, getHealthcheckQuery]);
 
     React.useEffect(() => {
         const fetchHealthcheck = () => {
@@ -87,60 +80,69 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
     const loading =
         (isFetching && data === undefined) || (isFetchingManually && manualData === undefined);
 
-    const renderHeader = () => {
+    const selfCheckResult: SelfCheckResult =
+        data?.self_check_result || manualData?.self_check_result || SelfCheckResult.UNSPECIFIED;
+
+    const modifier = selfCheckResult.toLowerCase();
+
+    if (loading) {
+        return <Skeleton className={b('skeleton')} />;
+    }
+
+    const issuesCount = data?.issue_log?.filter((issue) => !issue.reason).length;
+
+    const issuesText = issuesCount ? i18n('description_problems', {count: issuesCount}) : '';
+
+    const renderAlertMessage = () => {
+        if (error) {
+            return <ResponseError error={error} defaultMessage={i18n('description_no-data')} />;
+        }
         return (
-            <div className={b('preview-header')}>
-                <div className={b('preview-title-wrapper')}>
-                    <div className={b('preview-title')}>{i18n('title.healthcheck')}</div>
-                    {/* FIXME https://github.com/ydb-platform/ydb-embedded-ui/issues/1889 */}
+            <Flex
+                gap={1}
+                alignItems="center"
+                justifyContent={'space-between'}
+                className={b('alert-message')}
+            >
+                <Flex gap={1} alignItems="center">
+                    {HEALTHCHECK_RESULT_TO_TEXT[selfCheckResult]}
+                    {issuesText ? ` ${issuesText}` : ''}
                     {healthcheckPreviewDisabled ? (
                         <Popover
                             content={'Healthcheck is disabled. Please update healthcheck manually.'}
                             placement={['top']}
                             className={b('icon-wrapper')}
                         >
-                            {() => (
-                                <Icon
-                                    size={16}
-                                    className={b('icon-warn')}
-                                    data={CircleExclamationIcon}
-                                />
-                            )}
+                            {() => <Icon size={16} data={CircleExclamationIcon} />}
                         </Popover>
                     ) : null}
-                </div>
-            </div>
-        );
-    };
-
-    const renderContent = () => {
-        if (error) {
-            return <ResponseError error={error} defaultMessage={i18n('no-data')} />;
-        }
-
-        if (loading) {
-            return <Loader size="m" />;
-        }
-
-        const selfCheckResult =
-            data?.self_check_result || manualData?.self_check_result || SelfCheckResult.UNSPECIFIED;
-        const modifier = selfCheckResult.toLowerCase();
-        return (
-            <div className={b('preview-content')}>
-                <div className={b('preview-issue', {[modifier]: true})}>
-                    <Icon className={b('preview-status-icon')} data={icons[selfCheckResult]} />
-                    <div className={b('self-check-status-indicator')}>
-                        {selfCheckResult.replace(/_/g, ' ')}
-                    </div>
-                </div>
-            </div>
+                </Flex>
+                {issuesCount && (
+                    <Button
+                        onClick={() => {
+                            handleShowHealthcheckChange(true);
+                        }}
+                    >
+                        {i18n('action_review-issues')}
+                    </Button>
+                )}
+            </Flex>
         );
     };
 
     return (
-        <DiagnosticCard className={b('preview')} active={active}>
-            {renderHeader()}
-            {renderContent()}
-        </DiagnosticCard>
+        <Alert
+            className={b()}
+            theme={checkResultToAlertTheme[selfCheckResult]}
+            view={error ? 'outlined' : 'filled'}
+            message={renderAlertMessage()}
+            icon={
+                <Icon
+                    size={18}
+                    data={HEALTHCHECK_RESULT_TO_ICON[selfCheckResult]}
+                    className={b('icon', {[modifier]: true})}
+                />
+            }
+        />
     );
 }

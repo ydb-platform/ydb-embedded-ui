@@ -62,6 +62,11 @@ export interface TTenant {
 
     StorageUsage?: TStorageUsage[];
     QuotaUsage?: TStorageUsage[];
+
+    /** value is float */
+    NetworkUtilization?: number;
+    /** value is uint64 */
+    NetworkWriteThroughput?: string;
 }
 
 export interface THiveDomainStatsStateCount {
