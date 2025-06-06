@@ -123,3 +123,13 @@ export const useEditDatabaseFeatureAvailable = () => {
 export const useDeleteDatabaseFeatureAvailable = () => {
     return useGetMetaFeatureVersion('/meta/delete_database') >= 1;
 };
+
+export const useAddClusterFeatureAvailable = () => {
+    return useGetMetaFeatureVersion('/meta/create_cluster') >= 1;
+};
+export const useEditClusterFeatureAvailable = () => {
+    return useGetMetaFeatureVersion('/meta/update_cluster') >= 1;
+};
+export const useDeleteClusterFeatureAvailable = () => {
+    return useGetMetaFeatureVersion('/meta/delete_cluster') >= 1;
+};

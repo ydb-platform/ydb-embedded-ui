@@ -2,17 +2,15 @@
 
 .clusters {
     overflow: auto;
+    gap: var(--g-spacing-4);
 
-    padding-top: 15px;
+    padding: var(--g-spacing-4) var(--g-spacing-5) 0;
 
     @include mixins.body-2-typography();
     @include mixins.flex-container();
+
     &__autorefresh {
         margin-left: auto;
-    }
-    &__cluster {
-        display: flex;
-        align-items: center;
     }
     &__cluster-status {
         width: 18px;
@@ -63,11 +61,6 @@
         white-space: normal;
     }
 
-    &__controls {
-        display: flex;
-
-        margin-bottom: 20px;
-    }
     &__control {
         width: 200px;
         margin-right: 15px;
@@ -85,48 +78,6 @@
 
     & .g-progress__item {
         transition: none;
-    }
-
-    &__aggregation,
-    &__controls {
-        margin-right: 15px;
-        margin-left: 15px;
-    }
-
-    &__aggregation {
-        display: flex;
-        align-items: center;
-
-        width: max-content;
-        height: 46px;
-        margin-bottom: 20px;
-        padding: 10px 20px;
-
-        border: 1px solid var(--g-color-line-generic);
-        border-radius: 10px;
-        background: var(--g-color-base-generic-ultralight);
-    }
-
-    &__aggregation-value-container {
-        display: flex;
-        align-items: center;
-
-        max-width: 230px;
-
-        font-size: var(--g-text-subheader-3-font-size);
-        line-height: var(--g-text-subheader-3-line-height);
-    }
-
-    &__aggregation-value-container:not(:last-child) {
-        margin-right: 30px;
-    }
-
-    &__aggregation-label {
-        margin-right: 8px;
-
-        font-weight: 200;
-
-        color: var(--g-color-text-complementary);
     }
 
     &__text {
@@ -147,7 +98,6 @@
     &__table-wrapper {
         overflow: auto;
 
-        padding-left: 5px;
         @include mixins.flex-container();
     }
 
@@ -185,5 +135,9 @@
     &__error {
         margin-left: 15px;
         @include mixins.body-2-typography();
+    }
+
+    &__remove-cluster {
+        color: var(--ydb-color-status-red);
     }
 }

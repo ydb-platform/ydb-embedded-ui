@@ -15,5 +15,8 @@
 
   "tooltip_no-cluster-data": "No cluster data",
 
-  "page_title": "Clusters"
+  "page_title": "Clusters",
+
+  "edit-cluster": "Edit Cluster",
+  "remove-cluster": "Remove Cluster"
 }
