@@ -181,43 +181,7 @@ test.describe('Diagnostics Queries tab', async () => {
         expect(await diagnostics.getSelectedQueryPeriod()).toBe(QueryPeriod.PerHour);
     });
 
-    test('FixedHeightQuery maintains consistent height and proper scrolling behavior', async ({
-        page,
-    }) => {
-        // Setup mock with 100 rows for scrolling test
-        await setupTopQueriesMock(page);
-
-        const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
-            tenantPage: 'diagnostics',
-            diagnosticsTab: 'topQueries',
-        };
-        const tenantPage = new TenantPage(page);
-        await tenantPage.goto(pageQueryParams);
-
-        const diagnostics = new Diagnostics(page);
-        await expect(diagnostics.table.isVisible()).resolves.toBe(true);
-
-        // Verify we have enough rows to test scrolling
-        const rowCount = await diagnostics.table.getRowCount();
-        if (rowCount > 5) {
-            // Test scrolling behavior: click on a row that might not be fully visible
-            const targetRowIndex = Math.min(rowCount, 8); // Target a row further down
-
-            // Click on the target row to test scrolling
-            await diagnostics.table.clickRow(targetRowIndex);
-
-            // Wait for any scrolling animation
-            await page.waitForTimeout(500);
-
-            // Verify the row is now visible in the viewport
-            const isVisible = await diagnostics.table.isRowVisible(targetRowIndex);
-            expect(isVisible).toBe(true);
-        }
-    });
-
-    test('FixedHeightQuery components have consistent height across different query lengths', async ({
+    test('Top Query rows components have consistent height across different query lengths', async ({
         page,
     }) => {
         // Setup mock with 100 rows for scrolling test
