@@ -29,8 +29,11 @@ jobs:
 
             const projectNumber = 24;
             const org = "ydb-platform";
+            const issueNumber = issue.number;
+            const repoName = context.repo.repo;
+            const repoOwner = context.repo.owner;
 
-            const result = await github.graphql(`
+            const projectQuery = await github.graphql(`
               query($org: String!, $number: Int!) {
                 organization(login: $org) {
                   projectV2(number: $number) {
@@ -43,17 +46,44 @@ jobs:
                         }
                       }
                     }
-                    items(first: 100) {
-                      nodes {
-                        id
-                        content {
-                          __typename
-                          ... on Issue {
-                            id
-                            number
-                            repository {
-                              name
-                              owner { login }
+                  }
+                }
+              }
+            `, { org, number: projectNumber });
+
+            const projectId = projectQuery.organization.projectV2.id;
+            const field = projectQuery.organization.projectV2.fields.nodes.find(f => f.name === "CalculatedPriority");
+            if (!field) {
+              core.setFailed("Field 'CalculatedPriority' not found.");
+              return;
+            }
+            const fieldId = field.id;
+
+            // Now paginate to find the matching item
+            let item = null;
+            let cursor = null;
+            let hasNextPage = true;
+
+            while (hasNextPage && !item) {
+              const response = await github.graphql(`
+                query($org: String!, $number: Int!, $after: String) {
+                  organization(login: $org) {
+                    projectV2(number: $number) {
+                      items(first: 100, after: $after) {
+                        pageInfo {
+                          hasNextPage
+                          endCursor
+                        }
+                        nodes {
+                          id
+                          content {
+                            __typename
+                            ... on Issue {
+                              number
+                              repository {
+                                name
+                                owner { login }
+                              }
                             }
                           }
                         }
@@ -61,33 +91,27 @@ jobs:
                     }
                   }
                 }
-              }
-            `, { org, number: projectNumber });
+              `, { org, number: projectNumber, after: cursor });
 
-            const project = result.organization.projectV2;
+              const items = response.organization.projectV2.items.nodes;
 
-            const field = project.fields.nodes.find(f => f.name === "CalculatedPriority");
-            if (!field) {
-              core.setFailed("Field 'CalculatedPriority' not found.");
-              return;
+              item = items.find(n =>
+                n.content?.__typename === "Issue" &&
+                n.content?.number === issueNumber &&
+                n.content?.repository?.name === repoName &&
+                n.content?.repository?.owner?.login === repoOwner
+              );
+
+              hasNextPage = response.organization.projectV2.items.pageInfo.hasNextPage;
+              cursor = response.organization.projectV2.items.pageInfo.endCursor;
             }
-
-            const issueNumber = issue.number;
-            const repoName = context.repo.repo;
-            const repoOwner = context.repo.owner;
-
-            const item = project.items.nodes.find(n =>
-              n.content?.__typename === "Issue" &&
-              n.content?.number === issueNumber &&
-              n.content?.repository?.name === repoName &&
-              n.content?.repository?.owner?.login === repoOwner
-            );
 
             if (!item) {
               console.log(`Issue #${issueNumber} not found in project (repo=${repoName}).`);
               return;
             }
 
+            // Update field
             await github.graphql(`
               mutation($input: UpdateProjectV2ItemFieldValueInput!) {
                 updateProjectV2ItemFieldValue(input: $input) {
@@ -98,11 +122,11 @@ jobs:
               }
             `, {
               input: {
-                projectId: project.id,
+                projectId,
                 itemId: item.id,
-                fieldId: field.id,
+                fieldId,
                 value: { number: finalScore }
               }
             });
 
-            console.log(`Updated CalculatedPriority of issue #${issueNumber} to ${finalScore}`);
+            console.log(`✅ Updated CalculatedPriority of issue #${issueNumber} to ${finalScore}`);
