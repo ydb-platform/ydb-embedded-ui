@@ -1,0 +1,15 @@
+name: Auto-add to GitHub Project
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  auto-add:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add to project
+        uses: github/add-to-project@v1
+        with:
+          github-token: ${{ secrets.YDBOT_TOKEN }}
+          project-url: https://github.com/orgs/ydb-platform/projects/24

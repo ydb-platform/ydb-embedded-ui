@@ -25,7 +25,6 @@ jobs:
 
             const createdAt = new Date(issue.created_at);
             const daysOld = Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
-
             const finalScore = basePriority + daysOld;
 
             const projectNumber = 24;
@@ -48,9 +47,14 @@ jobs:
                       nodes {
                         id
                         content {
+                          __typename
                           ... on Issue {
                             id
                             number
+                            repository {
+                              name
+                              owner { login }
+                            }
                           }
                         }
                       }
@@ -61,15 +65,26 @@ jobs:
             `, { org, number: projectNumber });
 
             const project = result.organization.projectV2;
+
             const field = project.fields.nodes.find(f => f.name === "CalculatedPriority");
             if (!field) {
               core.setFailed("Field 'CalculatedPriority' not found.");
               return;
             }
 
-            const item = project.items.nodes.find(n => n.content?.number === issue.number);
+            const issueNumber = issue.number;
+            const repoName = context.repo.repo;
+            const repoOwner = context.repo.owner;
+
+            const item = project.items.nodes.find(n =>
+              n.content?.__typename === "Issue" &&
+              n.content?.number === issueNumber &&
+              n.content?.repository?.name === repoName &&
+              n.content?.repository?.owner?.login === repoOwner
+            );
+
             if (!item) {
-              console.log(`Issue #${issue.number} not found in project.`);
+              console.log(`Issue #${issueNumber} not found in project (repo=${repoName}).`);
               return;
             }
 
@@ -90,4 +105,4 @@ jobs:
               }
             });
 
-            console.log(`Updated CalculatedPriority of issue #${issue.number} to ${finalScore}`);
+            console.log(`Updated CalculatedPriority of issue #${issueNumber} to ${finalScore}`);
