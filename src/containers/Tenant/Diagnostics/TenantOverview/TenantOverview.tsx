@@ -1,14 +1,13 @@
-import {Flex} from '@gravity-ui/uikit';
+import {Button, Flex, Icon} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
-import {LogsButton} from '../../../../components/LogsButton/LogsButton';
-import {MonitoringButton} from '../../../../components/MonitoringButton/MonitoringButton';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {tenantApi} from '../../../../store/reducers/tenant/tenant';
 import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../../types/additionalProps';
+import {getDatabaseLinks} from '../../../../utils/additionalProps';
 import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
 import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
 import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
@@ -141,8 +140,7 @@ export function TenantOverview({
         }
     };
 
-    const monitoringLink = additionalTenantProps?.getMonitoringLink?.(Name, Type);
-    const logsLink = additionalTenantProps?.getLogsLink?.(Name);
+    const links = getDatabaseLinks(additionalTenantProps, Name, Type);
 
     return (
         <LoaderWrapper loading={tenantLoading}>
@@ -152,8 +150,17 @@ export function TenantOverview({
                     <Flex alignItems="center" gap="1" className={b('top')}>
                         {renderName()}
                         <Flex gap="2">
-                            {monitoringLink && <MonitoringButton href={monitoringLink} />}
-                            {logsLink && <LogsButton href={logsLink} />}
+                            {links.map(({title, url, icon}) => (
+                                <Button
+                                    key={title}
+                                    href={url}
+                                    target="_blank"
+                                    size="xs"
+                                    title={title}
+                                >
+                                    <Icon data={icon} />
+                                </Button>
+                            ))}
                         </Flex>
                     </Flex>
                     <Flex direction="column" gap={3}>

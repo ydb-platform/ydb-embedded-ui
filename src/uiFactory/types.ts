@@ -3,8 +3,11 @@ import type {
     GetHealthcheckViewTitles,
     GetHealthcheckViewsOrder,
 } from '../containers/Tenant/Healthcheck/shared';
+import type {ClusterInfo} from '../store/reducers/cluster/cluster';
 import type {IssuesTree} from '../store/reducers/healthcheckInfo/types';
 import type {PreparedTenant} from '../store/reducers/tenants/types';
+import type {ClusterLink, DatabaseLink} from '../types/additionalProps';
+import type {ETenantType} from '../types/api/tenant';
 import type {GetLogsLink} from '../utils/logs';
 import type {GetMonitoringClusterLink, GetMonitoringLink} from '../utils/monitoring';
 
@@ -16,6 +19,9 @@ export interface UIFactory {
     getLogsLink?: GetLogsLink;
     getMonitoringLink?: GetMonitoringLink;
     getMonitoringClusterLink?: GetMonitoringClusterLink;
+
+    getDatabaseLinks?: GetDatabaseLinks;
+    getClusterLinks?: GetClusterLinks;
 
     healthcheck: {
         getHealthckechViewTitles: GetHealthcheckViewTitles<CommonIssueType>;
@@ -37,3 +43,11 @@ export type HandleDeleteDB = (params: {
     clusterName: string;
     databaseData: PreparedTenant;
 }) => Promise<boolean>;
+
+export type GetDatabaseLinks = (params: {
+    clusterInfo: ClusterInfo;
+    dbName?: string;
+    dbType?: ETenantType;
+}) => DatabaseLink[];
+
+export type GetClusterLinks = (params: {clusterInfo: ClusterInfo}) => ClusterLink[];

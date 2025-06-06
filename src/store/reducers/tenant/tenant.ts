@@ -67,7 +67,11 @@ export const tenantApi = api.injectEndpoints({
                     } else {
                         tenantData = await window.api.viewer.getTenantInfo({path}, {signal});
                     }
-                    return {data: tenantData.TenantInfo?.[0] ?? null};
+                    const databases = tenantData.TenantInfo || [];
+                    // previous meta versions do not support filtering databases by name
+                    const data =
+                        databases.find((tenant) => tenant.Name === path) ?? databases[0] ?? null;
+                    return {data};
                 } catch (error) {
                     return {error};
                 }
