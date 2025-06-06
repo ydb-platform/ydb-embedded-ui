@@ -13,6 +13,7 @@ export const TOP_QUERIES_TABLE_SETTINGS: Settings = {
     ...QUERY_TABLE_SETTINGS,
     disableSortReset: true,
     externalSort: true,
+    dynamicRenderType: 'uniform', // All rows have fixed height due to FixedHeightQuery
 };
 
 export function createQueryInfoItems(data: KeyValueRow): InfoViewerItem[] {

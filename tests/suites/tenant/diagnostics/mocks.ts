@@ -65,6 +65,123 @@ const generateTopShardsHistoryRow = (index: number) => {
 };
 
 /**
+ * Generates a mock row for the TopQueries table
+ * @param index Row index (0-based)
+ * @returns An array of values for each column
+ */
+const generateTopQueriesRow = (index: number) => {
+    // Use a fixed base date for consistent results
+    const baseDate = new Date('2025-06-06T12:00:00Z');
+
+    // Generate end time in the past 6 hours (deterministic)
+    const endTime = new Date(baseDate);
+    endTime.setMinutes(endTime.getMinutes() - (index * 3 + (index % 30)));
+
+    // Generate CPU time in microseconds (deterministic based on index)
+    const cpuTimeUs = 1000 + ((index * 1000) % 99000);
+
+    // Generate duration in microseconds (slightly higher than CPU time)
+    const duration = cpuTimeUs + ((index * 500) % 50000);
+
+    // Generate read bytes (deterministic)
+    const readBytes = 100 + ((index * 100) % 9900);
+
+    // Generate read rows (deterministic)
+    const readRows = 1 + ((index * 10) % 999);
+
+    // Generate request units (deterministic)
+    const requestUnits = 1 + ((index * 2) % 49);
+
+    // Generate rank
+    const rank = index + 1;
+
+    // Generate user SID
+    const users = [
+        'user@system',
+        'admin@system',
+        'service@system',
+        'metadata@system',
+        'test@system',
+    ];
+    const userSID = users[index % users.length];
+
+    // Generate various query types
+    const queryTemplates = [
+        `SELECT * FROM \`//dev02/home/xenoxeno/db1/.metadata/initialization/migrations\`;`,
+        `SELECT * FROM \`//dev02/home/xenoxeno/db1/.metadata/secrets/values\`;`,
+        `--!syntax_v1\nDECLARE $c0_0 AS Uint64;\nDECLARE $c0_1 AS String;\nINSERT INTO \`kv_test\` (c0, c1) VALUES ($c0_0, $c0_1)`,
+        `SELECT * FROM \`ydb/MasterClusterExt.db\`;\nSELECT version_str, color_class FROM \`ydb/MasterClusterVersions.db\`;`,
+        `DECLARE $name AS Utf8;\nSELECT * FROM \`ydb/MasterClusterExt.db\` WHERE name=$name`,
+        `SELECT COUNT(*) FROM \`big_kv_test\` WHERE id > 1000;`,
+        `UPDATE \`boring_table\` SET value = 'updated' WHERE key = 'test';`,
+        `SELECT a.*, b.* FROM \`cities\` a JOIN \`boring_table2\` b ON a.id = b.city_id;`,
+        `INSERT INTO \`my_column_table\` (id, name, timestamp) VALUES (${index}, 'test_${index}', CurrentUtcTimestamp());`,
+        `DELETE FROM \`my_row_table\` WHERE created_at < DateTime::MakeDate(DateTime::ParseIso8601('2024-01-01T00:00:00Z'));`,
+    ];
+
+    const queryText = queryTemplates[index % queryTemplates.length];
+
+    return [
+        cpuTimeUs, // CPUTimeUs
+        queryText, // QueryText
+        endTime.toISOString(), // IntervalEnd
+        endTime.toISOString(), // EndTime
+        readRows, // ReadRows
+        readBytes, // ReadBytes
+        userSID, // UserSID
+        duration, // Duration
+        requestUnits, // RequestUnits
+        rank, // Rank
+    ];
+};
+
+/**
+ * Sets up a mock for the TopQueries tab with 100 rows for scrolling tests
+ */
+export const setupTopQueriesMock = async (page: Page) => {
+    await page.route(`${backend}/viewer/json/query?*`, async (route) => {
+        const request = route.request();
+        const postData = request.postData();
+
+        // Only mock TopQueries requests (check if it's a TopQueries query)
+        if (postData && postData.includes('CPUTime as CPUTimeUs')) {
+            await new Promise((resolve) => setTimeout(resolve, MOCK_DELAY));
+
+            // Generate 100 rows of data for scrolling test
+            const rows = Array.from({length: 100}, (_, i) => generateTopQueriesRow(i));
+
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    version: 8,
+                    result: [
+                        {
+                            rows: rows,
+                            columns: [
+                                {name: 'CPUTimeUs', type: 'Uint64?'},
+                                {name: 'QueryText', type: 'Utf8?'},
+                                {name: 'IntervalEnd', type: 'Timestamp?'},
+                                {name: 'EndTime', type: 'Timestamp?'},
+                                {name: 'ReadRows', type: 'Uint64?'},
+                                {name: 'ReadBytes', type: 'Uint64?'},
+                                {name: 'UserSID', type: 'Utf8?'},
+                                {name: 'Duration', type: 'Uint64?'},
+                                {name: 'RequestUnits', type: 'Uint64?'},
+                                {name: 'Rank', type: 'Uint32?'},
+                            ],
+                        },
+                    ],
+                }),
+            });
+        } else {
+            // Continue with the original request for other queries
+            await route.continue();
+        }
+    });
+};
+
+/**
  * Sets up a mock for the TopShards tab in History mode
  * This ensures the first row has values for all columns
  */
