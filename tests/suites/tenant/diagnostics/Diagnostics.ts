@@ -120,6 +120,27 @@ export class Table {
         });
         return true;
     }
+
+    async clickRow(row: number) {
+        const rowElement = this.table.locator(`tr.data-table__row:nth-child(${row})`);
+        await rowElement.click();
+    }
+
+    async getRowPosition(row: number) {
+        const rowElement = this.table.locator(`tr.data-table__row:nth-child(${row})`);
+        return await rowElement.boundingBox();
+    }
+
+    async isRowVisible(row: number) {
+        const rowElement = this.table.locator(`tr.data-table__row:nth-child(${row})`);
+        const boundingBox = await rowElement.boundingBox();
+        if (!boundingBox) {
+            return false;
+        }
+
+        const viewportHeight = await rowElement.page().evaluate(() => window.innerHeight);
+        return boundingBox.y >= 0 && boundingBox.y + boundingBox.height <= viewportHeight;
+    }
 }
 
 export enum QueriesSwitch {

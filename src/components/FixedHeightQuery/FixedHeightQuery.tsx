@@ -5,7 +5,7 @@ import {YDBSyntaxHighlighter} from '../SyntaxHighlighter/YDBSyntaxHighlighter';
 
 import './FixedHeightQuery.scss';
 
-const b = cn('kv-fixed-height-query');
+const b = cn('ydb-fixed-height-query');
 
 const FIXED_PADDING = 8;
 const LINE_HEIGHT = 20;
