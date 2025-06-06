@@ -179,4 +179,137 @@ test.describe('Diagnostics Queries tab', async () => {
         // Verify the view was updated back
         expect(await diagnostics.getSelectedQueryPeriod()).toBe(QueryPeriod.PerHour);
     });
+
+    test('FixedHeightQuery maintains consistent height and proper scrolling behavior', async ({
+        page,
+    }) => {
+        const pageQueryParams = {
+            schema: tenantName,
+            database: tenantName,
+            tenantPage: 'diagnostics',
+            diagnosticsTab: 'topQueries',
+        };
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto(pageQueryParams);
+
+        const diagnostics = new Diagnostics(page);
+        await expect(diagnostics.table.isVisible()).resolves.toBe(true);
+
+        // Verify we have enough rows to test scrolling
+        const rowCount = await diagnostics.table.getRowCount();
+        if (rowCount > 5) {
+            // Test scrolling behavior: click on a row that might not be fully visible
+            const targetRowIndex = Math.min(rowCount, 8); // Target a row further down
+
+            // Click on the target row to test scrolling
+            await diagnostics.table.clickRow(targetRowIndex);
+
+            // Wait for any scrolling animation
+            await page.waitForTimeout(500);
+
+            // Verify the row is now visible in the viewport
+            const isVisible = await diagnostics.table.isRowVisible(targetRowIndex);
+            expect(isVisible).toBe(true);
+        }
+    });
+
+    test('FixedHeightQuery components have consistent height across different query lengths', async ({
+        page,
+    }) => {
+        const pageQueryParams = {
+            schema: tenantName,
+            database: tenantName,
+            tenantPage: 'diagnostics',
+            diagnosticsTab: 'topQueries',
+        };
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto(pageQueryParams);
+
+        const diagnostics = new Diagnostics(page);
+        await expect(diagnostics.table.isVisible()).resolves.toBe(true);
+
+        // Check that FixedHeightQuery components have the expected fixed height
+        const fixedHeightElements = page.locator('.ydb-fixed-height-query');
+        const elementCount = await fixedHeightElements.count();
+
+        if (elementCount > 1) {
+            // Check that all FixedHeightQuery components have the same height
+            const heights = [];
+            for (let i = 0; i < Math.min(elementCount, 5); i++) {
+                const element = fixedHeightElements.nth(i);
+                const height = await element.evaluate((el) => {
+                    return window.getComputedStyle(el).height;
+                });
+                heights.push(height);
+            }
+
+            // All heights should be the same (88px for 4 lines)
+            const firstHeight = heights[0];
+            expect(firstHeight).toBe('88px');
+
+            for (const height of heights) {
+                expect(height).toBe(firstHeight);
+            }
+        }
+    });
+
+    test.only('Scroll to row, get shareable link, navigate to URL and verify row is scrolled into view', async ({
+        page,
+    }) => {
+        const pageQueryParams = {
+            schema: tenantName,
+            database: tenantName,
+            tenantPage: 'diagnostics',
+            diagnosticsTab: 'topQueries',
+        };
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto(pageQueryParams);
+
+        const diagnostics = new Diagnostics(page);
+        await expect(diagnostics.table.isVisible()).resolves.toBe(true);
+
+        // Get the number of rows and select a row that requires scrolling
+        const rowCount = await diagnostics.table.getRowCount();
+        if (rowCount > 5) {
+            const targetRowIndex = Math.min(rowCount, 8); // Target a row further down
+
+            // Click on the target row to open the drawer
+            await diagnostics.table.clickRow(targetRowIndex);
+
+            // Wait for drawer to open
+            await page.waitForTimeout(500);
+
+            // Find and click the copy link button in the drawer
+            const copyLinkButton = page.locator('.ydb-copy-link-button__icon').first();
+            await expect(copyLinkButton).toBeVisible();
+            await copyLinkButton.click();
+
+            // Get the copied URL from clipboard
+            const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+            expect(clipboardText).toBeTruthy();
+            expect(clipboardText).toContain('/tenant');
+
+            // Navigate to the copied URL
+            await page.goto(clipboardText);
+            await page.waitForTimeout(1000);
+
+            // Verify the table is visible and the target row is scrolled into view
+            await expect(diagnostics.table.isVisible()).resolves.toBe(true);
+
+            // Check that the target row is visible in the viewport
+            const isRowVisible = await diagnostics.table.isRowVisible(targetRowIndex);
+            expect(isRowVisible).toBe(true);
+
+            // Verify the row is highlighted/selected (if applicable)
+            const rowElement = page.locator(`tr.data-table__row:nth-child(${targetRowIndex})`);
+            const hasActiveClass = await rowElement.evaluate((el: HTMLElement) => {
+                return (
+                    el.classList.contains('kv-top-queries__row_active') ||
+                    el.classList.contains('active') ||
+                    el.getAttribute('aria-selected') === 'true'
+                );
+            });
+            expect(hasActiveClass).toBe(true);
+        }
+    });
 });

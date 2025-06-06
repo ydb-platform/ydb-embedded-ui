@@ -99,7 +99,6 @@ export const TopQueriesData = ({
         () => ({
             ...TOP_QUERIES_TABLE_SETTINGS,
             dynamicInnerRef: reactListRef,
-            // Using 'uniform' type - react-list automatically calculates size from first item
         }),
         [],
     );
