@@ -236,17 +236,13 @@ test.describe('Diagnostics Queries tab', async () => {
         await expect(diagnostics.table.isVisible()).resolves.toBe(true);
 
         // Check that FixedHeightQuery components have the expected fixed height
-        const fixedHeightElements = page.locator('.ydb-fixed-height-query');
-        const elementCount = await fixedHeightElements.count();
+        const rowCount = await diagnostics.table.getRowCount();
 
-        if (elementCount > 1) {
+        if (rowCount > 1) {
             // Check that all FixedHeightQuery components have the same height
             const heights = [];
-            for (let i = 0; i < Math.min(elementCount, 5); i++) {
-                const element = fixedHeightElements.nth(i);
-                const height = await element.evaluate((el) => {
-                    return window.getComputedStyle(el).height;
-                });
+            for (let i = 0; i < Math.min(rowCount, 5); i++) {
+                const height = await diagnostics.getFixedHeightQueryElementHeight(i);
                 heights.push(height);
             }
 
@@ -298,9 +294,8 @@ test.describe('Diagnostics Queries tab', async () => {
         await page.waitForTimeout(500);
 
         // Find and click the copy link button in the drawer
-        const copyLinkButton = page.locator('.ydb-copy-link-button__icon').first();
-        await expect(copyLinkButton).toBeVisible();
-        await copyLinkButton.click();
+        await expect(diagnostics.isCopyLinkButtonVisible()).resolves.toBe(true);
+        await diagnostics.clickCopyLinkButton();
 
         // Get the copied URL from clipboard
         const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
@@ -313,11 +308,9 @@ test.describe('Diagnostics Queries tab', async () => {
 
         const firstVisibleRowIndex = 4;
         // Verify the row is highlighted/selected (if applicable)
-        const rowElement = page.locator(`tr.data-table__row:nth-child(${firstVisibleRowIndex})`);
-        const rowElementClass = await rowElement.getAttribute('class');
         await page.waitForTimeout(1000);
 
-        const hasActiveClass = rowElementClass?.includes('kv-top-queries__row_active');
+        const hasActiveClass = await diagnostics.isRowActive(firstVisibleRowIndex);
 
         expect(hasActiveClass).toBe(true);
     });
