@@ -1,5 +1,23 @@
 # Changelog
 
+## [9.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.3.1...v9.4.0) (2025-06-06)
+
+
+### Features
+
+* **Automation:** add automation to calculate issue priority ([#2365](https://github.com/ydb-platform/ydb-embedded-ui/issues/2365)) ([a8c5b11](https://github.com/ydb-platform/ydb-embedded-ui/commit/a8c5b11ee12c7f7f6a02de97a3669d7cfda95622))
+* **createToast:** allow more props from uikit ([#2370](https://github.com/ydb-platform/ydb-embedded-ui/issues/2370)) ([0dda6ec](https://github.com/ydb-platform/ydb-embedded-ui/commit/0dda6ec77eb003ef2785f86e62cc69b8c6ec7644))
+* **Healthcheck:** redesign ([#2348](https://github.com/ydb-platform/ydb-embedded-ui/issues/2348)) ([eac76af](https://github.com/ydb-platform/ydb-embedded-ui/commit/eac76afd3a3dca4d80a73b56af4e859146603d27))
+
+
+### Bug Fixes
+
+* **Automation:** even more automation ([#2380](https://github.com/ydb-platform/ydb-embedded-ui/issues/2380)) ([4bc3812](https://github.com/ydb-platform/ydb-embedded-ui/commit/4bc3812552ad4cac4c5e2dc9fd33da34f74661fe))
+* **Automation:** fix bot token again ([#2373](https://github.com/ydb-platform/ydb-embedded-ui/issues/2373)) ([f2d4bae](https://github.com/ydb-platform/ydb-embedded-ui/commit/f2d4bae48a79a079f6e83855bd0a09cb24feb2d4))
+* **Automation:** fix bot token again and again ([#2374](https://github.com/ydb-platform/ydb-embedded-ui/issues/2374)) ([928fba4](https://github.com/ydb-platform/ydb-embedded-ui/commit/928fba434b44ec2a25a0e76d61291713b08c982c))
+* **Automation:** fix workflow token ([#2372](https://github.com/ydb-platform/ydb-embedded-ui/issues/2372)) ([55be936](https://github.com/ydb-platform/ydb-embedded-ui/commit/55be936194bedfb7a35002f31c55e052260c5074))
+* **Automation:** more automation, auto add to project ([#2376](https://github.com/ydb-platform/ydb-embedded-ui/issues/2376)) ([1a2ade4](https://github.com/ydb-platform/ydb-embedded-ui/commit/1a2ade49bde0e3a54187ea640267601a4c3d74f6))
+
 ## [9.3.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.3.0...v9.3.1) (2025-06-03)
 
 
