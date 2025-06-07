@@ -55,7 +55,7 @@ export function TopicPreview({database, path}: PreviewContainerProps) {
         }
         return {
             start: safeParseNumber(firstPartition.startOffset),
-            end: safeParseNumber(firstPartition.endOffset) - 1,
+            end: Math.max(safeParseNumber(firstPartition.endOffset) - 1, 0),
         };
     }, [firstPartition]);
 
