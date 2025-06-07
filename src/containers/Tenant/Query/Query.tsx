@@ -4,7 +4,6 @@ import {Helmet} from 'react-helmet-async';
 
 import {changeUserInput} from '../../../store/reducers/query/query';
 import {TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
-import type {EPathSubType, EPathType} from '../../../types/api/schema';
 import {cn} from '../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 
@@ -19,10 +18,6 @@ const b = cn('ydb-query');
 
 interface QueryProps {
     theme: string;
-    tenantName: string;
-    path: string;
-    type?: EPathType;
-    subType?: EPathSubType;
 }
 
 export const Query = (props: QueryProps) => {

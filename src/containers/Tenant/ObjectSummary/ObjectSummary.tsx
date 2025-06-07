@@ -28,6 +28,7 @@ import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {Acl} from '../Acl/Acl';
 import {EntityTitle} from '../EntityTitle/EntityTitle';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
+import {useCurrentSchema} from '../TenantContext';
 import {TENANT_INFO_TABS, TENANT_SCHEMA_TAB, TenantTabsGroups, getTenantPath} from '../TenantPages';
 import {getSummaryControls} from '../utils/controls';
 import {
@@ -58,24 +59,17 @@ const getTenantCommonInfoState = () => {
 };
 
 interface ObjectSummaryProps {
-    type?: EPathType;
-    subType?: EPathSubType;
-    tenantName: string;
-    path: string;
     onCollapseSummary: VoidFunction;
     onExpandSummary: VoidFunction;
     isCollapsed: boolean;
 }
 
 export function ObjectSummary({
-    type,
-    subType,
-    tenantName,
-    path,
     onCollapseSummary,
     onExpandSummary,
     isCollapsed,
 }: ObjectSummaryProps) {
+    const {path, database: tenantName, type, subType} = useCurrentSchema();
     const dispatch = useTypedDispatch();
     const [, setCurrentPath] = useQueryParam('schema', StringParam);
     const [commonInfoVisibilityState, dispatchCommonInfoVisibilityState] = React.useReducer(

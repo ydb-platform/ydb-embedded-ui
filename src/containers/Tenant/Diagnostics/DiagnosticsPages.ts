@@ -33,6 +33,10 @@ const topShards = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.topShards,
     title: 'Top shards',
 };
+const access = {
+    id: TENANT_DIAGNOSTICS_TABS_IDS.access,
+    title: 'Access',
+};
 
 const nodes = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.nodes,
@@ -91,9 +95,9 @@ const operations = {
     title: 'Operations',
 };
 
-const ASYNC_REPLICATION_PAGES = [overview, tablets, describe];
+const ASYNC_REPLICATION_PAGES = [overview, tablets, describe, access];
 
-const TRANSFER_PAGES = [overview, tablets, describe];
+const TRANSFER_PAGES = [overview, tablets, describe, access];
 
 const DATABASE_PAGES = [
     overview,
@@ -105,22 +109,23 @@ const DATABASE_PAGES = [
     network,
     describe,
     configs,
+    access,
     operations,
 ];
 
-const TABLE_PAGES = [overview, schema, topShards, nodes, graph, tablets, hotKeys, describe];
-const COLUMN_TABLE_PAGES = [overview, schema, topShards, nodes, tablets, describe];
+const TABLE_PAGES = [overview, schema, topShards, nodes, graph, tablets, hotKeys, describe, access];
+const COLUMN_TABLE_PAGES = [overview, schema, topShards, nodes, tablets, describe, access];
 
-const DIR_PAGES = [overview, topShards, nodes, describe];
+const DIR_PAGES = [overview, topShards, nodes, describe, access];
 
-const CDC_STREAM_PAGES = [overview, consumers, partitions, nodes, describe];
-const CDC_STREAM_IMPL_PAGES = [overview, nodes, tablets, describe];
-const TOPIC_PAGES = [overview, consumers, partitions, topicData, nodes, tablets, describe];
+const CDC_STREAM_PAGES = [overview, consumers, partitions, nodes, describe, access];
+const CDC_STREAM_IMPL_PAGES = [overview, nodes, tablets, describe, access];
+const TOPIC_PAGES = [overview, consumers, partitions, topicData, nodes, tablets, describe, access];
 
-const EXTERNAL_DATA_SOURCE_PAGES = [overview, describe];
-const EXTERNAL_TABLE_PAGES = [overview, schema, describe];
+const EXTERNAL_DATA_SOURCE_PAGES = [overview, describe, access];
+const EXTERNAL_TABLE_PAGES = [overview, schema, describe, access];
 
-const VIEW_PAGES = [overview, schema, describe];
+const VIEW_PAGES = [overview, schema, describe, access];
 
 // verbose mapping to guarantee correct tabs for new path types
 // TS will error when a new type is added but not mapped here
