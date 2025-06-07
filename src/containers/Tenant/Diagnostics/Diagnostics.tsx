@@ -13,7 +13,6 @@ import {
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../types/additionalProps';
-import type {EPathSubType, EPathType} from '../../../types/api/schema';
 import {cn} from '../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {Heatmap} from '../../Heatmap';
@@ -22,8 +21,10 @@ import {Operations} from '../../Operations';
 import {PaginatedStorage} from '../../Storage/PaginatedStorage';
 import {Tablets} from '../../Tablets/Tablets';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
+import {useCurrentSchema} from '../TenantContext';
 import {isDatabaseEntityType} from '../utils/schema';
 
+import {AccessRights} from './AccessRights/AccessRights';
 import {Configs} from './Configs/Configs';
 import {Consumers} from './Consumers';
 import Describe from './Describe/Describe';
@@ -39,10 +40,6 @@ import {TopicData} from './TopicData/TopicData';
 import './Diagnostics.scss';
 
 interface DiagnosticsProps {
-    type?: EPathType;
-    subType?: EPathSubType;
-    tenantName: string;
-    path: string;
     additionalTenantProps?: AdditionalTenantsProps;
     additionalNodesProps?: AdditionalNodesProps;
 }
@@ -50,6 +47,7 @@ interface DiagnosticsProps {
 const b = cn('kv-tenant-diagnostics');
 
 function Diagnostics(props: DiagnosticsProps) {
+    const {path, database, type, subType} = useCurrentSchema();
     const containerRef = React.useRef<HTMLDivElement>(null);
 
     const dispatch = useTypedDispatch();
@@ -59,14 +57,14 @@ function Diagnostics(props: DiagnosticsProps) {
 
     const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
 
-    const tenantName = isDatabaseEntityType(props.type) ? props.path : props.tenantName;
+    const tenantName = isDatabaseEntityType(type) ? path : database;
 
     const hasFeatureFlags = useFeatureFlagsAvailable();
     const hasTopicData = useTopicDataAvailable();
-    const pages = getPagesByType(props.type, props.subType, {
+    const pages = getPagesByType(type, subType, {
         hasFeatureFlags,
         hasTopicData,
-        isTopLevel: props.path === props.tenantName,
+        isTopLevel: path === database,
     });
     let activeTab = pages.find((el) => el.id === diagnosticsTab);
     if (!activeTab) {
@@ -80,8 +78,6 @@ function Diagnostics(props: DiagnosticsProps) {
     }, [activeTab, diagnosticsTab, dispatch]);
 
     const renderTabContent = () => {
-        const {type, path} = props;
-
         switch (activeTab?.id) {
             case TENANT_DIAGNOSTICS_TABS_IDS.overview: {
                 return (
@@ -112,6 +108,9 @@ function Diagnostics(props: DiagnosticsProps) {
                         scrollContainerRef={containerRef}
                     />
                 );
+            }
+            case TENANT_DIAGNOSTICS_TABS_IDS.access: {
+                return <AccessRights />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.tablets: {
                 return (

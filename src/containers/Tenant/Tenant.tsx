@@ -16,6 +16,7 @@ import {isAccessError} from '../../utils/response';
 
 import ObjectGeneral from './ObjectGeneral/ObjectGeneral';
 import {ObjectSummary} from './ObjectSummary/ObjectSummary';
+import {TenantContextProvider} from './TenantContext';
 import {TenantDrawerWrapper} from './TenantDrawerWrappers';
 import i18n from './i18n';
 import {useTenantQueryParams} from './useTenantQueryParams';
@@ -122,36 +123,35 @@ export function Tenant(props: TenantProps) {
             />
             <LoaderWrapper loading={initialLoading}>
                 <PageError error={showBlockingError ? error : undefined}>
-                    <TenantDrawerWrapper database={database}>
-                        <SplitPane
-                            defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
-                            defaultSizes={[25, 75]}
-                            triggerCollapse={summaryVisibilityState.triggerCollapse}
-                            triggerExpand={summaryVisibilityState.triggerExpand}
-                            minSize={[36, 200]}
-                            onSplitStartDragAdditional={onSplitStartDragAdditional}
-                        >
-                            <ObjectSummary
-                                type={currentPathType}
-                                subType={currentPathSubType}
-                                tenantName={database}
-                                path={path}
-                                onCollapseSummary={onCollapseSummaryHandler}
-                                onExpandSummary={onExpandSummaryHandler}
-                                isCollapsed={summaryVisibilityState.collapsed}
-                            />
-                            <div className={b('main')}>
-                                <ObjectGeneral
-                                    type={currentPathType}
-                                    subType={currentPathSubType}
-                                    additionalTenantProps={props.additionalTenantProps}
-                                    additionalNodesProps={props.additionalNodesProps}
-                                    tenantName={database}
-                                    path={path}
+                    <TenantContextProvider
+                        database={database}
+                        path={path}
+                        type={currentPathType}
+                        subType={currentPathSubType}
+                    >
+                        <TenantDrawerWrapper>
+                            <SplitPane
+                                defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
+                                defaultSizes={[25, 75]}
+                                triggerCollapse={summaryVisibilityState.triggerCollapse}
+                                triggerExpand={summaryVisibilityState.triggerExpand}
+                                minSize={[36, 200]}
+                                onSplitStartDragAdditional={onSplitStartDragAdditional}
+                            >
+                                <ObjectSummary
+                                    onCollapseSummary={onCollapseSummaryHandler}
+                                    onExpandSummary={onExpandSummaryHandler}
+                                    isCollapsed={summaryVisibilityState.collapsed}
                                 />
-                            </div>
-                        </SplitPane>
-                    </TenantDrawerWrapper>
+                                <div className={b('main')}>
+                                    <ObjectGeneral
+                                        additionalTenantProps={props.additionalTenantProps}
+                                        additionalNodesProps={props.additionalNodesProps}
+                                    />
+                                </div>
+                            </SplitPane>
+                        </TenantDrawerWrapper>
+                    </TenantContextProvider>
                 </PageError>
             </LoaderWrapper>
         </div>

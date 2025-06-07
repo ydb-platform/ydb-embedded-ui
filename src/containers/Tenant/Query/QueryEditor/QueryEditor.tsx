@@ -41,6 +41,7 @@ import {
 import {useChangedQuerySettings} from '../../../../utils/hooks/useChangedQuerySettings';
 import {useLastQueryExecutionSettings} from '../../../../utils/hooks/useLastQueryExecutionSettings';
 import {DEFAULT_QUERY_SETTINGS, QUERY_ACTIONS, QUERY_MODES} from '../../../../utils/query';
+import {useCurrentSchema} from '../../TenantContext';
 import type {InitialPaneState} from '../../utils/paneVisibilityToggleHelpers';
 import {
     PaneVisibilityActionTypes,
@@ -65,17 +66,14 @@ const initialTenantCommonInfoState = {
 };
 
 interface QueryEditorProps {
-    tenantName: string;
-    path: string;
     changeUserInput: (arg: {input: string}) => void;
     theme: string;
-    type?: EPathType;
-    subType?: EPathSubType;
 }
 
 export default function QueryEditor(props: QueryEditorProps) {
     const dispatch = useTypedDispatch();
-    const {tenantName, path, type, theme, changeUserInput, subType} = props;
+    const {database: tenantName, path, type, subType} = useCurrentSchema();
+    const {theme, changeUserInput} = props;
     const savedPath = useTypedSelector(selectTenantPath);
     const result = useTypedSelector(selectResult);
     const historyQueries = useTypedSelector(selectQueriesHistory);
