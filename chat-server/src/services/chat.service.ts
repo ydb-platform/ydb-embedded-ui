@@ -32,14 +32,6 @@ export class ChatService {
             temperature?: number; 
             maxTokens?: number; 
             maxIterations?: number;
-            context?: {
-                url?: string;
-                pathname?: string;
-                search?: string;
-                hash?: string;
-                params?: Record<string, string>;
-                description?: string;
-            };
         } = {}
     ): Promise<void> {
         try {
@@ -47,7 +39,7 @@ export class ChatService {
             const maxIterations = options.maxIterations || 5;
     
             // Create system prompt with PromptBuilder
-            const systemPrompt = PromptBuilder.createSystemPromptMessage(options.context);
+            const systemPrompt = PromptBuilder.createSystemPromptMessage();
 
             const conversationHistory = [systemPrompt, ...messages];
 

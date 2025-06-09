@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ChatAPI } from '../api/chatApi';
 import { chatActions } from '../store/chatSlice';
 import { ChatMessage, ChatDelta } from '../types/chat';
-import { usePageContext } from '../utils/pageContext';
 
 export function useChat() {
     const dispatch = useDispatch();
@@ -11,7 +10,6 @@ export function useChat() {
         (state: any) => state.chat
     );
     const abortControllerRef = useRef<AbortController | null>(null);
-    const pageContext = usePageContext();
 
     const generateMessageId = () => `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
@@ -39,24 +37,6 @@ export function useChat() {
         const allMessages = [...messages, userMessage];
 
         try {
-            // Use smart page context extraction
-            const context = {
-                url: window.location.href,
-                pathname: window.location.pathname,
-                search: window.location.search,
-                hash: window.location.hash,
-                params: {
-                    pageType: pageContext.pageType,
-                    ...(pageContext.clusterName && { clusterName: pageContext.clusterName }),
-                    ...(pageContext.database && { database: pageContext.database }),
-                    ...(pageContext.entityId && { entityId: pageContext.entityId }),
-                    ...(pageContext.activeTab && { activeTab: pageContext.activeTab }),
-                    ...(pageContext.nodeId && { nodeId: pageContext.nodeId }),
-                    ...(pageContext.tabletId && { tabletId: pageContext.tabletId }),
-                },
-                description: pageContext.description
-            };
-
             await ChatAPI.sendMessage(
                 allMessages,
                 (delta: ChatDelta) => {
@@ -65,15 +45,14 @@ export function useChat() {
                 (error: Error) => {
                     dispatch(chatActions.setError(error.message));
                 },
-                abortControllerRef.current.signal,
-                context
+                abortControllerRef.current.signal
             );
         } catch (error) {
             if (error instanceof Error && error.name !== 'AbortError') {
                 dispatch(chatActions.setError(error.message));
             }
         }
-    }, [dispatch, messages, isLoading, pageContext]);
+    }, [dispatch, messages, isLoading]);
 
     const stopGeneration = useCallback(() => {
         if (abortControllerRef.current) {

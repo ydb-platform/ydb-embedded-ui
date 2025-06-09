@@ -42,55 +42,12 @@ export class PromptBuilder {
 Отвечай на русском языке.${contextInfo}`;
     }
 
-    /**
-     * Build context information from options
-     */
-    static buildContextInfo(context?: {
-        url?: string;
-        pathname?: string;
-        search?: string;
-        hash?: string;
-        params?: Record<string, string>;
-        description?: string;
-    }): string {
-        if (!context) {
-            return '';
-        }
-
-        const { description, params } = context;
-        
-        if (description) {
-            return `\n\nКОНТЕКСТ ТЕКУЩЕЙ СТРАНИЦЫ:\n${description}`;
-        }
-
-        // Fallback to old logic if description is not available
-        const { url, pathname, search, hash } = context;
-        let contextInfo = `\n\nКОНТЕКСТ ТЕКУЩЕЙ СТРАНИЦЫ:
-- URL: ${url || 'неизвестен'}
-- Путь: ${pathname || 'неизвестен'}
-- Параметры запроса: ${search || 'отсутствуют'}
-- Хеш: ${hash || 'отсутствует'}`;
-
-        if (params && Object.keys(params).length > 0) {
-            contextInfo += `\n- Параметры: ${Object.entries(params).map(([key, value]) => `${key}=${value}`).join(', ')}`;
-        }
-
-        return contextInfo;
-    }
 
     /**
      * Create system prompt message object
      */
-    static createSystemPromptMessage(context?: {
-        url?: string;
-        pathname?: string;
-        search?: string;
-        hash?: string;
-        params?: Record<string, string>;
-        description?: string;
-    }): { role: string; content: string } {
-        const contextInfo = this.buildContextInfo(context);
-        const content = this.buildSystemPrompt(contextInfo);
+    static createSystemPromptMessage(): { role: string; content: string } {
+        const content = this.buildSystemPrompt();
         
         return {
             role: 'system',

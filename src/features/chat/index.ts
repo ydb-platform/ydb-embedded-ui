@@ -24,5 +24,3 @@ export type {
 export { ChatAPI } from './api/chatApi';
 
 // Utils
-export { usePageContext, extractPageContextFromLocation } from './utils/pageContext';
-export type { PageContext } from './utils/pageContext';

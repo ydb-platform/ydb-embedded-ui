@@ -27,16 +27,21 @@ The YDB AI Chat is a real-time assistant that helps users interact with YDB clus
 ### 1. User Interaction Flow
 
 ```
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│ User Query  │───►│ Page        │───►│ Chat        │───►│ AI          │
-│             │    │ Context     │    │ Server      │    │ Processing  │
-│ "Show DBs"  │    │ Extraction  │    │ + History   │    │ + Tools     │
-└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
-                                                                │
-┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐
-│ Live        │◄───│ Streaming   │◄───│ YDB         │◄───│ Tool        │
-│ UI Update   │    │ Response    │    │ Operations  │    │ Execution   │
-└─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│ User Query  │───►│ Chat        │───►│ AI          │
+│             │    │ Server      │    │ Processing  │
+│ "Show DBs"  │    │ + History   │    │ + Tools     │
+└─────────────┘    └─────────────┘    └─────────────┘
+                                             │
+┌─────────────┐    ┌─────────────┐    ┌─────────────┐
+│ Live        │◄───│ Streaming   │◄───│ YDB         │
+│ UI Update   │    │ Response    │    │ Operations  │
+└─────────────┘    └─────────────┘    └─────────────┘
+                                             │
+                                    ┌─────────────┐
+                                    │ Tool        │
+                                    │ Execution   │
+                                    └─────────────┘
 ```
 
 ### 2. Agent Loop Process
@@ -48,7 +53,6 @@ The YDB AI Chat is a real-time assistant that helps users interact with YDB clus
        │
 ┌──────▼──────┐
 │ AI Analysis │
-│ + Context   │
 └──────┬──────┘
        │
 ┌──────▼──────┐    ┌─────────────┐    ┌─────────────┐
@@ -67,26 +71,34 @@ The YDB AI Chat is a real-time assistant that helps users interact with YDB clus
 ### Frontend Layer
 
 - **Chat Interface**: Real-time messaging UI with streaming responses using @gravity-ui/navigation Drawer component
-- **Context Awareness**: Automatically detects current page (cluster, node, database)
 - **State Management**: Redux-based message history and session control
 - **Design System Integration**: Uses standard YDB UI components and class naming conventions
 
-### Backend Layer (Simplified Architecture)
+### Backend Layer (Modular Architecture)
 
 - **Chat Server**: Minimal Node.js Express service with only essential endpoints
   - `GET /health` - Basic health check with version info
   - `POST /api/chat` - Streaming chat with Server-Sent Events (SSE)
-- **ChatService**: Stateless message processing with agent loop
+- **ChatService**: Orchestrates the Agent Loop with modular components
   - Multi-iteration processing (max 5 iterations)
-  - Context-aware system prompts with page information
-  - Tool call execution and result formatting
+  - Delegates to specialized services for clean separation of concerns
+- **StreamProcessor**: Handles streaming response processing
+  - Accumulates content chunks from AI responses
+  - Manages tool call assembly from streaming deltas
+  - Sends real-time updates to frontend via SSE
+- **ToolExecutor**: Manages tool call execution
+  - Parses tool arguments and validates calls
+  - Executes MCP tool calls via MCPService
+  - Formats results for AI consumption
+- **PromptBuilder**: Creates system prompts for AI assistant
+  - Generates intelligent prompts with tool descriptions
+  - Includes usage guidelines and best practices
 - **LLMService**: OpenAI API client for Eliza communication
   - Streaming chat completions with tool support
-  - MCP tool conversion to OpenAI function format
   - OAuth authentication with Ya-Pool headers
 - **MCPService**: Model Context Protocol client
   - Server-Sent Events (SSE) transport for YDB MCP server
-  - Tool discovery and execution
+  - Tool discovery and caching (loaded once at startup)
   - Connection management and health monitoring
 
 ### AI Service Layer
@@ -136,7 +148,7 @@ The YDB AI Chat is a real-time assistant that helps users interact with YDB clus
 ### Message Lifecycle
 
 ```
-User Input → Context + History → AI Processing → Tool Execution →
+User Input → Message History → AI Processing → Tool Execution →
 Streaming Response → UI Update → Ready for Next Query
 ```
 
@@ -159,7 +171,7 @@ Handle Tools → Complete Response → End Session
 
 - **Live Data**: Always queries actual YDB state, never cached responses
 - **Multi-Step Operations**: Can perform complex workflows across multiple tools
-- **Transparent Execution**: User sees exactly what operations are being performed
+- **Seamless Execution**: Tool calls happen behind the scenes during Agent Loop iterations
 
 ### 3. Streaming Architecture
 
@@ -207,12 +219,11 @@ Body: {
   messages: ChatMessage[],
   model?: string,
   temperature?: number,
-  maxTokens?: number,
-  context?: PageContext
+  maxTokens?: number
 }
 
 Response: text/event-stream (SSE)
-Events: content, tool_call, tool_executing, tool_result, done, error
+Events: content, done, error
 ```
 
 ## Technical Characteristics

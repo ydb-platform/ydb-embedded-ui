@@ -187,20 +187,14 @@ res.setHeader('Connection', 'keep-alive');
 - **Что происходит**:
   1. Создается объект сообщения с уникальным ID
   2. Сообщение добавляется в Redux store (локальное состояние)
-  3. Система определяет контекст страницы: "Пользователь сейчас смотрит на кластер X"
-  4. Подготавливается HTTP запрос на сервер
+  3. Подготавливается HTTP запрос на сервер
 
 ### 🌐 **Шаг 3: Отправка на сервер**
 - **Куда**: POST запрос на `http://localhost:3001/api/chat`
 - **Что отправляется**:
   ```json
   {
-    "messages": [{"role": "user", "content": "какие есть ноды в кластере"}],
-    "context": {
-      "clusterName": "ydb_vla_dev02",
-      "pageType": "cluster",
-      "description": "Пользователь находится на странице кластера ydb_vla_dev02"
-    }
+    "messages": [{"role": "user", "content": "какие есть ноды в кластере"}]
   }
   ```
 
@@ -233,12 +227,11 @@ res.setHeader('Connection', 'keep-alive');
    // Получаем из памяти: ["ydb-get-clusters", "ydb-get-nodes", ...]
    ```
 
-2. **Создаем системный промпт с контекстом**:
+2. **Создаем системный промпт**:
    ```javascript
    const systemPrompt = {
      role: 'system',
      content: `Ты - помощник для работы с YDB.
-     КОНТЕКСТ: Пользователь находится на странице кластера "ydb_vla_dev02"
      ДОСТУПНЫЕ ИНСТРУМЕНТЫ: ydb-get-nodes, ydb-get-clusters, ...
      ПРАВИЛО: ВСЕГДА используй инструменты для получения актуальных данных!`
    };
@@ -425,4 +418,195 @@ const maxIterations = options.maxIterations || 5;
 
 ---
 
-*Продолжение следует... (здесь будет описание streaming ответов и обновления UI)*
+## Шаг 9: Streaming ответов и обновление UI
+
+После завершения Agent Loop начинается процесс отправки финального ответа пользователю через streaming.
+
+### 🎯 **Что происходит после Agent Loop**:
+
+**1. Отправка сигнала завершения**:
+```javascript
+// В chat.service.ts
+onData(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+```
+
+**2. Фронтенд получает сигнал**:
+```javascript
+// В chatApi.ts
+if (data === '[DONE]') {
+    return;  // ← Завершаем обработку streaming
+}
+```
+
+### 📡 **Как работает StreamProcessor**
+
+**StreamProcessor** - это ключевой компонент который превращает поток кусочков от AI в понятные сообщения.
+
+**Задача**: Собрать streaming ответ от Eliza API по частям и отправить фронтенду.
+
+### 🔄 **Пример streaming процесса**:
+
+**AI генерирует ответ по частям**:
+```
+chunk1: {"choices":[{"delta":{"content":"В"}}]}
+chunk2: {"choices":[{"delta":{"content":" кластере"}}]}
+chunk3: {"choices":[{"delta":{"content":" найдено"}}]}
+chunk4: {"choices":[{"delta":{"content":" 15 нод"}}]}
+```
+
+**StreamProcessor обрабатывает**:
+```javascript
+// Chunk 1:
+accumulatedContent = "В"
+onData(`data: ${JSON.stringify({type: 'content', content: 'В'})}\n\n`);
+
+// Chunk 2:
+accumulatedContent = "В кластере"
+onData(`data: ${JSON.stringify({type: 'content', content: ' кластере'})}\n\n`);
+
+// Chunk 3:
+accumulatedContent = "В кластере найдено"
+onData(`data: ${JSON.stringify({type: 'content', content: ' найдено'})}\n\n`);
+
+// Chunk 4:
+accumulatedContent = "В кластере найдено 15 нод"
+onData(`data: ${JSON.stringify({type: 'content', content: ' 15 нод'})}\n\n`);
+```
+
+### 🖥️ **Как фронтенд обновляется в реальном времени**
+
+**Redux обрабатывает события**:
+```javascript
+// В chatSlice.ts
+switch(delta.type) {
+    case 'content':
+        // Добавляем текст к текущему сообщению AI
+        assistantMessage.content += delta.content;
+        break;
+        
+    case 'done':
+        // Завершаем streaming
+        state.isStreaming = false;
+        state.isLoading = false;
+        break;
+        
+    case 'error':
+        // Показываем ошибку
+        state.error = delta.error;
+        break;
+}
+```
+
+**Результат**: Пользователь видит как текст появляется по буквам в реальном времени, как в ChatGPT.
+
+## Шаг 10: Детали MCP интеграции
+
+### 🔌 **Что такое MCP (Model Context Protocol)**
+
+**MCP** - это стандарт для подключения AI к внешним системам. Позволяет AI "вызывать" инструменты для получения реальных данных.
+
+### 🏗️ **Архитектура MCP в нашей системе**:
+
+```
+Chat Server ←→ YDB MCP Server
+     ↑              ↑
+  MCPService    YDB Tools
+     ↑              ↑
+  MCP Client    Real YDB Data
+```
+
+### 📋 **Как работает MCPService**:
+
+**1. При запуске сервера**:
+```javascript
+// Регистрируем YDB MCP Server
+await mcpService.registerServer({
+    name: 'ydb-mcp-server',
+    type: 'sse',
+    url: 'http://ydb-mcp-server:8080'
+});
+
+// Получаем список инструментов ОДИН РАЗ
+const tools = await client.listTools();
+server.tools = tools.tools;  // ← Сохраняем в памяти
+```
+
+**2. При каждом чате**:
+```javascript
+// Берем инструменты из памяти (быстро!)
+const availableTools = this.mcpService.getAllTools();
+// НЕ делаем новый запрос к YDB MCP Server
+```
+
+**3. При вызове инструмента**:
+```javascript
+// ToolExecutor делает запрос к YDB MCP Server
+const result = await this.mcpService.callTool(
+    'ydb-mcp-server',
+    'ydb-get-nodes',
+    {cluster_name: 'ydb_vla_dev02'}
+);
+```
+
+### 🛠️ **Доступные YDB инструменты**:
+
+- `ydb-get-clusters` - Список кластеров
+- `ydb-get-nodes` - Список нод в кластере  
+- `ydb-get-databases` - Список баз данных
+- `ydb-get-node-details` - Детали конкретной ноды
+- `ydb-get-cluster-health` - Состояние кластера
+- `ydb-get-disks` - Информация о дисках
+- И другие...
+
+### ⚡ **Преимущества такой архитектуры**:
+
+1. **Производительность**: Инструменты загружаются один раз при старте
+2. **Надежность**: Если YDB MCP Server недоступен, чат продолжает работать
+3. **Масштабируемость**: Можно легко добавить новые MCP серверы
+4. **Безопасность**: Chat Server контролирует какие инструменты доступны AI
+
+
+## Заключение: Полная картина работы системы
+
+### 🔄 **Полный цикл обработки запроса**:
+
+```
+1. Пользователь: "есть ли проблемы с кластером?"
+   ↓
+2. Фронтенд: Отправляет запрос на сервер
+   ↓  
+3. Chat Server: Получает запрос
+   ↓
+4. PromptBuilder: Создает системный промпт
+   ↓
+5. Agent Loop (до 5 итераций):
+   - AI анализирует запрос
+   - Просит инструменты: ydb-get-cluster-health()
+   - ToolExecutor выполняет запрос к YDB
+   - AI анализирует результат
+   - Решает нужны ли еще данные или можно отвечать
+   ↓
+6. StreamProcessor: Отправляет ответ по частям
+   ↓
+7. Фронтенд: Показывает ответ в реальном времени
+   ↓
+8. Пользователь: Видит результат
+```
+
+### 🎯 **Ключевые принципы архитектуры**:
+
+1. **Простота**: Минимум компонентов, максимум функциональности
+2. **Производительность**: Streaming, кэширование инструментов
+3. **Надежность**: Graceful degradation, обработка ошибок
+4. **Модульность**: Четкое разделение ответственности между сервисами
+5. **Честность**: Код соответствует документации
+
+### 🚀 **Что делает систему особенной**:
+
+- **Реальные данные**: Всегда актуальная информация из YDB
+- **Естественное общение**: Как с опытным администратором
+- **Мгновенные ответы**: Streaming без задержек
+- **Agent Loop**: Многошаговое выполнение сложных задач
+- **Простая архитектура**: Легко понять и модифицировать
+
+**Результат**: Администраторы YDB могут управлять кластерами через простой чат, получая актуальную информацию и экспертные советы в реальном времени.
