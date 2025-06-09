@@ -58,25 +58,23 @@ function getTitleColumn({isEditClusterAvailable, isDeleteClusterAvailable}: Clus
             const renderActions = () => {
                 const menuItems: (DropdownMenuItem | DropdownMenuItem[])[] = [];
 
-                if (isEditClusterAvailable) {
+                const {onEditCluster, onDeleteCluster} = uiFactory;
+
+                if (isEditClusterAvailable && onEditCluster) {
                     menuItems.push({
                         text: i18n('edit-cluster'),
                         iconStart: <Pencil />,
                         action: () => {
-                            uiFactory.onEditCluster?.({
-                                clusterData: row,
-                            });
+                            onEditCluster({clusterData: row});
                         },
                     });
                 }
-                if (isDeleteClusterAvailable) {
+                if (isDeleteClusterAvailable && onDeleteCluster) {
                     menuItems.push({
                         text: i18n('remove-cluster'),
                         iconStart: <TrashBin />,
                         action: () => {
-                            uiFactory.onDeleteCluster?.({
-                                clusterData: row,
-                            });
+                            onDeleteCluster({clusterData: row});
                         },
                         className: b('remove-cluster'),
                     });
