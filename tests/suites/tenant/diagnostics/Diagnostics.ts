@@ -120,6 +120,27 @@ export class Table {
         });
         return true;
     }
+
+    async clickRow(row: number) {
+        const rowElement = this.table.locator(`tr.data-table__row:nth-child(${row})`);
+        await rowElement.click();
+    }
+
+    async getRowPosition(row: number) {
+        const rowElement = this.table.locator(`tr.data-table__row:nth-child(${row})`);
+        return await rowElement.boundingBox();
+    }
+
+    async isRowVisible(row: number) {
+        const rowElement = this.table.locator(`tr.data-table__row:nth-child(${row})`);
+        const boundingBox = await rowElement.boundingBox();
+        if (!boundingBox) {
+            return false;
+        }
+
+        const viewportHeight = await rowElement.page().evaluate(() => window.innerHeight);
+        return boundingBox.y >= 0 && boundingBox.y + boundingBox.height <= viewportHeight;
+    }
 }
 
 export enum QueriesSwitch {
@@ -222,6 +243,8 @@ export class Diagnostics {
     private memoryCard: Locator;
     private healthcheckCard: Locator;
     private tableRadioButton: Locator;
+    private fixedHeightQueryElements: Locator;
+    private copyLinkButton: Locator;
 
     constructor(page: Page) {
         this.storage = new StoragePage(page);
@@ -238,6 +261,8 @@ export class Diagnostics {
         this.tableRadioButton = page.locator(
             '.ydb-table-with-controls-layout__controls .g-radio-button',
         );
+        this.fixedHeightQueryElements = page.locator('.ydb-fixed-height-query');
+        this.copyLinkButton = page.locator('.ydb-copy-link-button__icon');
 
         // Info tab cards
         this.cpuCard = page.locator('.metrics-cards__tab:has-text("CPU")');
@@ -372,5 +397,30 @@ export class Diagnostics {
             .locator('.g-select-control__option-text')
             .textContent();
         return selectedText?.trim() || '';
+    }
+
+    async getFixedHeightQueryElementsCount(): Promise<number> {
+        return await this.fixedHeightQueryElements.count();
+    }
+
+    async getFixedHeightQueryElementHeight(index: number): Promise<string> {
+        const element = this.fixedHeightQueryElements.nth(index);
+        return await element.evaluate((el) => {
+            return window.getComputedStyle(el).height;
+        });
+    }
+
+    async clickCopyLinkButton(): Promise<void> {
+        await this.copyLinkButton.first().click();
+    }
+
+    async isCopyLinkButtonVisible(): Promise<boolean> {
+        return await this.copyLinkButton.first().isVisible();
+    }
+
+    async isRowActive(rowIndex: number): Promise<boolean> {
+        const rowElement = this.dataTable.locator(`tr.data-table__row:nth-child(${rowIndex})`);
+        const rowElementClass = await rowElement.getAttribute('class');
+        return rowElementClass?.includes('kv-top-queries__row_active') || false;
     }
 }
