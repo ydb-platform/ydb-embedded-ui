@@ -25,12 +25,8 @@ export interface ToolCall {
 }
 
 export interface ChatDelta {
-    type: 'content' | 'tool_call' | 'tool_executing' | 'tool_result' | 'tool_error' | 'done' | 'error';
+    type: 'content' | 'done' | 'error';
     content?: string;
-    tool_calls?: ToolCall[];
-    tool_name?: string;
-    tool_id?: string;
-    result?: any;
     error?: string;
 }
 

@@ -99,60 +99,6 @@ const chatSlice = createSlice({
                     }
                     break;
 
-                case 'tool_call':
-                    // Find the last assistant message that's being streamed
-                    let toolMessage = state.isStreaming
-                        ? state.messages.filter(msg => msg.role === 'assistant').pop()
-                        : undefined;
-
-                    if (!toolMessage) {
-                        toolMessage = {
-                            id: `msg-${Date.now()}`,
-                            role: 'assistant',
-                            content: '',
-                            timestamp: Date.now(),
-                        };
-                        state.messages.push(toolMessage);
-                    }
-
-                    if (delta.tool_calls) {
-                        if (!toolMessage.toolCalls) {
-                            toolMessage.toolCalls = [];
-                        }
-                        toolMessage.toolCalls.push(...delta.tool_calls);
-                    }
-                    break;
-
-                case 'tool_executing':
-                    // Just log that tool is executing, don't add a message
-                    console.log('Tool executing:', delta.tool_name, delta.tool_id);
-                    break;
-
-                case 'tool_result':
-                    // Add tool result as a separate message
-                    if (delta.tool_id && delta.result) {
-                        console.log('Adding tool result message:', delta.tool_id, delta.result);
-                        state.messages.push({
-                            id: `tool-result-${Date.now()}`,
-                            role: 'tool',
-                            content: typeof delta.result === 'string' ? delta.result : JSON.stringify(delta.result, null, 2),
-                            timestamp: Date.now(),
-                            toolCallId: delta.tool_id,
-                        });
-                    }
-                    break;
-
-                case 'tool_error':
-                    // Add tool error as a message
-                    if (delta.error) {
-                        state.messages.push({
-                            id: `tool-error-${Date.now()}`,
-                            role: 'assistant',
-                            content: `Tool execution error: ${delta.error}`,
-                            timestamp: Date.now(),
-                        });
-                    }
-                    break;
 
                 case 'done':
                     state.isStreaming = false;
