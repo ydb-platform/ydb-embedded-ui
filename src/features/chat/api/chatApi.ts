@@ -22,8 +22,8 @@ export class ChatAPI {
                 messages: messages.map(msg => ({
                     role: msg.role,
                     content: msg.content,
-                    tool_calls: msg.toolCalls,
-                    tool_call_id: msg.toolCallId,
+                    ...(msg.toolCalls && { tool_calls: msg.toolCalls }),
+                    ...(msg.toolCallId && { tool_call_id: msg.toolCallId }),
                 })),
                 model: 'gpt-4.1',
                 ...(context && { context }),
