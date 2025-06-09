@@ -1,5 +1,20 @@
 # Changelog
 
+## [9.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.3.1...v9.4.0) (2025-06-09)
+
+
+### Features
+
+* **Clusters:** allow add, edit and delete cluster funcs ([#2369](https://github.com/ydb-platform/ydb-embedded-ui/issues/2369)) ([69b4b4e](https://github.com/ydb-platform/ydb-embedded-ui/commit/69b4b4e80453f1687154f5a7e0c68d6fb70bdfc9))
+* **createToast:** allow more props from uikit ([#2370](https://github.com/ydb-platform/ydb-embedded-ui/issues/2370)) ([0dda6ec](https://github.com/ydb-platform/ydb-embedded-ui/commit/0dda6ec77eb003ef2785f86e62cc69b8c6ec7644))
+* drawer table scroll ([#2364](https://github.com/ydb-platform/ydb-embedded-ui/issues/2364)) ([34ea140](https://github.com/ydb-platform/ydb-embedded-ui/commit/34ea140e58091f4065f2f7b23b07de12d9dd1f3c))
+* **Healthcheck:** redesign ([#2348](https://github.com/ydb-platform/ydb-embedded-ui/issues/2348)) ([eac76af](https://github.com/ydb-platform/ydb-embedded-ui/commit/eac76afd3a3dca4d80a73b56af4e859146603d27))
+
+
+### Bug Fixes
+
+* **TopicPreview:** dont show negative offsets ([#2381](https://github.com/ydb-platform/ydb-embedded-ui/issues/2381)) ([91deb63](https://github.com/ydb-platform/ydb-embedded-ui/commit/91deb634669fa48fa8ea9a670d015ae769aefceb))
+
 ## [9.3.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.3.0...v9.3.1) (2025-06-03)
 
 
