@@ -6,10 +6,11 @@ import {
 } from '@gravity-ui/icons';
 
 import {TabletIcon} from '../../components/TabletIcon/TabletIcon';
-import {getPDiskPagePath} from '../../routes';
+import routes, {getPDiskPagePath} from '../../routes';
 import type {
     BreadcrumbsOptions,
     ClusterBreadcrumbsOptions,
+    ClustersBreadcrumbsOptions,
     NodeBreadcrumbsOptions,
     PDiskBreadcrumbsOptions,
     Page,
@@ -37,7 +38,7 @@ export interface RawBreadcrumbItem {
 }
 
 interface GetBreadcrumbs<T, U = AnyRecord> {
-    (options: T, query?: U): RawBreadcrumbItem[];
+    (options: T & {singleClusterMode: boolean}, query?: U): RawBreadcrumbItem[];
 }
 
 const getQueryForTenant = (type: 'nodes' | 'tablets') => ({
@@ -45,16 +46,31 @@ const getQueryForTenant = (type: 'nodes' | 'tablets') => ({
     [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS[type],
 });
 
-const getClusterBreadcrumbs: GetBreadcrumbs<ClusterBreadcrumbsOptions> = (options, query = {}) => {
-    const {clusterName, clusterTab} = options;
-
+const getClustersBreadcrumbs: GetBreadcrumbs<ClustersBreadcrumbsOptions> = () => {
     return [
         {
-            text: clusterName || CLUSTER_DEFAULT_TITLE,
-            link: getClusterPath(clusterTab, query),
-            icon: <ClusterIcon />,
+            text: headerKeyset('breadcrumbs.clusters'),
+            link: routes.clusters,
         },
     ];
+};
+
+const getClusterBreadcrumbs: GetBreadcrumbs<ClusterBreadcrumbsOptions> = (options, query = {}) => {
+    const {clusterName, clusterTab, singleClusterMode} = options;
+
+    let breadcrumbs: RawBreadcrumbItem[] = [];
+
+    if (!singleClusterMode) {
+        breadcrumbs = getClustersBreadcrumbs(options, query);
+    }
+
+    breadcrumbs.push({
+        text: clusterName || CLUSTER_DEFAULT_TITLE,
+        link: getClusterPath(clusterTab, query),
+        icon: <ClusterIcon />,
+    });
+
+    return breadcrumbs;
 };
 
 const getTenantBreadcrumbs: GetBreadcrumbs<TenantBreadcrumbsOptions> = (options, query = {}) => {
@@ -191,6 +207,7 @@ const getTabletBreadcrumbs: GetBreadcrumbs<TabletBreadcrumbsOptions> = (options,
 };
 
 const mapPageToGetter = {
+    clusters: getClustersBreadcrumbs,
     cluster: getClusterBreadcrumbs,
     node: getNodeBreadcrumbs,
     pDisk: getPDiskBreadcrumbs,
@@ -202,7 +219,7 @@ const mapPageToGetter = {
 
 export const getBreadcrumbs = (
     page: Page,
-    options: BreadcrumbsOptions,
+    options: BreadcrumbsOptions & {singleClusterMode: boolean},
     rawBreadcrumbs: RawBreadcrumbItem[] = [],
     query = {},
 ) => {

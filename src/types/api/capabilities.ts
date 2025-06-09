@@ -39,4 +39,7 @@ export type MetaCapability =
     | '/meta/delete_database'
     | '/meta/simulate_database'
     | '/meta/start_database'
-    | '/meta/stop_database';
+    | '/meta/stop_database'
+    | '/meta/create_cluster'
+    | '/meta/update_cluster'
+    | '/meta/delete_cluster';

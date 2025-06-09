@@ -5,6 +5,7 @@ import type {EType} from '../../../types/api/tablet';
 import type {setHeaderBreadcrumbs} from './header';
 
 export type Page =
+    | 'clusters'
     | 'cluster'
     | 'tenant'
     | 'node'
@@ -14,7 +15,9 @@ export type Page =
     | 'storageGroup'
     | undefined;
 
-export interface ClusterBreadcrumbsOptions {
+export interface ClustersBreadcrumbsOptions {}
+
+export interface ClusterBreadcrumbsOptions extends ClustersBreadcrumbsOptions {
     clusterName?: string;
     clusterTab?: ClusterTab;
 }

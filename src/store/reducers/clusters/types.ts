@@ -6,17 +6,6 @@ export interface PreparedCluster extends MetaExtendedClusterInfo {
     preparedBackend?: string;
 }
 
-export interface ClusterDataAggregation {
-    NodesTotal: number;
-    NodesAlive: number;
-    Hosts: number;
-    Tenants: number;
-    LoadAverage: number;
-    NumberOfCpus: number;
-    StorageUsed: number;
-    StorageTotal: number;
-}
-
 export interface ClustersFilters {
     status: string[];
     service: string[];

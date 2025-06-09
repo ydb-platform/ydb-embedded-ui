@@ -27,7 +27,6 @@ import {lazyComponent} from '../../utils/lazyComponent';
 import Authentication from '../Authentication/Authentication';
 import {getClusterPath} from '../Cluster/utils';
 import Header from '../Header/Header';
-import type {RawBreadcrumbItem} from '../Header/breadcrumbs';
 
 import {
     ClusterSlot,
@@ -41,7 +40,6 @@ import {
     TenantSlot,
     VDiskPageSlot,
 } from './appSlots';
-import i18n from './i18n';
 
 import './App.scss';
 
@@ -147,26 +145,22 @@ export function Content(props: ContentProps) {
     const redirectProps: RedirectProps =
         redirect?.props ?? (singleClusterMode ? {to: getClusterPath()} : {to: routes.clusters});
 
-    let mainPage: RawBreadcrumbItem | undefined;
-    if (!singleClusterMode) {
-        mainPage = {text: i18n('pages.clusters'), link: routes.clusters};
-    }
-
     return (
         <Switch>
-            {singleClusterMode
-                ? null
-                : renderRouteSlot(slots, {
-                      path: routes.clusters,
-                      exact: true,
-                      component: Clusters,
-                      slot: ClustersSlot,
-                  })}
             {additionalRoutes?.rendered}
-            {/* Single cluster routes */}
-            <Route key="single-cluster">
-                <Header mainPage={mainPage} />
+            <Route>
+                <Header />
                 <Switch>
+                    {singleClusterMode
+                        ? null
+                        : renderRouteSlot(slots, {
+                              path: routes.clusters,
+                              exact: true,
+                              component: Clusters,
+                              slot: ClustersSlot,
+                              wrapper: GetMetaCapabilities,
+                          })}
+                    {/* Single cluster routes */}
                     {routesSlots.map((route) => {
                         return renderRouteSlot(slots, route);
                     })}
@@ -221,6 +215,20 @@ function GetCapabilities({children}: {children: React.ReactNode}) {
 
     return (
         <LoaderWrapper loading={!capabilitiesLoaded || !metaCapabilitiesLoaded} size="l">
+            {children}
+        </LoaderWrapper>
+    );
+}
+
+// Only for Clusters page, there is no need to request cluster capabilities there (GetCapabilities)
+// This wrapper is not used in GetCapabilities so the page does not wait for 2 consecutive capabilities requests
+function GetMetaCapabilities({children}: {children: React.ReactNode}) {
+    useMetaCapabilitiesQuery();
+    // It is always true if there is no meta, since request finishes with an error
+    const metaCapabilitiesLoaded = useMetaCapabilitiesLoaded();
+
+    return (
+        <LoaderWrapper loading={!metaCapabilitiesLoaded} size="l">
             {children}
         </LoaderWrapper>
     );

@@ -1,13 +1,22 @@
 import React from 'react';
 
 import {HelpPopover} from '@gravity-ui/components';
+import {Pencil, TrashBin} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column} from '@gravity-ui/react-data-table';
-import {ClipboardButton, Link as ExternalLink, Progress} from '@gravity-ui/uikit';
+import type {DropdownMenuItem} from '@gravity-ui/uikit';
+import {
+    ClipboardButton,
+    DropdownMenu,
+    Link as ExternalLink,
+    Flex,
+    Progress,
+} from '@gravity-ui/uikit';
 
 import {ProgressViewer} from '../../components/ProgressViewer/ProgressViewer';
 import {UserCard} from '../../components/User/User';
 import type {PreparedCluster} from '../../store/reducers/clusters/types';
+import {uiFactory} from '../../uiFactory/uiFactory';
 import {formatStorageValuesToTb} from '../../utils/dataFormatters/dataFormatters';
 import {createDeveloperUIMonitoringPageHref} from '../../utils/developerUI/developerUI';
 import {getCleanBalancerValue} from '../../utils/parseBalancer';
@@ -21,11 +30,17 @@ export const CLUSTERS_COLUMNS_WIDTH_LS_KEY = 'clustersTableColumnsWidth';
 
 const EMPTY_CELL = <span className={b('empty-cell')}>—</span>;
 
-export const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
-    {
+interface ClustersColumnsParams {
+    isEditClusterAvailable?: boolean;
+    isDeleteClusterAvailable?: boolean;
+}
+
+function getTitleColumn({isEditClusterAvailable, isDeleteClusterAvailable}: ClustersColumnsParams) {
+    return {
         name: COLUMNS_NAMES.TITLE,
         header: COLUMNS_TITLES[COLUMNS_NAMES.TITLE],
         width: 230,
+        defaultOrder: DataTable.ASCENDING,
         render: ({row}) => {
             const {
                 name: clusterName,
@@ -40,36 +55,73 @@ export const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
 
             const clusterStatus = row.cluster?.Overall;
 
+            const renderActions = () => {
+                const menuItems: (DropdownMenuItem | DropdownMenuItem[])[] = [];
+
+                const {onEditCluster, onDeleteCluster} = uiFactory;
+
+                if (isEditClusterAvailable && onEditCluster) {
+                    menuItems.push({
+                        text: i18n('edit-cluster'),
+                        iconStart: <Pencil />,
+                        action: () => {
+                            onEditCluster({clusterData: row});
+                        },
+                    });
+                }
+                if (isDeleteClusterAvailable && onDeleteCluster) {
+                    menuItems.push({
+                        text: i18n('remove-cluster'),
+                        iconStart: <TrashBin />,
+                        action: () => {
+                            onDeleteCluster({clusterData: row});
+                        },
+                        className: b('remove-cluster'),
+                    });
+                }
+
+                if (!menuItems.length) {
+                    return null;
+                }
+
+                return <DropdownMenu items={menuItems} />;
+            };
+
             return (
-                <div className={b('cluster')}>
-                    {clusterStatus ? (
-                        <ExternalLink href={clusterPath}>
-                            <div
-                                className={b('cluster-status', {
-                                    type: clusterStatus && clusterStatus.toLowerCase(),
-                                })}
-                            />
-                        </ExternalLink>
-                    ) : (
-                        <div className={b('cluster-status')}>
-                            <HelpPopover
-                                content={
-                                    <span className={b('tooltip-content')}>
-                                        {row.cluster?.error || i18n('tooltip_no-cluster-data')}
-                                    </span>
-                                }
-                                offset={{left: 0}}
-                            />
+                <Flex alignItems={'center'} justifyContent={'space-between'}>
+                    <Flex alignItems={'center'}>
+                        {clusterStatus ? (
+                            <ExternalLink href={clusterPath}>
+                                <div
+                                    className={b('cluster-status', {
+                                        type: clusterStatus && clusterStatus.toLowerCase(),
+                                    })}
+                                />
+                            </ExternalLink>
+                        ) : (
+                            <div className={b('cluster-status')}>
+                                <HelpPopover
+                                    content={
+                                        <span className={b('tooltip-content')}>
+                                            {row.cluster?.error || i18n('tooltip_no-cluster-data')}
+                                        </span>
+                                    }
+                                    offset={{left: 0}}
+                                />
+                            </div>
+                        )}
+                        <div className={b('cluster-name')}>
+                            <ExternalLink href={clusterPath}>{row.title || row.name}</ExternalLink>
                         </div>
-                    )}
-                    <div className={b('cluster-name')}>
-                        <ExternalLink href={clusterPath}>{row.title}</ExternalLink>
-                    </div>
-                </div>
+                    </Flex>
+                    {renderActions()}
+                </Flex>
             );
         },
-        defaultOrder: DataTable.ASCENDING,
-    },
+    } satisfies Column<PreparedCluster>;
+}
+
+const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
     {
         name: COLUMNS_NAMES.VERSIONS,
         header: COLUMNS_TITLES[COLUMNS_NAMES.VERSIONS],
@@ -294,3 +346,7 @@ export const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
         },
     },
 ];
+
+export function getClustersColumns(params: ClustersColumnsParams) {
+    return [getTitleColumn(params), ...CLUSTERS_COLUMNS];
+}
