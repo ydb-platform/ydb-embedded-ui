@@ -62,6 +62,7 @@ export class ChatService {
                 };
 
                 // Stream response from LLM
+                logger.info('Sending request to LLM');
                 const stream = await this.llmService.createStreamingChatCompletion(
                     request,
                     availableTools,
@@ -73,6 +74,7 @@ export class ChatService {
                     stream,
                     onData,
                 );
+                logger.info('Received response from LLM');
 
                 // Add assistant message to conversation history (for LLM context)
                 const assistantMessage = {
