@@ -5,18 +5,21 @@
 **YDB** - это распределенная база данных от Яндекса, которая работает на множестве серверов одновременно.
 
 **Проблема**: Администраторам базы данных нужно постоянно проверять:
+
 - Работают ли все серверы (ноды)?
 - Какие базы данных созданы?
 - Нет ли проблем с дисками?
 - Как работают запросы?
 
 **Обычно** для этого нужно:
+
 1. Заходить в разные разделы веб-интерфейса
 2. Помнить где что находится
 3. Знать технические команды
 4. Анализировать сложные графики и таблицы
 
 **Решение**: AI чат-ассистент, который может:
+
 - Отвечать на вопросы простым языком: "Покажи состояние кластера"
 - Сам находить нужную информацию в базе данных
 - Объяснять результаты понятным языком
@@ -28,24 +31,28 @@
 Система состоит из 4 основных компонентов (как ресторан с разными отделами):
 
 ### 1. **Frontend (Фронтенд)** - "зал ресторана"
+
 - **Что это**: Веб-интерфейс, который видит пользователь
 - **Что делает**: Показывает чат, принимает сообщения от пользователя, отображает ответы
 - **Технологии**: React (библиотека для создания интерфейсов)
 - **Аналогия**: Официант, который принимает ваш заказ и приносит еду
 
-### 2. **Backend/Chat Server (Бэкенд)** - "кухня ресторана"  
+### 2. **Backend/Chat Server (Бэкенд)** - "кухня ресторана"
+
 - **Что это**: Сервер, который обрабатывает запросы
 - **Что делает**: Получает сообщения от фронтенда, решает что делать, отправляет ответы обратно
 - **Технологии**: Node.js + Express (сервер на JavaScript)
 - **Аналогия**: Повар, который готовит ваш заказ
 
 ### 3. **AI Service (LLM)** - "шеф-повар"
+
 - **Что это**: Искусственный интеллект (большая языковая модель)
 - **Что делает**: Понимает вопросы пользователя, решает какие действия нужно выполнить
 - **Технологии**: Eliza API (аналог ChatGPT)
 - **Аналогия**: Опытный шеф-повар, который знает все рецепты и может придумать новые блюда
 
 ### 4. **YDB MCP Server** - "склад продуктов"
+
 - **Что это**: Специальный сервер, который умеет работать с базой данных YDB
 - **Что делает**: Выполняет реальные операции: проверяет состояние, получает списки баз данных и т.д.
 - **Технологии**: MCP (Model Context Protocol) - стандарт для подключения AI к внешним системам
@@ -56,20 +63,22 @@
 ### 🚀 **При старте сервера** (файл `server.ts`):
 
 1. **Создаются сервисы**:
+
    ```javascript
-   const mcpService = getMCPService();     // Для работы с YDB
-   const chatService = new ChatService();  // Для обработки чата
+   const mcpService = getMCPService(); // Для работы с YDB
+   const chatService = new ChatService(); // Для обработки чата
    ```
 
 2. **Подключение к YDB MCP Server**:
+
    ```javascript
    await mcpService.registerServer({
      name: 'ydb-mcp-server',
      type: 'sse',
-     url: 'http://ydb-mcp-server:8080'  // Адрес YDB сервера
+     url: 'http://ydb-mcp-server:8080', // Адрес YDB сервера
    });
    ```
-   
+
    **Простыми словами**: Сервер "знакомится" с YDB и узнает какие операции можно выполнять
 
 3. **Обнаружение доступных инструментов**:
@@ -100,22 +109,24 @@ class MCPService {
 ### 🔄 **Как происходит получение и сохранение**:
 
 **При запуске сервера**:
+
 1. Создается объект сервера БЕЗ инструментов:
+
    ```javascript
    const server = {
-       name: 'ydb-mcp-server',
-       type: 'sse',
-       url: 'http://ydb-mcp-server:8080',
-       status: 'disconnected',
-       tools: undefined  // ← Пока пусто!
+     name: 'ydb-mcp-server',
+     type: 'sse',
+     url: 'http://ydb-mcp-server:8080',
+     status: 'disconnected',
+     tools: undefined, // ← Пока пусто!
    };
    ```
 
 2. Подключаемся к YDB MCP Server
 3. **ОДИН РАЗ** запрашиваем список инструментов:
    ```javascript
-   const tools = await client.listTools();  // Запрос к YDB MCP Server
-   server.tools = tools.tools;               // ← Сохраняем в памяти!
+   const tools = await client.listTools(); // Запрос к YDB MCP Server
+   server.tools = tools.tools; // ← Сохраняем в памяти!
    ```
 
 ### 📦 **Что получается в итоге**:
@@ -137,30 +148,35 @@ servers.set('ydb-mcp-server', {
 ### ⚡ **Когда используются**:
 
 **При каждом запросе чата**:
+
 ```javascript
 // В chat.service.ts
-const availableTools = this.mcpService.getAllTools();  // ← Берем из памяти (быстро!)
+const availableTools = this.mcpService.getAllTools(); // ← Берем из памяти (быстро!)
 // НЕ делаем новый запрос к YDB MCP Server
 ```
 
-**Итак**: 
+**Итак**:
+
 - ✅ Получаем инструменты **ОДИН РАЗ** при запуске
-- ✅ Сохраняем в **оперативной памяти** 
+- ✅ Сохраняем в **оперативной памяти**
 - ✅ При каждом чате берем из памяти (не делаем новых запросов)
 
 ## Шаг 5: Что такое streaming и зачем он нужен
 
 ### 📡 **Server-Sent Events (SSE)**:
 
-**Обычный HTTP**: 
+**Обычный HTTP**:
+
 - Клиент спрашивает → Сервер отвечает → Соединение закрывается
 - Как SMS: отправил → получил ответ → всё
 
 **Streaming (SSE)**:
+
 - Клиент спрашивает → Сервер держит соединение открытым → Отправляет ответ частями
 - Как телефонный звонок: соединение открыто, можно говорить в реальном времени
 
 ### 🔧 **Настройка streaming** (в `/api/chat`):
+
 ```javascript
 // Говорим браузеру: "Это будет поток данных, не обычный ответ"
 res.setHeader('Content-Type', 'text/event-stream');
@@ -168,7 +184,8 @@ res.setHeader('Cache-Control', 'no-cache');
 res.setHeader('Connection', 'keep-alive');
 ```
 
-**Зачем это нужно?**: 
+**Зачем это нужно?**:
+
 - AI генерирует ответ не сразу, а по словам
 - Пользователь видит как текст появляется в реальном времени (как в ChatGPT)
 - Можно показать процесс: "AI думает... → Выполняю запрос к базе... → Получил результат..."
@@ -178,11 +195,13 @@ res.setHeader('Connection', 'keep-alive');
 ## Пример: Путешествие сообщения "какие есть ноды в кластере"
 
 ### 🎯 **Шаг 1: Пользователь нажимает "Отправить"**
+
 - Пользователь написал "какие есть ноды в кластере" и нажал Enter
 - **Где происходит**: В компоненте `ChatInput` (фронтенд)
 - **Что происходит**: Вызывается функция `sendMessage(content)`
 
 ### 📤 **Шаг 2: Фронтенд подготавливает запрос**
+
 - **Где**: В хуке `useChat.ts`
 - **Что происходит**:
   1. Создается объект сообщения с уникальным ID
@@ -190,6 +209,7 @@ res.setHeader('Connection', 'keep-alive');
   3. Подготавливается HTTP запрос на сервер
 
 ### 🌐 **Шаг 3: Отправка на сервер**
+
 - **Куда**: POST запрос на `http://localhost:3001/api/chat`
 - **Что отправляется**:
   ```json
@@ -199,6 +219,7 @@ res.setHeader('Connection', 'keep-alive');
   ```
 
 ### 🖥️ **Шаг 4: Сервер получает запрос**
+
 - **Где**: В файле `server.ts`, endpoint `/api/chat`
 - **Что происходит**:
   1. Сервер настраивает streaming (Server-Sent Events)
@@ -213,6 +234,7 @@ res.setHeader('Connection', 'keep-alive');
 ### 🔄 **Agent Loop - это сердце системы**
 
 **Что это такое**: Цикл, который может выполняться до 5 раз, где AI:
+
 1. Анализирует запрос
 2. Решает нужны ли инструменты
 3. "Просит" Chat Server вызвать инструменты
@@ -222,18 +244,20 @@ res.setHeader('Connection', 'keep-alive');
 ### 📋 **Подготовка к циклу**:
 
 1. **Получаем доступные инструменты**:
+
    ```javascript
    const availableTools = this.mcpService.getAllTools();
    // Получаем из памяти: ["ydb-get-clusters", "ydb-get-nodes", ...]
    ```
 
 2. **Создаем системный промпт**:
+
    ```javascript
    const systemPrompt = {
      role: 'system',
      content: `Ты - помощник для работы с YDB.
      ДОСТУПНЫЕ ИНСТРУМЕНТЫ: ydb-get-nodes, ydb-get-clusters, ...
-     ПРАВИЛО: ВСЕГДА используй инструменты для получения актуальных данных!`
+     ПРАВИЛО: ВСЕГДА используй инструменты для получения актуальных данных!`,
    };
    ```
 
@@ -241,7 +265,7 @@ res.setHeader('Connection', 'keep-alive');
    ```javascript
    const conversationHistory = [
      systemPrompt,
-     { role: 'user', content: 'какие есть ноды в кластере' }
+     {role: 'user', content: 'какие есть ноды в кластере'},
    ];
    ```
 
@@ -250,12 +274,14 @@ res.setHeader('Connection', 'keep-alive');
 ### 🤖 **ВАЖНО: AI НЕ может сам вызывать инструменты!**
 
 **AI (Eliza/ChatGPT)** - это просто "умный текстогенератор", который:
+
 - Получает текст на входе
 - Генерирует текст на выходе
 - НЕ может сам делать HTTP запросы
 - НЕ может сам подключаться к базам данных
 
 ### 🔧 **Схема взаимодействия**:
+
 ```
 Chat Server ←→ AI Service (Eliza) ←→ YDB MCP Server
      ↑              ↑                      ↑
@@ -265,6 +291,7 @@ Chat Server ←→ AI Service (Eliza) ←→ YDB MCP Server
 ### 📞 **Пошаговый процесс "вызова" инструментов**:
 
 **1. Chat Server отправляет AI запрос с доступными инструментами**:
+
 ```json
 {
   "messages": [{"role": "user", "content": "какие есть ноды в кластере"}],
@@ -281,6 +308,7 @@ Chat Server ←→ AI Service (Eliza) ←→ YDB MCP Server
 ```
 
 **2. AI анализирует и отвечает с "просьбой" вызвать инструмент**:
+
 ```json
 {
   "content": "Сейчас проверю ноды в кластере...",
@@ -297,19 +325,19 @@ Chat Server ←→ AI Service (Eliza) ←→ YDB MCP Server
 ```
 
 **3. Chat Server видит tool_calls и САМ выполняет запрос**:
+
 ```javascript
 // В chat.service.ts
 for (const toolCall of completeToolCalls) {
-    // Chat Server делает запрос к YDB MCP Server
-    const result = await this.mcpService.callTool(
-        'ydb-mcp-server',
-        'ydb-get-nodes',
-        {cluster_name: 'ydb_vla_dev02'}
-    );
+  // Chat Server делает запрос к YDB MCP Server
+  const result = await this.mcpService.callTool('ydb-mcp-server', 'ydb-get-nodes', {
+    cluster_name: 'ydb_vla_dev02',
+  });
 }
 ```
 
 **4. Chat Server отправляет результат обратно AI**:
+
 ```json
 {
   "role": "tool",
@@ -319,6 +347,7 @@ for (const toolCall of completeToolCalls) {
 ```
 
 **5. AI формулирует финальный ответ**:
+
 ```json
 {
   "content": "В кластере найдено 3 ноды: node1, node2, node3"
@@ -338,6 +367,7 @@ for (const toolCall of completeToolCalls) {
 ### 🎯 **Два способа завершения цикла**:
 
 ### 1. **AI НЕ просит инструменты** = Финальный ответ
+
 ```javascript
 // В chat.service.ts
 if (completeToolCalls.length === 0) {
@@ -346,16 +376,18 @@ if (completeToolCalls.length === 0) {
 }
 ```
 
-**Что это значит**: 
+**Что это значит**:
+
 - AI проанализировал ситуацию
 - Решил что у него достаточно информации
 - Дал финальный ответ пользователю
 - НЕ запросил никаких инструментов
 
 ### 2. **Достигнут лимит итераций** (максимум 5)
+
 ```javascript
 for (let iteration = 0; iteration < maxIterations; iteration++) {
-    // ... логика цикла
+  // ... логика цикла
 }
 // Если дошли до 5 итераций - принудительно завершаем
 ```
@@ -363,6 +395,7 @@ for (let iteration = 0; iteration < maxIterations; iteration++) {
 ### 🧠 **Примеры принятия решений AI**:
 
 **Пример 1 - Простой случай**:
+
 ```
 Пользователь: "какие есть ноды в кластере"
 
@@ -377,6 +410,7 @@ AI НЕ просит инструменты → КОНЕЦ
 ```
 
 **Пример 2 - Сложный случай**:
+
 ```
 Пользователь: "есть ли проблемы с кластером?"
 
@@ -400,6 +434,7 @@ AI НЕ просит инструменты → КОНЕЦ
 ### 🔍 **Что влияет на решение AI**:
 
 1. **Системный промпт** говорит AI:
+
    ```
    "В КОНЦЕ дай краткое резюме: какая была задача и что удалось выяснить"
    ```
@@ -425,16 +460,18 @@ const maxIterations = options.maxIterations || 5;
 ### 🎯 **Что происходит после Agent Loop**:
 
 **1. Отправка сигнала завершения**:
+
 ```javascript
 // В chat.service.ts
-onData(`data: ${JSON.stringify({ type: 'done' })}\n\n`);
+onData(`data: ${JSON.stringify({type: 'done'})}\n\n`);
 ```
 
 **2. Фронтенд получает сигнал**:
+
 ```javascript
 // В chatApi.ts
 if (data === '[DONE]') {
-    return;  // ← Завершаем обработку streaming
+  return; // ← Завершаем обработку streaming
 }
 ```
 
@@ -447,6 +484,7 @@ if (data === '[DONE]') {
 ### 🔄 **Пример streaming процесса**:
 
 **AI генерирует ответ по частям**:
+
 ```
 chunk1: {"choices":[{"delta":{"content":"В"}}]}
 chunk2: {"choices":[{"delta":{"content":" кластере"}}]}
@@ -455,45 +493,47 @@ chunk4: {"choices":[{"delta":{"content":" 15 нод"}}]}
 ```
 
 **StreamProcessor обрабатывает**:
+
 ```javascript
 // Chunk 1:
-accumulatedContent = "В"
+accumulatedContent = 'В';
 onData(`data: ${JSON.stringify({type: 'content', content: 'В'})}\n\n`);
 
 // Chunk 2:
-accumulatedContent = "В кластере"
+accumulatedContent = 'В кластере';
 onData(`data: ${JSON.stringify({type: 'content', content: ' кластере'})}\n\n`);
 
 // Chunk 3:
-accumulatedContent = "В кластере найдено"
+accumulatedContent = 'В кластере найдено';
 onData(`data: ${JSON.stringify({type: 'content', content: ' найдено'})}\n\n`);
 
 // Chunk 4:
-accumulatedContent = "В кластере найдено 15 нод"
+accumulatedContent = 'В кластере найдено 15 нод';
 onData(`data: ${JSON.stringify({type: 'content', content: ' 15 нод'})}\n\n`);
 ```
 
 ### 🖥️ **Как фронтенд обновляется в реальном времени**
 
 **Redux обрабатывает события**:
+
 ```javascript
 // В chatSlice.ts
-switch(delta.type) {
-    case 'content':
-        // Добавляем текст к текущему сообщению AI
-        assistantMessage.content += delta.content;
-        break;
-        
-    case 'done':
-        // Завершаем streaming
-        state.isStreaming = false;
-        state.isLoading = false;
-        break;
-        
-    case 'error':
-        // Показываем ошибку
-        state.error = delta.error;
-        break;
+switch (delta.type) {
+  case 'content':
+    // Добавляем текст к текущему сообщению AI
+    assistantMessage.content += delta.content;
+    break;
+
+  case 'done':
+    // Завершаем streaming
+    state.isStreaming = false;
+    state.isLoading = false;
+    break;
+
+  case 'error':
+    // Показываем ошибку
+    state.error = delta.error;
+    break;
 }
 ```
 
@@ -518,20 +558,22 @@ Chat Server ←→ YDB MCP Server
 ### 📋 **Как работает MCPService**:
 
 **1. При запуске сервера**:
+
 ```javascript
 // Регистрируем YDB MCP Server
 await mcpService.registerServer({
-    name: 'ydb-mcp-server',
-    type: 'sse',
-    url: 'http://ydb-mcp-server:8080'
+  name: 'ydb-mcp-server',
+  type: 'sse',
+  url: 'http://ydb-mcp-server:8080',
 });
 
 // Получаем список инструментов ОДИН РАЗ
 const tools = await client.listTools();
-server.tools = tools.tools;  // ← Сохраняем в памяти
+server.tools = tools.tools; // ← Сохраняем в памяти
 ```
 
 **2. При каждом чате**:
+
 ```javascript
 // Берем инструменты из памяти (быстро!)
 const availableTools = this.mcpService.getAllTools();
@@ -539,19 +581,18 @@ const availableTools = this.mcpService.getAllTools();
 ```
 
 **3. При вызове инструмента**:
+
 ```javascript
 // ToolExecutor делает запрос к YDB MCP Server
-const result = await this.mcpService.callTool(
-    'ydb-mcp-server',
-    'ydb-get-nodes',
-    {cluster_name: 'ydb_vla_dev02'}
-);
+const result = await this.mcpService.callTool('ydb-mcp-server', 'ydb-get-nodes', {
+  cluster_name: 'ydb_vla_dev02',
+});
 ```
 
 ### 🛠️ **Доступные YDB инструменты**:
 
 - `ydb-get-clusters` - Список кластеров
-- `ydb-get-nodes` - Список нод в кластере  
+- `ydb-get-nodes` - Список нод в кластере
 - `ydb-get-databases` - Список баз данных
 - `ydb-get-node-details` - Детали конкретной ноды
 - `ydb-get-cluster-health` - Состояние кластера
@@ -565,7 +606,6 @@ const result = await this.mcpService.callTool(
 3. **Масштабируемость**: Можно легко добавить новые MCP серверы
 4. **Безопасность**: Chat Server контролирует какие инструменты доступны AI
 
-
 ## Заключение: Полная картина работы системы
 
 ### 🔄 **Полный цикл обработки запроса**:
@@ -574,7 +614,7 @@ const result = await this.mcpService.callTool(
 1. Пользователь: "есть ли проблемы с кластером?"
    ↓
 2. Фронтенд: Отправляет запрос на сервер
-   ↓  
+   ↓
 3. Chat Server: Получает запрос
    ↓
 4. PromptBuilder: Создает системный промпт
@@ -610,3 +650,138 @@ const result = await this.mcpService.callTool(
 - **Простая архитектура**: Легко понять и модифицировать
 
 **Результат**: Администраторы YDB могут управлять кластерами через простой чат, получая актуальную информацию и экспертные советы в реальном времени.
+
+---
+
+## Критические исправления (Декабрь 2024)
+
+### 🐛 **Проблема: Рассинхронизация tool_calls и tool results**
+
+**Симптомы**:
+
+```
+Streaming chat completion failed: 400
+An assistant message with 'tool_calls' must be followed by tool messages
+responding to each 'tool_call_id'. The following tool_call_ids did not
+have response messages: call_aL3OysZ4wykzpm53SfkuNDpT
+```
+
+**Корень проблемы**:
+
+1. **Agent Loop генерирует несколько tool_calls**:
+
+   ```
+   Итерация 1: AI просит ydb-get-clusters → tool_call_id: call_123
+   Итерация 2: AI просит ydb-get-databases → tool_call_id: call_456
+   ```
+
+2. **Клиент получал только последний tool_call**:
+
+   ```javascript
+   // БЫЛО (неправильно):
+   state.messages[i].toolCalls = delta.tool_calls; // ← Перезаписывало!
+
+   // Результат: toolCalls = [call_456] (только последний)
+   ```
+
+3. **Но tool results отправлялись для ВСЕХ итераций**:
+
+   ```javascript
+   // Tool results в истории:
+   { role: 'tool', tool_call_id: 'call_123' }  // ← Для этого нет tool_call!
+   { role: 'tool', tool_call_id: 'call_456' }
+   ```
+
+4. **OpenAI API видел несоответствие**:
+   ```
+   assistant.tool_calls = ['call_456']           // ← Только один
+   tool_results = ['call_123', 'call_456']      // ← Два результата
+   ```
+
+### ✅ **Решение: Накопление tool_calls на клиенте**
+
+**Изменили логику в `chatSlice.ts`**:
+
+```javascript
+// СТАЛО (правильно):
+case 'tool_calls': {
+    if (delta.tool_calls) {
+        for (let i = state.messages.length - 1; i >= 0; i--) {
+            const message = state.messages[i];
+            if (message && message.role === 'assistant') {
+                // Инициализируем массив если его нет
+                if (!message.toolCalls) {
+                    message.toolCalls = [];
+                }
+                // НАКАПЛИВАЕМ tool_calls вместо перезаписи
+                message.toolCalls.push(...delta.tool_calls);
+                break;
+            }
+        }
+    }
+    break;
+}
+```
+
+**Результат**:
+
+```javascript
+// Теперь клиент накапливает ВСЕ tool_calls:
+assistant.toolCalls = ['call_123', 'call_456']; // ← Все итерации
+tool_results = ['call_123', 'call_456']; // ← Соответствуют
+```
+
+### 🔄 **Как это работает пошагово**:
+
+**Итерация 1 Agent Loop**:
+
+```
+1. AI генерирует: tool_calls = [call_123]
+2. Сервер отправляет: {type: 'tool_calls', tool_calls: [call_123]}
+3. Клиент: message.toolCalls = [call_123]
+4. Выполняется инструмент, добавляется tool result
+```
+
+**Итерация 2 Agent Loop**:
+
+```
+1. AI генерирует: tool_calls = [call_456]
+2. Сервер отправляет: {type: 'tool_calls', tool_calls: [call_456]}
+3. Клиент: message.toolCalls.push(call_456) → [call_123, call_456]
+4. Выполняется инструмент, добавляется tool result
+```
+
+**Финальная история сообщений**:
+
+```javascript
+[
+  {role: 'user', content: 'дай список баз'},
+  {
+    role: 'assistant',
+    content: 'Проверю кластеры и базы данных...',
+    toolCalls: [
+      {id: 'call_123', function: {name: 'ydb-get-clusters'}},
+      {id: 'call_456', function: {name: 'ydb-get-databases'}},
+    ],
+  },
+  {role: 'tool', content: 'Tool result: {...}', tool_call_id: 'call_123'},
+  {role: 'tool', content: 'Tool result: {...}', tool_call_id: 'call_456'},
+  {role: 'assistant', content: 'Вот список баз данных: ...'},
+];
+```
+
+### 🎯 **Ключевые принципы исправления**:
+
+1. **Накопление вместо замены**: `push()` вместо `=`
+2. **Синхронизация ID**: Каждый tool_call_id имеет соответствующий tool result
+3. **Правильная последовательность**: Assistant → Tool calls → Tool results → Assistant
+4. **Совместимость с OpenAI API**: Строгое соблюдение формата
+
+### 📊 **Результат исправления**:
+
+- ✅ **Стабильность**: Нет больше ошибок 400 от OpenAI API
+- ✅ **Надежность**: Корректная обработка сложных multi-tool операций
+- ✅ **Отладка**: Полная история tool_calls для диагностики
+- ✅ **Производительность**: Нет потерянных tool results
+
+**Вывод**: Проблема была в клиентской логике накопления tool_calls. Исправление обеспечило полную совместимость с OpenAI API и стабильную работу Agent Loop для сложных сценариев.

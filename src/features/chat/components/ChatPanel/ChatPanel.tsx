@@ -1,29 +1,29 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { Button, ActionTooltip, Icon, Text } from '@gravity-ui/uikit';
-import { Drawer, DrawerItem } from '@gravity-ui/navigation';
-import { Xmark } from '@gravity-ui/icons';
-import { ChatMessage } from '../ChatMessage/ChatMessage';
-import { ChatInput } from '../ChatInput/ChatInput';
-import { useChat } from '../../hooks/useChat';
-import { ChatState } from '../../types/chat';
-import { cn } from '../../../../utils/cn';
+import React from 'react';
+
+import {Xmark} from '@gravity-ui/icons';
+import {Drawer, DrawerItem} from '@gravity-ui/navigation';
+import {ActionTooltip, Button, Icon, Text} from '@gravity-ui/uikit';
+import {useSelector} from 'react-redux';
+
+import {cn} from '../../../../utils/cn';
+import {useChat} from '../../hooks/useChat';
+import {formatContextForAI, useCurrentContext} from '../../services/contextService';
+import type {ChatState} from '../../types/chat';
+import {ChatInput} from '../ChatInput/ChatInput';
+import {ChatMessage} from '../ChatMessage/ChatMessage';
+
 import './ChatPanel.scss';
 
 const b = cn('ydb-chat-drawer');
 
-export const ChatPanel: React.FC = () => {
-    const { messages, isLoading, isStreaming, error, isOpen } = useSelector(
-        (state: { chat: ChatState }) => state.chat
+export const ChatPanel = () => {
+    const {messages, isLoading, isStreaming, error, isOpen} = useSelector(
+        (state: {chat: ChatState}) => state.chat,
     );
-    const messagesEndRef = useRef<HTMLDivElement>(null);
-    
-    const { 
-        sendMessage, 
-        stopGeneration, 
-        clearHistory, 
-        closeChat 
-    } = useChat();
+    const messagesEndRef = React.useRef<HTMLDivElement>(null);
+
+    const {sendMessage, stopGeneration, clearHistory, closeChat} = useChat();
+    const context = useCurrentContext();
 
     const scrollToBottom = () => {
         if (messagesEndRef.current) {
@@ -34,39 +34,43 @@ export const ChatPanel: React.FC = () => {
         }
     };
 
-    useEffect(() => {
+    React.useEffect(() => {
         // Use setTimeout to ensure DOM has updated
         const timer = setTimeout(() => {
             scrollToBottom();
         }, 0);
-        
+
         return () => clearTimeout(timer);
     }, [messages]);
 
     const handleSendMessage = async (content: string) => {
-        await sendMessage(content);
+        const contextString = formatContextForAI(context);
+        await sendMessage(content, contextString);
     };
 
-    const handleClearHistory = () => {
+    const handleClearHistory = React.useCallback(() => {
         clearHistory();
-    };
+    }, [clearHistory]);
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-        if (event.metaKey && event.key === 'k') {
-            event.preventDefault();
-            handleClearHistory();
-        }
-    };
+    const handleKeyDown = React.useCallback(
+        (event: KeyboardEvent) => {
+            if (event.metaKey && event.key === 'k') {
+                event.preventDefault();
+                handleClearHistory();
+            }
+        },
+        [handleClearHistory],
+    );
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (isOpen) {
             document.addEventListener('keydown', handleKeyDown);
             return () => document.removeEventListener('keydown', handleKeyDown);
         }
-        return;
-    }, [isOpen]);
+        return undefined;
+    }, [handleKeyDown, isOpen]);
 
-    const [drawerWidth, setDrawerWidth] = useState(() => {
+    const [drawerWidth, setDrawerWidth] = React.useState(() => {
         const savedWidth = localStorage.getItem('chat-drawer-width');
         return savedWidth ? Number(savedWidth) : 400;
     });
@@ -77,12 +81,7 @@ export const ChatPanel: React.FC = () => {
     };
 
     return (
-        <Drawer
-            onEscape={closeChat}
-            onVeilClick={closeChat}
-            hideVeil
-            className={b('container')}
-        >
+        <Drawer onEscape={closeChat} onVeilClick={closeChat} hideVeil className={b('container')}>
             <DrawerItem
                 id="chat-drawer"
                 visible={isOpen}
@@ -101,7 +100,9 @@ export const ChatPanel: React.FC = () => {
                                 view="flat"
                                 size="s"
                                 onClick={handleClearHistory}
-                                disabled={messages.length === 0}
+                                disabled={
+                                    messages.filter((msg) => msg.role !== 'tool').length === 0
+                                }
                             >
                                 🗑
                             </Button>
@@ -116,15 +117,20 @@ export const ChatPanel: React.FC = () => {
 
                 {/* Messages */}
                 <div className={b('messages')}>
-                    {messages.length === 0 && (
+                    {messages.filter((msg) => msg.role !== 'tool').length === 0 && (
                         <div className={b('welcome')}>
                             <h4>Welcome to YDB AI Assistant</h4>
-                            <p>Ask questions about your YDB cluster, databases, or get help with queries.</p>
+                            <p>
+                                Ask questions about your YDB cluster, databases, or get help with
+                                queries.
+                            </p>
                             <div className={b('suggestions')}>
                                 <Button
                                     view="outlined"
                                     size="s"
-                                    onClick={() => handleSendMessage('Show me cluster health status')}
+                                    onClick={() =>
+                                        handleSendMessage('Show me cluster health status')
+                                    }
                                 >
                                     Check cluster health
                                 </Button>
@@ -146,9 +152,11 @@ export const ChatPanel: React.FC = () => {
                         </div>
                     )}
 
-                    {messages.map((message) => (
-                        <ChatMessage key={message.id} message={message} />
-                    ))}
+                    {messages
+                        .filter((message) => message.role !== 'tool')
+                        .map((message) => (
+                            <ChatMessage key={message.id} message={message} />
+                        ))}
 
                     {error && (
                         <div className={b('error')}>

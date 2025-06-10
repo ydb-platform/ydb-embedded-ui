@@ -1,5 +1,7 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ChatMessage, ChatState, ChatDelta } from '../types/chat';
+import type {PayloadAction} from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
+
+import type {ChatDelta, ChatMessage, ChatState} from '../types/chat';
 
 const initialState: ChatState = {
     messages: [],
@@ -29,8 +31,8 @@ const chatSlice = createSlice({
         addMessage: (state, action: PayloadAction<ChatMessage>) => {
             state.messages.push(action.payload);
         },
-        updateMessage: (state, action: PayloadAction<{ id: string; content: string }>) => {
-            const message = state.messages.find(msg => msg.id === action.payload.id);
+        updateMessage: (state, action: PayloadAction<{id: string; content: string}>) => {
+            const message = state.messages.find((msg) => msg.id === action.payload.id);
             if (message) {
                 message.content = action.payload.content;
             }
@@ -55,17 +57,17 @@ const chatSlice = createSlice({
             state.isLoading = false;
             state.needsNewAssistantMessage = false;
         },
-        
+
         // Handle streaming deltas
         processDelta: (state, action: PayloadAction<ChatDelta>) => {
             const delta = action.payload;
             console.log('Processing delta:', delta);
-            
+
             switch (delta.type) {
-                case 'content':
+                case 'content': {
                     // Find or create the current streaming assistant message
                     let assistantMessage: ChatMessage | undefined;
-                    
+
                     // If we need a new assistant message or there's no current streaming message
                     if (state.needsNewAssistantMessage || !state.currentStreamingMessageId) {
                         assistantMessage = {
@@ -79,7 +81,9 @@ const chatSlice = createSlice({
                         state.needsNewAssistantMessage = false;
                     } else {
                         // Find the current streaming message
-                        assistantMessage = state.messages.find(msg => msg.id === state.currentStreamingMessageId);
+                        assistantMessage = state.messages.find(
+                            (msg) => msg.id === state.currentStreamingMessageId,
+                        );
                         if (!assistantMessage) {
                             // Fallback: create new message if current streaming message not found
                             assistantMessage = {
@@ -98,7 +102,7 @@ const chatSlice = createSlice({
                         assistantMessage.content += delta.content;
                     }
                     break;
-
+                }
 
                 case 'done':
                     state.isStreaming = false;
@@ -112,6 +116,39 @@ const chatSlice = createSlice({
                     state.isStreaming = false;
                     state.isLoading = false;
                     break;
+
+                case 'tool_result': {
+                    // Parse tool message from content and add to messages
+                    if (delta.content) {
+                        try {
+                            const toolMessage = JSON.parse(delta.content) as ChatMessage;
+                            state.messages.push(toolMessage);
+                        } catch (error) {
+                            console.warn('Failed to parse tool result:', error);
+                        }
+                    }
+                    break;
+                }
+
+                case 'tool_calls': {
+                    // Accumulate tool_calls to the last assistant message
+                    if (delta.tool_calls) {
+                        // Find the last assistant message
+                        for (let i = state.messages.length - 1; i >= 0; i--) {
+                            const message = state.messages[i];
+                            if (message && message.role === 'assistant') {
+                                // Initialize toolCalls array if it doesn't exist
+                                if (!message.toolCalls) {
+                                    message.toolCalls = [];
+                                }
+                                // Add new tool calls to existing ones
+                                message.toolCalls.push(...delta.tool_calls);
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                }
             }
         },
 
@@ -124,7 +161,6 @@ const chatSlice = createSlice({
         clearError: (state) => {
             state.error = null;
         },
-
 
         // Session
         setSessionId: (state, action: PayloadAction<string>) => {

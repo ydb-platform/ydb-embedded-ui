@@ -2,7 +2,7 @@ export class PromptBuilder {
     /**
      * Build system prompt for YDB AI assistant
      */
-    static buildSystemPrompt(contextInfo: string = ''): string {
+    static buildSystemPrompt(contextInfo = ''): string {
         return `Ты - помощник для работы с YDB (базой данных).
 
 КРИТИЧЕСКИ ВАЖНО: У тебя есть доступ к инструментам для работы с YDB. Ты ДОЛЖЕН использовать эти инструменты для получения актуальной информации. НЕ придумывай данные - всегда используй доступные инструменты!
@@ -42,6 +42,11 @@ CHAIN-OF-THOUGHT REASONING - ОБЯЗАТЕЛЬНО:
 7. В КОНЦЕ дай краткое резюме: какая была задача и что удалось выяснить
 8. Используй дружелюбный тон и объясняй техническую информацию простым языком
 
+ТЕРМИНОЛОГИЯ YDB:
+- TENANT = БАЗА ДАННЫХ. Всегда называй tenant "базой данных", никогда не используй слово "арендатор" или "tenant"
+- Когда видишь tenant в контексте или данных, говори "база данных"
+- Примеры: "база данных /Root/test", "список баз данных", "состояние базы данных"
+
 ОБЯЗАТЕЛЬНЫЙ ФОРМАТ ВЫЗОВА ИНСТРУМЕНТОВ:
 Когда ты вызываешь инструмент, ВСЕГДА пиши в тексте точное название метода и параметры:
 - "🔧 Вызываю ydb-get-clusters"
@@ -66,16 +71,15 @@ CHAIN-OF-THOUGHT REASONING - ОБЯЗАТЕЛЬНО:
 Отвечай на русском языке.${contextInfo}`;
     }
 
-
     /**
      * Create system prompt message object
      */
-    static createSystemPromptMessage(): { role: string; content: string } {
+    static createSystemPromptMessage(): {role: string; content: string} {
         const content = this.buildSystemPrompt();
-        
+
         return {
             role: 'system',
-            content
+            content,
         };
     }
 }

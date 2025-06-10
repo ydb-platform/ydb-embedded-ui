@@ -25,9 +25,10 @@ export interface ToolCall {
 }
 
 export interface ChatDelta {
-    type: 'content' | 'done' | 'error';
+    type: 'content' | 'done' | 'error' | 'tool_result' | 'tool_calls';
     content?: string;
     error?: string;
+    tool_calls?: any[];
 }
 
 export interface ChatState {
@@ -48,6 +49,7 @@ export interface ChatRequest {
         tool_calls?: ToolCall[];
         tool_call_id?: string;
     }>;
+    context?: string;
     stream: boolean;
     model: string;
 }

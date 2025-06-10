@@ -1,4 +1,4 @@
-import { ChatMessage, ChatDelta } from '../types/chat';
+import type {ChatDelta, ChatMessage} from '../types/chat';
 
 export class ChatAPI {
     private static baseUrl = '/api/chat';
@@ -7,24 +7,26 @@ export class ChatAPI {
         messages: ChatMessage[],
         onDelta: (delta: ChatDelta) => void,
         onError: (error: Error) => void,
-        signal?: AbortSignal
+        signal?: AbortSignal,
+        context?: string,
     ): Promise<void> {
         try {
             const requestBody = {
-                messages: messages.map(msg => ({
+                messages: messages.map((msg) => ({
                     role: msg.role,
                     content: msg.content,
-                    ...(msg.toolCalls && { tool_calls: msg.toolCalls }),
-                    ...(msg.toolCallId && { tool_call_id: msg.toolCallId }),
+                    ...(msg.toolCalls && {tool_calls: msg.toolCalls}),
+                    ...(msg.toolCallId && {tool_call_id: msg.toolCallId}),
                 })),
                 model: 'gpt-4.1',
+                ...(context && {context}),
             };
 
             const response = await fetch(this.baseUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'text/event-stream',
+                    Accept: 'text/event-stream',
                 },
                 body: JSON.stringify(requestBody),
                 signal,
@@ -42,11 +44,14 @@ export class ChatAPI {
             const decoder = new TextDecoder();
             let buffer = '';
 
+            // eslint-disable-next-line no-constant-condition
             while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
+                const {done, value} = await reader.read();
+                if (done) {
+                    break;
+                }
 
-                buffer += decoder.decode(value, { stream: true });
+                buffer += decoder.decode(value, {stream: true});
                 const lines = buffer.split('\n');
                 buffer = lines.pop() || '';
 
@@ -74,5 +79,4 @@ export class ChatAPI {
             }
         }
     }
-
 }

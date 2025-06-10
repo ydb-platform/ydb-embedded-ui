@@ -1,5 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Button, TextArea, Icon } from '@gravity-ui/uikit';
+import React from 'react';
+
+import {Button, Icon, TextArea} from '@gravity-ui/uikit';
+
 import './ChatInput.scss';
 
 // Icons - these would need to be imported from your icon library
@@ -14,15 +16,15 @@ interface ChatInputProps {
     placeholder?: string;
 }
 
-export const ChatInput: React.FC<ChatInputProps> = ({
+export const ChatInput = ({
     onSendMessage,
     disabled = false,
     isStreaming = false,
     onStopGeneration,
-    placeholder = "Ask about your YDB cluster, databases, or queries..."
-}) => {
-    const [message, setMessage] = useState('');
-    const textAreaRef = useRef<HTMLTextAreaElement>(null);
+    placeholder = 'Ask about your YDB cluster, databases, or queries...',
+}: ChatInputProps) => {
+    const [message, setMessage] = React.useState('');
+    const textAreaRef = React.useRef<HTMLTextAreaElement>(null);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -59,7 +61,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     };
 
     // Focus on mount
-    useEffect(() => {
+    React.useEffect(() => {
         if (textAreaRef.current) {
             textAreaRef.current.focus();
         }
@@ -76,12 +78,13 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                     placeholder={placeholder}
                     disabled={disabled}
                     rows={1}
+                    autoFocus
                     minRows={1}
                     maxRows={8}
                     className="chat-input__textarea"
                 />
             </div>
-            
+
             <div className="chat-input__actions">
                 {isStreaming ? (
                     <Button

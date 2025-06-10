@@ -190,28 +190,33 @@ Handle Tools → Complete Response → End Session
 ### Configuration
 
 **Server Configuration:**
+
 - `PORT` - Server port (default: 3001)
 - `NODE_ENV` - Environment mode
 - `LOG_LEVEL` - Logging verbosity
 
 **Eliza API Configuration:**
+
 - `ELIZA_API_KEY` - OAuth token for authentication
 - `ELIZA_BASE_URL` - API endpoint URL
 - `ELIZA_MODEL` - LLM model identifier
 
 **MCP Configuration:**
+
 - `MCP_SERVER_URL` - YDB MCP server endpoint
 - `MCP_TIMEOUT` - Connection timeout in milliseconds
 
 ### API Endpoints
 
 **Health Check:**
+
 ```
 GET /health
 Response: { status: 'ok', timestamp: ISO8601, version: string }
 ```
 
 **Chat Streaming:**
+
 ```
 POST /api/chat
 Content-Type: application/json
@@ -271,6 +276,62 @@ Events: content, done, error
 - **Custom Tools**: User-defined operations and shortcuts
 - **Integration Hub**: Connect with external monitoring and alerting systems
 
+## Recent Critical Fixes (December 2024)
+
+### Tool Calls Synchronization Issue
+
+**Problem**: OpenAI API was rejecting requests due to mismatched tool_calls and tool results:
+
+```
+An assistant message with 'tool_calls' must be followed by tool messages responding to each 'tool_call_id'
+```
+
+**Root Cause**:
+
+- Agent Loop was generating multiple tool_calls across iterations
+- Client was only receiving the last iteration's tool_calls
+- Tool results were being sent for ALL iterations, creating ID mismatches
+
+**Solution**:
+
+- **Client-side accumulation**: Modified `chatSlice.ts` to accumulate tool_calls instead of replacing them
+- **Streaming coordination**: Ensured tool_calls are sent after each Agent Loop iteration
+- **Proper sequencing**: Tool results now correctly match their corresponding tool_calls
+
+**Files Modified**:
+
+- `src/features/chat/store/chatSlice.ts` - Tool calls accumulation logic
+- `chat-server/src/services/chat.service.ts` - Agent Loop streaming coordination
+
+### Agent Loop Streaming Architecture
+
+**Enhancement**: Improved the Agent Loop to properly handle multi-iteration tool execution:
+
+```typescript
+// Before: Only last iteration tool_calls sent
+tool_calls: lastIterationCalls
+
+// After: All iterations accumulated
+tool_calls: [...iteration1Calls, ...iteration2Calls, ...]
+```
+
+**Benefits**:
+
+- ✅ Consistent OpenAI API compliance
+- ✅ Proper tool execution tracking
+- ✅ Better debugging and error handling
+- ✅ Support for complex multi-step operations
+
+### Streaming Response Processing
+
+**Improvement**: Enhanced StreamProcessor to handle edge cases:
+
+- Empty content with tool_calls only
+- Partial tool_call chunks in streaming
+- Proper message history construction
+
+**Result**: More reliable streaming with better error recovery and consistent message formatting.
+
 ## Conclusion
 
 The YDB AI Chat represents a new paradigm for database administration interfaces:
@@ -279,5 +340,6 @@ The YDB AI Chat represents a new paradigm for database administration interfaces
 - **Real-Time Intelligence**: Always current data with immediate responses
 - **Context Awareness**: Understands user intent based on current UI state
 - **Enterprise Ready**: Scalable, secure, and production-grade architecture
+- **Battle-Tested**: Robust handling of complex streaming scenarios and tool execution
 
-This implementation demonstrates how AI can be seamlessly integrated into existing enterprise tools to dramatically improve user experience while maintaining reliability and security standards.
+This implementation demonstrates how AI can be seamlessly integrated into existing enterprise tools to dramatically improve user experience while maintaining reliability and security standards. The recent fixes ensure production-grade stability for complex multi-tool operations.

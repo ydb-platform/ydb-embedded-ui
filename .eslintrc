@@ -31,6 +31,6 @@
                 "fixStyle": "separate-type-imports",
             },
         ],
-        "curly": ["error", "all"],
+        "curly": ["error", "all"]
     },
 }
