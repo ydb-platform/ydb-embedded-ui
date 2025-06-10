@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.4.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.4.0...v9.4.1) (2025-06-10)
+
+
+### Bug Fixes
+
+* **uiFactory:** make overrides partial ([#2384](https://github.com/ydb-platform/ydb-embedded-ui/issues/2384)) ([a54999e](https://github.com/ydb-platform/ydb-embedded-ui/commit/a54999ee3e52b73d7764e5d91faf412ed750be33))
+
 ## [9.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.3.1...v9.4.0) (2025-06-09)
 
 
