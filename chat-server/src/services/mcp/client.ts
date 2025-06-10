@@ -1,7 +1,10 @@
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
-import { logger } from '../../utils/logger';
-import { MCPServer, MCPServerConfig } from './types';
+import {Client} from '@modelcontextprotocol/sdk/client/index.js';
+import {SSEClientTransport} from '@modelcontextprotocol/sdk/client/sse.js';
+
+import {getMCPConfig} from '../../utils/config';
+import {logger} from '../../utils/logger';
+
+import type {MCPServer, MCPServerConfig} from './types';
 
 export class MCPClient {
     private clients: Map<string, Client> = new Map();
@@ -11,41 +14,40 @@ export class MCPClient {
      */
     async connect(server: MCPServer, config: MCPServerConfig): Promise<void> {
         if (server.status === 'connected') {
-            logger.warn('Server already connected', { name: server.name });
+            logger.warn('Server already connected', {name: server.name});
             return;
         }
 
         server.status = 'connecting';
-        logger.info('Connecting to SSE MCP server', { 
-            name: server.name, 
-            url: config.url
+        logger.info('Connecting to SSE MCP server', {
+            name: server.name,
+            url: config.url,
         });
 
         try {
             const transport = new SSEClientTransport(new URL(config.url));
-            
+
             const client = new Client({
                 name: 'ydb-chat-server',
                 version: '1.0.0',
             });
 
             await client.connect(transport);
-            
+
             this.clients.set(server.name, client);
             server.status = 'connected';
-            
+
             logger.info('SSE MCP server connected successfully', {
                 name: server.name,
-                url: config.url
+                url: config.url,
             });
-
         } catch (error) {
             server.status = 'error';
             server.lastError = error instanceof Error ? error.message : String(error);
             logger.error('Failed to connect to SSE MCP server', {
                 name: server.name,
                 url: config.url,
-                error: server.lastError
+                error: server.lastError,
             });
             throw error;
         }
@@ -66,15 +68,14 @@ export class MCPClient {
         } catch (error) {
             logger.error('Failed to get tools from MCP server', {
                 serverName,
-                error: error instanceof Error ? error.message : String(error)
+                error: error instanceof Error ? error.message : String(error),
             });
             throw error;
         }
     }
 
-
     /**
-     * Call a tool on an MCP server
+     * Call a tool on an MCP server with timeout
      */
     async callTool(serverName: string, toolName: string, arguments_: any): Promise<any> {
         const client = this.clients.get(serverName);
@@ -82,22 +83,40 @@ export class MCPClient {
             throw new Error(`Server ${serverName} is not connected`);
         }
 
+        const config = getMCPConfig();
+        const timeout = config.toolCallTimeout;
+
         logger.debug('Calling MCP tool', {
             serverName,
             toolName,
-            arguments: arguments_
+            arguments: arguments_,
+            timeout,
         });
 
         try {
-            const response = await client.callTool({
-                name: toolName,
-                arguments: arguments_
+            // Create timeout promise
+            const timeoutPromise = new Promise<never>((_, reject) => {
+                setTimeout(() => {
+                    reject(new Error(`Tool call timeout after ${timeout}ms`));
+                }, timeout);
             });
+
+            // Race between tool call and timeout
+            const toolCallPromise = client.callTool({
+                name: toolName,
+                arguments: arguments_,
+            });
+
+            const response = await Promise.race([toolCallPromise, timeoutPromise]);
 
             logger.debug('MCP tool call completed', {
                 serverName,
                 toolName,
-                hasContent: !!(response.content && Array.isArray(response.content) && response.content.length > 0)
+                hasContent: Boolean(
+                    response.content &&
+                        Array.isArray(response.content) &&
+                        response.content.length > 0,
+                ),
             });
 
             return response;
@@ -105,12 +124,12 @@ export class MCPClient {
             logger.error('Failed to call MCP tool', {
                 serverName,
                 toolName,
-                error: error instanceof Error ? error.message : String(error)
+                error: error instanceof Error ? error.message : String(error),
+                timeout,
             });
             throw error;
         }
     }
-
 
     /**
      * Disconnect from a server
@@ -121,11 +140,11 @@ export class MCPClient {
             try {
                 await client.close();
                 this.clients.delete(serverName);
-                logger.info('Disconnected from MCP server', { name: serverName });
+                logger.info('Disconnected from MCP server', {name: serverName});
             } catch (error) {
                 logger.error('Error disconnecting from MCP server', {
                     name: serverName,
-                    error: error instanceof Error ? error.message : String(error)
+                    error: error instanceof Error ? error.message : String(error),
                 });
             }
         }
@@ -135,8 +154,8 @@ export class MCPClient {
      * Disconnect from all servers
      */
     async disconnectAll(): Promise<void> {
-        const disconnectPromises = Array.from(this.clients.keys()).map(serverName => 
-            this.disconnect(serverName)
+        const disconnectPromises = Array.from(this.clients.keys()).map((serverName) =>
+            this.disconnect(serverName),
         );
         await Promise.all(disconnectPromises);
     }

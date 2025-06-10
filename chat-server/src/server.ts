@@ -28,7 +28,7 @@ const initializeMCPServers = async function initializeMCPServers() {
 
         logger.info('Starting MCP server initialization', {
             serverUrl: mcpConfig.serverUrl,
-            timeout: mcpConfig.timeout,
+            connectionTimeout: mcpConfig.connectionTimeout,
         });
 
         await mcpService.registerServer({

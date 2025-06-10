@@ -1,4 +1,6 @@
 import type {MCPTool} from '../types/mcp';
+import {executeWithConcurrency} from '../utils/concurrency';
+import {getMCPConfig} from '../utils/config';
 import {logger} from '../utils/logger';
 
 import {getMCPService} from './mcp';
@@ -7,7 +9,7 @@ export class ToolExecutor {
     private mcpService = getMCPService();
 
     /**
-     * Execute all tool calls and add results to conversation history
+     * Execute all tool calls in parallel with controlled concurrency
      */
     async executeToolCalls(
         toolCalls: any[],
@@ -15,20 +17,62 @@ export class ToolExecutor {
         conversationHistory: any[],
         onData?: (data: string) => void,
     ): Promise<void> {
-        for (const toolCall of toolCalls) {
-            await this.executeToolCall(toolCall, availableTools, conversationHistory, onData);
+        if (toolCalls.length === 0) {
+            return;
         }
+
+        const config = getMCPConfig();
+        const concurrency = config.toolCallConcurrency;
+
+        logger.info('Executing tool calls', {
+            totalCalls: toolCalls.length,
+            concurrency,
+            tools: toolCalls.map((tc) => tc.function.name),
+        });
+
+        // Execute tool calls with controlled concurrency
+        const results = await executeWithConcurrency(
+            toolCalls,
+            async (toolCall) => {
+                return await this.executeToolCallInternal(toolCall, availableTools, onData);
+            },
+            concurrency,
+        );
+
+        // Add all results to conversation history in original order
+        for (let i = 0; i < results.length; i++) {
+            const result = results[i];
+            const toolCall = toolCalls[i];
+
+            if (result instanceof Error) {
+                // Handle error result
+                const toolMessage = {
+                    role: 'tool',
+                    content: JSON.stringify({error: result.message}),
+                    tool_call_id: toolCall.id,
+                };
+                conversationHistory.push(toolMessage);
+            } else {
+                // Handle successful result
+                conversationHistory.push(result);
+            }
+        }
+
+        logger.info('All tool calls completed', {
+            totalCalls: toolCalls.length,
+            successCount: results.filter((r) => !(r instanceof Error)).length,
+            errorCount: results.filter((r) => r instanceof Error).length,
+        });
     }
 
     /**
-     * Execute single tool call
+     * Execute single tool call for parallel execution (returns tool message)
      */
-    private async executeToolCall(
+    private async executeToolCallInternal(
         toolCall: any,
         availableTools: (MCPTool & {serverName: string})[],
-        conversationHistory: any[],
         onData?: (data: string) => void,
-    ): Promise<void> {
+    ): Promise<any> {
         const toolWithServer = availableTools.find(
             (t: MCPTool & {serverName: string}) => t.name === toolCall.function.name,
         );
@@ -51,8 +95,6 @@ export class ToolExecutor {
                 tool_call_id: toolCall.id,
             };
 
-            conversationHistory.push(toolMessage);
-
             // Send tool result to client if onData callback is provided
             if (onData) {
                 const toolResultMessage = {
@@ -70,16 +112,10 @@ export class ToolExecutor {
                     })}\n\n`,
                 );
             }
+
+            return toolMessage;
         } catch (toolError) {
             const errorMessage = toolError instanceof Error ? toolError.message : 'Unknown error';
-
-            const toolMessage = {
-                role: 'tool',
-                content: JSON.stringify({error: errorMessage}),
-                tool_call_id: toolCall.id,
-            };
-
-            conversationHistory.push(toolMessage);
 
             // Send tool error to client if onData callback is provided
             if (onData) {
@@ -98,6 +134,9 @@ export class ToolExecutor {
                     })}\n\n`,
                 );
             }
+
+            // Return error instead of throwing to be handled by concurrency control
+            return new Error(errorMessage);
         }
     }
 

@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { z } from 'zod';
+import {z} from 'zod';
 
 // Load environment variables
 dotenv.config();
@@ -22,6 +22,8 @@ const configSchema = z.object({
 
     // MCP Connection
     MCP_CONNECTION_TIMEOUT_MS: z.string().transform(Number).default('5000'),
+    MCP_TOOL_CALL_TIMEOUT_MS: z.string().transform(Number).default('30000'),
+    MCP_TOOL_CALL_CONCURRENCY: z.string().transform(Number).default('3'),
 });
 
 type Config = z.infer<typeof configSchema>;
@@ -51,7 +53,9 @@ export const getElizaConfig = () => ({
 
 export const getMCPConfig = () => ({
     serverUrl: config.MCP_SERVER_URL,
-    timeout: config.MCP_CONNECTION_TIMEOUT_MS,
+    connectionTimeout: config.MCP_CONNECTION_TIMEOUT_MS,
+    toolCallTimeout: config.MCP_TOOL_CALL_TIMEOUT_MS,
+    toolCallConcurrency: config.MCP_TOOL_CALL_CONCURRENCY,
     retryAttempts: 3,
     retryDelay: 1000,
 });
