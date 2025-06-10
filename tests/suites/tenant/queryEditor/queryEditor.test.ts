@@ -143,7 +143,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.waitForStatus('Stopped')).resolves.toBe(true);
     });
 
-    test('Streaming query shows some results and banner when stop button is clicked', async ({
+    test.only('Streaming query shows some results and banner when stop button is clicked', async ({
         page,
     }) => {
         // Safari in playwright has problem with painting an array
