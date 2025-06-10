@@ -20,7 +20,7 @@ const uiFactoryBase: UIFactory = {
     countHealthcheckIssuesByType: countHealthcheckIssuesByType,
 };
 
-export function configureUIFactory(overrides: UIFactory) {
+export function configureUIFactory(overrides: Partial<UIFactory>) {
     Object.assign(uiFactoryBase, overrides);
 }
 
