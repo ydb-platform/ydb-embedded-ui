@@ -1,0 +1,43 @@
+.ai-assistant-button {
+    position: relative;
+
+    &__indicator {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        pointer-events: none;
+
+        &--streaming {
+            background-color: var(--g-color-text-info);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        &--unread {
+            background-color: var(--g-color-text-danger);
+        }
+    }
+
+    &--has-messages {
+        .ai-assistant-button__indicator--unread {
+            display: block;
+        }
+    }
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.2);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

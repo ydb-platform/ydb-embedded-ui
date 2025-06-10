@@ -2,7 +2,7 @@
 export { ChatPanel } from './components/ChatPanel/ChatPanel';
 export { ChatMessage } from './components/ChatMessage/ChatMessage';
 export { ChatInput } from './components/ChatInput/ChatInput';
-export { ChatToggleButton } from './components/ChatToggleButton/ChatToggleButton';
+export { AIAssistantButton } from './components/AIAssistantButton/AIAssistantButton';
 export { ToolCallBlock } from './components/ToolCallBlock/ToolCallBlock';
 
 // Hooks

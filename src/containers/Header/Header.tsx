@@ -6,6 +6,7 @@ import {useLocation} from 'react-router-dom';
 
 import {getConnectToDBDialog} from '../../components/ConnectToDB/ConnectToDBDialog';
 import {InternalLink} from '../../components/InternalLink';
+import {AIAssistantButton} from '../../features/chat/components/AIAssistantButton/AIAssistantButton';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import {cn} from '../../utils/cn';
 import {DEVELOPER_UI_TITLE} from '../../utils/constants';
@@ -69,6 +70,9 @@ function Header({mainPage}: HeaderProps) {
                 </Button>,
             );
         }
+
+        // Always show AI Assistant button
+        elements.push(<AIAssistantButton />);
 
         if (isUserAllowedToMakeChanges) {
             elements.push(
