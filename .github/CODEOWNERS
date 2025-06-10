@@ -1,0 +1,6 @@
+# CODEOWNERS file for ydb-embedded-ui
+# This file defines who owns different parts of the codebase
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global owners - these users will be requested for review on all PRs
+* @artemmufazalov @astandrik @Raubzeug
