@@ -53,8 +53,6 @@ export class ChatService {
 
             // Agent Loop
             for (let iteration = 0; iteration < maxIterations; iteration++) {
-                logger.info(`Agent iteration ${iteration + 1}/${maxIterations}`);
-
                 const request = {
                     messages: conversationHistory,
                     stream: true,
@@ -91,13 +89,6 @@ export class ChatService {
                         })),
                     }),
                 };
-
-                logger.info('Adding assistant message to history', {
-                    hasToolCalls: completeToolCalls.length > 0,
-                    toolCallsCount: completeToolCalls.length,
-                    toolCallIds: completeToolCalls.map((tc) => tc.id),
-                    assistantMessage: JSON.stringify(assistantMessage, null, 2),
-                });
 
                 conversationHistory.push(assistantMessage);
 

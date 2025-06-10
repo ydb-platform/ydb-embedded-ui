@@ -92,10 +92,6 @@ app.post('/api/chat', async (req, res) => {
             return undefined;
         }
 
-        logger.info('Chat request received', {
-            messageCount: messages.length,
-        });
-
         // Process chat with callback for streaming
         await chatService.processChat(messages, (data) => res.write(data), {
             model,

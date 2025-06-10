@@ -61,7 +61,6 @@ const chatSlice = createSlice({
         // Handle streaming deltas
         processDelta: (state, action: PayloadAction<ChatDelta>) => {
             const delta = action.payload;
-            console.log('Processing delta:', delta);
 
             switch (delta.type) {
                 case 'content': {

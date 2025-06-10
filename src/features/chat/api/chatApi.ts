@@ -63,10 +63,9 @@ export class ChatAPI {
                         }
                         try {
                             const delta = JSON.parse(data) as ChatDelta;
-                            console.log('Received delta from server:', delta);
                             onDelta(delta);
                         } catch (error) {
-                            console.warn('Failed to parse SSE data:', error, 'Raw data:', data);
+                            console.warn('Failed to parse SSE data:', error);
                         }
                     }
                 }

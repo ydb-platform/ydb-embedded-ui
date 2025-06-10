@@ -51,12 +51,6 @@ export class ToolExecutor {
                 tool_call_id: toolCall.id,
             };
 
-            logger.info('Adding tool result to history', {
-                toolCallId: toolCall.id,
-                toolName: toolCall.function.name,
-                toolMessage: JSON.stringify(toolMessage, null, 2),
-            });
-
             conversationHistory.push(toolMessage);
 
             // Send tool result to client if onData callback is provided
