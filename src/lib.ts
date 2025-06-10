@@ -33,3 +33,5 @@ export type {
 export type {SettingProps, SettingsInfoFieldProps} from './containers/UserSettings/Setting';
 export type {AsideNavigationProps} from './containers/AsideNavigation/AsideNavigation';
 export type {GetMonitoringLink, GetMonitoringClusterLink} from './utils/monitoring';
+
+export {configureUIFactory} from './uiFactory/uiFactory';
