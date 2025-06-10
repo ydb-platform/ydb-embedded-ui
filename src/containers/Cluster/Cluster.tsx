@@ -137,7 +137,7 @@ export function Cluster({
                     />
                 </div>
             )}
-            <div className={b('tabs-sticky-wrapper')}>
+            <div className={b('tabs-stficky-wrapper')}>
                 <Tabs
                     size="l"
                     allowNotSelected={true}
