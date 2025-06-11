@@ -65,5 +65,8 @@
   "description_degraded": "Some issues, but still working.",
   "description_maintenance": "Working, but needs urgent attention to avoid failure.",
   "description_emergency": "Something is broken and not working.",
-  "label_download": "Download healthcheck data"
+  "label_download": "Download healthcheck data",
+
+  "label_grant-access": "Grant access",
+  "context_grant-access": "Please note that granular rights can be combined into groups"
 }
