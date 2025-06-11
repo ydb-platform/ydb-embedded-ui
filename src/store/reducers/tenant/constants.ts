@@ -28,6 +28,7 @@ export const TENANT_DIAGNOSTICS_TABS_IDS = {
     topicData: 'topicData',
     configs: 'configs',
     operations: 'operations',
+    access: 'access',
 } as const;
 
 export const TENANT_SUMMARY_TABS_IDS = {

@@ -17,6 +17,7 @@ export type Capability =
     | '/viewer/feature_flags'
     | '/viewer/cluster'
     | '/viewer/nodes'
+    | '/viewer/acl'
     | '/viewer/topic_data';
 
 export type SecuritySetting = 'UseLoginProvider' | 'DomainLoginOnly';
