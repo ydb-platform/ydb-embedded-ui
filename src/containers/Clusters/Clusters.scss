@@ -4,10 +4,15 @@
     overflow: auto;
     gap: var(--g-spacing-4);
 
-    padding: var(--g-spacing-4) var(--g-spacing-5) 0;
+    padding: var(--g-spacing-4) 0 0 var(--g-spacing-5);
 
     @include mixins.body-2-typography();
     @include mixins.flex-container();
+
+    &__title-wrapper,
+    &__controls-wrapper {
+        padding-right: var(--g-spacing-5);
+    }
 
     &__autorefresh {
         margin-left: auto;
