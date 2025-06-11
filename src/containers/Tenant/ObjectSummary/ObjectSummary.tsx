@@ -359,7 +359,7 @@ export function ObjectSummary({
     const renderTabContent = () => {
         switch (summaryTab) {
             case TENANT_SUMMARY_TABS_IDS.acl: {
-                return <Acl path={path} database={tenantName} />;
+                return <Acl />;
             }
             case TENANT_SUMMARY_TABS_IDS.schema: {
                 return <SchemaViewer type={type} path={path} tenantName={tenantName} />;
