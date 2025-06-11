@@ -84,7 +84,12 @@ function getTitleColumn({isEditClusterAvailable, isDeleteClusterAvailable}: Clus
                     return null;
                 }
 
-                return <DropdownMenu items={menuItems} />;
+                return (
+                    <DropdownMenu
+                        items={menuItems}
+                        defaultSwitcherProps={{view: 'flat-secondary'}}
+                    />
+                );
             };
 
             return (
