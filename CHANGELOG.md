@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.5.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.5.0...v9.5.1) (2025-06-11)
+
+
+### Bug Fixes
+
+* **Clusters:** increase menu items size ([#2396](https://github.com/ydb-platform/ydb-embedded-ui/issues/2396)) ([946efb3](https://github.com/ydb-platform/ydb-embedded-ui/commit/946efb3d60a8bc0da52dc8dbe7bf82641073dcf1))
+
 ## [9.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.4.1...v9.5.0) (2025-06-11)
 
 
