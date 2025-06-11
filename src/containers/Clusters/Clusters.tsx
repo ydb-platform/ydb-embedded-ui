@@ -128,7 +128,7 @@ export function Clusters() {
 
     const renderPageTitle = () => {
         return (
-            <Flex justifyContent="space-between">
+            <Flex justifyContent="space-between" className={b('title-wrapper')}>
                 <Flex gap={2}>
                     <Text variant="header-1">{i18n('page_title')}</Text>
                     <Text variant="header-1" color="secondary">
@@ -148,7 +148,7 @@ export function Clusters() {
 
             {renderPageTitle()}
 
-            <Flex>
+            <Flex className={b('controls-wrapper')}>
                 <div className={b('control', {wide: true})}>
                     <Search
                         placeholder={i18n('controls_search-placeholder')}
