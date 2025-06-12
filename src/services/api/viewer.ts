@@ -1,5 +1,9 @@
 import type {PlanToSvgQueryParams} from '../../store/reducers/planToSvg';
-import type {TMetaInfo} from '../../types/api/acl';
+import type {
+    AccessRightsUpdateRequest,
+    AvailablePermissionsResponse,
+    TMetaInfo,
+} from '../../types/api/acl';
 import type {TQueryAutocomplete} from '../../types/api/autocomplete';
 import type {CapabilitiesResponse} from '../../types/api/capabilities';
 import type {TClusterInfo} from '../../types/api/cluster';
@@ -193,6 +197,43 @@ export class ViewerAPI extends BaseYdbAPI {
                 database,
                 path,
                 merge_rules: true,
+                dialect: 'ydb-short',
+            },
+            {concurrentId, requestConfig: {signal}},
+        );
+    }
+    getAvailablePermissions(
+        {path, database}: {path: string; database: string},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
+        return this.get<AvailablePermissionsResponse>(
+            this.getPath('/viewer/json/acl'),
+            {
+                database,
+                path,
+                merge_rules: true,
+                dialect: 'ydb-short',
+                list_permissions: true,
+            },
+            {concurrentId, requestConfig: {signal}},
+        );
+    }
+    updateAccessRights(
+        {
+            path,
+            database,
+            rights,
+        }: {path: string; database: string; rights: AccessRightsUpdateRequest},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
+        return this.post<AccessRightsUpdateRequest>(
+            this.getPath('/viewer/json/acl'),
+            rights,
+            {
+                database,
+                path,
+                merge_rules: true,
+                dialect: 'ydb-short',
             },
             {concurrentId, requestConfig: {signal}},
         );

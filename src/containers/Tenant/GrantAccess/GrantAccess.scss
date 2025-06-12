@@ -1,0 +1,44 @@
+.ydb-grant-access {
+    padding: 0 var(--g-spacing-4);
+    &__single-right {
+        padding: var(--g-spacing-4);
+    }
+    &__navigation {
+        position: sticky;
+        z-index: calc(var(--gn-drawer-item-z-index) + 1);
+        top: 54px;
+
+        width: 100%;
+        padding: var(--g-spacing-4) 0;
+
+        background-color: var(--g-color-base-background);
+    }
+    &__footer {
+        position: sticky;
+        z-index: calc(var(--gn-drawer-item-z-index) + 1);
+        bottom: 0;
+
+        padding: var(--g-spacing-4) 0;
+
+        background-color: var(--g-color-base-background);
+    }
+    &__footer-button {
+        min-width: 128px;
+    }
+    &__subject-input {
+        width: 308px;
+        max-width: 308px;
+    }
+    &__subject-input-wrapper {
+        overflow: hidden;
+    }
+    &__input-content {
+        width: max-content;
+        padding: 0 var(--g-spacing-half);
+    }
+    &__subject-input-label {
+        width: 150px;
+
+        line-height: 28px;
+    }
+}

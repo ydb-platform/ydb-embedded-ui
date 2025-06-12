@@ -1,0 +1,11 @@
+.ydb-subject-with-avatar {
+    &__avatar-wrapper {
+        position: relative;
+    }
+
+    &__subject {
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+    }
+}

@@ -4,7 +4,8 @@
 @forward './illustrations.scss';
 
 body {
-    --ydb-drawer-veil-z-index: 0;
+    --ydb-drawer-veil-z-index: 2;
+    --gn-drawer-item-z-index: calc(var(--ydb-drawer-veil-z-index) + 1);
 
     --gn-drawer-veil-z-index: var(--ydb-drawer-veil-z-index);
     margin: 0;

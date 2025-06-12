@@ -1,0 +1,22 @@
+{
+  "title_owner": "owner",
+  "action_change-owner": "Change owner",
+  "description_owner": "The owner has complete management authority over the object and cannot acquire or lose any rights associated with it.",
+  "action_grant-access": "Grant Access",
+  "label_explicit-rights": "Explicit rights",
+  "label_effective-rights": "Effective rights",
+  "label_subject": "Subject",
+  "descrtiption_empty-rights": "No access rights",
+  "decription_enter-subject": "Enter subject",
+  "action_cancel": "Cancel",
+  "action_apply": "Apply",
+  "title_owner-changed": "Owner has been successfully changed",
+  "description_explicit-rights": "Direct granted permissions",
+  "description_effective-rights": "Total active permissions from inheritance and direct grants",
+  "action_revoke": "Revoke",
+  "label_revoke-all-rights": "Revoke all explicit rights",
+  "descripition_no-rights-to-revoke": "No rights to revoke",
+  "description_grant-explicit-rights": "Grant explicit rights",
+  "description_revoke-all-rights": "Are you sure you want to revoke all explicit rights for:",
+  "description_rights-revoked": "Explicit rights has been successfully revoked"
+}

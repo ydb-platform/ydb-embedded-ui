@@ -1,0 +1,40 @@
+{
+  "description_select-row": "Retrieve data rows from tables using SELECT queries.",
+  "description_update-row": "Modify existing data rows with UPDATE operations.",
+  "description_erase-row": "Modify existing data rows with UPDATE operations.",
+  "description_write-attributes": "Modify object metadata and manage access permissions.",
+  "description_create-directory": "Create new subdirectories in the database namespace.",
+  "description_create-table": "Define new tables with specified schemas.",
+  "description_create-queue": "Set up new message queue instances.",
+  "description_remove-schema": "Delete database objects (tables, directories, queues).",
+  "description_alter-schema": "Modify object definitions (add/remove columns, change types).",
+  "description_create-database": "Initialize new database instances.",
+  "description_drop-database": "Permanently delete databases and all contained objects.",
+  "description_read-attributes": "View object metadata and access control lists.",
+  "description_describe-schema": "Inspect object structure and properties.",
+  "description_connect-database": "Establish connections and submit requests to the database.",
+  "description_grant-access-rights": "Delegate permissions to other users (within own privilege scope).",
+  "description_generic-read": "Read data and metadata. Basic viewing permissions for tables/objects.",
+  "description_generic-write": "Modify data and schemas. Write/delete data + alter structure.",
+  "description_generic-manage": "Create/drop databases. Infrastructure-level change.",
+  "description_generic-list": "View object metadata and schemas. For inspecting structure without data access.",
+  "description_generic-use": "Complete data operations. Modern full access excluding DB management.",
+  "description_generic-use-legacy": "[Legacy] Complete data operations. Modern full access excluding DB management.",
+  "description_generic-full": "Unrestricted system access. All permissions including DB management.",
+  "description_generic-full-legacy": "[Legacy] Unrestricted system access. All permissions including DB management.",
+
+  "label_groups": "Groups",
+  "label_granular": "Granular",
+  "label_inherited": "Inherited",
+
+  "description_no-granular-permissions": "No granular permissions available.",
+  "description_no-group-permissions": "No group permissions available.",
+
+  "action_discard": "Discard Changes",
+  "action_cancel": "Cancel",
+  "action_save": "Apply",
+
+  "label_rights-updated": "Access rights has been successfully changed",
+  "description_failed": "Failed",
+  "label_grant-access-to": "Grant access to"
+}

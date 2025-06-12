@@ -3,17 +3,33 @@ import React from 'react';
 import {BooleanParam, StringParam, useQueryParams} from 'use-query-params';
 
 export function useTenantQueryParams() {
-    const [{showHealthcheck, database, schema, view, issuesFilter}, setQueryParams] =
-        useQueryParams({
-            showHealthcheck: BooleanParam,
-            database: StringParam,
-            schema: StringParam,
-            view: StringParam,
-            issuesFilter: StringParam,
-        });
+    const [
+        {showHealthcheck, database, schema, view, issuesFilter, showGrantAccess, aclSubject},
+        setQueryParams,
+    ] = useQueryParams({
+        showHealthcheck: BooleanParam,
+        database: StringParam,
+        schema: StringParam,
+        view: StringParam,
+        issuesFilter: StringParam,
+        showGrantAccess: BooleanParam,
+        aclSubject: StringParam,
+    });
     const handleShowHealthcheckChange = React.useCallback(
         (value?: boolean) => {
             setQueryParams({showHealthcheck: value}, 'replaceIn');
+        },
+        [setQueryParams],
+    );
+    const handleAclSubjectChange = React.useCallback(
+        (value?: string) => {
+            setQueryParams({aclSubject: value}, 'replaceIn');
+        },
+        [setQueryParams],
+    );
+    const handleShowGrantAccessChange = React.useCallback(
+        (value?: boolean) => {
+            setQueryParams({showGrantAccess: value}, 'replaceIn');
         },
         [setQueryParams],
     );
@@ -49,11 +65,15 @@ export function useTenantQueryParams() {
         handleShowHealthcheckChange,
         database,
         handleDatabaseChange,
+        showGrantAccess,
+        handleShowGrantAccessChange,
         schema,
         handleSchemaChange,
         view,
         handleHealthcheckViewChange,
         issuesFilter,
         handleIssuesFilterChange,
+        aclSubject,
+        handleAclSubjectChange,
     };
 }

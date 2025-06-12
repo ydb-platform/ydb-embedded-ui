@@ -1,7 +1,4 @@
 {
-  "title_rights": "Access Rights",
-  "title_effective-rights": "Effective Access Rights",
-  "title_owner": "Owner",
-  "title_interupt-inheritance": "Interrupt inheritance",
-  "description_empty": "No Acl data"
+  "description_section-moved": "Section was moved to Diagnostics",
+  "action-open-in-diagnostics": "Open in Diagnostics"
 }

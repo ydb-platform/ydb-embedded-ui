@@ -77,6 +77,9 @@ export const useClusterDashboardAvailable = () => {
 export const useStreamingAvailable = () => {
     return useGetFeatureVersion('/viewer/query') >= 8;
 };
+export const useEditAccessAvailable = () => {
+    return useGetFeatureVersion('/viewer/acl') >= 2;
+};
 
 export const useTopicDataAvailable = () => {
     return useGetFeatureVersion('/viewer/topic_data') >= 2;
