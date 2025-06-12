@@ -1,3 +1,4 @@
+import {valueIsDefined} from '..';
 import type {TPDiskStateInfo} from '../../types/api/pdisk';
 import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
 import {stringifyVdiskId} from '../dataFormatters/dataFormatters';
@@ -14,11 +15,16 @@ export function prepareWhiteboardVDiskData(
     if (!isFullVDiskData(vDiskState)) {
         const {NodeId, PDiskId, VSlotId} = vDiskState;
 
-        const StringifiedId = stringifyVdiskId({
-            NodeId,
-            PDiskId,
-            VSlotId,
-        });
+        const vDiskId =
+            valueIsDefined(VSlotId) && valueIsDefined(PDiskId) && valueIsDefined(NodeId)
+                ? {
+                      NodeId,
+                      PDiskId,
+                      VSlotId,
+                  }
+                : undefined;
+
+        const StringifiedId = stringifyVdiskId(vDiskId);
 
         return {
             StringifiedId,

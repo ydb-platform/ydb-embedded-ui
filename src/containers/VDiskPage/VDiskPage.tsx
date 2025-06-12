@@ -55,17 +55,18 @@ export function VDiskPage() {
             ? {nodeId, pDiskId, vDiskSlotId}
             : skipToken;
     const {
-        currentData: vDiskData = {},
+        currentData: vDiskData,
         isFetching,
         error,
     } = vDiskApi.useGetVDiskDataQuery(params, {
         pollingInterval: autoRefreshInterval,
     });
     const loading = isFetching && vDiskData === undefined;
-    const {NodeHost, NodeId, NodeType, NodeDC, PDiskId, PDiskType, Severity, VDiskId} = vDiskData;
+    const {NodeHost, NodeId, NodeType, NodeDC, PDiskId, PDiskType, Severity, VDiskId} =
+        vDiskData || {};
 
     const {GroupID, GroupGeneration, Ring, Domain, VDisk} =
-        VDiskId || getVDiskIdFromString(vDiskIdParam) || {};
+        VDiskId || (!loading && getVDiskIdFromString(vDiskIdParam)) || {};
     const vDiskIdParamsDefined =
         valueIsDefined(GroupID) &&
         valueIsDefined(GroupGeneration) &&
@@ -153,7 +154,7 @@ export function VDiskPage() {
                 className={vDiskPageCn('title')}
                 entityName={vDiskPageKeyset('vdisk')}
                 status={getSeverityColor(Severity)}
-                id={vDiskData?.StringifiedId ?? vDiskIdParam}
+                id={vDiskData?.StringifiedId || (!loading && vDiskIdParam)}
             />
         );
     };

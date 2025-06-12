@@ -14,6 +14,7 @@ export function getVDiskLink(data: PreparedVDisk) {
             vDiskSlotId: data.VDiskSlotId,
             pDiskId: data.PDiskId,
             nodeId: data.NodeId,
+            vDiskId: data.StringifiedId,
         });
     } else if (valueIsDefined(data.StringifiedId)) {
         vDiskPath = getVDiskPagePath({
