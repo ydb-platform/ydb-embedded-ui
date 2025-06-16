@@ -36,7 +36,7 @@ interface HealthcheckDetailsProps {
 
 export function Healthcheck({
     tenantName,
-    countIssueTypes = uiFactory.countHealthcheckIssuesByType,
+    countIssueTypes = uiFactory.healthcheck.countHealthcheckIssuesByType,
 }: HealthcheckDetailsProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const fullscreen = useTypedSelector((state) => state.fullscreen);

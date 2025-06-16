@@ -16,8 +16,8 @@ const uiFactoryBase: UIFactory = {
     healthcheck: {
         getHealthckechViewTitles,
         getHealthcheckViewsOrder,
+        countHealthcheckIssuesByType,
     },
-    countHealthcheckIssuesByType: countHealthcheckIssuesByType,
 };
 
 export function configureUIFactory(overrides: Partial<UIFactory>) {

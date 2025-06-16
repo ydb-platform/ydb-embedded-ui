@@ -12,7 +12,7 @@ import type {ETenantType} from '../types/api/tenant';
 import type {GetLogsLink} from '../utils/logs';
 import type {GetMonitoringClusterLink, GetMonitoringLink} from '../utils/monitoring';
 
-export interface UIFactory {
+export interface UIFactory<H extends string = CommonIssueType> {
     onCreateDB?: HandleCreateDB;
     onEditDB?: HandleEditDB;
     onDeleteDB?: HandleDeleteDB;
@@ -29,12 +29,10 @@ export interface UIFactory {
     getClusterLinks?: GetClusterLinks;
 
     healthcheck: {
-        getHealthckechViewTitles: GetHealthcheckViewTitles<CommonIssueType>;
-        getHealthcheckViewsOrder: GetHealthcheckViewsOrder<CommonIssueType>;
+        getHealthckechViewTitles: GetHealthcheckViewTitles<H>;
+        getHealthcheckViewsOrder: GetHealthcheckViewsOrder<H>;
+        countHealthcheckIssuesByType: (issueTrees: IssuesTree[]) => Record<H, number>;
     };
-    countHealthcheckIssuesByType: (
-        issueTrees: IssuesTree[],
-    ) => Record<CommonIssueType, number> & Record<string, number>;
 }
 
 export type HandleCreateDB = (params: {clusterName: string}) => Promise<boolean>;

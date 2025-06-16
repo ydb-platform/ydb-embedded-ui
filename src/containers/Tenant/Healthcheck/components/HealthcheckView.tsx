@@ -12,10 +12,10 @@ const HealthcheckViewValues: Record<string, CommonIssueType> = {
     compute: 'compute',
 };
 
-interface HealthcheckViewProps<T extends string = CommonIssueType> {
-    issuesCount: Record<T, number>;
-    viewTitles?: Record<T, string>;
-    sortOrder?: T[];
+interface HealthcheckViewProps {
+    issuesCount: ReturnType<typeof uiFactory.healthcheck.countHealthcheckIssuesByType>;
+    viewTitles?: ReturnType<typeof uiFactory.healthcheck.getHealthckechViewTitles>;
+    sortOrder?: ReturnType<typeof uiFactory.healthcheck.getHealthcheckViewsOrder>;
 }
 
 export function HealthcheckView({
