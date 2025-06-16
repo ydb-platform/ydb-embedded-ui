@@ -1,5 +1,17 @@
 # Changelog
 
+## [9.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.5.1...v9.6.0) (2025-06-16)
+
+
+### Features
+
+* evict unhealthy VDisk ([#2399](https://github.com/ydb-platform/ydb-embedded-ui/issues/2399)) ([7594f70](https://github.com/ydb-platform/ydb-embedded-ui/commit/7594f70684da836d9bcb9dc71c14507b0d1fa947))
+
+
+### Bug Fixes
+
+* **Healthcheck:** types ([#2402](https://github.com/ydb-platform/ydb-embedded-ui/issues/2402)) ([e09cc13](https://github.com/ydb-platform/ydb-embedded-ui/commit/e09cc1319025076f93b4169ba2e77d5b4d920e0d))
+
 ## [9.5.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.5.0...v9.5.1) (2025-06-11)
 
 
