@@ -36,6 +36,9 @@ export function countHealthcheckIssuesByType(
 
     for (const issue of issueTrees) {
         const type = issue.firstParentType ?? issue.type;
+        if (!type) {
+            continue;
+        }
         if (type.startsWith('STORAGE')) {
             result.storage++;
         } else if (type.startsWith('COMPUTE')) {

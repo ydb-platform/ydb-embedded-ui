@@ -41,8 +41,8 @@ const mapStatusToPriority: Partial<Record<StatusFlag, number>> = {
 
 const sortIssues = (data: IssueLog[]): IssueLog[] => {
     return data.sort((a, b) => {
-        const aPriority = mapStatusToPriority[a.status] || 0;
-        const bPriority = mapStatusToPriority[b.status] || 0;
+        const aPriority = a.status ? mapStatusToPriority[a.status] || 0 : 0;
+        const bPriority = b.status ? mapStatusToPriority[b.status] || 0 : 0;
 
         return aPriority - bPriority;
     });
