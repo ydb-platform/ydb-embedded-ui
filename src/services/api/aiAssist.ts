@@ -1,8 +1,12 @@
 import type {ChatDelta, ChatMessage, QuotaInfo} from '../../features/chat/types/chat';
+import {aiAssistBackend as AI_ASSISTANT_BACKEND} from '../../store';
 
 import {BaseYdbAPI} from './base';
 
 export class AIAssistAPI extends BaseYdbAPI {
+    getPath(path: string) {
+        return `${AI_ASSISTANT_BACKEND ?? ''}${path}`;
+    }
     async sendMessage(
         messages: ChatMessage[],
         onDelta: (delta: ChatDelta) => void,

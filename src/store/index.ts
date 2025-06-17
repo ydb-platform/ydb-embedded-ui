@@ -5,6 +5,7 @@ export {
     configureStore,
     customBackend,
     metaBackend,
+    aiAssistBackend,
     codeAssistBackend,
     webVersion,
 } from './configureStore';
