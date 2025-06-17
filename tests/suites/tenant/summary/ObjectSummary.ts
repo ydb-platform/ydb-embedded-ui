@@ -126,43 +126,34 @@ export class ObjectSummary {
     }
 
     async waitForAclVisible() {
-        await this.aclWrapper.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        // In the new UI, the ACL tab shows a redirect message instead of the actual ACL content
+        const redirectMessage = this.page.locator('text=Section was moved to Diagnostics');
+        await redirectMessage.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return true;
     }
 
-    async getAccessRights(): Promise<{user: string; rights: string}[]> {
-        await this.waitForAclVisible();
-        const items = await this.aclList.locator('.gc-definition-list__item').all();
-        const result = [];
-
-        for (const item of items) {
-            const user =
-                (await item.locator('.gc-definition-list__term-wrapper span').textContent()) || '';
-            const definitionContent = await item.locator('.gc-definition-list__definition').first();
-            const rights = (await definitionContent.textContent()) || '';
-            result.push({user: user.trim(), rights: rights.trim()});
+    async getRedirectMessage(): Promise<string | null> {
+        const redirectMessage = this.page.locator('text=Section was moved to Diagnostics');
+        if (await redirectMessage.isVisible()) {
+            return redirectMessage.textContent();
         }
-
-        return result;
+        return null;
     }
 
-    async getEffectiveAccessRights(): Promise<{group: string; permissions: string[]}[]> {
-        await this.waitForAclVisible();
-        const items = await this.effectiveAclList.locator('.gc-definition-list__item').all();
-        const result = [];
-
-        for (const item of items) {
-            const group =
-                (await item.locator('.gc-definition-list__term-wrapper span').textContent()) || '';
-            const definitionContent = await item.locator('.gc-definition-list__definition').first();
-            const permissionElements = await definitionContent.locator('span').all();
-            const permissions = await Promise.all(
-                permissionElements.map(async (el) => ((await el.textContent()) || '').trim()),
-            );
-            result.push({group: group.trim(), permissions});
+    async hasOpenInDiagnosticsButton(): Promise<boolean> {
+        try {
+            const diagnosticsButton = this.page.getByRole('button', {name: 'Open in Diagnostics'});
+            await diagnosticsButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+            return true;
+        } catch (error) {
+            console.error('Open in Diagnostics button not visible:', error);
+            return false;
         }
+    }
 
-        return result;
+    async clickOpenInDiagnosticsButton(): Promise<void> {
+        const diagnosticsButton = this.page.getByRole('button', {name: 'Open in Diagnostics'});
+        await diagnosticsButton.click();
     }
 
     async isTreeVisible() {
