@@ -7,11 +7,10 @@ import Fullscreen from '../../../components/Fullscreen/Fullscreen';
 import {HealthcheckStatus} from '../../../components/HealthcheckStatus/HealthcheckStatus';
 import {Illustration} from '../../../components/Illustration';
 import {Loader} from '../../../components/Loader';
-import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
 import type {IssuesTree} from '../../../store/reducers/healthcheckInfo/types';
 import {SelfCheckResult} from '../../../types/api/healthcheck';
 import {uiFactory} from '../../../uiFactory/uiFactory';
-import {useAutoRefreshInterval, useTypedSelector} from '../../../utils/hooks';
+import {useTypedSelector} from '../../../utils/hooks';
 import {HEALTHCHECK_RESULT_TO_TEXT} from '../constants';
 
 import {HealthcheckFilter} from './components/HealthcheckFilter';
@@ -38,14 +37,9 @@ export function Healthcheck({
     tenantName,
     countIssueTypes = uiFactory.healthcheck.countHealthcheckIssuesByType,
 }: HealthcheckDetailsProps) {
-    const [autoRefreshInterval] = useAutoRefreshInterval();
     const fullscreen = useTypedSelector((state) => state.fullscreen);
-    const {name} = useClusterBaseInfo();
     const {loading, error, selfCheckResult, fulfilledTimeStamp, leavesIssues, refetch} =
-        useHealthcheck(tenantName, {
-            //FIXME https://github.com/ydb-platform/ydb-embedded-ui/issues/1889
-            autorefresh: name === 'ydb_ru' ? undefined : autoRefreshInterval,
-        });
+        useHealthcheck(tenantName);
 
     const issuesCount = React.useMemo(
         () => countIssueTypes(leavesIssues),
