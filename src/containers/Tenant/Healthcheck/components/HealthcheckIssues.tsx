@@ -41,7 +41,7 @@ export function Issues({issues}: IssuesProps) {
             view
                 ? filteredIssues.filter((issue) => {
                       const type = issue.firstParentType || issue.type;
-                      return type.toLowerCase().startsWith(view);
+                      return type?.toLowerCase().startsWith(view);
                   })
                 : [],
         [filteredIssues, view],

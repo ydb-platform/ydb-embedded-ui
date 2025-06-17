@@ -38,8 +38,8 @@ export function HealthcheckIssueTabs({
                         onClick={() => setSelectedTab(parent.id)}
                     >
                         <Flex gap={2} wrap="nowrap" alignItems="center">
-                            <TabStatus status={parent.status} />
-                            {getTypeText(parent.type)}
+                            {parent.status && <TabStatus status={parent.status} />}
+                            {parent.type && getTypeText(parent.type)}
                         </Flex>
                     </HealthcjeckIssueTab>
                     {index !== parents.length - 1 && <Text color="secondary">/</Text>}

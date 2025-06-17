@@ -143,9 +143,9 @@ function PDiskInfo({location}: StorageSectionProps) {
         return null;
     }
 
-    return pdisk.map((disk: {id: string; path: string}) => (
+    return pdisk.map((disk) => (
         <LocationDetails
-            key={disk.id}
+            key={disk.id || disk.path}
             fields={[
                 {
                     value:

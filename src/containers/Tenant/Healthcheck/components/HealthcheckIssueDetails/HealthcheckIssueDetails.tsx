@@ -23,7 +23,6 @@ interface HealthcheckIssueDetailsProps {
 
 export function IssueDetails({issue}: HealthcheckIssueDetailsProps) {
     const {database} = useTenantQueryParams();
-    const {location} = issue;
 
     const {detailsFields, hiddenStorageFields, hiddenComputeFields} = React.useMemo(() => {
         const hiddenStorageFields: LocationFieldStorage[] = [];
@@ -75,6 +74,8 @@ export function IssueDetails({issue}: HealthcheckIssueDetailsProps) {
         return {detailsFields: fields, hiddenComputeFields, hiddenStorageFields};
     }, [issue, database]);
 
+    const {location} = issue;
+
     return (
         <Flex direction="column" gap={4}>
             <LocationDetails
@@ -82,10 +83,10 @@ export function IssueDetails({issue}: HealthcheckIssueDetailsProps) {
                 fields={detailsFields}
                 titleVariant="subheader-2"
             />
-            <StorageLocation location={location.storage} hiddenFields={hiddenStorageFields} />
-            <ComputeLocation location={location.compute} hiddenFields={hiddenComputeFields} />
-            <NodeLocation location={location.node} />
-            <PeerLocation location={location.peer} />
+            <StorageLocation location={location?.storage} hiddenFields={hiddenStorageFields} />
+            <ComputeLocation location={location?.compute} hiddenFields={hiddenComputeFields} />
+            <NodeLocation location={location?.node} />
+            <PeerLocation location={location?.peer} />
         </Flex>
     );
 }

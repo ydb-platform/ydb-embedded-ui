@@ -18,60 +18,60 @@ export enum StatusFlag {
 }
 
 interface LocationNode {
-    id: number;
-    host: string;
-    port: number;
+    id?: number;
+    host?: string;
+    port?: number;
 }
 
 interface LocationStoragePDisk {
-    id: string;
-    path: string;
+    id?: string;
+    path?: string;
 }
 
 interface LocationStorageVDisk {
-    id: string[];
-    pdisk: LocationStoragePDisk[];
+    id?: string[];
+    pdisk?: LocationStoragePDisk[];
 }
 
 interface LocationStorageGroup {
-    id: string[];
-    vdisk: LocationStorageVDisk;
+    id?: string[];
+    vdisk?: LocationStorageVDisk;
 }
 
 interface LocationStoragePool {
-    name: string;
-    group: LocationStorageGroup;
+    name?: string;
+    group?: LocationStorageGroup;
 }
 
 interface LocationStorage {
-    node: LocationNode;
-    pool: LocationStoragePool;
+    node?: LocationNode;
+    pool?: LocationStoragePool;
 }
 
 interface LocationComputePool {
-    name: string;
+    name?: string;
 }
 
 interface LocationComputeTablet {
-    type: string;
-    id: string[];
-    count: number;
+    type?: string;
+    id?: string[];
+    count?: number;
 }
 
 interface LocationComputeSchema {
-    type: string;
-    path: string;
+    type?: string;
+    path?: string;
 }
 
 interface LocationCompute {
-    node: LocationNode;
-    pool: LocationComputePool;
-    tablet: LocationComputeTablet;
-    schema: LocationComputeSchema;
+    node?: LocationNode;
+    pool?: LocationComputePool;
+    tablet?: LocationComputeTablet;
+    schema?: LocationComputeSchema;
 }
 
 interface LocationDatabase {
-    name: string;
+    name?: string;
 }
 
 export interface Location {
@@ -84,91 +84,91 @@ export interface Location {
 
 export interface IssueLog {
     id: string;
-    status: StatusFlag;
-    message: string;
-    location: Location;
+    status?: StatusFlag;
+    message?: string;
+    location?: Location;
     reason?: string[];
-    type: string;
-    level: number;
+    type?: string;
+    level?: number;
     listed?: number;
     count?: number;
 }
 
 interface StoragePDiskStatus {
-    id: string;
-    overall: StatusFlag;
+    id?: string;
+    overall?: StatusFlag;
 }
 
 interface StorageVDiskStatus {
-    id: string;
-    overall: StatusFlag;
-    vdisk_status: StatusFlag;
-    pdisk: StoragePDiskStatus;
+    id?: string;
+    overall?: StatusFlag;
+    vdisk_status?: StatusFlag;
+    pdisk?: StoragePDiskStatus;
 }
 
 interface StorageGroupStatus {
-    id: string;
-    overall: StatusFlag;
-    vdisks: StorageVDiskStatus[];
+    id?: string;
+    overall?: StatusFlag;
+    vdisks?: StorageVDiskStatus[];
 }
 
 interface StoragePoolStatus {
-    id: string;
-    overall: StatusFlag;
-    groups: StorageGroupStatus[];
+    id?: string;
+    overall?: StatusFlag;
+    groups?: StorageGroupStatus[];
 }
 
 interface StorageStatus {
-    overall: StatusFlag;
-    pools: StoragePoolStatus[];
+    overall?: StatusFlag;
+    pools?: StoragePoolStatus[];
 }
 
 interface ComputeTabletStatus {
-    overall: StatusFlag;
-    type: string;
-    state: string;
-    count: number;
-    id: string[];
+    overall?: StatusFlag;
+    type?: string;
+    state?: string;
+    count?: number;
+    id?: string[];
 }
 
 interface ThreadPoolStatus {
-    overall: StatusFlag;
-    name: string;
-    usage: number;
+    overall?: StatusFlag;
+    name?: string;
+    usage?: number;
 }
 
 interface LoadAverageStatus {
-    overall: StatusFlag;
-    load: number;
-    cores: number;
+    overall?: StatusFlag;
+    load?: number;
+    cores?: number;
 }
 
 interface ComputeNodeStatus {
-    id: string;
-    overall: StatusFlag;
-    tablets: ComputeTabletStatus[];
-    pools: ThreadPoolStatus[];
-    load: LoadAverageStatus;
+    id?: string;
+    overall?: StatusFlag;
+    tablets?: ComputeTabletStatus[];
+    pools?: ThreadPoolStatus[];
+    load?: LoadAverageStatus;
 }
 
 interface ComputeStatus {
-    overall: StatusFlag;
-    nodes: ComputeNodeStatus[];
-    tablets: ComputeTabletStatus[];
-    paths_quota_usage: number;
-    shards_quota_usage: number;
+    overall?: StatusFlag;
+    nodes?: ComputeNodeStatus[];
+    tablets?: ComputeTabletStatus[];
+    paths_quota_usage?: number;
+    shards_quota_usage?: number;
 }
 
 interface DatabaseStatus {
-    name: string;
-    overall: StatusFlag;
-    storage: StorageStatus;
-    compute: ComputeStatus;
+    name?: string;
+    overall?: StatusFlag;
+    storage?: StorageStatus;
+    compute?: ComputeStatus;
 }
 
 export interface HealthCheckAPIResponse {
     // eslint-disable-next-line camelcase
-    self_check_result: SelfCheckResult;
+    self_check_result?: SelfCheckResult;
     // eslint-disable-next-line camelcase
     issue_log?: IssueLog[];
     // eslint-disable-next-line camelcase
