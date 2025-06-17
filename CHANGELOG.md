@@ -1,5 +1,13 @@
 # Changelog
 
+## [9.6.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.6.1...v9.6.2) (2025-06-17)
+
+
+### Bug Fixes
+
+* **healthcheck:** all fields may be undefined ([#2410](https://github.com/ydb-platform/ydb-embedded-ui/issues/2410)) ([6d2f450](https://github.com/ydb-platform/ydb-embedded-ui/commit/6d2f45002b8ca5be7d323a727fd01c7e59ada221))
+* **Healthcheck:** do not autorefresh ([#2409](https://github.com/ydb-platform/ydb-embedded-ui/issues/2409)) ([7876ecb](https://github.com/ydb-platform/ydb-embedded-ui/commit/7876ecb7c98a443874e3c564d16c9a27855daaf5))
+
 ## [9.6.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.6.0...v9.6.1) (2025-06-16)
 
 
