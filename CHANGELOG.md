@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.6.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.6.2...v9.6.3) (2025-06-17)
+
+
+### Bug Fixes
+
+* check stats independently of plan ([#2413](https://github.com/ydb-platform/ydb-embedded-ui/issues/2413)) ([3b554c8](https://github.com/ydb-platform/ydb-embedded-ui/commit/3b554c867345dcd13909484785b71cbf1f215472))
+
 ## [9.6.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.6.1...v9.6.2) (2025-06-17)
 
 
