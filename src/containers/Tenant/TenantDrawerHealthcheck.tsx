@@ -46,7 +46,7 @@ export function TenantDrawerHealthcheck({children}: TenantDrawerWrapperProps) {
 
     const renderDrawerContent = React.useCallback(() => {
         return <Healthcheck tenantName={database} />;
-    }, []);
+    }, [database]);
 
     return (
         <DrawerWrapper

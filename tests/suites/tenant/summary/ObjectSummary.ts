@@ -20,11 +20,6 @@ export class ObjectSummary {
     private treeLoaders: Locator;
     private primaryKeys: Locator;
     private actionsMenu: ActionsMenu;
-    private aclWrapper: Locator;
-    private aclListWrapper: Locator;
-    private effectiveAclListWrapper: Locator;
-    private aclList: Locator;
-    private effectiveAclList: Locator;
     private createDirectoryModal: Locator;
     private createDirectoryInput: Locator;
     private createDirectoryButton: Locator;
@@ -44,13 +39,6 @@ export class ObjectSummary {
         this.schemaViewer = page.locator('.schema-viewer');
         this.primaryKeys = page.locator('.schema-viewer__keys_type_primary');
         this.actionsMenu = new ActionsMenu(page.locator('.g-popup.g-popup_open'));
-        this.aclWrapper = page.locator('.ydb-acl');
-        this.aclListWrapper = this.aclWrapper.locator('.gc-definition-list').first();
-        this.aclList = this.aclListWrapper.locator('dl.gc-definition-list__list').first();
-        this.effectiveAclListWrapper = this.aclWrapper.locator('.gc-definition-list').last();
-        this.effectiveAclList = this.effectiveAclListWrapper
-            .locator('dl.gc-definition-list__list')
-            .first();
         this.createDirectoryModal = page.locator('.g-modal.g-modal_open');
         this.createDirectoryInput = page.locator(
             '.g-text-input__control[placeholder="Relative path"]',
