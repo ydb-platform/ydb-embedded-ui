@@ -144,13 +144,15 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
                         )}
                     </Flex>
                     {subjectSelected && (
-                        <Rights
-                            inheritedRights={inheritedRightsSet}
-                            rights={currentRightsMap}
-                            availablePermissions={availablePermissions}
-                            handleChangeRightGetter={handleChangeRightGetter}
-                            view={rightView}
-                        />
+                        <div className={block('rights-wrapper')}>
+                            <Rights
+                                inheritedRights={inheritedRightsSet}
+                                rights={currentRightsMap}
+                                availablePermissions={availablePermissions}
+                                handleChangeRightGetter={handleChangeRightGetter}
+                                view={rightView}
+                            />
+                        </div>
                     )}
                 </Flex>
 

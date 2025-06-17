@@ -17,6 +17,7 @@ export enum DiagnosticsTab {
     HotKeys = 'Hot keys',
     Describe = 'Describe',
     Storage = 'Storage',
+    Access = 'Access',
 }
 
 export class Table {
@@ -230,6 +231,7 @@ export class Diagnostics {
     storage: StoragePage;
     nodes: NodesPage;
     memoryViewer: MemoryViewer;
+    private page: Page;
 
     private tabs: Locator;
     private schemaViewer: Locator;
@@ -245,8 +247,12 @@ export class Diagnostics {
     private tableRadioButton: Locator;
     private fixedHeightQueryElements: Locator;
     private copyLinkButton: Locator;
+    private ownerCard: Locator;
+    private changeOwnerButton: Locator;
+    private grantAccessButton: Locator;
 
     constructor(page: Page) {
+        this.page = page;
         this.storage = new StoragePage(page);
         this.nodes = new NodesPage(page);
         this.memoryViewer = new MemoryViewer(page);
@@ -269,6 +275,9 @@ export class Diagnostics {
         this.storageCard = page.locator('.metrics-cards__tab:has-text("Storage")');
         this.memoryCard = page.locator('.metrics-cards__tab:has-text("Memory")');
         this.healthcheckCard = page.locator('.ydb-healthcheck-preview');
+        this.ownerCard = page.locator('.ydb-access-rights__owner-card');
+        this.changeOwnerButton = page.locator('.ydb-access-rights__owner-card button');
+        this.grantAccessButton = page.locator('button:has-text("Grant Access")');
     }
 
     async isSchemaViewerVisible() {
@@ -423,4 +432,160 @@ export class Diagnostics {
         const rowElementClass = await rowElement.getAttribute('class');
         return rowElementClass?.includes('kv-top-queries__row_active') || false;
     }
+
+    async isOwnerCardVisible(): Promise<boolean> {
+        await this.ownerCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return true;
+    }
+
+    async getOwnerName(): Promise<string> {
+        const ownerNameElement = this.ownerCard.locator('.ydb-subject-with-avatar__subject');
+
+        return await ownerNameElement.innerText();
+    }
+
+    async clickChangeOwnerButton(): Promise<void> {
+        await this.changeOwnerButton.click();
+    }
+
+    async changeOwner(newOwnerName: string): Promise<void> {
+        await this.clickChangeOwnerButton();
+
+        // Wait for the dialog to appear
+        const dialog = this.page.locator('.g-dialog');
+        await dialog.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+
+        // Wait for the owner input field to appear
+        const ownerInput = dialog.locator('input[placeholder="Enter subject"]');
+        await ownerInput.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+
+        // Clear the input and type the new owner name
+        await ownerInput.clear();
+        await ownerInput.fill(newOwnerName);
+
+        // Click the Apply button
+        const applyButton = dialog.locator('button:has-text("Apply")');
+
+        // Wait for the button to be enabled
+        await this.page.waitForTimeout(500);
+        // Wait for the button to become enabled
+        await this.page.waitForSelector('.g-dialog button:has-text("Apply"):not([disabled])', {
+            timeout: VISIBILITY_TIMEOUT,
+        });
+        await applyButton.click();
+
+        // Wait for the dialog to close and changes to be applied
+        await dialog.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
+        await this.page.waitForTimeout(500);
+    }
+
+    async clickGrantAccessButton(): Promise<void> {
+        await this.grantAccessButton.click();
+    }
+
+    async isGrantAccessDrawerVisible(): Promise<boolean> {
+        const grantAccessDialog = this.page.locator('.ydb-grant-access');
+        await grantAccessDialog.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return true;
+    }
+
+    async enterSubjectInGrantAccessDialog(subject: string): Promise<void> {
+        const subjectInput = this.page.locator('.ydb-grant-access input[name="subjectInput"]');
+        await subjectInput.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await subjectInput.fill(subject);
+        await subjectInput.press('Enter');
+    }
+
+    async isRightsWrapperVisible(): Promise<boolean> {
+        const rightsWrapper = this.page.locator('.ydb-grant-access__rights-wrapper');
+        return rightsWrapper.isVisible();
+    }
+
+    async isApplyButtonDisabled(): Promise<boolean> {
+        const applyButton = this.page.locator('.ydb-grant-access__footer-button:has-text("Apply")');
+        await applyButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return await applyButton.isDisabled();
+    }
+
+    async clickFullAccessSwitch(): Promise<void> {
+        const fullAccessCard = this.page.locator('.ydb-grant-access__single-right').first();
+        await fullAccessCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        const switchElement = fullAccessCard.locator('.g-switch__indicator');
+        await switchElement.click();
+    }
+
+    async clickApplyButton(): Promise<void> {
+        const applyButton = this.page.locator('button:has-text("Apply")');
+        await applyButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await applyButton.click();
+    }
+
+    async isSubjectInRightsTable(subject: string): Promise<boolean> {
+        const rightsTable = this.page.locator('.ydb-access-rights__rights-table');
+        await rightsTable.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+
+        const rows = rightsTable.locator('.data-table__row');
+
+        await rows
+            .filter({hasText: subject})
+            .waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+
+        // for (const row of Array.from(rows)) {
+        //     // Get the first cell (Subject column)
+        //     const firstCell = row.querySelector('.data-table__td');
+        //     if (!firstCell) {
+        //         continue;
+        //     }
+
+        //     // Find the subject text element
+        //     const subjectElement = firstCell.querySelector('.ydb-subject-with-avatar__subject');
+        //     if (!subjectElement) {
+        //         continue;
+        //     }
+
+        //     // Check if the subject text contains the search text
+        //     const subjectText = subjectElement.textContent || '';
+        //     if (subjectText.includes(searchText)) {
+        //         return true;
+        //     }
+        // }
+
+        return true;
+    }
+
+    //     export function isSubjectInRightsTable(searchText: string): boolean {
+    //     // Find the rights table
+    //     const rightsTable = document.querySelector(
+    //         '.ydb-resizeable-data-table.ydb-access-rights__rights-table',
+    //     );
+    //     if (!rightsTable) {
+    //         return false;
+    //     }
+
+    //     // Find all rows in the table
+    //     const rows = rightsTable.querySelectorAll('.data-table__row');
+
+    //     // Check each row
+    //     for (const row of Array.from(rows)) {
+    //         // Get the first cell (Subject column)
+    //         const firstCell = row.querySelector('.data-table__td');
+    //         if (!firstCell) {
+    //             continue;
+    //         }
+
+    //         // Find the subject text element
+    //         const subjectElement = firstCell.querySelector('.ydb-subject-with-avatar__subject');
+    //         if (!subjectElement) {
+    //             continue;
+    //         }
+
+    //         // Check if the subject text contains the search text
+    //         const subjectText = subjectElement.textContent || '';
+    //         if (subjectText.includes(searchText)) {
+    //             return true;
+    //         }
+    //     }
+
+    //     return false;
+    // }
 }
