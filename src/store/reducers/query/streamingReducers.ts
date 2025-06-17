@@ -53,6 +53,9 @@ export const setStreamQueryResponse = (
         state.result.data.preparedPlan = Object.keys(planData).length > 0 ? planData : undefined;
         state.result.data.simplifiedPlan = simplifiedPlan;
         state.result.data.plan = chunk.plan;
+    }
+
+    if ('stats' in chunk) {
         state.result.data.stats = chunk.stats;
     }
 
