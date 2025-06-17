@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.6.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.6.0...v9.6.1) (2025-06-16)
+
+
+### Bug Fixes
+
+* **uiFactory:** add generic support ([#2407](https://github.com/ydb-platform/ydb-embedded-ui/issues/2407)) ([0014557](https://github.com/ydb-platform/ydb-embedded-ui/commit/00145578ae6d548763d66af2fe8e78c1e37dac5c))
+
 ## [9.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.5.1...v9.6.0) (2025-06-16)
 
 

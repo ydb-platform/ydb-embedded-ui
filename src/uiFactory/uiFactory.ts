@@ -20,7 +20,7 @@ const uiFactoryBase: UIFactory = {
     },
 };
 
-export function configureUIFactory(overrides: Partial<UIFactory>) {
+export function configureUIFactory<H extends string>(overrides: Partial<UIFactory<H>>) {
     Object.assign(uiFactoryBase, overrides);
 }
 
