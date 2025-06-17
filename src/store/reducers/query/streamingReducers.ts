@@ -56,6 +56,10 @@ export const setStreamQueryResponse = (
     }
 
     if ('stats' in chunk) {
+        if (!state.result.data) {
+            state.result.data = prepareQueryData(null);
+        }
+
         state.result.data.stats = chunk.stats;
     }
 
