@@ -529,63 +529,6 @@ export class Diagnostics {
         await rows
             .filter({hasText: subject})
             .waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-
-        // for (const row of Array.from(rows)) {
-        //     // Get the first cell (Subject column)
-        //     const firstCell = row.querySelector('.data-table__td');
-        //     if (!firstCell) {
-        //         continue;
-        //     }
-
-        //     // Find the subject text element
-        //     const subjectElement = firstCell.querySelector('.ydb-subject-with-avatar__subject');
-        //     if (!subjectElement) {
-        //         continue;
-        //     }
-
-        //     // Check if the subject text contains the search text
-        //     const subjectText = subjectElement.textContent || '';
-        //     if (subjectText.includes(searchText)) {
-        //         return true;
-        //     }
-        // }
-
         return true;
     }
-
-    //     export function isSubjectInRightsTable(searchText: string): boolean {
-    //     // Find the rights table
-    //     const rightsTable = document.querySelector(
-    //         '.ydb-resizeable-data-table.ydb-access-rights__rights-table',
-    //     );
-    //     if (!rightsTable) {
-    //         return false;
-    //     }
-
-    //     // Find all rows in the table
-    //     const rows = rightsTable.querySelectorAll('.data-table__row');
-
-    //     // Check each row
-    //     for (const row of Array.from(rows)) {
-    //         // Get the first cell (Subject column)
-    //         const firstCell = row.querySelector('.data-table__td');
-    //         if (!firstCell) {
-    //             continue;
-    //         }
-
-    //         // Find the subject text element
-    //         const subjectElement = firstCell.querySelector('.ydb-subject-with-avatar__subject');
-    //         if (!subjectElement) {
-    //             continue;
-    //         }
-
-    //         // Check if the subject text contains the search text
-    //         const subjectText = subjectElement.textContent || '';
-    //         if (subjectText.includes(searchText)) {
-    //             return true;
-    //         }
-    //     }
-
-    //     return false;
-    // }
 }
