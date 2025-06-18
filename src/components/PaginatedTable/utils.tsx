@@ -35,7 +35,6 @@ export const typedMemo: <T>(Component: T) => T = React.memo;
  * This function traverses up through the DOM tree, accumulating offsetTop values
  * from each parent element until it reaches either the specified container or
  * the top of the document.
- *
  * @param element - The HTML element to calculate the offset for
  * @param container - Optional container element to stop the calculation at
  * @returns The total vertical offset in pixels

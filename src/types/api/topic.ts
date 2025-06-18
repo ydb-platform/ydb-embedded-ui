@@ -1,5 +1,3 @@
-/* eslint-disable camelcase */
-
 import type {IProtobufTimeObject} from './common';
 import type {
     Consumer,

@@ -1,6 +1,5 @@
 import type {Page} from '@playwright/test';
 
-// eslint-disable-next-line no-implicit-globals
 export default async function executeQueryWithKeybinding(page: Page, browserName: string) {
     const isMac = process.platform === 'darwin';
     const modifierKey = browserName === 'webkit' ? 'Meta' : 'Control';

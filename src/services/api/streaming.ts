@@ -97,7 +97,7 @@ export class StreamingAPI extends BaseYdbAPI {
                     options.onQueryResponseChunk(chunk);
                 } else if (isKeepAliveChunk(chunk)) {
                     // Logging for debug purposes
-                    console.log('Received keep alive chunk');
+                    console.info('Received keep alive chunk');
                 }
             } catch (e) {
                 throw new Error(`Error parsing chunk: ${e}`);

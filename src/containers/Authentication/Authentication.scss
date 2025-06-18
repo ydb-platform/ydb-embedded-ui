@@ -8,11 +8,8 @@
     height: 100%;
 
     background-color: rgba(184, 212, 253, 0.1);
-    background-image: radial-gradient(
-            at 0% 100%,
-            rgba(0, 102, 255, 0.15) 20%,
-            rgba(247, 247, 247, 0) 40%
-        ),
+    background-image:
+        radial-gradient(at 0% 100%, rgba(0, 102, 255, 0.15) 20%, rgba(247, 247, 247, 0) 40%),
         radial-gradient(at 55% 0%, rgba(0, 102, 255, 0.15) 20%, rgba(247, 247, 247, 0) 40%),
         radial-gradient(at 110% 100%, rgba(0, 102, 255, 0.15) 20%, rgba(247, 247, 247, 0) 40%);
     background-blend-mode: normal;
