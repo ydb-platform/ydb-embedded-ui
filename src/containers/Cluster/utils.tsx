@@ -7,6 +7,7 @@ export const clusterTabsIds = {
     tenants: 'tenants',
     nodes: 'nodes',
     storage: 'storage',
+    network: 'network',
     versions: 'versions',
     tablets: 'tablets',
 } as const;
@@ -25,6 +26,10 @@ const storage = {
     id: clusterTabsIds.storage,
     title: 'Storage',
 };
+const network = {
+    id: clusterTabsIds.network,
+    title: 'Network',
+};
 const versions = {
     id: clusterTabsIds.versions,
     title: 'Versions',
@@ -34,7 +39,7 @@ const tablets = {
     title: 'Tablets',
 };
 
-export const clusterTabs = [tenants, nodes, storage, tablets, versions];
+export const clusterTabs = [tenants, nodes, storage, network, tablets, versions];
 
 export function isClusterTab(tab: any): tab is ClusterTab {
     return Object.values(clusterTabsIds).includes(tab);
