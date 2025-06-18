@@ -158,31 +158,6 @@ test.describe('Object Summary', async () => {
         expect(vslotsColumns).not.toEqual(storagePoolsColumns);
     });
 
-    test('ACL tab shows correct access rights', async ({page}) => {
-        const pageQueryParams = {
-            schema: '/local/.sys_health',
-            database: '/local',
-            summaryTab: 'acl',
-            tenantPage: 'query',
-        };
-        const tenantPage = new TenantPage(page);
-        await tenantPage.goto(pageQueryParams);
-
-        const objectSummary = new ObjectSummary(page);
-        await objectSummary.waitForAclVisible();
-
-        // Check Access Rights
-        const accessRights = await objectSummary.getAccessRights();
-        expect(accessRights).toEqual([{user: 'root@builtin', rights: 'Owner'}]);
-
-        // Check Effective Access Rights
-        const effectiveRights = await objectSummary.getEffectiveAccessRights();
-        expect(effectiveRights).toEqual([
-            {group: 'Access', permissions: ['Manage']},
-            {group: 'Inheritance type', permissions: ['Inherit']},
-        ]);
-    });
-
     test('Copy path copies correct path to clipboard', async ({page}) => {
         const pageQueryParams = {
             schema: dsVslotsSchema,
@@ -293,5 +268,58 @@ test.describe('Object Summary', async () => {
 
         await objectSummary.expandSummary();
         await expect(objectSummary.isSummaryCollapsed()).resolves.toBe(false);
+    });
+
+    test('ACL tab shows redirect message and link to Diagnostics', async ({page}) => {
+        // Define the URL parameters
+        const pageQueryParams = {
+            schema: '/local/.sys_health',
+            database: '/local',
+            summaryTab: 'acl',
+            tenantPage: 'query',
+        };
+
+        // Navigate to the page
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto(pageQueryParams);
+
+        // Get the ObjectSummary instance
+        const objectSummary = new ObjectSummary(page);
+
+        // Verify the ACL tab is selected
+        await objectSummary.clickTab(ObjectSummaryTab.ACL);
+
+        // Wait for the ACL content to be visible
+        await objectSummary.waitForAclVisible();
+
+        // Check for the redirect message
+        const redirectMessage = await objectSummary.getRedirectMessage();
+        expect(redirectMessage).toContain('Section was moved to Diagnostics');
+
+        // Check for the "Open in Diagnostics" button
+        const hasButton = await objectSummary.hasOpenInDiagnosticsButton();
+        expect(hasButton).toBe(true);
+
+        // Click the button and verify the URL
+        await objectSummary.clickOpenInDiagnosticsButton();
+
+        // Verify the URL contains the expected parameters
+        const expectedUrlParams = new URLSearchParams({
+            tenantPage: 'diagnostics',
+            diagnosticsTab: 'access',
+            summaryTab: 'acl',
+            schema: '/local/.sys_health',
+            database: '/local',
+        });
+
+        // Get the current URL and parse its parameters
+        const currentUrl = page.url();
+        const currentUrlObj = new URL(currentUrl);
+        const currentParams = currentUrlObj.searchParams;
+
+        // Verify each expected parameter is in the URL
+        for (const [key, value] of expectedUrlParams.entries()) {
+            expect(currentParams.get(key)).toBe(value);
+        }
     });
 });
