@@ -167,11 +167,10 @@ interface DatabaseStatus {
 }
 
 export interface HealthCheckAPIResponse {
-    // eslint-disable-next-line camelcase
     self_check_result?: SelfCheckResult;
-    // eslint-disable-next-line camelcase
+
     issue_log?: IssueLog[];
-    // eslint-disable-next-line camelcase
+
     database_status?: DatabaseStatus[];
     location?: LocationNode;
 }

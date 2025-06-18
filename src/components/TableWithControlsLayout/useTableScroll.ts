@@ -31,8 +31,6 @@ interface UseTableScrollProps {
  *
  * The scroll adjustment is triggered whenever any of the dependencies change,
  * but is skipped on the first render to prevent unwanted initial scrolling.
- *
- *
  * @param props - The hook parameters
  * @returns An object containing the handleTableScroll function that can be called manually
  */
@@ -47,7 +45,6 @@ export const useTableScroll = ({
      * Reads the `--data-table-sticky-header-offset` CSS variable from the table container
      * element and converts it to a number. This value is used to adjust the scroll position
      * to account for sticky headers.
-     *
      * @returns The sticky header offset in pixels, or 0 if not defined
      */
     const getStickyTopOffset = React.useCallback(() => {
@@ -107,7 +104,6 @@ export const useTableScroll = ({
 
         // Only scroll on subsequent renders when dependencies change
         handleTableScroll();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [handleTableScroll, tableContainerRef, scrollContainerRef, ...dependencies]);
 
     return {

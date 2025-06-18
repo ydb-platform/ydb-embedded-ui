@@ -258,22 +258,21 @@ enum SidType {
 
 interface DatabaseQuotas {
     /** uint64 */
-    // eslint-disable-next-line camelcase
+
     data_size_hard_quota: string;
 
     /** uint64 */
-    // eslint-disable-next-line camelcase
+
     data_size_soft_quota: string;
 
     /** uint64 */
-    // eslint-disable-next-line camelcase
+
     data_stream_shards_quota: string;
 
     /** uint64 */
-    // eslint-disable-next-line camelcase
+
     data_stream_reserved_storage_quota: string;
 
-    // eslint-disable-next-line camelcase
     ttl_min_run_internal_seconds: number;
 }
 

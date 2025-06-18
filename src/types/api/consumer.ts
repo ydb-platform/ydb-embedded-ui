@@ -1,5 +1,3 @@
-/* eslint-disable camelcase */
-
 import type {IProtobufTimeObject} from './common';
 
 /**
@@ -72,7 +70,8 @@ interface PartitionConsumerStats {
     /**
      * google.protobuf.Timestamp
      *
-     * Timestamp of last read from this partition. */
+     * Timestamp of last read from this partition.
+     */
     last_read_time?: string | IProtobufTimeObject;
 
     /**

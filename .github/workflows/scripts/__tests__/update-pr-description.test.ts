@@ -3,6 +3,7 @@ import {generateBundleSizeSection, getBundleInfo} from '../utils/bundle';
 import {generateTestChangesSummary} from '../utils/format';
 import {getTestStatus, readTestResults} from '../utils/results';
 import {compareTests} from '../utils/test';
+
 import type {TestResultsInfo} from './types';
 
 // Mock dependencies
