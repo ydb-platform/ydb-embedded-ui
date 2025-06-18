@@ -59,7 +59,7 @@ export function IdList({ids, renderItem}: IdListProps) {
     return (
         <Flex direction="column" gap={1}>
             {ids.map((id) => (
-                <React.Fragment key={id}>{renderItem ? renderItem(id) : id}</React.Fragment>
+                <div key={id}>{renderItem ? renderItem(id) : id}</div>
             ))}
         </Flex>
     );
