@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {throttle} from 'lodash';
+
 import {operationsApi} from '../../store/reducers/operations';
 import type {OperationKind, TOperation} from '../../types/api/operations';
 
@@ -132,6 +134,25 @@ export function useInfiniteOperations({
         pageSize,
         loadPageAndUpdate,
     ]);
+
+    // Resize handler - check if we need to load more pages when viewport changes
+    React.useEffect(() => {
+        const throttledHandleResize = throttle(
+            () => {
+                checkAndLoadMorePages();
+            },
+            200,
+            {
+                trailing: true,
+                leading: true,
+            },
+        );
+
+        window.addEventListener('resize', throttledHandleResize);
+        return () => {
+            window.removeEventListener('resize', throttledHandleResize);
+        };
+    }, [checkAndLoadMorePages]);
 
     // Filter operations
     const filteredOperations = React.useMemo(() => {
