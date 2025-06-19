@@ -13,7 +13,7 @@ interface UseInfiniteOperationsProps {
     scrollContainerRef?: React.RefObject<HTMLElement>;
 }
 
-const DEFAULT_PAGE_SIZE = 50;
+const DEFAULT_PAGE_SIZE = 10;
 const DEFAULT_SCROLL_MARGIN = 100;
 
 export function useInfiniteOperations({
