@@ -1,5 +1,3 @@
-import React from 'react';
-
 import type {AlertProps} from '@gravity-ui/uikit';
 import {Alert, Button, Flex, Icon, Popover, Skeleton} from '@gravity-ui/uikit';
 
@@ -52,36 +50,12 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
         {
             //FIXME https://github.com/ydb-platform/ydb-embedded-ui/issues/1889
             pollingInterval: healthcheckPreviewDisabled ? undefined : autoRefreshInterval,
-            skip: healthcheckPreviewDisabled,
         },
     );
 
-    const [getHealthcheckQuery, {currentData: manualData, isFetching: isFetchingManually}] =
-        healthcheckApi.useLazyGetHealthcheckInfoQuery();
+    const loading = isFetching && data === undefined;
 
-    React.useEffect(() => {
-        if (healthcheckPreviewDisabled) {
-            getHealthcheckQuery({database: tenantName});
-        }
-    }, [healthcheckPreviewDisabled, tenantName, getHealthcheckQuery]);
-
-    React.useEffect(() => {
-        const fetchHealthcheck = () => {
-            if (healthcheckPreviewDisabled) {
-                getHealthcheckQuery({database: tenantName});
-            }
-        };
-        document.addEventListener('diagnosticsRefresh', fetchHealthcheck);
-        return () => {
-            document.removeEventListener('diagnosticsRefresh', fetchHealthcheck);
-        };
-    }, [tenantName, healthcheckPreviewDisabled, getHealthcheckQuery]);
-
-    const loading =
-        (isFetching && data === undefined) || (isFetchingManually && manualData === undefined);
-
-    const selfCheckResult: SelfCheckResult =
-        data?.self_check_result || manualData?.self_check_result || SelfCheckResult.UNSPECIFIED;
+    const selfCheckResult: SelfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
 
     const modifier = selfCheckResult.toLowerCase();
 
