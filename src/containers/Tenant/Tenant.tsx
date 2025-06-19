@@ -43,6 +43,7 @@ interface TenantProps {
     additionalNodesProps?: AdditionalNodesProps;
 }
 
+// eslint-disable-next-line complexity
 export function Tenant(props: TenantProps) {
     const [summaryVisibilityState, dispatchSummaryVisibilityAction] = React.useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_TENANT_SUMMARY_COLLAPSED),
@@ -50,7 +51,16 @@ export function Tenant(props: TenantProps) {
         getTenantSummaryState,
     );
 
-    const {database, schema} = useTenantQueryParams();
+    // TODO: name is used together with database to keep old links valid, do not remove
+    const {database: queryDatabase, schema, name, handleDatabaseChange} = useTenantQueryParams();
+
+    React.useEffect(() => {
+        if (name && !queryDatabase) {
+            handleDatabaseChange(name);
+        }
+    }, [queryDatabase, name, handleDatabaseChange]);
+
+    const database = queryDatabase ?? name;
 
     if (!database) {
         throw new Error('Tenant name is not defined');

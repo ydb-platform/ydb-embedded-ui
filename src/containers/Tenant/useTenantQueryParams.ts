@@ -3,13 +3,14 @@ import React from 'react';
 import {BooleanParam, StringParam, useQueryParams} from 'use-query-params';
 
 export function useTenantQueryParams() {
-    const [{showHealthcheck, database, schema, view, issuesFilter}, setQueryParams] =
+    const [{showHealthcheck, database, schema, view, issuesFilter, name}, setQueryParams] =
         useQueryParams({
             showHealthcheck: BooleanParam,
             database: StringParam,
             schema: StringParam,
             view: StringParam,
             issuesFilter: StringParam,
+            name: StringParam,
         });
     const handleShowHealthcheckChange = React.useCallback(
         (value?: boolean) => {
@@ -55,5 +56,6 @@ export function useTenantQueryParams() {
         handleHealthcheckViewChange,
         issuesFilter,
         handleIssuesFilterChange,
+        name,
     };
 }
