@@ -178,7 +178,7 @@ export function getNodesGroupByFieldTitle(groupByField: NodesGroupByField) {
 // Also for some columns we may use more than one field
 export const NODES_COLUMNS_TO_DATA_FIELDS: Record<NodesColumnId, NodesRequiredField[]> = {
     NodeId: ['NodeId'],
-    Host: ['Host', 'Rack', 'Database', 'SystemState'],
+    Host: ['Host', 'Rack', 'Database', 'SystemState', 'ConnectStatus'],
     Database: ['Database'],
     NodeName: ['NodeName'],
     DC: ['DC'],

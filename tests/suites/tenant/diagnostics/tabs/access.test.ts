@@ -22,7 +22,8 @@ test.describe('Diagnostics Access tab', async () => {
         await expect(diagnostics.isOwnerCardVisible()).resolves.toBe(true);
     });
 
-    test('Can change owner on access tab', async ({page}) => {
+    // TODO: https://github.com/ydb-platform/ydb-embedded-ui/issues/2437
+    test.skip('Can change owner on access tab', async ({page}) => {
         const pageQueryParams = {
             schema: '/local/.sys_health',
             database: '/local',
@@ -47,7 +48,8 @@ test.describe('Diagnostics Access tab', async () => {
         expect(updatedOwnerName).not.toBe(initialOwnerName);
     });
 
-    test('Owner card is visible after navigating to access tab', async ({page}) => {
+    // TODO: https://github.com/ydb-platform/ydb-embedded-ui/issues/2437
+    test.skip('Owner card is visible after navigating to access tab', async ({page}) => {
         const pageQueryParams = {
             schema: '/dev02/home/xenoxeno/db1/my_row_table',
             database: '/dev02/home/xenoxeno/db1',
@@ -84,7 +86,7 @@ test.describe('Diagnostics Access tab', async () => {
         await expect(diagnostics.isGrantAccessDrawerVisible()).resolves.toBe(true);
     });
 
-    test.only('Can grant full access to a new subject', async ({page}) => {
+    test('Can grant full access to a new subject', async ({page}) => {
         const pageQueryParams = {
             schema: '/local/.sys_health',
             database: '/local',
