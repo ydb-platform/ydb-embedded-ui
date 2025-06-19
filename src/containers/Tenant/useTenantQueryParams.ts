@@ -4,9 +4,10 @@ import {BooleanParam, StringParam, useQueryParams} from 'use-query-params';
 
 export function useTenantQueryParams() {
     const [
-        {showHealthcheck, database, schema, view, issuesFilter, showGrantAccess, aclSubject},
+        {showHealthcheck, database, schema, view, issuesFilter, showGrantAccess, aclSubject, name},
         setQueryParams,
     ] = useQueryParams({
+        name: StringParam,
         showHealthcheck: BooleanParam,
         database: StringParam,
         schema: StringParam,
@@ -75,5 +76,6 @@ export function useTenantQueryParams() {
         handleIssuesFilterChange,
         aclSubject,
         handleAclSubjectChange,
+        name,
     };
 }
