@@ -146,6 +146,9 @@ function OperationsActions({operation, database, refreshTable}: OperationsAction
         return null;
     }
 
+    const isForgetButtonDisabled = isLoadingCancel;
+    const isCancelButtonDisabled = isForgetLoading || operation.ready === true;
+
     return (
         <Flex gap="2">
             <ActionTooltip title={i18n('header_forget')} placement={['left', 'auto']}>
@@ -166,15 +169,20 @@ function OperationsActions({operation, database, refreshTable}: OperationsAction
                                     refreshTable();
                                 })
                         }
-                        buttonDisabled={isLoadingCancel}
+                        buttonDisabled={isForgetButtonDisabled}
                     >
                         <Icon data={Ban} />
                     </ButtonWithConfirmDialog>
                 </div>
             </ActionTooltip>
-            <ActionTooltip title={i18n('header_cancel')} placement={['right', 'auto']}>
+            <ActionTooltip
+                title={i18n('header_cancel')}
+                placement={['right', 'auto']}
+                disabled={isCancelButtonDisabled}
+            >
                 <div>
                     <ButtonWithConfirmDialog
+                        popoverDisabled={isCancelButtonDisabled}
                         buttonView="outlined"
                         dialogHeader={i18n('header_cancel')}
                         dialogText={i18n('text_cancel')}
@@ -190,7 +198,7 @@ function OperationsActions({operation, database, refreshTable}: OperationsAction
                                     refreshTable();
                                 })
                         }
-                        buttonDisabled={isForgetLoading}
+                        buttonDisabled={isCancelButtonDisabled}
                     >
                         <Icon data={CircleStop} />
                     </ButtonWithConfirmDialog>
