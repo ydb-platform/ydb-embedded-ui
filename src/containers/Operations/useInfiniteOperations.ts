@@ -63,7 +63,7 @@ export function useInfiniteOperations({
     );
 
     // Load initial page when kind/search changes
-    React.useEffect(() => {
+    React.useLayoutEffect(() => {
         setOperationsList([]);
         setNextPageToken(undefined);
         loadPageAndUpdate({database, kind, page_size: pageSize}, true);
@@ -108,7 +108,7 @@ export function useInfiniteOperations({
     React.useEffect(() => {
         const scrollContainer = scrollContainerRef?.current;
         if (!scrollContainer) {
-            return;
+            return undefined;
         }
 
         const handleScroll = () => {

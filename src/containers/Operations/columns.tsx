@@ -6,7 +6,7 @@ import {ActionTooltip, Flex, Icon, Text} from '@gravity-ui/uikit';
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {CellWithPopover} from '../../components/CellWithPopover/CellWithPopover';
 import {operationsApi} from '../../store/reducers/operations';
-import type {TOperation} from '../../types/api/operations';
+import type {IndexBuildMetadata, OperationKind, TOperation} from '../../types/api/operations';
 import {EStatusCode} from '../../types/api/operations';
 import {EMPTY_DATA_PLACEHOLDER, HOUR_IN_SECONDS, SECOND_IN_MS} from '../../utils/constants';
 import createToast from '../../utils/createToast';
@@ -21,11 +21,23 @@ import './Operations.scss';
 export function getColumns({
     database,
     refreshTable,
+    kind,
 }: {
     database: string;
     refreshTable: VoidFunction;
+    kind: OperationKind;
 }): DataTableColumn<TOperation>[] {
-    return [
+    const isBuildIndex = kind === 'buildindex';
+
+    // Helper function to get description tooltip content
+    const getDescriptionTooltip = (operation: TOperation): string => {
+        if (!operation.metadata?.description) {
+            return '';
+        }
+        return JSON.stringify(operation.metadata.description, null, 2);
+    };
+
+    const columns: DataTableColumn<TOperation>[] = [
         {
             name: COLUMNS_NAMES.ID,
             header: COLUMNS_TITLES[COLUMNS_NAMES.ID],
@@ -34,8 +46,11 @@ export function getColumns({
                 if (!row.id) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
+
+                const tooltipContent = isBuildIndex ? getDescriptionTooltip(row) || row.id : row.id;
+
                 return (
-                    <CellWithPopover placement={['top', 'bottom']} content={row.id}>
+                    <CellWithPopover placement={['top', 'bottom']} content={tooltipContent}>
                         {row.id}
                     </CellWithPopover>
                 );
@@ -55,78 +70,114 @@ export function getColumns({
                 );
             },
         },
-        {
-            name: COLUMNS_NAMES.CREATED_BY,
-            header: COLUMNS_TITLES[COLUMNS_NAMES.CREATED_BY],
-            render: ({row}) => {
-                if (!row.created_by) {
-                    return EMPTY_DATA_PLACEHOLDER;
-                }
-                return row.created_by;
-            },
-        },
-        {
-            name: COLUMNS_NAMES.CREATE_TIME,
-            header: COLUMNS_TITLES[COLUMNS_NAMES.CREATE_TIME],
-            render: ({row}) => {
-                if (!row.create_time) {
-                    return EMPTY_DATA_PLACEHOLDER;
-                }
-                return formatDateTime(parseProtobufTimestampToMs(row.create_time));
-            },
-        },
-        {
-            name: COLUMNS_NAMES.END_TIME,
-            header: COLUMNS_TITLES[COLUMNS_NAMES.END_TIME],
-            render: ({row}) => {
-                if (!row.end_time) {
-                    return EMPTY_DATA_PLACEHOLDER;
-                }
-                return formatDateTime(parseProtobufTimestampToMs(row.end_time));
-            },
-        },
-        {
-            name: COLUMNS_NAMES.DURATION,
-            header: COLUMNS_TITLES[COLUMNS_NAMES.DURATION],
-            render: ({row}) => {
-                let durationValue = 0;
-                if (!row.create_time) {
-                    return EMPTY_DATA_PLACEHOLDER;
-                }
-                const createTime = parseProtobufTimestampToMs(row.create_time);
-                if (row.end_time) {
-                    const endTime = parseProtobufTimestampToMs(row.end_time);
-                    durationValue = endTime - createTime;
-                } else {
-                    durationValue = Date.now() - createTime;
-                }
-
-                const durationFormatted =
-                    durationValue > HOUR_IN_SECONDS * SECOND_IN_MS
-                        ? duration(durationValue).format('hh:mm:ss')
-                        : duration(durationValue).format('mm:ss');
-
-                return row.end_time
-                    ? durationFormatted
-                    : i18n('label_duration-ongoing', {value: durationFormatted});
-            },
-        },
-        {
-            name: 'Actions',
-            sortable: false,
-            resizeable: false,
-            header: '',
-            render: ({row}) => {
-                return (
-                    <OperationsActions
-                        operation={row}
-                        database={database}
-                        refreshTable={refreshTable}
-                    />
-                );
-            },
-        },
     ];
+
+    // Add buildindex-specific columns
+    if (isBuildIndex) {
+        columns.push(
+            {
+                name: COLUMNS_NAMES.STATE,
+                header: COLUMNS_TITLES[COLUMNS_NAMES.STATE],
+                render: ({row}) => {
+                    const metadata = row.metadata as IndexBuildMetadata | undefined;
+                    if (!metadata?.state) {
+                        return EMPTY_DATA_PLACEHOLDER;
+                    }
+                    return metadata.state;
+                },
+            },
+            {
+                name: COLUMNS_NAMES.PROGRESS,
+                header: COLUMNS_TITLES[COLUMNS_NAMES.PROGRESS],
+                render: ({row}) => {
+                    const metadata = row.metadata as IndexBuildMetadata | undefined;
+                    if (metadata?.progress === undefined) {
+                        return EMPTY_DATA_PLACEHOLDER;
+                    }
+                    return `${Math.round(metadata.progress)}%`;
+                },
+            },
+        );
+    } else {
+        // Add standard columns for non-buildindex operations
+        columns.push(
+            {
+                name: COLUMNS_NAMES.CREATED_BY,
+                header: COLUMNS_TITLES[COLUMNS_NAMES.CREATED_BY],
+                render: ({row}) => {
+                    if (!row.created_by) {
+                        return EMPTY_DATA_PLACEHOLDER;
+                    }
+                    return row.created_by;
+                },
+            },
+            {
+                name: COLUMNS_NAMES.CREATE_TIME,
+                header: COLUMNS_TITLES[COLUMNS_NAMES.CREATE_TIME],
+                render: ({row}) => {
+                    if (!row.create_time) {
+                        return EMPTY_DATA_PLACEHOLDER;
+                    }
+                    return formatDateTime(parseProtobufTimestampToMs(row.create_time));
+                },
+            },
+            {
+                name: COLUMNS_NAMES.END_TIME,
+                header: COLUMNS_TITLES[COLUMNS_NAMES.END_TIME],
+                render: ({row}) => {
+                    if (!row.end_time) {
+                        return EMPTY_DATA_PLACEHOLDER;
+                    }
+                    return formatDateTime(parseProtobufTimestampToMs(row.end_time));
+                },
+            },
+            {
+                name: COLUMNS_NAMES.DURATION,
+                header: COLUMNS_TITLES[COLUMNS_NAMES.DURATION],
+                render: ({row}) => {
+                    let durationValue = 0;
+                    if (!row.create_time) {
+                        return EMPTY_DATA_PLACEHOLDER;
+                    }
+                    const createTime = parseProtobufTimestampToMs(row.create_time);
+                    if (row.end_time) {
+                        const endTime = parseProtobufTimestampToMs(row.end_time);
+                        durationValue = endTime - createTime;
+                    } else {
+                        durationValue = Date.now() - createTime;
+                    }
+
+                    const durationFormatted =
+                        durationValue > HOUR_IN_SECONDS * SECOND_IN_MS
+                            ? duration(durationValue).format('hh:mm:ss')
+                            : duration(durationValue).format('mm:ss');
+
+                    return row.end_time
+                        ? durationFormatted
+                        : i18n('label_duration-ongoing', {value: durationFormatted});
+                },
+            },
+        );
+    }
+
+    // Add Actions column
+    columns.push({
+        name: 'Actions',
+        sortable: false,
+        resizeable: false,
+        header: '',
+        render: ({row}) => {
+            return (
+                <OperationsActions
+                    operation={row}
+                    database={database}
+                    refreshTable={refreshTable}
+                />
+            );
+        },
+    });
+
+    return columns;
 }
 
 interface OperationsActionsProps {

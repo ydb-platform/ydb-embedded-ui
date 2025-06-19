@@ -62,7 +62,7 @@ export function Operations({database, scrollContainerRef}: OperationsProps) {
             <TableWithControlsLayout.Table loading={isLoading} className={b('table')}>
                 {operations.length > 0 || isLoading ? (
                     <ResizeableDataTable
-                        columns={getColumns({database, refreshTable})}
+                        columns={getColumns({database, refreshTable, kind})}
                         columnsWidthLSKey={OPERATIONS_SELECTED_COLUMNS_KEY}
                         data={operations}
                         settings={settings}
