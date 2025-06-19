@@ -74,8 +74,6 @@ export function getColumns({
                 }
                 return formatDateTime(parseProtobufTimestampToMs(row.create_time));
             },
-            sortAccessor: (row) =>
-                row.create_time ? parseProtobufTimestampToMs(row.create_time) : 0,
         },
         {
             name: COLUMNS_NAMES.END_TIME,
@@ -86,8 +84,6 @@ export function getColumns({
                 }
                 return formatDateTime(parseProtobufTimestampToMs(row.end_time));
             },
-            sortAccessor: (row) =>
-                row.end_time ? parseProtobufTimestampToMs(row.end_time) : Number.MAX_SAFE_INTEGER,
         },
         {
             name: COLUMNS_NAMES.DURATION,
@@ -113,17 +109,6 @@ export function getColumns({
                 return row.end_time
                     ? durationFormatted
                     : i18n('label_duration-ongoing', {value: durationFormatted});
-            },
-            sortAccessor: (row) => {
-                if (!row.create_time) {
-                    return 0;
-                }
-                const createTime = parseProtobufTimestampToMs(row.create_time);
-                if (row.end_time) {
-                    const endTime = parseProtobufTimestampToMs(row.end_time);
-                    return endTime - createTime;
-                }
-                return Date.now() - createTime;
             },
         },
         {

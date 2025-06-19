@@ -125,7 +125,9 @@ export type OperationKind =
 export interface OperationListRequestParams {
     database: string;
     kind: OperationKind;
-    page_size?: number;
+
+    // required and important to pass correct value.
+    page_size: number;
     page_token?: string;
 }
 

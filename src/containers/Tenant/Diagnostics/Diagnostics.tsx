@@ -159,7 +159,7 @@ function Diagnostics(props: DiagnosticsProps) {
                 return <Configs database={tenantName} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.operations: {
-                return <Operations database={tenantName} />;
+                return <Operations database={tenantName} scrollContainerRef={containerRef} />;
             }
             default: {
                 return <div>No data...</div>;
