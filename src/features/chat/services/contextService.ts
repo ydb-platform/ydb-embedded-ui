@@ -97,7 +97,7 @@ export function useCurrentContext(): ChatContext {
     const baseContext: ChatContext = {
         currentPage: page || 'unknown',
         currentPath: location.pathname,
-        clusterName: clusterTitle || (query.clusterName as string),
+        clusterName: (query.clusterName as string) || clusterTitle,
     };
 
     const pageSpecificContext = extractPageSpecificContext(
