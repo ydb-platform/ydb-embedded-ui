@@ -185,7 +185,12 @@ function Diagnostics(props: DiagnosticsProps) {
                         }}
                         allowNotSelected={true}
                     />
-                    <AutoRefreshControl />
+                    <AutoRefreshControl
+                        onManualRefresh={() => {
+                            const event = new CustomEvent('diagnosticsRefresh');
+                            document.dispatchEvent(event);
+                        }}
+                    />
                 </div>
             </div>
         );

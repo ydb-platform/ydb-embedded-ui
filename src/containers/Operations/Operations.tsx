@@ -5,7 +5,6 @@ import {ResponseError} from '../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
-import {useAutoRefreshInterval} from '../../utils/hooks';
 import {isAccessError} from '../../utils/response';
 
 import {OperationsControls} from './OperationsControls';
@@ -22,8 +21,6 @@ interface OperationsProps {
 }
 
 export function Operations({database, scrollContainerRef}: OperationsProps) {
-    const [autoRefreshInterval] = useAutoRefreshInterval();
-
     const {kind, searchValue, pageSize, handleKindChange, handleSearchChange} =
         useOperationsQueryParams();
 
@@ -33,7 +30,6 @@ export function Operations({database, scrollContainerRef}: OperationsProps) {
             kind,
             pageSize,
             searchValue,
-            pollingInterval: autoRefreshInterval,
             scrollContainerRef,
         });
 

@@ -8,11 +8,10 @@ interface UseInfiniteOperationsProps {
     kind: OperationKind;
     pageSize?: number;
     searchValue: string;
-    pollingInterval?: number;
     scrollContainerRef?: React.RefObject<HTMLElement>;
 }
 
-const DEFAULT_PAGE_SIZE = 10;
+const DEFAULT_PAGE_SIZE = 50;
 const DEFAULT_SCROLL_MARGIN = 100;
 
 export function useInfiniteOperations({
@@ -20,30 +19,88 @@ export function useInfiniteOperations({
     kind,
     pageSize = DEFAULT_PAGE_SIZE,
     searchValue,
-    pollingInterval,
     scrollContainerRef,
 }: UseInfiniteOperationsProps) {
     const [operationsList, setOperationsList] = React.useState<TOperation[]>([]);
     const [nextPageToken, setNextPageToken] = React.useState<string | undefined>();
 
-    const [loadPage, {data, isFetching, error}] = operationsApi.useLazyGetOperationListQuery({
-        pollingInterval,
-    });
+    const [loadPage, {isFetching, error}] = operationsApi.useLazyGetOperationListQuery();
+
+    // Load a page and update state
+    const loadPageAndUpdate = React.useCallback(
+        async (
+            params: {
+                database: string;
+                kind: OperationKind;
+                page_size: number;
+                page_token?: string;
+            },
+            isInitial = false,
+        ) => {
+            try {
+                const result = await loadPage(params).unwrap();
+
+                if (result?.operations) {
+                    if (isInitial) {
+                        // Initial load or refresh - replace data
+                        setOperationsList(result.operations);
+                    } else {
+                        // Pagination - append data
+                        setOperationsList((prev) => [...prev, ...result.operations!]);
+                    }
+                    setNextPageToken(
+                        result.next_page_token === '0' ? undefined : result.next_page_token,
+                    );
+                }
+            } catch (err) {
+                // Error is handled by RTK Query
+                console.error('Failed to load operations:', err);
+            }
+        },
+        [loadPage],
+    );
 
     // Load initial page when kind/search changes
     React.useEffect(() => {
         setOperationsList([]);
         setNextPageToken(undefined);
-        loadPage({database, kind, page_size: pageSize});
-    }, [kind, searchValue, database, pageSize, loadPage]);
+        loadPageAndUpdate({database, kind, page_size: pageSize}, true);
+    }, [kind, searchValue, database, pageSize, loadPageAndUpdate]);
 
-    // When data arrives, update state
-    React.useEffect(() => {
-        if (data?.operations) {
-            setOperationsList((prev) => [...prev, ...data.operations!]);
-            setNextPageToken(data.next_page_token === '0' ? undefined : data.next_page_token);
+    // Check if we need to load more pages to fill the viewport
+    const checkAndLoadMorePages = React.useCallback(async () => {
+        const scrollContainer = scrollContainerRef?.current;
+        if (!scrollContainer || !nextPageToken || isFetching) {
+            return;
         }
-    }, [data]);
+
+        const {scrollHeight, clientHeight} = scrollContainer;
+
+        // If content height is less than or equal to viewport height, load more
+        if (scrollHeight <= clientHeight) {
+            await loadPageAndUpdate({
+                database,
+                kind,
+                page_size: pageSize,
+                page_token: nextPageToken,
+            });
+        }
+    }, [
+        scrollContainerRef,
+        nextPageToken,
+        isFetching,
+        database,
+        kind,
+        pageSize,
+        loadPageAndUpdate,
+    ]);
+
+    // Check if we need to load more pages after data updates
+    React.useLayoutEffect(() => {
+        if (!isFetching) {
+            checkAndLoadMorePages();
+        }
+    }, [operationsList, isFetching, checkAndLoadMorePages]);
 
     // Scroll handler
     React.useEffect(() => {
@@ -60,13 +117,21 @@ export function useInfiniteOperations({
                 nextPageToken &&
                 !isFetching
             ) {
-                loadPage({database, kind, page_size: pageSize, page_token: nextPageToken});
+                loadPageAndUpdate({database, kind, page_size: pageSize, page_token: nextPageToken});
             }
         };
 
         scrollContainer.addEventListener('scroll', handleScroll);
         return () => scrollContainer.removeEventListener('scroll', handleScroll);
-    }, [scrollContainerRef, nextPageToken, isFetching, database, kind, pageSize, loadPage]);
+    }, [
+        scrollContainerRef,
+        nextPageToken,
+        isFetching,
+        database,
+        kind,
+        pageSize,
+        loadPageAndUpdate,
+    ]);
 
     // Filter operations
     const filteredOperations = React.useMemo(() => {
@@ -78,8 +143,16 @@ export function useInfiniteOperations({
     const refreshTable = React.useCallback(() => {
         setOperationsList([]);
         setNextPageToken(undefined);
-        loadPage({database, kind, page_size: pageSize});
-    }, []);
+        loadPageAndUpdate({database, kind, page_size: pageSize}, true);
+    }, [database, kind, pageSize, loadPageAndUpdate]);
+
+    // Listen for diagnostics refresh events
+    React.useEffect(() => {
+        document.addEventListener('diagnosticsRefresh', refreshTable);
+        return () => {
+            document.removeEventListener('diagnosticsRefresh', refreshTable);
+        };
+    }, [refreshTable]);
 
     return {
         operations: filteredOperations,
