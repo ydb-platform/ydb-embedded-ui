@@ -1,11 +1,10 @@
 import {duration} from '@gravity-ui/date-utils';
 import {Ban, CircleStop} from '@gravity-ui/icons';
+import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
 import {ActionTooltip, Flex, Icon, Text} from '@gravity-ui/uikit';
-import type {ColumnDef} from '@tanstack/react-table';
 
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {CellWithPopover} from '../../components/CellWithPopover/CellWithPopover';
-import {ColumnHeader} from '../../components/Table/Table';
 import {operationsApi} from '../../store/reducers/operations';
 import type {TOperation} from '../../types/api/operations';
 import {EStatusCode} from '../../types/api/operations';
@@ -25,102 +24,82 @@ export function getColumns({
 }: {
     database: string;
     refreshTable: VoidFunction;
-}): ColumnDef<TOperation>[] {
+}): DataTableColumn<TOperation>[] {
     return [
         {
-            accessorKey: 'id',
-            header: () => <ColumnHeader>{COLUMNS_TITLES[COLUMNS_NAMES.ID]}</ColumnHeader>,
-            size: 340,
-            cell: ({getValue}) => {
-                const id = getValue<string>();
-                if (!id) {
+            name: COLUMNS_NAMES.ID,
+            header: COLUMNS_TITLES[COLUMNS_NAMES.ID],
+            width: 340,
+            render: ({row}) => {
+                if (!row.id) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
                 return (
-                    <CellWithPopover placement={['top', 'bottom']} content={id}>
-                        {id}
+                    <CellWithPopover placement={['top', 'bottom']} content={row.id}>
+                        {row.id}
                     </CellWithPopover>
                 );
             },
         },
         {
-            accessorKey: 'status',
-            header: () => <ColumnHeader>{COLUMNS_TITLES[COLUMNS_NAMES.STATUS]}</ColumnHeader>,
-            cell: ({getValue}) => {
-                const status = getValue<EStatusCode>();
-                if (!status) {
+            name: COLUMNS_NAMES.STATUS,
+            header: COLUMNS_TITLES[COLUMNS_NAMES.STATUS],
+            render: ({row}) => {
+                if (!row.status) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
                 return (
-                    <Text color={status === EStatusCode.SUCCESS ? 'positive' : 'danger'}>
-                        {status}
+                    <Text color={row.status === EStatusCode.SUCCESS ? 'positive' : 'danger'}>
+                        {row.status}
                     </Text>
                 );
             },
         },
         {
-            accessorKey: 'created_by',
-            header: () => <ColumnHeader>{COLUMNS_TITLES[COLUMNS_NAMES.CREATED_BY]}</ColumnHeader>,
-            cell: ({getValue}) => {
-                const createdBy = getValue<string>();
-                if (!createdBy) {
+            name: COLUMNS_NAMES.CREATED_BY,
+            header: COLUMNS_TITLES[COLUMNS_NAMES.CREATED_BY],
+            render: ({row}) => {
+                if (!row.created_by) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
-                return createdBy;
+                return row.created_by;
             },
         },
         {
-            accessorKey: 'create_time',
-            header: () => <ColumnHeader>{COLUMNS_TITLES[COLUMNS_NAMES.CREATE_TIME]}</ColumnHeader>,
-            cell: ({getValue}) => {
-                const createTime = getValue<TOperation['create_time']>();
-                if (!createTime) {
+            name: COLUMNS_NAMES.CREATE_TIME,
+            header: COLUMNS_TITLES[COLUMNS_NAMES.CREATE_TIME],
+            render: ({row}) => {
+                if (!row.create_time) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
-                return formatDateTime(parseProtobufTimestampToMs(createTime));
+                return formatDateTime(parseProtobufTimestampToMs(row.create_time));
             },
-            sortingFn: (rowA, rowB) => {
-                const a = rowA.original.create_time
-                    ? parseProtobufTimestampToMs(rowA.original.create_time)
-                    : 0;
-                const b = rowB.original.create_time
-                    ? parseProtobufTimestampToMs(rowB.original.create_time)
-                    : 0;
-                return a - b;
-            },
+            sortAccessor: (row) =>
+                row.create_time ? parseProtobufTimestampToMs(row.create_time) : 0,
         },
         {
-            accessorKey: 'end_time',
-            header: () => <ColumnHeader>{COLUMNS_TITLES[COLUMNS_NAMES.END_TIME]}</ColumnHeader>,
-            cell: ({getValue}) => {
-                const endTime = getValue<TOperation['end_time']>();
-                if (!endTime) {
+            name: COLUMNS_NAMES.END_TIME,
+            header: COLUMNS_TITLES[COLUMNS_NAMES.END_TIME],
+            render: ({row}) => {
+                if (!row.end_time) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
-                return formatDateTime(parseProtobufTimestampToMs(endTime));
+                return formatDateTime(parseProtobufTimestampToMs(row.end_time));
             },
-            sortingFn: (rowA, rowB) => {
-                const a = rowA.original.end_time
-                    ? parseProtobufTimestampToMs(rowA.original.end_time)
-                    : Number.MAX_SAFE_INTEGER;
-                const b = rowB.original.end_time
-                    ? parseProtobufTimestampToMs(rowB.original.end_time)
-                    : Number.MAX_SAFE_INTEGER;
-                return a - b;
-            },
+            sortAccessor: (row) =>
+                row.end_time ? parseProtobufTimestampToMs(row.end_time) : Number.MAX_SAFE_INTEGER,
         },
         {
-            id: 'duration',
-            header: () => <ColumnHeader>{COLUMNS_TITLES[COLUMNS_NAMES.DURATION]}</ColumnHeader>,
-            cell: ({row}) => {
-                const operation = row.original;
+            name: COLUMNS_NAMES.DURATION,
+            header: COLUMNS_TITLES[COLUMNS_NAMES.DURATION],
+            render: ({row}) => {
                 let durationValue = 0;
-                if (!operation.create_time) {
+                if (!row.create_time) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
-                const createTime = parseProtobufTimestampToMs(operation.create_time);
-                if (operation.end_time) {
-                    const endTime = parseProtobufTimestampToMs(operation.end_time);
+                const createTime = parseProtobufTimestampToMs(row.create_time);
+                if (row.end_time) {
+                    const endTime = parseProtobufTimestampToMs(row.end_time);
                     durationValue = endTime - createTime;
                 } else {
                     durationValue = Date.now() - createTime;
@@ -131,39 +110,36 @@ export function getColumns({
                         ? duration(durationValue).format('hh:mm:ss')
                         : duration(durationValue).format('mm:ss');
 
-                return operation.end_time
+                return row.end_time
                     ? durationFormatted
                     : i18n('label_duration-ongoing', {value: durationFormatted});
             },
-            sortingFn: (rowA, rowB) => {
-                const getDuration = (operation: TOperation) => {
-                    if (!operation.create_time) {
-                        return 0;
-                    }
-                    const createTime = parseProtobufTimestampToMs(operation.create_time);
-                    if (operation.end_time) {
-                        const endTime = parseProtobufTimestampToMs(operation.end_time);
-                        return endTime - createTime;
-                    }
-                    return Date.now() - createTime;
-                };
-                return getDuration(rowA.original) - getDuration(rowB.original);
+            sortAccessor: (row) => {
+                if (!row.create_time) {
+                    return 0;
+                }
+                const createTime = parseProtobufTimestampToMs(row.create_time);
+                if (row.end_time) {
+                    const endTime = parseProtobufTimestampToMs(row.end_time);
+                    return endTime - createTime;
+                }
+                return Date.now() - createTime;
             },
         },
         {
-            id: 'actions',
-            header: () => <ColumnHeader> </ColumnHeader>,
-            cell: ({row}) => {
+            name: 'Actions',
+            sortable: false,
+            resizeable: false,
+            header: '',
+            render: ({row}) => {
                 return (
                     <OperationsActions
-                        operation={row.original}
+                        operation={row}
                         database={database}
                         refreshTable={refreshTable}
                     />
                 );
             },
-            enableSorting: false,
-            size: 100,
         },
     ];
 }

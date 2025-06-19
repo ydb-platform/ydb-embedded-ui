@@ -22,7 +22,6 @@ export interface TableWrapperProps extends Omit<TableWithControlsLayoutItemProps
     loading?: boolean;
     scrollContainerRef?: React.RefObject<HTMLElement>;
     scrollDependencies?: any[];
-    onScroll?: (event: React.UIEvent<HTMLDivElement>) => void;
     children: React.ReactNode;
 }
 
@@ -58,7 +57,6 @@ TableWithControlsLayout.Table = function Table({
     className,
     scrollContainerRef,
     scrollDependencies = [],
-    onScroll,
 }: TableWrapperProps) {
     // Create an internal ref for the table container
     const tableContainerRef = React.useRef<HTMLDivElement>(null);
@@ -75,7 +73,7 @@ TableWithControlsLayout.Table = function Table({
     }
 
     return (
-        <div ref={tableContainerRef} className={b('table', className)} onScroll={onScroll}>
+        <div ref={tableContainerRef} className={b('table', className)}>
             {children}
         </div>
     );
