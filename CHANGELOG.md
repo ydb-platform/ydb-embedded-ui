@@ -1,5 +1,13 @@
 # Changelog
 
+## [9.6.3-hotfix.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.6.3...v9.6.3-hotfix.1) (2025-06-19)
+
+
+### Bug Fixes
+
+* **HealthcheckPreview:** use only one query ([#2427](https://github.com/ydb-platform/ydb-embedded-ui/issues/2427)) ([0089133](https://github.com/ydb-platform/ydb-embedded-ui/commit/00891339a9ae22518ffa5a331c0605227584cd02))
+* **Tenant:** support name param ([8103bb6](https://github.com/ydb-platform/ydb-embedded-ui/commit/8103bb68b1faccafc93ac569dc18d7e0be756801))
+
 ## [9.6.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.6.2...v9.6.3) (2025-06-17)
 
 
