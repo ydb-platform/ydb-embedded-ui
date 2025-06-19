@@ -19,6 +19,8 @@
     }
 
     &__header {
+        z-index: 100;
+
         display: flex;
         flex-shrink: 0;
         justify-content: space-between;
@@ -112,6 +114,8 @@
     }
 
     &__input {
+        z-index: 100;
+
         flex-shrink: 0;
 
         padding: 16px;

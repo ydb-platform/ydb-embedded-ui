@@ -18,7 +18,7 @@ export const ChatInput = ({
     disabled = false,
     isStreaming = false,
     onStopGeneration,
-    placeholder = 'Ask about your YDB cluster, databases, or queries...',
+    placeholder = 'Спросите о кластере YDB, базах данных или запросах...',
 }: ChatInputProps) => {
     const [message, setMessage] = React.useState('');
     const textAreaRef = React.useRef<HTMLTextAreaElement>(null);

@@ -110,11 +110,11 @@ export const ChatPanel = () => {
                 {/* Header */}
                 <div className={b('header')}>
                     <div className={b('header-left')}>
-                        <Text variant="subheader-2">AI Assistant</Text>
+                        <Text variant="subheader-2">AI Ассистент</Text>
                         <QuotaDisplay compact refreshTrigger={quotaRefreshTrigger} />
                     </div>
                     <div className={b('controls')}>
-                        <ActionTooltip title="Clear history (⌘K)">
+                        <ActionTooltip title="Очистить историю (⌘K)">
                             <Button
                                 view="flat"
                                 size="s"
@@ -126,7 +126,7 @@ export const ChatPanel = () => {
                                 🗑
                             </Button>
                         </ActionTooltip>
-                        <ActionTooltip title="Close">
+                        <ActionTooltip title="Закрыть">
                             <Button view="flat" size="s" onClick={closeChat}>
                                 <Icon data={Xmark} size={16} />
                             </Button>
@@ -138,34 +138,61 @@ export const ChatPanel = () => {
                 <div className={b('messages')}>
                     {messages.filter((msg) => msg.role !== 'tool').length === 0 && (
                         <div className={b('welcome')}>
-                            <h4>Welcome to YDB AI Assistant</h4>
+                            <h4>Добро пожаловать в YDB AI Ассистент</h4>
                             <p>
-                                Ask questions about your YDB cluster, databases, or get help with
-                                queries.
+                                Задавайте вопросы о состоянии кластера, базах данных или получите
+                                помощь с запросами.
                             </p>
                             <div className={b('suggestions')}>
                                 <Button
                                     view="outlined"
                                     size="s"
+                                    onClick={() => handleSendMessage('Покажи состояние кластера')}
+                                >
+                                    Состояние кластера
+                                </Button>
+                                <Button
+                                    view="outlined"
+                                    size="s"
+                                    onClick={() => handleSendMessage('Какие есть базы данных?')}
+                                >
+                                    Список БД
+                                </Button>
+                                <Button
+                                    view="outlined"
+                                    size="s"
+                                    onClick={() => handleSendMessage('Есть ли проблемы с нодами?')}
+                                >
+                                    Проверить ноды
+                                </Button>
+                                <Button
+                                    view="outlined"
+                                    size="s"
                                     onClick={() =>
-                                        handleSendMessage('Show me cluster health status')
+                                        handleSendMessage(
+                                            'Помоги написать YQL запрос для выборки данных',
+                                        )
                                     }
                                 >
-                                    Check cluster health
+                                    Помощь с YQL
                                 </Button>
                                 <Button
                                     view="outlined"
                                     size="s"
-                                    onClick={() => handleSendMessage('List all databases')}
+                                    onClick={() =>
+                                        handleSendMessage('Покажи топ медленных запросов')
+                                    }
                                 >
-                                    List databases
+                                    Медленные запросы
                                 </Button>
                                 <Button
                                     view="outlined"
                                     size="s"
-                                    onClick={() => handleSendMessage('Help me write a YQL query')}
+                                    onClick={() =>
+                                        handleSendMessage('Сколько места занимают таблицы?')
+                                    }
                                 >
-                                    Help with queries
+                                    Размер таблиц
                                 </Button>
                             </div>
                         </div>
