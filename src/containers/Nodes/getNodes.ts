@@ -13,18 +13,9 @@ import {getRequiredDataFields} from '../../utils/tableUtils/getRequiredDataField
 export const getNodes: FetchData<
     NodesPreparedEntity,
     NodesFilters,
-    Pick<NodesRequestParams, 'type' | 'storage' | 'tablets'>
+    Pick<NodesRequestParams, 'type' | 'storage'>
 > = async (params) => {
-    const {
-        type = 'any',
-        storage = false,
-        tablets = true,
-        limit,
-        offset,
-        sortParams,
-        filters,
-        columnsIds,
-    } = params;
+    const {type = 'any', storage = false, limit, offset, sortParams, filters, columnsIds} = params;
 
     const {sortOrder, columnId} = sortParams ?? {};
     const {
@@ -46,7 +37,6 @@ export const getNodes: FetchData<
     const response = await window.api.viewer.getNodes({
         type,
         storage,
-        tablets,
         limit,
         offset,
         sort,

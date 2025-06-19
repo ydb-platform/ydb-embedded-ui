@@ -102,7 +102,7 @@ export class ViewerAPI extends BaseYdbAPI {
     getNodes(
         {
             type = 'any',
-            tablets = false,
+            tablets,
             database,
             tenant,
             fieldsRequired,
@@ -119,7 +119,8 @@ export class ViewerAPI extends BaseYdbAPI {
             this.getPath('/viewer/json/nodes?enums=true'),
             {
                 type,
-                tablets,
+                // Use tablets for backward compatibility even if fieldsRequired is passed
+                tablets: tablets ?? fieldsRequired?.includes('Tablets'),
                 // Do not send empty string
                 filter: filter || undefined,
                 // TODO: remove after remove tenant param
