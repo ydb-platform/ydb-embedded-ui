@@ -1,12 +1,9 @@
 import React from 'react';
 
-import {Button, Icon, TextArea} from '@gravity-ui/uikit';
+import {CirclePlay, CircleStop} from '@gravity-ui/icons';
+import {ActionTooltip, Button, Icon, TextArea} from '@gravity-ui/uikit';
 
 import './ChatInput.scss';
-
-// Icons - these would need to be imported from your icon library
-const SendIcon = () => <span>➤</span>;
-const StopIcon = () => <span>⏹</span>;
 
 interface ChatInputProps {
     onSendMessage: (message: string) => void;
@@ -26,32 +23,22 @@ export const ChatInput = ({
     const [message, setMessage] = React.useState('');
     const textAreaRef = React.useRef<HTMLTextAreaElement>(null);
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = () => {
         if (message.trim() && !disabled) {
             onSendMessage(message.trim());
             setMessage('');
-            // Reset textarea height
-            if (textAreaRef.current) {
-                textAreaRef.current.style.height = 'auto';
-            }
         }
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            handleSubmit(e);
+            handleSubmit();
         }
     };
 
     const handleChange = (value: string) => {
         setMessage(value);
-        // Auto-resize textarea
-        if (textAreaRef.current) {
-            textAreaRef.current.style.height = 'auto';
-            textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
-        }
     };
 
     const handleStop = () => {
@@ -67,50 +54,51 @@ export const ChatInput = ({
         }
     }, []);
 
+    const actionButton = isStreaming ? (
+        <ActionTooltip title="Stop generation">
+            <Button
+                view="flat-danger"
+                size="m"
+                onClick={handleStop}
+                className="chat-input__stop-button"
+            >
+                <Icon data={CircleStop} size={16} />
+                Stop
+            </Button>
+        </ActionTooltip>
+    ) : (
+        <ActionTooltip title="Send message (Enter)">
+            <Button
+                view="action"
+                size="m"
+                disabled={disabled || !message.trim()}
+                onClick={handleSubmit}
+                className="chat-input__send-button"
+            >
+                <Icon data={CirclePlay} size={16} />
+                Send
+            </Button>
+        </ActionTooltip>
+    );
+
     return (
-        <form className="chat-input" onSubmit={handleSubmit}>
-            <div className="chat-input__field">
+        <div className="chat-input">
+            <div className="chat-input__container">
                 <TextArea
-                    ref={textAreaRef}
+                    controlRef={textAreaRef}
                     value={message}
                     onUpdate={handleChange}
                     onKeyDown={handleKeyDown}
                     placeholder={placeholder}
                     disabled={disabled}
-                    rows={1}
                     autoFocus
+                    size="xl"
                     minRows={1}
-                    maxRows={8}
-                    className="chat-input__textarea"
+                    maxRows={6}
+                    className="chat-input__field"
                 />
+                <div className="chat-input__button-container">{actionButton}</div>
             </div>
-
-            <div className="chat-input__actions">
-                {isStreaming ? (
-                    <Button
-                        view="action"
-                        size="m"
-                        onClick={handleStop}
-                        title="Stop generation"
-                        className="chat-input__stop-button"
-                    >
-                        <Icon data={StopIcon} />
-                        Stop
-                    </Button>
-                ) : (
-                    <Button
-                        view="action"
-                        size="m"
-                        type="submit"
-                        disabled={disabled || !message.trim()}
-                        title="Send message (Enter)"
-                        className="chat-input__send-button"
-                    >
-                        <Icon data={SendIcon} />
-                        Send
-                    </Button>
-                )}
-            </div>
-        </form>
+        </div>
     );
 };
