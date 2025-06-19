@@ -1,5 +1,5 @@
 import {CircleDollar} from '@gravity-ui/icons';
-import {Icon, Text} from '@gravity-ui/uikit';
+import {Icon, Label} from '@gravity-ui/uikit';
 
 import {cn} from '../../../../utils/cn';
 import type {UsageBreakdown} from '../../types/chat';
@@ -32,9 +32,9 @@ export const UsageDisplay = ({usage, className}: UsageDisplayProps) => {
         <div className={b(null, className)}>
             <div className={b('content')}>
                 <Icon data={CircleDollar} size={12} />
-                <Text variant="caption-2" color="secondary">
+                <Label theme="normal" size="xs">
                     {formatTokens(usage.totalTokens)} tokens • {formatCost(usage.estimatedCost)}
-                </Text>
+                </Label>
             </div>
         </div>
     );

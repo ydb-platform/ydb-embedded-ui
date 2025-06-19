@@ -58,7 +58,6 @@ const handleToolStatus = (state: ChatState, delta: ChatDelta) => {
 
 const initialState: ChatState = {
     messages: [],
-    isLoading: false,
     isStreaming: false,
     error: null,
     sessionId: null,
@@ -100,14 +99,12 @@ const chatSlice = createSlice({
         // Streaming state
         startStreaming: (state) => {
             state.isStreaming = true;
-            state.isLoading = true;
             state.error = null;
             // Mark that we need a new assistant message for this streaming session
             state.needsNewAssistantMessage = true;
         },
         stopStreaming: (state) => {
             state.isStreaming = false;
-            state.isLoading = false;
             state.needsNewAssistantMessage = false;
         },
 
@@ -158,7 +155,6 @@ const chatSlice = createSlice({
 
                 case 'done':
                     state.isStreaming = false;
-                    state.isLoading = false;
                     state.currentStreamingMessageId = undefined;
                     state.needsNewAssistantMessage = false;
                     break;
@@ -166,7 +162,6 @@ const chatSlice = createSlice({
                 case 'error':
                     state.error = delta.error || 'Unknown error occurred';
                     state.isStreaming = false;
-                    state.isLoading = false;
                     break;
 
                 case 'tool_result': {
@@ -210,7 +205,6 @@ const chatSlice = createSlice({
         // Error handling
         setError: (state, action: PayloadAction<string>) => {
             state.error = action.payload;
-            state.isLoading = false;
             state.isStreaming = false;
         },
         clearError: (state) => {

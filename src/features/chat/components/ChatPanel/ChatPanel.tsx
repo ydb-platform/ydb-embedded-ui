@@ -1,10 +1,11 @@
 import React from 'react';
 
-import {Xmark} from '@gravity-ui/icons';
+import {TrashBin, Xmark} from '@gravity-ui/icons';
 import {Drawer, DrawerItem} from '@gravity-ui/navigation';
 import {ActionTooltip, Button, Icon, Text} from '@gravity-ui/uikit';
 import {useSelector} from 'react-redux';
 
+import {Loader} from '../../../../components/Loader/Loader';
 import {cn} from '../../../../utils/cn';
 import {useChat} from '../../hooks/useChat';
 import {formatContextForAI, useCurrentContext} from '../../services/contextService';
@@ -18,7 +19,7 @@ import './ChatPanel.scss';
 const b = cn('ydb-chat-drawer');
 
 export const ChatPanel = () => {
-    const {messages, isLoading, isStreaming, error, isOpen} = useSelector(
+    const {messages, isStreaming, error, isOpen} = useSelector(
         (state: {chat: ChatState}) => state.chat,
     );
     const messagesEndRef = React.useRef<HTMLDivElement>(null);
@@ -47,8 +48,8 @@ export const ChatPanel = () => {
 
     // Update quota after chat completion
     React.useEffect(() => {
-        // When streaming stops and loading is complete, refresh quota
-        if (!isStreaming && !isLoading && messages.length > 0) {
+        // When streaming stops, refresh quota
+        if (!isStreaming && messages.length > 0) {
             // Add a small delay to ensure the message is fully processed
             const timer = setTimeout(() => {
                 setQuotaRefreshTrigger((prev) => prev + 1);
@@ -57,7 +58,7 @@ export const ChatPanel = () => {
             return () => clearTimeout(timer);
         }
         return undefined;
-    }, [isStreaming, isLoading, messages.length]);
+    }, [isStreaming, messages.length]);
 
     const handleSendMessage = async (content: string) => {
         const contextString = formatContextForAI(context);
@@ -111,9 +112,9 @@ export const ChatPanel = () => {
                 <div className={b('header')}>
                     <div className={b('header-left')}>
                         <Text variant="subheader-2">AI Ассистент</Text>
-                        <QuotaDisplay compact refreshTrigger={quotaRefreshTrigger} />
                     </div>
                     <div className={b('controls')}>
+                        <QuotaDisplay compact refreshTrigger={quotaRefreshTrigger} />
                         <ActionTooltip title="Очистить историю (⌘K)">
                             <Button
                                 view="flat"
@@ -123,7 +124,7 @@ export const ChatPanel = () => {
                                     messages.filter((msg) => msg.role !== 'tool').length === 0
                                 }
                             >
-                                🗑
+                                <Icon data={TrashBin} size={16} />
                             </Button>
                         </ActionTooltip>
                         <ActionTooltip title="Закрыть">
@@ -200,9 +201,33 @@ export const ChatPanel = () => {
 
                     {messages
                         .filter((message) => message.role !== 'tool')
-                        .map((message) => (
-                            <ChatMessage key={message.id} message={message} />
-                        ))}
+                        .map((message, index, filteredMessages) => {
+                            const isLastMessage = index === filteredMessages.length - 1;
+                            return (
+                                <ChatMessage
+                                    key={message.id}
+                                    message={message}
+                                    isStreaming={isStreaming}
+                                    isLastMessage={isLastMessage}
+                                />
+                            );
+                        })}
+
+                    {isStreaming &&
+                        (() => {
+                            const nonToolMessages = messages.filter((msg) => msg.role !== 'tool');
+                            const lastMessage = nonToolMessages[nonToolMessages.length - 1];
+                            return lastMessage?.role === 'user';
+                        })() && (
+                            <div className={b('loading-message')}>
+                                <div className={b('loading-content')}>
+                                    <Loader size="s" delay={0} />
+                                    <Text color="secondary" variant="body-2">
+                                        AI обрабатывает запрос...
+                                    </Text>
+                                </div>
+                            </div>
+                        )}
 
                     {error && (
                         <div className={b('error')}>
@@ -218,7 +243,7 @@ export const ChatPanel = () => {
                 <div className={b('input')}>
                     <ChatInput
                         onSendMessage={handleSendMessage}
-                        disabled={isLoading}
+                        disabled={isStreaming}
                         isStreaming={isStreaming}
                         onStopGeneration={stopGeneration}
                     />

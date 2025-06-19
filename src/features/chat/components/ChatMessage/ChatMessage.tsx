@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Button, Icon} from '@gravity-ui/uikit';
+import {ClipboardButton} from '@gravity-ui/uikit';
 
 import type {ChatMessage as ChatMessageType} from '../../types/chat';
 import {ToolCallBlock} from '../ToolCallBlock/ToolCallBlock';
@@ -12,17 +12,18 @@ import './ChatMessage.scss';
 const UserIcon = () => <span>👤</span>;
 const AssistantIcon = () => <span>🤖</span>;
 const ToolIcon = () => <span>🔧</span>;
-const CopyIcon = () => <span>📋</span>;
 
 interface ChatMessageProps {
     message: ChatMessageType;
+    isStreaming?: boolean;
+    isLastMessage?: boolean;
 }
 
-export const ChatMessage = ({message}: ChatMessageProps) => {
-    const handleCopyContent = () => {
-        navigator.clipboard.writeText(message.content);
-    };
-
+export const ChatMessage = ({
+    message,
+    isStreaming = false,
+    isLastMessage = false,
+}: ChatMessageProps) => {
     const formatTimestamp = (timestamp: number) => {
         return new Date(timestamp).toLocaleTimeString();
     };
@@ -256,18 +257,25 @@ export const ChatMessage = ({message}: ChatMessageProps) => {
     const getMessageIcon = () => {
         switch (message.role) {
             case 'user':
-                return <Icon data={UserIcon} />;
+                return <UserIcon />;
             case 'assistant':
-                return <Icon data={AssistantIcon} />;
+                return <AssistantIcon />;
             case 'tool':
-                return <Icon data={ToolIcon} />;
+                return <ToolIcon />;
             default:
                 return null;
         }
     };
 
     const getMessageClass = () => {
-        return `chat-message chat-message--${message.role}`;
+        let className = `chat-message chat-message--${message.role}`;
+
+        // Add complete class for assistant messages that are not currently streaming
+        if (message.role === 'assistant' && (!isStreaming || !isLastMessage)) {
+            className += ' chat-message--complete';
+        }
+
+        return className;
     };
 
     return (
@@ -287,9 +295,7 @@ export const ChatMessage = ({message}: ChatMessageProps) => {
                     </span>
                 </div>
                 <div className="chat-message__actions">
-                    <Button view="flat" size="xs" onClick={handleCopyContent} title="Copy message">
-                        <Icon data={CopyIcon} />
-                    </Button>
+                    <ClipboardButton text={message.content} size="xs" />
                 </div>
             </div>
 

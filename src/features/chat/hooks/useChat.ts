@@ -7,16 +7,14 @@ import type {ChatDelta, ChatMessage} from '../types/chat';
 
 export function useChat() {
     const dispatch = useDispatch();
-    const {messages, isLoading, isStreaming, error, isOpen} = useSelector(
-        (state: any) => state.chat,
-    );
+    const {messages, isStreaming, error, isOpen} = useSelector((state: any) => state.chat);
     const abortControllerRef = React.useRef<AbortController | null>(null);
 
     const generateMessageId = () => `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     const sendMessage = React.useCallback(
         async (content: string, context?: string) => {
-            if (!content.trim() || isLoading) {
+            if (!content.trim() || isStreaming) {
                 return;
             }
 
@@ -58,7 +56,7 @@ export function useChat() {
                 }
             }
         },
-        [dispatch, messages, isLoading],
+        [dispatch, messages, isStreaming],
     );
 
     const stopGeneration = React.useCallback(() => {
@@ -109,7 +107,6 @@ export function useChat() {
 
     return {
         messages,
-        isLoading,
         isStreaming,
         error,
         isOpen,

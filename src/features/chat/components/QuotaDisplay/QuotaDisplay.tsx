@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {CircleDollar, Clock} from '@gravity-ui/icons';
-import {Icon, Progress, Text} from '@gravity-ui/uikit';
+import {Icon, Label, Progress, Text} from '@gravity-ui/uikit';
 
 import {cn} from '../../../../utils/cn';
 import type {QuotaInfo} from '../../types/chat';
@@ -83,17 +83,38 @@ export const QuotaDisplay = ({className, refreshTrigger, compact = false}: Quota
 
     // Compact mode - single line display
     if (compact) {
-        const highestUsage = Math.max(quota.daily.percentage, quota.monthly.percentage);
-        const isHighUsage = highestUsage > 80;
+        const getDailyTheme = () => {
+            if (quota.daily.percentage > 90) {
+                return 'danger';
+            }
+            if (quota.daily.percentage > 80) {
+                return 'warning';
+            }
+            return 'normal';
+        };
+
+        const getMonthlyTheme = () => {
+            if (quota.monthly.percentage > 90) {
+                return 'danger';
+            }
+            if (quota.monthly.percentage > 80) {
+                return 'warning';
+            }
+            return 'normal';
+        };
 
         return (
             <div className={b({compact}, className)}>
                 <div className={b('compact-content')}>
-                    <Icon data={CircleDollar} size={12} />
-                    <Text variant="caption-2" color={isHighUsage ? 'danger' : 'secondary'}>
-                        {formatCost(quota.daily.used)}/{formatLimit(quota.daily.limit)} •{' '}
-                        {formatCost(quota.monthly.used)}/{formatLimit(quota.monthly.limit)}
+                    <Text variant="body-2" color="secondary">
+                        Квота:
                     </Text>
+                    <Label theme={getDailyTheme()} size="xs">
+                        День: {formatCost(quota.daily.used)}/{formatLimit(quota.daily.limit)}
+                    </Label>
+                    <Label theme={getMonthlyTheme()} size="xs">
+                        Месяц: {formatCost(quota.monthly.used)}/{formatLimit(quota.monthly.limit)}
+                    </Label>
                 </div>
             </div>
         );
@@ -120,9 +141,18 @@ export const QuotaDisplay = ({className, refreshTrigger, compact = false}: Quota
                     </div>
 
                     <div className={b('period-info')}>
-                        <Text variant="caption-2" color="secondary">
+                        <Label
+                            theme={
+                                quota.daily.percentage > 90
+                                    ? 'danger'
+                                    : quota.daily.percentage > 80
+                                      ? 'warning'
+                                      : 'normal'
+                            }
+                            size="xs"
+                        >
                             {formatCost(quota.daily.used)} / {formatLimit(quota.daily.limit)}
-                        </Text>
+                        </Label>
 
                         {quota.daily.limit !== Infinity && (
                             <Progress
@@ -145,9 +175,18 @@ export const QuotaDisplay = ({className, refreshTrigger, compact = false}: Quota
                     </div>
 
                     <div className={b('period-info')}>
-                        <Text variant="caption-2" color="secondary">
+                        <Label
+                            theme={
+                                quota.monthly.percentage > 90
+                                    ? 'danger'
+                                    : quota.monthly.percentage > 80
+                                      ? 'warning'
+                                      : 'normal'
+                            }
+                            size="xs"
+                        >
                             {formatCost(quota.monthly.used)} / {formatLimit(quota.monthly.limit)}
-                        </Text>
+                        </Label>
 
                         {quota.monthly.limit !== Infinity && (
                             <Progress

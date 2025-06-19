@@ -59,7 +59,6 @@ export interface ChatDelta {
 
 export interface ChatState {
     messages: ChatMessage[];
-    isLoading: boolean;
     isStreaming: boolean;
     error: string | null;
     sessionId: string | null;
