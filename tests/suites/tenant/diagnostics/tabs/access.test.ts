@@ -84,7 +84,7 @@ test.describe('Diagnostics Access tab', async () => {
         await expect(diagnostics.isGrantAccessDrawerVisible()).resolves.toBe(true);
     });
 
-    test.only('Can grant full access to a new subject', async ({page}) => {
+    test('Can grant full access to a new subject', async ({page}) => {
         const pageQueryParams = {
             schema: '/local/.sys_health',
             database: '/local',
