@@ -5,6 +5,7 @@ import {ResponseError} from '../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
+import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {isAccessError} from '../../utils/response';
 
 import {OperationsControls} from './OperationsControls';
@@ -39,6 +40,7 @@ export function Operations({database, scrollContainerRef}: OperationsProps) {
 
     const settings = React.useMemo(() => {
         return {
+            ...DEFAULT_TABLE_SETTINGS,
             sortable: false,
         };
     }, []);
