@@ -1,5 +1,24 @@
 # Changelog
 
+## [9.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.6.3...v9.7.0) (2025-06-20)
+
+
+### Features
+
+* add backups page with custom render ([#2442](https://github.com/ydb-platform/ydb-embedded-ui/issues/2442)) ([b66e8d5](https://github.com/ydb-platform/ydb-embedded-ui/commit/b66e8d50bdf23044f103850310bdec55a400ee54))
+* manage schema object permissions ([#2398](https://github.com/ydb-platform/ydb-embedded-ui/issues/2398)) ([0c89baa](https://github.com/ydb-platform/ydb-embedded-ui/commit/0c89baa3d9f33ae8cc9b67a101815bdcbf5a890d))
+
+
+### Bug Fixes
+
+* **HealthcheckPreview:** use only one query ([#2427](https://github.com/ydb-platform/ydb-embedded-ui/issues/2427)) ([74ca103](https://github.com/ydb-platform/ydb-embedded-ui/commit/74ca10362e45a062fccdd8b4a7691abb7bcc8a4d))
+* **healthcheck:** show groups ids in separate rows ([#2423](https://github.com/ydb-platform/ydb-embedded-ui/issues/2423)) ([eaa789b](https://github.com/ydb-platform/ydb-embedded-ui/commit/eaa789bcdb320ebec137aace2c1e055ef999bd2c))
+* **Network:** require ConnectStatus for host column ([#2429](https://github.com/ydb-platform/ydb-embedded-ui/issues/2429)) ([eccba69](https://github.com/ydb-platform/ydb-embedded-ui/commit/eccba6912daecf540d435b3df2eb3e186ab815ff))
+* **Nodes:** request tablets only if required ([#2433](https://github.com/ydb-platform/ydb-embedded-ui/issues/2433)) ([e1499e9](https://github.com/ydb-platform/ydb-embedded-ui/commit/e1499e9912692e3714708e574f87c77c3d507940))
+* support name param for database ([#2426](https://github.com/ydb-platform/ydb-embedded-ui/issues/2426)) ([ce1fb66](https://github.com/ydb-platform/ydb-embedded-ui/commit/ce1fb6639030e608bab6628f4c45cfd10e9512a5))
+* tests ([#2439](https://github.com/ydb-platform/ydb-embedded-ui/issues/2439)) ([6001e22](https://github.com/ydb-platform/ydb-embedded-ui/commit/6001e22d0b24abf1ff07b8548f9208c494b0afe7))
+* unskip tests ([#2436](https://github.com/ydb-platform/ydb-embedded-ui/issues/2436)) ([76b37bb](https://github.com/ydb-platform/ydb-embedded-ui/commit/76b37bbe8ec36bb91481fbf636bd6d038c5eb726))
+
 ## [9.6.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.6.2...v9.6.3) (2025-06-17)
 
 
