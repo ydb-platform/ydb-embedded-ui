@@ -30,7 +30,10 @@ export interface UIFactory<H extends string = CommonIssueType> {
     getDatabaseLinks?: GetDatabaseLinks;
     getClusterLinks?: GetClusterLinks;
 
-    renderBackups?: () => React.ReactNode;
+    renderBackups?: (props: {
+        database: string;
+        scrollContainerRef: React.RefObject<HTMLDivElement>;
+    }) => React.ReactNode;
 
     healthcheck: {
         getHealthckechViewTitles: GetHealthcheckViewTitles<H>;

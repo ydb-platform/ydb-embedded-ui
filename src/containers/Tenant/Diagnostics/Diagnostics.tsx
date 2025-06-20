@@ -50,7 +50,6 @@ const b = cn('kv-tenant-diagnostics');
 function Diagnostics(props: DiagnosticsProps) {
     const {path, database, type, subType} = useCurrentSchema();
     const containerRef = React.useRef<HTMLDivElement>(null);
-
     const dispatch = useTypedDispatch();
     const {diagnosticsTab = TENANT_DIAGNOSTICS_TABS_IDS.overview} = useTypedSelector(
         (state) => state.tenant,
@@ -165,7 +164,10 @@ function Diagnostics(props: DiagnosticsProps) {
                 return <Operations database={tenantName} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.backups: {
-                return uiFactory.renderBackups?.();
+                return uiFactory.renderBackups?.({
+                    database: tenantName,
+                    scrollContainerRef: containerRef,
+                });
             }
             default: {
                 return <div>No data...</div>;
