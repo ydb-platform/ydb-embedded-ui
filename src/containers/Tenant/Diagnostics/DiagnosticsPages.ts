@@ -37,6 +37,10 @@ const access = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.access,
     title: 'Access',
 };
+const backups = {
+    id: TENANT_DIAGNOSTICS_TABS_IDS.backups,
+    title: 'Backups',
+};
 
 const nodes = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.nodes,
@@ -111,6 +115,7 @@ const DATABASE_PAGES = [
     configs,
     access,
     operations,
+    backups,
 ];
 
 const TABLE_PAGES = [overview, schema, topShards, nodes, graph, tablets, hotKeys, describe, access];
@@ -166,7 +171,12 @@ const pathSubTypeToPages: Record<EPathSubType, Page[] | undefined> = {
 export const getPagesByType = (
     type?: EPathType,
     subType?: EPathSubType,
-    options?: {hasFeatureFlags?: boolean; hasTopicData?: boolean; isTopLevel?: boolean},
+    options?: {
+        hasFeatureFlags?: boolean;
+        hasTopicData?: boolean;
+        isTopLevel?: boolean;
+        hasBackups?: boolean;
+    },
 ) => {
     const subTypePages = subType ? pathSubTypeToPages[subType] : undefined;
     const typePages = type ? pathTypeToPages[type] : undefined;
@@ -180,6 +190,9 @@ export const getPagesByType = (
         if (!options?.hasFeatureFlags) {
             return pages.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.configs);
         }
+    }
+    if (!options?.hasBackups) {
+        return pages.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.backups);
     }
     return pages;
 };
