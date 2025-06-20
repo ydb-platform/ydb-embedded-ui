@@ -22,8 +22,7 @@ test.describe('Diagnostics Access tab', async () => {
         await expect(diagnostics.isOwnerCardVisible()).resolves.toBe(true);
     });
 
-    // TODO: https://github.com/ydb-platform/ydb-embedded-ui/issues/2437
-    test.skip('Can change owner on access tab', async ({page}) => {
+    test('Can change owner on access tab', async ({page}) => {
         const pageQueryParams = {
             schema: '/local/.sys_health',
             database: '/local',
@@ -39,21 +38,20 @@ test.describe('Diagnostics Access tab', async () => {
         const initialOwnerName = await diagnostics.getOwnerName();
 
         // Change the owner to "John Dow"
-        const newOwnerName = 'John Dow';
+        const newOwnerName = initialOwnerName + 'new';
         await diagnostics.changeOwner(newOwnerName);
 
         // Verify the owner has been changed
         const updatedOwnerName = await diagnostics.getOwnerName();
         expect(updatedOwnerName).toBe(newOwnerName);
-        expect(updatedOwnerName).not.toBe(initialOwnerName);
     });
 
-    // TODO: https://github.com/ydb-platform/ydb-embedded-ui/issues/2437
-    test.skip('Owner card is visible after navigating to access tab', async ({page}) => {
+    test('Owner card is visible after navigating to access tab', async ({page}) => {
         const pageQueryParams = {
-            schema: '/dev02/home/xenoxeno/db1/my_row_table',
-            database: '/dev02/home/xenoxeno/db1',
+            schema: '/local/.sys_health',
+            database: '/local',
             tenantPage: 'diagnostics',
+            diagnosticsTab: 'access',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
