@@ -11,6 +11,8 @@ export const COLUMNS_NAMES = {
     CREATE_TIME: 'create_time',
     END_TIME: 'end_time',
     DURATION: 'duration',
+    STATE: 'state',
+    PROGRESS: 'progress',
 } as const;
 
 export const COLUMNS_TITLES = {
@@ -20,6 +22,8 @@ export const COLUMNS_TITLES = {
     [COLUMNS_NAMES.CREATE_TIME]: i18n('column_createTime'),
     [COLUMNS_NAMES.END_TIME]: i18n('column_endTime'),
     [COLUMNS_NAMES.DURATION]: i18n('column_duration'),
+    [COLUMNS_NAMES.STATE]: i18n('column_state'),
+    [COLUMNS_NAMES.PROGRESS]: i18n('column_progress'),
 } as const;
 
 export const BASE_COLUMNS = [
