@@ -1,5 +1,14 @@
 # Changelog
 
+## [9.7.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.7.0...v9.7.1) (2025-06-21)
+
+
+### Bug Fixes
+
+* **Clusters:** filter empty DC ([#2453](https://github.com/ydb-platform/ydb-embedded-ui/issues/2453)) ([a106b5e](https://github.com/ydb-platform/ydb-embedded-ui/commit/a106b5e5aeb066b8f84e30d87c9c9b9af7cfd2f0))
+* **Clusters:** size s for actions menu ([#2451](https://github.com/ydb-platform/ydb-embedded-ui/issues/2451)) ([d9a4c44](https://github.com/ydb-platform/ydb-embedded-ui/commit/d9a4c441dd3f4a62da1104d98f2c50ac3df094ac))
+* **Cluster:** use cluster name if title is empty string ([#2452](https://github.com/ydb-platform/ydb-embedded-ui/issues/2452)) ([1c8a6c0](https://github.com/ydb-platform/ydb-embedded-ui/commit/1c8a6c0eb52d93f7becaff718b4590d346804d9f))
+
 ## [9.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.6.3...v9.7.0) (2025-06-20)
 
 
