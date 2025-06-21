@@ -147,7 +147,7 @@ export function useClusterBaseInfo() {
     // Name: ydb_vla_dev02
     // Title: YDB DEV VLA02
     const clusterName = name ?? clusterNameFromQuery ?? undefined;
-    const clusterTitle = title ?? clusterName;
+    const clusterTitle = title || clusterName;
 
     return {
         ...data,
