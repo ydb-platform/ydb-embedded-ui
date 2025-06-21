@@ -1,0 +1,436 @@
+{
+  "config": {
+    "configFile": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/playwright.config.ts",
+    "rootDir": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/playwrightSetup.ts",
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 2
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "./playwright-artifacts/playwright-report"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "./playwright-artifacts/test-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 15000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/playwright-artifacts/test-results",
+        "repeatEach": 1,
+        "retries": 2,
+        "metadata": {},
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 120000
+      },
+      {
+        "outputDir": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/playwright-artifacts/test-results",
+        "repeatEach": 1,
+        "retries": 2,
+        "metadata": {},
+        "id": "safari",
+        "name": "safari",
+        "testDir": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 120000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.50.1",
+    "workers": 2,
+    "webServer": {
+      "command": "npm run dev",
+      "env": {
+        "REACT_APP_DISABLE_CHECKS": "true"
+      },
+      "port": 3000,
+      "reuseExistingServer": false
+    }
+  },
+  "suites": [
+    {
+      "title": "tenant/queryEditor/queryEditor.test.ts",
+      "file": "tenant/queryEditor/queryEditor.test.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Test Query Editor",
+          "file": "tenant/queryEditor/queryEditor.test.ts",
+          "line": 25,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Streaming query shows some results and banner when stop button is clicked",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "status": "failed",
+                      "duration": 23401,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mresolves\u001b[2m.\u001b[22mtoBe\u001b[2m()\u001b[22m\n\nReceived promise rejected instead of resolved\nRejected to value: \u001b[31m[TimeoutError: locator.waitFor: Timeout 10000ms exceeded.\u001b[39m\n\u001b[31mCall log:\u001b[39m\n\u001b[31m\u001b[2m  - waiting for locator('.query-editor').locator('.ydb-query-stopped-banner') to be visible\u001b[22m\u001b[39m\n\u001b[31m]\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mresolves\u001b[2m.\u001b[22mtoBe\u001b[2m()\u001b[22m\n\nReceived promise rejected instead of resolved\nRejected to value: \u001b[31m[TimeoutError: locator.waitFor: Timeout 10000ms exceeded.\u001b[39m\n\u001b[31mCall log:\u001b[39m\n\u001b[31m\u001b[2m  - waiting for locator('.query-editor').locator('.ydb-query-stopped-banner') to be visible\u001b[22m\u001b[39m\n\u001b[31m]\u001b[39m\n    at /home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts:167:21",
+                        "location": {
+                          "file": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts",
+                          "column": 21,
+                          "line": 167
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 165 |\u001b[39m         \u001b[36mawait\u001b[39m queryEditor\u001b[33m.\u001b[39mclickStopButton()\u001b[33m;\u001b[39m\n \u001b[90m 166 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 167 |\u001b[39m         \u001b[36mawait\u001b[39m expect(queryEditor\u001b[33m.\u001b[39misStopBannerVisible())\u001b[33m.\u001b[39mresolves\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 168 |\u001b[39m         \u001b[36mawait\u001b[39m expect(queryEditor\u001b[33m.\u001b[39mresultTable\u001b[33m.\u001b[39mgetResultTitleText())\u001b[33m.\u001b[39mresolves\u001b[33m.\u001b[39mtoBe(\u001b[32m'Result'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 169 |\u001b[39m         \u001b[36mawait\u001b[39m expect(\n \u001b[90m 170 |\u001b[39m             \u001b[33mPromise\u001b[39m\u001b[33m.\u001b[39mresolve(\u001b[33mNumber\u001b[39m(\u001b[36mawait\u001b[39m queryEditor\u001b[33m.\u001b[39mresultTable\u001b[33m.\u001b[39mgetResultTitleCount()))\u001b[33m,\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts",
+                            "column": 21,
+                            "line": 167
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mresolves\u001b[2m.\u001b[22mtoBe\u001b[2m()\u001b[22m\n\nReceived promise rejected instead of resolved\nRejected to value: \u001b[31m[TimeoutError: locator.waitFor: Timeout 10000ms exceeded.\u001b[39m\n\u001b[31mCall log:\u001b[39m\n\u001b[31m\u001b[2m  - waiting for locator('.query-editor').locator('.ydb-query-stopped-banner') to be visible\u001b[22m\u001b[39m\n\u001b[31m]\u001b[39m\n\n  165 |         await queryEditor.clickStopButton();\n  166 |\n> 167 |         await expect(queryEditor.isStopBannerVisible()).resolves.toBe(true);\n      |                     ^\n  168 |         await expect(queryEditor.resultTable.getResultTitleText()).resolves.toBe('Result');\n  169 |         await expect(\n  170 |             Promise.resolve(Number(await queryEditor.resultTable.getResultTitleCount())),\n    at /home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts:167:21"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-09T16:10:23.582Z",
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/playwright-artifacts/test-results/tenant-queryEditor-queryEd-00c5f-when-stop-button-is-clicked-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/playwright-artifacts/test-results/tenant-queryEditor-queryEd-00c5f-when-stop-button-is-clicked-chromium/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts",
+                        "column": 21,
+                        "line": 167
+                      }
+                    },
+                    {
+                      "workerIndex": 2,
+                      "status": "failed",
+                      "duration": 17167,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mresolves\u001b[2m.\u001b[22mtoBe\u001b[2m()\u001b[22m\n\nReceived promise rejected instead of resolved\nRejected to value: \u001b[31m[TimeoutError: locator.waitFor: Timeout 10000ms exceeded.\u001b[39m\n\u001b[31mCall log:\u001b[39m\n\u001b[31m\u001b[2m  - waiting for locator('.query-editor').locator('.ydb-query-stopped-banner') to be visible\u001b[22m\u001b[39m\n\u001b[31m]\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mresolves\u001b[2m.\u001b[22mtoBe\u001b[2m()\u001b[22m\n\nReceived promise rejected instead of resolved\nRejected to value: \u001b[31m[TimeoutError: locator.waitFor: Timeout 10000ms exceeded.\u001b[39m\n\u001b[31mCall log:\u001b[39m\n\u001b[31m\u001b[2m  - waiting for locator('.query-editor').locator('.ydb-query-stopped-banner') to be visible\u001b[22m\u001b[39m\n\u001b[31m]\u001b[39m\n    at /home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts:167:21",
+                        "location": {
+                          "file": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts",
+                          "column": 21,
+                          "line": 167
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 165 |\u001b[39m         \u001b[36mawait\u001b[39m queryEditor\u001b[33m.\u001b[39mclickStopButton()\u001b[33m;\u001b[39m\n \u001b[90m 166 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 167 |\u001b[39m         \u001b[36mawait\u001b[39m expect(queryEditor\u001b[33m.\u001b[39misStopBannerVisible())\u001b[33m.\u001b[39mresolves\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 168 |\u001b[39m         \u001b[36mawait\u001b[39m expect(queryEditor\u001b[33m.\u001b[39mresultTable\u001b[33m.\u001b[39mgetResultTitleText())\u001b[33m.\u001b[39mresolves\u001b[33m.\u001b[39mtoBe(\u001b[32m'Result'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 169 |\u001b[39m         \u001b[36mawait\u001b[39m expect(\n \u001b[90m 170 |\u001b[39m             \u001b[33mPromise\u001b[39m\u001b[33m.\u001b[39mresolve(\u001b[33mNumber\u001b[39m(\u001b[36mawait\u001b[39m queryEditor\u001b[33m.\u001b[39mresultTable\u001b[33m.\u001b[39mgetResultTitleCount()))\u001b[33m,\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts",
+                            "column": 21,
+                            "line": 167
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mresolves\u001b[2m.\u001b[22mtoBe\u001b[2m()\u001b[22m\n\nReceived promise rejected instead of resolved\nRejected to value: \u001b[31m[TimeoutError: locator.waitFor: Timeout 10000ms exceeded.\u001b[39m\n\u001b[31mCall log:\u001b[39m\n\u001b[31m\u001b[2m  - waiting for locator('.query-editor').locator('.ydb-query-stopped-banner') to be visible\u001b[22m\u001b[39m\n\u001b[31m]\u001b[39m\n\n  165 |         await queryEditor.clickStopButton();\n  166 |\n> 167 |         await expect(queryEditor.isStopBannerVisible()).resolves.toBe(true);\n      |                     ^\n  168 |         await expect(queryEditor.resultTable.getResultTitleText()).resolves.toBe('Result');\n  169 |         await expect(\n  170 |             Promise.resolve(Number(await queryEditor.resultTable.getResultTitleCount())),\n    at /home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts:167:21"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2025-06-09T16:10:47.785Z",
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/playwright-artifacts/test-results/tenant-queryEditor-queryEd-00c5f-when-stop-button-is-clicked-chromium-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/playwright-artifacts/test-results/tenant-queryEditor-queryEd-00c5f-when-stop-button-is-clicked-chromium-retry1/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/playwright-artifacts/test-results/tenant-queryEditor-queryEd-00c5f-when-stop-button-is-clicked-chromium-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts",
+                        "column": 21,
+                        "line": 167
+                      }
+                    },
+                    {
+                      "workerIndex": 4,
+                      "status": "failed",
+                      "duration": 16794,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mresolves\u001b[2m.\u001b[22mtoBe\u001b[2m()\u001b[22m\n\nReceived promise rejected instead of resolved\nRejected to value: \u001b[31m[TimeoutError: locator.waitFor: Timeout 10000ms exceeded.\u001b[39m\n\u001b[31mCall log:\u001b[39m\n\u001b[31m\u001b[2m  - waiting for locator('.query-editor').locator('.ydb-query-stopped-banner') to be visible\u001b[22m\u001b[39m\n\u001b[31m]\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mresolves\u001b[2m.\u001b[22mtoBe\u001b[2m()\u001b[22m\n\nReceived promise rejected instead of resolved\nRejected to value: \u001b[31m[TimeoutError: locator.waitFor: Timeout 10000ms exceeded.\u001b[39m\n\u001b[31mCall log:\u001b[39m\n\u001b[31m\u001b[2m  - waiting for locator('.query-editor').locator('.ydb-query-stopped-banner') to be visible\u001b[22m\u001b[39m\n\u001b[31m]\u001b[39m\n    at /home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts:167:21",
+                        "location": {
+                          "file": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts",
+                          "column": 21,
+                          "line": 167
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 165 |\u001b[39m         \u001b[36mawait\u001b[39m queryEditor\u001b[33m.\u001b[39mclickStopButton()\u001b[33m;\u001b[39m\n \u001b[90m 166 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 167 |\u001b[39m         \u001b[36mawait\u001b[39m expect(queryEditor\u001b[33m.\u001b[39misStopBannerVisible())\u001b[33m.\u001b[39mresolves\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 168 |\u001b[39m         \u001b[36mawait\u001b[39m expect(queryEditor\u001b[33m.\u001b[39mresultTable\u001b[33m.\u001b[39mgetResultTitleText())\u001b[33m.\u001b[39mresolves\u001b[33m.\u001b[39mtoBe(\u001b[32m'Result'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 169 |\u001b[39m         \u001b[36mawait\u001b[39m expect(\n \u001b[90m 170 |\u001b[39m             \u001b[33mPromise\u001b[39m\u001b[33m.\u001b[39mresolve(\u001b[33mNumber\u001b[39m(\u001b[36mawait\u001b[39m queryEditor\u001b[33m.\u001b[39mresultTable\u001b[33m.\u001b[39mgetResultTitleCount()))\u001b[33m,\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts",
+                            "column": 21,
+                            "line": 167
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mresolves\u001b[2m.\u001b[22mtoBe\u001b[2m()\u001b[22m\n\nReceived promise rejected instead of resolved\nRejected to value: \u001b[31m[TimeoutError: locator.waitFor: Timeout 10000ms exceeded.\u001b[39m\n\u001b[31mCall log:\u001b[39m\n\u001b[31m\u001b[2m  - waiting for locator('.query-editor').locator('.ydb-query-stopped-banner') to be visible\u001b[22m\u001b[39m\n\u001b[31m]\u001b[39m\n\n  165 |         await queryEditor.clickStopButton();\n  166 |\n> 167 |         await expect(queryEditor.isStopBannerVisible()).resolves.toBe(true);\n      |                     ^\n  168 |         await expect(queryEditor.resultTable.getResultTitleText()).resolves.toBe('Result');\n  169 |         await expect(\n  170 |             Promise.resolve(Number(await queryEditor.resultTable.getResultTitleCount())),\n    at /home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts:167:21"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 2,
+                      "startTime": "2025-06-09T16:11:06.317Z",
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/playwright-artifacts/test-results/tenant-queryEditor-queryEd-00c5f-when-stop-button-is-clicked-chromium-retry2/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/playwright-artifacts/test-results/tenant-queryEditor-queryEd-00c5f-when-stop-button-is-clicked-chromium-retry2/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts",
+                        "column": 21,
+                        "line": 167
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "1edf77f8061520e77ee2-09486742b6c8b99d6a76",
+              "file": "tenant/queryEditor/queryEditor.test.ts",
+              "line": 146,
+              "column": 10
+            },
+            {
+              "title": "Streaming query shows some results and banner when stop button is clicked",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "safari",
+                  "projectName": "safari",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "status": "failed",
+                      "duration": 27019,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mresolves\u001b[2m.\u001b[22mtoBe\u001b[2m()\u001b[22m\n\nReceived promise rejected instead of resolved\nRejected to value: \u001b[31m[TimeoutError: locator.waitFor: Timeout 10000ms exceeded.\u001b[39m\n\u001b[31mCall log:\u001b[39m\n\u001b[31m\u001b[2m  - waiting for locator('.query-editor').locator('.ydb-query-stopped-banner') to be visible\u001b[22m\u001b[39m\n\u001b[31m]\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mresolves\u001b[2m.\u001b[22mtoBe\u001b[2m()\u001b[22m\n\nReceived promise rejected instead of resolved\nRejected to value: \u001b[31m[TimeoutError: locator.waitFor: Timeout 10000ms exceeded.\u001b[39m\n\u001b[31mCall log:\u001b[39m\n\u001b[31m\u001b[2m  - waiting for locator('.query-editor').locator('.ydb-query-stopped-banner') to be visible\u001b[22m\u001b[39m\n\u001b[31m]\u001b[39m\n    at /home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts:167:21",
+                        "location": {
+                          "file": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts",
+                          "column": 21,
+                          "line": 167
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 165 |\u001b[39m         \u001b[36mawait\u001b[39m queryEditor\u001b[33m.\u001b[39mclickStopButton()\u001b[33m;\u001b[39m\n \u001b[90m 166 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 167 |\u001b[39m         \u001b[36mawait\u001b[39m expect(queryEditor\u001b[33m.\u001b[39misStopBannerVisible())\u001b[33m.\u001b[39mresolves\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 168 |\u001b[39m         \u001b[36mawait\u001b[39m expect(queryEditor\u001b[33m.\u001b[39mresultTable\u001b[33m.\u001b[39mgetResultTitleText())\u001b[33m.\u001b[39mresolves\u001b[33m.\u001b[39mtoBe(\u001b[32m'Result'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 169 |\u001b[39m         \u001b[36mawait\u001b[39m expect(\n \u001b[90m 170 |\u001b[39m             \u001b[33mPromise\u001b[39m\u001b[33m.\u001b[39mresolve(\u001b[33mNumber\u001b[39m(\u001b[36mawait\u001b[39m queryEditor\u001b[33m.\u001b[39mresultTable\u001b[33m.\u001b[39mgetResultTitleCount()))\u001b[33m,\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts",
+                            "column": 21,
+                            "line": 167
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mresolves\u001b[2m.\u001b[22mtoBe\u001b[2m()\u001b[22m\n\nReceived promise rejected instead of resolved\nRejected to value: \u001b[31m[TimeoutError: locator.waitFor: Timeout 10000ms exceeded.\u001b[39m\n\u001b[31mCall log:\u001b[39m\n\u001b[31m\u001b[2m  - waiting for locator('.query-editor').locator('.ydb-query-stopped-banner') to be visible\u001b[22m\u001b[39m\n\u001b[31m]\u001b[39m\n\n  165 |         await queryEditor.clickStopButton();\n  166 |\n> 167 |         await expect(queryEditor.isStopBannerVisible()).resolves.toBe(true);\n      |                     ^\n  168 |         await expect(queryEditor.resultTable.getResultTitleText()).resolves.toBe('Result');\n  169 |         await expect(\n  170 |             Promise.resolve(Number(await queryEditor.resultTable.getResultTitleCount())),\n    at /home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts:167:21"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-06-09T16:10:23.468Z",
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/playwright-artifacts/test-results/tenant-queryEditor-queryEd-00c5f-when-stop-button-is-clicked-safari/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/playwright-artifacts/test-results/tenant-queryEditor-queryEd-00c5f-when-stop-button-is-clicked-safari/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts",
+                        "column": 21,
+                        "line": 167
+                      }
+                    },
+                    {
+                      "workerIndex": 3,
+                      "status": "failed",
+                      "duration": 20912,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mresolves\u001b[2m.\u001b[22mtoBe\u001b[2m()\u001b[22m\n\nReceived promise rejected instead of resolved\nRejected to value: \u001b[31m[TimeoutError: locator.waitFor: Timeout 10000ms exceeded.\u001b[39m\n\u001b[31mCall log:\u001b[39m\n\u001b[31m\u001b[2m  - waiting for locator('.query-editor').locator('.ydb-query-stopped-banner') to be visible\u001b[22m\u001b[39m\n\u001b[31m]\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mresolves\u001b[2m.\u001b[22mtoBe\u001b[2m()\u001b[22m\n\nReceived promise rejected instead of resolved\nRejected to value: \u001b[31m[TimeoutError: locator.waitFor: Timeout 10000ms exceeded.\u001b[39m\n\u001b[31mCall log:\u001b[39m\n\u001b[31m\u001b[2m  - waiting for locator('.query-editor').locator('.ydb-query-stopped-banner') to be visible\u001b[22m\u001b[39m\n\u001b[31m]\u001b[39m\n    at /home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts:167:21",
+                        "location": {
+                          "file": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts",
+                          "column": 21,
+                          "line": 167
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 165 |\u001b[39m         \u001b[36mawait\u001b[39m queryEditor\u001b[33m.\u001b[39mclickStopButton()\u001b[33m;\u001b[39m\n \u001b[90m 166 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 167 |\u001b[39m         \u001b[36mawait\u001b[39m expect(queryEditor\u001b[33m.\u001b[39misStopBannerVisible())\u001b[33m.\u001b[39mresolves\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 168 |\u001b[39m         \u001b[36mawait\u001b[39m expect(queryEditor\u001b[33m.\u001b[39mresultTable\u001b[33m.\u001b[39mgetResultTitleText())\u001b[33m.\u001b[39mresolves\u001b[33m.\u001b[39mtoBe(\u001b[32m'Result'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 169 |\u001b[39m         \u001b[36mawait\u001b[39m expect(\n \u001b[90m 170 |\u001b[39m             \u001b[33mPromise\u001b[39m\u001b[33m.\u001b[39mresolve(\u001b[33mNumber\u001b[39m(\u001b[36mawait\u001b[39m queryEditor\u001b[33m.\u001b[39mresultTable\u001b[33m.\u001b[39mgetResultTitleCount()))\u001b[33m,\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts",
+                            "column": 21,
+                            "line": 167
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mresolves\u001b[2m.\u001b[22mtoBe\u001b[2m()\u001b[22m\n\nReceived promise rejected instead of resolved\nRejected to value: \u001b[31m[TimeoutError: locator.waitFor: Timeout 10000ms exceeded.\u001b[39m\n\u001b[31mCall log:\u001b[39m\n\u001b[31m\u001b[2m  - waiting for locator('.query-editor').locator('.ydb-query-stopped-banner') to be visible\u001b[22m\u001b[39m\n\u001b[31m]\u001b[39m\n\n  165 |         await queryEditor.clickStopButton();\n  166 |\n> 167 |         await expect(queryEditor.isStopBannerVisible()).resolves.toBe(true);\n      |                     ^\n  168 |         await expect(queryEditor.resultTable.getResultTitleText()).resolves.toBe('Result');\n  169 |         await expect(\n  170 |             Promise.resolve(Number(await queryEditor.resultTable.getResultTitleCount())),\n    at /home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts:167:21"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2025-06-09T16:10:52.715Z",
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/playwright-artifacts/test-results/tenant-queryEditor-queryEd-00c5f-when-stop-button-is-clicked-safari-retry1/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/playwright-artifacts/test-results/tenant-queryEditor-queryEd-00c5f-when-stop-button-is-clicked-safari-retry1/video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/playwright-artifacts/test-results/tenant-queryEditor-queryEd-00c5f-when-stop-button-is-clicked-safari-retry1/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts",
+                        "column": 21,
+                        "line": 167
+                      }
+                    },
+                    {
+                      "workerIndex": 5,
+                      "status": "failed",
+                      "duration": 18577,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mresolves\u001b[2m.\u001b[22mtoBe\u001b[2m()\u001b[22m\n\nReceived promise rejected instead of resolved\nRejected to value: \u001b[31m[TimeoutError: locator.waitFor: Timeout 10000ms exceeded.\u001b[39m\n\u001b[31mCall log:\u001b[39m\n\u001b[31m\u001b[2m  - waiting for locator('.query-editor').locator('.ydb-query-stopped-banner') to be visible\u001b[22m\u001b[39m\n\u001b[31m]\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mresolves\u001b[2m.\u001b[22mtoBe\u001b[2m()\u001b[22m\n\nReceived promise rejected instead of resolved\nRejected to value: \u001b[31m[TimeoutError: locator.waitFor: Timeout 10000ms exceeded.\u001b[39m\n\u001b[31mCall log:\u001b[39m\n\u001b[31m\u001b[2m  - waiting for locator('.query-editor').locator('.ydb-query-stopped-banner') to be visible\u001b[22m\u001b[39m\n\u001b[31m]\u001b[39m\n    at /home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts:167:21",
+                        "location": {
+                          "file": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts",
+                          "column": 21,
+                          "line": 167
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 165 |\u001b[39m         \u001b[36mawait\u001b[39m queryEditor\u001b[33m.\u001b[39mclickStopButton()\u001b[33m;\u001b[39m\n \u001b[90m 166 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 167 |\u001b[39m         \u001b[36mawait\u001b[39m expect(queryEditor\u001b[33m.\u001b[39misStopBannerVisible())\u001b[33m.\u001b[39mresolves\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 168 |\u001b[39m         \u001b[36mawait\u001b[39m expect(queryEditor\u001b[33m.\u001b[39mresultTable\u001b[33m.\u001b[39mgetResultTitleText())\u001b[33m.\u001b[39mresolves\u001b[33m.\u001b[39mtoBe(\u001b[32m'Result'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 169 |\u001b[39m         \u001b[36mawait\u001b[39m expect(\n \u001b[90m 170 |\u001b[39m             \u001b[33mPromise\u001b[39m\u001b[33m.\u001b[39mresolve(\u001b[33mNumber\u001b[39m(\u001b[36mawait\u001b[39m queryEditor\u001b[33m.\u001b[39mresultTable\u001b[33m.\u001b[39mgetResultTitleCount()))\u001b[33m,\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts",
+                            "column": 21,
+                            "line": 167
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mresolves\u001b[2m.\u001b[22mtoBe\u001b[2m()\u001b[22m\n\nReceived promise rejected instead of resolved\nRejected to value: \u001b[31m[TimeoutError: locator.waitFor: Timeout 10000ms exceeded.\u001b[39m\n\u001b[31mCall log:\u001b[39m\n\u001b[31m\u001b[2m  - waiting for locator('.query-editor').locator('.ydb-query-stopped-banner') to be visible\u001b[22m\u001b[39m\n\u001b[31m]\u001b[39m\n\n  165 |         await queryEditor.clickStopButton();\n  166 |\n> 167 |         await expect(queryEditor.isStopBannerVisible()).resolves.toBe(true);\n      |                     ^\n  168 |         await expect(queryEditor.resultTable.getResultTitleText()).resolves.toBe('Result');\n  169 |         await expect(\n  170 |             Promise.resolve(Number(await queryEditor.resultTable.getResultTitleCount())),\n    at /home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts:167:21"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 2,
+                      "startTime": "2025-06-09T16:11:14.801Z",
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/playwright-artifacts/test-results/tenant-queryEditor-queryEd-00c5f-when-stop-button-is-clicked-safari-retry2/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/playwright-artifacts/test-results/tenant-queryEditor-queryEd-00c5f-when-stop-button-is-clicked-safari-retry2/video.webm"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/runner/work/ydb-embedded-ui/ydb-embedded-ui/tests/suites/tenant/queryEditor/queryEditor.test.ts",
+                        "column": 21,
+                        "line": 167
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "1edf77f8061520e77ee2-d3b4a0dcd4c08f09e93d",
+              "file": "tenant/queryEditor/queryEditor.test.ts",
+              "line": 146,
+              "column": 10
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-06-09T16:08:27.669Z",
+    "duration": 186231.657,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}
