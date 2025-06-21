@@ -8,7 +8,7 @@ const newSubject = 'foo';
 test.describe('Diagnostics Access tab', async () => {
     test('Access tab shows owner card', async ({page}) => {
         const pageQueryParams = {
-            schema: '/local/.sys_health',
+            schema: '/local',
             database: '/local',
             tenantPage: 'diagnostics',
             diagnosticsTab: 'access',
@@ -24,7 +24,7 @@ test.describe('Diagnostics Access tab', async () => {
 
     test('Can change owner on access tab', async ({page}) => {
         const pageQueryParams = {
-            schema: '/local/.sys_health',
+            schema: '/local',
             database: '/local',
             tenantPage: 'diagnostics',
             diagnosticsTab: 'access',
@@ -48,7 +48,7 @@ test.describe('Diagnostics Access tab', async () => {
 
     test('Owner card is visible after navigating to access tab', async ({page}) => {
         const pageQueryParams = {
-            schema: '/local/.sys_health',
+            schema: '/local',
             database: '/local',
             tenantPage: 'diagnostics',
             diagnosticsTab: 'access',
@@ -67,7 +67,7 @@ test.describe('Diagnostics Access tab', async () => {
 
     test('Grant Access button opens grant access drawer', async ({page}) => {
         const pageQueryParams = {
-            schema: '/local/.sys_health',
+            schema: '/local',
             database: '/local',
             tenantPage: 'diagnostics',
             diagnosticsTab: 'access',
@@ -86,7 +86,7 @@ test.describe('Diagnostics Access tab', async () => {
 
     test('Can grant full access to a new subject', async ({page}) => {
         const pageQueryParams = {
-            schema: '/local/.sys_health',
+            schema: '/local',
             database: '/local',
             tenantPage: 'diagnostics',
             diagnosticsTab: 'access',
