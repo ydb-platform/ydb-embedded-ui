@@ -273,7 +273,7 @@ test.describe('Object Summary', async () => {
     test('ACL tab shows redirect message and link to Diagnostics', async ({page}) => {
         // Define the URL parameters
         const pageQueryParams = {
-            schema: '/local/.sys_health',
+            schema: '/local',
             database: '/local',
             summaryTab: 'acl',
             tenantPage: 'query',
@@ -308,7 +308,7 @@ test.describe('Object Summary', async () => {
             tenantPage: 'diagnostics',
             diagnosticsTab: 'access',
             summaryTab: 'acl',
-            schema: '/local/.sys_health',
+            schema: '/local',
             database: '/local',
         });
 
