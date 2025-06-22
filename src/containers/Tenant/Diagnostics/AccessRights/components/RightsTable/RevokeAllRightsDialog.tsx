@@ -79,62 +79,59 @@ function RevokeAllRightsDialog({
     const [requestErrorMessage, setRequestErrorMessage] = React.useState('');
     const [removeAccess, removeAccessResponse] = schemaAclApi.useUpdateAccessMutation();
 
+    const onApply = () => {
+        removeAccess({
+            path,
+            database,
+            rights: {
+                RemoveAccess: [
+                    {
+                        Subject: subject,
+                        AccessRights: Array.from(subjectExplicitRights),
+                        AccessType: 'Allow',
+                    },
+                ],
+            },
+        })
+            .unwrap()
+            .then(() => {
+                onClose();
+                createToast({
+                    name: 'revokeAllRights',
+                    content: i18n('description_rights-revoked'),
+                    autoHiding: 3000,
+                });
+            })
+            .catch((error) => {
+                setRequestErrorMessage(prepareErrorMessage(error));
+            });
+    };
+
     return (
         <Dialog open={open} size="s" onClose={onClose}>
             <Dialog.Header caption={i18n('label_revoke-all-rights')} />
-            <form
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    removeAccess({
-                        path,
-                        database,
-                        rights: {
-                            RemoveAccess: [
-                                {
-                                    Subject: subject,
-                                    AccessRights: Array.from(subjectExplicitRights),
-                                    AccessType: 'Allow',
-                                },
-                            ],
-                        },
-                    })
-                        .unwrap()
-                        .then(() => {
-                            onClose();
-                            createToast({
-                                name: 'revokeAllRights',
-                                content: i18n('description_rights-revoked'),
-                                autoHiding: 3000,
-                            });
-                        })
-                        .catch((error) => {
-                            setRequestErrorMessage(prepareErrorMessage(error));
-                        });
+            <Dialog.Body>
+                <Flex direction="column" gap={5}>
+                    <Text variant="body-2">{i18n('description_revoke-all-rights')}</Text>
+                    <SubjectWithAvatar subject={subject} />
+                </Flex>
+            </Dialog.Body>
+            <Dialog.Footer
+                onClickButtonApply={onApply}
+                textButtonCancel={i18n('action_cancel')}
+                textButtonApply={i18n('action_revoke')}
+                onClickButtonCancel={onClose}
+                propsButtonApply={{
+                    loading: removeAccessResponse.isLoading,
+                    view: 'outlined-danger',
                 }}
             >
-                <Dialog.Body>
-                    <Flex direction="column" gap={5}>
-                        <Text variant="body-2">{i18n('description_revoke-all-rights')}</Text>
-                        <SubjectWithAvatar subject={subject} />
-                    </Flex>
-                </Dialog.Body>
-                <Dialog.Footer
-                    textButtonCancel={i18n('action_cancel')}
-                    textButtonApply={i18n('action_revoke')}
-                    onClickButtonCancel={onClose}
-                    propsButtonApply={{
-                        type: 'submit',
-                        loading: removeAccessResponse.isLoading,
-                        view: 'outlined-danger',
-                    }}
-                >
-                    {requestErrorMessage && (
-                        <Text color="danger" title={requestErrorMessage}>
-                            {requestErrorMessage}
-                        </Text>
-                    )}
-                </Dialog.Footer>
-            </form>
+                {requestErrorMessage && (
+                    <Text color="danger" title={requestErrorMessage}>
+                        {requestErrorMessage}
+                    </Text>
+                )}
+            </Dialog.Footer>
         </Dialog>
     );
 }

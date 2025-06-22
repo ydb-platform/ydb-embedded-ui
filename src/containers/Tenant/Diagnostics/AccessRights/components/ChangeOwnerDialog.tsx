@@ -66,60 +66,56 @@ function ChangeOwnerDialog({open, onClose, path, database}: ChangeOwnerDialogPro
         setNewOwner(value);
         setRequestErrorMessage('');
     };
+    const onApply = () => {
+        updateOwner({path, database, rights: {ChangeOwnership: {Subject: newOwner}}})
+            .unwrap()
+            .then(() => {
+                onClose();
+                createToast({
+                    name: 'updateOwner',
+                    content: i18n('title_owner-changed'),
+                    autoHiding: 3000,
+                });
+            })
+            .catch((error) => {
+                setRequestErrorMessage(prepareErrorMessage(error));
+            });
+    };
     return (
-        <Dialog open={open} size="s" onClose={onClose}>
+        <Dialog open={open} size="s" onClose={onClose} onEnterKeyDown={onApply}>
             <Dialog.Header caption={i18n('action_change-owner')} />
-            <form
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    updateOwner({path, database, rights: {ChangeOwnership: {Subject: newOwner}}})
-                        .unwrap()
-                        .then(() => {
-                            onClose();
-                            createToast({
-                                name: 'updateOwner',
-                                content: i18n('title_owner-changed'),
-                                autoHiding: 3000,
-                            });
-                        })
-                        .catch((error) => {
-                            setRequestErrorMessage(prepareErrorMessage(error));
-                        });
+            <Dialog.Body>
+                <div className={block('dialog-content-wrapper')}>
+                    <TextInput
+                        id="queryName"
+                        placeholder={i18n('decription_enter-subject')}
+                        value={newOwner}
+                        onUpdate={handleTyping}
+                        hasClear
+                        autoFocus
+                        autoComplete={false}
+                    />
+                    {requestErrorMessage && (
+                        <Text
+                            color="danger"
+                            className={block('dialog-error')}
+                            title={requestErrorMessage}
+                        >
+                            {requestErrorMessage}
+                        </Text>
+                    )}
+                </div>
+            </Dialog.Body>
+            <Dialog.Footer
+                onClickButtonApply={onApply}
+                textButtonCancel={i18n('action_cancel')}
+                textButtonApply={i18n('action_apply')}
+                onClickButtonCancel={onClose}
+                propsButtonApply={{
+                    loading: updateOwnerResponse.isLoading,
+                    disabled: !newOwner.length,
                 }}
-            >
-                <Dialog.Body>
-                    <div className={block('dialog-content-wrapper')}>
-                        <TextInput
-                            id="queryName"
-                            placeholder={i18n('decription_enter-subject')}
-                            value={newOwner}
-                            onUpdate={handleTyping}
-                            hasClear
-                            autoFocus
-                            autoComplete={false}
-                        />
-                        {requestErrorMessage && (
-                            <Text
-                                color="danger"
-                                className={block('dialog-error')}
-                                title={requestErrorMessage}
-                            >
-                                {requestErrorMessage}
-                            </Text>
-                        )}
-                    </div>
-                </Dialog.Body>
-                <Dialog.Footer
-                    textButtonCancel={i18n('action_cancel')}
-                    textButtonApply={i18n('action_apply')}
-                    onClickButtonCancel={onClose}
-                    propsButtonApply={{
-                        type: 'submit',
-                        loading: updateOwnerResponse.isLoading,
-                        disabled: !newOwner.length,
-                    }}
-                />
-            </form>
+            />
         </Dialog>
     );
 }
