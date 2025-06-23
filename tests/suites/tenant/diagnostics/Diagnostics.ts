@@ -325,6 +325,19 @@ export class Diagnostics {
         await this.refreshButton.click();
     }
 
+    async waitForTableDataWithRefresh(maxRetries = 10, refreshInterval = 1000): Promise<boolean> {
+        for (let i = 0; i < maxRetries; i++) {
+            await this.clickRefreshButton();
+            await this.page.waitForTimeout(refreshInterval);
+
+            const rowCount = await this.table.getRowCount();
+            if (rowCount > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     async setAutoRefresh(option: string): Promise<void> {
         await this.autoRefreshSelect.click();
         const optionLocator = this.autoRefreshSelect.locator(`text=${option}`);

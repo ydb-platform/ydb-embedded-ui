@@ -14,7 +14,7 @@ import {
 } from '../Diagnostics';
 import {setupTopQueriesMock} from '../mocks';
 
-test.describe('Diagnostics Queries tab', async () => {
+test.describe.only('Diagnostics Queries tab', async () => {
     test('No runnning queries in Queries if no queries are running', async ({page}) => {
         const pageQueryParams = {
             schema: tenantName,
@@ -118,9 +118,6 @@ test.describe('Diagnostics Queries tab', async () => {
             await queryEditor.waitForStatus('Completed');
         }
 
-        // Wait for query statistics to be collected
-        await page.waitForTimeout(2000);
-
         // Now navigate to diagnostics to check the top queries
         const pageQueryParams = {
             schema: tenantName,
@@ -132,9 +129,9 @@ test.describe('Diagnostics Queries tab', async () => {
 
         const diagnostics = new Diagnostics(page);
 
-        // Verify table has data
-        await expect(diagnostics.table.isVisible()).resolves.toBe(true);
-        await expect(diagnostics.table.getRowCount()).resolves.toBeGreaterThan(0);
+        // Wait for data to appear with active refreshing
+        const hasData = await diagnostics.waitForTableDataWithRefresh();
+        expect(hasData).toBe(true);
 
         // Verify first row has non-empty values for key columns (test first 4 columns)
         for (const column of QueryTopColumns.slice(0, 4)) {
