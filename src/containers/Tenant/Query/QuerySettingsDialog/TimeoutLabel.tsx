@@ -1,4 +1,5 @@
 import {HelpMark, Switch} from '@gravity-ui/uikit';
+import {StringParam, useQueryParams} from 'use-query-params';
 
 import {cn} from '../../../../utils/cn';
 import {ENABLE_QUERY_STREAMING} from '../../../../utils/constants';
@@ -20,7 +21,13 @@ interface TimeoutLabelProps {
 export function TimeoutLabel({isDisabled, isChecked, onToggle}: TimeoutLabelProps) {
     const [isQueryStreamingEnabled] = useSetting<boolean>(ENABLE_QUERY_STREAMING);
 
-    if (isQueryStreamingEnabled) {
+    // Temporary check: disable streaming UI if backend parameter contains "oidc"
+    const [{backend}] = useQueryParams({backend: StringParam});
+    const isOidcBackend = backend && backend.includes('oidc');
+
+    const shouldShowStreamingUI = isQueryStreamingEnabled && !isOidcBackend;
+
+    if (shouldShowStreamingUI) {
         return (
             <div className={b('switch-title')}>
                 <Switch

@@ -2,6 +2,7 @@ import React from 'react';
 
 import type {Settings} from '@gravity-ui/react-data-table';
 import {isEqual} from 'lodash';
+import {StringParam, useQueryParams} from 'use-query-params';
 import {v4 as uuidv4} from 'uuid';
 
 import SplitPane from '../../../../components/SplitPane';
@@ -94,10 +95,15 @@ export default function QueryEditor(props: QueryEditorProps) {
     const [lastExecutedQueryText, setLastExecutedQueryText] = React.useState<string>('');
     const [isQueryStreamingEnabled] = useSetting<boolean>(ENABLE_QUERY_STREAMING);
 
+    // Temporary check: disable streaming if backend parameter contains "oidc"
+    const [{backend}] = useQueryParams({backend: StringParam});
+    const isOidcBackend = backend && backend.includes('oidc');
+
     const isStreamingEnabled =
         useStreamingAvailable() &&
         isQueryStreamingEnabled &&
-        querySettings.queryMode === QUERY_MODES.query;
+        querySettings.queryMode === QUERY_MODES.query &&
+        !isOidcBackend;
 
     const [sendQuery] = queryApi.useUseSendQueryMutation();
     const [streamQuery] = queryApi.useUseStreamQueryMutation();
