@@ -1,7 +1,5 @@
 import React from 'react';
 
-import {StringParam, useQueryParams} from 'use-query-params';
-
 import {useTracingLevelOptionAvailable} from '../../store/reducers/capabilities/hooks';
 import type {QuerySettings} from '../../types/store/query';
 import {
@@ -16,6 +14,7 @@ import {
     querySettingsRestoreSchema,
 } from '../query';
 
+import {useDisableOidcStreaming} from './useDisableOidcStreaming';
 import {useSetting} from './useSetting';
 
 export const useQueryExecutionSettings = () => {
@@ -27,8 +26,7 @@ export const useQueryExecutionSettings = () => {
     const [enableQueryStreaming] = useSetting<boolean>(ENABLE_QUERY_STREAMING);
 
     // Temporary check: disable streaming behavior if backend parameter contains "oidc"
-    const [{backend}] = useQueryParams({backend: StringParam});
-    const isOidcBackend = backend && backend.includes('oidc');
+    const isOidcBackend = useDisableOidcStreaming();
 
     const effectiveStreamingEnabled = enableQueryStreaming && !isOidcBackend;
 

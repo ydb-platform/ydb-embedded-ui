@@ -2,7 +2,6 @@ import React from 'react';
 
 import type {Settings} from '@gravity-ui/react-data-table';
 import {isEqual} from 'lodash';
-import {StringParam, useQueryParams} from 'use-query-params';
 import {v4 as uuidv4} from 'uuid';
 
 import SplitPane from '../../../../components/SplitPane';
@@ -40,6 +39,7 @@ import {
     useTypedSelector,
 } from '../../../../utils/hooks';
 import {useChangedQuerySettings} from '../../../../utils/hooks/useChangedQuerySettings';
+import {useDisableOidcStreaming} from '../../../../utils/hooks/useDisableOidcStreaming';
 import {useLastQueryExecutionSettings} from '../../../../utils/hooks/useLastQueryExecutionSettings';
 import {DEFAULT_QUERY_SETTINGS, QUERY_ACTIONS, QUERY_MODES} from '../../../../utils/query';
 import {useCurrentSchema} from '../../TenantContext';
@@ -96,8 +96,7 @@ export default function QueryEditor(props: QueryEditorProps) {
     const [isQueryStreamingEnabled] = useSetting<boolean>(ENABLE_QUERY_STREAMING);
 
     // Temporary check: disable streaming if backend parameter contains "oidc"
-    const [{backend}] = useQueryParams({backend: StringParam});
-    const isOidcBackend = backend && backend.includes('oidc');
+    const isOidcBackend = useDisableOidcStreaming();
 
     const isStreamingEnabled =
         useStreamingAvailable() &&
