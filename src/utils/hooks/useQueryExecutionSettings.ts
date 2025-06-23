@@ -14,6 +14,7 @@ import {
     querySettingsRestoreSchema,
 } from '../query';
 
+import {useDisableOidcStreaming} from './useDisableOidcStreaming';
 import {useSetting} from './useSetting';
 
 export const useQueryExecutionSettings = () => {
@@ -23,6 +24,11 @@ export const useQueryExecutionSettings = () => {
     const validatedSettings = querySettingsRestoreSchema.parse(storageSettings);
     const [useShowPlanToSvg] = useSetting<boolean>(USE_SHOW_PLAN_SVG_KEY);
     const [enableQueryStreaming] = useSetting<boolean>(ENABLE_QUERY_STREAMING);
+
+    // Temporary check: disable streaming behavior if backend parameter contains "oidc"
+    const isOidcBackend = useDisableOidcStreaming();
+
+    const effectiveStreamingEnabled = enableQueryStreaming && !isOidcBackend;
 
     const setQueryExecutionSettings = React.useCallback(
         (settings: QuerySettings) => {
@@ -39,7 +45,7 @@ export const useQueryExecutionSettings = () => {
     const settings: QuerySettings = {
         ...validatedSettings,
         timeout:
-            enableQueryStreaming && validatedSettings.queryMode === QUERY_MODES.query
+            effectiveStreamingEnabled && validatedSettings.queryMode === QUERY_MODES.query
                 ? validatedSettings.timeout || null
                 : validatedSettings.timeout || undefined,
         statisticsMode: useShowPlanToSvg ? STATISTICS_MODES.full : validatedSettings.statisticsMode,
