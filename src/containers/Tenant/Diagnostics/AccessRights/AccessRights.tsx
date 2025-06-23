@@ -22,7 +22,7 @@ export function AccessRights() {
     const {path, database} = useCurrentSchema();
     const editable = useEditAccessAvailable();
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const {currentData, isFetching, error} = schemaAclApi.useGetSchemaAclQuery(
+    const {isLoading, error} = schemaAclApi.useGetSchemaAclQuery(
         {path, database},
         {
             pollingInterval: autoRefreshInterval,
@@ -30,8 +30,6 @@ export function AccessRights() {
     );
 
     const {handleShowGrantAccessChange} = useTenantQueryParams();
-
-    const loading = isFetching && !currentData;
 
     const renderContent = () => {
         if (error) {
@@ -64,5 +62,5 @@ export function AccessRights() {
         );
     };
 
-    return <LoaderWrapper loading={loading}>{renderContent()}</LoaderWrapper>;
+    return <LoaderWrapper loading={isLoading}>{renderContent()}</LoaderWrapper>;
 }

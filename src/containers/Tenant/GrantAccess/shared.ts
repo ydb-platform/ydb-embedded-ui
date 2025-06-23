@@ -4,7 +4,7 @@ import i18n from './i18n';
 
 export const block = cn('ydb-grant-access');
 
-export const HumanReadableRights: Record<string, number> = {
+export const RightsCodes: Record<string, number> = {
     selectRow: 1,
     updateRow: 2,
     eraseRow: 4,
@@ -31,36 +31,33 @@ export const HumanReadableRights: Record<string, number> = {
 };
 
 export const RightsDescription: Record<number, string> = {
-    [HumanReadableRights.selectRow]: i18n('description_select-row'),
-    [HumanReadableRights.updateRow]: i18n('description_update-row'),
-    [HumanReadableRights.eraseRow]: i18n('description_erase-row'),
-    [HumanReadableRights.writeAttributes]: i18n('description_write-attributes'),
-    [HumanReadableRights.createDirectory]: i18n('description_create-directory'),
-    [HumanReadableRights.createTable]: i18n('description_create-table'),
-    [HumanReadableRights.createQueue]: i18n('description_create-queue'),
-    [HumanReadableRights.removeSchema]: i18n('description_remove-schema'),
-    [HumanReadableRights.alterSchema]: i18n('description_alter-schema'),
-    [HumanReadableRights.createDatabase]: i18n('description_create-database'),
-    [HumanReadableRights.dropDatabase]: i18n('description_drop-database'),
-    [HumanReadableRights.readAttributes]: i18n('description_read-attributes'),
-    [HumanReadableRights.describeSchema]: i18n('description_describe-schema'),
-    [HumanReadableRights.connectDatabase]: i18n('description_connect-database'),
-    [HumanReadableRights.grantAccessRights]: i18n('description_grant-access-rights'),
-    [HumanReadableRights.genericRead]: i18n('description_generic-read'),
-    [HumanReadableRights.genericWrite]: i18n('description_generic-write'),
-    [HumanReadableRights.genericManage]: i18n('description_generic-manage'),
-    [HumanReadableRights.genericList]: i18n('description_generic-list'),
-    [HumanReadableRights.genericUse]: i18n('description_generic-use'),
-    [HumanReadableRights.genericUseLegacy]: i18n('description_generic-use-legacy'),
-    [HumanReadableRights.genericFull]: i18n('description_generic-full'),
-    [HumanReadableRights.genericFullLegacy]: i18n('description_generic-full-legacy'),
+    [RightsCodes.selectRow]: i18n('description_select-row'),
+    [RightsCodes.updateRow]: i18n('description_update-row'),
+    [RightsCodes.eraseRow]: i18n('description_erase-row'),
+    [RightsCodes.writeAttributes]: i18n('description_write-attributes'),
+    [RightsCodes.createDirectory]: i18n('description_create-directory'),
+    [RightsCodes.createTable]: i18n('description_create-table'),
+    [RightsCodes.createQueue]: i18n('description_create-queue'),
+    [RightsCodes.removeSchema]: i18n('description_remove-schema'),
+    [RightsCodes.alterSchema]: i18n('description_alter-schema'),
+    [RightsCodes.createDatabase]: i18n('description_create-database'),
+    [RightsCodes.dropDatabase]: i18n('description_drop-database'),
+    [RightsCodes.readAttributes]: i18n('description_read-attributes'),
+    [RightsCodes.describeSchema]: i18n('description_describe-schema'),
+    [RightsCodes.connectDatabase]: i18n('description_connect-database'),
+    [RightsCodes.grantAccessRights]: i18n('description_grant-access-rights'),
+    [RightsCodes.genericRead]: i18n('description_generic-read'),
+    [RightsCodes.genericWrite]: i18n('description_generic-write'),
+    [RightsCodes.genericManage]: i18n('description_generic-manage'),
+    [RightsCodes.genericList]: i18n('description_generic-list'),
+    [RightsCodes.genericUse]: i18n('description_generic-use'),
+    [RightsCodes.genericUseLegacy]: i18n('description_generic-use-legacy'),
+    [RightsCodes.genericFull]: i18n('description_generic-full'),
+    [RightsCodes.genericFullLegacy]: i18n('description_generic-full-legacy'),
 };
 
 export function isLegacyRight(right: number) {
-    return (
-        right === HumanReadableRights.genericFullLegacy ||
-        right === HumanReadableRights.genericUseLegacy
-    );
+    return right === RightsCodes.genericFullLegacy || right === RightsCodes.genericUseLegacy;
 }
 
 export interface CommonRightsProps {
