@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.6.3-hotfix.5](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.6.3-hotfix.1...v9.6.3-hotfix.5) (2025-06-23)
+
+
+### Bug Fixes
+
+* disable oidc streaming ([#2462](https://github.com/ydb-platform/ydb-embedded-ui/issues/2462)) ([042e544](https://github.com/ydb-platform/ydb-embedded-ui/commit/042e5448ee8215e46c43b1e182428be70164cef0))
+
 ## [9.6.3-hotfix.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.6.3...v9.6.3-hotfix.1) (2025-06-19)
 
 
