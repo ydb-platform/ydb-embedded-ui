@@ -61,10 +61,16 @@ export function useTenantQueryParams() {
         [setQueryParams],
     );
 
+    React.useEffect(() => {
+        if (name && !database) {
+            setQueryParams({database: name, name: undefined}, 'replaceIn');
+        }
+    }, [database, name, setQueryParams]);
+
     return {
         showHealthcheck,
         handleShowHealthcheckChange,
-        database,
+        database: database || name,
         handleDatabaseChange,
         showGrantAccess,
         handleShowGrantAccessChange,
@@ -76,6 +82,5 @@ export function useTenantQueryParams() {
         handleIssuesFilterChange,
         aclSubject,
         handleAclSubjectChange,
-        name,
     };
 }

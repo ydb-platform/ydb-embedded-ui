@@ -52,16 +52,7 @@ export function Tenant(props: TenantProps) {
         getTenantSummaryState,
     );
 
-    // TODO: name is used together with database to keep old links valid, do not remove
-    const {database: queryDatabase, schema, name, handleDatabaseChange} = useTenantQueryParams();
-
-    React.useEffect(() => {
-        if (name && !queryDatabase) {
-            handleDatabaseChange(name);
-        }
-    }, [queryDatabase, name, handleDatabaseChange]);
-
-    const database = queryDatabase ?? name;
+    const {database, schema} = useTenantQueryParams();
 
     if (!database) {
         throw new Error('Tenant name is not defined');
