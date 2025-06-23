@@ -13,6 +13,7 @@ import {
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../types/additionalProps';
+import {uiFactory} from '../../../uiFactory/uiFactory';
 import {cn} from '../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {Heatmap} from '../../Heatmap';
@@ -49,7 +50,6 @@ const b = cn('kv-tenant-diagnostics');
 function Diagnostics(props: DiagnosticsProps) {
     const {path, database, type, subType} = useCurrentSchema();
     const containerRef = React.useRef<HTMLDivElement>(null);
-
     const dispatch = useTypedDispatch();
     const {diagnosticsTab = TENANT_DIAGNOSTICS_TABS_IDS.overview} = useTypedSelector(
         (state) => state.tenant,
@@ -65,6 +65,7 @@ function Diagnostics(props: DiagnosticsProps) {
         hasFeatureFlags,
         hasTopicData,
         isTopLevel: path === database,
+        hasBackups: typeof uiFactory.renderBackups === 'function',
     });
     let activeTab = pages.find((el) => el.id === diagnosticsTab);
     if (!activeTab) {
@@ -77,6 +78,7 @@ function Diagnostics(props: DiagnosticsProps) {
         }
     }, [activeTab, diagnosticsTab, dispatch]);
 
+    // eslint-disable-next-line complexity
     const renderTabContent = () => {
         switch (activeTab?.id) {
             case TENANT_DIAGNOSTICS_TABS_IDS.overview: {
@@ -160,6 +162,12 @@ function Diagnostics(props: DiagnosticsProps) {
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.operations: {
                 return <Operations database={tenantName} scrollContainerRef={containerRef} />;
+            }
+            case TENANT_DIAGNOSTICS_TABS_IDS.backups: {
+                return uiFactory.renderBackups?.({
+                    database: tenantName,
+                    scrollContainerRef: containerRef,
+                });
             }
             default: {
                 return <div>No data...</div>;

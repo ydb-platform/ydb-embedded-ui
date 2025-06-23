@@ -88,6 +88,7 @@ function getTitleColumn({isEditClusterAvailable, isDeleteClusterAvailable}: Clus
                     <DropdownMenu
                         items={menuItems}
                         defaultSwitcherProps={{view: 'flat-secondary'}}
+                        size="s"
                         menuProps={{size: 'l'}}
                     />
                 );
@@ -199,7 +200,10 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
         sortable: false,
         render: ({row}) => {
             const dc = (row.cluster && row.cluster.DataCenters) || [];
-            return <div className={b('cluster-dc')}>{dc.join(', ') || EMPTY_CELL}</div>;
+            return (
+                // For some reason DC list could contain empty strings
+                <div className={b('cluster-dc')}>{dc.filter(Boolean).join(', ') || EMPTY_CELL}</div>
+            );
         },
     },
     {
