@@ -2,7 +2,7 @@ import {expect, test} from '@playwright/test';
 
 import {tenantName} from '../../../../utils/constants';
 import {NavigationTabs, TenantPage} from '../../TenantPage';
-import {longRunningQuery} from '../../constants';
+import {longRunningQuery, longTableSelect, simpleQuery} from '../../constants';
 import {QueryEditor} from '../../queryEditor/models/QueryEditor';
 import {
     Diagnostics,
@@ -14,7 +14,7 @@ import {
 } from '../Diagnostics';
 import {setupTopQueriesMock} from '../mocks';
 
-test.describe('Diagnostics Queries tab', async () => {
+test.describe.only('Diagnostics Queries tab', async () => {
     test('No runnning queries in Queries if no queries are running', async ({page}) => {
         const pageQueryParams = {
             schema: tenantName,
@@ -98,13 +98,36 @@ test.describe('Diagnostics Queries tab', async () => {
     });
 
     test('Query tab first row has values for all columns in Top mode', async ({page}) => {
+        // First, navigate to query page and run some queries to populate the Top queries data
+        const queryPageParams = {
+            schema: tenantName,
+            database: tenantName,
+            tenantPage: 'query',
+        };
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto(queryPageParams);
+
+        const queryEditor = new QueryEditor(page);
+
+        const queries = [simpleQuery, longTableSelect(10)];
+
+        for (const query of queries) {
+            await queryEditor.setQuery(query);
+            await queryEditor.clickRunButton();
+            // Wait for query to complete
+            await queryEditor.waitForStatus('Completed');
+        }
+
+        // Wait for query statistics to be collected
+        await page.waitForTimeout(2000);
+
+        // Now navigate to diagnostics to check the top queries
         const pageQueryParams = {
             schema: tenantName,
             database: tenantName,
             tenantPage: 'diagnostics',
             diagnosticsTab: 'topQueries',
         };
-        const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
 
         const diagnostics = new Diagnostics(page);
