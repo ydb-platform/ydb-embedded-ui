@@ -1,5 +1,17 @@
 # Changelog
 
+## [9.7.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.7.0...v9.7.1) (2025-06-23)
+
+
+### Bug Fixes
+
+* **AccessRights:** no need in forms ([#2457](https://github.com/ydb-platform/ydb-embedded-ui/issues/2457)) ([03f238e](https://github.com/ydb-platform/ydb-embedded-ui/commit/03f238e5af4298bb23bebb9221c60b33b311b4a9))
+* **Clusters:** filter empty DC ([#2453](https://github.com/ydb-platform/ydb-embedded-ui/issues/2453)) ([a106b5e](https://github.com/ydb-platform/ydb-embedded-ui/commit/a106b5e5aeb066b8f84e30d87c9c9b9af7cfd2f0))
+* **Clusters:** size s for actions menu ([#2451](https://github.com/ydb-platform/ydb-embedded-ui/issues/2451)) ([d9a4c44](https://github.com/ydb-platform/ydb-embedded-ui/commit/d9a4c441dd3f4a62da1104d98f2c50ac3df094ac))
+* **Cluster:** use cluster name if title is empty string ([#2452](https://github.com/ydb-platform/ydb-embedded-ui/issues/2452)) ([1c8a6c0](https://github.com/ydb-platform/ydb-embedded-ui/commit/1c8a6c0eb52d93f7becaff718b4590d346804d9f))
+* disable oidc streaming ([#2462](https://github.com/ydb-platform/ydb-embedded-ui/issues/2462)) ([3bffcbd](https://github.com/ydb-platform/ydb-embedded-ui/commit/3bffcbd1f9ff61500fb6c05c2ac3c371a0bc53a5))
+* do not expose obsolet name param ([#2458](https://github.com/ydb-platform/ydb-embedded-ui/issues/2458)) ([736c5f0](https://github.com/ydb-platform/ydb-embedded-ui/commit/736c5f0478eca2f38b3dc513278aae6a358dcefe))
+
 ## [9.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.6.3...v9.7.0) (2025-06-20)
 
 
