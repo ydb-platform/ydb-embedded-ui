@@ -14,7 +14,7 @@ import {
 } from '../Diagnostics';
 import {setupTopQueriesMock} from '../mocks';
 
-test.describe.only('Diagnostics Queries tab', async () => {
+test.describe('Diagnostics Queries tab', async () => {
     test('No runnning queries in Queries if no queries are running', async ({page}) => {
         const pageQueryParams = {
             schema: tenantName,
