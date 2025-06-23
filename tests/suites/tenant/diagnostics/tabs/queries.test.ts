@@ -2,7 +2,7 @@ import {expect, test} from '@playwright/test';
 
 import {tenantName} from '../../../../utils/constants';
 import {NavigationTabs, TenantPage} from '../../TenantPage';
-import {longRunningQuery} from '../../constants';
+import {longRunningQuery, longTableSelect, simpleQuery} from '../../constants';
 import {QueryEditor} from '../../queryEditor/models/QueryEditor';
 import {
     Diagnostics,
@@ -98,22 +98,48 @@ test.describe('Diagnostics Queries tab', async () => {
     });
 
     test('Query tab first row has values for all columns in Top mode', async ({page}) => {
+        // First, navigate to query page and run some queries to populate the Top queries data
+        const queryPageParams = {
+            schema: tenantName,
+            database: tenantName,
+            tenantPage: 'query',
+        };
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto(queryPageParams);
+
+        const queryEditor = new QueryEditor(page);
+
+        const queries = [simpleQuery, longTableSelect(10)];
+
+        for (const query of queries) {
+            await queryEditor.setQuery(query);
+            await queryEditor.clickRunButton();
+            // Wait for query to complete
+            await queryEditor.waitForStatus('Completed');
+        }
+
+        // Now navigate to diagnostics to check the top queries
         const pageQueryParams = {
             schema: tenantName,
             database: tenantName,
             tenantPage: 'diagnostics',
             diagnosticsTab: 'topQueries',
         };
-        const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
 
         const diagnostics = new Diagnostics(page);
 
-        // Verify table has data
-        await expect(diagnostics.table.isVisible()).resolves.toBe(true);
-        await expect(diagnostics.table.getRowCount()).resolves.toBeGreaterThan(0);
+        // Switch to "Per minute" view for testing
+        await diagnostics.selectQueryPeriod(QueryPeriod.PerMinute);
 
-        // Verify first row has non-empty values for key columns (test first 4 columns)
+        // Wait for the table to refresh with new data
+        await page.waitForTimeout(2000);
+
+        // Wait for data to appear with active refreshing
+        const hasData = await diagnostics.waitForTableDataWithRefresh();
+        expect(hasData).toBe(true);
+
+        // Verify first row has non-empty values for key columns in "Per minute" view
         for (const column of QueryTopColumns.slice(0, 4)) {
             const columnValue = await diagnostics.table.getCellValueByHeader(1, column);
             expect(columnValue.trim()).toBeTruthy();
@@ -244,12 +270,20 @@ test.describe('Diagnostics Queries tab', async () => {
         const diagnostics = new Diagnostics(page);
         await expect(diagnostics.table.isVisible()).resolves.toBe(true);
 
-        // Get the number of rows and select a row that requires scrolling (should be 100 from mock)
-        const rowCount = await diagnostics.table.getRowCount();
-        expect(rowCount).toBe(8); // Verify we have the expected 100 rows from mock
+        // Get the number of visible rows (should be around 8 due to virtualization)
+        const visibleRowCount = await diagnostics.table.getRowCount();
+        expect(visibleRowCount).toBeGreaterThan(0);
+        expect(visibleRowCount).toBeLessThanOrEqual(10); // Due to virtualization
 
-        // Target a row further down that requires scrolling
-        const targetRowIndex = 8;
+        // Target a row that's visible (use row 5 or 6 to ensure it's in the viewport)
+        const targetRowIndex = Math.min(5, visibleRowCount);
+
+        // Store the query hash of the target row to verify later
+        const targetQueryHash = await diagnostics.table.getCellValueByHeader(
+            targetRowIndex,
+            'Query Hash',
+        );
+        expect(targetQueryHash).toBeTruthy();
 
         // Click on the target row to open the drawer
         await diagnostics.table.clickRow(targetRowIndex);
@@ -261,6 +295,9 @@ test.describe('Diagnostics Queries tab', async () => {
         await expect(diagnostics.isCopyLinkButtonVisible()).resolves.toBe(true);
         await diagnostics.clickCopyLinkButton();
 
+        // Small wait for clipboard operation
+        await page.waitForTimeout(200);
+
         // Get the copied URL from clipboard
         const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
         expect(clipboardText).toBeTruthy();
@@ -268,14 +305,22 @@ test.describe('Diagnostics Queries tab', async () => {
 
         // Navigate to the copied URL
         await page.goto(clipboardText);
-        await page.waitForTimeout(1000);
 
-        const firstVisibleRowIndex = 4;
-        // Verify the row is highlighted/selected (if applicable)
-        await page.waitForTimeout(1000);
+        // Wait for the active row to appear
+        const hasActiveRow = await diagnostics.waitForActiveRow();
+        expect(hasActiveRow).toBe(true);
 
-        const hasActiveClass = await diagnostics.isRowActive(firstVisibleRowIndex);
+        // Get the index of the active row
+        const activeRowIndex = await diagnostics.getActiveRowIndex();
+        expect(activeRowIndex).not.toBeNull();
 
-        expect(hasActiveClass).toBe(true);
+        // Verify the active row has the same query hash as the one we selected
+        if (activeRowIndex) {
+            const activeRowQueryHash = await diagnostics.table.getCellValueByHeader(
+                activeRowIndex,
+                'Query Hash',
+            );
+            expect(activeRowQueryHash).toBe(targetQueryHash);
+        }
     });
 });

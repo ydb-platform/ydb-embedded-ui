@@ -325,6 +325,19 @@ export class Diagnostics {
         await this.refreshButton.click();
     }
 
+    async waitForTableDataWithRefresh(maxRetries = 10, refreshInterval = 1000): Promise<boolean> {
+        for (let i = 0; i < maxRetries; i++) {
+            await this.clickRefreshButton();
+            await this.page.waitForTimeout(refreshInterval);
+
+            const rowCount = await this.table.getRowCount();
+            if (rowCount > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     async setAutoRefresh(option: string): Promise<void> {
         await this.autoRefreshSelect.click();
         const optionLocator = this.autoRefreshSelect.locator(`text=${option}`);
@@ -431,6 +444,29 @@ export class Diagnostics {
         const rowElement = this.dataTable.locator(`tr.data-table__row:nth-child(${rowIndex})`);
         const rowElementClass = await rowElement.getAttribute('class');
         return rowElementClass?.includes('kv-top-queries__row_active') || false;
+    }
+
+    async waitForActiveRow(timeout = 10000): Promise<boolean> {
+        try {
+            await this.dataTable.locator('.kv-top-queries__row_active').waitFor({
+                state: 'visible',
+                timeout: timeout,
+            });
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    async getActiveRowIndex(): Promise<number | null> {
+        const rows = await this.dataTable.locator('tr.data-table__row').all();
+        for (let i = 0; i < rows.length; i++) {
+            const className = await rows[i].getAttribute('class');
+            if (className?.includes('kv-top-queries__row_active')) {
+                return i + 1; // Return 1-based index
+            }
+        }
+        return null;
     }
 
     async isOwnerCardVisible(): Promise<boolean> {
