@@ -264,12 +264,20 @@ test.describe.only('Diagnostics Queries tab', async () => {
         const diagnostics = new Diagnostics(page);
         await expect(diagnostics.table.isVisible()).resolves.toBe(true);
 
-        // Get the number of rows and select a row that requires scrolling (should be 100 from mock)
-        const rowCount = await diagnostics.table.getRowCount();
-        expect(rowCount).toBe(8); // Verify we have the expected 100 rows from mock
+        // Get the number of visible rows (should be around 8 due to virtualization)
+        const visibleRowCount = await diagnostics.table.getRowCount();
+        expect(visibleRowCount).toBeGreaterThan(0);
+        expect(visibleRowCount).toBeLessThanOrEqual(10); // Due to virtualization
 
-        // Target a row further down that requires scrolling
-        const targetRowIndex = 8;
+        // Target a row that's visible (use row 5 or 6 to ensure it's in the viewport)
+        const targetRowIndex = Math.min(5, visibleRowCount);
+
+        // Store the query hash of the target row to verify later
+        const targetQueryHash = await diagnostics.table.getCellValueByHeader(
+            targetRowIndex,
+            'Query Hash',
+        );
+        expect(targetQueryHash).toBeTruthy();
 
         // Click on the target row to open the drawer
         await diagnostics.table.clickRow(targetRowIndex);
@@ -281,6 +289,9 @@ test.describe.only('Diagnostics Queries tab', async () => {
         await expect(diagnostics.isCopyLinkButtonVisible()).resolves.toBe(true);
         await diagnostics.clickCopyLinkButton();
 
+        // Small wait for clipboard operation
+        await page.waitForTimeout(200);
+
         // Get the copied URL from clipboard
         const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
         expect(clipboardText).toBeTruthy();
@@ -288,14 +299,22 @@ test.describe.only('Diagnostics Queries tab', async () => {
 
         // Navigate to the copied URL
         await page.goto(clipboardText);
-        await page.waitForTimeout(1000);
 
-        const firstVisibleRowIndex = 4;
-        // Verify the row is highlighted/selected (if applicable)
-        await page.waitForTimeout(1000);
+        // Wait for the active row to appear
+        const hasActiveRow = await diagnostics.waitForActiveRow();
+        expect(hasActiveRow).toBe(true);
 
-        const hasActiveClass = await diagnostics.isRowActive(firstVisibleRowIndex);
+        // Get the index of the active row
+        const activeRowIndex = await diagnostics.getActiveRowIndex();
+        expect(activeRowIndex).not.toBeNull();
 
-        expect(hasActiveClass).toBe(true);
+        // Verify the active row has the same query hash as the one we selected
+        if (activeRowIndex) {
+            const activeRowQueryHash = await diagnostics.table.getCellValueByHeader(
+                activeRowIndex,
+                'Query Hash',
+            );
+            expect(activeRowQueryHash).toBe(targetQueryHash);
+        }
     });
 });

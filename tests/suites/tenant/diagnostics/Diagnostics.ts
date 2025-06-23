@@ -446,6 +446,29 @@ export class Diagnostics {
         return rowElementClass?.includes('kv-top-queries__row_active') || false;
     }
 
+    async waitForActiveRow(timeout = 10000): Promise<boolean> {
+        try {
+            await this.dataTable.locator('.kv-top-queries__row_active').waitFor({
+                state: 'visible',
+                timeout: timeout,
+            });
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    async getActiveRowIndex(): Promise<number | null> {
+        const rows = await this.dataTable.locator('tr.data-table__row').all();
+        for (let i = 0; i < rows.length; i++) {
+            const className = await rows[i].getAttribute('class');
+            if (className?.includes('kv-top-queries__row_active')) {
+                return i + 1; // Return 1-based index
+            }
+        }
+        return null;
+    }
+
     async isOwnerCardVisible(): Promise<boolean> {
         await this.ownerCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return true;
