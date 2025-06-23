@@ -129,11 +129,17 @@ test.describe('Diagnostics Queries tab', async () => {
 
         const diagnostics = new Diagnostics(page);
 
+        // Switch to "Per minute" view for testing
+        await diagnostics.selectQueryPeriod(QueryPeriod.PerMinute);
+
+        // Wait for the table to refresh with new data
+        await page.waitForTimeout(2000);
+
         // Wait for data to appear with active refreshing
         const hasData = await diagnostics.waitForTableDataWithRefresh();
         expect(hasData).toBe(true);
 
-        // Verify first row has non-empty values for key columns (test first 4 columns)
+        // Verify first row has non-empty values for key columns in "Per minute" view
         for (const column of QueryTopColumns.slice(0, 4)) {
             const columnValue = await diagnostics.table.getCellValueByHeader(1, column);
             expect(columnValue.trim()).toBeTruthy();
