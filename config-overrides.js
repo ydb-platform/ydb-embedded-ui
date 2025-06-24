@@ -58,7 +58,9 @@ module.exports = {
         // By default jest does not transform anything in node_modules
         // So this override excludes node_modules except @gravity-ui
         // see https://github.com/timarney/react-app-rewired/issues/241
-        config.transformIgnorePatterns = ['node_modules/(?!(@gravity-ui|@mjackson)/)'];
+        config.transformIgnorePatterns = [
+            'node_modules/(?!(@gravity-ui|@mjackson|@standard-schema)/)',
+        ];
 
         // Add .github directory to roots
         config.roots = ['<rootDir>/src', '<rootDir>/.github'];

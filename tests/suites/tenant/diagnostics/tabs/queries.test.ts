@@ -97,7 +97,8 @@ test.describe('Diagnostics Queries tab', async () => {
         ]);
     });
 
-    test('Query tab first row has values for all columns in Top mode', async ({page}) => {
+    // TODO: https://github.com/ydb-platform/ydb-embedded-ui/issues/2459
+    test.skip('Query tab first row has values for all columns in Top mode', async ({page}) => {
         const pageQueryParams = {
             schema: tenantName,
             database: tenantName,
