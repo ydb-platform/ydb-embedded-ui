@@ -110,7 +110,7 @@ export class CodeAssistAPI extends BaseYdbAPI {
     }
 
     sendCodeAssistTelemetry(data: TelemetryEvent) {
-        return this.post('/code-assist-telemetry', data, null, {
+        return this.post(this.getPath('/code-assist-telemetry'), data, null, {
             concurrentId: 'code-assist-telemetry',
             collectRequest: true,
         });
@@ -118,7 +118,7 @@ export class CodeAssistAPI extends BaseYdbAPI {
 
     sendCodeAssistOpenTabs(data: TelemetryOpenTabs) {
         return this.post(
-            '/code-assist-telemetry',
+            this.getPath('/code-assist-telemetry'),
             {OpenTabs: {Tabs: prepareCodeAssistTabs(data), IdeInfo: ideInfo}},
             null,
             {

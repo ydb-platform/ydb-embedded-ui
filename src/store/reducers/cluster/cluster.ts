@@ -23,13 +23,15 @@ import {
     parseGroupsStatsQueryResponse,
 } from './utils';
 
+export const INITIAL_DEFAULT_CLUSTER_TAB = clusterTabsIds.tenants;
+
 const defaultClusterTabLS = localStorage.getItem(DEFAULT_CLUSTER_TAB_KEY);
 
 let defaultClusterTab: ClusterTab;
 if (isClusterTab(defaultClusterTabLS)) {
     defaultClusterTab = defaultClusterTabLS;
 } else {
-    defaultClusterTab = clusterTabsIds.tenants;
+    defaultClusterTab = INITIAL_DEFAULT_CLUSTER_TAB;
 }
 
 const initialState: ClusterState = {

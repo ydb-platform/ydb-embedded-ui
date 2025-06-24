@@ -46,6 +46,7 @@ export function Tablets({nodeId, path, database, onlyActive, scrollContainerRef}
             database={database}
             loading={isLoading}
             error={error}
+            nodeId={nodeId}
         />
     );
 }

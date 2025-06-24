@@ -3,9 +3,9 @@ import React from 'react';
 import {AccessDenied} from '../../components/Errors/403';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
+import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
-import {operationsApi} from '../../store/reducers/operations';
-import {useAutoRefreshInterval} from '../../utils/hooks';
+import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {isAccessError} from '../../utils/response';
 
 import {OperationsControls} from './OperationsControls';
@@ -13,37 +13,37 @@ import {getColumns} from './columns';
 import {OPERATIONS_SELECTED_COLUMNS_KEY} from './constants';
 import i18n from './i18n';
 import {b} from './shared';
+import {useOperationsInfiniteQuery} from './useOperationsInfiniteQuery';
 import {useOperationsQueryParams} from './useOperationsQueryParams';
 
 interface OperationsProps {
     database: string;
+    scrollContainerRef?: React.RefObject<HTMLElement>;
 }
 
-export function Operations({database}: OperationsProps) {
-    const [autoRefreshInterval] = useAutoRefreshInterval();
-
-    const {kind, searchValue, pageSize, pageToken, handleKindChange, handleSearchChange} =
+export function Operations({database, scrollContainerRef}: OperationsProps) {
+    const {kind, searchValue, pageSize, handleKindChange, handleSearchChange} =
         useOperationsQueryParams();
 
-    const {data, isLoading, error, refetch} = operationsApi.useGetOperationListQuery(
-        {database, kind, page_size: pageSize, page_token: pageToken},
-        {
-            pollingInterval: autoRefreshInterval,
-        },
-    );
-
-    const filteredOperations = React.useMemo(() => {
-        if (!data?.operations) {
-            return [];
-        }
-        return data.operations.filter((op) =>
-            op.id?.toLowerCase().includes(searchValue.toLowerCase()),
-        );
-    }, [data?.operations, searchValue]);
+    const {operations, isLoading, isLoadingMore, error, refreshTable, totalCount} =
+        useOperationsInfiniteQuery({
+            database,
+            kind,
+            pageSize,
+            searchValue,
+            scrollContainerRef,
+        });
 
     if (isAccessError(error)) {
         return <AccessDenied position="left" />;
     }
+
+    const settings = React.useMemo(() => {
+        return {
+            ...DEFAULT_TABLE_SETTINGS,
+            sortable: false,
+        };
+    }, []);
 
     return (
         <TableWithControlsLayout>
@@ -51,8 +51,8 @@ export function Operations({database}: OperationsProps) {
                 <OperationsControls
                     kind={kind}
                     searchValue={searchValue}
-                    entitiesCountCurrent={filteredOperations.length}
-                    entitiesCountTotal={data?.operations?.length}
+                    entitiesCountCurrent={operations.length}
+                    entitiesCountTotal={totalCount}
                     entitiesLoading={isLoading}
                     handleKindChange={handleKindChange}
                     handleSearchChange={handleSearchChange}
@@ -60,14 +60,25 @@ export function Operations({database}: OperationsProps) {
             </TableWithControlsLayout.Controls>
             {error ? <ResponseError error={error} /> : null}
             <TableWithControlsLayout.Table loading={isLoading} className={b('table')}>
-                {data ? (
+                {operations.length > 0 || isLoading ? (
                     <ResizeableDataTable
-                        columns={getColumns({database, refreshTable: refetch})}
+                        columns={getColumns({database, refreshTable, kind})}
                         columnsWidthLSKey={OPERATIONS_SELECTED_COLUMNS_KEY}
-                        data={filteredOperations}
+                        data={operations}
+                        settings={settings}
                         emptyDataMessage={i18n('title_empty')}
                     />
-                ) : null}
+                ) : (
+                    <div>{i18n('title_empty')}</div>
+                )}
+                {isLoadingMore && (
+                    <TableSkeleton
+                        showHeader={false}
+                        rows={3}
+                        delay={0}
+                        className={b('loading-more')}
+                    />
+                )}
             </TableWithControlsLayout.Table>
         </TableWithControlsLayout>
     );

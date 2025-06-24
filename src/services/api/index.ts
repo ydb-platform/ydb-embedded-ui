@@ -1,5 +1,7 @@
 import type {AxiosRequestConfig} from 'axios';
 
+import {codeAssistBackend} from '../../store';
+
 import {AuthAPI} from './auth';
 import {CodeAssistAPI} from './codeAssist';
 import {MetaAPI} from './meta';
@@ -31,8 +33,12 @@ export class YdbEmbeddedAPI {
         this.auth = new AuthAPI({config});
         if (webVersion) {
             this.meta = new MetaAPI({config});
+        }
+
+        if (codeAssistBackend) {
             this.codeAssist = new CodeAssistAPI({config});
         }
+
         this.operation = new OperationAPI({config});
         this.pdisk = new PDiskAPI({config});
         this.scheme = new SchemeAPI({config});

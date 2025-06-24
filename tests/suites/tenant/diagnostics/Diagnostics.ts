@@ -6,6 +6,8 @@ import {NodesPage} from '../../nodes/NodesPage';
 import {StoragePage} from '../../storage/StoragePage';
 import {VISIBILITY_TIMEOUT} from '../TenantPage';
 
+import {OperationsTable} from './tabs/OperationsModel';
+
 export enum DiagnosticsTab {
     Info = 'Info',
     Schema = 'Schema',
@@ -17,6 +19,7 @@ export enum DiagnosticsTab {
     HotKeys = 'Hot keys',
     Describe = 'Describe',
     Storage = 'Storage',
+    Operations = 'Operations',
     Access = 'Access',
 }
 
@@ -231,6 +234,7 @@ export class Diagnostics {
     storage: StoragePage;
     nodes: NodesPage;
     memoryViewer: MemoryViewer;
+    operations: OperationsTable;
     private page: Page;
 
     private tabs: Locator;
@@ -256,6 +260,7 @@ export class Diagnostics {
         this.storage = new StoragePage(page);
         this.nodes = new NodesPage(page);
         this.memoryViewer = new MemoryViewer(page);
+        this.operations = new OperationsTable(page);
         this.tabs = page.locator('.kv-tenant-diagnostics__tabs');
         this.tableControls = page.locator('.ydb-table-with-controls-layout__controls');
         this.schemaViewer = page.locator('.schema-viewer');
