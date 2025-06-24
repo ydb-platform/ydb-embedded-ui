@@ -49,7 +49,6 @@
   "settings.useClusterBalancerAsBackend.description": "By default random cluster node is used as backend. It causes saved links to become invalid after some time, when node is restarted. Using balancer as backend fixes it",
 
   "settings.aclSyntax.title": "ACL syntax format",
-  "settings.aclSyntax.description": "Select the syntax format for displaying access control lists",
   "settings.aclSyntax.option-kikimr": "KiKiMr",
   "settings.aclSyntax.option-ydb-short": "YDB Short",
   "settings.aclSyntax.option-ydb": "YDB",
