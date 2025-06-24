@@ -19,6 +19,7 @@ export const api = createApi({
         'UserData',
         'VDiskData',
         'AccessRights',
+        'Backups',
     ],
 });
 
