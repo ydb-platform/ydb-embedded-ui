@@ -13,7 +13,7 @@ import {getColumns} from './columns';
 import {OPERATIONS_SELECTED_COLUMNS_KEY} from './constants';
 import i18n from './i18n';
 import {b} from './shared';
-import {useInfiniteOperations} from './useInfiniteOperations';
+import {useOperationsInfiniteQuery} from './useOperationsInfiniteQuery';
 import {useOperationsQueryParams} from './useOperationsQueryParams';
 
 interface OperationsProps {
@@ -26,7 +26,7 @@ export function Operations({database, scrollContainerRef}: OperationsProps) {
         useOperationsQueryParams();
 
     const {operations, isLoading, isLoadingMore, error, refreshTable, totalCount} =
-        useInfiniteOperations({
+        useOperationsInfiniteQuery({
             database,
             kind,
             pageSize,
