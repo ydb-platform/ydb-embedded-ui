@@ -202,7 +202,11 @@ function OperationsActions({operation, database, refreshTable}: OperationsAction
 
     return (
         <Flex gap="2">
-            <ActionTooltip title={i18n('header_forget')} placement={['left', 'auto']}>
+            <ActionTooltip
+                title={i18n('header_forget')}
+                placement={['left', 'auto']}
+                disabled={isForgetButtonDisabled}
+            >
                 <div>
                     <ButtonWithConfirmDialog
                         buttonView="outlined"
