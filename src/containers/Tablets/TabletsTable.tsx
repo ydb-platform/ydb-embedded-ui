@@ -25,7 +25,7 @@ import {getDefaultNodePath} from '../Node/NodePages';
 
 import i18n from './i18n';
 
-function getColumns({database}: {database?: string}) {
+function getColumns({database, nodeId}: {database?: string; nodeId?: string | number}) {
     const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
         {
             name: 'Type',
@@ -71,30 +71,39 @@ function getColumns({database}: {database?: string}) {
                 return <TabletState state={row.State} />;
             },
         },
-        {
-            name: 'NodeId',
-            get header() {
-                return i18n('Node ID');
+    ];
+
+    // For node page we don't need to show node columns
+    if (nodeId === undefined) {
+        columns.push(
+            {
+                name: 'NodeId',
+                get header() {
+                    return i18n('Node ID');
+                },
+                render: ({row}) => {
+                    const nodePath =
+                        row.NodeId === undefined ? undefined : getDefaultNodePath(row.NodeId);
+                    return <InternalLink to={nodePath}>{row.NodeId}</InternalLink>;
+                },
+                align: 'right',
             },
-            render: ({row}) => {
-                const nodePath =
-                    row.NodeId === undefined ? undefined : getDefaultNodePath(row.NodeId);
-                return <InternalLink to={nodePath}>{row.NodeId}</InternalLink>;
+            {
+                name: 'fqdn',
+                get header() {
+                    return i18n('Node FQDN');
+                },
+                render: ({row}) => {
+                    if (!row.fqdn) {
+                        return <span>—</span>;
+                    }
+                    return <EntityStatus name={row.fqdn} showStatus={false} hasClipboardButton />;
+                },
             },
-            align: 'right',
-        },
-        {
-            name: 'fqdn',
-            get header() {
-                return i18n('Node FQDN');
-            },
-            render: ({row}) => {
-                if (!row.fqdn) {
-                    return <span>—</span>;
-                }
-                return <EntityStatus name={row.fqdn} showStatus={false} hasClipboardButton />;
-            },
-        },
+        );
+    }
+
+    columns.push(
         {
             name: 'Generation',
             get header() {
@@ -123,7 +132,8 @@ function getColumns({database}: {database?: string}) {
                 return <TabletActions {...row} />;
             },
         },
-    ];
+    );
+
     return columns;
 }
 
@@ -170,6 +180,7 @@ interface TabletsTableProps {
     loading?: boolean;
     error?: unknown;
     scrollContainerRef: React.RefObject<HTMLElement>;
+    nodeId?: string | number;
 }
 
 export function TabletsTable({
@@ -178,6 +189,7 @@ export function TabletsTable({
     loading,
     error,
     scrollContainerRef,
+    nodeId,
 }: TabletsTableProps) {
     const [{tabletsSearch}, setQueryParams] = useQueryParams({
         tabletsSearch: StringParam,
@@ -186,7 +198,7 @@ export function TabletsTable({
     // Track sort state for scroll dependencies
     const [sortParams, setSortParams] = React.useState<SortOrder | SortOrder[] | undefined>();
 
-    const columns = React.useMemo(() => getColumns({database}), [database]);
+    const columns = React.useMemo(() => getColumns({database, nodeId}), [database, nodeId]);
 
     const filteredTablets = React.useMemo(() => {
         return tablets.filter((tablet) => {
