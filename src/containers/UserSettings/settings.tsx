@@ -2,6 +2,7 @@ import {CircleInfo, Flask, PencilToSquare, StarFill} from '@gravity-ui/icons';
 import type {IconProps} from '@gravity-ui/uikit';
 import {createNextState} from '@reduxjs/toolkit';
 
+import {codeAssistBackend} from '../../store';
 import {
     AUTOCOMPLETE_ON_ENTER,
     BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
@@ -230,11 +231,12 @@ export function getUserSettings({
               draft.sections[0].settings.push(useClusterBalancerAsBackendSetting);
           });
 
-    const editor = codeAssistantConfigured
-        ? createNextState(editorPage, (draft) => {
-              draft.sections[0].settings.push(enableCodeAssistantSetting);
-          })
-        : editorPage;
+    const editor =
+        codeAssistantConfigured || codeAssistBackend
+            ? createNextState(editorPage, (draft) => {
+                  draft.sections[0].settings.push(enableCodeAssistantSetting);
+              })
+            : editorPage;
 
     const settings: YDBEmbeddedUISettings = [generalPage, editor, experiments, aboutPage];
 
