@@ -9,9 +9,12 @@ import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefres
 import {EntityStatus} from '../../components/EntityStatusNew/EntityStatus';
 import {EFlagToDescription} from '../../components/EntityStatusNew/utils';
 import {InternalLink} from '../../components/InternalLink';
+import {NetworkTable} from '../../components/NetworkTable/NetworkTable';
+import {useShouldShowClusterNetworkTable} from '../../components/NetworkTable/hooks';
 import routes, {getLocationObjectFromHref} from '../../routes';
 import {useClusterDashboardAvailable} from '../../store/reducers/capabilities/hooks';
 import {
+    INITIAL_DEFAULT_CLUSTER_TAB,
     clusterApi,
     selectClusterTabletsWithFqdn,
     selectClusterTitle,
@@ -55,6 +58,8 @@ export function Cluster({
     const container = React.useRef<HTMLDivElement>(null);
     const isClusterDashboardAvailable = useClusterDashboardAvailable();
 
+    const shouldShowNetworkTable = useShouldShowClusterNetworkTable();
+
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const dispatch = useTypedDispatch();
@@ -92,6 +97,14 @@ export function Cluster({
         dispatch(setHeaderBreadcrumbs('cluster', {}));
     }, [dispatch]);
 
+    const actualClusterTabs = React.useMemo(() => {
+        if (shouldShowNetworkTable) {
+            return clusterTabs;
+        } else {
+            return clusterTabs.filter((tab) => tab.id !== clusterTabsIds.network);
+        }
+    }, [shouldShowNetworkTable]);
+
     const getClusterTitle = () => {
         if (infoLoading) {
             return <Skeleton className={b('title-skeleton')} />;
@@ -110,8 +123,8 @@ export function Cluster({
     };
 
     const activeTab = React.useMemo(
-        () => clusterTabs.find(({id}) => id === activeTabId),
-        [activeTabId],
+        () => actualClusterTabs.find(({id}) => id === activeTabId),
+        [activeTabId, actualClusterTabs],
     );
 
     return (
@@ -142,7 +155,7 @@ export function Cluster({
                     size="l"
                     allowNotSelected={true}
                     activeTab={activeTabId}
-                    items={clusterTabs}
+                    items={actualClusterTabs}
                     wrapTo={({id}, node) => {
                         const path = getClusterPath(id as ClusterTab, {clusterName, backend});
                         return (
@@ -202,6 +215,19 @@ export function Cluster({
                     >
                         <PaginatedStorage scrollContainerRef={container} />
                     </Route>
+                    {shouldShowNetworkTable && (
+                        <Route
+                            path={
+                                getLocationObjectFromHref(getClusterPath(clusterTabsIds.network))
+                                    .pathname
+                            }
+                        >
+                            <NetworkTable
+                                scrollContainerRef={container}
+                                additionalNodesProps={additionalNodesProps}
+                            />
+                        </Route>
+                    )}
                     <Route
                         path={
                             getLocationObjectFromHref(getClusterPath(clusterTabsIds.versions))
@@ -226,11 +252,16 @@ function useClusterTab() {
 
     const defaultTab = useTypedSelector((state) => state.cluster.defaultClusterTab);
 
+    const shouldShowNetworkTable = useShouldShowClusterNetworkTable();
+
     const match = useRouteMatch<{activeTab: string}>(routes.cluster);
 
     const {activeTab: activeTabFromParams} = match?.params || {};
     let activeTab: ClusterTab;
-    if (isClusterTab(activeTabFromParams)) {
+
+    if (!shouldShowNetworkTable && activeTabFromParams === clusterTabsIds.network) {
+        activeTab = INITIAL_DEFAULT_CLUSTER_TAB;
+    } else if (isClusterTab(activeTabFromParams)) {
         activeTab = activeTabFromParams;
     } else {
         activeTab = defaultTab;
