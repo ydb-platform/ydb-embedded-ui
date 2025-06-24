@@ -104,13 +104,6 @@ export function useOperationsInfiniteQuery({
         };
     }, [checkAndLoadMorePages]);
 
-    // Listen for diagnostics refresh events
-    React.useEffect(() => {
-        const handleRefresh = () => refetch();
-        document.addEventListener('diagnosticsRefresh', handleRefresh);
-        return () => document.removeEventListener('diagnosticsRefresh', handleRefresh);
-    }, [refetch]);
-
     return {
         operations: filteredOperations,
         isLoading,

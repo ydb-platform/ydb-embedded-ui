@@ -18,7 +18,7 @@ export const operationsApi = api.injectEndpoints({
             string | undefined // Page param type (page token)
         >({
             infiniteQueryOptions: {
-                initialPageParam: undefined as string | undefined,
+                initialPageParam: undefined,
                 getNextPageParam: (lastPage) => {
                     // Return next page token if available, undefined if no more pages
                     return lastPage.next_page_token === '0' ? undefined : lastPage.next_page_token;
