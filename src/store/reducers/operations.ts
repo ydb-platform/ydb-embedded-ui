@@ -12,18 +12,7 @@ const DEFAULT_PAGE_SIZE = 10;
 
 export const operationsApi = api.injectEndpoints({
     endpoints: (build) => ({
-        getOperationList: build.query({
-            queryFn: async (params: OperationListRequestParams, {signal}) => {
-                try {
-                    const data = await window.api.operation.getOperationList(params, {signal});
-                    return {data};
-                } catch (error) {
-                    return {error};
-                }
-            },
-            providesTags: ['All'],
-        }),
-        getOperationListInfinite: build.infiniteQuery<
+        getOperationList: build.infiniteQuery<
             TOperationList, // Full response type to access next_page_token
             {database: string; kind: OperationKind; page_size?: number}, // Include page_size in query arg
             string | undefined // Page param type (page token)

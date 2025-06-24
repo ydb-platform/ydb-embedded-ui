@@ -23,7 +23,7 @@ export function useOperationsInfiniteQuery({
     scrollContainerRef,
 }: UseOperationsInfiniteQueryProps) {
     const {data, error, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage, refetch} =
-        operationsApi.useGetOperationListInfiniteInfiniteQuery({
+        operationsApi.useGetOperationListInfiniteQuery({
             database,
             kind,
             page_size: pageSize,
