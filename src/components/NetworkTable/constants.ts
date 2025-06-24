@@ -1,5 +1,5 @@
-import type {NodesColumnId} from '../../../../../components/nodesColumns/constants';
-import type {NodesGroupByField} from '../../../../../types/api/nodes';
+import type {NodesGroupByField} from '../../types/api/nodes';
+import type {NodesColumnId} from '../nodesColumns/constants';
 
 export const NETWORK_NODES_TABLE_SELECTED_COLUMNS_KEY = 'networkNodesTableSelectedColumns';
 
