@@ -187,7 +187,7 @@ interface OperationsActionsProps {
 }
 
 function OperationsActions({operation, database, refreshTable}: OperationsActionsProps) {
-    const [cancelOperation, {isLoading: isLoadingCancel}] =
+    const [cancelOperation, {isLoading: isCancelLoading}] =
         operationsApi.useCancelOperationMutation();
     const [forgetOperation, {isLoading: isForgetLoading}] =
         operationsApi.useForgetOperationMutation();
@@ -197,8 +197,8 @@ function OperationsActions({operation, database, refreshTable}: OperationsAction
         return null;
     }
 
-    const isForgetButtonDisabled = isLoadingCancel;
-    const isCancelButtonDisabled = isForgetLoading || operation.ready === true;
+    const isForgetButtonDisabled = isForgetLoading;
+    const isCancelButtonDisabled = isCancelLoading || operation.ready === true;
 
     return (
         <Flex gap="2">

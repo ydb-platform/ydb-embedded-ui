@@ -98,7 +98,10 @@ export function useOperationsInfiniteQuery({
         });
 
         window.addEventListener('resize', throttledHandleResize);
-        return () => window.removeEventListener('resize', throttledHandleResize);
+        return () => {
+            throttledHandleResize.cancel();
+            window.removeEventListener('resize', throttledHandleResize);
+        };
     }, [checkAndLoadMorePages]);
 
     // Listen for diagnostics refresh events
