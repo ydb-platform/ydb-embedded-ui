@@ -29,7 +29,7 @@
     "@gravity-ui/websql-autocomplete": "^13.7.0",
     "@hookform/resolvers": "^3.10.0",
     "@mjackson/multipart-parser": "^0.8.2",
-    "@reduxjs/toolkit": "^2.5.0",
+    "@reduxjs/toolkit": "^2.8.2",
     "@tanstack/react-table": "^8.20.6",
     "@ydb-platform/monaco-ghost": "^0.6.1",
     "axios": "^1.8.4",

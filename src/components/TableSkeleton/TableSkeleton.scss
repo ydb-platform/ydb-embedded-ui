@@ -36,6 +36,19 @@
 
     &__col-5 {
         width: 20%;
+        margin-right: 5%;
+    }
+
+    &__col-6,
+    &__col-7,
+    &__col-8,
+    &__col-9 {
+        width: 8%;
+        margin-right: 3%;
+    }
+
+    &__col-10 {
+        width: 8%;
     }
 
     &__col-full {

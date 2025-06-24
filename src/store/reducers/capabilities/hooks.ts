@@ -67,6 +67,13 @@ export const useViewerNodesHandlerHasNetworkStats = () => {
     return useGetFeatureVersion('/viewer/nodes') > 13;
 };
 
+// Before this version handler has very big response size if nodes quantity is more than 100
+// Response size could be up to 20-30MB, it loads very long and freezes UI
+// It is not very common for databases, but an often case for clusters
+export const useNodesHandlerHasWorkingClusterNetworkStats = () => {
+    return useGetFeatureVersion('/viewer/nodes') >= 16;
+};
+
 export const useFeatureFlagsAvailable = () => {
     return useGetFeatureVersion('/viewer/feature_flags') > 1;
 };
