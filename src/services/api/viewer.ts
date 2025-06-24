@@ -40,8 +40,8 @@ import {BINARY_DATA_IN_PLAIN_TEXT_DISPLAY} from '../../utils/constants';
 import type {Nullable} from '../../utils/typecheckers';
 import {settingsManager} from '../settings';
 
-import {BaseYdbAPI} from './base';
 import type {AxiosOptions} from './base';
+import {BaseYdbAPI} from './base';
 
 export class ViewerAPI extends BaseYdbAPI {
     getClusterCapabilities({database}: {database?: string}) {
@@ -189,7 +189,7 @@ export class ViewerAPI extends BaseYdbAPI {
     }
 
     getSchemaAcl(
-        {path, database}: {path: string; database: string},
+        {path, database, dialect}: {path: string; database: string; dialect: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<TMetaInfo>(
@@ -198,13 +198,13 @@ export class ViewerAPI extends BaseYdbAPI {
                 database,
                 path,
                 merge_rules: true,
-                dialect: 'ydb-short',
+                dialect,
             },
             {concurrentId, requestConfig: {signal}},
         );
     }
     getAvailablePermissions(
-        {path, database}: {path: string; database: string},
+        {path, database, dialect}: {path: string; database: string; dialect: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<AvailablePermissionsResponse>(
@@ -213,7 +213,7 @@ export class ViewerAPI extends BaseYdbAPI {
                 database,
                 path,
                 merge_rules: true,
-                dialect: 'ydb-short',
+                dialect,
                 list_permissions: true,
             },
             {concurrentId, requestConfig: {signal}},
@@ -224,7 +224,8 @@ export class ViewerAPI extends BaseYdbAPI {
             path,
             database,
             rights,
-        }: {path: string; database: string; rights: AccessRightsUpdateRequest},
+            dialect,
+        }: {path: string; database: string; rights: AccessRightsUpdateRequest; dialect: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.post<AccessRightsUpdateRequest>(
@@ -234,7 +235,7 @@ export class ViewerAPI extends BaseYdbAPI {
                 database,
                 path,
                 merge_rules: true,
-                dialect: 'ydb-short',
+                dialect,
             },
             {concurrentId, requestConfig: {signal}},
         );

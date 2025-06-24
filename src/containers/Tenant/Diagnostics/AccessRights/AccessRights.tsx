@@ -7,7 +7,7 @@ import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {useEditAccessAvailable} from '../../../../store/reducers/capabilities/hooks';
 import {schemaAclApi} from '../../../../store/reducers/schemaAcl/schemaAcl';
-import {useAutoRefreshInterval} from '../../../../utils/hooks';
+import {useAclSyntax, useAutoRefreshInterval} from '../../../../utils/hooks';
 import {useCurrentSchema} from '../../TenantContext';
 import {useTenantQueryParams} from '../../useTenantQueryParams';
 
@@ -22,8 +22,9 @@ export function AccessRights() {
     const {path, database} = useCurrentSchema();
     const editable = useEditAccessAvailable();
     const [autoRefreshInterval] = useAutoRefreshInterval();
+    const dialect = useAclSyntax();
     const {isLoading, error} = schemaAclApi.useGetSchemaAclQuery(
-        {path, database},
+        {path, database, dialect},
         {
             pollingInterval: autoRefreshInterval,
         },

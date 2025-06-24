@@ -3,7 +3,7 @@ import type {Settings} from '@gravity-ui/react-data-table';
 import {ResizeableDataTable} from '../../../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {selectPreparedRights} from '../../../../../../store/reducers/schemaAcl/schemaAcl';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../../../utils/constants';
-import {useTypedSelector} from '../../../../../../utils/hooks';
+import {useAclSyntax, useTypedSelector} from '../../../../../../utils/hooks';
 import {useCurrentSchema} from '../../../../TenantContext';
 import i18n from '../../i18n';
 import {block} from '../../shared';
@@ -16,7 +16,8 @@ const AccessRightsTableSettings: Settings = {...DEFAULT_TABLE_SETTINGS, dynamicR
 
 export function RightsTable() {
     const {path, database} = useCurrentSchema();
-    const data = useTypedSelector((state) => selectPreparedRights(state, path, database));
+    const dialect = useAclSyntax();
+    const data = useTypedSelector((state) => selectPreparedRights(state, path, database, dialect));
     return (
         <ResizeableDataTable
             columnsWidthLSKey={RIGHT_TABLE_COLUMNS_WIDTH_LS_KEY}

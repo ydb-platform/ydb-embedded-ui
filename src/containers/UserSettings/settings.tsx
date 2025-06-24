@@ -3,7 +3,9 @@ import type {IconProps} from '@gravity-ui/uikit';
 import {createNextState} from '@reduxjs/toolkit';
 
 import {
+    ACL_SYNTAX_KEY,
     AUTOCOMPLETE_ON_ENTER,
+    AclSyntax,
     BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
     ENABLE_AUTOCOMPLETE,
     ENABLE_CODE_ASSISTANT,
@@ -146,6 +148,32 @@ export const autocompleteOnEnterSetting: SettingProps = {
     description: i18n('settings.editor.autocomplete-on-enter.description'),
 };
 
+const aclSyntaxOptions = [
+    {
+        value: AclSyntax.Kikimr,
+        content: i18n('settings.aclSyntax.option-kikimr'),
+    },
+    {
+        value: AclSyntax.YdbShort,
+        content: i18n('settings.aclSyntax.option-ydb-short'),
+    },
+    {
+        value: AclSyntax.Ydb,
+        content: i18n('settings.aclSyntax.option-ydb'),
+    },
+    {
+        value: AclSyntax.Yql,
+        content: i18n('settings.aclSyntax.option-yql'),
+    },
+];
+
+export const aclSyntaxSetting: SettingProps = {
+    settingKey: ACL_SYNTAX_KEY,
+    title: i18n('settings.aclSyntax.title'),
+    type: 'radio',
+    options: aclSyntaxOptions,
+};
+
 export const interfaceVersionInfoField: SettingsInfoFieldProps = {
     title: i18n('settings.about.interfaceVersionInfoField.title'),
     type: 'info',
@@ -160,6 +188,7 @@ export const appearanceSection: SettingsSection = {
         invertedDisksSetting,
         binaryDataInPlainTextDisplay,
         showDomainDatabase,
+        aclSyntaxSetting,
     ],
 };
 

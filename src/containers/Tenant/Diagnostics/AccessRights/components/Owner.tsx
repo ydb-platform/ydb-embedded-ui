@@ -4,7 +4,7 @@ import {ActionTooltip, Button, Card, Divider, Flex, Icon, Text} from '@gravity-u
 import {SubjectWithAvatar} from '../../../../../components/SubjectWithAvatar/SubjectWithAvatar';
 import {useEditAccessAvailable} from '../../../../../store/reducers/capabilities/hooks';
 import {selectSchemaOwner} from '../../../../../store/reducers/schemaAcl/schemaAcl';
-import {useTypedSelector} from '../../../../../utils/hooks';
+import {useAclSyntax, useTypedSelector} from '../../../../../utils/hooks';
 import {useCurrentSchema} from '../../../TenantContext';
 import i18n from '../i18n';
 import {block} from '../shared';
@@ -14,7 +14,8 @@ import {getChangeOwnerDialog} from './ChangeOwnerDialog';
 export function Owner() {
     const editable = useEditAccessAvailable();
     const {path, database} = useCurrentSchema();
-    const owner = useTypedSelector((state) => selectSchemaOwner(state, path, database));
+    const dialect = useAclSyntax();
+    const owner = useTypedSelector((state) => selectSchemaOwner(state, path, database, dialect));
 
     if (!owner) {
         return null;

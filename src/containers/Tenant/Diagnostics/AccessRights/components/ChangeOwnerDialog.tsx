@@ -5,6 +5,7 @@ import {Dialog, Text, TextInput} from '@gravity-ui/uikit';
 
 import {schemaAclApi} from '../../../../../store/reducers/schemaAcl/schemaAcl';
 import createToast from '../../../../../utils/createToast';
+import {useAclSyntax} from '../../../../../utils/hooks';
 import {prepareErrorMessage} from '../../../../../utils/prepareErrorMessage';
 import i18n from '../i18n';
 import {block} from '../shared';
@@ -61,13 +62,14 @@ function ChangeOwnerDialog({open, onClose, path, database}: ChangeOwnerDialogPro
     const [newOwner, setNewOwner] = React.useState('');
     const [requestErrorMessage, setRequestErrorMessage] = React.useState('');
     const [updateOwner, updateOwnerResponse] = schemaAclApi.useUpdateAccessMutation();
+    const dialect = useAclSyntax();
 
     const handleTyping = (value: string) => {
         setNewOwner(value);
         setRequestErrorMessage('');
     };
     const onApply = () => {
-        updateOwner({path, database, rights: {ChangeOwnership: {Subject: newOwner}}})
+        updateOwner({path, database, dialect, rights: {ChangeOwnership: {Subject: newOwner}}})
             .unwrap()
             .then(() => {
                 onClose();

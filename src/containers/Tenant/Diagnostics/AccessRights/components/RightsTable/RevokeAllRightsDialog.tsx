@@ -9,7 +9,7 @@ import {
     selectSubjectExplicitRights,
 } from '../../../../../../store/reducers/schemaAcl/schemaAcl';
 import createToast from '../../../../../../utils/createToast';
-import {useTypedSelector} from '../../../../../../utils/hooks';
+import {useAclSyntax, useTypedSelector} from '../../../../../../utils/hooks';
 import {prepareErrorMessage} from '../../../../../../utils/prepareErrorMessage';
 import i18n from '../../i18n';
 
@@ -72,8 +72,9 @@ function RevokeAllRightsDialog({
     database,
     subject,
 }: RevokeAllRightsDialogProps) {
+    const dialect = useAclSyntax();
     const subjectExplicitRights = useTypedSelector((state) =>
-        selectSubjectExplicitRights(state, subject, path, database),
+        selectSubjectExplicitRights(state, subject, path, database, dialect),
     );
 
     const [requestErrorMessage, setRequestErrorMessage] = React.useState('');
@@ -83,6 +84,7 @@ function RevokeAllRightsDialog({
         removeAccess({
             path,
             database,
+            dialect,
             rights: {
                 RemoveAccess: [
                     {
