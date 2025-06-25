@@ -142,4 +142,56 @@ export class OperationsTable extends BaseModel {
     async getAccessDeniedTitle(): Promise<string> {
         return await this.accessDeniedTitle.innerText();
     }
+
+    async getOperationsCount(): Promise<number> {
+        // The EntitiesCount component renders a Label with the count
+        const countLabel = await this.page
+            .locator('.ydb-entities-count .g-label__content')
+            .textContent();
+        if (!countLabel) {
+            return 0;
+        }
+        const match = countLabel.match(/(\d+)/);
+        return match ? parseInt(match[1], 10) : 0;
+    }
+
+    async waitForOperationsCount(expectedCount: number, timeout = 5000): Promise<void> {
+        await this.page.waitForFunction(
+            (expected) => {
+                const countElement = document.querySelector(
+                    '.ydb-entities-count .g-label__content',
+                );
+                if (!countElement) {
+                    return false;
+                }
+                const text = countElement.textContent || '';
+                const match = text.match(/(\d+)/);
+                const currentCount = match ? parseInt(match[1], 10) : 0;
+                return currentCount === expected;
+            },
+            expectedCount,
+            {timeout},
+        );
+    }
+
+    async waitForOperationsCountToChange(previousCount: number, timeout = 5000): Promise<number> {
+        await this.page.waitForFunction(
+            (prev) => {
+                const countElement = document.querySelector(
+                    '.ydb-entities-count .g-label__content',
+                );
+                if (!countElement) {
+                    return false;
+                }
+                const text = countElement.textContent || '';
+                const match = text.match(/(\d+)/);
+                const currentCount = match ? parseInt(match[1], 10) : 0;
+                return currentCount !== prev;
+            },
+            previousCount,
+            {timeout},
+        );
+        // Now get the actual new count
+        return await this.getOperationsCount();
+    }
 }

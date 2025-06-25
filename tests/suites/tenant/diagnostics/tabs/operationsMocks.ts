@@ -123,7 +123,7 @@ export const setupOperationsMock = async (page: Page, options?: OperationMockOpt
         const url = new URL(route.request().url());
         const params = Object.fromEntries(url.searchParams);
 
-        const requestedPageSize = parseInt(params.page_size || '10', 10);
+        const requestedPageSize = parseInt(params.page_size || '20', 10);
         const pageToken = params.page_token;
         const kind = params.kind || 'buildindex';
 
