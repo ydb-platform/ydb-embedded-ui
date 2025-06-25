@@ -1,4 +1,4 @@
-import {combineReducers, configureStore as configureReduxStore} from '@reduxjs/toolkit';
+import {configureStore as configureReduxStore} from '@reduxjs/toolkit';
 import type {Action, Dispatch, Middleware, Reducer, UnknownAction} from '@reduxjs/toolkit';
 import type {History} from 'history';
 import {createBrowserHistory} from 'history';
@@ -7,7 +7,7 @@ import {listenForHistoryChange} from 'redux-location-state';
 import {YdbEmbeddedAPI} from '../services/api';
 
 import {getUrlData} from './getUrlData';
-import {rootReducer} from './reducers';
+import rootReducer from './reducers';
 import {api as storeApi} from './reducers/api';
 import {syncUserSettingsFromLS} from './reducers/settings/settings';
 import {UPDATE_REF} from './reducers/tooltip';
@@ -54,70 +54,18 @@ export const codeAssistBackend = window.code_assist_backend;
 
 const isSingleClusterMode = `${metaBackend}` === 'undefined';
 
-interface BaseStoreOptions {
-    singleClusterMode?: boolean;
-    api?: YdbEmbeddedAPI;
-}
-
-interface StoreOptionsWithCustomRootReducer extends BaseStoreOptions {
-    /**
-     * Custom root reducer that completely replaces the default rootReducer.
-     * ⚠️ Cannot be used together with additionalReducers
-     */
-    aRootReducer: Reducer;
-    /**
-     * @deprecated When using aRootReducer, additionalReducers cannot be used
-     */
-    additionalReducers?: undefined;
-}
-
-interface StoreOptionsWithAdditionalReducers extends BaseStoreOptions {
-    /**
-     * @deprecated When using additionalReducers, aRootReducer cannot be used
-     */
-    aRootReducer?: undefined;
-    /**
-     * Additional reducers to be merged with the default rootReducer.
-     * ⚠️ Cannot be used together with aRootReducer
-     */
-    additionalReducers: Record<string, Reducer>;
-}
-
-interface StoreOptionsDefault extends BaseStoreOptions {
-    aRootReducer?: undefined;
-    additionalReducers?: undefined;
-}
-
-export type ConfigureStoreOptions =
-    | StoreOptionsWithCustomRootReducer
-    | StoreOptionsWithAdditionalReducers
-    | StoreOptionsDefault;
-
-export function configureStore(options: ConfigureStoreOptions = {}) {
-    const {
-        aRootReducer,
-        singleClusterMode = isSingleClusterMode,
-        api = new YdbEmbeddedAPI({webVersion, withCredentials: !customBackend}),
-        additionalReducers = {},
-    } = options;
-
+export function configureStore({
+    aRootReducer = rootReducer,
+    singleClusterMode = isSingleClusterMode,
+    api = new YdbEmbeddedAPI({webVersion, withCredentials: !customBackend}),
+} = {}) {
     ({backend, basename, clusterName} = getUrlData({
         singleClusterMode,
         customBackend,
     }));
     const history = createBrowserHistory({basename});
-    let finalReducer: Reducer;
 
-    if (aRootReducer) {
-        finalReducer = aRootReducer;
-    } else {
-        finalReducer = combineReducers({
-            ...rootReducer,
-            ...additionalReducers,
-        });
-    }
-
-    const store = _configureStore(finalReducer, history, {singleClusterMode}, [
+    const store = _configureStore(aRootReducer, history, {singleClusterMode}, [
         storeApi.middleware,
     ]);
     listenForHistoryChange(store, history);

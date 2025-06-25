@@ -1,3 +1,5 @@
+import {combineReducers} from '@reduxjs/toolkit';
+
 import {api} from './api';
 import authentication from './authentication/authentication';
 import cluster from './cluster/cluster';
@@ -37,3 +39,9 @@ export const rootReducer = {
     fullscreen,
     clusters,
 };
+
+const combinedReducer = combineReducers({
+    ...rootReducer,
+});
+
+export default combinedReducer;
