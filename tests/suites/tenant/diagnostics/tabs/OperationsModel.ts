@@ -13,6 +13,8 @@ export class OperationsTable extends BaseModel {
     private emptyState: Locator;
     private loadingMore: Locator;
     private scrollContainer: Locator;
+    private accessDeniedState: Locator;
+    private accessDeniedTitle: Locator;
 
     constructor(page: Page) {
         super(page, page.locator('.kv-tenant-diagnostics'));
@@ -22,6 +24,9 @@ export class OperationsTable extends BaseModel {
         this.emptyState = page.locator('.operations__table:has-text("No operations data")');
         this.loadingMore = page.locator('.operations__loading-more');
         this.scrollContainer = page.locator('.kv-tenant-diagnostics__page-wrapper');
+        // AccessDenied component is rendered at the root level of Operations component
+        this.accessDeniedState = page.locator('.kv-tenant-diagnostics .empty-state');
+        this.accessDeniedTitle = this.accessDeniedState.locator('.empty-state__title');
     }
 
     async waitForTableVisible() {
@@ -123,5 +128,70 @@ export class OperationsTable extends BaseModel {
         }
 
         return false;
+    }
+
+    async isAccessDeniedVisible(): Promise<boolean> {
+        try {
+            await this.accessDeniedState.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    async getAccessDeniedTitle(): Promise<string> {
+        return await this.accessDeniedTitle.innerText();
+    }
+
+    async getOperationsCount(): Promise<number> {
+        // The EntitiesCount component renders a Label with the count
+        const countLabel = await this.page
+            .locator('.ydb-entities-count .g-label__content')
+            .textContent();
+        if (!countLabel) {
+            return 0;
+        }
+        const match = countLabel.match(/(\d+)/);
+        return match ? parseInt(match[1], 10) : 0;
+    }
+
+    async waitForOperationsCount(expectedCount: number, timeout = 5000): Promise<void> {
+        await this.page.waitForFunction(
+            (expected) => {
+                const countElement = document.querySelector(
+                    '.ydb-entities-count .g-label__content',
+                );
+                if (!countElement) {
+                    return false;
+                }
+                const text = countElement.textContent || '';
+                const match = text.match(/(\d+)/);
+                const currentCount = match ? parseInt(match[1], 10) : 0;
+                return currentCount === expected;
+            },
+            expectedCount,
+            {timeout},
+        );
+    }
+
+    async waitForOperationsCountToChange(previousCount: number, timeout = 5000): Promise<number> {
+        await this.page.waitForFunction(
+            (prev) => {
+                const countElement = document.querySelector(
+                    '.ydb-entities-count .g-label__content',
+                );
+                if (!countElement) {
+                    return false;
+                }
+                const text = countElement.textContent || '';
+                const match = text.match(/(\d+)/);
+                const currentCount = match ? parseInt(match[1], 10) : 0;
+                return currentCount !== prev;
+            },
+            previousCount,
+            {timeout},
+        );
+        // Now get the actual new count
+        return await this.getOperationsCount();
     }
 }

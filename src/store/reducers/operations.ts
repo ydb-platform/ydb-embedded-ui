@@ -8,7 +8,7 @@ import type {
 
 import {api} from './api';
 
-const DEFAULT_PAGE_SIZE = 10;
+const DEFAULT_PAGE_SIZE = 20;
 
 export const operationsApi = api.injectEndpoints({
     endpoints: (build) => ({

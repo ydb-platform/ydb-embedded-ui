@@ -123,7 +123,7 @@ export const setupOperationsMock = async (page: Page, options?: OperationMockOpt
         const url = new URL(route.request().url());
         const params = Object.fromEntries(url.searchParams);
 
-        const requestedPageSize = parseInt(params.page_size || '10', 10);
+        const requestedPageSize = parseInt(params.page_size || '20', 10);
         const pageToken = params.page_token;
         const kind = params.kind || 'buildindex';
 
@@ -221,6 +221,20 @@ export const setupOperationErrorMock = async (page: Page) => {
             contentType: 'application/json',
             body: JSON.stringify({
                 error: 'Internal server error',
+            }),
+        });
+    });
+};
+
+export const setupOperation403Mock = async (page: Page) => {
+    await page.route(`${backend}/operation/list*`, async (route) => {
+        await new Promise((resolve) => setTimeout(resolve, MOCK_DELAY));
+
+        await route.fulfill({
+            status: 403,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                error: 'Forbidden',
             }),
         });
     });
