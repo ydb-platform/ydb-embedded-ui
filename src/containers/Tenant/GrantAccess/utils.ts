@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {selectSubjectExplicitRights} from '../../../store/reducers/schemaAcl/schemaAcl';
-import {useTypedSelector} from '../../../utils/hooks';
+import {useAclSyntax, useTypedSelector} from '../../../utils/hooks';
 
 interface UseRightsProps {
     aclSubject?: string;
@@ -10,8 +10,9 @@ interface UseRightsProps {
 }
 
 export function useRights({aclSubject, path, database}: UseRightsProps) {
+    const dialect = useAclSyntax();
     const subjectExplicitRights = useTypedSelector((state) =>
-        selectSubjectExplicitRights(state, aclSubject ?? undefined, path, database),
+        selectSubjectExplicitRights(state, aclSubject ?? undefined, path, database, dialect),
     );
     const [explicitRightsChanges, setExplicitRightsChanges] = React.useState(
         () => new Map<string, boolean>(),

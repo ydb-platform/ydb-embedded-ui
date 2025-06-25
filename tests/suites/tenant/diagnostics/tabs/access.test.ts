@@ -1,7 +1,8 @@
 import {expect, test} from '@playwright/test';
 
+import {Sidebar} from '../../../sidebar/Sidebar';
 import {TenantPage} from '../../TenantPage';
-import {Diagnostics, DiagnosticsTab} from '../Diagnostics';
+import {ACL_SYNTAX_TEST_CONFIGS, Diagnostics, DiagnosticsTab} from '../Diagnostics';
 
 const newSubject = 'foo';
 
@@ -126,5 +127,39 @@ test.describe('Diagnostics Access tab', async () => {
 
         // Verify that "foo" appears in the rights table
         await expect(diagnostics.isSubjectInRightsTable(newSubject)).resolves.toBe(true);
+    });
+
+    test('Effective rights display changes when switching ACL syntax', async ({page}) => {
+        const pageQueryParams = {
+            schema: '/local',
+            database: '/local',
+            tenantPage: 'diagnostics',
+            diagnosticsTab: 'access',
+        };
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto(pageQueryParams);
+
+        const diagnostics = new Diagnostics(page);
+        const sidebar = new Sidebar(page);
+
+        // Run tests for each syntax configuration
+        const results: Record<string, Record<string, string>> = {};
+
+        for (const config of ACL_SYNTAX_TEST_CONFIGS) {
+            const rights = await diagnostics.switchAclSyntaxAndGetRights(sidebar, config.syntax);
+            expect(rights).toBeTruthy();
+
+            // Verify expected patterns
+            for (const [subject, pattern] of Object.entries(config.patterns)) {
+                expect(rights[subject]).toContain(pattern);
+            }
+
+            results[config.syntax] = rights;
+        }
+
+        // Verify that permission formats are different between syntaxes
+        expect(results.YQL?.['USERS']).not.toEqual(results.KiKiMr?.['USERS']);
+        expect(results.KiKiMr?.['USERS']).not.toEqual(results['YDB Short']?.['USERS']);
+        expect(results.YQL?.['DATA-READERS']).not.toEqual(results['YDB Short']?.['DATA-READERS']);
     });
 });

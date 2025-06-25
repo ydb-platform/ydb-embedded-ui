@@ -134,3 +134,12 @@ export const DEV_ENABLE_TRACING_FOR_ALL_REQUESTS = 'enable_tracing_for_all_reque
 export const SHOW_NETWORK_UTILIZATION = 'enableNetworkUtilization';
 
 export const EXPAND_CLUSTER_DASHBOARD = 'expandClusterDashboard';
+
+export const ACL_SYNTAX_KEY = 'aclSyntax';
+
+export enum AclSyntax {
+    Kikimr = 'kikimr',
+    YdbShort = 'ydb-short',
+    Ydb = 'ydb',
+    Yql = 'yql',
+}

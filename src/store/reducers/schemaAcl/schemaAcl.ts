@@ -7,9 +7,23 @@ import {api} from '../api';
 export const schemaAclApi = api.injectEndpoints({
     endpoints: (build) => ({
         getSchemaAcl: build.query({
-            queryFn: async ({path, database}: {path: string; database: string}, {signal}) => {
+            queryFn: async (
+                {
+                    path,
+                    database,
+                    dialect,
+                }: {
+                    path: string;
+                    database: string;
+                    dialect: string;
+                },
+                {signal},
+            ) => {
                 try {
-                    const data = await window.api.viewer.getSchemaAcl({path, database}, {signal});
+                    const data = await window.api.viewer.getSchemaAcl(
+                        {path, database, dialect},
+                        {signal},
+                    );
                     return {
                         data: {
                             acl: data.Common.ACL,
@@ -25,10 +39,19 @@ export const schemaAclApi = api.injectEndpoints({
             providesTags: ['All', 'AccessRights'],
         }),
         getAvailablePermissions: build.query({
-            queryFn: async ({database}: {database: string}, {signal}) => {
+            queryFn: async (
+                {
+                    database,
+                    dialect,
+                }: {
+                    database: string;
+                    dialect: string;
+                },
+                {signal},
+            ) => {
                 try {
                     const data = await window.api.viewer.getAvailablePermissions(
-                        {path: database, database},
+                        {path: database, database, dialect},
                         {signal},
                     );
 
@@ -45,6 +68,7 @@ export const schemaAclApi = api.injectEndpoints({
                 database: string;
                 path: string;
                 rights: AccessRightsUpdateRequest;
+                dialect: string;
             }) => {
                 try {
                     const data = await window.api.viewer.updateAccessRights(props);
@@ -62,82 +86,97 @@ export const schemaAclApi = api.injectEndpoints({
 const createGetSchemaAclSelector = createSelector(
     (path: string) => path,
     (_path: string, database: string) => database,
-    (path, database) => schemaAclApi.endpoints.getSchemaAcl.select({path, database}),
+    (_path: string, _database: string, dialect: string) => dialect,
+    (path, database, dialect) =>
+        schemaAclApi.endpoints.getSchemaAcl.select({path, database, dialect}),
 );
 
 export const selectSchemaOwner = createSelector(
     (state: RootState) => state,
-    (_state: RootState, path: string, database: string) =>
-        createGetSchemaAclSelector(path, database),
+    (_state: RootState, path: string, database: string, dialect: string) =>
+        createGetSchemaAclSelector(path, database, dialect),
     (state, selectGetSchemaAcl) => selectGetSchemaAcl(state).data?.owner,
 );
 
 const selectAccessRights = createSelector(
     (state: RootState) => state,
-    (_state: RootState, path: string, database: string) =>
-        createGetSchemaAclSelector(path, database),
+    (_state: RootState, path: string, database: string, dialect: string) =>
+        createGetSchemaAclSelector(path, database, dialect),
     (state, selectGetSchemaAcl) => selectGetSchemaAcl(state).data,
 );
 
-const selectRightsMap = createSelector(selectAccessRights, (data) => {
-    if (!data) {
-        return null;
-    }
-    const {acl, effectiveAcl} = data;
+const selectRightsMap = createSelector(
+    (state: RootState, path: string, database: string, dialect: string) =>
+        selectAccessRights(state, path, database, dialect),
+    (data) => {
+        if (!data) {
+            return null;
+        }
+        const {acl, effectiveAcl} = data;
 
-    const result: Record<string, {explicit: Set<string>; effective: Set<string>}> = {};
+        const result: Record<string, {explicit: Set<string>; effective: Set<string>}> = {};
 
-    if (acl?.length) {
-        acl.forEach((aclItem) => {
-            if (aclItem.Subject) {
-                if (!result[aclItem.Subject]) {
-                    result[aclItem.Subject] = {explicit: new Set(), effective: new Set()};
+        if (acl?.length) {
+            acl.forEach((aclItem) => {
+                if (aclItem.Subject) {
+                    if (!result[aclItem.Subject]) {
+                        result[aclItem.Subject] = {explicit: new Set(), effective: new Set()};
+                    }
+                    aclItem.AccessRules?.forEach((rule) => {
+                        result[aclItem.Subject].explicit.add(rule);
+                    });
+                    aclItem.AccessRights?.forEach((rule) => {
+                        result[aclItem.Subject].explicit.add(rule);
+                    });
                 }
-                aclItem.AccessRules?.forEach((rule) => {
-                    result[aclItem.Subject].explicit.add(rule);
-                });
-                aclItem.AccessRights?.forEach((rule) => {
-                    result[aclItem.Subject].explicit.add(rule);
-                });
-            }
-        });
-    }
+            });
+        }
 
-    if (effectiveAcl?.length) {
-        effectiveAcl.forEach((aclItem) => {
-            if (aclItem.Subject) {
-                if (!result[aclItem.Subject]) {
-                    result[aclItem.Subject] = {explicit: new Set(), effective: new Set()};
+        if (effectiveAcl?.length) {
+            effectiveAcl.forEach((aclItem) => {
+                if (aclItem.Subject) {
+                    if (!result[aclItem.Subject]) {
+                        result[aclItem.Subject] = {explicit: new Set(), effective: new Set()};
+                    }
+                    aclItem.AccessRules?.forEach((rule) => {
+                        result[aclItem.Subject].effective.add(rule);
+                    });
+                    aclItem.AccessRights?.forEach((rule) => {
+                        result[aclItem.Subject].effective.add(rule);
+                    });
                 }
-                aclItem.AccessRules?.forEach((rule) => {
-                    result[aclItem.Subject].effective.add(rule);
-                });
-                aclItem.AccessRights?.forEach((rule) => {
-                    result[aclItem.Subject].effective.add(rule);
-                });
-            }
-        });
-    }
+            });
+        }
 
-    return result;
-});
+        return result;
+    },
+);
 
-export const selectPreparedRights = createSelector(selectRightsMap, (data) => {
-    if (!data) {
-        return null;
-    }
-    return Object.entries(data).map(([subject, value]) => ({
-        subject,
-        explicit: Array.from(value.explicit),
-        effective: Array.from(value.effective),
-    }));
-});
+export const selectPreparedRights = createSelector(
+    (state: RootState, path: string, database: string, dialect: string) =>
+        selectRightsMap(state, path, database, dialect),
+    (data) => {
+        if (!data) {
+            return null;
+        }
+        return Object.entries(data).map(([subject, value]) => ({
+            subject,
+            explicit: Array.from(value.explicit),
+            effective: Array.from(value.effective),
+        }));
+    },
+);
 
 export const selectSubjectExplicitRights = createSelector(
     [
         (_state: RootState, subject: string | undefined) => subject,
-        (state: RootState, _subject: string | undefined, path: string, database: string) =>
-            selectRightsMap(state, path, database),
+        (
+            state: RootState,
+            _subject: string | undefined,
+            path: string,
+            database: string,
+            dialect: string,
+        ) => selectRightsMap(state, path, database, dialect),
     ],
     (subject, rightsMap) => {
         if (!subject || !rightsMap) {
@@ -152,8 +191,13 @@ export const selectSubjectExplicitRights = createSelector(
 export const selectSubjectInheritedRights = createSelector(
     [
         (_state: RootState, subject: string | undefined) => subject,
-        (state: RootState, _subject: string | undefined, path: string, database: string) =>
-            selectRightsMap(state, path, database),
+        (
+            state: RootState,
+            _subject: string | undefined,
+            path: string,
+            database: string,
+            dialect: string,
+        ) => selectRightsMap(state, path, database, dialect),
     ],
     (subject, rightsMap) => {
         if (!subject || !rightsMap) {
@@ -172,12 +216,15 @@ export const selectSubjectInheritedRights = createSelector(
 
 const createGetAvailablePermissionsSelector = createSelector(
     (database: string) => database,
-    (database) => schemaAclApi.endpoints.getAvailablePermissions.select({database}),
+    (_database: string, dialect: string) => dialect,
+    (database, dialect) =>
+        schemaAclApi.endpoints.getAvailablePermissions.select({database, dialect}),
 );
 
 // Then create the main selector that extracts the available permissions data
 export const selectAvailablePermissions = createSelector(
     (state: RootState) => state,
-    (_state: RootState, database: string) => createGetAvailablePermissionsSelector(database),
+    (_state: RootState, database: string, dialect: string) =>
+        createGetAvailablePermissionsSelector(database, dialect),
     (state, selectGetAvailablePermissions) => selectGetAvailablePermissions(state).data,
 );

@@ -1,8 +1,10 @@
 import {TENANT_PAGES_IDS} from '../store/reducers/tenant/constants';
 import {
+    ACL_SYNTAX_KEY,
     ASIDE_HEADER_COMPACT_KEY,
     AUTOCOMPLETE_ON_ENTER,
     AUTO_REFRESH_INTERVAL,
+    AclSyntax,
     BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
     CASE_SENSITIVE_JSON_SEARCH,
     ENABLE_AUTOCOMPLETE,
@@ -60,6 +62,7 @@ export const DEFAULT_USER_SETTINGS = {
     [LAST_QUERY_EXECUTION_SETTINGS_KEY]: undefined,
     [QUERY_SETTINGS_BANNER_LAST_CLOSED_KEY]: undefined,
     [QUERY_EXECUTION_SETTINGS_KEY]: DEFAULT_QUERY_SETTINGS,
+    [ACL_SYNTAX_KEY]: AclSyntax.YdbShort,
 } as const satisfies SettingsObject;
 
 class SettingsManager {

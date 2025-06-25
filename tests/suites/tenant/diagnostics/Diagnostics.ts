@@ -3,6 +3,7 @@ import type {Locator, Page} from '@playwright/test';
 import {retryAction} from '../../../utils/retryAction';
 import {MemoryViewer} from '../../memoryViewer/MemoryViewer';
 import {NodesPage} from '../../nodes/NodesPage';
+import type {Sidebar} from '../../sidebar/Sidebar';
 import {StoragePage} from '../../storage/StoragePage';
 import {VISIBILITY_TIMEOUT} from '../TenantPage';
 
@@ -227,6 +228,33 @@ export const TopShardsHistoricalColumns = [
     TOP_SHARDS_COLUMNS_IDS.PeakTime,
     TOP_SHARDS_COLUMNS_IDS.InFlightTxCount,
     TOP_SHARDS_COLUMNS_IDS.IntervalEnd,
+];
+
+export const ACL_SYNTAX_TEST_CONFIGS = [
+    {
+        syntax: 'YQL' as const,
+        patterns: {
+            USERS: 'CONNECT',
+            'METADATA-READERS': 'LIST',
+            'DATA-READERS': 'SELECT ROW',
+        },
+    },
+    {
+        syntax: 'KiKiMr' as const,
+        patterns: {
+            USERS: 'ConnectDatabase',
+            'METADATA-READERS': 'List',
+            'DATA-READERS': 'SelectRow',
+        },
+    },
+    {
+        syntax: 'YDB Short' as const,
+        patterns: {
+            USERS: 'connect',
+            'METADATA-READERS': 'list',
+            'DATA-READERS': 'select_row',
+        },
+    },
 ];
 
 export class Diagnostics {
@@ -535,5 +563,72 @@ export class Diagnostics {
             .filter({hasText: subject})
             .waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return true;
+    }
+
+    async getEffectiveRightsFromTable(): Promise<Record<string, string>> {
+        const rightsTable = this.page.locator('.ydb-access-rights__rights-table');
+        await rightsTable.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+
+        const rows = await rightsTable.locator('tbody tr').all();
+        const rights: Record<string, string> = {};
+
+        for (const row of rows) {
+            const cells = await row.locator('td').all();
+            if (cells.length >= 3) {
+                // Get the subject name from the avatar component
+                const subjectElement = cells[0].locator('.ydb-subject-with-avatar__subject');
+                const subject = await subjectElement.textContent();
+                const effectiveRights = await cells[2].textContent();
+                if (subject && effectiveRights) {
+                    rights[subject.trim()] = effectiveRights.trim();
+                }
+            }
+        }
+
+        return rights;
+    }
+
+    async waitForTableDataToLoad(): Promise<void> {
+        // Wait for the table to be visible and have at least one row of data
+        const rightsTable = this.page.locator('.ydb-access-rights__rights-table');
+        await rightsTable.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await rightsTable
+            .locator('tbody tr')
+            .first()
+            .waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        // Additional small delay to ensure data is fully loaded
+        await this.page.waitForTimeout(500);
+    }
+
+    async getPermissionLabelsInGrantDialog(): Promise<string[]> {
+        const labels = await this.page
+            .locator('.ydb-grant-access__rights-wrapper .g-switch__text')
+            .all();
+        const texts: string[] = [];
+        for (const label of labels) {
+            const text = await label.textContent();
+            if (text) {
+                texts.push(text.trim());
+            }
+        }
+        return texts;
+    }
+
+    async switchAclSyntaxAndGetRights(
+        sidebar: Sidebar,
+        syntax: 'KiKiMr' | 'YDB Short' | 'YDB' | 'YQL',
+    ): Promise<Record<string, string>> {
+        // Switch syntax
+        await sidebar.clickSettings();
+        await sidebar.selectAclSyntax(syntax);
+        await sidebar.closeDrawer();
+
+        // Refresh the page data by navigating away and back
+        await this.clickTab(DiagnosticsTab.Info);
+        await this.clickTab(DiagnosticsTab.Access);
+        await this.waitForTableDataToLoad();
+
+        // Get and return the rights
+        return await this.getEffectiveRightsFromTable();
     }
 }
