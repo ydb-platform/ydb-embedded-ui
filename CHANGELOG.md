@@ -1,5 +1,21 @@
 # Changelog
 
+## [9.8.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.7.1...v9.8.0) (2025-06-25)
+
+
+### Features
+
+* add setting to select syntax in acl handlers ([#2474](https://github.com/ydb-platform/ydb-embedded-ui/issues/2474)) ([e5e6f3a](https://github.com/ydb-platform/ydb-embedded-ui/commit/e5e6f3ad87ac331ec99011571701b6a878d9f3d7))
+* **api:** add new possible tag ([#2476](https://github.com/ydb-platform/ydb-embedded-ui/issues/2476)) ([ec81875](https://github.com/ydb-platform/ydb-embedded-ui/commit/ec81875a9c1dcee7c5cfce34908da52f280f6a86))
+* **Cluster:** add Network tab ([#2424](https://github.com/ydb-platform/ydb-embedded-ui/issues/2424)) ([7af71c4](https://github.com/ydb-platform/ydb-embedded-ui/commit/7af71c478775ef70090e21fe60ac07ebc21534b6))
+
+
+### Bug Fixes
+
+* code-assistant requests 404 ([#2471](https://github.com/ydb-platform/ydb-embedded-ui/issues/2471)) ([1eb4e01](https://github.com/ydb-platform/ydb-embedded-ui/commit/1eb4e01b7a8eedf30bb3a2b47afa987788c368e7))
+* operations tab ([#2435](https://github.com/ydb-platform/ydb-embedded-ui/issues/2435)) ([937c561](https://github.com/ydb-platform/ydb-embedded-ui/commit/937c561c617bf4cf73c472631623ce6bf40db59f))
+* remove host fqdn and node id columns from node tablets table ([#2473](https://github.com/ydb-platform/ydb-embedded-ui/issues/2473)) ([6e598fd](https://github.com/ydb-platform/ydb-embedded-ui/commit/6e598fdb6d37ada84ef1e4cbb6c8c3d1045ed59c))
+
 ## [9.7.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.7.0...v9.7.1) (2025-06-23)
 
 
