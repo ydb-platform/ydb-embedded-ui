@@ -39,7 +39,6 @@ function Header() {
     const isAddClusterAvailable =
         useAddClusterFeatureAvailable() && uiFactory.onAddCluster !== undefined;
 
-    // Get AIAssistantButton from registry if it exists
     const AIAssistantButton = componentsRegistry.get('AIAssistantButton');
 
     const breadcrumbItems = React.useMemo(() => {
@@ -80,7 +79,6 @@ function Header() {
             );
         }
 
-        // Add AI Assistant button if component is registered
         if (AIAssistantButton) {
             elements.push(<AIAssistantButton key="ai-assistant" />);
         }

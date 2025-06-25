@@ -33,7 +33,6 @@ function App({
     children,
     userSettings = getUserSettings({singleClusterMode}),
 }: AppProps) {
-    // Get ChatPanel from registry if it exists
     const ChatPanel = componentsRegistry.get('ChatPanel');
 
     return (
@@ -47,7 +46,6 @@ function App({
                     </ErrorBoundary>
                 </Navigation>
             </ContentWrapper>
-            {/* Render ChatPanel only if it's registered */}
             {ChatPanel && <ChatPanel />}
             <ReduxTooltip />
         </Providers>
