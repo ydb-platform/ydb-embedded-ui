@@ -13,6 +13,8 @@ export class OperationsTable extends BaseModel {
     private emptyState: Locator;
     private loadingMore: Locator;
     private scrollContainer: Locator;
+    private accessDeniedState: Locator;
+    private accessDeniedTitle: Locator;
 
     constructor(page: Page) {
         super(page, page.locator('.kv-tenant-diagnostics'));
@@ -22,6 +24,9 @@ export class OperationsTable extends BaseModel {
         this.emptyState = page.locator('.operations__table:has-text("No operations data")');
         this.loadingMore = page.locator('.operations__loading-more');
         this.scrollContainer = page.locator('.kv-tenant-diagnostics__page-wrapper');
+        // AccessDenied component is rendered at the root level of Operations component
+        this.accessDeniedState = page.locator('.kv-tenant-diagnostics .empty-state');
+        this.accessDeniedTitle = this.accessDeniedState.locator('.empty-state__title');
     }
 
     async waitForTableVisible() {
@@ -123,5 +128,18 @@ export class OperationsTable extends BaseModel {
         }
 
         return false;
+    }
+
+    async isAccessDeniedVisible(): Promise<boolean> {
+        try {
+            await this.accessDeniedState.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    async getAccessDeniedTitle(): Promise<string> {
+        return await this.accessDeniedTitle.innerText();
     }
 }

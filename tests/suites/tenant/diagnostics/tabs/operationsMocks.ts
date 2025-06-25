@@ -226,6 +226,20 @@ export const setupOperationErrorMock = async (page: Page) => {
     });
 };
 
+export const setupOperation403Mock = async (page: Page) => {
+    await page.route(`${backend}/operation/list*`, async (route) => {
+        await new Promise((resolve) => setTimeout(resolve, MOCK_DELAY));
+
+        await route.fulfill({
+            status: 403,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                error: 'Forbidden',
+            }),
+        });
+    });
+};
+
 // Helper to setup all required mocks for operations
 export const setupAllOperationMocks = async (page: Page, options?: {totalOperations?: number}) => {
     await setupOperationsMock(page, options);

@@ -4,7 +4,11 @@ import {tenantName} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
 import {Diagnostics, DiagnosticsTab} from '../Diagnostics';
 
-import {setupEmptyOperationsMock, setupOperationsMock} from './operationsMocks';
+import {
+    setupEmptyOperationsMock,
+    setupOperation403Mock,
+    setupOperationsMock,
+} from './operationsMocks';
 
 test.describe('Operations Tab - Infinite Query', () => {
     test('loads initial page of operations on tab click', async ({page}) => {
@@ -118,5 +122,32 @@ test.describe('Operations Tab - Infinite Query', () => {
         // Verify no data rows (or possibly one empty row)
         const rowCount = await diagnostics.operations.getRowCount();
         expect(rowCount).toBeLessThanOrEqual(1);
+    });
+
+    test('shows access denied when operations request returns 403', async ({page}) => {
+        // Setup 403 error mock
+        await setupOperation403Mock(page);
+
+        const pageQueryParams = {
+            schema: tenantName,
+            database: tenantName,
+            tenantPage: 'diagnostics',
+        };
+
+        const tenantPageInstance = new TenantPage(page);
+        await tenantPageInstance.goto(pageQueryParams);
+
+        const diagnostics = new Diagnostics(page);
+        await diagnostics.clickTab(DiagnosticsTab.Operations);
+        // Wait a bit for potential loading
+        await page.waitForTimeout(2000);
+
+        // Wait for access denied state to be visible
+        const isAccessDeniedVisible = await diagnostics.operations.isAccessDeniedVisible();
+        expect(isAccessDeniedVisible).toBe(true);
+
+        // Verify the access denied message
+        const accessDeniedTitle = await diagnostics.operations.getAccessDeniedTitle();
+        expect(accessDeniedTitle).toBe('Access denied');
     });
 });

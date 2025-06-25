@@ -34,16 +34,16 @@ export function Operations({database, scrollContainerRef}: OperationsProps) {
             scrollContainerRef,
         });
 
-    if (isAccessError(error)) {
-        return <AccessDenied position="left" />;
-    }
-
     const settings = React.useMemo(() => {
         return {
             ...DEFAULT_TABLE_SETTINGS,
             sortable: false,
         };
     }, []);
+
+    if (isAccessError(error)) {
+        return <AccessDenied position="left" />;
+    }
 
     return (
         <TableWithControlsLayout>
