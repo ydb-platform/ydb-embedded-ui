@@ -5,6 +5,7 @@ import type {History} from 'history';
 import {Helmet} from 'react-helmet-async';
 import {connect} from 'react-redux';
 
+import {componentsRegistry} from '../../components/ComponentsProvider/componentsRegistry';
 import {ErrorBoundary} from '../../components/ErrorBoundary/ErrorBoundary';
 import type {RootState} from '../../store';
 import {Navigation} from '../AsideNavigation/Navigation';
@@ -32,6 +33,8 @@ function App({
     children,
     userSettings = getUserSettings({singleClusterMode}),
 }: AppProps) {
+    const ChatPanel = componentsRegistry.get('ChatPanel');
+
     return (
         <Providers store={store} history={history}>
             <Helmet defaultTitle="YDB Monitoring" titleTemplate="%s — YDB Monitoring" />
@@ -43,6 +46,7 @@ function App({
                     </ErrorBoundary>
                 </Navigation>
             </ContentWrapper>
+            {ChatPanel && <ChatPanel />}
             <ReduxTooltip />
         </Providers>
     );

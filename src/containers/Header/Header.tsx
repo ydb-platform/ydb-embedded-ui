@@ -4,6 +4,7 @@ import {ArrowUpRightFromSquare, CirclePlus, PlugConnection} from '@gravity-ui/ic
 import {Breadcrumbs, Button, Divider, Flex, Icon} from '@gravity-ui/uikit';
 import {useLocation} from 'react-router-dom';
 
+import {componentsRegistry} from '../../components/ComponentsProvider/componentsRegistry';
 import {getConnectToDBDialog} from '../../components/ConnectToDB/ConnectToDBDialog';
 import {InternalLink} from '../../components/InternalLink';
 import {useAddClusterFeatureAvailable} from '../../store/reducers/capabilities/hooks';
@@ -37,6 +38,8 @@ function Header() {
 
     const isAddClusterAvailable =
         useAddClusterFeatureAvailable() && uiFactory.onAddCluster !== undefined;
+
+    const AIAssistantButton = componentsRegistry.get('AIAssistantButton');
 
     const breadcrumbItems = React.useMemo(() => {
         let options = {...pageBreadcrumbsOptions, singleClusterMode};
@@ -74,6 +77,10 @@ function Header() {
                     {headerKeyset('connect')}
                 </Button>,
             );
+        }
+
+        if (AIAssistantButton) {
+            elements.push(<AIAssistantButton key="ai-assistant" />);
         }
 
         if (!isClustersPage && isUserAllowedToMakeChanges) {
