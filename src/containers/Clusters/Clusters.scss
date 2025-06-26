@@ -17,37 +17,6 @@
     &__autorefresh {
         margin-left: auto;
     }
-    &__cluster-status {
-        width: 18px;
-        height: 18px;
-        margin-right: 8px;
-
-        border-radius: 3px;
-
-        & span {
-            display: flex;
-            align-items: center;
-        }
-
-        &_type_green {
-            background-color: var(--ydb-color-status-green);
-        }
-        &_type_yellow {
-            background-color: var(--ydb-color-status-yellow);
-        }
-        &_type_blue {
-            background-color: var(--ydb-color-status-blue);
-        }
-        &_type_red {
-            background: var(--ydb-color-status-red);
-        }
-        &_type_grey {
-            background: var(--ydb-color-status-grey);
-        }
-        &_type_orange {
-            background: var(--ydb-color-status-orange);
-        }
-    }
     &__cluster-name {
         white-space: normal;
         text-decoration: none;
@@ -71,27 +40,15 @@
         margin-right: 15px;
 
         &_wide {
-            width: 300px;
+            width: 320px;
         }
     }
     &__empty-cell {
         color: var(--g-color-text-secondary);
     }
-    &__tooltip-content {
-        word-break: break-all;
-    }
 
     & .g-progress__item {
         transition: none;
-    }
-
-    &__text {
-        color: var(--g-color-text-primary);
-        @include mixins.body-2-typography();
-
-        &::first-letter {
-            color: var(--g-color-text-danger);
-        }
     }
 
     &__description {
@@ -113,36 +70,25 @@
     }
 
     &__table {
+        --data-table-cell-align: top;
+        --data-table-cell-vertical-padding: var(--g-spacing-3);
         @include mixins.freeze-nth-column(1);
     }
 
-    &__balancer-cell {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
+    &__balancer-copy-icon {
+        color: var(--g-color-text-secondary);
     }
+    &__search-icon {
+        margin: 0 var(--g-spacing-1);
 
-    &__balancer-text {
-        display: inline-block;
-        overflow: hidden;
-
-        max-width: 92%;
-        margin-right: 5px;
-
-        text-overflow: ellipsis;
-        overflow-wrap: break-word !important;
-    }
-    &__balancer-icon {
-        display: flex;
-        align-items: center;
-    }
-
-    &__error {
-        margin-left: 15px;
-        @include mixins.body-2-typography();
+        color: var(--g-color-text-secondary);
     }
 
     &__remove-cluster {
         color: var(--ydb-color-status-red);
+    }
+
+    &__progress {
+        --g-progress-filled-background-color: var(--ydb-color-status-green);
     }
 }

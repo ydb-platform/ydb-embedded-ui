@@ -1,7 +1,8 @@
 import React from 'react';
 
+import {Magnifier} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
-import {Flex, Select, TableColumnSetup, Text} from '@gravity-ui/uikit';
+import {Flex, Icon, Select, TableColumnSetup, Text} from '@gravity-ui/uikit';
 import {Helmet} from 'react-helmet-async';
 
 import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
@@ -129,12 +130,7 @@ export function Clusters() {
     const renderPageTitle = () => {
         return (
             <Flex justifyContent="space-between" className={b('title-wrapper')}>
-                <Flex gap={2}>
-                    <Text variant="header-1">{i18n('page_title')}</Text>
-                    <Text variant="header-1" color="secondary">
-                        {clusters?.length}
-                    </Text>
-                </Flex>
+                <Text variant="header-1">{i18n('page_title')}</Text>
                 <AutoRefreshControl className={b('autorefresh')} />
             </Flex>
         );
@@ -152,6 +148,7 @@ export function Clusters() {
                 <div className={b('control', {wide: true})}>
                     <Search
                         placeholder={i18n('controls_search-placeholder')}
+                        endContent={<Icon data={Magnifier} className={b('search-icon')} />}
                         onChange={changeClusterName}
                         value={clusterName}
                     />
@@ -206,7 +203,12 @@ export function Clusters() {
                     />
                 </div>
             </Flex>
-            {query.isError ? <ResponseError error={query.error} className={b('error')} /> : null}
+            {clusters?.length ? (
+                <Text color="secondary">
+                    {i18n('clusters-count', {count: filteredClusters?.length})}
+                </Text>
+            ) : null}
+            {query.isError ? <ResponseError error={query.error} /> : null}
             {query.isLoading ? <Loader size="l" /> : null}
             {query.fulfilledTimeStamp ? (
                 <div className={b('table-wrapper')}>

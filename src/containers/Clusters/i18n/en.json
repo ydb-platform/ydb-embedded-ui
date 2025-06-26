@@ -3,7 +3,7 @@
   "controls_service-select-label": "Service:",
   "controls_version-select-label": "Version:",
 
-  "controls_search-placeholder": "Cluster name, version, host",
+  "controls_search-placeholder": "Cluster name, version, host...",
   "controls_select-placeholder": "All",
 
   "statistics_clusters": "Clusters",
@@ -15,7 +15,10 @@
 
   "tooltip_no-cluster-data": "No cluster data",
 
-  "page_title": "Clusters",
+  "clusters-count": "{{count}} clusters",
+  "entities-count": "{{value}} of {{capacity}}",
+
+  "page_title": "YDB Enterprise Manager",
 
   "edit-cluster": "Edit Cluster",
   "remove-cluster": "Remove Cluster"
