@@ -18,7 +18,7 @@ const DEFAULT_SCROLL_MARGIN = 100;
 export function useOperationsInfiniteQuery({
     database,
     kind,
-    pageSize = 10,
+    pageSize = 20,
     searchValue,
     scrollContainerRef,
 }: UseOperationsInfiniteQueryProps) {
