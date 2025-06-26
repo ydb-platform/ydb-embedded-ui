@@ -1,12 +1,10 @@
 import React from 'react';
 
-import {AccessDenied} from '../../components/Errors/403';
-import {ResponseError} from '../../components/Errors/ResponseError';
+import {PageError} from '../../components/Errors/PageError/PageError';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
-import {isAccessError} from '../../utils/response';
 
 import {OperationsControls} from './OperationsControls';
 import {getColumns} from './columns';
@@ -41,8 +39,8 @@ export function Operations({database, scrollContainerRef}: OperationsProps) {
         };
     }, []);
 
-    if (isAccessError(error)) {
-        return <AccessDenied position="left" />;
+    if (error) {
+        return <PageError error={error} position="left" />;
     }
 
     return (
@@ -58,7 +56,6 @@ export function Operations({database, scrollContainerRef}: OperationsProps) {
                     handleSearchChange={handleSearchChange}
                 />
             </TableWithControlsLayout.Controls>
-            {error ? <ResponseError error={error} /> : null}
             <TableWithControlsLayout.Table loading={isLoading} className={b('table')}>
                 {operations.length > 0 || isLoading ? (
                     <ResizeableDataTable

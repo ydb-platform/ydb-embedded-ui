@@ -245,3 +245,11 @@ export const setupAllOperationMocks = async (page: Page, options?: {totalOperati
     await setupOperationsMock(page, options);
     await setupOperationMutationMocks(page);
 };
+
+export const setupOperationNetworkErrorMock = async (page: Page) => {
+    await page.route(`${backend}/operation/list*`, async (route) => {
+        // Simulate a network error by aborting the request
+        // This mimics what happens when CORS blocks a request
+        await route.abort('failed');
+    });
+};

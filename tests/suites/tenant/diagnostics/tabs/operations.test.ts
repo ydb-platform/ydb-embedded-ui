@@ -7,6 +7,7 @@ import {Diagnostics, DiagnosticsTab} from '../Diagnostics';
 import {
     setupEmptyOperationsMock,
     setupOperation403Mock,
+    setupOperationNetworkErrorMock,
     setupOperationsMock,
 } from './operationsMocks';
 
@@ -158,6 +159,37 @@ test.describe('Operations Tab - Infinite Query', () => {
         // Verify the access denied message
         const accessDeniedTitle = await diagnostics.operations.getAccessDeniedTitle();
         expect(accessDeniedTitle).toBe('Access denied');
+    });
+
+    test('shows error state when operations request returns network error', async ({page}) => {
+        // Setup network error mock (simulates CORS blocking)
+        await setupOperationNetworkErrorMock(page);
+
+        const pageQueryParams = {
+            schema: tenantName,
+            database: tenantName,
+            tenantPage: 'diagnostics',
+        };
+
+        const tenantPageInstance = new TenantPage(page);
+        await tenantPageInstance.goto(pageQueryParams);
+
+        const diagnostics = new Diagnostics(page);
+        await diagnostics.clickTab(DiagnosticsTab.Operations);
+        // Wait a bit for potential loading
+        await page.waitForTimeout(2000);
+
+        // Wait for error state to be visible
+        const isPageErrorVisible = await diagnostics.operations.isPageErrorVisible();
+        expect(isPageErrorVisible).toBe(true);
+
+        // Verify the error title
+        const errorTitle = await diagnostics.operations.getPageErrorTitle();
+        expect(errorTitle).toBe('Error');
+
+        // Verify the error description shows network error
+        const errorDescription = await diagnostics.operations.getPageErrorDescription();
+        expect(errorDescription.toLowerCase()).toContain('network');
     });
 
     test('loads all operations when scrolling to the bottom multiple times', async ({page}) => {
