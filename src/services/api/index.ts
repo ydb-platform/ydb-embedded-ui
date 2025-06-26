@@ -35,7 +35,7 @@ export class YdbEmbeddedAPI {
             this.meta = new MetaAPI({config});
         }
 
-        if (codeAssistBackend) {
+        if (webVersion || codeAssistBackend) {
             this.codeAssist = new CodeAssistAPI({config});
         }
 
