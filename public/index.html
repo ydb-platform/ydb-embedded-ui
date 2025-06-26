@@ -3,40 +3,15 @@
     <head>
         <script>
             (function () {
-                try {
-                    const savedTheme = localStorage.getItem('theme') || 'light';
-                    const isDarkThemePreferred = window?.matchMedia?.(
-                        '(prefers-color-scheme:dark)',
-                    )?.matches;
-
-                    let theme;
-                    if (!savedTheme || savedTheme === 'system') {
-                        theme = isDarkThemePreferred ? 'dark' : 'light';
-                    } else {
-                        theme = savedTheme;
-                    }
-
-                    const observer = new MutationObserver((mutations, obs) => {
-                        if (document.body) {
-                            try {
-                                const themeClass = [...document.body.classList].find((cl) =>
-                                    cl.startsWith('g-root_theme'),
-                                );
-                                if (themeClass) {
-                                    document.body.classList.remove(themeClass);
-                                }
-                                document.body.classList.add(`g-root_theme_${theme}`);
-                            } catch (e) {
-                            } finally {
-                                obs.disconnect();
-                            }
-                        }
-                    });
-
-                    observer.observe(document.documentElement, {
-                        childList: true,
-                    });
-                } catch (e) {}
+                const savedTheme = localStorage.getItem('theme') || 'light';
+                if (
+                    savedTheme.includes('dark') ||
+                    (savedTheme === 'system' &&
+                        window.matchMedia &&
+                        window.matchMedia('(prefers-color-scheme: dark)').matches)
+                ) {
+                    document.documentElement.style.backgroundColor = '#2d2c33';
+                }
             })();
         </script>
         <meta charset="utf-8" />
