@@ -16,6 +16,11 @@ export class Registry<Entities extends RegistryEntities = {}> {
         return this.entities[id];
     }
 
+    has<Id extends keyof Entities>(id: Id): boolean {
+        const entity = this.entities[id];
+        return entity && entity.name !== 'EmptyPlaceholder';
+    }
+
     register<Id extends string, T>(id: Id, entity: T): Registry<Entities & {[key in Id]: T}> {
         this.entities[id] = entity;
 
@@ -31,4 +36,5 @@ type ComponentType<T> =
 export interface ComponentsRegistryTemplate<T extends Registry, Entities = NonNullable<T['type']>> {
     set<Id extends keyof Entities>(id: Id, entity: ComponentType<Entities[Id]>): this;
     get<Id extends keyof Entities>(id: Id): ComponentType<Entities[Id]>;
+    has<Id extends keyof Entities>(id: Id): boolean;
 }
