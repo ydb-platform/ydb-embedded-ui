@@ -10,6 +10,20 @@ import {api} from './api';
 
 const DEFAULT_PAGE_SIZE = 20;
 
+// Validate and normalize the response to ensure it has proper structure
+function validateOperationListResponse(data: TOperationList): TOperationList {
+    // If operations array is missing, return empty operations and stop pagination
+    if (!Array.isArray(data.operations)) {
+        return {
+            ...data,
+            operations: [],
+            // Stop pagination by setting next_page_token to '0' (no more pages)
+            next_page_token: '0',
+        };
+    }
+    return data;
+}
+
 export const operationsApi = api.injectEndpoints({
     endpoints: (build) => ({
         getOperationList: build.infiniteQuery<
@@ -33,7 +47,9 @@ export const operationsApi = api.injectEndpoints({
                         page_token: pageParam,
                     };
                     const data = await window.api.operation.getOperationList(params, {signal});
-                    return {data};
+                    // Validate and normalize the response
+                    const validatedData = validateOperationListResponse(data);
+                    return {data: validatedData};
                 } catch (error) {
                     return {error};
                 }
