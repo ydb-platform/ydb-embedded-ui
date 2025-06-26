@@ -245,3 +245,71 @@ export const setupAllOperationMocks = async (page: Page, options?: {totalOperati
     await setupOperationsMock(page, options);
     await setupOperationMutationMocks(page);
 };
+
+export const setupOperationNetworkErrorMock = async (page: Page) => {
+    await page.route(`${backend}/operation/list*`, async (route) => {
+        // Simulate a network error by aborting the request
+        // This mimics what happens when CORS blocks a request
+        await route.abort('failed');
+    });
+};
+
+export const setupMalformedOperationsMock = async (page: Page) => {
+    await page.route(`${backend}/operation/list*`, async (route) => {
+        // Return a response with status SUCCESS but missing operations array
+        const response = {
+            status: 'SUCCESS',
+            next_page_token: '1',
+            // operations array is missing
+        };
+
+        await new Promise((resolve) => setTimeout(resolve, MOCK_DELAY));
+
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify(response),
+        });
+    });
+};
+
+export const setupPartialMalformedOperationsMock = async (page: Page) => {
+    let requestCount = 0;
+
+    await page.route(`${backend}/operation/list*`, async (route) => {
+        requestCount++;
+
+        // First request returns valid data
+        if (requestCount === 1) {
+            const operations = generateBuildIndexOperations(0, 20);
+            const response = {
+                next_page_token: '1',
+                status: 'SUCCESS',
+                operations,
+            };
+
+            await new Promise((resolve) => setTimeout(resolve, MOCK_DELAY));
+
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify(response),
+            });
+        } else {
+            // Subsequent requests return malformed response
+            const response = {
+                status: 'SUCCESS',
+                next_page_token: '2',
+                // operations array is missing
+            };
+
+            await new Promise((resolve) => setTimeout(resolve, MOCK_DELAY));
+
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify(response),
+            });
+        }
+    });
+};

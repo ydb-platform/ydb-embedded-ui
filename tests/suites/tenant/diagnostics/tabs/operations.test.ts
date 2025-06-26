@@ -6,8 +6,11 @@ import {Diagnostics, DiagnosticsTab} from '../Diagnostics';
 
 import {
     setupEmptyOperationsMock,
+    setupMalformedOperationsMock,
     setupOperation403Mock,
+    setupOperationNetworkErrorMock,
     setupOperationsMock,
+    setupPartialMalformedOperationsMock,
 } from './operationsMocks';
 
 test.describe('Operations Tab - Infinite Query', () => {
@@ -158,6 +161,129 @@ test.describe('Operations Tab - Infinite Query', () => {
         // Verify the access denied message
         const accessDeniedTitle = await diagnostics.operations.getAccessDeniedTitle();
         expect(accessDeniedTitle).toBe('Access denied');
+    });
+
+    test('shows error state when operations request returns network error', async ({page}) => {
+        // Setup network error mock (simulates CORS blocking)
+        await setupOperationNetworkErrorMock(page);
+
+        const pageQueryParams = {
+            schema: tenantName,
+            database: tenantName,
+            tenantPage: 'diagnostics',
+        };
+
+        const tenantPageInstance = new TenantPage(page);
+        await tenantPageInstance.goto(pageQueryParams);
+
+        const diagnostics = new Diagnostics(page);
+        await diagnostics.clickTab(DiagnosticsTab.Operations);
+        // Wait a bit for potential loading
+        await page.waitForTimeout(2000);
+
+        // Wait for error state to be visible
+        const isPageErrorVisible = await diagnostics.operations.isPageErrorVisible();
+        expect(isPageErrorVisible).toBe(true);
+
+        // Verify the error title
+        const errorTitle = await diagnostics.operations.getPageErrorTitle();
+        expect(errorTitle).toBe('Error');
+
+        // Verify the error description shows network error
+        const errorDescription = await diagnostics.operations.getPageErrorDescription();
+        expect(errorDescription.toLowerCase()).toContain('network');
+    });
+
+    test('handles malformed response without operations array', async ({page}) => {
+        // Setup malformed response mock (returns status SUCCESS but no operations array)
+        await setupMalformedOperationsMock(page);
+
+        const pageQueryParams = {
+            schema: tenantName,
+            database: tenantName,
+            tenantPage: 'diagnostics',
+        };
+
+        const tenantPageInstance = new TenantPage(page);
+        await tenantPageInstance.goto(pageQueryParams);
+
+        const diagnostics = new Diagnostics(page);
+        await diagnostics.clickTab(DiagnosticsTab.Operations);
+
+        // Wait for table to be visible
+        await diagnostics.operations.waitForTableVisible();
+        await diagnostics.operations.waitForDataLoad();
+
+        // Verify empty state is shown
+        const isEmptyVisible = await diagnostics.operations.isEmptyStateVisible();
+        expect(isEmptyVisible).toBe(true);
+
+        // Verify no data rows
+        const rowCount = await diagnostics.operations.getRowCount();
+        expect(rowCount).toBeLessThanOrEqual(1);
+
+        // Verify operations count is 0
+        const operationsCount = await diagnostics.operations.getOperationsCount();
+        expect(operationsCount).toBe(0);
+
+        // Wait to ensure no infinite refetching occurs
+        await page.waitForTimeout(3000);
+
+        // Verify the count is still 0 (no infinite refetching)
+        const finalOperationsCount = await diagnostics.operations.getOperationsCount();
+        expect(finalOperationsCount).toBe(0);
+    });
+
+    test('stops pagination when receiving malformed response after valid data', async ({page}) => {
+        // Setup mock that returns valid data first, then malformed response
+        await setupPartialMalformedOperationsMock(page);
+
+        const pageQueryParams = {
+            schema: tenantName,
+            database: tenantName,
+            tenantPage: 'diagnostics',
+        };
+
+        const tenantPageInstance = new TenantPage(page);
+        await tenantPageInstance.goto(pageQueryParams);
+
+        const diagnostics = new Diagnostics(page);
+        await diagnostics.clickTab(DiagnosticsTab.Operations);
+
+        // Wait for initial data to load
+        await diagnostics.operations.waitForTableVisible();
+        await diagnostics.operations.waitForDataLoad();
+
+        // Verify initial page loaded (should have 20 operations)
+        const initialOperationsCount = await diagnostics.operations.getOperationsCount();
+        expect(initialOperationsCount).toBe(20);
+
+        // Verify first row data
+        const firstRowData = await diagnostics.operations.getRowData(0);
+        expect(firstRowData['Operation ID']).toBeTruthy();
+
+        // Scroll to bottom to trigger next page load
+        await diagnostics.operations.scrollToBottom();
+
+        // Wait a bit for potential loading
+        await page.waitForTimeout(2000);
+
+        // Check if loading more appears and disappears
+        const isLoadingVisible = await diagnostics.operations.isLoadingMoreVisible();
+        if (isLoadingVisible) {
+            await diagnostics.operations.waitForLoadingMoreToDisappear();
+        }
+
+        // Verify the count remains at 20 (malformed response didn't add more)
+        const finalOperationsCount = await diagnostics.operations.getOperationsCount();
+        expect(finalOperationsCount).toBe(20);
+
+        // Wait to ensure no infinite refetching occurs
+        await page.waitForTimeout(3000);
+
+        // Verify the count is still 20
+        const stillFinalCount = await diagnostics.operations.getOperationsCount();
+        expect(stillFinalCount).toBe(20);
     });
 
     test('loads all operations when scrolling to the bottom multiple times', async ({page}) => {

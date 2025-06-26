@@ -15,6 +15,9 @@ export class OperationsTable extends BaseModel {
     private scrollContainer: Locator;
     private accessDeniedState: Locator;
     private accessDeniedTitle: Locator;
+    private pageErrorState: Locator;
+    private pageErrorTitle: Locator;
+    private pageErrorDescription: Locator;
 
     constructor(page: Page) {
         super(page, page.locator('.kv-tenant-diagnostics'));
@@ -27,6 +30,10 @@ export class OperationsTable extends BaseModel {
         // AccessDenied component is rendered at the root level of Operations component
         this.accessDeniedState = page.locator('.kv-tenant-diagnostics .empty-state');
         this.accessDeniedTitle = this.accessDeniedState.locator('.empty-state__title');
+        // PageError component also uses empty-state but with error illustration
+        this.pageErrorState = page.locator('.kv-tenant-diagnostics .empty-state');
+        this.pageErrorTitle = this.pageErrorState.locator('.empty-state__title');
+        this.pageErrorDescription = this.pageErrorState.locator('.empty-state__description .error');
     }
 
     async waitForTableVisible() {
@@ -193,5 +200,23 @@ export class OperationsTable extends BaseModel {
         );
         // Now get the actual new count
         return await this.getOperationsCount();
+    }
+
+    async isPageErrorVisible(): Promise<boolean> {
+        try {
+            await this.pageErrorState.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+            // Check if it has error description to distinguish from access denied
+            return await this.pageErrorDescription.isVisible();
+        } catch {
+            return false;
+        }
+    }
+
+    async getPageErrorTitle(): Promise<string> {
+        return await this.pageErrorTitle.innerText();
+    }
+
+    async getPageErrorDescription(): Promise<string> {
+        return await this.pageErrorDescription.innerText();
     }
 }
