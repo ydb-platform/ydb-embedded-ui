@@ -1,5 +1,7 @@
 import React from 'react';
 
+import type {TextInputProps} from '@gravity-ui/uikit';
+
 import {cn} from '../../utils/cn';
 import {DebouncedInput} from '../DebouncedInput/DebouncedTextInput';
 
@@ -7,13 +9,11 @@ import './Search.scss';
 
 const b = cn('ydb-search');
 
-interface SearchProps {
+interface SearchProps extends Omit<TextInputProps, 'onUpdate' | 'onChange'> {
     onChange: (value: string) => void;
     value?: string;
     width?: React.CSSProperties['width'];
-    className?: string;
     debounce?: number;
-    placeholder?: string;
     inputRef?: React.RefObject<HTMLInputElement>;
 }
 
@@ -23,8 +23,8 @@ export const Search = ({
     width,
     className,
     debounce,
-    placeholder,
     inputRef,
+    ...props
 }: SearchProps) => {
     return (
         <DebouncedInput
@@ -34,9 +34,9 @@ export const Search = ({
             controlRef={inputRef}
             style={{width}}
             className={b(null, className)}
-            placeholder={placeholder}
             value={value}
             onUpdate={onChange}
+            {...props}
         />
     );
 };
