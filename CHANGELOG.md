@@ -1,5 +1,12 @@
 # Changelog
 
+## [9.9.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.9.1...v9.9.2) (2025-06-27)
+
+
+### Bug Fixes
+
+* aibutton placeholder header ([#2499](https://github.com/ydb-platform/ydb-embedded-ui/issues/2499)) ([f2c967b](https://github.com/ydb-platform/ydb-embedded-ui/commit/f2c967bb1efc74f2c961463dbf7e750236d32008))
+
 ## [9.9.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.9.0...v9.9.1) (2025-06-26)
 
 
