@@ -39,8 +39,6 @@ function Header() {
     const isAddClusterAvailable =
         useAddClusterFeatureAvailable() && uiFactory.onAddCluster !== undefined;
 
-    const AIAssistantButton = componentsRegistry.get('AIAssistantButton');
-
     const breadcrumbItems = React.useMemo(() => {
         let options = {...pageBreadcrumbsOptions, singleClusterMode};
 
@@ -79,7 +77,8 @@ function Header() {
             );
         }
 
-        if (AIAssistantButton) {
+        if (componentsRegistry.has('AIAssistantButton')) {
+            const AIAssistantButton = componentsRegistry.get('AIAssistantButton');
             elements.push(<AIAssistantButton key="ai-assistant" />);
         }
 
