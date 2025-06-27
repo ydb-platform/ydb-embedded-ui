@@ -140,7 +140,7 @@ function getTitleColumn({isEditClusterAvailable, isDeleteClusterAvailable}: Clus
 
             return (
                 <Flex direction={'column'} gap={0.5}>
-                    <Flex alignItems={'center'} justifyContent={'space-between'} gap={1}>
+                    <Flex alignItems={'flex-start'} justifyContent={'space-between'} gap={1}>
                         {renderName()}
                         <Flex gap={1}>
                             {renderStatus()}
