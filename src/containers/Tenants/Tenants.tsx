@@ -35,15 +35,26 @@ import {setSearchValue, tenantsApi} from '../../store/reducers/tenants/tenants';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import type {AdditionalTenantsProps} from '../../types/additionalProps';
 import {uiFactory} from '../../uiFactory/uiFactory';
+import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
-import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
+import {
+    DEFAULT_TABLE_SETTINGS,
+    EMPTY_DATA_PLACEHOLDER,
+    SHOW_NETWORK_UTILIZATION,
+} from '../../utils/constants';
 import {
     formatCPU,
     formatNumber,
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
-import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {
+    useAutoRefreshInterval,
+    useSetting,
+    useTypedDispatch,
+    useTypedSelector,
+} from '../../utils/hooks';
 import {useClusterNameFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
+import {isNumeric} from '../../utils/utils';
 
 import i18n from './i18n';
 
@@ -83,6 +94,8 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
     const searchValue = useTypedSelector(selectTenantsSearchValue);
     const filteredTenants = useTypedSelector((state) => selectFilteredTenants(state, clusterName));
     const problemFilter = useTypedSelector(selectProblemFilter);
+
+    const [showNetworkUtilization] = useSetting<boolean>(SHOW_NETWORK_UTILIZATION);
 
     const handleProblemFilterChange = (value: ProblemFilterValue) => {
         dispatch(changeFilter(value));
@@ -214,6 +227,34 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },
+        ];
+
+        if (showNetworkUtilization) {
+            columns.push({
+                name: 'Network',
+                header: 'Network',
+                width: 120,
+                align: DataTable.RIGHT,
+                defaultOrder: DataTable.DESCENDING,
+                sortAccessor: ({NetworkWriteThroughput = 0}) => Number(NetworkWriteThroughput),
+                render: ({row}) => {
+                    const {NetworkWriteThroughput} = row;
+
+                    if (!isNumeric(NetworkWriteThroughput)) {
+                        return EMPTY_DATA_PLACEHOLDER;
+                    }
+
+                    return formatBytes({
+                        value: NetworkWriteThroughput,
+                        size: 'mb',
+                        withSpeedLabel: true,
+                        precision: 2,
+                    });
+                },
+            });
+        }
+
+        columns.push(
             {
                 name: 'nodesCount',
                 header: 'Nodes',
@@ -241,7 +282,7 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
                 align: DataTable.LEFT,
                 render: ({row}) => <PoolsGraph pools={row.PoolStats} />,
             },
-        ];
+        );
 
         if (clusterName && (isDeleteDBAvailable || isEditDBAvailable)) {
             const actionsColumn = getDBActionsColumn({
