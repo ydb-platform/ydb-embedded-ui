@@ -1,6 +1,5 @@
 import React from 'react';
 
-import {HelpPopover} from '@gravity-ui/components';
 import {Pencil, TrashBin} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column} from '@gravity-ui/react-data-table';
@@ -10,14 +9,16 @@ import {
     DropdownMenu,
     Link as ExternalLink,
     Flex,
+    Label,
     Progress,
+    Text,
 } from '@gravity-ui/uikit';
 
-import {ProgressViewer} from '../../components/ProgressViewer/ProgressViewer';
-import {UserCard} from '../../components/User/User';
+import {EntityStatus} from '../../components/EntityStatusNew/EntityStatus';
 import type {PreparedCluster} from '../../store/reducers/clusters/types';
+import {EFlag} from '../../types/api/enums';
 import {uiFactory} from '../../uiFactory/uiFactory';
-import {formatStorageValuesToTb} from '../../utils/dataFormatters/dataFormatters';
+import {formatNumber, formatStorageValuesToTb} from '../../utils/dataFormatters/dataFormatters';
 import {createDeveloperUIMonitoringPageHref} from '../../utils/developerUI/developerUI';
 import {getCleanBalancerValue} from '../../utils/parseBalancer';
 import {clusterTabsIds, getClusterPath} from '../Cluster/utils';
@@ -39,8 +40,9 @@ function getTitleColumn({isEditClusterAvailable, isDeleteClusterAvailable}: Clus
     return {
         name: COLUMNS_NAMES.TITLE,
         header: COLUMNS_TITLES[COLUMNS_NAMES.TITLE],
-        width: 230,
+        width: 320,
         defaultOrder: DataTable.ASCENDING,
+        sortAccessor: (row) => row.title || row.name,
         render: ({row}) => {
             const {
                 name: clusterName,
@@ -54,6 +56,8 @@ function getTitleColumn({isEditClusterAvailable, isDeleteClusterAvailable}: Clus
                     : getClusterPath(undefined, {backend, clusterName}, {withBasename: true});
 
             const clusterStatus = row.cluster?.Overall;
+
+            const cleanedBalancer = row.balancer ? getCleanBalancerValue(row.balancer) : null;
 
             const renderActions = () => {
                 const menuItems: (DropdownMenuItem | DropdownMenuItem[])[] = [];
@@ -87,41 +91,63 @@ function getTitleColumn({isEditClusterAvailable, isDeleteClusterAvailable}: Clus
                 return (
                     <DropdownMenu
                         items={menuItems}
-                        defaultSwitcherProps={{view: 'flat-secondary'}}
+                        defaultSwitcherProps={{view: 'flat-secondary', size: 'xs'}}
                         size="s"
                         menuProps={{size: 'l'}}
                     />
                 );
             };
 
-            return (
-                <Flex alignItems={'center'} justifyContent={'space-between'}>
-                    <Flex alignItems={'center'}>
-                        {clusterStatus ? (
-                            <ExternalLink href={clusterPath}>
-                                <div
-                                    className={b('cluster-status', {
-                                        type: clusterStatus && clusterStatus.toLowerCase(),
-                                    })}
-                                />
-                            </ExternalLink>
-                        ) : (
-                            <div className={b('cluster-status')}>
-                                <HelpPopover
-                                    content={
-                                        <span className={b('tooltip-content')}>
-                                            {row.cluster?.error || i18n('tooltip_no-cluster-data')}
-                                        </span>
-                                    }
-                                    offset={{left: 0}}
-                                />
-                            </div>
-                        )}
-                        <div className={b('cluster-name')}>
-                            <ExternalLink href={clusterPath}>{row.title || row.name}</ExternalLink>
-                        </div>
+            const renderName = () => {
+                return (
+                    <div className={b('cluster-name')}>
+                        <ExternalLink href={clusterPath}>{row.title || row.name}</ExternalLink>
+                    </div>
+                );
+            };
+
+            const renderStatus = () => {
+                if (clusterStatus) {
+                    return <EntityStatus.Label status={clusterStatus} size="xs" />;
+                }
+                return (
+                    <EntityStatus.Label
+                        status={EFlag.Grey}
+                        note={row.cluster?.error || i18n('tooltip_no-cluster-data')}
+                        size="xs"
+                    />
+                );
+            };
+
+            const renderBalancer = () => {
+                if (!cleanedBalancer) {
+                    return null;
+                }
+
+                return (
+                    <Flex gap={0.5} alignItems={'center'}>
+                        <Text variant="caption-2" color="secondary">
+                            {cleanedBalancer}
+                        </Text>
+                        <ClipboardButton
+                            size="xs"
+                            text={cleanedBalancer}
+                            className={b('balancer-copy-icon')}
+                        />
                     </Flex>
-                    {renderActions()}
+                );
+            };
+
+            return (
+                <Flex direction={'column'} gap={0.5}>
+                    <Flex alignItems={'flex-start'} justifyContent={'space-between'} gap={1}>
+                        {renderName()}
+                        <Flex gap={1}>
+                            {renderStatus()}
+                            {renderActions()}
+                        </Flex>
+                    </Flex>
+                    {renderBalancer()}
                 </Flex>
             );
         },
@@ -194,6 +220,21 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
         },
     },
     {
+        name: COLUMNS_NAMES.STATUS,
+        header: COLUMNS_TITLES[COLUMNS_NAMES.STATUS],
+        width: 180,
+        sortable: true,
+        render: ({row}) => {
+            return <Label>{row.status}</Label>;
+        },
+    },
+    {
+        name: COLUMNS_NAMES.SERVICE,
+        header: COLUMNS_TITLES[COLUMNS_NAMES.SERVICE],
+        width: 100,
+        sortable: true,
+    },
+    {
         name: COLUMNS_NAMES.DC,
         header: COLUMNS_TITLES[COLUMNS_NAMES.DC],
         width: 120,
@@ -207,20 +248,9 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
         },
     },
     {
-        name: COLUMNS_NAMES.SERVICE,
-        header: COLUMNS_TITLES[COLUMNS_NAMES.SERVICE],
-        width: 100,
-        sortable: true,
-    },
-    {
-        name: COLUMNS_NAMES.STATUS,
-        header: COLUMNS_TITLES[COLUMNS_NAMES.STATUS],
-        width: 150,
-        sortable: true,
-    },
-    {
         name: COLUMNS_NAMES.NODES,
         header: COLUMNS_TITLES[COLUMNS_NAMES.NODES],
+        width: 170,
         resizeMinWidth: 170,
         defaultOrder: DataTable.DESCENDING,
         sortAccessor: ({cluster = {}}) => {
@@ -235,16 +265,26 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
                 return EMPTY_CELL;
             }
 
-            return <ProgressViewer value={NodesAlive} capacity={NodesTotal} />;
+            return (
+                <ClustersTableProgressBar
+                    value={NodesAlive}
+                    capacity={NodesTotal}
+                    description={i18n('entities-count', {
+                        value: formatNumber(NodesAlive),
+                        capacity: formatNumber(NodesTotal),
+                    })}
+                />
+            );
         },
     },
     {
         name: COLUMNS_NAMES.LOAD,
         header: COLUMNS_TITLES[COLUMNS_NAMES.LOAD],
+        width: 170,
         resizeMinWidth: 170,
         defaultOrder: DataTable.DESCENDING,
         sortAccessor: ({cluster}) => {
-            return cluster?.NumberOfCpus;
+            return cluster?.NumberOfCpus || 0;
         },
         render: ({row}) => {
             const {
@@ -259,17 +299,25 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
             }
 
             return (
-                <ProgressViewer value={LoadAverage} capacity={RealNumberOfCpus ?? NumberOfCpus} />
+                <ClustersTableProgressBar
+                    value={LoadAverage}
+                    capacity={RealNumberOfCpus ?? NumberOfCpus}
+                    description={i18n('entities-count', {
+                        value: formatNumber(Math.round(LoadAverage)),
+                        capacity: formatNumber(RealNumberOfCpus ?? NumberOfCpus),
+                    })}
+                />
             );
         },
     },
     {
         name: COLUMNS_NAMES.STORAGE,
         header: COLUMNS_TITLES[COLUMNS_NAMES.STORAGE],
+        width: 170,
         resizeMinWidth: 170,
         defaultOrder: DataTable.DESCENDING,
         sortAccessor: ({cluster}) => {
-            return Number(cluster?.StorageTotal);
+            return Number(cluster?.StorageTotal) || 0;
         },
         render: ({row}) => {
             const {StorageUsed = 0, StorageTotal = 0, Overall} = row.cluster || {};
@@ -278,11 +326,19 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
                 return EMPTY_CELL;
             }
 
+            const [valueString, capacityString] = formatStorageValuesToTb(
+                Number(StorageUsed),
+                Number(StorageTotal),
+            );
+
             return (
-                <ProgressViewer
-                    value={StorageUsed}
-                    capacity={StorageTotal}
-                    formatValues={formatStorageValuesToTb}
+                <ClustersTableProgressBar
+                    value={Number(StorageUsed)}
+                    capacity={Number(StorageTotal)}
+                    description={i18n('entities-count', {
+                        value: valueString,
+                        capacity: capacityString,
+                    })}
                 />
             );
         },
@@ -312,22 +368,10 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
         },
     },
     {
-        name: COLUMNS_NAMES.OWNER,
-        header: COLUMNS_TITLES[COLUMNS_NAMES.OWNER],
-        sortable: false,
-        width: 120,
-        render: ({row}) => {
-            const logins = row.owner?.split(', ');
-            return logins?.length
-                ? logins.map((login) => <UserCard key={login} login={login} />)
-                : EMPTY_CELL;
-        },
-    },
-    {
         name: COLUMNS_NAMES.DESCRIPTION,
         header: COLUMNS_TITLES[COLUMNS_NAMES.DESCRIPTION],
         sortable: false,
-        width: 150,
+        width: 200,
         render: ({row}) => {
             return row.description ? (
                 <div className={b('description')}>{row.description}</div>
@@ -336,27 +380,29 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
             );
         },
     },
-    {
-        name: COLUMNS_NAMES.BALANCER,
-        header: COLUMNS_TITLES[COLUMNS_NAMES.BALANCER],
-        sortable: false,
-        width: 290,
-        render: ({row}) => {
-            if (!row.balancer) {
-                return EMPTY_CELL;
-            }
-
-            const cleanedValue = getCleanBalancerValue(row.balancer);
-            return (
-                <div className={b('balancer-cell')}>
-                    <div className={b('balancer-text')}>{cleanedValue}</div>
-                    <ClipboardButton size="s" text={cleanedValue} className={b('balancer-icon')} />
-                </div>
-            );
-        },
-    },
 ];
 
 export function getClustersColumns(params: ClustersColumnsParams) {
     return [getTitleColumn(params), ...CLUSTERS_COLUMNS];
+}
+
+function ClustersTableProgressBar({
+    value,
+    capacity,
+    description,
+}: {
+    value: number;
+    capacity: number;
+    description?: string;
+}) {
+    const usage = capacity ? (value / capacity) * 100 : 0;
+
+    return (
+        <Flex direction={'column'} gap={2}>
+            <div>
+                <Progress theme="success" size="s" value={usage} className={b('progress')} />
+            </div>
+            {description}
+        </Flex>
+    );
 }
