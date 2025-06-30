@@ -16,20 +16,18 @@ export type NodeHostData = NodeAddress &
         TenantName?: string;
     };
 
-export type StatusForIcon = 'SystemState' | 'ConnectStatus';
-
 interface NodeHostWrapperProps {
     node: NodeHostData;
     getNodeRef?: GetNodeRefFunc;
     database?: string;
-    statusForIcon?: StatusForIcon;
+    statusForIcon?: 'SystemState' | 'ConnectStatus';
 }
 
 export const NodeHostWrapper = ({
     node,
     getNodeRef,
     database,
-    statusForIcon,
+    statusForIcon = 'SystemState',
 }: NodeHostWrapperProps) => {
     if (!node.Host) {
         return <span>—</span>;
