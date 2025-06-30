@@ -5,7 +5,7 @@ import {
     getConnectionsColumn,
     getCpuColumn,
     getDataCenterColumn,
-    getHostColumn,
+    getNetworkHostColumn,
     getNetworkUtilizationColumn,
     getNodeIdColumn,
     getPingTimeColumn,
@@ -21,7 +21,7 @@ import type {GetNodesColumnsParams} from '../nodesColumns/types';
 export function getNetworkTableNodesColumns(params: GetNodesColumnsParams) {
     const columns: Column<NodesPreparedEntity>[] = [
         getNodeIdColumn(),
-        getHostColumn(params, {statusForIcon: 'ConnectStatus'}),
+        getNetworkHostColumn(params),
         getDataCenterColumn(),
         getRackColumn(),
         getUptimeColumn(),

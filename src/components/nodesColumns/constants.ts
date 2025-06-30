@@ -8,6 +8,7 @@ export const NODES_COLUMNS_WIDTH_LS_KEY = 'nodesTableColumnsWidth';
 export const NODES_COLUMNS_IDS = {
     NodeId: 'NodeId',
     Host: 'Host',
+    NetworkHost: 'NetworkHost',
     Database: 'Database',
     NodeName: 'NodeName',
     DC: 'DC',
@@ -49,6 +50,9 @@ export const NODES_COLUMNS_TITLES = {
         return i18n('node-id');
     },
     get Host() {
+        return i18n('host');
+    },
+    get NetworkHost() {
         return i18n('host');
     },
     get Database() {
@@ -178,7 +182,8 @@ export function getNodesGroupByFieldTitle(groupByField: NodesGroupByField) {
 // Also for some columns we may use more than one field
 export const NODES_COLUMNS_TO_DATA_FIELDS: Record<NodesColumnId, NodesRequiredField[]> = {
     NodeId: ['NodeId'],
-    Host: ['Host', 'Rack', 'Database', 'SystemState', 'ConnectStatus'],
+    Host: ['Host', 'Rack', 'Database', 'SystemState'],
+    NetworkHost: ['Host', 'Rack', 'Database', 'SystemState', 'ConnectStatus'],
     Database: ['Database'],
     NodeName: ['NodeName'],
     DC: ['DC'],
@@ -207,6 +212,7 @@ export const NODES_COLUMNS_TO_DATA_FIELDS: Record<NodesColumnId, NodesRequiredFi
 const NODES_COLUMNS_TO_SORT_FIELDS: Record<NodesColumnId, NodesSortValue | undefined> = {
     NodeId: 'NodeId',
     Host: 'Host',
+    NetworkHost: 'Host',
     Database: 'Database',
     NodeName: 'NodeName',
     DC: 'DC',

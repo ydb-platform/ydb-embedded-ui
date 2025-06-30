@@ -17,7 +17,7 @@ import {bytesToSpeed, isNumeric} from '../../utils/utils';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
 import {MemoryViewer} from '../MemoryViewer/MemoryViewer';
 import {NodeHostWrapper} from '../NodeHostWrapper/NodeHostWrapper';
-import type {NodeHostData, StatusForIcon} from '../NodeHostWrapper/NodeHostWrapper';
+import type {NodeHostData} from '../NodeHostWrapper/NodeHostWrapper';
 import {PoolsGraph} from '../PoolsGraph/PoolsGraph';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 import {TabletsStatistic} from '../TabletsStatistic';
@@ -44,20 +44,38 @@ export function getNodeIdColumn<T extends {NodeId?: string | number}>(): Column<
         align: DataTable.RIGHT,
     };
 }
-export function getHostColumn<T extends NodeHostData>(
-    {getNodeRef, database}: GetNodesColumnsParams,
-    {statusForIcon = 'SystemState'}: {statusForIcon?: StatusForIcon} = {},
-): Column<T> {
+export function getHostColumn<T extends NodeHostData>({
+    getNodeRef,
+    database,
+}: GetNodesColumnsParams): Column<T> {
     return {
         name: NODES_COLUMNS_IDS.Host,
         header: NODES_COLUMNS_TITLES.Host,
+        render: ({row}) => {
+            return <NodeHostWrapper node={row} getNodeRef={getNodeRef} database={database} />;
+        },
+        width: 350,
+        align: DataTable.LEFT,
+    };
+}
+
+// Different column for different set of required fields
+// ConnectStatus is required here, it makes handler to return network stats
+// On versions before 25-1-2 ConnectStatus also makes handler to return peers - it can significantly increase response size
+export function getNetworkHostColumn<T extends NodeHostData>({
+    getNodeRef,
+    database,
+}: GetNodesColumnsParams): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.NetworkHost,
+        header: NODES_COLUMNS_TITLES.NetworkHost,
         render: ({row}) => {
             return (
                 <NodeHostWrapper
                     node={row}
                     getNodeRef={getNodeRef}
                     database={database}
-                    statusForIcon={statusForIcon}
+                    statusForIcon={'ConnectStatus'}
                 />
             );
         },
