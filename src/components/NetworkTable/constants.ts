@@ -5,7 +5,7 @@ export const NETWORK_NODES_TABLE_SELECTED_COLUMNS_KEY = 'networkNodesTableSelect
 
 export const NETWORK_DEFAULT_NODES_COLUMNS: NodesColumnId[] = [
     'NodeId',
-    'Host',
+    'NetworkHost',
     'Connections',
     'NetworkUtilization',
     'SendThroughput',
@@ -14,7 +14,7 @@ export const NETWORK_DEFAULT_NODES_COLUMNS: NodesColumnId[] = [
     'ClockSkew',
 ];
 
-export const NETWORK_REQUIRED_NODES_COLUMNS: NodesColumnId[] = ['NodeId'];
+export const NETWORK_REQUIRED_NODES_COLUMNS: NodesColumnId[] = ['NodeId', 'NetworkHost'];
 
 export const NETWORK_NODES_GROUP_BY_PARAMS = [
     'Host',
