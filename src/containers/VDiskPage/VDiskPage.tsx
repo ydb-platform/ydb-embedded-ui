@@ -182,7 +182,7 @@ export function VDiskPage() {
     };
 
     const renderInfo = () => {
-        return <VDiskInfo data={vDiskData} className={vDiskPageCn('info')} />;
+        return <VDiskInfo data={vDiskData} className={vDiskPageCn('info')} wrap />;
     };
 
     const renderStorageInfo = () => {
@@ -211,7 +211,7 @@ export function VDiskPage() {
 
     const renderContent = () => {
         if (loading) {
-            return <InfoViewerSkeleton rows={20} />;
+            return <InfoViewerSkeleton rows={9} />;
         }
 
         return (
