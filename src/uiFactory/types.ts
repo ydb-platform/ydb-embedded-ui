@@ -23,6 +23,8 @@ export interface UIFactory<H extends string = CommonIssueType> {
     onEditCluster?: HandleEditCluster;
     onDeleteCluster?: HandleDeleteCluster;
 
+    clustersPageTitle?: string;
+
     getLogsLink?: GetLogsLink;
     getMonitoringLink?: GetMonitoringLink;
     getMonitoringClusterLink?: GetMonitoringClusterLink;

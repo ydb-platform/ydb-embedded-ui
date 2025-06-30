@@ -18,7 +18,7 @@
   "clusters-count": "{{count}} clusters",
   "entities-count": "{{value}} of {{capacity}}",
 
-  "page_title": "YDB Enterprise Manager",
+  "page_title": "Clusters",
 
   "edit-cluster": "Edit Cluster",
   "remove-cluster": "Remove Cluster"

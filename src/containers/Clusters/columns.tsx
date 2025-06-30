@@ -395,7 +395,7 @@ function ClustersTableProgressBar({
     capacity: number;
     description?: string;
 }) {
-    const usage = (value / capacity) * 100;
+    const usage = capacity ? (value / capacity) * 100 : 0;
 
     return (
         <Flex direction={'column'} gap={2}>

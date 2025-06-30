@@ -130,7 +130,7 @@ export function Clusters() {
     const renderPageTitle = () => {
         return (
             <Flex justifyContent="space-between" className={b('title-wrapper')}>
-                <Text variant="header-1">{i18n('page_title')}</Text>
+                <Text variant="header-1">{uiFactory.clustersPageTitle ?? i18n('page_title')}</Text>
                 <AutoRefreshControl className={b('autorefresh')} />
             </Flex>
         );
