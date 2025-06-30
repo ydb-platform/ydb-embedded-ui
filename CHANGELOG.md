@@ -1,5 +1,21 @@
 # Changelog
 
+## [9.10.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.9.1...v9.10.0) (2025-06-30)
+
+
+### Features
+
+* **Tenants:** add network column ([#2478](https://github.com/ydb-platform/ydb-embedded-ui/issues/2478)) ([f3b573a](https://github.com/ydb-platform/ydb-embedded-ui/commit/f3b573aad122b786e3c3baf655ebc626b3d3fe05))
+
+
+### Bug Fixes
+
+* aibutton placeholder header ([#2499](https://github.com/ydb-platform/ydb-embedded-ui/issues/2499)) ([f2c967b](https://github.com/ydb-platform/ydb-embedded-ui/commit/f2c967bb1efc74f2c961463dbf7e750236d32008))
+* interface blinks on reload with dark theme ([#2480](https://github.com/ydb-platform/ydb-embedded-ui/issues/2480)) ([d6f23a3](https://github.com/ydb-platform/ydb-embedded-ui/commit/d6f23a31380fea63368ce986f643e3c5880fd7d7))
+* **JsonViewer:** do not try to decode utf8 ([#2509](https://github.com/ydb-platform/ydb-embedded-ui/issues/2509)) ([141c7e0](https://github.com/ydb-platform/ydb-embedded-ui/commit/141c7e0b52882f51adff4d35c51a72d4ea8f8cbb))
+* **Network:** host in default and required columns ([#2511](https://github.com/ydb-platform/ydb-embedded-ui/issues/2511)) ([1affd72](https://github.com/ydb-platform/ydb-embedded-ui/commit/1affd723d2f9a6912869c92aa6caa7315a7f0514))
+* require ConnectStatus only for network table ([#2510](https://github.com/ydb-platform/ydb-embedded-ui/issues/2510)) ([d9a049f](https://github.com/ydb-platform/ydb-embedded-ui/commit/d9a049fbe9af38652e4a529550322e8bb60593d6))
+
 ## [9.9.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.9.0...v9.9.1) (2025-06-26)
 
 
