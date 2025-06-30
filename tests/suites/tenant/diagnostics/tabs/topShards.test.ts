@@ -89,10 +89,7 @@ test.describe('Diagnostics TopShards tab', async () => {
         }
     });
 
-    // TODO: https://github.com/ydb-platform/ydb-embedded-ui/issues/2459
-    test.skip('TopShards tab first row has values for all columns in History mode', async ({
-        page,
-    }) => {
+    test('TopShards tab first row has values for all columns in History mode', async ({page}) => {
         // Setup mock for TopShards tab in History mode
         await setupTopShardsHistoryMock(page);
 
