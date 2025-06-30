@@ -1,5 +1,19 @@
 # Changelog
 
+## [9.11.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.10.0...v9.11.0) (2025-06-30)
+
+
+### Features
+
+* **Clusters:** redesign table ([#2495](https://github.com/ydb-platform/ydb-embedded-ui/issues/2495)) ([7fa0358](https://github.com/ydb-platform/ydb-embedded-ui/commit/7fa0358d0be8572cb0bb46d6ac7b59de5f58e262))
+
+
+### Bug Fixes
+
+* **HealthcheckPreview:** enable autorefresh for all clusters ([#2512](https://github.com/ydb-platform/ydb-embedded-ui/issues/2512)) ([6ed077e](https://github.com/ydb-platform/ydb-embedded-ui/commit/6ed077ef1bb5a78774e43f875d3d37cee0f61f43))
+* unskip tests ([#2514](https://github.com/ydb-platform/ydb-embedded-ui/issues/2514)) ([0198726](https://github.com/ydb-platform/ydb-embedded-ui/commit/0198726db84917950799ae757479e50acd90948b))
+* **VDiskPage:** display params in 2 columns, change order ([#2479](https://github.com/ydb-platform/ydb-embedded-ui/issues/2479)) ([2e0f203](https://github.com/ydb-platform/ydb-embedded-ui/commit/2e0f2035c8bc61406f746fa15b697a1fde646fa7))
+
 ## [9.10.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.9.1...v9.10.0) (2025-06-30)
 
 
