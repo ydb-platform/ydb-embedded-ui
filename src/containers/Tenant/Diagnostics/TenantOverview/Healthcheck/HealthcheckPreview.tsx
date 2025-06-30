@@ -1,8 +1,7 @@
 import type {AlertProps} from '@gravity-ui/uikit';
-import {Alert, Button, Flex, Icon, Popover, Skeleton} from '@gravity-ui/uikit';
+import {Alert, Button, Flex, Icon, Skeleton} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
-import {useClusterBaseInfo} from '../../../../../store/reducers/cluster/cluster';
 import {healthcheckApi} from '../../../../../store/reducers/healthcheckInfo/healthcheckInfo';
 import {SelfCheckResult} from '../../../../../types/api/healthcheck';
 import {cn} from '../../../../../utils/cn';
@@ -11,8 +10,6 @@ import {HEALTHCHECK_RESULT_TO_ICON, HEALTHCHECK_RESULT_TO_TEXT} from '../../../c
 import {useTenantQueryParams} from '../../../useTenantQueryParams';
 
 import i18n from './i18n';
-
-import CircleExclamationIcon from '@gravity-ui/icons/svgs/circle-exclamation.svg';
 
 import './HealthcheckPreview.scss';
 
@@ -35,11 +32,7 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
     const {tenantName} = props;
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    const {name} = useClusterBaseInfo();
-
     const {handleShowHealthcheckChange} = useTenantQueryParams();
-
-    const healthcheckPreviewDisabled = name === 'ydb_ru';
 
     const {
         currentData: data,
@@ -48,8 +41,7 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
     } = healthcheckApi.useGetHealthcheckInfoQuery(
         {database: tenantName},
         {
-            //FIXME https://github.com/ydb-platform/ydb-embedded-ui/issues/1889
-            pollingInterval: healthcheckPreviewDisabled ? undefined : autoRefreshInterval,
+            pollingInterval: autoRefreshInterval,
         },
     );
 
@@ -81,15 +73,6 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
                 <Flex gap={1} alignItems="center">
                     {HEALTHCHECK_RESULT_TO_TEXT[selfCheckResult]}
                     {issuesText ? ` ${issuesText}` : ''}
-                    {healthcheckPreviewDisabled ? (
-                        <Popover
-                            content={'Healthcheck is disabled. Please update healthcheck manually.'}
-                            placement={['top']}
-                            className={b('icon-wrapper')}
-                        >
-                            {() => <Icon size={16} data={CircleExclamationIcon} />}
-                        </Popover>
-                    ) : null}
                 </Flex>
                 {issuesCount && (
                     <Button
