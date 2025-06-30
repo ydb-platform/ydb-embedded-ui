@@ -2,7 +2,7 @@ import {expect, test} from '@playwright/test';
 
 import {tenantName} from '../../../../utils/constants';
 import {NavigationTabs, TenantPage} from '../../TenantPage';
-import {longRunningQuery} from '../../constants';
+import {longRunningQuery, longRunningStreamQuery} from '../../constants';
 import {QueryEditor} from '../../queryEditor/models/QueryEditor';
 import {
     Diagnostics,
@@ -97,18 +97,37 @@ test.describe('Diagnostics Queries tab', async () => {
         ]);
     });
 
-    // TODO: https://github.com/ydb-platform/ydb-embedded-ui/issues/2459
-    test.skip('Query tab first row has values for all columns in Top mode', async ({page}) => {
+    test('Query tab first row has values for all columns in Top mode', async ({page}) => {
+        // First, run some CPU-intensive queries to generate data
         const pageQueryParams = {
             schema: tenantName,
             database: tenantName,
-            tenantPage: 'diagnostics',
-            diagnosticsTab: 'topQueries',
+            tenantPage: 'query',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
 
+        const queryEditor = new QueryEditor(page);
+
+        // Run CPU-intensive stream query
+        await queryEditor.setQuery(longRunningStreamQuery);
+        await queryEditor.clickRunButton();
+
+        // Wait for the query to complete
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+
+        // Give some time for the queries to be recorded in the system
+        await page.waitForTimeout(2000);
+
+        // Now navigate to diagnostics to check Top queries
+        await tenantPage.selectNavigationTab(NavigationTabs.Diagnostics);
+
         const diagnostics = new Diagnostics(page);
+        await diagnostics.clickTab(DiagnosticsTab.Queries);
+
+        // Ensure we're in Top mode (should be default)
+        const radioOption = await diagnostics.getSelectedTableMode();
+        expect(radioOption?.trim()).toBe(QueriesSwitch.Top);
 
         // Verify table has data
         await expect(diagnostics.table.isVisible()).resolves.toBe(true);
