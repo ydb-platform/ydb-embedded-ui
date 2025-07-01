@@ -61,11 +61,22 @@ describe('parseBalancer', () => {
 });
 
 describe('removeViewerPathname', () => {
-    test('should remove pathname', () => {
+    test('should remove /viewer/json pathname', () => {
         const initialValue = 'https://ydb-testing-0000.search.net:8765/viewer/json';
         const result = 'https://ydb-testing-0000.search.net:8765';
 
         expect(removeViewerPathname(initialValue)).toBe(result);
+    });
+    test('should remove /viewer pathname', () => {
+        const initialValue = 'https://ydb-testing-0000.search.net:8765/viewer';
+        const result = 'https://ydb-testing-0000.search.net:8765';
+
+        expect(removeViewerPathname(initialValue)).toBe(result);
+    });
+    test('should not change input if there is no /viewer or /viewer/json', () => {
+        const initialValue = 'https://ydb-testing-0000.search.net:8765';
+
+        expect(removeViewerPathname(initialValue)).toBe(initialValue);
     });
 });
 describe('removeProtocol', () => {
