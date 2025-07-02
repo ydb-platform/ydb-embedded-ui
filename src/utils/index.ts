@@ -17,3 +17,21 @@ export function normalizePathSlashes(path: string) {
     // (?<!:) - negative lookbehind - ignore parts that start with :
     return path.replaceAll(/(?<!:)\/\/+/g, '/');
 }
+
+export function getSystemTheme() {
+    if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    } else {
+        return 'light';
+    }
+}
+
+export function getTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+
+    if (savedTheme === 'system') {
+        return getSystemTheme();
+    }
+
+    return savedTheme.includes('dark') ? 'dark' : 'light';
+}

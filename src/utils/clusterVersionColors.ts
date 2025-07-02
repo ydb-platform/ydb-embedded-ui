@@ -3,7 +3,13 @@ import uniqBy from 'lodash/uniqBy';
 import type {MetaClusterVersion} from '../types/api/meta';
 import type {VersionToColorMap} from '../types/versions';
 
-import {COLORS, DEFAULT_COLOR, getMinorVersion, hashCode} from './versions';
+import {
+    DEFAULT_COLOR,
+    getColors,
+    getMinorVersion,
+    getMinorVersionColorVariant,
+    hashCode,
+} from './versions';
 
 const UNDEFINED_COLOR_INDEX = '__no_color__';
 
@@ -28,6 +34,8 @@ export const getVersionMap = (
 export const getVersionColors = (versionMap: VersionsMap) => {
     const versionToColor: VersionToColorMap = new Map();
 
+    const colors = getColors();
+
     for (const [baseColorIndex, item] of versionMap) {
         Array.from(item)
             // descending by version name: newer versions come first,
@@ -38,13 +46,16 @@ export const getVersionColors = (versionMap: VersionsMap) => {
                     versionToColor.set(minor, DEFAULT_COLOR);
                 } else {
                     // baseColorIndex is numeric as we check if it is UNDEFINED_COLOR_INDEX before
-                    const currentColorIndex = Number(baseColorIndex) % COLORS.length;
+                    const currentColorIndex = Number(baseColorIndex) % colors.length;
                     const minorQuantity = item.size;
-                    const majorColor = COLORS[currentColorIndex];
-                    const opacityPercent = Math.max(100 - minorIndex * (100 / minorQuantity), 20);
-                    const hexOpacity = Math.round((opacityPercent * 255) / 100).toString(16);
-                    const versionColor = `${majorColor}${hexOpacity}`;
-                    versionToColor.set(minor, versionColor);
+
+                    const minorColorVariant = getMinorVersionColorVariant(
+                        minorIndex,
+                        minorQuantity,
+                    );
+                    const minorColor = colors[currentColorIndex][minorColorVariant];
+
+                    versionToColor.set(minor, minorColor);
                 }
             });
     }
