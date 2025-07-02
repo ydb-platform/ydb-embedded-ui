@@ -8,7 +8,7 @@ import type {
 
 import {api} from './api';
 
-const DEFAULT_PAGE_SIZE = 20;
+export const DEFAULT_PAGE_SIZE = 20;
 
 // Validate and normalize the response to ensure it has proper structure
 function validateOperationListResponse(data: TOperationList): TOperationList {
