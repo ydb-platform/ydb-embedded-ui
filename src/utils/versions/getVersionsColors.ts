@@ -1,4 +1,3 @@
-import {getTheme} from '..';
 import type {VersionToColorMap, VersionsMap} from '../../types/versions';
 
 import {getMajorVersion, getMinorVersion} from './parseVersion';
@@ -10,35 +9,70 @@ export const hashCode = (s: string) => {
     }, 0);
 };
 
-const DARK_COLORS = [
-    ['#D50C38', '#FF2051', '#FB3A64', '#FF6989'],
-    ['#EB3320', '#FF503E', '#FF8376', '#FFA399'],
-    ['#F47B10', '#FF9B43', '#FFB06A', '#FFC693'],
-    ['#FFEA00', '#FFEE31', '#FFF480', '#FFF8A9'],
-    ['#83D400', '#B1FF33', '#CBFF78', '#DDFFA7'],
-    ['#27C98B', '#16FFA6', '#4CFFBA', '#9BFFD8'],
-    ['#0EDBDE', '#0CFBFF', '#63FDFF', '#B1FEFF'],
-    ['#2059FF', '#4070FF', '#658BFF', '#A1B9FF'],
-    ['#AB07E3', '#C92CFF', '#DD78FF', '#E79FFF'],
-    ['#E71498', '#FF34B3', '#FF75CB', '#FFB0E1'],
+export const COLORS = [
+    [
+        'var(--versions-red-1)',
+        'var(--versions-red-2)',
+        'var(--versions-red-3)',
+        'var(--versions-red-4)',
+    ],
+    [
+        'var(--versions-orange-red-1)',
+        'var(--versions-orange-red-2)',
+        'var(--versions-orange-red-3)',
+        'var(--versions-orange-red-4)',
+    ],
+    [
+        'var(--versions-orange-1)',
+        'var(--versions-orange-2)',
+        'var(--versions-orange-3)',
+        'var(--versions-orange-4)',
+    ],
+    [
+        'var(--versions-yellow-1)',
+        'var(--versions-yellow-2)',
+        'var(--versions-yellow-3)',
+        'var(--versions-yellow-4)',
+    ],
+    [
+        'var(--versions-green-1)',
+        'var(--versions-green-2)',
+        'var(--versions-green-3)',
+        'var(--versions-green-4)',
+    ],
+    [
+        'var(--versions-teal-1)',
+        'var(--versions-teal-2)',
+        'var(--versions-teal-3)',
+        'var(--versions-teal-4)',
+    ],
+    [
+        'var(--versions-cyan-1)',
+        'var(--versions-cyan-2)',
+        'var(--versions-cyan-3)',
+        'var(--versions-cyan-4)',
+    ],
+    [
+        'var(--versions-blue-1)',
+        'var(--versions-blue-2)',
+        'var(--versions-blue-3)',
+        'var(--versions-blue-4)',
+    ],
+    [
+        'var(--versions-purple-1)',
+        'var(--versions-purple-2)',
+        'var(--versions-purple-3)',
+        'var(--versions-purple-4)',
+    ],
+    [
+        'var(--versions-pink-1)',
+        'var(--versions-pink-2)',
+        'var(--versions-pink-3)',
+        'var(--versions-pink-4)',
+    ],
 ];
 
-const LIGHT_COLORS = [
-    ['#F4315B', '#FF426B', '#FF7391', '#FF8BA4'],
-    ['#FF6050', '#FF7A6D', '#FFAFA6', '#FFBCB5'],
-    ['#FF9233', '#FFAD65', '#FFC593', '#FFD3AC'],
-    ['#FFEA00', '#FFEE31', '#FFF480', '#FFF8A9'],
-    ['#A1EE26', '#B1FF33', '#CBFF78', '#DDFFA7'],
-    ['#31EBA4', '#16FFA6', '#4CFFBA', '#9BFFD8'],
-    ['#2EE4E8', '#0CFBFF', '#63FDFF', '#B1FEFF'],
-    ['#386BFF', '#4070FF', '#658BFF', '#A1B9FF'],
-    ['#C73AF7', '#C92CFF', '#DD78FF', '#E79FFF'],
-    ['#FF49BB', '#FF34B3', '#FF75CB', '#FFB0E1'],
-];
-
-export function getColors() {
-    return getTheme() === 'dark' ? DARK_COLORS : LIGHT_COLORS;
-}
+export const DEFAULT_COLOR = 'var(--g-color-base-generic-medium)';
 
 /** Calculates sub color index */
 export function getMinorVersionColorVariant(minorIndex: number, minorQuantity: number) {
@@ -64,9 +98,6 @@ export function getMinorVersionColorVariant(minorIndex: number, minorQuantity: n
     return Math.floor((4 * minorIndex) / minorQuantity);
 }
 
-// TODO: replace with color suggested by designer
-export const DEFAULT_COLOR = 'saddlebrown';
-
 export const getVersionsMap = (versions: string[], initialMap: VersionsMap = new Map()) => {
     versions.forEach((version) => {
         const majorVersion = getMajorVersion(version);
@@ -87,12 +118,10 @@ export const getVersionToColorMap = (versionsMap: VersionsMap) => {
         };
     });
 
-    const colors = getColors();
-
     const versionToColor: VersionToColorMap = new Map();
     // not every version is colored, therefore iteration index can't be used consistently
     // init with the colors length to put increment right after condition for better readability
-    let currentColorIndex = colors.length - 1;
+    let currentColorIndex = COLORS.length - 1;
 
     clustersVersions
         // ascending by version name, just for consistency
@@ -100,10 +129,10 @@ export const getVersionToColorMap = (versionsMap: VersionsMap) => {
         .sort((a, b) => a.hash - b.hash)
         .forEach((item) => {
             if (/^(\w+-)?stable/.test(item.version)) {
-                currentColorIndex = (currentColorIndex + 1) % colors.length;
+                currentColorIndex = (currentColorIndex + 1) % COLORS.length;
 
                 // Use fisrt color for major
-                versionToColor.set(item.version, colors[currentColorIndex][0]);
+                versionToColor.set(item.version, COLORS[currentColorIndex][0]);
 
                 const minors = Array.from(versionsMap.get(item.version) || [])
                     .filter((v) => v !== item.version)
@@ -125,7 +154,7 @@ export const getVersionToColorMap = (versionsMap: VersionsMap) => {
                             minorIndex,
                             minorQuantity,
                         );
-                        const minorColor = colors[currentColorIndex][minorColorVariant];
+                        const minorColor = COLORS[currentColorIndex][minorColorVariant];
                         versionToColor.set(minor.version, minorColor);
                     });
             } else {
