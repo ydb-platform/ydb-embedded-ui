@@ -2,7 +2,7 @@ import React from 'react';
 
 import {throttle} from 'lodash';
 
-import {operationsApi} from '../../store/reducers/operations';
+import {DEFAULT_PAGE_SIZE, operationsApi} from '../../store/reducers/operations';
 import type {OperationKind} from '../../types/api/operations';
 
 interface UseOperationsInfiniteQueryProps {
@@ -18,7 +18,7 @@ const DEFAULT_SCROLL_MARGIN = 100;
 export function useOperationsInfiniteQuery({
     database,
     kind,
-    pageSize = 10,
+    pageSize = DEFAULT_PAGE_SIZE,
     searchValue,
     scrollContainerRef,
 }: UseOperationsInfiniteQueryProps) {
@@ -63,8 +63,14 @@ export function useOperationsInfiniteQuery({
     // Check after data updates
     React.useLayoutEffect(() => {
         if (!isFetchingNextPage) {
-            checkAndLoadMorePages();
+            // RAF to ensure browser has completed layout and paint
+            const raf = requestAnimationFrame(() => {
+                checkAndLoadMorePages();
+            });
+            return () => cancelAnimationFrame(raf);
         }
+
+        return undefined;
     }, [data, isFetchingNextPage, checkAndLoadMorePages]);
 
     // Scroll handler for infinite scrolling
