@@ -63,8 +63,14 @@ export function useOperationsInfiniteQuery({
     // Check after data updates
     React.useLayoutEffect(() => {
         if (!isFetchingNextPage) {
-            checkAndLoadMorePages();
+            // RAF to ensure browser has completed layout and paint
+            const raf = requestAnimationFrame(() => {
+                checkAndLoadMorePages();
+            });
+            return () => cancelAnimationFrame(raf);
         }
+
+        return undefined;
     }, [data, isFetchingNextPage, checkAndLoadMorePages]);
 
     // Scroll handler for infinite scrolling
