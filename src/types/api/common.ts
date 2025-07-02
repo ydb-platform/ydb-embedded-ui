@@ -1,6 +1,6 @@
 export interface IProtobufTimeObject {
     /** int64 */
-    seconds?: string;
+    seconds?: string | number;
     nanos?: number;
 }
 
