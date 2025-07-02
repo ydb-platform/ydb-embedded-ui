@@ -13,7 +13,6 @@ const componentsRegistryInner = new Registry()
     .register('AsideNavigation', AsideNavigation)
     .register('ErrorBoundary', ErrorBoundaryInner)
     .register('ShardsTable', ShardsTable)
-    .register('AIAssistantButton', EmptyPlaceholder)
     .register('ChatPanel', EmptyPlaceholder);
 
 export type ComponentsRegistry = ComponentsRegistryTemplate<typeof componentsRegistryInner>;
