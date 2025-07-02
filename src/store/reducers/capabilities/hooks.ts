@@ -89,7 +89,7 @@ export const useEditAccessAvailable = () => {
 };
 
 export const useTopicDataAvailable = () => {
-    return useGetFeatureVersion('/viewer/topic_data') >= 2;
+    return useGetFeatureVersion('/viewer/topic_data') >= 1;
 };
 
 const useGetSecuritySetting = (feature: SecuritySetting) => {
