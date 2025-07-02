@@ -1,7 +1,7 @@
 import {normalizePathSlashes} from '.';
 
 const protocolRegex = /^http[s]?:\/\//;
-const viewerPathnameRegex = /\/viewer\/json$/;
+const viewerPathnameRegex = /\/viewer(\/json)?$/;
 
 export const removeViewerPathname = (value: string) => {
     return value.replace(viewerPathnameRegex, '');
