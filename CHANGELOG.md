@@ -1,5 +1,22 @@
 # Changelog
 
+## [10.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.11.0...v10.0.0) (2025-07-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove ai assistant button ([#2535](https://github.com/ydb-platform/ydb-embedded-ui/issues/2535))
+
+### Features
+
+* remove ai assistant button ([#2535](https://github.com/ydb-platform/ydb-embedded-ui/issues/2535)) ([2511059](https://github.com/ydb-platform/ydb-embedded-ui/commit/2511059fc05ef035a4b44f71434f20f462b96c21))
+
+
+### Bug Fixes
+
+* make operations page_size to 20 ([#2498](https://github.com/ydb-platform/ydb-embedded-ui/issues/2498)) ([512cf15](https://github.com/ydb-platform/ydb-embedded-ui/commit/512cf159374b0fa416910540ed437ef4fa840946))
+* remove viewer from balancer ([#2523](https://github.com/ydb-platform/ydb-embedded-ui/issues/2523)) ([c37f2e3](https://github.com/ydb-platform/ydb-embedded-ui/commit/c37f2e3609d97ba35caa9010d8b8a8be1881a661))
+
 ## [9.11.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.10.0...v9.11.0) (2025-06-30)
 
 
