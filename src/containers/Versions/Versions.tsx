@@ -32,7 +32,7 @@ export function VersionsContainer({cluster, loading}: VersionsContainerProps) {
         {tablets: false, fieldsRequired: ['SystemState', 'SubDomainKey']},
         {pollingInterval: autoRefreshInterval},
     );
-    const versionToColor = useVersionToColorMap();
+    const versionToColor = useVersionToColorMap(cluster);
 
     const versionsValues = useGetVersionValues({cluster, versionToColor, clusterLoading: loading});
 

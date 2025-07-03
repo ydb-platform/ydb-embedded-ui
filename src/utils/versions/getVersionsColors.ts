@@ -9,23 +9,94 @@ export const hashCode = (s: string) => {
     }, 0);
 };
 
-// TODO: colors used in charts as well, need to move to constants
-// 11 distinct colors from https://mokole.com/palette.html
 export const COLORS = [
-    '#008000', // green
-    '#4169e1', // royalblue
-    '#ffd700', // gold
-    '#ff8c00', // darkorange
-    '#808000', // olive
-    '#e9967a', // darksalmon
-    '#ff1493', // deeppink
-    '#00bfff', // deepskyblue
-    '#da70d6', // orchid
-    '#8b4513', //saddlebrown
-    '#b22222', // firebrick
+    [
+        'var(--versions-red-1)',
+        'var(--versions-red-2)',
+        'var(--versions-red-3)',
+        'var(--versions-red-4)',
+    ],
+    [
+        'var(--versions-orange-red-1)',
+        'var(--versions-orange-red-2)',
+        'var(--versions-orange-red-3)',
+        'var(--versions-orange-red-4)',
+    ],
+    [
+        'var(--versions-orange-1)',
+        'var(--versions-orange-2)',
+        'var(--versions-orange-3)',
+        'var(--versions-orange-4)',
+    ],
+    [
+        'var(--versions-yellow-1)',
+        'var(--versions-yellow-2)',
+        'var(--versions-yellow-3)',
+        'var(--versions-yellow-4)',
+    ],
+    [
+        'var(--versions-green-1)',
+        'var(--versions-green-2)',
+        'var(--versions-green-3)',
+        'var(--versions-green-4)',
+    ],
+    [
+        'var(--versions-teal-1)',
+        'var(--versions-teal-2)',
+        'var(--versions-teal-3)',
+        'var(--versions-teal-4)',
+    ],
+    [
+        'var(--versions-cyan-1)',
+        'var(--versions-cyan-2)',
+        'var(--versions-cyan-3)',
+        'var(--versions-cyan-4)',
+    ],
+    [
+        'var(--versions-blue-1)',
+        'var(--versions-blue-2)',
+        'var(--versions-blue-3)',
+        'var(--versions-blue-4)',
+    ],
+    [
+        'var(--versions-purple-1)',
+        'var(--versions-purple-2)',
+        'var(--versions-purple-3)',
+        'var(--versions-purple-4)',
+    ],
+    [
+        'var(--versions-pink-1)',
+        'var(--versions-pink-2)',
+        'var(--versions-pink-3)',
+        'var(--versions-pink-4)',
+    ],
 ];
 
-export const DEFAULT_COLOR = '#3cb371'; // mediumseagreen
+export const DEFAULT_COLOR = 'var(--g-color-base-generic-medium)';
+
+/** Calculates sub color index */
+export function getMinorVersionColorVariant(minorIndex: number, minorQuantity: number) {
+    // We have 4 sub colors for each color
+    // For 4+ minors first 25% will be colored with the first most bright color
+    // Every next 25% will be colored with corresponding color
+    // Do not use all colors if there are less than 4 minors
+
+    if (minorQuantity === 1) {
+        return 0;
+    }
+    // Use only 2 colors
+    if (minorQuantity === 2) {
+        return Math.floor((2 * minorIndex) / minorQuantity);
+    }
+    // Use only 3 colors
+    if (minorQuantity === 3) {
+        return Math.floor((3 * minorIndex) / minorQuantity);
+    }
+
+    // Max minor index is minorQuantity - 1
+    // So result values always will be in range from 0 to 3
+    return Math.floor((4 * minorIndex) / minorQuantity);
+}
 
 export const getVersionsMap = (versions: string[], initialMap: VersionsMap = new Map()) => {
     versions.forEach((version) => {
@@ -60,7 +131,8 @@ export const getVersionToColorMap = (versionsMap: VersionsMap) => {
             if (/^(\w+-)?stable/.test(item.version)) {
                 currentColorIndex = (currentColorIndex + 1) % COLORS.length;
 
-                versionToColor.set(item.version, COLORS[currentColorIndex]);
+                // Use fisrt color for major
+                versionToColor.set(item.version, COLORS[currentColorIndex][0]);
 
                 const minors = Array.from(versionsMap.get(item.version) || [])
                     .filter((v) => v !== item.version)
@@ -78,14 +150,12 @@ export const getVersionToColorMap = (versionsMap: VersionsMap) => {
                     // so the newer version gets the brighter color
                     .sort((a, b) => b.hash - a.hash)
                     .forEach((minor, minorIndex) => {
-                        const majorColor = COLORS[currentColorIndex];
-                        const opacityPercent = Math.max(
-                            100 - minorIndex * (100 / minorQuantity),
-                            20,
+                        const minorColorVariant = getMinorVersionColorVariant(
+                            minorIndex,
+                            minorQuantity,
                         );
-                        const hexOpacity = Math.round((opacityPercent * 255) / 100).toString(16);
-                        const versionColor = `${majorColor}${hexOpacity}`;
-                        versionToColor.set(minor.version, versionColor);
+                        const minorColor = COLORS[currentColorIndex][minorColorVariant];
+                        versionToColor.set(minor.version, minorColor);
                     });
             } else {
                 versionToColor.set(item.version, DEFAULT_COLOR);
