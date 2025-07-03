@@ -23,14 +23,13 @@ export function Operations({database, scrollContainerRef}: OperationsProps) {
     const {kind, searchValue, pageSize, handleKindChange, handleSearchChange} =
         useOperationsQueryParams();
 
-    const {operations, isLoading, isLoadingMore, error, refreshTable, totalCount} =
-        useOperationsInfiniteQuery({
-            database,
-            kind,
-            pageSize,
-            searchValue,
-            scrollContainerRef,
-        });
+    const {operations, isLoading, isLoadingMore, error, refreshTable} = useOperationsInfiniteQuery({
+        database,
+        kind,
+        pageSize,
+        searchValue,
+        scrollContainerRef,
+    });
 
     const settings = React.useMemo(() => {
         return {
@@ -49,9 +48,6 @@ export function Operations({database, scrollContainerRef}: OperationsProps) {
                 <OperationsControls
                     kind={kind}
                     searchValue={searchValue}
-                    entitiesCountCurrent={operations.length}
-                    entitiesCountTotal={totalCount}
-                    entitiesLoading={isLoading}
                     handleKindChange={handleKindChange}
                     handleSearchChange={handleSearchChange}
                 />

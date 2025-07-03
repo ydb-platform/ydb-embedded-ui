@@ -1,5 +1,4 @@
 {
-  "label_operations": "Operations",
   "title_empty": "No operations data",
   "pleaceholder_search": "Search operations",
   "placeholder_kind": "Select operation kind",
@@ -8,7 +7,6 @@
   "kind_export_yt": "Export/YT",
   "kind_import_s3": "Import/S3",
   "kind_buildIndex": "Build Index",
-
   "column_operationId": "Operation ID",
   "column_status": "Status",
   "column_createdBy": "Created By",
@@ -18,7 +16,6 @@
   "column_state": "State",
   "column_progress": "Progress",
   "label_duration-ongoing": "{{value}} (ongoing)",
-
   "header_cancel": "Cancel operation",
   "header_forget": "Forget operation",
   "text_cancel": "The operation will be cancelled. Do you want to proceed?",

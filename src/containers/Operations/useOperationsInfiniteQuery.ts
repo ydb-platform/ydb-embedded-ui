@@ -116,6 +116,5 @@ export function useOperationsInfiniteQuery({
         isLoadingMore: isFetchingNextPage,
         error,
         refreshTable: refetch,
-        totalCount: allOperations.length,
     };
 }
