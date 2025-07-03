@@ -39,7 +39,6 @@ import {
     useTypedSelector,
 } from '../../../../utils/hooks';
 import {useChangedQuerySettings} from '../../../../utils/hooks/useChangedQuerySettings';
-import {useDisableOidcStreaming} from '../../../../utils/hooks/useDisableOidcStreaming';
 import {useLastQueryExecutionSettings} from '../../../../utils/hooks/useLastQueryExecutionSettings';
 import {DEFAULT_QUERY_SETTINGS, QUERY_ACTIONS, QUERY_MODES} from '../../../../utils/query';
 import {useCurrentSchema} from '../../TenantContext';
@@ -95,14 +94,10 @@ export default function QueryEditor(props: QueryEditorProps) {
     const [lastExecutedQueryText, setLastExecutedQueryText] = React.useState<string>('');
     const [isQueryStreamingEnabled] = useSetting<boolean>(ENABLE_QUERY_STREAMING);
 
-    // Temporary check: disable streaming if backend parameter contains "oidc"
-    const isOidcBackend = useDisableOidcStreaming();
-
     const isStreamingEnabled =
         useStreamingAvailable() &&
         isQueryStreamingEnabled &&
-        querySettings.queryMode === QUERY_MODES.query &&
-        !isOidcBackend;
+        querySettings.queryMode === QUERY_MODES.query;
 
     const [sendQuery] = queryApi.useUseSendQueryMutation();
     const [streamQuery] = queryApi.useUseStreamQueryMutation();
