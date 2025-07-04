@@ -1,0 +1,10 @@
+{
+  "title": "Queries Activity",
+  "subtitle": "Monitor changes in real time",
+  "per-sec": "{{count}} per sec",
+  "ms": "{{time}} ms",
+  "running-queries": "Running Queries",
+  "applications": "Applications",
+  "users": "Users",
+  "open-running-queries": "Open Running Queries"
+}

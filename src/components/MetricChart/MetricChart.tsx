@@ -3,11 +3,14 @@ import React from 'react';
 import ChartKit, {settings} from '@gravity-ui/chartkit';
 import type {YagrWidgetData} from '@gravity-ui/chartkit/yagr';
 import {YagrPlugin} from '@gravity-ui/chartkit/yagr';
+import {Flex} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 import type {TimeFrame} from '../../utils/timeframes';
 import {ResponseError} from '../Errors/ResponseError';
 import {Loader} from '../Loader';
+import {TimeFrameDropdown} from '../TimeFrameDropdown/TimeFrameDropdown';
+import {TimeFrameSelector} from '../TimeFrameSelector/TimeFrameSelector';
 
 import {colorToRGBA, colors} from './colors';
 import {getDefaultDataFormatter} from './getDefaultDataFormatter';
@@ -122,6 +125,21 @@ interface DiagnosticsChartProps {
      * Pass isChartVisible prop to ensure proper chart render
      */
     isChartVisible?: boolean;
+
+    /** Remove border from chart */
+    noBorder?: boolean;
+
+    /** Make chart take full width of container */
+    fullWidth?: boolean;
+
+    /** Show timeframe selector to the right of chart title */
+    withTimeframeSelector?: boolean;
+
+    /** Callback when timeframe is changed via the selector */
+    onTimeFrameChange?: (timeFrame: TimeFrame) => void;
+
+    /** Timeframe component to choose between 'selector' and 'dropdown' */
+    timeFrameComponent?: 'selector' | 'dropdown';
 }
 
 export const MetricChart = ({
@@ -135,7 +153,16 @@ export const MetricChart = ({
     chartOptions,
     onChartDataStatusChange,
     isChartVisible,
+    noBorder,
+    fullWidth,
+    withTimeframeSelector,
+    onTimeFrameChange,
+    timeFrameComponent = 'selector',
 }: DiagnosticsChartProps) => {
+    // Use a reasonable default for maxDataPoints when fullWidth is true
+    const effectiveWidth = fullWidth ? 600 : width;
+    const maxDataPoints = effectiveWidth / 2;
+
     const {currentData, error, isFetching, status} = chartApi.useGetChartDataQuery(
         // maxDataPoints param is calculated based on width
         // should be width > maxDataPoints to prevent points that cannot be selected
@@ -144,7 +171,7 @@ export const MetricChart = ({
             database,
             metrics,
             timeFrame,
-            maxDataPoints: width / 2,
+            maxDataPoints,
         },
         {pollingInterval: autorefresh},
     );
@@ -176,13 +203,22 @@ export const MetricChart = ({
 
     return (
         <div
-            className={b(null)}
+            className={b({noBorder, fullWidth})}
             style={{
                 height,
-                width,
+                width: fullWidth ? '100%' : width,
             }}
         >
-            <div className={b('title')}>{title}</div>
+            <Flex className={b('title')} justifyContent="space-between" alignItems="center">
+                <div>{title}</div>
+                {withTimeframeSelector &&
+                    onTimeFrameChange &&
+                    (timeFrameComponent === 'dropdown' ? (
+                        <TimeFrameDropdown value={timeFrame} onChange={onTimeFrameChange} />
+                    ) : (
+                        <TimeFrameSelector value={timeFrame} onChange={onTimeFrameChange} />
+                    ))}
+            </Flex>
             {renderContent()}
         </div>
     );
