@@ -3,7 +3,6 @@ import {HelpMark, Switch} from '@gravity-ui/uikit';
 import {cn} from '../../../../utils/cn';
 import {ENABLE_QUERY_STREAMING} from '../../../../utils/constants';
 import {useSetting} from '../../../../utils/hooks';
-import {useDisableOidcStreaming} from '../../../../utils/hooks/useDisableOidcStreaming';
 
 import {QUERY_SETTINGS_FIELD_SETTINGS} from './constants';
 import i18n from './i18n';
@@ -21,12 +20,7 @@ interface TimeoutLabelProps {
 export function TimeoutLabel({isDisabled, isChecked, onToggle}: TimeoutLabelProps) {
     const [isQueryStreamingEnabled] = useSetting<boolean>(ENABLE_QUERY_STREAMING);
 
-    // Temporary check: disable streaming UI if backend parameter contains "oidc"
-    const isOidcBackend = useDisableOidcStreaming();
-
-    const shouldShowStreamingUI = isQueryStreamingEnabled && !isOidcBackend;
-
-    if (shouldShowStreamingUI) {
+    if (isQueryStreamingEnabled) {
         return (
             <div className={b('switch-title')}>
                 <Switch
