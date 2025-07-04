@@ -1,5 +1,17 @@
 # Changelog
 
+## [10.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v10.0.0...v10.1.0) (2025-07-04)
+
+
+### Features
+
+* update versions colors ([#2530](https://github.com/ydb-platform/ydb-embedded-ui/issues/2530)) ([a392546](https://github.com/ydb-platform/ydb-embedded-ui/commit/a39254666dff7b323e7d499ee301ceeddf46e8d0))
+
+
+### Bug Fixes
+
+* remove operations counter ([#2540](https://github.com/ydb-platform/ydb-embedded-ui/issues/2540)) ([4821f40](https://github.com/ydb-platform/ydb-embedded-ui/commit/4821f40da2e710d3b5345b269dd04aca5855e8ea))
+
 ## [10.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v9.11.0...v10.0.0) (2025-07-03)
 
 
