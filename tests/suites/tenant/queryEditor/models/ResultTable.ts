@@ -10,7 +10,7 @@ export class PaneWrapper {
 
     constructor(page: Page) {
         this.paneWrapper = page.locator('.query-editor__pane-wrapper');
-        this.radioButton = this.paneWrapper.locator('.g-radio-button');
+        this.radioButton = this.paneWrapper.locator('.g-segmented-radio-group');
     }
 
     async selectTab(tabName: ResultTabNames) {
@@ -71,9 +71,7 @@ export class ResultTable {
     }
 
     async getResultTabs() {
-        const tabs = this.resultWrapper.locator(
-            '.ydb-query-result-sets-viewer__tabs .g-tabs__item',
-        );
+        const tabs = this.resultWrapper.locator('.ydb-query-result-sets-viewer__tabs .g-tab');
         await tabs.first().waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return tabs;
     }

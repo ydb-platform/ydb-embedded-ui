@@ -298,7 +298,7 @@ export class Diagnostics {
         this.autoRefreshSelect = page.locator('.g-select');
         this.table = new Table(page.locator('.object-general'));
         this.tableRadioButton = page.locator(
-            '.ydb-table-with-controls-layout__controls .g-radio-button',
+            '.ydb-table-with-controls-layout__controls .g-segmented-radio-group',
         );
         this.fixedHeightQueryElements = page.locator('.ydb-fixed-height-query');
         this.copyLinkButton = page.locator('.ydb-copy-link-button__icon');

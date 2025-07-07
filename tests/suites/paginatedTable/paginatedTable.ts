@@ -17,7 +17,7 @@ export class TableControls {
         this.page = page;
         this.tableSelector = tableSelector;
         this.searchInput = this.tableSelector.locator('.ydb-search input');
-        this.radioButtons = this.tableSelector.locator('.g-radio-button');
+        this.radioButtons = this.tableSelector.locator('.g-segmented-radio-group');
         this.countLabel = this.tableSelector.locator('.ydb-entities-count .g-label__content');
         this.refreshButton = page.locator('.auto-refresh-control button[aria-label="Refresh"]');
         this.refreshIntervalSelect = page.getByTestId('ydb-autorefresh-select');

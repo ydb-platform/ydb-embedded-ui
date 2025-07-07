@@ -191,7 +191,7 @@ export class Sidebar {
             .filter({hasText: 'ACL syntax format'});
 
         // Then find the radio button group within that item
-        return aclSettingsItem.locator('.g-radio-button');
+        return aclSettingsItem.locator('.g-segmented-radio-group');
     }
 
     async getSelectedAclSyntax(): Promise<string> {
