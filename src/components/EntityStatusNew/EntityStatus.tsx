@@ -73,7 +73,7 @@ function EntityStatusLabel({
                 <Flex gap="2" wrap="nowrap">
                     {children}
                     {withStatusName ? EFlagToStatusName[status] : null}
-                    {note && <HelpMark>{note}</HelpMark>}
+                    {note && <HelpMark className={b('note')}>{note}</HelpMark>}
                 </Flex>
             </Label>
         </ActionTooltip>

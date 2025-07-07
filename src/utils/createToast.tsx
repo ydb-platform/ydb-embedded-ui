@@ -1,5 +1,7 @@
 import type {ToastProps} from '@gravity-ui/uikit';
-import {toaster} from '@gravity-ui/uikit/toaster-singleton-react-18';
+import {Toaster} from '@gravity-ui/uikit';
+
+const toaster = new Toaster();
 
 export {toaster};
 

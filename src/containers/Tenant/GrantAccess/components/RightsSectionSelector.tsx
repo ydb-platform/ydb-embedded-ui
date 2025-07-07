@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {RadioButton, Text} from '@gravity-ui/uikit';
+import {SegmentedRadioGroup} from '@gravity-ui/uikit';
 
 import type {AvailablePermissionsConfig} from '../../../../types/api/acl';
 import i18n from '../i18n';
@@ -33,25 +33,23 @@ export function RightsSectionSelector({
     )?.length;
     return (
         <div className={block('view-selector')}>
-            <RadioButton value={value} onUpdate={onUpdate}>
-                <RadioButton.Option value={'Groups'}>
+            <SegmentedRadioGroup value={value} onUpdate={onUpdate}>
+                <SegmentedRadioGroup.Option value={'Groups'}>
                     {RightsViewTitle['Groups']}
                     {selectedRulesCount ? (
                         <React.Fragment>
                             &nbsp;
-                            <Text color="secondary">{selectedRulesCount}</Text>
+                            {selectedRulesCount}
                         </React.Fragment>
                     ) : null}
-                </RadioButton.Option>
-                <RadioButton.Option value={'Granular'}>
+                </SegmentedRadioGroup.Option>
+                <SegmentedRadioGroup.Option value={'Granular'}>
                     {RightsViewTitle['Granular']}&nbsp;
                     {selectedRightsCount ? (
-                        <React.Fragment>
-                            &nbsp;<Text color="secondary">{selectedRightsCount}</Text>
-                        </React.Fragment>
+                        <React.Fragment>&nbsp;{selectedRightsCount}</React.Fragment>
                     ) : null}
-                </RadioButton.Option>
-            </RadioButton>
+                </SegmentedRadioGroup.Option>
+            </SegmentedRadioGroup>
         </div>
     );
 }

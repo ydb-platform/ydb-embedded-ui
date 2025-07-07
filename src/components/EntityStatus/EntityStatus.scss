@@ -142,4 +142,8 @@
             color: var(--ydb-color-status-red);
         }
     }
+
+    &__info-popover {
+        padding: var(--g-spacing-4);
+    }
 }

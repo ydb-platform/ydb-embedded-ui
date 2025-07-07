@@ -42,7 +42,7 @@ export const ContentWithPopup = ({
     return (
         <React.Fragment>
             <Popup
-                anchorRef={anchor}
+                anchorElement={anchor.current}
                 open={isPinned || isPopupVisible}
                 placement={placement}
                 hasArrow={hasArrow}

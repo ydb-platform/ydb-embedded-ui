@@ -8,21 +8,21 @@ import {cn} from '../../utils/cn';
 
 import './HoverPopup.scss';
 
-const b = cn('hover-popup');
-
 const DEBOUNCE_TIMEOUT = 100;
+
+const b = cn('ydb-hover-popup');
 
 type HoverPopupProps = {
     children: React.ReactNode;
     renderPopupContent: () => React.ReactNode;
     showPopup?: boolean;
-    offset?: [number, number];
     anchorRef?: React.RefObject<HTMLElement>;
     onShowPopup?: VoidFunction;
     onHidePopup?: VoidFunction;
     delayOpen?: number;
     delayClose?: number;
-} & Pick<PopupProps, 'placement' | 'contentClassName'>;
+    contentClassName?: string;
+} & Pick<PopupProps, 'placement' | 'offset'>;
 
 export const HoverPopup = ({
     children,
@@ -100,20 +100,29 @@ export const HoverPopup = ({
             </span>
             {open ? (
                 <Popup
-                    contentClassName={b(null, contentClassName)}
-                    anchorRef={anchorRef || anchor}
-                    onMouseEnter={onPopupMouseEnter}
-                    onMouseLeave={onPopupMouseLeave}
-                    onEscapeKeyDown={onPopupEscapeKeyDown}
-                    onBlur={onPopupBlur}
+                    anchorElement={anchorRef?.current || anchor.current}
+                    onOpenChange={(_open, _event, reason) => {
+                        if (reason === 'escape-key') {
+                            onPopupEscapeKeyDown();
+                        }
+                    }}
                     placement={placement}
                     hasArrow
                     open
                     // bigger offset for easier switching to neighbour nodes
                     // matches the default offset for popup with arrow out of a sense of beauty
-                    offset={offset || [0, 12]}
+                    offset={offset || {mainAxis: 12, crossAxis: 0}}
+                    className={b()}
                 >
-                    <div onContextMenu={onPopupContextMenu}>{renderPopupContent()}</div>
+                    <div
+                        className={contentClassName}
+                        onContextMenu={onPopupContextMenu}
+                        onMouseEnter={onPopupMouseEnter}
+                        onMouseLeave={onPopupMouseLeave}
+                        onBlur={onPopupBlur}
+                    >
+                        {renderPopupContent()}
+                    </div>
                 </Popup>
             ) : null}
         </React.Fragment>

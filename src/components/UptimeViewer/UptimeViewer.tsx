@@ -43,7 +43,7 @@ export function NodeUptime({StartTime, DisconnectTime}: NodeUptimeProps) {
 
     return (
         <CellWithPopover
-            placement={['top', 'auto']}
+            placement={['top', 'bottom']}
             disabled={!content}
             content={<DefinitionList responsive>{content}</DefinitionList>}
         >
@@ -68,7 +68,7 @@ export function TabletUptime({ChangeTime}: TabletUptimeProps) {
     }
     return (
         <CellWithPopover
-            placement={['top', 'auto']}
+            placement={['top', 'bottom']}
             content={
                 <DefinitionList responsive>
                     <DefinitionList.Item key={'changeTime'} name={i18n('change-time')}>

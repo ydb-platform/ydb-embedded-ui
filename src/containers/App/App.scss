@@ -50,6 +50,8 @@ body,
 
     --g-popover-max-width: 500px;
 
+    --gn-drawer-item-position: absolute;
+
     &_theme_light,
     &_theme_light-hc {
         --code-background-color: var(--g-color-base-simple-hover);
@@ -115,4 +117,11 @@ body,
 
 .app_embedded {
     font-family: 'Rubik', sans-serif;
+}
+
+.g-tab__title {
+    display: inline-flex;
+    align-items: center;
+
+    height: 100%;
 }

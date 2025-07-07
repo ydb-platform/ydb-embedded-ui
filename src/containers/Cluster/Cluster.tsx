@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Skeleton, Tabs} from '@gravity-ui/uikit';
+import {Skeleton, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {Helmet} from 'react-helmet-async';
 import {Redirect, Route, Switch, useRouteMatch} from 'react-router-dom';
 import {StringParam, useQueryParams} from 'use-query-params';
@@ -151,26 +151,28 @@ export function Cluster({
                 </div>
             )}
             <div className={b('tabs-sticky-wrapper')}>
-                <Tabs
-                    size="l"
-                    allowNotSelected={true}
-                    activeTab={activeTabId}
-                    items={actualClusterTabs}
-                    wrapTo={({id}, node) => {
-                        const path = getClusterPath(id as ClusterTab, {clusterName, backend});
-                        return (
-                            <InternalLink
-                                to={path}
-                                key={id}
-                                onClick={() => {
-                                    dispatch(updateDefaultClusterTab(id));
-                                }}
-                            >
-                                {node}
-                            </InternalLink>
-                        );
-                    }}
-                />
+                <TabProvider value={activeTabId}>
+                    <TabList size="l">
+                        {actualClusterTabs.map(({id, title}) => {
+                            const path = getClusterPath(id as ClusterTab, {clusterName, backend});
+                            return (
+                                <Tab key={id} value={id}>
+                                    <InternalLink
+                                        view="primary"
+                                        as="tab"
+                                        to={path}
+                                        key={id}
+                                        onClick={() => {
+                                            dispatch(updateDefaultClusterTab(id));
+                                        }}
+                                    >
+                                        {title}
+                                    </InternalLink>
+                                </Tab>
+                            );
+                        })}
+                    </TabList>
+                </TabProvider>
             </div>
             <div className={b('content')}>
                 <Switch>

@@ -109,7 +109,6 @@ export const SpeedMultiMeter = ({
                     placement={'bottom'}
                     disabled={!withPopover}
                     hasArrow={true}
-                    size="s"
                 >
                     <div className={b('bars')} onMouseLeave={onLeaveDiagram}>
                         {renderValues()}

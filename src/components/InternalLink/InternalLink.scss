@@ -1,0 +1,13 @@
+.ydb-link {
+    &_tab {
+        display: inline-flex;
+        align-items: center;
+
+        height: 100%;
+
+        color: unset;
+        &:hover {
+            color: unset;
+        }
+    }
+}

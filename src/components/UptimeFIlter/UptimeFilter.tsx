@@ -1,4 +1,4 @@
-import {RadioButton} from '@gravity-ui/uikit';
+import {SegmentedRadioGroup} from '@gravity-ui/uikit';
 
 import {NodesUptimeFilterTitles, NodesUptimeFilterValues} from '../../utils/nodes';
 
@@ -10,13 +10,13 @@ interface UptimeFilterProps {
 
 export const UptimeFilter = ({value, onChange, className}: UptimeFilterProps) => {
     return (
-        <RadioButton value={value} onUpdate={onChange} className={className}>
-            <RadioButton.Option value={NodesUptimeFilterValues.All}>
+        <SegmentedRadioGroup value={value} onUpdate={onChange} className={className}>
+            <SegmentedRadioGroup.Option value={NodesUptimeFilterValues.All}>
                 {NodesUptimeFilterTitles[NodesUptimeFilterValues.All]}
-            </RadioButton.Option>
-            <RadioButton.Option value={NodesUptimeFilterValues.SmallUptime}>
+            </SegmentedRadioGroup.Option>
+            <SegmentedRadioGroup.Option value={NodesUptimeFilterValues.SmallUptime}>
                 {NodesUptimeFilterTitles[NodesUptimeFilterValues.SmallUptime]}
-            </RadioButton.Option>
-        </RadioButton>
+            </SegmentedRadioGroup.Option>
+        </SegmentedRadioGroup>
     );
 };

@@ -122,7 +122,6 @@ export function EntityStatus({
                                 <Popover
                                     className={b('info-popover')}
                                     content={infoPopoverContent}
-                                    tooltipOffset={[-4, 4]}
                                     placement={['top-start', 'bottom-start']}
                                     onOpenChange={(visible) => setInfoIconHovered(visible)}
                                 >

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Checkbox, RadioButton} from '@gravity-ui/uikit';
+import {Checkbox, SegmentedRadioGroup} from '@gravity-ui/uikit';
 
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {nodesApi} from '../../store/reducers/nodes/nodes';
@@ -65,14 +65,14 @@ function Versions({versionsValues, nodes, versionToColor}: VersionsProps) {
         return (
             <div className={b('group')}>
                 <span className={b('label')}>Group by:</span>
-                <RadioButton value={groupByValue} onUpdate={handleGroupByValueChange}>
-                    <RadioButton.Option value={GroupByValue.TENANT}>
+                <SegmentedRadioGroup value={groupByValue} onUpdate={handleGroupByValueChange}>
+                    <SegmentedRadioGroup.Option value={GroupByValue.TENANT}>
                         {GroupByValue.TENANT}
-                    </RadioButton.Option>
-                    <RadioButton.Option value={GroupByValue.VERSION}>
+                    </SegmentedRadioGroup.Option>
+                    <SegmentedRadioGroup.Option value={GroupByValue.VERSION}>
                         {GroupByValue.VERSION}
-                    </RadioButton.Option>
-                </RadioButton>
+                    </SegmentedRadioGroup.Option>
+                </SegmentedRadioGroup>
             </div>
         );
     };

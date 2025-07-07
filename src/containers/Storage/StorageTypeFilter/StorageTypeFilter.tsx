@@ -1,4 +1,4 @@
-import {RadioButton} from '@gravity-ui/uikit';
+import {SegmentedRadioGroup} from '@gravity-ui/uikit';
 
 import {STORAGE_TYPES} from '../../../store/reducers/storage/constants';
 import type {StorageType} from '../../../store/reducers/storage/types';
@@ -17,13 +17,13 @@ const storageTypeFilterQa = 'storage-type-filter';
 
 export const StorageTypeFilter = ({value, onChange}: StorageTypeFilterProps) => {
     return (
-        <RadioButton value={value} onUpdate={onChange} qa={storageTypeFilterQa}>
-            <RadioButton.Option value={STORAGE_TYPES.groups}>
+        <SegmentedRadioGroup value={value} onUpdate={onChange} qa={storageTypeFilterQa}>
+            <SegmentedRadioGroup.Option value={STORAGE_TYPES.groups}>
                 {StorageTypesTitles[STORAGE_TYPES.groups]}
-            </RadioButton.Option>
-            <RadioButton.Option value={STORAGE_TYPES.nodes}>
+            </SegmentedRadioGroup.Option>
+            <SegmentedRadioGroup.Option value={STORAGE_TYPES.nodes}>
                 {StorageTypesTitles[STORAGE_TYPES.nodes]}
-            </RadioButton.Option>
-        </RadioButton>
+            </SegmentedRadioGroup.Option>
+        </SegmentedRadioGroup>
     );
 };

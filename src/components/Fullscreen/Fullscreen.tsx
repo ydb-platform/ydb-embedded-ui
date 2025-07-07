@@ -1,10 +1,11 @@
 import React from 'react';
 
-import {Button, Icon, Portal} from '@gravity-ui/uikit';
+import {Button, Icon} from '@gravity-ui/uikit';
 
 import {disableFullscreen} from '../../store/reducers/fullscreen';
 import {cn} from '../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {Portal} from '../Portal/Portal';
 
 import disableFullscreenIcon from '../../assets/icons/disableFullscreen.svg';
 

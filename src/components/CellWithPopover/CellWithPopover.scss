@@ -12,6 +12,7 @@
         overflow: hidden;
 
         max-width: 100%;
+        padding: var(--g-spacing-4);
 
         vertical-align: middle;
         white-space: nowrap;
@@ -24,5 +25,8 @@
         &_full-width {
             width: 100%;
         }
+    }
+    &__children-wrapper {
+        cursor: pointer;
     }
 }

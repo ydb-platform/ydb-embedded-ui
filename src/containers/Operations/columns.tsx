@@ -204,7 +204,7 @@ function OperationsActions({operation, database, refreshTable}: OperationsAction
         <Flex gap="2">
             <ActionTooltip
                 title={i18n('header_forget')}
-                placement={['left', 'auto']}
+                placement={['left', 'bottom']}
                 disabled={isForgetButtonDisabled}
             >
                 <div>
@@ -232,7 +232,7 @@ function OperationsActions({operation, database, refreshTable}: OperationsAction
             </ActionTooltip>
             <ActionTooltip
                 title={i18n('header_cancel')}
-                placement={['right', 'auto']}
+                placement={['right', 'bottom']}
                 disabled={isCancelButtonDisabled}
             >
                 <div>

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import NiceModal from '@ebay/nice-modal-react';
-import {Dialog, Tabs} from '@gravity-ui/uikit';
+import {Dialog, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 
 import {tenantApi} from '../../store/reducers/tenant/tenant';
@@ -65,14 +65,15 @@ function ConnectToDBDialog({
             <Dialog.Header caption={i18n('header')} />
             <Dialog.Body>
                 <div>{i18n('connection-info-message')}</div>
-                <Tabs
-                    size="m"
-                    allowNotSelected={false}
-                    activeTab={activeTab}
-                    items={connectionTabs}
-                    onSelectTab={(tab) => setActiveTab(tab as SnippetLanguage)}
-                    className={b('dialog-tabs')}
-                />
+                <TabProvider value={activeTab}>
+                    <TabList className={b('dialog-tabs')}>
+                        {connectionTabs.map(({id, title}) => (
+                            <Tab key={id} value={id} onClick={() => setActiveTab(id)}>
+                                {title}
+                            </Tab>
+                        ))}
+                    </TabList>
+                </TabProvider>
                 <div className={b('snippet-container')}>
                     <LoaderWrapper loading={isTenantDataLoading}>
                         <YDBSyntaxHighlighterLazy
