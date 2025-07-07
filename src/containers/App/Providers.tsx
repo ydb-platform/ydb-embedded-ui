@@ -1,7 +1,7 @@
 import React from 'react';
 
 import * as NiceModal from '@ebay/nice-modal-react';
-import {ThemeProvider} from '@gravity-ui/uikit';
+import {ThemeProvider, ToasterComponent, ToasterProvider} from '@gravity-ui/uikit';
 import type {Store} from '@reduxjs/toolkit';
 import type {History} from 'history';
 import {HelmetProvider} from 'react-helmet-async';
@@ -14,6 +14,7 @@ import {ComponentsProvider} from '../../components/ComponentsProvider/Components
 import {componentsRegistry as defaultComponentsRegistry} from '../../components/ComponentsProvider/componentsRegistry';
 import type {ComponentsRegistry} from '../../components/ComponentsProvider/componentsRegistry';
 import {THEME_KEY} from '../../utils/constants';
+import {toaster} from '../../utils/createToast';
 import {useSetting} from '../../utils/hooks';
 
 interface ProvidersProps {
@@ -35,9 +36,12 @@ export function Providers({
                 <Router history={history}>
                     <QueryParamProvider adapter={ReactRouter5Adapter}>
                         <Theme>
-                            <ComponentsProvider registry={componentsRegistry}>
-                                <NiceModal.Provider>{children}</NiceModal.Provider>
-                            </ComponentsProvider>
+                            <ToasterProvider toaster={toaster}>
+                                <ComponentsProvider registry={componentsRegistry}>
+                                    <NiceModal.Provider>{children}</NiceModal.Provider>
+                                    <ToasterComponent />
+                                </ComponentsProvider>
+                            </ToasterProvider>
                         </Theme>
                     </QueryParamProvider>
                 </Router>
