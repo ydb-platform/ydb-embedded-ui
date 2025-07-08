@@ -33,7 +33,9 @@ export class TableControls {
 
     async selectRadioOption(groupIndex: number, optionText: string) {
         const radioGroup = this.radioButtons.nth(groupIndex);
-        const option = radioGroup.locator(`.g-radio-button__option:has-text("${optionText}")`);
+        const option = radioGroup.locator(
+            `.g-segmented-radio-group__option:has-text("${optionText}")`,
+        );
         await option.evaluate((el) => (el as HTMLElement).click());
     }
 

@@ -324,13 +324,13 @@ export class Diagnostics {
     }
 
     async clickTab(tabName: DiagnosticsTab): Promise<void> {
-        const tab = this.tabs.locator(`.kv-tenant-diagnostics__tab:has-text("${tabName}")`);
+        const tab = this.tabs.locator(`.g-tab:has-text("${tabName}")`);
         await tab.click();
     }
 
     async clickRadioSwitch(radioName: QueriesSwitch): Promise<void> {
         const option = this.tableControls.locator(
-            `.g-radio-button__option:has-text("${radioName}")`,
+            `.g-segmented-radio-group__option:has-text("${radioName}")`,
         );
 
         await option.evaluate((el) => (el as HTMLElement).click());
@@ -412,12 +412,16 @@ export class Diagnostics {
     }
 
     async selectTopShardsMode(mode: TopShardsMode): Promise<void> {
-        const option = this.tableRadioButton.locator(`.g-radio-button__option:has-text("${mode}")`);
+        const option = this.tableRadioButton.locator(
+            `.g-segmented-radio-group__option:has-text("${mode}")`,
+        );
         await option.evaluate((el) => (el as HTMLElement).click());
     }
 
     async getSelectedTableMode(): Promise<string> {
-        const checkedOption = this.tableRadioButton.locator('.g-radio-button__option_checked');
+        const checkedOption = this.tableRadioButton.locator(
+            '.g-segmented-radio-group__option_checked',
+        );
         return (await checkedOption.textContent())?.trim() || '';
     }
 

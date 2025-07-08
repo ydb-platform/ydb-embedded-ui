@@ -78,6 +78,7 @@ export const HotkeysPanelWrapper = ({
             visible={visible}
             hotkeys={hotkeyGroups}
             className={b('hotkeys-panel')}
+            drawerItemClassName={b('hotkeys-drawer')}
             title={
                 <div className={b('hotkeys-panel-title')}>
                     {i18n('hotkeys.title')}

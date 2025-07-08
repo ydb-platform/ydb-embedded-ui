@@ -20,7 +20,7 @@ export class Sidebar {
         this.logoButton = this.sidebarContainer.locator('.gn-logo__btn-logo');
         this.footer = this.sidebarContainer.locator('.gn-aside-header__footer');
         this.drawer = page.locator('.gn-drawer');
-        this.popupContent = page.locator('.g-popup__content');
+        this.popupContent = page.locator('.information-popup__content');
         this.hotkeysButton = this.popupContent.locator('text=Keyboard shortcuts');
         this.hotkeysPanel = page.locator('.gn-hotkeys-panel__drawer-item');
         this.drawerMenu = page.locator('.gn-settings-menu');
@@ -196,7 +196,7 @@ export class Sidebar {
 
     async getSelectedAclSyntax(): Promise<string> {
         const radioGroup = await this.getAclSyntaxRadioGroup();
-        const checkedOption = radioGroup.locator('.g-radio-button__option_checked');
+        const checkedOption = radioGroup.locator('.g-segmented-radio-group__option_checked');
         const text = await checkedOption.textContent();
         return text?.trim() || '';
     }
@@ -206,7 +206,7 @@ export class Sidebar {
         await this.drawer.waitFor({state: 'visible'});
 
         const radioGroup = await this.getAclSyntaxRadioGroup();
-        const option = radioGroup.locator(`.g-radio-button__option:has-text("${syntax}")`);
+        const option = radioGroup.locator(`.g-segmented-radio-group__option:has-text("${syntax}")`);
         await option.click();
         // Small delay to ensure the setting is saved
         await this.drawer.page().waitForTimeout(100);
@@ -214,7 +214,7 @@ export class Sidebar {
 
     async getAclSyntaxOptions(): Promise<string[]> {
         const radioGroup = await this.getAclSyntaxRadioGroup();
-        const options = radioGroup.locator('.g-radio-button__option');
+        const options = radioGroup.locator('.g-segmented-radio-group__option');
         const count = await options.count();
         const texts: string[] = [];
         for (let i = 0; i < count; i++) {
