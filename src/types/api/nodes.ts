@@ -89,17 +89,14 @@ export interface TMemoryStats {
     QueryExecutionConsumption?: string;
     QueryExecutionLimit?: string;
 
-    ScanGroupedMemoryLimiterConsumption?: string;
-    ScanGroupedMemoryLimiterLimit?: string;
+    ColumnTablesReadExecutionConsumption?: string;
+    ColumnTablesReadExecutionLimit?: string;
 
-    CompGroupedMemoryLimiterConsumption?: string;
-    CompGroupedMemoryLimiterLimit?: string;
+    ColumnTablesCompactionConsumption?: string;
+    ColumnTablesCompactionLimit?: string;
 
-    BlobCacheConsumption?: string;
-    BlobCacheLimit?: string;
-
-    DataAccessorCacheConsumption?: string;
-    DataAccessorCacheLimit?: string;
+    ColumnTablesCacheConsumption?: string;
+    ColumnTablesCacheLimit?: string;
 
     HardLimit?: string;
     SoftLimit?: string;
