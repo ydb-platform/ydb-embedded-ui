@@ -40,7 +40,7 @@ export class SettingsDialog {
         this.timeoutInput = this.dialog.locator('.ydb-query-settings-timeout__input');
         this.timeoutSwitch = this.dialog.locator('.ydb-timeout-label__switch');
         this.timeoutSwitchHint = this.dialog.locator('.ydb-timeout-label__question-icon');
-        this.timeoutHintPopover = this.page.locator('.g-popover-legacy__tooltip-content');
+        this.timeoutHintPopover = this.page.locator('.g-help-mark__popover');
         this.timeoutLabel = this.dialog.locator('.ydb-timeout-label__label-title');
 
         // Define distinct locators for selects
