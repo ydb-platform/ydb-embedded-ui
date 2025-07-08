@@ -1,5 +1,12 @@
 # Changelog
 
+## [10.1.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v10.1.0...v10.1.1) (2025-07-08)
+
+
+### Bug Fixes
+
+* **capabilities:** show topic data from 1 handler version ([#2529](https://github.com/ydb-platform/ydb-embedded-ui/issues/2529)) ([de6b802](https://github.com/ydb-platform/ydb-embedded-ui/commit/de6b8024a28fc362fcdfc3faf98d0eef802e46b7))
+
 ## [10.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v10.0.0...v10.1.0) (2025-07-07)
 
 
