@@ -24,7 +24,7 @@ export class TableControls {
         this.columnSetupButton = this.tableSelector.locator(
             '.g-tree-select.g-table-column-setup button',
         );
-        this.columnSetupPopup = page.locator('.g-popup .g-select-popup.g-tree-select__popup');
+        this.columnSetupPopup = page.locator('.g-popup.g-tree-select__popup');
     }
 
     async search(searchTerm: string) {

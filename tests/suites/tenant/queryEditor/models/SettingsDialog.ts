@@ -35,12 +35,12 @@ export class SettingsDialog {
         this.limitRowsErrorIcon = this.dialog.locator(
             '.ydb-query-settings-dialog__limit-rows [data-qa="control-error-icon-qa"]',
         );
-        this.limitRowsErrorPopover = this.page.locator('.g-popover__tooltip-content');
+        this.limitRowsErrorPopover = this.page.locator('.g-popover-legacy__tooltip-content');
         this.selectPopup = page.locator('.ydb-query-settings-select__popup');
         this.timeoutInput = this.dialog.locator('.ydb-query-settings-timeout__input');
         this.timeoutSwitch = this.dialog.locator('.ydb-timeout-label__switch');
         this.timeoutSwitchHint = this.dialog.locator('.ydb-timeout-label__question-icon');
-        this.timeoutHintPopover = this.page.locator('.g-popover__tooltip-content');
+        this.timeoutHintPopover = this.page.locator('.g-popover-legacy__tooltip-content');
         this.timeoutLabel = this.dialog.locator('.ydb-timeout-label__label-title');
 
         // Define distinct locators for selects
