@@ -41,6 +41,7 @@ export function TopicMessage({offset, size, message}: TopicMessageProps) {
                 preparedMessage = decodedMessage;
             }
         } catch (e) {
+            preparedMessage = decodedMessage;
             console.warn(e);
         }
 
