@@ -1,5 +1,12 @@
 # Changelog
 
+## [11.0.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.0.0...v11.0.1) (2025-07-09)
+
+
+### Bug Fixes
+
+* **TopicData:** decode data for message, show error for entire table ([#2554](https://github.com/ydb-platform/ydb-embedded-ui/issues/2554)) ([b56cd82](https://github.com/ydb-platform/ydb-embedded-ui/commit/b56cd827b91d2ce3c42d3cec3a8877267f1a7092))
+
 ## [11.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v10.1.1...v11.0.0) (2025-07-09)
 
 
