@@ -1,7 +1,7 @@
 import React from 'react';
 
-import type {DefinitionListProps} from '@gravity-ui/components';
-import {DefinitionList} from '@gravity-ui/components';
+import type {DefinitionListProps} from '@gravity-ui/uikit';
+import {DefinitionList} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 
@@ -11,8 +11,11 @@ import './YDBDefinitionList.scss';
 
 const b = cn('ydb-definition-list');
 
-interface YDBDefinitionListProps extends DefinitionListProps {
+export type YDBDefinitionListItem = {name: string; content: React.ReactNode; copyText?: string};
+
+interface YDBDefinitionListProps extends Omit<DefinitionListProps, 'children'> {
     title?: React.ReactNode;
+    items: YDBDefinitionListItem[];
 }
 
 /** DefinitionList with predefined styles and layout */
@@ -20,9 +23,7 @@ export function YDBDefinitionList({
     title,
     items,
     nameMaxWidth = 220,
-    copyPosition = 'outside',
     className,
-    itemClassName,
     ...restProps
 }: YDBDefinitionListProps) {
     const renderTitle = () => {
@@ -36,13 +37,14 @@ export function YDBDefinitionList({
         if (items.length) {
             return (
                 <DefinitionList
-                    items={items}
                     nameMaxWidth={nameMaxWidth}
-                    copyPosition={copyPosition}
                     className={b('properties-list', className)}
-                    itemClassName={b('item', itemClassName)}
                     {...restProps}
-                />
+                >
+                    {items.map((item) => (
+                        <DefinitionList.Item key={item.name} {...item} />
+                    ))}
+                </DefinitionList>
             );
         }
 

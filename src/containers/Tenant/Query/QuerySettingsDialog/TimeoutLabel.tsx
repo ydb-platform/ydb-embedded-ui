@@ -31,7 +31,10 @@ export function TimeoutLabel({isDisabled, isChecked, onToggle}: TimeoutLabelProp
                     content={QUERY_SETTINGS_FIELD_SETTINGS.timeout.title}
                 />
                 {isDisabled && (
-                    <HelpMark className={b('question-icon')} placement="bottom-start">
+                    <HelpMark
+                        className={b('question-icon')}
+                        popoverProps={{placement: 'bottom-start'}}
+                    >
                         {i18n('form.timeout.disabled')}
                     </HelpMark>
                 )}

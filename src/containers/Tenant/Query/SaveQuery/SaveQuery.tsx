@@ -1,7 +1,7 @@
 import React from 'react';
 
 import NiceModal from '@ebay/nice-modal-react';
-import type {ButtonProps} from '@gravity-ui/uikit';
+import type {ButtonButtonProps, ButtonProps} from '@gravity-ui/uikit';
 import {Button, Dialog, DropdownMenu, TextInput} from '@gravity-ui/uikit';
 
 import {setIsDirty} from '../../../../store/reducers/query/query';
@@ -35,7 +35,7 @@ function useSaveQueryHandler(dialogProps?: SaveQueryDialogCommonProps) {
     return onSaveQueryClick;
 }
 
-interface SaveQueryButtonProps extends ButtonProps {
+interface SaveQueryButtonProps extends ButtonButtonProps {
     dialogProps?: SaveQueryDialogCommonProps;
 }
 

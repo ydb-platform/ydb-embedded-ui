@@ -116,3 +116,10 @@ body,
 .app_embedded {
     font-family: 'Rubik', sans-serif;
 }
+
+.g-tab__title {
+    display: inline-flex;
+    align-items: center;
+
+    height: 100%;
+}

@@ -1,6 +1,6 @@
 import {ShieldKeyhole} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
-import {Icon, Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
+import {Icon, Label, Popover} from '@gravity-ui/uikit';
 
 import {CellWithPopover} from '../../../../components/CellWithPopover/CellWithPopover';
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
@@ -39,7 +39,7 @@ const poolNameColumn: StorageGroupsColumn = {
             <CellWithPopover
                 content={row.PoolName}
                 placement={['right']}
-                behavior={PopoverBehavior.Immediate}
+                openDelay={0}
                 className={b('pool-name-wrapper')}
             >
                 <span className={b('pool-name')}>{row.PoolName}</span>
@@ -62,11 +62,7 @@ const typeColumn: StorageGroupsColumn = {
             <Label>{row.MediaType || '—'}</Label>
             {'\u00a0'}
             {row.Encryption && (
-                <Popover
-                    content={i18n('encrypted')}
-                    placement="right"
-                    behavior={PopoverBehavior.Immediate}
-                >
+                <Popover content={i18n('encrypted')} placement="right" openDelay={0}>
                     <Label>
                         <Icon data={ShieldKeyhole} size={18} />
                     </Label>

@@ -1,4 +1,4 @@
-import {RadioButton} from '@gravity-ui/uikit';
+import {SegmentedRadioGroup} from '@gravity-ui/uikit';
 
 import {ProblemFilterValues} from '../../store/reducers/settings/settings';
 import type {ProblemFilterValue} from '../../store/reducers/settings/types';
@@ -11,13 +11,13 @@ interface ProblemFilterProps {
 
 export const ProblemFilter = ({value, onChange, className}: ProblemFilterProps) => {
     return (
-        <RadioButton value={value} onUpdate={onChange} className={className}>
-            <RadioButton.Option value={ProblemFilterValues.ALL}>
+        <SegmentedRadioGroup value={value} onUpdate={onChange} className={className}>
+            <SegmentedRadioGroup.Option value={ProblemFilterValues.ALL}>
                 {ProblemFilterValues.ALL}
-            </RadioButton.Option>
-            <RadioButton.Option value={ProblemFilterValues.PROBLEMS}>
+            </SegmentedRadioGroup.Option>
+            <SegmentedRadioGroup.Option value={ProblemFilterValues.PROBLEMS}>
                 {ProblemFilterValues.PROBLEMS}
-            </RadioButton.Option>
-        </RadioButton>
+            </SegmentedRadioGroup.Option>
+        </SegmentedRadioGroup>
     );
 };

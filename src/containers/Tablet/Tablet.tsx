@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Flex, Tabs} from '@gravity-ui/uikit';
+import {Flex, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {useParams} from 'react-router-dom';
@@ -190,21 +190,22 @@ function TabletTabs({
         <Flex gap={5} direction="column">
             {/* block wrapper fror tabs to preserve height */}
             <div>
-                <Tabs
-                    size="l"
-                    items={TABLET_PAGE_TABS.filter(({isAdvanced}) =>
-                        isAdvanced ? !noAdvancedInfo : true,
-                    )}
-                    activeTab={tabletTab}
-                    wrapTo={(tab, tabNode) => {
-                        const path = getTabletPagePath(id, {...restParams, activeTab: tab.id});
-                        return (
-                            <InternalLink to={path} key={tab.id}>
-                                {tabNode}
-                            </InternalLink>
-                        );
-                    }}
-                />
+                <TabProvider value={tabletTab}>
+                    <TabList size="l">
+                        {TABLET_PAGE_TABS.filter(({isAdvanced}) =>
+                            isAdvanced ? !noAdvancedInfo : true,
+                        ).map(({id: tabId, title}) => {
+                            const path = getTabletPagePath(id, {...restParams, activeTab: tabId});
+                            return (
+                                <Tab key={tabId} value={tabId}>
+                                    <InternalLink view="primary" as="tab" to={path}>
+                                        {title}
+                                    </InternalLink>
+                                </Tab>
+                            );
+                        })}
+                    </TabList>
+                </TabProvider>
             </div>
             {tabletTab === 'history' ? (
                 <TabletTable history={history} tabletId={id} database={database} />

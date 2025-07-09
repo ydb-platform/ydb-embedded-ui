@@ -1,7 +1,6 @@
 import React from 'react';
 
-import type {TabsItemProps} from '@gravity-ui/uikit';
-import {Tabs} from '@gravity-ui/uikit';
+import {Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {useRouteMatch} from 'react-router-dom';
@@ -184,7 +183,7 @@ interface NodePageContentProps {
     tenantName?: string;
 
     activeTabId: NodeTab;
-    tabs: TabsItemProps[];
+    tabs: {id: string; title: string}[];
 
     parentContainer: React.RefObject<HTMLDivElement>;
 }
@@ -199,23 +198,24 @@ function NodePageContent({
     const renderTabs = () => {
         return (
             <div className={b('tabs')}>
-                <Tabs
-                    size="l"
-                    items={tabs}
-                    activeTab={activeTabId}
-                    wrapTo={({id}, tabNode) => {
-                        const path = getDefaultNodePath(
-                            nodeId,
-                            {database: tenantName},
-                            id as NodeTab,
-                        );
-                        return (
-                            <InternalLink to={path} key={id}>
-                                {tabNode}
-                            </InternalLink>
-                        );
-                    }}
-                />
+                <TabProvider value={activeTabId}>
+                    <TabList className={b('tab-list')} size="l">
+                        {tabs.map(({id, title}) => {
+                            const path = getDefaultNodePath(
+                                nodeId,
+                                {database: tenantName},
+                                id as NodeTab,
+                            );
+                            return (
+                                <Tab value={id} key={id}>
+                                    <InternalLink to={path} as="tab">
+                                        {title}
+                                    </InternalLink>
+                                </Tab>
+                            );
+                        })}
+                    </TabList>
+                </TabProvider>
             </div>
         );
     };

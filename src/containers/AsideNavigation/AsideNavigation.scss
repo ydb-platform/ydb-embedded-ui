@@ -19,7 +19,9 @@
         width: 300px;
         padding: 10px;
     }
-
+    &__hotkeys-drawer {
+        left: 0;
+    }
     &__hotkeys-panel-title {
         display: flex;
         gap: var(--g-spacing-2);

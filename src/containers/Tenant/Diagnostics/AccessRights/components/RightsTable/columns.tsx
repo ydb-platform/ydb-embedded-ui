@@ -85,7 +85,9 @@ function HeaderWithHelpMark({header, note}: HeaderWithHelpMarkProps) {
     return (
         <Flex gap={1} alignItems="center">
             {header}
-            <HelpMark className={block('note')}>{note}</HelpMark>
+            <HelpMark popoverProps={{placement: ['right', 'left']}} className={block('note')}>
+                {note}
+            </HelpMark>
         </Flex>
     );
 }

@@ -277,7 +277,8 @@ export class ObjectSummary {
     }
 
     async clickTab(tabName: ObjectSummaryTab): Promise<void> {
-        const tab = this.tabs.locator(`.ydb-object-summary__tab:has-text("${tabName}")`);
+        const dataTab = tabName.toLowerCase();
+        const tab = this.tabs.locator(`button[data-tab="${dataTab}"]`);
         await tab.click();
     }
 

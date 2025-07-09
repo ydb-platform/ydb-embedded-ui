@@ -2,7 +2,7 @@ import React from 'react';
 
 import type {Settings} from '@gravity-ui/react-data-table';
 import type {ControlGroupOption} from '@gravity-ui/uikit';
-import {ClipboardButton, Flex, RadioButton, Text} from '@gravity-ui/uikit';
+import {ClipboardButton, Flex, SegmentedRadioGroup, Text} from '@gravity-ui/uikit';
 
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
@@ -298,7 +298,7 @@ export function QueryResultViewer({
         return (
             <div className={b('controls-left')}>
                 {radioButtonOptions.length && activeSection ? (
-                    <RadioButton
+                    <SegmentedRadioGroup
                         options={radioButtonOptions}
                         value={activeSection}
                         onUpdate={onSelectSection}

@@ -23,7 +23,11 @@ function Legend({children, variant = 'subheader-3', color = 'primary', note}: Le
             <Text variant={variant} color={color} className={b('legend')} as="div">
                 {children}
             </Text>
-            {note && <HelpMark className={b('legend-note')}>{note}</HelpMark>}
+            {note && (
+                <HelpMark className={b('legend-note')} popoverProps={{placement: 'right'}}>
+                    {note}
+                </HelpMark>
+            )}
         </Flex>
     );
 }

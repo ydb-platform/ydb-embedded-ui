@@ -58,7 +58,7 @@ export function MetricCard({active, label, status, metrics, interactive, note}: 
             return null;
         }
         return (
-            <HelpMark placement="top" className={b('note')}>
+            <HelpMark popoverProps={{placement: 'top'}} className={b('note')}>
                 {note}
             </HelpMark>
         );

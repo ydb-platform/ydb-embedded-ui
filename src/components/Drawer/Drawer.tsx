@@ -2,11 +2,12 @@ import React from 'react';
 
 import {Xmark} from '@gravity-ui/icons';
 import {DrawerItem, Drawer as GravityDrawer} from '@gravity-ui/navigation';
-import {ActionTooltip, Button, Flex, Icon, Portal, Text} from '@gravity-ui/uikit';
+import {ActionTooltip, Button, Flex, Icon, Text} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 import {isNumeric} from '../../utils/utils';
 import {CopyLinkButton} from '../CopyLinkButton/CopyLinkButton';
+import {Portal} from '../Portal/Portal';
 
 import {useDrawerContext} from './DrawerContext';
 

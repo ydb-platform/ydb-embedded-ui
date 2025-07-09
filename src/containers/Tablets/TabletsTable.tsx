@@ -163,7 +163,7 @@ function TabletActions(tablet: TTabletStateInfo) {
                     ? i18n('dialog.kill-header')
                     : i18n('controls.kill-not-allowed')
             }
-            popoverPlacement={['right', 'auto']}
+            popoverPlacement={['right', 'bottom']}
             popoverDisabled={false}
         >
             <Icon data={ArrowRotateLeft} />

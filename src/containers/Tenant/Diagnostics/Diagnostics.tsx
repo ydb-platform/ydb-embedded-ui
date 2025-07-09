@@ -1,11 +1,11 @@
 import React from 'react';
 
-import {Tabs} from '@gravity-ui/uikit';
+import {Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {Helmet} from 'react-helmet-async';
-import {Link} from 'react-router-dom';
 
 import {AutoRefreshControl} from '../../../components/AutoRefreshControl/AutoRefreshControl';
 import {DrawerContextProvider} from '../../../components/Drawer/DrawerContext';
+import {InternalLink} from '../../../components/InternalLink';
 import {
     useFeatureFlagsAvailable,
     useTopicDataAvailable,
@@ -180,21 +180,20 @@ function Diagnostics(props: DiagnosticsProps) {
         return (
             <div className={b('header-wrapper')}>
                 <div className={b('tabs')}>
-                    <Tabs
-                        size="l"
-                        items={pages}
-                        activeTab={activeTab?.id}
-                        wrapTo={({id}, node) => {
-                            const path = getDiagnosticsPageLink(id);
-
-                            return (
-                                <Link to={path} key={id} className={b('tab')}>
-                                    {node}
-                                </Link>
-                            );
-                        }}
-                        allowNotSelected={true}
-                    />
+                    <TabProvider value={activeTab?.id}>
+                        <TabList size="l">
+                            {pages.map(({id, title}) => {
+                                const path = getDiagnosticsPageLink(id);
+                                return (
+                                    <Tab key={id} value={id}>
+                                        <InternalLink to={path} as="tab">
+                                            {title}
+                                        </InternalLink>
+                                    </Tab>
+                                );
+                            })}
+                        </TabList>
+                    </TabProvider>
                     <AutoRefreshControl />
                 </div>
             </div>

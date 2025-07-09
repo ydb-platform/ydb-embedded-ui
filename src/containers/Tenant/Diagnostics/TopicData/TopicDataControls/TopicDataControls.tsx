@@ -11,7 +11,7 @@ import {
     Flex,
     HelpMark,
     Icon,
-    RadioButton,
+    SegmentedRadioGroup,
     Select,
     TableColumnSetup,
     Text,
@@ -180,14 +180,17 @@ function TopicDataStartControls({scrollToOffset}: TopicDataStartControlsProps) {
 
     return (
         <React.Fragment>
-            <RadioButton<TopicDataFilterValue> value={topicDataFilter} onUpdate={onFilterChange}>
-                <RadioButton.Option value="TIMESTAMP">
+            <SegmentedRadioGroup<TopicDataFilterValue>
+                value={topicDataFilter}
+                onUpdate={onFilterChange}
+            >
+                <SegmentedRadioGroup.Option value="TIMESTAMP">
                     {TopicDataFilterValues.TIMESTAMP}
-                </RadioButton.Option>
-                <RadioButton.Option value="OFFSET">
+                </SegmentedRadioGroup.Option>
+                <SegmentedRadioGroup.Option value="OFFSET">
                     {TopicDataFilterValues.OFFSET}
-                </RadioButton.Option>
-            </RadioButton>
+                </SegmentedRadioGroup.Option>
+            </SegmentedRadioGroup>
             {topicDataFilter === 'OFFSET' && (
                 <DebouncedInput
                     controlRef={inputRef}

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {RadioButton} from '@gravity-ui/uikit';
+import {SegmentedRadioGroup} from '@gravity-ui/uikit';
 
 import type {DateRangeValues} from '../../../../../components/DateRange';
 import {DateRange} from '../../../../../components/DateRange';
@@ -48,14 +48,14 @@ export const Filters = ({value, onChange}: FiltersProps) => {
 
     return (
         <React.Fragment>
-            <RadioButton value={value.mode} onUpdate={handleModeChange}>
-                <RadioButton.Option value={EShardsWorkloadMode.Immediate}>
+            <SegmentedRadioGroup value={value.mode} onUpdate={handleModeChange}>
+                <SegmentedRadioGroup.Option value={EShardsWorkloadMode.Immediate}>
                     {i18n('filters.mode.immediate')}
-                </RadioButton.Option>
-                <RadioButton.Option value={EShardsWorkloadMode.History}>
+                </SegmentedRadioGroup.Option>
+                <SegmentedRadioGroup.Option value={EShardsWorkloadMode.History}>
                     {i18n('filters.mode.history')}
-                </RadioButton.Option>
-            </RadioButton>
+                </SegmentedRadioGroup.Option>
+            </SegmentedRadioGroup>
             <DateRange
                 from={from}
                 to={to}

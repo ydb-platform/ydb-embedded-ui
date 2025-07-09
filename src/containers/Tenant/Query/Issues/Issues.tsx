@@ -184,7 +184,7 @@ function IssueText({issue}: IssueTextProps) {
     };
 
     return (
-        <Link href="#" extraProps={{draggable: false}} onClick={onIssueClickHandler} view="primary">
+        <Link href="#" onClick={onIssueClickHandler} view="primary" draggable={false}>
             {getIssue()}
         </Link>
     );

@@ -1,4 +1,4 @@
-import {Tabs} from '@gravity-ui/uikit';
+import {Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {useLocation} from 'react-router-dom';
 
 import {InternalLink} from '../../../../components/InternalLink/InternalLink';
@@ -34,23 +34,23 @@ export const QueryTabs = ({className, activeTab}: QueryEditorTabsProps) => {
 
     return (
         <div className={className}>
-            <Tabs
-                size="l"
-                allowNotSelected={true}
-                activeTab={activeTab}
-                items={queryEditorTabs}
-                wrapTo={({id}, node) => {
-                    const path = getTenantPath({
-                        ...queryParams,
-                        [TenantTabsGroups.queryTab]: id,
-                    });
-                    return (
-                        <InternalLink to={path} key={id}>
-                            {node}
-                        </InternalLink>
-                    );
-                }}
-            />
+            <TabProvider value={activeTab}>
+                <TabList size="l">
+                    {queryEditorTabs.map(({id, title}) => {
+                        const path = getTenantPath({
+                            ...queryParams,
+                            [TenantTabsGroups.queryTab]: id,
+                        });
+                        return (
+                            <Tab key={id} value={id}>
+                                <InternalLink to={path} as="tab">
+                                    {title}
+                                </InternalLink>
+                            </Tab>
+                        );
+                    })}
+                </TabList>
+            </TabProvider>
         </div>
     );
 };

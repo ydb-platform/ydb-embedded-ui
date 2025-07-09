@@ -108,30 +108,27 @@ function Header() {
     const renderHeader = () => {
         return (
             <header className={b()}>
-                <Breadcrumbs
-                    items={breadcrumbItems}
-                    lastDisplayedItemsCount={1}
-                    firstDisplayedItemsCount={1}
-                    className={b('breadcrumbs')}
-                    renderItem={({item, isCurrent}) => {
+                <Breadcrumbs className={b('breadcrumbs')}>
+                    {breadcrumbItems.map((item, index) => {
                         const {icon, text, link} = item;
+                        const isLast = index === breadcrumbItems.length - 1;
 
                         return (
-                            <InternalLink
-                                className={b('breadcrumbs-item', {
-                                    active: isCurrent,
-                                    link: !isCurrent,
-                                })}
-                                to={isCurrent ? undefined : link}
+                            <Breadcrumbs.Item
+                                key={index}
+                                className={b('breadcrumbs-item', {active: isLast})}
+                                disabled={isLast}
                             >
-                                {icon ? (
-                                    <span className={b('breadcrumbs-icon')}>{icon}</span>
-                                ) : null}
-                                <span>{text}</span>
-                            </InternalLink>
+                                <InternalLink to={isLast ? undefined : link} as="tab">
+                                    <Flex alignItems="center" gap={1}>
+                                        {icon}
+                                        {text}
+                                    </Flex>
+                                </InternalLink>
+                            </Breadcrumbs.Item>
                         );
-                    }}
-                />
+                    })}
+                </Breadcrumbs>
 
                 {renderRightControls()}
             </header>

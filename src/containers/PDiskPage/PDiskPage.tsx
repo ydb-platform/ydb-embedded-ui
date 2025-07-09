@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {ArrowRotateLeft} from '@gravity-ui/icons';
-import {Icon, Tabs} from '@gravity-ui/uikit';
+import {Icon, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
@@ -216,21 +216,22 @@ export function PDiskPage() {
     const renderTabs = () => {
         return (
             <div className={pdiskPageCn('tabs')}>
-                <Tabs
-                    size="l"
-                    items={PDISK_PAGE_TABS}
-                    activeTab={pDiskTab}
-                    wrapTo={({id}, tabNode) => {
-                        const path = pDiskParamsDefined
-                            ? getPDiskPagePath(pDiskId, nodeId, {activeTab: id})
-                            : undefined;
-                        return (
-                            <InternalLink to={path} key={id}>
-                                {tabNode}
-                            </InternalLink>
-                        );
-                    }}
-                />
+                <TabProvider value={pDiskTab}>
+                    <TabList size="l">
+                        {PDISK_PAGE_TABS.map(({id, title}) => {
+                            const path = pDiskParamsDefined
+                                ? getPDiskPagePath(pDiskId, nodeId, {activeTab: id})
+                                : undefined;
+                            return (
+                                <Tab key={id} value={id}>
+                                    <InternalLink as="tab" to={path}>
+                                        {title}
+                                    </InternalLink>
+                                </Tab>
+                            );
+                        })}
+                    </TabList>
+                </TabProvider>
             </div>
         );
     };
