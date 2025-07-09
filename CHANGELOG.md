@@ -1,5 +1,16 @@
 # Changelog
 
+## [11.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v10.1.1...v11.0.0) (2025-07-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* update to uikit7 ([#2544](https://github.com/ydb-platform/ydb-embedded-ui/issues/2544))
+
+### Features
+
+* update to uikit7 ([#2544](https://github.com/ydb-platform/ydb-embedded-ui/issues/2544)) ([9716a69](https://github.com/ydb-platform/ydb-embedded-ui/commit/9716a695627eff4ad888e4641086fafcff5e3e6d))
+
 ## [10.1.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v10.1.0...v10.1.1) (2025-07-08)
 
 
