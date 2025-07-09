@@ -1,5 +1,13 @@
 # Changelog
 
+## [10.1.1-hotfix.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v10.1.1...v10.1.1-hotfix.1) (2025-07-09)
+
+
+### Bug Fixes
+
+* hotfix ([013d260](https://github.com/ydb-platform/ydb-embedded-ui/commit/013d26023be5364cf3b15af8619a855bcf2aee4f))
+* **TopicData:** decode data for message, show error for entire table ([#2554](https://github.com/ydb-platform/ydb-embedded-ui/issues/2554)) ([b85d213](https://github.com/ydb-platform/ydb-embedded-ui/commit/b85d213bd91a460c2e6cbadd9101137ee173408c))
+
 ## [10.1.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v10.1.0...v10.1.1) (2025-07-08)
 
 
