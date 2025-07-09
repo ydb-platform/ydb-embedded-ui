@@ -207,8 +207,8 @@ function NodePageContent({
                                 id as NodeTab,
                             );
                             return (
-                                <Tab value={id}>
-                                    <InternalLink to={path} key={id} as="tab">
+                                <Tab value={id} key={id}>
+                                    <InternalLink to={path} as="tab">
                                         {title}
                                     </InternalLink>
                                 </Tab>
