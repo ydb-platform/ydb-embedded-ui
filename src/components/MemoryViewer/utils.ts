@@ -38,6 +38,13 @@ export function getMemorySegments(stats: TMemoryStats, memoryUsage: number): Mem
             isInfo: false,
         },
         {
+            label: i18n('text_memtable'),
+            key: 'MemTableConsumption',
+            value: getMaybeNumber(stats.MemTableConsumption),
+            capacity: getMaybeNumber(stats.MemTableLimit),
+            isInfo: false,
+        },
+        {
             label: i18n('text_column-tables-read-execution'),
             key: 'ColumnTablesReadExecutionConsumption',
             value: getMaybeNumber(stats.ColumnTablesReadExecutionConsumption),
@@ -56,13 +63,6 @@ export function getMemorySegments(stats: TMemoryStats, memoryUsage: number): Mem
             key: 'ColumnTablesCacheConsumption',
             value: getMaybeNumber(stats.ColumnTablesCacheConsumption),
             capacity: getMaybeNumber(stats.ColumnTablesCacheLimit),
-            isInfo: false,
-        },
-        {
-            label: i18n('text_memtable'),
-            key: 'MemTableConsumption',
-            value: getMaybeNumber(stats.MemTableConsumption),
-            capacity: getMaybeNumber(stats.MemTableLimit),
             isInfo: false,
         },
         {
