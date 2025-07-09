@@ -97,7 +97,7 @@ export function TopicDataControls({
             />
             <TopicDataStartControls scrollToOffset={scrollToOffset} />
 
-            {!isNil(startOffset) && !isNil(endOffset) && (
+            {!isNil(startOffset) && !isNil(endOffset) && endOffset > startOffset && (
                 <Flex gap={1}>
                     <Text color="secondary" whiteSpace="nowrap">
                         {formatNumber(startOffset)}—{formatNumber(endOffset - 1)}
