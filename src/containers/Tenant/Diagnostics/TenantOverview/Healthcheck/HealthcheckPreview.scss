@@ -1,5 +1,6 @@
 .ydb-healthcheck-preview {
     $block: &;
+    border-radius: var(--g-border-radius-s);
 
     &__skeleton {
         width: 100%;

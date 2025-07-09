@@ -23,5 +23,5 @@ export interface TenantState {
     queryTab?: TenantQueryTab;
     diagnosticsTab?: TenantDiagnosticsTab;
     summaryTab?: TenantSummaryTab;
-    metricsTab?: TenantMetricsTab;
+    metricsTab: TenantMetricsTab;
 }

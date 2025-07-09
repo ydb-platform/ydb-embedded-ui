@@ -10,6 +10,8 @@ import './DoughnutMetrics.scss';
 
 const b = cn('ydb-doughnut-metrics');
 
+const SizeContext = React.createContext<'small' | 'medium' | 'large'>('medium');
+
 interface LegendProps {
     children?: React.ReactNode;
     variant?: TextProps['variant'];
@@ -31,9 +33,19 @@ function Legend({children, variant = 'subheader-3', color = 'primary', note}: Le
         </Flex>
     );
 }
-function Value({children, variant = 'subheader-2'}: LegendProps) {
+function Value({children, variant}: LegendProps) {
+    const size = React.useContext(SizeContext);
+
+    const sizeVariantMap = {
+        small: 'subheader-1',
+        medium: 'subheader-2',
+        large: 'subheader-3',
+    } as const;
+
+    const finalVariant = variant || sizeVariantMap[size];
+
     return (
-        <Text variant={variant} className={b('value')}>
+        <Text variant={finalVariant} className={b('value')}>
             {children}
         </Text>
     );
@@ -44,9 +56,18 @@ interface DoughnutProps {
     fillWidth: number;
     children?: React.ReactNode;
     className?: string;
+    size?: 'small' | 'medium' | 'large';
+    centerColor?: string;
 }
 
-export function DoughnutMetrics({status, fillWidth, children, className}: DoughnutProps) {
+export function DoughnutMetrics({
+    status,
+    fillWidth,
+    children,
+    className,
+    size = 'medium',
+    centerColor,
+}: DoughnutProps) {
     let filledDegrees = fillWidth * 3.6;
     let doughnutFillVar = 'var(--doughnut-color)';
     let doughnutBackdropVar = 'var(--doughnut-backdrop-color)';
@@ -57,17 +78,19 @@ export function DoughnutMetrics({status, fillWidth, children, className}: Doughn
         doughnutFillVar = 'var(--doughnut-overlap-color)';
     }
 
+    const doughnutStyle: React.CSSProperties = {
+        background: `conic-gradient(${doughnutFillVar} 0deg ${filledDegrees}deg, ${doughnutBackdropVar} ${filledDegrees}deg 360deg)`,
+        ...(centerColor && ({'--center-color': centerColor} as React.CSSProperties)),
+    };
+
     return (
-        <div className={b(null, className)}>
-            <div
-                style={{
-                    background: `conic-gradient(${doughnutFillVar} 0deg ${filledDegrees}deg, ${doughnutBackdropVar} ${filledDegrees}deg 360deg)`,
-                }}
-                className={b('doughnut', {status})}
-            >
-                <div className={b('text-wrapper')}>{children}</div>
+        <SizeContext.Provider value={size}>
+            <div className={b(null, className)}>
+                <div style={doughnutStyle} className={b('doughnut', {status, size})}>
+                    <div className={b('text-wrapper')}>{children}</div>
+                </div>
             </div>
-        </div>
+        </SizeContext.Provider>
     );
 }
 
