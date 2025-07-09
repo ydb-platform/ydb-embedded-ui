@@ -198,7 +198,7 @@ function TabletTabs({
                             const path = getTabletPagePath(id, {...restParams, activeTab: tabId});
                             return (
                                 <Tab key={tabId} value={tabId}>
-                                    <InternalLink view="primary" as="tab" to={path} key={tabId}>
+                                    <InternalLink view="primary" as="tab" to={path}>
                                         {title}
                                     </InternalLink>
                                 </Tab>

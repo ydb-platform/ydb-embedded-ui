@@ -161,7 +161,6 @@ export function Cluster({
                                         view="primary"
                                         as="tab"
                                         to={path}
-                                        key={id}
                                         onClick={() => {
                                             dispatch(updateDefaultClusterTab(id));
                                         }}

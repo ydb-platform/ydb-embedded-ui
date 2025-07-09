@@ -224,7 +224,7 @@ export function PDiskPage() {
                                 : undefined;
                             return (
                                 <Tab key={id} value={id}>
-                                    <InternalLink as="tab" to={path} key={id}>
+                                    <InternalLink as="tab" to={path}>
                                         {title}
                                     </InternalLink>
                                 </Tab>
