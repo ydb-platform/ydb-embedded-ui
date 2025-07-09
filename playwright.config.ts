@@ -44,7 +44,7 @@ const config: PlaywrightTestConfig = {
             name: 'safari',
             use: {
                 ...devices['Desktop Safari'],
-                contextOptions: {permissions: ['clipboard-read', 'clipboard-write']},
+                contextOptions: {permissions: ['clipboard-read']},
             },
         },
     ],
