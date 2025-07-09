@@ -2,17 +2,9 @@
     width: var(--diagnostics-section-table-width);
     margin-bottom: var(--diagnostics-section-margin);
 
-    &__controls {
-        margin-bottom: 10px;
-    }
-
     &__charts {
         display: flex;
         flex-flow: row wrap;
         gap: 16px;
-    }
-
-    &__toolbar {
-        margin-bottom: 10px;
     }
 }

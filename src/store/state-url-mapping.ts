@@ -13,6 +13,7 @@ import {stateToParams} from 'redux-location-state/lib/stateToParams';
 
 import {initialState as initialHeatmapState} from './reducers/heatmap';
 import {initialState as initialSettingsState} from './reducers/settings/settings';
+import {initialState as initialTenantState} from './reducers/tenant/tenant';
 
 export const paramSetup = {
     global: {
@@ -50,6 +51,7 @@ export const paramSetup = {
         },
         metricsTab: {
             stateKey: 'tenant.metricsTab',
+            initialState: initialTenantState.metricsTab,
         },
         shardsMode: {
             stateKey: 'shardsWorkload.mode',
