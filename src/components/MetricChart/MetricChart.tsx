@@ -203,7 +203,7 @@ export const MetricChart = ({
 
     return (
         <div
-            className={b({noBorder, fullWidth})}
+            className={b({noBorder})}
             style={{
                 height,
                 width: fullWidth ? '100%' : width,
