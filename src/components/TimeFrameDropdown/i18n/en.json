@@ -1,6 +1,6 @@
 {
-  "30m": "Last 30 min",
-  "1h": "Last hour",
-  "1d": "Last day",
-  "1w": "Last week"
+  "value_30m": "Last 30 min",
+  "value_1h": "Last hour",
+  "value_1d": "Last day",
+  "value_1w": "Last week"
 }

@@ -1,10 +1,10 @@
 {
-  "title": "Queries Activity",
-  "subtitle": "Monitor changes in real time",
-  "per-sec": "{{count}} per sec",
-  "ms": "{{time}} ms",
-  "running-queries": "Running Queries",
-  "applications": "Applications",
-  "users": "Users",
-  "open-running-queries": "Open Running Queries"
+  "title_queries-activity": "Queries Activity",
+  "context_monitor-changes-realtime": "Monitor changes in real time",
+  "value_per-sec": "{{count}} per sec",
+  "value_ms": "{{time}} ms",
+  "field_running-queries": "Running Queries",
+  "field_applications": "Applications",
+  "field_users": "Users",
+  "action_open-running-queries": "Open Running Queries"
 }

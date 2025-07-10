@@ -117,14 +117,14 @@ export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
                             <Flex justifyContent="space-between" className={b('content-wrapper')}>
                                 <Flex direction="column" className={b('title-section')}>
                                     <Text variant="subheader-2" className={b('title')}>
-                                        {i18n('title')}
+                                        {i18n('title_queries-activity')}
                                     </Text>
                                     <Text
                                         color="secondary"
                                         variant="caption-2"
                                         className={b('subtitle')}
                                     >
-                                        {i18n('subtitle')}
+                                        {i18n('context_monitor-changes-realtime')}
                                     </Text>
                                 </Flex>
 
@@ -143,7 +143,7 @@ export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
                                         icon={<Icon data={Rocket} size={14} />}
                                         value={formatTrendValue(qps.trend.value)}
                                     >
-                                        {i18n('per-sec', {count: qps.value})}
+                                        {i18n('value_per-sec', {count: qps.value})}
                                     </Label>
 
                                     <Label
@@ -152,7 +152,7 @@ export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
                                         icon={<Icon data={Clock} size={14} />}
                                         value={formatTrendValue(latency.trend.value)}
                                     >
-                                        {i18n('ms', {time: latency.value})}
+                                        {i18n('value_ms', {time: latency.value})}
                                     </Label>
                                 </div>
                             </Flex>
@@ -171,7 +171,7 @@ export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
                                 size="s"
                                 value={String(runningQueriesCount)}
                             >
-                                {i18n('running-queries')}
+                                {i18n('field_running-queries')}
                             </Label>
 
                             <Label
@@ -180,7 +180,7 @@ export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
                                 size="s"
                                 value={String(uniqueApplications)}
                             >
-                                {i18n('applications')}
+                                {i18n('field_applications')}
                             </Label>
 
                             <Label
@@ -189,7 +189,7 @@ export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
                                 size="s"
                                 value={String(uniqueUsers)}
                             >
-                                {i18n('users')}
+                                {i18n('field_users')}
                             </Label>
 
                             <Button
@@ -198,7 +198,7 @@ export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
                                 onClick={handleOpenRunningQueries}
                                 className={b('open-queries-button')}
                             >
-                                {i18n('open-running-queries')}
+                                {i18n('action_open-running-queries')}
                             </Button>
                         </div>
                     </div>

@@ -10,6 +10,21 @@ import type {TimeFrame} from '../../utils/timeframes';
 
 import i18n from './i18n';
 
+const getTimeFrameLabel = (timeFrame: TimeFrame) => {
+    switch (timeFrame) {
+        case '30m':
+            return i18n('value_30m');
+        case '1h':
+            return i18n('value_1h');
+        case '1d':
+            return i18n('value_1d');
+        case '1w':
+            return i18n('value_1w');
+        default:
+            return timeFrame;
+    }
+};
+
 const b = cn('ydb-timeframe-dropdown');
 
 interface TimeFrameDropdownProps {
@@ -30,7 +45,7 @@ export const TimeFrameDropdown = ({
     const items = React.useMemo(
         () =>
             Object.keys(TIMEFRAMES).map((timeFrame) => ({
-                text: i18n(timeFrame as TimeFrame),
+                text: getTimeFrameLabel(timeFrame as TimeFrame),
                 action: () => onChange(timeFrame as TimeFrame),
             })),
         [onChange],
@@ -38,7 +53,7 @@ export const TimeFrameDropdown = ({
 
     const renderSwitcher = (props: ButtonProps) => (
         <Button {...props} size={size} view={view} className={b(null, className)}>
-            {i18n(value)}
+            {getTimeFrameLabel(value)}
             <Icon data={ChevronDown} size={12} />
         </Button>
     );
