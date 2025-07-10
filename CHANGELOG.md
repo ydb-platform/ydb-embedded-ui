@@ -1,5 +1,17 @@
 # Changelog
 
+## [11.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.0.1...v11.1.0) (2025-07-10)
+
+
+### Features
+
+* add Queries activities banner ([#2549](https://github.com/ydb-platform/ydb-embedded-ui/issues/2549)) ([dcfca43](https://github.com/ydb-platform/ydb-embedded-ui/commit/dcfca43edffca6b5e8ee568e0ea7ff4bb8547654))
+
+
+### Bug Fixes
+
+* cancel previous multipart request if the new one starts ([#2559](https://github.com/ydb-platform/ydb-embedded-ui/issues/2559)) ([a4792fd](https://github.com/ydb-platform/ydb-embedded-ui/commit/a4792fd90edfc8e84d1ff3f31b380c417e25175e))
+
 ## [11.0.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.0.0...v11.0.1) (2025-07-09)
 
 
