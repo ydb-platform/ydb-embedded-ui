@@ -143,6 +143,8 @@ export default function QueryEditor(props: QueryEditorProps) {
             setLastQueryExecutionSettings(querySettings);
         }
         const queryId = uuidv4();
+
+        // Abort previous query if there was any
         queryManagerInstance.abortQuery();
 
         if (isStreamingEnabled) {
