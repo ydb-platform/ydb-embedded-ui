@@ -296,6 +296,10 @@ export const queryApi = api.injectEndpoints({
                     return {data: null};
                 } catch (error) {
                     const state = getState() as RootState;
+                    if (state.query.result?.startTime !== startTime) {
+                        // This query is no longer current, don't update state
+                        return {error};
+                    }
                     dispatch(
                         setQueryResult({
                             ...state.query.result,
@@ -321,7 +325,7 @@ export const queryApi = api.injectEndpoints({
                     enableTracingLevel,
                     queryId,
                 },
-                {signal, dispatch},
+                {signal, dispatch, getState},
             ) => {
                 const startTime = Date.now();
                 dispatch(
@@ -410,6 +414,11 @@ export const queryApi = api.injectEndpoints({
                     );
                     return {data: null};
                 } catch (error) {
+                    const state = getState() as RootState;
+                    if (state.query.result?.startTime !== startTime) {
+                        // This query is no longer current, don't update state
+                        return {error};
+                    }
                     dispatch(
                         setQueryResult({
                             type: actionType,
