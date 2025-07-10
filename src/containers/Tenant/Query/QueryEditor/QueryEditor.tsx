@@ -143,10 +143,9 @@ export default function QueryEditor(props: QueryEditorProps) {
             setLastQueryExecutionSettings(querySettings);
         }
         const queryId = uuidv4();
+        queryManagerInstance.abortQuery();
 
         if (isStreamingEnabled) {
-            queryManagerInstance.abortQuery();
-
             const query = streamQuery({
                 actionType: 'execute',
                 query: text,
@@ -157,8 +156,6 @@ export default function QueryEditor(props: QueryEditorProps) {
 
             queryManagerInstance.registerQuery(query);
         } else {
-            queryManagerInstance.abortQuery();
-
             const query = sendQuery({
                 actionType: 'execute',
                 query: text,
