@@ -103,7 +103,6 @@ const emptyChartData: PreparedMetricsData = {timeline: [], metrics: []};
 interface DiagnosticsChartProps {
     database: string;
 
-    title?: string;
     metrics: MetricDescription[];
     timeFrame?: TimeFrame;
 
@@ -122,11 +121,19 @@ interface DiagnosticsChartProps {
      * Pass isChartVisible prop to ensure proper chart render
      */
     isChartVisible?: boolean;
+
+    /** Remove border from chart */
+    noBorder?: boolean;
+
+    /** Make chart take full width of container */
+    fullWidth?: boolean;
+
+    /** Render custom toolbar content to the right of chart title */
+    renderChartToolbar?: () => React.ReactNode;
 }
 
 export const MetricChart = ({
     database,
-    title,
     metrics,
     timeFrame = '1h',
     autorefresh,
@@ -135,7 +142,14 @@ export const MetricChart = ({
     chartOptions,
     onChartDataStatusChange,
     isChartVisible,
+    noBorder,
+    fullWidth,
+    renderChartToolbar,
 }: DiagnosticsChartProps) => {
+    // Use a reasonable default for maxDataPoints when fullWidth is true
+    const effectiveWidth = fullWidth ? 600 : width;
+    const maxDataPoints = effectiveWidth / 2;
+
     const {currentData, error, isFetching, status} = chartApi.useGetChartDataQuery(
         // maxDataPoints param is calculated based on width
         // should be width > maxDataPoints to prevent points that cannot be selected
@@ -144,7 +158,7 @@ export const MetricChart = ({
             database,
             metrics,
             timeFrame,
-            maxDataPoints: width / 2,
+            maxDataPoints,
         },
         {pollingInterval: autorefresh},
     );
@@ -176,13 +190,13 @@ export const MetricChart = ({
 
     return (
         <div
-            className={b(null)}
+            className={b({noBorder})}
             style={{
                 height,
-                width,
+                width: fullWidth ? '100%' : width,
             }}
         >
-            <div className={b('title')}>{title}</div>
+            {renderChartToolbar?.()}
             {renderContent()}
         </div>
     );

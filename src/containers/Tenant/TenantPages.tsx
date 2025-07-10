@@ -16,6 +16,7 @@ type AdditionalQueryParams = {
     activeOffset?: string;
     metricsTab?: string;
     showPreview?: boolean;
+    queryMode?: string;
 };
 
 export type TenantQuery = TenantQueryParams | AdditionalQueryParams;

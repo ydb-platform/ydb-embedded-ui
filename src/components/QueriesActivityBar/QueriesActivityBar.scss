@@ -1,0 +1,109 @@
+@use '../../styles/mixins.scss';
+
+.queries-activity-bar {
+    $b: &;
+
+    margin-bottom: var(--diagnostics-section-title-margin);
+
+    border: 1px solid transparent;
+    border-radius: var(--g-border-radius-m);
+
+    // Collapsed state (default)
+    background-color: var(--g-color-base-float);
+
+    &_expanded {
+        border: 1px solid var(--g-color-base-generic);
+        border-radius: var(--g-border-radius-m);
+        background-color: transparent;
+    }
+
+    &__disclosure {
+        width: 100%;
+    }
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--g-spacing-3);
+
+        padding: var(--g-spacing-3) var(--g-spacing-4);
+
+        cursor: pointer;
+
+        border-radius: var(--g-border-radius-m);
+
+        transition: background-color 0.15s ease;
+
+        &:hover {
+            background-color: var(--g-color-base-simple-hover);
+        }
+
+        // When expanded, only round top corners
+        #{$b}_expanded &:hover {
+            background-color: transparent;
+        }
+    }
+
+    &__content-wrapper {
+        display: flex;
+        flex-grow: 1;
+        align-items: center;
+        gap: var(--g-spacing-2);
+    }
+
+    &__metrics {
+        display: flex;
+        align-items: center;
+        gap: var(--g-spacing-1);
+    }
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+        gap: var(--g-spacing-4);
+    }
+
+    &__stats {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--g-spacing-1);
+
+        padding: 0 var(--g-spacing-4);
+    }
+
+    &__open-queries-button {
+        margin-left: 4px;
+    }
+
+    &__charts {
+        display: flex;
+        gap: var(--g-spacing-4);
+
+        padding: 0 var(--g-spacing-4);
+        padding-top: var(--g-spacing-4);
+
+        @media (max-width: 1200px) {
+            flex-direction: column;
+        }
+    }
+
+    &__chart-container {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: var(--g-spacing-3);
+    }
+
+    &__toolbar {
+        margin-bottom: 10px;
+    }
+
+    // Focus states for accessibility
+    &__header:focus-visible,
+    &__open-queries-button:focus-visible {
+        outline: 2px solid var(--g-color-line-focus);
+        outline-offset: 2px;
+    }
+}

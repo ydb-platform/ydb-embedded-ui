@@ -2,6 +2,7 @@ import {Button, Flex, Icon} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
+import {QueriesActivityBar} from '../../../../components/QueriesActivityBar/QueriesActivityBar';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {tenantApi} from '../../../../store/reducers/tenant/tenant';
@@ -165,6 +166,7 @@ export function TenantOverview({
                     </Flex>
                     <Flex direction="column" gap={3}>
                         <HealthcheckPreview tenantName={tenantName} />
+                        <QueriesActivityBar tenantName={tenantName} />
                         <MetricsCards
                             poolsCpuStats={poolsStats}
                             memoryStats={memoryStats}
