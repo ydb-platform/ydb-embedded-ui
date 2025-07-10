@@ -3,14 +3,11 @@ import React from 'react';
 import ChartKit, {settings} from '@gravity-ui/chartkit';
 import type {YagrWidgetData} from '@gravity-ui/chartkit/yagr';
 import {YagrPlugin} from '@gravity-ui/chartkit/yagr';
-import {Flex} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 import type {TimeFrame} from '../../utils/timeframes';
 import {ResponseError} from '../Errors/ResponseError';
 import {Loader} from '../Loader';
-import {TimeFrameDropdown} from '../TimeFrameDropdown/TimeFrameDropdown';
-import {TimeFrameSelector} from '../TimeFrameSelector/TimeFrameSelector';
 
 import {colorToRGBA, colors} from './colors';
 import {getDefaultDataFormatter} from './getDefaultDataFormatter';
@@ -106,7 +103,6 @@ const emptyChartData: PreparedMetricsData = {timeline: [], metrics: []};
 interface DiagnosticsChartProps {
     database: string;
 
-    title?: string;
     metrics: MetricDescription[];
     timeFrame?: TimeFrame;
 
@@ -132,19 +128,12 @@ interface DiagnosticsChartProps {
     /** Make chart take full width of container */
     fullWidth?: boolean;
 
-    /** Show timeframe selector to the right of chart title */
-    withTimeframeSelector?: boolean;
-
-    /** Callback when timeframe is changed via the selector */
-    onTimeFrameChange?: (timeFrame: TimeFrame) => void;
-
-    /** Timeframe component to choose between 'selector' and 'dropdown' */
-    timeFrameComponent?: 'selector' | 'dropdown';
+    /** Render custom toolbar content to the right of chart title */
+    renderChartToolbar?: () => React.ReactNode;
 }
 
 export const MetricChart = ({
     database,
-    title,
     metrics,
     timeFrame = '1h',
     autorefresh,
@@ -155,9 +144,7 @@ export const MetricChart = ({
     isChartVisible,
     noBorder,
     fullWidth,
-    withTimeframeSelector,
-    onTimeFrameChange,
-    timeFrameComponent = 'selector',
+    renderChartToolbar,
 }: DiagnosticsChartProps) => {
     // Use a reasonable default for maxDataPoints when fullWidth is true
     const effectiveWidth = fullWidth ? 600 : width;
@@ -209,16 +196,7 @@ export const MetricChart = ({
                 width: fullWidth ? '100%' : width,
             }}
         >
-            <Flex className={b('title')} justifyContent="space-between" alignItems="center">
-                <div>{title}</div>
-                {withTimeframeSelector &&
-                    onTimeFrameChange &&
-                    (timeFrameComponent === 'dropdown' ? (
-                        <TimeFrameDropdown value={timeFrame} onChange={onTimeFrameChange} />
-                    ) : (
-                        <TimeFrameSelector value={timeFrame} onChange={onTimeFrameChange} />
-                    ))}
-            </Flex>
+            {renderChartToolbar?.()}
             {renderContent()}
         </div>
     );

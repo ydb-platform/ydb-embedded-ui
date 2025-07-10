@@ -1,11 +1,14 @@
 import React from 'react';
 
+import {Flex} from '@gravity-ui/uikit';
+
 import {defaultDashboardConfig} from '../../containers/Tenant/Diagnostics/TenantOverview/DefaultOverviewContent/defaultDashboardConfig';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import type {TimeFrame} from '../../utils/timeframes';
 import {MetricChart} from '../MetricChart/MetricChart';
 import type {ChartDataStatus} from '../MetricChart/types';
+import {TimeFrameDropdown} from '../TimeFrameDropdown/TimeFrameDropdown';
 
 const b = cn('queries-activity-bar');
 
@@ -55,6 +58,32 @@ export function QueriesActivityCharts({tenantName, expanded}: QueriesActivityCha
         setLatenciesTimeFrame(newTimeFrame);
     }, []);
 
+    const renderQueriesChartToolbar = React.useCallback(
+        () => (
+            <Flex className={b('toolbar')} justifyContent="space-between" alignItems="center">
+                <div>{queriesChartConfig.title}</div>
+                <TimeFrameDropdown
+                    value={queriesTimeFrame}
+                    onChange={handleQueriesTimeFrameChange}
+                />
+            </Flex>
+        ),
+        [queriesChartConfig.title, queriesTimeFrame],
+    );
+
+    const renderLatenciesChartToolbar = React.useCallback(
+        () => (
+            <Flex className={b('toolbar')} justifyContent="space-between" alignItems="center">
+                <div>{latenciesChartConfig.title}</div>
+                <TimeFrameDropdown
+                    value={latenciesTimeFrame}
+                    onChange={handleLatenciesTimeFrameChange}
+                />
+            </Flex>
+        ),
+        [latenciesChartConfig.title, latenciesTimeFrame],
+    );
+
     // WORKAROUND: Charts are rendered outside Disclosure component due to YAGR tooltip bug
     // Issue: https://github.com/gravity-ui/yagr/issues/262
 
@@ -72,7 +101,6 @@ export function QueriesActivityCharts({tenantName, expanded}: QueriesActivityCha
             <div className={b('chart-container')}>
                 <MetricChart
                     database={tenantName}
-                    title={queriesChartConfig.title}
                     metrics={queriesChartConfig.metrics}
                     timeFrame={queriesTimeFrame}
                     autorefresh={shouldRefresh}
@@ -82,16 +110,13 @@ export function QueriesActivityCharts({tenantName, expanded}: QueriesActivityCha
                     isChartVisible={hasChartsLoaded}
                     noBorder={true}
                     fullWidth={true}
-                    withTimeframeSelector={true}
-                    onTimeFrameChange={handleQueriesTimeFrameChange}
-                    timeFrameComponent="dropdown"
+                    renderChartToolbar={renderQueriesChartToolbar}
                 />
             </div>
 
             <div className={b('chart-container')}>
                 <MetricChart
                     database={tenantName}
-                    title={latenciesChartConfig.title}
                     metrics={latenciesChartConfig.metrics}
                     timeFrame={latenciesTimeFrame}
                     autorefresh={shouldRefresh}
@@ -101,9 +126,7 @@ export function QueriesActivityCharts({tenantName, expanded}: QueriesActivityCha
                     isChartVisible={hasChartsLoaded}
                     noBorder={true}
                     fullWidth={true}
-                    withTimeframeSelector={true}
-                    onTimeFrameChange={handleLatenciesTimeFrameChange}
-                    timeFrameComponent="dropdown"
+                    renderChartToolbar={renderLatenciesChartToolbar}
                 />
             </div>
         </div>

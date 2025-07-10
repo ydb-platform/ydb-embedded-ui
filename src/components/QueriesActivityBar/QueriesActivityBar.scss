@@ -96,6 +96,10 @@
         gap: var(--g-spacing-3);
     }
 
+    &__toolbar {
+        margin-bottom: 10px;
+    }
+
     // Focus states for accessibility
     &__header:focus-visible,
     &__open-queries-button:focus-visible {

@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {Flex} from '@gravity-ui/uikit';
 import {StringParam, useQueryParam} from 'use-query-params';
 
 import {MetricChart} from '../../../../../components/MetricChart';
@@ -60,6 +61,15 @@ export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
     const chartWidth = charts.length === 1 ? CHART_WIDTH_FULL : CHART_WIDTH;
     const chartHeight = CHART_WIDTH / 1.5;
 
+    const renderChartToolbar = React.useCallback(
+        (chartConfig: ChartConfig) => (
+            <Flex className={b('toolbar')} justifyContent="space-between" alignItems="center">
+                <div>{chartConfig.title}</div>
+            </Flex>
+        ),
+        [],
+    );
+
     const renderContent = () => {
         return charts.map((chartConfig) => {
             const chartId = chartConfig.metrics.map(({target}) => target).join('&');
@@ -67,7 +77,6 @@ export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
                 <MetricChart
                     key={chartId}
                     database={database}
-                    title={chartConfig.title}
                     metrics={chartConfig.metrics}
                     timeFrame={timeFrame as TimeFrame}
                     chartOptions={chartConfig.options}
@@ -76,6 +85,7 @@ export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
                     height={chartHeight}
                     onChartDataStatusChange={handleChartDataStatusChange}
                     isChartVisible={!isDashboardHidden}
+                    renderChartToolbar={() => renderChartToolbar(chartConfig)}
                 />
             );
         });
