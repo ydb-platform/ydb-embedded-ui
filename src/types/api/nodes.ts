@@ -89,6 +89,15 @@ export interface TMemoryStats {
     QueryExecutionConsumption?: string;
     QueryExecutionLimit?: string;
 
+    ColumnTablesReadExecutionConsumption?: string;
+    ColumnTablesReadExecutionLimit?: string;
+
+    ColumnTablesCompactionConsumption?: string;
+    ColumnTablesCompactionLimit?: string;
+
+    ColumnTablesCacheConsumption?: string;
+    ColumnTablesCacheLimit?: string;
+
     HardLimit?: string;
     SoftLimit?: string;
 }
