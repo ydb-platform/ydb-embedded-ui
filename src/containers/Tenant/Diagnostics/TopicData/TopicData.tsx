@@ -270,6 +270,7 @@ export function TopicData({scrollContainerRef, path, database}: TopicDataProps) 
         setColumns,
         startOffset,
         truncated,
+        handlePartitionChange,
     ]);
 
     const renderEmptyDataMessage = () => {
