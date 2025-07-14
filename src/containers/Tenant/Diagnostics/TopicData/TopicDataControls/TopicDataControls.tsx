@@ -41,11 +41,13 @@ interface TopicDataControlsProps {
     endOffset?: number;
     truncatedData?: boolean;
     scrollToOffset: (offset: number) => void;
+    handlePartitionChange?: (value: string[]) => void;
 }
 
 export function TopicDataControls({
     columnsToSelect,
     handleSelectedColumnsUpdate,
+    handlePartitionChange,
 
     startOffset,
     endOffset,
@@ -55,30 +57,12 @@ export function TopicDataControls({
     scrollToOffset,
     truncatedData,
 }: TopicDataControlsProps) {
-    const {
-        selectedPartition,
-        handleSelectedPartitionChange: handleSelectedPartitionParamChange,
-        handleSelectedOffsetChange,
-        handleStartTimestampChange,
-    } = useTopicDataQueryParams();
+    const {selectedPartition} = useTopicDataQueryParams();
 
     const partitionsToSelect = partitions?.map(({partitionId}) => ({
         content: String(partitionId),
         value: String(partitionId),
     }));
-
-    const handleSelectedPartitionChange = React.useCallback(
-        (value: string[]) => {
-            handleSelectedPartitionParamChange(value[0]);
-            handleSelectedOffsetChange(undefined);
-            handleStartTimestampChange(undefined);
-        },
-        [
-            handleSelectedPartitionParamChange,
-            handleStartTimestampChange,
-            handleSelectedOffsetChange,
-        ],
-    );
 
     return (
         <React.Fragment>
@@ -87,7 +71,7 @@ export function TopicDataControls({
                 label={i18n('label_partition-id')}
                 options={partitionsToSelect}
                 value={selectedPartition ? [selectedPartition] : undefined}
-                onUpdate={handleSelectedPartitionChange}
+                onUpdate={handlePartitionChange}
                 filterable={partitions && partitions.length > 5}
                 disabled={!partitions || !partitions.length}
                 errorPlacement="inside"
