@@ -199,6 +199,14 @@ export function TopicData({scrollContainerRef, path, database}: TopicDataProps) 
         }
     }, [handleSelectedOffsetChange, handleStartTimestampChange, topicDataFilter]);
 
+    const handlePartitionChange = React.useCallback(
+        (value: string[]) => {
+            handleSelectedPartitionChange(value[0]);
+            resetFilters();
+        },
+        [handleSelectedPartitionChange, resetFilters],
+    );
+
     const scrollToOffset = React.useCallback(
         (newOffset: number) => {
             const scrollTop = (newOffset - (baseOffset ?? 0)) * DEFAULT_TABLE_ROW_HEIGHT;
@@ -241,6 +249,7 @@ export function TopicData({scrollContainerRef, path, database}: TopicDataProps) 
                 key={controlsKey}
                 columnsToSelect={columnsToSelect}
                 handleSelectedColumnsUpdate={setColumns}
+                handlePartitionChange={handlePartitionChange}
                 partitions={partitions}
                 partitionsLoading={partitionsLoading}
                 partitionsError={partitionsError}
@@ -261,6 +270,7 @@ export function TopicData({scrollContainerRef, path, database}: TopicDataProps) 
         setColumns,
         startOffset,
         truncated,
+        handlePartitionChange,
     ]);
 
     const renderEmptyDataMessage = () => {
