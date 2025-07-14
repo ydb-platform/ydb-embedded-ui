@@ -28,12 +28,12 @@ import {cn} from '../../../../utils/cn';
 import {
     DEFAULT_IS_QUERY_RESULT_COLLAPSED,
     DEFAULT_SIZE_RESULT_PANE_KEY,
-    ENABLE_QUERY_STREAMING,
     LAST_USED_QUERY_ACTION_KEY,
 } from '../../../../utils/constants';
 import {
     useEventHandler,
     useQueryExecutionSettings,
+    useQueryStreamingSetting,
     useSetting,
     useTypedDispatch,
     useTypedSelector,
@@ -92,7 +92,7 @@ export default function QueryEditor(props: QueryEditorProps) {
         LAST_USED_QUERY_ACTION_KEY,
     );
     const [lastExecutedQueryText, setLastExecutedQueryText] = React.useState<string>('');
-    const [isQueryStreamingEnabled] = useSetting<boolean>(ENABLE_QUERY_STREAMING);
+    const [isQueryStreamingEnabled] = useQueryStreamingSetting();
 
     const isStreamingEnabled =
         useStreamingAvailable() &&

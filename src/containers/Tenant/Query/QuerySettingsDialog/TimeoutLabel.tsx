@@ -1,8 +1,7 @@
 import {HelpMark, Switch} from '@gravity-ui/uikit';
 
 import {cn} from '../../../../utils/cn';
-import {ENABLE_QUERY_STREAMING} from '../../../../utils/constants';
-import {useSetting} from '../../../../utils/hooks';
+import {useQueryStreamingSetting} from '../../../../utils/hooks';
 
 import {QUERY_SETTINGS_FIELD_SETTINGS} from './constants';
 import i18n from './i18n';
@@ -18,7 +17,7 @@ interface TimeoutLabelProps {
 }
 
 export function TimeoutLabel({isDisabled, isChecked, onToggle}: TimeoutLabelProps) {
-    const [isQueryStreamingEnabled] = useSetting<boolean>(ENABLE_QUERY_STREAMING);
+    const [isQueryStreamingEnabled] = useQueryStreamingSetting();
 
     if (isQueryStreamingEnabled) {
         return (
