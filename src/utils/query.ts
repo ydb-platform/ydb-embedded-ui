@@ -297,6 +297,8 @@ export const parseQueryErrorToString = (error: unknown) => {
     return parsedError?.error?.message;
 };
 
+export const defaultPragma = 'PRAGMA OrderedColumns;';
+
 export const DEFAULT_QUERY_SETTINGS = {
     queryMode: QUERY_MODES.query,
     transactionMode: TRANSACTION_MODES.implicit,
@@ -304,7 +306,7 @@ export const DEFAULT_QUERY_SETTINGS = {
     limitRows: 10000,
     statisticsMode: STATISTICS_MODES.none,
     tracingLevel: TRACING_LEVELS.off,
-    pragmas: 'PRAGMA OrderedColumns;',
+    pragmas: defaultPragma,
 };
 
 export const queryModeSchema = z.nativeEnum(QUERY_MODES);

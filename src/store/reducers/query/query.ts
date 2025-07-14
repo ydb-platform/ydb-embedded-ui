@@ -18,7 +18,7 @@ import {
     setStreamSession as setStreamSessionReducer,
 } from './streamingReducers';
 import type {QueryResult, QueryState} from './types';
-import {getActionAndSyntaxFromQueryMode, getQueryInHistory} from './utils';
+import {getActionAndSyntaxFromQueryMode, getQueryInHistory, prepareQueryWithPragmas} from './utils';
 
 const MAXIMUM_QUERIES_IN_HISTORY = 20;
 
@@ -208,18 +208,6 @@ interface QueryStats {
 
 const DEFAULT_STREAM_CHUNK_SIZE = 1000;
 const DEFAULT_CONCURRENT_RESULTS = false;
-
-const prepareQueryWithPragmas = (query: string, pragmas?: string): string => {
-    if (!pragmas || !pragmas.trim()) {
-        return query;
-    }
-
-    // Add pragmas at the beginning with proper line separation
-    const trimmedPragmas = pragmas.trim();
-    const separator = trimmedPragmas.endsWith(';') ? '\n\n' : ';\n\n';
-
-    return `${trimmedPragmas}${separator}${query}`;
-};
 
 export const queryApi = api.injectEndpoints({
     endpoints: (build) => ({
