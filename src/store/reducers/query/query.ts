@@ -209,6 +209,18 @@ interface QueryStats {
 const DEFAULT_STREAM_CHUNK_SIZE = 1000;
 const DEFAULT_CONCURRENT_RESULTS = false;
 
+const prepareQueryWithPragmas = (query: string, pragmas?: string): string => {
+    if (!pragmas || !pragmas.trim()) {
+        return query;
+    }
+
+    // Add pragmas at the beginning with proper line separation
+    const trimmedPragmas = pragmas.trim();
+    const separator = trimmedPragmas.endsWith(';') ? '\n\n' : ';\n\n';
+
+    return `${trimmedPragmas}${separator}${query}`;
+};
+
 export const queryApi = api.injectEndpoints({
     endpoints: (build) => ({
         useStreamQuery: build.mutation<null, StreamQueryParams>({
@@ -231,6 +243,8 @@ export const queryApi = api.injectEndpoints({
                     querySettings?.queryMode,
                 );
 
+                const finalQuery = prepareQueryWithPragmas(query, querySettings.pragmas);
+
                 try {
                     let streamDataChunkBatch: StreamDataChunk[] = [];
                     let batchTimeout: number | null = null;
@@ -245,7 +259,7 @@ export const queryApi = api.injectEndpoints({
 
                     await window.api.streaming.streamQuery(
                         {
-                            query,
+                            query: finalQuery,
                             database,
                             action,
                             syntax,
@@ -342,11 +356,13 @@ export const queryApi = api.injectEndpoints({
                     querySettings?.queryMode,
                 );
 
+                const finalQuery = prepareQueryWithPragmas(query, querySettings.pragmas);
+
                 try {
                     const timeStart = Date.now();
                     const response = await window.api.viewer.sendQuery(
                         {
-                            query,
+                            query: finalQuery,
                             database,
                             action,
                             syntax,

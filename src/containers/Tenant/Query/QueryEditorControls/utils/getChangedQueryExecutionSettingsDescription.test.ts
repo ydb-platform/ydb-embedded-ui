@@ -57,6 +57,7 @@ describe('getChangedQueryExecutionSettingsDescription', () => {
             limitRows: DEFAULT_QUERY_SETTINGS.limitRows,
             statisticsMode: STATISTICS_MODES.profile,
             tracingLevel: TRACING_LEVELS.diagnostic,
+            pragmas: 'PRAGMA TestPragma;',
         };
 
         const result = getChangedQueryExecutionSettingsDescription({
@@ -71,6 +72,7 @@ describe('getChangedQueryExecutionSettingsDescription', () => {
             [QUERY_SETTINGS_FIELD_SETTINGS.timeout.title]: '120',
             [QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.title]: STATISTICS_MODES_TITLES.profile,
             [QUERY_SETTINGS_FIELD_SETTINGS.tracingLevel.title]: TRACING_LEVELS_TITLES.diagnostic,
+            [QUERY_SETTINGS_FIELD_SETTINGS.pragmas.title]: 'PRAGMA TestPragma;',
         });
     });
 });

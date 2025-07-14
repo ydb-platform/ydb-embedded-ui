@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Button, Dialog, Flex, TextInput, Tooltip} from '@gravity-ui/uikit';
+import {Button, Dialog, Flex, TextArea, TextInput, Tooltip} from '@gravity-ui/uikit';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {Controller, useForm} from 'react-hook-form';
 
@@ -215,6 +215,29 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                             {i18n('form.limit.rows')}
                                         </span>
                                     }
+                                />
+                            )}
+                        />
+                    </div>
+                </Flex>
+                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
+                    <label htmlFor="pragmas" className={b('field-title')}>
+                        {QUERY_SETTINGS_FIELD_SETTINGS.pragmas.title}
+                    </label>
+                    <div className={b('control-wrapper')}>
+                        <Controller
+                            name="pragmas"
+                            control={control}
+                            render={({field}) => (
+                                <TextArea
+                                    id="pragmas"
+                                    {...field}
+                                    className={b('pragmas')}
+                                    placeholder="PRAGMA OrderedColumns;"
+                                    rows={3}
+                                    validationState={errors.pragmas ? 'invalid' : undefined}
+                                    errorMessage={errors.pragmas?.message}
+                                    errorPlacement="inside"
                                 />
                             )}
                         />
