@@ -38,9 +38,9 @@ function App({store, history, singleClusterMode, children, userSettings}: AppPro
                     <Content singleClusterMode={singleClusterMode}>{children}</Content>
                     <div id="fullscreen-root"></div>
                 </NavigationWrapper>
-                <ReduxTooltip />
             </ContentWrapper>
             {ChatPanel && <ChatPanel />}
+            <ReduxTooltip />
         </Providers>
     );
 }
