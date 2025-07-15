@@ -13,6 +13,7 @@ import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import type {TimeFrame} from '../../utils/timeframes';
 import {chartApi} from '../MetricChart/reducer';
+import type {ChartDataStatus} from '../MetricChart/types';
 
 import {QueriesActivityCharts} from './QueriesActivityCharts';
 import i18n from './i18n';
@@ -33,6 +34,25 @@ export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
     const [expanded, setExpanded] = React.useState(false);
     const [queriesTimeFrame] = React.useState<TimeFrame>('1h');
     const [latenciesTimeFrame] = React.useState<TimeFrame>('1h');
+    const [isActivityBarHidden, setIsActivityBarHidden] = React.useState<boolean>(true);
+
+    // Refetch data only if activity bar successfully loaded
+    const shouldRefresh = isActivityBarHidden ? 0 : autoRefreshInterval;
+
+    /**
+     * Activity bar should be hidden, if charts are not enabled:
+     * 1. GraphShard is not enabled
+     * 2. ydb version does not have /viewer/json/render endpoint (400, 404, CORS error, etc.)
+     *
+     * If at least one chart successfully loaded, activity bar should be shown
+     * @link https://github.com/ydb-platform/ydb-embedded-ui/issues/659
+     * @todo disable only for specific errors ('GraphShard is not enabled') after ydb-stable-24 is generally used
+     */
+    const handleChartDataStatusChange = React.useCallback((chartStatus: ChartDataStatus) => {
+        if (chartStatus === 'success') {
+            setIsActivityBarHidden(false);
+        }
+    }, []);
 
     // Fetch running queries
     const {data: runningQueriesData} = topQueriesApi.useGetRunningQueriesQuery(
@@ -40,7 +60,7 @@ export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
             database: tenantName,
             filters: {},
         },
-        {pollingInterval: autoRefreshInterval},
+        {pollingInterval: shouldRefresh},
     );
 
     // Fetch queries per second data for header metrics
@@ -51,7 +71,7 @@ export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
             timeFrame: queriesTimeFrame,
             maxDataPoints: 30,
         },
-        {pollingInterval: autoRefreshInterval},
+        {pollingInterval: shouldRefresh},
     );
 
     // Fetch latency data for header metrics
@@ -62,7 +82,7 @@ export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
             timeFrame: latenciesTimeFrame,
             maxDataPoints: 30,
         },
-        {pollingInterval: autoRefreshInterval},
+        {pollingInterval: shouldRefresh},
     );
 
     const runningQueriesCount = runningQueriesData?.resultSets?.[0]?.result?.length || 0;
@@ -109,7 +129,7 @@ export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
     };
 
     return (
-        <div className={b({expanded})}>
+        <div className={b({expanded})} style={{display: isActivityBarHidden ? 'none' : undefined}}>
             <Disclosure expanded={expanded} onUpdate={setExpanded} className={b('disclosure')}>
                 <Disclosure.Summary>
                     {(props) => (
@@ -204,7 +224,11 @@ export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
                     </div>
                 ) : null}
             </Disclosure>
-            <QueriesActivityCharts tenantName={tenantName} expanded={expanded} />
+            <QueriesActivityCharts
+                tenantName={tenantName}
+                expanded={expanded}
+                onChartDataStatusChange={handleChartDataStatusChange}
+            />
         </div>
     );
 }
