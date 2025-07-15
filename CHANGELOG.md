@@ -1,5 +1,13 @@
 # Changelog
 
+## [11.1.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.1.0...v11.1.1) (2025-07-15)
+
+
+### Bug Fixes
+
+* query activities banner visibility ([#2572](https://github.com/ydb-platform/ydb-embedded-ui/issues/2572)) ([c021e65](https://github.com/ydb-platform/ydb-embedded-ui/commit/c021e651a4053b32fe24572919b28d06b5beac6d))
+* **StorageLocation:** pdisk id calculation ([#2570](https://github.com/ydb-platform/ydb-embedded-ui/issues/2570)) ([8c9b492](https://github.com/ydb-platform/ydb-embedded-ui/commit/8c9b492bfaef377d7b7545187b7bccae2a065db6))
+
 ## [11.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.0.1...v11.1.0) (2025-07-15)
 
 
