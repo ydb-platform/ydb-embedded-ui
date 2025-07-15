@@ -18,7 +18,7 @@ import {
     setStreamSession as setStreamSessionReducer,
 } from './streamingReducers';
 import type {QueryResult, QueryState} from './types';
-import {getActionAndSyntaxFromQueryMode, getQueryInHistory} from './utils';
+import {getActionAndSyntaxFromQueryMode, getQueryInHistory, prepareQueryWithPragmas} from './utils';
 
 const MAXIMUM_QUERIES_IN_HISTORY = 20;
 
@@ -231,6 +231,8 @@ export const queryApi = api.injectEndpoints({
                     querySettings?.queryMode,
                 );
 
+                const finalQuery = prepareQueryWithPragmas(query, querySettings.pragmas);
+
                 try {
                     let streamDataChunkBatch: StreamDataChunk[] = [];
                     let batchTimeout: number | null = null;
@@ -245,7 +247,7 @@ export const queryApi = api.injectEndpoints({
 
                     await window.api.streaming.streamQuery(
                         {
-                            query,
+                            query: finalQuery,
                             database,
                             action,
                             syntax,
@@ -342,11 +344,13 @@ export const queryApi = api.injectEndpoints({
                     querySettings?.queryMode,
                 );
 
+                const finalQuery = prepareQueryWithPragmas(query, querySettings.pragmas);
+
                 try {
                     const timeStart = Date.now();
                     const response = await window.api.viewer.sendQuery(
                         {
-                            query,
+                            query: finalQuery,
                             database,
                             action,
                             syntax,
