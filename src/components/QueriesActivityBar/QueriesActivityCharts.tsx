@@ -15,11 +15,16 @@ const b = cn('queries-activity-bar');
 interface QueriesActivityChartsProps {
     tenantName: string;
     expanded: boolean;
+    onChartDataStatusChange?: (status: ChartDataStatus) => void;
 }
 
 const ACTIVITY_CHART_HEIGHT = 292;
 
-export function QueriesActivityCharts({tenantName, expanded}: QueriesActivityChartsProps) {
+export function QueriesActivityCharts({
+    tenantName,
+    expanded,
+    onChartDataStatusChange,
+}: QueriesActivityChartsProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const [queriesTimeFrame, setQueriesTimeFrame] = React.useState<TimeFrame>('1h');
     const [latenciesTimeFrame, setLatenciesTimeFrame] = React.useState<TimeFrame>('1h');
@@ -44,11 +49,16 @@ export function QueriesActivityCharts({tenantName, expanded}: QueriesActivityCha
     // Refetch data only if charts have successfully loaded at least once
     const shouldRefresh = hasChartsLoaded ? autoRefreshInterval : 0;
 
-    const handleChartDataStatusChange = React.useCallback((status: ChartDataStatus) => {
-        if (status === 'success') {
-            setHasChartsLoaded(true);
-        }
-    }, []);
+    const handleChartDataStatusChange = React.useCallback(
+        (status: ChartDataStatus) => {
+            if (status === 'success') {
+                setHasChartsLoaded(true);
+            }
+            // Also call parent callback if provided
+            onChartDataStatusChange?.(status);
+        },
+        [onChartDataStatusChange],
+    );
 
     const handleQueriesTimeFrameChange = React.useCallback((newTimeFrame: TimeFrame) => {
         setQueriesTimeFrame(newTimeFrame);
@@ -92,12 +102,9 @@ export function QueriesActivityCharts({tenantName, expanded}: QueriesActivityCha
     // fails when the chart is not immediately visible during mounting.
 
     // TODO: Remove this workaround once the upstream issue is fixed
-    if (!expanded) {
-        return null;
-    }
 
     return (
-        <div className={b('charts')}>
+        <div className={b('charts')} style={{display: expanded ? undefined : 'none'}}>
             <div className={b('chart-container')}>
                 <MetricChart
                     database={tenantName}
@@ -107,7 +114,7 @@ export function QueriesActivityCharts({tenantName, expanded}: QueriesActivityCha
                     height={ACTIVITY_CHART_HEIGHT}
                     chartOptions={queriesChartConfig.options}
                     onChartDataStatusChange={handleChartDataStatusChange}
-                    isChartVisible={hasChartsLoaded}
+                    isChartVisible={hasChartsLoaded && expanded}
                     noBorder={true}
                     fullWidth={true}
                     renderChartToolbar={renderQueriesChartToolbar}
@@ -123,7 +130,7 @@ export function QueriesActivityCharts({tenantName, expanded}: QueriesActivityCha
                     height={ACTIVITY_CHART_HEIGHT}
                     chartOptions={latenciesChartConfig.options}
                     onChartDataStatusChange={handleChartDataStatusChange}
-                    isChartVisible={hasChartsLoaded}
+                    isChartVisible={hasChartsLoaded && expanded}
                     noBorder={true}
                     fullWidth={true}
                     renderChartToolbar={renderLatenciesChartToolbar}
