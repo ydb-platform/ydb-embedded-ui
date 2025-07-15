@@ -1,5 +1,20 @@
 # Changelog
 
+## [11.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.0.1...v11.1.0) (2025-07-15)
+
+
+### Features
+
+* add Queries activities banner ([#2549](https://github.com/ydb-platform/ydb-embedded-ui/issues/2549)) ([dcfca43](https://github.com/ydb-platform/ydb-embedded-ui/commit/dcfca43edffca6b5e8ee568e0ea7ff4bb8547654))
+* **query:** add multi-line Pragmas field to Query Settings Dialog ([#2563](https://github.com/ydb-platform/ydb-embedded-ui/issues/2563)) ([2010164](https://github.com/ydb-platform/ydb-embedded-ui/commit/2010164e2ee680bcfe31b7d83b35deae2bb09bb8))
+
+
+### Bug Fixes
+
+* cancel previous multipart request if the new one starts ([#2559](https://github.com/ydb-platform/ydb-embedded-ui/issues/2559)) ([a4792fd](https://github.com/ydb-platform/ydb-embedded-ui/commit/a4792fd90edfc8e84d1ff3f31b380c417e25175e))
+* disable streaming by default for some clusters ([#2566](https://github.com/ydb-platform/ydb-embedded-ui/issues/2566)) ([a9670eb](https://github.com/ydb-platform/ydb-embedded-ui/commit/a9670eb128ae69b2c61bf0794defd3d40de55eea))
+* **TopicData:** reset filters on partition change ([#2567](https://github.com/ydb-platform/ydb-embedded-ui/issues/2567)) ([848f754](https://github.com/ydb-platform/ydb-embedded-ui/commit/848f754f3d9964c9218ea670bd76276ddb37b82a))
+
 ## [11.0.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.0.0...v11.0.1) (2025-07-09)
 
 
