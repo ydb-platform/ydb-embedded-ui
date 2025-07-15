@@ -134,7 +134,7 @@ function VDiskInfo({location}: StorageSectionProps) {
     );
 }
 function PDiskInfo({location}: StorageSectionProps) {
-    const {node, pool} = location ?? {};
+    const {pool} = location ?? {};
     const {group} = pool ?? {};
     const {vdisk} = group ?? {};
     const {pdisk} = vdisk ?? {};
@@ -143,23 +143,33 @@ function PDiskInfo({location}: StorageSectionProps) {
         return null;
     }
 
-    return pdisk.map((disk) => (
-        <LocationDetails
-            key={disk.id || disk.path}
-            fields={[
-                {
-                    value:
-                        disk.id && node?.id ? (
-                            <InternalLink to={getPDiskPagePath(disk.id, node.id)}>
-                                {disk.id}
-                            </InternalLink>
-                        ) : (
-                            disk.id
-                        ),
-                    title: i18n('label_pdisk-id'),
-                },
-                {value: disk.path, title: i18n('label_pdisk-path')},
-            ]}
-        />
-    ));
+    return pdisk.map((disk) => {
+        let nodeId: string | undefined;
+        let pdiskId: string | undefined;
+        if (disk.id) {
+            const splittedId = disk.id.split('-');
+            nodeId = splittedId[0];
+            pdiskId = splittedId.slice(1).join('-');
+        }
+
+        return (
+            <LocationDetails
+                key={disk.id || disk.path}
+                fields={[
+                    {
+                        value:
+                            nodeId && pdiskId ? (
+                                <InternalLink to={getPDiskPagePath(pdiskId, nodeId)}>
+                                    {disk.id}
+                                </InternalLink>
+                            ) : (
+                                disk.id
+                            ),
+                        title: i18n('label_pdisk-id'),
+                    },
+                    {value: disk.path, title: i18n('label_pdisk-path')},
+                ]}
+            />
+        );
+    });
 }
