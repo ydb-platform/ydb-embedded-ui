@@ -19,6 +19,7 @@
   "title_details": "Details",
   "label_overview": "Overview",
   "label_load": "Load",
+  "greeting": "Hello",
   "context_of": "of",
   "context_cpu": "CPU load",
   "context_memory": "Memory used",

@@ -54,7 +54,7 @@ export function ClusterOverview(props: ClusterOverviewProps) {
                                 <Flex gap={2} alignItems="center">
                                     <Icon data={overviewIcon} size={16} />
                                     <Text variant="body-2" color="primary" className={b('title')}>
-                                        {i18n('label_overview')}
+                                        {i18n('greeting')} - {i18n('label_overview')}
                                     </Text>
                                 </Flex>
                                 {!expandDashboard && <ClusterDashboard {...props} collapsed />}
