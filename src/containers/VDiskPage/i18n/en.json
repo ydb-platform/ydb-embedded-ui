@@ -4,6 +4,12 @@
   "pdisk": "PDisk",
   "vdisk": "VDisk",
   "storage": "Storage",
+  "tablets": "Tablets",
+
+  "tablet-id": "Tablet ID",
+  "channel-id": "Channel ID",
+  "count": "Count",
+  "size": "Size",
 
   "evict-vdisk-button": "Evict VDisk",
   "force-evict-vdisk-button": "Evict anyway",
