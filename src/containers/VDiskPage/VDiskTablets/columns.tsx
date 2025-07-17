@@ -10,8 +10,9 @@ import {vDiskPageKeyset} from '../i18n';
 
 const b = cn('ydb-vdisk-tablets');
 
-function TabletIdCell({getValue}: CellContext<VDiskBlobIndexItem, unknown>) {
-    const tabletId = getValue<string | number>();
+function TabletIdCell({row}: CellContext<VDiskBlobIndexItem, unknown>) {
+    const item = row.original;
+    const tabletId = item.TabletId || item.tabletId;
 
     if (!tabletId) {
         return <span>-</span>;
@@ -20,13 +21,26 @@ function TabletIdCell({getValue}: CellContext<VDiskBlobIndexItem, unknown>) {
     return <InternalLink to={getTabletPagePath(String(tabletId))}>{tabletId}</InternalLink>;
 }
 
-function MetricsCell({getValue}: CellContext<VDiskBlobIndexItem, unknown>) {
-    const value = getValue<string | number>();
+function MetricsCell({row, column}: CellContext<VDiskBlobIndexItem, unknown>) {
+    const item = row.original;
+    const fieldName = column.id;
+    
+    // Handle both PascalCase and camelCase field names
+    let value;
+    if (fieldName === 'ChannelId') {
+        value = item.ChannelId ?? item.channelId;
+    } else if (fieldName === 'Count') {
+        value = item.Count ?? item.count;
+    } else {
+        value = item[fieldName];
+    }
+    
     return <span className={b('metrics-cell')}>{value ?? '-'}</span>;
 }
 
-function SizeCell({getValue}: CellContext<VDiskBlobIndexItem, unknown>) {
-    const size = getValue<string | number>();
+function SizeCell({row}: CellContext<VDiskBlobIndexItem, unknown>) {
+    const item = row.original;
+    const size = item.Size ?? item.size;
     const numericSize = Number(size) || 0;
     return <span className={b('size-cell')}>{formatBytes(numericSize)}</span>;
 }

@@ -33,13 +33,57 @@ export function VDiskTablets({nodeId, pDiskId, vDiskSlotId, className}: VDiskTab
     });
 
     const loading = isFetching && currentData === undefined;
-    const tableData: VDiskBlobIndexItem[] = currentData?.BlobIndexStat || [];
+    
+    // Debug: Log the actual response to understand the structure
+    React.useEffect(() => {
+        if (currentData) {
+            console.log('VDisk BlobIndexStat Response:', currentData);
+            console.log('Response keys:', Object.keys(currentData));
+            console.log('BlobIndexStat field:', currentData.BlobIndexStat);
+            console.log('blobIndexStat field:', currentData.blobIndexStat);
+            console.log('blobindexstat field:', currentData.blobindexstat);
+            console.log('result field:', currentData.result);
+            console.log('data field:', currentData.data);
+        }
+    }, [currentData]);
+    
+    // Try multiple possible field names for the data array
+    const tableData: VDiskBlobIndexItem[] = React.useMemo(() => {
+        if (!currentData) return [];
+        
+        // Try different possible field names
+        const possibleFields = [
+            currentData.BlobIndexStat,
+            currentData.blobIndexStat,
+            currentData.blobindexstat,
+            currentData.result,
+            currentData.data,
+        ];
+        
+        for (const field of possibleFields) {
+            if (Array.isArray(field)) {
+                console.log('Using field:', field);
+                return field;
+            }
+        }
+        
+        // If none of the expected fields work, try to find any array in the response
+        for (const [key, value] of Object.entries(currentData)) {
+            if (Array.isArray(value)) {
+                console.log('Found array field:', key, value);
+                return value;
+            }
+        }
+        
+        console.log('No array found in response, returning empty array');
+        return [];
+    }, [currentData]);
 
     // Sort by size descending by default
     const sortedData = React.useMemo(() => {
         return [...tableData].sort((a, b) => {
-            const sizeA = Number(a.Size) || 0;
-            const sizeB = Number(b.Size) || 0;
+            const sizeA = Number(a.Size ?? a.size) || 0;
+            const sizeB = Number(b.Size ?? b.size) || 0;
             return sizeB - sizeA;
         });
     }, [tableData]);
