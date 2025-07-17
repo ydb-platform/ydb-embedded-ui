@@ -2,6 +2,7 @@ import React from 'react';
 
 import {useTable} from '@gravity-ui/table';
 import {skipToken} from '@reduxjs/toolkit/query';
+import type {SortingState} from '@tanstack/react-table';
 
 import {InfoViewerSkeleton} from '../../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {Table} from '../../../components/Table/Table';
@@ -25,6 +26,9 @@ interface VDiskTabletsProps {
 
 export function VDiskTablets({nodeId, pDiskId, vDiskSlotId, className}: VDiskTabletsProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
+    const [sorting, setSorting] = React.useState<SortingState>([
+        {id: 'Size', desc: true}, // Default sort by size descending
+    ]);
 
     const params = nodeId && pDiskId && vDiskSlotId ? {nodeId, pDiskId, vDiskSlotId} : skipToken;
 
@@ -34,7 +38,7 @@ export function VDiskTablets({nodeId, pDiskId, vDiskSlotId, className}: VDiskTab
 
     const loading = isFetching && currentData === undefined;
 
-    // Transform the actual API response structure into the expected flat table format
+    // Remove the manual sorting since we'll let the table handle it with enableSorting
     const tableData: VDiskBlobIndexItem[] = React.useMemo(() => {
         if (!currentData) {
             return [];
@@ -76,20 +80,18 @@ export function VDiskTablets({nodeId, pDiskId, vDiskSlotId, className}: VDiskTab
         return flatData;
     }, [currentData]);
 
-    // Sort by size descending by default
-    const sortedData = React.useMemo(() => {
-        return [...tableData].sort((a, b) => {
-            const sizeA = Number(a.Size) || 0;
-            const sizeB = Number(b.Size) || 0;
-            return sizeB - sizeA;
-        });
-    }, [tableData]);
-
     const columns = React.useMemo(() => getColumns(), []);
 
     const table = useTable({
         columns,
-        data: sortedData,
+        data: tableData,
+        enableSorting: true,
+        enableColumnResizing: true,
+        columnResizeMode: 'onChange',
+        onSortingChange: setSorting,
+        state: {
+            sorting,
+        },
     });
 
     if (error) {
@@ -106,7 +108,7 @@ export function VDiskTablets({nodeId, pDiskId, vDiskSlotId, className}: VDiskTab
 
     return (
         <div className={vDiskTabletsCn(null, className)}>
-            <Table table={table} />
+            <Table table={table} stickyHeader width="max" />
         </div>
     );
 }

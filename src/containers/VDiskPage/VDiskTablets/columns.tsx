@@ -24,7 +24,7 @@ function TabletIdCell({row}: CellContext<VDiskBlobIndexItem, unknown>) {
 function MetricsCell({row, column}: CellContext<VDiskBlobIndexItem, unknown>) {
     const item = row.original;
     const fieldName = column.id;
-    
+
     // Handle both PascalCase and camelCase field names
     let value;
     if (fieldName === 'ChannelId') {
@@ -34,7 +34,7 @@ function MetricsCell({row, column}: CellContext<VDiskBlobIndexItem, unknown>) {
     } else {
         value = item[fieldName];
     }
-    
+
     return <span className={b('metrics-cell')}>{value ?? '-'}</span>;
 }
 
@@ -51,28 +51,37 @@ export function getColumns() {
             accessorKey: 'TabletId',
             header: () => <ColumnHeader>{vDiskPageKeyset('tablet-id')}</ColumnHeader>,
             size: 150,
+            minSize: 100,
             cell: TabletIdCell,
+            enableSorting: true,
         },
         {
             accessorKey: 'ChannelId',
             header: () => <ColumnHeader>{vDiskPageKeyset('channel-id')}</ColumnHeader>,
             size: 100,
+            minSize: 80,
             cell: MetricsCell,
             meta: {align: 'right'},
+            enableSorting: true,
         },
         {
             accessorKey: 'Count',
             header: () => <ColumnHeader>{vDiskPageKeyset('count')}</ColumnHeader>,
             size: 100,
+            minSize: 80,
             cell: MetricsCell,
             meta: {align: 'right'},
+            enableSorting: true,
         },
         {
             accessorKey: 'Size',
             header: () => <ColumnHeader>{vDiskPageKeyset('size')}</ColumnHeader>,
             size: 120,
+            minSize: 100,
             cell: SizeCell,
             meta: {align: 'right'},
+            enableSorting: true,
+            sortingFn: 'basic', // Use basic sorting for numeric values
         },
     ];
 
