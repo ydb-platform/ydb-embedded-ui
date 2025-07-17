@@ -25,18 +25,44 @@ export interface VDiskBlobIndexItem {
     [key: string]: any;
 }
 
+export interface VDiskBlobIndexChannel {
+    /** Channel count */
+    count?: string;
+    /** Channel data size */
+    data_size?: string;
+    /** Channel minimum ID */
+    min_id?: string;
+    /** Channel maximum ID */
+    max_id?: string;
+}
+
+export interface VDiskBlobIndexTablet {
+    /** Tablet identifier */
+    tablet_id?: string;
+    /** Array of tablet channels */
+    channels?: VDiskBlobIndexChannel[];
+}
+
+export interface VDiskBlobIndexStat {
+    /** Array of tablets */
+    tablets?: VDiskBlobIndexTablet[];
+    /** Array of channels */
+    channels?: VDiskBlobIndexChannel[];
+}
+
 export interface VDiskBlobIndexResponse {
-    /** Array of blob index statistics */
-    BlobIndexStat?: VDiskBlobIndexItem[];
-    /** Alternative possible field name (camelCase) */
-    blobIndexStat?: VDiskBlobIndexItem[];
-    /** Alternative possible field name (lowercase) */
-    blobindexstat?: VDiskBlobIndexItem[];
+    /** Response status */
+    status?: string;
+    /** Statistics data */
+    stat?: VDiskBlobIndexStat;
     /** Response time */
     ResponseTime?: string;
     /** Response duration */
     ResponseDuration?: number;
-    /** Alternative response structures */
+    /** Alternative response structures for backward compatibility */
+    BlobIndexStat?: VDiskBlobIndexItem[];
+    blobIndexStat?: VDiskBlobIndexItem[];
+    blobindexstat?: VDiskBlobIndexItem[];
     result?: VDiskBlobIndexItem[];
     data?: VDiskBlobIndexItem[];
     [key: string]: any; // Allow for other possible field names

@@ -33,57 +33,54 @@ export function VDiskTablets({nodeId, pDiskId, vDiskSlotId, className}: VDiskTab
     });
 
     const loading = isFetching && currentData === undefined;
-    
-    // Debug: Log the actual response to understand the structure
-    React.useEffect(() => {
-        if (currentData) {
-            console.log('VDisk BlobIndexStat Response:', currentData);
-            console.log('Response keys:', Object.keys(currentData));
-            console.log('BlobIndexStat field:', currentData.BlobIndexStat);
-            console.log('blobIndexStat field:', currentData.blobIndexStat);
-            console.log('blobindexstat field:', currentData.blobindexstat);
-            console.log('result field:', currentData.result);
-            console.log('data field:', currentData.data);
-        }
-    }, [currentData]);
-    
-    // Try multiple possible field names for the data array
+
+    // Transform the actual API response structure into the expected flat table format
     const tableData: VDiskBlobIndexItem[] = React.useMemo(() => {
-        if (!currentData) return [];
-        
-        // Try different possible field names
-        const possibleFields = [
-            currentData.BlobIndexStat,
-            currentData.blobIndexStat,
-            currentData.blobindexstat,
-            currentData.result,
-            currentData.data,
-        ];
-        
-        for (const field of possibleFields) {
-            if (Array.isArray(field)) {
-                console.log('Using field:', field);
-                return field;
-            }
+        if (!currentData) {
+            return [];
         }
-        
-        // If none of the expected fields work, try to find any array in the response
-        for (const [key, value] of Object.entries(currentData)) {
-            if (Array.isArray(value)) {
-                console.log('Found array field:', key, value);
-                return value;
-            }
+
+        // Debug: Log the actual response structure
+        console.info('VDisk BlobIndexStat Response:', currentData);
+
+        // Check if we have the expected structure: {stat: {tablets: [...]}}
+        const stat = currentData.stat;
+        if (!stat || !Array.isArray(stat.tablets)) {
+            console.info('No stat.tablets array found in response');
+            return [];
         }
-        
-        console.log('No array found in response, returning empty array');
-        return [];
+
+        // Transform the nested structure into flat table rows
+        const flatData: VDiskBlobIndexItem[] = [];
+
+        stat.tablets.forEach((tablet: any) => {
+            const tabletId = tablet.tablet_id;
+            if (!tabletId || !Array.isArray(tablet.channels)) {
+                return; // Skip tablets without ID or channels
+            }
+
+            tablet.channels.forEach((channel: any, channelIndex: number) => {
+                // Only include channels that have count and data_size
+                if (channel.count && channel.data_size) {
+                    flatData.push({
+                        TabletId: tabletId,
+                        ChannelId: channelIndex,
+                        Count: parseInt(channel.count, 10) || 0,
+                        Size: parseInt(channel.data_size, 10) || 0,
+                    });
+                }
+            });
+        });
+
+        console.info('Transformed data:', flatData);
+        return flatData;
     }, [currentData]);
 
     // Sort by size descending by default
     const sortedData = React.useMemo(() => {
         return [...tableData].sort((a, b) => {
-            const sizeA = Number(a.Size ?? a.size) || 0;
-            const sizeB = Number(b.Size ?? b.size) || 0;
+            const sizeA = Number(a.Size) || 0;
+            const sizeB = Number(b.Size) || 0;
             return sizeB - sizeA;
         });
     }, [tableData]);
