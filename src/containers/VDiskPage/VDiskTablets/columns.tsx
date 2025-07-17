@@ -1,89 +1,47 @@
-import type {CellContext, ColumnDef} from '@tanstack/react-table';
+import type {Column} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
 
 import {InternalLink} from '../../../components/InternalLink/InternalLink';
-import {ColumnHeader} from '../../../components/Table/Table';
 import {getTabletPagePath} from '../../../routes';
 import type {VDiskBlobIndexItem} from '../../../types/api/vdiskBlobIndex';
-import {cn} from '../../../utils/cn';
 import {formatBytes} from '../../../utils/dataFormatters/dataFormatters';
 import {vDiskPageKeyset} from '../i18n';
 
-const b = cn('ydb-vdisk-tablets');
-
-function TabletIdCell({row}: CellContext<VDiskBlobIndexItem, unknown>) {
-    const item = row.original;
-    const tabletId = item.TabletId || item.tabletId;
-
-    if (!tabletId) {
-        return <span>-</span>;
-    }
-
-    return <InternalLink to={getTabletPagePath(String(tabletId))}>{tabletId}</InternalLink>;
-}
-
-function MetricsCell({row, column}: CellContext<VDiskBlobIndexItem, unknown>) {
-    const item = row.original;
-    const fieldName = column.id;
-
-    // Handle both PascalCase and camelCase field names
-    let value;
-    if (fieldName === 'ChannelId') {
-        value = item.ChannelId ?? item.channelId;
-    } else if (fieldName === 'Count') {
-        value = item.Count ?? item.count;
-    } else {
-        value = item[fieldName];
-    }
-
-    return <span className={b('metrics-cell')}>{value ?? '-'}</span>;
-}
-
-function SizeCell({row}: CellContext<VDiskBlobIndexItem, unknown>) {
-    const item = row.original;
-    const size = item.Size ?? item.size;
-    const numericSize = Number(size) || 0;
-    return <span className={b('size-cell')}>{formatBytes(numericSize)}</span>;
-}
-
-export function getColumns() {
-    const columns: ColumnDef<VDiskBlobIndexItem>[] = [
+export function getColumns(): Column<VDiskBlobIndexItem>[] {
+    return [
         {
-            accessorKey: 'TabletId',
-            header: () => <ColumnHeader>{vDiskPageKeyset('tablet-id')}</ColumnHeader>,
-            size: 150,
-            minSize: 100,
-            cell: TabletIdCell,
-            enableSorting: true,
+            name: vDiskPageKeyset('tablet-id'),
+            render: ({row}) => {
+                const tabletId = row.TabletId;
+                if (!tabletId) {
+                    return <span>-</span>;
+                }
+                return <InternalLink to={getTabletPagePath(String(tabletId))}>{tabletId}</InternalLink>;
+            },
+            width: 150,
         },
         {
-            accessorKey: 'ChannelId',
-            header: () => <ColumnHeader>{vDiskPageKeyset('channel-id')}</ColumnHeader>,
-            size: 100,
-            minSize: 80,
-            cell: MetricsCell,
-            meta: {align: 'right'},
-            enableSorting: true,
+            name: vDiskPageKeyset('channel-id'),
+            align: DataTable.RIGHT,
+            render: ({row}) => row.ChannelId ?? '-',
+            width: 100,
         },
         {
-            accessorKey: 'Count',
-            header: () => <ColumnHeader>{vDiskPageKeyset('count')}</ColumnHeader>,
-            size: 100,
-            minSize: 80,
-            cell: MetricsCell,
-            meta: {align: 'right'},
-            enableSorting: true,
+            name: vDiskPageKeyset('count'),
+            align: DataTable.RIGHT,
+            render: ({row}) => row.Count ?? '-',
+            width: 100,
         },
         {
-            accessorKey: 'Size',
-            header: () => <ColumnHeader>{vDiskPageKeyset('size')}</ColumnHeader>,
-            size: 120,
-            minSize: 100,
-            cell: SizeCell,
-            meta: {align: 'right'},
-            enableSorting: true,
-            sortingFn: 'basic', // Use basic sorting for numeric values
+            name: vDiskPageKeyset('size'),
+            align: DataTable.RIGHT,
+            render: ({row}) => {
+                const size = row.Size;
+                const numericSize = Number(size) || 0;
+                return formatBytes(numericSize);
+            },
+            width: 120,
+            sortAccessor: (row) => row.Size || 0,
         },
     ];
-
-    return columns;
 }

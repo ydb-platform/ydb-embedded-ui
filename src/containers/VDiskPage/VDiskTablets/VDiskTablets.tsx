@@ -1,21 +1,29 @@
 import React from 'react';
 
-import {useTable} from '@gravity-ui/table';
+import type {Column} from '@gravity-ui/react-data-table';
+import DataTable from '@gravity-ui/react-data-table';
 import {skipToken} from '@reduxjs/toolkit/query';
-import type {SortingState} from '@tanstack/react-table';
 
 import {InfoViewerSkeleton} from '../../../components/InfoViewerSkeleton/InfoViewerSkeleton';
-import {Table} from '../../../components/Table/Table';
+import {ResizeableDataTable} from '../../../components/ResizeableDataTable/ResizeableDataTable';
 import {vDiskApi} from '../../../store/reducers/vdisk/vdisk';
 import type {VDiskBlobIndexItem} from '../../../types/api/vdiskBlobIndex';
 import {cn} from '../../../utils/cn';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
 
 import {getColumns} from './columns';
+import {vDiskPageKeyset} from '../i18n';
 
 import './VDiskTablets.scss';
 
 const vDiskTabletsCn = cn('ydb-vdisk-tablets');
+const VDISK_TABLETS_COLUMNS_WIDTH_LS_KEY = 'vdiskTabletsColumnsWidth';
+
+const TABLE_SETTINGS = {
+    displayIndices: false,
+    highlightRows: true,
+    stickyHead: DataTable.MOVING,
+};
 
 interface VDiskTabletsProps {
     nodeId?: string | number;
@@ -26,9 +34,6 @@ interface VDiskTabletsProps {
 
 export function VDiskTablets({nodeId, pDiskId, vDiskSlotId, className}: VDiskTabletsProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const [sorting, setSorting] = React.useState<SortingState>([
-        {id: 'Size', desc: true}, // Default sort by size descending
-    ]);
 
     const params = nodeId && pDiskId && vDiskSlotId ? {nodeId, pDiskId, vDiskSlotId} : skipToken;
 
@@ -38,19 +43,14 @@ export function VDiskTablets({nodeId, pDiskId, vDiskSlotId, className}: VDiskTab
 
     const loading = isFetching && currentData === undefined;
 
-    // Remove the manual sorting since we'll let the table handle it with enableSorting
     const tableData: VDiskBlobIndexItem[] = React.useMemo(() => {
         if (!currentData) {
             return [];
         }
 
-        // Debug: Log the actual response structure
-        console.info('VDisk BlobIndexStat Response:', currentData);
-
         // Check if we have the expected structure: {stat: {tablets: [...]}}
         const stat = currentData.stat;
         if (!stat || !Array.isArray(stat.tablets)) {
-            console.info('No stat.tablets array found in response');
             return [];
         }
 
@@ -76,23 +76,10 @@ export function VDiskTablets({nodeId, pDiskId, vDiskSlotId, className}: VDiskTab
             });
         });
 
-        console.info('Transformed data:', flatData);
         return flatData;
     }, [currentData]);
 
     const columns = React.useMemo(() => getColumns(), []);
-
-    const table = useTable({
-        columns,
-        data: tableData,
-        enableSorting: true,
-        enableColumnResizing: true,
-        columnResizeMode: 'onChange',
-        onSortingChange: setSorting,
-        state: {
-            sorting,
-        },
-    });
 
     if (error) {
         return (
@@ -108,7 +95,17 @@ export function VDiskTablets({nodeId, pDiskId, vDiskSlotId, className}: VDiskTab
 
     return (
         <div className={vDiskTabletsCn(null, className)}>
-            <Table table={table} stickyHeader width="max" />
+            <ResizeableDataTable
+                columnsWidthLSKey={VDISK_TABLETS_COLUMNS_WIDTH_LS_KEY}
+                data={tableData}
+                columns={columns}
+                settings={TABLE_SETTINGS}
+                loading={loading}
+                initialSortOrder={{
+                    columnId: vDiskPageKeyset('size'),
+                    order: DataTable.DESCENDING,
+                }}
+            />
         </div>
     );
 }
