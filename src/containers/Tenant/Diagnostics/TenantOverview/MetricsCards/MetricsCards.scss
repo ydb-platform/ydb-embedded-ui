@@ -28,6 +28,28 @@
     @include pseudo-base($side, var(--tab-filler-size));
 }
 
+// Utility mixins for common patterns
+
+@mixin tab-border-base($color) {
+    border: var(--tab-border-width) solid $color;
+    border-bottom: none;
+    border-radius: var(--g-border-radius-s) var(--g-border-radius-s) 0 0;
+}
+
+@mixin tab-edge-filler($side) {
+    &.tenant-metrics-cards__link-container_active::after {
+        @include pseudo-active-filler($side);
+    }
+
+    &:not(.tenant-metrics-cards__link-container_active)::after {
+        @include pseudo-inactive-filler($side);
+    }
+
+    &:not(.tenant-metrics-cards__link-container_active)::before {
+        @include pseudo-background-fill($side);
+    }
+}
+
 .tenant-metrics-cards {
     // CSS Variables for consistent design system
     --tab-border-width: 1px;
@@ -39,6 +61,16 @@
     --z-tab-base: 100;
     --z-tab-active: 102;
     --g-border-radius-xxl: 12px;
+
+    // Fallback for browsers without :has() support
+    @supports not selector(:has(*)) {
+        &__link-container:not(:last-child) {
+            padding-right: var(--tab-adjusted-spacing);
+
+            border-right: var(--tab-border-width) solid var(--g-color-line-generic);
+            border-bottom-right-radius: var(--g-border-radius-xxl);
+        }
+    }
 
     &__link {
         text-decoration: none;
@@ -62,83 +94,47 @@
         border-top: var(--tab-border-width) solid var(--g-color-base-background);
         border-bottom: var(--tab-border-width) solid var(--g-color-line-generic);
         background: var(--g-color-base-background);
-    }
 
-    // Filler for the first and last cards
-    // As they dont have left and right neighbors
-    &__link-container:first-child {
-        margin-left: 0;
-
-        &.tenant-metrics-cards__link-container_active::after {
-            @include pseudo-active-filler(left);
+        // Reset edge padding for first/last elements
+        &:first-child {
+            margin-left: 0;
         }
 
-        &:not(.tenant-metrics-cards__link-container_active)::after {
-            @include pseudo-inactive-filler(left);
+        &:first-child {
+            padding-left: 0;
+            @include tab-edge-filler(left);
         }
 
-        &:not(.tenant-metrics-cards__link-container_active)::before {
-            @include pseudo-background-fill(left);
-        }
-    }
-
-    &__link-container:last-child {
-        margin-right: 0;
-
-        &.tenant-metrics-cards__link-container_active::after {
-            @include pseudo-active-filler(right);
-        }
-
-        &:not(.tenant-metrics-cards__link-container_active)::after {
-            @include pseudo-inactive-filler(right);
-        }
-
-        &:not(.tenant-metrics-cards__link-container_active)::before {
-            @include pseudo-background-fill(right);
+        &:last-child {
+            margin-right: 0;
+            padding-right: 0;
+            @include tab-edge-filler(right);
         }
     }
 
     &__link {
         display: block;
-
-        border: var(--tab-border-width) solid var(--g-color-base-background);
-        border-bottom: none;
-        border-radius: var(--g-border-radius-s) var(--g-border-radius-s) 0 0;
+        @include tab-border-base(var(--g-color-base-background));
     }
 
-    &__link-container_active &__link {
-        display: block;
-
-        padding-bottom: var(--tab-border-compensation);
-
-        border: var(--tab-border-width) solid var(--g-color-line-generic);
-        border-bottom: none;
-        border-radius: var(--g-border-radius-s) var(--g-border-radius-s) 0 0;
-    }
-
+    // Active state styling
     &__link-container_active {
         z-index: var(--z-tab-active);
 
         padding: 0;
 
-        border-bottom: 0 !important;
+        border-bottom: 0;
         background: var(--g-color-base-background);
 
         transform: translateY(var(--tab-lift-offset));
+
+        .tenant-metrics-cards__link {
+            padding-bottom: var(--tab-border-compensation);
+            @include tab-border-base(var(--g-color-line-generic));
+        }
     }
 
-    &__link-container:first-child {
-        padding-left: 0;
-    }
-
-    &__link-container:last-child {
-        padding-right: 0;
-    }
-
-    &__link-container:not(:has(+ &__link-container_active)) {
-        padding-right: 0;
-    }
-
+    // Adjacent tab styling (modern browsers with :has() support)
     &__link-container:has(+ &__link-container_active) {
         padding-right: var(--tab-adjusted-spacing);
 
@@ -151,5 +147,10 @@
 
         border-left: var(--tab-border-width) solid var(--g-color-line-generic);
         border-bottom-left-radius: var(--g-border-radius-xxl);
+    }
+
+    // Reset padding for specific cases
+    &__link-container:not(:has(+ &__link-container_active)) {
+        padding-right: 0;
     }
 }
