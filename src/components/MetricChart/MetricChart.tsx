@@ -107,18 +107,18 @@ const emptyChartData: PreparedMetricsData = {timeline: [], metrics: []};
 
 interface DiagnosticsChartProps {
     database: string;
-
     metrics: MetricDescription[];
-    timeFrame: TimeFrame;
-    onTimeFrameChange: (timeFrame: TimeFrame) => void;
+
+    /** Default timeframe for uncontrolled usage */
+    defaultTimeFrame?: TimeFrame;
+
+    /** Callback for timeframe changes - required when using controlled mode */
+    onTimeFrameChange?: (timeFrame: TimeFrame) => void;
 
     autorefresh?: number;
-
     height?: number;
     width?: number;
-
     chartOptions?: ChartOptions;
-
     onChartDataStatusChange?: OnChartDataStatusChange;
 
     /**
@@ -135,8 +135,7 @@ interface DiagnosticsChartProps {
 export const MetricChart = ({
     database,
     metrics,
-    timeFrame,
-    onTimeFrameChange,
+    defaultTimeFrame = '1h',
     autorefresh,
     width = 400,
     height = width / 1.5,
@@ -145,6 +144,8 @@ export const MetricChart = ({
     isChartVisible,
     title,
 }: DiagnosticsChartProps) => {
+    const [timeFrame, setTimeFrame] = React.useState<TimeFrame>(defaultTimeFrame);
+
     // Use a reasonable default for maxDataPoints when fullWidth is true
     const maxDataPoints = DEFAULT_EFFECTIVE_WIDTH / 2;
 
@@ -172,7 +173,7 @@ export const MetricChart = ({
     const renderToolbar = () => (
         <Flex className={b('toolbar')} justifyContent="space-between" alignItems="center">
             <div>{title}</div>
-            <TimeFrameDropdown value={timeFrame} onChange={onTimeFrameChange} />
+            <TimeFrameDropdown value={timeFrame} onChange={setTimeFrame} />
         </Flex>
     );
 

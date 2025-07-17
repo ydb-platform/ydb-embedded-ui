@@ -8,7 +8,6 @@ import type {
 } from '../../../../../components/MetricChart';
 import {cn} from '../../../../../utils/cn';
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
-import type {TimeFrame} from '../../../../../utils/timeframes';
 
 import './TenantDashboard.scss';
 
@@ -30,17 +29,6 @@ interface TenantDashboardProps {
 
 export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
     const [isDashboardHidden, setIsDashboardHidden] = React.useState<boolean>(true);
-
-    // Each chart has its own timeframe state
-    const [chartTimeFrames, setChartTimeFrames] = React.useState<Record<string, TimeFrame>>(() => {
-        const initialTimeFrames: Record<string, TimeFrame> = {};
-        charts.forEach((chartConfig) => {
-            const chartId = chartConfig.metrics.map(({target}) => target).join('&');
-            initialTimeFrames[chartId] = '1h';
-        });
-        return initialTimeFrames;
-    });
-
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     // Refetch data only if dashboard successfully loaded
@@ -65,35 +53,21 @@ export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
     const chartWidth = charts.length === 1 ? CHART_WIDTH_FULL : CHART_WIDTH;
     const chartHeight = CHART_WIDTH / 1.5;
 
-    const handleTimeFrameChange = React.useCallback((chartId: string, newTimeFrame: TimeFrame) => {
-        setChartTimeFrames((prev) => ({
-            ...prev,
-            [chartId]: newTimeFrame,
-        }));
-    }, []);
-
     const renderContent = () => {
-        return charts.map((chartConfig) => {
-            const chartId = chartConfig.metrics.map(({target}) => target).join('&');
-            return (
-                <MetricChart
-                    key={chartId}
-                    database={database}
-                    metrics={chartConfig.metrics}
-                    timeFrame={chartTimeFrames[chartId] || '1h'}
-                    onTimeFrameChange={(newTimeFrame) =>
-                        handleTimeFrameChange(chartId, newTimeFrame)
-                    }
-                    chartOptions={chartConfig.options}
-                    autorefresh={shouldRefresh}
-                    width={chartWidth}
-                    height={chartHeight}
-                    onChartDataStatusChange={handleChartDataStatusChange}
-                    isChartVisible={!isDashboardHidden}
-                    title={chartConfig.title}
-                />
-            );
-        });
+        return charts.map((chartConfig, index) => (
+            <MetricChart
+                key={index}
+                database={database}
+                metrics={chartConfig.metrics}
+                chartOptions={chartConfig.options}
+                autorefresh={shouldRefresh}
+                width={chartWidth}
+                height={chartHeight}
+                onChartDataStatusChange={handleChartDataStatusChange}
+                isChartVisible={!isDashboardHidden}
+                title={chartConfig.title}
+            />
+        ));
     };
 
     return (

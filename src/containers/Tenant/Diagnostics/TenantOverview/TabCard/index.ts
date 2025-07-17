@@ -1,1 +1,0 @@
-export {TabCard} from './TabCard';
