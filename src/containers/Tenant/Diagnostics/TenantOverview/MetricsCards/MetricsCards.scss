@@ -1,4 +1,43 @@
+// Mixins for pseudo-element patterns
+
+@mixin pseudo-base($side: left, $height: var(--tab-filler-size)) {
+    position: absolute;
+    top: 100%;
+    #{$side}: 0;
+    width: var(--tab-filler-size);
+    height: $height;
+
+    content: '';
+
+    background-color: var(--g-color-base-background);
+}
+
+@mixin pseudo-active-filler($side: left) {
+    @include pseudo-base($side, var(--g-spacing-3));
+    border-#{$side}: var(--tab-border-width) solid var(--g-color-line-generic);
+}
+
+@mixin pseudo-inactive-filler($side: left) {
+    border-top: var(--tab-border-width) solid var(--g-color-line-generic);
+    @include pseudo-base($side, var(--tab-filler-size));
+    border-#{$side}: var(--tab-border-width) solid var(--g-color-line-generic);
+    border-top-#{$side}-radius: var(--g-border-radius-s);
+}
+
+@mixin pseudo-background-fill($side: left) {
+    @include pseudo-base($side, var(--tab-filler-size));
+}
+
 .tenant-metrics-cards {
+    // CSS Variables for consistent design system
+    --tab-border-width: 1px;
+    --tab-filler-size: 10px;
+    --tab-overlap: -1px;
+    --tab-lift-offset: -6px;
+    --tab-border-compensation: 1px;
+    --tab-adjusted-spacing: calc(var(--g-spacing-3) - var(--tab-border-width));
+    --z-tab-base: 100;
+    --z-tab-active: 102;
     --g-border-radius-xxl: 12px;
 
     &__link {
@@ -13,15 +52,15 @@
 
     &__link-container {
         position: relative;
-        z-index: 100;
+        z-index: var(--z-tab-base);
 
         flex: 1;
 
-        margin-left: -1px;
+        margin-left: var(--tab-overlap);
         padding: 0 var(--g-spacing-3) var(--g-spacing-3) var(--g-spacing-3);
 
-        border-top: 1px solid var(--g-color-base-background);
-        border-bottom: 1px solid var(--g-color-line-generic);
+        border-top: var(--tab-border-width) solid var(--g-color-base-background);
+        border-bottom: var(--tab-border-width) solid var(--g-color-line-generic);
         background: var(--g-color-base-background);
     }
 
@@ -31,46 +70,15 @@
         margin-left: 0;
 
         &.tenant-metrics-cards__link-container_active::after {
-            position: absolute;
-            top: 100%;
-            left: 0;
-
-            width: 10px;
-            height: var(--g-spacing-3);
-
-            content: '';
-
-            border-left: 1px solid var(--g-color-line-generic);
-            background-color: var(--g-color-base-background);
+            @include pseudo-active-filler(left);
         }
 
         &:not(.tenant-metrics-cards__link-container_active)::after {
-            position: absolute;
-            top: 100%;
-            left: 0;
-
-            width: 10px;
-            height: 10px;
-
-            content: '';
-
-            border-top: 1px solid var(--g-color-line-generic);
-            border-left: 1px solid var(--g-color-line-generic);
-            border-top-left-radius: var(--g-border-radius-s);
-            background-color: var(--g-color-base-background);
+            @include pseudo-inactive-filler(left);
         }
 
         &:not(.tenant-metrics-cards__link-container_active)::before {
-            position: absolute;
-            top: 100%;
-            left: 0;
-
-            width: 10px;
-            height: 10px;
-
-            content: '';
-
-            background-color: var(--g-color-base-background);
+            @include pseudo-background-fill(left);
         }
     }
 
@@ -78,80 +86,45 @@
         margin-right: 0;
 
         &.tenant-metrics-cards__link-container_active::after {
-            position: absolute;
-            top: 100%;
-            right: 0;
-
-            width: 10px;
-            height: var(--g-spacing-3);
-
-            content: '';
-
-            border-right: 1px solid var(--g-color-line-generic);
-            background-color: var(--g-color-base-background);
+            @include pseudo-active-filler(right);
         }
 
         &:not(.tenant-metrics-cards__link-container_active)::after {
-            position: absolute;
-            top: 100%;
-            right: 0;
-
-            width: 10px;
-            height: 10px;
-
-            content: '';
-
-            border-top: 1px solid var(--g-color-line-generic);
-            border-right: 1px solid var(--g-color-line-generic);
-            border-top-right-radius: var(--g-border-radius-s);
-            background-color: var(--g-color-base-background);
+            @include pseudo-inactive-filler(right);
         }
 
         &:not(.tenant-metrics-cards__link-container_active)::before {
-            position: absolute;
-            top: 100%;
-            right: 0;
-
-            width: 10px;
-            height: 10px;
-
-            content: '';
-
-            background-color: var(--g-color-base-background);
+            @include pseudo-background-fill(right);
         }
     }
 
     &__link {
         display: block;
 
-        border-top: 1px solid var(--g-color-base-background);
-        border-right: 1px solid var(--g-color-base-background);
-        border-left: 1px solid var(--g-color-base-background);
-        border-top-left-radius: var(--g-border-radius-s);
-        border-top-right-radius: var(--g-border-radius-s);
+        border: var(--tab-border-width) solid var(--g-color-base-background);
+        border-bottom: none;
+        border-radius: var(--g-border-radius-s) var(--g-border-radius-s) 0 0;
     }
 
     &__link-container_active &__link {
         display: block;
 
-        padding-bottom: 1px;
+        padding-bottom: var(--tab-border-compensation);
 
-        border-top: 1px solid var(--g-color-line-generic);
-        border-right: 1px solid var(--g-color-line-generic);
-        border-left: 1px solid var(--g-color-line-generic);
-        border-top-left-radius: var(--g-border-radius-s);
-        border-top-right-radius: var(--g-border-radius-s);
+        border: var(--tab-border-width) solid var(--g-color-line-generic);
+        border-bottom: none;
+        border-radius: var(--g-border-radius-s) var(--g-border-radius-s) 0 0;
     }
 
     &__link-container_active {
-        z-index: 102;
+        z-index: var(--z-tab-active);
 
         padding: 0;
 
         border-bottom: 0 !important;
         background: var(--g-color-base-background);
 
-        transform: translateY(-6px);
+        transform: translateY(var(--tab-lift-offset));
     }
 
     &__link-container:first-child {
@@ -167,16 +140,16 @@
     }
 
     &__link-container:has(+ &__link-container_active) {
-        padding-right: calc(var(--g-spacing-3) - 1px);
+        padding-right: var(--tab-adjusted-spacing);
 
-        border-right: 1px solid var(--g-color-line-generic);
+        border-right: var(--tab-border-width) solid var(--g-color-line-generic);
         border-bottom-right-radius: var(--g-border-radius-xxl);
     }
 
     &__link-container_active + &__link-container {
-        padding-left: calc(var(--g-spacing-3) - 1px);
+        padding-left: var(--tab-adjusted-spacing);
 
-        border-left: 1px solid var(--g-color-line-generic);
+        border-left: var(--tab-border-width) solid var(--g-color-line-generic);
         border-bottom-left-radius: var(--g-border-radius-xxl);
     }
 }
