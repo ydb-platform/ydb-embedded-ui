@@ -1,10 +1,13 @@
 import type {Column} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
+import {isNil} from 'lodash';
 
 import {InternalLink} from '../../../components/InternalLink/InternalLink';
 import {getTabletPagePath} from '../../../routes';
 import type {VDiskBlobIndexItem} from '../../../types/api/vdiskBlobIndex';
-import {formatBytes} from '../../../utils/dataFormatters/dataFormatters';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
+import {formatBytes, formatNumber} from '../../../utils/dataFormatters/dataFormatters';
+import {safeParseNumber} from '../../../utils/utils';
 import {vDiskPageKeyset} from '../i18n';
 
 export function getColumns(): Column<VDiskBlobIndexItem>[] {
@@ -14,22 +17,29 @@ export function getColumns(): Column<VDiskBlobIndexItem>[] {
             render: ({row}) => {
                 const tabletId = row.TabletId;
                 if (!tabletId) {
-                    return <span>-</span>;
+                    return EMPTY_DATA_PLACEHOLDER;
                 }
-                return <InternalLink to={getTabletPagePath(String(tabletId))}>{tabletId}</InternalLink>;
+                return (
+                    <InternalLink to={getTabletPagePath(String(tabletId))}>{tabletId}</InternalLink>
+                );
             },
-            width: 150,
+            width: 220,
         },
         {
             name: vDiskPageKeyset('channel-id'),
             align: DataTable.RIGHT,
-            render: ({row}) => row.ChannelId ?? '-',
-            width: 100,
+            render: ({row}) => row.ChannelId ?? EMPTY_DATA_PLACEHOLDER,
+            width: 130,
         },
         {
             name: vDiskPageKeyset('count'),
             align: DataTable.RIGHT,
-            render: ({row}) => row.Count ?? '-',
+            render: ({row}) => {
+                if (isNil(row.Count)) {
+                    return EMPTY_DATA_PLACEHOLDER;
+                }
+                return formatNumber(row.Count);
+            },
             width: 100,
         },
         {
@@ -37,7 +47,10 @@ export function getColumns(): Column<VDiskBlobIndexItem>[] {
             align: DataTable.RIGHT,
             render: ({row}) => {
                 const size = row.Size;
-                const numericSize = Number(size) || 0;
+                if (isNil(size)) {
+                    return EMPTY_DATA_PLACEHOLDER;
+                }
+                const numericSize = safeParseNumber(size);
                 return formatBytes(numericSize);
             },
             width: 120,

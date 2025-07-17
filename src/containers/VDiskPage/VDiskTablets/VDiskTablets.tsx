@@ -1,29 +1,23 @@
 import React from 'react';
 
-import type {Column} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
 import {skipToken} from '@reduxjs/toolkit/query';
 
+import {PageError} from '../../../components/Errors/PageError/PageError';
 import {InfoViewerSkeleton} from '../../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {ResizeableDataTable} from '../../../components/ResizeableDataTable/ResizeableDataTable';
 import {vDiskApi} from '../../../store/reducers/vdisk/vdisk';
 import type {VDiskBlobIndexItem} from '../../../types/api/vdiskBlobIndex';
-import {cn} from '../../../utils/cn';
+import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
-
-import {getColumns} from './columns';
+import {safeParseNumber} from '../../../utils/utils';
 import {vDiskPageKeyset} from '../i18n';
 
-import './VDiskTablets.scss';
+import {getColumns} from './columns';
 
-const vDiskTabletsCn = cn('ydb-vdisk-tablets');
 const VDISK_TABLETS_COLUMNS_WIDTH_LS_KEY = 'vdiskTabletsColumnsWidth';
 
-const TABLE_SETTINGS = {
-    displayIndices: false,
-    highlightRows: true,
-    stickyHead: DataTable.MOVING,
-};
+const columns = getColumns();
 
 interface VDiskTabletsProps {
     nodeId?: string | number;
@@ -57,20 +51,20 @@ export function VDiskTablets({nodeId, pDiskId, vDiskSlotId, className}: VDiskTab
         // Transform the nested structure into flat table rows
         const flatData: VDiskBlobIndexItem[] = [];
 
-        stat.tablets.forEach((tablet: any) => {
+        stat.tablets.forEach((tablet) => {
             const tabletId = tablet.tablet_id;
             if (!tabletId || !Array.isArray(tablet.channels)) {
                 return; // Skip tablets without ID or channels
             }
 
-            tablet.channels.forEach((channel: any, channelIndex: number) => {
+            tablet.channels.forEach((channel, channelIndex) => {
                 // Only include channels that have count and data_size
                 if (channel.count && channel.data_size) {
                     flatData.push({
                         TabletId: tabletId,
                         ChannelId: channelIndex,
-                        Count: parseInt(channel.count, 10) || 0,
-                        Size: parseInt(channel.data_size, 10) || 0,
+                        Count: safeParseNumber(channel.count),
+                        Size: safeParseNumber(channel.data_size),
                     });
                 }
             });
@@ -79,14 +73,8 @@ export function VDiskTablets({nodeId, pDiskId, vDiskSlotId, className}: VDiskTab
         return flatData;
     }, [currentData]);
 
-    const columns = React.useMemo(() => getColumns(), []);
-
     if (error) {
-        return (
-            <div className={vDiskTabletsCn('error', className)}>
-                Error loading tablet statistics
-            </div>
-        );
+        return <PageError error={error} position="left" size="s" />;
     }
 
     if (loading) {
@@ -94,12 +82,12 @@ export function VDiskTablets({nodeId, pDiskId, vDiskSlotId, className}: VDiskTab
     }
 
     return (
-        <div className={vDiskTabletsCn(null, className)}>
+        <div className={className}>
             <ResizeableDataTable
                 columnsWidthLSKey={VDISK_TABLETS_COLUMNS_WIDTH_LS_KEY}
                 data={tableData}
                 columns={columns}
-                settings={TABLE_SETTINGS}
+                settings={DEFAULT_TABLE_SETTINGS}
                 loading={loading}
                 initialSortOrder={{
                     columnId: vDiskPageKeyset('size'),
