@@ -3,7 +3,6 @@ import React from 'react';
 import {defaultDashboardConfig} from '../../containers/Tenant/Diagnostics/TenantOverview/DefaultOverviewContent/defaultDashboardConfig';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval} from '../../utils/hooks';
-import type {TimeFrame} from '../../utils/timeframes';
 import {MetricChart} from '../MetricChart/MetricChart';
 import type {ChartDataStatus} from '../MetricChart/types';
 
@@ -23,8 +22,6 @@ export function QueriesActivityCharts({
     onChartDataStatusChange,
 }: QueriesActivityChartsProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const [queriesTimeFrame, setQueriesTimeFrame] = React.useState<TimeFrame>('1h');
-    const [latenciesTimeFrame, setLatenciesTimeFrame] = React.useState<TimeFrame>('1h');
     const [hasChartsLoaded, setHasChartsLoaded] = React.useState(false);
 
     // Extract chart configurations from defaultDashboardConfig
@@ -57,14 +54,6 @@ export function QueriesActivityCharts({
         [onChartDataStatusChange],
     );
 
-    const handleQueriesTimeFrameChange = React.useCallback((newTimeFrame: TimeFrame) => {
-        setQueriesTimeFrame(newTimeFrame);
-    }, []);
-
-    const handleLatenciesTimeFrameChange = React.useCallback((newTimeFrame: TimeFrame) => {
-        setLatenciesTimeFrame(newTimeFrame);
-    }, []);
-
     // WORKAROUND: Charts are rendered outside Disclosure component due to YAGR tooltip bug
     // Issue: https://github.com/gravity-ui/yagr/issues/262
 
@@ -80,8 +69,6 @@ export function QueriesActivityCharts({
                 <MetricChart
                     database={tenantName}
                     metrics={queriesChartConfig.metrics}
-                    timeFrame={queriesTimeFrame}
-                    onTimeFrameChange={handleQueriesTimeFrameChange}
                     autorefresh={shouldRefresh}
                     height={ACTIVITY_CHART_HEIGHT}
                     chartOptions={queriesChartConfig.options}
@@ -95,8 +82,6 @@ export function QueriesActivityCharts({
                 <MetricChart
                     database={tenantName}
                     metrics={latenciesChartConfig.metrics}
-                    timeFrame={latenciesTimeFrame}
-                    onTimeFrameChange={handleLatenciesTimeFrameChange}
                     autorefresh={shouldRefresh}
                     height={ACTIVITY_CHART_HEIGHT}
                     chartOptions={latenciesChartConfig.options}
