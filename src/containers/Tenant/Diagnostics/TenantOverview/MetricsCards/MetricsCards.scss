@@ -1,5 +1,12 @@
 // Mixins for pseudo-element patterns
 
+/**
+ * Base mixin for creating positioned pseudo-elements with consistent sizing
+ * Used as foundation for all tab filler pseudo-elements
+ * @param {string} $side - Which side to position the element (left|right)
+ * @param {length} $height - Height of the pseudo-element
+ */
+
 @mixin pseudo-base($side: left, $height: var(--tab-filler-size)) {
     position: absolute;
     top: 100%;
@@ -12,10 +19,22 @@
     background-color: var(--g-color-base-background);
 }
 
+/**
+ * Creates a vertical filler for active tab states
+ * Used to extend the active tab's background below the container
+ * @param {string} $side - Which side to position the filler (left|right)
+ */
+
 @mixin pseudo-active-filler($side: left) {
     @include pseudo-base($side, var(--g-spacing-3));
     border-#{$side}: var(--tab-border-width) solid var(--g-color-line-generic);
 }
+
+/**
+ * Creates a rounded corner filler for inactive tab states
+ * Provides visual separation between tabs with border and radius
+ * @param {string} $side - Which side to position the filler (left|right)
+ */
 
 @mixin pseudo-inactive-filler($side: left) {
     border-top: var(--tab-border-width) solid var(--g-color-line-generic);
@@ -24,17 +43,36 @@
     border-top-#{$side}-radius: var(--g-border-radius-s);
 }
 
+/**
+ * Creates a simple background fill without borders
+ * Used as a background layer behind other pseudo-elements
+ * @param {string} $side - Which side to position the fill (left|right)
+ */
+
 @mixin pseudo-background-fill($side: left) {
     @include pseudo-base($side, var(--tab-filler-size));
 }
 
 // Utility mixins for common patterns
 
+/**
+ * Consistent tab border styling for both active and inactive states
+ * Creates the characteristic tab shape with top and side borders only
+ * @param {color} $color - Border color to use
+ */
+
 @mixin tab-border-base($color) {
     border: var(--tab-border-width) solid $color;
     border-bottom: none;
     border-radius: var(--g-border-radius-s) var(--g-border-radius-s) 0 0;
 }
+
+/**
+ * Complete edge filler system for first/last tabs
+ * Handles all pseudo-element states (active/inactive, ::before/::after)
+ * Creates the complex tab connection visuals for edge containers
+ * @param {string} $side - Which edge this applies to (left|right)
+ */
 
 @mixin tab-edge-filler($side) {
     &.tenant-metrics-cards__link-container_active::after {
