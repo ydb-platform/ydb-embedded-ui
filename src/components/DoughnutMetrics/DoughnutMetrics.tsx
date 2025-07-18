@@ -57,7 +57,6 @@ interface DoughnutProps {
     children?: React.ReactNode;
     className?: string;
     size?: 'small' | 'medium' | 'large';
-    centerColor?: string;
 }
 
 export function DoughnutMetrics({
@@ -66,7 +65,6 @@ export function DoughnutMetrics({
     children,
     className,
     size = 'medium',
-    centerColor,
 }: DoughnutProps) {
     let filledDegrees = fillWidth * 3.6;
     let doughnutFillVar = 'var(--doughnut-color)';
@@ -80,15 +78,13 @@ export function DoughnutMetrics({
 
     const doughnutStyle: React.CSSProperties = {
         background: `conic-gradient(${doughnutFillVar} 0deg ${filledDegrees}deg, ${doughnutBackdropVar} ${filledDegrees}deg 360deg)`,
-        ...(centerColor && ({'--center-color': centerColor} as React.CSSProperties)),
     };
 
     return (
         <SizeContext.Provider value={size}>
-            <div className={b(null, className)}>
-                <div style={doughnutStyle} className={b('doughnut', {status, size})}>
-                    <div className={b('text-wrapper')}>{children}</div>
-                </div>
+            <div className={b(null, className)} style={{position: 'relative'}}>
+                <div style={doughnutStyle} className={b('doughnut', {status, size})}></div>
+                <div className={b('text-wrapper')}>{children}</div>
             </div>
         </SizeContext.Provider>
     );

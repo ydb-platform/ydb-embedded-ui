@@ -46,9 +46,6 @@ export function TabCard({
         formattedValue = `${value} of ${limit}${unit ? ' ' + unit : ''}`;
     }
 
-    // Set center color based on card state
-    const centerColor = active ? 'var(--g-color-base-background)' : 'var(--g-color-base-float)';
-
     return (
         <div className={b({clickable, active})}>
             <Card
@@ -62,7 +59,6 @@ export function TabCard({
                         status={status}
                         fillWidth={percentage}
                         className={b('doughnut')}
-                        centerColor={centerColor}
                     >
                         <DoughnutMetrics.Value variant="subheader-1">
                             {formattedPercentage}

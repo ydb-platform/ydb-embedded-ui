@@ -13,21 +13,9 @@
         aspect-ratio: 1;
 
         border-radius: 50%;
+        mask: radial-gradient(circle at center, transparent 46%, #000 46.5%);
 
         transform: rotate(180deg);
-        &::before {
-            display: block;
-
-            height: calc(100% - calc(var(--doughnut-border) * 2));
-
-            content: '';
-
-            border-radius: 50%;
-            background-color: var(--center-color, var(--g-color-base-background));
-
-            transform: translate(var(--doughnut-border), var(--doughnut-border));
-            aspect-ratio: 1;
-        }
     }
 
     // Size modifiers - using visually centered values
@@ -61,8 +49,9 @@
     }
     &__text-wrapper {
         position: absolute;
+        z-index: 1;
         top: var(--doughnut-wrapper-indent);
-        right: var(--doughnut-wrapper-indent);
+        left: var(--doughnut-wrapper-indent);
 
         display: flex;
         flex-direction: column;
@@ -73,7 +62,6 @@
 
         text-align: center;
 
-        transform: rotate(180deg);
         aspect-ratio: 1;
     }
 
