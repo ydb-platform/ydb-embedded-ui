@@ -70,6 +70,9 @@
         font-size: 18px;
         line-height: 24px;
     }
+    &__popover-content {
+        padding: var(--g-spacing-4);
+    }
 
     &__popover-row {
         display: block;
