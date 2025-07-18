@@ -3,12 +3,14 @@ import importOrderConfig from '@gravity-ui/eslint-config/import-order';
 import prettierConfig from '@gravity-ui/eslint-config/prettier';
 import typescriptParser from '@typescript-eslint/parser';
 import importPlugin from 'eslint-plugin-import';
+import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 
 export default [
     {
         plugins: {
             import: importPlugin,
+            'react-hooks': reactHooks,
         },
     },
     ...baseConfig,
@@ -43,6 +45,7 @@ export default [
         rules: {
             'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],
             curly: ['error', 'all'],
+            'react-hooks/exhaustive-deps': 'warn',
         },
     },
     // TypeScript-specific rules that require type information
