@@ -30,7 +30,7 @@
         transition: background-color 0.15s ease;
 
         &:hover {
-            background-color: var(--g-color-base-simple-hover);
+            background-color: var(--g-color-base-float-hover);
         }
 
         #{$b}_expanded & {

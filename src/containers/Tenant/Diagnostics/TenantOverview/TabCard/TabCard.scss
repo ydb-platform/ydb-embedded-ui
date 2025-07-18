@@ -1,25 +1,6 @@
 .tenant-tab-card {
     border-radius: var(--g-border-radius-s);
 
-    &_clickable {
-        cursor: pointer;
-
-        // Smooth hover transition
-        transition: background-color 0.15s ease;
-
-        &:hover {
-            background-color: var(--g-color-base-simple-hover);
-        }
-    }
-
-    &_active {
-        cursor: default !important;
-        // Active tabs should not have hover background change
-        &.tenant-tab-card_clickable:hover {
-            background-color: transparent;
-        }
-    }
-
     &__help-icon {
         color: var(--g-color-text-hint);
     }
@@ -29,5 +10,24 @@
 
         border: 0;
         border-radius: var(--g-border-radius-s);
+    }
+
+    &__card-container_clickable {
+        cursor: pointer;
+
+        // Smooth hover transition
+        transition: background-color 0.15s ease;
+
+        &:hover {
+            background-color: var(--g-color-base-float-hover);
+        }
+    }
+
+    &__card-container_active {
+        cursor: default !important;
+
+        &:hover {
+            background-color: transparent;
+        }
     }
 }

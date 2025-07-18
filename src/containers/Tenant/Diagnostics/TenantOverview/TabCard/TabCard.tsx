@@ -47,9 +47,9 @@ export function TabCard({
     }
 
     return (
-        <div className={b({clickable, active})}>
+        <div className={b({active})}>
             <Card
-                className={b('card-container', {active})}
+                className={b('card-container', {active, clickable})}
                 type="container"
                 view={active ? 'outlined' : 'raised'}
             >
