@@ -1,42 +1,25 @@
+import {Flex} from '@gravity-ui/uikit';
 import {Link, useLocation} from 'react-router-dom';
 
 import {parseQuery} from '../../../../../routes';
 import {TENANT_METRICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {TenantMetricsTab} from '../../../../../store/reducers/tenant/types';
-import {
-    METRIC_STATUS,
-    MetricStatusToSeverity,
-} from '../../../../../store/reducers/tenants/contants';
-import type {MetricStatus} from '../../../../../store/reducers/tenants/types';
 import type {
     TenantMetricStats,
     TenantPoolsStats,
     TenantStorageStats,
 } from '../../../../../store/reducers/tenants/utils';
-import {getMetricStatusFromUsage} from '../../../../../store/reducers/tenants/utils';
-import {formatBytes} from '../../../../../utils/bytesParsers';
 import {cn} from '../../../../../utils/cn';
 import {SHOW_NETWORK_UTILIZATION} from '../../../../../utils/constants';
-import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
 import {useSetting, useTypedSelector} from '../../../../../utils/hooks';
+import {calculateMetricAggregates} from '../../../../../utils/metrics';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
+import {TabCard} from '../TabCard/TabCard';
 import i18n from '../i18n';
-
-import type {DiagnosticsCardMetric} from './MetricCard/MetricCard';
-import {MetricCard} from './MetricCard/MetricCard';
 
 import './MetricsCards.scss';
 
-const b = cn('metrics-cards');
-
-export interface TenantMetrics {
-    memoryUsed?: number;
-    memoryLimit?: number;
-    cpuUsed?: number;
-    cpuUsage?: number;
-    storageUsed?: number;
-    storageLimit?: number;
-}
+const b = cn('tenant-metrics-cards');
 
 interface MetricsCardsProps {
     poolsCpuStats?: TenantPoolsStats[];
@@ -54,202 +37,115 @@ export function MetricsCards({
     networkStats,
 }: MetricsCardsProps) {
     const location = useLocation();
-
     const {metricsTab} = useTypedSelector((state) => state.tenant);
-
     const queryParams = parseQuery(location);
-
-    // Allow tabs untoggle behaviour
-    const getTabIfNotActive = (tab: TenantMetricsTab) => {
-        if (tab === metricsTab) {
-            return '';
-        }
-
-        return tab;
-    };
 
     const tabLinks: Record<TenantMetricsTab, string> = {
         [TENANT_METRICS_TABS_IDS.cpu]: getTenantPath({
             ...queryParams,
-            [TenantTabsGroups.metricsTab]: getTabIfNotActive(TENANT_METRICS_TABS_IDS.cpu),
+            [TenantTabsGroups.metricsTab]: TENANT_METRICS_TABS_IDS.cpu,
         }),
         [TENANT_METRICS_TABS_IDS.storage]: getTenantPath({
             ...queryParams,
-            [TenantTabsGroups.metricsTab]: getTabIfNotActive(TENANT_METRICS_TABS_IDS.storage),
+            [TenantTabsGroups.metricsTab]: TENANT_METRICS_TABS_IDS.storage,
         }),
         [TENANT_METRICS_TABS_IDS.memory]: getTenantPath({
             ...queryParams,
-            [TenantTabsGroups.metricsTab]: getTabIfNotActive(TENANT_METRICS_TABS_IDS.memory),
+            [TenantTabsGroups.metricsTab]: TENANT_METRICS_TABS_IDS.memory,
         }),
     };
 
-    return (
-        <div className={b()}>
-            <Link to={tabLinks.cpu} className={b('tab')}>
-                <CPUCard
-                    poolsCpuStats={poolsCpuStats}
-                    active={metricsTab === TENANT_METRICS_TABS_IDS.cpu}
-                />
-            </Link>
-            <Link to={tabLinks.storage} className={b('tab')}>
-                <StorageCard
-                    blobStorageStats={blobStorageStats}
-                    tabletStorageStats={tabletStorageStats}
-                    active={metricsTab === TENANT_METRICS_TABS_IDS.storage}
-                />
-            </Link>
-            <Link to={tabLinks.memory} className={b('tab')}>
-                <MemoryCard
-                    memoryStats={memoryStats}
-                    active={metricsTab === TENANT_METRICS_TABS_IDS.memory}
-                />
-            </Link>
-            <NetworkCard networkStats={networkStats} />
-        </div>
+    // Calculate CPU metrics using utility
+    const cpuPools = (poolsCpuStats || []).filter(
+        (pool) => !(pool.name === 'Batch' || pool.name === 'IO'),
     );
-}
+    const cpuMetrics = calculateMetricAggregates(cpuPools);
 
-interface CPUCardProps {
-    poolsCpuStats?: TenantPoolsStats[];
-    active?: boolean;
-}
+    // Calculate storage metrics using utility
+    const storageStats = tabletStorageStats || blobStorageStats || [];
+    const storageMetrics = calculateMetricAggregates(storageStats);
+    const storageGroupCount = storageStats.length;
 
-function CPUCard({poolsCpuStats = [], active}: CPUCardProps) {
-    let status: MetricStatus = METRIC_STATUS.Unspecified;
+    // Calculate memory metrics using utility
+    const memoryMetrics = calculateMetricAggregates(memoryStats);
 
-    const metrics: DiagnosticsCardMetric[] = poolsCpuStats
-        // Use only pools that directly indicate resources available to perform user queries
-        .filter((pool) => !(pool.name === 'Batch' || pool.name === 'IO'))
-        .map((pool) => {
-            const {name, usage, limit, used} = pool;
-
-            const poolStatus = getMetricStatusFromUsage(usage);
-            if (MetricStatusToSeverity[poolStatus] > MetricStatusToSeverity[status]) {
-                status = poolStatus;
-            }
-
-            return {
-                title: name,
-                value: used,
-                capacity: limit,
-            };
-        });
-
-    return (
-        <MetricCard
-            label={i18n('cards.cpu-label')}
-            active={active}
-            metrics={metrics}
-            status={status}
-        />
-    );
-}
-
-interface StorageCardProps {
-    active?: boolean;
-    blobStorageStats?: TenantStorageStats[];
-    tabletStorageStats?: TenantStorageStats[];
-}
-
-function StorageCard({blobStorageStats = [], tabletStorageStats, active}: StorageCardProps) {
-    let status: MetricStatus = METRIC_STATUS.Unspecified;
-
-    // Display tablet storage stats if limits are set and blob storage stats otherwise
-    const storageStats = tabletStorageStats || blobStorageStats;
-
-    const metrics: DiagnosticsCardMetric[] = storageStats.map((metric) => {
-        const {name, used, limit, usage} = metric;
-
-        const metircStatus = getMetricStatusFromUsage(usage);
-        if (MetricStatusToSeverity[metircStatus] > MetricStatusToSeverity[status]) {
-            status = metircStatus;
-        }
-
-        return {
-            title: name,
-            value: used,
-            capacity: limit,
-            formatValues: formatStorageValues,
-        };
-    });
-
-    return (
-        <MetricCard
-            label={i18n('cards.storage-label')}
-            active={active}
-            metrics={metrics}
-            status={status}
-        />
-    );
-}
-interface MemoryCardProps {
-    active?: boolean;
-    memoryStats?: TenantMetricStats[];
-}
-
-function MemoryCard({active, memoryStats = []}: MemoryCardProps) {
-    let status: MetricStatus = METRIC_STATUS.Unspecified;
-
-    const metrics: DiagnosticsCardMetric[] = memoryStats.map((metric) => {
-        const {name, used, limit, usage} = metric;
-
-        const metircStatus = getMetricStatusFromUsage(usage);
-        if (MetricStatusToSeverity[metircStatus] > MetricStatusToSeverity[status]) {
-            status = metircStatus;
-        }
-
-        return {
-            title: name,
-            value: used,
-            capacity: limit,
-            formatValues: formatStorageValues,
-        };
-    });
-
-    return (
-        <MetricCard
-            label={i18n('cards.memory-label')}
-            active={active}
-            metrics={metrics}
-            status={status}
-        />
-    );
-}
-interface NetworkCardProps {
-    networkStats?: TenantMetricStats[];
-}
-
-function NetworkCard({networkStats}: NetworkCardProps) {
+    // Calculate network metrics using utility
     const [showNetworkUtilization] = useSetting<boolean>(SHOW_NETWORK_UTILIZATION);
-    if (!showNetworkUtilization || !networkStats) {
-        return null;
-    }
-    let status: MetricStatus = METRIC_STATUS.Unspecified;
-
-    const metrics: DiagnosticsCardMetric[] = networkStats.map((metric) => {
-        const {used, limit, usage} = metric;
-
-        const metricStatus = getMetricStatusFromUsage(usage);
-        if (MetricStatusToSeverity[metricStatus] > MetricStatusToSeverity[status]) {
-            status = metricStatus;
-        }
-
-        return {
-            title: formatBytes({value: limit, withSpeedLabel: true}),
-            value: used,
-            capacity: limit,
-            percents: true,
-            withOverflow: true,
-        };
-    });
+    const networkMetrics = networkStats ? calculateMetricAggregates(networkStats) : null;
 
     return (
-        <MetricCard
-            interactive={false}
-            label={i18n('cards.network-label')}
-            note={i18n('cards.network-note')}
-            metrics={metrics}
-            status={status}
-        />
+        <Flex className={b()} alignItems="center">
+            <div
+                className={b('link-container', {
+                    active: metricsTab === TENANT_METRICS_TABS_IDS.cpu,
+                })}
+            >
+                <Link to={tabLinks.cpu} className={b('link')}>
+                    <TabCard
+                        label={i18n('cards.cpu-label')}
+                        sublabel={i18n('context_cpu-load')}
+                        value={cpuMetrics.totalUsed}
+                        limit={cpuMetrics.totalLimit}
+                        unit="cores"
+                        active={metricsTab === TENANT_METRICS_TABS_IDS.cpu}
+                        status={cpuMetrics.status}
+                        helpText={i18n('context_cpu-description')}
+                    />
+                </Link>
+            </div>
+            <div
+                className={b('link-container', {
+                    active: metricsTab === TENANT_METRICS_TABS_IDS.storage,
+                })}
+            >
+                <Link to={tabLinks.storage} className={b('link')}>
+                    <TabCard
+                        label={i18n('cards.storage-label')}
+                        sublabel={i18n('context_storage-groups', {count: storageGroupCount})}
+                        value={storageMetrics.totalUsed}
+                        limit={storageMetrics.totalLimit}
+                        unit="bytes"
+                        active={metricsTab === TENANT_METRICS_TABS_IDS.storage}
+                        status={storageMetrics.status}
+                        helpText={i18n('context_storage-description')}
+                    />
+                </Link>
+            </div>
+            <div
+                className={b('link-container', {
+                    active: metricsTab === TENANT_METRICS_TABS_IDS.memory,
+                })}
+            >
+                <Link to={tabLinks.memory} className={b('link')}>
+                    <TabCard
+                        label={i18n('cards.memory-label')}
+                        sublabel={i18n('context_memory-used')}
+                        value={memoryMetrics.totalUsed}
+                        limit={memoryMetrics.totalLimit}
+                        unit="bytes"
+                        active={metricsTab === TENANT_METRICS_TABS_IDS.memory}
+                        status={memoryMetrics.status}
+                        helpText={i18n('context_memory-description')}
+                    />
+                </Link>
+            </div>
+            {showNetworkUtilization && networkStats && networkMetrics && (
+                <div className={b('link-container')}>
+                    <div className={b('link')}>
+                        <TabCard
+                            label={i18n('cards.network-label')}
+                            sublabel={i18n('context_network-evaluation')}
+                            value={networkMetrics.totalUsed}
+                            limit={networkMetrics.totalLimit}
+                            unit="bytes"
+                            active={false}
+                            status={networkMetrics.status}
+                            clickable={false}
+                            helpText={i18n('context_network-description')}
+                        />
+                    </div>
+                </div>
+            )}
+        </Flex>
     );
 }

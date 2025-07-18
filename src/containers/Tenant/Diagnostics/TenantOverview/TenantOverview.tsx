@@ -14,7 +14,6 @@ import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks'
 import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
 
-import {DefaultOverviewContent} from './DefaultOverviewContent/DefaultOverviewContent';
 import {HealthcheckPreview} from './Healthcheck/HealthcheckPreview';
 import {MetricsCards} from './MetricsCards/MetricsCards';
 import {TenantCpu} from './TenantCpu/TenantCpu';
@@ -86,9 +85,9 @@ export function TenantOverview({
 
         poolsStats,
         memoryStats,
-        networkStats,
         blobStorageStats,
         tabletStorageStats,
+        networkStats,
     } = calculateTenantMetrics(tenantData);
 
     const storageMetrics = {
@@ -135,9 +134,6 @@ export function TenantOverview({
                     />
                 );
             }
-            default: {
-                return <DefaultOverviewContent database={tenantName} />;
-            }
         }
     };
 
@@ -164,7 +160,7 @@ export function TenantOverview({
                             ))}
                         </Flex>
                     </Flex>
-                    <Flex direction="column" gap={3}>
+                    <Flex direction="column" gap={4}>
                         <HealthcheckPreview tenantName={tenantName} />
                         <QueriesActivityBar tenantName={tenantName} />
                         <MetricsCards
@@ -176,7 +172,7 @@ export function TenantOverview({
                         />
                     </Flex>
                 </div>
-                {renderTabContent()}
+                <div className={b('tab-content')}>{renderTabContent()}</div>
             </div>
         </LoaderWrapper>
     );
