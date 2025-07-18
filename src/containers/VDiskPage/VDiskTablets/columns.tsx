@@ -8,12 +8,14 @@ import type {VDiskBlobIndexItem} from '../../../types/api/vdiskBlobIndex';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
 import {formatBytes, formatNumber} from '../../../utils/dataFormatters/dataFormatters';
 import {safeParseNumber} from '../../../utils/utils';
-import {vDiskPageKeyset} from '../i18n';
+
+import {COLUMNS_NAMES, COLUMNS_TITLES} from './constants';
 
 export function getColumns(): Column<VDiskBlobIndexItem>[] {
     return [
         {
-            name: vDiskPageKeyset('tablet-id'),
+            name: COLUMNS_NAMES.TABLET_ID,
+            header: COLUMNS_TITLES[COLUMNS_NAMES.TABLET_ID],
             render: ({row}) => {
                 const tabletId = row.TabletId;
                 if (!tabletId) {
@@ -26,13 +28,16 @@ export function getColumns(): Column<VDiskBlobIndexItem>[] {
             width: 220,
         },
         {
-            name: vDiskPageKeyset('channel-id'),
+            name: COLUMNS_NAMES.CHANNEL_ID,
+            header: COLUMNS_TITLES[COLUMNS_NAMES.CHANNEL_ID],
             align: DataTable.RIGHT,
             render: ({row}) => row.ChannelId ?? EMPTY_DATA_PLACEHOLDER,
             width: 130,
+            sortable: true,
         },
         {
-            name: vDiskPageKeyset('count'),
+            name: COLUMNS_NAMES.COUNT,
+            header: COLUMNS_TITLES[COLUMNS_NAMES.COUNT],
             align: DataTable.RIGHT,
             render: ({row}) => {
                 if (isNil(row.Count)) {
@@ -43,7 +48,8 @@ export function getColumns(): Column<VDiskBlobIndexItem>[] {
             width: 100,
         },
         {
-            name: vDiskPageKeyset('size'),
+            name: COLUMNS_NAMES.SIZE,
+            header: COLUMNS_TITLES[COLUMNS_NAMES.SIZE],
             align: DataTable.RIGHT,
             render: ({row}) => {
                 const size = row.Size;
@@ -54,7 +60,6 @@ export function getColumns(): Column<VDiskBlobIndexItem>[] {
                 return formatBytes(numericSize);
             },
             width: 120,
-            sortAccessor: (row) => row.Size || 0,
         },
     ];
 }
