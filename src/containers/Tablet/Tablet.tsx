@@ -93,14 +93,13 @@ export function Tablet() {
         );
     }, [dispatch, queryDatabase, id, tabletType]);
 
-    const {Leader, Type} = tablet;
+    const {Leader} = tablet;
     const metaItems: string[] = [];
     if (database) {
         metaItems.push(`${i18n('tablet.meta-database')}: ${database}`);
     }
-    if (Type) {
-        metaItems.push(Type);
-    }
+    // Add "Tablet" instead of tablet type to metadata
+    metaItems.push(i18n('tablet.header'));
     if (Leader === false) {
         metaItems.push(i18n('tablet.meta-follower').toUpperCase());
     }
@@ -135,7 +134,7 @@ function TabletContent({
     database?: string;
 }) {
     const isEmpty = !Object.keys(tablet).length;
-    const {Overall, HiveId, FollowerId} = tablet;
+    const {Overall, HiveId, FollowerId, Type} = tablet;
 
     const tabletName = `${id}${FollowerId ? `.${FollowerId}` : ''}`;
 
@@ -147,7 +146,7 @@ function TabletContent({
         >
             <Flex gap={5} direction="column">
                 <EntityPageTitle
-                    entityName={i18n('tablet.header')}
+                    entityName={Type || i18n('tablet.header')}
                     status={Overall ?? EFlag.Grey}
                     id={tabletName}
                 />
