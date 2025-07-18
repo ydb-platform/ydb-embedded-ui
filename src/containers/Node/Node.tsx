@@ -22,6 +22,7 @@ import {nodeApi} from '../../store/reducers/node/node';
 import type {PreparedNode} from '../../store/reducers/node/types';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
+import {useAppTitle} from '../App/AppTitleContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 import {Tablets} from '../Tablets/Tablets';
 
@@ -121,12 +122,10 @@ interface NodePageHelmetProps {
 }
 
 function NodePageHelmet({node, activeTabTitle}: NodePageHelmetProps) {
+    const {appTitle} = useAppTitle();
     const host = node?.Host ? node.Host : i18n('node');
     return (
-        <Helmet
-            titleTemplate={`%s — ${host} — YDB Monitoring`}
-            defaultTitle={`${host} — YDB Monitoring`}
-        >
+        <Helmet titleTemplate={`%s — ${host} — ${appTitle}`} defaultTitle={`${host} — ${appTitle}`}>
             <title>{activeTabTitle}</title>
         </Helmet>
     );

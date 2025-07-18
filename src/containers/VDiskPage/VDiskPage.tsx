@@ -26,6 +26,7 @@ import {cn} from '../../utils/cn';
 import {getSeverityColor, getVDiskSlotBasedId} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {useAppTitle} from '../App/AppTitleContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 
 import {VDiskTablets} from './VDiskTablets';
@@ -144,6 +145,8 @@ export function VDiskPage() {
         );
     };
 
+    const {appTitle} = useAppTitle();
+
     const renderHelmet = () => {
         const vDiskPagePart = vDiskSlotId
             ? `${vDiskPageKeyset('vdisk')} ${vDiskSlotId}`
@@ -157,8 +160,8 @@ export function VDiskPage() {
 
         return (
             <Helmet
-                titleTemplate={`%s - ${vDiskPagePart} - ${pDiskPagePart} — ${nodePagePart} — YDB Monitoring`}
-                defaultTitle={`${vDiskPagePart} - ${pDiskPagePart} — ${nodePagePart} — YDB Monitoring`}
+                titleTemplate={`%s - ${vDiskPagePart} - ${pDiskPagePart} — ${nodePagePart} — ${appTitle}`}
+                defaultTitle={`${vDiskPagePart} - ${pDiskPagePart} — ${nodePagePart} — ${appTitle}`}
             />
         );
     };

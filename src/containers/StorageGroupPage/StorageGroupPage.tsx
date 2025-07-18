@@ -19,6 +19,7 @@ import {EFlag} from '../../types/api/enums';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
+import {useAppTitle} from '../App/AppTitleContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 
 import {storageGroupPageKeyset} from './i18n';
@@ -53,6 +54,7 @@ export function StorageGroupPage() {
     const storageGroupData = groupQuery.data?.groups?.[0];
 
     const loading = groupQuery.isFetching && storageGroupData === undefined;
+    const {appTitle} = useAppTitle();
 
     const renderHelmet = () => {
         const pageTitle = groupId
@@ -61,8 +63,8 @@ export function StorageGroupPage() {
 
         return (
             <Helmet
-                titleTemplate={`%s - ${pageTitle} — YDB Monitoring`}
-                defaultTitle={`${pageTitle} — YDB Monitoring`}
+                titleTemplate={`%s - ${pageTitle} — ${appTitle}`}
+                defaultTitle={`${pageTitle} — ${appTitle}`}
             />
         );
     };

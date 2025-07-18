@@ -15,11 +15,18 @@ export interface AppWithClustersProps {
     history: History;
     userSettings?: YDBEmbeddedUISettings;
     children?: React.ReactNode;
+    appTitle?: string;
 }
 
-export function AppWithClusters({store, history, userSettings, children}: AppWithClustersProps) {
+export function AppWithClusters({
+    store,
+    history,
+    userSettings,
+    appTitle,
+    children,
+}: AppWithClustersProps) {
     return (
-        <App store={store} history={history} userSettings={userSettings}>
+        <App store={store} history={history} userSettings={userSettings} appTitle={appTitle}>
             <AppSlots.ClusterSlot>
                 {({component}) => {
                     return (
