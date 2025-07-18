@@ -3,7 +3,6 @@
 .queries-activity-bar {
     $b: &;
 
-    border: 1px solid transparent;
     border-radius: var(--g-border-radius-s);
 
     // Collapsed state (default)
@@ -29,12 +28,17 @@
 
         cursor: pointer;
 
+        border: 1px solid transparent;
         border-radius: var(--g-border-radius-s);
 
         transition: background-color 0.15s ease;
 
         &:hover {
             background-color: var(--g-color-base-simple-hover);
+        }
+
+        #{$b}_expanded & {
+            border: none;
         }
 
         // When expanded, only round top corners
