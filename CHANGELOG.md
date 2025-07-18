@@ -1,5 +1,15 @@
 # Changelog
 
+## [11.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.1.1...v11.2.0) (2025-07-18)
+
+
+### Features
+
+* **configureStore:** use custom backend ([#2583](https://github.com/ydb-platform/ydb-embedded-ui/issues/2583)) ([1a2aa24](https://github.com/ydb-platform/ydb-embedded-ui/commit/1a2aa242f312b7a39d7865f243df72518660d65e))
+* **query:** apply pragmas setting to Table Preview queries ([#2575](https://github.com/ydb-platform/ydb-embedded-ui/issues/2575)) ([ff85ffc](https://github.com/ydb-platform/ydb-embedded-ui/commit/ff85ffc907716dcde07725fb3d4781834fe012ef))
+* **tablet:** improve tablet page layout: swap places type and title ([#2581](https://github.com/ydb-platform/ydb-embedded-ui/issues/2581)) ([ac9bc21](https://github.com/ydb-platform/ydb-embedded-ui/commit/ac9bc21f08a8920f6f0b2102bff1043e5484de21))
+* **vdisk:** add tablet usage statistics to vdisk page ([#2577](https://github.com/ydb-platform/ydb-embedded-ui/issues/2577)) ([4ca86da](https://github.com/ydb-platform/ydb-embedded-ui/commit/4ca86da7f63027830471d4e9cc50b8274d81be12))
+
 ## [11.1.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.1.0...v11.1.1) (2025-07-15)
 
 
