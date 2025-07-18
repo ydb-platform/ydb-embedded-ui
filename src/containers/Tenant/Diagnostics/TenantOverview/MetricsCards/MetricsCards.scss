@@ -97,7 +97,7 @@
     --tab-border-compensation: 1px;
     --tab-adjusted-spacing: calc(var(--g-spacing-3) - var(--tab-border-width));
     --z-tab-base: 100;
-    --z-tab-active: 102;
+    --z-tab-active: 110;
     --g-border-radius-xxl: 12px;
 
     // Fallback for browsers without :has() support
@@ -132,6 +132,22 @@
         border-bottom: var(--tab-border-width) solid var(--g-color-line-generic);
         background: var(--g-color-base-background);
 
+        &:nth-child(1) {
+            z-index: calc(var(--z-tab-base) + 3);
+        }
+
+        &:nth-child(2) {
+            z-index: calc(var(--z-tab-base) + 2);
+        }
+
+        &:nth-child(3) {
+            z-index: calc(var(--z-tab-base) + 1);
+        }
+
+        &:nth-child(4) {
+            z-index: calc(var(--z-tab-base) + 0);
+        }
+
         // Reset edge padding for first/last elements
         &:first-child {
             margin-left: 0;
@@ -156,7 +172,7 @@
 
     // Active state styling
     &__link-container_active {
-        z-index: var(--z-tab-active);
+        z-index: var(--z-tab-active) !important;
 
         padding: 0;
 
