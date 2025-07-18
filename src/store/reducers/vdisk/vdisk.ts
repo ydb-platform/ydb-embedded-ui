@@ -33,6 +33,26 @@ export const vDiskApi = api.injectEndpoints({
                 },
             ],
         }),
+        getVDiskBlobIndexStat: build.query({
+            queryFn: async ({nodeId, pDiskId, vDiskSlotId}: VDiskDataRequestParams, {signal}) => {
+                try {
+                    const response = await window.api.viewer.getVDiskBlobIndexStat(
+                        {nodeId, pDiskId, vDiskSlotId},
+                        {signal},
+                    );
+                    return {data: response};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            providesTags: (_result, _error, arg) => [
+                'All',
+                {
+                    type: 'VDiskBlobIndexStat',
+                    id: getVDiskSlotBasedId(arg.nodeId, arg.pDiskId, arg.vDiskSlotId),
+                },
+            ],
+        }),
     }),
     overrideExisting: 'throw',
 });

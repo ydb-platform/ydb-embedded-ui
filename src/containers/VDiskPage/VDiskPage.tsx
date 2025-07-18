@@ -1,17 +1,20 @@
 import React from 'react';
 
 import {ArrowsOppositeToDots} from '@gravity-ui/icons';
-import {Icon} from '@gravity-ui/uikit';
+import {Icon, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
+import {z} from 'zod';
 
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {EntityPageTitle} from '../../components/EntityPageTitle/EntityPageTitle';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
+import {InternalLink} from '../../components/InternalLink/InternalLink';
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import {VDiskInfo} from '../../components/VDiskInfo/VDiskInfo';
+import {getVDiskPagePath} from '../../routes';
 import {api} from '../../store/reducers/api';
 import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
@@ -25,11 +28,34 @@ import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 
+import {VDiskTablets} from './VDiskTablets';
 import {vDiskPageKeyset} from './i18n';
 
 import './VDiskPage.scss';
 
 const vDiskPageCn = cn('ydb-vdisk-page');
+
+const VDISK_TABS_IDS = {
+    storage: 'storage',
+    tablets: 'tablets',
+} as const;
+
+const VDISK_PAGE_TABS = [
+    {
+        id: VDISK_TABS_IDS.storage,
+        get title() {
+            return vDiskPageKeyset('storage');
+        },
+    },
+    {
+        id: VDISK_TABS_IDS.tablets,
+        get title() {
+            return vDiskPageKeyset('tablets');
+        },
+    },
+];
+
+const vDiskTabSchema = z.nativeEnum(VDISK_TABS_IDS).catch(VDISK_TABS_IDS.storage);
 
 export function VDiskPage() {
     const dispatch = useTypedDispatch();
@@ -38,12 +64,15 @@ export function VDiskPage() {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const newDiskApiAvailable = useDiskPagesAvailable();
 
-    const [{nodeId, pDiskId, vDiskSlotId, vDiskId: vDiskIdParam}] = useQueryParams({
+    const [{nodeId, pDiskId, vDiskSlotId, vDiskId: vDiskIdParam, activeTab}] = useQueryParams({
         nodeId: StringParam,
         pDiskId: StringParam,
         vDiskSlotId: StringParam,
         vDiskId: StringParam,
+        activeTab: StringParam,
     });
+
+    const vDiskTab = vDiskTabSchema.parse(activeTab);
 
     React.useEffect(() => {
         dispatch(setHeaderBreadcrumbs('vDisk', {nodeId, pDiskId, vDiskSlotId}));
@@ -185,24 +214,67 @@ export function VDiskPage() {
         return <VDiskInfo data={vDiskData} className={vDiskPageCn('info')} wrap />;
     };
 
+    const renderTabs = () => {
+        const vDiskParamsDefined =
+            valueIsDefined(nodeId) && valueIsDefined(pDiskId) && valueIsDefined(vDiskSlotId);
+
+        return (
+            <div className={vDiskPageCn('tabs')}>
+                <TabProvider value={vDiskTab}>
+                    <TabList size="l">
+                        {VDISK_PAGE_TABS.map(({id, title}) => {
+                            const path = vDiskParamsDefined
+                                ? getVDiskPagePath({nodeId, pDiskId, vDiskSlotId}, {activeTab: id})
+                                : undefined;
+                            return (
+                                <Tab key={id} value={id}>
+                                    <InternalLink as="tab" to={path}>
+                                        {title}
+                                    </InternalLink>
+                                </Tab>
+                            );
+                        })}
+                    </TabList>
+                </TabProvider>
+            </div>
+        );
+    };
+
+    const renderTabsContent = () => {
+        switch (vDiskTab) {
+            case 'storage': {
+                return renderStorageInfo();
+            }
+            case 'tablets': {
+                return (
+                    <VDiskTablets
+                        nodeId={nodeId ?? undefined}
+                        pDiskId={pDiskId ?? undefined}
+                        vDiskSlotId={vDiskSlotId ?? undefined}
+                        className={vDiskPageCn('tablets-content')}
+                    />
+                );
+            }
+            default:
+                return null;
+        }
+    };
+
     const renderStorageInfo = () => {
         if (valueIsDefined(GroupID) && valueIsDefined(nodeId)) {
             return (
-                <React.Fragment>
-                    <div className={vDiskPageCn('storage-title')}>{vDiskPageKeyset('storage')}</div>
-                    <PaginatedStorage
-                        groupId={GroupID}
-                        nodeId={nodeId}
-                        pDiskId={pDiskId ?? undefined}
-                        scrollContainerRef={containerRef}
-                        viewContext={{
-                            groupId: GroupID?.toString(),
-                            nodeId: nodeId?.toString(),
-                            pDiskId: pDiskId?.toString(),
-                            vDiskSlotId: vDiskSlotId?.toString(),
-                        }}
-                    />
-                </React.Fragment>
+                <PaginatedStorage
+                    groupId={GroupID}
+                    nodeId={nodeId}
+                    pDiskId={pDiskId ?? undefined}
+                    scrollContainerRef={containerRef}
+                    viewContext={{
+                        groupId: GroupID?.toString(),
+                        nodeId: nodeId?.toString(),
+                        pDiskId: pDiskId?.toString(),
+                        vDiskSlotId: vDiskSlotId?.toString(),
+                    }}
+                />
             );
         }
 
@@ -218,7 +290,8 @@ export function VDiskPage() {
             <React.Fragment>
                 {error ? <ResponseError error={error} /> : null}
                 {renderInfo()}
-                {renderStorageInfo()}
+                {renderTabs()}
+                {renderTabsContent()}
             </React.Fragment>
         );
     };
