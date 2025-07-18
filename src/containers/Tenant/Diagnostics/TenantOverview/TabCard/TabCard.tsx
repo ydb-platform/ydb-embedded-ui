@@ -51,7 +51,7 @@ export function TabCard({
             <Card
                 className={b('card-container', {active})}
                 type="container"
-                view={active ? 'outlined' : 'filled'}
+                view={active ? 'outlined' : 'raised'}
             >
                 <Flex gap={3} alignItems="center">
                     <DoughnutMetrics
