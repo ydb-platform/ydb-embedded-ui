@@ -25,6 +25,7 @@ import {cn} from '../../utils/cn';
 import {getPDiskId, getSeverityColor} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {useAppTitle} from '../App/AppTitleContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 
 import {DecommissionButton} from './DecommissionButton/DecommissionButton';
@@ -134,6 +135,8 @@ export function PDiskPage() {
         }
     };
 
+    const {appTitle} = useAppTitle();
+
     const renderHelmet = () => {
         const pDiskPagePart = pDiskId
             ? `${pDiskPageKeyset('pdisk')} ${pDiskId}`
@@ -143,8 +146,8 @@ export function PDiskPage() {
 
         return (
             <Helmet
-                titleTemplate={`%s - ${pDiskPagePart} — ${nodePagePart} — YDB Monitoring`}
-                defaultTitle={`${pDiskPagePart} — ${nodePagePart} — YDB Monitoring`}
+                titleTemplate={`%s - ${pDiskPagePart} — ${nodePagePart} — ${appTitle}`}
+                defaultTitle={`${pDiskPagePart} — ${nodePagePart} — ${appTitle}`}
             />
         );
     };
