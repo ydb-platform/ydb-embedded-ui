@@ -82,8 +82,8 @@ export function DoughnutMetrics({
 
     return (
         <SizeContext.Provider value={size}>
-            <div className={b(null, className)} style={{position: 'relative'}}>
-                <div style={doughnutStyle} className={b('doughnut', {status, size})}></div>
+            <div className={b({status}, className)} style={{position: 'relative'}}>
+                <div style={doughnutStyle} className={b('doughnut', {size})}></div>
                 <div className={b('text-wrapper')}>{children}</div>
             </div>
         </SizeContext.Provider>
