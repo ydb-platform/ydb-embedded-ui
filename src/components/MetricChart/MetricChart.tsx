@@ -109,12 +109,7 @@ interface DiagnosticsChartProps {
     database: string;
     metrics: MetricDescription[];
 
-    /** Default timeframe for uncontrolled usage */
     defaultTimeFrame?: TimeFrame;
-
-    /** Callback for timeframe changes - required when using controlled mode */
-    onTimeFrameChange?: (timeFrame: TimeFrame) => void;
-
     autorefresh?: number;
     height?: number;
     width?: number;
