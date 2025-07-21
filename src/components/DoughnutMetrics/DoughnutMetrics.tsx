@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type {TextProps} from '@gravity-ui/uikit';
+import type {HelpMarkProps, TextProps} from '@gravity-ui/uikit';
 import {Flex, HelpMark, Text} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
@@ -17,16 +17,27 @@ interface LegendProps {
     variant?: TextProps['variant'];
     color?: TextProps['color'];
     note?: React.ReactNode;
+    noteIconSize?: HelpMarkProps['iconSize'];
 }
 
-function Legend({children, variant = 'subheader-3', color = 'primary', note}: LegendProps) {
+function Legend({
+    children,
+    variant = 'subheader-3',
+    color = 'primary',
+    note,
+    noteIconSize,
+}: LegendProps) {
     return (
         <Flex gap={1} alignItems="center">
             <Text variant={variant} color={color} className={b('legend')} as="div">
                 {children}
             </Text>
             {note && (
-                <HelpMark className={b('legend-note')} popoverProps={{placement: 'right'}}>
+                <HelpMark
+                    iconSize={noteIconSize || 'm'}
+                    className={b('legend-note')}
+                    popoverProps={{placement: 'right'}}
+                >
                     {note}
                 </HelpMark>
             )}

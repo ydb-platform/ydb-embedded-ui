@@ -1,4 +1,4 @@
-import {Card, Flex, HelpMark, Text} from '@gravity-ui/uikit';
+import {Card, Flex} from '@gravity-ui/uikit';
 
 import {DoughnutMetrics} from '../../../../../components/DoughnutMetrics/DoughnutMetrics';
 import {formatBytes} from '../../../../../utils/bytesParsers';
@@ -64,17 +64,19 @@ export function TabCard({
                             {formattedPercentage}
                         </DoughnutMetrics.Value>
                     </DoughnutMetrics>
-                    <Flex direction="column" gap={1}>
-                        <Text variant="subheader-2" color="primary">
+                    <div className={b('legend-wrapper')}>
+                        <DoughnutMetrics.Legend variant="subheader-2">
                             {formattedValue}
-                        </Text>
-                        <Flex alignItems="center" gap={1}>
-                            <Text variant="body-1" color="secondary">
-                                {sublabel || label}
-                            </Text>
-                            {helpText && <HelpMark className={b('help-icon')}>{helpText}</HelpMark>}
-                        </Flex>
-                    </Flex>
+                        </DoughnutMetrics.Legend>
+                        <DoughnutMetrics.Legend
+                            variant="body-1"
+                            color="secondary"
+                            note={helpText}
+                            noteIconSize="s"
+                        >
+                            {sublabel || label}
+                        </DoughnutMetrics.Legend>
+                    </div>
                 </Flex>
             </Card>
         </div>
