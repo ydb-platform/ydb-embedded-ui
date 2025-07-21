@@ -27,14 +27,11 @@ export interface AppProps {
 }
 
 function App({store, history, children, userSettings, appTitle = defaultAppTitle}: AppProps) {
-    const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
     const ChatPanel = componentsRegistry.get('ChatPanel');
 
     return (
         <Providers store={store} history={history} appTitle={appTitle}>
-            <AppContent singleClusterMode={singleClusterMode} userSettings={userSettings}>
-                {children}
-            </AppContent>
+            <AppContent userSettings={userSettings}>{children}</AppContent>
             {ChatPanel && <ChatPanel />}
             <ReduxTooltip />
         </Providers>
@@ -42,15 +39,14 @@ function App({store, history, children, userSettings, appTitle = defaultAppTitle
 }
 
 function AppContent({
-    singleClusterMode,
     userSettings,
     children,
 }: {
-    singleClusterMode: boolean;
     userSettings?: YDBEmbeddedUISettings;
     children?: React.ReactNode;
 }) {
     const {appTitle} = useAppTitle();
+    const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
 
     return (
         <React.Fragment>
