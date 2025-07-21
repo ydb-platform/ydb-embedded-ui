@@ -7,6 +7,7 @@ import {EFlag} from '../../types/api/enums';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
+import {formatUptimeInSeconds} from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
@@ -73,6 +74,8 @@ const prepareVDiskData = (data: PreparedVDisk, withDeveloperUILink?: boolean) =>
         DiskSpace,
         FrontQueues,
         Replicated,
+        ReplicationProgress,
+        ReplicationSecondsRemaining,
         UnsyncedVDisks,
         AllocatedSize,
         ReadThroughput,
@@ -127,6 +130,24 @@ const prepareVDiskData = (data: PreparedVDisk, withDeveloperUILink?: boolean) =>
 
     if (Replicated === false) {
         vdiskData.push({label: 'Replicated', value: 'NO'});
+    }
+
+    if (valueIsDefined(ReplicationProgress)) {
+        const progressPercent = Math.round(ReplicationProgress * 100);
+        vdiskData.push({
+            label: 'Replication Progress',
+            value: `${progressPercent}%`,
+        });
+    }
+
+    if (valueIsDefined(ReplicationSecondsRemaining)) {
+        const timeRemaining = formatUptimeInSeconds(ReplicationSecondsRemaining);
+        if (timeRemaining) {
+            vdiskData.push({
+                label: 'Time Remaining',
+                value: timeRemaining,
+            });
+        }
     }
 
     if (UnsyncedVDisks) {
