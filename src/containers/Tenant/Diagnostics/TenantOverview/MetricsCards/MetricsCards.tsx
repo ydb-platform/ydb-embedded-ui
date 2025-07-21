@@ -13,6 +13,10 @@ import {cn} from '../../../../../utils/cn';
 import {SHOW_NETWORK_UTILIZATION} from '../../../../../utils/constants';
 import {useSetting, useTypedSelector} from '../../../../../utils/hooks';
 import {calculateMetricAggregates} from '../../../../../utils/metrics';
+import {
+    formatCoresLegend,
+    formatStorageLegend,
+} from '../../../../../utils/metrics/formatMetricLegend';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TabCard} from '../TabCard/TabCard';
 import i18n from '../i18n';
@@ -86,7 +90,7 @@ export function MetricsCards({
                         sublabel={i18n('context_cpu-load')}
                         value={cpuMetrics.totalUsed}
                         limit={cpuMetrics.totalLimit}
-                        unit="cores"
+                        legendFormatter={formatCoresLegend}
                         active={metricsTab === TENANT_METRICS_TABS_IDS.cpu}
                         helpText={i18n('context_cpu-description')}
                     />
@@ -103,7 +107,7 @@ export function MetricsCards({
                         sublabel={i18n('context_storage-groups', {count: storageGroupCount})}
                         value={storageMetrics.totalUsed}
                         limit={storageMetrics.totalLimit}
-                        unit="bytes"
+                        legendFormatter={formatStorageLegend}
                         active={metricsTab === TENANT_METRICS_TABS_IDS.storage}
                         helpText={i18n('context_storage-description')}
                     />
@@ -120,7 +124,7 @@ export function MetricsCards({
                         sublabel={i18n('context_memory-used')}
                         value={memoryMetrics.totalUsed}
                         limit={memoryMetrics.totalLimit}
-                        unit="bytes"
+                        legendFormatter={formatStorageLegend}
                         active={metricsTab === TENANT_METRICS_TABS_IDS.memory}
                         helpText={i18n('context_memory-description')}
                     />
@@ -134,7 +138,7 @@ export function MetricsCards({
                             sublabel={i18n('context_network-evaluation')}
                             value={networkMetrics.totalUsed}
                             limit={networkMetrics.totalLimit}
-                            unit="bytes"
+                            legendFormatter={formatStorageLegend}
                             active={false}
                             clickable={false}
                             helpText={i18n('context_network-description')}

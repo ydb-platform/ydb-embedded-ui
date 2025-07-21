@@ -3,10 +3,6 @@ import {Card, Flex} from '@gravity-ui/uikit';
 import {DoughnutMetrics} from '../../../../../components/DoughnutMetrics/DoughnutMetrics';
 import {getDiagramValues} from '../../../../../containers/Cluster/ClusterOverview/utils';
 import {cn} from '../../../../../utils/cn';
-import {
-    formatCoresLegend,
-    formatStorageLegend,
-} from '../../../../../utils/metrics/formatMetricLegend';
 
 import './TabCard.scss';
 
@@ -17,10 +13,10 @@ interface TabCardProps {
     sublabel?: string;
     value: number;
     limit: number;
-    unit: 'bytes' | 'cores';
     active?: boolean;
     helpText?: string;
     clickable?: boolean;
+    legendFormatter: (params: {value: number; capacity: number}) => string;
 }
 
 export function TabCard({
@@ -28,13 +24,11 @@ export function TabCard({
     sublabel,
     value,
     limit,
-    unit,
     active,
     helpText,
     clickable = true,
+    legendFormatter,
 }: TabCardProps) {
-    const legendFormatter = unit === 'bytes' ? formatStorageLegend : formatCoresLegend;
-
     const {status, percents, legend, fill} = getDiagramValues({
         value,
         capacity: limit,
