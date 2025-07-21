@@ -1,5 +1,5 @@
 import {DoughnutMetrics} from '../../../../components/DoughnutMetrics/DoughnutMetrics';
-import {formatStorageValues} from '../../../../utils/dataFormatters/dataFormatters';
+import {formatStorageLegend} from '../../../../utils/metrics/formatMetricLegend';
 import i18n from '../../i18n';
 import type {ClusterMetricsCommonProps} from '../shared';
 import {getDiagramValues} from '../utils';
@@ -7,11 +7,6 @@ import {getDiagramValues} from '../utils';
 import {ClusterMetricsCardContent} from './ClusterMetricsCard';
 
 interface ClusterMetricsMemoryProps extends ClusterMetricsCommonProps {}
-
-function formatStorageLegend({value, capacity}: {value: number; capacity: number}) {
-    const formatted = formatStorageValues(value, capacity, undefined, '\n');
-    return `${formatted[0]} ${i18n('context_of')} ${formatted[1]}`;
-}
 
 export function ClusterMetricsMemory({
     value,

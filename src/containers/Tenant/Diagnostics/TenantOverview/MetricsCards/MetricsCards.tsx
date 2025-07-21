@@ -88,7 +88,6 @@ export function MetricsCards({
                         limit={cpuMetrics.totalLimit}
                         unit="cores"
                         active={metricsTab === TENANT_METRICS_TABS_IDS.cpu}
-                        status={cpuMetrics.status}
                         helpText={i18n('context_cpu-description')}
                     />
                 </Link>
@@ -106,7 +105,6 @@ export function MetricsCards({
                         limit={storageMetrics.totalLimit}
                         unit="bytes"
                         active={metricsTab === TENANT_METRICS_TABS_IDS.storage}
-                        status={storageMetrics.status}
                         helpText={i18n('context_storage-description')}
                     />
                 </Link>
@@ -124,7 +122,6 @@ export function MetricsCards({
                         limit={memoryMetrics.totalLimit}
                         unit="bytes"
                         active={metricsTab === TENANT_METRICS_TABS_IDS.memory}
-                        status={memoryMetrics.status}
                         helpText={i18n('context_memory-description')}
                     />
                 </Link>
@@ -139,7 +136,6 @@ export function MetricsCards({
                             limit={networkMetrics.totalLimit}
                             unit="bytes"
                             active={false}
-                            status={networkMetrics.status}
                             clickable={false}
                             helpText={i18n('context_network-description')}
                         />

@@ -1,10 +1,12 @@
 import {Card, Flex} from '@gravity-ui/uikit';
 
 import {DoughnutMetrics} from '../../../../../components/DoughnutMetrics/DoughnutMetrics';
-import {formatBytes} from '../../../../../utils/bytesParsers';
+import {getDiagramValues} from '../../../../../containers/Cluster/ClusterOverview/utils';
 import {cn} from '../../../../../utils/cn';
-import {formatPercent} from '../../../../../utils/dataFormatters/dataFormatters';
-import type {ProgressStatus} from '../../../../../utils/progress';
+import {
+    formatCoresLegend,
+    formatStorageLegend,
+} from '../../../../../utils/metrics/formatMetricLegend';
 
 import './TabCard.scss';
 
@@ -15,9 +17,8 @@ interface TabCardProps {
     sublabel?: string;
     value: number;
     limit: number;
-    unit?: string;
+    unit: 'bytes' | 'cores';
     active?: boolean;
-    status?: ProgressStatus;
     helpText?: string;
     clickable?: boolean;
 }
@@ -27,24 +28,18 @@ export function TabCard({
     sublabel,
     value,
     limit,
-    unit = '',
+    unit,
     active,
-    status = 'good',
     helpText,
     clickable = true,
 }: TabCardProps) {
-    const percentage = limit > 0 ? (value / limit) * 100 : 0;
-    const formattedPercentage = formatPercent(percentage / 100);
+    const legendFormatter = unit === 'bytes' ? formatStorageLegend : formatCoresLegend;
 
-    // Format values based on unit type
-    let formattedValue: string;
-    if (unit === 'bytes') {
-        const formattedUsed = formatBytes({value});
-        const formattedLimit = formatBytes({value: limit});
-        formattedValue = `${formattedUsed} of ${formattedLimit}`;
-    } else {
-        formattedValue = `${value} of ${limit}${unit ? ' ' + unit : ''}`;
-    }
+    const {status, percents, legend, fill} = getDiagramValues({
+        value,
+        capacity: limit,
+        legendFormatter,
+    });
 
     return (
         <div className={b({active})}>
@@ -57,16 +52,16 @@ export function TabCard({
                     <DoughnutMetrics
                         size="small"
                         status={status}
-                        fillWidth={percentage}
+                        fillWidth={fill}
                         className={b('doughnut')}
                     >
                         <DoughnutMetrics.Value variant="subheader-1">
-                            {formattedPercentage}
+                            {percents}
                         </DoughnutMetrics.Value>
                     </DoughnutMetrics>
                     <div className={b('legend-wrapper')}>
                         <DoughnutMetrics.Legend variant="subheader-2">
-                            {formattedValue}
+                            {legend}
                         </DoughnutMetrics.Legend>
                         <DoughnutMetrics.Legend
                             variant="body-1"
