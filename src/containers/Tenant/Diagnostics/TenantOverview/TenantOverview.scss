@@ -60,6 +60,8 @@
     }
 
     &__tab-content {
+        overflow: auto;
+
         margin-top: -1px;
         padding: var(--g-spacing-4);
 
