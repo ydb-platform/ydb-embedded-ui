@@ -5,9 +5,13 @@ import {Flex} from '@gravity-ui/uikit';
 import {getVDiskPagePath} from '../../routes';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
-import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
+import {
+    formatStorageValuesToGb,
+    formatUptimeInSeconds,
+    stringifyVdiskId,
+} from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
-import {getSeverityColor} from '../../utils/disks/helpers';
+import {getSeverityColor, isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToSpeed} from '../../utils/utils';
@@ -46,6 +50,9 @@ export function VDiskInfo<T extends PreparedVDisk>({
         FrontQueues,
         Guid,
         Replicated,
+        ReplicationProgress,
+        ReplicationSecondsRemaining,
+        Donors,
         VDiskState,
         VDiskSlotId,
         Kind,
@@ -130,6 +137,31 @@ export function VDiskInfo<T extends PreparedVDisk>({
             value: Replicated ? vDiskInfoKeyset('yes') : vDiskInfoKeyset('no'),
         });
     }
+    if (valueIsDefined(ReplicationProgress)) {
+        rightColumn.push({
+            label: vDiskInfoKeyset('replication-progress'),
+            value: (
+                <ProgressViewer
+                    value={ReplicationProgress}
+                    capacity={1}
+                    formatValues={(value, capacity) => [
+                        `${Math.round((value || 0) * 100)}%`,
+                        `${Math.round((capacity || 1) * 100)}%`,
+                    ]}
+                    colorizeProgress={true}
+                />
+            ),
+        });
+    }
+    if (valueIsDefined(ReplicationSecondsRemaining)) {
+        const timeRemaining = formatUptimeInSeconds(ReplicationSecondsRemaining);
+        if (timeRemaining) {
+            rightColumn.push({
+                label: vDiskInfoKeyset('replication-time-remaining'),
+                value: timeRemaining,
+            });
+        }
+    }
     if (valueIsDefined(VDiskSlotId)) {
         rightColumn.push({label: vDiskInfoKeyset('slot-id'), value: VDiskSlotId});
     }
@@ -151,6 +183,22 @@ export function VDiskInfo<T extends PreparedVDisk>({
             label: vDiskInfoKeyset('has-unreadable-blobs'),
             value: HasUnreadableBlobs ? vDiskInfoKeyset('yes') : vDiskInfoKeyset('no'),
         });
+    }
+    if (Donors && Donors.length > 0) {
+        const donorsList = Donors.map((donor) => {
+            const isFullData = isFullVDiskData(donor);
+            const donorId = stringifyVdiskId(isFullData ? donor.VDiskId : donor);
+            return donorId;
+        })
+            .filter(Boolean)
+            .join(', ');
+
+        if (donorsList) {
+            rightColumn.push({
+                label: vDiskInfoKeyset('donors'),
+                value: donorsList,
+            });
+        }
     }
 
     const diskParamsDefined =
