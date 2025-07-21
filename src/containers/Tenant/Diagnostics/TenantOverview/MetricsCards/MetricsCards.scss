@@ -132,6 +132,15 @@
         border-bottom: var(--tab-border-width) solid var(--g-color-line-generic);
         background: var(--g-color-base-background);
 
+        .tenant-tab-card__card-container {
+            border: 1px solid transparent;
+            border-top: none;
+
+            & > div {
+                transform: translateY(1px);
+            }
+        }
+
         &:nth-child(1) {
             z-index: calc(var(--z-tab-base) + 3);
         }
@@ -167,7 +176,6 @@
 
     &__link {
         display: block;
-        @include tab-border-base(var(--g-color-base-background));
     }
 
     // Active state styling
@@ -180,6 +188,14 @@
         background: var(--g-color-base-background);
 
         transform: translateY(var(--tab-lift-offset));
+
+        .tenant-tab-card__card-container {
+            border: none;
+
+            & > div {
+                transform: translateY(0);
+            }
+        }
 
         .tenant-metrics-cards__link {
             padding-bottom: var(--tab-border-compensation);
