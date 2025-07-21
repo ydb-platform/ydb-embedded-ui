@@ -3,8 +3,9 @@
     --doughnut-width: 100px;
     --doughnut-wrapper-indent: calc(var(--doughnut-border) + 5px);
     --doughnut-color: var(--g-color-base-positive-heavy);
-    --doughnut-backdrop-color: var(--g-color-sfx-fade);
+    --doughnut-backdrop-color: var(--g-color-base-generic);
     --doughnut-overlap-color: var(--g-color-base-positive-heavy-hover);
+    --doughnut-text-color: var(--g-color-text-positive-heavy);
 
     &__doughnut {
         position: relative;
@@ -39,13 +40,13 @@
 
     &_status_warning {
         --doughnut-color: var(--g-color-base-warning-heavy);
-        --doughnut-backdrop-color: var(--g-color-sfx-fade);
         --doughnut-overlap-color: var(--g-color-base-warning-heavy-hover);
+        --doughnut-text-color: var(--g-color-text-warning);
     }
     &_status_danger {
         --doughnut-color: var(--g-color-base-danger-heavy);
-        --doughnut-backdrop-color: var(--g-color-sfx-fade);
         --doughnut-overlap-color: var(--g-color-base-danger-heavy-hover);
+        --doughnut-text-color: var(--g-color-base-danger-heavy);
     }
     &__text-wrapper {
         position: absolute;
@@ -66,7 +67,7 @@
     }
 
     &__value {
-        color: var(--doughnut-color);
+        color: var(--doughnut-text-color);
     }
 
     &__legend-note {
