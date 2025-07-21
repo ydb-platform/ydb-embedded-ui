@@ -191,6 +191,7 @@
 
         .tenant-tab-card__card-container {
             border: none;
+            border-radius: var(--g-border-radius-xs);
 
             & > div {
                 transform: translateY(0);
