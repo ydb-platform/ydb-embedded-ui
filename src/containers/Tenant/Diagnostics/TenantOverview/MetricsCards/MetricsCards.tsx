@@ -55,7 +55,7 @@ export function MetricsCards({
         }),
     };
 
-    // Calculate CPU metrics using utility
+    // Use only pools that directly indicate resources available to perform user queries
     const cpuPools = (poolsCpuStats || []).filter(
         (pool) => !(pool.name === 'Batch' || pool.name === 'IO'),
     );
