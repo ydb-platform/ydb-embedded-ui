@@ -16,6 +16,7 @@
   "by-memory": "by memory",
   "by-usage": "by usage",
   "by-size": "by size",
+  "action_all-nodes": "All Nodes",
   "cards.cpu-label": "CPU load",
   "cards.storage-label": "Storage",
   "cards.memory-label": "Memory used",

@@ -1,15 +1,7 @@
 import React from 'react';
 
-import {ChevronRight} from '@gravity-ui/icons';
-import {
-    Button,
-    Flex,
-    Icon,
-    SegmentedRadioGroup,
-    Tab,
-    TabList,
-    TabProvider,
-} from '@gravity-ui/uikit';
+import {ArrowRight} from '@gravity-ui/icons';
+import {Flex, Icon, SegmentedRadioGroup, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {useLocation} from 'react-router-dom';
 
 import {InternalLink} from '../../../../../components/InternalLink';
@@ -25,6 +17,7 @@ import {useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
 import {useDiagnosticsPageLinkGetter} from '../../../Diagnostics/DiagnosticsPages';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
+import i18n from '../i18n';
 
 import {TopNodesByCpu} from './TopNodesByCpu';
 import {TopNodesByLoad} from './TopNodesByLoad';
@@ -81,14 +74,13 @@ export function TenantCpu({tenantName, additionalNodesProps}: TenantCpuProps) {
         );
 
         const allNodesButton = (
-            <Button
-                view="flat-secondary"
-                size="s"
-                href={getDiagnosticsPageLink(TENANT_DIAGNOSTICS_TABS_IDS.nodes)}
+            <InternalLink
+                className={b('all-nodes-link')}
+                to={getDiagnosticsPageLink(TENANT_DIAGNOSTICS_TABS_IDS.nodes)}
             >
-                All Nodes
-                <Icon data={ChevronRight} size={16} />
-            </Button>
+                {i18n('action_all-nodes')}
+                <Icon data={ArrowRight} size={16} />
+            </InternalLink>
         );
 
         const nodesComponent =
@@ -105,7 +97,7 @@ export function TenantCpu({tenantName, additionalNodesProps}: TenantCpuProps) {
             );
 
         return (
-            <Flex direction="column" gap={3}>
+            <Flex direction="column" gap={2}>
                 <Flex justifyContent="space-between" alignItems="center">
                     {nodesModeControl}
                     {allNodesButton}

@@ -1,3 +1,5 @@
+@use '../../../../../styles/mixins.scss';
+
 .tenant-cpu {
     &__tabs-container {
         margin-top: var(--g-spacing-3);
@@ -5,5 +7,15 @@
 
     &__tab-content {
         margin-top: var(--g-spacing-3);
+    }
+
+    &__all-nodes-link {
+        display: flex;
+        align-items: center;
+        gap: var(--g-spacing-1);
+
+        margin-right: var(--g-spacing-2);
+
+        @include mixins.body-1-typography();
     }
 }

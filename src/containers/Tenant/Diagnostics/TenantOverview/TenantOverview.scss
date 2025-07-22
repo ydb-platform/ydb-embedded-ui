@@ -34,9 +34,7 @@
     &__title {
         margin-bottom: 10px;
 
-        font-weight: 700;
-
-        @include mixins.body-2-typography();
+        @include mixins.subheader-1-typography();
     }
 
     &__table {
