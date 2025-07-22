@@ -99,7 +99,7 @@ export function TenantOverview({
 
     const renderName = () => {
         return (
-            <div className={b('tenant-name-wrapper')}>
+            <Flex alignItems="center" style={{overflow: 'hidden'}}>
                 <EntityStatus
                     status={Overall}
                     name={Name || TENANT_DEFAULT_TITLE}
@@ -107,7 +107,7 @@ export function TenantOverview({
                     hasClipboardButton={Boolean(tenant)}
                     clipboardButtonAlwaysVisible
                 />
-            </div>
+            </Flex>
         );
     };
 

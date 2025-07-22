@@ -6,9 +6,10 @@ import type {TTenantInfo} from '../../../types/api/tenant';
 import {TENANT_INITIAL_PAGE_KEY} from '../../../utils/constants';
 import {api} from '../api';
 
-import {TENANT_METRICS_TABS_IDS} from './constants';
+import {TENANT_CPU_TABS_IDS, TENANT_METRICS_TABS_IDS} from './constants';
 import {tenantPageSchema} from './types';
 import type {
+    TenantCpuTab,
     TenantDiagnosticsTab,
     TenantMetricsTab,
     TenantPage,
@@ -24,6 +25,7 @@ const tenantPage = tenantPageSchema
 export const initialState: TenantState = {
     tenantPage,
     metricsTab: TENANT_METRICS_TABS_IDS.cpu,
+    cpuTab: TENANT_CPU_TABS_IDS.nodes,
 };
 
 const slice = createSlice({
@@ -48,12 +50,21 @@ const slice = createSlice({
             const isValidTab = action.payload && validTabs.includes(action.payload as any);
             state.metricsTab = isValidTab ? action.payload : TENANT_METRICS_TABS_IDS.cpu;
         },
+        setCpuTab: (state, action: PayloadAction<TenantCpuTab>) => {
+            state.cpuTab = action.payload;
+        },
     },
 });
 
 export default slice.reducer;
-export const {setTenantPage, setQueryTab, setDiagnosticsTab, setSummaryTab, setMetricsTab} =
-    slice.actions;
+export const {
+    setTenantPage,
+    setQueryTab,
+    setDiagnosticsTab,
+    setSummaryTab,
+    setMetricsTab,
+    setCpuTab,
+} = slice.actions;
 
 export const tenantApi = api.injectEndpoints({
     endpoints: (builder) => ({

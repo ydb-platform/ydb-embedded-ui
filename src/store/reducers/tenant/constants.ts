@@ -43,3 +43,9 @@ export const TENANT_METRICS_TABS_IDS = {
     storage: 'storage',
     memory: 'memory',
 } as const;
+
+export const TENANT_CPU_TABS_IDS = {
+    nodes: 'nodes',
+    shards: 'shards',
+    queries: 'queries',
+} as const;
