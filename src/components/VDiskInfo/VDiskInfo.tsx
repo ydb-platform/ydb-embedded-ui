@@ -16,6 +16,7 @@ import type {PreparedVDisk} from '../../utils/disks/types';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToSpeed} from '../../utils/utils';
 import {InfoViewer} from '../InfoViewer';
+import {InternalLink} from '../InternalLink';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 import {StatusIcon} from '../StatusIcon/StatusIcon';
@@ -191,14 +192,36 @@ export function VDiskInfo<T extends PreparedVDisk>({
 
     // Show donors list when replication is in progress
     if (Replicated === false && VDiskState === EVDiskState.OK && Donors && Donors.length > 0) {
-        const donorsList = Donors.map((donor) => donor.StringifiedId)
-            .filter(Boolean)
-            .join(', ');
+        const donorLinks = Donors.map((donor, index) => {
+            if (!donor.StringifiedId) {
+                return null;
+            }
 
-        if (donorsList) {
+            // Parse StringifiedId format: "nodeId-pDiskId-vDiskSlotId"
+            const parts = donor.StringifiedId.split('-');
+            if (parts.length !== 3) {
+                return donor.StringifiedId;
+            }
+
+            const [nodeId, pDiskId, vDiskSlotId] = parts;
+            const vDiskPath = getVDiskPagePath({
+                nodeId: parseInt(nodeId),
+                pDiskId: parseInt(pDiskId),
+                vDiskSlotId: parseInt(vDiskSlotId),
+            });
+
+            return (
+                <React.Fragment key={index}>
+                    {index > 0 && ', '}
+                    <InternalLink to={vDiskPath}>{donor.StringifiedId}</InternalLink>
+                </React.Fragment>
+            );
+        }).filter(Boolean);
+
+        if (donorLinks.length > 0) {
             rightColumn.push({
                 label: vDiskInfoKeyset('donors'),
-                value: donorsList,
+                value: <>{donorLinks}</>,
             });
         }
     }
