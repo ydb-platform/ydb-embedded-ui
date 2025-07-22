@@ -4,6 +4,8 @@ import type {ValueOf} from '../../../types/common';
 
 import {TENANT_PAGES_IDS} from './constants';
 import type {
+    TENANT_CPU_NODES_MODE_IDS,
+    TENANT_CPU_TABS_IDS,
     TENANT_DIAGNOSTICS_TABS_IDS,
     TENANT_METRICS_TABS_IDS,
     TENANT_QUERY_TABS_ID,
@@ -17,6 +19,8 @@ export type TenantQueryTab = ValueOf<typeof TENANT_QUERY_TABS_ID>;
 export type TenantDiagnosticsTab = ValueOf<typeof TENANT_DIAGNOSTICS_TABS_IDS>;
 export type TenantSummaryTab = ValueOf<typeof TENANT_SUMMARY_TABS_IDS>;
 export type TenantMetricsTab = ValueOf<typeof TENANT_METRICS_TABS_IDS>;
+export type TenantCpuTab = ValueOf<typeof TENANT_CPU_TABS_IDS>;
+export type TenantNodesMode = ValueOf<typeof TENANT_CPU_NODES_MODE_IDS>;
 
 export interface TenantState {
     tenantPage: TenantPage;
@@ -24,4 +28,6 @@ export interface TenantState {
     diagnosticsTab?: TenantDiagnosticsTab;
     summaryTab?: TenantSummaryTab;
     metricsTab: TenantMetricsTab;
+    cpuTab?: TenantCpuTab;
+    nodesMode?: TenantNodesMode;
 }

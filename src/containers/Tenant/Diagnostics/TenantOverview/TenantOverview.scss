@@ -4,10 +4,9 @@
     height: 100%;
     padding-bottom: 20px;
 
-    &__tenant-name-wrapper {
-        display: flex;
-        overflow: hidden;
-        align-items: center;
+    // Make header font size smaller using project typography
+    .data-table__th {
+        @include mixins.subheader-1-typography();
     }
 
     &__top {
@@ -35,9 +34,7 @@
     &__title {
         margin-bottom: 10px;
 
-        font-weight: 700;
-
-        @include mixins.body-2-typography();
+        @include mixins.subheader-1-typography();
     }
 
     &__table {

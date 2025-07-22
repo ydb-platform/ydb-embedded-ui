@@ -6,11 +6,13 @@ import type {TTenantInfo} from '../../../types/api/tenant';
 import {TENANT_INITIAL_PAGE_KEY} from '../../../utils/constants';
 import {api} from '../api';
 
-import {TENANT_METRICS_TABS_IDS} from './constants';
+import {TENANT_CPU_NODES_MODE_IDS, TENANT_CPU_TABS_IDS, TENANT_METRICS_TABS_IDS} from './constants';
 import {tenantPageSchema} from './types';
 import type {
+    TenantCpuTab,
     TenantDiagnosticsTab,
     TenantMetricsTab,
+    TenantNodesMode,
     TenantPage,
     TenantQueryTab,
     TenantState,
@@ -24,6 +26,8 @@ const tenantPage = tenantPageSchema
 export const initialState: TenantState = {
     tenantPage,
     metricsTab: TENANT_METRICS_TABS_IDS.cpu,
+    cpuTab: TENANT_CPU_TABS_IDS.nodes,
+    nodesMode: TENANT_CPU_NODES_MODE_IDS.load,
 };
 
 const slice = createSlice({
@@ -48,12 +52,31 @@ const slice = createSlice({
             const isValidTab = action.payload && validTabs.includes(action.payload as any);
             state.metricsTab = isValidTab ? action.payload : TENANT_METRICS_TABS_IDS.cpu;
         },
+        setCpuTab: (state, action: PayloadAction<TenantCpuTab>) => {
+            // Ensure we always have a valid cpu tab - fallback to nodes if empty/invalid
+            const validTabs = Object.values(TENANT_CPU_TABS_IDS);
+            const isValidTab = action.payload && validTabs.includes(action.payload as any);
+            state.cpuTab = isValidTab ? action.payload : TENANT_CPU_TABS_IDS.nodes;
+        },
+        setNodesMode: (state, action: PayloadAction<TenantNodesMode>) => {
+            // Ensure we always have a valid nodes mode - fallback to load if empty/invalid
+            const validModes = Object.values(TENANT_CPU_NODES_MODE_IDS);
+            const isValidMode = action.payload && validModes.includes(action.payload as any);
+            state.nodesMode = isValidMode ? action.payload : TENANT_CPU_NODES_MODE_IDS.load;
+        },
     },
 });
 
 export default slice.reducer;
-export const {setTenantPage, setQueryTab, setDiagnosticsTab, setSummaryTab, setMetricsTab} =
-    slice.actions;
+export const {
+    setTenantPage,
+    setQueryTab,
+    setDiagnosticsTab,
+    setSummaryTab,
+    setMetricsTab,
+    setCpuTab,
+    setNodesMode,
+} = slice.actions;
 
 export const tenantApi = api.injectEndpoints({
     endpoints: (builder) => ({

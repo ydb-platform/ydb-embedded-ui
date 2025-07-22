@@ -79,7 +79,7 @@ export const getHighestSeverityStatus = (statuses: MetricStatus[]): MetricStatus
 
 /**
  * Calculate metric aggregates (sum of used/limit values) and determine status
- * This replaces the repetitive calculation logic from MetricsCards.tsx
+ * This replaces the repetitive calculation logic from MetricsTabs.tsx
  */
 export const calculateMetricAggregates = <T extends MetricStats>(
     items: T[] = [],
