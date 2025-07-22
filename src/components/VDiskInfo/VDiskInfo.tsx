@@ -211,17 +211,20 @@ export function VDiskInfo<T extends PreparedVDisk>({
             });
 
             return (
-                <React.Fragment key={index}>
-                    {index > 0 && ', '}
-                    <InternalLink to={vDiskPath}>{donor.StringifiedId}</InternalLink>
-                </React.Fragment>
+                <InternalLink key={index} to={vDiskPath}>
+                    {donor.StringifiedId}
+                </InternalLink>
             );
         }).filter(Boolean);
 
         if (donorLinks.length > 0) {
             rightColumn.push({
                 label: vDiskInfoKeyset('donors'),
-                value: <>{donorLinks}</>,
+                value: (
+                    <Flex direction="column" gap={1}>
+                        {donorLinks}
+                    </Flex>
+                ),
             });
         }
     }
