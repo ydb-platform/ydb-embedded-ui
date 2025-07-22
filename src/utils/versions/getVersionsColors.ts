@@ -11,18 +11,6 @@ export const hashCode = (s: string) => {
 
 export const COLORS = [
     [
-        'var(--versions-red-1)',
-        'var(--versions-red-2)',
-        'var(--versions-red-3)',
-        'var(--versions-red-4)',
-    ],
-    [
-        'var(--versions-orange-red-1)',
-        'var(--versions-orange-red-2)',
-        'var(--versions-orange-red-3)',
-        'var(--versions-orange-red-4)',
-    ],
-    [
         'var(--versions-orange-1)',
         'var(--versions-orange-2)',
         'var(--versions-orange-3)',
@@ -41,16 +29,10 @@ export const COLORS = [
         'var(--versions-green-4)',
     ],
     [
-        'var(--versions-teal-1)',
-        'var(--versions-teal-2)',
-        'var(--versions-teal-3)',
-        'var(--versions-teal-4)',
-    ],
-    [
-        'var(--versions-cyan-1)',
-        'var(--versions-cyan-2)',
-        'var(--versions-cyan-3)',
-        'var(--versions-cyan-4)',
+        'var(--versions-lightblue-1)',
+        'var(--versions-lightblue-2)',
+        'var(--versions-lightblue-3)',
+        'var(--versions-lightblue-4)',
     ],
     [
         'var(--versions-blue-1)',
@@ -59,10 +41,10 @@ export const COLORS = [
         'var(--versions-blue-4)',
     ],
     [
-        'var(--versions-purple-1)',
-        'var(--versions-purple-2)',
-        'var(--versions-purple-3)',
-        'var(--versions-purple-4)',
+        'var(--versions-violet-1)',
+        'var(--versions-violet-2)',
+        'var(--versions-violet-3)',
+        'var(--versions-violet-4)',
     ],
     [
         'var(--versions-pink-1)',
@@ -70,9 +52,39 @@ export const COLORS = [
         'var(--versions-pink-3)',
         'var(--versions-pink-4)',
     ],
+    [
+        'var(--versions-caramel-1)',
+        'var(--versions-caramel-2)',
+        'var(--versions-caramel-3)',
+        'var(--versions-caramel-4)',
+    ],
+    [
+        'var(--versions-moss-1)',
+        'var(--versions-moss-2)',
+        'var(--versions-moss-3)',
+        'var(--versions-moss-4)',
+    ],
+    [
+        'var(--versions-turquoise-1)',
+        'var(--versions-turquoise-2)',
+        'var(--versions-turquoise-3)',
+        'var(--versions-turquoise-4)',
+    ],
+    [
+        'var(--versions-barbie-1)',
+        'var(--versions-barbie-2)',
+        'var(--versions-barbie-3)',
+        'var(--versions-barbie-4)',
+    ],
+    [
+        'var(--versions-night-1)',
+        'var(--versions-night-2)',
+        'var(--versions-night-3)',
+        'var(--versions-night-4)',
+    ],
 ];
 
-export const DEFAULT_COLOR = 'var(--g-color-base-generic-medium)';
+export const DEFAULT_COLOR = 'var(--versions-default-color)';
 
 /** Calculates sub color index */
 export function getMinorVersionColorVariant(minorIndex: number, minorQuantity: number) {
