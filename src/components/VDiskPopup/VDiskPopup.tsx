@@ -4,6 +4,7 @@ import {Flex, Label} from '@gravity-ui/uikit';
 
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
+import {EVDiskState} from '../../types/api/vdisk';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
@@ -128,10 +129,10 @@ const prepareVDiskData = (data: PreparedVDisk, withDeveloperUILink?: boolean) =>
         vdiskData.push({label: 'FrontQueues', value: FrontQueues});
     }
 
-    if (Replicated === false) {
+    if (Replicated === false && VDiskState === EVDiskState.OK) {
         vdiskData.push({label: 'Replicated', value: 'NO'});
 
-        // Only show replication progress and time remaining when disk is not replicated
+        // Only show replication progress and time remaining when disk is not replicated and state is OK
         if (valueIsDefined(ReplicationProgress)) {
             const progressPercent = Math.round(ReplicationProgress * 100);
             vdiskData.push({

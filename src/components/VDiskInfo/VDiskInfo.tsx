@@ -3,15 +3,15 @@ import React from 'react';
 import {Flex} from '@gravity-ui/uikit';
 
 import {getVDiskPagePath} from '../../routes';
+import {EVDiskState} from '../../types/api/vdisk';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {
     formatStorageValuesToGb,
     formatUptimeInSeconds,
-    stringifyVdiskId,
 } from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
-import {getSeverityColor, isFullVDiskData} from '../../utils/disks/helpers';
+import {getSeverityColor} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToSpeed} from '../../utils/utils';
@@ -52,7 +52,6 @@ export function VDiskInfo<T extends PreparedVDisk>({
         Replicated,
         ReplicationProgress,
         ReplicationSecondsRemaining,
-        Donors,
         VDiskState,
         VDiskSlotId,
         Kind,
@@ -137,8 +136,8 @@ export function VDiskInfo<T extends PreparedVDisk>({
             value: Replicated ? vDiskInfoKeyset('yes') : vDiskInfoKeyset('no'),
         });
     }
-    // Only show replication progress and time remaining when disk is not replicated
-    if (Replicated === false) {
+    // Only show replication progress and time remaining when disk is not replicated and state is OK
+    if (Replicated === false && VDiskState === EVDiskState.OK) {
         if (valueIsDefined(ReplicationProgress)) {
             rightColumn.push({
                 label: vDiskInfoKeyset('replication-progress'),
@@ -152,6 +151,8 @@ export function VDiskInfo<T extends PreparedVDisk>({
                         ]}
                         colorizeProgress={true}
                         inverseColorize={true}
+                        dangerThreshold={0}
+                        warningThreshold={0}
                     />
                 ),
             });
@@ -187,22 +188,6 @@ export function VDiskInfo<T extends PreparedVDisk>({
             label: vDiskInfoKeyset('has-unreadable-blobs'),
             value: HasUnreadableBlobs ? vDiskInfoKeyset('yes') : vDiskInfoKeyset('no'),
         });
-    }
-    if (Donors && Donors.length > 0) {
-        const donorsList = Donors.map((donor) => {
-            const isFullData = isFullVDiskData(donor);
-            const donorId = stringifyVdiskId(isFullData ? donor.VDiskId : donor);
-            return donorId;
-        })
-            .filter(Boolean)
-            .join(', ');
-
-        if (donorsList) {
-            rightColumn.push({
-                label: vDiskInfoKeyset('donors'),
-                value: donorsList,
-            });
-        }
     }
 
     const diskParamsDefined =
