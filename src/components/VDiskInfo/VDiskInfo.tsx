@@ -9,9 +9,10 @@ import {cn} from '../../utils/cn';
 import {
     formatStorageValuesToGb,
     formatUptimeInSeconds,
+    stringifyVdiskId,
 } from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
-import {getSeverityColor} from '../../utils/disks/helpers';
+import {getSeverityColor, isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToSpeed} from '../../utils/utils';
@@ -52,6 +53,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
         Replicated,
         ReplicationProgress,
         ReplicationSecondsRemaining,
+        Donors,
         VDiskState,
         VDiskSlotId,
         Kind,
@@ -186,6 +188,32 @@ export function VDiskInfo<T extends PreparedVDisk>({
             label: vDiskInfoKeyset('has-unreadable-blobs'),
             value: HasUnreadableBlobs ? vDiskInfoKeyset('yes') : vDiskInfoKeyset('no'),
         });
+    }
+
+    // Show donors list when replication is in progress  
+    if (Replicated === false && VDiskState === EVDiskState.OK && Donors && Donors.length > 0) {
+        const donorsList = Donors.map((donor) => {
+            if (isFullVDiskData(donor)) {
+                // Full VDisk data - use VDiskId if available
+                return stringifyVdiskId(donor.VDiskId);
+            } else {
+                // TVSlotId data - construct from NodeId-PDiskId-VSlotId
+                const {NodeId: dNodeId, PDiskId: dPDiskId, VSlotId} = donor;
+                if (valueIsDefined(dNodeId) && valueIsDefined(dPDiskId) && valueIsDefined(VSlotId)) {
+                    return `${dNodeId}-${dPDiskId}-${VSlotId}`;
+                }
+                return null;
+            }
+        })
+            .filter(Boolean)
+            .join(', ');
+
+        if (donorsList) {
+            rightColumn.push({
+                label: vDiskInfoKeyset('donors'),
+                value: donorsList,
+            });
+        }
     }
 
     const diskParamsDefined =

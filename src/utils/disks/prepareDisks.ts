@@ -63,8 +63,27 @@ export function prepareWhiteboardVDiskData(
     const StringifiedId = stringifyVdiskId(VDiskId);
 
     const preparedDonors = Donors?.map((donor) => {
-        return prepareWhiteboardVDiskData({...donor, DonorMode: true});
-    });
+        // Handle both TVDiskStateInfo and TVSlotId donor types
+        if (isFullVDiskData(donor)) {
+            // Full VDisk data
+            return prepareWhiteboardVDiskData({...donor, DonorMode: true});
+        } else {
+            // TVSlotId data - create a minimal PreparedVDisk
+            const {NodeId: dNodeId, PDiskId: dPDiskId, VSlotId} = donor;
+            const StringifiedId = 
+                valueIsDefined(dNodeId) && valueIsDefined(dPDiskId) && valueIsDefined(VSlotId)
+                    ? `${dNodeId}-${dPDiskId}-${VSlotId}`
+                    : '';
+            
+            return {
+                NodeId: dNodeId,
+                PDiskId: dPDiskId, 
+                VDiskSlotId: VSlotId,
+                StringifiedId,
+                DonorMode: true,
+            } as PreparedVDisk;
+        }
+    }).filter((donor) => donor.StringifiedId);
 
     return {
         ...restVDiskFields,
