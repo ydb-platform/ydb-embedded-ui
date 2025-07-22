@@ -145,14 +145,12 @@ export function VDiskInfo<T extends PreparedVDisk>({
                     <ProgressViewer
                         value={ReplicationProgress}
                         capacity={1}
-                        formatValues={(value, capacity) => [
-                            `${Math.round((value || 0) * 100)}%`,
-                            `${Math.round((capacity || 1) * 100)}%`,
-                        ]}
+                        formatValues={(value) => [`${Math.round((value || 0) * 100)}%`]}
                         colorizeProgress={true}
                         inverseColorize={true}
                         dangerThreshold={0}
                         warningThreshold={0}
+                        hideCapacity={true}
                     />
                 ),
             });

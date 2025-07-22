@@ -136,7 +136,7 @@ const prepareVDiskData = (data: PreparedVDisk, withDeveloperUILink?: boolean) =>
         if (valueIsDefined(ReplicationProgress)) {
             const progressPercent = Math.round(ReplicationProgress * 100);
             vdiskData.push({
-                label: 'Replication Progress',
+                label: 'Progress',
                 value: `${progressPercent}%`,
             });
         }
@@ -145,7 +145,7 @@ const prepareVDiskData = (data: PreparedVDisk, withDeveloperUILink?: boolean) =>
             const timeRemaining = formatUptimeInSeconds(ReplicationSecondsRemaining);
             if (timeRemaining) {
                 vdiskData.push({
-                    label: 'Time Remaining',
+                    label: 'Remaining',
                     value: timeRemaining,
                 });
             }
