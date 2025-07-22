@@ -17,11 +17,14 @@ import {THEME_KEY} from '../../utils/constants';
 import {toaster} from '../../utils/createToast';
 import {useSetting} from '../../utils/hooks';
 
+import {AppTitleProvider} from './AppTitleContext';
+
 interface ProvidersProps {
     store: Store;
     history: History;
     componentsRegistry?: ComponentsRegistry;
     children: React.ReactNode;
+    appTitle: string;
 }
 
 export function Providers({
@@ -29,20 +32,23 @@ export function Providers({
     history,
     componentsRegistry = defaultComponentsRegistry,
     children,
+    appTitle,
 }: ProvidersProps) {
     return (
         <HelmetProvider>
             <Provider store={store}>
                 <Router history={history}>
                     <QueryParamProvider adapter={ReactRouter5Adapter}>
-                        <Theme>
-                            <ToasterProvider toaster={toaster}>
-                                <ComponentsProvider registry={componentsRegistry}>
-                                    <NiceModal.Provider>{children}</NiceModal.Provider>
-                                    <ToasterComponent />
-                                </ComponentsProvider>
-                            </ToasterProvider>
-                        </Theme>
+                        <AppTitleProvider appTitle={appTitle}>
+                            <Theme>
+                                <ToasterProvider toaster={toaster}>
+                                    <ComponentsProvider registry={componentsRegistry}>
+                                        <NiceModal.Provider>{children}</NiceModal.Provider>
+                                        <ToasterComponent />
+                                    </ComponentsProvider>
+                                </ToasterProvider>
+                            </Theme>
+                        </AppTitleProvider>
                     </QueryParamProvider>
                 </Router>
             </Provider>
