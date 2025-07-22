@@ -15,7 +15,7 @@ import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQu
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
 
 import {HealthcheckPreview} from './Healthcheck/HealthcheckPreview';
-import {MetricsCards} from './MetricsCards/MetricsCards';
+import {MetricsTabs} from './MetricsTabs/MetricsTabs';
 import {TenantCpu} from './TenantCpu/TenantCpu';
 import {TenantMemory} from './TenantMemory/TenantMemory';
 import {TenantStorage} from './TenantStorage/TenantStorage';
@@ -163,7 +163,7 @@ export function TenantOverview({
                     <Flex direction="column" gap={4}>
                         <HealthcheckPreview tenantName={tenantName} />
                         <QueriesActivityBar tenantName={tenantName} />
-                        <MetricsCards
+                        <MetricsTabs
                             poolsCpuStats={poolsStats}
                             memoryStats={memoryStats}
                             blobStorageStats={blobStorageStats}

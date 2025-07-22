@@ -21,11 +21,11 @@ import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TabCard} from '../TabCard/TabCard';
 import i18n from '../i18n';
 
-import './MetricsCards.scss';
+import './MetricsTabs.scss';
 
-const b = cn('tenant-metrics-cards');
+const b = cn('tenant-metrics-tabs');
 
-interface MetricsCardsProps {
+interface MetricsTabsProps {
     poolsCpuStats?: TenantPoolsStats[];
     memoryStats?: TenantMetricStats[];
     blobStorageStats?: TenantStorageStats[];
@@ -33,13 +33,13 @@ interface MetricsCardsProps {
     networkStats?: TenantMetricStats[];
 }
 
-export function MetricsCards({
+export function MetricsTabs({
     poolsCpuStats,
     memoryStats,
     blobStorageStats,
     tabletStorageStats,
     networkStats,
-}: MetricsCardsProps) {
+}: MetricsTabsProps) {
     const location = useLocation();
     const {metricsTab} = useTypedSelector((state) => state.tenant);
     const queryParams = parseQuery(location);
