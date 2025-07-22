@@ -137,29 +137,33 @@ export function VDiskInfo<T extends PreparedVDisk>({
             value: Replicated ? vDiskInfoKeyset('yes') : vDiskInfoKeyset('no'),
         });
     }
-    if (valueIsDefined(ReplicationProgress)) {
-        rightColumn.push({
-            label: vDiskInfoKeyset('replication-progress'),
-            value: (
-                <ProgressViewer
-                    value={ReplicationProgress}
-                    capacity={1}
-                    formatValues={(value, capacity) => [
-                        `${Math.round((value || 0) * 100)}%`,
-                        `${Math.round((capacity || 1) * 100)}%`,
-                    ]}
-                    colorizeProgress={true}
-                />
-            ),
-        });
-    }
-    if (valueIsDefined(ReplicationSecondsRemaining)) {
-        const timeRemaining = formatUptimeInSeconds(ReplicationSecondsRemaining);
-        if (timeRemaining) {
+    // Only show replication progress and time remaining when disk is not replicated
+    if (Replicated === false) {
+        if (valueIsDefined(ReplicationProgress)) {
             rightColumn.push({
-                label: vDiskInfoKeyset('replication-time-remaining'),
-                value: timeRemaining,
+                label: vDiskInfoKeyset('replication-progress'),
+                value: (
+                    <ProgressViewer
+                        value={ReplicationProgress}
+                        capacity={1}
+                        formatValues={(value, capacity) => [
+                            `${Math.round((value || 0) * 100)}%`,
+                            `${Math.round((capacity || 1) * 100)}%`,
+                        ]}
+                        colorizeProgress={true}
+                        inverseColorize={true}
+                    />
+                ),
             });
+        }
+        if (valueIsDefined(ReplicationSecondsRemaining)) {
+            const timeRemaining = formatUptimeInSeconds(ReplicationSecondsRemaining);
+            if (timeRemaining) {
+                rightColumn.push({
+                    label: vDiskInfoKeyset('replication-time-remaining'),
+                    value: timeRemaining,
+                });
+            }
         }
     }
     if (valueIsDefined(VDiskSlotId)) {

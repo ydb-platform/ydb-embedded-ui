@@ -130,23 +130,24 @@ const prepareVDiskData = (data: PreparedVDisk, withDeveloperUILink?: boolean) =>
 
     if (Replicated === false) {
         vdiskData.push({label: 'Replicated', value: 'NO'});
-    }
 
-    if (valueIsDefined(ReplicationProgress)) {
-        const progressPercent = Math.round(ReplicationProgress * 100);
-        vdiskData.push({
-            label: 'Replication Progress',
-            value: `${progressPercent}%`,
-        });
-    }
-
-    if (valueIsDefined(ReplicationSecondsRemaining)) {
-        const timeRemaining = formatUptimeInSeconds(ReplicationSecondsRemaining);
-        if (timeRemaining) {
+        // Only show replication progress and time remaining when disk is not replicated
+        if (valueIsDefined(ReplicationProgress)) {
+            const progressPercent = Math.round(ReplicationProgress * 100);
             vdiskData.push({
-                label: 'Time Remaining',
-                value: timeRemaining,
+                label: 'Replication Progress',
+                value: `${progressPercent}%`,
             });
+        }
+
+        if (valueIsDefined(ReplicationSecondsRemaining)) {
+            const timeRemaining = formatUptimeInSeconds(ReplicationSecondsRemaining);
+            if (timeRemaining) {
+                vdiskData.push({
+                    label: 'Time Remaining',
+                    value: timeRemaining,
+                });
+            }
         }
     }
 
