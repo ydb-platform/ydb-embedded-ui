@@ -16,6 +16,7 @@ export interface InfoViewerProps {
     info?: InfoViewerItem[];
     dots?: boolean;
     size?: 's';
+    variant?: 'default' | 'storage';
     className?: string;
     multilineLabels?: boolean;
     renderEmptyState?: (props?: Pick<InfoViewerProps, 'title' | 'size'>) => React.ReactNode;
@@ -28,6 +29,7 @@ export const InfoViewer = ({
     info,
     dots = true,
     size,
+    variant = 'default',
     className,
     multilineLabels,
     renderEmptyState,
@@ -37,7 +39,7 @@ export const InfoViewer = ({
     }
 
     return (
-        <div className={b({size}, className)}>
+        <div className={b({size, variant}, className)}>
             {title && <div className={b('title')}>{title}</div>}
             {info && info.length > 0 ? (
                 <div className={b('items')}>

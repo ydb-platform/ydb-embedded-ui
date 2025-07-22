@@ -14,5 +14,5 @@ export const ResponseError = ({
 }: ResponseErrorProps) => {
     const message = prepareErrorMessage(error) || defaultMessage;
 
-    return <div className={`error ${className}`}>{message}</div>;
+    return <div className={`error ${className || ''}`}>{message}</div>;
 };

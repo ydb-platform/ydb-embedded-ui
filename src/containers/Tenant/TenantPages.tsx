@@ -15,6 +15,8 @@ type AdditionalQueryParams = {
     selectedPartition?: string;
     activeOffset?: string;
     metricsTab?: string;
+    cpuTab?: string;
+    storageTab?: string;
     showPreview?: boolean;
     queryMode?: string;
 };
@@ -27,6 +29,7 @@ export const TenantTabsGroups = {
     diagnosticsTab: 'diagnosticsTab',
     metricsTab: 'metricsTab',
     cpuTab: 'cpuTab',
+    storageTab: 'storageTab',
 } as const;
 
 export const TENANT_INFO_TABS = [

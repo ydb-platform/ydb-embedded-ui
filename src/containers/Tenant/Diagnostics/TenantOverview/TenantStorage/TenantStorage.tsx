@@ -1,18 +1,29 @@
 import React from 'react';
 
+import {Tab, TabList, TabProvider} from '@gravity-ui/uikit';
+
 import {InfoViewer} from '../../../../../components/InfoViewer/InfoViewer';
 import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
 import {ProgressViewer} from '../../../../../components/ProgressViewer/ProgressViewer';
+import {TENANT_STORAGE_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
+import {cn} from '../../../../../utils/cn';
 import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
 import i18n from '../i18n';
-import {b} from '../utils';
 
 import {TopGroups} from './TopGroups';
 import {TopTables} from './TopTables';
 import {storageDashboardConfig} from './storageDashboardConfig';
+import {useTenantStorageQueryParams} from './useTenantStorageQueryParams';
 
-import '../TenantOverview.scss';
+import './TenantStorage.scss';
+
+const tenantStorageCn = cn('tenant-storage');
+
+const storageTabs = [
+    {id: TENANT_STORAGE_TABS_IDS.tables, title: i18n('title_top-tables-by-size')},
+    {id: TENANT_STORAGE_TABS_IDS.groups, title: i18n('title_top-groups-by-usage')},
+];
 
 export interface TenantStorageMetrics {
     blobStorageUsed?: number;
@@ -27,7 +38,20 @@ interface TenantStorageProps {
 }
 
 export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
+    const {storageTab, handleStorageTabChange} = useTenantStorageQueryParams();
+
     const {blobStorageUsed, tabletStorageUsed, blobStorageLimit, tabletStorageLimit} = metrics;
+
+    const renderTabContent = () => {
+        switch (storageTab) {
+            case TENANT_STORAGE_TABS_IDS.tables:
+                return <TopTables database={tenantName} />;
+            case TENANT_STORAGE_TABS_IDS.groups:
+                return <TopGroups tenant={tenantName} />;
+            default:
+                return null;
+        }
+    };
 
     const info = [
         {
@@ -43,6 +67,7 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
                     capacity={tabletStorageLimit}
                     formatValues={formatStorageValues}
                     colorizeProgress={true}
+                    size="storage"
                 />
             ),
         },
@@ -59,6 +84,7 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
                     capacity={blobStorageLimit}
                     formatValues={formatStorageValues}
                     colorizeProgress={true}
+                    size="storage"
                 />
             ),
         },
@@ -67,9 +93,27 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
     return (
         <React.Fragment>
             <TenantDashboard database={tenantName} charts={storageDashboardConfig} />
-            <InfoViewer className={b('storage-info')} title="Storage details" info={info} />
-            <TopTables database={tenantName} />
-            <TopGroups tenant={tenantName} />
+            <InfoViewer
+                variant="storage"
+                title={i18n('storage.storage-details-title')}
+                info={info}
+            />
+
+            <div className={tenantStorageCn('tabs-container')}>
+                <TabProvider value={storageTab}>
+                    <TabList size="m">
+                        {storageTabs.map(({id, title}) => {
+                            return (
+                                <Tab key={id} value={id} onClick={() => handleStorageTabChange(id)}>
+                                    {title}
+                                </Tab>
+                            );
+                        })}
+                    </TabList>
+                </TabProvider>
+
+                <div className={tenantStorageCn('tab-content')}>{renderTabContent()}</div>
+            </div>
         </React.Fragment>
     );
 }
