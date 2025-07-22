@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to AI coding assistants when working with this codebase. Compatible with Claude, GitHub Copilot, Cursor, and other AI development tools.
+This file provides guidance to AI coding assistants when working with this codebase. Designed for OpenAI Codex, GitHub Copilot, Claude, Cursor, and other AI development tools.
 
 ## Project Overview
 
