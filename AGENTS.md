@@ -179,6 +179,24 @@ Uses BEM naming convention with `cn()` utility from `utils/cn`. Create a block f
 - **Parsers**: `src/utils/timeParsers/` - Time parsing utilities
 - **Query Utils**: `src/utils/query.ts` - SQL/YQL query helpers
 
+### Internationalization (i18n)
+
+All user-facing text must be internationalized using the i18n system. Follow the naming rules from `i18n-naming-ruleset.md`:
+
+- **Component Structure**: Each component has an `i18n/` folder with `en.json` and `index.ts`
+- **Registration**: Use `registerKeysets()` with a unique component name
+- **Key Format**: Follow `<context>_<content>` pattern (e.g., `action_save`, `field_name`, `alert_error`)
+- **Context Prefixes**:
+  - `action_` - buttons, links, menu items
+  - `field_` - form fields, table columns
+  - `title_` - page/section titles
+  - `alert_` - notifications, errors
+  - `context_` - descriptions, hints
+  - `confirm_` - confirmation dialogs
+  - `value_` - status values, options
+- **NEVER** use hardcoded strings in UI components
+- **ALWAYS** create i18n entries for all user-visible text
+
 ### Performance Considerations
 
 - Tables use virtual scrolling for large datasets
@@ -202,10 +220,12 @@ Uses React Router v5 hooks (`useHistory`, `useParams`, etc.). Always validate ro
 
 - **NEVER** call APIs directly - use `window.api.module.method()`
 - **NEVER** mutate state in RTK Query - return new objects/arrays
+- **NEVER** hardcode user-facing strings - use i18n
 - **ALWAYS** use `cn()` for classNames: `const b = cn('component-name')`
 - **ALWAYS** clear errors on user input
 - **ALWAYS** handle loading states in UI
 - **ALWAYS** validate route params exist before use
+- **ALWAYS** follow i18n naming rules from `i18n-naming-ruleset.md`
 
 ### Debugging Tips
 
