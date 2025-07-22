@@ -30,9 +30,9 @@ import './TenantCpu.scss';
 const b = cn('tenant-cpu');
 
 const cpuTabs = [
-    {id: TENANT_CPU_TABS_IDS.nodes, title: 'Top Nodes'},
-    {id: TENANT_CPU_TABS_IDS.shards, title: 'Top Shards'},
-    {id: TENANT_CPU_TABS_IDS.queries, title: 'Top Queries'},
+    {id: TENANT_CPU_TABS_IDS.nodes, title: i18n('title_top-nodes')},
+    {id: TENANT_CPU_TABS_IDS.shards, title: i18n('title_top-shards')},
+    {id: TENANT_CPU_TABS_IDS.queries, title: i18n('title_top-queries')},
 ];
 
 const NodesModeIds = {
@@ -65,10 +65,10 @@ export function TenantCpu({tenantName, additionalNodesProps}: TenantCpuProps) {
         const nodesModeControl = (
             <SegmentedRadioGroup value={nodesMode} onUpdate={setNodesMode}>
                 <SegmentedRadioGroup.Option value={NodesModeIds.load}>
-                    By Load
+                    {i18n('action_by-load')}
                 </SegmentedRadioGroup.Option>
                 <SegmentedRadioGroup.Option value={NodesModeIds.pools}>
-                    By Pool Usage
+                    {i18n('action_by-pool-usage')}
                 </SegmentedRadioGroup.Option>
             </SegmentedRadioGroup>
         );

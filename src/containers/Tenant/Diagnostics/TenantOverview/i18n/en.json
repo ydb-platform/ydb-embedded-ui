@@ -40,5 +40,10 @@
   "storage.db-storage-title": "Database storage",
   "storage.db-storage-description": "Size of data stored in distributed storage with all overheads for redundancy",
   "executed-last-hour": "executed in the last hour",
-  "column-header.process": "Process"
+  "column-header.process": "Process",
+  "title_top-nodes": "Top Nodes",
+  "title_top-shards": "Top Shards",
+  "title_top-queries": "Top Queries",
+  "action_by-load": "By Load",
+  "action_by-pool-usage": "By Pool Usage"
 }
