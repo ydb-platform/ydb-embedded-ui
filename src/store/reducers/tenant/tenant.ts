@@ -6,6 +6,7 @@ import type {TTenantInfo} from '../../../types/api/tenant';
 import {TENANT_INITIAL_PAGE_KEY} from '../../../utils/constants';
 import {api} from '../api';
 
+import {TENANT_METRICS_TABS_IDS} from './constants';
 import {tenantPageSchema} from './types';
 import type {
     TenantDiagnosticsTab,
@@ -20,8 +21,9 @@ const tenantPage = tenantPageSchema
     .catch(DEFAULT_USER_SETTINGS[TENANT_INITIAL_PAGE_KEY])
     .parse(settingsManager.readUserSettingsValue(TENANT_INITIAL_PAGE_KEY));
 
-const initialState: TenantState = {
+export const initialState: TenantState = {
     tenantPage,
+    metricsTab: TENANT_METRICS_TABS_IDS.cpu,
 };
 
 const slice = createSlice({
@@ -41,7 +43,10 @@ const slice = createSlice({
             state.summaryTab = action.payload;
         },
         setMetricsTab: (state, action: PayloadAction<TenantMetricsTab>) => {
-            state.metricsTab = action.payload;
+            // Ensure we always have a valid metrics tab - fallback to CPU if empty/invalid
+            const validTabs = Object.values(TENANT_METRICS_TABS_IDS);
+            const isValidTab = action.payload && validTabs.includes(action.payload as any);
+            state.metricsTab = isValidTab ? action.payload : TENANT_METRICS_TABS_IDS.cpu;
         },
     },
 });

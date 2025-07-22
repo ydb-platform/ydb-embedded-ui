@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {CirclePlay, Clock, Display, Person, Rocket} from '@gravity-ui/icons';
-import {ArrowToggle, Button, Disclosure, Flex, Icon, Label, Text} from '@gravity-ui/uikit';
+import {ArrowToggle, Button, Card, Flex, Icon, Label, Text} from '@gravity-ui/uikit';
 import {useHistory, useLocation} from 'react-router-dom';
 
 import {TenantTabsGroups, getTenantPath} from '../../containers/Tenant/TenantPages';
@@ -128,61 +128,57 @@ export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
         history.push(path);
     };
 
+    const handleToggleExpanded = () => {
+        setExpanded(!expanded);
+    };
+
     return (
         <div className={b({expanded})} style={{display: isActivityBarHidden ? 'none' : undefined}}>
-            <Disclosure expanded={expanded} onUpdate={setExpanded} className={b('disclosure')}>
-                <Disclosure.Summary>
-                    {(props) => (
-                        <div {...props} className={b('header')}>
-                            <Flex justifyContent="space-between" className={b('content-wrapper')}>
-                                <Flex direction="column" className={b('title-section')}>
-                                    <Text variant="subheader-2" className={b('title')}>
-                                        {i18n('title_queries-activity')}
-                                    </Text>
-                                    <Text
-                                        color="secondary"
-                                        variant="caption-2"
-                                        className={b('subtitle')}
-                                    >
-                                        {i18n('context_monitor-changes-realtime')}
-                                    </Text>
-                                </Flex>
+            <Card className={b('card')} type="container" view={expanded ? 'outlined' : 'raised'}>
+                <div className={b('header')} onClick={handleToggleExpanded}>
+                    <Flex justifyContent="space-between" className={b('content-wrapper')}>
+                        <Flex direction="column" className={b('title-section')}>
+                            <Text variant="subheader-2" className={b('title')}>
+                                {i18n('title_queries-activity')}
+                            </Text>
+                            <Text color="secondary" variant="caption-2" className={b('subtitle')}>
+                                {i18n('context_monitor-changes-realtime')}
+                            </Text>
+                        </Flex>
 
-                                <div className={b('metrics')}>
-                                    <Label
-                                        theme={runningQueriesCount > 0 ? 'success' : 'unknown'}
-                                        size="s"
-                                        icon={<Icon data={CirclePlay} size={14} />}
-                                    >
-                                        {runningQueriesCount}
-                                    </Label>
+                        <div className={b('metrics')}>
+                            <Label
+                                theme={runningQueriesCount > 0 ? 'success' : 'unknown'}
+                                size="s"
+                                icon={<Icon data={CirclePlay} size={14} />}
+                            >
+                                {runningQueriesCount}
+                            </Label>
 
-                                    <Label
-                                        theme="clear"
-                                        size="s"
-                                        icon={<Icon data={Rocket} size={14} />}
-                                        value={formatTrendValue(qps.trend.value)}
-                                    >
-                                        {i18n('value_per-sec', {count: qps.value})}
-                                    </Label>
+                            <Label
+                                theme="clear"
+                                size="s"
+                                icon={<Icon data={Rocket} size={14} />}
+                                value={formatTrendValue(qps.trend.value)}
+                            >
+                                {i18n('value_per-sec', {count: qps.value})}
+                            </Label>
 
-                                    <Label
-                                        theme="clear"
-                                        size="s"
-                                        icon={<Icon data={Clock} size={14} />}
-                                        value={formatTrendValue(latency.trend.value)}
-                                    >
-                                        {i18n('value_ms', {time: latency.value})}
-                                    </Label>
-                                </div>
-                            </Flex>
-
-                            <ArrowToggle direction={props.expanded ? 'top' : 'bottom'} />
+                            <Label
+                                theme="clear"
+                                size="s"
+                                icon={<Icon data={Clock} size={14} />}
+                                value={formatTrendValue(latency.trend.value)}
+                            >
+                                {i18n('value_ms', {time: latency.value})}
+                            </Label>
                         </div>
-                    )}
-                </Disclosure.Summary>
+                    </Flex>
 
-                {expanded ? (
+                    <ArrowToggle direction={expanded ? 'top' : 'bottom'} />
+                </div>
+
+                {expanded && (
                     <div className={b('content')}>
                         <div className={b('stats')}>
                             <Label
@@ -222,13 +218,13 @@ export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
                             </Button>
                         </div>
                     </div>
-                ) : null}
-            </Disclosure>
-            <QueriesActivityCharts
-                tenantName={tenantName}
-                expanded={expanded}
-                onChartDataStatusChange={handleChartDataStatusChange}
-            />
+                )}
+                <QueriesActivityCharts
+                    tenantName={tenantName}
+                    expanded={expanded}
+                    onChartDataStatusChange={handleChartDataStatusChange}
+                />
+            </Card>
         </div>
     );
 }

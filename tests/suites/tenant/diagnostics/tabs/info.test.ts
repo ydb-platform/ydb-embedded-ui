@@ -32,11 +32,13 @@ test.describe('Diagnostics Info tab', async () => {
         await diagnostics.clickTab(DiagnosticsTab.Info);
 
         const utilization = await diagnostics.getResourceUtilization();
-        expect(utilization.cpu.system).toMatch(/\d+(\.\d+)? \/ \d+/);
-        expect(utilization.cpu.user).toMatch(/\d+(\.\d+)? \/ \d+/);
-        expect(utilization.cpu.ic).toMatch(/\d+(\.\d+)? \/ \d+/);
-        expect(utilization.storage).toBeTruthy();
-        expect(utilization.memory).toMatch(/\d+ \/ \d+\s*GB/);
+        // Test the new aggregated metric structure
+        expect(utilization.cpu.percentage).toMatch(/\d+(\.\d+)?%/);
+        expect(utilization.cpu.usage).toBeTruthy();
+        expect(utilization.storage.percentage).toMatch(/\d+(\.\d+)?%/);
+        expect(utilization.storage.usage).toBeTruthy();
+        expect(utilization.memory.percentage).toMatch(/\d+(\.\d+)?%/);
+        expect(utilization.memory.usage).toBeTruthy();
     });
 
     test('Info tab shows healthcheck status', async ({page}) => {
