@@ -1,8 +1,8 @@
 import {useTheme} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
-import {formatNumber, roundToPrecision} from '../../utils/dataFormatters/dataFormatters';
-import {calculateProgressStatus} from '../../utils/progress';
+import {calculateProgressStatus, defaultFormatProgressValues} from '../../utils/progress';
+import type {FormatProgressViewerValues} from '../../utils/progress';
 import {isNumeric} from '../../utils/utils';
 
 import './ProgressViewer.scss';
@@ -10,19 +10,6 @@ import './ProgressViewer.scss';
 const b = cn('progress-viewer');
 
 type ProgressViewerSize = 'xs' | 's' | 'ns' | 'm' | 'n' | 'l' | 'head';
-
-export type FormatProgressViewerValues = (
-    value?: number,
-    capacity?: number,
-) => (string | number | undefined)[];
-
-const formatValue = (value?: number) => {
-    return formatNumber(roundToPrecision(Number(value), 2));
-};
-
-const defaultFormatValues: FormatProgressViewerValues = (value, total) => {
-    return [formatValue(value), formatValue(total)];
-};
 
 /*
 
@@ -56,7 +43,7 @@ export interface ProgressViewerProps {
 export function ProgressViewer({
     value,
     capacity,
-    formatValues = defaultFormatValues,
+    formatValues = defaultFormatProgressValues,
     percents,
     withOverflow,
     className,

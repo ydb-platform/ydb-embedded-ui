@@ -11,8 +11,6 @@ import {TENANT_OVERVIEW_TABLES_SETTINGS} from '../../../../../utils/constants';
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../../utils/query';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
-import {getSectionTitle} from '../getSectionTitle';
-import i18n from '../i18n';
 
 import '../TenantOverview.scss';
 
@@ -57,14 +55,8 @@ export function TopTables({database}: TopTablesProps) {
                 ) : null,
         },
     ];
-    const title = getSectionTitle({
-        entity: i18n('tables'),
-        postfix: i18n('by-size'),
-    });
-
     return (
         <TenantOverviewTableLayout
-            title={title}
             loading={loading}
             error={parseQueryErrorToString(error)}
             withData={Boolean(currentData)}

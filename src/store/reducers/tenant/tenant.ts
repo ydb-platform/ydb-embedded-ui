@@ -44,8 +44,8 @@ const slice = createSlice({
         },
         setMetricsTab: (state, action: PayloadAction<TenantMetricsTab>) => {
             // Ensure we always have a valid metrics tab - fallback to CPU if empty/invalid
-            const validTabs = Object.values(TENANT_METRICS_TABS_IDS);
-            const isValidTab = action.payload && validTabs.includes(action.payload as any);
+            const validTabs = Object.values(TENANT_METRICS_TABS_IDS) as TenantMetricsTab[];
+            const isValidTab = action.payload && validTabs.includes(action.payload);
             state.metricsTab = isValidTab ? action.payload : TENANT_METRICS_TABS_IDS.cpu;
         },
     },

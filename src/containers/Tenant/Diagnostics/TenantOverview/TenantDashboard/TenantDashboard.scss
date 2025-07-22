@@ -1,6 +1,6 @@
 .ydb-tenant-dashboard {
     width: var(--diagnostics-section-table-width);
-    margin-bottom: var(--diagnostics-section-margin);
+    margin-bottom: var(--g-spacing-4);
 
     &__charts {
         display: flex;
