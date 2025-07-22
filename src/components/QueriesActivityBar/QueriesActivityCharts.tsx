@@ -1,14 +1,10 @@
 import React from 'react';
 
-import {Flex} from '@gravity-ui/uikit';
-
 import {defaultDashboardConfig} from '../../containers/Tenant/Diagnostics/TenantOverview/DefaultOverviewContent/defaultDashboardConfig';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval} from '../../utils/hooks';
-import type {TimeFrame} from '../../utils/timeframes';
 import {MetricChart} from '../MetricChart/MetricChart';
 import type {ChartDataStatus} from '../MetricChart/types';
-import {TimeFrameDropdown} from '../TimeFrameDropdown/TimeFrameDropdown';
 
 const b = cn('queries-activity-bar');
 
@@ -26,8 +22,6 @@ export function QueriesActivityCharts({
     onChartDataStatusChange,
 }: QueriesActivityChartsProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const [queriesTimeFrame, setQueriesTimeFrame] = React.useState<TimeFrame>('1h');
-    const [latenciesTimeFrame, setLatenciesTimeFrame] = React.useState<TimeFrame>('1h');
     const [hasChartsLoaded, setHasChartsLoaded] = React.useState(false);
 
     // Extract chart configurations from defaultDashboardConfig
@@ -60,40 +54,6 @@ export function QueriesActivityCharts({
         [onChartDataStatusChange],
     );
 
-    const handleQueriesTimeFrameChange = React.useCallback((newTimeFrame: TimeFrame) => {
-        setQueriesTimeFrame(newTimeFrame);
-    }, []);
-
-    const handleLatenciesTimeFrameChange = React.useCallback((newTimeFrame: TimeFrame) => {
-        setLatenciesTimeFrame(newTimeFrame);
-    }, []);
-
-    const renderQueriesChartToolbar = React.useCallback(
-        () => (
-            <Flex className={b('toolbar')} justifyContent="space-between" alignItems="center">
-                <div>{queriesChartConfig.title}</div>
-                <TimeFrameDropdown
-                    value={queriesTimeFrame}
-                    onChange={handleQueriesTimeFrameChange}
-                />
-            </Flex>
-        ),
-        [queriesChartConfig.title, queriesTimeFrame],
-    );
-
-    const renderLatenciesChartToolbar = React.useCallback(
-        () => (
-            <Flex className={b('toolbar')} justifyContent="space-between" alignItems="center">
-                <div>{latenciesChartConfig.title}</div>
-                <TimeFrameDropdown
-                    value={latenciesTimeFrame}
-                    onChange={handleLatenciesTimeFrameChange}
-                />
-            </Flex>
-        ),
-        [latenciesChartConfig.title, latenciesTimeFrame],
-    );
-
     // WORKAROUND: Charts are rendered outside Disclosure component due to YAGR tooltip bug
     // Issue: https://github.com/gravity-ui/yagr/issues/262
 
@@ -109,15 +69,12 @@ export function QueriesActivityCharts({
                 <MetricChart
                     database={tenantName}
                     metrics={queriesChartConfig.metrics}
-                    timeFrame={queriesTimeFrame}
                     autorefresh={shouldRefresh}
                     height={ACTIVITY_CHART_HEIGHT}
                     chartOptions={queriesChartConfig.options}
                     onChartDataStatusChange={handleChartDataStatusChange}
                     isChartVisible={hasChartsLoaded && expanded}
-                    noBorder={true}
-                    fullWidth={true}
-                    renderChartToolbar={renderQueriesChartToolbar}
+                    title={queriesChartConfig.title}
                 />
             </div>
 
@@ -125,15 +82,12 @@ export function QueriesActivityCharts({
                 <MetricChart
                     database={tenantName}
                     metrics={latenciesChartConfig.metrics}
-                    timeFrame={latenciesTimeFrame}
                     autorefresh={shouldRefresh}
                     height={ACTIVITY_CHART_HEIGHT}
                     chartOptions={latenciesChartConfig.options}
                     onChartDataStatusChange={handleChartDataStatusChange}
                     isChartVisible={hasChartsLoaded && expanded}
-                    noBorder={true}
-                    fullWidth={true}
-                    renderChartToolbar={renderLatenciesChartToolbar}
+                    title={latenciesChartConfig.title}
                 />
             </div>
         </div>

@@ -1,12 +1,226 @@
-.metrics-cards {
-    display: flex;
-    gap: 16px;
+// Mixins for pseudo-element patterns
 
-    margin-bottom: 32px;
+/**
+ * Base mixin for creating positioned pseudo-elements with consistent sizing
+ * Used as foundation for all tab filler pseudo-elements
+ * @param {string} $side - Which side to position the element (left|right)
+ * @param {length} $height - Height of the pseudo-element
+ */
 
-    &__tab {
+@mixin pseudo-base($side: left, $height: var(--tab-filler-size)) {
+    position: absolute;
+    top: 100%;
+    #{$side}: 0;
+    width: var(--tab-filler-size);
+    height: $height;
+
+    content: '';
+
+    background-color: var(--g-color-base-background);
+}
+
+/**
+ * Creates a vertical filler for active tab states
+ * Used to extend the active tab's background below the container
+ * @param {string} $side - Which side to position the filler (left|right)
+ */
+
+@mixin pseudo-active-filler($side: left) {
+    @include pseudo-base($side, var(--g-spacing-3));
+    border-#{$side}: var(--tab-border-width) solid var(--g-color-line-generic);
+}
+
+/**
+ * Creates a rounded corner filler for inactive tab states
+ * Provides visual separation between tabs with border and radius
+ * @param {string} $side - Which side to position the filler (left|right)
+ */
+
+@mixin pseudo-inactive-filler($side: left) {
+    border-top: var(--tab-border-width) solid var(--g-color-line-generic);
+    @include pseudo-base($side, var(--tab-filler-size));
+    border-#{$side}: var(--tab-border-width) solid var(--g-color-line-generic);
+    border-top-#{$side}-radius: var(--g-border-radius-s);
+}
+
+/**
+ * Creates a simple background fill without borders
+ * Used as a background layer behind other pseudo-elements
+ * @param {string} $side - Which side to position the fill (left|right)
+ */
+
+@mixin pseudo-background-fill($side: left) {
+    @include pseudo-base($side, var(--tab-filler-size));
+}
+
+// Utility mixins for common patterns
+
+/**
+ * Consistent tab border styling for both active and inactive states
+ * Creates the characteristic tab shape with top and side borders only
+ * @param {color} $color - Border color to use
+ */
+
+@mixin tab-border-base($color) {
+    border: var(--tab-border-width) solid $color;
+    border-bottom: none;
+    border-radius: var(--g-border-radius-s) var(--g-border-radius-s) 0 0;
+}
+
+/**
+ * Complete edge filler system for first/last tabs
+ * Handles all pseudo-element states (active/inactive, ::before/::after)
+ * Creates the complex tab connection visuals for edge containers
+ * @param {string} $side - Which edge this applies to (left|right)
+ */
+
+@mixin tab-edge-filler($side) {
+    &.tenant-metrics-cards__link-container_active::after {
+        @include pseudo-active-filler($side);
+    }
+
+    &:not(.tenant-metrics-cards__link-container_active)::after {
+        @include pseudo-inactive-filler($side);
+    }
+
+    &:not(.tenant-metrics-cards__link-container_active)::before {
+        @include pseudo-background-fill($side);
+    }
+}
+
+.tenant-metrics-cards {
+    // CSS Variables for consistent design system
+    --tab-border-width: 1px;
+    --tab-filler-size: 10px;
+    --tab-overlap: -1px;
+    --tab-lift-offset: -6px;
+    --tab-border-compensation: 1px;
+    --tab-adjusted-spacing: calc(var(--g-spacing-3) - var(--tab-border-width));
+    --z-tab-base: 100;
+    --z-tab-active: 110;
+    --g-border-radius-xxl: 12px;
+
+    // Fallback for browsers without :has() support
+    @supports not selector(:has(*)) {
+        &__link-container:not(:last-child) {
+            padding-right: var(--tab-adjusted-spacing);
+
+            border-right: var(--tab-border-width) solid var(--g-color-line-generic);
+            border-bottom-right-radius: var(--g-border-radius-xxl);
+        }
+    }
+
+    &__link {
         text-decoration: none;
 
         color: inherit;
+
+        &:hover {
+            text-decoration: none;
+        }
+    }
+
+    &__link-container {
+        position: relative;
+        z-index: var(--z-tab-base);
+
+        flex: 1;
+
+        margin-left: var(--tab-overlap);
+        padding: 0 var(--g-spacing-3) var(--g-spacing-3) var(--g-spacing-3);
+
+        border-bottom: var(--tab-border-width) solid var(--g-color-line-generic);
+        background: var(--g-color-base-background);
+
+        .tenant-tab-card__card-container {
+            border: 1px solid transparent;
+            border-top: none;
+
+            & > div {
+                transform: translateY(1px);
+            }
+        }
+
+        &:nth-child(1) {
+            z-index: calc(var(--z-tab-base) + 3);
+        }
+
+        &:nth-child(2) {
+            z-index: calc(var(--z-tab-base) + 2);
+        }
+
+        &:nth-child(3) {
+            z-index: calc(var(--z-tab-base) + 1);
+        }
+
+        &:nth-child(4) {
+            z-index: calc(var(--z-tab-base) + 0);
+        }
+
+        // Reset edge padding for first/last elements
+        &:first-child {
+            margin-left: 0;
+        }
+
+        &:first-child {
+            padding-left: 0;
+            @include tab-edge-filler(left);
+        }
+
+        &:last-child {
+            margin-right: 0;
+            padding-right: 0;
+            @include tab-edge-filler(right);
+        }
+    }
+
+    &__link {
+        display: block;
+    }
+
+    // Active state styling
+    &__link-container_active {
+        z-index: var(--z-tab-active) !important;
+
+        padding: 0;
+
+        border-bottom: 0;
+        background: var(--g-color-base-background);
+
+        transform: translateY(var(--tab-lift-offset));
+
+        .tenant-tab-card__card-container {
+            border: none;
+            border-radius: var(--g-border-radius-xs);
+
+            & > div {
+                transform: translateY(0);
+            }
+        }
+
+        .tenant-metrics-cards__link {
+            padding-bottom: var(--tab-border-compensation);
+            @include tab-border-base(var(--g-color-line-generic));
+        }
+    }
+
+    // Adjacent tab styling (modern browsers with :has() support)
+    &__link-container:has(+ &__link-container_active) {
+        padding-right: var(--tab-adjusted-spacing);
+
+        border-right: var(--tab-border-width) solid var(--g-color-line-generic);
+        border-bottom-right-radius: var(--g-border-radius-xxl);
+    }
+
+    &__link-container_active + &__link-container {
+        padding-left: var(--tab-adjusted-spacing);
+
+        border-left: var(--tab-border-width) solid var(--g-color-line-generic);
+        border-bottom-left-radius: var(--g-border-radius-xxl);
+    }
+
+    // Reset padding for specific cases
+    &__link-container:not(:has(+ &__link-container_active)) {
+        padding-right: 0;
     }
 }

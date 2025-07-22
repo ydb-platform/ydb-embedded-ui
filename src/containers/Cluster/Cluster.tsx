@@ -30,6 +30,7 @@ import type {
 import {EFlag} from '../../types/api/enums';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useAppTitle} from '../App/AppTitleContext';
 import {Nodes} from '../Nodes/Nodes';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 import {TabletsTable} from '../Tablets/TabletsTable';
@@ -127,11 +128,13 @@ export function Cluster({
         [activeTabId, actualClusterTabs],
     );
 
+    const {appTitle} = useAppTitle();
+
     return (
         <div className={b()} ref={container}>
             <Helmet
-                defaultTitle={`${clusterTitle} — YDB Monitoring`}
-                titleTemplate={`%s — ${clusterTitle} — YDB Monitoring`}
+                defaultTitle={`${clusterTitle} — ${appTitle}`}
+                titleTemplate={`%s — ${clusterTitle} — ${appTitle}`}
             >
                 {activeTab ? <title>{activeTab.title}</title> : null}
             </Helmet>
