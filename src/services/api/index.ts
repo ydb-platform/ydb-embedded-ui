@@ -27,7 +27,11 @@ export class YdbEmbeddedAPI {
     meta?: MetaAPI;
     codeAssist?: CodeAssistAPI;
 
-    constructor({webVersion = false, withCredentials = false} = {}) {
+    constructor({
+        webVersion = false,
+        withCredentials = false,
+        csrfTokenGetter = () => undefined,
+    } = {}) {
         const config: AxiosRequestConfig = {withCredentials};
 
         this.auth = new AuthAPI({config});
@@ -47,5 +51,20 @@ export class YdbEmbeddedAPI {
         this.tablets = new TabletsAPI({config});
         this.vdisk = new VDiskAPI({config});
         this.viewer = new ViewerAPI({config});
+
+        const token = csrfTokenGetter();
+        if (token) {
+            this.auth.setCSRFToken(token);
+            this.meta?.setCSRFToken(token);
+            this.codeAssist?.setCSRFToken(token);
+            this.operation.setCSRFToken(token);
+            this.pdisk.setCSRFToken(token);
+            this.scheme.setCSRFToken(token);
+            this.storage.setCSRFToken(token);
+            this.streaming.setCSRFToken(token);
+            this.tablets.setCSRFToken(token);
+            this.vdisk.setCSRFToken(token);
+            this.viewer.setCSRFToken(token);
+        }
     }
 }
