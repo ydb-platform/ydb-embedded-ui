@@ -213,7 +213,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
             );
         }).filter(Boolean);
 
-        if (donorLinks.length > 0) {
+        if (donorLinks.length) {
             rightColumn.push({
                 label: vDiskInfoKeyset('donors'),
                 value: (
