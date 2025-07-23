@@ -115,12 +115,13 @@ export function Threads({nodeId, className}: ThreadsProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {
-        currentData: threadsData,
+        currentData: nodeData,
         isLoading,
         error,
-    } = nodeApi.useGetNodeThreadsQuery({nodeId}, {pollingInterval: autoRefreshInterval});
+    } = nodeApi.useGetNodeInfoQuery({nodeId}, {pollingInterval: autoRefreshInterval});
 
-    const data = threadsData?.Threads || [];
+    // Extract threads data from the node data
+    const data = nodeData?.Threads || [];
 
     return (
         <div className={b(null, className)}>

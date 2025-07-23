@@ -2,6 +2,7 @@ import type {BackendSortParam} from './common';
 import type {EFlag} from './enums';
 import type {TPDiskStateInfo} from './pdisk';
 import type {TTabletStateInfo} from './tablet';
+import type {TThreadPoolInfo} from './threads';
 import type {TVDiskStateInfo} from './vdisk';
 
 /**
@@ -152,6 +153,8 @@ export interface TSystemStateInfo {
     SharedCacheStats?: TNodeSharedCache;
     TotalSessions?: number;
     NodeName?: string;
+    /** Detailed thread information when fields_required=-1 is used */
+    Threads?: TThreadPoolInfo[];
 }
 
 interface TNodeStateInfo {

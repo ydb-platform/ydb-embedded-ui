@@ -26,25 +26,6 @@ export const nodeApi = api.injectEndpoints({
             },
             providesTags: ['All'],
         }),
-        getNodeThreads: build.query({
-            queryFn: async ({nodeId}: {nodeId: string}, {signal}) => {
-                try {
-                    const data = await window.api.viewer.getNodeInfo(nodeId, {signal});
-
-                    // Extract thread information from the response
-                    return {
-                        data: {
-                            Threads: data.Threads || [],
-                            ResponseTime: data.ResponseTime,
-                            ResponseDuration: data.ResponseDuration,
-                        },
-                    };
-                } catch (error) {
-                    return {error};
-                }
-            },
-            providesTags: ['All'],
-        }),
     }),
     overrideExisting: 'throw',
 });
