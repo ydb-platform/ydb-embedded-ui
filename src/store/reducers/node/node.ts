@@ -30,9 +30,22 @@ export const nodeApi = api.injectEndpoints({
         getNodeThreads: build.query({
             queryFn: async ({nodeId}: {nodeId: string}, {signal}) => {
                 try {
-                    const data = await window.api.viewer.getNodeThreads(nodeId, {signal});
-                    // TODO: Transform the data to extract detailed thread information
-                    // For now, return mock data matching the issue requirements
+                    const data = await window.api.viewer.getNodeInfo(nodeId, {signal});
+
+                    // Extract thread information from the response
+                    // If the backend provides Threads field with detailed info, use it
+                    // Otherwise, fall back to mock data for development
+                    if (data.Threads && data.Threads.length > 0) {
+                        return {
+                            data: {
+                                Threads: data.Threads,
+                                ResponseTime: data.ResponseTime,
+                                ResponseDuration: data.ResponseDuration,
+                            },
+                        };
+                    }
+
+                    // Fallback to mock data for development until backend is fully implemented
                     const mockThreadData = {
                         Threads: [
                             {
