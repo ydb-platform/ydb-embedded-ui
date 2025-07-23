@@ -145,14 +145,10 @@ export function VDiskInfo<T extends PreparedVDisk>({
                 label: vDiskInfoKeyset('replication-progress'),
                 value: (
                     <ProgressViewer
-                        value={ReplicationProgress}
-                        capacity={1}
-                        formatValues={(value) => [`${Math.round((value || 0) * 100)}%`]}
+                        value={Math.round(ReplicationProgress * 100)}
+                        percents
                         colorizeProgress={true}
-                        inverseColorize={true}
-                        dangerThreshold={0}
-                        warningThreshold={0}
-                        hideCapacity={true}
+                        capacity={100}
                     />
                 ),
             });
@@ -191,28 +187,28 @@ export function VDiskInfo<T extends PreparedVDisk>({
     }
 
     // Show donors list when replication is in progress
-    if (Replicated === false && VDiskState === EVDiskState.OK && Donors && Donors.length > 0) {
+    if (Replicated === false && VDiskState === EVDiskState.OK && Donors?.length) {
         const donorLinks = Donors.map((donor, index) => {
-            if (!donor.StringifiedId) {
+            const {
+                StringifiedId: id,
+                NodeId: dNodeId,
+                PDiskId: dPDiskId,
+                VDiskSlotId: dVSlotId,
+            } = donor;
+
+            if (!id || !dVSlotId || !dNodeId || !dPDiskId) {
                 return null;
             }
 
-            // Parse StringifiedId format: "nodeId-pDiskId-vDiskSlotId"
-            const parts = donor.StringifiedId.split('-');
-            if (parts.length !== 3) {
-                return donor.StringifiedId;
-            }
-
-            const [nodeId, pDiskId, vDiskSlotId] = parts;
             const vDiskPath = getVDiskPagePath({
-                nodeId: parseInt(nodeId),
-                pDiskId: parseInt(pDiskId),
-                vDiskSlotId: parseInt(vDiskSlotId),
+                nodeId: dNodeId,
+                pDiskId: dPDiskId,
+                vDiskSlotId: dVSlotId,
             });
 
             return (
                 <InternalLink key={index} to={vDiskPath}>
-                    {donor.StringifiedId}
+                    {id}
                 </InternalLink>
             );
         }).filter(Boolean);

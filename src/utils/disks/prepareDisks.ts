@@ -1,3 +1,5 @@
+import {isNil} from 'lodash';
+
 import {valueIsDefined} from '..';
 import type {TPDiskStateInfo} from '../../types/api/pdisk';
 import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
@@ -69,21 +71,21 @@ export function prepareWhiteboardVDiskData(
             return prepareWhiteboardVDiskData({...donor, DonorMode: true});
         } else {
             // TVSlotId data - create a minimal PreparedVDisk
-            const {NodeId: dNodeId, PDiskId: dPDiskId, VSlotId} = donor;
-            const StringifiedId = 
-                valueIsDefined(dNodeId) && valueIsDefined(dPDiskId) && valueIsDefined(VSlotId)
-                    ? `${dNodeId}-${dPDiskId}-${VSlotId}`
+            const {NodeId: dNodeId, PDiskId: dPDiskId, VSlotId: vSlotId} = donor;
+            const stringifiedId =
+                !isNil(dNodeId) && !isNil(dPDiskId) && !isNil(vSlotId)
+                    ? `${dNodeId}-${dPDiskId}-${vSlotId}`
                     : '';
-            
+
             return {
                 NodeId: dNodeId,
-                PDiskId: dPDiskId, 
-                VDiskSlotId: VSlotId,
-                StringifiedId,
+                PDiskId: dPDiskId,
+                VDiskSlotId: vSlotId,
+                StringifiedId: stringifiedId,
                 DonorMode: true,
-            } as PreparedVDisk;
+            };
         }
-    }).filter((donor) => donor.StringifiedId);
+    });
 
     return {
         ...restVDiskFields,
