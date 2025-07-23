@@ -1,5 +1,19 @@
 # Changelog
 
+## [11.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.2.0...v11.3.0) (2025-07-23)
+
+
+### Features
+
+* rework metric cards to tabs ([#2580](https://github.com/ydb-platform/ydb-embedded-ui/issues/2580)) ([016a515](https://github.com/ydb-platform/ydb-embedded-ui/commit/016a5158cec7cb32e69a4d76cf35c0a0e6f122a5))
+* use custom app title ([#2584](https://github.com/ydb-platform/ydb-embedded-ui/issues/2584)) ([c09d9be](https://github.com/ydb-platform/ydb-embedded-ui/commit/c09d9be6cabf835b3a20e6e47ff4909ce7502739))
+* **VDisk:** add replication progress, remaining time, donors info ([#2588](https://github.com/ydb-platform/ydb-embedded-ui/issues/2588)) ([f50686c](https://github.com/ydb-platform/ydb-embedded-ui/commit/f50686c9f906512406545d2df6ed3f545567e54c))
+
+
+### Bug Fixes
+
+* **SpeedMuliMeter:** add popup content padding ([#2585](https://github.com/ydb-platform/ydb-embedded-ui/issues/2585)) ([dd0108a](https://github.com/ydb-platform/ydb-embedded-ui/commit/dd0108a7db8b2aae6532ea0d7233d5537a7c9499))
+
 ## [11.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.1.1...v11.2.0) (2025-07-18)
 
 
