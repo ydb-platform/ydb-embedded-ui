@@ -4,9 +4,11 @@ import DataTable from '@gravity-ui/react-data-table';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {Loader} from '../../../components/Loader';
 import {ResizeableDataTable} from '../../../components/ResizeableDataTable/ResizeableDataTable';
+import {nodeApi} from '../../../store/reducers/node/node';
 import type {TThreadPoolInfo} from '../../../types/api/threads';
 import {cn} from '../../../utils/cn';
 import {formatNumber} from '../../../utils/dataFormatters/dataFormatters';
+import {useAutoRefreshInterval} from '../../../utils/hooks';
 
 import {CpuUsageBar} from './CpuUsageBar/CpuUsageBar';
 import {ThreadStatesBar} from './ThreadStatesBar/ThreadStatesBar';
@@ -17,6 +19,7 @@ import './Threads.scss';
 const b = cn('threads');
 
 interface ThreadsProps {
+    nodeId: string;
     className?: string;
 }
 
@@ -108,45 +111,21 @@ function ThreadsTable({data, loading}: ThreadsTableProps) {
 /**
  * Main threads component for displaying thread pool information
  */
-export function Threads({className}: ThreadsProps) {
-    // TODO: Replace with actual API call when thread endpoint is available
-    const mockData: TThreadPoolInfo[] = [
-        {
-            Name: 'AwsEventLoop',
-            Threads: 64,
-            SystemUsage: 0,
-            UserUsage: 0,
-            MinorPageFaults: 0,
-            MajorPageFaults: 0,
-            States: {S: 64},
-        },
-        {
-            Name: 'klktmr.IC',
-            Threads: 3,
-            SystemUsage: 0.2917210162,
-            UserUsage: 0.470575124,
-            MinorPageFaults: 0,
-            MajorPageFaults: 0,
-            States: {R: 2, S: 1},
-        },
-        {
-            Name: 'klktmr.IO',
-            Threads: 1,
-            SystemUsage: 0.001333074062,
-            UserUsage: 0.001333074062,
-            MinorPageFaults: 0,
-            MajorPageFaults: 0,
-            States: {S: 1},
-        },
-    ];
+export function Threads({nodeId, className}: ThreadsProps) {
+    const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    const loading = false;
-    const error = null;
+    const {
+        currentData: threadsData,
+        isLoading,
+        error,
+    } = nodeApi.useGetNodeThreadsQuery({nodeId}, {pollingInterval: autoRefreshInterval});
+
+    const data = threadsData?.Threads || [];
 
     return (
         <div className={b(null, className)}>
             {error ? <ResponseError error={error} className={b('error')} /> : null}
-            <ThreadsTable data={mockData} loading={loading} />
+            <ThreadsTable data={data} loading={isLoading} />
         </div>
     );
 }

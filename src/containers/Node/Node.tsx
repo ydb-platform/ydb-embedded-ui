@@ -249,7 +249,7 @@ function NodePageContent({
             }
 
             case 'threads': {
-                return <Threads />;
+                return <Threads nodeId={nodeId} />;
             }
 
             default:

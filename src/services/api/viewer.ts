@@ -600,4 +600,17 @@ export class ViewerAPI extends BaseYdbAPI {
             {concurrentId, requestConfig: {signal}},
         );
     }
+
+    getNodeThreads(nodeId: string | number, {concurrentId, signal}: AxiosOptions = {}) {
+        // TODO: This endpoint needs to be implemented in the YDB backend
+        // For now, we'll use the existing sysinfo endpoint and extract thread data
+        // In the future, this should be a dedicated /viewer/json/threads endpoint
+        return this.get<TEvSystemStateResponse>(
+            this.getPath('/viewer/json/sysinfo?enums=true'),
+            {
+                node_id: nodeId,
+            },
+            {concurrentId: concurrentId || `getNodeThreads|${nodeId}`, requestConfig: {signal}},
+        );
+    }
 }
