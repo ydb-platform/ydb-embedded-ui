@@ -1,0 +1,28 @@
+.cpu-usage-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    min-width: 120px;
+
+    &__progress {
+        flex: 1;
+
+        min-width: 60px;
+    }
+
+    &__text {
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    &__total {
+        font-weight: 500;
+    }
+
+    &__breakdown {
+        margin-left: 4px;
+
+        color: var(--g-color-text-secondary);
+    }
+}
