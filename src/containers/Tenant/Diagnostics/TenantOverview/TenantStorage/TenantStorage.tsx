@@ -16,7 +16,6 @@ import {useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
 import i18n from '../i18n';
-import {b} from '../utils';
 
 import {TopGroups} from './TopGroups';
 import {TopTables} from './TopTables';
@@ -83,6 +82,7 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
                     capacity={tabletStorageLimit}
                     formatValues={formatStorageValues}
                     colorizeProgress={true}
+                    size="storage"
                 />
             ),
         },
@@ -99,6 +99,7 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
                     capacity={blobStorageLimit}
                     formatValues={formatStorageValues}
                     colorizeProgress={true}
+                    size="storage"
                 />
             ),
         },
@@ -107,7 +108,11 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
     return (
         <React.Fragment>
             <TenantDashboard database={tenantName} charts={storageDashboardConfig} />
-            <InfoViewer className={b('storage-info')} title="Storage details" info={info} />
+            <InfoViewer
+                variant="storage"
+                title={i18n('storage.storage-details-title')}
+                info={info}
+            />
 
             <div className={tenantStorageCn('tabs-container')}>
                 <TabProvider value={storageTab}>
