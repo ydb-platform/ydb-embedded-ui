@@ -31,11 +31,12 @@ interface TenantDashboardProps {
 export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
     const graphShardExists = useGraphShardExists();
 
-    // If GraphShardExists capability is true, show dashboard immediately
-    // Otherwise, fall back to reactive behavior (hidden until first chart succeeds)
-    const [isDashboardHidden, setIsDashboardHidden] = React.useState<boolean>(
-        graphShardExists !== true,
-    );
+    const [hasSuccessfulChart, setHasSuccessfulChart] = React.useState<boolean>(false);
+
+    const isDashboardHidden = React.useMemo(() => {
+        return graphShardExists !== true && !hasSuccessfulChart;
+    }, [graphShardExists, hasSuccessfulChart]);
+
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     // Refetch data only if dashboard successfully loaded
@@ -54,7 +55,7 @@ export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
     const handleChartDataStatusChange = (chartStatus: ChartDataStatus) => {
         // Only use reactive behavior when GraphShardExists capability is not true
         if (graphShardExists !== true && chartStatus === 'success') {
-            setIsDashboardHidden(false);
+            setHasSuccessfulChart(true);
         }
     };
 
