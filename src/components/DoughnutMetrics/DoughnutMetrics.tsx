@@ -95,17 +95,17 @@ export function DoughnutMetrics({
 
     if (fillWidth <= 100) {
         const filledLength = (fillWidth / 100) * circumference;
-        // Use negative dash to go counter-clockwise
-        strokeDasharray = `0 ${circumference - filledLength} ${filledLength} 0`;
+        // Use clockwise fill direction
+        strokeDasharray = `${filledLength} ${circumference - filledLength}`;
     } else {
         // For values over 100%, we need to show overlap
-        strokeDasharray = `0 0 ${circumference} 0`;
+        strokeDasharray = `${circumference} 0`;
         // We'll use a second circle for the overlap
     }
 
     const needsOverlapCircle = fillWidth > 100;
     const overlapDasharray = needsOverlapCircle
-        ? `0 ${circumference - ((fillWidth - 100) / 100) * circumference} ${((fillWidth - 100) / 100) * circumference} 0`
+        ? `${((fillWidth - 100) / 100) * circumference} ${circumference - ((fillWidth - 100) / 100) * circumference}`
         : '0 0';
 
     return (
