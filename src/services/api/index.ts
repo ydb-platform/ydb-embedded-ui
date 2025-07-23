@@ -55,7 +55,9 @@ export class YdbEmbeddedAPI {
         const token = csrfTokenGetter();
         if (token) {
             this.auth.setCSRFToken(token);
+            // Use optional chaining as `meta` may not be initialized.
             this.meta?.setCSRFToken(token);
+            // Use optional chaining as `codeAssist` may not be initialized.
             this.codeAssist?.setCSRFToken(token);
             this.operation.setCSRFToken(token);
             this.pdisk.setCSRFToken(token);
