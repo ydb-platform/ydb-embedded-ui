@@ -6,12 +6,24 @@ import {Flex, HelpMark, Text} from '@gravity-ui/uikit';
 import {cn} from '../../utils/cn';
 import type {ProgressStatus} from '../../utils/progress';
 
+import {SvgCircle} from './SvgCircle';
+import {
+    ROTATION_OFFSET,
+    SIZE_CONFIG,
+    calculateCircumference,
+    calculateOverlapDasharray,
+    calculateStrokeDasharray,
+} from './utils';
+
 import './DoughnutMetrics.scss';
 
 const b = cn('ydb-doughnut-metrics');
 
-const SizeContext = React.createContext<'small' | 'medium' | 'large'>('medium');
+type Size = keyof typeof SIZE_CONFIG;
 
+const SizeContext = React.createContext<Size>('medium');
+
+// Legend component
 interface LegendProps {
     children?: React.ReactNode;
     variant?: TextProps['variant'];
@@ -25,7 +37,7 @@ function Legend({
     variant = 'subheader-3',
     color = 'primary',
     note,
-    noteIconSize,
+    noteIconSize = 'm',
 }: LegendProps) {
     return (
         <Flex gap={1} alignItems="center">
@@ -34,7 +46,7 @@ function Legend({
             </Text>
             {note && (
                 <HelpMark
-                    iconSize={noteIconSize || 'm'}
+                    iconSize={noteIconSize}
                     className={b('legend-note')}
                     popoverProps={{placement: 'right'}}
                 >
@@ -44,16 +56,11 @@ function Legend({
         </Flex>
     );
 }
+
+// Value component
 function Value({children, variant}: LegendProps) {
     const size = React.useContext(SizeContext);
-
-    const sizeVariantMap = {
-        small: 'subheader-1',
-        medium: 'subheader-2',
-        large: 'subheader-3',
-    } as const;
-
-    const finalVariant = variant || sizeVariantMap[size];
+    const finalVariant = variant || SIZE_CONFIG[size].textVariant;
 
     return (
         <Text variant={finalVariant} className={b('value')}>
@@ -62,12 +69,13 @@ function Value({children, variant}: LegendProps) {
     );
 }
 
+// Main component
 interface DoughnutProps {
     status: ProgressStatus;
     fillWidth: number;
     children?: React.ReactNode;
     className?: string;
-    size?: 'small' | 'medium' | 'large';
+    size?: Size;
 }
 
 export function DoughnutMetrics({
@@ -77,24 +85,57 @@ export function DoughnutMetrics({
     className,
     size = 'medium',
 }: DoughnutProps) {
-    let filledDegrees = fillWidth * 3.6;
-    let doughnutFillVar = 'var(--doughnut-color)';
-    let doughnutBackdropVar = 'var(--doughnut-backdrop-color)';
+    const config = SIZE_CONFIG[size];
+    const radius = (config.width - config.strokeWidth) / 2;
+    const circumference = calculateCircumference(radius);
+    const strokeDashoffset = circumference * ROTATION_OFFSET;
 
-    if (filledDegrees > 360) {
-        filledDegrees -= 360;
-        doughnutBackdropVar = 'var(--doughnut-color)';
-        doughnutFillVar = 'var(--doughnut-overlap-color)';
-    }
+    const centerX = config.width / 2;
+    const centerY = config.width / 2;
 
-    const doughnutStyle: React.CSSProperties = {
-        background: `conic-gradient(${doughnutFillVar} 0deg ${filledDegrees}deg, ${doughnutBackdropVar} ${filledDegrees}deg 360deg)`,
-    };
+    const strokeDasharray = calculateStrokeDasharray(fillWidth, circumference);
+    const overlapDasharray = calculateOverlapDasharray(fillWidth, circumference);
+    const needsOverlapCircle = fillWidth > 100;
 
     return (
         <SizeContext.Provider value={size}>
-            <div className={b({status}, className)} style={{position: 'relative'}}>
-                <div style={doughnutStyle} className={b('doughnut', {size})}></div>
+            <div className={b({status}, className)}>
+                <svg width={config.width} height={config.width} className={b('doughnut')}>
+                    {/* Background circle */}
+                    <SvgCircle
+                        cx={centerX}
+                        cy={centerY}
+                        r={radius}
+                        stroke="var(--doughnut-backdrop-color)"
+                        strokeWidth={config.strokeWidth}
+                    />
+
+                    {/* Progress circle */}
+                    <SvgCircle
+                        cx={centerX}
+                        cy={centerY}
+                        r={radius}
+                        stroke="var(--doughnut-color)"
+                        strokeWidth={config.strokeWidth}
+                        strokeDasharray={strokeDasharray}
+                        strokeDashoffset={strokeDashoffset}
+                        className={b('progress-circle')}
+                    />
+
+                    {/* Overlap circle for values > 100% */}
+                    {needsOverlapCircle && (
+                        <SvgCircle
+                            cx={centerX}
+                            cy={centerY}
+                            r={radius}
+                            stroke="var(--doughnut-overlap-color)"
+                            strokeWidth={config.strokeWidth}
+                            strokeDasharray={overlapDasharray}
+                            strokeDashoffset={strokeDashoffset}
+                            className={b('overlap-circle')}
+                        />
+                    )}
+                </svg>
                 <div className={b('text-wrapper')}>{children}</div>
             </div>
         </SizeContext.Provider>
