@@ -6,7 +6,7 @@ import type {TTenantInfo} from '../../../types/api/tenant';
 import {TENANT_INITIAL_PAGE_KEY} from '../../../utils/constants';
 import {api} from '../api';
 
-import {TENANT_CPU_TABS_IDS, TENANT_METRICS_TABS_IDS} from './constants';
+import {TENANT_CPU_TABS_IDS, TENANT_METRICS_TABS_IDS, TENANT_STORAGE_TABS_IDS} from './constants';
 import {tenantPageSchema} from './types';
 import type {
     TenantCpuTab,
@@ -15,6 +15,7 @@ import type {
     TenantPage,
     TenantQueryTab,
     TenantState,
+    TenantStorageTab,
     TenantSummaryTab,
 } from './types';
 
@@ -26,6 +27,7 @@ export const initialState: TenantState = {
     tenantPage,
     metricsTab: TENANT_METRICS_TABS_IDS.cpu,
     cpuTab: TENANT_CPU_TABS_IDS.nodes,
+    storageTab: TENANT_STORAGE_TABS_IDS.tables,
 };
 
 const slice = createSlice({
@@ -53,6 +55,9 @@ const slice = createSlice({
         setCpuTab: (state, action: PayloadAction<TenantCpuTab>) => {
             state.cpuTab = action.payload;
         },
+        setStorageTab: (state, action: PayloadAction<TenantStorageTab>) => {
+            state.storageTab = action.payload;
+        },
     },
 });
 
@@ -64,6 +69,7 @@ export const {
     setSummaryTab,
     setMetricsTab,
     setCpuTab,
+    setStorageTab,
 } = slice.actions;
 
 export const tenantApi = api.injectEndpoints({

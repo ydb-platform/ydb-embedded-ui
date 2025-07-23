@@ -44,6 +44,8 @@
   "title_top-nodes": "Top Nodes",
   "title_top-shards": "Top Shards",
   "title_top-queries": "Top Queries",
+  "title_top-tables-by-size": "Top Tables By Size",
+  "title_top-groups-by-usage": "Top Groups By Usage",
   "action_by-load": "By Load",
   "action_by-pool-usage": "By Pool Usage"
 }

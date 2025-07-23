@@ -49,3 +49,8 @@ export const TENANT_CPU_TABS_IDS = {
     shards: 'shards',
     queries: 'queries',
 } as const;
+
+export const TENANT_STORAGE_TABS_IDS = {
+    tables: 'tables',
+    groups: 'groups',
+} as const;

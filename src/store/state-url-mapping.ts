@@ -57,6 +57,10 @@ export const paramSetup = {
             stateKey: 'tenant.cpuTab',
             initialState: initialTenantState.cpuTab,
         },
+        storageTab: {
+            stateKey: 'tenant.storageTab',
+            initialState: initialTenantState.storageTab,
+        },
         shardsMode: {
             stateKey: 'shardsWorkload.mode',
         },
