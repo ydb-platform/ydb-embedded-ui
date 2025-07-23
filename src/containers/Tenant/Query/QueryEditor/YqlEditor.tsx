@@ -157,7 +157,6 @@ export function YqlEditor({
         editor.addAction({
             id: 'previous-query',
             label: i18n('action.previous-query'),
-            keybindings: [keybindings.selectPreviousQuery],
             contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
             contextMenuOrder: 2,
             run: () => {
@@ -167,7 +166,6 @@ export function YqlEditor({
         editor.addAction({
             id: 'next-query',
             label: i18n('action.next-query'),
-            keybindings: [keybindings.selectNextQuery],
             contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
             contextMenuOrder: 3,
             run: () => {
