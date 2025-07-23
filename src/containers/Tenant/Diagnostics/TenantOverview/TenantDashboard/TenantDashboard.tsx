@@ -53,8 +53,8 @@ export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
      * @todo disable only for specific errors ('GraphShard is not enabled') after ydb-stable-24 is generally used
      */
     const handleChartDataStatusChange = (chartStatus: ChartDataStatus) => {
-        // Only use reactive behavior when GraphShardExists capability is not true
-        if (graphShardExists !== true && chartStatus === 'success') {
+        // Always track successful chart loads for fallback behavior
+        if (chartStatus === 'success') {
             setHasSuccessfulChart(true);
         }
     };
