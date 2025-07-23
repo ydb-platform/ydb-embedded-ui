@@ -77,24 +77,81 @@ export function DoughnutMetrics({
     className,
     size = 'medium',
 }: DoughnutProps) {
-    let filledDegrees = fillWidth * 3.6;
-    let doughnutFillVar = 'var(--doughnut-color)';
-    let doughnutBackdropVar = 'var(--doughnut-backdrop-color)';
+    // Size configurations
+    const sizeConfig = {
+        small: {width: 65, strokeWidth: 12},
+        medium: {width: 100, strokeWidth: 16},
+        large: {width: 130, strokeWidth: 20},
+    };
 
-    if (filledDegrees > 360) {
-        filledDegrees -= 360;
-        doughnutBackdropVar = 'var(--doughnut-color)';
-        doughnutFillVar = 'var(--doughnut-overlap-color)';
+    const config = sizeConfig[size];
+    const radius = (config.width - config.strokeWidth) / 2;
+    const circumference = 2 * Math.PI * radius;
+
+    // Calculate stroke dash for filled portion
+    let strokeDasharray: string;
+    // Start from bottom (270 degrees = 0.75 of circumference)
+    const strokeDashoffset = circumference * 0.75;
+
+    if (fillWidth <= 100) {
+        const filledLength = (fillWidth / 100) * circumference;
+        // Use negative dash to go counter-clockwise
+        strokeDasharray = `0 ${circumference - filledLength} ${filledLength} 0`;
+    } else {
+        // For values over 100%, we need to show overlap
+        strokeDasharray = `0 0 ${circumference} 0`;
+        // We'll use a second circle for the overlap
     }
 
-    const doughnutStyle: React.CSSProperties = {
-        background: `conic-gradient(${doughnutFillVar} 0deg ${filledDegrees}deg, ${doughnutBackdropVar} ${filledDegrees}deg 360deg)`,
-    };
+    const needsOverlapCircle = fillWidth > 100;
+    const overlapDasharray = needsOverlapCircle
+        ? `0 ${circumference - ((fillWidth - 100) / 100) * circumference} ${((fillWidth - 100) / 100) * circumference} 0`
+        : '0 0';
 
     return (
         <SizeContext.Provider value={size}>
             <div className={b({status}, className)} style={{position: 'relative'}}>
-                <div style={doughnutStyle} className={b('doughnut', {size})}></div>
+                <svg width={config.width} height={config.width} className={b('doughnut', {size})}>
+                    {/* Background circle */}
+                    <circle
+                        cx={config.width / 2}
+                        cy={config.width / 2}
+                        r={radius}
+                        fill="none"
+                        stroke="var(--doughnut-backdrop-color)"
+                        strokeWidth={config.strokeWidth}
+                    />
+
+                    {/* Progress circle */}
+                    <circle
+                        cx={config.width / 2}
+                        cy={config.width / 2}
+                        r={radius}
+                        fill="none"
+                        stroke="var(--doughnut-color)"
+                        strokeWidth={config.strokeWidth}
+                        strokeDasharray={strokeDasharray}
+                        strokeDashoffset={strokeDashoffset}
+                        strokeLinecap="butt"
+                        className={b('progress-circle')}
+                    />
+
+                    {/* Overlap circle for values > 100% */}
+                    {needsOverlapCircle && (
+                        <circle
+                            cx={config.width / 2}
+                            cy={config.width / 2}
+                            r={radius}
+                            fill="none"
+                            stroke="var(--doughnut-overlap-color)"
+                            strokeWidth={config.strokeWidth}
+                            strokeDasharray={overlapDasharray}
+                            strokeDashoffset={strokeDashoffset}
+                            strokeLinecap="butt"
+                            className={b('overlap-circle')}
+                        />
+                    )}
+                </svg>
                 <div className={b('text-wrapper')}>{children}</div>
             </div>
         </SizeContext.Provider>
