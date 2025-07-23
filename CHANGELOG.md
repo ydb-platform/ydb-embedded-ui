@@ -1,5 +1,19 @@
 # Changelog
 
+## [11.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.3.0...v11.4.0) (2025-07-23)
+
+
+### Features
+
+* add support for csrf ([#2604](https://github.com/ydb-platform/ydb-embedded-ui/issues/2604)) ([7a4505f](https://github.com/ydb-platform/ydb-embedded-ui/commit/7a4505f8b79d17e2791f98dd2b881dcf03b0243c))
+* **prepareErrorMessage:** treat error.data as object ([#2601](https://github.com/ydb-platform/ydb-embedded-ui/issues/2601)) ([4937cd3](https://github.com/ydb-platform/ydb-embedded-ui/commit/4937cd37170257351d5618525c14cb7fb52a3562))
+* update versions colors ([#2596](https://github.com/ydb-platform/ydb-embedded-ui/issues/2596)) ([17c8d29](https://github.com/ydb-platform/ydb-embedded-ui/commit/17c8d292a709d9ca9817f65bf0ab6e1dfded424e))
+
+
+### Bug Fixes
+
+* use svg instead of mask for doughnuts ([#2600](https://github.com/ydb-platform/ydb-embedded-ui/issues/2600)) ([dcbefa1](https://github.com/ydb-platform/ydb-embedded-ui/commit/dcbefa1fba1445323d265f7a3105f29416693fa8))
+
 ## [11.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.2.0...v11.3.0) (2025-07-23)
 
 
