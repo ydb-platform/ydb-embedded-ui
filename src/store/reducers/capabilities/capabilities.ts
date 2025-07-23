@@ -65,6 +65,13 @@ export const selectSecuritySetting = createSelector(
         selectDatabaseCapabilities(state, database).data?.Settings?.Security?.[setting],
 );
 
+export const selectGraphShardExists = createSelector(
+    (state: RootState) => state,
+    (_state: RootState, database?: string) => database,
+    (state, database) =>
+        selectDatabaseCapabilities(state, database).data?.Settings?.Database?.GraphShardExists,
+);
+
 export async function queryCapability(
     capability: Capability,
     database: string | undefined,
