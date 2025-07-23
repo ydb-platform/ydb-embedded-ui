@@ -6,12 +6,24 @@ import {Flex, HelpMark, Text} from '@gravity-ui/uikit';
 import {cn} from '../../utils/cn';
 import type {ProgressStatus} from '../../utils/progress';
 
+import {SvgCircle} from './SvgCircle';
+import {
+    ROTATION_OFFSET,
+    SIZE_CONFIG,
+    calculateCircumference,
+    calculateOverlapDasharray,
+    calculateStrokeDasharray,
+} from './utils';
+
 import './DoughnutMetrics.scss';
 
 const b = cn('ydb-doughnut-metrics');
 
-const SizeContext = React.createContext<'small' | 'medium' | 'large'>('medium');
+type Size = keyof typeof SIZE_CONFIG;
 
+const SizeContext = React.createContext<Size>('medium');
+
+// Legend component
 interface LegendProps {
     children?: React.ReactNode;
     variant?: TextProps['variant'];
@@ -25,7 +37,7 @@ function Legend({
     variant = 'subheader-3',
     color = 'primary',
     note,
-    noteIconSize,
+    noteIconSize = 'm',
 }: LegendProps) {
     return (
         <Flex gap={1} alignItems="center">
@@ -34,7 +46,7 @@ function Legend({
             </Text>
             {note && (
                 <HelpMark
-                    iconSize={noteIconSize || 'm'}
+                    iconSize={noteIconSize}
                     className={b('legend-note')}
                     popoverProps={{placement: 'right'}}
                 >
@@ -44,16 +56,11 @@ function Legend({
         </Flex>
     );
 }
+
+// Value component
 function Value({children, variant}: LegendProps) {
     const size = React.useContext(SizeContext);
-
-    const sizeVariantMap = {
-        small: 'subheader-1',
-        medium: 'subheader-2',
-        large: 'subheader-3',
-    } as const;
-
-    const finalVariant = variant || sizeVariantMap[size];
+    const finalVariant = variant || SIZE_CONFIG[size].textVariant;
 
     return (
         <Text variant={finalVariant} className={b('value')}>
@@ -62,12 +69,13 @@ function Value({children, variant}: LegendProps) {
     );
 }
 
+// Main component
 interface DoughnutProps {
     status: ProgressStatus;
     fillWidth: number;
     children?: React.ReactNode;
     className?: string;
-    size?: 'small' | 'medium' | 'large';
+    size?: Size;
 }
 
 export function DoughnutMetrics({
@@ -77,77 +85,53 @@ export function DoughnutMetrics({
     className,
     size = 'medium',
 }: DoughnutProps) {
-    // Size configurations
-    const sizeConfig = {
-        small: {width: 65, strokeWidth: 12},
-        medium: {width: 100, strokeWidth: 16},
-        large: {width: 130, strokeWidth: 20},
-    };
-
-    const config = sizeConfig[size];
+    const config = SIZE_CONFIG[size];
     const radius = (config.width - config.strokeWidth) / 2;
-    const circumference = 2 * Math.PI * radius;
+    const circumference = calculateCircumference(radius);
+    const strokeDashoffset = circumference * ROTATION_OFFSET;
 
-    // Calculate stroke dash for filled portion
-    let strokeDasharray: string;
-    // Start from bottom (270 degrees = 0.75 of circumference)
-    const strokeDashoffset = circumference * 0.75;
+    const centerX = config.width / 2;
+    const centerY = config.width / 2;
 
-    if (fillWidth <= 100) {
-        const filledLength = (fillWidth / 100) * circumference;
-        // Use clockwise fill direction
-        strokeDasharray = `${filledLength} ${circumference - filledLength}`;
-    } else {
-        // For values over 100%, we need to show overlap
-        strokeDasharray = `${circumference} 0`;
-        // We'll use a second circle for the overlap
-    }
-
+    const strokeDasharray = calculateStrokeDasharray(fillWidth, circumference);
+    const overlapDasharray = calculateOverlapDasharray(fillWidth, circumference);
     const needsOverlapCircle = fillWidth > 100;
-    const overlapDasharray = needsOverlapCircle
-        ? `${((fillWidth - 100) / 100) * circumference} ${circumference - ((fillWidth - 100) / 100) * circumference}`
-        : '0 0';
 
     return (
         <SizeContext.Provider value={size}>
-            <div className={b({status}, className)} style={{position: 'relative'}}>
-                <svg width={config.width} height={config.width} className={b('doughnut', {size})}>
+            <div className={b({status}, className)}>
+                <svg width={config.width} height={config.width} className={b('doughnut')}>
                     {/* Background circle */}
-                    <circle
-                        cx={config.width / 2}
-                        cy={config.width / 2}
+                    <SvgCircle
+                        cx={centerX}
+                        cy={centerY}
                         r={radius}
-                        fill="none"
                         stroke="var(--doughnut-backdrop-color)"
                         strokeWidth={config.strokeWidth}
                     />
 
                     {/* Progress circle */}
-                    <circle
-                        cx={config.width / 2}
-                        cy={config.width / 2}
+                    <SvgCircle
+                        cx={centerX}
+                        cy={centerY}
                         r={radius}
-                        fill="none"
                         stroke="var(--doughnut-color)"
                         strokeWidth={config.strokeWidth}
                         strokeDasharray={strokeDasharray}
                         strokeDashoffset={strokeDashoffset}
-                        strokeLinecap="butt"
                         className={b('progress-circle')}
                     />
 
                     {/* Overlap circle for values > 100% */}
                     {needsOverlapCircle && (
-                        <circle
-                            cx={config.width / 2}
-                            cy={config.width / 2}
+                        <SvgCircle
+                            cx={centerX}
+                            cy={centerY}
                             r={radius}
-                            fill="none"
                             stroke="var(--doughnut-overlap-color)"
                             strokeWidth={config.strokeWidth}
                             strokeDasharray={overlapDasharray}
                             strokeDashoffset={strokeDashoffset}
-                            strokeLinecap="butt"
                             className={b('overlap-circle')}
                         />
                     )}
