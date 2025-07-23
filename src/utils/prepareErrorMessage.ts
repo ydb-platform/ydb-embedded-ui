@@ -7,7 +7,11 @@ export function prepareErrorMessage(error: unknown) {
         if ('data' in error && error.data) {
             if (typeof error.data === 'string') {
                 return error.data;
-            } else if (typeof error.data === 'object' && 'message' in error.data) {
+            } else if (
+                typeof error.data === 'object' &&
+                'message' in error.data &&
+                typeof error.data.message === 'string'
+            ) {
                 return error.data.message;
             }
         } else if ('statusText' in error && typeof error.statusText === 'string') {
