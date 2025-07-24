@@ -52,7 +52,7 @@ export function ProgressWrapper({
         if (numericCapacity <= 0) {
             return String(valueText);
         }
-        return i18n('value_of_capacity', {value: valueText, capacity: capacityText});
+        return i18n('context_capacity-usage', {value: valueText, capacity: capacityText});
     }, [valueText, capacityText, numericCapacity]);
 
     const validatedWidth = Math.max(0, width);
