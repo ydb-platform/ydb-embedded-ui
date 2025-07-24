@@ -32,7 +32,9 @@
     }
 
     &__title {
-        margin-bottom: 10px;
+        margin-bottom: var(--g-spacing-2);
+
+        font-weight: 500;
 
         @include mixins.subheader-1-typography();
     }

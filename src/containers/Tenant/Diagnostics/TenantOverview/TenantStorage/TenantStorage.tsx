@@ -4,13 +4,13 @@ import {Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 
 import {InfoViewer} from '../../../../../components/InfoViewer/InfoViewer';
 import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
+import {ProgressWrapper} from '../../../../../components/ProgressWrapper';
 import {TENANT_STORAGE_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {cn} from '../../../../../utils/cn';
 import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
 import i18n from '../i18n';
 
-import {ProgressWrapper} from './ProgressWrapper';
 import {TopGroups} from './TopGroups';
 import {TopTables} from './TopTables';
 import {storageDashboardConfig} from './storageDashboardConfig';
@@ -66,6 +66,7 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
                     value={tabletStorageUsed}
                     capacity={tabletStorageLimit}
                     formatValues={formatStorageValues}
+                    withValue
                 />
             ),
         },
@@ -81,6 +82,7 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
                     value={blobStorageUsed}
                     capacity={blobStorageLimit}
                     formatValues={formatStorageValues}
+                    withValue
                 />
             ),
         },
