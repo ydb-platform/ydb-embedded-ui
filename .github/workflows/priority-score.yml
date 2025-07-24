@@ -13,19 +13,58 @@ jobs:
         with:
           github-token: ${{ secrets.YDBOT_TOKEN }}
           script: |
-            const labelWeights = {
-              "prio/high": 1000,
-              "prio/medium": 500,
-              "prio/low": 100
+            // Priority estimation based on reach/impact/effort methodology
+            const reachWeights = {
+              "reach:high": 100,
+              "reach:medium": 75,
+              "reach:low": 50
+            };
+
+            const impactWeights = {
+              "impact:high": 200,
+              "impact:medium": 137.5,
+              "impact:low": 75
+            };
+
+            const effortWeights = {
+              "effort:high": 10,
+              "effort:medium": 5,
+              "effort:low": 2
             };
 
             const issue = context.payload.issue;
             const labels = issue.labels.map(l => l.name);
-            const basePriority = Math.min(...labels.map(l => labelWeights[l] || 10), 1000);
 
-            const createdAt = new Date(issue.created_at);
-            const daysOld = Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
-            const finalScore = basePriority + daysOld;
+            // Find reach, impact, and effort values from labels
+            let reach = null;
+            let impact = null;
+            let effort = null;
+
+            for (const label of labels) {
+              if (reachWeights[label] !== undefined) {
+                reach = reachWeights[label];
+              }
+              if (impactWeights[label] !== undefined) {
+                impact = impactWeights[label];
+              }
+              if (effortWeights[label] !== undefined) {
+                effort = effortWeights[label];
+              }
+            }
+
+            // Calculate priority score using formula: (reach * impact) / effort
+            let finalScore = 0;
+            if (reach !== null && impact !== null && effort !== null) {
+              finalScore = Math.round((reach * impact) / effort);
+            } else {
+              // Fallback to default values if labels are missing
+              const defaultReach = reach || 50;  // default to medium-low reach
+              const defaultImpact = impact || 75;  // default to low impact
+              const defaultEffort = effort || 5;  // default to medium effort
+              finalScore = Math.round((defaultReach * defaultImpact) / defaultEffort);
+            }
+
+            console.log(`📊 Priority calculation: reach=${reach || 'default'}, impact=${impact || 'default'}, effort=${effort || 'default'} → score=${finalScore}`);
 
             const projectNumber = 24;
             const org = "ydb-platform";
