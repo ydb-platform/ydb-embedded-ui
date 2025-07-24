@@ -28,6 +28,4 @@ export interface TenantState {
     diagnosticsTab?: TenantDiagnosticsTab;
     summaryTab?: TenantSummaryTab;
     metricsTab: TenantMetricsTab;
-    cpuTab?: TenantCpuTab;
-    nodesMode?: TenantNodesMode;
 }

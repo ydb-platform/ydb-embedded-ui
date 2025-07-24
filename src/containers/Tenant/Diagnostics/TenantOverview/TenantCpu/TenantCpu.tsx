@@ -2,21 +2,16 @@ import React from 'react';
 
 import {ArrowRight} from '@gravity-ui/icons';
 import {Flex, Icon, SegmentedRadioGroup, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
-import {useLocation} from 'react-router-dom';
 
 import {InternalLink} from '../../../../../components/InternalLink';
-import {parseQuery} from '../../../../../routes';
 import {
     TENANT_CPU_NODES_MODE_IDS,
     TENANT_CPU_TABS_IDS,
     TENANT_DIAGNOSTICS_TABS_IDS,
 } from '../../../../../store/reducers/tenant/constants';
-import {setNodesMode} from '../../../../../store/reducers/tenant/tenant';
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import {cn} from '../../../../../utils/cn';
-import {useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
 import {useDiagnosticsPageLinkGetter} from '../../../Diagnostics/DiagnosticsPages';
-import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
 import i18n from '../i18n';
 
@@ -25,6 +20,7 @@ import {TopNodesByLoad} from './TopNodesByLoad';
 import {TopQueries} from './TopQueries';
 import {TopShards} from './TopShards';
 import {cpuDashboardConfig} from './cpuDashboardConfig';
+import {useTenantCpuQueryParams} from './useTenantCpuQueryParams';
 
 import './TenantCpu.scss';
 
@@ -42,20 +38,13 @@ interface TenantCpuProps {
 }
 
 export function TenantCpu({tenantName, additionalNodesProps}: TenantCpuProps) {
-    const dispatch = useTypedDispatch();
-    const location = useLocation();
-    const {cpuTab = TENANT_CPU_TABS_IDS.nodes, nodesMode = TENANT_CPU_NODES_MODE_IDS.load} =
-        useTypedSelector((state) => state.tenant);
+    const {cpuTab, nodesMode, handleCpuTabChange, handleNodesModeChange} =
+        useTenantCpuQueryParams();
     const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
-
-    const queryParams = parseQuery(location);
 
     const renderNodesContent = () => {
         const nodesModeControl = (
-            <SegmentedRadioGroup
-                value={nodesMode}
-                onUpdate={(mode) => dispatch(setNodesMode(mode))}
-            >
+            <SegmentedRadioGroup value={nodesMode} onUpdate={handleNodesModeChange}>
                 <SegmentedRadioGroup.Option value={TENANT_CPU_NODES_MODE_IDS.load}>
                     {i18n('action_by-load')}
                 </SegmentedRadioGroup.Option>
@@ -120,15 +109,9 @@ export function TenantCpu({tenantName, additionalNodesProps}: TenantCpuProps) {
                 <TabProvider value={cpuTab}>
                     <TabList size="m">
                         {cpuTabs.map(({id, title}) => {
-                            const path = getTenantPath({
-                                ...queryParams,
-                                [TenantTabsGroups.cpuTab]: id,
-                            });
                             return (
-                                <Tab key={id} value={id}>
-                                    <InternalLink to={path} as="tab">
-                                        {title}
-                                    </InternalLink>
+                                <Tab key={id} value={id} onClick={() => handleCpuTabChange(id)}>
+                                    {title}
                                 </Tab>
                             );
                         })}

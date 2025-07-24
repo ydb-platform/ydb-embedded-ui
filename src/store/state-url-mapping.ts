@@ -53,14 +53,6 @@ export const paramSetup = {
             stateKey: 'tenant.metricsTab',
             initialState: initialTenantState.metricsTab,
         },
-        cpuTab: {
-            stateKey: 'tenant.cpuTab',
-            initialState: initialTenantState.cpuTab,
-        },
-        nodesMode: {
-            stateKey: 'tenant.nodesMode',
-            initialState: initialTenantState.nodesMode,
-        },
         shardsMode: {
             stateKey: 'shardsWorkload.mode',
         },
