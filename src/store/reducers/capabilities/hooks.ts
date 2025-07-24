@@ -6,6 +6,7 @@ import {
     capabilitiesApi,
     selectCapabilityVersion,
     selectDatabaseCapabilities,
+    selectGraphShardExists,
     selectMetaCapabilities,
     selectMetaCapabilityVersion,
     selectSecuritySetting,
@@ -96,6 +97,12 @@ const useGetSecuritySetting = (feature: SecuritySetting) => {
     const database = useDatabaseFromQuery();
 
     return useTypedSelector((state) => selectSecuritySetting(state, feature, database));
+};
+
+export const useGraphShardExists = () => {
+    const database = useDatabaseFromQuery();
+
+    return useTypedSelector((state) => selectGraphShardExists(state, database));
 };
 
 export const useClusterWithoutAuthInUI = () => {

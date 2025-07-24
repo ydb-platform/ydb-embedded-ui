@@ -6,6 +6,7 @@ import type {
     ChartOptions,
     MetricDescription,
 } from '../../../../../components/MetricChart';
+import {useGraphShardExists} from '../../../../../store/reducers/capabilities/hooks';
 import {cn} from '../../../../../utils/cn';
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 
@@ -28,7 +29,14 @@ interface TenantDashboardProps {
 }
 
 export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
-    const [isDashboardHidden, setIsDashboardHidden] = React.useState<boolean>(true);
+    const graphShardExists = useGraphShardExists();
+
+    const [hasSuccessfulChart, setHasSuccessfulChart] = React.useState<boolean>(false);
+
+    const isDashboardHidden = React.useMemo(() => {
+        return !graphShardExists && !hasSuccessfulChart;
+    }, [graphShardExists, hasSuccessfulChart]);
+
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     // Refetch data only if dashboard successfully loaded
@@ -40,12 +48,14 @@ export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
      * 2. ydb version does not have /viewer/json/render endpoint (400, 404, CORS error, etc.)
      *
      * If at least one chart successfully loaded, dashboard should be shown
+     * This fallback behavior is only used when GraphShardExists capability is not available or false
      * @link https://github.com/ydb-platform/ydb-embedded-ui/issues/659
      * @todo disable only for specific errors ('GraphShard is not enabled') after ydb-stable-24 is generally used
      */
     const handleChartDataStatusChange = (chartStatus: ChartDataStatus) => {
+        // Always track successful chart loads for fallback behavior
         if (chartStatus === 'success') {
-            setIsDashboardHidden(false);
+            setHasSuccessfulChart(true);
         }
     };
 
