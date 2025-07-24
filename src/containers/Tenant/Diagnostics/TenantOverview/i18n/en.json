@@ -35,7 +35,7 @@
   "charts.cpu-usage": "CPU usage by pool",
   "charts.storage-usage": "Tablet storage usage",
   "charts.memory-usage": "Memory usage",
-  "storage.storage-details-title": "Storage Details",
+  "title_storage-details": "Storage Details",
   "storage.tablet-storage-title": "Tablet storage",
   "storage.tablet-storage-description": "Size of user data and indexes stored in schema objects (tables, topics, etc.)",
   "storage.db-storage-title": "Database storage",

@@ -89,7 +89,7 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
     return (
         <React.Fragment>
             <TenantDashboard database={tenantName} charts={storageDashboardConfig} />
-            <InfoViewer variant="small" title={i18n('storage.storage-details-title')} info={info} />
+            <InfoViewer variant="small" title={i18n('title_storage-details')} info={info} />
 
             <div className={tenantStorageCn('tabs-container')}>
                 <TabProvider value={storageTab}>

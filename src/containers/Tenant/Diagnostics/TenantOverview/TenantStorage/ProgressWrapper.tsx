@@ -17,6 +17,9 @@ interface ProgressWrapperProps {
     width?: number;
 }
 
+const isValidValue = (val?: number | string): boolean =>
+    isNumeric(val) && safeParseNumber(val) >= 0;
+
 export function ProgressWrapper({
     value,
     capacity,
@@ -24,16 +27,12 @@ export function ProgressWrapper({
     className,
     width = DEFAULT_PROGRESS_WIDTH,
 }: ProgressWrapperProps) {
-    if (!isNumeric(value)) {
+    if (!isValidValue(value)) {
         return <div className={className}>{i18n('alert_no-data')}</div>;
     }
 
     const numericValue = safeParseNumber(value);
     const numericCapacity = safeParseNumber(capacity);
-
-    if (numericValue < 0) {
-        return <div className={className}>{i18n('alert_no-data')}</div>;
-    }
 
     const rawPercentage =
         numericCapacity > 0
