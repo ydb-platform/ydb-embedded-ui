@@ -13,12 +13,25 @@ export function getMaybeNumber(value: string | number | undefined): number | und
     return isNumeric(value) ? parseFloat(String(value)) : undefined;
 }
 
-interface MemorySegment {
+export interface MemorySegment {
     label: string;
     key: string;
     value: number;
     capacity?: number;
     isInfo?: boolean;
+}
+
+// Memory segment colors using CSS variables for theme support
+export const MEMORY_SEGMENT_COLORS: Record<string, string> = {
+    SharedCacheConsumption: 'var(--g-color-base-info-medium)',
+    QueryExecutionConsumption: 'var(--g-color-base-positive-medium)',
+    MemTableConsumption: 'var(--g-color-base-warning-medium)',
+    AllocatorCachesMemory: 'var(--g-color-base-danger-medium)',
+    Other: 'var(--g-color-base-neutral-medium)',
+};
+
+export function getMemorySegmentColor(key: string): string {
+    return MEMORY_SEGMENT_COLORS[key] || MEMORY_SEGMENT_COLORS['Other'];
 }
 
 export function getMemorySegments(stats: TMemoryStats, memoryUsage: number): MemorySegment[] {

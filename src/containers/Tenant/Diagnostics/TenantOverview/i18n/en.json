@@ -48,5 +48,7 @@
   "title_top-tables-by-size": "Top Tables By Size",
   "title_top-groups-by-usage": "Top Groups By Usage",
   "action_by-load": "By Load",
-  "action_by-pool-usage": "By Pool Usage"
+  "action_by-pool-usage": "By Pool Usage",
+  "title_memory-details": "Memory Details",
+  "field_memory-usage": "Memory usage"
 }
