@@ -38,11 +38,10 @@ export function ProgressWrapper({
         return <div className={className}>{i18n('alert_no-data')}</div>;
     }
 
-    if (numericCapacity <= 0 && capacity !== undefined) {
-        return <div className={className}>{i18n('alert_no-data')}</div>;
-    }
-
-    const rawPercentage = Math.floor((numericValue / numericCapacity) * MAX_PERCENTAGE);
+    const rawPercentage =
+        numericCapacity > 0
+            ? Math.floor((numericValue / numericCapacity) * MAX_PERCENTAGE)
+            : MAX_PERCENTAGE;
     const fillWidth = Math.max(MIN_PERCENTAGE, rawPercentage);
     const clampedFillWidth = Math.min(fillWidth, MAX_PERCENTAGE);
 
@@ -54,7 +53,7 @@ export function ProgressWrapper({
     }, [formatValues, value, capacity]);
 
     const displayText = React.useMemo(() => {
-        if (!isNumeric(numericCapacity) || numericCapacity <= 0) {
+        if (numericCapacity <= 0) {
             return String(valueText);
         }
         return i18n('value_of_capacity', {value: valueText, capacity: capacityText});
