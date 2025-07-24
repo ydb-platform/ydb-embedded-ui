@@ -2,7 +2,8 @@ import React from 'react';
 
 import {Flex, Progress, Text} from '@gravity-ui/uikit';
 
-import type {FormatProgressViewerValues} from '../../../../../components/ProgressViewer/ProgressViewer';
+import {defaultFormatProgressValues} from '../../../../../utils/progress';
+import type {FormatProgressViewerValues} from '../../../../../utils/progress';
 import {isNumeric, safeParseNumber} from '../../../../../utils/utils';
 
 import {DEFAULT_PROGRESS_WIDTH, MAX_PERCENTAGE, MIN_PERCENTAGE, PROGRESS_SIZE} from './constants';
@@ -16,14 +17,10 @@ interface ProgressWrapperProps {
     width?: number;
 }
 
-const defaultFormatValues: FormatProgressViewerValues = (value, total) => {
-    return [value, total];
-};
-
 export function ProgressWrapper({
     value,
     capacity,
-    formatValues = defaultFormatValues,
+    formatValues = defaultFormatProgressValues,
     className,
     width = DEFAULT_PROGRESS_WIDTH,
 }: ProgressWrapperProps) {
