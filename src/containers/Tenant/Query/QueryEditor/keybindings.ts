@@ -9,8 +9,6 @@ export function getKeyBindings(monaco: typeof Monaco) {
     return {
         sendQuery: ctrlKey | KeyCode.Enter,
         sendSelectedQuery: ctrlKey | KeyMod.Shift | monaco.KeyCode.Enter,
-        selectPreviousQuery: ctrlKey | KeyCode.UpArrow,
-        selectNextQuery: ctrlKey | KeyCode.DownArrow,
         saveQuery: ctrlKey | KeyCode.KeyS,
         saveSelectedQuery: ctrlKey | KeyMod.Shift | KeyCode.KeyS,
         shortcutsHotkey: ctrlKey | KeyCode.KeyK,

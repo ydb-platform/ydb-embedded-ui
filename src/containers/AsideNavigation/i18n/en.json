@@ -15,8 +15,6 @@
   "hotkeys.title": "Keyboard shortcuts",
   "hotkeys.execute-query": "Execute query",
   "hotkeys.execute-selected-query": "Execute selected query",
-  "hotkeys.previous-query": "Previous query",
-  "hotkeys.next-query": "Next query",
   "hotkeys.save-query": "Save query",
   "hotkeys.save-selected-query": "Save selected query"
 }
