@@ -155,12 +155,35 @@ The action should log calculation details in this format:
 - If calculations seem incorrect, check the action logs for the exact values used
 - If default values aren't applied correctly, verify the fallback logic in the script
 
+## Additional Test Cases (13-15)
+
+### Test Case 13: Multiple Labels of Same Category (Overwrite Behavior)
+
+1. Create an issue with labels: `reach:low`, `reach:medium`, `reach:high`, `impact:medium`, `effort:low`
+2. Run the GitHub action
+3. **Expected Priority Score**: (100 × 137.5) / 2 = **6,875** (should use `reach:high` as the last processed)
+4. Verify the action correctly handles multiple conflicting labels
+
+### Test Case 14: Edge Case - Lowest Possible Score
+
+1. Create an issue with labels: `reach:low`, `impact:low`, `effort:high`
+2. Run the GitHub action
+3. **Expected Priority Score**: (50 × 75) / 10 = **375**
+4. Verify this represents the minimum priority calculation
+
+### Test Case 15: Edge Case - Highest Possible Score
+
+1. Create an issue with labels: `reach:high`, `impact:high`, `effort:low`
+2. Run the GitHub action
+3. **Expected Priority Score**: (100 × 200) / 2 = **10,000**
+4. Verify this represents the maximum priority calculation
+
 ## Boundary Testing
 
 Additional edge cases to consider:
 
-- Very old issues (does age factor still apply?)
 - Issues with special characters in labels
 - Issues not added to the project board
 - Network failures during GraphQL API calls
-- Issues with multiple reach/impact/effort labels
+- Issues with multiple reach/impact/effort labels (should use last processed value)
+- Rounding behavior for non-integer results
