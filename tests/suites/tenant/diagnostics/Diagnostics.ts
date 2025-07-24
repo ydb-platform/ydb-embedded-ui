@@ -304,11 +304,9 @@ export class Diagnostics {
         this.copyLinkButton = page.locator('.ydb-copy-link-button__icon');
 
         // Info tab cards
-        this.cpuCard = page.locator('.tenant-metrics-cards__link-container:has-text("CPU")');
-        this.storageCard = page.locator(
-            '.tenant-metrics-cards__link-container:has-text("Storage")',
-        );
-        this.memoryCard = page.locator('.tenant-metrics-cards__link-container:has-text("Memory")');
+        this.cpuCard = page.locator('.tenant-metrics-tabs__link-container:has-text("CPU")');
+        this.storageCard = page.locator('.tenant-metrics-tabs__link-container:has-text("Storage")');
+        this.memoryCard = page.locator('.tenant-metrics-tabs__link-container:has-text("Memory")');
         this.healthcheckCard = page.locator('.ydb-healthcheck-preview');
         this.ownerCard = page.locator('.ydb-access-rights__owner-card');
         this.changeOwnerButton = page.locator('.ydb-access-rights__owner-card button');
