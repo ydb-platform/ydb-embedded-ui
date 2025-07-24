@@ -31,6 +31,10 @@ export class YdbEmbeddedAPI {
         webVersion = false,
         withCredentials = false,
         csrfTokenGetter = () => undefined,
+    }: {
+        webVersion?: boolean;
+        withCredentials?: boolean;
+        csrfTokenGetter?: () => string | undefined;
     } = {}) {
         const config: AxiosRequestConfig = {withCredentials};
 
