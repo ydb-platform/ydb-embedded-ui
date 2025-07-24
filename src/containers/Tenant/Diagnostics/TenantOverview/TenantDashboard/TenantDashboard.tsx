@@ -34,7 +34,7 @@ export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
     const [hasSuccessfulChart, setHasSuccessfulChart] = React.useState<boolean>(false);
 
     const isDashboardHidden = React.useMemo(() => {
-        return graphShardExists !== true && !hasSuccessfulChart;
+        return !graphShardExists && !hasSuccessfulChart;
     }, [graphShardExists, hasSuccessfulChart]);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
