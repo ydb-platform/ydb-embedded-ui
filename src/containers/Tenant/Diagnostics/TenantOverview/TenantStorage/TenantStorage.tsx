@@ -66,7 +66,6 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
                     value={tabletStorageUsed}
                     capacity={tabletStorageLimit}
                     formatValues={formatStorageValues}
-                    size="storage"
                 />
             ),
         },
@@ -82,7 +81,6 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
                     value={blobStorageUsed}
                     capacity={blobStorageLimit}
                     formatValues={formatStorageValues}
-                    size="storage"
                 />
             ),
         },

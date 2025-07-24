@@ -5,14 +5,13 @@ import {Flex, Progress, Text} from '@gravity-ui/uikit';
 import type {FormatProgressViewerValues} from '../../../../../components/ProgressViewer/ProgressViewer';
 import {isNumeric, safeParseNumber} from '../../../../../utils/utils';
 
-import {DEFAULT_PROGRESS_WIDTH, MAX_PERCENTAGE, MIN_PERCENTAGE, PROGRESS_SIZES} from './constants';
+import {DEFAULT_PROGRESS_WIDTH, MAX_PERCENTAGE, MIN_PERCENTAGE, PROGRESS_SIZE} from './constants';
 import i18n from './i18n';
 
 interface ProgressWrapperProps {
     value?: number | string;
     capacity?: number | string;
     formatValues?: FormatProgressViewerValues;
-    size?: 'storage';
     className?: string;
     width?: number;
 }
@@ -25,7 +24,6 @@ export function ProgressWrapper({
     value,
     capacity,
     formatValues = defaultFormatValues,
-    size = 'storage',
     className,
     width = DEFAULT_PROGRESS_WIDTH,
 }: ProgressWrapperProps) {
@@ -64,26 +62,14 @@ export function ProgressWrapper({
 
     const validatedWidth = Math.max(0, width);
 
-    if (size === 'storage') {
-        return (
-            <Flex alignItems="center" gap="2" className={className}>
-                <div style={{width: `${validatedWidth}px`}}>
-                    <Progress
-                        value={clampedFillWidth}
-                        theme="success"
-                        size={PROGRESS_SIZES.STORAGE}
-                    />
-                </div>
-                <Text variant="body-1" color="secondary">
-                    {displayText}
-                </Text>
-            </Flex>
-        );
-    }
-
     return (
-        <div className={className}>
-            <Progress value={clampedFillWidth} text={displayText} size={PROGRESS_SIZES.DEFAULT} />
-        </div>
+        <Flex alignItems="center" gap="2" className={className}>
+            <div style={{width: `${validatedWidth}px`}}>
+                <Progress value={clampedFillWidth} theme="success" size={PROGRESS_SIZE} />
+            </div>
+            <Text variant="body-1" color="secondary">
+                {displayText}
+            </Text>
+        </Flex>
     );
 }
