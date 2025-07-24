@@ -1,17 +1,15 @@
-import {Flex, Text, useTheme} from '@gravity-ui/uikit';
+import {useTheme} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 import {formatNumber, roundToPrecision} from '../../utils/dataFormatters/dataFormatters';
 import {calculateProgressStatus} from '../../utils/progress';
 import {isNumeric} from '../../utils/utils';
 
-import i18n from './i18n';
-
 import './ProgressViewer.scss';
 
 const b = cn('progress-viewer');
 
-type ProgressViewerSize = 'xs' | 's' | 'ns' | 'm' | 'n' | 'l' | 'head' | 'storage';
+type ProgressViewerSize = 'xs' | 's' | 'ns' | 'm' | 'n' | 'l' | 'head';
 
 export type FormatProgressViewerValues = (
     value?: number,
@@ -109,29 +107,7 @@ export function ProgressViewer({
         return valueText;
     };
 
-    const isStorageVariant = size === 'storage';
-
     if (isNumeric(value)) {
-        if (isStorageVariant) {
-            const storageDisplayText =
-                isNumeric(capacity) && !hideCapacity
-                    ? i18n('value_of_capacity', {value: valueText, capacity: capacityText})
-                    : valueText;
-
-            return (
-                <Flex alignItems="center" gap="2" className={className}>
-                    <div className={b({size, theme, status})}>
-                        <div className={b('progress-container')}>
-                            <div className={b('line')} style={lineStyle}></div>
-                        </div>
-                    </div>
-                    <Text variant="body-2" color="secondary">
-                        {storageDisplayText}
-                    </Text>
-                </Flex>
-            );
-        }
-
         return (
             <div className={b({size, theme, status}, className)}>
                 <div className={b('line')} style={lineStyle}></div>
@@ -140,5 +116,5 @@ export function ProgressViewer({
         );
     }
 
-    return <div className={`${b({size})} ${className || ''} error`}>{i18n('no-data')}</div>;
+    return <div className={`${b({size})} ${className} error`}>no data</div>;
 }

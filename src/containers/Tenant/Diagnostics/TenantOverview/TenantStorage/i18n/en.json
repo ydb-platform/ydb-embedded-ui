@@ -1,0 +1,4 @@
+{
+  "alert_no-data": "No data",
+  "value_of_capacity": "{{value}} of {{capacity}}"
+}

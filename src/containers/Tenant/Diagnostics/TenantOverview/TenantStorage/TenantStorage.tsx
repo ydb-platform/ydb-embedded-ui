@@ -4,13 +4,13 @@ import {Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 
 import {InfoViewer} from '../../../../../components/InfoViewer/InfoViewer';
 import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
-import {ProgressViewer} from '../../../../../components/ProgressViewer/ProgressViewer';
 import {TENANT_STORAGE_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {cn} from '../../../../../utils/cn';
 import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
 import i18n from '../i18n';
 
+import {ProgressWrapper} from './ProgressWrapper';
 import {TopGroups} from './TopGroups';
 import {TopTables} from './TopTables';
 import {storageDashboardConfig} from './storageDashboardConfig';
@@ -62,11 +62,10 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
                 />
             ),
             value: (
-                <ProgressViewer
+                <ProgressWrapper
                     value={tabletStorageUsed}
                     capacity={tabletStorageLimit}
                     formatValues={formatStorageValues}
-                    colorizeProgress={true}
                     size="storage"
                 />
             ),
@@ -79,11 +78,10 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
                 />
             ),
             value: (
-                <ProgressViewer
+                <ProgressWrapper
                     value={blobStorageUsed}
                     capacity={blobStorageLimit}
                     formatValues={formatStorageValues}
-                    colorizeProgress={true}
                     size="storage"
                 />
             ),
@@ -93,11 +91,7 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
     return (
         <React.Fragment>
             <TenantDashboard database={tenantName} charts={storageDashboardConfig} />
-            <InfoViewer
-                variant="storage"
-                title={i18n('storage.storage-details-title')}
-                info={info}
-            />
+            <InfoViewer variant="small" title={i18n('storage.storage-details-title')} info={info} />
 
             <div className={tenantStorageCn('tabs-container')}>
                 <TabProvider value={storageTab}>

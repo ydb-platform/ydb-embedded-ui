@@ -16,7 +16,7 @@ export interface InfoViewerProps {
     info?: InfoViewerItem[];
     dots?: boolean;
     size?: 's';
-    variant?: 'default' | 'storage';
+    variant?: 'default' | 'small';
     className?: string;
     multilineLabels?: boolean;
     renderEmptyState?: (props?: Pick<InfoViewerProps, 'title' | 'size'>) => React.ReactNode;
