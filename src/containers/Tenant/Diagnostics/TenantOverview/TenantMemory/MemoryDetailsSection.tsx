@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {Text} from '@gravity-ui/uikit';
 
 import i18n from '../../../../../components/MemoryViewer/i18n';
@@ -18,19 +20,24 @@ interface MemoryDetailsSectionProps {
 }
 
 export function MemoryDetailsSection({memoryStats}: MemoryDetailsSectionProps) {
-    let memoryUsage: number;
-    if (memoryStats.AnonRss === undefined) {
-        memoryUsage =
-            Number(memoryStats.AllocatedMemory || 0) +
-            Number(memoryStats.AllocatorCachesMemory || 0);
-    } else {
-        memoryUsage = Number(memoryStats.AnonRss);
-    }
+    const memoryUsage = React.useMemo(() => {
+        if (memoryStats.AnonRss === undefined) {
+            return (
+                Number(memoryStats.AllocatedMemory || 0) +
+                Number(memoryStats.AllocatorCachesMemory || 0)
+            );
+        } else {
+            return Number(memoryStats.AnonRss);
+        }
+    }, [memoryStats.AnonRss, memoryStats.AllocatedMemory, memoryStats.AllocatorCachesMemory]);
 
-    const memorySegments = getMemorySegments(memoryStats, Number(memoryUsage));
-    const displaySegments = memorySegments.filter(
-        (segment) => !segment.isInfo && segment.value > 0,
-    );
+    const memorySegments = React.useMemo(() => {
+        return getMemorySegments(memoryStats, memoryUsage);
+    }, [memoryStats, memoryUsage]);
+
+    const displaySegments = React.useMemo(() => {
+        return memorySegments.filter((segment) => !segment.isInfo && segment.value > 0);
+    }, [memorySegments]);
 
     return (
         <div className={b()}>

@@ -25,21 +25,31 @@ export function StackProgress({
     size = PROGRESS_SIZE,
     withValue = false,
 }: ProgressWrapperStackProps) {
-    const displaySegments = stack.filter((segment) => !segment.isInfo && segment.value > 0);
+    const displaySegments = React.useMemo(() => {
+        return stack.filter((segment) => !segment.isInfo && segment.value > 0);
+    }, [stack]);
 
     if (displaySegments.length === 0) {
         return <div className={className}>{i18n('alert_no-data')}</div>;
     }
 
-    const totalValue = displaySegments.reduce((sum, segment) => sum + segment.value, 0);
-    const numericTotalCapacity = safeParseNumber(totalCapacity);
+    const totalValue = React.useMemo(() => {
+        return displaySegments.reduce((sum, segment) => sum + segment.value, 0);
+    }, [displaySegments]);
+
+    const numericTotalCapacity = React.useMemo(() => {
+        return safeParseNumber(totalCapacity);
+    }, [totalCapacity]);
+
     const maxValue = numericTotalCapacity || totalValue;
 
-    const stackElements = displaySegments.map((segment) => ({
-        value: maxValue > 0 ? (segment.value / maxValue) * MAX_PERCENTAGE : 0,
-        color: getMemorySegmentColor(segment.key),
-        title: segment.label,
-    }));
+    const stackElements = React.useMemo(() => {
+        return displaySegments.map((segment) => ({
+            value: maxValue > 0 ? (segment.value / maxValue) * MAX_PERCENTAGE : 0,
+            color: getMemorySegmentColor(segment.key),
+            title: segment.label,
+        }));
+    }, [displaySegments, maxValue]);
 
     const [totalValueText, totalCapacityText] = React.useMemo(() => {
         return formatDisplayValues(totalValue, numericTotalCapacity || totalValue, formatValues);

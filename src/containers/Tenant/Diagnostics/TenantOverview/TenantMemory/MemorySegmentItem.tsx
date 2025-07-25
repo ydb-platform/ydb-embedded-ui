@@ -14,13 +14,23 @@ interface MemorySegmentItemProps {
 }
 
 export function MemorySegmentItem({segment}: MemorySegmentItemProps) {
-    const segmentColor = getMemorySegmentColor(segment.key);
+    const segmentColor = React.useMemo(() => {
+        return getMemorySegmentColor(segment.key);
+    }, [segment.key]);
 
-    const valueText = formatSegmentValue(segment.value, segment.capacity);
+    const valueText = React.useMemo(() => {
+        return formatSegmentValue(segment.value, segment.capacity);
+    }, [segment.value, segment.capacity]);
 
-    const progressStyle: React.CSSProperties & Record<string, string> = {
-        '--g-progress-filled-background-color': segmentColor,
-    };
+    const progressValue = React.useMemo(() => {
+        return segment.capacity ? (segment.value / segment.capacity) * 100 : 100;
+    }, [segment.value, segment.capacity]);
+
+    const progressStyle: React.CSSProperties & Record<string, string> = React.useMemo(() => {
+        return {
+            '--g-progress-filled-background-color': segmentColor,
+        };
+    }, [segmentColor]);
 
     return (
         <div className={b('segment-row')}>
@@ -37,11 +47,7 @@ export function MemorySegmentItem({segment}: MemorySegmentItemProps) {
                         <div className={b('segment-progress')}>
                             <div style={progressStyle}>
                                 <Progress
-                                    value={
-                                        segment.capacity
-                                            ? (segment.value / segment.capacity) * 100
-                                            : 100
-                                    }
+                                    value={progressValue}
                                     size="s"
                                     className={b('progress-bar')}
                                 />
