@@ -42,10 +42,7 @@ export function ProgressWrapper({
     const clampedFillWidth = Math.min(fillWidth, MAX_PERCENTAGE);
 
     const [valueText, capacityText] = React.useMemo(() => {
-        if (formatValues) {
-            return formatValues(Number(value), Number(capacity));
-        }
-        return [value, capacity];
+        return formatValues(Number(value), Number(capacity));
     }, [formatValues, value, capacity]);
 
     const displayText = React.useMemo(() => {
