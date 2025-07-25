@@ -48,8 +48,12 @@ export function TenantMemory({
                                 />
                                 {memoryUsed && memoryLimit && (
                                     <div className={b('value-text')}>
-                                        {formatStorageValuesToGb(Number(memoryUsed))[0]} of{' '}
-                                        {formatStorageValuesToGb(Number(memoryLimit))[0]}
+                                        {i18n('context_capacity-usage', {
+                                            value: formatStorageValuesToGb(Number(memoryUsed))[0],
+                                            capacity: formatStorageValuesToGb(
+                                                Number(memoryLimit),
+                                            )[0],
+                                        })}
                                     </div>
                                 )}
                             </div>

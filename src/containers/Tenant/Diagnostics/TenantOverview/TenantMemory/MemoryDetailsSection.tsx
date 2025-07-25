@@ -39,6 +39,23 @@ export function MemoryDetailsSection({memoryStats}: MemoryDetailsSectionProps) {
         return memorySegments.filter((segment) => !segment.isInfo && segment.value > 0);
     }, [memorySegments]);
 
+    const formatValues = React.useCallback((value?: number, total?: number): [string, string] => {
+        return [
+            formatBytes({
+                value: value || 0,
+                size: 'gb',
+                withSizeLabel: false,
+                precision: 2,
+            }),
+            formatBytes({
+                value: total || 0,
+                size: 'gb',
+                withSizeLabel: true,
+                precision: 1,
+            }),
+        ];
+    }, []);
+
     return (
         <div className={b()}>
             <div className={b('header')}>
@@ -51,20 +68,7 @@ export function MemoryDetailsSection({memoryStats}: MemoryDetailsSectionProps) {
                     <ProgressWrapper
                         stack={memorySegments}
                         totalCapacity={memoryStats.HardLimit}
-                        formatValues={(value?: number, total?: number): [string, string] => [
-                            formatBytes({
-                                value: value || 0,
-                                size: 'gb',
-                                withSizeLabel: false,
-                                precision: 2,
-                            }),
-                            formatBytes({
-                                value: total || 0,
-                                size: 'gb',
-                                withSizeLabel: true,
-                                precision: 1,
-                            }),
-                        ]}
+                        formatValues={formatValues}
                         className={b('main-progress-bar')}
                         size="m"
                         width="full"
