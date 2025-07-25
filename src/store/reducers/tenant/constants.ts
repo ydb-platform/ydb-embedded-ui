@@ -42,6 +42,7 @@ export const TENANT_METRICS_TABS_IDS = {
     cpu: 'cpu',
     storage: 'storage',
     memory: 'memory',
+    network: 'network',
 } as const;
 
 export const TENANT_CPU_TABS_IDS = {
@@ -58,4 +59,9 @@ export const TENANT_CPU_NODES_MODE_IDS = {
 export const TENANT_STORAGE_TABS_IDS = {
     tables: 'tables',
     groups: 'groups',
+} as const;
+
+export const TENANT_NETWORK_TABS_IDS = {
+    ping: 'ping',
+    skew: 'skew',
 } as const;

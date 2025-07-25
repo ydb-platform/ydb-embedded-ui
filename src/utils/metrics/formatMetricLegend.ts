@@ -1,3 +1,4 @@
+import {formatBytes, getBytesSizeUnit} from '../bytesParsers';
 import {
     formatNumber,
     formatNumericValues,
@@ -24,4 +25,28 @@ export function formatCoresLegend({value, capacity}: MetricFormatParams): string
         formatted = formatNumericValues(value, capacity, undefined, '', true);
     }
     return `${formatted[0]} ${i18n('context_of')} ${formatted[1]} ${i18n('context_cores')}`;
+}
+
+export function formatSpeedLegend({value, capacity}: MetricFormatParams): string {
+    // Determine unit based on capacity
+    const unit = getBytesSizeUnit(capacity);
+
+    // Format used value without units
+    const usedSpeed = formatBytes({
+        value,
+        size: unit,
+        precision: 2,
+        withSpeedLabel: false,
+        withSizeLabel: false,
+    });
+
+    // Format limit with speed units
+    const limitSpeed = formatBytes({
+        value: capacity,
+        size: unit,
+        precision: 2,
+        withSpeedLabel: true,
+    });
+
+    return `${usedSpeed} ${i18n('context_of')} ${limitSpeed}`;
 }

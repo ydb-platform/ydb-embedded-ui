@@ -18,6 +18,7 @@ import {HealthcheckPreview} from './Healthcheck/HealthcheckPreview';
 import {MetricsTabs} from './MetricsTabs/MetricsTabs';
 import {TenantCpu} from './TenantCpu/TenantCpu';
 import {TenantMemory} from './TenantMemory/TenantMemory';
+import {TenantNetwork} from './TenantNetwork/TenantNetwork';
 import {TenantStorage} from './TenantStorage/TenantStorage';
 import {b} from './utils';
 
@@ -131,6 +132,14 @@ export function TenantOverview({
                         memoryUsed={tenantData.MemoryUsed}
                         memoryLimit={tenantData.MemoryLimit}
                         memoryStats={tenantData.MemoryStats}
+                    />
+                );
+            }
+            case TENANT_METRICS_TABS_IDS.network: {
+                return (
+                    <TenantNetwork
+                        tenantName={tenantName}
+                        additionalNodesProps={additionalNodesProps}
                     />
                 );
             }

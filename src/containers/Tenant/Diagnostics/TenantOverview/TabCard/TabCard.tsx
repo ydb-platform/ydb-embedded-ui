@@ -15,7 +15,6 @@ interface TabCardProps {
     limit: number;
     active?: boolean;
     helpText?: string;
-    clickable?: boolean;
     legendFormatter: (params: {value: number; capacity: number}) => string;
 }
 
@@ -26,7 +25,6 @@ export function TabCard({
     limit,
     active,
     helpText,
-    clickable = true,
     legendFormatter,
 }: TabCardProps) {
     const {status, percents, legend, fill} = getDiagramValues({
@@ -38,7 +36,7 @@ export function TabCard({
     return (
         <div className={b({active})}>
             <Card
-                className={b('card-container', {active, clickable})}
+                className={b('card-container', {active})}
                 type="container"
                 view={active ? 'outlined' : 'raised'}
             >
