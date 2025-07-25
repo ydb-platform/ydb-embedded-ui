@@ -2,10 +2,10 @@ import {Text} from '@gravity-ui/uikit';
 
 import i18n from '../../../../../components/MemoryViewer/i18n';
 import {getMemorySegments} from '../../../../../components/MemoryViewer/utils';
+import {ProgressWrapper} from '../../../../../components/ProgressWrapper';
 import type {TMemoryStats} from '../../../../../types/api/nodes';
 import {formatBytes} from '../../../../../utils/bytesParsers';
 import {cn} from '../../../../../utils/cn';
-import {ProgressWrapper} from '../TenantStorage/ProgressWrapper';
 
 import {MemorySegmentItem} from './MemorySegmentItem';
 
