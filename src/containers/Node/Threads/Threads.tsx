@@ -2,16 +2,11 @@ import {ResponseError} from '../../../components/Errors/ResponseError';
 import {LoaderWrapper} from '../../../components/LoaderWrapper/LoaderWrapper';
 import {ResizeableDataTable} from '../../../components/ResizeableDataTable/ResizeableDataTable';
 import {nodeApi} from '../../../store/reducers/node/node';
-import {cn} from '../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
 
 import {columns} from './columns';
 import i18n from './i18n';
-
-import './Threads.scss';
-
-const b = cn('threads');
 
 interface ThreadsProps {
     nodeId: string;
@@ -32,7 +27,7 @@ export function Threads({nodeId, className}: ThreadsProps) {
     const data = nodeData?.Threads || [];
 
     return (
-        <LoaderWrapper loading={isLoading} className={b(null, className)}>
+        <LoaderWrapper loading={isLoading} className={className}>
             {error ? <ResponseError error={error} /> : null}
             <ResizeableDataTable
                 columnsWidthLSKey={THREADS_COLUMNS_WIDTH_LS_KEY}
