@@ -57,6 +57,10 @@ export function MetricsTabs({
             ...queryParams,
             [TenantTabsGroups.metricsTab]: TENANT_METRICS_TABS_IDS.memory,
         }),
+        [TENANT_METRICS_TABS_IDS.network]: getTenantPath({
+            ...queryParams,
+            [TenantTabsGroups.metricsTab]: TENANT_METRICS_TABS_IDS.network,
+        }),
     };
 
     // Use only pools that directly indicate resources available to perform user queries
@@ -131,19 +135,22 @@ export function MetricsTabs({
                 </Link>
             </div>
             {showNetworkUtilization && networkStats && networkMetrics && (
-                <div className={b('link-container')}>
-                    <div className={b('link')}>
+                <div
+                    className={b('link-container', {
+                        active: metricsTab === TENANT_METRICS_TABS_IDS.network,
+                    })}
+                >
+                    <Link to={tabLinks.network} className={b('link')}>
                         <TabCard
                             label={i18n('cards.network-label')}
                             sublabel={i18n('context_network-evaluation')}
                             value={networkMetrics.totalUsed}
                             limit={networkMetrics.totalLimit}
                             legendFormatter={formatStorageLegend}
-                            active={false}
-                            clickable={false}
+                            active={metricsTab === TENANT_METRICS_TABS_IDS.network}
                             helpText={i18n('context_network-description')}
                         />
-                    </div>
+                    </Link>
                 </div>
             )}
         </Flex>
