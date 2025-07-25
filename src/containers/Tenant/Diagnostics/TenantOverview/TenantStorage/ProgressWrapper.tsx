@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {Flex, Progress, Text} from '@gravity-ui/uikit';
-import type {ProgressSize, ProgressTheme} from '@gravity-ui/uikit';
+import type {ProgressSize} from '@gravity-ui/uikit';
 
 import type {MemorySegment} from '../../../../../components/MemoryViewer/utils';
 import {getMemorySegmentColor} from '../../../../../components/MemoryViewer/utils';
@@ -38,22 +38,6 @@ type ProgressWrapperProps = ProgressWrapperSingleProps | ProgressWrapperStackPro
 const isValidValue = (val?: number | string): boolean =>
     isNumeric(val) && safeParseNumber(val) >= 0;
 
-// Map memory segment types to Progress themes
-const getProgressThemeForSegment = (segmentKey: string): ProgressTheme => {
-    switch (segmentKey) {
-        case 'SharedCacheConsumption':
-            return 'info';
-        case 'QueryExecutionConsumption':
-            return 'success';
-        case 'MemTableConsumption':
-            return 'warning';
-        case 'AllocatorCachesMemory':
-            return 'misc';
-        default:
-            return 'default';
-    }
-};
-
 export function ProgressWrapper({
     formatValues = defaultFormatProgressValues,
     className,
@@ -82,7 +66,6 @@ export function ProgressWrapper({
             value: maxValue > 0 ? (segment.value / maxValue) * MAX_PERCENTAGE : 0,
             color: getMemorySegmentColor(segment.key),
             title: segment.label,
-            theme: getProgressThemeForSegment(segment.key),
         }));
 
         const [totalValueText, totalCapacityText] = React.useMemo(() => {
