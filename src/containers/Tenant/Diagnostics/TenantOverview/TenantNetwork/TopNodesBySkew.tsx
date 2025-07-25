@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {ResizeableDataTable} from '../../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../../../../components/nodesColumns/constants';
 import {nodesApi} from '../../../../../store/reducers/nodes/nodes';

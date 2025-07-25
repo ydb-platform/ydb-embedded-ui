@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {Flex, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 
 import {TENANT_NETWORK_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
