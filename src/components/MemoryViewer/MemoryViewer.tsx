@@ -4,10 +4,10 @@ import type {TMemoryStats} from '../../types/api/nodes';
 import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
 import {GIGABYTE} from '../../utils/constants';
+import type {FormatProgressViewerValues} from '../../utils/progress';
 import {calculateProgressStatus} from '../../utils/progress';
 import {isNumeric} from '../../utils/utils';
 import {HoverPopup} from '../HoverPopup/HoverPopup';
-import type {FormatProgressViewerValues} from '../ProgressViewer/ProgressViewer';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 
 import {calculateAllocatedMemory, getMemorySegments} from './utils';

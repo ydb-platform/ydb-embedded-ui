@@ -35,6 +35,7 @@
   "charts.cpu-usage": "CPU usage by pool",
   "charts.storage-usage": "Tablet storage usage",
   "charts.memory-usage": "Memory usage",
+  "title_storage-details": "Storage Details",
   "storage.tablet-storage-title": "Tablet storage",
   "storage.tablet-storage-description": "Size of user data and indexes stored in schema objects (tables, topics, etc.)",
   "storage.db-storage-title": "Database storage",
@@ -44,6 +45,8 @@
   "title_top-nodes": "Top Nodes",
   "title_top-shards": "Top Shards",
   "title_top-queries": "Top Queries",
+  "title_top-tables-by-size": "Top Tables By Size",
+  "title_top-groups-by-usage": "Top Groups By Usage",
   "action_by-load": "By Load",
   "action_by-pool-usage": "By Pool Usage"
 }

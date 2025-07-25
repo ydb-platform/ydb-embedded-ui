@@ -1,3 +1,5 @@
+@use '../../styles/mixins.scss';
+
 .info-viewer {
     --ydb-info-viewer-font-size: var(--g-text-body-2-font-size);
     --ydb-info-viewer-line-height: var(--g-text-body-2-line-height);
@@ -28,6 +30,10 @@
 
         max-width: 100%;
         padding-top: 4px;
+
+        &:first-child {
+            padding-top: 0;
+        }
     }
 
     &__label {
@@ -86,6 +92,20 @@
                     min-width: 85px;
                 }
             }
+        }
+    }
+
+    &_variant_small {
+        .info-viewer__title {
+            margin: 0 0 var(--g-spacing-3);
+
+            color: var(--g-color-text-primary);
+            @include mixins.subheader-1-typography();
+        }
+
+        .info-viewer__label {
+            color: var(--g-color-text-secondary);
+            @include mixins.body-1-typography();
         }
     }
 }

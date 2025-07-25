@@ -54,3 +54,8 @@ export const TENANT_CPU_NODES_MODE_IDS = {
     load: 'load',
     pools: 'pools',
 } as const;
+
+export const TENANT_STORAGE_TABS_IDS = {
+    tables: 'tables',
+    groups: 'groups',
+} as const;
