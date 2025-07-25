@@ -1,9 +1,9 @@
 $memory-type-colors: (
-    'AllocatorCachesMemory': var(--g-color-base-utility-medium-hover),
-    'SharedCacheConsumption': var(--g-color-base-info-medium-hover),
-    'MemTableConsumption': var(--g-color-base-warning-medium-hover),
-    'QueryExecutionConsumption': var(--g-color-base-positive-medium-hover),
-    'Other': var(--g-color-base-generic-medium-hover),
+    'SharedCacheConsumption': var(--g-color-base-info-medium),
+    'QueryExecutionConsumption': var(--g-color-base-positive-medium),
+    'MemTableConsumption': var(--g-color-base-warning-medium),
+    'AllocatorCachesMemory': var(--g-color-base-danger-medium),
+    'Other': var(--g-color-base-neutral-medium),
 );
 
 @mixin memory-type-color($type) {

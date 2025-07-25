@@ -1,0 +1,93 @@
+@use '../../../../../styles/mixins.scss';
+
+.memory-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: stretch;
+    gap: var(--g-spacing-3);
+
+    &__header {
+        align-self: stretch;
+    }
+
+    &__title {
+        font-weight: 500;
+        @include mixins.subheader-1-typography();
+    }
+
+    &__content {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        align-self: stretch;
+        gap: var(--g-spacing-4);
+    }
+
+    &__main-progress {
+        align-self: stretch;
+    }
+
+    &__main-progress-bar {
+        height: 20px;
+    }
+
+    &__segments-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        align-self: stretch;
+        gap: var(--g-spacing-2);
+
+        margin-bottom: var(--g-spacing-4);
+    }
+
+    &__segment-row {
+        display: flex;
+        align-items: center;
+        align-self: stretch;
+        gap: var(--g-spacing-1);
+    }
+
+    &__segment-indicator {
+        flex-shrink: 0;
+
+        width: 8px;
+        height: 8px;
+
+        border-radius: 50%;
+    }
+
+    &__segment-definition-list {
+        flex: 1;
+    }
+
+    &__segment-progress {
+        flex-shrink: 0;
+
+        width: 400px;
+    }
+
+    &__progress-bar {
+        height: 10px;
+    }
+
+    &__popup-container {
+        display: flex;
+        align-items: center;
+        gap: var(--g-spacing-2);
+    }
+
+    &__popup-legend {
+        flex-shrink: 0;
+
+        width: 12px;
+        height: 12px;
+
+        border-radius: var(--g-border-radius-xs);
+    }
+
+    &__popup-name {
+        color: var(--g-color-text-primary);
+    }
+}
