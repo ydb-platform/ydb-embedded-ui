@@ -1,12 +1,10 @@
 import {DefinitionList, Flex, Progress, Text} from '@gravity-ui/uikit';
 
-import {HoverPopup} from '../../../../../components/HoverPopup/HoverPopup';
 import i18n from '../../../../../components/MemoryViewer/i18n';
 import {
     getMemorySegmentColor,
     getMemorySegments,
 } from '../../../../../components/MemoryViewer/utils';
-import {ProgressViewer} from '../../../../../components/ProgressViewer/ProgressViewer';
 import type {TMemoryStats} from '../../../../../types/api/nodes';
 import {formatBytes} from '../../../../../utils/bytesParsers';
 import {cn} from '../../../../../utils/cn';
@@ -44,90 +42,27 @@ export function MemoryDetailsSection({memoryStats}: MemoryDetailsSectionProps) {
             </div>
             <div className={b('content')}>
                 <div className={b('main-progress')}>
-                    <HoverPopup
-                        renderPopupContent={() => (
-                            <DefinitionList responsive>
-                                {memorySegments.map(
-                                    ({
-                                        label,
-                                        value: segmentSize,
-                                        capacity: segmentCapacity,
-                                        key,
-                                    }) => (
-                                        <DefinitionList.Item
-                                            key={label}
-                                            name={
-                                                <div className={b('popup-container')}>
-                                                    <div
-                                                        className={b('popup-legend')}
-                                                        style={{
-                                                            backgroundColor:
-                                                                getMemorySegmentColor(key),
-                                                        }}
-                                                    />
-                                                    <div className={b('popup-name')}>{label}</div>
-                                                </div>
-                                            }
-                                        >
-                                            {segmentCapacity ? (
-                                                <ProgressViewer
-                                                    value={segmentSize}
-                                                    capacity={segmentCapacity}
-                                                    formatValues={(
-                                                        value?: number,
-                                                        total?: number,
-                                                    ): [string, string] => [
-                                                        formatBytes({
-                                                            value: value || 0,
-                                                            size: 'gb',
-                                                            withSizeLabel: false,
-                                                            precision: 2,
-                                                        }),
-                                                        formatBytes({
-                                                            value: total || 0,
-                                                            size: 'gb',
-                                                            withSizeLabel: true,
-                                                            precision: 1,
-                                                        }),
-                                                    ]}
-                                                    colorizeProgress
-                                                />
-                                            ) : (
-                                                formatBytes({
-                                                    value: segmentSize,
-                                                    size: 'gb',
-                                                    withSizeLabel: true,
-                                                    precision: 2,
-                                                })
-                                            )}
-                                        </DefinitionList.Item>
-                                    ),
-                                )}
-                            </DefinitionList>
-                        )}
-                    >
-                        <ProgressWrapper
-                            stack={memorySegments}
-                            totalCapacity={memoryStats.HardLimit}
-                            formatValues={(value?: number, total?: number): [string, string] => [
-                                formatBytes({
-                                    value: value || 0,
-                                    size: 'gb',
-                                    withSizeLabel: false,
-                                    precision: 2,
-                                }),
-                                formatBytes({
-                                    value: total || 0,
-                                    size: 'gb',
-                                    withSizeLabel: true,
-                                    precision: 1,
-                                }),
-                            ]}
-                            className={b('main-progress-bar')}
-                            size="m"
-                            width="full"
-                        />
-                    </HoverPopup>
+                    <ProgressWrapper
+                        stack={memorySegments}
+                        totalCapacity={memoryStats.HardLimit}
+                        formatValues={(value?: number, total?: number): [string, string] => [
+                            formatBytes({
+                                value: value || 0,
+                                size: 'gb',
+                                withSizeLabel: false,
+                                precision: 2,
+                            }),
+                            formatBytes({
+                                value: total || 0,
+                                size: 'gb',
+                                withSizeLabel: true,
+                                precision: 1,
+                            }),
+                        ]}
+                        className={b('main-progress-bar')}
+                        size="m"
+                        width="full"
+                    />
                 </div>
                 <div className={b('segments-container')}>
                     {displaySegments.map((segment) => {

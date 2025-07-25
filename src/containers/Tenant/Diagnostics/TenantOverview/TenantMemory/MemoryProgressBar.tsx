@@ -13,7 +13,9 @@ import type {TMemoryStats} from '../../../../../types/api/nodes';
 import {formatBytes} from '../../../../../utils/bytesParsers';
 import {cn} from '../../../../../utils/cn';
 
-const b = cn('tenant-memory');
+import './MemoryProgressBar.scss';
+
+const b = cn('memory-progress-bar');
 const MIN_SEGMENT_WIDTH_PERCENT = 0.5;
 
 const formatDetailedValues = (value?: number, total?: number): [string, string] => {
