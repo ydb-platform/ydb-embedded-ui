@@ -1,8 +1,12 @@
+import type {ProgressTheme} from '@gravity-ui/uikit';
+import {ActionTooltip, Flex, Progress, Text} from '@gravity-ui/uikit';
+
 import {cn} from '../../../../utils/cn';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 
 import './ThreadStatesBar.scss';
 
-const b = cn('thread-states-bar');
+const b = cn('ydb-thread-states-bar');
 
 interface ThreadStatesBarProps {
     states?: Record<string, number>;
@@ -13,64 +17,89 @@ interface ThreadStatesBarProps {
 /**
  * Thread state colors based on the state type
  */
-const getStateColor = (state: string): string => {
+const getProgressBackgroundColor = (state: string): string => {
     switch (state.toUpperCase()) {
         case 'R': // Running
-            return 'var(--g-color-text-positive)';
+            return 'var(--g-color-base-positive-medium)';
         case 'S': // Sleeping
-            return 'var(--g-color-text-secondary)';
+            return 'var(--g-color-base-info-medium)';
         case 'D': // Uninterruptible sleep
-            return 'var(--g-color-text-warning)';
+            return 'var(--g-color-base-warning-medium)';
         case 'Z': // Zombie
         case 'T': // Stopped
         case 'X': // Dead
-            return 'var(--g-color-text-danger)';
+            return 'var(--g-color-base-danger-medium)';
         default:
-            return 'var(--g-color-text-misc)';
+            return 'var(--g-color-base-misc-medium)';
+    }
+};
+const getStackThemeColor = (state: string): ProgressTheme => {
+    switch (state.toUpperCase()) {
+        case 'R': // Running
+            return 'success';
+        case 'S': // Sleeping
+            return 'info';
+        case 'D': // Uninterruptible sleep
+            return 'warning';
+        case 'Z': // Zombie
+        case 'T': // Stopped
+        case 'X': // Dead
+            return 'danger';
+        default:
+            return 'misc';
+    }
+};
+const getStateTitle = (state: string): string => {
+    switch (state.toUpperCase()) {
+        case 'R': // Running
+            return 'Running';
+        case 'S': // Sleeping
+            return 'Sleeping';
+        case 'D': // Uninterruptible sleep
+            return 'Uninterruptible sleep';
+        case 'Z': // Zombie
+            return 'Zombie';
+        case 'T': // Stopped
+            return 'Stopped';
+        case 'X': // Dead
+            return 'Dead';
+        default:
+            return 'Unknown';
     }
 };
 
-/**
- * Component to display thread states as a horizontal bar chart
- */
 export function ThreadStatesBar({states = {}, totalThreads, className}: ThreadStatesBarProps) {
     const total = totalThreads || Object.values(states).reduce((sum, count) => sum + count, 0);
 
     if (total === 0) {
-        return <div className={b(null, className)}>No threads</div>;
+        return EMPTY_DATA_PLACEHOLDER;
     }
 
     const stateEntries = Object.entries(states).filter(([, count]) => count > 0);
 
+    const stack = Object.entries(states).map(([state, count]) => ({
+        theme: getStackThemeColor(state),
+        value: (count / total) * 100,
+    }));
+
     return (
         <div className={b(null, className)}>
-            <div className={b('bar')}>
-                {stateEntries.map(([state, count]) => {
-                    const percentage = (count / total) * 100;
-                    return (
-                        <div
-                            key={state}
-                            className={b('segment')}
-                            style={{
-                                width: `${percentage}%`,
-                                backgroundColor: getStateColor(state),
-                            }}
-                            title={`${state}: ${count} threads (${Math.round(percentage)}%)`}
-                        />
-                    );
-                })}
-            </div>
-            <div className={b('legend')}>
+            <Progress stack={stack} size="s" />
+            <Flex gap={2}>
                 {stateEntries.map(([state, count]) => (
-                    <span key={state} className={b('legend-item')}>
-                        <span
-                            className={b('legend-color')}
-                            style={{backgroundColor: getStateColor(state)}}
-                        />
-                        {state}: {count}
-                    </span>
+                    <ActionTooltip key={state} title={getStateTitle(state)}>
+                        <Flex gap={1} alignItems="center">
+                            <div
+                                className={b('legend-color')}
+                                style={{backgroundColor: getProgressBackgroundColor(state)}}
+                            />
+                            <Text color="secondary" variant="caption-2">
+                                {state}: {count}
+                            </Text>
+                        </Flex>
+                    </ActionTooltip>
                 ))}
-            </div>
+            </Flex>
         </div>
     );
 }

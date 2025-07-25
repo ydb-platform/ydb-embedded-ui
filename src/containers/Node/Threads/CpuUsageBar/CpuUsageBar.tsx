@@ -1,5 +1,6 @@
-import {Progress} from '@gravity-ui/uikit';
+import {Flex, Text} from '@gravity-ui/uikit';
 
+import {ProgressViewer} from '../../../../components/ProgressViewer/ProgressViewer';
 import {cn} from '../../../../utils/cn';
 
 import './CpuUsageBar.scss';
@@ -12,37 +13,26 @@ interface CpuUsageBarProps {
     className?: string;
 }
 
-/**
- * Component to display CPU usage as a progress bar showing both system and user usage
- */
 export function CpuUsageBar({systemUsage = 0, userUsage = 0, className}: CpuUsageBarProps) {
     const totalUsage = systemUsage + userUsage;
     const systemPercent = Math.round(systemUsage * 100);
     const userPercent = Math.round(userUsage * 100);
     const totalPercent = Math.round(totalUsage * 100);
 
-    // Determine color based on total load
-    const getProgressTheme = (): 'success' | 'warning' | 'danger' => {
-        if (totalUsage >= 1.0) {
-            return 'danger';
-        } // 100% or more load
-        if (totalUsage >= 0.8) {
-            return 'warning';
-        } // 80% or more load
-        return 'success';
-    };
-
     return (
-        <div className={b(null, className)}>
+        <Flex gap={2} className={b(null, className)}>
             <div className={b('progress')}>
-                <Progress value={Math.min(totalPercent, 100)} theme={getProgressTheme()} size="s" />
+                <ProgressViewer
+                    value={totalPercent}
+                    percents={true}
+                    colorizeProgress={true}
+                    capacity={100}
+                    className={b('progress')}
+                />
             </div>
-            <div className={b('text')}>
-                <span className={b('total')}>{totalPercent}%</span>
-                <span className={b('breakdown')}>
-                    (S: {systemPercent}%, U: {userPercent}%)
-                </span>
-            </div>
-        </div>
+            <Text color="secondary">
+                (Sys: {systemPercent}%, U: {userPercent}%)
+            </Text>
+        </Flex>
     );
 }

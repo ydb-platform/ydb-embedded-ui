@@ -6,5 +6,6 @@
   "field_major-page-faults": "Major Page Faults",
   "field_thread-states": "Thread States",
   "value_unknown": "Unknown",
-  "alert_no-thread-data": "No thread pool information available"
+  "alert_no-thread-data": "No thread pool information available",
+  "description_cpu-usage": "System usage + user usage"
 }

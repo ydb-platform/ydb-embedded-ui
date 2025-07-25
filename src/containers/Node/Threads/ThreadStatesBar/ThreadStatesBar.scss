@@ -1,49 +1,10 @@
-.thread-states-bar {
-    &__bar {
-        display: flex;
-        overflow: hidden;
-
-        min-width: 80px;
-        height: 16px;
-        margin-bottom: 4px;
-
-        border: 1px solid var(--g-color-line-generic);
-        border-radius: 4px;
-        background-color: var(--g-color-base-generic);
-    }
-
-    &__segment {
-        transition: opacity 0.2s ease;
-
-        &:hover {
-            opacity: 0.8;
-        }
-    }
-
-    &__legend {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-
-        font-size: 11px;
-
-        color: var(--g-color-text-secondary);
-    }
-
-    &__legend-item {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-
-        white-space: nowrap;
-    }
-
+.ydb-thread-states-bar {
     &__legend-color {
         flex-shrink: 0;
 
         width: 8px;
-        height: 8px;
+        aspect-ratio: 1;
 
-        border-radius: 2px;
+        border-radius: var(--g-border-radius-xs);
     }
 }
