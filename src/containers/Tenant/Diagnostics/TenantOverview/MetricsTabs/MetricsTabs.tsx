@@ -15,6 +15,7 @@ import {useSetting, useTypedSelector} from '../../../../../utils/hooks';
 import {calculateMetricAggregates} from '../../../../../utils/metrics';
 import {
     formatCoresLegend,
+    formatSpeedLegend,
     formatStorageLegend,
 } from '../../../../../utils/metrics/formatMetricLegend';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
@@ -143,10 +144,10 @@ export function MetricsTabs({
                     <Link to={tabLinks.network} className={b('link')}>
                         <TabCard
                             label={i18n('cards.network-label')}
-                            sublabel={i18n('context_network-evaluation')}
+                            sublabel={i18n('context_network-usage')}
                             value={networkMetrics.totalUsed}
                             limit={networkMetrics.totalLimit}
-                            legendFormatter={formatStorageLegend}
+                            legendFormatter={formatSpeedLegend}
                             active={metricsTab === TENANT_METRICS_TABS_IDS.network}
                             helpText={i18n('context_network-description')}
                         />
