@@ -1,0 +1,10 @@
+.ydb-thread-states-bar {
+    &__legend-color {
+        flex-shrink: 0;
+
+        width: 8px;
+        aspect-ratio: 1;
+
+        border-radius: var(--g-border-radius-xs);
+    }
+}
