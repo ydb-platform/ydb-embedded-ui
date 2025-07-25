@@ -46,10 +46,12 @@ export function TenantMemory({
                                     memoryUsed={memoryUsed}
                                     memoryLimit={memoryLimit}
                                 />
-                                <div className={b('value-text')} style={{marginTop: '8px'}}>
-                                    {formatStorageValuesToGb(Number(memoryUsed))[0]} of{' '}
-                                    {formatStorageValuesToGb(Number(memoryLimit))[0]}
-                                </div>
+                                {memoryUsed && memoryLimit && (
+                                    <div className={b('value-text')}>
+                                        {formatStorageValuesToGb(Number(memoryUsed))[0]} of{' '}
+                                        {formatStorageValuesToGb(Number(memoryLimit))[0]}
+                                    </div>
+                                )}
                             </div>
                         ),
                     },

@@ -38,7 +38,7 @@ export function SingleProgress({
     }, [formatValues, value, capacity]);
 
     const displayText = React.useMemo(() => {
-        return formatProgressText(valueText, capacityText, numericCapacity, i18n);
+        return formatProgressText(valueText, capacityText, numericCapacity);
     }, [valueText, capacityText, numericCapacity]);
 
     return (

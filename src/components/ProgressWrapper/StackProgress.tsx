@@ -46,12 +46,7 @@ export function StackProgress({
     }, [formatValues, totalValue, numericTotalCapacity]);
 
     const displayText = React.useMemo(() => {
-        return formatProgressText(
-            totalValueText,
-            totalCapacityText,
-            numericTotalCapacity || 0,
-            i18n,
-        );
+        return formatProgressText(totalValueText, totalCapacityText, numericTotalCapacity || 0);
     }, [totalValueText, totalCapacityText, numericTotalCapacity]);
 
     return (

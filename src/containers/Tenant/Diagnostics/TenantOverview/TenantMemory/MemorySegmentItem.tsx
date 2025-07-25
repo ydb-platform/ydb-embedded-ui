@@ -18,6 +18,10 @@ export function MemorySegmentItem({segment}: MemorySegmentItemProps) {
 
     const valueText = formatSegmentValue(segment.value, segment.capacity);
 
+    const progressStyle: React.CSSProperties & Record<string, string> = {
+        '--g-progress-filled-background-color': segmentColor,
+    };
+
     return (
         <div className={b('segment-row')}>
             <div className={b('segment-indicator')} style={{backgroundColor: segmentColor}} />
@@ -31,13 +35,7 @@ export function MemorySegmentItem({segment}: MemorySegmentItemProps) {
                 >
                     <Flex alignItems="center" gap="3">
                         <div className={b('segment-progress')}>
-                            <div
-                                style={
-                                    {
-                                        '--g-progress-filled-background-color': segmentColor,
-                                    } as React.CSSProperties
-                                }
-                            >
+                            <div style={progressStyle}>
                                 <Progress
                                     value={
                                         segment.capacity

@@ -1,6 +1,8 @@
 import type {FormatProgressViewerValues} from '../../utils/progress';
 import {isNumeric, safeParseNumber} from '../../utils/utils';
 
+import i18n from './i18n';
+
 // Constants that were previously in TenantStorage/constants
 export const DEFAULT_PROGRESS_WIDTH = 400;
 export const MAX_PERCENTAGE = 100;
@@ -31,7 +33,6 @@ export function formatProgressText(
     valueText: string | number | undefined,
     capacityText: string | number | undefined,
     numericCapacity: number,
-    i18n: any,
 ): string {
     if (numericCapacity <= 0) {
         return String(valueText);
