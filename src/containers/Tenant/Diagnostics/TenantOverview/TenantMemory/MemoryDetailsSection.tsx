@@ -50,7 +50,7 @@ export function MemoryDetailsSection({memoryStats}: MemoryDetailsSectionProps) {
                     {i18n('text_memory-details')}
                 </Text>
             </div>
-            <Flex direction="column" alignItems="flex-start" gap="4">
+            <Flex direction="column" alignItems="flex-start" gap="4" width="100%">
                 <div className={b('main-progress')}>
                     <ProgressWrapper
                         stack={memorySegments}
