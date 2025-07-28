@@ -104,7 +104,7 @@
             @include mixins.body-1-typography();
         }
 
-        .info-viewer__item:first-child {
+        .info-viewer__row:first-child {
             padding-top: 0;
         }
     }
