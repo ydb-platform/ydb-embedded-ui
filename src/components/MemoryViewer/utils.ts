@@ -9,7 +9,7 @@ export function calculateAllocatedMemory(stats: TMemoryStats) {
     return String(allocatedMemory + allocatorCaches);
 }
 
-export function getMaybeNumber(value: string | number | undefined): number | undefined {
+function getMaybeNumber(value: string | number | undefined): number | undefined {
     return isNumeric(value) ? parseFloat(String(value)) : undefined;
 }
 
