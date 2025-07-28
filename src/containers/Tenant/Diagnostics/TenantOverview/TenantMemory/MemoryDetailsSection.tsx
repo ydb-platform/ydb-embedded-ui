@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Text} from '@gravity-ui/uikit';
+import {Flex, Text} from '@gravity-ui/uikit';
 
 import i18n from '../../../../../components/MemoryViewer/i18n';
 import {getMemorySegments} from '../../../../../components/MemoryViewer/utils';
@@ -57,13 +57,13 @@ export function MemoryDetailsSection({memoryStats}: MemoryDetailsSectionProps) {
     }, []);
 
     return (
-        <div className={b()}>
+        <Flex direction="column" alignItems="flex-start" gap="3">
             <div className={b('header')}>
                 <Text variant="body-1" className={b('title')}>
                     {i18n('text_memory-details')}
                 </Text>
             </div>
-            <div className={b('content')}>
+            <Flex direction="column" alignItems="flex-start" gap="4">
                 <div className={b('main-progress')}>
                     <ProgressWrapper
                         stack={memorySegments}
@@ -74,12 +74,17 @@ export function MemoryDetailsSection({memoryStats}: MemoryDetailsSectionProps) {
                         width="full"
                     />
                 </div>
-                <div className={b('segments-container')}>
+                <Flex
+                    direction="column"
+                    alignItems="flex-start"
+                    gap="2"
+                    className={b('segments-container')}
+                >
                     {displaySegments.map((segment) => (
                         <MemorySegmentItem key={segment.key} segment={segment} />
                     ))}
-                </div>
-            </div>
-        </div>
+                </Flex>
+            </Flex>
+        </Flex>
     );
 }

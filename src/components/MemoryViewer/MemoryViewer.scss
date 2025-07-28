@@ -31,8 +31,6 @@ $memory-type-colors: (
     }
 
     &__container {
-        display: flex;
-
         padding: 2px 0;
     }
 
@@ -92,11 +90,5 @@ $memory-type-colors: (
                 background-color: var(--g-color-base-danger-light);
             }
         }
-    }
-
-    &__text {
-        display: flex;
-        justify-content: center;
-        align-items: center;
     }
 }

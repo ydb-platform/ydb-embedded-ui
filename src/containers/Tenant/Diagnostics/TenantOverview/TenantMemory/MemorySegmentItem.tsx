@@ -33,7 +33,7 @@ export function MemorySegmentItem({segment}: MemorySegmentItemProps) {
     }, [segmentColor]);
 
     return (
-        <div className={b('segment-row')}>
+        <Flex alignItems="center" gap="1">
             <div className={b('segment-indicator')} style={{backgroundColor: segmentColor}} />
             <DefinitionList nameMaxWidth={200} className={b('segment-definition-list')}>
                 <DefinitionList.Item
@@ -59,6 +59,6 @@ export function MemorySegmentItem({segment}: MemorySegmentItemProps) {
                     </Flex>
                 </DefinitionList.Item>
             </DefinitionList>
-        </div>
+        </Flex>
     );
 }

@@ -6,7 +6,7 @@ import type {ProgressContainerProps} from './types';
 export function ProgressContainer({
     children,
     displayText,
-    withValue = false,
+    withCapacityUsage = false,
     className,
     width,
 }: ProgressContainerProps) {
@@ -15,7 +15,7 @@ export function ProgressContainer({
     return (
         <Flex alignItems="center" gap="2" className={className}>
             <div style={progressStyle}>{children}</div>
-            {withValue && displayText && (
+            {withCapacityUsage && displayText && (
                 <Text variant="body-1" color="secondary">
                     {displayText}
                 </Text>

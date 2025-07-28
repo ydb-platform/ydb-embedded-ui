@@ -8,7 +8,7 @@ export interface ProgressWrapperBaseProps {
     className?: string;
     width?: number | 'full';
     size?: ProgressSize;
-    withValue?: boolean;
+    withCapacityUsage?: boolean;
 }
 
 export interface ProgressWrapperSingleProps extends ProgressWrapperBaseProps {
@@ -29,7 +29,7 @@ export type ProgressWrapperProps = ProgressWrapperSingleProps | ProgressWrapperS
 export interface ProgressContainerProps {
     children: React.ReactNode;
     displayText?: string;
-    withValue?: boolean;
+    withCapacityUsage?: boolean;
     className?: string;
     width?: number | 'full';
 }

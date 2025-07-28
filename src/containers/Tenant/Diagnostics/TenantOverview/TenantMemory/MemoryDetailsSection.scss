@@ -1,12 +1,6 @@
 @use '../../../../../styles/mixins.scss';
 
 .memory-details {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    align-self: stretch;
-    gap: var(--g-spacing-3);
-
     &__header {
         align-self: stretch;
     }
@@ -14,14 +8,6 @@
     &__title {
         font-weight: 500;
         @include mixins.subheader-1-typography();
-    }
-
-    &__content {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        align-self: stretch;
-        gap: var(--g-spacing-4);
     }
 
     &__main-progress {
@@ -33,20 +19,7 @@
     }
 
     &__segments-container {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        align-self: stretch;
-        gap: var(--g-spacing-2);
-
         margin-bottom: var(--g-spacing-4);
-    }
-
-    &__segment-row {
-        display: flex;
-        align-items: center;
-        align-self: stretch;
-        gap: var(--g-spacing-1);
     }
 
     &__segment-indicator {
@@ -70,12 +43,6 @@
 
     &__progress-bar {
         height: 10px;
-    }
-
-    &__popup-container {
-        display: flex;
-        align-items: center;
-        gap: var(--g-spacing-2);
     }
 
     &__popup-legend {

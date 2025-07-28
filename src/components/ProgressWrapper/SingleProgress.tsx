@@ -23,7 +23,7 @@ export function SingleProgress({
     className,
     width,
     size = PROGRESS_SIZE,
-    withValue = false,
+    withCapacityUsage = false,
 }: ProgressWrapperSingleProps) {
     if (!isValidValue(value)) {
         return <div className={className}>{i18n('alert_no-data')}</div>;
@@ -44,7 +44,7 @@ export function SingleProgress({
     return (
         <ProgressContainer
             displayText={displayText}
-            withValue={withValue}
+            withCapacityUsage={withCapacityUsage}
             className={className}
             width={width}
         >

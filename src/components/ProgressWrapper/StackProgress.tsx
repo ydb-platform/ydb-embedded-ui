@@ -23,7 +23,7 @@ export function StackProgress({
     className,
     width,
     size = PROGRESS_SIZE,
-    withValue = false,
+    withCapacityUsage = false,
 }: ProgressWrapperStackProps) {
     const displaySegments = React.useMemo(() => {
         return stack.filter((segment) => !segment.isInfo && segment.value > 0);
@@ -62,7 +62,7 @@ export function StackProgress({
     return (
         <ProgressContainer
             displayText={displayText}
-            withValue={withValue}
+            withCapacityUsage={withCapacityUsage}
             className={className}
             width={width}
         >

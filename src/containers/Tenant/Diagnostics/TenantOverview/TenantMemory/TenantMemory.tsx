@@ -1,4 +1,5 @@
 import {InfoViewer} from '../../../../../components/InfoViewer/InfoViewer';
+import {ProgressWrapper} from '../../../../../components/ProgressWrapper';
 import type {TMemoryStats} from '../../../../../types/api/nodes';
 import {cn} from '../../../../../utils/cn';
 import {formatStorageValuesToGb} from '../../../../../utils/dataFormatters/dataFormatters';
@@ -6,7 +7,6 @@ import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
 import i18n from '../i18n';
 
 import {MemoryDetailsSection} from './MemoryDetailsSection';
-import {MemoryProgressBar} from './MemoryProgressBar';
 import {TopNodesByMemory} from './TopNodesByMemory';
 import {memoryDashboardConfig} from './memoryDashboardConfig';
 
@@ -41,22 +41,17 @@ export function TenantMemory({
                     {
                         label: i18n('field_memory-usage'),
                         value: (
-                            <div>
-                                <MemoryProgressBar
-                                    memoryUsed={memoryUsed}
-                                    memoryLimit={memoryLimit}
-                                />
-                                {memoryUsed && memoryLimit && (
-                                    <div className={b('value-text')}>
-                                        {i18n('context_capacity-usage', {
-                                            value: formatStorageValuesToGb(Number(memoryUsed))[0],
-                                            capacity: formatStorageValuesToGb(
-                                                Number(memoryLimit),
-                                            )[0],
-                                        })}
-                                    </div>
-                                )}
-                            </div>
+                            <ProgressWrapper
+                                value={memoryUsed}
+                                capacity={memoryLimit}
+                                formatValues={(value, total) => [
+                                    formatStorageValuesToGb(Number(value))[0],
+                                    formatStorageValuesToGb(Number(total))[0],
+                                ]}
+                                withCapacityUsage
+                                size="m"
+                                width="full"
+                            />
                         ),
                     },
                 ]}
