@@ -44,10 +44,7 @@ export function TenantMemory({
                             <ProgressWrapper
                                 value={memoryUsed}
                                 capacity={memoryLimit}
-                                formatValues={(value, total) => [
-                                    formatStorageValuesToGb(Number(value))[0],
-                                    formatStorageValuesToGb(Number(total))[0],
-                                ]}
+                                formatValues={formatStorageValuesToGb}
                                 withCapacityUsage
                                 size="m"
                                 width="full"

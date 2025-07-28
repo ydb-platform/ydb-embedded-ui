@@ -6,8 +6,8 @@ import i18n from '../../../../../components/MemoryViewer/i18n';
 import {getMemorySegments} from '../../../../../components/MemoryViewer/utils';
 import {ProgressWrapper} from '../../../../../components/ProgressWrapper';
 import type {TMemoryStats} from '../../../../../types/api/nodes';
-import {formatBytes} from '../../../../../utils/bytesParsers';
 import {cn} from '../../../../../utils/cn';
+import {formatStorageValuesToGb} from '../../../../../utils/dataFormatters/dataFormatters';
 
 import {MemorySegmentItem} from './MemorySegmentItem';
 
@@ -40,20 +40,7 @@ export function MemoryDetailsSection({memoryStats}: MemoryDetailsSectionProps) {
     }, [memorySegments]);
 
     const formatValues = React.useCallback((value?: number, total?: number): [string, string] => {
-        return [
-            formatBytes({
-                value: value || 0,
-                size: 'gb',
-                withSizeLabel: false,
-                precision: 2,
-            }),
-            formatBytes({
-                value: total || 0,
-                size: 'gb',
-                withSizeLabel: true,
-                precision: 1,
-            }),
-        ];
+        return formatStorageValuesToGb(value, total) as [string, string];
     }, []);
 
     return (
