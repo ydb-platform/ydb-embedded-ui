@@ -23,10 +23,10 @@ export interface MemorySegment {
 
 // Memory segment colors using CSS variables for theme support
 export const MEMORY_SEGMENT_COLORS: Record<string, string> = {
-    SharedCacheConsumption: 'var(--g-color-base-info-medium)',
-    QueryExecutionConsumption: 'var(--g-color-base-positive-medium)',
-    MemTableConsumption: 'var(--g-color-base-warning-medium)',
     AllocatorCachesMemory: 'var(--g-color-base-danger-medium)',
+    SharedCacheConsumption: 'var(--g-color-base-info-medium)',
+    MemTableConsumption: 'var(--g-color-base-warning-medium)',
+    QueryExecutionConsumption: 'var(--g-color-base-positive-medium)',
     Other: 'var(--g-color-base-neutral-medium)',
 };
 
