@@ -161,7 +161,7 @@ export function MemoryViewer({
                                 />
                             );
                         })}
-                    <Flex justifyContent="center" alignItems="center">
+                    <Flex justifyContent="center" alignItems="center" className={b('text')}>
                         {renderContent()}
                     </Flex>
                 </div>

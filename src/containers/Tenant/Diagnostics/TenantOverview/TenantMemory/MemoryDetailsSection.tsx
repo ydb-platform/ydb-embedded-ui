@@ -8,6 +8,7 @@ import {ProgressWrapper} from '../../../../../components/ProgressWrapper';
 import type {TMemoryStats} from '../../../../../types/api/nodes';
 import {cn} from '../../../../../utils/cn';
 import {formatStorageValuesToGb} from '../../../../../utils/dataFormatters/dataFormatters';
+import {safeParseNumber} from '../../../../../utils/utils';
 
 import {MemorySegmentItem} from './MemorySegmentItem';
 
@@ -23,11 +24,11 @@ export function MemoryDetailsSection({memoryStats}: MemoryDetailsSectionProps) {
     const memoryUsage = React.useMemo(() => {
         if (memoryStats.AnonRss === undefined) {
             return (
-                Number(memoryStats.AllocatedMemory || 0) +
-                Number(memoryStats.AllocatorCachesMemory || 0)
+                safeParseNumber(memoryStats.AllocatedMemory) +
+                safeParseNumber(memoryStats.AllocatorCachesMemory)
             );
         } else {
-            return Number(memoryStats.AnonRss);
+            return safeParseNumber(memoryStats.AnonRss);
         }
     }, [memoryStats.AnonRss, memoryStats.AllocatedMemory, memoryStats.AllocatorCachesMemory]);
 

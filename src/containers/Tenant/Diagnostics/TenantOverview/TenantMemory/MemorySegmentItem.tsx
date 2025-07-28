@@ -4,9 +4,9 @@ import {DefinitionList, Flex, Progress, Text} from '@gravity-ui/uikit';
 
 import type {MemorySegment} from '../../../../../components/MemoryViewer/utils';
 import {getMemorySegmentColor} from '../../../../../components/MemoryViewer/utils';
-import i18n from '../../../../../components/ProgressWrapper/i18n';
 import {cn} from '../../../../../utils/cn';
 import {formatStorageValuesToGb} from '../../../../../utils/dataFormatters/dataFormatters';
+import i18n from '../i18n';
 
 const b = cn('memory-details');
 
