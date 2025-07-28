@@ -46,8 +46,9 @@ export function TenantMemory({
                                 capacity={memoryLimit}
                                 formatValues={formatStorageValuesToGb}
                                 withCapacityUsage
+                                className={b('fallback-progress-wrapper')}
                                 size="m"
-                                width="full"
+                                width={400}
                             />
                         ),
                     },

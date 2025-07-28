@@ -13,4 +13,8 @@
         color: var(--g-color-text-secondary);
         @include mixins.body-1-typography();
     }
+
+    &__fallback-progress-wrapper {
+        margin-bottom: var(--g-spacing-4);
+    }
 }
