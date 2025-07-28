@@ -30,10 +30,6 @@
 
         max-width: 100%;
         padding-top: 4px;
-
-        &:first-child {
-            padding-top: 0;
-        }
     }
 
     &__label {
@@ -106,6 +102,10 @@
         .info-viewer__label {
             color: var(--g-color-text-secondary);
             @include mixins.body-1-typography();
+        }
+
+        .info-viewer__item:first-child {
+            padding-top: 0;
         }
     }
 }
