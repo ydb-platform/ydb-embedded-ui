@@ -1,4 +1,5 @@
 import React from 'react';
+// Query result viewer with tab persistence functionality
 
 import type {Settings} from '@gravity-ui/react-data-table';
 import type {ControlGroupOption} from '@gravity-ui/uikit';
