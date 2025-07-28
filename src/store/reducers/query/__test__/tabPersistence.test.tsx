@@ -1,7 +1,8 @@
 import queryReducer, {setResultTab} from '../query';
+import type {QueryState} from '../types';
 
 describe('QueryResultViewer tab persistence integration', () => {
-    const initialState = {
+    const initialState: QueryState = {
         input: '',
         history: {
             queries: [],
