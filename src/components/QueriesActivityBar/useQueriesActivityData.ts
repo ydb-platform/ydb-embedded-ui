@@ -18,6 +18,7 @@ interface UseQueriesActivityDataResult {
     uniqueUsers: number;
     qps: ReturnType<typeof calculateQueriesPerSecond>;
     latency: ReturnType<typeof calculateLatency>;
+    areChartsAvailable: boolean | null; // null = loading, boolean = result
 }
 
 export function useQueriesActivityData(tenantName: string): UseQueriesActivityDataResult {
@@ -33,7 +34,11 @@ export function useQueriesActivityData(tenantName: string): UseQueriesActivityDa
         {pollingInterval: shouldRefresh},
     );
 
-    const {data: queriesPerSecData} = chartApi.useGetChartDataQuery(
+    const {
+        data: queriesPerSecData,
+        isSuccess: queriesSuccess,
+        isError: queriesError,
+    } = chartApi.useGetChartDataQuery(
         {
             database: tenantName,
             metrics: [{target: 'queries.requests'}],
@@ -54,6 +59,17 @@ export function useQueriesActivityData(tenantName: string): UseQueriesActivityDa
     );
 
     const runningQueriesCount = runningQueriesData?.resultSets?.[0]?.result?.length || 0;
+
+    // Determine chart availability from queries API success/error state
+    const areChartsAvailable = React.useMemo(() => {
+        if (queriesSuccess) {
+            return true;
+        }
+        if (queriesError) {
+            return false;
+        }
+        return null; // Still loading
+    }, [queriesSuccess, queriesError]);
 
     const qps = React.useMemo(
         () => calculateQueriesPerSecond(queriesPerSecData?.metrics?.[0]?.data),
@@ -91,5 +107,6 @@ export function useQueriesActivityData(tenantName: string): UseQueriesActivityDa
         uniqueUsers,
         qps,
         latency,
+        areChartsAvailable,
     };
 }

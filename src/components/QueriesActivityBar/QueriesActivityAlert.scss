@@ -14,7 +14,7 @@
     }
 
     &__content {
-        padding: var(--g-spacing-5) var(--g-spacing-4);
+        padding: calc(var(--g-spacing-5) - 1px) var(--g-spacing-4);
     }
 
     &__title {
