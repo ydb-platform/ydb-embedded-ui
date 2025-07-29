@@ -8,6 +8,7 @@ import {parseQueryErrorToString} from '../../../../../utils/query';
 import {QueriesTableWithDrawer} from '../../TopQueries/QueriesTableWithDrawer';
 import {getTenantOverviewTopQueriesColumns} from '../../TopQueries/columns/columns';
 import {TOP_QUERIES_COLUMNS_WIDTH_LS_KEY} from '../../TopQueries/columns/constants';
+import {useTopQueriesSort} from '../../TopQueries/hooks/useTopQueriesSort';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 
 interface TopQueriesProps {
@@ -19,8 +20,15 @@ const columns = getTenantOverviewTopQueriesColumns();
 export function TopQueries({tenantName}: TopQueriesProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
+    const {backendSort} = useTopQueriesSort();
+
     const {currentData, isFetching, error} = topQueriesApi.useGetTopQueriesQuery(
-        {database: tenantName, timeFrame: 'hour', limit: TENANT_OVERVIEW_TABLES_LIMIT},
+        {
+            database: tenantName,
+            timeFrame: 'hour',
+            limit: TENANT_OVERVIEW_TABLES_LIMIT,
+            sortOrder: backendSort,
+        },
         {pollingInterval: autoRefreshInterval},
     );
 
