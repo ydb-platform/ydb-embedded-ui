@@ -128,6 +128,16 @@ const slice = createSlice({
         setQueryHistoryFilter: (state, action: PayloadAction<string>) => {
             state.history.filter = action.payload;
         },
+        setResultTab: (
+            state,
+            action: PayloadAction<{queryType: 'execute' | 'explain'; tabId: string}>,
+        ) => {
+            const {queryType, tabId} = action.payload;
+            if (!state.selectedResultTab) {
+                state.selectedResultTab = {};
+            }
+            state.selectedResultTab[queryType] = tabId;
+        },
         setStreamSession: setStreamSessionReducer,
         addStreamingChunks: addStreamingChunksReducer,
         setStreamQueryResponse: setStreamQueryResponseReducer,
@@ -149,6 +159,7 @@ const slice = createSlice({
         selectUserInput: (state) => state.input,
         selectIsDirty: (state) => state.isDirty,
         selectQueriesHistoryCurrentIndex: (state) => state.history?.currentIndex,
+        selectResultTab: (state) => state.selectedResultTab,
     },
 });
 
@@ -177,6 +188,7 @@ export const {
     setStreamQueryResponse,
     setStreamSession,
     setIsDirty,
+    setResultTab,
 } = slice.actions;
 
 export const {
@@ -187,6 +199,7 @@ export const {
     selectResult,
     selectUserInput,
     selectIsDirty,
+    selectResultTab,
 } = slice.selectors;
 
 interface SendQueryParams extends QueryRequestParams {
