@@ -66,7 +66,7 @@ test.describe('Test Sidebar', async () => {
 
         // Click the Information button to open the popup
         await sidebar.clickInformation();
-        await page.waitForTimeout(500); // Wait for animation
+        await page.waitForTimeout(700); // Wait for animation
 
         // Check if the popup is visible
         await expect(sidebar.isPopupVisible()).resolves.toBe(true);
@@ -86,7 +86,7 @@ test.describe('Test Sidebar', async () => {
 
         // Click the Information button to open the popup
         await sidebar.clickInformation();
-        await page.waitForTimeout(500); // Wait for animation
+        await page.waitForTimeout(700); // Wait for animation
 
         // Check if the popup is visible
         await expect(sidebar.isPopupVisible()).resolves.toBe(true);
