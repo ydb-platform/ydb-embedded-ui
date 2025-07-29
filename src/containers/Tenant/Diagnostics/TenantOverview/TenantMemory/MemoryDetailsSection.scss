@@ -18,7 +18,8 @@
         height: 20px;
     }
 
-    &__segments-container {
+    &__memory-segments-list {
+        --g-definition-list-item-gap: var(--g-spacing-2);
         margin-bottom: var(--g-spacing-4);
     }
 
@@ -29,10 +30,6 @@
         height: 8px;
 
         border-radius: 50%;
-    }
-
-    &__segment-definition-list {
-        flex: 1;
     }
 
     &__segment-progress {

@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Flex, Text} from '@gravity-ui/uikit';
 
-import i18n from '../../../../../components/MemoryViewer/i18n';
+import memoryI18n from '../../../../../components/MemoryViewer/i18n';
 import {getMemorySegments} from '../../../../../components/MemoryViewer/utils';
 import {ProgressWrapper} from '../../../../../components/ProgressWrapper';
 import type {TMemoryStats} from '../../../../../types/api/nodes';
@@ -10,7 +10,7 @@ import {cn} from '../../../../../utils/cn';
 import {formatStorageValuesToGb} from '../../../../../utils/dataFormatters/dataFormatters';
 import {safeParseNumber} from '../../../../../utils/utils';
 
-import {MemorySegmentItem} from './MemorySegmentItem';
+import {MemorySegmentsList} from './MemorySegmentsList';
 
 import './MemoryDetailsSection.scss';
 
@@ -48,7 +48,7 @@ export function MemoryDetailsSection({memoryStats}: MemoryDetailsSectionProps) {
         <Flex direction="column" alignItems="flex-start" gap="3">
             <div className={b('header')}>
                 <Text variant="body-1" className={b('title')}>
-                    {i18n('text_memory-details')}
+                    {memoryI18n('text_memory-details')}
                 </Text>
             </div>
             <Flex direction="column" alignItems="flex-start" gap="4" width="100%">
@@ -62,16 +62,10 @@ export function MemoryDetailsSection({memoryStats}: MemoryDetailsSectionProps) {
                         width="full"
                     />
                 </div>
-                <Flex
-                    direction="column"
-                    alignItems="flex-start"
-                    gap="2"
-                    className={b('segments-container')}
-                >
-                    {displaySegments.map((segment) => (
-                        <MemorySegmentItem key={segment.key} segment={segment} />
-                    ))}
-                </Flex>
+                <MemorySegmentsList
+                    segments={displaySegments}
+                    className={b('memory-segments-list')}
+                />
             </Flex>
         </Flex>
     );
