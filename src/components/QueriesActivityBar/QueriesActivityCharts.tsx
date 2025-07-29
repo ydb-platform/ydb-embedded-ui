@@ -14,7 +14,9 @@ interface QueriesActivityChartsProps {
     onChartDataStatusChange?: (status: ChartDataStatus) => void;
 }
 
-const ACTIVITY_CHART_HEIGHT = 292;
+const LEGEND_HEIGHT = 34.5;
+const QUERIES_PER_SECOND_CHART_HEIGHT = 292;
+const QUERIES_LATENCIES_CHART_HEIGHT = 292 + LEGEND_HEIGHT;
 
 export function QueriesActivityCharts({
     tenantName,
@@ -70,7 +72,7 @@ export function QueriesActivityCharts({
                     database={tenantName}
                     metrics={queriesChartConfig.metrics}
                     autorefresh={shouldRefresh}
-                    height={ACTIVITY_CHART_HEIGHT}
+                    height={QUERIES_PER_SECOND_CHART_HEIGHT}
                     chartOptions={queriesChartConfig.options}
                     onChartDataStatusChange={handleChartDataStatusChange}
                     isChartVisible={hasChartsLoaded && expanded}
@@ -83,7 +85,7 @@ export function QueriesActivityCharts({
                     database={tenantName}
                     metrics={latenciesChartConfig.metrics}
                     autorefresh={shouldRefresh}
-                    height={ACTIVITY_CHART_HEIGHT}
+                    height={QUERIES_LATENCIES_CHART_HEIGHT}
                     chartOptions={latenciesChartConfig.options}
                     onChartDataStatusChange={handleChartDataStatusChange}
                     isChartVisible={hasChartsLoaded && expanded}

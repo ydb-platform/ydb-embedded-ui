@@ -10,7 +10,7 @@ describe('QueryResultViewer tab persistence integration', () => {
         },
     };
 
-    it('should save and retrieve tab selection for explain queries', () => {
+    test('should save and retrieve tab selection for explain queries', () => {
         // Test that we can set and get the tab preference
         let state = queryReducer(initialState, setResultTab({queryType: 'explain', tabId: 'json'}));
 
@@ -26,7 +26,7 @@ describe('QueryResultViewer tab persistence integration', () => {
         });
     });
 
-    it('should save and retrieve tab selection for execute queries', () => {
+    test('should save and retrieve tab selection for execute queries', () => {
         const state = queryReducer(
             initialState,
             setResultTab({queryType: 'execute', tabId: 'stats'}),
@@ -37,7 +37,7 @@ describe('QueryResultViewer tab persistence integration', () => {
         });
     });
 
-    it('should maintain separate preferences for different query types', () => {
+    test('should maintain separate preferences for different query types', () => {
         let state = initialState;
 
         // Set explain tab
@@ -61,7 +61,7 @@ describe('QueryResultViewer tab persistence integration', () => {
         });
     });
 
-    it('should handle multiple updates to the same query type', () => {
+    test('should handle multiple updates to the same query type', () => {
         let state = initialState;
 
         // Set initial value

@@ -6,18 +6,16 @@ import {useHistory, useLocation} from 'react-router-dom';
 
 import {TenantTabsGroups, getTenantPath} from '../../containers/Tenant/TenantPages';
 import {parseQuery} from '../../routes';
-import {topQueriesApi} from '../../store/reducers/executeTopQueries/executeTopQueries';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../store/reducers/tenant/constants';
-import type {KeyValueRow} from '../../types/api/query';
 import {cn} from '../../utils/cn';
-import {useAutoRefreshInterval} from '../../utils/hooks';
-import type {TimeFrame} from '../../utils/timeframes';
-import {chartApi} from '../MetricChart/reducer';
-import type {ChartDataStatus} from '../MetricChart/types';
 
+import {QueriesActivityAlert} from './QueriesActivityAlert';
 import {QueriesActivityCharts} from './QueriesActivityCharts';
+import {QueriesActivitySkeleton} from './QueriesActivitySkeleton';
 import i18n from './i18n';
-import {calculateLatency, calculateQueriesPerSecond, formatTrendValue} from './utils';
+import {useChartAvailability} from './useChartAvailability';
+import {useQueriesActivityData} from './useQueriesActivityData';
+import {formatTrendValue} from './utils';
 
 import './QueriesActivityBar.scss';
 
@@ -30,93 +28,13 @@ interface QueriesActivityBarProps {
 export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
     const history = useHistory();
     const location = useLocation();
-    const [autoRefreshInterval] = useAutoRefreshInterval();
     const [expanded, setExpanded] = React.useState(false);
-    const [queriesTimeFrame] = React.useState<TimeFrame>('1h');
-    const [latenciesTimeFrame] = React.useState<TimeFrame>('1h');
-    const [isActivityBarHidden, setIsActivityBarHidden] = React.useState<boolean>(true);
 
-    // Refetch data only if activity bar successfully loaded
-    const shouldRefresh = isActivityBarHidden ? 0 : autoRefreshInterval;
+    // Check chart availability without rendering hidden components
+    const areChartsAvailable = useChartAvailability(tenantName);
 
-    /**
-     * Activity bar should be hidden, if charts are not enabled:
-     * 1. GraphShard is not enabled
-     * 2. ydb version does not have /viewer/json/render endpoint (400, 404, CORS error, etc.)
-     *
-     * If at least one chart successfully loaded, activity bar should be shown
-     * @link https://github.com/ydb-platform/ydb-embedded-ui/issues/659
-     * @todo disable only for specific errors ('GraphShard is not enabled') after ydb-stable-24 is generally used
-     */
-    const handleChartDataStatusChange = React.useCallback((chartStatus: ChartDataStatus) => {
-        if (chartStatus === 'success') {
-            setIsActivityBarHidden(false);
-        }
-    }, []);
-
-    // Fetch running queries
-    const {data: runningQueriesData} = topQueriesApi.useGetRunningQueriesQuery(
-        {
-            database: tenantName,
-            filters: {},
-        },
-        {pollingInterval: shouldRefresh},
-    );
-
-    // Fetch queries per second data for header metrics
-    const {data: queriesPerSecData} = chartApi.useGetChartDataQuery(
-        {
-            database: tenantName,
-            metrics: [{target: 'queries.requests'}],
-            timeFrame: queriesTimeFrame,
-            maxDataPoints: 30,
-        },
-        {pollingInterval: shouldRefresh},
-    );
-
-    // Fetch latency data for header metrics
-    const {data: latencyData} = chartApi.useGetChartDataQuery(
-        {
-            database: tenantName,
-            metrics: [{target: 'queries.latencies.p99'}],
-            timeFrame: latenciesTimeFrame,
-            maxDataPoints: 30,
-        },
-        {pollingInterval: shouldRefresh},
-    );
-
-    const runningQueriesCount = runningQueriesData?.resultSets?.[0]?.result?.length || 0;
-
-    const qps = React.useMemo(
-        () => calculateQueriesPerSecond(queriesPerSecData?.metrics?.[0]?.data),
-        [queriesPerSecData?.metrics?.[0]?.data],
-    );
-
-    const latency = React.useMemo(
-        () => calculateLatency(latencyData?.metrics?.[0]?.data),
-        [latencyData?.metrics?.[0]?.data],
-    );
-
-    // Calculate unique applications and users
-    const uniqueApplications = React.useMemo(() => {
-        const apps = new Set<string>();
-        runningQueriesData?.resultSets?.[0]?.result?.forEach((row: KeyValueRow) => {
-            if (row.ApplicationName) {
-                apps.add(String(row.ApplicationName));
-            }
-        });
-        return apps.size;
-    }, [runningQueriesData]);
-
-    const uniqueUsers = React.useMemo(() => {
-        const users = new Set<string>();
-        runningQueriesData?.resultSets?.[0]?.result?.forEach((row: KeyValueRow) => {
-            if (row.UserSID) {
-                users.add(String(row.UserSID));
-            }
-        });
-        return users.size;
-    }, [runningQueriesData]);
+    const {runningQueriesCount, uniqueApplications, uniqueUsers, qps, latency} =
+        useQueriesActivityData(tenantName);
 
     const handleOpenRunningQueries = () => {
         const queryParams = parseQuery(location);
@@ -132,8 +50,25 @@ export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
         setExpanded(!expanded);
     };
 
+    // Show skeleton while determining chart availability
+    if (areChartsAvailable === null) {
+        return <QueriesActivitySkeleton />;
+    }
+
+    // Render compact alert-style mode when charts are not available
+    if (areChartsAvailable === false) {
+        return (
+            <QueriesActivityAlert
+                runningQueriesCount={runningQueriesCount}
+                uniqueApplications={uniqueApplications}
+                uniqueUsers={uniqueUsers}
+            />
+        );
+    }
+
+    // Render expandable mode when charts are available
     return (
-        <div className={b({expanded})} style={{display: isActivityBarHidden ? 'none' : undefined}}>
+        <div className={b({expanded})}>
             <Card className={b('card')} type="container" view={expanded ? 'outlined' : 'raised'}>
                 <div className={b('header')} onClick={handleToggleExpanded}>
                     <Flex justifyContent="space-between" className={b('content-wrapper')}>
@@ -146,36 +81,36 @@ export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
                             </Text>
                         </Flex>
 
-                        <div className={b('metrics')}>
-                            <Label
-                                theme={runningQueriesCount > 0 ? 'success' : 'unknown'}
-                                size="s"
-                                icon={<Icon data={CirclePlay} size={14} />}
-                            >
-                                {runningQueriesCount}
-                            </Label>
+                        <Flex alignItems="center" gap={4} className={b('header-metrics')}>
+                            <div className={b('metrics')}>
+                                <Label
+                                    theme={runningQueriesCount > 0 ? 'success' : 'unknown'}
+                                    size="s"
+                                    icon={<Icon data={CirclePlay} size={14} />}
+                                >
+                                    {runningQueriesCount}
+                                </Label>
+                                <Label
+                                    theme="unknown"
+                                    icon={<Icon data={Rocket} />}
+                                    size="s"
+                                    value={formatTrendValue(qps?.trend?.value ?? 0)}
+                                >
+                                    {i18n('value_per-sec', {count: qps?.value ?? '0'})}
+                                </Label>
+                                <Label
+                                    theme="unknown"
+                                    icon={<Icon data={Clock} />}
+                                    size="s"
+                                    value={formatTrendValue(latency?.trend?.value ?? 0)}
+                                >
+                                    {i18n('value_ms', {time: latency?.value ?? '0'})}
+                                </Label>
+                            </div>
 
-                            <Label
-                                theme="clear"
-                                size="s"
-                                icon={<Icon data={Rocket} size={14} />}
-                                value={formatTrendValue(qps.trend.value)}
-                            >
-                                {i18n('value_per-sec', {count: qps.value})}
-                            </Label>
-
-                            <Label
-                                theme="clear"
-                                size="s"
-                                icon={<Icon data={Clock} size={14} />}
-                                value={formatTrendValue(latency.trend.value)}
-                            >
-                                {i18n('value_ms', {time: latency.value})}
-                            </Label>
-                        </div>
+                            <ArrowToggle direction={expanded ? 'top' : 'bottom'} size={16} />
+                        </Flex>
                     </Flex>
-
-                    <ArrowToggle direction={expanded ? 'top' : 'bottom'} />
                 </div>
 
                 {expanded && (
@@ -208,22 +143,20 @@ export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
                                 {i18n('field_users')}
                             </Label>
 
-                            <Button
-                                view="outlined"
-                                size="s"
-                                onClick={handleOpenRunningQueries}
-                                className={b('open-queries-button')}
-                            >
-                                {i18n('action_open-running-queries')}
-                            </Button>
+                            {runningQueriesCount > 0 && (
+                                <Button
+                                    view="outlined"
+                                    size="s"
+                                    onClick={handleOpenRunningQueries}
+                                    className={b('open-queries-button')}
+                                >
+                                    {i18n('action_open-running-queries')}
+                                </Button>
+                            )}
                         </div>
                     </div>
                 )}
-                <QueriesActivityCharts
-                    tenantName={tenantName}
-                    expanded={expanded}
-                    onChartDataStatusChange={handleChartDataStatusChange}
-                />
+                <QueriesActivityCharts tenantName={tenantName} expanded={expanded} />
             </Card>
         </div>
     );

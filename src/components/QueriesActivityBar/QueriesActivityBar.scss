@@ -57,6 +57,12 @@
         gap: var(--g-spacing-1);
     }
 
+    &__header-metrics {
+        display: flex;
+        align-items: center;
+        gap: var(--g-spacing-1);
+    }
+
     &__content {
         display: flex;
         flex-direction: column;
