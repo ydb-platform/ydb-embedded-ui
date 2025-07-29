@@ -1,17 +1,11 @@
-import React from 'react';
+import {Flex} from '@gravity-ui/uikit';
 
-import {ArrowRight} from '@gravity-ui/icons';
-import {Flex, Icon, SegmentedRadioGroup, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
-
-import {InternalLink} from '../../../../../components/InternalLink';
-import {
-    TENANT_CPU_NODES_MODE_IDS,
-    TENANT_CPU_TABS_IDS,
-    TENANT_DIAGNOSTICS_TABS_IDS,
-} from '../../../../../store/reducers/tenant/constants';
+import {setTopQueriesFilters} from '../../../../../store/reducers/executeTopQueries/executeTopQueries';
+import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
-import {cn} from '../../../../../utils/cn';
+import {useTypedDispatch} from '../../../../../utils/hooks';
 import {useDiagnosticsPageLinkGetter} from '../../../Diagnostics/DiagnosticsPages';
+import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
 import i18n from '../i18n';
 
@@ -20,17 +14,6 @@ import {TopNodesByLoad} from './TopNodesByLoad';
 import {TopQueries} from './TopQueries';
 import {TopShards} from './TopShards';
 import {cpuDashboardConfig} from './cpuDashboardConfig';
-import {useTenantCpuQueryParams} from './useTenantCpuQueryParams';
-
-import './TenantCpu.scss';
-
-const b = cn('tenant-cpu');
-
-const cpuTabs = [
-    {id: TENANT_CPU_TABS_IDS.nodes, title: i18n('title_top-nodes')},
-    {id: TENANT_CPU_TABS_IDS.shards, title: i18n('title_top-shards')},
-    {id: TENANT_CPU_TABS_IDS.queries, title: i18n('title_top-queries')},
-];
 
 interface TenantCpuProps {
     tenantName: string;
@@ -38,88 +21,53 @@ interface TenantCpuProps {
 }
 
 export function TenantCpu({tenantName, additionalNodesProps}: TenantCpuProps) {
-    const {cpuTab, nodesMode, handleCpuTabChange, handleNodesModeChange} =
-        useTenantCpuQueryParams();
+    const dispatch = useTypedDispatch();
     const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
 
-    const renderNodesContent = () => {
-        const nodesModeControl = (
-            <SegmentedRadioGroup value={nodesMode} onUpdate={handleNodesModeChange}>
-                <SegmentedRadioGroup.Option value={TENANT_CPU_NODES_MODE_IDS.load}>
-                    {i18n('action_by-load')}
-                </SegmentedRadioGroup.Option>
-                <SegmentedRadioGroup.Option value={TENANT_CPU_NODES_MODE_IDS.pools}>
-                    {i18n('action_by-pool-usage')}
-                </SegmentedRadioGroup.Option>
-            </SegmentedRadioGroup>
-        );
+    const allNodesLink = getDiagnosticsPageLink(TENANT_DIAGNOSTICS_TABS_IDS.nodes);
+    const topShardsLink = getDiagnosticsPageLink(TENANT_DIAGNOSTICS_TABS_IDS.topShards);
+    const topQueriesLink = getDiagnosticsPageLink(TENANT_DIAGNOSTICS_TABS_IDS.topQueries);
 
-        const allNodesButton = (
-            <InternalLink
-                className={b('all-nodes-link')}
-                to={getDiagnosticsPageLink(TENANT_DIAGNOSTICS_TABS_IDS.nodes)}
+    return (
+        <Flex direction="column" gap={4}>
+            <TenantDashboard database={tenantName} charts={cpuDashboardConfig} />
+            <StatsWrapper
+                allEntitiesLink={allNodesLink}
+                title={i18n('title_top-nodes-load')}
+                description={i18n('context_top-nodes-load')}
             >
-                {i18n('action_all-nodes')}
-                <Icon data={ArrowRight} size={16} />
-            </InternalLink>
-        );
-
-        const nodesComponent =
-            nodesMode === TENANT_CPU_NODES_MODE_IDS.load ? (
                 <TopNodesByLoad
                     tenantName={tenantName}
                     additionalNodesProps={additionalNodesProps}
                 />
-            ) : (
+            </StatsWrapper>
+            <StatsWrapper
+                title={i18n('title_top-nodes-pool')}
+                allEntitiesLink={allNodesLink}
+                description={i18n('context_top-nodes-pool')}
+            >
                 <TopNodesByCpu
                     tenantName={tenantName}
                     additionalNodesProps={additionalNodesProps}
                 />
-            );
-
-        return (
-            <Flex direction="column" gap={2}>
-                <Flex justifyContent="space-between" alignItems="center">
-                    {nodesModeControl}
-                    {allNodesButton}
-                </Flex>
-                {nodesComponent}
-            </Flex>
-        );
-    };
-
-    const renderTabContent = () => {
-        switch (cpuTab) {
-            case TENANT_CPU_TABS_IDS.nodes:
-                return renderNodesContent();
-            case TENANT_CPU_TABS_IDS.shards:
-                return <TopShards tenantName={tenantName} path={tenantName} />;
-            case TENANT_CPU_TABS_IDS.queries:
-                return <TopQueries tenantName={tenantName} />;
-            default:
-                return null;
-        }
-    };
-
-    return (
-        <React.Fragment>
-            <TenantDashboard database={tenantName} charts={cpuDashboardConfig} />
-
-            <div className={b('tabs-container')}>
-                <TabProvider value={cpuTab}>
-                    <TabList size="m">
-                        {cpuTabs.map(({id, title}) => {
-                            return (
-                                <Tab key={id} value={id} onClick={() => handleCpuTabChange(id)}>
-                                    {title}
-                                </Tab>
-                            );
-                        })}
-                    </TabList>
-                </TabProvider>
-
-                <div className={b('tab-content')}>{renderTabContent()}</div>
-            </div>
-        </React.Fragment>
+            </StatsWrapper>
+            <StatsWrapper
+                title={i18n('title_top-shards')}
+                allEntitiesLink={topShardsLink}
+                description={i18n('context_top-shards')}
+            >
+                <TopShards tenantName={tenantName} path={tenantName} />
+            </StatsWrapper>
+            <StatsWrapper
+                title={i18n('title_top-queries')}
+                allEntitiesLink={topQueriesLink}
+                description={i18n('context_top-queries')}
+                onAllEntitiesClick={() =>
+                    dispatch(setTopQueriesFilters({from: undefined, to: undefined}))
+                }
+            >
+                <TopQueries tenantName={tenantName} />
+            </StatsWrapper>
+        </Flex>
     );
 }

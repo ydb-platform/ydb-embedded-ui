@@ -132,6 +132,12 @@
             border-spacing: 0;
             border-collapse: separate;
         }
+
+        tbody > tr:last-child {
+            td {
+                border-bottom: unset;
+            }
+        }
     }
 
     // DataTable with moving head is actually made of two separate tables
