@@ -9,7 +9,7 @@ export type FormatProgressViewerValues = (
 ) => (string | number | undefined)[];
 
 const formatValue = (value?: number) => {
-    return formatNumber(roundToPrecision(Number(value), 2));
+    return formatNumber(roundToPrecision(value || 0, 2));
 };
 
 export const defaultFormatProgressValues: FormatProgressViewerValues = (value, total) => {

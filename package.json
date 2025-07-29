@@ -13,7 +13,7 @@
     "@bem-react/classname": "^1.6.0",
     "@ebay/nice-modal-react": "^1.2.13",
     "@gravity-ui/axios-wrapper": "^1.5.1",
-    "@gravity-ui/chartkit": "^7.0.1",
+    "@gravity-ui/chartkit": "^7.1.0",
     "@gravity-ui/components": "^4.4.0",
     "@gravity-ui/date-components": "^3.2.3",
     "@gravity-ui/date-utils": "^2.5.6",
