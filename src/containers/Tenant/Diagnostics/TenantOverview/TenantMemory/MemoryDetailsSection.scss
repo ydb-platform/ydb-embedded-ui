@@ -44,17 +44,4 @@
     &__progress-bar {
         height: 10px;
     }
-
-    &__popup-legend {
-        flex-shrink: 0;
-
-        width: 12px;
-        height: 12px;
-
-        border-radius: var(--g-border-radius-xs);
-    }
-
-    &__popup-name {
-        color: var(--g-color-text-primary);
-    }
 }
