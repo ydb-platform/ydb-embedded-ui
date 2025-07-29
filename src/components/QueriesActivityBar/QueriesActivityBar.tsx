@@ -70,52 +70,56 @@ export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
     return (
         <div className={b({expanded})}>
             <Card className={b('card')} type="container" view={expanded ? 'outlined' : 'raised'}>
-                <div className={b('header')} onClick={handleToggleExpanded}>
-                    <Flex justifyContent="space-between" className={b('content-wrapper')}>
-                        <Flex direction="column" className={b('title-section')}>
-                            <Text variant="subheader-2" className={b('title')}>
-                                {i18n('title_queries-activity')}
-                            </Text>
-                            <Text color="secondary" variant="caption-2" className={b('subtitle')}>
-                                {i18n('context_monitor-changes-realtime')}
-                            </Text>
-                        </Flex>
-
-                        <Flex alignItems="center" gap={4} className={b('header-metrics')}>
-                            <div className={b('metrics')}>
-                                <Label
-                                    theme={runningQueriesCount > 0 ? 'success' : 'unknown'}
-                                    size="s"
-                                    icon={<Icon data={CirclePlay} size={14} />}
-                                >
-                                    {runningQueriesCount}
-                                </Label>
-                                <Label
-                                    theme="unknown"
-                                    icon={<Icon data={Rocket} />}
-                                    size="s"
-                                    value={formatTrendValue(qps?.trend?.value ?? 0)}
-                                >
-                                    {i18n('value_per-sec', {count: qps?.value ?? '0'})}
-                                </Label>
-                                <Label
-                                    theme="unknown"
-                                    icon={<Icon data={Clock} />}
-                                    size="s"
-                                    value={formatTrendValue(latency?.trend?.value ?? 0)}
-                                >
-                                    {i18n('value_ms', {time: latency?.value ?? '0'})}
-                                </Label>
-                            </div>
-
-                            <ArrowToggle direction={expanded ? 'top' : 'bottom'} size={16} />
-                        </Flex>
+                <Flex
+                    className={b('header')}
+                    onClick={handleToggleExpanded}
+                    justifyContent="space-between"
+                    alignItems="center"
+                    gap={3}
+                >
+                    <Flex direction="column">
+                        <Text variant="subheader-2" className={b('title')}>
+                            {i18n('title_queries-activity')}
+                        </Text>
+                        <Text color="secondary" variant="caption-2" className={b('subtitle')}>
+                            {i18n('context_monitor-changes-realtime')}
+                        </Text>
                     </Flex>
-                </div>
+
+                    <Flex alignItems="center" gap={4}>
+                        <Flex alignItems="center" gap={1}>
+                            <Label
+                                theme={runningQueriesCount > 0 ? 'success' : 'unknown'}
+                                size="s"
+                                icon={<Icon data={CirclePlay} size={14} />}
+                            >
+                                {runningQueriesCount}
+                            </Label>
+                            <Label
+                                theme="unknown"
+                                icon={<Icon data={Rocket} />}
+                                size="s"
+                                value={formatTrendValue(qps?.trend?.value ?? 0)}
+                            >
+                                {i18n('value_per-sec', {count: qps?.value ?? '0'})}
+                            </Label>
+                            <Label
+                                theme="unknown"
+                                icon={<Icon data={Clock} />}
+                                size="s"
+                                value={formatTrendValue(latency?.trend?.value ?? 0)}
+                            >
+                                {i18n('value_ms', {time: latency?.value ?? '0'})}
+                            </Label>
+                        </Flex>
+
+                        <ArrowToggle direction={expanded ? 'top' : 'bottom'} size={16} />
+                    </Flex>
+                </Flex>
 
                 {expanded && (
-                    <div className={b('content')}>
-                        <div className={b('stats')}>
+                    <Flex direction="column" gap={4} className={b('content')}>
+                        <Flex wrap alignItems="center" gap={1} className={b('stats')}>
                             <Label
                                 theme="unknown"
                                 icon={<Icon data={CirclePlay} />}
@@ -153,8 +157,8 @@ export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
                                     {i18n('action_open-running-queries')}
                                 </Button>
                             )}
-                        </div>
-                    </div>
+                        </Flex>
+                    </Flex>
                 )}
                 <QueriesActivityCharts tenantName={tenantName} expanded={expanded} />
             </Card>

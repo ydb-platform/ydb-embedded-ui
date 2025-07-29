@@ -14,7 +14,7 @@
     }
 
     &__content {
-        padding: var(--g-spacing-3) var(--g-spacing-4);
+        padding: var(--g-spacing-5) var(--g-spacing-4);
     }
 
     &__title {
@@ -23,10 +23,5 @@
 
     &__open-queries-button {
         margin-left: var(--g-spacing-1);
-
-        &:focus-visible {
-            outline: 2px solid var(--g-color-line-focus);
-            outline-offset: 2px;
-        }
     }
 }

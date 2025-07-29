@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {Flex} from '@gravity-ui/uikit';
+
 import {defaultDashboardConfig} from '../../containers/Tenant/Diagnostics/TenantOverview/DefaultOverviewContent/defaultDashboardConfig';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval} from '../../utils/hooks';
@@ -66,8 +68,13 @@ export function QueriesActivityCharts({
     // TODO: Remove this workaround once the upstream issue is fixed
 
     return (
-        <div className={b('charts')} style={{display: expanded ? undefined : 'none'}}>
-            <div className={b('chart-container')}>
+        <Flex
+            className={b('charts')}
+            gap={4}
+            direction="row"
+            style={{display: expanded ? undefined : 'none'}}
+        >
+            <Flex direction="column" gap={3} grow>
                 <MetricChart
                     database={tenantName}
                     metrics={queriesChartConfig.metrics}
@@ -78,9 +85,9 @@ export function QueriesActivityCharts({
                     isChartVisible={hasChartsLoaded && expanded}
                     title={queriesChartConfig.title}
                 />
-            </div>
+            </Flex>
 
-            <div className={b('chart-container')}>
+            <Flex direction="column" gap={3} grow>
                 <MetricChart
                     database={tenantName}
                     metrics={latenciesChartConfig.metrics}
@@ -91,7 +98,7 @@ export function QueriesActivityCharts({
                     isChartVisible={hasChartsLoaded && expanded}
                     title={latenciesChartConfig.title}
                 />
-            </div>
-        </div>
+            </Flex>
+        </Flex>
     );
 }
