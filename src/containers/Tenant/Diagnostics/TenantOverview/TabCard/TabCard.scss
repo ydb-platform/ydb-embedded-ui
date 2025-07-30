@@ -4,12 +4,10 @@
     &__card-container {
         padding: var(--g-spacing-4);
 
+        cursor: pointer;
+
         border: 0;
         border-radius: var(--g-border-radius-s);
-    }
-
-    &__card-container_clickable {
-        cursor: pointer;
 
         // Smooth hover transition
         transition: background-color 0.15s ease;

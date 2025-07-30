@@ -11,6 +11,7 @@ import {
 import type {
     TENANT_DIAGNOSTICS_TABS_IDS,
     TENANT_METRICS_TABS_IDS,
+    TENANT_NETWORK_TABS_IDS,
     TENANT_QUERY_TABS_ID,
     TENANT_SUMMARY_TABS_IDS,
 } from './constants';
@@ -37,6 +38,7 @@ export type TenantMetricsTab = ValueOf<typeof TENANT_METRICS_TABS_IDS>;
 export type TenantCpuTab = ValueOf<typeof TENANT_CPU_TABS_IDS>;
 export type TenantNodesMode = ValueOf<typeof TENANT_CPU_NODES_MODE_IDS>;
 export type TenantStorageTab = ValueOf<typeof TENANT_STORAGE_TABS_IDS>;
+export type TenantNetworkTab = ValueOf<typeof TENANT_NETWORK_TABS_IDS>;
 
 export interface TenantState {
     tenantPage: TenantPage;
