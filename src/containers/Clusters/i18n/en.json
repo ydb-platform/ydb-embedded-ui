@@ -15,7 +15,11 @@
 
   "tooltip_no-cluster-data": "No cluster data",
 
-  "clusters-count": "{{count}} clusters",
+  "clusters-count": {
+    "one": "{{count}} cluster",
+    "other": "{{count}} clusters"
+  },
+
   "entities-count": "{{value}} of {{capacity}}",
 
   "page_title": "Clusters",
