@@ -27,22 +27,31 @@ const cpuTimeUsColumn: Column<KeyValueRow> = {
     align: DataTable.RIGHT,
 };
 
-const getQueryTextColumn = (lines = 3) => {
-    const queryTextColumn: Column<KeyValueRow> = {
-        name: QUERIES_COLUMNS_IDS.QueryText,
-        header: QUERIES_COLUMNS_TITLES.QueryText,
-        render: ({row}) => (
-            <div className={b('query')}>
-                <FixedHeightQuery
-                    value={row.QueryText?.toString()}
-                    lines={lines}
-                    hasClipboardButton
-                />
-            </div>
-        ),
-        width: 500,
-    };
-    return queryTextColumn;
+const queryTextColumn: Column<KeyValueRow> = {
+    name: QUERIES_COLUMNS_IDS.QueryText,
+    header: QUERIES_COLUMNS_TITLES.QueryText,
+    render: ({row}) => (
+        <div className={b('query')}>
+            <FixedHeightQuery value={row.QueryText?.toString()} lines={3} hasClipboardButton />
+        </div>
+    ),
+    width: 500,
+};
+
+const queryTextColumnWithMaxHeight: Column<KeyValueRow> = {
+    name: QUERIES_COLUMNS_IDS.QueryText,
+    header: QUERIES_COLUMNS_TITLES.QueryText,
+    render: ({row}) => (
+        <div className={b('query')}>
+            <FixedHeightQuery
+                value={row.QueryText?.toString()}
+                lines={6}
+                hasClipboardButton
+                mode="fixed"
+            />
+        </div>
+    ),
+    width: 500,
 };
 
 const endTimeColumn: Column<KeyValueRow> = {
@@ -80,7 +89,7 @@ const userSIDColumn: Column<KeyValueRow> = {
 const queryHashColumn: Column<KeyValueRow> = {
     name: QUERIES_COLUMNS_IDS.QueryHash,
     header: QUERIES_COLUMNS_TITLES.QueryHash,
-    render: ({row}) => <div className={b('query-hash')}>{generateHash(String(row.QueryText))}</div>,
+    render: ({row}) => generateHash(String(row.QueryText)),
     width: 130,
 };
 
@@ -121,7 +130,7 @@ export function getTopQueriesColumns() {
         durationColumn,
         readBytesColumn,
         requestUnitsColumn,
-        getQueryTextColumn(),
+        queryTextColumn,
         endTimeColumn,
         readRowsColumn,
         userSIDColumn,
@@ -135,14 +144,14 @@ export function getTopQueriesColumns() {
 }
 
 export function getTenantOverviewTopQueriesColumns() {
-    return [queryHashColumn, getQueryTextColumn(6), cpuTimeUsColumn];
+    return [queryHashColumn, queryTextColumnWithMaxHeight, cpuTimeUsColumn];
 }
 export function getRunningQueriesColumns() {
     const columns = [
         queryHashColumn,
         userSIDColumn,
         queryStartColumn,
-        getQueryTextColumn(),
+        queryTextColumn,
         applicationColumn,
     ];
 

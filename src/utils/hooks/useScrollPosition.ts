@@ -3,7 +3,7 @@ import React from 'react';
 import {debounce} from 'lodash';
 import {useHistory} from 'react-router-dom';
 
-const DEBAUNCE_DELAY = 100;
+const DEBOUNCE_DELAY = 100;
 
 /**
  * Hook for saving and restoring scroll position on navigation
@@ -65,7 +65,7 @@ export function useScrollPosition(
         () =>
             debounce((scrollTop: number) => {
                 saveScrollPosition(scrollTop);
-            }, DEBAUNCE_DELAY),
+            }, DEBOUNCE_DELAY),
         [saveScrollPosition],
     );
 
@@ -88,14 +88,15 @@ export function useScrollPosition(
 
     // Handle location changes
     React.useLayoutEffect(() => {
+        let timeoutId: number | undefined;
         if (isHistoryNavigation && shouldRestore) {
             // This is a browser back/forward navigation - restore position with timeout to ensure that content rendered
-            const timeoutId = setTimeout(restoreScrollPosition, 100);
-            return () => clearTimeout(timeoutId);
+            timeoutId = window.setTimeout(restoreScrollPosition, 100);
         } else {
             // This is a regular navigation (tab click, page reload) - clear position
             clearScrollPosition();
         }
+        return () => clearTimeout(timeoutId);
     }, [
         isHistoryNavigation,
         restoreScrollPosition,
