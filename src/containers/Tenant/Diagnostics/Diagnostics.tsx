@@ -16,7 +16,7 @@ import {setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../types/additionalProps';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 import {cn} from '../../../utils/cn';
-import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
+import {useScrollPosition, useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {Heatmap} from '../../Heatmap';
 import {Nodes} from '../../Nodes/Nodes';
 import {Operations} from '../../Operations';
@@ -199,6 +199,12 @@ function Diagnostics(props: DiagnosticsProps) {
             </div>
         );
     };
+
+    useScrollPosition(
+        containerRef,
+        `tenant-diagnostics-${tenantName}-${activeTab?.id}`,
+        activeTab?.id === TENANT_DIAGNOSTICS_TABS_IDS.overview,
+    );
 
     return (
         <div className={b()}>

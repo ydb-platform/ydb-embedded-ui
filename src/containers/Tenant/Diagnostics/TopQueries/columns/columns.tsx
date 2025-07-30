@@ -2,7 +2,6 @@ import DataTable from '@gravity-ui/react-data-table';
 import type {Column, OrderType} from '@gravity-ui/react-data-table';
 
 import {FixedHeightQuery} from '../../../../../components/FixedHeightQuery/FixedHeightQuery';
-import {YDBSyntaxHighlighter} from '../../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {cn} from '../../../../../utils/cn';
 import {formatDateTime, formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
@@ -28,15 +27,22 @@ const cpuTimeUsColumn: Column<KeyValueRow> = {
     align: DataTable.RIGHT,
 };
 
-const queryTextColumn: Column<KeyValueRow> = {
-    name: QUERIES_COLUMNS_IDS.QueryText,
-    header: QUERIES_COLUMNS_TITLES.QueryText,
-    render: ({row}) => (
-        <div className={b('query')}>
-            <FixedHeightQuery value={row.QueryText?.toString()} lines={3} hasClipboardButton />
-        </div>
-    ),
-    width: 500,
+const getQueryTextColumn = (lines = 3) => {
+    const queryTextColumn: Column<KeyValueRow> = {
+        name: QUERIES_COLUMNS_IDS.QueryText,
+        header: QUERIES_COLUMNS_TITLES.QueryText,
+        render: ({row}) => (
+            <div className={b('query')}>
+                <FixedHeightQuery
+                    value={row.QueryText?.toString()}
+                    lines={lines}
+                    hasClipboardButton
+                />
+            </div>
+        ),
+        width: 500,
+    };
+    return queryTextColumn;
 };
 
 const endTimeColumn: Column<KeyValueRow> = {
@@ -71,25 +77,10 @@ const userSIDColumn: Column<KeyValueRow> = {
     width: 120,
 };
 
-const oneLineQueryTextColumn: Column<KeyValueRow> = {
-    name: QUERIES_COLUMNS_IDS.OneLineQueryText,
-    header: QUERIES_COLUMNS_TITLES.OneLineQueryText,
-    render: ({row}) => (
-        <YDBSyntaxHighlighter
-            language="yql"
-            text={row.QueryText?.toString() || ''}
-            withClipboardButton={{
-                withLabel: false,
-            }}
-        />
-    ),
-    width: 500,
-};
-
 const queryHashColumn: Column<KeyValueRow> = {
     name: QUERIES_COLUMNS_IDS.QueryHash,
     header: QUERIES_COLUMNS_TITLES.QueryHash,
-    render: ({row}) => generateHash(String(row.QueryText)),
+    render: ({row}) => <div className={b('query-hash')}>{generateHash(String(row.QueryText))}</div>,
     width: 130,
 };
 
@@ -130,7 +121,7 @@ export function getTopQueriesColumns() {
         durationColumn,
         readBytesColumn,
         requestUnitsColumn,
-        queryTextColumn,
+        getQueryTextColumn(),
         endTimeColumn,
         readRowsColumn,
         userSIDColumn,
@@ -144,14 +135,14 @@ export function getTopQueriesColumns() {
 }
 
 export function getTenantOverviewTopQueriesColumns() {
-    return [queryHashColumn, oneLineQueryTextColumn, cpuTimeUsColumn];
+    return [queryHashColumn, getQueryTextColumn(6), cpuTimeUsColumn];
 }
 export function getRunningQueriesColumns() {
     const columns = [
         queryHashColumn,
         userSIDColumn,
         queryStartColumn,
-        queryTextColumn,
+        getQueryTextColumn(),
         applicationColumn,
     ];
 
