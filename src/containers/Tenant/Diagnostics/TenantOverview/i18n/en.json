@@ -18,6 +18,7 @@
   "context_storage-groups": "Storage: {{count}} groups",
   "context_memory-used": "Memory used",
   "context_network-usage": "Network usage",
+  "context_network-evaluation": "Network usage",
   "context_cpu-description": "CPU load is calculated as the cumulative usage across all actor system pools in the database",
   "context_memory-description": "Memory usage is the total memory consumed by all processes in the database",
   "context_storage-description": "Storage usage shows how much data is stored in the database including user data and indexes",
