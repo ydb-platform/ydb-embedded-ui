@@ -47,7 +47,7 @@ const queryTextColumnWithMaxHeight: Column<KeyValueRow> = {
                 value={row.QueryText?.toString()}
                 lines={6}
                 hasClipboardButton
-                mode="fixed"
+                mode="max"
             />
         </div>
     ),
