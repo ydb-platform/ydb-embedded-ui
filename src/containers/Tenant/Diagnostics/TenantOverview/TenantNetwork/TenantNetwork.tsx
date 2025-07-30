@@ -1,5 +1,10 @@
 import {Flex, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 
+import {EmptyState} from '../../../../../components/EmptyState/EmptyState';
+import {Illustration} from '../../../../../components/Illustration';
+import {LoaderWrapper} from '../../../../../components/LoaderWrapper/LoaderWrapper';
+import {useShouldShowDatabaseNetworkTable} from '../../../../../components/NetworkTable/hooks';
+import {useCapabilitiesLoaded} from '../../../../../store/reducers/capabilities/hooks';
 import {TENANT_NETWORK_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import {cn} from '../../../../../utils/cn';
@@ -24,6 +29,8 @@ interface TenantNetworkProps {
 }
 
 export function TenantNetwork({tenantName, additionalNodesProps}: TenantNetworkProps) {
+    const capabilitiesLoaded = useCapabilitiesLoaded();
+    const shouldShowNetworkTable = useShouldShowDatabaseNetworkTable();
     const {networkTab, handleNetworkTabChange} = useTenantNetworkQueryParams();
 
     const renderTabContent = () => {
@@ -50,25 +57,48 @@ export function TenantNetwork({tenantName, additionalNodesProps}: TenantNetworkP
         }
     };
 
-    return (
-        <Flex direction="column" gap={4} className={b()}>
-            <Flex direction="column" gap={3} className={b('tabs-container')}>
-                <TabProvider value={networkTab}>
-                    <TabList size="m">
-                        {networkTabs.map(({id, title}) => {
-                            return (
-                                <Tab key={id} value={id} onClick={() => handleNetworkTabChange(id)}>
-                                    {title}
-                                </Tab>
-                            );
-                        })}
-                    </TabList>
-                </TabProvider>
+    const renderNetworkStatsUnavailable = () => {
+        return (
+            <EmptyState
+                image={<Illustration name="thumbsUp" />}
+                title={i18n('network-stats-unavailable.title')}
+                description={i18n('network-stats-unavailable.description')}
+                size="s"
+            />
+        );
+    };
 
-                <Flex direction="column" className={b('tab-content')}>
-                    {renderTabContent()}
+    const renderContent = () => {
+        if (!shouldShowNetworkTable) {
+            return renderNetworkStatsUnavailable();
+        }
+
+        return (
+            <Flex direction="column" gap={4} className={b()}>
+                <Flex direction="column" gap={3} className={b('tabs-container')}>
+                    <TabProvider value={networkTab}>
+                        <TabList size="m">
+                            {networkTabs.map(({id, title}) => {
+                                return (
+                                    <Tab
+                                        key={id}
+                                        value={id}
+                                        onClick={() => handleNetworkTabChange(id)}
+                                    >
+                                        {title}
+                                    </Tab>
+                                );
+                            })}
+                        </TabList>
+                    </TabProvider>
+
+                    <Flex direction="column" className={b('tab-content')}>
+                        {renderTabContent()}
+                    </Flex>
                 </Flex>
             </Flex>
-        </Flex>
-    );
+        );
+    };
+
+    return <LoaderWrapper loading={!capabilitiesLoaded}>{renderContent()}</LoaderWrapper>;
 }

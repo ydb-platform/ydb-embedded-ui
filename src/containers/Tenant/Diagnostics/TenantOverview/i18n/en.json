@@ -56,5 +56,7 @@
   "action_by-pool-usage": "By Pool Usage",
   "title_memory-details": "Memory Details",
   "field_memory-usage": "Memory usage",
-  "context_capacity-usage": "{{value}} of {{capacity}}"
+  "context_capacity-usage": "{{value}} of {{capacity}}",
+  "network-stats-unavailable.title": "Network Statistics Unavailable",
+  "network-stats-unavailable.description": "Network ping and clock skew statistics require a newer backend version. Please upgrade your YDB installation to access these features."
 }

@@ -1,37 +1,29 @@
 import {
     getClockSkewColumn,
-    getDataCenterColumn,
     getNetworkHostColumn,
     getNodeIdColumn,
     getPingTimeColumn,
-    getRackColumn,
     getUptimeColumn,
 } from '../../../../../components/nodesColumns/columns';
-import {isSortableNodesColumn} from '../../../../../components/nodesColumns/constants';
+import {
+    NODES_COLUMNS_TO_DATA_FIELDS,
+    isSortableNodesColumn,
+} from '../../../../../components/nodesColumns/constants';
 import type {GetNodesColumnsParams} from '../../../../../components/nodesColumns/types';
 import type {NodesPreparedEntity} from '../../../../../store/reducers/nodes/types';
+import {getRequiredDataFields} from '../../../../../utils/tableUtils/getRequiredDataFields';
 import type {Column} from '../../../../../utils/tableUtils/types';
 
 export function getTopNodesByPingColumns(params: GetNodesColumnsParams) {
     const columns: Column<NodesPreparedEntity>[] = [
         getNodeIdColumn(),
         getNetworkHostColumn(params),
-        getDataCenterColumn(),
-        getRackColumn(),
         getUptimeColumn(),
         getPingTimeColumn(),
     ];
 
-    const fieldsRequired = [
-        'NodeId',
-        'Host',
-        'DataCenter',
-        'Rack',
-        'UptimeSeconds',
-        'PingTimeUs',
-        'PingTimeMinUs',
-        'PingTimeMaxUs',
-    ];
+    const columnsIds = columns.map((column) => column.name);
+    const fieldsRequired = getRequiredDataFields(columnsIds, NODES_COLUMNS_TO_DATA_FIELDS);
 
     return [
         columns.map((column) => ({
@@ -46,22 +38,12 @@ export function getTopNodesBySkewColumns(params: GetNodesColumnsParams) {
     const columns: Column<NodesPreparedEntity>[] = [
         getNodeIdColumn(),
         getNetworkHostColumn(params),
-        getDataCenterColumn(),
-        getRackColumn(),
         getUptimeColumn(),
         getClockSkewColumn(),
     ];
 
-    const fieldsRequired = [
-        'NodeId',
-        'Host',
-        'DataCenter',
-        'Rack',
-        'UptimeSeconds',
-        'ClockSkewUs',
-        'ClockSkewMinUs',
-        'ClockSkewMaxUs',
-    ];
+    const columnsIds = columns.map((column) => column.name);
+    const fieldsRequired = getRequiredDataFields(columnsIds, NODES_COLUMNS_TO_DATA_FIELDS);
 
     return [
         columns.map((column) => ({
