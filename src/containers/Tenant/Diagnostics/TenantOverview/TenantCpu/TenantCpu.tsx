@@ -31,37 +31,24 @@ export function TenantCpu({tenantName, additionalNodesProps}: TenantCpuProps) {
     return (
         <Flex direction="column" gap={4}>
             <TenantDashboard database={tenantName} charts={cpuDashboardConfig} />
-            <StatsWrapper
-                allEntitiesLink={allNodesLink}
-                title={i18n('title_top-nodes-load')}
-                description={i18n('context_top-nodes-load')}
-            >
+            <StatsWrapper allEntitiesLink={allNodesLink} title={i18n('title_top-nodes-load')}>
                 <TopNodesByLoad
                     tenantName={tenantName}
                     additionalNodesProps={additionalNodesProps}
                 />
             </StatsWrapper>
-            <StatsWrapper
-                title={i18n('title_top-nodes-pool')}
-                allEntitiesLink={allNodesLink}
-                description={i18n('context_top-nodes-pool')}
-            >
+            <StatsWrapper title={i18n('title_top-nodes-pool')} allEntitiesLink={allNodesLink}>
                 <TopNodesByCpu
                     tenantName={tenantName}
                     additionalNodesProps={additionalNodesProps}
                 />
             </StatsWrapper>
-            <StatsWrapper
-                title={i18n('title_top-shards')}
-                allEntitiesLink={topShardsLink}
-                description={i18n('context_top-shards')}
-            >
+            <StatsWrapper title={i18n('title_top-shards')} allEntitiesLink={topShardsLink}>
                 <TopShards tenantName={tenantName} path={tenantName} />
             </StatsWrapper>
             <StatsWrapper
                 title={i18n('title_top-queries')}
                 allEntitiesLink={topQueriesLink}
-                description={i18n('context_top-queries')}
                 onAllEntitiesClick={() =>
                     dispatch(setTopQueriesFilters({from: undefined, to: undefined}))
                 }
