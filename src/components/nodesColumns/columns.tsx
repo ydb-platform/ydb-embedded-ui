@@ -422,7 +422,6 @@ export function getNetworkUtilizationColumn<
             return (
                 <CellWithPopover
                     placement={['top', 'bottom']}
-                    fullWidth
                     content={
                         <DefinitionList responsive>
                             <DefinitionList.Item key={'NetworkUtilization'} name={i18n('sum')}>
@@ -489,7 +488,6 @@ export function getPingTimeColumn<
             return (
                 <CellWithPopover
                     placement={['top', 'bottom']}
-                    fullWidth
                     content={
                         <DefinitionList responsive>
                             <DefinitionList.Item key={'PingTimeUs'} name={i18n('avg')}>
@@ -528,7 +526,6 @@ export function getClockSkewColumn<
             return (
                 <CellWithPopover
                     placement={['top', 'bottom']}
-                    fullWidth
                     content={
                         <DefinitionList responsive>
                             <DefinitionList.Item key={'ClockSkewUs'} name={i18n('avg')}>
