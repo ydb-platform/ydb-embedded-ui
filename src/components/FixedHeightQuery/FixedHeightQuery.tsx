@@ -7,7 +7,7 @@ import './FixedHeightQuery.scss';
 
 const b = cn('ydb-fixed-height-query');
 
-const FIXED_PADDING = 8;
+const FIXED_PADDING = 0;
 const LINE_HEIGHT = 20;
 
 type FixedHeightQueryMode = 'fixed' | 'max';
@@ -53,6 +53,7 @@ export const FixedHeightQuery = ({
                               alwaysVisible: clipboardButtonAlwaysVisible,
                               copyText: value,
                               withLabel: false,
+                              size: 'xs',
                           }
                         : false
                 }

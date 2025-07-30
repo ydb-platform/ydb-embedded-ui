@@ -1,5 +1,6 @@
 import React from 'react';
 
+import type {ButtonSize} from '@gravity-ui/uikit';
 import {ClipboardButton} from '@gravity-ui/uikit';
 import {nanoid} from '@reduxjs/toolkit';
 import {PrismLight as ReactSyntaxHighlighter} from 'react-syntax-highlighter';
@@ -27,6 +28,7 @@ interface ClipboardButtonOptions {
     alwaysVisible?: boolean;
     copyText?: string;
     withLabel?: boolean;
+    size?: ButtonSize;
 }
 
 export type WithClipboardButtonProp = ClipboardButtonOptions | boolean;
@@ -58,28 +60,22 @@ export function YDBSyntaxHighlighter({
         registerLangAndUpdateKey();
     }, [language]);
 
+    const clipboardButtonProps =
+        typeof withClipboardButton === 'object' ? withClipboardButton : undefined;
+
     const renderCopyButton = () => {
         if (withClipboardButton) {
             return (
                 <div className={b('sticky-container')} onClick={(e) => e.stopPropagation()}>
                     <ClipboardButton
                         view="flat-secondary"
-                        size="s"
+                        size={clipboardButtonProps?.size || 'xs'}
                         className={b('copy', {
-                            visible:
-                                typeof withClipboardButton === 'object' &&
-                                withClipboardButton.alwaysVisible,
+                            visible: clipboardButtonProps?.alwaysVisible,
                         })}
-                        text={
-                            (typeof withClipboardButton === 'object' &&
-                                withClipboardButton.copyText) ||
-                            text
-                        }
+                        text={clipboardButtonProps?.copyText || text}
                     >
-                        {typeof withClipboardButton === 'object' &&
-                        withClipboardButton.withLabel === false
-                            ? null
-                            : i18n('copy')}
+                        {clipboardButtonProps?.withLabel === false ? null : i18n('copy')}
                     </ClipboardButton>
                 </div>
             );
