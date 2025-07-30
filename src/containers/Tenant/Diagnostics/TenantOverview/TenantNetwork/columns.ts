@@ -5,10 +5,7 @@ import {
     getPingTimeColumn,
     getUptimeColumn,
 } from '../../../../../components/nodesColumns/columns';
-import {
-    NODES_COLUMNS_TO_DATA_FIELDS,
-    isSortableNodesColumn,
-} from '../../../../../components/nodesColumns/constants';
+import {NODES_COLUMNS_TO_DATA_FIELDS} from '../../../../../components/nodesColumns/constants';
 import type {GetNodesColumnsParams} from '../../../../../components/nodesColumns/types';
 import type {NodesPreparedEntity} from '../../../../../store/reducers/nodes/types';
 import {getRequiredDataFields} from '../../../../../utils/tableUtils/getRequiredDataFields';
@@ -28,7 +25,7 @@ export function getTopNodesByPingColumns(params: GetNodesColumnsParams) {
     return [
         columns.map((column) => ({
             ...column,
-            sortable: isSortableNodesColumn(column.name),
+            sortable: false,
         })),
         fieldsRequired,
     ] as const;
@@ -48,7 +45,7 @@ export function getTopNodesBySkewColumns(params: GetNodesColumnsParams) {
     return [
         columns.map((column) => ({
             ...column,
-            sortable: isSortableNodesColumn(column.name),
+            sortable: false,
         })),
         fieldsRequired,
     ] as const;

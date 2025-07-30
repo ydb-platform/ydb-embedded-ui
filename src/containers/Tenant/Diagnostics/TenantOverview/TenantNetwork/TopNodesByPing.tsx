@@ -3,7 +3,10 @@ import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../../../../components/nodesColumns
 import {nodesApi} from '../../../../../store/reducers/nodes/nodes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
-import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../../utils/constants';
+import {
+    TENANT_OVERVIEW_TABLES_LIMIT,
+    TENANT_OVERVIEW_TABLES_SETTINGS,
+} from '../../../../../utils/constants';
 import {useAutoRefreshInterval, useSearchQuery} from '../../../../../utils/hooks';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
@@ -11,11 +14,6 @@ import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';
 
 import {getTopNodesByPingColumns} from './columns';
-
-const TENANT_OVERVIEW_TABLES_SETTINGS = {
-    stripedRows: false,
-    sortable: false,
-};
 
 interface TopNodesByPingProps {
     tenantName: string;
@@ -37,7 +35,7 @@ export function TopNodesByPing({tenantName, additionalNodesProps}: TopNodesByPin
             sort: '-PingTime',
             limit: TENANT_OVERVIEW_TABLES_LIMIT,
             tablets: false,
-            fieldsRequired: fieldsRequired as any,
+            fieldsRequired: fieldsRequired,
         },
         {pollingInterval: autoRefreshInterval},
     );
