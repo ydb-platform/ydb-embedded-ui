@@ -143,7 +143,7 @@ export const getVersionsDataMap = (versionsMap: VersionsMap) => {
                 currentColorIndex = (currentColorIndex + 1) % COLORS.length;
 
                 versionsDataMap.set(item.version, {
-                    // Use fisrt color for major
+                    // Use first color for major
                     color: COLORS[currentColorIndex][0],
                     majorIndex: currentColorIndex,
                     minorIndex: 0,
