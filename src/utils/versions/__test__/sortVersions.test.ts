@@ -2,7 +2,7 @@ import {sortVersions} from '../sortVersions';
 import type {PreparedVersion} from '../types';
 
 describe('sortVersions', () => {
-    test('should sort versions by majorIndex in descending order', function () {
+    test('should sort versions by majorIndex in ascending order', function () {
         const versions: PreparedVersion[] = [
             {version: 'v2.0.0', majorIndex: 1},
             {version: 'v1.0.0', majorIndex: 2},
@@ -34,7 +34,7 @@ describe('sortVersions', () => {
         ]);
     });
 
-    test('should sort versions by minorIndex in descending order when majorIndex is the same', function () {
+    test('should sort versions by minorIndex in ascending order when majorIndex is the same', function () {
         const versions: PreparedVersion[] = [
             {version: 'v1.2.0', majorIndex: 2, minorIndex: 1},
             {version: 'v1.1.0', majorIndex: 2, minorIndex: 2},
