@@ -75,20 +75,20 @@
  */
 
 @mixin tab-edge-filler($side) {
-    &.tenant-metrics-cards__link-container_active::after {
+    &.tenant-metrics-tabs__link-container_active::after {
         @include pseudo-active-filler($side);
     }
 
-    &:not(.tenant-metrics-cards__link-container_active)::after {
+    &:not(.tenant-metrics-tabs__link-container_active)::after {
         @include pseudo-inactive-filler($side);
     }
 
-    &:not(.tenant-metrics-cards__link-container_active)::before {
+    &:not(.tenant-metrics-tabs__link-container_active)::before {
         @include pseudo-background-fill($side);
     }
 }
 
-.tenant-metrics-cards {
+.tenant-metrics-tabs {
     // CSS Variables for consistent design system
     --tab-border-width: 1px;
     --tab-filler-size: 10px;
@@ -198,7 +198,7 @@
             }
         }
 
-        .tenant-metrics-cards__link {
+        .tenant-metrics-tabs__link {
             padding-bottom: var(--tab-border-compensation);
             @include tab-border-base(var(--g-color-line-generic));
         }

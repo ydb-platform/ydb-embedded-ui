@@ -1,14 +1,16 @@
-import React from 'react';
-
-import {MemoryViewer} from '../../../../../components/MemoryViewer/MemoryViewer';
-import {ProgressViewer} from '../../../../../components/ProgressViewer/ProgressViewer';
+import {InfoViewer} from '../../../../../components/InfoViewer/InfoViewer';
+import {ProgressWrapper} from '../../../../../components/ProgressWrapper';
 import type {TMemoryStats} from '../../../../../types/api/nodes';
+import {cn} from '../../../../../utils/cn';
 import {formatStorageValuesToGb} from '../../../../../utils/dataFormatters/dataFormatters';
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
-import {b} from '../utils';
+import i18n from '../i18n';
 
+import {MemoryDetailsSection} from './MemoryDetailsSection';
 import {TopNodesByMemory} from './TopNodesByMemory';
 import {memoryDashboardConfig} from './memoryDashboardConfig';
+
+import './TenantMemory.scss';
 
 interface TenantMemoryProps {
     tenantName: string;
@@ -17,29 +19,49 @@ interface TenantMemoryProps {
     memoryLimit?: string;
 }
 
+const b = cn('tenant-memory');
+
 export function TenantMemory({
     tenantName,
     memoryStats,
     memoryUsed,
     memoryLimit,
 }: TenantMemoryProps) {
+    const renderMemoryDetails = () => {
+        if (memoryStats) {
+            return <MemoryDetailsSection memoryStats={memoryStats} />;
+        }
+
+        // Simple fallback view
+        return (
+            <InfoViewer
+                variant="small"
+                title={i18n('title_memory-details')}
+                info={[
+                    {
+                        label: i18n('field_memory-usage'),
+                        value: (
+                            <ProgressWrapper
+                                value={memoryUsed}
+                                capacity={memoryLimit}
+                                formatValues={formatStorageValuesToGb}
+                                withCapacityUsage
+                                className={b('fallback-progress-wrapper')}
+                                size="m"
+                                width={400}
+                            />
+                        ),
+                    },
+                ]}
+            />
+        );
+    };
+
     return (
-        <React.Fragment>
+        <div className={b()}>
             <TenantDashboard database={tenantName} charts={memoryDashboardConfig} />
-            <div className={b('title')}>{'Memory details'}</div>
-            <div className={b('memory-info')}>
-                {memoryStats ? (
-                    <MemoryViewer formatValues={formatStorageValuesToGb} stats={memoryStats} />
-                ) : (
-                    <ProgressViewer
-                        value={memoryUsed}
-                        capacity={memoryLimit}
-                        formatValues={formatStorageValuesToGb}
-                        colorizeProgress={true}
-                    />
-                )}
-            </div>
+            {renderMemoryDetails()}
             <TopNodesByMemory tenantName={tenantName} />
-        </React.Fragment>
+        </div>
     );
 }

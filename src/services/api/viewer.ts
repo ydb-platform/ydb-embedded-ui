@@ -66,6 +66,7 @@ export class ViewerAPI extends BaseYdbAPI {
             this.getPath('/viewer/json/sysinfo?enums=true'),
             {
                 node_id: id,
+                fields_required: -1,
             },
             {concurrentId, requestConfig: {signal}, timeout},
         );

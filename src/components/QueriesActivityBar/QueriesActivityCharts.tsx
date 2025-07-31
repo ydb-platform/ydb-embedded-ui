@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {Flex} from '@gravity-ui/uikit';
+
 import {defaultDashboardConfig} from '../../containers/Tenant/Diagnostics/TenantOverview/DefaultOverviewContent/defaultDashboardConfig';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval} from '../../utils/hooks';
@@ -14,7 +16,9 @@ interface QueriesActivityChartsProps {
     onChartDataStatusChange?: (status: ChartDataStatus) => void;
 }
 
-const ACTIVITY_CHART_HEIGHT = 292;
+const LEGEND_HEIGHT = 34.5;
+const QUERIES_PER_SECOND_CHART_HEIGHT = 292;
+const QUERIES_LATENCIES_CHART_HEIGHT = 292 + LEGEND_HEIGHT;
 
 export function QueriesActivityCharts({
     tenantName,
@@ -64,32 +68,37 @@ export function QueriesActivityCharts({
     // TODO: Remove this workaround once the upstream issue is fixed
 
     return (
-        <div className={b('charts')} style={{display: expanded ? undefined : 'none'}}>
-            <div className={b('chart-container')}>
+        <Flex
+            className={b('charts')}
+            gap={4}
+            direction="row"
+            style={{display: expanded ? undefined : 'none'}}
+        >
+            <Flex direction="column" gap={3} grow>
                 <MetricChart
                     database={tenantName}
                     metrics={queriesChartConfig.metrics}
                     autorefresh={shouldRefresh}
-                    height={ACTIVITY_CHART_HEIGHT}
+                    height={QUERIES_PER_SECOND_CHART_HEIGHT}
                     chartOptions={queriesChartConfig.options}
                     onChartDataStatusChange={handleChartDataStatusChange}
                     isChartVisible={hasChartsLoaded && expanded}
                     title={queriesChartConfig.title}
                 />
-            </div>
+            </Flex>
 
-            <div className={b('chart-container')}>
+            <Flex direction="column" gap={3} grow>
                 <MetricChart
                     database={tenantName}
                     metrics={latenciesChartConfig.metrics}
                     autorefresh={shouldRefresh}
-                    height={ACTIVITY_CHART_HEIGHT}
+                    height={QUERIES_LATENCIES_CHART_HEIGHT}
                     chartOptions={latenciesChartConfig.options}
                     onChartDataStatusChange={handleChartDataStatusChange}
                     isChartVisible={hasChartsLoaded && expanded}
                     title={latenciesChartConfig.title}
                 />
-            </div>
-        </div>
+            </Flex>
+        </Flex>
     );
 }

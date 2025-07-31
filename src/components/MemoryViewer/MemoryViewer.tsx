@@ -1,13 +1,13 @@
-import {DefinitionList, useTheme} from '@gravity-ui/uikit';
+import {DefinitionList, Flex, useTheme} from '@gravity-ui/uikit';
 
 import type {TMemoryStats} from '../../types/api/nodes';
 import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
 import {GIGABYTE} from '../../utils/constants';
+import type {FormatProgressViewerValues} from '../../utils/progress';
 import {calculateProgressStatus} from '../../utils/progress';
 import {isNumeric} from '../../utils/utils';
 import {HoverPopup} from '../HoverPopup/HoverPopup';
-import type {FormatProgressViewerValues} from '../ProgressViewer/ProgressViewer';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 
 import {calculateAllocatedMemory, getMemorySegments} from './utils';
@@ -107,10 +107,10 @@ export function MemoryViewer({
                             <DefinitionList.Item
                                 key={label}
                                 name={
-                                    <div className={b('container')}>
+                                    <Flex alignItems="center" gap="1" className={b('container')}>
                                         <div className={b('legend', {type: key})}></div>
                                         <div className={b('name')}>{label}</div>
-                                    </div>
+                                    </Flex>
                                 }
                             >
                                 {segmentCapacity ? (
@@ -161,7 +161,9 @@ export function MemoryViewer({
                                 />
                             );
                         })}
-                    <div className={b('text')}>{renderContent()}</div>
+                    <Flex justifyContent="center" alignItems="center" className={b('text')}>
+                        {renderContent()}
+                    </Flex>
                 </div>
             </div>
         </HoverPopup>

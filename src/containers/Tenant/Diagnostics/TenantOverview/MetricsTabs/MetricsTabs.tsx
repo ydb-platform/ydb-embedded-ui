@@ -15,17 +15,18 @@ import {useSetting, useTypedSelector} from '../../../../../utils/hooks';
 import {calculateMetricAggregates} from '../../../../../utils/metrics';
 import {
     formatCoresLegend,
+    formatSpeedLegend,
     formatStorageLegend,
 } from '../../../../../utils/metrics/formatMetricLegend';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TabCard} from '../TabCard/TabCard';
 import i18n from '../i18n';
 
-import './MetricsCards.scss';
+import './MetricsTabs.scss';
 
-const b = cn('tenant-metrics-cards');
+const b = cn('tenant-metrics-tabs');
 
-interface MetricsCardsProps {
+interface MetricsTabsProps {
     poolsCpuStats?: TenantPoolsStats[];
     memoryStats?: TenantMetricStats[];
     blobStorageStats?: TenantStorageStats[];
@@ -33,13 +34,13 @@ interface MetricsCardsProps {
     networkStats?: TenantMetricStats[];
 }
 
-export function MetricsCards({
+export function MetricsTabs({
     poolsCpuStats,
     memoryStats,
     blobStorageStats,
     tabletStorageStats,
     networkStats,
-}: MetricsCardsProps) {
+}: MetricsTabsProps) {
     const location = useLocation();
     const {metricsTab} = useTypedSelector((state) => state.tenant);
     const queryParams = parseQuery(location);
@@ -56,6 +57,10 @@ export function MetricsCards({
         [TENANT_METRICS_TABS_IDS.memory]: getTenantPath({
             ...queryParams,
             [TenantTabsGroups.metricsTab]: TENANT_METRICS_TABS_IDS.memory,
+        }),
+        [TENANT_METRICS_TABS_IDS.network]: getTenantPath({
+            ...queryParams,
+            [TenantTabsGroups.metricsTab]: TENANT_METRICS_TABS_IDS.network,
         }),
     };
 
@@ -131,19 +136,22 @@ export function MetricsCards({
                 </Link>
             </div>
             {showNetworkUtilization && networkStats && networkMetrics && (
-                <div className={b('link-container')}>
-                    <div className={b('link')}>
+                <div
+                    className={b('link-container', {
+                        active: metricsTab === TENANT_METRICS_TABS_IDS.network,
+                    })}
+                >
+                    <Link to={tabLinks.network} className={b('link')}>
                         <TabCard
                             label={i18n('cards.network-label')}
-                            sublabel={i18n('context_network-evaluation')}
+                            sublabel={i18n('context_network-usage')}
                             value={networkMetrics.totalUsed}
                             limit={networkMetrics.totalLimit}
-                            legendFormatter={formatStorageLegend}
-                            active={false}
-                            clickable={false}
+                            legendFormatter={formatSpeedLegend}
+                            active={metricsTab === TENANT_METRICS_TABS_IDS.network}
                             helpText={i18n('context_network-description')}
                         />
-                    </div>
+                    </Link>
                 </div>
             )}
         </Flex>

@@ -1,0 +1,44 @@
+@use '../../../../../styles/mixins.scss';
+
+.memory-details {
+    &__header {
+        align-self: stretch;
+    }
+
+    &__title {
+        font-weight: 500;
+        @include mixins.subheader-1-typography();
+    }
+
+    &__main-progress {
+        align-self: stretch;
+    }
+
+    &__main-progress-bar {
+        height: 20px;
+    }
+
+    &__memory-segments-list {
+        --g-definition-list-item-gap: var(--g-spacing-2);
+        margin-bottom: var(--g-spacing-4);
+    }
+
+    &__segment-indicator {
+        flex-shrink: 0;
+
+        width: 8px;
+        height: 8px;
+
+        border-radius: 50%;
+    }
+
+    &__segment-progress {
+        flex-shrink: 0;
+
+        width: 400px;
+    }
+
+    &__progress-bar {
+        height: 10px;
+    }
+}

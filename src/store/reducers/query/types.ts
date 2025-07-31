@@ -68,4 +68,8 @@ export interface QueryState {
         filter?: string;
     };
     tenantPath?: string;
+    selectedResultTab?: {
+        execute?: string;
+        explain?: string;
+    };
 }

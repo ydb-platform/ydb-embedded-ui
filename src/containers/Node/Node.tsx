@@ -29,6 +29,7 @@ import {Tablets} from '../Tablets/Tablets';
 import type {NodeTab} from './NodePages';
 import {NODE_TABS, getDefaultNodePath, nodePageQueryParams, nodePageTabSchema} from './NodePages';
 import NodeStructure from './NodeStructure/NodeStructure';
+import {Threads} from './Threads/Threads';
 import i18n from './i18n';
 
 import './Node.scss';
@@ -245,6 +246,10 @@ function NodePageContent({
 
             case 'structure': {
                 return <NodeStructure nodeId={nodeId} />;
+            }
+
+            case 'threads': {
+                return <Threads nodeId={nodeId} />;
             }
 
             default:
