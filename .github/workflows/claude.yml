@@ -39,26 +39,43 @@ jobs:
           # This is an optional setting that allows Claude to read CI results on PRs
           additional_permissions: |
             actions: read
-          
+
           # Optional: Specify model (defaults to Claude Sonnet 4, uncomment for Claude Opus 4)
-          # model: "claude-opus-4-20250514"
-          
+          model: 'claude-opus-4-20250514'
+
           # Optional: Customize the trigger phrase (default: @claude)
           # trigger_phrase: "/claude"
-          
-          # Optional: Trigger when specific user is assigned to an issue
-          # assignee_trigger: "claude-bot"
-          
-          # Optional: Allow Claude to run specific commands
-          # allowed_tools: "Bash(npm install),Bash(npm run build),Bash(npm run test:*),Bash(npm run lint:*)"
-          
-          # Optional: Add custom instructions for Claude to customize its behavior for your project
-          # custom_instructions: |
-          #   Follow our coding standards
-          #   Ensure all new code has tests
-          #   Use TypeScript for new files
-          
-          # Optional: Custom environment variables for Claude
-          # claude_env: |
-          #   NODE_ENV: test
 
+          # Optional: Trigger when specific user is assigned to an issue
+          assignee_trigger: 'claude-bot'
+
+          # Optional: Allow Claude to run specific commands
+          allowed_tools: |
+            Bash(npm ci)
+            Bash(npm run dev)
+            Bash(npm run build:*)
+            Bash(npm run lint)
+            Bash(npm run typecheck)
+            Bash(npm run unused)
+            Bash(npm test)
+            Bash(npm run test:*)
+            Bash(docker run*)
+            Bash(git log*)
+            Bash(git diff*)
+            Bash(git status)
+
+          # Optional: Add custom instructions for Claude to customize its behavior for your project
+          custom_instructions: |
+            Follow the CLAUDE.md guidelines in the repository
+            Use Gravity UI components for any UI changes
+            Always use i18n for user-facing strings following i18n-naming-ruleset.md
+            Run npm run lint and npm run typecheck before committing
+            Use RTK Query for API calls, never call APIs directly
+            Follow BEM naming convention with cn() utility
+            Use PaginatedTable for large datasets
+            TypeScript types should be prefixed with 'T' (e.g., TTenantInfo)
+
+          # Optional: Custom environment variables for Claude
+          claude_env: |
+            NODE_VERSION: 18
+            REACT_APP_BACKEND: http://localhost:8765
