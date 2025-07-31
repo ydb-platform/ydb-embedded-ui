@@ -1,23 +1,20 @@
-import uniqBy from 'lodash/uniqBy';
+import type {MetaClusterVersion} from '../../types/api/meta';
 
-import type {MetaClusterVersion} from '../types/api/meta';
-import type {VersionToColorMap} from '../types/versions';
+import {sortVerions} from './sortVersions';
+import type {
+    ColorIndexToVersionsMap,
+    PreparedVersion,
+    PreparedVersions,
+    VersionsDataMap,
+} from './types';
 
-import {
-    COLORS,
-    DEFAULT_COLOR,
-    getMinorVersion,
-    getMinorVersionColorVariant,
-    hashCode,
-} from './versions';
+import {COLORS, DEFAULT_COLOR, getMinorVersion, getMinorVersionColorVariant, hashCode} from '.';
 
 const UNDEFINED_COLOR_INDEX = '__no_color__';
 
-type VersionsMap = Map<number | string, Set<string>>;
-
 export const getVersionMap = (
     versions: MetaClusterVersion[],
-    initialMap: VersionsMap = new Map(),
+    initialMap: ColorIndexToVersionsMap = new Map(),
 ) => {
     versions.forEach(
         ({version, version_base_color_index: versionBaseColorIndex = UNDEFINED_COLOR_INDEX}) => {
@@ -31,8 +28,8 @@ export const getVersionMap = (
     return initialMap;
 };
 
-export const getVersionColors = (versionMap: VersionsMap) => {
-    const versionToColor: VersionToColorMap = new Map();
+export const getVersionsData = (versionMap: ColorIndexToVersionsMap) => {
+    const versionsDataMap: VersionsDataMap = new Map();
 
     for (const [baseColorIndex, item] of versionMap) {
         Array.from(item)
@@ -41,7 +38,9 @@ export const getVersionColors = (versionMap: VersionsMap) => {
             .sort((a, b) => hashCode(b) - hashCode(a))
             .forEach((minor, minorIndex) => {
                 if (baseColorIndex === UNDEFINED_COLOR_INDEX) {
-                    versionToColor.set(minor, DEFAULT_COLOR);
+                    versionsDataMap.set(minor, {
+                        color: DEFAULT_COLOR,
+                    });
                 } else {
                     // baseColorIndex is numeric as we check if it is UNDEFINED_COLOR_INDEX before
                     const currentColorIndex = Number(baseColorIndex) % COLORS.length;
@@ -53,35 +52,43 @@ export const getVersionColors = (versionMap: VersionsMap) => {
                     );
                     const minorColor = COLORS[currentColorIndex][minorColorVariant];
 
-                    versionToColor.set(minor, minorColor);
+                    versionsDataMap.set(minor, {
+                        color: minorColor,
+                        majorIndex: currentColorIndex,
+                        minorIndex,
+                    });
                 }
             });
     }
 
-    return versionToColor;
+    return versionsDataMap;
 };
-
-export interface ExtendedMetaClusterVersion extends MetaClusterVersion {
-    minorVersion: string;
-    color: string | undefined;
-}
 
 export const prepareClusterVersions = (
     clusterVersions: MetaClusterVersion[] = [],
-    versionToColor: VersionToColorMap,
-) => {
+    versionsDataMap: VersionsDataMap,
+): PreparedVersion[] => {
     const filteredVersions = clusterVersions.filter((item) => item.version);
-    const preparedVersions = uniqBy(filteredVersions, 'version').map((item) => {
-        return {
-            ...item,
-            minorVersion: getMinorVersion(item.version),
+
+    const result: PreparedVersions = {};
+
+    filteredVersions.forEach((item) => {
+        if (result[item.version]) {
+            result[item.version].count = result[item.version].count || 0 + item.count || 0;
+        }
+
+        const minorVersion = getMinorVersion(item.version);
+        const data = versionsDataMap.get(minorVersion);
+
+        result[item.version] = {
+            version: item.version,
+            minorVersion,
+            color: data?.color,
+            majorIndex: data?.majorIndex,
+            minorIndex: data?.minorIndex,
+            count: item.count || 0,
         };
     });
-    const versionsColors = preparedVersions.reduce<ExtendedMetaClusterVersion[]>((acc, item) => {
-        const color = versionToColor.get(item.minorVersion);
-        acc.push({...item, color});
-        return acc;
-    }, []);
 
-    return versionsColors;
+    return sortVerions(Object.values(result));
 };

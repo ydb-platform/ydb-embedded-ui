@@ -1,8 +1,8 @@
 import type {MetaExtendedClusterInfo} from '../../../types/api/meta';
-import type {ExtendedMetaClusterVersion} from '../../../utils/clusterVersionColors';
+import type {PreparedVersion} from '../../../utils/versions/types';
 
 export interface PreparedCluster extends MetaExtendedClusterInfo {
-    preparedVersions: ExtendedMetaClusterVersion[];
+    preparedVersions: PreparedVersion[];
     preparedBackend?: string;
 }
 

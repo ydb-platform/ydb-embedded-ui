@@ -1,6 +1,5 @@
-import type {VersionToColorMap, VersionsMap} from '../../types/versions';
-
 import {getMajorVersion, getMinorVersion} from './parseVersion';
+import type {VersionsDataMap, VersionsMap} from './types';
 
 export const hashCode = (s: string) => {
     return s.split('').reduce((a, b) => {
@@ -122,7 +121,7 @@ export const getVersionsMap = (versions: string[], initialMap: VersionsMap = new
     return initialMap;
 };
 
-export const getVersionToColorMap = (versionsMap: VersionsMap) => {
+export const getVersionsDataMap = (versionsMap: VersionsMap) => {
     const clustersVersions = Array.from(versionsMap.keys()).map((version) => {
         return {
             version,
@@ -130,7 +129,7 @@ export const getVersionToColorMap = (versionsMap: VersionsMap) => {
         };
     });
 
-    const versionToColor: VersionToColorMap = new Map();
+    const versionsDataMap: VersionsDataMap = new Map();
     // not every version is colored, therefore iteration index can't be used consistently
     // init with the colors length to put increment right after condition for better readability
     let currentColorIndex = COLORS.length - 1;
@@ -143,8 +142,12 @@ export const getVersionToColorMap = (versionsMap: VersionsMap) => {
             if (/^(\w+-)?stable/.test(item.version)) {
                 currentColorIndex = (currentColorIndex + 1) % COLORS.length;
 
-                // Use fisrt color for major
-                versionToColor.set(item.version, COLORS[currentColorIndex][0]);
+                versionsDataMap.set(item.version, {
+                    // Use fisrt color for major
+                    color: COLORS[currentColorIndex][0],
+                    majorIndex: currentColorIndex,
+                    minorIndex: 0,
+                });
 
                 const minors = Array.from(versionsMap.get(item.version) || [])
                     .filter((v) => v !== item.version)
@@ -167,15 +170,32 @@ export const getVersionToColorMap = (versionsMap: VersionsMap) => {
                             minorQuantity,
                         );
                         const minorColor = COLORS[currentColorIndex][minorColorVariant];
-                        versionToColor.set(minor.version, minorColor);
+
+                        versionsDataMap.set(minor.version, {
+                            color: minorColor,
+                            majorIndex: currentColorIndex,
+                            minorIndex: minorIndex,
+                        });
                     });
             } else {
-                versionToColor.set(item.version, DEFAULT_COLOR);
+                versionsDataMap.set(item.version, {
+                    color: DEFAULT_COLOR,
+                });
             }
         });
-    return versionToColor;
+    return versionsDataMap;
 };
 
-export const parseVersionsToVersionToColorMap = (versions: string[] = []) => {
-    return getVersionToColorMap(getVersionsMap(versions));
+export const parseVersionsToVersionsDataMap = (versions: string[] = []) => {
+    return getVersionsDataMap(getVersionsMap(versions));
 };
+
+export function getColorFromVersionsData(
+    version: string,
+    versionsDataMap: VersionsDataMap | undefined,
+) {
+    const minorVersion = getMinorVersion(version);
+    const versionData = versionsDataMap?.get(minorVersion);
+
+    return versionData?.color;
+}

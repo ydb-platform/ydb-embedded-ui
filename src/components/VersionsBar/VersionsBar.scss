@@ -1,0 +1,36 @@
+@use '../../styles/mixins.scss';
+
+.ydb-versions-bar {
+    &__bar {
+        width: 100%;
+        height: 10px;
+    }
+
+    &__titles-wrapper {
+        width: max-content;
+    }
+
+    &__title {
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+
+        color: var(--g-color-text-primary);
+
+        @include mixins.body-1-typography();
+    }
+
+    &__version {
+        min-width: 10px;
+
+        border-radius: var(--g-border-radius-xs);
+    }
+
+    &__title,
+    &__version,
+    &__version-icon {
+        &_dimmed {
+            opacity: 0.5;
+        }
+    }
+}
