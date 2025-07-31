@@ -16,7 +16,7 @@ import type {PreparedVersion} from './types';
  * @param versions - Array of prepared cluster versions to sort
  * @returns A new sorted array of cluster versions
  */
-export function sortVerions(versions: PreparedVersion[]) {
+export function sortVersions(versions: PreparedVersion[]) {
     return versions.slice().sort((versionA, versionB) => {
         if (versionA.majorIndex !== versionB.majorIndex) {
             if (versionA.majorIndex === undefined) {

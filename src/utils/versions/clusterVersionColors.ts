@@ -1,6 +1,6 @@
 import type {MetaClusterVersion} from '../../types/api/meta';
 
-import {sortVerions} from './sortVersions';
+import {sortVersions} from './sortVersions';
 import type {
     ColorIndexToVersionsMap,
     PreparedVersion,
@@ -74,7 +74,11 @@ export const prepareClusterVersions = (
 
     filteredVersions.forEach((item) => {
         if (result[item.version]) {
-            result[item.version].count = result[item.version].count || 0 + item.count || 0;
+            // Summ count for versions of different nodes types
+            const currentCount = result[item.version].count || 0;
+            const itemCount = item.count || 0;
+
+            result[item.version].count = currentCount + itemCount;
         }
 
         const minorVersion = getMinorVersion(item.version);
@@ -90,5 +94,5 @@ export const prepareClusterVersions = (
         };
     });
 
-    return sortVerions(Object.values(result));
+    return sortVersions(Object.values(result));
 };

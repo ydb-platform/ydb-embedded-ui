@@ -1,7 +1,7 @@
-import {sortVerions} from '../sortVersions';
+import {sortVersions} from '../sortVersions';
 import type {PreparedVersion} from '../types';
 
-describe('sortVerions', () => {
+describe('sortVersions', () => {
     test('should sort versions by majorIndex in descending order', function () {
         const versions: PreparedVersion[] = [
             {version: 'v2.0.0', majorIndex: 1},
@@ -9,7 +9,7 @@ describe('sortVerions', () => {
             {version: 'v3.0.0', majorIndex: 0},
         ];
 
-        const sortedVersions = sortVerions(versions);
+        const sortedVersions = sortVersions(versions);
 
         expect(sortedVersions).toEqual([
             {version: 'v3.0.0', majorIndex: 0},
@@ -25,7 +25,7 @@ describe('sortVerions', () => {
             {version: 'v3.0.0', majorIndex: 0},
         ];
 
-        const sortedVersions = sortVerions(versions);
+        const sortedVersions = sortVersions(versions);
 
         expect(sortedVersions).toEqual([
             {version: 'v3.0.0', majorIndex: 0},
@@ -41,7 +41,7 @@ describe('sortVerions', () => {
             {version: 'v1.3.0', majorIndex: 2, minorIndex: 0},
         ];
 
-        const sortedVersions = sortVerions(versions);
+        const sortedVersions = sortVersions(versions);
 
         expect(sortedVersions).toEqual([
             {version: 'v1.3.0', majorIndex: 2, minorIndex: 0},
@@ -57,7 +57,7 @@ describe('sortVerions', () => {
             {version: 'v1.3.0', majorIndex: 2, minorIndex: 0},
         ];
 
-        const sortedVersions = sortVerions(versions);
+        const sortedVersions = sortVersions(versions);
 
         expect(sortedVersions).toEqual([
             {version: 'v1.3.0', majorIndex: 2, minorIndex: 0},
@@ -73,7 +73,7 @@ describe('sortVerions', () => {
             {version: 'v1.1.0', majorIndex: 2, minorIndex: 1},
         ];
 
-        const sortedVersions = sortVerions(versions);
+        const sortedVersions = sortVersions(versions);
 
         expect(sortedVersions).toEqual([
             {version: 'v1.1.2', majorIndex: 2, minorIndex: 1},
@@ -89,7 +89,7 @@ describe('sortVerions', () => {
             {version: 'v3.0.0', majorIndex: undefined},
         ];
 
-        const sortedVersions = sortVerions(versions);
+        const sortedVersions = sortVersions(versions);
 
         // When majorIndex is undefined, versions are sorted by hashCode
         // This test assumes the hashCode implementation results in this order
@@ -109,7 +109,7 @@ describe('sortVerions', () => {
             {version: 'v2.0.0', majorIndex: 1, minorIndex: undefined},
         ];
 
-        const sortedVersions = sortVerions(versions);
+        const sortedVersions = sortVersions(versions);
 
         expect(sortedVersions).toEqual([
             {version: 'v3.0.0', majorIndex: 0, minorIndex: 0},
@@ -122,7 +122,7 @@ describe('sortVerions', () => {
 
     test('should handle empty array', function () {
         const versions: PreparedVersion[] = [];
-        const sortedVersions = sortVerions(versions);
+        const sortedVersions = sortVersions(versions);
         expect(sortedVersions).toEqual([]);
     });
 });

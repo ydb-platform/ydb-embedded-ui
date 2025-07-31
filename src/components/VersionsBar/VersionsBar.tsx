@@ -26,7 +26,7 @@ export function VersionsBar({preparedVersions}: VersionsBarProps) {
 
         return preparedVersions.map((item) => {
             return {
-                value: (item.count || 0 / total) * 100,
+                value: ((item.count || 0) / total) * 100,
                 color: item.color,
                 version: item.version,
                 count: item.count,
@@ -78,7 +78,7 @@ export function VersionsBar({preparedVersions}: VersionsBarProps) {
         return null;
     };
 
-    const handelMouseLeave = () => {
+    const handleMouseLeave = () => {
         setHoveredVersion(undefined);
     };
 
@@ -106,7 +106,7 @@ export function VersionsBar({preparedVersions}: VersionsBarProps) {
                             onMouseEnter={() => {
                                 setHoveredVersion(item.version);
                             }}
-                            onMouseLeave={handelMouseLeave}
+                            onMouseLeave={handleMouseLeave}
                             className={b('version', {dimmed: isDimmed(item.version)})}
                             style={{backgroundColor: item.color, width: `${item.value}%`}}
                         />
@@ -138,7 +138,7 @@ export function VersionsBar({preparedVersions}: VersionsBarProps) {
                                 onMouseEnter={() => {
                                     setHoveredVersion(item.version);
                                 }}
-                                onMouseLeave={handelMouseLeave}
+                                onMouseLeave={handleMouseLeave}
                             >
                                 {item.version}
                             </div>
