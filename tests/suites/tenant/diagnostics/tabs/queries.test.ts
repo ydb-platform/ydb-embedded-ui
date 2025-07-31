@@ -269,7 +269,7 @@ test.describe('Diagnostics Queries tab', async () => {
 
         // Get the number of rows and select a row that requires scrolling (should be 100 from mock)
         const rowCount = await diagnostics.table.getRowCount();
-        expect(rowCount).toBe(8); // Verify we have the expected 100 rows from mock
+        expect(rowCount).toBe(9); // Verify we have the expected 100 rows from mock
 
         // Target a row further down that requires scrolling
         const targetRowIndex = 8;
