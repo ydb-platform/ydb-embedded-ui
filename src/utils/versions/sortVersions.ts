@@ -4,7 +4,8 @@ import type {PreparedVersion} from './types';
 /**
  * Sorts cluster versions according to the following rules:
  * 1. First by majorIndex in ascending order (lower index first)
- * - Higher version numbers typically have lower indices (e.g., v3.0.0: index 0, v2.0.0: index 1, v1.0.0: index 2)
+ * - In embedded versions higher version numbers typically have lower indices (e.g., v3.0.0: index 0, v2.0.0: index 1, v1.0.0: index 2)
+ * - In multi-cluster version indices may be provided by backend with no specific rule, but we use the same sorting for consistency
  * - Versions with undefined majorIndex come last
  * 2. Then by minorIndex in ascending order (lower index first) when majorIndex is the same
  * - Higher minor versions typically have lower indices

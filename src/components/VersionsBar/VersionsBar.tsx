@@ -11,12 +11,16 @@ import './VersionsBar.scss';
 
 const b = cn('ydb-versions-bar');
 
+const TRUNCATION_THRESHOLD = 4;
+// One more line for Show more / Hide button
+const MAX_DISPLAYED_VERSIONS = TRUNCATION_THRESHOLD - 1;
+
 interface VersionsBarProps {
     preparedVersions: PreparedVersion[];
 }
 
 export function VersionsBar({preparedVersions}: VersionsBarProps) {
-    const shouldTruncateVersions = preparedVersions.length > 4;
+    const shouldTruncateVersions = preparedVersions.length > TRUNCATION_THRESHOLD;
 
     const [hoveredVersion, setHoveredVersion] = React.useState<string | undefined>();
     const [allVersionsDisplayed, setAllVersionsDisplayed] = React.useState<boolean>(false);
@@ -39,7 +43,9 @@ export function VersionsBar({preparedVersions}: VersionsBarProps) {
             return preparedVersions;
         }
 
-        return shouldTruncateVersions ? preparedVersions.slice(0, 3) : preparedVersions;
+        return shouldTruncateVersions
+            ? preparedVersions.slice(0, MAX_DISPLAYED_VERSIONS)
+            : preparedVersions;
     }, [allVersionsDisplayed, preparedVersions, shouldTruncateVersions]);
 
     const handleShowAllVersions = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -55,7 +61,7 @@ export function VersionsBar({preparedVersions}: VersionsBarProps) {
 
     const renderButton = () => {
         if (shouldTruncateVersions) {
-            const truncatedVersionsCount = preparedVersions.length - 3;
+            const truncatedVersionsCount = preparedVersions.length - MAX_DISPLAYED_VERSIONS;
 
             if (allVersionsDisplayed) {
                 return (

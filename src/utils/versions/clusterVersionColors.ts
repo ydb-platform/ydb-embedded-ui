@@ -74,7 +74,7 @@ export const prepareClusterVersions = (
 
     filteredVersions.forEach((item) => {
         if (result[item.version]) {
-            // Summ count for versions of different nodes types
+            // Sum count for versions of different nodes types
             const currentCount = result[item.version].count || 0;
             const itemCount = item.count || 0;
 
