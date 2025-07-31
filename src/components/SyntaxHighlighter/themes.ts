@@ -7,12 +7,14 @@ export const lightTransparent = {
         ...materialLight['pre[class*="language-"]'],
         background: 'transparent',
         margin: 0,
+        lineHeight: '15px',
     },
     'code[class*="language-"]': {
         ...materialLight['code[class*="language-"]'],
         background: 'transparent',
         color: 'var(--g-color-text-primary)',
         whiteSpace: 'pre-wrap' as const,
+        fontSize: '13px',
     },
     comment: {
         color: '#969896',
@@ -49,12 +51,14 @@ export const darkTransparent = {
         ...vscDarkPlus['pre[class*="language-"]'],
         background: 'transparent',
         margin: 0,
+        lineHeight: '15px',
     },
     'code[class*="language-"]': {
         ...vscDarkPlus['code[class*="language-"]'],
         background: 'transparent',
         color: 'var(--g-color-text-primary)',
         whiteSpace: 'pre-wrap' as const,
+        fontSize: '13px',
     },
     comment: {
         color: '#969896',
@@ -91,10 +95,12 @@ const dark: Record<string, React.CSSProperties> = {
         ...darkTransparent['pre[class*="language-"]'],
         background: vscDarkPlus['pre[class*="language-"]'].background,
         scrollbarColor: `var(--g-color-scroll-handle) transparent`,
+        lineHeight: '15px',
     },
     'code[class*="language-"]': {
         ...darkTransparent['code[class*="language-"]'],
         whiteSpace: 'pre',
+        fontSize: '13px',
     },
 };
 
@@ -104,10 +110,12 @@ const light: Record<string, React.CSSProperties> = {
         ...lightTransparent['pre[class*="language-"]'],
         background: 'var(--g-color-base-misc-light)',
         scrollbarColor: `var(--g-color-scroll-handle) transparent`,
+        lineHeight: '15px',
     },
     'code[class*="language-"]': {
         ...lightTransparent['code[class*="language-"]'],
         whiteSpace: 'pre',
+        fontSize: '13px',
     },
 };
 

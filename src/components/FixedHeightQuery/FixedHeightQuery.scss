@@ -23,7 +23,7 @@
 
             height: 100% !important;
             margin: 0 !important;
-            padding: var(--g-spacing-2) !important;
+            padding: 0 !important;
 
             white-space: pre-wrap !important;
             text-overflow: ellipsis !important;
@@ -38,5 +38,9 @@
             text-overflow: ellipsis !important;
             word-break: break-word !important;
         }
+    }
+    .ydb-syntax-highlighter__copy {
+        top: 0;
+        right: 0;
     }
 }

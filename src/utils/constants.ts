@@ -97,7 +97,7 @@ export const SECTION_IDS = {
     ABOUT: 'aboutSettingsSection',
 } as const;
 
-export const TENANT_OVERVIEW_TABLES_LIMIT = 5;
+export const TENANT_OVERVIEW_TABLES_LIMIT = 3;
 
 export const EMPTY_DATA_PLACEHOLDER = '—';
 

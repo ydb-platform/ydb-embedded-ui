@@ -80,7 +80,7 @@ export const getCpuCoresColumn: GetShardsColumn = () => {
                 <UsageLabel value={roundToPrecision(usage, 2)} theme={getUsageSeverity(usage)} />
             );
         },
-        align: DataTable.RIGHT,
+        align: DataTable.LEFT,
         width: 110,
         resizeMinWidth: 110,
     };
