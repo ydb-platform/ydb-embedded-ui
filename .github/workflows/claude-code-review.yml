@@ -1,0 +1,101 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    # Optional: Only run on specific file changes
+    paths:
+      - 'src/**/*.ts'
+      - 'src/**/*.tsx'
+      - 'src/**/*.js'
+      - 'src/**/*.jsx'
+      - 'package.json'
+      - 'package-lock.json'
+
+jobs:
+  claude-review:
+    # Optional: Skip review for specific conditions
+    if: |
+      !contains(github.event.pull_request.title, '[skip-review]') &&
+      !contains(github.event.pull_request.title, '[WIP]')
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code Review
+        id: claude-review
+        uses: anthropics/claude-code-action@beta
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
+          # Specify model for consistency with main workflow
+          model: 'claude-opus-4-20250514'
+
+          # Direct prompt for automated review (no @claude mention needed)
+          direct_prompt: |
+            Review this YDB Embedded UI pull request focusing on:
+
+            1. **Code Standards**:
+               - TypeScript type safety and proper interface usage (prefixed with 'T')
+               - React best practices and Gravity UI component usage
+               - Redux Toolkit patterns with RTK Query
+               - BEM naming convention with cn() utility
+
+            2. **Critical Requirements**:
+               - All user-facing text must use i18n (no hardcoded strings)
+               - API calls must go through window.api, never direct calls
+               - No state mutations in RTK Query
+               - Route params validation (React Router v5)
+
+            3. **Performance & Security**:
+               - Virtual scrolling for large tables (PaginatedTable)
+               - React.memo for expensive renders
+               - No exposed secrets or keys
+               - Proper error handling and loading states
+
+            4. **Testing**:
+               - Unit tests in __test__ directories
+               - E2E tests follow page object pattern
+
+            Be constructive and reference specific files with file_path:line_number format.
+
+          # Use sticky comments to make Claude reuse the same comment on subsequent pushes to the same PR
+          use_sticky_comment: true
+
+          # Optional: Customize review based on file types
+          # direct_prompt: |
+          #   Review this PR focusing on:
+          #   - For TypeScript files: Type safety and proper interface usage
+          #   - For API endpoints: Security, input validation, and error handling
+          #   - For React components: Performance, accessibility, and best practices
+          #   - For tests: Coverage, edge cases, and test quality
+
+          # Optional: Different prompts for different authors
+          # direct_prompt: |
+          #   ${{ github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR' &&
+          #   'Welcome! Please review this PR from a first-time contributor. Be encouraging and provide detailed explanations for any suggestions.' ||
+          #   'Please provide a thorough code review focusing on our coding standards and best practices.' }}
+
+          # Add specific tools for running tests or linting
+          allowed_tools: |
+            Bash(npm run lint)
+            Bash(npm run typecheck)
+            Bash(npm test -- --no-watch)
+            Bash(npm run unused)
+            Bash(git diff)
+            Bash(git log)
+
+          # Optional: Skip review for certain conditions
+          # if: |
+          #   !contains(github.event.pull_request.title, '[skip-review]') &&
+          #   !contains(github.event.pull_request.title, '[WIP]')
