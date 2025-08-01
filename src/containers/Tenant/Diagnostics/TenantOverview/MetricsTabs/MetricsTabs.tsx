@@ -32,6 +32,7 @@ interface MetricsTabsProps {
     blobStorageStats?: TenantStorageStats[];
     tabletStorageStats?: TenantStorageStats[];
     networkStats?: TenantMetricStats[];
+    storageGroupsCount?: number;
 }
 
 export function MetricsTabs({
@@ -40,6 +41,7 @@ export function MetricsTabs({
     blobStorageStats,
     tabletStorageStats,
     networkStats,
+    storageGroupsCount,
 }: MetricsTabsProps) {
     const location = useLocation();
     const {metricsTab} = useTypedSelector((state) => state.tenant);
@@ -73,7 +75,6 @@ export function MetricsTabs({
     // Calculate storage metrics using utility
     const storageStats = tabletStorageStats || blobStorageStats || [];
     const storageMetrics = calculateMetricAggregates(storageStats);
-    const storageGroupCount = storageStats.length;
 
     // Calculate memory metrics using utility
     const memoryMetrics = calculateMetricAggregates(memoryStats);
@@ -91,8 +92,7 @@ export function MetricsTabs({
             >
                 <Link to={tabLinks.cpu} className={b('link')}>
                     <TabCard
-                        label={i18n('cards.cpu-label')}
-                        sublabel={i18n('context_cpu-load')}
+                        text={i18n('context_cpu-load')}
                         value={cpuMetrics.totalUsed}
                         limit={cpuMetrics.totalLimit}
                         legendFormatter={formatCoresLegend}
@@ -108,8 +108,11 @@ export function MetricsTabs({
             >
                 <Link to={tabLinks.storage} className={b('link')}>
                     <TabCard
-                        label={i18n('cards.storage-label')}
-                        sublabel={i18n('context_storage-groups', {count: storageGroupCount})}
+                        text={
+                            storageGroupsCount === undefined
+                                ? i18n('cards.storage-label')
+                                : i18n('context_storage-groups', {count: storageGroupsCount})
+                        }
                         value={storageMetrics.totalUsed}
                         limit={storageMetrics.totalLimit}
                         legendFormatter={formatStorageLegend}
@@ -125,8 +128,7 @@ export function MetricsTabs({
             >
                 <Link to={tabLinks.memory} className={b('link')}>
                     <TabCard
-                        label={i18n('cards.memory-label')}
-                        sublabel={i18n('context_memory-used')}
+                        text={i18n('context_memory-used')}
                         value={memoryMetrics.totalUsed}
                         limit={memoryMetrics.totalLimit}
                         legendFormatter={formatStorageLegend}
@@ -143,8 +145,7 @@ export function MetricsTabs({
                 >
                     <Link to={tabLinks.network} className={b('link')}>
                         <TabCard
-                            label={i18n('cards.network-label')}
-                            sublabel={i18n('context_network-usage')}
+                            text={i18n('context_network-usage')}
                             value={networkMetrics.totalUsed}
                             limit={networkMetrics.totalLimit}
                             legendFormatter={formatSpeedLegend}

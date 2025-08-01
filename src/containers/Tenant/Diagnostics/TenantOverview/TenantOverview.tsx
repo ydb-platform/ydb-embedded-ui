@@ -178,6 +178,11 @@ export function TenantOverview({
                             blobStorageStats={blobStorageStats}
                             tabletStorageStats={tabletStorageStats}
                             networkStats={networkStats}
+                            storageGroupsCount={
+                                tenantData.StorageGroups
+                                    ? Number(tenantData.StorageGroups)
+                                    : undefined
+                            }
                         />
                     </Flex>
                 </div>
