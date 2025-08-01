@@ -9,8 +9,8 @@ jobs:
   claude:
     if: |
       github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'issue_comment' && 
-       github.event.issue.pull_request && 
+      (github.event_name == 'issue_comment' &&
+       github.event.issue.pull_request &&
        contains(github.event.comment.body, '@claude'))
     runs-on: ubuntu-latest
     permissions:
@@ -20,10 +20,26 @@ jobs:
       id-token: write
       actions: read # Required for Claude to read CI results on PRs
     steps:
+      - name: Get PR details
+        id: pr-details
+        if: github.event_name == 'issue_comment'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER="${{ github.event.issue.number }}"
+          PR_DATA=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER}")
+          PR_HEAD_SHA=$(echo "$PR_DATA" | jq -r '.head.sha')
+          echo "pr_head_sha=$PR_HEAD_SHA" >> $GITHUB_OUTPUT
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          # For workflow_dispatch, checkout default branch
+          # For issue_comment on PR, checkout the PR head commit
+          ref: ${{ github.event_name == 'issue_comment' && steps.pr-details.outputs.pr_head_sha || github.ref }}
+          fetch-depth: 0
 
       - name: Run Claude Code
         id: claude
