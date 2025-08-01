@@ -100,8 +100,9 @@ export function MetricsTabs({
     const storageStats = tabletStorageStats || blobStorageStats || [];
     const storageMetrics = calculateMetricAggregates(storageStats);
 
-    // Get correct storage groups count from API (only if groups handler available)
-    const storageGroupCount = groupsHandlerAvailable ? (storageGroupsData?.total ?? 0) : undefined;
+    // Get correct storage groups count from API (only if groups handler available and data is loaded)
+    const storageGroupCount =
+        groupsHandlerAvailable && storageGroupsData ? storageGroupsData.total : undefined;
 
     // Calculate memory metrics using utility
     const memoryMetrics = calculateMetricAggregates(memoryStats);
