@@ -98,7 +98,8 @@ This is a React-based monitoring and management interface for YDB clusters. The 
 
 - Run `npm run lint` and `npm run typecheck` before committing
 - Follow conventional commit message format
-- Use conventional commit format for PR titles (fix:, feat:, chore:, docs:, etc.)
+- Use conventional commit format for PR titles with lowercase subjects (e.g., "fix: update api endpoints", "feat: add new component", "chore: update dependencies")
+- PR title subjects must be lowercase (no proper nouns, sentence-case, start-case, pascal-case, or upper-case)
 - Ensure all user-facing text is internationalized
 - Test with a local YDB instance when possible
 
