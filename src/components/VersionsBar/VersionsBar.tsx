@@ -94,11 +94,13 @@ export function VersionsBar({preparedVersions}: VersionsBarProps) {
             setHoveredVersion(version);
         }, HOVER_DELAY);
     }, []);
-
-    const handleMouseLeave = () => {
+    const handleMouseLeave = React.useMemo(() => {
         handleMouseEnter.cancel();
-        setHoveredVersion(undefined);
-    };
+
+        return debounce(() => {
+            setHoveredVersion(undefined);
+        }, HOVER_DELAY);
+    }, [handleMouseEnter]);
 
     const isDimmed = (version: string) => {
         return hoveredVersion && hoveredVersion !== version;
