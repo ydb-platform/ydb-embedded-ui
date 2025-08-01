@@ -2,11 +2,6 @@ import {Flex} from '@gravity-ui/uikit';
 import {Link, useLocation} from 'react-router-dom';
 
 import {parseQuery} from '../../../../../routes';
-import {
-    useCapabilitiesLoaded,
-    useStorageGroupsHandlerAvailable,
-} from '../../../../../store/reducers/capabilities/hooks';
-import {storageApi} from '../../../../../store/reducers/storage/storage';
 import {TENANT_METRICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {TenantMetricsTab} from '../../../../../store/reducers/tenant/types';
 import type {
@@ -16,7 +11,7 @@ import type {
 } from '../../../../../store/reducers/tenants/utils';
 import {cn} from '../../../../../utils/cn';
 import {SHOW_NETWORK_UTILIZATION} from '../../../../../utils/constants';
-import {useAutoRefreshInterval, useSetting, useTypedSelector} from '../../../../../utils/hooks';
+import {useSetting, useTypedSelector} from '../../../../../utils/hooks';
 import {calculateMetricAggregates} from '../../../../../utils/metrics';
 import {
     formatCoresLegend,
@@ -32,44 +27,25 @@ import './MetricsTabs.scss';
 const b = cn('tenant-metrics-tabs');
 
 interface MetricsTabsProps {
-    tenantName: string;
     poolsCpuStats?: TenantPoolsStats[];
     memoryStats?: TenantMetricStats[];
     blobStorageStats?: TenantStorageStats[];
     tabletStorageStats?: TenantStorageStats[];
     networkStats?: TenantMetricStats[];
+    storageGroupsCount?: number;
 }
 
 export function MetricsTabs({
-    tenantName,
     poolsCpuStats,
     memoryStats,
     blobStorageStats,
     tabletStorageStats,
     networkStats,
+    storageGroupsCount,
 }: MetricsTabsProps) {
     const location = useLocation();
     const {metricsTab} = useTypedSelector((state) => state.tenant);
     const queryParams = parseQuery(location);
-
-    // Fetch storage groups data to get correct count (only if groups handler available)
-    const capabilitiesLoaded = useCapabilitiesLoaded();
-    const groupsHandlerAvailable = useStorageGroupsHandlerAvailable();
-    const [autoRefreshInterval] = useAutoRefreshInterval();
-
-    const {currentData: storageGroupsData} = storageApi.useGetStorageGroupsInfoQuery(
-        {
-            tenant: tenantName,
-            shouldUseGroupsHandler: groupsHandlerAvailable,
-            with: 'all',
-            limit: 0,
-            fieldsRequired: [],
-        },
-        {
-            pollingInterval: autoRefreshInterval,
-            skip: !capabilitiesLoaded || !groupsHandlerAvailable,
-        },
-    );
 
     const tabLinks: Record<TenantMetricsTab, string> = {
         [TENANT_METRICS_TABS_IDS.cpu]: getTenantPath({
@@ -99,10 +75,6 @@ export function MetricsTabs({
     // Calculate storage metrics using utility
     const storageStats = tabletStorageStats || blobStorageStats || [];
     const storageMetrics = calculateMetricAggregates(storageStats);
-
-    // Get correct storage groups count from API (only if groups handler available and data is loaded)
-    const storageGroupCount =
-        groupsHandlerAvailable && storageGroupsData ? storageGroupsData.total : undefined;
 
     // Calculate memory metrics using utility
     const memoryMetrics = calculateMetricAggregates(memoryStats);
@@ -137,9 +109,9 @@ export function MetricsTabs({
                 <Link to={tabLinks.storage} className={b('link')}>
                     <TabCard
                         text={
-                            storageGroupCount === undefined
+                            storageGroupsCount === undefined
                                 ? i18n('cards.storage-label')
-                                : i18n('context_storage-groups', {count: storageGroupCount})
+                                : i18n('context_storage-groups', {count: storageGroupsCount})
                         }
                         value={storageMetrics.totalUsed}
                         limit={storageMetrics.totalLimit}

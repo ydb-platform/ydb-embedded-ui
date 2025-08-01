@@ -173,12 +173,16 @@ export function TenantOverview({
                         <HealthcheckPreview tenantName={tenantName} />
                         <QueriesActivityBar tenantName={tenantName} />
                         <MetricsTabs
-                            tenantName={tenantName}
                             poolsCpuStats={poolsStats}
                             memoryStats={memoryStats}
                             blobStorageStats={blobStorageStats}
                             tabletStorageStats={tabletStorageStats}
                             networkStats={networkStats}
+                            storageGroupsCount={
+                                tenantData.StorageGroups
+                                    ? Number(tenantData.StorageGroups)
+                                    : undefined
+                            }
                         />
                     </Flex>
                 </div>
