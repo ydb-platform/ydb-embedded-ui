@@ -1,29 +1,19 @@
-import React from 'react';
-
-import {Tab, TabList, TabProvider} from '@gravity-ui/uikit';
+import {Flex} from '@gravity-ui/uikit';
 
 import {InfoViewer} from '../../../../../components/InfoViewer/InfoViewer';
 import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
 import {ProgressWrapper} from '../../../../../components/ProgressWrapper';
-import {TENANT_STORAGE_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
-import {cn} from '../../../../../utils/cn';
+import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
+import {useSearchQuery} from '../../../../../utils/hooks';
+import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
+import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
 import i18n from '../i18n';
 
 import {TopGroups} from './TopGroups';
 import {TopTables} from './TopTables';
 import {storageDashboardConfig} from './storageDashboardConfig';
-import {useTenantStorageQueryParams} from './useTenantStorageQueryParams';
-
-import './TenantStorage.scss';
-
-const tenantStorageCn = cn('tenant-storage');
-
-const storageTabs = [
-    {id: TENANT_STORAGE_TABS_IDS.tables, title: i18n('title_top-tables-by-size')},
-    {id: TENANT_STORAGE_TABS_IDS.groups, title: i18n('title_top-groups-by-usage')},
-];
 
 export interface TenantStorageMetrics {
     blobStorageUsed?: number;
@@ -38,20 +28,8 @@ interface TenantStorageProps {
 }
 
 export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
-    const {storageTab, handleStorageTabChange} = useTenantStorageQueryParams();
-
     const {blobStorageUsed, tabletStorageUsed, blobStorageLimit, tabletStorageLimit} = metrics;
-
-    const renderTabContent = () => {
-        switch (storageTab) {
-            case TENANT_STORAGE_TABS_IDS.tables:
-                return <TopTables database={tenantName} />;
-            case TENANT_STORAGE_TABS_IDS.groups:
-                return <TopGroups tenant={tenantName} />;
-            default:
-                return null;
-        }
-    };
+    const query = useSearchQuery();
 
     const info = [
         {
@@ -89,25 +67,21 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
     ];
 
     return (
-        <React.Fragment>
+        <Flex direction="column" gap={4}>
             <TenantDashboard database={tenantName} charts={storageDashboardConfig} />
             <InfoViewer variant="small" title={i18n('title_storage-details')} info={info} />
-
-            <div className={tenantStorageCn('tabs-container')}>
-                <TabProvider value={storageTab}>
-                    <TabList size="m">
-                        {storageTabs.map(({id, title}) => {
-                            return (
-                                <Tab key={id} value={id} onClick={() => handleStorageTabChange(id)}>
-                                    {title}
-                                </Tab>
-                            );
-                        })}
-                    </TabList>
-                </TabProvider>
-
-                <div className={tenantStorageCn('tab-content')}>{renderTabContent()}</div>
-            </div>
-        </React.Fragment>
+            <StatsWrapper title={i18n('title_top-tables-by-size')}>
+                <TopTables database={tenantName} />
+            </StatsWrapper>
+            <StatsWrapper
+                title={i18n('title_top-groups-by-usage')}
+                allEntitiesLink={getTenantPath({
+                    ...query,
+                    [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.storage,
+                })}
+            >
+                <TopGroups tenant={tenantName} />
+            </StatsWrapper>
+        </Flex>
     );
 }

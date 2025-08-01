@@ -200,3 +200,5 @@ export enum AclSyntax {
     Ydb = 'ydb',
     Yql = 'yql',
 }
+
+export const YDB_POPOVER_CLASS_NAME = 'ydb-popover';

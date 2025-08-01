@@ -4,13 +4,12 @@ import {
     useStorageGroupsHandlerAvailable,
 } from '../../../../../store/reducers/capabilities/hooks';
 import {storageApi} from '../../../../../store/reducers/storage/storage';
-import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {GroupsRequiredField} from '../../../../../types/api/storage';
 import {
     TENANT_OVERVIEW_TABLES_LIMIT,
     TENANT_OVERVIEW_TABLES_SETTINGS,
 } from '../../../../../utils/constants';
-import {useAutoRefreshInterval, useSearchQuery} from '../../../../../utils/hooks';
+import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 import {getRequiredDataFields} from '../../../../../utils/tableUtils/getRequiredDataFields';
 import {getStorageTopGroupsColumns} from '../../../../Storage/PaginatedStorageGroupsTable/columns/columns';
 import {
@@ -18,10 +17,7 @@ import {
     STORAGE_GROUPS_COLUMNS_WIDTH_LS_KEY,
 } from '../../../../Storage/PaginatedStorageGroupsTable/columns/constants';
 import type {StorageGroupsColumn} from '../../../../Storage/PaginatedStorageGroupsTable/columns/types';
-import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
-import {getSectionTitle} from '../getSectionTitle';
-import i18n from '../i18n';
 
 function getColumns(): [StorageGroupsColumn[], GroupsRequiredField[]] {
     const preparedColumns = getStorageTopGroupsColumns();
@@ -37,8 +33,6 @@ interface TopGroupsProps {
 }
 
 export function TopGroups({tenant}: TopGroupsProps) {
-    const query = useSearchQuery();
-
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const groupsHandlerAvailable = useStorageGroupsHandlerAvailable();
     const [autoRefreshInterval] = useAutoRefreshInterval();
@@ -64,18 +58,8 @@ export function TopGroups({tenant}: TopGroupsProps) {
 
     const groups = currentData?.groups || [];
 
-    const title = getSectionTitle({
-        entity: i18n('groups'),
-        postfix: i18n('by-usage'),
-        link: getTenantPath({
-            ...query,
-            [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.storage,
-        }),
-    });
-
     return (
         <TenantOverviewTableLayout
-            title={title}
             loading={loading || !capabilitiesLoaded}
             error={error}
             withData={Boolean(currentData)}
