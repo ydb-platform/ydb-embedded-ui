@@ -9,8 +9,7 @@ import './TabCard.scss';
 const b = cn('tenant-tab-card');
 
 interface TabCardProps {
-    label: string;
-    sublabel?: string;
+    text: string;
     value: number;
     limit: number;
     active?: boolean;
@@ -18,15 +17,7 @@ interface TabCardProps {
     legendFormatter: (params: {value: number; capacity: number}) => string;
 }
 
-export function TabCard({
-    label,
-    sublabel,
-    value,
-    limit,
-    active,
-    helpText,
-    legendFormatter,
-}: TabCardProps) {
+export function TabCard({text, value, limit, active, helpText, legendFormatter}: TabCardProps) {
     const {status, percents, legend, fill} = getDiagramValues({
         value,
         capacity: limit,
@@ -61,7 +52,7 @@ export function TabCard({
                             note={helpText}
                             noteIconSize="s"
                         >
-                            {sublabel || label}
+                            {text}
                         </DoughnutMetrics.Legend>
                     </div>
                 </Flex>
