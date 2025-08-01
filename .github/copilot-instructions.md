@@ -103,6 +103,61 @@ This is a React-based monitoring and management interface for YDB clusters. The 
 - Ensure all user-facing text is internationalized
 - Test with a local YDB instance when possible
 
+
+
+## Code Review Patterns (Historical Analysis)
+
+### Common Review Feedback to Address
+
+#### TypeScript Quality
+- Use proper TypeScript types instead of any
+- Define interfaces for API responses
+- Use strict type checking
+- Avoid type assertions, use type guards
+
+#### React Implementation
+- Use React.memo for performance optimization
+- Implement proper error boundaries
+- Use useCallback and useMemo appropriately
+- Follow React hooks rules
+
+#### State Management
+- Use RTK Query for API calls instead of direct fetch
+- Implement proper loading states
+- Handle errors in Redux slices
+- Use injectEndpoints pattern
+
+### Critical Anti-Patterns (Auto-fix when detected)
+- Direct API calls instead of window.api pattern
+- Hardcoded strings instead of i18n
+- Mutating Redux state directly
+- Using React Router v6 patterns (project uses v5)
+- Missing loading states in UI
+
+### Best Practice Enforcement
+- Use window.api.module.method() pattern for API calls
+- Implement proper error handling with ResponseError component
+- Use PaginatedTable for data tables
+- Implement virtual scrolling for large datasets
+- Use Monaco Editor for code editing features
+
+## Copilot-Specific Guidelines
+
+### Auto-completion Priorities
+1. Suggest `window.api` calls over direct fetch
+2. Propose i18n keys for any string literals
+3. Recommend Gravity UI components
+4. Suggest proper TypeScript types
+5. Include error handling patterns
+
+### Code Generation Rules
+- Always generate TypeScript interfaces for new data structures
+- Include i18n setup for new components
+- Add loading states for async operations
+- Implement proper error boundaries
+- Follow BEM naming conventions
+
+
 ## Debugging Helpers
 
 - `window.api` - Access API methods in browser console

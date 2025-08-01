@@ -280,6 +280,82 @@ Build artifacts are placed in `/build` directory. For embedded deployments, file
 2. **Bundle size**: Run `npm run analyze` to identify large dependencies
 3. **Memory leaks**: Check for missing cleanup in useEffect hooks
 
+
+## Code Review Guidelines (Based on Historical Patterns)
+
+### Common Code Review Feedback Patterns
+
+#### TypeScript Best Practices
+- Use proper TypeScript types instead of any
+- Define interfaces for API responses
+- Use strict type checking
+- Avoid type assertions, use type guards
+
+#### React Development Patterns
+- Use React.memo for performance optimization
+- Implement proper error boundaries
+- Use useCallback and useMemo appropriately
+- Follow React hooks rules
+
+#### State Management (Redux/RTK Query)
+- Use RTK Query for API calls instead of direct fetch
+- Implement proper loading states
+- Handle errors in Redux slices
+- Use injectEndpoints pattern
+
+#### Internationalization Requirements
+- Never hardcode user-facing strings
+- Create i18n keys for all text
+- Use registerKeysets for new components
+- Follow i18n naming conventions
+
+#### Component Architecture
+- Use BEM naming with cn() utility
+- Implement proper prop interfaces
+- Follow component file organization
+- Use Gravity UI components consistently
+
+#### Testing Standards
+- Add unit tests for new components
+- Use testing-library best practices
+- Test error scenarios
+- Mock external dependencies properly
+
+### Anti-Patterns to Avoid
+- ❌ Direct API calls instead of window.api pattern
+- ❌ Hardcoded strings instead of i18n
+- ❌ Mutating Redux state directly
+- ❌ Using React Router v6 patterns (project uses v5)
+- ❌ Missing loading states in UI
+- ❌ Not handling error cases
+- ❌ Inconsistent naming conventions
+- ❌ Missing TypeScript types
+
+### Recommended Best Practices
+- ✅ Use window.api.module.method() pattern for API calls
+- ✅ Implement proper error handling with ResponseError component
+- ✅ Use PaginatedTable for data tables
+- ✅ Implement virtual scrolling for large datasets
+- ✅ Use Monaco Editor for code editing features
+- ✅ Follow conventional commit message format
+- ✅ Run lint and typecheck before committing
+- ✅ Use Gravity UI components over custom implementations
+
+### Code Review Checklist
+
+Before submitting a PR, ensure:
+
+- [ ] TypeScript types are properly defined (no `any` types)
+- [ ] All user-facing strings are internationalized
+- [ ] API calls use `window.api` pattern
+- [ ] Components follow BEM naming with `cn()` utility
+- [ ] Loading states and error handling are implemented
+- [ ] Tests are added for new functionality
+- [ ] Code follows project conventions
+- [ ] `npm run lint` and `npm run typecheck` pass
+- [ ] Commit messages follow conventional format
+
+
 ## Reference Resources
 
 - **YDB Documentation**: https://ydb.tech/en/docs/
