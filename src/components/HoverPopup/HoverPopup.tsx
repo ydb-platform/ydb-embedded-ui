@@ -4,13 +4,9 @@ import type {PopupProps} from '@gravity-ui/uikit';
 import {Popup} from '@gravity-ui/uikit';
 import debounce from 'lodash/debounce';
 
-import {cn} from '../../utils/cn';
-
-import './HoverPopup.scss';
+import {YDB_POPOVER_CLASS_NAME} from '../../utils/constants';
 
 const DEBOUNCE_TIMEOUT = 100;
-
-const b = cn('ydb-hover-popup');
 
 type HoverPopupProps = {
     children: React.ReactNode;
@@ -112,7 +108,7 @@ export const HoverPopup = ({
                     // bigger offset for easier switching to neighbour nodes
                     // matches the default offset for popup with arrow out of a sense of beauty
                     offset={offset || {mainAxis: 12, crossAxis: 0}}
-                    className={b()}
+                    className={YDB_POPOVER_CLASS_NAME}
                 >
                     <div
                         className={contentClassName}

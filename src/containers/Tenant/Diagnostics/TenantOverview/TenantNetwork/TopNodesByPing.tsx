@@ -1,16 +1,13 @@
 import {ResizeableDataTable} from '../../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../../../../components/nodesColumns/constants';
 import {nodesApi} from '../../../../../store/reducers/nodes/nodes';
-import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import {
     TENANT_OVERVIEW_TABLES_LIMIT,
     TENANT_OVERVIEW_TABLES_SETTINGS,
 } from '../../../../../utils/constants';
-import {useAutoRefreshInterval, useSearchQuery} from '../../../../../utils/hooks';
-import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
+import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
-import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';
 
 import {getTopNodesByPingColumns} from './columns';
@@ -21,7 +18,6 @@ interface TopNodesByPingProps {
 }
 
 export function TopNodesByPing({tenantName, additionalNodesProps}: TopNodesByPingProps) {
-    const query = useSearchQuery();
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const [columns, fieldsRequired] = getTopNodesByPingColumns({
         getNodeRef: additionalNodesProps?.getNodeRef,
@@ -43,22 +39,8 @@ export function TopNodesByPing({tenantName, additionalNodesProps}: TopNodesByPin
     const loading = isFetching && currentData === undefined;
     const topNodes = currentData?.Nodes || [];
 
-    const title = getSectionTitle({
-        entity: i18n('nodes'),
-        postfix: i18n('by-ping'),
-        link: getTenantPath({
-            ...query,
-            [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.nodes,
-        }),
-    });
-
     return (
-        <TenantOverviewTableLayout
-            title={title}
-            loading={loading}
-            error={error}
-            withData={Boolean(currentData)}
-        >
+        <TenantOverviewTableLayout loading={loading} error={error} withData={Boolean(currentData)}>
             <ResizeableDataTable
                 columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
                 data={topNodes}

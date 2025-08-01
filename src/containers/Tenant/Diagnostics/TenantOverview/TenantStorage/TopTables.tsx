@@ -1,3 +1,5 @@
+import React from 'react';
+
 import type {Column} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
 
@@ -12,36 +14,18 @@ import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 import {parseQueryErrorToString} from '../../../../../utils/query';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 
-import '../TenantOverview.scss';
-
 interface TopTablesProps {
     database: string;
 }
 
 const TOP_TABLES_COLUMNS_WIDTH_LS_KEY = 'topTablesTableColumnsWidth';
 
-export function TopTables({database}: TopTablesProps) {
-    const [autoRefreshInterval] = useAutoRefreshInterval();
-
-    const {currentData, error, isFetching} = topTablesApi.useGetTopTablesQuery(
-        {database},
-        {pollingInterval: autoRefreshInterval},
-    );
-    const loading = isFetching && currentData === undefined;
-
-    const data = currentData?.resultSets?.[0]?.result || [];
-
-    const formatSize = (value?: number) => {
-        const size = getBytesSizeUnit(data?.length ? Number(data[0].Size) : 0);
-
-        return formatBytes({value, size, precision: 1});
-    };
-
+function getColumns(size: ReturnType<typeof getBytesSizeUnit>) {
     const columns: Column<KeyValueRow>[] = [
         {
             name: 'Size',
             width: 100,
-            render: ({row}) => formatSize(Number(row.Size)),
+            render: ({row}) => formatBytes({value: Number(row.Size), size, precision: 1}),
             align: DataTable.RIGHT,
         },
         {
@@ -55,6 +39,22 @@ export function TopTables({database}: TopTablesProps) {
                 ) : null,
         },
     ];
+    return columns;
+}
+
+export function TopTables({database}: TopTablesProps) {
+    const [autoRefreshInterval] = useAutoRefreshInterval();
+
+    const {currentData, error, isFetching} = topTablesApi.useGetTopTablesQuery(
+        {database},
+        {pollingInterval: autoRefreshInterval},
+    );
+    const loading = isFetching && currentData === undefined;
+
+    const data = currentData?.resultSets?.[0]?.result || [];
+    const size = getBytesSizeUnit(data?.length ? Number(data[0].Size) : 0);
+    const columns = React.useMemo(() => getColumns(size), [size]);
+
     return (
         <TenantOverviewTableLayout
             loading={loading}

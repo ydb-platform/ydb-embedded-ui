@@ -5,6 +5,7 @@ import {Popover} from '@gravity-ui/uikit';
 import type {BytesSizes, ProcessSpeedStats} from '../../utils/bytesParsers';
 import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
+import {YDB_POPOVER_CLASS_NAME} from '../../utils/constants';
 
 import i18n from './i18n';
 
@@ -105,7 +106,7 @@ export const SpeedMultiMeter = ({
                 )}
                 <Popover
                     content={renderPopoverContent()}
-                    className={b('popover-container')}
+                    className={b('popover-container', YDB_POPOVER_CLASS_NAME)}
                     placement={'bottom'}
                     disabled={!withPopover}
                     hasArrow={true}
