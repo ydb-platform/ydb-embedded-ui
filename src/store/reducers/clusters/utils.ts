@@ -1,10 +1,10 @@
 import type {MetaClusters} from '../../../types/api/meta';
-import {
-    getVersionColors,
-    getVersionMap,
-    prepareClusterVersions,
-} from '../../../utils/clusterVersionColors';
 import {prepareBackendFromBalancer} from '../../../utils/parseBalancer';
+import {
+    getVersionMap,
+    getVersionsData,
+    prepareClusterVersions,
+} from '../../../utils/versions/clusterVersionColors';
 
 import type {PreparedCluster} from './types';
 
@@ -19,12 +19,12 @@ export const prepareClustersData = (data: MetaClusters): PreparedCluster[] => {
     });
 
     // Get colors map for all clusters colors
-    const versionToColor = getVersionColors(allMinorVersions);
+    const versionsData = getVersionsData(allMinorVersions);
 
     // Apply color map to every cluster in the list
     return clusters.map((cluster) => ({
         ...cluster,
-        preparedVersions: prepareClusterVersions(cluster.versions, versionToColor),
+        preparedVersions: prepareClusterVersions(cluster.versions, versionsData),
         preparedBackend: cluster.balancer
             ? prepareBackendFromBalancer(cluster.balancer)
             : undefined,

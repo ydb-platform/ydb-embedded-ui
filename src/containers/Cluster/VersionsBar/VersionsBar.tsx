@@ -1,8 +1,8 @@
 import type {ProgressProps} from '@gravity-ui/uikit';
 import {Progress} from '@gravity-ui/uikit';
 
-import type {VersionValue} from '../../../types/versions';
 import {cn} from '../../../utils/cn';
+import type {VersionValue} from '../../../utils/versions/types';
 
 import './VersionsBar.scss';
 
