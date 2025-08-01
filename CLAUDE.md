@@ -1,6 +1,52 @@
-# AGENTS.md
+# CLAUDE.md
 
-This file provides guidance to AI coding assistants when working with this codebase. Designed for OpenAI Codex, GitHub Copilot, Claude, Cursor, and other AI development tools.
+This file provides guidance for using Claude AI with this YDB Embedded UI codebase and documents the Claude code review workflow configuration.
+
+## Claude Code Review Workflows
+
+This repository includes two GitHub Actions workflows for Claude AI integration:
+
+### 1. Claude Code Review (`claude-code-review.yml`)
+
+- **Trigger**: Comment `/claude_review` on any PR
+- **Purpose**: Automated code review focusing on coding standards and best practices
+- **Model**: `claude-opus-4-20250514`
+
+### 2. Claude Code (`claude.yml`)
+
+- **Trigger**: Comment `@claude` on any PR or assign `claude-bot` to an issue
+- **Purpose**: Interactive Claude assistance for development tasks
+- **Model**: `claude-opus-4-20250514`
+
+### Workflow Architecture
+
+Both workflows use a robust reference resolution system to ensure Claude reviews the latest changes:
+
+1. **PR Reference Resolution**: When triggered by issue comments on PRs, workflows:
+
+   - Fetch the current PR details via GitHub API
+   - Extract the head commit SHA (latest changes)
+   - Checkout the actual PR head instead of the base branch
+
+2. **Fallback Logic**: For manual workflow dispatches, falls back to the default branch
+
+3. **Full Git History**: Uses `fetch-depth: 0` to provide complete context for reviews
+
+### Recent Fix (Issue #2651)
+
+**Problem**: Claude was reviewing stale data because workflows checked out the base branch instead of PR head.
+
+**Solution**: Added dynamic reference resolution:
+
+```yaml
+ref: ${{ github.event_name == 'issue_comment' && steps.pr-details.outputs.pr_head_sha || github.ref }}
+```
+
+This ensures Claude always reviews the current state of the PR, including any recent commits.
+
+---
+
+# Project Development Guide
 
 ## Project Overview
 
