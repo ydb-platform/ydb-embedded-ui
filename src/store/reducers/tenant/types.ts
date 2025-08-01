@@ -29,7 +29,7 @@ export type TenantNetworkTab = ValueOf<typeof TENANT_NETWORK_TABS_IDS>;
 export interface TenantState {
     tenantPage: TenantPage;
     queryTab?: TenantQueryTab;
-    diagnosticsTab?: TenantDiagnosticsTab;
+    diagnosticsTab: TenantDiagnosticsTab;
     summaryTab?: TenantSummaryTab;
     metricsTab: TenantMetricsTab;
 }
