@@ -42,32 +42,6 @@ jobs:
           ref: ${{ github.event_name == 'issue_comment' && steps.pr-details.outputs.pr_head_sha || github.ref }}
           fetch-depth: 0
 
-      - name: Validate checkout (verification step)
-        run: |
-          echo "=== Workflow Checkout Validation ==="
-          echo "Event type: ${{ github.event_name }}"
-          if [ "${{ github.event_name }}" = "issue_comment" ]; then
-            echo "PR number: ${{ steps.pr-details.outputs.pr_number }}"
-            echo "Expected PR head SHA: ${{ steps.pr-details.outputs.pr_head_sha }}"
-          fi
-          echo "Checked out commit: $(git rev-parse HEAD)"
-          echo "Current branch/ref: $(git symbolic-ref HEAD 2>/dev/null || echo 'detached HEAD')"
-          echo "=== Validation Complete ==="
-
-          # Verify we checked out the correct commit for PR comments
-          if [ "${{ github.event_name }}" = "issue_comment" ]; then
-            CURRENT_SHA=$(git rev-parse HEAD)
-            EXPECTED_SHA="${{ steps.pr-details.outputs.pr_head_sha }}"
-            if [ "$CURRENT_SHA" = "$EXPECTED_SHA" ]; then
-              echo "✅ SUCCESS: Checked out correct PR head commit"
-            else
-              echo "❌ ERROR: Checked out $CURRENT_SHA but expected $EXPECTED_SHA"
-              exit 1
-            fi
-          else
-            echo "✅ SUCCESS: Workflow dispatch - using default ref"
-          fi
-
       - name: Run Claude Code Review
         id: claude-review
         uses: anthropics/claude-code-action@beta
