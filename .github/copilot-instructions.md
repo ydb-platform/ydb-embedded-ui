@@ -103,60 +103,118 @@ This is a React-based monitoring and management interface for YDB clusters. The 
 - Ensure all user-facing text is internationalized
 - Test with a local YDB instance when possible
 
+## MANDATORY Code Review Rules (From 435 PR Analysis)
 
+### Top 5 Issues to Prevent
 
-## Code Review Patterns (Historical Analysis)
+1. **Hardcoded Strings (42 occurrences)** - #1 issue
+   - NEVER use hardcoded strings for user-facing text
+   - Even dashes must use i18n: `i18n('context_no-data')` not `'–'`
+2. **Missing Tests (39 occurrences)**
+   - ALL new features must have tests
+   - Unit tests for components, E2E tests for features
+3. **Improper State Management (16 occurrences)**
+   - Use Redux selectors, not direct state access
+   - NEVER mutate state in RTK Query
+4. **Missing Loading States (12 occurrences)**
+   - ALL async operations must show loading indicators
+   - Use Loader and TableSkeleton components
+5. **Poor Error Handling (9 occurrences)**
+   - Use ResponseError component for API errors
+   - Clear errors on user input
 
-### Common Review Feedback to Address
+### NEVER Do These
 
-#### TypeScript Quality
-- Use proper TypeScript types instead of any
-- Define interfaces for API responses
-- Use strict type checking
-- Avoid type assertions, use type guards
+- Use mock data in production code
+- Make direct fetch/axios calls (use `window.api`)
+- Skip required API parameters
+- Create duplicate API calls
+- Use improper type names (API types need 'T' prefix)
+- Commit without running lint and typecheck
 
-#### React Implementation
-- Use React.memo for performance optimization
-- Implement proper error boundaries
-- Use useCallback and useMemo appropriately
-- Follow React hooks rules
+### ALWAYS Do These
 
-#### State Management
-- Use RTK Query for API calls instead of direct fetch
-- Implement proper loading states
-- Handle errors in Redux slices
-- Use injectEndpoints pattern
+- Test with real YDB backend: `docker run -dp 8765:8765 ghcr.io/ydb-platform/local-ydb:nightly`
+- Include `fields_required: -1` for sysinfo API calls
+- Make tables sortable, resizable with sticky headers
+- Clear errors on user input in forms
+- Use conventional commits with lowercase subjects
 
-### Critical Anti-Patterns (Auto-fix when detected)
-- Direct API calls instead of window.api pattern
-- Hardcoded strings instead of i18n
-- Mutating Redux state directly
-- Using React Router v6 patterns (project uses v5)
-- Missing loading states in UI
+### Specific API Requirements
 
-### Best Practice Enforcement
-- Use window.api.module.method() pattern for API calls
-- Implement proper error handling with ResponseError component
-- Use PaginatedTable for data tables
-- Implement virtual scrolling for large datasets
-- Use Monaco Editor for code editing features
+```typescript
+// Required for threads data (PR #2599)
+window.api.viewer.getSysInfo({
+  nodeId: nodeId,
+  fields_required: -1, // MANDATORY parameter
+});
+```
 
-## Copilot-Specific Guidelines
+### Review Priority Matrix
 
-### Auto-completion Priorities
-1. Suggest `window.api` calls over direct fetch
-2. Propose i18n keys for any string literals
-3. Recommend Gravity UI components
-4. Suggest proper TypeScript types
-5. Include error handling patterns
+| Priority | Issue             | Check For                       |
+| -------- | ----------------- | ------------------------------- |
+| P0       | Hardcoded strings | All text uses i18n()            |
+| P0       | Missing tests     | New features have test coverage |
+| P1       | Mock data         | Only real backend data used     |
+| P1       | API patterns      | window.api usage, no fetch()    |
+| P2       | Type naming       | API types prefixed with 'T'     |
 
-### Code Generation Rules
-- Always generate TypeScript interfaces for new data structures
-- Include i18n setup for new components
-- Add loading states for async operations
-- Implement proper error boundaries
-- Follow BEM naming conventions
+## Universal Code Review Standards
 
+Apply these standards consistently for ALL code reviews:
+
+### Backend & API Standards
+
+- NO mock data - always use real backend data
+- Verify all required API parameters are included
+- Check for duplicate API calls
+- Ensure proper error handling
+
+### UI/UX Standards
+
+- Tables must have sticky headers, be sortable and resizable
+- Proper data alignment in all UI components
+- Use existing patterns from the codebase
+- Loading states for all async operations
+
+### Code Quality Standards
+
+- Conventional commit format with lowercase subjects
+- No unnecessary files (test scripts, debug code)
+- No duplicate code or tests
+- Proper TypeScript types (API types prefixed with 'T')
+- Simplified event handler types
+
+### Testing Standards
+
+- All new features must have tests
+- Verify functionality with real YDB instance
+- Remove all console.logs and debug statements
+
+## Common Code Patterns to Flag
+
+```typescript
+// ❌ Hardcoded string
+{
+  value || '–';
+}
+
+// ✅ Internationalized
+{
+  value || i18n('context_no-data');
+}
+
+// ❌ Verbose event type
+(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) =>
+  // ✅ Simplified
+  (event: React.MouseEvent<HTMLButtonElement>) =>
+    // ❌ Direct API call
+    fetch('/api/data');
+
+// ✅ Via window.api
+window.api.module.getData();
+```
 
 ## Debugging Helpers
 

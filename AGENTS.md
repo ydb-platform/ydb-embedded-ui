@@ -123,6 +123,41 @@ REACT_APP_BACKEND=http://your-cluster:8765  # Single cluster mode
 - Commit messages must follow conventional commit format
 - Always run `npm run lint` and `npm run typecheck` to catch issues early
 
+## PR & Commit Standards
+
+### Conventional Commits (REQUIRED)
+
+Based on 435 code reviews, all commits and PR titles must follow this format:
+
+```
+feat: add new feature
+fix: resolve bug
+chore: update dependencies
+docs: update documentation
+test: add tests
+refactor: code improvements
+```
+
+**Critical**: Subject MUST be lowercase (no proper nouns, sentence-case, or upper-case)
+
+Examples:
+
+- ✅ `fix: update storage group count calculation`
+- ❌ `Fix: Update Storage Group Count`
+- ❌ `fix: Update API endpoints`
+
+### PR Checklist
+
+Before submitting a PR:
+
+- [ ] Title follows conventional commits with lowercase subject
+- [ ] No mock data in code (test with real backend)
+- [ ] Tested with real YDB backend: `docker run -dp 8765:8765 ghcr.io/ydb-platform/local-ydb:nightly`
+- [ ] No duplicate API calls
+- [ ] All strings internationalized
+- [ ] Run `npm run lint` and `npm run typecheck`
+- [ ] Add tests for new features
+
 ### UI Framework
 
 The project uses Gravity UI (@gravity-ui/uikit) as the primary component library. When adding new UI components, prefer using Gravity UI components over custom implementations.
@@ -150,9 +185,49 @@ The project uses Gravity UI (@gravity-ui/uikit) as the primary component library
 
 All API calls go through `window.api` global object with domain-specific modules (viewer, schema, storage, etc.)
 
+**Critical API Parameters (from PR reviews):**
+
+```typescript
+// For sysinfo calls - REQUIRED for threads data (PR #2599)
+await window.api.viewer.getSysInfo({
+  nodeId: nodeId,
+  fields_required: -1, // Must include this parameter
+});
+
+// Common API mistakes:
+// ❌ Direct fetch calls
+fetch('/api/endpoint');
+
+// ❌ Missing required parameters
+window.api.viewer.getSysInfo({nodeId});
+
+// ✅ Correct pattern
+window.api.viewer.getSysInfo({nodeId, fields_required: -1});
+```
+
 ### Table Implementation
 
 Use `PaginatedTable` component for data grids with virtual scrolling. Tables require columns, fetchData function, and a unique tableName.
+
+**Table Requirements (from PR reviews by @Raubzeug and @artemmufazalov):**
+
+```typescript
+// ✅ Correct table implementation
+<ResizeableDataTable
+  columns={columns}
+  data={data}
+  settings={TABLE_SETTINGS}
+  theme="yandex-cloud"
+  stickyHeader      // Required for scrollable content
+  sortable          // Required for all tables
+  // Virtual scrolling enabled by default
+/>
+
+// Common table issues:
+// - Missing sticky headers (flagged in PR #2577)
+// - Incorrect sorting implementation (PR #2633)
+// - Not using ResizeableDataTable for data tables
+```
 
 ### Redux Toolkit Query Pattern
 
@@ -196,6 +271,20 @@ All user-facing text must be internationalized using the i18n system. Follow the
   - `value_` - status values, options
 - **NEVER** use hardcoded strings in UI components
 - **ALWAYS** create i18n entries for all user-visible text
+
+**Common i18n Mistakes (from 42 PR reviews):**
+
+```typescript
+// ❌ Hardcoded dash
+{
+  row.UserSID || '–';
+}
+
+// ✅ Internationalized
+{
+  row.UserSID || i18n('context_no-data');
+}
+```
 
 ### Performance Considerations
 
@@ -259,6 +348,35 @@ Build artifacts are placed in `/build` directory. For embedded deployments, file
 - `PUBLIC_URL` - Base URL for static assets (use `.` for relative paths)
 - `GENERATE_SOURCEMAP` - Set to `false` for production builds
 
+## Common Issues from Code Reviews (Based on 435 PR Reviews)
+
+### Top 5 Issues to Avoid
+
+1. **Hardcoded Strings (42 occurrences)**
+
+   - ALWAYS use i18n for ALL user-facing text
+   - Even dashes: Use `i18n('context_no-data')` not `'–'`
+
+2. **Missing Tests (39 occurrences)**
+
+   - Add unit tests for new components
+   - E2E tests for new features
+   - Never merge without test coverage
+
+3. **Improper State Management (16 occurrences)**
+
+   - Use Redux selectors, not direct state access
+   - Never mutate state in RTK Query
+
+4. **Missing Loading States (12 occurrences)**
+
+   - Always show loading indicators
+   - Handle skeleton states for tables
+
+5. **Poor Error Handling (9 occurrences)**
+   - Use ResponseError component
+   - Clear errors on user input
+
 ## Common Issues & Troubleshooting
 
 ### Development Issues
@@ -273,6 +391,7 @@ Build artifacts are placed in `/build` directory. For embedded deployments, file
 1. **CORS errors**: Check if backend allows localhost:3000 origin in development
 2. **Authentication failures**: Verify credentials and authentication method
 3. **Network timeouts**: Check backend availability and network configuration
+4. **Double API calls**: Check for duplicate useEffect hooks or missing dependencies
 
 ### Performance Issues
 
@@ -280,81 +399,67 @@ Build artifacts are placed in `/build` directory. For embedded deployments, file
 2. **Bundle size**: Run `npm run analyze` to identify large dependencies
 3. **Memory leaks**: Check for missing cleanup in useEffect hooks
 
+## Real Code Review Examples & Solutions
 
-## Code Review Guidelines (Based on Historical Patterns)
+### Component Patterns (From Actual Reviews)
 
-### Common Code Review Feedback Patterns
+#### Event Handler Types (PR #2642)
 
-#### TypeScript Best Practices
-- Use proper TypeScript types instead of any
-- Define interfaces for API responses
-- Use strict type checking
-- Avoid type assertions, use type guards
+```typescript
+// ❌ Verbose - Flagged in review
+const handleClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 
-#### React Development Patterns
-- Use React.memo for performance optimization
-- Implement proper error boundaries
-- Use useCallback and useMemo appropriately
-- Follow React hooks rules
+// ✅ Simplified - Approved
+const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+```
 
-#### State Management (Redux/RTK Query)
-- Use RTK Query for API calls instead of direct fetch
-- Implement proper loading states
-- Handle errors in Redux slices
-- Use injectEndpoints pattern
+#### Double API Calls (PR #2599)
 
-#### Internationalization Requirements
-- Never hardcode user-facing strings
-- Create i18n keys for all text
-- Use registerKeysets for new components
-- Follow i18n naming conventions
+```typescript
+// ❌ Causes double requests - Flagged by @adameat
+useEffect(() => {
+  fetchData();
+}, []);
 
-#### Component Architecture
-- Use BEM naming with cn() utility
-- Implement proper prop interfaces
-- Follow component file organization
-- Use Gravity UI components consistently
+useEffect(() => {
+  fetchData();
+}, [someParam]);
 
-#### Testing Standards
-- Add unit tests for new components
-- Use testing-library best practices
-- Test error scenarios
-- Mock external dependencies properly
+// ✅ Single effect with proper dependencies
+useEffect(() => {
+  fetchData();
+}, [someParam]);
+```
 
-### Anti-Patterns to Avoid
-- ❌ Direct API calls instead of window.api pattern
-- ❌ Hardcoded strings instead of i18n
-- ❌ Mutating Redux state directly
-- ❌ Using React Router v6 patterns (project uses v5)
-- ❌ Missing loading states in UI
-- ❌ Not handling error cases
-- ❌ Inconsistent naming conventions
-- ❌ Missing TypeScript types
+#### Mock Data Usage (PR #2599)
 
-### Recommended Best Practices
-- ✅ Use window.api.module.method() pattern for API calls
-- ✅ Implement proper error handling with ResponseError component
-- ✅ Use PaginatedTable for data tables
-- ✅ Implement virtual scrolling for large datasets
-- ✅ Use Monaco Editor for code editing features
-- ✅ Follow conventional commit message format
-- ✅ Run lint and typecheck before committing
-- ✅ Use Gravity UI components over custom implementations
+```typescript
+// ❌ Using mock data - Always flagged
+const mockData = { threads: [...] };
+return mockData;
 
-### Code Review Checklist
+// ✅ Always use real backend data
+const response = await window.api.viewer.getSysInfo({
+  nodeId,
+  fields_required: -1
+});
+return response;
+```
 
-Before submitting a PR, ensure:
+### UI/UX Requirements (From Reviews)
 
-- [ ] TypeScript types are properly defined (no `any` types)
-- [ ] All user-facing strings are internationalized
-- [ ] API calls use `window.api` pattern
-- [ ] Components follow BEM naming with `cn()` utility
-- [ ] Loading states and error handling are implemented
-- [ ] Tests are added for new functionality
-- [ ] Code follows project conventions
-- [ ] `npm run lint` and `npm run typecheck` pass
-- [ ] Commit messages follow conventional format
+#### Progress Indicators (PR #2588 by @adameat)
 
+- 100% progress should always be displayed in green
+- Replication progress must show only when disk is not replicated
+- Proper alignment required in tooltips
+
+#### Table Features (PR #2577 by @Raubzeug)
+
+- Sticky headers for all scrollable tables
+- Sortable columns (especially numeric data)
+- Resizable columns
+- Use common patterns from existing tables
 
 ## Reference Resources
 
