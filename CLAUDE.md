@@ -44,6 +44,35 @@ ref: ${{ github.event_name == 'issue_comment' && steps.pr-details.outputs.pr_hea
 
 This ensures Claude always reviews the current state of the PR, including any recent commits.
 
+### Testing the Workflow Fix
+
+To verify the Claude workflows are correctly checking out PR head commits:
+
+1. **Automatic Validation**: Both workflows include a validation step that:
+
+   - Logs the event type and commit SHA being checked out
+   - Verifies the checked out commit matches the expected PR head
+   - Fails with a clear error if the wrong commit is checked out
+
+2. **Manual Testing**:
+
+   - Create a test PR with some changes
+   - Add a comment with `/claude_review` or `@claude`
+   - Check the workflow logs for "Validate checkout (verification step)"
+   - Look for `✅ SUCCESS: Checked out correct PR head commit`
+
+3. **Test Script**: Run `.github/workflows/scripts/test-claude-workflow-fix.sh` to validate the logic locally
+
+4. **Expected Log Output**:
+   ```
+   === Workflow Checkout Validation ===
+   Event type: issue_comment
+   PR number: 123
+   Expected PR head SHA: abc123def456...
+   Checked out commit: abc123def456...
+   ✅ SUCCESS: Checked out correct PR head commit
+   ```
+
 ---
 
 # Project Development Guide
