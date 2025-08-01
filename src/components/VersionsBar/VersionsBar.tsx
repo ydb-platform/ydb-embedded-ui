@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {Button, Flex, Tooltip} from '@gravity-ui/uikit';
+import {debounce} from 'lodash';
 
 import {cn} from '../../utils/cn';
 import type {PreparedVersion} from '../../utils/versions/types';
@@ -14,6 +15,9 @@ const b = cn('ydb-versions-bar');
 const TRUNCATION_THRESHOLD = 4;
 // One more line for Show more / Hide button
 const MAX_DISPLAYED_VERSIONS = TRUNCATION_THRESHOLD - 1;
+
+const HOVER_DELAY = 200;
+const TOOLTIP_OPEN_DELAY = 200;
 
 interface VersionsBarProps {
     preparedVersions: PreparedVersion[];
@@ -60,31 +64,39 @@ export function VersionsBar({preparedVersions}: VersionsBarProps) {
     };
 
     const renderButton = () => {
-        if (shouldTruncateVersions) {
-            const truncatedVersionsCount = preparedVersions.length - MAX_DISPLAYED_VERSIONS;
-
-            if (allVersionsDisplayed) {
-                return (
-                    <Button view="flat-secondary" size={'s'} onClick={handleHideAllVersions}>
-                        {i18n('action_hide', {
-                            count: truncatedVersionsCount,
-                        })}
-                    </Button>
-                );
-            } else {
-                return (
-                    <Button view="flat-secondary" size={'s'} onClick={handleShowAllVersions}>
-                        {i18n('action_show_more', {
-                            count: truncatedVersionsCount,
-                        })}
-                    </Button>
-                );
-            }
+        if (!shouldTruncateVersions) {
+            return null;
         }
-        return null;
+
+        const truncatedVersionsCount = preparedVersions.length - MAX_DISPLAYED_VERSIONS;
+
+        if (allVersionsDisplayed) {
+            return (
+                <Button view="flat-secondary" size={'s'} onClick={handleHideAllVersions}>
+                    {i18n('action_hide', {
+                        count: truncatedVersionsCount,
+                    })}
+                </Button>
+            );
+        } else {
+            return (
+                <Button view="flat-secondary" size={'s'} onClick={handleShowAllVersions}>
+                    {i18n('action_show_more', {
+                        count: truncatedVersionsCount,
+                    })}
+                </Button>
+            );
+        }
     };
 
+    const handleMouseEnter = React.useMemo(() => {
+        return debounce((version: string) => {
+            setHoveredVersion(version);
+        }, HOVER_DELAY);
+    }, []);
+
     const handleMouseLeave = () => {
+        handleMouseEnter.cancel();
         setHoveredVersion(undefined);
     };
 
@@ -106,11 +118,11 @@ export function VersionsBar({preparedVersions}: VersionsBarProps) {
                             </React.Fragment>
                         }
                         placement={'top-start'}
-                        openDelay={100}
+                        openDelay={TOOLTIP_OPEN_DELAY}
                     >
                         <span
                             onMouseEnter={() => {
-                                setHoveredVersion(item.version);
+                                handleMouseEnter(item.version);
                             }}
                             onMouseLeave={handleMouseLeave}
                             className={b('version', {dimmed: isDimmed(item.version)})}
@@ -126,7 +138,7 @@ export function VersionsBar({preparedVersions}: VersionsBarProps) {
                         key={item.version}
                         content={i18n('tooltip_nodes', {count: item.count})}
                         placement={'bottom-end'}
-                        openDelay={100}
+                        openDelay={TOOLTIP_OPEN_DELAY}
                     >
                         <Flex gap={1} alignItems={'center'} className={b('titles-wrapper')}>
                             <svg
@@ -142,7 +154,7 @@ export function VersionsBar({preparedVersions}: VersionsBarProps) {
                             <div
                                 className={b('title', {dimmed: isDimmed(item.version)})}
                                 onMouseEnter={() => {
-                                    setHoveredVersion(item.version);
+                                    handleMouseEnter(item.version);
                                 }}
                                 onMouseLeave={handleMouseLeave}
                             >
