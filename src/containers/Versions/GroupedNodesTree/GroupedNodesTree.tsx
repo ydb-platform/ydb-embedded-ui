@@ -3,8 +3,8 @@ import React from 'react';
 import {TreeView} from 'ydb-ui-components';
 
 import type {NodesPreparedEntity} from '../../../store/reducers/nodes/types';
-import type {VersionValue} from '../../../types/versions';
 import {cn} from '../../../utils/cn';
+import type {VersionValue} from '../../../utils/versions/types';
 import {NodesTable} from '../NodesTable/NodesTable';
 import {NodesTreeTitle} from '../NodesTreeTitle/NodesTreeTitle';
 import type {GroupedNodesItem} from '../types';
