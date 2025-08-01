@@ -98,6 +98,7 @@ This is a React-based monitoring and management interface for YDB clusters. The 
 
 - Run `npm run lint` and `npm run typecheck` before committing
 - Follow conventional commit message format
+- Use conventional commit format for PR titles (fix:, feat:, chore:, docs:, etc.)
 - Ensure all user-facing text is internationalized
 - Test with a local YDB instance when possible
 
