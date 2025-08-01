@@ -6,7 +6,7 @@ import type {TTenantInfo} from '../../../types/api/tenant';
 import {TENANT_INITIAL_PAGE_KEY} from '../../../utils/constants';
 import {api} from '../api';
 
-import {TENANT_METRICS_TABS_IDS} from './constants';
+import {TENANT_DIAGNOSTICS_TABS_IDS, TENANT_METRICS_TABS_IDS} from './constants';
 import {tenantPageSchema} from './types';
 import type {
     TenantDiagnosticsTab,
@@ -24,6 +24,7 @@ const tenantPage = tenantPageSchema
 export const initialState: TenantState = {
     tenantPage,
     metricsTab: TENANT_METRICS_TABS_IDS.cpu,
+    diagnosticsTab: TENANT_DIAGNOSTICS_TABS_IDS.overview,
 };
 
 const slice = createSlice({
