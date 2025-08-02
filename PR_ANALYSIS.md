@@ -11,7 +11,7 @@ The repository includes a comprehensive PR comment analysis script (`analyze-pr-
 The script categorizes valuable comments into these categories:
 
 - **Internationalization**: Comments about i18n implementation, missing translations, and localization best practices
-- **Type Safety**: TypeScript-related improvements, type definitions, and type safety enhancements  
+- **Type Safety**: TypeScript-related improvements, type definitions, and type safety enhancements
 - **Testing**: Suggestions for test coverage, test quality, and testing best practices
 - **Performance**: Performance optimization suggestions, memory usage improvements, and efficiency concerns
 - **Security**: Security vulnerabilities, authentication issues, and security best practices
@@ -24,6 +24,7 @@ The script categorizes valuable comments into these categories:
 ### Value Detection Algorithm
 
 The script identifies valuable comments by looking for keywords like:
+
 - Technical terms: `bug`, `issue`, `problem`, `error`, `fix`, `improve`, `suggestion`
 - Quality indicators: `performance`, `security`, `optimization`, `refactor`, `better`
 - Best practices: `consider`, `recommend`, `should`, `could`, `pattern`, `best practice`
@@ -32,6 +33,7 @@ The script identifies valuable comments by looking for keywords like:
 - Testing: `test`, `testing`, `coverage`, `validation`, `edge case`
 
 And filters out non-valuable comments containing:
+
 - Simple approvals: `lgtm`, `looks good`, `approved`, `merge`
 - Social responses: `thanks`, `thank you`, `nice`, `great`, `awesome`, `perfect`
 
@@ -40,30 +42,35 @@ And filters out non-valuable comments containing:
 Based on the analysis framework, the following coding guidelines emerge:
 
 #### 1. Internationalization (High Priority)
+
 - All user-facing strings must be internationalized
 - Use i18n keys following the pattern: `<context>_<content>`
 - Register keysets with `registerKeysets()` using unique component names
 - Never hardcode text in components
 
-#### 2. Type Safety (High Priority) 
+#### 2. Type Safety (High Priority)
+
 - Use strict TypeScript configurations
 - Define proper interfaces for API responses
 - Avoid `any` types where possible
 - Use proper type guards for runtime type checking
 
 #### 3. Testing Standards (Medium Priority)
+
 - Maintain comprehensive test coverage
 - Write both unit and integration tests
 - Use proper test naming conventions
 - Test edge cases and error scenarios
 
 #### 4. Performance Considerations (Medium Priority)
+
 - Use React.memo for expensive components
 - Implement proper lazy loading
 - Optimize bundle sizes
 - Use virtual scrolling for large datasets
 
 #### 5. Code Architecture (Medium Priority)
+
 - Follow established patterns (BEM naming, Redux Toolkit)
 - Use proper separation of concerns
 - Implement consistent error handling
