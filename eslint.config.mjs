@@ -69,5 +69,5 @@ export default [
             },
         },
     },
-    {ignores: ['dist', 'build', 'analyze-pr-comments.js']},
+    {ignores: ['dist', 'build']},
 ];
