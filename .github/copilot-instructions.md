@@ -188,19 +188,31 @@ const handleClick = useCallback(() => {
 - Test additions
 - Styling modifications
 
-## Developer Experience Guidelines
+## Developer Guidelines
 
-### By Experience Level
+### Universal Standards
 
-**Junior Developers**: Focus on type safety (43% of issues), use strict TypeScript
-**Mid-Level Developers**: Focus on performance (52% of issues), always memoize computations  
-**Senior Developers**: Focus on architecture (67% of insights), review cross-system impact
+**Type Safety** (Critical for all developers):
+- Use strict TypeScript with no implicit any
+- Follow established type conventions
+- Validate all inputs and handle edge cases
 
-### Learning Acceleration
+**Performance** (Required for all implementations):  
+- Always memoize expensive computations and object/array creation
+- Use proper React performance patterns (useMemo, useCallback)
+- Consider rendering performance impact
 
-- Pair junior developers with senior reviewers for architectural decisions
+**Architecture** (Essential for all changes):
+- Review cross-system impact of changes
+- Follow established patterns and conventions
+- Consider scalability and maintainability
+
+### Learning and Knowledge Sharing
+
 - Document complex decisions for team knowledge sharing
+- Collaborate on architectural decisions when needed
 - Use quantified feedback to track improvement (current: 67% reduction in recurring issues)
+- Follow established review patterns and quality standards
 
 ## Debugging Helpers
 
