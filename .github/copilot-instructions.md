@@ -1,21 +1,24 @@
 # GitHub Copilot Instructions for YDB Embedded UI
 
-> **Purpose**: Optimized guidance for GitHub Copilot when assisting with YDB Embedded UI development.
-> Derived from AGENTS.md but structured for Copilot's code suggestion patterns.
+> **Note**: This file contains project-specific instructions for GitHub Copilot code review and assistance.
+> These instructions are derived from AGENTS.md but formatted specifically for Copilot's consumption.
+> When updating project conventions, update both AGENTS.md (for human developers) and this file (for Copilot).
 
-## Quick Context
+## Project Overview
 
-**Project**: React-based monitoring interface for YDB clusters
-**Key Tech**: React 18.3 + TypeScript 5.x + Redux Toolkit 2.x + Gravity UI 7.x + React Router v5
+This is a React-based monitoring and management interface for YDB clusters. The codebase follows specific patterns and conventions that must be maintained.
 
-## Critical Rules (Prevent 67% of Bugs)
+## Tech Stack Requirements
 
-> Based on analysis of 267 code review comments - these prevent production issues.
+- Use React 18.3 with TypeScript 5.x
+- Use Redux Toolkit 2.x with RTK Query for state management
+- Use Gravity UI (@gravity-ui/uikit) 7.x for UI components
+- Use React Router v5 (NOT v6) for routing
+- Use Monaco Editor 0.52 for code editing features
 
-### API & State Management
-- **NEVER** call APIs directly → use `window.api.module.method()` pattern
-- **NEVER** mutate Redux state → return new objects/arrays  
-- **ALWAYS** wrap `window.api` calls in RTK Query with `injectEndpoints`
+## Critical Bug Prevention Patterns
+
+> Based on analysis of 267 code review comments - these prevent 67% of production issues.
 
 ### React Performance (MANDATORY)
 - **ALWAYS** use `useMemo` for expensive computations, object/array creation
@@ -41,106 +44,96 @@ const handleClick = useCallback(() => {
 - **NEVER** expose authentication tokens in logs or console
 - **ALWAYS** validate user input before processing
 - **NEVER** skip error handling for async operations
-## Internationalization (MANDATORY)
 
-- **NEVER** hardcode user-facing strings
-- **ALWAYS** create i18n entries in component's `i18n/` folder
-- Follow key format: `<context>_<content>` (e.g., `action_save`, `field_name`)
-- Register keysets with `registerKeysets()` using unique component name
+## Critical Coding Rules
 
-```typescript
-// ✅ CORRECT
-const b = cn('component-name');
-<Button>{i18n('action_save')}</Button>
+### API Architecture
 
-// ❌ WRONG
-<Button>Save</Button>
-```
+- NEVER call APIs directly - always use `window.api.module.method()` pattern
+- Use RTK Query's `injectEndpoints` pattern for API endpoints
+- Wrap `window.api` calls in RTK Query for proper state management
 
-## Component Patterns
+### Component Patterns
 
-### Class Names (BEM)
-```typescript
-const b = cn('component-name');
-<div className={b()}>
-  <div className={b('element')}>
-    <span className={b('element', {modifier: true})}>
-```
-
-### Tables & Data Display
+- Use BEM naming with `cn()` utility: `const b = cn('component-name')`
 - Use `PaginatedTable` component for all data tables
 - Tables require: columns, fetchData function, and unique tableName
 - Use virtual scrolling for large datasets
 
-### Error Handling
-```typescript
-// ✅ REQUIRED - All async operations
-try {
-  const result = await apiCall();
-  return result;
-} catch (error) {
-  return <ResponseError error={error} />;
-}
-```
+### Internationalization (MANDATORY)
 
-### Forms
-```typescript
-// ✅ REQUIRED - Clear errors on input, validate before submit
-const handleInputChange = (field, value) => {
-  setValue(field, value);
-  if (errors[field]) {
-    setErrors(prev => ({ ...prev, [field]: null }));
-  }
-};
-```
+- NEVER hardcode user-facing strings
+- ALWAYS create i18n entries in component's `i18n/` folder
+- Follow key format: `<context>_<content>` (e.g., `action_save`, `field_name`)
+- Register keysets with `registerKeysets()` using unique component name
 
-## Quality Gates (Before Every Commit)
+### State Management
 
-1. ✅ Run `npm run lint` and `npm run typecheck` - NO exceptions
-2. ✅ Verify ALL user-facing strings use i18n (search for hardcoded text)
-3. ✅ Check ALL useEffect hooks have proper cleanup functions
-4. ✅ Ensure memoization for ALL expensive operations
-5. ✅ Validate error handling for ALL async operations
-6. ✅ Confirm NO authentication tokens exposed in logs
-7. ✅ Test mathematical expressions for edge cases (zero division)
+- Use Redux Toolkit with domain-based organization
+- NEVER mutate state in RTK Query - return new objects/arrays
+- Clear errors on user input in forms
+- Always handle loading states in UI
 
-## Code Suggestions Context
+### UI Components
 
-### Common Patterns to Suggest
-- `const b = cn('component-name')` for new components
-- `useMemo` for any array/object creation or filtering
-- `useCallback` for event handlers in dependencies
-- `i18n('key_name')` instead of hardcoded strings
-- `Number(value) || 0` instead of `Number(value)`
-- `condition > 0 ? calculation : 0` for divisions
+- Prefer Gravity UI components over custom implementations
+- Use `createToast` for notifications
+- Use `ResponseError` component for API errors
+- Use `Loader` and `TableSkeleton` for loading states
 
-### Avoid Suggesting
-- Direct API calls (suggest `window.api` instead)
-- Hardcoded strings (suggest i18n keys)
-- State mutations (suggest immutable returns)
-- Missing cleanup in useEffect
-- Missing error boundaries for async operations
+### Form Handling
+
+- Always use controlled components with validation
+- Clear errors on user input
+- Validate before submission
+- Use Gravity UI form components with error states
+
+### Dialog/Modal Patterns
+
+- Use `@ebay/nice-modal-react` for complex modals
+- Use Gravity UI `Dialog` for simple dialogs
+- Always include loading states
 
 ### Type Conventions
-- API types: `TTenantInfo`, `TClusterInfo` (T prefix)
-- Located in `src/types/api/`
-- Use strict TypeScript, avoid `any`
+
+- API types prefixed with 'T' (e.g., `TTenantInfo`, `TClusterInfo`)
+- Types located in `src/types/api/` directory
+
+### Performance Requirements
+
+- Use React.memo for expensive renders
+- Lazy load Monaco Editor
+- Batch API requests when possible
+- Use virtual scrolling for tables
+
+### Testing Patterns
+
+- Unit tests colocated in `__test__` directories
+- E2E tests use Playwright with page objects pattern
+- Use CSS class selectors for E2E element selection
 
 ### Navigation (React Router v5)
-- Use `useHistory`, `useParams` (NOT v6 hooks)
+
+- Use React Router v5 hooks (`useHistory`, `useParams`)
 - Always validate route params exist before use
 
-## Common Utilities for Suggestions
+## Common Utilities
 
-- **Formatters**: `formatBytes()`, `formatDateTime()` from `src/utils/dataFormatters/`
-- **Class Names**: `cn()` from `src/utils/cn`
-- **Time Parsing**: utilities in `src/utils/timeParsers/`
-- **Query Helpers**: `src/utils/query.ts` for SQL/YQL
+- Formatters: `formatBytes()`, `formatDateTime()` from `src/utils/dataFormatters/`
+- Time parsing: utilities in `src/utils/timeParsers/`
+- Query utilities: `src/utils/query.ts` for SQL/YQL helpers
 
-## Performance Requirements
+## Before Making Changes
 
-When suggesting code changes:
-- Always consider React performance impact
-- Suggest memoization for expensive operations
-- Consider rendering performance for large datasets
-- Prefer Gravity UI components over custom implementations
+- Run `npm run lint` and `npm run typecheck` before committing
+- Follow conventional commit message format
+- Use conventional commit format for PR titles with lowercase subjects (e.g., "fix: update api endpoints", "feat: add new component", "chore: update dependencies")
+- PR title subjects must be lowercase (no proper nouns, sentence-case, start-case, pascal-case, or upper-case)
+- Ensure all user-facing text is internationalized
+- Test with a local YDB instance when possible
+
+## Debugging Helpers
+
+- `window.api` - Access API methods in browser console
+- `window.ydbEditor` - Monaco editor instance
+- Enable request tracing with `DEV_ENABLE_TRACING_FOR_ALL_REQUESTS`
