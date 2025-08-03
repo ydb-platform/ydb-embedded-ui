@@ -1,53 +1,29 @@
 # GitHub Copilot Instructions for YDB Embedded UI
 
-> **Note**: This file contains project-specific instructions for GitHub Copilot code review and assistance.
-> These instructions are derived from AGENTS.md but formatted specifically for Copilot's consumption.
-> When updating project conventions, update both AGENTS.md (for human developers) and this file (for Copilot).
+> **Purpose**: Optimized guidance for GitHub Copilot when assisting with YDB Embedded UI development.
+> Derived from AGENTS.md but structured for Copilot's code suggestion patterns.
 
-## Project Overview
+## Quick Context
 
-This is a React-based monitoring and management interface for YDB clusters. The codebase follows specific patterns and conventions that must be maintained.
+**Project**: React-based monitoring interface for YDB clusters
+**Key Tech**: React 18.3 + TypeScript 5.x + Redux Toolkit 2.x + Gravity UI 7.x + React Router v5
 
-## Tech Stack Requirements
+## Critical Rules (Prevent 67% of Bugs)
 
-- Use React 18.3 with TypeScript 5.x
-- Use Redux Toolkit 2.x with RTK Query for state management
-- Use Gravity UI (@gravity-ui/uikit) 7.x for UI components
-- Use React Router v5 (NOT v6) for routing
-- Use Monaco Editor 0.52 for code editing features
+> Based on analysis of 267 code review comments - these prevent production issues.
 
-## Critical Coding Rules
+### API & State Management
+- **NEVER** call APIs directly → use `window.api.module.method()` pattern
+- **NEVER** mutate Redux state → return new objects/arrays  
+- **ALWAYS** wrap `window.api` calls in RTK Query with `injectEndpoints`
 
-*Based on analysis of 267 code review comments: These rules prevent 67% of production bugs and maintain 94% type safety compliance.*
+### React Performance (MANDATORY)
+- **ALWAYS** use `useMemo` for expensive computations, object/array creation
+- **ALWAYS** use `useCallback` for functions in effect dependencies
+- **ALWAYS** memoize table columns, filtered data, computed values
 
-### API Architecture
-
-- NEVER call APIs directly - always use `window.api.module.method()` pattern
-- Use RTK Query's `injectEndpoints` pattern for API endpoints
-- Wrap `window.api` calls in RTK Query for proper state management
-
-### Critical Bug Prevention Patterns
-
-**Memory & Display Safety**:
-- ALWAYS provide fallback values: `Number(value) || 0` instead of `Number(value)`
-- NEVER allow division by zero: `capacity > 0 ? value/capacity : 0`
-- ALWAYS dispose Monaco Editor: `return () => editor.dispose();` in useEffect
-
-**State Management**:
-- NEVER mutate state in RTK Query - return new objects/arrays
-- ALWAYS handle Redux race conditions with proper loading states
-- Clear errors on user input in forms
-
-### React Performance Requirements (MANDATORY)
-
-**Memoization Rules**:
-- ALWAYS use `useMemo` for expensive computations, object/array creation
-- ALWAYS use `useCallback` for functions in effect dependencies
-- ALWAYS memoize table columns, filtered data, computed values
-
-**Example**:
 ```typescript
-// ✅ REQUIRED
+// ✅ REQUIRED patterns
 const displaySegments = useMemo(() => 
   segments.filter(segment => segment.visible), [segments]
 );
@@ -56,166 +32,115 @@ const handleClick = useCallback(() => {
 }, [dependency]);
 ```
 
-### Security Requirements (CRITICAL)
+### Memory & Display Safety
+- **ALWAYS** provide fallback values: `Number(value) || 0`
+- **NEVER** allow division by zero: `capacity > 0 ? value/capacity : 0`
+- **ALWAYS** dispose Monaco Editor: `return () => editor.dispose();` in useEffect
 
-- NEVER expose authentication tokens in logs or console
-- ALWAYS validate user input before processing
-- NEVER skip error handling for async operations
-- ALWAYS use proper authentication token handling patterns
+### Security & Input Validation
+- **NEVER** expose authentication tokens in logs or console
+- **ALWAYS** validate user input before processing
+- **NEVER** skip error handling for async operations
+## Internationalization (MANDATORY)
 
-### Memory Management Rules
-
-- ALWAYS dispose Monaco Editor instances: `return () => editor.dispose();`
-- ALWAYS cleanup event listeners in useEffect return functions
-- NEVER skip cleanup for subscriptions or timers
-
-### Error Handling Standards
-
-- ALWAYS use try/catch for async operations
-- ALWAYS use `ResponseError` component for API errors
-- ALWAYS clear form errors on user input
-- NEVER allow unhandled promise rejections
-
-### Mathematical Expression Safety
-
-- ALWAYS use explicit parentheses: `(a + b) * c` not `a + b * c`
-- ALWAYS check for division by zero: `denominator > 0 ? x/denominator : 0`
-- ALWAYS provide fallbacks for undefined values in calculations
-
-### Internationalization (MANDATORY)
-
-- NEVER hardcode user-facing strings
-- ALWAYS create i18n entries in component's `i18n/` folder
+- **NEVER** hardcode user-facing strings
+- **ALWAYS** create i18n entries in component's `i18n/` folder
 - Follow key format: `<context>_<content>` (e.g., `action_save`, `field_name`)
 - Register keysets with `registerKeysets()` using unique component name
 
-### Component Patterns
+```typescript
+// ✅ CORRECT
+const b = cn('component-name');
+<Button>{i18n('action_save')}</Button>
 
-- Use BEM naming with `cn()` utility: `const b = cn('component-name')`
+// ❌ WRONG
+<Button>Save</Button>
+```
+
+## Component Patterns
+
+### Class Names (BEM)
+```typescript
+const b = cn('component-name');
+<div className={b()}>
+  <div className={b('element')}>
+    <span className={b('element', {modifier: true})}>
+```
+
+### Tables & Data Display
 - Use `PaginatedTable` component for all data tables
 - Tables require: columns, fetchData function, and unique tableName
 - Use virtual scrolling for large datasets
 
-### State Management
+### Error Handling
+```typescript
+// ✅ REQUIRED - All async operations
+try {
+  const result = await apiCall();
+  return result;
+} catch (error) {
+  return <ResponseError error={error} />;
+}
+```
 
-- Use Redux Toolkit with domain-based organization
-- NEVER mutate state in RTK Query - return new objects/arrays
-- Clear errors on user input in forms
-- Always handle loading states in UI
+### Forms
+```typescript
+// ✅ REQUIRED - Clear errors on input, validate before submit
+const handleInputChange = (field, value) => {
+  setValue(field, value);
+  if (errors[field]) {
+    setErrors(prev => ({ ...prev, [field]: null }));
+  }
+};
+```
 
-### UI Components
+## Quality Gates (Before Every Commit)
 
-- Prefer Gravity UI components over custom implementations
-- Use `createToast` for notifications
-- Use `ResponseError` component for API errors
-- Use `Loader` and `TableSkeleton` for loading states
+1. ✅ Run `npm run lint` and `npm run typecheck` - NO exceptions
+2. ✅ Verify ALL user-facing strings use i18n (search for hardcoded text)
+3. ✅ Check ALL useEffect hooks have proper cleanup functions
+4. ✅ Ensure memoization for ALL expensive operations
+5. ✅ Validate error handling for ALL async operations
+6. ✅ Confirm NO authentication tokens exposed in logs
+7. ✅ Test mathematical expressions for edge cases (zero division)
 
-### Form Handling
+## Code Suggestions Context
 
-- Always use controlled components with validation
-- Clear errors on user input
-- Validate before submission
-- Use Gravity UI form components with error states
+### Common Patterns to Suggest
+- `const b = cn('component-name')` for new components
+- `useMemo` for any array/object creation or filtering
+- `useCallback` for event handlers in dependencies
+- `i18n('key_name')` instead of hardcoded strings
+- `Number(value) || 0` instead of `Number(value)`
+- `condition > 0 ? calculation : 0` for divisions
 
-### Dialog/Modal Patterns
-
-- Use `@ebay/nice-modal-react` for complex modals
-- Use Gravity UI `Dialog` for simple dialogs
-- Always include loading states
+### Avoid Suggesting
+- Direct API calls (suggest `window.api` instead)
+- Hardcoded strings (suggest i18n keys)
+- State mutations (suggest immutable returns)
+- Missing cleanup in useEffect
+- Missing error boundaries for async operations
 
 ### Type Conventions
-
-- API types prefixed with 'T' (e.g., `TTenantInfo`, `TClusterInfo`)
-- Types located in `src/types/api/` directory
-
-### Performance Requirements
-
-- Use React.memo for expensive renders
-- Lazy load Monaco Editor
-- Batch API requests when possible
-- Use virtual scrolling for tables
-
-### Testing Patterns
-
-- Unit tests colocated in `__test__` directories
-- E2E tests use Playwright with page objects pattern
-- Use CSS class selectors for E2E element selection
+- API types: `TTenantInfo`, `TClusterInfo` (T prefix)
+- Located in `src/types/api/`
+- Use strict TypeScript, avoid `any`
 
 ### Navigation (React Router v5)
-
-- Use React Router v5 hooks (`useHistory`, `useParams`)
+- Use `useHistory`, `useParams` (NOT v6 hooks)
 - Always validate route params exist before use
 
-## Common Utilities
+## Common Utilities for Suggestions
 
-- Formatters: `formatBytes()`, `formatDateTime()` from `src/utils/dataFormatters/`
-- Time parsing: utilities in `src/utils/timeParsers/`
-- Query utilities: `src/utils/query.ts` for SQL/YQL helpers
+- **Formatters**: `formatBytes()`, `formatDateTime()` from `src/utils/dataFormatters/`
+- **Class Names**: `cn()` from `src/utils/cn`
+- **Time Parsing**: utilities in `src/utils/timeParsers/`
+- **Query Helpers**: `src/utils/query.ts` for SQL/YQL
 
-## Quality Gate Requirements
+## Performance Requirements
 
-*These requirements ensure 88% implementation rate and prevent critical bugs before commit.*
-
-### Before Every Commit (MANDATORY)
-
-1. Run `npm run lint` and `npm run typecheck` - NO exceptions
-2. Verify ALL user-facing strings use i18n (search for hardcoded text)
-3. Check ALL useEffect hooks have proper cleanup functions
-4. Ensure memoization for ALL expensive operations
-5. Validate error handling for ALL async operations
-6. Confirm NO authentication tokens exposed in logs
-7. Test mathematical expressions for edge cases (zero division)
-
-### Pre-Commit Automated Checks
-
-- Spell checking enabled for all text
-- Magic number detection (all constants must be named)
-- TypeScript strict mode with no implicit any
-- Performance regression detection
-- Security token exposure scanning
-
-### Review Standards by Change Type
-
-**Critical Review Required** (Security/Performance):
-- Authentication/authorization changes
-- Monaco Editor integrations (memory management)
-- State management modifications (Redux patterns)
-- Performance optimizations (React patterns)
-
-**Standard Review**:
-- UI component changes
-- Documentation updates
-- Test additions
-- Styling modifications
-
-## Developer Guidelines
-
-### Universal Standards
-
-**Type Safety** (Critical for all developers):
-- Use strict TypeScript with no implicit any
-- Follow established type conventions
-- Validate all inputs and handle edge cases
-
-**Performance** (Required for all implementations):  
-- Always memoize expensive computations and object/array creation
-- Use proper React performance patterns (useMemo, useCallback)
-- Consider rendering performance impact
-
-**Architecture** (Essential for all changes):
-- Review cross-system impact of changes
-- Follow established patterns and conventions
-- Consider scalability and maintainability
-
-### Learning and Knowledge Sharing
-
-- Document complex decisions for team knowledge sharing
-- Collaborate on architectural decisions when needed
-- Use quantified feedback to track improvement (current: 67% reduction in recurring issues)
-- Follow established review patterns and quality standards
-
-## Debugging Helpers
-
-- `window.api` - Access API methods in browser console
-- `window.ydbEditor` - Monaco editor instance
-- Enable request tracing with `DEV_ENABLE_TRACING_FOR_ALL_REQUESTS`
+When suggesting code changes:
+- Always consider React performance impact
+- Suggest memoization for expensive operations
+- Consider rendering performance for large datasets
+- Prefer Gravity UI components over custom implementations
