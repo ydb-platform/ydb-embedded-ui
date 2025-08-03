@@ -93,8 +93,6 @@ src/
 
 ## Critical Bug Prevention Patterns
 
-> Based on analysis of 267 code review comments from the last three months, these patterns prevent 67% of production issues.
-
 ### Memory Management
 - **ALWAYS** dispose Monaco Editor instances: `return () => editor.dispose();` in useEffect
 - **NEVER** allow memory leaks in long-running components

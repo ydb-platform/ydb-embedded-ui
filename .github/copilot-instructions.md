@@ -18,8 +18,6 @@ This is a React-based monitoring and management interface for YDB clusters. The 
 
 ## Critical Bug Prevention Patterns
 
-> Based on analysis of 267 code review comments - these prevent 67% of production issues.
-
 ### React Performance (MANDATORY)
 - **ALWAYS** use `useMemo` for expensive computations, object/array creation
 - **ALWAYS** use `useCallback` for functions in effect dependencies
