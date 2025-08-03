@@ -175,6 +175,7 @@ npm run unused      # Find unused code
 - Follow conventional commit message format
 - Use conventional commit format for PR titles with lowercase subjects (e.g., "fix: update api endpoints", "feat: add new component", "chore: update dependencies")
 - PR title subjects must be lowercase (no proper nouns, sentence-case, start-case, pascal-case, or upper-case)
+- PR title must not exceed 72 characters (keep them concise and descriptive)
 - Ensure all user-facing text is internationalized
 - Test with a local YDB instance when possible
 

@@ -94,11 +94,13 @@ src/
 ## Critical Bug Prevention Patterns
 
 ### Memory Management
+
 - **ALWAYS** dispose Monaco Editor instances: `return () => editor.dispose();` in useEffect
 - **NEVER** allow memory leaks in long-running components
 - Clear timeouts and intervals in cleanup functions
 
 ### React Performance (MANDATORY)
+
 - **ALWAYS** use `useMemo` for expensive computations and object/array creation
 - **ALWAYS** use `useCallback` for functions passed to dependencies
 - **ALWAYS** memoize table columns, filtered data, and computed values
@@ -107,18 +109,19 @@ src/
 
 ```typescript
 // ✅ REQUIRED patterns
-const displaySegments = useMemo(() => 
-  segments.filter(segment => segment.visible), [segments]
-);
+const displaySegments = useMemo(() => segments.filter((segment) => segment.visible), [segments]);
 const handleClick = useCallback(() => {
   // logic
 }, [dependency]);
 
 // ✅ PREFER direct callbacks over useEffect
-const handleInputChange = useCallback((value: string) => {
-  setSearchTerm(value);
-  onSearchChange?.(value);
-}, [onSearchChange]);
+const handleInputChange = useCallback(
+  (value: string) => {
+    setSearchTerm(value);
+    onSearchChange?.(value);
+  },
+  [onSearchChange],
+);
 
 // ❌ AVOID unnecessary useEffect
 // useEffect(() => {
@@ -127,11 +130,13 @@ const handleInputChange = useCallback((value: string) => {
 ```
 
 ### Display Safety
+
 - **ALWAYS** provide fallback values: `Number(value) || 0`
 - **NEVER** allow division by zero: `capacity > 0 ? value/capacity : 0`
 - **ALWAYS** handle null/undefined data gracefully
 
 ### Security & Input Validation
+
 - **NEVER** expose authentication tokens in logs or console output
 - **ALWAYS** validate user input before processing
 - **NEVER** skip error handling for async operations
@@ -271,19 +276,17 @@ Uses React Router v5 hooks (`useHistory`, `useParams`, etc.). Always validate ro
 
 ```typescript
 // ✅ PREFERRED pattern for URL parameters
-const sortColumnSchema = z
-    .enum(['column1', 'column2', 'column3'])
-    .catch('column1');
+const sortColumnSchema = z.enum(['column1', 'column2', 'column3']).catch('column1');
 
 const SortOrderParam: QueryParamConfig<SortOrder[]> = {
-    encode: (value) => value ? encodeURIComponent(JSON.stringify(value)) : undefined,
-    decode: (value) => {
-        try {
-            return value ? JSON.parse(decodeURIComponent(value)) : [];
-        } catch {
-            return [];
-        }
-    },
+  encode: (value) => (value ? encodeURIComponent(JSON.stringify(value)) : undefined),
+  decode: (value) => {
+    try {
+      return value ? JSON.parse(decodeURIComponent(value)) : [];
+    } catch {
+      return [];
+    }
+  },
 };
 
 const [urlParam, setUrlParam] = useQueryParam('sort', SortOrderParam);
