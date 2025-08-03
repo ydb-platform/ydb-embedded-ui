@@ -19,6 +19,7 @@ This is a React-based monitoring and management interface for YDB clusters. The 
 ## Critical Bug Prevention Patterns
 
 ### React Performance (MANDATORY)
+
 - **ALWAYS** use `useMemo` for expensive computations, object/array creation
 - **ALWAYS** use `useCallback` for functions in effect dependencies
 - **ALWAYS** memoize table columns, filtered data, computed values
@@ -27,18 +28,19 @@ This is a React-based monitoring and management interface for YDB clusters. The 
 
 ```typescript
 // ✅ REQUIRED patterns
-const displaySegments = useMemo(() => 
-  segments.filter(segment => segment.visible), [segments]
-);
+const displaySegments = useMemo(() => segments.filter((segment) => segment.visible), [segments]);
 const handleClick = useCallback(() => {
   // logic
 }, [dependency]);
 
 // ✅ PREFER direct callbacks over useEffect
-const handleInputChange = useCallback((value: string) => {
-  setSearchTerm(value);
-  onSearchChange?.(value);
-}, [onSearchChange]);
+const handleInputChange = useCallback(
+  (value: string) => {
+    setSearchTerm(value);
+    onSearchChange?.(value);
+  },
+  [onSearchChange],
+);
 
 // ❌ AVOID unnecessary useEffect
 // useEffect(() => {
@@ -47,11 +49,13 @@ const handleInputChange = useCallback((value: string) => {
 ```
 
 ### Memory & Display Safety
+
 - **ALWAYS** provide fallback values: `Number(value) || 0`
 - **NEVER** allow division by zero: `capacity > 0 ? value/capacity : 0`
 - **ALWAYS** dispose Monaco Editor: `return () => editor.dispose();` in useEffect
 
 ### Security & Input Validation
+
 - **NEVER** expose authentication tokens in logs or console
 - **ALWAYS** validate user input before processing
 - **NEVER** skip error handling for async operations
@@ -137,19 +141,17 @@ const handleInputChange = useCallback((value: string) => {
 
 ```typescript
 // ✅ REQUIRED pattern for URL parameters
-const sortColumnSchema = z
-    .enum(['column1', 'column2', 'column3'])
-    .catch('column1');
+const sortColumnSchema = z.enum(['column1', 'column2', 'column3']).catch('column1');
 
 const SortOrderParam: QueryParamConfig<SortOrder[]> = {
-    encode: (value) => value ? encodeURIComponent(JSON.stringify(value)) : undefined,
-    decode: (value) => {
-        try {
-            return value ? JSON.parse(decodeURIComponent(value)) : [];
-        } catch {
-            return [];
-        }
-    },
+  encode: (value) => (value ? encodeURIComponent(JSON.stringify(value)) : undefined),
+  decode: (value) => {
+    try {
+      return value ? JSON.parse(decodeURIComponent(value)) : [];
+    } catch {
+      return [];
+    }
+  },
 };
 ```
 
@@ -158,6 +160,14 @@ const SortOrderParam: QueryParamConfig<SortOrder[]> = {
 - Formatters: `formatBytes()`, `formatDateTime()` from `src/utils/dataFormatters/`
 - Time parsing: utilities in `src/utils/timeParsers/`
 - Query utilities: `src/utils/query.ts` for SQL/YQL helpers
+
+## Development Commands
+
+```bash
+npm run lint        # Run all linters before committing
+npm run typecheck   # TypeScript type checking
+npm run unused      # Find unused code
+```
 
 ## Before Making Changes
 
@@ -173,3 +183,10 @@ const SortOrderParam: QueryParamConfig<SortOrder[]> = {
 - `window.api` - Access API methods in browser console
 - `window.ydbEditor` - Monaco editor instance
 - Enable request tracing with `DEV_ENABLE_TRACING_FOR_ALL_REQUESTS`
+
+## Environment Variables
+
+- `REACT_APP_BACKEND` - Backend URL for single-cluster mode
+- `REACT_APP_META_BACKEND` - Meta backend URL for multi-cluster mode
+- `PUBLIC_URL` - Base URL for static assets (use `.` for relative paths)
+- `GENERATE_SOURCEMAP` - Set to `false` for production builds
