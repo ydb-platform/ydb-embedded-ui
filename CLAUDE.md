@@ -104,6 +104,8 @@ src/
 - **ALWAYS** use `useMemo` for expensive computations and object/array creation
 - **ALWAYS** use `useCallback` for functions passed to dependencies
 - **ALWAYS** memoize table columns, filtered data, and computed values
+- **AVOID** `useEffect` when possible - prefer direct approaches with `useCallback`
+- **PREFER** direct event handlers and callbacks over useEffect for user interactions
 
 ```typescript
 // ✅ REQUIRED patterns
@@ -113,6 +115,17 @@ const displaySegments = useMemo(() =>
 const handleClick = useCallback(() => {
   // logic
 }, [dependency]);
+
+// ✅ PREFER direct callbacks over useEffect
+const handleInputChange = useCallback((value: string) => {
+  setSearchTerm(value);
+  onSearchChange?.(value);
+}, [onSearchChange]);
+
+// ❌ AVOID unnecessary useEffect
+// useEffect(() => {
+//   onSearchChange?.(searchTerm);
+// }, [searchTerm, onSearchChange]);
 ```
 
 ### Display Safety

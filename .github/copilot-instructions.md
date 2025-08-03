@@ -24,6 +24,8 @@ This is a React-based monitoring and management interface for YDB clusters. The 
 - **ALWAYS** use `useMemo` for expensive computations, object/array creation
 - **ALWAYS** use `useCallback` for functions in effect dependencies
 - **ALWAYS** memoize table columns, filtered data, computed values
+- **AVOID** `useEffect` when possible - prefer direct approaches with `useCallback`
+- **PREFER** direct event handlers and callbacks over useEffect for user interactions
 
 ```typescript
 // ✅ REQUIRED patterns
@@ -33,6 +35,17 @@ const displaySegments = useMemo(() =>
 const handleClick = useCallback(() => {
   // logic
 }, [dependency]);
+
+// ✅ PREFER direct callbacks over useEffect
+const handleInputChange = useCallback((value: string) => {
+  setSearchTerm(value);
+  onSearchChange?.(value);
+}, [onSearchChange]);
+
+// ❌ AVOID unnecessary useEffect
+// useEffect(() => {
+//   onSearchChange?.(searchTerm);
+// }, [searchTerm, onSearchChange]);
 ```
 
 ### Memory & Display Safety
