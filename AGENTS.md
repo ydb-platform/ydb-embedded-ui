@@ -274,6 +274,9 @@ Uses React Router v5 hooks (`useHistory`, `useParams`, etc.). Always validate ro
 - **ALWAYS** handle loading states in UI
 - **ALWAYS** validate route params exist before use
 - **ALWAYS** follow i18n naming rules from `i18n-naming-ruleset.md`
+- **ALWAYS** use Zod schemas for URL parameter validation with fallbacks
+- **PREFER** `use-query-params` over `redux-location-state` for new URL parameter handling
+- **PREFER** `use-query-params` over `redux-location-state` for new URL parameter handling
 
 ### Debugging Tips
 

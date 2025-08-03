@@ -130,6 +130,31 @@ const handleInputChange = useCallback((value: string) => {
 - Use React Router v5 hooks (`useHistory`, `useParams`)
 - Always validate route params exist before use
 
+### URL Parameter Management (MANDATORY)
+
+- **PREFER** `use-query-params` over `redux-location-state` for new development
+- **ALWAYS** use Zod schemas for URL parameter validation with fallbacks
+- **ALWAYS** use `z.enum([...]).catch(defaultValue)` pattern for safe parsing
+- Use custom `QueryParamConfig` objects for encoding/decoding complex parameters
+
+```typescript
+// ✅ REQUIRED pattern for URL parameters
+const sortColumnSchema = z
+    .enum(['column1', 'column2', 'column3'])
+    .catch('column1');
+
+const SortOrderParam: QueryParamConfig<SortOrder[]> = {
+    encode: (value) => value ? encodeURIComponent(JSON.stringify(value)) : undefined,
+    decode: (value) => {
+        try {
+            return value ? JSON.parse(decodeURIComponent(value)) : [];
+        } catch {
+            return [];
+        }
+    },
+};
+```
+
 ## Common Utilities
 
 - Formatters: `formatBytes()`, `formatDateTime()` from `src/utils/dataFormatters/`

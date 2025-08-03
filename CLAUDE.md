@@ -264,6 +264,33 @@ Complex modals use `@ebay/nice-modal-react` library. Simple dialogs use Gravity 
 
 Uses React Router v5 hooks (`useHistory`, `useParams`, etc.). Always validate route params exist before using them.
 
+### URL Parameter Management
+
+- **PREFER** `use-query-params` over `redux-location-state` for new development
+- **ALWAYS** use Zod schemas for URL parameter validation with fallbacks
+- Use custom `QueryParamConfig` objects for encoding/decoding complex parameters
+- Use `z.enum([...]).catch(defaultValue)` pattern for safe parsing with fallbacks
+
+```typescript
+// ✅ PREFERRED pattern for URL parameters
+const sortColumnSchema = z
+    .enum(['column1', 'column2', 'column3'])
+    .catch('column1');
+
+const SortOrderParam: QueryParamConfig<SortOrder[]> = {
+    encode: (value) => value ? encodeURIComponent(JSON.stringify(value)) : undefined,
+    decode: (value) => {
+        try {
+            return value ? JSON.parse(decodeURIComponent(value)) : [];
+        } catch {
+            return [];
+        }
+    },
+};
+
+const [urlParam, setUrlParam] = useQueryParam('sort', SortOrderParam);
+```
+
 ### Critical Rules
 
 - **NEVER** call APIs directly - use `window.api.module.method()`
@@ -274,6 +301,8 @@ Uses React Router v5 hooks (`useHistory`, `useParams`, etc.). Always validate ro
 - **ALWAYS** handle loading states in UI
 - **ALWAYS** validate route params exist before use
 - **ALWAYS** follow i18n naming rules from `i18n-naming-ruleset.md`
+- **ALWAYS** use Zod schemas for URL parameter validation with fallbacks
+- **PREFER** `use-query-params` over `redux-location-state` for new URL parameter handling
 
 ### Debugging Tips
 
