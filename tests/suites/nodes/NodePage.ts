@@ -19,24 +19,36 @@ export class NodePage extends PageModel {
 
     async waitForNodePageLoad() {
         // Wait for the page to load and tabs to be visible
-        await this.tabs.waitFor({state: 'visible'});
+        try {
+            await this.tabs.waitFor({state: 'visible', timeout: 10000});
+            console.log('Node page tabs loaded successfully');
+        } catch (error) {
+            console.error('Failed to load node page tabs:', error);
+            throw error;
+        }
     }
 
     async isThreadsTabVisible() {
+        const threadsTab = this.tabs.locator('.g-tab:has-text("Threads")');
         try {
-            await this.threadsTab.waitFor({state: 'visible', timeout: 1000});
+            await threadsTab.waitFor({state: 'visible', timeout: 2000});
+            console.log('Threads tab is visible');
             return true;
         } catch {
+            console.log('Threads tab is not visible');
             return false;
         }
     }
 
     async clickThreadsTab() {
-        await this.threadsTab.click();
+        const threadsTab = this.tabs.locator('.g-tab:has-text("Threads")');
+        console.log('Clicking threads tab');
+        await threadsTab.click();
     }
 
     async getAllTabNames() {
-        const tabs = await this.tabs.locator('.g-tabs__item').allTextContents();
+        const tabs = await this.tabs.locator('.g-tab').allTextContents();
+        console.log('Available tabs:', tabs);
         return tabs;
     }
 }
