@@ -91,6 +91,57 @@ src/
 3. **Feature-based Organization**: Features grouped with their state, API, and components
 4. **Separation of Concerns**: Clear separation between UI and business logic
 
+## Critical Bug Prevention Patterns
+
+### Memory Management
+
+- **ALWAYS** dispose Monaco Editor instances: `return () => editor.dispose();` in useEffect
+- **NEVER** allow memory leaks in long-running components
+- Clear timeouts and intervals in cleanup functions
+
+### React Performance (MANDATORY)
+
+- **ALWAYS** use `useMemo` for expensive computations and object/array creation
+- **ALWAYS** use `useCallback` for functions passed to dependencies
+- **ALWAYS** memoize table columns, filtered data, and computed values
+- **AVOID** `useEffect` when possible - prefer direct approaches with `useCallback`
+- **PREFER** direct event handlers and callbacks over useEffect for user interactions
+
+```typescript
+// ✅ REQUIRED patterns
+const displaySegments = useMemo(() => segments.filter((segment) => segment.visible), [segments]);
+const handleClick = useCallback(() => {
+  // logic
+}, [dependency]);
+
+// ✅ PREFER direct callbacks over useEffect
+const handleInputChange = useCallback(
+  (value: string) => {
+    setSearchTerm(value);
+    onSearchChange?.(value);
+  },
+  [onSearchChange],
+);
+
+// ❌ AVOID unnecessary useEffect
+// useEffect(() => {
+//   onSearchChange?.(searchTerm);
+// }, [searchTerm, onSearchChange]);
+```
+
+### Display Safety
+
+- **ALWAYS** provide fallback values: `Number(value) || 0`
+- **NEVER** allow division by zero: `capacity > 0 ? value/capacity : 0`
+- **ALWAYS** handle null/undefined data gracefully
+
+### Security & Input Validation
+
+- **NEVER** expose authentication tokens in logs or console output
+- **ALWAYS** validate user input before processing
+- **NEVER** skip error handling for async operations
+- Sanitize data before displaying in UI components
+
 ## Important Development Notes
 
 ### Testing Backend Connection
@@ -216,6 +267,31 @@ Complex modals use `@ebay/nice-modal-react` library. Simple dialogs use Gravity 
 
 Uses React Router v5 hooks (`useHistory`, `useParams`, etc.). Always validate route params exist before using them.
 
+### URL Parameter Management
+
+- **PREFER** `use-query-params` over `redux-location-state` for new development
+- **ALWAYS** use Zod schemas for URL parameter validation with fallbacks
+- Use custom `QueryParamConfig` objects for encoding/decoding complex parameters
+- Use `z.enum([...]).catch(defaultValue)` pattern for safe parsing with fallbacks
+
+```typescript
+// ✅ PREFERRED pattern for URL parameters
+const sortColumnSchema = z.enum(['column1', 'column2', 'column3']).catch('column1');
+
+const SortOrderParam: QueryParamConfig<SortOrder[]> = {
+  encode: (value) => (value ? encodeURIComponent(JSON.stringify(value)) : undefined),
+  decode: (value) => {
+    try {
+      return value ? JSON.parse(decodeURIComponent(value)) : [];
+    } catch {
+      return [];
+    }
+  },
+};
+
+const [urlParam, setUrlParam] = useQueryParam('sort', SortOrderParam);
+```
+
 ### Critical Rules
 
 - **NEVER** call APIs directly - use `window.api.module.method()`
@@ -226,6 +302,8 @@ Uses React Router v5 hooks (`useHistory`, `useParams`, etc.). Always validate ro
 - **ALWAYS** handle loading states in UI
 - **ALWAYS** validate route params exist before use
 - **ALWAYS** follow i18n naming rules from `i18n-naming-ruleset.md`
+- **ALWAYS** use Zod schemas for URL parameter validation with fallbacks
+- **PREFER** `use-query-params` over `redux-location-state` for new URL parameter handling
 
 ### Debugging Tips
 
