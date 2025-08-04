@@ -214,27 +214,9 @@ test.describe('Test Node Page Threads Tab', async () => {
             });
         });
 
-        const nodesPage = new NodesPage(page);
-        await nodesPage.goto();
-
-        // Get first node ID to navigate to
-        const paginatedTable = new ClusterNodesTable(page);
-        await paginatedTable.waitForTableToLoad();
-        await paginatedTable.waitForTableData();
-
-        // Click on first node to navigate to node page
-        const firstRowLink = page
-            .locator('.ydb-paginated-table__table tbody tr:first-child a')
-            .first();
-        await firstRowLink.click();
-
-        // Wait for navigation to complete
-        await page.waitForURL(/\/node\/\d+/);
-
-        const nodeId = await page.url().match(/\/node\/(\d+)/)?.[1];
-        expect(nodeId).toBeDefined();
-
-        const nodePage = new NodePage(page, nodeId!);
+        // Navigate directly to node page
+        const nodePage = new NodePage(page, '1');
+        await nodePage.goto();
         await nodePage.waitForNodePageLoad();
 
         // Verify threads tab is not visible
@@ -270,27 +252,9 @@ test.describe('Test Node Page Threads Tab', async () => {
             });
         });
 
-        const nodesPage = new NodesPage(page);
-        await nodesPage.goto();
-
-        // Get first node ID to navigate to
-        const paginatedTable = new ClusterNodesTable(page);
-        await paginatedTable.waitForTableToLoad();
-        await paginatedTable.waitForTableData();
-
-        // Click on first node to navigate to node page
-        const firstRowLink = page
-            .locator('.ydb-paginated-table__table tbody tr:first-child a')
-            .first();
-        await firstRowLink.click();
-
-        // Wait for navigation to complete
-        await page.waitForURL(/\/node\/\d+/);
-
-        const nodeId = await page.url().match(/\/node\/(\d+)/)?.[1];
-        expect(nodeId).toBeDefined();
-
-        const nodePage = new NodePage(page, nodeId!);
+        // Navigate directly to node page
+        const nodePage = new NodePage(page, '1');
+        await nodePage.goto();
         await nodePage.waitForNodePageLoad();
 
         // Verify threads tab is visible
@@ -325,27 +289,9 @@ test.describe('Test Node Page Threads Tab', async () => {
             });
         });
 
-        const nodesPage = new NodesPage(page);
-        await nodesPage.goto();
-
-        // Get first node ID to navigate to
-        const paginatedTable = new ClusterNodesTable(page);
-        await paginatedTable.waitForTableToLoad();
-        await paginatedTable.waitForTableData();
-
-        // Click on first node to navigate to node page
-        const firstRowLink = page
-            .locator('.ydb-paginated-table__table tbody tr:first-child a')
-            .first();
-        await firstRowLink.click();
-
-        // Wait for navigation to complete
-        await page.waitForURL(/\/node\/\d+/);
-
-        const nodeId = await page.url().match(/\/node\/(\d+)/)?.[1];
-        expect(nodeId).toBeDefined();
-
-        const nodePage = new NodePage(page, nodeId!);
+        // Navigate directly to node page
+        const nodePage = new NodePage(page, '1');
+        await nodePage.goto();
         await nodePage.waitForNodePageLoad();
 
         // Verify threads tab is not visible
