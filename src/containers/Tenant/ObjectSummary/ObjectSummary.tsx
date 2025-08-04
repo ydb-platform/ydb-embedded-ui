@@ -33,7 +33,6 @@ import {
     formatSecondsToHours,
 } from '../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
-import {Acl} from '../Acl/Acl';
 import {EntityTitle} from '../EntityTitle/EntityTitle';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
 import {useCurrentSchema} from '../TenantContext';
@@ -366,9 +365,6 @@ export function ObjectSummary({
 
     const renderTabContent = () => {
         switch (summaryTab) {
-            case TENANT_SUMMARY_TABS_IDS.acl: {
-                return <Acl />;
-            }
             case TENANT_SUMMARY_TABS_IDS.schema: {
                 return <SchemaViewer type={type} path={path} tenantName={tenantName} />;
             }

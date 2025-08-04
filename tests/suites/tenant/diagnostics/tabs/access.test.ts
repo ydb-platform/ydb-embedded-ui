@@ -72,7 +72,6 @@ test.describe('Diagnostics Access tab', async () => {
             database: '/local',
             tenantPage: 'diagnostics',
             diagnosticsTab: 'access',
-            summaryTab: 'acl',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
@@ -91,7 +90,6 @@ test.describe('Diagnostics Access tab', async () => {
             database: '/local',
             tenantPage: 'diagnostics',
             diagnosticsTab: 'access',
-            summaryTab: 'acl',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);

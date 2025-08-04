@@ -34,7 +34,6 @@ export const TENANT_DIAGNOSTICS_TABS_IDS = {
 
 export const TENANT_SUMMARY_TABS_IDS = {
     overview: 'overview',
-    acl: 'acl',
     schema: 'schema',
 } as const;
 

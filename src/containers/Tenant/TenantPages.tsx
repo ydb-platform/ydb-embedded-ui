@@ -33,10 +33,6 @@ export const TENANT_INFO_TABS = [
         id: TENANT_SUMMARY_TABS_IDS.overview,
         title: 'Overview',
     },
-    {
-        id: TENANT_SUMMARY_TABS_IDS.acl,
-        title: 'ACL',
-    },
 ];
 
 export const TENANT_SCHEMA_TAB = [
