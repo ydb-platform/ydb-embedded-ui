@@ -26,7 +26,8 @@ export const slice = createSlice({
             }
         },
         setUser: (state, action: PayloadAction<TUserToken>) => {
-            const {UserSID, AuthType, IsMonitoringAllowed} = action.payload;
+            const {UserSID, AuthType, IsMonitoringAllowed, IsDatabaseAllowed, IsViewerAllowed} =
+                action.payload;
 
             state.user = AuthType === 'Login' ? UserSID : undefined;
 
@@ -35,17 +36,20 @@ export const slice = createSlice({
             // Otherwise every user is allowed to make changes
             // Anyway there will be guards on backend
             state.isUserAllowedToMakeChanges = IsMonitoringAllowed !== false;
+            state.isOnlyDatabaseUser = IsDatabaseAllowed && IsViewerAllowed === false;
         },
     },
     selectors: {
         selectIsUserAllowedToMakeChanges: (state) => state.isUserAllowedToMakeChanges,
+        selectIsOnlyDatabaseUser: (state) => state.isOnlyDatabaseUser,
         selectUser: (state) => state.user,
     },
 });
 
 export default slice.reducer;
 export const {setIsAuthenticated, setUser} = slice.actions;
-export const {selectIsUserAllowedToMakeChanges, selectUser} = slice.selectors;
+export const {selectIsUserAllowedToMakeChanges, selectIsOnlyDatabaseUser, selectUser} =
+    slice.selectors;
 
 export const authenticationApi = api.injectEndpoints({
     endpoints: (build) => ({

@@ -15,7 +15,9 @@ export type Page =
     | 'storageGroup'
     | undefined;
 
-export interface ClustersBreadcrumbsOptions {}
+export interface ClustersBreadcrumbsOptions {
+    isOnlyDatabaseUser?: boolean;
+}
 
 export interface ClusterBreadcrumbsOptions extends ClustersBreadcrumbsOptions {
     clusterName?: string;

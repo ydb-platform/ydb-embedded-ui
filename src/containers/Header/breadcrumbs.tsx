@@ -46,7 +46,10 @@ const getQueryForTenant = (type: 'nodes' | 'tablets') => ({
     [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS[type],
 });
 
-const getClustersBreadcrumbs: GetBreadcrumbs<ClustersBreadcrumbsOptions> = () => {
+const getClustersBreadcrumbs: GetBreadcrumbs<ClustersBreadcrumbsOptions> = (options) => {
+    if (options.isOnlyDatabaseUser) {
+        return [];
+    }
     return [
         {
             text: headerKeyset('breadcrumbs.clusters'),
@@ -56,7 +59,11 @@ const getClustersBreadcrumbs: GetBreadcrumbs<ClustersBreadcrumbsOptions> = () =>
 };
 
 const getClusterBreadcrumbs: GetBreadcrumbs<ClusterBreadcrumbsOptions> = (options, query = {}) => {
-    const {clusterName, clusterTab, singleClusterMode} = options;
+    const {clusterName, clusterTab, singleClusterMode, isOnlyDatabaseUser} = options;
+
+    if (isOnlyDatabaseUser) {
+        return [];
+    }
 
     let breadcrumbs: RawBreadcrumbItem[] = [];
 
