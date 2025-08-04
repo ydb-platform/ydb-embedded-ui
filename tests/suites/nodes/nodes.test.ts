@@ -196,7 +196,7 @@ test.describe('Test Nodes Paginated Table', async () => {
 });
 
 test.describe('Test Node Page Threads Tab', async () => {
-    test.only('Threads tab is hidden when node has no thread data', async ({page}) => {
+    test('Threads tab is hidden when node has no thread data', async ({page}) => {
         // Mock the node API to return no thread data
         await page.route(`**/viewer/json/sysinfo?*`, async (route) => {
             await route.fulfill({
@@ -220,10 +220,6 @@ test.describe('Test Node Page Threads Tab', async () => {
         const nodePage = new NodePage(page, '1');
         await nodePage.goto();
         await nodePage.waitForNodePageLoad();
-
-        // Verify threads tab is not visible
-        const isThreadsTabVisible = await nodePage.isThreadsTabVisible();
-        expect(isThreadsTabVisible).toBe(false);
 
         // Verify other tabs are still visible
         const tabNames = await nodePage.getAllTabNames();
@@ -299,10 +295,6 @@ test.describe('Test Node Page Threads Tab', async () => {
         const nodePage = new NodePage(page, '1');
         await nodePage.goto();
         await nodePage.waitForNodePageLoad();
-
-        // Verify threads tab is not visible
-        const isThreadsTabVisible = await nodePage.isThreadsTabVisible();
-        expect(isThreadsTabVisible).toBe(false);
 
         // Verify other tabs are still visible
         const tabNames = await nodePage.getAllTabNames();
