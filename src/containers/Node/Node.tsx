@@ -75,12 +75,16 @@ export function Node() {
         if (isDiskPagesAvailable) {
             actulaNodeTabs = actulaNodeTabs.filter((el) => el.id !== 'structure');
         }
+        // Filter out threads tab if there's no thread data in the API response
+        if (!node?.Threads || node.Threads.length === 0) {
+            actulaNodeTabs = actulaNodeTabs.filter((el) => el.id !== 'threads');
+        }
 
         const actualActiveTab =
             actulaNodeTabs.find(({id}) => id === activeTabId) ?? actulaNodeTabs[0];
 
         return {activeTab: actualActiveTab, nodeTabs: actulaNodeTabs};
-    }, [isStorageNode, isDiskPagesAvailable, activeTabId]);
+    }, [isStorageNode, isDiskPagesAvailable, activeTabId, node?.Threads]);
 
     const tenantName = node?.Tenants?.[0] || tenantNameFromQuery?.toString();
 
