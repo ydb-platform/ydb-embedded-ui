@@ -2,6 +2,7 @@ import {expect, test} from '@playwright/test';
 
 import {backend} from '../../utils/constants';
 import {NodesPage} from '../nodes/NodesPage';
+import {NodePage} from '../nodes/NodePage';
 import {ClusterNodesTable} from '../paginatedTable/paginatedTable';
 
 test.describe('Test Nodes page', async () => {
@@ -191,5 +192,155 @@ test.describe('Test Nodes Paginated Table', async () => {
 
         const hostValues = await paginatedTable.getColumnValues('Host');
         expect(hostValues.length).toBeGreaterThan(0);
+    });
+});
+
+test.describe('Test Node Page Threads Tab', async () => {
+    test('Threads tab is hidden when node has no thread data', async ({page}) => {
+        // Mock the node API to return no thread data
+        await page.route(`${backend}/viewer/json/sysinfo?*`, async (route) => {
+            await route.fulfill({
+                json: {
+                    SystemStateInfo: [{
+                        Host: 'localhost',
+                        NodeId: 1,
+                        SystemState: 1, // Green
+                        Version: 'test-version',
+                    }],
+                    // No Threads property
+                }
+            });
+        });
+
+        const nodesPage = new NodesPage(page);
+        await nodesPage.goto();
+        
+        // Get first node ID to navigate to
+        const paginatedTable = new ClusterNodesTable(page);
+        await paginatedTable.waitForTableToLoad();
+        await paginatedTable.waitForTableData();
+        
+        // Click on first node to navigate to node page
+        const firstRowLink = page.locator('.ydb-paginated-table__table tbody tr:first-child a').first();
+        await firstRowLink.click();
+        
+        // Wait for navigation to complete
+        await page.waitForURL(/\/node\/\d+/);
+        
+        const nodeId = await page.url().match(/\/node\/(\d+)/)?.[1];
+        expect(nodeId).toBeDefined();
+        
+        const nodePage = new NodePage(page, nodeId!);
+        await nodePage.waitForNodePageLoad();
+        
+        // Verify threads tab is not visible
+        const isThreadsTabVisible = await nodePage.isThreadsTabVisible();
+        expect(isThreadsTabVisible).toBe(false);
+        
+        // Verify other tabs are still visible
+        const tabNames = await nodePage.getAllTabNames();
+        expect(tabNames).toContain('Tablets');
+        expect(tabNames).not.toContain('Threads');
+    });
+
+    test('Threads tab is visible when node has thread data', async ({page}) => {
+        // Mock the node API to return thread data
+        await page.route(`${backend}/viewer/json/sysinfo?*`, async (route) => {
+            await route.fulfill({
+                json: {
+                    SystemStateInfo: [{
+                        Host: 'localhost',
+                        NodeId: 1,
+                        SystemState: 1, // Green
+                        Version: 'test-version',
+                    }],
+                    Threads: [{
+                        Name: 'TestPool',
+                        Threads: 4
+                    }]
+                }
+            });
+        });
+
+        const nodesPage = new NodesPage(page);
+        await nodesPage.goto();
+        
+        // Get first node ID to navigate to
+        const paginatedTable = new ClusterNodesTable(page);
+        await paginatedTable.waitForTableToLoad();
+        await paginatedTable.waitForTableData();
+        
+        // Click on first node to navigate to node page
+        const firstRowLink = page.locator('.ydb-paginated-table__table tbody tr:first-child a').first();
+        await firstRowLink.click();
+        
+        // Wait for navigation to complete
+        await page.waitForURL(/\/node\/\d+/);
+        
+        const nodeId = await page.url().match(/\/node\/(\d+)/)?.[1];
+        expect(nodeId).toBeDefined();
+        
+        const nodePage = new NodePage(page, nodeId!);
+        await nodePage.waitForNodePageLoad();
+        
+        // Verify threads tab is visible
+        const isThreadsTabVisible = await nodePage.isThreadsTabVisible();
+        expect(isThreadsTabVisible).toBe(true);
+        
+        // Verify can click on threads tab
+        await nodePage.clickThreadsTab();
+        await page.waitForURL(/\/node\/\d+\/threads/);
+        
+        // Verify other tabs are also visible
+        const tabNames = await nodePage.getAllTabNames();
+        expect(tabNames).toContain('Tablets');
+        expect(tabNames).toContain('Threads');
+    });
+
+    test('Threads tab is hidden when node has empty thread array', async ({page}) => {
+        // Mock the node API to return empty thread data
+        await page.route(`${backend}/viewer/json/sysinfo?*`, async (route) => {
+            await route.fulfill({
+                json: {
+                    SystemStateInfo: [{
+                        Host: 'localhost', 
+                        NodeId: 1,
+                        SystemState: 1, // Green
+                        Version: 'test-version',
+                    }],
+                    Threads: [] // Empty array
+                }
+            });
+        });
+
+        const nodesPage = new NodesPage(page);
+        await nodesPage.goto();
+        
+        // Get first node ID to navigate to
+        const paginatedTable = new ClusterNodesTable(page);
+        await paginatedTable.waitForTableToLoad();
+        await paginatedTable.waitForTableData();
+        
+        // Click on first node to navigate to node page
+        const firstRowLink = page.locator('.ydb-paginated-table__table tbody tr:first-child a').first();
+        await firstRowLink.click();
+        
+        // Wait for navigation to complete
+        await page.waitForURL(/\/node\/\d+/);
+        
+        const nodeId = await page.url().match(/\/node\/(\d+)/)?.[1];
+        expect(nodeId).toBeDefined();
+        
+        const nodePage = new NodePage(page, nodeId!);
+        await nodePage.waitForNodePageLoad();
+        
+        // Verify threads tab is not visible
+        const isThreadsTabVisible = await nodePage.isThreadsTabVisible();
+        expect(isThreadsTabVisible).toBe(false);
+        
+        // Verify other tabs are still visible
+        const tabNames = await nodePage.getAllTabNames();
+        expect(tabNames).toContain('Tablets');
+        expect(tabNames).not.toContain('Threads');
     });
 });

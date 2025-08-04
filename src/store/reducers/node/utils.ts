@@ -9,6 +9,12 @@ export const prepareNodeData = (data: TEvSystemStateResponse): PreparedNode => {
     }
 
     const nodeData = data.SystemStateInfo[0];
+    
+    const preparedSystemState = prepareNodeSystemState(nodeData);
 
-    return prepareNodeSystemState(nodeData);
+    // Include Threads from the top-level response for the tab filtering logic
+    return {
+        ...preparedSystemState,
+        Threads: data.Threads,
+    };
 };
