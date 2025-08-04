@@ -1,4 +1,3 @@
-import type {TThreadPoolInfo} from '../../../types/api/threads';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import type {PreparedNodeSystemState} from '../../../utils/nodes';
 
@@ -19,6 +18,4 @@ export interface PreparedStructurePDisk extends PreparedPDisk {
 
 export type PreparedNodeStructure = Record<string, PreparedStructurePDisk>;
 
-export interface PreparedNode extends Partial<PreparedNodeSystemState> {
-    Threads?: TThreadPoolInfo[];
-}
+export interface PreparedNode extends Partial<PreparedNodeSystemState> {}

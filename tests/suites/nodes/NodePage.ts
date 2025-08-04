@@ -1,6 +1,7 @@
 import type {Locator, Page} from '@playwright/test';
 
 import {PageModel} from '../../models/PageModel';
+import {VISIBILITY_TIMEOUT} from '../tenant/TenantPage';
 
 export class NodePage extends PageModel {
     readonly tabs: Locator;
@@ -20,8 +21,7 @@ export class NodePage extends PageModel {
     async waitForNodePageLoad() {
         // Wait for the page to load and tabs to be visible
         try {
-            await this.tabs.waitFor({state: 'visible', timeout: 10000});
-            console.log('Node page tabs loaded successfully');
+            await this.tabs.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         } catch (error) {
             console.error('Failed to load node page tabs:', error);
             throw error;
@@ -31,24 +31,21 @@ export class NodePage extends PageModel {
     async isThreadsTabVisible() {
         const threadsTab = this.tabs.locator('.g-tab:has-text("Threads")');
         try {
-            await threadsTab.waitFor({state: 'visible', timeout: 2000});
-            console.log('Threads tab is visible');
+            await threadsTab.waitFor({state: 'visible'});
             return true;
         } catch {
-            console.log('Threads tab is not visible');
+            console.error('Threads tab is not visible');
             return false;
         }
     }
 
     async clickThreadsTab() {
         const threadsTab = this.tabs.locator('.g-tab:has-text("Threads")');
-        console.log('Clicking threads tab');
         await threadsTab.click();
     }
 
     async getAllTabNames() {
         const tabs = await this.tabs.locator('.g-tab').allTextContents();
-        console.log('Available tabs:', tabs);
         return tabs;
     }
 }

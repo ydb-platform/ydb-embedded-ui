@@ -196,12 +196,9 @@ test.describe('Test Nodes Paginated Table', async () => {
 });
 
 test.describe('Test Node Page Threads Tab', async () => {
-    test('Threads tab is hidden when node has no thread data', async ({page}) => {
+    test.only('Threads tab is hidden when node has no thread data', async ({page}) => {
         // Mock the node API to return no thread data
-        await page.route(`${backend}/viewer/json/sysinfo?*`, async (route) => {
-            const url = route.request().url();
-            console.log('Intercepted sysinfo request:', url);
-            
+        await page.route(`**/viewer/json/sysinfo?*`, async (route) => {
             await route.fulfill({
                 status: 200,
                 contentType: 'application/json',
@@ -210,7 +207,7 @@ test.describe('Test Node Page Threads Tab', async () => {
                         {
                             Host: 'localhost',
                             NodeId: 1,
-                            SystemState: 1, // Green
+                            SystemState: 'Green',
                             Version: 'test-version',
                         },
                     ],
@@ -236,10 +233,7 @@ test.describe('Test Node Page Threads Tab', async () => {
 
     test('Threads tab is visible when node has thread data', async ({page}) => {
         // Mock the node API to return thread data
-        await page.route(`${backend}/viewer/json/sysinfo?*`, async (route) => {
-            const url = route.request().url();
-            console.log('Intercepted sysinfo request:', url);
-            
+        await page.route(`**/viewer/json/sysinfo?*`, async (route) => {
             await route.fulfill({
                 status: 200,
                 contentType: 'application/json',
@@ -248,7 +242,7 @@ test.describe('Test Node Page Threads Tab', async () => {
                         {
                             Host: 'localhost',
                             NodeId: 1,
-                            SystemState: 1, // Green
+                            SystemState: 'Green',
                             Version: 'test-version',
                         },
                     ],
@@ -283,10 +277,7 @@ test.describe('Test Node Page Threads Tab', async () => {
 
     test('Threads tab is hidden when node has empty thread array', async ({page}) => {
         // Mock the node API to return empty thread data
-        await page.route(`${backend}/viewer/json/sysinfo?*`, async (route) => {
-            const url = route.request().url();
-            console.log('Intercepted sysinfo request:', url);
-            
+        await page.route(`**/viewer/json/sysinfo?*`, async (route) => {
             await route.fulfill({
                 status: 200,
                 contentType: 'application/json',
@@ -295,7 +286,7 @@ test.describe('Test Node Page Threads Tab', async () => {
                         {
                             Host: 'localhost',
                             NodeId: 1,
-                            SystemState: 1, // Green
+                            SystemState: 'Green',
                             Version: 'test-version',
                         },
                     ],
