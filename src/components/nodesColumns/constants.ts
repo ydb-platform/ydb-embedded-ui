@@ -43,6 +43,12 @@ export function isMonitoringUserNodesColumn(columnId: string): boolean {
     return MONITORING_USER_COLUMNS_IDS.includes(columnId as NodesColumnId);
 }
 
+// Columns, that should displayed only for users with isViewerAllowed:true
+const VIEWER_USER_COLUMNS_IDS: NodesColumnId[] = ['LoadAverage'];
+export function isViewerUserNodesColumn(columnId: string): boolean {
+    return VIEWER_USER_COLUMNS_IDS.some((el) => el === columnId);
+}
+
 // This code is running when module is initialized and correct language may not be set yet
 // get functions guarantee that i18n fields will be inited on render with current render language
 export const NODES_COLUMNS_TITLES = {

@@ -10,6 +10,7 @@ import type {TClusterInfo} from '../../../types/api/cluster';
 import type {TTabletStateInfo} from '../../../types/api/tablet';
 import {CLUSTER_DEFAULT_TITLE, DEFAULT_CLUSTER_TAB_KEY} from '../../../utils/constants';
 import {useClusterNameFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
+import {useIsViewerUser} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {isQueryErrorResponse} from '../../../utils/query';
 import type {RootState} from '../../defaultStore';
 import {api} from '../api';
@@ -139,8 +140,11 @@ export const clusterApi = api.injectEndpoints({
 
 export function useClusterBaseInfo() {
     const clusterNameFromQuery = useClusterNameFromQuery();
+    const isViewerUser = useIsViewerUser();
 
-    const {currentData} = clusterApi.useGetClusterBaseInfoQuery(clusterNameFromQuery ?? skipToken);
+    const {currentData} = clusterApi.useGetClusterBaseInfoQuery(clusterNameFromQuery ?? skipToken, {
+        skip: !isViewerUser,
+    });
 
     const {solomon: monitoring, name, title, trace_view: traceView, ...data} = currentData || {};
 

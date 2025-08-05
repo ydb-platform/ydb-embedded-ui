@@ -176,6 +176,7 @@ export const getPagesByType = (
         hasTopicData?: boolean;
         isTopLevel?: boolean;
         hasBackups?: boolean;
+        hasConfigs?: boolean;
     },
 ) => {
     const subTypePages = subType ? pathSubTypeToPages[subType] : undefined;
@@ -183,16 +184,19 @@ export const getPagesByType = (
     let pages = subTypePages || typePages || DIR_PAGES;
 
     if (isTopicEntityType(type) && !options?.hasTopicData) {
-        return pages?.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.topicData);
+        pages = pages?.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.topicData);
     }
     if (isDatabaseEntityType(type) || options?.isTopLevel) {
         pages = DATABASE_PAGES;
         if (!options?.hasFeatureFlags) {
-            return pages.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.configs);
+            pages = pages.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.configs);
         }
     }
     if (!options?.hasBackups) {
-        return pages.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.backups);
+        pages = pages.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.backups);
+    }
+    if (!options?.hasConfigs) {
+        pages = pages.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.configs);
     }
     return pages;
 };

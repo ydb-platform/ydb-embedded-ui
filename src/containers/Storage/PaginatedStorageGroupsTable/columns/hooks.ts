@@ -1,7 +1,10 @@
 import React from 'react';
 
 import {VISIBLE_ENTITIES} from '../../../../store/reducers/storage/constants';
-import {useIsUserAllowedToMakeChanges} from '../../../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {
+    useIsUserAllowedToMakeChanges,
+    useIsViewerUser,
+} from '../../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 
 import {getStorageGroupsColumns} from './columns';
@@ -12,6 +15,7 @@ import {
     STORAGE_GROUPS_COLUMNS_TITLES,
     STORAGE_GROUPS_SELECTED_COLUMNS_LS_KEY,
     isMonitoringUserGroupsColumn,
+    isViewerGroupsColumn,
 } from './constants';
 import type {GetStorageGroupsColumnsParams} from './types';
 
@@ -20,6 +24,7 @@ export function useStorageGroupsSelectedColumns({
     viewContext,
 }: GetStorageGroupsColumnsParams) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const isViewerUser = useIsViewerUser();
 
     const columns = React.useMemo(() => {
         const allColumns = getStorageGroupsColumns({viewContext});
@@ -27,8 +32,14 @@ export function useStorageGroupsSelectedColumns({
         if (isUserAllowedToMakeChanges) {
             return allColumns;
         }
-        return allColumns.filter((column) => !isMonitoringUserGroupsColumn(column.name));
-    }, [isUserAllowedToMakeChanges, viewContext]);
+        const filteredColumns = allColumns.filter(
+            (column) => !isMonitoringUserGroupsColumn(column.name),
+        );
+        if (isViewerUser) {
+            return filteredColumns;
+        }
+        return filteredColumns.filter((column) => !isViewerGroupsColumn(column.name));
+    }, [isUserAllowedToMakeChanges, viewContext, isViewerUser]);
 
     const requiredColumns = React.useMemo(() => {
         if (visibleEntities === VISIBLE_ENTITIES.missing) {

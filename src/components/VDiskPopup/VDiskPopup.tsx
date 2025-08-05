@@ -13,7 +13,10 @@ import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
-import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {
+    useIsUserAllowedToMakeChanges,
+    useIsViewerUser,
+} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToGB, bytesToSpeed} from '../../utils/utils';
 import type {InfoViewerItem} from '../InfoViewer';
 import {InfoViewer} from '../InfoViewer';
@@ -221,6 +224,7 @@ interface VDiskPopupProps {
 
 export const VDiskPopup = ({data}: VDiskPopupProps) => {
     const isFullData = isFullVDiskData(data);
+    const isViewerUser = useIsViewerUser();
 
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
@@ -257,7 +261,7 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
         <div className={b()}>
             {data.DonorMode && <Label className={b('donor-label')}>Donor</Label>}
             <InfoViewer title="VDisk" info={vdiskInfo} size="s" />
-            {pdiskInfo && <InfoViewer title="PDisk" info={pdiskInfo} size="s" />}
+            {pdiskInfo && isViewerUser && <InfoViewer title="PDisk" info={pdiskInfo} size="s" />}
             {donorsInfo.length > 0 && <InfoViewer title="Donors" info={donorsInfo} size="s" />}
         </div>
     );

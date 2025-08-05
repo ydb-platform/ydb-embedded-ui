@@ -1,12 +1,18 @@
 import React from 'react';
 
 import type {Column} from '../../components/PaginatedTable';
-import {isMonitoringUserNodesColumn} from '../../components/nodesColumns/constants';
+import {
+    isMonitoringUserNodesColumn,
+    isViewerUserNodesColumn,
+} from '../../components/nodesColumns/constants';
 import type {NodesColumnId} from '../../components/nodesColumns/constants';
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 import type {NodesGroupByField} from '../../types/api/nodes';
-import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {
+    useIsUserAllowedToMakeChanges,
+    useIsViewerUser,
+} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 
 import {PaginatedNodes} from './PaginatedNodes';
 import {getNodesColumns} from './columns/columns';
@@ -45,13 +51,20 @@ export function Nodes({
     groupByParams = ALL_NODES_GROUP_BY_PARAMS,
 }: NodesProps) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const isViewerUser = useIsViewerUser();
 
     const preparedColumns = React.useMemo(() => {
         if (isUserAllowedToMakeChanges) {
             return columns;
         }
-        return columns.filter((column) => !isMonitoringUserNodesColumn(column.name));
-    }, [columns, isUserAllowedToMakeChanges]);
+        const filteredColumns = columns.filter(
+            (column) => !isMonitoringUserNodesColumn(column.name),
+        );
+        if (isViewerUser) {
+            return filteredColumns;
+        }
+        return filteredColumns.filter((column) => !isViewerUserNodesColumn(column.name));
+    }, [columns, isUserAllowedToMakeChanges, isViewerUser]);
 
     return (
         <PaginatedNodes
