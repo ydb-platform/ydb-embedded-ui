@@ -203,4 +203,10 @@
     &__row-skeleton::after {
         display: none !important;
     }
+
+    tbody > tr:last-child {
+        td {
+            border-bottom: unset;
+        }
+    }
 }
