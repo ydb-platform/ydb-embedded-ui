@@ -68,19 +68,25 @@ export function Node() {
 
     const isStorageNode = node?.Roles?.find((el) => el === STORAGE_ROLE);
 
+    const threadsQuantity = node?.Threads?.length;
+
     const {activeTab, nodeTabs} = React.useMemo(() => {
-        let actulaNodeTabs = isStorageNode
+        let actualNodeTabs = isStorageNode
             ? NODE_TABS
             : NODE_TABS.filter((el) => el.id !== 'storage');
         if (isDiskPagesAvailable) {
-            actulaNodeTabs = actulaNodeTabs.filter((el) => el.id !== 'structure');
+            actualNodeTabs = actualNodeTabs.filter((el) => el.id !== 'structure');
+        }
+        // Filter out threads tab if there's no thread data in the API response
+        if (!threadsQuantity) {
+            actualNodeTabs = actualNodeTabs.filter((el) => el.id !== 'threads');
         }
 
         const actualActiveTab =
-            actulaNodeTabs.find(({id}) => id === activeTabId) ?? actulaNodeTabs[0];
+            actualNodeTabs.find(({id}) => id === activeTabId) ?? actualNodeTabs[0];
 
-        return {activeTab: actualActiveTab, nodeTabs: actulaNodeTabs};
-    }, [isStorageNode, isDiskPagesAvailable, activeTabId]);
+        return {activeTab: actualActiveTab, nodeTabs: actualNodeTabs};
+    }, [isStorageNode, isDiskPagesAvailable, activeTabId, threadsQuantity]);
 
     const tenantName = node?.Tenants?.[0] || tenantNameFromQuery?.toString();
 
