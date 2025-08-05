@@ -47,7 +47,7 @@ const getQueryForTenant = (type: 'nodes' | 'tablets') => ({
 });
 
 const getClustersBreadcrumbs: GetBreadcrumbs<ClustersBreadcrumbsOptions> = (options) => {
-    if (options.isOnlyDatabaseUser) {
+    if (!options.isViewerUser) {
         return [];
     }
     return [
@@ -59,9 +59,9 @@ const getClustersBreadcrumbs: GetBreadcrumbs<ClustersBreadcrumbsOptions> = (opti
 };
 
 const getClusterBreadcrumbs: GetBreadcrumbs<ClusterBreadcrumbsOptions> = (options, query = {}) => {
-    const {clusterName, clusterTab, singleClusterMode, isOnlyDatabaseUser} = options;
+    const {clusterName, clusterTab, singleClusterMode, isViewerUser} = options;
 
-    if (isOnlyDatabaseUser) {
+    if (!isViewerUser) {
         return [];
     }
 

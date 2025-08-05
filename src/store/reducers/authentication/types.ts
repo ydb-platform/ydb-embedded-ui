@@ -1,6 +1,6 @@
 export interface AuthenticationState {
     isAuthenticated: boolean;
     isUserAllowedToMakeChanges?: boolean;
-    isOnlyDatabaseUser?: boolean;
+    isViewerUser?: boolean;
     user: string | undefined;
 }

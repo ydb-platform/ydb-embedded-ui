@@ -16,7 +16,7 @@ export type Page =
     | undefined;
 
 export interface ClustersBreadcrumbsOptions {
-    isOnlyDatabaseUser?: boolean;
+    isViewerUser?: boolean;
 }
 
 export interface ClusterBreadcrumbsOptions extends ClustersBreadcrumbsOptions {

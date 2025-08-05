@@ -11,7 +11,7 @@ export interface TUserToken {
 
     /** Is user allowed to view only database specific data */
     IsDatabaseAllowed?: boolean;
-    /** Is user allowed to view data */
+    /** Is user allowed to view data (includes IsDatabaseAllowed rights) */
     IsViewerAllowed?: boolean;
     /** Is user allowed to view deeper and make simple changes */
     IsMonitoringAllowed?: boolean;
