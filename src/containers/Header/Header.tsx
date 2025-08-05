@@ -14,7 +14,10 @@ import {DEVELOPER_UI_TITLE} from '../../utils/constants';
 import {createDeveloperUIInternalPageHref} from '../../utils/developerUI/developerUI';
 import {useTypedSelector} from '../../utils/hooks';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
-import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {
+    useIsUserAllowedToMakeChanges,
+    useIsViewerUser,
+} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 
 import {getBreadcrumbs} from './breadcrumbs';
 import {headerKeyset} from './i18n';
@@ -27,6 +30,7 @@ function Header() {
     const {page, pageBreadcrumbsOptions} = useTypedSelector((state) => state.header);
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const isViewerUser = useIsViewerUser();
 
     const {title: clusterTitle} = useClusterBaseInfo();
 
@@ -39,7 +43,11 @@ function Header() {
         useAddClusterFeatureAvailable() && uiFactory.onAddCluster !== undefined;
 
     const breadcrumbItems = React.useMemo(() => {
-        let options = {...pageBreadcrumbsOptions, singleClusterMode};
+        let options = {
+            ...pageBreadcrumbsOptions,
+            singleClusterMode,
+            isViewerUser,
+        };
 
         if (clusterTitle) {
             options = {
@@ -53,7 +61,7 @@ function Header() {
         return breadcrumbs.map((item) => {
             return {...item, action: () => {}};
         });
-    }, [clusterTitle, page, pageBreadcrumbsOptions, singleClusterMode]);
+    }, [clusterTitle, page, pageBreadcrumbsOptions, singleClusterMode, isViewerUser]);
 
     const renderRightControls = () => {
         const elements: React.ReactNode[] = [];
