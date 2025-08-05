@@ -5,6 +5,7 @@ import {DEFAULT_USER_SETTINGS, settingsManager} from '../../../services/settings
 import type {TTenantInfo} from '../../../types/api/tenant';
 import {TENANT_INITIAL_PAGE_KEY} from '../../../utils/constants';
 import {api} from '../api';
+import {prepareTenants} from '../tenants/utils';
 
 import {TENANT_DIAGNOSTICS_TABS_IDS, TENANT_METRICS_TABS_IDS} from './constants';
 import {tenantPageSchema} from './types';
@@ -73,7 +74,7 @@ export const tenantApi = api.injectEndpoints({
                     } else {
                         tenantData = await window.api.viewer.getTenantInfo({path}, {signal});
                     }
-                    const databases = tenantData.TenantInfo || [];
+                    const databases = prepareTenants(tenantData.TenantInfo || []);
                     // previous meta versions do not support filtering databases by name
                     const data =
                         databases.find((tenant) => tenant.Name === path) ?? databases[0] ?? null;

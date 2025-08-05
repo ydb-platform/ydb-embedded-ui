@@ -33,4 +33,9 @@
         display: flex;
         align-items: center;
     }
+
+    &__remove-db {
+        // !important to prevent color from .g-menu__item
+        color: var(--ydb-color-status-red) !important;
+    }
 }
