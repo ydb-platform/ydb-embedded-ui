@@ -1,5 +1,4 @@
 import type {TSystemStateInfo} from './nodes';
-import type {TThreadPoolInfo} from './threads';
 
 /**
  * endpoint: /viewer/json/sysinfo
@@ -8,8 +7,6 @@ import type {TThreadPoolInfo} from './threads';
  */
 export interface TEvSystemStateResponse {
     SystemStateInfo?: TSystemStateInfo[];
-    /** Detailed thread information when fields_required=-1 is used */
-    Threads?: TThreadPoolInfo[];
     /** uint64 */
     ResponseTime?: string;
     ResponseDuration?: number;
