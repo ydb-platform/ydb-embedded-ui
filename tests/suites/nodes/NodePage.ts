@@ -31,7 +31,7 @@ export class NodePage extends PageModel {
     async isThreadsTabVisible() {
         const threadsTab = this.tabs.locator('.g-tab:has-text("Threads")');
         try {
-            await threadsTab.waitFor({state: 'visible'});
+            await threadsTab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
             return true;
         } catch {
             console.error('Threads tab is not visible');

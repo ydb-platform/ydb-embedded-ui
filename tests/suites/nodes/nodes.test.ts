@@ -240,12 +240,12 @@ test.describe('Test Node Page Threads Tab', async () => {
                             NodeId: 1,
                             SystemState: 'Green',
                             Version: 'test-version',
-                        },
-                    ],
-                    Threads: [
-                        {
-                            Name: 'TestPool',
-                            Threads: 4,
+                            Threads: [
+                                {
+                                    Name: 'TestPool',
+                                    Threads: 4,
+                                },
+                            ],
                         },
                     ],
                 }),
