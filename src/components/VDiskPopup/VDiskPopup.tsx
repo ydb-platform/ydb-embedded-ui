@@ -26,6 +26,8 @@ import {preparePDiskData} from '../PDiskPopup/PDiskPopup';
 import {getVDiskLink} from '../VDisk/utils';
 import {vDiskInfoKeyset} from '../VDiskInfo/i18n';
 
+import {vDiskPopupKeyset} from './i18n';
+
 import './VDiskPopup.scss';
 
 const b = cn('vdisk-storage-popup');
@@ -33,16 +35,18 @@ const b = cn('vdisk-storage-popup');
 const prepareUnavailableVDiskData = (data: UnavailableDonor, withDeveloperUILink?: boolean) => {
     const {NodeId, PDiskId, VSlotId, StoragePoolName} = data;
 
-    const vdiskData: InfoViewerItem[] = [{label: 'State', value: 'not available'}];
+    const vdiskData: InfoViewerItem[] = [
+        {label: vDiskPopupKeyset('label_state'), value: vDiskPopupKeyset('context_not-available')},
+    ];
 
     if (StoragePoolName) {
-        vdiskData.push({label: 'StoragePool', value: StoragePoolName});
+        vdiskData.push({label: vDiskPopupKeyset('label_storage-pool'), value: StoragePoolName});
     }
 
     vdiskData.push(
-        {label: 'NodeId', value: NodeId ?? EMPTY_DATA_PLACEHOLDER},
-        {label: 'PDiskId', value: PDiskId ?? EMPTY_DATA_PLACEHOLDER},
-        {label: 'VSlotId', value: VSlotId ?? EMPTY_DATA_PLACEHOLDER},
+        {label: vDiskPopupKeyset('label_node-id'), value: NodeId ?? EMPTY_DATA_PLACEHOLDER},
+        {label: vDiskPopupKeyset('label_pdisk-id'), value: PDiskId ?? EMPTY_DATA_PLACEHOLDER},
+        {label: vDiskPopupKeyset('label_vslot-id'), value: VSlotId ?? EMPTY_DATA_PLACEHOLDER},
     );
 
     if (
@@ -58,7 +62,7 @@ const prepareUnavailableVDiskData = (data: UnavailableDonor, withDeveloperUILink
         });
 
         vdiskData.push({
-            label: 'Links',
+            label: vDiskPopupKeyset('label_links'),
             value: <LinkWithIcon title={'Developer UI'} url={vDiskInternalViewerPath} />,
         });
     }
@@ -88,58 +92,61 @@ const prepareVDiskData = (data: PreparedVDisk, withDeveloperUILink?: boolean) =>
     } = data;
 
     const vdiskData: InfoViewerItem[] = [
-        {label: 'VDisk', value: StringifiedId},
-        {label: 'State', value: VDiskState ?? 'not available'},
+        {label: vDiskPopupKeyset('label_vdisk'), value: StringifiedId},
+        {
+            label: vDiskPopupKeyset('label_state'),
+            value: VDiskState ?? vDiskPopupKeyset('context_not-available'),
+        },
     ];
 
     if (StoragePoolName) {
-        vdiskData.push({label: 'StoragePool', value: StoragePoolName});
+        vdiskData.push({label: vDiskPopupKeyset('label_storage-pool'), value: StoragePoolName});
     }
 
     if (SatisfactionRank && SatisfactionRank.FreshRank?.Flag !== EFlag.Green) {
         vdiskData.push({
-            label: 'Fresh',
+            label: vDiskPopupKeyset('label_fresh'),
             value: SatisfactionRank.FreshRank?.Flag,
         });
     }
 
     if (SatisfactionRank && SatisfactionRank.LevelRank?.Flag !== EFlag.Green) {
         vdiskData.push({
-            label: 'Level',
+            label: vDiskPopupKeyset('label_level'),
             value: SatisfactionRank.LevelRank?.Flag,
         });
     }
 
     if (SatisfactionRank && SatisfactionRank.FreshRank?.RankPercent) {
         vdiskData.push({
-            label: 'Fresh',
+            label: vDiskPopupKeyset('label_fresh'),
             value: SatisfactionRank.FreshRank.RankPercent,
         });
     }
 
     if (SatisfactionRank && SatisfactionRank.LevelRank?.RankPercent) {
         vdiskData.push({
-            label: 'Level',
+            label: vDiskPopupKeyset('label_level'),
             value: SatisfactionRank.LevelRank.RankPercent,
         });
     }
 
     if (DiskSpace && DiskSpace !== EFlag.Green) {
-        vdiskData.push({label: 'Space', value: DiskSpace});
+        vdiskData.push({label: vDiskPopupKeyset('label_space'), value: DiskSpace});
     }
 
     if (FrontQueues && FrontQueues !== EFlag.Green) {
-        vdiskData.push({label: 'FrontQueues', value: FrontQueues});
+        vdiskData.push({label: vDiskPopupKeyset('label_front-queues'), value: FrontQueues});
     }
 
     if (Replicated === false && VDiskState === EVDiskState.OK) {
-        vdiskData.push({label: 'Replicated', value: 'NO'});
+        vdiskData.push({label: vDiskPopupKeyset('label_replicated'), value: 'NO'});
 
         // Only show replication progress and time remaining when disk is not replicated and state is OK
         if (valueIsDefined(ReplicationProgress)) {
             const progressPercent = Math.round(ReplicationProgress * 100);
             vdiskData.push({
-                label: 'Progress',
+                label: vDiskPopupKeyset('label_progress'),
                 value: `${progressPercent}%`,
             });
         }
@@ -148,7 +155,7 @@ const prepareVDiskData = (data: PreparedVDisk, withDeveloperUILink?: boolean) =>
             const timeRemaining = formatUptimeInSeconds(ReplicationSecondsRemaining);
             if (timeRemaining) {
                 vdiskData.push({
-                    label: 'Remaining',
+                    label: vDiskPopupKeyset('label_remaining'),
                     value: timeRemaining,
                 });
             }
@@ -156,23 +163,26 @@ const prepareVDiskData = (data: PreparedVDisk, withDeveloperUILink?: boolean) =>
     }
 
     if (UnsyncedVDisks) {
-        vdiskData.push({label: 'UnsyncVDisks', value: UnsyncedVDisks});
+        vdiskData.push({label: vDiskPopupKeyset('label_unsync-vdisks'), value: UnsyncedVDisks});
     }
 
     if (Number(AllocatedSize)) {
         vdiskData.push({
-            label: 'Allocated',
+            label: vDiskPopupKeyset('label_allocated'),
             value: bytesToGB(AllocatedSize),
         });
     }
 
     if (Number(ReadThroughput)) {
-        vdiskData.push({label: 'Read', value: bytesToSpeed(ReadThroughput)});
+        vdiskData.push({
+            label: vDiskPopupKeyset('label_read'),
+            value: bytesToSpeed(ReadThroughput),
+        });
     }
 
     if (Number(WriteThroughput)) {
         vdiskData.push({
-            label: 'Write',
+            label: vDiskPopupKeyset('label_write'),
             value: bytesToSpeed(WriteThroughput),
         });
     }
@@ -194,7 +204,7 @@ const prepareVDiskData = (data: PreparedVDisk, withDeveloperUILink?: boolean) =>
         const vDiskPagePath = getVDiskLink({VDiskSlotId, PDiskId, NodeId, StringifiedId});
         if (vDiskPagePath) {
             vdiskData.push({
-                label: 'Links',
+                label: vDiskPopupKeyset('label_links'),
                 value: (
                     <Flex wrap="wrap" gap={2}>
                         <LinkWithIcon
@@ -251,7 +261,7 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
         const donors = data.Donors;
         for (const donor of donors) {
             donorsInfo.push({
-                label: 'VDisk',
+                label: vDiskPopupKeyset('label_vdisk'),
                 value: <InternalLink to={getVDiskLink(donor)}>{donor.StringifiedId}</InternalLink>,
             });
         }
