@@ -4,6 +4,7 @@ import type {PayloadAction} from '@reduxjs/toolkit';
 import {DEFAULT_USER_SETTINGS, settingsManager} from '../../../services/settings';
 import type {TTenantInfo} from '../../../types/api/tenant';
 import {TENANT_INITIAL_PAGE_KEY} from '../../../utils/constants';
+import {useClusterNameFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {api} from '../api';
 
 import {TENANT_DIAGNOSTICS_TABS_IDS, TENANT_METRICS_TABS_IDS} from './constants';
@@ -100,3 +101,18 @@ export const tenantApi = api.injectEndpoints({
     }),
     overrideExisting: 'throw',
 });
+
+export function useTenantBaseInfo(path: string) {
+    const clusterNameFromQuery = useClusterNameFromQuery();
+
+    const {currentData} = tenantApi.useGetTenantInfoQuery({
+        path,
+        clusterName: clusterNameFromQuery,
+    });
+
+    const {ControlPlane} = currentData || {};
+
+    return {
+        controlPlane: ControlPlane,
+    };
+}
