@@ -80,10 +80,6 @@
         color: var(--g-color-text-secondary);
     }
 
-    &__remove-cluster {
-        color: var(--ydb-color-status-red);
-    }
-
     &__progress {
         --g-progress-filled-background-color: var(--ydb-color-status-green);
     }

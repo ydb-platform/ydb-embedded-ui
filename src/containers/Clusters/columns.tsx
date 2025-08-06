@@ -79,7 +79,7 @@ function getTitleColumn({isEditClusterAvailable, isDeleteClusterAvailable}: Clus
                         action: () => {
                             onDeleteCluster({clusterData: row});
                         },
-                        className: b('remove-cluster'),
+                        theme: 'danger',
                     });
                 }
 

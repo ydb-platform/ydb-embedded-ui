@@ -374,7 +374,7 @@ function getDBActionsColumn({
                             databaseData: row,
                         });
                     },
-                    className: b('remove-db'),
+                    theme: 'danger',
                 });
             }
 
