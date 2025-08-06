@@ -53,6 +53,7 @@
     "react-router-dom": "^5.3.4",
     "react-split": "^2.0.14",
     "react-syntax-highlighter": "^15.6.1",
+    "react-yandex-metrika": "^2.6.0",
     "redux": "^5.0.1",
     "redux-location-state": "^2.8.2",
     "tslib": "^2.8.1",
