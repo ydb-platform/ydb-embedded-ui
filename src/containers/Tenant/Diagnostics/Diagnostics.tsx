@@ -10,13 +10,13 @@ import {
     useFeatureFlagsAvailable,
     useTopicDataAvailable,
 } from '../../../store/reducers/capabilities/hooks';
-import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
-import {setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
+import {setDiagnosticsTab, useTenantBaseInfo} from '../../../store/reducers/tenant/tenant';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../types/additionalProps';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 import {cn} from '../../../utils/cn';
 import {useScrollPosition, useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
+import {useIsViewerUser} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {Heatmap} from '../../Heatmap';
 import {Nodes} from '../../Nodes/Nodes';
 import {Operations} from '../../Operations';
@@ -50,7 +50,7 @@ const b = cn('kv-tenant-diagnostics');
 
 function Diagnostics(props: DiagnosticsProps) {
     const {path, database, type, subType} = useCurrentSchema();
-    const {control_plane: controlPlane} = useClusterBaseInfo();
+    const {controlPlane} = useTenantBaseInfo(path);
     const containerRef = React.useRef<HTMLDivElement>(null);
     const dispatch = useTypedDispatch();
     const {diagnosticsTab = TENANT_DIAGNOSTICS_TABS_IDS.overview} = useTypedSelector(
@@ -63,11 +63,13 @@ function Diagnostics(props: DiagnosticsProps) {
 
     const hasFeatureFlags = useFeatureFlagsAvailable();
     const hasTopicData = useTopicDataAvailable();
+    const isViewerUser = useIsViewerUser();
     const pages = getPagesByType(type, subType, {
         hasFeatureFlags,
         hasTopicData,
         isTopLevel: path === database,
         hasBackups: typeof uiFactory.renderBackups === 'function' && Boolean(controlPlane),
+        hasConfigs: isViewerUser,
     });
     let activeTab = pages.find((el) => el.id === diagnosticsTab);
     if (!activeTab) {
