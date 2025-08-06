@@ -19,8 +19,7 @@ export function Credentials({connection}: CredentialsProps) {
         );
     }
 
-    if (connection.OAuthToken) {
-        //return connection.OAuthToken.keys().length;
+    if ('OAuthToken' in connection) {
         return connection.OAuthToken.Token || connection.OAuthToken.TokenSecretName ? 'OAuth' : '';
     }
 
