@@ -20,7 +20,8 @@ export function Credentials({connection}: CredentialsProps) {
     }
 
     if ('OAuthToken' in connection) {
-        return 'Token' in connection.OAuthToken || 'TokenSecretName' in connection.OAuthToken
+        return connection.OAuthToken !== undefined &&
+            ('Token' in connection.OAuthToken || 'TokenSecretName' in connection.OAuthToken)
             ? 'OAuth'
             : '';
     }
