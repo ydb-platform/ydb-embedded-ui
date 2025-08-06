@@ -121,9 +121,9 @@ function Header() {
 
             const {onEditDB, onDeleteDB} = uiFactory;
 
-            const isEnoughtData = clusterName && databaseData;
+            const isEnoughData = clusterName && databaseData;
 
-            if (isEditDBAvailable && onEditDB && isEnoughtData) {
+            if (isEditDBAvailable && onEditDB && isEnoughData) {
                 menuItems.push({
                     text: headerKeyset('action_edit-db'),
                     iconStart: <Pencil />,
@@ -132,7 +132,7 @@ function Header() {
                     },
                 });
             }
-            if (isDeleteDBAvailable && onDeleteDB && isEnoughtData) {
+            if (isDeleteDBAvailable && onDeleteDB && isEnoughData) {
                 menuItems.push({
                     text: headerKeyset('action_delete-db'),
                     iconStart: <TrashBin />,
@@ -144,7 +144,7 @@ function Header() {
                             }
                         });
                     },
-                    className: b('remove-db'),
+                    theme: 'danger',
                 });
             }
 
