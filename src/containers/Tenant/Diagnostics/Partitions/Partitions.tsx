@@ -54,7 +54,7 @@ export const Partitions = ({path, database}: PartitionsProps) => {
         currentData: nodesData,
         isFetching: nodesIsFetching,
         error: nodesError,
-    } = nodesListApi.useGetNodesListQuery(undefined);
+    } = nodesListApi.useGetNodesListQuery({database}, undefined);
     const nodesLoading = nodesIsFetching && nodesData === undefined;
     const nodeHostsMap = useTypedSelector(selectNodesMap);
 

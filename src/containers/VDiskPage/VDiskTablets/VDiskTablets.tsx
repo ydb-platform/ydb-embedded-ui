@@ -2,10 +2,11 @@ import React from 'react';
 
 import DataTable from '@gravity-ui/react-data-table';
 import {skipToken} from '@reduxjs/toolkit/query';
+import {isNil} from 'lodash';
 
 import {PageError} from '../../../components/Errors/PageError/PageError';
-import {InfoViewerSkeleton} from '../../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {ResizeableDataTable} from '../../../components/ResizeableDataTable/ResizeableDataTable';
+import {TableWithControlsLayout} from '../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {vDiskApi} from '../../../store/reducers/vdisk/vdisk';
 import type {VDiskBlobIndexItem} from '../../../types/api/vdiskBlobIndex';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
@@ -24,16 +25,26 @@ interface VDiskTabletsProps {
     pDiskId?: string | number;
     vDiskSlotId?: string | number;
     className?: string;
+    scrollContainerRef: React.RefObject<HTMLElement>;
 }
 
-export function VDiskTablets({nodeId, pDiskId, vDiskSlotId, className}: VDiskTabletsProps) {
+export function VDiskTablets({
+    nodeId,
+    pDiskId,
+    vDiskSlotId,
+    className,
+    scrollContainerRef,
+}: VDiskTabletsProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    const params = nodeId && pDiskId && vDiskSlotId ? {nodeId, pDiskId, vDiskSlotId} : skipToken;
-
-    const {currentData, isFetching, error} = vDiskApi.useGetVDiskBlobIndexStatQuery(params, {
-        pollingInterval: autoRefreshInterval,
-    });
+    const {currentData, isFetching, error} = vDiskApi.useGetVDiskBlobIndexStatQuery(
+        !isNil(nodeId) && !isNil(pDiskId) && !isNil(vDiskSlotId)
+            ? {nodeId, pDiskId, vDiskSlotId}
+            : skipToken,
+        {
+            pollingInterval: autoRefreshInterval,
+        },
+    );
 
     const loading = isFetching && currentData === undefined;
 
@@ -77,23 +88,23 @@ export function VDiskTablets({nodeId, pDiskId, vDiskSlotId, className}: VDiskTab
         return <PageError error={error} position="left" size="s" />;
     }
 
-    if (loading) {
-        return <InfoViewerSkeleton rows={5} />;
-    }
-
     return (
         <div className={className}>
-            <ResizeableDataTable
-                columnsWidthLSKey={VDISK_TABLETS_COLUMNS_WIDTH_LS_KEY}
-                data={tableData}
-                columns={columns}
-                settings={DEFAULT_TABLE_SETTINGS}
+            <TableWithControlsLayout.Table
+                scrollContainerRef={scrollContainerRef}
                 loading={loading}
-                initialSortOrder={{
-                    columnId: vDiskPageKeyset('size'),
-                    order: DataTable.DESCENDING,
-                }}
-            />
+            >
+                <ResizeableDataTable
+                    columnsWidthLSKey={VDISK_TABLETS_COLUMNS_WIDTH_LS_KEY}
+                    data={tableData}
+                    columns={columns}
+                    settings={DEFAULT_TABLE_SETTINGS}
+                    initialSortOrder={{
+                        columnId: vDiskPageKeyset('size'),
+                        order: DataTable.DESCENDING,
+                    }}
+                />
+            </TableWithControlsLayout.Table>
         </div>
     );
 }

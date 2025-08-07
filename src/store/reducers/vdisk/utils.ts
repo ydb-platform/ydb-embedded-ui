@@ -11,16 +11,16 @@ import type {VDiskData} from './types';
 
 export function prepareVDiskDataResponse([vDiskResponse, pDiskResponse, nodeResponse]: [
     TEvVDiskStateResponse,
-    TEvPDiskStateResponse,
-    TEvSystemStateResponse,
+    TEvPDiskStateResponse | undefined,
+    TEvSystemStateResponse | undefined,
 ]): VDiskData {
     const rawVDisk = vDiskResponse.VDiskStateInfo?.[0];
     const preparedVDisk = prepareWhiteboardVDiskData(rawVDisk);
 
-    const rawPDisk = pDiskResponse.PDiskStateInfo?.[0];
+    const rawPDisk = pDiskResponse?.PDiskStateInfo?.[0];
     const preparedPDisk = prepareWhiteboardPDiskData(rawPDisk);
 
-    const rawNode = nodeResponse.SystemStateInfo?.[0];
+    const rawNode = nodeResponse?.SystemStateInfo?.[0];
     const preparedNode = prepareNodeSystemState(rawNode);
 
     const NodeId = preparedVDisk.NodeId ?? preparedPDisk.NodeId ?? preparedNode.NodeId;

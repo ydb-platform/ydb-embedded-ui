@@ -5,12 +5,12 @@ import DataTable from '@gravity-ui/react-data-table';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {InternalLink} from '../../../../components/InternalLink/InternalLink';
+import {NodeId} from '../../../../components/NodeId/NodeId';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TabletState} from '../../../../components/TabletState/TabletState';
 import {TabletUptime} from '../../../../components/UptimeViewer/UptimeViewer';
 import {getTabletPagePath} from '../../../../routes';
 import type {ITabletPreparedHistoryItem} from '../../../../types/store/tablet';
-import {getDefaultNodePath} from '../../../Node/NodePages';
 
 const TABLET_COLUMNS_WIDTH_LS_KEY = 'tabletTableColumnsWidth';
 
@@ -54,7 +54,7 @@ const getColumns: (props: {
         align: DataTable.RIGHT,
         sortable: false,
         render: ({row}) => {
-            return <InternalLink to={getDefaultNodePath(row.nodeId)}>{row.nodeId}</InternalLink>;
+            return <NodeId id={row.nodeId} />;
         },
     },
     {

@@ -11,6 +11,7 @@ import {ETabletState} from '../../../../types/api/tablet';
 import type {TTabletStateInfo} from '../../../../types/api/tablet';
 import {cn} from '../../../../utils/cn';
 import {createTabletDeveloperUIHref} from '../../../../utils/developerUI/developerUI';
+import {useDatabaseFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
 import {useIsUserAllowedToMakeChanges} from '../../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {getDefaultNodePath} from '../../../Node/NodePages';
 import {hasHive} from '../../utils';
@@ -27,6 +28,7 @@ interface TabletInfoProps {
 
 export const TabletInfo = ({tablet}: TabletInfoProps) => {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const database = useDatabaseFromQuery();
 
     const {
         ChangeTime,
@@ -48,7 +50,7 @@ export const TabletInfo = ({tablet}: TabletInfoProps) => {
         tabletInfo.push({
             label: tabletInfoKeyset('field_hive'),
             value: (
-                <Link to={getTabletPagePath(HiveId)} className={b('link')}>
+                <Link to={getTabletPagePath(HiveId, {database})} className={b('link')}>
                     {HiveId}
                 </Link>
             ),
@@ -59,7 +61,7 @@ export const TabletInfo = ({tablet}: TabletInfoProps) => {
         tabletInfo.push({
             label: tabletInfoKeyset('field_scheme-shard'),
             value: (
-                <Link to={getTabletPagePath(SchemeShard)} className={b('link')}>
+                <Link to={getTabletPagePath(SchemeShard, {database})} className={b('link')}>
                     {SchemeShard}
                 </Link>
             ),
@@ -80,7 +82,7 @@ export const TabletInfo = ({tablet}: TabletInfoProps) => {
         {
             label: tabletInfoKeyset('field_node'),
             value: (
-                <Link className={b('link')} to={getDefaultNodePath(String(NodeId))}>
+                <Link className={b('link')} to={getDefaultNodePath(String(NodeId), {database})}>
                     {NodeId}
                 </Link>
             ),

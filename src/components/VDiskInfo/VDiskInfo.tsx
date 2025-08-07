@@ -13,6 +13,7 @@ import {
 import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import {getSeverityColor} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
+import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToSpeed} from '../../utils/utils';
 import {InfoViewer} from '../InfoViewer';
@@ -44,6 +45,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
     wrap,
 }: VDiskInfoProps<T>) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const database = useDatabaseFromQuery();
 
     const {
         AllocatedSize,
@@ -66,6 +68,8 @@ export function VDiskInfo<T extends PreparedVDisk>({
         ReadThroughput,
         WriteThroughput,
         PDiskId,
+        StringifiedId,
+        VDiskId,
         NodeId,
     } = data || {};
 
@@ -194,17 +198,23 @@ export function VDiskInfo<T extends PreparedVDisk>({
                 NodeId: dNodeId,
                 PDiskId: dPDiskId,
                 VDiskSlotId: dVSlotId,
+                VDiskId: dVdiskId,
             } = donor;
 
             if (!id || !dVSlotId || !dNodeId || !dPDiskId) {
                 return null;
             }
 
-            const vDiskPath = getVDiskPagePath({
-                nodeId: dNodeId,
-                pDiskId: dPDiskId,
-                vDiskSlotId: dVSlotId,
-            });
+            const vDiskPath = getVDiskPagePath(
+                {
+                    nodeId: dNodeId,
+                    pDiskId: dPDiskId,
+                    vDiskSlotId: dVSlotId,
+                    vDiskId: id,
+                    groupId: dVdiskId?.GroupID,
+                },
+                {database},
+            );
 
             return (
                 <InternalLink key={index} to={vDiskPath}>
@@ -232,11 +242,16 @@ export function VDiskInfo<T extends PreparedVDisk>({
         const links: React.ReactNode[] = [];
 
         if (withVDiskPageLink) {
-            const vDiskPagePath = getVDiskPagePath({
-                vDiskSlotId: VDiskSlotId,
-                pDiskId: PDiskId,
-                nodeId: NodeId,
-            });
+            const vDiskPagePath = getVDiskPagePath(
+                {
+                    vDiskSlotId: VDiskSlotId,
+                    pDiskId: PDiskId,
+                    nodeId: NodeId,
+                    vDiskId: StringifiedId,
+                    groupId: VDiskId?.GroupID,
+                },
+                {database},
+            );
             links.push(
                 <LinkWithIcon
                     key={vDiskPagePath}

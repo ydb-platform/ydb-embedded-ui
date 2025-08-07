@@ -61,11 +61,15 @@ export class ViewerAPI extends BaseYdbAPI {
     }
 
     /** id=. returns data about node that fullfills request */
-    getNodeInfo(id?: string | number, {concurrentId, timeout, signal}: AxiosOptions = {}) {
+    getNodeInfo(
+        {nodeId, database}: {nodeId?: string | number; database?: string},
+        {concurrentId, timeout, signal}: AxiosOptions = {},
+    ) {
         return this.get<TEvSystemStateResponse>(
             this.getPath('/viewer/json/sysinfo?enums=true'),
             {
-                node_id: id,
+                node_id: nodeId,
+                database,
                 fields_required: -1,
             },
             {concurrentId, requestConfig: {signal}, timeout},
@@ -370,11 +374,12 @@ export class ViewerAPI extends BaseYdbAPI {
         );
     }
 
-    getNodesList({concurrentId, signal}: AxiosOptions = {}) {
+    getNodesList({database}: {database?: string}, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<TEvNodesInfo>(
             this.getPath('/viewer/json/nodelist'),
             {
                 enums: true,
+                database,
             },
             {
                 concurrentId,
@@ -441,12 +446,17 @@ export class ViewerAPI extends BaseYdbAPI {
         );
     }
 
-    getTabletDescribe(tenantId: TDomainKey, {concurrentId, signal}: AxiosOptions = {}) {
+    getTabletDescribe(
+        tenantId: TDomainKey,
+        database?: string,
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
         return this.get<Nullable<TEvDescribeSchemeResult>>(
             this.getPath('/viewer/json/describe'),
             {
                 schemeshard_id: tenantId?.SchemeShard,
                 path_id: tenantId?.PathId,
+                database,
             },
             {concurrentId, requestConfig: {signal}},
         );
@@ -517,22 +527,34 @@ export class ViewerAPI extends BaseYdbAPI {
     }
 
     getVDiskInfo(
-        {
-            vDiskSlotId,
-            pDiskId,
-            nodeId,
-        }: {
-            vDiskSlotId: string | number;
-            pDiskId: string | number;
-            nodeId: string | number;
-        },
+        params:
+            | {
+                  vDiskSlotId: string | number;
+                  pDiskId: string | number;
+                  nodeId: string | number;
+                  database?: string;
+              }
+            | {
+                  vDiskId: string | number;
+                  database?: string;
+              },
         {concurrentId, signal}: AxiosOptions = {},
     ) {
+        let filter = '';
+        let nodeId;
+        if ('vDiskId' in params) {
+            filter = `(VDiskId=${params.vDiskId})`;
+        } else {
+            const {pDiskId, vDiskSlotId} = params;
+            filter = `(PDiskId=${pDiskId};VDiskSlotId=${vDiskSlotId})`;
+            nodeId = params.nodeId;
+        }
         return this.get<TEvVDiskStateResponse>(
             this.getPath('/viewer/json/vdiskinfo?enums=true'),
             {
                 node_id: nodeId,
-                filter: `(PDiskId=${pDiskId};VDiskSlotId=${vDiskSlotId})`,
+                filter: filter,
+                database: params.database,
             },
             {concurrentId, requestConfig: {signal}},
         );
@@ -543,10 +565,12 @@ export class ViewerAPI extends BaseYdbAPI {
             vDiskSlotId,
             pDiskId,
             nodeId,
+            database,
         }: {
             vDiskSlotId: string | number;
             pDiskId: string | number;
             nodeId: string | number;
+            database?: string;
         },
         {concurrentId, signal}: AxiosOptions = {},
     ) {
@@ -556,19 +580,25 @@ export class ViewerAPI extends BaseYdbAPI {
                 node_id: nodeId,
                 pdisk_id: pDiskId,
                 vslot_id: vDiskSlotId,
+                database,
             },
             {concurrentId, requestConfig: {signal}},
         );
     }
 
     getNodeWhiteboardPDiskInfo(
-        {nodeId, pDiskId}: {nodeId: string | number; pDiskId: string | number},
+        {
+            nodeId,
+            pDiskId,
+            database,
+        }: {nodeId: string | number; pDiskId: string | number; database?: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<TEvPDiskStateResponse>(
             this.getPath('/viewer/json/pdiskinfo?enums=true'),
             {
                 filter: `(NodeId=${nodeId}${pDiskId ? `;PDiskId=${pDiskId}` : ''})`,
+                database,
             },
             {concurrentId, requestConfig: {signal}},
         );

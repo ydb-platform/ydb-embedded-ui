@@ -4,9 +4,10 @@ import {
     Database as DatabaseIcon,
     HardDrive as StorageNodeIcon,
 } from '@gravity-ui/icons';
+import {isNil} from 'lodash';
 
 import {TabletIcon} from '../../components/TabletIcon/TabletIcon';
-import routes, {getPDiskPagePath} from '../../routes';
+import routes, {getPDiskPagePath, getStorageGroupPath} from '../../routes';
 import type {
     BreadcrumbsOptions,
     ClusterBreadcrumbsOptions,
@@ -38,7 +39,10 @@ export interface RawBreadcrumbItem {
 }
 
 interface GetBreadcrumbs<T, U = AnyRecord> {
-    (options: T & {singleClusterMode: boolean}, query?: U): RawBreadcrumbItem[];
+    (
+        options: T & {singleClusterMode: boolean; isViewerUser?: boolean},
+        query?: U,
+    ): RawBreadcrumbItem[];
 }
 
 const getQueryForTenant = (type: 'nodes' | 'tablets') => ({
@@ -133,6 +137,9 @@ function getNodeIcon(nodeRole: 'Storage' | 'Compute' | undefined) {
 }
 
 const getPDiskBreadcrumbs: GetBreadcrumbs<PDiskBreadcrumbsOptions> = (options, query = {}) => {
+    if (!options.isViewerUser) {
+        return [];
+    }
     const {nodeId, pDiskId, nodeRole} = options;
 
     const breadcrumbs = getNodeBreadcrumbs({
@@ -157,35 +164,42 @@ const getPDiskBreadcrumbs: GetBreadcrumbs<PDiskBreadcrumbsOptions> = (options, q
     return breadcrumbs;
 };
 
-const getVDiskBreadcrumbs: GetBreadcrumbs<VDiskBreadcrumbsOptions> = (options, query = {}) => {
-    const {vDiskSlotId} = options;
+const getStorageGroupBreadcrumbs: GetBreadcrumbs<StorageGroupBreadcrumbsOptions> = (
+    options,
+    query = {},
+) => {
+    const {groupId, isViewerUser, tenantName} = options;
 
-    const breadcrumbs = getPDiskBreadcrumbs(options, query);
+    const breadcrumbs = isViewerUser
+        ? getClusterBreadcrumbs(options, query)
+        : getTenantBreadcrumbs(options, query);
 
-    let text = headerKeyset('breadcrumbs.vDisk');
-    if (vDiskSlotId) {
-        text += ` ${vDiskSlotId}`;
+    let text = headerKeyset('breadcrumbs.storageGroup');
+    if (groupId) {
+        text += ` ${groupId}`;
     }
 
     const lastItem = {
         text,
+        link: groupId ? getStorageGroupPath(groupId, {database: tenantName}) : undefined,
     };
     breadcrumbs.push(lastItem);
 
     return breadcrumbs;
 };
 
-const getStorageGroupBreadcrumbs: GetBreadcrumbs<StorageGroupBreadcrumbsOptions> = (
-    options,
-    query = {},
-) => {
-    const {groupId} = options;
+const getVDiskBreadcrumbs: GetBreadcrumbs<VDiskBreadcrumbsOptions> = (options, query = {}) => {
+    const {vDiskSlotId, groupId} = options;
 
-    const breadcrumbs = getClusterBreadcrumbs(options, query);
+    let breadcrumbs = getPDiskBreadcrumbs(options, query);
 
-    let text = headerKeyset('breadcrumbs.storageGroup');
-    if (groupId) {
-        text += ` ${groupId}`;
+    if (breadcrumbs.length === 0 && !isNil(groupId)) {
+        breadcrumbs = getStorageGroupBreadcrumbs(options, query);
+    }
+
+    let text = headerKeyset('breadcrumbs.vDisk');
+    if (vDiskSlotId) {
+        text += ` ${vDiskSlotId}`;
     }
 
     const lastItem = {
@@ -226,7 +240,7 @@ const mapPageToGetter = {
 
 export const getBreadcrumbs = (
     page: Page,
-    options: BreadcrumbsOptions & {singleClusterMode: boolean},
+    options: BreadcrumbsOptions & {singleClusterMode: boolean; isViewerUser?: boolean},
     rawBreadcrumbs: RawBreadcrumbItem[] = [],
     query = {},
 ) => {

@@ -8,9 +8,9 @@ import {api} from './api';
 export const nodesListApi = api.injectEndpoints({
     endpoints: (build) => ({
         getNodesList: build.query({
-            queryFn: async (_, {signal}) => {
+            queryFn: async ({database}, {signal}) => {
                 try {
-                    const data = await window.api.viewer.getNodesList({signal});
+                    const data = await window.api.viewer.getNodesList({database}, {signal});
                     return {data};
                 } catch (error) {
                     return {error};

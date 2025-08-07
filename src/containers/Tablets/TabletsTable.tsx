@@ -3,13 +3,14 @@ import React from 'react';
 import {ArrowRotateLeft} from '@gravity-ui/icons';
 import type {Column as DataTableColumn, SortOrder} from '@gravity-ui/react-data-table';
 import {Icon, Text} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 import {StringParam, useQueryParams} from 'use-query-params';
 
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {EntitiesCount} from '../../components/EntitiesCount';
 import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../components/Errors/ResponseError';
-import {InternalLink} from '../../components/InternalLink';
+import {NodeId} from '../../components/NodeId/NodeId';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../components/Search/Search';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
@@ -21,7 +22,6 @@ import {ETabletState} from '../../types/api/tablet';
 import type {TTabletStateInfo} from '../../types/api/tablet';
 import {DEFAULT_TABLE_SETTINGS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
-import {getDefaultNodePath} from '../Node/NodePages';
 
 import i18n from './i18n';
 
@@ -82,9 +82,10 @@ function getColumns({database, nodeId}: {database?: string; nodeId?: string | nu
                     return i18n('Node ID');
                 },
                 render: ({row}) => {
-                    const nodePath =
-                        row.NodeId === undefined ? undefined : getDefaultNodePath(row.NodeId);
-                    return <InternalLink to={nodePath}>{row.NodeId}</InternalLink>;
+                    if (isNil(row.NodeId)) {
+                        return EMPTY_DATA_PLACEHOLDER;
+                    }
+                    return <NodeId id={row.NodeId} />;
                 },
                 align: 'right',
             },

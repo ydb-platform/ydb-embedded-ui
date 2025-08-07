@@ -1,5 +1,6 @@
 import {cn} from '../../utils/cn';
 import type {PreparedVDisk} from '../../utils/disks/types';
+import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {DiskStateProgressBar} from '../DiskStateProgressBar/DiskStateProgressBar';
 import {HoverPopup} from '../HoverPopup/HoverPopup';
 import {InternalLink} from '../InternalLink';
@@ -34,7 +35,10 @@ export const VDisk = ({
     delayClose,
     delayOpen,
 }: VDiskProps) => {
-    const vDiskPath = getVDiskLink(data);
+    const database = useDatabaseFromQuery();
+    const vDiskPath = getVDiskLink(data, {
+        database: database,
+    });
 
     return (
         <HoverPopup

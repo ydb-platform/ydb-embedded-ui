@@ -7,6 +7,7 @@ import {getTabletPagePath} from '../../../routes';
 import type {VDiskBlobIndexItem} from '../../../types/api/vdiskBlobIndex';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
 import {formatBytes, formatNumber} from '../../../utils/dataFormatters/dataFormatters';
+import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {safeParseNumber} from '../../../utils/utils';
 
 import {COLUMNS_NAMES, COLUMNS_TITLES} from './constants';
@@ -21,9 +22,7 @@ export function getColumns(): Column<VDiskBlobIndexItem>[] {
                 if (!tabletId) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
-                return (
-                    <InternalLink to={getTabletPagePath(String(tabletId))}>{tabletId}</InternalLink>
-                );
+                return <TabletId id={tabletId} />;
             },
             width: 220,
         },
@@ -62,4 +61,9 @@ export function getColumns(): Column<VDiskBlobIndexItem>[] {
             width: 120,
         },
     ];
+}
+
+function TabletId({id}: {id: string | number}) {
+    const database = useDatabaseFromQuery();
+    return <InternalLink to={getTabletPagePath(id, {database})}>{id}</InternalLink>;
 }

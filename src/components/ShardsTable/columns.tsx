@@ -1,11 +1,10 @@
 import DataTable from '@gravity-ui/react-data-table';
 
-import {getDefaultNodePath} from '../../containers/Node/NodePages';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatNumber, roundToPrecision} from '../../utils/dataFormatters/dataFormatters';
 import {getUsageSeverity} from '../../utils/generateEvaluator';
-import {InternalLink} from '../InternalLink';
 import {LinkToSchemaObject} from '../LinkToSchemaObject/LinkToSchemaObject';
+import {NodeId} from '../NodeId/NodeId';
 import {TabletNameWrapper} from '../TabletNameWrapper/TabletNameWrapper';
 import {UsageLabel} from '../UsageLabel/UsageLabel';
 
@@ -39,7 +38,7 @@ export const getDataSizeColumn: GetShardsColumn = () => {
         align: DataTable.RIGHT,
     };
 };
-export const getTabletIdColumn: GetShardsColumn = () => {
+export const getTabletIdColumn: GetShardsColumn = ({database}) => {
     return {
         name: TOP_SHARDS_COLUMNS_IDS.TabletId,
         header: TOP_SHARDS_COLUMNS_TITLES.TabletId,
@@ -51,6 +50,7 @@ export const getTabletIdColumn: GetShardsColumn = () => {
                 <TabletNameWrapper
                     tabletId={row.TabletId}
                     followerId={row.FollowerId || undefined}
+                    database={database}
                 />
             );
         },
@@ -65,7 +65,7 @@ export const getNodeIdColumn: GetShardsColumn = () => {
             if (!row.NodeId) {
                 return EMPTY_DATA_PLACEHOLDER;
             }
-            return <InternalLink to={getDefaultNodePath(row.NodeId)}>{row.NodeId}</InternalLink>;
+            return <NodeId id={row.NodeId} />;
         },
         align: DataTable.RIGHT,
     };

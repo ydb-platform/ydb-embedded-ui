@@ -12,6 +12,7 @@ import {cn} from '../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER, YDB_POPOVER_CLASS_NAME} from '../../../../utils/constants';
 import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
 import {getUsageSeverity} from '../../../../utils/generateEvaluator';
+import {useDatabaseFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
 import {formatToMs} from '../../../../utils/timeParsers';
 import {bytesToGB, bytesToSpeed} from '../../../../utils/utils';
 import {Disks} from '../../Disks/Disks';
@@ -65,7 +66,6 @@ const typeColumn: StorageGroupsColumn = {
                 <Popover
                     content={i18n('encrypted')}
                     placement="right"
-                    openDelay={0}
                     className={YDB_POPOVER_CLASS_NAME}
                 >
                     <Label>
@@ -147,16 +147,7 @@ const groupIdColumn: StorageGroupsColumn = {
     header: STORAGE_GROUPS_COLUMNS_TITLES.GroupId,
     width: 140,
     render: ({row}) => {
-        return row.GroupId ? (
-            <EntityStatus
-                name={String(row.GroupId)}
-                path={getStorageGroupPath(row.GroupId)}
-                hasClipboardButton
-                showStatus={false}
-            />
-        ) : (
-            '-'
-        );
+        return row.GroupId ? <GroupId id={row.GroupId} /> : '-';
     },
     sortAccessor: (row) => Number(row.GroupId),
     align: DataTable.LEFT,
@@ -298,3 +289,15 @@ export const getStorageGroupsColumns: StorageColumnsGetter = (data) => {
         sortable: isSortableStorageGroupsColumn(column.name),
     }));
 };
+
+function GroupId({id}: {id: string | number}) {
+    const database = useDatabaseFromQuery();
+    return (
+        <EntityStatus
+            name={String(id)}
+            path={getStorageGroupPath(id, {database})}
+            hasClipboardButton
+            showStatus={false}
+        />
+    );
+}
