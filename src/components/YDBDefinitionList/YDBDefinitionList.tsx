@@ -42,7 +42,7 @@ export function YDBDefinitionList({
                     {...restProps}
                 >
                     {items.map((item) => (
-                        <DefinitionList.Item key={item.name} {...item} />
+                        <DefinitionList.Item key={item.name} children={item.content} {...item} />
                     ))}
                 </DefinitionList>
             );
