@@ -33,7 +33,6 @@ import type {
 } from '../../types/api/tablet';
 import type {TTenantInfo, TTenants} from '../../types/api/tenant';
 import type {DescribeTopicResult, TopicDataRequest, TopicDataResponse} from '../../types/api/topic';
-import type {TEvVDiskStateResponse} from '../../types/api/vdisk';
 import type {VDiskBlobIndexResponse} from '../../types/api/vdiskBlobIndex';
 import type {TUserToken} from '../../types/api/whoami';
 import type {TabletsApiRequestParams} from '../../types/store/tablets';
@@ -520,36 +519,6 @@ export class ViewerAPI extends BaseYdbAPI {
         return this.get<FeatureFlagConfigs>(
             this.getPath('/viewer/feature_flags'),
             {
-                database,
-            },
-            {concurrentId, requestConfig: {signal}},
-        );
-    }
-
-    getVDiskInfo(
-        {
-            pDiskId,
-            nodeId,
-            database,
-            vDiskId,
-        }: {
-            pDiskId?: string | number;
-            nodeId?: string | number;
-            database?: string;
-            vDiskId: string | number;
-        },
-        {concurrentId, signal}: AxiosOptions = {},
-    ) {
-        const filterParams = {VDiskId: vDiskId, PDiskId: pDiskId};
-        const normalizedFilterParams = Object.entries(filterParams).filter(([_key, value]) =>
-            Boolean(value),
-        ) as [string, string][];
-        const filter = `(${normalizedFilterParams.map(([key, value]) => `${key}=${value}`).join(';')})`;
-        return this.get<TEvVDiskStateResponse>(
-            this.getPath('/viewer/json/vdiskinfo?enums=true'),
-            {
-                node_id: nodeId,
-                filter: filter,
                 database,
             },
             {concurrentId, requestConfig: {signal}},
