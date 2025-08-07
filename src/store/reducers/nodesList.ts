@@ -21,9 +21,13 @@ export const nodesListApi = api.injectEndpoints({
     overrideExisting: 'throw',
 });
 
-const selectNodesList = nodesListApi.endpoints.getNodesList.select(undefined);
+const createGetNodesListSelector = createSelector(
+    (database?: string) => database,
+    (database) => nodesListApi.endpoints.getNodesList.select({database}),
+);
 
 export const selectNodesMap = createSelector(
-    (state: RootState) => selectNodesList(state).data,
-    (data) => prepareNodesMap(data),
+    (state: RootState) => state,
+    (_state: RootState, database?: string) => createGetNodesListSelector(database),
+    (state, selectNodesList) => prepareNodesMap(selectNodesList(state).data),
 );

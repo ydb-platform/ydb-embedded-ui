@@ -257,7 +257,7 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
         [data, isFullData, isUserAllowedToMakeChanges, database],
     );
 
-    const nodesMap = useTypedSelector(selectNodesMap);
+    const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));
     const nodeData = valueIsDefined(data.NodeId) ? nodesMap?.get(data.NodeId) : undefined;
     const pdiskInfo = React.useMemo(
         () =>
