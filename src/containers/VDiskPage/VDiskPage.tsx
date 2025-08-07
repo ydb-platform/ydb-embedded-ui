@@ -23,7 +23,7 @@ import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
 import type {ModifyDiskResponse} from '../../types/api/modifyDisk';
 import type {TVDiskID} from '../../types/api/vdisk';
 import {cn} from '../../utils/cn';
-import {getSeverityColor, getVDiskSlotBasedId} from '../../utils/disks/helpers';
+import {getSeverityColor} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {
     useIsUserAllowedToMakeChanges,
@@ -69,54 +69,27 @@ export function VDiskPage() {
     const newDiskApiAvailable = useDiskPagesAvailable();
     const isViewerUser = useIsViewerUser();
 
-    const [
-        {
-            nodeId,
-            pDiskId,
-            vDiskSlotId,
-            vDiskId: vDiskIdParam,
-            activeTab,
-            database: databaseParam,
-            groupId,
-        },
-    ] = useQueryParams({
-        nodeId: StringParam,
-        pDiskId: StringParam,
-        vDiskSlotId: StringParam,
-        vDiskId: StringParam,
-        activeTab: StringParam,
-        database: StringParam,
-        groupId: StringParam,
-    });
+    const [{nodeId, pDiskId, vDiskId: vDiskIdParam, activeTab, database: databaseParam}] =
+        useQueryParams({
+            nodeId: StringParam,
+            pDiskId: StringParam,
+            vDiskId: StringParam,
+            activeTab: StringParam,
+            database: StringParam,
+        });
     const database = databaseParam ?? undefined;
 
     const vDiskTab = vDiskTabSchema.parse(activeTab);
-    React.useEffect(() => {
-        if (isViewerUser) {
-            dispatch(setHeaderBreadcrumbs('vDisk', {nodeId, pDiskId, vDiskSlotId}));
-        } else {
-            dispatch(
-                setHeaderBreadcrumbs('vDisk', {
-                    groupId: groupId,
-                    tenantName: database,
-                    vDiskSlotId,
-                }),
-            );
-        }
-    }, [dispatch, nodeId, pDiskId, vDiskSlotId, isViewerUser, groupId, database]);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const params = React.useMemo(() => {
-        if (!isNil(nodeId) && !isNil(pDiskId) && !isNil(vDiskSlotId) && isViewerUser) {
-            return {nodeId, pDiskId, vDiskSlotId, database};
-        }
         if (!isNil(vDiskIdParam)) {
-            return {vDiskId: vDiskIdParam, database};
+            return {vDiskId: vDiskIdParam, nodeId: nodeId?.toString(), database};
         }
 
         return skipToken;
-    }, [nodeId, pDiskId, vDiskSlotId, vDiskIdParam, database, isViewerUser]);
+    }, [nodeId, vDiskIdParam, database]);
     const {
         currentData: vDiskData,
         isFetching,
@@ -124,6 +97,30 @@ export function VDiskPage() {
     } = vDiskApi.useGetVDiskDataQuery(params, {
         pollingInterval: autoRefreshInterval,
     });
+
+    const vDiskSlotId = vDiskData?.VDiskSlotId;
+
+    React.useEffect(() => {
+        if (isViewerUser) {
+            dispatch(setHeaderBreadcrumbs('vDisk', {nodeId, pDiskId, vDiskSlotId}));
+        } else {
+            dispatch(
+                setHeaderBreadcrumbs('vDisk', {
+                    groupId: vDiskData?.VDiskId?.GroupID,
+                    tenantName: database,
+                    vDiskSlotId,
+                }),
+            );
+        }
+    }, [
+        dispatch,
+        nodeId,
+        pDiskId,
+        isViewerUser,
+        database,
+        vDiskData?.VDiskId?.GroupID,
+        vDiskSlotId,
+    ]);
 
     const loading = isFetching && vDiskData === undefined;
     const {NodeHost, NodeId, NodeType, NodeDC, PDiskId, PDiskType, Severity, VDiskId} =
@@ -167,12 +164,14 @@ export function VDiskPage() {
         }
     };
 
+    const vDiskId = vDiskData?.StringifiedId || (loading ? undefined : vDiskIdParam);
+
     const handleAfterEvictVDisk = () => {
         dispatch(
             api.util.invalidateTags([
                 {
                     type: 'VDiskData',
-                    id: getVDiskSlotBasedId(nodeId || 0, pDiskId || 0, vDiskSlotId || 0),
+                    id: vDiskId?.toString(),
                 },
                 'StorageData',
             ]),
@@ -213,8 +212,6 @@ export function VDiskPage() {
             />
         );
     };
-
-    const vDiskId = vDiskData?.StringifiedId || (loading ? undefined : vDiskIdParam);
 
     const renderPageTitle = () => {
         return (
@@ -269,9 +266,7 @@ export function VDiskPage() {
                                     {
                                         nodeId: nodeId?.toString(),
                                         pDiskId: pDiskId?.toString(),
-                                        vDiskSlotId: vDiskSlotId?.toString(),
                                         vDiskId: vDiskId?.toString(),
-                                        groupId: groupId?.toString(),
                                     },
                                     {activeTab: id, database},
                                 );

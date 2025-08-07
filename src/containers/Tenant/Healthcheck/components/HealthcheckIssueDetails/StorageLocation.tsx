@@ -124,8 +124,6 @@ function VDiskInfo({location}: StorageSectionProps) {
                                             vDiskId: id,
                                             nodeId: node?.id,
                                             pDiskId: undefined,
-                                            groupId: undefined,
-                                            vDiskSlotId: undefined,
                                         },
                                         {database},
                                     )}

@@ -527,34 +527,30 @@ export class ViewerAPI extends BaseYdbAPI {
     }
 
     getVDiskInfo(
-        params:
-            | {
-                  vDiskSlotId: string | number;
-                  pDiskId: string | number;
-                  nodeId: string | number;
-                  database?: string;
-              }
-            | {
-                  vDiskId: string | number;
-                  database?: string;
-              },
+        {
+            pDiskId,
+            nodeId,
+            database,
+            vDiskId,
+        }: {
+            pDiskId?: string | number;
+            nodeId?: string | number;
+            database?: string;
+            vDiskId: string | number;
+        },
         {concurrentId, signal}: AxiosOptions = {},
     ) {
-        let filter = '';
-        let nodeId;
-        if ('vDiskId' in params) {
-            filter = `(VDiskId=${params.vDiskId})`;
-        } else {
-            const {pDiskId, vDiskSlotId} = params;
-            filter = `(PDiskId=${pDiskId};VDiskSlotId=${vDiskSlotId})`;
-            nodeId = params.nodeId;
-        }
+        const filterParams = {VDiskId: vDiskId, PDiskId: pDiskId};
+        const normalizedFilterParams = Object.entries(filterParams).filter(([_key, value]) =>
+            Boolean(value),
+        ) as [string, string][];
+        const filter = `(${normalizedFilterParams.map(([key, value]) => `${key}=${value}`).join(';')})`;
         return this.get<TEvVDiskStateResponse>(
             this.getPath('/viewer/json/vdiskinfo?enums=true'),
             {
                 node_id: nodeId,
                 filter: filter,
-                database: params.database,
+                database,
             },
             {concurrentId, requestConfig: {signal}},
         );

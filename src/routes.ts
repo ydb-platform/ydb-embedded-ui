@@ -123,10 +123,8 @@ export function getPDiskPagePath(
 export function getVDiskPagePath(
     // provide all of the params to functions to ensure nothing was forgotten
     params: {
-        vDiskSlotId: string | number | undefined;
         pDiskId: string | number | undefined;
         nodeId: string | number | undefined;
-        groupId: string | number | undefined;
         vDiskId: string | undefined;
     },
     query: {database: string | undefined; activeTab?: string} = {database: undefined},

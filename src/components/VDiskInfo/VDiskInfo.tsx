@@ -69,7 +69,6 @@ export function VDiskInfo<T extends PreparedVDisk>({
         WriteThroughput,
         PDiskId,
         StringifiedId,
-        VDiskId,
         NodeId,
     } = data || {};
 
@@ -198,7 +197,6 @@ export function VDiskInfo<T extends PreparedVDisk>({
                 NodeId: dNodeId,
                 PDiskId: dPDiskId,
                 VDiskSlotId: dVSlotId,
-                VDiskId: dVdiskId,
             } = donor;
 
             if (!id || !dVSlotId || !dNodeId || !dPDiskId) {
@@ -209,9 +207,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
                 {
                     nodeId: dNodeId,
                     pDiskId: dPDiskId,
-                    vDiskSlotId: dVSlotId,
                     vDiskId: id,
-                    groupId: dVdiskId?.GroupID,
                 },
                 {database},
             );
@@ -244,11 +240,9 @@ export function VDiskInfo<T extends PreparedVDisk>({
         if (withVDiskPageLink) {
             const vDiskPagePath = getVDiskPagePath(
                 {
-                    vDiskSlotId: VDiskSlotId,
                     pDiskId: PDiskId,
                     nodeId: NodeId,
                     vDiskId: StringifiedId,
-                    groupId: VDiskId?.GroupID,
                 },
                 {database},
             );
