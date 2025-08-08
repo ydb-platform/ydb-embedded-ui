@@ -123,7 +123,6 @@ function VDiskInfo({location}: StorageSectionProps) {
                                         {
                                             vDiskId: id,
                                             nodeId: node?.id,
-                                            pDiskId: undefined,
                                         },
                                         {database},
                                     )}
