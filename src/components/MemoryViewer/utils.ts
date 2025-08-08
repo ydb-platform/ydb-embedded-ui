@@ -58,6 +58,13 @@ export function getMemorySegments(stats: TMemoryStats, memoryUsage: number): Mem
             isInfo: false,
         },
         {
+            label: i18n('text_compaction'),
+            key: 'CompactionConsumption',
+            value: getMaybeNumber(stats.CompactionConsumption),
+            capacity: getMaybeNumber(stats.CompactionLimit),
+            isInfo: false,
+        },
+        {
             label: i18n('text_allocator-caches'),
             key: 'AllocatorCachesMemory',
             value: getMaybeNumber(stats.AllocatorCachesMemory),
