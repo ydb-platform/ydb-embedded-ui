@@ -59,6 +59,10 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
 
     const issuesText = issuesCount ? i18n('description_problems', {count: issuesCount}) : '';
 
+    if (selfCheckResult === 'GOOD' && !issuesCount && !loading) {
+        return null;
+    }
+
     const renderAlertMessage = () => {
         if (error) {
             return <ResponseError error={error} defaultMessage={i18n('description_no-data')} />;
