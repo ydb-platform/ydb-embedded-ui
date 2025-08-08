@@ -7,11 +7,6 @@ export const getMinorVersion = (version: string) => {
         result = result.replace(/(-hotfix-\d{1,}(-\d{1,})?)?\.[0-9a-zA-Z]+$/, ''); // stable-19-2-18.bfa368f -> stable-19-2-18
     }
 
-    const buildVersionRegexp = /\d{1,}-\d{1,}-\d{1,}-\d{1,}$/;
-    if (buildVersionRegexp.test(version)) {
-        result = result.replace(/-\d{1,}$/, ''); // stable-19-2-18-1 -> stable-19-2-18
-    }
-
     return result;
 };
 
