@@ -1,0 +1,60 @@
+.queries-activity-bar {
+    $b: &;
+
+    border-radius: var(--g-border-radius-s);
+
+    &__card {
+        width: 100%;
+
+        // Override Card's default padding for custom content layout
+        padding: 0;
+
+        border-radius: var(--g-border-radius-s);
+    }
+
+    &__header {
+        padding: var(--g-spacing-3) var(--g-spacing-4);
+
+        cursor: pointer;
+
+        border: 1px solid transparent;
+        border-radius: var(--g-border-radius-s);
+
+        transition: background-color 0.15s ease;
+
+        &:hover {
+            background-color: var(--g-color-base-float-hover);
+        }
+
+        #{$b}_expanded & {
+            border: none;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        #{$b}_expanded &:hover {
+            background-color: transparent;
+        }
+    }
+
+    &__content {
+        padding-top: var(--g-spacing-3);
+        padding-bottom: var(--g-spacing-3);
+    }
+
+    &__stats {
+        padding: 0 var(--g-spacing-4);
+    }
+
+    &__open-queries-button {
+        margin-left: var(--g-spacing-1);
+    }
+
+    &__charts {
+        padding: 0 var(--g-spacing-4);
+
+        @media (max-width: 1200px) {
+            flex-direction: column !important;
+        }
+    }
+}

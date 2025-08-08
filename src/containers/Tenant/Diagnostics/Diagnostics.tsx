@@ -1,22 +1,22 @@
 import React from 'react';
 
-import {Tabs} from '@gravity-ui/uikit';
+import {Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {Helmet} from 'react-helmet-async';
-import {Link} from 'react-router-dom';
 
 import {AutoRefreshControl} from '../../../components/AutoRefreshControl/AutoRefreshControl';
 import {DrawerContextProvider} from '../../../components/Drawer/DrawerContext';
+import {InternalLink} from '../../../components/InternalLink';
 import {
     useFeatureFlagsAvailable,
     useTopicDataAvailable,
 } from '../../../store/reducers/capabilities/hooks';
-import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
-import {setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
+import {setDiagnosticsTab, useTenantBaseInfo} from '../../../store/reducers/tenant/tenant';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../types/additionalProps';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 import {cn} from '../../../utils/cn';
-import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
+import {useScrollPosition, useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
+import {useIsViewerUser} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {Heatmap} from '../../Heatmap';
 import {Nodes} from '../../Nodes/Nodes';
 import {Operations} from '../../Operations';
@@ -50,7 +50,7 @@ const b = cn('kv-tenant-diagnostics');
 
 function Diagnostics(props: DiagnosticsProps) {
     const {path, database, type, subType} = useCurrentSchema();
-    const {control_plane: controlPlane} = useClusterBaseInfo();
+    const {controlPlane} = useTenantBaseInfo(path);
     const containerRef = React.useRef<HTMLDivElement>(null);
     const dispatch = useTypedDispatch();
     const {diagnosticsTab = TENANT_DIAGNOSTICS_TABS_IDS.overview} = useTypedSelector(
@@ -63,11 +63,14 @@ function Diagnostics(props: DiagnosticsProps) {
 
     const hasFeatureFlags = useFeatureFlagsAvailable();
     const hasTopicData = useTopicDataAvailable();
+    const isViewerUser = useIsViewerUser();
     const pages = getPagesByType(type, subType, {
         hasFeatureFlags,
         hasTopicData,
         isTopLevel: path === database,
         hasBackups: typeof uiFactory.renderBackups === 'function' && Boolean(controlPlane),
+        hasConfigs: isViewerUser,
+        hasAccess: uiFactory.hasAccess,
     });
     let activeTab = pages.find((el) => el.id === diagnosticsTab);
     if (!activeTab) {
@@ -180,26 +183,31 @@ function Diagnostics(props: DiagnosticsProps) {
         return (
             <div className={b('header-wrapper')}>
                 <div className={b('tabs')}>
-                    <Tabs
-                        size="l"
-                        items={pages}
-                        activeTab={activeTab?.id}
-                        wrapTo={({id}, node) => {
-                            const path = getDiagnosticsPageLink(id);
-
-                            return (
-                                <Link to={path} key={id} className={b('tab')}>
-                                    {node}
-                                </Link>
-                            );
-                        }}
-                        allowNotSelected={true}
-                    />
+                    <TabProvider value={activeTab?.id}>
+                        <TabList size="l">
+                            {pages.map(({id, title}) => {
+                                const path = getDiagnosticsPageLink(id);
+                                return (
+                                    <Tab key={id} value={id}>
+                                        <InternalLink to={path} as="tab">
+                                            {title}
+                                        </InternalLink>
+                                    </Tab>
+                                );
+                            })}
+                        </TabList>
+                    </TabProvider>
                     <AutoRefreshControl />
                 </div>
             </div>
         );
     };
+
+    useScrollPosition(
+        containerRef,
+        `tenant-diagnostics-${tenantName}-${activeTab?.id}`,
+        activeTab?.id === TENANT_DIAGNOSTICS_TABS_IDS.overview,
+    );
 
     return (
         <div className={b()}>

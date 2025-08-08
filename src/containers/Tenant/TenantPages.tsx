@@ -16,6 +16,7 @@ type AdditionalQueryParams = {
     activeOffset?: string;
     metricsTab?: string;
     showPreview?: boolean;
+    queryMode?: string;
 };
 
 export type TenantQuery = TenantQueryParams | AdditionalQueryParams;
@@ -31,10 +32,6 @@ export const TENANT_INFO_TABS = [
     {
         id: TENANT_SUMMARY_TABS_IDS.overview,
         title: 'Overview',
-    },
-    {
-        id: TENANT_SUMMARY_TABS_IDS.acl,
-        title: 'ACL',
     },
 ];
 

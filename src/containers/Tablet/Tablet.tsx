@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Flex, Tabs} from '@gravity-ui/uikit';
+import {Flex, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {useParams} from 'react-router-dom';
@@ -93,14 +93,13 @@ export function Tablet() {
         );
     }, [dispatch, queryDatabase, id, tabletType]);
 
-    const {Leader, Type} = tablet;
+    const {Leader} = tablet;
     const metaItems: string[] = [];
     if (database) {
         metaItems.push(`${i18n('tablet.meta-database')}: ${database}`);
     }
-    if (Type) {
-        metaItems.push(Type);
-    }
+    // Add "Tablet" instead of tablet type to metadata
+    metaItems.push(i18n('tablet.header'));
     if (Leader === false) {
         metaItems.push(i18n('tablet.meta-follower').toUpperCase());
     }
@@ -135,7 +134,7 @@ function TabletContent({
     database?: string;
 }) {
     const isEmpty = !Object.keys(tablet).length;
-    const {Overall, HiveId, FollowerId} = tablet;
+    const {Overall, HiveId, FollowerId, Type} = tablet;
 
     const tabletName = `${id}${FollowerId ? `.${FollowerId}` : ''}`;
 
@@ -147,7 +146,7 @@ function TabletContent({
         >
             <Flex gap={5} direction="column">
                 <EntityPageTitle
-                    entityName={i18n('tablet.header')}
+                    entityName={Type || i18n('tablet.header')}
                     status={Overall ?? EFlag.Grey}
                     id={tabletName}
                 />
@@ -190,21 +189,22 @@ function TabletTabs({
         <Flex gap={5} direction="column">
             {/* block wrapper fror tabs to preserve height */}
             <div>
-                <Tabs
-                    size="l"
-                    items={TABLET_PAGE_TABS.filter(({isAdvanced}) =>
-                        isAdvanced ? !noAdvancedInfo : true,
-                    )}
-                    activeTab={tabletTab}
-                    wrapTo={(tab, tabNode) => {
-                        const path = getTabletPagePath(id, {...restParams, activeTab: tab.id});
-                        return (
-                            <InternalLink to={path} key={tab.id}>
-                                {tabNode}
-                            </InternalLink>
-                        );
-                    }}
-                />
+                <TabProvider value={tabletTab}>
+                    <TabList size="l">
+                        {TABLET_PAGE_TABS.filter(({isAdvanced}) =>
+                            isAdvanced ? !noAdvancedInfo : true,
+                        ).map(({id: tabId, title}) => {
+                            const path = getTabletPagePath(id, {...restParams, activeTab: tabId});
+                            return (
+                                <Tab key={tabId} value={tabId}>
+                                    <InternalLink view="primary" as="tab" to={path}>
+                                        {title}
+                                    </InternalLink>
+                                </Tab>
+                            );
+                        })}
+                    </TabList>
+                </TabProvider>
             </div>
             {tabletTab === 'history' ? (
                 <TabletTable history={history} tabletId={id} database={database} />

@@ -161,7 +161,7 @@ export function CriticalActionDialog<T>({
             className={b()}
             size="s"
             onClose={onClose}
-            onTransitionExited={handleTransitionExited}
+            onTransitionOutComplete={handleTransitionExited}
         >
             {renderDialogContent()}
         </Dialog>

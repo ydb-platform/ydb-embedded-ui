@@ -15,8 +15,6 @@
   "hotkeys.title": "Быстрые клавиши",
   "hotkeys.execute-query": "Выполнить запрос",
   "hotkeys.execute-selected-query": "Выполнить выбранный запрос",
-  "hotkeys.previous-query": "Предыдущий запрос",
-  "hotkeys.next-query": "Следующий запрос",
   "hotkeys.save-query": "Сохранить запрос",
   "hotkeys.save-selected-query": "Сохранить выбранный запрос"
 }

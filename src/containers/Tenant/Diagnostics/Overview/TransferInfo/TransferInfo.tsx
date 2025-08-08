@@ -1,8 +1,8 @@
-import type {DefinitionListItem} from '@gravity-ui/components';
 import {Flex, Text} from '@gravity-ui/uikit';
 
 import {AsyncReplicationState} from '../../../../../components/AsyncReplicationState';
 import {YDBSyntaxHighlighter} from '../../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
+import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {replicationApi} from '../../../../../store/reducers/replication';
 import type {DescribeReplicationResult} from '../../../../../types/api/replication';
@@ -53,7 +53,7 @@ function prepareTransferItems(
     const dstPath = target?.DstPath;
     const transformLambda = target?.TransformLambda;
 
-    const info: DefinitionListItem[] = [];
+    const info: YDBDefinitionListItem[] = [];
 
     if (state) {
         info.push({

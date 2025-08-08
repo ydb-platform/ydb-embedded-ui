@@ -13,6 +13,7 @@ import {cn} from '../../utils/cn';
 import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {isAccessError} from '../../utils/response';
+import {useAppTitle} from '../App/AppTitleContext';
 
 import ObjectGeneral from './ObjectGeneral/ObjectGeneral';
 import {ObjectSummary} from './ObjectSummary/ObjectSummary';
@@ -116,11 +117,12 @@ export function Tenant(props: TenantProps) {
     }
 
     const title = path || i18n('page.title');
+    const {appTitle} = useAppTitle();
     return (
         <div className={b()}>
             <Helmet
-                defaultTitle={`${title} — YDB Monitoring`}
-                titleTemplate={`%s — ${title} — YDB Monitoring`}
+                defaultTitle={`${title} — ${appTitle}`}
+                titleTemplate={`%s — ${title} — ${appTitle}`}
             />
             <LoaderWrapper loading={initialLoading}>
                 <PageError error={showBlockingError ? error : undefined}>

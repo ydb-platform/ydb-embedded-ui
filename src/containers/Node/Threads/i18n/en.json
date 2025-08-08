@@ -1,0 +1,11 @@
+{
+  "field_pool-name": "Pool Name",
+  "field_thread-count": "Threads",
+  "field_cpu-usage": "CPU Usage",
+  "field_minor-page-faults": "Minor Page Faults",
+  "field_major-page-faults": "Major Page Faults",
+  "field_thread-states": "Thread States",
+  "value_unknown": "Unknown",
+  "alert_no-thread-data": "No thread pool information available",
+  "description_cpu-usage": "System usage + user usage"
+}

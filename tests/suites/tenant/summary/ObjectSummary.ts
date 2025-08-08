@@ -8,7 +8,6 @@ import type {RowTableAction} from './types';
 
 export enum ObjectSummaryTab {
     Overview = 'Overview',
-    ACL = 'ACL',
     Schema = 'Schema',
 }
 export class ObjectSummary {
@@ -111,37 +110,6 @@ export class ObjectSummary {
         await this.clickCreateDirectoryButton();
         // Wait for modal to close
         await this.createDirectoryModal.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
-    }
-
-    async waitForAclVisible() {
-        // In the new UI, the ACL tab shows a redirect message instead of the actual ACL content
-        const redirectMessage = this.page.locator('text=Section was moved to Diagnostics');
-        await redirectMessage.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return true;
-    }
-
-    async getRedirectMessage(): Promise<string | null> {
-        const redirectMessage = this.page.locator('text=Section was moved to Diagnostics');
-        if (await redirectMessage.isVisible()) {
-            return redirectMessage.textContent();
-        }
-        return null;
-    }
-
-    async hasOpenInDiagnosticsButton(): Promise<boolean> {
-        try {
-            const diagnosticsButton = this.page.getByRole('button', {name: 'Open in Diagnostics'});
-            await diagnosticsButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-            return true;
-        } catch (error) {
-            console.error('Open in Diagnostics button not visible:', error);
-            return false;
-        }
-    }
-
-    async clickOpenInDiagnosticsButton(): Promise<void> {
-        const diagnosticsButton = this.page.getByRole('button', {name: 'Open in Diagnostics'});
-        await diagnosticsButton.click();
     }
 
     async isTreeVisible() {
@@ -277,7 +245,8 @@ export class ObjectSummary {
     }
 
     async clickTab(tabName: ObjectSummaryTab): Promise<void> {
-        const tab = this.tabs.locator(`.ydb-object-summary__tab:has-text("${tabName}")`);
+        const dataTab = tabName.toLowerCase();
+        const tab = this.tabs.locator(`button[data-tab="${dataTab}"]`);
         await tab.click();
     }
 

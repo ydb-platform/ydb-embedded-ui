@@ -1,8 +1,6 @@
 import type {Page} from '@playwright/test';
 
 export const getClipboardContent = async (page: Page): Promise<string> => {
-    await page.context().grantPermissions(['clipboard-read']);
-
     // First try the modern Clipboard API
     const clipboardText = await page.evaluate(async () => {
         try {

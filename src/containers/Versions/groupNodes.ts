@@ -1,8 +1,8 @@
 import groupBy from 'lodash/groupBy';
 
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
-import type {VersionToColorMap} from '../../types/versions';
-import {getMinorVersion, parseNodesToVersionsValues} from '../../utils/versions';
+import {getColorFromVersionsData, parseNodesToVersionsValues} from '../../utils/versions';
+import type {VersionsDataMap} from '../../utils/versions/types';
 
 import type {GroupedNodesItem} from './types';
 import {GroupByValue} from './types';
@@ -12,7 +12,7 @@ const sortByTitle = (a: GroupedNodesItem, b: GroupedNodesItem) =>
 
 export const getGroupedTenantNodes = (
     nodes: NodesPreparedEntity[] | undefined,
-    versionToColor: VersionToColorMap | undefined,
+    versionsDataMap: VersionsDataMap | undefined,
     groupByValue: GroupByValue,
 ): GroupedNodesItem[] | undefined => {
     if (!nodes || !nodes.length) {
@@ -43,7 +43,7 @@ export const getGroupedTenantNodes = (
                 return {
                     title: version,
                     items: items,
-                    versionColor: versionToColor?.get(getMinorVersion(version)),
+                    versionColor: getColorFromVersionsData(version, versionsDataMap),
                 };
             })
             .filter((item): item is GroupedNodesItem => Boolean(item));
@@ -55,7 +55,7 @@ export const getGroupedTenantNodes = (
             .map<GroupedNodesItem | null>((tenant) => {
                 const versionsValues = parseNodesToVersionsValues(
                     dividedByTenant[tenant],
-                    versionToColor,
+                    versionsDataMap,
                 );
 
                 const dividedByVersion = groupBy(dividedByTenant[tenant], 'Version');
@@ -63,7 +63,7 @@ export const getGroupedTenantNodes = (
                     return {
                         title: version,
                         nodes: dividedByVersion[version],
-                        versionColor: versionToColor?.get(getMinorVersion(version)),
+                        versionColor: getColorFromVersionsData(version, versionsDataMap),
                     };
                 });
 
@@ -84,7 +84,7 @@ export const getGroupedTenantNodes = (
 
 export const getGroupedStorageNodes = (
     nodes: NodesPreparedEntity[] | undefined,
-    versionToColor: VersionToColorMap | undefined,
+    versionsDataMap: VersionsDataMap | undefined,
 ): GroupedNodesItem[] | undefined => {
     if (!nodes || !nodes.length) {
         return undefined;
@@ -97,14 +97,14 @@ export const getGroupedStorageNodes = (
         return {
             title: version,
             nodes: storageNodesDividedByVersion[version],
-            versionColor: versionToColor?.get(getMinorVersion(version)),
+            versionColor: getColorFromVersionsData(version, versionsDataMap),
         };
     });
 };
 
 export const getOtherNodes = (
     nodes: NodesPreparedEntity[] | undefined,
-    versionToColor: VersionToColorMap | undefined,
+    versionsDataMap: VersionsDataMap | undefined,
 ): GroupedNodesItem[] | undefined => {
     if (!nodes || !nodes.length) {
         return undefined;
@@ -120,7 +120,7 @@ export const getOtherNodes = (
         return {
             title: version,
             nodes: otherNodesDividedByVersion[version],
-            versionColor: versionToColor?.get(getMinorVersion(version)),
+            versionColor: getColorFromVersionsData(version, versionsDataMap),
         };
     });
 };

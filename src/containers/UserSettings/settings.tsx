@@ -12,8 +12,12 @@ import {
     ENABLE_CODE_ASSISTANT,
     ENABLE_NETWORK_TABLE_KEY,
     ENABLE_QUERY_STREAMING,
+    ENABLE_QUERY_STREAMING_OLD_BACKEND,
     INVERTED_DISKS_KEY,
     LANGUAGE_KEY,
+    OLD_BACKEND_CLUSTER_NAMES,
+    PAGE_IDS,
+    SECTION_IDS,
     SHOW_DOMAIN_DATABASE_KEY,
     SHOW_NETWORK_UTILIZATION,
     THEME_KEY,
@@ -38,8 +42,7 @@ export interface SettingsPage {
     title: string;
     icon: IconProps;
     sections: SettingsSection[];
-    // default true
-    showTitle?: false;
+    hideTitle?: boolean;
 }
 
 export type YDBEmbeddedUISettings = SettingsPage[];
@@ -138,6 +141,42 @@ export const enableQueryStreamingSetting: SettingProps = {
     description: i18n('settings.editor.queryStreaming.description'),
 };
 
+export const enableQueryStreamingOldBackendSetting: SettingProps = {
+    settingKey: ENABLE_QUERY_STREAMING_OLD_BACKEND,
+    title: i18n('settings.editor.queryStreaming.title'),
+    description: i18n('settings.editor.queryStreaming.description'),
+};
+
+export function applyClusterSpecificQueryStreamingSetting(
+    settings: YDBEmbeddedUISettings,
+    clusterName?: string,
+): YDBEmbeddedUISettings {
+    const isOldBackendCluster = clusterName && OLD_BACKEND_CLUSTER_NAMES.includes(clusterName);
+
+    const queryStreamingSetting = isOldBackendCluster
+        ? enableQueryStreamingOldBackendSetting
+        : enableQueryStreamingSetting;
+
+    return settings.map((page) => {
+        // Look for the experiments page
+        if (page.id === PAGE_IDS.EXPERIMENTS) {
+            return createNextState(page, (draft) => {
+                // Find and replace the query streaming setting in experimentsSection
+                const section = draft.sections[0]; // experimentsSection
+                const settingIndex = section.settings.findIndex(
+                    (setting) =>
+                        'settingKey' in setting && setting.settingKey === ENABLE_QUERY_STREAMING,
+                );
+
+                if (settingIndex !== -1) {
+                    section.settings[settingIndex] = queryStreamingSetting;
+                }
+            });
+        }
+        return page;
+    });
+}
+
 export const showNetworkUtilizationSetting: SettingProps = {
     settingKey: SHOW_NETWORK_UTILIZATION,
     title: i18n('settings.showNetworkUtilization.title'),
@@ -182,10 +221,11 @@ export const interfaceVersionInfoField: SettingsInfoFieldProps = {
 };
 
 export const appearanceSection: SettingsSection = {
-    id: 'appearanceSection',
+    id: SECTION_IDS.APPEARANCE,
     title: i18n('section.appearance'),
     settings: [
         themeSetting,
+        languageSetting,
         invertedDisksSetting,
         binaryDataInPlainTextDisplay,
         showDomainDatabase,
@@ -194,7 +234,7 @@ export const appearanceSection: SettingsSection = {
 };
 
 export const experimentsSection: SettingsSection = {
-    id: 'experimentsSection',
+    id: SECTION_IDS.EXPERIMENTS,
     title: i18n('section.experiments'),
     settings: [
         enableNetworkTable,
@@ -205,54 +245,57 @@ export const experimentsSection: SettingsSection = {
 };
 
 export const devSettingsSection: SettingsSection = {
-    id: 'devSettingsSection',
+    id: SECTION_IDS.DEV_SETTINGS,
     title: i18n('section.dev-setting'),
     settings: [enableAutocompleteSetting, autocompleteOnEnterSetting],
 };
 
 export const aboutSettingsSection: SettingsSection = {
-    id: 'aboutSettingsSection',
+    id: SECTION_IDS.ABOUT,
     title: i18n('section.about'),
     settings: [interfaceVersionInfoField],
 };
 
 export const generalPage: SettingsPage = {
-    id: 'generalPage',
+    id: PAGE_IDS.GENERAL,
     title: i18n('page.general'),
     icon: {data: StarFill, height: 14, width: 14},
     sections: [appearanceSection],
-    showTitle: false,
+    hideTitle: true,
 };
 
 export const experimentsPage: SettingsPage = {
-    id: 'experimentsPage',
+    id: PAGE_IDS.EXPERIMENTS,
     title: i18n('page.experiments'),
     icon: {data: Flask},
     sections: [experimentsSection],
-    showTitle: false,
+    hideTitle: true,
 };
 
 export const editorPage: SettingsPage = {
-    id: 'editorPage',
+    id: PAGE_IDS.EDITOR,
     title: i18n('page.editor'),
     icon: {data: PencilToSquare},
     sections: [devSettingsSection],
+    hideTitle: true,
 };
 
 export const aboutPage: SettingsPage = {
-    id: 'aboutPage',
+    id: PAGE_IDS.ABOUT,
     title: i18n('page.about'),
     icon: {data: CircleInfo},
     sections: [aboutSettingsSection],
-    showTitle: false,
+    hideTitle: true,
 };
 
 export function getUserSettings({
     singleClusterMode,
     codeAssistantConfigured,
+    clusterName,
 }: {
     singleClusterMode: boolean;
     codeAssistantConfigured?: boolean;
+    clusterName?: string;
 }) {
     const experiments = singleClusterMode
         ? experimentsPage
@@ -267,7 +310,8 @@ export function getUserSettings({
               })
             : editorPage;
 
-    const settings: YDBEmbeddedUISettings = [generalPage, editor, experiments, aboutPage];
+    const baseSettings: YDBEmbeddedUISettings = [generalPage, editor, experiments, aboutPage];
 
-    return settings;
+    // Apply cluster-specific query streaming logic
+    return applyClusterSpecificQueryStreamingSetting(baseSettings, clusterName);
 }

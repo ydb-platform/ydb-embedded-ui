@@ -1,8 +1,9 @@
 import React from 'react';
+// Query result viewer with tab persistence functionality
 
 import type {Settings} from '@gravity-ui/react-data-table';
 import type {ControlGroupOption} from '@gravity-ui/uikit';
-import {ClipboardButton, Flex, RadioButton, Text} from '@gravity-ui/uikit';
+import {ClipboardButton, Flex, SegmentedRadioGroup, Text} from '@gravity-ui/uikit';
 
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
@@ -10,13 +11,14 @@ import {Illustration} from '../../../../components/Illustration';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
+import {selectResultTab, setResultTab} from '../../../../store/reducers/query/query';
 import type {QueryResult} from '../../../../store/reducers/query/types';
 import type {ValueOf} from '../../../../types/common';
 import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {USE_SHOW_PLAN_SVG_KEY} from '../../../../utils/constants';
 import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
-import {useSetting, useTypedDispatch} from '../../../../utils/hooks';
+import {useSetting, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 import {QuerySettingsBanner} from '../QuerySettingsBanner/QuerySettingsBanner';
 import {QueryStoppedBanner} from '../QueryStoppedBanner/QueryStoppedBanner';
@@ -98,27 +100,43 @@ export function QueryResultViewer({
     onExpandResults,
 }: ExecuteResultProps) {
     const dispatch = useTypedDispatch();
+    const selectedTabs = useTypedSelector(selectResultTab);
 
     const isExecute = resultType === 'execute';
     const isExplain = resultType === 'explain';
 
     const [selectedResultSet, setSelectedResultSet] = React.useState(0);
-    const [activeSection, setActiveSection] = React.useState<SectionID>(() => {
-        return isExecute ? RESULT_OPTIONS_IDS.result : RESULT_OPTIONS_IDS.schema;
-    });
     const [useShowPlanToSvg] = useSetting<boolean>(USE_SHOW_PLAN_SVG_KEY);
+
+    // Get the saved tab for the current query type, or use default
+    const getDefaultSection = (): SectionID => {
+        return isExecute ? RESULT_OPTIONS_IDS.result : RESULT_OPTIONS_IDS.schema;
+    };
+
+    const activeSection: SectionID = React.useMemo(() => {
+        const savedTab = selectedTabs?.[resultType];
+        if (savedTab) {
+            // Validate that the saved tab is valid for the current result type
+            const validSections = isExecute ? EXECUTE_SECTIONS : EXPLAIN_SECTIONS;
+            if (validSections.includes(savedTab as SectionID)) {
+                return savedTab as SectionID;
+            }
+        }
+        return getDefaultSection();
+    }, [selectedTabs, resultType, isExecute]);
 
     const {error, isLoading, data = {}} = result;
     const {preparedPlan, simplifiedPlan, stats, resultSets, ast} = data;
 
     React.useEffect(() => {
-        if (resultType === 'execute' && !EXECUTE_SECTIONS.includes(activeSection)) {
-            setActiveSection('result');
-        }
-        if (resultType === 'explain' && !EXPLAIN_SECTIONS.includes(activeSection)) {
-            setActiveSection('schema');
-        }
-    }, [activeSection, resultType]);
+        return () => {
+            dispatch(disableFullscreen());
+        };
+    }, [dispatch]);
+
+    const onSelectSection = (value: SectionID) => {
+        dispatch(setResultTab({queryType: resultType, tabId: value}));
+    };
 
     const radioButtonOptions: ControlGroupOption<SectionID>[] = React.useMemo(() => {
         let sections: SectionID[] = [];
@@ -136,16 +154,6 @@ export function QueryResultViewer({
             };
         });
     }, [isExecute, isExplain]);
-
-    React.useEffect(() => {
-        return () => {
-            dispatch(disableFullscreen());
-        };
-    }, [dispatch]);
-
-    const onSelectSection = (value: SectionID) => {
-        setActiveSection(value);
-    };
 
     const getStatsToCopy = () => {
         switch (activeSection) {
@@ -298,7 +306,7 @@ export function QueryResultViewer({
         return (
             <div className={b('controls-left')}>
                 {radioButtonOptions.length && activeSection ? (
-                    <RadioButton
+                    <SegmentedRadioGroup
                         options={radioButtonOptions}
                         value={activeSection}
                         onUpdate={onSelectSection}

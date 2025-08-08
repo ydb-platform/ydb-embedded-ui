@@ -1,6 +1,6 @@
 {
   "name": "ydb-embedded-ui",
-  "version": "10.1.1",
+  "version": "11.5.0",
   "files": [
     "dist"
   ],
@@ -13,18 +13,18 @@
     "@bem-react/classname": "^1.6.0",
     "@ebay/nice-modal-react": "^1.2.13",
     "@gravity-ui/axios-wrapper": "^1.5.1",
-    "@gravity-ui/chartkit": "^5.20.0",
-    "@gravity-ui/components": "^3.13.2",
-    "@gravity-ui/date-components": "^2.11.0",
+    "@gravity-ui/chartkit": "^7.1.0",
+    "@gravity-ui/components": "^4.4.0",
+    "@gravity-ui/date-components": "^3.2.3",
     "@gravity-ui/date-utils": "^2.5.6",
     "@gravity-ui/i18n": "^1.7.0",
-    "@gravity-ui/icons": "^2.12.0",
-    "@gravity-ui/illustrations": "^2.0.0",
-    "@gravity-ui/navigation": "^2.30.0",
-    "@gravity-ui/paranoid": "^2.0.1",
+    "@gravity-ui/icons": "^2.13.0",
+    "@gravity-ui/illustrations": "^2.1.0",
+    "@gravity-ui/navigation": "^3.3.9",
+    "@gravity-ui/paranoid": "^3.0.0",
     "@gravity-ui/react-data-table": "^2.2.1",
-    "@gravity-ui/table": "^1.7.0",
-    "@gravity-ui/uikit": "^6.40.0",
+    "@gravity-ui/table": "^1.10.1",
+    "@gravity-ui/uikit": "^7.16.2",
     "@gravity-ui/unipika": "^5.2.1",
     "@gravity-ui/websql-autocomplete": "^13.7.0",
     "@hookform/resolvers": "^3.10.0",
@@ -59,7 +59,7 @@
     "use-query-params": "^2.2.1",
     "uuid": "^10.0.0",
     "web-vitals": "^1.1.2",
-    "ydb-ui-components": "^4.7.0",
+    "ydb-ui-components": "^5.0.0",
     "zod": "^3.24.1"
   },
   "scripts": {
@@ -117,8 +117,7 @@
     "testEnvironment": "jsdom",
     "moduleNameMapper": {
       "\\.(css|less|scss|sass)$": "jest-transform-css",
-      "^axios$": "axios/dist/node/axios.cjs",
-      "^@gravity-ui/uikit/toaster-singleton-react-18$": "@gravity-ui/uikit/build/cjs/toaster-singleton-react-18.js"
+      "^axios$": "axios/dist/node/axios.cjs"
     }
   },
   "browserslist": [
@@ -149,6 +148,7 @@
     "@typescript-eslint/parser": "^8.34.1",
     "copyfiles": "^2.4.1",
     "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
     "globals": "^16.2.0",
     "http-proxy-middleware": "^2.0.7",
     "husky": "^9.1.7",

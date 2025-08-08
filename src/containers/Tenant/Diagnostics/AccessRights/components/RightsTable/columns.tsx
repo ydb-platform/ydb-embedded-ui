@@ -1,7 +1,8 @@
 import type {Column} from '@gravity-ui/react-data-table';
-import {Flex, HelpMark, Label} from '@gravity-ui/uikit';
+import {Flex, Label} from '@gravity-ui/uikit';
 
 import {SubjectWithAvatar} from '../../../../../../components/SubjectWithAvatar/SubjectWithAvatar';
+import {TitleWithHelpMark} from '../../../../../../components/TitleWithHelpmark/TitleWithHelpmark';
 import type {PreparedAccessRights} from '../../../../../../types/api/acl';
 import i18n from '../../i18n';
 import {block} from '../../shared';
@@ -24,7 +25,7 @@ export const columns: Column<PreparedAccessRights>[] = [
         width: 400,
         get header() {
             return (
-                <HeaderWithHelpMark
+                <TitleWithHelpMark
                     header={i18n('label_explicit-rights')}
                     note={i18n('description_explicit-rights')}
                 />
@@ -55,7 +56,7 @@ export const columns: Column<PreparedAccessRights>[] = [
         width: 400,
         get header() {
             return (
-                <HeaderWithHelpMark
+                <TitleWithHelpMark
                     header={i18n('label_effective-rights')}
                     note={i18n('description_effective-rights')}
                 />
@@ -75,17 +76,3 @@ export const columns: Column<PreparedAccessRights>[] = [
         sortable: false,
     },
 ];
-
-interface HeaderWithHelpMarkProps {
-    header: string;
-    note: string;
-}
-
-function HeaderWithHelpMark({header, note}: HeaderWithHelpMarkProps) {
-    return (
-        <Flex gap={1} alignItems="center">
-            {header}
-            <HelpMark className={block('note')}>{note}</HelpMark>
-        </Flex>
-    );
-}

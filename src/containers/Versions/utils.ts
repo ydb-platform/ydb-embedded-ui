@@ -7,24 +7,24 @@ import {clustersApi} from '../../store/reducers/clusters/clusters';
 import {nodesApi} from '../../store/reducers/nodes/nodes';
 import {isClusterInfoV2} from '../../types/api/cluster';
 import type {TClusterInfo} from '../../types/api/cluster';
-import type {VersionToColorMap} from '../../types/versions';
-import {getVersionColors, getVersionMap} from '../../utils/clusterVersionColors';
 import {useTypedSelector} from '../../utils/hooks';
 import {
     parseNodeGroupsToVersionsValues,
     parseNodesToVersionsValues,
-    parseVersionsToVersionToColorMap,
+    parseVersionsToVersionsDataMap,
 } from '../../utils/versions';
+import {getVersionMap, getVersionsData} from '../../utils/versions/clusterVersionColors';
+import type {VersionsDataMap} from '../../utils/versions/types';
 
 interface UseGetVersionValuesProps {
     cluster?: TClusterInfo;
-    versionToColor?: VersionToColorMap;
+    versionsDataMap?: VersionsDataMap;
     clusterLoading?: boolean;
 }
 
 export const useGetVersionValues = ({
     cluster,
-    versionToColor,
+    versionsDataMap,
     clusterLoading,
 }: UseGetVersionValuesProps) => {
     const {currentData} = nodesApi.useGetNodesQuery(
@@ -43,7 +43,7 @@ export const useGetVersionValues = ({
                 name: version,
                 count,
             }));
-            return parseNodeGroupsToVersionsValues(groups, versionToColor, cluster.NodesTotal);
+            return parseNodeGroupsToVersionsValues(groups, versionsDataMap, cluster.NodesTotal);
         }
         if (!currentData) {
             return [];
@@ -51,29 +51,29 @@ export const useGetVersionValues = ({
         if (Array.isArray(currentData.NodeGroups)) {
             return parseNodeGroupsToVersionsValues(
                 currentData.NodeGroups,
-                versionToColor,
+                versionsDataMap,
                 cluster?.NodesTotal,
             );
         }
-        return parseNodesToVersionsValues(currentData.Nodes, versionToColor);
-    }, [currentData, versionToColor, cluster]);
+        return parseNodesToVersionsValues(currentData.Nodes, versionsDataMap);
+    }, [currentData, versionsDataMap, cluster]);
 
     return versionsValues;
 };
 
-export function useVersionToColorMap(cluster?: TClusterInfo) {
-    const getVersionToColorMap = useGetClusterVersionToColorMap();
+export function useVersionsDataMap(cluster?: TClusterInfo) {
+    const getVersionsDataMap = useGetClusterVersionsDataMap();
 
     return React.useMemo(() => {
-        if (getVersionToColorMap) {
-            return getVersionToColorMap();
+        if (getVersionsDataMap) {
+            return getVersionsDataMap();
         }
-        return parseVersionsToVersionToColorMap(cluster?.Versions);
-    }, [cluster?.Versions, getVersionToColorMap]);
+        return parseVersionsToVersionsDataMap(cluster?.Versions);
+    }, [cluster?.Versions, getVersionsDataMap]);
 }
 
 /** For multi-cluster version - with using meta handlers */
-function useGetClusterVersionToColorMap(): (() => VersionToColorMap) | undefined {
+function useGetClusterVersionsDataMap(): (() => VersionsDataMap) | undefined {
     const [clusterName] = useQueryParam('clusterName', StringParam);
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
     const {data} = clustersApi.useGetClustersListQuery(undefined, {skip: singleClusterMode});
@@ -87,6 +87,6 @@ function useGetClusterVersionToColorMap(): (() => VersionToColorMap) | undefined
         const info = clusters.find((cluster) => cluster.name === clusterName);
         const versions = info?.versions || [];
 
-        return () => getVersionColors(getVersionMap(versions));
+        return () => getVersionsData(getVersionMap(versions));
     }, [singleClusterMode, data, clusterName]);
 }

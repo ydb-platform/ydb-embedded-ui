@@ -1,14 +1,14 @@
 import type {NodesGroup} from '../../store/reducers/nodes/types';
 import type {TSystemStateInfo} from '../../types/api/nodes';
-import type {VersionToColorMap, VersionValue} from '../../types/versions';
 
-import {getMinorVersion} from './parseVersion';
+import {getColorFromVersionsData} from './getVersionsColors';
+import type {VersionValue, VersionsDataMap} from './types';
 
 const MIN_VALUE = 0.5;
 
 export const parseNodesToVersionsValues = (
     nodes: TSystemStateInfo[] = [],
-    versionsToColor?: VersionToColorMap,
+    versionsDataMap?: VersionsDataMap,
 ): VersionValue[] => {
     const versionsCount = nodes.reduce<Record<string, number>>((acc, node) => {
         if (node.Version) {
@@ -22,11 +22,12 @@ export const parseNodesToVersionsValues = (
     }, {});
     const result = Object.keys(versionsCount).map((version) => {
         const value = (versionsCount[version] / nodes.length) * 100;
+
         return {
             title: version,
             version: version,
-            color: versionsToColor?.get(getMinorVersion(version)),
             value: value < MIN_VALUE ? MIN_VALUE : value,
+            color: getColorFromVersionsData(version, versionsDataMap),
         };
     });
     return normalizeResult(result);
@@ -34,17 +35,18 @@ export const parseNodesToVersionsValues = (
 
 export function parseNodeGroupsToVersionsValues(
     groups: NodesGroup[],
-    versionsToColor?: VersionToColorMap,
+    versionsDataMap?: VersionsDataMap,
     total?: number,
 ) {
     const normalizedTotal = total ?? groups.reduce((acc, group) => acc + group.count, 0);
     const result = groups.map((group) => {
         const value = (group.count / normalizedTotal) * 100;
+
         return {
             title: group.name,
             version: group.name,
-            color: versionsToColor?.get(getMinorVersion(group.name)),
             value: value < MIN_VALUE ? MIN_VALUE : value,
+            color: getColorFromVersionsData(group.name, versionsDataMap),
         };
     });
     const normalized = normalizeResult(result);

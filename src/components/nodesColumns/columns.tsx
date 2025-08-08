@@ -155,7 +155,7 @@ export function getRAMColumn<T extends {MemoryUsed?: string; MemoryLimit?: strin
                     : [0, 0];
             return (
                 <CellWithPopover
-                    placement={['top', 'auto']}
+                    placement={['top', 'bottom']}
                     fullWidth
                     content={
                         <DefinitionList responsive>
@@ -253,7 +253,7 @@ export function getCpuColumn<
 
             return (
                 <CellWithPopover
-                    placement={['top', 'auto']}
+                    placement={['top', 'bottom']}
                     fullWidth
                     content={
                         <DefinitionList responsive>
@@ -421,8 +421,7 @@ export function getNetworkUtilizationColumn<
 
             return (
                 <CellWithPopover
-                    placement={['top', 'auto']}
-                    fullWidth
+                    placement={['top', 'bottom']}
                     content={
                         <DefinitionList responsive>
                             <DefinitionList.Item key={'NetworkUtilization'} name={i18n('sum')}>
@@ -488,8 +487,7 @@ export function getPingTimeColumn<
 
             return (
                 <CellWithPopover
-                    placement={['top', 'auto']}
-                    fullWidth
+                    placement={['top', 'bottom']}
                     content={
                         <DefinitionList responsive>
                             <DefinitionList.Item key={'PingTimeUs'} name={i18n('avg')}>
@@ -527,8 +525,7 @@ export function getClockSkewColumn<
 
             return (
                 <CellWithPopover
-                    placement={['top', 'auto']}
-                    fullWidth
+                    placement={['top', 'bottom']}
                     content={
                         <DefinitionList responsive>
                             <DefinitionList.Item key={'ClockSkewUs'} name={i18n('avg')}>

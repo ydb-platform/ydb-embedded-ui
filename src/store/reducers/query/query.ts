@@ -18,7 +18,7 @@ import {
     setStreamSession as setStreamSessionReducer,
 } from './streamingReducers';
 import type {QueryResult, QueryState} from './types';
-import {getActionAndSyntaxFromQueryMode, getQueryInHistory} from './utils';
+import {getActionAndSyntaxFromQueryMode, getQueryInHistory, prepareQueryWithPragmas} from './utils';
 
 const MAXIMUM_QUERIES_IN_HISTORY = 20;
 
@@ -128,6 +128,16 @@ const slice = createSlice({
         setQueryHistoryFilter: (state, action: PayloadAction<string>) => {
             state.history.filter = action.payload;
         },
+        setResultTab: (
+            state,
+            action: PayloadAction<{queryType: 'execute' | 'explain'; tabId: string}>,
+        ) => {
+            const {queryType, tabId} = action.payload;
+            if (!state.selectedResultTab) {
+                state.selectedResultTab = {};
+            }
+            state.selectedResultTab[queryType] = tabId;
+        },
         setStreamSession: setStreamSessionReducer,
         addStreamingChunks: addStreamingChunksReducer,
         setStreamQueryResponse: setStreamQueryResponseReducer,
@@ -149,6 +159,7 @@ const slice = createSlice({
         selectUserInput: (state) => state.input,
         selectIsDirty: (state) => state.isDirty,
         selectQueriesHistoryCurrentIndex: (state) => state.history?.currentIndex,
+        selectResultTab: (state) => state.selectedResultTab,
     },
 });
 
@@ -177,6 +188,7 @@ export const {
     setStreamQueryResponse,
     setStreamSession,
     setIsDirty,
+    setResultTab,
 } = slice.actions;
 
 export const {
@@ -187,6 +199,7 @@ export const {
     selectResult,
     selectUserInput,
     selectIsDirty,
+    selectResultTab,
 } = slice.selectors;
 
 interface SendQueryParams extends QueryRequestParams {
@@ -231,6 +244,8 @@ export const queryApi = api.injectEndpoints({
                     querySettings?.queryMode,
                 );
 
+                const finalQuery = prepareQueryWithPragmas(query, querySettings.pragmas);
+
                 try {
                     let streamDataChunkBatch: StreamDataChunk[] = [];
                     let batchTimeout: number | null = null;
@@ -245,7 +260,7 @@ export const queryApi = api.injectEndpoints({
 
                     await window.api.streaming.streamQuery(
                         {
-                            query,
+                            query: finalQuery,
                             database,
                             action,
                             syntax,
@@ -296,6 +311,10 @@ export const queryApi = api.injectEndpoints({
                     return {data: null};
                 } catch (error) {
                     const state = getState() as RootState;
+                    if (state.query.result?.startTime !== startTime) {
+                        // This query is no longer current, don't update state
+                        return {error};
+                    }
                     dispatch(
                         setQueryResult({
                             ...state.query.result,
@@ -321,7 +340,7 @@ export const queryApi = api.injectEndpoints({
                     enableTracingLevel,
                     queryId,
                 },
-                {signal, dispatch},
+                {signal, dispatch, getState},
             ) => {
                 const startTime = Date.now();
                 dispatch(
@@ -338,11 +357,13 @@ export const queryApi = api.injectEndpoints({
                     querySettings?.queryMode,
                 );
 
+                const finalQuery = prepareQueryWithPragmas(query, querySettings.pragmas);
+
                 try {
                     const timeStart = Date.now();
                     const response = await window.api.viewer.sendQuery(
                         {
-                            query,
+                            query: finalQuery,
                             database,
                             action,
                             syntax,
@@ -410,6 +431,11 @@ export const queryApi = api.injectEndpoints({
                     );
                     return {data: null};
                 } catch (error) {
+                    const state = getState() as RootState;
+                    if (state.query.result?.startTime !== startTime) {
+                        // This query is no longer current, don't update state
+                        return {error};
+                    }
                     dispatch(
                         setQueryResult({
                             type: actionType,

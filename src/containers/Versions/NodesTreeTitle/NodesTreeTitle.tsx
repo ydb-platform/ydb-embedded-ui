@@ -1,8 +1,8 @@
 import {ClipboardButton, Progress} from '@gravity-ui/uikit';
 
-import type {VersionValue} from '../../../types/versions';
 import {cn} from '../../../utils/cn';
 import type {PreparedNodeSystemState} from '../../../utils/nodes';
+import type {VersionValue} from '../../../utils/versions/types';
 import type {GroupedNodesItem} from '../types';
 
 import './NodesTreeTitle.scss';

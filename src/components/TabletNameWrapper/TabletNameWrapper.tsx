@@ -1,4 +1,4 @@
-import {DefinitionList, PopoverBehavior} from '@gravity-ui/uikit';
+import {DefinitionList} from '@gravity-ui/uikit';
 
 import {getTabletPagePath} from '../../routes';
 import {createTabletDeveloperUIHref} from '../../utils/developerUI/developerUI';
@@ -24,7 +24,7 @@ export function TabletNameWrapper({tabletId, followerId, database}: TabletNameWr
     return (
         <CellWithPopover
             disabled={!isUserAllowedToMakeChanges}
-            delayClosing={200}
+            closeDelay={200}
             content={
                 <DefinitionList responsive>
                     <DefinitionList.Item name={i18n('field_links')}>
@@ -36,7 +36,7 @@ export function TabletNameWrapper({tabletId, followerId, database}: TabletNameWr
                 </DefinitionList>
             }
             placement={['top', 'bottom']}
-            behavior={PopoverBehavior.Immediate}
+            openDelay={0}
         >
             <EntityStatus
                 name={tabletName}

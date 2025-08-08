@@ -151,4 +151,7 @@ export const QUERY_SETTINGS_FIELD_SETTINGS = {
     limitRows: {
         title: formI18n('form.limit-rows'),
     },
+    pragmas: {
+        title: formI18n('form.pragmas'),
+    },
 } as const;

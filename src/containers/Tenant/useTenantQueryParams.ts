@@ -30,7 +30,7 @@ export function useTenantQueryParams() {
     );
     const handleShowGrantAccessChange = React.useCallback(
         (value?: boolean) => {
-            setQueryParams({showGrantAccess: value}, 'replaceIn');
+            setQueryParams({showGrantAccess: value || undefined}, 'replaceIn');
         },
         [setQueryParams],
     );
@@ -56,7 +56,7 @@ export function useTenantQueryParams() {
     );
     const handleHealthcheckViewChange = React.useCallback(
         (value?: string) => {
-            setQueryParams({view: value}, 'replaceIn');
+            setQueryParams({view: value || undefined}, 'replaceIn');
         },
         [setQueryParams],
     );

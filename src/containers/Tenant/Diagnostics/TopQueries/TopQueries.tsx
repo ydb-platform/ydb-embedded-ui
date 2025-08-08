@@ -1,7 +1,6 @@
 import React from 'react';
 
-import type {RadioButtonOption} from '@gravity-ui/uikit';
-import {RadioButton} from '@gravity-ui/uikit';
+import {SegmentedRadioGroup} from '@gravity-ui/uikit';
 import {StringParam, useQueryParam} from 'use-query-params';
 import {z} from 'zod';
 
@@ -21,21 +20,6 @@ const QueryModeIds = {
     top: 'top',
     running: 'running',
 } as const;
-
-const QUERY_MODE_OPTIONS: RadioButtonOption[] = [
-    {
-        value: QueryModeIds.top,
-        get content() {
-            return i18n('mode_top');
-        },
-    },
-    {
-        value: QueryModeIds.running,
-        get content() {
-            return i18n('mode_running');
-        },
-    },
-];
 
 const queryModeSchema = z.nativeEnum(QueryModeIds).catch(QueryModeIds.top);
 const timeFrameSchema = z.nativeEnum(TimeFrameIds).catch(TimeFrameIds.hour);
@@ -71,7 +55,14 @@ export const TopQueries = ({tenantName}: TopQueriesProps) => {
 
     const renderQueryModeControl = React.useCallback(() => {
         return (
-            <RadioButton options={QUERY_MODE_OPTIONS} value={queryMode} onUpdate={setQueryMode} />
+            <SegmentedRadioGroup value={queryMode} onUpdate={setQueryMode}>
+                <SegmentedRadioGroup.Option value={QueryModeIds.top}>
+                    {i18n('mode_top')}
+                </SegmentedRadioGroup.Option>
+                <SegmentedRadioGroup.Option value={QueryModeIds.running}>
+                    {i18n('mode_running')}
+                </SegmentedRadioGroup.Option>
+            </SegmentedRadioGroup>
         );
     }, [queryMode, setQueryMode]);
 

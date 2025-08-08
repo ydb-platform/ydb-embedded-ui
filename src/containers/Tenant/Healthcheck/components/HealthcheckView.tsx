@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {RadioButton, Text} from '@gravity-ui/uikit';
+import {SegmentedRadioGroup, Text} from '@gravity-ui/uikit';
 
 import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {useTenantQueryParams} from '../../useTenantQueryParams';
@@ -49,15 +49,15 @@ export function HealthcheckView({
 
     const renderHealthcheckViewOption = (view: (typeof sortOrder)[number]) => {
         return (
-            <RadioButton.Option value={view} key={view}>
+            <SegmentedRadioGroup.Option value={view} key={view}>
                 {viewTitles[view] ?? view}&nbsp;
                 {renderCount(view)}
-            </RadioButton.Option>
+            </SegmentedRadioGroup.Option>
         );
     };
 
     return (
-        <RadioButton
+        <SegmentedRadioGroup
             value={view}
             onUpdate={(newView) => {
                 handleHealthcheckViewChange(newView);
@@ -66,6 +66,6 @@ export function HealthcheckView({
             className={b('control-wrapper')}
         >
             {sortOrder.map((type) => renderHealthcheckViewOption(type))}
-        </RadioButton>
+        </SegmentedRadioGroup>
     );
 }

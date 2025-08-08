@@ -55,6 +55,12 @@ export const DEFAULT_STORAGE_GROUPS_COLUMNS: StorageGroupsColumnId[] = [
     'VDisks',
 ];
 
+// Columns, that should displayed only for users with isViewerAllowed:true
+const VIEWER_USER_COLUMNS_IDS: StorageGroupsColumnId[] = ['DiskSpace'];
+export function isViewerGroupsColumn(columnId: string): boolean {
+    return VIEWER_USER_COLUMNS_IDS.some((el) => el === columnId);
+}
+
 export const REQUIRED_STORAGE_GROUPS_COLUMNS: StorageGroupsColumnId[] = ['GroupId'];
 
 // This code is running when module is initialized and correct language may not be set yet

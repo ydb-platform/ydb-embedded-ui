@@ -2,6 +2,7 @@ import {StringParam, useQueryParams} from 'use-query-params';
 
 import {useViewerNodesHandlerHasGroupingBySystemState} from '../../store/reducers/capabilities/hooks';
 import type {NodesGroupByField, NodesPeerRole} from '../../types/api/nodes';
+import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import type {NodesUptimeFilterValues} from '../../utils/nodes';
 import {nodesUptimeFilterValuesSchema} from '../../utils/nodes';
 
@@ -16,9 +17,13 @@ export function useNodesPageQueryParams(groupByParams: NodesGroupByField[] | und
         nodesGroupBy: StringParam,
     });
 
+    const isViewerUser = useIsViewerUser();
+
     const uptimeFilter = nodesUptimeFilterValuesSchema.parse(queryParams.uptimeFilter);
     const searchValue = queryParams.search ?? '';
-    const peerRoleFilter = parseNodesPeerRoleFilter(queryParams.peerRole);
+    const peerRoleFilter = isViewerUser
+        ? parseNodesPeerRoleFilter(queryParams.peerRole)
+        : 'database';
 
     const systemStateGroupingAvailable = useViewerNodesHandlerHasGroupingBySystemState();
     const groupByParam = parseNodesGroupByParam(

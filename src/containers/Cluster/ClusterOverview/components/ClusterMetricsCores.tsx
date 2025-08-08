@@ -1,5 +1,5 @@
 import {DoughnutMetrics} from '../../../../components/DoughnutMetrics/DoughnutMetrics';
-import {formatNumber, formatNumericValues} from '../../../../utils/dataFormatters/dataFormatters';
+import {formatCoresLegend} from '../../../../utils/metrics/formatMetricLegend';
 import i18n from '../../i18n';
 import type {ClusterMetricsCommonProps} from '../shared';
 import {getDiagramValues} from '../utils';
@@ -7,16 +7,6 @@ import {getDiagramValues} from '../utils';
 import {ClusterMetricsCardContent} from './ClusterMetricsCard';
 
 interface ClusterMetricsCoresProps extends ClusterMetricsCommonProps {}
-
-function formatCoresLegend({value, capacity}: {value: number; capacity: number}) {
-    let formatted = [];
-    if (capacity < 10_000) {
-        formatted = [formatNumber(Math.round(value)), formatNumber(Math.round(capacity))];
-    } else {
-        formatted = formatNumericValues(value, capacity, undefined, '', true);
-    }
-    return `${formatted[0]} ${i18n('context_of')} ${formatted[1]} ${i18n('context_cores')}`;
-}
 
 export function ClusterMetricsCores({
     collapsed,

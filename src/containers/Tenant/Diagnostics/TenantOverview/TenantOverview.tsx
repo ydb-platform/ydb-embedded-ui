@@ -2,6 +2,7 @@ import {Button, Flex, Icon} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
+import {QueriesActivityBar} from '../../../../components/QueriesActivityBar/QueriesActivityBar';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {tenantApi} from '../../../../store/reducers/tenant/tenant';
@@ -13,11 +14,11 @@ import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks'
 import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
 
-import {DefaultOverviewContent} from './DefaultOverviewContent/DefaultOverviewContent';
 import {HealthcheckPreview} from './Healthcheck/HealthcheckPreview';
-import {MetricsCards} from './MetricsCards/MetricsCards';
+import {MetricsTabs} from './MetricsTabs/MetricsTabs';
 import {TenantCpu} from './TenantCpu/TenantCpu';
 import {TenantMemory} from './TenantMemory/TenantMemory';
+import {TenantNetwork} from './TenantNetwork/TenantNetwork';
 import {TenantStorage} from './TenantStorage/TenantStorage';
 import {b} from './utils';
 
@@ -85,9 +86,9 @@ export function TenantOverview({
 
         poolsStats,
         memoryStats,
-        networkStats,
         blobStorageStats,
         tabletStorageStats,
+        networkStats,
     } = calculateTenantMetrics(tenantData);
 
     const storageMetrics = {
@@ -99,7 +100,7 @@ export function TenantOverview({
 
     const renderName = () => {
         return (
-            <div className={b('tenant-name-wrapper')}>
+            <Flex alignItems="center" style={{overflow: 'hidden'}}>
                 <EntityStatus
                     status={Overall}
                     name={Name || TENANT_DEFAULT_TITLE}
@@ -107,7 +108,7 @@ export function TenantOverview({
                     hasClipboardButton={Boolean(tenant)}
                     clipboardButtonAlwaysVisible
                 />
-            </div>
+            </Flex>
         );
     };
 
@@ -134,8 +135,13 @@ export function TenantOverview({
                     />
                 );
             }
-            default: {
-                return <DefaultOverviewContent database={tenantName} />;
+            case TENANT_METRICS_TABS_IDS.network: {
+                return (
+                    <TenantNetwork
+                        tenantName={tenantName}
+                        additionalNodesProps={additionalNodesProps}
+                    />
+                );
             }
         }
     };
@@ -163,18 +169,24 @@ export function TenantOverview({
                             ))}
                         </Flex>
                     </Flex>
-                    <Flex direction="column" gap={3}>
+                    <Flex direction="column" gap={4}>
                         <HealthcheckPreview tenantName={tenantName} />
-                        <MetricsCards
+                        <QueriesActivityBar tenantName={tenantName} />
+                        <MetricsTabs
                             poolsCpuStats={poolsStats}
                             memoryStats={memoryStats}
                             blobStorageStats={blobStorageStats}
                             tabletStorageStats={tabletStorageStats}
                             networkStats={networkStats}
+                            storageGroupsCount={
+                                tenantData.StorageGroups
+                                    ? Number(tenantData.StorageGroups)
+                                    : undefined
+                            }
                         />
                     </Flex>
                 </div>
-                {renderTabContent()}
+                <div className={b('tab-content')}>{renderTabContent()}</div>
             </div>
         </LoaderWrapper>
     );

@@ -68,14 +68,15 @@ describe('getGroupedTenantNodes', () => {
         expect(result).toBeUndefined();
     });
 
+    // eslint-disable-next-line complexity
     test('should group tenant nodes by version when groupByValue is VERSION', () => {
-        const versionToColor = new Map([
-            ['25-1-1', 'red'],
-            ['25-1-2', 'blue'],
-            ['25-1-3', 'green'],
+        const versionsDataMap = new Map([
+            ['25-1-1', {color: 'red'}],
+            ['25-1-2', {color: 'blue'}],
+            ['25-1-3', {color: 'green'}],
         ]);
 
-        const result = getGroupedTenantNodes(nodes, versionToColor, GroupByValue.VERSION);
+        const result = getGroupedTenantNodes(nodes, versionsDataMap, GroupByValue.VERSION);
 
         expect(result).toHaveLength(3);
 
@@ -104,14 +105,15 @@ describe('getGroupedTenantNodes', () => {
         expect(result?.[2].items?.[0].nodes?.[0].NodeId).toBe(6);
     });
 
+    // eslint-disable-next-line complexity
     test('should group tenant nodes by tenant when groupByValue is TENANT', () => {
-        const versionToColor = new Map([
-            ['25-1-1', 'red'],
-            ['25-1-2', 'blue'],
-            ['25-1-3', 'green'],
+        const versionsDataMap = new Map([
+            ['25-1-1', {color: 'red'}],
+            ['25-1-2', {color: 'blue'}],
+            ['25-1-3', {color: 'green'}],
         ]);
 
-        const result = getGroupedTenantNodes(nodes, versionToColor, GroupByValue.TENANT);
+        const result = getGroupedTenantNodes(nodes, versionsDataMap, GroupByValue.TENANT);
 
         expect(result).toHaveLength(3);
 
@@ -155,13 +157,13 @@ describe('getGroupedStorageNodes', () => {
     });
 
     test('should group storage nodes by version', () => {
-        const versionToColor = new Map([
-            ['25-1-1', 'red'],
-            ['25-1-2', 'blue'],
-            ['25-1-3', 'green'],
+        const versionsDataMap = new Map([
+            ['25-1-1', {color: 'red'}],
+            ['25-1-2', {color: 'blue'}],
+            ['25-1-3', {color: 'green'}],
         ]);
 
-        const result = getGroupedStorageNodes(nodes, versionToColor);
+        const result = getGroupedStorageNodes(nodes, versionsDataMap);
 
         expect(result).toHaveLength(3);
 
@@ -197,13 +199,13 @@ describe('getOtherNodes', () => {
     });
 
     test('should group other nodes by version', () => {
-        const versionToColor = new Map([
-            ['25-1-1', 'red'],
-            ['25-1-2', 'blue'],
-            ['25-1-3', 'green'],
+        const versionsDataMap = new Map([
+            ['25-1-1', {color: 'red'}],
+            ['25-1-2', {color: 'blue'}],
+            ['25-1-3', {color: 'green'}],
         ]);
 
-        const result = getOtherNodes(nodes, versionToColor);
+        const result = getOtherNodes(nodes, versionsDataMap);
 
         expect(result).toHaveLength(1);
 

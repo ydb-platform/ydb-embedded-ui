@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {Link} from '@gravity-ui/icons';
-import type {ButtonProps, CopyToClipboardStatus} from '@gravity-ui/uikit';
+import type {ButtonButtonProps, CopyToClipboardStatus} from '@gravity-ui/uikit';
 import {ActionTooltip, Button, CopyToClipboard, Icon} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
@@ -12,8 +12,7 @@ import './CopyLinkButton.scss';
 
 const b = cn('ydb-copy-link-button');
 
-interface LinkButtonComponentProps extends ButtonProps {
-    size?: ButtonProps['size'];
+interface LinkButtonComponentProps extends ButtonButtonProps {
     hasTooltip?: boolean;
     status: CopyToClipboardStatus;
     closeDelay?: number;
@@ -43,7 +42,7 @@ const LinkButtonComponent = (props: LinkButtonComponentProps) => {
     );
 };
 
-export interface CopyLinkButtonProps extends ButtonProps {
+export interface CopyLinkButtonProps extends ButtonButtonProps {
     text: string;
 }
 

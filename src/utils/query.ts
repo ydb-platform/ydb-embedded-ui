@@ -297,6 +297,8 @@ export const parseQueryErrorToString = (error: unknown) => {
     return parsedError?.error?.message;
 };
 
+export const defaultPragma = 'PRAGMA OrderedColumns;';
+
 export const DEFAULT_QUERY_SETTINGS = {
     queryMode: QUERY_MODES.query,
     transactionMode: TRANSACTION_MODES.implicit,
@@ -304,6 +306,7 @@ export const DEFAULT_QUERY_SETTINGS = {
     limitRows: 10000,
     statisticsMode: STATISTICS_MODES.none,
     tracingLevel: TRACING_LEVELS.off,
+    pragmas: defaultPragma,
 };
 
 export const queryModeSchema = z.nativeEnum(QUERY_MODES);
@@ -327,6 +330,7 @@ export const querySettingsValidationSchema = z.object({
     transactionMode: transactionModeSchema,
     statisticsMode: statisticsModeSchema,
     tracingLevel: tracingLevelSchema,
+    pragmas: z.string(),
 });
 
 export const querySettingsRestoreSchema = z
@@ -343,5 +347,6 @@ export const querySettingsRestoreSchema = z
         transactionMode: transactionModeSchema.catch(DEFAULT_QUERY_SETTINGS.transactionMode),
         statisticsMode: statisticsModeSchema.catch(DEFAULT_QUERY_SETTINGS.statisticsMode),
         tracingLevel: tracingLevelSchema.catch(DEFAULT_QUERY_SETTINGS.tracingLevel),
+        pragmas: z.string().catch(DEFAULT_QUERY_SETTINGS.pragmas),
     })
     .catch(DEFAULT_QUERY_SETTINGS);

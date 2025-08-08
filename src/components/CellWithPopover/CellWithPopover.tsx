@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {Popover} from '@gravity-ui/uikit';
 import type {PopoverProps} from '@gravity-ui/uikit';
 
@@ -7,9 +9,10 @@ import './CellWithPopover.scss';
 
 const b = cn('ydb-cell-with-popover');
 
-interface CellWithPopoverProps extends PopoverProps {
+interface CellWithPopoverProps extends Omit<PopoverProps, 'children'> {
     wrapperClassName?: string;
     fullWidth?: boolean;
+    children: React.ReactNode;
 }
 
 const DELAY_TIMEOUT = 100;
@@ -24,12 +27,12 @@ export function CellWithPopover({
     return (
         <div className={b({'full-width': fullWidth}, wrapperClassName)}>
             <Popover
-                delayClosing={DELAY_TIMEOUT}
-                delayOpening={DELAY_TIMEOUT}
+                openDelay={DELAY_TIMEOUT}
+                closeDelay={DELAY_TIMEOUT}
                 className={b('popover', {'full-width': fullWidth}, className)}
                 {...props}
             >
-                {children}
+                <div className={b('children-wrapper')}>{children}</div>
             </Popover>
         </div>
     );

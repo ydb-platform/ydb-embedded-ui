@@ -27,7 +27,7 @@ export function AutoRefreshControl({className, onManualRefresh}: AutoRefreshCont
                     dispatch(api.util.invalidateTags(['All']));
                     onManualRefresh?.();
                 }}
-                extraProps={{'aria-label': i18n('Refresh')}}
+                aria-label={i18n('Refresh')}
             >
                 <Button.Icon>
                     <ArrowsRotateLeft />

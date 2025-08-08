@@ -11,6 +11,7 @@ const NODE_TABS_IDS = {
     storage: 'storage',
     tablets: 'tablets',
     structure: 'structure',
+    threads: 'threads',
 } as const;
 
 export type NodeTab = ValueOf<typeof NODE_TABS_IDS>;
@@ -32,6 +33,12 @@ export const NODE_TABS = [
         id: NODE_TABS_IDS.tablets,
         get title() {
             return i18n('tabs.tablets');
+        },
+    },
+    {
+        id: NODE_TABS_IDS.threads,
+        get title() {
+            return i18n('tabs.threads');
         },
     },
 ];

@@ -12,7 +12,7 @@
     &__title,
     &__controls,
     &__info,
-    &__storage-title {
+    &__tabs {
         position: sticky;
         left: 0;
 
@@ -29,8 +29,7 @@
         gap: var(--g-spacing-2);
     }
 
-    &__storage-title {
-        margin-bottom: 0;
-        @include mixins.header-1-typography();
+    &__tablets-content {
+        margin-top: var(--g-spacing-4);
     }
 }

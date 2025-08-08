@@ -298,15 +298,15 @@ export class Diagnostics {
         this.autoRefreshSelect = page.locator('.g-select');
         this.table = new Table(page.locator('.object-general'));
         this.tableRadioButton = page.locator(
-            '.ydb-table-with-controls-layout__controls .g-radio-button',
+            '.ydb-table-with-controls-layout__controls .g-segmented-radio-group',
         );
         this.fixedHeightQueryElements = page.locator('.ydb-fixed-height-query');
         this.copyLinkButton = page.locator('.ydb-copy-link-button__icon');
 
         // Info tab cards
-        this.cpuCard = page.locator('.metrics-cards__tab:has-text("CPU")');
-        this.storageCard = page.locator('.metrics-cards__tab:has-text("Storage")');
-        this.memoryCard = page.locator('.metrics-cards__tab:has-text("Memory")');
+        this.cpuCard = page.locator('.tenant-metrics-tabs__link-container:has-text("CPU")');
+        this.storageCard = page.locator('.tenant-metrics-tabs__link-container:has-text("Storage")');
+        this.memoryCard = page.locator('.tenant-metrics-tabs__link-container:has-text("Memory")');
         this.healthcheckCard = page.locator('.ydb-healthcheck-preview');
         this.ownerCard = page.locator('.ydb-access-rights__owner-card');
         this.changeOwnerButton = page.locator('.ydb-access-rights__owner-card button');
@@ -324,13 +324,13 @@ export class Diagnostics {
     }
 
     async clickTab(tabName: DiagnosticsTab): Promise<void> {
-        const tab = this.tabs.locator(`.kv-tenant-diagnostics__tab:has-text("${tabName}")`);
+        const tab = this.tabs.locator(`.g-tab:has-text("${tabName}")`);
         await tab.click();
     }
 
     async clickRadioSwitch(radioName: QueriesSwitch): Promise<void> {
         const option = this.tableControls.locator(
-            `.g-radio-button__option:has-text("${radioName}")`,
+            `.g-segmented-radio-group__option:has-text("${radioName}")`,
         );
 
         await option.evaluate((el) => (el as HTMLElement).click());
@@ -373,30 +373,39 @@ export class Diagnostics {
     }
 
     async getResourceUtilization() {
-        const cpuSystem = await this.cpuCard
-            .locator('.ydb-metrics-card__metric:has-text("System") .progress-viewer__text')
+        // Get aggregated metrics from the new TabCard structure
+        const cpuPercentage = await this.cpuCard
+            .locator('.ydb-doughnut-metrics__value')
             .textContent();
-        const cpuUser = await this.cpuCard
-            .locator('.ydb-metrics-card__metric:has-text("User") .progress-viewer__text')
+        const cpuUsage = await this.cpuCard.locator('.g-text_variant_subheader-2').textContent();
+
+        const storagePercentage = await this.storageCard
+            .locator('.ydb-doughnut-metrics__value')
             .textContent();
-        const cpuIC = await this.cpuCard
-            .locator('.ydb-metrics-card__metric:has-text("IC") .progress-viewer__text')
+        const storageUsage = await this.storageCard
+            .locator('.g-text_variant_subheader-2')
             .textContent();
-        const storage = await this.storageCard
-            .locator('.ydb-metrics-card__metric:has-text("SSD") .progress-viewer__text')
+
+        const memoryPercentage = await this.memoryCard
+            .locator('.ydb-doughnut-metrics__value')
             .textContent();
-        const memory = await this.memoryCard
-            .locator('.ydb-metrics-card__metric:has-text("Process") .progress-viewer__text')
+        const memoryUsage = await this.memoryCard
+            .locator('.g-text_variant_subheader-2')
             .textContent();
 
         return {
             cpu: {
-                system: cpuSystem?.trim() || '',
-                user: cpuUser?.trim() || '',
-                ic: cpuIC?.trim() || '',
+                percentage: cpuPercentage?.trim() || '',
+                usage: cpuUsage?.trim() || '',
             },
-            storage: storage?.trim() || '',
-            memory: memory?.trim() || '',
+            storage: {
+                percentage: storagePercentage?.trim() || '',
+                usage: storageUsage?.trim() || '',
+            },
+            memory: {
+                percentage: memoryPercentage?.trim() || '',
+                usage: memoryUsage?.trim() || '',
+            },
         };
     }
 
@@ -412,12 +421,16 @@ export class Diagnostics {
     }
 
     async selectTopShardsMode(mode: TopShardsMode): Promise<void> {
-        const option = this.tableRadioButton.locator(`.g-radio-button__option:has-text("${mode}")`);
+        const option = this.tableRadioButton.locator(
+            `.g-segmented-radio-group__option:has-text("${mode}")`,
+        );
         await option.evaluate((el) => (el as HTMLElement).click());
     }
 
     async getSelectedTableMode(): Promise<string> {
-        const checkedOption = this.tableRadioButton.locator('.g-radio-button__option_checked');
+        const checkedOption = this.tableRadioButton.locator(
+            '.g-segmented-radio-group__option_checked',
+        );
         return (await checkedOption.textContent())?.trim() || '';
     }
 

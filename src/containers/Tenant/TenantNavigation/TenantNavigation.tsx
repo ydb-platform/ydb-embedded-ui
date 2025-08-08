@@ -1,5 +1,5 @@
-import type {RadioButtonOption} from '@gravity-ui/uikit';
-import {Icon, RadioButton} from '@gravity-ui/uikit';
+import type {SegmentedRadioGroupOptionProps} from '@gravity-ui/uikit';
+import {Icon, SegmentedRadioGroup} from '@gravity-ui/uikit';
 
 import {cn} from '../../../utils/cn';
 
@@ -11,7 +11,7 @@ const b = cn('ydb-tenant-navigation');
 
 type MenuItem = ReturnType<typeof useTenantNavigation>[0];
 
-const transformItemToOption = ({id, title, icon}: MenuItem): RadioButtonOption => {
+const transformItemToOption = ({id, title, icon}: MenuItem): SegmentedRadioGroupOptionProps => {
     const content = (
         <span className={b('item')}>
             <Icon data={icon} size={16} className={b('icon')} />
@@ -35,7 +35,7 @@ export const TenantNavigation = () => {
 
     return (
         <div className={b()}>
-            <RadioButton
+            <SegmentedRadioGroup
                 width="auto"
                 onUpdate={handleUpdate}
                 size="l"

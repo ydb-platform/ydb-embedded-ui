@@ -27,8 +27,18 @@ export class YdbEmbeddedAPI {
     meta?: MetaAPI;
     codeAssist?: CodeAssistAPI;
 
-    constructor({webVersion = false, withCredentials = false} = {}) {
-        const config: AxiosRequestConfig = {withCredentials};
+    constructor({
+        webVersion = false,
+        withCredentials = false,
+        csrfTokenGetter = () => undefined,
+        defaults = {},
+    }: {
+        webVersion?: boolean;
+        withCredentials?: boolean;
+        csrfTokenGetter?: () => string | undefined;
+        defaults?: AxiosRequestConfig;
+    } = {}) {
+        const config: AxiosRequestConfig = {withCredentials, ...defaults};
 
         this.auth = new AuthAPI({config});
         if (webVersion) {
@@ -47,5 +57,22 @@ export class YdbEmbeddedAPI {
         this.tablets = new TabletsAPI({config});
         this.vdisk = new VDiskAPI({config});
         this.viewer = new ViewerAPI({config});
+
+        const token = csrfTokenGetter();
+        if (token) {
+            this.auth.setCSRFToken(token);
+            // Use optional chaining as `meta` may not be initialized.
+            this.meta?.setCSRFToken(token);
+            // Use optional chaining as `codeAssist` may not be initialized.
+            this.codeAssist?.setCSRFToken(token);
+            this.operation.setCSRFToken(token);
+            this.pdisk.setCSRFToken(token);
+            this.scheme.setCSRFToken(token);
+            this.storage.setCSRFToken(token);
+            this.streaming.setCSRFToken(token);
+            this.tablets.setCSRFToken(token);
+            this.vdisk.setCSRFToken(token);
+            this.viewer.setCSRFToken(token);
+        }
     }
 }

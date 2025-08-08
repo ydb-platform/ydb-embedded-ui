@@ -25,16 +25,6 @@
         }
     }
 
-    &__tab {
-        margin-right: 40px;
-
-        text-decoration: none;
-
-        &:first-letter {
-            text-transform: uppercase;
-        }
-    }
-
     &__page-wrapper {
         overflow: auto;
         flex-grow: 1;

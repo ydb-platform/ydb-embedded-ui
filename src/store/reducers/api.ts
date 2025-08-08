@@ -18,6 +18,7 @@ export const api = createApi({
         'Tablet',
         'UserData',
         'VDiskData',
+        'VDiskBlobIndexStat',
         'AccessRights',
         'Backups',
         'BackupsSchedule',

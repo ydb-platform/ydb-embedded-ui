@@ -35,11 +35,17 @@ const config: PlaywrightTestConfig = {
     projects: [
         {
             name: 'chromium',
-            use: {...devices['Desktop Chrome']},
+            use: {
+                ...devices['Desktop Chrome'],
+                contextOptions: {permissions: ['clipboard-read', 'clipboard-write']},
+            },
         },
         {
             name: 'safari',
-            use: {...devices['Desktop Safari']},
+            use: {
+                ...devices['Desktop Safari'],
+                contextOptions: {permissions: ['clipboard-read']},
+            },
         },
     ],
 };

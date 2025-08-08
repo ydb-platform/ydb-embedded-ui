@@ -1,6 +1,6 @@
 import {ShieldKeyhole} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
-import {Icon, Label, Popover, PopoverBehavior} from '@gravity-ui/uikit';
+import {Flex, Icon, Label, Popover} from '@gravity-ui/uikit';
 
 import {CellWithPopover} from '../../../../components/CellWithPopover/CellWithPopover';
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
@@ -9,7 +9,7 @@ import {UsageLabel} from '../../../../components/UsageLabel/UsageLabel';
 import {getStorageGroupPath} from '../../../../routes';
 import {valueIsDefined} from '../../../../utils';
 import {cn} from '../../../../utils/cn';
-import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
+import {EMPTY_DATA_PLACEHOLDER, YDB_POPOVER_CLASS_NAME} from '../../../../utils/constants';
 import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
 import {getUsageSeverity} from '../../../../utils/generateEvaluator';
 import {formatToMs} from '../../../../utils/timeParsers';
@@ -39,7 +39,7 @@ const poolNameColumn: StorageGroupsColumn = {
             <CellWithPopover
                 content={row.PoolName}
                 placement={['right']}
-                behavior={PopoverBehavior.Immediate}
+                openDelay={0}
                 className={b('pool-name-wrapper')}
             >
                 <span className={b('pool-name')}>{row.PoolName}</span>
@@ -58,21 +58,22 @@ const typeColumn: StorageGroupsColumn = {
     resizeMinWidth: 100,
     align: DataTable.LEFT,
     render: ({row}) => (
-        <div>
+        <Flex>
             <Label>{row.MediaType || '—'}</Label>
             {'\u00a0'}
             {row.Encryption && (
                 <Popover
                     content={i18n('encrypted')}
                     placement="right"
-                    behavior={PopoverBehavior.Immediate}
+                    openDelay={0}
+                    className={YDB_POPOVER_CLASS_NAME}
                 >
                     <Label>
                         <Icon data={ShieldKeyhole} size={18} />
                     </Label>
                 </Popover>
             )}
-        </div>
+        </Flex>
     ),
     sortable: false,
 };

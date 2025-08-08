@@ -1,7 +1,6 @@
 import React from 'react';
 
-import type {TabsItemProps} from '@gravity-ui/uikit';
-import {Tabs} from '@gravity-ui/uikit';
+import {Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
 import {useRouteMatch} from 'react-router-dom';
@@ -23,12 +22,14 @@ import {nodeApi} from '../../store/reducers/node/node';
 import type {PreparedNode} from '../../store/reducers/node/types';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
+import {useAppTitle} from '../App/AppTitleContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 import {Tablets} from '../Tablets/Tablets';
 
 import type {NodeTab} from './NodePages';
 import {NODE_TABS, getDefaultNodePath, nodePageQueryParams, nodePageTabSchema} from './NodePages';
 import NodeStructure from './NodeStructure/NodeStructure';
+import {Threads} from './Threads/Threads';
 import i18n from './i18n';
 
 import './Node.scss';
@@ -67,19 +68,25 @@ export function Node() {
 
     const isStorageNode = node?.Roles?.find((el) => el === STORAGE_ROLE);
 
+    const threadsQuantity = node?.Threads?.length;
+
     const {activeTab, nodeTabs} = React.useMemo(() => {
-        let actulaNodeTabs = isStorageNode
+        let actualNodeTabs = isStorageNode
             ? NODE_TABS
             : NODE_TABS.filter((el) => el.id !== 'storage');
         if (isDiskPagesAvailable) {
-            actulaNodeTabs = actulaNodeTabs.filter((el) => el.id !== 'structure');
+            actualNodeTabs = actualNodeTabs.filter((el) => el.id !== 'structure');
+        }
+        // Filter out threads tab if there's no thread data in the API response
+        if (!threadsQuantity) {
+            actualNodeTabs = actualNodeTabs.filter((el) => el.id !== 'threads');
         }
 
         const actualActiveTab =
-            actulaNodeTabs.find(({id}) => id === activeTabId) ?? actulaNodeTabs[0];
+            actualNodeTabs.find(({id}) => id === activeTabId) ?? actualNodeTabs[0];
 
-        return {activeTab: actualActiveTab, nodeTabs: actulaNodeTabs};
-    }, [isStorageNode, isDiskPagesAvailable, activeTabId]);
+        return {activeTab: actualActiveTab, nodeTabs: actualNodeTabs};
+    }, [isStorageNode, isDiskPagesAvailable, activeTabId, threadsQuantity]);
 
     const tenantName = node?.Tenants?.[0] || tenantNameFromQuery?.toString();
 
@@ -122,12 +129,10 @@ interface NodePageHelmetProps {
 }
 
 function NodePageHelmet({node, activeTabTitle}: NodePageHelmetProps) {
+    const {appTitle} = useAppTitle();
     const host = node?.Host ? node.Host : i18n('node');
     return (
-        <Helmet
-            titleTemplate={`%s — ${host} — YDB Monitoring`}
-            defaultTitle={`${host} — YDB Monitoring`}
-        >
+        <Helmet titleTemplate={`%s — ${host} — ${appTitle}`} defaultTitle={`${host} — ${appTitle}`}>
             <title>{activeTabTitle}</title>
         </Helmet>
     );
@@ -184,7 +189,7 @@ interface NodePageContentProps {
     tenantName?: string;
 
     activeTabId: NodeTab;
-    tabs: TabsItemProps[];
+    tabs: {id: string; title: string}[];
 
     parentContainer: React.RefObject<HTMLDivElement>;
 }
@@ -199,23 +204,24 @@ function NodePageContent({
     const renderTabs = () => {
         return (
             <div className={b('tabs')}>
-                <Tabs
-                    size="l"
-                    items={tabs}
-                    activeTab={activeTabId}
-                    wrapTo={({id}, tabNode) => {
-                        const path = getDefaultNodePath(
-                            nodeId,
-                            {database: tenantName},
-                            id as NodeTab,
-                        );
-                        return (
-                            <InternalLink to={path} key={id}>
-                                {tabNode}
-                            </InternalLink>
-                        );
-                    }}
-                />
+                <TabProvider value={activeTabId}>
+                    <TabList className={b('tab-list')} size="l">
+                        {tabs.map(({id, title}) => {
+                            const path = getDefaultNodePath(
+                                nodeId,
+                                {database: tenantName},
+                                id as NodeTab,
+                            );
+                            return (
+                                <Tab value={id} key={id}>
+                                    <InternalLink to={path} as="tab">
+                                        {title}
+                                    </InternalLink>
+                                </Tab>
+                            );
+                        })}
+                    </TabList>
+                </TabProvider>
             </div>
         );
     };
@@ -246,6 +252,10 @@ function NodePageContent({
 
             case 'structure': {
                 return <NodeStructure nodeId={nodeId} />;
+            }
+
+            case 'threads': {
+                return <Threads nodeId={nodeId} />;
             }
 
             default:

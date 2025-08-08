@@ -58,11 +58,11 @@ export function configureStore({
     aRootReducer = rootReducer,
     singleClusterMode = isSingleClusterMode,
     api = new YdbEmbeddedAPI({webVersion, withCredentials: !customBackend}),
+    getBackend = (params: ReturnType<typeof getUrlData>) => params.backend,
 } = {}) {
-    ({backend, basename, clusterName} = getUrlData({
-        singleClusterMode,
-        customBackend,
-    }));
+    const params = getUrlData({singleClusterMode, customBackend});
+    ({basename, clusterName} = params);
+    backend = getBackend(params);
     const history = createBrowserHistory({basename});
 
     const store = _configureStore(aRootReducer, history, {singleClusterMode}, [

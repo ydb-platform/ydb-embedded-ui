@@ -17,14 +17,14 @@ export class TableControls {
         this.page = page;
         this.tableSelector = tableSelector;
         this.searchInput = this.tableSelector.locator('.ydb-search input');
-        this.radioButtons = this.tableSelector.locator('.g-radio-button');
+        this.radioButtons = this.tableSelector.locator('.g-segmented-radio-group');
         this.countLabel = this.tableSelector.locator('.ydb-entities-count .g-label__content');
         this.refreshButton = page.locator('.auto-refresh-control button[aria-label="Refresh"]');
         this.refreshIntervalSelect = page.getByTestId('ydb-autorefresh-select');
         this.columnSetupButton = this.tableSelector.locator(
             '.g-tree-select.g-table-column-setup button',
         );
-        this.columnSetupPopup = page.locator('.g-popup .g-select-popup.g-tree-select__popup');
+        this.columnSetupPopup = page.locator('.g-popup.g-tree-select__popup');
     }
 
     async search(searchTerm: string) {
@@ -33,7 +33,9 @@ export class TableControls {
 
     async selectRadioOption(groupIndex: number, optionText: string) {
         const radioGroup = this.radioButtons.nth(groupIndex);
-        const option = radioGroup.locator(`.g-radio-button__option:has-text("${optionText}")`);
+        const option = radioGroup.locator(
+            `.g-segmented-radio-group__option:has-text("${optionText}")`,
+        );
         await option.evaluate((el) => (el as HTMLElement).click());
     }
 

@@ -1,3 +1,5 @@
+import {isNil} from 'lodash';
+
 import {valueIsDefined} from '..';
 import type {TPDiskStateInfo} from '../../types/api/pdisk';
 import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
@@ -63,7 +65,26 @@ export function prepareWhiteboardVDiskData(
     const StringifiedId = stringifyVdiskId(VDiskId);
 
     const preparedDonors = Donors?.map((donor) => {
-        return prepareWhiteboardVDiskData({...donor, DonorMode: true});
+        // Handle both TVDiskStateInfo and TVSlotId donor types
+        if (isFullVDiskData(donor)) {
+            // Full VDisk data
+            return prepareWhiteboardVDiskData({...donor, DonorMode: true});
+        } else {
+            // TVSlotId data - create a minimal PreparedVDisk
+            const {NodeId: dNodeId, PDiskId: dPDiskId, VSlotId: vSlotId} = donor;
+            const stringifiedId =
+                !isNil(dNodeId) && !isNil(dPDiskId) && !isNil(vSlotId)
+                    ? `${dNodeId}-${dPDiskId}-${vSlotId}`
+                    : '';
+
+            return {
+                NodeId: dNodeId,
+                PDiskId: dPDiskId,
+                VDiskSlotId: vSlotId,
+                StringifiedId: stringifiedId,
+                DonorMode: true,
+            };
+        }
     });
 
     return {

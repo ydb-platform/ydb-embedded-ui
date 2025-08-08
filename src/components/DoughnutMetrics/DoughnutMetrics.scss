@@ -1,64 +1,72 @@
 .ydb-doughnut-metrics {
-    --doughnut-border: 16px;
-    --doughnut-color: var(--ydb-color-status-green);
-    --doughnut-backdrop-color: var(--g-color-base-positive-light);
+    --doughnut-color: var(--g-color-base-positive-heavy);
+    --doughnut-backdrop-color: var(--g-color-base-generic);
     --doughnut-overlap-color: var(--g-color-base-positive-heavy-hover);
+    --doughnut-text-color: var(--g-color-text-positive-heavy);
+
+    position: relative;
+
     &__doughnut {
         position: relative;
 
-        width: 100px;
-        aspect-ratio: 1;
+        display: block;
 
-        border-radius: 50%;
+        // Enable smooth rendering for SVG
+        shape-rendering: geometricPrecision;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
 
-        transform: rotate(180deg);
-        &::before {
-            display: block;
+        // Ensure SVG renders smoothly
+        image-rendering: smooth;
+        will-change: transform;
 
-            height: calc(100% - calc(var(--doughnut-border) * 2));
-
-            content: '';
-
-            border-radius: 50%;
-            background-color: var(--g-color-base-background);
-
-            transform: translate(var(--doughnut-border), var(--doughnut-border));
-            aspect-ratio: 1;
-        }
+        // Preserve rotation origin
+        transform-origin: center;
     }
-    &__doughnut_status_warning {
-        --doughnut-color: var(--ydb-color-status-yellow);
-        --doughnut-backdrop-color: var(--g-color-base-warning-light);
+
+    // Progress circle animation
+    &__progress-circle,
+    &__overlap-circle {
+        transition: stroke-dasharray 0.3s ease;
+        transform-origin: center;
+    }
+
+    // Status modifiers
+    &_status_warning {
+        --doughnut-color: var(--g-color-base-warning-heavy);
         --doughnut-overlap-color: var(--g-color-base-warning-heavy-hover);
+        --doughnut-text-color: var(--g-color-text-warning);
     }
-    &__doughnut_status_danger {
-        --doughnut-color: var(--ydb-color-status-red);
-        --doughnut-backdrop-color: var(--g-color-base-danger-light);
-        --doughnut-overlap-color: var(--g-color-base-danger-heavy-hover);
-    }
-    &__text-wrapper {
-        --wrapper-indent: calc(var(--doughnut-border) + 5px);
 
+    &_status_danger {
+        --doughnut-color: var(--g-color-base-danger-heavy);
+        --doughnut-overlap-color: var(--g-color-base-danger-heavy-hover);
+        --doughnut-text-color: var(--g-color-base-danger-heavy);
+    }
+
+    &__text-wrapper {
         position: absolute;
-        top: var(--wrapper-indent);
-        right: var(--wrapper-indent);
+        z-index: 1;
+        top: 50%;
+        left: 50%;
 
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
 
-        width: calc(100% - calc(var(--wrapper-indent) * 2));
+        width: 100%;
+        height: 100%;
 
         text-align: center;
 
-        transform: rotate(180deg);
-        aspect-ratio: 1;
+        transform: translate(-50%, -50%);
     }
+
     &__value {
-        position: absolute;
-        bottom: 20px;
+        color: var(--doughnut-text-color);
     }
+
     &__legend-note {
         display: flex;
     }

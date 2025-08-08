@@ -1,21 +1,21 @@
 import React from 'react';
 
-import {Checkbox, RadioButton} from '@gravity-ui/uikit';
+import {Checkbox, SegmentedRadioGroup} from '@gravity-ui/uikit';
 
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {nodesApi} from '../../store/reducers/nodes/nodes';
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import type {TClusterInfo} from '../../types/api/cluster';
-import type {VersionToColorMap, VersionValue} from '../../types/versions';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval} from '../../utils/hooks';
+import type {VersionValue, VersionsDataMap} from '../../utils/versions/types';
 import {VersionsBar} from '../Cluster/VersionsBar/VersionsBar';
 
 import {GroupedNodesTree} from './GroupedNodesTree/GroupedNodesTree';
 import {getGroupedStorageNodes, getGroupedTenantNodes, getOtherNodes} from './groupNodes';
 import i18n from './i18n';
 import {GroupByValue} from './types';
-import {useGetVersionValues, useVersionToColorMap} from './utils';
+import {useGetVersionValues, useVersionsDataMap} from './utils';
 
 import './Versions.scss';
 
@@ -32,16 +32,16 @@ export function VersionsContainer({cluster, loading}: VersionsContainerProps) {
         {tablets: false, fieldsRequired: ['SystemState', 'SubDomainKey']},
         {pollingInterval: autoRefreshInterval},
     );
-    const versionToColor = useVersionToColorMap(cluster);
+    const versionsDataMap = useVersionsDataMap(cluster);
 
-    const versionsValues = useGetVersionValues({cluster, versionToColor, clusterLoading: loading});
+    const versionsValues = useGetVersionValues({cluster, versionsDataMap, clusterLoading: loading});
 
     return (
         <LoaderWrapper loading={loading || isNodesLoading}>
             <Versions
                 versionsValues={versionsValues}
                 nodes={currentData?.Nodes}
-                versionToColor={versionToColor}
+                versionsDataMap={versionsDataMap}
             />
         </LoaderWrapper>
     );
@@ -50,10 +50,10 @@ export function VersionsContainer({cluster, loading}: VersionsContainerProps) {
 interface VersionsProps {
     nodes?: NodesPreparedEntity[];
     versionsValues: VersionValue[];
-    versionToColor?: VersionToColorMap;
+    versionsDataMap?: VersionsDataMap;
 }
 
-function Versions({versionsValues, nodes, versionToColor}: VersionsProps) {
+function Versions({versionsValues, nodes, versionsDataMap}: VersionsProps) {
     const [groupByValue, setGroupByValue] = React.useState<GroupByValue>(GroupByValue.VERSION);
     const [expanded, setExpanded] = React.useState(false);
 
@@ -65,14 +65,14 @@ function Versions({versionsValues, nodes, versionToColor}: VersionsProps) {
         return (
             <div className={b('group')}>
                 <span className={b('label')}>Group by:</span>
-                <RadioButton value={groupByValue} onUpdate={handleGroupByValueChange}>
-                    <RadioButton.Option value={GroupByValue.TENANT}>
+                <SegmentedRadioGroup value={groupByValue} onUpdate={handleGroupByValueChange}>
+                    <SegmentedRadioGroup.Option value={GroupByValue.TENANT}>
                         {GroupByValue.TENANT}
-                    </RadioButton.Option>
-                    <RadioButton.Option value={GroupByValue.VERSION}>
+                    </SegmentedRadioGroup.Option>
+                    <SegmentedRadioGroup.Option value={GroupByValue.VERSION}>
                         {GroupByValue.VERSION}
-                    </RadioButton.Option>
-                </RadioButton>
+                    </SegmentedRadioGroup.Option>
+                </SegmentedRadioGroup>
             </div>
         );
     };
@@ -91,9 +91,9 @@ function Versions({versionsValues, nodes, versionToColor}: VersionsProps) {
         );
     };
 
-    const tenantNodes = getGroupedTenantNodes(nodes, versionToColor, groupByValue);
-    const storageNodes = getGroupedStorageNodes(nodes, versionToColor);
-    const otherNodes = getOtherNodes(nodes, versionToColor);
+    const tenantNodes = getGroupedTenantNodes(nodes, versionsDataMap, groupByValue);
+    const storageNodes = getGroupedStorageNodes(nodes, versionsDataMap);
+    const otherNodes = getOtherNodes(nodes, versionsDataMap);
     const storageNodesContent = storageNodes?.length ? (
         <React.Fragment>
             <h4>{i18n('title_storage')}</h4>

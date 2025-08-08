@@ -4,8 +4,11 @@ import type {PayloadAction} from '@reduxjs/toolkit';
 import {DEFAULT_USER_SETTINGS, settingsManager} from '../../../services/settings';
 import type {TTenantInfo} from '../../../types/api/tenant';
 import {TENANT_INITIAL_PAGE_KEY} from '../../../utils/constants';
+import {useClusterNameFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {api} from '../api';
+import {prepareTenants} from '../tenants/utils';
 
+import {TENANT_DIAGNOSTICS_TABS_IDS, TENANT_METRICS_TABS_IDS} from './constants';
 import {tenantPageSchema} from './types';
 import type {
     TenantDiagnosticsTab,
@@ -20,8 +23,10 @@ const tenantPage = tenantPageSchema
     .catch(DEFAULT_USER_SETTINGS[TENANT_INITIAL_PAGE_KEY])
     .parse(settingsManager.readUserSettingsValue(TENANT_INITIAL_PAGE_KEY));
 
-const initialState: TenantState = {
+export const initialState: TenantState = {
     tenantPage,
+    metricsTab: TENANT_METRICS_TABS_IDS.cpu,
+    diagnosticsTab: TENANT_DIAGNOSTICS_TABS_IDS.overview,
 };
 
 const slice = createSlice({
@@ -41,7 +46,10 @@ const slice = createSlice({
             state.summaryTab = action.payload;
         },
         setMetricsTab: (state, action: PayloadAction<TenantMetricsTab>) => {
-            state.metricsTab = action.payload;
+            // Ensure we always have a valid metrics tab - fallback to CPU if empty/invalid
+            const validTabs = Object.values(TENANT_METRICS_TABS_IDS) as TenantMetricsTab[];
+            const isValidTab = action.payload && validTabs.includes(action.payload);
+            state.metricsTab = isValidTab ? action.payload : TENANT_METRICS_TABS_IDS.cpu;
         },
     },
 });
@@ -67,7 +75,7 @@ export const tenantApi = api.injectEndpoints({
                     } else {
                         tenantData = await window.api.viewer.getTenantInfo({path}, {signal});
                     }
-                    const databases = tenantData.TenantInfo || [];
+                    const databases = prepareTenants(tenantData.TenantInfo || []);
                     // previous meta versions do not support filtering databases by name
                     const data =
                         databases.find((tenant) => tenant.Name === path) ?? databases[0] ?? null;
@@ -94,3 +102,18 @@ export const tenantApi = api.injectEndpoints({
     }),
     overrideExisting: 'throw',
 });
+
+export function useTenantBaseInfo(path: string) {
+    const clusterNameFromQuery = useClusterNameFromQuery();
+
+    const {currentData} = tenantApi.useGetTenantInfoQuery({
+        path,
+        clusterName: clusterNameFromQuery,
+    });
+
+    const {ControlPlane} = currentData || {};
+
+    return {
+        controlPlane: ControlPlane,
+    };
+}

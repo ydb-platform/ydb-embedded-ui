@@ -34,6 +34,7 @@ import type {
 import type {TTenantInfo, TTenants} from '../../types/api/tenant';
 import type {DescribeTopicResult, TopicDataRequest, TopicDataResponse} from '../../types/api/topic';
 import type {TEvVDiskStateResponse} from '../../types/api/vdisk';
+import type {VDiskBlobIndexResponse} from '../../types/api/vdiskBlobIndex';
 import type {TUserToken} from '../../types/api/whoami';
 import type {TabletsApiRequestParams} from '../../types/store/tablets';
 import {BINARY_DATA_IN_PLAIN_TEXT_DISPLAY} from '../../utils/constants';
@@ -65,6 +66,7 @@ export class ViewerAPI extends BaseYdbAPI {
             this.getPath('/viewer/json/sysinfo?enums=true'),
             {
                 node_id: id,
+                fields_required: -1,
             },
             {concurrentId, requestConfig: {signal}, timeout},
         );
@@ -531,6 +533,29 @@ export class ViewerAPI extends BaseYdbAPI {
             {
                 node_id: nodeId,
                 filter: `(PDiskId=${pDiskId};VDiskSlotId=${vDiskSlotId})`,
+            },
+            {concurrentId, requestConfig: {signal}},
+        );
+    }
+
+    getVDiskBlobIndexStat(
+        {
+            vDiskSlotId,
+            pDiskId,
+            nodeId,
+        }: {
+            vDiskSlotId: string | number;
+            pDiskId: string | number;
+            nodeId: string | number;
+        },
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
+        return this.get<VDiskBlobIndexResponse>(
+            this.getPath('/vdisk/blobindexstat'),
+            {
+                node_id: nodeId,
+                pdisk_id: pDiskId,
+                vslot_id: vDiskSlotId,
             },
             {concurrentId, requestConfig: {signal}},
         );

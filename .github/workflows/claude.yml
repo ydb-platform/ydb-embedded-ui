@@ -1,0 +1,92 @@
+name: Claude Code
+
+on:
+  workflow_dispatch:
+  issue_comment:
+    types: [created]
+
+jobs:
+  claude:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issue_comment' &&
+       github.event.issue.pull_request &&
+       contains(github.event.comment.body, '@claude'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+      id-token: write
+      actions: read # Required for Claude to read CI results on PRs
+    steps:
+      - name: Get PR details
+        id: pr-details
+        if: github.event_name == 'issue_comment'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER="${{ github.event.issue.number }}"
+          PR_DATA=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${PR_NUMBER}")
+          PR_HEAD_SHA=$(echo "$PR_DATA" | jq -r '.head.sha')
+          echo "pr_head_sha=$PR_HEAD_SHA" >> $GITHUB_OUTPUT
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # For workflow_dispatch, checkout default branch
+          # For issue_comment on PR, checkout the PR head commit
+          ref: ${{ github.event_name == 'issue_comment' && steps.pr-details.outputs.pr_head_sha || github.ref }}
+          fetch-depth: 0
+
+      - name: Run Claude Code
+        id: claude
+        uses: anthropics/claude-code-action@beta
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
+          # This is an optional setting that allows Claude to read CI results on PRs
+          additional_permissions: |
+            actions: read
+
+          # Optional: Specify model (defaults to Claude Sonnet 4, uncomment for Claude Opus 4)
+          model: 'claude-opus-4-20250514'
+
+          # Optional: Customize the trigger phrase (default: @claude)
+          # trigger_phrase: "/claude"
+
+          # Optional: Trigger when specific user is assigned to an issue
+          assignee_trigger: 'claude-bot'
+
+          # Optional: Allow Claude to run specific commands
+          allowed_tools: |
+            Bash(npm ci)
+            Bash(npm run dev)
+            Bash(npm run build:*)
+            Bash(npm run lint)
+            Bash(npm run typecheck)
+            Bash(npm run unused)
+            Bash(npm test)
+            Bash(npm run test:*)
+            Bash(docker run*)
+            Bash(git log*)
+            Bash(git diff*)
+            Bash(git status)
+
+          # Optional: Add custom instructions for Claude to customize its behavior for your project
+          custom_instructions: |
+            Follow the CLAUDE.md guidelines in the repository
+            Use Gravity UI components for any UI changes
+            Always use i18n for user-facing strings following i18n-naming-ruleset.md
+            Run npm run lint and npm run typecheck before committing
+            Use RTK Query for API calls, never call APIs directly
+            Follow BEM naming convention with cn() utility
+            Use PaginatedTable for large datasets
+            TypeScript types should be prefixed with 'T' (e.g., TTenantInfo)
+
+          # Optional: Custom environment variables for Claude
+          claude_env: |
+            NODE_VERSION: 18
+            REACT_APP_BACKEND: http://localhost:8765

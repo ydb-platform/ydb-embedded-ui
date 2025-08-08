@@ -1,6 +1,20 @@
 import {DEFAULT_DANGER_THRESHOLD, DEFAULT_WARNING_THRESHOLD} from './constants';
+import {formatNumber, roundToPrecision} from './dataFormatters/dataFormatters';
 
 export type ProgressStatus = 'good' | 'warning' | 'danger';
+
+export type FormatProgressViewerValues = (
+    value?: number,
+    capacity?: number,
+) => (string | number | undefined)[];
+
+const formatValue = (value?: number) => {
+    return formatNumber(roundToPrecision(value || 0, 2));
+};
+
+export const defaultFormatProgressValues: FormatProgressViewerValues = (value, total) => {
+    return [formatValue(value), formatValue(total)];
+};
 
 interface CalculateProgressStatusProps {
     inverseColorize?: boolean;

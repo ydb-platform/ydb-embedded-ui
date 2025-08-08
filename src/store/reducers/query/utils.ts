@@ -50,3 +50,15 @@ export function isQueryResponseChunk(content: StreamingChunk): content is QueryR
 export function isKeepAliveChunk(content: StreamingChunk): content is SessionChunk {
     return content?.meta?.event === 'KeepAlive';
 }
+
+export const prepareQueryWithPragmas = (query: string, pragmas?: string): string => {
+    if (!pragmas || !pragmas.trim()) {
+        return query;
+    }
+
+    // Add pragmas at the beginning with proper line separation
+    const trimmedPragmas = pragmas.trim();
+    const separator = trimmedPragmas.endsWith(';') ? '\n\n' : ';\n\n';
+
+    return `${trimmedPragmas}${separator}${query}`;
+};

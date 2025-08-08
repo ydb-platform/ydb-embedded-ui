@@ -1,13 +1,21 @@
 import React from 'react';
 
-import {HelpPopover} from '@gravity-ui/components';
-import {ClipboardButton, DefinitionList, Flex, Tabs} from '@gravity-ui/uikit';
+import {
+    ClipboardButton,
+    DefinitionList,
+    Flex,
+    HelpMark,
+    Tab,
+    TabList,
+    TabProvider,
+} from '@gravity-ui/uikit';
 import qs from 'qs';
-import {Link, useLocation} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 import {StringParam, useQueryParam} from 'use-query-params';
 
 import {AsyncReplicationState} from '../../../components/AsyncReplicationState';
 import {toFormattedSize} from '../../../components/FormattedBytes/utils';
+import {InternalLink} from '../../../components/InternalLink';
 import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
 import SplitPane from '../../../components/SplitPane';
 import {createExternalUILink} from '../../../routes';
@@ -25,7 +33,6 @@ import {
     formatSecondsToHours,
 } from '../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
-import {Acl} from '../Acl/Acl';
 import {EntityTitle} from '../EntityTitle/EntityTitle';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
 import {useCurrentSchema} from '../TenantContext';
@@ -113,23 +120,23 @@ export function ObjectSummary({
                     justifyContent="space-between"
                     alignItems="center"
                 >
-                    <Tabs
-                        size="l"
-                        items={tabsItems}
-                        activeTab={summaryTab}
-                        wrapTo={({id}, node) => {
-                            const tabPath = getTenantPath({
-                                ...queryParams,
-                                [TenantTabsGroups.summaryTab]: id,
-                            });
-                            return (
-                                <Link to={tabPath} key={id} className={b('tab')}>
-                                    {node}
-                                </Link>
-                            );
-                        }}
-                        allowNotSelected
-                    />
+                    <TabProvider value={summaryTab}>
+                        <TabList size="l">
+                            {tabsItems.map(({id, title}) => {
+                                const tabPath = getTenantPath({
+                                    ...queryParams,
+                                    [TenantTabsGroups.summaryTab]: id,
+                                });
+                                return (
+                                    <Tab key={id} value={id}>
+                                        <InternalLink to={tabPath} as="tab">
+                                            {title}
+                                        </InternalLink>
+                                    </Tab>
+                                );
+                            })}
+                        </TabList>
+                    </TabProvider>
                     {summaryTab === TENANT_SUMMARY_TABS_IDS.schema && <SchemaActions />}
                 </Flex>
             </div>
@@ -358,9 +365,6 @@ export function ObjectSummary({
 
     const renderTabContent = () => {
         switch (summaryTab) {
-            case TENANT_SUMMARY_TABS_IDS.acl: {
-                return <Acl />;
-            }
             case TENANT_SUMMARY_TABS_IDS.schema: {
                 return <SchemaViewer type={type} path={path} tenantName={tenantName} />;
             }
@@ -424,7 +428,7 @@ export function ObjectSummary({
         }
         return (
             <div className={b('entity-type', {error: true})}>
-                <HelpPopover content={message} offset={{left: 0}} />
+                <HelpMark content={message} />
             </div>
         );
     };

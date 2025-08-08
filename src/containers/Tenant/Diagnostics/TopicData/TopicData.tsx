@@ -7,6 +7,7 @@ import {isNil} from 'lodash';
 import {DrawerWrapper} from '../../../../components/Drawer';
 import {EmptyFilter} from '../../../../components/EmptyFilter/EmptyFilter';
 import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
+import {PageError} from '../../../../components/Errors/PageError/PageError';
 import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
 import {
     DEFAULT_TABLE_ROW_HEIGHT,
@@ -198,6 +199,14 @@ export function TopicData({scrollContainerRef, path, database}: TopicDataProps) 
         }
     }, [handleSelectedOffsetChange, handleStartTimestampChange, topicDataFilter]);
 
+    const handlePartitionChange = React.useCallback(
+        (value: string[]) => {
+            handleSelectedPartitionChange(value[0]);
+            resetFilters();
+        },
+        [handleSelectedPartitionChange, resetFilters],
+    );
+
     const scrollToOffset = React.useCallback(
         (newOffset: number) => {
             const scrollTop = (newOffset - (baseOffset ?? 0)) * DEFAULT_TABLE_ROW_HEIGHT;
@@ -240,6 +249,7 @@ export function TopicData({scrollContainerRef, path, database}: TopicDataProps) 
                 key={controlsKey}
                 columnsToSelect={columnsToSelect}
                 handleSelectedColumnsUpdate={setColumns}
+                handlePartitionChange={handlePartitionChange}
                 partitions={partitions}
                 partitionsLoading={partitionsLoading}
                 partitionsError={partitionsError}
@@ -260,6 +270,7 @@ export function TopicData({scrollContainerRef, path, database}: TopicDataProps) 
         setColumns,
         startOffset,
         truncated,
+        handlePartitionChange,
     ]);
 
     const renderEmptyDataMessage = () => {
@@ -292,6 +303,10 @@ export function TopicData({scrollContainerRef, path, database}: TopicDataProps) 
             </Fullscreen>
         );
     }, [database, path]);
+
+    if (error) {
+        return <PageError error={error} position="left" />;
+    }
 
     return (
         !isNil(baseOffset) &&

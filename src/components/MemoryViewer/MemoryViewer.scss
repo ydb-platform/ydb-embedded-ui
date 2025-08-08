@@ -1,10 +1,10 @@
 $memory-type-colors: (
-    'AllocatorCachesMemory': var(--g-color-base-utility-medium-hover),
-    'SharedCacheConsumption': var(--g-color-base-info-medium-hover),
-    'MemTableConsumption': var(--g-color-base-warning-medium-hover),
-    'QueryExecutionConsumption': var(--g-color-base-positive-medium-hover),
-    'CompactionConsumption': var(--g-color-base-danger-medium-hover),
-    'Other': var(--g-color-base-generic-medium-hover),
+    'AllocatorCachesMemory': var(--g-color-base-danger-medium),
+    'SharedCacheConsumption': var(--g-color-base-info-medium),
+    'MemTableConsumption': var(--g-color-base-warning-medium),
+    'CompactionConsumption': var(--g-color-base-danger-medium),
+    'QueryExecutionConsumption': var(--g-color-base-positive-medium),
+    'Other': var(--g-color-base-neutral-medium),
 );
 
 @mixin memory-type-color($type) {
@@ -32,8 +32,6 @@ $memory-type-colors: (
     }
 
     &__container {
-        display: flex;
-
         padding: 2px 0;
     }
 
@@ -93,11 +91,5 @@ $memory-type-colors: (
                 background-color: var(--g-color-base-danger-light);
             }
         }
-    }
-
-    &__text {
-        display: flex;
-        justify-content: center;
-        align-items: center;
     }
 }

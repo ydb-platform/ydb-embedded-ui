@@ -1,4 +1,4 @@
-import {RadioButton, Switch} from '@gravity-ui/uikit';
+import {SegmentedRadioGroup, Switch} from '@gravity-ui/uikit';
 
 import {useSetting} from '../../utils/hooks';
 
@@ -46,15 +46,15 @@ export const Setting = ({
             }
 
             return (
-                <RadioButton value={String(settingValue)} onUpdate={onUpdate}>
+                <SegmentedRadioGroup value={String(settingValue)} onUpdate={onUpdate}>
                     {options.map(({value, content}) => {
                         return (
-                            <RadioButton.Option value={value} key={value}>
+                            <SegmentedRadioGroup.Option value={value} key={value}>
                                 {content}
-                            </RadioButton.Option>
+                            </SegmentedRadioGroup.Option>
                         );
                     })}
-                </RadioButton>
+                </SegmentedRadioGroup>
             );
         }
 

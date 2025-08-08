@@ -1,18 +1,19 @@
-import React from 'react';
+import {Flex} from '@gravity-ui/uikit';
 
 import {InfoViewer} from '../../../../../components/InfoViewer/InfoViewer';
 import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
-import {ProgressViewer} from '../../../../../components/ProgressViewer/ProgressViewer';
+import {ProgressWrapper} from '../../../../../components/ProgressWrapper';
+import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
+import {useSearchQuery} from '../../../../../utils/hooks';
+import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
+import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
 import i18n from '../i18n';
-import {b} from '../utils';
 
 import {TopGroups} from './TopGroups';
 import {TopTables} from './TopTables';
 import {storageDashboardConfig} from './storageDashboardConfig';
-
-import '../TenantOverview.scss';
 
 export interface TenantStorageMetrics {
     blobStorageUsed?: number;
@@ -28,6 +29,7 @@ interface TenantStorageProps {
 
 export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
     const {blobStorageUsed, tabletStorageUsed, blobStorageLimit, tabletStorageLimit} = metrics;
+    const query = useSearchQuery();
 
     const info = [
         {
@@ -38,11 +40,11 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
                 />
             ),
             value: (
-                <ProgressViewer
+                <ProgressWrapper
                     value={tabletStorageUsed}
                     capacity={tabletStorageLimit}
                     formatValues={formatStorageValues}
-                    colorizeProgress={true}
+                    withCapacityUsage
                 />
             ),
         },
@@ -54,22 +56,32 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
                 />
             ),
             value: (
-                <ProgressViewer
+                <ProgressWrapper
                     value={blobStorageUsed}
                     capacity={blobStorageLimit}
                     formatValues={formatStorageValues}
-                    colorizeProgress={true}
+                    withCapacityUsage
                 />
             ),
         },
     ];
 
     return (
-        <React.Fragment>
+        <Flex direction="column" gap={4}>
             <TenantDashboard database={tenantName} charts={storageDashboardConfig} />
-            <InfoViewer className={b('storage-info')} title="Storage details" info={info} />
-            <TopTables database={tenantName} />
-            <TopGroups tenant={tenantName} />
-        </React.Fragment>
+            <InfoViewer variant="small" title={i18n('title_storage-details')} info={info} />
+            <StatsWrapper title={i18n('title_top-tables-by-size')}>
+                <TopTables database={tenantName} />
+            </StatsWrapper>
+            <StatsWrapper
+                title={i18n('title_top-groups-by-usage')}
+                allEntitiesLink={getTenantPath({
+                    ...query,
+                    [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.storage,
+                })}
+            >
+                <TopGroups tenant={tenantName} />
+            </StatsWrapper>
+        </Flex>
     );
 }

@@ -8,5 +8,6 @@
   "text_usage": "Usage",
   "text_soft-limit": "Soft Limit",
   "text_hard-limit": "Hard Limit",
-  "text_other": "Other"
+  "text_other": "Other",
+  "text_memory-details": "Memory Details"
 }

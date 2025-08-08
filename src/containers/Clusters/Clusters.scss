@@ -26,11 +26,7 @@
     &__cluster-versions {
         text-decoration: none;
     }
-    &__cluster-version {
-        overflow: hidden;
 
-        text-overflow: ellipsis;
-    }
     &__cluster-dc {
         white-space: normal;
     }
@@ -82,10 +78,6 @@
         margin: 0 var(--g-spacing-1);
 
         color: var(--g-color-text-secondary);
-    }
-
-    &__remove-cluster {
-        color: var(--ydb-color-status-red);
     }
 
     &__progress {

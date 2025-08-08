@@ -105,14 +105,16 @@ export const QueryResultTable = (props: QueryResultTableProps) => {
     }
 
     return (
-        <ResizeableDataTable
-            data={data}
-            columns={preparedColumns}
-            settings={settings}
-            // prevent accessing row.id in case it is present but is not the PK (i.e. may repeat)
-            rowKey={getRowIndex}
-            visibleRowIndex={getVisibleRowIndex}
-            wrapperClassName={b('table-wrapper')}
-        />
+        <div style={{display: 'flex', flexGrow: 1}}>
+            <ResizeableDataTable
+                data={data}
+                columns={preparedColumns}
+                settings={settings}
+                // prevent accessing row.id in case it is present but is not the PK (i.e. may repeat)
+                rowKey={getRowIndex}
+                visibleRowIndex={getVisibleRowIndex}
+                wrapperClassName={b('table-wrapper')}
+            />
+        </div>
     );
 };

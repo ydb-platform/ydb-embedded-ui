@@ -3,15 +3,20 @@ import React from 'react';
 import {Flex} from '@gravity-ui/uikit';
 
 import {getVDiskPagePath} from '../../routes';
+import {EVDiskState} from '../../types/api/vdisk';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
-import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
+import {
+    formatStorageValuesToGb,
+    formatUptimeInSeconds,
+} from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import {getSeverityColor} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToSpeed} from '../../utils/utils';
 import {InfoViewer} from '../InfoViewer';
+import {InternalLink} from '../InternalLink';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 import {StatusIcon} from '../StatusIcon/StatusIcon';
@@ -46,6 +51,9 @@ export function VDiskInfo<T extends PreparedVDisk>({
         FrontQueues,
         Guid,
         Replicated,
+        ReplicationProgress,
+        ReplicationSecondsRemaining,
+        Donors,
         VDiskState,
         VDiskSlotId,
         Kind,
@@ -130,6 +138,31 @@ export function VDiskInfo<T extends PreparedVDisk>({
             value: Replicated ? vDiskInfoKeyset('yes') : vDiskInfoKeyset('no'),
         });
     }
+    // Only show replication progress and time remaining when disk is not replicated and state is OK
+    if (Replicated === false && VDiskState === EVDiskState.OK) {
+        if (valueIsDefined(ReplicationProgress)) {
+            rightColumn.push({
+                label: vDiskInfoKeyset('replication-progress'),
+                value: (
+                    <ProgressViewer
+                        value={Math.round(ReplicationProgress * 100)}
+                        percents
+                        colorizeProgress={true}
+                        capacity={100}
+                    />
+                ),
+            });
+        }
+        if (valueIsDefined(ReplicationSecondsRemaining)) {
+            const timeRemaining = formatUptimeInSeconds(ReplicationSecondsRemaining);
+            if (timeRemaining) {
+                rightColumn.push({
+                    label: vDiskInfoKeyset('replication-time-remaining'),
+                    value: timeRemaining,
+                });
+            }
+        }
+    }
     if (valueIsDefined(VDiskSlotId)) {
         rightColumn.push({label: vDiskInfoKeyset('slot-id'), value: VDiskSlotId});
     }
@@ -151,6 +184,45 @@ export function VDiskInfo<T extends PreparedVDisk>({
             label: vDiskInfoKeyset('has-unreadable-blobs'),
             value: HasUnreadableBlobs ? vDiskInfoKeyset('yes') : vDiskInfoKeyset('no'),
         });
+    }
+
+    // Show donors list when replication is in progress
+    if (Replicated === false && VDiskState === EVDiskState.OK && Donors?.length) {
+        const donorLinks = Donors.map((donor, index) => {
+            const {
+                StringifiedId: id,
+                NodeId: dNodeId,
+                PDiskId: dPDiskId,
+                VDiskSlotId: dVSlotId,
+            } = donor;
+
+            if (!id || !dVSlotId || !dNodeId || !dPDiskId) {
+                return null;
+            }
+
+            const vDiskPath = getVDiskPagePath({
+                nodeId: dNodeId,
+                pDiskId: dPDiskId,
+                vDiskSlotId: dVSlotId,
+            });
+
+            return (
+                <InternalLink key={index} to={vDiskPath}>
+                    {id}
+                </InternalLink>
+            );
+        }).filter(Boolean);
+
+        if (donorLinks.length) {
+            rightColumn.push({
+                label: vDiskInfoKeyset('donors'),
+                value: (
+                    <Flex direction="column" gap={1}>
+                        {donorLinks}
+                    </Flex>
+                ),
+            });
+        }
     }
 
     const diskParamsDefined =

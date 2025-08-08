@@ -13,6 +13,7 @@ import {
 } from '../../../store/reducers/capabilities/hooks';
 import {useProblemFilter} from '../../../store/reducers/settings/hooks';
 import type {NodesGroupByField} from '../../../types/api/nodes';
+import {useIsViewerUser} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {PeerRoleFilter} from '../PeerRoleFilter/PeerRoleFilter';
 import {getNodesGroupByOptions} from '../columns/constants';
 import i18n from '../i18n';
@@ -58,12 +59,13 @@ export function NodesControls({
         handleGroupByParamChange,
     } = useNodesPageQueryParams(groupByParams);
     const {problemFilter, handleProblemFilterChange} = useProblemFilter();
+    const isViewerUser = useIsViewerUser();
 
     const systemStateGroupingAvailable = useViewerNodesHandlerHasGroupingBySystemState();
     const groupByoptions = getNodesGroupByOptions(groupByParams, systemStateGroupingAvailable);
 
     const networStatsAvailable = useViewerNodesHandlerHasNetworkStats();
-    const shouldDisplayPeerRoleFilter = withPeerRoleFilter && networStatsAvailable;
+    const shouldDisplayPeerRoleFilter = withPeerRoleFilter && networStatsAvailable && isViewerUser;
 
     const handleGroupBySelectUpdate = (value: string[]) => {
         handleGroupByParamChange(value[0]);

@@ -9,5 +9,9 @@
   "breadcrumbs.storageGroup": "Storage Group",
 
   "connect": "Connect",
-  "add-cluster": "Add Cluster"
+  "add-cluster": "Add Cluster",
+
+  "action_edit-db": "Edit database",
+  "action_delete-db": "Delete database",
+  "action_manage": "Manage"
 }

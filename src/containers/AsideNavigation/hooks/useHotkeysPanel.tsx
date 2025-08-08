@@ -27,14 +27,6 @@ export const DEFAULT_HOTKEY_GROUPS: HotkeysGroup[] = [
                 value: isMac() ? 'cmd+shift+enter' : 'ctrl+shift+enter',
             },
             {
-                title: i18n('hotkeys.previous-query'),
-                value: isMac() ? 'cmd+arrowUp' : 'ctrl+arrowUp',
-            },
-            {
-                title: i18n('hotkeys.next-query'),
-                value: isMac() ? 'cmd+arrowDown' : 'ctrl+arrowDown',
-            },
-            {
                 title: i18n('hotkeys.save-query'),
                 value: isMac() ? 'cmd+s' : 'ctrl+s',
             },
@@ -78,6 +70,7 @@ export const HotkeysPanelWrapper = ({
             visible={visible}
             hotkeys={hotkeyGroups}
             className={b('hotkeys-panel')}
+            drawerItemClassName={b('hotkeys-drawer')}
             title={
                 <div className={b('hotkeys-panel-title')}>
                     {i18n('hotkeys.title')}

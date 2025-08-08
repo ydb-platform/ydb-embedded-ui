@@ -1,0 +1,8 @@
+{
+  "action_show_more": "Show {{count}} more",
+  "action_hide": "Hide {{count}}",
+  "tooltip_nodes": {
+    "one": "{{count}} Node",
+    "other": "{{count}} Nodes"
+  }
+}

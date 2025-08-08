@@ -1,44 +1,41 @@
 {
-  "no-data": "No data",
-  "no-pools-data": "No pools data",
-
   "top-nodes.empty-data": "No such nodes",
-  "top-groups.empty-data": "No such groups",
-
-  "top": "Top",
-
-  "nodes": "nodes",
-  "shards": "shards",
-  "groups": "groups",
-  "queries": "queries",
-  "tables": "tables",
-
-  "by-pools-usage": "by pools usage",
-  "by-cpu-time": "by cpu time, {{executionPeriod}}",
-  "by-cpu-usage": "by cpu usage",
-  "by-load": "by load",
-  "by-memory": "by memory",
-  "by-usage": "by usage",
-  "by-size": "by size",
-
-  "cards.cpu-label": "CPU",
+  "title_top-nodes-load": "Top nodes by load",
+  "title_top-nodes-pool": "Top nodes by pools usage",
+  "cards.cpu-label": "CPU load",
   "cards.storage-label": "Storage",
-  "cards.memory-label": "Memory",
+  "cards.memory-label": "Memory used",
   "cards.network-label": "Network",
-  "cards.network-note": "Network usage is the average outgoing bandwidth usage across all nodes in the database",
-
+  "cards.network-note": "Network throughput is the average outgoing bandwidth usage across all nodes in the database",
+  "context_cpu-load": "CPU load",
+  "context_storage-groups": "Storage: {{count}} groups",
+  "context_memory-used": "Memory used",
+  "context_network-usage": "Network usage",
+  "context_cpu-description": "CPU load is calculated as the cumulative usage across all actor system pools in the database",
+  "context_memory-description": "Memory usage is the total memory consumed by all processes in the database",
+  "context_storage-description": "Storage usage shows how much data is stored in the database including user data and indexes",
+  "context_network-description": "Network throughput is the average outgoing bandwidth usage across all nodes in the database",
   "charts.queries-per-second": "Queries per second",
-  "charts.transaction-latency": "Transactions latencies {{percentile}}",
+  "charts.queries-latency": "Queries latencies {{percentile}}",
   "charts.cpu-usage": "CPU usage by pool",
   "charts.storage-usage": "Tablet storage usage",
   "charts.memory-usage": "Memory usage",
-
+  "charts.network-utilization": "Network utilization",
+  "title_storage-details": "Storage Details",
   "storage.tablet-storage-title": "Tablet storage",
   "storage.tablet-storage-description": "Size of user data and indexes stored in schema objects (tables, topics, etc.)",
   "storage.db-storage-title": "Database storage",
   "storage.db-storage-description": "Size of data stored in distributed storage with all overheads for redundancy",
-
-  "executed-last-hour": "executed in the last hour",
-
-  "column-header.process": "Process"
+  "title_top-shards": "Top shards by CPU usage",
+  "title_top-queries": "Top queries by CPU usage",
+  "title_top-tables-by-size": "Top tables by size",
+  "title_top-groups-by-usage": "Top groups by usage",
+  "title_top-nodes-by-memory": "Top nodes by memory",
+  "title_nodes-by-ping": "Top nodes by ping time",
+  "title_nodes-by-skew": "Top nodes by clock skew",
+  "title_memory-details": "Memory Details",
+  "field_memory-usage": "Memory usage",
+  "context_capacity-usage": "{{value}} of {{capacity}}",
+  "network-stats-unavailable.title": "Network Statistics Unavailable",
+  "network-stats-unavailable.description": "Network ping and clock skew statistics require a newer backend version. Please upgrade your YDB installation to access these features."
 }

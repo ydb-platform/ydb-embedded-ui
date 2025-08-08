@@ -1,6 +1,7 @@
 import {expect, test} from '@playwright/test';
 
 import {backend} from '../../utils/constants';
+import {NodePage} from '../nodes/NodePage';
 import {NodesPage} from '../nodes/NodesPage';
 import {ClusterNodesTable} from '../paginatedTable/paginatedTable';
 
@@ -191,5 +192,113 @@ test.describe('Test Nodes Paginated Table', async () => {
 
         const hostValues = await paginatedTable.getColumnValues('Host');
         expect(hostValues.length).toBeGreaterThan(0);
+    });
+});
+
+test.describe('Test Node Page Threads Tab', async () => {
+    test('Threads tab is hidden when node has no thread data', async ({page}) => {
+        // Mock the node API to return no thread data
+        await page.route(`**/viewer/json/sysinfo?*`, async (route) => {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    SystemStateInfo: [
+                        {
+                            Host: 'localhost',
+                            NodeId: 1,
+                            SystemState: 'Green',
+                            Version: 'test-version',
+                        },
+                    ],
+                    // No Threads property
+                }),
+            });
+        });
+
+        // Navigate directly to node page
+        const nodePage = new NodePage(page, '1');
+        await nodePage.goto();
+        await nodePage.waitForNodePageLoad();
+
+        // Verify other tabs are still visible
+        const tabNames = await nodePage.getAllTabNames();
+        expect(tabNames).toContain('Tablets');
+        expect(tabNames).not.toContain('Threads');
+    });
+
+    test('Threads tab is visible when node has thread data', async ({page}) => {
+        // Mock the node API to return thread data
+        await page.route(`**/viewer/json/sysinfo?*`, async (route) => {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    SystemStateInfo: [
+                        {
+                            Host: 'localhost',
+                            NodeId: 1,
+                            SystemState: 'Green',
+                            Version: 'test-version',
+                            Threads: [
+                                {
+                                    Name: 'TestPool',
+                                    Threads: 4,
+                                },
+                            ],
+                        },
+                    ],
+                }),
+            });
+        });
+
+        // Navigate directly to node page
+        const nodePage = new NodePage(page, '1');
+        await nodePage.goto();
+        await nodePage.waitForNodePageLoad();
+
+        // Verify threads tab is visible
+        const isThreadsTabVisible = await nodePage.isThreadsTabVisible();
+        expect(isThreadsTabVisible).toBe(true);
+
+        // Verify can click on threads tab
+        await nodePage.clickThreadsTab();
+        await page.waitForURL(/\/node\/\d+\/threads/);
+
+        // Verify other tabs are also visible
+        const tabNames = await nodePage.getAllTabNames();
+        expect(tabNames).toContain('Tablets');
+        expect(tabNames).toContain('Threads');
+    });
+
+    test('Threads tab is hidden when node has empty thread array', async ({page}) => {
+        // Mock the node API to return empty thread data
+        await page.route(`**/viewer/json/sysinfo?*`, async (route) => {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    SystemStateInfo: [
+                        {
+                            Host: 'localhost',
+                            NodeId: 1,
+                            SystemState: 'Green',
+                            Version: 'test-version',
+                        },
+                    ],
+                    Threads: [], // Empty array
+                }),
+            });
+        });
+
+        // Navigate directly to node page
+        const nodePage = new NodePage(page, '1');
+        await nodePage.goto();
+        await nodePage.waitForNodePageLoad();
+
+        // Verify other tabs are still visible
+        const tabNames = await nodePage.getAllTabNames();
+        expect(tabNames).toContain('Tablets');
+        expect(tabNames).not.toContain('Threads');
     });
 });

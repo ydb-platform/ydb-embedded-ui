@@ -33,7 +33,7 @@ body,
     --tenant-object-info-max-value-width: 300px;
     --diagnostics-section-title-margin: 20px;
     --diagnostics-section-margin: 30px;
-    --diagnostics-section-table-width: 872px;
+    --diagnostics-section-table-width: 100%;
 }
 
 .g-root {
@@ -115,4 +115,15 @@ body,
 
 .app_embedded {
     font-family: 'Rubik', sans-serif;
+}
+
+.g-tab__title {
+    display: inline-flex;
+    align-items: center;
+
+    height: 100%;
+}
+
+.ydb-popover {
+    padding: var(--g-spacing-4);
 }

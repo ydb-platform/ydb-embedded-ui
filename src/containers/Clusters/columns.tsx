@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {Pencil, TrashBin} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column} from '@gravity-ui/react-data-table';
@@ -15,6 +13,7 @@ import {
 } from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../components/EntityStatusNew/EntityStatus';
+import {VersionsBar} from '../../components/VersionsBar/VersionsBar';
 import type {PreparedCluster} from '../../store/reducers/clusters/types';
 import {EFlag} from '../../types/api/enums';
 import {uiFactory} from '../../uiFactory/uiFactory';
@@ -80,7 +79,7 @@ function getTitleColumn({isEditClusterAvailable, isDeleteClusterAvailable}: Clus
                         action: () => {
                             onDeleteCluster({clusterData: row});
                         },
-                        className: b('remove-cluster'),
+                        theme: 'danger',
                     });
                 }
 
@@ -158,7 +157,7 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
     {
         name: COLUMNS_NAMES.VERSIONS,
         header: COLUMNS_TITLES[COLUMNS_NAMES.VERSIONS],
-        width: 300,
+        width: 400,
         defaultOrder: DataTable.DESCENDING,
         sortAccessor: ({preparedVersions}) => {
             const versions = preparedVersions
@@ -181,16 +180,6 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
                 return EMPTY_CELL;
             }
 
-            const total = versions.reduce((acc, item) => acc + item.count, 0);
-            const versionsValues = versions.map((item) => {
-                return {
-                    value: (item.count / total) * 100,
-                    color: preparedVersions.find(
-                        (versionItem) => versionItem.version === item.version,
-                    )?.color,
-                };
-            });
-
             return (
                 preparedVersions.length > 0 && (
                     <ExternalLink
@@ -201,19 +190,7 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
                             {withBasename: true},
                         )}
                     >
-                        <React.Fragment>
-                            {preparedVersions.map((item, index) => (
-                                <div
-                                    className={b('cluster-version')}
-                                    style={{color: item.color}}
-                                    key={index}
-                                    title={item.version}
-                                >
-                                    {item.version}
-                                </div>
-                            ))}
-                            {<Progress size="s" value={100} stack={versionsValues} />}
-                        </React.Fragment>
+                        <VersionsBar preparedVersions={preparedVersions} />
                     </ExternalLink>
                 )
             );

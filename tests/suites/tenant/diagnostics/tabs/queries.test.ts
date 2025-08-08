@@ -1,5 +1,7 @@
 import {expect, test} from '@playwright/test';
 
+import {prepareQueryWithPragmas} from '../../../../../src/store/reducers/query/utils';
+import {defaultPragma} from '../../../../../src/utils/query';
 import {tenantName} from '../../../../utils/constants';
 import {NavigationTabs, TenantPage} from '../../TenantPage';
 import {longRunningQuery, longRunningStreamQuery} from '../../constants';
@@ -51,8 +53,9 @@ test.describe('Diagnostics Queries tab', async () => {
         const diagnostics = new Diagnostics(page);
         await diagnostics.clickTab(DiagnosticsTab.Queries);
         await diagnostics.clickRadioSwitch(QueriesSwitch.Running);
+        const finalQueryText = prepareQueryWithPragmas(longRunningQuery, defaultPragma);
         expect(
-            await diagnostics.table.waitForCellValueByHeader(1, 'Query text', longRunningQuery),
+            await diagnostics.table.waitForCellValueByHeader(1, 'Query text', finalQueryText),
         ).toBe(true);
     });
 
@@ -266,7 +269,7 @@ test.describe('Diagnostics Queries tab', async () => {
 
         // Get the number of rows and select a row that requires scrolling (should be 100 from mock)
         const rowCount = await diagnostics.table.getRowCount();
-        expect(rowCount).toBe(8); // Verify we have the expected 100 rows from mock
+        expect(rowCount).toBe(9); // Verify we have the expected 100 rows from mock
 
         // Target a row further down that requires scrolling
         const targetRowIndex = 8;

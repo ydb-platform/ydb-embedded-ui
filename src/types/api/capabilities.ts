@@ -5,6 +5,9 @@ export interface CapabilitiesResponse {
     Capabilities: Record<Partial<Capability>, number>;
     Settings?: {
         Security?: Record<Partial<SecuritySetting>, boolean>;
+        Database?: {
+            GraphShardExists?: boolean;
+        };
     };
 }
 

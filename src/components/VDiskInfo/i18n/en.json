@@ -8,6 +8,9 @@
   "instance-guid": "Instance GUID",
 
   "replication-status": "Replicated",
+  "replication-progress": "Replication Progress",
+  "replication-time-remaining": "Time Remaining",
+  "donors": "Donors",
   "state-status": "VDisk State",
   "space-status": "Disk Space",
 

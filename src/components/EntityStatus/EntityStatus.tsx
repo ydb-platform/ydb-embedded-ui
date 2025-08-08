@@ -5,6 +5,7 @@ import {Button, ClipboardButton, Icon, Popover, Link as UIKitLink} from '@gravit
 
 import {EFlag} from '../../types/api/enums';
 import {cn} from '../../utils/cn';
+import {YDB_POPOVER_CLASS_NAME} from '../../utils/constants';
 import {InternalLink} from '../InternalLink/InternalLink';
 import {StatusIcon} from '../StatusIcon/StatusIcon';
 import type {StatusIconMode, StatusIconSize} from '../StatusIcon/StatusIcon';
@@ -120,9 +121,8 @@ export function EntityStatus({
                         >
                             {infoPopoverContent && (
                                 <Popover
-                                    className={b('info-popover')}
+                                    className={YDB_POPOVER_CLASS_NAME}
                                     content={infoPopoverContent}
-                                    tooltipOffset={[-4, 4]}
                                     placement={['top-start', 'bottom-start']}
                                     onOpenChange={(visible) => setInfoIconHovered(visible)}
                                 >

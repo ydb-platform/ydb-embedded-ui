@@ -81,7 +81,9 @@ export class QueryEditor {
         this.executionStatus = this.selector.locator('.kv-query-execution-status .g-text');
         this.resultsControls = this.selector.locator('.ydb-query-result__controls');
         this.elapsedTimeLabel = this.selector.locator('.kv-query-execution-status .g-label__value');
-        this.radioButton = this.selector.locator('.query-editor__pane-wrapper .g-radio-button');
+        this.radioButton = this.selector.locator(
+            '.query-editor__pane-wrapper .g-segmented-radio-group',
+        );
         this.banner = this.page.locator('.ydb-query-settings-banner');
 
         this.settingsDialog = new SettingsDialog(page);

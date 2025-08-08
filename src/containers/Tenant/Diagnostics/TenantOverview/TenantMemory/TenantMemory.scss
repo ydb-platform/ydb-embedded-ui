@@ -1,0 +1,20 @@
+@use '../../../../../styles/mixins.scss';
+
+.tenant-memory {
+    &__value-text {
+        flex-shrink: 0;
+
+        min-width: 84px;
+        margin-top: var(--g-spacing-2);
+
+        text-align: right;
+        white-space: nowrap;
+
+        color: var(--g-color-text-secondary);
+        @include mixins.body-1-typography();
+    }
+
+    &__fallback-progress-wrapper {
+        margin-bottom: var(--g-spacing-4);
+    }
+}

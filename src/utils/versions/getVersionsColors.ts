@@ -1,6 +1,5 @@
-import type {VersionToColorMap, VersionsMap} from '../../types/versions';
-
 import {getMajorVersion, getMinorVersion} from './parseVersion';
+import type {VersionsDataMap, VersionsMap} from './types';
 
 export const hashCode = (s: string) => {
     return s.split('').reduce((a, b) => {
@@ -10,18 +9,6 @@ export const hashCode = (s: string) => {
 };
 
 export const COLORS = [
-    [
-        'var(--versions-red-1)',
-        'var(--versions-red-2)',
-        'var(--versions-red-3)',
-        'var(--versions-red-4)',
-    ],
-    [
-        'var(--versions-orange-red-1)',
-        'var(--versions-orange-red-2)',
-        'var(--versions-orange-red-3)',
-        'var(--versions-orange-red-4)',
-    ],
     [
         'var(--versions-orange-1)',
         'var(--versions-orange-2)',
@@ -41,16 +28,10 @@ export const COLORS = [
         'var(--versions-green-4)',
     ],
     [
-        'var(--versions-teal-1)',
-        'var(--versions-teal-2)',
-        'var(--versions-teal-3)',
-        'var(--versions-teal-4)',
-    ],
-    [
-        'var(--versions-cyan-1)',
-        'var(--versions-cyan-2)',
-        'var(--versions-cyan-3)',
-        'var(--versions-cyan-4)',
+        'var(--versions-lightblue-1)',
+        'var(--versions-lightblue-2)',
+        'var(--versions-lightblue-3)',
+        'var(--versions-lightblue-4)',
     ],
     [
         'var(--versions-blue-1)',
@@ -59,10 +40,10 @@ export const COLORS = [
         'var(--versions-blue-4)',
     ],
     [
-        'var(--versions-purple-1)',
-        'var(--versions-purple-2)',
-        'var(--versions-purple-3)',
-        'var(--versions-purple-4)',
+        'var(--versions-violet-1)',
+        'var(--versions-violet-2)',
+        'var(--versions-violet-3)',
+        'var(--versions-violet-4)',
     ],
     [
         'var(--versions-pink-1)',
@@ -70,9 +51,39 @@ export const COLORS = [
         'var(--versions-pink-3)',
         'var(--versions-pink-4)',
     ],
+    [
+        'var(--versions-caramel-1)',
+        'var(--versions-caramel-2)',
+        'var(--versions-caramel-3)',
+        'var(--versions-caramel-4)',
+    ],
+    [
+        'var(--versions-moss-1)',
+        'var(--versions-moss-2)',
+        'var(--versions-moss-3)',
+        'var(--versions-moss-4)',
+    ],
+    [
+        'var(--versions-turquoise-1)',
+        'var(--versions-turquoise-2)',
+        'var(--versions-turquoise-3)',
+        'var(--versions-turquoise-4)',
+    ],
+    [
+        'var(--versions-barbie-1)',
+        'var(--versions-barbie-2)',
+        'var(--versions-barbie-3)',
+        'var(--versions-barbie-4)',
+    ],
+    [
+        'var(--versions-night-1)',
+        'var(--versions-night-2)',
+        'var(--versions-night-3)',
+        'var(--versions-night-4)',
+    ],
 ];
 
-export const DEFAULT_COLOR = 'var(--g-color-base-generic-medium)';
+export const DEFAULT_COLOR = 'var(--versions-default-color)';
 
 /** Calculates sub color index */
 export function getMinorVersionColorVariant(minorIndex: number, minorQuantity: number) {
@@ -110,7 +121,7 @@ export const getVersionsMap = (versions: string[], initialMap: VersionsMap = new
     return initialMap;
 };
 
-export const getVersionToColorMap = (versionsMap: VersionsMap) => {
+export const getVersionsDataMap = (versionsMap: VersionsMap) => {
     const clustersVersions = Array.from(versionsMap.keys()).map((version) => {
         return {
             version,
@@ -118,7 +129,7 @@ export const getVersionToColorMap = (versionsMap: VersionsMap) => {
         };
     });
 
-    const versionToColor: VersionToColorMap = new Map();
+    const versionsDataMap: VersionsDataMap = new Map();
     // not every version is colored, therefore iteration index can't be used consistently
     // init with the colors length to put increment right after condition for better readability
     let currentColorIndex = COLORS.length - 1;
@@ -131,8 +142,12 @@ export const getVersionToColorMap = (versionsMap: VersionsMap) => {
             if (/^(\w+-)?stable/.test(item.version)) {
                 currentColorIndex = (currentColorIndex + 1) % COLORS.length;
 
-                // Use fisrt color for major
-                versionToColor.set(item.version, COLORS[currentColorIndex][0]);
+                versionsDataMap.set(item.version, {
+                    // Use first color for major
+                    color: COLORS[currentColorIndex][0],
+                    majorIndex: currentColorIndex,
+                    minorIndex: 0,
+                });
 
                 const minors = Array.from(versionsMap.get(item.version) || [])
                     .filter((v) => v !== item.version)
@@ -155,15 +170,32 @@ export const getVersionToColorMap = (versionsMap: VersionsMap) => {
                             minorQuantity,
                         );
                         const minorColor = COLORS[currentColorIndex][minorColorVariant];
-                        versionToColor.set(minor.version, minorColor);
+
+                        versionsDataMap.set(minor.version, {
+                            color: minorColor,
+                            majorIndex: currentColorIndex,
+                            minorIndex: minorIndex,
+                        });
                     });
             } else {
-                versionToColor.set(item.version, DEFAULT_COLOR);
+                versionsDataMap.set(item.version, {
+                    color: DEFAULT_COLOR,
+                });
             }
         });
-    return versionToColor;
+    return versionsDataMap;
 };
 
-export const parseVersionsToVersionToColorMap = (versions: string[] = []) => {
-    return getVersionToColorMap(getVersionsMap(versions));
+export const parseVersionsToVersionsDataMap = (versions: string[] = []) => {
+    return getVersionsDataMap(getVersionsMap(versions));
 };
+
+export function getColorFromVersionsData(
+    version: string,
+    versionsDataMap: VersionsDataMap | undefined,
+) {
+    const minorVersion = getMinorVersion(version);
+    const versionData = versionsDataMap?.get(minorVersion);
+
+    return versionData?.color;
+}

@@ -1,5 +1,6 @@
 .ydb-drawer {
     &__drawer-container {
+        --gn-drawer-item-position: absolute;
         position: relative;
 
         overflow: hidden;
