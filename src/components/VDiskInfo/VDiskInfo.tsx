@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Flex} from '@gravity-ui/uikit';
 
-import {getVDiskPagePath} from '../../routes';
+import {getPDiskPagePath, getVDiskPagePath} from '../../routes';
 import {EVDiskState} from '../../types/api/vdisk';
 import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
@@ -169,6 +169,16 @@ export function VDiskInfo<T extends PreparedVDisk>({
     if (valueIsDefined(VDiskSlotId)) {
         rightColumn.push({label: vDiskInfoKeyset('slot-id'), value: VDiskSlotId});
     }
+    if (valueIsDefined(PDiskId)) {
+        const pDiskPath = valueIsDefined(NodeId) ? getPDiskPagePath(PDiskId, NodeId) : undefined;
+
+        const value = pDiskPath ? <InternalLink to={pDiskPath}>{PDiskId}</InternalLink> : PDiskId;
+
+        rightColumn.push({
+            label: vDiskInfoKeyset('label_pdisk-id'),
+            value,
+        });
+    }
 
     if (valueIsDefined(Kind)) {
         rightColumn.push({label: vDiskInfoKeyset('kind'), value: Kind});
@@ -192,14 +202,9 @@ export function VDiskInfo<T extends PreparedVDisk>({
     // Show donors list when replication is in progress
     if (Replicated === false && VDiskState === EVDiskState.OK && Donors?.length) {
         const donorLinks = Donors.map((donor, index) => {
-            const {
-                StringifiedId: id,
-                NodeId: dNodeId,
-                PDiskId: dPDiskId,
-                VDiskSlotId: dVSlotId,
-            } = donor;
+            const {StringifiedId: id, NodeId: dNodeId, PDiskId: dPDiskId} = donor;
 
-            if (!id || !dVSlotId || !dNodeId || !dPDiskId) {
+            if (!id || !dNodeId || !dPDiskId) {
                 return null;
             }
 

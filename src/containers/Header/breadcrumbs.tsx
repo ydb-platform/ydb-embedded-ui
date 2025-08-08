@@ -4,7 +4,6 @@ import {
     Database as DatabaseIcon,
     HardDrive as StorageNodeIcon,
 } from '@gravity-ui/icons';
-import {isNil} from 'lodash';
 
 import {TabletIcon} from '../../components/TabletIcon/TabletIcon';
 import routes, {getPDiskPagePath, getStorageGroupPath} from '../../routes';
@@ -168,11 +167,11 @@ const getStorageGroupBreadcrumbs: GetBreadcrumbs<StorageGroupBreadcrumbsOptions>
     options,
     query = {},
 ) => {
-    const {groupId, isViewerUser, tenantName} = options;
+    const {groupId, tenantName} = options;
 
-    const breadcrumbs = isViewerUser
-        ? getClusterBreadcrumbs(options, query)
-        : getTenantBreadcrumbs(options, query);
+    const breadcrumbs = tenantName
+        ? getTenantBreadcrumbs(options, query)
+        : getClusterBreadcrumbs(options, query);
 
     let text = headerKeyset('breadcrumbs.storageGroup');
     if (groupId) {
@@ -189,17 +188,13 @@ const getStorageGroupBreadcrumbs: GetBreadcrumbs<StorageGroupBreadcrumbsOptions>
 };
 
 const getVDiskBreadcrumbs: GetBreadcrumbs<VDiskBreadcrumbsOptions> = (options, query = {}) => {
-    const {vDiskSlotId, groupId} = options;
+    const {vDiskId} = options;
 
-    let breadcrumbs = getPDiskBreadcrumbs(options, query);
-
-    if (breadcrumbs.length === 0 && !isNil(groupId)) {
-        breadcrumbs = getStorageGroupBreadcrumbs(options, query);
-    }
+    const breadcrumbs = getStorageGroupBreadcrumbs(options, query);
 
     let text = headerKeyset('breadcrumbs.vDisk');
-    if (vDiskSlotId) {
-        text += ` ${vDiskSlotId}`;
+    if (vDiskId) {
+        text += ` ${vDiskId}`;
     }
 
     const lastItem = {

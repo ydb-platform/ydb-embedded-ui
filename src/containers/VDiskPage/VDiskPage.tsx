@@ -25,10 +25,7 @@ import type {TVDiskID} from '../../types/api/vdisk';
 import {cn} from '../../utils/cn';
 import {getSeverityColor} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
-import {
-    useIsUserAllowedToMakeChanges,
-    useIsViewerUser,
-} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useAppTitle} from '../App/AppTitleContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 
@@ -67,7 +64,6 @@ export function VDiskPage() {
     const containerRef = React.useRef<HTMLDivElement>(null);
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const newDiskApiAvailable = useDiskPagesAvailable();
-    const isViewerUser = useIsViewerUser();
 
     const [{nodeId, pDiskId, vDiskId: vDiskIdParam, activeTab, database: databaseParam}] =
         useQueryParams({
@@ -101,25 +97,20 @@ export function VDiskPage() {
     const vDiskSlotId = vDiskData?.VDiskSlotId;
 
     React.useEffect(() => {
-        if (isViewerUser) {
-            dispatch(setHeaderBreadcrumbs('vDisk', {nodeId, pDiskId, vDiskSlotId}));
-        } else {
-            dispatch(
-                setHeaderBreadcrumbs('vDisk', {
-                    groupId: vDiskData?.VDiskId?.GroupID,
-                    tenantName: database,
-                    vDiskSlotId,
-                }),
-            );
-        }
+        dispatch(
+            setHeaderBreadcrumbs('vDisk', {
+                groupId: vDiskData?.VDiskId?.GroupID,
+                tenantName: database,
+                vDiskId: vDiskData?.StringifiedId,
+            }),
+        );
     }, [
         dispatch,
         nodeId,
         pDiskId,
-        isViewerUser,
         database,
         vDiskData?.VDiskId?.GroupID,
-        vDiskSlotId,
+        vDiskData?.StringifiedId,
     ]);
 
     const loading = isFetching && vDiskData === undefined;

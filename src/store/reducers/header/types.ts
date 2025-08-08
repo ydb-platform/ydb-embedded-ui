@@ -42,7 +42,7 @@ export interface PDiskBreadcrumbsOptions extends Omit<NodeBreadcrumbsOptions, 't
 }
 
 export interface VDiskBreadcrumbsOptions extends PDiskBreadcrumbsOptions {
-    vDiskSlotId?: string | number;
+    vDiskId?: string | number;
     groupId?: string;
 }
 
