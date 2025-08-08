@@ -2,9 +2,11 @@ import {getVDiskPagePath} from '../../routes';
 import type {PreparedVDisk} from '../../utils/disks/types';
 
 export function getVDiskLink(data: PreparedVDisk, query: {database: string | undefined}) {
+    if (!data.StringifiedId) {
+        return undefined;
+    }
     return getVDiskPagePath(
         {
-            pDiskId: data.PDiskId,
             nodeId: data.NodeId,
             vDiskId: data.StringifiedId,
         },

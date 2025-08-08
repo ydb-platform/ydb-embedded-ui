@@ -46,6 +46,7 @@ export default [
             'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],
             curly: ['error', 'all'],
             'react-hooks/exhaustive-deps': 'warn',
+            'react-hooks/rules-of-hooks': 'error',
         },
     },
     // TypeScript-specific rules that require type information

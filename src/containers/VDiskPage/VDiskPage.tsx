@@ -104,14 +104,7 @@ export function VDiskPage() {
                 vDiskId: vDiskData?.StringifiedId,
             }),
         );
-    }, [
-        dispatch,
-        nodeId,
-        pDiskId,
-        database,
-        vDiskData?.VDiskId?.GroupID,
-        vDiskData?.StringifiedId,
-    ]);
+    }, [dispatch, database, vDiskData?.VDiskId?.GroupID, vDiskData?.StringifiedId]);
 
     const loading = isFetching && vDiskData === undefined;
     const {NodeHost, NodeId, NodeType, NodeDC, PDiskId, PDiskType, Severity, VDiskId} =
@@ -242,21 +235,16 @@ export function VDiskPage() {
     };
 
     const renderTabs = () => {
-        const vDiskExtendedParamsDefined = !isNil(nodeId) && !isNil(pDiskId) && !isNil(vDiskSlotId);
-
-        const vDiskBasicParamsDefined = !isNil(vDiskId);
-
         return (
             <div className={vDiskPageCn('tabs')}>
                 <TabProvider value={vDiskTab}>
                     <TabList size="l">
                         {VDISK_PAGE_TABS.map(({id, title}) => {
                             let path: string | undefined;
-                            if (vDiskExtendedParamsDefined || vDiskBasicParamsDefined) {
+                            if (!isNil(vDiskId)) {
                                 path = getVDiskPagePath(
                                     {
                                         nodeId: nodeId?.toString(),
-                                        pDiskId: pDiskId?.toString(),
                                         vDiskId: vDiskId?.toString(),
                                     },
                                     {activeTab: id, database},
