@@ -3,9 +3,7 @@ $memory-type-colors: (
     'SharedCacheConsumption': var(--g-color-base-info-medium-hover),
     'MemTableConsumption': var(--g-color-base-warning-medium-hover),
     'QueryExecutionConsumption': var(--g-color-base-positive-medium-hover),
-    'ColumnTablesReadExecutionConsumption': var(--g-color-base-danger-light),
-    'ColumnTablesCompactionConsumption': var(--g-color-base-danger-medium),
-    'ColumnTablesCacheConsumption': var(--g-color-base-danger-heavy),
+    'CompactionConsumption': var(--g-color-base-danger-medium-hover),
     'Other': var(--g-color-base-generic-medium-hover),
 );
 

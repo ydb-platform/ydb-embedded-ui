@@ -45,24 +45,10 @@ export function getMemorySegments(stats: TMemoryStats, memoryUsage: number): Mem
             isInfo: false,
         },
         {
-            label: i18n('text_column-tables-read-execution'),
-            key: 'ColumnTablesReadExecutionConsumption',
-            value: getMaybeNumber(stats.ColumnTablesReadExecutionConsumption),
-            capacity: getMaybeNumber(stats.ColumnTablesReadExecutionLimit),
-            isInfo: false,
-        },
-        {
-            label: i18n('text_column-tables-compaction'),
-            key: 'ColumnTablesCompactionConsumption',
-            value: getMaybeNumber(stats.ColumnTablesCompactionConsumption),
-            capacity: getMaybeNumber(stats.ColumnTablesCompactionLimit),
-            isInfo: false,
-        },
-        {
-            label: i18n('text_column-tables-cache'),
-            key: 'ColumnTablesCacheConsumption',
-            value: getMaybeNumber(stats.ColumnTablesCacheConsumption),
-            capacity: getMaybeNumber(stats.ColumnTablesCacheLimit),
+            label: i18n('text_compaction'),
+            key: 'CompactionConsumption',
+            value: getMaybeNumber(stats.CompactionConsumption),
+            capacity: getMaybeNumber(stats.CompactionLimit),
             isInfo: false,
         },
         {
