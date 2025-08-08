@@ -42,6 +42,7 @@ export interface UIFactory<H extends string = CommonIssueType> {
         getHealthcheckViewsOrder: GetHealthcheckViewsOrder<H>;
         countHealthcheckIssuesByType: (issueTrees: IssuesTree[]) => Record<H, number>;
     };
+    hasAccess?: boolean;
 }
 
 export type HandleCreateDB = (params: {clusterName: string}) => Promise<boolean>;

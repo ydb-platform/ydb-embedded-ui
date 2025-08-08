@@ -177,6 +177,7 @@ export const getPagesByType = (
         isTopLevel?: boolean;
         hasBackups?: boolean;
         hasConfigs?: boolean;
+        hasAccess?: boolean;
     },
 ) => {
     const subTypePages = subType ? pathSubTypeToPages[subType] : undefined;
@@ -197,6 +198,9 @@ export const getPagesByType = (
     }
     if (!options?.hasConfigs) {
         pages = pages.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.configs);
+    }
+    if (!options?.hasAccess) {
+        pages = pages.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.access);
     }
     return pages;
 };
