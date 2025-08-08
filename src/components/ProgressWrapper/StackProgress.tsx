@@ -29,10 +29,6 @@ export function StackProgress({
         return stack.filter((segment) => !segment.isInfo && segment.value > 0);
     }, [stack]);
 
-    if (displaySegments.length === 0) {
-        return <div className={className}>{i18n('alert_no-data')}</div>;
-    }
-
     const totalValue = React.useMemo(() => {
         return displaySegments.reduce((sum, segment) => sum + segment.value, 0);
     }, [displaySegments]);
@@ -58,6 +54,10 @@ export function StackProgress({
     const displayText = React.useMemo(() => {
         return formatProgressText(totalValueText, totalCapacityText, numericTotalCapacity || 0);
     }, [totalValueText, totalCapacityText, numericTotalCapacity]);
+
+    if (displaySegments.length === 0) {
+        return <div className={className}>{i18n('alert_no-data')}</div>;
+    }
 
     return (
         <ProgressContainer

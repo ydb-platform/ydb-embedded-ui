@@ -38,12 +38,6 @@ export function QueriesActivityCharts({
     const queriesChartConfig = getChartByTarget('queries.requests');
     const latenciesChartConfig = getChartByTarget('queries.latencies.p99');
 
-    // Early return if required charts are not found
-    if (!queriesChartConfig || !latenciesChartConfig) {
-        console.warn('Required chart configurations not found in defaultDashboardConfig');
-        return null;
-    }
-
     // Refetch data only if charts have successfully loaded at least once
     const shouldRefresh = hasChartsLoaded ? autoRefreshInterval : 0;
 
@@ -57,6 +51,12 @@ export function QueriesActivityCharts({
         },
         [onChartDataStatusChange],
     );
+
+    // Early return if required charts are not found
+    if (!queriesChartConfig || !latenciesChartConfig) {
+        console.warn('Required chart configurations not found in defaultDashboardConfig');
+        return null;
+    }
 
     // WORKAROUND: Charts are rendered outside Disclosure component due to YAGR tooltip bug
     // Issue: https://github.com/gravity-ui/yagr/issues/262
