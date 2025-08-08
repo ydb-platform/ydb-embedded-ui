@@ -70,6 +70,7 @@ function Diagnostics(props: DiagnosticsProps) {
         isTopLevel: path === database,
         hasBackups: typeof uiFactory.renderBackups === 'function' && Boolean(controlPlane),
         hasConfigs: isViewerUser,
+        hasAccess: uiFactory.hasAccess,
     });
     let activeTab = pages.find((el) => el.id === diagnosticsTab);
     if (!activeTab) {

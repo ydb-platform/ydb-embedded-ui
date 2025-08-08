@@ -18,6 +18,7 @@ const uiFactoryBase: UIFactory = {
         getHealthcheckViewsOrder,
         countHealthcheckIssuesByType,
     },
+    hasAccess: true,
 };
 
 export function configureUIFactory<H extends string>(overrides: Partial<UIFactory<H>>) {
