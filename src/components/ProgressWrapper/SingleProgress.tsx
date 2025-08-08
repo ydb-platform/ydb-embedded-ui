@@ -25,10 +25,6 @@ export function SingleProgress({
     size = PROGRESS_SIZE,
     withCapacityUsage = false,
 }: ProgressWrapperSingleProps) {
-    if (!isValidValue(value)) {
-        return <div className={className}>{i18n('alert_no-data')}</div>;
-    }
-
     const numericValue = safeParseNumber(value);
     const numericCapacity = safeParseNumber(capacity);
     const clampedFillWidth = calculateProgressWidth(numericValue, numericCapacity);
@@ -40,6 +36,10 @@ export function SingleProgress({
     const displayText = React.useMemo(() => {
         return formatProgressText(valueText, capacityText, numericCapacity);
     }, [valueText, capacityText, numericCapacity]);
+
+    if (!isValidValue(value)) {
+        return <div className={className}>{i18n('alert_no-data')}</div>;
+    }
 
     return (
         <ProgressContainer

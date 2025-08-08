@@ -1,10 +1,10 @@
 import React from 'react';
 
 import {Flex} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
-import {getVDiskPagePath} from '../../routes';
+import {getPDiskPagePath, getVDiskPagePath} from '../../routes';
 import {EVDiskState} from '../../types/api/vdisk';
-import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {
     formatStorageValuesToGb,
@@ -13,6 +13,7 @@ import {
 import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import {getSeverityColor} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
+import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToSpeed} from '../../utils/utils';
 import {InfoViewer} from '../InfoViewer';
@@ -44,6 +45,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
     wrap,
 }: VDiskInfoProps<T>) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const database = useDatabaseFromQuery();
 
     const {
         AllocatedSize,
@@ -66,15 +68,16 @@ export function VDiskInfo<T extends PreparedVDisk>({
         ReadThroughput,
         WriteThroughput,
         PDiskId,
+        StringifiedId,
         NodeId,
     } = data || {};
 
     const leftColumn = [];
 
-    if (valueIsDefined(StoragePoolName)) {
+    if (!isNil(StoragePoolName)) {
         leftColumn.push({label: vDiskInfoKeyset('pool-name'), value: StoragePoolName});
     }
-    if (valueIsDefined(VDiskState)) {
+    if (!isNil(VDiskState)) {
         leftColumn.push({
             label: vDiskInfoKeyset('state-status'),
             value: VDiskState,
@@ -93,37 +96,37 @@ export function VDiskInfo<T extends PreparedVDisk>({
             ),
         });
     }
-    if (valueIsDefined(DiskSpace)) {
+    if (!isNil(DiskSpace)) {
         leftColumn.push({
             label: vDiskInfoKeyset('space-status'),
             value: <StatusIcon status={DiskSpace} />,
         });
     }
-    if (valueIsDefined(FrontQueues)) {
+    if (!isNil(FrontQueues)) {
         leftColumn.push({
             label: vDiskInfoKeyset('front-queues'),
             value: <StatusIcon status={FrontQueues} />,
         });
     }
-    if (valueIsDefined(SatisfactionRank?.FreshRank?.Flag)) {
+    if (!isNil(SatisfactionRank?.FreshRank?.Flag)) {
         leftColumn.push({
             label: vDiskInfoKeyset('fresh-rank-satisfaction'),
             value: <StatusIcon status={SatisfactionRank?.FreshRank?.Flag} />,
         });
     }
-    if (valueIsDefined(SatisfactionRank?.LevelRank?.Flag)) {
+    if (!isNil(SatisfactionRank?.LevelRank?.Flag)) {
         leftColumn.push({
             label: vDiskInfoKeyset('level-rank-satisfaction'),
             value: <StatusIcon status={SatisfactionRank?.LevelRank?.Flag} />,
         });
     }
-    if (valueIsDefined(ReadThroughput)) {
+    if (!isNil(ReadThroughput)) {
         leftColumn.push({
             label: vDiskInfoKeyset('read-throughput'),
             value: bytesToSpeed(ReadThroughput),
         });
     }
-    if (valueIsDefined(WriteThroughput)) {
+    if (!isNil(WriteThroughput)) {
         leftColumn.push({
             label: vDiskInfoKeyset('write-throughput'),
             value: bytesToSpeed(WriteThroughput),
@@ -132,7 +135,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
 
     const rightColumn = [];
 
-    if (valueIsDefined(Replicated)) {
+    if (!isNil(Replicated)) {
         rightColumn.push({
             label: vDiskInfoKeyset('replication-status'),
             value: Replicated ? vDiskInfoKeyset('yes') : vDiskInfoKeyset('no'),
@@ -140,7 +143,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
     }
     // Only show replication progress and time remaining when disk is not replicated and state is OK
     if (Replicated === false && VDiskState === EVDiskState.OK) {
-        if (valueIsDefined(ReplicationProgress)) {
+        if (!isNil(ReplicationProgress)) {
             rightColumn.push({
                 label: vDiskInfoKeyset('replication-progress'),
                 value: (
@@ -153,7 +156,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
                 ),
             });
         }
-        if (valueIsDefined(ReplicationSecondsRemaining)) {
+        if (!isNil(ReplicationSecondsRemaining)) {
             const timeRemaining = formatUptimeInSeconds(ReplicationSecondsRemaining);
             if (timeRemaining) {
                 rightColumn.push({
@@ -163,23 +166,33 @@ export function VDiskInfo<T extends PreparedVDisk>({
             }
         }
     }
-    if (valueIsDefined(VDiskSlotId)) {
+    if (!isNil(VDiskSlotId)) {
         rightColumn.push({label: vDiskInfoKeyset('slot-id'), value: VDiskSlotId});
     }
+    if (!isNil(PDiskId)) {
+        const pDiskPath = !isNil(NodeId) ? getPDiskPagePath(PDiskId, NodeId) : undefined;
 
-    if (valueIsDefined(Kind)) {
+        const value = pDiskPath ? <InternalLink to={pDiskPath}>{PDiskId}</InternalLink> : PDiskId;
+
+        rightColumn.push({
+            label: vDiskInfoKeyset('label_pdisk-id'),
+            value,
+        });
+    }
+
+    if (!isNil(Kind)) {
         rightColumn.push({label: vDiskInfoKeyset('kind'), value: Kind});
     }
-    if (valueIsDefined(Guid)) {
+    if (!isNil(Guid)) {
         rightColumn.push({label: vDiskInfoKeyset('guid'), value: Guid});
     }
-    if (valueIsDefined(IncarnationGuid)) {
+    if (!isNil(IncarnationGuid)) {
         rightColumn.push({label: vDiskInfoKeyset('incarnation-guid'), value: IncarnationGuid});
     }
-    if (valueIsDefined(InstanceGuid)) {
+    if (!isNil(InstanceGuid)) {
         rightColumn.push({label: vDiskInfoKeyset('instance-guid'), value: InstanceGuid});
     }
-    if (valueIsDefined(HasUnreadableBlobs)) {
+    if (!isNil(HasUnreadableBlobs)) {
         rightColumn.push({
             label: vDiskInfoKeyset('has-unreadable-blobs'),
             value: HasUnreadableBlobs ? vDiskInfoKeyset('yes') : vDiskInfoKeyset('no'),
@@ -189,22 +202,19 @@ export function VDiskInfo<T extends PreparedVDisk>({
     // Show donors list when replication is in progress
     if (Replicated === false && VDiskState === EVDiskState.OK && Donors?.length) {
         const donorLinks = Donors.map((donor, index) => {
-            const {
-                StringifiedId: id,
-                NodeId: dNodeId,
-                PDiskId: dPDiskId,
-                VDiskSlotId: dVSlotId,
-            } = donor;
+            const {StringifiedId: id, NodeId: dNodeId} = donor;
 
-            if (!id || !dVSlotId || !dNodeId || !dPDiskId) {
+            if (!id || !dNodeId) {
                 return null;
             }
 
-            const vDiskPath = getVDiskPagePath({
-                nodeId: dNodeId,
-                pDiskId: dPDiskId,
-                vDiskSlotId: dVSlotId,
-            });
+            const vDiskPath = getVDiskPagePath(
+                {
+                    nodeId: dNodeId,
+                    vDiskId: id,
+                },
+                {database},
+            );
 
             return (
                 <InternalLink key={index} to={vDiskPath}>
@@ -224,19 +234,16 @@ export function VDiskInfo<T extends PreparedVDisk>({
             });
         }
     }
-
-    const diskParamsDefined =
-        valueIsDefined(PDiskId) && valueIsDefined(NodeId) && valueIsDefined(VDiskSlotId);
-
-    if (diskParamsDefined) {
-        const links: React.ReactNode[] = [];
-
+    const links: React.ReactNode[] = [];
+    if (!isNil(StringifiedId)) {
         if (withVDiskPageLink) {
-            const vDiskPagePath = getVDiskPagePath({
-                vDiskSlotId: VDiskSlotId,
-                pDiskId: PDiskId,
-                nodeId: NodeId,
-            });
+            const vDiskPagePath = getVDiskPagePath(
+                {
+                    nodeId: NodeId,
+                    vDiskId: StringifiedId,
+                },
+                {database},
+            );
             links.push(
                 <LinkWithIcon
                     key={vDiskPagePath}
@@ -246,33 +253,33 @@ export function VDiskInfo<T extends PreparedVDisk>({
                 />,
             );
         }
+    }
 
-        if (isUserAllowedToMakeChanges) {
-            const vDiskInternalViewerPath = createVDiskDeveloperUILink({
-                nodeId: NodeId,
-                pDiskId: PDiskId,
-                vDiskSlotId: VDiskSlotId,
-            });
+    if (isUserAllowedToMakeChanges && !isNil(NodeId) && !isNil(VDiskSlotId) && !isNil(PDiskId)) {
+        const vDiskInternalViewerPath = createVDiskDeveloperUILink({
+            nodeId: NodeId,
+            pDiskId: PDiskId,
+            vDiskSlotId: VDiskSlotId,
+        });
 
-            links.push(
-                <LinkWithIcon
-                    key={vDiskInternalViewerPath}
-                    title={vDiskInfoKeyset('developer-ui')}
-                    url={vDiskInternalViewerPath}
-                />,
-            );
-        }
+        links.push(
+            <LinkWithIcon
+                key={vDiskInternalViewerPath}
+                title={vDiskInfoKeyset('developer-ui')}
+                url={vDiskInternalViewerPath}
+            />,
+        );
+    }
 
-        if (links.length) {
-            rightColumn.push({
-                label: vDiskInfoKeyset('links'),
-                value: (
-                    <Flex wrap="wrap" gap={2}>
-                        {links}
-                    </Flex>
-                ),
-            });
-        }
+    if (links.length) {
+        rightColumn.push({
+            label: vDiskInfoKeyset('links'),
+            value: (
+                <Flex wrap="wrap" gap={2}>
+                    {links}
+                </Flex>
+            ),
+        });
     }
 
     const title = data && withTitle ? <VDiskTitle data={data} /> : null;

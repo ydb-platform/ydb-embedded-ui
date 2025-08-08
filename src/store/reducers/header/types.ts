@@ -15,9 +15,7 @@ export type Page =
     | 'storageGroup'
     | undefined;
 
-export interface ClustersBreadcrumbsOptions {
-    isViewerUser?: boolean;
-}
+export interface ClustersBreadcrumbsOptions {}
 
 export interface ClusterBreadcrumbsOptions extends ClustersBreadcrumbsOptions {
     clusterName?: string;
@@ -30,6 +28,7 @@ export interface TenantBreadcrumbsOptions extends ClusterBreadcrumbsOptions {
 
 export interface StorageGroupBreadcrumbsOptions extends ClusterBreadcrumbsOptions {
     groupId?: string;
+    tenantName?: string;
 }
 
 export interface NodeBreadcrumbsOptions extends TenantBreadcrumbsOptions {
@@ -43,7 +42,8 @@ export interface PDiskBreadcrumbsOptions extends Omit<NodeBreadcrumbsOptions, 't
 }
 
 export interface VDiskBreadcrumbsOptions extends PDiskBreadcrumbsOptions {
-    vDiskSlotId?: string | number;
+    vDiskId?: string | number;
+    groupId?: string;
 }
 
 export interface TabletBreadcrumbsOptions extends TenantBreadcrumbsOptions {

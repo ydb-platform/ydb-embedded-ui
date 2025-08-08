@@ -6,6 +6,7 @@ import {isEmpty} from 'lodash';
 import {InternalLink} from '../../../../../components/InternalLink';
 import {getPDiskPagePath, getVDiskPagePath} from '../../../../../routes';
 import type {Location} from '../../../../../types/api/healthcheck';
+import {useDatabaseFromQuery} from '../../../../../utils/hooks/useDatabaseFromQuery';
 import i18n from '../../i18n';
 
 import {NodeInfo} from './NodeInfo';
@@ -98,6 +99,7 @@ function GroupInfo({location}: StorageSectionProps) {
 }
 
 function VDiskInfo({location}: StorageSectionProps) {
+    const database = useDatabaseFromQuery();
     const {node, pool} = location ?? {};
     const {group} = pool ?? {};
     const {vdisk} = group ?? {};
@@ -117,10 +119,13 @@ function VDiskInfo({location}: StorageSectionProps) {
                             ids={ids}
                             renderItem={(id) => (
                                 <InternalLink
-                                    to={getVDiskPagePath({
-                                        vDiskId: id,
-                                        nodeId: node?.id,
-                                    })}
+                                    to={getVDiskPagePath(
+                                        {
+                                            vDiskId: id,
+                                            nodeId: node?.id,
+                                        },
+                                        {database},
+                                    )}
                                 >
                                     {id}
                                 </InternalLink>

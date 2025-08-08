@@ -1,5 +1,6 @@
 {
   "slot-id": "VDisk Slot Id",
+  "label_pdisk-id": "PDisk Id",
   "pool-name": "Storage Pool Name",
   "kind": "Kind",
 

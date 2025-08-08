@@ -121,14 +121,11 @@ export function getPDiskPagePath(
 }
 
 export function getVDiskPagePath(
-    params:
-        | {
-              vDiskSlotId: string | number;
-              pDiskId: string | number;
-              nodeId: string | number;
-          }
-        | {vDiskId: string; pDiskId?: string | number; nodeId?: string | number},
-    query: Query = {},
+    params: {
+        nodeId: string | number | undefined;
+        vDiskId: string;
+    },
+    query: {database: string | undefined; activeTab?: string} = {database: undefined},
 ) {
     return createHref(routes.vDisk, undefined, {...query, ...params});
 }

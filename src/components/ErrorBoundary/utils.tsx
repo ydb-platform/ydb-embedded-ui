@@ -24,7 +24,7 @@ async function getBackendVersion() {
         // node_id=. returns data about node that fullfills request
         // normally this request should be fast (200-300ms with good connection)
         // timeout=1000 in order not to wait too much in case everything is broken
-        const data = await window.api.viewer.getNodeInfo('.', {timeout: 1000});
+        const data = await window.api.viewer.getNodeInfo({nodeId: '.'}, {timeout: 1000});
         return data?.SystemStateInfo?.[0]?.Version;
     } catch (error) {
         return {error: prepareErrorMessage(error)};

@@ -76,7 +76,9 @@ export function Tablet() {
     const {data: tablet = {}, history = []} = currentData || {};
 
     const {currentData: tenantPath} = tabletApi.useGetTabletDescribeQuery(
-        tablet.TenantId ? {tenantId: tablet.TenantId} : skipToken,
+        tablet.TenantId
+            ? {tenantId: tablet.TenantId, database: queryDatabase?.toString()}
+            : skipToken,
     );
 
     const database = (tenantPath || queryDatabase) ?? undefined;

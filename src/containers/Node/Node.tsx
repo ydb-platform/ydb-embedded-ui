@@ -54,7 +54,7 @@ export function Node() {
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    const params = nodeId ? {nodeId} : skipToken;
+    const params = nodeId ? {nodeId, database: tenantNameFromQuery?.toString()} : skipToken;
     const {
         currentData: node,
         isLoading,
@@ -231,6 +231,7 @@ function NodePageContent({
             case 'storage': {
                 return (
                     <PaginatedStorage
+                        database={tenantName}
                         nodeId={nodeId}
                         scrollContainerRef={parentContainer}
                         viewContext={{

@@ -8,9 +8,9 @@ import {api} from './api';
 export const nodesListApi = api.injectEndpoints({
     endpoints: (build) => ({
         getNodesList: build.query({
-            queryFn: async (_, {signal}) => {
+            queryFn: async ({database}, {signal}) => {
                 try {
-                    const data = await window.api.viewer.getNodesList({signal});
+                    const data = await window.api.viewer.getNodesList({database}, {signal});
                     return {data};
                 } catch (error) {
                     return {error};
@@ -21,9 +21,13 @@ export const nodesListApi = api.injectEndpoints({
     overrideExisting: 'throw',
 });
 
-const selectNodesList = nodesListApi.endpoints.getNodesList.select(undefined);
+const createGetNodesListSelector = createSelector(
+    (database?: string) => database,
+    (database) => nodesListApi.endpoints.getNodesList.select({database}),
+);
 
 export const selectNodesMap = createSelector(
-    (state: RootState) => selectNodesList(state).data,
-    (data) => prepareNodesMap(data),
+    (state: RootState) => state,
+    (_state: RootState, database?: string) => createGetNodesListSelector(database),
+    (state, selectNodesList) => prepareNodesMap(selectNodesList(state).data),
 );

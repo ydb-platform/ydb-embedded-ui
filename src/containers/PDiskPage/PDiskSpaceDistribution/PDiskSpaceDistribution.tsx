@@ -74,15 +74,15 @@ interface SlotProps<T extends SlotItemType> {
     nodeId?: string | number;
 }
 
-function Slot<T extends SlotItemType>({item, pDiskId, nodeId}: SlotProps<T>) {
+function Slot<T extends SlotItemType>({item, nodeId}: SlotProps<T>) {
     const renderContent = () => {
         if (isVDiskSlot(item)) {
-            const vDiskPagePath =
-                valueIsDefined(item.SlotData?.VDiskSlotId) &&
-                valueIsDefined(pDiskId) &&
-                valueIsDefined(nodeId)
-                    ? getVDiskPagePath({vDiskSlotId: item.SlotData.VDiskSlotId, pDiskId, nodeId})
-                    : undefined;
+            const vDiskPagePath = valueIsDefined(item.SlotData?.StringifiedId)
+                ? getVDiskPagePath({
+                      nodeId,
+                      vDiskId: item.SlotData.StringifiedId,
+                  })
+                : undefined;
 
             return (
                 <HoverPopup

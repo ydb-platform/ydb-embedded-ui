@@ -1,6 +1,5 @@
-import type {TEvPDiskStateResponse} from '../../../types/api/pdisk';
+import type {StorageGroupsResponse} from '../../../types/api/storage';
 import type {TEvSystemStateResponse} from '../../../types/api/systemState';
-import type {TEvVDiskStateResponse} from '../../../types/api/vdisk';
 import {
     prepareWhiteboardPDiskData,
     prepareWhiteboardVDiskData,
@@ -9,18 +8,22 @@ import {prepareNodeSystemState} from '../../../utils/nodes';
 
 import type {VDiskData} from './types';
 
-export function prepareVDiskDataResponse([vDiskResponse, pDiskResponse, nodeResponse]: [
-    TEvVDiskStateResponse,
-    TEvPDiskStateResponse,
-    TEvSystemStateResponse,
-]): VDiskData {
-    const rawVDisk = vDiskResponse.VDiskStateInfo?.[0];
-    const preparedVDisk = prepareWhiteboardVDiskData(rawVDisk);
+export function prepareVDiskDataResponse(
+    [storageGroupResponse, nodeResponse]: [
+        StorageGroupsResponse,
+        TEvSystemStateResponse | undefined,
+    ],
+    vDiskId: string,
+): VDiskData {
+    const rawVDisk = storageGroupResponse?.StorageGroups?.[0].VDisks?.find(
+        ({VDiskId}) => VDiskId === vDiskId,
+    );
+    const preparedVDisk = prepareWhiteboardVDiskData(rawVDisk?.Whiteboard);
 
-    const rawPDisk = pDiskResponse.PDiskStateInfo?.[0];
+    const rawPDisk = rawVDisk?.PDisk?.Whiteboard;
     const preparedPDisk = prepareWhiteboardPDiskData(rawPDisk);
 
-    const rawNode = nodeResponse.SystemStateInfo?.[0];
+    const rawNode = nodeResponse?.SystemStateInfo?.[0];
     const preparedNode = prepareNodeSystemState(rawNode);
 
     const NodeId = preparedVDisk.NodeId ?? preparedPDisk.NodeId ?? preparedNode.NodeId;

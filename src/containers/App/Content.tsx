@@ -201,7 +201,8 @@ function GetUser({children}: {children: React.ReactNode}) {
 }
 
 function GetNodesList() {
-    nodesListApi.useGetNodesListQuery(undefined);
+    const database = useDatabaseFromQuery();
+    nodesListApi.useGetNodesListQuery({database}, undefined);
     return null;
 }
 

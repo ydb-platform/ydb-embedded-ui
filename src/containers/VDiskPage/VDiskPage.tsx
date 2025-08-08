@@ -3,6 +3,7 @@ import React from 'react';
 import {ArrowsOppositeToDots} from '@gravity-ui/icons';
 import {Icon, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
+import {isNil} from 'lodash';
 import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
 import {z} from 'zod';
@@ -21,9 +22,8 @@ import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
 import type {ModifyDiskResponse} from '../../types/api/modifyDisk';
 import type {TVDiskID} from '../../types/api/vdisk';
-import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
-import {getSeverityColor, getVDiskSlotBasedId} from '../../utils/disks/helpers';
+import {getSeverityColor} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useAppTitle} from '../App/AppTitleContext';
@@ -65,25 +65,27 @@ export function VDiskPage() {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const newDiskApiAvailable = useDiskPagesAvailable();
 
-    const [{nodeId, pDiskId, vDiskSlotId, vDiskId: vDiskIdParam, activeTab}] = useQueryParams({
-        nodeId: StringParam,
-        pDiskId: StringParam,
-        vDiskSlotId: StringParam,
-        vDiskId: StringParam,
-        activeTab: StringParam,
-    });
+    const [{nodeId, pDiskId, vDiskId: vDiskIdParam, activeTab, database: databaseParam}] =
+        useQueryParams({
+            nodeId: StringParam,
+            pDiskId: StringParam,
+            vDiskId: StringParam,
+            activeTab: StringParam,
+            database: StringParam,
+        });
+    const database = databaseParam ?? undefined;
 
     const vDiskTab = vDiskTabSchema.parse(activeTab);
 
-    React.useEffect(() => {
-        dispatch(setHeaderBreadcrumbs('vDisk', {nodeId, pDiskId, vDiskSlotId}));
-    }, [dispatch, nodeId, pDiskId, vDiskSlotId]);
-
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const params =
-        valueIsDefined(nodeId) && valueIsDefined(pDiskId) && valueIsDefined(vDiskSlotId)
-            ? {nodeId, pDiskId, vDiskSlotId}
-            : skipToken;
+
+    const params = React.useMemo(() => {
+        if (!isNil(vDiskIdParam)) {
+            return {vDiskId: vDiskIdParam, nodeId: nodeId?.toString(), database};
+        }
+
+        return skipToken;
+    }, [nodeId, vDiskIdParam, database]);
     const {
         currentData: vDiskData,
         isFetching,
@@ -91,6 +93,19 @@ export function VDiskPage() {
     } = vDiskApi.useGetVDiskDataQuery(params, {
         pollingInterval: autoRefreshInterval,
     });
+
+    const vDiskSlotId = vDiskData?.VDiskSlotId;
+
+    React.useEffect(() => {
+        dispatch(
+            setHeaderBreadcrumbs('vDisk', {
+                groupId: vDiskData?.VDiskId?.GroupID,
+                tenantName: database,
+                vDiskId: vDiskData?.StringifiedId,
+            }),
+        );
+    }, [dispatch, database, vDiskData?.VDiskId?.GroupID, vDiskData?.StringifiedId]);
+
     const loading = isFetching && vDiskData === undefined;
     const {NodeHost, NodeId, NodeType, NodeDC, PDiskId, PDiskType, Severity, VDiskId} =
         vDiskData || {};
@@ -98,11 +113,11 @@ export function VDiskPage() {
     const {GroupID, GroupGeneration, Ring, Domain, VDisk} =
         VDiskId || (!loading && getVDiskIdFromString(vDiskIdParam)) || {};
     const vDiskIdParamsDefined =
-        valueIsDefined(GroupID) &&
-        valueIsDefined(GroupGeneration) &&
-        valueIsDefined(Ring) &&
-        valueIsDefined(Domain) &&
-        valueIsDefined(VDisk);
+        !isNil(GroupID) &&
+        !isNil(GroupGeneration) &&
+        !isNil(Ring) &&
+        !isNil(Domain) &&
+        !isNil(VDisk);
 
     const handleEvictVDisk = async (isRetry?: boolean) => {
         if (vDiskIdParamsDefined) {
@@ -133,12 +148,14 @@ export function VDiskPage() {
         }
     };
 
+    const vDiskId = vDiskData?.StringifiedId || (loading ? undefined : vDiskIdParam);
+
     const handleAfterEvictVDisk = () => {
         dispatch(
             api.util.invalidateTags([
                 {
                     type: 'VDiskData',
-                    id: getVDiskSlotBasedId(nodeId || 0, pDiskId || 0, vDiskSlotId || 0),
+                    id: vDiskId?.toString(),
                 },
                 'StorageData',
             ]),
@@ -186,7 +203,7 @@ export function VDiskPage() {
                 className={vDiskPageCn('title')}
                 entityName={vDiskPageKeyset('vdisk')}
                 status={getSeverityColor(Severity)}
-                id={vDiskData?.StringifiedId || (!loading && vDiskIdParam)}
+                id={vDiskId}
             />
         );
     };
@@ -218,19 +235,24 @@ export function VDiskPage() {
     };
 
     const renderTabs = () => {
-        const vDiskParamsDefined =
-            valueIsDefined(nodeId) && valueIsDefined(pDiskId) && valueIsDefined(vDiskSlotId);
-
         return (
             <div className={vDiskPageCn('tabs')}>
                 <TabProvider value={vDiskTab}>
                     <TabList size="l">
                         {VDISK_PAGE_TABS.map(({id, title}) => {
-                            const path = vDiskParamsDefined
-                                ? getVDiskPagePath({nodeId, pDiskId, vDiskSlotId}, {activeTab: id})
-                                : undefined;
+                            let path: string | undefined;
+                            if (!isNil(vDiskId)) {
+                                path = getVDiskPagePath(
+                                    {
+                                        nodeId: nodeId?.toString(),
+                                        vDiskId: vDiskId?.toString(),
+                                    },
+                                    {activeTab: id, database},
+                                );
+                            }
+
                             return (
-                                <Tab key={id} value={id}>
+                                <Tab key={id} value={id} disabled={!path}>
                                     <InternalLink as="tab" to={path}>
                                         {title}
                                     </InternalLink>
@@ -251,6 +273,7 @@ export function VDiskPage() {
             case 'tablets': {
                 return (
                     <VDiskTablets
+                        scrollContainerRef={containerRef}
                         nodeId={nodeId ?? undefined}
                         pDiskId={pDiskId ?? undefined}
                         vDiskSlotId={vDiskSlotId ?? undefined}
@@ -264,11 +287,12 @@ export function VDiskPage() {
     };
 
     const renderStorageInfo = () => {
-        if (valueIsDefined(GroupID) && valueIsDefined(nodeId)) {
+        if (!isNil(GroupID)) {
             return (
                 <PaginatedStorage
+                    database={database}
                     groupId={GroupID}
-                    nodeId={nodeId}
+                    nodeId={nodeId ?? undefined}
                     pDiskId={pDiskId ?? undefined}
                     scrollContainerRef={containerRef}
                     viewContext={{

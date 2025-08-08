@@ -7,6 +7,7 @@ import {valueIsDefined} from '../../../utils';
 import type {PreparedVDisk} from '../../../utils/disks/types';
 import {generateEvaluator} from '../../../utils/generateEvaluator';
 import {useTypedSelector} from '../../../utils/hooks';
+import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import type {StorageViewContext} from '../types';
 
 const defaultDegradationEvaluator = generateEvaluator(['success', 'warning', 'danger'], 1, 2);
@@ -91,7 +92,8 @@ function isErasureWithDifferentDC(erasure?: Erasure) {
 }
 
 export function useVDisksWithDCMargins(vDisks: PreparedVDisk[] = [], erasure?: Erasure) {
-    const nodesMap = useTypedSelector(selectNodesMap);
+    const database = useDatabaseFromQuery();
+    const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));
 
     return React.useMemo(() => {
         const disksWithMargins: number[] = [];

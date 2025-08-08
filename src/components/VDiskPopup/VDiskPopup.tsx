@@ -13,6 +13,7 @@ import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
+import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {
     useIsUserAllowedToMakeChanges,
     useIsViewerUser,
@@ -71,7 +72,11 @@ const prepareUnavailableVDiskData = (data: UnavailableDonor, withDeveloperUILink
 };
 
 // eslint-disable-next-line complexity
-const prepareVDiskData = (data: PreparedVDisk, withDeveloperUILink?: boolean) => {
+const prepareVDiskData = (
+    data: PreparedVDisk,
+    withDeveloperUILink: boolean | undefined,
+    query: {database: string | undefined},
+) => {
     const {
         NodeId,
         PDiskId,
@@ -89,6 +94,7 @@ const prepareVDiskData = (data: PreparedVDisk, withDeveloperUILink?: boolean) =>
         ReadThroughput,
         WriteThroughput,
         StoragePoolName,
+        VDiskId,
     } = data;
 
     const vdiskData: InfoViewerItem[] = [
@@ -201,7 +207,10 @@ const prepareVDiskData = (data: PreparedVDisk, withDeveloperUILink?: boolean) =>
               })
             : undefined;
 
-        const vDiskPagePath = getVDiskLink({VDiskSlotId, PDiskId, NodeId, StringifiedId});
+        const vDiskPagePath = getVDiskLink(
+            {VDiskSlotId, PDiskId, NodeId, StringifiedId, VDiskId},
+            query,
+        );
         if (vDiskPagePath) {
             vdiskData.push({
                 label: vDiskPopupKeyset('label_links'),
@@ -238,15 +247,17 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
 
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
+    const database = useDatabaseFromQuery();
+
     const vdiskInfo = React.useMemo(
         () =>
             isFullData
-                ? prepareVDiskData(data, isUserAllowedToMakeChanges)
+                ? prepareVDiskData(data, isUserAllowedToMakeChanges, {database})
                 : prepareUnavailableVDiskData(data, isUserAllowedToMakeChanges),
-        [data, isFullData, isUserAllowedToMakeChanges],
+        [data, isFullData, isUserAllowedToMakeChanges, database],
     );
 
-    const nodesMap = useTypedSelector(selectNodesMap);
+    const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));
     const nodeData = valueIsDefined(data.NodeId) ? nodesMap?.get(data.NodeId) : undefined;
     const pdiskInfo = React.useMemo(
         () =>
@@ -262,7 +273,11 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
         for (const donor of donors) {
             donorsInfo.push({
                 label: vDiskPopupKeyset('label_vdisk'),
-                value: <InternalLink to={getVDiskLink(donor)}>{donor.StringifiedId}</InternalLink>,
+                value: (
+                    <InternalLink to={getVDiskLink(donor, {database})}>
+                        {donor.StringifiedId}
+                    </InternalLink>
+                ),
             });
         }
     }
