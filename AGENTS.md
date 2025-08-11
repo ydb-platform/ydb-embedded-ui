@@ -297,6 +297,7 @@ const [urlParam, setUrlParam] = useQueryParam('sort', SortOrderParam);
 - **NEVER** call APIs directly - use `window.api.module.method()`
 - **NEVER** mutate state in RTK Query - return new objects/arrays
 - **NEVER** hardcode user-facing strings - use i18n
+- **ALWAYS** use `EMPTY_DATA_PLACEHOLDER` for empty UI values. Do not hardcode em dashes `—` or en dashes `–` as placeholders. Hyphen `-` and dashes may be used as separators in titles/ranges. Before submitting, grep the code for `—`/`–` and ensure placeholders use `EMPTY_DATA_PLACEHOLDER` from `src/utils/constants.ts`.
 - **ALWAYS** use `cn()` for classNames: `const b = cn('component-name')`
 - **ALWAYS** clear errors on user input
 - **ALWAYS** handle loading states in UI

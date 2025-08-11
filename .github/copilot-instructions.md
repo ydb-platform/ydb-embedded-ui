@@ -82,6 +82,10 @@ const handleInputChange = useCallback(
 - Follow key format: `<context>_<content>` (e.g., `action_save`, `field_name`)
 - Register keysets with `registerKeysets()` using unique component name
 
+### Display Placeholders (MANDATORY)
+
+- ALWAYS use `EMPTY_DATA_PLACEHOLDER` for empty UI values. Do not hardcode em or en dashes (`—`, `–`) as placeholders. Hyphen `-`/dashes may be used as separators in titles/ranges. Before submitting a PR, grep for `—` and `–` and ensure placeholder usages use `EMPTY_DATA_PLACEHOLDER` from `src/utils/constants.ts`.
+
 ### State Management
 
 - Use Redux Toolkit with domain-based organization

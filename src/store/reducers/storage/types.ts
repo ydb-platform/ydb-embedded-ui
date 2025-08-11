@@ -37,6 +37,9 @@ export interface PreparedStorageNode extends PreparedNodeSystemState {
     Missing: number;
     MaximumSlotsPerDisk: number;
     MaximumDisksPerNode: number;
+
+    // Bridge mode
+    PileName?: string;
 }
 
 export interface PreparedStorageGroupFilters {
@@ -54,6 +57,7 @@ export interface PreparedStorageGroupFilters {
 
 export interface PreparedStorageGroup {
     PoolName?: string;
+    PileName?: string;
     MediaType?: string;
     Encryption?: boolean;
     ErasureSpecies?: Erasure;

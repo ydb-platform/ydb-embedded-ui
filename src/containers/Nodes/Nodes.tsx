@@ -2,10 +2,12 @@ import React from 'react';
 
 import type {Column} from '../../components/PaginatedTable';
 import {
+    NODES_COLUMNS_IDS,
     isMonitoringUserNodesColumn,
     isViewerUserNodesColumn,
 } from '../../components/nodesColumns/constants';
 import type {NodesColumnId} from '../../components/nodesColumns/constants';
+import {useBridgeModeEnabled} from '../../store/reducers/capabilities/hooks';
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 import type {NodesGroupByField} from '../../types/api/nodes';
@@ -50,21 +52,46 @@ export function Nodes({
     selectedColumnsKey = NODES_TABLE_SELECTED_COLUMNS_LS_KEY,
     groupByParams = ALL_NODES_GROUP_BY_PARAMS,
 }: NodesProps) {
+    const bridgeModeEnabled = useBridgeModeEnabled();
+
+    const columnsWithPile = React.useMemo(() => {
+        return bridgeModeEnabled
+            ? columns
+            : columns.filter((c) => c.name !== NODES_COLUMNS_IDS.PileName);
+    }, [bridgeModeEnabled, columns]);
+
+    const effectiveDefaultColumns = React.useMemo(() => {
+        if (!bridgeModeEnabled) {
+            return defaultColumnsIds;
+        }
+        return defaultColumnsIds.includes(NODES_COLUMNS_IDS.PileName)
+            ? defaultColumnsIds
+            : [...defaultColumnsIds, NODES_COLUMNS_IDS.PileName];
+    }, [bridgeModeEnabled, defaultColumnsIds]);
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const isViewerUser = useIsViewerUser();
 
     const preparedColumns = React.useMemo(() => {
         if (isUserAllowedToMakeChanges) {
-            return columns;
+            return columnsWithPile;
         }
-        const filteredColumns = columns.filter(
+        const filteredColumns = columnsWithPile.filter(
             (column) => !isMonitoringUserNodesColumn(column.name),
         );
         if (isViewerUser) {
             return filteredColumns;
         }
         return filteredColumns.filter((column) => !isViewerUserNodesColumn(column.name));
-    }, [columns, isUserAllowedToMakeChanges, isViewerUser]);
+    }, [columnsWithPile, isUserAllowedToMakeChanges, isViewerUser]);
+
+    const effectiveGroupByParams = React.useMemo(() => {
+        if (!bridgeModeEnabled || !groupByParams) {
+            return groupByParams;
+        }
+        return groupByParams.includes('PileName')
+            ? groupByParams
+            : ([...groupByParams, 'PileName'] as NodesGroupByField[]);
+    }, [bridgeModeEnabled, groupByParams]);
 
     return (
         <PaginatedNodes
@@ -73,10 +100,10 @@ export function Nodes({
             scrollContainerRef={scrollContainerRef}
             withPeerRoleFilter={withPeerRoleFilter}
             columns={preparedColumns}
-            defaultColumnsIds={defaultColumnsIds}
+            defaultColumnsIds={effectiveDefaultColumns}
             requiredColumnsIds={requiredColumnsIds}
             selectedColumnsKey={selectedColumnsKey}
-            groupByParams={groupByParams}
+            groupByParams={effectiveGroupByParams}
         />
     );
 }

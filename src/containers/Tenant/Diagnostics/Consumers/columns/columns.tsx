@@ -4,6 +4,7 @@ import qs from 'qs';
 
 import {InternalLink} from '../../../../../components/InternalLink';
 import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../../lib';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {IPreparedConsumerData} from '../../../../../types/store/topic';
 import {cn} from '../../../../../utils/cn';
@@ -30,7 +31,7 @@ export const columns: Column<IPreparedConsumerData>[] = [
         align: DataTable.LEFT,
         render: ({row}) => {
             if (!row.name) {
-                return '–';
+                return EMPTY_DATA_PLACEHOLDER;
             }
 
             const queryParams = qs.parse(location.search, {

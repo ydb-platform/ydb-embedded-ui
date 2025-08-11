@@ -1,6 +1,7 @@
 import {getDefaultNodePath} from '../../containers/Node/NodePages';
 import type {GetNodeRefFunc, NodeAddress} from '../../types/additionalProps';
 import type {TNodeInfo, TSystemStateInfo} from '../../types/api/nodes';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {
     createDeveloperUIInternalPageHref,
     createDeveloperUILinkWithNodeId,
@@ -30,7 +31,7 @@ export const NodeHostWrapper = ({
     statusForIcon = 'SystemState',
 }: NodeHostWrapperProps) => {
     if (!node.Host) {
-        return <span>—</span>;
+        return EMPTY_DATA_PLACEHOLDER;
     }
 
     const status = statusForIcon === 'ConnectStatus' ? node.ConnectStatus : node.SystemState;

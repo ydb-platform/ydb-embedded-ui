@@ -4,6 +4,7 @@ import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 
 import {
     capabilitiesApi,
+    selectBridgeModeEnabled,
     selectCapabilityVersion,
     selectDatabaseCapabilities,
     selectGraphShardExists,
@@ -103,6 +104,12 @@ export const useGraphShardExists = () => {
     const database = useDatabaseFromQuery();
 
     return useTypedSelector((state) => selectGraphShardExists(state, database));
+};
+
+export const useBridgeModeEnabled = () => {
+    const database = useDatabaseFromQuery();
+    const enabled = useTypedSelector((state) => selectBridgeModeEnabled(state, database));
+    return Boolean(enabled);
 };
 
 export const useClusterWithoutAuthInUI = () => {

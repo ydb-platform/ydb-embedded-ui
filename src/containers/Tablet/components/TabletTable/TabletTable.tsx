@@ -63,7 +63,7 @@ const getColumns: (props: {
         width: 300,
         render: ({row}) => {
             if (!row.fqdn) {
-                return <span>—</span>;
+                return EMPTY_DATA_PLACEHOLDER;
             }
             return <EntityStatus name={row.fqdn} showStatus={false} hasClipboardButton />;
         },

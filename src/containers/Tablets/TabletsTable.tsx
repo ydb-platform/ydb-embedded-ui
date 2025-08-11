@@ -96,7 +96,7 @@ function getColumns({database, nodeId}: {database?: string; nodeId?: string | nu
                 },
                 render: ({row}) => {
                     if (!row.fqdn) {
-                        return <span>—</span>;
+                        return EMPTY_DATA_PLACEHOLDER;
                     }
                     return <EntityStatus name={row.fqdn} showStatus={false} hasClipboardButton />;
                 },

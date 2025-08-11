@@ -6,6 +6,7 @@ import {Select, TableColumnSetup, Text} from '@gravity-ui/uikit';
 import {EntitiesCount} from '../../../components/EntitiesCount/EntitiesCount';
 import {usePaginatedTableState} from '../../../components/PaginatedTable/PaginatedTableContext';
 import {Search} from '../../../components/Search/Search';
+import {useBridgeModeEnabled} from '../../../store/reducers/capabilities/hooks';
 import {useIsUserAllowedToMakeChanges} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {STORAGE_GROUPS_GROUP_BY_OPTIONS} from '../PaginatedStorageGroupsTable/columns/constants';
 import {StorageTypeFilter} from '../StorageTypeFilter/StorageTypeFilter';
@@ -49,6 +50,13 @@ export function StorageGroupsControls({
     } = useStorageQueryParams();
 
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const bridgeModeEnabled = useBridgeModeEnabled();
+    const groupByOptions = React.useMemo(() => {
+        if (bridgeModeEnabled) {
+            return STORAGE_GROUPS_GROUP_BY_OPTIONS;
+        }
+        return STORAGE_GROUPS_GROUP_BY_OPTIONS.filter((opt) => opt.value !== 'PileName');
+    }, [bridgeModeEnabled]);
 
     const handleGroupBySelectUpdate = (value: string[]) => {
         handleStorageGroupsGroupByParamChange(value[0]);
@@ -91,7 +99,7 @@ export function StorageGroupsControls({
                             storageGroupsGroupByParam ? [storageGroupsGroupByParam] : undefined
                         }
                         onUpdate={handleGroupBySelectUpdate}
-                        options={STORAGE_GROUPS_GROUP_BY_OPTIONS}
+                        options={groupByOptions}
                     />
                 </React.Fragment>
             ) : null}

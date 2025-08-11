@@ -219,6 +219,7 @@ const prepareStorageNodeData = (
         ...prepareNodeSystemState(node.SystemState),
         NodeId: node.NodeId,
         DiskSpaceUsage: node.DiskSpaceUsage,
+        PileName: node.PileName,
         PDisks: pDisks,
         VDisks: vDisks,
         Missing: missing,

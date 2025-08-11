@@ -32,6 +32,7 @@ export const NODES_COLUMNS_IDS = {
     Missing: 'Missing',
     Tablets: 'Tablets',
     PDisks: 'PDisks',
+    PileName: 'PileName',
 } as const;
 
 export type NodesColumnId = ValueOf<typeof NODES_COLUMNS_IDS>;
@@ -130,6 +131,9 @@ export const NODES_COLUMNS_TITLES = {
     get PDisks() {
         return i18n('pdisks');
     },
+    get PileName() {
+        return i18n('PileName');
+    },
 } as const satisfies Record<NodesColumnId, string>;
 
 const NODES_COLUMNS_GROUP_BY_TITLES = {
@@ -178,6 +182,9 @@ const NODES_COLUMNS_GROUP_BY_TITLES = {
     get PingTime() {
         return i18n('ping-time');
     },
+    get PileName() {
+        return i18n('PileName');
+    },
 } as const satisfies Record<NodesGroupByField, string>;
 
 export function getNodesGroupByFieldTitle(groupByField: NodesGroupByField) {
@@ -213,6 +220,7 @@ export const NODES_COLUMNS_TO_DATA_FIELDS: Record<NodesColumnId, NodesRequiredFi
     Missing: ['Missing'],
     Tablets: ['Tablets', 'Database'],
     PDisks: ['PDisks'],
+    PileName: ['PileName'],
 };
 
 const NODES_COLUMNS_TO_SORT_FIELDS: Record<NodesColumnId, NodesSortValue | undefined> = {
@@ -242,6 +250,7 @@ const NODES_COLUMNS_TO_SORT_FIELDS: Record<NodesColumnId, NodesSortValue | undef
     Missing: 'Missing',
     Tablets: undefined,
     PDisks: undefined,
+    PileName: undefined,
 };
 
 export function getNodesColumnSortField(columnId?: string) {

@@ -132,6 +132,8 @@ export interface TGroupsStorageGroupInfo {
     /** uint64 */
     GroupGeneration?: string;
     PoolName?: string;
+    // Bridge mode
+    PileName?: string;
     Encryption?: boolean;
     Overall?: EFlag;
     DiskSpace?: EFlag;
@@ -278,6 +280,7 @@ export type GroupsGroupByField =
     | 'Usage'
     | 'DiskSpaceUsage'
     | 'PoolName'
+    | 'PileName'
     | 'Kind'
     | 'Encryption'
     | 'MediaType'
@@ -288,6 +291,7 @@ export type GroupsGroupByField =
 export type GroupsRequiredField =
     | 'GroupId' // always required
     | 'PoolName'
+    | 'PileName'
     | 'Kind'
     | 'MediaType'
     | 'Erasure'
