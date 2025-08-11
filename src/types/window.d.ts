@@ -45,5 +45,5 @@ interface Window {
 
     api: import('../services/api/index').YdbEmbeddedAPI;
 
-    [key: `yaCounter${number}`]: number;
+    [key: `yaCounter${number}`]: any;
 }
