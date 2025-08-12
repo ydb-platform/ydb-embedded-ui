@@ -38,20 +38,20 @@ export const SpeedMultiMeter = ({
         {value: formatValue(perDay), label: i18n('perDay')},
     ];
 
-    const [valueToDisplay, setValueToDisplay] = React.useState(perMinute);
+    const [valueToDisplayIndex, setValueToDisplayIndex] = React.useState(0);
     const [highlightedValueIndex, setHighlightedValueIndex] = React.useState(
         withValue ? 0 : undefined,
     );
     const [highlightedContainerIndex, setHighlightedContainerIndex] = React.useState<number>();
 
-    const onEnterDiagram = (values: number[], index: number) => {
-        setValueToDisplay(values[index]);
+    const onEnterDiagram = (index: number) => {
+        setValueToDisplayIndex(index);
         setHighlightedValueIndex(index);
         setHighlightedContainerIndex(index);
     };
 
     const onLeaveDiagram = () => {
-        setValueToDisplay(perMinute);
+        setValueToDisplayIndex(0);
         setHighlightedValueIndex(withValue ? 0 : undefined);
         setHighlightedContainerIndex(undefined);
     };
@@ -70,7 +70,7 @@ export const SpeedMultiMeter = ({
                 className={b('bar-container', {
                     highlighted: isContainerHighlighted(index),
                 })}
-                onMouseEnter={onEnterDiagram.bind(null, rawValues, index)}
+                onMouseEnter={() => onEnterDiagram(index)}
             >
                 <div
                     className={b('bar', {
@@ -102,7 +102,9 @@ export const SpeedMultiMeter = ({
         <div className={b()}>
             <div className={b('content')}>
                 {withValue && (
-                    <div className={b('displayed-value')}>{formatValue(valueToDisplay)}</div>
+                    <div className={b('displayed-value')}>
+                        {formatValue(rawValues[valueToDisplayIndex])}
+                    </div>
                 )}
                 <Popover
                     content={renderPopoverContent()}
