@@ -43,7 +43,7 @@ export interface UIFactory<H extends string = CommonIssueType> {
         countHealthcheckIssuesByType: (issueTrees: IssuesTree[]) => Record<H, number>;
     };
     hasAccess?: boolean;
-    yaMetricaId?: number;
+    yaMetricaMap?: Record<string, number>;
 }
 
 export type HandleCreateDB = (params: {clusterName: string}) => Promise<boolean>;

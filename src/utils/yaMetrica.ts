@@ -7,10 +7,16 @@ export interface Counter {
     reachGoal: (...args: unknown[]) => void;
 }
 
-const yaMetricaId = uiFactory.yaMetricaId;
+const yaMetricaMap = uiFactory.yaMetricaMap;
 
 class FakeMetrica implements Counter {
+    name: string;
+
     private warnShown = false;
+
+    constructor(name: string) {
+        this.name = name;
+    }
 
     hit() {
         this.warnOnce();
@@ -30,16 +36,17 @@ class FakeMetrica implements Counter {
 
     private warnOnce() {
         if (!this.warnShown) {
-            console.warn('YaMetrica counter is not defined\n');
+            console.warn(`YaMetrica counter "${this.name}" is not defined\n`);
             this.warnShown = true;
         }
     }
 }
 
-export function getMetrica() {
+export function getMetrica(name: string) {
+    const yaMetricaId = yaMetricaMap?.[name];
     const metricaInstance = yaMetricaId
         ? (window[`yaCounter${yaMetricaId}`] as Counter)
         : undefined;
 
-    return metricaInstance ?? new FakeMetrica();
+    return metricaInstance ?? new FakeMetrica(name);
 }
