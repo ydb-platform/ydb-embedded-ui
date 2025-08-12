@@ -9,6 +9,7 @@ import {NodeId} from '../../../../components/NodeId/NodeId';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TabletState} from '../../../../components/TabletState/TabletState';
 import {TabletUptime} from '../../../../components/UptimeViewer/UptimeViewer';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../lib';
 import {getTabletPagePath} from '../../../../routes';
 import type {ITabletPreparedHistoryItem} from '../../../../types/store/tablet';
 
