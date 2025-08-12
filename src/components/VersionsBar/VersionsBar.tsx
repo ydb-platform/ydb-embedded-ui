@@ -19,12 +19,16 @@ const MAX_DISPLAYED_VERSIONS = TRUNCATION_THRESHOLD - 1;
 const HOVER_DELAY = 200;
 const TOOLTIP_OPEN_DELAY = 200;
 
+type VersionsBarSize = 's' | 'm';
+
 interface VersionsBarProps {
     preparedVersions: PreparedVersion[];
+    withTitles?: boolean;
+    size?: VersionsBarSize;
 }
 
-export function VersionsBar({preparedVersions}: VersionsBarProps) {
-    const shouldTruncateVersions = preparedVersions.length > TRUNCATION_THRESHOLD;
+export function VersionsBar({preparedVersions, withTitles = true, size = 's'}: VersionsBarProps) {
+    const shouldTruncateVersions = preparedVersions.length > TRUNCATION_THRESHOLD && size === 's';
 
     const [hoveredVersion, setHoveredVersion] = React.useState<string | undefined>();
     const [allVersionsDisplayed, setAllVersionsDisplayed] = React.useState<boolean>(false);
@@ -103,12 +107,12 @@ export function VersionsBar({preparedVersions}: VersionsBarProps) {
     }, [handleMouseEnter]);
 
     const isDimmed = (version: string) => {
-        return hoveredVersion && hoveredVersion !== version;
+        return Boolean(hoveredVersion && hoveredVersion !== version);
     };
 
     return (
-        <Flex gap={2} direction={'column'} className={b(null)} wrap>
-            <Flex className={b('bar')} grow={1} gap={0.5}>
+        <Flex direction={'column'} className={b('bar-wrapper', {size})} wrap>
+            <Flex className={b('bar', {size})} grow={1}>
                 {displayedVersions.map((item) => (
                     <Tooltip
                         key={item.version}
@@ -119,7 +123,7 @@ export function VersionsBar({preparedVersions}: VersionsBarProps) {
                                 {item.version}
                             </React.Fragment>
                         }
-                        placement={'top-start'}
+                        placement={size === 'm' ? 'auto' : 'top-start'}
                         openDelay={TOOLTIP_OPEN_DELAY}
                     >
                         <span
@@ -127,46 +131,95 @@ export function VersionsBar({preparedVersions}: VersionsBarProps) {
                                 handleMouseEnter(item.version);
                             }}
                             onMouseLeave={handleMouseLeave}
-                            className={b('version', {dimmed: isDimmed(item.version)})}
+                            className={b('version', {dimmed: isDimmed(item.version), size})}
                             style={{backgroundColor: item.color, width: `${item.value}%`}}
                         />
                     </Tooltip>
                 ))}
             </Flex>
 
-            <Flex gap={0.5} direction={'column'}>
-                {truncatedDisplayedVersions.map((item) => (
-                    <Tooltip
-                        key={item.version}
-                        content={i18n('tooltip_nodes', {count: item.count})}
-                        placement={'bottom-end'}
-                        openDelay={TOOLTIP_OPEN_DELAY}
-                    >
-                        <Flex gap={1} alignItems={'center'} className={b('titles-wrapper')}>
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="6"
-                                height="6"
-                                viewBox="0 0 6 6"
-                                fill="none"
-                                className={b('version-icon', {dimmed: isDimmed(item.version)})}
-                            >
-                                <circle cx="3" cy="3" r="3" fill={item.color} />
-                            </svg>
-                            <div
-                                className={b('title', {dimmed: isDimmed(item.version)})}
-                                onMouseEnter={() => {
-                                    handleMouseEnter(item.version);
-                                }}
-                                onMouseLeave={handleMouseLeave}
-                            >
-                                {item.version}
-                            </div>
-                        </Flex>
-                    </Tooltip>
-                ))}
-                <Flex>{renderButton()}</Flex>
-            </Flex>
+            {withTitles && (
+                <Flex className={b('titles-wrapper', {size})}>
+                    {truncatedDisplayedVersions.map((item) => (
+                        <VersionTitle
+                            key={item.version}
+                            version={item.version}
+                            color={item.color || ''}
+                            count={item.count}
+                            isDimmed={isDimmed(item.version)}
+                            onMouseEnter={() => {
+                                handleMouseEnter(item.version);
+                            }}
+                            onMouseLeave={handleMouseLeave}
+                            size={size}
+                        />
+                    ))}
+                    <Flex>{renderButton()}</Flex>
+                </Flex>
+            )}
         </Flex>
+    );
+}
+
+interface VersionTitleProps {
+    version: string;
+    color: string;
+    count?: number;
+    isDimmed: boolean;
+    onMouseEnter: () => void;
+    onMouseLeave: () => void;
+    size: VersionsBarSize;
+}
+
+function VersionTitle({
+    version,
+    color,
+    count,
+    isDimmed,
+    onMouseEnter,
+    onMouseLeave,
+    size,
+}: VersionTitleProps) {
+    return (
+        <Tooltip
+            content={i18n('tooltip_nodes', {count: count})}
+            placement={'bottom-end'}
+            openDelay={TOOLTIP_OPEN_DELAY}
+        >
+            <Flex alignItems={'center'} className={b('title', {size})}>
+                <VersionCircle size={size} dimmed={isDimmed} color={color} />
+                <div
+                    className={b('title-text', {dimmed: isDimmed, size})}
+                    onMouseEnter={onMouseEnter}
+                    onMouseLeave={onMouseLeave}
+                >
+                    {version}
+                </div>
+            </Flex>
+        </Tooltip>
+    );
+}
+
+interface VersionCircleProps {
+    size: VersionsBarSize;
+    dimmed: boolean;
+    color: string;
+}
+
+function VersionCircle({size, dimmed, color}: VersionCircleProps) {
+    const numericSize = size === 'm' ? 8 : 6;
+    const radius = numericSize / 2;
+
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width={numericSize}
+            height={numericSize}
+            viewBox={`0 0 ${numericSize} ${numericSize}`}
+            fill="none"
+            className={b('version-icon', {dimmed})}
+        >
+            <circle cx={radius} cy={radius} r={radius} fill={color} />
+        </svg>
     );
 }

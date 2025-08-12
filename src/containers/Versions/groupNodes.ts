@@ -1,7 +1,7 @@
 import groupBy from 'lodash/groupBy';
 
 import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
-import {getColorFromVersionsData, parseNodesToVersionsValues} from '../../utils/versions';
+import {getColorFromVersionsData, parseNodesToPreparedVersions} from '../../utils/versions';
 import type {VersionsDataMap} from '../../utils/versions/types';
 
 import type {GroupedNodesItem} from './types';
@@ -31,6 +31,7 @@ export const getGroupedTenantNodes = (
                     .map((tenant) => {
                         return {
                             title: tenant,
+                            isDatabase: true,
                             nodes: dividedByTenant[tenant],
                         };
                     })
@@ -53,7 +54,7 @@ export const getGroupedTenantNodes = (
 
         return Object.keys(dividedByTenant)
             .map<GroupedNodesItem | null>((tenant) => {
-                const versionsValues = parseNodesToVersionsValues(
+                const preparedVersions = parseNodesToPreparedVersions(
                     dividedByTenant[tenant],
                     versionsDataMap,
                 );
@@ -73,8 +74,9 @@ export const getGroupedTenantNodes = (
 
                 return {
                     title: tenant,
+                    isDatabase: true,
                     items: preparedItems,
-                    versionsValues,
+                    preparedVersions,
                 };
             })
             .filter((item): item is GroupedNodesItem => Boolean(item))

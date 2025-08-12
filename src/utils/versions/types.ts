@@ -1,13 +1,6 @@
 export type VersionsMap = Map<string, Set<string>>;
 export type VersionToColorMap = Map<string, string>;
 
-export interface VersionValue {
-    value: number;
-    color?: string;
-    version: string;
-    title: string;
-}
-
 export type ColorIndexToVersionsMap = Map<number | string, Set<string>>;
 
 interface VersionWithColorIndexes {
