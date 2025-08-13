@@ -148,14 +148,6 @@ const slice = createSlice({
         selectResult: (state) => state.result,
         selectStartTime: (state) => state.result?.startTime,
         selectEndTime: (state) => state.result?.endTime,
-        selectQueriesHistory: (state) => {
-            const items = state.history.queries;
-            const filter = state.history.filter?.toLowerCase();
-
-            return filter
-                ? items.filter((item) => item.queryText.toLowerCase().includes(filter))
-                : items;
-        },
         selectUserInput: (state) => state.input,
         selectIsDirty: (state) => state.isDirty,
         selectQueriesHistoryCurrentIndex: (state) => state.history?.currentIndex,
@@ -171,6 +163,19 @@ export const selectQueryDuration = createSelector(
             startTime,
             endTime,
         };
+    },
+);
+
+export const selectQueriesHistory = createSelector(
+    [
+        (state: RootState) => state.query.history.queries,
+        (state: RootState) => state.query.history.filter,
+    ],
+    (queries, filter) => {
+        const normalizedFilter = filter?.toLowerCase();
+        return normalizedFilter
+            ? queries.filter((item) => item.queryText.toLowerCase().includes(normalizedFilter))
+            : queries;
     },
 );
 
@@ -194,7 +199,6 @@ export const {
 export const {
     selectQueriesHistoryFilter,
     selectQueriesHistoryCurrentIndex,
-    selectQueriesHistory,
     selectTenantPath,
     selectResult,
     selectUserInput,
