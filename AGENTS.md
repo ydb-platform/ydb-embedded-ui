@@ -232,21 +232,7 @@ Uses BEM naming convention with `cn()` utility from `utils/cn`. Create a block f
 
 ### Internationalization (i18n)
 
-All user-facing text must be internationalized using the i18n system. Follow the naming rules from `i18n-naming-ruleset.md`:
-
-- **Component Structure**: Each component has an `i18n/` folder with `en.json` and `index.ts`
-- **Registration**: Use `registerKeysets()` with a unique component name
-- **Key Format**: Follow `<context>_<content>` pattern (e.g., `action_save`, `field_name`, `alert_error`)
-- **Context Prefixes**:
-  - `action_` - buttons, links, menu items
-  - `field_` - form fields, table columns
-  - `title_` - page/section titles
-  - `alert_` - notifications, errors
-  - `context_` - descriptions, hints
-  - `confirm_` - confirmation dialogs
-  - `value_` - status values, options
-- **NEVER** use hardcoded strings in UI components
-- **ALWAYS** create i18n entries for all user-visible text
+See `i18n-naming-ruleset.md` in the repo root for all i18n conventions (naming and usage).
 
 ### Performance Considerations
 

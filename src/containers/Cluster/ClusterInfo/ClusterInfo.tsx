@@ -20,8 +20,6 @@ import {getInfo, getStorageGroupStats} from './utils/utils';
 
 import './ClusterInfo.scss';
 
-const GROUPS_SECTION_GAP = 10;
-
 interface ClusterInfoProps {
     cluster?: TClusterInfo;
     loading?: boolean;
@@ -101,7 +99,7 @@ export const ClusterInfo = ({
         }
         return (
             <InfoSection>
-                <Flex gap={GROUPS_SECTION_GAP} width="full">
+                <Flex gap={10} width="full">
                     <Flex direction="column" gap={2}>
                         <Text as="div" variant="subheader-2" className={b('section-title')}>
                             {i18n('title_storage-groups')}{' '}

@@ -114,7 +114,7 @@ export function getRackColumn<T extends {Rack?: string}>(): Column<T> {
 export function getPileNameColumn<T extends {PileName?: string}>(): Column<T> {
     return {
         name: NODES_COLUMNS_IDS.PileName,
-        header: i18n('PileName'),
+        header: i18n('field_pile-name'),
         align: DataTable.LEFT,
         render: ({row}) => row.PileName || EMPTY_DATA_PLACEHOLDER,
         width: 100,

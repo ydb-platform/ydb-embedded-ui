@@ -20,7 +20,7 @@
   "pdisks": "PDisks",
   "field_memory-used": "Memory used",
   "field_memory-limit": "Memory limit",
-  "PileName": "Pile Name",
+  "field_pile-name": "Pile Name",
   "system-state": "System State",
   "connect-status": "Connect Status",
   "utilization": "Utilization",

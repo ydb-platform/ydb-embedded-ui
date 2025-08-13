@@ -5,8 +5,8 @@ import {skipToken} from '@reduxjs/toolkit/query';
 import type {ClusterTab} from '../../../containers/Cluster/utils';
 import {clusterTabsIds, isClusterTab} from '../../../containers/Cluster/utils';
 import {parseTraceFields} from '../../../services/parsers/parseMetaCluster';
-import {isClusterInfoV2, isClusterInfoV5} from '../../../types/api/cluster';
-import type {TClusterInfo, TClusterInfoV5} from '../../../types/api/cluster';
+import {isClusterInfoV2} from '../../../types/api/cluster';
+import type {TClusterInfo} from '../../../types/api/cluster';
 import type {TTabletStateInfo} from '../../../types/api/tablet';
 import {CLUSTER_DEFAULT_TITLE, DEFAULT_CLUSTER_TAB_KEY} from '../../../utils/constants';
 import {useClusterNameFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
@@ -205,16 +205,5 @@ export const selectClusterTabletsWithFqdn = createSelector(
                 tablet.NodeId === undefined ? undefined : nodeHostsMap.get(tablet.NodeId)?.Host;
             return {...tablet, fqdn};
         });
-    },
-);
-
-export const selectBridgeInfo = createSelector(
-    (state: RootState) => state,
-    (_state: RootState, clusterName?: string) => clusterName,
-    (state, clusterName) => {
-        const info = selectClusterInfo(state, clusterName)?.clusterData;
-        return isClusterInfoV5(info as TClusterInfo)
-            ? (info as TClusterInfoV5).BridgeInfo
-            : undefined;
     },
 );

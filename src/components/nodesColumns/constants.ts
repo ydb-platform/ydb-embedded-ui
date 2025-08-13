@@ -132,7 +132,7 @@ export const NODES_COLUMNS_TITLES = {
         return i18n('pdisks');
     },
     get PileName() {
-        return i18n('PileName');
+        return i18n('field_pile-name');
     },
 } as const satisfies Record<NodesColumnId, string>;
 
@@ -183,7 +183,7 @@ const NODES_COLUMNS_GROUP_BY_TITLES = {
         return i18n('ping-time');
     },
     get PileName() {
-        return i18n('PileName');
+        return i18n('field_pile-name');
     },
 } as const satisfies Record<NodesGroupByField, string>;
 

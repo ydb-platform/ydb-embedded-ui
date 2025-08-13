@@ -21,11 +21,6 @@
         margin-left: 5px;
     }
 
-    &__details-layout {
-        align-items: flex-start;
-        gap: var(--g-spacing-6);
-    }
-
     &__bridge-table {
         flex: 0 0 360px; // do not shrink, fixed basis so stats don't take all space
 

@@ -19,26 +19,26 @@ export function BridgeInfoTable({piles}: BridgeInfoTableProps) {
         () => [
             {
                 name: 'Name',
-                header: i18n('label_name'),
+                header: i18n('field_name'),
                 width: 160,
                 align: DataTable.LEFT,
             },
             {
                 name: 'IsPrimary',
-                header: i18n('label_primary'),
+                header: i18n('field_primary'),
                 width: 110,
                 align: DataTable.LEFT,
                 render: ({row}) => (row.IsPrimary ? i18n('value_yes') : i18n('value_no')),
             },
             {
                 name: 'State',
-                header: i18n('label_state'),
+                header: i18n('field_state'),
                 width: 160,
                 align: DataTable.LEFT,
             },
             {
                 name: 'Nodes',
-                header: i18n('label_nodes'),
+                header: i18n('field_nodes'),
                 width: 100,
                 align: DataTable.RIGHT,
                 render: ({row}) =>

@@ -1,3 +1,11 @@
+# Copilot Instructions
+
+## Internationalization (i18n)
+
+- Do NOT hardcode user-facing strings.
+- ALWAYS use the component i18n keysets.
+- For key naming, see `i18n-naming-ruleset.md` in the repo root.
+
 # GitHub Copilot Instructions for YDB Embedded UI
 
 > **Note**: This file contains project-specific instructions for GitHub Copilot code review and assistance.
