@@ -99,7 +99,7 @@ export const ClusterInfo = ({
         }
         return (
             <InfoSection>
-                <Flex gap={10} width="full">
+                <Flex gap={6} width="full">
                     <Flex direction="column" gap={2}>
                         <Text as="div" variant="subheader-2" className={b('section-title')}>
                             {i18n('title_storage-groups')}{' '}
@@ -112,7 +112,10 @@ export const ClusterInfo = ({
                     {bridgePiles?.length ? (
                         <Flex direction="column" gap={2} className={b('bridge-table')}>
                             <Text as="div" variant="subheader-2" className={b('section-title')}>
-                                {i18n('title_bridge')}
+                                {i18n('title_bridge')}{' '}
+                                <Text variant="subheader-2" color="secondary">
+                                    {formatNumber(bridgePiles.length)}
+                                </Text>
                             </Text>
                             <BridgeInfoTable piles={bridgePiles} />
                         </Flex>

@@ -1,10 +1,16 @@
 import {expect, test} from '@playwright/test';
 
 import {backend, nodesPage} from '../../utils/constants';
+import {ClusterPage} from '../cluster/ClusterPage';
 import {ClusterNodesTable, ClusterStorageTable} from '../paginatedTable/paginatedTable';
 import {StoragePage} from '../storage/StoragePage';
 
-import {mockCapabilities, mockNodesWithPile, mockStorageGroupsWithPile} from './mocks';
+import {
+    mockCapabilities,
+    mockClusterWithBridgePiles,
+    mockNodesWithPile,
+    mockStorageGroupsWithPile,
+} from './mocks';
 
 test.describe('Bridge mode - Nodes table', () => {
     test('off: no Pile Name column and no group-by option', async ({page}) => {
@@ -83,5 +89,38 @@ test.describe('Bridge mode - Storage groups', () => {
         await table.waitForTableToLoad();
         const headers = await table.getHeaders();
         expect(headers.join(' ')).not.toContain('Pile Name');
+    });
+});
+
+test.describe('Bridge mode - Cluster Overview', () => {
+    test('off: does not show Bridge piles section', async ({page}) => {
+        await mockCapabilities(page, false);
+
+        const clusterPage = new ClusterPage(page);
+        await clusterPage.goto();
+
+        // Bridge piles section should not be visible
+        expect(await clusterPage.isBridgeSectionVisible()).toBe(false);
+    });
+
+    test('on: shows Bridge piles section with data', async ({page}) => {
+        await mockCapabilities(page, true);
+        await mockClusterWithBridgePiles(page);
+
+        const clusterPage = new ClusterPage(page);
+        await clusterPage.goto();
+
+        // Bridge piles section should be visible
+        expect(await clusterPage.isBridgeSectionVisible()).toBe(true);
+
+        // Should show pile cards
+        expect(await clusterPage.getPileCardsCount()).toBe(2);
+
+        // Check first pile content
+        const firstPileContent = await clusterPage.getFirstPileContent();
+        expect(firstPileContent).toContain('r1');
+        expect(firstPileContent).toContain('Yes'); // Primary status
+        expect(firstPileContent).toContain('SYNCHRONIZED');
+        expect(firstPileContent).toContain('16'); // Nodes count
     });
 });

@@ -20,10 +20,4 @@
 
         margin-left: 5px;
     }
-
-    &__bridge-table {
-        flex: 0 0 360px; // do not shrink, fixed basis so stats don't take all space
-
-        min-width: 360px;
-    }
 }

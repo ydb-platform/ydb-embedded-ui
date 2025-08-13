@@ -10,7 +10,7 @@ import {
 import type {ClusterGroupsStats} from '../../../store/reducers/cluster/types';
 import type {AdditionalClusterProps} from '../../../types/additionalProps';
 import {isClusterInfoV2, isClusterInfoV5} from '../../../types/api/cluster';
-import type {TBridgePile, TClusterInfo} from '../../../types/api/cluster';
+import type {TClusterInfo} from '../../../types/api/cluster';
 import type {IResponseError} from '../../../types/api/error';
 import {valueIsDefined} from '../../../utils';
 import {EXPAND_CLUSTER_DASHBOARD} from '../../../utils/constants';
@@ -42,14 +42,15 @@ interface ClusterOverviewProps {
 export function ClusterOverview(props: ClusterOverviewProps) {
     const [expandDashboard, setExpandDashboard] = useSetting<boolean>(EXPAND_CLUSTER_DASHBOARD);
     const bridgeModeEnabled = useBridgeModeEnabled();
-    let bridgePiles: TBridgePile[] | undefined;
-    if (isClusterInfoV5(props.cluster)) {
-        const {BridgeInfo} = props.cluster;
-        const shouldShowBridge = bridgeModeEnabled && Boolean(BridgeInfo?.Piles?.length);
-        if (shouldShowBridge) {
-            bridgePiles = BridgeInfo?.Piles;
+
+    const bridgePiles = React.useMemo(() => {
+        if (!bridgeModeEnabled || !isClusterInfoV5(props.cluster)) {
+            return undefined;
         }
-    }
+
+        const {BridgeInfo} = props.cluster;
+        return BridgeInfo?.Piles?.length ? BridgeInfo.Piles : undefined;
+    }, [props.cluster, bridgeModeEnabled]);
     if (props.error) {
         return <ResponseError error={props.error} className={b('error')} />;
     }
