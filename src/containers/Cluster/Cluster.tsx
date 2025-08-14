@@ -28,6 +28,7 @@ import type {
     AdditionalTenantsProps,
 } from '../../types/additionalProps';
 import {EFlag} from '../../types/api/enums';
+import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {useAppTitle} from '../App/AppTitleContext';
@@ -39,7 +40,13 @@ import {VersionsContainer} from '../Versions/Versions';
 
 import {ClusterOverview} from './ClusterOverview/ClusterOverview';
 import type {ClusterTab} from './utils';
-import {clusterTabs, clusterTabsIds, getClusterPath, isClusterTab} from './utils';
+import {
+    clusterTabs,
+    clusterTabsIds,
+    getClusterPath,
+    isClusterTab,
+    useShouldShowEventsTab,
+} from './utils';
 
 import './Cluster.scss';
 
@@ -60,6 +67,7 @@ export function Cluster({
     const isClusterDashboardAvailable = useClusterDashboardAvailable();
 
     const shouldShowNetworkTable = useShouldShowClusterNetworkTable();
+    const shouldShowEventsTab = useShouldShowEventsTab();
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
@@ -99,12 +107,17 @@ export function Cluster({
     }, [dispatch]);
 
     const actualClusterTabs = React.useMemo(() => {
-        if (shouldShowNetworkTable) {
-            return clusterTabs;
-        } else {
-            return clusterTabs.filter((tab) => tab.id !== clusterTabsIds.network);
+        let tabs = clusterTabs;
+
+        if (!shouldShowNetworkTable) {
+            tabs = tabs.filter((tab) => tab.id !== clusterTabsIds.network);
         }
-    }, [shouldShowNetworkTable]);
+        if (!shouldShowEventsTab) {
+            tabs = tabs.filter((tab) => tab.id !== clusterTabsIds.events);
+        }
+
+        return tabs;
+    }, [shouldShowEventsTab, shouldShowNetworkTable]);
 
     const getClusterTitle = () => {
         if (infoLoading) {
@@ -240,6 +253,17 @@ export function Cluster({
                     >
                         <VersionsContainer cluster={cluster} loading={infoLoading} />
                     </Route>
+                    {shouldShowEventsTab && (
+                        <Route
+                            path={
+                                getLocationObjectFromHref(getClusterPath(clusterTabsIds.events))
+                                    .pathname
+                            }
+                        >
+                            {uiFactory.renderEvents?.()}
+                        </Route>
+                    )}
+
                     <Route
                         render={() => (
                             <Redirect to={getLocationObjectFromHref(getClusterPath(activeTabId))} />
@@ -257,13 +281,19 @@ function useClusterTab() {
     const defaultTab = useTypedSelector((state) => state.cluster.defaultClusterTab);
 
     const shouldShowNetworkTable = useShouldShowClusterNetworkTable();
+    const shouldShowEventsTab = useShouldShowEventsTab();
 
     const match = useRouteMatch<{activeTab: string}>(routes.cluster);
 
     const {activeTab: activeTabFromParams} = match?.params || {};
     let activeTab: ClusterTab;
 
-    if (!shouldShowNetworkTable && activeTabFromParams === clusterTabsIds.network) {
+    const shouldSwitchFromNetworkToDefault =
+        !shouldShowNetworkTable && activeTabFromParams === clusterTabsIds.network;
+    const shouldSwitchFromEventsToDefault =
+        !shouldShowEventsTab && activeTabFromParams === clusterTabsIds.events;
+
+    if (shouldSwitchFromNetworkToDefault || shouldSwitchFromEventsToDefault) {
         activeTab = INITIAL_DEFAULT_CLUSTER_TAB;
     } else if (isClusterTab(activeTabFromParams)) {
         activeTab = activeTabFromParams;
