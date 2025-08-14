@@ -44,4 +44,6 @@ interface Window {
     systemSettings?: import('../services/settings').SettingsObject;
 
     api: import('../services/api/index').YdbEmbeddedAPI;
+
+    [key: `yaCounter${number}`]: any;
 }
