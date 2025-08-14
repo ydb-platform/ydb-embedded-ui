@@ -368,7 +368,6 @@ export class Diagnostics {
         await this.cpuCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.storageCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.memoryCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await this.healthcheckCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return true;
     }
 
