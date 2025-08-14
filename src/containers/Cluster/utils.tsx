@@ -1,7 +1,9 @@
 import type {CreateHrefOptions} from '../../routes';
 import routes, {createHref} from '../../routes';
+import {useClusterEventsAvailable} from '../../store/reducers/capabilities/hooks';
 import type {ClusterGroupsStats} from '../../store/reducers/cluster/types';
 import type {ValueOf} from '../../types/common';
+import {uiFactory} from '../../uiFactory/uiFactory';
 
 export const clusterTabsIds = {
     tenants: 'tenants',
@@ -10,6 +12,7 @@ export const clusterTabsIds = {
     network: 'network',
     versions: 'versions',
     tablets: 'tablets',
+    events: 'events',
 } as const;
 
 export type ClusterTab = ValueOf<typeof clusterTabsIds>;
@@ -38,8 +41,12 @@ const tablets = {
     id: clusterTabsIds.tablets,
     title: 'Tablets',
 };
+const events = {
+    id: clusterTabsIds.events,
+    title: 'Events',
+};
 
-export const clusterTabs = [tenants, nodes, storage, network, tablets, versions];
+export const clusterTabs = [tenants, nodes, storage, network, tablets, versions, events];
 
 export function isClusterTab(tab: any): tab is ClusterTab {
     return Object.values(clusterTabsIds).includes(tab);
@@ -58,3 +65,7 @@ export const getTotalStorageGroupsUsed = (groupStats: ClusterGroupsStats) => {
         return acc;
     }, 0);
 };
+
+export function useShouldShowEventsTab() {
+    return useClusterEventsAvailable() && uiFactory.renderEvents;
+}
