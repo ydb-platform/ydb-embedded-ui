@@ -135,7 +135,7 @@ function Versions({preparedVersions, nodes, versionsDataMap}: VersionsProps) {
             ];
             return (
                 <Select
-                    label={'Group by:'}
+                    label={i18n('group-by')}
                     value={[groupByValue]}
                     options={options}
                     onUpdate={(values) => handleGroupByValueChange(values[0])}
