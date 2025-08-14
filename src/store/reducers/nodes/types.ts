@@ -15,6 +15,8 @@ export interface NodesPreparedEntity extends PreparedNodeSystemState {
     NodeName?: string;
     SystemState?: EFlag;
     Version?: string;
+    // Bridge mode
+    PileName?: string;
 
     StartTime?: string;
     DisconnectTime?: string;

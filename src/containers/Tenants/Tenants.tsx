@@ -194,7 +194,7 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
             {
                 name: 'State',
                 width: 150,
-                render: ({row}) => (row.State ? row.State.toLowerCase() : '—'),
+                render: ({row}) => (row.State ? row.State.toLowerCase() : EMPTY_DATA_PLACEHOLDER),
                 customStyle: () => ({textTransform: 'capitalize'}),
             },
             {
@@ -206,7 +206,7 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
                     if (row.cpu && row.cpu > 10_000) {
                         return formatCPU(row.cpu);
                     }
-                    return '—';
+                    return EMPTY_DATA_PLACEHOLDER;
                 },
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
@@ -215,7 +215,8 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
                 name: 'memory',
                 header: 'Memory',
                 width: 120,
-                render: ({row}) => (row.memory ? formatStorageValuesToGb(row.memory) : '—'),
+                render: ({row}) =>
+                    row.memory ? formatStorageValuesToGb(row.memory) : EMPTY_DATA_PLACEHOLDER,
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },
@@ -223,7 +224,8 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
                 name: 'storage',
                 header: 'Storage',
                 width: 120,
-                render: ({row}) => (row.storage ? formatStorageValuesToGb(row.storage) : '—'),
+                render: ({row}) =>
+                    row.storage ? formatStorageValuesToGb(row.storage) : EMPTY_DATA_PLACEHOLDER,
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },
@@ -259,7 +261,8 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
                 name: 'nodesCount',
                 header: 'Nodes',
                 width: 100,
-                render: ({row}) => (row.nodesCount ? formatNumber(row.nodesCount) : '—'),
+                render: ({row}) =>
+                    row.nodesCount ? formatNumber(row.nodesCount) : EMPTY_DATA_PLACEHOLDER,
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },
@@ -267,7 +270,8 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
                 name: 'groupsCount',
                 header: 'Groups',
                 width: 100,
-                render: ({row}) => (row.groupsCount ? formatNumber(row.groupsCount) : '—'),
+                render: ({row}) =>
+                    row.groupsCount ? formatNumber(row.groupsCount) : EMPTY_DATA_PLACEHOLDER,
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },

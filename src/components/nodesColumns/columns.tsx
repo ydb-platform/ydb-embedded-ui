@@ -110,6 +110,16 @@ export function getRackColumn<T extends {Rack?: string}>(): Column<T> {
         width: 100,
     };
 }
+
+export function getPileNameColumn<T extends {PileName?: string}>(): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.PileName,
+        header: i18n('field_pile-name'),
+        align: DataTable.LEFT,
+        render: ({row}) => row.PileName || EMPTY_DATA_PLACEHOLDER,
+        width: 100,
+    };
+}
 export function getVersionColumn<T extends {Version?: string}>(): Column<T> {
     return {
         name: NODES_COLUMNS_IDS.Version,

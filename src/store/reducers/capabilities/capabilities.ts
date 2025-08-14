@@ -72,6 +72,13 @@ export const selectGraphShardExists = createSelector(
         selectDatabaseCapabilities(state, database).data?.Settings?.Database?.GraphShardExists,
 );
 
+export const selectBridgeModeEnabled = createSelector(
+    (state: RootState) => state,
+    (_state: RootState, database?: string) => database,
+    (state, database) =>
+        selectDatabaseCapabilities(state, database).data?.Settings?.Cluster?.BridgeModeEnabled,
+);
+
 export async function queryCapability(
     capability: Capability,
     database: string | undefined,

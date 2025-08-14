@@ -1,0 +1,27 @@
+@use '../../../../styles/mixins.scss';
+
+.bridge-info-table {
+    height: 100%;
+
+    &__pile-card {
+        --g-definition-list-item-gap: var(--g-spacing-3);
+
+        width: 347px;
+        padding: var(--g-spacing-3) var(--g-spacing-4);
+
+        border-radius: var(--g-border-radius-s);
+        background-color: var(--g-color-base-generic-ultralight);
+
+        @include mixins.body-2-typography();
+    }
+
+    &__status-icon {
+        &_primary {
+            color: var(--g-color-text-positive);
+        }
+
+        &:not(&_primary) {
+            color: var(--g-color-private-white-250);
+        }
+    }
+}

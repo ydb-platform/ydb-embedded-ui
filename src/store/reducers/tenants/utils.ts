@@ -3,7 +3,11 @@ import {isNil} from 'lodash';
 import type {PoolName, TPoolStats} from '../../../types/api/nodes';
 import type {TTenant} from '../../../types/api/tenant';
 import {EType} from '../../../types/api/tenant';
-import {DEFAULT_DANGER_THRESHOLD, DEFAULT_WARNING_THRESHOLD} from '../../../utils/constants';
+import {
+    DEFAULT_DANGER_THRESHOLD,
+    DEFAULT_WARNING_THRESHOLD,
+    EMPTY_DATA_PLACEHOLDER,
+} from '../../../utils/constants';
 import {isNumeric, safeParseNumber} from '../../../utils/utils';
 
 import {METRIC_STATUS} from './contants';
@@ -11,7 +15,7 @@ import type {PreparedTenant} from './types';
 
 const getControlPlaneValue = (tenant: TTenant) => {
     const parts = tenant.Name?.split('/');
-    const defaultValue = parts?.length ? parts[parts.length - 1] : '—';
+    const defaultValue = parts?.length ? parts[parts.length - 1] : EMPTY_DATA_PLACEHOLDER;
     const controlPlaneName = tenant.ControlPlane?.name;
 
     return controlPlaneName ?? defaultValue;

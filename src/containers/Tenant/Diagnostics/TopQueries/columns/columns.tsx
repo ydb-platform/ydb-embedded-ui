@@ -2,6 +2,7 @@ import DataTable from '@gravity-ui/react-data-table';
 import type {Column, OrderType} from '@gravity-ui/react-data-table';
 
 import {FixedHeightQuery} from '../../../../../components/FixedHeightQuery/FixedHeightQuery';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../../lib';
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {cn} from '../../../../../utils/cn';
 import {formatDateTime, formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
@@ -81,7 +82,7 @@ const readBytesColumn: Column<KeyValueRow> = {
 const userSIDColumn: Column<KeyValueRow> = {
     name: QUERIES_COLUMNS_IDS.UserSID,
     header: QUERIES_COLUMNS_TITLES.UserSID,
-    render: ({row}) => <div className={b('user-sid')}>{row.UserSID || '–'}</div>,
+    render: ({row}) => <div className={b('user-sid')}>{row.UserSID || EMPTY_DATA_PLACEHOLDER}</div>,
     align: DataTable.LEFT,
     width: 120,
 };
@@ -120,7 +121,9 @@ const requestUnitsColumn: Column<KeyValueRow> = {
 const applicationColumn: Column<KeyValueRow> = {
     name: QUERIES_COLUMNS_IDS.ApplicationName,
     header: QUERIES_COLUMNS_TITLES.ApplicationName,
-    render: ({row}) => <div className={b('user-sid')}>{row.ApplicationName || '–'}</div>,
+    render: ({row}) => (
+        <div className={b('user-sid')}>{row.ApplicationName || EMPTY_DATA_PLACEHOLDER}</div>
+    ),
 };
 
 export function getTopQueriesColumns() {

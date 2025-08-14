@@ -8,6 +8,9 @@ export interface CapabilitiesResponse {
         Database?: {
             GraphShardExists?: boolean;
         };
+        Cluster?: {
+            BridgeModeEnabled?: boolean;
+        };
     };
 }
 

@@ -52,6 +52,14 @@ const poolNameColumn: StorageGroupsColumn = {
     align: DataTable.LEFT,
 };
 
+const pileNameColumn: StorageGroupsColumn = {
+    name: STORAGE_GROUPS_COLUMNS_IDS.PileName,
+    header: STORAGE_GROUPS_COLUMNS_TITLES.PileName,
+    width: 120,
+    render: ({row}) => row.PileName || EMPTY_DATA_PLACEHOLDER,
+    align: DataTable.LEFT,
+};
+
 const typeColumn: StorageGroupsColumn = {
     name: STORAGE_GROUPS_COLUMNS_IDS.MediaType,
     header: STORAGE_GROUPS_COLUMNS_TITLES.MediaType,
@@ -60,7 +68,7 @@ const typeColumn: StorageGroupsColumn = {
     align: DataTable.LEFT,
     render: ({row}) => (
         <Flex>
-            <Label>{row.MediaType || '—'}</Label>
+            <Label>{row.MediaType || EMPTY_DATA_PLACEHOLDER}</Label>
             {'\u00a0'}
             {row.Encryption && (
                 <Popover
@@ -267,6 +275,7 @@ export const getStorageGroupsColumns: StorageColumnsGetter = (data) => {
     const columns = [
         groupIdColumn,
         poolNameColumn,
+        pileNameColumn,
         typeColumn,
         erasureColumn,
         degradedColumn,

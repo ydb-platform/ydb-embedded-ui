@@ -8,6 +8,7 @@ import {heatmapApi, setHeatmapOptions} from '../../store/reducers/heatmap';
 import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
 import type {IHeatmapMetricValue} from '../../types/store/heatmap';
 import {cn} from '../../utils/cn';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatNumber} from '../../utils/dataFormatters/dataFormatters';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
@@ -148,13 +149,13 @@ export const Heatmap = ({path, database}: HeatmapProps) => {
                         <div className={b('limits-block')}>
                             <div className={b('limits-title')}>min:</div>
                             <div className={b('limits-value')}>
-                                {Number.isInteger(min) ? formatNumber(min) : '—'}
+                                {Number.isInteger(min) ? formatNumber(min) : EMPTY_DATA_PLACEHOLDER}
                             </div>
                         </div>
                         <div className={b('limits-block')}>
                             <div className={b('limits-title')}>max:</div>
                             <div className={b('limits-value')}>
-                                {Number.isInteger(max) ? formatNumber(max) : '—'}
+                                {Number.isInteger(max) ? formatNumber(max) : EMPTY_DATA_PLACEHOLDER}
                             </div>
                         </div>
                         <div className={b('limits-block')}>

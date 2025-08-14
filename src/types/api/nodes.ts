@@ -68,6 +68,9 @@ export interface TNodeInfo {
     ReversePingTimeUs?: string; // Avg
     Peers?: TNodeStateInfo[];
     ReversePeers?: TNodeStateInfo[];
+
+    // Bridge mode
+    PileName?: string;
 }
 
 export interface TNodesGroup {
@@ -262,7 +265,8 @@ export type NodesGroupByField =
     | 'ConnectStatus' // v13
     | 'NetworkUtilization' // v13
     | 'ClockSkew' // v13
-    | 'PingTime'; // v13
+    | 'PingTime' // v13
+    | 'PileName';
 
 export type NodesRequiredField =
     | 'NodeId'
@@ -292,7 +296,8 @@ export type NodesRequiredField =
     | `ClockSkew` // v13
     | `PingTime` // v13
     | `SendThroughput` // v13
-    | `ReceiveThroughput`; // v13
+    | `ReceiveThroughput` // v13
+    | 'PileName';
 
 export type NodesSortValue =
     | 'NodeId'

@@ -16,6 +16,7 @@ export const STORAGE_GROUPS_SELECTED_COLUMNS_LS_KEY = 'storageGroupsSelectedColu
 export const STORAGE_GROUPS_COLUMNS_IDS = {
     GroupId: 'GroupId',
     PoolName: 'PoolName',
+    PileName: 'PileName',
     MediaType: 'MediaType',
     Erasure: 'Erasure',
     Used: 'Used',
@@ -71,6 +72,9 @@ export const STORAGE_GROUPS_COLUMNS_TITLES = {
     },
     get MediaType() {
         return i18n('type');
+    },
+    get PileName() {
+        return i18n('pile-name');
     },
     get Erasure() {
         return i18n('erasure');
@@ -135,6 +139,9 @@ const STORAGE_GROUPS_COLUMNS_GROUP_BY_TITLES = {
     get PoolName() {
         return i18n('pool-name');
     },
+    get PileName() {
+        return i18n('pile-name');
+    },
     get Kind() {
         return i18n('type');
     },
@@ -157,6 +164,7 @@ const STORAGE_GROUPS_COLUMNS_GROUP_BY_TITLES = {
 
 const STORAGE_GROUPS_GROUP_BY_PARAMS = [
     'PoolName',
+    'PileName',
     'MediaType',
     'Encryption',
     'Erasure',
@@ -187,6 +195,7 @@ export const storageGroupsGroupByParamSchema = z
 export const GROUPS_COLUMNS_TO_DATA_FIELDS: Record<StorageGroupsColumnId, GroupsRequiredField[]> = {
     GroupId: ['GroupId'],
     PoolName: ['PoolName'],
+    PileName: ['PileName'],
     // We display MediaType and Encryption in one Type column
     MediaType: ['MediaType', 'Encryption'],
     Erasure: ['Erasure'],
@@ -212,6 +221,7 @@ const STORAGE_GROUPS_COLUMNS_TO_SORT_FIELDS: Record<
 > = {
     GroupId: 'GroupId',
     PoolName: 'PoolName',
+    PileName: undefined,
     MediaType: 'MediaType',
     Erasure: 'Erasure',
     Used: 'Used',

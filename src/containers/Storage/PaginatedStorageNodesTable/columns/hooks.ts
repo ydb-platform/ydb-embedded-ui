@@ -4,6 +4,7 @@ import {
     NODES_COLUMNS_IDS,
     NODES_COLUMNS_TITLES,
 } from '../../../../components/nodesColumns/constants';
+import {useBridgeModeEnabled} from '../../../../store/reducers/capabilities/hooks';
 import {VISIBLE_ENTITIES} from '../../../../store/reducers/storage/constants';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 
@@ -22,14 +23,17 @@ export function useStorageNodesSelectedColumns({
     viewContext,
     columnsSettings,
 }: GetStorageNodesColumnsParams) {
+    const bridgeModeEnabled = useBridgeModeEnabled();
+
     const columns = React.useMemo(() => {
-        return getStorageNodesColumns({
+        const all = getStorageNodesColumns({
             database,
             additionalNodesProps,
             viewContext,
             columnsSettings,
         });
-    }, [database, additionalNodesProps, viewContext, columnsSettings]);
+        return bridgeModeEnabled ? all : all.filter((c) => c.name !== NODES_COLUMNS_IDS.PileName);
+    }, [database, additionalNodesProps, viewContext, columnsSettings, bridgeModeEnabled]);
 
     const requiredColumns = React.useMemo(() => {
         if (visibleEntities === VISIBLE_ENTITIES.missing) {
@@ -38,11 +42,20 @@ export function useStorageNodesSelectedColumns({
         return REQUIRED_STORAGE_NODES_COLUMNS;
     }, [visibleEntities]);
 
+    const defaultColumns = React.useMemo(() => {
+        if (!bridgeModeEnabled) {
+            return DEFAULT_STORAGE_NODES_COLUMNS;
+        }
+        return DEFAULT_STORAGE_NODES_COLUMNS.includes(NODES_COLUMNS_IDS.PileName)
+            ? DEFAULT_STORAGE_NODES_COLUMNS
+            : [...DEFAULT_STORAGE_NODES_COLUMNS, NODES_COLUMNS_IDS.PileName];
+    }, [bridgeModeEnabled]);
+
     return useSelectedColumns(
         columns,
         STORAGE_NODES_SELECTED_COLUMNS_LS_KEY,
         NODES_COLUMNS_TITLES,
-        DEFAULT_STORAGE_NODES_COLUMNS,
+        defaultColumns,
         requiredColumns,
     );
 }

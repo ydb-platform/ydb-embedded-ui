@@ -7,9 +7,10 @@ import {InfoViewerSkeleton} from '../../../components/InfoViewerSkeleton/InfoVie
 import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
 import type {ClusterGroupsStats} from '../../../store/reducers/cluster/types';
 import type {AdditionalClusterProps} from '../../../types/additionalProps';
-import type {TClusterInfo} from '../../../types/api/cluster';
+import type {TBridgePile, TClusterInfo} from '../../../types/api/cluster';
 import type {IResponseError} from '../../../types/api/error';
 import {formatNumber} from '../../../utils/dataFormatters/dataFormatters';
+import {BridgeInfoTable} from '../ClusterOverview/components/BridgeInfoTable';
 import i18n from '../i18n';
 import {getTotalStorageGroupsUsed} from '../utils';
 
@@ -25,6 +26,7 @@ interface ClusterInfoProps {
     error?: IResponseError | string;
     additionalClusterProps?: AdditionalClusterProps;
     groupStats?: ClusterGroupsStats;
+    bridgePiles?: TBridgePile[];
 }
 
 export const ClusterInfo = ({
@@ -33,6 +35,7 @@ export const ClusterInfo = ({
     error,
     additionalClusterProps = {},
     groupStats = {},
+    bridgePiles,
 }: ClusterInfoProps) => {
     const {info = [], links = []} = additionalClusterProps;
 
@@ -96,13 +99,28 @@ export const ClusterInfo = ({
         }
         return (
             <InfoSection>
-                <Text as="div" variant="subheader-2" className={b('section-title')}>
-                    {i18n('title_storage-groups')}{' '}
-                    <Text variant="subheader-2" color="secondary">
-                        {formatNumber(total)}
-                    </Text>
-                </Text>
-                <Flex gap={2}>{stats}</Flex>
+                <Flex gap={6} width="full">
+                    <Flex direction="column" gap={2}>
+                        <Text as="div" variant="subheader-2" className={b('section-title')}>
+                            {i18n('title_storage-groups')}{' '}
+                            <Text variant="subheader-2" color="secondary">
+                                {formatNumber(total)}
+                            </Text>
+                        </Text>
+                        <Flex gap={2}>{stats}</Flex>
+                    </Flex>
+                    {bridgePiles?.length ? (
+                        <Flex direction="column" gap={2} className={b('bridge-table')}>
+                            <Text as="div" variant="subheader-2" className={b('section-title')}>
+                                {i18n('title_bridge')}{' '}
+                                <Text variant="subheader-2" color="secondary">
+                                    {formatNumber(bridgePiles.length)}
+                                </Text>
+                            </Text>
+                            <BridgeInfoTable piles={bridgePiles} />
+                        </Flex>
+                    ) : null}
+                </Flex>
             </InfoSection>
         );
     };

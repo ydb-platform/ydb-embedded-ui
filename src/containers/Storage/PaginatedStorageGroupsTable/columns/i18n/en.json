@@ -1,5 +1,6 @@
 {
   "pool-name": "Pool Name",
+  "pile-name": "Pile Name",
   "type": "Type",
   "encryption": "Encryption",
   "erasure": "Erasure",

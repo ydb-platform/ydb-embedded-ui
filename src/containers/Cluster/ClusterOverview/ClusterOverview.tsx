@@ -1,7 +1,12 @@
+import React from 'react';
+
 import {ArrowToggle, Disclosure, Flex, Icon, Text} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../../components/Errors/ResponseError';
-import {useClusterDashboardAvailable} from '../../../store/reducers/capabilities/hooks';
+import {
+    useBridgeModeEnabled,
+    useClusterDashboardAvailable,
+} from '../../../store/reducers/capabilities/hooks';
 import type {ClusterGroupsStats} from '../../../store/reducers/cluster/types';
 import type {AdditionalClusterProps} from '../../../types/additionalProps';
 import {isClusterInfoV2, isClusterInfoV5} from '../../../types/api/cluster';
@@ -36,6 +41,16 @@ interface ClusterOverviewProps {
 
 export function ClusterOverview(props: ClusterOverviewProps) {
     const [expandDashboard, setExpandDashboard] = useSetting<boolean>(EXPAND_CLUSTER_DASHBOARD);
+    const bridgeModeEnabled = useBridgeModeEnabled();
+
+    const bridgePiles = React.useMemo(() => {
+        if (!bridgeModeEnabled || !isClusterInfoV5(props.cluster)) {
+            return undefined;
+        }
+
+        const {BridgeInfo} = props.cluster;
+        return BridgeInfo?.Piles?.length ? BridgeInfo.Piles : undefined;
+    }, [props.cluster, bridgeModeEnabled]);
     if (props.error) {
         return <ResponseError error={props.error} className={b('error')} />;
     }
@@ -67,7 +82,7 @@ export function ClusterOverview(props: ClusterOverviewProps) {
                     )}
                 </Disclosure.Summary>
                 <ClusterDashboard {...props} />
-                <ClusterInfo {...props} />
+                <ClusterInfo {...props} bridgePiles={bridgePiles} />
             </Disclosure>
         </Flex>
     );
@@ -93,7 +108,7 @@ function ClusterDoughnuts({cluster, groupStats = {}, loading, collapsed}: Cluste
     if (loading) {
         return <ClusterDashboardSkeleton collapsed={collapsed} />;
     }
-    const metricsCards = [];
+    const metricsCards: React.ReactNode[] = [];
     if (isClusterInfoV2(cluster)) {
         const {CoresUsed, NumberOfCpus, CoresTotal} = cluster;
         const total = CoresTotal ?? NumberOfCpus;

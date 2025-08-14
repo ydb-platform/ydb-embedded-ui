@@ -127,6 +127,10 @@ export class PaginatedTable {
         return this.controls;
     }
 
+    async getHeaders(): Promise<string[]> {
+        return this.headCells.allTextContents();
+    }
+
     async waitForTableVisible() {
         await this.tableSelector.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
     }

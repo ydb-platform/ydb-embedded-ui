@@ -7,6 +7,7 @@ import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
 import {useTopicDataAvailable} from '../../../../../store/reducers/capabilities/hooks';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {cn} from '../../../../../utils/cn';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {formatBytes, formatMsToUptime} from '../../../../../utils/dataFormatters/dataFormatters';
 import {isNumeric} from '../../../../../utils/utils';
 import {getDefaultNodePath} from '../../../../Node/NodePages';
@@ -182,7 +183,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
             row.readSessionId ? (
                 <EntityStatus name={row.readSessionId} showStatus={false} hasClipboardButton />
             ) : (
-                '–'
+                EMPTY_DATA_PLACEHOLDER
             ),
     },
     {
@@ -198,7 +199,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
             row.readerName ? (
                 <EntityStatus name={row.readerName} showStatus={false} hasClipboardButton />
             ) : (
-                '–'
+                EMPTY_DATA_PLACEHOLDER
             ),
     },
     {
@@ -219,7 +220,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
                     hasClipboardButton
                 />
             ) : (
-                '–'
+                EMPTY_DATA_PLACEHOLDER
             ),
     },
     {
@@ -240,7 +241,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
                     hasClipboardButton
                 />
             ) : (
-                '–'
+                EMPTY_DATA_PLACEHOLDER
             ),
     },
 ];

@@ -1,3 +1,11 @@
+# Copilot Instructions
+
+## Internationalization (i18n)
+
+- Do NOT hardcode user-facing strings.
+- ALWAYS use the component i18n keysets.
+- For key naming, see `i18n-naming-ruleset.md` in the repo root.
+
 # GitHub Copilot Instructions for YDB Embedded UI
 
 > **Note**: This file contains project-specific instructions for GitHub Copilot code review and assistance.
@@ -81,6 +89,10 @@ const handleInputChange = useCallback(
 - ALWAYS create i18n entries in component's `i18n/` folder
 - Follow key format: `<context>_<content>` (e.g., `action_save`, `field_name`)
 - Register keysets with `registerKeysets()` using unique component name
+
+### Display Placeholders (MANDATORY)
+
+- ALWAYS use `EMPTY_DATA_PLACEHOLDER` for empty UI values. Do not hardcode em or en dashes (`—`, `–`) as placeholders. Hyphen `-`/dashes may be used as separators in titles/ranges. Before submitting a PR, grep for `—` and `–` and ensure placeholder usages use `EMPTY_DATA_PLACEHOLDER` from `src/utils/constants.ts`.
 
 ### State Management
 

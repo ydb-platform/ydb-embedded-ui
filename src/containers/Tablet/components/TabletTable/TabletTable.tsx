@@ -9,6 +9,7 @@ import {NodeId} from '../../../../components/NodeId/NodeId';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TabletState} from '../../../../components/TabletState/TabletState';
 import {TabletUptime} from '../../../../components/UptimeViewer/UptimeViewer';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../lib';
 import {getTabletPagePath} from '../../../../routes';
 import type {ITabletPreparedHistoryItem} from '../../../../types/store/tablet';
 
@@ -63,7 +64,7 @@ const getColumns: (props: {
         width: 300,
         render: ({row}) => {
             if (!row.fqdn) {
-                return <span>—</span>;
+                return EMPTY_DATA_PLACEHOLDER;
             }
             return <EntityStatus name={row.fqdn} showStatus={false} hasClipboardButton />;
         },
