@@ -1,8 +1,13 @@
-import {ClipboardButton, Progress} from '@gravity-ui/uikit';
+import React from 'react';
 
+import {ChevronDown, ChevronUp, Database} from '@gravity-ui/icons';
+import {ClipboardButton, Flex, Icon, Text} from '@gravity-ui/uikit';
+
+import {VersionsBar} from '../../../components/VersionsBar/VersionsBar';
 import {cn} from '../../../utils/cn';
 import type {PreparedNodeSystemState} from '../../../utils/nodes';
-import type {VersionValue} from '../../../utils/versions/types';
+import type {PreparedVersion} from '../../../utils/versions/types';
+import i18n from '../i18n';
 import type {GroupedNodesItem} from '../types';
 
 import './NodesTreeTitle.scss';
@@ -11,61 +16,72 @@ const b = cn('ydb-versions-nodes-tree-title');
 
 interface NodesTreeTitleProps {
     title?: string;
+    isDatabase?: boolean;
+    expanded?: boolean;
     nodes?: PreparedNodeSystemState[];
     items?: GroupedNodesItem[];
     versionColor?: string;
-    versionsValues?: VersionValue[];
+    preparedVersions?: PreparedVersion[];
+    onClick?: () => void;
 }
 
 export const NodesTreeTitle = ({
     title,
+    isDatabase,
+    expanded,
     nodes,
     items,
     versionColor,
-    versionsValues,
+    preparedVersions,
+    onClick,
 }: NodesTreeTitleProps) => {
-    let nodesAmount;
-    if (items) {
-        nodesAmount = items.reduce((acc, curr) => {
-            if (!curr.nodes) {
-                return acc;
-            }
-            return acc + curr.nodes.length;
-        }, 0);
-    } else {
-        nodesAmount = nodes ? nodes.length : 0;
-    }
+    const nodesAmount = React.useMemo(() => {
+        if (items) {
+            return items.reduce((acc, curr) => {
+                if (!curr.nodes) {
+                    return acc;
+                }
+                return acc + curr.nodes.length;
+            }, 0);
+        } else {
+            return nodes ? nodes.length : 0;
+        }
+    }, [items, nodes]);
 
     return (
-        <div className={b('overview')}>
-            <div className={b('overview-container')}>
-                {versionColor ? (
+        <div className={b('overview')} onClick={onClick}>
+            <Flex gap={2} alignItems={'center'}>
+                {versionColor && !isDatabase ? (
                     <div className={b('version-color')} style={{background: versionColor}} />
                 ) : null}
+                {isDatabase ? <Icon data={Database} /> : null}
                 {title ? (
-                    <span className={b('overview-title')}>
+                    <React.Fragment>
                         {title}
                         <ClipboardButton
                             text={title}
                             size="s"
                             className={b('clipboard-button')}
-                            view="normal"
+                            view="flat"
+                            onClickCapture={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }}
                         />
-                    </span>
+                    </React.Fragment>
                 ) : null}
-            </div>
-            <div className={b('overview-info')}>
-                <div>
-                    <span className={b('info-value')}>{nodesAmount}</span>
-                    <span className={b('info-label', {margin: 'left'})}>Nodes</span>
-                </div>
-                {versionsValues ? (
+                <Text variant="body-2" color="hint">
+                    {i18n('nodes-count', {count: nodesAmount})}
+                </Text>
+            </Flex>
+            <Flex alignItems={'center'} gap={4}>
+                {preparedVersions ? (
                     <div className={b('version-progress')}>
-                        <span className={b('info-label', {margin: 'right'})}>Versions</span>
-                        <Progress size="s" value={100} stack={versionsValues} />
+                        <VersionsBar preparedVersions={preparedVersions} withTitles={false} />
                     </div>
                 ) : null}
-            </div>
+                <Icon className={b('icon')} data={expanded ? ChevronUp : ChevronDown} />
+            </Flex>
         </div>
     );
 };

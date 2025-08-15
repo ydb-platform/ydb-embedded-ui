@@ -1,15 +1,9 @@
 @use '../../../styles/mixins.scss';
 
 .ydb-versions-grouped-node-tree {
-    $item-width: 100%;
-    $margin-size: 24px;
-
-    &_first-level {
-        margin-top: 10px;
-        margin-bottom: 10px;
-
+    &__wrapper {
         border: 1px solid var(--g-color-line-generic);
-        border-radius: 10px;
+        border-radius: var(--g-border-radius-m);
     }
 
     &__dt-wrapper {
@@ -17,37 +11,5 @@
         z-index: 0;
 
         overflow: auto hidden;
-
-        margin-right: $margin-size;
-        margin-left: $margin-size;
-    }
-
-    .ydb-tree-view {
-        @include mixins.body-2-typography();
-
-        // Apply margin ignoring first element of the tree
-        .ydb-tree-view {
-            margin-left: $margin-size;
-        }
-    }
-
-    & .tree-view_item {
-        height: 40px;
-        margin: 0;
-
-        // By default tree is rendered with padding calculated based on level
-        // We replace padding with margin for correct hover
-        padding: 0 10px !important;
-
-        border: 0;
-        border-radius: 10px;
-    }
-
-    & .tree-view_children .tree-view_item {
-        width: $item-width;
-    }
-
-    & .g-progress__stack {
-        cursor: pointer;
     }
 }
