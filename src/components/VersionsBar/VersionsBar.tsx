@@ -76,7 +76,12 @@ export function VersionsBar({preparedVersions, withTitles = true, size = 's'}: V
 
         if (allVersionsDisplayed) {
             return (
-                <Button view="flat-secondary" size={'s'} onClick={handleHideAllVersions}>
+                <Button
+                    view="flat-secondary"
+                    size={'s'}
+                    onClick={handleHideAllVersions}
+                    className={b('button')}
+                >
                     {i18n('action_hide', {
                         count: truncatedVersionsCount,
                     })}
@@ -84,7 +89,12 @@ export function VersionsBar({preparedVersions, withTitles = true, size = 's'}: V
             );
         } else {
             return (
-                <Button view="flat-secondary" size={'s'} onClick={handleShowAllVersions}>
+                <Button
+                    view="flat-secondary"
+                    size={'s'}
+                    onClick={handleShowAllVersions}
+                    className={b('button')}
+                >
                     {i18n('action_show_more', {
                         count: truncatedVersionsCount,
                     })}
@@ -154,7 +164,7 @@ export function VersionsBar({preparedVersions, withTitles = true, size = 's'}: V
                             size={size}
                         />
                     ))}
-                    <Flex>{renderButton()}</Flex>
+                    {renderButton()}
                 </Flex>
             )}
         </Flex>
@@ -166,8 +176,8 @@ interface VersionTitleProps {
     color: string;
     count?: number;
     isDimmed: boolean;
-    onMouseEnter: () => void;
-    onMouseLeave: () => void;
+    onMouseEnter: VoidFunction;
+    onMouseLeave: VoidFunction;
     size: VersionsBarSize;
 }
 
