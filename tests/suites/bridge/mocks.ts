@@ -131,8 +131,22 @@ export const mockClusterWithBridgePiles = (page: Page) => {
                 NetworkWriteThroughput: '1445752',
                 BridgeInfo: {
                     Piles: [
-                        {PileId: 1, Name: 'r1', State: 'SYNCHRONIZED', IsPrimary: true, Nodes: 16},
-                        {PileId: 2, Name: 'r2', State: 'READY', IsPrimary: false, Nodes: 12},
+                        {
+                            PileId: 1,
+                            Name: 'r1',
+                            State: 'SYNCHRONIZED',
+                            IsPrimary: true,
+                            IsBeingPromoted: false,
+                            Nodes: 16,
+                        },
+                        {
+                            PileId: 2,
+                            Name: 'r2',
+                            State: 'READY',
+                            IsPrimary: false,
+                            IsBeingPromoted: true,
+                            Nodes: 12,
+                        },
                     ],
                 },
             }),
