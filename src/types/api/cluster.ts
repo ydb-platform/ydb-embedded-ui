@@ -106,6 +106,8 @@ export interface TBridgePile {
     State?: string;
     /** whether this pile is primary */
     IsPrimary?: boolean;
+    /** whether this pile is being promoted to primary */
+    IsBeingPromoted?: boolean;
     /** number of nodes in the pile */
     Nodes?: number;
 }
