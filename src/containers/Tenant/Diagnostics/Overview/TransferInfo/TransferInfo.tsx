@@ -1,6 +1,5 @@
-import {Flex, Text} from '@gravity-ui/uikit';
+import {Flex, Label, Text} from '@gravity-ui/uikit';
 
-import {AsyncReplicationState} from '../../../../../components/AsyncReplicationState';
 import {YDBSyntaxHighlighter} from '../../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
 import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
@@ -40,12 +39,32 @@ export function TransferInfo({path, database, data}: TransferProps) {
     );
 }
 
+function transferState(state: DescribeReplicationResult | undefined) {
+    if (!state) {
+        return null;
+    }
+
+    if ('running' in state) {
+        return <Label theme="info">Running</Label>;
+    }
+    if ('paused' in state) {
+        return <Label theme="info">Paused</Label>;
+    }
+    if ('done' in state) {
+        return <Label theme="success">Done</Label>;
+    }
+    if ('error' in state) {
+        return <Label theme="danger">Error</Label>;
+    }
+
+    return <Label size="s">Unknown</Label>;
+}
+
 function prepareTransferItems(
     data: TEvDescribeSchemeResult,
     replicationData: DescribeReplicationResult | undefined,
 ) {
     const transferDescription = data.PathDescription?.ReplicationDescription || {};
-    const state = transferDescription.State;
     const srcConnectionParams = transferDescription.Config?.SrcConnectionParams || {};
     const {Endpoint, Database} = srcConnectionParams;
     const target = transferDescription.Config?.TransferSpecific?.Target;
@@ -55,10 +74,10 @@ function prepareTransferItems(
 
     const info: YDBDefinitionListItem[] = [];
 
-    if (state) {
+    if (replicationData) {
         info.push({
             name: i18n('state.label'),
-            content: <AsyncReplicationState state={state} />,
+            content: transferState(replicationData),
         });
     }
 
