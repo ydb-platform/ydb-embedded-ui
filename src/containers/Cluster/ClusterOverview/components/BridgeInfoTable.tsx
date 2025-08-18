@@ -46,11 +46,32 @@ const BridgePileCard = React.memo(function BridgePileCard({pile}: BridgePileCard
         return <Label theme={theme}>{pile.State}</Label>;
     }, [pile.State]);
 
+    const renderBeingPromotedStatus = React.useCallback(() => {
+        const isBeingPromoted = pile.IsBeingPromoted;
+        const icon = isBeingPromoted ? CircleCheckFill : CircleXmarkFill;
+        const text = isBeingPromoted ? i18n('value_yes') : i18n('value_no');
+
+        return (
+            <Flex gap={1} alignItems="center">
+                <Icon
+                    data={icon}
+                    size={16}
+                    className={b('status-icon', {primary: isBeingPromoted})}
+                />
+                <Text color="secondary">{text}</Text>
+            </Flex>
+        );
+    }, [pile.IsBeingPromoted]);
+
     const info = React.useMemo(
         () => [
             {
                 name: i18n('field_primary'),
                 content: renderPrimaryStatus(),
+            },
+            {
+                name: i18n('field_being-promoted'),
+                content: renderBeingPromotedStatus(),
             },
             {
                 name: i18n('field_state'),
@@ -62,7 +83,7 @@ const BridgePileCard = React.memo(function BridgePileCard({pile}: BridgePileCard
                     pile.Nodes === undefined ? EMPTY_DATA_PLACEHOLDER : formatNumber(pile.Nodes),
             },
         ],
-        [renderPrimaryStatus, renderStateStatus, pile.Nodes],
+        [renderPrimaryStatus, renderBeingPromotedStatus, renderStateStatus, pile.Nodes],
     );
 
     return (

@@ -1,16 +1,50 @@
 @use '../../styles/mixins.scss';
 
 .ydb-versions-bar {
+    &__bar-wrapper {
+        gap: var(--g-spacing-2);
+
+        width: 100%;
+
+        &_size_m {
+            gap: var(--g-spacing-3);
+        }
+    }
+
     &__bar {
+        gap: var(--g-spacing-half);
+
         width: 100%;
         height: 10px;
+
+        &_size_m {
+            gap: var(--g-spacing-1);
+
+            height: 20px;
+        }
     }
 
     &__titles-wrapper {
-        width: max-content;
+        flex-direction: column;
+        gap: var(--g-spacing-half);
+
+        &_size_m {
+            flex-flow: row wrap;
+            gap: var(--g-spacing-4);
+        }
     }
 
     &__title {
+        gap: var(--g-spacing-1);
+
+        width: max-content;
+
+        &_size_m {
+            gap: var(--g-spacing-2);
+        }
+    }
+
+    &__title-text {
         overflow: hidden;
 
         text-overflow: ellipsis;
@@ -18,17 +52,33 @@
         color: var(--g-color-text-primary);
 
         @include mixins.body-1-typography();
+
+        &_size_m {
+            overflow: visible;
+
+            text-overflow: initial;
+        }
     }
 
     &__version {
         min-width: 10px;
 
         border-radius: var(--g-border-radius-xs);
+
+        &_size_m {
+            min-width: 20px;
+        }
     }
 
-    &__title,
+    &__button {
+        width: max-content;
+    }
+
+    &__title-text,
     &__version,
     &__version-icon {
+        cursor: pointer;
+
         &_dimmed {
             opacity: 0.5;
         }

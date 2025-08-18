@@ -22,6 +22,7 @@
   "label_load": "Load",
   "field_name": "Name",
   "field_primary": "Primary",
+  "field_being-promoted": "Being Promoted",
   "field_state": "State",
   "field_nodes": "Nodes",
   "value_yes": "Yes",

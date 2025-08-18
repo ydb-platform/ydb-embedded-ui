@@ -120,6 +120,7 @@ test.describe('Bridge mode - Cluster Overview', () => {
         const firstPileContent = await clusterPage.getFirstPileContent();
         expect(firstPileContent).toContain('r1');
         expect(firstPileContent).toContain('Yes'); // Primary status
+        expect(firstPileContent).toContain('No'); // Being Promoted status (false for first pile)
         expect(firstPileContent).toContain('SYNCHRONIZED');
         expect(firstPileContent).toContain('16'); // Nodes count
     });
