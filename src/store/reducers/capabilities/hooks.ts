@@ -15,7 +15,7 @@ import {
 export function useCapabilitiesQuery() {
     const database = useDatabaseFromQuery();
 
-    capabilitiesApi.useGetClusterCapabilitiesQuery({database});
+    return capabilitiesApi.useGetClusterCapabilitiesQuery({database});
 }
 
 export function useCapabilitiesLoaded() {
