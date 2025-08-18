@@ -1,6 +1,18 @@
 {
   "title_overall": "Overall",
-  "title_storage": "Storage nodes",
-  "title_database": "Database nodes",
-  "title_other": "Other nodes"
+  "title_storage-nodes": "Storage Nodes",
+  "title_database-nodes": "Database Nodes",
+  "title_other-nodes": "Other Nodes",
+  "title_database": "Database",
+  "title_version": "Version",
+
+  "nodes-count": {
+    "one": "{{count}} node",
+    "other": "{{count}} nodes"
+  },
+
+  "group-by": "Group by:",
+
+  "action_expand": "Expand all",
+  "action_collapse": "Collapse all"
 }

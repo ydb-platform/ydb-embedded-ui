@@ -9,8 +9,8 @@ import {isClusterInfoV2} from '../../types/api/cluster';
 import type {TClusterInfo} from '../../types/api/cluster';
 import {useTypedSelector} from '../../utils/hooks';
 import {
-    parseNodeGroupsToVersionsValues,
-    parseNodesToVersionsValues,
+    parseNodeGroupsToPreparedVersions,
+    parseNodesToPreparedVersions,
     parseVersionsToVersionsDataMap,
 } from '../../utils/versions';
 import {getVersionMap, getVersionsData} from '../../utils/versions/clusterVersionColors';
@@ -22,11 +22,11 @@ interface UseGetVersionValuesProps {
     clusterLoading?: boolean;
 }
 
-export const useGetVersionValues = ({
+export function useGetPreparedVersions({
     cluster,
     versionsDataMap,
     clusterLoading,
-}: UseGetVersionValuesProps) => {
+}: UseGetVersionValuesProps) {
     const {currentData} = nodesApi.useGetNodesQuery(
         isClusterInfoV2(cluster) || clusterLoading
             ? skipToken
@@ -37,29 +37,25 @@ export const useGetVersionValues = ({
               },
     );
 
-    const versionsValues = React.useMemo(() => {
+    const preparedVersions = React.useMemo(() => {
         if (isClusterInfoV2(cluster) && cluster.MapVersions) {
             const groups = Object.entries(cluster.MapVersions).map(([version, count]) => ({
                 name: version,
                 count,
             }));
-            return parseNodeGroupsToVersionsValues(groups, versionsDataMap, cluster.NodesTotal);
+            return parseNodeGroupsToPreparedVersions(groups, versionsDataMap);
         }
         if (!currentData) {
             return [];
         }
         if (Array.isArray(currentData.NodeGroups)) {
-            return parseNodeGroupsToVersionsValues(
-                currentData.NodeGroups,
-                versionsDataMap,
-                cluster?.NodesTotal,
-            );
+            return parseNodeGroupsToPreparedVersions(currentData.NodeGroups, versionsDataMap);
         }
-        return parseNodesToVersionsValues(currentData.Nodes, versionsDataMap);
+        return parseNodesToPreparedVersions(currentData.Nodes, versionsDataMap);
     }, [currentData, versionsDataMap, cluster]);
 
-    return versionsValues;
-};
+    return preparedVersions;
+}
 
 export function useVersionsDataMap(cluster?: TClusterInfo) {
     const getVersionsDataMap = useGetClusterVersionsDataMap();
