@@ -1,9 +1,9 @@
 import React from 'react';
 
-import {CircleCheckFill, CircleXmarkFill} from '@gravity-ui/icons';
-import {DefinitionList, Flex, Icon, Label, Text} from '@gravity-ui/uikit';
+import {DefinitionList, Flex, Label, Text} from '@gravity-ui/uikit';
 
 import type {TBridgePile} from '../../../../types/api/cluster';
+import {BridgePileState} from '../../../../types/api/cluster';
 import {cn} from '../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
@@ -12,6 +12,32 @@ import i18n from '../../i18n';
 import './BridgeInfoTable.scss';
 
 const b = cn('bridge-info-table');
+
+function getBridgePileStateTheme(
+    state?: string,
+): 'normal' | 'info' | 'success' | 'warning' | 'danger' | 'utility' | 'unknown' {
+    if (!state) {
+        return 'unknown';
+    }
+
+    switch (state.toUpperCase()) {
+        case BridgePileState.PRIMARY:
+            return 'success'; // Green - active primary
+        case BridgePileState.PROMOTE:
+            return 'warning'; // Orange - transitioning to primary
+        case BridgePileState.SYNCHRONIZED:
+            return 'info'; // Blue - ready but not primary
+        case BridgePileState.NOT_SYNCHRONIZED:
+            return 'danger'; // Red - problematic state
+        case BridgePileState.SUSPENDED:
+            return 'utility'; // Gray - graceful shutdown
+        case BridgePileState.DISCONNECTED:
+            return 'danger'; // Red - connectivity issue
+        case BridgePileState.UNSPECIFIED:
+        default:
+            return 'unknown'; // Purple - unknown state
+    }
+}
 
 interface BridgeInfoTableProps {
     piles: TBridgePile[];
@@ -22,57 +48,17 @@ interface BridgePileCardProps {
 }
 
 const BridgePileCard = React.memo(function BridgePileCard({pile}: BridgePileCardProps) {
-    const renderPrimaryStatus = React.useCallback(() => {
-        const isPrimary = pile.IsPrimary;
-        const icon = isPrimary ? CircleCheckFill : CircleXmarkFill;
-        const text = isPrimary ? i18n('value_yes') : i18n('value_no');
-
-        return (
-            <Flex gap={1} alignItems="center">
-                <Icon data={icon} size={16} className={b('status-icon', {primary: isPrimary})} />
-                <Text color="secondary">{text}</Text>
-            </Flex>
-        );
-    }, [pile.IsPrimary]);
-
     const renderStateStatus = React.useCallback(() => {
         if (!pile.State) {
             return EMPTY_DATA_PLACEHOLDER;
         }
 
-        const isSynchronized = pile.State.toUpperCase() === 'SYNCHRONIZED';
-        const theme = isSynchronized ? 'success' : 'info';
-
+        const theme = getBridgePileStateTheme(pile.State);
         return <Label theme={theme}>{pile.State}</Label>;
     }, [pile.State]);
 
-    const renderBeingPromotedStatus = React.useCallback(() => {
-        const isBeingPromoted = pile.IsBeingPromoted;
-        const icon = isBeingPromoted ? CircleCheckFill : CircleXmarkFill;
-        const text = isBeingPromoted ? i18n('value_yes') : i18n('value_no');
-
-        return (
-            <Flex gap={1} alignItems="center">
-                <Icon
-                    data={icon}
-                    size={16}
-                    className={b('status-icon', {primary: isBeingPromoted})}
-                />
-                <Text color="secondary">{text}</Text>
-            </Flex>
-        );
-    }, [pile.IsBeingPromoted]);
-
     const info = React.useMemo(
         () => [
-            {
-                name: i18n('field_primary'),
-                content: renderPrimaryStatus(),
-            },
-            {
-                name: i18n('field_being-promoted'),
-                content: renderBeingPromotedStatus(),
-            },
             {
                 name: i18n('field_state'),
                 content: renderStateStatus(),
@@ -83,7 +69,7 @@ const BridgePileCard = React.memo(function BridgePileCard({pile}: BridgePileCard
                     pile.Nodes === undefined ? EMPTY_DATA_PLACEHOLDER : formatNumber(pile.Nodes),
             },
         ],
-        [renderPrimaryStatus, renderBeingPromotedStatus, renderStateStatus, pile.Nodes],
+        [renderStateStatus, pile.Nodes],
     );
 
     return (
