@@ -168,6 +168,7 @@ export const topQueriesApi = api.injectEndpoints({
                             query: getRunningQueriesText(filters, sortOrder, limit),
                             database,
                             action: 'execute-scan',
+                            internal_call: true,
                         },
                         {signal, withRetries: true},
                     );
