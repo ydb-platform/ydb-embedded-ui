@@ -97,17 +97,23 @@ function isClusterParticularVersionOrHigher(info: TClusterInfo | undefined, vers
     );
 }
 
+export enum BridgePileState {
+    UNSPECIFIED = 'UNSPECIFIED',
+    PRIMARY = 'PRIMARY',
+    PROMOTE = 'PROMOTE',
+    SYNCHRONIZED = 'SYNCHRONIZED',
+    NOT_SYNCHRONIZED = 'NOT_SYNCHRONIZED',
+    SUSPENDED = 'SUSPENDED',
+    DISCONNECTED = 'DISCONNECTED',
+}
+
 export interface TBridgePile {
     /** unique pile identifier */
     PileId?: number;
     /** pile name, e.g., r1 */
     Name?: string;
-    /** pile state (string from backend, e.g., SYNCHRONIZED) */
+    /** pile state from backend */
     State?: string;
-    /** whether this pile is primary */
-    IsPrimary?: boolean;
-    /** whether this pile is being promoted to primary */
-    IsBeingPromoted?: boolean;
     /** number of nodes in the pile */
     Nodes?: number;
 }
