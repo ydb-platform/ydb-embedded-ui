@@ -16,7 +16,7 @@ export const previewApi = api.injectEndpoints({
             queryFn: async ({query, database, action, limitRows}: SendQueryParams, {signal}) => {
                 try {
                     const response = await window.api.viewer.sendQuery(
-                        {query, database, action, limit_rows: limitRows, internal_call: true},
+                        {query, database, action, limit_rows: limitRows},
                         {signal, withRetries: true},
                     );
 
