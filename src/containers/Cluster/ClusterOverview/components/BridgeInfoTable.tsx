@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {DefinitionList, Flex, Label, Text} from '@gravity-ui/uikit';
+import type {LabelProps} from '@gravity-ui/uikit';
 
 import type {TBridgePile} from '../../../../types/api/cluster';
 import {BridgePileState} from '../../../../types/api/cluster';
@@ -13,9 +14,7 @@ import './BridgeInfoTable.scss';
 
 const b = cn('bridge-info-table');
 
-function getBridgePileStateTheme(
-    state?: string,
-): 'normal' | 'info' | 'success' | 'warning' | 'danger' | 'utility' | 'unknown' {
+function getBridgePileStateTheme(state?: string): NonNullable<LabelProps['theme']> {
     if (!state) {
         return 'unknown';
     }
