@@ -14,7 +14,6 @@ import routes from '../../routes';
 import type {RootState} from '../../store';
 import {authenticationApi} from '../../store/reducers/authentication/authentication';
 import {
-    useCapabilitiesLoaded,
     useCapabilitiesQuery,
     useClusterWithoutAuthInUI,
     useMetaCapabilitiesLoaded,
@@ -24,6 +23,7 @@ import {nodesListApi} from '../../store/reducers/nodesList';
 import {cn} from '../../utils/cn';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {lazyComponent} from '../../utils/lazyComponent';
+import {isAccessError, isRedirectToAuth} from '../../utils/response';
 import Authentication from '../Authentication/Authentication';
 import {getClusterPath} from '../Cluster/utils';
 import Header from '../Header/Header';
@@ -207,12 +207,22 @@ function GetNodesList() {
 }
 
 function GetCapabilities({children}: {children: React.ReactNode}) {
-    useCapabilitiesQuery();
-    const capabilitiesLoaded = useCapabilitiesLoaded();
+    const {data, error} = useCapabilitiesQuery();
 
     useMetaCapabilitiesQuery();
     // It is always true if there is no meta, since request finishes with an error
     const metaCapabilitiesLoaded = useMetaCapabilitiesLoaded();
+
+    //do nothing, authentication is in progress upon redirect
+    if (isRedirectToAuth(error)) {
+        return null;
+    }
+
+    if (isAccessError(error)) {
+        return <AccessDenied />;
+    }
+
+    const capabilitiesLoaded = Boolean(data || error);
 
     return (
         <LoaderWrapper loading={!capabilitiesLoaded || !metaCapabilitiesLoaded} size="l">
