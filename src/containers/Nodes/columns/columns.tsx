@@ -91,8 +91,8 @@ export function getNodesColumns(params: GetNodesColumnsParams): Column<NodesPrep
         getMemoryColumn<NodesPreparedEntity>(),
         getLoadAverageColumn<NodesPreparedEntity>(),
         getVersionColumn<NodesPreparedEntity>(),
-        getTabletsColumn<NodesPreparedEntity>(params),
         getPDisksColumn(),
+        getTabletsColumn<NodesPreparedEntity>(params),
     ];
 
     return columns.map((column) => {

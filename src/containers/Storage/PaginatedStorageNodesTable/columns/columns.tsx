@@ -98,8 +98,8 @@ export const getStorageNodesColumns = ({
         getDiskSpaceUsageColumn<PreparedStorageNode>(),
         getVersionColumn<PreparedStorageNode>(),
         getMissingDisksColumn<PreparedStorageNode>(),
-        getTabletsColumn<PreparedStorageNode>({database}),
         getPDisksColumn({viewContext, columnsSettings}),
+        getTabletsColumn<PreparedStorageNode>({database}),
     ];
 
     const sortableColumns = columns.map((column) => ({
