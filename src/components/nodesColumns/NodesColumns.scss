@@ -3,4 +3,20 @@
     &__column-cpu {
         min-width: 40px;
     }
+
+    &__pdisks-column {
+        overflow: visible; // to enable stacked disks overflow the row
+    }
+
+    &__pdisks-wrapper {
+        display: flex;
+        gap: 10px;
+
+        height: 40px;
+    }
+
+    &__pdisks-item {
+        display: flex;
+        flex-shrink: 0;
+    }
 }

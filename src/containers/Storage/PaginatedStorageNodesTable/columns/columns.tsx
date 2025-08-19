@@ -13,6 +13,7 @@ import {
     getPoolsColumn,
     getRAMColumn,
     getRackColumn,
+    getTabletsColumn,
     getUptimeColumn,
     getVersionColumn,
 } from '../../../../components/nodesColumns/columns';
@@ -97,6 +98,7 @@ export const getStorageNodesColumns = ({
         getDiskSpaceUsageColumn<PreparedStorageNode>(),
         getVersionColumn<PreparedStorageNode>(),
         getMissingDisksColumn<PreparedStorageNode>(),
+        getTabletsColumn<PreparedStorageNode>({database}),
         getPDisksColumn({viewContext, columnsSettings}),
     ];
 
