@@ -21,17 +21,14 @@ function getBridgePileStateTheme(state?: string): NonNullable<LabelProps['theme'
 
     switch (state.toUpperCase()) {
         case BridgePileState.PRIMARY:
-            return 'success'; // Green - active primary
         case BridgePileState.PROMOTE:
-            return 'warning'; // Orange - transitioning to primary
         case BridgePileState.SYNCHRONIZED:
-            return 'info'; // Blue - ready but not primary
+            return 'success'; // Green - healthy states
         case BridgePileState.NOT_SYNCHRONIZED:
-            return 'danger'; // Red - problematic state
+            return 'warning'; // Yellow - needs attention
         case BridgePileState.SUSPENDED:
-            return 'utility'; // Gray - graceful shutdown
         case BridgePileState.DISCONNECTED:
-            return 'danger'; // Red - connectivity issue
+            return 'danger'; // Red - critical states
         case BridgePileState.UNSPECIFIED:
         default:
             return 'unknown'; // Purple - unknown state
