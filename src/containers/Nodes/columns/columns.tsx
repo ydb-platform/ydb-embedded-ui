@@ -46,6 +46,8 @@ function getPDisksColumn(): Column<NodesPreparedEntity> {
         name: NODES_COLUMNS_IDS.PDisks,
         header: NODES_COLUMNS_TITLES.PDisks,
         className: b('pdisks-column'),
+        width: 500,
+        resizeMinWidth: 500,
         render: ({row}) => {
             const nodeWithDisks = row as NodeWithDisks;
             return (
