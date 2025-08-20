@@ -1,9 +1,21 @@
-import React, { useEffect } from 'react';
-import { Graph, TGraphConfig, GraphState } from "@gravity-ui/graph";
-import { GraphCanvas, GraphBlock, useGraph, useElk, TBlock, TConnection, useGraphEvent, MultipointConnection } from "@gravity-ui/graph/react";
-import ELK, { ElkNode, ElkExtendedEdge } from 'elkjs';
+import React, {useEffect, useMemo} from 'react';
 
-import type { Data, GraphNode, Options, Shapes } from '@gravity-ui/paranoid';
+import type {TBlock, TGraphConfig} from '@gravity-ui/graph';
+import {Graph, GraphState} from '@gravity-ui/graph';
+import {
+    GraphBlock,
+    GraphCanvas,
+    MultipointConnection,
+    TConnection,
+    useElk,
+    useGraph,
+    useGraphEvent,
+} from '@gravity-ui/graph/react';
+import type {Data, GraphNode, Options, Shapes} from '@gravity-ui/paranoid';
+import type {ElkExtendedEdge, ElkNode} from 'elkjs';
+import ELK from 'elkjs';
+
+import {prepareBlocks, prepareChildren, prepareConnections, prepareEdges} from './utils';
 
 interface Props<T> {
     data: Data<T>;
@@ -11,97 +23,84 @@ interface Props<T> {
 
 const config = {
     settings: {
-        connection: MultipointConnection
-    }
+        connection: MultipointConnection,
+    },
 };
 const elk = new ELK();
 
 const renderBlockFn = (graph, block) => {
-    return <GraphBlock graph={graph} block={block}>{block.id}</GraphBlock>;
+    return (
+        <GraphBlock graph={graph} block={block}>
+            {block.id}
+        </GraphBlock>
+    );
 };
 
-const prepareChildren = (blocks: TGraphConfig["blocks"]) => {
-    return blocks.map((b) => {
-        return {
-            id: b.id as string,
-            width: b.width,
-            height: b.height,
-        } satisfies ElkNode;
-    });
-};
+// const _blocks: TBlock[] = [
+//     {
+//         width: 200,
+//         height: 160,
+//         id: 'Left',
+//         is: 'block-action',
+//         selected: false,
+//         name: 'Left block',
+//         anchors: [],
+//     },
+//     {
+//         width: 200,
+//         height: 160,
+//         id: 'Right',
+//         is: 'block-action',
+//         selected: false,
+//         name: 'Right block',
+//         anchors: [],
+//     },
+// ];
 
-const prepareEdges = (connections: TGraphConfig["connections"], skipLabels?: boolean) => {
-    return connections.map((c, i) => {
-        const labelText = `label ${i}`;
+// const _connections = [
+//     {
+//         id: 'c1',
+//         sourceBlockId: 'Left',
+//         targetBlockId: 'Right',
+//     },
+// ];
 
-        return {
-            id: c.id as string,
-            sources: [c.sourceBlockId as string],
-            targets: [c.targetBlockId as string],
-            //   labels: skipLabels
-            //     ? []
-            //     : [{ text: labelText, width: measureText(labelText, `${FONT_SIZE}px sans-serif`), height: FONT_SIZE }],
-        } satisfies ElkExtendedEdge;
-    });
-};
-
-
-
-const _blocks = [
-    {
-        width: 200,
-        height: 160,
-        id: "Left",
-        is: "Block",
-        selected: false,
-        name: "Left block",
-        anchors: [],
-    },
-    {
-        width: 200,
-        height: 160,
-        id: "Right",
-        is: "Block",
-        selected: false,
-        name: "Right block",
-        anchors: [],
-    }
-]
-
-const _connections = [
-    {
-        id: "c1",
-        sourceBlockId: "Left",
-        targetBlockId: "Right",
-    }
-]
-
-const elkConfig = {
-    id: "root",
-    children: prepareChildren(_blocks),
-    edges: prepareEdges(_connections),
+const baseElkConfig = {
+    id: 'root',
     layoutOptions: {
-        'elk.algorithm': 'mrtree',
+        'elk.algorithm': 'layered',
         'elk.direction': 'DOWN',
-        'elk.spacing.edgeNode': '50',
-        'elk.spacing.nodeNode': '50'
-    }
+        // 'elk.spacing.edgeNode': '50',
+        'elk.layered.spacing.nodeNodeBetweenLayers': '50',
+        'elk.layered.nodePlacement.bk.fixedAlignment': 'BALANCED',
+        'elk.layered.nodePlacement.bk.ordering': 'INTERACTIVE',
+        'elk.debugMode': true
+        // 'elk.alignment': 'CENTER'
+    },
 };
 
-export function GravityGraph<T>({ data }: Props<T>) {
-    console.log(data);
+export function GravityGraph<T>({data}: Props<T>) {
+    // console.log('997', data);
 
-    const { graph, start } = useGraph(config);
-    const { isLoading, result } = useElk(elkConfig, elk);
+    const _blocks = useMemo(() => prepareBlocks(data.nodes), [data.nodes]);
+    const _connections = useMemo(() => prepareConnections(data.links), [data.links]);
+    const elkConfig = useMemo(
+        () => ({
+            ...baseElkConfig,
+            children: prepareChildren(_blocks),
+            edges: prepareEdges(_connections),
+        }),
+        [_blocks, _connections],
+    );
+    const {graph, start} = useGraph(config);
+    const {isLoading, result} = useElk(elkConfig, elk);
 
     React.useEffect(() => {
-
         if (isLoading || !result) {
             return;
         }
 
-        console.log('result', result);
-
+        // console.log('result', result);
 
         const blocks = _blocks.map((block) => {
             return {
@@ -120,8 +119,7 @@ export function GravityGraph<T>({ data }: Props<T>) {
             return acc;
         }, []);
 
-        console.log('connections', connections);
-
+        // console.log('connections', connections);
 
         graph.setEntities({
             blocks,
@@ -129,12 +127,12 @@ export function GravityGraph<T>({ data }: Props<T>) {
         });
     }, [isLoading, result, graph]);
 
-    useGraphEvent(graph, "state-change", ({ state }) => {
+    useGraphEvent(graph, 'state-change', ({state}) => {
         if (state === GraphState.ATTACHED) {
-            console.log('start')
+            console.log('start');
             start();
         }
     });
 
-    return <GraphCanvas graph={graph} renderBlock={renderBlockFn} />
+    return <GraphCanvas graph={graph} renderBlock={renderBlockFn} />;
 }
