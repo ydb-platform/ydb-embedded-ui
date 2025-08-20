@@ -29,6 +29,7 @@ export const topShardsApi = api.injectEndpoints({
                             query: createShardQuery(path, database),
                             database,
                             action: queryAction,
+                            internal_call: true,
                         },
                         {signal, withRetries: true},
                     );

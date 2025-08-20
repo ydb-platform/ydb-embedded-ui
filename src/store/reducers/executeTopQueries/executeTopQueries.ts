@@ -129,6 +129,7 @@ export const topQueriesApi = api.injectEndpoints({
                             query: getQueryText(timeFrame, preparedFilters, sortOrder, limit),
                             database,
                             action: 'execute-scan',
+                            internal_call: true,
                         },
                         {signal, withRetries: true},
                     );
@@ -168,6 +169,7 @@ export const topQueriesApi = api.injectEndpoints({
                             query: getRunningQueriesText(filters, sortOrder, limit),
                             database,
                             action: 'execute-scan',
+                            internal_call: true,
                         },
                         {signal, withRetries: true},
                     );

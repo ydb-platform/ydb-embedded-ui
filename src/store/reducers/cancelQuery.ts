@@ -20,6 +20,7 @@ export const cancelQueryApi = api.injectEndpoints({
                             database,
                             action,
                             query_id: queryId,
+                            internal_call: true,
                         },
                         {signal},
                     );

@@ -126,6 +126,7 @@ export const shardApi = api.injectEndpoints({
                                       ),
                             database,
                             action: queryAction,
+                            internal_call: true,
                         },
                         {
                             signal,

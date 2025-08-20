@@ -99,6 +99,7 @@ export const clusterApi = api.injectEndpoints({
                             query: query,
                             database: clusterRoot,
                             action: 'execute-scan',
+                            internal_call: true,
                         });
 
                         if (isQueryErrorResponse(groupsStatsResponse)) {

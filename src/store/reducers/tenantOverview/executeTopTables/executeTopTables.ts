@@ -23,6 +23,7 @@ export const topTablesApi = api.injectEndpoints({
                             query: getQueryText(),
                             database,
                             action: 'execute-scan',
+                            internal_call: true,
                         },
                         {signal, withRetries: true},
                     );

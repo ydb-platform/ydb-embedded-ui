@@ -24,6 +24,7 @@ export const viewSchemaApi = api.injectEndpoints({
                             database,
                             action: 'execute-scan',
                             timeout,
+                            internal_call: true,
                         },
                         {withRetries: true},
                     );
