@@ -1,5 +1,12 @@
 # Changelog
 
+## [11.8.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.7.0...v11.8.0) (2025-08-20)
+
+
+### Features
+
+* mark UI-generated queries with internal_call=true parameter ([#2731](https://github.com/ydb-platform/ydb-embedded-ui/issues/2731)) ([62cc324](https://github.com/ydb-platform/ydb-embedded-ui/commit/62cc324fc7701a1b8423ae6aeacbd6b3d615792f))
+
 ## [11.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.6.0...v11.7.0) (2025-08-19)
 
 
