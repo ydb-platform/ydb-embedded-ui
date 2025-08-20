@@ -1,5 +1,7 @@
 import type {Page, Route} from '@playwright/test';
 
+import {BridgePileState} from '../../../src/types/api/cluster';
+
 export const mockCapabilities = (page: Page, enabled: boolean) => {
     return page.route(`**/viewer/capabilities`, async (route: Route) => {
         await route.fulfill({
@@ -51,6 +53,59 @@ export const mockStorageGroupsWithPile = (page: Page) => {
                 FoundGroups: 1,
                 TotalGroups: 1,
                 StorageGroups: [{GroupId: '1', PoolName: 'p', MediaType: 'NVME', PileName: 'r1'}],
+            }),
+        });
+    });
+};
+
+export const mockClusterWithAllBridgePileStates = (page: Page) => {
+    return page.route(`**/viewer/json/cluster?*`, async (route: Route) => {
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                Version: 6,
+                Domain: '/dev02',
+                BridgeInfo: {
+                    Piles: [
+                        {
+                            PileId: 1,
+                            Name: 'primary-pile',
+                            State: BridgePileState.PRIMARY,
+                            Nodes: 16,
+                        },
+                        {
+                            PileId: 2,
+                            Name: 'promoting-pile',
+                            State: BridgePileState.PROMOTE,
+                            Nodes: 12,
+                        },
+                        {
+                            PileId: 3,
+                            Name: 'sync-pile',
+                            State: BridgePileState.SYNCHRONIZED,
+                            Nodes: 8,
+                        },
+                        {
+                            PileId: 4,
+                            Name: 'not-sync-pile',
+                            State: BridgePileState.NOT_SYNCHRONIZED,
+                            Nodes: 4,
+                        },
+                        {
+                            PileId: 5,
+                            Name: 'suspended-pile',
+                            State: BridgePileState.SUSPENDED,
+                            Nodes: 6,
+                        },
+                        {
+                            PileId: 6,
+                            Name: 'disconnected-pile',
+                            State: BridgePileState.DISCONNECTED,
+                            Nodes: 0,
+                        },
+                    ],
+                },
             }),
         });
     });
@@ -134,17 +189,13 @@ export const mockClusterWithBridgePiles = (page: Page) => {
                         {
                             PileId: 1,
                             Name: 'r1',
-                            State: 'SYNCHRONIZED',
-                            IsPrimary: true,
-                            IsBeingPromoted: false,
+                            State: BridgePileState.PRIMARY,
                             Nodes: 16,
                         },
                         {
                             PileId: 2,
                             Name: 'r2',
-                            State: 'READY',
-                            IsPrimary: false,
-                            IsBeingPromoted: true,
+                            State: BridgePileState.SYNCHRONIZED,
                             Nodes: 12,
                         },
                     ],
