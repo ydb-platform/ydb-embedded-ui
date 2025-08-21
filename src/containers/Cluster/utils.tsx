@@ -22,7 +22,7 @@ export type ClusterTab = ValueOf<typeof clusterTabsIds>;
 const tenants = {
     id: clusterTabsIds.tenants,
     get title() {
-        return i18n('tab_tenants');
+        return i18n('tab_databases');
     },
 };
 const nodes = {
