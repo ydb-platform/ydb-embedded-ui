@@ -77,7 +77,7 @@ export const mockClusterWithAllBridgePileStates = (page: Page) => {
                         {
                             PileId: 2,
                             Name: 'promoting-pile',
-                            State: BridgePileState.PROMOTE,
+                            State: BridgePileState.PROMOTED,
                             Nodes: 12,
                         },
                         {
