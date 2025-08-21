@@ -19,11 +19,6 @@ $memory-type-colors: (
     min-width: 150px;
     padding: 0 var(--g-spacing-1);
 
-    &_width_full {
-        width: 100%;
-        min-width: 40px;
-    }
-
     &__progress-container {
         position: relative;
 

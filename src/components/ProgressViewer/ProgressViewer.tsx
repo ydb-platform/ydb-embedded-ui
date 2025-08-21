@@ -39,7 +39,6 @@ export interface ProgressViewerProps {
     dangerThreshold?: number;
     hideCapacity?: boolean;
     withOverflow?: boolean;
-    width?: 'full';
 }
 
 export function ProgressViewer({
@@ -55,7 +54,6 @@ export function ProgressViewer({
     warningThreshold,
     dangerThreshold,
     hideCapacity,
-    width,
 }: ProgressViewerProps) {
     const theme = useTheme();
 
@@ -99,12 +97,12 @@ export function ProgressViewer({
 
     if (isNumeric(value)) {
         return (
-            <div className={b({size, theme, status, width}, className)}>
+            <div className={b({size, theme, status}, className)}>
                 <div className={b('line')} style={lineStyle}></div>
                 <span className={b('text')}>{renderContent()}</span>
             </div>
         );
     }
 
-    return <div className={b({size, width}, className)}>{EMPTY_DATA_PLACEHOLDER}</div>;
+    return <div className={b({size}, className)}>{EMPTY_DATA_PLACEHOLDER}</div>;
 }
