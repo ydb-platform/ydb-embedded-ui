@@ -1,5 +1,18 @@
 # Changelog
 
+## [11.9.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.8.0...v11.9.0) (2025-08-21)
+
+
+### Features
+
+* enable cluster events tab ([#2710](https://github.com/ydb-platform/ydb-embedded-ui/issues/2710)) ([2e3fb59](https://github.com/ydb-platform/ydb-embedded-ui/commit/2e3fb5914a8d994962af13ca33983eb2deddebc0))
+
+
+### Bug Fixes
+
+* **EntityStatus:** fix buttons bg in selected table rows ([#2738](https://github.com/ydb-platform/ydb-embedded-ui/issues/2738)) ([4474b34](https://github.com/ydb-platform/ydb-embedded-ui/commit/4474b34da09b575d2976b8b98839a4bc9f4f1907))
+* rename PROMOTE to PROMOTED ([#2746](https://github.com/ydb-platform/ydb-embedded-ui/issues/2746)) ([d06c4de](https://github.com/ydb-platform/ydb-embedded-ui/commit/d06c4de7133cc81350559823f5a9e30469380577))
+
 ## [11.8.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.7.0...v11.8.0) (2025-08-20)
 
 
