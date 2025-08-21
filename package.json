@@ -1,6 +1,6 @@
 {
   "name": "ydb-embedded-ui",
-  "version": "11.8.0",
+  "version": "11.9.0",
   "files": [
     "dist"
   ],
