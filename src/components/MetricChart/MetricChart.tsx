@@ -5,6 +5,7 @@ import type {YagrWidgetData} from '@gravity-ui/chartkit/yagr';
 import {YagrPlugin} from '@gravity-ui/chartkit/yagr';
 import {Flex} from '@gravity-ui/uikit';
 
+import {useGraphShardExists} from '../../store/reducers/capabilities/hooks';
 import {cn} from '../../utils/cn';
 import type {TimeFrame} from '../../utils/timeframes';
 import {ResponseError} from '../Errors/ResponseError';
@@ -140,10 +141,13 @@ export const MetricChart = ({
     title,
 }: DiagnosticsChartProps) => {
     const [timeFrame, setTimeFrame] = React.useState<TimeFrame>(defaultTimeFrame);
+    const graphShardExists = useGraphShardExists();
 
     // Use a reasonable default for maxDataPoints when fullWidth is true
     const maxDataPoints = DEFAULT_EFFECTIVE_WIDTH / 2;
 
+    // Skip the query if GraphShard is not enabled
+    // This prevents unnecessary API calls to /viewer/json/render when charts are not supported
     const {currentData, error, isFetching, status} = chartApi.useGetChartDataQuery(
         // maxDataPoints param is calculated based on width
         // should be width > maxDataPoints to prevent points that cannot be selected
@@ -154,14 +158,23 @@ export const MetricChart = ({
             timeFrame,
             maxDataPoints,
         },
-        {pollingInterval: autorefresh},
+        {
+            pollingInterval: autorefresh,
+            skip: !graphShardExists,
+        },
     );
 
     const loading = isFetching && !currentData;
 
     React.useEffect(() => {
-        return onChartDataStatusChange?.(status === 'fulfilled' ? 'success' : 'loading');
-    }, [status, onChartDataStatusChange]);
+        // If GraphShard doesn't exist, report loading status to prevent hanging state
+        if (!graphShardExists) {
+            onChartDataStatusChange?.('loading');
+            return;
+        }
+
+        onChartDataStatusChange?.(status === 'fulfilled' ? 'success' : 'loading');
+    }, [status, onChartDataStatusChange, graphShardExists]);
 
     const convertedData = prepareWidgetData(currentData || emptyChartData, chartOptions);
 
