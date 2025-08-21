@@ -208,7 +208,6 @@ export function getMemoryColumn<
                 <MemoryViewer
                     formatValues={formatStorageValuesToGb}
                     stats={row.MemoryStats}
-                    width="full"
                 />
             ) : (
                 <ProgressViewer
@@ -216,7 +215,6 @@ export function getMemoryColumn<
                     capacity={row.MemoryLimit}
                     formatValues={formatStorageValuesToGb}
                     colorizeProgress={true}
-                    width="full"
                 />
             );
         },
