@@ -7,6 +7,11 @@
 
 * mark UI-generated queries with internal_call=true parameter ([#2731](https://github.com/ydb-platform/ydb-embedded-ui/issues/2731)) ([62cc324](https://github.com/ydb-platform/ydb-embedded-ui/commit/62cc324fc7701a1b8423ae6aeacbd6b3d615792f))
 
+
+### Bug Fixes
+
+* import components styles in App scss ([#2737](https://github.com/ydb-platform/ydb-embedded-ui/issues/2737)) ([b2fd583](https://github.com/ydb-platform/ydb-embedded-ui/commit/b2fd5839f0cc005daae47141766270a298f40548))
+
 ## [11.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.6.0...v11.7.0) (2025-08-19)
 
 
