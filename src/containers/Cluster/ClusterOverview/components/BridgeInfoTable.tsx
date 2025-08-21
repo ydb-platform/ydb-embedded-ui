@@ -21,7 +21,7 @@ function getBridgePileStateTheme(state?: string): NonNullable<LabelProps['theme'
 
     switch (state.toUpperCase()) {
         case BridgePileState.PRIMARY:
-        case BridgePileState.PROMOTE:
+        case BridgePileState.PROMOTED:
         case BridgePileState.SYNCHRONIZED:
             return 'success'; // Green - healthy states
         case BridgePileState.NOT_SYNCHRONIZED:
