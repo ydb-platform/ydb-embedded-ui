@@ -1,6 +1,8 @@
 .ydb-nodes-columns {
     &__column-ram,
     &__column-cpu {
+        flex: 1;
+
         min-width: 40px;
     }
 }

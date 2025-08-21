@@ -43,6 +43,7 @@ export interface MemoryProgressViewerProps {
     dangerThreshold?: number;
     formatValues: FormatProgressViewerValues;
     percents?: boolean;
+    width?: 'full';
 }
 
 export function MemoryViewer({
@@ -52,6 +53,7 @@ export function MemoryViewer({
     className,
     warningThreshold,
     dangerThreshold,
+    width,
 }: MemoryProgressViewerProps) {
     const memoryUsage = stats.AnonRss ?? calculateAllocatedMemory(stats);
 
@@ -134,7 +136,7 @@ export function MemoryViewer({
                 </DefinitionList>
             )}
         >
-            <div className={b({theme, status}, className)}>
+            <div className={b({theme, status, width}, className)}>
                 <div className={b('progress-container')}>
                     {memorySegments
                         .filter(({isInfo}) => !isInfo)

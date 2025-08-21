@@ -22,6 +22,11 @@
     border-radius: 2px;
     background: var(--g-color-base-generic);
 
+    &_width_full {
+        width: 100%;
+        min-width: 40px;
+    }
+
     &_theme_dark {
         color: var(--g-color-text-light-primary);
 

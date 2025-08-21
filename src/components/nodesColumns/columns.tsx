@@ -187,6 +187,7 @@ export function getRAMColumn<T extends {MemoryUsed?: string; MemoryLimit?: strin
                         className={b('column-ram')}
                         colorizeProgress
                         hideCapacity
+                        width="full"
                     />
                 </CellWithPopover>
             );
@@ -205,13 +206,18 @@ export function getMemoryColumn<
         defaultOrder: DataTable.DESCENDING,
         render: ({row}) => {
             return row.MemoryStats ? (
-                <MemoryViewer formatValues={formatStorageValuesToGb} stats={row.MemoryStats} />
+                <MemoryViewer
+                    formatValues={formatStorageValuesToGb}
+                    stats={row.MemoryStats}
+                    width="full"
+                />
             ) : (
                 <ProgressViewer
                     value={row.MemoryUsed}
                     capacity={row.MemoryLimit}
                     formatValues={formatStorageValuesToGb}
                     colorizeProgress={true}
+                    width="full"
                 />
             );
         },
@@ -283,6 +289,7 @@ export function getCpuColumn<
                         capacity={1}
                         colorizeProgress
                         percents
+                        width="full"
                     />
                 </CellWithPopover>
             );
