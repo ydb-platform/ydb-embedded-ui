@@ -187,7 +187,6 @@ export function getRAMColumn<T extends {MemoryUsed?: string; MemoryLimit?: strin
                         className={b('column-ram')}
                         colorizeProgress
                         hideCapacity
-                        width="full"
                     />
                 </CellWithPopover>
             );
@@ -289,7 +288,6 @@ export function getCpuColumn<
                         capacity={1}
                         colorizeProgress
                         percents
-                        width="full"
                     />
                 </CellWithPopover>
             );
