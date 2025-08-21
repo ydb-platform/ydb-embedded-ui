@@ -37,6 +37,8 @@ export interface UIFactory<H extends string = CommonIssueType> {
         scrollContainerRef: React.RefObject<HTMLDivElement>;
     }) => React.ReactNode;
 
+    renderEvents?: () => React.ReactNode;
+
     healthcheck: {
         getHealthckechViewTitles: GetHealthcheckViewTitles<H>;
         getHealthcheckViewsOrder: GetHealthcheckViewsOrder<H>;

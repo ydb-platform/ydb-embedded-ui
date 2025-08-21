@@ -1,7 +1,11 @@
 import type {CreateHrefOptions} from '../../routes';
 import routes, {createHref} from '../../routes';
+import {useClusterEventsAvailable} from '../../store/reducers/capabilities/hooks';
 import type {ClusterGroupsStats} from '../../store/reducers/cluster/types';
 import type {ValueOf} from '../../types/common';
+import {uiFactory} from '../../uiFactory/uiFactory';
+
+import i18n from './i18n';
 
 export const clusterTabsIds = {
     tenants: 'tenants',
@@ -10,36 +14,55 @@ export const clusterTabsIds = {
     network: 'network',
     versions: 'versions',
     tablets: 'tablets',
+    events: 'events',
 } as const;
 
 export type ClusterTab = ValueOf<typeof clusterTabsIds>;
 
 const tenants = {
     id: clusterTabsIds.tenants,
-    title: 'Databases',
+    get title() {
+        return i18n('tab_databases');
+    },
 };
 const nodes = {
     id: clusterTabsIds.nodes,
-    title: 'Nodes',
+    get title() {
+        return i18n('tab_nodes');
+    },
 };
 const storage = {
     id: clusterTabsIds.storage,
-    title: 'Storage',
+    get title() {
+        return i18n('tab_storage');
+    },
 };
 const network = {
     id: clusterTabsIds.network,
-    title: 'Network',
+    get title() {
+        return i18n('tab_network');
+    },
 };
 const versions = {
     id: clusterTabsIds.versions,
-    title: 'Versions',
+    get title() {
+        return i18n('tab_versions');
+    },
 };
 const tablets = {
     id: clusterTabsIds.tablets,
-    title: 'Tablets',
+    get title() {
+        return i18n('tab_tablets');
+    },
+};
+const events = {
+    id: clusterTabsIds.events,
+    get title() {
+        return i18n('tab_events');
+    },
 };
 
-export const clusterTabs = [tenants, nodes, storage, network, tablets, versions];
+export const clusterTabs = [tenants, nodes, storage, network, tablets, versions, events];
 
 export function isClusterTab(tab: any): tab is ClusterTab {
     return Object.values(clusterTabsIds).includes(tab);
@@ -58,3 +81,7 @@ export const getTotalStorageGroupsUsed = (groupStats: ClusterGroupsStats) => {
         return acc;
     }, 0);
 };
+
+export function useShouldShowEventsTab() {
+    return useClusterEventsAvailable() && uiFactory.renderEvents;
+}
