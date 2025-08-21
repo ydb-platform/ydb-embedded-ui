@@ -1,0 +1,6 @@
+.g-root {
+    --ydb-drawer-veil-z-index: 2;
+    --gn-drawer-item-z-index: calc(var(--ydb-drawer-veil-z-index) + 1);
+
+    --gn-drawer-veil-z-index: var(--ydb-drawer-veil-z-index);
+}

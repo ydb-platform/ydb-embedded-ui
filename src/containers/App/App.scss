@@ -1,5 +1,9 @@
 @use '../../styles/mixins.scss';
 
+@forward '../../styles/drawer.scss';
+@forward '../../styles/versions.scss';
+@forward '../../styles/unipika.scss';
+
 @import url('https://fonts.googleapis.com/css2?family=Rubik&display=swap');
 
 * {
