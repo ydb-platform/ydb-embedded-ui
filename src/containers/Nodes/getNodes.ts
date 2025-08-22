@@ -3,24 +3,13 @@ import {
     NODES_COLUMNS_TO_DATA_FIELDS,
     getNodesColumnSortField,
 } from '../../components/nodesColumns/constants';
+import type {NodesFilters} from '../../store/reducers/nodes/types';
 import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import {prepareStorageNodesResponse} from '../../store/reducers/storage/utils';
 import type {NodesRequestParams} from '../../types/api/nodes';
 import {prepareSortValue} from '../../utils/filters';
 import {getProblemParamValue, getUptimeParamValue} from '../../utils/nodes';
 import {getRequiredDataFields} from '../../utils/tableUtils/getRequiredDataFields';
-
-// Define filters type for consistency with PreparedStorageNode
-interface NodesFilters {
-    searchValue?: string;
-    problemFilter?: string;
-    uptimeFilter?: string;
-    peerRoleFilter?: string;
-    path?: string;
-    database?: string;
-    filterGroup?: string;
-    filterGroupBy?: string;
-}
 
 export const getNodes: FetchData<
     PreparedStorageNode,
