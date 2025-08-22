@@ -32,7 +32,7 @@ export function CellWithPopover({
                 className={b('popover', {'full-width': fullWidth}, className)}
                 {...props}
             >
-                <div className={b('children-wrapper')}>{children}</div>
+                <div className={b('children-wrapper', {'full-width': fullWidth})}>{children}</div>
             </Popover>
         </div>
     );
