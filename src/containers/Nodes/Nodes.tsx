@@ -8,7 +8,7 @@ import {
 } from '../../components/nodesColumns/constants';
 import type {NodesColumnId} from '../../components/nodesColumns/constants';
 import {useBridgeModeEnabled} from '../../store/reducers/capabilities/hooks';
-import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
+import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import type {AdditionalNodesProps} from '../../types/additionalProps';
 import type {NodesGroupByField} from '../../types/api/nodes';
 import {
@@ -33,7 +33,7 @@ export interface NodesProps {
     scrollContainerRef: React.RefObject<HTMLElement>;
     additionalNodesProps?: AdditionalNodesProps;
     withPeerRoleFilter?: boolean;
-    columns?: Column<NodesPreparedEntity>[];
+    columns?: Column<PreparedStorageNode>[];
     defaultColumnsIds?: NodesColumnId[];
     requiredColumnsIds?: NodesColumnId[];
     selectedColumnsKey?: string;

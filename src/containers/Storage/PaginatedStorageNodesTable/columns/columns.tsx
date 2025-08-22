@@ -36,7 +36,7 @@ import './StorageNodesColumns.scss';
 
 const b = cn('ydb-storage-nodes-columns');
 
-const getPDisksColumn = ({
+export const getPDisksColumn = ({
     viewContext,
     columnsSettings,
 }: GetStorageNodesColumnsParams & {
