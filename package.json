@@ -17,6 +17,7 @@
     "@gravity-ui/components": "^4.4.0",
     "@gravity-ui/date-components": "^3.2.3",
     "@gravity-ui/date-utils": "^2.5.6",
+    "@gravity-ui/graph": "^1.1.4",
     "@gravity-ui/i18n": "^1.7.0",
     "@gravity-ui/icons": "^2.13.0",
     "@gravity-ui/illustrations": "^2.1.0",
@@ -37,6 +38,7 @@
     "colord": "^2.9.3",
     "copy-to-clipboard": "^3.3.3",
     "crc-32": "^1.2.2",
+    "elkjs": "^0.10.0",
     "history": "^4.10.1",
     "hotkeys-js": "^3.13.9",
     "lodash": "^4.17.21",
@@ -59,6 +61,7 @@
     "use-query-params": "^2.2.1",
     "uuid": "^10.0.0",
     "web-vitals": "^1.1.2",
+    "web-worker": "^1.5.0",
     "ydb-ui-components": "^5.0.0",
     "zod": "^3.24.1"
   },

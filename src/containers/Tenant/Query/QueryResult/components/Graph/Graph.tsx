@@ -3,6 +3,7 @@ import React from 'react';
 import type {Data} from '@gravity-ui/paranoid';
 
 import {YDBGraph} from '../../../../../../components/Graph/Graph';
+import {GravityGraph} from '../../../../../../components/Graph/GravityGraph';
 import type {PreparedPlan} from '../../../../../../store/reducers/query/types';
 import {cn} from '../../../../../../utils/cn';
 import i18n from '../../i18n';
@@ -22,6 +23,8 @@ function isValidGraphData(data: Partial<Data>): data is Data {
 }
 
 export function Graph({explain = {}, theme}: GraphProps) {
+    console.log('explain', explain);
+
     const {links, nodes} = explain;
 
     const data = React.useMemo(() => ({links, nodes}), [links, nodes]);
@@ -32,7 +35,7 @@ export function Graph({explain = {}, theme}: GraphProps) {
 
     return (
         <div className={b('canvas-container')}>
-            <YDBGraph key={theme} data={data} />
+            {(true) ? <GravityGraph data={data} /> : <YDBGraph key={theme} data={data} />}
         </div>
     );
 }
