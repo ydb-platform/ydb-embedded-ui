@@ -93,6 +93,9 @@ export interface TMemoryStats {
     QueryExecutionConsumption?: string;
     QueryExecutionLimit?: string;
 
+    CompactionConsumption?: string;
+    CompactionLimit?: string;
+
     HardLimit?: string;
     SoftLimit?: string;
 }
