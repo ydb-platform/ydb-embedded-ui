@@ -222,6 +222,7 @@ const prepareStorageNodeData = (
         PileName: node.PileName,
         PDisks: pDisks,
         VDisks: vDisks,
+        Tablets: node.Tablets,
         Missing: missing,
         MaximumSlotsPerDisk: maximumSlotsPerDisk,
         MaximumDisksPerNode: maximumDisksPerNode,
