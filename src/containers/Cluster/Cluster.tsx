@@ -6,6 +6,7 @@ import {Redirect, Route, Switch, useRouteMatch} from 'react-router-dom';
 import {StringParam, useQueryParams} from 'use-query-params';
 
 import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
+import {DrawerContextProvider} from '../../components/Drawer/DrawerContext';
 import {EntityStatus} from '../../components/EntityStatusNew/EntityStatus';
 import {EFlagToDescription} from '../../components/EntityStatusNew/utils';
 import {InternalLink} from '../../components/InternalLink';
@@ -144,134 +145,143 @@ export function Cluster({
     const {appTitle} = useAppTitle();
 
     return (
-        <div className={b()} ref={container}>
-            <Helmet
-                defaultTitle={`${clusterTitle} — ${appTitle}`}
-                titleTemplate={`%s — ${clusterTitle} — ${appTitle}`}
-            >
-                {activeTab ? <title>{activeTab.title}</title> : null}
-            </Helmet>
-            <div className={b('header')}>{getClusterTitle()}</div>
-            <div className={b('sticky-wrapper')}>
-                <AutoRefreshControl className={b('auto-refresh-control')} />
-            </div>
-            {isClusterDashboardAvailable && (
-                <div className={b('dashboard')}>
-                    <ClusterOverview
-                        cluster={cluster ?? {}}
-                        groupStats={groupsStats}
-                        loading={infoLoading}
-                        error={clusterError || cluster?.error}
-                        additionalClusterProps={additionalClusterProps}
-                    />
+        <DrawerContextProvider>
+            <div className={b()} ref={container}>
+                <Helmet
+                    defaultTitle={`${clusterTitle} — ${appTitle}`}
+                    titleTemplate={`%s — ${clusterTitle} — ${appTitle}`}
+                >
+                    {activeTab ? <title>{activeTab.title}</title> : null}
+                </Helmet>
+                <div className={b('header')}>{getClusterTitle()}</div>
+                <div className={b('sticky-wrapper')}>
+                    <AutoRefreshControl className={b('auto-refresh-control')} />
                 </div>
-            )}
-            <div className={b('tabs-sticky-wrapper')}>
-                <TabProvider value={activeTabId}>
-                    <TabList size="l">
-                        {actualClusterTabs.map(({id, title}) => {
-                            const path = getClusterPath(id as ClusterTab, {clusterName, backend});
-                            return (
-                                <Tab key={id} value={id}>
-                                    <InternalLink
-                                        view="primary"
-                                        as="tab"
-                                        to={path}
-                                        onClick={() => {
-                                            dispatch(updateDefaultClusterTab(id));
-                                        }}
-                                    >
-                                        {title}
-                                    </InternalLink>
-                                </Tab>
-                            );
-                        })}
-                    </TabList>
-                </TabProvider>
-            </div>
-            <div className={b('content')}>
-                <Switch>
-                    <Route
-                        path={
-                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.tablets))
-                                .pathname
-                        }
-                    >
-                        <TabletsTable
+                {isClusterDashboardAvailable && (
+                    <div className={b('dashboard')}>
+                        <ClusterOverview
+                            cluster={cluster ?? {}}
+                            groupStats={groupsStats}
                             loading={infoLoading}
-                            tablets={clusterTablets}
-                            scrollContainerRef={container}
+                            error={clusterError || cluster?.error}
+                            additionalClusterProps={additionalClusterProps}
                         />
-                    </Route>
-                    <Route
-                        path={
-                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.tenants))
-                                .pathname
-                        }
-                    >
-                        <Tenants
-                            additionalTenantsProps={additionalTenantsProps}
-                            scrollContainerRef={container}
-                        />
-                    </Route>
-                    <Route
-                        path={
-                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.nodes)).pathname
-                        }
-                    >
-                        <Nodes
-                            scrollContainerRef={container}
-                            additionalNodesProps={additionalNodesProps}
-                        />
-                    </Route>
-                    <Route
-                        path={
-                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.storage))
-                                .pathname
-                        }
-                    >
-                        <PaginatedStorage scrollContainerRef={container} />
-                    </Route>
-                    {shouldShowNetworkTable && (
+                    </div>
+                )}
+                <div className={b('tabs-sticky-wrapper')}>
+                    <TabProvider value={activeTabId}>
+                        <TabList size="l">
+                            {actualClusterTabs.map(({id, title}) => {
+                                const path = getClusterPath(id as ClusterTab, {
+                                    clusterName,
+                                    backend,
+                                });
+                                return (
+                                    <Tab key={id} value={id}>
+                                        <InternalLink
+                                            view="primary"
+                                            as="tab"
+                                            to={path}
+                                            onClick={() => {
+                                                dispatch(updateDefaultClusterTab(id));
+                                            }}
+                                        >
+                                            {title}
+                                        </InternalLink>
+                                    </Tab>
+                                );
+                            })}
+                        </TabList>
+                    </TabProvider>
+                </div>
+                <div className={b('content')}>
+                    <Switch>
                         <Route
                             path={
-                                getLocationObjectFromHref(getClusterPath(clusterTabsIds.network))
+                                getLocationObjectFromHref(getClusterPath(clusterTabsIds.tablets))
                                     .pathname
                             }
                         >
-                            <NetworkTable
+                            <TabletsTable
+                                loading={infoLoading}
+                                tablets={clusterTablets}
+                                scrollContainerRef={container}
+                            />
+                        </Route>
+                        <Route
+                            path={
+                                getLocationObjectFromHref(getClusterPath(clusterTabsIds.tenants))
+                                    .pathname
+                            }
+                        >
+                            <Tenants
+                                additionalTenantsProps={additionalTenantsProps}
+                                scrollContainerRef={container}
+                            />
+                        </Route>
+                        <Route
+                            path={
+                                getLocationObjectFromHref(getClusterPath(clusterTabsIds.nodes))
+                                    .pathname
+                            }
+                        >
+                            <Nodes
                                 scrollContainerRef={container}
                                 additionalNodesProps={additionalNodesProps}
                             />
                         </Route>
-                    )}
-                    <Route
-                        path={
-                            getLocationObjectFromHref(getClusterPath(clusterTabsIds.versions))
-                                .pathname
-                        }
-                    >
-                        <VersionsContainer cluster={cluster} loading={infoLoading} />
-                    </Route>
-                    {shouldShowEventsTab && (
                         <Route
                             path={
-                                getLocationObjectFromHref(getClusterPath(clusterTabsIds.events))
+                                getLocationObjectFromHref(getClusterPath(clusterTabsIds.storage))
                                     .pathname
                             }
                         >
-                            {uiFactory.renderEvents?.()}
+                            <PaginatedStorage scrollContainerRef={container} />
                         </Route>
-                    )}
-
-                    <Route
-                        render={() => (
-                            <Redirect to={getLocationObjectFromHref(getClusterPath(activeTabId))} />
+                        {shouldShowNetworkTable && (
+                            <Route
+                                path={
+                                    getLocationObjectFromHref(
+                                        getClusterPath(clusterTabsIds.network),
+                                    ).pathname
+                                }
+                            >
+                                <NetworkTable
+                                    scrollContainerRef={container}
+                                    additionalNodesProps={additionalNodesProps}
+                                />
+                            </Route>
                         )}
-                    />
-                </Switch>
+                        <Route
+                            path={
+                                getLocationObjectFromHref(getClusterPath(clusterTabsIds.versions))
+                                    .pathname
+                            }
+                        >
+                            <VersionsContainer cluster={cluster} loading={infoLoading} />
+                        </Route>
+                        {shouldShowEventsTab && (
+                            <Route
+                                path={
+                                    getLocationObjectFromHref(getClusterPath(clusterTabsIds.events))
+                                        .pathname
+                                }
+                            >
+                                {uiFactory.renderEvents?.()}
+                            </Route>
+                        )}
+
+                        <Route
+                            render={() => (
+                                <Redirect
+                                    to={getLocationObjectFromHref(getClusterPath(activeTabId))}
+                                />
+                            )}
+                        />
+                    </Switch>
+                </div>
             </div>
-        </div>
+        </DrawerContextProvider>
     );
 }
 
