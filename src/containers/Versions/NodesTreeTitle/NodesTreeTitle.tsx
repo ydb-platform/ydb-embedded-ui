@@ -96,7 +96,9 @@ export const NodesTreeTitle = ({
 function isActiveButtonTarget(target: EventTarget) {
     return (
         target instanceof HTMLElement &&
-        ((target.nodeName === 'BUTTON' && !target.hasAttribute('disabled')) ||
+        ((target.nodeName === 'BUTTON' &&
+            !target.hasAttribute('disabled') &&
+            target.getAttribute('aria-disabled') !== 'true') ||
             (target.hasAttribute('tabindex') && target.tabIndex > -1))
     );
 }
