@@ -35,6 +35,17 @@ export const NodesTreeTitle = ({
     preparedVersions,
     onClick,
 }: NodesTreeTitleProps) => {
+    const handleClick = React.useCallback<React.MouseEventHandler<HTMLDivElement>>(
+        (event) => {
+            const shouldSkip = event.nativeEvent.composedPath().some(isActiveButtonTarget);
+
+            if (!shouldSkip) {
+                onClick?.();
+            }
+        },
+        [onClick],
+    );
+
     const nodesAmount = React.useMemo(() => {
         if (items) {
             return items.reduce((acc, curr) => {
@@ -49,7 +60,7 @@ export const NodesTreeTitle = ({
     }, [items, nodes]);
 
     return (
-        <div className={b('overview')} onClick={onClick}>
+        <div className={b('overview')} onClick={handleClick}>
             <Flex gap={2} alignItems={'center'}>
                 {versionColor && !isDatabase ? (
                     <div className={b('version-color')} style={{background: versionColor}} />
@@ -63,10 +74,6 @@ export const NodesTreeTitle = ({
                             size="s"
                             className={b('clipboard-button')}
                             view="flat"
-                            onClickCapture={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                            }}
                         />
                     </React.Fragment>
                 ) : null}
@@ -85,3 +92,11 @@ export const NodesTreeTitle = ({
         </div>
     );
 };
+
+function isActiveButtonTarget(target: EventTarget) {
+    return (
+        target instanceof HTMLElement &&
+        ((target.nodeName === 'BUTTON' && !target.hasAttribute('disabled')) ||
+            (target.hasAttribute('tabindex') && target.tabIndex > -1))
+    );
+}
