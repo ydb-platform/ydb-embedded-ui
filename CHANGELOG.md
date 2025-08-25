@@ -1,5 +1,18 @@
 # Changelog
 
+## [11.10.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.9.0...v11.10.0) (2025-08-25)
+
+
+### Features
+
+* make RAM and CPU bars fill container width in tables ([#2748](https://github.com/ydb-platform/ydb-embedded-ui/issues/2748)) ([d08c5db](https://github.com/ydb-platform/ydb-embedded-ui/commit/d08c5db9daec459c0d4f34e58c111a895b29155d))
+
+
+### Bug Fixes
+
+* **EntityStatus:** return controls wrapper bg ([#2752](https://github.com/ydb-platform/ydb-embedded-ui/issues/2752)) ([fe465ff](https://github.com/ydb-platform/ydb-embedded-ui/commit/fe465ff9bac1a2c3f94dc95833586ec01083ae6c))
+* **Versions:** fix version copy ([#2755](https://github.com/ydb-platform/ydb-embedded-ui/issues/2755)) ([c7d2eed](https://github.com/ydb-platform/ydb-embedded-ui/commit/c7d2eedb13a9d75f41834e7908b5696d5e60bf13))
+
 ## [11.9.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.8.0...v11.9.0) (2025-08-21)
 
 
