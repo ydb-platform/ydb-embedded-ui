@@ -5,11 +5,12 @@
 
         overflow: hidden;
 
+        width: 100%;
         height: 100%;
     }
 
     &__item {
-        z-index: 4;
+        z-index: var(--gn-drawer-item-z-index);
 
         height: 100%;
     }
