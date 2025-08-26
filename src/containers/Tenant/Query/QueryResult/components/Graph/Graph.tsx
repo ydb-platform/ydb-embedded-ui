@@ -35,7 +35,11 @@ export function Graph({explain = {}, theme}: GraphProps) {
 
     return (
         <div className={b('canvas-container')}>
-            {(true) ? <GravityGraph data={data} /> : <YDBGraph key={theme} data={data} />}
+            {true ? (
+                <GravityGraph data={data} theme={theme} key={theme} />
+            ) : (
+                <YDBGraph key={theme} data={data} />
+            )}
         </div>
     );
 }

@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo} from 'react';
 
 import type {TBlock, TGraphConfig} from '@gravity-ui/graph';
-import {Graph, GraphState} from '@gravity-ui/graph';
+import {Graph, GraphState, CanvasBlock} from '@gravity-ui/graph';
 import {
     GraphBlock,
     GraphCanvas,
@@ -15,15 +15,32 @@ import type {Data, GraphNode, Options, Shapes} from '@gravity-ui/paranoid';
 import type {ElkExtendedEdge, ElkNode} from 'elkjs';
 import ELK from 'elkjs';
 
-import {prepareBlocks, prepareChildren, prepareConnections, prepareEdges} from './utils';
+import {
+    prepareBlocks,
+    prepareChildren,
+    prepareConnections,
+    prepareEdges,
+    parseCustomPropertyValue,
+} from './utils';
+
+import {QueryBlockView} from './BlockComponents/QueryBlockView';
+import {graphColorsConfig} from './colorsConfig';
 
 interface Props<T> {
     data: Data<T>;
+    theme?: string;
 }
 
 const config = {
     settings: {
         connection: MultipointConnection,
+        blockComponents: {
+            Query: QueryBlockView,
+        },
+        // canDragCamera: true,
+        // canZoomCamera: false,
+        // useBezierConnections: false,
+        showConnectionArrows: false,
     },
 };
 const elk = new ELK();
@@ -74,12 +91,12 @@ const baseElkConfig = {
         'elk.layered.spacing.nodeNodeBetweenLayers': '50',
         'elk.layered.nodePlacement.bk.fixedAlignment': 'BALANCED',
         'elk.layered.nodePlacement.bk.ordering': 'INTERACTIVE',
-        'elk.debugMode': true
+        'elk.debugMode': true,
         // 'elk.alignment': 'CENTER'
     },
 };
 
-export function GravityGraph<T>({data}: Props<T>) {
+export function GravityGraph<T>({data, theme}: Props<T>) {
     // console.log('997', data);
 
     const _blocks = useMemo(() => prepareBlocks(data.nodes), [data.nodes]);
@@ -127,10 +144,15 @@ export function GravityGraph<T>({data}: Props<T>) {
         });
     }, [isLoading, result, graph]);
 
+    React.useEffect(() => {
+        graph.setColors(parseCustomPropertyValue(graphColorsConfig, graph.getGraphCanvas()));
+    }, [graph, theme]);
+
     useGraphEvent(graph, 'state-change', ({state}) => {
         if (state === GraphState.ATTACHED) {
             console.log('start');
             start();
+            // graph.zoomTo("center", { padding: 300 });
         }
     });
 

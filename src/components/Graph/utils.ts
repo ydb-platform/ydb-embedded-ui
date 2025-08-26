@@ -1,6 +1,7 @@
 import type {TBlock, TConnection, TGraphConfig} from '@gravity-ui/graph';
 import type {Data, GraphNode, Options, Shapes} from '@gravity-ui/paranoid';
 import type {ElkExtendedEdge, ElkNode} from 'elkjs';
+import type {AbstractGraphColorsConfig} from './colorsConfig';
 
 export const prepareChildren = (blocks: TGraphConfig['blocks']) => {
     return blocks?.map((b) => {
@@ -38,6 +39,7 @@ export const prepareEdges = (connections: TGraphConfig['connections'], skipLabel
 export const prepareBlocks = (nodes: Data['nodes']): TBlock[] => {
     return nodes?.map(({data: {id, name, ...rest}}) => ({
         id: String(id),
+        is: name,
         name,
         width: 200,
         height: 100,
@@ -52,3 +54,44 @@ export const prepareConnections = (links: Data['links']): TConnection[] => {
         targetBlockId: to,
     }));
 };
+
+function calculateCurrentCustomPropertyValue<T extends string>(
+    colorSettings: Partial<Record<T, string>>,
+    computedStyle: CSSStyleDeclaration,
+): Partial<Record<T, string>> {
+    const result: Partial<Record<T, string>> = {};
+
+    for (const nestedKey in colorSettings) {
+        if (Object.prototype.hasOwnProperty.call(colorSettings, nestedKey)) {
+            const value = colorSettings[nestedKey];
+
+            if (value !== undefined) {
+                result[nestedKey] = value?.startsWith('var(')
+                    ? computedStyle.getPropertyValue(value.substring(4, value.length - 1)).trim()
+                    : value;
+            }
+        }
+    }
+
+    return result;
+}
+
+export function parseCustomPropertyValue<T extends AbstractGraphColorsConfig>(
+    colors: T,
+    block: HTMLElement = globalThis.document.body,
+): T {
+    const parsed: AbstractGraphColorsConfig = {};
+    const computedStyle = window.getComputedStyle(block);
+
+    for (const topKey in colors) {
+        if (Object.prototype.hasOwnProperty.call(colors, topKey)) {
+            const nestedObj = colors[topKey];
+
+            if (nestedObj) {
+                parsed[topKey] = calculateCurrentCustomPropertyValue(nestedObj, computedStyle);
+            }
+        }
+    }
+
+    return parsed as T;
+}
