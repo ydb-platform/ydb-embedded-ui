@@ -2,6 +2,7 @@ import type {TBlock, TConnection, TGraphConfig} from '@gravity-ui/graph';
 import type {Data, GraphNode, Options, Shapes} from '@gravity-ui/paranoid';
 import type {ElkExtendedEdge, ElkNode} from 'elkjs';
 import type {AbstractGraphColorsConfig} from './colorsConfig';
+import {graphSizesConfig} from './sizesConfig';
 
 export const prepareChildren = (blocks: TGraphConfig['blocks']) => {
     return blocks?.map((b) => {
@@ -37,12 +38,12 @@ export const prepareEdges = (connections: TGraphConfig['connections'], skipLabel
 };
 
 export const prepareBlocks = (nodes: Data['nodes']): TBlock[] => {
-    return nodes?.map(({data: {id, name, ...rest}}) => ({
+    return nodes?.map(({data: {id, name, type, ...rest}}) => ({
         id: String(id),
-        is: name,
+        is: type,
         name,
-        width: 200,
-        height: 100,
+        width: graphSizesConfig[type]?.width || 100,
+        height: graphSizesConfig[type]?.height || 40,
         ...rest,
     }));
 };

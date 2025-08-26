@@ -23,7 +23,17 @@ import {
     parseCustomPropertyValue,
 } from './utils';
 
+import {cn} from '../../utils/cn';
+
+import './GravityGraph.scss';
+
+const b = cn('ydb-gravity-graph');
+
 import {QueryBlockView} from './BlockComponents/QueryBlockView';
+import {QueryBlockComponent} from './BlockComponents/QueryBlockComponent';
+import {ResultBlockComponent} from './BlockComponents/ResultBlockComponent';
+import {StageBlockComponent} from './BlockComponents/StageBlockComponent';
+import {ConnectionBlockComponent} from './BlockComponents/ConnectionBlockComponent';
 import {graphColorsConfig} from './colorsConfig';
 
 interface Props<T> {
@@ -35,7 +45,7 @@ const config = {
     settings: {
         connection: MultipointConnection,
         blockComponents: {
-            Query: QueryBlockView,
+            query: QueryBlockView,
         },
         // canDragCamera: true,
         // canZoomCamera: false,
@@ -46,9 +56,24 @@ const config = {
 const elk = new ELK();
 
 const renderBlockFn = (graph, block) => {
+    console.log('===', block);
+
+    const map = {
+        query: QueryBlockComponent,
+        result: ResultBlockComponent,
+        stage: StageBlockComponent,
+        connection: ConnectionBlockComponent,
+    };
+
+    const Component = map[block.is];
+
     return (
-        <GraphBlock graph={graph} block={block}>
-            {block.id}
+        <GraphBlock graph={graph} block={block} className={b('block')}>
+            {Component ? (
+                <Component graph={graph} block={block} className={b('block-content', block.is)} />
+            ) : (
+                block.id
+            )}
         </GraphBlock>
     );
 };
@@ -88,7 +113,7 @@ const baseElkConfig = {
         'elk.algorithm': 'layered',
         'elk.direction': 'DOWN',
         // 'elk.spacing.edgeNode': '50',
-        'elk.layered.spacing.nodeNodeBetweenLayers': '50',
+        'elk.layered.spacing.nodeNodeBetweenLayers': '20',
         'elk.layered.nodePlacement.bk.fixedAlignment': 'BALANCED',
         'elk.layered.nodePlacement.bk.ordering': 'INTERACTIVE',
         'elk.debugMode': true,
@@ -151,6 +176,10 @@ export function GravityGraph<T>({data, theme}: Props<T>) {
     useGraphEvent(graph, 'state-change', ({state}) => {
         if (state === GraphState.ATTACHED) {
             console.log('start');
+            graph.cameraService.set({
+                scale: 1,
+                scaleMax: 1.5,
+            });
             start();
             // graph.zoomTo("center", { padding: 300 });
         }
