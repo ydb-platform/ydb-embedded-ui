@@ -10,6 +10,8 @@ interface GraphProps<T> {
 }
 
 export function Graph<T>(props: GraphProps<T>) {
+    console.log(props);
+    
     const containerRef = React.useRef<HTMLDivElement>(null);
     const containerId = React.useId();
 
