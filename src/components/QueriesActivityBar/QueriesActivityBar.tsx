@@ -13,7 +13,7 @@ export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
     const {runningQueriesCount, uniqueApplications, uniqueUsers, qps, latency, areChartsAvailable} =
         useQueriesActivityData(tenantName);
 
-    // Show skeleton while determining chart availability
+    // Show skeleton only on initial load
     if (areChartsAvailable === null) {
         return <QueriesActivitySkeleton />;
     }
