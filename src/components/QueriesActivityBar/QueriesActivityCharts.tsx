@@ -74,7 +74,7 @@ export function QueriesActivityCharts({
             direction="row"
             style={{display: expanded ? undefined : 'none'}}
         >
-            <Flex direction="column" gap={3} grow>
+            <Flex direction="column" gap={3} grow basis={0} minWidth={0}>
                 <MetricChart
                     database={tenantName}
                     metrics={queriesChartConfig.metrics}
@@ -87,7 +87,7 @@ export function QueriesActivityCharts({
                 />
             </Flex>
 
-            <Flex direction="column" gap={3} grow>
+            <Flex direction="column" gap={3} grow basis={0} minWidth={0}>
                 <MetricChart
                     database={tenantName}
                     metrics={latenciesChartConfig.metrics}
