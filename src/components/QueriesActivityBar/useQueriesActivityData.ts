@@ -18,7 +18,7 @@ interface UseQueriesActivityDataResult {
     uniqueUsers: number;
     qps: ReturnType<typeof calculateQueriesPerSecond>;
     latency: ReturnType<typeof calculateLatency>;
-    areChartsAvailable: boolean | null; // null = loading, boolean = result
+    areChartsAvailable: boolean | null; // null = initial load, boolean = result
 }
 
 export function useQueriesActivityData(tenantName: string): UseQueriesActivityDataResult {
@@ -34,11 +34,7 @@ export function useQueriesActivityData(tenantName: string): UseQueriesActivityDa
         {pollingInterval: shouldRefresh},
     );
 
-    const {
-        data: queriesPerSecData,
-        isSuccess: queriesSuccess,
-        isError: queriesError,
-    } = chartApi.useGetChartDataQuery(
+    const {data: queriesPerSecData, isError: queriesError} = chartApi.useGetChartDataQuery(
         {
             database: tenantName,
             metrics: [{target: 'queries.requests'}],
@@ -60,16 +56,16 @@ export function useQueriesActivityData(tenantName: string): UseQueriesActivityDa
 
     const runningQueriesCount = runningQueriesData?.resultSets?.[0]?.result?.length || 0;
 
-    // Determine chart availability from queries API success/error state
+    // Determine chart availability - only show skeleton on initial load
     const areChartsAvailable = React.useMemo(() => {
-        if (queriesSuccess) {
-            return true;
+        if (queriesPerSecData !== undefined) {
+            return true; // We have data, charts are available
         }
         if (queriesError) {
-            return false;
+            return false; // Error occurred, charts not available
         }
-        return null; // Still loading
-    }, [queriesSuccess, queriesError]);
+        return null; // Still loading initial data
+    }, [queriesPerSecData, queriesError]);
 
     const qps = React.useMemo(
         () => calculateQueriesPerSecond(queriesPerSecData?.metrics?.[0]?.data),
