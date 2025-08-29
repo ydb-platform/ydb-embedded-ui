@@ -4,6 +4,7 @@ import NiceModal from '@ebay/nice-modal-react';
 import {Dialog, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 
+import {useDatabasesAvailable} from '../../store/reducers/capabilities/hooks';
 import {tenantApi} from '../../store/reducers/tenant/tenant';
 import {cn} from '../../utils/cn';
 import {useTypedSelector} from '../../utils/hooks';
@@ -48,11 +49,15 @@ function ConnectToDBDialog({
     const clusterName = useClusterNameFromQuery();
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
 
+    const isMetaDatabasesAvailable = useDatabasesAvailable();
+
     // If there is endpoint from props, we don't need to request tenant data
     // Also we should not request tenant data if we are in single cluster mode
     // Since there is no ControlPlane data in this case
     const shouldRequestTenantData = database && !endpointFromProps && !singleClusterMode;
-    const params = shouldRequestTenantData ? {path: database, clusterName} : skipToken;
+    const params = shouldRequestTenantData
+        ? {path: database, clusterName, isMetaDatabasesAvailable}
+        : skipToken;
     const {currentData: tenantData, isLoading: isTenantDataLoading} =
         tenantApi.useGetTenantInfoQuery(params);
     const endpoint = endpointFromProps ?? tenantData?.ControlPlane?.endpoint;

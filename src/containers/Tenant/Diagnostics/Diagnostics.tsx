@@ -50,7 +50,6 @@ const b = cn('kv-tenant-diagnostics');
 
 function Diagnostics(props: DiagnosticsProps) {
     const {path, database, type, subType} = useCurrentSchema();
-    const {controlPlane} = useTenantBaseInfo(path);
     const containerRef = React.useRef<HTMLDivElement>(null);
     const dispatch = useTypedDispatch();
     const {diagnosticsTab = TENANT_DIAGNOSTICS_TABS_IDS.overview} = useTypedSelector(
@@ -60,6 +59,8 @@ function Diagnostics(props: DiagnosticsProps) {
     const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
 
     const tenantName = isDatabaseEntityType(type) ? path : database;
+
+    const {controlPlane} = useTenantBaseInfo(isDatabaseEntityType(type) ? path : '');
 
     const hasFeatureFlags = useFeatureFlagsAvailable();
     const hasTopicData = useTopicDataAvailable();

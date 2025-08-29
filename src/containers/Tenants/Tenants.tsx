@@ -17,6 +17,7 @@ import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/
 import {TenantNameWrapper} from '../../components/TenantNameWrapper/TenantNameWrapper';
 import {
     useCreateDatabaseFeatureAvailable,
+    useDatabasesAvailable,
     useDeleteDatabaseFeatureAvailable,
     useEditDatabaseFeatureAvailable,
 } from '../../store/reducers/capabilities/hooks';
@@ -73,10 +74,10 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
     const dispatch = useTypedDispatch();
 
     const clusterName = useClusterNameFromQuery();
-
+    const isMetaDatabasesAvailable = useDatabasesAvailable();
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tenantsApi.useGetTenantsInfoQuery(
-        {clusterName},
+        {clusterName, isMetaDatabasesAvailable},
         {pollingInterval: autoRefreshInterval},
     );
     const loading = isFetching && currentData === undefined;

@@ -161,3 +161,7 @@ export const useDeleteClusterFeatureAvailable = () => {
 export const useClusterEventsAvailable = () => {
     return useGetMetaFeatureVersion('/meta/events') >= 1;
 };
+
+export const useDatabasesAvailable = () => {
+    return useGetMetaFeatureVersion('/meta/databases') >= 1;
+};

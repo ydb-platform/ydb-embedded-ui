@@ -8,6 +8,7 @@ import SplitPane from '../../components/SplitPane';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {overviewApi} from '../../store/reducers/overview/overview';
 import {selectSchemaObjectData} from '../../store/reducers/schema/schema';
+import {useTenantBaseInfo} from '../../store/reducers/tenant/tenant';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../types/additionalProps';
 import {cn} from '../../utils/cn';
 import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
@@ -55,6 +56,8 @@ export function Tenant(props: TenantProps) {
 
     const {database, schema} = useTenantQueryParams();
 
+    const {controlPlane, name} = useTenantBaseInfo(database ?? '');
+
     if (!database) {
         throw new Error('Tenant name is not defined');
     }
@@ -73,11 +76,6 @@ export function Tenant(props: TenantProps) {
         }
     }, [database]);
 
-    const dispatch = useTypedDispatch();
-    React.useEffect(() => {
-        dispatch(setHeaderBreadcrumbs('tenant', {tenantName: database}));
-    }, [database, dispatch]);
-
     const path = schema ?? database;
 
     const {
@@ -85,6 +83,13 @@ export function Tenant(props: TenantProps) {
         error,
         isLoading,
     } = overviewApi.useGetOverviewQuery({path, database: database});
+
+    const databaseName = name ?? controlPlane?.name ?? database;
+
+    const dispatch = useTypedDispatch();
+    React.useEffect(() => {
+        dispatch(setHeaderBreadcrumbs('tenant', {tenantName: databaseName}));
+    }, [databaseName, dispatch]);
 
     const preloadedData = useTypedSelector((state) =>
         selectSchemaObjectData(state, path, database),

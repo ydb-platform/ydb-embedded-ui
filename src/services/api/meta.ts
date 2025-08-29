@@ -12,7 +12,7 @@ import type {AxiosOptions} from './base';
 import {BaseYdbAPI} from './base';
 
 export class MetaAPI extends BaseYdbAPI {
-    getPath(path: string) {
+    getPath(path: string, _clusterName?: string) {
         return `${META_BACKEND ?? ''}${path}`;
     }
 
@@ -31,14 +31,29 @@ export class MetaAPI extends BaseYdbAPI {
     }
 
     getTenants(
-        {clusterName, databaseName}: {clusterName?: string; databaseName?: string},
+        {clusterName, path}: {clusterName?: string; path?: string},
         {signal}: AxiosOptions = {},
     ) {
         return this.get<MetaTenants>(
-            this.getPath('/meta/cp_databases'),
+            this.getPath('/meta/cp_databases', clusterName),
             {
                 cluster_name: clusterName,
-                database_name: databaseName,
+                database_name: path,
+                database: path,
+            },
+            {requestConfig: {signal}},
+        ).then(parseMetaTenants);
+    }
+
+    getTenantsV2(
+        {path, clusterName}: {clusterName?: string; path?: string},
+        {signal}: AxiosOptions = {},
+    ) {
+        return this.get<MetaTenants>(
+            this.getPath('/meta/databases', clusterName),
+            {
+                cluster_name: clusterName,
+                database: path,
             },
             {requestConfig: {signal}},
         ).then(parseMetaTenants);
@@ -49,7 +64,7 @@ export class MetaAPI extends BaseYdbAPI {
         {concurrentId, signal}: AxiosOptions = {},
     ): Promise<MetaBaseClusterInfo> {
         return this.get<MetaBaseClusters>(
-            this.getPath('/meta/db_clusters'),
+            this.getPath('/meta/db_clusters', clusterName),
             {
                 name: clusterName,
             },
