@@ -1,6 +1,8 @@
+import type {MetaClusterLogsUrls} from '../types/api/meta';
+
 export interface GetLogsLinkProps {
     dbName: string;
-    logging: string;
+    logging: MetaClusterLogsUrls;
 }
 
 export type GetLogsLink = (props: GetLogsLinkProps) => string;
