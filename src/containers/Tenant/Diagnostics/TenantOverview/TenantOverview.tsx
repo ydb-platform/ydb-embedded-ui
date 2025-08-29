@@ -3,6 +3,7 @@ import {Button, Flex, Icon} from '@gravity-ui/uikit';
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueriesActivityBar} from '../../../../components/QueriesActivityBar/QueriesActivityBar';
+import {useDatabasesAvailable} from '../../../../store/reducers/capabilities/hooks';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {tenantApi} from '../../../../store/reducers/tenant/tenant';
@@ -39,8 +40,10 @@ export function TenantOverview({
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const clusterName = useClusterNameFromQuery();
 
+    const isMetaDatabasesAvailable = useDatabasesAvailable();
+
     const {currentData: tenant, isFetching} = tenantApi.useGetTenantInfoQuery(
-        {path: tenantName, clusterName},
+        {path: tenantName, clusterName, isMetaDatabasesAvailable},
         {pollingInterval: autoRefreshInterval},
     );
     const tenantLoading = isFetching && tenant === undefined;

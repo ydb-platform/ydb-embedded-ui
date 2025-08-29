@@ -6,6 +6,7 @@ import type {TTenantInfo} from '../../../types/api/tenant';
 import {TENANT_INITIAL_PAGE_KEY} from '../../../utils/constants';
 import {useClusterNameFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {api} from '../api';
+import {useDatabasesAvailable} from '../capabilities/hooks';
 import {prepareTenants} from '../tenants/utils';
 
 import {TENANT_DIAGNOSTICS_TABS_IDS, TENANT_METRICS_TABS_IDS} from './constants';
@@ -62,12 +63,25 @@ export const tenantApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getTenantInfo: builder.query({
             queryFn: async (
-                {path, clusterName}: {path: string; clusterName?: string},
+                {
+                    path,
+                    clusterName,
+                    isMetaDatabasesAvailable,
+                }: {
+                    path: string;
+                    clusterName?: string;
+                    isMetaDatabasesAvailable: boolean;
+                },
                 {signal},
             ) => {
                 try {
                     let tenantData: TTenantInfo;
-                    if (window.api.meta && clusterName) {
+                    if (window.api.meta && clusterName && isMetaDatabasesAvailable) {
+                        tenantData = await window.api.meta.getTenantsV2(
+                            {database: path, clusterName},
+                            {signal},
+                        );
+                    } else if (window.api.meta && clusterName) {
                         tenantData = await window.api.meta.getTenants(
                             {databaseName: path, clusterName},
                             {signal},
@@ -85,7 +99,12 @@ export const tenantApi = api.injectEndpoints({
                 }
             },
             providesTags: ['All'],
+            serializeQueryArgs: ({queryArgs}) => {
+                const {clusterName, path} = queryArgs;
+                return {clusterName, path};
+            },
         }),
+
         getClusterConfig: builder.query({
             queryFn: async ({database}: {database: string}, {signal}) => {
                 try {
@@ -105,15 +124,21 @@ export const tenantApi = api.injectEndpoints({
 
 export function useTenantBaseInfo(path: string) {
     const clusterNameFromQuery = useClusterNameFromQuery();
+    const isMetaDatabasesAvailable = useDatabasesAvailable();
 
-    const {currentData} = tenantApi.useGetTenantInfoQuery({
-        path,
-        clusterName: clusterNameFromQuery,
-    });
+    const {currentData} = tenantApi.useGetTenantInfoQuery(
+        {
+            path,
+            clusterName: clusterNameFromQuery,
+            isMetaDatabasesAvailable,
+        },
+        {skip: !path},
+    );
 
-    const {ControlPlane} = currentData || {};
+    const {ControlPlane, Name} = currentData || {};
 
     return {
         controlPlane: ControlPlane,
+        name: Name,
     };
 }

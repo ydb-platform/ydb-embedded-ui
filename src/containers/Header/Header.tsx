@@ -17,6 +17,7 @@ import {getConnectToDBDialog} from '../../components/ConnectToDB/ConnectToDBDial
 import {InternalLink} from '../../components/InternalLink';
 import {
     useAddClusterFeatureAvailable,
+    useDatabasesAvailable,
     useDeleteDatabaseFeatureAvailable,
     useEditDatabaseFeatureAvailable,
 } from '../../store/reducers/capabilities/hooks';
@@ -50,6 +51,8 @@ function Header() {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const isViewerUser = useIsViewerUser();
 
+    const isMetaDatabasesAvailable = useDatabasesAvailable();
+
     const {title: clusterTitle} = useClusterBaseInfo();
 
     const database = useDatabaseFromQuery();
@@ -71,7 +74,9 @@ function Header() {
     const shouldRequestTenantData =
         database && isDatabasePage && (isEditDBAvailable || isDeleteDBAvailable);
 
-    const params = shouldRequestTenantData ? {path: database, clusterName} : skipToken;
+    const params = shouldRequestTenantData
+        ? {path: database, clusterName, isMetaDatabasesAvailable}
+        : skipToken;
 
     const {currentData: databaseData, isLoading: isDatabaseDataLoading} =
         tenantApi.useGetTenantInfoQuery(params);

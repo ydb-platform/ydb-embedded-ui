@@ -50,4 +50,5 @@ export type MetaCapability =
     | '/meta/create_cluster'
     | '/meta/update_cluster'
     | '/meta/delete_cluster'
-    | '/meta/events';
+    | '/meta/events'
+    | '/meta/databases';
