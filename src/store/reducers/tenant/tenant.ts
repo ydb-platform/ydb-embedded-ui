@@ -78,12 +78,12 @@ export const tenantApi = api.injectEndpoints({
                     let tenantData: TTenantInfo;
                     if (window.api.meta && clusterName && isMetaDatabasesAvailable) {
                         tenantData = await window.api.meta.getTenantsV2(
-                            {database: path, clusterName},
+                            {path, clusterName},
                             {signal},
                         );
                     } else if (window.api.meta && clusterName) {
                         tenantData = await window.api.meta.getTenants(
-                            {databaseName: path, clusterName},
+                            {path, clusterName},
                             {signal},
                         );
                     } else {
