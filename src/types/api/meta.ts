@@ -19,6 +19,7 @@ export interface MetaTenants {
 /** With fields present only in /api/meta/meta/clusters */
 export interface MetaExtendedClusterInfo extends MetaGeneralClusterInfo {
     hosts?: Record<string, number>;
+    endpoint?: string;
     versions?: MetaClusterVersion[];
 }
 
@@ -31,12 +32,8 @@ export interface MetaBaseClusterInfo {
     location?: string;
     image?: string;
     title?: string;
-    endpoint?: string;
     mvp_token?: string;
     name?: string;
-    solomon?: string;
-    cores?: string;
-    logging?: string;
     status?: string;
     scale?: number;
     environment?: string;
@@ -44,8 +41,17 @@ export interface MetaBaseClusterInfo {
     description?: string;
     balancer?: string;
     service?: string;
-    trace_view?: string;
     use_embedded_ui?: boolean;
+
+    // Depending on meta version, these fields could be stringified objects or valid JSON
+    solomon?: string | MetaClusterMonitoringData;
+    cores?: string | MetaClusterCoresUrl;
+    logging?: string | MetaClusterLogsUrls;
+    trace_view?: string | MetaClusterTraceView;
+    trace_check?: string | MetaClusterTraceCheck;
+
+    // Settings are returned only by meta versions, that decode values by itself
+    settings?: MetaClusterSettings;
 }
 
 export interface MetaGeneralClusterInfo extends MetaBaseClusterInfo {
@@ -62,4 +68,36 @@ export interface MetaClusterVersion {
     version_base_color_index?: number;
     count: number;
     role: string;
+}
+
+export interface MetaClusterMonitoringData {
+    monitoring_url: string;
+
+    serverless_dashboard?: string;
+    dedicated_dashboard?: string;
+    cluster_dashboard?: string;
+
+    host?: string;
+    slot?: string;
+
+    cluster_name?: string;
+}
+export interface MetaClusterCoresUrl {
+    url?: string;
+}
+export interface MetaClusterLogsUrls {
+    url?: string;
+    slo_logs_url?: string;
+    monium_cluster?: string;
+}
+export interface MetaClusterTraceView {
+    url?: string;
+}
+export interface MetaClusterTraceCheck {
+    url?: string;
+}
+
+export interface MetaClusterSettings {
+    use_meta_proxy?: boolean;
+    proxy?: unknown;
 }
