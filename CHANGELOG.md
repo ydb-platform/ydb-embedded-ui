@@ -1,5 +1,12 @@
 # Changelog
 
+## [11.12.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.11.1...v11.12.0) (2025-08-29)
+
+
+### Features
+
+* support meta/databases handler ([#2782](https://github.com/ydb-platform/ydb-embedded-ui/issues/2782)) ([ab99d1b](https://github.com/ydb-platform/ydb-embedded-ui/commit/ab99d1bf951e642f6dafe69c0e331e47fb74576c))
+
 ## [11.11.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.11.0...v11.11.1) (2025-08-29)
 
 
