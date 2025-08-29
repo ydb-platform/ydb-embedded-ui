@@ -2,8 +2,8 @@ import React from 'react';
 
 import {ArrowRight, ChevronDown, ChevronUp, Database} from '@gravity-ui/icons';
 import {Button, ClipboardButton, Flex, Icon, Text} from '@gravity-ui/uikit';
+import {useHistory} from 'react-router-dom';
 
-import {InternalLink} from '../../../components/InternalLink';
 import {VersionsBar} from '../../../components/VersionsBar/VersionsBar';
 import {cn} from '../../../utils/cn';
 import type {PreparedNodeSystemState} from '../../../utils/nodes';
@@ -37,6 +37,8 @@ export const NodesTreeTitle = ({
     preparedVersions,
     onClick,
 }: NodesTreeTitleProps) => {
+    const history = useHistory();
+
     const handleClick = React.useCallback<React.MouseEventHandler<HTMLDivElement>>(
         (event) => {
             const shouldSkip = event.nativeEvent.composedPath().some(isActiveButtonTarget);
@@ -64,18 +66,15 @@ export const NodesTreeTitle = ({
     const renderNodesCount = () => {
         if (isDatabase) {
             return (
-                <InternalLink
-                    to={getTenantPath({
-                        database: title,
-                        diagnosticsTab: 'nodes',
-                    })}
-                    tabIndex={0}
+                <Button
+                    size="s"
+                    onClick={() =>
+                        history.push(getTenantPath({database: title, diagnosticsTab: 'nodes'}))
+                    }
                 >
-                    <Button size="s">
-                        {i18n('nodes-count', {count: nodesAmount})}
-                        <Icon data={ArrowRight} />
-                    </Button>
-                </InternalLink>
+                    {i18n('nodes-count', {count: nodesAmount})}
+                    <Icon data={ArrowRight} />
+                </Button>
             );
         }
 
