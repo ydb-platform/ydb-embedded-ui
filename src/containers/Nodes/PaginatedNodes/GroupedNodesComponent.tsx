@@ -6,7 +6,7 @@ import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/Pagin
 import {NODES_COLUMNS_TITLES} from '../../../components/nodesColumns/constants';
 import type {NodesColumnId} from '../../../components/nodesColumns/constants';
 import {nodesApi} from '../../../store/reducers/nodes/nodes';
-import type {NodesPreparedEntity} from '../../../store/reducers/nodes/types';
+import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField, NodesPeerRole} from '../../../types/api/nodes';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
@@ -28,7 +28,7 @@ interface NodeGroupProps {
     searchValue: string;
     peerRoleFilter?: NodesPeerRole;
     groupByParam?: NodesGroupByField;
-    columns: Column<NodesPreparedEntity>[];
+    columns: Column<PreparedStorageNode>[];
     scrollContainerRef: React.RefObject<HTMLElement>;
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
 }
@@ -85,7 +85,7 @@ interface GroupedNodesComponentProps {
     database?: string;
     scrollContainerRef: React.RefObject<HTMLElement>;
     withPeerRoleFilter?: boolean;
-    columns: Column<NodesPreparedEntity>[];
+    columns: Column<PreparedStorageNode>[];
     defaultColumnsIds: NodesColumnId[];
     requiredColumnsIds: NodesColumnId[];
     selectedColumnsKey: string;

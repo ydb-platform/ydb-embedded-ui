@@ -3,6 +3,7 @@ import {z} from 'zod';
 import type {EFlag} from '../../../types/api/enums';
 import type {NodesGroupByField} from '../../../types/api/nodes';
 import type {Erasure, GroupsGroupByField} from '../../../types/api/storage';
+import type {TTabletStateInfo} from '../../../types/api/tablet';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import type {NodesUptimeFilterValues, PreparedNodeSystemState} from '../../../utils/nodes';
 
@@ -33,6 +34,7 @@ export interface PreparedStorageNode extends PreparedNodeSystemState {
 
     PDisks?: PreparedPDisk[];
     VDisks?: PreparedVDisk[];
+    Tablets?: TTabletStateInfo[];
 
     Missing: number;
     MaximumSlotsPerDisk: number;

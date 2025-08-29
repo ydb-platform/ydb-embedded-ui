@@ -3,7 +3,7 @@ import React from 'react';
 import {Illustration} from '../../components/Illustration';
 import {ResizeablePaginatedTable} from '../../components/PaginatedTable';
 import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../components/nodesColumns/constants';
-import type {NodesFilters, NodesPreparedEntity} from '../../store/reducers/nodes/types';
+import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import type {ProblemFilterValue} from '../../store/reducers/settings/types';
 import type {NodesGroupByField, NodesPeerRole} from '../../types/api/nodes';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
@@ -13,6 +13,18 @@ import type {Column} from '../../utils/tableUtils/types';
 import {getNodes} from './getNodes';
 import i18n from './i18n';
 import {getRowClassName} from './shared';
+
+// Define filters type for consistency with storage nodes
+interface NodesFilters {
+    searchValue?: string;
+    problemFilter?: ProblemFilterValue;
+    uptimeFilter?: NodesUptimeFilterValues;
+    peerRoleFilter?: NodesPeerRole;
+    path?: string;
+    database?: string;
+    filterGroup?: string;
+    filterGroupBy?: NodesGroupByField;
+}
 
 interface NodesTableProps {
     path?: string;
@@ -26,7 +38,7 @@ interface NodesTableProps {
     filterGroup?: string;
     filterGroupBy?: NodesGroupByField;
 
-    columns: Column<NodesPreparedEntity>[];
+    columns: Column<PreparedStorageNode>[];
     scrollContainerRef: React.RefObject<HTMLElement>;
 
     initialEntitiesCount?: number;

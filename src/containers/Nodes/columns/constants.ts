@@ -13,7 +13,6 @@ export const DEFAULT_NODES_COLUMNS: NodesColumnId[] = [
     'CPU',
     'RAM',
     'Version',
-    'Tablets',
 ];
 
 export const REQUIRED_NODES_COLUMNS: NodesColumnId[] = ['NodeId'];
