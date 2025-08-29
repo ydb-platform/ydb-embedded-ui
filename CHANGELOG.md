@@ -1,5 +1,14 @@
 # Changelog
 
+## [11.11.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.11.0...v11.11.1) (2025-08-29)
+
+
+### Bug Fixes
+
+* charts width jump in banner ([#2766](https://github.com/ydb-platform/ydb-embedded-ui/issues/2766)) ([75a950b](https://github.com/ydb-platform/ydb-embedded-ui/commit/75a950b2cae607ac606db77dbac53522638475ff))
+* **streaming:** use CSRF-token if presented ([#2781](https://github.com/ydb-platform/ydb-embedded-ui/issues/2781)) ([1b7282a](https://github.com/ydb-platform/ydb-embedded-ui/commit/1b7282aae04cd68807c838b94c3adfc5f585a66b))
+* **Versions:** replace radio with sections ([#2773](https://github.com/ydb-platform/ydb-embedded-ui/issues/2773)) ([d7d82fa](https://github.com/ydb-platform/ydb-embedded-ui/commit/d7d82fa1c81a4508027c13f2dd189b0ca73584ca))
+
 ## [11.11.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.10.0...v11.11.0) (2025-08-25)
 
 
