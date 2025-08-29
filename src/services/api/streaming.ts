@@ -28,6 +28,12 @@ export interface StreamQueryOptions {
 }
 
 export class StreamingAPI extends BaseYdbAPI {
+    private csrfToken?: string;
+
+    setCSRFToken = (token: string) => {
+        this.csrfToken = token;
+    };
+
     async streamQuery<Action extends Actions>(
         params: StreamQueryParams<Action>,
         options: StreamQueryOptions,
@@ -47,6 +53,10 @@ export class StreamingAPI extends BaseYdbAPI {
             Accept: 'multipart/form-data',
             'Content-Type': 'application/json',
         });
+
+        if (this.csrfToken) {
+            headers.set('X-CSRF-Token', this.csrfToken);
+        }
 
         if (params.tracingLevel) {
             headers.set('X-Trace-Verbosity', String(params.tracingLevel));
