@@ -2,8 +2,9 @@ import AxiosWrapper from '@gravity-ui/axios-wrapper';
 import type {AxiosWrapperOptions} from '@gravity-ui/axios-wrapper';
 import axiosRetry from 'axios-retry';
 
-import {backend as BACKEND} from '../../store';
+import {backend as BACKEND, clusterName} from '../../store';
 import {DEV_ENABLE_TRACING_FOR_ALL_REQUESTS} from '../../utils/constants';
+import {prepareBackendWithMetaProxy} from '../../utils/parseBalancer';
 import {isRedirectToAuth} from '../../utils/response';
 import {settingsManager} from '../settings';
 
@@ -14,11 +15,19 @@ export type AxiosOptions = {
     timeout?: number;
 };
 
+export interface BaseAPIParams {
+    singleClusterMode?: boolean;
+}
+
 export class BaseYdbAPI extends AxiosWrapper {
     DEFAULT_RETRIES_COUNT = 0;
 
-    constructor(options?: AxiosWrapperOptions) {
-        super(options);
+    singleClusterMode?: boolean;
+
+    constructor(axiosOptions?: AxiosWrapperOptions, {singleClusterMode}: BaseAPIParams = {}) {
+        super(axiosOptions);
+
+        this.singleClusterMode = singleClusterMode;
 
         axiosRetry(this._axios, {
             retries: this.DEFAULT_RETRIES_COUNT,
@@ -74,6 +83,10 @@ export class BaseYdbAPI extends AxiosWrapper {
     }
 
     getPath(path: string) {
+        if (clusterName && !this.singleClusterMode && !BACKEND) {
+            return prepareBackendWithMetaProxy({clusterName}) + path;
+        }
+
         return `${BACKEND ?? ''}${path}`;
     }
 

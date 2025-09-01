@@ -70,3 +70,11 @@ export function prepareBackendFromBalancer(rawBalancer: string) {
 
     return preparedBalancer;
 }
+
+export function prepareBackendWithMetaProxy({clusterName}: {clusterName?: string}) {
+    if (!clusterName) {
+        return undefined;
+    }
+
+    return prepareBackendFromBalancer(`/proxy/cluster/${clusterName}`);
+}

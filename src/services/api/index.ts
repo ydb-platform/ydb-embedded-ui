@@ -1,3 +1,4 @@
+import type {AxiosWrapperOptions} from '@gravity-ui/axios-wrapper';
 import type {AxiosRequestConfig} from 'axios';
 
 import {codeAssistBackend} from '../../store';
@@ -30,33 +31,36 @@ export class YdbEmbeddedAPI {
     constructor({
         webVersion = false,
         withCredentials = false,
+        singleClusterMode,
         csrfTokenGetter = () => undefined,
         defaults = {},
     }: {
         webVersion?: boolean;
         withCredentials?: boolean;
+        singleClusterMode?: boolean;
         csrfTokenGetter?: () => string | undefined;
         defaults?: AxiosRequestConfig;
     } = {}) {
-        const config: AxiosRequestConfig = {withCredentials, ...defaults};
+        const axiosParams: AxiosWrapperOptions = {config: {withCredentials, ...defaults}};
+        const baseApiParams = {singleClusterMode};
 
-        this.auth = new AuthAPI({config});
+        this.auth = new AuthAPI(axiosParams, baseApiParams);
         if (webVersion) {
-            this.meta = new MetaAPI({config});
+            this.meta = new MetaAPI(axiosParams, baseApiParams);
         }
 
         if (webVersion || codeAssistBackend) {
-            this.codeAssist = new CodeAssistAPI({config});
+            this.codeAssist = new CodeAssistAPI(axiosParams, baseApiParams);
         }
 
-        this.operation = new OperationAPI({config});
-        this.pdisk = new PDiskAPI({config});
-        this.scheme = new SchemeAPI({config});
-        this.storage = new StorageAPI({config});
-        this.streaming = new StreamingAPI({config});
-        this.tablets = new TabletsAPI({config});
-        this.vdisk = new VDiskAPI({config});
-        this.viewer = new ViewerAPI({config});
+        this.operation = new OperationAPI(axiosParams, baseApiParams);
+        this.pdisk = new PDiskAPI(axiosParams, baseApiParams);
+        this.scheme = new SchemeAPI(axiosParams, baseApiParams);
+        this.storage = new StorageAPI(axiosParams, baseApiParams);
+        this.streaming = new StreamingAPI(axiosParams, baseApiParams);
+        this.tablets = new TabletsAPI(axiosParams, baseApiParams);
+        this.vdisk = new VDiskAPI(axiosParams, baseApiParams);
+        this.viewer = new ViewerAPI(axiosParams, baseApiParams);
 
         const token = csrfTokenGetter();
         if (token) {

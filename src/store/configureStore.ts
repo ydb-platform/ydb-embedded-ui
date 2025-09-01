@@ -57,7 +57,11 @@ const isSingleClusterMode = `${metaBackend}` === 'undefined';
 export function configureStore({
     aRootReducer = rootReducer,
     singleClusterMode = isSingleClusterMode,
-    api = new YdbEmbeddedAPI({webVersion, withCredentials: !customBackend}),
+    api = new YdbEmbeddedAPI({
+        webVersion,
+        singleClusterMode: isSingleClusterMode,
+        withCredentials: !customBackend,
+    }),
     getBackend = (params: ReturnType<typeof getUrlData>) => params.backend,
 } = {}) {
     const params = getUrlData({singleClusterMode, customBackend});
