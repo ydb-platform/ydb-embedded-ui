@@ -1,20 +1,8 @@
+import type {MetaBaseClusterInfo, MetaClusterMonitoringData} from '../types/api/meta';
 import type {ETenantType} from '../types/api/tenant';
 
-type ParsedMonitoringData = {
-    monitoring_url: string;
-
-    serverless_dashboard?: string;
-    dedicated_dashboard?: string;
-    cluster_dashboard?: string;
-
-    host?: string;
-    slot?: string;
-
-    cluster_name?: string;
-};
-
 interface GetMonitoringLinkProps {
-    monitoring: string;
+    monitoring: MetaBaseClusterInfo['solomon'];
     dbName: string;
     dbType: ETenantType;
     clusterName?: string;
@@ -62,7 +50,10 @@ export function getMonitoringLink({
 
 export type GetMonitoringClusterLink = typeof getMonitoringClusterLink;
 
-export function getMonitoringClusterLink(monitoring: string, clusterName?: string) {
+export function getMonitoringClusterLink(
+    monitoring: MetaBaseClusterInfo['solomon'],
+    clusterName?: string,
+) {
     try {
         const data = parseMonitoringData(monitoring);
 
@@ -89,9 +80,15 @@ export function getMonitoringClusterLink(monitoring: string, clusterName?: strin
     return '';
 }
 
-export function parseMonitoringData(monitoring: string): ParsedMonitoringData | undefined {
+export function parseMonitoringData(
+    monitoring: MetaBaseClusterInfo['solomon'],
+): MetaClusterMonitoringData | undefined {
+    if (monitoring && typeof monitoring === 'object') {
+        return monitoring;
+    }
+
     try {
-        const data = JSON.parse(monitoring);
+        const data = monitoring ? JSON.parse(monitoring) : undefined;
         if (typeof data === 'object' && 'monitoring_url' in data) {
             return data;
         }

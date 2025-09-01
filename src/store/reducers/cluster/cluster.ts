@@ -4,7 +4,6 @@ import {skipToken} from '@reduxjs/toolkit/query';
 
 import type {ClusterTab} from '../../../containers/Cluster/utils';
 import {clusterTabsIds, isClusterTab} from '../../../containers/Cluster/utils';
-import {parseTraceFields} from '../../../services/parsers/parseMetaCluster';
 import {isClusterInfoV2} from '../../../types/api/cluster';
 import type {TClusterInfo} from '../../../types/api/cluster';
 import type {TTabletStateInfo} from '../../../types/api/tablet';
@@ -16,6 +15,7 @@ import type {RootState} from '../../defaultStore';
 import {api} from '../api';
 import {selectNodesMap} from '../nodesList';
 
+import {parseCoresUrl, parseLoggingUrls, parseTraceField} from './parseFields';
 import type {ClusterGroupsStats, ClusterState} from './types';
 import {
     createSelectClusterGroupsQuery,
@@ -147,7 +147,7 @@ export function useClusterBaseInfo() {
         skip: !isViewerUser,
     });
 
-    const {solomon: monitoring, name, title, trace_view: traceView, ...data} = currentData || {};
+    const {solomon: monitoring, name, title, ...data} = currentData || {};
 
     // name is used for requests, title is used for display
     // Example:
@@ -158,10 +158,15 @@ export function useClusterBaseInfo() {
 
     return {
         ...data,
-        ...parseTraceFields({traceView}),
+
+        monitoring,
+
         name: clusterName,
         title: clusterTitle,
-        monitoring,
+
+        traceView: parseTraceField(data.trace_view),
+        cores: parseCoresUrl(data.cores),
+        logging: parseLoggingUrls(data.logging),
     };
 }
 
