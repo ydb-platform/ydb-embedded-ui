@@ -77,6 +77,10 @@ export class BaseYdbAPI extends AxiosWrapper {
         return `${BACKEND ?? ''}${path}`;
     }
 
+    getSchemaPath(props: {path?: string; database?: string}) {
+        return props.path;
+    }
+
     prepareArrayRequestParam(arr: (string | number)[]) {
         return arr.join(',');
     }

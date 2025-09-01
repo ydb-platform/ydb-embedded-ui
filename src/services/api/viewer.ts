@@ -147,7 +147,7 @@ export class ViewerAPI extends BaseYdbAPI {
             {
                 database,
                 node_id: nodeId,
-                path,
+                path: this.getSchemaPath({path, database}),
                 enums: true,
                 filter,
             },
@@ -163,7 +163,7 @@ export class ViewerAPI extends BaseYdbAPI {
             this.getPath('/viewer/json/describe'),
             {
                 database,
-                path,
+                path: this.getSchemaPath({path, database}),
                 enums: true,
                 backup: false,
                 private: true,
@@ -184,7 +184,7 @@ export class ViewerAPI extends BaseYdbAPI {
             this.getPath('/viewer/json/describe'),
             {
                 database,
-                path,
+                path: this.getSchemaPath({path, database}),
                 enums: true,
                 partition_stats: true,
                 subs: 0,
@@ -201,7 +201,7 @@ export class ViewerAPI extends BaseYdbAPI {
             this.getPath('/viewer/json/acl'),
             {
                 database,
-                path,
+                path: this.getSchemaPath({path, database}),
                 merge_rules: true,
                 dialect,
             },
@@ -216,7 +216,7 @@ export class ViewerAPI extends BaseYdbAPI {
             this.getPath('/viewer/json/acl'),
             {
                 database,
-                path,
+                path: this.getSchemaPath({path, database}),
                 merge_rules: true,
                 dialect,
                 list_permissions: true,
@@ -238,7 +238,7 @@ export class ViewerAPI extends BaseYdbAPI {
             rights,
             {
                 database,
-                path,
+                path: this.getSchemaPath({path, database}),
                 merge_rules: true,
                 dialect,
             },
@@ -254,7 +254,7 @@ export class ViewerAPI extends BaseYdbAPI {
             this.getPath('/viewer/json/describe'),
             {
                 database,
-                path,
+                path: this.getSchemaPath({path, database}),
                 enums: true,
                 backup: false,
                 children: false,
@@ -274,7 +274,7 @@ export class ViewerAPI extends BaseYdbAPI {
             {
                 enums: true,
                 database,
-                path,
+                path: this.getSchemaPath({path, database}),
             },
             {concurrentId, requestConfig: {signal}},
         );
@@ -290,7 +290,7 @@ export class ViewerAPI extends BaseYdbAPI {
                 enums: true,
                 include_stats: true,
                 database,
-                path,
+                path: this.getSchemaPath({path, database}),
             },
             {concurrentId, requestConfig: {signal}},
         );
@@ -306,7 +306,7 @@ export class ViewerAPI extends BaseYdbAPI {
                 enums: true,
                 include_stats: true,
                 database,
-                path,
+                path: this.getSchemaPath({path, database}),
             },
             {concurrentId, requestConfig: {signal}},
         );
@@ -329,7 +329,7 @@ export class ViewerAPI extends BaseYdbAPI {
                 enums: true,
                 include_stats: true,
                 database,
-                path,
+                path: this.getSchemaPath({path, database}),
                 consumer,
             },
             {concurrentId: concurrentId || 'getConsumer', requestConfig: {signal}},
@@ -438,7 +438,7 @@ export class ViewerAPI extends BaseYdbAPI {
             this.getPath('/viewer/json/hotkeys'),
             {
                 database,
-                path,
+                path: this.getSchemaPath({path, database}),
                 enable_sampling: enableSampling,
             },
             {concurrentId: concurrentId || 'getHotKeys', requestConfig: {signal}},
