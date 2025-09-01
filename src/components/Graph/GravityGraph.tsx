@@ -70,7 +70,12 @@ const renderBlockFn = (graph, block) => {
     return (
         <GraphBlock graph={graph} block={block} className={b('block')}>
             {Component ? (
-                <Component graph={graph} block={block} className={b('block-content', block.is)} />
+                <>
+                    <Component graph={graph} block={block} className={b('block-content', block.is)} />
+                    {block.id !== 'undefined' && block.is !== 'result' && <div className={b('block-id')}>
+                        #{block.id}
+                    </div>}
+                </>
             ) : (
                 block.id
             )}

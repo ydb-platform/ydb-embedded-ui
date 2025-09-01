@@ -1,4 +1,5 @@
 import type {TBlock} from '@gravity-ui/graph';
+import { Text } from '@gravity-ui/uikit';
 
 type Props = {
     block: TBlock;
@@ -8,7 +9,8 @@ type Props = {
 export const StageBlockComponent = ({className, block}: Props) => {
     return (
         <div className={className}>
-            {block.operators ? block.operators.join('') : block.name} #{block.id}
+            {block.operators ? block.operators.map((item) => <div key={item}>{item}</div>) : block.name}
+            {block.tables ? <div><Text color='secondary'>Tables: </Text>{block.tables.join(', ')}</div> : null}
         </div>
     );
 };
