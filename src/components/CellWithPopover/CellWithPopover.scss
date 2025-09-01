@@ -9,14 +9,12 @@
 
     &__popover {
         display: inline-block;
-        overflow: hidden;
 
         max-width: 100%;
         padding: var(--g-spacing-4);
 
         vertical-align: middle;
         white-space: nowrap;
-        text-overflow: ellipsis;
 
         .g-popover__handler {
             display: inline;
@@ -27,7 +25,10 @@
         }
     }
     &__children-wrapper {
+        overflow: hidden;
+
         cursor: pointer;
+        text-overflow: ellipsis;
 
         &_full-width {
             width: 100%;
