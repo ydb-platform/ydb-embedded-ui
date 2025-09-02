@@ -34,15 +34,17 @@ export class YdbEmbeddedAPI {
         singleClusterMode,
         csrfTokenGetter = () => undefined,
         defaults = {},
+        proxyMeta = false,
     }: {
         webVersion?: boolean;
         withCredentials?: boolean;
         singleClusterMode?: boolean;
         csrfTokenGetter?: () => string | undefined;
         defaults?: AxiosRequestConfig;
+        proxyMeta?: boolean;
     } = {}) {
         const axiosParams: AxiosWrapperOptions = {config: {withCredentials, ...defaults}};
-        const baseApiParams = {singleClusterMode};
+        const baseApiParams = {singleClusterMode, proxyMeta};
 
         this.auth = new AuthAPI(axiosParams, baseApiParams);
         if (webVersion) {
