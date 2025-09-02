@@ -1,5 +1,18 @@
 # Changelog
 
+## [11.14.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.13.0...v11.14.0) (2025-09-02)
+
+
+### Features
+
+* **settings:** enable network settings by default ([#2810](https://github.com/ydb-platform/ydb-embedded-ui/issues/2810)) ([b7e7625](https://github.com/ydb-platform/ydb-embedded-ui/commit/b7e76251f49abb9f653574974da8e4f523275ab2))
+* support use database id in links ([#2812](https://github.com/ydb-platform/ydb-embedded-ui/issues/2812)) ([53a7902](https://github.com/ydb-platform/ydb-embedded-ui/commit/53a79029d1d37ed5da8e81e9bcefb9d636d20cc9))
+
+
+### Bug Fixes
+
+* rack groups disco dance ([#2809](https://github.com/ydb-platform/ydb-embedded-ui/issues/2809)) ([9b35acd](https://github.com/ydb-platform/ydb-embedded-ui/commit/9b35acd0dd32297a8ca98414f8eb0940ac2bb0de))
+
 ## [11.13.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.12.0...v11.13.0) (2025-09-02)
 
 
