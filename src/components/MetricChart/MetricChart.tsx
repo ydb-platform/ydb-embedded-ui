@@ -125,6 +125,11 @@ interface DiagnosticsChartProps {
 
     /** Chart title displayed in the toolbar */
     title: string;
+
+    /**
+     * When true, skip fetching chart data completely (no initial request, no polling)
+     */
+    skip?: boolean;
 }
 
 export const MetricChart = ({
@@ -138,6 +143,7 @@ export const MetricChart = ({
     onChartDataStatusChange,
     isChartVisible,
     title,
+    skip,
 }: DiagnosticsChartProps) => {
     const [timeFrame, setTimeFrame] = React.useState<TimeFrame>(defaultTimeFrame);
 
@@ -154,7 +160,7 @@ export const MetricChart = ({
             timeFrame,
             maxDataPoints,
         },
-        {pollingInterval: autorefresh},
+        {pollingInterval: autorefresh, skip},
     );
 
     const loading = isFetching && !currentData;

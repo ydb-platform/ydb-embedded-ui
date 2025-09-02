@@ -49,7 +49,7 @@ export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
      *
      * If at least one chart successfully loaded, dashboard should be shown
      * This fallback behavior is only used when GraphShardExists capability is not available or false
-     * @link https://github.com/ydb-platform/ydb-embedded-ui/issues/659
+     * Link: https://github.com/ydb-platform/ydb-embedded-ui/issues/659
      * @todo disable only for specific errors ('GraphShard is not enabled') after ydb-stable-24 is generally used
      */
     const handleChartDataStatusChange = (chartStatus: ChartDataStatus) => {
@@ -64,6 +64,7 @@ export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
     const chartHeight = CHART_WIDTH / 1.5;
 
     const renderContent = () => {
+        const skipCharts = graphShardExists === false;
         return charts.map((chartConfig, index) => (
             <MetricChart
                 key={index}
@@ -76,6 +77,7 @@ export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
                 onChartDataStatusChange={handleChartDataStatusChange}
                 isChartVisible={!isDashboardHidden}
                 title={chartConfig.title}
+                skip={skipCharts}
             />
         ));
     };
