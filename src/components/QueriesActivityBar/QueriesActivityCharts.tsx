@@ -3,7 +3,6 @@ import React from 'react';
 import {Flex} from '@gravity-ui/uikit';
 
 import {defaultDashboardConfig} from '../../containers/Tenant/Diagnostics/TenantOverview/DefaultOverviewContent/defaultDashboardConfig';
-import {useGraphShardExists} from '../../store/reducers/capabilities/hooks';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {MetricChart} from '../MetricChart/MetricChart';
@@ -26,7 +25,6 @@ export function QueriesActivityCharts({
     expanded,
     onChartDataStatusChange,
 }: QueriesActivityChartsProps) {
-    const graphShardExists = useGraphShardExists();
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const [hasChartsLoaded, setHasChartsLoaded] = React.useState(false);
 
@@ -86,7 +84,6 @@ export function QueriesActivityCharts({
                     onChartDataStatusChange={handleChartDataStatusChange}
                     isChartVisible={hasChartsLoaded && expanded}
                     title={queriesChartConfig.title}
-                    skip={graphShardExists === false}
                 />
             </Flex>
 
@@ -100,7 +97,6 @@ export function QueriesActivityCharts({
                     onChartDataStatusChange={handleChartDataStatusChange}
                     isChartVisible={hasChartsLoaded && expanded}
                     title={latenciesChartConfig.title}
-                    skip={graphShardExists === false}
                 />
             </Flex>
         </Flex>
