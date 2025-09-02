@@ -3,6 +3,7 @@ import {DefinitionList, Flex} from '@gravity-ui/uikit';
 import {getTenantPath} from '../../containers/Tenant/TenantPages';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import type {AdditionalTenantsProps} from '../../types/additionalProps';
+import {uiFactory} from '../../uiFactory/uiFactory';
 import {getDatabaseLinks} from '../../utils/additionalProps';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
@@ -63,7 +64,7 @@ export function TenantNameWrapper({tenant, additionalTenantsProps}: TenantNameWr
             hasClipboardButton
             path={getTenantPath(
                 {
-                    database: tenant.Name,
+                    database: uiFactory.useDatabaseId ? tenant.Id : tenant.Name,
                     backend,
                 },
                 {withBasename: isExternalLink},

@@ -24,6 +24,7 @@ export interface ClusterBreadcrumbsOptions extends ClustersBreadcrumbsOptions {
 
 export interface TenantBreadcrumbsOptions extends ClusterBreadcrumbsOptions {
     tenantName?: string;
+    tenantId?: string;
 }
 
 export interface StorageGroupBreadcrumbsOptions extends ClusterBreadcrumbsOptions {

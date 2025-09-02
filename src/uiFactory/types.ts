@@ -42,6 +42,8 @@ export interface UIFactory<H extends string = CommonIssueType> {
     };
     hasAccess?: boolean;
     yaMetricaMap?: Record<string, number>;
+
+    useDatabaseId?: boolean;
 }
 
 export type HandleCreateDB = (params: {clusterName: string}) => Promise<boolean>;
