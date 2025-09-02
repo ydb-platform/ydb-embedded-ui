@@ -13,7 +13,12 @@
         box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
         border: 1px solid var(--g-color-line-generic);
         font-size: var(--g-text-body-short-font-size);
+        font-family: var(--g-font-family);
         line-height: var(--g-text-body-short-line-height);
+
+        &[aria-haspopup='dialog'] {
+            cursor: pointer;
+        }
     }
 
     &__block-id {
@@ -52,10 +57,37 @@
     }
 
     &__tooltip-content {
-        padding: 8px;
+        padding: 0 8px 8px;
         width: 300px;
         font-size: var(--g-text-body-short-font-size);
+        font-family: var(--g-font-family);
         line-height: var(--g-text-body-short-line-height);
+    }
 
+    &__tooltip-tabs {
+        margin-bottom: 8px;
+    }
+
+    &__tooltip-stat-row {
+        display: grid;
+        grid-template-columns: 100px auto;
+        gap: 8px;
+        margin: 4px 0 0;
+
+        span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        span:nth-child(2) {
+            word-wrap: break-word;
+        }
+    }
+
+    &__tooltip-stat-group {
+        margin-top: 8px;
+    }
+
+    &__tooltip-stat-group-name {
+        font-weight: bold;
     }
 }

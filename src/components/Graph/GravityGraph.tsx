@@ -53,10 +53,26 @@ const config = {
         showConnectionArrows: false,
     },
 };
+
+const baseElkConfig = {
+    id: 'root',
+    layoutOptions: {
+        'elk.algorithm': 'layered',
+        'elk.direction': 'DOWN',
+        // 'elk.spacing.edgeNode': '50',
+        'elk.layered.spacing.nodeNodeBetweenLayers': '20',
+        'elk.layered.nodePlacement.bk.fixedAlignment': 'BALANCED',
+        'elk.layered.nodePlacement.bk.ordering': 'INTERACTIVE',
+        // 'elk.debugMode': true,
+        // 'elk.alignment': 'CENTER'
+    },
+};
+
+
 const elk = new ELK();
 
 const renderBlockFn = (graph, block) => {
-    // console.log('===', block);
+    console.log('===', block);
 
     const map = {
         query: QueryBlockComponent,
@@ -83,52 +99,7 @@ const renderBlockFn = (graph, block) => {
     );
 };
 
-// const _blocks: TBlock[] = [
-//     {
-//         width: 200,
-//         height: 160,
-//         id: 'Left',
-//         is: 'block-action',
-//         selected: false,
-//         name: 'Left block',
-//         anchors: [],
-//     },
-//     {
-//         width: 200,
-//         height: 160,
-//         id: 'Right',
-//         is: 'block-action',
-//         selected: false,
-//         name: 'Right block',
-//         anchors: [],
-//     },
-// ];
-
-// const _connections = [
-//     {
-//         id: 'c1',
-//         sourceBlockId: 'Left',
-//         targetBlockId: 'Right',
-//     },
-// ];
-
-const baseElkConfig = {
-    id: 'root',
-    layoutOptions: {
-        'elk.algorithm': 'layered',
-        'elk.direction': 'DOWN',
-        // 'elk.spacing.edgeNode': '50',
-        'elk.layered.spacing.nodeNodeBetweenLayers': '20',
-        'elk.layered.nodePlacement.bk.fixedAlignment': 'BALANCED',
-        'elk.layered.nodePlacement.bk.ordering': 'INTERACTIVE',
-        'elk.debugMode': true,
-        // 'elk.alignment': 'CENTER'
-    },
-};
-
 export function GravityGraph<T>({data, theme}: Props<T>) {
-    // console.log('997', data);
-
     const _blocks = useMemo(() => prepareBlocks(data.nodes), [data.nodes]);
     const _connections = useMemo(() => prepareConnections(data.links), [data.links]);
     const elkConfig = useMemo(
@@ -147,26 +118,15 @@ export function GravityGraph<T>({data, theme}: Props<T>) {
             return;
         }
 
-        // console.log('result', result);
+        const blocks = _blocks.map((block) => ({
+            ...block,
+            ...result.blocks[block.id],
+        }));
 
-        const blocks = _blocks.map((block) => {
-            return {
-                ...block,
-                ...result.blocks[block.id],
-            };
-        });
-
-        const connections = _connections.reduce((acc, connection) => {
-            if (connection.id in result.edges) {
-                acc.push({
-                    ...connection,
-                    ...result.edges[connection.id],
-                });
-            }
-            return acc;
-        }, []);
-
-        // console.log('connections', connections);
+        const connections = _connections.map((connection) => ({
+            ...connection,
+            ...(connection.id? result.edges[connection.id] : {}),
+        }));
 
         graph.setEntities({
             blocks,
