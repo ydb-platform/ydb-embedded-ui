@@ -41,10 +41,21 @@
     }
 
     &__block-content.connection {
+        display: flex;
+        align-items: center;
+        gap: 4px;
         border-radius: 6px;
         box-shadow: none;
         background: var(--g-color-base-info-light);
         border: 1px solid var(--g-color-line-info);
         color: var(--g-color-text-info-heavy);
+    }
+
+    &__tooltip-content {
+        padding: 8px;
+        width: 300px;
+        font-size: var(--g-text-body-short-font-size);
+        line-height: var(--g-text-body-short-line-height);
+
     }
 }

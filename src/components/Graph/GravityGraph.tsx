@@ -56,7 +56,7 @@ const config = {
 const elk = new ELK();
 
 const renderBlockFn = (graph, block) => {
-    console.log('===', block);
+    // console.log('===', block);
 
     const map = {
         query: QueryBlockComponent,
