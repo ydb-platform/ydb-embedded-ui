@@ -42,6 +42,11 @@ export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
     // Refetch data only if dashboard successfully loaded
     const shouldRefresh = isDashboardHidden ? 0 : autoRefreshInterval;
 
+    // Do not render charts at all when GraphShard capability explicitly says it's absent
+    if (graphShardExists === false) {
+        return null;
+    }
+
     /**
      * Charts should be hidden, if they are not enabled:
      * 1. GraphShard is not enabled
@@ -64,7 +69,6 @@ export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
     const chartHeight = CHART_WIDTH / 1.5;
 
     const renderContent = () => {
-        const skipCharts = graphShardExists === false;
         return charts.map((chartConfig, index) => (
             <MetricChart
                 key={index}
@@ -77,7 +81,6 @@ export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
                 onChartDataStatusChange={handleChartDataStatusChange}
                 isChartVisible={!isDashboardHidden}
                 title={chartConfig.title}
-                skip={skipCharts}
             />
         ));
     };
