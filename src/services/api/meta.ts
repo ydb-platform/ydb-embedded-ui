@@ -1,3 +1,5 @@
+import type {AxiosWrapperOptions} from '@gravity-ui/axios-wrapper';
+
 import {metaBackend as META_BACKEND} from '../../store';
 import type {MetaCapabilitiesResponse} from '../../types/api/capabilities';
 import type {
@@ -8,11 +10,20 @@ import type {
 } from '../../types/api/meta';
 import {parseMetaTenants} from '../parsers/parseMetaTenants';
 
-import type {AxiosOptions} from './base';
+import type {AxiosOptions, BaseAPIParams} from './base';
 import {BaseYdbAPI} from './base';
 
 export class MetaAPI extends BaseYdbAPI {
-    getPath(path: string, _clusterName?: string) {
+    proxyMeta?: boolean;
+    constructor(axiosOptions?: AxiosWrapperOptions, {proxyMeta}: BaseAPIParams = {}) {
+        super(axiosOptions);
+
+        this.proxyMeta = proxyMeta;
+    }
+    getPath(path: string, clusterName?: string) {
+        if (this.proxyMeta && clusterName) {
+            return `${META_BACKEND}/proxy/cluster/${clusterName}${path}`;
+        }
         return `${META_BACKEND ?? ''}${path}`;
     }
 

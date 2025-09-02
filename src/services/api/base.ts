@@ -17,6 +17,7 @@ export type AxiosOptions = {
 
 export interface BaseAPIParams {
     singleClusterMode?: boolean;
+    proxyMeta?: boolean;
 }
 
 export class BaseYdbAPI extends AxiosWrapper {
