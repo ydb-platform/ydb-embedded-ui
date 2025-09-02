@@ -1,5 +1,20 @@
 # Changelog
 
+## [11.13.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.12.0...v11.13.0) (2025-09-02)
+
+
+### Features
+
+* **api:** support proxyfing meta ([#2807](https://github.com/ydb-platform/ydb-embedded-ui/issues/2807)) ([3427206](https://github.com/ydb-platform/ydb-embedded-ui/commit/3427206925dd300a82f20fab56f2a84999c7b939))
+* dont fetch render for false graphshard ([#2803](https://github.com/ydb-platform/ydb-embedded-ui/issues/2803)) ([548ce2f](https://github.com/ydb-platform/ydb-embedded-ui/commit/548ce2ff4ceb247058d3a21c633254640ca6bbdc))
+
+
+### Bug Fixes
+
+* **CellWithPopover:** text overflow with ellipsis ([#2792](https://github.com/ydb-platform/ydb-embedded-ui/issues/2792)) ([ed9375e](https://github.com/ydb-platform/ydb-embedded-ui/commit/ed9375e6f18ec14f779b16f8575bc368b245411e))
+* **configureStore:** remove getBackend ([#2806](https://github.com/ydb-platform/ydb-embedded-ui/issues/2806)) ([d740ed8](https://github.com/ydb-platform/ydb-embedded-ui/commit/d740ed8ccdfb0fb7ce09d9905397111cb628faac))
+* **YdbEmbeddedAPI:** require all params to be passed ([#2808](https://github.com/ydb-platform/ydb-embedded-ui/issues/2808)) ([fb48f49](https://github.com/ydb-platform/ydb-embedded-ui/commit/fb48f4907ac048ddfa0f8d9e70a1e6766dc03674))
+
 ## [11.12.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.11.1...v11.12.0) (2025-09-01)
 
 
