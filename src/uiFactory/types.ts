@@ -32,12 +32,8 @@ export interface UIFactory<H extends string = CommonIssueType> {
     getDatabaseLinks?: GetDatabaseLinks;
     getClusterLinks?: GetClusterLinks;
 
-    renderBackups?: (props: {
-        database: string;
-        scrollContainerRef: React.RefObject<HTMLDivElement>;
-    }) => React.ReactNode;
-
-    renderEvents?: () => React.ReactNode;
+    renderBackups?: RenderBackups;
+    renderEvents?: RenderEvents;
 
     healthcheck: {
         getHealthckechViewTitles: GetHealthcheckViewTitles<H>;
@@ -73,3 +69,10 @@ export type GetDatabaseLinks = (params: {
 }) => DatabaseLink[];
 
 export type GetClusterLinks = (params: {clusterInfo: ClusterInfo}) => ClusterLink[];
+
+export type RenderBackups = (props: {
+    database: string;
+    scrollContainerRef: React.RefObject<HTMLDivElement>;
+}) => React.ReactNode;
+
+export type RenderEvents = () => React.ReactNode;

@@ -16,19 +16,19 @@ export type AxiosOptions = {
 };
 
 export interface BaseAPIParams {
-    singleClusterMode?: boolean;
-    proxyMeta?: boolean;
+    singleClusterMode: undefined | boolean;
+    proxyMeta: undefined | boolean;
 }
 
 export class BaseYdbAPI extends AxiosWrapper {
     DEFAULT_RETRIES_COUNT = 0;
 
-    singleClusterMode?: boolean;
+    singleClusterMode: BaseAPIParams['singleClusterMode'];
 
-    constructor(axiosOptions?: AxiosWrapperOptions, {singleClusterMode}: BaseAPIParams = {}) {
+    constructor(axiosOptions: AxiosWrapperOptions, baseApiParams: BaseAPIParams) {
         super(axiosOptions);
 
-        this.singleClusterMode = singleClusterMode;
+        this.singleClusterMode = baseApiParams.singleClusterMode;
 
         axiosRetry(this._axios, {
             retries: this.DEFAULT_RETRIES_COUNT,

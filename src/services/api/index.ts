@@ -15,6 +15,18 @@ import {TabletsAPI} from './tablets';
 import {VDiskAPI} from './vdisk';
 import {ViewerAPI} from './viewer';
 
+// Require all fields to be explicitly passed
+// It is needed to prevent forgotten params in installations
+// Where ydb-embedded-ui is used as a package
+interface YdbEmbeddedAPIProps {
+    webVersion: undefined | boolean;
+    withCredentials: undefined | boolean;
+    singleClusterMode: undefined | boolean;
+    proxyMeta: undefined | boolean;
+    csrfTokenGetter: undefined | (() => string | undefined);
+    defaults: undefined | AxiosRequestConfig;
+}
+
 export class YdbEmbeddedAPI {
     auth: AuthAPI;
     operation: OperationAPI;
@@ -25,24 +37,18 @@ export class YdbEmbeddedAPI {
     tablets: TabletsAPI;
     vdisk: VDiskAPI;
     viewer: ViewerAPI;
+
     meta?: MetaAPI;
     codeAssist?: CodeAssistAPI;
 
     constructor({
         webVersion = false,
         withCredentials = false,
-        singleClusterMode,
+        singleClusterMode = true,
+        proxyMeta = false,
         csrfTokenGetter = () => undefined,
         defaults = {},
-        proxyMeta = false,
-    }: {
-        webVersion?: boolean;
-        withCredentials?: boolean;
-        singleClusterMode?: boolean;
-        csrfTokenGetter?: () => string | undefined;
-        defaults?: AxiosRequestConfig;
-        proxyMeta?: boolean;
-    } = {}) {
+    }: YdbEmbeddedAPIProps) {
         const axiosParams: AxiosWrapperOptions = {config: {withCredentials, ...defaults}};
         const baseApiParams = {singleClusterMode, proxyMeta};
 
