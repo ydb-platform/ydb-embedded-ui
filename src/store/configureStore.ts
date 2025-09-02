@@ -62,11 +62,10 @@ export function configureStore({
         singleClusterMode: isSingleClusterMode,
         withCredentials: !customBackend,
     }),
-    getBackend = (params: ReturnType<typeof getUrlData>) => params.backend,
 } = {}) {
     const params = getUrlData({singleClusterMode, customBackend});
     ({basename, clusterName} = params);
-    backend = getBackend(params);
+    backend = params.backend;
     const history = createBrowserHistory({basename});
 
     const store = _configureStore(aRootReducer, history, {singleClusterMode}, [
