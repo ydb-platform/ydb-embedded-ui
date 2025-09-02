@@ -17,7 +17,6 @@ export interface TableChunksRendererProps<T, F> {
     scrollContainerRef: React.RefObject<HTMLElement>;
     tableRef: React.RefObject<HTMLElement>;
     foundEntities: number;
-    tableOffset: number;
     chunkSize: number;
     rowHeight: number;
     columns: Column<T>[];
@@ -36,7 +35,6 @@ export const TableChunksRenderer = <T, F>({
     scrollContainerRef,
     tableRef,
     foundEntities,
-    tableOffset,
     chunkSize,
     rowHeight,
     columns,
@@ -56,7 +54,6 @@ export const TableChunksRenderer = <T, F>({
         totalItems: foundEntities || 1,
         rowHeight,
         chunkSize,
-        tableOffset,
     });
 
     const lastChunkSize = React.useMemo(() => {
