@@ -14,11 +14,12 @@ import type {AxiosOptions, BaseAPIParams} from './base';
 import {BaseYdbAPI} from './base';
 
 export class MetaAPI extends BaseYdbAPI {
-    proxyMeta?: boolean;
-    constructor(axiosOptions?: AxiosWrapperOptions, {proxyMeta}: BaseAPIParams = {}) {
-        super(axiosOptions);
+    proxyMeta: BaseAPIParams['proxyMeta'];
 
-        this.proxyMeta = proxyMeta;
+    constructor(axiosOptions: AxiosWrapperOptions, baseApiParams: BaseAPIParams) {
+        super(axiosOptions, baseApiParams);
+
+        this.proxyMeta = baseApiParams.proxyMeta;
     }
     getPath(path: string, clusterName?: string) {
         if (this.proxyMeta && clusterName) {

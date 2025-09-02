@@ -61,6 +61,9 @@ export function configureStore({
         webVersion,
         singleClusterMode: isSingleClusterMode,
         withCredentials: !customBackend,
+        proxyMeta: false,
+        csrfTokenGetter: undefined,
+        defaults: undefined,
     }),
 } = {}) {
     const params = getUrlData({singleClusterMode, customBackend});
