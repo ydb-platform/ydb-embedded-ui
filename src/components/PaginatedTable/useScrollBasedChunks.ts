@@ -96,11 +96,8 @@ export const useScrollBasedChunks = ({
     const updateVisibleChunks = React.useCallback(() => {
         const newRange = calculateVisibleRange();
         if (newRange) {
-            const {start, end, skipUpdate} = newRange as unknown as {
-                start: number;
-                end: number;
-                skipUpdate?: boolean;
-            };
+            const {start, end, skipUpdate} = newRange;
+
             if (skipUpdate) {
                 return;
             }

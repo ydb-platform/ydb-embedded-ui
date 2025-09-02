@@ -90,7 +90,7 @@ export const PaginatedTable = <T, F>({
                 scrollContainer.style.willChange = 'transform';
             }
         }
-    }, [scrollContainerRef]);
+    }, [scrollContainerRef.current]);
 
     // Reset table on initialization and filters change
     React.useLayoutEffect(() => {
