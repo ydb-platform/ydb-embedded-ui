@@ -7,6 +7,8 @@ import {cn} from '../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {Portal} from '../Portal/Portal';
 
+import {useFullscreenContext} from './FullscreenContext';
+
 import disableFullscreenIcon from '../../assets/icons/disableFullscreen.svg';
 
 import './Fullscreen.scss';
@@ -21,11 +23,7 @@ interface FullscreenProps {
 export function Fullscreen({children, className}: FullscreenProps) {
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
     const dispatch = useTypedDispatch();
-
-    const fullscreenRoot = React.useMemo(
-        () => document.getElementById('fullscreen-root') ?? undefined,
-        [],
-    );
+    const fullscreenRootRef = useFullscreenContext();
 
     const onDisableFullScreen = React.useCallback(() => {
         dispatch(disableFullscreen());
@@ -47,25 +45,25 @@ export function Fullscreen({children, className}: FullscreenProps) {
     const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
     React.useEffect(() => {
         const div = document.createElement('div');
-        fullscreenRoot?.appendChild(div);
+        fullscreenRootRef.current?.appendChild(div);
         div.style.display = 'contents';
         setContainer(div);
         return () => {
             setContainer(null);
             div.remove();
         };
-    }, [fullscreenRoot]);
+    }, [fullscreenRootRef]);
 
     const ref = React.useRef<HTMLDivElement>(null);
     React.useLayoutEffect(() => {
         if (container) {
             if (isFullscreen) {
-                fullscreenRoot?.appendChild(container);
+                fullscreenRootRef.current?.appendChild(container);
             } else {
                 ref.current?.appendChild(container);
             }
         }
-    }, [container, fullscreenRoot, isFullscreen]);
+    }, [container, fullscreenRootRef, isFullscreen]);
 
     if (!container) {
         return null;
