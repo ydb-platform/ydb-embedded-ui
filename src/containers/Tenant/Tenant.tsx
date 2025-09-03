@@ -56,7 +56,7 @@ export function Tenant(props: TenantProps) {
 
     const {database, schema} = useTenantQueryParams();
 
-    const {controlPlane, name, id} = useTenantBaseInfo(database ?? '');
+    const {controlPlane, name} = useTenantBaseInfo(database ?? '');
 
     if (!database) {
         throw new Error('Tenant name is not defined');
@@ -88,8 +88,8 @@ export function Tenant(props: TenantProps) {
 
     const dispatch = useTypedDispatch();
     React.useEffect(() => {
-        dispatch(setHeaderBreadcrumbs('tenant', {tenantName: databaseName, tenantId: id}));
-    }, [databaseName, id, dispatch]);
+        dispatch(setHeaderBreadcrumbs('tenant', {tenantName: databaseName, database}));
+    }, [databaseName, database, dispatch]);
 
     const preloadedData = useTypedSelector((state) =>
         selectSchemaObjectData(state, path, database),

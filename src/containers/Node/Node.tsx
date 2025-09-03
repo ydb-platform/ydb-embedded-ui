@@ -90,18 +90,21 @@ export function Node() {
 
     const tenantName = node?.Tenants?.[0] || tenantNameFromQuery?.toString();
 
+    const database = tenantNameFromQuery?.toString();
+
     React.useEffect(() => {
         // Dispatch only if loaded to get correct node role
         if (!isLoading) {
             dispatch(
                 setHeaderBreadcrumbs('node', {
                     tenantName,
+                    database,
                     nodeRole: isStorageNode ? 'Storage' : 'Compute',
                     nodeId,
                 }),
             );
         }
-    }, [dispatch, tenantName, nodeId, isLoading, isStorageNode]);
+    }, [dispatch, tenantName, nodeId, isLoading, isStorageNode, database]);
 
     return (
         <div className={b(null)} ref={container}>
