@@ -61,6 +61,11 @@ function Fullscreen({children, className}: FullscreenProps) {
             } else {
                 ref.current?.appendChild(container);
             }
+            // Trigger recalculation for components relying on window resize
+            // Dispatch after DOM repaint to ensure correct measurements
+            requestAnimationFrame(() => {
+                window.dispatchEvent(new Event('resize'));
+            });
         }
     }, [container, isFullscreen]);
 
