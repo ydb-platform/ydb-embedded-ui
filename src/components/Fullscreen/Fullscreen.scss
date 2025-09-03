@@ -1,4 +1,6 @@
 .ydb-fullscreen {
+    --ydb-fullscreen-z-index: 1000;
+
     overflow: hidden;
     flex-grow: 1;
 
@@ -6,7 +8,7 @@
         // should expand to fill the content area, keeping aside navigation visible
         // counts on .gn-aside-header__content to have position: relative, it is set in App.scss
         position: absolute;
-        z-index: 10;
+        z-index: var(--ydb-fullscreen-z-index);
         inset: 0;
 
         background-color: var(--g-color-base-background);
@@ -14,7 +16,7 @@
 
     &__close-button {
         position: fixed;
-        z-index: 11;
+        z-index: calc(var(--ydb-fullscreen-z-index) + 1);
         top: 8px;
         right: 20px;
 

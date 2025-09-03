@@ -18,11 +18,14 @@ interface FullscreenProps {
     className?: string;
 }
 
-const fullscreenRoot = document.getElementById('fullscreen-root') ?? undefined;
-
-function Fullscreen({children, className}: FullscreenProps) {
+export function Fullscreen({children, className}: FullscreenProps) {
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
     const dispatch = useTypedDispatch();
+
+    const fullscreenRoot = React.useMemo(
+        () => document.getElementById('fullscreen-root') ?? undefined,
+        [],
+    );
 
     const onDisableFullScreen = React.useCallback(() => {
         dispatch(disableFullscreen());
@@ -51,7 +54,7 @@ function Fullscreen({children, className}: FullscreenProps) {
             setContainer(null);
             div.remove();
         };
-    }, []);
+    }, [fullscreenRoot]);
 
     const ref = React.useRef<HTMLDivElement>(null);
     React.useLayoutEffect(() => {
@@ -62,7 +65,7 @@ function Fullscreen({children, className}: FullscreenProps) {
                 ref.current?.appendChild(container);
             }
         }
-    }, [container, isFullscreen]);
+    }, [container, fullscreenRoot, isFullscreen]);
 
     if (!container) {
         return null;
@@ -85,5 +88,3 @@ function Fullscreen({children, className}: FullscreenProps) {
         </div>
     );
 }
-
-export default Fullscreen;

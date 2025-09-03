@@ -3,7 +3,7 @@ import React from 'react';
 import {Flex, Icon} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../../components/Errors/ResponseError';
-import Fullscreen from '../../../components/Fullscreen/Fullscreen';
+import {Fullscreen} from '../../../components/Fullscreen/Fullscreen';
 import {HealthcheckStatus} from '../../../components/HealthcheckStatus/HealthcheckStatus';
 import {Illustration} from '../../../components/Illustration';
 import {Loader} from '../../../components/Loader';
