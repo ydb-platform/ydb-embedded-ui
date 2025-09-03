@@ -5,6 +5,7 @@ import type {History} from 'history';
 import {Helmet} from 'react-helmet-async';
 
 import {componentsRegistry} from '../../components/ComponentsProvider/componentsRegistry';
+import {FullscreenProvider} from '../../components/Fullscreen/FullscreenContext';
 import {useTypedSelector} from '../../utils/hooks';
 import ReduxTooltip from '../ReduxTooltip/ReduxTooltip';
 import type {YDBEmbeddedUISettings} from '../UserSettings/settings';
@@ -47,19 +48,22 @@ function AppContent({
 }) {
     const {appTitle} = useAppTitle();
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
+    const fullscreenRootRef = React.useRef<HTMLDivElement>(null);
 
     return (
         <React.Fragment>
             <Helmet defaultTitle={appTitle} titleTemplate={`%s — ${appTitle}`} />
-            <ContentWrapper>
-                <NavigationWrapper
-                    singleClusterMode={singleClusterMode}
-                    userSettings={userSettings}
-                >
-                    <Content singleClusterMode={singleClusterMode}>{children}</Content>
-                    <div id="fullscreen-root"></div>
-                </NavigationWrapper>
-            </ContentWrapper>
+            <FullscreenProvider fullscreenRootRef={fullscreenRootRef}>
+                <ContentWrapper>
+                    <NavigationWrapper
+                        singleClusterMode={singleClusterMode}
+                        userSettings={userSettings}
+                    >
+                        <Content singleClusterMode={singleClusterMode}>{children}</Content>
+                        <div ref={fullscreenRootRef}></div>
+                    </NavigationWrapper>
+                </ContentWrapper>
+            </FullscreenProvider>
         </React.Fragment>
     );
 }

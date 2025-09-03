@@ -6,9 +6,9 @@ import {isNil} from 'lodash';
 
 import {DrawerWrapper} from '../../../../components/Drawer';
 import {EmptyFilter} from '../../../../components/EmptyFilter/EmptyFilter';
-import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
+import {EnableFullscreenButton} from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import {PageError} from '../../../../components/Errors/PageError/PageError';
-import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
+import {Fullscreen} from '../../../../components/Fullscreen/Fullscreen';
 import {
     DEFAULT_TABLE_ROW_HEIGHT,
     ResizeablePaginatedTable,
