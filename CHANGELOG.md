@@ -1,5 +1,13 @@
 # Changelog
 
+## [11.14.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.14.0...v11.14.1) (2025-09-03)
+
+
+### Bug Fixes
+
+* **meta:** cp_databases not accept database param ([#2819](https://github.com/ydb-platform/ydb-embedded-ui/issues/2819)) ([ed4f15b](https://github.com/ydb-platform/ydb-embedded-ui/commit/ed4f15bc26cf10216c784c2b2c539834dca1bb7b))
+* query tables styles ([#2815](https://github.com/ydb-platform/ydb-embedded-ui/issues/2815)) ([96913ac](https://github.com/ydb-platform/ydb-embedded-ui/commit/96913ac012ab9b8ff6d0ca87d77d3c91cf2c414e))
+
 ## [11.14.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.13.0...v11.14.0) (2025-09-02)
 
 
