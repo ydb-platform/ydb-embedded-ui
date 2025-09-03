@@ -51,7 +51,6 @@ export class MetaAPI extends BaseYdbAPI {
             {
                 cluster_name: clusterName,
                 database_name: path,
-                database: path,
             },
             {requestConfig: {signal}},
         ).then(parseMetaTenants);
