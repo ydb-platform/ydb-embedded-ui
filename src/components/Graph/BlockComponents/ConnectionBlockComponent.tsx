@@ -1,6 +1,6 @@
 import type {TBlock} from '@gravity-ui/graph';
 import { Icon } from '@gravity-ui/uikit';
-import {CodeMerge, Shuffle, VectorCircle, MapPin, BroadcastSignal} from '@gravity-ui/icons';
+import {DatabaseFill, Shuffle, GripHorizontal, MapPin, ArrowsExpandHorizontal} from '@gravity-ui/icons';
 
 import { TooltipComponent } from '../TooltipComponent';
 
@@ -12,15 +12,15 @@ type Props = {
 const getIcon = (name: string) => {
     switch (name) {
         case 'Merge':
-            return CodeMerge;
+            return DatabaseFill;
         case 'UnionAll':
-            return VectorCircle;
+            return GripHorizontal;
         case 'HashShuffle':
             return Shuffle;
         case 'Map':
             return MapPin;
         case 'Broadcast':
-            return BroadcastSignal;
+            return ArrowsExpandHorizontal;
     }
 }
 
