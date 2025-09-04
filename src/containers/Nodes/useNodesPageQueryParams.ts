@@ -27,6 +27,7 @@ export function useNodesPageQueryParams(
 
     let peerRoleFilter: NodesPeerRole | undefined;
 
+    // Do not add peerRoleFilter on Cluster page Network tab
     if (withPeerRoleFilter) {
         peerRoleFilter = isViewerUser
             ? parseNodesPeerRoleFilter(queryParams.peerRole, 'database')
