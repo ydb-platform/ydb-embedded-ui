@@ -9,7 +9,7 @@ export function transformPath(path: string, dbName: string): string {
         return normalizedPath || '/';
     }
     if (normalizedPath === normalizedDbName) {
-        return `/${normalizedPath}`;
+        return '';
     }
 
     let result = normalizedPath.slice(normalizedDbName.length);
