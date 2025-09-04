@@ -13,7 +13,7 @@ import type {
 } from '../../../../../store/reducers/tenants/utils';
 import {cn} from '../../../../../utils/cn';
 import {SHOW_NETWORK_UTILIZATION} from '../../../../../utils/constants';
-import {useSetting, useTypedSelector} from '../../../../../utils/hooks';
+import {useSetting} from '../../../../../utils/hooks';
 import {calculateMetricAggregates} from '../../../../../utils/metrics';
 import {
     formatCoresLegend,
@@ -38,7 +38,7 @@ interface MetricsTabsProps {
     networkStats?: TenantMetricStats[];
     storageGroupsCount?: number;
     isServerless?: boolean;
-    activeTab?: TenantMetricsTab;
+    activeTab: TenantMetricsTab;
 }
 
 export function MetricsTabs({
@@ -52,7 +52,6 @@ export function MetricsTabs({
     activeTab,
 }: MetricsTabsProps) {
     const location = useLocation();
-    const {metricsTab} = useTypedSelector((state) => state.tenant);
     const queryParams = parseQuery(location);
 
     const tabLinks: Record<TenantMetricsTab, string> = {
@@ -99,14 +98,13 @@ export function MetricsTabs({
         [networkStats],
     );
 
-    const active = activeTab ?? metricsTab;
     const cardVariant = isServerless ? 'serverless' : 'default';
 
     return (
         <Flex className={b({serverless: Boolean(isServerless)})} alignItems="center">
             <div
                 className={b('link-container', {
-                    active: active === TENANT_METRICS_TABS_IDS.cpu,
+                    active: activeTab === TENANT_METRICS_TABS_IDS.cpu,
                 })}
             >
                 <Link to={tabLinks.cpu} className={b('link')}>
@@ -115,7 +113,7 @@ export function MetricsTabs({
                         value={cpuMetrics.totalUsed}
                         limit={cpuMetrics.totalLimit}
                         legendFormatter={formatCoresLegend}
-                        active={active === TENANT_METRICS_TABS_IDS.cpu}
+                        active={activeTab === TENANT_METRICS_TABS_IDS.cpu}
                         helpText={i18n('context_cpu-description')}
                         variant={cardVariant}
                         subtitle={isServerless ? i18n('serverless.autoscaled') : undefined}
@@ -124,7 +122,7 @@ export function MetricsTabs({
             </div>
             <div
                 className={b('link-container', {
-                    active: active === TENANT_METRICS_TABS_IDS.storage,
+                    active: activeTab === TENANT_METRICS_TABS_IDS.storage,
                 })}
             >
                 <Link to={tabLinks.storage} className={b('link')}>
@@ -133,7 +131,7 @@ export function MetricsTabs({
                         value={storageMetrics.totalUsed}
                         limit={storageMetrics.totalLimit}
                         legendFormatter={formatStorageLegend}
-                        active={active === TENANT_METRICS_TABS_IDS.storage}
+                        active={activeTab === TENANT_METRICS_TABS_IDS.storage}
                         helpText={i18n('context_storage-description')}
                         variant={cardVariant}
                         subtitle={
@@ -154,7 +152,7 @@ export function MetricsTabs({
                 <>
                     <div
                         className={b('link-container', {
-                            active: active === TENANT_METRICS_TABS_IDS.memory,
+                            active: activeTab === TENANT_METRICS_TABS_IDS.memory,
                         })}
                     >
                         <Link to={tabLinks.memory} className={b('link')}>
@@ -163,7 +161,7 @@ export function MetricsTabs({
                                 value={memoryMetrics.totalUsed}
                                 limit={memoryMetrics.totalLimit}
                                 legendFormatter={formatStorageLegend}
-                                active={active === TENANT_METRICS_TABS_IDS.memory}
+                                active={activeTab === TENANT_METRICS_TABS_IDS.memory}
                                 helpText={i18n('context_memory-description')}
                             />
                         </Link>
@@ -171,7 +169,7 @@ export function MetricsTabs({
                     {showNetworkUtilization && networkStats && networkMetrics && (
                         <div
                             className={b('link-container', {
-                                active: active === TENANT_METRICS_TABS_IDS.network,
+                                active: activeTab === TENANT_METRICS_TABS_IDS.network,
                             })}
                         >
                             <Link to={tabLinks.network} className={b('link')}>
@@ -180,7 +178,7 @@ export function MetricsTabs({
                                     value={networkMetrics.totalUsed}
                                     limit={networkMetrics.totalLimit}
                                     legendFormatter={formatSpeedLegend}
-                                    active={active === TENANT_METRICS_TABS_IDS.network}
+                                    active={activeTab === TENANT_METRICS_TABS_IDS.network}
                                     helpText={i18n('context_network-description')}
                                 />
                             </Link>

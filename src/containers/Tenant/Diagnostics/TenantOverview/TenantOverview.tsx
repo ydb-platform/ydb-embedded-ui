@@ -51,7 +51,7 @@ export function TenantOverview({
     const tenantLoading = isFetching && tenant === undefined;
     const {Name, Type, Overall} = tenant || {};
     const isServerless = Type === 'Serverless';
-    const effectiveMetricsTab =
+    const activeMetricsTab =
         isServerless &&
         metricsTab !== TENANT_METRICS_TABS_IDS.cpu &&
         metricsTab !== TENANT_METRICS_TABS_IDS.storage
@@ -134,7 +134,7 @@ export function TenantOverview({
     };
 
     const renderTabContent = () => {
-        switch (effectiveMetricsTab) {
+        switch (activeMetricsTab) {
             case TENANT_METRICS_TABS_IDS.cpu: {
                 return (
                     <TenantCpu
@@ -215,7 +215,7 @@ export function TenantOverview({
                                     : undefined
                             }
                             isServerless={isServerless}
-                            activeTab={effectiveMetricsTab}
+                            activeTab={activeMetricsTab}
                         />
                     </Flex>
                 </div>
