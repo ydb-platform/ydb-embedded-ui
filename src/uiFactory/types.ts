@@ -41,6 +41,7 @@ export interface UIFactory<H extends string = CommonIssueType> {
         countHealthcheckIssuesByType: (issueTrees: IssuesTree[]) => Record<H, number>;
     };
     hasAccess?: boolean;
+    hideGrantAccess?: boolean;
     yaMetricaMap?: Record<string, number>;
 
     useDatabaseId?: boolean;
