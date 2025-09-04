@@ -1,4 +1,5 @@
 import type {Capability, MetaCapability, SecuritySetting} from '../../../types/api/capabilities';
+import {uiFactory} from '../../../uiFactory/uiFactory';
 import {useTypedSelector} from '../../../utils/hooks';
 import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 
@@ -87,7 +88,7 @@ export const useStreamingAvailable = () => {
     return useGetFeatureVersion('/viewer/query') >= 8;
 };
 export const useEditAccessAvailable = () => {
-    return useGetFeatureVersion('/viewer/acl') >= 2;
+    return useGetFeatureVersion('/viewer/acl') >= 2 && !uiFactory.hideGrantAccess;
 };
 
 export const useTopicDataAvailable = () => {
