@@ -29,24 +29,25 @@ import './GravityGraph.scss';
 
 const b = cn('ydb-gravity-graph');
 
-import {QueryBlockView} from './BlockComponents/QueryBlockView';
+// import {QueryBlockView} from './BlockComponents/QueryBlockView';
 import {QueryBlockComponent} from './BlockComponents/QueryBlockComponent';
 import {ResultBlockComponent} from './BlockComponents/ResultBlockComponent';
 import {StageBlockComponent} from './BlockComponents/StageBlockComponent';
 import {ConnectionBlockComponent} from './BlockComponents/ConnectionBlockComponent';
 import {graphColorsConfig} from './colorsConfig';
+import { GraphControls } from './GraphControls';
 
 interface Props<T> {
     data: Data<T>;
     theme?: string;
 }
 
-const config = {
+const config: TGraphConfig = {
     settings: {
         connection: MultipointConnection,
-        blockComponents: {
-            query: QueryBlockView,
-        },
+        // blockComponents: {
+        //     query: QueryBlockView,
+        // },
         // canDragCamera: true,
         // canZoomCamera: false,
         // useBezierConnections: false,
@@ -72,7 +73,7 @@ const baseElkConfig = {
 const elk = new ELK();
 
 const renderBlockFn = (graph, block) => {
-    console.log('===', block);
+    // console.log('===', block);
 
     const map = {
         query: QueryBlockComponent,
@@ -140,15 +141,27 @@ export function GravityGraph<T>({data, theme}: Props<T>) {
 
     useGraphEvent(graph, 'state-change', ({state}) => {
         if (state === GraphState.ATTACHED) {
-            console.log('start');
             graph.cameraService.set({
                 scale: 1,
                 scaleMax: 1.5,
+                scaleMin: 0.5,
+            });
+            graph.setConstants({
+                block: {
+                    SCALES: [0.125, 0.225, 0.5] // Detailed view stays until zoom = 0.5
+                  }
             });
             start();
             // graph.zoomTo("center", { padding: 300 });
         }
     });
 
-    return <GraphCanvas graph={graph} renderBlock={renderBlockFn} />;
+    // useGraphEvent(graph, 'connection-selection-change', (event) => {
+    //     console.log('connection-click', event);
+    // });
+
+    return <>
+        <GraphCanvas graph={graph} renderBlock={renderBlockFn} />
+        <GraphControls graph={graph} />
+    </>;
 }

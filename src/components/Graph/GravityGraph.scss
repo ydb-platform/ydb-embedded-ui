@@ -78,6 +78,9 @@
             overflow: hidden;
             text-overflow: ellipsis;
         }
+        span:nth-child(1) {
+            color: var(--g-color-text-secondary);
+        }
         span:nth-child(2) {
             word-wrap: break-word;
         }
@@ -86,8 +89,22 @@
     &__tooltip-stat-group {
         margin-top: 8px;
     }
+    
+    &__tooltip-stat-group + &__tooltip-stat-group {
+        padding-top: 8px;
+        border-top: 1px dotted var(--g-color-line-generic);
+    }
 
     &__tooltip-stat-group-name {
         font-weight: bold;
+    }
+
+    &__zoom-controls {
+        position: absolute;
+        top: 8px;
+        right: 50px;
+        z-index: 999;
+        display: flex;
+        gap: 2px;
     }
 }
