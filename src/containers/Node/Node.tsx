@@ -109,7 +109,7 @@ export function Node() {
             {<NodePageMeta node={node} loading={pageLoading} />}
             {<NodePageTitle node={node} />}
             {error ? <ResponseError error={error} className={b('error')} /> : null}
-            {<NodePageInfo node={node} loading={pageLoading} />}
+            {<NodePageInfo node={node} loading={pageLoading} database={tenantName} />}
             {nodeId ? (
                 <NodePageContent
                     nodeId={nodeId}
@@ -174,14 +174,15 @@ function NodePageTitle({node}: NodePageTitleProps) {
 interface NodePageInfoProps {
     node?: PreparedNode;
     loading?: boolean;
+    database?: string;
 }
 
-function NodePageInfo({node, loading}: NodePageInfoProps) {
+function NodePageInfo({node, loading, database}: NodePageInfoProps) {
     if (loading) {
         return <InfoViewerSkeleton className={b('info')} rows={10} />;
     }
 
-    return <FullNodeViewer node={node} className={b('info')} />;
+    return <FullNodeViewer node={node} className={b('info')} database={database} />;
 }
 
 interface NodePageContentProps {

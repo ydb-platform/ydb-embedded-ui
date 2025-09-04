@@ -17,5 +17,15 @@
   "title.endpoints": "Endpoints",
   "title.roles": "Roles",
   "title.pools": "Pools",
-  "title.load-average": "Load average"
+  "title.load-average": "Load average",
+  "title.network": "Network",
+
+  "network.connected-peers": "Connected peers",
+  "network.total-peers": "Total peers",
+  "network.peer-node-id": "Node ID",
+  "network.peer-host": "Host",
+  "network.peer-dc": "DC",
+  "network.peer-rack": "Rack",
+  "network.peer-connected": "Connected",
+  "network.peer-status": "Status"
 }

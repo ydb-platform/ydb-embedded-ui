@@ -1,5 +1,7 @@
 import {Flex} from '@gravity-ui/uikit';
+import {skipToken} from '@reduxjs/toolkit/query';
 
+import {nodeApi} from '../../store/reducers/node/node';
 import type {PreparedNode} from '../../store/reducers/node/types';
 import {cn} from '../../utils/cn';
 import {useNodeDeveloperUIHref} from '../../utils/hooks/useNodeDeveloperUIHref';
@@ -10,6 +12,7 @@ import {PoolUsage} from '../PoolUsage/PoolUsage';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 import {NodeUptime} from '../UptimeViewer/UptimeViewer';
 
+import {NodeNetworkInfo} from './NodeNetworkInfo';
 import i18n from './i18n';
 
 import './FullNodeViewer.scss';
@@ -19,13 +22,19 @@ const b = cn('full-node-viewer');
 interface FullNodeViewerProps {
     node?: PreparedNode;
     className?: string;
+    database?: string;
 }
 const getLoadAverageIntervalTitle = (index: number) => {
     return [i18n('la-interval-1m'), i18n('la-interval-5m'), i18n('la-interval-15m')][index];
 };
 
-export const FullNodeViewer = ({node, className}: FullNodeViewerProps) => {
+export const FullNodeViewer = ({node, className, database}: FullNodeViewerProps) => {
     const developerUIHref = useNodeDeveloperUIHref(node);
+
+    const nodeId = node?.NodeId?.toString();
+    const {currentData: nodeNetworkInfo} = nodeApi.useGetNodeNetworkInfoQuery(
+        nodeId && database ? {nodeId, database} : skipToken,
+    );
 
     const commonInfo: InfoViewerItem[] = [];
 
@@ -84,6 +93,14 @@ export const FullNodeViewer = ({node, className}: FullNodeViewerProps) => {
                             title={i18n('title.endpoints')}
                             className={b('section')}
                             info={endpointsInfo}
+                        />
+                    ) : null}
+
+                    {nodeNetworkInfo ? (
+                        <NodeNetworkInfo
+                            nodeNetworkInfo={nodeNetworkInfo}
+                            className={b('section')}
+                            database={database}
                         />
                     ) : null}
                 </Flex>
