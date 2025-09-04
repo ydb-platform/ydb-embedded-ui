@@ -131,7 +131,6 @@ export class ViewerAPI extends BaseYdbAPI {
                 filter: filter || undefined,
                 // TODO: remove after remove tenant param
                 database: database || tenant,
-                tenant: tenant || database,
                 fields_required: preparedFieldsRequired,
                 path: this.getSchemaPath({path, database}),
                 ...params,
@@ -464,14 +463,13 @@ export class ViewerAPI extends BaseYdbAPI {
     }
 
     getStorageInfo(
-        {tenant, database, nodeId, groupId, pDiskId, filter, ...params}: StorageRequestParams,
+        {database, nodeId, groupId, pDiskId, filter, ...params}: StorageRequestParams,
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<TStorageInfo>(
             this.getPath(`/viewer/json/storage?enums=true`),
             {
-                database: database || tenant,
-                tenant: tenant || database,
+                database,
                 node_id: nodeId,
                 group_id: groupId,
                 pdisk_id: pDiskId,
@@ -594,7 +592,7 @@ export class ViewerAPI extends BaseYdbAPI {
     ) {
         return this.get<HealthCheckAPIResponse>(
             this.getPath('/viewer/json/healthcheck?merge_records=true'),
-            {database, tenant: database, max_level: maxLevel},
+            {database, max_level: maxLevel},
             {concurrentId, requestConfig: {signal}},
         );
     }
