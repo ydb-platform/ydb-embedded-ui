@@ -12,7 +12,7 @@ import type {
     TenantStorageStats,
 } from '../../../../../store/reducers/tenants/utils';
 import {cn} from '../../../../../utils/cn';
-import {NON_BREAKING_SPACE, SHOW_NETWORK_UTILIZATION} from '../../../../../utils/constants';
+import {SHOW_NETWORK_UTILIZATION} from '../../../../../utils/constants';
 import {useSetting, useTypedSelector} from '../../../../../utils/hooks';
 import {calculateMetricAggregates} from '../../../../../utils/metrics';
 import {
@@ -24,13 +24,11 @@ import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TabCard} from '../TabCard/TabCard';
 import i18n from '../i18n';
 
+import {ServerlessPlaceholderTabs} from './ServerlessPlaceholderTabs';
+
 import './MetricsTabs.scss';
 
 const b = cn('tenant-metrics-tabs');
-
-// Placeholder values used for serverless layout filler cards
-const PLACEHOLDER_VALUE = 0;
-const PLACEHOLDER_LIMIT = 1;
 
 interface MetricsTabsProps {
     poolsCpuStats?: TenantPoolsStats[];
@@ -190,36 +188,7 @@ export function MetricsTabs({
                 </>
             )}
 
-            {isServerless && (
-                <>
-                    <div className={b('link-container', {placeholder: true})}>
-                        <div className={b('link')}>
-                            <TabCard
-                                text={NON_BREAKING_SPACE}
-                                value={PLACEHOLDER_VALUE}
-                                limit={PLACEHOLDER_LIMIT}
-                                legendFormatter={formatCoresLegend}
-                                active={false}
-                                variant={isServerless ? 'serverless' : 'default'}
-                                subtitle={NON_BREAKING_SPACE}
-                            />
-                        </div>
-                    </div>
-                    <div className={b('link-container', {placeholder: true})}>
-                        <div className={b('link')}>
-                            <TabCard
-                                text={NON_BREAKING_SPACE}
-                                value={PLACEHOLDER_VALUE}
-                                limit={PLACEHOLDER_LIMIT}
-                                legendFormatter={formatCoresLegend}
-                                active={false}
-                                variant={isServerless ? 'serverless' : 'default'}
-                                subtitle={NON_BREAKING_SPACE}
-                            />
-                        </div>
-                    </div>
-                </>
-            )}
+            {isServerless && <ServerlessPlaceholderTabs />}
         </Flex>
     );
 }
