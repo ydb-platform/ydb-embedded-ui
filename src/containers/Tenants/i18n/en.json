@@ -1,5 +1,6 @@
 {
   "create-database": "Create database",
   "remove": "Remove",
-  "edit": "Edit"
+  "edit": "Edit",
+  "value_pending": "Pending"
 }
