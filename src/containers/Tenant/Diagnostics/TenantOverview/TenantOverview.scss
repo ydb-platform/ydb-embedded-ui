@@ -24,6 +24,20 @@
         line-height: 24px;
     }
 
+    &__serverless-tag {
+        margin-left: var(--g-spacing-2);
+        padding: 2px var(--g-spacing-2);
+
+        border: 1px solid var(--g-color-line-generic);
+        border-radius: var(--g-border-radius-s);
+    }
+
+    &__serverless-tag-label {
+        display: flex;
+        align-items: center;
+        gap: var(--g-spacing-1);
+    }
+
     &__info {
         position: sticky;
         left: 0;

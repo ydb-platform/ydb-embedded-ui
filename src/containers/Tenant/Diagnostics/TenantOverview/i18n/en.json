@@ -37,5 +37,9 @@
   "field_memory-usage": "Memory usage",
   "context_capacity-usage": "{{value}} of {{capacity}}",
   "network-stats-unavailable.title": "Network Statistics Unavailable",
-  "network-stats-unavailable.description": "Network ping and clock skew statistics require a newer backend version. Please upgrade your YDB installation to access these features."
+  "network-stats-unavailable.description": "Network ping and clock skew statistics require a newer backend version. Please upgrade your YDB installation to access these features.",
+  "serverless.label": "Serverless",
+  "serverless.tooltip": "Some metrics are hidden in Serverless mode — resources scale automatically based on workload",
+  "serverless.autoscaled": "Auto-Scaled Resources",
+  "serverless.storage-subtitle": "{{legend}} | {{groups}} groups"
 }

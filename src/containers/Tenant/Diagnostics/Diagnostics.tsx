@@ -60,7 +60,7 @@ function Diagnostics(props: DiagnosticsProps) {
 
     const tenantName = isDatabaseEntityType(type) ? path : database;
 
-    const {controlPlane} = useTenantBaseInfo(isDatabaseEntityType(type) ? path : '');
+    const {controlPlane, databaseType} = useTenantBaseInfo(isDatabaseEntityType(type) ? path : '');
 
     const hasFeatureFlags = useFeatureFlagsAvailable();
     const hasTopicData = useTopicDataAvailable();
@@ -72,6 +72,7 @@ function Diagnostics(props: DiagnosticsProps) {
         hasBackups: typeof uiFactory.renderBackups === 'function' && Boolean(controlPlane),
         hasConfigs: isViewerUser,
         hasAccess: uiFactory.hasAccess,
+        isServerless: databaseType === 'Serverless',
     });
     let activeTab = pages.find((el) => el.id === diagnosticsTab);
     if (!activeTab) {
@@ -187,10 +188,10 @@ function Diagnostics(props: DiagnosticsProps) {
                     <TabProvider value={activeTab?.id}>
                         <TabList size="l">
                             {pages.map(({id, title}) => {
-                                const path = getDiagnosticsPageLink(id);
+                                const linkPath = getDiagnosticsPageLink(id);
                                 return (
                                     <Tab key={id} value={id}>
-                                        <InternalLink to={path} as="tab">
+                                        <InternalLink to={linkPath} as="tab">
                                             {title}
                                         </InternalLink>
                                     </Tab>

@@ -25,9 +25,10 @@ export interface TenantStorageMetrics {
 interface TenantStorageProps {
     tenantName: string;
     metrics: TenantStorageMetrics;
+    mode?: 'regular' | 'serverless';
 }
 
-export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
+export function TenantStorage({tenantName, metrics, mode = 'regular'}: TenantStorageProps) {
     const {blobStorageUsed, tabletStorageUsed, blobStorageLimit, tabletStorageLimit} = metrics;
     const query = useSearchQuery();
 
@@ -65,6 +66,22 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
             ),
         },
     ];
+
+    if (mode === 'serverless') {
+        return (
+            <Flex direction="column" gap={4}>
+                <StatsWrapper
+                    title={i18n('title_top-tables-by-size')}
+                    allEntitiesLink={getTenantPath({
+                        ...query,
+                        [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.storage,
+                    })}
+                >
+                    <TopTables database={tenantName} />
+                </StatsWrapper>
+            </Flex>
+        );
+    }
 
     return (
         <Flex direction="column" gap={4}>

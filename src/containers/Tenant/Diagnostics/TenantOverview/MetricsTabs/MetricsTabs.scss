@@ -224,3 +224,15 @@
         padding-right: 0;
     }
 }
+
+// Serverless variant: exactly two tabs (CPU, Storage) at 50% width each
+
+.tenant-metrics-tabs_serverless {
+    .tenant-metrics-tabs__link-container_placeholder {
+        pointer-events: none;
+
+        .tenant-tab-card__card-container {
+            opacity: 0;
+        }
+    }
+}

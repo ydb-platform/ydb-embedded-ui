@@ -18,9 +18,10 @@ import {cpuDashboardConfig} from './cpuDashboardConfig';
 interface TenantCpuProps {
     tenantName: string;
     additionalNodesProps?: AdditionalNodesProps;
+    mode?: 'regular' | 'serverless';
 }
 
-export function TenantCpu({tenantName, additionalNodesProps}: TenantCpuProps) {
+export function TenantCpu({tenantName, additionalNodesProps, mode = 'regular'}: TenantCpuProps) {
     const dispatch = useTypedDispatch();
     const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
 
@@ -28,21 +29,33 @@ export function TenantCpu({tenantName, additionalNodesProps}: TenantCpuProps) {
     const topShardsLink = getDiagnosticsPageLink(TENANT_DIAGNOSTICS_TABS_IDS.topShards);
     const topQueriesLink = getDiagnosticsPageLink(TENANT_DIAGNOSTICS_TABS_IDS.topQueries);
 
+    const isServerless = mode === 'serverless';
+
     return (
         <Flex direction="column" gap={4}>
-            <TenantDashboard database={tenantName} charts={cpuDashboardConfig} />
-            <StatsWrapper allEntitiesLink={allNodesLink} title={i18n('title_top-nodes-load')}>
-                <TopNodesByLoad
-                    tenantName={tenantName}
-                    additionalNodesProps={additionalNodesProps}
-                />
-            </StatsWrapper>
-            <StatsWrapper title={i18n('title_top-nodes-pool')} allEntitiesLink={allNodesLink}>
-                <TopNodesByCpu
-                    tenantName={tenantName}
-                    additionalNodesProps={additionalNodesProps}
-                />
-            </StatsWrapper>
+            {!isServerless && (
+                <>
+                    <TenantDashboard database={tenantName} charts={cpuDashboardConfig} />
+                    <StatsWrapper
+                        allEntitiesLink={allNodesLink}
+                        title={i18n('title_top-nodes-load')}
+                    >
+                        <TopNodesByLoad
+                            tenantName={tenantName}
+                            additionalNodesProps={additionalNodesProps}
+                        />
+                    </StatsWrapper>
+                    <StatsWrapper
+                        title={i18n('title_top-nodes-pool')}
+                        allEntitiesLink={allNodesLink}
+                    >
+                        <TopNodesByCpu
+                            tenantName={tenantName}
+                            additionalNodesProps={additionalNodesProps}
+                        />
+                    </StatsWrapper>
+                </>
+            )}
             <StatsWrapper title={i18n('title_top-shards')} allEntitiesLink={topShardsLink}>
                 <TopShards tenantName={tenantName} path={tenantName} />
             </StatsWrapper>

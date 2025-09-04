@@ -15,14 +15,52 @@ interface TabCardProps {
     active?: boolean;
     helpText?: string;
     legendFormatter: (params: {value: number; capacity: number}) => string;
+    variant?: 'default' | 'serverless';
+    subtitle?: string;
 }
 
-export function TabCard({text, value, limit, active, helpText, legendFormatter}: TabCardProps) {
+export function TabCard({
+    text,
+    value,
+    limit,
+    active,
+    helpText,
+    legendFormatter,
+    variant = 'default',
+    subtitle,
+}: TabCardProps) {
     const {status, percents, legend, fill} = getDiagramValues({
         value,
         capacity: limit,
         legendFormatter,
     });
+
+    if (variant === 'serverless') {
+        return (
+            <div className={b({active})}>
+                <Card
+                    className={b('card-container', {active})}
+                    type="container"
+                    view={active ? 'outlined' : 'raised'}
+                >
+                    <div className={b('legend-wrapper')}>
+                        <DoughnutMetrics.Legend
+                            variant="subheader-2"
+                            note={helpText}
+                            noteIconSize="s"
+                        >
+                            {text}
+                        </DoughnutMetrics.Legend>
+                        {subtitle ? (
+                            <DoughnutMetrics.Legend variant="body-1" color="secondary">
+                                {subtitle}
+                            </DoughnutMetrics.Legend>
+                        ) : null}
+                    </div>
+                </Card>
+            </div>
+        );
+    }
 
     return (
         <div className={b({active})}>

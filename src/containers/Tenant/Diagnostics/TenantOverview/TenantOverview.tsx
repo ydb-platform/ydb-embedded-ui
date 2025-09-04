@@ -1,6 +1,7 @@
 import {Button, Flex, Icon} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
+import {LabelWithPopover} from '../../../../components/LabelWithPopover/LabelWithPopover';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueriesActivityBar} from '../../../../components/QueriesActivityBar/QueriesActivityBar';
 import {useDatabasesAvailable} from '../../../../store/reducers/capabilities/hooks';
@@ -21,6 +22,7 @@ import {TenantCpu} from './TenantCpu/TenantCpu';
 import {TenantMemory} from './TenantMemory/TenantMemory';
 import {TenantNetwork} from './TenantNetwork/TenantNetwork';
 import {TenantStorage} from './TenantStorage/TenantStorage';
+import i18n from './i18n';
 import {b} from './utils';
 
 import './TenantOverview.scss';
@@ -48,6 +50,13 @@ export function TenantOverview({
     );
     const tenantLoading = isFetching && tenant === undefined;
     const {Name, Type, Overall} = tenant || {};
+    const isServerless = Type === 'Serverless';
+    const effectiveMetricsTab =
+        isServerless &&
+        metricsTab !== TENANT_METRICS_TABS_IDS.cpu &&
+        metricsTab !== TENANT_METRICS_TABS_IDS.storage
+            ? TENANT_METRICS_TABS_IDS.cpu
+            : metricsTab;
 
     const tenantType = mapDatabaseTypeToDBName(Type);
     // FIXME: remove after correct data is added to tenantInfo
@@ -111,22 +120,38 @@ export function TenantOverview({
                     hasClipboardButton={Boolean(tenant)}
                     clipboardButtonAlwaysVisible
                 />
+                {isServerless ? (
+                    <div className={b('serverless-tag')}>
+                        <LabelWithPopover
+                            className={b('serverless-tag-label')}
+                            text={i18n('serverless.label')}
+                            popoverContent={i18n('serverless.tooltip')}
+                        />
+                    </div>
+                ) : null}
             </Flex>
         );
     };
 
     const renderTabContent = () => {
-        switch (metricsTab) {
+        switch (effectiveMetricsTab) {
             case TENANT_METRICS_TABS_IDS.cpu: {
                 return (
                     <TenantCpu
                         tenantName={tenantName}
                         additionalNodesProps={additionalNodesProps}
+                        mode={isServerless ? 'serverless' : 'regular'}
                     />
                 );
             }
             case TENANT_METRICS_TABS_IDS.storage: {
-                return <TenantStorage tenantName={tenantName} metrics={storageMetrics} />;
+                return (
+                    <TenantStorage
+                        tenantName={tenantName}
+                        metrics={storageMetrics}
+                        mode={isServerless ? 'serverless' : 'regular'}
+                    />
+                );
             }
             case TENANT_METRICS_TABS_IDS.memory: {
                 return (
@@ -145,6 +170,9 @@ export function TenantOverview({
                         additionalNodesProps={additionalNodesProps}
                     />
                 );
+            }
+            default: {
+                return null;
             }
         }
     };
@@ -186,6 +214,8 @@ export function TenantOverview({
                                     ? Number(tenantData.StorageGroups)
                                     : undefined
                             }
+                            isServerless={isServerless}
+                            activeTab={effectiveMetricsTab}
                         />
                     </Flex>
                 </div>
