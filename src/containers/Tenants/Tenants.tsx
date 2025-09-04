@@ -65,6 +65,21 @@ const b = cn('tenants');
 
 const DATABASES_COLUMNS_WIDTH_LS_KEY = 'databasesTableColumnsWidth';
 
+function formatDatabaseState(state?: string): string {
+    if (!state) {
+        return EMPTY_DATA_PLACEHOLDER;
+    }
+
+    // Map specific state values to user-friendly display names
+    switch (state) {
+        case 'PENDING_RESOURCES':
+            return i18n('value_pending');
+        default:
+            // For other states, use capitalized version (first letter uppercase, rest lowercase)
+            return state.charAt(0).toUpperCase() + state.slice(1).toLowerCase();
+    }
+}
+
 interface TenantsProps {
     scrollContainerRef: React.RefObject<HTMLElement>;
     additionalTenantsProps?: AdditionalTenantsProps;
@@ -195,8 +210,7 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
             {
                 name: 'State',
                 width: 150,
-                render: ({row}) => (row.State ? row.State.toLowerCase() : EMPTY_DATA_PLACEHOLDER),
-                customStyle: () => ({textTransform: 'capitalize'}),
+                render: ({row}) => formatDatabaseState(row.State),
             },
             {
                 name: 'cpu',
