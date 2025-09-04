@@ -1,3 +1,5 @@
+import {useMemo} from 'react';
+
 import {Flex} from '@gravity-ui/uikit';
 import {Link, useLocation} from 'react-router-dom';
 
@@ -10,7 +12,7 @@ import type {
     TenantStorageStats,
 } from '../../../../../store/reducers/tenants/utils';
 import {cn} from '../../../../../utils/cn';
-import {SHOW_NETWORK_UTILIZATION} from '../../../../../utils/constants';
+import {NON_BREAKING_SPACE, SHOW_NETWORK_UTILIZATION} from '../../../../../utils/constants';
 import {useSetting, useTypedSelector} from '../../../../../utils/hooks';
 import {calculateMetricAggregates} from '../../../../../utils/metrics';
 import {
@@ -25,6 +27,10 @@ import i18n from '../i18n';
 import './MetricsTabs.scss';
 
 const b = cn('tenant-metrics-tabs');
+
+// Placeholder values used for serverless layout filler cards
+const PLACEHOLDER_VALUE = 0;
+const PLACEHOLDER_LIMIT = 1;
 
 interface MetricsTabsProps {
     poolsCpuStats?: TenantPoolsStats[];
@@ -71,21 +77,29 @@ export function MetricsTabs({
     };
 
     // Use only pools that directly indicate resources available to perform user queries
-    const cpuPools = (poolsCpuStats || []).filter(
-        (pool) => !(pool.name === 'Batch' || pool.name === 'IO'),
+    const cpuPools = useMemo(
+        () =>
+            (poolsCpuStats || []).filter((pool) => !(pool.name === 'Batch' || pool.name === 'IO')),
+        [poolsCpuStats],
     );
-    const cpuMetrics = calculateMetricAggregates(cpuPools);
+    const cpuMetrics = useMemo(() => calculateMetricAggregates(cpuPools), [cpuPools]);
 
     // Calculate storage metrics using utility
-    const storageStats = tabletStorageStats || blobStorageStats || [];
-    const storageMetrics = calculateMetricAggregates(storageStats);
+    const storageStats = useMemo(
+        () => tabletStorageStats || blobStorageStats || [],
+        [tabletStorageStats, blobStorageStats],
+    );
+    const storageMetrics = useMemo(() => calculateMetricAggregates(storageStats), [storageStats]);
 
     // Calculate memory metrics using utility
-    const memoryMetrics = calculateMetricAggregates(memoryStats);
+    const memoryMetrics = useMemo(() => calculateMetricAggregates(memoryStats), [memoryStats]);
 
     // Calculate network metrics using utility
     const [showNetworkUtilization] = useSetting<boolean>(SHOW_NETWORK_UTILIZATION);
-    const networkMetrics = networkStats ? calculateMetricAggregates(networkStats) : null;
+    const networkMetrics = useMemo(
+        () => (networkStats ? calculateMetricAggregates(networkStats) : null),
+        [networkStats],
+    );
 
     const active = activeTab ?? metricsTab;
 
@@ -181,26 +195,26 @@ export function MetricsTabs({
                     <div className={b('link-container', {placeholder: true})}>
                         <div className={b('link')}>
                             <TabCard
-                                text={'\u00A0'}
-                                value={0}
-                                limit={1}
+                                text={NON_BREAKING_SPACE}
+                                value={PLACEHOLDER_VALUE}
+                                limit={PLACEHOLDER_LIMIT}
                                 legendFormatter={formatCoresLegend}
                                 active={false}
                                 variant={isServerless ? 'serverless' : 'default'}
-                                subtitle={'\u00A0'}
+                                subtitle={NON_BREAKING_SPACE}
                             />
                         </div>
                     </div>
                     <div className={b('link-container', {placeholder: true})}>
                         <div className={b('link')}>
                             <TabCard
-                                text={'\u00A0'}
-                                value={0}
-                                limit={1}
+                                text={NON_BREAKING_SPACE}
+                                value={PLACEHOLDER_VALUE}
+                                limit={PLACEHOLDER_LIMIT}
                                 legendFormatter={formatCoresLegend}
                                 active={false}
                                 variant={isServerless ? 'serverless' : 'default'}
-                                subtitle={'\u00A0'}
+                                subtitle={NON_BREAKING_SPACE}
                             />
                         </div>
                     </div>

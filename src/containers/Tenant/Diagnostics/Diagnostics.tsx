@@ -38,6 +38,7 @@ import {Partitions} from './Partitions/Partitions';
 import {TopQueries} from './TopQueries';
 import {TopShards} from './TopShards';
 import {TopicData} from './TopicData/TopicData';
+import i18n from './i18n';
 
 import './Diagnostics.scss';
 
@@ -177,7 +178,7 @@ function Diagnostics(props: DiagnosticsProps) {
                 });
             }
             default: {
-                return <div>No data...</div>;
+                return <div>{i18n('no-data')}</div>;
             }
         }
     };
