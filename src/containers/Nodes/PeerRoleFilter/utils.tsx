@@ -18,6 +18,9 @@ export const NODES_PEER_ROLES_TITLES: Record<NodesPeerRole, string> = {
     },
 };
 
-export function parseNodesPeerRoleFilter(paramToParse: unknown): NodesPeerRole | undefined {
-    return NODES_PEER_ROLES.find((peerRoleParam) => peerRoleParam === paramToParse);
+export function parseNodesPeerRoleFilter(
+    paramToParse: unknown,
+    defaultValue?: NodesPeerRole,
+): NodesPeerRole | undefined {
+    return NODES_PEER_ROLES.find((peerRoleParam) => peerRoleParam === paramToParse) ?? defaultValue;
 }

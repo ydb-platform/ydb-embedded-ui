@@ -57,7 +57,7 @@ export function NodesControls({
         handleUptimeFilterChange,
         handlePeerRoleFilterChange,
         handleGroupByParamChange,
-    } = useNodesPageQueryParams(groupByParams);
+    } = useNodesPageQueryParams(groupByParams, withPeerRoleFilter);
     const {problemFilter, handleProblemFilterChange} = useProblemFilter();
     const isViewerUser = useIsViewerUser();
 

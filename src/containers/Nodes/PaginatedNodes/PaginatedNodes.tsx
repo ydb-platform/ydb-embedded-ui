@@ -33,6 +33,7 @@ export interface PaginatedNodesProps {
 export function PaginatedNodes(props: PaginatedNodesProps) {
     const {uptimeFilter, groupByParam, handleUptimeFilterChange} = useNodesPageQueryParams(
         props.groupByParams,
+        props.withPeerRoleFilter,
     );
 
     const {problemFilter, handleProblemFilterChange} = useProblemFilter();
