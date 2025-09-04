@@ -1,7 +1,9 @@
 @use '../../styles/mixins.scss';
 
 .entity-status {
-    --button-width: 28px;
+    --button-width: 24px;
+    --entity-status-height: 20px;
+
     position: relative;
 
     display: inline-flex;
@@ -38,6 +40,8 @@
 
         overflow: hidden;
 
+        height: var(--entity-status-height);
+
         &_with-clipboard-button {
             padding-right: var(--button-width);
         }
@@ -63,11 +67,9 @@
         gap: var(--g-spacing-1);
 
         width: 0;
-        height: 100%;
 
         &_visible {
             width: min-content;
-            padding: var(--g-spacing-1);
 
             background-color: var(--g-color-base-background);
         }
@@ -76,7 +78,6 @@
         .ydb-paginated-table__row:hover &,
         .ydb-tree-view__item & {
             width: min-content;
-            padding: var(--g-spacing-1);
 
             background-color: var(--ydb-data-table-color-hover);
         }
@@ -99,7 +100,6 @@
         overflow: hidden;
 
         width: 100%;
-        margin-top: 5px;
 
         white-space: nowrap;
         text-overflow: ellipsis;
