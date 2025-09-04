@@ -112,6 +112,7 @@ export class ViewerAPI extends BaseYdbAPI {
             tenant,
             fieldsRequired,
             filter,
+            path,
             ...params
         }: NodesRequestParams,
         {concurrentId, signal}: AxiosOptions = {},
@@ -132,6 +133,7 @@ export class ViewerAPI extends BaseYdbAPI {
                 database: database || tenant,
                 tenant: tenant || database,
                 fields_required: preparedFieldsRequired,
+                path: this.getSchemaPath({path, database}),
                 ...params,
             },
             {concurrentId, requestConfig: {signal}},
