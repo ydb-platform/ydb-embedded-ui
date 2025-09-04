@@ -148,7 +148,9 @@ export function MetricsTabs({
                     />
                 </Link>
             </div>
-            {!isServerless && (
+            {isServerless ? (
+                <ServerlessPlaceholderTabs />
+            ) : (
                 <>
                     <div
                         className={b('link-container', {
@@ -186,8 +188,6 @@ export function MetricsTabs({
                     )}
                 </>
             )}
-
-            {isServerless && <ServerlessPlaceholderTabs />}
         </Flex>
     );
 }
