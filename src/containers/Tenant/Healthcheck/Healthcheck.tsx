@@ -85,7 +85,7 @@ export function Healthcheck({
         return (
             <Flex direction="column" grow={1}>
                 {renderControls()}
-                <Flex direction="column" gap={3} grow={1} className={b('issues')}>
+                <Flex direction="column" gap={4} grow={1} className={b('issues')}>
                     <Issues issues={leavesIssues} />
                 </Flex>
             </Flex>
