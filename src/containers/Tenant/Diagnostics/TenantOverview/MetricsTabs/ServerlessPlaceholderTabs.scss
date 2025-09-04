@@ -1,7 +1,9 @@
 .tenant-metrics-tabs_serverless {
-    pointer-events: none;
+    .tenant-metrics-tabs__link-container_placeholder {
+        pointer-events: none;
 
-    .tenant-tab-card__card-container {
-        opacity: 0;
+        .tenant-tab-card__card-container {
+            opacity: 0;
+        }
     }
 }

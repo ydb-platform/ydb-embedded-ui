@@ -100,6 +100,7 @@ export function MetricsTabs({
     );
 
     const active = activeTab ?? metricsTab;
+    const cardVariant = isServerless ? 'serverless' : 'default';
 
     return (
         <Flex className={b({serverless: Boolean(isServerless)})} alignItems="center">
@@ -116,7 +117,7 @@ export function MetricsTabs({
                         legendFormatter={formatCoresLegend}
                         active={active === TENANT_METRICS_TABS_IDS.cpu}
                         helpText={i18n('context_cpu-description')}
-                        variant={isServerless ? 'serverless' : 'default'}
+                        variant={cardVariant}
                         subtitle={isServerless ? i18n('serverless.autoscaled') : undefined}
                     />
                 </Link>
@@ -134,7 +135,7 @@ export function MetricsTabs({
                         legendFormatter={formatStorageLegend}
                         active={active === TENANT_METRICS_TABS_IDS.storage}
                         helpText={i18n('context_storage-description')}
-                        variant={isServerless ? 'serverless' : 'default'}
+                        variant={cardVariant}
                         subtitle={
                             isServerless && storageMetrics.totalLimit
                                 ? i18n('serverless.storage-subtitle', {
