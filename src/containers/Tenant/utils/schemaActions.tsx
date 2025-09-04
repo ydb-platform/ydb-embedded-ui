@@ -204,7 +204,7 @@ export const getActions =
                 },
             ],
         };
-        const DB_SET: ActionsSet = [[copyItem, connectToDBItem], createEntitiesSet];
+        const DB_SET: ActionsSet = [[connectToDBItem], createEntitiesSet];
 
         const DIR_SET: ActionsSet = [[copyItem], createEntitiesSet];
 
