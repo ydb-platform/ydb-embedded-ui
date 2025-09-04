@@ -312,8 +312,6 @@ export type GroupsRequiredField =
     | 'Latency';
 
 interface BaseStorageRequestParams {
-    /** @deprecated use database instead */
-    tenant?: string;
     database?: string;
     pool?: string;
     with?: StorageWithFilter;
