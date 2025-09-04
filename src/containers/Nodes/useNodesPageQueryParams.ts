@@ -9,7 +9,10 @@ import {nodesUptimeFilterValuesSchema} from '../../utils/nodes';
 import {parseNodesPeerRoleFilter} from './PeerRoleFilter/utils';
 import {parseNodesGroupByParam} from './columns/constants';
 
-export function useNodesPageQueryParams(groupByParams: NodesGroupByField[] | undefined) {
+export function useNodesPageQueryParams(
+    groupByParams: NodesGroupByField[] | undefined,
+    withPeerRoleFilter: boolean | undefined,
+) {
     const [queryParams, setQueryParams] = useQueryParams({
         uptimeFilter: StringParam,
         peerRole: StringParam,
@@ -21,9 +24,14 @@ export function useNodesPageQueryParams(groupByParams: NodesGroupByField[] | und
 
     const uptimeFilter = nodesUptimeFilterValuesSchema.parse(queryParams.uptimeFilter);
     const searchValue = queryParams.search ?? '';
-    const peerRoleFilter = isViewerUser
-        ? parseNodesPeerRoleFilter(queryParams.peerRole)
-        : 'database';
+
+    let peerRoleFilter: NodesPeerRole | undefined;
+
+    if (withPeerRoleFilter) {
+        peerRoleFilter = isViewerUser
+            ? parseNodesPeerRoleFilter(queryParams.peerRole, 'database')
+            : 'database';
+    }
 
     const systemStateGroupingAvailable = useViewerNodesHandlerHasGroupingBySystemState();
     const groupByParam = parseNodesGroupByParam(
