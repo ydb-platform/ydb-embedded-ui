@@ -89,6 +89,7 @@ export function Tablet() {
         dispatch(
             setHeaderBreadcrumbs('tablet', {
                 tenantName: queryDatabase ?? undefined,
+                database: queryDatabase ?? undefined,
                 tabletId: id,
                 tabletType,
             }),

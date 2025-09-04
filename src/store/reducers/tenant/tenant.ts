@@ -135,11 +135,10 @@ export function useTenantBaseInfo(path: string) {
         {skip: !path},
     );
 
-    const {ControlPlane, Name, Id} = currentData || {};
+    const {ControlPlane, Name} = currentData || {};
 
     return {
         controlPlane: ControlPlane,
         name: Name,
-        id: Id,
     };
 }

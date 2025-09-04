@@ -24,7 +24,6 @@ import {
     TENANT_PAGE,
     TENANT_PAGES_IDS,
 } from '../../store/reducers/tenant/constants';
-import {uiFactory} from '../../uiFactory/uiFactory';
 import {CLUSTER_DEFAULT_TITLE, getTabletLabel} from '../../utils/constants';
 import {getClusterPath} from '../Cluster/utils';
 import {getDefaultNodePath} from '../Node/NodePages';
@@ -85,14 +84,12 @@ const getClusterBreadcrumbs: GetBreadcrumbs<ClusterBreadcrumbsOptions> = (option
 };
 
 const getTenantBreadcrumbs: GetBreadcrumbs<TenantBreadcrumbsOptions> = (options, query = {}) => {
-    const {tenantName, tenantId} = options;
+    const {tenantName, database} = options;
 
     const breadcrumbs = getClusterBreadcrumbs(options, query);
 
     const text = tenantName || headerKeyset('breadcrumbs.tenant');
-    const link = tenantName
-        ? getTenantPath({...query, database: uiFactory.useDatabaseId ? tenantId : tenantName})
-        : undefined;
+    const link = tenantName ? getTenantPath({...query, database}) : undefined;
 
     const lastItem = {text, link, icon: <DatabaseIcon />};
     breadcrumbs.push(lastItem);

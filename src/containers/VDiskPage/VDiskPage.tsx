@@ -101,6 +101,7 @@ export function VDiskPage() {
             setHeaderBreadcrumbs('vDisk', {
                 groupId: vDiskData?.VDiskId?.GroupID,
                 tenantName: database,
+                database,
                 vDiskId: vDiskData?.StringifiedId,
             }),
         );
