@@ -18,10 +18,10 @@ import {cpuDashboardConfig} from './cpuDashboardConfig';
 interface TenantCpuProps {
     tenantName: string;
     additionalNodesProps?: AdditionalNodesProps;
-    mode?: 'regular' | 'serverless';
+    mode?: 'default' | 'serverless';
 }
 
-export function TenantCpu({tenantName, additionalNodesProps, mode = 'regular'}: TenantCpuProps) {
+export function TenantCpu({tenantName, additionalNodesProps, mode = 'default'}: TenantCpuProps) {
     const dispatch = useTypedDispatch();
     const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
 

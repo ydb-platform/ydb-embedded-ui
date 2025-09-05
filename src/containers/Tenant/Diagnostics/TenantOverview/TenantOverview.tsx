@@ -142,7 +142,7 @@ export function TenantOverview({
                     <TenantCpu
                         tenantName={tenantName}
                         additionalNodesProps={additionalNodesProps}
-                        mode={isServerless ? 'serverless' : 'regular'}
+                        mode={isServerless ? 'serverless' : 'default'}
                     />
                 );
             }
@@ -151,7 +151,7 @@ export function TenantOverview({
                     <TenantStorage
                         tenantName={tenantName}
                         metrics={storageMetrics}
-                        mode={isServerless ? 'serverless' : 'regular'}
+                        mode={isServerless ? 'serverless' : 'default'}
                     />
                 );
             }

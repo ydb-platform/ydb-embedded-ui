@@ -25,10 +25,10 @@ export interface TenantStorageMetrics {
 interface TenantStorageProps {
     tenantName: string;
     metrics: TenantStorageMetrics;
-    mode?: 'regular' | 'serverless';
+    mode?: 'default' | 'serverless';
 }
 
-export function TenantStorage({tenantName, metrics, mode = 'regular'}: TenantStorageProps) {
+export function TenantStorage({tenantName, metrics, mode = 'default'}: TenantStorageProps) {
     const {blobStorageUsed, tabletStorageUsed, blobStorageLimit, tabletStorageLimit} = metrics;
     const query = useSearchQuery();
 

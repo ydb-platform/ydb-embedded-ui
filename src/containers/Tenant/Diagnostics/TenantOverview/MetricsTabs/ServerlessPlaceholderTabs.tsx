@@ -14,21 +14,17 @@ export const ServerlessPlaceholderTabs: React.FC<ServerlessPlaceholderTabsProps>
     ({count = 2}) => {
         const items = React.useMemo(() => Array.from({length: count}, (_, i) => i), [count]);
 
-        return (
-            <>
-                {items.map((idx) => (
-                    <div key={idx} className={b('link-container', {placeholder: true})}>
-                        <div className={b('link')}>
-                            <TabCard
-                                text={NON_BREAKING_SPACE}
-                                active={false}
-                                variant="serverless"
-                                subtitle={NON_BREAKING_SPACE}
-                            />
-                        </div>
-                    </div>
-                ))}
-            </>
-        );
+        return items.map((idx) => (
+            <div key={idx} className={b('link-container', {placeholder: true})}>
+                <div className={b('link')}>
+                    <TabCard
+                        text={NON_BREAKING_SPACE}
+                        active={false}
+                        variant="serverless"
+                        subtitle={NON_BREAKING_SPACE}
+                    />
+                </div>
+            </div>
+        ));
     },
 );
