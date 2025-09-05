@@ -128,7 +128,7 @@ export function MetricsTabs({
                 <Link to={tabLinks.storage} className={b('link')}>
                     <TabCard
                         text={
-                            storageGroupsCount === undefined
+                            storageGroupsCount === undefined || isServerless
                                 ? i18n('cards.storage-label')
                                 : i18n('context_storage-groups', {count: storageGroupsCount})
                         }
