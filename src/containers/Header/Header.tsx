@@ -56,6 +56,7 @@ function Header() {
     const {title: clusterTitle} = useClusterBaseInfo();
 
     const database = useDatabaseFromQuery();
+
     const clusterName = useClusterNameFromQuery();
 
     const location = useLocation();
@@ -116,7 +117,10 @@ function Header() {
 
         if (isDatabasePage && database) {
             elements.push(
-                <Button view={'flat'} onClick={() => getConnectToDBDialog({database})}>
+                <Button
+                    view={'flat'}
+                    onClick={() => getConnectToDBDialog({database: databaseData?.Name || database})}
+                >
                     <Icon data={PlugConnection} />
                     {headerKeyset('connect')}
                 </Button>,
