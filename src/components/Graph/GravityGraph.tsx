@@ -2,14 +2,7 @@ import React, {useEffect, useMemo} from 'react';
 
 import type {TBlock, TGraphConfig} from '@gravity-ui/graph';
 import {Graph, GraphState, CanvasBlock} from '@gravity-ui/graph';
-import {
-    GraphBlock,
-    GraphCanvas,
-    MultipointConnection,
-    TConnection,
-    useGraph,
-    useGraphEvent,
-} from '@gravity-ui/graph/react';
+import {GraphBlock, GraphCanvas, useGraph, useGraphEvent} from '@gravity-ui/graph/react';
 import type {Data, GraphNode, Options, Shapes} from '@gravity-ui/paranoid';
 
 import {prepareBlocks, prepareConnections, parseCustomPropertyValue} from './utils';
@@ -27,6 +20,7 @@ import {ConnectionBlockComponent} from './BlockComponents/ConnectionBlockCompone
 import {graphColorsConfig} from './colorsConfig';
 import {GraphControls} from './GraphControls';
 import {calculateTreeLayout, calculateConnectionPaths} from './treeLayout';
+import {NonSelectableConnection} from './NonSelectableConnection';
 
 interface Props<T> {
     data: Data<T>;
@@ -35,13 +29,7 @@ interface Props<T> {
 
 const config: TGraphConfig = {
     settings: {
-        connection: MultipointConnection,
-        // blockComponents: {
-        //     query: QueryBlockView,
-        // },
-        // canDragCamera: true,
-        // canZoomCamera: false,
-        // useBezierConnections: false,
+        connection: NonSelectableConnection,
         showConnectionArrows: false,
     },
 };

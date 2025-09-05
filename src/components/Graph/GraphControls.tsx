@@ -29,25 +29,15 @@ export const GraphControls = ({graph}: Props) => {
 
     return (
         <div className={b('zoom-controls')}>
-            <Button
-                view="raised"
-                onClick={onZoomInClick}
-            >
+            <Button view="raised" onClick={onZoomInClick}>
                 <Icon data={MagnifierPlusIcon} size={16} />
             </Button>
-            <Button
-                view="raised"
-                onClick={onZoomOutClick}
-            >
+            <Button view="raised" onClick={onZoomOutClick}>
                 <Icon data={MagnifierMinusIcon} size={16} />
             </Button>
-            <Button
-                view="raised"
-                onClick={onResetZoomClick}
-            >
+            <Button view="raised" onClick={onResetZoomClick}>
                 1:1
             </Button>
         </div>
     );
 };
-

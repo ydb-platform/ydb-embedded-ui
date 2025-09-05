@@ -1,8 +1,14 @@
 import type {TBlock} from '@gravity-ui/graph';
-import { Icon } from '@gravity-ui/uikit';
-import {DatabaseFill, Shuffle, GripHorizontal, MapPin, ArrowsExpandHorizontal} from '@gravity-ui/icons';
+import {Icon} from '@gravity-ui/uikit';
+import {
+    DatabaseFill,
+    Shuffle,
+    GripHorizontal,
+    MapPin,
+    ArrowsExpandHorizontal,
+} from '@gravity-ui/icons';
 
-import { TooltipComponent } from '../TooltipComponent';
+import {TooltipComponent} from '../TooltipComponent';
 
 type Props = {
     block: TBlock;
@@ -22,13 +28,13 @@ const getIcon = (name: string) => {
         case 'Broadcast':
             return ArrowsExpandHorizontal;
     }
-}
+};
 
 export const ConnectionBlockComponent = ({className, block}: Props) => {
     const icon = getIcon(block.name);
     const content = (
         <div className={className}>
-            {icon && <Icon data={icon}/>} {block.name}
+            {icon && <Icon data={icon} />} {block.name}
         </div>
     );
 
@@ -36,8 +42,5 @@ export const ConnectionBlockComponent = ({className, block}: Props) => {
         return content;
     }
 
-    return (
-        <TooltipComponent block={block}>{content}</TooltipComponent>
-            
-    );
+    return <TooltipComponent block={block}>{content}</TooltipComponent>;
 };

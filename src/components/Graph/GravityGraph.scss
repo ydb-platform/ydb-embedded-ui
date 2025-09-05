@@ -7,7 +7,6 @@
 
     &__block-content {
         width: 100%;
-        // height: 100%;
         padding: 8px 12px;
         background: var(--g-color-base-float);
         box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
@@ -28,7 +27,7 @@
         color: var(--g-color-text-secondary);
         font-size: 10px;
         line-height: 1;
-    }   
+    }
 
     &__block-content.query {
         border-radius: 50%;
@@ -89,7 +88,7 @@
     &__tooltip-stat-group {
         margin-top: 8px;
     }
-    
+
     &__tooltip-stat-group + &__tooltip-stat-group {
         padding-top: 8px;
         border-top: 1px dotted var(--g-color-line-generic);
