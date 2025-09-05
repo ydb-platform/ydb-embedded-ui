@@ -77,7 +77,10 @@ export const getCpuCoresColumn: GetShardsColumn = () => {
         render: ({row}) => {
             const usage = Number(row.CPUCores) * 100 || 0;
             return (
-                <UsageLabel value={roundToPrecision(usage, 2)} theme={getUsageSeverity(usage)} />
+                <UsageLabel
+                    value={Math.ceil(roundToPrecision(usage, 2))}
+                    theme={getUsageSeverity(usage)}
+                />
             );
         },
         align: DataTable.LEFT,
