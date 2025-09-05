@@ -63,6 +63,7 @@ export function configureStore({
         withCredentials: !customBackend,
         proxyMeta: false,
         csrfTokenGetter: undefined,
+        useRelativePath: false,
         defaults: undefined,
     }),
 } = {}) {
