@@ -38,6 +38,7 @@ import {Partitions} from './Partitions/Partitions';
 import {TopQueries} from './TopQueries';
 import {TopShards} from './TopShards';
 import {TopicData} from './TopicData/TopicData';
+import i18n from './i18n';
 
 import './Diagnostics.scss';
 
@@ -60,7 +61,7 @@ function Diagnostics(props: DiagnosticsProps) {
 
     const tenantName = isDatabaseEntityType(type) ? path : database;
 
-    const {controlPlane} = useTenantBaseInfo(isDatabaseEntityType(type) ? path : '');
+    const {controlPlane, databaseType} = useTenantBaseInfo(isDatabaseEntityType(type) ? path : '');
 
     const hasFeatureFlags = useFeatureFlagsAvailable();
     const hasTopicData = useTopicDataAvailable();
@@ -72,6 +73,7 @@ function Diagnostics(props: DiagnosticsProps) {
         hasBackups: typeof uiFactory.renderBackups === 'function' && Boolean(controlPlane),
         hasConfigs: isViewerUser,
         hasAccess: uiFactory.hasAccess,
+        databaseType,
     });
     let activeTab = pages.find((el) => el.id === diagnosticsTab);
     if (!activeTab) {
@@ -176,7 +178,7 @@ function Diagnostics(props: DiagnosticsProps) {
                 });
             }
             default: {
-                return <div>No data...</div>;
+                return <div>{i18n('no-data')}</div>;
             }
         }
     };
@@ -187,10 +189,10 @@ function Diagnostics(props: DiagnosticsProps) {
                     <TabProvider value={activeTab?.id}>
                         <TabList size="l">
                             {pages.map(({id, title}) => {
-                                const path = getDiagnosticsPageLink(id);
+                                const linkPath = getDiagnosticsPageLink(id);
                                 return (
                                     <Tab key={id} value={id}>
-                                        <InternalLink to={path} as="tab">
+                                        <InternalLink to={linkPath} as="tab">
                                             {title}
                                         </InternalLink>
                                     </Tab>
