@@ -35,11 +35,12 @@ interface SchemaTreeProps {
     rootType?: EPathType;
     currentPath?: string;
     onActivePathUpdate: (path: string) => void;
+    databaseFullPath: string;
 }
 
 export function SchemaTree(props: SchemaTreeProps) {
     const createDirectoryFeatureAvailable = useCreateDirectoryFeatureAvailable();
-    const {rootPath, rootName, rootType, currentPath, onActivePathUpdate} = props;
+    const {rootPath, rootName, rootType, currentPath, onActivePathUpdate, databaseFullPath} = props;
     const dispatch = useTypedDispatch();
     const input = useTypedSelector(selectUserInput);
     const isDirty = useTypedSelector(selectIsDirty);
@@ -137,6 +138,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                 getConnectToDBDialog,
                 schemaData: actionsSchemaData,
                 isSchemaDataLoading: isActionsDataFetching,
+                databaseFullPath,
             },
             rootPath,
         );
@@ -149,6 +151,7 @@ export function SchemaTree(props: SchemaTreeProps) {
         isDirty,
         onActivePathUpdate,
         rootPath,
+        databaseFullPath,
     ]);
 
     return (
