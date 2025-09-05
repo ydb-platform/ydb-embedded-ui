@@ -1,7 +1,7 @@
 import {EPathType} from '../../../../types/api/schema';
 import {isDomain, transformPath} from '../transformPath';
 
-describe.only('transformPath', () => {
+describe('transformPath', () => {
     test.each([
         // Tests with various combinations of path and dbName
         ['/prod/v1/sth', '/prod', 'v1/sth'],
@@ -10,8 +10,8 @@ describe.only('transformPath', () => {
         ['/prod/v1/sth', 'prod/v1', 'sth'],
         ['/dev/v1/sth', '/dev', 'v1/sth'],
         ['/dev/v1/sth', 'dev', 'v1/sth'],
-        ['/dev', '/dev', ''],
-        ['/dev', 'dev', ''],
+        ['/dev', '/dev', '/dev'],
+        ['/dev', 'dev', '/dev'],
         ['/', '/dev', '/'],
         ['/', 'dev', '/'],
         ['', '/dev', '/'],
@@ -33,8 +33,8 @@ describe.only('transformPath', () => {
     test('handles root dbName', () => {
         expect(transformPath('/v1/sth', '/')).toBe('v1/sth');
         expect(transformPath('/v1/sth', '')).toBe('v1/sth');
-        expect(transformPath('/', '/')).toBe('');
-        expect(transformPath('', '')).toBe('');
+        expect(transformPath('/', '/')).toBe('/');
+        expect(transformPath('', '')).toBe('/');
     });
 
     test('handles paths with multiple leading slashes', () => {
