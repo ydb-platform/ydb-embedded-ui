@@ -1,21 +1,17 @@
 import React from 'react';
 
 import {Flex} from '@gravity-ui/uikit';
-import {isEmpty} from 'lodash';
 
 import {InternalLink} from '../../../../../components/InternalLink';
 import {getTabletPagePath} from '../../../../../routes';
 import type {IssuesTree} from '../../../../../store/reducers/healthcheckInfo/types';
-import type {Location} from '../../../../../types/api/healthcheck';
 import {useTenantQueryParams} from '../../../useTenantQueryParams';
 import i18n from '../../i18n';
 
-import {ComputeLocation} from './ComputeLocation';
 import type {LocationFieldCompute} from './ComputeLocation';
-import {NodeInfo} from './NodeInfo';
+import {IssueLocation} from './IssueLocation';
 import type {LocationFieldStorage} from './StorageLocation';
-import {StorageLocation} from './StorageLocation';
-import {IdList, LocationDetails, SectionWithTitle} from './utils';
+import {IdList, LocationDetails} from './utils';
 
 interface HealthcheckIssueDetailsProps {
     issue: IssuesTree;
@@ -83,42 +79,11 @@ export function IssueDetails({issue}: HealthcheckIssueDetailsProps) {
                 fields={detailsFields}
                 titleVariant="subheader-2"
             />
-            <StorageLocation location={location?.storage} hiddenFields={hiddenStorageFields} />
-            <ComputeLocation location={location?.compute} hiddenFields={hiddenComputeFields} />
-            <NodeLocation location={location?.node} />
-            <PeerLocation location={location?.peer} />
+            <IssueLocation
+                location={location}
+                hiddenStorageFields={hiddenStorageFields}
+                hiddenComputeFields={hiddenComputeFields}
+            />
         </Flex>
-    );
-}
-
-interface NodeLocationProps {
-    location: Location['node'];
-}
-
-function NodeLocation({location}: NodeLocationProps) {
-    if (!location || isEmpty(location)) {
-        return null;
-    }
-
-    return (
-        <SectionWithTitle title={i18n('label_node_location')}>
-            <NodeInfo node={location} />
-        </SectionWithTitle>
-    );
-}
-
-interface PeerLocationProps {
-    location: Location['peer'];
-}
-
-function PeerLocation({location}: PeerLocationProps) {
-    if (!location || isEmpty(location)) {
-        return null;
-    }
-
-    return (
-        <SectionWithTitle title={i18n('label_peer_location')}>
-            <NodeInfo node={location} />
-        </SectionWithTitle>
     );
 }
