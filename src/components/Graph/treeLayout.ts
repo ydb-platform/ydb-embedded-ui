@@ -1,8 +1,17 @@
+import type {TBlock, TConnection} from '@gravity-ui/graph';
+
+import type {ExtendedTBlock, LayoutOptions, TreeNode} from './types';
 import {prepareBlocks, prepareConnections} from './utils';
 
 class TreeLayoutEngine {
-    constructor(blocks, connections, options = {}) {
-        this.blocks = new Map(blocks.map((block) => [block.id, {...block}]));
+    private blocks: Map<string, any>;
+    private connections: TConnection[];
+    private options: Required<LayoutOptions>;
+    private tree: TreeNode | null;
+    private levels: TreeNode[][];
+
+    constructor(blocks: any[], connections: TConnection[], options: LayoutOptions = {}) {
+        this.blocks = new Map(blocks.map((block: any) => [block.id, {...block}]));
         this.connections = connections;
 
         // Настройки отступов
@@ -44,11 +53,11 @@ class TreeLayoutEngine {
         }
 
         // Рекурсивно строим дерево
-        const buildNode = (nodeId, level = 0) => {
+        const buildNode = (nodeId: string, level = 0): TreeNode => {
             const block = this.blocks.get(nodeId);
             const children = childrenMap
                 .get(nodeId)
-                .map((childId) => buildNode(childId, level + 1));
+                .map((childId: string) => buildNode(childId, level + 1));
 
             return {
                 id: nodeId,
@@ -81,7 +90,7 @@ class TreeLayoutEngine {
     }
 
     // Вычисление ширины поддерева для каждого узла
-    calculateSubtreeWidths(node = this.tree) {
+    calculateSubtreeWidths(node: TreeNode = this.tree!): number {
         if (node.children.length === 0) {
             // Листовой узел - ширина равна ширине блока
             node.subtreeWidth = node.block.width;
@@ -92,7 +101,10 @@ class TreeLayoutEngine {
             }
 
             // Ширина поддерева = сумма ширин поддеревьев детей + отступы между ними
-            const childrenWidth = node.children.reduce((sum, child) => sum + child.subtreeWidth, 0);
+            const childrenWidth = node.children.reduce(
+                (sum: number, child: TreeNode) => sum + child.subtreeWidth,
+                0,
+            );
             const spacingWidth = (node.children.length - 1) * this.options.horizontalSpacing;
             const totalChildrenWidth = childrenWidth + spacingWidth;
 
@@ -107,18 +119,20 @@ class TreeLayoutEngine {
     positionNodes() {
         // Вычисляем Y координаты для каждого уровня
         let currentY = 0;
-        const levelY = [];
+        const levelY: number[] = [];
 
         for (let level = 0; level < this.levels.length; level++) {
             levelY[level] = currentY;
 
             // Находим максимальную высоту блоков на этом уровне
-            const maxHeight = Math.max(...this.levels[level].map((node) => node.block.height));
+            const maxHeight = Math.max(
+                ...this.levels[level].map((node: TreeNode) => node.block.height),
+            );
             currentY += maxHeight + this.options.verticalSpacing;
         }
 
         // Рекурсивно размещаем узлы
-        const positionNode = (node, leftX) => {
+        const positionNode = (node: TreeNode, leftX: number): void => {
             // Устанавливаем Y координату
             node.y = levelY[node.level];
 
@@ -131,7 +145,7 @@ class TreeLayoutEngine {
 
                 // Если ширина узла больше суммарной ширины детей, добавляем отступ
                 const childrenWidth = node.children.reduce(
-                    (sum, child) => sum + child.subtreeWidth,
+                    (sum: number, child: TreeNode) => sum + child.subtreeWidth,
                     0,
                 );
                 const spacingWidth = (node.children.length - 1) * this.options.horizontalSpacing;
@@ -198,7 +212,7 @@ class TreeLayoutEngine {
 
     // Получение результата компоновки
     getLayoutResult() {
-        const result = [];
+        const result: ExtendedTBlock[] = [];
 
         const collectResults = (node) => {
             result.push({
@@ -223,12 +237,12 @@ class TreeLayoutEngine {
 }
 
 // Функция для использования алгоритма
-function calculateTreeLayout(blocks, connections, options = {}) {
+function calculateTreeLayout(blocks: TBlock[], connections: TConnection[], options = {}) {
     const engine = new TreeLayoutEngine(blocks, connections, options);
     return engine.layout();
 }
 
-function calculateTreeEdges(layoutResult, connections) {
+function calculateTreeEdges(layoutResult: ExtendedTBlock[], connections: TConnection[]) {
     // Создаем карту позиций для удобства поиска
     const positionMap = new Map(layoutResult.map((item) => [item.id, item]));
 
@@ -248,7 +262,9 @@ function calculateTreeEdges(layoutResult, connections) {
     // Для каждого родительского блока рассчитываем пути к детям
     for (const [parentId, parentConnections] of connectionsByParent) {
         const parent = positionMap.get(parentId);
-        if (!parent) continue;
+        if (!parent) {
+            continue;
+        }
 
         // Координаты начальной точки (центр нижней части родителя)
         const startX = parent.x + parent.width / 2;
@@ -281,7 +297,9 @@ function calculateTreeEdges(layoutResult, connections) {
                 .map((conn) => positionMap.get(conn.targetBlockId))
                 .filter((child) => child !== undefined);
 
-            if (children.length === 0) continue;
+            if (children.length === 0) {
+                continue;
+            }
 
             // Находим минимальное расстояние до детей по Y
             const minChildY = Math.min(...children.map((child) => child.y));
@@ -292,7 +310,9 @@ function calculateTreeEdges(layoutResult, connections) {
             // Для каждого дочернего блока создаем ломаную линию
             for (const connection of parentConnections) {
                 const child = positionMap.get(connection.targetBlockId);
-                if (!child) continue;
+                if (!child) {
+                    continue;
+                }
 
                 const endX = child.x + child.width / 2;
                 const endY = child.y;

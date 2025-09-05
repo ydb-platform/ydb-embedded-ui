@@ -1,26 +1,24 @@
-import React, {useEffect, useMemo} from 'react';
+import React from 'react';
 
-import type {TBlock, TGraphConfig} from '@gravity-ui/graph';
-import {Graph, GraphState, CanvasBlock} from '@gravity-ui/graph';
+import type {TGraphConfig} from '@gravity-ui/graph';
+import {GraphState} from '@gravity-ui/graph';
 import {GraphBlock, GraphCanvas, useGraph, useGraphEvent} from '@gravity-ui/graph/react';
-import type {Data, GraphNode, Options, Shapes} from '@gravity-ui/paranoid';
-
-import {prepareBlocks, prepareConnections, parseCustomPropertyValue} from './utils';
 
 import {cn} from '../../utils/cn';
 
-import './GravityGraph.scss';
-
 const b = cn('ydb-gravity-graph');
 
+import {ConnectionBlockComponent} from './BlockComponents/ConnectionBlockComponent';
 import {QueryBlockComponent} from './BlockComponents/QueryBlockComponent';
 import {ResultBlockComponent} from './BlockComponents/ResultBlockComponent';
 import {StageBlockComponent} from './BlockComponents/StageBlockComponent';
-import {ConnectionBlockComponent} from './BlockComponents/ConnectionBlockComponent';
-import {graphColorsConfig} from './colorsConfig';
 import {GraphControls} from './GraphControls';
-// import {calculateTreeLayout, calculateConnectionPaths} from './treeLayout';
 import {NonSelectableConnection} from './NonSelectableConnection';
+import {graphColorsConfig} from './colorsConfig';
+import type {Data} from './types';
+import {parseCustomPropertyValue} from './utils';
+
+import './GravityGraph.scss';
 
 interface Props<T> {
     data: Data<T>;
@@ -34,15 +32,15 @@ const config: TGraphConfig = {
     },
 };
 
-const renderBlockFn = (graph, block) => {
-    const map = {
+const renderBlockFn = (graph: any, block: any) => {
+    const map: Record<string, React.ComponentType<any>> = {
         query: QueryBlockComponent,
         result: ResultBlockComponent,
         stage: StageBlockComponent,
         connection: ConnectionBlockComponent,
     };
 
-    const Component = map[block.is];
+    const Component = map[block.is as keyof typeof map];
 
     return (
         <GraphBlock graph={graph} block={block} className={b('block')}>

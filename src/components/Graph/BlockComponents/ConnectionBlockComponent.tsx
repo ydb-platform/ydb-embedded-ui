@@ -1,21 +1,22 @@
-import type {TBlock} from '@gravity-ui/graph';
-import {Icon} from '@gravity-ui/uikit';
 import {
+    ArrowsExpandHorizontal,
     DatabaseFill,
-    Shuffle,
     GripHorizontal,
     MapPin,
-    ArrowsExpandHorizontal,
+    Shuffle,
 } from '@gravity-ui/icons';
+import {Icon} from '@gravity-ui/uikit';
+import type {IconData} from '@gravity-ui/uikit';
 
 import {TooltipComponent} from '../TooltipComponent';
+import type {ExtendedTBlock} from '../types';
 
 type Props = {
-    block: TBlock;
+    block: ExtendedTBlock;
     className: string;
 };
 
-const getIcon = (name: string) => {
+const getIcon = (name: string): IconData | undefined => {
     switch (name) {
         case 'Merge':
             return DatabaseFill;
@@ -27,6 +28,8 @@ const getIcon = (name: string) => {
             return MapPin;
         case 'Broadcast':
             return ArrowsExpandHorizontal;
+        default:
+            return undefined;
     }
 };
 

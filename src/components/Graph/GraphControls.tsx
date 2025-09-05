@@ -1,9 +1,11 @@
 import type {Graph} from '@gravity-ui/graph';
-import MagnifierMinusIcon from '@gravity-ui/icons/svgs/magnifier-minus.svg';
-import MagnifierPlusIcon from '@gravity-ui/icons/svgs/magnifier-plus.svg';
 import {Button, Icon} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
+
+import MagnifierMinusIcon from '@gravity-ui/icons/svgs/magnifier-minus.svg';
+import MagnifierPlusIcon from '@gravity-ui/icons/svgs/magnifier-plus.svg';
+
 const b = cn('ydb-gravity-graph');
 
 const ZOOM_STEP = 1.25;

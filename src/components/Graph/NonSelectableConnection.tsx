@@ -5,10 +5,10 @@ import {MultipointConnection} from '@gravity-ui/graph/react';
  * Наследуется от MultipointConnection и переопределяет поведение
  */
 export class NonSelectableConnection extends MultipointConnection {
-    public override cursor = 'default';
+    public override cursor: 'pointer' = 'pointer';
 
     // Переопределяем метод для предотвращения выделения при клике
-    protected override handleEvent(event) {
+    protected override handleEvent(event: Event) {
         event.stopPropagation();
     }
 }

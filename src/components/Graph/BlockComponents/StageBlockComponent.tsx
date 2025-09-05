@@ -1,10 +1,10 @@
-import type {TBlock} from '@gravity-ui/graph';
 import {Text} from '@gravity-ui/uikit';
 
 import {TooltipComponent} from '../TooltipComponent';
+import type {ExtendedTBlock} from '../types';
 
 type Props = {
-    block: TBlock;
+    block: ExtendedTBlock;
     className: string;
 };
 

@@ -1,6 +1,7 @@
-import type {TBlock, TConnection, TGraphConfig} from '@gravity-ui/graph';
-import type {Data, GraphNode, Options, Shapes, ExplainPlanNodeData} from '@gravity-ui/paranoid';
+import type {TBlock, TConnection} from '@gravity-ui/graph';
+
 import type {AbstractGraphColorsConfig} from './colorsConfig';
+import type {Data, ExplainPlanNodeData} from './types';
 
 const BLOCK_TOP_PADDING = 8;
 const BLOCK_LINE_HEIGHT = 16;
@@ -8,6 +9,8 @@ const BORDER_HEIGHT = 2;
 
 const getBlockSize = (block: ExplainPlanNodeData) => {
     const ONE_LINE_HEIGHT = BLOCK_TOP_PADDING * 2 + BLOCK_LINE_HEIGHT + BORDER_HEIGHT;
+    const operatorsLength = block.operators?.length ?? 1;
+    const tablesLength = block.tables?.length ?? 0;
 
     switch (block.type) {
         case 'query':
@@ -21,9 +24,6 @@ const getBlockSize = (block: ExplainPlanNodeData) => {
                 height: ONE_LINE_HEIGHT,
             };
         case 'stage':
-            const operatorsLength = block.operators?.length ?? 1;
-            const tablesLength = block.tables?.length ?? 0;
-
             return {
                 width: 248,
                 height:
