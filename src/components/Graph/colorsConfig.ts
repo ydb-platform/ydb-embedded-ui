@@ -6,7 +6,7 @@ export const graphColorsConfig = {
     canvas: {
         belowLayerBackground: '#0000',
         border: '#0000',
-        dots: 'var(--g-color-base-background)',
+        dots: 'var(--g-color-line-generic)',
         layerBackground: 'var(--g-color-base-background)',
     },
     // block: {

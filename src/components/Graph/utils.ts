@@ -1,40 +1,6 @@
 import type {TBlock, TConnection, TGraphConfig} from '@gravity-ui/graph';
 import type {Data, GraphNode, Options, Shapes, ExplainPlanNodeData} from '@gravity-ui/paranoid';
-import type {ElkExtendedEdge, ElkNode} from 'elkjs';
 import type {AbstractGraphColorsConfig} from './colorsConfig';
-
-export const prepareChildren = (blocks: TGraphConfig['blocks']) => {
-    return blocks?.map((b) => {
-        return {
-            id: b.id as string,
-            width: b.width,
-            height: b.height,
-            ports: [
-                {
-                    id: `port_${b.id as string}`,
-                },
-            ],
-            // properties: {
-            //     'elk.portConstraints': 'FIXED_ORDER',
-            //     // 'elk.spacing.portPort': '0',
-            // },
-        } satisfies ElkNode;
-    });
-};
-
-export const prepareEdges = (connections: TGraphConfig['connections'], skipLabels?: boolean) => {
-    return connections?.map((c, i) => {
-        const labelText = `label ${i}`;
-
-        return {
-            id: c.id as string,
-            sources: [`port_${c.sourceBlockId as string}`],
-            // sources: [c.sourceBlockId as string],
-            targets: [c.targetBlockId as string],
-            // labels: skipLabels ? [] : [{text: labelText, width: 50, height: 14}],
-        } satisfies ElkExtendedEdge;
-    });
-};
 
 const BLOCK_TOP_PADDING = 8;
 const BLOCK_LINE_HEIGHT = 16;
@@ -57,10 +23,13 @@ const getBlockSize = (block: ExplainPlanNodeData) => {
         case 'stage':
             const operatorsLength = block.operators?.length ?? 1;
             const tablesLength = block.tables?.length ?? 0;
-            
+
             return {
                 width: 248,
-                height: BORDER_HEIGHT + BLOCK_TOP_PADDING * 2 + (operatorsLength + tablesLength) * BLOCK_LINE_HEIGHT,
+                height:
+                    BORDER_HEIGHT +
+                    BLOCK_TOP_PADDING * 2 +
+                    (operatorsLength + tablesLength) * BLOCK_LINE_HEIGHT,
             };
         case 'connection':
             return {
@@ -78,7 +47,7 @@ const getBlockSize = (block: ExplainPlanNodeData) => {
                 height: ONE_LINE_HEIGHT,
             };
     }
-}
+};
 
 export const prepareBlocks = (nodes: Data['nodes']): TBlock[] => {
     return nodes?.map(({data: {id, name, type, ...rest}, data}) => ({

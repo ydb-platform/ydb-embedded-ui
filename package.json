@@ -38,7 +38,6 @@
     "colord": "^2.9.3",
     "copy-to-clipboard": "^3.3.3",
     "crc-32": "^1.2.2",
-    "elkjs": "^0.10.0",
     "history": "^4.10.1",
     "hotkeys-js": "^3.13.9",
     "lodash": "^4.17.21",
@@ -61,7 +60,6 @@
     "use-query-params": "^2.2.1",
     "uuid": "^10.0.0",
     "web-vitals": "^1.1.2",
-    "web-worker": "^1.5.0",
     "ydb-ui-components": "^5.0.0",
     "zod": "^3.24.1"
   },
