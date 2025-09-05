@@ -116,7 +116,7 @@ export function MetricsTabs({
                         active={activeTab === TENANT_METRICS_TABS_IDS.cpu}
                         helpText={i18n('context_cpu-description')}
                         variant={cardVariant}
-                        subtitle={isServerless ? i18n('serverless.autoscaled') : undefined}
+                        subtitle={isServerless ? i18n('context_serverless-autoscaled') : undefined}
                     />
                 </Link>
             </div>
@@ -136,7 +136,7 @@ export function MetricsTabs({
                         variant={cardVariant}
                         subtitle={
                             isServerless && storageMetrics.totalLimit
-                                ? i18n('serverless.storage-subtitle', {
+                                ? i18n('context_serverless-storage-subtitle', {
                                       groups: String(storageGroupsCount ?? 0),
                                       legend: formatStorageLegend({
                                           value: storageMetrics.totalUsed,

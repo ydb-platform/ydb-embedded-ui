@@ -1,7 +1,6 @@
-import {Button, Flex, Icon} from '@gravity-ui/uikit';
+import {Button, Flex, HelpMark, Icon, Label} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
-import {LabelWithPopover} from '../../../../components/LabelWithPopover/LabelWithPopover';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueriesActivityBar} from '../../../../components/QueriesActivityBar/QueriesActivityBar';
 import {useDatabasesAvailable} from '../../../../store/reducers/capabilities/hooks';
@@ -122,11 +121,14 @@ export function TenantOverview({
                 />
                 {isServerless ? (
                     <div className={b('serverless-tag')}>
-                        <LabelWithPopover
-                            className={b('serverless-tag-label')}
-                            text={i18n('serverless.label')}
-                            popoverContent={i18n('serverless.tooltip')}
-                        />
+                        <Label theme="clear" size="s" className={b('serverless-tag-label')}>
+                            <Flex alignItems="center" gap="2">
+                                {i18n('value_serverless')}
+                                <HelpMark iconSize="s" className={b('serverless-tag-tooltip')}>
+                                    {i18n('context_serverless-tooltip')}
+                                </HelpMark>
+                            </Flex>
+                        </Label>
                     </div>
                 ) : null}
             </Flex>
