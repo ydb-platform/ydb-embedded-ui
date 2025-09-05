@@ -18,17 +18,20 @@ export type AxiosOptions = {
 export interface BaseAPIParams {
     singleClusterMode: undefined | boolean;
     proxyMeta: undefined | boolean;
+    useRelativePath: undefined | boolean;
 }
 
 export class BaseYdbAPI extends AxiosWrapper {
     DEFAULT_RETRIES_COUNT = 0;
 
     singleClusterMode: BaseAPIParams['singleClusterMode'];
+    useRelativePath: BaseAPIParams['useRelativePath'];
 
     constructor(axiosOptions: AxiosWrapperOptions, baseApiParams: BaseAPIParams) {
         super(axiosOptions);
 
         this.singleClusterMode = baseApiParams.singleClusterMode;
+        this.useRelativePath = baseApiParams.useRelativePath;
 
         axiosRetry(this._axios, {
             retries: this.DEFAULT_RETRIES_COUNT,
@@ -91,8 +94,19 @@ export class BaseYdbAPI extends AxiosWrapper {
         return `${BACKEND ?? ''}${path}`;
     }
 
-    getSchemaPath(props: {path?: string; database?: string}) {
-        return props.path;
+    getSchemaPath({path, database}: {path?: string; database?: string}) {
+        if (!this.useRelativePath || !path || !database) {
+            return path;
+        }
+
+        if (path === database) {
+            return '';
+        }
+
+        if (path.startsWith(database + '/')) {
+            return path.slice(database.length + 1);
+        }
+        return path;
     }
 
     prepareArrayRequestParam(arr: (string | number)[]) {

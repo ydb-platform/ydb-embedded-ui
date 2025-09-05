@@ -10,7 +10,7 @@ export class SchemeAPI extends BaseYdbAPI {
             {},
             {
                 database,
-                path,
+                path: this.getSchemaPath({path, database}),
             },
             {
                 requestConfig: {signal},
