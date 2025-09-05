@@ -127,7 +127,11 @@ export function MetricsTabs({
             >
                 <Link to={tabLinks.storage} className={b('link')}>
                     <TabCard
-                        text={i18n('cards.storage-label')}
+                        text={
+                            storageGroupsCount === undefined
+                                ? i18n('cards.storage-label')
+                                : i18n('context_storage-groups', {count: storageGroupsCount})
+                        }
                         value={storageMetrics.totalUsed}
                         limit={storageMetrics.totalLimit}
                         legendFormatter={formatStorageLegend}
