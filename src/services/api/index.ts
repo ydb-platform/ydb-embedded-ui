@@ -23,6 +23,7 @@ interface YdbEmbeddedAPIProps {
     withCredentials: undefined | boolean;
     singleClusterMode: undefined | boolean;
     proxyMeta: undefined | boolean;
+    // this setting allows to use schema object path relative to database in api requests
     useRelativePath: undefined | boolean;
     csrfTokenGetter: undefined | (() => string | undefined);
     defaults: undefined | AxiosRequestConfig;
