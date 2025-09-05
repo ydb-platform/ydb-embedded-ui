@@ -23,6 +23,7 @@ interface YdbEmbeddedAPIProps {
     withCredentials: undefined | boolean;
     singleClusterMode: undefined | boolean;
     proxyMeta: undefined | boolean;
+    useRelativePath: undefined | boolean;
     csrfTokenGetter: undefined | (() => string | undefined);
     defaults: undefined | AxiosRequestConfig;
 }
@@ -48,9 +49,10 @@ export class YdbEmbeddedAPI {
         proxyMeta = false,
         csrfTokenGetter = () => undefined,
         defaults = {},
+        useRelativePath = false,
     }: YdbEmbeddedAPIProps) {
         const axiosParams: AxiosWrapperOptions = {config: {withCredentials, ...defaults}};
-        const baseApiParams = {singleClusterMode, proxyMeta};
+        const baseApiParams = {singleClusterMode, proxyMeta, useRelativePath};
 
         this.auth = new AuthAPI(axiosParams, baseApiParams);
         if (webVersion) {
