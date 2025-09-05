@@ -1,7 +1,7 @@
 import {useMemo} from 'react';
 
 import {Flex} from '@gravity-ui/uikit';
-import {Link, useLocation} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 
 import {parseQuery} from '../../../../../routes';
 import {TENANT_METRICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
@@ -11,19 +11,16 @@ import type {
     TenantPoolsStats,
     TenantStorageStats,
 } from '../../../../../store/reducers/tenants/utils';
+import type {ETenantType} from '../../../../../types/api/tenant';
 import {cn} from '../../../../../utils/cn';
 import {SHOW_NETWORK_UTILIZATION} from '../../../../../utils/constants';
 import {useSetting} from '../../../../../utils/hooks';
 import {calculateMetricAggregates} from '../../../../../utils/metrics';
-import {
-    formatCoresLegend,
-    formatSpeedLegend,
-    formatStorageLegend,
-} from '../../../../../utils/metrics/formatMetricLegend';
+// no direct legend formatters needed here – handled in subcomponents
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
-import {TabCard} from '../TabCard/TabCard';
-import i18n from '../i18n';
 
+import {CommonMetricsTabs} from './CommonMetricsTabs';
+import {DedicatedMetricsTabs} from './DedicatedMetricsTabs';
 import {ServerlessPlaceholderTabs} from './ServerlessPlaceholderTabs';
 
 import './MetricsTabs.scss';
@@ -37,7 +34,7 @@ interface MetricsTabsProps {
     tabletStorageStats?: TenantStorageStats[];
     networkStats?: TenantMetricStats[];
     storageGroupsCount?: number;
-    isServerless?: boolean;
+    databaseType?: ETenantType;
     activeTab: TenantMetricsTab;
 }
 
@@ -48,7 +45,7 @@ export function MetricsTabs({
     tabletStorageStats,
     networkStats,
     storageGroupsCount,
-    isServerless,
+    databaseType,
     activeTab,
 }: MetricsTabsProps) {
     const location = useLocation();
@@ -98,99 +95,36 @@ export function MetricsTabs({
         [networkStats],
     );
 
-    const cardVariant = isServerless ? 'serverless' : 'default';
+    // card variant is handled within subcomponents
+
+    const isServerless = databaseType === 'Serverless';
 
     return (
         <Flex className={b({serverless: Boolean(isServerless)})} alignItems="center">
-            <div
-                className={b('link-container', {
-                    active: activeTab === TENANT_METRICS_TABS_IDS.cpu,
-                })}
-            >
-                <Link to={tabLinks.cpu} className={b('link')}>
-                    <TabCard
-                        text={i18n('context_cpu-load')}
-                        value={cpuMetrics.totalUsed}
-                        limit={cpuMetrics.totalLimit}
-                        legendFormatter={formatCoresLegend}
-                        active={activeTab === TENANT_METRICS_TABS_IDS.cpu}
-                        helpText={i18n('context_cpu-description')}
-                        variant={cardVariant}
-                        subtitle={isServerless ? i18n('context_serverless-autoscaled') : undefined}
-                    />
-                </Link>
-            </div>
-            <div
-                className={b('link-container', {
-                    active: activeTab === TENANT_METRICS_TABS_IDS.storage,
-                })}
-            >
-                <Link to={tabLinks.storage} className={b('link')}>
-                    <TabCard
-                        text={
-                            storageGroupsCount === undefined || isServerless
-                                ? i18n('cards.storage-label')
-                                : i18n('context_storage-groups', {count: storageGroupsCount})
-                        }
-                        value={storageMetrics.totalUsed}
-                        limit={storageMetrics.totalLimit}
-                        legendFormatter={formatStorageLegend}
-                        active={activeTab === TENANT_METRICS_TABS_IDS.storage}
-                        helpText={i18n('context_storage-description')}
-                        variant={cardVariant}
-                        subtitle={
-                            isServerless && storageMetrics.totalLimit
-                                ? i18n('context_serverless-storage-subtitle', {
-                                      groups: String(storageGroupsCount ?? 0),
-                                      legend: formatStorageLegend({
-                                          value: storageMetrics.totalUsed,
-                                          capacity: storageMetrics.totalLimit,
-                                      }),
-                                  })
-                                : undefined
-                        }
-                    />
-                </Link>
-            </div>
+            <CommonMetricsTabs
+                activeTab={activeTab}
+                tabLinks={tabLinks}
+                cpu={{totalUsed: cpuMetrics.totalUsed, totalLimit: cpuMetrics.totalLimit}}
+                storage={{
+                    totalUsed: storageMetrics.totalUsed,
+                    totalLimit: storageMetrics.totalLimit,
+                }}
+                storageGroupsCount={storageGroupsCount}
+                databaseType={databaseType}
+            />
             {isServerless ? (
                 <ServerlessPlaceholderTabs />
             ) : (
-                <>
-                    <div
-                        className={b('link-container', {
-                            active: activeTab === TENANT_METRICS_TABS_IDS.memory,
-                        })}
-                    >
-                        <Link to={tabLinks.memory} className={b('link')}>
-                            <TabCard
-                                text={i18n('context_memory-used')}
-                                value={memoryMetrics.totalUsed}
-                                limit={memoryMetrics.totalLimit}
-                                legendFormatter={formatStorageLegend}
-                                active={activeTab === TENANT_METRICS_TABS_IDS.memory}
-                                helpText={i18n('context_memory-description')}
-                            />
-                        </Link>
-                    </div>
-                    {showNetworkUtilization && networkStats && networkMetrics && (
-                        <div
-                            className={b('link-container', {
-                                active: activeTab === TENANT_METRICS_TABS_IDS.network,
-                            })}
-                        >
-                            <Link to={tabLinks.network} className={b('link')}>
-                                <TabCard
-                                    text={i18n('context_network-usage')}
-                                    value={networkMetrics.totalUsed}
-                                    limit={networkMetrics.totalLimit}
-                                    legendFormatter={formatSpeedLegend}
-                                    active={activeTab === TENANT_METRICS_TABS_IDS.network}
-                                    helpText={i18n('context_network-description')}
-                                />
-                            </Link>
-                        </div>
-                    )}
-                </>
+                <DedicatedMetricsTabs
+                    activeTab={activeTab}
+                    tabLinks={tabLinks}
+                    memory={{
+                        totalUsed: memoryMetrics.totalUsed,
+                        totalLimit: memoryMetrics.totalLimit,
+                    }}
+                    network={networkMetrics}
+                    showNetwork={Boolean(showNetworkUtilization && networkStats && networkMetrics)}
+                />
             )}
         </Flex>
     );

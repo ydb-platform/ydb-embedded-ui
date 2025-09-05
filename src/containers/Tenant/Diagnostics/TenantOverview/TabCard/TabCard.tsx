@@ -4,13 +4,12 @@ import {Card, Flex} from '@gravity-ui/uikit';
 
 import {DoughnutMetrics} from '../../../../../components/DoughnutMetrics/DoughnutMetrics';
 import {getDiagramValues} from '../../../../../containers/Cluster/ClusterOverview/utils';
+import type {ETenantType} from '../../../../../types/api/tenant';
 import {cn} from '../../../../../utils/cn';
 
 import './TabCard.scss';
 
 const b = cn('tenant-tab-card');
-
-type TabCardVariant = 'default' | 'serverless';
 
 interface TabCardBaseProps {
     text: string;
@@ -20,20 +19,20 @@ interface TabCardBaseProps {
 }
 
 interface TabCardDefaultProps extends TabCardBaseProps {
-    variant?: Extract<TabCardVariant, 'default'>;
+    databaseType?: Exclude<ETenantType, 'Serverless'>;
     value: number;
     limit: number;
     legendFormatter: (params: {value: number; capacity: number}) => string;
 }
 
 interface TabCardServerlessProps extends TabCardBaseProps {
-    variant: Extract<TabCardVariant, 'serverless'>;
+    databaseType: 'Serverless';
 }
 
 type TabCardProps = TabCardDefaultProps | TabCardServerlessProps;
 
 function isServerlessProps(props: TabCardProps): props is TabCardServerlessProps {
-    return props.variant === 'serverless';
+    return props.databaseType === 'Serverless';
 }
 
 function TabCardContainer({active, children}: {active?: boolean; children: React.ReactNode}) {

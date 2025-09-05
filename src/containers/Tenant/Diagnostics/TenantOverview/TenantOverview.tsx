@@ -142,7 +142,7 @@ export function TenantOverview({
                     <TenantCpu
                         tenantName={tenantName}
                         additionalNodesProps={additionalNodesProps}
-                        mode={isServerless ? 'serverless' : 'default'}
+                        databaseType={Type}
                     />
                 );
             }
@@ -151,7 +151,7 @@ export function TenantOverview({
                     <TenantStorage
                         tenantName={tenantName}
                         metrics={storageMetrics}
-                        mode={isServerless ? 'serverless' : 'default'}
+                        databaseType={Type}
                     />
                 );
             }
@@ -216,7 +216,7 @@ export function TenantOverview({
                                     ? Number(tenantData.StorageGroups)
                                     : undefined
                             }
-                            isServerless={isServerless}
+                            databaseType={Type}
                             activeTab={activeMetricsTab}
                         />
                     </Flex>

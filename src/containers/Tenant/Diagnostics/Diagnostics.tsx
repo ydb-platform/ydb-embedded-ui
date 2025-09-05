@@ -73,7 +73,7 @@ function Diagnostics(props: DiagnosticsProps) {
         hasBackups: typeof uiFactory.renderBackups === 'function' && Boolean(controlPlane),
         hasConfigs: isViewerUser,
         hasAccess: uiFactory.hasAccess,
-        isServerless: databaseType === 'Serverless',
+        databaseType,
     });
     let activeTab = pages.find((el) => el.id === diagnosticsTab);
     if (!activeTab) {

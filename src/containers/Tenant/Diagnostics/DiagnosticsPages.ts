@@ -5,6 +5,7 @@ import {StringParam, useQueryParams} from 'use-query-params';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import type {TenantDiagnosticsTab} from '../../../store/reducers/tenant/types';
 import {EPathSubType, EPathType} from '../../../types/api/schema';
+import type {ETenantType} from '../../../types/api/tenant';
 import type {TenantQuery} from '../TenantPages';
 import {TenantTabsGroups, getTenantPath} from '../TenantPages';
 import {isDatabaseEntityType, isTopicEntityType} from '../utils/schema';
@@ -21,7 +22,7 @@ interface GetPagesOptions {
     hasBackups?: boolean;
     hasConfigs?: boolean;
     hasAccess?: boolean;
-    isServerless?: boolean;
+    databaseType?: ETenantType;
 }
 
 const overview = {
@@ -194,8 +195,8 @@ function computeInitialPages(type?: EPathType, subType?: EPathSubType) {
     return subTypePages || typePages || DIR_PAGES;
 }
 
-function getDatabasePages(isServerless?: boolean) {
-    return isServerless ? SERVERLESS_DATABASE_PAGES : DATABASE_PAGES;
+function getDatabasePages(databaseType?: ETenantType) {
+    return databaseType === 'Serverless' ? SERVERLESS_DATABASE_PAGES : DATABASE_PAGES;
 }
 
 function applyFilters(pages: Page[], type?: EPathType, options: GetPagesOptions = {}) {
@@ -226,7 +227,7 @@ export const getPagesByType = (
 ) => {
     const base = computeInitialPages(type, subType);
     const dbContext = isDatabaseEntityType(type) || options?.isTopLevel;
-    const seeded = dbContext ? getDatabasePages(options?.isServerless) : base;
+    const seeded = dbContext ? getDatabasePages(options?.databaseType) : base;
 
     let withFlags = seeded;
     if (!options?.hasFeatureFlags) {

@@ -3,6 +3,7 @@ import {Flex} from '@gravity-ui/uikit';
 import {setTopQueriesFilters} from '../../../../../store/reducers/executeTopQueries/executeTopQueries';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
+import type {ETenantType} from '../../../../../types/api/tenant';
 import {useTypedDispatch} from '../../../../../utils/hooks';
 import {useDiagnosticsPageLinkGetter} from '../../../Diagnostics/DiagnosticsPages';
 import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
@@ -18,10 +19,10 @@ import {cpuDashboardConfig} from './cpuDashboardConfig';
 interface TenantCpuProps {
     tenantName: string;
     additionalNodesProps?: AdditionalNodesProps;
-    mode?: 'default' | 'serverless';
+    databaseType?: ETenantType;
 }
 
-export function TenantCpu({tenantName, additionalNodesProps, mode = 'default'}: TenantCpuProps) {
+export function TenantCpu({tenantName, additionalNodesProps, databaseType}: TenantCpuProps) {
     const dispatch = useTypedDispatch();
     const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
 
@@ -29,7 +30,7 @@ export function TenantCpu({tenantName, additionalNodesProps, mode = 'default'}: 
     const topShardsLink = getDiagnosticsPageLink(TENANT_DIAGNOSTICS_TABS_IDS.topShards);
     const topQueriesLink = getDiagnosticsPageLink(TENANT_DIAGNOSTICS_TABS_IDS.topQueries);
 
-    const isServerless = mode === 'serverless';
+    const isServerless = databaseType === 'Serverless';
 
     return (
         <Flex direction="column" gap={4}>

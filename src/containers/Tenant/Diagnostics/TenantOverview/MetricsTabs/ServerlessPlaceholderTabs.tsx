@@ -4,8 +4,10 @@ import {cn} from '../../../../../utils/cn';
 import {NON_BREAKING_SPACE} from '../../../../../utils/constants';
 import {TabCard} from '../TabCard/TabCard';
 
-const b = cn('tenant-metrics-tabs');
 import './MetricsTabs.scss';
+
+const b = cn('tenant-metrics-tabs');
+
 interface ServerlessPlaceholderTabsProps {
     count?: number;
 }
@@ -20,7 +22,7 @@ export const ServerlessPlaceholderTabs: React.FC<ServerlessPlaceholderTabsProps>
                     <TabCard
                         text={NON_BREAKING_SPACE}
                         active={false}
-                        variant="serverless"
+                        databaseType="Serverless"
                         subtitle={NON_BREAKING_SPACE}
                     />
                 </div>
