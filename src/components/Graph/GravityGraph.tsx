@@ -19,7 +19,7 @@ import {StageBlockComponent} from './BlockComponents/StageBlockComponent';
 import {ConnectionBlockComponent} from './BlockComponents/ConnectionBlockComponent';
 import {graphColorsConfig} from './colorsConfig';
 import {GraphControls} from './GraphControls';
-import {calculateTreeLayout, calculateConnectionPaths} from './treeLayout';
+// import {calculateTreeLayout, calculateConnectionPaths} from './treeLayout';
 import {NonSelectableConnection} from './NonSelectableConnection';
 
 interface Props<T> {
@@ -68,15 +68,29 @@ export function GravityGraph<T>({data, theme}: Props<T>) {
     const {graph, start} = useGraph(config);
 
     React.useEffect(() => {
-        const blocks = prepareBlocks(data.nodes);
-        const connections = prepareConnections(data.links);
-        const layouted = calculateTreeLayout(blocks, connections);
-        const edges = calculateConnectionPaths(layouted, connections);
-
-        graph.setEntities({
-            blocks: layouted,
-            connections: edges,
+        // на всякий случай, хотя маунт больше времени занимает, чем расчёт
+        const worker = new Worker(new URL('./treeLayout', import.meta.url));
+        worker.postMessage({
+            nodes: data.nodes,
+            links: data.links,
         });
+
+        worker.onmessage = function (e) {
+            const {layout, edges} = e.data;
+
+            graph.setEntities({
+                blocks: layout,
+                connections: edges,
+            });
+        };
+
+        worker.onerror = (err) => {
+            console.error(err);
+        };
+
+        return () => {
+            worker.terminate();
+        };
     }, [data.nodes, data.links, graph]);
 
     React.useEffect(() => {

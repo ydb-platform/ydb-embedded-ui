@@ -1,3 +1,5 @@
+import {prepareBlocks, prepareConnections} from './utils';
+
 class TreeLayoutEngine {
     constructor(blocks, connections, options = {}) {
         this.blocks = new Map(blocks.map((block) => [block.id, {...block}]));
@@ -221,12 +223,12 @@ class TreeLayoutEngine {
 }
 
 // Функция для использования алгоритма
-export function calculateTreeLayout(blocks, connections, options = {}) {
+function calculateTreeLayout(blocks, connections, options = {}) {
     const engine = new TreeLayoutEngine(blocks, connections, options);
     return engine.layout();
 }
 
-export function calculateConnectionPaths(layoutResult, connections) {
+function calculateTreeEdges(layoutResult, connections) {
     // Создаем карту позиций для удобства поиска
     const positionMap = new Map(layoutResult.map((item) => [item.id, item]));
 
@@ -314,3 +316,16 @@ export function calculateConnectionPaths(layoutResult, connections) {
 
     return connectionPaths;
 }
+
+onmessage = function (e) {
+    const {nodes, links} = e.data;
+    const blocks = prepareBlocks(nodes);
+    const connections = prepareConnections(links);
+    const layout = calculateTreeLayout(blocks, connections);
+    const edges = calculateTreeEdges(layout, connections);
+
+    postMessage({
+        layout,
+        edges,
+    });
+};
