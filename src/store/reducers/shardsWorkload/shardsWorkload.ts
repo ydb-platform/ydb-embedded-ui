@@ -42,40 +42,57 @@ function createShardQueryHistorical(
     filters?: ShardsWorkloadFilters,
     sortOrder?: SortOrder[],
 ) {
-    const pathSelect = `CAST(SUBSTRING(CAST(Path AS String), ${database.length}) AS Utf8) AS RelativePath`;
+    const pathSelect = `CAST(SUBSTRING(CAST(Path AS String), ${database.length + 1}) AS Utf8) AS RelativePath`;
 
-    let where = `Path='${path}' OR Path LIKE '${path}/%'`;
+    let where = '';
 
+    let pathFilter = '';
+
+    if (path) {
+        pathFilter = `Path='${path}' OR Path LIKE '${path}/%'`;
+    }
+
+    if (pathFilter) {
+        where = `(${pathFilter})`;
+    }
     const filterConditions = getFiltersConditions(filters);
+
     if (filterConditions.length) {
-        where = `(${where}) AND ${filterConditions}`;
+        where = where ? `${where} AND ${filterConditions}` : filterConditions;
     }
 
     const orderBy = prepareOrderByFromTableSort(sortOrder);
+
+    const whereStatement = where ? `WHERE ${where}` : '';
 
     return `${QUERY_TECHNICAL_MARK}    
 SELECT
     ${pathSelect},
     \`.sys/top_partitions_one_hour\`.*
 FROM \`.sys/top_partitions_one_hour\`
-WHERE ${where}
+${whereStatement}
 ${orderBy}
 LIMIT 20`;
 }
 
 function createShardQueryImmediate(path: string, database: string, sortOrder?: SortOrder[]) {
-    const pathSelect = `CAST(SUBSTRING(CAST(Path AS String), ${database.length}) AS Utf8) AS RelativePath`;
+    const pathSelect = `CAST(SUBSTRING(CAST(Path AS String), ${database.length + 1}) AS Utf8) AS RelativePath`;
 
     const orderBy = prepareOrderByFromTableSort(sortOrder);
+
+    const where = path
+        ? `WHERE
+    Path='${path}'
+    OR Path LIKE '${path}/%'
+    `
+        : '';
 
     return `${QUERY_TECHNICAL_MARK}    
 SELECT
     ${pathSelect},
     \`.sys/partition_stats\`.*
 FROM \`.sys/partition_stats\`
-WHERE
-    Path='${path}'
-    OR Path LIKE '${path}/%'
+${where}
 ${orderBy}
 LIMIT 20`;
 }
@@ -100,6 +117,7 @@ export default slice.reducer;
 
 interface SendShardQueryParams {
     database: string;
+    databaseFullPath: string;
     path?: string;
     sortOrder?: SortOrder[];
     filters?: ShardsWorkloadFilters;
@@ -109,7 +127,7 @@ export const shardApi = api.injectEndpoints({
     endpoints: (build) => ({
         sendShardQuery: build.query({
             queryFn: async (
-                {database, path = '', sortOrder, filters}: SendShardQueryParams,
+                {database, path = '', sortOrder, filters, databaseFullPath}: SendShardQueryParams,
                 {signal},
             ) => {
                 try {
@@ -117,10 +135,10 @@ export const shardApi = api.injectEndpoints({
                         {
                             query:
                                 filters?.mode === EShardsWorkloadMode.Immediate
-                                    ? createShardQueryImmediate(path, database, sortOrder)
+                                    ? createShardQueryImmediate(path, databaseFullPath, sortOrder)
                                     : createShardQueryHistorical(
                                           path,
-                                          database,
+                                          databaseFullPath,
                                           filters,
                                           sortOrder,
                                       ),

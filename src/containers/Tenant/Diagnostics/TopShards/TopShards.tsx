@@ -42,9 +42,10 @@ function fillDateRangeFor(value: ShardsWorkloadFilters) {
 interface TopShardsProps {
     tenantName: string;
     path: string;
+    databaseFullPath: string;
 }
 
-export const TopShards = ({tenantName, path}: TopShardsProps) => {
+export const TopShards = ({tenantName, path, databaseFullPath}: TopShardsProps) => {
     const ShardsTable = useComponent('ShardsTable');
 
     const dispatch = useTypedDispatch();
@@ -71,6 +72,13 @@ export const TopShards = ({tenantName, path}: TopShardsProps) => {
 
     const {tableSort, handleTableSort, backendSort} = useTopShardSort();
 
+    let normalizedPath = path;
+
+    if (tenantName !== databaseFullPath) {
+        const shrinkedPath = path.startsWith(tenantName) ? path.slice(tenantName.length) : path;
+        normalizedPath = databaseFullPath + shrinkedPath;
+    }
+
     const {
         currentData: result,
         isFetching,
@@ -78,9 +86,10 @@ export const TopShards = ({tenantName, path}: TopShardsProps) => {
     } = shardApi.useSendShardQueryQuery(
         {
             database: tenantName,
-            path: path,
+            path: normalizedPath,
             sortOrder: backendSort,
             filters,
+            databaseFullPath,
         },
         {pollingInterval: autoRefreshInterval},
     );
