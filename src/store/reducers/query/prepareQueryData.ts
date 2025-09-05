@@ -10,7 +10,9 @@ export function prepareQueryData(
     const result = parseQueryAPIResponse(response);
     const {plan: rawPlan, stats} = result;
 
+
     const {simplifiedPlan, ...planData} = preparePlanData(rawPlan, stats);
+    console.log('prepareQueryData', rawPlan, planData);
     return {
         ...result,
         preparedPlan: Object.keys(planData).length > 0 ? planData : undefined,
