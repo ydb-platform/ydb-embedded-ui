@@ -16,25 +16,27 @@ import {
 } from '../../../components/nodesColumns/columns';
 import {isSortableNodesColumn} from '../../../components/nodesColumns/constants';
 import type {GetNodesColumnsParams} from '../../../components/nodesColumns/types';
-import type {NodesPreparedEntity} from '../../../store/reducers/nodes/types';
+import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import type {Column} from '../../../utils/tableUtils/types';
+import {getPDisksColumn} from '../../Storage/PaginatedStorageNodesTable/columns/columns';
 
-export function getNodesColumns(params: GetNodesColumnsParams): Column<NodesPreparedEntity>[] {
+export function getNodesColumns(params: GetNodesColumnsParams): Column<PreparedStorageNode>[] {
     const columns = [
-        getNodeIdColumn<NodesPreparedEntity>(),
-        getHostColumn<NodesPreparedEntity>(params),
-        getNodeNameColumn<NodesPreparedEntity>(),
-        getDataCenterColumn<NodesPreparedEntity>(),
-        getPileNameColumn<NodesPreparedEntity>(),
-        getRackColumn<NodesPreparedEntity>(),
-        getUptimeColumn<NodesPreparedEntity>(),
-        getCpuColumn<NodesPreparedEntity>(),
-        getPoolsColumn<NodesPreparedEntity>(),
-        getRAMColumn<NodesPreparedEntity>(),
-        getMemoryColumn<NodesPreparedEntity>(),
-        getLoadAverageColumn<NodesPreparedEntity>(),
-        getVersionColumn<NodesPreparedEntity>(),
-        getTabletsColumn<NodesPreparedEntity>(params),
+        getNodeIdColumn<PreparedStorageNode>(),
+        getHostColumn<PreparedStorageNode>(params),
+        getNodeNameColumn<PreparedStorageNode>(),
+        getDataCenterColumn<PreparedStorageNode>(),
+        getPileNameColumn<PreparedStorageNode>(),
+        getRackColumn<PreparedStorageNode>(),
+        getUptimeColumn<PreparedStorageNode>(),
+        getCpuColumn<PreparedStorageNode>(),
+        getPoolsColumn<PreparedStorageNode>(),
+        getRAMColumn<PreparedStorageNode>(),
+        getMemoryColumn<PreparedStorageNode>(),
+        getLoadAverageColumn<PreparedStorageNode>(),
+        getVersionColumn<PreparedStorageNode>(),
+        getPDisksColumn({viewContext: {}, columnsSettings: undefined}),
+        getTabletsColumn<PreparedStorageNode>(params),
     ];
 
     return columns.map((column) => {

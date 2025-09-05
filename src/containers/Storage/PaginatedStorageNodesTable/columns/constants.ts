@@ -14,7 +14,6 @@ export const DEFAULT_STORAGE_NODES_COLUMNS: NodesColumnId[] = [
     'Uptime',
     'CPU',
     'RAM',
-    'PDisks',
 ];
 export const REQUIRED_STORAGE_NODES_COLUMNS: NodesColumnId[] = ['NodeId'];
 
