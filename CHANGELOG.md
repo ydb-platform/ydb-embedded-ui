@@ -1,5 +1,12 @@
 # Changelog
 
+## [11.14.1-hotfix.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.14.1...v11.14.1-hotfix.1) (2025-09-05)
+
+
+### Features
+
+* configurable hide grant access tools ([#2829](https://github.com/ydb-platform/ydb-embedded-ui/issues/2829)) ([db02459](https://github.com/ydb-platform/ydb-embedded-ui/commit/db02459f23c6f8f27f5fcb402a5003864f555374))
+
 ## [11.14.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.14.0...v11.14.1) (2025-09-03)
 
 
