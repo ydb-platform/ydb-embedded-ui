@@ -1,5 +1,32 @@
 # Changelog
 
+## [12.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.14.1...v12.0.0) (2025-09-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove deprecated tenant parameter from api ([#2833](https://github.com/ydb-platform/ydb-embedded-ui/issues/2833))
+
+### Features
+
+* configurable hide grant access tools ([#2829](https://github.com/ydb-platform/ydb-embedded-ui/issues/2829)) ([55d8164](https://github.com/ydb-platform/ydb-embedded-ui/commit/55d8164c25e5b27fa8f4637e4fb33b9759d8fc28))
+* configurable use relative paths in api ([#2841](https://github.com/ydb-platform/ydb-embedded-ui/issues/2841)) ([3069209](https://github.com/ydb-platform/ydb-embedded-ui/commit/306920956a4e1e1355514eca14c5519205e9dc9b))
+* remove deprecated tenant parameter from api ([#2833](https://github.com/ydb-platform/ydb-embedded-ui/issues/2833)) ([5b8ab25](https://github.com/ydb-platform/ydb-embedded-ui/commit/5b8ab2527b8ce7b81b8870934fde829306120c44))
+* serverless database view ([#2836](https://github.com/ydb-platform/ydb-embedded-ui/issues/2836)) ([5654ed0](https://github.com/ydb-platform/ydb-embedded-ui/commit/5654ed086fc6a36d9a77508e28e929bbc11056a8))
+
+
+### Bug Fixes
+
+* **breadcrumbs:** use database param for links ([#2823](https://github.com/ydb-platform/ydb-embedded-ui/issues/2823)) ([a242ed0](https://github.com/ydb-platform/ydb-embedded-ui/commit/a242ed025abc75c0dcbe7cb88832c42f3b67a29c))
+* **Fullscreen:** fix overlay and root ([#2817](https://github.com/ydb-platform/ydb-embedded-ui/issues/2817)) ([9e18128](https://github.com/ydb-platform/ydb-embedded-ui/commit/9e181281fbffd69e8d1580a163b9e94529b6242f))
+* **Healthcheck:** separate issue location, increase gaps ([#2837](https://github.com/ydb-platform/ydb-embedded-ui/issues/2837)) ([c81a708](https://github.com/ydb-platform/ydb-embedded-ui/commit/c81a708b235d848b95225bc196ccc1745924346d))
+* **Network:** correctly pass database in peer role ([#2831](https://github.com/ydb-platform/ydb-embedded-ui/issues/2831)) ([de83881](https://github.com/ydb-platform/ydb-embedded-ui/commit/de83881cdf4d7ef263ea99e887d0fc004a186b21))
+* relative path usage fixes ([#2843](https://github.com/ydb-platform/ydb-embedded-ui/issues/2843)) ([c89b733](https://github.com/ydb-platform/ydb-embedded-ui/commit/c89b733e7b767c60e70f8d459f961f8930b170d3))
+* **ShardsTable:** show ceil rounded value for cpu cores ([#2842](https://github.com/ydb-platform/ydb-embedded-ui/issues/2842)) ([aa861e2](https://github.com/ydb-platform/ydb-embedded-ui/commit/aa861e2d81a7321cc459268caede27f483b3672c))
+* **transformPath:** do not use fair relative path ([#2839](https://github.com/ydb-platform/ydb-embedded-ui/issues/2839)) ([1a0d0a5](https://github.com/ydb-platform/ydb-embedded-ui/commit/1a0d0a5cc21bd121381c666ba12ce67541203707))
+* **transformPath:** use fair relative path ([#2828](https://github.com/ydb-platform/ydb-embedded-ui/issues/2828)) ([6c94aaf](https://github.com/ydb-platform/ydb-embedded-ui/commit/6c94aafb0b55b0dd687053688b2cae8b662008e5))
+* use getSchemaPath for /nodes ([#2830](https://github.com/ydb-platform/ydb-embedded-ui/issues/2830)) ([f164b8b](https://github.com/ydb-platform/ydb-embedded-ui/commit/f164b8b69f2971faafa0bff5e84c69f720ae4e8a))
+
 ## [11.14.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.14.0...v11.14.1) (2025-09-03)
 
 
