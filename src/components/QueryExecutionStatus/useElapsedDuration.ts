@@ -30,10 +30,7 @@ export function useElapsedDuration({
 
     const getJitteredFastDelay = React.useCallback(() => {
         const jitter = Math.floor((Math.random() * 2 - 1) * FAST_REFRESH_JITTER_MS);
-        const delay = FAST_REFRESH_MS + jitter;
-        const min = FAST_REFRESH_MS - FAST_REFRESH_JITTER_MS;
-        const max = FAST_REFRESH_MS + FAST_REFRESH_JITTER_MS;
-        return Math.max(min, Math.min(max, delay));
+        return FAST_REFRESH_MS + jitter;
     }, []);
 
     const timerRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
