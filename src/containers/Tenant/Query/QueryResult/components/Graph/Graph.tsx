@@ -23,8 +23,6 @@ function isValidGraphData(data: Partial<Data>): data is Data {
 }
 
 export function Graph({explain = {}, theme}: GraphProps) {
-    console.log('explain', explain);
-
     const {links, nodes} = explain;
 
     const data = React.useMemo(() => ({links, nodes}), [links, nodes]);

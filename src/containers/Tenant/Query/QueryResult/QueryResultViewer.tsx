@@ -272,7 +272,6 @@ export function QueryResultViewer({
             if (!preparedPlan?.nodes?.length) {
                 return renderStubMessage();
             }
-            console.log(preparedPlan);
             
             return <Graph theme={theme} explain={preparedPlan} />;
         }
