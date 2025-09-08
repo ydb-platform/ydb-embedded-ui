@@ -21,7 +21,7 @@ export interface Link {
     to: string;
 }
 export interface Data<TData = any> {
-    links?: Link[];
+    links: Link[];
     nodes: GraphNode<TData>[];
 }
 export interface Metric {

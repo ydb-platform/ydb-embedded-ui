@@ -272,7 +272,6 @@ export function QueryResultViewer({
             if (!preparedPlan?.nodes?.length) {
                 return renderStubMessage();
             }
-            
             return <Graph theme={theme} explain={preparedPlan} />;
         }
         if (activeSection === RESULT_OPTIONS_IDS.json) {

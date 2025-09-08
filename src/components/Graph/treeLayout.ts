@@ -75,7 +75,11 @@ class TreeLayoutEngine {
     }
 
     // Группировка узлов по уровням
-    groupByLevels(node = this.tree, levels = []) {
+    groupByLevels(node: TreeNode | null = this.tree, levels: TreeNode[][] = []): TreeNode[][] {
+        if (!node) {
+            return levels;
+        }
+
         if (!levels[node.level]) {
             levels[node.level] = [];
         }
@@ -117,6 +121,10 @@ class TreeLayoutEngine {
 
     // Размещение узлов по позициям
     positionNodes() {
+        if (!this.tree) {
+            return;
+        }
+
         // Вычисляем Y координаты для каждого уровня
         let currentY = 0;
         const levelY: number[] = [];
@@ -175,9 +183,13 @@ class TreeLayoutEngine {
 
     // Нормализация координат (чтобы минимальные координаты были >= 0)
     normalizeCoordinates() {
-        const allNodes = [];
+        if (!this.tree) {
+            return;
+        }
 
-        const collectNodes = (node) => {
+        const allNodes: TreeNode[] = [];
+
+        const collectNodes = (node: TreeNode) => {
             allNodes.push(node);
             for (const child of node.children) {
                 collectNodes(child);
@@ -211,10 +223,14 @@ class TreeLayoutEngine {
     }
 
     // Получение результата компоновки
-    getLayoutResult() {
+    getLayoutResult(): ExtendedTBlock[] {
+        if (!this.tree) {
+            return [];
+        }
+
         const result: ExtendedTBlock[] = [];
 
-        const collectResults = (node) => {
+        const collectResults = (node: TreeNode) => {
             result.push({
                 id: node.id,
                 x: node.x,
@@ -257,7 +273,12 @@ function calculateTreeEdges(layoutResult: ExtendedTBlock[], connections: TConnec
         connectionsByParent.get(parentId).push(connection);
     }
 
-    const connectionPaths = [];
+    const connectionPaths: {
+        connectionId: string | undefined;
+        sourceBlockId: string | number;
+        targetBlockId: string | number;
+        points: {x: number; y: number}[];
+    }[] = [];
 
     // Для каждого родительского блока рассчитываем пути к детям
     for (const [parentId, parentConnections] of connectionsByParent) {
@@ -294,15 +315,18 @@ function calculateTreeEdges(layoutResult: ExtendedTBlock[], connections: TConnec
 
             // Находим вертикальное расстояние между родителем и ближайшим ребенком
             const children = parentConnections
-                .map((conn) => positionMap.get(conn.targetBlockId))
-                .filter((child) => child !== undefined);
+                .map((conn: TConnection) => positionMap.get(conn.targetBlockId))
+                .filter(
+                    (child: ExtendedTBlock | undefined): child is ExtendedTBlock =>
+                        child !== undefined,
+                );
 
             if (children.length === 0) {
                 continue;
             }
 
             // Находим минимальное расстояние до детей по Y
-            const minChildY = Math.min(...children.map((child) => child.y));
+            const minChildY = Math.min(...children.map((child: ExtendedTBlock) => child.y));
 
             // Точка разветвления - посередине между родителем и детьми
             const branchY = startY + (minChildY - startY) / 2;
