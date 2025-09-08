@@ -18,9 +18,7 @@ interface EntityStatusProps {
     status?: EFlag;
     name?: string;
     renderName?: (name?: string) => React.ReactNode;
-    label?: string;
     path?: string;
-    iconPath?: string;
 
     size?: StatusIconSize;
     mode?: StatusIconMode;
@@ -45,9 +43,7 @@ export function EntityStatus({
     status = EFlag.Grey,
     name = '',
     renderName = defaultRenderName,
-    label,
     path,
-    iconPath,
 
     size = 's',
     mode = 'color',
@@ -71,13 +67,7 @@ export function EntityStatus({
 
         return <StatusIcon className={b('icon')} status={status} size={size} mode={mode} />;
     };
-    const renderStatusLink = (href: string) => {
-        return (
-            <UIKitLink target="_blank" href={href}>
-                {renderIcon()}
-            </UIKitLink>
-        );
-    };
+
     const renderLink = () => {
         if (path) {
             if (externalLink) {
@@ -96,14 +86,10 @@ export function EntityStatus({
         }
         return name && <span className={b('name')}>{renderName(name)}</span>;
     };
+
     return (
         <div className={b(null, className)}>
-            {iconPath ? renderStatusLink(iconPath) : renderIcon()}
-            {label && (
-                <span title={label} className={b('label', {size, state: status.toLowerCase()})}>
-                    {label}
-                </span>
-            )}
+            {renderIcon()}
             {(path || name) && (
                 <div
                     className={b('wrapper', {
@@ -127,15 +113,15 @@ export function EntityStatus({
                                     placement={['top-start', 'bottom-start']}
                                     onOpenChange={(visible) => setInfoIconHovered(visible)}
                                 >
-                                    <Button view="normal" size="xs">
-                                        <Icon
-                                            data={CircleInfo}
-                                            size="12"
-                                            className={b('info-icon', {
-                                                visible:
-                                                    clipboardButtonAlwaysVisible || infoIconHovered,
-                                            })}
-                                        />
+                                    <Button
+                                        view="normal"
+                                        size="xs"
+                                        className={b('info-icon', {
+                                            visible:
+                                                clipboardButtonAlwaysVisible || infoIconHovered,
+                                        })}
+                                    >
+                                        <Icon data={CircleInfo} size="12" />
                                     </Button>
                                 </Popover>
                             )}
