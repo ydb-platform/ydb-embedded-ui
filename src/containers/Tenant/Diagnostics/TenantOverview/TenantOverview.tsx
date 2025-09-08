@@ -143,6 +143,7 @@ export function TenantOverview({
                         tenantName={tenantName}
                         additionalNodesProps={additionalNodesProps}
                         databaseType={Type}
+                        databaseFullPath={Name}
                     />
                 );
             }
