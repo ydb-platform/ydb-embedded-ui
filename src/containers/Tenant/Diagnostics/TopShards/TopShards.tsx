@@ -75,6 +75,7 @@ export const TopShards = ({tenantName, path, databaseFullPath}: TopShardsProps) 
     let normalizedPath = path;
 
     if (tenantName !== databaseFullPath) {
+        //tenantName may be database full path or database id. If it is database id, we must remove it from object's path and add database full path instead
         const shrinkedPath = path.startsWith(tenantName) ? path.slice(tenantName.length) : path;
         normalizedPath = databaseFullPath + shrinkedPath;
     }

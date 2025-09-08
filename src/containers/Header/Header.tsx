@@ -117,10 +117,7 @@ function Header() {
 
         if (isDatabasePage && database) {
             elements.push(
-                <Button
-                    view={'flat'}
-                    onClick={() => getConnectToDBDialog({database: databaseData?.Name || database})}
-                >
+                <Button view={'flat'} onClick={() => getConnectToDBDialog({database})}>
                     <Icon data={PlugConnection} />
                     {headerKeyset('connect')}
                 </Button>,
