@@ -284,29 +284,3 @@
         --entity-state-border-color: var(--g-color-line-generic-hover);
     }
 }
-
-@mixin table-hover-appearing-button {
-    opacity: 0;
-
-    &_visible,
-    &:focus-visible {
-        opacity: 1;
-    }
-    &:focus-visible {
-        position: absolute;
-        top: 2px;
-        right: 2px;
-
-        background-color: var(--g-color-base-float);
-    }
-    .data-table__row:hover &,
-    .ydb-paginated-table__row:hover & {
-        opacity: 1;
-    }
-    .data-table__row:hover &:focus-visible,
-    .ydb-paginated-table__row:hover &:focus-visible {
-        position: static;
-
-        background-color: unset;
-    }
-}
