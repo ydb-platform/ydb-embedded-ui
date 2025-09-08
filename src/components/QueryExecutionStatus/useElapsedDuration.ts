@@ -28,11 +28,6 @@ export function useElapsedDuration({
         }
     }, [endTime, startTime]);
 
-    const getJitteredFastDelay = React.useCallback(() => {
-        const jitter = Math.floor((Math.random() * 2 - 1) * FAST_REFRESH_JITTER_MS);
-        return FAST_REFRESH_MS + jitter;
-    }, []);
-
     const timerRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
     const cancelledRef = React.useRef<boolean>(false);
 
@@ -48,9 +43,10 @@ export function useElapsedDuration({
 
         const actualEndTime = endTime || Date.now();
         const elapsedMs = actualEndTime - startTime;
-        const nextDelay = elapsedMs < TEN_SECONDS_IN_MS ? getJitteredFastDelay() : SECOND_IN_MS;
+        const jitter = Math.floor((Math.random() * 2 - 1) * FAST_REFRESH_JITTER_MS);
+        const nextDelay = elapsedMs < TEN_SECONDS_IN_MS ? FAST_REFRESH_MS + jitter : SECOND_IN_MS;
         timerRef.current = setTimeout(tick, nextDelay);
-    }, [setDuration, loading, startTime, endTime, getJitteredFastDelay]);
+    }, [setDuration, loading, startTime, endTime]);
 
     React.useEffect(() => {
         cancelledRef.current = false;
