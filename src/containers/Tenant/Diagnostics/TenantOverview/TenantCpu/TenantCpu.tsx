@@ -18,11 +18,17 @@ import {cpuDashboardConfig} from './cpuDashboardConfig';
 
 interface TenantCpuProps {
     tenantName: string;
+    databaseFullPath?: string;
     additionalNodesProps?: AdditionalNodesProps;
     databaseType?: ETenantType;
 }
 
-export function TenantCpu({tenantName, additionalNodesProps, databaseType}: TenantCpuProps) {
+export function TenantCpu({
+    tenantName,
+    additionalNodesProps,
+    databaseType,
+    databaseFullPath,
+}: TenantCpuProps) {
     const dispatch = useTypedDispatch();
     const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
 
@@ -58,7 +64,11 @@ export function TenantCpu({tenantName, additionalNodesProps, databaseType}: Tena
                 </>
             )}
             <StatsWrapper title={i18n('title_top-shards')} allEntitiesLink={topShardsLink}>
-                <TopShards tenantName={tenantName} path={tenantName} />
+                <TopShards
+                    tenantName={tenantName}
+                    path={tenantName}
+                    databaseFullPath={databaseFullPath}
+                />
             </StatsWrapper>
             <StatsWrapper
                 title={i18n('title_top-queries')}

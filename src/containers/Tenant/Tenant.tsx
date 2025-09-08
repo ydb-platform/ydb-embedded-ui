@@ -136,6 +136,7 @@ export function Tenant(props: TenantProps) {
                         path={path}
                         type={currentPathType}
                         subType={currentPathSubType}
+                        databaseFullPath={databaseName}
                     >
                         <TenantDrawerWrapper>
                             <SplitPane

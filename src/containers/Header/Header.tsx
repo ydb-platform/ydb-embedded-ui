@@ -56,6 +56,7 @@ function Header() {
     const {title: clusterTitle} = useClusterBaseInfo();
 
     const database = useDatabaseFromQuery();
+
     const clusterName = useClusterNameFromQuery();
 
     const location = useLocation();

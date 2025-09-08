@@ -50,7 +50,7 @@ interface DiagnosticsProps {
 const b = cn('kv-tenant-diagnostics');
 
 function Diagnostics(props: DiagnosticsProps) {
-    const {path, database, type, subType} = useCurrentSchema();
+    const {path, database, type, subType, databaseFullPath} = useCurrentSchema();
     const containerRef = React.useRef<HTMLDivElement>(null);
     const dispatch = useTypedDispatch();
     const {diagnosticsTab = TENANT_DIAGNOSTICS_TABS_IDS.overview} = useTypedSelector(
@@ -58,8 +58,6 @@ function Diagnostics(props: DiagnosticsProps) {
     );
 
     const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
-
-    const tenantName = isDatabaseEntityType(type) ? path : database;
 
     const {controlPlane, databaseType} = useTenantBaseInfo(isDatabaseEntityType(type) ? path : '');
 
@@ -93,7 +91,7 @@ function Diagnostics(props: DiagnosticsProps) {
                 return (
                     <DetailedOverview
                         type={type}
-                        tenantName={tenantName}
+                        tenantName={database}
                         path={path}
                         additionalTenantProps={props.additionalTenantProps}
                         additionalNodesProps={props.additionalNodesProps}
@@ -101,19 +99,25 @@ function Diagnostics(props: DiagnosticsProps) {
                 );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.schema: {
-                return <SchemaViewer path={path} tenantName={tenantName} type={type} extended />;
+                return <SchemaViewer path={path} tenantName={database} type={type} extended />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.topQueries: {
-                return <TopQueries tenantName={tenantName} />;
+                return <TopQueries tenantName={database} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.topShards: {
-                return <TopShards tenantName={tenantName} path={path} />;
+                return (
+                    <TopShards
+                        tenantName={database}
+                        path={path}
+                        databaseFullPath={databaseFullPath}
+                    />
+                );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.nodes: {
                 return (
                     <Nodes
                         path={path}
-                        database={tenantName}
+                        database={database}
                         additionalNodesProps={props.additionalNodesProps}
                         scrollContainerRef={containerRef}
                     />
@@ -124,56 +128,56 @@ function Diagnostics(props: DiagnosticsProps) {
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.tablets: {
                 return (
-                    <Tablets scrollContainerRef={containerRef} path={path} database={tenantName} />
+                    <Tablets scrollContainerRef={containerRef} path={path} database={database} />
                 );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.storage: {
-                return <PaginatedStorage database={tenantName} scrollContainerRef={containerRef} />;
+                return <PaginatedStorage database={database} scrollContainerRef={containerRef} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.network: {
                 return (
                     <NetworkWrapper
                         path={path}
-                        database={tenantName}
+                        database={database}
                         additionalNodesProps={props.additionalNodesProps}
                         scrollContainerRef={containerRef}
                     />
                 );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.describe: {
-                return <Describe path={path} database={tenantName} />;
+                return <Describe path={path} database={database} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.hotKeys: {
-                return <HotKeys path={path} database={tenantName} />;
+                return <HotKeys path={path} database={database} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.graph: {
-                return <Heatmap path={path} database={tenantName} />;
+                return <Heatmap path={path} database={database} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.consumers: {
-                return <Consumers path={path} database={tenantName} type={type} />;
+                return <Consumers path={path} database={database} type={type} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.partitions: {
-                return <Partitions path={path} database={tenantName} />;
+                return <Partitions path={path} database={database} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.topicData: {
                 return (
                     <TopicData
                         key={path}
                         path={path}
-                        database={tenantName}
+                        database={database}
                         scrollContainerRef={containerRef}
                     />
                 );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.configs: {
-                return <Configs database={tenantName} />;
+                return <Configs database={database} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.operations: {
-                return <Operations database={tenantName} scrollContainerRef={containerRef} />;
+                return <Operations database={database} scrollContainerRef={containerRef} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.backups: {
                 return uiFactory.renderBackups?.({
-                    database: tenantName,
+                    database,
                     scrollContainerRef: containerRef,
                 });
             }
@@ -208,7 +212,7 @@ function Diagnostics(props: DiagnosticsProps) {
 
     useScrollPosition(
         containerRef,
-        `tenant-diagnostics-${tenantName}-${activeTab?.id}`,
+        `tenant-diagnostics-${database}-${activeTab?.id}`,
         activeTab?.id === TENANT_DIAGNOSTICS_TABS_IDS.overview,
     );
 

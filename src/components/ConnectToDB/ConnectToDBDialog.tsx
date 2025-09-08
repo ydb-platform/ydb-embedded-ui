@@ -62,7 +62,7 @@ function ConnectToDBDialog({
         tenantApi.useGetTenantInfoQuery(params);
     const endpoint = endpointFromProps ?? tenantData?.ControlPlane?.endpoint;
 
-    const snippet = getSnippetCode(activeTab, {database, endpoint});
+    const snippet = getSnippetCode(activeTab, {database: tenantData?.Name, endpoint});
     const docsLink = getDocsLink(activeTab);
 
     return (
