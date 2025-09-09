@@ -98,7 +98,7 @@ const bindActions = (
                   showCreateDirectoryDialog(params.relativePath);
               }
             : undefined,
-        getConnectToDBDialog: () => getConnectToDBDialog?.({database: params.databaseFullPath}),
+        getConnectToDBDialog: () => getConnectToDBDialog?.({database: params.tenantName}),
         createTable: inputQuery(createTableTemplate),
         createColumnTable: inputQuery(createColumnTableTemplate),
         createAsyncReplication: inputQuery(createAsyncReplicationTemplate),

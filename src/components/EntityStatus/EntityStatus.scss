@@ -1,14 +1,16 @@
 @use '../../styles/mixins.scss';
 
 .entity-status {
-    --button-width: 28px;
+    --button-width: 24px;
+    --entity-status-height: 20px;
+
     position: relative;
 
     display: inline-flex;
     align-items: center;
 
     max-width: 100%;
-    height: 100%;
+    height: var(--entity-status-height);
 
     @include mixins.body-2-typography();
 
@@ -18,16 +20,27 @@
 
     &__info-icon,
     &__clipboard-button {
+        // Default button height is 20px. When focused it has 24px height because of outline
+        // Negative offset is needed to prevent button to have bigger size when focused
+        --g-button-focus-outline-offset: -2px;
+        --g-button-focus-outline-width: 2px;
+
+        opacity: 0;
         color: var(--g-color-text-secondary);
 
-        @include mixins.table-hover-appearing-button();
-
-        &_visible {
+        &_visible,
+        &:focus-visible,
+        &:hover,
+        .entity-status__wrapper:focus-within &,
+        .data-table__row:hover &,
+        .ydb-paginated-table__row:hover & {
             opacity: 1;
         }
-    }
 
-    &__info-icon {
+        &:focus-visible,
+        .entity-status__wrapper:focus-within {
+            background-color: var(--g-color-base-float);
+        }
         &:hover {
             color: var(--g-color-text-primary);
         }
@@ -37,6 +50,8 @@
         position: relative;
 
         overflow: hidden;
+
+        height: var(--entity-status-height);
 
         &_with-clipboard-button {
             padding-right: var(--button-width);
@@ -63,46 +78,20 @@
         gap: var(--g-spacing-1);
 
         width: 0;
-        height: 100%;
 
-        &_visible {
+        &_visible,
+        &:focus-within {
             width: min-content;
-            padding: var(--g-spacing-1);
 
             background-color: var(--g-color-base-background);
         }
 
         .data-table__row:hover &,
-        .ydb-paginated-table__row:hover &,
-        .ydb-tree-view__item & {
+        .ydb-paginated-table__row:hover & {
             width: min-content;
-            padding: var(--g-spacing-1);
 
             background-color: var(--ydb-data-table-color-hover);
         }
-    }
-
-    &__label {
-        margin-right: 2px;
-
-        color: var(--g-color-text-complementary);
-
-        @include mixins.body-2-typography();
-
-        &_size_l {
-            font-size: var(--g-text-header-2-font-size);
-        }
-    }
-
-    &__link {
-        display: inline-block;
-        overflow: hidden;
-
-        width: 100%;
-        margin-top: 5px;
-
-        white-space: nowrap;
-        text-overflow: ellipsis;
     }
 
     &__wrapper_with-clipboard-button &__link {
@@ -119,27 +108,22 @@
         }
     }
 
+    &__link {
+        display: inline-block;
+        overflow: hidden;
+
+        width: 100%;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
     &__link_with-left-trim {
         text-align: end;
         direction: rtl;
 
         .entity-status__name {
             unicode-bidi: plaintext;
-        }
-    }
-
-    &__label {
-        &_state_blue {
-            color: var(--ydb-color-status-blue);
-        }
-        &_state_yellow {
-            color: var(--ydb-color-status-yellow);
-        }
-        &_state_orange {
-            color: var(--ydb-color-status-orange);
-        }
-        &_state_red {
-            color: var(--ydb-color-status-red);
         }
     }
 }
