@@ -37,7 +37,7 @@ export function useElapsedDuration({
         }
         setDuration();
 
-        if (!loading || !startTime || cancelledRef.current) {
+        if (!loading || !startTime) {
             return;
         }
 
