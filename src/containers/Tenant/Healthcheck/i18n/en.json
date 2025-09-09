@@ -34,7 +34,7 @@
   "label_schema-path": "Schema Path",
   "label_group-id": "Group ID",
   "label_vdisk-id": "VDisk ID",
-  "label_pdisk-id": "Pdisk ID",
+  "label_pdisk-id": "PDisk ID",
   "label_pdisk-path": "PDisk Path",
   "label_node_location": "Node Location",
   "label_peer_location": "Peer Node Location"
