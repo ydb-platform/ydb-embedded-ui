@@ -7,6 +7,7 @@ function createShardQuery(path: string, database: string) {
     return `${QUERY_TECHNICAL_MARK}
 SELECT
     ${pathSelect},
+    Path,
     TabletId,
     CPUCores,
 FROM \`.sys/partition_stats\`
