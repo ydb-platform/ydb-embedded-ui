@@ -1,5 +1,20 @@
 # Changelog
 
+## [12.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.0.0...v12.1.0) (2025-09-09)
+
+
+### Features
+
+* configure access errors ([#2855](https://github.com/ydb-platform/ydb-embedded-ui/issues/2855)) ([2e6adf9](https://github.com/ydb-platform/ydb-embedded-ui/commit/2e6adf940a31f091d2b3e2b2bb5db9d453d40c4c))
+
+
+### Bug Fixes
+
+* **EntityStatus:** fix buttons bg in selected table rows ([#2835](https://github.com/ydb-platform/ydb-embedded-ui/issues/2835)) ([f0d6b7c](https://github.com/ydb-platform/ydb-embedded-ui/commit/f0d6b7ce0e374db686779ab9c24c9d7de9e71388))
+* **schemaActions:** pass database to getConnectToDBDialog ([#2851](https://github.com/ydb-platform/ydb-embedded-ui/issues/2851)) ([dd3933f](https://github.com/ydb-platform/ydb-embedded-ui/commit/dd3933f7186ecd08d2673cd5584730b2206065b7))
+* **TenantOverview:** show shard advice ([#2854](https://github.com/ydb-platform/ydb-embedded-ui/issues/2854)) ([e7561d7](https://github.com/ydb-platform/ydb-embedded-ui/commit/e7561d73ee921d7f55ea9d9fd48b6986f8df84b1))
+* write intelligent timing to query ([#2853](https://github.com/ydb-platform/ydb-embedded-ui/issues/2853)) ([9e98f40](https://github.com/ydb-platform/ydb-embedded-ui/commit/9e98f405d2f8e23070bac88b201a16b9415b88e3))
+
 ## [12.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v11.14.1...v12.0.0) (2025-09-08)
 
 
