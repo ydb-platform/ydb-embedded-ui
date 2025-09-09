@@ -1,5 +1,6 @@
 import type React from 'react';
 
+import type {EmptyStateProps} from '../components/EmptyState';
 import type {
     CommonIssueType,
     GetHealthcheckViewTitles,
@@ -34,6 +35,7 @@ export interface UIFactory<H extends string = CommonIssueType> {
 
     renderBackups?: RenderBackups;
     renderEvents?: RenderEvents;
+    clusterOrDatabaseAccessError?: Partial<EmptyStateProps>;
 
     healthcheck: {
         getHealthckechViewTitles: GetHealthcheckViewTitles<H>;

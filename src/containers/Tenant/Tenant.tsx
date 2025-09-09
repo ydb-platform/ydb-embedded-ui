@@ -10,6 +10,7 @@ import {overviewApi} from '../../store/reducers/overview/overview';
 import {selectSchemaObjectData} from '../../store/reducers/schema/schema';
 import {useTenantBaseInfo} from '../../store/reducers/tenant/tenant';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../types/additionalProps';
+import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
@@ -130,7 +131,10 @@ export function Tenant(props: TenantProps) {
                 titleTemplate={`%s — ${title} — ${appTitle}`}
             />
             <LoaderWrapper loading={initialLoading}>
-                <PageError error={showBlockingError ? error : undefined}>
+                <PageError
+                    error={showBlockingError ? error : undefined}
+                    {...uiFactory.clusterOrDatabaseAccessError}
+                >
                     <TenantContextProvider
                         database={database}
                         path={path}
