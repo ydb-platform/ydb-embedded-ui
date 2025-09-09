@@ -22,6 +22,7 @@ import {
     useEditDatabaseFeatureAvailable,
 } from '../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
+import {clustersApi} from '../../store/reducers/clusters/clusters';
 import {tenantApi} from '../../store/reducers/tenant/tenant';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
@@ -36,6 +37,7 @@ import {
     useIsUserAllowedToMakeChanges,
     useIsViewerUser,
 } from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {isAccessError} from '../../utils/response';
 import {getClusterPath} from '../Cluster/utils';
 
 import {getBreadcrumbs} from './breadcrumbs';
@@ -65,8 +67,16 @@ function Header() {
     const isDatabasePage = location.pathname === '/tenant';
     const isClustersPage = location.pathname === '/clusters';
 
+    const {isFetching: isClustersFetching, error: clustersError} =
+        clustersApi.useGetClustersListQuery(undefined, {
+            skip: !isClustersPage,
+        });
+
     const isAddClusterAvailable =
-        useAddClusterFeatureAvailable() && uiFactory.onAddCluster !== undefined;
+        useAddClusterFeatureAvailable() &&
+        uiFactory.onAddCluster !== undefined &&
+        !isClustersFetching &&
+        !isAccessError(clustersError);
 
     const isEditDBAvailable = useEditDatabaseFeatureAvailable() && uiFactory.onEditDB !== undefined;
     const isDeleteDBAvailable =
