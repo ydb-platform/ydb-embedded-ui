@@ -116,6 +116,11 @@
 
         white-space: nowrap;
         text-overflow: ellipsis;
+
+        & a:focus-visible {
+            outline-width: 2px;
+            outline-offset: -2px;
+        }
     }
 
     &__link_with-left-trim {
