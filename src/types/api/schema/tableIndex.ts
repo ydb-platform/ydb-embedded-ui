@@ -26,14 +26,14 @@ export interface TIndexDescription {
     VectorIndexKmeansTreeDescription?: TVectorIndexKmeansTreeDescription;
 }
 
-enum EIndexType {
+export enum EIndexType {
     EIndexTypeInvalid = 'EIndexTypeInvalid',
     EIndexTypeGlobal = 'EIndexTypeGlobal',
     EIndexTypeGlobalAsync = 'EIndexTypeGlobalAsync',
     EIndexTypeGlobalVectorKmeansTree = 'EIndexTypeGlobalVectorKmeansTree',
 }
 
-enum EIndexState {
+export enum EIndexState {
     EIndexStateInvalid = 'EIndexStateInvalid',
     EIndexStateReady = 'EIndexStateReady',
     EIndexStateNotReady = 'EIndexStateNotReady',

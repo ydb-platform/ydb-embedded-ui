@@ -1,6 +1,7 @@
 import type {InfoViewerItem} from '..';
 import {InfoViewer} from '..';
 import {getEntityName} from '../../../containers/Tenant/utils';
+import {EIndexType} from '../../../types/api/schema';
 import type {TEvDescribeSchemeResult} from '../../../types/api/schema';
 
 import i18n from './i18n';
@@ -22,16 +23,17 @@ export const TableIndexInfo = ({data}: TableIndexInfoProps) => {
 
     const vectorSettings = TableIndex?.VectorIndexKmeansTreeDescription?.Settings;
 
-    if (!vectorSettings) {
-        return <InfoViewer title={entityName} info={info} />;
+    const isVectorIndex = TableIndex?.Type === EIndexType.EIndexTypeGlobalVectorKmeansTree;
+
+    if (isVectorIndex) {
+        const vectorInfo: Array<InfoViewerItem> = buildVectorIndexInfo(vectorSettings);
+        return (
+            <>
+                <InfoViewer title={i18n('title_vector-index')} info={info} />
+                <InfoViewer info={vectorInfo} />
+            </>
+        );
     }
 
-    const vectorInfo: Array<InfoViewerItem> = buildVectorIndexInfo(vectorSettings);
-
-    return (
-        <>
-            <InfoViewer title={entityName} info={info} />
-            <InfoViewer title={i18n('title_vector-index')} info={vectorInfo} />
-        </>
-    );
+    return <InfoViewer title={entityName} info={info} />;
 };
