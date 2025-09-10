@@ -80,4 +80,6 @@ export type RenderBackups = (props: {
     scrollContainerRef: React.RefObject<HTMLDivElement>;
 }) => React.ReactNode;
 
-export type RenderEvents = () => React.ReactNode;
+export type RenderEvents = (props: {
+    scrollContainerRef: React.RefObject<HTMLDivElement>;
+}) => React.ReactNode;
