@@ -267,7 +267,7 @@ export function Cluster({
                                         .pathname
                                 }
                             >
-                                {uiFactory.renderEvents?.()}
+                                {uiFactory.renderEvents?.({scrollContainerRef: container})}
                             </Route>
                         )}
 
