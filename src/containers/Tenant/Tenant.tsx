@@ -106,6 +106,8 @@ export function Tenant(props: TenantProps) {
 
     const showBlockingError = isAccessError(error);
 
+    const errorProps = showBlockingError ? uiFactory.clusterOrDatabaseAccessError : undefined;
+
     const onCollapseSummaryHandler = () => {
         dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.triggerCollapse);
     };
@@ -131,10 +133,7 @@ export function Tenant(props: TenantProps) {
                 titleTemplate={`%s — ${title} — ${appTitle}`}
             />
             <LoaderWrapper loading={initialLoading}>
-                <PageError
-                    error={showBlockingError ? error : undefined}
-                    {...uiFactory.clusterOrDatabaseAccessError}
-                >
+                <PageError error={showBlockingError ? error : undefined} {...errorProps}>
                     <TenantContextProvider
                         database={database}
                         path={path}
