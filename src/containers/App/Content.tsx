@@ -196,13 +196,11 @@ function GetUser({children}: {children: React.ReactNode}) {
     const {isLoading, error} = authenticationApi.useWhoamiQuery({database});
     const {appTitle} = useAppTitle();
 
+    const errorProps = error ? {...uiFactory.clusterOrDatabaseAccessError} : undefined;
+
     return (
         <LoaderWrapper loading={isLoading} size="l">
-            <PageError
-                error={error}
-                {...uiFactory.clusterOrDatabaseAccessError}
-                errorPageTitle={appTitle}
-            >
+            <PageError error={error} {...errorProps} errorPageTitle={appTitle}>
                 {children}
             </PageError>
         </LoaderWrapper>

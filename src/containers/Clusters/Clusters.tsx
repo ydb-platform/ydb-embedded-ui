@@ -140,10 +140,13 @@ export function Clusters() {
 
     const showBlockingError = isAccessError(query.error);
 
+    const errorProps = showBlockingError ? uiFactory.clusterOrDatabaseAccessError : undefined;
+
     return (
         <PageError
             error={showBlockingError ? query.error : undefined}
-            {...uiFactory.clusterOrDatabaseAccessError}
+            {...errorProps}
+            errorPageTitle={uiFactory.clustersPageTitle ?? i18n('page_title')}
         >
             <div className={b()}>
                 <Helmet>
