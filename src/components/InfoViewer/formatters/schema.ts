@@ -1,5 +1,6 @@
 import type {TIndexDescription} from '../../../types/api/schema';
 import {toFormattedSize} from '../../FormattedBytes/utils';
+import i18n from '../schemaInfo/i18n';
 import {createInfoFormatter} from '../utils';
 
 export const formatTableIndexItem = createInfoFormatter<TIndexDescription>({
@@ -11,7 +12,8 @@ export const formatTableIndexItem = createInfoFormatter<TIndexDescription>({
         DataSize: toFormattedSize,
     },
     labels: {
-        KeyColumnNames: 'Columns',
-        DataColumnNames: 'Includes',
+        KeyColumnNames: i18n('field_columns'),
+        DataColumnNames: i18n('field_includes'),
+        DataSize: i18n('field_data-size'),
     },
 });
