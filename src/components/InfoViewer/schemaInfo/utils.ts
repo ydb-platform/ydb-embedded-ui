@@ -61,6 +61,7 @@ export function buildVectorIndexInfo(vectorSettings?: VectorSettings): InfoViewe
     const settingsFormatter = createInfoFormatter<TVectorIndexKmeansTreeDescriptionSettingsInner>({
         values: {
             vector_dimension: (v) => (typeof v === 'number' ? formatNumber(v) : v),
+            vector_type: (v) => (typeof v === 'string' ? v.replace(/^VECTOR_TYPE_/, '') : v),
         },
         labels: {
             vector_dimension: i18n('field_vector-dimension'),
