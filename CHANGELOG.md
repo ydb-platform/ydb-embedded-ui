@@ -1,5 +1,19 @@
 # Changelog
 
+## [12.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.1.1...v12.2.0) (2025-09-10)
+
+
+### Features
+
+* vector index parameters on Info tab ([#2862](https://github.com/ydb-platform/ydb-embedded-ui/issues/2862)) ([f1266f7](https://github.com/ydb-platform/ydb-embedded-ui/commit/f1266f7e0457f3179bc8ac825fe245a0b1fd4d41))
+
+
+### Bug Fixes
+
+* add events and conversations api tags ([#2866](https://github.com/ydb-platform/ydb-embedded-ui/issues/2866)) ([89893f0](https://github.com/ydb-platform/ydb-embedded-ui/commit/89893f08478c7cce34fc9dbdf18c09241d32efda))
+* **Cluster:** pass scroll container to render events ([#2865](https://github.com/ydb-platform/ydb-embedded-ui/issues/2865)) ([05ca930](https://github.com/ydb-platform/ydb-embedded-ui/commit/05ca930eb63c60fc0a2cc316fb3399f4bcd19750))
+* vector index fixes ([#2864](https://github.com/ydb-platform/ydb-embedded-ui/issues/2864)) ([a717aca](https://github.com/ydb-platform/ydb-embedded-ui/commit/a717acaf5561ddd80d799c4f7a94771d95f7b4a7))
+
 ## [12.1.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.1.0...v12.1.1) (2025-09-10)
 
 
