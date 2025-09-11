@@ -76,7 +76,7 @@ function formatDatabaseState(state?: State): string {
         case State.STATE_UNSPECIFIED:
             return 'Unspecified';
         case State.PENDING_RESOURCES:
-            return i18n('value_pending');
+            return 'Pending';
         default:
             // For other states, use capitalized version (first letter uppercase, rest lowercase)
             return state.charAt(0).toUpperCase() + state.slice(1).toLowerCase();
