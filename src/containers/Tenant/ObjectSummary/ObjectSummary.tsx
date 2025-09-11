@@ -99,6 +99,7 @@ export function ObjectSummary({
     const {currentData: currentObjectData} = overviewApi.useGetOverviewQuery({
         path,
         database,
+        databaseFullPath,
     });
     const currentSchemaData = currentObjectData?.PathDescription?.Self;
 
@@ -367,7 +368,14 @@ export function ObjectSummary({
     const renderTabContent = () => {
         switch (summaryTab) {
             case TENANT_SUMMARY_TABS_IDS.schema: {
-                return <SchemaViewer type={type} path={path} tenantName={database} />;
+                return (
+                    <SchemaViewer
+                        type={type}
+                        path={path}
+                        database={database}
+                        databaseFullPath={databaseFullPath}
+                    />
+                );
             }
             default: {
                 return renderObjectOverview();
@@ -386,7 +394,7 @@ export function ObjectSummary({
         dispatchCommonInfoVisibilityState(PaneVisibilityActionTypes.clear);
     };
 
-    const relativePath = transformPath(path, database, databaseFullPath);
+    const relativePath = transformPath(path, databaseFullPath);
 
     const renderCommonInfoControls = () => {
         const showPreview = isTableType(type) && !isIndexTableType(subType);
@@ -449,7 +457,7 @@ export function ObjectSummary({
                             collapsedSizes={[100, 0]}
                         >
                             <ObjectTree
-                                tenantName={database}
+                                database={database}
                                 path={path}
                                 databaseFullPath={databaseFullPath}
                             />

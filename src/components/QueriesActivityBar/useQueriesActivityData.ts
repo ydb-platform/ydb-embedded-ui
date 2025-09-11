@@ -23,18 +23,18 @@ interface UseQueriesActivityDataResult {
     areChartsAvailable: boolean | null; // null = loading, boolean = result
 }
 
-export function useQueriesActivityData(tenantName: string): UseQueriesActivityDataResult {
+export function useQueriesActivityData(database: string): UseQueriesActivityDataResult {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const shouldRefresh = autoRefreshInterval;
 
     // Respect GraphShardExists if explicitly false for the specific tenant
-    const graphShardExists = useTypedSelector((state) => selectGraphShardExists(state, tenantName));
+    const graphShardExists = useTypedSelector((state) => selectGraphShardExists(state, database));
     const skipCharts = graphShardExists === false;
 
     const {data: runningQueriesData} = topQueriesApi.useGetRunningQueriesQuery(
         {
-            database: tenantName,
+            database,
             filters: {},
         },
         {pollingInterval: shouldRefresh},
@@ -46,7 +46,7 @@ export function useQueriesActivityData(tenantName: string): UseQueriesActivityDa
         isError: queriesError,
     } = chartApi.useGetChartDataQuery(
         {
-            database: tenantName,
+            database,
             metrics: [{target: 'queries.requests'}],
             timeFrame: QUERIES_TIME_FRAME,
             maxDataPoints: 30,
@@ -56,7 +56,7 @@ export function useQueriesActivityData(tenantName: string): UseQueriesActivityDa
 
     const {data: latencyData} = chartApi.useGetChartDataQuery(
         {
-            database: tenantName,
+            database,
             metrics: [{target: 'queries.latencies.p99'}],
             timeFrame: LATENCIES_TIME_FRAME,
             maxDataPoints: 30,

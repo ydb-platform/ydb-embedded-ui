@@ -1,4 +1,4 @@
-import type {BackendSortParam} from './common';
+import type {BackendSortParam, SchemaPathParam} from './common';
 import type {EFlag} from './enums';
 import type {TPDiskStateInfo} from './pdisk';
 import type {TTabletStateInfo} from './tablet';
@@ -325,11 +325,18 @@ export type NodesSortValue =
 
 export type NodesSort = BackendSortParam<NodesSortValue>;
 
+export interface NodesPathParam {
+    path: string;
+    databaseFullPath: string;
+}
+
 export interface NodesRequestParams {
     /** @deprecated use database instead */
     tenant?: string;
     database?: string;
-    path?: string;
+
+    path?: SchemaPathParam;
+
     node_id?: string | number;
     group_id?: string | number;
     pool?: string;

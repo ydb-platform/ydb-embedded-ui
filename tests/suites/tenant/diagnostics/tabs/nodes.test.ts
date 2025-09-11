@@ -1,6 +1,6 @@
 import {expect, test} from '@playwright/test';
 
-import {tenantName} from '../../../../utils/constants';
+import {database} from '../../../../utils/constants';
 import {DiagnosticsNodesTable} from '../../../paginatedTable/paginatedTable';
 import {TenantPage} from '../../TenantPage';
 import {Diagnostics, DiagnosticsTab} from '../Diagnostics';
@@ -8,8 +8,8 @@ import {Diagnostics, DiagnosticsTab} from '../Diagnostics';
 test.describe('Diagnostics Nodes tab', async () => {
     test('Nodes tab shows nodes table with memory viewer', async ({page}) => {
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
         };
         const tenantPage = new TenantPage(page);

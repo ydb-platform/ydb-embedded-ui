@@ -6,12 +6,12 @@ import {useQueriesActivityData} from './useQueriesActivityData';
 import './QueriesActivityBar.scss';
 
 interface QueriesActivityBarProps {
-    tenantName: string;
+    database: string;
 }
 
-export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
+export function QueriesActivityBar({database}: QueriesActivityBarProps) {
     const {runningQueriesCount, uniqueApplications, uniqueUsers, qps, latency, areChartsAvailable} =
-        useQueriesActivityData(tenantName);
+        useQueriesActivityData(database);
 
     // Show skeleton while determining chart availability
     if (areChartsAvailable === null) {
@@ -32,7 +32,7 @@ export function QueriesActivityBar({tenantName}: QueriesActivityBarProps) {
     // Render expandable mode when charts are available
     return (
         <QueriesActivityExpandable
-            tenantName={tenantName}
+            database={database}
             runningQueriesCount={runningQueriesCount}
             uniqueApplications={uniqueApplications}
             uniqueUsers={uniqueUsers}

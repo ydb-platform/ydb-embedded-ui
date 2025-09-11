@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {isNil} from 'lodash';
+
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import type {Column} from '../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
@@ -24,6 +26,7 @@ interface NodeGroupProps {
     count: number;
     isExpanded: boolean;
     path?: string;
+    databaseFullPath?: string;
     database?: string;
     searchValue: string;
     peerRoleFilter?: NodesPeerRole;
@@ -39,6 +42,7 @@ const NodeGroup = React.memo(function NodeGroup({
     isExpanded,
     path,
     database,
+    databaseFullPath,
     searchValue,
     peerRoleFilter,
     groupByParam,
@@ -60,6 +64,7 @@ const NodeGroup = React.memo(function NodeGroup({
                 table={
                     <NodesTable
                         path={path}
+                        databaseFullPath={databaseFullPath}
                         database={database}
                         searchValue={searchValue}
                         problemFilter={'All'}
@@ -83,6 +88,7 @@ const NodeGroup = React.memo(function NodeGroup({
 interface GroupedNodesComponentProps {
     path?: string;
     database?: string;
+    databaseFullPath?: string;
     scrollContainerRef: React.RefObject<HTMLElement>;
     withPeerRoleFilter?: boolean;
     columns: Column<NodesPreparedEntity>[];
@@ -94,6 +100,7 @@ interface GroupedNodesComponentProps {
 
 export function GroupedNodesComponent({
     path,
+    databaseFullPath,
     database,
     scrollContainerRef,
     withPeerRoleFilter,
@@ -117,9 +124,16 @@ export function GroupedNodesComponent({
         requiredColumnsIds,
     );
 
+    const schemaPathParam = React.useMemo(() => {
+        if (!isNil(path) && !isNil(databaseFullPath)) {
+            return {path, databaseFullPath};
+        }
+        return undefined;
+    }, [path, databaseFullPath]);
+
     const {currentData, isFetching, error} = nodesApi.useGetNodesQuery(
         {
-            path,
+            path: schemaPathParam,
             database,
             filter: searchValue,
             filter_peer_role: peerRoleFilter,
@@ -163,6 +177,7 @@ export function GroupedNodesComponent({
                         count={count}
                         isExpanded={isExpanded}
                         path={path}
+                        databaseFullPath={databaseFullPath}
                         database={database}
                         searchValue={searchValue}
                         peerRoleFilter={peerRoleFilter}

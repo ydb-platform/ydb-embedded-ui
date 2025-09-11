@@ -1,6 +1,6 @@
 import {expect, test} from '@playwright/test';
 
-import {tenantName} from '../../../../utils/constants';
+import {database} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
 import {Diagnostics, DiagnosticsTab} from '../Diagnostics';
 
@@ -19,8 +19,8 @@ test.describe('Operations Tab - Infinite Query', () => {
         await setupOperationsMock(page, {totalOperations: 80});
 
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
         };
 
@@ -63,8 +63,8 @@ test.describe('Operations Tab - Infinite Query', () => {
         await setupOperationsMock(page, {totalOperations: 80});
 
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
         };
 
@@ -112,8 +112,8 @@ test.describe('Operations Tab - Infinite Query', () => {
         await setupEmptyOperationsMock(page);
 
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
         };
 
@@ -141,8 +141,8 @@ test.describe('Operations Tab - Infinite Query', () => {
         await setupOperation403Mock(page);
 
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
         };
 
@@ -168,8 +168,8 @@ test.describe('Operations Tab - Infinite Query', () => {
         await setupOperationNetworkErrorMock(page);
 
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
         };
 
@@ -199,8 +199,8 @@ test.describe('Operations Tab - Infinite Query', () => {
         await setupMalformedOperationsMock(page);
 
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
         };
 
@@ -235,8 +235,8 @@ test.describe('Operations Tab - Infinite Query', () => {
         await setupPartialMalformedOperationsMock(page);
 
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
         };
 
@@ -290,8 +290,8 @@ test.describe('Operations Tab - Infinite Query', () => {
         await setupOperationsMock(page, {totalOperations: 80});
 
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
         };
 

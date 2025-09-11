@@ -16,7 +16,7 @@ import './HealthcheckPreview.scss';
 const b = cn('ydb-healthcheck-preview');
 
 interface HealthcheckPreviewProps {
-    tenantName: string;
+    database: string;
     active?: boolean;
 }
 
@@ -29,7 +29,7 @@ const checkResultToAlertTheme: Record<SelfCheckResult, AlertProps['theme']> = {
 };
 
 export function HealthcheckPreview(props: HealthcheckPreviewProps) {
-    const {tenantName} = props;
+    const {database} = props;
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {handleShowHealthcheckChange} = useTenantQueryParams();
@@ -39,7 +39,7 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
         isFetching,
         error,
     } = healthcheckApi.useGetHealthcheckInfoQuery(
-        {database: tenantName},
+        {database},
         {
             pollingInterval: autoRefreshInterval,
         },

@@ -11,16 +11,19 @@ export const viewSchemaApi = api.injectEndpoints({
             queryFn: async ({
                 database,
                 path,
+                databaseFullPath,
                 timeout,
             }: {
                 database: string;
                 path: string;
+                databaseFullPath: string;
                 timeout?: number;
             }) => {
                 try {
+                    const relativePath = path.replace(databaseFullPath, '');
                     const response = await window.api.viewer.sendQuery(
                         {
-                            query: createViewSchemaQuery(path),
+                            query: createViewSchemaQuery(relativePath),
                             database,
                             action: 'execute-scan',
                             timeout,

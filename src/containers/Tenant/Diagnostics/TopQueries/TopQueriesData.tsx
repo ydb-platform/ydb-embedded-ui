@@ -38,7 +38,7 @@ import {generateShareableUrl} from './utils/generateShareableUrl';
 const b = cn('kv-top-queries');
 
 interface TopQueriesDataProps {
-    tenantName: string;
+    database: string;
     timeFrame: TimeFrame;
     renderQueryModeControl: () => React.ReactNode;
     handleTimeFrameChange: (value: string[]) => void;
@@ -47,7 +47,7 @@ interface TopQueriesDataProps {
 }
 
 export const TopQueriesData = ({
-    tenantName,
+    database,
     timeFrame,
     renderQueryModeControl,
     handleTimeFrameChange,
@@ -80,7 +80,7 @@ export const TopQueriesData = ({
     const {tableSort, handleTableSort, backendSort} = useTopQueriesSort();
     const {currentData, isFetching, isLoading, error} = topQueriesApi.useGetTopQueriesQuery(
         {
-            database: tenantName,
+            database,
             filters,
             sortOrder: backendSort,
             timeFrame,

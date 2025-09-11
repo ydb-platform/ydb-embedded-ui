@@ -30,17 +30,17 @@ import {useDispatchTreeKey, useTreeKey} from '../UpdateTreeContext';
 import {isDomain} from '../transformPath';
 
 interface SchemaTreeProps {
-    rootPath: string;
     rootName: string;
     rootType?: EPathType;
     currentPath?: string;
     onActivePathUpdate: (path: string) => void;
     databaseFullPath: string;
+    database: string;
 }
 
 export function SchemaTree(props: SchemaTreeProps) {
     const createDirectoryFeatureAvailable = useCreateDirectoryFeatureAvailable();
-    const {rootPath, rootName, rootType, currentPath, onActivePathUpdate, databaseFullPath} = props;
+    const {rootName, rootType, currentPath, onActivePathUpdate, databaseFullPath, database} = props;
     const dispatch = useTypedDispatch();
     const input = useTypedSelector(selectUserInput);
     const isDirty = useTypedSelector(selectIsDirty);
@@ -56,7 +56,7 @@ export function SchemaTree(props: SchemaTreeProps) {
     const setSchemaTreeKey = useDispatchTreeKey();
     const schemaTreeKey = useTreeKey();
 
-    const rootNodeType = isDomain(rootPath, rootType)
+    const rootNodeType = isDomain(databaseFullPath, rootType)
         ? 'database'
         : mapPathTypeToNavigationTreeType(rootType);
 
@@ -65,7 +65,7 @@ export function SchemaTree(props: SchemaTreeProps) {
         do {
             const promise = dispatch(
                 schemaApi.endpoints.getSchema.initiate(
-                    {path, database: rootPath},
+                    {path, database, databaseFullPath},
                     {forceRefetch: true},
                 ),
             );
@@ -106,13 +106,14 @@ export function SchemaTree(props: SchemaTreeProps) {
     };
     React.useEffect(() => {
         // if the cached path is not in the current tree, show root
-        if (!currentPath?.startsWith(rootPath)) {
-            onActivePathUpdate(rootPath);
+        if (!currentPath?.startsWith(databaseFullPath)) {
+            onActivePathUpdate(databaseFullPath);
         }
-    }, [currentPath, onActivePathUpdate, rootPath]);
+    }, [currentPath, onActivePathUpdate, databaseFullPath]);
 
     const handleSuccessSubmit = (relativePath: string) => {
-        const newPath = `${parentPath}/${relativePath}`;
+        const prefix = databaseFullPath === parentPath ? '' : `${databaseFullPath}/`;
+        const newPath = `${prefix}${parentPath}/${relativePath}`;
         onActivePathUpdate(newPath);
         setSchemaTreeKey(newPath);
     };
@@ -138,9 +139,9 @@ export function SchemaTree(props: SchemaTreeProps) {
                 getConnectToDBDialog,
                 schemaData: actionsSchemaData,
                 isSchemaDataLoading: isActionsDataFetching,
-                databaseFullPath,
             },
-            rootPath,
+            databaseFullPath,
+            database,
         );
     }, [
         actionsSchemaData,
@@ -150,8 +151,8 @@ export function SchemaTree(props: SchemaTreeProps) {
         isActionsDataFetching,
         isDirty,
         onActivePathUpdate,
-        rootPath,
         databaseFullPath,
+        database,
     ]);
 
     return (
@@ -159,14 +160,15 @@ export function SchemaTree(props: SchemaTreeProps) {
             <CreateDirectoryDialog
                 onClose={handleCloseDialog}
                 open={createDirectoryOpen}
-                database={rootPath}
+                database={database}
+                databaseFullPath={databaseFullPath}
                 parentPath={parentPath}
                 onSuccess={handleSuccessSubmit}
             />
             <NavigationTree<DropdownItem, TreeNodeMeta>
                 key={schemaTreeKey}
                 rootState={{
-                    path: rootPath,
+                    path: databaseFullPath,
                     name: rootName,
                     type: rootNodeType,
                     collapsed: false,
@@ -176,7 +178,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                 onActionsOpenToggle={({path, type, isOpen}) => {
                     const pathType = nodeTableTypeToPathType[type];
                     if (isOpen && pathType) {
-                        getTableSchemaDataQuery({path, tenantName: rootPath, type: pathType});
+                        getTableSchemaDataQuery({path, database, type: pathType, databaseFullPath});
                     }
 
                     return [];

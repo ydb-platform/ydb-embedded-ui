@@ -15,6 +15,7 @@ const CHANGE_OWNER_DIALOG = 'change-owner-dialog';
 interface GetChangeOwnerDialogProps {
     path: string;
     database: string;
+    databaseFullPath: string;
 }
 
 export async function getChangeOwnerDialog({
@@ -29,7 +30,7 @@ export async function getChangeOwnerDialog({
 }
 
 const ChangeOwnerDialogNiceModal = NiceModal.create(
-    ({path, database}: GetChangeOwnerDialogProps) => {
+    ({path, database, databaseFullPath}: GetChangeOwnerDialogProps) => {
         const modal = NiceModal.useModal();
 
         const handleClose = () => {
@@ -46,6 +47,7 @@ const ChangeOwnerDialogNiceModal = NiceModal.create(
                 open={modal.visible}
                 path={path}
                 database={database}
+                databaseFullPath={databaseFullPath}
             />
         );
     },
@@ -58,7 +60,13 @@ interface ChangeOwnerDialogProps extends GetChangeOwnerDialogProps {
     onClose: () => void;
 }
 
-function ChangeOwnerDialog({open, onClose, path, database}: ChangeOwnerDialogProps) {
+function ChangeOwnerDialog({
+    open,
+    onClose,
+    path,
+    database,
+    databaseFullPath,
+}: ChangeOwnerDialogProps) {
     const [newOwner, setNewOwner] = React.useState('');
     const [requestErrorMessage, setRequestErrorMessage] = React.useState('');
     const [updateOwner, updateOwnerResponse] = schemaAclApi.useUpdateAccessMutation();
@@ -69,7 +77,13 @@ function ChangeOwnerDialog({open, onClose, path, database}: ChangeOwnerDialogPro
         setRequestErrorMessage('');
     };
     const onApply = () => {
-        updateOwner({path, database, dialect, rights: {ChangeOwnership: {Subject: newOwner}}})
+        updateOwner({
+            path,
+            database,
+            databaseFullPath,
+            dialect,
+            rights: {ChangeOwnership: {Subject: newOwner}},
+        })
             .unwrap()
             .then(() => {
                 onClose();

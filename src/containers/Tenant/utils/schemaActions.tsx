@@ -48,11 +48,10 @@ interface ActionsAdditionalParams {
     getConnectToDBDialog?: (params: SnippetParams) => Promise<boolean>;
     schemaData?: SchemaData[];
     isSchemaDataLoading?: boolean;
-    databaseFullPath: string;
 }
 
 interface BindActionParams {
-    tenantName: string;
+    database: string;
     type: NavigationTreeNodeType;
     path: string;
     databaseFullPath: string;
@@ -98,7 +97,7 @@ const bindActions = (
                   showCreateDirectoryDialog(params.relativePath);
               }
             : undefined,
-        getConnectToDBDialog: () => getConnectToDBDialog?.({database: params.tenantName}),
+        getConnectToDBDialog: () => getConnectToDBDialog?.({database: params.database}),
         createTable: inputQuery(createTableTemplate),
         createColumnTable: inputQuery(createColumnTableTemplate),
         createAsyncReplication: inputQuery(createAsyncReplicationTemplate),
@@ -162,16 +161,21 @@ const getActionWithLoader = ({text, action, isLoading}: ActionConfig) => ({
 });
 
 export const getActions =
-    (dispatch: AppDispatch, additionalEffects: ActionsAdditionalParams, rootPath = '') =>
+    (
+        dispatch: AppDispatch,
+        additionalEffects: ActionsAdditionalParams,
+        rootPath = '',
+        database: string,
+    ) =>
     (path: string, type: NavigationTreeNodeType) => {
-        const relativePath = transformPath(path, rootPath, additionalEffects.databaseFullPath);
+        const relativePath = transformPath(path, rootPath);
         const actions = bindActions(
             {
                 path,
                 relativePath,
-                tenantName: rootPath,
+                database,
                 type,
-                databaseFullPath: additionalEffects.databaseFullPath,
+                databaseFullPath: rootPath,
             },
             dispatch,
             additionalEffects,

@@ -8,11 +8,12 @@ import {prepareTopicSchemaInfo} from '../utils';
 interface TopicInfoProps {
     path: string;
     database: string;
+    databaseFullPath: string;
     data?: TEvDescribeSchemeResult;
 }
 
 /** Displays overview for PersQueueGroup EPathType */
-export const TopicInfo = ({data, path, database}: TopicInfoProps) => {
+export const TopicInfo = ({data, path, database, databaseFullPath}: TopicInfoProps) => {
     const entityName = getEntityName(data?.PathDescription);
 
     if (!data) {
@@ -25,7 +26,7 @@ export const TopicInfo = ({data, path, database}: TopicInfoProps) => {
             return null;
         }
 
-        return <TopicStats path={path} database={database} />;
+        return <TopicStats path={path} database={database} databaseFullPath={databaseFullPath} />;
     };
 
     return (

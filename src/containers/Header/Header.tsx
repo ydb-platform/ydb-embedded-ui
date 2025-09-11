@@ -86,7 +86,7 @@ function Header() {
         database && isDatabasePage && (isEditDBAvailable || isDeleteDBAvailable);
 
     const params = shouldRequestTenantData
-        ? {path: database, clusterName, isMetaDatabasesAvailable}
+        ? {database, clusterName, isMetaDatabasesAvailable}
         : skipToken;
 
     const {currentData: databaseData, isLoading: isDatabaseDataLoading} =

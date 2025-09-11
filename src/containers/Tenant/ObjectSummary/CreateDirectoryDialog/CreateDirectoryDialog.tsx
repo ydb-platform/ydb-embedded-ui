@@ -17,6 +17,7 @@ interface CreateDirectoryDialogProps {
     open: boolean;
     onClose: VoidFunction;
     database: string;
+    databaseFullPath: string;
     parentPath: string;
     onSuccess: (value: string) => void;
 }
@@ -35,12 +36,14 @@ export function CreateDirectoryDialog({
     open,
     onClose,
     database,
+    databaseFullPath,
     parentPath,
     onSuccess,
 }: CreateDirectoryDialogProps) {
     const [validationError, setValidationError] = React.useState('');
     const [relativePath, setRelativePath] = React.useState('');
     const [create, response] = schemaApi.useCreateDirectoryMutation();
+    const inputRef = React.useRef<HTMLInputElement>(null);
 
     const resetErrors = () => {
         setValidationError('');
@@ -60,8 +63,10 @@ export function CreateDirectoryDialog({
 
     const handleSubmit = () => {
         const path = `${parentPath}/${relativePath}`;
+
         create({
             database,
+            databaseFullPath,
             path,
         })
             .unwrap()
@@ -72,7 +77,7 @@ export function CreateDirectoryDialog({
     };
 
     return (
-        <Dialog open={open} onClose={handleClose} size="s">
+        <Dialog open={open} onClose={handleClose} size="s" initialFocus={inputRef}>
             <Dialog.Header caption={i18n('schema.tree.dialog.header')} />
             <form
                 onSubmit={(e) => {
@@ -93,6 +98,7 @@ export function CreateDirectoryDialog({
                     </label>
                     <div className={b('input-wrapper')}>
                         <TextInput
+                            controlRef={inputRef}
                             placeholder={i18n('schema.tree.dialog.placeholder')}
                             value={relativePath}
                             onUpdate={handleUpdate}

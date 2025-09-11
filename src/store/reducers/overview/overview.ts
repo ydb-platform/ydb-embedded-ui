@@ -4,13 +4,18 @@ export const overviewApi = api.injectEndpoints({
     endpoints: (build) => ({
         getOverview: build.query({
             queryFn: async (
-                {path, database, timeout}: {path: string; database: string; timeout?: number},
+                {
+                    path,
+                    database,
+                    timeout,
+                    databaseFullPath,
+                }: {path: string; database: string; timeout?: number; databaseFullPath: string},
                 {signal},
             ) => {
                 try {
                     const data = await window.api.viewer.getDescribe(
                         {
-                            path,
+                            path: {path, databaseFullPath},
                             database,
                             timeout,
                         },

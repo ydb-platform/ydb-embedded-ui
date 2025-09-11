@@ -19,12 +19,12 @@ import {block} from './shared';
 import './AccessRights.scss';
 
 export function AccessRights() {
-    const {path, database} = useCurrentSchema();
+    const {path, database, databaseFullPath} = useCurrentSchema();
     const editable = useEditAccessAvailable();
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const dialect = useAclSyntax();
     const {isFetching, currentData, error} = schemaAclApi.useGetSchemaAclQuery(
-        {path, database, dialect},
+        {path, database, dialect, databaseFullPath},
         {
             pollingInterval: autoRefreshInterval,
         },

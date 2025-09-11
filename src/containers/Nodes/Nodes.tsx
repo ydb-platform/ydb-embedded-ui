@@ -30,6 +30,7 @@ import './Nodes.scss';
 export interface NodesProps {
     path?: string;
     database?: string;
+    databaseFullPath?: string;
     scrollContainerRef: React.RefObject<HTMLElement>;
     additionalNodesProps?: AdditionalNodesProps;
     withPeerRoleFilter?: boolean;
@@ -43,6 +44,7 @@ export interface NodesProps {
 export function Nodes({
     path,
     database,
+    databaseFullPath,
     scrollContainerRef,
     additionalNodesProps,
     withPeerRoleFilter,
@@ -96,6 +98,7 @@ export function Nodes({
     return (
         <PaginatedNodes
             path={path}
+            databaseFullPath={databaseFullPath}
             database={database}
             scrollContainerRef={scrollContainerRef}
             withPeerRoleFilter={withPeerRoleFilter}

@@ -18,6 +18,7 @@ const REVOKE_ALL_RIGHTS_DIALOG = 'revoke-all-rights-dialog';
 interface GetRevokeAllRightsDialogProps {
     path: string;
     database: string;
+    databaseFullPath: string;
     subject: string;
 }
 
@@ -35,7 +36,7 @@ export async function getRevokeAllRightsDialog({
 }
 
 const RevokeAllRightsDialogNiceModal = NiceModal.create(
-    ({path, database, subject}: GetRevokeAllRightsDialogProps) => {
+    ({path, database, subject, databaseFullPath}: GetRevokeAllRightsDialogProps) => {
         const modal = NiceModal.useModal();
 
         const handleClose = () => {
@@ -53,6 +54,7 @@ const RevokeAllRightsDialogNiceModal = NiceModal.create(
                 path={path}
                 database={database}
                 subject={subject}
+                databaseFullPath={databaseFullPath}
             />
         );
     },
@@ -70,11 +72,12 @@ function RevokeAllRightsDialog({
     onClose,
     path,
     database,
+    databaseFullPath,
     subject,
 }: RevokeAllRightsDialogProps) {
     const dialect = useAclSyntax();
     const subjectExplicitRights = useTypedSelector((state) =>
-        selectSubjectExplicitRights(state, subject, path, database, dialect),
+        selectSubjectExplicitRights(state, subject, path, database, databaseFullPath, dialect),
     );
 
     const [requestErrorMessage, setRequestErrorMessage] = React.useState('');
@@ -84,6 +87,7 @@ function RevokeAllRightsDialog({
         removeAccess({
             path,
             database,
+            databaseFullPath,
             dialect,
             rights: {
                 RemoveAccess: [

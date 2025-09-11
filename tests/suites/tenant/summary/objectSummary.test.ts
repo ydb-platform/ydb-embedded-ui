@@ -4,10 +4,10 @@ import {wait} from '../../../../src/utils';
 import {getClipboardContent} from '../../../utils/clipboard';
 import {
     backend,
+    database,
     dsStoragePoolsTableName,
     dsVslotsSchema,
     dsVslotsTableName,
-    tenantName,
 } from '../../../utils/constants';
 import {TenantPage} from '../TenantPage';
 import {QueryEditor} from '../queryEditor/models/QueryEditor';
@@ -19,7 +19,7 @@ test.describe('Object Summary', async () => {
     test.beforeEach(async ({page}) => {
         const pageQueryParams = {
             schema: dsVslotsSchema,
-            database: tenantName,
+            database,
             general: 'query',
         };
         const tenantPage = new TenantPage(page);
@@ -161,7 +161,7 @@ test.describe('Object Summary', async () => {
     test('Copy path copies correct path to clipboard', async ({page}) => {
         const pageQueryParams = {
             schema: dsVslotsSchema,
-            database: tenantName,
+            database,
             general: 'query',
         };
         const tenantPage = new TenantPage(page);
@@ -187,8 +187,8 @@ test.describe('Object Summary', async () => {
 
     test('Create directory in local node', async ({page}) => {
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             general: 'query',
         };
         const tenantPage = new TenantPage(page);
@@ -213,8 +213,8 @@ test.describe('Object Summary', async () => {
 
     test('Refresh button updates tree view after creating table', async ({page}) => {
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             general: 'query',
         };
         const tenantPage = new TenantPage(page);

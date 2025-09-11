@@ -1,21 +1,16 @@
-import {QUERY_TECHNICAL_MARK, TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
+import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
 import {isQueryErrorResponse, parseQueryAPIResponse} from '../../../../utils/query';
+import {createPartitionStatsQuery} from '../../../../utils/shardsQueryBuilders';
 import {api} from '../../api';
 
-function createShardQuery(path: string, database: string) {
-    const pathSelect = `CAST(SUBSTRING(CAST(Path AS String), ${database.length + 1}) AS Utf8) AS RelativePath`;
-    return `${QUERY_TECHNICAL_MARK}
-SELECT
-    ${pathSelect},
-    Path,
-    TabletId,
-    CPUCores,
-FROM \`.sys/partition_stats\`
-WHERE
-    Path='${path}'
-    OR Path LIKE '${path}/%'
-ORDER BY CPUCores DESC
-LIMIT ${TENANT_OVERVIEW_TABLES_LIMIT}`;
+function createShardQuery(path: string, databaseFullPath: string) {
+    return createPartitionStatsQuery({
+        databaseFullPath,
+        path,
+        selectFields: ['Path', 'TabletId', 'CPUCores'],
+        sortOrder: [{columnId: 'CPUCores', order: -1}],
+        limit: TENANT_OVERVIEW_TABLES_LIMIT,
+    });
 }
 
 const queryAction = 'execute-scan';
@@ -26,9 +21,9 @@ export const topShardsApi = api.injectEndpoints({
             queryFn: async (
                 {
                     database,
-                    path = '',
+                    path,
                     databaseFullPath,
-                }: {database: string; path?: string; databaseFullPath: string},
+                }: {database: string; path: string; databaseFullPath: string},
                 {signal},
             ) => {
                 try {

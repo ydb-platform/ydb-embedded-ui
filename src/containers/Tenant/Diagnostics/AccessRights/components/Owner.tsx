@@ -13,9 +13,11 @@ import {getChangeOwnerDialog} from './ChangeOwnerDialog';
 
 export function Owner() {
     const editable = useEditAccessAvailable();
-    const {path, database} = useCurrentSchema();
+    const {path, database, databaseFullPath} = useCurrentSchema();
     const dialect = useAclSyntax();
-    const owner = useTypedSelector((state) => selectSchemaOwner(state, path, database, dialect));
+    const owner = useTypedSelector((state) =>
+        selectSchemaOwner(state, path, database, databaseFullPath, dialect),
+    );
 
     if (!owner) {
         return null;
@@ -43,7 +45,9 @@ export function Owner() {
                             <ActionTooltip title={i18n('action_change-owner')}>
                                 <Button
                                     view="flat-secondary"
-                                    onClick={() => getChangeOwnerDialog({path, database})}
+                                    onClick={() =>
+                                        getChangeOwnerDialog({path, database, databaseFullPath})
+                                    }
                                 >
                                     <Icon data={Pencil} />
                                 </Button>
