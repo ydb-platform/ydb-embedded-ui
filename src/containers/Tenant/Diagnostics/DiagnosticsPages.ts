@@ -5,6 +5,7 @@ import {StringParam, useQueryParams} from 'use-query-params';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import type {TenantDiagnosticsTab} from '../../../store/reducers/tenant/types';
 import {EPathSubType, EPathType} from '../../../types/api/schema';
+import type {ETenantType} from '../../../types/api/tenant';
 import type {TenantQuery} from '../TenantPages';
 import {TenantTabsGroups, getTenantPath} from '../TenantPages';
 import {isDatabaseEntityType, isTopicEntityType} from '../utils/schema';
@@ -13,6 +14,16 @@ type Page = {
     id: TenantDiagnosticsTab;
     title: string;
 };
+
+interface GetPagesOptions {
+    hasFeatureFlags?: boolean;
+    hasTopicData?: boolean;
+    isTopLevel?: boolean;
+    hasBackups?: boolean;
+    hasConfigs?: boolean;
+    hasAccess?: boolean;
+    databaseType?: ETenantType;
+}
 
 const overview = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.overview,
@@ -118,6 +129,16 @@ const DATABASE_PAGES = [
     backups,
 ];
 
+const SERVERLESS_DATABASE_PAGES = [
+    overview,
+    topQueries,
+    topShards,
+    tablets,
+    describe,
+    configs,
+    operations,
+];
+
 const TABLE_PAGES = [overview, schema, topShards, nodes, graph, tablets, hotKeys, describe, access];
 const COLUMN_TABLE_PAGES = [overview, schema, topShards, nodes, tablets, describe, access];
 
@@ -168,41 +189,52 @@ const pathSubTypeToPages: Record<EPathSubType, Page[] | undefined> = {
     [EPathSubType.EPathSubTypeEmpty]: undefined,
 };
 
+function computeInitialPages(type?: EPathType, subType?: EPathSubType) {
+    const subTypePages = subType ? pathSubTypeToPages[subType] : undefined;
+    const typePages = type ? pathTypeToPages[type] : undefined;
+    return subTypePages || typePages || DIR_PAGES;
+}
+
+function getDatabasePages(databaseType?: ETenantType) {
+    return databaseType === 'Serverless' ? SERVERLESS_DATABASE_PAGES : DATABASE_PAGES;
+}
+
+function applyFilters(pages: Page[], type?: EPathType, options: GetPagesOptions = {}) {
+    let result = pages;
+
+    if (isTopicEntityType(type) && !options.hasTopicData) {
+        result = result.filter((p) => p.id !== TENANT_DIAGNOSTICS_TABS_IDS.topicData);
+    }
+
+    const removals: TenantDiagnosticsTab[] = [];
+    if (!options.hasBackups) {
+        removals.push(TENANT_DIAGNOSTICS_TABS_IDS.backups);
+    }
+    if (!options.hasConfigs) {
+        removals.push(TENANT_DIAGNOSTICS_TABS_IDS.configs);
+    }
+    if (!options.hasAccess) {
+        removals.push(TENANT_DIAGNOSTICS_TABS_IDS.access);
+    }
+
+    return result.filter((p) => !removals.includes(p.id));
+}
+
 export const getPagesByType = (
     type?: EPathType,
     subType?: EPathSubType,
-    options?: {
-        hasFeatureFlags?: boolean;
-        hasTopicData?: boolean;
-        isTopLevel?: boolean;
-        hasBackups?: boolean;
-        hasConfigs?: boolean;
-        hasAccess?: boolean;
-    },
+    options?: GetPagesOptions,
 ) => {
-    const subTypePages = subType ? pathSubTypeToPages[subType] : undefined;
-    const typePages = type ? pathTypeToPages[type] : undefined;
-    let pages = subTypePages || typePages || DIR_PAGES;
+    const base = computeInitialPages(type, subType);
+    const dbContext = isDatabaseEntityType(type) || options?.isTopLevel;
+    const seeded = dbContext ? getDatabasePages(options?.databaseType) : base;
 
-    if (isTopicEntityType(type) && !options?.hasTopicData) {
-        pages = pages?.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.topicData);
+    let withFlags = seeded;
+    if (!options?.hasFeatureFlags) {
+        withFlags = seeded.filter((p) => p.id !== TENANT_DIAGNOSTICS_TABS_IDS.configs);
     }
-    if (isDatabaseEntityType(type) || options?.isTopLevel) {
-        pages = DATABASE_PAGES;
-        if (!options?.hasFeatureFlags) {
-            pages = pages.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.configs);
-        }
-    }
-    if (!options?.hasBackups) {
-        pages = pages.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.backups);
-    }
-    if (!options?.hasConfigs) {
-        pages = pages.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.configs);
-    }
-    if (!options?.hasAccess) {
-        pages = pages.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.access);
-    }
-    return pages;
+
+    return applyFilters(withFlags, type, options);
 };
 
 export const useDiagnosticsPageLinkGetter = () => {

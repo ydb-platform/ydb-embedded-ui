@@ -37,7 +37,10 @@ export function NodesComponent({
     selectedColumnsKey,
     groupByParams,
 }: NodesComponentProps) {
-    const {searchValue, uptimeFilter, peerRoleFilter} = useNodesPageQueryParams(groupByParams);
+    const {searchValue, uptimeFilter, peerRoleFilter} = useNodesPageQueryParams(
+        groupByParams,
+        withPeerRoleFilter,
+    );
     const {problemFilter} = useProblemFilter();
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
 

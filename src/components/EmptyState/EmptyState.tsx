@@ -1,4 +1,4 @@
-import {Icon} from '@gravity-ui/uikit';
+import {Flex, Icon, Text} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 
@@ -8,20 +8,22 @@ import './EmptyState.scss';
 
 const block = cn('empty-state');
 
-const sizes = {
+export const EMPTY_STATE_SIZES = {
     xs: 100,
     s: 150,
-    m: 250,
+    m: 230,
     l: 350,
 };
 
 export interface EmptyStateProps {
-    title: string;
+    title: React.ReactNode;
     image?: React.ReactNode;
     description?: React.ReactNode;
     actions?: React.ReactNode[];
-    size?: keyof typeof sizes;
+    size?: keyof typeof EMPTY_STATE_SIZES;
     position?: 'left' | 'center';
+    pageTitle?: string;
+    className?: string;
 }
 
 export const EmptyState = ({
@@ -31,21 +33,33 @@ export const EmptyState = ({
     actions,
     size = 'm',
     position = 'center',
+    pageTitle,
+    className,
 }: EmptyStateProps) => {
     return (
-        <div className={block({size})}>
+        <div className={block({size}, className)}>
+            {pageTitle ? <Text variant="header-1">{pageTitle}</Text> : null}
             <div className={block('wrapper', {size, position})}>
                 <div className={block('image')}>
                     {image ? (
                         image
                     ) : (
-                        <Icon data={emptyStateIcon} width={sizes[size]} height={sizes[size]} />
+                        <Icon
+                            data={emptyStateIcon}
+                            width={EMPTY_STATE_SIZES[size]}
+                            height={EMPTY_STATE_SIZES[size]}
+                        />
                     )}
                 </div>
-
-                <div className={block('title', {size})}>{title}</div>
-                <div className={block('description')}>{description}</div>
-                <div className={block('actions')}>{actions}</div>
+                <Flex gap={5} className={block('content')} direction="column">
+                    <Flex gap={3} direction="column">
+                        <div className={block('title', {size})}>{title}</div>
+                        {description ? (
+                            <div className={block('description')}>{description}</div>
+                        ) : null}
+                    </Flex>
+                    {actions ? <Flex gap={2}>{actions}</Flex> : null}
+                </Flex>
             </div>
         </div>
     );

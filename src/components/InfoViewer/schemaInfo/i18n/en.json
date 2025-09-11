@@ -1,0 +1,12 @@
+{
+  "title_vector-index": "Vector Index",
+  "field_clusters": "Clusters",
+  "field_levels": "Levels",
+  "field_vector-dimension": "Vector Dimension",
+  "field_vector-type": "Vector Type",
+  "field_metric": "Metric",
+  "field_columns": "Columns",
+  "field_includes": "Includes",
+  "field_data-size": "Data Size",
+  "alert_no-entity-data": "No {{entity}} data"
+}

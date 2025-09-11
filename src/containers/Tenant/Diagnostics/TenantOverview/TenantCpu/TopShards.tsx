@@ -10,15 +10,23 @@ const columnsIds: TopShardsColumnId[] = ['TabletId', 'Path', 'CPUCores'];
 interface TopShardsProps {
     tenantName: string;
     path: string;
+    databaseFullPath?: string;
 }
 
-export const TopShards = ({tenantName, path}: TopShardsProps) => {
+export const TopShards = ({tenantName, path, databaseFullPath = tenantName}: TopShardsProps) => {
     const ShardsTable = useComponent('ShardsTable');
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
+    let normalizedPath = path;
+    if (tenantName !== databaseFullPath) {
+        //tenantName may be database full path or database id. If it is database id, we must remove it from object's path and add database full path instead
+        const shrinkedPath = path.startsWith(tenantName) ? path.slice(tenantName.length) : path;
+        normalizedPath = databaseFullPath + shrinkedPath;
+    }
+
     const {currentData, isFetching, error} = topShardsApi.useGetTopShardsQuery(
-        {database: tenantName, path},
+        {database: tenantName, path: normalizedPath, databaseFullPath},
         {pollingInterval: autoRefreshInterval},
     );
 

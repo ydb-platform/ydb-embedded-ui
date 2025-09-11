@@ -3,10 +3,11 @@ import {isQueryErrorResponse, parseQueryAPIResponse} from '../../../../utils/que
 import {api} from '../../api';
 
 function createShardQuery(path: string, database: string) {
-    const pathSelect = `CAST(SUBSTRING(CAST(Path AS String), ${database.length}) AS Utf8) AS RelativePath`;
+    const pathSelect = `CAST(SUBSTRING(CAST(Path AS String), ${database.length + 1}) AS Utf8) AS RelativePath`;
     return `${QUERY_TECHNICAL_MARK}
 SELECT
     ${pathSelect},
+    Path,
     TabletId,
     CPUCores,
 FROM \`.sys/partition_stats\`
@@ -22,11 +23,18 @@ const queryAction = 'execute-scan';
 export const topShardsApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getTopShards: builder.query({
-            queryFn: async ({database, path = ''}: {database: string; path?: string}, {signal}) => {
+            queryFn: async (
+                {
+                    database,
+                    path = '',
+                    databaseFullPath,
+                }: {database: string; path?: string; databaseFullPath: string},
+                {signal},
+            ) => {
                 try {
                     const response = await window.api.viewer.sendQuery(
                         {
-                            query: createShardQuery(path, database),
+                            query: createShardQuery(path, databaseFullPath),
                             database,
                             action: queryAction,
                             internal_call: true,

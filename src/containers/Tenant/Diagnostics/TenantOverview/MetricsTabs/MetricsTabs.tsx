@@ -1,5 +1,7 @@
+import {useMemo} from 'react';
+
 import {Flex} from '@gravity-ui/uikit';
-import {Link, useLocation} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 
 import {parseQuery} from '../../../../../routes';
 import {TENANT_METRICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
@@ -9,18 +11,17 @@ import type {
     TenantPoolsStats,
     TenantStorageStats,
 } from '../../../../../store/reducers/tenants/utils';
+import type {ETenantType} from '../../../../../types/api/tenant';
 import {cn} from '../../../../../utils/cn';
 import {SHOW_NETWORK_UTILIZATION} from '../../../../../utils/constants';
-import {useSetting, useTypedSelector} from '../../../../../utils/hooks';
+import {useSetting} from '../../../../../utils/hooks';
 import {calculateMetricAggregates} from '../../../../../utils/metrics';
-import {
-    formatCoresLegend,
-    formatSpeedLegend,
-    formatStorageLegend,
-} from '../../../../../utils/metrics/formatMetricLegend';
+// no direct legend formatters needed here – handled in subcomponents
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
-import {TabCard} from '../TabCard/TabCard';
-import i18n from '../i18n';
+
+import {CommonMetricsTabs} from './CommonMetricsTabs';
+import {DedicatedMetricsTabs} from './DedicatedMetricsTabs';
+import {ServerlessPlaceholderTabs} from './ServerlessPlaceholderTabs';
 
 import './MetricsTabs.scss';
 
@@ -33,6 +34,8 @@ interface MetricsTabsProps {
     tabletStorageStats?: TenantStorageStats[];
     networkStats?: TenantMetricStats[];
     storageGroupsCount?: number;
+    databaseType?: ETenantType;
+    activeTab: TenantMetricsTab;
 }
 
 export function MetricsTabs({
@@ -42,9 +45,10 @@ export function MetricsTabs({
     tabletStorageStats,
     networkStats,
     storageGroupsCount,
+    databaseType,
+    activeTab,
 }: MetricsTabsProps) {
     const location = useLocation();
-    const {metricsTab} = useTypedSelector((state) => state.tenant);
     const queryParams = parseQuery(location);
 
     const tabLinks: Record<TenantMetricsTab, string> = {
@@ -67,93 +71,60 @@ export function MetricsTabs({
     };
 
     // Use only pools that directly indicate resources available to perform user queries
-    const cpuPools = (poolsCpuStats || []).filter(
-        (pool) => !(pool.name === 'Batch' || pool.name === 'IO'),
+    const cpuPools = useMemo(
+        () =>
+            (poolsCpuStats || []).filter((pool) => !(pool.name === 'Batch' || pool.name === 'IO')),
+        [poolsCpuStats],
     );
-    const cpuMetrics = calculateMetricAggregates(cpuPools);
+    const cpuMetrics = useMemo(() => calculateMetricAggregates(cpuPools), [cpuPools]);
 
     // Calculate storage metrics using utility
-    const storageStats = tabletStorageStats || blobStorageStats || [];
-    const storageMetrics = calculateMetricAggregates(storageStats);
+    const storageStats = useMemo(
+        () => tabletStorageStats || blobStorageStats || [],
+        [tabletStorageStats, blobStorageStats],
+    );
+    const storageMetrics = useMemo(() => calculateMetricAggregates(storageStats), [storageStats]);
 
     // Calculate memory metrics using utility
-    const memoryMetrics = calculateMetricAggregates(memoryStats);
+    const memoryMetrics = useMemo(() => calculateMetricAggregates(memoryStats), [memoryStats]);
 
     // Calculate network metrics using utility
     const [showNetworkUtilization] = useSetting<boolean>(SHOW_NETWORK_UTILIZATION);
-    const networkMetrics = networkStats ? calculateMetricAggregates(networkStats) : null;
+    const networkMetrics = useMemo(
+        () => (networkStats ? calculateMetricAggregates(networkStats) : null),
+        [networkStats],
+    );
+
+    // card variant is handled within subcomponents
+
+    const isServerless = databaseType === 'Serverless';
 
     return (
-        <Flex className={b()} alignItems="center">
-            <div
-                className={b('link-container', {
-                    active: metricsTab === TENANT_METRICS_TABS_IDS.cpu,
-                })}
-            >
-                <Link to={tabLinks.cpu} className={b('link')}>
-                    <TabCard
-                        text={i18n('context_cpu-load')}
-                        value={cpuMetrics.totalUsed}
-                        limit={cpuMetrics.totalLimit}
-                        legendFormatter={formatCoresLegend}
-                        active={metricsTab === TENANT_METRICS_TABS_IDS.cpu}
-                        helpText={i18n('context_cpu-description')}
-                    />
-                </Link>
-            </div>
-            <div
-                className={b('link-container', {
-                    active: metricsTab === TENANT_METRICS_TABS_IDS.storage,
-                })}
-            >
-                <Link to={tabLinks.storage} className={b('link')}>
-                    <TabCard
-                        text={
-                            storageGroupsCount === undefined
-                                ? i18n('cards.storage-label')
-                                : i18n('context_storage-groups', {count: storageGroupsCount})
-                        }
-                        value={storageMetrics.totalUsed}
-                        limit={storageMetrics.totalLimit}
-                        legendFormatter={formatStorageLegend}
-                        active={metricsTab === TENANT_METRICS_TABS_IDS.storage}
-                        helpText={i18n('context_storage-description')}
-                    />
-                </Link>
-            </div>
-            <div
-                className={b('link-container', {
-                    active: metricsTab === TENANT_METRICS_TABS_IDS.memory,
-                })}
-            >
-                <Link to={tabLinks.memory} className={b('link')}>
-                    <TabCard
-                        text={i18n('context_memory-used')}
-                        value={memoryMetrics.totalUsed}
-                        limit={memoryMetrics.totalLimit}
-                        legendFormatter={formatStorageLegend}
-                        active={metricsTab === TENANT_METRICS_TABS_IDS.memory}
-                        helpText={i18n('context_memory-description')}
-                    />
-                </Link>
-            </div>
-            {showNetworkUtilization && networkStats && networkMetrics && (
-                <div
-                    className={b('link-container', {
-                        active: metricsTab === TENANT_METRICS_TABS_IDS.network,
-                    })}
-                >
-                    <Link to={tabLinks.network} className={b('link')}>
-                        <TabCard
-                            text={i18n('context_network-usage')}
-                            value={networkMetrics.totalUsed}
-                            limit={networkMetrics.totalLimit}
-                            legendFormatter={formatSpeedLegend}
-                            active={metricsTab === TENANT_METRICS_TABS_IDS.network}
-                            helpText={i18n('context_network-description')}
-                        />
-                    </Link>
-                </div>
+        <Flex className={b({serverless: Boolean(isServerless)})} alignItems="center">
+            <CommonMetricsTabs
+                activeTab={activeTab}
+                tabLinks={tabLinks}
+                cpu={{totalUsed: cpuMetrics.totalUsed, totalLimit: cpuMetrics.totalLimit}}
+                storage={{
+                    totalUsed: storageMetrics.totalUsed,
+                    totalLimit: storageMetrics.totalLimit,
+                }}
+                storageGroupsCount={storageGroupsCount}
+                databaseType={databaseType}
+            />
+            {isServerless ? (
+                <ServerlessPlaceholderTabs />
+            ) : (
+                <DedicatedMetricsTabs
+                    activeTab={activeTab}
+                    tabLinks={tabLinks}
+                    memory={{
+                        totalUsed: memoryMetrics.totalUsed,
+                        totalLimit: memoryMetrics.totalLimit,
+                    }}
+                    network={networkMetrics}
+                    showNetwork={Boolean(showNetworkUtilization && networkStats && networkMetrics)}
+                />
             )}
         </Flex>
     );

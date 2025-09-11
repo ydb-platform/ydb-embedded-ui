@@ -10,6 +10,7 @@ import {overviewApi} from '../../store/reducers/overview/overview';
 import {selectSchemaObjectData} from '../../store/reducers/schema/schema';
 import {useTenantBaseInfo} from '../../store/reducers/tenant/tenant';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../types/additionalProps';
+import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
@@ -56,7 +57,7 @@ export function Tenant(props: TenantProps) {
 
     const {database, schema} = useTenantQueryParams();
 
-    const {controlPlane, name, id} = useTenantBaseInfo(database ?? '');
+    const {controlPlane, name} = useTenantBaseInfo(database ?? '');
 
     if (!database) {
         throw new Error('Tenant name is not defined');
@@ -88,8 +89,8 @@ export function Tenant(props: TenantProps) {
 
     const dispatch = useTypedDispatch();
     React.useEffect(() => {
-        dispatch(setHeaderBreadcrumbs('tenant', {tenantName: databaseName, tenantId: id}));
-    }, [databaseName, id, dispatch]);
+        dispatch(setHeaderBreadcrumbs('tenant', {tenantName: databaseName, database}));
+    }, [databaseName, database, dispatch]);
 
     const preloadedData = useTypedSelector((state) =>
         selectSchemaObjectData(state, path, database),
@@ -104,6 +105,8 @@ export function Tenant(props: TenantProps) {
         preloadedData?.PathDescription?.Self?.PathSubType;
 
     const showBlockingError = isAccessError(error);
+
+    const errorProps = showBlockingError ? uiFactory.clusterOrDatabaseAccessError : undefined;
 
     const onCollapseSummaryHandler = () => {
         dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.triggerCollapse);
@@ -130,12 +133,13 @@ export function Tenant(props: TenantProps) {
                 titleTemplate={`%s — ${title} — ${appTitle}`}
             />
             <LoaderWrapper loading={initialLoading}>
-                <PageError error={showBlockingError ? error : undefined}>
+                <PageError error={showBlockingError ? error : undefined} {...errorProps}>
                     <TenantContextProvider
                         database={database}
                         path={path}
                         type={currentPathType}
                         subType={currentPathSubType}
+                        databaseFullPath={databaseName}
                     >
                         <TenantDrawerWrapper>
                             <SplitPane

@@ -103,7 +103,10 @@ export function GroupedNodesComponent({
     selectedColumnsKey,
     groupByParams,
 }: GroupedNodesComponentProps) {
-    const {searchValue, peerRoleFilter, groupByParam} = useNodesPageQueryParams(groupByParams);
+    const {searchValue, peerRoleFilter, groupByParam} = useNodesPageQueryParams(
+        groupByParams,
+        withPeerRoleFilter,
+    );
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(

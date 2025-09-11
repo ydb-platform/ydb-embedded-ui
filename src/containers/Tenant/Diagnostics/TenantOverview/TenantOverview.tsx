@@ -1,4 +1,4 @@
-import {Button, Flex, Icon} from '@gravity-ui/uikit';
+import {Button, Flex, HelpMark, Icon, Label} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
@@ -21,6 +21,7 @@ import {TenantCpu} from './TenantCpu/TenantCpu';
 import {TenantMemory} from './TenantMemory/TenantMemory';
 import {TenantNetwork} from './TenantNetwork/TenantNetwork';
 import {TenantStorage} from './TenantStorage/TenantStorage';
+import i18n from './i18n';
 import {b} from './utils';
 
 import './TenantOverview.scss';
@@ -48,6 +49,13 @@ export function TenantOverview({
     );
     const tenantLoading = isFetching && tenant === undefined;
     const {Name, Type, Overall} = tenant || {};
+    const isServerless = Type === 'Serverless';
+    const activeMetricsTab =
+        isServerless &&
+        metricsTab !== TENANT_METRICS_TABS_IDS.cpu &&
+        metricsTab !== TENANT_METRICS_TABS_IDS.storage
+            ? TENANT_METRICS_TABS_IDS.cpu
+            : metricsTab;
 
     const tenantType = mapDatabaseTypeToDBName(Type);
     // FIXME: remove after correct data is added to tenantInfo
@@ -111,22 +119,42 @@ export function TenantOverview({
                     hasClipboardButton={Boolean(tenant)}
                     clipboardButtonAlwaysVisible
                 />
+                {isServerless ? (
+                    <div className={b('serverless-tag')}>
+                        <Label theme="clear" size="s" className={b('serverless-tag-label')}>
+                            <Flex alignItems="center" gap="2">
+                                {i18n('value_serverless')}
+                                <HelpMark iconSize="s" className={b('serverless-tag-tooltip')}>
+                                    {i18n('context_serverless-tooltip')}
+                                </HelpMark>
+                            </Flex>
+                        </Label>
+                    </div>
+                ) : null}
             </Flex>
         );
     };
 
     const renderTabContent = () => {
-        switch (metricsTab) {
+        switch (activeMetricsTab) {
             case TENANT_METRICS_TABS_IDS.cpu: {
                 return (
                     <TenantCpu
                         tenantName={tenantName}
                         additionalNodesProps={additionalNodesProps}
+                        databaseType={Type}
+                        databaseFullPath={Name}
                     />
                 );
             }
             case TENANT_METRICS_TABS_IDS.storage: {
-                return <TenantStorage tenantName={tenantName} metrics={storageMetrics} />;
+                return (
+                    <TenantStorage
+                        tenantName={tenantName}
+                        metrics={storageMetrics}
+                        databaseType={Type}
+                    />
+                );
             }
             case TENANT_METRICS_TABS_IDS.memory: {
                 return (
@@ -145,6 +173,9 @@ export function TenantOverview({
                         additionalNodesProps={additionalNodesProps}
                     />
                 );
+            }
+            default: {
+                return null;
             }
         }
     };
@@ -186,6 +217,8 @@ export function TenantOverview({
                                     ? Number(tenantData.StorageGroups)
                                     : undefined
                             }
+                            databaseType={Type}
+                            activeTab={activeMetricsTab}
                         />
                     </Flex>
                 </div>

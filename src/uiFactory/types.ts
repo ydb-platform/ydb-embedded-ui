@@ -1,5 +1,6 @@
 import type React from 'react';
 
+import type {EmptyStateProps} from '../components/EmptyState';
 import type {
     CommonIssueType,
     GetHealthcheckViewTitles,
@@ -34,6 +35,7 @@ export interface UIFactory<H extends string = CommonIssueType> {
 
     renderBackups?: RenderBackups;
     renderEvents?: RenderEvents;
+    clusterOrDatabaseAccessError?: Partial<EmptyStateProps>;
 
     healthcheck: {
         getHealthckechViewTitles: GetHealthcheckViewTitles<H>;
@@ -41,6 +43,7 @@ export interface UIFactory<H extends string = CommonIssueType> {
         countHealthcheckIssuesByType: (issueTrees: IssuesTree[]) => Record<H, number>;
     };
     hasAccess?: boolean;
+    hideGrantAccess?: boolean;
     yaMetricaMap?: Record<string, number>;
 
     useDatabaseId?: boolean;
@@ -77,4 +80,6 @@ export type RenderBackups = (props: {
     scrollContainerRef: React.RefObject<HTMLDivElement>;
 }) => React.ReactNode;
 
-export type RenderEvents = () => React.ReactNode;
+export type RenderEvents = (props: {
+    scrollContainerRef: React.RefObject<HTMLDivElement>;
+}) => React.ReactNode;

@@ -4,6 +4,7 @@ import {InfoViewer} from '../../../../../components/InfoViewer/InfoViewer';
 import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
 import {ProgressWrapper} from '../../../../../components/ProgressWrapper';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
+import type {ETenantType} from '../../../../../types/api/tenant';
 import {formatStorageValues} from '../../../../../utils/dataFormatters/dataFormatters';
 import {useSearchQuery} from '../../../../../utils/hooks';
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
@@ -25,9 +26,10 @@ export interface TenantStorageMetrics {
 interface TenantStorageProps {
     tenantName: string;
     metrics: TenantStorageMetrics;
+    databaseType?: ETenantType;
 }
 
-export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
+export function TenantStorage({tenantName, metrics, databaseType}: TenantStorageProps) {
     const {blobStorageUsed, tabletStorageUsed, blobStorageLimit, tabletStorageLimit} = metrics;
     const query = useSearchQuery();
 
@@ -65,6 +67,22 @@ export function TenantStorage({tenantName, metrics}: TenantStorageProps) {
             ),
         },
     ];
+
+    if (databaseType === 'Serverless') {
+        return (
+            <Flex direction="column" gap={4}>
+                <StatsWrapper
+                    title={i18n('title_top-tables-by-size')}
+                    allEntitiesLink={getTenantPath({
+                        ...query,
+                        [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.storage,
+                    })}
+                >
+                    <TopTables database={tenantName} />
+                </StatsWrapper>
+            </Flex>
+        );
+    }
 
     return (
         <Flex direction="column" gap={4}>

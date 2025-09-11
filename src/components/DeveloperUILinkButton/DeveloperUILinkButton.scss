@@ -1,5 +1,0 @@
-@use '../../styles/mixins.scss';
-
-.developer-ui-link-button {
-    @include mixins.table-hover-appearing-button();
-}

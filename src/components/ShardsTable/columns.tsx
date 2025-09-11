@@ -18,9 +18,9 @@ export const getPathColumn: GetShardsColumn = ({schemaPath = ''}) => {
         name: TOP_SHARDS_COLUMNS_IDS.Path,
         header: TOP_SHARDS_COLUMNS_TITLES.Path,
         render: ({row}) => {
-            // row.RelativePath - relative schema path
+            // row.RelativePath - relative schema path without start slash
             return (
-                <LinkToSchemaObject path={schemaPath + row.RelativePath}>
+                <LinkToSchemaObject path={`${schemaPath}/${row.RelativePath}`}>
                     {row.RelativePath}
                 </LinkToSchemaObject>
             );
@@ -77,7 +77,10 @@ export const getCpuCoresColumn: GetShardsColumn = () => {
         render: ({row}) => {
             const usage = Number(row.CPUCores) * 100 || 0;
             return (
-                <UsageLabel value={roundToPrecision(usage, 2)} theme={getUsageSeverity(usage)} />
+                <UsageLabel
+                    value={Math.ceil(roundToPrecision(usage, 2))}
+                    theme={getUsageSeverity(usage)}
+                />
             );
         },
         align: DataTable.LEFT,

@@ -58,7 +58,7 @@ export function ComputeLocation({location, hiddenFields = []}: ComputeLocationPr
 
     return (
         <SectionWithTitle title={i18n('label_compute_location')} titleVariant="subheader-2">
-            <Flex direction="column" gap={2}>
+            <Flex direction="column" gap={3}>
                 {fields.map((field) => LocationFieldRenderer[field](location))}
             </Flex>
         </SectionWithTitle>

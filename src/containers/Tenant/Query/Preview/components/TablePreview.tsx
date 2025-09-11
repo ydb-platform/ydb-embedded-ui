@@ -1,7 +1,9 @@
 import {QueryResultTable} from '../../../../../components/QueryResultTable';
 import {previewApi} from '../../../../../store/reducers/preview';
 import {prepareQueryWithPragmas} from '../../../../../store/reducers/query/utils';
+import {useTenantBaseInfo} from '../../../../../store/reducers/tenant/tenant';
 import {useQueryExecutionSettings} from '../../../../../utils/hooks/useQueryExecutionSettings';
+import {transformPath} from '../../../ObjectSummary/transformPath';
 import {isExternalTableType} from '../../../utils/schema';
 import type {PreviewContainerProps} from '../types';
 
@@ -11,8 +13,11 @@ const TABLE_PREVIEW_LIMIT = 100;
 
 export function TablePreview({database, path, type}: PreviewContainerProps) {
     const [querySettings] = useQueryExecutionSettings();
+    const {name} = useTenantBaseInfo(database);
 
-    const baseQuery = `select * from \`${path}\` limit 101`;
+    const relativePath = transformPath(path, database, name);
+
+    const baseQuery = `select * from \`${relativePath}\` limit 101`;
     const query = prepareQueryWithPragmas(baseQuery, querySettings.pragmas);
 
     const {currentData, isFetching, error} = previewApi.useSendQueryQuery(
@@ -35,7 +40,7 @@ export function TablePreview({database, path, type}: PreviewContainerProps) {
 
     return (
         <Preview
-            path={path}
+            path={relativePath}
             renderResult={renderResult}
             loading={loading}
             error={error}

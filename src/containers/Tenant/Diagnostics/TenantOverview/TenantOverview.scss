@@ -24,6 +24,10 @@
         line-height: 24px;
     }
 
+    &__serverless-tag-label {
+        margin-left: var(--g-spacing-1);
+    }
+
     &__info {
         position: sticky;
         left: 0;
