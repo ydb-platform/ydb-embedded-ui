@@ -35,6 +35,7 @@ import {
 import {setSearchValue, tenantsApi} from '../../store/reducers/tenants/tenants';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import type {AdditionalTenantsProps} from '../../types/additionalProps';
+import {State} from '../../types/api/tenant';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
@@ -65,14 +66,16 @@ const b = cn('tenants');
 
 const DATABASES_COLUMNS_WIDTH_LS_KEY = 'databasesTableColumnsWidth';
 
-function formatDatabaseState(state?: string): string {
+function formatDatabaseState(state?: State): string {
     if (!state) {
         return EMPTY_DATA_PLACEHOLDER;
     }
 
     // Map specific state values to user-friendly display names
     switch (state) {
-        case 'PENDING_RESOURCES':
+        case State.STATE_UNSPECIFIED:
+            return 'Unspecified';
+        case State.PENDING_RESOURCES:
             return i18n('value_pending');
         default:
             // For other states, use capitalized version (first letter uppercase, rest lowercase)
