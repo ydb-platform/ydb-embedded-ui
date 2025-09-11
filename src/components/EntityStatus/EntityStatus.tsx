@@ -105,6 +105,7 @@ export function EntityStatus({
                             className={b('controls-wrapper', {
                                 visible: clipboardButtonAlwaysVisible || infoIconHovered,
                             })}
+                            onClick={(e) => e.stopPropagation()}
                         >
                             {infoPopoverContent && (
                                 <Popover
