@@ -99,7 +99,8 @@ export function TenantOverview({
         memoryStats,
         blobStorageStats,
         tabletStorageStats,
-        networkStats,
+        networkUtilization,
+        networkThroughput,
     } = calculateTenantMetrics(tenantData);
 
     const storageMetrics = {
@@ -211,7 +212,8 @@ export function TenantOverview({
                             memoryStats={memoryStats}
                             blobStorageStats={blobStorageStats}
                             tabletStorageStats={tabletStorageStats}
-                            networkStats={networkStats}
+                            networkUtilization={networkUtilization}
+                            networkThroughput={networkThroughput}
                             storageGroupsCount={
                                 tenantData.StorageGroups
                                     ? Number(tenantData.StorageGroups)

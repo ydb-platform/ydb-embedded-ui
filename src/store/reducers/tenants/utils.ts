@@ -148,17 +148,13 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
         },
     ];
 
-    const isNetworkStatsAvailabe = !isNil(NetworkUtilization) && !isNil(NetworkWriteThroughput);
-    const networkThroughput = safeParseNumber(NetworkWriteThroughput);
-    const usedNetwork = safeParseNumber(NetworkUtilization) * networkThroughput;
-    const networkStats: TenantMetricStats[] | undefined = isNetworkStatsAvailabe
-        ? [
-              {
-                  used: usedNetwork,
-                  limit: networkThroughput,
-              },
-          ]
-        : undefined;
+    // Expose raw network utilization and throughput for consumers.
+    const networkUtilization = isNil(NetworkUtilization)
+        ? undefined
+        : safeParseNumber(NetworkUtilization);
+    const networkThroughput = isNil(NetworkWriteThroughput)
+        ? undefined
+        : safeParseNumber(NetworkWriteThroughput);
 
     return {
         memory,
@@ -173,7 +169,8 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
         memoryStats,
         blobStorageStats,
         tabletStorageStats,
-        networkStats,
+        networkUtilization,
+        networkThroughput,
     };
 };
 
