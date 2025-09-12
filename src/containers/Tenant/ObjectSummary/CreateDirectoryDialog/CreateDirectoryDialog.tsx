@@ -6,6 +6,7 @@ import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
 import {cn} from '../../../../utils/cn';
 import i18n from '../../i18n';
+import {transformPath} from '../transformPath';
 
 import './CreateDirectoryDialog.scss';
 
@@ -76,6 +77,8 @@ export function CreateDirectoryDialog({
             });
     };
 
+    const relativeParentPath = transformPath(parentPath, databaseFullPath);
+
     return (
         <Dialog open={open} onClose={handleClose} size="s" initialFocus={inputRef}>
             <Dialog.Header caption={i18n('schema.tree.dialog.header')} />
@@ -94,7 +97,7 @@ export function CreateDirectoryDialog({
                         <span className={b('description')}>
                             {i18n('schema.tree.dialog.description')}
                         </span>
-                        {`${parentPath}/`}
+                        {`${relativeParentPath}/`}
                     </label>
                     <div className={b('input-wrapper')}>
                         <TextInput

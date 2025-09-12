@@ -112,8 +112,7 @@ export function SchemaTree(props: SchemaTreeProps) {
     }, [currentPath, onActivePathUpdate, databaseFullPath]);
 
     const handleSuccessSubmit = (relativePath: string) => {
-        const prefix = databaseFullPath === parentPath ? '' : `${databaseFullPath}/`;
-        const newPath = `${prefix}${parentPath}/${relativePath}`;
+        const newPath = `${parentPath}/${relativePath}`;
         onActivePathUpdate(newPath);
         setSchemaTreeKey(newPath);
     };

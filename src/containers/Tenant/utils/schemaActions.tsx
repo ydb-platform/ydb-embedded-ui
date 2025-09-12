@@ -94,7 +94,7 @@ const bindActions = (
     return {
         createDirectory: showCreateDirectoryDialog
             ? () => {
-                  showCreateDirectoryDialog(params.relativePath);
+                  showCreateDirectoryDialog(params.path);
               }
             : undefined,
         getConnectToDBDialog: () => getConnectToDBDialog?.({database: params.database}),
