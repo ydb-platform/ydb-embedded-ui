@@ -2,15 +2,19 @@ import {Link} from 'react-router-dom';
 
 import {TENANT_METRICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {TenantMetricsTab} from '../../../../../store/reducers/tenant/types';
+import {formatBytes} from '../../../../../utils/bytesParsers';
 import {cn} from '../../../../../utils/cn';
-import {
-    formatSpeedLegend,
-    formatStorageLegend,
-} from '../../../../../utils/metrics/formatMetricLegend';
+import {formatStorageLegend} from '../../../../../utils/metrics/formatMetricLegend';
+import type {MetricFormatParams} from '../../../../../utils/metrics/formatMetricLegend';
 import {TabCard} from '../TabCard/TabCard';
 import i18n from '../i18n';
 
 const b = cn('tenant-metrics-tabs');
+
+// Format network throughput to match cluster display (just the throughput value, not "X of Y")
+function formatNetworkThroughputLegend({value}: MetricFormatParams): string {
+    return formatBytes({value, withSpeedLabel: true});
+}
 
 interface DedicatedMetricsTabsProps {
     activeTab: TenantMetricsTab;
@@ -57,7 +61,7 @@ export function DedicatedMetricsTabs({
                             text={i18n('context_network-usage')}
                             value={network.totalUsed}
                             limit={network.totalLimit}
-                            legendFormatter={formatSpeedLegend}
+                            legendFormatter={formatNetworkThroughputLegend}
                             active={activeTab === TENANT_METRICS_TABS_IDS.network}
                             helpText={i18n('context_network-description')}
                             databaseType="Dedicated"
