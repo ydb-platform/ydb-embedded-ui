@@ -28,6 +28,7 @@ import {Tablets} from '../Tablets/Tablets';
 
 import type {NodeTab} from './NodePages';
 import {NODE_TABS, getDefaultNodePath, nodePageQueryParams, nodePageTabSchema} from './NodePages';
+import {NodeNetwork} from './Network/NodeNetwork';
 import NodeStructure from './NodeStructure/NodeStructure';
 import {Threads} from './Threads/Threads';
 import i18n from './i18n';
@@ -109,7 +110,7 @@ export function Node() {
             {<NodePageMeta node={node} loading={pageLoading} />}
             {<NodePageTitle node={node} />}
             {error ? <ResponseError error={error} className={b('error')} /> : null}
-            {<NodePageInfo node={node} loading={pageLoading} database={tenantName} />}
+            {<NodePageInfo node={node} loading={pageLoading} />}
             {nodeId ? (
                 <NodePageContent
                     nodeId={nodeId}
@@ -174,15 +175,14 @@ function NodePageTitle({node}: NodePageTitleProps) {
 interface NodePageInfoProps {
     node?: PreparedNode;
     loading?: boolean;
-    database?: string;
 }
 
-function NodePageInfo({node, loading, database}: NodePageInfoProps) {
+function NodePageInfo({node, loading}: NodePageInfoProps) {
     if (loading) {
         return <InfoViewerSkeleton className={b('info')} rows={10} />;
     }
 
-    return <FullNodeViewer node={node} className={b('info')} database={database} />;
+    return <FullNodeViewer node={node} className={b('info')} />;
 }
 
 interface NodePageContentProps {
@@ -258,6 +258,10 @@ function NodePageContent({
 
             case 'threads': {
                 return <Threads nodeId={nodeId} />;
+            }
+
+            case 'network': {
+                return <NodeNetwork nodeId={nodeId} tenantName={tenantName} />;
             }
 
             default:

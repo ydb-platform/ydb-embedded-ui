@@ -15,24 +15,6 @@ export const nodeApi = api.injectEndpoints({
             },
             providesTags: ['All'],
         }),
-        getNodeNetworkInfo: build.query({
-            queryFn: async ({nodeId, database}: {nodeId: string; database?: string}, {signal}) => {
-                try {
-                    const data = await window.api.viewer.getNodes(
-                        {
-                            node_id: nodeId,
-                            database,
-                            fieldsRequired: ['Peers'],
-                        },
-                        {signal},
-                    );
-                    return {data: data.Nodes?.[0] || null};
-                } catch (error) {
-                    return {error};
-                }
-            },
-            providesTags: ['All'],
-        }),
         getNodeStructure: build.query({
             queryFn: async ({nodeId}: {nodeId: string}, {signal}) => {
                 try {
