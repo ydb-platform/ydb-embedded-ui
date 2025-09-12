@@ -26,12 +26,14 @@ export async function getRevokeAllRightsDialog({
     path,
     database,
     subject,
+    databaseFullPath,
 }: GetRevokeAllRightsDialogProps): Promise<boolean> {
     return await NiceModal.show(REVOKE_ALL_RIGHTS_DIALOG, {
         id: REVOKE_ALL_RIGHTS_DIALOG,
         path,
         database,
         subject,
+        databaseFullPath,
     });
 }
 

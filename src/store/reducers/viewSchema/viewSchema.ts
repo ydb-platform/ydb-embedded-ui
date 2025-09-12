@@ -1,3 +1,4 @@
+import {transformPath} from '../../../containers/Tenant/ObjectSummary/transformPath';
 import {isQueryErrorResponse} from '../../../utils/query';
 import {api} from '../api';
 
@@ -20,7 +21,7 @@ export const viewSchemaApi = api.injectEndpoints({
                 timeout?: number;
             }) => {
                 try {
-                    const relativePath = path.replace(databaseFullPath, '');
+                    const relativePath = transformPath(path, databaseFullPath);
                     const response = await window.api.viewer.sendQuery(
                         {
                             query: createViewSchemaQuery(relativePath),

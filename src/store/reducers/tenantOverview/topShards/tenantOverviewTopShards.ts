@@ -19,17 +19,13 @@ export const topShardsApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getTopShards: builder.query({
             queryFn: async (
-                {
-                    database,
-                    path,
-                    databaseFullPath,
-                }: {database: string; path: string; databaseFullPath: string},
+                {database, databaseFullPath}: {database: string; databaseFullPath: string},
                 {signal},
             ) => {
                 try {
                     const response = await window.api.viewer.sendQuery(
                         {
-                            query: createShardQuery(path, databaseFullPath),
+                            query: createShardQuery(databaseFullPath, databaseFullPath),
                             database,
                             action: queryAction,
                             internal_call: true,

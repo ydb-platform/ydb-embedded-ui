@@ -95,5 +95,7 @@ function createPathWhereCondition(path: string): string {
     if (!path) {
         return '';
     }
-    return `Path='${path}' OR Path LIKE '${path}/%'`;
+    // Escape single quotes to prevent SQL injection
+    const escapedPath = path.replace(/'/g, "''");
+    return `Path='${escapedPath}' OR Path LIKE '${escapedPath}/%'`;
 }

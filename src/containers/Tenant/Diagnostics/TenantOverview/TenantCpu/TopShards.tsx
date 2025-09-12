@@ -9,17 +9,16 @@ const columnsIds: TopShardsColumnId[] = ['TabletId', 'Path', 'CPUCores'];
 
 interface TopShardsProps {
     database: string;
-    path: string;
     databaseFullPath: string;
 }
 
-export const TopShards = ({database, path, databaseFullPath}: TopShardsProps) => {
+export const TopShards = ({database, databaseFullPath}: TopShardsProps) => {
     const ShardsTable = useComponent('ShardsTable');
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {currentData, isFetching, error} = topShardsApi.useGetTopShardsQuery(
-        {database, path, databaseFullPath},
+        {database, databaseFullPath},
         {pollingInterval: autoRefreshInterval},
     );
 

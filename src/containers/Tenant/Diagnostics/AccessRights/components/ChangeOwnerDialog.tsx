@@ -21,11 +21,13 @@ interface GetChangeOwnerDialogProps {
 export async function getChangeOwnerDialog({
     path,
     database,
+    databaseFullPath,
 }: GetChangeOwnerDialogProps): Promise<boolean> {
     return await NiceModal.show(CHANGE_OWNER_DIALOG, {
         id: CHANGE_OWNER_DIALOG,
         path,
         database,
+        databaseFullPath,
     });
 }
 

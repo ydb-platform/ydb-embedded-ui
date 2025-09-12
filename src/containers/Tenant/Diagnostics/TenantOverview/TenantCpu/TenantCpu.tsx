@@ -64,11 +64,7 @@ export function TenantCpu({
                 </>
             )}
             <StatsWrapper title={i18n('title_top-shards')} allEntitiesLink={topShardsLink}>
-                <TopShards
-                    database={database}
-                    path={databaseFullPath}
-                    databaseFullPath={databaseFullPath}
-                />
+                <TopShards database={database} databaseFullPath={databaseFullPath} />
             </StatsWrapper>
             <StatsWrapper
                 title={i18n('title_top-queries')}
