@@ -99,6 +99,25 @@ export function MetricsTabs({
 
     const isServerless = databaseType === 'Serverless';
 
+    const renderNetworkTab = () => {
+        if (!showNetworkUtilization) {
+            return null;
+        }
+
+        if (isServerless) {
+            return <PlaceholderTab />;
+        }
+
+        return (
+            <NetworkTab
+                to={tabLinks[TENANT_METRICS_TABS_IDS.network]}
+                active={activeTab === TENANT_METRICS_TABS_IDS.network}
+                networkUtilization={networkUtilization}
+                networkThroughput={networkThroughput}
+            />
+        );
+    };
+
     return (
         <Flex className={b({serverless: Boolean(isServerless)})} alignItems="center">
             <CpuTab
@@ -129,16 +148,7 @@ export function MetricsTabs({
                     }}
                 />
             )}
-            {isServerless || !showNetworkUtilization ? (
-                <PlaceholderTab />
-            ) : (
-                <NetworkTab
-                    to={tabLinks[TENANT_METRICS_TABS_IDS.network]}
-                    active={activeTab === TENANT_METRICS_TABS_IDS.network}
-                    networkUtilization={networkUtilization}
-                    networkThroughput={networkThroughput}
-                />
-            )}
+            {renderNetworkTab()}
         </Flex>
     );
 }

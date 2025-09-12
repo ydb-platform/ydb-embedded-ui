@@ -4,7 +4,6 @@ import {Card, Flex} from '@gravity-ui/uikit';
 
 import {DoughnutMetrics} from '../../../../../components/DoughnutMetrics/DoughnutMetrics';
 import {getDiagramValues} from '../../../../../containers/Cluster/ClusterOverview/utils';
-import type {ETenantType} from '../../../../../types/api/tenant';
 import {cn} from '../../../../../utils/cn';
 
 import './TabCard.scss';
@@ -15,8 +14,6 @@ interface UsageTabCardProps {
     text: string;
     active?: boolean;
     helpText?: string;
-    subtitle?: string;
-    databaseType?: Exclude<ETenantType, 'Serverless'>;
     value: number;
     limit: number;
     legendFormatter: (params: {value: number; capacity: number}) => string;
