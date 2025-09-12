@@ -99,6 +99,7 @@ export function SubjectInput({newSubjects, setNewSubjects}: SubjectInputProps) {
                         onUpdate={setInputValue}
                         ref={subjectInputRef}
                         startContent={renderInline ? renderLabels() : undefined}
+                        autoFocus
                     />
                     {!renderInline && renderLabels('wrap')}
                 </Flex>

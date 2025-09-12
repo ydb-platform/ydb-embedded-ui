@@ -74,6 +74,8 @@ function ChangeOwnerDialog({
     const [updateOwner, updateOwnerResponse] = schemaAclApi.useUpdateAccessMutation();
     const dialect = useAclSyntax();
 
+    const inputRef = React.useRef<HTMLInputElement>(null);
+
     const handleTyping = (value: string) => {
         setNewOwner(value);
         setRequestErrorMessage('');
@@ -100,11 +102,18 @@ function ChangeOwnerDialog({
             });
     };
     return (
-        <Dialog open={open} size="s" onClose={onClose} onEnterKeyDown={onApply}>
+        <Dialog
+            open={open}
+            size="s"
+            onClose={onClose}
+            onEnterKeyDown={onApply}
+            initialFocus={inputRef}
+        >
             <Dialog.Header caption={i18n('action_change-owner')} />
             <Dialog.Body>
                 <div className={block('dialog-content-wrapper')}>
                     <TextInput
+                        controlRef={inputRef}
                         id="queryName"
                         placeholder={i18n('decription_enter-subject')}
                         value={newOwner}
