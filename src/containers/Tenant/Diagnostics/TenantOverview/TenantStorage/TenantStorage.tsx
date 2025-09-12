@@ -24,12 +24,12 @@ export interface TenantStorageMetrics {
 }
 
 interface TenantStorageProps {
-    tenantName: string;
+    database: string;
     metrics: TenantStorageMetrics;
     databaseType?: ETenantType;
 }
 
-export function TenantStorage({tenantName, metrics, databaseType}: TenantStorageProps) {
+export function TenantStorage({database, metrics, databaseType}: TenantStorageProps) {
     const {blobStorageUsed, tabletStorageUsed, blobStorageLimit, tabletStorageLimit} = metrics;
     const query = useSearchQuery();
 
@@ -78,7 +78,7 @@ export function TenantStorage({tenantName, metrics, databaseType}: TenantStorage
                         [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.storage,
                     })}
                 >
-                    <TopTables database={tenantName} />
+                    <TopTables database={database} />
                 </StatsWrapper>
             </Flex>
         );
@@ -86,10 +86,10 @@ export function TenantStorage({tenantName, metrics, databaseType}: TenantStorage
 
     return (
         <Flex direction="column" gap={4}>
-            <TenantDashboard database={tenantName} charts={storageDashboardConfig} />
+            <TenantDashboard database={database} charts={storageDashboardConfig} />
             <InfoViewer variant="small" title={i18n('title_storage-details')} info={info} />
             <StatsWrapper title={i18n('title_top-tables-by-size')}>
-                <TopTables database={tenantName} />
+                <TopTables database={database} />
             </StatsWrapper>
             <StatsWrapper
                 title={i18n('title_top-groups-by-usage')}
@@ -98,7 +98,7 @@ export function TenantStorage({tenantName, metrics, databaseType}: TenantStorage
                     [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.storage,
                 })}
             >
-                <TopGroups tenant={tenantName} />
+                <TopGroups tenant={database} />
             </StatsWrapper>
         </Flex>
     );

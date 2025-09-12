@@ -55,6 +55,7 @@ export interface NodesFilters {
     peerRoleFilter?: NodesPeerRole;
 
     path?: string;
+    databaseFullPath?: string;
     database?: string;
 
     filterGroup?: string;

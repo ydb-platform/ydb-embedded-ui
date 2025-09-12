@@ -16,7 +16,7 @@ interface HealthcheckParams {
 }
 
 export const useHealthcheck = (
-    tenantName: string,
+    database: string,
     {autorefresh}: {autorefresh?: number} = {},
 ): HealthcheckParams => {
     const {
@@ -26,14 +26,14 @@ export const useHealthcheck = (
         refetch,
         fulfilledTimeStamp,
     } = healthcheckApi.useGetHealthcheckInfoQuery(
-        {database: tenantName},
+        {database},
         {
             pollingInterval: autorefresh,
         },
     );
 
     const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
-    const leavesIssues = useTypedSelector((state) => selectLeavesIssues(state, tenantName));
+    const leavesIssues = useTypedSelector((state) => selectLeavesIssues(state, database));
 
     return {
         loading: data === undefined && isFetching,

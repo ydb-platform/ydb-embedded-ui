@@ -47,20 +47,20 @@ function getTopNodesByLoadColumns(
 }
 
 interface TopNodesByLoadProps {
-    tenantName: string;
+    database: string;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-export function TopNodesByLoad({tenantName, additionalNodesProps}: TopNodesByLoadProps) {
+export function TopNodesByLoad({database, additionalNodesProps}: TopNodesByLoadProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const [columns, fieldsRequired] = getTopNodesByLoadColumns({
         getNodeRef: additionalNodesProps?.getNodeRef,
-        database: tenantName,
+        database,
     });
 
     const {currentData, isFetching, error} = nodesApi.useGetNodesQuery(
         {
-            tenant: tenantName,
+            tenant: database,
             type: 'any',
             sort: '-LoadAverage',
             limit: TENANT_OVERVIEW_TABLES_LIMIT,

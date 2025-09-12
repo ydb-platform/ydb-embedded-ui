@@ -32,23 +32,26 @@ export const b = cn('ydb-diagnostics-partitions');
 interface PartitionsProps {
     path: string;
     database: string;
+    databaseFullPath: string;
 }
 
-export const Partitions = ({path, database}: PartitionsProps) => {
+export const Partitions = ({path, database, databaseFullPath}: PartitionsProps) => {
     const dispatch = useTypedDispatch();
 
     const [partitionsToRender, setPartitionsToRender] = React.useState<
         PreparedPartitionDataWithHosts[]
     >([]);
 
-    const consumers = useTypedSelector((state) => selectConsumersNames(state, path, database));
+    const consumers = useTypedSelector((state) =>
+        selectConsumersNames(state, path, database, databaseFullPath),
+    );
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {selectedConsumer} = useTypedSelector((state) => state.partitions);
     const {
         currentData: topicData,
         isFetching: topicIsFetching,
         error: topicError,
-    } = topicApi.useGetTopicQuery({path, database});
+    } = topicApi.useGetTopicQuery({path, database, databaseFullPath});
     const topicLoading = topicIsFetching && topicData === undefined;
     const {
         currentData: nodesData,
@@ -62,7 +65,9 @@ export const Partitions = ({path, database}: PartitionsProps) => {
 
     const [columns, columnsIdsForSelector] = useGetPartitionsColumns(selectedConsumer);
 
-    const params = topicLoading ? skipToken : {path, database, consumerName: selectedConsumer};
+    const params = topicLoading
+        ? skipToken
+        : {path, database, consumerName: selectedConsumer, databaseFullPath};
     const {
         currentData: partitionsData,
         isFetching: partitionsIsFetching,

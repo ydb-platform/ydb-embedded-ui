@@ -20,6 +20,7 @@ import '../Nodes.scss';
 
 export interface PaginatedNodesProps {
     path?: string;
+    databaseFullPath?: string;
     database?: string;
     scrollContainerRef: React.RefObject<HTMLElement>;
     withPeerRoleFilter?: boolean;

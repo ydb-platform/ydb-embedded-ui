@@ -56,7 +56,7 @@ function ConnectToDBDialog({
     // Since there is no ControlPlane data in this case
     const shouldRequestTenantData = database && !endpointFromProps && !singleClusterMode;
     const params = shouldRequestTenantData
-        ? {path: database, clusterName, isMetaDatabasesAvailable}
+        ? {database, clusterName, isMetaDatabasesAvailable}
         : skipToken;
     const {currentData: tenantData, isLoading: isTenantDataLoading} =
         tenantApi.useGetTenantInfoQuery(params);

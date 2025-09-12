@@ -2,7 +2,7 @@ import {expect, test} from '@playwright/test';
 
 import {QUERY_MODES, STATISTICS_MODES} from '../../../../src/utils/query';
 import {getClipboardContent} from '../../../utils/clipboard';
-import {tenantName} from '../../../utils/constants';
+import {database} from '../../../utils/constants';
 import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {NavigationTabs, TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 import {
@@ -28,8 +28,8 @@ test.describe('Test Query Editor', async () => {
 
     test.beforeEach(async ({page}) => {
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             general: 'query',
         };
 

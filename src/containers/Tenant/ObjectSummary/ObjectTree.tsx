@@ -7,7 +7,7 @@ import i18n from './i18n';
 import {b} from './shared';
 
 interface ObjectTreeProps {
-    tenantName: string;
+    database: string;
     databaseFullPath: string;
     path?: string;
 }
@@ -20,10 +20,11 @@ function prepareSchemaRootName(name: string | undefined, fallback: string): stri
     return fallback.startsWith('/') ? fallback : `/${fallback}`;
 }
 
-export function ObjectTree({tenantName, path, databaseFullPath}: ObjectTreeProps) {
+export function ObjectTree({database, path, databaseFullPath}: ObjectTreeProps) {
     const {data: tenantData = {}, isLoading} = useGetSchemaQuery({
-        path: tenantName,
-        database: tenantName,
+        path: databaseFullPath,
+        databaseFullPath,
+        database,
     });
     const pathData = tenantData?.PathDescription?.Self;
 
@@ -44,11 +45,10 @@ export function ObjectTree({tenantName, path, databaseFullPath}: ObjectTreeProps
             <div className={b('tree')}>
                 {pathData ? (
                     <SchemaTree
+                        database={database}
                         databaseFullPath={databaseFullPath}
-                        rootPath={tenantName}
-                        // for the root pathData.Name contains the same string as tenantName,
                         // ensure it has the leading slash
-                        rootName={prepareSchemaRootName(pathData.Name, tenantName)}
+                        rootName={prepareSchemaRootName(pathData.Name, databaseFullPath)}
                         rootType={pathData.PathType}
                         currentPath={path}
                         onActivePathUpdate={handleSchemaChange}

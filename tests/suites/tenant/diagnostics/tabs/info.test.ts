@@ -1,14 +1,14 @@
 import {expect, test} from '@playwright/test';
 
-import {tenantName} from '../../../../utils/constants';
+import {database} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
 import {Diagnostics, DiagnosticsTab} from '../Diagnostics';
 
 test.describe('Diagnostics Info tab', async () => {
     test('Info tab shows main page elements', async ({page}) => {
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
         };
         const tenantPage = new TenantPage(page);
@@ -21,8 +21,8 @@ test.describe('Diagnostics Info tab', async () => {
 
     test('Info tab shows resource utilization', async ({page}) => {
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
         };
         const tenantPage = new TenantPage(page);
@@ -56,7 +56,7 @@ test.describe('Diagnostics Info tab', async () => {
                             message: 'Some degraded component',
                             location: {
                                 database: {
-                                    name: tenantName,
+                                    name: database,
                                 },
                             },
                         },
@@ -66,8 +66,8 @@ test.describe('Diagnostics Info tab', async () => {
         });
 
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
         };
         const tenantPage = new TenantPage(page);
@@ -99,8 +99,8 @@ test.describe('Diagnostics Info tab', async () => {
         });
 
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
         };
         const tenantPage = new TenantPage(page);
@@ -127,7 +127,7 @@ test.describe('Diagnostics Info tab', async () => {
                             message: 'Some informational issue',
                             location: {
                                 database: {
-                                    name: tenantName,
+                                    name: database,
                                 },
                             },
                         },
@@ -137,8 +137,8 @@ test.describe('Diagnostics Info tab', async () => {
         });
 
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
         };
         const tenantPage = new TenantPage(page);

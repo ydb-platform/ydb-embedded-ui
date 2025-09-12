@@ -40,12 +40,12 @@ function fillDateRangeFor(value: ShardsWorkloadFilters) {
 }
 
 interface TopShardsProps {
-    tenantName: string;
+    database: string;
     path: string;
     databaseFullPath: string;
 }
 
-export const TopShards = ({tenantName, path, databaseFullPath}: TopShardsProps) => {
+export const TopShards = ({database, path, databaseFullPath}: TopShardsProps) => {
     const ShardsTable = useComponent('ShardsTable');
 
     const dispatch = useTypedDispatch();
@@ -72,22 +72,14 @@ export const TopShards = ({tenantName, path, databaseFullPath}: TopShardsProps) 
 
     const {tableSort, handleTableSort, backendSort} = useTopShardSort();
 
-    let normalizedPath = path;
-
-    if (tenantName !== databaseFullPath) {
-        //tenantName may be database full path or database id. If it is database id, we must remove it from object's path and add database full path instead
-        const shrinkedPath = path.startsWith(tenantName) ? path.slice(tenantName.length) : path;
-        normalizedPath = databaseFullPath + shrinkedPath;
-    }
-
     const {
         currentData: result,
         isFetching,
         error,
     } = shardApi.useSendShardQueryQuery(
         {
-            database: tenantName,
-            path: normalizedPath,
+            database,
+            path,
             sortOrder: backendSort,
             filters,
             databaseFullPath,
@@ -151,8 +143,8 @@ export const TopShards = ({tenantName, path, databaseFullPath}: TopShardsProps) 
 
         return (
             <ShardsTable
-                database={tenantName}
-                schemaPath={path}
+                database={database}
+                databaseFullPath={databaseFullPath}
                 columnsIds={columnsIds}
                 data={data}
                 settings={TABLE_SETTINGS}

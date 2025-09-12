@@ -12,19 +12,19 @@ import {useTopQueriesSort} from '../../TopQueries/hooks/useTopQueriesSort';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 
 interface TopQueriesProps {
-    tenantName: string;
+    database: string;
 }
 
 const columns = getTenantOverviewTopQueriesColumns();
 
-export function TopQueries({tenantName}: TopQueriesProps) {
+export function TopQueries({database}: TopQueriesProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {backendSort} = useTopQueriesSort();
 
     const {currentData, isFetching, error} = topQueriesApi.useGetTopQueriesQuery(
         {
-            database: tenantName,
+            database,
             timeFrame: 'hour',
             limit: TENANT_OVERVIEW_TABLES_LIMIT,
             sortOrder: backendSort,

@@ -2,7 +2,7 @@ import {expect, test} from '@playwright/test';
 
 import {prepareQueryWithPragmas} from '../../../../../src/store/reducers/query/utils';
 import {defaultPragma} from '../../../../../src/utils/query';
-import {tenantName} from '../../../../utils/constants';
+import {database} from '../../../../utils/constants';
 import {NavigationTabs, TenantPage} from '../../TenantPage';
 import {longRunningQuery, longRunningStreamQuery} from '../../constants';
 import {QueryEditor} from '../../queryEditor/models/QueryEditor';
@@ -19,8 +19,8 @@ import {setupTopQueriesMock} from '../mocks';
 test.describe('Diagnostics Queries tab', async () => {
     test('No runnning queries in Queries if no queries are running', async ({page}) => {
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
         };
         const tenantPage = new TenantPage(page);
@@ -34,8 +34,8 @@ test.describe('Diagnostics Queries tab', async () => {
 
     test('Running query is shown if query is running', async ({page}) => {
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'query',
         };
         const tenantPage = new TenantPage(page);
@@ -61,8 +61,8 @@ test.describe('Diagnostics Queries tab', async () => {
 
     test('Query tab defaults to Top mode', async ({page}) => {
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
             diagnosticsTab: 'topQueries',
         };
@@ -78,8 +78,8 @@ test.describe('Diagnostics Queries tab', async () => {
 
     test('Query Top tab shows expected column headers', async ({page}) => {
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
             diagnosticsTab: 'topQueries',
         };
@@ -103,8 +103,8 @@ test.describe('Diagnostics Queries tab', async () => {
     test('Query tab first row has values for all columns in Top mode', async ({page}) => {
         // First, run some CPU-intensive queries to generate data
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'query',
         };
         const tenantPage = new TenantPage(page);
@@ -145,8 +145,8 @@ test.describe('Diagnostics Queries tab', async () => {
 
     test('Query tab can switch between Top and Running modes', async ({page}) => {
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
             diagnosticsTab: 'topQueries',
         };
@@ -171,8 +171,8 @@ test.describe('Diagnostics Queries tab', async () => {
 
     test('Query tab allows changing between Per hour and Per minute views', async ({page}) => {
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
             diagnosticsTab: 'topQueries',
         };
@@ -211,8 +211,8 @@ test.describe('Diagnostics Queries tab', async () => {
         await setupTopQueriesMock(page);
 
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
             diagnosticsTab: 'topQueries',
         };
@@ -256,8 +256,8 @@ test.describe('Diagnostics Queries tab', async () => {
         await setupTopQueriesMock(page);
 
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
             diagnosticsTab: 'topQueries',
         };

@@ -3,6 +3,7 @@ import type {AxiosWrapperOptions} from '@gravity-ui/axios-wrapper';
 import axiosRetry from 'axios-retry';
 
 import {backend as BACKEND, clusterName} from '../../store';
+import type {SchemaPathParam} from '../../types/api/common';
 import {DEV_ENABLE_TRACING_FOR_ALL_REQUESTS} from '../../utils/constants';
 import {prepareBackendWithMetaProxy} from '../../utils/parseBalancer';
 import {isRedirectToAuth} from '../../utils/response';
@@ -94,17 +95,18 @@ export class BaseYdbAPI extends AxiosWrapper {
         return `${BACKEND ?? ''}${path}`;
     }
 
-    getSchemaPath({path, database}: {path?: string; database?: string}) {
-        if (!this.useRelativePath || !path || !database) {
+    getSchemaPath(params?: SchemaPathParam) {
+        const {path, databaseFullPath} = params ?? {};
+        if (!this.useRelativePath || !path || !databaseFullPath) {
             return path;
         }
 
-        if (path === database) {
+        if (path === databaseFullPath) {
             return '';
         }
 
-        if (path.startsWith(database + '/')) {
-            return path.slice(database.length + 1);
+        if (path.startsWith(databaseFullPath + '/')) {
+            return path.slice(databaseFullPath.length + 1);
         }
         return path;
     }

@@ -17,4 +17,5 @@ export interface IHeatmapState {
 export interface IHeatmapApiRequestParams {
     path: string;
     database: string;
+    databaseFullPath: string;
 }

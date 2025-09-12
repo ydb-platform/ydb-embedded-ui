@@ -84,12 +84,12 @@ const getClusterBreadcrumbs: GetBreadcrumbs<ClusterBreadcrumbsOptions> = (option
 };
 
 const getTenantBreadcrumbs: GetBreadcrumbs<TenantBreadcrumbsOptions> = (options, query = {}) => {
-    const {tenantName, database} = options;
+    const {databaseName, database} = options;
 
     const breadcrumbs = getClusterBreadcrumbs(options, query);
 
-    const text = tenantName || headerKeyset('breadcrumbs.tenant');
-    const link = tenantName ? getTenantPath({...query, database}) : undefined;
+    const text = databaseName || headerKeyset('breadcrumbs.tenant');
+    const link = database ? getTenantPath({...query, database}) : undefined;
 
     const lastItem = {text, link, icon: <DatabaseIcon />};
     breadcrumbs.push(lastItem);
@@ -98,11 +98,11 @@ const getTenantBreadcrumbs: GetBreadcrumbs<TenantBreadcrumbsOptions> = (options,
 };
 
 const getNodeBreadcrumbs: GetBreadcrumbs<NodeBreadcrumbsOptions> = (options, query = {}) => {
-    const {nodeId, nodeRole, nodeActiveTab, tenantName} = options;
+    const {nodeId, nodeRole, nodeActiveTab, database} = options;
 
     const tenantQuery = getQueryForTenant(nodeActiveTab === 'tablets' ? 'tablets' : 'nodes');
 
-    const breadcrumbs = tenantName
+    const breadcrumbs = database
         ? getTenantBreadcrumbs(options, {...query, ...tenantQuery})
         : getClusterBreadcrumbs(options, query);
 
@@ -113,9 +113,7 @@ const getNodeBreadcrumbs: GetBreadcrumbs<NodeBreadcrumbsOptions> = (options, que
 
     const lastItem = {
         text,
-        link: nodeId
-            ? getDefaultNodePath(nodeId, {database: tenantName, ...query}, nodeActiveTab)
-            : undefined,
+        link: nodeId ? getDefaultNodePath(nodeId, {database, ...query}, nodeActiveTab) : undefined,
         icon: getNodeIcon(nodeRole),
     };
 
@@ -167,9 +165,9 @@ const getStorageGroupBreadcrumbs: GetBreadcrumbs<StorageGroupBreadcrumbsOptions>
     options,
     query = {},
 ) => {
-    const {groupId, tenantName} = options;
+    const {groupId, database} = options;
 
-    const breadcrumbs = tenantName
+    const breadcrumbs = database
         ? getTenantBreadcrumbs(options, query)
         : getClusterBreadcrumbs(options, query);
 
@@ -180,7 +178,7 @@ const getStorageGroupBreadcrumbs: GetBreadcrumbs<StorageGroupBreadcrumbsOptions>
 
     const lastItem = {
         text,
-        link: groupId ? getStorageGroupPath(groupId, {database: tenantName}) : undefined,
+        link: groupId ? getStorageGroupPath(groupId, {database}) : undefined,
     };
     breadcrumbs.push(lastItem);
 
@@ -206,9 +204,9 @@ const getVDiskBreadcrumbs: GetBreadcrumbs<VDiskBreadcrumbsOptions> = (options, q
 };
 
 const getTabletBreadcrumbs: GetBreadcrumbs<TabletBreadcrumbsOptions> = (options, query = {}) => {
-    const {tabletId, tabletType, tenantName} = options;
+    const {tabletId, tabletType, database} = options;
 
-    const breadcrumbs = tenantName
+    const breadcrumbs = database
         ? getTenantBreadcrumbs(options, query)
         : getClusterBreadcrumbs(options, query);
 

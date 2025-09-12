@@ -1,7 +1,7 @@
 import {expect, test} from '@playwright/test';
 
 import {QUERY_MODES, TRANSACTION_MODES} from '../../../../src/utils/query';
-import {tenantName} from '../../../utils/constants';
+import {database} from '../../../utils/constants';
 import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 import {longRunningQuery} from '../constants';
@@ -13,8 +13,8 @@ test.describe('Test Query Settings', async () => {
 
     test.beforeEach(async ({page}) => {
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             general: 'query',
         };
 

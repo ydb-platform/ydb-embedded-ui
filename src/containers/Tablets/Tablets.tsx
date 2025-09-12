@@ -1,4 +1,7 @@
+import React from 'react';
+
 import {skipToken} from '@reduxjs/toolkit/query';
+import {isNil} from 'lodash';
 
 import {selectTabletsWithFqdn, tabletsApi} from '../../store/reducers/tablets';
 import type {TabletsApiRequestParams} from '../../types/store/tablets';
@@ -10,6 +13,7 @@ import {TabletsTable} from './TabletsTable';
 interface TabletsProps {
     path?: string;
     database?: string;
+    databaseFullPath?: string;
     nodeId?: string | number;
     /**
      * Show/hide dead tablets: shown in pages needing complete statistics,
@@ -19,16 +23,30 @@ interface TabletsProps {
     scrollContainerRef: React.RefObject<HTMLElement>;
 }
 
-export function Tablets({nodeId, path, database, onlyActive, scrollContainerRef}: TabletsProps) {
+export function Tablets({
+    nodeId,
+    path,
+    database,
+    databaseFullPath,
+    onlyActive,
+    scrollContainerRef,
+}: TabletsProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     let params: TabletsApiRequestParams = {};
     const filter = onlyActive ? `(State!=Dead)` : undefined;
 
+    const schemaPathParam = React.useMemo(() => {
+        if (!isNil(path) && !isNil(databaseFullPath)) {
+            return {path, databaseFullPath};
+        }
+        return undefined;
+    }, [path, databaseFullPath]);
+
     if (valueIsDefined(nodeId)) {
         params = {nodeId, database, filter};
-    } else if (path) {
-        params = {path, database, filter};
+    } else if (schemaPathParam) {
+        params = {path: schemaPathParam, database, filter};
     }
     const {isLoading, error} = tabletsApi.useGetTabletsInfoQuery(
         Object.keys(params).length === 0 ? skipToken : params,

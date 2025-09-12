@@ -17,7 +17,7 @@ import {memoryDashboardConfig} from './memoryDashboardConfig';
 import './TenantMemory.scss';
 
 interface TenantMemoryProps {
-    tenantName: string;
+    database: string;
     memoryStats?: TMemoryStats;
     memoryUsed?: string;
     memoryLimit?: string;
@@ -25,12 +25,7 @@ interface TenantMemoryProps {
 
 const b = cn('tenant-memory');
 
-export function TenantMemory({
-    tenantName,
-    memoryStats,
-    memoryUsed,
-    memoryLimit,
-}: TenantMemoryProps) {
+export function TenantMemory({database, memoryStats, memoryUsed, memoryLimit}: TenantMemoryProps) {
     const query = useSearchQuery();
     const renderMemoryDetails = () => {
         if (memoryStats) {
@@ -64,7 +59,7 @@ export function TenantMemory({
 
     return (
         <div className={b()}>
-            <TenantDashboard database={tenantName} charts={memoryDashboardConfig} />
+            <TenantDashboard database={database} charts={memoryDashboardConfig} />
             {renderMemoryDetails()}
 
             <StatsWrapper
@@ -74,7 +69,7 @@ export function TenantMemory({
                     [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.nodes,
                 })}
             >
-                <TopNodesByMemory tenantName={tenantName} />
+                <TopNodesByMemory database={database} />
             </StatsWrapper>
         </div>
     );

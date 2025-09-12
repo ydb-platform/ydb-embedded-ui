@@ -9,8 +9,9 @@ import './DetailedOverview.scss';
 interface DetailedOverviewProps {
     type?: EPathType;
     className?: string;
-    tenantName: string;
+    database: string;
     path: string;
+    databaseFullPath: string;
     additionalTenantProps?: AdditionalTenantsProps;
     additionalNodesProps?: AdditionalNodesProps;
 }
@@ -18,13 +19,15 @@ interface DetailedOverviewProps {
 const b = cn('kv-detailed-overview');
 
 function DetailedOverview(props: DetailedOverviewProps) {
-    const {type, tenantName, path, additionalTenantProps, additionalNodesProps} = props;
+    const {type, database, databaseFullPath, path, additionalTenantProps, additionalNodesProps} =
+        props;
 
     const renderTenantOverview = () => {
         return (
             <div className={b('section')}>
                 <TenantOverview
-                    tenantName={tenantName}
+                    database={database}
+                    databaseFullPath={databaseFullPath}
                     additionalTenantProps={additionalTenantProps}
                     additionalNodesProps={additionalNodesProps}
                 />
@@ -32,14 +35,19 @@ function DetailedOverview(props: DetailedOverviewProps) {
         );
     };
 
-    const isTenant = tenantName === path;
+    const isTenant = databaseFullPath === path;
 
     return (
         <div className={b()}>
             {isTenant ? (
                 renderTenantOverview()
             ) : (
-                <Overview type={type} path={path} database={tenantName} />
+                <Overview
+                    type={type}
+                    path={path}
+                    database={database}
+                    databaseFullPath={databaseFullPath}
+                />
             )}
         </div>
     );

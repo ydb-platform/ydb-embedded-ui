@@ -22,7 +22,7 @@ interface QueryEditorControlsProps {
     disabled?: boolean;
     highlightedAction: QueryAction;
     queryId?: string;
-    tenantName: string;
+    database: string;
     isStreamingEnabled?: boolean;
 
     handleGetExplainQueryClick: (text: string) => void;
@@ -75,7 +75,7 @@ export const QueryEditorControls = ({
     isLoading,
     highlightedAction,
     queryId,
-    tenantName,
+    database,
     isStreamingEnabled,
 
     handleSendExecuteClick,
@@ -94,7 +94,7 @@ export const QueryEditorControls = ({
             if (isStreamingEnabled) {
                 queryManagerInstance.abortQuery();
             } else if (queryId) {
-                await sendCancelQuery({queryId, database: tenantName}).unwrap();
+                await sendCancelQuery({queryId, database}).unwrap();
             }
         } catch {
             createToast({
@@ -113,7 +113,7 @@ export const QueryEditorControls = ({
                 setCancelQueryError(false);
             }, CANCEL_ERROR_ANIMATION_DURATION);
         }
-    }, [isStreamingEnabled, queryId, sendCancelQuery, tenantName]);
+    }, [isStreamingEnabled, queryId, sendCancelQuery, database]);
 
     const isRunHighlighted = highlightedAction === 'execute';
     const isExplainHighlighted = highlightedAction === 'explain';

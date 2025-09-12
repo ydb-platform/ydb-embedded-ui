@@ -59,7 +59,9 @@ function Diagnostics(props: DiagnosticsProps) {
 
     const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
 
-    const {controlPlane, databaseType} = useTenantBaseInfo(isDatabaseEntityType(type) ? path : '');
+    const {controlPlane, databaseType} = useTenantBaseInfo(
+        isDatabaseEntityType(type) ? database : '',
+    );
 
     const hasFeatureFlags = useFeatureFlagsAvailable();
     const hasTopicData = useTopicDataAvailable();
@@ -91,23 +93,32 @@ function Diagnostics(props: DiagnosticsProps) {
                 return (
                     <DetailedOverview
                         type={type}
-                        tenantName={database}
+                        database={database}
                         path={path}
+                        databaseFullPath={databaseFullPath}
                         additionalTenantProps={props.additionalTenantProps}
                         additionalNodesProps={props.additionalNodesProps}
                     />
                 );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.schema: {
-                return <SchemaViewer path={path} tenantName={database} type={type} extended />;
+                return (
+                    <SchemaViewer
+                        path={path}
+                        database={database}
+                        databaseFullPath={databaseFullPath}
+                        type={type}
+                        extended
+                    />
+                );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.topQueries: {
-                return <TopQueries tenantName={database} />;
+                return <TopQueries database={database} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.topShards: {
                 return (
                     <TopShards
-                        tenantName={database}
+                        database={database}
                         path={path}
                         databaseFullPath={databaseFullPath}
                     />
@@ -117,6 +128,7 @@ function Diagnostics(props: DiagnosticsProps) {
                 return (
                     <Nodes
                         path={path}
+                        databaseFullPath={databaseFullPath}
                         database={database}
                         additionalNodesProps={props.additionalNodesProps}
                         scrollContainerRef={containerRef}
@@ -128,7 +140,12 @@ function Diagnostics(props: DiagnosticsProps) {
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.tablets: {
                 return (
-                    <Tablets scrollContainerRef={containerRef} path={path} database={database} />
+                    <Tablets
+                        scrollContainerRef={containerRef}
+                        path={path}
+                        databaseFullPath={databaseFullPath}
+                        database={database}
+                    />
                 );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.storage: {
@@ -138,6 +155,7 @@ function Diagnostics(props: DiagnosticsProps) {
                 return (
                     <NetworkWrapper
                         path={path}
+                        databaseFullPath={databaseFullPath}
                         database={database}
                         additionalNodesProps={props.additionalNodesProps}
                         scrollContainerRef={containerRef}
@@ -145,25 +163,45 @@ function Diagnostics(props: DiagnosticsProps) {
                 );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.describe: {
-                return <Describe path={path} database={database} />;
+                return (
+                    <Describe path={path} databaseFullPath={databaseFullPath} database={database} />
+                );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.hotKeys: {
-                return <HotKeys path={path} database={database} />;
+                return (
+                    <HotKeys path={path} databaseFullPath={databaseFullPath} database={database} />
+                );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.graph: {
-                return <Heatmap path={path} database={database} />;
+                return (
+                    <Heatmap path={path} databaseFullPath={databaseFullPath} database={database} />
+                );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.consumers: {
-                return <Consumers path={path} database={database} type={type} />;
+                return (
+                    <Consumers
+                        path={path}
+                        databaseFullPath={databaseFullPath}
+                        database={database}
+                        type={type}
+                    />
+                );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.partitions: {
-                return <Partitions path={path} database={database} />;
+                return (
+                    <Partitions
+                        path={path}
+                        databaseFullPath={databaseFullPath}
+                        database={database}
+                    />
+                );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.topicData: {
                 return (
                     <TopicData
                         key={path}
                         path={path}
+                        databaseFullPath={databaseFullPath}
                         database={database}
                         scrollContainerRef={containerRef}
                     />

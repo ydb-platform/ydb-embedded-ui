@@ -14,11 +14,12 @@ import i18n from './i18n';
 interface TransferProps {
     path: string;
     database: string;
+    databaseFullPath: string;
     data?: TEvDescribeSchemeResult;
 }
 
 /** Displays overview for Transfer EPathType */
-export function TransferInfo({path, database, data}: TransferProps) {
+export function TransferInfo({path, database, data, databaseFullPath}: TransferProps) {
     const entityName = getEntityName(data?.PathDescription);
 
     if (!data) {
@@ -29,7 +30,10 @@ export function TransferInfo({path, database, data}: TransferProps) {
         );
     }
 
-    const {data: replicationData} = replicationApi.useGetReplicationQuery({path, database}, {});
+    const {data: replicationData} = replicationApi.useGetReplicationQuery(
+        {path, database, databaseFullPath},
+        {},
+    );
     const transferItems = prepareTransferItems(data, replicationData);
 
     return (

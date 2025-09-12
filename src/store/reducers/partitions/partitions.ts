@@ -30,13 +30,19 @@ export const partitionsApi = api.injectEndpoints({
                     path,
                     database,
                     consumerName,
-                }: {path: string; database: string; consumerName?: string},
+                    databaseFullPath,
+                }: {
+                    path: string;
+                    database: string;
+                    consumerName?: string;
+                    databaseFullPath: string;
+                },
                 {signal},
             ) => {
                 try {
                     if (consumerName) {
                         const response = await window.api.viewer.getConsumer(
-                            {path, database, consumer: consumerName},
+                            {path: {path, databaseFullPath}, database, consumer: consumerName},
                             {signal},
                         );
                         const rawPartitions = response.partitions;
@@ -44,7 +50,7 @@ export const partitionsApi = api.injectEndpoints({
                         return {data};
                     } else {
                         const response = await window.api.viewer.getTopic(
-                            {path, database},
+                            {path: {path, databaseFullPath}, database},
                             {signal},
                         );
                         const rawPartitions = response.partitions;

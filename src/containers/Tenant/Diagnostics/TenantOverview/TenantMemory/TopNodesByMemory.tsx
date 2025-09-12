@@ -48,20 +48,20 @@ function getTopNodesByMemoryColumns(
 }
 
 interface TopNodesByMemoryProps {
-    tenantName: string;
+    database: string;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-export function TopNodesByMemory({tenantName, additionalNodesProps}: TopNodesByMemoryProps) {
+export function TopNodesByMemory({database, additionalNodesProps}: TopNodesByMemoryProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const [columns, fieldsRequired] = getTopNodesByMemoryColumns({
         getNodeRef: additionalNodesProps?.getNodeRef,
-        database: tenantName,
+        database,
     });
 
     const {currentData, isFetching, error} = nodesApi.useGetNodesQuery(
         {
-            tenant: tenantName,
+            tenant: database,
             type: 'any',
             tablets: true,
             sort: '-Memory',

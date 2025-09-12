@@ -49,15 +49,15 @@ function GrantRightsToSubject({subject}: ActionProps) {
 }
 
 function RevokeAllRights({subject}: ActionProps) {
-    const {path, database} = useCurrentSchema();
+    const {path, database, databaseFullPath} = useCurrentSchema();
     const dialect = useAclSyntax();
     const subjectExplicitRights = useTypedSelector((state) =>
-        selectSubjectExplicitRights(state, subject, path, database, dialect),
+        selectSubjectExplicitRights(state, subject, path, database, databaseFullPath, dialect),
     );
     const noRightsToRevoke = subjectExplicitRights.length === 0;
 
     const handleClick = async () => {
-        await getRevokeAllRightsDialog({path, database, subject});
+        await getRevokeAllRightsDialog({path, database, databaseFullPath, subject});
     };
 
     return (

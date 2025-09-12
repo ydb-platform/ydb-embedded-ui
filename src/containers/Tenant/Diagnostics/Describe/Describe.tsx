@@ -15,13 +15,14 @@ const b = cn('ydb-describe');
 interface IDescribeProps {
     path: string;
     database: string;
+    databaseFullPath: string;
 }
 
-const Describe = ({path, database}: IDescribeProps) => {
+const Describe = ({path, database, databaseFullPath}: IDescribeProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {currentData, isFetching, error} = overviewApi.useGetOverviewQuery(
-        {path, database},
+        {path, database, databaseFullPath},
         {pollingInterval: autoRefreshInterval},
     );
 

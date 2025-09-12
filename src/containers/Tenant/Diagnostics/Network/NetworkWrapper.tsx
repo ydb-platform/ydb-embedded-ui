@@ -9,11 +9,13 @@ import {Network} from './Network';
 interface NetworkWrapperProps
     extends Pick<NodesProps, 'path' | 'scrollContainerRef' | 'additionalNodesProps'> {
     database: string;
+    databaseFullPath: string;
 }
 
 export function NetworkWrapper({
     database,
     path,
+    databaseFullPath,
     scrollContainerRef,
     additionalNodesProps,
 }: NetworkWrapperProps) {
@@ -25,6 +27,7 @@ export function NetworkWrapper({
             return (
                 <NetworkTable
                     path={path}
+                    databaseFullPath={databaseFullPath}
                     database={database}
                     scrollContainerRef={scrollContainerRef}
                     additionalNodesProps={additionalNodesProps}
@@ -32,7 +35,7 @@ export function NetworkWrapper({
             );
         }
 
-        return <Network tenantName={database} />;
+        return <Network database={database} databaseFullPath={databaseFullPath} />;
     };
 
     return <LoaderWrapper loading={!capabilitiesLoaded}>{renderContent()}</LoaderWrapper>;

@@ -17,12 +17,12 @@ import {TopicPreviewTable} from './TopicPreviewTable';
 
 const TOPIC_PREVIEW_LIMIT = 100;
 
-export function TopicPreview({database, path}: PreviewContainerProps) {
+export function TopicPreview({database, path, databaseFullPath}: PreviewContainerProps) {
     const {
         data: partitions,
         isLoading: partitionsLoading,
         error: partitionsError,
-    } = partitionsApi.useGetPartitionsQuery({path, database});
+    } = partitionsApi.useGetPartitionsQuery({path, database, databaseFullPath});
 
     const firstPartition = React.useMemo(() => {
         return partitions?.[0];

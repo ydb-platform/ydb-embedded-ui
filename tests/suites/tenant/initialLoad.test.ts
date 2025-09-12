@@ -1,12 +1,12 @@
 import {expect, test} from '@playwright/test';
 
-import {backend, tenantName} from '../../utils/constants';
+import {backend, database} from '../../utils/constants';
 
 import {TenantPage} from './TenantPage';
 
 const pageQueryParams = {
-    schema: tenantName,
-    database: tenantName,
+    schema: database,
+    database,
     tenantPage: 'diagnostics',
 };
 

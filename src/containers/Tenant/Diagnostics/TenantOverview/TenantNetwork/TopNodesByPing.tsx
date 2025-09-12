@@ -13,20 +13,20 @@ import i18n from '../i18n';
 import {getTopNodesByPingColumns} from './columns';
 
 interface TopNodesByPingProps {
-    tenantName: string;
+    database: string;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-export function TopNodesByPing({tenantName, additionalNodesProps}: TopNodesByPingProps) {
+export function TopNodesByPing({database, additionalNodesProps}: TopNodesByPingProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const [columns, fieldsRequired] = getTopNodesByPingColumns({
         getNodeRef: additionalNodesProps?.getNodeRef,
-        database: tenantName,
+        database,
     });
 
     const {currentData, isFetching, error} = nodesApi.useGetNodesQuery(
         {
-            tenant: tenantName,
+            tenant: database,
             type: 'any',
             sort: '-PingTime',
             limit: TENANT_OVERVIEW_TABLES_LIMIT,

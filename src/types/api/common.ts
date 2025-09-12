@@ -5,3 +5,5 @@ export interface IProtobufTimeObject {
 }
 
 export type BackendSortParam<T extends string> = `-${T}` | `+${T}` | T;
+
+export type SchemaPathParam = {path: string; databaseFullPath: string};

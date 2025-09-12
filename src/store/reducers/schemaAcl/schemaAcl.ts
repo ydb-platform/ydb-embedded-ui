@@ -12,16 +12,18 @@ export const schemaAclApi = api.injectEndpoints({
                     path,
                     database,
                     dialect,
+                    databaseFullPath,
                 }: {
                     path: string;
                     database: string;
                     dialect: string;
+                    databaseFullPath: string;
                 },
                 {signal},
             ) => {
                 try {
                     const data = await window.api.viewer.getSchemaAcl(
-                        {path, database, dialect},
+                        {path: {path, databaseFullPath}, database, dialect},
                         {signal},
                     );
                     return {
@@ -43,15 +45,17 @@ export const schemaAclApi = api.injectEndpoints({
                 {
                     database,
                     dialect,
+                    databaseFullPath,
                 }: {
                     database: string;
+                    databaseFullPath: string;
                     dialect: string;
                 },
                 {signal},
             ) => {
                 try {
                     const data = await window.api.viewer.getAvailablePermissions(
-                        {path: database, database, dialect},
+                        {path: {path: databaseFullPath, databaseFullPath}, database, dialect},
                         {signal},
                     );
 
@@ -64,14 +68,26 @@ export const schemaAclApi = api.injectEndpoints({
             },
         }),
         updateAccess: build.mutation({
-            queryFn: async (props: {
+            queryFn: async ({
+                database,
+                databaseFullPath,
+                path,
+                rights,
+                dialect,
+            }: {
                 database: string;
+                databaseFullPath: string;
                 path: string;
                 rights: AccessRightsUpdateRequest;
                 dialect: string;
             }) => {
                 try {
-                    const data = await window.api.viewer.updateAccessRights(props);
+                    const data = await window.api.viewer.updateAccessRights({
+                        database,
+                        rights,
+                        dialect,
+                        path: {path, databaseFullPath},
+                    });
                     return {data};
                 } catch (error) {
                     return {error};
@@ -86,28 +102,39 @@ export const schemaAclApi = api.injectEndpoints({
 const createGetSchemaAclSelector = createSelector(
     (path: string) => path,
     (_path: string, database: string) => database,
-    (_path: string, _database: string, dialect: string) => dialect,
-    (path, database, dialect) =>
-        schemaAclApi.endpoints.getSchemaAcl.select({path, database, dialect}),
+    (_path: string, _database: string, databaseFullPath: string) => databaseFullPath,
+    (_path: string, _database: string, _databaseFullPath: string, dialect: string) => dialect,
+    (path, database, databaseFullPath, dialect) =>
+        schemaAclApi.endpoints.getSchemaAcl.select({path, database, databaseFullPath, dialect}),
 );
 
 export const selectSchemaOwner = createSelector(
     (state: RootState) => state,
-    (_state: RootState, path: string, database: string, dialect: string) =>
-        createGetSchemaAclSelector(path, database, dialect),
+    (
+        _state: RootState,
+        path: string,
+        database: string,
+        databaseFullPath: string,
+        dialect: string,
+    ) => createGetSchemaAclSelector(path, database, databaseFullPath, dialect),
     (state, selectGetSchemaAcl) => selectGetSchemaAcl(state).data?.owner,
 );
 
 const selectAccessRights = createSelector(
     (state: RootState) => state,
-    (_state: RootState, path: string, database: string, dialect: string) =>
-        createGetSchemaAclSelector(path, database, dialect),
+    (
+        _state: RootState,
+        path: string,
+        database: string,
+        databaseFullPath: string,
+        dialect: string,
+    ) => createGetSchemaAclSelector(path, database, databaseFullPath, dialect),
     (state, selectGetSchemaAcl) => selectGetSchemaAcl(state).data,
 );
 
 const selectRightsMap = createSelector(
-    (state: RootState, path: string, database: string, dialect: string) =>
-        selectAccessRights(state, path, database, dialect),
+    (state: RootState, path: string, database: string, databaseFullPath: string, dialect: string) =>
+        selectAccessRights(state, path, database, databaseFullPath, dialect),
     (data) => {
         if (!data) {
             return null;
@@ -153,8 +180,8 @@ const selectRightsMap = createSelector(
 );
 
 export const selectPreparedRights = createSelector(
-    (state: RootState, path: string, database: string, dialect: string) =>
-        selectRightsMap(state, path, database, dialect),
+    (state: RootState, path: string, database: string, databaseFullPath: string, dialect: string) =>
+        selectRightsMap(state, path, database, databaseFullPath, dialect),
     (data) => {
         if (!data) {
             return null;
@@ -175,8 +202,9 @@ export const selectSubjectExplicitRights = createSelector(
             _subject: string | undefined,
             path: string,
             database: string,
+            databaseFullPath: string,
             dialect: string,
-        ) => selectRightsMap(state, path, database, dialect),
+        ) => selectRightsMap(state, path, database, databaseFullPath, dialect),
     ],
     (subject, rightsMap) => {
         if (!subject || !rightsMap) {
@@ -196,8 +224,9 @@ export const selectSubjectInheritedRights = createSelector(
             _subject: string | undefined,
             path: string,
             database: string,
+            databaseFullPath: string,
             dialect: string,
-        ) => selectRightsMap(state, path, database, dialect),
+        ) => selectRightsMap(state, path, database, databaseFullPath, dialect),
     ],
     (subject, rightsMap) => {
         if (!subject || !rightsMap) {
@@ -216,15 +245,20 @@ export const selectSubjectInheritedRights = createSelector(
 
 const createGetAvailablePermissionsSelector = createSelector(
     (database: string) => database,
-    (_database: string, dialect: string) => dialect,
-    (database, dialect) =>
-        schemaAclApi.endpoints.getAvailablePermissions.select({database, dialect}),
+    (_database: string, databaseFullPath: string) => databaseFullPath,
+    (_database: string, _databaseFullPath: string, dialect: string) => dialect,
+    (database, databaseFullPath, dialect) =>
+        schemaAclApi.endpoints.getAvailablePermissions.select({
+            database,
+            dialect,
+            databaseFullPath,
+        }),
 );
 
 // Then create the main selector that extracts the available permissions data
 export const selectAvailablePermissions = createSelector(
     (state: RootState) => state,
-    (_state: RootState, database: string, dialect: string) =>
-        createGetAvailablePermissionsSelector(database, dialect),
+    (_state: RootState, database: string, databaseFullPath: string, dialect: string) =>
+        createGetAvailablePermissionsSelector(database, databaseFullPath, dialect),
     (state, selectGetAvailablePermissions) => selectGetAvailablePermissions(state).data,
 );

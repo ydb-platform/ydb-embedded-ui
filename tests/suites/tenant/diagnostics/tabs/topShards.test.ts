@@ -1,6 +1,6 @@
 import {expect, test} from '@playwright/test';
 
-import {tenantName} from '../../../../utils/constants';
+import {database} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
 import {
     Diagnostics,
@@ -13,8 +13,8 @@ import {setupTopShardsHistoryMock} from '../mocks';
 test.describe('Diagnostics TopShards tab', async () => {
     test('TopShards tab defaults to Immediate mode', async ({page}) => {
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
             diagnosticsTab: 'topShards',
         };
@@ -29,8 +29,8 @@ test.describe('Diagnostics TopShards tab', async () => {
 
     test('TopShards immediate tab shows all expected column headers', async ({page}) => {
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
             diagnosticsTab: 'topShards',
         };
@@ -48,8 +48,8 @@ test.describe('Diagnostics TopShards tab', async () => {
 
     test('TopShards history tab shows all expected column headers', async ({page}) => {
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
             diagnosticsTab: 'topShards',
         };
@@ -68,8 +68,8 @@ test.describe('Diagnostics TopShards tab', async () => {
 
     test('TopShards tab first row has values for all columns in Immediate mode', async ({page}) => {
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
             diagnosticsTab: 'topShards',
         };
@@ -95,8 +95,8 @@ test.describe('Diagnostics TopShards tab', async () => {
 
         // Now navigate to diagnostics page to check topShards
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
             diagnosticsTab: 'topShards',
         };
@@ -119,8 +119,8 @@ test.describe('Diagnostics TopShards tab', async () => {
 
     test('TopShards tab can switch back to Immediate mode from Historical mode', async ({page}) => {
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
             diagnosticsTab: 'topShards',
         };

@@ -80,7 +80,7 @@ interface ExecuteResultProps {
     resultType?: QueryAction;
     isResultsCollapsed?: boolean;
     theme?: string;
-    tenantName: string;
+    database: string;
     queryText?: string;
     tableSettings?: Partial<Settings>;
 
@@ -93,7 +93,7 @@ export function QueryResultViewer({
     resultType = 'execute',
     isResultsCollapsed,
     theme,
-    tenantName,
+    database,
     queryText,
     tableSettings,
     onCollapseResults,
@@ -209,7 +209,7 @@ export function QueryResultViewer({
                     plan: data.plan,
                 }}
                 error={error}
-                database={tenantName}
+                database={database}
                 hasPlanToSvg={Boolean(data?.plan && useShowPlanToSvg && isExecute)}
             />
         );
