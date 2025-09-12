@@ -67,7 +67,7 @@ function Header() {
     const isDatabasePage = location.pathname === '/tenant';
     const isClustersPage = location.pathname === '/clusters';
 
-    const {isFetching: isClustersFetching, error: clustersError} =
+    const {isLoading: isClustersLoading, error: clustersError} =
         clustersApi.useGetClustersListQuery(undefined, {
             skip: !isClustersPage,
         });
@@ -75,7 +75,7 @@ function Header() {
     const isAddClusterAvailable =
         useAddClusterFeatureAvailable() &&
         uiFactory.onAddCluster !== undefined &&
-        !isClustersFetching &&
+        !isClustersLoading &&
         !isAccessError(clustersError);
 
     const isEditDBAvailable = useEditDatabaseFeatureAvailable() && uiFactory.onEditDB !== undefined;
