@@ -19,9 +19,11 @@ import {calculateMetricAggregates} from '../../../../../utils/metrics';
 // no direct legend formatters needed here – handled in subcomponents
 import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 
-import {CommonMetricsTabs} from './CommonMetricsTabs';
-import {DedicatedMetricsTabs} from './DedicatedMetricsTabs';
-import {ServerlessPlaceholderTabs} from './ServerlessPlaceholderTabs';
+import {CpuTab} from './components/CpuTab';
+import {MemoryTab} from './components/MemoryTab';
+import {NetworkTab} from './components/NetworkTab';
+import {PlaceholderTab} from './components/PlaceholderTab';
+import {StorageTab} from './components/StorageTab';
 
 import './MetricsTabs.scss';
 
@@ -32,7 +34,8 @@ interface MetricsTabsProps {
     memoryStats?: TenantMetricStats[];
     blobStorageStats?: TenantStorageStats[];
     tabletStorageStats?: TenantStorageStats[];
-    networkStats?: TenantMetricStats[];
+    networkUtilization?: number;
+    networkThroughput?: number;
     storageGroupsCount?: number;
     databaseType?: ETenantType;
     activeTab: TenantMetricsTab;
@@ -43,7 +46,8 @@ export function MetricsTabs({
     memoryStats,
     blobStorageStats,
     tabletStorageStats,
-    networkStats,
+    networkUtilization,
+    networkThroughput,
     storageGroupsCount,
     databaseType,
     activeTab,
@@ -88,44 +92,63 @@ export function MetricsTabs({
     // Calculate memory metrics using utility
     const memoryMetrics = useMemo(() => calculateMetricAggregates(memoryStats), [memoryStats]);
 
-    // Calculate network metrics using utility
+    // Pass raw network values; DedicatedMetricsTabs computes percent and legend
     const [showNetworkUtilization] = useSetting<boolean>(SHOW_NETWORK_UTILIZATION);
-    const networkMetrics = useMemo(
-        () => (networkStats ? calculateMetricAggregates(networkStats) : null),
-        [networkStats],
-    );
 
     // card variant is handled within subcomponents
 
     const isServerless = databaseType === 'Serverless';
 
+    const renderNetworkTab = () => {
+        if (!showNetworkUtilization) {
+            return null;
+        }
+
+        if (isServerless) {
+            return <PlaceholderTab />;
+        }
+
+        return (
+            <NetworkTab
+                to={tabLinks[TENANT_METRICS_TABS_IDS.network]}
+                active={activeTab === TENANT_METRICS_TABS_IDS.network}
+                networkUtilization={networkUtilization}
+                networkThroughput={networkThroughput}
+            />
+        );
+    };
+
     return (
         <Flex className={b({serverless: Boolean(isServerless)})} alignItems="center">
-            <CommonMetricsTabs
-                activeTab={activeTab}
-                tabLinks={tabLinks}
+            <CpuTab
+                to={tabLinks[TENANT_METRICS_TABS_IDS.cpu]}
+                active={activeTab === TENANT_METRICS_TABS_IDS.cpu}
+                isServerless={Boolean(isServerless)}
                 cpu={{totalUsed: cpuMetrics.totalUsed, totalLimit: cpuMetrics.totalLimit}}
+            />
+            <StorageTab
+                to={tabLinks[TENANT_METRICS_TABS_IDS.storage]}
+                active={activeTab === TENANT_METRICS_TABS_IDS.storage}
+                isServerless={Boolean(isServerless)}
                 storage={{
                     totalUsed: storageMetrics.totalUsed,
                     totalLimit: storageMetrics.totalLimit,
                 }}
                 storageGroupsCount={storageGroupsCount}
-                databaseType={databaseType}
             />
             {isServerless ? (
-                <ServerlessPlaceholderTabs />
+                <PlaceholderTab />
             ) : (
-                <DedicatedMetricsTabs
-                    activeTab={activeTab}
-                    tabLinks={tabLinks}
+                <MemoryTab
+                    to={tabLinks[TENANT_METRICS_TABS_IDS.memory]}
+                    active={activeTab === TENANT_METRICS_TABS_IDS.memory}
                     memory={{
                         totalUsed: memoryMetrics.totalUsed,
                         totalLimit: memoryMetrics.totalLimit,
                     }}
-                    network={networkMetrics}
-                    showNetwork={Boolean(showNetworkUtilization && networkStats && networkMetrics)}
                 />
             )}
+            {renderNetworkTab()}
         </Flex>
     );
 }
