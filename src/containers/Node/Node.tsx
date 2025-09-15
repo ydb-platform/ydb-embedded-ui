@@ -28,6 +28,7 @@ import {Tablets} from '../Tablets/Tablets';
 
 import type {NodeTab} from './NodePages';
 import {NODE_TABS, getDefaultNodePath, nodePageQueryParams, nodePageTabSchema} from './NodePages';
+import {NodeNetwork} from './Network/NodeNetwork';
 import NodeStructure from './NodeStructure/NodeStructure';
 import {Threads} from './Threads/Threads';
 import i18n from './i18n';
@@ -256,6 +257,10 @@ function NodePageContent({
 
             case 'threads': {
                 return <Threads nodeId={nodeId} />;
+            }
+
+            case 'network': {
+                return <NodeNetwork nodeId={nodeId} tenantName={tenantName} />;
             }
 
             default:
