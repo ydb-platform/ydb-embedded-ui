@@ -1,5 +1,16 @@
 # Changelog
 
+## [12.2.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.2.0...v12.2.1) (2025-09-15)
+
+
+### Bug Fixes
+
+* **EntityStatus:** do not propagate copy clicks ([#2874](https://github.com/ydb-platform/ydb-embedded-ui/issues/2874)) ([4146f85](https://github.com/ydb-platform/ydb-embedded-ui/commit/4146f8526585ba36407d22c7f8f5d35708ffadde))
+* **Header:** fix add cluster button blinking on refresh ([#2873](https://github.com/ydb-platform/ydb-embedded-ui/issues/2873)) ([f8f14a9](https://github.com/ydb-platform/ydb-embedded-ui/commit/f8f14a917e4c096d4036a954feba61bcf5c60b60))
+* refactor relative paths support ([#2877](https://github.com/ydb-platform/ydb-embedded-ui/issues/2877)) ([9fc87c4](https://github.com/ydb-platform/ydb-embedded-ui/commit/9fc87c499e362ec000b9d7c598121dabfcb14317))
+* **Tenants:** format state from Pending_resources to Pending ([#2825](https://github.com/ydb-platform/ydb-embedded-ui/issues/2825)) ([7eb1f2f](https://github.com/ydb-platform/ydb-embedded-ui/commit/7eb1f2f22f5891f23c820eb20f9074f1ec368191))
+* write network info for tenant same as for cluster ([#2882](https://github.com/ydb-platform/ydb-embedded-ui/issues/2882)) ([e9a4e6f](https://github.com/ydb-platform/ydb-embedded-ui/commit/e9a4e6fe59626fdae56dff56ccde347726050f83))
+
 ## [12.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.1.1...v12.2.0) (2025-09-10)
 
 
