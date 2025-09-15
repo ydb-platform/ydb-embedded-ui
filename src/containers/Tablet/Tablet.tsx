@@ -88,9 +88,10 @@ export function Tablet() {
                 database,
                 tabletId: id,
                 tabletType,
+                databaseName: databaseFullPath,
             }),
         );
-    }, [dispatch, database, id, tabletType]);
+    }, [dispatch, database, id, tabletType, databaseFullPath]);
 
     const {Leader} = tablet;
     const metaItems: string[] = [];

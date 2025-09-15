@@ -325,11 +325,6 @@ export type NodesSortValue =
 
 export type NodesSort = BackendSortParam<NodesSortValue>;
 
-export interface NodesPathParam {
-    path: string;
-    databaseFullPath: string;
-}
-
 export interface NodesRequestParams {
     /** @deprecated use database instead */
     tenant?: string;
