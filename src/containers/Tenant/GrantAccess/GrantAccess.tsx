@@ -35,20 +35,22 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
     const [newSubjects, setNewSubjects] = React.useState<string[]>([]);
     const [rightView, setRightsView] = React.useState<RightsView>('Groups');
 
-    const {path, database} = useCurrentSchema();
+    const {path, database, databaseFullPath} = useCurrentSchema();
     const dialect = useAclSyntax();
     const {currentRightsMap, setExplicitRightsChanges, rightsToGrant, rightsToRevoke, hasChanges} =
-        useRights({aclSubject: aclSubject ?? undefined, path, database});
+        useRights({aclSubject: aclSubject ?? undefined, path, database, databaseFullPath});
     const {isFetching: aclIsFetching} = schemaAclApi.useGetSchemaAclQuery(
         {
             path,
             database,
+            databaseFullPath,
             dialect,
         },
         {skip: !aclSubject},
     );
     const {isFetching: availableRightsAreFetching} = schemaAclApi.useGetAvailablePermissionsQuery({
         database,
+        databaseFullPath,
         dialect,
     });
     const [updateRights, updateRightsResponse] = schemaAclApi.useUpdateAccessMutation();
@@ -56,7 +58,14 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
     const [updateRightsError, setUpdateRightsError] = React.useState('');
 
     const inheritedRightsSet = useTypedSelector((state) =>
-        selectSubjectInheritedRights(state, aclSubject ?? undefined, path, database, dialect),
+        selectSubjectInheritedRights(
+            state,
+            aclSubject ?? undefined,
+            path,
+            database,
+            databaseFullPath,
+            dialect,
+        ),
     );
 
     const handleDiscardRightsChanges = React.useCallback(() => {
@@ -71,6 +80,7 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
         updateRights({
             path,
             database,
+            databaseFullPath,
             dialect,
             rights: {
                 AddAccess: subjects.map((subj) => ({
@@ -108,10 +118,11 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
         rightsToRevoke,
         newSubjects,
         handleCloseDrawer,
+        databaseFullPath,
     ]);
 
     const availablePermissions = useTypedSelector((state) =>
-        selectAvailablePermissions(state, database, dialect),
+        selectAvailablePermissions(state, database, databaseFullPath, dialect),
     );
     const handleChangeRightGetter = React.useCallback(
         (right: string) => {

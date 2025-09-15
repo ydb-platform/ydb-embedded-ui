@@ -30,11 +30,18 @@ import './SchemaViewer.scss';
 interface SchemaViewerProps {
     type?: EPathType;
     path: string;
-    tenantName: string;
+    databaseFullPath: string;
+    database: string;
     extended?: boolean;
 }
 
-export const SchemaViewer = ({type, path, tenantName, extended = false}: SchemaViewerProps) => {
+export const SchemaViewer = ({
+    type,
+    path,
+    database,
+    extended = false,
+    databaseFullPath,
+}: SchemaViewerProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     // Refresh table only in Diagnostics
@@ -42,12 +49,12 @@ export const SchemaViewer = ({type, path, tenantName, extended = false}: SchemaV
 
     const {currentData: tableSchemaData, isFetching: isTableSchemaFetching} =
         overviewApi.useGetOverviewQuery(
-            {path, database: tenantName},
+            {path, database, databaseFullPath},
             {pollingInterval, skip: isViewType(type)},
         );
     const {currentData: viewColumnsData, isFetching: isViewSchemaFetching} =
         viewSchemaApi.useGetViewSchemaQuery(
-            {path, database: tenantName},
+            {path, database, databaseFullPath},
             {pollingInterval, skip: !isViewType(type)},
         );
 

@@ -17,6 +17,7 @@ import {NodesControlsWithTableState} from './NodesControlsWithTableState';
 interface NodesComponentProps {
     path?: string;
     database?: string;
+    databaseFullPath?: string;
     scrollContainerRef: React.RefObject<HTMLElement>;
     withPeerRoleFilter?: boolean;
     columns: Column<NodesPreparedEntity>[];
@@ -29,6 +30,7 @@ interface NodesComponentProps {
 export function NodesComponent({
     path,
     database,
+    databaseFullPath,
     scrollContainerRef,
     withPeerRoleFilter,
     columns,
@@ -67,6 +69,7 @@ export function NodesComponent({
                 <NodesTable
                     path={path}
                     database={database}
+                    databaseFullPath={databaseFullPath}
                     searchValue={searchValue}
                     problemFilter={problemFilter}
                     uptimeFilter={uptimeFilter}

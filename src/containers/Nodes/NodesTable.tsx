@@ -17,6 +17,7 @@ import {getRowClassName} from './shared';
 interface NodesTableProps {
     path?: string;
     database?: string;
+    databaseFullPath?: string;
 
     searchValue: string;
     problemFilter: ProblemFilterValue;
@@ -35,6 +36,7 @@ interface NodesTableProps {
 export function NodesTable({
     path,
     database,
+    databaseFullPath,
     searchValue,
     problemFilter,
     uptimeFilter,
@@ -48,6 +50,7 @@ export function NodesTable({
     const tableFilters: NodesFilters = React.useMemo(() => {
         return {
             path,
+            databaseFullPath,
             database,
             searchValue,
             problemFilter,
@@ -58,6 +61,7 @@ export function NodesTable({
         };
     }, [
         path,
+        databaseFullPath,
         database,
         searchValue,
         problemFilter,

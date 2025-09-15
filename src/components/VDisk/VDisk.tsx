@@ -37,7 +37,7 @@ export const VDisk = ({
 }: VDiskProps) => {
     const database = useDatabaseFromQuery();
     const vDiskPath = getVDiskLink(data, {
-        database: database,
+        database,
     });
 
     return (

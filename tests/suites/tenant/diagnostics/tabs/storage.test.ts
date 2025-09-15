@@ -1,14 +1,14 @@
 import {expect, test} from '@playwright/test';
 
-import {tenantName} from '../../../../utils/constants';
+import {database} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
 import {Diagnostics, DiagnosticsTab} from '../Diagnostics';
 
 test.describe('Diagnostics Storage tab', async () => {
     test('Storage tab shows Groups and Nodes views', async ({page}) => {
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             tenantPage: 'diagnostics',
         };
         const tenantPage = new TenantPage(page);

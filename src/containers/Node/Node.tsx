@@ -88,23 +88,23 @@ export function Node() {
         return {activeTab: actualActiveTab, nodeTabs: actualNodeTabs};
     }, [isStorageNode, isDiskPagesAvailable, activeTabId, threadsQuantity]);
 
-    const tenantName = node?.Tenants?.[0] || tenantNameFromQuery?.toString();
-
     const database = tenantNameFromQuery?.toString();
+
+    const databaseName = node?.Tenants?.[0];
 
     React.useEffect(() => {
         // Dispatch only if loaded to get correct node role
         if (!isLoading) {
             dispatch(
                 setHeaderBreadcrumbs('node', {
-                    tenantName,
                     database,
+                    databaseName,
                     nodeRole: isStorageNode ? 'Storage' : 'Compute',
                     nodeId,
                 }),
             );
         }
-    }, [dispatch, tenantName, nodeId, isLoading, isStorageNode, database]);
+    }, [dispatch, database, nodeId, isLoading, isStorageNode, databaseName]);
 
     return (
         <div className={b(null)} ref={container}>
@@ -116,7 +116,7 @@ export function Node() {
             {nodeId ? (
                 <NodePageContent
                     nodeId={nodeId}
-                    tenantName={tenantName}
+                    database={database}
                     activeTabId={activeTab.id}
                     tabs={nodeTabs}
                     parentContainer={container}
@@ -189,7 +189,7 @@ function NodePageInfo({node, loading}: NodePageInfoProps) {
 
 interface NodePageContentProps {
     nodeId: string;
-    tenantName?: string;
+    database?: string;
 
     activeTabId: NodeTab;
     tabs: {id: string; title: string}[];
@@ -199,7 +199,7 @@ interface NodePageContentProps {
 
 function NodePageContent({
     nodeId,
-    tenantName,
+    database,
     activeTabId,
     tabs,
     parentContainer,
@@ -210,11 +210,7 @@ function NodePageContent({
                 <TabProvider value={activeTabId}>
                     <TabList className={b('tab-list')} size="l">
                         {tabs.map(({id, title}) => {
-                            const path = getDefaultNodePath(
-                                nodeId,
-                                {database: tenantName},
-                                id as NodeTab,
-                            );
+                            const path = getDefaultNodePath(nodeId, {database}, id as NodeTab);
                             return (
                                 <Tab value={id} key={id}>
                                     <InternalLink to={path} as="tab">
@@ -234,7 +230,7 @@ function NodePageContent({
             case 'storage': {
                 return (
                     <PaginatedStorage
-                        database={tenantName}
+                        database={database}
                         nodeId={nodeId}
                         scrollContainerRef={parentContainer}
                         viewContext={{
@@ -248,7 +244,7 @@ function NodePageContent({
                     <Tablets
                         scrollContainerRef={parentContainer}
                         nodeId={nodeId}
-                        database={tenantName}
+                        database={database}
                         onlyActive
                     />
                 );

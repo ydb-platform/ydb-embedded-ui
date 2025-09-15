@@ -29,13 +29,13 @@ import {TOP_QUERIES_TABLE_SETTINGS} from './utils';
 const b = cn('kv-top-queries');
 
 interface RunningQueriesDataProps {
-    tenantName: string;
+    database: string;
     renderQueryModeControl: () => React.ReactNode;
     handleTextSearchUpdate: (text: string) => void;
 }
 
 export const RunningQueriesData = ({
-    tenantName,
+    database,
     renderQueryModeControl,
     handleTextSearchUpdate,
 }: RunningQueriesDataProps) => {
@@ -60,7 +60,7 @@ export const RunningQueriesData = ({
 
     const {currentData, isFetching, isLoading, error} = topQueriesApi.useGetRunningQueriesQuery(
         {
-            database: tenantName,
+            database,
             filters,
             sortOrder: backendSort,
         },

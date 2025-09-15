@@ -17,14 +17,14 @@ import {TopShards} from './TopShards';
 import {cpuDashboardConfig} from './cpuDashboardConfig';
 
 interface TenantCpuProps {
-    tenantName: string;
-    databaseFullPath?: string;
+    database: string;
+    databaseFullPath: string;
     additionalNodesProps?: AdditionalNodesProps;
     databaseType?: ETenantType;
 }
 
 export function TenantCpu({
-    tenantName,
+    database,
     additionalNodesProps,
     databaseType,
     databaseFullPath,
@@ -42,13 +42,13 @@ export function TenantCpu({
         <Flex direction="column" gap={4}>
             {!isServerless && (
                 <>
-                    <TenantDashboard database={tenantName} charts={cpuDashboardConfig} />
+                    <TenantDashboard database={database} charts={cpuDashboardConfig} />
                     <StatsWrapper
                         allEntitiesLink={allNodesLink}
                         title={i18n('title_top-nodes-load')}
                     >
                         <TopNodesByLoad
-                            tenantName={tenantName}
+                            database={database}
                             additionalNodesProps={additionalNodesProps}
                         />
                     </StatsWrapper>
@@ -57,18 +57,14 @@ export function TenantCpu({
                         allEntitiesLink={allNodesLink}
                     >
                         <TopNodesByCpu
-                            tenantName={tenantName}
+                            database={database}
                             additionalNodesProps={additionalNodesProps}
                         />
                     </StatsWrapper>
                 </>
             )}
             <StatsWrapper title={i18n('title_top-shards')} allEntitiesLink={topShardsLink}>
-                <TopShards
-                    tenantName={tenantName}
-                    path={tenantName}
-                    databaseFullPath={databaseFullPath}
-                />
+                <TopShards database={database} databaseFullPath={databaseFullPath} />
             </StatsWrapper>
             <StatsWrapper
                 title={i18n('title_top-queries')}
@@ -77,7 +73,7 @@ export function TenantCpu({
                     dispatch(setTopQueriesFilters({from: undefined, to: undefined}))
                 }
             >
-                <TopQueries tenantName={tenantName} />
+                <TopQueries database={database} />
             </StatsWrapper>
         </Flex>
     );

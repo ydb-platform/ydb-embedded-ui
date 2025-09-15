@@ -27,13 +27,15 @@ import {b} from './utils';
 import './TenantOverview.scss';
 
 interface TenantOverviewProps {
-    tenantName: string;
+    database: string;
+    databaseFullPath: string;
     additionalTenantProps?: AdditionalTenantsProps;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
 export function TenantOverview({
-    tenantName,
+    database,
+    databaseFullPath,
     additionalTenantProps,
     additionalNodesProps,
 }: TenantOverviewProps) {
@@ -44,7 +46,7 @@ export function TenantOverview({
     const isMetaDatabasesAvailable = useDatabasesAvailable();
 
     const {currentData: tenant, isFetching} = tenantApi.useGetTenantInfoQuery(
-        {path: tenantName, clusterName, isMetaDatabasesAvailable},
+        {database, clusterName, isMetaDatabasesAvailable},
         {pollingInterval: autoRefreshInterval},
     );
     const tenantLoading = isFetching && tenant === undefined;
@@ -61,8 +63,9 @@ export function TenantOverview({
     // FIXME: remove after correct data is added to tenantInfo
     const {currentData: tenantSchemaData} = overviewApi.useGetOverviewQuery(
         {
-            path: tenantName,
-            database: tenantName,
+            path: database,
+            database,
+            databaseFullPath,
         },
         {
             pollingInterval: autoRefreshInterval,
@@ -140,17 +143,17 @@ export function TenantOverview({
             case TENANT_METRICS_TABS_IDS.cpu: {
                 return (
                     <TenantCpu
-                        tenantName={tenantName}
+                        database={database}
                         additionalNodesProps={additionalNodesProps}
                         databaseType={Type}
-                        databaseFullPath={Name}
+                        databaseFullPath={databaseFullPath}
                     />
                 );
             }
             case TENANT_METRICS_TABS_IDS.storage: {
                 return (
                     <TenantStorage
-                        tenantName={tenantName}
+                        database={database}
                         metrics={storageMetrics}
                         databaseType={Type}
                     />
@@ -159,7 +162,7 @@ export function TenantOverview({
             case TENANT_METRICS_TABS_IDS.memory: {
                 return (
                     <TenantMemory
-                        tenantName={tenantName}
+                        database={database}
                         memoryUsed={tenantData.MemoryUsed}
                         memoryLimit={tenantData.MemoryLimit}
                         memoryStats={tenantData.MemoryStats}
@@ -169,7 +172,7 @@ export function TenantOverview({
             case TENANT_METRICS_TABS_IDS.network: {
                 return (
                     <TenantNetwork
-                        tenantName={tenantName}
+                        database={database}
                         additionalNodesProps={additionalNodesProps}
                     />
                 );
@@ -204,8 +207,8 @@ export function TenantOverview({
                         </Flex>
                     </Flex>
                     <Flex direction="column" gap={4}>
-                        <HealthcheckPreview tenantName={tenantName} />
-                        <QueriesActivityBar tenantName={tenantName} />
+                        <HealthcheckPreview database={database} />
+                        <QueriesActivityBar database={database} />
                         <MetricsTabs
                             poolsCpuStats={poolsStats}
                             memoryStats={memoryStats}

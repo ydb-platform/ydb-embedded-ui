@@ -71,14 +71,22 @@ const prepareBytesWrittenInfo = (data: IPreparedTopicStats): Array<InfoViewerIte
     ];
 };
 
-export const TopicStats = ({path, database}: {path: string; database: string}) => {
+interface TopicStatsProps {
+    path: string;
+    database: string;
+    databaseFullPath: string;
+}
+
+export const TopicStats = ({path, database, databaseFullPath}: TopicStatsProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = topicApi.useGetTopicQuery(
-        {path, database},
+        {path, database, databaseFullPath},
         {pollingInterval: autoRefreshInterval},
     );
     const loading = isFetching && currentData === undefined;
-    const data = useTypedSelector((state) => selectPreparedTopicStats(state, path, database));
+    const data = useTypedSelector((state) =>
+        selectPreparedTopicStats(state, path, database, databaseFullPath),
+    );
 
     if (loading) {
         return (

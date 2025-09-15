@@ -57,7 +57,7 @@ export function Tenant(props: TenantProps) {
 
     const {database, schema} = useTenantQueryParams();
 
-    const {controlPlane, name} = useTenantBaseInfo(database ?? '');
+    const {name, isLoading: tenantBaseInfoLoading} = useTenantBaseInfo(database ?? '');
 
     if (!database) {
         throw new Error('Tenant name is not defined');
@@ -77,23 +77,23 @@ export function Tenant(props: TenantProps) {
         }
     }, [database]);
 
-    const path = schema ?? database;
+    const databaseName = name ?? '';
+
+    const path = schema ?? databaseName;
 
     const {
         currentData: currentItem,
         error,
         isLoading,
-    } = overviewApi.useGetOverviewQuery({path, database: database});
-
-    const databaseName = name ?? controlPlane?.name ?? database;
+    } = overviewApi.useGetOverviewQuery({path, database, databaseFullPath: databaseName});
 
     const dispatch = useTypedDispatch();
     React.useEffect(() => {
-        dispatch(setHeaderBreadcrumbs('tenant', {tenantName: databaseName, database}));
+        dispatch(setHeaderBreadcrumbs('tenant', {databaseName, database}));
     }, [databaseName, database, dispatch]);
 
     const preloadedData = useTypedSelector((state) =>
-        selectSchemaObjectData(state, path, database),
+        selectSchemaObjectData(state, path, database, databaseName),
     );
 
     // Use preloaded data if there is no current item data yet
@@ -120,7 +120,7 @@ export function Tenant(props: TenantProps) {
     };
 
     const [initialLoading, setInitialLoading] = React.useState(true);
-    if (initialLoading && !isLoading) {
+    if (initialLoading && !isLoading && !tenantBaseInfoLoading) {
         setInitialLoading(false);
     }
 

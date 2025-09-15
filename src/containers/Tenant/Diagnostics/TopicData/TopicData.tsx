@@ -45,13 +45,14 @@ import './TopicData.scss';
 interface TopicDataProps {
     path: string;
     database: string;
+    databaseFullPath: string;
     scrollContainerRef: React.RefObject<HTMLElement>;
 }
 const PAGINATED_TABLE_LIMIT = 50_000;
 
 const columns = getAllColumns();
 
-export function TopicData({scrollContainerRef, path, database}: TopicDataProps) {
+export function TopicData({scrollContainerRef, path, database, databaseFullPath}: TopicDataProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const [startOffset, setStartOffset] = React.useState<number>();
     const [endOffset, setEndOffset] = React.useState<number>();
@@ -105,7 +106,7 @@ export function TopicData({scrollContainerRef, path, database}: TopicDataProps) 
         isLoading: partitionsLoading,
         error: partitionsError,
     } = partitionsApi.useGetPartitionsQuery(
-        {path, database},
+        {path, database, databaseFullPath},
         {pollingInterval: autoRefreshInterval},
     );
 

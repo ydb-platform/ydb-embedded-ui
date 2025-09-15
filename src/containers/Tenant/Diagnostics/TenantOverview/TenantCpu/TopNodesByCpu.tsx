@@ -42,20 +42,20 @@ function getTopNodesByCpuColumns(
 }
 
 interface TopNodesByCpuProps {
-    tenantName: string;
+    database: string;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-export function TopNodesByCpu({tenantName, additionalNodesProps}: TopNodesByCpuProps) {
+export function TopNodesByCpu({database, additionalNodesProps}: TopNodesByCpuProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const [columns, fieldsRequired] = getTopNodesByCpuColumns({
         getNodeRef: additionalNodesProps?.getNodeRef,
-        database: tenantName,
+        database,
     });
 
     const {currentData, isFetching, error} = nodesApi.useGetNodesQuery(
         {
-            tenant: tenantName,
+            tenant: database,
             type: 'any',
             sort: '-CPU',
             limit: TENANT_OVERVIEW_TABLES_LIMIT,

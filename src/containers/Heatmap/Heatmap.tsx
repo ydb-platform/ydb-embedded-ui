@@ -23,10 +23,11 @@ const COLORS_RANGE = getColorRange(COLORS_RANGE_SIZE);
 
 interface HeatmapProps {
     database: string;
+    databaseFullPath: string;
     path: string;
 }
 
-export const Heatmap = ({path, database}: HeatmapProps) => {
+export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
     const dispatch = useTypedDispatch();
 
     const itemsContainer = React.createRef<HTMLDivElement>();
@@ -34,7 +35,7 @@ export const Heatmap = ({path, database}: HeatmapProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {currentData, isFetching, error} = heatmapApi.useGetHeatmapTabletsInfoQuery(
-        {path, database},
+        {path, database, databaseFullPath},
         {pollingInterval: autoRefreshInterval},
     );
 

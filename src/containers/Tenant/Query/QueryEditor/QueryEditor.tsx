@@ -72,7 +72,7 @@ interface QueryEditorProps {
 
 export default function QueryEditor(props: QueryEditorProps) {
     const dispatch = useTypedDispatch();
-    const {database: tenantName, path, type, subType} = useCurrentSchema();
+    const {database, path, type, subType, databaseFullPath} = useCurrentSchema();
     const {theme, changeUserInput} = props;
     const savedPath = useTypedSelector(selectTenantPath);
     const result = useTypedSelector(selectResult);
@@ -113,10 +113,10 @@ export default function QueryEditor(props: QueryEditorProps) {
     }, [isStreamingEnabled, querySettings.limitRows]);
 
     React.useEffect(() => {
-        if (savedPath !== tenantName) {
-            dispatch(setTenantPath(tenantName));
+        if (savedPath !== database) {
+            dispatch(setTenantPath(database));
         }
-    }, [dispatch, tenantName, savedPath]);
+    }, [dispatch, database, savedPath]);
 
     const [resultVisibilityState, dispatchResultVisibilityState] = React.useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_QUERY_RESULT_COLLAPSED),
@@ -151,7 +151,7 @@ export default function QueryEditor(props: QueryEditorProps) {
             const query = streamQuery({
                 actionType: 'execute',
                 query: text,
-                database: tenantName,
+                database,
                 querySettings,
                 enableTracingLevel,
             });
@@ -161,7 +161,7 @@ export default function QueryEditor(props: QueryEditorProps) {
             const query = sendQuery({
                 actionType: 'execute',
                 query: text,
-                database: tenantName,
+                database,
                 querySettings,
                 enableTracingLevel,
                 queryId,
@@ -199,7 +199,7 @@ export default function QueryEditor(props: QueryEditorProps) {
         const query = sendQuery({
             actionType: 'explain',
             query: text,
-            database: tenantName,
+            database,
             querySettings,
             enableTracingLevel,
             queryId,
@@ -231,7 +231,7 @@ export default function QueryEditor(props: QueryEditorProps) {
                 isLoading={Boolean(result?.isLoading)}
                 handleGetExplainQueryClick={handleGetExplainQueryClick}
                 highlightedAction={lastUsedQueryAction}
-                tenantName={tenantName}
+                database={database}
                 queryId={result?.queryId}
                 isStreamingEnabled={isStreamingEnabled}
             />
@@ -276,7 +276,8 @@ export default function QueryEditor(props: QueryEditorProps) {
                         theme={theme}
                         key={result?.queryId}
                         result={result}
-                        tenantName={tenantName}
+                        database={database}
+                        databaseFullPath={databaseFullPath}
                         path={path}
                         showPreview={showPreview}
                         queryText={lastExecutedQueryText}
@@ -297,7 +298,8 @@ interface ResultProps {
     subType?: EPathSubType;
     theme: string;
     result?: QueryResult;
-    tenantName: string;
+    database: string;
+    databaseFullPath: string;
     path: string;
     showPreview?: boolean;
     queryText: string;
@@ -311,14 +313,23 @@ function Result({
     subType,
     theme,
     result,
-    tenantName,
+    database,
+    databaseFullPath,
     path,
     showPreview,
     queryText,
     tableSettings,
 }: ResultProps) {
     if (showPreview) {
-        return <PreviewContainer database={tenantName} path={path} type={type} subType={subType} />;
+        return (
+            <PreviewContainer
+                database={database}
+                path={path}
+                type={type}
+                subType={subType}
+                databaseFullPath={databaseFullPath}
+            />
+        );
     }
 
     if (result) {
@@ -327,7 +338,7 @@ function Result({
                 result={result}
                 resultType={result?.type}
                 theme={theme}
-                tenantName={tenantName}
+                database={database}
                 isResultsCollapsed={resultVisibilityState.collapsed}
                 tableSettings={tableSettings}
                 onExpandResults={onExpandResultHandler}

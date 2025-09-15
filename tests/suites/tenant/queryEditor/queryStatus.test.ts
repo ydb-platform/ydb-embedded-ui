@@ -1,7 +1,7 @@
 import {expect, test} from '@playwright/test';
 
 import {STATISTICS_MODES} from '../../../../src/utils/query';
-import {tenantName} from '../../../utils/constants';
+import {database} from '../../../utils/constants';
 import {TenantPage} from '../TenantPage';
 import {longRunningQuery} from '../constants';
 
@@ -12,8 +12,8 @@ test.describe('Test Query Execution Status', async () => {
 
     test.beforeEach(async ({page}) => {
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             general: 'query',
         };
 

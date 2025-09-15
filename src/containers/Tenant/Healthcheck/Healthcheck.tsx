@@ -27,19 +27,19 @@ import cryCatIcon from '../../../assets/icons/cry-cat.svg';
 import './Healthcheck.scss';
 
 interface HealthcheckDetailsProps {
-    tenantName: string;
+    database: string;
     countIssueTypes?: (
         issueTrees: IssuesTree[],
     ) => Record<CommonIssueType, number> & Record<string, number>;
 }
 
 export function Healthcheck({
-    tenantName,
+    database,
     countIssueTypes = uiFactory.healthcheck.countHealthcheckIssuesByType,
 }: HealthcheckDetailsProps) {
     const fullscreen = useTypedSelector((state) => state.fullscreen);
     const {loading, error, selfCheckResult, fulfilledTimeStamp, leavesIssues, refetch} =
-        useHealthcheck(tenantName);
+        useHealthcheck(database);
 
     const issuesCount = React.useMemo(
         () => countIssueTypes(leavesIssues),

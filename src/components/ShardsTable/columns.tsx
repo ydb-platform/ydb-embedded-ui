@@ -13,14 +13,14 @@ import {TOP_SHARDS_COLUMNS_IDS, TOP_SHARDS_COLUMNS_TITLES} from './constants';
 import type {GetShardsColumn} from './types';
 import {prepareDateTimeValue} from './utils';
 
-export const getPathColumn: GetShardsColumn = ({schemaPath = ''}) => {
+export const getPathColumn: GetShardsColumn = ({databaseFullPath = ''}) => {
     return {
         name: TOP_SHARDS_COLUMNS_IDS.Path,
         header: TOP_SHARDS_COLUMNS_TITLES.Path,
         render: ({row}) => {
             // row.RelativePath - relative schema path without start slash
             return (
-                <LinkToSchemaObject path={`${schemaPath}/${row.RelativePath}`}>
+                <LinkToSchemaObject path={`${databaseFullPath}/${row.RelativePath}`}>
                     {row.RelativePath}
                 </LinkToSchemaObject>
             );

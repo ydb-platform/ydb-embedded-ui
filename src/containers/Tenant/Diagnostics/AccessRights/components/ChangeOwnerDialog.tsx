@@ -15,21 +15,24 @@ const CHANGE_OWNER_DIALOG = 'change-owner-dialog';
 interface GetChangeOwnerDialogProps {
     path: string;
     database: string;
+    databaseFullPath: string;
 }
 
 export async function getChangeOwnerDialog({
     path,
     database,
+    databaseFullPath,
 }: GetChangeOwnerDialogProps): Promise<boolean> {
     return await NiceModal.show(CHANGE_OWNER_DIALOG, {
         id: CHANGE_OWNER_DIALOG,
         path,
         database,
+        databaseFullPath,
     });
 }
 
 const ChangeOwnerDialogNiceModal = NiceModal.create(
-    ({path, database}: GetChangeOwnerDialogProps) => {
+    ({path, database, databaseFullPath}: GetChangeOwnerDialogProps) => {
         const modal = NiceModal.useModal();
 
         const handleClose = () => {
@@ -46,6 +49,7 @@ const ChangeOwnerDialogNiceModal = NiceModal.create(
                 open={modal.visible}
                 path={path}
                 database={database}
+                databaseFullPath={databaseFullPath}
             />
         );
     },
@@ -58,18 +62,32 @@ interface ChangeOwnerDialogProps extends GetChangeOwnerDialogProps {
     onClose: () => void;
 }
 
-function ChangeOwnerDialog({open, onClose, path, database}: ChangeOwnerDialogProps) {
+function ChangeOwnerDialog({
+    open,
+    onClose,
+    path,
+    database,
+    databaseFullPath,
+}: ChangeOwnerDialogProps) {
     const [newOwner, setNewOwner] = React.useState('');
     const [requestErrorMessage, setRequestErrorMessage] = React.useState('');
     const [updateOwner, updateOwnerResponse] = schemaAclApi.useUpdateAccessMutation();
     const dialect = useAclSyntax();
+
+    const inputRef = React.useRef<HTMLInputElement>(null);
 
     const handleTyping = (value: string) => {
         setNewOwner(value);
         setRequestErrorMessage('');
     };
     const onApply = () => {
-        updateOwner({path, database, dialect, rights: {ChangeOwnership: {Subject: newOwner}}})
+        updateOwner({
+            path,
+            database,
+            databaseFullPath,
+            dialect,
+            rights: {ChangeOwnership: {Subject: newOwner}},
+        })
             .unwrap()
             .then(() => {
                 onClose();
@@ -84,11 +102,18 @@ function ChangeOwnerDialog({open, onClose, path, database}: ChangeOwnerDialogPro
             });
     };
     return (
-        <Dialog open={open} size="s" onClose={onClose} onEnterKeyDown={onApply}>
+        <Dialog
+            open={open}
+            size="s"
+            onClose={onClose}
+            onEnterKeyDown={onApply}
+            initialFocus={inputRef}
+        >
             <Dialog.Header caption={i18n('action_change-owner')} />
             <Dialog.Body>
                 <div className={block('dialog-content-wrapper')}>
                     <TextInput
+                        controlRef={inputRef}
                         id="queryName"
                         placeholder={i18n('decription_enter-subject')}
                         value={newOwner}

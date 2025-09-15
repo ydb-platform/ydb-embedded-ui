@@ -1,3 +1,5 @@
+import {isNil} from 'lodash';
+
 import type {FetchData} from '../../components/PaginatedTable';
 import {
     NODES_COLUMNS_TO_DATA_FIELDS,
@@ -20,6 +22,7 @@ export const getNodes: FetchData<
     const {sortOrder, columnId} = sortParams ?? {};
     const {
         path,
+        databaseFullPath,
         database,
         searchValue,
         problemFilter,
@@ -34,13 +37,16 @@ export const getNodes: FetchData<
 
     const dataFieldsRequired = getRequiredDataFields(columnsIds, NODES_COLUMNS_TO_DATA_FIELDS);
 
+    const schemePathParam =
+        !isNil(path) && !isNil(databaseFullPath) ? {path, databaseFullPath} : undefined;
+
     const response = await window.api.viewer.getNodes({
         type,
         storage,
         limit,
         offset,
         sort,
-        path,
+        path: schemePathParam,
         database,
         filter: searchValue,
         problems_only: getProblemParamValue(problemFilter),

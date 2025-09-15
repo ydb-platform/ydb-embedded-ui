@@ -17,11 +17,11 @@ import './TenantNetwork.scss';
 const b = cn('tenant-network');
 
 interface TenantNetworkProps {
-    tenantName: string;
+    database: string;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-export function TenantNetwork({tenantName, additionalNodesProps}: TenantNetworkProps) {
+export function TenantNetwork({database, additionalNodesProps}: TenantNetworkProps) {
     const query = useSearchQuery();
     const [networkTableEnabled] = useSetting(ENABLE_NETWORK_TABLE_KEY);
 
@@ -37,16 +37,10 @@ export function TenantNetwork({tenantName, additionalNodesProps}: TenantNetworkP
     return (
         <Flex direction="column" gap={4} className={b()}>
             <StatsWrapper title={i18n('title_nodes-by-ping')} allEntitiesLink={allNodesLink}>
-                <TopNodesByPing
-                    tenantName={tenantName}
-                    additionalNodesProps={additionalNodesProps}
-                />
+                <TopNodesByPing database={database} additionalNodesProps={additionalNodesProps} />
             </StatsWrapper>
             <StatsWrapper title={i18n('title_nodes-by-skew')} allEntitiesLink={allNodesLink}>
-                <TopNodesBySkew
-                    tenantName={tenantName}
-                    additionalNodesProps={additionalNodesProps}
-                />
+                <TopNodesBySkew database={database} additionalNodesProps={additionalNodesProps} />
             </StatsWrapper>
         </Flex>
     );

@@ -100,7 +100,6 @@ export function VDiskPage() {
         dispatch(
             setHeaderBreadcrumbs('vDisk', {
                 groupId: vDiskData?.VDiskId?.GroupID,
-                tenantName: database,
                 database,
                 vDiskId: vDiskData?.StringifiedId,
             }),

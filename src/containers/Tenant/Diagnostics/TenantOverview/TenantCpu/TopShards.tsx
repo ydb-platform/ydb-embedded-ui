@@ -8,25 +8,17 @@ import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 const columnsIds: TopShardsColumnId[] = ['TabletId', 'Path', 'CPUCores'];
 
 interface TopShardsProps {
-    tenantName: string;
-    path: string;
-    databaseFullPath?: string;
+    database: string;
+    databaseFullPath: string;
 }
 
-export const TopShards = ({tenantName, path, databaseFullPath = tenantName}: TopShardsProps) => {
+export const TopShards = ({database, databaseFullPath}: TopShardsProps) => {
     const ShardsTable = useComponent('ShardsTable');
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    let normalizedPath = path;
-    if (tenantName !== databaseFullPath) {
-        //tenantName may be database full path or database id. If it is database id, we must remove it from object's path and add database full path instead
-        const shrinkedPath = path.startsWith(tenantName) ? path.slice(tenantName.length) : path;
-        normalizedPath = databaseFullPath + shrinkedPath;
-    }
-
     const {currentData, isFetching, error} = topShardsApi.useGetTopShardsQuery(
-        {database: tenantName, path: normalizedPath, databaseFullPath},
+        {database, databaseFullPath},
         {pollingInterval: autoRefreshInterval},
     );
 
@@ -41,8 +33,8 @@ export const TopShards = ({tenantName, path, databaseFullPath = tenantName}: Top
         >
             <ShardsTable
                 data={data}
-                schemaPath={tenantName}
-                database={tenantName}
+                databaseFullPath={databaseFullPath}
+                database={database}
                 columnsIds={columnsIds}
                 settings={TENANT_OVERVIEW_TABLES_SETTINGS}
             />
