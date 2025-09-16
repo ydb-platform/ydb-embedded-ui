@@ -34,7 +34,9 @@ export function Tablets({
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     let params: TabletsApiRequestParams = {};
-    const filter = onlyActive ? `(State!=Dead)` : undefined;
+    const filter = onlyActive
+        ? `(State=[Created,ResolveStateStorage,Candidate,BlockBlobStorage,RebuildGraph,WriteZeroEntry,Restored,Discover,Lock,Active,ResolveLeader,Terminating])`
+        : undefined;
 
     const schemaPathParam = React.useMemo(() => {
         if (!isNil(path) && !isNil(databaseFullPath)) {
