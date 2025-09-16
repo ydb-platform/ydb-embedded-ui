@@ -7,7 +7,7 @@ interface DebouncedInputProps extends TextInputProps {
     debounce?: number;
 }
 
-export const DebouncedInput = ({
+export const DebouncedTextInput = ({
     onUpdate,
     value = '',
     debounce = 200,

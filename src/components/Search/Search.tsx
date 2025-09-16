@@ -3,7 +3,7 @@ import React from 'react';
 import type {TextInputProps} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
-import {DebouncedInput} from '../DebouncedInput/DebouncedTextInput';
+import {DebouncedTextInput} from '../DebouncedInput/DebouncedTextInput';
 
 import './Search.scss';
 
@@ -27,7 +27,7 @@ export const Search = ({
     ...props
 }: SearchProps) => {
     return (
-        <DebouncedInput
+        <DebouncedTextInput
             debounce={debounce}
             hasClear
             autoFocus

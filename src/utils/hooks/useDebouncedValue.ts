@@ -1,6 +1,6 @@
 import React from 'react';
 
-export function useDebouncedValue<T extends string | number>({
+export function useDebouncedValue<T extends string | number | null>({
     value,
     onUpdate,
     debounce = 200,

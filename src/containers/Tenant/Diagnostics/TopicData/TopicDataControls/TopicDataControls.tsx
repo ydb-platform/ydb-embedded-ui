@@ -18,7 +18,7 @@ import {
 } from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
-import {DebouncedInput} from '../../../../../components/DebouncedInput/DebouncedTextInput';
+import {DebouncedNumberInput} from '../../../../../components/DebouncedInput/DebouncedNumerInput';
 import type {PreparedPartitionData} from '../../../../../store/reducers/partitions/types';
 import {formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {prepareErrorMessage} from '../../../../../utils/prepareErrorMessage';
@@ -137,7 +137,7 @@ function TopicDataStartControls({scrollToOffset}: TopicDataStartControlsProps) {
         [handleTopicDataFilterChange, handleSelectedOffsetChange, handleStartTimestampChange],
     );
     const onStartOffsetChange = React.useCallback(
-        (value: string) => {
+        (value: number | null) => {
             handleSelectedOffsetChange(value);
         },
         [handleSelectedOffsetChange],
@@ -176,19 +176,19 @@ function TopicDataStartControls({scrollToOffset}: TopicDataStartControlsProps) {
                 </SegmentedRadioGroup.Option>
             </SegmentedRadioGroup>
             {topicDataFilter === 'OFFSET' && (
-                <DebouncedInput
+                <DebouncedNumberInput
                     controlRef={inputRef}
                     className={b('offset-input')}
-                    value={selectedOffset ? String(selectedOffset) : ''}
+                    max={Number.MAX_SAFE_INTEGER}
+                    value={isNil(selectedOffset) ? null : safeParseNumber(selectedOffset)}
                     onUpdate={onStartOffsetChange}
                     label={i18n('label_from')}
                     placeholder={i18n('label_offset')}
-                    type="number"
                     debounce={600}
                     endContent={
                         <ActionTooltip title={i18n('action_scroll-selected')}>
                             <Button
-                                disabled={isNil(selectedOffset) || selectedOffset === ''}
+                                disabled={isNil(selectedOffset)}
                                 className={b('scroll-button')}
                                 view="flat-action"
                                 size="xs"

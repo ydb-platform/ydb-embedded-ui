@@ -351,7 +351,7 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
                             getRowClassName={(row) => {
                                 return b('row', {
                                     active: Boolean(
-                                        String(row.Offset) === selectedOffset ||
+                                        safeParseNumber(row.Offset) === selectedOffset ||
                                             String(row.Offset) === activeOffset,
                                     ),
                                     removed: row.removed,
