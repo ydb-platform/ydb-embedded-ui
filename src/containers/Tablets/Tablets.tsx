@@ -4,11 +4,27 @@ import {skipToken} from '@reduxjs/toolkit/query';
 import {isNil} from 'lodash';
 
 import {selectTabletsWithFqdn, tabletsApi} from '../../store/reducers/tablets';
+import {ETabletState} from '../../types/api/tablet';
 import type {TabletsApiRequestParams} from '../../types/store/tablets';
 import {valueIsDefined} from '../../utils';
 import {useAutoRefreshInterval, useTypedSelector} from '../../utils/hooks';
 
 import {TabletsTable} from './TabletsTable';
+
+const activeStatuses: ETabletState[] = [
+    ETabletState.Created,
+    ETabletState.ResolveStateStorage,
+    ETabletState.Candidate,
+    ETabletState.BlockBlobStorage,
+    ETabletState.RebuildGraph,
+    ETabletState.WriteZeroEntry,
+    ETabletState.Restored,
+    ETabletState.Discover,
+    ETabletState.Lock,
+    ETabletState.Active,
+    ETabletState.ResolveLeader,
+    ETabletState.Terminating,
+];
 
 interface TabletsProps {
     path?: string;
@@ -34,9 +50,7 @@ export function Tablets({
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     let params: TabletsApiRequestParams = {};
-    const filter = onlyActive
-        ? `(State=[Created,ResolveStateStorage,Candidate,BlockBlobStorage,RebuildGraph,WriteZeroEntry,Restored,Discover,Lock,Active,ResolveLeader,Terminating])`
-        : undefined;
+    const filter = onlyActive ? `(State=[${activeStatuses.join(',')}])` : undefined;
 
     const schemaPathParam = React.useMemo(() => {
         if (!isNil(path) && !isNil(databaseFullPath)) {
