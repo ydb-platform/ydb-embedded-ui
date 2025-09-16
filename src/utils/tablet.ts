@@ -18,6 +18,7 @@ const tabletStateToColorState: Record<ETabletState, EFlag> = {
     [ETabletState.Stopped]: EFlag.Yellow,
     [ETabletState.ResolveLeader]: EFlag.Yellow,
     [ETabletState.RebuildGraph]: EFlag.Yellow,
+    [ETabletState.Terminating]: EFlag.Yellow,
 
     [ETabletState.Deleted]: EFlag.Green,
     [ETabletState.Active]: EFlag.Green,
