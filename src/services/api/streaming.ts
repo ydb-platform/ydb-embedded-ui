@@ -113,7 +113,7 @@ export class StreamingAPI extends BaseYdbAPI {
                 throw chunk;
             }
 
-            const streamingChunk = chunk as unknown as StreamingChunk;
+            const streamingChunk = chunk as StreamingChunk;
 
             if (isSessionChunk(streamingChunk)) {
                 const sessionChunk = streamingChunk;
