@@ -1,4 +1,4 @@
-import type {Actions} from '../../../types/api/query';
+import type {Actions, ErrorResponse} from '../../../types/api/query';
 import type {QueryAction, QueryMode, QuerySyntax} from '../../../types/store/query';
 import type {
     QueryResponseChunk,
@@ -49,6 +49,12 @@ export function isQueryResponseChunk(content: StreamingChunk): content is QueryR
 
 export function isKeepAliveChunk(content: StreamingChunk): content is SessionChunk {
     return content?.meta?.event === 'KeepAlive';
+}
+
+export function isErrorChunk(content: unknown): content is ErrorResponse {
+    return Boolean(
+        content && typeof content === 'object' && ('error' in content || 'issues' in content),
+    );
 }
 
 export const prepareQueryWithPragmas = (query: string, pragmas?: string): string => {
