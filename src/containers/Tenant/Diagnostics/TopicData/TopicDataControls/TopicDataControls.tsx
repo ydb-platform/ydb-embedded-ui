@@ -180,6 +180,7 @@ function TopicDataStartControls({scrollToOffset}: TopicDataStartControlsProps) {
                     controlRef={inputRef}
                     className={b('offset-input')}
                     max={Number.MAX_SAFE_INTEGER}
+                    min={0}
                     value={isNil(selectedOffset) ? null : safeParseNumber(selectedOffset)}
                     onUpdate={onStartOffsetChange}
                     label={i18n('label_from')}
