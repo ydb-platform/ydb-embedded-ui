@@ -2,6 +2,7 @@ import React from 'react';
 
 import type {Column} from '../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
+import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {NODES_COLUMNS_TITLES} from '../../../components/nodesColumns/constants';
 import type {NodesColumnId} from '../../../components/nodesColumns/constants';
 import {useViewerNodesHandlerHasGrouping} from '../../../store/reducers/capabilities/hooks';
@@ -61,8 +62,15 @@ export function NodesComponent({
                     withGroupBySelect={viewerNodesHandlerHasGrouping}
                     groupByParams={groupByParams}
                     withPeerRoleFilter={withPeerRoleFilter}
-                    columnsToSelect={columnsToSelect}
-                    handleSelectedColumnsUpdate={setColumns}
+                />
+            }
+            extraControls={
+                <TableColumnSetup
+                    popupWidth={200}
+                    items={columnsToSelect}
+                    showStatus
+                    onUpdate={setColumns}
+                    sortable={false}
                 />
             }
             table={

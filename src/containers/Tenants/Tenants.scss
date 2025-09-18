@@ -58,11 +58,4 @@
 
         width: max-content;
     }
-
-    &__create-database {
-        position: sticky;
-        right: calc(var(--cluster-side-padding) * 2);
-
-        margin: 0 0 0 auto;
-    }
 }

@@ -1,13 +1,14 @@
 import React from 'react';
 
 import type {Column} from '@gravity-ui/react-data-table';
-import {Select, TableColumnSetup} from '@gravity-ui/uikit';
+import {Select} from '@gravity-ui/uikit';
 
 import type {DateRangeValues} from '../../../../components/DateRange';
 import {DateRange} from '../../../../components/DateRange';
 import type {DrawerControl} from '../../../../components/Drawer/Drawer';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {Search} from '../../../../components/Search';
+import {TableColumnSetup} from '../../../../components/TableColumnSetup/TableColumnSetup';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {topQueriesApi} from '../../../../store/reducers/executeTopQueries/executeTopQueries';
 import type {TimeFrame} from '../../../../store/reducers/executeTopQueries/types';
@@ -125,9 +126,21 @@ export const TopQueriesData = ({
         [getTopQueryUrl],
     );
 
+    const renderExtraControls = () => {
+        return (
+            <TableColumnSetup
+                popupWidth={200}
+                items={columnsToSelect}
+                showStatus
+                onUpdate={setColumns}
+                sortable={false}
+            />
+        );
+    };
+
     return (
         <TableWithControlsLayout>
-            <TableWithControlsLayout.Controls>
+            <TableWithControlsLayout.Controls renderExtraControls={renderExtraControls}>
                 {renderQueryModeControl()}
                 <Select
                     options={TIME_FRAME_OPTIONS}
@@ -146,13 +159,6 @@ export const TopQueriesData = ({
                     onChange={handleTextSearchUpdate}
                     placeholder={i18n('filter.text.placeholder')}
                     className={b('search')}
-                />
-                <TableColumnSetup
-                    popupWidth={200}
-                    items={columnsToSelect}
-                    showStatus
-                    onUpdate={setColumns}
-                    sortable={false}
                 />
             </TableWithControlsLayout.Controls>
 

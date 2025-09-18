@@ -16,6 +16,8 @@
     &__controls-wrapper {
         z-index: 3;
 
+        align-items: center;
+
         box-sizing: border-box;
         width: 100%;
 
@@ -30,6 +32,13 @@
 
         @include mixins.controls();
         @include mixins.sticky-top();
+    }
+
+    &__extra-controls {
+        position: sticky;
+        right: var(--extra-controls-right, 0);
+
+        margin: 0 0 0 auto;
     }
 
     &__table {

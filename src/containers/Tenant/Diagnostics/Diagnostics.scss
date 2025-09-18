@@ -43,6 +43,10 @@
                 padding-top: 0;
             }
 
+            &__controls-wrapper {
+                align-items: flex-start;
+            }
+
             .data-table__sticky_moving,
             .ydb-paginated-table__head {
                 top: 46px !important;

@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Magnifier} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
-import {Flex, Icon, Select, TableColumnSetup, Text} from '@gravity-ui/uikit';
+import {Flex, Icon, Select, Text} from '@gravity-ui/uikit';
 import {Helmet} from 'react-helmet-async';
 
 import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
@@ -11,6 +11,7 @@ import {ResponseError} from '../../components/Errors/ResponseError';
 import {Loader} from '../../components/Loader';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../components/Search';
+import {TableColumnSetup} from '../../components/TableColumnSetup/TableColumnSetup';
 import {
     useDeleteClusterFeatureAvailable,
     useEditClusterFeatureAvailable,
@@ -203,16 +204,15 @@ export function Clusters() {
                             width="max"
                         />
                     </div>
-                    <div className={b('control')}>
-                        <TableColumnSetup
-                            key="TableColumnSetup"
-                            popupWidth={242}
-                            items={columnsToSelect}
-                            showStatus
-                            onUpdate={setColumns}
-                            sortable={false}
-                        />
-                    </div>
+                    <TableColumnSetup
+                        className={b('column-setup')}
+                        key="TableColumnSetup"
+                        popupWidth={242}
+                        items={columnsToSelect}
+                        showStatus
+                        onUpdate={setColumns}
+                        sortable={false}
+                    />
                 </Flex>
                 {clusters?.length ? (
                     <Text color="secondary">
