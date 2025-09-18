@@ -56,28 +56,34 @@ export function ClusterOverview(props: ClusterOverviewProps) {
     }
 
     return (
-        <Flex direction="column" className={b('overview-wrapper', {collapsed: !expandDashboard})}>
-            <Disclosure
-                arrowPosition="end"
-                size="l"
-                expanded={expandDashboard}
-                onUpdate={() => setExpandDashboard(!expandDashboard)}
-                summary={
-                    <Flex alignItems="center" justifyContent="space-between" width={'100%'}>
-                        <Flex gap={2} alignItems="center">
-                            <Icon data={overviewIcon} size={16} />
-                            <Text variant="body-2" color="primary" className={b('title')}>
-                                {i18n('label_overview')}
-                            </Text>
-                        </Flex>
-                        {!expandDashboard && <ClusterDashboard {...props} collapsed />}
+        <Disclosure
+            arrowPosition="end"
+            size="l"
+            expanded={expandDashboard}
+            onUpdate={() => setExpandDashboard(!expandDashboard)}
+            className={b('overview-wrapper', {collapsed: !expandDashboard})}
+            summary={
+                <Flex
+                    alignItems="center"
+                    justifyContent="space-between"
+                    width={'100%'}
+                    className={b('disclosure-summary')}
+                >
+                    <Flex gap={2} alignItems="center">
+                        <Icon data={overviewIcon} size={16} />
+                        <Text variant="body-2" color="primary" className={b('title')}>
+                            {i18n('label_overview')}
+                        </Text>
                     </Flex>
-                }
-            >
+                    {!expandDashboard && <ClusterDashboard {...props} collapsed />}
+                </Flex>
+            }
+        >
+            <div className={b('disclosure-content')}>
                 <ClusterDashboard {...props} />
                 <ClusterInfo {...props} bridgePiles={bridgePiles} />
-            </Disclosure>
-        </Flex>
+            </div>
+        </Disclosure>
     );
 }
 
