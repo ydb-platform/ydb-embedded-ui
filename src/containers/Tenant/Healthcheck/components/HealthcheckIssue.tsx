@@ -36,7 +36,7 @@ export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
             <Disclosure className={b('issue-content')} defaultExpanded={expanded}>
                 <Disclosure.Summary>
                     {(props) => (
-                        <div {...props}>
+                        <button {...props} className={b('disclosure-trigger')}>
                             <Flex
                                 wrap="nowrap"
                                 gap={2}
@@ -68,7 +68,7 @@ export function HealthcheckIssue({issue, expanded}: HealthcheckIssueProps) {
                                     <ArrowToggle direction={props.expanded ? 'top' : 'bottom'} />
                                 </Flex>
                             </Flex>
-                        </div>
+                        </button>
                     )}
                 </Disclosure.Summary>
                 <div className={b('animation-container')}>
