@@ -110,6 +110,7 @@ export class StreamingAPI extends BaseYdbAPI {
             }
 
             if (isErrorChunk(chunk)) {
+                await response.body?.cancel().catch(() => {});
                 throw chunk;
             }
 
