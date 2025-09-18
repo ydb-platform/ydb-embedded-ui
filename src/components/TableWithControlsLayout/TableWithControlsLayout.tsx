@@ -39,14 +39,9 @@ TableWithControlsLayout.Controls = function TableControls({
     className,
 }: TableWithControlsLayoutItemProps) {
     return (
-        <Flex
-            justifyContent="space-between"
-            alignItems="center"
-            className={b('controls-wrapper')}
-            gap={2}
-        >
+        <Flex justifyContent="space-between" className={b('controls-wrapper')} gap={2}>
             <div className={b('controls', className)}>{children}</div>
-            {renderExtraControls?.()}
+            <div className={b('extra-controls')}>{renderExtraControls?.()}</div>
         </Flex>
     );
 };

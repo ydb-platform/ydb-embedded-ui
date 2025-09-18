@@ -1,7 +1,6 @@
 import React from 'react';
 
-import type {TableColumnSetupItem} from '@gravity-ui/uikit';
-import {Select, TableColumnSetup, Text} from '@gravity-ui/uikit';
+import {Select, Text} from '@gravity-ui/uikit';
 
 import {EntitiesCount} from '../../../components/EntitiesCount';
 import {ProblemFilter} from '../../../components/ProblemFilter';
@@ -26,9 +25,6 @@ interface NodesControlsProps {
 
     withPeerRoleFilter?: boolean;
 
-    columnsToSelect: TableColumnSetupItem[];
-    handleSelectedColumnsUpdate: (updated: TableColumnSetupItem[]) => void;
-
     entitiesCountCurrent: number;
     entitiesCountTotal?: number;
     entitiesLoading: boolean;
@@ -39,9 +35,6 @@ export function NodesControls({
     groupByParams = [],
 
     withPeerRoleFilter,
-
-    columnsToSelect,
-    handleSelectedColumnsUpdate,
 
     entitiesCountCurrent,
     entitiesCountTotal,
@@ -91,13 +84,7 @@ export function NodesControls({
                     <PeerRoleFilter value={peerRoleFilter} onChange={handlePeerRoleFilterChange} />
                 </React.Fragment>
             ) : null}
-            <TableColumnSetup
-                popupWidth={200}
-                items={columnsToSelect}
-                showStatus
-                onUpdate={handleSelectedColumnsUpdate}
-                sortable={false}
-            />
+
             {withGroupBySelect ? (
                 <React.Fragment>
                     <Text variant="body-2">{i18n('controls_group-by-placeholder')}</Text>

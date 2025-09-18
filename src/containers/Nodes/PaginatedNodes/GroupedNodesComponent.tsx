@@ -5,6 +5,7 @@ import {isNil} from 'lodash';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import type {Column} from '../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
+import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {NODES_COLUMNS_TITLES} from '../../../components/nodesColumns/constants';
 import type {NodesColumnId} from '../../../components/nodesColumns/constants';
 import {nodesApi} from '../../../store/reducers/nodes/nodes';
@@ -200,12 +201,19 @@ export function GroupedNodesComponent({
                 <NodesControls
                     groupByParams={groupByParams}
                     withPeerRoleFilter={withPeerRoleFilter}
-                    columnsToSelect={columnsToSelect}
-                    handleSelectedColumnsUpdate={setColumns}
                     entitiesCountCurrent={found}
                     entitiesCountTotal={total}
                     entitiesLoading={isLoading}
                     withGroupBySelect
+                />
+            }
+            extraControls={
+                <TableColumnSetup
+                    popupWidth={200}
+                    items={columnsToSelect}
+                    showStatus
+                    onUpdate={setColumns}
+                    sortable={false}
                 />
             }
             error={error ? <ResponseError error={error} /> : null}

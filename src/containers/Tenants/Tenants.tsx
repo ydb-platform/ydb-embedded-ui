@@ -129,11 +129,7 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
 
         if (buttonAvailable && !loading) {
             return (
-                <Button
-                    view="action"
-                    onClick={() => uiFactory.onCreateDB?.({clusterName})}
-                    className={b('create-database')}
-                >
+                <Button view="action" onClick={() => uiFactory.onCreateDB?.({clusterName})}>
                     <Icon data={CirclePlus} />
                     {i18n('create-database')}
                 </Button>

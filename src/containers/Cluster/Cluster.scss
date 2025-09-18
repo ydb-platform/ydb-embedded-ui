@@ -3,6 +3,8 @@
 .ydb-cluster {
     --cluster-side-padding: var(--g-spacing-5);
     --sticky-tabs-height: 40px;
+    --extra-controls-right: calc(var(--cluster-side-padding) * 2);
+
     position: relative;
 
     overflow: auto;

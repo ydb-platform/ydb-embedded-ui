@@ -14,6 +14,7 @@ import {
     ResizeablePaginatedTable,
 } from '../../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../../components/PaginatedTable/PaginatedTableWithLayout';
+import {TableColumnSetup} from '../../../../components/TableColumnSetup/TableColumnSetup';
 import {partitionsApi} from '../../../../store/reducers/partitions/partitions';
 import {topicApi} from '../../../../store/reducers/topic';
 import type {TopicDataRequest} from '../../../../types/api/topic';
@@ -248,8 +249,6 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
             <TopicDataControls
                 // component has uncontrolled components inside, so it should be rerendered on filters reset
                 key={controlsKey}
-                columnsToSelect={columnsToSelect}
-                handleSelectedColumnsUpdate={setColumns}
                 handlePartitionChange={handlePartitionChange}
                 partitions={partitions}
                 partitionsLoading={partitionsLoading}
@@ -261,18 +260,28 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
             />
         );
     }, [
-        columnsToSelect,
         controlsKey,
         endOffset,
         partitions,
         partitionsError,
         partitionsLoading,
         scrollToOffset,
-        setColumns,
         startOffset,
         truncated,
         handlePartitionChange,
     ]);
+
+    const renderExtraControls = React.useCallback(() => {
+        return (
+            <TableColumnSetup
+                popupWidth={242}
+                items={columnsToSelect}
+                showStatus
+                onUpdate={setColumns}
+                sortable={false}
+            />
+        );
+    }, [columnsToSelect, setColumns]);
 
     const renderEmptyDataMessage = () => {
         const hasFilters = selectedOffset || startTimestamp;
@@ -334,6 +343,7 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
             >
                 <PaginatedTableWithLayout
                     controls={renderControls()}
+                    extraControls={renderExtraControls()}
                     table={
                         <ResizeablePaginatedTable
                             columnsWidthLSKey={TOPIC_DATA_COLUMNS_WIDTH_LS_KEY}

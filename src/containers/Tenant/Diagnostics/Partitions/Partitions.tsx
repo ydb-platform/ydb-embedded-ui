@@ -18,7 +18,10 @@ import {
     useTypedSelector,
 } from '../../../../utils/hooks';
 
-import {PartitionsControls} from './PartitionsControls/PartitionsControls';
+import {
+    PartitionsControls,
+    PartitionsTableColumnSetup,
+} from './PartitionsControls/PartitionsControls';
 import {PARTITIONS_COLUMNS_WIDTH_LS_KEY} from './columns';
 import i18n from './i18n';
 import {addHostToPartitions} from './utils';
@@ -117,6 +120,13 @@ export const Partitions = ({path, database, databaseFullPath}: PartitionsProps) 
                 selectDisabled={Boolean(error) || loading}
                 partitions={partitionsWithHosts}
                 onSearchChange={setPartitionsToRender}
+            />
+        );
+    };
+
+    const renderExtraControls = () => {
+        return (
+            <PartitionsTableColumnSetup
                 hiddenColumns={hiddenColumns}
                 onHiddenColumnsChange={hadleTableColumnsSetupChange}
                 initialColumnsIds={columnsIdsForSelector}
@@ -143,7 +153,9 @@ export const Partitions = ({path, database, databaseFullPath}: PartitionsProps) 
 
     return (
         <TableWithControlsLayout className={b()}>
-            <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
+            <TableWithControlsLayout.Controls renderExtraControls={renderExtraControls}>
+                {renderControls()}
+            </TableWithControlsLayout.Controls>
             <TableWithControlsLayout.Table>
                 {error ? <ResponseError error={error} /> : null}
                 {partitionsData ? renderContent() : null}

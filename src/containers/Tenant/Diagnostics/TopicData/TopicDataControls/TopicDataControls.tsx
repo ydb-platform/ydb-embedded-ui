@@ -4,7 +4,6 @@ import type {Value} from '@gravity-ui/date-components';
 import {RelativeDatePicker} from '@gravity-ui/date-components';
 import {dateTimeParse} from '@gravity-ui/date-utils';
 import {CircleChevronDownFill} from '@gravity-ui/icons';
-import type {TableColumnSetupItem} from '@gravity-ui/uikit';
 import {
     ActionTooltip,
     Button,
@@ -13,7 +12,6 @@ import {
     Icon,
     SegmentedRadioGroup,
     Select,
-    TableColumnSetup,
     Text,
 } from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
@@ -30,9 +28,6 @@ import {TopicDataFilterValues} from '../utils/types';
 import type {TopicDataFilterValue} from '../utils/types';
 
 interface TopicDataControlsProps {
-    columnsToSelect: TableColumnSetupItem[];
-    handleSelectedColumnsUpdate: (updated: TableColumnSetupItem[]) => void;
-
     partitions?: PreparedPartitionData[];
     partitionsLoading: boolean;
     partitionsError: unknown;
@@ -45,8 +40,6 @@ interface TopicDataControlsProps {
 }
 
 export function TopicDataControls({
-    columnsToSelect,
-    handleSelectedColumnsUpdate,
     handlePartitionChange,
 
     startOffset,
@@ -89,13 +82,6 @@ export function TopicDataControls({
                     {truncatedData && <HelpMark>{i18n('description_last-messages')}</HelpMark>}
                 </Flex>
             )}
-            <TableColumnSetup
-                popupWidth={242}
-                items={columnsToSelect}
-                showStatus
-                onUpdate={handleSelectedColumnsUpdate}
-                sortable={false}
-            />
         </React.Fragment>
     );
 }
