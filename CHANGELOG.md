@@ -1,5 +1,17 @@
 # Changelog
 
+## [12.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.3.0...v12.4.0) (2025-09-18)
+
+
+### Features
+
+* **TopicData:** use number input for offset selection ([#2890](https://github.com/ydb-platform/ydb-embedded-ui/issues/2890)) ([a68dbb4](https://github.com/ydb-platform/ydb-embedded-ui/commit/a68dbb4ba920e3a14b905bd3410e1cda0ceafe54))
+
+
+### Bug Fixes
+
+* shard overload handle ([#2895](https://github.com/ydb-platform/ydb-embedded-ui/issues/2895)) ([bfb4b36](https://github.com/ydb-platform/ydb-embedded-ui/commit/bfb4b36ec51dd8a23ddd8cb9fd91ce77a6606fe2))
+
 ## [12.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.2.1...v12.3.0) (2025-09-16)
 
 
