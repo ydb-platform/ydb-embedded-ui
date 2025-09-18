@@ -1,6 +1,15 @@
 import React from 'react';
 
-import {ChevronDown} from '@gravity-ui/icons';
+import {
+    ArrowsOppositeToDots,
+    ChevronDown,
+    FileArrowRightOut,
+    FileText,
+    LayoutHeaderCells,
+    PencilToSquare,
+    Persons,
+} from '@gravity-ui/icons';
+import type {DropdownMenuItem} from '@gravity-ui/uikit';
 import {Button, DropdownMenu} from '@gravity-ui/uikit';
 
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
@@ -18,9 +27,10 @@ export function NewSQL() {
 
     const actions = bindActions(onTemplateClick);
 
-    const items = [
+    const items: DropdownMenuItem[] = [
         {
             text: i18n('menu.tables'),
+            iconStart: <LayoutHeaderCells />,
             items: [
                 {
                     text: i18n('action.create-row-table'),
@@ -74,6 +84,7 @@ export function NewSQL() {
         },
         {
             text: i18n('menu.topics'),
+            iconStart: <FileText />,
             items: [
                 {
                     text: i18n('action.create-topic'),
@@ -91,6 +102,7 @@ export function NewSQL() {
         },
         {
             text: i18n('menu.replication'),
+            iconStart: <ArrowsOppositeToDots />,
             items: [
                 {
                     text: i18n('action.create-async-replication'),
@@ -108,6 +120,7 @@ export function NewSQL() {
         },
         {
             text: i18n('menu.transfer'),
+            iconStart: <FileArrowRightOut />,
             items: [
                 {
                     text: i18n('action.create-transfer'),
@@ -125,6 +138,7 @@ export function NewSQL() {
         },
         {
             text: i18n('menu.capture'),
+            iconStart: <PencilToSquare />,
             items: [
                 {
                     text: i18n('action.create-cdc-stream'),
@@ -134,6 +148,7 @@ export function NewSQL() {
         },
         {
             text: i18n('menu.users'),
+            iconStart: <Persons />,
             items: [
                 {
                     text: i18n('action.create-user'),

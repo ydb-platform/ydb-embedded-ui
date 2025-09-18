@@ -18,7 +18,7 @@
     "@gravity-ui/date-components": "^3.2.3",
     "@gravity-ui/date-utils": "^2.5.6",
     "@gravity-ui/i18n": "^1.7.0",
-    "@gravity-ui/icons": "^2.13.0",
+    "@gravity-ui/icons": "^2.16.0",
     "@gravity-ui/illustrations": "^2.1.0",
     "@gravity-ui/navigation": "^3.3.9",
     "@gravity-ui/paranoid": "^3.0.0",
@@ -59,7 +59,7 @@
     "use-query-params": "^2.2.1",
     "uuid": "^10.0.0",
     "web-vitals": "^1.1.2",
-    "ydb-ui-components": "^5.0.0",
+    "ydb-ui-components": "^5.1.0",
     "zod": "^3.24.1"
   },
   "scripts": {
