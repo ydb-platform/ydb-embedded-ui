@@ -11,7 +11,7 @@ export function useTopicDataQueryParams() {
         setQueryParams,
     ] = useQueryParams({
         selectedPartition: StringParam,
-        selectedOffset: StringParam,
+        selectedOffset: NumberParam,
         startTimestamp: NumberParam,
         topicDataFilter: TopicDataFilterValueParam,
         activeOffset: StringParam,
@@ -25,8 +25,8 @@ export function useTopicDataQueryParams() {
     );
 
     const handleSelectedOffsetChange = React.useCallback(
-        (value?: string) => {
-            setQueryParams({selectedOffset: value}, 'replaceIn');
+        (value?: number | null) => {
+            setQueryParams({selectedOffset: value || undefined}, 'replaceIn');
         },
         [setQueryParams],
     );
