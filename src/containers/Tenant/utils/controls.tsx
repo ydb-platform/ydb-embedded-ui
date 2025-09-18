@@ -75,6 +75,7 @@ export const getSchemaControls =
 
             table: openPreview,
             column_table: openPreview,
+            system_table: openPreview,
 
             index_table: undefined,
             topic: isTopicPreviewAvailable && !isCdcTopic ? openPreview : undefined,
