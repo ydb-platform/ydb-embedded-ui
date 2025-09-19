@@ -45,7 +45,6 @@ export function StorageNodesComponent({
                     items={columnsToSelect}
                     showStatus
                     onUpdate={setColumns}
-                    sortable={false}
                 />
             }
             table={

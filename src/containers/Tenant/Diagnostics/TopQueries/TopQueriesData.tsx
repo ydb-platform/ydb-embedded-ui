@@ -133,7 +133,6 @@ export const TopQueriesData = ({
                 items={columnsToSelect}
                 showStatus
                 onUpdate={setColumns}
-                sortable={false}
             />
         );
     };
