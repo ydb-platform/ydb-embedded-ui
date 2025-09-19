@@ -104,6 +104,16 @@ export function MetricsTabs({
             return null;
         }
 
+        const canShow =
+            networkUtilization !== undefined &&
+            networkThroughput !== undefined &&
+            isFinite(networkUtilization) &&
+            isFinite(networkThroughput);
+
+        if (!canShow) {
+            return null;
+        }
+
         if (isServerless) {
             return <PlaceholderTab />;
         }

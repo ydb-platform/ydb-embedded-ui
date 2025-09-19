@@ -5,8 +5,6 @@ import {cn} from '../../../../../../utils/cn';
 import {UtilizationTabCard} from '../../TabCard/UtilizationTabCard';
 import i18n from '../../i18n';
 
-import {PlaceholderTab} from './PlaceholderTab';
-
 import '../MetricsTabs.scss';
 
 const b = cn('tenant-metrics-tabs');
@@ -14,22 +12,11 @@ const b = cn('tenant-metrics-tabs');
 interface NetworkTabProps {
     to: string;
     active: boolean;
-    networkUtilization?: number;
-    networkThroughput?: number;
+    networkUtilization: number;
+    networkThroughput: number;
 }
 
 export function NetworkTab({to, active, networkUtilization, networkThroughput}: NetworkTabProps) {
-    const canShow =
-        networkUtilization !== undefined &&
-        networkThroughput !== undefined &&
-        isFinite(networkUtilization) &&
-        isFinite(networkThroughput) &&
-        networkThroughput > 0;
-
-    if (!canShow) {
-        return <PlaceholderTab />;
-    }
-
     const fillPercent = networkUtilization * 100;
     const legendText = formatBytes({value: networkThroughput, withSpeedLabel: true});
 
