@@ -25,6 +25,7 @@ const pathTypeToNodeType: Record<EPathType, NavigationTreeNodeType | undefined> 
     [EPathType.EPathTypeColumnStore]: 'directory',
 
     [EPathType.EPathTypeTable]: 'table',
+    [EPathType.EPathTypeSysView]: 'system_table',
 
     [EPathType.EPathTypeTableIndex]: 'index',
 
@@ -76,6 +77,7 @@ const pathTypeToEntityName: Record<EPathType, string | undefined> = {
 
     [EPathType.EPathTypeDir]: 'Directory',
     [EPathType.EPathTypeTable]: 'Table',
+    [EPathType.EPathTypeSysView]: 'System view',
     [EPathType.EPathTypeTableIndex]: 'Secondary Index',
     [EPathType.EPathTypeColumnStore]: 'Tablestore',
     [EPathType.EPathTypeColumnTable]: 'Column-oriented table',
@@ -115,6 +117,7 @@ export const mapDatabaseTypeToDBName = (type?: ETenantType) => type && databaseT
 const pathTypeToIsTable: Record<EPathType, boolean> = {
     [EPathType.EPathTypeTable]: true,
     [EPathType.EPathTypeColumnTable]: true,
+    [EPathType.EPathTypeSysView]: true,
 
     [EPathType.EPathTypeExternalTable]: true,
 
@@ -160,6 +163,7 @@ const pathTypeToIsColumn: Record<EPathType, boolean> = {
     [EPathType.EPathTypeInvalid]: false,
     [EPathType.EPathTypeDir]: false,
     [EPathType.EPathTypeTable]: false,
+    [EPathType.EPathTypeSysView]: false,
     [EPathType.EPathTypeSubDomain]: false,
     [EPathType.EPathTypeTableIndex]: false,
     [EPathType.EPathTypeExtSubDomain]: false,
@@ -189,6 +193,7 @@ const pathTypeToIsDatabase: Record<EPathType, boolean> = {
     [EPathType.EPathTypeColumnStore]: false,
     [EPathType.EPathTypeColumnTable]: false,
     [EPathType.EPathTypeTable]: false,
+    [EPathType.EPathTypeSysView]: false,
     [EPathType.EPathTypeTableIndex]: false,
     [EPathType.EPathTypeCdcStream]: false,
     [EPathType.EPathTypePersQueueGroup]: false,
@@ -240,6 +245,7 @@ const pathTypeToChildless: Record<EPathType, boolean> = {
     [EPathType.EPathTypeColumnTable]: false,
     [EPathType.EPathTypeDir]: false,
     [EPathType.EPathTypeTable]: false,
+    [EPathType.EPathTypeSysView]: false,
     [EPathType.EPathTypeSubDomain]: false,
     [EPathType.EPathTypeTableIndex]: false,
     [EPathType.EPathTypeExtSubDomain]: false,
@@ -253,3 +259,4 @@ export const isChildlessPathType = (type?: EPathType, subType?: EPathSubType) =>
 export const isExternalTableType = (type?: EPathType) => type === EPathType.EPathTypeExternalTable;
 export const isRowTableType = (type?: EPathType) => type === EPathType.EPathTypeTable;
 export const isViewType = (type?: EPathType) => type === EPathType.EPathTypeView;
+export const isSystemViewType = (type?: EPathType) => type === EPathType.EPathTypeSysView;

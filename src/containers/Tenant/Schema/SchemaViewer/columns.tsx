@@ -146,6 +146,9 @@ function normalizeColumns(columns: SchemaColumn[], data?: SchemaData[]) {
 export function getViewColumns(data?: SchemaData[]): SchemaColumn[] {
     return normalizeColumns([nameColumn, typeColumn], data);
 }
+export function getSystemViewColumns(data?: SchemaData[]): SchemaColumn[] {
+    return normalizeColumns([idColumn, nameColumn, typeColumn, notNullColumn], data);
+}
 export function getExternalTableColumns(data?: SchemaData[]): SchemaColumn[] {
     return normalizeColumns([idColumn, nameColumn, typeColumn, notNullColumn], data);
 }
