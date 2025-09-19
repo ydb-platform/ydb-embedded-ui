@@ -6,5 +6,9 @@
   "external-objects.auth-method.none": "None",
   "external-objects.auth-method.service-account": "Service Account",
 
-  "view.query-text": "Query Text"
+  "view.query-text": "Query Text",
+
+  "field_system-view-type": "System view type",
+
+  "no-entity-data": "No {{entityName}} data"
 }

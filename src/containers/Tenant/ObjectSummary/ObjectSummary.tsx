@@ -32,6 +32,7 @@ import {
     formatSecondsToHours,
 } from '../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
+import {prepareSystemViewType} from '../../../utils/schema';
 import {EntityTitle} from '../EntityTitle/EntityTitle';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
 import {useCurrentSchema} from '../TenantContext';
@@ -231,6 +232,12 @@ export function ObjectSummary({
                 {
                     name: i18n('field_partitions'),
                     content: PathDescription?.TablePartitions?.length,
+                },
+            ],
+            [EPathType.EPathTypeSysView]: () => [
+                {
+                    name: i18n('field_system-view-type'),
+                    content: prepareSystemViewType(PathDescription?.SysViewDescription?.Type),
                 },
             ],
             [EPathType.EPathTypeSubDomain]: getDatabaseOverview,

@@ -11,6 +11,7 @@ import {
     isColumnEntityType,
     isExternalTableType,
     isRowTableType,
+    isSystemViewType,
     isViewType,
 } from '../../utils/schema';
 
@@ -20,6 +21,7 @@ import {
     getColumnTableColumns,
     getExternalTableColumns,
     getRowTableColumns,
+    getSystemViewColumns,
     getViewColumns,
 } from './columns';
 import {prepareSchemaData, prepareViewSchema} from './prepareData';
@@ -81,6 +83,9 @@ export const SchemaViewer = ({
     const columns = React.useMemo(() => {
         if (isViewType(type)) {
             return getViewColumns(tableData);
+        }
+        if (isSystemViewType(type)) {
+            return getSystemViewColumns(tableData);
         }
         if (isExternalTableType(type)) {
             return getExternalTableColumns(tableData);

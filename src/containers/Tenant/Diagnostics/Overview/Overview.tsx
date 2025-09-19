@@ -8,6 +8,7 @@ import {EPathType} from '../../../../types/api/schema';
 import {useAutoRefreshInterval} from '../../../../utils/hooks';
 import {ExternalDataSourceInfo} from '../../Info/ExternalDataSource/ExternalDataSource';
 import {ExternalTableInfo} from '../../Info/ExternalTable/ExternalTable';
+import {SystemViewInfo} from '../../Info/SystemView/SystemView';
 import {ViewInfo} from '../../Info/View/View';
 
 import {AsyncReplicationInfo} from './AsyncReplicationInfo';
@@ -42,6 +43,7 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
             [EPathType.EPathTypeDir]: undefined,
             [EPathType.EPathTypeResourcePool]: undefined,
             [EPathType.EPathTypeTable]: undefined,
+            [EPathType.EPathTypeSysView]: () => <SystemViewInfo data={data} />,
             [EPathType.EPathTypeSubDomain]: undefined,
             [EPathType.EPathTypeTableIndex]: () => <TableIndexInfo data={data} />,
             [EPathType.EPathTypeExtSubDomain]: undefined,

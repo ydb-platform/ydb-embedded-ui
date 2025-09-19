@@ -141,6 +141,7 @@ const SERVERLESS_DATABASE_PAGES = [
 
 const TABLE_PAGES = [overview, schema, topShards, nodes, graph, tablets, hotKeys, describe, access];
 const COLUMN_TABLE_PAGES = [overview, schema, topShards, nodes, tablets, describe, access];
+const SYSTEM_VIEW_PAGES = [overview, schema, nodes, describe, access];
 
 const DIR_PAGES = [overview, topShards, nodes, describe, access];
 
@@ -164,6 +165,7 @@ const pathTypeToPages: Record<EPathType, Page[] | undefined> = {
 
     [EPathType.EPathTypeTable]: TABLE_PAGES,
     [EPathType.EPathTypeColumnTable]: COLUMN_TABLE_PAGES,
+    [EPathType.EPathTypeSysView]: SYSTEM_VIEW_PAGES,
 
     [EPathType.EPathTypeDir]: DIR_PAGES,
     [EPathType.EPathTypeTableIndex]: DIR_PAGES,
