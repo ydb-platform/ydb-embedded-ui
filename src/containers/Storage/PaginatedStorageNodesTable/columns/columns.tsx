@@ -13,6 +13,7 @@ import {
     getPoolsColumn,
     getRAMColumn,
     getRackColumn,
+    getTabletsColumn,
     getUptimeColumn,
     getVersionColumn,
 } from '../../../../components/nodesColumns/columns';
@@ -35,7 +36,7 @@ import './StorageNodesColumns.scss';
 
 const b = cn('ydb-storage-nodes-columns');
 
-const getPDisksColumn = ({
+export const getPDisksColumn = ({
     viewContext,
     columnsSettings,
 }: GetStorageNodesColumnsParams & {
@@ -98,6 +99,7 @@ export const getStorageNodesColumns = ({
         getVersionColumn<PreparedStorageNode>(),
         getMissingDisksColumn<PreparedStorageNode>(),
         getPDisksColumn({viewContext, columnsSettings}),
+        getTabletsColumn<PreparedStorageNode>({database}),
     ];
 
     const sortableColumns = columns.map((column) => ({

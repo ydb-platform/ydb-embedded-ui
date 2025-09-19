@@ -6,7 +6,7 @@ import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumn
 import {NODES_COLUMNS_TITLES} from '../../../components/nodesColumns/constants';
 import type {NodesColumnId} from '../../../components/nodesColumns/constants';
 import {useViewerNodesHandlerHasGrouping} from '../../../store/reducers/capabilities/hooks';
-import type {NodesPreparedEntity} from '../../../store/reducers/nodes/types';
+import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import {useProblemFilter} from '../../../store/reducers/settings/hooks';
 import type {NodesGroupByField} from '../../../types/api/nodes';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
@@ -21,7 +21,7 @@ interface NodesComponentProps {
     databaseFullPath?: string;
     scrollContainerRef: React.RefObject<HTMLElement>;
     withPeerRoleFilter?: boolean;
-    columns: Column<NodesPreparedEntity>[];
+    columns: Column<PreparedStorageNode>[];
     defaultColumnsIds: NodesColumnId[];
     requiredColumnsIds: NodesColumnId[];
     selectedColumnsKey: string;
