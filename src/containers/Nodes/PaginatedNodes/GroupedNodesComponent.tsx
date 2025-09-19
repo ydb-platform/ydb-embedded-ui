@@ -213,7 +213,6 @@ export function GroupedNodesComponent({
                     items={columnsToSelect}
                     showStatus
                     onUpdate={setColumns}
-                    sortable={false}
                 />
             }
             error={error ? <ResponseError error={error} /> : null}

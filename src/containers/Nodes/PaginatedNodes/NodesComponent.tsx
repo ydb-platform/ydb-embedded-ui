@@ -70,7 +70,6 @@ export function NodesComponent({
                     items={columnsToSelect}
                     showStatus
                     onUpdate={setColumns}
-                    sortable={false}
                 />
             }
             table={

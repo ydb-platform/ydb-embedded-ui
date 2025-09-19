@@ -41,7 +41,6 @@ export function StorageGroupsComponent({
                     items={columnsToSelect}
                     showStatus
                     onUpdate={setColumns}
-                    sortable={false}
                 />
             }
             table={
