@@ -1,5 +1,19 @@
 # Changelog
 
+## [12.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.4.0...v12.5.0) (2025-09-19)
+
+
+### Features
+
+* add icons to schema actions and templates ([#2893](https://github.com/ydb-platform/ydb-embedded-ui/issues/2893)) ([3377b87](https://github.com/ydb-platform/ydb-embedded-ui/commit/3377b8723d8c719b6f172ff37f465ecd0913a095))
+* support system view ([#2899](https://github.com/ydb-platform/ydb-embedded-ui/issues/2899)) ([b4e749a](https://github.com/ydb-platform/ydb-embedded-ui/commit/b4e749af60012a7fe692e5d9bcfb964ae921a1d4))
+
+
+### Bug Fixes
+
+* dont render network tab for clusters without network ([#2905](https://github.com/ydb-platform/ydb-embedded-ui/issues/2905)) ([dc7e723](https://github.com/ydb-platform/ydb-embedded-ui/commit/dc7e7234ba07500d54fc331ae06e2216eae4afa4))
+* move column selector to the right ([#2896](https://github.com/ydb-platform/ydb-embedded-ui/issues/2896)) ([f30ed6e](https://github.com/ydb-platform/ydb-embedded-ui/commit/f30ed6ed21352e0abc4b6687dd580379cf7c0fb8))
+
 ## [12.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.3.0...v12.4.0) (2025-09-18)
 
 
