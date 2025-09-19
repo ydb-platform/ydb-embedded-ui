@@ -5,8 +5,6 @@ import {cn} from '../../../../../../utils/cn';
 import {UtilizationTabCard} from '../../TabCard/UtilizationTabCard';
 import i18n from '../../i18n';
 
-import {PlaceholderTab} from './PlaceholderTab';
-
 import '../MetricsTabs.scss';
 
 const b = cn('tenant-metrics-tabs');
@@ -23,11 +21,10 @@ export function NetworkTab({to, active, networkUtilization, networkThroughput}: 
         networkUtilization !== undefined &&
         networkThroughput !== undefined &&
         isFinite(networkUtilization) &&
-        isFinite(networkThroughput) &&
-        networkThroughput > 0;
+        isFinite(networkThroughput);
 
     if (!canShow) {
-        return <PlaceholderTab />;
+        return null;
     }
 
     const fillPercent = networkUtilization * 100;
