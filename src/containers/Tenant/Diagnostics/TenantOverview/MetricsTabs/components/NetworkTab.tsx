@@ -12,21 +12,11 @@ const b = cn('tenant-metrics-tabs');
 interface NetworkTabProps {
     to: string;
     active: boolean;
-    networkUtilization?: number;
-    networkThroughput?: number;
+    networkUtilization: number;
+    networkThroughput: number;
 }
 
 export function NetworkTab({to, active, networkUtilization, networkThroughput}: NetworkTabProps) {
-    const canShow =
-        networkUtilization !== undefined &&
-        networkThroughput !== undefined &&
-        isFinite(networkUtilization) &&
-        isFinite(networkThroughput);
-
-    if (!canShow) {
-        return null;
-    }
-
     const fillPercent = networkUtilization * 100;
     const legendText = formatBytes({value: networkThroughput, withSpeedLabel: true});
 
