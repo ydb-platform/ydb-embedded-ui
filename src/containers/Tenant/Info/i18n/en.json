@@ -8,7 +8,7 @@
 
   "view.query-text": "Query Text",
 
-  "system-view_type": "System view type",
+  "field_system-view-type": "System view type",
 
   "no-entity-data": "No {{entityName}} data"
 }

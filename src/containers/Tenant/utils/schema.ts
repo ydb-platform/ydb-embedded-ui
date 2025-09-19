@@ -2,6 +2,7 @@ import type {NavigationTreeNodeType} from 'ydb-ui-components';
 
 import {EPathSubType, EPathType} from '../../../types/api/schema';
 import type {ETenantType} from '../../../types/api/tenant';
+import i18n from '../i18n';
 
 // this file contains verbose mappings that are typed in a way that ensures
 // correctness when a new node type or a new path type is added
@@ -62,8 +63,8 @@ export const mapPathTypeToNavigationTreeType = (
 // ====================
 
 const pathSubTypeToEntityName: Record<EPathSubType, string | undefined> = {
-    [EPathSubType.EPathSubTypeSyncIndexImplTable]: 'Secondary Index Table',
-    [EPathSubType.EPathSubTypeAsyncIndexImplTable]: 'Secondary Index Table',
+    [EPathSubType.EPathSubTypeSyncIndexImplTable]: i18n('entity-name_secondary-index-table'),
+    [EPathSubType.EPathSubTypeAsyncIndexImplTable]: i18n('entity-name_secondary-index-table'),
 
     [EPathSubType.EPathSubTypeStreamImpl]: undefined,
     [EPathSubType.EPathSubTypeEmpty]: undefined,
@@ -72,26 +73,26 @@ const pathSubTypeToEntityName: Record<EPathSubType, string | undefined> = {
 const pathTypeToEntityName: Record<EPathType, string | undefined> = {
     [EPathType.EPathTypeInvalid]: undefined,
 
-    [EPathType.EPathTypeSubDomain]: 'Database',
-    [EPathType.EPathTypeExtSubDomain]: 'Database',
+    [EPathType.EPathTypeSubDomain]: i18n('entity-name_database'),
+    [EPathType.EPathTypeExtSubDomain]: i18n('entity-name_database'),
 
-    [EPathType.EPathTypeDir]: 'Directory',
-    [EPathType.EPathTypeTable]: 'Table',
-    [EPathType.EPathTypeSysView]: 'System view',
-    [EPathType.EPathTypeTableIndex]: 'Secondary Index',
-    [EPathType.EPathTypeColumnStore]: 'Tablestore',
-    [EPathType.EPathTypeColumnTable]: 'Column-oriented table',
-    [EPathType.EPathTypeCdcStream]: 'Changefeed',
-    [EPathType.EPathTypePersQueueGroup]: 'Topic',
+    [EPathType.EPathTypeDir]: i18n('entity-name_directory'),
+    [EPathType.EPathTypeTable]: i18n('entity-name_table'),
+    [EPathType.EPathTypeSysView]: i18n('entity-name_system-view'),
+    [EPathType.EPathTypeTableIndex]: i18n('entity-name_secondary-index'),
+    [EPathType.EPathTypeColumnStore]: i18n('entity-name_tablestore'),
+    [EPathType.EPathTypeColumnTable]: i18n('entity-name_column-oriented-table'),
+    [EPathType.EPathTypeCdcStream]: i18n('entity-name_changefeed'),
+    [EPathType.EPathTypePersQueueGroup]: i18n('entity-name_topic'),
 
-    [EPathType.EPathTypeExternalDataSource]: 'External Data Source',
-    [EPathType.EPathTypeExternalTable]: 'External Table',
+    [EPathType.EPathTypeExternalDataSource]: i18n('entity-name_external-data-source'),
+    [EPathType.EPathTypeExternalTable]: i18n('entity-name_external-table'),
 
-    [EPathType.EPathTypeView]: 'View',
+    [EPathType.EPathTypeView]: i18n('entity-name_view'),
 
-    [EPathType.EPathTypeReplication]: 'Async Replication',
-    [EPathType.EPathTypeTransfer]: 'Transfer',
-    [EPathType.EPathTypeResourcePool]: 'Resource Pool',
+    [EPathType.EPathTypeReplication]: i18n('entity-name_async-replication'),
+    [EPathType.EPathTypeTransfer]: i18n('entity-name_transfer'),
+    [EPathType.EPathTypeResourcePool]: i18n('entity-name_resource-pool'),
 };
 
 export const mapPathTypeToEntityName = (

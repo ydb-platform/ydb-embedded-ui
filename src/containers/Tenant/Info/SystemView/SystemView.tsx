@@ -10,7 +10,7 @@ const prepareSystemViewItems = (data: TEvDescribeSchemeResult): YDBDefinitionLis
 
     return [
         {
-            name: i18n('system-view_type'),
+            name: i18n('field_system-view-type'),
             content: prepareSystemViewType(systemViewType),
         },
     ];

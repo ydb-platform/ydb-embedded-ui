@@ -68,5 +68,22 @@
   "label_download": "Download healthcheck data",
 
   "label_grant-access": "Grant access",
-  "context_grant-access": "Please note that granular rights can be combined into groups"
+  "context_grant-access": "Please note that granular rights can be combined into groups",
+
+  "entity-name_database": "Database",
+  "entity-name_directory": "Directory",
+  "entity-name_table": "Table",
+  "entity-name_system-view": "System view",
+  "entity-name_secondary-index": "Secondary Index",
+  "entity-name_tablestore": "Tablestore",
+  "entity-name_column-oriented-table": "Column-oriented table",
+  "entity-name_changefeed": "Changefeed",
+  "entity-name_topic": "Topic",
+  "entity-name_external-data-source": "External Data Source",
+  "entity-name_external-table": "External Table",
+  "entity-name_view": "View",
+  "entity-name_async-replication": "Async Replication",
+  "entity-name_transfer": "Transfer",
+  "entity-name_resource-pool": "Resource Pool",
+  "entity-name_secondary-index-table": "Secondary Index Table"
 }
