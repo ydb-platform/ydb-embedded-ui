@@ -1,3 +1,5 @@
+import {Text} from '@gravity-ui/uikit';
+
 import type {YDBDefinitionListItem} from '../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {YDBDefinitionList} from '../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {TEvDescribeSchemeResult} from '../../../../types/api/schema';
@@ -24,7 +26,11 @@ export function SystemViewInfo({data}: SystemViewInfoProps) {
     const entityName = getEntityName(data?.PathDescription);
 
     if (!data) {
-        return <div className="error">{i18n('no-entity-data', {entityName})}</div>;
+        return (
+            <Text variant="body-2" color="danger">
+                {i18n('no-entity-data', {entityName})}
+            </Text>
+        );
     }
 
     const items = prepareSystemViewItems(data);
