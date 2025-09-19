@@ -186,7 +186,6 @@ export function PartitionsTableColumnSetup({
             items={columnsToSelect}
             showStatus
             onUpdate={handleTableColumnsSetupChange}
-            sortable={false}
         />
     );
 }

@@ -211,7 +211,6 @@ export function Clusters() {
                         items={columnsToSelect}
                         showStatus
                         onUpdate={setColumns}
-                        sortable={false}
                     />
                 </Flex>
                 {clusters?.length ? (
