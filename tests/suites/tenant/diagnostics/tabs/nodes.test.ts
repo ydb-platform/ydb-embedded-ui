@@ -28,7 +28,6 @@ test.describe('Diagnostics Nodes tab', async () => {
         const controls = paginatedTable.getControls();
         await controls.openColumnSetup();
         await controls.setColumnChecked('Memory');
-        await controls.applyColumnVisibility();
 
         // Check memory viewer is present and visible
         await diagnostics.memoryViewer.waitForVisible();

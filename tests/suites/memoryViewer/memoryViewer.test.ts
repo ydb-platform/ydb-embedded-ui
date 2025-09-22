@@ -18,7 +18,6 @@ test.describe('Memory Viewer Widget', () => {
             const controls = paginatedTable.getControls();
             await controls.openColumnSetup();
             await controls.setColumnChecked('Memory');
-            await controls.applyColumnVisibility();
         }
         await memoryViewer.waitForVisible();
     });

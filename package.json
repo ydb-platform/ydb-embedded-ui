@@ -24,7 +24,7 @@
     "@gravity-ui/paranoid": "^3.0.0",
     "@gravity-ui/react-data-table": "^2.2.1",
     "@gravity-ui/table": "^1.10.1",
-    "@gravity-ui/uikit": "^7.22.0",
+    "@gravity-ui/uikit": "^7.23.0",
     "@gravity-ui/unipika": "^5.2.1",
     "@gravity-ui/websql-autocomplete": "^13.7.0",
     "@hookform/resolvers": "^3.10.0",

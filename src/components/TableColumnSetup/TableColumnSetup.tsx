@@ -29,5 +29,5 @@ export function TableColumnSetup(props: TableColumnSetupProps) {
         );
     };
 
-    return <TableColumnSetupUikit {...props} renderSwitcher={renderSwitcher} />;
+    return <TableColumnSetupUikit {...props} renderSwitcher={renderSwitcher} hideApplyButton />;
 }
