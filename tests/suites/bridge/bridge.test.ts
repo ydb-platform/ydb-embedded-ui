@@ -33,7 +33,6 @@ test.describe('Bridge mode - Nodes table', () => {
         const table = new ClusterNodesTable(page);
         await table.getControls().openColumnSetup();
         await table.getControls().setColumnChecked('PileName');
-        await table.getControls().applyColumnVisibility();
         await table.waitForTableToLoad();
         const headers = await table.getHeaders();
         expect(headers.join(' ')).toContain('Pile Name');
@@ -49,7 +48,6 @@ test.describe('Bridge mode - Storage nodes', () => {
         const table = new ClusterStorageTable(page);
         await table.getControls().openColumnSetup();
         await table.getControls().setColumnChecked('PileName');
-        await table.getControls().applyColumnVisibility();
         await table.waitForTableToLoad();
         const headers = await table.getHeaders();
         expect(headers.join(' ')).toContain('Pile Name');
@@ -75,7 +73,6 @@ test.describe('Bridge mode - Storage groups', () => {
         const table = new ClusterStorageTable(page);
         await table.getControls().openColumnSetup();
         await table.getControls().setColumnChecked('PileName');
-        await table.getControls().applyColumnVisibility();
         await table.waitForTableToLoad();
         const headers = await table.getHeaders();
         expect(headers.join(' ')).toContain('Pile Name');
