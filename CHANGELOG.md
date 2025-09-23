@@ -1,5 +1,22 @@
 # Changelog
 
+## [12.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.4.0...v12.5.0) (2025-09-23)
+
+
+### Features
+
+* add icons to schema actions and templates ([#2893](https://github.com/ydb-platform/ydb-embedded-ui/issues/2893)) ([3377b87](https://github.com/ydb-platform/ydb-embedded-ui/commit/3377b8723d8c719b6f172ff37f465ecd0913a095))
+* support system view ([#2899](https://github.com/ydb-platform/ydb-embedded-ui/issues/2899)) ([b4e749a](https://github.com/ydb-platform/ydb-embedded-ui/commit/b4e749af60012a7fe692e5d9bcfb964ae921a1d4))
+* **TableColumnSelector:** apply settings immediatelly ([#2907](https://github.com/ydb-platform/ydb-embedded-ui/issues/2907)) ([f7e763d](https://github.com/ydb-platform/ydb-embedded-ui/commit/f7e763db5e4caf4941c552f961c8c2a22056b4a7))
+
+
+### Bug Fixes
+
+* disable healthcheck for serverless ([#2912](https://github.com/ydb-platform/ydb-embedded-ui/issues/2912)) ([025b1b5](https://github.com/ydb-platform/ydb-embedded-ui/commit/025b1b56ce39bc0ac6fc3b99ae6943d8bbf4a534))
+* dont render network tab for clusters without network ([#2905](https://github.com/ydb-platform/ydb-embedded-ui/issues/2905)) ([dc7e723](https://github.com/ydb-platform/ydb-embedded-ui/commit/dc7e7234ba07500d54fc331ae06e2216eae4afa4))
+* move column selector to the right ([#2896](https://github.com/ydb-platform/ydb-embedded-ui/issues/2896)) ([f30ed6e](https://github.com/ydb-platform/ydb-embedded-ui/commit/f30ed6ed21352e0abc4b6687dd580379cf7c0fb8))
+* **SchemaTree:** prevent infinite loop ([#2909](https://github.com/ydb-platform/ydb-embedded-ui/issues/2909)) ([7ffc5c4](https://github.com/ydb-platform/ydb-embedded-ui/commit/7ffc5c47941c78ed253fbcaa488a057eb7f9e8a7))
+
 ## [12.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.3.0...v12.4.0) (2025-09-18)
 
 
