@@ -302,7 +302,7 @@ function Nodes({nodes, isRight, showId, showRacks, clickedNode, onClickNode}: No
     });
 
     if (filter === ProblemFilterValues.PROBLEMS && problemNodesCount === 0) {
-        return <Illustration name="thumbsUp" width="200" />;
+        return <Illustration name="thumbsUp" width={200} />;
     } else {
         return result;
     }
