@@ -78,7 +78,6 @@ export const RunningQueriesData = ({
                 items={columnsToSelect}
                 showStatus
                 onUpdate={setColumns}
-                sortable={false}
             />
         );
     };

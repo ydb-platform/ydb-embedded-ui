@@ -278,7 +278,6 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
                 items={columnsToSelect}
                 showStatus
                 onUpdate={setColumns}
-                sortable={false}
             />
         );
     }, [columnsToSelect, setColumns]);
