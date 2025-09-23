@@ -60,50 +60,56 @@ export function SchemaTree(props: SchemaTreeProps) {
         ? 'database'
         : mapPathTypeToNavigationTreeType(rootType);
 
-    const fetchPath = async (path: string) => {
-        let schemaData: TEvDescribeSchemeResult | undefined;
-        do {
-            const promise = dispatch(
-                schemaApi.endpoints.getSchema.initiate(
-                    {path, database, databaseFullPath},
-                    {forceRefetch: true},
-                ),
-            );
-            const {data, originalArgs} = await promise;
-            promise.unsubscribe();
-            // Check if the result from the current request is received. rtk-query may skip the current request and
-            // return data from a parallel request, due to the same cache key.
-            if (originalArgs?.path === path) {
-                schemaData = data?.[path];
-                break;
+    const fetchPath = React.useCallback(
+        async (path: string) => {
+            let schemaData: TEvDescribeSchemeResult | undefined;
+
+            do {
+                const promise = dispatch(
+                    schemaApi.endpoints.getSchema.initiate(
+                        {path, database, databaseFullPath},
+                        {forceRefetch: true},
+                    ),
+                );
+
+                const {data, originalArgs} = await promise;
+                promise.unsubscribe();
+                // Check if the result from the current request is reonceived. rtk-query may skip the current request and
+                // return data from a parallel request, due to the same cache key.
+                if (originalArgs?.path === path) {
+                    schemaData = data?.[path];
+                    break;
+                }
+                // eslint-disable-next-line no-constant-condition
+            } while (true);
+
+            if (!schemaData) {
+                throw new Error(`No describe data about path ${path}`);
             }
-            // eslint-disable-next-line no-constant-condition
-        } while (true);
 
-        if (!schemaData) {
-            throw new Error(`no describe data about path ${path}`);
-        }
-        const {PathDescription: {Children = []} = {}} = schemaData;
+            const {PathDescription: {Children = []} = {}} = schemaData;
 
-        const childItems = Children.map((childData) => {
-            const {Name = '', PathType, PathSubType, ChildrenExist} = childData;
+            const childItems = Children.map((childData) => {
+                const {Name = '', PathType, PathSubType, ChildrenExist} = childData;
 
-            const isChildless =
-                isChildlessPathType(PathType, PathSubType) ||
-                (valueIsDefined(ChildrenExist) && !ChildrenExist);
+                const isChildless =
+                    isChildlessPathType(PathType, PathSubType) ||
+                    (valueIsDefined(ChildrenExist) && !ChildrenExist);
 
-            return {
-                name: Name,
-                type: mapPathTypeToNavigationTreeType(PathType, PathSubType),
-                // FIXME: should only be explicitly set to true for tables with indexes
-                // at the moment of writing there is no property to determine this, fix later
-                expandable: !isChildless,
-                meta: {subType: PathSubType},
-            };
-        });
+                return {
+                    name: Name,
+                    type: mapPathTypeToNavigationTreeType(PathType, PathSubType),
+                    // FIXME: should only be explicitly set to true for tables with indexes
+                    // at the moment of writing there is no property to determine this, fix later
+                    expandable: !isChildless,
+                    meta: {subType: PathSubType},
+                };
+            });
 
-        return childItems;
-    };
+            return childItems;
+        },
+        [dispatch, database, databaseFullPath],
+    );
     React.useEffect(() => {
         // if the cached path is not in the current tree, show root
         if (!currentPath?.startsWith(databaseFullPath)) {
