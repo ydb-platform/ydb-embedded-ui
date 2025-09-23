@@ -3,6 +3,7 @@ import {
     selectLeavesIssues,
 } from '../../../store/reducers/healthcheckInfo/healthcheckInfo';
 import type {IssuesTree} from '../../../store/reducers/healthcheckInfo/types';
+import {useTenantBaseInfo} from '../../../store/reducers/tenant/tenant';
 import {SelfCheckResult} from '../../../types/api/healthcheck';
 import {useTypedSelector} from '../../../utils/hooks';
 
@@ -19,6 +20,7 @@ export const useHealthcheck = (
     database: string,
     {autorefresh}: {autorefresh?: number} = {},
 ): HealthcheckParams => {
+    const {databaseType} = useTenantBaseInfo(database);
     const {
         currentData: data,
         isFetching,
@@ -29,6 +31,7 @@ export const useHealthcheck = (
         {database},
         {
             pollingInterval: autorefresh,
+            skip: databaseType === 'Serverless',
         },
     );
 

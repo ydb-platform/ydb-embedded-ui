@@ -208,7 +208,7 @@ export function TenantOverview({
                         </Flex>
                     </Flex>
                     <Flex direction="column" gap={4}>
-                        <HealthcheckPreview database={database} />
+                        {!isServerless && <HealthcheckPreview database={database} />}
                         <QueriesActivityBar database={database} />
                         <MetricsTabs
                             poolsCpuStats={poolsStats}
