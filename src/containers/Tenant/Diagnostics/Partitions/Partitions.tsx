@@ -4,27 +4,27 @@ import {skipToken} from '@reduxjs/toolkit/query';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
+import {TableColumnSetup} from '../../../../components/TableColumnSetup/TableColumnSetup';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {nodesListApi, selectNodesMap} from '../../../../store/reducers/nodesList';
 import {partitionsApi, setSelectedConsumer} from '../../../../store/reducers/partitions/partitions';
 import {selectConsumersNames, topicApi} from '../../../../store/reducers/topic';
 import {cn} from '../../../../utils/cn';
-import {DEFAULT_TABLE_SETTINGS, PARTITIONS_HIDDEN_COLUMNS_KEY} from '../../../../utils/constants';
-import {
-    useAutoRefreshInterval,
-    useSetting,
-    useTypedDispatch,
-    useTypedSelector,
-} from '../../../../utils/hooks';
+import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
+import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 
-import {
-    PartitionsControls,
-    PartitionsTableColumnSetup,
-} from './PartitionsControls/PartitionsControls';
+import {PartitionsControls} from './PartitionsControls/PartitionsControls';
 import {PARTITIONS_COLUMNS_WIDTH_LS_KEY} from './columns';
 import i18n from './i18n';
 import {addHostToPartitions} from './utils';
+import {
+    PARTITIONS_COLUMNS_IDS,
+    PARTITIONS_COLUMNS_TITLES,
+    allPartitionsColumnsIds,
+    generalPartitionColumnsIds,
+} from './utils/constants';
 import type {PreparedPartitionDataWithHosts} from './utils/types';
 import {useGetPartitionsColumns} from './utils/useGetPartitionsColumns';
 
@@ -64,9 +64,15 @@ export const Partitions = ({path, database, databaseFullPath}: PartitionsProps) 
     const nodesLoading = nodesIsFetching && nodesData === undefined;
     const nodeHostsMap = useTypedSelector((state) => selectNodesMap(state, database));
 
-    const [hiddenColumns, setHiddenColumns] = useSetting<string[]>(PARTITIONS_HIDDEN_COLUMNS_KEY);
+    const columns = useGetPartitionsColumns(selectedConsumer);
 
-    const [columns, columnsIdsForSelector] = useGetPartitionsColumns(selectedConsumer);
+    const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
+        columns,
+        'partitionsSelectedColumns',
+        PARTITIONS_COLUMNS_TITLES,
+        selectedConsumer ? allPartitionsColumnsIds : generalPartitionColumnsIds,
+        [PARTITIONS_COLUMNS_IDS.PARTITION_ID],
+    );
 
     const params = topicLoading
         ? skipToken
@@ -95,14 +101,6 @@ export const Partitions = ({path, database, databaseFullPath}: PartitionsProps) 
         }
     }, [dispatch, topicLoading, selectedConsumer, consumers]);
 
-    const columnsToShow = React.useMemo(() => {
-        return columns.filter((column) => !hiddenColumns.includes(column.name));
-    }, [columns, hiddenColumns]);
-
-    const hadleTableColumnsSetupChange = (newHiddenColumns: string[]) => {
-        setHiddenColumns(newHiddenColumns);
-    };
-
     const handleSelectedConsumerChange = (value?: string) => {
         dispatch(setSelectedConsumer(value));
     };
@@ -125,13 +123,7 @@ export const Partitions = ({path, database, databaseFullPath}: PartitionsProps) 
     };
 
     const renderExtraControls = () => {
-        return (
-            <PartitionsTableColumnSetup
-                hiddenColumns={hiddenColumns}
-                onHiddenColumnsChange={hadleTableColumnsSetupChange}
-                initialColumnsIds={columnsIdsForSelector}
-            />
-        );
+        return <TableColumnSetup items={columnsToSelect} showStatus onUpdate={setColumns} />;
     };
 
     const renderContent = () => {

@@ -1,15 +1,12 @@
 import React from 'react';
 
-import type {SelectOption, TableColumnSetupItem, TableColumnSetupProps} from '@gravity-ui/uikit';
+import type {SelectOption} from '@gravity-ui/uikit';
 import {Select} from '@gravity-ui/uikit';
 import escapeRegExp from 'lodash/escapeRegExp';
 
 import {Search} from '../../../../../components/Search/Search';
-import {TableColumnSetup} from '../../../../../components/TableColumnSetup/TableColumnSetup';
-import type {ValueOf} from '../../../../../types/common';
 import {b} from '../Partitions';
 import i18n from '../i18n';
-import {PARTITIONS_COLUMNS_IDS, PARTITIONS_COLUMNS_TITLES} from '../utils/constants';
 import type {PreparedPartitionDataWithHosts} from '../utils/types';
 
 interface PartitionsControlsProps {
@@ -132,60 +129,3 @@ export const PartitionsControls = ({
         </React.Fragment>
     );
 };
-
-interface PartitionsTableColumnSetupProps {
-    hiddenColumns: string[];
-    onHiddenColumnsChange: (newHiddenColumns: string[]) => void;
-    initialColumnsIds: string[];
-}
-
-export function PartitionsTableColumnSetup({
-    hiddenColumns,
-    onHiddenColumnsChange,
-    initialColumnsIds,
-}: PartitionsTableColumnSetupProps) {
-    const columnsToSelect = React.useMemo(() => {
-        const columns: TableColumnSetupItem[] = [];
-        for (const id of initialColumnsIds) {
-            const isId = id === PARTITIONS_COLUMNS_IDS.PARTITION_ID;
-            const column: TableColumnSetupItem = {
-                title: PARTITIONS_COLUMNS_TITLES[id as ValueOf<typeof PARTITIONS_COLUMNS_IDS>],
-                selected: Boolean(!hiddenColumns.includes(id)),
-                id: id,
-                required: isId,
-                sticky: isId ? 'start' : undefined,
-            };
-            if (isId) {
-                columns.unshift(column);
-            } else {
-                columns.push(column);
-            }
-        }
-        return columns;
-    }, [initialColumnsIds, hiddenColumns]);
-    const handleTableColumnsSetupChange: TableColumnSetupProps['onUpdate'] = (value) => {
-        const result = [...hiddenColumns];
-
-        // Process current set of columns
-        // This way we do not remove from hidden these columns, that are not displayed currently
-        // The reasons: set of columns differs for partitions with and without consumers
-        value.forEach((el) => {
-            if (!el.selected && !hiddenColumns.includes(el.id)) {
-                result.push(el.id);
-            } else if (el.selected && hiddenColumns.includes(el.id)) {
-                result.splice(hiddenColumns.indexOf(el.id));
-            }
-        });
-
-        onHiddenColumnsChange(result);
-    };
-    return (
-        <TableColumnSetup
-            key="TableColumnSetup"
-            popupWidth={242}
-            items={columnsToSelect}
-            showStatus
-            onUpdate={handleTableColumnsSetupChange}
-        />
-    );
-}
