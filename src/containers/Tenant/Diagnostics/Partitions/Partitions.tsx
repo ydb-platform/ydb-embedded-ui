@@ -13,18 +13,11 @@ import {selectConsumersNames, topicApi} from '../../../../store/reducers/topic';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
-import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 
 import {PartitionsControls} from './PartitionsControls/PartitionsControls';
 import {PARTITIONS_COLUMNS_WIDTH_LS_KEY} from './columns';
 import i18n from './i18n';
 import {addHostToPartitions} from './utils';
-import {
-    PARTITIONS_COLUMNS_IDS,
-    PARTITIONS_COLUMNS_TITLES,
-    allPartitionsColumnsIds,
-    generalPartitionColumnsIds,
-} from './utils/constants';
 import type {PreparedPartitionDataWithHosts} from './utils/types';
 import {useGetPartitionsColumns} from './utils/useGetPartitionsColumns';
 
@@ -64,15 +57,7 @@ export const Partitions = ({path, database, databaseFullPath}: PartitionsProps) 
     const nodesLoading = nodesIsFetching && nodesData === undefined;
     const nodeHostsMap = useTypedSelector((state) => selectNodesMap(state, database));
 
-    const columns = useGetPartitionsColumns(selectedConsumer);
-
-    const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
-        columns,
-        'partitionsSelectedColumns',
-        PARTITIONS_COLUMNS_TITLES,
-        selectedConsumer ? allPartitionsColumnsIds : generalPartitionColumnsIds,
-        [PARTITIONS_COLUMNS_IDS.PARTITION_ID],
-    );
+    const {columnsToShow, columnsToSelect, setColumns} = useGetPartitionsColumns(selectedConsumer);
 
     const params = topicLoading
         ? skipToken
