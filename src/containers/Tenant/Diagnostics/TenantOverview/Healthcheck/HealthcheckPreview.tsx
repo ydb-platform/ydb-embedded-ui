@@ -17,7 +17,6 @@ const b = cn('ydb-healthcheck-preview');
 
 interface HealthcheckPreviewProps {
     database: string;
-    active?: boolean;
 }
 
 const checkResultToAlertTheme: Record<SelfCheckResult, AlertProps['theme']> = {
