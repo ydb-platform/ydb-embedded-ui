@@ -1,5 +1,19 @@
 # Changelog
 
+## [12.4.0-hotfix.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.4.0...v12.4.0-hotfix.1) (2025-09-23)
+
+
+### Features
+
+* add icons to schema actions and templates ([#2893](https://github.com/ydb-platform/ydb-embedded-ui/issues/2893)) ([edee104](https://github.com/ydb-platform/ydb-embedded-ui/commit/edee10478b056665068d4f38e8300de39fa45468))
+
+
+### Bug Fixes
+
+* disable healthcheck for serverless ([#2912](https://github.com/ydb-platform/ydb-embedded-ui/issues/2912)) ([628948d](https://github.com/ydb-platform/ydb-embedded-ui/commit/628948de8c24da202961e58eeb77b3d96f291e11))
+* dont render network tab for clusters without network ([#2905](https://github.com/ydb-platform/ydb-embedded-ui/issues/2905)) ([a4cb568](https://github.com/ydb-platform/ydb-embedded-ui/commit/a4cb568dc88654df07ef2bdae5666b46d31db293))
+* **SchemaTree:** prevent infinite loop ([#2909](https://github.com/ydb-platform/ydb-embedded-ui/issues/2909)) ([74fcf45](https://github.com/ydb-platform/ydb-embedded-ui/commit/74fcf45673ffe7e30e99825ded49374e553fc30b))
+
 ## [12.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.3.0...v12.4.0) (2025-09-18)
 
 
