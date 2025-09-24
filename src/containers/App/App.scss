@@ -24,18 +24,11 @@ body,
 #root {
     --g-scrollbar-width: 8px;
     overflow: auto;
-    -webkit-overflow-scrolling: touch;
 
     box-sizing: border-box;
     height: 100%;
     margin: 0;
     padding: 0;
-
-    @include mixins.scrollbar();
-    ::-webkit-scrollbar-corner,
-    ::-webkit-scrollbar-thumb {
-        border-radius: 8px;
-    }
 }
 
 :root {
@@ -64,6 +57,7 @@ body,
     --ydb-color-status-black: var(--g-color-base-misc-heavy);
 
     --g-popover-max-width: 500px;
+
     -webkit-overflow-scrolling: touch;
     @include mixins.scrollbar();
     ::-webkit-scrollbar-corner,
