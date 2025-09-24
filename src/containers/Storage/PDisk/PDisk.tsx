@@ -85,7 +85,7 @@ export const PDisk = ({
             {renderVDisks()}
             <HoverPopup
                 showPopup={showPopup}
-                offset={{mainAxis: 5, crossAxis: 0}}
+                offset={{mainAxis: 2, crossAxis: 0}}
                 anchorRef={anchorRef}
                 onShowPopup={onShowPopup}
                 onHidePopup={onHidePopup}
