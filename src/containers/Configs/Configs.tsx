@@ -26,7 +26,7 @@ export function Configs({database, className, scrollContainerRef}: ConfigsProps)
             case ConfigTypes.current:
                 return <Config database={database} />;
             case ConfigTypes.startup:
-                return <Startup database={database} />;
+                return <Startup database={database} className={b('startup')} />;
             case ConfigTypes.features:
                 return <FeatureFlags database={database} className={b('feature-flags')} />;
         }

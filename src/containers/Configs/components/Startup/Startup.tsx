@@ -6,8 +6,9 @@ import {useAutoRefreshInterval} from '../../../../utils/hooks/useAutoRefreshInte
 
 interface StartupProps {
     database?: string;
+    className?: string;
 }
-export function Startup({database}: StartupProps) {
+export function Startup({database, className}: StartupProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isLoading, error} = configsApi.useGetConfigQuery(
         {database},
@@ -21,6 +22,7 @@ export function Startup({database}: StartupProps) {
             {error ? <ResponseError error={error} /> : null}
             {startup ? (
                 <YDBSyntaxHighlighterLazy
+                    className={className}
                     language="yaml"
                     text={startup}
                     transparentBackground={false}

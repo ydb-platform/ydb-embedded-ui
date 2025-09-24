@@ -17,6 +17,11 @@
         --data-table-start: calc(
             var(--sticky-tabs-height, 0px) + var(--ydb-configs-controls-height)
         );
-        --ydb-table-with-controls-layout-controls-height: 46px;
+        --ydb-table-with-controls-layout-controls-height: 44px;
+    }
+    &__startup {
+        pre {
+            border-radius: 4px;
+        }
     }
 }

@@ -107,6 +107,7 @@ export const FeatureFlags = ({database, className}: FeatureFlagsProps) => {
                     value={featureFlagsFilter}
                     onChange={handleSearchChange}
                     placeholder={i18n('search-placeholder')}
+                    width={300}
                 />
             </TableWithControlsLayout.Controls>
             <TableWithControlsLayout.Table loading={isLoading}>

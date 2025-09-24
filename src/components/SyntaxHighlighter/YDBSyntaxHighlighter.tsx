@@ -68,6 +68,7 @@ export function YDBSyntaxHighlighter({
                     className={b('copy', {
                         visible: alwaysVisible,
                     })}
+                    view="flat-secondary"
                 />
             </div>
         );
