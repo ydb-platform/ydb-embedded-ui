@@ -24,11 +24,11 @@ async function registerLanguage(lang: Language) {
     }
 }
 
-interface WithClipboardButtonProp extends ClipboardButtonProps {
+export interface WithClipboardButtonProp extends ClipboardButtonProps {
     alwaysVisible?: boolean;
 }
 
-type YDBSyntaxHighlighterProps = {
+export type YDBSyntaxHighlighterProps = {
     text: string;
     language: Language;
     className?: string;
