@@ -1,4 +1,4 @@
-import type {NodesGroup} from '../../store/reducers/nodes/types';
+import type {TableGroup} from '../../store/reducers/storage/types';
 import type {TSystemStateInfo} from '../../types/api/nodes';
 
 import {getMinorVersion} from './parseVersion';
@@ -36,7 +36,7 @@ export const parseNodesToPreparedVersions = (
 };
 
 export function parseNodeGroupsToPreparedVersions(
-    groups: NodesGroup[],
+    groups: TableGroup[],
     versionsDataMap?: VersionsDataMap,
 ): PreparedVersion[] {
     const preparedVersions = groups.map((group) => {

@@ -1,10 +1,10 @@
-import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
+import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 
 import {getGroupedStorageNodes, getGroupedTenantNodes, getOtherNodes} from './groupNodes';
 import {GroupByValue} from './types';
 
 // Only needed for tests values are present
-const nodes: NodesPreparedEntity[] = [
+const nodes: PreparedStorageNode[] = [
     {
         // Storage node with many roles
         NodeId: 1,

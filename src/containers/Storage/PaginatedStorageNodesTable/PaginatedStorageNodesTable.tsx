@@ -2,6 +2,7 @@ import React from 'react';
 
 import type {PaginatedTableData, RenderErrorMessage} from '../../../components/PaginatedTable';
 import {ResizeablePaginatedTable} from '../../../components/PaginatedTable';
+import type {NodesColumn} from '../../../components/nodesColumns/types';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField} from '../../../types/api/nodes';
@@ -10,7 +11,6 @@ import {NodesUptimeFilterValues, isUnavailableNode} from '../../../utils/nodes';
 
 import {StorageNodesEmptyDataMessage} from './StorageNodesEmptyDataMessage';
 import {STORAGE_NODES_COLUMNS_WIDTH_LS_KEY} from './columns/constants';
-import type {StorageNodesColumn} from './columns/types';
 import {getStorageNodes} from './getNodes';
 import i18n from './i18n';
 
@@ -22,7 +22,7 @@ const getRowUnavailableClassName = (row: PreparedStorageNode) =>
     b('node', {unavailable: isUnavailableNode(row)});
 
 interface PaginatedStorageNodesTableProps {
-    columns: StorageNodesColumn[];
+    columns: NodesColumn[];
 
     database?: string;
     nodeId?: string | number;

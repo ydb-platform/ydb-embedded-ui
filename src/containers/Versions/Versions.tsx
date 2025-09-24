@@ -8,7 +8,7 @@ import {z} from 'zod';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {VersionsBar} from '../../components/VersionsBar/VersionsBar';
 import {nodesApi} from '../../store/reducers/nodes/nodes';
-import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
+import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import type {TClusterInfo} from '../../types/api/cluster';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval} from '../../utils/hooks';
@@ -48,7 +48,7 @@ export function VersionsContainer({cluster, loading}: VersionsContainerProps) {
         <LoaderWrapper loading={loading || isNodesLoading}>
             <Versions
                 preparedVersions={preparedVersions}
-                nodes={currentData?.Nodes}
+                nodes={currentData?.nodes}
                 versionsDataMap={versionsDataMap}
             />
         </LoaderWrapper>
@@ -56,7 +56,7 @@ export function VersionsContainer({cluster, loading}: VersionsContainerProps) {
 }
 
 interface VersionsProps {
-    nodes?: NodesPreparedEntity[];
+    nodes?: PreparedStorageNode[];
     preparedVersions: PreparedVersion[];
     versionsDataMap?: VersionsDataMap;
 }

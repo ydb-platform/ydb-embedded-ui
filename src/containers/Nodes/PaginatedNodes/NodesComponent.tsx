@@ -1,13 +1,14 @@
 import React from 'react';
 
-import type {Column} from '../../../components/PaginatedTable';
+import type {PaginatedTableData} from '../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {NODES_COLUMNS_TITLES} from '../../../components/nodesColumns/constants';
 import type {NodesColumnId} from '../../../components/nodesColumns/constants';
+import type {NodesColumn} from '../../../components/nodesColumns/types';
 import {useViewerNodesHandlerHasGrouping} from '../../../store/reducers/capabilities/hooks';
-import type {NodesPreparedEntity} from '../../../store/reducers/nodes/types';
 import {useProblemFilter} from '../../../store/reducers/settings/hooks';
+import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField} from '../../../types/api/nodes';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
 import {NodesTable} from '../NodesTable';
@@ -21,11 +22,12 @@ interface NodesComponentProps {
     databaseFullPath?: string;
     scrollContainerRef: React.RefObject<HTMLElement>;
     withPeerRoleFilter?: boolean;
-    columns: Column<NodesPreparedEntity>[];
+    columns: NodesColumn[];
     defaultColumnsIds: NodesColumnId[];
     requiredColumnsIds: NodesColumnId[];
     selectedColumnsKey: string;
     groupByParams: NodesGroupByField[];
+    onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
 }
 
 export function NodesComponent({
@@ -39,6 +41,7 @@ export function NodesComponent({
     requiredColumnsIds,
     selectedColumnsKey,
     groupByParams,
+    onDataFetched,
 }: NodesComponentProps) {
     const {searchValue, uptimeFilter, peerRoleFilter} = useNodesPageQueryParams(
         groupByParams,
@@ -83,6 +86,7 @@ export function NodesComponent({
                     peerRoleFilter={peerRoleFilter}
                     columns={columnsToShow}
                     scrollContainerRef={scrollContainerRef}
+                    onDataFetched={onDataFetched}
                 />
             }
             tableWrapperProps={{
