@@ -63,7 +63,7 @@ export function TenantOverview({
     // FIXME: remove after correct data is added to tenantInfo
     const {currentData: tenantSchemaData} = overviewApi.useGetOverviewQuery(
         {
-            path: database,
+            path: databaseFullPath,
             database,
             databaseFullPath,
         },
