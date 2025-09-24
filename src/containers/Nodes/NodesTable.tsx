@@ -73,7 +73,7 @@ export function NodesTable({
 
     const renderEmptyDataMessage = () => {
         if (problemFilter !== 'All' || uptimeFilter !== NodesUptimeFilterValues.All) {
-            return <Illustration name="thumbsUp" width="200" />;
+            return <Illustration name="thumbsUp" width={200} />;
         }
 
         return i18n('empty.default');

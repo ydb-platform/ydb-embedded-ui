@@ -76,7 +76,7 @@ export function Healthcheck({
         if (selfCheckResult === SelfCheckResult.GOOD && (!leavesIssues || !leavesIssues.length)) {
             return (
                 <Flex direction="column" gap={1} className={b('stub-wrapper')}>
-                    <Illustration name="thumbsUp" width="200" />
+                    <Illustration name="thumbsUp" width={200} />
                     {HEALTHCHECK_RESULT_TO_TEXT[selfCheckResult]}
                 </Flex>
             );

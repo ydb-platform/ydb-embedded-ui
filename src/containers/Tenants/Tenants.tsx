@@ -313,7 +313,7 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
         }
 
         if (filteredTenants.length === 0 && problemFilter !== ProblemFilterValues.ALL) {
-            return <Illustration name="thumbsUp" width="200" />;
+            return <Illustration name="thumbsUp" width={200} />;
         }
 
         return (
