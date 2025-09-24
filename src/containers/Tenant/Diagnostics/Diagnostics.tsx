@@ -17,6 +17,7 @@ import {uiFactory} from '../../../uiFactory/uiFactory';
 import {cn} from '../../../utils/cn';
 import {useScrollPosition, useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {useIsViewerUser} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {Configs} from '../../Configs/Configs';
 import {Heatmap} from '../../Heatmap';
 import {Nodes} from '../../Nodes/Nodes';
 import {Operations} from '../../Operations';
@@ -27,7 +28,6 @@ import {useCurrentSchema} from '../TenantContext';
 import {isDatabaseEntityType} from '../utils/schema';
 
 import {AccessRights} from './AccessRights/AccessRights';
-import {Configs} from './Configs/Configs';
 import {Consumers} from './Consumers';
 import Describe from './Describe/Describe';
 import DetailedOverview from './DetailedOverview/DetailedOverview';

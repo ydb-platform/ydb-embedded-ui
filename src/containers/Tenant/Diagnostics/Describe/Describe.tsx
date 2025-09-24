@@ -1,5 +1,3 @@
-import {ClipboardButton} from '@gravity-ui/uikit';
-
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {JsonViewer} from '../../../../components/JsonViewer/JsonViewer';
 import {useUnipikaConvert} from '../../../../components/JsonViewer/unipika/unipika';
@@ -45,12 +43,10 @@ const Describe = ({path, database, databaseFullPath}: IDescribeProps) => {
                 <div className={b('result')}>
                     <JsonViewer
                         value={convertedValue}
-                        extraTools={
-                            <ClipboardButton
-                                view="flat-secondary"
-                                text={JSON.stringify(currentData)}
-                            />
-                        }
+                        withClipboardButton={{
+                            withLabel: false,
+                            copyText: JSON.stringify(currentData),
+                        }}
                         search
                         collapsedInitially
                     />

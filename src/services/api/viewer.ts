@@ -522,9 +522,18 @@ export class ViewerAPI extends BaseYdbAPI {
         );
     }
 
-    getClusterConfig(database?: string, {concurrentId, signal}: AxiosOptions = {}) {
+    getFeatureFlags(database?: string, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<FeatureFlagConfigs>(
             this.getPath('/viewer/feature_flags'),
+            {
+                database,
+            },
+            {concurrentId, requestConfig: {signal}},
+        );
+    }
+    getConfig(database?: string, {concurrentId, signal}: AxiosOptions = {}) {
+        return this.get<Record<string, unknown>>(
+            this.getPath('/viewer/config'),
             {
                 database,
             },

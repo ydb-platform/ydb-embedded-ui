@@ -1,11 +1,11 @@
 import React from 'react';
 
-import type {ButtonSize} from '@gravity-ui/uikit';
-import {ClipboardButton} from '@gravity-ui/uikit';
 import {nanoid} from '@reduxjs/toolkit';
 import {PrismLight as ReactSyntaxHighlighter} from 'react-syntax-highlighter';
 
-import i18n from './i18n';
+import type {ClipboardButtonProps} from '../ClipboardButton/ClipboardButton';
+import {ClipboardButton} from '../ClipboardButton/ClipboardButton';
+
 import {b} from './shared';
 import {useSyntaxHighlighterStyle} from './themes';
 import type {Language} from './types';
@@ -24,14 +24,9 @@ async function registerLanguage(lang: Language) {
     }
 }
 
-interface ClipboardButtonOptions {
+interface WithClipboardButtonProp extends ClipboardButtonProps {
     alwaysVisible?: boolean;
-    copyText?: string;
-    withLabel?: boolean;
-    size?: ButtonSize;
 }
-
-export type WithClipboardButtonProp = ClipboardButtonOptions | boolean;
 
 type YDBSyntaxHighlighterProps = {
     text: string;
@@ -60,37 +55,27 @@ export function YDBSyntaxHighlighter({
         registerLangAndUpdateKey();
     }, [language]);
 
-    const clipboardButtonProps =
-        typeof withClipboardButton === 'object' ? withClipboardButton : undefined;
-
     const renderCopyButton = () => {
-        if (withClipboardButton) {
-            return (
-                <div className={b('sticky-container')} onClick={(e) => e.stopPropagation()}>
-                    <ClipboardButton
-                        view="flat-secondary"
-                        size={clipboardButtonProps?.size || 'xs'}
-                        className={b('copy', {
-                            visible: clipboardButtonProps?.alwaysVisible,
-                        })}
-                        text={clipboardButtonProps?.copyText || text}
-                    >
-                        {clipboardButtonProps?.withLabel === false ? null : i18n('copy')}
-                    </ClipboardButton>
-                </div>
-            );
+        if (!withClipboardButton) {
+            return null;
         }
-
-        return null;
+        const {alwaysVisible, copyText, ...rest} = withClipboardButton;
+        return (
+            <div className={b('sticky-container')} onClick={(e) => e.stopPropagation()}>
+                <ClipboardButton
+                    {...rest}
+                    copyText={copyText || text}
+                    className={b('copy', {
+                        visible: alwaysVisible,
+                    })}
+                />
+            </div>
+        );
     };
 
     let paddingStyles = {};
 
-    if (
-        withClipboardButton &&
-        typeof withClipboardButton === 'object' &&
-        withClipboardButton.alwaysVisible
-    ) {
+    if (withClipboardButton?.alwaysVisible) {
         if (withClipboardButton.withLabel) {
             paddingStyles = {paddingRight: 80};
         } else {

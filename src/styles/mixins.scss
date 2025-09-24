@@ -57,9 +57,9 @@
     line-height: var(--g-text-header-2-line-height);
 }
 
-@mixin sticky-top {
+@mixin sticky-top($top: 0) {
     position: sticky;
-    top: 0;
+    top: $top;
     left: 0;
 
     background-color: var(--g-color-base-background);
@@ -88,12 +88,12 @@
     text-overflow: ellipsis;
 }
 
-@mixin controls() {
+@mixin controls($padding-top: var(--g-spacing-4)) {
     display: flex;
     align-items: center;
     gap: 12px;
 
-    padding: 16px 0 18px;
+    padding: $padding-top 0 var(--g-spacing-4);
 }
 
 @mixin search() {

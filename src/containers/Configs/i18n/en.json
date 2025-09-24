@@ -9,5 +9,11 @@
 
   "search-placeholder": "Search by feature flag",
   "search-empty": "Empty search result",
-  "no-data": "No data"
+  "no-data": "No data",
+
+  "title_current": "Current",
+  "title_startup": "Startup",
+  "title_features": "Feature flags",
+
+  "action_copy-config": "Copy config"
 }

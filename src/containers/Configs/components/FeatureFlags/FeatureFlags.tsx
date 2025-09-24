@@ -1,25 +1,24 @@
 import {PersonPencil} from '@gravity-ui/icons';
 import type {Column} from '@gravity-ui/react-data-table';
 import {Icon, Popover, Switch} from '@gravity-ui/uikit';
-import {StringParam, useQueryParam} from 'use-query-params';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
-import {tenantApi} from '../../../../store/reducers/tenant/tenant';
+import {configsApi} from '../../../../store/reducers/configs';
 import type {FeatureFlagConfig} from '../../../../types/api/featureFlags';
 import {cn} from '../../../../utils/cn';
-import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
+import {DEFAULT_TABLE_SETTINGS, YDB_POPOVER_CLASS_NAME} from '../../../../utils/constants';
 import {useAutoRefreshInterval} from '../../../../utils/hooks';
+import i18n from '../../i18n';
+import {useConfigQueryParams} from '../../useConfigsQueryParams';
 
-import i18n from './i18n';
-
-import './Configs.scss';
+import './FeatureFlags.scss';
 
 const FEATURE_FLAGS_COLUMNS_WIDTH_LS_KEY = 'featureFlagsColumnsWidth';
 
-const b = cn('ydb-diagnostics-configs');
+const b = cn('ydb-feature-flags');
 
 const columns: Column<FeatureFlagConfig>[] = [
     {
@@ -29,7 +28,7 @@ const columns: Column<FeatureFlagConfig>[] = [
             row.Current ? (
                 <Popover
                     content={i18n('flag-touched')}
-                    className={b('icon-touched')}
+                    className={b('icon-touched', YDB_POPOVER_CLASS_NAME)}
                     placement="left"
                 >
                     <Icon data={PersonPencil} />
@@ -82,22 +81,19 @@ const columns: Column<FeatureFlagConfig>[] = [
     },
 ];
 
-interface ConfigsProps {
-    database: string;
+interface FeatureFlagsProps {
+    database?: string;
+    className?: string;
 }
 
-export const Configs = ({database}: ConfigsProps) => {
-    const [search, setSearch] = useQueryParam('search', StringParam);
+export const FeatureFlags = ({database, className}: FeatureFlagsProps) => {
+    const {search, handleSearchChange} = useConfigQueryParams();
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {
         currentData = [],
         isLoading,
         error,
-    } = tenantApi.useGetClusterConfigQuery({database}, {pollingInterval: autoRefreshInterval});
-
-    const onChange = (value: string) => {
-        setSearch(value || undefined, 'replaceIn');
-    };
+    } = configsApi.useGetFeatureFlagsQuery({database}, {pollingInterval: autoRefreshInterval});
 
     const featureFlagsFilter = search?.toLocaleLowerCase();
     const featureFlags = featureFlagsFilter
@@ -105,11 +101,11 @@ export const Configs = ({database}: ConfigsProps) => {
         : currentData;
 
     return (
-        <TableWithControlsLayout>
+        <TableWithControlsLayout className={className}>
             <TableWithControlsLayout.Controls>
                 <Search
                     value={featureFlagsFilter}
-                    onChange={onChange}
+                    onChange={handleSearchChange}
                     placeholder={i18n('search-placeholder')}
                 />
             </TableWithControlsLayout.Controls>

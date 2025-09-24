@@ -32,7 +32,9 @@ import {EFlag} from '../../types/api/enums';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useAppTitle} from '../App/AppTitleContext';
+import {Configs} from '../Configs/Configs';
 import {Nodes} from '../Nodes/Nodes';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 import {TabletsTable} from '../Tablets/TabletsTable';
@@ -69,6 +71,7 @@ export function Cluster({
 
     const shouldShowNetworkTable = useShouldShowClusterNetworkTable();
     const shouldShowEventsTab = useShouldShowEventsTab();
+    const isViewerUser = useIsViewerUser();
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
@@ -108,17 +111,20 @@ export function Cluster({
     }, [dispatch]);
 
     const actualClusterTabs = React.useMemo(() => {
-        let tabs = clusterTabs;
+        const skippedTabs: ClusterTab[] = [];
 
         if (!shouldShowNetworkTable) {
-            tabs = tabs.filter((tab) => tab.id !== clusterTabsIds.network);
+            skippedTabs.push(clusterTabsIds.network);
         }
         if (!shouldShowEventsTab) {
-            tabs = tabs.filter((tab) => tab.id !== clusterTabsIds.events);
+            skippedTabs.push(clusterTabsIds.events);
+        }
+        if (!isViewerUser) {
+            skippedTabs.push(clusterTabsIds.configs);
         }
 
-        return tabs;
-    }, [shouldShowEventsTab, shouldShowNetworkTable]);
+        return clusterTabs.filter((el) => !skippedTabs.includes(el.id));
+    }, [shouldShowEventsTab, shouldShowNetworkTable, isViewerUser]);
 
     const getClusterTitle = () => {
         if (infoLoading) {
@@ -268,6 +274,20 @@ export function Cluster({
                                 }
                             >
                                 {uiFactory.renderEvents?.({scrollContainerRef: container})}
+                            </Route>
+                        )}
+                        {isViewerUser && (
+                            <Route
+                                path={
+                                    getLocationObjectFromHref(
+                                        getClusterPath(clusterTabsIds.configs),
+                                    ).pathname
+                                }
+                            >
+                                <Configs
+                                    className={b('cluster-configs')}
+                                    scrollContainerRef={container}
+                                />
                             </Route>
                         )}
 

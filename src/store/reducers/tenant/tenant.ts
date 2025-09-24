@@ -108,20 +108,6 @@ export const tenantApi = api.injectEndpoints({
                 return {clusterName, database};
             },
         }),
-
-        getClusterConfig: builder.query({
-            queryFn: async ({database}: {database: string}, {signal}) => {
-                try {
-                    const res = await window.api.viewer.getClusterConfig(database, {signal});
-                    const db = res.Databases[0];
-
-                    return {data: db.FeatureFlags};
-                } catch (error) {
-                    return {error};
-                }
-            },
-            providesTags: ['All'],
-        }),
     }),
     overrideExisting: 'throw',
 });

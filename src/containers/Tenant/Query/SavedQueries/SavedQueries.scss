@@ -3,6 +3,8 @@
 .ydb-saved-queries {
     $block: &;
 
+    --ydb-table-with-controls-layout-controls-height: 46px;
+
     overflow: auto;
 
     height: 100%;
@@ -11,12 +13,8 @@
     @include mixins.flex-container();
 
     .ydb-table-with-controls-layout__controls {
-        height: 46px;
+        height: var(--ydb-table-with-controls-layout-controls-height);
         padding-top: 0;
-    }
-
-    &.ydb-table-with-controls-layout .data-table__sticky_moving {
-        top: 46px !important;
     }
 
     &__search {
