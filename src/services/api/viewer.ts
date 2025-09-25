@@ -111,10 +111,15 @@ export class ViewerAPI extends BaseYdbAPI {
             fieldsRequired,
             filter,
             path,
+            storage,
             ...params
         }: NodesRequestParams,
         {concurrentId, signal}: AxiosOptions = {},
     ) {
+        // This param determines whether we need VDisks to be returned
+        // We need them only together with PDisks
+        const isStorage = storage ?? fieldsRequired?.includes('PDisks');
+
         const preparedFieldsRequired = Array.isArray(fieldsRequired)
             ? this.prepareArrayRequestParam(fieldsRequired)
             : fieldsRequired;
@@ -131,6 +136,7 @@ export class ViewerAPI extends BaseYdbAPI {
                 database: database || tenant,
                 fields_required: preparedFieldsRequired,
                 path: this.getSchemaPath(path),
+                storage: isStorage,
                 ...params,
             },
             {concurrentId, requestConfig: {signal}},

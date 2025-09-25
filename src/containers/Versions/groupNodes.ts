@@ -1,6 +1,6 @@
 import groupBy from 'lodash/groupBy';
 
-import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
+import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import {getColorFromVersionsData, parseNodesToPreparedVersions} from '../../utils/versions';
 import type {VersionsDataMap} from '../../utils/versions/types';
 
@@ -11,7 +11,7 @@ const sortByTitle = (a: GroupedNodesItem, b: GroupedNodesItem) =>
     a.title?.localeCompare(b.title || '') || -1;
 
 export const getGroupedTenantNodes = (
-    nodes: NodesPreparedEntity[] | undefined,
+    nodes: PreparedStorageNode[] | undefined,
     versionsDataMap: VersionsDataMap | undefined,
     groupByValue: GroupByValue,
 ): GroupedNodesItem[] | undefined => {
@@ -85,7 +85,7 @@ export const getGroupedTenantNodes = (
 };
 
 export const getGroupedStorageNodes = (
-    nodes: NodesPreparedEntity[] | undefined,
+    nodes: PreparedStorageNode[] | undefined,
     versionsDataMap: VersionsDataMap | undefined,
 ): GroupedNodesItem[] | undefined => {
     if (!nodes || !nodes.length) {
@@ -105,7 +105,7 @@ export const getGroupedStorageNodes = (
 };
 
 export const getOtherNodes = (
-    nodes: NodesPreparedEntity[] | undefined,
+    nodes: PreparedStorageNode[] | undefined,
     versionsDataMap: VersionsDataMap | undefined,
 ): GroupedNodesItem[] | undefined => {
     if (!nodes || !nodes.length) {
@@ -127,10 +127,10 @@ export const getOtherNodes = (
     });
 };
 
-function isStorageNode(node: NodesPreparedEntity) {
+function isStorageNode(node: PreparedStorageNode) {
     return Boolean(node.Roles?.includes('Storage'));
 }
 
-function isTenantNode(node: NodesPreparedEntity) {
+function isTenantNode(node: PreparedStorageNode) {
     return Boolean(node.Tenants);
 }

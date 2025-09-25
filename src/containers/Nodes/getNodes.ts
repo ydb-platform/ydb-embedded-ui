@@ -5,19 +5,20 @@ import {
     NODES_COLUMNS_TO_DATA_FIELDS,
     getNodesColumnSortField,
 } from '../../components/nodesColumns/constants';
-import type {NodesFilters, NodesPreparedEntity} from '../../store/reducers/nodes/types';
-import {prepareNodesData} from '../../store/reducers/nodes/utils';
+import type {NodesFilters} from '../../store/reducers/nodes/types';
+import type {PreparedStorageNode} from '../../store/reducers/storage/types';
+import {prepareStorageNodesResponse} from '../../store/reducers/storage/utils';
 import type {NodesRequestParams} from '../../types/api/nodes';
 import {prepareSortValue} from '../../utils/filters';
 import {getProblemParamValue, getUptimeParamValue} from '../../utils/nodes';
 import {getRequiredDataFields} from '../../utils/tableUtils/getRequiredDataFields';
 
 export const getNodes: FetchData<
-    NodesPreparedEntity,
+    PreparedStorageNode,
     NodesFilters,
     Pick<NodesRequestParams, 'type' | 'storage'>
 > = async (params) => {
-    const {type = 'any', storage = false, limit, offset, sortParams, filters, columnsIds} = params;
+    const {type = 'any', storage, limit, offset, sortParams, filters, columnsIds} = params;
 
     const {sortOrder, columnId} = sortParams ?? {};
     const {
@@ -56,11 +57,11 @@ export const getNodes: FetchData<
         filter_group_by: filterGroupBy,
         fieldsRequired: dataFieldsRequired,
     });
-    const preparedResponse = prepareNodesData(response);
+    const preparedResponse = prepareStorageNodesResponse(response);
 
     return {
-        data: preparedResponse.Nodes || [],
-        found: preparedResponse.FoundNodes || 0,
-        total: preparedResponse.TotalNodes || 0,
+        data: preparedResponse.nodes || [],
+        found: preparedResponse.found || 0,
+        total: preparedResponse.total || 0,
     };
 };

@@ -37,7 +37,7 @@ export function TopNodesBySkew({database, additionalNodesProps}: TopNodesBySkewP
     );
 
     const loading = isFetching && currentData === undefined;
-    const topNodes = currentData?.Nodes || [];
+    const topNodes = currentData?.nodes || [];
 
     return (
         <TenantOverviewTableLayout loading={loading} error={error} withData={Boolean(currentData)}>

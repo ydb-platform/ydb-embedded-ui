@@ -6,13 +6,14 @@ import {
     getUptimeColumn,
 } from '../../../../../components/nodesColumns/columns';
 import {NODES_COLUMNS_TO_DATA_FIELDS} from '../../../../../components/nodesColumns/constants';
-import type {GetNodesColumnsParams} from '../../../../../components/nodesColumns/types';
-import type {NodesPreparedEntity} from '../../../../../store/reducers/nodes/types';
+import type {
+    GetNodesColumnsParams,
+    NodesColumn,
+} from '../../../../../components/nodesColumns/types';
 import {getRequiredDataFields} from '../../../../../utils/tableUtils/getRequiredDataFields';
-import type {Column} from '../../../../../utils/tableUtils/types';
 
 export function getTopNodesByPingColumns(params: GetNodesColumnsParams) {
-    const columns: Column<NodesPreparedEntity>[] = [
+    const columns: NodesColumn[] = [
         getNodeIdColumn(),
         getNetworkHostColumn(params),
         getUptimeColumn(),
@@ -32,7 +33,7 @@ export function getTopNodesByPingColumns(params: GetNodesColumnsParams) {
 }
 
 export function getTopNodesBySkewColumns(params: GetNodesColumnsParams) {
-    const columns: Column<NodesPreparedEntity>[] = [
+    const columns: NodesColumn[] = [
         getNodeIdColumn(),
         getNetworkHostColumn(params),
         getUptimeColumn(),

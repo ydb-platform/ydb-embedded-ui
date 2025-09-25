@@ -3,13 +3,14 @@ import React from 'react';
 import {isNil} from 'lodash';
 
 import {ResponseError} from '../../../components/Errors/ResponseError';
-import type {Column} from '../../../components/PaginatedTable';
+import type {PaginatedTableData} from '../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {NODES_COLUMNS_TITLES} from '../../../components/nodesColumns/constants';
 import type {NodesColumnId} from '../../../components/nodesColumns/constants';
+import type {NodesColumn} from '../../../components/nodesColumns/types';
 import {nodesApi} from '../../../store/reducers/nodes/nodes';
-import type {NodesPreparedEntity} from '../../../store/reducers/nodes/types';
+import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField, NodesPeerRole} from '../../../types/api/nodes';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
@@ -32,9 +33,10 @@ interface NodeGroupProps {
     searchValue: string;
     peerRoleFilter?: NodesPeerRole;
     groupByParam?: NodesGroupByField;
-    columns: Column<NodesPreparedEntity>[];
+    columns: NodesColumn[];
     scrollContainerRef: React.RefObject<HTMLElement>;
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
+    onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
 }
 
 const NodeGroup = React.memo(function NodeGroup({
@@ -50,6 +52,7 @@ const NodeGroup = React.memo(function NodeGroup({
     columns,
     scrollContainerRef,
     onIsExpandedChange,
+    onDataFetched,
 }: NodeGroupProps) {
     return (
         <TableGroup
@@ -76,6 +79,7 @@ const NodeGroup = React.memo(function NodeGroup({
                         initialEntitiesCount={count}
                         columns={columns}
                         scrollContainerRef={scrollContainerRef}
+                        onDataFetched={onDataFetched}
                     />
                 }
                 tableWrapperProps={{
@@ -92,11 +96,12 @@ interface GroupedNodesComponentProps {
     databaseFullPath?: string;
     scrollContainerRef: React.RefObject<HTMLElement>;
     withPeerRoleFilter?: boolean;
-    columns: Column<NodesPreparedEntity>[];
+    columns: NodesColumn[];
     defaultColumnsIds: NodesColumnId[];
     requiredColumnsIds: NodesColumnId[];
     selectedColumnsKey: string;
     groupByParams: NodesGroupByField[];
+    onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
 }
 
 export function GroupedNodesComponent({
@@ -110,6 +115,7 @@ export function GroupedNodesComponent({
     requiredColumnsIds,
     selectedColumnsKey,
     groupByParams,
+    onDataFetched,
 }: GroupedNodesComponentProps) {
     const {searchValue, peerRoleFilter, groupByParam} = useNodesPageQueryParams(
         groupByParams,
@@ -147,11 +153,7 @@ export function GroupedNodesComponent({
     );
 
     const isLoading = currentData === undefined && isFetching;
-    const {
-        NodeGroups: tableGroups,
-        FoundNodes: found = 0,
-        TotalNodes: total = 0,
-    } = currentData || {};
+    const {tableGroups, found = 0, total = 0} = currentData || {};
 
     const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
 
@@ -186,6 +188,7 @@ export function GroupedNodesComponent({
                         columns={columnsToShow}
                         scrollContainerRef={scrollContainerRef}
                         onIsExpandedChange={setIsGroupExpanded}
+                        onDataFetched={onDataFetched}
                     />
                 );
             });
