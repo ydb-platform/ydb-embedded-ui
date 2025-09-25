@@ -108,7 +108,6 @@ export const HoverPopup = ({
                     // bigger offset for easier switching to neighbour nodes
                     // matches the default offset for popup with arrow out of a sense of beauty
                     offset={offset || {mainAxis: 12, crossAxis: 0}}
-                    className={YDB_POPOVER_CLASS_NAME}
                 >
                     <div
                         className={contentClassName}
@@ -117,7 +116,7 @@ export const HoverPopup = ({
                         onMouseLeave={onPopupMouseLeave}
                         onBlur={onPopupBlur}
                     >
-                        {renderPopupContent()}
+                        <div className={YDB_POPOVER_CLASS_NAME}>{renderPopupContent()}</div>
                     </div>
                 </Popup>
             ) : null}
