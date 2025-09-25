@@ -1,5 +1,19 @@
 # Changelog
 
+## [12.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.5.0...v12.6.0) (2025-09-25)
+
+
+### Features
+
+* **Illustration:** render with Icon component ([#2917](https://github.com/ydb-platform/ydb-embedded-ui/issues/2917)) ([0a9e5fa](https://github.com/ydb-platform/ydb-embedded-ui/commit/0a9e5fa099f152b149505e0486e2320aab02d49c))
+* **TableColumnSetup:** support sortable columns ([#2908](https://github.com/ydb-platform/ydb-embedded-ui/issues/2908)) ([a2ace67](https://github.com/ydb-platform/ydb-embedded-ui/commit/a2ace674d85293d31d4b618d86652f79a636d752))
+
+
+### Bug Fixes
+
+* **HoverPopup:** prevent untimely closing ([#2926](https://github.com/ydb-platform/ydb-embedded-ui/issues/2926)) ([257abd5](https://github.com/ydb-platform/ydb-embedded-ui/commit/257abd5d7c16ac2a43031a7b35a07a05699b4a68))
+* **TenantOverview:** use database path in request ([#2925](https://github.com/ydb-platform/ydb-embedded-ui/issues/2925)) ([5624d26](https://github.com/ydb-platform/ydb-embedded-ui/commit/5624d26f14b3e52c45281340300558c8c394a8c4))
+
 ## [12.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.4.0...v12.5.0) (2025-09-23)
 
 
