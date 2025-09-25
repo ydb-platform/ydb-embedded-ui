@@ -207,20 +207,20 @@ const prepareStorageNodeData = (
     const pDisks = PDisks?.map((pDisk) => {
         return {
             ...prepareWhiteboardPDiskData(pDisk),
-            NodeId: node.NodeId,
+            NodeId,
         };
     });
     const vDisks = VDisks?.map((vDisk) => {
         return {
             ...prepareWhiteboardVDiskData(vDisk),
-            NodeId: node.NodeId,
+            NodeId,
         };
     });
 
     return {
         ...restNodeParams,
         ...prepareNodeSystemState(SystemState),
-        NodeId: NodeId,
+        NodeId,
         PDisks: pDisks,
         VDisks: vDisks,
         Missing: missing,

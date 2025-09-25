@@ -10,18 +10,27 @@ const nodes: PreparedStorageNode[] = [
         NodeId: 1,
         Version: '25-1-1',
         Roles: ['StateStorageBoard', 'SchemeBoard', 'Bootstrapper', 'StateStorage', 'Storage'],
+        Missing: 0,
+        MaximumSlotsPerDisk: 0,
+        MaximumDisksPerNode: 0,
     },
     {
         // Storage node
         NodeId: 2,
         Version: '25-1-2',
         Roles: ['Storage'],
+        Missing: 0,
+        MaximumSlotsPerDisk: 0,
+        MaximumDisksPerNode: 0,
     },
     {
         // Storage node
         NodeId: 3,
         Version: '25-1-3',
         Roles: ['Storage'],
+        Missing: 0,
+        MaximumSlotsPerDisk: 0,
+        MaximumDisksPerNode: 0,
     },
     {
         // Tenant node
@@ -29,6 +38,9 @@ const nodes: PreparedStorageNode[] = [
         Version: '25-1-1',
         Roles: ['Tenant'],
         Tenants: ['/Root/db1'],
+        Missing: 0,
+        MaximumSlotsPerDisk: 0,
+        MaximumDisksPerNode: 0,
     },
     {
         // Tenant node
@@ -36,24 +48,36 @@ const nodes: PreparedStorageNode[] = [
         Version: '25-1-2',
         Roles: ['Tenant'],
         Tenants: ['/Root/db2'],
+        Missing: 0,
+        MaximumSlotsPerDisk: 0,
+        MaximumDisksPerNode: 0,
     },
     {
         // Tenant node without Roles
         NodeId: 6,
         Version: '25-1-3',
         Tenants: ['/Root/db3'],
+        Missing: 0,
+        MaximumSlotsPerDisk: 0,
+        MaximumDisksPerNode: 0,
     },
     {
         // Node with some other role
         NodeId: 7,
         Version: '25-1-1',
         Roles: ['Bootstrapper'],
+        Missing: 0,
+        MaximumSlotsPerDisk: 0,
+        MaximumDisksPerNode: 0,
     },
     {
         // Node without roles
         NodeId: 8,
         Version: '25-1-1',
         Roles: [],
+        Missing: 0,
+        MaximumSlotsPerDisk: 0,
+        MaximumDisksPerNode: 0,
     },
 ];
 

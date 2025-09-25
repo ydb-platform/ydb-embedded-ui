@@ -36,9 +36,9 @@ export interface PreparedStorageNode
     VDisks?: PreparedVDisk[];
     Tablets?: TTabletStateInfo[];
 
-    Missing?: number;
-    MaximumSlotsPerDisk?: number;
-    MaximumDisksPerNode?: number;
+    Missing: number;
+    MaximumSlotsPerDisk: number;
+    MaximumDisksPerNode: number;
 }
 
 export interface PreparedStorageGroupFilters {
