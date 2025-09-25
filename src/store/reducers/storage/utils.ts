@@ -220,6 +220,8 @@ const prepareStorageNodeData = (
     return {
         ...restNodeParams,
         ...prepareNodeSystemState(SystemState),
+        // There is NodeId both in node and its system state
+        // We should use only NodeId from node, since it's always present (there may be no SystemState)
         NodeId,
         PDisks: pDisks,
         VDisks: vDisks,

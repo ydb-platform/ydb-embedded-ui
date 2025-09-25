@@ -116,6 +116,8 @@ export class ViewerAPI extends BaseYdbAPI {
         }: NodesRequestParams,
         {concurrentId, signal}: AxiosOptions = {},
     ) {
+        // This param determines whether we need VDisks to be returned
+        // We need them only together with PDisks
         const isStorage = storage ?? fieldsRequired?.includes('PDisks');
 
         const preparedFieldsRequired = Array.isArray(fieldsRequired)
