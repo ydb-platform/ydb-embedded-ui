@@ -3,6 +3,7 @@ import React from 'react';
 import type {Data} from '@gravity-ui/paranoid';
 
 import {YDBGraph} from '../../../../../../components/Graph/Graph';
+import {GravityGraph} from '../../../../../../components/Graph/GravityGraph';
 import type {PreparedPlan} from '../../../../../../store/reducers/query/types';
 import {cn} from '../../../../../../utils/cn';
 import i18n from '../../i18n';
@@ -32,7 +33,11 @@ export function Graph({explain = {}, theme}: GraphProps) {
 
     return (
         <div className={b('canvas-container')}>
-            <YDBGraph key={theme} data={data} />
+            {true ? (
+                <GravityGraph data={data} theme={theme} key={theme} />
+            ) : (
+                <YDBGraph key={theme} data={data} />
+            )}
         </div>
     );
 }

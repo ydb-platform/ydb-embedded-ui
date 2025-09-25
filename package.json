@@ -17,6 +17,7 @@
     "@gravity-ui/components": "^4.4.0",
     "@gravity-ui/date-components": "^3.2.3",
     "@gravity-ui/date-utils": "^2.5.6",
+    "@gravity-ui/graph": "^1.1.4",
     "@gravity-ui/i18n": "^1.7.0",
     "@gravity-ui/icons": "^2.16.0",
     "@gravity-ui/illustrations": "^2.1.0",
