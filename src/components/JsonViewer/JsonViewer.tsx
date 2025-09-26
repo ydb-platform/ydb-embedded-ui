@@ -1,11 +1,14 @@
 import React from 'react';
 
+import {ChevronsCollapseVertical, ChevronsExpandVertical} from '@gravity-ui/icons';
 import type * as DT100 from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
 import {ActionTooltip, Button, Flex, Icon} from '@gravity-ui/uikit';
 
 import {CASE_SENSITIVE_JSON_SEARCH} from '../../utils/constants';
 import {useSetting} from '../../utils/hooks';
+import type {ClipboardButtonProps} from '../ClipboardButton/ClipboardButton';
+import {ClipboardButton} from '../ClipboardButton/ClipboardButton';
 
 import {Cell} from './components/Cell';
 import {Filter} from './components/Filter';
@@ -22,9 +25,6 @@ import type {
 } from './unipika/flattenUnipika';
 import {unipika} from './unipika/unipika';
 
-import ArrowDownToLineIcon from '@gravity-ui/icons/svgs/arrow-down-to-line.svg';
-import ArrowUpFromLineIcon from '@gravity-ui/icons/svgs/arrow-up-from-line.svg';
-
 import './JsonViewer.scss';
 
 interface JsonViewerCommonProps {
@@ -35,6 +35,7 @@ interface JsonViewerCommonProps {
     collapsedInitially?: boolean;
     maxValueWidth?: number;
     toolbarClassName?: string;
+    withClipboardButton?: Omit<ClipboardButtonProps, 'size' | 'view'>;
 }
 
 interface JsonViewerProps extends JsonViewerCommonProps {
@@ -118,6 +119,7 @@ function JsonViewerComponent({
     collapsedInitially,
     maxValueWidth = 100,
     toolbarClassName,
+    withClipboardButton,
 }: JsonViewerComponentProps) {
     const [caseSensitiveSearch, setCaseSensitiveSearch] = useSetting(
         CASE_SENSITIVE_JSON_SEARCH,
@@ -300,19 +302,12 @@ function JsonViewerComponent({
 
     const renderToolbar = () => {
         return (
-            <Flex gap={2} wrap="nowrap" className={block('toolbar', toolbarClassName)}>
-                <Flex gap={1} wrap="nowrap">
-                    <ActionTooltip title={i18n('action_expand-all')}>
-                        <Button onClick={onExpandAll} view="flat-secondary">
-                            <Icon data={ArrowDownToLineIcon} />
-                        </Button>
-                    </ActionTooltip>
-                    <ActionTooltip title={i18n('action_collapse-all')}>
-                        <Button onClick={onCollapseAll} view="flat-secondary">
-                            <Icon data={ArrowUpFromLineIcon} />
-                        </Button>
-                    </ActionTooltip>
-                </Flex>
+            <Flex
+                gap={2}
+                wrap="nowrap"
+                className={block('toolbar', toolbarClassName)}
+                justifyContent="space-between"
+            >
                 {search && (
                     <Filter
                         onUpdate={onFilterChange}
@@ -327,7 +322,22 @@ function JsonViewerComponent({
                         onUpdateCaseSensitive={handleUpdateCaseSensitive}
                     />
                 )}
-                <span className={block('extra-tools')}>{extraTools}</span>
+                <Flex gap={2} wrap="nowrap">
+                    <ActionTooltip title={i18n('action_expand-all')} placement="top-start">
+                        <Button onClick={onExpandAll}>
+                            <Icon data={ChevronsExpandVertical} />
+                        </Button>
+                    </ActionTooltip>
+                    <ActionTooltip title={i18n('action_collapse-all')} placement="top-start">
+                        <Button onClick={onCollapseAll}>
+                            <Icon data={ChevronsCollapseVertical} />
+                        </Button>
+                    </ActionTooltip>
+                    {withClipboardButton && (
+                        <ClipboardButton {...withClipboardButton} size="m" view="normal" />
+                    )}
+                    {extraTools}
+                </Flex>
             </Flex>
         );
     };

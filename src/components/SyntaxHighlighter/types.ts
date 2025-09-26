@@ -7,4 +7,5 @@ export type Language =
     | 'javascript'
     | 'php'
     | 'python'
-    | 'yql';
+    | 'yql'
+    | 'yaml';

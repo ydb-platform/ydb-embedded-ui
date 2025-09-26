@@ -48,5 +48,6 @@
   "tab_network": "Network",
   "tab_versions": "Versions",
   "tab_tablets": "Tablets",
-  "tab_events": "Events"
+  "tab_events": "Events",
+  "tab_configs": "Configs"
 }

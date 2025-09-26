@@ -40,7 +40,7 @@ export const TruncatedQuery = ({
                                   copyText: value,
                                   withLabel: false,
                               }
-                            : false
+                            : undefined
                     }
                 />
                 <span className={b('message', {color: 'secondary'})}>{message}</span>
@@ -58,7 +58,7 @@ export const TruncatedQuery = ({
                           copyText: value,
                           withLabel: false,
                       }
-                    : false
+                    : undefined
             }
         />
     );

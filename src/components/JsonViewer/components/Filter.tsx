@@ -38,7 +38,7 @@ export const Filter = React.forwardRef<HTMLInputElement, FilterProps>(function F
     const count = matchedRows.length;
     const matchPosition = count ? 1 + (matchIndex % count) : 0;
     return (
-        <React.Fragment>
+        <Flex gap={2} wrap="nowrap">
             <TextInput
                 ref={ref}
                 className={block('filter')}
@@ -69,28 +69,32 @@ export const Filter = React.forwardRef<HTMLInputElement, FilterProps>(function F
                 }
             />
             <Flex gap={1} wrap="nowrap">
-                <Button
-                    className={block('match-btn')}
-                    view="flat-secondary"
-                    title={i18n('action_next')}
-                    onClick={onNextMatch}
-                    disabled={!count}
-                >
-                    <Icon data={ChevronDownIcon} />
-                </Button>
-                <Button
-                    className={block('match-btn')}
-                    view="flat-secondary"
-                    title={i18n('action_back')}
-                    onClick={onPrevMatch}
-                    disabled={!count}
-                >
-                    <Icon data={ChevronUpIcon} />
-                </Button>
+                <ActionTooltip title={i18n('action_next')} placement="top-start">
+                    <Button
+                        className={block('match-btn')}
+                        view="flat-secondary"
+                        onClick={onNextMatch}
+                        disabled={!count}
+                    >
+                        <Icon data={ChevronDownIcon} />
+                    </Button>
+                </ActionTooltip>
+                <ActionTooltip title={i18n('action_back')} placement="top-start">
+                    <Button
+                        className={block('match-btn')}
+                        view="flat-secondary"
+                        onClick={onPrevMatch}
+                        disabled={!count}
+                    >
+                        <Icon data={ChevronUpIcon} />
+                    </Button>
+                </ActionTooltip>
             </Flex>
-            <span className={block('match-counter')} title={i18n('description_matched-rows')}>
-                {matchPosition} / {count || 0}
-            </span>
-        </React.Fragment>
+            {value && (
+                <span className={block('match-counter')} title={i18n('description_matched-rows')}>
+                    {matchPosition} / {count || 0}
+                </span>
+            )}
+        </Flex>
     );
 });

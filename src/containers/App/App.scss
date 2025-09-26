@@ -22,6 +22,7 @@
 html,
 body,
 #root {
+    --g-scrollbar-width: 8px;
     overflow: auto;
 
     box-sizing: border-box;
@@ -41,6 +42,9 @@ body,
 }
 
 .g-root {
+    --g-scrollbar-width: 8px;
+    --header-height: 40px;
+
     --ydb-data-table-color-hover: var(--g-color-base-simple-hover-solid);
 
     // Colors for tablets, status icons and progress bars
@@ -53,6 +57,13 @@ body,
     --ydb-color-status-black: var(--g-color-base-misc-heavy);
 
     --g-popover-max-width: 500px;
+
+    -webkit-overflow-scrolling: touch;
+    @include mixins.scrollbar();
+    ::-webkit-scrollbar-corner,
+    ::-webkit-scrollbar-thumb {
+        border-radius: 8px;
+    }
 
     &_theme_light,
     &_theme_light-hc {
