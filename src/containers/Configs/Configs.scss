@@ -9,7 +9,7 @@
                 --ydb-table-with-controls-layout-controls-height
             ) - var(--configs-padding-bottom)
     );
-
+    max-width: 100%;
     padding-bottom: var(--configs-padding-bottom);
 
     &__feature-flags {
@@ -20,8 +20,6 @@
         --ydb-table-with-controls-layout-controls-height: 44px;
     }
     &__startup {
-        pre {
-            border-radius: 4px;
-        }
+        height: var(--ydb-syntax-highlighter-height);
     }
 }
