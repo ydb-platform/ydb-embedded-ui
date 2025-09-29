@@ -1,4 +1,4 @@
-import {registerKeysets} from '../../../../../utils/i18n';
+import {registerKeysets} from '../../../utils/i18n';
 
 import en from './en.json';
 

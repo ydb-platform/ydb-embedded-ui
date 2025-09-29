@@ -7,7 +7,7 @@ import {AutoRefreshControl} from '../../../components/AutoRefreshControl/AutoRef
 import {DrawerContextProvider} from '../../../components/Drawer/DrawerContext';
 import {InternalLink} from '../../../components/InternalLink';
 import {
-    useFeatureFlagsAvailable,
+    useConfigAvailable,
     useTopicDataAvailable,
 } from '../../../store/reducers/capabilities/hooks';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
@@ -17,6 +17,7 @@ import {uiFactory} from '../../../uiFactory/uiFactory';
 import {cn} from '../../../utils/cn';
 import {useScrollPosition, useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {useIsViewerUser} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {Configs} from '../../Configs/Configs';
 import {Heatmap} from '../../Heatmap';
 import {Nodes} from '../../Nodes/Nodes';
 import {Operations} from '../../Operations';
@@ -27,7 +28,6 @@ import {useCurrentSchema} from '../TenantContext';
 import {isDatabaseEntityType} from '../utils/schema';
 
 import {AccessRights} from './AccessRights/AccessRights';
-import {Configs} from './Configs/Configs';
 import {Consumers} from './Consumers';
 import Describe from './Describe/Describe';
 import DetailedOverview from './DetailedOverview/DetailedOverview';
@@ -63,15 +63,14 @@ function Diagnostics(props: DiagnosticsProps) {
         isDatabaseEntityType(type) ? database : '',
     );
 
-    const hasFeatureFlags = useFeatureFlagsAvailable();
+    const hasConfigs = useConfigAvailable();
     const hasTopicData = useTopicDataAvailable();
     const isViewerUser = useIsViewerUser();
     const pages = getPagesByType(type, subType, {
-        hasFeatureFlags,
         hasTopicData,
         isTopLevel: path === database,
         hasBackups: typeof uiFactory.renderBackups === 'function' && Boolean(controlPlane),
-        hasConfigs: isViewerUser,
+        hasConfigs: isViewerUser && hasConfigs,
         hasAccess: uiFactory.hasAccess,
         databaseType,
     });

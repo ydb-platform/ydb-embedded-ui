@@ -1,6 +1,8 @@
 @use '../../styles/mixins';
 
 .node {
+    --ydb-configs-controls-height: 62px;
+    --ydb-configs-container-height: calc(100vh - var(--header-height));
     position: relative;
 
     overflow: auto;
@@ -30,5 +32,8 @@
 
     &__tabs {
         @include mixins.tabs-wrapper-styles();
+    }
+    &__treads {
+        --ydb-table-with-controls-layout-controls-height: 0px;
     }
 }

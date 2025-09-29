@@ -2,7 +2,9 @@
 
 .ydb-table-with-controls-layout {
     // Total height of all fixed elements above table for sticky header positioning
-    --data-table-sticky-header-offset: 62px;
+    --data-table-sticky-header-offset: calc(
+        var(--data-table-start, 0px) + var(--ydb-table-with-controls-layout-controls-height, 62px)
+    );
 
     display: inline-block;
 
@@ -14,23 +16,26 @@
     }
 
     &__controls-wrapper {
+        $padding-top: var(--ydb-table-with-controls-layout-controls-padding-top, 0px);
         z-index: 3;
 
-        align-items: center;
+        align-items: if($padding-top == 0px, flex-start, center);
 
         box-sizing: border-box;
         width: 100%;
 
-        @include mixins.sticky-top();
+        @include mixins.sticky-top(var(--data-table-start, 0px));
     }
 
     &__controls {
         z-index: 3;
 
         width: max-content;
-        height: 62px;
+        height: var(--ydb-table-with-controls-layout-controls-height, 62px);
 
-        @include mixins.controls();
+        @include mixins.controls(
+            var(--ydb-table-with-controls-layout-controls-padding-top, var(--g-spacing-4))
+        );
         @include mixins.sticky-top();
     }
 

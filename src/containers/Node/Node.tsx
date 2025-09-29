@@ -15,6 +15,7 @@ import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import routes from '../../routes';
 import {
     useCapabilitiesLoaded,
+    useConfigAvailable,
     useDiskPagesAvailable,
 } from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
@@ -22,7 +23,9 @@ import {nodeApi} from '../../store/reducers/node/node';
 import type {PreparedNode} from '../../store/reducers/node/types';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
+import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useAppTitle} from '../App/AppTitleContext';
+import {Configs} from '../Configs/Configs';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 import {Tablets} from '../Tablets/Tablets';
 
@@ -40,6 +43,10 @@ const STORAGE_ROLE = 'Storage';
 
 export function Node() {
     const container = React.useRef<HTMLDivElement>(null);
+    const isViewerUser = useIsViewerUser();
+    const hasConfigs = useConfigAvailable();
+
+    const configsAvailable = isViewerUser && hasConfigs;
 
     const dispatch = useTypedDispatch();
 
@@ -71,22 +78,26 @@ export function Node() {
     const threadsQuantity = node?.Threads?.length;
 
     const {activeTab, nodeTabs} = React.useMemo(() => {
-        let actualNodeTabs = isStorageNode
-            ? NODE_TABS
-            : NODE_TABS.filter((el) => el.id !== 'storage');
+        const skippedTabs: NodeTab[] = [];
+        if (!isStorageNode) {
+            skippedTabs.push('storage');
+        }
+        if (!configsAvailable) {
+            skippedTabs.push('configs');
+        }
         if (isDiskPagesAvailable) {
-            actualNodeTabs = actualNodeTabs.filter((el) => el.id !== 'structure');
+            skippedTabs.push('structure');
         }
-        // Filter out threads tab if there's no thread data in the API response
         if (!threadsQuantity) {
-            actualNodeTabs = actualNodeTabs.filter((el) => el.id !== 'threads');
+            skippedTabs.push('threads');
         }
+        const actualNodeTabs = NODE_TABS.filter((el) => !skippedTabs.includes(el.id));
 
         const actualActiveTab =
             actualNodeTabs.find(({id}) => id === activeTabId) ?? actualNodeTabs[0];
 
         return {activeTab: actualActiveTab, nodeTabs: actualNodeTabs};
-    }, [isStorageNode, isDiskPagesAvailable, activeTabId, threadsQuantity]);
+    }, [isStorageNode, isDiskPagesAvailable, activeTabId, threadsQuantity, configsAvailable]);
 
     const database = tenantNameFromQuery?.toString();
 
@@ -255,7 +266,17 @@ function NodePageContent({
             }
 
             case 'threads': {
-                return <Threads nodeId={nodeId} />;
+                return (
+                    <Threads
+                        nodeId={nodeId}
+                        scrollContainerRef={parentContainer}
+                        className={b('treads')}
+                    />
+                );
+            }
+
+            case 'configs': {
+                return <Configs database={database} scrollContainerRef={parentContainer} />;
             }
 
             default:

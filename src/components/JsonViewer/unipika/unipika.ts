@@ -16,6 +16,9 @@ export const defaultUnipikaSettings = {
 };
 
 export function unipikaConvert(value: unknown) {
+    if (!value) {
+        return value;
+    }
     let result;
     try {
         result = unipika.converters.yson(value, defaultUnipikaSettings);
