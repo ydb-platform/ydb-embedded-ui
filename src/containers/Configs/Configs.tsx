@@ -1,15 +1,23 @@
+import React from 'react';
+
 import {SegmentedRadioGroup} from '@gravity-ui/uikit';
 
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
+import {
+    useConfigAvailable,
+    useFeatureFlagsAvailable,
+} from '../../store/reducers/capabilities/hooks';
 import {cn} from '../../utils/cn';
 
 import {Config} from './components/Config/Config';
 import {FeatureFlags} from './components/FeatureFlags/FeatureFlags';
 import {Startup} from './components/Startup/Startup';
+import type {ConfigType} from './types';
 import {ConfigTypeTitles, ConfigTypes} from './types';
 import {useConfigQueryParams} from './useConfigsQueryParams';
 
 import './Configs.scss';
+
 interface ConfigsProps {
     database?: string;
     className?: string;
@@ -20,6 +28,21 @@ const b = cn('ydb-configs');
 
 export function Configs({database, className, scrollContainerRef}: ConfigsProps) {
     const {configType} = useConfigQueryParams();
+
+    const isFeaturesAvailable = useFeatureFlagsAvailable();
+    const isConfigsAvailable = useConfigAvailable();
+
+    const options = React.useMemo(() => {
+        const options: ConfigType[] = [];
+        if (isFeaturesAvailable) {
+            options.push(ConfigTypes.features);
+        }
+        if (isConfigsAvailable) {
+            options.push(ConfigTypes.current);
+            options.push(ConfigTypes.startup);
+        }
+        return options;
+    }, [isFeaturesAvailable, isConfigsAvailable]);
 
     const renderContent = () => {
         switch (configType) {
@@ -35,7 +58,7 @@ export function Configs({database, className, scrollContainerRef}: ConfigsProps)
     return (
         <TableWithControlsLayout fullHeight className={b(null, className)}>
             <TableWithControlsLayout.Controls>
-                <ConfigSelector />
+                <ConfigSelector options={options} />
             </TableWithControlsLayout.Controls>
             <TableWithControlsLayout.Table scrollContainerRef={scrollContainerRef}>
                 {renderContent()}
@@ -44,20 +67,20 @@ export function Configs({database, className, scrollContainerRef}: ConfigsProps)
     );
 }
 
-function ConfigSelector() {
+function ConfigSelector({options}: {options: ConfigType[]}) {
     const {configType, handleConfigTypeChange} = useConfigQueryParams();
+
+    if (!options.length) {
+        return null;
+    }
 
     return (
         <SegmentedRadioGroup value={configType} onUpdate={handleConfigTypeChange}>
-            <SegmentedRadioGroup.Option value={ConfigTypes.current}>
-                {ConfigTypeTitles[ConfigTypes.current]}
-            </SegmentedRadioGroup.Option>
-            <SegmentedRadioGroup.Option value={ConfigTypes.startup}>
-                {ConfigTypeTitles[ConfigTypes.startup]}
-            </SegmentedRadioGroup.Option>
-            <SegmentedRadioGroup.Option value={ConfigTypes.features}>
-                {ConfigTypeTitles[ConfigTypes.features]}
-            </SegmentedRadioGroup.Option>
+            {options.map((option) => (
+                <SegmentedRadioGroup.Option key={option} value={option}>
+                    {ConfigTypeTitles[option]}
+                </SegmentedRadioGroup.Option>
+            ))}
         </SegmentedRadioGroup>
     );
 }

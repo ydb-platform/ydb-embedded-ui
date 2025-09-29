@@ -21,6 +21,7 @@ export type Capability =
     | '/storage/groups'
     | '/viewer/query'
     | '/viewer/feature_flags'
+    | '/viewer/config'
     | '/viewer/cluster'
     | '/viewer/nodes'
     | '/viewer/acl'

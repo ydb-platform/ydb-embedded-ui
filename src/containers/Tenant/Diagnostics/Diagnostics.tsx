@@ -7,6 +7,7 @@ import {AutoRefreshControl} from '../../../components/AutoRefreshControl/AutoRef
 import {DrawerContextProvider} from '../../../components/Drawer/DrawerContext';
 import {InternalLink} from '../../../components/InternalLink';
 import {
+    useConfigAvailable,
     useFeatureFlagsAvailable,
     useTopicDataAvailable,
 } from '../../../store/reducers/capabilities/hooks';
@@ -64,14 +65,15 @@ function Diagnostics(props: DiagnosticsProps) {
     );
 
     const hasFeatureFlags = useFeatureFlagsAvailable();
+    const hasConfigs = useConfigAvailable();
+    const configsAvailable = hasFeatureFlags || hasConfigs;
     const hasTopicData = useTopicDataAvailable();
     const isViewerUser = useIsViewerUser();
     const pages = getPagesByType(type, subType, {
-        hasFeatureFlags,
         hasTopicData,
         isTopLevel: path === database,
         hasBackups: typeof uiFactory.renderBackups === 'function' && Boolean(controlPlane),
-        hasConfigs: isViewerUser,
+        hasConfigs: isViewerUser && configsAvailable,
         hasAccess: uiFactory.hasAccess,
         databaseType,
     });

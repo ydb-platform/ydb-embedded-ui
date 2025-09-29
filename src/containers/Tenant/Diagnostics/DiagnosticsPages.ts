@@ -16,7 +16,6 @@ type Page = {
 };
 
 interface GetPagesOptions {
-    hasFeatureFlags?: boolean;
     hasTopicData?: boolean;
     isTopLevel?: boolean;
     hasBackups?: boolean;
@@ -231,12 +230,7 @@ export const getPagesByType = (
     const dbContext = isDatabaseEntityType(type) || options?.isTopLevel;
     const seeded = dbContext ? getDatabasePages(options?.databaseType) : base;
 
-    let withFlags = seeded;
-    if (!options?.hasFeatureFlags) {
-        withFlags = seeded.filter((p) => p.id !== TENANT_DIAGNOSTICS_TABS_IDS.configs);
-    }
-
-    return applyFilters(withFlags, type, options);
+    return applyFilters(seeded, type, options);
 };
 
 export const useDiagnosticsPageLinkGetter = () => {
