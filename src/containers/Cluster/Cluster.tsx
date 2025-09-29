@@ -77,6 +77,8 @@ export function Cluster({
     const isViewerUser = useIsViewerUser();
     const isConfigsAvailable = useConfigAvailable();
 
+    const showConfigs = isViewerUser && isConfigsAvailable;
+
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const dispatch = useTypedDispatch();
@@ -123,12 +125,12 @@ export function Cluster({
         if (!shouldShowEventsTab) {
             skippedTabs.push(clusterTabsIds.events);
         }
-        if (!isViewerUser) {
+        if (!showConfigs) {
             skippedTabs.push(clusterTabsIds.configs);
         }
 
         return clusterTabs.filter((el) => !skippedTabs.includes(el.id));
-    }, [shouldShowEventsTab, shouldShowNetworkTable, isViewerUser]);
+    }, [shouldShowEventsTab, shouldShowNetworkTable, showConfigs]);
 
     const getClusterTitle = () => {
         if (infoLoading) {
@@ -280,7 +282,7 @@ export function Cluster({
                                 {uiFactory.renderEvents?.({scrollContainerRef: container})}
                             </Route>
                         )}
-                        {isViewerUser && isConfigsAvailable && (
+                        {showConfigs && (
                             <Route
                                 path={
                                     getLocationObjectFromHref(
