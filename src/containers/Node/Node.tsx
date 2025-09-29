@@ -15,6 +15,7 @@ import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import routes from '../../routes';
 import {
     useCapabilitiesLoaded,
+    useConfigAvailable,
     useDiskPagesAvailable,
 } from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
@@ -43,6 +44,9 @@ const STORAGE_ROLE = 'Storage';
 export function Node() {
     const container = React.useRef<HTMLDivElement>(null);
     const isViewerUser = useIsViewerUser();
+    const hasConfigs = useConfigAvailable();
+
+    const configsAvailable = isViewerUser && hasConfigs;
 
     const dispatch = useTypedDispatch();
 
@@ -78,7 +82,7 @@ export function Node() {
         if (!isStorageNode) {
             skippedTabs.push('storage');
         }
-        if (!isViewerUser) {
+        if (!configsAvailable) {
             skippedTabs.push('configs');
         }
         if (isDiskPagesAvailable) {
@@ -93,7 +97,7 @@ export function Node() {
             actualNodeTabs.find(({id}) => id === activeTabId) ?? actualNodeTabs[0];
 
         return {activeTab: actualActiveTab, nodeTabs: actualNodeTabs};
-    }, [isStorageNode, isDiskPagesAvailable, activeTabId, threadsQuantity, isViewerUser]);
+    }, [isStorageNode, isDiskPagesAvailable, activeTabId, threadsQuantity, configsAvailable]);
 
     const database = tenantNameFromQuery?.toString();
 

@@ -13,7 +13,10 @@ import {InternalLink} from '../../components/InternalLink';
 import {NetworkTable} from '../../components/NetworkTable/NetworkTable';
 import {useShouldShowClusterNetworkTable} from '../../components/NetworkTable/hooks';
 import routes, {getLocationObjectFromHref} from '../../routes';
-import {useClusterDashboardAvailable} from '../../store/reducers/capabilities/hooks';
+import {
+    useClusterDashboardAvailable,
+    useConfigAvailable,
+} from '../../store/reducers/capabilities/hooks';
 import {
     INITIAL_DEFAULT_CLUSTER_TAB,
     clusterApi,
@@ -72,6 +75,7 @@ export function Cluster({
     const shouldShowNetworkTable = useShouldShowClusterNetworkTable();
     const shouldShowEventsTab = useShouldShowEventsTab();
     const isViewerUser = useIsViewerUser();
+    const isConfigsAvailable = useConfigAvailable();
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
@@ -276,7 +280,7 @@ export function Cluster({
                                 {uiFactory.renderEvents?.({scrollContainerRef: container})}
                             </Route>
                         )}
-                        {isViewerUser && (
+                        {isViewerUser && isConfigsAvailable && (
                             <Route
                                 path={
                                     getLocationObjectFromHref(

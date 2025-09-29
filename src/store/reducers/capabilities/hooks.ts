@@ -87,9 +87,16 @@ export const useClusterDashboardAvailable = () => {
 export const useStreamingAvailable = () => {
     return useGetFeatureVersion('/viewer/query') >= 8;
 };
-export const useConfigAvailable = () => {
+export const useBaseConfigAvailable = () => {
     return useGetFeatureVersion('/viewer/config') >= 1;
 };
+
+export const useConfigAvailable = () => {
+    const isBaseConfigsAvailable = useBaseConfigAvailable();
+    const isFeaturesAvailable = useFeatureFlagsAvailable();
+    return isBaseConfigsAvailable || isFeaturesAvailable;
+};
+
 export const useEditAccessAvailable = () => {
     return useGetFeatureVersion('/viewer/acl') >= 2 && !uiFactory.hideGrantAccess;
 };

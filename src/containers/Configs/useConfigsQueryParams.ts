@@ -3,7 +3,7 @@ import React from 'react';
 import {StringParam, createEnumParam, useQueryParams, withDefault} from 'use-query-params';
 
 import {
-    useConfigAvailable,
+    useBaseConfigAvailable,
     useFeatureFlagsAvailable,
 } from '../../store/reducers/capabilities/hooks';
 
@@ -24,7 +24,7 @@ export const ConfigTypeValueParam = withDefault<ConfigType | undefined | null, '
 
 export function useConfigQueryParams() {
     const isFeaturesAvailable = useFeatureFlagsAvailable();
-    const isConfigsAvailable = useConfigAvailable();
+    const isConfigsAvailable = useBaseConfigAvailable();
     const [{configType, search}, setQueryParams] = useQueryParams({
         configType: ConfigTypeValueParam,
         search: StringParam,

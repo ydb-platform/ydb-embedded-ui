@@ -4,7 +4,7 @@ import {SegmentedRadioGroup} from '@gravity-ui/uikit';
 
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {
-    useConfigAvailable,
+    useBaseConfigAvailable,
     useFeatureFlagsAvailable,
 } from '../../store/reducers/capabilities/hooks';
 import {cn} from '../../utils/cn';
@@ -30,7 +30,7 @@ export function Configs({database, className, scrollContainerRef}: ConfigsProps)
     const {configType} = useConfigQueryParams();
 
     const isFeaturesAvailable = useFeatureFlagsAvailable();
-    const isConfigsAvailable = useConfigAvailable();
+    const isConfigsAvailable = useBaseConfigAvailable();
 
     const options = React.useMemo(() => {
         const options: ConfigType[] = [];
