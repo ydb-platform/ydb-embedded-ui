@@ -1,7 +1,9 @@
 import type {TBlock, TConnection} from '@gravity-ui/graph';
 
+import type {ExplainPlanNodeData} from '../../store/reducers/query/types';
+
 import type {AbstractGraphColorsConfig} from './colorsConfig';
-import type {Data, ExplainPlanNodeData} from './types';
+import type {Data} from './types';
 
 const BLOCK_TOP_PADDING = 8;
 const BLOCK_LINE_HEIGHT = 16;
@@ -50,7 +52,7 @@ const getBlockSize = (block: ExplainPlanNodeData) => {
 };
 
 export const prepareBlocks = (nodes: Data['nodes']): TBlock[] => {
-    return nodes?.map(({data: {id, name, type, ...rest}, data}) => ({
+    return nodes.map(({data: {id, name, type, ...rest}, data}) => ({
         id: String(id),
         is: type,
         name,
@@ -60,7 +62,7 @@ export const prepareBlocks = (nodes: Data['nodes']): TBlock[] => {
 };
 
 export const prepareConnections = (links: Data['links']): TConnection[] => {
-    return links?.map(({from, to}) => ({
+    return links.map(({from, to}) => ({
         id: `${from}:${to}`,
         sourceBlockId: from,
         targetBlockId: to,

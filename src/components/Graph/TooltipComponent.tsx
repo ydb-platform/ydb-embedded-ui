@@ -2,13 +2,13 @@ import React, {useState} from 'react';
 
 import {Popover, Tab, TabList, TabPanel, TabProvider} from '@gravity-ui/uikit';
 
-import {cn} from '../../utils/cn';
-
 import type {
-    ExtendedTBlock,
     TopologyNodeDataStatsItem,
     TopologyNodeDataStatsSection,
-} from './types';
+} from '../../store/reducers/query/types';
+import {cn} from '../../utils/cn';
+
+import type {ExtendedTBlock} from './types';
 
 const b = cn('ydb-gravity-graph');
 type Props = {
