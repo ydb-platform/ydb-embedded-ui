@@ -7,7 +7,6 @@ import {getNodesColumns} from './columns';
 export function useGetNodesColumns({
     columns: externalColumns,
     database,
-    getNodeRef,
     viewContext,
     columnsSettings,
 }: GetNodesColumnsParams & {columns?: NodesColumn[]}) {
@@ -17,14 +16,9 @@ export function useGetNodesColumns({
         if (externalColumns) {
             columns = externalColumns;
         } else {
-            columns = getNodesColumns({
-                database,
-                getNodeRef,
-                viewContext,
-                columnsSettings,
-            });
+            columns = getNodesColumns({database, viewContext, columnsSettings});
         }
 
         return columns;
-    }, [externalColumns, database, getNodeRef, viewContext, columnsSettings]);
+    }, [externalColumns, database, viewContext, columnsSettings]);
 }

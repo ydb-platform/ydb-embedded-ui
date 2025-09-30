@@ -1,4 +1,3 @@
-import {useAdditionalNodesProps} from '../../../utils/hooks/useAdditionalNodesProps';
 import {useStorageNodesSelectedColumns} from '../PaginatedStorageNodesTable/columns/hooks';
 import type {StorageNodesColumnsSettings} from '../PaginatedStorageNodesTable/columns/types';
 import type {StorageViewContext} from '../types';
@@ -13,11 +12,9 @@ export function useStorageNodesColumnsToSelect({
     viewContext?: StorageViewContext;
     columnsSettings?: StorageNodesColumnsSettings;
 }) {
-    const additionalNodesProps = useAdditionalNodesProps();
     const {visibleEntities} = useStorageQueryParams();
 
     return useStorageNodesSelectedColumns({
-        additionalNodesProps,
         visibleEntities,
         database,
         viewContext,

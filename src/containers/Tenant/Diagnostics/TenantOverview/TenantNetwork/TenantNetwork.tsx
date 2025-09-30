@@ -1,7 +1,6 @@
 import {Flex} from '@gravity-ui/uikit';
 
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
-import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import {cn} from '../../../../../utils/cn';
 import {ENABLE_NETWORK_TABLE_KEY} from '../../../../../utils/constants';
 import {useSearchQuery, useSetting} from '../../../../../utils/hooks';
@@ -18,10 +17,9 @@ const b = cn('tenant-network');
 
 interface TenantNetworkProps {
     database: string;
-    additionalNodesProps?: AdditionalNodesProps;
 }
 
-export function TenantNetwork({database, additionalNodesProps}: TenantNetworkProps) {
+export function TenantNetwork({database}: TenantNetworkProps) {
     const query = useSearchQuery();
     const [networkTableEnabled] = useSetting(ENABLE_NETWORK_TABLE_KEY);
 
@@ -37,10 +35,10 @@ export function TenantNetwork({database, additionalNodesProps}: TenantNetworkPro
     return (
         <Flex direction="column" gap={4} className={b()}>
             <StatsWrapper title={i18n('title_nodes-by-ping')} allEntitiesLink={allNodesLink}>
-                <TopNodesByPing database={database} additionalNodesProps={additionalNodesProps} />
+                <TopNodesByPing database={database} />
             </StatsWrapper>
             <StatsWrapper title={i18n('title_nodes-by-skew')} allEntitiesLink={allNodesLink}>
-                <TopNodesBySkew database={database} additionalNodesProps={additionalNodesProps} />
+                <TopNodesBySkew database={database} />
             </StatsWrapper>
         </Flex>
     );

@@ -1,7 +1,6 @@
 import {ResizeableDataTable} from '../../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../../../../components/nodesColumns/constants';
 import {nodesApi} from '../../../../../store/reducers/nodes/nodes';
-import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import {
     TENANT_OVERVIEW_TABLES_LIMIT,
     TENANT_OVERVIEW_TABLES_SETTINGS,
@@ -14,15 +13,11 @@ import {getTopNodesBySkewColumns} from './columns';
 
 interface TopNodesBySkewProps {
     database: string;
-    additionalNodesProps?: AdditionalNodesProps;
 }
 
-export function TopNodesBySkew({database, additionalNodesProps}: TopNodesBySkewProps) {
+export function TopNodesBySkew({database}: TopNodesBySkewProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const [columns, fieldsRequired] = getTopNodesBySkewColumns({
-        getNodeRef: additionalNodesProps?.getNodeRef,
-        database,
-    });
+    const [columns, fieldsRequired] = getTopNodesBySkewColumns({database});
 
     const {currentData, isFetching, error} = nodesApi.useGetNodesQuery(
         {

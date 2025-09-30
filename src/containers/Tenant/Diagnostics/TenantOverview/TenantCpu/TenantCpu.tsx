@@ -2,7 +2,6 @@ import {Flex} from '@gravity-ui/uikit';
 
 import {setTopQueriesFilters} from '../../../../../store/reducers/executeTopQueries/executeTopQueries';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
-import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import type {ETenantType} from '../../../../../types/api/tenant';
 import {useTypedDispatch} from '../../../../../utils/hooks';
 import {useDiagnosticsPageLinkGetter} from '../../../Diagnostics/DiagnosticsPages';
@@ -19,16 +18,10 @@ import {cpuDashboardConfig} from './cpuDashboardConfig';
 interface TenantCpuProps {
     database: string;
     databaseFullPath: string;
-    additionalNodesProps?: AdditionalNodesProps;
     databaseType?: ETenantType;
 }
 
-export function TenantCpu({
-    database,
-    additionalNodesProps,
-    databaseType,
-    databaseFullPath,
-}: TenantCpuProps) {
+export function TenantCpu({database, databaseType, databaseFullPath}: TenantCpuProps) {
     const dispatch = useTypedDispatch();
     const getDiagnosticsPageLink = useDiagnosticsPageLinkGetter();
 
@@ -47,19 +40,13 @@ export function TenantCpu({
                         allEntitiesLink={allNodesLink}
                         title={i18n('title_top-nodes-load')}
                     >
-                        <TopNodesByLoad
-                            database={database}
-                            additionalNodesProps={additionalNodesProps}
-                        />
+                        <TopNodesByLoad database={database} />
                     </StatsWrapper>
                     <StatsWrapper
                         title={i18n('title_top-nodes-pool')}
                         allEntitiesLink={allNodesLink}
                     >
-                        <TopNodesByCpu
-                            database={database}
-                            additionalNodesProps={additionalNodesProps}
-                        />
+                        <TopNodesByCpu database={database} />
                     </StatsWrapper>
                 </>
             )}

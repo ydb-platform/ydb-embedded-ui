@@ -1,4 +1,4 @@
-import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../../types/additionalProps';
+import type {AdditionalTenantsProps} from '../../../../types/additionalProps';
 import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
 import Overview from '../Overview/Overview';
@@ -13,15 +13,17 @@ interface DetailedOverviewProps {
     path: string;
     databaseFullPath: string;
     additionalTenantProps?: AdditionalTenantsProps;
-    additionalNodesProps?: AdditionalNodesProps;
 }
 
 const b = cn('kv-detailed-overview');
 
-function DetailedOverview(props: DetailedOverviewProps) {
-    const {type, database, databaseFullPath, path, additionalTenantProps, additionalNodesProps} =
-        props;
-
+function DetailedOverview({
+    type,
+    database,
+    databaseFullPath,
+    path,
+    additionalTenantProps,
+}: DetailedOverviewProps) {
     const renderTenantOverview = () => {
         return (
             <div className={b('section')}>
@@ -29,7 +31,6 @@ function DetailedOverview(props: DetailedOverviewProps) {
                     database={database}
                     databaseFullPath={databaseFullPath}
                     additionalTenantProps={additionalTenantProps}
-                    additionalNodesProps={additionalNodesProps}
                 />
             </div>
         );

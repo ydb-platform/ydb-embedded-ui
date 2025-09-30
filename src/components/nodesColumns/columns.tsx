@@ -1,6 +1,7 @@
 import DataTable from '@gravity-ui/react-data-table';
 import {DefinitionList} from '@gravity-ui/uikit';
 
+import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import type {TMemoryStats, TPoolStats} from '../../types/api/nodes';
 import type {TTabletStateInfo} from '../../types/api/tablet';
 import {valueIsDefined} from '../../utils';
@@ -17,7 +18,6 @@ import {bytesToSpeed, isNumeric} from '../../utils/utils';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
 import {MemoryViewer} from '../MemoryViewer/MemoryViewer';
 import {NodeHostWrapper} from '../NodeHostWrapper/NodeHostWrapper';
-import type {NodeHostData} from '../NodeHostWrapper/NodeHostWrapper';
 import {PoolsGraph} from '../PoolsGraph/PoolsGraph';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 import {TabletsStatistic} from '../TabletsStatistic';
@@ -44,15 +44,14 @@ export function getNodeIdColumn<T extends {NodeId?: string | number}>(): Column<
         align: DataTable.RIGHT,
     };
 }
-export function getHostColumn<T extends NodeHostData>({
-    getNodeRef,
+export function getHostColumn<T extends PreparedStorageNode>({
     database,
 }: GetNodesColumnsParams): Column<T> {
     return {
         name: NODES_COLUMNS_IDS.Host,
         header: NODES_COLUMNS_TITLES.Host,
         render: ({row}) => {
-            return <NodeHostWrapper node={row} getNodeRef={getNodeRef} database={database} />;
+            return <NodeHostWrapper node={row} database={database} />;
         },
         width: 350,
         align: DataTable.LEFT,
@@ -62,8 +61,7 @@ export function getHostColumn<T extends NodeHostData>({
 // Different column for different set of required fields
 // ConnectStatus is required here, it makes handler to return network stats
 // On versions before 25-1-2 ConnectStatus also makes handler to return peers - it can significantly increase response size
-export function getNetworkHostColumn<T extends NodeHostData>({
-    getNodeRef,
+export function getNetworkHostColumn<T extends PreparedStorageNode>({
     database,
 }: GetNodesColumnsParams): Column<T> {
     return {
@@ -71,12 +69,7 @@ export function getNetworkHostColumn<T extends NodeHostData>({
         header: NODES_COLUMNS_TITLES.NetworkHost,
         render: ({row}) => {
             return (
-                <NodeHostWrapper
-                    node={row}
-                    getNodeRef={getNodeRef}
-                    database={database}
-                    statusForIcon={'ConnectStatus'}
-                />
+                <NodeHostWrapper node={row} database={database} statusForIcon={'ConnectStatus'} />
             );
         },
         width: 350,

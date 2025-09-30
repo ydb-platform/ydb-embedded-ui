@@ -17,7 +17,6 @@ import type {
     NodesColumn,
 } from '../../../../../components/nodesColumns/types';
 import {nodesApi} from '../../../../../store/reducers/nodes/nodes';
-import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import type {NodesRequiredField} from '../../../../../types/api/nodes';
 import {
     TENANT_OVERVIEW_TABLES_LIMIT,
@@ -49,15 +48,11 @@ function getTopNodesByMemoryColumns(
 
 interface TopNodesByMemoryProps {
     database: string;
-    additionalNodesProps?: AdditionalNodesProps;
 }
 
-export function TopNodesByMemory({database, additionalNodesProps}: TopNodesByMemoryProps) {
+export function TopNodesByMemory({database}: TopNodesByMemoryProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const [columns, fieldsRequired] = getTopNodesByMemoryColumns({
-        getNodeRef: additionalNodesProps?.getNodeRef,
-        database,
-    });
+    const [columns, fieldsRequired] = getTopNodesByMemoryColumns({database});
 
     const {currentData, isFetching, error} = nodesApi.useGetNodesQuery(
         {

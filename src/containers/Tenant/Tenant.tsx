@@ -9,7 +9,7 @@ import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {overviewApi} from '../../store/reducers/overview/overview';
 import {selectSchemaObjectData} from '../../store/reducers/schema/schema';
 import {useTenantBaseInfo} from '../../store/reducers/tenant/tenant';
-import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../types/additionalProps';
+import type {AdditionalTenantsProps} from '../../types/additionalProps';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
@@ -44,11 +44,10 @@ const getTenantSummaryState = () => {
 
 interface TenantProps {
     additionalTenantProps?: AdditionalTenantsProps;
-    additionalNodesProps?: AdditionalNodesProps;
 }
 
 // eslint-disable-next-line complexity
-export function Tenant(props: TenantProps) {
+export function Tenant({additionalTenantProps}: TenantProps) {
     const [summaryVisibilityState, dispatchSummaryVisibilityAction] = React.useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_TENANT_SUMMARY_COLLAPSED),
         undefined,
@@ -156,10 +155,7 @@ export function Tenant(props: TenantProps) {
                                     isCollapsed={summaryVisibilityState.collapsed}
                                 />
                                 <div className={b('main')}>
-                                    <ObjectGeneral
-                                        additionalTenantProps={props.additionalTenantProps}
-                                        additionalNodesProps={props.additionalNodesProps}
-                                    />
+                                    <ObjectGeneral additionalTenantProps={additionalTenantProps} />
                                 </div>
                             </SplitPane>
                         </TenantDrawerWrapper>

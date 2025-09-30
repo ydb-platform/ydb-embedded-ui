@@ -8,7 +8,6 @@ import {
 import type {NodesColumnId} from '../../components/nodesColumns/constants';
 import type {NodesColumn} from '../../components/nodesColumns/types';
 import {useBridgeModeEnabled} from '../../store/reducers/capabilities/hooks';
-import type {AdditionalNodesProps} from '../../types/additionalProps';
 import type {NodesGroupByField} from '../../types/api/nodes';
 import {
     useIsUserAllowedToMakeChanges,
@@ -32,7 +31,6 @@ export interface NodesProps {
     database?: string;
     databaseFullPath?: string;
     scrollContainerRef: React.RefObject<HTMLElement>;
-    additionalNodesProps?: AdditionalNodesProps;
     withPeerRoleFilter?: boolean;
     columns?: NodesColumn[];
     defaultColumnsIds?: NodesColumnId[];
@@ -46,7 +44,6 @@ export function Nodes({
     database,
     databaseFullPath,
     scrollContainerRef,
-    additionalNodesProps,
     withPeerRoleFilter,
     columns: externalColumns,
     defaultColumnsIds = DEFAULT_NODES_COLUMNS,
@@ -56,12 +53,7 @@ export function Nodes({
 }: NodesProps) {
     const {handleDataFetched, columnsSettings} = useStorageColumnsSettings();
 
-    const columns = useGetNodesColumns({
-        columns: externalColumns,
-        database,
-        getNodeRef: additionalNodesProps?.getNodeRef,
-        columnsSettings,
-    });
+    const columns = useGetNodesColumns({columns: externalColumns, database, columnsSettings});
 
     const bridgeModeEnabled = useBridgeModeEnabled();
 
