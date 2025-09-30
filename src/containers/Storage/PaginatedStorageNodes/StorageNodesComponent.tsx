@@ -1,4 +1,5 @@
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
+import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {useViewerNodesHandlerHasGrouping} from '../../../store/reducers/capabilities/hooks';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
@@ -36,8 +37,14 @@ export function StorageNodesComponent({
                 <StorageNodesControlsWithTableState
                     withTypeSelector
                     withGroupBySelect={viewerNodesHandlerHasGrouping}
-                    columnsToSelect={columnsToSelect}
-                    handleSelectedColumnsUpdate={setColumns}
+                />
+            }
+            extraControls={
+                <TableColumnSetup
+                    popupWidth={200}
+                    items={columnsToSelect}
+                    showStatus
+                    onUpdate={setColumns}
                 />
             }
             table={

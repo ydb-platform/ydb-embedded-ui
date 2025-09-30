@@ -37,7 +37,7 @@ export const VDisk = ({
 }: VDiskProps) => {
     const database = useDatabaseFromQuery();
     const vDiskPath = getVDiskLink(data, {
-        database: database,
+        database,
     });
 
     return (
@@ -46,7 +46,7 @@ export const VDisk = ({
             onShowPopup={onShowPopup}
             onHidePopup={onHidePopup}
             renderPopupContent={() => <VDiskPopup data={data} />}
-            offset={{mainAxis: 5, crossAxis: 0}}
+            offset={{mainAxis: 2, crossAxis: 0}}
             delayClose={delayClose}
             delayOpen={delayOpen}
         >

@@ -12,7 +12,10 @@ interface EnableFullscreenButtonProps {
     view?: ButtonView;
 }
 
-function EnableFullscreenButton({disabled, view = 'flat-secondary'}: EnableFullscreenButtonProps) {
+export function EnableFullscreenButton({
+    disabled,
+    view = 'flat-secondary',
+}: EnableFullscreenButtonProps) {
     const dispatch = useTypedDispatch();
     const onEnableFullscreen = () => {
         dispatch(enableFullscreen());
@@ -25,5 +28,3 @@ function EnableFullscreenButton({disabled, view = 'flat-secondary'}: EnableFulls
         </ActionTooltip>
     );
 }
-
-export default EnableFullscreenButton;

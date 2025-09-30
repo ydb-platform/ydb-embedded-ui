@@ -17,6 +17,7 @@ import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/
 import {TenantNameWrapper} from '../../components/TenantNameWrapper/TenantNameWrapper';
 import {
     useCreateDatabaseFeatureAvailable,
+    useDatabasesAvailable,
     useDeleteDatabaseFeatureAvailable,
     useEditDatabaseFeatureAvailable,
 } from '../../store/reducers/capabilities/hooks';
@@ -34,6 +35,7 @@ import {
 import {setSearchValue, tenantsApi} from '../../store/reducers/tenants/tenants';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import type {AdditionalTenantsProps} from '../../types/additionalProps';
+import {State} from '../../types/api/tenant';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
@@ -64,6 +66,23 @@ const b = cn('tenants');
 
 const DATABASES_COLUMNS_WIDTH_LS_KEY = 'databasesTableColumnsWidth';
 
+function formatDatabaseState(state?: State): string {
+    if (!state) {
+        return EMPTY_DATA_PLACEHOLDER;
+    }
+
+    // Map specific state values to user-friendly display names
+    switch (state) {
+        case State.STATE_UNSPECIFIED:
+            return 'Unspecified';
+        case State.PENDING_RESOURCES:
+            return 'Pending';
+        default:
+            // For other states, use capitalized version (first letter uppercase, rest lowercase)
+            return state.charAt(0).toUpperCase() + state.slice(1).toLowerCase();
+    }
+}
+
 interface TenantsProps {
     scrollContainerRef: React.RefObject<HTMLElement>;
     additionalTenantsProps?: AdditionalTenantsProps;
@@ -73,10 +92,10 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
     const dispatch = useTypedDispatch();
 
     const clusterName = useClusterNameFromQuery();
-
+    const isMetaDatabasesAvailable = useDatabasesAvailable();
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tenantsApi.useGetTenantsInfoQuery(
-        {clusterName},
+        {clusterName, isMetaDatabasesAvailable},
         {pollingInterval: autoRefreshInterval},
     );
     const loading = isFetching && currentData === undefined;
@@ -110,11 +129,7 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
 
         if (buttonAvailable && !loading) {
             return (
-                <Button
-                    view="action"
-                    onClick={() => uiFactory.onCreateDB?.({clusterName})}
-                    className={b('create-database')}
-                >
+                <Button view="action" onClick={() => uiFactory.onCreateDB?.({clusterName})}>
                     <Icon data={CirclePlus} />
                     {i18n('create-database')}
                 </Button>
@@ -194,8 +209,7 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
             {
                 name: 'State',
                 width: 150,
-                render: ({row}) => (row.State ? row.State.toLowerCase() : EMPTY_DATA_PLACEHOLDER),
-                customStyle: () => ({textTransform: 'capitalize'}),
+                render: ({row}) => formatDatabaseState(row.State),
             },
             {
                 name: 'cpu',
@@ -299,7 +313,7 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
         }
 
         if (filteredTenants.length === 0 && problemFilter !== ProblemFilterValues.ALL) {
-            return <Illustration name="thumbsUp" width="200" />;
+            return <Illustration name="thumbsUp" width={200} />;
         }
 
         return (

@@ -9,7 +9,12 @@ import type {
 } from '../../../../types/api/schema';
 import {EColumnCodec} from '../../../../types/api/schema';
 import type {Nullable} from '../../../../utils/typecheckers';
-import {isColumnEntityType, isExternalTableType, isRowTableType} from '../../utils/schema';
+import {
+    isColumnEntityType,
+    isExternalTableType,
+    isRowTableType,
+    isSystemViewType,
+} from '../../utils/schema';
 
 import type {SchemaData} from './types';
 
@@ -126,7 +131,7 @@ export function prepareSchemaData(
 ): SchemaData[] {
     const {Table, ColumnTableDescription, ExternalTableDescription} = schema?.PathDescription || {};
 
-    if (isRowTableType(type)) {
+    if (isRowTableType(type) || isSystemViewType(type)) {
         return prepareRowTableSchema(Table);
     } else if (isColumnEntityType(type)) {
         return prepareColumnTableSchema(ColumnTableDescription);

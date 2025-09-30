@@ -19,17 +19,39 @@ export interface TIndexDescription {
     DataColumnNames?: string[];
     /** uint64 */
     DataSize?: string;
+
+    /**
+     * Present for vector indexes of type EIndexTypeGlobalVectorKmeansTree
+     */
+    VectorIndexKmeansTreeDescription?: TVectorIndexKmeansTreeDescription;
 }
 
-enum EIndexType {
+export enum EIndexType {
     EIndexTypeInvalid = 'EIndexTypeInvalid',
     EIndexTypeGlobal = 'EIndexTypeGlobal',
     EIndexTypeGlobalAsync = 'EIndexTypeGlobalAsync',
+    EIndexTypeGlobalVectorKmeansTree = 'EIndexTypeGlobalVectorKmeansTree',
 }
 
-enum EIndexState {
+export enum EIndexState {
     EIndexStateInvalid = 'EIndexStateInvalid',
     EIndexStateReady = 'EIndexStateReady',
     EIndexStateNotReady = 'EIndexStateNotReady',
     EIndexStateWriteOnly = 'EIndexStateWriteOnly',
+}
+
+export interface TVectorIndexKmeansTreeDescriptionSettingsInner {
+    vector_dimension?: number;
+    vector_type?: string;
+    metric?: string;
+}
+
+export interface TVectorIndexKmeansTreeDescriptionSettings {
+    clusters?: number;
+    levels?: number;
+    settings?: TVectorIndexKmeansTreeDescriptionSettingsInner;
+}
+
+export interface TVectorIndexKmeansTreeDescription {
+    Settings?: TVectorIndexKmeansTreeDescriptionSettings;
 }

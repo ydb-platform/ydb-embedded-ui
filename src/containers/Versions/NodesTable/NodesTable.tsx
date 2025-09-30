@@ -1,5 +1,3 @@
-import type {Column} from '@gravity-ui/react-data-table';
-
 import {ResizeableDataTable} from '../../../components/ResizeableDataTable/ResizeableDataTable';
 import {
     getCpuColumn,
@@ -11,28 +9,28 @@ import {
     getUptimeColumn,
 } from '../../../components/nodesColumns/columns';
 import {NODES_COLUMNS_IDS} from '../../../components/nodesColumns/constants';
-import type {GetNodesColumnsParams} from '../../../components/nodesColumns/types';
+import type {GetNodesColumnsParams, NodesColumn} from '../../../components/nodesColumns/types';
 import {useBridgeModeEnabled} from '../../../store/reducers/capabilities/hooks';
-import type {NodesPreparedEntity} from '../../../store/reducers/nodes/types';
+import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
 import {useAdditionalNodesProps} from '../../../utils/hooks/useAdditionalNodesProps';
 
 const VERSIONS_COLUMNS_WIDTH_LS_KEY = 'versionsTableColumnsWidth';
 
-function getColumns(params: GetNodesColumnsParams): Column<NodesPreparedEntity>[] {
+function getColumns(params: GetNodesColumnsParams): NodesColumn[] {
     return [
-        getNodeIdColumn<NodesPreparedEntity>(),
-        getHostColumn<NodesPreparedEntity>(params),
-        getPileNameColumn<NodesPreparedEntity>(),
-        getUptimeColumn<NodesPreparedEntity>(),
-        getRAMColumn<NodesPreparedEntity>(),
-        getCpuColumn<NodesPreparedEntity>(),
-        getLoadAverageColumn<NodesPreparedEntity>(),
+        getNodeIdColumn(),
+        getHostColumn(params),
+        getPileNameColumn(),
+        getUptimeColumn(),
+        getRAMColumn(),
+        getCpuColumn(),
+        getLoadAverageColumn(),
     ];
 }
 
 interface NodesTableProps {
-    nodes: NodesPreparedEntity[];
+    nodes: PreparedStorageNode[];
 }
 
 export const NodesTable = ({nodes}: NodesTableProps) => {

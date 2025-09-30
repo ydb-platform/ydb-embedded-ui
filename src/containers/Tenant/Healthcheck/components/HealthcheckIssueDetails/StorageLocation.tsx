@@ -65,7 +65,7 @@ export function StorageLocation({location, hiddenFields = []}: StorageLocationPr
 
     return (
         <SectionWithTitle title={i18n('label_storage_location')} titleVariant="subheader-2">
-            <Flex direction="column" gap={2}>
+            <Flex direction="column" gap={3}>
                 {fields.map((field) => LocationFieldRenderer[field](location))}
             </Flex>
         </SectionWithTitle>

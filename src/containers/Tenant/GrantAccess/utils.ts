@@ -7,12 +7,20 @@ interface UseRightsProps {
     aclSubject?: string;
     path: string;
     database: string;
+    databaseFullPath: string;
 }
 
-export function useRights({aclSubject, path, database}: UseRightsProps) {
+export function useRights({aclSubject, path, database, databaseFullPath}: UseRightsProps) {
     const dialect = useAclSyntax();
     const subjectExplicitRights = useTypedSelector((state) =>
-        selectSubjectExplicitRights(state, aclSubject ?? undefined, path, database, dialect),
+        selectSubjectExplicitRights(
+            state,
+            aclSubject ?? undefined,
+            path,
+            database,
+            databaseFullPath,
+            dialect,
+        ),
     );
     const [explicitRightsChanges, setExplicitRightsChanges] = React.useState(
         () => new Map<string, boolean>(),

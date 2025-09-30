@@ -37,7 +37,7 @@ export function StorageGroupPage() {
     const [{groupId}] = useQueryParams({groupId: StringParam});
 
     React.useEffect(() => {
-        dispatch(setHeaderBreadcrumbs('storageGroup', {groupId, tenantName: database}));
+        dispatch(setHeaderBreadcrumbs('storageGroup', {groupId, database}));
     }, [dispatch, groupId, database]);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();

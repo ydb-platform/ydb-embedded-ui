@@ -14,7 +14,6 @@ import type {
     RenderEmptyDataMessage,
     RenderErrorMessage,
 } from './types';
-import {calculateElementOffsetTop} from './utils';
 
 import './PaginatedTable.scss';
 
@@ -62,7 +61,6 @@ export const PaginatedTable = <T, F>({
     const {sortParams, foundEntities} = tableState;
 
     const tableRef = React.useRef<HTMLDivElement>(null);
-    const [tableOffset, setTableOffset] = React.useState(0);
 
     // this prevent situation when filters are new, but active chunks is not yet recalculated (it will be done to the next rendrer, so we bring filters change on the next render too)
     const [filters, setFilters] = React.useState(rawFilters);
@@ -82,14 +80,6 @@ export const PaginatedTable = <T, F>({
         },
         [onDataFetched, setFoundEntities, setIsInitialLoad, setTotalEntities],
     );
-
-    React.useLayoutEffect(() => {
-        const scrollContainer = scrollContainerRef.current;
-        const table = tableRef.current;
-        if (table && scrollContainer) {
-            setTableOffset(calculateElementOffsetTop(table, scrollContainer));
-        }
-    }, [scrollContainerRef.current, tableRef.current, foundEntities]);
 
     // Set will-change: transform on scroll container if not already set
     React.useLayoutEffect(() => {
@@ -120,7 +110,6 @@ export const PaginatedTable = <T, F>({
                     scrollContainerRef={scrollContainerRef}
                     tableRef={tableRef}
                     foundEntities={foundEntities}
-                    tableOffset={tableOffset}
                     chunkSize={chunkSize}
                     rowHeight={rowHeight}
                     columns={columns}

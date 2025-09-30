@@ -4,6 +4,8 @@
     justify-content: space-between;
     align-items: center;
 
+    height: var(--header-height, auto);
+    max-height: var(--header-height, auto);
     padding: 0 var(--g-spacing-5);
 
     border-bottom: 1px solid var(--g-color-line-generic);

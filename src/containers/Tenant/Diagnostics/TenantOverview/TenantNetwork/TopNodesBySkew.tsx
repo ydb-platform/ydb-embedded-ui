@@ -13,20 +13,20 @@ import i18n from '../i18n';
 import {getTopNodesBySkewColumns} from './columns';
 
 interface TopNodesBySkewProps {
-    tenantName: string;
+    database: string;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-export function TopNodesBySkew({tenantName, additionalNodesProps}: TopNodesBySkewProps) {
+export function TopNodesBySkew({database, additionalNodesProps}: TopNodesBySkewProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const [columns, fieldsRequired] = getTopNodesBySkewColumns({
         getNodeRef: additionalNodesProps?.getNodeRef,
-        database: tenantName,
+        database,
     });
 
     const {currentData, isFetching, error} = nodesApi.useGetNodesQuery(
         {
-            tenant: tenantName,
+            tenant: database,
             type: 'any',
             sort: '-ClockSkew',
             limit: TENANT_OVERVIEW_TABLES_LIMIT,
@@ -37,7 +37,7 @@ export function TopNodesBySkew({tenantName, additionalNodesProps}: TopNodesBySke
     );
 
     const loading = isFetching && currentData === undefined;
-    const topNodes = currentData?.Nodes || [];
+    const topNodes = currentData?.nodes || [];
 
     return (
         <TenantOverviewTableLayout loading={loading} error={error} withData={Boolean(currentData)}>

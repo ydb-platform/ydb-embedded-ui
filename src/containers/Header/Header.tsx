@@ -17,10 +17,12 @@ import {getConnectToDBDialog} from '../../components/ConnectToDB/ConnectToDBDial
 import {InternalLink} from '../../components/InternalLink';
 import {
     useAddClusterFeatureAvailable,
+    useDatabasesAvailable,
     useDeleteDatabaseFeatureAvailable,
     useEditDatabaseFeatureAvailable,
 } from '../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
+import {clustersApi} from '../../store/reducers/clusters/clusters';
 import {tenantApi} from '../../store/reducers/tenant/tenant';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
@@ -35,6 +37,7 @@ import {
     useIsUserAllowedToMakeChanges,
     useIsViewerUser,
 } from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {isAccessError} from '../../utils/response';
 import {getClusterPath} from '../Cluster/utils';
 
 import {getBreadcrumbs} from './breadcrumbs';
@@ -50,9 +53,12 @@ function Header() {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const isViewerUser = useIsViewerUser();
 
+    const isMetaDatabasesAvailable = useDatabasesAvailable();
+
     const {title: clusterTitle} = useClusterBaseInfo();
 
     const database = useDatabaseFromQuery();
+
     const clusterName = useClusterNameFromQuery();
 
     const location = useLocation();
@@ -61,8 +67,16 @@ function Header() {
     const isDatabasePage = location.pathname === '/tenant';
     const isClustersPage = location.pathname === '/clusters';
 
+    const {isLoading: isClustersLoading, error: clustersError} =
+        clustersApi.useGetClustersListQuery(undefined, {
+            skip: !isClustersPage,
+        });
+
     const isAddClusterAvailable =
-        useAddClusterFeatureAvailable() && uiFactory.onAddCluster !== undefined;
+        useAddClusterFeatureAvailable() &&
+        uiFactory.onAddCluster !== undefined &&
+        !isClustersLoading &&
+        !isAccessError(clustersError);
 
     const isEditDBAvailable = useEditDatabaseFeatureAvailable() && uiFactory.onEditDB !== undefined;
     const isDeleteDBAvailable =
@@ -71,7 +85,9 @@ function Header() {
     const shouldRequestTenantData =
         database && isDatabasePage && (isEditDBAvailable || isDeleteDBAvailable);
 
-    const params = shouldRequestTenantData ? {path: database, clusterName} : skipToken;
+    const params = shouldRequestTenantData
+        ? {database, clusterName, isMetaDatabasesAvailable}
+        : skipToken;
 
     const {currentData: databaseData, isLoading: isDatabaseDataLoading} =
         tenantApi.useGetTenantInfoQuery(params);

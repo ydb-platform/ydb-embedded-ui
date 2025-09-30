@@ -1,8 +1,9 @@
-import {Button, Flex, Icon} from '@gravity-ui/uikit';
+import {Button, Flex, HelpMark, Icon, Label} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueriesActivityBar} from '../../../../components/QueriesActivityBar/QueriesActivityBar';
+import {useDatabasesAvailable} from '../../../../store/reducers/capabilities/hooks';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {tenantApi} from '../../../../store/reducers/tenant/tenant';
@@ -20,18 +21,21 @@ import {TenantCpu} from './TenantCpu/TenantCpu';
 import {TenantMemory} from './TenantMemory/TenantMemory';
 import {TenantNetwork} from './TenantNetwork/TenantNetwork';
 import {TenantStorage} from './TenantStorage/TenantStorage';
+import i18n from './i18n';
 import {b} from './utils';
 
 import './TenantOverview.scss';
 
 interface TenantOverviewProps {
-    tenantName: string;
+    database: string;
+    databaseFullPath: string;
     additionalTenantProps?: AdditionalTenantsProps;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
 export function TenantOverview({
-    tenantName,
+    database,
+    databaseFullPath,
     additionalTenantProps,
     additionalNodesProps,
 }: TenantOverviewProps) {
@@ -39,19 +43,29 @@ export function TenantOverview({
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const clusterName = useClusterNameFromQuery();
 
+    const isMetaDatabasesAvailable = useDatabasesAvailable();
+
     const {currentData: tenant, isFetching} = tenantApi.useGetTenantInfoQuery(
-        {path: tenantName, clusterName},
+        {database, clusterName, isMetaDatabasesAvailable},
         {pollingInterval: autoRefreshInterval},
     );
     const tenantLoading = isFetching && tenant === undefined;
     const {Name, Type, Overall} = tenant || {};
+    const isServerless = Type === 'Serverless';
+    const activeMetricsTab =
+        isServerless &&
+        metricsTab !== TENANT_METRICS_TABS_IDS.cpu &&
+        metricsTab !== TENANT_METRICS_TABS_IDS.storage
+            ? TENANT_METRICS_TABS_IDS.cpu
+            : metricsTab;
 
     const tenantType = mapDatabaseTypeToDBName(Type);
     // FIXME: remove after correct data is added to tenantInfo
     const {currentData: tenantSchemaData} = overviewApi.useGetOverviewQuery(
         {
-            path: tenantName,
-            database: tenantName,
+            path: databaseFullPath,
+            database,
+            databaseFullPath,
         },
         {
             pollingInterval: autoRefreshInterval,
@@ -88,7 +102,8 @@ export function TenantOverview({
         memoryStats,
         blobStorageStats,
         tabletStorageStats,
-        networkStats,
+        networkUtilization,
+        networkThroughput,
     } = calculateTenantMetrics(tenantData);
 
     const storageMetrics = {
@@ -108,27 +123,47 @@ export function TenantOverview({
                     hasClipboardButton={Boolean(tenant)}
                     clipboardButtonAlwaysVisible
                 />
+                {isServerless ? (
+                    <div className={b('serverless-tag')}>
+                        <Label theme="clear" size="s" className={b('serverless-tag-label')}>
+                            <Flex alignItems="center" gap="2">
+                                {i18n('value_serverless')}
+                                <HelpMark iconSize="s" className={b('serverless-tag-tooltip')}>
+                                    {i18n('context_serverless-tooltip')}
+                                </HelpMark>
+                            </Flex>
+                        </Label>
+                    </div>
+                ) : null}
             </Flex>
         );
     };
 
     const renderTabContent = () => {
-        switch (metricsTab) {
+        switch (activeMetricsTab) {
             case TENANT_METRICS_TABS_IDS.cpu: {
                 return (
                     <TenantCpu
-                        tenantName={tenantName}
+                        database={database}
                         additionalNodesProps={additionalNodesProps}
+                        databaseType={Type}
+                        databaseFullPath={databaseFullPath}
                     />
                 );
             }
             case TENANT_METRICS_TABS_IDS.storage: {
-                return <TenantStorage tenantName={tenantName} metrics={storageMetrics} />;
+                return (
+                    <TenantStorage
+                        database={database}
+                        metrics={storageMetrics}
+                        databaseType={Type}
+                    />
+                );
             }
             case TENANT_METRICS_TABS_IDS.memory: {
                 return (
                     <TenantMemory
-                        tenantName={tenantName}
+                        database={database}
                         memoryUsed={tenantData.MemoryUsed}
                         memoryLimit={tenantData.MemoryLimit}
                         memoryStats={tenantData.MemoryStats}
@@ -138,10 +173,13 @@ export function TenantOverview({
             case TENANT_METRICS_TABS_IDS.network: {
                 return (
                     <TenantNetwork
-                        tenantName={tenantName}
+                        database={database}
                         additionalNodesProps={additionalNodesProps}
                     />
                 );
+            }
+            default: {
+                return null;
             }
         }
     };
@@ -170,19 +208,22 @@ export function TenantOverview({
                         </Flex>
                     </Flex>
                     <Flex direction="column" gap={4}>
-                        <HealthcheckPreview tenantName={tenantName} />
-                        <QueriesActivityBar tenantName={tenantName} />
+                        {!isServerless && <HealthcheckPreview database={database} />}
+                        <QueriesActivityBar database={database} />
                         <MetricsTabs
                             poolsCpuStats={poolsStats}
                             memoryStats={memoryStats}
                             blobStorageStats={blobStorageStats}
                             tabletStorageStats={tabletStorageStats}
-                            networkStats={networkStats}
+                            networkUtilization={networkUtilization}
+                            networkThroughput={networkThroughput}
                             storageGroupsCount={
                                 tenantData.StorageGroups
                                     ? Number(tenantData.StorageGroups)
                                     : undefined
                             }
+                            databaseType={Type}
+                            activeTab={activeMetricsTab}
                         />
                     </Flex>
                 </div>

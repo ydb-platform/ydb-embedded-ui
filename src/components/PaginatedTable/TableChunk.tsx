@@ -66,7 +66,8 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {noBatching} = usePaginatedTableState();
 
-    const columnsIds = columns.map((column) => column.name);
+    //sort ids to prevent refetch if only order was changed
+    const columnsIds = columns.map((column) => column.name).toSorted();
 
     const queryParams = {
         offset: id * chunkSize,

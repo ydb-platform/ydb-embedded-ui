@@ -18,7 +18,7 @@ export function useTenantQueryParams() {
     });
     const handleShowHealthcheckChange = React.useCallback(
         (value?: boolean) => {
-            setQueryParams({showHealthcheck: value}, 'replaceIn');
+            setQueryParams({showHealthcheck: value || undefined}, 'replaceIn');
         },
         [setQueryParams],
     );
@@ -56,7 +56,7 @@ export function useTenantQueryParams() {
     );
     const handleHealthcheckViewChange = React.useCallback(
         (value?: string) => {
-            setQueryParams({view: value || undefined}, 'replaceIn');
+            setQueryParams({view: value}, 'replaceIn');
         },
         [setQueryParams],
     );

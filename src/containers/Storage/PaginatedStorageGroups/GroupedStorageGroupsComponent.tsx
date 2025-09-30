@@ -2,6 +2,7 @@ import React from 'react';
 
 import {ResponseError} from '../../../components/Errors/ResponseError/ResponseError';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
+import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {storageApi} from '../../../store/reducers/storage/storage';
 import type {GroupsGroupByField} from '../../../types/api/storage';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
@@ -174,8 +175,14 @@ export function GroupedStorageGroupsComponent({
                     entitiesCountCurrent={found}
                     entitiesCountTotal={total}
                     entitiesLoading={isLoading}
-                    columnsToSelect={columnsToSelect}
-                    handleSelectedColumnsUpdate={setColumns}
+                />
+            }
+            extraControls={
+                <TableColumnSetup
+                    popupWidth={200}
+                    items={columnsToSelect}
+                    showStatus
+                    onUpdate={setColumns}
                 />
             }
             error={error ? <ResponseError error={error} /> : null}

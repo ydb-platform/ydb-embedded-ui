@@ -48,10 +48,10 @@ export function useGetPreparedVersions({
         if (!currentData) {
             return [];
         }
-        if (Array.isArray(currentData.NodeGroups)) {
-            return parseNodeGroupsToPreparedVersions(currentData.NodeGroups, versionsDataMap);
+        if (Array.isArray(currentData.tableGroups)) {
+            return parseNodeGroupsToPreparedVersions(currentData.tableGroups, versionsDataMap);
         }
-        return parseNodesToPreparedVersions(currentData.Nodes, versionsDataMap);
+        return parseNodesToPreparedVersions(currentData.nodes, versionsDataMap);
     }, [currentData, versionsDataMap, cluster]);
 
     return preparedVersions;

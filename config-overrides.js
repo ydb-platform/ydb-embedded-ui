@@ -17,6 +17,7 @@ module.exports = {
             test: /\.svg$/,
             include: [
                 path.resolve(srcRoot, 'assets/icons'),
+                path.resolve(srcRoot, 'assets/illustrations'),
                 path.resolve(uiKitRoot, 'assets/icons'),
                 uiKitIconsRoot,
             ],

@@ -1,24 +1,23 @@
 import React from 'react';
 
 import {ChevronsCollapseVertical, ChevronsExpandVertical} from '@gravity-ui/icons';
-import {Button, Flex, Icon, SegmentedRadioGroup, Select, Text} from '@gravity-ui/uikit';
+import {Button, Flex, Icon, Select, Text} from '@gravity-ui/uikit';
 import {StringParam, useQueryParams} from 'use-query-params';
 import {z} from 'zod';
 
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {VersionsBar} from '../../components/VersionsBar/VersionsBar';
 import {nodesApi} from '../../store/reducers/nodes/nodes';
-import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
+import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import type {TClusterInfo} from '../../types/api/cluster';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import type {PreparedVersion, VersionsDataMap} from '../../utils/versions/types';
 
 import {GroupedNodesTree} from './GroupedNodesTree/GroupedNodesTree';
-import type {NodeType} from './constants';
-import {NODE_TYPES, NODE_TYPES_TITLE} from './constants';
 import {getGroupedStorageNodes, getGroupedTenantNodes, getOtherNodes} from './groupNodes';
 import i18n from './i18n';
+import type {GroupedNodesItem} from './types';
 import {GroupByValue} from './types';
 import {useGetPreparedVersions, useVersionsDataMap} from './utils';
 
@@ -49,7 +48,7 @@ export function VersionsContainer({cluster, loading}: VersionsContainerProps) {
         <LoaderWrapper loading={loading || isNodesLoading}>
             <Versions
                 preparedVersions={preparedVersions}
-                nodes={currentData?.Nodes}
+                nodes={currentData?.nodes}
                 versionsDataMap={versionsDataMap}
             />
         </LoaderWrapper>
@@ -57,24 +56,19 @@ export function VersionsContainer({cluster, loading}: VersionsContainerProps) {
 }
 
 interface VersionsProps {
-    nodes?: NodesPreparedEntity[];
+    nodes?: PreparedStorageNode[];
     preparedVersions: PreparedVersion[];
     versionsDataMap?: VersionsDataMap;
 }
 
-const nodeTypeSchema = z.nativeEnum(NODE_TYPES).catch(NODE_TYPES.storage);
 const groupByValueSchema = z.nativeEnum(GroupByValue).catch(GroupByValue.VERSION);
 
 function Versions({preparedVersions, nodes, versionsDataMap}: VersionsProps) {
-    const [{nodeType: rawNodeType, groupBy: rawGroupByValue}, setQueryParams] = useQueryParams({
-        nodeType: StringParam,
+    const [{groupBy: rawGroupByValue}, setQueryParams] = useQueryParams({
         groupBy: StringParam,
     });
 
-    const nodeType = nodeTypeSchema.parse(rawNodeType);
     const groupByValue = groupByValueSchema.parse(rawGroupByValue);
-
-    const [expanded, setExpanded] = React.useState(false);
 
     const tenantNodes = React.useMemo(() => {
         return getGroupedTenantNodes(nodes, versionsDataMap, groupByValue);
@@ -89,9 +83,56 @@ function Versions({preparedVersions, nodes, versionsDataMap}: VersionsProps) {
     const handleGroupByValueChange = (value: string) => {
         setQueryParams({groupBy: value as GroupByValue}, 'replaceIn');
     };
-    const handleNodeTypeChange = (value: string) => {
-        setQueryParams({nodeType: value as NodeType}, 'replaceIn');
+
+    const renderGroupControl = () => {
+        const options = [
+            {value: GroupByValue.TENANT, content: i18n('title_database')},
+            {value: GroupByValue.VERSION, content: i18n('title_version')},
+        ];
+        return (
+            <Select
+                label={i18n('group-by')}
+                value={[groupByValue]}
+                options={options}
+                onUpdate={(values) => handleGroupByValueChange(values[0])}
+                width={200}
+                size="m"
+            />
+        );
     };
+
+    return (
+        <Flex className={b()} direction={'column'} gap={6}>
+            <Flex gap={3} direction={'column'} className={b('overall')}>
+                <Text variant="subheader-3">{i18n('title_overall')}</Text>
+                <VersionsBar preparedVersions={preparedVersions} size="m" />
+            </Flex>
+
+            <VersionsSection sectionTitle={i18n('title_storage-nodes')} nodes={storageNodes} />
+            <VersionsSection
+                sectionTitle={i18n('title_database-nodes')}
+                nodes={tenantNodes}
+                renderControls={renderGroupControl}
+            />
+            <VersionsSection sectionTitle={i18n('title_other-nodes')} nodes={otherNodes} />
+        </Flex>
+    );
+}
+
+function VersionsSection({
+    sectionTitle,
+    renderControls,
+    nodes,
+}: {
+    sectionTitle: string;
+    renderControls?: () => React.ReactNode;
+    nodes?: GroupedNodesItem[];
+}) {
+    const [expanded, setExpanded] = React.useState(false);
+
+    if (!nodes?.length) {
+        return null;
+    }
 
     const renderExpandButton = () => {
         return (
@@ -102,154 +143,40 @@ function Versions({preparedVersions, nodes, versionsDataMap}: VersionsProps) {
         );
     };
 
-    const renderNodeTypeRadio = () => {
-        const options = [
-            <SegmentedRadioGroup.Option value={NODE_TYPES.storage}>
-                {NODE_TYPES_TITLE.storage}
-            </SegmentedRadioGroup.Option>,
-            <SegmentedRadioGroup.Option value={NODE_TYPES.database}>
-                {NODE_TYPES_TITLE.database}
-            </SegmentedRadioGroup.Option>,
-        ];
-
-        if (otherNodes?.length) {
-            options.push(
-                <SegmentedRadioGroup.Option value={NODE_TYPES.other}>
-                    {NODE_TYPES_TITLE.other}
-                </SegmentedRadioGroup.Option>,
-            );
-        }
-
-        return (
-            <SegmentedRadioGroup value={nodeType} onUpdate={handleNodeTypeChange}>
-                {options}
-            </SegmentedRadioGroup>
-        );
-    };
-
-    const renderGroupControl = () => {
-        if (nodeType === NODE_TYPES.database) {
-            const options = [
-                {value: GroupByValue.TENANT, content: i18n('title_database')},
-                {value: GroupByValue.VERSION, content: i18n('title_version')},
-            ];
-            return (
-                <Select
-                    label={i18n('group-by')}
-                    value={[groupByValue]}
-                    options={options}
-                    onUpdate={(values) => handleGroupByValueChange(values[0])}
-                    width={200}
-                    size="m"
-                />
-            );
-        }
-        return null;
-    };
-    const renderControls = () => {
-        return (
-            <Flex gap={3} className={b('controls')}>
-                {renderNodeTypeRadio()}
-                {renderGroupControl()}
-                {renderExpandButton()}
-            </Flex>
-        );
-    };
-
-    const renderStorageNodes = () => {
-        if (storageNodes?.length) {
-            return storageNodes.map(({title, nodes: itemNodes, items, versionColor}) => (
+    const renderNodes = () => {
+        return nodes.map(
+            ({
+                title,
+                isDatabase,
+                nodes: itemNodes,
+                items,
+                versionColor,
+                preparedVersions: nodesVersions,
+            }) => (
                 <GroupedNodesTree
-                    key={`storage-nodes-${title}`}
+                    key={title}
                     title={title}
+                    isDatabase={isDatabase}
                     nodes={itemNodes}
                     items={items}
-                    expanded={expanded}
                     versionColor={versionColor}
+                    expanded={expanded}
+                    preparedVersions={nodesVersions}
                 />
-            ));
-        }
-        return null;
+            ),
+        );
     };
-    const renderDatabaseNodes = () => {
-        if (tenantNodes?.length) {
-            return tenantNodes.map(
-                ({
-                    title,
-                    isDatabase,
-                    nodes: itemNodes,
-                    items,
-                    versionColor,
-                    preparedVersions: nodesVersions,
-                }) => (
-                    <GroupedNodesTree
-                        key={`tenant-nodes-${title}`}
-                        title={title}
-                        isDatabase={isDatabase}
-                        nodes={itemNodes}
-                        items={items}
-                        expanded={expanded}
-                        versionColor={versionColor}
-                        preparedVersions={nodesVersions}
-                    />
-                ),
-            );
-        }
-        return null;
-    };
-
-    const renderOtherNodes = () => {
-        if (otherNodes?.length) {
-            return otherNodes.map(
-                ({
-                    title,
-                    nodes: itemNodes,
-                    items,
-                    versionColor,
-                    preparedVersions: nodesVersions,
-                }) => (
-                    <GroupedNodesTree
-                        key={`other-nodes-${title}`}
-                        title={title}
-                        nodes={itemNodes}
-                        items={items}
-                        versionColor={versionColor}
-                        expanded={expanded}
-                        preparedVersions={nodesVersions}
-                    />
-                ),
-            );
-        }
-        return null;
-    };
-
-    const renderContent = () => {
-        switch (nodeType) {
-            case NODE_TYPES.storage:
-                return renderStorageNodes();
-            case NODE_TYPES.database:
-                return renderDatabaseNodes();
-            case NODE_TYPES.other:
-                return renderOtherNodes();
-            default:
-                return null;
-        }
-    };
-
-    const overallContent = (
-        <Flex gap={3} direction={'column'} className={b('overall')}>
-            <Text variant="subheader-3">{i18n('title_overall')}</Text>
-            <VersionsBar preparedVersions={preparedVersions} size="m" />
-        </Flex>
-    );
 
     return (
-        <div className={b()}>
-            {overallContent}
-            {renderControls()}
-            <Flex direction={'column'} gap={3}>
-                {renderContent()}
+        <Flex gap={3} direction={'column'}>
+            <Flex justifyContent={'space-between'}>
+                <Flex gap={3}>
+                    <Text variant="subheader-3">{sectionTitle}</Text>
+                    {renderControls?.()}
+                </Flex>
+                {renderExpandButton()}
             </Flex>
-        </div>
+            {renderNodes()}
+        </Flex>
     );
 }

@@ -1,14 +1,15 @@
 import React from 'react';
 
 import {LoaderWrapper} from '../../../components/LoaderWrapper/LoaderWrapper';
-import type {Column} from '../../../components/PaginatedTable';
+import type {PaginatedTableData} from '../../../components/PaginatedTable';
 import type {NodesColumnId} from '../../../components/nodesColumns/constants';
+import type {NodesColumn} from '../../../components/nodesColumns/types';
 import {
     useCapabilitiesLoaded,
     useViewerNodesHandlerHasGrouping,
 } from '../../../store/reducers/capabilities/hooks';
-import type {NodesPreparedEntity} from '../../../store/reducers/nodes/types';
 import {useProblemFilter} from '../../../store/reducers/settings/hooks';
+import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField} from '../../../types/api/nodes';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
 import {useNodesPageQueryParams} from '../useNodesPageQueryParams';
@@ -20,19 +21,22 @@ import '../Nodes.scss';
 
 export interface PaginatedNodesProps {
     path?: string;
+    databaseFullPath?: string;
     database?: string;
     scrollContainerRef: React.RefObject<HTMLElement>;
     withPeerRoleFilter?: boolean;
-    columns: Column<NodesPreparedEntity>[];
+    columns: NodesColumn[];
     defaultColumnsIds: NodesColumnId[];
     requiredColumnsIds: NodesColumnId[];
     selectedColumnsKey: string;
     groupByParams: NodesGroupByField[];
+    onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
 }
 
 export function PaginatedNodes(props: PaginatedNodesProps) {
     const {uptimeFilter, groupByParam, handleUptimeFilterChange} = useNodesPageQueryParams(
         props.groupByParams,
+        props.withPeerRoleFilter,
     );
 
     const {problemFilter, handleProblemFilterChange} = useProblemFilter();

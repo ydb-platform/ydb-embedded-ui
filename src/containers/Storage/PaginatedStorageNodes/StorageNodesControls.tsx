@@ -1,7 +1,6 @@
 import React from 'react';
 
-import type {TableColumnSetupItem} from '@gravity-ui/uikit';
-import {Select, TableColumnSetup, Text} from '@gravity-ui/uikit';
+import {Select, Text} from '@gravity-ui/uikit';
 
 import {EntitiesCount} from '../../../components/EntitiesCount/EntitiesCount';
 import {usePaginatedTableState} from '../../../components/PaginatedTable/PaginatedTableContext';
@@ -21,9 +20,6 @@ interface StorageControlsProps {
     entitiesCountCurrent: number;
     entitiesCountTotal?: number;
     entitiesLoading: boolean;
-
-    columnsToSelect: TableColumnSetupItem[];
-    handleSelectedColumnsUpdate: (updated: TableColumnSetupItem[]) => void;
 }
 
 export function StorageNodesControls({
@@ -33,9 +29,6 @@ export function StorageNodesControls({
     entitiesCountCurrent,
     entitiesCountTotal,
     entitiesLoading,
-
-    columnsToSelect,
-    handleSelectedColumnsUpdate,
 }: StorageControlsProps) {
     const {
         searchValue,
@@ -74,13 +67,6 @@ export function StorageNodesControls({
             {withGroupBySelect ? null : (
                 <UptimeFilter value={nodesUptimeFilter} onChange={handleUptimeFilterChange} />
             )}
-            <TableColumnSetup
-                popupWidth={200}
-                items={columnsToSelect}
-                showStatus
-                onUpdate={handleSelectedColumnsUpdate}
-                sortable={false}
-            />
             {withGroupBySelect ? (
                 <React.Fragment>
                     <Text variant="body-2">{i18n('controls_group-by-placeholder')}</Text>
@@ -109,13 +95,9 @@ export function StorageNodesControls({
 export function StorageNodesControlsWithTableState({
     withTypeSelector,
     withGroupBySelect,
-    columnsToSelect,
-    handleSelectedColumnsUpdate,
 }: {
     withTypeSelector?: boolean;
     withGroupBySelect?: boolean;
-    columnsToSelect: any[];
-    handleSelectedColumnsUpdate: (updated: any[]) => void;
 }) {
     const {tableState} = usePaginatedTableState();
 
@@ -126,8 +108,6 @@ export function StorageNodesControlsWithTableState({
             entitiesCountCurrent={tableState.foundEntities}
             entitiesCountTotal={tableState.totalEntities}
             entitiesLoading={tableState.isInitialLoad}
-            columnsToSelect={columnsToSelect}
-            handleSelectedColumnsUpdate={handleSelectedColumnsUpdate}
         />
     );
 }

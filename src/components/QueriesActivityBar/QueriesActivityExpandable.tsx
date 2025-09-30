@@ -18,7 +18,7 @@ import './QueriesActivityBar.scss';
 const b = cn('queries-activity-bar');
 
 interface QueriesActivityExpandableProps {
-    tenantName: string;
+    database: string;
     runningQueriesCount: number;
     uniqueApplications: number;
     uniqueUsers: number;
@@ -37,7 +37,7 @@ interface QueriesActivityExpandableProps {
 }
 
 export function QueriesActivityExpandable({
-    tenantName,
+    database,
     runningQueriesCount,
     uniqueApplications,
     uniqueUsers,
@@ -155,7 +155,7 @@ export function QueriesActivityExpandable({
                         </Flex>
                     </Flex>
                 )}
-                <QueriesActivityCharts tenantName={tenantName} expanded={expanded} />
+                <QueriesActivityCharts database={database} expanded={expanded} />
             </Card>
         </div>
     );

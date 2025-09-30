@@ -11,7 +11,7 @@ import type {ChartDataStatus} from '../MetricChart/types';
 const b = cn('queries-activity-bar');
 
 interface QueriesActivityChartsProps {
-    tenantName: string;
+    database: string;
     expanded: boolean;
     onChartDataStatusChange?: (status: ChartDataStatus) => void;
 }
@@ -21,7 +21,7 @@ const QUERIES_PER_SECOND_CHART_HEIGHT = 292;
 const QUERIES_LATENCIES_CHART_HEIGHT = 292 + LEGEND_HEIGHT;
 
 export function QueriesActivityCharts({
-    tenantName,
+    database,
     expanded,
     onChartDataStatusChange,
 }: QueriesActivityChartsProps) {
@@ -74,9 +74,9 @@ export function QueriesActivityCharts({
             direction="row"
             style={{display: expanded ? undefined : 'none'}}
         >
-            <Flex direction="column" gap={3} grow>
+            <Flex direction="column" gap={3} grow basis={0} minWidth={0}>
                 <MetricChart
-                    database={tenantName}
+                    database={database}
                     metrics={queriesChartConfig.metrics}
                     autorefresh={shouldRefresh}
                     height={QUERIES_PER_SECOND_CHART_HEIGHT}
@@ -87,9 +87,9 @@ export function QueriesActivityCharts({
                 />
             </Flex>
 
-            <Flex direction="column" gap={3} grow>
+            <Flex direction="column" gap={3} grow basis={0} minWidth={0}>
                 <MetricChart
-                    database={tenantName}
+                    database={database}
                     metrics={latenciesChartConfig.metrics}
                     autorefresh={shouldRefresh}
                     height={QUERIES_LATENCIES_CHART_HEIGHT}

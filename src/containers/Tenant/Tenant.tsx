@@ -8,7 +8,9 @@ import SplitPane from '../../components/SplitPane';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {overviewApi} from '../../store/reducers/overview/overview';
 import {selectSchemaObjectData} from '../../store/reducers/schema/schema';
+import {useTenantBaseInfo} from '../../store/reducers/tenant/tenant';
 import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../types/additionalProps';
+import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
@@ -55,6 +57,8 @@ export function Tenant(props: TenantProps) {
 
     const {database, schema} = useTenantQueryParams();
 
+    const {name, isLoading: tenantBaseInfoLoading} = useTenantBaseInfo(database ?? '');
+
     if (!database) {
         throw new Error('Tenant name is not defined');
     }
@@ -73,21 +77,23 @@ export function Tenant(props: TenantProps) {
         }
     }, [database]);
 
-    const dispatch = useTypedDispatch();
-    React.useEffect(() => {
-        dispatch(setHeaderBreadcrumbs('tenant', {tenantName: database}));
-    }, [database, dispatch]);
+    const databaseName = name ?? '';
 
-    const path = schema ?? database;
+    const path = schema ?? databaseName;
 
     const {
         currentData: currentItem,
         error,
         isLoading,
-    } = overviewApi.useGetOverviewQuery({path, database: database});
+    } = overviewApi.useGetOverviewQuery({path, database, databaseFullPath: databaseName});
+
+    const dispatch = useTypedDispatch();
+    React.useEffect(() => {
+        dispatch(setHeaderBreadcrumbs('tenant', {databaseName, database}));
+    }, [databaseName, database, dispatch]);
 
     const preloadedData = useTypedSelector((state) =>
-        selectSchemaObjectData(state, path, database),
+        selectSchemaObjectData(state, path, database, databaseName),
     );
 
     // Use preloaded data if there is no current item data yet
@@ -99,6 +105,8 @@ export function Tenant(props: TenantProps) {
         preloadedData?.PathDescription?.Self?.PathSubType;
 
     const showBlockingError = isAccessError(error);
+
+    const errorProps = showBlockingError ? uiFactory.clusterOrDatabaseAccessError : undefined;
 
     const onCollapseSummaryHandler = () => {
         dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.triggerCollapse);
@@ -112,7 +120,7 @@ export function Tenant(props: TenantProps) {
     };
 
     const [initialLoading, setInitialLoading] = React.useState(true);
-    if (initialLoading && !isLoading) {
+    if (initialLoading && !isLoading && !tenantBaseInfoLoading) {
         setInitialLoading(false);
     }
 
@@ -125,12 +133,13 @@ export function Tenant(props: TenantProps) {
                 titleTemplate={`%s — ${title} — ${appTitle}`}
             />
             <LoaderWrapper loading={initialLoading}>
-                <PageError error={showBlockingError ? error : undefined}>
+                <PageError error={showBlockingError ? error : undefined} {...errorProps}>
                     <TenantContextProvider
                         database={database}
                         path={path}
                         type={currentPathType}
                         subType={currentPathSubType}
+                        databaseFullPath={databaseName}
                     >
                         <TenantDrawerWrapper>
                             <SplitPane

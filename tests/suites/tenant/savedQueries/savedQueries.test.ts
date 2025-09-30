@@ -1,7 +1,7 @@
 import {expect, test} from '@playwright/test';
 import {v4 as uuidv4} from 'uuid';
 
-import {dsVslotsSchema, tenantName} from '../../../utils/constants';
+import {database, dsVslotsSchema} from '../../../utils/constants';
 import {TenantPage} from '../TenantPage';
 import {QueryTabs} from '../queryEditor/models/QueryEditor';
 
@@ -11,7 +11,7 @@ test.describe('Saved Queries', () => {
     test.beforeEach(async ({page}) => {
         const pageQueryParams = {
             schema: dsVslotsSchema,
-            database: tenantName,
+            database,
             general: 'query',
         };
 

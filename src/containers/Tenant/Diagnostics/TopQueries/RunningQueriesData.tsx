@@ -1,10 +1,10 @@
 import React from 'react';
 
 import type {Column} from '@gravity-ui/react-data-table';
-import {TableColumnSetup} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {Search} from '../../../../components/Search';
+import {TableColumnSetup} from '../../../../components/TableColumnSetup/TableColumnSetup';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {topQueriesApi} from '../../../../store/reducers/executeTopQueries/executeTopQueries';
 import type {KeyValueRow} from '../../../../types/api/query';
@@ -29,13 +29,13 @@ import {TOP_QUERIES_TABLE_SETTINGS} from './utils';
 const b = cn('kv-top-queries');
 
 interface RunningQueriesDataProps {
-    tenantName: string;
+    database: string;
     renderQueryModeControl: () => React.ReactNode;
     handleTextSearchUpdate: (text: string) => void;
 }
 
 export const RunningQueriesData = ({
-    tenantName,
+    database,
     renderQueryModeControl,
     handleTextSearchUpdate,
 }: RunningQueriesDataProps) => {
@@ -60,7 +60,7 @@ export const RunningQueriesData = ({
 
     const {currentData, isFetching, isLoading, error} = topQueriesApi.useGetRunningQueriesQuery(
         {
-            database: tenantName,
+            database,
             filters,
             sortOrder: backendSort,
         },
@@ -71,9 +71,20 @@ export const RunningQueriesData = ({
 
     const inputRef = React.useRef<HTMLInputElement>(null);
 
+    const renderExtraControls = () => {
+        return (
+            <TableColumnSetup
+                popupWidth={200}
+                items={columnsToSelect}
+                showStatus
+                onUpdate={setColumns}
+            />
+        );
+    };
+
     return (
         <TableWithControlsLayout>
-            <TableWithControlsLayout.Controls>
+            <TableWithControlsLayout.Controls renderExtraControls={renderExtraControls}>
                 {renderQueryModeControl()}
                 <Search
                     value={filters.text}
@@ -81,13 +92,6 @@ export const RunningQueriesData = ({
                     placeholder={i18n('filter.text.placeholder')}
                     className={b('search')}
                     inputRef={inputRef}
-                />
-                <TableColumnSetup
-                    popupWidth={200}
-                    items={columnsToSelect}
-                    showStatus
-                    onUpdate={setColumns}
-                    sortable={false}
                 />
             </TableWithControlsLayout.Controls>
 

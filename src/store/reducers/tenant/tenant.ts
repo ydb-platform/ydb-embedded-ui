@@ -6,6 +6,7 @@ import type {TTenantInfo} from '../../../types/api/tenant';
 import {TENANT_INITIAL_PAGE_KEY} from '../../../utils/constants';
 import {useClusterNameFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {api} from '../api';
+import {useDatabasesAvailable} from '../capabilities/hooks';
 import {prepareTenants} from '../tenants/utils';
 
 import {TENANT_DIAGNOSTICS_TABS_IDS, TENANT_METRICS_TABS_IDS} from './constants';
@@ -62,58 +63,76 @@ export const tenantApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getTenantInfo: builder.query({
             queryFn: async (
-                {path, clusterName}: {path: string; clusterName?: string},
+                {
+                    database,
+                    clusterName,
+                    isMetaDatabasesAvailable,
+                }: {
+                    database: string;
+                    clusterName?: string;
+                    isMetaDatabasesAvailable: boolean;
+                },
                 {signal},
             ) => {
                 try {
                     let tenantData: TTenantInfo;
-                    if (window.api.meta && clusterName) {
+                    if (window.api.meta && clusterName && isMetaDatabasesAvailable) {
+                        tenantData = await window.api.meta.getTenantsV2(
+                            {database, clusterName},
+                            {signal},
+                        );
+                    } else if (window.api.meta && clusterName) {
                         tenantData = await window.api.meta.getTenants(
-                            {databaseName: path, clusterName},
+                            {database, clusterName},
                             {signal},
                         );
                     } else {
-                        tenantData = await window.api.viewer.getTenantInfo({path}, {signal});
+                        tenantData = await window.api.viewer.getTenantInfo({database}, {signal});
                     }
                     const databases = prepareTenants(tenantData.TenantInfo || []);
                     // previous meta versions do not support filtering databases by name
                     const data =
-                        databases.find((tenant) => tenant.Name === path) ?? databases[0] ?? null;
+                        databases.find(
+                            (tenant) => tenant.Name === database || tenant.Id === database,
+                        ) ??
+                        databases[0] ??
+                        null;
                     return {data};
                 } catch (error) {
                     return {error};
                 }
             },
             providesTags: ['All'],
-        }),
-        getClusterConfig: builder.query({
-            queryFn: async ({database}: {database: string}, {signal}) => {
-                try {
-                    const res = await window.api.viewer.getClusterConfig(database, {signal});
-                    const db = res.Databases[0];
-
-                    return {data: db.FeatureFlags};
-                } catch (error) {
-                    return {error};
-                }
+            serializeQueryArgs: ({queryArgs}) => {
+                const {clusterName, database} = queryArgs;
+                return {clusterName, database};
             },
-            providesTags: ['All'],
         }),
     }),
     overrideExisting: 'throw',
 });
 
-export function useTenantBaseInfo(path: string) {
+export function useTenantBaseInfo(database: string) {
     const clusterNameFromQuery = useClusterNameFromQuery();
+    const isMetaDatabasesAvailable = useDatabasesAvailable();
 
-    const {currentData} = tenantApi.useGetTenantInfoQuery({
-        path,
-        clusterName: clusterNameFromQuery,
-    });
+    const {currentData, isLoading, isError} = tenantApi.useGetTenantInfoQuery(
+        {
+            database,
+            clusterName: clusterNameFromQuery,
+            isMetaDatabasesAvailable,
+        },
+        {skip: !database},
+    );
 
-    const {ControlPlane} = currentData || {};
+    const {ControlPlane, Name, Id, Type} = currentData || {};
 
     return {
         controlPlane: ControlPlane,
+        name: Name,
+        id: Id,
+        databaseType: Type,
+        isLoading,
+        isError,
     };
 }

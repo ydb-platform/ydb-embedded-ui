@@ -28,5 +28,9 @@
     }
     &__children-wrapper {
         cursor: pointer;
+
+        &_full-width {
+            width: 100%;
+        }
     }
 }

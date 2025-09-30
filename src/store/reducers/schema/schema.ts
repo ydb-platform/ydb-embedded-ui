@@ -33,11 +33,14 @@ export const {selectShowPreview} = slice.selectors;
 
 export const schemaApi = api.injectEndpoints({
     endpoints: (builder) => ({
-        createDirectory: builder.mutation<unknown, {database: string; path: string}>({
-            queryFn: async ({database, path}, {signal}) => {
+        createDirectory: builder.mutation<
+            unknown,
+            {database: string; path: string; databaseFullPath: string}
+        >({
+            queryFn: async ({database, path, databaseFullPath}, {signal}) => {
                 try {
                     const data = await window.api.scheme.createSchemaDirectory(
-                        {database, path},
+                        {database, path: {path, databaseFullPath}},
                         {signal},
                     );
                     return {data};
@@ -48,11 +51,14 @@ export const schemaApi = api.injectEndpoints({
         }),
         getSchema: builder.query<
             {[path: string]: TEvDescribeSchemeResult & {partial?: boolean}},
-            {path: string; database: string}
+            {path: string; database: string; databaseFullPath: string}
         >({
-            queryFn: async ({path, database}, {signal}) => {
+            queryFn: async ({path, database, databaseFullPath}, {signal}) => {
                 try {
-                    const data = await window.api.viewer.getSchema({path, database}, {signal});
+                    const data = await window.api.viewer.getSchema(
+                        {path: {path, databaseFullPath}, database},
+                        {signal},
+                    );
                     if (!data) {
                         return {error: new Error('Schema is not available')};
                     }
@@ -92,10 +98,19 @@ function getSchemaChildren(data: TEvDescribeSchemeResult) {
     return children;
 }
 
-export function useGetSchemaQuery({path, database}: {path: string; database: string}) {
+export function useGetSchemaQuery({
+    path,
+    database,
+    databaseFullPath,
+}: {
+    path: string;
+    database: string;
+    databaseFullPath: string;
+}) {
     const {currentData, isFetching, error, refetch, originalArgs} = schemaApi.useGetSchemaQuery({
         path,
         database,
+        databaseFullPath,
     });
 
     const data = currentData?.[path];
@@ -113,15 +128,20 @@ export function useGetSchemaQuery({path, database}: {path: string; database: str
 }
 
 const getSchemaSelector = createSelector(
-    (path: string) => path,
-    (_path: string, database: string) => database,
-    (path, database) => schemaApi.endpoints.getSchema.select({path, database}),
+    [
+        (path: string) => path,
+        (_path: string, database: string) => database,
+        (_path: string, _database: string, databaseFullPath: string) => databaseFullPath,
+    ],
+    (path, database, databaseFullPath) =>
+        schemaApi.endpoints.getSchema.select({path, database, databaseFullPath}),
 );
 
 export const selectSchemaObjectData = createSelector(
     (state: RootState) => state,
     (_state: RootState, path: string) => path,
-    (_state: RootState, path: string, database: string) => getSchemaSelector(path, database),
+    (_state: RootState, path: string, database: string, databaseFullPath: string) =>
+        getSchemaSelector(path, database, databaseFullPath),
     (state, path, selectSchemaData) => {
         return selectSchemaData(state).data?.[path];
     },

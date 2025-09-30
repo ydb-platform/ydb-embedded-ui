@@ -1,5 +1,3 @@
-import type {Column} from '@gravity-ui/react-data-table';
-
 import {ResizeableDataTable} from '../../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {
     getHostColumn,
@@ -11,9 +9,11 @@ import {
     NODES_COLUMNS_TO_DATA_FIELDS,
     NODES_COLUMNS_WIDTH_LS_KEY,
 } from '../../../../../components/nodesColumns/constants';
-import type {GetNodesColumnsParams} from '../../../../../components/nodesColumns/types';
+import type {
+    GetNodesColumnsParams,
+    NodesColumn,
+} from '../../../../../components/nodesColumns/types';
 import {nodesApi} from '../../../../../store/reducers/nodes/nodes';
-import type {NodesPreparedEntity} from '../../../../../store/reducers/nodes/types';
 import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import type {NodesRequiredField} from '../../../../../types/api/nodes';
 import {
@@ -27,17 +27,17 @@ import i18n from '../i18n';
 
 function getTopNodesByLoadColumns(
     params: GetNodesColumnsParams,
-): [Column<NodesPreparedEntity>[], NodesRequiredField[]] {
-    const hostColumn = {
-        ...getHostColumn<NodesPreparedEntity>(params),
+): [NodesColumn[], NodesRequiredField[]] {
+    const hostColumn: NodesColumn = {
+        ...getHostColumn(params),
         width: undefined,
     };
 
-    const columns = [
-        getLoadColumn<NodesPreparedEntity>(),
-        getNodeIdColumn<NodesPreparedEntity>(),
+    const columns: NodesColumn[] = [
+        getLoadColumn(),
+        getNodeIdColumn(),
         hostColumn,
-        getVersionColumn<NodesPreparedEntity>(),
+        getVersionColumn(),
     ];
 
     const columnsIds = columns.map((column) => column.name);
@@ -47,20 +47,20 @@ function getTopNodesByLoadColumns(
 }
 
 interface TopNodesByLoadProps {
-    tenantName: string;
+    database: string;
     additionalNodesProps?: AdditionalNodesProps;
 }
 
-export function TopNodesByLoad({tenantName, additionalNodesProps}: TopNodesByLoadProps) {
+export function TopNodesByLoad({database, additionalNodesProps}: TopNodesByLoadProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const [columns, fieldsRequired] = getTopNodesByLoadColumns({
         getNodeRef: additionalNodesProps?.getNodeRef,
-        database: tenantName,
+        database,
     });
 
     const {currentData, isFetching, error} = nodesApi.useGetNodesQuery(
         {
-            tenant: tenantName,
+            tenant: database,
             type: 'any',
             sort: '-LoadAverage',
             limit: TENANT_OVERVIEW_TABLES_LIMIT,
@@ -72,7 +72,7 @@ export function TopNodesByLoad({tenantName, additionalNodesProps}: TopNodesByLoa
 
     const loading = isFetching && currentData === undefined;
 
-    const topNodes = currentData?.Nodes || [];
+    const topNodes = currentData?.nodes || [];
 
     return (
         <TenantOverviewTableLayout loading={loading} error={error} withData={Boolean(currentData)}>

@@ -57,12 +57,19 @@ const isSingleClusterMode = `${metaBackend}` === 'undefined';
 export function configureStore({
     aRootReducer = rootReducer,
     singleClusterMode = isSingleClusterMode,
-    api = new YdbEmbeddedAPI({webVersion, withCredentials: !customBackend}),
-    getBackend = (params: ReturnType<typeof getUrlData>) => params.backend,
+    api = new YdbEmbeddedAPI({
+        webVersion,
+        singleClusterMode: isSingleClusterMode,
+        withCredentials: !customBackend,
+        proxyMeta: false,
+        csrfTokenGetter: undefined,
+        useRelativePath: false,
+        defaults: undefined,
+    }),
 } = {}) {
     const params = getUrlData({singleClusterMode, customBackend});
     ({basename, clusterName} = params);
-    backend = getBackend(params);
+    backend = params.backend;
     const history = createBrowserHistory({basename});
 
     const store = _configureStore(aRootReducer, history, {singleClusterMode}, [

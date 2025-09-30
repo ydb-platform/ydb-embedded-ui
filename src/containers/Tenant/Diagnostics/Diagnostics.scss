@@ -26,6 +26,10 @@
     }
 
     &__page-wrapper {
+        --ydb-configs-controls-height: 46px;
+        --ydb-configs-container-height: 100cqh;
+        --ydb-table-with-controls-layout-controls-height: 44px;
+        --ydb-table-with-controls-layout-controls-padding-top: 0px;
         overflow: auto;
         flex-grow: 1;
 
@@ -37,16 +41,8 @@
         margin-top: var(--diagnostics-margin-top);
         padding: 0 var(--g-spacing-5);
 
-        .ydb-table-with-controls-layout {
-            &__controls {
-                height: 46px;
-                padding-top: 0;
-            }
-
-            .data-table__sticky_moving,
-            .ydb-paginated-table__head {
-                top: 46px !important;
-            }
-        }
+        // Use container query units to fix the height to this specific container
+        // This prevents inheritance issues with percentage-based calculations
+        container-type: size;
     }
 }

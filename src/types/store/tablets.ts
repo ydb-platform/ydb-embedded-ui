@@ -1,6 +1,8 @@
+import type {SchemaPathParam} from '../api/common';
+
 export interface TabletsApiRequestParams {
     nodeId?: string | number;
-    path?: string;
+    path?: SchemaPathParam;
     database?: string;
     filter?: string;
 }

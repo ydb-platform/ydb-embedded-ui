@@ -20,6 +20,7 @@ import {
     useMetaCapabilitiesQuery,
 } from '../../store/reducers/capabilities/hooks';
 import {nodesListApi} from '../../store/reducers/nodesList';
+import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {lazyComponent} from '../../utils/lazyComponent';
@@ -28,6 +29,7 @@ import Authentication from '../Authentication/Authentication';
 import {getClusterPath} from '../Cluster/utils';
 import Header from '../Header/Header';
 
+import {useAppTitle} from './AppTitleContext';
 import {
     ClusterSlot,
     ClustersSlot,
@@ -192,10 +194,15 @@ function DataWrapper({children}: {children: React.ReactNode}) {
 function GetUser({children}: {children: React.ReactNode}) {
     const database = useDatabaseFromQuery();
     const {isLoading, error} = authenticationApi.useWhoamiQuery({database});
+    const {appTitle} = useAppTitle();
+
+    const errorProps = error ? {...uiFactory.clusterOrDatabaseAccessError} : undefined;
 
     return (
         <LoaderWrapper loading={isLoading} size="l">
-            <PageError error={error}>{children}</PageError>
+            <PageError error={error} {...errorProps} errorPageTitle={appTitle}>
+                {children}
+            </PageError>
         </LoaderWrapper>
     );
 }

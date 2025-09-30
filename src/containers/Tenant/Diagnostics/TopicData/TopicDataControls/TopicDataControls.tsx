@@ -4,7 +4,6 @@ import type {Value} from '@gravity-ui/date-components';
 import {RelativeDatePicker} from '@gravity-ui/date-components';
 import {dateTimeParse} from '@gravity-ui/date-utils';
 import {CircleChevronDownFill} from '@gravity-ui/icons';
-import type {TableColumnSetupItem} from '@gravity-ui/uikit';
 import {
     ActionTooltip,
     Button,
@@ -13,12 +12,11 @@ import {
     Icon,
     SegmentedRadioGroup,
     Select,
-    TableColumnSetup,
     Text,
 } from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
-import {DebouncedInput} from '../../../../../components/DebouncedInput/DebouncedTextInput';
+import {DebouncedNumberInput} from '../../../../../components/DebouncedInput/DebouncedNumerInput';
 import type {PreparedPartitionData} from '../../../../../store/reducers/partitions/types';
 import {formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {prepareErrorMessage} from '../../../../../utils/prepareErrorMessage';
@@ -30,9 +28,6 @@ import {TopicDataFilterValues} from '../utils/types';
 import type {TopicDataFilterValue} from '../utils/types';
 
 interface TopicDataControlsProps {
-    columnsToSelect: TableColumnSetupItem[];
-    handleSelectedColumnsUpdate: (updated: TableColumnSetupItem[]) => void;
-
     partitions?: PreparedPartitionData[];
     partitionsLoading: boolean;
     partitionsError: unknown;
@@ -45,8 +40,6 @@ interface TopicDataControlsProps {
 }
 
 export function TopicDataControls({
-    columnsToSelect,
-    handleSelectedColumnsUpdate,
     handlePartitionChange,
 
     startOffset,
@@ -89,13 +82,6 @@ export function TopicDataControls({
                     {truncatedData && <HelpMark>{i18n('description_last-messages')}</HelpMark>}
                 </Flex>
             )}
-            <TableColumnSetup
-                popupWidth={242}
-                items={columnsToSelect}
-                showStatus
-                onUpdate={handleSelectedColumnsUpdate}
-                sortable={false}
-            />
         </React.Fragment>
     );
 }
@@ -137,7 +123,7 @@ function TopicDataStartControls({scrollToOffset}: TopicDataStartControlsProps) {
         [handleTopicDataFilterChange, handleSelectedOffsetChange, handleStartTimestampChange],
     );
     const onStartOffsetChange = React.useCallback(
-        (value: string) => {
+        (value: number | null) => {
             handleSelectedOffsetChange(value);
         },
         [handleSelectedOffsetChange],
@@ -176,19 +162,20 @@ function TopicDataStartControls({scrollToOffset}: TopicDataStartControlsProps) {
                 </SegmentedRadioGroup.Option>
             </SegmentedRadioGroup>
             {topicDataFilter === 'OFFSET' && (
-                <DebouncedInput
+                <DebouncedNumberInput
                     controlRef={inputRef}
                     className={b('offset-input')}
-                    value={selectedOffset ? String(selectedOffset) : ''}
+                    max={Number.MAX_SAFE_INTEGER}
+                    min={0}
+                    value={isNil(selectedOffset) ? null : safeParseNumber(selectedOffset)}
                     onUpdate={onStartOffsetChange}
                     label={i18n('label_from')}
                     placeholder={i18n('label_offset')}
-                    type="number"
                     debounce={600}
                     endContent={
                         <ActionTooltip title={i18n('action_scroll-selected')}>
                             <Button
-                                disabled={isNil(selectedOffset) || selectedOffset === ''}
+                                disabled={isNil(selectedOffset)}
                                 className={b('scroll-button')}
                                 view="flat-action"
                                 size="xs"

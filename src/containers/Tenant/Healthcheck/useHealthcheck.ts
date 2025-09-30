@@ -3,6 +3,7 @@ import {
     selectLeavesIssues,
 } from '../../../store/reducers/healthcheckInfo/healthcheckInfo';
 import type {IssuesTree} from '../../../store/reducers/healthcheckInfo/types';
+import {useTenantBaseInfo} from '../../../store/reducers/tenant/tenant';
 import {SelfCheckResult} from '../../../types/api/healthcheck';
 import {useTypedSelector} from '../../../utils/hooks';
 
@@ -16,9 +17,10 @@ interface HealthcheckParams {
 }
 
 export const useHealthcheck = (
-    tenantName: string,
+    database: string,
     {autorefresh}: {autorefresh?: number} = {},
 ): HealthcheckParams => {
+    const {databaseType} = useTenantBaseInfo(database);
     const {
         currentData: data,
         isFetching,
@@ -26,14 +28,15 @@ export const useHealthcheck = (
         refetch,
         fulfilledTimeStamp,
     } = healthcheckApi.useGetHealthcheckInfoQuery(
-        {database: tenantName},
+        {database},
         {
             pollingInterval: autorefresh,
+            skip: databaseType === 'Serverless',
         },
     );
 
     const selfCheckResult = data?.self_check_result || SelfCheckResult.UNSPECIFIED;
-    const leavesIssues = useTypedSelector((state) => selectLeavesIssues(state, tenantName));
+    const leavesIssues = useTypedSelector((state) => selectLeavesIssues(state, database));
 
     return {
         loading: data === undefined && isFetching,

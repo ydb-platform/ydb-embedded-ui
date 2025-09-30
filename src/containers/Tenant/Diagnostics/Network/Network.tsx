@@ -28,9 +28,10 @@ import './Network.scss';
 const b = cn('network');
 
 interface NetworkProps {
-    tenantName: string;
+    database: string;
+    databaseFullPath: string;
 }
-export function Network({tenantName}: NetworkProps) {
+export function Network({database, databaseFullPath}: NetworkProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const filter = useTypedSelector(selectProblemFilter);
     const dispatch = useTypedDispatch();
@@ -39,9 +40,12 @@ export function Network({tenantName}: NetworkProps) {
     const [showId, setShowId] = React.useState(false);
     const [showRacks, setShowRacks] = React.useState(false);
 
-    const {currentData, isFetching, error} = networkApi.useGetNetworkInfoQuery(tenantName, {
-        pollingInterval: autoRefreshInterval,
-    });
+    const {currentData, isFetching, error} = networkApi.useGetNetworkInfoQuery(
+        {database, databaseFullPath},
+        {
+            pollingInterval: autoRefreshInterval,
+        },
+    );
     const loading = isFetching && currentData === undefined;
 
     if (loading) {
@@ -298,7 +302,7 @@ function Nodes({nodes, isRight, showId, showRacks, clickedNode, onClickNode}: No
     });
 
     if (filter === ProblemFilterValues.PROBLEMS && problemNodesCount === 0) {
-        return <Illustration name="thumbsUp" width="200" />;
+        return <Illustration name="thumbsUp" width={200} />;
     } else {
         return result;
     }

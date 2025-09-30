@@ -1,15 +1,35 @@
+import React from 'react';
+
 import {skipToken} from '@reduxjs/toolkit/query';
+import {isNil} from 'lodash';
 
 import {selectTabletsWithFqdn, tabletsApi} from '../../store/reducers/tablets';
+import {ETabletState} from '../../types/api/tablet';
 import type {TabletsApiRequestParams} from '../../types/store/tablets';
 import {valueIsDefined} from '../../utils';
 import {useAutoRefreshInterval, useTypedSelector} from '../../utils/hooks';
 
 import {TabletsTable} from './TabletsTable';
 
+const activeStatuses: ETabletState[] = [
+    ETabletState.Created,
+    ETabletState.ResolveStateStorage,
+    ETabletState.Candidate,
+    ETabletState.BlockBlobStorage,
+    ETabletState.RebuildGraph,
+    ETabletState.WriteZeroEntry,
+    ETabletState.Restored,
+    ETabletState.Discover,
+    ETabletState.Lock,
+    ETabletState.Active,
+    ETabletState.ResolveLeader,
+    ETabletState.Terminating,
+];
+
 interface TabletsProps {
     path?: string;
     database?: string;
+    databaseFullPath?: string;
     nodeId?: string | number;
     /**
      * Show/hide dead tablets: shown in pages needing complete statistics,
@@ -19,16 +39,30 @@ interface TabletsProps {
     scrollContainerRef: React.RefObject<HTMLElement>;
 }
 
-export function Tablets({nodeId, path, database, onlyActive, scrollContainerRef}: TabletsProps) {
+export function Tablets({
+    nodeId,
+    path,
+    database,
+    databaseFullPath,
+    onlyActive,
+    scrollContainerRef,
+}: TabletsProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     let params: TabletsApiRequestParams = {};
-    const filter = onlyActive ? `(State!=Dead)` : undefined;
+    const filter = onlyActive ? `(State=[${activeStatuses.join(',')}])` : undefined;
+
+    const schemaPathParam = React.useMemo(() => {
+        if (!isNil(path) && !isNil(databaseFullPath)) {
+            return {path, databaseFullPath};
+        }
+        return undefined;
+    }, [path, databaseFullPath]);
 
     if (valueIsDefined(nodeId)) {
         params = {nodeId, database, filter};
-    } else if (path) {
-        params = {path, database, filter};
+    } else if (schemaPathParam) {
+        params = {path: schemaPathParam, database, filter};
     }
     const {isLoading, error} = tabletsApi.useGetTabletsInfoQuery(
         Object.keys(params).length === 0 ? skipToken : params,

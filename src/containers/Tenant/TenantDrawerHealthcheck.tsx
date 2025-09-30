@@ -4,7 +4,7 @@ import {ArrowDownToLine} from '@gravity-ui/icons';
 import {ActionTooltip, Button, Flex, Icon, Text} from '@gravity-ui/uikit';
 
 import {DrawerWrapper} from '../../components/Drawer';
-import EnableFullscreenButton from '../../components/EnableFullscreenButton/EnableFullscreenButton';
+import {EnableFullscreenButton} from '../../components/EnableFullscreenButton/EnableFullscreenButton';
 import {
     selectAllHealthcheckInfo,
     selectCheckStatus,
@@ -45,7 +45,7 @@ export function TenantDrawerHealthcheck({children}: TenantDrawerWrapperProps) {
     }, [handleShowHealthcheckChange, handleIssuesFilterChange, handleHealthcheckViewChange]);
 
     const renderDrawerContent = React.useCallback(() => {
-        return <Healthcheck tenantName={database} />;
+        return <Healthcheck database={database} />;
     }, [database]);
 
     return (

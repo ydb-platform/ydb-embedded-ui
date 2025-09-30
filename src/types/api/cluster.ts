@@ -100,7 +100,7 @@ function isClusterParticularVersionOrHigher(info: TClusterInfo | undefined, vers
 export enum BridgePileState {
     UNSPECIFIED = 'UNSPECIFIED',
     PRIMARY = 'PRIMARY',
-    PROMOTE = 'PROMOTE',
+    PROMOTED = 'PROMOTED',
     SYNCHRONIZED = 'SYNCHRONIZED',
     NOT_SYNCHRONIZED = 'NOT_SYNCHRONIZED',
     SUSPENDED = 'SUSPENDED',

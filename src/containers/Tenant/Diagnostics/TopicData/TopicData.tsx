@@ -6,14 +6,15 @@ import {isNil} from 'lodash';
 
 import {DrawerWrapper} from '../../../../components/Drawer';
 import {EmptyFilter} from '../../../../components/EmptyFilter/EmptyFilter';
-import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
+import {EnableFullscreenButton} from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import {PageError} from '../../../../components/Errors/PageError/PageError';
-import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
+import {Fullscreen} from '../../../../components/Fullscreen/Fullscreen';
 import {
     DEFAULT_TABLE_ROW_HEIGHT,
     ResizeablePaginatedTable,
 } from '../../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../../components/PaginatedTable/PaginatedTableWithLayout';
+import {TableColumnSetup} from '../../../../components/TableColumnSetup/TableColumnSetup';
 import {partitionsApi} from '../../../../store/reducers/partitions/partitions';
 import {topicApi} from '../../../../store/reducers/topic';
 import type {TopicDataRequest} from '../../../../types/api/topic';
@@ -45,13 +46,14 @@ import './TopicData.scss';
 interface TopicDataProps {
     path: string;
     database: string;
+    databaseFullPath: string;
     scrollContainerRef: React.RefObject<HTMLElement>;
 }
 const PAGINATED_TABLE_LIMIT = 50_000;
 
 const columns = getAllColumns();
 
-export function TopicData({scrollContainerRef, path, database}: TopicDataProps) {
+export function TopicData({scrollContainerRef, path, database, databaseFullPath}: TopicDataProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const [startOffset, setStartOffset] = React.useState<number>();
     const [endOffset, setEndOffset] = React.useState<number>();
@@ -105,7 +107,7 @@ export function TopicData({scrollContainerRef, path, database}: TopicDataProps) 
         isLoading: partitionsLoading,
         error: partitionsError,
     } = partitionsApi.useGetPartitionsQuery(
-        {path, database},
+        {path, database, databaseFullPath},
         {pollingInterval: autoRefreshInterval},
     );
 
@@ -247,8 +249,6 @@ export function TopicData({scrollContainerRef, path, database}: TopicDataProps) 
             <TopicDataControls
                 // component has uncontrolled components inside, so it should be rerendered on filters reset
                 key={controlsKey}
-                columnsToSelect={columnsToSelect}
-                handleSelectedColumnsUpdate={setColumns}
                 handlePartitionChange={handlePartitionChange}
                 partitions={partitions}
                 partitionsLoading={partitionsLoading}
@@ -260,18 +260,27 @@ export function TopicData({scrollContainerRef, path, database}: TopicDataProps) 
             />
         );
     }, [
-        columnsToSelect,
         controlsKey,
         endOffset,
         partitions,
         partitionsError,
         partitionsLoading,
         scrollToOffset,
-        setColumns,
         startOffset,
         truncated,
         handlePartitionChange,
     ]);
+
+    const renderExtraControls = React.useCallback(() => {
+        return (
+            <TableColumnSetup
+                popupWidth={242}
+                items={columnsToSelect}
+                showStatus
+                onUpdate={setColumns}
+            />
+        );
+    }, [columnsToSelect, setColumns]);
 
     const renderEmptyDataMessage = () => {
         const hasFilters = selectedOffset || startTimestamp;
@@ -333,6 +342,7 @@ export function TopicData({scrollContainerRef, path, database}: TopicDataProps) 
             >
                 <PaginatedTableWithLayout
                     controls={renderControls()}
+                    extraControls={renderExtraControls()}
                     table={
                         <ResizeablePaginatedTable
                             columnsWidthLSKey={TOPIC_DATA_COLUMNS_WIDTH_LS_KEY}
@@ -350,7 +360,7 @@ export function TopicData({scrollContainerRef, path, database}: TopicDataProps) 
                             getRowClassName={(row) => {
                                 return b('row', {
                                     active: Boolean(
-                                        String(row.Offset) === selectedOffset ||
+                                        safeParseNumber(row.Offset) === selectedOffset ||
                                             String(row.Offset) === activeOffset,
                                     ),
                                     removed: row.removed,

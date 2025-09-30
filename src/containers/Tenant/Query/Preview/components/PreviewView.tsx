@@ -3,8 +3,8 @@ import React from 'react';
 import {Xmark} from '@gravity-ui/icons';
 import {Button, Flex, Icon, Text} from '@gravity-ui/uikit';
 
-import EnableFullscreenButton from '../../../../../components/EnableFullscreenButton/EnableFullscreenButton';
-import Fullscreen from '../../../../../components/Fullscreen/Fullscreen';
+import {EnableFullscreenButton} from '../../../../../components/EnableFullscreenButton/EnableFullscreenButton';
+import {Fullscreen} from '../../../../../components/Fullscreen/Fullscreen';
 import {LoaderWrapper} from '../../../../../components/LoaderWrapper/LoaderWrapper';
 import {setShowPreview} from '../../../../../store/reducers/schema/schema';
 import {useTypedDispatch} from '../../../../../utils/hooks';

@@ -5,8 +5,8 @@ import type {Settings} from '@gravity-ui/react-data-table';
 import type {ControlGroupOption} from '@gravity-ui/uikit';
 import {ClipboardButton, Flex, SegmentedRadioGroup, Text} from '@gravity-ui/uikit';
 
-import EnableFullscreenButton from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
-import Fullscreen from '../../../../components/Fullscreen/Fullscreen';
+import {EnableFullscreenButton} from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
+import {Fullscreen} from '../../../../components/Fullscreen/Fullscreen';
 import {Illustration} from '../../../../components/Illustration';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
@@ -80,7 +80,7 @@ interface ExecuteResultProps {
     resultType?: QueryAction;
     isResultsCollapsed?: boolean;
     theme?: string;
-    tenantName: string;
+    database: string;
     queryText?: string;
     tableSettings?: Partial<Settings>;
 
@@ -93,7 +93,7 @@ export function QueryResultViewer({
     resultType = 'execute',
     isResultsCollapsed,
     theme,
-    tenantName,
+    database,
     queryText,
     tableSettings,
     onCollapseResults,
@@ -209,7 +209,7 @@ export function QueryResultViewer({
                     plan: data.plan,
                 }}
                 error={error}
-                database={tenantName}
+                database={database}
                 hasPlanToSvg={Boolean(data?.plan && useShowPlanToSvg && isExecute)}
             />
         );

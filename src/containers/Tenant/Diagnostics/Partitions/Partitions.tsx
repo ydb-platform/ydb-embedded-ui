@@ -4,19 +4,15 @@ import {skipToken} from '@reduxjs/toolkit/query';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
+import {TableColumnSetup} from '../../../../components/TableColumnSetup/TableColumnSetup';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {nodesListApi, selectNodesMap} from '../../../../store/reducers/nodesList';
 import {partitionsApi, setSelectedConsumer} from '../../../../store/reducers/partitions/partitions';
 import {selectConsumersNames, topicApi} from '../../../../store/reducers/topic';
 import {cn} from '../../../../utils/cn';
-import {DEFAULT_TABLE_SETTINGS, PARTITIONS_HIDDEN_COLUMNS_KEY} from '../../../../utils/constants';
-import {
-    useAutoRefreshInterval,
-    useSetting,
-    useTypedDispatch,
-    useTypedSelector,
-} from '../../../../utils/hooks';
+import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
+import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 
 import {PartitionsControls} from './PartitionsControls/PartitionsControls';
 import {PARTITIONS_COLUMNS_WIDTH_LS_KEY} from './columns';
@@ -32,23 +28,26 @@ export const b = cn('ydb-diagnostics-partitions');
 interface PartitionsProps {
     path: string;
     database: string;
+    databaseFullPath: string;
 }
 
-export const Partitions = ({path, database}: PartitionsProps) => {
+export const Partitions = ({path, database, databaseFullPath}: PartitionsProps) => {
     const dispatch = useTypedDispatch();
 
     const [partitionsToRender, setPartitionsToRender] = React.useState<
         PreparedPartitionDataWithHosts[]
     >([]);
 
-    const consumers = useTypedSelector((state) => selectConsumersNames(state, path, database));
+    const consumers = useTypedSelector((state) =>
+        selectConsumersNames(state, path, database, databaseFullPath),
+    );
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {selectedConsumer} = useTypedSelector((state) => state.partitions);
     const {
         currentData: topicData,
         isFetching: topicIsFetching,
         error: topicError,
-    } = topicApi.useGetTopicQuery({path, database});
+    } = topicApi.useGetTopicQuery({path, database, databaseFullPath});
     const topicLoading = topicIsFetching && topicData === undefined;
     const {
         currentData: nodesData,
@@ -58,11 +57,11 @@ export const Partitions = ({path, database}: PartitionsProps) => {
     const nodesLoading = nodesIsFetching && nodesData === undefined;
     const nodeHostsMap = useTypedSelector((state) => selectNodesMap(state, database));
 
-    const [hiddenColumns, setHiddenColumns] = useSetting<string[]>(PARTITIONS_HIDDEN_COLUMNS_KEY);
+    const {columnsToShow, columnsToSelect, setColumns} = useGetPartitionsColumns(selectedConsumer);
 
-    const [columns, columnsIdsForSelector] = useGetPartitionsColumns(selectedConsumer);
-
-    const params = topicLoading ? skipToken : {path, database, consumerName: selectedConsumer};
+    const params = topicLoading
+        ? skipToken
+        : {path, database, consumerName: selectedConsumer, databaseFullPath};
     const {
         currentData: partitionsData,
         isFetching: partitionsIsFetching,
@@ -87,14 +86,6 @@ export const Partitions = ({path, database}: PartitionsProps) => {
         }
     }, [dispatch, topicLoading, selectedConsumer, consumers]);
 
-    const columnsToShow = React.useMemo(() => {
-        return columns.filter((column) => !hiddenColumns.includes(column.name));
-    }, [columns, hiddenColumns]);
-
-    const hadleTableColumnsSetupChange = (newHiddenColumns: string[]) => {
-        setHiddenColumns(newHiddenColumns);
-    };
-
     const handleSelectedConsumerChange = (value?: string) => {
         dispatch(setSelectedConsumer(value));
     };
@@ -112,11 +103,12 @@ export const Partitions = ({path, database}: PartitionsProps) => {
                 selectDisabled={Boolean(error) || loading}
                 partitions={partitionsWithHosts}
                 onSearchChange={setPartitionsToRender}
-                hiddenColumns={hiddenColumns}
-                onHiddenColumnsChange={hadleTableColumnsSetupChange}
-                initialColumnsIds={columnsIdsForSelector}
             />
         );
+    };
+
+    const renderExtraControls = () => {
+        return <TableColumnSetup items={columnsToSelect} showStatus onUpdate={setColumns} />;
     };
 
     const renderContent = () => {
@@ -138,7 +130,9 @@ export const Partitions = ({path, database}: PartitionsProps) => {
 
     return (
         <TableWithControlsLayout className={b()}>
-            <TableWithControlsLayout.Controls>{renderControls()}</TableWithControlsLayout.Controls>
+            <TableWithControlsLayout.Controls renderExtraControls={renderExtraControls}>
+                {renderControls()}
+            </TableWithControlsLayout.Controls>
             <TableWithControlsLayout.Table>
                 {error ? <ResponseError error={error} /> : null}
                 {partitionsData ? renderContent() : null}

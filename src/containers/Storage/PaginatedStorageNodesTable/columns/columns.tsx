@@ -13,6 +13,7 @@ import {
     getPoolsColumn,
     getRAMColumn,
     getRackColumn,
+    getTabletsColumn,
     getUptimeColumn,
     getVersionColumn,
 } from '../../../../components/nodesColumns/columns';
@@ -21,26 +22,20 @@ import {
     NODES_COLUMNS_TITLES,
     isSortableNodesColumn,
 } from '../../../../components/nodesColumns/constants';
-import type {PreparedStorageNode} from '../../../../store/reducers/storage/types';
+import type {NodesColumn} from '../../../../components/nodesColumns/types';
 import {cn} from '../../../../utils/cn';
 import {PDisk} from '../../PDisk/PDisk';
 
-import type {
-    GetStorageNodesColumnsParams,
-    StorageNodesColumn,
-    StorageNodesColumnsSettings,
-} from './types';
+import type {GetStorageNodesColumnsParams} from './types';
 
 import './StorageNodesColumns.scss';
 
 const b = cn('ydb-storage-nodes-columns');
 
-const getPDisksColumn = ({
+export const getPDisksColumn = ({
     viewContext,
     columnsSettings,
-}: GetStorageNodesColumnsParams & {
-    columnsSettings?: StorageNodesColumnsSettings;
-}): StorageNodesColumn => {
+}: GetStorageNodesColumnsParams): NodesColumn => {
     return {
         name: NODES_COLUMNS_IDS.PDisks,
         header: NODES_COLUMNS_TITLES.PDisks,
@@ -79,25 +74,26 @@ export const getStorageNodesColumns = ({
     additionalNodesProps,
     viewContext,
     columnsSettings,
-}: GetStorageNodesColumnsParams): StorageNodesColumn[] => {
+}: GetStorageNodesColumnsParams): NodesColumn[] => {
     const getNodeRef = additionalNodesProps?.getNodeRef;
 
-    const columns = [
-        getNodeIdColumn<PreparedStorageNode>(),
-        getHostColumn<PreparedStorageNode>({getNodeRef, database}),
-        getNodeNameColumn<PreparedStorageNode>(),
-        getDataCenterColumn<PreparedStorageNode>(),
-        getPileNameColumn<PreparedStorageNode>(),
-        getRackColumn<PreparedStorageNode>(),
-        getUptimeColumn<PreparedStorageNode>(),
-        getCpuColumn<PreparedStorageNode>(),
-        getPoolsColumn<PreparedStorageNode>(),
-        getRAMColumn<PreparedStorageNode>(),
-        getMemoryColumn<PreparedStorageNode>(),
-        getDiskSpaceUsageColumn<PreparedStorageNode>(),
-        getVersionColumn<PreparedStorageNode>(),
-        getMissingDisksColumn<PreparedStorageNode>(),
+    const columns: NodesColumn[] = [
+        getNodeIdColumn(),
+        getHostColumn({getNodeRef, database}),
+        getNodeNameColumn(),
+        getDataCenterColumn(),
+        getPileNameColumn(),
+        getRackColumn(),
+        getUptimeColumn(),
+        getCpuColumn(),
+        getPoolsColumn(),
+        getRAMColumn(),
+        getMemoryColumn(),
+        getDiskSpaceUsageColumn(),
+        getVersionColumn(),
+        getMissingDisksColumn(),
         getPDisksColumn({viewContext, columnsSettings}),
+        getTabletsColumn({database}),
     ];
 
     const sortableColumns = columns.map((column) => ({

@@ -29,28 +29,44 @@ export function calculateColumnWidth(newWidth: number, minWidth = 40, maxWidth =
 export const typedMemo: <T>(Component: T) => T = React.memo;
 
 /**
- * Calculates the total vertical offset (distance from top) of an element relative to its container
- * or the document body if no container is specified.
- *
- * This function traverses up through the DOM tree, accumulating offsetTop values
- * from each parent element until it reaches either the specified container or
- * the top of the document.
- * @param element - The HTML element to calculate the offset for
- * @param container - Optional container element to stop the calculation at
- * @returns The total vertical offset in pixels
- *
- * Example:
- * const offset = calculateElementOffsetTop(myElement, myContainer);
- * // Returns the distance in pixels from myElement to the top of myContainer
+ * Computes the current vertical offset of a table element relative to a scrollable container.
+ * Uses DOMRects to calculate the distance from the table's top edge to the container's top edge
+ * in container scroll coordinates: tableRect.top - containerRect.top + container.scrollTop.
+ * @param container The scrollable container element
+ * @param table The table (or table wrapper) element whose offset is calculated
+ * @returns The vertical offset in pixels
  */
-export function calculateElementOffsetTop(element: HTMLElement, container?: HTMLElement): number {
-    let currentElement = element;
-    let offsetTop = 0;
+export function getCurrentTableOffset(container: HTMLElement, table: HTMLElement): number {
+    const tableRect = table.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    return tableRect.top - containerRect.top + container.scrollTop;
+}
 
-    while (currentElement && currentElement !== container) {
-        offsetTop += currentElement.offsetTop;
-        currentElement = currentElement.offsetParent as HTMLElement;
-    }
-
-    return offsetTop;
+/**
+ * Returns whether a table is considered offscreen relative to the container's viewport
+ * with an additional safety margin (freeze margin).
+ * A table is offscreen if its vertical span [tableStartY, tableEndY] lies farther than
+ * the specified margin outside the viewport [scrollTop, scrollTop + clientHeight].
+ * @param params The parameters for the offscreen check
+ * @param params.container The scrollable container element
+ * @param params.currentTableOffset The current vertical offset of the table within the container
+ * @param params.totalItems Total number of rows in the table
+ * @param params.rowHeight Fixed row height in pixels
+ * @param params.freezeMarginPx Optional additional margin in pixels; defaults to container.clientHeight
+ * @returns True if the table is offscreen beyond the margin; otherwise false
+ */
+export function isTableOffscreen(params: {
+    container: HTMLElement;
+    currentTableOffset: number;
+    totalItems: number;
+    rowHeight: number;
+    freezeMarginPx?: number;
+}): boolean {
+    const {container, currentTableOffset, totalItems, rowHeight, freezeMarginPx} = params;
+    const tableStartY = currentTableOffset;
+    const tableEndY = tableStartY + totalItems * rowHeight;
+    const viewportMin = container.scrollTop;
+    const viewportMax = viewportMin + container.clientHeight;
+    const margin = typeof freezeMarginPx === 'number' ? freezeMarginPx : container.clientHeight;
+    return viewportMax < tableStartY - margin || viewportMin > tableEndY + margin;
 }

@@ -6,7 +6,6 @@ import {Flex, Tab, TabList, TabProvider, Text} from '@gravity-ui/uikit';
 import {QueryResultTable} from '../../../../../../components/QueryResultTable';
 import type {ParsedResultSet} from '../../../../../../types/store/query';
 import {cn} from '../../../../../../utils/cn';
-import {useTypedSelector} from '../../../../../../utils/hooks';
 import {QueryResultError} from '../QueryResultError/QueryResultError';
 
 import './ResultSetsViewer.scss';
@@ -23,19 +22,10 @@ interface ResultSetsViewerProps {
 
 export function ResultSetsViewer(props: ResultSetsViewerProps) {
     const {selectedResultSet, setSelectedResultSet, resultSets, error} = props;
-    const isFullscreen = useTypedSelector((state) => state.fullscreen);
 
     const scrollRef = React.useRef<HTMLDivElement>(null);
 
     const currentResult = resultSets?.[selectedResultSet];
-
-    React.useEffect(() => {
-        //this is needed to trigger data-table recount visible rows
-        if (isFullscreen) {
-            const resizeEvent = new Event('resize');
-            scrollRef.current?.dispatchEvent(resizeEvent);
-        }
-    }, [isFullscreen]);
 
     const renderTabs = () => {
         return (

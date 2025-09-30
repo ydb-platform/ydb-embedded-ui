@@ -14,7 +14,7 @@ export function SectionWithTitle({
     title,
     children,
     titleVariant = 'body-2',
-    gap = 2,
+    gap = 3,
 }: SectionWithTitleProps) {
     return (
         <Flex direction="column" gap={gap}>

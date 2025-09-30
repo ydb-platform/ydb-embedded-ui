@@ -7,6 +7,8 @@ import {cn} from '../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {Portal} from '../Portal/Portal';
 
+import {useFullscreenContext} from './FullscreenContext';
+
 import disableFullscreenIcon from '../../assets/icons/disableFullscreen.svg';
 
 import './Fullscreen.scss';
@@ -18,11 +20,10 @@ interface FullscreenProps {
     className?: string;
 }
 
-const fullscreenRoot = document.getElementById('fullscreen-root') ?? undefined;
-
-function Fullscreen({children, className}: FullscreenProps) {
+export function Fullscreen({children, className}: FullscreenProps) {
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
     const dispatch = useTypedDispatch();
+    const fullscreenRootRef = useFullscreenContext();
 
     const onDisableFullScreen = React.useCallback(() => {
         dispatch(disableFullscreen());
@@ -44,25 +45,30 @@ function Fullscreen({children, className}: FullscreenProps) {
     const [container, setContainer] = React.useState<HTMLDivElement | null>(null);
     React.useEffect(() => {
         const div = document.createElement('div');
-        fullscreenRoot?.appendChild(div);
+        fullscreenRootRef.current?.appendChild(div);
         div.style.display = 'contents';
         setContainer(div);
         return () => {
             setContainer(null);
             div.remove();
         };
-    }, []);
+    }, [fullscreenRootRef]);
 
     const ref = React.useRef<HTMLDivElement>(null);
     React.useLayoutEffect(() => {
         if (container) {
             if (isFullscreen) {
-                fullscreenRoot?.appendChild(container);
+                fullscreenRootRef.current?.appendChild(container);
             } else {
                 ref.current?.appendChild(container);
             }
+            // Trigger recalculation for components relying on window resize
+            // Dispatch after DOM repaint to ensure correct measurements
+            requestAnimationFrame(() => {
+                window.dispatchEvent(new Event('resize'));
+            });
         }
-    }, [container, isFullscreen]);
+    }, [container, fullscreenRootRef, isFullscreen]);
 
     if (!container) {
         return null;
@@ -85,5 +91,3 @@ function Fullscreen({children, className}: FullscreenProps) {
         </div>
     );
 }
-
-export default Fullscreen;

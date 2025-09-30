@@ -1,5 +1,3 @@
-import {ClipboardButton} from '@gravity-ui/uikit';
-
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {JsonViewer} from '../../../../components/JsonViewer/JsonViewer';
 import {useUnipikaConvert} from '../../../../components/JsonViewer/unipika/unipika';
@@ -15,13 +13,14 @@ const b = cn('ydb-describe');
 interface IDescribeProps {
     path: string;
     database: string;
+    databaseFullPath: string;
 }
 
-const Describe = ({path, database}: IDescribeProps) => {
+const Describe = ({path, database, databaseFullPath}: IDescribeProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {currentData, isFetching, error} = overviewApi.useGetOverviewQuery(
-        {path, database},
+        {path, database, databaseFullPath},
         {pollingInterval: autoRefreshInterval},
     );
 
@@ -44,12 +43,10 @@ const Describe = ({path, database}: IDescribeProps) => {
                 <div className={b('result')}>
                     <JsonViewer
                         value={convertedValue}
-                        extraTools={
-                            <ClipboardButton
-                                view="flat-secondary"
-                                text={JSON.stringify(currentData)}
-                            />
-                        }
+                        withClipboardButton={{
+                            withLabel: false,
+                            copyText: JSON.stringify(currentData),
+                        }}
                         search
                         collapsedInitially
                     />

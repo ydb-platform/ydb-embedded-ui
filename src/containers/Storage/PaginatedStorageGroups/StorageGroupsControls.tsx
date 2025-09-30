@@ -1,7 +1,6 @@
 import React from 'react';
 
-import type {TableColumnSetupItem} from '@gravity-ui/uikit';
-import {Select, TableColumnSetup, Text} from '@gravity-ui/uikit';
+import {Select, Text} from '@gravity-ui/uikit';
 
 import {EntitiesCount} from '../../../components/EntitiesCount/EntitiesCount';
 import {usePaginatedTableState} from '../../../components/PaginatedTable/PaginatedTableContext';
@@ -22,9 +21,6 @@ interface StorageControlsProps {
     entitiesCountCurrent: number;
     entitiesCountTotal?: number;
     entitiesLoading: boolean;
-
-    columnsToSelect: TableColumnSetupItem[];
-    handleSelectedColumnsUpdate: (updated: TableColumnSetupItem[]) => void;
 }
 
 export function StorageGroupsControls({
@@ -34,9 +30,6 @@ export function StorageGroupsControls({
     entitiesCountCurrent,
     entitiesCountTotal,
     entitiesLoading,
-
-    columnsToSelect,
-    handleSelectedColumnsUpdate,
 }: StorageControlsProps) {
     const {
         searchValue,
@@ -81,13 +74,6 @@ export function StorageGroupsControls({
                     onChange={handleVisibleEntitiesChange}
                 />
             )}
-            <TableColumnSetup
-                popupWidth={200}
-                items={columnsToSelect}
-                showStatus
-                onUpdate={handleSelectedColumnsUpdate}
-                sortable={false}
-            />
             {withGroupBySelect ? (
                 <React.Fragment>
                     <Text variant="body-2">{i18n('controls_group-by-placeholder')}</Text>
@@ -116,13 +102,9 @@ export function StorageGroupsControls({
 export function StorageGroupsControlsWithTableState({
     withTypeSelector,
     withGroupBySelect,
-    columnsToSelect,
-    handleSelectedColumnsUpdate,
 }: {
     withTypeSelector?: boolean;
     withGroupBySelect?: boolean;
-    columnsToSelect: any[];
-    handleSelectedColumnsUpdate: (updated: any[]) => void;
 }) {
     const {tableState} = usePaginatedTableState();
 
@@ -133,8 +115,6 @@ export function StorageGroupsControlsWithTableState({
             entitiesCountCurrent={tableState.foundEntities}
             entitiesCountTotal={tableState.totalEntities}
             entitiesLoading={tableState.isInitialLoad}
-            columnsToSelect={columnsToSelect}
-            handleSelectedColumnsUpdate={handleSelectedColumnsUpdate}
         />
     );
 }

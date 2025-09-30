@@ -3,6 +3,10 @@
 .ydb-cluster {
     --cluster-side-padding: var(--g-spacing-5);
     --sticky-tabs-height: 40px;
+    --extra-controls-right: calc(var(--cluster-side-padding) * 2);
+    --data-table-start: var(--sticky-tabs-height);
+    --ydb-table-with-controls-layout-controls-padding-top: var(--g-spacing-4);
+
     position: relative;
 
     overflow: auto;
@@ -72,12 +76,13 @@
 
         background-color: var(--g-color-base-background);
     }
-    .ydb-table-with-controls-layout__controls-wrapper {
-        top: 40px;
-    }
+    &__cluster-configs {
+        --ydb-configs-controls-height: 62px;
 
-    .ydb-table-with-controls-layout {
-        // Total height of all fixed elements above table for sticky header positioning
-        --data-table-sticky-header-offset: 102px;
+        //calculate height of configs container
+        --ydb-configs-container-height: calc(
+            100vh - var(--sticky-tabs-height) - var(--header-height)
+        );
+        padding-right: var(--g-spacing-5);
     }
 }

@@ -97,7 +97,7 @@ export function OperationCell<TData>({row, depth = 0, params}: OperationCellProp
             className={block('operation-name')}
         >
             {dividers}
-            <Flex gap={1} alignItems="center" className={block('operation-content')}>
+            <Flex gap={1} className={block('operation-content')}>
                 {row.getCanExpand() && (
                     <Button view="flat" size="xs" onClick={row.getToggleExpandedHandler()}>
                         <Button.Icon>

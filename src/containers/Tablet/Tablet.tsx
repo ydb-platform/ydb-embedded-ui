@@ -66,6 +66,7 @@ export function Tablet() {
     const [{database: queryDatabase, clusterName: queryClusterName, followerId: queryFollowerId}] =
         useQueryParams(tabletPageQueryParams);
 
+    const database = queryDatabase?.toString();
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tabletApi.useGetTabletQuery(
         {id, database: queryDatabase ?? undefined, followerId: queryFollowerId ?? undefined},
@@ -75,30 +76,27 @@ export function Tablet() {
     const loading = isFetching && currentData === undefined;
     const {data: tablet = {}, history = []} = currentData || {};
 
-    const {currentData: tenantPath} = tabletApi.useGetTabletDescribeQuery(
-        tablet.TenantId
-            ? {tenantId: tablet.TenantId, database: queryDatabase?.toString()}
-            : skipToken,
+    const {currentData: databaseFullPath} = tabletApi.useGetTabletDescribeQuery(
+        tablet.TenantId ? {tenantId: tablet.TenantId, database} : skipToken,
     );
-
-    const database = (tenantPath || queryDatabase) ?? undefined;
 
     const tabletType = tablet.Type;
 
     React.useEffect(() => {
         dispatch(
             setHeaderBreadcrumbs('tablet', {
-                tenantName: queryDatabase ?? undefined,
+                database,
                 tabletId: id,
                 tabletType,
+                databaseName: databaseFullPath,
             }),
         );
-    }, [dispatch, queryDatabase, id, tabletType]);
+    }, [dispatch, database, id, tabletType, databaseFullPath]);
 
     const {Leader} = tablet;
     const metaItems: string[] = [];
-    if (database) {
-        metaItems.push(`${i18n('tablet.meta-database')}: ${database}`);
+    if (databaseFullPath) {
+        metaItems.push(`${i18n('tablet.meta-database')}: ${databaseFullPath}`);
     }
     // Add "Tablet" instead of tablet type to metadata
     metaItems.push(i18n('tablet.header'));
@@ -110,7 +108,7 @@ export function Tablet() {
         <Flex gap={5} direction="column" className={b()}>
             <Helmet>
                 <title>{`${id} — ${i18n('tablet.header')} — ${
-                    database || queryClusterName || CLUSTER_DEFAULT_TITLE
+                    databaseFullPath || queryClusterName || CLUSTER_DEFAULT_TITLE
                 }`}</title>
             </Helmet>
             <PageMetaWithAutorefresh items={metaItems} />

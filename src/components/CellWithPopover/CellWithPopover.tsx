@@ -29,10 +29,12 @@ export function CellWithPopover({
             <Popover
                 openDelay={DELAY_TIMEOUT}
                 closeDelay={DELAY_TIMEOUT}
-                className={b('popover', {'full-width': fullWidth}, className)}
+                className={b('popover', {'full-width': fullWidth})}
                 {...props}
             >
-                <div className={b('children-wrapper')}>{children}</div>
+                <div className={b('children-wrapper', {'full-width': fullWidth}, className)}>
+                    {children}
+                </div>
             </Popover>
         </div>
     );

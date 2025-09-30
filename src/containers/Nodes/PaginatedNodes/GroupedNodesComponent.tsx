@@ -1,12 +1,16 @@
 import React from 'react';
 
+import {isNil} from 'lodash';
+
 import {ResponseError} from '../../../components/Errors/ResponseError';
-import type {Column} from '../../../components/PaginatedTable';
+import type {PaginatedTableData} from '../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
+import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {NODES_COLUMNS_TITLES} from '../../../components/nodesColumns/constants';
 import type {NodesColumnId} from '../../../components/nodesColumns/constants';
+import type {NodesColumn} from '../../../components/nodesColumns/types';
 import {nodesApi} from '../../../store/reducers/nodes/nodes';
-import type {NodesPreparedEntity} from '../../../store/reducers/nodes/types';
+import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField, NodesPeerRole} from '../../../types/api/nodes';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
@@ -24,13 +28,15 @@ interface NodeGroupProps {
     count: number;
     isExpanded: boolean;
     path?: string;
+    databaseFullPath?: string;
     database?: string;
     searchValue: string;
     peerRoleFilter?: NodesPeerRole;
     groupByParam?: NodesGroupByField;
-    columns: Column<NodesPreparedEntity>[];
+    columns: NodesColumn[];
     scrollContainerRef: React.RefObject<HTMLElement>;
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
+    onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
 }
 
 const NodeGroup = React.memo(function NodeGroup({
@@ -39,12 +45,14 @@ const NodeGroup = React.memo(function NodeGroup({
     isExpanded,
     path,
     database,
+    databaseFullPath,
     searchValue,
     peerRoleFilter,
     groupByParam,
     columns,
     scrollContainerRef,
     onIsExpandedChange,
+    onDataFetched,
 }: NodeGroupProps) {
     return (
         <TableGroup
@@ -60,6 +68,7 @@ const NodeGroup = React.memo(function NodeGroup({
                 table={
                     <NodesTable
                         path={path}
+                        databaseFullPath={databaseFullPath}
                         database={database}
                         searchValue={searchValue}
                         problemFilter={'All'}
@@ -70,6 +79,7 @@ const NodeGroup = React.memo(function NodeGroup({
                         initialEntitiesCount={count}
                         columns={columns}
                         scrollContainerRef={scrollContainerRef}
+                        onDataFetched={onDataFetched}
                     />
                 }
                 tableWrapperProps={{
@@ -83,17 +93,20 @@ const NodeGroup = React.memo(function NodeGroup({
 interface GroupedNodesComponentProps {
     path?: string;
     database?: string;
+    databaseFullPath?: string;
     scrollContainerRef: React.RefObject<HTMLElement>;
     withPeerRoleFilter?: boolean;
-    columns: Column<NodesPreparedEntity>[];
+    columns: NodesColumn[];
     defaultColumnsIds: NodesColumnId[];
     requiredColumnsIds: NodesColumnId[];
     selectedColumnsKey: string;
     groupByParams: NodesGroupByField[];
+    onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
 }
 
 export function GroupedNodesComponent({
     path,
+    databaseFullPath,
     database,
     scrollContainerRef,
     withPeerRoleFilter,
@@ -102,8 +115,12 @@ export function GroupedNodesComponent({
     requiredColumnsIds,
     selectedColumnsKey,
     groupByParams,
+    onDataFetched,
 }: GroupedNodesComponentProps) {
-    const {searchValue, peerRoleFilter, groupByParam} = useNodesPageQueryParams(groupByParams);
+    const {searchValue, peerRoleFilter, groupByParam} = useNodesPageQueryParams(
+        groupByParams,
+        withPeerRoleFilter,
+    );
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
@@ -114,9 +131,16 @@ export function GroupedNodesComponent({
         requiredColumnsIds,
     );
 
+    const schemaPathParam = React.useMemo(() => {
+        if (!isNil(path) && !isNil(databaseFullPath)) {
+            return {path, databaseFullPath};
+        }
+        return undefined;
+    }, [path, databaseFullPath]);
+
     const {currentData, isFetching, error} = nodesApi.useGetNodesQuery(
         {
-            path,
+            path: schemaPathParam,
             database,
             filter: searchValue,
             filter_peer_role: peerRoleFilter,
@@ -129,11 +153,7 @@ export function GroupedNodesComponent({
     );
 
     const isLoading = currentData === undefined && isFetching;
-    const {
-        NodeGroups: tableGroups,
-        FoundNodes: found = 0,
-        TotalNodes: total = 0,
-    } = currentData || {};
+    const {tableGroups, found = 0, total = 0} = currentData || {};
 
     const {expandedGroups, setIsGroupExpanded} = useExpandedGroups(tableGroups);
 
@@ -160,6 +180,7 @@ export function GroupedNodesComponent({
                         count={count}
                         isExpanded={isExpanded}
                         path={path}
+                        databaseFullPath={databaseFullPath}
                         database={database}
                         searchValue={searchValue}
                         peerRoleFilter={peerRoleFilter}
@@ -167,6 +188,7 @@ export function GroupedNodesComponent({
                         columns={columnsToShow}
                         scrollContainerRef={scrollContainerRef}
                         onIsExpandedChange={setIsGroupExpanded}
+                        onDataFetched={onDataFetched}
                     />
                 );
             });
@@ -182,12 +204,18 @@ export function GroupedNodesComponent({
                 <NodesControls
                     groupByParams={groupByParams}
                     withPeerRoleFilter={withPeerRoleFilter}
-                    columnsToSelect={columnsToSelect}
-                    handleSelectedColumnsUpdate={setColumns}
                     entitiesCountCurrent={found}
                     entitiesCountTotal={total}
                     entitiesLoading={isLoading}
                     withGroupBySelect
+                />
+            }
+            extraControls={
+                <TableColumnSetup
+                    popupWidth={200}
+                    items={columnsToSelect}
+                    showStatus
+                    onUpdate={setColumns}
                 />
             }
             error={error ? <ResponseError error={error} /> : null}

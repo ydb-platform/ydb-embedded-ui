@@ -42,6 +42,11 @@ export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
     // Refetch data only if dashboard successfully loaded
     const shouldRefresh = isDashboardHidden ? 0 : autoRefreshInterval;
 
+    // Do not render charts at all when GraphShard capability explicitly says it's absent
+    if (graphShardExists === false) {
+        return null;
+    }
+
     /**
      * Charts should be hidden, if they are not enabled:
      * 1. GraphShard is not enabled
@@ -49,7 +54,7 @@ export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
      *
      * If at least one chart successfully loaded, dashboard should be shown
      * This fallback behavior is only used when GraphShardExists capability is not available or false
-     * @link https://github.com/ydb-platform/ydb-embedded-ui/issues/659
+     * Link: https://github.com/ydb-platform/ydb-embedded-ui/issues/659
      * @todo disable only for specific errors ('GraphShard is not enabled') after ydb-stable-24 is generally used
      */
     const handleChartDataStatusChange = (chartStatus: ChartDataStatus) => {

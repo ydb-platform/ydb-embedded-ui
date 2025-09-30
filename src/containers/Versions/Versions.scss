@@ -9,11 +9,7 @@
     font-size: var(--ydb-info-viewer-font-size);
     line-height: var(--ydb-info-viewer-line-height);
 
-    &__controls {
-        margin-bottom: var(--g-spacing-3);
-    }
     &__overall {
         margin-top: var(--g-spacing-4);
-        margin-bottom: var(--g-spacing-6);
     }
 }

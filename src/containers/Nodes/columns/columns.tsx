@@ -15,26 +15,26 @@ import {
     getVersionColumn,
 } from '../../../components/nodesColumns/columns';
 import {isSortableNodesColumn} from '../../../components/nodesColumns/constants';
-import type {GetNodesColumnsParams} from '../../../components/nodesColumns/types';
-import type {NodesPreparedEntity} from '../../../store/reducers/nodes/types';
-import type {Column} from '../../../utils/tableUtils/types';
+import type {GetNodesColumnsParams, NodesColumn} from '../../../components/nodesColumns/types';
+import {getPDisksColumn} from '../../Storage/PaginatedStorageNodesTable/columns/columns';
 
-export function getNodesColumns(params: GetNodesColumnsParams): Column<NodesPreparedEntity>[] {
-    const columns = [
-        getNodeIdColumn<NodesPreparedEntity>(),
-        getHostColumn<NodesPreparedEntity>(params),
-        getNodeNameColumn<NodesPreparedEntity>(),
-        getDataCenterColumn<NodesPreparedEntity>(),
-        getPileNameColumn<NodesPreparedEntity>(),
-        getRackColumn<NodesPreparedEntity>(),
-        getUptimeColumn<NodesPreparedEntity>(),
-        getCpuColumn<NodesPreparedEntity>(),
-        getPoolsColumn<NodesPreparedEntity>(),
-        getRAMColumn<NodesPreparedEntity>(),
-        getMemoryColumn<NodesPreparedEntity>(),
-        getLoadAverageColumn<NodesPreparedEntity>(),
-        getVersionColumn<NodesPreparedEntity>(),
-        getTabletsColumn<NodesPreparedEntity>(params),
+export function getNodesColumns(params: GetNodesColumnsParams): NodesColumn[] {
+    const columns: NodesColumn[] = [
+        getNodeIdColumn(),
+        getHostColumn(params),
+        getNodeNameColumn(),
+        getDataCenterColumn(),
+        getPileNameColumn(),
+        getRackColumn(),
+        getUptimeColumn(),
+        getCpuColumn(),
+        getPoolsColumn(),
+        getRAMColumn(),
+        getMemoryColumn(),
+        getLoadAverageColumn(),
+        getVersionColumn(),
+        getPDisksColumn(params),
+        getTabletsColumn(params),
     ];
 
     return columns.map((column) => {

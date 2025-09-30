@@ -1,8 +1,10 @@
 import React from 'react';
 
+import {selectGraphShardExists} from '../../store/reducers/capabilities/capabilities';
 import {topQueriesApi} from '../../store/reducers/executeTopQueries/executeTopQueries';
 import type {KeyValueRow} from '../../types/api/query';
 import {useAutoRefreshInterval} from '../../utils/hooks';
+import {useTypedSelector} from '../../utils/hooks/useTypedSelector';
 import type {TimeFrame} from '../../utils/timeframes';
 import {chartApi} from '../MetricChart/reducer';
 
@@ -21,14 +23,18 @@ interface UseQueriesActivityDataResult {
     areChartsAvailable: boolean | null; // null = loading, boolean = result
 }
 
-export function useQueriesActivityData(tenantName: string): UseQueriesActivityDataResult {
+export function useQueriesActivityData(database: string): UseQueriesActivityDataResult {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const shouldRefresh = autoRefreshInterval;
 
+    // Respect GraphShardExists if explicitly false for the specific tenant
+    const graphShardExists = useTypedSelector((state) => selectGraphShardExists(state, database));
+    const skipCharts = graphShardExists === false;
+
     const {data: runningQueriesData} = topQueriesApi.useGetRunningQueriesQuery(
         {
-            database: tenantName,
+            database,
             filters: {},
         },
         {pollingInterval: shouldRefresh},
@@ -40,28 +46,31 @@ export function useQueriesActivityData(tenantName: string): UseQueriesActivityDa
         isError: queriesError,
     } = chartApi.useGetChartDataQuery(
         {
-            database: tenantName,
+            database,
             metrics: [{target: 'queries.requests'}],
             timeFrame: QUERIES_TIME_FRAME,
             maxDataPoints: 30,
         },
-        {pollingInterval: shouldRefresh},
+        {pollingInterval: shouldRefresh, skip: skipCharts},
     );
 
     const {data: latencyData} = chartApi.useGetChartDataQuery(
         {
-            database: tenantName,
+            database,
             metrics: [{target: 'queries.latencies.p99'}],
             timeFrame: LATENCIES_TIME_FRAME,
             maxDataPoints: 30,
         },
-        {pollingInterval: shouldRefresh},
+        {pollingInterval: shouldRefresh, skip: skipCharts},
     );
 
     const runningQueriesCount = runningQueriesData?.resultSets?.[0]?.result?.length || 0;
 
     // Determine chart availability from queries API success/error state
     const areChartsAvailable = React.useMemo(() => {
+        if (skipCharts) {
+            return false;
+        }
         if (queriesSuccess) {
             return true;
         }
@@ -69,7 +78,7 @@ export function useQueriesActivityData(tenantName: string): UseQueriesActivityDa
             return false;
         }
         return null; // Still loading
-    }, [queriesSuccess, queriesError]);
+    }, [queriesSuccess, queriesError, skipCharts]);
 
     const qps = React.useMemo(
         () => calculateQueriesPerSecond(queriesPerSecData?.metrics?.[0]?.data),

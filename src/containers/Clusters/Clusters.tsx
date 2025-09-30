@@ -2,14 +2,16 @@ import React from 'react';
 
 import {Magnifier} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
-import {Flex, Icon, Select, TableColumnSetup, Text} from '@gravity-ui/uikit';
+import {Flex, Icon, Select, Text} from '@gravity-ui/uikit';
 import {Helmet} from 'react-helmet-async';
 
 import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
+import {PageError} from '../../components/Errors/PageError/PageError';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {Loader} from '../../components/Loader';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../components/Search';
+import {TableColumnSetup} from '../../components/TableColumnSetup/TableColumnSetup';
 import {
     useDeleteClusterFeatureAvailable,
     useEditClusterFeatureAvailable,
@@ -27,6 +29,7 @@ import {uiFactory} from '../../uiFactory/uiFactory';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
+import {isAccessError} from '../../utils/response';
 import {getMinorVersion} from '../../utils/versions';
 
 import {CLUSTERS_COLUMNS_WIDTH_LS_KEY, getClustersColumns} from './columns';
@@ -136,97 +139,105 @@ export function Clusters() {
         );
     };
 
+    const showBlockingError = isAccessError(query.error);
+
+    const errorProps = showBlockingError ? uiFactory.clusterOrDatabaseAccessError : undefined;
+
     return (
-        <div className={b()}>
-            <Helmet>
-                <title>{i18n('page_title')}</title>
-            </Helmet>
+        <PageError
+            error={showBlockingError ? query.error : undefined}
+            {...errorProps}
+            errorPageTitle={uiFactory.clustersPageTitle ?? i18n('page_title')}
+        >
+            <div className={b()}>
+                <Helmet>
+                    <title>{i18n('page_title')}</title>
+                </Helmet>
 
-            {renderPageTitle()}
+                {renderPageTitle()}
 
-            <Flex className={b('controls-wrapper')}>
-                <div className={b('control', {wide: true})}>
-                    <Search
-                        placeholder={i18n('controls_search-placeholder')}
-                        endContent={<Icon data={Magnifier} className={b('search-icon')} />}
-                        onChange={changeClusterName}
-                        value={clusterName}
-                    />
-                </div>
-                <div className={b('control')}>
-                    <Select
-                        multiple
-                        filterable
-                        hasClear
-                        placeholder={i18n('controls_select-placeholder')}
-                        label={i18n('controls_status-select-label')}
-                        value={status}
-                        options={statuses}
-                        onUpdate={changeStatus}
-                        width="max"
-                    />
-                </div>
-                <div className={b('control')}>
-                    <Select
-                        multiple
-                        filterable
-                        hasClear
-                        placeholder={i18n('controls_select-placeholder')}
-                        label={i18n('controls_service-select-label')}
-                        value={service}
-                        options={servicesToSelect}
-                        onUpdate={changeService}
-                        width="max"
-                    />
-                </div>
-                <div className={b('control')}>
-                    <Select
-                        multiple
-                        filterable
-                        hasClear
-                        placeholder={i18n('controls_select-placeholder')}
-                        label={i18n('controls_version-select-label')}
-                        value={version}
-                        options={versions}
-                        onUpdate={changeVersion}
-                        width="max"
-                    />
-                </div>
-                <div className={b('control')}>
+                <Flex className={b('controls-wrapper')}>
+                    <div className={b('control', {wide: true})}>
+                        <Search
+                            placeholder={i18n('controls_search-placeholder')}
+                            endContent={<Icon data={Magnifier} className={b('search-icon')} />}
+                            onChange={changeClusterName}
+                            value={clusterName}
+                        />
+                    </div>
+                    <div className={b('control')}>
+                        <Select
+                            multiple
+                            filterable
+                            hasClear
+                            placeholder={i18n('controls_select-placeholder')}
+                            label={i18n('controls_status-select-label')}
+                            value={status}
+                            options={statuses}
+                            onUpdate={changeStatus}
+                            width="max"
+                        />
+                    </div>
+                    <div className={b('control')}>
+                        <Select
+                            multiple
+                            filterable
+                            hasClear
+                            placeholder={i18n('controls_select-placeholder')}
+                            label={i18n('controls_service-select-label')}
+                            value={service}
+                            options={servicesToSelect}
+                            onUpdate={changeService}
+                            width="max"
+                        />
+                    </div>
+                    <div className={b('control')}>
+                        <Select
+                            multiple
+                            filterable
+                            hasClear
+                            placeholder={i18n('controls_select-placeholder')}
+                            label={i18n('controls_version-select-label')}
+                            value={version}
+                            options={versions}
+                            onUpdate={changeVersion}
+                            width="max"
+                        />
+                    </div>
                     <TableColumnSetup
+                        className={b('column-setup')}
                         key="TableColumnSetup"
                         popupWidth={242}
                         items={columnsToSelect}
                         showStatus
                         onUpdate={setColumns}
-                        sortable={false}
                     />
-                </div>
-            </Flex>
-            {clusters?.length ? (
-                <Text color="secondary">
-                    {i18n('clusters-count', {count: filteredClusters?.length})}
-                </Text>
-            ) : null}
-            {query.isError ? <ResponseError error={query.error} /> : null}
-            {query.isLoading ? <Loader size="l" /> : null}
-            {query.fulfilledTimeStamp ? (
-                <div className={b('table-wrapper')}>
-                    <div className={b('table-content')}>
-                        <ResizeableDataTable
-                            columnsWidthLSKey={CLUSTERS_COLUMNS_WIDTH_LS_KEY}
-                            wrapperClassName={b('table')}
-                            data={filteredClusters}
-                            columns={columnsToShow}
-                            settings={{...DEFAULT_TABLE_SETTINGS, dynamicRender: false}}
-                            initialSortOrder={{
-                                columnId: COLUMNS_NAMES.TITLE,
-                                order: DataTable.ASCENDING,
-                            }}
-                        />
+                </Flex>
+                {clusters?.length ? (
+                    <Text color="secondary">
+                        {i18n('clusters-count', {count: filteredClusters?.length})}
+                    </Text>
+                ) : null}
+                {query.isError ? <ResponseError error={query.error} /> : null}
+                {query.isLoading ? <Loader size="l" /> : null}
+                {query.fulfilledTimeStamp ? (
+                    <div className={b('table-wrapper')}>
+                        <div className={b('table-content')}>
+                            <ResizeableDataTable
+                                columnsWidthLSKey={CLUSTERS_COLUMNS_WIDTH_LS_KEY}
+                                wrapperClassName={b('table')}
+                                data={filteredClusters}
+                                columns={columnsToShow}
+                                settings={{...DEFAULT_TABLE_SETTINGS, dynamicRender: false}}
+                                initialSortOrder={{
+                                    columnId: COLUMNS_NAMES.TITLE,
+                                    order: DataTable.ASCENDING,
+                                }}
+                            />
+                        </div>
                     </div>
-                </div>
-            ) : null}
-        </div>
+                ) : null}
+            </div>
+        </PageError>
     );
 }

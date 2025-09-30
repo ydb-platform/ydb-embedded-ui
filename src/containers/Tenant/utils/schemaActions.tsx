@@ -1,4 +1,4 @@
-import {Copy, PlugConnection} from '@gravity-ui/icons';
+import {CirclePlus, Copy, PlugConnection} from '@gravity-ui/icons';
 import {Flex, Spin} from '@gravity-ui/uikit';
 import copy from 'copy-to-clipboard';
 import type {NavigationTreeNodeType} from 'ydb-ui-components';
@@ -51,9 +51,10 @@ interface ActionsAdditionalParams {
 }
 
 interface BindActionParams {
-    tenantName: string;
+    database: string;
     type: NavigationTreeNodeType;
     path: string;
+    databaseFullPath: string;
     relativePath: string;
 }
 
@@ -96,7 +97,7 @@ const bindActions = (
                   showCreateDirectoryDialog(params.path);
               }
             : undefined,
-        getConnectToDBDialog: () => getConnectToDBDialog?.({database: params.path}),
+        getConnectToDBDialog: () => getConnectToDBDialog?.({database: params.database}),
         createTable: inputQuery(createTableTemplate),
         createColumnTable: inputQuery(createColumnTableTemplate),
         createAsyncReplication: inputQuery(createAsyncReplicationTemplate),
@@ -160,23 +161,34 @@ const getActionWithLoader = ({text, action, isLoading}: ActionConfig) => ({
 });
 
 export const getActions =
-    (dispatch: AppDispatch, additionalEffects: ActionsAdditionalParams, rootPath = '') =>
+    (
+        dispatch: AppDispatch,
+        additionalEffects: ActionsAdditionalParams,
+        rootPath = '',
+        database: string,
+    ) =>
     (path: string, type: NavigationTreeNodeType) => {
         const relativePath = transformPath(path, rootPath);
         const actions = bindActions(
-            {path, relativePath, tenantName: rootPath, type},
+            {
+                path,
+                relativePath,
+                database,
+                type,
+                databaseFullPath: rootPath,
+            },
             dispatch,
             additionalEffects,
         );
         const copyItem: ActionsSet[0] = {
             text: i18n('actions.copyPath'),
             action: actions.copyPath,
-            iconEnd: <Copy />,
+            iconStart: <Copy />,
         };
         const connectToDBItem = {
             text: i18n('actions.connectToDB'),
             action: actions.getConnectToDBDialog,
-            iconEnd: <PlugConnection />,
+            iconStart: <PlugConnection />,
         };
 
         const createEntitiesSet = [
@@ -212,6 +224,7 @@ export const getActions =
             const createDirectoryItem = {
                 text: i18n('actions.createDirectory'),
                 action: actions.createDirectory,
+                iconStart: <CirclePlus />,
             };
 
             DB_SET.splice(1, 0, [createDirectoryItem]);
@@ -277,6 +290,11 @@ export const getActions =
             [{text: i18n('actions.dropView'), action: actions.dropView}],
         ];
 
+        const SYSTEM_VIEW_SET: ActionsSet = [
+            [copyItem],
+            [{text: i18n('actions.selectQuery'), action: actions.selectQuery}],
+        ];
+
         const ASYNC_REPLICATION_SET: ActionsSet = [
             [copyItem],
             [
@@ -312,6 +330,7 @@ export const getActions =
 
             table: ROW_TABLE_SET,
             column_table: COLUMN_TABLE_SET,
+            system_table: SYSTEM_VIEW_SET,
 
             index_table: JUST_COPY,
             topic: TOPIC_SET,

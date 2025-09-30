@@ -1,6 +1,6 @@
 {
   "name": "ydb-embedded-ui",
-  "version": "11.7.0",
+  "version": "12.6.0",
   "files": [
     "dist"
   ],
@@ -19,13 +19,13 @@
     "@gravity-ui/date-utils": "^2.5.6",
     "@gravity-ui/graph": "^1.1.4",
     "@gravity-ui/i18n": "^1.7.0",
-    "@gravity-ui/icons": "^2.13.0",
+    "@gravity-ui/icons": "^2.16.0",
     "@gravity-ui/illustrations": "^2.1.0",
     "@gravity-ui/navigation": "^3.3.9",
     "@gravity-ui/paranoid": "^3.0.0",
     "@gravity-ui/react-data-table": "^2.2.1",
     "@gravity-ui/table": "^1.10.1",
-    "@gravity-ui/uikit": "^7.16.2",
+    "@gravity-ui/uikit": "^7.23.0",
     "@gravity-ui/unipika": "^5.2.1",
     "@gravity-ui/websql-autocomplete": "^13.7.0",
     "@hookform/resolvers": "^3.10.0",
@@ -60,7 +60,7 @@
     "use-query-params": "^2.2.1",
     "uuid": "^10.0.0",
     "web-vitals": "^1.1.2",
-    "ydb-ui-components": "^5.0.0",
+    "ydb-ui-components": "^5.1.1",
     "zod": "^3.24.1"
   },
   "scripts": {

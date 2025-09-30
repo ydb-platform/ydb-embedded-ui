@@ -8,6 +8,7 @@ import type {PaginatedTableState} from './types';
 
 export interface PaginatedTableWithLayoutProps {
     controls?: React.ReactNode;
+    extraControls?: React.ReactNode;
     table: React.ReactNode;
     tableWrapperProps?: Omit<TableWrapperProps, 'children'>;
     error?: React.ReactNode;
@@ -42,12 +43,22 @@ const TableWrapper = ({
     );
 };
 
-const ControlsSection = ({controls}: {controls?: React.ReactNode}) => {
-    if (!controls) {
+const ControlsSection = ({
+    controls,
+    extraControls,
+}: {
+    controls?: React.ReactNode;
+    extraControls?: React.ReactNode;
+}) => {
+    if (!controls && !extraControls) {
         return null;
     }
 
-    return <TableWithControlsLayout.Controls>{controls}</TableWithControlsLayout.Controls>;
+    return (
+        <TableWithControlsLayout.Controls renderExtraControls={() => extraControls}>
+            {controls}
+        </TableWithControlsLayout.Controls>
+    );
 };
 
 const ErrorSection = ({error}: {error?: React.ReactNode}) => {
@@ -60,6 +71,7 @@ const ErrorSection = ({error}: {error?: React.ReactNode}) => {
 
 export const PaginatedTableWithLayout = ({
     controls,
+    extraControls,
     table,
     tableWrapperProps,
     error,
@@ -70,7 +82,7 @@ export const PaginatedTableWithLayout = ({
     return (
         <PaginatedTableProvider initialState={initialState} noBatching={noBatching}>
             <TableWithControlsLayout fullHeight={fullHeight}>
-                <ControlsSection controls={controls} />
+                <ControlsSection controls={controls} extraControls={extraControls} />
                 <ErrorSection error={error} />
                 <TableWrapper table={table} tableWrapperProps={tableWrapperProps} />
             </TableWithControlsLayout>

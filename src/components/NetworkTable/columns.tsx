@@ -1,5 +1,3 @@
-import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
-import type {Column} from '../../utils/tableUtils/types';
 import {
     getClockSkewColumn,
     getConnectionsColumn,
@@ -16,10 +14,10 @@ import {
     getUptimeColumn,
 } from '../nodesColumns/columns';
 import {isSortableNodesColumn} from '../nodesColumns/constants';
-import type {GetNodesColumnsParams} from '../nodesColumns/types';
+import type {GetNodesColumnsParams, NodesColumn} from '../nodesColumns/types';
 
 export function getNetworkTableNodesColumns(params: GetNodesColumnsParams) {
-    const columns: Column<NodesPreparedEntity>[] = [
+    const columns: NodesColumn[] = [
         getNodeIdColumn(),
         getNetworkHostColumn(params),
         getDataCenterColumn(),

@@ -1,14 +1,14 @@
-import {StringParam, useQueryParam} from 'use-query-params';
-
 import {Loader} from '../../../components/Loader';
 import {useGetSchemaQuery} from '../../../store/reducers/schema/schema';
+import {useTenantQueryParams} from '../useTenantQueryParams';
 
 import {SchemaTree} from './SchemaTree/SchemaTree';
 import i18n from './i18n';
 import {b} from './shared';
 
 interface ObjectTreeProps {
-    tenantName: string;
+    database: string;
+    databaseFullPath: string;
     path?: string;
 }
 
@@ -20,14 +20,15 @@ function prepareSchemaRootName(name: string | undefined, fallback: string): stri
     return fallback.startsWith('/') ? fallback : `/${fallback}`;
 }
 
-export function ObjectTree({tenantName, path}: ObjectTreeProps) {
+export function ObjectTree({database, path, databaseFullPath}: ObjectTreeProps) {
     const {data: tenantData = {}, isLoading} = useGetSchemaQuery({
-        path: tenantName,
-        database: tenantName,
+        path: databaseFullPath,
+        databaseFullPath,
+        database,
     });
     const pathData = tenantData?.PathDescription?.Self;
 
-    const [, setCurrentPath] = useQueryParam('schema', StringParam);
+    const {handleSchemaChange} = useTenantQueryParams();
 
     if (!pathData && isLoading) {
         // If Loader isn't wrapped with div, SplitPane doesn't calculate panes height correctly
@@ -44,13 +45,13 @@ export function ObjectTree({tenantName, path}: ObjectTreeProps) {
             <div className={b('tree')}>
                 {pathData ? (
                     <SchemaTree
-                        rootPath={tenantName}
-                        // for the root pathData.Name contains the same string as tenantName,
+                        database={database}
+                        databaseFullPath={databaseFullPath}
                         // ensure it has the leading slash
-                        rootName={prepareSchemaRootName(pathData.Name, tenantName)}
+                        rootName={prepareSchemaRootName(pathData.Name, databaseFullPath)}
                         rootType={pathData.PathType}
                         currentPath={path}
-                        onActivePathUpdate={setCurrentPath}
+                        onActivePathUpdate={handleSchemaChange}
                     />
                 ) : null}
             </div>

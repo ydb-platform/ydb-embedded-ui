@@ -11,7 +11,6 @@ import {
 } from '@gravity-ui/uikit';
 import qs from 'qs';
 import {useLocation} from 'react-router-dom';
-import {StringParam, useQueryParam} from 'use-query-params';
 
 import {AsyncReplicationState} from '../../../components/AsyncReplicationState';
 import {toFormattedSize} from '../../../components/FormattedBytes/utils';
@@ -33,10 +32,12 @@ import {
     formatSecondsToHours,
 } from '../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
+import {prepareSystemViewType} from '../../../utils/schema';
 import {EntityTitle} from '../EntityTitle/EntityTitle';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
 import {useCurrentSchema} from '../TenantContext';
 import {TENANT_INFO_TABS, TENANT_SCHEMA_TAB, TenantTabsGroups, getTenantPath} from '../TenantPages';
+import {useTenantQueryParams} from '../useTenantQueryParams';
 import {getSummaryControls} from '../utils/controls';
 import {
     PaneVisibilityActionTypes,
@@ -76,9 +77,10 @@ export function ObjectSummary({
     onExpandSummary,
     isCollapsed,
 }: ObjectSummaryProps) {
-    const {path, database: tenantName, type, subType} = useCurrentSchema();
+    const {path, database, type, subType, databaseFullPath} = useCurrentSchema();
+
     const dispatch = useTypedDispatch();
-    const [, setCurrentPath] = useQueryParam('schema', StringParam);
+    const {handleSchemaChange} = useTenantQueryParams();
     const [commonInfoVisibilityState, dispatchCommonInfoVisibilityState] = React.useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED),
         undefined,
@@ -97,7 +99,8 @@ export function ObjectSummary({
 
     const {currentData: currentObjectData} = overviewApi.useGetOverviewQuery({
         path,
-        database: tenantName,
+        database,
+        databaseFullPath,
     });
     const currentSchemaData = currentObjectData?.PathDescription?.Self;
 
@@ -229,6 +232,12 @@ export function ObjectSummary({
                 {
                     name: i18n('field_partitions'),
                     content: PathDescription?.TablePartitions?.length,
+                },
+            ],
+            [EPathType.EPathTypeSysView]: () => [
+                {
+                    name: i18n('field_system-view-type'),
+                    content: prepareSystemViewType(PathDescription?.SysViewDescription?.Type),
                 },
             ],
             [EPathType.EPathTypeSubDomain]: getDatabaseOverview,
@@ -366,7 +375,14 @@ export function ObjectSummary({
     const renderTabContent = () => {
         switch (summaryTab) {
             case TENANT_SUMMARY_TABS_IDS.schema: {
-                return <SchemaViewer type={type} path={path} tenantName={tenantName} />;
+                return (
+                    <SchemaViewer
+                        type={type}
+                        path={path}
+                        database={database}
+                        databaseFullPath={databaseFullPath}
+                    />
+                );
             }
             default: {
                 return renderObjectOverview();
@@ -385,7 +401,7 @@ export function ObjectSummary({
         dispatchCommonInfoVisibilityState(PaneVisibilityActionTypes.clear);
     };
 
-    const relativePath = transformPath(path, tenantName);
+    const relativePath = transformPath(path, databaseFullPath);
 
     const renderCommonInfoControls = () => {
         const showPreview = isTableType(type) && !isIndexTableType(subType);
@@ -394,7 +410,7 @@ export function ObjectSummary({
                 {showPreview &&
                     getSummaryControls(
                         dispatch,
-                        {setActivePath: setCurrentPath},
+                        {setActivePath: handleSchemaChange},
                         'm',
                     )(path, 'preview')}
                 <ClipboardButton
@@ -447,7 +463,11 @@ export function ObjectSummary({
                             minSize={[200, 52]}
                             collapsedSizes={[100, 0]}
                         >
-                            <ObjectTree tenantName={tenantName} path={path} />
+                            <ObjectTree
+                                database={database}
+                                path={path}
+                                databaseFullPath={databaseFullPath}
+                            />
                             <div className={b('info')}>
                                 <div className={b('sticky-top')}>
                                     <div className={b('info-header')}>

@@ -1,9 +1,9 @@
 import {EPathType} from '../../../types/api/schema';
 
-export function transformPath(path: string, dbName: string): string {
+export function transformPath(path: string, databaseFullPath: string): string {
     // Normalize the path and dbName by removing leading/trailing slashes
     const normalizedPath = path.replace(/^\/+|\/+$/g, '');
-    const normalizedDbName = dbName.replace(/^\/+|\/+$/g, '');
+    const normalizedDbName = databaseFullPath.replace(/^\/+|\/+$/g, '');
 
     if (!normalizedPath.startsWith(normalizedDbName)) {
         return normalizedPath || '/';

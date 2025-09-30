@@ -1,15 +1,21 @@
 import React from 'react';
 
-import {useThemeValue} from '@gravity-ui/uikit';
+import type {IconData} from '@gravity-ui/uikit';
+import {Flex, Icon, useThemeValue} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
 import {cn} from '../../utils/cn';
 
-export interface IllustrationProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+import './Illustration.scss';
+
+export interface IllustrationProps {
     name: string;
+    width?: number;
+    height?: number;
     className?: string;
 }
 
-type IllustrationStore = Record<string, Record<string, () => Promise<{default: any}>>>;
+type IllustrationStore = Record<string, Record<string, () => Promise<{default: IconData}>>>;
 
 const store: IllustrationStore = {
     light: {
@@ -24,23 +30,42 @@ const store: IllustrationStore = {
     },
 };
 
-const b = cn('kv-illustration');
+const b = cn('ydb-illustration');
 
-export const Illustration = ({name, className, ...props}: IllustrationProps) => {
+export const Illustration = ({name, className, width, height}: IllustrationProps) => {
     const theme = useThemeValue();
-    const [src, setSrc] = React.useState('');
-    const srcGetter = store[theme] && store[theme][name];
+
+    // When a function is stored in useState, typeof returns 'object'
+    // SVGR loads SVG files as React components (functions)
+    // However, in the Icon component, these are treated as objects and incorrectly rendered as sprite elements (bug)
+    // To fix this, we need to wrap the icon data in an additional object, so its initial type is preserved
+    const [{iconData}, setIconData] = React.useState<{iconData?: IconData}>({});
 
     React.useEffect(() => {
-        if (typeof srcGetter === 'function') {
-            srcGetter()
-                .then((svg) => setSrc(svg.default))
-                .catch((e) => {
-                    console.error(e);
-                    setSrc('');
-                });
-        }
-    }, [srcGetter]);
+        const loadIcon = async () => {
+            try {
+                const iconLoader = store[theme]?.[name];
 
-    return src ? <img alt={name} src={src} className={b(null, className)} {...props} /> : null;
+                if (iconLoader && typeof iconLoader === 'function') {
+                    const module = await iconLoader();
+                    setIconData({iconData: module.default});
+                }
+            } catch (err) {
+                console.error('Failed to load illustration:', name, err);
+                setIconData({});
+            }
+        };
+
+        loadIcon();
+    }, [name, theme]);
+
+    if (isNil(iconData)) {
+        return null;
+    }
+
+    return (
+        <Flex style={{width, height}} className={b(null, className)}>
+            <Icon data={iconData} className={b('icon')} />
+        </Flex>
+    );
 };

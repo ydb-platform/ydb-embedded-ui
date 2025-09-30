@@ -41,7 +41,7 @@ export function TopGroups({tenant}: TopGroupsProps) {
 
     const {currentData, isFetching, error} = storageApi.useGetStorageGroupsInfoQuery(
         {
-            tenant,
+            database: tenant,
             sort: '-Usage',
             with: 'all',
             limit: TENANT_OVERVIEW_TABLES_LIMIT,

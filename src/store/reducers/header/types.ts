@@ -23,12 +23,13 @@ export interface ClusterBreadcrumbsOptions extends ClustersBreadcrumbsOptions {
 }
 
 export interface TenantBreadcrumbsOptions extends ClusterBreadcrumbsOptions {
-    tenantName?: string;
+    database?: string;
+    databaseName?: string;
 }
 
 export interface StorageGroupBreadcrumbsOptions extends ClusterBreadcrumbsOptions {
     groupId?: string;
-    tenantName?: string;
+    database?: string;
 }
 
 export interface NodeBreadcrumbsOptions extends TenantBreadcrumbsOptions {
@@ -37,7 +38,7 @@ export interface NodeBreadcrumbsOptions extends TenantBreadcrumbsOptions {
     nodeRole?: 'Storage' | 'Compute';
 }
 
-export interface PDiskBreadcrumbsOptions extends Omit<NodeBreadcrumbsOptions, 'tenantName'> {
+export interface PDiskBreadcrumbsOptions extends Omit<NodeBreadcrumbsOptions, 'database'> {
     pDiskId?: string | number;
 }
 

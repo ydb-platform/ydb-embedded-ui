@@ -160,13 +160,13 @@ export const formatPercent = (number?: unknown, precision = 2) => {
         return '';
     }
 
-    // Numeral doesn't work well with very low numbers (for example 2e-27)
-    // We can receive such numbers from backend in float fields
-    // So we need apply toFixed before configuration
-    const preparedNumber = Number(number).toFixed(precision);
-    const configuredNumber = configuredNumeral(preparedNumber);
+    // Round precision for very low numbers (e.g. 2e-27 from backend)
+    // Pass as number, not string, to avoid locale decimal separator issues
+    const numberValue = Number(number);
+    const roundedNumber = Number(numberValue.toFixed(precision));
+
     const format = '0.[00]%';
-    return configuredNumber.format(format);
+    return configuredNumeral(roundedNumber).format(format);
 };
 
 export const formatSecondsToHours = (seconds: number) => {
