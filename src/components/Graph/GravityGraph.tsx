@@ -1,7 +1,7 @@
 import React from 'react';
 
-import type {TGraphConfig} from '@gravity-ui/graph';
 import {GraphState} from '@gravity-ui/graph';
+import type {HookGraphParams} from '@gravity-ui/graph/react';
 import {GraphBlock, GraphCanvas, useGraph, useGraphEvent} from '@gravity-ui/graph/react';
 
 import {cn} from '../../utils/cn';
@@ -25,7 +25,7 @@ interface Props<T> {
     theme?: string;
 }
 
-const config: TGraphConfig = {
+const config: HookGraphParams = {
     settings: {
         connection: NonSelectableConnection,
         showConnectionArrows: false,
@@ -92,7 +92,7 @@ export function GravityGraph<T>({data, theme}: Props<T>) {
     }, [data.nodes, data.links, graph]);
 
     React.useEffect(() => {
-        graph.setColors(parseCustomPropertyValue(graphColorsConfig, graph.getGraphCanvas()));
+        graph.setColors(parseCustomPropertyValue(graphColorsConfig));
     }, [graph, theme]);
 
     useGraphEvent(graph, 'state-change', ({state}) => {

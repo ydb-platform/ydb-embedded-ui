@@ -8,6 +8,11 @@ export const graphColorsConfig = {
         dots: 'var(--g-color-line-generic)',
         layerBackground: 'var(--g-color-base-background)',
     },
+    block: {
+        text: 'var(--g-color-text-primary)',
+        background: 'var(--g-color-base-float)',
+        border: 'var(--g-color-line-generic-solid)',
+    },
     connection: {
         background: 'var(--g-color-line-generic-solid)',
         hoverBackground: 'var(--g-color-line-generic-solid)',

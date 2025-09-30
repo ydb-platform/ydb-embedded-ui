@@ -30,7 +30,7 @@ export function Graph({explain = {}, theme}: GraphProps) {
 
     return (
         <div className={b('canvas-container')}>
-            <GravityGraph data={data} theme={theme} key={theme} />
+            <GravityGraph data={data} theme={theme} />
         </div>
     );
 }
