@@ -14,10 +14,10 @@ class TreeLayoutEngine {
         this.blocks = new Map(blocks.map((block: any) => [block.id, {...block}]));
         this.connections = connections;
 
-        // Настройки отступов
+        // Layout settings
         this.options = {
-            horizontalSpacing: options.horizontalSpacing || 40, // расстояние между блоками по горизонтали
-            verticalSpacing: options.verticalSpacing || 20, // расстояние между уровнями
+            horizontalSpacing: options.horizontalSpacing || 40, // horizontal distance between blocks
+            verticalSpacing: options.verticalSpacing || 20, // vertical distance between levels
             ...options,
         };
 
@@ -25,18 +25,16 @@ class TreeLayoutEngine {
         this.levels = [];
     }
 
-    // Построение структуры дерева
+    // Building a tree structure
     buildTree() {
-        // Создаем карты родителей и детей
         const childrenMap = new Map();
         const parentMap = new Map();
 
-        // Инициализируем карты
         for (const block of this.blocks.values()) {
             childrenMap.set(block.id, []);
         }
 
-        // Заполняем связи
+        // Setting connections
         for (const connection of this.connections) {
             const parent = connection.sourceBlockId;
             const child = connection.targetBlockId;
@@ -45,14 +43,14 @@ class TreeLayoutEngine {
             parentMap.set(child, parent);
         }
 
-        // Находим корневой узел (узел без родителя)
+        // Find root (a node without a parent)
         const rootId = Array.from(this.blocks.keys()).find((id) => !parentMap.has(id));
 
         if (!rootId) {
             throw new Error('Root node not found');
         }
 
-        // Рекурсивно строим дерево
+        // Recursively building a tree
         const buildNode = (nodeId: string, level = 0): TreeNode => {
             const block = this.blocks.get(nodeId);
             const children = childrenMap
@@ -74,7 +72,7 @@ class TreeLayoutEngine {
         return this.tree;
     }
 
-    // Группировка узлов по уровням
+    // Grouping nodes by levels
     groupByLevels(node: TreeNode | null = this.tree, levels: TreeNode[][] = []): TreeNode[][] {
         if (!node) {
             return levels;
@@ -93,18 +91,18 @@ class TreeLayoutEngine {
         return levels;
     }
 
-    // Вычисление ширины поддерева для каждого узла
+    // Calculating the width of the subtree for each node
     calculateSubtreeWidths(node: TreeNode = this.tree!): number {
         if (node.children.length === 0) {
-            // Листовой узел - ширина равна ширине блока
+            // Leaf node - width is equal to the width of the block
             node.subtreeWidth = node.block.width;
         } else {
-            // Рекурсивно вычисляем ширину для детей
+            // Recursively calculating the width for children
             for (const child of node.children) {
                 this.calculateSubtreeWidths(child);
             }
 
-            // Ширина поддерева = сумма ширин поддеревьев детей + отступы между ними
+            // Subtree width = sum of the widths of the children's subtrees + the margins between them
             const childrenWidth = node.children.reduce(
                 (sum: number, child: TreeNode) => sum + child.subtreeWidth,
                 0,
@@ -112,46 +110,46 @@ class TreeLayoutEngine {
             const spacingWidth = (node.children.length - 1) * this.options.horizontalSpacing;
             const totalChildrenWidth = childrenWidth + spacingWidth;
 
-            // Ширина поддерева = максимум из ширины самого узла и суммарной ширины детей
+            // Subtree width = the maximum of the width of the node itself and the total width of the children
             node.subtreeWidth = Math.max(node.block.width, totalChildrenWidth);
         }
 
         return node.subtreeWidth;
     }
 
-    // Размещение узлов по позициям
+    // Placement of nodes by position
     positionNodes() {
         if (!this.tree) {
             return;
         }
 
-        // Вычисляем Y координаты для каждого уровня
+        // Calculating the Y coordinates for each level
         let currentY = 0;
         const levelY: number[] = [];
 
         for (let level = 0; level < this.levels.length; level++) {
             levelY[level] = currentY;
 
-            // Находим максимальную высоту блоков на этом уровне
+            // We find the maximum height of the blocks at this level
             const maxHeight = Math.max(
                 ...this.levels[level].map((node: TreeNode) => node.block.height),
             );
             currentY += maxHeight + this.options.verticalSpacing;
         }
 
-        // Рекурсивно размещаем узлы
+        // Recursively placing nodes
         const positionNode = (node: TreeNode, leftX: number): void => {
-            // Устанавливаем Y координату
+            // Setting the Y coordinate
             node.y = levelY[node.level];
 
             if (node.children.length === 0) {
-                // Листовой узел - размещаем в текущей позиции
+                // The leaf node is placed in the current position.
                 node.x = leftX;
             } else {
-                // Размещаем детей
+                // Place children
                 let childX = leftX;
 
-                // Если ширина узла больше суммарной ширины детей, добавляем отступ
+                // If the node width is greater than the total width of the children, add an indentation.
                 const childrenWidth = node.children.reduce(
                     (sum: number, child: TreeNode) => sum + child.subtreeWidth,
                     0,
@@ -164,13 +162,13 @@ class TreeLayoutEngine {
                     childX += extraSpace;
                 }
 
-                // Размещаем каждого ребенка
+                // Place each child
                 for (const child of node.children) {
                     positionNode(child, childX);
                     childX += child.subtreeWidth + this.options.horizontalSpacing;
                 }
 
-                // Центрируем родительский узел относительно детей
+                // Center the parent node relative to the children
                 const firstChild = node.children[0];
                 const lastChild = node.children[node.children.length - 1];
                 const childrenCenter = (firstChild.x + lastChild.x + lastChild.block.width) / 2;
@@ -181,7 +179,7 @@ class TreeLayoutEngine {
         positionNode(this.tree, 0);
     }
 
-    // Нормализация координат (чтобы минимальные координаты были >= 0)
+    // Normalization of coordinates (so that the minimum coordinates are >= 0)
     normalizeCoordinates() {
         if (!this.tree) {
             return;
@@ -201,7 +199,7 @@ class TreeLayoutEngine {
         const minX = Math.min(...allNodes.map((node) => node.x));
         const minY = Math.min(...allNodes.map((node) => node.y));
 
-        // Сдвигаем все координаты так, чтобы минимальные были равны 0
+        // Shift all coordinates so that the minimum ones are equal to 0
         const offsetX = minX < 0 ? -minX : 0;
         const offsetY = minY < 0 ? -minY : 0;
 
@@ -211,7 +209,7 @@ class TreeLayoutEngine {
         }
     }
 
-    // Основной метод компоновки
+    // Main method of composition
     layout() {
         this.buildTree();
         this.groupByLevels();
@@ -222,7 +220,7 @@ class TreeLayoutEngine {
         return this.getLayoutResult();
     }
 
-    // Получение результата компоновки
+    // Getting the result of composition
     getLayoutResult(): ExtendedTBlock[] {
         if (!this.tree) {
             return [];
@@ -252,17 +250,17 @@ class TreeLayoutEngine {
     }
 }
 
-// Функция для использования алгоритма
+// Function for using the algorithm
 function calculateTreeLayout(blocks: TBlock[], connections: TConnection[], options = {}) {
     const engine = new TreeLayoutEngine(blocks, connections, options);
     return engine.layout();
 }
 
 function calculateTreeEdges(layoutResult: ExtendedTBlock[], connections: TConnection[]) {
-    // Создаем карту позиций для удобства поиска
+    // Create a position map for convenience of search
     const positionMap = new Map(layoutResult.map((item) => [item.id, item]));
 
-    // Группируем связи по родительскому блоку
+    // Group connections by parent block
     const connectionsByParent = new Map();
 
     for (const connection of connections) {
@@ -280,19 +278,19 @@ function calculateTreeEdges(layoutResult: ExtendedTBlock[], connections: TConnec
         points: {x: number; y: number}[];
     }[] = [];
 
-    // Для каждого родительского блока рассчитываем пути к детям
+    // For each parent block, we calculate the paths to the children
     for (const [parentId, parentConnections] of connectionsByParent) {
         const parent = positionMap.get(parentId);
         if (!parent) {
             continue;
         }
 
-        // Координаты начальной точки (центр нижней части родителя)
+        // Coordinates of the initial point (center of the lower part of the parent)
         const startX = parent.x + parent.width / 2;
         const startY = parent.y + parent.height;
 
         if (parentConnections.length === 1) {
-            // Один дочерний блок - простая прямая линия
+            // One child block - simple straight line
             const connection = parentConnections[0];
             const child = positionMap.get(connection.targetBlockId);
 
@@ -311,9 +309,9 @@ function calculateTreeEdges(layoutResult: ExtendedTBlock[], connections: TConnec
                 });
             }
         } else {
-            // Несколько дочерних блоков - ломаные линии
+            // Several child blocks - broken lines
 
-            // Находим вертикальное расстояние между родителем и ближайшим ребенком
+            // We find the vertical distance between the parent and the nearest child
             const children = parentConnections
                 .map((conn: TConnection) => positionMap.get(conn.targetBlockId))
                 .filter(
@@ -325,13 +323,13 @@ function calculateTreeEdges(layoutResult: ExtendedTBlock[], connections: TConnec
                 continue;
             }
 
-            // Находим минимальное расстояние до детей по Y
+            // We find the minimum distance to the children by Y
             const minChildY = Math.min(...children.map((child: ExtendedTBlock) => child.y));
 
-            // Точка разветвления - посередине между родителем и детьми
+            // The point of branching - in the middle between the parent and the children
             const branchY = startY + (minChildY - startY) / 2;
 
-            // Для каждого дочернего блока создаем ломаную линию
+            // For each child block, we create a broken line
             for (const connection of parentConnections) {
                 const child = positionMap.get(connection.targetBlockId);
                 if (!child) {
@@ -342,10 +340,10 @@ function calculateTreeEdges(layoutResult: ExtendedTBlock[], connections: TConnec
                 const endY = child.y;
 
                 const points = [
-                    {x: startX, y: startY}, // Начало - центр нижней части родителя
-                    {x: startX, y: branchY}, // Вертикально вниз до точки разветвления
-                    {x: endX, y: branchY}, // Горизонтально до центра дочернего блока
-                    {x: endX, y: endY}, // Вертикально вниз до центра верхней части дочернего блока
+                    {x: startX, y: startY}, // Start - center of the lower part of the parent
+                    {x: startX, y: branchY}, // Vertically down to the point of branching
+                    {x: endX, y: branchY}, // Horizontally to the center of the child block
+                    {x: endX, y: endY}, // Vertically down to the center of the upper part of the child block
                 ];
 
                 connectionPaths.push({

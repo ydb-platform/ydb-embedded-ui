@@ -1,3 +1,5 @@
+import {useCallback} from 'react';
+
 import type {Graph} from '@gravity-ui/graph';
 import {Button, Icon} from '@gravity-ui/uikit';
 
@@ -15,19 +17,19 @@ interface Props {
 }
 
 export const GraphControls = ({graph}: Props) => {
-    const onZoomInClick = () => {
+    const onZoomInClick = useCallback(() => {
         const cameraScale = graph.cameraService.getCameraScale();
         graph.zoom({scale: cameraScale * ZOOM_STEP});
-    };
+    }, [graph]);
 
-    const onZoomOutClick = () => {
+    const onZoomOutClick = useCallback(() => {
         const cameraScale = graph.cameraService.getCameraScale();
         graph.zoom({scale: cameraScale / ZOOM_STEP});
-    };
+    }, [graph]);
 
-    const onResetZoomClick = () => {
+    const onResetZoomClick = useCallback(() => {
         graph.zoom({scale: 1});
-    };
+    }, [graph]);
 
     return (
         <div className={b('zoom-controls')}>

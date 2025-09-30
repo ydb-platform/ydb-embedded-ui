@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 
 import {Popover, Tab, TabList, TabPanel, TabProvider} from '@gravity-ui/uikit';
 
@@ -43,21 +43,24 @@ const useTooltipContent = (block: ExtendedTBlock) => {
     const firstTab = block?.stats?.[0]?.group || '';
     const [activeTab, setActiveTab] = useState(firstTab);
 
-    return (
-        <TabProvider value={activeTab} onUpdate={setActiveTab}>
-            <TabList className={b('tooltip-tabs')}>
+    return useMemo(
+        () => (
+            <TabProvider value={activeTab} onUpdate={setActiveTab}>
+                <TabList className={b('tooltip-tabs')}>
+                    {block?.stats?.map((item) => (
+                        <Tab value={item.group} key={item.group}>
+                            {item.group}
+                        </Tab>
+                    ))}
+                </TabList>
                 {block?.stats?.map((item) => (
-                    <Tab value={item.group} key={item.group}>
-                        {item.group}
-                    </Tab>
+                    <TabPanel value={item.group} key={item.group}>
+                        {item.stats?.map(getStatsContent)}
+                    </TabPanel>
                 ))}
-            </TabList>
-            {block?.stats?.map((item) => (
-                <TabPanel value={item.group} key={item.group}>
-                    {item.stats?.map(getStatsContent)}
-                </TabPanel>
-            ))}
-        </TabProvider>
+            </TabProvider>
+        ),
+        [block?.stats, activeTab],
     );
 };
 

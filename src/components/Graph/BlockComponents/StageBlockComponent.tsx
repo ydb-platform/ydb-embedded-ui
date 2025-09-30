@@ -1,6 +1,7 @@
 import {Text} from '@gravity-ui/uikit';
 
 import {TooltipComponent} from '../TooltipComponent';
+import i18n from '../i18n';
 import type {ExtendedTBlock} from '../types';
 
 type Props = {
@@ -16,7 +17,7 @@ export const StageBlockComponent = ({className, block}: Props) => {
                 : block.name}
             {block.tables ? (
                 <div>
-                    <Text color="secondary">Tables: </Text>
+                    <Text color="secondary">{i18n('label_tables')}: </Text>
                     {block.tables.join(', ')}
                 </div>
             ) : null}

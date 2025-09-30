@@ -66,7 +66,7 @@ export function GravityGraph<T>({data, theme}: Props<T>) {
     const {graph, start} = useGraph(config);
 
     React.useEffect(() => {
-        // на всякий случай, хотя маунт больше времени занимает, чем расчёт
+        // Just in case, although mounting takes more time than calculation
         const worker = new Worker(new URL('./treeLayout', import.meta.url));
         worker.postMessage({
             nodes: data.nodes,
