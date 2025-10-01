@@ -59,7 +59,6 @@ body,
     --g-popover-max-width: 500px;
 
     -webkit-overflow-scrolling: touch;
-    @include mixins.scrollbar();
     ::-webkit-scrollbar-corner,
     ::-webkit-scrollbar-thumb {
         border-radius: 8px;
