@@ -1,16 +1,9 @@
 import React from 'react';
 
-import {
-    ArrowsOppositeToDots,
-    ChevronDown,
-    FileArrowRightOut,
-    FileText,
-    LayoutHeaderCells,
-    PencilToSquare,
-    Persons,
-} from '@gravity-ui/icons';
+import {ChevronDown, Persons} from '@gravity-ui/icons';
 import type {DropdownMenuItem} from '@gravity-ui/uikit';
 import {Button, DropdownMenu} from '@gravity-ui/uikit';
+import {AsyncReplicationIcon, TableIcon, TopicIcon, TransferIcon} from 'ydb-ui-components';
 
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {insertSnippetToEditor} from '../../../../utils/monaco/insertSnippet';
@@ -30,7 +23,7 @@ export function NewSQL() {
     const items: DropdownMenuItem[] = [
         {
             text: i18n('menu.tables'),
-            iconStart: <LayoutHeaderCells />,
+            iconStart: <TableIcon />,
             items: [
                 {
                     text: i18n('action.create-row-table'),
@@ -84,7 +77,7 @@ export function NewSQL() {
         },
         {
             text: i18n('menu.topics'),
-            iconStart: <FileText />,
+            iconStart: <TopicIcon />,
             items: [
                 {
                     text: i18n('action.create-topic'),
@@ -102,7 +95,7 @@ export function NewSQL() {
         },
         {
             text: i18n('menu.replication'),
-            iconStart: <ArrowsOppositeToDots />,
+            iconStart: <AsyncReplicationIcon />,
             items: [
                 {
                     text: i18n('action.create-async-replication'),
@@ -120,7 +113,7 @@ export function NewSQL() {
         },
         {
             text: i18n('menu.transfer'),
-            iconStart: <FileArrowRightOut />,
+            iconStart: <TransferIcon />,
             items: [
                 {
                     text: i18n('action.create-transfer'),
@@ -138,7 +131,7 @@ export function NewSQL() {
         },
         {
             text: i18n('menu.capture'),
-            iconStart: <PencilToSquare />,
+            iconStart: <TopicIcon />,
             items: [
                 {
                     text: i18n('action.create-cdc-stream'),
