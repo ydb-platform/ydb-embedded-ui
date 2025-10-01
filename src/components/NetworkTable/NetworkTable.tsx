@@ -11,7 +11,7 @@ import {
 
 type NetworkWrapperProps = Pick<
     NodesProps,
-    'path' | 'scrollContainerRef' | 'additionalNodesProps' | 'database' | 'databaseFullPath'
+    'path' | 'scrollContainerRef' | 'database' | 'databaseFullPath'
 >;
 
 export function NetworkTable({
@@ -19,7 +19,6 @@ export function NetworkTable({
     databaseFullPath,
     path,
     scrollContainerRef,
-    additionalNodesProps,
 }: NetworkWrapperProps) {
     return (
         <Nodes
@@ -28,11 +27,7 @@ export function NetworkTable({
             databaseFullPath={databaseFullPath}
             scrollContainerRef={scrollContainerRef}
             withPeerRoleFilter={Boolean(database)}
-            additionalNodesProps={additionalNodesProps}
-            columns={getNetworkTableNodesColumns({
-                database,
-                getNodeRef: additionalNodesProps?.getNodeRef,
-            })}
+            columns={getNetworkTableNodesColumns({database})}
             defaultColumnsIds={NETWORK_DEFAULT_NODES_COLUMNS}
             requiredColumnsIds={NETWORK_REQUIRED_NODES_COLUMNS}
             selectedColumnsKey={NETWORK_NODES_TABLE_SELECTED_COLUMNS_KEY}

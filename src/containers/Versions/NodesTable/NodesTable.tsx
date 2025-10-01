@@ -13,7 +13,6 @@ import type {GetNodesColumnsParams, NodesColumn} from '../../../components/nodes
 import {useBridgeModeEnabled} from '../../../store/reducers/capabilities/hooks';
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
-import {useAdditionalNodesProps} from '../../../utils/hooks/useAdditionalNodesProps';
 
 const VERSIONS_COLUMNS_WIDTH_LS_KEY = 'versionsTableColumnsWidth';
 
@@ -34,10 +33,9 @@ interface NodesTableProps {
 }
 
 export const NodesTable = ({nodes}: NodesTableProps) => {
-    const additionalNodesProps = useAdditionalNodesProps();
     const bridgeModeEnabled = useBridgeModeEnabled();
 
-    const allColumns = getColumns({getNodeRef: additionalNodesProps?.getNodeRef});
+    const allColumns = getColumns({});
     const columns = bridgeModeEnabled
         ? allColumns
         : allColumns.filter((c) => c.name !== NODES_COLUMNS_IDS.PileName);

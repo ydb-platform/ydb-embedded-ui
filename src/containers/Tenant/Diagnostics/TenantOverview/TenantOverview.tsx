@@ -8,7 +8,7 @@ import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
 import {tenantApi} from '../../../../store/reducers/tenant/tenant';
 import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
-import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../../types/additionalProps';
+import type {AdditionalTenantsProps} from '../../../../types/additionalProps';
 import {getDatabaseLinks} from '../../../../utils/additionalProps';
 import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
 import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
@@ -30,14 +30,12 @@ interface TenantOverviewProps {
     database: string;
     databaseFullPath: string;
     additionalTenantProps?: AdditionalTenantsProps;
-    additionalNodesProps?: AdditionalNodesProps;
 }
 
 export function TenantOverview({
     database,
     databaseFullPath,
     additionalTenantProps,
-    additionalNodesProps,
 }: TenantOverviewProps) {
     const {metricsTab} = useTypedSelector((state) => state.tenant);
     const [autoRefreshInterval] = useAutoRefreshInterval();
@@ -145,7 +143,6 @@ export function TenantOverview({
                 return (
                     <TenantCpu
                         database={database}
-                        additionalNodesProps={additionalNodesProps}
                         databaseType={Type}
                         databaseFullPath={databaseFullPath}
                     />
@@ -171,12 +168,7 @@ export function TenantOverview({
                 );
             }
             case TENANT_METRICS_TABS_IDS.network: {
-                return (
-                    <TenantNetwork
-                        database={database}
-                        additionalNodesProps={additionalNodesProps}
-                    />
-                );
+                return <TenantNetwork database={database} />;
             }
             default: {
                 return null;

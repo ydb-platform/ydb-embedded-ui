@@ -1,11 +1,8 @@
 import {getDefaultNodePath} from '../../containers/Node/NodePages';
-import type {GetNodeRefFunc, NodeAddress} from '../../types/additionalProps';
+import type {PreparedStorageNode} from '../../store/reducers/storage/types';
+import type {NodeAddress} from '../../types/additionalProps';
 import type {TNodeInfo, TSystemStateInfo} from '../../types/api/nodes';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {
-    createDeveloperUIInternalPageHref,
-    createDeveloperUILinkWithNodeId,
-} from '../../utils/developerUI/developerUI';
 import {isUnavailableNode} from '../../utils/nodes';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
 import {NodeEndpointsTooltipContent} from '../TooltipsContent';
@@ -18,15 +15,13 @@ export type NodeHostData = NodeAddress &
     };
 
 interface NodeHostWrapperProps {
-    node: NodeHostData;
-    getNodeRef?: GetNodeRefFunc;
+    node: PreparedStorageNode;
     database?: string;
     statusForIcon?: 'SystemState' | 'ConnectStatus';
 }
 
 export const NodeHostWrapper = ({
     node,
-    getNodeRef,
     database,
     statusForIcon = 'SystemState',
 }: NodeHostWrapperProps) => {
@@ -37,17 +32,6 @@ export const NodeHostWrapper = ({
     const status = statusForIcon === 'ConnectStatus' ? node.ConnectStatus : node.SystemState;
 
     const isNodeAvailable = !isUnavailableNode(node);
-
-    let developerUIInternalHref: string | undefined;
-    if (getNodeRef) {
-        const developerUIHref = getNodeRef(node);
-        developerUIInternalHref = developerUIHref
-            ? createDeveloperUIInternalPageHref(developerUIHref)
-            : undefined;
-    } else if (node.NodeId) {
-        const developerUIHref = createDeveloperUILinkWithNodeId(node.NodeId);
-        developerUIInternalHref = createDeveloperUIInternalPageHref(developerUIHref);
-    }
 
     const nodePath = isNodeAvailable
         ? getDefaultNodePath(
@@ -66,9 +50,7 @@ export const NodeHostWrapper = ({
             path={nodePath}
             hasClipboardButton
             infoPopoverContent={
-                isNodeAvailable ? (
-                    <NodeEndpointsTooltipContent data={node} nodeHref={developerUIInternalHref} />
-                ) : null
+                isNodeAvailable ? <NodeEndpointsTooltipContent data={node} /> : null
             }
         />
     );

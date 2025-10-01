@@ -12,7 +12,7 @@ import {
 } from '../../../store/reducers/capabilities/hooks';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setDiagnosticsTab, useTenantBaseInfo} from '../../../store/reducers/tenant/tenant';
-import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../types/additionalProps';
+import type {AdditionalTenantsProps} from '../../../types/additionalProps';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 import {cn} from '../../../utils/cn';
 import {useScrollPosition, useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
@@ -44,12 +44,11 @@ import './Diagnostics.scss';
 
 interface DiagnosticsProps {
     additionalTenantProps?: AdditionalTenantsProps;
-    additionalNodesProps?: AdditionalNodesProps;
 }
 
 const b = cn('kv-tenant-diagnostics');
 
-function Diagnostics(props: DiagnosticsProps) {
+function Diagnostics({additionalTenantProps}: DiagnosticsProps) {
     const {path, database, type, subType, databaseFullPath} = useCurrentSchema();
     const containerRef = React.useRef<HTMLDivElement>(null);
     const dispatch = useTypedDispatch();
@@ -95,8 +94,7 @@ function Diagnostics(props: DiagnosticsProps) {
                         database={database}
                         path={path}
                         databaseFullPath={databaseFullPath}
-                        additionalTenantProps={props.additionalTenantProps}
-                        additionalNodesProps={props.additionalNodesProps}
+                        additionalTenantProps={additionalTenantProps}
                     />
                 );
             }
@@ -129,7 +127,6 @@ function Diagnostics(props: DiagnosticsProps) {
                         path={path}
                         databaseFullPath={databaseFullPath}
                         database={database}
-                        additionalNodesProps={props.additionalNodesProps}
                         scrollContainerRef={containerRef}
                     />
                 );
@@ -156,7 +153,6 @@ function Diagnostics(props: DiagnosticsProps) {
                         path={path}
                         databaseFullPath={databaseFullPath}
                         database={database}
-                        additionalNodesProps={props.additionalNodesProps}
                         scrollContainerRef={containerRef}
                     />
                 );

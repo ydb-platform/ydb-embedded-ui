@@ -14,7 +14,6 @@ import type {
     NodesColumn,
 } from '../../../../../components/nodesColumns/types';
 import {nodesApi} from '../../../../../store/reducers/nodes/nodes';
-import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import type {NodesRequiredField} from '../../../../../types/api/nodes';
 import {
     TENANT_OVERVIEW_TABLES_LIMIT,
@@ -48,15 +47,11 @@ function getTopNodesByLoadColumns(
 
 interface TopNodesByLoadProps {
     database: string;
-    additionalNodesProps?: AdditionalNodesProps;
 }
 
-export function TopNodesByLoad({database, additionalNodesProps}: TopNodesByLoadProps) {
+export function TopNodesByLoad({database}: TopNodesByLoadProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const [columns, fieldsRequired] = getTopNodesByLoadColumns({
-        getNodeRef: additionalNodesProps?.getNodeRef,
-        database,
-    });
+    const [columns, fieldsRequired] = getTopNodesByLoadColumns({database});
 
     const {currentData, isFetching, error} = nodesApi.useGetNodesQuery(
         {

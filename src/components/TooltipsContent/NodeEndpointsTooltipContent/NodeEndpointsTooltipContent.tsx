@@ -1,9 +1,9 @@
 import type {DefinitionListItemProps} from '@gravity-ui/uikit';
 import {DefinitionList} from '@gravity-ui/uikit';
 
-import type {TSystemStateInfo} from '../../../types/api/nodes';
+import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import {cn} from '../../../utils/cn';
-import {useIsUserAllowedToMakeChanges} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {useNodeDeveloperUIHref} from '../../../utils/hooks/useNodeDeveloperUIHref';
 import {LinkWithIcon} from '../../LinkWithIcon/LinkWithIcon';
 
 import i18n from './i18n';
@@ -13,12 +13,12 @@ import './NodeEndpointsTooltipContent.scss';
 const b = cn('ydb-node-endpoints-tooltip-content');
 
 interface NodeEdpointsTooltipProps {
-    data?: TSystemStateInfo;
-    nodeHref?: string;
+    data?: PreparedStorageNode;
 }
 
-export const NodeEndpointsTooltipContent = ({data, nodeHref}: NodeEdpointsTooltipProps) => {
-    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+export const NodeEndpointsTooltipContent = ({data}: NodeEdpointsTooltipProps) => {
+    const developerUIInternalHref = useNodeDeveloperUIHref(data);
+
     const info: (DefinitionListItemProps & {key: string})[] = [];
 
     if (data?.Roles?.length) {
@@ -58,10 +58,12 @@ export const NodeEndpointsTooltipContent = ({data, nodeHref}: NodeEdpointsToolti
         });
     }
 
-    if (isUserAllowedToMakeChanges && nodeHref) {
+    if (developerUIInternalHref) {
         info.push({
             name: 'Links',
-            children: <LinkWithIcon title={i18n('context_developer-ui')} url={nodeHref} />,
+            children: (
+                <LinkWithIcon title={i18n('context_developer-ui')} url={developerUIInternalHref} />
+            ),
             key: 'developerUi',
         });
     }

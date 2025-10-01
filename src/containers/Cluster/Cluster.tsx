@@ -26,11 +26,7 @@ import {
     useClusterBaseInfo,
 } from '../../store/reducers/cluster/cluster';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
-import type {
-    AdditionalClusterProps,
-    AdditionalNodesProps,
-    AdditionalTenantsProps,
-} from '../../types/additionalProps';
+import type {AdditionalClusterProps, AdditionalTenantsProps} from '../../types/additionalProps';
 import {EFlag} from '../../types/api/enums';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
@@ -60,15 +56,10 @@ const b = cn('ydb-cluster');
 
 interface ClusterProps {
     additionalTenantsProps?: AdditionalTenantsProps;
-    additionalNodesProps?: AdditionalNodesProps;
     additionalClusterProps?: AdditionalClusterProps;
 }
 
-export function Cluster({
-    additionalClusterProps,
-    additionalTenantsProps,
-    additionalNodesProps,
-}: ClusterProps) {
+export function Cluster({additionalClusterProps, additionalTenantsProps}: ClusterProps) {
     const container = React.useRef<HTMLDivElement>(null);
     const isClusterDashboardAvailable = useClusterDashboardAvailable();
 
@@ -237,10 +228,7 @@ export function Cluster({
                                     .pathname
                             }
                         >
-                            <Nodes
-                                scrollContainerRef={container}
-                                additionalNodesProps={additionalNodesProps}
-                            />
+                            <Nodes scrollContainerRef={container} />
                         </Route>
                         <Route
                             path={
@@ -258,10 +246,7 @@ export function Cluster({
                                     ).pathname
                                 }
                             >
-                                <NetworkTable
-                                    scrollContainerRef={container}
-                                    additionalNodesProps={additionalNodesProps}
-                                />
+                                <NetworkTable scrollContainerRef={container} />
                             </Route>
                         )}
                         <Route

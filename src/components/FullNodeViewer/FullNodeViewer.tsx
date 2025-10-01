@@ -24,6 +24,7 @@ const getLoadAverageIntervalTitle = (index: number) => {
     return [i18n('la-interval-1m'), i18n('la-interval-5m'), i18n('la-interval-15m')][index];
 };
 
+// eslint-disable-next-line complexity
 export const FullNodeViewer = ({node, className}: FullNodeViewerProps) => {
     const developerUIHref = useNodeDeveloperUIHref(node);
 

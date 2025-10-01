@@ -1,7 +1,6 @@
 import {ResizeableDataTable} from '../../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../../../../components/nodesColumns/constants';
 import {nodesApi} from '../../../../../store/reducers/nodes/nodes';
-import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import {
     TENANT_OVERVIEW_TABLES_LIMIT,
     TENANT_OVERVIEW_TABLES_SETTINGS,
@@ -14,15 +13,11 @@ import {getTopNodesByPingColumns} from './columns';
 
 interface TopNodesByPingProps {
     database: string;
-    additionalNodesProps?: AdditionalNodesProps;
 }
 
-export function TopNodesByPing({database, additionalNodesProps}: TopNodesByPingProps) {
+export function TopNodesByPing({database}: TopNodesByPingProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const [columns, fieldsRequired] = getTopNodesByPingColumns({
-        getNodeRef: additionalNodesProps?.getNodeRef,
-        database,
-    });
+    const [columns, fieldsRequired] = getTopNodesByPingColumns({database});
 
     const {currentData, isFetching, error} = nodesApi.useGetNodesQuery(
         {

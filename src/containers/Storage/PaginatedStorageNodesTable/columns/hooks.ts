@@ -19,7 +19,6 @@ import type {GetStorageNodesColumnsParams} from './types';
 export function useStorageNodesSelectedColumns({
     visibleEntities,
     database,
-    additionalNodesProps,
     viewContext,
     columnsSettings,
 }: GetStorageNodesColumnsParams) {
@@ -28,12 +27,11 @@ export function useStorageNodesSelectedColumns({
     const columns = React.useMemo(() => {
         const all = getStorageNodesColumns({
             database,
-            additionalNodesProps,
             viewContext,
             columnsSettings,
         });
         return bridgeModeEnabled ? all : all.filter((c) => c.name !== NODES_COLUMNS_IDS.PileName);
-    }, [database, additionalNodesProps, viewContext, columnsSettings, bridgeModeEnabled]);
+    }, [database, viewContext, columnsSettings, bridgeModeEnabled]);
 
     const requiredColumns = React.useMemo(() => {
         if (visibleEntities === VISIBLE_ENTITIES.missing) {

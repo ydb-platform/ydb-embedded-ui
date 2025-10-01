@@ -71,15 +71,12 @@ export const getPDisksColumn = ({
 
 export const getStorageNodesColumns = ({
     database,
-    additionalNodesProps,
     viewContext,
     columnsSettings,
 }: GetStorageNodesColumnsParams): NodesColumn[] => {
-    const getNodeRef = additionalNodesProps?.getNodeRef;
-
     const columns: NodesColumn[] = [
         getNodeIdColumn(),
-        getHostColumn({getNodeRef, database}),
+        getHostColumn({database}),
         getNodeNameColumn(),
         getDataCenterColumn(),
         getPileNameColumn(),

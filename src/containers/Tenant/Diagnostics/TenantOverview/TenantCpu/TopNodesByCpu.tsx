@@ -13,7 +13,6 @@ import type {
     NodesColumn,
 } from '../../../../../components/nodesColumns/types';
 import {nodesApi} from '../../../../../store/reducers/nodes/nodes';
-import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import type {NodesRequiredField} from '../../../../../types/api/nodes';
 import {
     TENANT_OVERVIEW_TABLES_LIMIT,
@@ -42,15 +41,11 @@ function getTopNodesByCpuColumns(
 
 interface TopNodesByCpuProps {
     database: string;
-    additionalNodesProps?: AdditionalNodesProps;
 }
 
-export function TopNodesByCpu({database, additionalNodesProps}: TopNodesByCpuProps) {
+export function TopNodesByCpu({database}: TopNodesByCpuProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const [columns, fieldsRequired] = getTopNodesByCpuColumns({
-        getNodeRef: additionalNodesProps?.getNodeRef,
-        database,
-    });
+    const [columns, fieldsRequired] = getTopNodesByCpuColumns({database});
 
     const {currentData, isFetching, error} = nodesApi.useGetNodesQuery(
         {
