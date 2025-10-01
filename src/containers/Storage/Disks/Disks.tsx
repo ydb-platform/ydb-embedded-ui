@@ -8,6 +8,7 @@ import {cn} from '../../../utils/cn';
 import type {PreparedVDisk} from '../../../utils/disks/types';
 import {isNumeric} from '../../../utils/utils';
 import {PDisk} from '../PDisk';
+import {DISKS_POPUP_DEBOUNCE_TIMEOUT} from '../shared';
 import type {StorageViewContext} from '../types';
 import {isVdiskActive, useVDisksWithDCMargins} from '../utils';
 
@@ -101,6 +102,8 @@ function VDiskItem({
                 compact
                 inactive={inactive}
                 showPopup={highlightedVDisk === vDiskId}
+                delayOpen={DISKS_POPUP_DEBOUNCE_TIMEOUT}
+                delayClose={DISKS_POPUP_DEBOUNCE_TIMEOUT}
                 onShowPopup={() => setHighlightedVDisk(vDiskId)}
                 onHidePopup={() => setHighlightedVDisk(undefined)}
                 progressBarClassName={b('vdisk-progress-bar')}
@@ -122,6 +125,8 @@ function PDiskItem({vDisk, highlightedVDisk, setHighlightedVDisk, withDCMargin}:
             progressBarClassName={b('pdisk-progress-bar')}
             data={vDisk.PDisk}
             showPopup={highlightedVDisk === vDiskId}
+            delayOpen={DISKS_POPUP_DEBOUNCE_TIMEOUT}
+            delayClose={DISKS_POPUP_DEBOUNCE_TIMEOUT}
             onShowPopup={() => setHighlightedVDisk(vDiskId)}
             onHidePopup={() => setHighlightedVDisk(undefined)}
         />

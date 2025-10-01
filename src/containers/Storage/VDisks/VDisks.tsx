@@ -2,6 +2,7 @@ import {VDiskWithDonorsStack} from '../../../components/VDisk/VDiskWithDonorsSta
 import type {Erasure} from '../../../types/api/storage';
 import {cn} from '../../../utils/cn';
 import type {PreparedVDisk} from '../../../utils/disks/types';
+import {DISKS_POPUP_DEBOUNCE_TIMEOUT} from '../shared';
 import type {StorageViewContext} from '../types';
 import {isVdiskActive, useVDisksWithDCMargins} from '../utils';
 
@@ -25,6 +26,8 @@ export function VDisks({vDisks, viewContext, erasure}: VDisksProps) {
                     key={vDisk.StringifiedId}
                     data={vDisk}
                     inactive={!isVdiskActive(vDisk, viewContext)}
+                    delayOpen={DISKS_POPUP_DEBOUNCE_TIMEOUT}
+                    delayClose={DISKS_POPUP_DEBOUNCE_TIMEOUT}
                     className={b('item', {
                         'with-dc-margin': vDisksWithDCMargins.includes(index),
                     })}
