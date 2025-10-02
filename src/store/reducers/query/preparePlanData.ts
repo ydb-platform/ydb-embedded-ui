@@ -1,10 +1,8 @@
-import type {ExplainPlanNodeData, GraphNode, Link} from '@gravity-ui/paranoid';
-
 import type {QueryPlan, ScriptPlan, TKqpStatsQuery} from '../../../types/api/query';
 import {preparePlan, prepareSimplifiedPlan} from '../../../utils/prepareQueryExplain';
 import {parseQueryExplainPlan} from '../../../utils/query';
 
-import type {PreparedQueryData} from './types';
+import type {ExplainPlanNodeData, GraphNode, Link, PreparedQueryData} from './types';
 
 const explainVersions = {
     v2: '0.2',
