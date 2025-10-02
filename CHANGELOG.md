@@ -1,5 +1,24 @@
 # Changelog
 
+## [12.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.6.0...v12.7.0) (2025-10-02)
+
+
+### Features
+
+* **Configs:** add info about full config ([#2921](https://github.com/ydb-platform/ydb-embedded-ui/issues/2921)) ([097aabe](https://github.com/ydb-platform/ydb-embedded-ui/commit/097aabe5bcceb926841f52a1486343e2028e9c05))
+* **Nodes,Storage:** enable both tablets and pdisks columns ([#2729](https://github.com/ydb-platform/ydb-embedded-ui/issues/2729)) ([c3cf2a7](https://github.com/ydb-platform/ydb-embedded-ui/commit/c3cf2a7ff5df28dd38b1971c564158af767e138c))
+* remove additionalNodesProps ([#2941](https://github.com/ydb-platform/ydb-embedded-ui/issues/2941)) ([d8d0954](https://github.com/ydb-platform/ydb-embedded-ui/commit/d8d09540949789ca7c3b436aa253ea90f9047def))
+
+
+### Bug Fixes
+
+* **Disks:** fix vdisk popup hiding ([#2946](https://github.com/ydb-platform/ydb-embedded-ui/issues/2946)) ([3b77a60](https://github.com/ydb-platform/ydb-embedded-ui/commit/3b77a60629c07fef80b0f130283afcc068ef8edf))
+* fix developer ui links in cloud and em ([#2949](https://github.com/ydb-platform/ydb-embedded-ui/issues/2949)) ([bcc3e93](https://github.com/ydb-platform/ydb-embedded-ui/commit/bcc3e9371050d10e6541da8294589b997324388a))
+* metric tabs look bad on small screens ([#2942](https://github.com/ydb-platform/ydb-embedded-ui/issues/2942)) ([adc051b](https://github.com/ydb-platform/ydb-embedded-ui/commit/adc051b656e98a8ff5a65577cb01b2413cdad3fb))
+* **NewSQL:** use the same icons as in schema tree ([#2948](https://github.com/ydb-platform/ydb-embedded-ui/issues/2948)) ([b960d4d](https://github.com/ydb-platform/ydb-embedded-ui/commit/b960d4d9a920ad67d904c89026053877e0109cac))
+* **OperationCell:** layout ([#2931](https://github.com/ydb-platform/ydb-embedded-ui/issues/2931)) ([f926c89](https://github.com/ydb-platform/ydb-embedded-ui/commit/f926c89e50c4214ad0f4e9bde03bf89799df2987))
+* percents incorrectly formatted for locale ru ([#2939](https://github.com/ydb-platform/ydb-embedded-ui/issues/2939)) ([eda8c5a](https://github.com/ydb-platform/ydb-embedded-ui/commit/eda8c5ad99401185252696279224f81e44863a7f))
+
 ## [12.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.5.0...v12.6.0) (2025-09-25)
 
 
