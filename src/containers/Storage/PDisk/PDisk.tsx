@@ -9,6 +9,7 @@ import {getPDiskPagePath} from '../../../routes';
 import {valueIsDefined} from '../../../utils';
 import {cn} from '../../../utils/cn';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
+import {DISKS_POPUP_DEBOUNCE_TIMEOUT} from '../shared';
 import type {StorageViewContext} from '../types';
 import {isVdiskActive} from '../utils';
 
@@ -26,6 +27,8 @@ interface PDiskProps {
     progressBarClassName?: string;
     viewContext?: StorageViewContext;
     width?: number;
+    delayOpen?: number;
+    delayClose?: number;
 }
 
 export const PDisk = ({
@@ -38,6 +41,8 @@ export const PDisk = ({
     progressBarClassName,
     viewContext,
     width,
+    delayOpen = DISKS_POPUP_DEBOUNCE_TIMEOUT,
+    delayClose = DISKS_POPUP_DEBOUNCE_TIMEOUT,
 }: PDiskProps) => {
     const {NodeId, PDiskId} = data;
     const pDiskIdsDefined = valueIsDefined(NodeId) && valueIsDefined(PDiskId);
@@ -65,8 +70,8 @@ export const PDisk = ({
                             data={vdisk}
                             inactive={!isVdiskActive(vdisk, viewContext)}
                             compact
-                            delayClose={200}
-                            delayOpen={200}
+                            delayOpen={delayOpen}
+                            delayClose={delayClose}
                         />
                     </div>
                 ))}
@@ -90,7 +95,8 @@ export const PDisk = ({
                 onShowPopup={onShowPopup}
                 onHidePopup={onHidePopup}
                 renderPopupContent={() => <PDiskPopup data={data} />}
-                delayClose={200}
+                delayOpen={delayOpen}
+                delayClose={delayClose}
             >
                 <InternalLink to={pDiskPath} className={b('content')}>
                     <DiskStateProgressBar
