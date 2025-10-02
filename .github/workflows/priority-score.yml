@@ -61,7 +61,7 @@ jobs:
               // Fallback to default values if labels are missing
               const defaultReach = reach || 75;  // default to medium reach
               const defaultImpact = impact || 75;  // default to low impact
-              const defaultEffort = effort || 5;  // default to medium effort
+              const defaultEffort = effort || 4;  // default to medium effort
               finalScore = Math.round((defaultReach * defaultImpact) / defaultEffort);
             }
 
