@@ -5,7 +5,12 @@ import {settingsManager} from '../../../services/settings';
 import {TracingLevelNumber} from '../../../types/api/query';
 import type {QueryAction, QueryRequestParams, QuerySettings} from '../../../types/store/query';
 import type {StreamDataChunk} from '../../../types/store/streaming';
-import {QUERIES_HISTORY_KEY} from '../../../utils/constants';
+import {loadFromSessionStorage, saveToSessionStorage} from '../../../utils';
+import {
+    QUERIES_HISTORY_KEY,
+    QUERY_EDITOR_CURRENT_QUERY_KEY,
+    QUERY_EDITOR_DIRTY_KEY,
+} from '../../../utils/constants';
 import {isQueryErrorResponse} from '../../../utils/query';
 import {isNumeric} from '../../../utils/utils';
 import type {RootState} from '../../defaultStore';
@@ -29,9 +34,14 @@ const queriesHistoryInitial = settingsManager.readUserSettingsValue(
 
 const sliceLimit = queriesHistoryInitial.length - MAXIMUM_QUERIES_IN_HISTORY;
 
+const rawQuery = loadFromSessionStorage(QUERY_EDITOR_CURRENT_QUERY_KEY);
+const input = typeof rawQuery === 'string' ? rawQuery : '';
+
+const isDirty = Boolean(loadFromSessionStorage(QUERY_EDITOR_DIRTY_KEY));
+
 const initialState: QueryState = {
-    input: '',
-    isDirty: false,
+    input,
+    isDirty,
     history: {
         queries: queriesHistoryInitial
             .slice(sliceLimit < 0 ? 0 : sliceLimit)
@@ -50,9 +60,11 @@ const slice = createSlice({
     reducers: {
         changeUserInput: (state, action: PayloadAction<{input: string}>) => {
             state.input = action.payload.input;
+            saveToSessionStorage(QUERY_EDITOR_CURRENT_QUERY_KEY, action.payload.input);
         },
         setIsDirty: (state, action: PayloadAction<boolean>) => {
             state.isDirty = action.payload;
+            saveToSessionStorage(QUERY_EDITOR_DIRTY_KEY, action.payload);
         },
         setQueryResult: (state, action: PayloadAction<QueryResult | undefined>) => {
             state.result = action.payload;

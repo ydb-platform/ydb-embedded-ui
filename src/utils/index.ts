@@ -17,3 +17,24 @@ export function normalizePathSlashes(path: string) {
     // (?<!:) - negative lookbehind - ignore parts that start with :
     return path.replaceAll(/(?<!:)\/\/+/g, '/');
 }
+
+export function saveToSessionStorage(key: string, value: unknown): void {
+    try {
+        sessionStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+        console.warn('Failed to save to session storage:', error);
+    }
+}
+
+export function loadFromSessionStorage(key: string): unknown {
+    try {
+        const stored = sessionStorage.getItem(key);
+        if (!stored) {
+            return null;
+        }
+        return JSON.parse(stored);
+    } catch (error) {
+        console.warn('Failed to load from session storage:', error);
+        return null;
+    }
+}
