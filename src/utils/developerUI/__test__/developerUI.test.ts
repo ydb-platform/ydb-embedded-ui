@@ -1,3 +1,4 @@
+import type {YdbEmbeddedAPI} from '../../../services/api';
 import {
     createDeveloperUIInternalPageHref,
     createDeveloperUILinkWithNodeId,
@@ -6,6 +7,15 @@ import {
 } from '../developerUI';
 
 describe('Developer UI links generators', () => {
+    beforeAll(() => {
+        const api = {
+            viewer: {
+                getPath: () => '',
+            },
+        };
+        window.api = api as unknown as YdbEmbeddedAPI;
+    });
+
     describe('createDeveloperUIInternalPageHref', () => {
         test('should create correct link for embedded UI', () => {
             expect(createDeveloperUIInternalPageHref('')).toBe('/internal');

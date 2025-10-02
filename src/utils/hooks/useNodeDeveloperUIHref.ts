@@ -13,8 +13,10 @@ import {useTypedSelector} from './useTypedSelector';
 export function useNodeDeveloperUIHref(node?: NodeAddress) {
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
 
-    const {balancer = backend} = useClusterBaseInfo();
+    const {balancer = backend, settings} = useClusterBaseInfo();
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+
+    const useMetaProxy = settings?.use_meta_proxy;
 
     if (!isUserAllowedToMakeChanges) {
         return undefined;
@@ -22,7 +24,11 @@ export function useNodeDeveloperUIHref(node?: NodeAddress) {
 
     // Only for multi-cluster version since there is no balancer in single-cluster mode
     if (!singleClusterMode) {
-        const developerUIHref = getBackendFromBalancerAndNodeId(node?.NodeId, balancer ?? '');
+        const developerUIHref = getBackendFromBalancerAndNodeId(
+            node?.NodeId,
+            balancer,
+            useMetaProxy,
+        );
         return developerUIHref ? createDeveloperUIInternalPageHref(developerUIHref) : undefined;
     }
 
