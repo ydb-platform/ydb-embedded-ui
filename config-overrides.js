@@ -37,6 +37,7 @@ module.exports = {
         }
         config.plugins.push(
             new MonacoWebpackPlugin({
+                languages: ['yaml'],
                 customLanguages: [
                     {
                         label: 'yql',
