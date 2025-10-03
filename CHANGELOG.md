@@ -1,5 +1,19 @@
 # Changelog
 
+## [12.8.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.7.0...v12.8.0) (2025-10-03)
+
+
+### Features
+
+* **estimation:** update priority scoring weights and defaults ([#2951](https://github.com/ydb-platform/ydb-embedded-ui/issues/2951)) ([84b68f2](https://github.com/ydb-platform/ydb-embedded-ui/commit/84b68f2463ed20eebd4b007b3f83f6795e735304))
+* **QueryEditor:** save current query in session storage ([#2950](https://github.com/ydb-platform/ydb-embedded-ui/issues/2950)) ([8609f66](https://github.com/ydb-platform/ydb-embedded-ui/commit/8609f6654a6dd4c4205229d4a18172dc43041db9))
+
+
+### Bug Fixes
+
+* **Nodes:** hide PDisks column for not viewers ([#2954](https://github.com/ydb-platform/ydb-embedded-ui/issues/2954)) ([0988e9f](https://github.com/ydb-platform/ydb-embedded-ui/commit/0988e9fb136e57bb9bb626e94ed4f806f048ead7))
+* syntax highlight for yaml ([#2958](https://github.com/ydb-platform/ydb-embedded-ui/issues/2958)) ([6723efc](https://github.com/ydb-platform/ydb-embedded-ui/commit/6723efc159c8696b2af4d21a846bf34b0f4cfb82))
+
 ## [12.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.6.0...v12.7.0) (2025-10-02)
 
 
