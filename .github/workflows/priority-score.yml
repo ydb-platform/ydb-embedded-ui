@@ -27,9 +27,10 @@ jobs:
             };
 
             const effortWeights = {
-              "effort:high": 10,
-              "effort:medium": 5,
-              "effort:low": 2
+              "size/l": 9,
+              "size/m": 4,
+              "size/s": 1,
+              "size/xl": 18
             };
 
             const issue = context.payload.issue;
@@ -58,9 +59,9 @@ jobs:
               finalScore = Math.round((reach * impact) / effort);
             } else {
               // Fallback to default values if labels are missing
-              const defaultReach = reach || 50;  // default to medium-low reach
+              const defaultReach = reach || 75;  // default to medium reach
               const defaultImpact = impact || 75;  // default to low impact
-              const defaultEffort = effort || 5;  // default to medium effort
+              const defaultEffort = effort || 4;  // default to medium effort
               finalScore = Math.round((defaultReach * defaultImpact) / defaultEffort);
             }
 
