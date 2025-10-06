@@ -63,7 +63,10 @@
     }
 
     &__tooltip-content {
+        overflow: auto;
+
         width: 300px;
+        max-height: 90vh;
         padding: 0 8px 8px;
 
         font-family: var(--g-font-family);
