@@ -75,6 +75,8 @@
   "entity-name_table": "Table",
   "entity-name_system-view": "System view",
   "entity-name_secondary-index": "Secondary Index",
+  "entity-name_vector-index": "Vector Index",
+  "entity-name_fulltext-index": "Fulltext Index",
   "entity-name_tablestore": "Tablestore",
   "entity-name_column-oriented-table": "Column-oriented table",
   "entity-name_changefeed": "Changefeed",
@@ -85,5 +87,7 @@
   "entity-name_async-replication": "Async Replication",
   "entity-name_transfer": "Transfer",
   "entity-name_resource-pool": "Resource Pool",
-  "entity-name_secondary-index-table": "Secondary Index Table"
+  "entity-name_secondary-index-table": "Secondary Index Table",
+  "entity-name_vector-index-table": "Vector Index Table",
+  "entity-name_fulltext-index-table": "Fulltext Index Table"
 }

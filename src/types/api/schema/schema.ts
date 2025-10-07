@@ -308,6 +308,8 @@ export enum EPathSubType {
     EPathSubTypeSyncIndexImplTable = 'EPathSubTypeSyncIndexImplTable',
     EPathSubTypeAsyncIndexImplTable = 'EPathSubTypeAsyncIndexImplTable',
     EPathSubTypeStreamImpl = 'EPathSubTypeStreamImpl',
+    EPathSubTypeVectorKmeansTreeIndexImplTable = 'EPathSubTypeVectorKmeansTreeIndexImplTable',
+    EPathSubTypeFulltextIndexImplTable = 'EPathSubTypeFulltextIndexImplTable',
 }
 
 enum EPathState {

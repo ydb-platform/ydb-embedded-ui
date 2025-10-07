@@ -3,9 +3,16 @@ import {InfoViewer} from '..';
 import {getEntityName} from '../../../containers/Tenant/utils';
 import {EIndexType} from '../../../types/api/schema';
 import type {TEvDescribeSchemeResult} from '../../../types/api/schema';
+import {cn} from '../../../utils/cn';
 
 import i18n from './i18n';
-import {buildIndexInfo, buildVectorIndexInfo} from './utils';
+import {
+    buildFulltextIndexSettingsInfo,
+    buildIndexInfo,
+    buildVectorIndexSettingsInfo,
+} from './utils';
+
+const b = cn('ydb-diagnostics-table-info');
 
 interface TableIndexInfoProps {
     data?: TEvDescribeSchemeResult;
@@ -21,19 +28,31 @@ export const TableIndexInfo = ({data}: TableIndexInfoProps) => {
     const TableIndex = data.PathDescription?.TableIndex;
     const info: Array<InfoViewerItem> = buildIndexInfo(TableIndex);
 
-    const vectorSettings = TableIndex?.VectorIndexKmeansTreeDescription?.Settings;
-
-    const isVectorIndex = TableIndex?.Type === EIndexType.EIndexTypeGlobalVectorKmeansTree;
-
-    if (isVectorIndex) {
-        const vectorInfo: Array<InfoViewerItem> = buildVectorIndexInfo(vectorSettings);
-        return (
-            <>
-                <InfoViewer title={i18n('title_vector-index')} info={info} />
-                <InfoViewer info={vectorInfo} />
-            </>
+    let settings: Array<InfoViewerItem> = [];
+    if (TableIndex?.Type === EIndexType.EIndexTypeGlobalVectorKmeansTree) {
+        settings = buildVectorIndexSettingsInfo(
+            TableIndex?.VectorIndexKmeansTreeDescription?.Settings,
         );
     }
+    if (TableIndex?.Type === EIndexType.EIndexTypeGlobalFulltext) {
+        settings = buildFulltextIndexSettingsInfo(TableIndex?.FulltextIndexDescription?.Settings);
+    }
 
-    return <InfoViewer title={entityName} info={info} />;
+    return (
+        <div className={b()}>
+            <InfoViewer
+                info={info}
+                title={entityName}
+                className={b('info-block')}
+                renderEmptyState={() => <div className={b('title')}>{entityName}</div>}
+            />
+            {settings && settings.length ? (
+                <InfoViewer
+                    info={settings}
+                    title={i18n('title_index-settings')}
+                    className={b('info-block')}
+                />
+            ) : null}
+        </div>
+    );
 };
