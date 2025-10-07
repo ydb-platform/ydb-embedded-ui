@@ -36,7 +36,7 @@
     "Storage: {{count}} groups",
     "Storage: {{count}} groups"
   ],
-  "context_network": "Network Evaluation",
+  "context_network": "Network Usage",
   "context_cpu-description": "CPU load is calculated as the cumulative usage across all actor system pools on all nodes in the cluster",
   "context_memory-description": "Memory usage is the total memory consumed by all nodes in the cluster",
   "context_storage-description": "Storage usage is a cumulative usage of raw disk space of all media types",
