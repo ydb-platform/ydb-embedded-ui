@@ -44,7 +44,7 @@ import {
     PaneVisibilityToggleButtons,
     paneVisibilityToggleReducerCreator,
 } from '../utils/paneVisibilityToggleHelpers';
-import {isIndexTableType, isTableType} from '../utils/schema';
+import {isTableType} from '../utils/schema';
 
 import {ObjectTree} from './ObjectTree';
 import {SchemaActions} from './SchemaActions';
@@ -77,7 +77,7 @@ export function ObjectSummary({
     onExpandSummary,
     isCollapsed,
 }: ObjectSummaryProps) {
-    const {path, database, type, subType, databaseFullPath} = useCurrentSchema();
+    const {path, database, type, databaseFullPath} = useCurrentSchema();
 
     const dispatch = useTypedDispatch();
     const {handleSchemaChange} = useTenantQueryParams();
@@ -404,7 +404,7 @@ export function ObjectSummary({
     const relativePath = transformPath(path, databaseFullPath);
 
     const renderCommonInfoControls = () => {
-        const showPreview = isTableType(type) && !isIndexTableType(subType);
+        const showPreview = isTableType(type);
         return (
             <React.Fragment>
                 {showPreview &&

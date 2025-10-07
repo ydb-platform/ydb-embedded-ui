@@ -1,6 +1,6 @@
 import type {NavigationTreeNodeType} from 'ydb-ui-components';
 
-import {EPathSubType, EPathType} from '../../../types/api/schema';
+import {EIndexType, EPathSubType, EPathType} from '../../../types/api/schema';
 import type {ETenantType} from '../../../types/api/tenant';
 import i18n from '../i18n';
 
@@ -11,6 +11,8 @@ import i18n from '../i18n';
 const pathSubTypeToNodeType: Record<EPathSubType, NavigationTreeNodeType | undefined> = {
     [EPathSubType.EPathSubTypeSyncIndexImplTable]: 'index_table',
     [EPathSubType.EPathSubTypeAsyncIndexImplTable]: 'index_table',
+    [EPathSubType.EPathSubTypeVectorKmeansTreeIndexImplTable]: 'index_table',
+    [EPathSubType.EPathSubTypeFulltextIndexImplTable]: 'index_table',
 
     [EPathSubType.EPathSubTypeStreamImpl]: undefined,
     [EPathSubType.EPathSubTypeEmpty]: undefined,
@@ -65,6 +67,10 @@ export const mapPathTypeToNavigationTreeType = (
 const pathSubTypeToEntityName: Record<EPathSubType, string | undefined> = {
     [EPathSubType.EPathSubTypeSyncIndexImplTable]: i18n('entity-name_secondary-index-table'),
     [EPathSubType.EPathSubTypeAsyncIndexImplTable]: i18n('entity-name_secondary-index-table'),
+    [EPathSubType.EPathSubTypeVectorKmeansTreeIndexImplTable]: i18n(
+        'entity-name_vector-index-table',
+    ),
+    [EPathSubType.EPathSubTypeFulltextIndexImplTable]: i18n('entity-name_fulltext-index-table'),
 
     [EPathSubType.EPathSubTypeStreamImpl]: undefined,
     [EPathSubType.EPathSubTypeEmpty]: undefined,
@@ -100,6 +106,18 @@ export const mapPathTypeToEntityName = (
     subType?: EPathSubType,
 ): string | undefined =>
     (subType && pathSubTypeToEntityName[subType]) || (type && pathTypeToEntityName[type]);
+
+// ====================
+
+const indexTypeToEntityName: Record<EIndexType, string | undefined> = {
+    [EIndexType.EIndexTypeInvalid]: undefined,
+    [EIndexType.EIndexTypeGlobal]: i18n('entity-name_secondary-index'),
+    [EIndexType.EIndexTypeGlobalAsync]: i18n('entity-name_secondary-index'),
+    [EIndexType.EIndexTypeGlobalVectorKmeansTree]: i18n('entity-name_vector-index'),
+    [EIndexType.EIndexTypeGlobalFulltext]: i18n('entity-name_fulltext-index'),
+};
+
+export const mapIndexTypeToEntityName = (type?: EIndexType) => type && indexTypeToEntityName[type];
 
 // ====================
 
@@ -147,6 +165,8 @@ export const isTableType = (pathType?: EPathType) =>
 const pathSubTypeToIsIndexImpl: Record<EPathSubType, boolean> = {
     [EPathSubType.EPathSubTypeSyncIndexImplTable]: true,
     [EPathSubType.EPathSubTypeAsyncIndexImplTable]: true,
+    [EPathSubType.EPathSubTypeVectorKmeansTreeIndexImplTable]: true,
+    [EPathSubType.EPathSubTypeFulltextIndexImplTable]: true,
 
     [EPathSubType.EPathSubTypeStreamImpl]: false,
     [EPathSubType.EPathSubTypeEmpty]: false,
@@ -223,6 +243,8 @@ export const isTopicEntityType = (type?: EPathType) => type === EPathType.EPathT
 const pathSubTypeToChildless: Record<EPathSubType, boolean> = {
     [EPathSubType.EPathSubTypeSyncIndexImplTable]: true,
     [EPathSubType.EPathSubTypeAsyncIndexImplTable]: true,
+    [EPathSubType.EPathSubTypeVectorKmeansTreeIndexImplTable]: true,
+    [EPathSubType.EPathSubTypeFulltextIndexImplTable]: true,
     [EPathSubType.EPathSubTypeStreamImpl]: true,
 
     [EPathSubType.EPathSubTypeEmpty]: false,
