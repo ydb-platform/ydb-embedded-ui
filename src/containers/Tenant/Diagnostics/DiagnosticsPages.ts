@@ -187,6 +187,8 @@ const pathSubTypeToPages: Record<EPathSubType, Page[] | undefined> = {
 
     [EPathSubType.EPathSubTypeSyncIndexImplTable]: undefined,
     [EPathSubType.EPathSubTypeAsyncIndexImplTable]: undefined,
+    [EPathSubType.EPathSubTypeVectorKmeansTreeIndexImplTable]: undefined,
+    [EPathSubType.EPathSubTypeFulltextIndexImplTable]: undefined,
     [EPathSubType.EPathSubTypeEmpty]: undefined,
 };
 

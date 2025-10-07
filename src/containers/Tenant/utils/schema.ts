@@ -165,6 +165,8 @@ export const isTableType = (pathType?: EPathType) =>
 const pathSubTypeToIsIndexImpl: Record<EPathSubType, boolean> = {
     [EPathSubType.EPathSubTypeSyncIndexImplTable]: true,
     [EPathSubType.EPathSubTypeAsyncIndexImplTable]: true,
+    [EPathSubType.EPathSubTypeVectorKmeansTreeIndexImplTable]: true,
+    [EPathSubType.EPathSubTypeFulltextIndexImplTable]: true,
 
     [EPathSubType.EPathSubTypeStreamImpl]: false,
     [EPathSubType.EPathSubTypeEmpty]: false,
@@ -241,6 +243,8 @@ export const isTopicEntityType = (type?: EPathType) => type === EPathType.EPathT
 const pathSubTypeToChildless: Record<EPathSubType, boolean> = {
     [EPathSubType.EPathSubTypeSyncIndexImplTable]: true,
     [EPathSubType.EPathSubTypeAsyncIndexImplTable]: true,
+    [EPathSubType.EPathSubTypeVectorKmeansTreeIndexImplTable]: true,
+    [EPathSubType.EPathSubTypeFulltextIndexImplTable]: true,
     [EPathSubType.EPathSubTypeStreamImpl]: true,
 
     [EPathSubType.EPathSubTypeEmpty]: false,
