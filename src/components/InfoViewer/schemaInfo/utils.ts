@@ -154,6 +154,8 @@ export function buildFulltextIndexSettingsInfo(
         },
     });
 
+    const analyzers = fulltextSettings.columns?.filter((col) => col.analyzers !== undefined)[0]
+        ?.analyzers;
     const {
         tokenizer,
         language,
@@ -166,7 +168,7 @@ export function buildFulltextIndexSettingsInfo(
         use_filter_length,
         filter_length_min,
         filter_length_max,
-    } = fulltextSettings.columns?.at(0)?.analyzers ?? {};
+    } = analyzers ?? {};
     if (tokenizer !== undefined) {
         info.push(fulltextIndexAnalyzersFormatter('tokenizer', tokenizer));
     }
