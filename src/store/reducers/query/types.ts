@@ -1,5 +1,3 @@
-import type {ExplainPlanNodeData, GraphNode, Link} from '@gravity-ui/paranoid';
-
 import type {
     PlanTable,
     QueryPlan,
@@ -15,6 +13,48 @@ export interface QueryInHistory {
     syntax?: string;
     endTime?: string | number;
     durationUs?: string | number;
+}
+
+export interface Link {
+    from: string;
+    to: string;
+}
+
+export interface Metric {
+    name: string;
+    value: string;
+    theme?: 'warning' | 'danger';
+}
+
+export interface GraphNode<TData = any> {
+    name: string;
+    status?: string;
+    meta?: string;
+    group?: string;
+    data?: TData;
+    metrics?: Metric[];
+}
+
+export interface ExplainPlanNodeData {
+    id?: number;
+    type: 'query' | 'result' | 'stage' | 'connection' | 'materialize';
+    name?: string;
+    operators?: string[];
+    tables?: string[];
+    cte?: string;
+    stats?: TopologyNodeDataStats[];
+}
+export interface TopologyNodeDataStatsItem {
+    name: string;
+    value: string | number;
+}
+export interface TopologyNodeDataStatsSection {
+    name: string;
+    items: TopologyNodeDataStatsItem[];
+}
+export interface TopologyNodeDataStats {
+    group: string;
+    stats: TopologyNodeDataStatsSection[] | TopologyNodeDataStatsItem[];
 }
 
 export interface PreparedPlan {

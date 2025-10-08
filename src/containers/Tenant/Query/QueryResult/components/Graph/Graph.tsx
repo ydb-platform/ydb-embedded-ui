@@ -1,8 +1,6 @@
 import React from 'react';
 
-import type {Data} from '@gravity-ui/paranoid';
-
-import {YDBGraph} from '../../../../../../components/Graph/Graph';
+import {GravityGraph} from '../../../../../../components/Graph/GravityGraph';
 import type {PreparedPlan} from '../../../../../../store/reducers/query/types';
 import {cn} from '../../../../../../utils/cn';
 import i18n from '../../i18n';
@@ -17,14 +15,14 @@ interface GraphProps {
     theme?: string;
 }
 
-function isValidGraphData(data: Partial<Data>): data is Data {
+function isValidGraphData(data: Partial<PreparedPlan>) {
     return Boolean(data.links && data.nodes && data.nodes.length);
 }
 
 export function Graph({explain = {}, theme}: GraphProps) {
     const {links, nodes} = explain;
 
-    const data = React.useMemo(() => ({links, nodes}), [links, nodes]);
+    const data = React.useMemo(() => ({links: links || [], nodes: nodes || []}), [links, nodes]);
 
     if (!isValidGraphData(data)) {
         return <StubMessage message={i18n('description.graph-is-not-supported')} />;
@@ -32,7 +30,7 @@ export function Graph({explain = {}, theme}: GraphProps) {
 
     return (
         <div className={b('canvas-container')}>
-            <YDBGraph key={theme} data={data} />
+            <GravityGraph data={data} theme={theme} />
         </div>
     );
 }
