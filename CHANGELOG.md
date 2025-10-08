@@ -1,5 +1,19 @@
 # Changelog
 
+## [12.9.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.8.0...v12.9.0) (2025-10-08)
+
+
+### Features
+
+* migrate to gravity-ui/graph ([#2735](https://github.com/ydb-platform/ydb-embedded-ui/issues/2735)) ([2fb30ad](https://github.com/ydb-platform/ydb-embedded-ui/commit/2fb30ad3402ecd54070bb3fe9c99a3013aafbda0))
+* **ui:** support fulltext index ([#2962](https://github.com/ydb-platform/ydb-embedded-ui/issues/2962)) ([11ddc82](https://github.com/ydb-platform/ydb-embedded-ui/commit/11ddc825f2542b866e07db9739cda46236658c2e))
+
+
+### Bug Fixes
+
+* default interface theme is system ([#2960](https://github.com/ydb-platform/ydb-embedded-ui/issues/2960)) ([7020e05](https://github.com/ydb-platform/ydb-embedded-ui/commit/7020e057115ab3e8089cb07eeb851631b4e2fe09))
+* keysets ([#2963](https://github.com/ydb-platform/ydb-embedded-ui/issues/2963)) ([5d116e9](https://github.com/ydb-platform/ydb-embedded-ui/commit/5d116e944b55d70ba4cafa8630c01b530f8229b7))
+
 ## [12.8.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.7.0...v12.8.0) (2025-10-03)
 
 
