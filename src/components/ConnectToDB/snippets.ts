@@ -138,7 +138,7 @@ const driver = new Driver(connectionString);
 async function run() {
   await driver.ready();
   const sql = query(driver);
-  
+
   const resultSets: ResultSet[] = await sql\`SELECT 'Hello, world!' AS message;\`;
   console.log(resultSets[0].rows[0].message);
 
@@ -168,7 +168,7 @@ $config = [
         // 'root_cert_file' => './CA.pem',  Root CA file (uncomment for dedicated server only)
     ],
 
-    'credentials' => new AccessTokenAuthentication('<token>') // use from reference/ydb-sdk/auth
+    'credentials' => new AccessTokenAuthentication('<token>')
 ];
 
 $ydb = new Ydb($config);`;
