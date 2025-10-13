@@ -28,7 +28,7 @@ const connectionTabs: {id: SnippetLanguage; title: string}[] = [
     {id: 'csharp', title: 'C# (.NET)'},
     {id: 'go', title: 'Go'},
     {id: 'java', title: 'Java'},
-    {id: 'javascript', title: 'Node JS'},
+    {id: 'javascript', title: 'JavaScript/TypeScript'},
     {id: 'php', title: 'PHP'},
     {id: 'python', title: 'Python'},
 ];
