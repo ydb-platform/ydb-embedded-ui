@@ -14,6 +14,7 @@ export interface TExternalDataSourceDescription {
 interface TAuth {
     None?: NoneAuth;
     ServiceAccount?: ServiceAccountAuth;
+    Aws?: AwsAuth;
 }
 
 interface NoneAuth {}
@@ -21,4 +22,9 @@ interface NoneAuth {}
 interface ServiceAccountAuth {
     Id?: string;
     SecretName?: string;
+}
+interface AwsAuth {
+    AwsSecretAccessKeySecretName?: string;
+    AwsRegion?: string;
+    AwsAccessKeyIdSecretName?: string;
 }
