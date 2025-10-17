@@ -36,6 +36,15 @@ function getAuthMethodValue(data: TEvDescribeSchemeResult) {
     if (Auth?.Aws) {
         return i18n('external-objects.auth-method.aws');
     }
+    if (Auth?.Token) {
+        return i18n('external-objects.auth-method.token');
+    }
+    if (Auth?.Basic) {
+        return i18n('external-objects.auth-method.basic');
+    }
+    if (Auth?.MdbBasic) {
+        return i18n('external-objects.auth-method.mdb-basic');
+    }
     return i18n('external-objects.auth-method.none');
 }
 

@@ -15,6 +15,9 @@ interface TAuth {
     None?: NoneAuth;
     ServiceAccount?: ServiceAccountAuth;
     Aws?: AwsAuth;
+    Token?: string;
+    MdbBasic?: MdbBasic;
+    Basic?: Basic;
 }
 
 interface NoneAuth {}
@@ -27,4 +30,16 @@ interface AwsAuth {
     AwsSecretAccessKeySecretName?: string;
     AwsRegion?: string;
     AwsAccessKeyIdSecretName?: string;
+}
+
+interface Basic {
+    Login?: string;
+    PasswordSecretName?: string;
+}
+
+interface MdbBasic {
+    ServiceAccountId?: string;
+    ServiceAccountSecretName?: string;
+    Login?: string;
+    PasswordSecretName?: string;
 }
