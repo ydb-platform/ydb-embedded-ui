@@ -5,6 +5,7 @@
   "external-objects.auth-method": "Auth Method",
   "external-objects.auth-method.none": "None",
   "external-objects.auth-method.service-account": "Service Account",
+  "external-objects.auth-method.aws": "AWS",
 
   "view.query-text": "Query Text",
 

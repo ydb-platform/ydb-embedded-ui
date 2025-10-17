@@ -28,8 +28,19 @@ const prepareExternalDataSourceSummary = (data: TEvDescribeSchemeResult) => {
     return info;
 };
 
+function getAuthMethodValue(data: TEvDescribeSchemeResult) {
+    const {Auth} = data.PathDescription?.ExternalDataSourceDescription || {};
+    if (Auth?.ServiceAccount) {
+        return i18n('external-objects.auth-method.service-account');
+    }
+    if (Auth?.Aws) {
+        return i18n('external-objects.auth-method.aws');
+    }
+    return i18n('external-objects.auth-method.none');
+}
+
 const prepareExternalDataSourceInfo = (data: TEvDescribeSchemeResult): InfoViewerItem[] => {
-    const {Location, Auth} = data.PathDescription?.ExternalDataSourceDescription || {};
+    const {Location} = data.PathDescription?.ExternalDataSourceDescription || {};
 
     return [
         ...prepareExternalDataSourceSummary(data),
@@ -47,9 +58,7 @@ const prepareExternalDataSourceInfo = (data: TEvDescribeSchemeResult): InfoViewe
         },
         {
             label: i18n('external-objects.auth-method'),
-            value: Auth?.ServiceAccount
-                ? i18n('external-objects.auth-method.service-account')
-                : i18n('external-objects.auth-method.none'),
+            value: getAuthMethodValue(data),
         },
     ];
 };
