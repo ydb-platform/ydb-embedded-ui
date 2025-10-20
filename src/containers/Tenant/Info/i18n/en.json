@@ -5,6 +5,10 @@
   "external-objects.auth-method": "Auth Method",
   "external-objects.auth-method.none": "None",
   "external-objects.auth-method.service-account": "Service Account",
+  "external-objects.auth-method.aws": "AWS",
+  "external-objects.auth-method.token": "Token",
+  "external-objects.auth-method.basic": "Basic",
+  "external-objects.auth-method.mdb-basic": "MDB Basic",
 
   "view.query-text": "Query Text",
 
