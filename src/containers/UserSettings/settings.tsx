@@ -225,7 +225,6 @@ export const appearanceSection: SettingsSection = {
     title: i18n('section.appearance'),
     settings: [
         themeSetting,
-        languageSetting,
         invertedDisksSetting,
         binaryDataInPlainTextDisplay,
         showDomainDatabase,
