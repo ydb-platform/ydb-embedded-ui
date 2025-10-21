@@ -62,7 +62,7 @@ export interface AsideNavigationProps {
     renderFooterItems?: (
         defaultFooterItems: React.ReactNode[],
         ctx: {compact: boolean; asideRef: React.RefObject<HTMLDivElement>},
-    ) => React.ReactNode;
+    ) => React.ReactNode[];
 }
 
 enum Panel {
