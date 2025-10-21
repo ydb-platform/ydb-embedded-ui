@@ -58,6 +58,7 @@ export interface AsideNavigationProps {
     ydbInternalUser: JSX.Element;
     menuItems?: MenuItem[];
     content: React.ReactNode;
+    renderFooterItems?: (defaultFooterItems: React.ReactNode) => React.ReactNode;
     user?: {login: string; icon?: IconData};
 }
 
@@ -110,10 +111,11 @@ export function AsideNavigation(props: AsideNavigationProps) {
                 onChangeCompact={setIsCompact}
                 className={b()}
                 renderContent={() => props.content}
-                renderFooter={({compact, asideRef}) => (
-                    <React.Fragment>
+                renderFooter={({compact: footerCompact, asideRef}) => {
+                    const defaultFooterItems = [
                         <FooterItem
-                            compact={compact}
+                            key="information"
+                            compact={footerCompact}
                             item={{
                                 id: 'information',
                                 title: i18n('navigation-item.information'),
@@ -125,9 +127,10 @@ export function AsideNavigation(props: AsideNavigationProps) {
                             popupVisible={informationPopupVisible}
                             onClosePopup={closeInformationPopup}
                             renderPopupContent={renderInformationPopup}
-                        />
+                        />,
 
                         <FooterItem
+                            key="user-settings"
                             item={{
                                 id: 'user-settings',
                                 title: i18n('navigation-item.settings'),
@@ -141,14 +144,23 @@ export function AsideNavigation(props: AsideNavigationProps) {
                                     );
                                 },
                             }}
-                            compact={compact}
-                        />
+                            compact={footerCompact}
+                        />,
 
-                        <UserDropdown isCompact={compact} popupAnchor={asideRef} user={props.user}>
+                        <UserDropdown
+                            key="user-dropdown"
+                            isCompact={footerCompact}
+                            popupAnchor={asideRef}
+                            user={props.user}
+                        >
                             {props.ydbInternalUser}
-                        </UserDropdown>
-                    </React.Fragment>
-                )}
+                        </UserDropdown>,
+                    ];
+
+                    return props.renderFooterItems
+                        ? props.renderFooterItems(defaultFooterItems)
+                        : defaultFooterItems;
+                }}
                 panelItems={[
                     {
                         id: 'user-settings',
