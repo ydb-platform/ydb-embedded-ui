@@ -59,7 +59,10 @@ export interface AsideNavigationProps {
     menuItems?: MenuItem[];
     content: React.ReactNode;
     user?: {login: string; icon?: IconData};
-    renderFooterItems?: (defaultFooterItems: React.ReactNode) => React.ReactNode;
+    renderFooterItems?: (
+        defaultFooterItems: React.ReactNode[],
+        ctx: {compact: boolean; asideRef: React.RefObject<HTMLDivElement>},
+    ) => React.ReactNode;
 }
 
 enum Panel {
@@ -160,7 +163,10 @@ export function AsideNavigation(props: AsideNavigationProps) {
                     return (
                         <React.Fragment>
                             {props.renderFooterItems
-                                ? props.renderFooterItems(defaultFooterItems)
+                                ? props.renderFooterItems(defaultFooterItems, {
+                                      compact: footerCompact,
+                                      asideRef,
+                                  })
                                 : defaultFooterItems}
                         </React.Fragment>
                     );
