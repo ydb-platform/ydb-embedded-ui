@@ -1,4 +1,4 @@
-import {getDefaultNodePath} from '../../containers/Node/NodePages';
+import {getDefaultNodePath} from '../../routes';
 import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import type {NodeAddress} from '../../types/additionalProps';
 import type {TNodeInfo, TSystemStateInfo} from '../../types/api/nodes';
@@ -35,11 +35,10 @@ export const NodeHostWrapper = ({
 
     const nodePath = isNodeAvailable
         ? getDefaultNodePath(
-              node.NodeId,
+              {id: node.NodeId, activeTab: node.TenantName ? 'tablets' : 'storage'},
               {
                   database: database ?? node.TenantName,
               },
-              node.TenantName ? 'tablets' : 'storage',
           )
         : undefined;
 

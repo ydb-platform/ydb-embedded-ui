@@ -143,7 +143,6 @@ export const TopShards = ({database, path, databaseFullPath}: TopShardsProps) =>
 
         return (
             <ShardsTable
-                database={database}
                 databaseFullPath={databaseFullPath}
                 columnsIds={columnsIds}
                 data={data}

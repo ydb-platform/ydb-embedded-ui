@@ -1,6 +1,6 @@
 import type {AxiosWrapperOptions} from '@gravity-ui/axios-wrapper';
 
-import {metaBackend as META_BACKEND} from '../../store';
+import {environment as ENVIRONMENT, metaBackend as META_BACKEND} from '../../store';
 import type {MetaCapabilitiesResponse} from '../../types/api/capabilities';
 import type {
     MetaBaseClusterInfo,
@@ -24,7 +24,8 @@ export class MetaAPI extends BaseYdbAPI {
     }
     getPath(path: string, clusterName?: string) {
         if (this.proxyMeta && clusterName) {
-            return `${META_BACKEND}/proxy/cluster/${clusterName}${path}`;
+            const envPrefix = ENVIRONMENT ? `/${ENVIRONMENT}` : '';
+            return `${envPrefix}${META_BACKEND}/proxy/cluster/${clusterName}${path}`;
         }
         return `${META_BACKEND ?? ''}${path}`;
     }

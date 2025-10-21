@@ -3,11 +3,10 @@ import DataTable from '@gravity-ui/react-data-table';
 import {isNil} from 'lodash';
 
 import {InternalLink} from '../../../components/InternalLink/InternalLink';
-import {getTabletPagePath} from '../../../routes';
+import {useTabletPagePath} from '../../../routes';
 import type {VDiskBlobIndexItem} from '../../../types/api/vdiskBlobIndex';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
 import {formatBytes, formatNumber} from '../../../utils/dataFormatters/dataFormatters';
-import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {safeParseNumber} from '../../../utils/utils';
 
 import {COLUMNS_NAMES, COLUMNS_TITLES} from './constants';
@@ -64,6 +63,6 @@ export function getColumns(): Column<VDiskBlobIndexItem>[] {
 }
 
 function TabletId({id}: {id: string | number}) {
-    const database = useDatabaseFromQuery();
-    return <InternalLink to={getTabletPagePath(id, {database})}>{id}</InternalLink>;
+    const getTabletPagePath = useTabletPagePath();
+    return <InternalLink to={getTabletPagePath(id)}>{id}</InternalLink>;
 }

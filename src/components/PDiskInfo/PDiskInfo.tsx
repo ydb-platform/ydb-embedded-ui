@@ -1,6 +1,5 @@
 import {Flex} from '@gravity-ui/uikit';
 
-import {getPDiskPagePath} from '../../routes';
 import {valueIsDefined} from '../../utils';
 import {formatBytes} from '../../utils/bytesParsers';
 import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
@@ -10,6 +9,7 @@ import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedT
 import type {InfoViewerItem} from '../InfoViewer';
 import {InfoViewer} from '../InfoViewer/InfoViewer';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
+import {PDiskPageLink} from '../PDiskPageLink/PDiskPageLink';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 import {StatusIcon} from '../StatusIcon/StatusIcon';
 
@@ -149,7 +149,6 @@ function getPDiskInfo<T extends PreparedPDisk>({
         valueIsDefined(nodeId);
 
     if (shouldDisplayLinks) {
-        const pDiskPagePath = getPDiskPagePath(PDiskId, nodeId);
         const pDiskInternalViewerPath = createPDiskDeveloperUILink({
             nodeId,
             pDiskId: PDiskId,
@@ -159,13 +158,7 @@ function getPDiskInfo<T extends PreparedPDisk>({
             label: pDiskInfoKeyset('links'),
             value: (
                 <Flex wrap="wrap" gap={2}>
-                    {withPDiskPageLink && (
-                        <LinkWithIcon
-                            title={pDiskInfoKeyset('pdisk-page')}
-                            url={pDiskPagePath}
-                            external={false}
-                        />
-                    )}
+                    {withPDiskPageLink && <PDiskPageLink pDiskId={PDiskId} nodeId={nodeId} />}
                     {isUserAllowedToMakeChanges && (
                         <LinkWithIcon
                             title={pDiskInfoKeyset('developer-ui')}

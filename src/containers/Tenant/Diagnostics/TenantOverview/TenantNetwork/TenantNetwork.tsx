@@ -1,10 +1,11 @@
 import {Flex} from '@gravity-ui/uikit';
 
+import {getTenantPath} from '../../../../../routes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {cn} from '../../../../../utils/cn';
 import {ENABLE_NETWORK_TABLE_KEY} from '../../../../../utils/constants';
 import {useSearchQuery, useSetting} from '../../../../../utils/hooks';
-import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
+import {TenantTabsGroups} from '../../../TenantPages';
 import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
 import i18n from '../i18n';
 

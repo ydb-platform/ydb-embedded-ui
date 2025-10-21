@@ -72,7 +72,63 @@ export const paramSetup = {
             stateKey: 'partitions.selectedConsumer',
         },
     },
+    '/*/tenant': {
+        sort: {
+            stateKey: 'heatmap.sort',
+            initialState: initialHeatmapState.sort,
+            type: 'bool',
+        },
+        heatmap: {
+            stateKey: 'heatmap.heatmap',
+            initialState: initialHeatmapState.heatmap,
+            type: 'bool',
+        },
+        currentMetric: {
+            stateKey: 'heatmap.currentMetric',
+            initialState: initialHeatmapState.currentMetric,
+        },
+        tenantPage: {
+            stateKey: 'tenant.tenantPage',
+        },
+        queryTab: {
+            stateKey: 'tenant.queryTab',
+        },
+        diagnosticsTab: {
+            stateKey: 'tenant.diagnosticsTab',
+        },
+        summaryTab: {
+            stateKey: 'tenant.summaryTab',
+        },
+        metricsTab: {
+            stateKey: 'tenant.metricsTab',
+            initialState: initialTenantState.metricsTab,
+        },
+        shardsMode: {
+            stateKey: 'shardsWorkload.mode',
+        },
+        shardsDateFrom: {
+            stateKey: 'shardsWorkload.from',
+        },
+        shardsDateTo: {
+            stateKey: 'shardsWorkload.to',
+        },
+        topQueriesDateFrom: {
+            stateKey: 'executeTopQueries.from',
+        },
+        topQueriesDateTo: {
+            stateKey: 'executeTopQueries.to',
+        },
+        selectedConsumer: {
+            stateKey: 'partitions.selectedConsumer',
+        },
+    },
     '/cluster/tenants': {
+        search: {
+            stateKey: 'tenants.searchValue',
+            initialState: '',
+        },
+    },
+    '/*/cluster/tenants': {
         search: {
             stateKey: 'tenants.searchValue',
             initialState: '',

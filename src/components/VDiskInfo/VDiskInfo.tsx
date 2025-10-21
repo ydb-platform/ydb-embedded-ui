@@ -3,7 +3,7 @@ import React from 'react';
 import {Flex} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
-import {getPDiskPagePath, getVDiskPagePath} from '../../routes';
+import {getPDiskPagePath, useVDiskPagePath} from '../../routes';
 import {EVDiskState} from '../../types/api/vdisk';
 import {cn} from '../../utils/cn';
 import {
@@ -13,7 +13,6 @@ import {
 import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import {getSeverityColor} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
-import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToSpeed} from '../../utils/utils';
 import {InfoViewer} from '../InfoViewer';
@@ -45,7 +44,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
     wrap,
 }: VDiskInfoProps<T>) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
-    const database = useDatabaseFromQuery();
+    const getVDiskPagePath = useVDiskPagePath();
 
     const {
         AllocatedSize,
@@ -179,7 +178,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
         rightColumn.push({label: vDiskInfoKeyset('slot-id'), value: VDiskSlotId});
     }
     if (!isNil(PDiskId)) {
-        const pDiskPath = !isNil(NodeId) ? getPDiskPagePath(PDiskId, NodeId) : undefined;
+        const pDiskPath = isNil(NodeId) ? undefined : getPDiskPagePath(PDiskId, NodeId);
 
         const value = pDiskPath ? <InternalLink to={pDiskPath}>{PDiskId}</InternalLink> : PDiskId;
 
@@ -217,13 +216,10 @@ export function VDiskInfo<T extends PreparedVDisk>({
                 return null;
             }
 
-            const vDiskPath = getVDiskPagePath(
-                {
-                    nodeId: dNodeId,
-                    vDiskId: id,
-                },
-                {database},
-            );
+            const vDiskPath = getVDiskPagePath({
+                nodeId: dNodeId,
+                vDiskId: id,
+            });
 
             return (
                 <InternalLink key={index} to={vDiskPath}>
@@ -244,24 +240,19 @@ export function VDiskInfo<T extends PreparedVDisk>({
         }
     }
     const links: React.ReactNode[] = [];
-    if (!isNil(StringifiedId)) {
-        if (withVDiskPageLink) {
-            const vDiskPagePath = getVDiskPagePath(
-                {
-                    nodeId: NodeId,
-                    vDiskId: StringifiedId,
-                },
-                {database},
-            );
-            links.push(
-                <LinkWithIcon
-                    key={vDiskPagePath}
-                    title={vDiskInfoKeyset('vdisk-page')}
-                    url={vDiskPagePath}
-                    external={false}
-                />,
-            );
-        }
+    const vDiskPagePath = getVDiskPagePath({
+        nodeId: NodeId,
+        vDiskId: StringifiedId,
+    });
+    if (withVDiskPageLink && vDiskPagePath) {
+        links.push(
+            <LinkWithIcon
+                key={vDiskPagePath}
+                title={vDiskInfoKeyset('vdisk-page')}
+                url={vDiskPagePath}
+                external={false}
+            />,
+        );
     }
 
     if (isUserAllowedToMakeChanges && !isNil(NodeId) && !isNil(VDiskSlotId) && !isNil(PDiskId)) {

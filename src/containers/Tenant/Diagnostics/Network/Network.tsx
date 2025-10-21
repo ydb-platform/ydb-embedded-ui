@@ -6,6 +6,7 @@ import {Link} from 'react-router-dom';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {Illustration} from '../../../../components/Illustration';
 import {ProblemFilter} from '../../../../components/ProblemFilter';
+import {getDefaultNodePath} from '../../../../routes';
 import {networkApi} from '../../../../store/reducers/network/network';
 import {
     ProblemFilterValues,
@@ -16,7 +17,6 @@ import {hideTooltip, showTooltip} from '../../../../store/reducers/tooltip';
 import type {TNetNodeInfo, TNetNodePeerInfo} from '../../../../types/api/netInfo';
 import {cn} from '../../../../utils/cn';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
-import {getDefaultNodePath} from '../../../Node/NodePages';
 
 import {NodeNetwork} from './NodeNetwork/NodeNetwork';
 import {getConnectedNodesCount} from './utils';
@@ -119,7 +119,7 @@ export function Network({database, databaseFullPath}: NetworkProps) {
                                         Connectivity of node{' '}
                                         <Link
                                             className={b('link')}
-                                            to={getDefaultNodePath(clickedNode.NodeId)}
+                                            to={getDefaultNodePath({id: clickedNode.NodeId})}
                                         >
                                             {clickedNode.NodeId}
                                         </Link>{' '}

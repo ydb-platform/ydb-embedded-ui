@@ -38,6 +38,7 @@ interface Window {
     custom_backend?: string;
     meta_backend?: string;
     code_assist_backend?: string;
+    environment?: string;
 
     react_app_disable_checks?: boolean;
 

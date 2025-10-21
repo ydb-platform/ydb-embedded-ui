@@ -5,11 +5,12 @@ import qs from 'qs';
 import {InternalLink} from '../../../../../components/InternalLink';
 import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../lib';
+import {getTenantPath} from '../../../../../routes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {IPreparedConsumerData} from '../../../../../types/store/topic';
 import {cn} from '../../../../../utils/cn';
 import {formatMsToUptime} from '../../../../../utils/dataFormatters/dataFormatters';
-import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
+import {TenantTabsGroups} from '../../../TenantPages';
 import {ReadLagsHeader} from '../Headers';
 import {
     CONSUMERS_COLUMNS_IDS,
@@ -34,21 +35,7 @@ export const columns: Column<IPreparedConsumerData>[] = [
                 return EMPTY_DATA_PLACEHOLDER;
             }
 
-            const queryParams = qs.parse(location.search, {
-                ignoreQueryPrefix: true,
-            });
-
-            return (
-                <InternalLink
-                    to={getTenantPath({
-                        ...queryParams,
-                        [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.partitions,
-                        selectedConsumer: row.name,
-                    })}
-                >
-                    {row.name}
-                </InternalLink>
-            );
+            return <Consumer name={row.name} />;
         },
     },
     {
@@ -91,3 +78,24 @@ export const columns: Column<IPreparedConsumerData>[] = [
         ],
     },
 ];
+
+interface ConsumerProps {
+    name: string;
+}
+
+function Consumer({name}: ConsumerProps) {
+    const queryParams = qs.parse(location.search, {
+        ignoreQueryPrefix: true,
+    });
+    return (
+        <InternalLink
+            to={getTenantPath({
+                ...queryParams,
+                [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.partitions,
+                selectedConsumer: name,
+            })}
+        >
+            {name}
+        </InternalLink>
+    );
+}

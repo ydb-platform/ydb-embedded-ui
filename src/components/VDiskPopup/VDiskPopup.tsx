@@ -2,6 +2,7 @@ import React from 'react';
 
 import {Flex, Label} from '@gravity-ui/uikit';
 
+import {useVDiskPagePath} from '../../routes';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
 import {EVDiskState} from '../../types/api/vdisk';
@@ -24,7 +25,6 @@ import {InfoViewer} from '../InfoViewer';
 import {InternalLink} from '../InternalLink';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {preparePDiskData} from '../PDiskPopup/PDiskPopup';
-import {getVDiskLink} from '../VDisk/utils';
 import {vDiskInfoKeyset} from '../VDiskInfo/i18n';
 
 import {vDiskPopupKeyset} from './i18n';
@@ -75,7 +75,10 @@ const prepareUnavailableVDiskData = (data: UnavailableDonor, withDeveloperUILink
 const prepareVDiskData = (
     data: PreparedVDisk,
     withDeveloperUILink: boolean | undefined,
-    query: {database: string | undefined},
+    getVDiskLinkFn?: (data: {
+        nodeId: string | number;
+        vDiskId: string | undefined;
+    }) => string | undefined,
 ) => {
     const {
         NodeId,
@@ -94,7 +97,6 @@ const prepareVDiskData = (
         ReadThroughput,
         WriteThroughput,
         StoragePoolName,
-        VDiskId,
     } = data;
 
     const vdiskData: InfoViewerItem[] = [
@@ -207,10 +209,9 @@ const prepareVDiskData = (
               })
             : undefined;
 
-        const vDiskPagePath = getVDiskLink(
-            {VDiskSlotId, PDiskId, NodeId, StringifiedId, VDiskId},
-            query,
-        );
+        const vDiskPagePath = getVDiskLinkFn
+            ? getVDiskLinkFn({nodeId: NodeId, vDiskId: StringifiedId})
+            : undefined;
         if (vDiskPagePath) {
             vdiskData.push({
                 label: vDiskPopupKeyset('label_links'),
@@ -246,15 +247,16 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
     const isViewerUser = useIsViewerUser();
 
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const getVDiskLink = useVDiskPagePath();
 
     const database = useDatabaseFromQuery();
 
     const vdiskInfo = React.useMemo(
         () =>
             isFullData
-                ? prepareVDiskData(data, isUserAllowedToMakeChanges, {database})
+                ? prepareVDiskData(data, isUserAllowedToMakeChanges, getVDiskLink)
                 : prepareUnavailableVDiskData(data, isUserAllowedToMakeChanges),
-        [data, isFullData, isUserAllowedToMakeChanges, database],
+        [data, isFullData, isUserAllowedToMakeChanges, getVDiskLink],
     );
 
     const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));
@@ -274,7 +276,9 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
             donorsInfo.push({
                 label: vDiskPopupKeyset('label_vdisk'),
                 value: (
-                    <InternalLink to={getVDiskLink(donor, {database})}>
+                    <InternalLink
+                        to={getVDiskLink({nodeId: donor.NodeId, vDiskId: donor.StringifiedId})}
+                    >
                         {donor.StringifiedId}
                     </InternalLink>
                 ),

@@ -6,13 +6,12 @@ import {CellWithPopover} from '../../../../components/CellWithPopover/CellWithPo
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {StatusIcon} from '../../../../components/StatusIcon/StatusIcon';
 import {UsageLabel} from '../../../../components/UsageLabel/UsageLabel';
-import {getStorageGroupPath} from '../../../../routes';
+import {useStorageGroupPath} from '../../../../routes';
 import {valueIsDefined} from '../../../../utils';
 import {cn} from '../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER, YDB_POPOVER_CLASS_NAME} from '../../../../utils/constants';
 import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
 import {getUsageSeverity} from '../../../../utils/generateEvaluator';
-import {useDatabaseFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
 import {formatToMs} from '../../../../utils/timeParsers';
 import {bytesToGB, bytesToSpeed} from '../../../../utils/utils';
 import {Disks} from '../../Disks/Disks';
@@ -300,11 +299,11 @@ export const getStorageGroupsColumns: StorageColumnsGetter = (data) => {
 };
 
 function GroupId({id}: {id: string | number}) {
-    const database = useDatabaseFromQuery();
+    const getStorageGroupPath = useStorageGroupPath();
     return (
         <EntityStatus
             name={String(id)}
-            path={getStorageGroupPath(id, {database})}
+            path={getStorageGroupPath(id)}
             hasClipboardButton
             showStatus={false}
         />

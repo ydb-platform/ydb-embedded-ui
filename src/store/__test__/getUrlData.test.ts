@@ -44,7 +44,7 @@ describe('getUrlData', () => {
                 clusterName: 'my_cluster',
             });
         });
-        test('should parse pathname with folder and some prefix', () => {
+        test('should parse pathname without folder', () => {
             windowSpy.mockImplementation(() => {
                 return {
                     location: {
@@ -58,6 +58,91 @@ describe('getUrlData', () => {
                 basename: '',
                 backend: 'http://my-node:8765',
                 clusterName: 'my_cluster',
+            });
+        });
+        test('should extract environment from first segment', () => {
+            windowSpy.mockImplementation(() => {
+                return {
+                    location: {
+                        href: 'http://ydb-ui/cloud-prod/cluster?clusterName=my_cluster&backend=http://my-node:8765',
+                        pathname:
+                            '/cloud-prod/cluster?clusterName=my_cluster&backend=http://my-node:8765',
+                    },
+                } as Window & typeof globalThis;
+            });
+            const result = getUrlData({
+                singleClusterMode: false,
+                customBackend: undefined,
+                allowedEnvironments: ['cloud-prod', 'cloud-preprod'],
+            });
+            expect(result).toEqual({
+                basename: '',
+                backend: 'http://my-node:8765',
+                clusterName: 'my_cluster',
+                environment: 'cloud-prod',
+            });
+        });
+        test('should extract environment from first segment with monitoring folder', () => {
+            windowSpy.mockImplementation(() => {
+                return {
+                    location: {
+                        href: 'http://ydb-ui/cloud-preprod/api/meta3/proxy/cluster/pre-prod_global/monitoring/cluster/tenants',
+                        pathname:
+                            '/cloud-preprod/api/meta3/proxy/cluster/pre-prod_global/monitoring/cluster/tenants',
+                    },
+                } as Window & typeof globalThis;
+            });
+            const result = getUrlData({
+                singleClusterMode: false,
+                customBackend: undefined,
+                allowedEnvironments: ['cloud-prod', 'cloud-preprod'],
+            });
+            expect(result).toEqual({
+                basename: '/cloud-preprod/api/meta3/proxy/cluster/pre-prod_global/monitoring',
+                backend: undefined,
+                clusterName: undefined,
+                environment: 'cloud-preprod',
+            });
+        });
+        test('should not extract environment if not in allowed list', () => {
+            windowSpy.mockImplementation(() => {
+                return {
+                    location: {
+                        href: 'http://ydb-ui/cluster/tenants?clusterName=my_cluster',
+                        pathname: '/cluster/tenants?clusterName=my_cluster',
+                    },
+                } as Window & typeof globalThis;
+            });
+            const result = getUrlData({
+                singleClusterMode: false,
+                customBackend: undefined,
+                allowedEnvironments: ['cloud-prod', 'cloud-preprod'],
+            });
+            expect(result).toEqual({
+                basename: '',
+                backend: undefined,
+                clusterName: 'my_cluster',
+                environment: undefined,
+            });
+        });
+        test('should not extract environment without allowedEnvironments list', () => {
+            windowSpy.mockImplementation(() => {
+                return {
+                    location: {
+                        href: 'http://ydb-ui/my-env/cluster?clusterName=my_cluster',
+                        pathname: '/my-env/cluster?clusterName=my_cluster',
+                    },
+                } as Window & typeof globalThis;
+            });
+            const result = getUrlData({
+                singleClusterMode: false,
+                customBackend: undefined,
+            });
+            expect(result).toEqual({
+                basename: '',
+                backend: undefined,
+                clusterName: 'my_cluster',
+                environment: undefined,
             });
         });
     });

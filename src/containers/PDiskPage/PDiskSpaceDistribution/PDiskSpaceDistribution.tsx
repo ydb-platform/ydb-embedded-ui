@@ -5,7 +5,7 @@ import {InfoViewer} from '../../../components/InfoViewer';
 import {InternalLink} from '../../../components/InternalLink';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
 import {VDiskInfo} from '../../../components/VDiskInfo/VDiskInfo';
-import {getVDiskPagePath} from '../../../routes';
+import {useVDiskPagePath} from '../../../routes';
 import type {
     EmptySlotData,
     LogSlotData,
@@ -32,6 +32,7 @@ interface PDiskSpaceDistributionProps {
 }
 
 export function PDiskSpaceDistribution({data}: PDiskSpaceDistributionProps) {
+    const getVDiskPagePath = useVDiskPagePath();
     const {SlotItems} = data;
 
     const {PDiskId, NodeId} = data;
@@ -40,7 +41,15 @@ export function PDiskSpaceDistribution({data}: PDiskSpaceDistributionProps) {
 
     const renderSlots = () => {
         return SlotItems?.map((item, index) => {
-            return <Slot item={item} pDiskId={PDiskId} nodeId={NodeId} key={index} />;
+            return (
+                <Slot
+                    item={item}
+                    pDiskId={PDiskId}
+                    nodeId={NodeId}
+                    getVDiskPagePath={getVDiskPagePath}
+                    key={index}
+                />
+            );
         });
     };
 
@@ -72,17 +81,19 @@ interface SlotProps<T extends SlotItemType> {
 
     pDiskId?: string | number;
     nodeId?: string | number;
+    getVDiskPagePath?: (
+        params: {nodeId: string | number | undefined; vDiskId: string | undefined},
+        query?: {activeTab?: string},
+    ) => string | undefined;
 }
 
-function Slot<T extends SlotItemType>({item, nodeId}: SlotProps<T>) {
+function Slot<T extends SlotItemType>({item, nodeId, getVDiskPagePath}: SlotProps<T>) {
     const renderContent = () => {
         if (isVDiskSlot(item)) {
-            const vDiskPagePath = valueIsDefined(item.SlotData?.StringifiedId)
-                ? getVDiskPagePath({
-                      nodeId,
-                      vDiskId: item.SlotData.StringifiedId,
-                  })
-                : undefined;
+            const vDiskPagePath = getVDiskPagePath?.({
+                nodeId,
+                vDiskId: item.SlotData.StringifiedId,
+            });
 
             return (
                 <HoverPopup

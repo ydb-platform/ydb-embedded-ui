@@ -15,7 +15,8 @@ import {useHistory, useLocation} from 'react-router-dom';
 
 import {getConnectToDBDialog} from '../../components/ConnectToDB/ConnectToDBDialog';
 import {InternalLink} from '../../components/InternalLink';
-import {checkIsClustersPage, checkIsTenantPage} from '../../routes';
+import {checkIsClustersPage, checkIsTenantPage, getClusterPath} from '../../routes';
+import {environment} from '../../store';
 import {
     useAddClusterFeatureAvailable,
     useDatabasesAvailable,
@@ -39,7 +40,6 @@ import {
     useIsViewerUser,
 } from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {isAccessError} from '../../utils/response';
-import {getClusterPath} from '../Cluster/utils';
 
 import {getBreadcrumbs} from './breadcrumbs';
 import {headerKeyset} from './i18n';
@@ -98,6 +98,7 @@ function Header() {
             ...pageBreadcrumbsOptions,
             singleClusterMode,
             isViewerUser,
+            environment,
         };
 
         if (clusterTitle) {
@@ -156,7 +157,7 @@ function Header() {
                     action: () => {
                         onDeleteDB({clusterName, databaseData}).then((isDeleted) => {
                             if (isDeleted) {
-                                const path = getClusterPath('tenants');
+                                const path = getClusterPath({activeTab: 'tenants'});
                                 history.push(path);
                             }
                         });

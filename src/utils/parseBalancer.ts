@@ -65,7 +65,8 @@ export function prepareBackendFromBalancer(rawBalancer: string) {
 
     // Use meta_backend if it is defined to form backend url
     if (window.meta_backend) {
-        return normalizePathSlashes(`${window.meta_backend}/${preparedBalancer}`);
+        const envPrefix = window.environment ? `/${window.environment}` : '';
+        return normalizePathSlashes(`${envPrefix}/${window.meta_backend}/${preparedBalancer}`);
     }
 
     return preparedBalancer;

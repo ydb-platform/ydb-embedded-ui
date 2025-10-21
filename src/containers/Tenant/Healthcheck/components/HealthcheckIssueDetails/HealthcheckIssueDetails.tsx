@@ -3,9 +3,8 @@ import React from 'react';
 import {Flex} from '@gravity-ui/uikit';
 
 import {InternalLink} from '../../../../../components/InternalLink';
-import {getTabletPagePath} from '../../../../../routes';
+import {useTabletPagePath} from '../../../../../routes';
 import type {IssuesTree} from '../../../../../store/reducers/healthcheckInfo/types';
-import {useTenantQueryParams} from '../../../useTenantQueryParams';
 import i18n from '../../i18n';
 
 import type {LocationFieldCompute} from './ComputeLocation';
@@ -18,7 +17,7 @@ interface HealthcheckIssueDetailsProps {
 }
 
 export function IssueDetails({issue}: HealthcheckIssueDetailsProps) {
-    const {database} = useTenantQueryParams();
+    const getTabletPagePath = useTabletPagePath();
 
     const {detailsFields, hiddenStorageFields, hiddenComputeFields} = React.useMemo(() => {
         const hiddenStorageFields: LocationFieldStorage[] = [];
@@ -48,9 +47,7 @@ export function IssueDetails({issue}: HealthcheckIssueDetailsProps) {
                         <IdList
                             ids={tablet.id}
                             renderItem={(id) => (
-                                <InternalLink to={getTabletPagePath(id, {database})}>
-                                    {id}
-                                </InternalLink>
+                                <InternalLink to={getTabletPagePath(id)}>{id}</InternalLink>
                             )}
                         />
                     ) : undefined,
@@ -68,7 +65,7 @@ export function IssueDetails({issue}: HealthcheckIssueDetailsProps) {
             hiddenComputeFields.push('tablet');
         }
         return {detailsFields: fields, hiddenComputeFields, hiddenStorageFields};
-    }, [issue, database]);
+    }, [issue, getTabletPagePath]);
 
     const {location} = issue;
 

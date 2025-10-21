@@ -14,6 +14,7 @@ import {
 
 import {EntityStatus} from '../../components/EntityStatusNew/EntityStatus';
 import {VersionsBar} from '../../components/VersionsBar/VersionsBar';
+import {getClusterPath} from '../../routes';
 import type {PreparedCluster} from '../../store/reducers/clusters/types';
 import {EFlag} from '../../types/api/enums';
 import {uiFactory} from '../../uiFactory/uiFactory';
@@ -21,7 +22,7 @@ import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatNumber, formatStorageValuesToTb} from '../../utils/dataFormatters/dataFormatters';
 import {createDeveloperUIMonitoringPageHref} from '../../utils/developerUI/developerUI';
 import {getCleanBalancerValue} from '../../utils/parseBalancer';
-import {clusterTabsIds, getClusterPath} from '../Cluster/utils';
+import {clusterTabsIds} from '../Cluster/utils';
 
 import {COLUMNS_NAMES, COLUMNS_TITLES} from './constants';
 import i18n from './i18n';
@@ -43,17 +44,6 @@ function getTitleColumn({isEditClusterAvailable, isDeleteClusterAvailable}: Clus
         defaultOrder: DataTable.ASCENDING,
         sortAccessor: (row) => row.title || row.name,
         render: ({row}) => {
-            const {
-                name: clusterName,
-                use_embedded_ui: useEmbeddedUi,
-                preparedBackend: backend,
-            } = row;
-
-            const clusterPath =
-                useEmbeddedUi && backend
-                    ? createDeveloperUIMonitoringPageHref(backend)
-                    : getClusterPath(undefined, {backend, clusterName}, {withBasename: true});
-
             const clusterStatus = row.cluster?.Overall;
 
             const cleanedBalancer = row.balancer ? getCleanBalancerValue(row.balancer) : null;
@@ -98,11 +88,7 @@ function getTitleColumn({isEditClusterAvailable, isDeleteClusterAvailable}: Clus
             };
 
             const renderName = () => {
-                return (
-                    <div className={b('cluster-name')}>
-                        <ExternalLink href={clusterPath}>{row.title || row.name}</ExternalLink>
-                    </div>
-                );
+                return <ClusterName row={row} />;
             };
 
             const renderStatus = () => {
@@ -153,6 +139,32 @@ function getTitleColumn({isEditClusterAvailable, isDeleteClusterAvailable}: Clus
     } satisfies Column<PreparedCluster>;
 }
 
+interface ClusterNameProps {
+    row: PreparedCluster;
+}
+
+function ClusterName({row}: ClusterNameProps) {
+    const {
+        name: clusterName,
+        use_embedded_ui: useEmbeddedUi,
+        preparedBackend: backend,
+        settings,
+    } = row;
+    const clusterPath =
+        useEmbeddedUi && backend
+            ? createDeveloperUIMonitoringPageHref(backend)
+            : getClusterPath(
+                  {environment: settings?.auth_service},
+                  {backend, clusterName},
+                  {withBasename: true},
+              );
+    return (
+        <div className={b('cluster-name')}>
+            <ExternalLink href={clusterPath}>{row.title || row.name}</ExternalLink>
+        </div>
+    );
+}
+
 const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
     {
         name: COLUMNS_NAMES.VERSIONS,
@@ -167,12 +179,7 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
             return versions[0] || undefined;
         },
         render: ({row}) => {
-            const {
-                preparedVersions,
-                versions = [],
-                name: clusterName,
-                preparedBackend: backend,
-            } = row;
+            const {versions = []} = row;
 
             const hasErrors = !versions.length || versions.some((item) => !item.version);
 
@@ -180,20 +187,7 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
                 return EMPTY_CELL;
             }
 
-            return (
-                preparedVersions.length > 0 && (
-                    <ExternalLink
-                        className={b('cluster-versions')}
-                        href={getClusterPath(
-                            clusterTabsIds.versions,
-                            {backend, clusterName},
-                            {withBasename: true},
-                        )}
-                    >
-                        <VersionsBar preparedVersions={preparedVersions} />
-                    </ExternalLink>
-                )
-            );
+            return <Versions row={row} />;
         },
     },
     {
@@ -358,6 +352,29 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
         },
     },
 ];
+
+interface VersionsProps {
+    row: PreparedCluster;
+}
+
+function Versions({row}: VersionsProps) {
+    const {preparedVersions, name: clusterName, preparedBackend: backend, settings} = row;
+    if (!preparedVersions.length) {
+        return null;
+    }
+    return (
+        <ExternalLink
+            className={b('cluster-versions')}
+            href={getClusterPath(
+                {activeTab: clusterTabsIds.versions, environment: settings?.auth_service},
+                {backend, clusterName},
+                {withBasename: true},
+            )}
+        >
+            <VersionsBar preparedVersions={preparedVersions} />
+        </ExternalLink>
+    );
+}
 
 export function getClustersColumns(params: ClustersColumnsParams) {
     return [getTitleColumn(params), ...CLUSTERS_COLUMNS];

@@ -20,6 +20,7 @@ export interface ClustersBreadcrumbsOptions {}
 export interface ClusterBreadcrumbsOptions extends ClustersBreadcrumbsOptions {
     clusterName?: string;
     clusterTab?: ClusterTab;
+    environment?: string;
 }
 
 export interface TenantBreadcrumbsOptions extends ClusterBreadcrumbsOptions {

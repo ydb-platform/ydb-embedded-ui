@@ -15,7 +15,7 @@ import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewer
 import {InternalLink} from '../../components/InternalLink/InternalLink';
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import {VDiskInfo} from '../../components/VDiskInfo/VDiskInfo';
-import {getVDiskPagePath} from '../../routes';
+import {useVDiskPagePath} from '../../routes';
 import {api} from '../../store/reducers/api';
 import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
@@ -60,6 +60,7 @@ const vDiskTabSchema = z.nativeEnum(VDISK_TABS_IDS).catch(VDISK_TABS_IDS.storage
 
 export function VDiskPage() {
     const dispatch = useTypedDispatch();
+    const getVDiskPagePath = useVDiskPagePath();
 
     const containerRef = React.useRef<HTMLDivElement>(null);
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
@@ -247,16 +248,13 @@ export function VDiskPage() {
                 <TabProvider value={vDiskTab}>
                     <TabList size="l">
                         {VDISK_PAGE_TABS.map(({id, title}) => {
-                            let path: string | undefined;
-                            if (!isNil(vDiskId)) {
-                                path = getVDiskPagePath(
-                                    {
-                                        nodeId: nodeId?.toString(),
-                                        vDiskId: vDiskId?.toString(),
-                                    },
-                                    {activeTab: id, database},
-                                );
-                            }
+                            const path = getVDiskPagePath(
+                                {
+                                    nodeId: nodeId?.toString(),
+                                    vDiskId: vDiskId?.toString(),
+                                },
+                                {activeTab: id},
+                            );
 
                             return (
                                 <Tab key={id} value={id} disabled={!path}>

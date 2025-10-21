@@ -34,7 +34,6 @@ export const TopShards = ({database, databaseFullPath}: TopShardsProps) => {
             <ShardsTable
                 data={data}
                 databaseFullPath={databaseFullPath}
-                database={database}
                 columnsIds={columnsIds}
                 settings={TENANT_OVERVIEW_TABLES_SETTINGS}
             />
