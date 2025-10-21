@@ -58,8 +58,8 @@ export interface AsideNavigationProps {
     ydbInternalUser: JSX.Element;
     menuItems?: MenuItem[];
     content: React.ReactNode;
-    renderFooterItems?: (defaultFooterItems: React.ReactNode) => React.ReactNode;
     user?: {login: string; icon?: IconData};
+    renderFooterItems?: (defaultFooterItems: React.ReactNode) => React.ReactNode;
 }
 
 enum Panel {
@@ -157,9 +157,13 @@ export function AsideNavigation(props: AsideNavigationProps) {
                         </UserDropdown>,
                     ];
 
-                    return props.renderFooterItems
-                        ? props.renderFooterItems(defaultFooterItems)
-                        : defaultFooterItems;
+                    return (
+                        <React.Fragment>
+                            {props.renderFooterItems
+                                ? props.renderFooterItems(defaultFooterItems)
+                                : defaultFooterItems}
+                        </React.Fragment>
+                    );
                 }}
                 panelItems={[
                     {
