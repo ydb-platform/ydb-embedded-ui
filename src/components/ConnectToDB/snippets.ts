@@ -131,7 +131,7 @@ import {Driver} from '@ydbjs/core';
 import {query} from '@ydbjs/query';
 import type {ResultSet} from '@ydbjs/query';
 
-const connectionString = 'grpc://${endpoint ?? '<endpoint>'}${database ?? '/<database>'}';
+const connectionString = '${endpoint ?? '<endpoint>'}${database ?? '/<database>'}';
 
 const driver = new Driver(connectionString);
 
