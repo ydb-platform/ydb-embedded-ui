@@ -49,6 +49,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
 
     const {
         AllocatedSize,
+        SizeLimit,
         DiskSpace,
         FrontQueues,
         Guid,
@@ -60,7 +61,6 @@ export function VDiskInfo<T extends PreparedVDisk>({
         VDiskSlotId,
         Kind,
         SatisfactionRank,
-        AvailableSize,
         HasUnreadableBlobs,
         IncarnationGuid,
         InstanceGuid,
@@ -83,13 +83,14 @@ export function VDiskInfo<T extends PreparedVDisk>({
             value: VDiskState,
         });
     }
-    if (Number(AllocatedSize) >= 0 && Number(AvailableSize) >= 0) {
+
+    if (Number(AllocatedSize) >= 0 && Number(SizeLimit) >= 0) {
         leftColumn.push({
             label: vDiskInfoKeyset('size'),
             value: (
                 <ProgressViewer
                     value={AllocatedSize}
-                    capacity={Number(AllocatedSize) + Number(AvailableSize)}
+                    capacity={SizeLimit}
                     formatValues={formatStorageValuesToGb}
                     colorizeProgress={true}
                 />

@@ -25,8 +25,9 @@ export function prepareGroupsVDisk(data: TStorageVDisk = {}): PreparedVDisk {
     const Severity = calculateVDiskSeverity(mergedVDiskData);
 
     const vDiskSizeFields = prepareVDiskSizeFields({
-        AvailableSize: mergedVDiskData.AvailableSize ?? PDisk?.AvailableSize,
+        AvailableSize: mergedVDiskData.AvailableSize,
         AllocatedSize: mergedVDiskData.AllocatedSize,
+        SlotSize: PDisk?.SlotSize,
     });
 
     const preparedDonors = bscVDisk.Donors?.map((donor) => {

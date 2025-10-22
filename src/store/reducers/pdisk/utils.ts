@@ -70,13 +70,22 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
         // VDisks with their full statuses can be seen in popup on hover, in Storage table and on vdisks pages
         const slotSeverity = getSpaceSeverity(preparedVDisk.AllocatedPercent);
 
+        const used = Number(preparedVDisk.AllocatedSize);
+        let total = Number(preparedVDisk.SizeLimit);
+
+        // In case used size is more than limit
+        // use used size as total to show correct slot relative size
+        if (used > total) {
+            total = used;
+        }
+
         return {
             SlotType: 'vDisk',
             Id: preparedVDisk.VDiskId?.GroupID,
             Title: preparedVDisk.StoragePoolName,
             Severity: slotSeverity,
-            Used: Number(preparedVDisk.AllocatedSize),
-            Total: Number(preparedVDisk.TotalSize),
+            Used: used,
+            Total: total,
             UsagePercent: preparedVDisk.AllocatedPercent,
 
             SlotData: preparedVDisk,

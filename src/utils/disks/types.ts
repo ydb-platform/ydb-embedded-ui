@@ -28,9 +28,9 @@ export interface PreparedVDisk
     StringifiedId?: string;
 
     AvailableSize?: number;
-    TotalSize?: number;
     AllocatedSize?: number;
     AllocatedPercent?: number;
+    SizeLimit?: number;
 
     Donors?: PreparedVDisk[];
 }

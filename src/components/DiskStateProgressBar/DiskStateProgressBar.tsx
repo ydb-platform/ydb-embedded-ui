@@ -44,7 +44,11 @@ export function DiskStateProgressBar({
             return <div className={b('fill-bar', mods)} style={{width: '100%'}} />;
         }
 
-        const fillWidth = inverted ? 100 - diskAllocatedPercent : diskAllocatedPercent;
+        // diskAllocatedPercent could be more than 100
+        let fillWidth = Math.min(diskAllocatedPercent, 100);
+        if (inverted) {
+            fillWidth = Math.max(100 - diskAllocatedPercent, 0);
+        }
 
         if (diskAllocatedPercent >= 0) {
             return <div className={b('fill-bar', mods)} style={{width: `${fillWidth}%`}} />;
