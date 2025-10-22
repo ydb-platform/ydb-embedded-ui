@@ -1,5 +1,7 @@
 import {cn} from '../../../../utils/cn';
 
+import i18n from './i18n';
+
 import './Monitoring.scss';
 
 const b = cn('ydb-monitoring');
@@ -13,7 +15,7 @@ export function Monitoring({monitoringUrl}: MonitoringProps) {
     if (!monitoringUrl) {
         return (
             <div className={b('empty')}>
-                <div className={b('empty-text')}>Monitoring is not available</div>
+                <div className={b('empty-text')}>{i18n('message_not-available')}</div>
             </div>
         );
     }
