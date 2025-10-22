@@ -146,3 +146,11 @@ type TabletPageQuery = QueryParamsTypeFromQueryObject<typeof tabletPageQueryPara
 export function getTabletPagePath(tabletId: string | number, query: TabletPageQuery = {}) {
     return createHref(routes.tablet, {id: tabletId}, {...query});
 }
+
+export function checkIsClustersPage(pathname: string) {
+    return pathname.endsWith(routes.clusters);
+}
+
+export function checkIsTenantPage(pathname: string) {
+    return pathname.endsWith(routes.tenant);
+}

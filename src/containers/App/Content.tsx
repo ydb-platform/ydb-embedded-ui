@@ -2,7 +2,7 @@ import React from 'react';
 
 import {connect} from 'react-redux';
 import type {RedirectProps} from 'react-router-dom';
-import {Redirect, Route, Switch} from 'react-router-dom';
+import {Redirect, Route, Switch, useLocation} from 'react-router-dom';
 
 import {AccessDenied} from '../../components/Errors/403';
 import {PageError} from '../../components/Errors/PageError/PageError';
@@ -10,7 +10,7 @@ import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {useSlots} from '../../components/slots';
 import type {SlotMap} from '../../components/slots/SlotMap';
 import type {SlotComponent} from '../../components/slots/types';
-import routes from '../../routes';
+import routes, {checkIsClustersPage} from '../../routes';
 import type {RootState} from '../../store';
 import {authenticationApi} from '../../store/reducers/authentication/authentication';
 import {
@@ -18,6 +18,7 @@ import {
     useClusterWithoutAuthInUI,
     useMetaCapabilitiesLoaded,
     useMetaCapabilitiesQuery,
+    useMetaLoginAvailable,
 } from '../../store/reducers/capabilities/hooks';
 import {nodesListApi} from '../../store/reducers/nodesList';
 import {uiFactory} from '../../uiFactory/uiFactory';
@@ -160,7 +161,7 @@ export function Content(props: ContentProps) {
                               exact: true,
                               component: Clusters,
                               slot: ClustersSlot,
-                              wrapper: GetMetaCapabilities,
+                              wrapper: ClustersDataWrapper,
                           })}
                     {/* Single cluster routes */}
                     {routesSlots.map((route) => {
@@ -191,9 +192,34 @@ function DataWrapper({children}: {children: React.ReactNode}) {
     );
 }
 
-function GetUser({children}: {children: React.ReactNode}) {
+function ClustersDataWrapper({children}: {children: React.ReactNode}) {
+    return (
+        <GetMetaCapabilities>
+            <GetMetaUser>{children}</GetMetaUser>
+        </GetMetaCapabilities>
+    );
+}
+
+function GetMetaUser({children}: {children: React.ReactNode}) {
+    const location = useLocation();
+
+    const isClustersPage = checkIsClustersPage(location.pathname);
+
+    const isMetaLoginAvailable = useMetaLoginAvailable();
+
+    if (isClustersPage && isMetaLoginAvailable) {
+        return <GetUser useMeta>{children}</GetUser>;
+    }
+    return children;
+}
+
+function GetUser({children, useMeta}: {children: React.ReactNode; useMeta?: boolean}) {
     const database = useDatabaseFromQuery();
-    const {isLoading, error} = authenticationApi.useWhoamiQuery({database});
+
+    const {isLoading, error} = authenticationApi.useWhoamiQuery({
+        database,
+        useMeta,
+    });
     const {appTitle} = useAppTitle();
 
     const errorProps = error ? {...uiFactory.clusterOrDatabaseAccessError} : undefined;
@@ -262,8 +288,15 @@ function ContentWrapper(props: ContentWrapperProps) {
     const {singleClusterMode, isAuthenticated} = props;
     const authUnavailable = useClusterWithoutAuthInUI();
 
+    const location = useLocation();
+    const isClustersPage = checkIsClustersPage(location.pathname);
+
+    const isMetaLoginAvailable = useMetaLoginAvailable();
+
+    const isClustersAuthUnavailable = isClustersPage && !isMetaLoginAvailable;
+
     const renderNotAuthenticated = () => {
-        if (authUnavailable) {
+        if (authUnavailable || isClustersAuthUnavailable) {
             return <AccessDenied />;
         }
         return <Authentication />;

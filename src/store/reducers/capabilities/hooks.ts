@@ -176,3 +176,7 @@ export const useClusterEventsAvailable = () => {
 export const useDatabasesAvailable = () => {
     return useGetMetaFeatureVersion('/meta/databases') >= 1;
 };
+
+export const useMetaLoginAvailable = () => {
+    return useGetMetaFeatureVersion('/meta/login') >= 1;
+};
