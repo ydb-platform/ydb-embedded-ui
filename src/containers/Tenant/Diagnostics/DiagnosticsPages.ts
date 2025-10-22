@@ -29,6 +29,11 @@ const overview = {
     title: 'Info',
 };
 
+const monitoring = {
+    id: TENANT_DIAGNOSTICS_TABS_IDS.monitoring,
+    title: 'Monitoring',
+};
+
 const schema = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.schema,
     title: 'Schema',
@@ -115,6 +120,7 @@ const TRANSFER_PAGES = [overview, tablets, describe, access];
 
 const DATABASE_PAGES = [
     overview,
+    monitoring,
     topQueries,
     topShards,
     nodes,
@@ -130,6 +136,7 @@ const DATABASE_PAGES = [
 
 const SERVERLESS_DATABASE_PAGES = [
     overview,
+    monitoring,
     topQueries,
     topShards,
     tablets,

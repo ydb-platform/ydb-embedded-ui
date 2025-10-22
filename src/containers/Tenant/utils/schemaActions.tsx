@@ -1,12 +1,16 @@
-import {CirclePlus, Copy, PlugConnection} from '@gravity-ui/icons';
+import {CirclePlus, Copy, PlugConnection, Pulse} from '@gravity-ui/icons';
 import {Flex, Spin} from '@gravity-ui/uikit';
 import copy from 'copy-to-clipboard';
 import type {NavigationTreeNodeType} from 'ydb-ui-components';
 
 import type {SnippetParams} from '../../../components/ConnectToDB/types';
 import type {AppDispatch} from '../../../store';
-import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
-import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
+import {
+    TENANT_DIAGNOSTICS_TABS_IDS,
+    TENANT_PAGES_IDS,
+    TENANT_QUERY_TABS_ID,
+} from '../../../store/reducers/tenant/constants';
+import {setDiagnosticsTab, setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
 import createToast from '../../../utils/createToast';
 import {insertSnippetToEditor} from '../../../utils/monaco/insertSnippet';
 import {transformPath} from '../ObjectSummary/transformPath';
@@ -98,6 +102,11 @@ const bindActions = (
               }
             : undefined,
         getConnectToDBDialog: () => getConnectToDBDialog?.({database: params.database}),
+        goToMonitoring: () => {
+            dispatch(setTenantPage(TENANT_PAGES_IDS.diagnostics));
+            dispatch(setDiagnosticsTab(TENANT_DIAGNOSTICS_TABS_IDS.monitoring));
+            setActivePath(params.path);
+        },
         createTable: inputQuery(createTableTemplate),
         createColumnTable: inputQuery(createColumnTableTemplate),
         createAsyncReplication: inputQuery(createAsyncReplicationTemplate),
@@ -190,6 +199,11 @@ export const getActions =
             action: actions.getConnectToDBDialog,
             iconStart: <PlugConnection />,
         };
+        const monitoringItem = {
+            text: i18n('actions.monitoring'),
+            action: actions.goToMonitoring,
+            iconStart: <Pulse />,
+        };
 
         const createEntitiesSet = [
             {text: i18n('actions.createTable'), action: actions.createTable},
@@ -216,7 +230,7 @@ export const getActions =
                 },
             ],
         };
-        const DB_SET: ActionsSet = [[copyItem, connectToDBItem], createEntitiesSet];
+        const DB_SET: ActionsSet = [[copyItem, connectToDBItem, monitoringItem], createEntitiesSet];
 
         const DIR_SET: ActionsSet = [[copyItem], createEntitiesSet];
 

@@ -41,5 +41,7 @@
   "value_serverless": "Serverless",
   "context_serverless-tooltip": "Some metrics are hidden in Serverless mode — resources scale automatically based on workload",
   "context_serverless-autoscaled": "Auto-Scaled Resources",
-  "context_serverless-storage-subtitle": "{{legend}} | {{groups}} groups"
+  "context_serverless-storage-subtitle": "{{legend}} | {{groups}} groups",
+  "field_monitoring-link": "Monitoring",
+  "tooltip_monium": "Full monitoring in Monium"
 }

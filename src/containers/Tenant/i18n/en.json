@@ -26,6 +26,7 @@
   "actions.notCopied": "Couldn’t copy the path",
   "actions.copyPath": "Copy path",
   "actions.connectToDB": "Connect to DB",
+  "actions.monitoring": "Monitoring",
   "actions.dropIndex": "Drop index",
   "actions.openPreview": "Open preview",
   "actions.createTable": "Create table...",

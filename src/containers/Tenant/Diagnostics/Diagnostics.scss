@@ -45,4 +45,8 @@
         // This prevents inheritance issues with percentage-based calculations
         container-type: size;
     }
+
+    &__new-label {
+        margin-left: 8px;
+    }
 }

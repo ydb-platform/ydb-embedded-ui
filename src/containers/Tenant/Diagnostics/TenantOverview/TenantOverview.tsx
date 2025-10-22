@@ -1,4 +1,4 @@
-import {Button, Flex, HelpMark, Icon, Label} from '@gravity-ui/uikit';
+import {Button, Flex, HelpMark, Icon, Label, Tooltip} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
@@ -186,17 +186,37 @@ export function TenantOverview({
                     <Flex alignItems="center" gap="1" className={b('top')}>
                         {renderName()}
                         <Flex gap="2">
-                            {links.map(({title, url, icon}) => (
-                                <Button
-                                    key={title}
-                                    href={url}
-                                    target="_blank"
-                                    size="xs"
-                                    title={title}
-                                >
+                            {links.map(({title, url, icon}) => {
+                                const isMonitoring = title === i18n('field_monitoring-link');
+                                const buttonContent = isMonitoring ? (
+                                    <>
+                                        <Icon data={icon} />
+                                        Monium
+                                    </>
+                                ) : (
                                     <Icon data={icon} />
-                                </Button>
-                            ))}
+                                );
+
+                                const button = (
+                                    <Button
+                                        key={title}
+                                        href={url}
+                                        target="_blank"
+                                        size="xs"
+                                        title={isMonitoring ? undefined : title}
+                                    >
+                                        {buttonContent}
+                                    </Button>
+                                );
+
+                                return isMonitoring ? (
+                                    <Tooltip key={title} content={i18n('tooltip_monium')}>
+                                        {button}
+                                    </Tooltip>
+                                ) : (
+                                    button
+                                );
+                            })}
                         </Flex>
                     </Flex>
                     <Flex direction="column" gap={4}>

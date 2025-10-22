@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Tab, TabList, TabProvider} from '@gravity-ui/uikit';
+import {Label, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {Helmet} from 'react-helmet-async';
 
 import {AutoRefreshControl} from '../../../components/AutoRefreshControl/AutoRefreshControl';
@@ -33,6 +33,7 @@ import Describe from './Describe/Describe';
 import DetailedOverview from './DetailedOverview/DetailedOverview';
 import {getPagesByType, useDiagnosticsPageLinkGetter} from './DiagnosticsPages';
 import {HotKeys} from './HotKeys/HotKeys';
+import {Monitoring} from './Monitoring/Monitoring';
 import {NetworkWrapper} from './Network/NetworkWrapper';
 import {Partitions} from './Partitions/Partitions';
 import {TopQueries} from './TopQueries';
@@ -96,6 +97,15 @@ function Diagnostics({additionalTenantProps}: DiagnosticsProps) {
                         databaseFullPath={databaseFullPath}
                         additionalTenantProps={additionalTenantProps}
                     />
+                );
+            }
+            case TENANT_DIAGNOSTICS_TABS_IDS.monitoring: {
+                const monitoringUrl = additionalTenantProps?.getMonitoringLink?.(
+                    database,
+                    databaseType,
+                );
+                return (
+                    <Monitoring database={database} monitoringUrl={monitoringUrl || undefined} />
                 );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.schema: {
@@ -220,6 +230,13 @@ function Diagnostics({additionalTenantProps}: DiagnosticsProps) {
         }
     };
     const renderTabs = () => {
+        // Date when the Monitoring tab was added (Oct 22, 2025)
+        const MONITORING_TAB_LAUNCH_DATE = new Date('2025-10-22');
+        const FOURTEEN_DAYS_MS = 14 * 24 * 60 * 60 * 1000;
+        const now = new Date();
+        const showNewLabel =
+            now.getTime() - MONITORING_TAB_LAUNCH_DATE.getTime() < FOURTEEN_DAYS_MS;
+
         return (
             <div className={b('header-wrapper')}>
                 <div className={b('tabs')}>
@@ -227,10 +244,21 @@ function Diagnostics({additionalTenantProps}: DiagnosticsProps) {
                         <TabList size="l">
                             {pages.map(({id, title}) => {
                                 const linkPath = getDiagnosticsPageLink(id);
+                                const isMonitoringTab =
+                                    id === TENANT_DIAGNOSTICS_TABS_IDS.monitoring;
                                 return (
                                     <Tab key={id} value={id}>
                                         <InternalLink to={linkPath} as="tab">
                                             {title}
+                                            {isMonitoringTab && showNewLabel && (
+                                                <Label
+                                                    theme="info"
+                                                    size="xs"
+                                                    className={b('new-label')}
+                                                >
+                                                    New
+                                                </Label>
+                                            )}
                                         </InternalLink>
                                     </Tab>
                                 );
