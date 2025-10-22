@@ -153,6 +153,7 @@ export function prepareVDiskSizeFields({
     SlotSize: string | number | undefined;
 }) {
     const available = Number(AvailableSize ?? 0);
+    // Unlike available, allocated is displayed in UI, it is incorrect to fallback it to 0
     const allocated = Number(AllocatedSize);
     const slotSize = Number(SlotSize);
 
@@ -163,7 +164,7 @@ export function prepareVDiskSizeFields({
         sizeLimit = slotSize;
     }
 
-    const allocatedPercent = Math.floor((allocated * 100) / sizeLimit);
+    const allocatedPercent = sizeLimit > 0 ? Math.floor((allocated * 100) / sizeLimit) : NaN;
 
     return {
         AvailableSize: available,
