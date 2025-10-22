@@ -8,6 +8,7 @@ import type {
     MetaClusters,
     MetaTenants,
 } from '../../types/api/meta';
+import type {TUserToken} from '../../types/api/whoami';
 import {parseMetaTenants} from '../parsers/parseMetaTenants';
 
 import type {AxiosOptions, BaseAPIParams} from './base';
@@ -26,6 +27,14 @@ export class MetaAPI extends BaseYdbAPI {
             return `${META_BACKEND}/proxy/cluster/${clusterName}${path}`;
         }
         return `${META_BACKEND ?? ''}${path}`;
+    }
+
+    metaAuthenticate(params: {user: string; password: string}) {
+        return this.post(this.getPath('/meta/login'), params, {});
+    }
+
+    metaWhoami() {
+        return this.post<TUserToken>(this.getPath('/meta/whoami'), {}, {});
     }
 
     getMetaCapabilities() {

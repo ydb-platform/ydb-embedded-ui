@@ -15,6 +15,7 @@ import {useHistory, useLocation} from 'react-router-dom';
 
 import {getConnectToDBDialog} from '../../components/ConnectToDB/ConnectToDBDialog';
 import {InternalLink} from '../../components/InternalLink';
+import {checkIsClustersPage, checkIsTenantPage} from '../../routes';
 import {
     useAddClusterFeatureAvailable,
     useDatabasesAvailable,
@@ -64,8 +65,8 @@ function Header() {
     const location = useLocation();
     const history = useHistory();
 
-    const isDatabasePage = location.pathname === '/tenant';
-    const isClustersPage = location.pathname === '/clusters';
+    const isDatabasePage = checkIsTenantPage(location.pathname);
+    const isClustersPage = checkIsClustersPage(location.pathname);
 
     const {isLoading: isClustersLoading, error: clustersError} =
         clustersApi.useGetClustersListQuery(undefined, {
