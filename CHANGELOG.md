@@ -1,5 +1,24 @@
 # Changelog
 
+## [12.9.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.8.0...v12.9.0) (2025-10-22)
+
+
+### Features
+
+* add different auth methods for external datasource ([#2982](https://github.com/ydb-platform/ydb-embedded-ui/issues/2982)) ([45732e1](https://github.com/ydb-platform/ydb-embedded-ui/commit/45732e1c033c60e26eb09961bcbd8ced5d8652a6))
+* **Clusters:** authorize with meta ([#2988](https://github.com/ydb-platform/ydb-embedded-ui/issues/2988)) ([e5de2d4](https://github.com/ydb-platform/ydb-embedded-ui/commit/e5de2d46a5f40a1f5684a0482eda2c304070214f))
+* migrate to gravity-ui/graph ([#2735](https://github.com/ydb-platform/ydb-embedded-ui/issues/2735)) ([2fb30ad](https://github.com/ydb-platform/ydb-embedded-ui/commit/2fb30ad3402ecd54070bb3fe9c99a3013aafbda0))
+* render additional footer items in navigation ([#2991](https://github.com/ydb-platform/ydb-embedded-ui/issues/2991)) ([1cff57d](https://github.com/ydb-platform/ydb-embedded-ui/commit/1cff57df8fd69ff2c91590f7c0648506f46b9628))
+* **ui:** support fulltext index ([#2962](https://github.com/ydb-platform/ydb-embedded-ui/issues/2962)) ([11ddc82](https://github.com/ydb-platform/ydb-embedded-ui/commit/11ddc825f2542b866e07db9739cda46236658c2e))
+* update js/ts connection example to use new sdk ([#2974](https://github.com/ydb-platform/ydb-embedded-ui/issues/2974)) ([0982a58](https://github.com/ydb-platform/ydb-embedded-ui/commit/0982a58cec7c71979e25319c1c1066581531dc15))
+
+
+### Bug Fixes
+
+* default interface theme is system ([#2960](https://github.com/ydb-platform/ydb-embedded-ui/issues/2960)) ([7020e05](https://github.com/ydb-platform/ydb-embedded-ui/commit/7020e057115ab3e8089cb07eeb851631b4e2fe09))
+* keysets ([#2963](https://github.com/ydb-platform/ydb-embedded-ui/issues/2963)) ([5d116e9](https://github.com/ydb-platform/ydb-embedded-ui/commit/5d116e944b55d70ba4cafa8630c01b530f8229b7))
+* **UserSettings:** do not show language setting ([#2989](https://github.com/ydb-platform/ydb-embedded-ui/issues/2989)) ([55a1fc6](https://github.com/ydb-platform/ydb-embedded-ui/commit/55a1fc63313367dcd29ca390ca8b876e2cfc3b8d))
+
 ## [12.8.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.7.0...v12.8.0) (2025-10-03)
 
 
