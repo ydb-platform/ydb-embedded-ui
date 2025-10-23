@@ -9,11 +9,18 @@ interface LoaderWrapperProps {
     size?: LoaderSize;
     className?: string;
     children: React.ReactNode;
+    delay?: number;
 }
 
-export function LoaderWrapper({loading, size = 'm', className, children}: LoaderWrapperProps) {
+export function LoaderWrapper({
+    loading,
+    size = 'm',
+    className,
+    children,
+    delay,
+}: LoaderWrapperProps) {
     if (loading) {
-        return <Loader size={size} className={className} />;
+        return <Loader size={size} className={className} delay={delay} />;
     }
     return children;
 }

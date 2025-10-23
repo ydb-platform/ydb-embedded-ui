@@ -33,6 +33,10 @@ export class MetaAPI extends BaseYdbAPI {
         return this.post(this.getPath('/meta/login'), params, {});
     }
 
+    metaLogout() {
+        return this.post(this.getPath('/meta/logout'), {}, {});
+    }
+
     metaWhoami() {
         return this.post<TUserToken>(this.getPath('/meta/whoami'), {}, {});
     }
