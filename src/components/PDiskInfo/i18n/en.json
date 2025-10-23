@@ -11,6 +11,7 @@
   "realtime": "Realtime",
 
   "space": "Space",
+  "usage": "Usage",
   "slots": "Slots",
   "log-size": "Log Size",
   "system-size": "System Size",

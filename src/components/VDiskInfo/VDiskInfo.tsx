@@ -50,6 +50,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
     const {
         AllocatedSize,
         SizeLimit,
+        AllocatedPercent,
         DiskSpace,
         FrontQueues,
         Guid,
@@ -97,6 +98,13 @@ export function VDiskInfo<T extends PreparedVDisk>({
             ),
         });
     }
+    if (!isNaN(Number(AllocatedPercent))) {
+        leftColumn.push({
+            label: vDiskInfoKeyset('usage'),
+            value: `${AllocatedPercent}%`,
+        });
+    }
+
     if (!isNil(DiskSpace)) {
         leftColumn.push({
             label: vDiskInfoKeyset('space-status'),
