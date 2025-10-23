@@ -22,6 +22,7 @@
   "has-unreadable-blobs": "Has Unreadable Blobs",
 
   "size": "Size",
+  "usage": "Usage",
 
   "read-throughput": "Read Throughput",
   "write-throughput": "Write Throughput",

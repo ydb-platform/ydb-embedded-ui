@@ -41,6 +41,7 @@ function getPDiskInfo<T extends PreparedPDisk>({
         SerialNumber,
         TotalSize,
         AllocatedSize,
+        AllocatedPercent,
         StatusV2,
         NumActiveSlots,
         ExpectedSlotCount,
@@ -109,6 +110,12 @@ function getPDiskInfo<T extends PreparedPDisk>({
             />
         ),
     });
+    if (!isNaN(Number(AllocatedPercent))) {
+        spaceInfo.push({
+            label: pDiskInfoKeyset('usage'),
+            value: `${AllocatedPercent}%`,
+        });
+    }
     if (valueIsDefined(NumActiveSlots) && valueIsDefined(ExpectedSlotCount)) {
         spaceInfo.push({
             label: pDiskInfoKeyset('slots'),
