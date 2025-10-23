@@ -1,32 +1,26 @@
-import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
-import type {InfoViewerItem} from '../../../../components/InfoViewer';
-import {InfoViewer} from '../../../../components/InfoViewer';
-import {formatCommonItem} from '../../../../components/InfoViewer/formatters';
+import type {YDBDefinitionListItem} from '../../../../components/YDBDefinitionList/YDBDefinitionList';
+import {YDBDefinitionList} from '../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {TEvDescribeSchemeResult} from '../../../../types/api/schema';
-import {cn} from '../../../../utils/cn';
 import {getEntityName} from '../../utils';
 import i18n from '../i18n';
+import {prepareCreateTimeItem, renderNoEntityDataError} from '../utils';
 
-import './ExternalDataSource.scss';
-
-const b = cn('ydb-external-data-source-info');
-
-const prepareExternalDataSourceSummary = (data: TEvDescribeSchemeResult) => {
-    const info: InfoViewerItem[] = [
+function prepareExternalDataSourceSummary(data: TEvDescribeSchemeResult): YDBDefinitionListItem[] {
+    const info: YDBDefinitionListItem[] = [
         {
-            label: i18n('external-objects.source-type'),
-            value: data.PathDescription?.ExternalDataSourceDescription?.SourceType,
+            name: i18n('external-objects.source-type'),
+            content: data.PathDescription?.ExternalDataSourceDescription?.SourceType,
         },
     ];
 
     const createStep = data.PathDescription?.Self?.CreateStep;
 
     if (Number(createStep)) {
-        info.push(formatCommonItem('CreateStep', data.PathDescription?.Self?.CreateStep));
+        info.push(prepareCreateTimeItem(createStep));
     }
 
     return info;
-};
+}
 
 function getAuthMethodValue(data: TEvDescribeSchemeResult) {
     const {Auth} = data.PathDescription?.ExternalDataSourceDescription || {};
@@ -48,43 +42,35 @@ function getAuthMethodValue(data: TEvDescribeSchemeResult) {
     return i18n('external-objects.auth-method.none');
 }
 
-const prepareExternalDataSourceInfo = (data: TEvDescribeSchemeResult): InfoViewerItem[] => {
+function prepareExternalDataSourceInfo(data: TEvDescribeSchemeResult): YDBDefinitionListItem[] {
     const {Location} = data.PathDescription?.ExternalDataSourceDescription || {};
 
     return [
         ...prepareExternalDataSourceSummary(data),
         {
-            label: i18n('external-objects.location'),
-            value: (
-                <EntityStatus
-                    name={Location}
-                    showStatus={false}
-                    hasClipboardButton
-                    clipboardButtonAlwaysVisible
-                    className={b('location')}
-                />
-            ),
+            name: i18n('external-objects.location'),
+            content: Location,
+            copyText: Location,
         },
         {
-            label: i18n('external-objects.auth-method'),
-            value: getAuthMethodValue(data),
+            name: i18n('external-objects.auth-method'),
+            content: getAuthMethodValue(data),
         },
     ];
-};
+}
 
 interface ExternalDataSourceProps {
     data?: TEvDescribeSchemeResult;
-    prepareData: (data: TEvDescribeSchemeResult) => InfoViewerItem[];
+    prepareData: (data: TEvDescribeSchemeResult) => YDBDefinitionListItem[];
 }
 
 const ExternalDataSource = ({data, prepareData}: ExternalDataSourceProps) => {
     const entityName = getEntityName(data?.PathDescription);
 
     if (!data) {
-        return <div className="error">No {entityName} data</div>;
+        return renderNoEntityDataError(entityName);
     }
-
-    return <InfoViewer title={entityName} info={prepareData(data)} />;
+    return <YDBDefinitionList title={entityName} items={prepareData(data)} />;
 };
 
 export const ExternalDataSourceInfo = ({data}: {data?: TEvDescribeSchemeResult}) => {
