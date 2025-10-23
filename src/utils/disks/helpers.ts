@@ -48,7 +48,7 @@ export function getPDiskId({
     return undefined;
 }
 
-export function getVDiskSlotBasedId(params: VDiskBlobIndexStatParams) {
+export function getVDiskId(params: VDiskBlobIndexStatParams) {
     const parts =
         'vDiskId' in params
             ? [params.vDiskId]

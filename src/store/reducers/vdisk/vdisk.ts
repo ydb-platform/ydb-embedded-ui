@@ -1,6 +1,6 @@
 import type {StorageGroupsResponse} from '../../../types/api/storage';
 import type {TEvSystemStateResponse} from '../../../types/api/systemState';
-import {getVDiskSlotBasedId} from '../../../utils/disks/helpers';
+import {getVDiskId} from '../../../utils/disks/helpers';
 import {api} from '../api';
 
 import {prepareVDiskDataResponse} from './utils';
@@ -74,7 +74,7 @@ export const vDiskApi = api.injectEndpoints({
                 'All',
                 {
                     type: 'VDiskBlobIndexStat',
-                    id: getVDiskSlotBasedId(arg),
+                    id: getVDiskId(arg),
                 },
             ],
         }),
