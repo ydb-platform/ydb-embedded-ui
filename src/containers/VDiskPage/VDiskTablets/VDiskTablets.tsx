@@ -7,6 +7,7 @@ import {isNil} from 'lodash';
 import {PageError} from '../../../components/Errors/PageError/PageError';
 import {ResizeableDataTable} from '../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableWithControlsLayout} from '../../../components/TableWithControlsLayout/TableWithControlsLayout';
+import {useBlobIndexStatWithVdiskId} from '../../../store/reducers/capabilities/hooks';
 import {vDiskApi} from '../../../store/reducers/vdisk/vdisk';
 import type {VDiskBlobIndexItem} from '../../../types/api/vdiskBlobIndex';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
@@ -22,6 +23,7 @@ const columns = getColumns();
 
 interface VDiskTabletsProps {
     nodeId?: string | number;
+    vDiskId?: string;
     pDiskId?: string | number;
     vDiskSlotId?: string | number;
     className?: string;
@@ -32,19 +34,26 @@ export function VDiskTablets({
     nodeId,
     pDiskId,
     vDiskSlotId,
+    vDiskId,
     className,
     scrollContainerRef,
 }: VDiskTabletsProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
+    const useVdiskId = useBlobIndexStatWithVdiskId();
 
-    const {currentData, isFetching, error} = vDiskApi.useGetVDiskBlobIndexStatQuery(
-        !isNil(nodeId) && !isNil(pDiskId) && !isNil(vDiskSlotId)
-            ? {nodeId, pDiskId, vDiskSlotId}
-            : skipToken,
-        {
-            pollingInterval: autoRefreshInterval,
-        },
-    );
+    const params = React.useMemo(() => {
+        if (useVdiskId && !isNil(vDiskId)) {
+            return {vDiskId};
+        }
+        if (!isNil(nodeId) && !isNil(vDiskSlotId) && !isNil(pDiskId)) {
+            return {nodeId, pDiskId, vDiskSlotId};
+        }
+        return skipToken;
+    }, [nodeId, pDiskId, vDiskSlotId, vDiskId, useVdiskId]);
+
+    const {currentData, isFetching, error} = vDiskApi.useGetVDiskBlobIndexStatQuery(params, {
+        pollingInterval: autoRefreshInterval,
+    });
 
     const loading = isFetching && currentData === undefined;
 

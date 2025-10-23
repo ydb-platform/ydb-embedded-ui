@@ -4,6 +4,7 @@ import {
     Database as DatabaseIcon,
     HardDrive as StorageNodeIcon,
 } from '@gravity-ui/icons';
+import {isNil} from 'lodash';
 
 import {TabletIcon} from '../../components/TabletIcon/TabletIcon';
 import routes, {getPDiskPagePath, getStorageGroupPath} from '../../routes';
@@ -172,13 +173,13 @@ const getStorageGroupBreadcrumbs: GetBreadcrumbs<StorageGroupBreadcrumbsOptions>
         : getClusterBreadcrumbs(options, query);
 
     let text = headerKeyset('breadcrumbs.storageGroup');
-    if (groupId) {
+    if (!isNil(groupId)) {
         text += ` ${groupId}`;
     }
 
     const lastItem = {
         text,
-        link: groupId ? getStorageGroupPath(groupId, {database}) : undefined,
+        link: isNil(groupId) ? undefined : getStorageGroupPath(groupId, {database}),
     };
     breadcrumbs.push(lastItem);
 

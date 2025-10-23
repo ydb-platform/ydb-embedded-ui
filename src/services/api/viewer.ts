@@ -1,4 +1,5 @@
 import type {PlanToSvgQueryParams} from '../../store/reducers/planToSvg';
+import type {VDiskBlobIndexStatParams} from '../../store/reducers/vdisk/vdisk';
 import type {
     AccessRightsUpdateRequest,
     AvailablePermissionsResponse,
@@ -548,25 +549,21 @@ export class ViewerAPI extends BaseYdbAPI {
     }
 
     getVDiskBlobIndexStat(
-        {
-            vDiskSlotId,
-            pDiskId,
-            nodeId,
-            database,
-        }: {
-            vDiskSlotId: string | number;
-            pDiskId: string | number;
-            nodeId: string | number;
-            database?: string;
-        },
+        {database, ...rest}: VDiskBlobIndexStatParams,
         {concurrentId, signal}: AxiosOptions = {},
     ) {
+        const params =
+            'vDiskId' in rest
+                ? {vdisk_id: rest.vDiskId}
+                : {
+                      node_id: rest.nodeId,
+                      pdisk_id: rest.pDiskId,
+                      vslot_id: rest.vDiskSlotId,
+                  };
         return this.get<VDiskBlobIndexResponse>(
             this.getPath('/vdisk/blobindexstat'),
             {
-                node_id: nodeId,
-                pdisk_id: pDiskId,
-                vslot_id: vDiskSlotId,
+                ...params,
                 database,
             },
             {concurrentId, requestConfig: {signal}},

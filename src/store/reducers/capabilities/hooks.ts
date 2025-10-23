@@ -54,6 +54,10 @@ export const useStorageGroupsHandlerAvailable = () => {
     return useGetFeatureVersion('/storage/groups') > 2;
 };
 
+export const useBlobIndexStatWithVdiskId = () => {
+    return useGetFeatureVersion('/vdisk/blobindexstat') > 1;
+};
+
 export const useStorageGroupsHandlerHasGrouping = () => {
     return useGetFeatureVersion('/storage/groups') > 4;
 };
