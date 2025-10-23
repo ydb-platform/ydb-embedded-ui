@@ -3,6 +3,8 @@ import React from 'react';
 import {GraphState} from '@gravity-ui/graph';
 import type {HookGraphParams} from '@gravity-ui/graph/react';
 import {GraphBlock, GraphCanvas, useGraph, useGraphEvent} from '@gravity-ui/graph/react';
+// @ts-ignore - workerize-loader syntax
+import createWorker from 'workerize-loader!./treeLayout.worker';
 
 import {cn} from '../../utils/cn';
 
@@ -66,25 +68,21 @@ export function GravityGraph<T>({data, theme}: Props<T>) {
     const {graph, start} = useGraph(config);
 
     React.useEffect(() => {
-        // Just in case, although mounting takes more time than calculation
-        const worker = new Worker(new URL('./treeLayout', import.meta.url));
-        worker.postMessage({
-            nodes: data.nodes,
-            links: data.links,
-        });
+        // Using workerize-loader to inline the worker and avoid CORS issues
+        const worker = createWorker();
 
-        worker.onmessage = function (e) {
-            const {layout, edges} = e.data;
-
-            graph.setEntities({
-                blocks: layout,
-                connections: edges,
+        // Call the exported function from the worker
+        worker
+            .calculateLayout(data.nodes, data.links)
+            .then((result: {layout: any; edges: any}) => {
+                graph.setEntities({
+                    blocks: result.layout,
+                    connections: result.edges,
+                });
+            })
+            .catch((err: Error) => {
+                console.error('Worker error:', err);
             });
-        };
-
-        worker.onerror = (err) => {
-            console.error(err);
-        };
 
         return () => {
             worker.terminate();

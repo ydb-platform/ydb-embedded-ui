@@ -16,7 +16,7 @@ export const StageBlockComponent = ({className, block}: Props) => {
                 ? block.operators.map((item) => <div key={item}>{item}</div>)
                 : block.name}
             {block.tables ? (
-                <div>
+                <div style={{overflow: 'hidden', textOverflow: 'ellipsis'}}>
                     <Text color="secondary">{i18n('label_tables')}: </Text>
                     {block.tables.join(', ')}
                 </div>
