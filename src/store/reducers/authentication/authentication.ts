@@ -96,9 +96,14 @@ export const authenticationApi = api.injectEndpoints({
             invalidatesTags: (_, error) => (error ? [] : ['UserData']),
         }),
         logout: build.mutation({
-            queryFn: async (_, {dispatch}) => {
+            queryFn: async ({useMeta}: {useMeta?: boolean}, {dispatch}) => {
                 try {
-                    const data = await window.api.auth.logout();
+                    let data;
+                    if (useMeta && window.api.meta) {
+                        data = await window.api.meta.metaLogout();
+                    } else {
+                        data = await window.api.auth.logout();
+                    }
                     dispatch(setIsAuthenticated(false));
                     return {data};
                 } catch (error) {

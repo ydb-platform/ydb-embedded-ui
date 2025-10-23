@@ -4,10 +4,11 @@ import {Eye, EyeSlash, Xmark} from '@gravity-ui/icons';
 import {Button, Link as ExternalLink, Icon, TextInput} from '@gravity-ui/uikit';
 import {useHistory, useLocation} from 'react-router-dom';
 
-import {checkIsClustersPage, parseQuery} from '../../routes';
+import {parseQuery} from '../../routes';
 import {authenticationApi} from '../../store/reducers/authentication/authentication';
-import {useLoginWithDatabase, useMetaLoginAvailable} from '../../store/reducers/capabilities/hooks';
+import {useLoginWithDatabase} from '../../store/reducers/capabilities/hooks';
 import {cn} from '../../utils/cn';
+import {useMetaAuth} from '../../utils/hooks/useMetaAuth';
 
 import {isDatabaseError, isPasswordError, isUserError} from './utils';
 
@@ -27,8 +28,7 @@ function Authentication({closable = false}: AuthenticationProps) {
 
     const needDatabase = useLoginWithDatabase();
 
-    const isClustersPage = checkIsClustersPage(location.pathname);
-    const isMetaLoginAvailable = useMetaLoginAvailable();
+    const useMeta = useMetaAuth();
 
     const [authenticate, {isLoading}] = authenticationApi.useAuthenticateMutation();
 
@@ -55,8 +55,6 @@ function Authentication({closable = false}: AuthenticationProps) {
         setPass(value);
         setPasswordError('');
     };
-
-    const useMeta = isClustersPage && isMetaLoginAvailable;
 
     const onLoginClick = () => {
         authenticate({user: login, password, database, useMeta})
