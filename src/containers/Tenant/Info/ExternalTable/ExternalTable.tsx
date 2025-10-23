@@ -1,19 +1,13 @@
 import {useLocation} from 'react-router-dom';
 
-import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
-import type {InfoViewerItem} from '../../../../components/InfoViewer';
-import {InfoViewer} from '../../../../components/InfoViewer';
-import {formatCommonItem} from '../../../../components/InfoViewer/formatters';
 import {LinkWithIcon} from '../../../../components/LinkWithIcon/LinkWithIcon';
+import type {YDBDefinitionListItem} from '../../../../components/YDBDefinitionList/YDBDefinitionList';
+import {YDBDefinitionList} from '../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {createExternalUILink, parseQuery} from '../../../../routes';
 import type {TEvDescribeSchemeResult} from '../../../../types/api/schema';
-import {cn} from '../../../../utils/cn';
 import {getEntityName} from '../../utils';
 import i18n from '../i18n';
-
-import './ExternalTable.scss';
-
-const b = cn('ydb-external-table-info');
+import {prepareCreateTimeItem, renderNoEntityDataError} from '../utils';
 
 const prepareExternalTableSummary = (data: TEvDescribeSchemeResult, pathToDataSource: string) => {
     const {CreateStep} = data.PathDescription?.Self || {};
@@ -21,17 +15,17 @@ const prepareExternalTableSummary = (data: TEvDescribeSchemeResult, pathToDataSo
 
     const dataSourceName = DataSourcePath?.split('/').pop();
 
-    const info: InfoViewerItem[] = [
-        {label: i18n('external-objects.source-type'), value: SourceType},
+    const info: YDBDefinitionListItem[] = [
+        {name: i18n('external-objects.source-type'), content: SourceType},
     ];
 
     if (Number(CreateStep)) {
-        info.push(formatCommonItem('CreateStep', CreateStep));
+        info.push(prepareCreateTimeItem(CreateStep));
     }
 
     info.push({
-        label: i18n('external-objects.data-source'),
-        value: DataSourcePath && (
+        name: i18n('external-objects.data-source'),
+        content: DataSourcePath && (
             <span title={DataSourcePath}>
                 <LinkWithIcon title={dataSourceName || ''} url={pathToDataSource} />
             </span>
@@ -44,29 +38,25 @@ const prepareExternalTableSummary = (data: TEvDescribeSchemeResult, pathToDataSo
 const prepareExternalTableInfo = (
     data: TEvDescribeSchemeResult,
     pathToDataSource: string,
-): InfoViewerItem[] => {
+): YDBDefinitionListItem[] => {
     const location = data.PathDescription?.ExternalTableDescription?.Location;
 
     return [
         ...prepareExternalTableSummary(data, pathToDataSource),
         {
-            label: i18n('external-objects.location'),
-            value: (
-                <EntityStatus
-                    name={location}
-                    showStatus={false}
-                    hasClipboardButton
-                    clipboardButtonAlwaysVisible
-                    className={b('location')}
-                />
-            ),
+            name: i18n('external-objects.location'),
+            content: location,
+            copyText: location,
         },
     ];
 };
 
 interface ExternalTableProps {
     data?: TEvDescribeSchemeResult;
-    prepareData: (data: TEvDescribeSchemeResult, pathToDataSource: string) => InfoViewerItem[];
+    prepareData: (
+        data: TEvDescribeSchemeResult,
+        pathToDataSource: string,
+    ) => YDBDefinitionListItem[];
 }
 
 const ExternalTable = ({data, prepareData}: ExternalTableProps) => {
@@ -81,10 +71,10 @@ const ExternalTable = ({data, prepareData}: ExternalTableProps) => {
     const entityName = getEntityName(data?.PathDescription);
 
     if (!data) {
-        return <div className="error">No {entityName} data</div>;
+        return renderNoEntityDataError(entityName);
     }
 
-    return <InfoViewer title={entityName} info={prepareData(data, pathToDataSource)} />;
+    return <YDBDefinitionList title={entityName} items={prepareData(data, pathToDataSource)} />;
 };
 
 export const ExternalTableInfo = ({data}: {data?: TEvDescribeSchemeResult}) => {
