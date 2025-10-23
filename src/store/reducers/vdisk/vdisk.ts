@@ -11,6 +11,14 @@ type VDiskDataRequestParams = {
     database?: string;
 };
 
+type VDiskBlobIndexStatBasicParams =
+    | {nodeId: string | number; pDiskId: string | number; vDiskSlotId: string | number}
+    | {vDiskId: string};
+
+export type VDiskBlobIndexStatParams = VDiskBlobIndexStatBasicParams & {
+    database?: string;
+};
+
 export const vDiskApi = api.injectEndpoints({
     endpoints: (build) => ({
         getVDiskData: build.query({
@@ -52,25 +60,11 @@ export const vDiskApi = api.injectEndpoints({
             ],
         }),
         getVDiskBlobIndexStat: build.query({
-            queryFn: async (
-                {
-                    nodeId,
-                    pDiskId,
-                    vDiskSlotId,
-                    database,
-                }: {
-                    nodeId: string | number;
-                    pDiskId: string | number;
-                    vDiskSlotId: string | number;
-                    database?: string;
-                },
-                {signal},
-            ) => {
+            queryFn: async (params: VDiskBlobIndexStatParams, {signal}) => {
                 try {
-                    const response = await window.api.viewer.getVDiskBlobIndexStat(
-                        {nodeId, pDiskId, vDiskSlotId, database},
-                        {signal},
-                    );
+                    const response = await window.api.viewer.getVDiskBlobIndexStat(params, {
+                        signal,
+                    });
                     return {data: response};
                 } catch (error) {
                     return {error};
@@ -80,7 +74,7 @@ export const vDiskApi = api.injectEndpoints({
                 'All',
                 {
                     type: 'VDiskBlobIndexStat',
-                    id: getVDiskSlotBasedId(arg.nodeId, arg.pDiskId, arg.vDiskSlotId),
+                    id: getVDiskSlotBasedId(arg),
                 },
             ],
         }),

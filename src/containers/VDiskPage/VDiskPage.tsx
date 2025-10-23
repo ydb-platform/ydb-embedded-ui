@@ -65,14 +65,12 @@ export function VDiskPage() {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const newDiskApiAvailable = useDiskPagesAvailable();
 
-    const [{nodeId, pDiskId, vDiskId: vDiskIdParam, activeTab, database: databaseParam}] =
-        useQueryParams({
-            nodeId: StringParam,
-            pDiskId: StringParam,
-            vDiskId: StringParam,
-            activeTab: StringParam,
-            database: StringParam,
-        });
+    const [{nodeId, vDiskId: vDiskIdParam, activeTab, database: databaseParam}] = useQueryParams({
+        nodeId: StringParam,
+        vDiskId: StringParam,
+        activeTab: StringParam,
+        database: StringParam,
+    });
     const database = databaseParam ?? undefined;
 
     const vDiskTab = vDiskTabSchema.parse(activeTab);
@@ -107,8 +105,17 @@ export function VDiskPage() {
     }, [dispatch, database, vDiskData?.VDiskId?.GroupID, vDiskData?.StringifiedId]);
 
     const loading = isFetching && vDiskData === undefined;
-    const {NodeHost, NodeId, NodeType, NodeDC, PDiskId, PDiskType, Severity, VDiskId} =
-        vDiskData || {};
+    const {
+        NodeHost,
+        NodeId,
+        NodeType,
+        NodeDC,
+        PDiskId,
+        PDiskType,
+        Severity,
+        VDiskId,
+        StringifiedId,
+    } = vDiskData || {};
 
     const {GroupID, GroupGeneration, Ring, Domain, VDisk} =
         VDiskId || (!loading && getVDiskIdFromString(vDiskIdParam)) || {};
@@ -169,8 +176,8 @@ export function VDiskPage() {
             ? `${vDiskPageKeyset('vdisk')} ${vDiskSlotId}`
             : vDiskPageKeyset('vdisk');
 
-        const pDiskPagePart = pDiskId
-            ? `${vDiskPageKeyset('pdisk')} ${pDiskId}`
+        const pDiskPagePart = PDiskId
+            ? `${vDiskPageKeyset('pdisk')} ${PDiskId}`
             : vDiskPageKeyset('pdisk');
 
         const nodePagePart = NodeHost ? NodeHost : vDiskPageKeyset('node');
@@ -275,8 +282,9 @@ export function VDiskPage() {
                     <VDiskTablets
                         scrollContainerRef={containerRef}
                         nodeId={nodeId ?? undefined}
-                        pDiskId={pDiskId ?? undefined}
+                        pDiskId={PDiskId}
                         vDiskSlotId={vDiskSlotId ?? undefined}
+                        vDiskId={StringifiedId}
                         className={vDiskPageCn('tablets-content')}
                     />
                 );
@@ -293,12 +301,12 @@ export function VDiskPage() {
                     database={database}
                     groupId={GroupID}
                     nodeId={nodeId ?? undefined}
-                    pDiskId={pDiskId ?? undefined}
+                    pDiskId={PDiskId}
                     scrollContainerRef={containerRef}
                     viewContext={{
                         groupId: GroupID?.toString(),
                         nodeId: nodeId?.toString(),
-                        pDiskId: pDiskId?.toString(),
+                        pDiskId: PDiskId?.toString(),
                         vDiskSlotId: vDiskSlotId?.toString(),
                     }}
                 />

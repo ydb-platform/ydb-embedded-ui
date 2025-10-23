@@ -1,4 +1,5 @@
 import {valueIsDefined} from '..';
+import type {VDiskBlobIndexStatParams} from '../../store/reducers/vdisk/vdisk';
 import {EFlag} from '../../types/api/enums';
 import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
 import {generateEvaluator} from '../generateEvaluator';
@@ -47,10 +48,10 @@ export function getPDiskId({
     return undefined;
 }
 
-export function getVDiskSlotBasedId(
-    nodeId: string | number,
-    pDiskId: string | number,
-    vDiskSlotId: string | number,
-) {
-    return [nodeId, pDiskId, vDiskSlotId].join('-');
+export function getVDiskSlotBasedId(params: VDiskBlobIndexStatParams) {
+    const parts =
+        'vDiskId' in params
+            ? [params.vDiskId]
+            : [params.nodeId, params.pDiskId, params.vDiskSlotId];
+    return parts.join('-');
 }

@@ -23,6 +23,7 @@ export type Capability =
     | '/viewer/feature_flags'
     | '/viewer/config'
     | '/viewer/cluster'
+    | '/vdisk/blobindexstat'
     | '/viewer/nodes'
     | '/viewer/acl'
     | '/viewer/topic_data';
