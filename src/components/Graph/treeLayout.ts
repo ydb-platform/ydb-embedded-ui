@@ -359,15 +359,15 @@ function calculateTreeEdges(layoutResult: ExtendedTBlock[], connections: TConnec
     return connectionPaths;
 }
 
-// Export function for workerize-loader
-export function calculateLayout(nodes: any[], links: any[]) {
+onmessage = function (e) {
+    const {nodes, links} = e.data;
     const blocks = prepareBlocks(nodes);
     const connections = prepareConnections(links);
     const layout = calculateTreeLayout(blocks, connections);
     const edges = calculateTreeEdges(layout, connections);
 
-    return {
+    postMessage({
         layout,
         edges,
-    };
-}
+    });
+};
