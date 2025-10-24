@@ -1,24 +1,28 @@
 import {useLocation} from 'react-router-dom';
 
 import {checkIsClustersPage} from '../../routes';
-import {useMetaLoginAvailable} from '../../store/reducers/capabilities/hooks';
+import {
+    useMetaLoginAvailable,
+    useMetaWhoAmIAvailable,
+} from '../../store/reducers/capabilities/hooks';
 
 function useMetaAuthState() {
     const location = useLocation();
     const isClustersPage = checkIsClustersPage(location.pathname);
     const metaLoginAvailable = useMetaLoginAvailable();
+    const metaWhoAmIAvailable = useMetaWhoAmIAvailable();
 
-    return {isClustersPage, metaLoginAvailable};
+    return {isClustersPage, metaAuthAvailable: metaLoginAvailable && metaWhoAmIAvailable};
 }
 
 export function useMetaAuth() {
-    const {isClustersPage, metaLoginAvailable} = useMetaAuthState();
+    const {isClustersPage, metaAuthAvailable} = useMetaAuthState();
 
-    return isClustersPage && metaLoginAvailable;
+    return isClustersPage && metaAuthAvailable;
 }
 
 export function useMetaAuthUnavailable() {
-    const {isClustersPage, metaLoginAvailable} = useMetaAuthState();
+    const {isClustersPage, metaAuthAvailable} = useMetaAuthState();
 
-    return isClustersPage && !metaLoginAvailable;
+    return isClustersPage && !metaAuthAvailable;
 }

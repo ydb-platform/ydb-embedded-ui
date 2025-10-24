@@ -184,3 +184,7 @@ export const useDatabasesAvailable = () => {
 export const useMetaLoginAvailable = () => {
     return useGetMetaFeatureVersion('/meta/login') >= 1;
 };
+
+export const useMetaWhoAmIAvailable = () => {
+    return useGetMetaFeatureVersion('/meta/whoami') >= 1;
+};
