@@ -54,4 +54,5 @@ export type MetaCapability =
     | '/meta/delete_cluster'
     | '/meta/events'
     | '/meta/login'
+    | '/meta/whoami'
     | '/meta/databases';
