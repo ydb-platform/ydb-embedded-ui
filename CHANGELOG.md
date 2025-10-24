@@ -1,5 +1,13 @@
 # Changelog
 
+## [12.10.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.10.0...v12.10.1) (2025-10-24)
+
+
+### Bug Fixes
+
+* revert migrate to gravity-ui/graph ([#3009](https://github.com/ydb-platform/ydb-embedded-ui/issues/3009)) ([fcb424c](https://github.com/ydb-platform/ydb-embedded-ui/commit/fcb424c0b5d2a0cf70a96d006eb41f08c8ad91fd))
+* revert workers should be inline to work in other apps ([#3007](https://github.com/ydb-platform/ydb-embedded-ui/issues/3007)) ([6553da8](https://github.com/ydb-platform/ydb-embedded-ui/commit/6553da8d3b4be2c7a6816d0b720e1a558c92e726))
+
 ## [12.10.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.9.0...v12.10.0) (2025-10-24)
 
 
