@@ -55,7 +55,7 @@ module.exports = {
         return config;
     },
     jest: (config) => {
-        // Some @gravity-ui libs (react-data-table) are build in esm only
+        // Some @gravity-ui libs (react-data-table, paranoid) are build in esm only
         // So they need to be transformed
         // By default jest does not transform anything in node_modules
         // So this override excludes node_modules except @gravity-ui
