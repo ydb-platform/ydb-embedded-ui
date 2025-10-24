@@ -1,5 +1,22 @@
 # Changelog
 
+## [12.10.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.9.0...v12.10.0) (2025-10-24)
+
+
+### Features
+
+* support meta logout ([#2998](https://github.com/ydb-platform/ydb-embedded-ui/issues/2998)) ([4c519c1](https://github.com/ydb-platform/ydb-embedded-ui/commit/4c519c1b30f43a981b30bb957edcec2108e332e6))
+
+
+### Bug Fixes
+
+* check meta/whoami availability ([#3004](https://github.com/ydb-platform/ydb-embedded-ui/issues/3004)) ([d53b170](https://github.com/ydb-platform/ydb-embedded-ui/commit/d53b170e96782de68fa208de6bc4d7cf61ff968c))
+* display usage on disks pages ([#2999](https://github.com/ydb-platform/ydb-embedded-ui/issues/2999)) ([9952f18](https://github.com/ydb-platform/ydb-embedded-ui/commit/9952f182133226c0fe6b1026fa165dac031c54bf))
+* **Overview:** use definition list for external objects info ([#3002](https://github.com/ydb-platform/ydb-embedded-ui/issues/3002)) ([34e428a](https://github.com/ydb-platform/ydb-embedded-ui/commit/34e428a86dbabe9ef4042ed518a408e5182e899b))
+* use SlotSize as VDisk size limit if AvailableSize is 0 ([#2996](https://github.com/ydb-platform/ydb-embedded-ui/issues/2996)) ([da03b66](https://github.com/ydb-platform/ydb-embedded-ui/commit/da03b66d648b8e2666f1294eaf5dec918ee2abf0))
+* **VDiskPage:** use vdisk_id for api requests if possible ([#3001](https://github.com/ydb-platform/ydb-embedded-ui/issues/3001)) ([afb6e95](https://github.com/ydb-platform/ydb-embedded-ui/commit/afb6e950475598e215013bdb167b3c1efd544dd3))
+* workers should be inline to work in other apps ([#3003](https://github.com/ydb-platform/ydb-embedded-ui/issues/3003)) ([85ba867](https://github.com/ydb-platform/ydb-embedded-ui/commit/85ba8675df33d7d5bef0335845624cb1df26dc76))
+
 ## [12.9.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.8.0...v12.9.0) (2025-10-22)
 
 
