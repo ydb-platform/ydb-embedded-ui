@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.11.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.10.1...v12.11.0) (2025-10-28)
+
+
+### Features
+
+* configurable balancer usage ([#3015](https://github.com/ydb-platform/ydb-embedded-ui/issues/3015)) ([52c9a89](https://github.com/ydb-platform/ydb-embedded-ui/commit/52c9a89004dd32f930d7d687d80507ae8aa95aee))
+
 ## [12.10.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.10.0...v12.10.1) (2025-10-24)
 
 
