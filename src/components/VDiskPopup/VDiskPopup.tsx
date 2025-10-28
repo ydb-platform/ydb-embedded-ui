@@ -209,9 +209,7 @@ const prepareVDiskData = (
               })
             : undefined;
 
-        const vDiskPagePath = getVDiskLinkFn
-            ? getVDiskLinkFn({nodeId: NodeId, vDiskId: StringifiedId})
-            : undefined;
+        const vDiskPagePath = getVDiskLinkFn?.({nodeId: NodeId, vDiskId: StringifiedId});
         if (vDiskPagePath) {
             vdiskData.push({
                 label: vDiskPopupKeyset('label_links'),
