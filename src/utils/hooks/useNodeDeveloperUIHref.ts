@@ -1,6 +1,7 @@
 import {backend} from '../../store';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import type {NodeAddress} from '../../types/additionalProps';
+import {uiFactory} from '../../uiFactory/uiFactory';
 import {
     createDeveloperUIInternalPageHref,
     createDeveloperUILinkWithNodeId,
@@ -16,7 +17,7 @@ export function useNodeDeveloperUIHref(node?: NodeAddress) {
     const {balancer = backend, settings} = useClusterBaseInfo();
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
-    const useMetaProxy = settings?.use_meta_proxy;
+    const useMetaProxy = settings?.use_meta_proxy || !uiFactory.useMetaProxy;
 
     if (!isUserAllowedToMakeChanges) {
         return undefined;

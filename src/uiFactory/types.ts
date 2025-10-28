@@ -47,6 +47,8 @@ export interface UIFactory<H extends string = CommonIssueType> {
     yaMetricaMap?: Record<string, number>;
 
     useDatabaseId?: boolean;
+
+    useMetaProxy?: boolean;
 }
 
 export type HandleCreateDB = (params: {clusterName: string}) => Promise<boolean>;
