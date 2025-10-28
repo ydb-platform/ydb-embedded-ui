@@ -86,7 +86,6 @@ export function configureStore({
     listenForHistoryChange(store, history);
 
     window.api = api;
-    window.environment = environment;
 
     return {history, store};
 }

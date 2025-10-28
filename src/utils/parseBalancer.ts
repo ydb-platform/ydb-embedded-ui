@@ -1,3 +1,5 @@
+import {environment} from '../store';
+
 import {normalizePathSlashes} from '.';
 
 const protocolRegex = /^http[s]?:\/\//;
@@ -65,8 +67,16 @@ export function prepareBackendFromBalancer(rawBalancer: string) {
 
     // Use meta_backend if it is defined to form backend url
     if (window.meta_backend) {
-        const envPrefix = window.environment ? `/${window.environment}` : '';
-        return normalizePathSlashes(`${envPrefix}/${window.meta_backend}/${preparedBalancer}`);
+        const metaBackend = window.meta_backend;
+        const envPrefix = environment ? `/${environment}` : '';
+
+        // If meta_backend is a full URL (has protocol), don't add leading slash
+        if (protocolRegex.test(metaBackend)) {
+            return normalizePathSlashes(`${metaBackend}/${preparedBalancer}`);
+        }
+
+        // For relative meta_backend, include environment prefix
+        return normalizePathSlashes(`${envPrefix}/${metaBackend}/${preparedBalancer}`);
     }
 
     return preparedBalancer;
