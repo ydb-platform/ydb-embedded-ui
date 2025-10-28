@@ -7,11 +7,14 @@ import {useSetting, useTypedSelector} from '../../../../utils/hooks';
 
 export function useSavedQueries() {
     const [savedQueries] = useSetting<SavedQuery[]>(SAVED_QUERIES_KEY, []);
-    const filter = useTypedSelector(selectSavedQueriesFilter).toLowerCase();
+    const filter = useTypedSelector(selectSavedQueriesFilter).trim().toLowerCase();
 
     const filteredSavedQueries = React.useMemo(() => {
+        if (filter.length === 0) {
+            return savedQueries;
+        }
         return savedQueries.filter((item) => item.body.toLowerCase().includes(filter));
     }, [savedQueries, filter]);
 
-    return filter ? filteredSavedQueries : savedQueries;
+    return filteredSavedQueries;
 }
