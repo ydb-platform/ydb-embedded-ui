@@ -24,7 +24,7 @@ import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import i18n from '../i18n';
-import {useSavedQueries} from '../utils/useSavedQueries';
+import {useFilteredSavedQueries} from '../utils/useSavedQueries';
 
 import './SavedQueries.scss';
 
@@ -68,7 +68,7 @@ interface SavedQueriesProps {
 }
 
 export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
-    const savedQueries = useSavedQueries();
+    const savedQueries = useFilteredSavedQueries();
     const dispatch = useTypedDispatch();
     const filter = useTypedSelector(selectSavedQueriesFilter);
 

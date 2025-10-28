@@ -6,14 +6,10 @@ import type Monaco from 'monaco-editor';
 import {codeAssistApi} from '../../../../store/reducers/codeAssist/codeAssist';
 import {selectQueriesHistory} from '../../../../store/reducers/query/query';
 import type {TelemetryOpenTabs} from '../../../../types/api/codeAssist';
-import type {SavedQuery} from '../../../../types/store/query';
-import {
-    AUTOCOMPLETE_ON_ENTER,
-    ENABLE_AUTOCOMPLETE,
-    SAVED_QUERIES_KEY,
-} from '../../../../utils/constants';
+import {AUTOCOMPLETE_ON_ENTER, ENABLE_AUTOCOMPLETE} from '../../../../utils/constants';
 import {useSetting, useTypedSelector} from '../../../../utils/hooks';
 import {YQL_LANGUAGE_ID} from '../../../../utils/monaco/constats';
+import {useSavedQueries} from '../utils/useSavedQueries';
 
 export type EditorOptions = Monaco.editor.IEditorOptions & Monaco.editor.IGlobalEditorOptions;
 
@@ -50,7 +46,7 @@ export function useCodeAssistHelpers() {
     const [ignoreSuggestion] = codeAssistApi.useIgnoreSuggestionMutation();
     const [sendUserQueriesData] = codeAssistApi.useSendUserQueriesDataMutation();
     const historyQueries = useTypedSelector(selectQueriesHistory);
-    const [savedQueries] = useSetting<SavedQuery[]>(SAVED_QUERIES_KEY, []);
+    const savedQueries = useSavedQueries();
 
     const getCodeAssistSuggestions = React.useCallback(
         async (promptFiles: PromptFile[]) => sendCodeAssistPrompt(promptFiles).unwrap(),
