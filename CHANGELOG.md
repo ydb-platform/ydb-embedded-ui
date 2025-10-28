@@ -1,5 +1,13 @@
 # Changelog
 
+## [12.11.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.11.0...v12.11.1) (2025-10-28)
+
+
+### Bug Fixes
+
+* monaco-ghost infinite loop ([#3021](https://github.com/ydb-platform/ydb-embedded-ui/issues/3021)) ([4594a93](https://github.com/ydb-platform/ydb-embedded-ui/commit/4594a9335cd8c68cdeb14afc273e53079b0f858d))
+* refactor useSavedQueries ([#3023](https://github.com/ydb-platform/ydb-embedded-ui/issues/3023)) ([c34f669](https://github.com/ydb-platform/ydb-embedded-ui/commit/c34f669bcdee8f312a2576080b521390ee387ba6))
+
 ## [12.11.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.10.1...v12.11.0) (2025-10-28)
 
 
