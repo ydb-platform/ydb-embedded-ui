@@ -70,7 +70,7 @@ export function prepareBackendFromBalancer(rawBalancer: string) {
         const metaBackend = window.meta_backend;
         const envPrefix = environment ? `/${environment}` : '';
 
-        // If meta_backend is a full URL (has protocol), don't add leading slash
+        // If meta_backend is a full URL (has protocol), don't add environment prefix
         if (protocolRegex.test(metaBackend)) {
             return normalizePathSlashes(`${metaBackend}/${preparedBalancer}`);
         }

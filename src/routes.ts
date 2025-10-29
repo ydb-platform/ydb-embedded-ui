@@ -86,8 +86,10 @@ export function createHref(
         extendedQuery = {...extendedQuery, clusterName};
     }
 
-    //if {environment: undefinded} in params - it meant we want to reset it
-    if (webVersion && environment && !('environment' in extendedParams)) {
+    //if {environment: ""} in params - it meant we want to reset it
+    const isEnvironmentInParams = typeof params?.environment === 'string';
+
+    if (webVersion && environment && !isEnvironmentInParams) {
         extendedParams = {...extendedParams, environment};
     }
 
@@ -140,8 +142,9 @@ export function getStorageGroupPath(groupId: string | number, query: Query = {})
 export function getDefaultNodePath(
     params: {id: string | number; activeTab?: NodeTab},
     query: NodePageQuery = {},
+    options?: CreateHrefOptions,
 ) {
-    return createHref(routes.node, params, query);
+    return createHref(routes.node, params, query, options);
 }
 
 export const getClusterPath = (
