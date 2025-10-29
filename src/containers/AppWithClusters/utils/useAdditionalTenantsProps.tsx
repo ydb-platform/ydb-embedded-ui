@@ -27,7 +27,7 @@ export function useAdditionalTenantsProps({
 
     const {balancer, monitoring, logging, name: clusterName} = clusterInfo;
 
-    const useMetaProxy = clusterInfo.settings?.use_meta_proxy || uiFactory.useMetaProxy;
+    const useMetaProxy = uiFactory.useMetaProxy && clusterInfo.settings?.use_meta_proxy !== false;
 
     const additionalTenantsProps: AdditionalTenantsProps = {};
     additionalTenantsProps.prepareTenantBackend = (nodeId) => {

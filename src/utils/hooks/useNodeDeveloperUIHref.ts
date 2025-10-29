@@ -17,7 +17,7 @@ export function useNodeDeveloperUIHref(node?: NodeAddress) {
     const {balancer = backend, settings} = useClusterBaseInfo();
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
-    const useMetaProxy = settings?.use_meta_proxy || uiFactory.useMetaProxy;
+    const useMetaProxy = uiFactory.useMetaProxy && settings?.use_meta_proxy !== false;
 
     if (!isUserAllowedToMakeChanges) {
         return undefined;
