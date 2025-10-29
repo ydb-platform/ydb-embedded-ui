@@ -15,7 +15,7 @@ import type {RootState} from '../../defaultStore';
 import {api} from '../api';
 import {selectNodesMap} from '../nodesList';
 
-import {parseCoresUrl, parseLoggingUrls, parseTraceField} from './parseFields';
+import {parseCoresUrl, parseLoggingUrls, parseSettingsField, parseTraceField} from './parseFields';
 import type {ClusterGroupsStats, ClusterState} from './types';
 import {
     createSelectClusterGroupsQuery,
@@ -167,6 +167,8 @@ export function useClusterBaseInfo() {
         traceView: parseTraceField(data.trace_view),
         cores: parseCoresUrl(data.cores),
         logging: parseLoggingUrls(data.logging),
+
+        settings: parseSettingsField(data.settings),
     };
 }
 

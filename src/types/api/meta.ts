@@ -49,9 +49,7 @@ export interface MetaBaseClusterInfo {
     logging?: string | MetaClusterLogsUrls;
     trace_view?: string | MetaClusterTraceView;
     trace_check?: string | MetaClusterTraceCheck;
-
-    // Settings are returned only by meta versions, that decode values by itself
-    settings?: MetaClusterSettings;
+    settings?: string | MetaClusterSettings;
 }
 
 export interface MetaGeneralClusterInfo extends MetaBaseClusterInfo {
@@ -99,5 +97,4 @@ export interface MetaClusterTraceCheck {
 
 export interface MetaClusterSettings {
     use_meta_proxy?: boolean;
-    proxy?: unknown;
 }
