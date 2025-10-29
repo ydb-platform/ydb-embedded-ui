@@ -28,11 +28,26 @@ function Authentication({closable = false}: AuthenticationProps) {
 
     const needDatabase = useLoginWithDatabase();
 
-    const useMeta = useMetaAuth();
-
     const [authenticate, {isLoading}] = authenticationApi.useAuthenticateMutation();
 
     const {returnUrl, database: databaseFromQuery} = parseQuery(location);
+
+    const path = React.useMemo(() => {
+        let path: string | undefined;
+
+        if (returnUrl) {
+            const decodedUrl = decodeURIComponent(returnUrl.toString());
+
+            // to prevent page reload we use router history
+            // history navigates relative to origin
+            // so we remove origin to make it work properly
+            const url = new URL(decodedUrl);
+            path = url.pathname + url.search;
+        }
+        return path;
+    }, [returnUrl]);
+
+    const useMeta = useMetaAuth(path);
 
     const [login, setLogin] = React.useState('');
     const [database, setDatabase] = React.useState(databaseFromQuery?.toString() ?? '');
@@ -60,14 +75,7 @@ function Authentication({closable = false}: AuthenticationProps) {
         authenticate({user: login, password, database, useMeta})
             .unwrap()
             .then(() => {
-                if (returnUrl) {
-                    const decodedUrl = decodeURIComponent(returnUrl.toString());
-
-                    // to prevent page reload we use router history
-                    // history navigates relative to origin
-                    // so we remove origin to make it work properly
-                    const url = new URL(decodedUrl);
-                    const path = url.pathname + url.search;
+                if (path) {
                     history.replace(path);
                 }
             })
