@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.12.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.12.0...v12.12.1) (2025-10-29)
+
+
+### Bug Fixes
+
+* cluster settings may be string ([#3027](https://github.com/ydb-platform/ydb-embedded-ui/issues/3027)) ([e84ce6b](https://github.com/ydb-platform/ydb-embedded-ui/commit/e84ce6beeb0d52441ef514eefbdb096bed696152))
+
 ## [12.12.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.11.1...v12.12.0) (2025-10-29)
 
 
