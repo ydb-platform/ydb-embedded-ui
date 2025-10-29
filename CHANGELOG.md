@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.12.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.11.1...v12.12.0) (2025-10-29)
+
+
+### Features
+
+* use_meta_proxy true by default ([#3024](https://github.com/ydb-platform/ydb-embedded-ui/issues/3024)) ([f5820cf](https://github.com/ydb-platform/ydb-embedded-ui/commit/f5820cffcd0bba89bf768a281cca22102024db31))
+
 ## [12.11.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.11.0...v12.11.1) (2025-10-28)
 
 
