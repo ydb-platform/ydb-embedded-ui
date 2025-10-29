@@ -4,6 +4,7 @@ import type {
     MetaBaseClusterInfo,
     MetaClusterCoresUrl,
     MetaClusterLogsUrls,
+    MetaClusterSettings,
     MetaClusterTraceView,
 } from '../../../types/api/meta';
 
@@ -61,6 +62,25 @@ export function parseLoggingUrls(
         return logging ? loggingUrlsSchema.parse(JSON.parse(logging)) : undefined;
     } catch (e) {
         console.error('Error parsing logging field:', e);
+    }
+
+    return undefined;
+}
+
+const settingsSchema = z.object({
+    use_meta_proxy: z.boolean().optional(),
+});
+
+export function parseSettingsField(
+    settings: MetaBaseClusterInfo['settings'],
+): MetaClusterSettings | undefined {
+    if (settings && typeof settings === 'object') {
+        return settings;
+    }
+    try {
+        return settings ? settingsSchema.parse(JSON.parse(settings)) : undefined;
+    } catch (e) {
+        console.error('Error parsing settings field:', e);
     }
 
     return undefined;
