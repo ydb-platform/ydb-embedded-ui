@@ -9,8 +9,9 @@ import type {
 import type {ClusterInfo} from '../store/reducers/cluster/cluster';
 import type {IssuesTree} from '../store/reducers/healthcheckInfo/types';
 import type {PreparedTenant} from '../store/reducers/tenants/types';
-import type {ClusterLink, DatabaseLink} from '../types/additionalProps';
+import type {AdditionalTenantsProps, ClusterLink, DatabaseLink} from '../types/additionalProps';
 import type {MetaBaseClusterInfo} from '../types/api/meta';
+import type {EPathSubType, EPathType} from '../types/api/schema/schema';
 import type {ETenantType} from '../types/api/tenant';
 import type {GetLogsLink} from '../utils/logs';
 import type {GetMonitoringClusterLink, GetMonitoringLink} from '../utils/monitoring';
@@ -35,6 +36,7 @@ export interface UIFactory<H extends string = CommonIssueType> {
 
     renderBackups?: RenderBackups;
     renderEvents?: RenderEvents;
+    additionalDiagnosticsTabs?: AdditionalDiagnosticsTab[];
     clusterOrDatabaseAccessError?: Partial<EmptyStateProps>;
 
     healthcheck: {
@@ -85,3 +87,21 @@ export type RenderBackups = (props: {
 export type RenderEvents = (props: {
     scrollContainerRef: React.RefObject<HTMLDivElement>;
 }) => React.ReactNode;
+
+export type DiagnosticsTabProps = {
+    type?: EPathType;
+    subType?: EPathSubType;
+    database: string;
+    path: string;
+    databaseFullPath?: string;
+    additionalTenantProps?: AdditionalTenantsProps;
+    scrollContainerRef: React.RefObject<HTMLDivElement>;
+};
+
+export type AdditionalDiagnosticsTab = {
+    id: string;
+    title: string;
+    render: (props: DiagnosticsTabProps) => React.ReactNode;
+    shouldShow?: (type?: EPathType, subType?: EPathSubType) => boolean;
+    insertAfter?: number;
+};

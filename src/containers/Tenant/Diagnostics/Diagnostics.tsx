@@ -215,6 +215,22 @@ function Diagnostics({additionalTenantProps}: DiagnosticsProps) {
                 });
             }
             default: {
+                const customTab = uiFactory.additionalDiagnosticsTabs?.find(
+                    (tab) => tab.id === activeTab?.id,
+                );
+
+                if (customTab) {
+                    return customTab.render({
+                        type,
+                        subType,
+                        database,
+                        path,
+                        databaseFullPath,
+                        additionalTenantProps,
+                        scrollContainerRef: containerRef,
+                    });
+                }
+
                 return <div>{i18n('no-data')}</div>;
             }
         }

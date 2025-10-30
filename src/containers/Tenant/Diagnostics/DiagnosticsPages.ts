@@ -7,6 +7,8 @@ import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/consta
 import type {TenantDiagnosticsTab} from '../../../store/reducers/tenant/types';
 import {EPathSubType, EPathType} from '../../../types/api/schema';
 import type {ETenantType} from '../../../types/api/tenant';
+import type {AdditionalDiagnosticsTab} from '../../../uiFactory/types';
+import {uiFactory} from '../../../uiFactory/uiFactory';
 import type {TenantQuery} from '../TenantPages';
 import {TenantTabsGroups} from '../TenantPages';
 import {isDatabaseEntityType, isTopicEntityType} from '../utils/schema';
@@ -233,7 +235,34 @@ export const getPagesByType = (
     const dbContext = isDatabaseEntityType(type) || options?.isTopLevel;
     const seeded = dbContext ? getDatabasePages(options?.databaseType) : base;
 
-    return applyFilters(seeded, type, options);
+    const filtered = applyFilters(seeded, type, options);
+
+    // Add custom tabs from uiFactory if available
+    const customTabsToInsert =
+        uiFactory.additionalDiagnosticsTabs?.filter(
+            (tab: AdditionalDiagnosticsTab) => !tab.shouldShow || tab.shouldShow(type, subType),
+        ) || [];
+
+    if (customTabsToInsert.length === 0) {
+        return filtered;
+    }
+
+    const result = [...filtered];
+
+    customTabsToInsert.forEach((customTab: AdditionalDiagnosticsTab) => {
+        const tabPage = {id: customTab.id, title: customTab.title};
+
+        if (customTab.insertAfter === undefined) {
+            // Append at the end
+            result.push(tabPage);
+        } else {
+            // Insert at specific index
+            const index = Math.max(0, Math.min(customTab.insertAfter, result.length));
+            result.splice(index, 0, tabPage);
+        }
+    });
+
+    return result;
 };
 
 export const useDiagnosticsPageLinkGetter = () => {

@@ -35,3 +35,4 @@ export type {AsideNavigationProps} from './containers/AsideNavigation/AsideNavig
 export type {GetMonitoringLink, GetMonitoringClusterLink} from './utils/monitoring';
 
 export {configureUIFactory} from './uiFactory/uiFactory';
+export type {DiagnosticsTabProps, AdditionalDiagnosticsTab} from './uiFactory/types';
