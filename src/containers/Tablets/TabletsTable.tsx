@@ -138,7 +138,8 @@ function getColumns({nodeId}: {nodeId?: string | number}) {
 }
 
 function TabletActions(tablet: TTabletStateInfo) {
-    const isDisabledRestart = tablet.State === ETabletState.Stopped;
+    const isFollower = tablet.Leader === false;
+    const isDisabledRestart = tablet.State === ETabletState.Stopped || isFollower;
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const [killTablet] = tabletApi.useKillTabletMutation();
 
@@ -150,7 +151,6 @@ function TabletActions(tablet: TTabletStateInfo) {
     return (
         <ButtonWithConfirmDialog
             buttonView="outlined"
-            buttonTitle={i18n('dialog.kill-header')}
             dialogHeader={i18n('dialog.kill-header')}
             dialogText={i18n('dialog.kill-text')}
             onConfirmAction={() => {
@@ -159,9 +159,11 @@ function TabletActions(tablet: TTabletStateInfo) {
             buttonDisabled={isDisabledRestart || !isUserAllowedToMakeChanges}
             withPopover
             popoverContent={
-                isUserAllowedToMakeChanges
-                    ? i18n('dialog.kill-header')
-                    : i18n('controls.kill-not-allowed')
+                isFollower
+                    ? i18n('controls.kill-impossible-follower')
+                    : isUserAllowedToMakeChanges
+                      ? i18n('dialog.kill-header')
+                      : i18n('controls.kill-not-allowed')
             }
             popoverPlacement={['right', 'bottom']}
             popoverDisabled={false}
