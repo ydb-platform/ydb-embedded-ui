@@ -36,7 +36,7 @@ export interface UIFactory<H extends string = CommonIssueType> {
 
     renderBackups?: RenderBackups;
     renderEvents?: RenderEvents;
-    additionalDiagnosticsTabs?: AdditionalDiagnosticsTab[];
+    renderMonitoring?: RenderMonitoring;
     clusterOrDatabaseAccessError?: Partial<EmptyStateProps>;
 
     healthcheck: {
@@ -88,7 +88,7 @@ export type RenderEvents = (props: {
     scrollContainerRef: React.RefObject<HTMLDivElement>;
 }) => React.ReactNode;
 
-export type DiagnosticsTabProps = {
+export type RenderMonitoring = (props: {
     type?: EPathType;
     subType?: EPathSubType;
     database: string;
@@ -96,12 +96,4 @@ export type DiagnosticsTabProps = {
     databaseFullPath?: string;
     additionalTenantProps?: AdditionalTenantsProps;
     scrollContainerRef: React.RefObject<HTMLDivElement>;
-};
-
-export type AdditionalDiagnosticsTab = {
-    id: string;
-    title: string;
-    render: (props: DiagnosticsTabProps) => React.ReactNode;
-    shouldShow?: (type?: EPathType, subType?: EPathSubType) => boolean;
-    insertAfter?: number;
-};
+}) => React.ReactNode;

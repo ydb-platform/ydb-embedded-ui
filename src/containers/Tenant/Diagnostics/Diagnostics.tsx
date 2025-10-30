@@ -214,23 +214,18 @@ function Diagnostics({additionalTenantProps}: DiagnosticsProps) {
                     scrollContainerRef: containerRef,
                 });
             }
+            case TENANT_DIAGNOSTICS_TABS_IDS.monitoring: {
+                return uiFactory.renderMonitoring?.({
+                    type,
+                    subType,
+                    database,
+                    path,
+                    databaseFullPath,
+                    additionalTenantProps,
+                    scrollContainerRef: containerRef,
+                });
+            }
             default: {
-                const customTab = uiFactory.additionalDiagnosticsTabs?.find(
-                    (tab) => tab.id === activeTab?.id,
-                );
-
-                if (customTab) {
-                    return customTab.render({
-                        type,
-                        subType,
-                        database,
-                        path,
-                        databaseFullPath,
-                        additionalTenantProps,
-                        scrollContainerRef: containerRef,
-                    });
-                }
-
                 return <div>{i18n('no-data')}</div>;
             }
         }
