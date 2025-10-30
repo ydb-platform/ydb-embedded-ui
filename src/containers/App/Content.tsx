@@ -295,7 +295,7 @@ function ContentWrapper(props: ContentWrapperProps) {
 
     return (
         <Switch>
-            {!authUnavailable && (
+            {!authUnavailable && !metaAuthUnavailable && (
                 <Route path={routes.auth}>
                     <Authentication closable />
                 </Route>
