@@ -6,23 +6,25 @@ import {
     useMetaWhoAmIAvailable,
 } from '../../store/reducers/capabilities/hooks';
 
-function useMetaAuthState() {
+function useMetaAuthState(path?: string) {
     const location = useLocation();
-    const isClustersPage = checkIsClustersPage(location.pathname);
+    const isClustersPage = path
+        ? checkIsClustersPage(path)
+        : checkIsClustersPage(location.pathname);
     const metaLoginAvailable = useMetaLoginAvailable();
     const metaWhoAmIAvailable = useMetaWhoAmIAvailable();
 
     return {isClustersPage, metaAuthAvailable: metaLoginAvailable && metaWhoAmIAvailable};
 }
 
-export function useMetaAuth() {
-    const {isClustersPage, metaAuthAvailable} = useMetaAuthState();
+export function useMetaAuth(path?: string) {
+    const {isClustersPage, metaAuthAvailable} = useMetaAuthState(path);
 
     return isClustersPage && metaAuthAvailable;
 }
 
-export function useMetaAuthUnavailable() {
-    const {isClustersPage, metaAuthAvailable} = useMetaAuthState();
+export function useMetaAuthUnavailable(path?: string) {
+    const {isClustersPage, metaAuthAvailable} = useMetaAuthState(path);
 
     return isClustersPage && !metaAuthAvailable;
 }
