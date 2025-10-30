@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.12.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.12.1...v12.12.2) (2025-10-30)
+
+
+### Bug Fixes
+
+* use meta if returnUrl is clusters page ([#3029](https://github.com/ydb-platform/ydb-embedded-ui/issues/3029)) ([8aece77](https://github.com/ydb-platform/ydb-embedded-ui/commit/8aece77ebcbd839de18ad834752a66d0689060a3))
+
 ## [12.12.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.12.0...v12.12.1) (2025-10-29)
 
 
