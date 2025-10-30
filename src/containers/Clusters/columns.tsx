@@ -358,19 +358,26 @@ interface VersionsProps {
 }
 
 function Versions({row}: VersionsProps) {
-    const {preparedVersions, name: clusterName, preparedBackend: backend, settings} = row;
+    const {
+        preparedVersions,
+        name: clusterName,
+        preparedBackend: backend,
+        settings,
+        use_embedded_ui: useEmbeddedUi,
+    } = row;
     if (!preparedVersions.length) {
         return null;
     }
+    const clusterPath =
+        useEmbeddedUi && backend
+            ? createDeveloperUIMonitoringPageHref(backend)
+            : getClusterPath(
+                  {activeTab: clusterTabsIds.versions, environment: settings?.auth_service},
+                  {backend, clusterName},
+                  {withBasename: true},
+              );
     return (
-        <ExternalLink
-            className={b('cluster-versions')}
-            href={getClusterPath(
-                {activeTab: clusterTabsIds.versions, environment: settings?.auth_service},
-                {backend, clusterName},
-                {withBasename: true},
-            )}
-        >
+        <ExternalLink className={b('cluster-versions')} href={clusterPath}>
             <VersionsBar preparedVersions={preparedVersions} />
         </ExternalLink>
     );

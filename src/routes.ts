@@ -1,4 +1,4 @@
-import {useCallback} from 'react';
+import * as React from 'react';
 
 import type {Location} from 'history';
 import isEmpty from 'lodash/isEmpty';
@@ -64,7 +64,6 @@ type Query = AnyRecord;
 
 export interface CreateHrefOptions {
     withBasename?: boolean;
-    withEnv?: boolean;
 }
 
 export function createHref(
@@ -171,7 +170,7 @@ type TabletPageQuery = QueryParamsTypeFromQueryObject<typeof tabletPageQueryPara
 export function useVDiskPagePath() {
     const database = useDatabaseFromQuery();
 
-    return useCallback(
+    return React.useCallback(
         (
             params: {
                 nodeId: string | number | undefined;
@@ -191,7 +190,7 @@ export function useVDiskPagePath() {
 export function useStorageGroupPath() {
     const database = useDatabaseFromQuery();
 
-    return useCallback(
+    return React.useCallback(
         (groupId: string | number, query: Query = {}) => {
             return createHref(routes.storageGroup, undefined, {...query, groupId, database});
         },
@@ -202,7 +201,7 @@ export function useStorageGroupPath() {
 export function useTabletPagePath() {
     const database = useDatabaseFromQuery();
 
-    return useCallback(
+    return React.useCallback(
         (tabletId: string | number, query: TabletPageQuery = {}) => {
             return createHref(routes.tablet, {id: tabletId}, {...query, database});
         },
