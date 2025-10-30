@@ -2,7 +2,6 @@ import React from 'react';
 
 import {Flex} from '@gravity-ui/uikit';
 
-import {getPDiskPagePath} from '../../routes';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
 import {valueIsDefined} from '../../utils';
@@ -17,6 +16,7 @@ import {InfoViewer} from '../InfoViewer';
 import type {InfoViewerItem} from '../InfoViewer';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {pDiskInfoKeyset} from '../PDiskInfo/i18n';
+import {PDiskPageLink} from '../PDiskPageLink/PDiskPageLink';
 
 const errorColors = [EFlag.Orange, EFlag.Red, EFlag.Yellow];
 
@@ -83,16 +83,11 @@ export const preparePDiskData = (
             pDiskId: PDiskId,
         });
 
-        const pDiskPagePath = getPDiskPagePath(PDiskId, NodeId);
         pdiskData.push({
             label: 'Links',
             value: (
                 <Flex gap={2} wrap="wrap">
-                    <LinkWithIcon
-                        title={pDiskInfoKeyset('pdisk-page')}
-                        url={pDiskPagePath}
-                        external={false}
-                    />
+                    <PDiskPageLink pDiskId={PDiskId} nodeId={NodeId} />
                     <LinkWithIcon
                         title={pDiskInfoKeyset('developer-ui')}
                         url={pDiskInternalViewerPath}

@@ -1,13 +1,12 @@
 import React from 'react';
 
 import {Pulse, Terminal} from '@gravity-ui/icons';
-import {useHistory, useLocation} from 'react-router-dom';
+import {useHistory, useLocation, useRouteMatch} from 'react-router-dom';
 
-import routes, {parseQuery} from '../../../routes';
+import routes, {getTenantPath, parseQuery} from '../../../routes';
 import {TENANT_PAGE, TENANT_PAGES_IDS} from '../../../store/reducers/tenant/constants';
 import {TENANT_INITIAL_PAGE_KEY} from '../../../utils/constants';
 import {useSetting, useTypedSelector} from '../../../utils/hooks';
-import {getTenantPath} from '../TenantPages';
 import i18n from '../i18n';
 
 type TenantPages = keyof typeof TENANT_PAGES_IDS;
@@ -24,12 +23,13 @@ export function useTenantNavigation() {
 
     const location = useLocation();
     const queryParams = parseQuery(location);
+    const match = useRouteMatch(routes.tenant);
 
     const [, setInitialTenantPage] = useSetting<string>(TENANT_INITIAL_PAGE_KEY);
     const {tenantPage} = useTypedSelector((state) => state.tenant);
 
     const menuItems = React.useMemo(() => {
-        if (location.pathname !== routes.tenant) {
+        if (!match) {
             return [];
         }
 
@@ -53,7 +53,7 @@ export function useTenantNavigation() {
         });
 
         return items;
-    }, [tenantPage, setInitialTenantPage, location.pathname, history, queryParams]);
+    }, [tenantPage, setInitialTenantPage, match, history, queryParams]);
 
     return menuItems;
 }

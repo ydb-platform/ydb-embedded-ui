@@ -77,7 +77,6 @@ export function Tablets({
         <TabletsTable
             scrollContainerRef={scrollContainerRef}
             tablets={tablets}
-            database={database}
             loading={isLoading}
             error={error}
             nodeId={nodeId}

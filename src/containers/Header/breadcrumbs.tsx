@@ -7,7 +7,13 @@ import {
 import {isNil} from 'lodash';
 
 import {TabletIcon} from '../../components/TabletIcon/TabletIcon';
-import routes, {getPDiskPagePath, getStorageGroupPath} from '../../routes';
+import routes, {
+    getClusterPath,
+    getDefaultNodePath,
+    getPDiskPagePath,
+    getStorageGroupPath,
+    getTenantPath,
+} from '../../routes';
 import type {
     BreadcrumbsOptions,
     ClusterBreadcrumbsOptions,
@@ -26,9 +32,7 @@ import {
     TENANT_PAGES_IDS,
 } from '../../store/reducers/tenant/constants';
 import {CLUSTER_DEFAULT_TITLE, getTabletLabel} from '../../utils/constants';
-import {getClusterPath} from '../Cluster/utils';
-import {getDefaultNodePath} from '../Node/NodePages';
-import {TenantTabsGroups, getTenantPath} from '../Tenant/TenantPages';
+import {TenantTabsGroups} from '../Tenant/TenantPages';
 
 import {headerKeyset} from './i18n';
 
@@ -63,7 +67,7 @@ const getClustersBreadcrumbs: GetBreadcrumbs<ClustersBreadcrumbsOptions> = (opti
 };
 
 const getClusterBreadcrumbs: GetBreadcrumbs<ClusterBreadcrumbsOptions> = (options, query = {}) => {
-    const {clusterName, clusterTab, singleClusterMode, isViewerUser} = options;
+    const {clusterName, clusterTab, singleClusterMode, isViewerUser, environment} = options;
 
     if (!isViewerUser) {
         return [];
@@ -77,7 +81,7 @@ const getClusterBreadcrumbs: GetBreadcrumbs<ClusterBreadcrumbsOptions> = (option
 
     breadcrumbs.push({
         text: clusterName || CLUSTER_DEFAULT_TITLE,
-        link: getClusterPath(clusterTab, query),
+        link: getClusterPath({activeTab: clusterTab, environment}, query),
         icon: <ClusterIcon />,
     });
 
@@ -114,7 +118,9 @@ const getNodeBreadcrumbs: GetBreadcrumbs<NodeBreadcrumbsOptions> = (options, que
 
     const lastItem = {
         text,
-        link: nodeId ? getDefaultNodePath(nodeId, {database, ...query}, nodeActiveTab) : undefined,
+        link: nodeId
+            ? getDefaultNodePath({id: nodeId, activeTab: nodeActiveTab}, {database, ...query})
+            : undefined,
         icon: getNodeIcon(nodeRole),
     };
 

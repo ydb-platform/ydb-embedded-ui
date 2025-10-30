@@ -10,7 +10,7 @@ import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {useSlots} from '../../components/slots';
 import type {SlotMap} from '../../components/slots/SlotMap';
 import type {SlotComponent} from '../../components/slots/types';
-import routes from '../../routes';
+import routes, {getClusterPath} from '../../routes';
 import type {RootState} from '../../store';
 import {authenticationApi} from '../../store/reducers/authentication/authentication';
 import {
@@ -27,7 +27,6 @@ import {useMetaAuth, useMetaAuthUnavailable} from '../../utils/hooks/useMetaAuth
 import {lazyComponent} from '../../utils/lazyComponent';
 import {isAccessError, isRedirectToAuth} from '../../utils/response';
 import Authentication from '../Authentication/Authentication';
-import {getClusterPath} from '../Cluster/utils';
 import Header from '../Header/Header';
 
 import {useAppTitle} from './AppTitleContext';

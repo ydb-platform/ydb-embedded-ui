@@ -3,7 +3,7 @@ import {useMemo} from 'react';
 import {Flex} from '@gravity-ui/uikit';
 import {useLocation} from 'react-router-dom';
 
-import {parseQuery} from '../../../../../routes';
+import {getTenantPath, parseQuery} from '../../../../../routes';
 import {TENANT_METRICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {TenantMetricsTab} from '../../../../../store/reducers/tenant/types';
 import type {
@@ -17,7 +17,7 @@ import {SHOW_NETWORK_UTILIZATION} from '../../../../../utils/constants';
 import {useSetting} from '../../../../../utils/hooks';
 import {calculateMetricAggregates} from '../../../../../utils/metrics';
 // no direct legend formatters needed here – handled in subcomponents
-import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
+import {TenantTabsGroups} from '../../../TenantPages';
 
 import {CpuTab} from './components/CpuTab';
 import {MemoryTab} from './components/MemoryTab';

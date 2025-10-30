@@ -1,6 +1,6 @@
 import {DefinitionList, Flex} from '@gravity-ui/uikit';
 
-import {getTenantPath} from '../../containers/Tenant/TenantPages';
+import {getTenantPath} from '../../routes';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import type {AdditionalTenantsProps} from '../../types/additionalProps';
 import {uiFactory} from '../../uiFactory/uiFactory';

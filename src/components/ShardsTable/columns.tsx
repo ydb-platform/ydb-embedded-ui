@@ -38,7 +38,7 @@ export const getDataSizeColumn: GetShardsColumn = () => {
         align: DataTable.RIGHT,
     };
 };
-export const getTabletIdColumn: GetShardsColumn = ({database}) => {
+export const getTabletIdColumn: GetShardsColumn = () => {
     return {
         name: TOP_SHARDS_COLUMNS_IDS.TabletId,
         header: TOP_SHARDS_COLUMNS_TITLES.TabletId,
@@ -50,7 +50,6 @@ export const getTabletIdColumn: GetShardsColumn = ({database}) => {
                 <TabletNameWrapper
                     tabletId={row.TabletId}
                     followerId={row.FollowerId || undefined}
-                    database={database}
                 />
             );
         },

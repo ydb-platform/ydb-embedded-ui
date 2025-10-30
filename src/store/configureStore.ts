@@ -13,7 +13,10 @@ import {syncUserSettingsFromLS} from './reducers/settings/settings';
 import {UPDATE_REF} from './reducers/tooltip';
 import getLocationMiddleware from './state-url-mapping';
 
-export let backend: string | undefined, basename: string, clusterName: string | undefined;
+export let backend: string | undefined,
+    basename: string,
+    clusterName: string | undefined,
+    environment: string | undefined;
 
 function _configureStore<
     S = any,
@@ -57,6 +60,7 @@ const isSingleClusterMode = `${metaBackend}` === 'undefined';
 export function configureStore({
     aRootReducer = rootReducer,
     singleClusterMode = isSingleClusterMode,
+    environments = [] as string[],
     api = new YdbEmbeddedAPI({
         webVersion,
         singleClusterMode: isSingleClusterMode,
@@ -67,8 +71,12 @@ export function configureStore({
         defaults: undefined,
     }),
 } = {}) {
-    const params = getUrlData({singleClusterMode, customBackend});
-    ({basename, clusterName} = params);
+    const params = getUrlData({
+        singleClusterMode,
+        customBackend,
+        allowedEnvironments: environments,
+    });
+    ({basename, clusterName, environment} = params);
     backend = params.backend;
     const history = createBrowserHistory({basename});
 

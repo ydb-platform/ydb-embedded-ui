@@ -1,5 +1,6 @@
 export {
     backend,
+    environment,
     basename,
     clusterName,
     configureStore,

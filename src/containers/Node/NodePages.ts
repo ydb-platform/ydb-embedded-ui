@@ -2,7 +2,6 @@ import {StringParam} from 'use-query-params';
 import {z} from 'zod';
 
 import type {QueryParamsTypeFromQueryObject} from '../../routes';
-import routes, {createHref} from '../../routes';
 import type {ValueOf} from '../../types/common';
 
 import i18n from './i18n';
@@ -58,19 +57,4 @@ export const nodePageQueryParams = {
     vdiskId: StringParam,
 };
 
-type NodePageQuery = QueryParamsTypeFromQueryObject<typeof nodePageQueryParams>;
-
-export function getDefaultNodePath(
-    nodeId: string | number,
-    query: NodePageQuery = {},
-    activeTab?: NodeTab,
-) {
-    return createHref(
-        routes.node,
-        {
-            id: nodeId,
-            activeTab,
-        },
-        query,
-    );
-}
+export type NodePageQuery = QueryParamsTypeFromQueryObject<typeof nodePageQueryParams>;

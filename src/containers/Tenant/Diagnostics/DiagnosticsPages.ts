@@ -2,12 +2,13 @@ import React from 'react';
 
 import {StringParam, useQueryParams} from 'use-query-params';
 
+import {getTenantPath} from '../../../routes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import type {TenantDiagnosticsTab} from '../../../store/reducers/tenant/types';
 import {EPathSubType, EPathType} from '../../../types/api/schema';
 import type {ETenantType} from '../../../types/api/tenant';
 import type {TenantQuery} from '../TenantPages';
-import {TenantTabsGroups, getTenantPath} from '../TenantPages';
+import {TenantTabsGroups} from '../TenantPages';
 import {isDatabaseEntityType, isTopicEntityType} from '../utils/schema';
 
 type Page = {

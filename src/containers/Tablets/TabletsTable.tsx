@@ -25,7 +25,7 @@ import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedT
 
 import i18n from './i18n';
 
-function getColumns({database, nodeId}: {database?: string; nodeId?: string | number}) {
+function getColumns({nodeId}: {nodeId?: string | number}) {
     const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
         {
             name: 'Type',
@@ -56,7 +56,6 @@ function getColumns({database, nodeId}: {database?: string; nodeId?: string | nu
                 return (
                     <TabletNameWrapper
                         tabletId={row.TabletId}
-                        database={database}
                         followerId={row.FollowerId || undefined}
                     />
                 );
@@ -173,7 +172,6 @@ function TabletActions(tablet: TTabletStateInfo) {
 }
 
 interface TabletsTableProps {
-    database?: string;
     tablets: (TTabletStateInfo & {
         fqdn?: string;
     })[];
@@ -185,7 +183,6 @@ interface TabletsTableProps {
 }
 
 export function TabletsTable({
-    database,
     tablets,
     loading,
     error,
@@ -199,7 +196,7 @@ export function TabletsTable({
     // Track sort state for scroll dependencies
     const [sortParams, setSortParams] = React.useState<SortOrder | SortOrder[] | undefined>();
 
-    const columns = React.useMemo(() => getColumns({database, nodeId}), [database, nodeId]);
+    const columns = React.useMemo(() => getColumns({nodeId}), [nodeId]);
 
     const filteredTablets = React.useMemo(() => {
         return tablets.filter((tablet) => {

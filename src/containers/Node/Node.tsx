@@ -12,7 +12,7 @@ import {FullNodeViewer} from '../../components/FullNodeViewer/FullNodeViewer';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {InternalLink} from '../../components/InternalLink';
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
-import routes from '../../routes';
+import routes, {getDefaultNodePath} from '../../routes';
 import {
     useCapabilitiesLoaded,
     useConfigAvailable,
@@ -30,7 +30,7 @@ import {PaginatedStorage} from '../Storage/PaginatedStorage';
 import {Tablets} from '../Tablets/Tablets';
 
 import type {NodeTab} from './NodePages';
-import {NODE_TABS, getDefaultNodePath, nodePageQueryParams, nodePageTabSchema} from './NodePages';
+import {NODE_TABS, nodePageQueryParams, nodePageTabSchema} from './NodePages';
 import NodeStructure from './NodeStructure/NodeStructure';
 import {Threads} from './Threads/Threads';
 import i18n from './i18n';
@@ -221,7 +221,10 @@ function NodePageContent({
                 <TabProvider value={activeTabId}>
                     <TabList className={b('tab-list')} size="l">
                         {tabs.map(({id, title}) => {
-                            const path = getDefaultNodePath(nodeId, {database}, id as NodeTab);
+                            const path = getDefaultNodePath(
+                                {id: nodeId, activeTab: id as NodeTab},
+                                {database},
+                            );
                             return (
                                 <Tab value={id} key={id}>
                                     <InternalLink to={path} as="tab">

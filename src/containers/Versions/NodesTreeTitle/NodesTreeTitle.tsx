@@ -5,10 +5,10 @@ import {Button, ClipboardButton, Flex, Icon, Text} from '@gravity-ui/uikit';
 import {useHistory} from 'react-router-dom';
 
 import {VersionsBar} from '../../../components/VersionsBar/VersionsBar';
+import {getTenantPath} from '../../../routes';
 import {cn} from '../../../utils/cn';
 import type {PreparedNodeSystemState} from '../../../utils/nodes';
 import type {PreparedVersion} from '../../../utils/versions/types';
-import {getTenantPath} from '../../Tenant/TenantPages';
 import i18n from '../i18n';
 import type {GroupedNodesItem} from '../types';
 

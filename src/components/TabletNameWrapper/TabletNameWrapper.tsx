@@ -1,14 +1,14 @@
-import {getTabletPagePath} from '../../routes';
+import {useTabletPagePath} from '../../routes';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
 
 interface TabletNameWrapperProps {
     tabletId: string | number;
     followerId?: string | number;
-    database?: string;
 }
 
-export function TabletNameWrapper({tabletId, followerId, database}: TabletNameWrapperProps) {
-    const tabletPath = getTabletPagePath(tabletId, {database, followerId: followerId?.toString()});
+export function TabletNameWrapper({tabletId, followerId}: TabletNameWrapperProps) {
+    const getTabletPagePath = useTabletPagePath();
+    const tabletPath = getTabletPagePath(tabletId, {followerId: followerId?.toString()});
     const tabletName = `${tabletId}${followerId ? `.${followerId}` : ''}`;
 
     return (

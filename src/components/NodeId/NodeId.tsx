@@ -1,4 +1,4 @@
-import {getDefaultNodePath} from '../../containers/Node/NodePages';
+import {getDefaultNodePath} from '../../routes';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {InternalLink} from '../InternalLink';
 
@@ -8,5 +8,5 @@ interface NodeIdProps {
 
 export function NodeId({id}: NodeIdProps) {
     const database = useDatabaseFromQuery();
-    return <InternalLink to={getDefaultNodePath(id, {database})}>{id}</InternalLink>;
+    return <InternalLink to={getDefaultNodePath({id}, {database})}>{id}</InternalLink>;
 }
