@@ -25,6 +25,10 @@ import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedT
 
 import i18n from './i18n';
 
+function isFollowerTablet(state: TTabletStateInfo) {
+    return state.Leader === false;
+}
+
 function getColumns({nodeId}: {nodeId?: string | number}) {
     const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
         {
@@ -34,7 +38,7 @@ function getColumns({nodeId}: {nodeId?: string | number}) {
                 return i18n('Type');
             },
             render: ({row}) => {
-                const isFollower = row.Leader === false;
+                const isFollower = isFollowerTablet(row);
                 return (
                     <span>
                         {row.Type} {isFollower ? <Text color="secondary">follower</Text> : ''}
@@ -138,7 +142,8 @@ function getColumns({nodeId}: {nodeId?: string | number}) {
 }
 
 function TabletActions(tablet: TTabletStateInfo) {
-    const isDisabledRestart = tablet.State === ETabletState.Stopped;
+    const isFollower = isFollowerTablet(tablet);
+    const isDisabledRestart = tablet.State === ETabletState.Stopped || isFollower;
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const [killTablet] = tabletApi.useKillTabletMutation();
 
@@ -147,10 +152,19 @@ function TabletActions(tablet: TTabletStateInfo) {
         return null;
     }
 
+    let popoverContent: React.ReactNode;
+
+    if (isFollower) {
+        popoverContent = i18n('controls.kill-impossible-follower');
+    } else if (!isUserAllowedToMakeChanges) {
+        popoverContent = i18n('controls.kill-not-allowed');
+    } else {
+        popoverContent = i18n('dialog.kill-header');
+    }
+
     return (
         <ButtonWithConfirmDialog
             buttonView="outlined"
-            buttonTitle={i18n('dialog.kill-header')}
             dialogHeader={i18n('dialog.kill-header')}
             dialogText={i18n('dialog.kill-text')}
             onConfirmAction={() => {
@@ -158,11 +172,7 @@ function TabletActions(tablet: TTabletStateInfo) {
             }}
             buttonDisabled={isDisabledRestart || !isUserAllowedToMakeChanges}
             withPopover
-            popoverContent={
-                isUserAllowedToMakeChanges
-                    ? i18n('dialog.kill-header')
-                    : i18n('controls.kill-not-allowed')
-            }
+            popoverContent={popoverContent}
             popoverPlacement={['right', 'bottom']}
             popoverDisabled={false}
         >
