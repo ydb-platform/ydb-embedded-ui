@@ -41,6 +41,7 @@ import {
 import {useChangedQuerySettings} from '../../../../utils/hooks/useChangedQuerySettings';
 import {useLastQueryExecutionSettings} from '../../../../utils/hooks/useLastQueryExecutionSettings';
 import {DEFAULT_QUERY_SETTINGS, QUERY_ACTIONS, QUERY_MODES} from '../../../../utils/query';
+import {reachMetricaGoal} from '../../../../utils/yaMetrica';
 import {useCurrentSchema} from '../../TenantContext';
 import type {InitialPaneState} from '../../utils/paneVisibilityToggleHelpers';
 import {
@@ -148,6 +149,11 @@ export default function QueryEditor(props: QueryEditorProps) {
         queryManagerInstance.abortQuery();
 
         if (isStreamingEnabled) {
+            reachMetricaGoal('runQuery', {
+                actionType: 'execute',
+                isStreaming: true,
+                ...querySettings,
+            });
             const query = streamQuery({
                 actionType: 'execute',
                 query: text,
@@ -158,6 +164,7 @@ export default function QueryEditor(props: QueryEditorProps) {
 
             queryManagerInstance.registerQuery(query);
         } else {
+            reachMetricaGoal('runQuery', {actionType: 'execute', ...querySettings});
             const query = sendQuery({
                 actionType: 'execute',
                 query: text,
@@ -195,6 +202,8 @@ export default function QueryEditor(props: QueryEditorProps) {
         }
 
         const queryId = uuidv4();
+
+        reachMetricaGoal('runQuery', {actionType: 'explain', ...querySettings});
 
         const query = sendQuery({
             actionType: 'explain',

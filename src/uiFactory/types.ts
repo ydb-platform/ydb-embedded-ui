@@ -16,7 +16,7 @@ import type {ETenantType} from '../types/api/tenant';
 import type {GetLogsLink} from '../utils/logs';
 import type {GetMonitoringClusterLink, GetMonitoringLink} from '../utils/monitoring';
 
-export interface UIFactory<H extends string = CommonIssueType> {
+export interface UIFactory<H extends string = CommonIssueType, T extends string = string> {
     onCreateDB?: HandleCreateDB;
     onEditDB?: HandleEditDB;
     onDeleteDB?: HandleDeleteDB;
@@ -46,11 +46,16 @@ export interface UIFactory<H extends string = CommonIssueType> {
     };
     hasAccess?: boolean;
     hideGrantAccess?: boolean;
-    yaMetricaMap?: Record<string, number>;
 
     useDatabaseId?: boolean;
 
     useMetaProxy?: boolean;
+
+    yaMetricaConfig?: {
+        yaMetricaMap: Record<T, number | undefined>;
+        goals: UiMetricaGoals;
+        getMetricaName: (goalKey: UiMetricaGoal) => T;
+    };
 }
 
 export type HandleCreateDB = (params: {clusterName: string}) => Promise<boolean>;
@@ -97,3 +102,9 @@ export type RenderMonitoring = (props: {
     additionalTenantProps?: AdditionalTenantsProps;
     scrollContainerRef: React.RefObject<HTMLDivElement>;
 }) => React.ReactNode;
+export interface UiMetricaGoals {
+    runQuery?: string;
+    stopQuery?: string;
+}
+
+export type UiMetricaGoal = keyof UiMetricaGoals;

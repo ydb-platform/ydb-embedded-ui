@@ -6,6 +6,7 @@ import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import createToast from '../../../../utils/createToast';
 import {useTypedSelector} from '../../../../utils/hooks';
+import {reachMetricaGoal} from '../../../../utils/yaMetrica';
 import {NewSQL} from '../NewSQL/NewSQL';
 import {queryManagerInstance} from '../QueryEditor/helpers';
 import {SaveQuery} from '../SaveQuery/SaveQuery';
@@ -90,6 +91,7 @@ export const QueryEditorControls = ({
     const [cancelQueryError, setCancelQueryError] = React.useState<boolean>(false);
 
     const onStopButtonClick = React.useCallback(async () => {
+        reachMetricaGoal('stopQuery');
         try {
             if (isStreamingEnabled) {
                 queryManagerInstance.abortQuery();
