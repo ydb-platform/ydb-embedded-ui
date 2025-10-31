@@ -1,4 +1,4 @@
-import {useMemo} from 'react';
+import React from 'react';
 
 import {Flex} from '@gravity-ui/uikit';
 import {useLocation} from 'react-router-dom';
@@ -75,22 +75,28 @@ export function MetricsTabs({
     };
 
     // Use only pools that directly indicate resources available to perform user queries
-    const cpuPools = useMemo(
+    const cpuPools = React.useMemo(
         () =>
             (poolsCpuStats || []).filter((pool) => !(pool.name === 'Batch' || pool.name === 'IO')),
         [poolsCpuStats],
     );
-    const cpuMetrics = useMemo(() => calculateMetricAggregates(cpuPools), [cpuPools]);
+    const cpuMetrics = React.useMemo(() => calculateMetricAggregates(cpuPools), [cpuPools]);
 
     // Calculate storage metrics using utility
-    const storageStats = useMemo(
+    const storageStats = React.useMemo(
         () => tabletStorageStats || blobStorageStats || [],
         [tabletStorageStats, blobStorageStats],
     );
-    const storageMetrics = useMemo(() => calculateMetricAggregates(storageStats), [storageStats]);
+    const storageMetrics = React.useMemo(
+        () => calculateMetricAggregates(storageStats),
+        [storageStats],
+    );
 
     // Calculate memory metrics using utility
-    const memoryMetrics = useMemo(() => calculateMetricAggregates(memoryStats), [memoryStats]);
+    const memoryMetrics = React.useMemo(
+        () => calculateMetricAggregates(memoryStats),
+        [memoryStats],
+    );
 
     // Pass raw network values; DedicatedMetricsTabs computes percent and legend
     const [showNetworkUtilization] = useSetting<boolean>(SHOW_NETWORK_UTILIZATION);

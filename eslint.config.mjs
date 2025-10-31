@@ -47,6 +47,18 @@ export default [
             curly: ['error', 'all'],
             'react-hooks/exhaustive-deps': 'warn',
             'react-hooks/rules-of-hooks': 'error',
+            'no-restricted-syntax': [
+                'error',
+                {
+                    selector:
+                        "ImportDeclaration[source.value='react'] :matches(ImportNamespaceSpecifier, ImportDefaultSpecifier:not([local.name='React']), ImportSpecifier)",
+                    message: "Please use import React from 'react' instead.",
+                },
+                {
+                    selector: 'JSXFragment>JSXOpeningFragment:not(:has(JSXIdentifier))',
+                    message: 'Please use React.Fragment instead.',
+                },
+            ],
         },
     },
     // TypeScript-specific rules that require type information
