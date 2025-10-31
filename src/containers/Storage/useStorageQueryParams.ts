@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import React from 'react';
 
 import {StringParam, useQueryParams} from 'use-query-params';
 
@@ -36,7 +36,7 @@ export function useStorageQueryParams() {
         queryParams.storageNodesGroupBy,
     );
 
-    useEffect(() => {
+    React.useEffect(() => {
         if (queryParams.search) {
             const patch: Record<string, string | undefined> = {search: undefined};
             patch[STORAGE_SEARCH_PARAM_BY_TYPE[storageType]] = queryParams.search;
