@@ -96,7 +96,7 @@ export function GroupedStorageGroupsComponent({
     viewContext,
 }: PaginatedStorageProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const {searchValue, storageGroupsGroupByParam, visibleEntities, handleShowAllGroups} =
+    const {groupsSearchValue, storageGroupsGroupByParam, visibleEntities, handleShowAllGroups} =
         useStorageQueryParams();
 
     const {columnsToShow, columnsToSelect, setColumns} = useStorageGroupsSelectedColumns({
@@ -111,7 +111,7 @@ export function GroupedStorageGroupsComponent({
             nodeId,
             groupId,
             pDiskId,
-            filter: searchValue,
+            filter: groupsSearchValue,
             shouldUseGroupsHandler: true,
             group: storageGroupsGroupByParam,
         },
@@ -152,7 +152,7 @@ export function GroupedStorageGroupsComponent({
                         groupId={groupId}
                         pDiskId={pDiskId}
                         filterGroupBy={storageGroupsGroupByParam}
-                        searchValue={searchValue}
+                        searchValue={groupsSearchValue}
                         visibleEntities={'all'}
                         scrollContainerRef={scrollContainerRef}
                         onIsExpandedChange={setIsGroupExpanded}
@@ -190,7 +190,7 @@ export function GroupedStorageGroupsComponent({
             initialState={initialState}
             tableWrapperProps={{
                 scrollContainerRef,
-                scrollDependencies: [searchValue, storageGroupsGroupByParam, tableGroups],
+                scrollDependencies: [groupsSearchValue, storageGroupsGroupByParam, tableGroups],
                 loading: isLoading,
                 className: b('groups-wrapper'),
             }}

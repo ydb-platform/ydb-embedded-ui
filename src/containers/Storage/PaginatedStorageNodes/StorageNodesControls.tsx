@@ -31,12 +31,12 @@ export function StorageNodesControls({
     entitiesLoading,
 }: StorageControlsProps) {
     const {
-        searchValue,
+        nodesSearchValue,
         storageType,
         visibleEntities,
         nodesUptimeFilter,
         storageNodesGroupByParam,
-        handleTextFilterChange,
+        handleTextFilterNodesChange,
         handleStorageTypeChange,
         handleVisibleEntitiesChange,
         handleUptimeFilterChange,
@@ -50,8 +50,8 @@ export function StorageNodesControls({
     return (
         <React.Fragment>
             <Search
-                value={searchValue}
-                onChange={handleTextFilterChange}
+                value={nodesSearchValue}
+                onChange={handleTextFilterNodesChange}
                 placeholder={i18n('controls_nodes-search-placeholder')}
                 className={b('search')}
             />

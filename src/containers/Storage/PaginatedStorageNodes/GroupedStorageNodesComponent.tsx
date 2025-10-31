@@ -98,7 +98,8 @@ export function GroupedStorageNodesComponent({
 }: PaginatedStorageProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    const {searchValue, storageNodesGroupByParam, handleShowAllNodes} = useStorageQueryParams();
+    const {nodesSearchValue, storageNodesGroupByParam, handleShowAllNodes} =
+        useStorageQueryParams();
 
     const {handleDataFetched, columnsSettings} = useStorageColumnsSettings();
     const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
@@ -111,7 +112,7 @@ export function GroupedStorageNodesComponent({
         {
             database,
             with: 'all',
-            filter: searchValue,
+            filter: nodesSearchValue,
             node_id: nodeId,
             group_id: groupId,
             group: storageNodesGroupByParam,
@@ -151,7 +152,7 @@ export function GroupedStorageNodesComponent({
                         database={database}
                         nodeId={nodeId}
                         groupId={groupId}
-                        searchValue={searchValue}
+                        searchValue={nodesSearchValue}
                         visibleEntities="all"
                         filterGroupBy={storageNodesGroupByParam}
                         scrollContainerRef={scrollContainerRef}
@@ -191,7 +192,7 @@ export function GroupedStorageNodesComponent({
             initialState={initialState}
             tableWrapperProps={{
                 scrollContainerRef,
-                scrollDependencies: [searchValue, storageNodesGroupByParam, tableGroups],
+                scrollDependencies: [nodesSearchValue, storageNodesGroupByParam, tableGroups],
                 loading: isLoading,
                 className: b('groups-wrapper'),
             }}
