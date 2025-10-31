@@ -25,6 +25,10 @@ import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedT
 
 import i18n from './i18n';
 
+function isFollowerTablet(state: TTabletStateInfo) {
+    return state.Leader === false;
+}
+
 function getColumns({nodeId}: {nodeId?: string | number}) {
     const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
         {
@@ -34,7 +38,7 @@ function getColumns({nodeId}: {nodeId?: string | number}) {
                 return i18n('Type');
             },
             render: ({row}) => {
-                const isFollower = row.Leader === false;
+                const isFollower = isFollowerTablet(row);
                 return (
                     <span>
                         {row.Type} {isFollower ? <Text color="secondary">follower</Text> : ''}
@@ -138,7 +142,7 @@ function getColumns({nodeId}: {nodeId?: string | number}) {
 }
 
 function TabletActions(tablet: TTabletStateInfo) {
-    const isFollower = tablet.Leader === false;
+    const isFollower = isFollowerTablet(tablet);
     const isDisabledRestart = tablet.State === ETabletState.Stopped || isFollower;
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const [killTablet] = tabletApi.useKillTabletMutation();
@@ -146,6 +150,16 @@ function TabletActions(tablet: TTabletStateInfo) {
     const id = tablet.TabletId;
     if (!id) {
         return null;
+    }
+
+    let popoverContent: React.ReactNode;
+
+    if (isFollower) {
+        popoverContent = i18n('controls.kill-impossible-follower');
+    } else if (!isUserAllowedToMakeChanges) {
+        popoverContent = i18n('controls.kill-not-allowed');
+    } else {
+        popoverContent = i18n('dialog.kill-header');
     }
 
     return (
@@ -158,13 +172,7 @@ function TabletActions(tablet: TTabletStateInfo) {
             }}
             buttonDisabled={isDisabledRestart || !isUserAllowedToMakeChanges}
             withPopover
-            popoverContent={
-                isFollower
-                    ? i18n('controls.kill-impossible-follower')
-                    : isUserAllowedToMakeChanges
-                      ? i18n('dialog.kill-header')
-                      : i18n('controls.kill-not-allowed')
-            }
+            popoverContent={popoverContent}
             popoverPlacement={['right', 'bottom']}
             popoverDisabled={false}
         >

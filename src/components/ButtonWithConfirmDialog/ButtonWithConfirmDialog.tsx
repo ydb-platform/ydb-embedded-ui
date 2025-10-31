@@ -75,6 +75,7 @@ export function ButtonWithConfirmDialog<T, K>({
         );
     };
 
+    // keep <span>: if button is disabled, popover won't open without this wrapper
     const renderContent = () => {
         if (withPopover) {
             return (
