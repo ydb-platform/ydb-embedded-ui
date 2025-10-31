@@ -1,10 +1,10 @@
-import React, {createContext, useContext} from 'react';
+import React from 'react';
 
 interface AppTitleContextType {
     appTitle: string;
 }
 
-const AppTitleContext = createContext<AppTitleContextType | undefined>(undefined);
+const AppTitleContext = React.createContext<AppTitleContextType | undefined>(undefined);
 
 interface AppTitleProviderProps {
     appTitle: string;
@@ -16,7 +16,7 @@ export function AppTitleProvider({appTitle, children}: AppTitleProviderProps) {
 }
 
 export function useAppTitle(): AppTitleContextType {
-    const context = useContext(AppTitleContext);
+    const context = React.useContext(AppTitleContext);
     if (context === undefined) {
         throw new Error('useAppTitle must be used within an AppTitleProvider');
     }

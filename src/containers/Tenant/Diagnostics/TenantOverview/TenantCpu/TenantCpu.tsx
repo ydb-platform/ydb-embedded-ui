@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {Flex} from '@gravity-ui/uikit';
 
 import {setTopQueriesFilters} from '../../../../../store/reducers/executeTopQueries/executeTopQueries';
@@ -34,7 +36,7 @@ export function TenantCpu({database, databaseType, databaseFullPath}: TenantCpuP
     return (
         <Flex direction="column" gap={4}>
             {!isServerless && (
-                <>
+                <React.Fragment>
                     <TenantDashboard database={database} charts={cpuDashboardConfig} />
                     <StatsWrapper
                         allEntitiesLink={allNodesLink}
@@ -48,7 +50,7 @@ export function TenantCpu({database, databaseType, databaseFullPath}: TenantCpuP
                     >
                         <TopNodesByCpu database={database} />
                     </StatsWrapper>
-                </>
+                </React.Fragment>
             )}
             <StatsWrapper title={i18n('title_top-shards')} allEntitiesLink={topShardsLink}>
                 <TopShards database={database} databaseFullPath={databaseFullPath} />
