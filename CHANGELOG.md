@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.14.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.13.0...v12.14.0) (2025-11-01)
+
+
+### Features
+
+* support custom metrics events ([#3038](https://github.com/ydb-platform/ydb-embedded-ui/issues/3038)) ([2c38116](https://github.com/ydb-platform/ydb-embedded-ui/commit/2c3811648534185dec9607cf9a42d6ad6e2e0234))
+
 ## [12.13.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.12.2...v12.13.0) (2025-11-01)
 
 
