@@ -1,11 +1,10 @@
 import React from 'react';
 
-import {Tab, TabList, TabProvider} from '@gravity-ui/uikit';
+import {TabList, TabProvider} from '@gravity-ui/uikit';
 import {Helmet} from 'react-helmet-async';
 
 import {AutoRefreshControl} from '../../../components/AutoRefreshControl/AutoRefreshControl';
 import {DrawerContextProvider} from '../../../components/Drawer/DrawerContext';
-import {InternalLink} from '../../../components/InternalLink';
 import {
     useConfigAvailable,
     useTopicDataAvailable,
@@ -32,6 +31,7 @@ import {Consumers} from './Consumers';
 import Describe from './Describe/Describe';
 import DetailedOverview from './DetailedOverview/DetailedOverview';
 import {getPagesByType, useDiagnosticsPageLinkGetter} from './DiagnosticsPages';
+import {DiagnosticsTabItem} from './DiagnosticsTabItem';
 import {HotKeys} from './HotKeys/HotKeys';
 import {NetworkWrapper} from './Network/NetworkWrapper';
 import {Partitions} from './Partitions/Partitions';
@@ -71,6 +71,7 @@ function Diagnostics({additionalTenantProps}: DiagnosticsProps) {
         hasBackups: typeof uiFactory.renderBackups === 'function' && Boolean(controlPlane),
         hasConfigs: isViewerUser && hasConfigs,
         hasAccess: uiFactory.hasAccess,
+        hasMonitoring: typeof uiFactory.renderMonitoring === 'function',
         databaseType,
     });
     let activeTab = pages.find((el) => el.id === diagnosticsTab);
@@ -214,6 +215,17 @@ function Diagnostics({additionalTenantProps}: DiagnosticsProps) {
                     scrollContainerRef: containerRef,
                 });
             }
+            case TENANT_DIAGNOSTICS_TABS_IDS.monitoring: {
+                return uiFactory.renderMonitoring?.({
+                    type,
+                    subType,
+                    database,
+                    path,
+                    databaseFullPath,
+                    additionalTenantProps,
+                    scrollContainerRef: containerRef,
+                });
+            }
             default: {
                 return <div>{i18n('no-data')}</div>;
             }
@@ -225,16 +237,15 @@ function Diagnostics({additionalTenantProps}: DiagnosticsProps) {
                 <div className={b('tabs')}>
                     <TabProvider value={activeTab?.id}>
                         <TabList size="l">
-                            {pages.map(({id, title}) => {
-                                const linkPath = getDiagnosticsPageLink(id);
-                                return (
-                                    <Tab key={id} value={id}>
-                                        <InternalLink to={linkPath} as="tab">
-                                            {title}
-                                        </InternalLink>
-                                    </Tab>
-                                );
-                            })}
+                            {pages.map(({id, title, badge}) => (
+                                <DiagnosticsTabItem
+                                    key={id}
+                                    id={id}
+                                    title={title}
+                                    linkPath={getDiagnosticsPageLink(id)}
+                                    badge={badge}
+                                />
+                            ))}
                         </TabList>
                     </TabProvider>
                     <AutoRefreshControl />

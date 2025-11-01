@@ -28,6 +28,7 @@
   "actions.connectToDB": "Connect to DB",
   "actions.dropIndex": "Drop index",
   "actions.openPreview": "Open preview",
+  "actions.openMonitoring": "Monitoring",
   "actions.createTable": "Create table...",
   "actions.createExternalTable": "Create external table...",
   "actions.createTopic": "Create topic...",

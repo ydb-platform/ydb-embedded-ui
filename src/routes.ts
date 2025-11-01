@@ -2,7 +2,7 @@ import React from 'react';
 
 import type {Location} from 'history';
 import isEmpty from 'lodash/isEmpty';
-import {compile} from 'path-to-regexp';
+import {compile, match} from 'path-to-regexp';
 import qs from 'qs';
 import type {QueryParamConfig} from 'use-query-params';
 import {StringParam} from 'use-query-params';
@@ -210,9 +210,11 @@ export function useTabletPagePath() {
 }
 
 export function checkIsClustersPage(pathname: string) {
-    return pathname.endsWith(routes.clusters);
+    const matchFn = match(routes.clusters);
+    return Boolean(matchFn(pathname));
 }
 
 export function checkIsTenantPage(pathname: string) {
-    return pathname.endsWith(routes.tenant);
+    const matchFn = match(routes.tenant);
+    return Boolean(matchFn(pathname));
 }

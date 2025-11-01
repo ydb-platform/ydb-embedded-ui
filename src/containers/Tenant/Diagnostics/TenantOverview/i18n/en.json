@@ -1,4 +1,5 @@
 {
+  "action_open-monitoring": "Monitoring",
   "top-nodes.empty-data": "No such nodes",
   "title_top-nodes-load": "Top nodes by load",
   "title_top-nodes-pool": "Top nodes by pools usage",

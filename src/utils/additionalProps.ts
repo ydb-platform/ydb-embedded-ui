@@ -36,3 +36,28 @@ export function getDatabaseLinks(
 
     return links;
 }
+
+export function getInfoTabLinks(
+    additionalProps?: AdditionalTenantsProps,
+    name?: string,
+    type?: ETenantType,
+) {
+    if (!additionalProps) {
+        return [];
+    }
+
+    const links: DatabaseLink[] = [];
+
+    if (additionalProps.getLogsLink) {
+        const link = additionalProps.getLogsLink(name);
+        if (link) {
+            links.push({title: i18n('field_logs-link'), url: link, icon: FileText});
+        }
+    }
+
+    if (additionalProps.getLinks) {
+        links.push(...additionalProps.getLinks(name, type));
+    }
+
+    return links;
+}

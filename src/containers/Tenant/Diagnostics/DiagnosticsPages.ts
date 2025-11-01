@@ -1,5 +1,6 @@
 import React from 'react';
 
+import type {LabelProps} from '@gravity-ui/uikit';
 import {StringParam, useQueryParams} from 'use-query-params';
 
 import {getTenantPath} from '../../../routes';
@@ -11,9 +12,16 @@ import type {TenantQuery} from '../TenantPages';
 import {TenantTabsGroups} from '../TenantPages';
 import {isDatabaseEntityType, isTopicEntityType} from '../utils/schema';
 
+interface Badge {
+    text: string;
+    theme?: LabelProps['theme'];
+    size?: LabelProps['size'];
+}
+
 type Page = {
     id: TenantDiagnosticsTab;
     title: string;
+    badge?: Badge;
 };
 
 interface GetPagesOptions {
@@ -22,6 +30,7 @@ interface GetPagesOptions {
     hasBackups?: boolean;
     hasConfigs?: boolean;
     hasAccess?: boolean;
+    hasMonitoring?: boolean;
     databaseType?: ETenantType;
 }
 
@@ -110,12 +119,23 @@ const operations = {
     title: 'Operations',
 };
 
+const monitoring = {
+    id: TENANT_DIAGNOSTICS_TABS_IDS.monitoring,
+    title: 'Monitoring',
+    badge: {
+        text: 'New',
+        theme: 'normal' as const,
+        size: 'xs' as const,
+    },
+};
+
 const ASYNC_REPLICATION_PAGES = [overview, tablets, describe, access];
 
 const TRANSFER_PAGES = [overview, tablets, describe, access];
 
 const DATABASE_PAGES = [
     overview,
+    monitoring,
     topQueries,
     topShards,
     nodes,
@@ -131,6 +151,7 @@ const DATABASE_PAGES = [
 
 const SERVERLESS_DATABASE_PAGES = [
     overview,
+    monitoring,
     topQueries,
     topShards,
     tablets,
@@ -219,6 +240,9 @@ function applyFilters(pages: Page[], type?: EPathType, options: GetPagesOptions 
     }
     if (!options.hasAccess) {
         removals.push(TENANT_DIAGNOSTICS_TABS_IDS.access);
+    }
+    if (!options.hasMonitoring) {
+        removals.push(TENANT_DIAGNOSTICS_TABS_IDS.monitoring);
     }
 
     return result.filter((p) => !removals.includes(p.id));
