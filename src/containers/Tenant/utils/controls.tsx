@@ -87,6 +87,8 @@ export const getSchemaControls =
             external_data_source: undefined,
 
             view: openPreview,
+
+            streaming_query: undefined,
         };
 
         return nodeTypeToControls[type];

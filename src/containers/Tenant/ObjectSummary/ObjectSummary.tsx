@@ -343,6 +343,7 @@ export function ObjectSummary({
                     },
                 ];
             },
+            [EPathType.EPathTypeStreamingQuery]: undefined,
         };
 
         const pathTypeOverview = (PathType && getPathTypeOverview[PathType]?.()) || [];

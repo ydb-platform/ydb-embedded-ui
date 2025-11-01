@@ -90,5 +90,6 @@
   "entity-name_resource-pool": "Resource Pool",
   "entity-name_secondary-index-table": "Secondary Index Table",
   "entity-name_vector-index-table": "Vector Index Table",
-  "entity-name_fulltext-index-table": "Fulltext Index Table"
+  "entity-name_fulltext-index-table": "Fulltext Index Table",
+  "entity-name_streaming_query": "Streaming Query"
 }
