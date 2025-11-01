@@ -1,5 +1,19 @@
 # Changelog
 
+## [12.13.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.12.2...v12.13.0) (2025-11-01)
+
+
+### Features
+
+* renderMonitoring to diagnostics ([#3032](https://github.com/ydb-platform/ydb-embedded-ui/issues/3032)) ([66e8cf8](https://github.com/ydb-platform/ydb-embedded-ui/commit/66e8cf87d9093875ae2b1c30a9cde830f2bfb760))
+* use environment in paths ([#3020](https://github.com/ydb-platform/ydb-embedded-ui/issues/3020)) ([44dd3b4](https://github.com/ydb-platform/ydb-embedded-ui/commit/44dd3b45b0ee43faf33b68b8e78beaa47e0c924c))
+
+
+### Bug Fixes
+
+* disable restart for followers and remove duplicate tooltip ([#3036](https://github.com/ydb-platform/ydb-embedded-ui/issues/3036)) ([9ca4400](https://github.com/ydb-platform/ydb-embedded-ui/commit/9ca44003baa864f7c46970f39fb96b7cb8e496e5))
+* **storage:** keep separate search for groups and nodes ([#3037](https://github.com/ydb-platform/ydb-embedded-ui/issues/3037)) ([74d6d5d](https://github.com/ydb-platform/ydb-embedded-ui/commit/74d6d5d5a6dcbdd3497d8d4eb65189dc58bc54b1))
+
 ## [12.12.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.12.1...v12.12.2) (2025-10-30)
 
 
