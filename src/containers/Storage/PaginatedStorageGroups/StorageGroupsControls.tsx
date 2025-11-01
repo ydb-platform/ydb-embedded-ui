@@ -32,11 +32,11 @@ export function StorageGroupsControls({
     entitiesLoading,
 }: StorageControlsProps) {
     const {
-        searchValue,
+        groupsSearchValue,
         storageType,
         visibleEntities,
         storageGroupsGroupByParam,
-        handleTextFilterChange,
+        handleTextFilterGroupsChange,
         handleStorageTypeChange,
         handleVisibleEntitiesChange,
         handleStorageGroupsGroupByParamChange,
@@ -60,8 +60,8 @@ export function StorageGroupsControls({
     return (
         <React.Fragment>
             <Search
-                value={searchValue}
-                onChange={handleTextFilterChange}
+                value={groupsSearchValue}
+                onChange={handleTextFilterGroupsChange}
                 placeholder={i18n('controls_groups-search-placeholder')}
                 className={b('search')}
             />

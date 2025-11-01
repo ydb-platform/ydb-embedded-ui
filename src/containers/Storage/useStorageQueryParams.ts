@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {StringParam, useQueryParams} from 'use-query-params';
 
 import type {StorageType, VisibleEntities} from '../../store/reducers/storage/types';
@@ -6,11 +8,14 @@ import {NodesUptimeFilterValues, nodesUptimeFilterValuesSchema} from '../../util
 
 import {storageGroupsGroupByParamSchema} from './PaginatedStorageGroupsTable/columns/constants';
 import {storageNodesGroupByParamSchema} from './PaginatedStorageNodesTable/columns/constants';
+import {STORAGE_SEARCH_PARAM_BY_TYPE} from './constants';
 
 export function useStorageQueryParams() {
     const [queryParams, setQueryParams] = useQueryParams({
         type: StringParam,
         visible: StringParam,
+        groupsSearch: StringParam,
+        nodesSearch: StringParam,
         search: StringParam,
         uptimeFilter: StringParam,
         storageNodesGroupBy: StringParam,
@@ -20,7 +25,8 @@ export function useStorageQueryParams() {
     const storageType = storageTypeSchema.parse(queryParams.type);
 
     const visibleEntities = visibleEntitiesSchema.parse(queryParams.visible);
-    const searchValue = queryParams.search ?? '';
+    const groupsSearchValue = queryParams.groupsSearch ?? '';
+    const nodesSearchValue = queryParams.nodesSearch ?? '';
     const nodesUptimeFilter = nodesUptimeFilterValuesSchema.parse(queryParams.uptimeFilter);
 
     const storageGroupsGroupByParam = storageGroupsGroupByParamSchema.parse(
@@ -30,8 +36,20 @@ export function useStorageQueryParams() {
         queryParams.storageNodesGroupBy,
     );
 
-    const handleTextFilterChange = (value: string) => {
-        setQueryParams({search: value || undefined}, 'replaceIn');
+    React.useEffect(() => {
+        if (queryParams.search) {
+            const patch: Record<string, string | undefined> = {search: undefined};
+            patch[STORAGE_SEARCH_PARAM_BY_TYPE[storageType]] = queryParams.search;
+            setQueryParams(patch, 'replaceIn');
+        }
+    }, [queryParams.search, storageType]);
+
+    const handleTextFilterGroupsChange = (value: string) => {
+        setQueryParams({groupsSearch: value || undefined}, 'replaceIn');
+    };
+
+    const handleTextFilterNodesChange = (value: string) => {
+        setQueryParams({nodesSearch: value || undefined}, 'replaceIn');
     };
 
     const handleVisibleEntitiesChange = (value: VisibleEntities) => {
@@ -49,6 +67,7 @@ export function useStorageQueryParams() {
     const handleStorageGroupsGroupByParamChange = (value: string) => {
         setQueryParams({storageGroupsGroupBy: value}, 'replaceIn');
     };
+
     const handleStorageNodesGroupByParamChange = (value: string) => {
         setQueryParams({storageNodesGroupBy: value}, 'replaceIn');
     };
@@ -65,12 +84,14 @@ export function useStorageQueryParams() {
     return {
         storageType,
         visibleEntities,
-        searchValue,
+        groupsSearchValue,
+        nodesSearchValue,
         nodesUptimeFilter,
         storageGroupsGroupByParam,
         storageNodesGroupByParam,
 
-        handleTextFilterChange,
+        handleTextFilterGroupsChange,
+        handleTextFilterNodesChange,
         handleVisibleEntitiesChange,
         handleStorageTypeChange,
         handleUptimeFilterChange,
