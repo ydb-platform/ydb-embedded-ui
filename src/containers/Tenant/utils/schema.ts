@@ -45,6 +45,8 @@ const pathTypeToNodeType: Record<EPathType, NavigationTreeNodeType | undefined> 
     [EPathType.EPathTypeReplication]: 'async_replication',
     [EPathType.EPathTypeTransfer]: 'transfer',
     [EPathType.EPathTypeResourcePool]: 'resource_pool',
+
+    [EPathType.EPathTypeStreamingQuery]: 'streaming_query',
 };
 
 export const nodeTableTypeToPathType: Partial<Record<NavigationTreeNodeType, EPathType>> = {
@@ -93,6 +95,8 @@ const pathTypeToEntityName: Record<EPathType, string | undefined> = {
 
     [EPathType.EPathTypeExternalDataSource]: i18n('entity-name_external-data-source'),
     [EPathType.EPathTypeExternalTable]: i18n('entity-name_external-table'),
+
+    [EPathType.EPathTypeStreamingQuery]: i18n('entity-name_streaming_query'),
 
     [EPathType.EPathTypeView]: i18n('entity-name_view'),
 
@@ -154,6 +158,7 @@ const pathTypeToIsTable: Record<EPathType, boolean> = {
     [EPathType.EPathTypeReplication]: false,
     [EPathType.EPathTypeTransfer]: false,
     [EPathType.EPathTypeResourcePool]: false,
+    [EPathType.EPathTypeStreamingQuery]: false,
 };
 
 //if add entity with tableType, make sure that Schema is available in Diagnostics section
@@ -194,6 +199,8 @@ const pathTypeToIsColumn: Record<EPathType, boolean> = {
     [EPathType.EPathTypeExternalDataSource]: false,
     [EPathType.EPathTypeExternalTable]: false,
 
+    [EPathType.EPathTypeStreamingQuery]: false,
+
     [EPathType.EPathTypeView]: false,
 
     [EPathType.EPathTypeReplication]: false,
@@ -221,6 +228,8 @@ const pathTypeToIsDatabase: Record<EPathType, boolean> = {
 
     [EPathType.EPathTypeExternalDataSource]: false,
     [EPathType.EPathTypeExternalTable]: false,
+
+    [EPathType.EPathTypeStreamingQuery]: false,
 
     [EPathType.EPathTypeView]: false,
 
@@ -272,6 +281,7 @@ const pathTypeToChildless: Record<EPathType, boolean> = {
     [EPathType.EPathTypeSubDomain]: false,
     [EPathType.EPathTypeTableIndex]: false,
     [EPathType.EPathTypeExtSubDomain]: false,
+    [EPathType.EPathTypeStreamingQuery]: false,
 };
 
 export const isChildlessPathType = (type?: EPathType, subType?: EPathSubType) =>

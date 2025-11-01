@@ -301,6 +301,8 @@ export enum EPathType {
     EPathTypeReplication = 'EPathTypeReplication',
     EPathTypeTransfer = 'EPathTypeTransfer',
     EPathTypeResourcePool = 'EPathTypeResourcePool',
+
+    EPathTypeStreamingQuery = 'EPathTypeStreamingQuery',
 }
 
 export enum EPathSubType {
