@@ -200,7 +200,7 @@ export function TenantOverview({
             <div className={b()}>
                 <div className={b('info')}>
                     <Flex alignItems="center" gap="2" className={b('top-label')}>
-                        <div>{tenantType}</div>
+                        {tenantType}
                         {monitoringTabAvailable && (
                             <Button view="normal" onClick={handleOpenMonitoring}>
                                 <Icon data={DisplayPulse} size={16} />
