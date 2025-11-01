@@ -6,17 +6,6 @@ import type {ETenantType} from '../types/api/tenant';
 
 import monitoringIcon from '../assets/icons/monitoring.svg';
 
-export function getMonitoringLink(
-    additionalProps?: AdditionalTenantsProps,
-    name?: string,
-    type?: ETenantType,
-): string | null {
-    if (!additionalProps?.getMonitoringLink) {
-        return null;
-    }
-    return additionalProps.getMonitoringLink(name, type);
-}
-
 export function getDatabaseLinks(
     additionalProps?: AdditionalTenantsProps,
     name?: string,
