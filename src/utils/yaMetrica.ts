@@ -1,3 +1,4 @@
+import type {UiMetricaGoal} from '../uiFactory/types';
 import {uiFactory} from '../uiFactory/uiFactory';
 
 /**
@@ -14,7 +15,7 @@ export interface Counter {
     reachGoal: (...args: unknown[]) => void;
 }
 
-const yaMetricaMap = uiFactory.yaMetricaMap;
+const yaMetricaMap = uiFactory.yaMetricaConfig?.yaMetricaMap;
 
 /**
  * A fake implementation of a counter metric for Yandex.Metrica.
@@ -62,11 +63,32 @@ class FakeMetrica implements Counter {
  * @param name The name of the metrica to retrieve
  * @returns The Yandex Metrica instance if found, otherwise a FakeMetrica instance
  */
-export function getMetrica(name: string) {
+export function getMetrica(name?: string) {
+    if (!name) {
+        return undefined;
+    }
     const yaMetricaId = yaMetricaMap?.[name];
     const metricaInstance = yaMetricaId
         ? (window[`yaCounter${yaMetricaId}`] as Counter)
         : undefined;
 
     return metricaInstance ?? new FakeMetrica(name);
+}
+
+export function reachMetricaGoal(
+    goalKey: UiMetricaGoal,
+    params?: Record<string, boolean | string | number | null>,
+) {
+    const metricaName = uiFactory.yaMetricaConfig?.getMetricaName(goalKey);
+    const metrica = getMetrica(metricaName);
+    if (!metrica) {
+        console.warn('Metrica is not defined');
+        return;
+    }
+    const goal = uiFactory.yaMetricaConfig?.goals[goalKey];
+    if (!goal) {
+        console.warn('Metrica goal is not defined');
+        return;
+    }
+    metrica.reachGoal(goal, params);
 }
