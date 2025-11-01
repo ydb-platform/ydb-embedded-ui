@@ -106,6 +106,7 @@ export const QUERY_TECHNICAL_MARK = '/*UI-QUERY-EXCLUDE*/';
 
 // ==== Titles ====
 export const DEVELOPER_UI_TITLE = 'Developer UI';
+export const MONITORING_UI_TITLE = 'Monitoring';
 export const CLUSTER_DEFAULT_TITLE = 'Cluster';
 export const TENANT_DEFAULT_TITLE = 'Database';
 

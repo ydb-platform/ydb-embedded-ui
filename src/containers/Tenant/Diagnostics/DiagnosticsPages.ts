@@ -1,5 +1,6 @@
 import React from 'react';
 
+import type {LabelProps} from '@gravity-ui/uikit';
 import {StringParam, useQueryParams} from 'use-query-params';
 
 import {getTenantPath} from '../../../routes';
@@ -7,14 +8,20 @@ import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/consta
 import type {TenantDiagnosticsTab} from '../../../store/reducers/tenant/types';
 import {EPathSubType, EPathType} from '../../../types/api/schema';
 import type {ETenantType} from '../../../types/api/tenant';
-import {uiFactory} from '../../../uiFactory/uiFactory';
 import type {TenantQuery} from '../TenantPages';
 import {TenantTabsGroups} from '../TenantPages';
 import {isDatabaseEntityType, isTopicEntityType} from '../utils/schema';
 
+interface Badge {
+    text: string;
+    theme?: LabelProps['theme'];
+    size?: LabelProps['size'];
+}
+
 type Page = {
     id: TenantDiagnosticsTab;
     title: string;
+    badge?: Badge;
 };
 
 interface GetPagesOptions {
@@ -23,6 +30,7 @@ interface GetPagesOptions {
     hasBackups?: boolean;
     hasConfigs?: boolean;
     hasAccess?: boolean;
+    hasMonitoring?: boolean;
     databaseType?: ETenantType;
 }
 
@@ -114,6 +122,11 @@ const operations = {
 const monitoring = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.monitoring,
     title: 'Monitoring',
+    badge: {
+        text: 'New',
+        theme: 'normal' as const,
+        size: 'xs' as const,
+    },
 };
 
 const ASYNC_REPLICATION_PAGES = [overview, tablets, describe, access];
@@ -122,6 +135,7 @@ const TRANSFER_PAGES = [overview, tablets, describe, access];
 
 const DATABASE_PAGES = [
     overview,
+    monitoring,
     topQueries,
     topShards,
     nodes,
@@ -137,6 +151,7 @@ const DATABASE_PAGES = [
 
 const SERVERLESS_DATABASE_PAGES = [
     overview,
+    monitoring,
     topQueries,
     topShards,
     tablets,
@@ -226,6 +241,9 @@ function applyFilters(pages: Page[], type?: EPathType, options: GetPagesOptions 
     if (!options.hasAccess) {
         removals.push(TENANT_DIAGNOSTICS_TABS_IDS.access);
     }
+    if (!options.hasMonitoring) {
+        removals.push(TENANT_DIAGNOSTICS_TABS_IDS.monitoring);
+    }
 
     return result.filter((p) => !removals.includes(p.id));
 }
@@ -240,11 +258,6 @@ export const getPagesByType = (
     const seeded = dbContext ? getDatabasePages(options?.databaseType) : base;
 
     const result = applyFilters(seeded, type, options);
-
-    // Add monitoring tab as second tab if renderMonitoring is available
-    if (uiFactory.renderMonitoring) {
-        result.splice(1, 0, monitoring);
-    }
 
     return result;
 };

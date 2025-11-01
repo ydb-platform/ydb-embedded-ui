@@ -26,7 +26,7 @@ export const TABLET = 'tablet';
 const routes = {
     clusters: `/${CLUSTERS}`,
     cluster: `/:environment?/${CLUSTER}/:activeTab?`,
-    tenant: `/:environment?/${TENANT}`,
+    tenant: `/${TENANT}`,
     node: `/:environment?/${NODE}/:id/:activeTab?`,
     pDisk: `/:environment?/${PDISK}`,
     vDisk: `/:environment?/${VDISK}`,

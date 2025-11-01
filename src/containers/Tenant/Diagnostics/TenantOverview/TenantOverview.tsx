@@ -1,3 +1,4 @@
+import {DisplayPulse} from '@gravity-ui/icons';
 import {Button, Flex, HelpMark, Icon, Label} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
@@ -5,13 +6,22 @@ import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper'
 import {QueriesActivityBar} from '../../../../components/QueriesActivityBar/QueriesActivityBar';
 import {useDatabasesAvailable} from '../../../../store/reducers/capabilities/hooks';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
-import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
-import {tenantApi} from '../../../../store/reducers/tenant/tenant';
+import {
+    TENANT_DIAGNOSTICS_TABS_IDS,
+    TENANT_METRICS_TABS_IDS,
+    TENANT_PAGES_IDS,
+} from '../../../../store/reducers/tenant/constants';
+import {
+    setDiagnosticsTab,
+    setTenantPage,
+    tenantApi,
+} from '../../../../store/reducers/tenant/tenant';
 import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
 import type {AdditionalTenantsProps} from '../../../../types/additionalProps';
-import {getDatabaseLinks} from '../../../../utils/additionalProps';
+import {uiFactory} from '../../../../uiFactory/uiFactory';
+import {getInfoTabLinks} from '../../../../utils/additionalProps';
 import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
-import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
+import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
 
@@ -40,6 +50,7 @@ export function TenantOverview({
     const {metricsTab} = useTypedSelector((state) => state.tenant);
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const clusterName = useClusterNameFromQuery();
+    const dispatch = useTypedDispatch();
 
     const isMetaDatabasesAvailable = useDatabasesAvailable();
 
@@ -176,28 +187,44 @@ export function TenantOverview({
         }
     };
 
-    const links = getDatabaseLinks(additionalTenantProps, Name, Type);
+    const links = getInfoTabLinks(additionalTenantProps, Name, Type);
+    const monitoringTabAvailable = Boolean(uiFactory.renderMonitoring);
+
+    const handleOpenMonitoring = () => {
+        dispatch(setTenantPage(TENANT_PAGES_IDS.diagnostics));
+        dispatch(setDiagnosticsTab(TENANT_DIAGNOSTICS_TABS_IDS.monitoring));
+    };
 
     return (
         <LoaderWrapper loading={tenantLoading}>
             <div className={b()}>
                 <div className={b('info')}>
-                    <div className={b('top-label')}>{tenantType}</div>
+                    <Flex alignItems="center" gap="2" className={b('top-label')}>
+                        <div>{tenantType}</div>
+                        {monitoringTabAvailable && (
+                            <Button view="normal" onClick={handleOpenMonitoring}>
+                                <Icon data={DisplayPulse} size={16} />
+                                {i18n('action_open-monitoring')}
+                            </Button>
+                        )}
+                    </Flex>
                     <Flex alignItems="center" gap="1" className={b('top')}>
                         {renderName()}
-                        <Flex gap="2">
-                            {links.map(({title, url, icon}) => (
-                                <Button
-                                    key={title}
-                                    href={url}
-                                    target="_blank"
-                                    size="xs"
-                                    title={title}
-                                >
-                                    <Icon data={icon} />
-                                </Button>
-                            ))}
-                        </Flex>
+                        {links.length > 0 && (
+                            <Flex gap="2">
+                                {links.map(({title, url, icon}) => (
+                                    <Button
+                                        key={title}
+                                        href={url}
+                                        target="_blank"
+                                        size="xs"
+                                        title={title}
+                                    >
+                                        <Icon data={icon} />
+                                    </Button>
+                                ))}
+                            </Flex>
+                        )}
                     </Flex>
                     <Flex direction="column" gap={4}>
                         {!isServerless && <HealthcheckPreview database={database} />}

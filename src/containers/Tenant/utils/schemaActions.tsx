@@ -1,12 +1,16 @@
-import {CirclePlus, Copy, PlugConnection} from '@gravity-ui/icons';
+import {CirclePlus, Copy, DisplayPulse, PlugConnection} from '@gravity-ui/icons';
 import {Flex, Spin} from '@gravity-ui/uikit';
 import copy from 'copy-to-clipboard';
 import type {NavigationTreeNodeType} from 'ydb-ui-components';
 
 import type {SnippetParams} from '../../../components/ConnectToDB/types';
 import type {AppDispatch} from '../../../store';
-import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
-import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
+import {
+    TENANT_DIAGNOSTICS_TABS_IDS,
+    TENANT_PAGES_IDS,
+    TENANT_QUERY_TABS_ID,
+} from '../../../store/reducers/tenant/constants';
+import {setDiagnosticsTab, setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
 import createToast from '../../../utils/createToast';
 import {insertSnippetToEditor} from '../../../utils/monaco/insertSnippet';
 import {transformPath} from '../ObjectSummary/transformPath';
@@ -48,6 +52,7 @@ interface ActionsAdditionalParams {
     getConnectToDBDialog?: (params: SnippetParams) => Promise<boolean>;
     schemaData?: SchemaData[];
     isSchemaDataLoading?: boolean;
+    hasMonitoring?: boolean;
 }
 
 interface BindActionParams {
@@ -98,6 +103,11 @@ const bindActions = (
               }
             : undefined,
         getConnectToDBDialog: () => getConnectToDBDialog?.({database: params.database}),
+        openMonitoring: () => {
+            dispatch(setTenantPage(TENANT_PAGES_IDS.diagnostics));
+            dispatch(setDiagnosticsTab(TENANT_DIAGNOSTICS_TABS_IDS.monitoring));
+            setActivePath(params.path);
+        },
         createTable: inputQuery(createTableTemplate),
         createColumnTable: inputQuery(createColumnTableTemplate),
         createAsyncReplication: inputQuery(createAsyncReplicationTemplate),
@@ -190,6 +200,11 @@ export const getActions =
             action: actions.getConnectToDBDialog,
             iconStart: <PlugConnection />,
         };
+        const monitoringItem = {
+            text: i18n('actions.openMonitoring'),
+            action: actions.openMonitoring,
+            iconStart: <DisplayPulse />,
+        };
 
         const createEntitiesSet = [
             {text: i18n('actions.createTable'), action: actions.createTable},
@@ -216,9 +231,13 @@ export const getActions =
                 },
             ],
         };
-        const DB_SET: ActionsSet = [[copyItem, connectToDBItem], createEntitiesSet];
+        let DB_SET: ActionsSet = [[copyItem, connectToDBItem], createEntitiesSet];
 
         const DIR_SET: ActionsSet = [[copyItem], createEntitiesSet];
+
+        if (additionalEffects.hasMonitoring) {
+            DB_SET = [[copyItem, connectToDBItem, monitoringItem], createEntitiesSet];
+        }
 
         if (actions.createDirectory) {
             const createDirectoryItem = {

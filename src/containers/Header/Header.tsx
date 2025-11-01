@@ -28,7 +28,7 @@ import {clustersApi} from '../../store/reducers/clusters/clusters';
 import {tenantApi} from '../../store/reducers/tenant/tenant';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
-import {DEVELOPER_UI_TITLE} from '../../utils/constants';
+import {DEVELOPER_UI_TITLE, MONITORING_UI_TITLE} from '../../utils/constants';
 import {createDeveloperUIInternalPageHref} from '../../utils/developerUI/developerUI';
 import {useTypedSelector} from '../../utils/hooks';
 import {
@@ -56,7 +56,7 @@ function Header() {
 
     const isMetaDatabasesAvailable = useDatabasesAvailable();
 
-    const {title: clusterTitle} = useClusterBaseInfo();
+    const {title: clusterTitle, monitoring} = useClusterBaseInfo();
 
     const database = useDatabaseFromQuery();
 
@@ -93,6 +93,16 @@ function Header() {
     const {currentData: databaseData, isLoading: isDatabaseDataLoading} =
         tenantApi.useGetTenantInfoQuery(params);
 
+    const monitoringLinkUrl =
+        monitoring && uiFactory.getMonitoringLink && databaseData?.Name && databaseData?.Type
+            ? uiFactory.getMonitoringLink({
+                  monitoring,
+                  clusterName,
+                  dbName: databaseData.Name,
+                  dbType: databaseData.Type,
+              })
+            : null;
+
     const breadcrumbItems = React.useMemo(() => {
         let options = {
             ...pageBreadcrumbsOptions,
@@ -128,6 +138,15 @@ function Header() {
         }
 
         if (isDatabasePage && database) {
+            if (monitoringLinkUrl) {
+                elements.push(
+                    <Button view="flat" href={monitoringLinkUrl} target="_blank">
+                        {MONITORING_UI_TITLE}
+                        <Icon data={ArrowUpRightFromSquare} />
+                    </Button>,
+                );
+            }
+
             elements.push(
                 <Button view={'flat'} onClick={() => getConnectToDBDialog({database})}>
                     <Icon data={PlugConnection} />

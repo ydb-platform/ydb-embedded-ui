@@ -8,6 +8,10 @@
 
     height: 100%;
 
+    &__tab-badge {
+        margin-left: var(--g-spacing-2);
+    }
+
     &__header-wrapper {
         padding: 0 var(--g-spacing-5);
 

@@ -6,6 +6,17 @@ import type {ETenantType} from '../types/api/tenant';
 
 import monitoringIcon from '../assets/icons/monitoring.svg';
 
+export function getMonitoringLink(
+    additionalProps?: AdditionalTenantsProps,
+    name?: string,
+    type?: ETenantType,
+): string | null {
+    if (!additionalProps?.getMonitoringLink) {
+        return null;
+    }
+    return additionalProps.getMonitoringLink(name, type);
+}
+
 export function getDatabaseLinks(
     additionalProps?: AdditionalTenantsProps,
     name?: string,
@@ -22,6 +33,31 @@ export function getDatabaseLinks(
             links.push({title: i18n('field_monitoring-link'), url: link, icon: monitoringIcon});
         }
     }
+
+    if (additionalProps.getLogsLink) {
+        const link = additionalProps.getLogsLink(name);
+        if (link) {
+            links.push({title: i18n('field_logs-link'), url: link, icon: FileText});
+        }
+    }
+
+    if (additionalProps.getLinks) {
+        links.push(...additionalProps.getLinks(name, type));
+    }
+
+    return links;
+}
+
+export function getInfoTabLinks(
+    additionalProps?: AdditionalTenantsProps,
+    name?: string,
+    type?: ETenantType,
+) {
+    if (!additionalProps) {
+        return [];
+    }
+
+    const links: DatabaseLink[] = [];
 
     if (additionalProps.getLogsLink) {
         const link = additionalProps.getLogsLink(name);
