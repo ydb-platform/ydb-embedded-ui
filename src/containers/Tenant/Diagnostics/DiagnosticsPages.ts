@@ -257,9 +257,7 @@ export const getPagesByType = (
     const dbContext = isDatabaseEntityType(type) || options?.isTopLevel;
     const seeded = dbContext ? getDatabasePages(options?.databaseType) : base;
 
-    const result = applyFilters(seeded, type, options);
-
-    return result;
+    return applyFilters(seeded, type, options);
 };
 
 export const useDiagnosticsPageLinkGetter = () => {
