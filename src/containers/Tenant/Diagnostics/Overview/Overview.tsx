@@ -77,6 +77,7 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
                     data={data}
                 />
             ),
+            [EPathType.EPathTypeStreamingQuery]: undefined,
         };
 
         return (type && pathTypeToComponent[type]?.()) || <TableInfo data={data} type={type} />;

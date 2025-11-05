@@ -361,6 +361,8 @@ export const getActions =
             external_data_source: EXTERNAL_DATA_SOURCE_SET,
 
             view: VIEW_SET,
+
+            streaming_query: JUST_COPY,
         };
 
         return nodeTypeToActions[type];

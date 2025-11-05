@@ -175,6 +175,8 @@ const EXTERNAL_TABLE_PAGES = [overview, schema, describe, access];
 
 const VIEW_PAGES = [overview, schema, describe, access];
 
+const STREAMING_QUERY_PAGES = [overview, describe, access];
+
 // verbose mapping to guarantee correct tabs for new path types
 // TS will error when a new type is added but not mapped here
 const pathTypeToPages: Record<EPathType, Page[] | undefined> = {
@@ -197,6 +199,8 @@ const pathTypeToPages: Record<EPathType, Page[] | undefined> = {
 
     [EPathType.EPathTypeExternalDataSource]: EXTERNAL_DATA_SOURCE_PAGES,
     [EPathType.EPathTypeExternalTable]: EXTERNAL_TABLE_PAGES,
+
+    [EPathType.EPathTypeStreamingQuery]: STREAMING_QUERY_PAGES,
 
     [EPathType.EPathTypeView]: VIEW_PAGES,
 
