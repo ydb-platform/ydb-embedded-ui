@@ -1,5 +1,17 @@
 # Changelog
 
+## [12.15.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.14.0...v12.15.0) (2025-11-05)
+
+
+### Features
+
+* add Streaming Query node type and actions/controls ([#3041](https://github.com/ydb-platform/ydb-embedded-ui/issues/3041)) ([c3d1764](https://github.com/ydb-platform/ydb-embedded-ui/commit/c3d1764807ad3a227042fe867396b2db37093d5a))
+
+
+### Bug Fixes
+
+* **Authentication:** remove basename ([#3042](https://github.com/ydb-platform/ydb-embedded-ui/issues/3042)) ([6e86384](https://github.com/ydb-platform/ydb-embedded-ui/commit/6e863841e462a4076d47d5bc01d2cbed864940e1))
+
 ## [12.14.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.13.0...v12.14.0) (2025-11-01)
 
 
