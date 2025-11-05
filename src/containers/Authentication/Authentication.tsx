@@ -5,6 +5,7 @@ import {Button, Link as ExternalLink, Icon, TextInput} from '@gravity-ui/uikit';
 import {useHistory, useLocation} from 'react-router-dom';
 
 import {parseQuery} from '../../routes';
+import {basename} from '../../store';
 import {authenticationApi} from '../../store/reducers/authentication/authentication';
 import {useLoginWithDatabase} from '../../store/reducers/capabilities/hooks';
 import {cn} from '../../utils/cn';
@@ -42,7 +43,19 @@ function Authentication({closable = false}: AuthenticationProps) {
             // history navigates relative to origin
             // so we remove origin to make it work properly
             const url = new URL(decodedUrl);
-            path = url.pathname + url.search;
+            let pathname = url.pathname;
+
+            // Remove basename from pathname since history.replace expects paths relative to basename
+            if (basename && pathname.startsWith(basename)) {
+                pathname = pathname.slice(basename.length);
+            }
+
+            // Ensure pathname starts with /
+            if (pathname && !pathname.startsWith('/')) {
+                pathname = '/' + pathname;
+            }
+
+            path = pathname + url.search;
         }
         return path;
     }, [returnUrl]);
