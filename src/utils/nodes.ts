@@ -99,3 +99,11 @@ export const getProblemParamValue = (problemFilter: ProblemFilterValue | undefin
 export const getUptimeParamValue = (nodesUptimeFilter: NodesUptimeFilterValues | undefined) => {
     return nodesUptimeFilter === NodesUptimeFilterValues.SmallUptime ? HOUR_IN_SECONDS : undefined;
 };
+
+export function checkIsStorageNode<T extends PreparedNodeSystemState>(node?: T) {
+    return Boolean(node?.Roles?.includes('Storage'));
+}
+
+export function checkIsTenantNode<T extends PreparedNodeSystemState>(node?: T) {
+    return Boolean(node?.Tenants);
+}
