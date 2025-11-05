@@ -281,7 +281,7 @@ const pathTypeToChildless: Record<EPathType, boolean> = {
     [EPathType.EPathTypeSubDomain]: false,
     [EPathType.EPathTypeTableIndex]: false,
     [EPathType.EPathTypeExtSubDomain]: false,
-    [EPathType.EPathTypeStreamingQuery]: false,
+    [EPathType.EPathTypeStreamingQuery]: true,
 };
 
 export const isChildlessPathType = (type?: EPathType, subType?: EPathSubType) =>
