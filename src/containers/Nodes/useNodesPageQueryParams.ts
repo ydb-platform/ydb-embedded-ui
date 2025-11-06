@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {BooleanParam, StringParam, useQueryParams} from 'use-query-params';
 
 import {useViewerNodesHandlerHasGroupingBySystemState} from '../../store/reducers/capabilities/hooks';
@@ -43,21 +45,36 @@ export function useNodesPageQueryParams(
         systemStateGroupingAvailable,
     );
 
-    const handleSearchQueryChange = (value: string) => {
-        setQueryParams({search: value || undefined}, 'replaceIn');
-    };
-    const handleUptimeFilterChange = (value: NodesUptimeFilterValues) => {
-        setQueryParams({uptimeFilter: value}, 'replaceIn');
-    };
-    const handlePeerRoleFilterChange = (value: NodesPeerRole) => {
-        setQueryParams({peerRole: value}, 'replaceIn');
-    };
-    const handleGroupByParamChange = (value: string) => {
-        setQueryParams({nodesGroupBy: value}, 'replaceIn');
-    };
-    const handleWithProblemsChange = (value: boolean) => {
-        setQueryParams({withProblems: value || undefined}, 'replaceIn');
-    };
+    const handleSearchQueryChange = React.useCallback(
+        (value: string) => {
+            setQueryParams({search: value || undefined}, 'replaceIn');
+        },
+        [setQueryParams],
+    );
+    const handleUptimeFilterChange = React.useCallback(
+        (value: NodesUptimeFilterValues) => {
+            setQueryParams({uptimeFilter: value}, 'replaceIn');
+        },
+        [setQueryParams],
+    );
+    const handlePeerRoleFilterChange = React.useCallback(
+        (value: NodesPeerRole) => {
+            setQueryParams({peerRole: value}, 'replaceIn');
+        },
+        [setQueryParams],
+    );
+    const handleGroupByParamChange = React.useCallback(
+        (value: string) => {
+            setQueryParams({nodesGroupBy: value}, 'replaceIn');
+        },
+        [setQueryParams],
+    );
+    const handleWithProblemsChange = React.useCallback(
+        (value: boolean) => {
+            setQueryParams({withProblems: value || undefined}, 'replaceIn');
+        },
+        [setQueryParams],
+    );
 
     return {
         uptimeFilter,

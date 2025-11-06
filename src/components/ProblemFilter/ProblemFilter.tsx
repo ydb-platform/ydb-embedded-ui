@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {SegmentedRadioGroup} from '@gravity-ui/uikit';
 
 import i18n from './i18n';
@@ -9,9 +11,12 @@ interface ProblemFilterProps {
 }
 
 export function ProblemFilter({value, onChange, className}: ProblemFilterProps) {
-    const handleValueChange = (value: string) => {
-        onChange(value === 'true');
-    };
+    const handleValueChange = React.useCallback(
+        (value: string) => {
+            onChange(value === 'true');
+        },
+        [onChange],
+    );
 
     return (
         <SegmentedRadioGroup
