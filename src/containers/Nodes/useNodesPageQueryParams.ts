@@ -1,4 +1,4 @@
-import {StringParam, useQueryParams} from 'use-query-params';
+import {BooleanParam, StringParam, useQueryParams} from 'use-query-params';
 
 import {useViewerNodesHandlerHasGroupingBySystemState} from '../../store/reducers/capabilities/hooks';
 import type {NodesGroupByField, NodesPeerRole} from '../../types/api/nodes';
@@ -18,12 +18,14 @@ export function useNodesPageQueryParams(
         peerRole: StringParam,
         search: StringParam,
         nodesGroupBy: StringParam,
+        withProblems: BooleanParam,
     });
 
     const isViewerUser = useIsViewerUser();
 
     const uptimeFilter = nodesUptimeFilterValuesSchema.parse(queryParams.uptimeFilter);
     const searchValue = queryParams.search ?? '';
+    const withProblems = Boolean(queryParams.withProblems);
 
     let peerRoleFilter: NodesPeerRole | undefined;
 
@@ -53,16 +55,21 @@ export function useNodesPageQueryParams(
     const handleGroupByParamChange = (value: string) => {
         setQueryParams({nodesGroupBy: value}, 'replaceIn');
     };
+    const handleWithProblemsChange = (value: boolean) => {
+        setQueryParams({withProblems: value || undefined}, 'replaceIn');
+    };
 
     return {
         uptimeFilter,
         searchValue,
         peerRoleFilter,
         groupByParam,
+        withProblems,
 
         handleSearchQueryChange,
         handleUptimeFilterChange,
         handlePeerRoleFilterChange,
         handleGroupByParamChange,
+        handleWithProblemsChange,
     };
 }

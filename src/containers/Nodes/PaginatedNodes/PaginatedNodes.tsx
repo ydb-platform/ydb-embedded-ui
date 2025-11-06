@@ -8,7 +8,6 @@ import {
     useCapabilitiesLoaded,
     useViewerNodesHandlerHasGrouping,
 } from '../../../store/reducers/capabilities/hooks';
-import {useProblemFilter} from '../../../store/reducers/settings/hooks';
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField} from '../../../types/api/nodes';
 import {NodesUptimeFilterValues} from '../../../utils/nodes';
@@ -34,12 +33,13 @@ export interface PaginatedNodesProps {
 }
 
 export function PaginatedNodes(props: PaginatedNodesProps) {
-    const {uptimeFilter, groupByParam, handleUptimeFilterChange} = useNodesPageQueryParams(
-        props.groupByParams,
-        props.withPeerRoleFilter,
-    );
-
-    const {problemFilter, handleProblemFilterChange} = useProblemFilter();
+    const {
+        uptimeFilter,
+        groupByParam,
+        withProblems,
+        handleUptimeFilterChange,
+        handleWithProblemsChange,
+    } = useNodesPageQueryParams(props.groupByParams, props.withPeerRoleFilter);
 
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
@@ -49,15 +49,15 @@ export function PaginatedNodes(props: PaginatedNodesProps) {
     React.useEffect(() => {
         if (
             viewerNodesHandlerHasGrouping &&
-            (problemFilter !== 'All' || uptimeFilter !== NodesUptimeFilterValues.All)
+            (withProblems || uptimeFilter !== NodesUptimeFilterValues.All)
         ) {
-            handleProblemFilterChange('All');
+            handleWithProblemsChange(false);
             handleUptimeFilterChange(NodesUptimeFilterValues.All);
         }
     }, [
-        handleProblemFilterChange,
+        handleWithProblemsChange,
         handleUptimeFilterChange,
-        problemFilter,
+        withProblems,
         uptimeFilter,
         viewerNodesHandlerHasGrouping,
     ]);
