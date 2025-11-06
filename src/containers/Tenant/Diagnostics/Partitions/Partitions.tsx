@@ -5,7 +5,6 @@ import {skipToken} from '@reduxjs/toolkit/query';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableColumnSetup} from '../../../../components/TableColumnSetup/TableColumnSetup';
-import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {nodesListApi, selectNodesMap} from '../../../../store/reducers/nodesList';
 import {partitionsApi, setSelectedConsumer} from '../../../../store/reducers/partitions/partitions';
@@ -112,16 +111,13 @@ export const Partitions = ({path, database, databaseFullPath}: PartitionsProps) 
     };
 
     const renderContent = () => {
-        if (loading) {
-            return <TableSkeleton className={b('loader')} />;
-        }
-
         return (
             <ResizeableDataTable
                 columnsWidthLSKey={PARTITIONS_COLUMNS_WIDTH_LS_KEY}
                 wrapperClassName={b('table')}
                 data={partitionsToRender}
                 columns={columnsToShow}
+                isLoading={loading}
                 settings={DEFAULT_TABLE_SETTINGS}
                 emptyDataMessage={i18n('table.emptyDataMessage')}
             />
