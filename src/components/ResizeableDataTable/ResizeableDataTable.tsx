@@ -70,7 +70,7 @@ export function ResizeableDataTable<T>({
     const processedData = React.useMemo(() => {
         if (isFetching && !data?.length) {
             // We do not use data in render method when loading, so we can return an array of empty objects
-            return Array(loadingSkeletonRowsCount).fill({}) as T[];
+            return Array.from({length: loadingSkeletonRowsCount}, () => ({}) as T);
         }
         return data;
     }, [isFetching, data, loadingSkeletonRowsCount]);
