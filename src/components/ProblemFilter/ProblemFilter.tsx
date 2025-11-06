@@ -24,9 +24,11 @@ export function ProblemFilter({value, onChange, className}: ProblemFilterProps) 
             onUpdate={handleValueChange}
             className={className}
         >
-            <SegmentedRadioGroup.Option value={'false'}>{i18n('all')}</SegmentedRadioGroup.Option>
+            <SegmentedRadioGroup.Option value={'false'}>
+                {i18n('value_all')}
+            </SegmentedRadioGroup.Option>
             <SegmentedRadioGroup.Option value={'true'}>
-                {i18n('with-problems')}
+                {i18n('value_with-problems')}
             </SegmentedRadioGroup.Option>
         </SegmentedRadioGroup>
     );
