@@ -6,7 +6,6 @@ import {ResizeablePaginatedTable} from '../../components/PaginatedTable';
 import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../components/nodesColumns/constants';
 import type {NodesColumn} from '../../components/nodesColumns/types';
 import type {NodesFilters} from '../../store/reducers/nodes/types';
-import type {ProblemFilterValue} from '../../store/reducers/settings/types';
 import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import type {NodesGroupByField, NodesPeerRole} from '../../types/api/nodes';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
@@ -22,7 +21,7 @@ interface NodesTableProps {
     databaseFullPath?: string;
 
     searchValue: string;
-    problemFilter: ProblemFilterValue;
+    withProblems: boolean;
     uptimeFilter: NodesUptimeFilterValues;
     peerRoleFilter?: NodesPeerRole;
 
@@ -42,7 +41,7 @@ export function NodesTable({
     database,
     databaseFullPath,
     searchValue,
-    problemFilter,
+    withProblems,
     uptimeFilter,
     peerRoleFilter,
     filterGroup,
@@ -58,7 +57,7 @@ export function NodesTable({
             databaseFullPath,
             database,
             searchValue,
-            problemFilter,
+            withProblems,
             uptimeFilter,
             peerRoleFilter,
             filterGroup,
@@ -69,7 +68,7 @@ export function NodesTable({
         databaseFullPath,
         database,
         searchValue,
-        problemFilter,
+        withProblems,
         uptimeFilter,
         peerRoleFilter,
         filterGroup,
@@ -77,7 +76,7 @@ export function NodesTable({
     ]);
 
     const renderEmptyDataMessage = () => {
-        if (problemFilter !== 'All' || uptimeFilter !== NodesUptimeFilterValues.All) {
+        if (withProblems || uptimeFilter !== NodesUptimeFilterValues.All) {
             return <Illustration name="thumbsUp" width={200} />;
         }
 

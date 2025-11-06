@@ -12,16 +12,11 @@ import {parseQuery} from 'redux-location-state/lib/parseQuery';
 import {stateToParams} from 'redux-location-state/lib/stateToParams';
 
 import {initialState as initialHeatmapState} from './reducers/heatmap';
-import {initialState as initialSettingsState} from './reducers/settings/settings';
 import {initialState as initialTenantState} from './reducers/tenant/tenant';
 
 export const paramSetup = {
-    global: {
-        problemFilter: {
-            stateKey: 'settings.problemFilter',
-            initialState: initialSettingsState.problemFilter,
-        },
-    },
+    // Do not delete, without `global` params redux-location-state goes crazy
+    global: {},
     '/tenant': {
         sort: {
             stateKey: 'heatmap.sort',
@@ -120,18 +115,6 @@ export const paramSetup = {
         },
         selectedConsumer: {
             stateKey: 'partitions.selectedConsumer',
-        },
-    },
-    '/cluster/tenants': {
-        search: {
-            stateKey: 'tenants.searchValue',
-            initialState: '',
-        },
-    },
-    '/*/cluster/tenants': {
-        search: {
-            stateKey: 'tenants.searchValue',
-            initialState: '',
         },
     },
 } as const;

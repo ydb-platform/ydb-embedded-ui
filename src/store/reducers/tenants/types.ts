@@ -14,12 +14,4 @@ export interface PreparedTenant extends TTenant {
     groupsCount: number;
 }
 
-export interface TenantsState {
-    searchValue: string;
-}
-
-export interface TenantsStateSlice {
-    tenants: TenantsState;
-}
-
 export type MetricStatus = ValueOf<typeof METRIC_STATUS>;

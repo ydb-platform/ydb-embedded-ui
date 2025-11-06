@@ -10,7 +10,7 @@ import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import {prepareStorageNodesResponse} from '../../store/reducers/storage/utils';
 import type {NodesRequestParams} from '../../types/api/nodes';
 import {prepareSortValue} from '../../utils/filters';
-import {getProblemParamValue, getUptimeParamValue} from '../../utils/nodes';
+import {getUptimeParamValue} from '../../utils/nodes';
 import {getRequiredDataFields} from '../../utils/tableUtils/getRequiredDataFields';
 
 export const getNodes: FetchData<
@@ -26,7 +26,7 @@ export const getNodes: FetchData<
         databaseFullPath,
         database,
         searchValue,
-        problemFilter,
+        withProblems,
         uptimeFilter,
         peerRoleFilter,
         filterGroup,
@@ -50,7 +50,7 @@ export const getNodes: FetchData<
         path: schemePathParam,
         database,
         filter: searchValue,
-        problems_only: getProblemParamValue(problemFilter),
+        problems_only: withProblems,
         uptime: getUptimeParamValue(uptimeFilter),
         filter_peer_role: peerRoleFilter,
         filter_group: filterGroup,
