@@ -37,7 +37,7 @@ export function Threads({nodeId, className, scrollContainerRef}: ThreadsProps) {
                     columns={columns}
                     settings={DEFAULT_TABLE_SETTINGS}
                     emptyDataMessage={i18n('alert_no-thread-data')}
-                    loading={isLoading}
+                    isLoading={isLoading}
                 />
             </TableWithControlsLayout.Table>
         </TableWithControlsLayout>
