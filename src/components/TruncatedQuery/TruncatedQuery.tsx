@@ -50,6 +50,7 @@ export const TruncatedQuery = ({
     return (
         <YDBSyntaxHighlighter
             language="yql"
+            className={b()}
             text={value}
             withClipboardButton={
                 hasClipboardButton

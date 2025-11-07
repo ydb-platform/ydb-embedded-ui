@@ -1,10 +1,5 @@
-export type Language =
-    | 'bash'
-    | 'cpp'
-    | 'csharp'
-    | 'go'
-    | 'java'
-    | 'javascript'
-    | 'php'
-    | 'python'
-    | 'yql';
+import type {BundledLanguage, BundledTheme} from 'shiki';
+
+export type Language = BundledLanguage | 'yql';
+
+export type Theme = BundledTheme | 'yql-light' | 'yql-dark';

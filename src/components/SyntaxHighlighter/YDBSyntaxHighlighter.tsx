@@ -1,28 +1,15 @@
 import React from 'react';
 
-import {nanoid} from '@reduxjs/toolkit';
-import {PrismLight as ReactSyntaxHighlighter} from 'react-syntax-highlighter';
+import {useThemeType} from '@gravity-ui/uikit';
 
 import type {ClipboardButtonProps} from '../ClipboardButton/ClipboardButton';
 import {ClipboardButton} from '../ClipboardButton/ClipboardButton';
 
 import {b} from './shared';
-import {useSyntaxHighlighterStyle} from './themes';
+import {highlightCode} from './shikiHighlighter';
 import type {Language} from './types';
-import {yql} from './yql';
 
 import './YDBSyntaxHighlighter.scss';
-
-async function registerLanguage(lang: Language) {
-    if (lang === 'yql') {
-        ReactSyntaxHighlighter.registerLanguage('yql', yql);
-    } else {
-        const {default: syntax} = await import(
-            `react-syntax-highlighter/dist/esm/languages/prism/${lang}`
-        );
-        ReactSyntaxHighlighter.registerLanguage(lang, syntax);
-    }
-}
 
 export interface WithClipboardButtonProp extends ClipboardButtonProps {
     alwaysVisible?: boolean;
@@ -43,17 +30,34 @@ export function YDBSyntaxHighlighter({
     transparentBackground = true,
     withClipboardButton,
 }: YDBSyntaxHighlighterProps) {
-    const [highlighterKey, setHighlighterKey] = React.useState('');
+    const [highlightedHtml, setHighlightedHtml] = React.useState<string>('');
+    const [isLoading, setIsLoading] = React.useState(true);
 
-    const style = useSyntaxHighlighterStyle(transparentBackground);
+    const themeType = useThemeType();
 
     React.useEffect(() => {
-        async function registerLangAndUpdateKey() {
-            await registerLanguage(language);
-            setHighlighterKey(nanoid());
+        let cancelled = false;
+
+        async function highlight() {
+            setIsLoading(true);
+            try {
+                const html = await highlightCode(text, language, themeType);
+                if (!cancelled) {
+                    setHighlightedHtml(html);
+                }
+            } catch (error) {
+                console.error('Failed to highlight code:', error);
+            } finally {
+                setIsLoading(false);
+            }
         }
-        registerLangAndUpdateKey();
-    }, [language]);
+
+        highlight();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [text, language, themeType]);
 
     const renderCopyButton = () => {
         if (!withClipboardButton) {
@@ -75,27 +79,42 @@ export function YDBSyntaxHighlighter({
     };
 
     let paddingStyles = {};
-
     if (withClipboardButton?.alwaysVisible) {
-        if (withClipboardButton.withLabel) {
-            paddingStyles = {paddingRight: 80};
-        } else {
+        if (withClipboardButton.withLabel === false) {
             paddingStyles = {paddingRight: 40};
+        } else {
+            paddingStyles = {paddingRight: 80};
         }
+    }
+
+    const containerStyle: React.CSSProperties = {
+        ...paddingStyles,
+    };
+
+    if (transparentBackground) {
+        containerStyle.background = 'transparent';
     }
 
     return (
         <div className={b(null, className)}>
             {renderCopyButton()}
 
-            <ReactSyntaxHighlighter
-                key={highlighterKey}
-                language={language}
-                style={style}
-                customStyle={{height: '100%', ...paddingStyles}}
-            >
-                {text}
-            </ReactSyntaxHighlighter>
+            {isLoading || !highlightedHtml ? (
+                <div
+                    style={containerStyle}
+                    className={b('content', {transparent: transparentBackground})}
+                >
+                    <pre>
+                        <code>{text}</code>
+                    </pre>
+                </div>
+            ) : (
+                <div
+                    className={b('content', {transparent: transparentBackground})}
+                    style={containerStyle}
+                    dangerouslySetInnerHTML={{__html: highlightedHtml}}
+                />
+            )}
         </div>
     );
 }
