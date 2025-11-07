@@ -1,5 +1,15 @@
 # Changelog
 
+## [12.15.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.15.0...v12.15.1) (2025-11-06)
+
+
+### Bug Fixes
+
+* **NodeHostWrapper:** correct node page path for storage nodes ([#3046](https://github.com/ydb-platform/ydb-embedded-ui/issues/3046)) ([351dbfb](https://github.com/ydb-platform/ydb-embedded-ui/commit/351dbfb90965d3255a6b242bd67848bb2a2cbf7c))
+* **Nodes:** fix version column overflow ([#3044](https://github.com/ydb-platform/ydb-embedded-ui/issues/3044)) ([29c36d9](https://github.com/ydb-platform/ydb-embedded-ui/commit/29c36d92df33debcfb11130f1ee1307e5de9303d))
+* problem filter to query ([#3047](https://github.com/ydb-platform/ydb-embedded-ui/issues/3047)) ([73a104e](https://github.com/ydb-platform/ydb-embedded-ui/commit/73a104e11dc01fe6e1323a5837b7105a65cb1ebf))
+* **ResizeableDataTable:** rework loading state ([#3048](https://github.com/ydb-platform/ydb-embedded-ui/issues/3048)) ([11848f5](https://github.com/ydb-platform/ydb-embedded-ui/commit/11848f5bb8ad1d294dc12288a4889e03adc171ba))
+
 ## [12.15.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.14.0...v12.15.0) (2025-11-05)
 
 
