@@ -1,10 +1,10 @@
 import type {YQLEntity} from '@gravity-ui/websql-autocomplete/yql';
 import type {FetchedColumn} from 'monaco-yql-languages/build/yql/autocomplete';
 import {registerCompletionItemProvider} from 'monaco-yql-languages/build/yql/autocomplete';
-import {LANGUAGE_ID} from 'monaco-yql-languages/build/yql/yql.contribution';
 
 import {isAutocompleteColumn} from '../../../types/api/autocomplete';
 import type {TAutocompleteEntity} from '../../../types/api/autocomplete';
+import {YQL_LANGUAGE_ID} from '../constats';
 
 import {
     checkIsDirectory,
@@ -66,7 +66,7 @@ export function registerYQLCompletionItemProvider(database: string) {
         return result;
     };
 
-    registerCompletionItemProvider(LANGUAGE_ID, [' ', '.', '`', '(', '/'], {
+    registerCompletionItemProvider(YQL_LANGUAGE_ID, [' ', '.', '`', '(', '/'], {
         fetchEntities,
         fetchEntityColumns,
         getEntitySettings,
