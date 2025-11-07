@@ -1,4 +1,3 @@
-import {createHighlighter} from 'shiki';
 import type {Highlighter} from 'shiki';
 
 import {yqlDarkTheme, yqlLightTheme} from './themes';
@@ -23,13 +22,18 @@ const loadedThemes = new Set<Theme>();
 
 /**
  * Get or create the single highlighter instance
+ * Lazy loads the shiki library on first use
  */
 async function getHighlighter(): Promise<Highlighter> {
     if (!highlighterPromise) {
-        highlighterPromise = createHighlighter({
-            themes: [],
-            langs: [],
-        });
+        // Dynamically import shiki library only when needed
+        highlighterPromise = (async () => {
+            const {createHighlighter} = await import('shiki');
+            return createHighlighter({
+                themes: [],
+                langs: [],
+            });
+        })();
     }
     return highlighterPromise;
 }
