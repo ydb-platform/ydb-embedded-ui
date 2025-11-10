@@ -24,6 +24,7 @@ import type {PreparedNode} from '../../store/reducers/node/types';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {checkIsStorageNode} from '../../utils/nodes';
 import {useAppTitle} from '../App/AppTitleContext';
 import {Configs} from '../Configs/Configs';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
@@ -38,8 +39,6 @@ import i18n from './i18n';
 import './Node.scss';
 
 const b = cn('node');
-
-const STORAGE_ROLE = 'Storage';
 
 export function Node() {
     const container = React.useRef<HTMLDivElement>(null);
@@ -73,7 +72,7 @@ export function Node() {
 
     const pageLoading = isLoading || !capabilitiesLoaded;
 
-    const isStorageNode = node?.Roles?.find((el) => el === STORAGE_ROLE);
+    const isStorageNode = checkIsStorageNode(node);
 
     const threadsQuantity = node?.Threads?.length;
 

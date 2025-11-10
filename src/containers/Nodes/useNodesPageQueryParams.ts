@@ -1,4 +1,6 @@
-import {StringParam, useQueryParams} from 'use-query-params';
+import React from 'react';
+
+import {BooleanParam, StringParam, useQueryParams} from 'use-query-params';
 
 import {useViewerNodesHandlerHasGroupingBySystemState} from '../../store/reducers/capabilities/hooks';
 import type {NodesGroupByField, NodesPeerRole} from '../../types/api/nodes';
@@ -18,12 +20,14 @@ export function useNodesPageQueryParams(
         peerRole: StringParam,
         search: StringParam,
         nodesGroupBy: StringParam,
+        withProblems: BooleanParam,
     });
 
     const isViewerUser = useIsViewerUser();
 
     const uptimeFilter = nodesUptimeFilterValuesSchema.parse(queryParams.uptimeFilter);
     const searchValue = queryParams.search ?? '';
+    const withProblems = Boolean(queryParams.withProblems);
 
     let peerRoleFilter: NodesPeerRole | undefined;
 
@@ -41,28 +45,48 @@ export function useNodesPageQueryParams(
         systemStateGroupingAvailable,
     );
 
-    const handleSearchQueryChange = (value: string) => {
-        setQueryParams({search: value || undefined}, 'replaceIn');
-    };
-    const handleUptimeFilterChange = (value: NodesUptimeFilterValues) => {
-        setQueryParams({uptimeFilter: value}, 'replaceIn');
-    };
-    const handlePeerRoleFilterChange = (value: NodesPeerRole) => {
-        setQueryParams({peerRole: value}, 'replaceIn');
-    };
-    const handleGroupByParamChange = (value: string) => {
-        setQueryParams({nodesGroupBy: value}, 'replaceIn');
-    };
+    const handleSearchQueryChange = React.useCallback(
+        (value: string) => {
+            setQueryParams({search: value || undefined}, 'replaceIn');
+        },
+        [setQueryParams],
+    );
+    const handleUptimeFilterChange = React.useCallback(
+        (value: NodesUptimeFilterValues) => {
+            setQueryParams({uptimeFilter: value}, 'replaceIn');
+        },
+        [setQueryParams],
+    );
+    const handlePeerRoleFilterChange = React.useCallback(
+        (value: NodesPeerRole) => {
+            setQueryParams({peerRole: value}, 'replaceIn');
+        },
+        [setQueryParams],
+    );
+    const handleGroupByParamChange = React.useCallback(
+        (value: string) => {
+            setQueryParams({nodesGroupBy: value}, 'replaceIn');
+        },
+        [setQueryParams],
+    );
+    const handleWithProblemsChange = React.useCallback(
+        (value: boolean) => {
+            setQueryParams({withProblems: value || undefined}, 'replaceIn');
+        },
+        [setQueryParams],
+    );
 
     return {
         uptimeFilter,
         searchValue,
         peerRoleFilter,
         groupByParam,
+        withProblems,
 
         handleSearchQueryChange,
         handleUptimeFilterChange,
         handlePeerRoleFilterChange,
         handleGroupByParamChange,
+        handleWithProblemsChange,
     };
 }

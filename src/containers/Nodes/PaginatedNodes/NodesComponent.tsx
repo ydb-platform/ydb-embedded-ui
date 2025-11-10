@@ -7,7 +7,6 @@ import {NODES_COLUMNS_TITLES} from '../../../components/nodesColumns/constants';
 import type {NodesColumnId} from '../../../components/nodesColumns/constants';
 import type {NodesColumn} from '../../../components/nodesColumns/types';
 import {useViewerNodesHandlerHasGrouping} from '../../../store/reducers/capabilities/hooks';
-import {useProblemFilter} from '../../../store/reducers/settings/hooks';
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField} from '../../../types/api/nodes';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
@@ -43,11 +42,10 @@ export function NodesComponent({
     groupByParams,
     onDataFetched,
 }: NodesComponentProps) {
-    const {searchValue, uptimeFilter, peerRoleFilter} = useNodesPageQueryParams(
+    const {searchValue, uptimeFilter, peerRoleFilter, withProblems} = useNodesPageQueryParams(
         groupByParams,
         withPeerRoleFilter,
     );
-    const {problemFilter} = useProblemFilter();
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
@@ -81,7 +79,7 @@ export function NodesComponent({
                     database={database}
                     databaseFullPath={databaseFullPath}
                     searchValue={searchValue}
-                    problemFilter={problemFilter}
+                    withProblems={withProblems}
                     uptimeFilter={uptimeFilter}
                     peerRoleFilter={peerRoleFilter}
                     columns={columnsToShow}
@@ -91,7 +89,7 @@ export function NodesComponent({
             }
             tableWrapperProps={{
                 scrollContainerRef,
-                scrollDependencies: [searchValue, problemFilter, uptimeFilter, peerRoleFilter],
+                scrollDependencies: [searchValue, withProblems, uptimeFilter, peerRoleFilter],
             }}
         />
     );

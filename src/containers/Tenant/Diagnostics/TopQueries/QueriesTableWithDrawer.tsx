@@ -104,7 +104,7 @@ export function QueriesTableWithDrawer({
                 columnsWidthLSKey={columnsWidthLSKey}
                 columns={columns}
                 data={data}
-                loading={loading}
+                isFetching={loading}
                 settings={tableSettings}
                 onRowClick={handleRowClick}
                 rowClassName={(row) => b('row', {active: isEqual(row, selectedRow)})}

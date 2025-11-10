@@ -83,8 +83,7 @@ function Header() {
     const isDeleteDBAvailable =
         useDeleteDatabaseFeatureAvailable() && uiFactory.onDeleteDB !== undefined;
 
-    const shouldRequestTenantData =
-        database && isDatabasePage && (isEditDBAvailable || isDeleteDBAvailable);
+    const shouldRequestTenantData = database && isDatabasePage;
 
     const params = shouldRequestTenantData
         ? {database, clusterName, isMetaDatabasesAvailable}

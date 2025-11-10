@@ -1,23 +1,35 @@
+import React from 'react';
+
 import {SegmentedRadioGroup} from '@gravity-ui/uikit';
 
-import {ProblemFilterValues} from '../../store/reducers/settings/settings';
-import type {ProblemFilterValue} from '../../store/reducers/settings/types';
+import i18n from './i18n';
 
 interface ProblemFilterProps {
-    value: ProblemFilterValue;
-    onChange: (value: ProblemFilterValue) => void;
+    value: boolean;
+    onChange: (value: boolean) => void;
     className?: string;
 }
 
-export const ProblemFilter = ({value, onChange, className}: ProblemFilterProps) => {
+export function ProblemFilter({value, onChange, className}: ProblemFilterProps) {
+    const handleValueChange = React.useCallback(
+        (value: string) => {
+            onChange(value === 'true');
+        },
+        [onChange],
+    );
+
     return (
-        <SegmentedRadioGroup value={value} onUpdate={onChange} className={className}>
-            <SegmentedRadioGroup.Option value={ProblemFilterValues.ALL}>
-                {ProblemFilterValues.ALL}
+        <SegmentedRadioGroup
+            value={value.toString()}
+            onUpdate={handleValueChange}
+            className={className}
+        >
+            <SegmentedRadioGroup.Option value={'false'}>
+                {i18n('value_all')}
             </SegmentedRadioGroup.Option>
-            <SegmentedRadioGroup.Option value={ProblemFilterValues.PROBLEMS}>
-                {ProblemFilterValues.PROBLEMS}
+            <SegmentedRadioGroup.Option value={'true'}>
+                {i18n('value_with-problems')}
             </SegmentedRadioGroup.Option>
         </SegmentedRadioGroup>
     );
-};
+}

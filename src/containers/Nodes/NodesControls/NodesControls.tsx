@@ -3,14 +3,13 @@ import React from 'react';
 import {Select, Text} from '@gravity-ui/uikit';
 
 import {EntitiesCount} from '../../../components/EntitiesCount';
-import {ProblemFilter} from '../../../components/ProblemFilter';
+import {ProblemFilter} from '../../../components/ProblemFilter/ProblemFilter';
 import {Search} from '../../../components/Search';
 import {UptimeFilter} from '../../../components/UptimeFIlter';
 import {
     useViewerNodesHandlerHasGroupingBySystemState,
     useViewerNodesHandlerHasNetworkStats,
 } from '../../../store/reducers/capabilities/hooks';
-import {useProblemFilter} from '../../../store/reducers/settings/hooks';
 import type {NodesGroupByField} from '../../../types/api/nodes';
 import {useIsViewerUser} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {PeerRoleFilter} from '../PeerRoleFilter/PeerRoleFilter';
@@ -45,13 +44,14 @@ export function NodesControls({
         uptimeFilter,
         peerRoleFilter,
         groupByParam,
+        withProblems,
 
         handleSearchQueryChange,
         handleUptimeFilterChange,
         handlePeerRoleFilterChange,
         handleGroupByParamChange,
+        handleWithProblemsChange,
     } = useNodesPageQueryParams(groupByParams, withPeerRoleFilter);
-    const {problemFilter, handleProblemFilterChange} = useProblemFilter();
     const isViewerUser = useIsViewerUser();
 
     const systemStateGroupingAvailable = useViewerNodesHandlerHasGroupingBySystemState();
@@ -73,7 +73,7 @@ export function NodesControls({
                 value={searchValue}
             />
             {systemStateGroupingAvailable && withGroupBySelect ? null : (
-                <ProblemFilter value={problemFilter} onChange={handleProblemFilterChange} />
+                <ProblemFilter value={withProblems} onChange={handleWithProblemsChange} />
             )}
             {withGroupBySelect ? null : (
                 <UptimeFilter value={uptimeFilter} onChange={handleUptimeFilterChange} />

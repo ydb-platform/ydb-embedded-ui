@@ -1,10 +1,9 @@
 import type {NodesGroupByField, NodesPeerRole} from '../../../types/api/nodes';
 import type {NodesUptimeFilterValues} from '../../../utils/nodes';
-import type {ProblemFilterValue} from '../settings/types';
 
 export interface NodesFilters {
     searchValue: string;
-    problemFilter: ProblemFilterValue;
+    withProblems: boolean;
     uptimeFilter: NodesUptimeFilterValues;
     peerRoleFilter?: NodesPeerRole;
 
