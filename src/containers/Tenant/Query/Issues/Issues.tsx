@@ -26,48 +26,98 @@ const blockIssue = cn('kv-issue');
 interface ResultIssuesProps {
     data: ErrorResponse | string;
     hideSeverity?: boolean;
+
+    // 'inline': Expands/collapses the full issues tree right below the preview.
+    // 'modal': Opens the full issues tree in an extra modal on "Show details".
+    detailsMode?: 'inline' | 'modal';
+    onOpenDetails?: () => void;
+
+    // 'single': Show a single top line: "<Severity> Error + root error.message".
+    // 'multi': If there is no root error.message, preview can show all first-level issues.
+    // Otherwise falls back to 'single'.
+    titlePreviewMode?: 'single' | 'multi';
 }
 
-export function ResultIssues({data, hideSeverity}: ResultIssuesProps) {
+export function ResultIssues({
+    data,
+    hideSeverity,
+    detailsMode = 'inline',
+    onOpenDetails,
+    titlePreviewMode = 'single',
+}: ResultIssuesProps) {
     const [showIssues, setShowIssues] = React.useState(false);
 
     const issues = typeof data === 'string' ? undefined : data?.issues;
     const hasIssues = Array.isArray(issues) && issues.length > 0;
 
-    const renderTitle = () => {
-        let content;
-        if (typeof data === 'string') {
-            content = data;
-        } else {
-            const severity = getSeverity(data?.error?.severity);
-            content = (
+    const rootHasMessage = typeof data === 'string' ? undefined : data?.error?.message;
+
+    const isMultiApplicable = titlePreviewMode === 'multi' && hasIssues && !rootHasMessage;
+
+    const renderSinglePreviewLine = (severity: SEVERITY, message?: string) => (
+        <React.Fragment>
+            {hideSeverity ? null : (
                 <React.Fragment>
-                    {hideSeverity ? null : (
-                        <React.Fragment>
-                            <IssueSeverity severity={severity} />{' '}
-                        </React.Fragment>
-                    )}
-                    <span className={blockWrapper('error-message-text')}>
-                        {data?.error?.message}
-                    </span>
+                    <IssueSeverity severity={severity} />{' '}
                 </React.Fragment>
+            )}
+            <span className={blockWrapper('error-message-text')}>{message}</span>
+        </React.Fragment>
+    );
+
+    const renderTitle = () => {
+        if (typeof data === 'string') {
+            return data;
+        }
+
+        if (isMultiApplicable) {
+            return (
+                <div className={blockWrapper('error-list')}>
+                    {issues.map((issue, idx) => {
+                        const severity = getSeverity(issue.severity);
+                        return (
+                            <div className={blockWrapper('error-list-item')} key={idx}>
+                                {renderSinglePreviewLine(severity, issue.message)}
+                            </div>
+                        );
+                    })}
+                </div>
             );
         }
 
-        return content;
+        const severity = getSeverity(data?.error?.severity);
+        return renderSinglePreviewLine(severity, data?.error?.message ?? '');
+    };
+
+    const renderDetailsControl = () => {
+        if (!hasIssues) {
+            return null;
+        }
+
+        if (detailsMode === 'modal') {
+            return (
+                <Button view="normal" onClick={() => onOpenDetails?.()}>
+                    Show details
+                </Button>
+            );
+        }
+
+        return (
+            <Button view="normal" onClick={() => setShowIssues(!showIssues)}>
+                {showIssues ? 'Hide details' : 'Show details'}
+            </Button>
+        );
     };
 
     return (
         <div className={blockWrapper()}>
-            <div className={blockWrapper('error-message')}>
+            <div className={blockWrapper('error-message', {column: isMultiApplicable})}>
                 {renderTitle()}
-                {hasIssues && (
-                    <Button view="normal" onClick={() => setShowIssues(!showIssues)}>
-                        {showIssues ? 'Hide details' : 'Show details'}
-                    </Button>
-                )}
+                {renderDetailsControl()}
             </div>
-            {hasIssues && showIssues && <Issues hideSeverity={hideSeverity} issues={issues} />}
+            {detailsMode === 'inline' && hasIssues && showIssues && (
+                <Issues hideSeverity={hideSeverity} issues={issues} />
+            )}
         </div>
     );
 }

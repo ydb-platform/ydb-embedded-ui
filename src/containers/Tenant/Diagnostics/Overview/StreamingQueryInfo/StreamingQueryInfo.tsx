@@ -1,7 +1,7 @@
 import React from 'react';
 
 import NiceModal from '@ebay/nice-modal-react';
-import {Button, Flex, Label} from '@gravity-ui/uikit';
+import {Flex, Label} from '@gravity-ui/uikit';
 
 import {CONFIRMATION_DIALOG} from '../../../../../components/ConfirmationDialog/ConfirmationDialog';
 import {YDBSyntaxHighlighter} from '../../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
@@ -12,7 +12,7 @@ import type {ErrorResponse} from '../../../../../types/api/query';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import type {IQueryResult} from '../../../../../types/store/query';
 import {getStringifiedData} from '../../../../../utils/dataFormatters/dataFormatters';
-import {ResultIssues} from '../../../Query/Issues/Issues';
+import {Issues, ResultIssues} from '../../../Query/Issues/Issues';
 import {getEntityName} from '../../../utils';
 
 import i18n from './i18n';
@@ -83,6 +83,7 @@ function prepareStreamingQueryItems(sysData?: IQueryResult): YDBDefinitionListIt
     const normalizedQueryText = normalizeQueryText(queryText);
 
     const errorRaw = sysData.resultSets?.[0]?.result?.[0]?.Error;
+
     let errorData: ErrorResponse | string | undefined;
     if (typeof errorRaw === 'string') {
         try {
@@ -100,21 +101,22 @@ function prepareStreamingQueryItems(sysData?: IQueryResult): YDBDefinitionListIt
     });
 
     if (errorData && Object.keys(errorData).length > 0) {
+        const issues = typeof errorData === 'string' ? undefined : errorData.issues;
+
         info.push({
             name: i18n('state.error'),
             content: (
-                <Button
-                    size="s"
-                    view="normal"
-                    onClick={() =>
+                <ResultIssues
+                    data={errorData}
+                    titlePreviewMode="multi"
+                    detailsMode="modal"
+                    onOpenDetails={() =>
                         NiceModal.show(CONFIRMATION_DIALOG, {
                             caption: i18n('state.error'),
-                            children: <ResultIssues data={errorData} />,
+                            children: <Issues issues={issues ?? []} />,
                         })
                     }
-                >
-                    {i18n('error.detailsButton')}
-                </Button>
+                />
             ),
         });
     }
