@@ -48,6 +48,13 @@ export function getInfoTabLinks(
 
     const links: DatabaseLink[] = [];
 
+    if (additionalProps.getMonitoringLink) {
+        const link = additionalProps.getMonitoringLink(name, type);
+        if (link) {
+            links.push({title: i18n('field_monitoring-link'), url: link, icon: monitoringIcon});
+        }
+    }
+
     if (additionalProps.getLogsLink) {
         const link = additionalProps.getLogsLink(name);
         if (link) {
