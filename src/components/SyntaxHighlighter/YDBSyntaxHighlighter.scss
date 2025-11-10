@@ -46,12 +46,6 @@
             word-break: break-word;
             @include mixins.text-code-2();
         }
-
-        &_transparent {
-            pre {
-                background: transparent !important;
-            }
-        }
     }
 
     .data-table__row:hover &__copy,

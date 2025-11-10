@@ -48,7 +48,9 @@ export function YDBSyntaxHighlighter({
             } catch (error) {
                 console.error('Failed to highlight code:', error);
             } finally {
-                setIsLoading(false);
+                if (!cancelled) {
+                    setIsLoading(false);
+                }
             }
         }
 
