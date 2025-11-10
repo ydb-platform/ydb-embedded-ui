@@ -2,6 +2,5 @@
   "noData": "No data for entity:",
   "state.label": "State",
   "state.error": "Error",
-  "text.label": "Text",
-  "error.detailsButton": "Show error"
+  "text.label": "Text"
 }
