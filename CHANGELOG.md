@@ -1,5 +1,17 @@
 # Changelog
 
+## [12.16.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.15.1...v12.16.0) (2025-11-10)
+
+
+### Features
+
+* update grammar and highlight ([#3050](https://github.com/ydb-platform/ydb-embedded-ui/issues/3050)) ([4971ad3](https://github.com/ydb-platform/ydb-embedded-ui/commit/4971ad3602e11517df5b0e8220a8e4b37fc6d69c))
+
+
+### Bug Fixes
+
+* always request database data on database page ([#3057](https://github.com/ydb-platform/ydb-embedded-ui/issues/3057)) ([f464ffb](https://github.com/ydb-platform/ydb-embedded-ui/commit/f464ffb1a788012e92a20d7dc0f4dddd2a6b6e12))
+
 ## [12.15.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.15.0...v12.15.1) (2025-11-06)
 
 
