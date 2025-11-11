@@ -8,6 +8,7 @@ import {
     isSessionChunk,
     isStreamDataChunk,
 } from '../../store/reducers/query/utils';
+import {readSettingValueFromLS} from '../../store/reducers/settings/utils';
 import type {Actions, StreamQueryParams} from '../../types/api/query';
 import type {
     QueryResponseChunk,
@@ -15,12 +16,8 @@ import type {
     StreamDataChunk,
     StreamingChunk,
 } from '../../types/store/streaming';
-import {
-    BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
-    DEV_ENABLE_TRACING_FOR_ALL_REQUESTS,
-} from '../../utils/constants';
+import {DEV_ENABLE_TRACING_FOR_ALL_REQUESTS} from '../../utils/constants';
 import {isRedirectToAuth} from '../../utils/response';
-import {settingsManager} from '../settings';
 
 import {BaseYdbAPI} from './base';
 
@@ -44,10 +41,7 @@ export class StreamingAPI extends BaseYdbAPI {
         params: StreamQueryParams<Action>,
         options: StreamQueryOptions,
     ) {
-        const base64 = !settingsManager.readUserSettingsValue(
-            BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
-            true,
-        );
+        const base64 = params.base64;
 
         const queryParams = qs.stringify(
             {timeout: params.timeout, base64, schema: 'multipart'},
@@ -68,9 +62,7 @@ export class StreamingAPI extends BaseYdbAPI {
             headers.set('X-Trace-Verbosity', String(params.tracingLevel));
         }
 
-        const enableTracing = settingsManager.readUserSettingsValue(
-            DEV_ENABLE_TRACING_FOR_ALL_REQUESTS,
-        );
+        const enableTracing = readSettingValueFromLS(DEV_ENABLE_TRACING_FOR_ALL_REQUESTS);
 
         if (enableTracing) {
             headers.set('X-Want-Trace', '1');

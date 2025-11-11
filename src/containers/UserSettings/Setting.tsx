@@ -1,6 +1,6 @@
 import {SegmentedRadioGroup, Switch} from '@gravity-ui/uikit';
 
-import {useSetting} from '../../utils/hooks';
+import {useSetting} from '../../store/reducers/settings/useSetting';
 
 export interface SettingsInfoFieldProps {
     type: 'info';
@@ -17,18 +17,11 @@ export interface SettingProps {
     description?: React.ReactNode;
     settingKey: string;
     options?: {value: string; content: string}[];
-    defaultValue?: unknown;
     onValueUpdate?: VoidFunction;
 }
 
-export const Setting = ({
-    type = 'switch',
-    settingKey,
-    options,
-    defaultValue,
-    onValueUpdate,
-}: SettingProps) => {
-    const [settingValue, setValue] = useSetting(settingKey, defaultValue);
+export const Setting = ({type = 'switch', settingKey, options, onValueUpdate}: SettingProps) => {
+    const {value, saveValue: setValue} = useSetting(settingKey);
 
     const onUpdate = (value: unknown) => {
         setValue(value);
@@ -37,7 +30,7 @@ export const Setting = ({
 
     switch (type) {
         case 'switch': {
-            return <Switch checked={Boolean(settingValue)} onUpdate={onUpdate} />;
+            return <Switch checked={Boolean(value)} onUpdate={onUpdate} />;
         }
 
         case 'radio': {
@@ -46,7 +39,7 @@ export const Setting = ({
             }
 
             return (
-                <SegmentedRadioGroup value={String(settingValue)} onUpdate={onUpdate}>
+                <SegmentedRadioGroup value={String(value)} onUpdate={onUpdate}>
                     {options.map(({value, content}) => {
                         return (
                             <SegmentedRadioGroup.Option value={value} key={value}>

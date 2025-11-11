@@ -6,9 +6,9 @@ import {AsideHeader, FooterItem} from '@gravity-ui/navigation';
 import type {IconData} from '@gravity-ui/uikit';
 import {useHistory} from 'react-router-dom';
 
+import {SETTING_KEYS} from '../../store/reducers/settings/constants';
+import {useSetting} from '../../store/reducers/settings/useSetting';
 import {cn} from '../../utils/cn';
-import {ASIDE_HEADER_COMPACT_KEY} from '../../utils/constants';
-import {useSetting} from '../../utils/hooks';
 
 import {InformationPopup} from './InformationPopup';
 import {useHotkeysPanel} from './hooks/useHotkeysPanel';
@@ -76,7 +76,9 @@ export function AsideNavigation(props: AsideNavigationProps) {
 
     const [visiblePanel, setVisiblePanel] = React.useState<Panel>();
     const [informationPopupVisible, setInformationPopupVisible] = React.useState(false);
-    const [compact, setIsCompact] = useSetting<boolean>(ASIDE_HEADER_COMPACT_KEY);
+    const {value: compact, saveValue: setIsCompact} = useSetting<boolean>(
+        SETTING_KEYS.ASIDE_HEADER_COMPACT,
+    );
 
     const toggleInformationPopup = () => setInformationPopupVisible((prev) => !prev);
 
@@ -110,7 +112,7 @@ export function AsideNavigation(props: AsideNavigationProps) {
                     onClick: () => history.push('/'),
                 }}
                 menuItems={props.menuItems}
-                compact={compact}
+                compact={Boolean(compact)}
                 onChangeCompact={setIsCompact}
                 className={b()}
                 renderContent={() => props.content}

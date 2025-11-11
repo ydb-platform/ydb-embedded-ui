@@ -6,21 +6,12 @@ import throttle from 'lodash/throttle';
 import type Monaco from 'monaco-editor';
 
 import {MonacoEditor} from '../../../../components/MonacoEditor/MonacoEditor';
-import {
-    goToNextQuery,
-    goToPreviousQuery,
-    selectQueriesHistory,
-    selectUserInput,
-    setIsDirty,
-} from '../../../../store/reducers/query/query';
+import {selectUserInput, setIsDirty} from '../../../../store/reducers/query/query';
+import {useQueryHistory} from '../../../../store/reducers/query/useQueryHistory';
+import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
+import {useSetting} from '../../../../store/reducers/settings/useSetting';
 import type {QueryAction} from '../../../../types/store/query';
-import {ENABLE_CODE_ASSISTANT, LAST_USED_QUERY_ACTION_KEY} from '../../../../utils/constants';
-import {
-    useEventHandler,
-    useSetting,
-    useTypedDispatch,
-    useTypedSelector,
-} from '../../../../utils/hooks';
+import {useEventHandler, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {YQL_LANGUAGE_ID} from '../../../../utils/monaco/constats';
 import {useUpdateErrorsHighlighting} from '../../../../utils/monaco/highlightErrors';
 import {QUERY_ACTIONS} from '../../../../utils/query';
@@ -49,13 +40,15 @@ export function YqlEditor({
     const dispatch = useTypedDispatch();
     const [monacoGhostInstance, setMonacoGhostInstance] =
         React.useState<ReturnType<typeof createMonacoGhostInstance>>();
-    const historyQueries = useTypedSelector(selectQueriesHistory);
-    const [isCodeAssistEnabled] = useSetting(ENABLE_CODE_ASSISTANT);
+    const {queries: historyQueries, goToPreviousQuery, goToNextQuery} = useQueryHistory();
+    const {value: isCodeAssistEnabled} = useSetting(SETTING_KEYS.ENABLE_CODE_ASSISTANT);
 
     const editorOptions = useEditorOptions();
     const updateErrorsHighlighting = useUpdateErrorsHighlighting();
 
-    const [lastUsedQueryAction] = useSetting<QueryAction>(LAST_USED_QUERY_ACTION_KEY);
+    const {value: lastUsedQueryAction} = useSetting<QueryAction>(
+        SETTING_KEYS.LAST_USED_QUERY_ACTION,
+    );
 
     const getLastQueryText = useEventHandler(() => {
         if (!historyQueries || historyQueries.length === 0) {
@@ -160,7 +153,7 @@ export function YqlEditor({
             contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
             contextMenuOrder: 2,
             run: () => {
-                dispatch(goToPreviousQuery());
+                goToPreviousQuery();
             },
         });
         editor.addAction({
@@ -169,7 +162,7 @@ export function YqlEditor({
             contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
             contextMenuOrder: 3,
             run: () => {
-                dispatch(goToNextQuery());
+                goToNextQuery();
             },
         });
         editor.addAction({

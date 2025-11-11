@@ -32,9 +32,6 @@ export const paramSetup = {
             stateKey: 'heatmap.currentMetric',
             initialState: initialHeatmapState.currentMetric,
         },
-        tenantPage: {
-            stateKey: 'tenant.tenantPage',
-        },
         queryTab: {
             stateKey: 'tenant.queryTab',
         },
@@ -81,9 +78,6 @@ export const paramSetup = {
         currentMetric: {
             stateKey: 'heatmap.currentMetric',
             initialState: initialHeatmapState.currentMetric,
-        },
-        tenantPage: {
-            stateKey: 'tenant.tenantPage',
         },
         queryTab: {
             stateKey: 'tenant.queryTab',

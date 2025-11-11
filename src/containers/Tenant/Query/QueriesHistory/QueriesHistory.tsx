@@ -5,12 +5,12 @@ import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
 import {
-    selectQueriesHistory,
     selectQueriesHistoryFilter,
     setIsDirty,
     setQueryHistoryFilter,
 } from '../../../../store/reducers/query/query';
 import type {QueryInHistory} from '../../../../store/reducers/query/types';
+import {useQueryHistory} from '../../../../store/reducers/query/useQueryHistory';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import {cn} from '../../../../utils/cn';
@@ -34,9 +34,10 @@ interface QueriesHistoryProps {
 function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
     const dispatch = useTypedDispatch();
 
-    const queriesHistory = useTypedSelector(selectQueriesHistory);
+    const {filteredQueries, isLoading} = useQueryHistory();
+
     const filter = useTypedSelector(selectQueriesHistoryFilter);
-    const reversedHistory = [...queriesHistory].reverse();
+    const reversedHistory = [...filteredQueries].reverse();
 
     const applyQueryClick = (query: QueryInHistory) => {
         changeUserInput({input: query.queryText});
@@ -96,6 +97,7 @@ function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
                 <ResizeableDataTable
                     columnsWidthLSKey={QUERIES_HISTORY_COLUMNS_WIDTH_LS_KEY}
                     columns={columns}
+                    isLoading={isLoading}
                     data={reversedHistory}
                     settings={QUERY_TABLE_SETTINGS}
                     emptyDataMessage={i18n(filter ? 'history.empty-search' : 'history.empty')}

@@ -1,26 +1,66 @@
 import React from 'react';
 
 import {selectSavedQueriesFilter} from '../../../../store/reducers/queryActions/queryActions';
+import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
+import {useSetting} from '../../../../store/reducers/settings/useSetting';
 import type {SavedQuery} from '../../../../types/store/query';
-import {SAVED_QUERIES_KEY} from '../../../../utils/constants';
-import {useSetting, useTypedSelector} from '../../../../utils/hooks';
+import {useTypedSelector} from '../../../../utils/hooks';
 
 export function useSavedQueries() {
-    const [savedQueries] = useSetting<SavedQuery[]>(SAVED_QUERIES_KEY, []);
+    const {
+        value: savedQueries,
+        saveValue: saveQueries,
+        isLoading,
+    } = useSetting<SavedQuery[]>(SETTING_KEYS.SAVED_QUERIES);
+    const filter = useTypedSelector(selectSavedQueriesFilter).toLowerCase();
+    const currentInput = useTypedSelector((state) => state.query.input);
 
-    return savedQueries;
-}
+    const filteredQueries = React.useMemo(() => {
+        const queries = savedQueries ?? [];
 
-export function useFilteredSavedQueries() {
-    const savedQueries = useSavedQueries();
-    const filter = useTypedSelector(selectSavedQueriesFilter).trim().toLowerCase();
-
-    const filteredSavedQueries = React.useMemo(() => {
-        if (filter.length === 0) {
-            return savedQueries;
+        if (filter) {
+            return queries.filter((item) => item.body.toLowerCase().includes(filter));
         }
-        return savedQueries.filter((item) => item.body.toLowerCase().includes(filter));
-    }, [savedQueries, filter]);
+        return queries;
+    }, [filter, savedQueries]);
 
-    return filteredSavedQueries;
+    const deleteSavedQuery = React.useCallback(
+        (queryName: string) => {
+            const nextSavedQueries = savedQueries?.filter(
+                (el) => el.name.toLowerCase() !== queryName.toLowerCase(),
+            );
+
+            saveQueries(nextSavedQueries);
+        },
+        [savedQueries, saveQueries],
+    );
+
+    const saveNewQuery = React.useCallback(
+        (queryName: string | null) => {
+            if (queryName === null) {
+                return;
+            }
+
+            let nextSavedQueries: SavedQuery[] = [];
+
+            if (savedQueries) {
+                nextSavedQueries = [...savedQueries];
+            }
+
+            const query = nextSavedQueries.find(
+                (el) => el.name.toLowerCase() === queryName.toLowerCase(),
+            );
+
+            if (query) {
+                query.body = currentInput;
+            } else {
+                nextSavedQueries.push({name: queryName, body: currentInput});
+            }
+
+            saveQueries(nextSavedQueries);
+        },
+        [savedQueries, saveQueries, currentInput],
+    );
+
+    return {savedQueries, filteredQueries, saveNewQuery, deleteSavedQuery, isLoading} as const;
 }

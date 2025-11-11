@@ -36,6 +36,7 @@ import {prepareSystemViewType} from '../../../utils/schema';
 import {EntityTitle} from '../EntityTitle/EntityTitle';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
 import {useCurrentSchema} from '../TenantContext';
+import {useTenantPage} from '../TenantNavigation/useTenantNavigation';
 import {TENANT_INFO_TABS, TENANT_SCHEMA_TAB, TenantTabsGroups} from '../TenantPages';
 import {useTenantQueryParams} from '../useTenantQueryParams';
 import {getSummaryControls} from '../utils/controls';
@@ -90,6 +91,8 @@ export function ObjectSummary({
     const {summaryTab = TENANT_SUMMARY_TABS_IDS.overview} = useTypedSelector(
         (state) => state.tenant,
     );
+
+    const {handleTenantPageChange} = useTenantPage();
 
     const location = useLocation();
 
@@ -411,7 +414,7 @@ export function ObjectSummary({
                 {showPreview &&
                     getSummaryControls(
                         dispatch,
-                        {setActivePath: handleSchemaChange},
+                        {setActivePath: handleSchemaChange, setTenantPage: handleTenantPageChange},
                         'm',
                     )(path, 'preview')}
                 <ClipboardButton

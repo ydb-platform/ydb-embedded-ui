@@ -44,7 +44,8 @@ export function ResizeableDataTable<T>({
     data,
     ...props
 }: ResizeableDataTableProps<T>) {
-    const [tableColumnsWidth, setTableColumnsWidth] = useTableResize(columnsWidthLSKey);
+    const [tableColumnsWidth, setTableColumnsWidth, isTableWidthLoading] =
+        useTableResize(columnsWidthLSKey);
 
     const handleSort = React.useCallback(
         (params: SortOrder | SortOrder[] | undefined) => {
@@ -82,7 +83,7 @@ export function ResizeableDataTable<T>({
         };
     }, [settings]);
 
-    if (isLoading) {
+    if (isLoading || isTableWidthLoading) {
         return <TableSkeleton rows={loadingSkeletonRowsCount} />;
     }
 
