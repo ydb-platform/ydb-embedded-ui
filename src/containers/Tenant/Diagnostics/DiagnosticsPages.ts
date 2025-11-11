@@ -10,7 +10,7 @@ import {EPathSubType, EPathType} from '../../../types/api/schema';
 import type {ETenantType} from '../../../types/api/tenant';
 import type {TenantQuery} from '../TenantPages';
 import {TenantTabsGroups} from '../TenantPages';
-import {isDatabaseEntityType, isTopicEntityType} from '../utils/schema';
+import {isDatabaseEntityType, isEntityWithTopicData} from '../utils/schema';
 
 interface Badge {
     text: string;
@@ -166,7 +166,7 @@ const SYSTEM_VIEW_PAGES = [overview, schema, nodes, describe, access];
 
 const DIR_PAGES = [overview, topShards, nodes, describe, access];
 
-const CDC_STREAM_PAGES = [overview, consumers, partitions, nodes, describe, access];
+const CDC_STREAM_PAGES = [overview, consumers, partitions, topicData, nodes, describe, access];
 const CDC_STREAM_IMPL_PAGES = [overview, nodes, tablets, describe, access];
 const TOPIC_PAGES = [overview, consumers, partitions, topicData, nodes, tablets, describe, access];
 
@@ -231,7 +231,7 @@ function getDatabasePages(databaseType?: ETenantType) {
 function applyFilters(pages: Page[], type?: EPathType, options: GetPagesOptions = {}) {
     let result = pages;
 
-    if (isTopicEntityType(type) && !options.hasTopicData) {
+    if (isEntityWithTopicData(type) && !options.hasTopicData) {
         result = result.filter((p) => p.id !== TENANT_DIAGNOSTICS_TABS_IDS.topicData);
     }
 
