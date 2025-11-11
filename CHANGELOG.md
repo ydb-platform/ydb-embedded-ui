@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.17.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.17.0...v12.17.1) (2025-11-11)
+
+
+### Bug Fixes
+
+* downgrade shiki to 3.14.0 ([#3066](https://github.com/ydb-platform/ydb-embedded-ui/issues/3066)) ([c558b29](https://github.com/ydb-platform/ydb-embedded-ui/commit/c558b29f179d5a101cae09f64f343f680d7bcc2c))
+
 ## [12.17.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.16.1...v12.17.0) (2025-11-11)
 
 
