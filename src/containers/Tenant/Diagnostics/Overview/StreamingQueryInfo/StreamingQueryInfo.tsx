@@ -112,7 +112,7 @@ function prepareStreamingQueryItems(sysData?: IQueryResult): YDBDefinitionListIt
                     detailsMode="modal"
                     onOpenDetails={() =>
                         NiceModal.show(CONFIRMATION_DIALOG, {
-                            caption: i18n('state.error'),
+                            size: 'm',
                             children: <Issues issues={issues ?? []} />,
                         })
                     }
