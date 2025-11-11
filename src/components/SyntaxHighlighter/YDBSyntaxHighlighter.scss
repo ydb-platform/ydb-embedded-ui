@@ -26,6 +26,28 @@
         }
     }
 
+    &__content {
+        overflow: auto;
+
+        height: 100%;
+
+        background-color: var(--g-color-base-misc-light);
+        scrollbar-color: var(--g-color-scroll-handle) transparent;
+
+        pre {
+            margin: 0;
+            padding: var(--g-spacing-4) 0 var(--g-spacing-4) var(--g-spacing-4);
+
+            background: transparent !important;
+        }
+
+        code {
+            white-space: pre-wrap;
+            word-break: break-word;
+            @include mixins.text-code-2();
+        }
+    }
+
     .data-table__row:hover &__copy,
     .ydb-paginated-table__row:hover &__copy {
         opacity: 1;
