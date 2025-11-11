@@ -54,7 +54,7 @@
     "react-split": "^2.0.14",
     "redux": "^5.0.1",
     "redux-location-state": "^2.8.2",
-    "shiki": "^3.15.0",
+    "shiki": "^3.14.0",
     "tslib": "^2.8.1",
     "use-query-params": "^2.2.1",
     "uuid": "^10.0.0",
