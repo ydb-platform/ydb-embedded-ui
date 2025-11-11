@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.17.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.16.1...v12.17.0) (2025-11-11)
+
+
+### Features
+
+* use shiki for syntax highlight ([#3052](https://github.com/ydb-platform/ydb-embedded-ui/issues/3052)) ([b6a2d5a](https://github.com/ydb-platform/ydb-embedded-ui/commit/b6a2d5a0137a01cc78f2ad0cd180f0bd4d838c76))
+
 ## [12.16.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.16.0...v12.16.1) (2025-11-11)
 
 
