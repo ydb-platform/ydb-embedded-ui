@@ -1,5 +1,13 @@
 # Changelog
 
+## [12.16.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.16.0...v12.16.1) (2025-11-11)
+
+
+### Bug Fixes
+
+* rename monitoring-to-monium ([#3061](https://github.com/ydb-platform/ydb-embedded-ui/issues/3061)) ([c93d1d5](https://github.com/ydb-platform/ydb-embedded-ui/commit/c93d1d5e07a14cb7c4dfe290dc48b6e5e012a4f4))
+* show topic data for cdc stream ([#3063](https://github.com/ydb-platform/ydb-embedded-ui/issues/3063)) ([f64334d](https://github.com/ydb-platform/ydb-embedded-ui/commit/f64334d9c6154bf1635e728b4adf05a8e6519516))
+
 ## [12.16.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.15.1...v12.16.0) (2025-11-10)
 
 
