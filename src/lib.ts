@@ -24,7 +24,7 @@ export * from './utils/constants';
 
 export {default as reportWebVitals} from './reportWebVitals';
 
-export type {SettingsObject} from './services/settings';
+export type {SettingsObject} from './store/reducers/settings/types';
 export type {
     YDBEmbeddedUISettings,
     SettingsPage,

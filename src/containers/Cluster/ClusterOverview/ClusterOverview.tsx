@@ -8,12 +8,12 @@ import {
     useClusterDashboardAvailable,
 } from '../../../store/reducers/capabilities/hooks';
 import type {ClusterGroupsStats} from '../../../store/reducers/cluster/types';
+import {SETTING_KEYS} from '../../../store/reducers/settings/constants';
 import type {AdditionalClusterProps} from '../../../types/additionalProps';
 import {isClusterInfoV2, isClusterInfoV5} from '../../../types/api/cluster';
 import type {TClusterInfo} from '../../../types/api/cluster';
 import type {IResponseError} from '../../../types/api/error';
 import {valueIsDefined} from '../../../utils';
-import {EXPAND_CLUSTER_DASHBOARD} from '../../../utils/constants';
 import {useSetting} from '../../../utils/hooks/useSetting';
 import {ClusterInfo} from '../ClusterInfo/ClusterInfo';
 import i18n from '../i18n';
@@ -40,7 +40,9 @@ interface ClusterOverviewProps {
 }
 
 export function ClusterOverview(props: ClusterOverviewProps) {
-    const [expandDashboard, setExpandDashboard] = useSetting<boolean>(EXPAND_CLUSTER_DASHBOARD);
+    const [expandDashboard, setExpandDashboard] = useSetting<boolean>(
+        SETTING_KEYS.EXPAND_CLUSTER_DASHBOARD,
+    );
     const bridgeModeEnabled = useBridgeModeEnabled();
 
     const bridgePiles = React.useMemo(() => {

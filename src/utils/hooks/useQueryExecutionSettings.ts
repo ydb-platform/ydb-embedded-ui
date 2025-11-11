@@ -1,8 +1,8 @@
 import React from 'react';
 
 import {useTracingLevelOptionAvailable} from '../../store/reducers/capabilities/hooks';
+import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import type {QuerySettings} from '../../types/store/query';
-import {QUERY_EXECUTION_SETTINGS_KEY, USE_SHOW_PLAN_SVG_KEY} from '../constants';
 import {
     DEFAULT_QUERY_SETTINGS,
     QUERY_MODES,
@@ -15,10 +15,12 @@ import {useSetting} from './useSetting';
 
 export const useQueryExecutionSettings = () => {
     const enableTracingLevel = useTracingLevelOptionAvailable();
-    const [storageSettings, setSettings] = useSetting<QuerySettings>(QUERY_EXECUTION_SETTINGS_KEY);
+    const [storageSettings, setSettings] = useSetting<QuerySettings>(
+        SETTING_KEYS.QUERY_EXECUTION_SETTINGS,
+    );
 
     const validatedSettings = querySettingsRestoreSchema.parse(storageSettings);
-    const [useShowPlanToSvg] = useSetting<boolean>(USE_SHOW_PLAN_SVG_KEY);
+    const [useShowPlanToSvg] = useSetting<boolean>(SETTING_KEYS.USE_SHOW_PLAN_SVG);
     const [enableQueryStreaming] = useQueryStreamingSetting();
 
     const setQueryExecutionSettings = React.useCallback(

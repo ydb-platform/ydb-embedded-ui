@@ -1,12 +1,12 @@
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
-import {DEFAULT_USER_SETTINGS, settingsManager} from '../../../services/settings';
+import {settingsManager} from '../../../services/settings';
 import type {TTenantInfo} from '../../../types/api/tenant';
-import {TENANT_INITIAL_PAGE_KEY} from '../../../utils/constants';
 import {useClusterNameFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {api} from '../api';
 import {useDatabasesAvailable} from '../capabilities/hooks';
+import {DEFAULT_USER_SETTINGS, SETTING_KEYS} from '../settings/constants';
 import {prepareTenants} from '../tenants/utils';
 
 import {TENANT_DIAGNOSTICS_TABS_IDS, TENANT_METRICS_TABS_IDS} from './constants';
@@ -21,8 +21,8 @@ import type {
 } from './types';
 
 const tenantPage = tenantPageSchema
-    .catch(DEFAULT_USER_SETTINGS[TENANT_INITIAL_PAGE_KEY])
-    .parse(settingsManager.readUserSettingsValue(TENANT_INITIAL_PAGE_KEY));
+    .catch(DEFAULT_USER_SETTINGS[SETTING_KEYS.TENANT_INITIAL_PAGE])
+    .parse(settingsManager.readUserSettingsValue(SETTING_KEYS.TENANT_INITIAL_PAGE));
 
 export const initialState: TenantState = {
     tenantPage,

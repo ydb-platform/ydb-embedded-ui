@@ -9,7 +9,8 @@ import type {AuthenticationState} from './types';
 
 const initialState: AuthenticationState = {
     isAuthenticated: true,
-    user: '',
+    user: undefined,
+    id: undefined,
 };
 
 export const slice = createSlice({
@@ -22,13 +23,15 @@ export const slice = createSlice({
             state.isAuthenticated = isAuthenticated;
 
             if (!isAuthenticated) {
-                state.user = '';
+                state.user = undefined;
             }
         },
         setUser: (state, action: PayloadAction<TUserToken>) => {
-            const {UserSID, AuthType, IsMonitoringAllowed, IsViewerAllowed} = action.payload;
+            const {UserSID, UserID, AuthType, IsMonitoringAllowed, IsViewerAllowed} =
+                action.payload;
 
             state.user = AuthType === 'Login' ? UserSID : undefined;
+            state.id = UserID;
 
             // If ydb version supports this feature,
             // There should be explicit flag in whoami response
@@ -42,12 +45,14 @@ export const slice = createSlice({
         selectIsUserAllowedToMakeChanges: (state) => state.isUserAllowedToMakeChanges,
         selectIsViewerUser: (state) => state.isViewerUser,
         selectUser: (state) => state.user,
+        selectID: (state) => state.id,
     },
 });
 
 export default slice.reducer;
 export const {setIsAuthenticated, setUser} = slice.actions;
-export const {selectIsUserAllowedToMakeChanges, selectIsViewerUser, selectUser} = slice.selectors;
+export const {selectIsUserAllowedToMakeChanges, selectIsViewerUser, selectUser, selectID} =
+    slice.selectors;
 
 export const authenticationApi = api.injectEndpoints({
     endpoints: (build) => ({

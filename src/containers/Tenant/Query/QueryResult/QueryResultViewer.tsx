@@ -13,10 +13,10 @@ import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus'
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import {selectResultTab, setResultTab} from '../../../../store/reducers/query/query';
 import type {QueryResult} from '../../../../store/reducers/query/types';
+import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import type {ValueOf} from '../../../../types/common';
 import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
-import {USE_SHOW_PLAN_SVG_KEY} from '../../../../utils/constants';
 import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
 import {useSetting, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
@@ -106,7 +106,7 @@ export function QueryResultViewer({
     const isExplain = resultType === 'explain';
 
     const [selectedResultSet, setSelectedResultSet] = React.useState(0);
-    const [useShowPlanToSvg] = useSetting<boolean>(USE_SHOW_PLAN_SVG_KEY);
+    const [useShowPlanToSvg] = useSetting<boolean>(SETTING_KEYS.USE_SHOW_PLAN_SVG);
 
     // Get the saved tab for the current query type, or use default
     const getDefaultSection = (): SectionID => {

@@ -1,6 +1,3 @@
-import type {AxiosWrapperOptions} from '@gravity-ui/axios-wrapper';
-
-import {environment as ENVIRONMENT, metaBackend as META_BACKEND} from '../../store';
 import type {MetaCapabilitiesResponse} from '../../types/api/capabilities';
 import type {
     MetaBaseClusterInfo,
@@ -11,25 +8,10 @@ import type {
 import type {TUserToken} from '../../types/api/whoami';
 import {parseMetaTenants} from '../parsers/parseMetaTenants';
 
-import type {AxiosOptions, BaseAPIParams} from './base';
-import {BaseYdbAPI} from './base';
+import type {AxiosOptions} from './base';
+import {BaseMetaAPI} from './baseMeta';
 
-export class MetaAPI extends BaseYdbAPI {
-    proxyMeta: BaseAPIParams['proxyMeta'];
-
-    constructor(axiosOptions: AxiosWrapperOptions, baseApiParams: BaseAPIParams) {
-        super(axiosOptions, baseApiParams);
-
-        this.proxyMeta = baseApiParams.proxyMeta;
-    }
-    getPath(path: string, clusterName?: string) {
-        if (this.proxyMeta && clusterName) {
-            const envPrefix = ENVIRONMENT ? `/${ENVIRONMENT}` : '';
-            return `${envPrefix}${META_BACKEND}/proxy/cluster/${clusterName}${path}`;
-        }
-        return `${META_BACKEND ?? ''}${path}`;
-    }
-
+export class MetaAPI extends BaseMetaAPI {
     metaAuthenticate(params: {user: string; password: string}) {
         return this.post(this.getPath('/meta/login'), params, {});
     }

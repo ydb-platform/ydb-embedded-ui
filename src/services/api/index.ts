@@ -2,10 +2,12 @@ import type {AxiosWrapperOptions} from '@gravity-ui/axios-wrapper';
 import type {AxiosRequestConfig} from 'axios';
 
 import {codeAssistBackend} from '../../store';
+import {uiFactory} from '../../uiFactory/uiFactory';
 
 import {AuthAPI} from './auth';
 import {CodeAssistAPI} from './codeAssist';
 import {MetaAPI} from './meta';
+import {MetaSettingsAPI} from './metaSettings';
 import {OperationAPI} from './operation';
 import {PDiskAPI} from './pdisk';
 import {SchemeAPI} from './scheme';
@@ -41,6 +43,7 @@ export class YdbEmbeddedAPI {
     viewer: ViewerAPI;
 
     meta?: MetaAPI;
+    metaSettings?: MetaSettingsAPI;
     codeAssist?: CodeAssistAPI;
 
     constructor({
@@ -59,6 +62,9 @@ export class YdbEmbeddedAPI {
         if (webVersion) {
             this.meta = new MetaAPI(axiosParams, baseApiParams);
         }
+        if (uiFactory.useMetaSettings) {
+            this.metaSettings = new MetaSettingsAPI(axiosParams, baseApiParams);
+        }
 
         if (webVersion || codeAssistBackend) {
             this.codeAssist = new CodeAssistAPI(axiosParams, baseApiParams);
@@ -76,9 +82,8 @@ export class YdbEmbeddedAPI {
         const token = csrfTokenGetter();
         if (token) {
             this.auth.setCSRFToken(token);
-            // Use optional chaining as `meta` may not be initialized.
             this.meta?.setCSRFToken(token);
-            // Use optional chaining as `codeAssist` may not be initialized.
+            this.metaSettings?.setCSRFToken(token);
             this.codeAssist?.setCSRFToken(token);
             this.operation.setCSRFToken(token);
             this.pdisk.setCSRFToken(token);

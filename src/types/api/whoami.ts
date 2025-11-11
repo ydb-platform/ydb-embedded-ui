@@ -5,6 +5,8 @@
  */
 export interface TUserToken {
     UserSID?: string;
+    // Generated ID when user is not authenticated
+    UserID?: string;
     GroupSIDs?: TProtoHashTable;
     OriginalUserToken?: string;
     AuthType?: string;

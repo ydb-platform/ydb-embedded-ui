@@ -22,13 +22,13 @@ import {
 import type {QueryResult} from '../../../../store/reducers/query/types';
 import {setQueryAction} from '../../../../store/reducers/queryActions/queryActions';
 import {selectShowPreview, setShowPreview} from '../../../../store/reducers/schema/schema';
+import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import type {EPathSubType, EPathType} from '../../../../types/api/schema';
 import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {
     DEFAULT_IS_QUERY_RESULT_COLLAPSED,
     DEFAULT_SIZE_RESULT_PANE_KEY,
-    LAST_USED_QUERY_ACTION_KEY,
 } from '../../../../utils/constants';
 import {
     useEventHandler,
@@ -90,7 +90,7 @@ export default function QueryEditor(props: QueryEditorProps) {
     const {resetBanner} = useChangedQuerySettings();
 
     const [lastUsedQueryAction, setLastUsedQueryAction] = useSetting<QueryAction>(
-        LAST_USED_QUERY_ACTION_KEY,
+        SETTING_KEYS.LAST_USED_QUERY_ACTION,
     );
     const [lastExecutedQueryText, setLastExecutedQueryText] = React.useState<string>('');
     const [isQueryStreamingEnabled] = useQueryStreamingSetting();
