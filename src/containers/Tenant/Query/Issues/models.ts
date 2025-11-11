@@ -14,3 +14,12 @@ function isSeverity(value: number | undefined) {
 export function getSeverity(value: number | undefined) {
     return isSeverity(value) ? SEVERITY_LIST[value!] : 'S_INFO';
 }
+
+// 'inline': Expands/collapses the full issues tree right below the preview.
+// 'modal': Opens the full issues tree in an extra modal on "Show details".
+export const ISSUES_VIEW_MODE = {
+    INLINE: 'inline',
+    MODAL: 'modal',
+};
+
+export type IssuesViewMode = (typeof ISSUES_VIEW_MODE)[keyof typeof ISSUES_VIEW_MODE];
