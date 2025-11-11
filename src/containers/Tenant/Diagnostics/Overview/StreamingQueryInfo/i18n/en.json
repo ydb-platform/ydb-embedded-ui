@@ -1,6 +1,6 @@
 {
-  "noData": "No data for entity:",
-  "state.label": "State",
-  "state.error": "Error",
-  "text.label": "Text"
+  "fallback_no-data": "No data for entity:",
+  "query.state-field": "State",
+  "query.error-field": "Error",
+  "query.text-field": "Text"
 }

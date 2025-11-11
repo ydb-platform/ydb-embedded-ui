@@ -1,5 +1,6 @@
 import React from 'react';
 
+import NiceModal from '@ebay/nice-modal-react';
 import {
     CircleExclamationFill,
     CircleInfoFill,
@@ -7,15 +8,17 @@ import {
     TriangleExclamationFill,
 } from '@gravity-ui/icons';
 import type {IconData} from '@gravity-ui/uikit';
-import {ArrowToggle, Button, Icon, Link} from '@gravity-ui/uikit';
+import {ArrowToggle, Button, Flex, Icon, Link} from '@gravity-ui/uikit';
 
+import {CONFIRMATION_DIALOG} from '../../../../components/ConfirmationDialog/ConfirmationDialog';
 import ShortyString from '../../../../components/ShortyString/ShortyString';
 import type {ErrorResponse, IssueMessage} from '../../../../types/api/query';
 import {cn} from '../../../../utils/cn';
 import {isNumeric} from '../../../../utils/utils';
 
-import type {SEVERITY} from './models';
-import {getSeverity} from './models';
+import i18n from './i18n';
+import type {IssuesViewMode, SEVERITY} from './models';
+import {ISSUES_VIEW_MODE, getSeverity} from './models';
 
 import './Issues.scss';
 
@@ -27,96 +30,106 @@ interface ResultIssuesProps {
     data: ErrorResponse | string;
     hideSeverity?: boolean;
 
-    // 'inline': Expands/collapses the full issues tree right below the preview.
-    // 'modal': Opens the full issues tree in an extra modal on "Show details".
-    detailsMode?: 'inline' | 'modal';
-    onOpenDetails?: () => void;
-
-    // 'single': Show a single top line: "<Severity> Error + root error.message".
-    // 'multi': If there is no root error.message, preview can show all first-level issues.
-    // Otherwise falls back to 'single'.
-    titlePreviewMode?: 'single' | 'multi';
+    detailsMode?: IssuesViewMode;
 }
 
 export function ResultIssues({
     data,
     hideSeverity,
-    detailsMode = 'inline',
-    onOpenDetails,
-    titlePreviewMode = 'single',
+    detailsMode = ISSUES_VIEW_MODE.INLINE,
 }: ResultIssuesProps) {
-    const [showIssues, setShowIssues] = React.useState(false);
+    const roots = normalizeRoots(data);
 
-    const issues = typeof data === 'string' ? undefined : data?.issues;
-    const hasIssues = Array.isArray(issues) && issues.length > 0;
+    const [expanded, setExpanded] = React.useState<Record<number, boolean>>({});
 
-    const rootHasMessage = typeof data === 'string' ? undefined : data?.error?.message;
+    const onToggleInline = (idx: number) => setExpanded((p) => ({...p, [idx]: !p[idx]}));
 
-    const isMultiApplicable = titlePreviewMode === 'multi' && hasIssues && !rootHasMessage;
+    const onOpenModal = (issues?: IssueMessage[]) => {
+        NiceModal.show(CONFIRMATION_DIALOG, {
+            size: 'm',
+            children: <Issues issues={issues ?? []} />,
+        });
+    };
 
-    const renderSinglePreviewLine = (severity: SEVERITY, message?: string) => (
-        <React.Fragment>
+    if (typeof data === 'string') {
+        return <div className={blockWrapper('error-message')}>{data}</div>;
+    }
+
+    return (
+        <div className={blockWrapper()}>
+            <Flex direction="column">
+                {roots.map((root, idx) => {
+                    const hasIssues = Array.isArray(root.issues) && root.issues.length > 0;
+
+                    return (
+                        <React.Fragment key={idx}>
+                            <ErrorPreviewItem
+                                severity={getSeverity(root.severity)}
+                                message={root.message || ''}
+                                hideSeverity={hideSeverity}
+                                mode={detailsMode}
+                                hasIssues={hasIssues}
+                                expanded={expanded[idx]}
+                                onClick={
+                                    detailsMode === ISSUES_VIEW_MODE.MODAL
+                                        ? () => onOpenModal(root.issues)
+                                        : () => onToggleInline(idx)
+                                }
+                            />
+                            {detailsMode === ISSUES_VIEW_MODE.INLINE &&
+                                expanded[idx] &&
+                                hasIssues && (
+                                    <Issues hideSeverity={hideSeverity} issues={root.issues} />
+                                )}
+                        </React.Fragment>
+                    );
+                })}
+            </Flex>
+        </div>
+    );
+}
+
+interface ErrorPreviewItemProps {
+    severity: SEVERITY;
+    message?: string;
+    hideSeverity?: boolean;
+    mode: IssuesViewMode;
+    hasIssues?: boolean;
+    expanded?: boolean;
+    onClick: () => void;
+}
+
+export function ErrorPreviewItem({
+    severity,
+    message,
+    hideSeverity,
+    mode = ISSUES_VIEW_MODE.INLINE,
+    hasIssues,
+    expanded,
+    onClick,
+}: ErrorPreviewItemProps) {
+    let buttonLabel;
+    if (mode === ISSUES_VIEW_MODE.MODAL) {
+        buttonLabel = i18n('action.show-details');
+    } else if (expanded) {
+        buttonLabel = i18n('action.hide-details');
+    } else {
+        buttonLabel = i18n('action.show-details');
+    }
+
+    return (
+        <div className={blockWrapper('error-message')}>
             {hideSeverity ? null : (
                 <React.Fragment>
                     <IssueSeverity severity={severity} />{' '}
                 </React.Fragment>
             )}
             <span className={blockWrapper('error-message-text')}>{message}</span>
-        </React.Fragment>
-    );
 
-    const renderTitle = () => {
-        if (typeof data === 'string') {
-            return data;
-        }
-
-        if (isMultiApplicable) {
-            return (
-                <div className={blockWrapper('error-list')}>
-                    {issues.map((issue, idx) => {
-                        const severity = getSeverity(issue.severity);
-                        return (
-                            <div className={blockWrapper('error-list-item')} key={idx}>
-                                {renderSinglePreviewLine(severity, issue.message)}
-                            </div>
-                        );
-                    })}
-                </div>
-            );
-        }
-
-        const severity = getSeverity(data?.error?.severity);
-        return renderSinglePreviewLine(severity, data?.error?.message ?? '');
-    };
-
-    const renderDetailsControl = () => {
-        if (!hasIssues) {
-            return null;
-        }
-
-        if (detailsMode === 'modal') {
-            return (
-                <Button view="normal" onClick={() => onOpenDetails?.()}>
-                    Show details
+            {hasIssues && (
+                <Button view="normal" size="s" onClick={onClick}>
+                    {buttonLabel}
                 </Button>
-            );
-        }
-
-        return (
-            <Button view="normal" onClick={() => setShowIssues(!showIssues)}>
-                {showIssues ? 'Hide details' : 'Show details'}
-            </Button>
-        );
-    };
-
-    return (
-        <div className={blockWrapper()}>
-            <div className={blockWrapper('error-message', {column: isMultiApplicable})}>
-                {renderTitle()}
-                {renderDetailsControl()}
-            </div>
-            {detailsMode === 'inline' && hasIssues && showIssues && (
-                <Issues hideSeverity={hideSeverity} issues={issues} />
             )}
         </div>
     );
@@ -138,7 +151,7 @@ export function Issues({issues, hideSeverity}: IssuesProps) {
                     key={index}
                     hideSeverity={hideSeverity}
                     issue={issue}
-                    expanded={issue === mostSevereIssue}
+                    expanded={index === mostSevereIssue}
                 />
             ))}
         </div>
@@ -277,4 +290,25 @@ function getIssuePosition(issue: IssueMessage): string {
     const {row, column} = position;
 
     return isNumeric(column) ? `${row}:${column}` : `line ${row}`;
+}
+
+function normalizeRoots(data: ErrorResponse | string): IssueMessage[] {
+    if (typeof data === 'string') {
+        return [];
+    }
+
+    if (data?.error?.message) {
+        return [
+            {
+                message: data.error.message,
+                severity: data.error.severity,
+                position: data.error.position,
+                end_position: data.error.end_position,
+                issue_code: data.error.issue_code,
+                issues: Array.isArray(data.issues) ? data.issues : [],
+            },
+        ];
+    }
+
+    return Array.isArray(data.issues) ? data.issues : [];
 }

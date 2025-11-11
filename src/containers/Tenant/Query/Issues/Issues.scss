@@ -1,17 +1,6 @@
 .kv-result-issues {
     padding: 0 10px;
 
-    &__error-list,
-    &__error-list-item {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    &__error-list-item {
-        gap: 4px;
-    }
-
     &__error-message {
         position: sticky;
         z-index: 2;
@@ -24,12 +13,6 @@
         padding: 10px 0;
 
         background-color: var(--g-color-base-background);
-
-        &_column {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 20px;
-        }
     }
 
     &__error-message-text {

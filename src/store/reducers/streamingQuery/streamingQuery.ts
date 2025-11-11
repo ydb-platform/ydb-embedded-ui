@@ -39,9 +39,6 @@ export const streamingQueriesApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            forceRefetch() {
-                return true;
-            },
             providesTags: ['All'],
         }),
     }),

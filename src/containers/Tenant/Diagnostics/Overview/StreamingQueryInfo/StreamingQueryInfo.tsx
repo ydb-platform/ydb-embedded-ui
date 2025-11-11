@@ -1,9 +1,7 @@
 import React from 'react';
 
-import NiceModal from '@ebay/nice-modal-react';
-import {Flex, Label} from '@gravity-ui/uikit';
+import {Label} from '@gravity-ui/uikit';
 
-import {CONFIRMATION_DIALOG} from '../../../../../components/ConfirmationDialog/ConfirmationDialog';
 import {YDBSyntaxHighlighter} from '../../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
@@ -12,7 +10,8 @@ import type {ErrorResponse} from '../../../../../types/api/query';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import type {IQueryResult} from '../../../../../types/store/query';
 import {getStringifiedData} from '../../../../../utils/dataFormatters/dataFormatters';
-import {Issues, ResultIssues} from '../../../Query/Issues/Issues';
+import {ResultIssues} from '../../../Query/Issues/Issues';
+import {ISSUES_VIEW_MODE} from '../../../Query/Issues/models';
 import {getEntityName} from '../../../utils';
 
 import i18n from './i18n';
@@ -30,7 +29,7 @@ export function StreamingQueryInfo({data, database, path}: StreamingQueryProps) 
     if (!data) {
         return (
             <div className="error">
-                {i18n('noData')} {entityName}
+                {i18n('fallback_no-data')} {entityName}
             </div>
         );
     }
@@ -42,11 +41,7 @@ export function StreamingQueryInfo({data, database, path}: StreamingQueryProps) 
 
     const items = prepareStreamingQueryItems(sysData);
 
-    return (
-        <Flex direction="column" gap="4">
-            <YDBDefinitionList title={entityName} items={items} />
-        </Flex>
-    );
+    return <YDBDefinitionList title={entityName} items={items} />;
 }
 
 const STATE_THEME_MAP: Record<string, React.ComponentProps<typeof Label>['theme']> = {
@@ -80,10 +75,11 @@ function prepareStreamingQueryItems(sysData?: IQueryResult): YDBDefinitionListIt
     const state = getStringifiedData(sysData.resultSets?.[0]?.result?.[0]?.State);
 
     const queryText = getStringifiedData(sysData.resultSets?.[0]?.result?.[0]?.Text);
-    const normalizedQueryText = normalizeQueryText(queryText);
+    const normalizedQueryText = typeof queryText === 'string' ? queryText.trim() : '';
 
     const errorRaw = sysData.resultSets?.[0]?.result?.[0]?.Error;
 
+    // We need custom error check, because error type can be non-standard
     let errorData: ErrorResponse | string | undefined;
     if (typeof errorRaw === 'string') {
         try {
@@ -96,33 +92,19 @@ function prepareStreamingQueryItems(sysData?: IQueryResult): YDBDefinitionListIt
     }
 
     info.push({
-        name: i18n('state.label'),
+        name: i18n('query.state-field'),
         content: renderStateLabel(state),
     });
 
     if (errorData && Object.keys(errorData).length > 0) {
-        const issues = typeof errorData === 'string' ? undefined : errorData.issues;
-
         info.push({
-            name: i18n('state.error'),
-            content: (
-                <ResultIssues
-                    data={errorData}
-                    titlePreviewMode="multi"
-                    detailsMode="modal"
-                    onOpenDetails={() =>
-                        NiceModal.show(CONFIRMATION_DIALOG, {
-                            size: 'm',
-                            children: <Issues issues={issues ?? []} />,
-                        })
-                    }
-                />
-            ),
+            name: i18n('query.error-field'),
+            content: <ResultIssues data={errorData} detailsMode={ISSUES_VIEW_MODE.MODAL} />,
         });
     }
 
     info.push({
-        name: i18n('text.label'),
+        name: i18n('query.text-field'),
         copyText: normalizedQueryText,
         content: normalizedQueryText ? (
             <YDBSyntaxHighlighter language="yql" text={normalizedQueryText} />
@@ -130,15 +112,4 @@ function prepareStreamingQueryItems(sysData?: IQueryResult): YDBDefinitionListIt
     });
 
     return info;
-}
-
-function normalizeQueryText(text?: string) {
-    if (!text) {
-        return text;
-    }
-
-    let normalized = text.replace(/^\s*\n+/, '');
-    normalized = normalized.replace(/\n+\s*$/, '');
-
-    return normalized;
 }
