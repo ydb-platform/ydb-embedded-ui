@@ -1,5 +1,27 @@
 # Changelog
 
+## [12.17.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.17.0...v12.17.1) (2025-11-11)
+
+
+### Bug Fixes
+
+* downgrade shiki to 3.14.0 ([#3066](https://github.com/ydb-platform/ydb-embedded-ui/issues/3066)) ([c558b29](https://github.com/ydb-platform/ydb-embedded-ui/commit/c558b29f179d5a101cae09f64f343f680d7bcc2c))
+
+## [12.17.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.16.1...v12.17.0) (2025-11-11)
+
+
+### Features
+
+* use shiki for syntax highlight ([#3052](https://github.com/ydb-platform/ydb-embedded-ui/issues/3052)) ([b6a2d5a](https://github.com/ydb-platform/ydb-embedded-ui/commit/b6a2d5a0137a01cc78f2ad0cd180f0bd4d838c76))
+
+## [12.16.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.16.0...v12.16.1) (2025-11-11)
+
+
+### Bug Fixes
+
+* rename monitoring-to-monium ([#3061](https://github.com/ydb-platform/ydb-embedded-ui/issues/3061)) ([c93d1d5](https://github.com/ydb-platform/ydb-embedded-ui/commit/c93d1d5e07a14cb7c4dfe290dc48b6e5e012a4f4))
+* show topic data for cdc stream ([#3063](https://github.com/ydb-platform/ydb-embedded-ui/issues/3063)) ([f64334d](https://github.com/ydb-platform/ydb-embedded-ui/commit/f64334d9c6154bf1635e728b4adf05a8e6519516))
+
 ## [12.16.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.15.1...v12.16.0) (2025-11-10)
 
 

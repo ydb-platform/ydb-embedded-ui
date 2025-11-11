@@ -247,6 +247,9 @@ export const isCdcStreamEntityType = (type?: EPathType) => type === EPathType.EP
 
 export const isTopicEntityType = (type?: EPathType) => type === EPathType.EPathTypePersQueueGroup;
 
+export const isEntityWithTopicData = (type?: EPathType) =>
+    type === EPathType.EPathTypeCdcStream || type === EPathType.EPathTypePersQueueGroup;
+
 // ====================
 
 const pathSubTypeToChildless: Record<EPathSubType, boolean> = {
