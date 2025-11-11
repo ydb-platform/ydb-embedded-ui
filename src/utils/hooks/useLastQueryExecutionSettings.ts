@@ -1,13 +1,12 @@
+import {SETTING_KEYS} from '../../store/reducers/settings/constants';
+import {useSetting} from '../../store/reducers/settings/useSetting';
 import type {QuerySettings} from '../../types/store/query';
-import {LAST_QUERY_EXECUTION_SETTINGS_KEY} from '../constants';
 import {querySettingsValidationSchema} from '../query';
 
-import {useSetting} from './useSetting';
-
 export const useLastQueryExecutionSettings = () => {
-    const [lastStorageSettings, setLastSettings] = useSetting<QuerySettings | undefined>(
-        LAST_QUERY_EXECUTION_SETTINGS_KEY,
-    );
+    const {value: lastStorageSettings, saveValue: setLastSettings} = useSetting<
+        QuerySettings | undefined
+    >(SETTING_KEYS.LAST_QUERY_EXECUTION_SETTINGS);
     let lastSettings: QuerySettings | undefined;
 
     try {

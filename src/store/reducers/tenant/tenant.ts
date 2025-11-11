@@ -1,31 +1,22 @@
 import {createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
-import {DEFAULT_USER_SETTINGS, settingsManager} from '../../../services/settings';
 import type {TTenantInfo} from '../../../types/api/tenant';
-import {TENANT_INITIAL_PAGE_KEY} from '../../../utils/constants';
 import {useClusterNameFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {api} from '../api';
 import {useDatabasesAvailable} from '../capabilities/hooks';
 import {prepareTenants} from '../tenants/utils';
 
 import {TENANT_DIAGNOSTICS_TABS_IDS, TENANT_METRICS_TABS_IDS} from './constants';
-import {tenantPageSchema} from './types';
 import type {
     TenantDiagnosticsTab,
     TenantMetricsTab,
-    TenantPage,
     TenantQueryTab,
     TenantState,
     TenantSummaryTab,
 } from './types';
 
-const tenantPage = tenantPageSchema
-    .catch(DEFAULT_USER_SETTINGS[TENANT_INITIAL_PAGE_KEY])
-    .parse(settingsManager.readUserSettingsValue(TENANT_INITIAL_PAGE_KEY));
-
 export const initialState: TenantState = {
-    tenantPage,
     metricsTab: TENANT_METRICS_TABS_IDS.cpu,
     diagnosticsTab: TENANT_DIAGNOSTICS_TABS_IDS.overview,
 };
@@ -34,9 +25,6 @@ const slice = createSlice({
     name: 'tenant',
     initialState,
     reducers: {
-        setTenantPage: (state, action: PayloadAction<TenantPage>) => {
-            state.tenantPage = action.payload;
-        },
         setQueryTab: (state, action: PayloadAction<TenantQueryTab>) => {
             state.queryTab = action.payload;
         },
@@ -56,8 +44,7 @@ const slice = createSlice({
 });
 
 export default slice.reducer;
-export const {setTenantPage, setQueryTab, setDiagnosticsTab, setSummaryTab, setMetricsTab} =
-    slice.actions;
+export const {setQueryTab, setDiagnosticsTab, setSummaryTab, setMetricsTab} = slice.actions;
 
 export const tenantApi = api.injectEndpoints({
     endpoints: (builder) => ({

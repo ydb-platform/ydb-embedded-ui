@@ -11,30 +11,28 @@ import {
 } from '../../../../store/reducers/capabilities/hooks';
 import {
     queryApi,
-    saveQueryToHistory,
-    selectQueriesHistory,
-    selectQueriesHistoryCurrentIndex,
     selectResult,
     selectTenantPath,
     setIsDirty,
     setTenantPath,
 } from '../../../../store/reducers/query/query';
 import type {QueryResult} from '../../../../store/reducers/query/types';
+import {useQueryHistory} from '../../../../store/reducers/query/useQueryHistory';
 import {setQueryAction} from '../../../../store/reducers/queryActions/queryActions';
 import {selectShowPreview, setShowPreview} from '../../../../store/reducers/schema/schema';
+import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
+import {useSetting} from '../../../../store/reducers/settings/useSetting';
 import type {EPathSubType, EPathType} from '../../../../types/api/schema';
 import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {
     DEFAULT_IS_QUERY_RESULT_COLLAPSED,
     DEFAULT_SIZE_RESULT_PANE_KEY,
-    LAST_USED_QUERY_ACTION_KEY,
 } from '../../../../utils/constants';
 import {
     useEventHandler,
     useQueryExecutionSettings,
     useQueryStreamingSetting,
-    useSetting,
     useTypedDispatch,
     useTypedSelector,
 } from '../../../../utils/hooks';
@@ -77,9 +75,14 @@ export default function QueryEditor(props: QueryEditorProps) {
     const {theme, changeUserInput} = props;
     const savedPath = useTypedSelector(selectTenantPath);
     const result = useTypedSelector(selectResult);
-    const historyQueries = useTypedSelector(selectQueriesHistory);
-    const historyCurrentIndex = useTypedSelector(selectQueriesHistoryCurrentIndex);
     const showPreview = useTypedSelector(selectShowPreview);
+
+    const {
+        queries: historyQueries,
+        currentIndex: historyCurrentIndex,
+        saveQueryToHistory,
+        updateQueryInHistory,
+    } = useQueryHistory();
 
     const isResultLoaded = Boolean(result);
 
@@ -89,11 +92,14 @@ export default function QueryEditor(props: QueryEditorProps) {
         useLastQueryExecutionSettings();
     const {resetBanner} = useChangedQuerySettings();
 
-    const [lastUsedQueryAction, setLastUsedQueryAction] = useSetting<QueryAction>(
-        LAST_USED_QUERY_ACTION_KEY,
+    const {value: lastUsedQueryAction, saveValue: setLastUsedQueryAction} = useSetting<QueryAction>(
+        SETTING_KEYS.LAST_USED_QUERY_ACTION,
     );
     const [lastExecutedQueryText, setLastExecutedQueryText] = React.useState<string>('');
-    const [isQueryStreamingEnabled] = useQueryStreamingSetting();
+    const {value: isQueryStreamingEnabled} = useQueryStreamingSetting();
+    const {value: binaryDataInPlainTextDisplay} = useSetting<boolean>(
+        SETTING_KEYS.BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
+    );
 
     const isStreamingEnabled =
         useStreamingAvailable() &&
@@ -160,6 +166,7 @@ export default function QueryEditor(props: QueryEditorProps) {
                 database,
                 querySettings,
                 enableTracingLevel,
+                base64: !binaryDataInPlainTextDisplay,
             });
 
             queryManagerInstance.registerQuery(query);
@@ -172,6 +179,13 @@ export default function QueryEditor(props: QueryEditorProps) {
                 querySettings,
                 enableTracingLevel,
                 queryId,
+                base64: !binaryDataInPlainTextDisplay,
+            });
+
+            query.then(({data}) => {
+                if (data?.queryId) {
+                    updateQueryInHistory(data.queryId, data?.queryStats);
+                }
             });
 
             queryManagerInstance.registerQuery(query);
@@ -181,8 +195,8 @@ export default function QueryEditor(props: QueryEditorProps) {
 
         // Don't save partial queries in history
         if (!partial) {
-            if (text !== historyQueries[historyCurrentIndex]?.queryText) {
-                dispatch(saveQueryToHistory({queryText: text, queryId}));
+            if (text !== historyQueries[historyCurrentIndex ?? -1]?.queryText) {
+                saveQueryToHistory(text, queryId);
             }
             dispatch(setIsDirty(false));
         }
@@ -212,6 +226,7 @@ export default function QueryEditor(props: QueryEditorProps) {
             querySettings,
             enableTracingLevel,
             queryId,
+            base64: !binaryDataInPlainTextDisplay,
         });
 
         queryManagerInstance.registerQuery(query);

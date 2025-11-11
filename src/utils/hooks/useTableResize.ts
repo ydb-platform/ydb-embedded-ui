@@ -1,31 +1,40 @@
 import React from 'react';
 
-import type {
-    ColumnWidthByName,
-    GetSavedColumnWidthByName,
-    HandleResize,
-    SaveColumnWidthByName,
-} from '@gravity-ui/react-data-table';
-import {useTableResize as libUseTableResize} from '@gravity-ui/react-data-table';
+import type {ColumnWidthByName, HandleResize} from '@gravity-ui/react-data-table';
 
-import {settingsManager} from '../../services/settings';
+import {useSetting} from '../../store/reducers/settings/useSetting';
 
-export const useTableResize = (localStorageKey?: string): [ColumnWidthByName, HandleResize] => {
-    const getSizes: GetSavedColumnWidthByName = React.useCallback(() => {
-        if (!localStorageKey) {
-            return {};
-        }
-        return settingsManager.readUserSettingsValue(localStorageKey, {}) as ColumnWidthByName;
-    }, [localStorageKey]);
+export const useTableResize = (
+    localStorageKey?: string,
+): [ColumnWidthByName, HandleResize, boolean] => {
+    const {
+        value: sizes,
+        saveValue: saveSizes,
+        isLoading,
+    } = useSetting<ColumnWidthByName>(localStorageKey, {
+        debounceTime: 300,
+    });
 
-    const saveSizes: SaveColumnWidthByName = React.useCallback(
-        (value) => {
-            if (localStorageKey) {
-                settingsManager.setUserSettingsValue(localStorageKey, value);
-            }
+    const [actualSizes, setActualSizes] = React.useState(() => {
+        return sizes ?? ({} as ColumnWidthByName);
+    });
+
+    React.useEffect(() => {
+        setActualSizes(sizes ?? {});
+    }, [sizes]);
+
+    const handleSetupChange: HandleResize = React.useCallback(
+        (columnId, columnWidth) => {
+            setActualSizes((previousSetup) => {
+                const setup = Object.assign(Object.assign({}, previousSetup), {
+                    [columnId]: columnWidth,
+                });
+                saveSizes(setup);
+                return setup;
+            });
         },
-        [localStorageKey],
+        [saveSizes],
     );
 
-    return libUseTableResize({saveSizes, getSizes});
+    return [actualSizes, handleSetupChange, isLoading];
 };

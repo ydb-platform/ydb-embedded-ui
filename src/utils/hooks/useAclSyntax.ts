@@ -1,10 +1,8 @@
-import {ACL_SYNTAX_KEY, AclSyntax} from '../constants';
-
-import {useTypedSelector} from './useTypedSelector';
+import {SETTING_KEYS} from '../../store/reducers/settings/constants';
+import {useSetting} from '../../store/reducers/settings/useSetting';
+import {AclSyntax} from '../constants';
 
 export function useAclSyntax(): string {
-    const aclSyntax = useTypedSelector(
-        (state) => state.settings.userSettings[ACL_SYNTAX_KEY] as string | undefined,
-    );
+    const {value: aclSyntax} = useSetting<string | undefined>(SETTING_KEYS.ACL_SYNTAX);
     return aclSyntax ?? AclSyntax.YdbShort;
 }

@@ -3,10 +3,10 @@ import {useThemeValue} from '@gravity-ui/uikit';
 import {TENANT_PAGES_IDS} from '../../../store/reducers/tenant/constants';
 import type {AdditionalTenantsProps} from '../../../types/additionalProps';
 import {cn} from '../../../utils/cn';
-import {useTypedSelector} from '../../../utils/hooks';
 import Diagnostics from '../Diagnostics/Diagnostics';
 import {Query} from '../Query/Query';
 import {TenantNavigation} from '../TenantNavigation/TenantNavigation';
+import {useTenantPage} from '../TenantNavigation/useTenantNavigation';
 
 import './ObjectGeneral.scss';
 
@@ -19,7 +19,7 @@ interface ObjectGeneralProps {
 function ObjectGeneral({additionalTenantProps}: ObjectGeneralProps) {
     const theme = useThemeValue();
 
-    const {tenantPage} = useTypedSelector((state) => state.tenant);
+    const {tenantPage} = useTenantPage();
 
     const renderPageContent = () => {
         switch (tenantPage) {

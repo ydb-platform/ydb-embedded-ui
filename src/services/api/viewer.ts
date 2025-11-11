@@ -38,9 +38,7 @@ import type {DescribeTopicResult, TopicDataRequest, TopicDataResponse} from '../
 import type {VDiskBlobIndexResponse} from '../../types/api/vdiskBlobIndex';
 import type {TUserToken} from '../../types/api/whoami';
 import type {TabletsApiRequestParams} from '../../types/store/tablets';
-import {BINARY_DATA_IN_PLAIN_TEXT_DISPLAY} from '../../utils/constants';
 import type {Nullable} from '../../utils/typecheckers';
-import {settingsManager} from '../settings';
 
 import type {AxiosOptions} from './base';
 import {BaseYdbAPI} from './base';
@@ -416,10 +414,7 @@ export class ViewerAPI extends BaseYdbAPI {
         params: SendQueryParams<Action>,
         {concurrentId, signal, withRetries}: AxiosOptions = {},
     ) {
-        const base64 = !settingsManager.readUserSettingsValue(
-            BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
-            true,
-        );
+        const base64 = params.base64;
 
         return this.post<QueryAPIResponse<Action> | ErrorResponse | null>(
             this.getPath('/viewer/json/query'),

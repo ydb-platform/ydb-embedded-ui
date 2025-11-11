@@ -21,6 +21,8 @@ import {
     useDeleteDatabaseFeatureAvailable,
     useEditDatabaseFeatureAvailable,
 } from '../../store/reducers/capabilities/hooks';
+import {SETTING_KEYS} from '../../store/reducers/settings/constants';
+import {useSetting} from '../../store/reducers/settings/useSetting';
 import {
     filterTenantsByDomain,
     filterTenantsByProblems,
@@ -33,18 +35,13 @@ import {State} from '../../types/api/tenant';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
-import {
-    DEFAULT_TABLE_SETTINGS,
-    EMPTY_DATA_PLACEHOLDER,
-    SHOW_DOMAIN_DATABASE_KEY,
-    SHOW_NETWORK_UTILIZATION,
-} from '../../utils/constants';
+import {DEFAULT_TABLE_SETTINGS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {
     formatCPU,
     formatNumber,
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
-import {useAutoRefreshInterval, useSetting} from '../../utils/hooks';
+import {useAutoRefreshInterval} from '../../utils/hooks';
 import {useClusterNameFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {isNumeric} from '../../utils/utils';
 
@@ -101,8 +98,10 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
     const {search, withProblems, handleSearchChange, handleWithProblemsChange} =
         useTenantsQueryParams();
 
-    const [showNetworkUtilization] = useSetting<boolean>(SHOW_NETWORK_UTILIZATION);
-    const [showDomainDatabase] = useSetting<boolean>(SHOW_DOMAIN_DATABASE_KEY);
+    const {value: showNetworkUtilization} = useSetting<boolean>(
+        SETTING_KEYS.SHOW_NETWORK_UTILIZATION,
+    );
+    const {value: showDomainDatabase} = useSetting<boolean>(SETTING_KEYS.SHOW_DOMAIN_DATABASE);
 
     // We should apply domain filter before other filters
     // It is done to ensure proper entities count
@@ -315,6 +314,7 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
         return (
             <ResizeableDataTable
                 columnsWidthLSKey={DATABASES_COLUMNS_WIDTH_LS_KEY}
+                isLoading={loading}
                 data={filteredTenants}
                 columns={columns}
                 settings={DEFAULT_TABLE_SETTINGS}
@@ -333,10 +333,9 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
                 {error ? <ResponseError error={error} /> : null}
                 <TableWithControlsLayout.Table
                     scrollContainerRef={scrollContainerRef}
-                    loading={loading}
                     scrollDependencies={[search, withProblems, sortParams]}
                 >
-                    {currentData ? renderTable() : null}
+                    {renderTable()}
                 </TableWithControlsLayout.Table>
             </TableWithControlsLayout>
         </div>

@@ -1,12 +1,15 @@
 import React from 'react';
 
 import {Pulse, Terminal} from '@gravity-ui/icons';
-import {useHistory, useLocation, useRouteMatch} from 'react-router-dom';
+import {useLocation, useRouteMatch} from 'react-router-dom';
+import {StringParam, useQueryParams} from 'use-query-params';
 
 import routes, {getTenantPath, parseQuery} from '../../../routes';
+import {DEFAULT_USER_SETTINGS, SETTING_KEYS} from '../../../store/reducers/settings/constants';
+import {useSetting} from '../../../store/reducers/settings/useSetting';
 import {TENANT_PAGE, TENANT_PAGES_IDS} from '../../../store/reducers/tenant/constants';
-import {TENANT_INITIAL_PAGE_KEY} from '../../../utils/constants';
-import {useSetting, useTypedSelector} from '../../../utils/hooks';
+import {tenantPageSchema} from '../../../store/reducers/tenant/types';
+import type {TenantPage} from '../../../store/reducers/tenant/types';
 import i18n from '../i18n';
 
 type TenantPages = keyof typeof TENANT_PAGES_IDS;
@@ -19,14 +22,11 @@ const mapPageToIcon = {
 };
 
 export function useTenantNavigation() {
-    const history = useHistory();
-
     const location = useLocation();
     const queryParams = parseQuery(location);
     const match = useRouteMatch(routes.tenant);
 
-    const [, setInitialTenantPage] = useSetting<string>(TENANT_INITIAL_PAGE_KEY);
-    const {tenantPage} = useTypedSelector((state) => state.tenant);
+    const {tenantPage, handleTenantPageChange} = useTenantPage();
 
     const menuItems = React.useMemo(() => {
         if (!match) {
@@ -44,8 +44,7 @@ export function useTenantNavigation() {
                 path: pagePath,
                 current: tenantPage === pageId,
                 onForward: () => {
-                    setInitialTenantPage(pageId);
-                    history.push(pagePath);
+                    handleTenantPageChange(pageId);
                 },
             };
 
@@ -53,7 +52,36 @@ export function useTenantNavigation() {
         });
 
         return items;
-    }, [tenantPage, setInitialTenantPage, match, history, queryParams]);
+    }, [tenantPage, handleTenantPageChange, match, queryParams]);
 
     return menuItems;
+}
+
+export function useTenantPage() {
+    const [{tenantPage}, setQueryParams] = useQueryParams({tenantPage: StringParam});
+
+    const {value: initialTenantPage, saveValue: setInitialTenantPage} = useSetting<TenantPage>(
+        SETTING_KEYS.TENANT_INITIAL_PAGE,
+    );
+
+    const handleTenantPageChange = React.useCallback(
+        (value?: TenantPage) => {
+            setInitialTenantPage(value);
+            setQueryParams({tenantPage: value});
+        },
+        [setInitialTenantPage, setQueryParams],
+    );
+
+    React.useEffect(() => {
+        try {
+            tenantPageSchema.parse(tenantPage);
+        } catch {
+            const parsedInitialPage = tenantPageSchema
+                .catch(DEFAULT_USER_SETTINGS[SETTING_KEYS.TENANT_INITIAL_PAGE] as TenantPage)
+                .parse(initialTenantPage);
+            handleTenantPageChange(parsedInitialPage);
+        }
+    }, [tenantPage, initialTenantPage, handleTenantPageChange]);
+
+    return {tenantPage, handleTenantPageChange} as const;
 }
