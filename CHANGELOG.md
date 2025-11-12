@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.18.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.17.1...v12.18.0) (2025-11-12)
+
+
+### Features
+
+* pass controlplane and userattributes to get links ([#3074](https://github.com/ydb-platform/ydb-embedded-ui/issues/3074)) ([44c82d9](https://github.com/ydb-platform/ydb-embedded-ui/commit/44c82d9e14c3bb804907fbed3483b2f2225e4eac))
+
 ## [12.17.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.17.0...v12.17.1) (2025-11-11)
 
 
