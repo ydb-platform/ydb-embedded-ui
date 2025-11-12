@@ -9,12 +9,17 @@ import {streamingQueriesApi} from '../../../../../store/reducers/streamingQuery/
 import type {ErrorResponse} from '../../../../../types/api/query';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import type {IQueryResult} from '../../../../../types/store/query';
+import {cn} from '../../../../../utils/cn';
 import {getStringifiedData} from '../../../../../utils/dataFormatters/dataFormatters';
 import {ResultIssues} from '../../../Query/Issues/Issues';
 import {ISSUES_VIEW_MODE} from '../../../Query/Issues/models';
 import {getEntityName} from '../../../utils';
 
 import i18n from './i18n';
+
+import './StreamingQueryInfo.scss';
+
+const b = cn('kv-streaming-query-info');
 
 interface StreamingQueryProps {
     data?: TEvDescribeSchemeResult;
@@ -107,7 +112,7 @@ function prepareStreamingQueryItems(sysData?: IQueryResult): YDBDefinitionListIt
         name: i18n('query.text-field'),
         copyText: normalizedQueryText,
         content: normalizedQueryText ? (
-            <YDBSyntaxHighlighter language="yql" text={normalizedQueryText} />
+            <YDBSyntaxHighlighter language="yql" className={b()} text={normalizedQueryText} />
         ) : null,
     });
 

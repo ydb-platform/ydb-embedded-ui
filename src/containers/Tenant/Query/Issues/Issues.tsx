@@ -57,7 +57,7 @@ export function ResultIssues({
 
     return (
         <div className={blockWrapper()}>
-            <Flex direction="column">
+            <Flex direction="column" gap="3">
                 {roots.map((root, idx) => {
                     const hasIssues = Array.isArray(root.issues) && root.issues.length > 0;
 
@@ -151,7 +151,7 @@ export function Issues({issues, hideSeverity}: IssuesProps) {
                     key={index}
                     hideSeverity={hideSeverity}
                     issue={issue}
-                    expanded={index === mostSevereIssue}
+                    expanded={issue === mostSevereIssue}
                 />
             ))}
         </div>
