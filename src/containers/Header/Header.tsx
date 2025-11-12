@@ -99,6 +99,8 @@ function Header() {
                   clusterName,
                   dbName: databaseData.Name,
                   dbType: databaseData.Type,
+                  controlPlane: databaseData.ControlPlane,
+                  userAttributes: databaseData.UserAttributes,
               })
             : null;
 
