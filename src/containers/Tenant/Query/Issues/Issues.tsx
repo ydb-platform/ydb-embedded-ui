@@ -57,7 +57,7 @@ export function ResultIssues({
 
     return (
         <div className={blockWrapper()}>
-            <Flex direction="column" gap="3">
+            <Flex direction="column" gap="2">
                 {roots.map((root, idx) => {
                     const hasIssues = Array.isArray(root.issues) && root.issues.length > 0;
 
