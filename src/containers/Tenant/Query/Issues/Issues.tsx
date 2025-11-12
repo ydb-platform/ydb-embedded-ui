@@ -151,7 +151,7 @@ export function Issues({issues, hideSeverity}: IssuesProps) {
                     key={index}
                     hideSeverity={hideSeverity}
                     issue={issue}
-                    expanded={issue === mostSevereIssue}
+                    expanded={issue.severity === mostSevereIssue}
                 />
             ))}
         </div>
