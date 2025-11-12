@@ -39,5 +39,5 @@ export function deleteValueFromLS(name: string | undefined) {
         return;
     }
 
-    delete localStorage[name];
+    localStorage.removeItem(name);
 }

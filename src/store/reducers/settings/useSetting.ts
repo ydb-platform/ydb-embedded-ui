@@ -39,9 +39,9 @@ export function useSetting<T>(
     const settingValue = useTypedSelector((state) => getSettingValue(state, name)) as T | undefined;
 
     const authUserSID = useTypedSelector(selectUser);
-    const anonymosUserId = useTypedSelector(selectID);
+    const anonymousUserId = useTypedSelector(selectID);
 
-    const user = authUserSID || anonymosUserId;
+    const user = authUserSID || anonymousUserId;
     const shouldUseMetaSettings = uiFactory.useMetaSettings && user && name;
 
     const shouldUseOnlyExternalSettings = shouldUseMetaSettings && preventSyncWithLS;
@@ -79,7 +79,7 @@ export function useSetting<T>(
             const parsedValue = parseSettingValue<T>(metaSetting.value);
             dispatch(setSettingValue(name, parsedValue));
         }
-    }, [shouldUseOnlyExternalSettings, metaSetting, name, dispatch]);
+    }, [shouldUseMetaSettings, shouldUseOnlyExternalSettings, metaSetting, name, dispatch]);
 
     // Load local value to backend
     React.useEffect(() => {
@@ -136,7 +136,7 @@ export function useSetting<T>(
                 setSettingValueToLS(name, value);
             }
         },
-        [shouldUseOnlyExternalSettings, user, name, debouncedSetMetaSetting],
+        [shouldUseMetaSettings, shouldUseOnlyExternalSettings, user, name, debouncedSetMetaSetting],
     );
 
     return {value: settingValue, saveValue, isLoading} as const;

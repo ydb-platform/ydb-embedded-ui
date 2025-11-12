@@ -26,9 +26,10 @@ export const useTableResize = (
     const handleSetupChange: HandleResize = React.useCallback(
         (columnId, columnWidth) => {
             setActualSizes((previousSetup) => {
-                const setup = Object.assign(Object.assign({}, previousSetup), {
+                const setup = {
+                    ...previousSetup,
                     [columnId]: columnWidth,
-                });
+                };
                 saveSizes(setup);
                 return setup;
             });

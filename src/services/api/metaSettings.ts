@@ -68,8 +68,9 @@ export class MetaSettingsAPI extends BaseMetaAPI {
 
         const batch = this.requestQueue;
         const user = this.currentUser;
-        this.requestQueue = undefined;
         clearTimeout(this.batchTimeout);
+        this.requestQueue = undefined;
+        this.batchTimeout = undefined;
 
         const settingNames = Array.from(batch.keys());
 
