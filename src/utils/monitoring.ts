@@ -1,11 +1,13 @@
 import type {MetaBaseClusterInfo, MetaClusterMonitoringData} from '../types/api/meta';
-import type {ETenantType} from '../types/api/tenant';
+import type {ETenantType, TTenant} from '../types/api/tenant';
 
 interface GetMonitoringLinkProps {
     monitoring: MetaBaseClusterInfo['solomon'];
     dbName: string;
     dbType: ETenantType;
     clusterName?: string;
+    controlPlane?: TTenant['ControlPlane'];
+    userAttributes?: TTenant['UserAttributes'];
 }
 
 export type GetMonitoringLink = typeof getMonitoringLink;
