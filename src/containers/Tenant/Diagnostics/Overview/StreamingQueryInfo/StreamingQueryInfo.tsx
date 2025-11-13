@@ -33,7 +33,7 @@ export function StreamingQueryInfo({data, database, path}: StreamingQueryProps) 
     if (!data) {
         return (
             <div className="error">
-                {i18n('no-data')} {entityName}
+                {i18n('alert_no-data')} {entityName}
             </div>
         );
     }
