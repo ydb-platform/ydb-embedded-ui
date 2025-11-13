@@ -88,19 +88,19 @@ function prepareStreamingQueryItems(sysData?: IQueryResult): YDBDefinitionListIt
     const errorData = parseErrorData(errorRaw);
 
     info.push({
-        name: i18n('field-query_state'),
+        name: i18n('field_query-state'),
         content: <StateLabel state={state} />,
     });
 
     if (errorData) {
         info.push({
-            name: i18n('field-query_error'),
+            name: i18n('field_query-error'),
             content: <ResultIssuesModal data={errorData} />,
         });
     }
 
     info.push({
-        name: i18n('field-query_text'),
+        name: i18n('field_query-text'),
         copyText: normalizedQueryText,
         content: normalizedQueryText ? (
             <YDBSyntaxHighlighter language="yql" text={normalizedQueryText} />
