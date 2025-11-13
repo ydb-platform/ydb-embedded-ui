@@ -9,17 +9,12 @@ import {streamingQueriesApi} from '../../../../../store/reducers/streamingQuery/
 import type {ErrorResponse} from '../../../../../types/api/query';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import type {IQueryResult} from '../../../../../types/store/query';
-import {cn} from '../../../../../utils/cn';
 import {getStringifiedData} from '../../../../../utils/dataFormatters/dataFormatters';
-import {ResultIssues} from '../../../Query/Issues/Issues';
-import {ISSUES_VIEW_MODE} from '../../../Query/Issues/models';
+import {isErrorResponse} from '../../../../../utils/query';
+import {ResultIssuesModal} from '../../../Query/Issues/Issues';
 import {getEntityName} from '../../../utils';
 
 import i18n from './i18n';
-
-import './StreamingQueryInfo.scss';
-
-const b = cn('kv-streaming-query-info');
 
 interface StreamingQueryProps {
     data?: TEvDescribeSchemeResult;
@@ -84,27 +79,18 @@ function prepareStreamingQueryItems(sysData?: IQueryResult): YDBDefinitionListIt
 
     const errorRaw = sysData.resultSets?.[0]?.result?.[0]?.Error;
 
-    // We need custom error check, because error type can be non-standard
-    let errorData: ErrorResponse | string | undefined;
-    if (typeof errorRaw === 'string') {
-        try {
-            errorData = JSON.parse(errorRaw) as ErrorResponse;
-        } catch {
-            errorData = errorRaw;
-        }
-    } else if (errorRaw) {
-        errorData = errorRaw as ErrorResponse;
-    }
+    // We use custom error check, because error type can be non-standard
+    const errorData = parseErrorData(errorRaw);
 
     info.push({
         name: i18n('query.state-field'),
         content: <StateLabel state={state} />,
     });
 
-    if (errorData && Object.keys(errorData).length > 0) {
+    if (errorData) {
         info.push({
             name: i18n('query.error-field'),
-            content: <ResultIssues data={errorData} detailsMode={ISSUES_VIEW_MODE.MODAL} />,
+            content: <ResultIssuesModal data={errorData} />,
         });
     }
 
@@ -112,9 +98,26 @@ function prepareStreamingQueryItems(sysData?: IQueryResult): YDBDefinitionListIt
         name: i18n('query.text-field'),
         copyText: normalizedQueryText,
         content: normalizedQueryText ? (
-            <YDBSyntaxHighlighter language="yql" className={b()} text={normalizedQueryText} />
+            <YDBSyntaxHighlighter language="yql" text={normalizedQueryText} />
         ) : null,
     });
 
     return info;
+}
+
+function parseErrorData(raw: unknown): ErrorResponse | string | undefined {
+    if (typeof raw === 'string') {
+        try {
+            const parsed = JSON.parse(raw);
+            return isErrorResponse(parsed) ? parsed : undefined;
+        } catch {
+            return raw;
+        }
+    }
+
+    if (isErrorResponse(raw)) {
+        return raw;
+    }
+
+    return undefined;
 }

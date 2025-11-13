@@ -16,7 +16,6 @@ interface CommonDialogProps {
     caption?: string;
     message?: React.ReactNode;
     body?: React.ReactNode;
-    size?: 's' | 'm' | 'l';
 
     progress?: boolean;
     textButtonCancel?: string;
@@ -40,7 +39,6 @@ export const CONFIRMATION_DIALOG = 'confirmation-dialog';
 function ConfirmationDialog({
     caption = '',
     children,
-    size = 's',
     onConfirm,
     onClose,
     progress,
@@ -54,7 +52,7 @@ function ConfirmationDialog({
     return (
         <Dialog
             className={block(null, className)}
-            size={size}
+            size="s"
             onClose={onClose}
             disableOutsideClick
             open={open}

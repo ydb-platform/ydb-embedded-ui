@@ -1,4 +1,5 @@
 {
   "action.show-details": "Show details",
-  "action.hide-details": "Hide details"
+  "action.hide-details": "Hide details",
+  "action.close": "Close"
 }
