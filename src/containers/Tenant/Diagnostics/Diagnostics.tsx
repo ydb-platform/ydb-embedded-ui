@@ -9,6 +9,7 @@ import {
     useConfigAvailable,
     useTopicDataAvailable,
 } from '../../../store/reducers/capabilities/hooks';
+import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setDiagnosticsTab, useTenantBaseInfo} from '../../../store/reducers/tenant/tenant';
 import type {AdditionalTenantsProps} from '../../../types/additionalProps';
@@ -16,6 +17,7 @@ import {uiFactory} from '../../../uiFactory/uiFactory';
 import {cn} from '../../../utils/cn';
 import {useScrollPosition, useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {useIsViewerUser} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {canShowTenantMonitoring} from '../../../utils/monitoringVisibility';
 import {Configs} from '../../Configs/Configs';
 import {Heatmap} from '../../Heatmap';
 import {Nodes} from '../../Nodes/Nodes';
@@ -61,17 +63,19 @@ function Diagnostics({additionalTenantProps}: DiagnosticsProps) {
     const {controlPlane, databaseType} = useTenantBaseInfo(
         isDatabaseEntityType(type) ? database : '',
     );
+    const {monitoring: clusterMonitoring} = useClusterBaseInfo();
 
     const hasConfigs = useConfigAvailable();
     const hasTopicData = useTopicDataAvailable();
     const isViewerUser = useIsViewerUser();
+    const canShowMonitoring = canShowTenantMonitoring(controlPlane, clusterMonitoring);
     const pages = getPagesByType(type, subType, {
         hasTopicData,
         isTopLevel: path === database,
         hasBackups: typeof uiFactory.renderBackups === 'function' && Boolean(controlPlane),
         hasConfigs: isViewerUser && hasConfigs,
         hasAccess: uiFactory.hasAccess,
-        hasMonitoring: typeof uiFactory.renderMonitoring === 'function',
+        hasMonitoring: typeof uiFactory.renderMonitoring === 'function' && canShowMonitoring,
         databaseType,
     });
     let activeTab = pages.find((el) => el.id === diagnosticsTab);

@@ -10,15 +10,18 @@ import {
     useCreateDirectoryFeatureAvailable,
     useTopicDataAvailable,
 } from '../../../../store/reducers/capabilities/hooks';
+import {useClusterBaseInfo} from '../../../../store/reducers/cluster/cluster';
 import {selectIsDirty, selectUserInput} from '../../../../store/reducers/query/query';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
 import {streamingQueriesApi} from '../../../../store/reducers/streamingQuery/streamingQuery';
 import {tableSchemaDataApi} from '../../../../store/reducers/tableSchemaData';
+import {useTenantBaseInfo} from '../../../../store/reducers/tenant/tenant';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
 import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {valueIsDefined} from '../../../../utils';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {getConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
+import {canShowTenantMonitoring} from '../../../../utils/monitoringVisibility';
 import {getSchemaControls} from '../../utils/controls';
 import {
     isChildlessPathType,
@@ -139,7 +142,11 @@ export function SchemaTree(props: SchemaTreeProps) {
         setCreateDirectoryOpen(true);
     };
 
+    const {monitoring: clusterMonitoring} = useClusterBaseInfo();
+    const {controlPlane} = useTenantBaseInfo(database);
+    const canShowMonitoring = canShowTenantMonitoring(controlPlane, clusterMonitoring);
     const getTreeNodeActions = React.useMemo(() => {
+        const hasMonitoring = typeof uiFactory.renderMonitoring === 'function' && canShowMonitoring;
         return getActions(
             dispatch,
             {
@@ -151,7 +158,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                 getConnectToDBDialog,
                 schemaData: actionsSchemaData,
                 isSchemaDataLoading: isActionsDataFetching,
-                hasMonitoring: typeof uiFactory.renderMonitoring === 'function',
+                hasMonitoring,
                 streamingQueryData: streamingSysData,
                 isStreamingQueryTextLoading: isStreamingInfoFetching,
             },
@@ -167,9 +174,10 @@ export function SchemaTree(props: SchemaTreeProps) {
         isDirty,
         isStreamingInfoFetching,
         onActivePathUpdate,
-        databaseFullPath,
-        database,
         streamingSysData,
+        database,
+        databaseFullPath,
+        canShowMonitoring,
     ]);
 
     return (

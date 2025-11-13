@@ -39,6 +39,7 @@ import {
     useIsUserAllowedToMakeChanges,
     useIsViewerUser,
 } from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {canShowTenantMonitoring} from '../../utils/monitoringVisibility';
 import {isAccessError} from '../../utils/response';
 
 import {getBreadcrumbs} from './breadcrumbs';
@@ -92,8 +93,17 @@ function Header() {
     const {currentData: databaseData, isLoading: isDatabaseDataLoading} =
         tenantApi.useGetTenantInfoQuery(params);
 
+    // Show Monitoring only when:
+    // - ControlPlane exists AND has a non-empty id
+    // - OR ControlPlane is absent, but cluster-level monitoring meta exists
+    const controlPlane = databaseData?.ControlPlane;
+    const canShowMonitoring = canShowTenantMonitoring(controlPlane, monitoring);
     const monitoringLinkUrl =
-        monitoring && uiFactory.getMonitoringLink && databaseData?.Name && databaseData?.Type
+        canShowMonitoring &&
+        monitoring &&
+        uiFactory.getMonitoringLink &&
+        databaseData?.Name &&
+        databaseData?.Type
             ? uiFactory.getMonitoringLink({
                   monitoring,
                   clusterName,
