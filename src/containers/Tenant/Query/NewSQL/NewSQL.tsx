@@ -3,7 +3,13 @@ import React from 'react';
 import {ChevronDown, Persons} from '@gravity-ui/icons';
 import type {DropdownMenuItem} from '@gravity-ui/uikit';
 import {Button, DropdownMenu} from '@gravity-ui/uikit';
-import {AsyncReplicationIcon, TableIcon, TopicIcon, TransferIcon} from 'ydb-ui-components';
+import {
+    AsyncReplicationIcon,
+    StreamingQueryIcon,
+    TableIcon,
+    TopicIcon,
+    TransferIcon,
+} from 'ydb-ui-components';
 
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {insertSnippetToEditor} from '../../../../utils/monaco/insertSnippet';
@@ -90,6 +96,28 @@ export function NewSQL() {
                 {
                     text: i18n('action.drop-topic'),
                     action: actions.dropTopic,
+                },
+            ],
+        },
+        {
+            text: i18n('menu.streaming-query'),
+            iconStart: <StreamingQueryIcon />,
+            items: [
+                {
+                    text: i18n('action.create-streaming-query'),
+                    action: actions.createStreamingQuery,
+                },
+                {
+                    text: i18n('action.alter-streaming-query-settings'),
+                    action: actions.alterStreamingQuerySettings,
+                },
+                {
+                    text: i18n('action.alter-streaming-query-text'),
+                    action: actions.alterStreamingQueryText,
+                },
+                {
+                    text: i18n('action.drop-streaming-query'),
+                    action: actions.dropStreamingQuery,
                 },
             ],
         },
