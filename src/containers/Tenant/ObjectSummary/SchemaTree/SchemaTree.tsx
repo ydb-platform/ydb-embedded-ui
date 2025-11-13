@@ -165,11 +165,11 @@ export function SchemaTree(props: SchemaTreeProps) {
         input,
         isActionsDataFetching,
         isDirty,
+        isStreamingInfoFetching,
         onActivePathUpdate,
         databaseFullPath,
         database,
         streamingSysData,
-        isStreamingInfoFetching,
     ]);
 
     return (
@@ -200,7 +200,7 @@ export function SchemaTree(props: SchemaTreeProps) {
 
                     const streamingPathType = nodeStreamingQueryTypeToPathType[type];
                     if (isOpen && streamingPathType) {
-                        getStreamingQueryInfo({database, path});
+                        getStreamingQueryInfo({database, path}, true); // preferCacheValue = true
                     }
 
                     return [];
