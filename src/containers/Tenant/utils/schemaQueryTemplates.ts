@@ -15,12 +15,19 @@ function normalizeParameter(param: string) {
     return param.replace(/\$/g, '\\$');
 }
 
-function toLF(s: string) {
-    return s.replace(/\r\n?/g, '\n');
+function toLF(str: string) {
+    return str.replace(/\r\n?/g, '\n');
 }
 
-function indentBlock(s: string, pad = '    ') {
-    return s.replace(/^/gm, pad);
+function stripAllLeadingIndent(str: string) {
+    return str
+        .split('\n')
+        .map((line) => line.replace(/^[ \t]+/, ''))
+        .join('\n');
+}
+
+function indentBlock(str: string, pad = '    ') {
+    return str.replace(/^/gm, pad);
 }
 
 export const createTableTemplate = (params?: SchemaQueryParams) => {
@@ -339,11 +346,12 @@ export const alterStreamingQueryText = (params?: SchemaQueryParams) => {
 
     const sysData = params?.streamingQueryData;
     const rawQueryText = getStringifiedData(sysData?.resultSets?.[0]?.result?.[0]?.Text);
-    const normalizedQueryText = normalizeParameter(toLF(rawQueryText).trim());
+    let queryText = toLF(rawQueryText);
+    queryText = queryText.trim();
+    queryText = stripAllLeadingIndent(queryText);
+    queryText = normalizeParameter(queryText);
 
-    const bodyQueryText = normalizedQueryText
-        ? indentBlock(normalizedQueryText)
-        : '$2{{    current query text}}';
+    const bodyQueryText = queryText ? indentBlock(queryText) : '    {current query text}';
     return `ALTER STREAMING QUERY ${streamingQueryName} SET (
     FORCE = TRUE, -- Allow to drop last query checkpoint if query state can't be loaded
 ) AS

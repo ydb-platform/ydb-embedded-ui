@@ -354,10 +354,11 @@ export const getActions =
                     text: i18n('actions.alterStreamingQuerySettings'),
                     action: actions.alterStreamingQuerySettings,
                 },
-                {
+                getActionWithLoader({
                     text: i18n('actions.alterStreamingQueryText'),
                     action: actions.alterStreamingQueryText,
-                },
+                    isLoading: additionalEffects.isStreamingQueryTextLoading,
+                }),
                 {
                     text: i18n('actions.dropStreamingQuery'),
                     action: actions.dropStreamingQuery,
