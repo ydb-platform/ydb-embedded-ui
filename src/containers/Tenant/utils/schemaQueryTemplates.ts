@@ -19,10 +19,10 @@ function toLF(str: string) {
     return str.replace(/\r\n?/g, '\n');
 }
 
-function stripAllLeadingIndent(str: string) {
+function stripAllIndent(str: string) {
     return str
         .split('\n')
-        .map((line) => line.replace(/^[ \t]+/, ''))
+        .map((line) => line.trim())
         .join('\n');
 }
 
@@ -348,10 +348,12 @@ export const alterStreamingQueryText = (params?: SchemaQueryParams) => {
     const rawQueryText = getStringifiedData(sysData?.resultSets?.[0]?.result?.[0]?.Text);
     let queryText = toLF(rawQueryText);
     queryText = queryText.trim();
-    queryText = stripAllLeadingIndent(queryText);
+    queryText = stripAllIndent(queryText);
     queryText = normalizeParameter(queryText);
 
-    const bodyQueryText = queryText ? indentBlock(queryText) : '    {current query text}';
+    const bodyQueryText = queryText
+        ? indentBlock(queryText)
+        : indentBlock('${2:<streaming_query_text>}');
     return `ALTER STREAMING QUERY ${streamingQueryName} SET (
     FORCE = TRUE, -- Allow to drop last query checkpoint if query state can't be loaded
 ) AS
