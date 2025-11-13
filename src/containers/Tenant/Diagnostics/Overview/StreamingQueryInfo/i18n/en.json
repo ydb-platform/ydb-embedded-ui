@@ -1,6 +1,6 @@
 {
   "alert_no-data": "No data for entity:",
-  "query.state-field": "State",
-  "query.error-field": "Error",
-  "query.text-field": "Text"
+  "field-query_state": "State",
+  "field-query_error": "Error",
+  "field-query_text": "Text"
 }

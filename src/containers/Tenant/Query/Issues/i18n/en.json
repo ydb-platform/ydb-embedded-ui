@@ -1,5 +1,9 @@
 {
-  "action.show-details": "Show details",
-  "action.hide-details": "Hide details",
-  "action.close": "Close"
+  "action_show-details": "Show details",
+  "action_hide-details": "Hide details",
+  "action_close": "Close",
+  "action_show-full-message": "Show full message",
+
+  "field_code": "Code",
+  "field_position": "Position"
 }

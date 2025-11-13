@@ -115,7 +115,7 @@ export function ResultIssuesModal({data, hideSeverity}: ResultIssuesProps) {
                 issues={currentIssues ?? []}
                 hideSeverity={hideSeverity}
                 onClose={closeDialog}
-                textButtonCancel={i18n('action.close')}
+                textButtonCancel={i18n('action_close')}
             />
         </React.Fragment>
     );
@@ -138,7 +138,7 @@ export function ErrorPreviewItem({
     expanded,
     onClick,
 }: ErrorPreviewItemProps) {
-    const buttonLabel = expanded ? i18n('action.hide-details') : i18n('action.show-details');
+    const buttonLabel = expanded ? i18n('action_hide-details') : i18n('action_show-details');
 
     return (
         <div className={blockWrapper('error-message')}>
@@ -212,7 +212,9 @@ function Issue({
                 {hideSeverity ? null : <IssueSeverity severity={severity} />}
                 <IssueText issue={issue} />
                 {issue.issue_code ? (
-                    <span className={blockIssue('code')}>Code: {issue.issue_code}</span>
+                    <span className={blockIssue('code')}>
+                        {i18n('field_code')}: {issue.issue_code}
+                    </span>
                 ) : null}
             </div>
             {hasIssues && isExpand && (
@@ -237,12 +239,15 @@ function IssueText({issue}: IssueTextProps) {
         return (
             <span className={blockIssue('message')}>
                 {position && (
-                    <span className={blockIssue('place-text')} title="Position">
+                    <span className={blockIssue('place-text')} title={i18n('field_position')}>
                         {position}
                     </span>
                 )}
                 <div className={blockIssue('message-text')}>
-                    <ShortyString value={issue.message} expandLabel={'Show full message'} />
+                    <ShortyString
+                        value={issue.message}
+                        expandLabel={i18n('action_show-full-message')}
+                    />
                 </div>
             </span>
         );
