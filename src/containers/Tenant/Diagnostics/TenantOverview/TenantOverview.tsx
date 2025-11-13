@@ -191,9 +191,9 @@ export function TenantOverview({
 
     const links = getInfoTabLinks(additionalTenantProps, Name, Type);
     const {monitoring: clusterMonitoring} = useClusterBaseInfo();
-    const cp = tenant?.ControlPlane;
     const monitoringTabAvailable =
-        Boolean(uiFactory.renderMonitoring) && canShowTenantMonitoring(cp, clusterMonitoring);
+        Boolean(uiFactory.renderMonitoring) &&
+        canShowTenantMonitoring(tenant?.ControlPlane, clusterMonitoring);
 
     const handleOpenMonitoring = () => {
         dispatch(setTenantPage(TENANT_PAGES_IDS.diagnostics));
