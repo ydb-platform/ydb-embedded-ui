@@ -67,7 +67,6 @@ export function ResultIssues({
                                 severity={getSeverity(root.severity)}
                                 message={root.message || ''}
                                 hideSeverity={hideSeverity}
-                                mode={detailsMode}
                                 hasIssues={hasIssues}
                                 expanded={expanded[idx]}
                                 onClick={
@@ -93,7 +92,6 @@ interface ErrorPreviewItemProps {
     severity: SEVERITY;
     message?: string;
     hideSeverity?: boolean;
-    mode: IssuesViewMode;
     hasIssues?: boolean;
     expanded?: boolean;
     onClick: () => void;
@@ -103,27 +101,15 @@ export function ErrorPreviewItem({
     severity,
     message,
     hideSeverity,
-    mode = ISSUES_VIEW_MODE.INLINE,
     hasIssues,
     expanded,
     onClick,
 }: ErrorPreviewItemProps) {
-    let buttonLabel;
-    if (mode === ISSUES_VIEW_MODE.MODAL) {
-        buttonLabel = i18n('action.show-details');
-    } else if (expanded) {
-        buttonLabel = i18n('action.hide-details');
-    } else {
-        buttonLabel = i18n('action.show-details');
-    }
+    const buttonLabel = expanded ? i18n('action.hide-details') : i18n('action.show-details');
 
     return (
         <div className={blockWrapper('error-message')}>
-            {hideSeverity ? null : (
-                <React.Fragment>
-                    <IssueSeverity severity={severity} />{' '}
-                </React.Fragment>
-            )}
+            {hideSeverity ? null : <IssueSeverity severity={severity} />}
             <span className={blockWrapper('error-message-text')}>{message}</span>
 
             {hasIssues && (

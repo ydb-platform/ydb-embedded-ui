@@ -1,5 +1,5 @@
 {
-  "fallback_no-data": "No data for entity:",
+  "no-data": "No data for entity:",
   "query.state-field": "State",
   "query.error-field": "Error",
   "query.text-field": "Text"

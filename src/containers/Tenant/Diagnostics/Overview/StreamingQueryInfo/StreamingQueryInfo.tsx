@@ -34,7 +34,7 @@ export function StreamingQueryInfo({data, database, path}: StreamingQueryProps) 
     if (!data) {
         return (
             <div className="error">
-                {i18n('fallback_no-data')} {entityName}
+                {i18n('no-data')} {entityName}
             </div>
         );
     }
@@ -61,7 +61,7 @@ const STATE_THEME_MAP: Record<string, React.ComponentProps<typeof Label>['theme'
     FAILED: 'danger',
 };
 
-function renderStateLabel(state?: string) {
+function StateLabel({state}: {state?: string}) {
     if (!state) {
         return null;
     }
@@ -98,7 +98,7 @@ function prepareStreamingQueryItems(sysData?: IQueryResult): YDBDefinitionListIt
 
     info.push({
         name: i18n('query.state-field'),
-        content: renderStateLabel(state),
+        content: <StateLabel state={state} />,
     });
 
     if (errorData && Object.keys(errorData).length > 0) {
