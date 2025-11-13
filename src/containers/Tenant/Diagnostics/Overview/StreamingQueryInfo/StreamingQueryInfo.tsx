@@ -9,7 +9,11 @@ import {streamingQueriesApi} from '../../../../../store/reducers/streamingQuery/
 import type {ErrorResponse} from '../../../../../types/api/query';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import type {IQueryResult} from '../../../../../types/store/query';
-import {getStringifiedData} from '../../../../../utils/dataFormatters/dataFormatters';
+import {
+    getStringifiedData,
+    stripIndentByFirstLine,
+    trimOuterEmptyLines,
+} from '../../../../../utils/dataFormatters/dataFormatters';
 import {isErrorResponse} from '../../../../../utils/query';
 import {ResultIssuesModal} from '../../../Query/Issues/Issues';
 import {getEntityName} from '../../../utils';
@@ -75,7 +79,8 @@ function prepareStreamingQueryItems(sysData?: IQueryResult): YDBDefinitionListIt
     const state = getStringifiedData(sysData.resultSets?.[0]?.result?.[0]?.State);
 
     const queryText = getStringifiedData(sysData.resultSets?.[0]?.result?.[0]?.Text);
-    const normalizedQueryText = typeof queryText === 'string' ? queryText.trim() : '';
+    let normalizedQueryText = trimOuterEmptyLines(queryText);
+    normalizedQueryText = stripIndentByFirstLine(normalizedQueryText);
 
     const errorRaw = sysData.resultSets?.[0]?.result?.[0]?.Error;
 
