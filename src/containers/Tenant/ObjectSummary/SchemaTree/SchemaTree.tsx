@@ -12,6 +12,7 @@ import {
 } from '../../../../store/reducers/capabilities/hooks';
 import {selectIsDirty, selectUserInput} from '../../../../store/reducers/query/query';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
+import {streamingQueriesApi} from '../../../../store/reducers/streamingQuery/streamingQuery';
 import {tableSchemaDataApi} from '../../../../store/reducers/tableSchemaData';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
 import {uiFactory} from '../../../../uiFactory/uiFactory';
@@ -22,6 +23,7 @@ import {getSchemaControls} from '../../utils/controls';
 import {
     isChildlessPathType,
     mapPathTypeToNavigationTreeType,
+    nodeStreamingQueryTypeToPathType,
     nodeTableTypeToPathType,
 } from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
@@ -49,6 +51,10 @@ export function SchemaTree(props: SchemaTreeProps) {
         getTableSchemaDataQuery,
         {currentData: actionsSchemaData, isFetching: isActionsDataFetching},
     ] = tableSchemaDataApi.useLazyGetTableSchemaDataQuery();
+    const [
+        getStreamingQueryInfo,
+        {currentData: streamingSysData, isFetching: isStreamingInfoFetching},
+    ] = streamingQueriesApi.useLazyGetStreamingQueryInfoQuery();
 
     const isTopicPreviewAvailable = useTopicDataAvailable();
 
@@ -146,6 +152,8 @@ export function SchemaTree(props: SchemaTreeProps) {
                 schemaData: actionsSchemaData,
                 isSchemaDataLoading: isActionsDataFetching,
                 hasMonitoring: typeof uiFactory.renderMonitoring === 'function',
+                streamingQueryData: streamingSysData,
+                isStreamingQueryTextLoading: isStreamingInfoFetching,
             },
             databaseFullPath,
             database,
@@ -157,9 +165,11 @@ export function SchemaTree(props: SchemaTreeProps) {
         input,
         isActionsDataFetching,
         isDirty,
+        isStreamingInfoFetching,
         onActivePathUpdate,
         databaseFullPath,
         database,
+        streamingSysData,
     ]);
 
     return (
@@ -186,6 +196,11 @@ export function SchemaTree(props: SchemaTreeProps) {
                     const pathType = nodeTableTypeToPathType[type];
                     if (isOpen && pathType) {
                         getTableSchemaDataQuery({path, database, type: pathType, databaseFullPath});
+                    }
+
+                    const streamingPathType = nodeStreamingQueryTypeToPathType[type];
+                    if (isOpen && streamingPathType) {
+                        getStreamingQueryInfo({database, path}, true); // preferCacheValue = true
                     }
 
                     return [];
