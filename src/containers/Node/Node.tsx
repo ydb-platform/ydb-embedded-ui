@@ -11,6 +11,7 @@ import {ResponseError} from '../../components/Errors/ResponseError';
 import {FullNodeViewer} from '../../components/FullNodeViewer/FullNodeViewer';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {InternalLink} from '../../components/InternalLink';
+import {NetworkTable} from '../../components/NetworkTable/NetworkTable';
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import routes, {getDefaultNodePath} from '../../routes';
 import {
@@ -282,7 +283,13 @@ function NodePageContent({
             }
 
             case 'network': {
-                return <NodeNetwork nodeId={nodeId} tenantName={tenantName} />;
+                return (
+                    <NetworkTable
+                        database={database}
+                        scrollContainerRef={parentContainer}
+                        nodeId={nodeId}
+                    />
+                );
             }
 
             default:

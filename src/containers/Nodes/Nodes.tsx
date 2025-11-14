@@ -37,6 +37,7 @@ export interface NodesProps {
     requiredColumnsIds?: NodesColumnId[];
     selectedColumnsKey?: string;
     groupByParams?: NodesGroupByField[];
+    nodeId?: string;
 }
 
 export function Nodes({
@@ -50,6 +51,7 @@ export function Nodes({
     requiredColumnsIds = REQUIRED_NODES_COLUMNS,
     selectedColumnsKey = NODES_TABLE_SELECTED_COLUMNS_LS_KEY,
     groupByParams = ALL_NODES_GROUP_BY_PARAMS,
+    nodeId,
 }: NodesProps) {
     const {handleDataFetched, columnsSettings} = useStorageColumnsSettings();
 
@@ -109,6 +111,7 @@ export function Nodes({
             selectedColumnsKey={selectedColumnsKey}
             groupByParams={effectiveGroupByParams}
             onDataFetched={handleDataFetched}
+            nodeId={nodeId}
         />
     );
 }

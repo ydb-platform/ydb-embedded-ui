@@ -102,6 +102,7 @@ interface GroupedNodesComponentProps {
     selectedColumnsKey: string;
     groupByParams: NodesGroupByField[];
     onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
+    nodeId?: string;
 }
 
 export function GroupedNodesComponent({
@@ -116,6 +117,7 @@ export function GroupedNodesComponent({
     selectedColumnsKey,
     groupByParams,
     onDataFetched,
+    nodeId,
 }: GroupedNodesComponentProps) {
     const {searchValue, peerRoleFilter, groupByParam} = useNodesPageQueryParams(
         groupByParams,
@@ -145,6 +147,7 @@ export function GroupedNodesComponent({
             filter: searchValue,
             filter_peer_role: peerRoleFilter,
             group: groupByParam,
+            node_id: nodeId,
             limit: 0,
         },
         {

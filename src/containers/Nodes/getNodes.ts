@@ -31,6 +31,7 @@ export const getNodes: FetchData<
         peerRoleFilter,
         filterGroup,
         filterGroupBy,
+        nodeId,
     } = filters ?? {};
 
     const sortField = getNodesColumnSortField(columnId);
@@ -55,6 +56,7 @@ export const getNodes: FetchData<
         filter_peer_role: peerRoleFilter,
         filter_group: filterGroup,
         filter_group_by: filterGroupBy,
+        node_id: nodeId,
         fieldsRequired: dataFieldsRequired,
     });
     const preparedResponse = prepareStorageNodesResponse(response);

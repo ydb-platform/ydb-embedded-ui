@@ -30,6 +30,7 @@ export interface PaginatedNodesProps {
     selectedColumnsKey: string;
     groupByParams: NodesGroupByField[];
     onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
+    nodeId?: string;
 }
 
 export function PaginatedNodes(props: PaginatedNodesProps) {
