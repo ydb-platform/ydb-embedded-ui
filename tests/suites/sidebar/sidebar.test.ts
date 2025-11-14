@@ -63,6 +63,7 @@ test.describe('Test Sidebar', async () => {
     test('Information popup contains documentation and keyboard shortcuts', async ({page}) => {
         const sidebar = new Sidebar(page);
         await sidebar.waitForSidebarToLoad();
+        await page.waitForTimeout(1000); // Wait for page to load fully
 
         // Click the Information button to open the popup
         await sidebar.clickInformation();
@@ -83,6 +84,7 @@ test.describe('Test Sidebar', async () => {
     }) => {
         const sidebar = new Sidebar(page);
         await sidebar.waitForSidebarToLoad();
+        await page.waitForTimeout(1000); // Wait for page to load fully
 
         // Click the Information button to open the popup
         await sidebar.clickInformation();
