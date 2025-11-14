@@ -241,3 +241,45 @@ export function getStringifiedData(value: unknown) {
         return value.toString();
     }
 }
+
+// Delete outer empty lines, saving first line spaces
+export function trimOuterEmptyLines(str: string) {
+    const lines = str.split('\n');
+
+    let start = 0;
+    while (start < lines.length && lines[start].trim() === '') {
+        start++;
+    }
+
+    let end = lines.length - 1;
+    while (end >= start && lines[end].trim() === '') {
+        end--;
+    }
+
+    return lines.slice(start, end + 1).join('\n');
+}
+
+// Remove from each line exactly as many leading spaces
+// as from the first non-empty line
+export function stripIndentByFirstLine(str: string) {
+    const lines = str.split('\n');
+    if (lines.length === 0) {
+        return str;
+    }
+
+    const firstIdx = lines.findIndex((l) => l.trim() !== '');
+    if (firstIdx === -1) {
+        return str;
+    }
+
+    const firstLine = lines[firstIdx];
+    const match = firstLine.match(/^ +/);
+    const leadSpaces = match ? match[0].length : 0;
+    if (leadSpaces === 0) {
+        return str;
+    }
+
+    const re = new RegExp(`^ {0,${leadSpaces}}`);
+    const res = lines.map((line) => line.replace(re, ''));
+    return res.join('\n');
+}

@@ -1,5 +1,9 @@
 import type {IQueryResult} from '../../../types/store/query';
-import {getStringifiedData} from '../../../utils/dataFormatters/dataFormatters';
+import {
+    getStringifiedData,
+    stripIndentByFirstLine,
+    trimOuterEmptyLines,
+} from '../../../utils/dataFormatters/dataFormatters';
 import type {SchemaData} from '../Schema/SchemaViewer/types';
 
 export interface SchemaQueryParams {
@@ -17,13 +21,6 @@ function normalizeParameter(param: string) {
 
 function toLF(str: string) {
     return str.replace(/\r\n?/g, '\n');
-}
-
-function stripAllIndent(str: string) {
-    return str
-        .split('\n')
-        .map((line) => line.trim())
-        .join('\n');
 }
 
 function indentBlock(str: string, pad = '    ') {
@@ -347,8 +344,8 @@ export const alterStreamingQueryText = (params?: SchemaQueryParams) => {
     const sysData = params?.streamingQueryData;
     const rawQueryText = getStringifiedData(sysData?.resultSets?.[0]?.result?.[0]?.Text);
     let queryText = toLF(rawQueryText);
-    queryText = queryText.trim();
-    queryText = stripAllIndent(queryText);
+    queryText = trimOuterEmptyLines(queryText);
+    queryText = stripIndentByFirstLine(queryText);
     queryText = normalizeParameter(queryText);
 
     const bodyQueryText = queryText

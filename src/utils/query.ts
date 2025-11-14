@@ -231,6 +231,10 @@ export function isQueryErrorResponse(data: unknown): data is ErrorResponse {
     return Boolean(data && typeof data === 'object' && 'error' in data && 'issues' in data);
 }
 
+export function isErrorResponse(data: unknown): data is ErrorResponse {
+    return Boolean(data && typeof data === 'object' && 'issues' in data);
+}
+
 // Although schema is set in request, if schema is not supported default schema for the version will be used
 // So we should additionally parse response
 export function parseQueryAPIResponse(

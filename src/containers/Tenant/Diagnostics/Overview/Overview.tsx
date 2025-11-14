@@ -13,6 +13,7 @@ import {ViewInfo} from '../../Info/View/View';
 
 import {AsyncReplicationInfo} from './AsyncReplicationInfo';
 import {ChangefeedInfo} from './ChangefeedInfo';
+import {StreamingQueryInfo} from './StreamingQueryInfo';
 import {TableInfo} from './TableInfo';
 import {TopicInfo} from './TopicInfo';
 import {TransferInfo} from './TransferInfo';
@@ -77,7 +78,9 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
                     data={data}
                 />
             ),
-            [EPathType.EPathTypeStreamingQuery]: undefined,
+            [EPathType.EPathTypeStreamingQuery]: () => (
+                <StreamingQueryInfo data={data} path={path} database={database} />
+            ),
         };
 
         return (type && pathTypeToComponent[type]?.()) || <TableInfo data={data} type={type} />;
