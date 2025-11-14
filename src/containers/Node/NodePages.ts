@@ -11,6 +11,7 @@ const NODE_TABS_IDS = {
     tablets: 'tablets',
     structure: 'structure',
     threads: 'threads',
+    network: 'network',
     configs: 'configs',
 } as const;
 
@@ -39,6 +40,12 @@ export const NODE_TABS = [
         id: NODE_TABS_IDS.threads,
         get title() {
             return i18n('tabs.threads');
+        },
+    },
+    {
+        id: NODE_TABS_IDS.network,
+        get title() {
+            return i18n('tabs.network');
         },
     },
     {
