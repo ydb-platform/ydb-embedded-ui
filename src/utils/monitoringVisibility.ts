@@ -12,10 +12,7 @@ export function canShowTenantMonitoring(
     controlPlane?: ControlPlane,
     clusterMonitoring?: MetaBaseClusterInfo['solomon'],
 ): boolean {
-    if (controlPlane) {
-        return Boolean(controlPlane.id);
-    }
-    return Boolean(clusterMonitoring);
+    return Boolean(clusterMonitoring) || Boolean(controlPlane?.id);
 }
 
 /**
