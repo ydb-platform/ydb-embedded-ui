@@ -1,5 +1,20 @@
 # Changelog
 
+## [12.19.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.18.0...v12.19.0) (2025-11-14)
+
+
+### Features
+
+* add streaming query snippets ([#3076](https://github.com/ydb-platform/ydb-embedded-ui/issues/3076)) ([5e503fc](https://github.com/ydb-platform/ydb-embedded-ui/commit/5e503fc445abad1a6ca66f258b8cc642a4353560))
+* show streaming query stats in Info tab ([#3060](https://github.com/ydb-platform/ydb-embedded-ui/issues/3060)) ([2a05ad5](https://github.com/ydb-platform/ydb-embedded-ui/commit/2a05ad5a177f71dc56b5759fcb21d5588561e0ee))
+
+
+### Bug Fixes
+
+* **Healthcheck:** sort issues ([#3079](https://github.com/ydb-platform/ydb-embedded-ui/issues/3079)) ([c9733a7](https://github.com/ydb-platform/ydb-embedded-ui/commit/c9733a752a8ccf55493352168cf1563817fc95b8))
+* monitoring show conditions ([#3080](https://github.com/ydb-platform/ydb-embedded-ui/issues/3080)) ([88d731f](https://github.com/ydb-platform/ydb-embedded-ui/commit/88d731f6749c5f471d796866316c35c5610fdf50))
+* show truthful percents on doughnuts ([#3077](https://github.com/ydb-platform/ydb-embedded-ui/issues/3077)) ([9c2fb00](https://github.com/ydb-platform/ydb-embedded-ui/commit/9c2fb001f9637a8450b628782c9f8ac7a2dc4236))
+
 ## [12.18.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.17.1...v12.18.0) (2025-11-12)
 
 
