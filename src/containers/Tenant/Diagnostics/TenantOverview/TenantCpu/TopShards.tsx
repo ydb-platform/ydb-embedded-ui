@@ -8,17 +8,17 @@ import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 const columnsIds: TopShardsColumnId[] = ['TabletId', 'Path', 'CPUCores'];
 
 interface TopShardsProps {
-    tenantName: string;
-    path: string;
+    database: string;
+    databaseFullPath: string;
 }
 
-export const TopShards = ({tenantName, path}: TopShardsProps) => {
+export const TopShards = ({database, databaseFullPath}: TopShardsProps) => {
     const ShardsTable = useComponent('ShardsTable');
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {currentData, isFetching, error} = topShardsApi.useGetTopShardsQuery(
-        {database: tenantName, path},
+        {database, databaseFullPath},
         {pollingInterval: autoRefreshInterval},
     );
 
@@ -33,8 +33,7 @@ export const TopShards = ({tenantName, path}: TopShardsProps) => {
         >
             <ShardsTable
                 data={data}
-                schemaPath={tenantName}
-                database={tenantName}
+                databaseFullPath={databaseFullPath}
                 columnsIds={columnsIds}
                 settings={TENANT_OVERVIEW_TABLES_SETTINGS}
             />

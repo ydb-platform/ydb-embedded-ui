@@ -3,10 +3,9 @@ import React from 'react';
 import throttle from 'lodash/throttle';
 import PropTypes from 'prop-types';
 
-import {getTabletPagePath} from '../../../routes';
+import {useTabletPagePath} from '../../../routes';
 import {basename as appBasename} from '../../../store/index';
 import {cn} from '../../../utils/cn';
-import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 
 const b = cn('heatmap');
 const defaultDimensions = {width: 0, height: 0};
@@ -19,7 +18,8 @@ export const HeatmapCanvas = (props) => {
     const {tablets} = props;
     const canvasRef = React.useRef(null);
     const containerRef = React.useRef(null);
-    const database = useDatabaseFromQuery();
+
+    const getTabletPagePath = useTabletPagePath();
 
     function drawTablet(ctx) {
         return (tablet, index) => {
@@ -92,7 +92,7 @@ export const HeatmapCanvas = (props) => {
     const generateTabletExternalLink = (tablet) => {
         const {TabletId: id} = tablet;
         const hostname = window.location.hostname;
-        const path = getTabletPagePath(id, {database});
+        const path = getTabletPagePath(id);
         const protocol = 'https://';
         const href = [hostname, appBasename, path]
             .map((item) => (item.startsWith('/') ? item.slice(1) : item))

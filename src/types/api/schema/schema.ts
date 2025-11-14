@@ -6,6 +6,7 @@ import type {TExternalDataSourceDescription} from './externalDataSource';
 import type {TExternalTableDescription} from './externalTable';
 import type {TPersQueueGroupDescription} from './persQueueGroup';
 import type {TReplicationDescription} from './replication';
+import type {TSysViewDescription} from './sysView';
 import type {TTableDescription, TTableStats} from './table';
 import type {TIndexDescription} from './tableIndex';
 import type {TViewDescription} from './view';
@@ -86,6 +87,7 @@ export interface TPathDescription {
     ExternalDataSourceDescription?: TExternalDataSourceDescription;
 
     ViewDescription?: TViewDescription;
+    SysViewDescription?: TSysViewDescription;
 
     ReplicationDescription?: TReplicationDescription;
 }
@@ -283,6 +285,7 @@ export enum EPathType {
     EPathTypeTable = 'EPathTypeTable',
     EPathTypePersQueueGroup = 'EPathTypePersQueueGroup',
     EPathTypeSubDomain = 'EPathTypeSubDomain',
+    EPathTypeSysView = 'EPathTypeSysView',
 
     EPathTypeTableIndex = 'EPathTypeTableIndex',
     EPathTypeExtSubDomain = 'EPathTypeExtSubDomain',
@@ -298,6 +301,8 @@ export enum EPathType {
     EPathTypeReplication = 'EPathTypeReplication',
     EPathTypeTransfer = 'EPathTypeTransfer',
     EPathTypeResourcePool = 'EPathTypeResourcePool',
+
+    EPathTypeStreamingQuery = 'EPathTypeStreamingQuery',
 }
 
 export enum EPathSubType {
@@ -305,6 +310,8 @@ export enum EPathSubType {
     EPathSubTypeSyncIndexImplTable = 'EPathSubTypeSyncIndexImplTable',
     EPathSubTypeAsyncIndexImplTable = 'EPathSubTypeAsyncIndexImplTable',
     EPathSubTypeStreamImpl = 'EPathSubTypeStreamImpl',
+    EPathSubTypeVectorKmeansTreeIndexImplTable = 'EPathSubTypeVectorKmeansTreeIndexImplTable',
+    EPathSubTypeFulltextIndexImplTable = 'EPathSubTypeFulltextIndexImplTable',
 }
 
 enum EPathState {

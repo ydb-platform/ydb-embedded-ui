@@ -74,7 +74,6 @@ export class PDiskAPI extends BaseYdbAPI {
         const pDiskPath = createPDiskDeveloperUILink({
             nodeId,
             pDiskId,
-            host: this.getPath(''),
         });
 
         return this.post<ModifyDiskResponse>(

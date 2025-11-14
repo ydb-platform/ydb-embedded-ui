@@ -2,8 +2,8 @@ import {CirclePlay, Display, Person} from '@gravity-ui/icons';
 import {Button, Card, Flex, Icon, Label, Text} from '@gravity-ui/uikit';
 import {useHistory, useLocation} from 'react-router-dom';
 
-import {TenantTabsGroups, getTenantPath} from '../../containers/Tenant/TenantPages';
-import {parseQuery} from '../../routes';
+import {TenantTabsGroups} from '../../containers/Tenant/TenantPages';
+import {getTenantPath, parseQuery} from '../../routes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../store/reducers/tenant/constants';
 import {cn} from '../../utils/cn';
 

@@ -78,7 +78,7 @@ const selectIssuesTreesRoots = createSelector(getIssuesLog, (issues = []) => get
 export const selectLeavesIssues = createSelector(
     [getIssuesLog, selectIssuesTreesRoots],
     (data = [], roots = []) => {
-        return roots.map((root) => getLeavesFromTree(data, root)).flat();
+        return roots.map((root) => sortIssues(getLeavesFromTree(data, root))).flat();
     },
 );
 

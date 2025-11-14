@@ -39,6 +39,9 @@
             width: 320px;
         }
     }
+    &__column-setup {
+        margin-left: auto;
+    }
     &__empty-cell {
         color: var(--g-color-text-secondary);
     }

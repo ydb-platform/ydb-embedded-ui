@@ -25,4 +25,9 @@
         top: 23px;
         right: 13px;
     }
+
+    // Delete padding for all query text on Diagnostics -> Info tab
+    pre {
+        padding: 0;
+    }
 }

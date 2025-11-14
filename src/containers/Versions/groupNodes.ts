@@ -1,6 +1,7 @@
 import groupBy from 'lodash/groupBy';
 
-import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
+import type {PreparedStorageNode} from '../../store/reducers/storage/types';
+import {checkIsStorageNode, checkIsTenantNode} from '../../utils/nodes';
 import {getColorFromVersionsData, parseNodesToPreparedVersions} from '../../utils/versions';
 import type {VersionsDataMap} from '../../utils/versions/types';
 
@@ -11,7 +12,7 @@ const sortByTitle = (a: GroupedNodesItem, b: GroupedNodesItem) =>
     a.title?.localeCompare(b.title || '') || -1;
 
 export const getGroupedTenantNodes = (
-    nodes: NodesPreparedEntity[] | undefined,
+    nodes: PreparedStorageNode[] | undefined,
     versionsDataMap: VersionsDataMap | undefined,
     groupByValue: GroupByValue,
 ): GroupedNodesItem[] | undefined => {
@@ -24,7 +25,7 @@ export const getGroupedTenantNodes = (
 
         return Object.keys(dividedByVersion)
             .map<GroupedNodesItem | null>((version) => {
-                const filteredNodes = dividedByVersion[version].filter(isTenantNode);
+                const filteredNodes = dividedByVersion[version].filter(checkIsTenantNode);
                 const dividedByTenant = groupBy(filteredNodes, 'Tenants');
 
                 const items = Object.keys(dividedByTenant)
@@ -49,7 +50,7 @@ export const getGroupedTenantNodes = (
             })
             .filter((item): item is GroupedNodesItem => Boolean(item));
     } else {
-        const filteredNodes = nodes.filter(isTenantNode);
+        const filteredNodes = nodes.filter(checkIsTenantNode);
         const dividedByTenant = groupBy(filteredNodes, 'Tenants');
 
         return Object.keys(dividedByTenant)
@@ -85,14 +86,14 @@ export const getGroupedTenantNodes = (
 };
 
 export const getGroupedStorageNodes = (
-    nodes: NodesPreparedEntity[] | undefined,
+    nodes: PreparedStorageNode[] | undefined,
     versionsDataMap: VersionsDataMap | undefined,
 ): GroupedNodesItem[] | undefined => {
     if (!nodes || !nodes.length) {
         return undefined;
     }
 
-    const storageNodes = nodes.filter(isStorageNode);
+    const storageNodes = nodes.filter(checkIsStorageNode);
     const storageNodesDividedByVersion = groupBy(storageNodes, 'Version');
 
     return Object.keys(storageNodesDividedByVersion).map((version) => {
@@ -105,7 +106,7 @@ export const getGroupedStorageNodes = (
 };
 
 export const getOtherNodes = (
-    nodes: NodesPreparedEntity[] | undefined,
+    nodes: PreparedStorageNode[] | undefined,
     versionsDataMap: VersionsDataMap | undefined,
 ): GroupedNodesItem[] | undefined => {
     if (!nodes || !nodes.length) {
@@ -114,7 +115,7 @@ export const getOtherNodes = (
 
     // Nodes that are not included in other groups
     const otherNodes = nodes.filter(
-        (node) => !isStorageNode(node) && !isTenantNode(node) && node.Version,
+        (node) => !checkIsStorageNode(node) && !checkIsTenantNode(node) && node.Version,
     );
     const otherNodesDividedByVersion = groupBy(otherNodes, 'Version');
 
@@ -126,11 +127,3 @@ export const getOtherNodes = (
         };
     });
 };
-
-function isStorageNode(node: NodesPreparedEntity) {
-    return Boolean(node.Roles?.includes('Storage'));
-}
-
-function isTenantNode(node: NodesPreparedEntity) {
-    return Boolean(node.Tenants);
-}

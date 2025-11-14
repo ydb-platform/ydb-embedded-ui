@@ -118,6 +118,7 @@ export enum ETabletState {
     'ResolveLeader' = 'ResolveLeader',
     'Deleted' = 'Deleted',
     'Stopped' = 'Stopped',
+    'Terminating' = 'Terminating',
 }
 
 interface TBoundChannel {

@@ -28,7 +28,7 @@ const connectionTabs: {id: SnippetLanguage; title: string}[] = [
     {id: 'csharp', title: 'C# (.NET)'},
     {id: 'go', title: 'Go'},
     {id: 'java', title: 'Java'},
-    {id: 'javascript', title: 'Node JS'},
+    {id: 'javascript', title: 'JavaScript/TypeScript'},
     {id: 'php', title: 'PHP'},
     {id: 'python', title: 'Python'},
 ];
@@ -56,13 +56,13 @@ function ConnectToDBDialog({
     // Since there is no ControlPlane data in this case
     const shouldRequestTenantData = database && !endpointFromProps && !singleClusterMode;
     const params = shouldRequestTenantData
-        ? {path: database, clusterName, isMetaDatabasesAvailable}
+        ? {database, clusterName, isMetaDatabasesAvailable}
         : skipToken;
     const {currentData: tenantData, isLoading: isTenantDataLoading} =
         tenantApi.useGetTenantInfoQuery(params);
     const endpoint = endpointFromProps ?? tenantData?.ControlPlane?.endpoint;
 
-    const snippet = getSnippetCode(activeTab, {database, endpoint});
+    const snippet = getSnippetCode(activeTab, {database: tenantData?.Name, endpoint});
     const docsLink = getDocsLink(activeTab);
 
     return (

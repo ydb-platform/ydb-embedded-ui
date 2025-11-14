@@ -9,7 +9,8 @@ import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {overviewApi} from '../../store/reducers/overview/overview';
 import {selectSchemaObjectData} from '../../store/reducers/schema/schema';
 import {useTenantBaseInfo} from '../../store/reducers/tenant/tenant';
-import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../types/additionalProps';
+import type {AdditionalTenantsProps} from '../../types/additionalProps';
+import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
@@ -43,11 +44,10 @@ const getTenantSummaryState = () => {
 
 interface TenantProps {
     additionalTenantProps?: AdditionalTenantsProps;
-    additionalNodesProps?: AdditionalNodesProps;
 }
 
 // eslint-disable-next-line complexity
-export function Tenant(props: TenantProps) {
+export function Tenant({additionalTenantProps}: TenantProps) {
     const [summaryVisibilityState, dispatchSummaryVisibilityAction] = React.useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_TENANT_SUMMARY_COLLAPSED),
         undefined,
@@ -56,7 +56,7 @@ export function Tenant(props: TenantProps) {
 
     const {database, schema} = useTenantQueryParams();
 
-    const {controlPlane, name, id} = useTenantBaseInfo(database ?? '');
+    const {name, isLoading: tenantBaseInfoLoading} = useTenantBaseInfo(database ?? '');
 
     if (!database) {
         throw new Error('Tenant name is not defined');
@@ -76,23 +76,23 @@ export function Tenant(props: TenantProps) {
         }
     }, [database]);
 
-    const path = schema ?? database;
+    const databaseName = name ?? '';
+
+    const path = schema ?? databaseName;
 
     const {
         currentData: currentItem,
         error,
         isLoading,
-    } = overviewApi.useGetOverviewQuery({path, database: database});
-
-    const databaseName = name ?? controlPlane?.name ?? database;
+    } = overviewApi.useGetOverviewQuery({path, database, databaseFullPath: databaseName});
 
     const dispatch = useTypedDispatch();
     React.useEffect(() => {
-        dispatch(setHeaderBreadcrumbs('tenant', {tenantName: databaseName, tenantId: id}));
-    }, [databaseName, id, dispatch]);
+        dispatch(setHeaderBreadcrumbs('tenant', {databaseName, database}));
+    }, [databaseName, database, dispatch]);
 
     const preloadedData = useTypedSelector((state) =>
-        selectSchemaObjectData(state, path, database),
+        selectSchemaObjectData(state, path, database, databaseName),
     );
 
     // Use preloaded data if there is no current item data yet
@@ -104,6 +104,8 @@ export function Tenant(props: TenantProps) {
         preloadedData?.PathDescription?.Self?.PathSubType;
 
     const showBlockingError = isAccessError(error);
+
+    const errorProps = showBlockingError ? uiFactory.clusterOrDatabaseAccessError : undefined;
 
     const onCollapseSummaryHandler = () => {
         dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.triggerCollapse);
@@ -117,7 +119,7 @@ export function Tenant(props: TenantProps) {
     };
 
     const [initialLoading, setInitialLoading] = React.useState(true);
-    if (initialLoading && !isLoading) {
+    if (initialLoading && !isLoading && !tenantBaseInfoLoading) {
         setInitialLoading(false);
     }
 
@@ -130,12 +132,13 @@ export function Tenant(props: TenantProps) {
                 titleTemplate={`%s — ${title} — ${appTitle}`}
             />
             <LoaderWrapper loading={initialLoading}>
-                <PageError error={showBlockingError ? error : undefined}>
+                <PageError error={showBlockingError ? error : undefined} {...errorProps}>
                     <TenantContextProvider
                         database={database}
                         path={path}
                         type={currentPathType}
                         subType={currentPathSubType}
+                        databaseFullPath={databaseName}
                     >
                         <TenantDrawerWrapper>
                             <SplitPane
@@ -152,10 +155,7 @@ export function Tenant(props: TenantProps) {
                                     isCollapsed={summaryVisibilityState.collapsed}
                                 />
                                 <div className={b('main')}>
-                                    <ObjectGeneral
-                                        additionalTenantProps={props.additionalTenantProps}
-                                        additionalNodesProps={props.additionalNodesProps}
-                                    />
+                                    <ObjectGeneral additionalTenantProps={additionalTenantProps} />
                                 </div>
                             </SplitPane>
                         </TenantDrawerWrapper>

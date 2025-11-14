@@ -2,6 +2,7 @@ import React from 'react';
 
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
+import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {storageApi} from '../../../store/reducers/storage/storage';
 import type {NodesGroupByField} from '../../../types/api/nodes';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
@@ -97,7 +98,8 @@ export function GroupedStorageNodesComponent({
 }: PaginatedStorageProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    const {searchValue, storageNodesGroupByParam, handleShowAllNodes} = useStorageQueryParams();
+    const {nodesSearchValue, storageNodesGroupByParam, handleShowAllNodes} =
+        useStorageQueryParams();
 
     const {handleDataFetched, columnsSettings} = useStorageColumnsSettings();
     const {columnsToShow, columnsToSelect, setColumns} = useStorageNodesColumnsToSelect({
@@ -110,7 +112,7 @@ export function GroupedStorageNodesComponent({
         {
             database,
             with: 'all',
-            filter: searchValue,
+            filter: nodesSearchValue,
             node_id: nodeId,
             group_id: groupId,
             group: storageNodesGroupByParam,
@@ -150,7 +152,7 @@ export function GroupedStorageNodesComponent({
                         database={database}
                         nodeId={nodeId}
                         groupId={groupId}
-                        searchValue={searchValue}
+                        searchValue={nodesSearchValue}
                         visibleEntities="all"
                         filterGroupBy={storageNodesGroupByParam}
                         scrollContainerRef={scrollContainerRef}
@@ -175,8 +177,14 @@ export function GroupedStorageNodesComponent({
                     entitiesCountCurrent={found}
                     entitiesCountTotal={total}
                     entitiesLoading={isLoading}
-                    columnsToSelect={columnsToSelect}
-                    handleSelectedColumnsUpdate={setColumns}
+                />
+            }
+            extraControls={
+                <TableColumnSetup
+                    popupWidth={200}
+                    items={columnsToSelect}
+                    showStatus
+                    onUpdate={setColumns}
                 />
             }
             error={error ? <ResponseError error={error} /> : null}
@@ -184,7 +192,7 @@ export function GroupedStorageNodesComponent({
             initialState={initialState}
             tableWrapperProps={{
                 scrollContainerRef,
-                scrollDependencies: [searchValue, storageNodesGroupByParam, tableGroups],
+                scrollDependencies: [nodesSearchValue, storageNodesGroupByParam, tableGroups],
                 loading: isLoading,
                 className: b('groups-wrapper'),
             }}

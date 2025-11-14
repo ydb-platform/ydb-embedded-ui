@@ -3,9 +3,11 @@ import {normalizePathSlashes} from '../utils';
 export const getUrlData = ({
     singleClusterMode,
     customBackend,
+    allowedEnvironments,
 }: {
     singleClusterMode: boolean;
     customBackend?: string;
+    allowedEnvironments?: string[];
 }) => {
     // UI could be located in "monitoring" or "ui" folders
     // my-host:8765/some/path/monitoring/react-router-path or my-host:8765/some/path/ui/react-router-path
@@ -28,10 +30,18 @@ export const getUrlData = ({
     if (!singleClusterMode) {
         // Multi-cluster version
         // Cluster and backend are determined by url params
+        // Extract environment from the first path segment if it's in allowedEnvironments list
+        // e.g., /cloud-preprod/api/meta3/proxy/cluster/pre-prod_global/monitoring/cluster -> environment: 'cloud-preprod'
+        // e.g., /cloud-prod/cluster -> environment: 'cloud-prod'
+        // Environment is only extracted if allowedEnvironments list is provided
+        const firstSegment = window.location.pathname.split('/').filter(Boolean)[0];
+        const environment = allowedEnvironments?.includes(firstSegment) ? firstSegment : undefined;
+
         return {
             basename,
             backend,
             clusterName,
+            environment,
         };
     } else if (customBackend) {
         // Single-cluster version
@@ -39,7 +49,7 @@ export const getUrlData = ({
         // There is a backend url param for requests
         return {
             basename,
-            backend: backend ? backend : customBackend,
+            backend: backend || customBackend,
         };
     } else {
         // Single-cluster version

@@ -45,7 +45,7 @@ export function isMonitoringUserNodesColumn(columnId: string): boolean {
 }
 
 // Columns, that should displayed only for users with isViewerAllowed:true
-const VIEWER_USER_COLUMNS_IDS: NodesColumnId[] = ['LoadAverage'];
+const VIEWER_USER_COLUMNS_IDS: NodesColumnId[] = ['LoadAverage', 'PDisks'];
 export function isViewerUserNodesColumn(columnId: string): boolean {
     return VIEWER_USER_COLUMNS_IDS.some((el) => el === columnId);
 }

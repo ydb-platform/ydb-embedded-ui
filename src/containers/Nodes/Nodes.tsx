@@ -1,39 +1,38 @@
 import React from 'react';
 
-import type {Column} from '../../components/PaginatedTable';
 import {
     NODES_COLUMNS_IDS,
     isMonitoringUserNodesColumn,
     isViewerUserNodesColumn,
 } from '../../components/nodesColumns/constants';
 import type {NodesColumnId} from '../../components/nodesColumns/constants';
+import type {NodesColumn} from '../../components/nodesColumns/types';
 import {useBridgeModeEnabled} from '../../store/reducers/capabilities/hooks';
-import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
-import type {AdditionalNodesProps} from '../../types/additionalProps';
 import type {NodesGroupByField} from '../../types/api/nodes';
 import {
     useIsUserAllowedToMakeChanges,
     useIsViewerUser,
 } from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {useStorageColumnsSettings} from '../Storage/utils';
 
 import {PaginatedNodes} from './PaginatedNodes';
-import {getNodesColumns} from './columns/columns';
 import {
     ALL_NODES_GROUP_BY_PARAMS,
     DEFAULT_NODES_COLUMNS,
     NODES_TABLE_SELECTED_COLUMNS_LS_KEY,
     REQUIRED_NODES_COLUMNS,
 } from './columns/constants';
+import {useGetNodesColumns} from './columns/hooks';
 
 import './Nodes.scss';
 
 export interface NodesProps {
     path?: string;
     database?: string;
+    databaseFullPath?: string;
     scrollContainerRef: React.RefObject<HTMLElement>;
-    additionalNodesProps?: AdditionalNodesProps;
     withPeerRoleFilter?: boolean;
-    columns?: Column<NodesPreparedEntity>[];
+    columns?: NodesColumn[];
     defaultColumnsIds?: NodesColumnId[];
     requiredColumnsIds?: NodesColumnId[];
     selectedColumnsKey?: string;
@@ -43,15 +42,19 @@ export interface NodesProps {
 export function Nodes({
     path,
     database,
+    databaseFullPath,
     scrollContainerRef,
-    additionalNodesProps,
     withPeerRoleFilter,
-    columns = getNodesColumns({database, getNodeRef: additionalNodesProps?.getNodeRef}),
+    columns: externalColumns,
     defaultColumnsIds = DEFAULT_NODES_COLUMNS,
     requiredColumnsIds = REQUIRED_NODES_COLUMNS,
     selectedColumnsKey = NODES_TABLE_SELECTED_COLUMNS_LS_KEY,
     groupByParams = ALL_NODES_GROUP_BY_PARAMS,
 }: NodesProps) {
+    const {handleDataFetched, columnsSettings} = useStorageColumnsSettings();
+
+    const columns = useGetNodesColumns({columns: externalColumns, database, columnsSettings});
+
     const bridgeModeEnabled = useBridgeModeEnabled();
 
     const columnsWithPile = React.useMemo(() => {
@@ -96,6 +99,7 @@ export function Nodes({
     return (
         <PaginatedNodes
             path={path}
+            databaseFullPath={databaseFullPath}
             database={database}
             scrollContainerRef={scrollContainerRef}
             withPeerRoleFilter={withPeerRoleFilter}
@@ -104,6 +108,7 @@ export function Nodes({
             requiredColumnsIds={requiredColumnsIds}
             selectedColumnsKey={selectedColumnsKey}
             groupByParams={effectiveGroupByParams}
+            onDataFetched={handleDataFetched}
         />
     );
 }

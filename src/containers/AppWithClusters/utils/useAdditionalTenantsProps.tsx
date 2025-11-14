@@ -4,6 +4,7 @@ import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
 import type {AdditionalTenantsProps} from '../../../types/additionalProps';
 import type {ETenantType} from '../../../types/api/tenant';
 import type {GetDatabaseLinks} from '../../../uiFactory/types';
+import {uiFactory} from '../../../uiFactory/uiFactory';
 import {USE_CLUSTER_BALANCER_AS_BACKEND_KEY} from '../../../utils/constants';
 import {useSetting} from '../../../utils/hooks';
 import type {GetLogsLink} from '../../../utils/logs';
@@ -26,7 +27,7 @@ export function useAdditionalTenantsProps({
 
     const {balancer, monitoring, logging, name: clusterName} = clusterInfo;
 
-    const useMetaProxy = clusterInfo.settings?.use_meta_proxy;
+    const useMetaProxy = uiFactory.useMetaProxy && clusterInfo.settings?.use_meta_proxy !== false;
 
     const additionalTenantsProps: AdditionalTenantsProps = {};
     additionalTenantsProps.prepareTenantBackend = (nodeId) => {

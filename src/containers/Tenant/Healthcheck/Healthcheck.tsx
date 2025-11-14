@@ -27,19 +27,19 @@ import cryCatIcon from '../../../assets/icons/cry-cat.svg';
 import './Healthcheck.scss';
 
 interface HealthcheckDetailsProps {
-    tenantName: string;
+    database: string;
     countIssueTypes?: (
         issueTrees: IssuesTree[],
     ) => Record<CommonIssueType, number> & Record<string, number>;
 }
 
 export function Healthcheck({
-    tenantName,
+    database,
     countIssueTypes = uiFactory.healthcheck.countHealthcheckIssuesByType,
 }: HealthcheckDetailsProps) {
     const fullscreen = useTypedSelector((state) => state.fullscreen);
     const {loading, error, selfCheckResult, fulfilledTimeStamp, leavesIssues, refetch} =
-        useHealthcheck(tenantName);
+        useHealthcheck(database);
 
     const issuesCount = React.useMemo(
         () => countIssueTypes(leavesIssues),
@@ -76,7 +76,7 @@ export function Healthcheck({
         if (selfCheckResult === SelfCheckResult.GOOD && (!leavesIssues || !leavesIssues.length)) {
             return (
                 <Flex direction="column" gap={1} className={b('stub-wrapper')}>
-                    <Illustration name="thumbsUp" width="200" />
+                    <Illustration name="thumbsUp" width={200} />
                     {HEALTHCHECK_RESULT_TO_TEXT[selfCheckResult]}
                 </Flex>
             );
@@ -85,7 +85,7 @@ export function Healthcheck({
         return (
             <Flex direction="column" grow={1}>
                 {renderControls()}
-                <Flex direction="column" gap={3} grow={1} className={b('issues')}>
+                <Flex direction="column" gap={4} grow={1} className={b('issues')}>
                     <Issues issues={leavesIssues} />
                 </Flex>
             </Flex>

@@ -4,4 +4,4 @@ import type {KeyValueRow} from '../../types/api/query';
 
 export type ShardsColumn = Column<KeyValueRow>;
 
-export type GetShardsColumn = (params: {database: string; schemaPath?: string}) => ShardsColumn;
+export type GetShardsColumn = (params: {databaseFullPath?: string}) => ShardsColumn;

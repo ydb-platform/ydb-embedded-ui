@@ -55,17 +55,23 @@ const getHotKeysColumns = (keyColumnsIds: string[] = []): Column<HotKey>[] => {
 
 interface HotKeysProps {
     database: string;
+    databaseFullPath: string;
     path: string;
 }
 
-export function HotKeys({path, database}: HotKeysProps) {
-    const {currentData: data, isFetching, error} = hotKeysApi.useGetHotKeysQuery({path, database});
+export function HotKeys({path, database, databaseFullPath}: HotKeysProps) {
+    const {
+        currentData: data,
+        isFetching,
+        error,
+    } = hotKeysApi.useGetHotKeysQuery({path, database, databaseFullPath});
     const loading = isFetching && data === undefined;
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData: schemaData, isLoading: schemaLoading} = overviewApi.useGetOverviewQuery(
         {
             path,
             database,
+            databaseFullPath,
         },
         {
             pollingInterval: autoRefreshInterval,

@@ -1,5 +1,6 @@
 import type React from 'react';
 
+import type {EmptyStateProps} from '../components/EmptyState';
 import type {
     CommonIssueType,
     GetHealthcheckViewTitles,
@@ -8,13 +9,14 @@ import type {
 import type {ClusterInfo} from '../store/reducers/cluster/cluster';
 import type {IssuesTree} from '../store/reducers/healthcheckInfo/types';
 import type {PreparedTenant} from '../store/reducers/tenants/types';
-import type {ClusterLink, DatabaseLink} from '../types/additionalProps';
+import type {AdditionalTenantsProps, ClusterLink, DatabaseLink} from '../types/additionalProps';
 import type {MetaBaseClusterInfo} from '../types/api/meta';
+import type {EPathSubType, EPathType} from '../types/api/schema/schema';
 import type {ETenantType} from '../types/api/tenant';
 import type {GetLogsLink} from '../utils/logs';
 import type {GetMonitoringClusterLink, GetMonitoringLink} from '../utils/monitoring';
 
-export interface UIFactory<H extends string = CommonIssueType> {
+export interface UIFactory<H extends string = CommonIssueType, T extends string = string> {
     onCreateDB?: HandleCreateDB;
     onEditDB?: HandleEditDB;
     onDeleteDB?: HandleDeleteDB;
@@ -34,6 +36,8 @@ export interface UIFactory<H extends string = CommonIssueType> {
 
     renderBackups?: RenderBackups;
     renderEvents?: RenderEvents;
+    renderMonitoring?: RenderMonitoring;
+    clusterOrDatabaseAccessError?: Partial<EmptyStateProps>;
 
     healthcheck: {
         getHealthckechViewTitles: GetHealthcheckViewTitles<H>;
@@ -41,9 +45,17 @@ export interface UIFactory<H extends string = CommonIssueType> {
         countHealthcheckIssuesByType: (issueTrees: IssuesTree[]) => Record<H, number>;
     };
     hasAccess?: boolean;
-    yaMetricaMap?: Record<string, number>;
+    hideGrantAccess?: boolean;
 
     useDatabaseId?: boolean;
+
+    useMetaProxy?: boolean;
+
+    yaMetricaConfig?: {
+        yaMetricaMap: Record<T, number | undefined>;
+        goals: UiMetricaGoals;
+        getMetricaName: (goalKey: UiMetricaGoal) => T;
+    };
 }
 
 export type HandleCreateDB = (params: {clusterName: string}) => Promise<boolean>;
@@ -77,4 +89,22 @@ export type RenderBackups = (props: {
     scrollContainerRef: React.RefObject<HTMLDivElement>;
 }) => React.ReactNode;
 
-export type RenderEvents = () => React.ReactNode;
+export type RenderEvents = (props: {
+    scrollContainerRef: React.RefObject<HTMLDivElement>;
+}) => React.ReactNode;
+
+export type RenderMonitoring = (props: {
+    type?: EPathType;
+    subType?: EPathSubType;
+    database: string;
+    path: string;
+    databaseFullPath?: string;
+    additionalTenantProps?: AdditionalTenantsProps;
+    scrollContainerRef: React.RefObject<HTMLDivElement>;
+}) => React.ReactNode;
+export interface UiMetricaGoals {
+    runQuery?: string;
+    stopQuery?: string;
+}
+
+export type UiMetricaGoal = keyof UiMetricaGoals;

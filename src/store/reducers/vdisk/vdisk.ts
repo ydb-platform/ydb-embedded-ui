@@ -1,6 +1,6 @@
 import type {StorageGroupsResponse} from '../../../types/api/storage';
 import type {TEvSystemStateResponse} from '../../../types/api/systemState';
-import {getVDiskSlotBasedId} from '../../../utils/disks/helpers';
+import {getVDiskId} from '../../../utils/disks/helpers';
 import {api} from '../api';
 
 import {prepareVDiskDataResponse} from './utils';
@@ -8,6 +8,14 @@ import {prepareVDiskDataResponse} from './utils';
 type VDiskDataRequestParams = {
     vDiskId: string;
     nodeId?: number | string;
+    database?: string;
+};
+
+type VDiskBlobIndexStatBasicParams =
+    | {nodeId: string | number; pDiskId: string | number; vDiskSlotId: string | number}
+    | {vDiskId: string};
+
+export type VDiskBlobIndexStatParams = VDiskBlobIndexStatBasicParams & {
     database?: string;
 };
 
@@ -52,25 +60,11 @@ export const vDiskApi = api.injectEndpoints({
             ],
         }),
         getVDiskBlobIndexStat: build.query({
-            queryFn: async (
-                {
-                    nodeId,
-                    pDiskId,
-                    vDiskSlotId,
-                    database,
-                }: {
-                    nodeId: string | number;
-                    pDiskId: string | number;
-                    vDiskSlotId: string | number;
-                    database?: string;
-                },
-                {signal},
-            ) => {
+            queryFn: async (params: VDiskBlobIndexStatParams, {signal}) => {
                 try {
-                    const response = await window.api.viewer.getVDiskBlobIndexStat(
-                        {nodeId, pDiskId, vDiskSlotId, database},
-                        {signal},
-                    );
+                    const response = await window.api.viewer.getVDiskBlobIndexStat(params, {
+                        signal,
+                    });
                     return {data: response};
                 } catch (error) {
                     return {error};
@@ -80,7 +74,7 @@ export const vDiskApi = api.injectEndpoints({
                 'All',
                 {
                     type: 'VDiskBlobIndexStat',
-                    id: getVDiskSlotBasedId(arg.nodeId, arg.pDiskId, arg.vDiskSlotId),
+                    id: getVDiskId(arg),
                 },
             ],
         }),

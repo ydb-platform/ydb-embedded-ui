@@ -16,7 +16,7 @@ test.describe('Test Nodes page', async () => {
         const nodesPage = new NodesPage(page);
 
         // Get table with all nodes
-        await nodesPage.goto({problemFilter: 'All'});
+        await nodesPage.goto();
 
         // Check if table is present
         await expect(nodesPage.table).toBeVisible();

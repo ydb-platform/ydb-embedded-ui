@@ -3,6 +3,7 @@ import type {AxiosWrapperOptions} from '@gravity-ui/axios-wrapper';
 import axiosRetry from 'axios-retry';
 
 import {backend as BACKEND, clusterName} from '../../store';
+import type {SchemaPathParam} from '../../types/api/common';
 import {DEV_ENABLE_TRACING_FOR_ALL_REQUESTS} from '../../utils/constants';
 import {prepareBackendWithMetaProxy} from '../../utils/parseBalancer';
 import {isRedirectToAuth} from '../../utils/response';
@@ -18,17 +19,20 @@ export type AxiosOptions = {
 export interface BaseAPIParams {
     singleClusterMode: undefined | boolean;
     proxyMeta: undefined | boolean;
+    useRelativePath: undefined | boolean;
 }
 
 export class BaseYdbAPI extends AxiosWrapper {
     DEFAULT_RETRIES_COUNT = 0;
 
     singleClusterMode: BaseAPIParams['singleClusterMode'];
+    useRelativePath: BaseAPIParams['useRelativePath'];
 
     constructor(axiosOptions: AxiosWrapperOptions, baseApiParams: BaseAPIParams) {
         super(axiosOptions);
 
         this.singleClusterMode = baseApiParams.singleClusterMode;
+        this.useRelativePath = baseApiParams.useRelativePath;
 
         axiosRetry(this._axios, {
             retries: this.DEFAULT_RETRIES_COUNT,
@@ -91,8 +95,20 @@ export class BaseYdbAPI extends AxiosWrapper {
         return `${BACKEND ?? ''}${path}`;
     }
 
-    getSchemaPath(props: {path?: string; database?: string}) {
-        return props.path;
+    getSchemaPath(params?: SchemaPathParam) {
+        const {path, databaseFullPath} = params ?? {};
+        if (!this.useRelativePath || !path || !databaseFullPath) {
+            return path;
+        }
+
+        if (path === databaseFullPath) {
+            return '';
+        }
+
+        if (path.startsWith(databaseFullPath + '/')) {
+            return path.slice(databaseFullPath.length + 1);
+        }
+        return path;
     }
 
     prepareArrayRequestParam(arr: (string | number)[]) {

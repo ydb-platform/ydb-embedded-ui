@@ -1,7 +1,7 @@
 import {expect, test} from '@playwright/test';
 
 import {PageModel} from '../../models/PageModel';
-import {tenantName} from '../../utils/constants';
+import {database} from '../../utils/constants';
 import {toggleExperiment} from '../../utils/toggleExperiment';
 import {TenantPage} from '../tenant/TenantPage';
 
@@ -63,6 +63,7 @@ test.describe('Test Sidebar', async () => {
     test('Information popup contains documentation and keyboard shortcuts', async ({page}) => {
         const sidebar = new Sidebar(page);
         await sidebar.waitForSidebarToLoad();
+        await page.waitForTimeout(1000); // Wait for page to load fully
 
         // Click the Information button to open the popup
         await sidebar.clickInformation();
@@ -83,6 +84,7 @@ test.describe('Test Sidebar', async () => {
     }) => {
         const sidebar = new Sidebar(page);
         await sidebar.waitForSidebarToLoad();
+        await page.waitForTimeout(1000); // Wait for page to load fully
 
         // Click the Information button to open the popup
         await sidebar.clickInformation();
@@ -111,8 +113,8 @@ test.describe('Test Sidebar', async () => {
     test('Pressing Ctrl+K in editor page opens hotkeys panel', async ({page}) => {
         // Open editor page
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             general: 'query',
         };
 

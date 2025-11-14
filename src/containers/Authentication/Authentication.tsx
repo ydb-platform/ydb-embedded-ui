@@ -5,9 +5,11 @@ import {Button, Link as ExternalLink, Icon, TextInput} from '@gravity-ui/uikit';
 import {useHistory, useLocation} from 'react-router-dom';
 
 import {parseQuery} from '../../routes';
+import {basename} from '../../store';
 import {authenticationApi} from '../../store/reducers/authentication/authentication';
 import {useLoginWithDatabase} from '../../store/reducers/capabilities/hooks';
 import {cn} from '../../utils/cn';
+import {useMetaAuth} from '../../utils/hooks/useMetaAuth';
 
 import {isDatabaseError, isPasswordError, isUserError} from './utils';
 
@@ -27,9 +29,38 @@ function Authentication({closable = false}: AuthenticationProps) {
 
     const needDatabase = useLoginWithDatabase();
 
-    const [authenticate, {isLoading}] = authenticationApi.useAuthenticateMutation(undefined);
+    const [authenticate, {isLoading}] = authenticationApi.useAuthenticateMutation();
 
     const {returnUrl, database: databaseFromQuery} = parseQuery(location);
+
+    const path = React.useMemo(() => {
+        let path: string | undefined;
+
+        if (returnUrl) {
+            const decodedUrl = decodeURIComponent(returnUrl.toString());
+
+            // to prevent page reload we use router history
+            // history navigates relative to origin
+            // so we remove origin to make it work properly
+            const url = new URL(decodedUrl);
+            let pathname = url.pathname;
+
+            // Remove basename from pathname since history.replace expects paths relative to basename
+            if (basename && pathname.startsWith(basename)) {
+                pathname = pathname.slice(basename.length);
+            }
+
+            // Ensure pathname starts with /
+            if (pathname && !pathname.startsWith('/')) {
+                pathname = '/' + pathname;
+            }
+
+            path = pathname + url.search;
+        }
+        return path;
+    }, [returnUrl]);
+
+    const useMeta = useMetaAuth(path);
 
     const [login, setLogin] = React.useState('');
     const [database, setDatabase] = React.useState(databaseFromQuery?.toString() ?? '');
@@ -54,17 +85,10 @@ function Authentication({closable = false}: AuthenticationProps) {
     };
 
     const onLoginClick = () => {
-        authenticate({user: login, password, database})
+        authenticate({user: login, password, database, useMeta})
             .unwrap()
             .then(() => {
-                if (returnUrl) {
-                    const decodedUrl = decodeURIComponent(returnUrl.toString());
-
-                    // to prevent page reload we use router history
-                    // history navigates relative to origin
-                    // so we remove origin to make it work properly
-                    const url = new URL(decodedUrl);
-                    const path = url.pathname + url.search;
+                if (path) {
                     history.replace(path);
                 }
             })

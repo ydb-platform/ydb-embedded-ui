@@ -1,7 +1,6 @@
 import {ResizeableDataTable} from '../../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../../../../components/nodesColumns/constants';
 import {nodesApi} from '../../../../../store/reducers/nodes/nodes';
-import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import {
     TENANT_OVERVIEW_TABLES_LIMIT,
     TENANT_OVERVIEW_TABLES_SETTINGS,
@@ -13,20 +12,16 @@ import i18n from '../i18n';
 import {getTopNodesBySkewColumns} from './columns';
 
 interface TopNodesBySkewProps {
-    tenantName: string;
-    additionalNodesProps?: AdditionalNodesProps;
+    database: string;
 }
 
-export function TopNodesBySkew({tenantName, additionalNodesProps}: TopNodesBySkewProps) {
+export function TopNodesBySkew({database}: TopNodesBySkewProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const [columns, fieldsRequired] = getTopNodesBySkewColumns({
-        getNodeRef: additionalNodesProps?.getNodeRef,
-        database: tenantName,
-    });
+    const [columns, fieldsRequired] = getTopNodesBySkewColumns({database});
 
     const {currentData, isFetching, error} = nodesApi.useGetNodesQuery(
         {
-            tenant: tenantName,
+            tenant: database,
             type: 'any',
             sort: '-ClockSkew',
             limit: TENANT_OVERVIEW_TABLES_LIMIT,
@@ -37,7 +32,7 @@ export function TopNodesBySkew({tenantName, additionalNodesProps}: TopNodesBySke
     );
 
     const loading = isFetching && currentData === undefined;
-    const topNodes = currentData?.Nodes || [];
+    const topNodes = currentData?.nodes || [];
 
     return (
         <TenantOverviewTableLayout loading={loading} error={error} withData={Boolean(currentData)}>

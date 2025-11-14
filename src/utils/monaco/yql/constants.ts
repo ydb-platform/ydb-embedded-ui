@@ -756,4 +756,5 @@ export const EntitySettings: Record<YQLEntity, string[]> = {
     replication: ['ENDPOINT', 'DATABASE', 'USER', 'PASSWORD'],
     tableIndex: [],
     topicConsumer: ['important', 'read_from'],
+    streamingQuery: ['RUN'],
 };

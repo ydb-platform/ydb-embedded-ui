@@ -123,27 +123,26 @@ public class YDBConnect {
 }
 
 export function getNodeJSSnippetCode({database, endpoint}: SnippetParams) {
-    return `const {Driver, getCredentialsFromEnv, getLogger} = require('ydb-sdk');
+    return `// Requires Node.js 20.19 or higher (also works with Deno/Bun)
+// Documentation: https://ydb.js.org
+// Source code: https://github.com/ydb-platform/ydb-js-sdk
+// Examples: https://github.com/ydb-platform/ydb-js-examples
+import {Driver} from '@ydbjs/core';
+import {query} from '@ydbjs/query';
+import type {ResultSet} from '@ydbjs/query';
 
-const logger = getLogger({level: 'debug'});
-const endpoint = '${endpoint ?? '<endpoint>'}';
-const database = '${database ?? '/<database>'}';
-const authService = getCredentialsFromEnv();
-const driver = new Driver({endpoint, database, authService});
+const connectionString = '${endpoint ?? '<endpoint>'}${database ?? '/<database>'}';
+
+const driver = new Driver(connectionString);
 
 async function run() {
-  if (!await driver.ready(100)) {
-      logger.fatal('Driver has not become ready in 10 seconds!');
-      process.exit(1);
-  }
+  await driver.ready();
+  const sql = query(driver);
 
-  await driver.tableClient.withSession(async (session) => {
-      res = await session.executeQuery("SELECT 'Hello, world!'")
-      console.log(res.resultSets[0].rows[0].items[0].bytesValue.toString())
-      return
-  });
+  const resultSets: ResultSet[] = await sql\`SELECT 'Hello, world!' AS message;\`;
+  console.log(resultSets[0].rows[0].message);
 
-  process.exit(0)
+  await driver.close();
 }
 
 run();`;
@@ -169,7 +168,7 @@ $config = [
         // 'root_cert_file' => './CA.pem',  Root CA file (uncomment for dedicated server only)
     ],
 
-    'credentials' => new AccessTokenAuthentication('<token>') // use from reference/ydb-sdk/auth
+    'credentials' => new AccessTokenAuthentication('<token>')
 ];
 
 $ydb = new Ydb($config);`;

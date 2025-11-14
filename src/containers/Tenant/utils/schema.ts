@@ -1,7 +1,8 @@
 import type {NavigationTreeNodeType} from 'ydb-ui-components';
 
-import {EPathSubType, EPathType} from '../../../types/api/schema';
+import {EIndexType, EPathSubType, EPathType} from '../../../types/api/schema';
 import type {ETenantType} from '../../../types/api/tenant';
+import i18n from '../i18n';
 
 // this file contains verbose mappings that are typed in a way that ensures
 // correctness when a new node type or a new path type is added
@@ -10,6 +11,8 @@ import type {ETenantType} from '../../../types/api/tenant';
 const pathSubTypeToNodeType: Record<EPathSubType, NavigationTreeNodeType | undefined> = {
     [EPathSubType.EPathSubTypeSyncIndexImplTable]: 'index_table',
     [EPathSubType.EPathSubTypeAsyncIndexImplTable]: 'index_table',
+    [EPathSubType.EPathSubTypeVectorKmeansTreeIndexImplTable]: 'index_table',
+    [EPathSubType.EPathSubTypeFulltextIndexImplTable]: 'index_table',
 
     [EPathSubType.EPathSubTypeStreamImpl]: undefined,
     [EPathSubType.EPathSubTypeEmpty]: undefined,
@@ -25,6 +28,7 @@ const pathTypeToNodeType: Record<EPathType, NavigationTreeNodeType | undefined> 
     [EPathType.EPathTypeColumnStore]: 'directory',
 
     [EPathType.EPathTypeTable]: 'table',
+    [EPathType.EPathTypeSysView]: 'system_table',
 
     [EPathType.EPathTypeTableIndex]: 'index',
 
@@ -41,6 +45,8 @@ const pathTypeToNodeType: Record<EPathType, NavigationTreeNodeType | undefined> 
     [EPathType.EPathTypeReplication]: 'async_replication',
     [EPathType.EPathTypeTransfer]: 'transfer',
     [EPathType.EPathTypeResourcePool]: 'resource_pool',
+
+    [EPathType.EPathTypeStreamingQuery]: 'streaming_query',
 };
 
 export const nodeTableTypeToPathType: Partial<Record<NavigationTreeNodeType, EPathType>> = {
@@ -50,6 +56,11 @@ export const nodeTableTypeToPathType: Partial<Record<NavigationTreeNodeType, EPa
     external_table: EPathType.EPathTypeExternalTable,
     view: EPathType.EPathTypeView,
 };
+
+export const nodeStreamingQueryTypeToPathType: Partial<Record<NavigationTreeNodeType, EPathType>> =
+    {
+        streaming_query: EPathType.EPathTypeStreamingQuery,
+    };
 
 export const mapPathTypeToNavigationTreeType = (
     type: EPathType = EPathType.EPathTypeDir,
@@ -61,8 +72,12 @@ export const mapPathTypeToNavigationTreeType = (
 // ====================
 
 const pathSubTypeToEntityName: Record<EPathSubType, string | undefined> = {
-    [EPathSubType.EPathSubTypeSyncIndexImplTable]: 'Secondary Index Table',
-    [EPathSubType.EPathSubTypeAsyncIndexImplTable]: 'Secondary Index Table',
+    [EPathSubType.EPathSubTypeSyncIndexImplTable]: i18n('entity-name_secondary-index-table'),
+    [EPathSubType.EPathSubTypeAsyncIndexImplTable]: i18n('entity-name_secondary-index-table'),
+    [EPathSubType.EPathSubTypeVectorKmeansTreeIndexImplTable]: i18n(
+        'entity-name_vector-index-table',
+    ),
+    [EPathSubType.EPathSubTypeFulltextIndexImplTable]: i18n('entity-name_fulltext-index-table'),
 
     [EPathSubType.EPathSubTypeStreamImpl]: undefined,
     [EPathSubType.EPathSubTypeEmpty]: undefined,
@@ -71,25 +86,28 @@ const pathSubTypeToEntityName: Record<EPathSubType, string | undefined> = {
 const pathTypeToEntityName: Record<EPathType, string | undefined> = {
     [EPathType.EPathTypeInvalid]: undefined,
 
-    [EPathType.EPathTypeSubDomain]: 'Database',
-    [EPathType.EPathTypeExtSubDomain]: 'Database',
+    [EPathType.EPathTypeSubDomain]: i18n('entity-name_database'),
+    [EPathType.EPathTypeExtSubDomain]: i18n('entity-name_database'),
 
-    [EPathType.EPathTypeDir]: 'Directory',
-    [EPathType.EPathTypeTable]: 'Table',
-    [EPathType.EPathTypeTableIndex]: 'Secondary Index',
-    [EPathType.EPathTypeColumnStore]: 'Tablestore',
-    [EPathType.EPathTypeColumnTable]: 'Column-oriented table',
-    [EPathType.EPathTypeCdcStream]: 'Changefeed',
-    [EPathType.EPathTypePersQueueGroup]: 'Topic',
+    [EPathType.EPathTypeDir]: i18n('entity-name_directory'),
+    [EPathType.EPathTypeTable]: i18n('entity-name_table'),
+    [EPathType.EPathTypeSysView]: i18n('entity-name_system-view'),
+    [EPathType.EPathTypeTableIndex]: i18n('entity-name_secondary-index'),
+    [EPathType.EPathTypeColumnStore]: i18n('entity-name_tablestore'),
+    [EPathType.EPathTypeColumnTable]: i18n('entity-name_column-oriented-table'),
+    [EPathType.EPathTypeCdcStream]: i18n('entity-name_changefeed'),
+    [EPathType.EPathTypePersQueueGroup]: i18n('entity-name_topic'),
 
-    [EPathType.EPathTypeExternalDataSource]: 'External Data Source',
-    [EPathType.EPathTypeExternalTable]: 'External Table',
+    [EPathType.EPathTypeExternalDataSource]: i18n('entity-name_external-data-source'),
+    [EPathType.EPathTypeExternalTable]: i18n('entity-name_external-table'),
 
-    [EPathType.EPathTypeView]: 'View',
+    [EPathType.EPathTypeStreamingQuery]: i18n('entity-name_streaming_query'),
 
-    [EPathType.EPathTypeReplication]: 'Async Replication',
-    [EPathType.EPathTypeTransfer]: 'Transfer',
-    [EPathType.EPathTypeResourcePool]: 'Resource Pool',
+    [EPathType.EPathTypeView]: i18n('entity-name_view'),
+
+    [EPathType.EPathTypeReplication]: i18n('entity-name_async-replication'),
+    [EPathType.EPathTypeTransfer]: i18n('entity-name_transfer'),
+    [EPathType.EPathTypeResourcePool]: i18n('entity-name_resource-pool'),
 };
 
 export const mapPathTypeToEntityName = (
@@ -97,6 +115,18 @@ export const mapPathTypeToEntityName = (
     subType?: EPathSubType,
 ): string | undefined =>
     (subType && pathSubTypeToEntityName[subType]) || (type && pathTypeToEntityName[type]);
+
+// ====================
+
+const indexTypeToEntityName: Record<EIndexType, string | undefined> = {
+    [EIndexType.EIndexTypeInvalid]: undefined,
+    [EIndexType.EIndexTypeGlobal]: i18n('entity-name_secondary-index'),
+    [EIndexType.EIndexTypeGlobalAsync]: i18n('entity-name_secondary-index'),
+    [EIndexType.EIndexTypeGlobalVectorKmeansTree]: i18n('entity-name_vector-index'),
+    [EIndexType.EIndexTypeGlobalFulltext]: i18n('entity-name_fulltext-index'),
+};
+
+export const mapIndexTypeToEntityName = (type?: EIndexType) => type && indexTypeToEntityName[type];
 
 // ====================
 
@@ -115,6 +145,7 @@ export const mapDatabaseTypeToDBName = (type?: ETenantType) => type && databaseT
 const pathTypeToIsTable: Record<EPathType, boolean> = {
     [EPathType.EPathTypeTable]: true,
     [EPathType.EPathTypeColumnTable]: true,
+    [EPathType.EPathTypeSysView]: true,
 
     [EPathType.EPathTypeExternalTable]: true,
 
@@ -132,6 +163,7 @@ const pathTypeToIsTable: Record<EPathType, boolean> = {
     [EPathType.EPathTypeReplication]: false,
     [EPathType.EPathTypeTransfer]: false,
     [EPathType.EPathTypeResourcePool]: false,
+    [EPathType.EPathTypeStreamingQuery]: false,
 };
 
 //if add entity with tableType, make sure that Schema is available in Diagnostics section
@@ -143,6 +175,8 @@ export const isTableType = (pathType?: EPathType) =>
 const pathSubTypeToIsIndexImpl: Record<EPathSubType, boolean> = {
     [EPathSubType.EPathSubTypeSyncIndexImplTable]: true,
     [EPathSubType.EPathSubTypeAsyncIndexImplTable]: true,
+    [EPathSubType.EPathSubTypeVectorKmeansTreeIndexImplTable]: true,
+    [EPathSubType.EPathSubTypeFulltextIndexImplTable]: true,
 
     [EPathSubType.EPathSubTypeStreamImpl]: false,
     [EPathSubType.EPathSubTypeEmpty]: false,
@@ -160,6 +194,7 @@ const pathTypeToIsColumn: Record<EPathType, boolean> = {
     [EPathType.EPathTypeInvalid]: false,
     [EPathType.EPathTypeDir]: false,
     [EPathType.EPathTypeTable]: false,
+    [EPathType.EPathTypeSysView]: false,
     [EPathType.EPathTypeSubDomain]: false,
     [EPathType.EPathTypeTableIndex]: false,
     [EPathType.EPathTypeExtSubDomain]: false,
@@ -168,6 +203,8 @@ const pathTypeToIsColumn: Record<EPathType, boolean> = {
 
     [EPathType.EPathTypeExternalDataSource]: false,
     [EPathType.EPathTypeExternalTable]: false,
+
+    [EPathType.EPathTypeStreamingQuery]: false,
 
     [EPathType.EPathTypeView]: false,
 
@@ -189,12 +226,15 @@ const pathTypeToIsDatabase: Record<EPathType, boolean> = {
     [EPathType.EPathTypeColumnStore]: false,
     [EPathType.EPathTypeColumnTable]: false,
     [EPathType.EPathTypeTable]: false,
+    [EPathType.EPathTypeSysView]: false,
     [EPathType.EPathTypeTableIndex]: false,
     [EPathType.EPathTypeCdcStream]: false,
     [EPathType.EPathTypePersQueueGroup]: false,
 
     [EPathType.EPathTypeExternalDataSource]: false,
     [EPathType.EPathTypeExternalTable]: false,
+
+    [EPathType.EPathTypeStreamingQuery]: false,
 
     [EPathType.EPathTypeView]: false,
 
@@ -212,11 +252,16 @@ export const isCdcStreamEntityType = (type?: EPathType) => type === EPathType.EP
 
 export const isTopicEntityType = (type?: EPathType) => type === EPathType.EPathTypePersQueueGroup;
 
+export const isEntityWithTopicData = (type?: EPathType) =>
+    type === EPathType.EPathTypeCdcStream || type === EPathType.EPathTypePersQueueGroup;
+
 // ====================
 
 const pathSubTypeToChildless: Record<EPathSubType, boolean> = {
     [EPathSubType.EPathSubTypeSyncIndexImplTable]: true,
     [EPathSubType.EPathSubTypeAsyncIndexImplTable]: true,
+    [EPathSubType.EPathSubTypeVectorKmeansTreeIndexImplTable]: true,
+    [EPathSubType.EPathSubTypeFulltextIndexImplTable]: true,
     [EPathSubType.EPathSubTypeStreamImpl]: true,
 
     [EPathSubType.EPathSubTypeEmpty]: false,
@@ -240,9 +285,11 @@ const pathTypeToChildless: Record<EPathType, boolean> = {
     [EPathType.EPathTypeColumnTable]: false,
     [EPathType.EPathTypeDir]: false,
     [EPathType.EPathTypeTable]: false,
+    [EPathType.EPathTypeSysView]: false,
     [EPathType.EPathTypeSubDomain]: false,
     [EPathType.EPathTypeTableIndex]: false,
     [EPathType.EPathTypeExtSubDomain]: false,
+    [EPathType.EPathTypeStreamingQuery]: true,
 };
 
 export const isChildlessPathType = (type?: EPathType, subType?: EPathSubType) =>
@@ -253,3 +300,4 @@ export const isChildlessPathType = (type?: EPathType, subType?: EPathSubType) =>
 export const isExternalTableType = (type?: EPathType) => type === EPathType.EPathTypeExternalTable;
 export const isRowTableType = (type?: EPathType) => type === EPathType.EPathTypeTable;
 export const isViewType = (type?: EPathType) => type === EPathType.EPathTypeView;
+export const isSystemViewType = (type?: EPathType) => type === EPathType.EPathTypeSysView;

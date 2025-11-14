@@ -1,18 +1,38 @@
 import React from 'react';
 
+import type {LabelProps} from '@gravity-ui/uikit';
 import {StringParam, useQueryParams} from 'use-query-params';
 
+import {getTenantPath} from '../../../routes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import type {TenantDiagnosticsTab} from '../../../store/reducers/tenant/types';
 import {EPathSubType, EPathType} from '../../../types/api/schema';
+import type {ETenantType} from '../../../types/api/tenant';
 import type {TenantQuery} from '../TenantPages';
-import {TenantTabsGroups, getTenantPath} from '../TenantPages';
-import {isDatabaseEntityType, isTopicEntityType} from '../utils/schema';
+import {TenantTabsGroups} from '../TenantPages';
+import {isDatabaseEntityType, isEntityWithTopicData} from '../utils/schema';
+
+interface Badge {
+    text: string;
+    theme?: LabelProps['theme'];
+    size?: LabelProps['size'];
+}
 
 type Page = {
     id: TenantDiagnosticsTab;
     title: string;
+    badge?: Badge;
 };
+
+interface GetPagesOptions {
+    hasTopicData?: boolean;
+    isTopLevel?: boolean;
+    hasBackups?: boolean;
+    hasConfigs?: boolean;
+    hasAccess?: boolean;
+    hasMonitoring?: boolean;
+    databaseType?: ETenantType;
+}
 
 const overview = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.overview,
@@ -99,12 +119,23 @@ const operations = {
     title: 'Operations',
 };
 
+const monitoring = {
+    id: TENANT_DIAGNOSTICS_TABS_IDS.monitoring,
+    title: 'Monitoring',
+    badge: {
+        text: 'New',
+        theme: 'normal' as const,
+        size: 'xs' as const,
+    },
+};
+
 const ASYNC_REPLICATION_PAGES = [overview, tablets, describe, access];
 
 const TRANSFER_PAGES = [overview, tablets, describe, access];
 
 const DATABASE_PAGES = [
     overview,
+    monitoring,
     topQueries,
     topShards,
     nodes,
@@ -118,12 +149,24 @@ const DATABASE_PAGES = [
     backups,
 ];
 
+const SERVERLESS_DATABASE_PAGES = [
+    overview,
+    monitoring,
+    topQueries,
+    topShards,
+    tablets,
+    describe,
+    configs,
+    operations,
+];
+
 const TABLE_PAGES = [overview, schema, topShards, nodes, graph, tablets, hotKeys, describe, access];
 const COLUMN_TABLE_PAGES = [overview, schema, topShards, nodes, tablets, describe, access];
+const SYSTEM_VIEW_PAGES = [overview, schema, nodes, describe, access];
 
 const DIR_PAGES = [overview, topShards, nodes, describe, access];
 
-const CDC_STREAM_PAGES = [overview, consumers, partitions, nodes, describe, access];
+const CDC_STREAM_PAGES = [overview, consumers, partitions, topicData, nodes, describe, access];
 const CDC_STREAM_IMPL_PAGES = [overview, nodes, tablets, describe, access];
 const TOPIC_PAGES = [overview, consumers, partitions, topicData, nodes, tablets, describe, access];
 
@@ -131,6 +174,8 @@ const EXTERNAL_DATA_SOURCE_PAGES = [overview, describe, access];
 const EXTERNAL_TABLE_PAGES = [overview, schema, describe, access];
 
 const VIEW_PAGES = [overview, schema, describe, access];
+
+const STREAMING_QUERY_PAGES = [overview, describe, access];
 
 // verbose mapping to guarantee correct tabs for new path types
 // TS will error when a new type is added but not mapped here
@@ -143,6 +188,7 @@ const pathTypeToPages: Record<EPathType, Page[] | undefined> = {
 
     [EPathType.EPathTypeTable]: TABLE_PAGES,
     [EPathType.EPathTypeColumnTable]: COLUMN_TABLE_PAGES,
+    [EPathType.EPathTypeSysView]: SYSTEM_VIEW_PAGES,
 
     [EPathType.EPathTypeDir]: DIR_PAGES,
     [EPathType.EPathTypeTableIndex]: DIR_PAGES,
@@ -153,6 +199,8 @@ const pathTypeToPages: Record<EPathType, Page[] | undefined> = {
 
     [EPathType.EPathTypeExternalDataSource]: EXTERNAL_DATA_SOURCE_PAGES,
     [EPathType.EPathTypeExternalTable]: EXTERNAL_TABLE_PAGES,
+
+    [EPathType.EPathTypeStreamingQuery]: STREAMING_QUERY_PAGES,
 
     [EPathType.EPathTypeView]: VIEW_PAGES,
 
@@ -165,44 +213,55 @@ const pathSubTypeToPages: Record<EPathSubType, Page[] | undefined> = {
 
     [EPathSubType.EPathSubTypeSyncIndexImplTable]: undefined,
     [EPathSubType.EPathSubTypeAsyncIndexImplTable]: undefined,
+    [EPathSubType.EPathSubTypeVectorKmeansTreeIndexImplTable]: undefined,
+    [EPathSubType.EPathSubTypeFulltextIndexImplTable]: undefined,
     [EPathSubType.EPathSubTypeEmpty]: undefined,
 };
+
+function computeInitialPages(type?: EPathType, subType?: EPathSubType) {
+    const subTypePages = subType ? pathSubTypeToPages[subType] : undefined;
+    const typePages = type ? pathTypeToPages[type] : undefined;
+    return subTypePages || typePages || DIR_PAGES;
+}
+
+function getDatabasePages(databaseType?: ETenantType) {
+    return databaseType === 'Serverless' ? SERVERLESS_DATABASE_PAGES : DATABASE_PAGES;
+}
+
+function applyFilters(pages: Page[], type?: EPathType, options: GetPagesOptions = {}) {
+    let result = pages;
+
+    if (isEntityWithTopicData(type) && !options.hasTopicData) {
+        result = result.filter((p) => p.id !== TENANT_DIAGNOSTICS_TABS_IDS.topicData);
+    }
+
+    const removals: TenantDiagnosticsTab[] = [];
+    if (!options.hasBackups) {
+        removals.push(TENANT_DIAGNOSTICS_TABS_IDS.backups);
+    }
+    if (!options.hasConfigs) {
+        removals.push(TENANT_DIAGNOSTICS_TABS_IDS.configs);
+    }
+    if (!options.hasAccess) {
+        removals.push(TENANT_DIAGNOSTICS_TABS_IDS.access);
+    }
+    if (!options.hasMonitoring) {
+        removals.push(TENANT_DIAGNOSTICS_TABS_IDS.monitoring);
+    }
+
+    return result.filter((p) => !removals.includes(p.id));
+}
 
 export const getPagesByType = (
     type?: EPathType,
     subType?: EPathSubType,
-    options?: {
-        hasFeatureFlags?: boolean;
-        hasTopicData?: boolean;
-        isTopLevel?: boolean;
-        hasBackups?: boolean;
-        hasConfigs?: boolean;
-        hasAccess?: boolean;
-    },
+    options?: GetPagesOptions,
 ) => {
-    const subTypePages = subType ? pathSubTypeToPages[subType] : undefined;
-    const typePages = type ? pathTypeToPages[type] : undefined;
-    let pages = subTypePages || typePages || DIR_PAGES;
+    const base = computeInitialPages(type, subType);
+    const dbContext = isDatabaseEntityType(type) || options?.isTopLevel;
+    const seeded = dbContext ? getDatabasePages(options?.databaseType) : base;
 
-    if (isTopicEntityType(type) && !options?.hasTopicData) {
-        pages = pages?.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.topicData);
-    }
-    if (isDatabaseEntityType(type) || options?.isTopLevel) {
-        pages = DATABASE_PAGES;
-        if (!options?.hasFeatureFlags) {
-            pages = pages.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.configs);
-        }
-    }
-    if (!options?.hasBackups) {
-        pages = pages.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.backups);
-    }
-    if (!options?.hasConfigs) {
-        pages = pages.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.configs);
-    }
-    if (!options?.hasAccess) {
-        pages = pages.filter((item) => item.id !== TENANT_DIAGNOSTICS_TABS_IDS.access);
-    }
-    return pages;
+    return applyFilters(seeded, type, options);
 };
 
 export const useDiagnosticsPageLinkGetter = () => {

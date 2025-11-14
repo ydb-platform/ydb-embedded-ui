@@ -1,17 +1,15 @@
 import React from 'react';
 
-import type {TableColumnSetupItem} from '@gravity-ui/uikit';
-import {Select, TableColumnSetup, Text} from '@gravity-ui/uikit';
+import {Select, Text} from '@gravity-ui/uikit';
 
 import {EntitiesCount} from '../../../components/EntitiesCount';
-import {ProblemFilter} from '../../../components/ProblemFilter';
+import {ProblemFilter} from '../../../components/ProblemFilter/ProblemFilter';
 import {Search} from '../../../components/Search';
 import {UptimeFilter} from '../../../components/UptimeFIlter';
 import {
     useViewerNodesHandlerHasGroupingBySystemState,
     useViewerNodesHandlerHasNetworkStats,
 } from '../../../store/reducers/capabilities/hooks';
-import {useProblemFilter} from '../../../store/reducers/settings/hooks';
 import type {NodesGroupByField} from '../../../types/api/nodes';
 import {useIsViewerUser} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {PeerRoleFilter} from '../PeerRoleFilter/PeerRoleFilter';
@@ -26,9 +24,6 @@ interface NodesControlsProps {
 
     withPeerRoleFilter?: boolean;
 
-    columnsToSelect: TableColumnSetupItem[];
-    handleSelectedColumnsUpdate: (updated: TableColumnSetupItem[]) => void;
-
     entitiesCountCurrent: number;
     entitiesCountTotal?: number;
     entitiesLoading: boolean;
@@ -40,9 +35,6 @@ export function NodesControls({
 
     withPeerRoleFilter,
 
-    columnsToSelect,
-    handleSelectedColumnsUpdate,
-
     entitiesCountCurrent,
     entitiesCountTotal,
     entitiesLoading,
@@ -52,13 +44,14 @@ export function NodesControls({
         uptimeFilter,
         peerRoleFilter,
         groupByParam,
+        withProblems,
 
         handleSearchQueryChange,
         handleUptimeFilterChange,
         handlePeerRoleFilterChange,
         handleGroupByParamChange,
-    } = useNodesPageQueryParams(groupByParams);
-    const {problemFilter, handleProblemFilterChange} = useProblemFilter();
+        handleWithProblemsChange,
+    } = useNodesPageQueryParams(groupByParams, withPeerRoleFilter);
     const isViewerUser = useIsViewerUser();
 
     const systemStateGroupingAvailable = useViewerNodesHandlerHasGroupingBySystemState();
@@ -80,7 +73,7 @@ export function NodesControls({
                 value={searchValue}
             />
             {systemStateGroupingAvailable && withGroupBySelect ? null : (
-                <ProblemFilter value={problemFilter} onChange={handleProblemFilterChange} />
+                <ProblemFilter value={withProblems} onChange={handleWithProblemsChange} />
             )}
             {withGroupBySelect ? null : (
                 <UptimeFilter value={uptimeFilter} onChange={handleUptimeFilterChange} />
@@ -91,13 +84,7 @@ export function NodesControls({
                     <PeerRoleFilter value={peerRoleFilter} onChange={handlePeerRoleFilterChange} />
                 </React.Fragment>
             ) : null}
-            <TableColumnSetup
-                popupWidth={200}
-                items={columnsToSelect}
-                showStatus
-                onUpdate={handleSelectedColumnsUpdate}
-                sortable={false}
-            />
+
             {withGroupBySelect ? (
                 <React.Fragment>
                     <Text variant="body-2">{i18n('controls_group-by-placeholder')}</Text>

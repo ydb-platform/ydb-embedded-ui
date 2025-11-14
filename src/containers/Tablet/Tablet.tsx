@@ -13,7 +13,7 @@ import {ResponseError} from '../../components/Errors/ResponseError';
 import {InternalLink} from '../../components/InternalLink';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
-import {getTabletPagePath, tabletPageQueryParams} from '../../routes';
+import {tabletPageQueryParams, useTabletPagePath} from '../../routes';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {tabletApi} from '../../store/reducers/tablet';
 import {EFlag} from '../../types/api/enums';
@@ -66,39 +66,37 @@ export function Tablet() {
     const [{database: queryDatabase, clusterName: queryClusterName, followerId: queryFollowerId}] =
         useQueryParams(tabletPageQueryParams);
 
+    const database = queryDatabase?.toString();
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tabletApi.useGetTabletQuery(
-        {id, database: queryDatabase ?? undefined, followerId: queryFollowerId ?? undefined},
+        {id, database, followerId: queryFollowerId ?? undefined},
         {pollingInterval: autoRefreshInterval},
     );
 
     const loading = isFetching && currentData === undefined;
     const {data: tablet = {}, history = []} = currentData || {};
 
-    const {currentData: tenantPath} = tabletApi.useGetTabletDescribeQuery(
-        tablet.TenantId
-            ? {tenantId: tablet.TenantId, database: queryDatabase?.toString()}
-            : skipToken,
+    const {currentData: databaseFullPath} = tabletApi.useGetTabletDescribeQuery(
+        tablet.TenantId ? {tenantId: tablet.TenantId, database} : skipToken,
     );
-
-    const database = (tenantPath || queryDatabase) ?? undefined;
 
     const tabletType = tablet.Type;
 
     React.useEffect(() => {
         dispatch(
             setHeaderBreadcrumbs('tablet', {
-                tenantName: queryDatabase ?? undefined,
+                database,
                 tabletId: id,
                 tabletType,
+                databaseName: databaseFullPath,
             }),
         );
-    }, [dispatch, queryDatabase, id, tabletType]);
+    }, [dispatch, database, id, tabletType, databaseFullPath]);
 
     const {Leader} = tablet;
     const metaItems: string[] = [];
-    if (database) {
-        metaItems.push(`${i18n('tablet.meta-database')}: ${database}`);
+    if (databaseFullPath) {
+        metaItems.push(`${i18n('tablet.meta-database')}: ${databaseFullPath}`);
     }
     // Add "Tablet" instead of tablet type to metadata
     metaItems.push(i18n('tablet.header'));
@@ -110,15 +108,13 @@ export function Tablet() {
         <Flex gap={5} direction="column" className={b()}>
             <Helmet>
                 <title>{`${id} — ${i18n('tablet.header')} — ${
-                    database || queryClusterName || CLUSTER_DEFAULT_TITLE
+                    databaseFullPath || queryClusterName || CLUSTER_DEFAULT_TITLE
                 }`}</title>
             </Helmet>
             <PageMetaWithAutorefresh items={metaItems} />
             <LoaderWrapper loading={loading} size="l">
                 {error ? <ResponseError error={error} /> : null}
-                {currentData ? (
-                    <TabletContent id={id} tablet={tablet} history={history} database={database} />
-                ) : null}
+                {currentData ? <TabletContent id={id} tablet={tablet} history={history} /> : null}
             </LoaderWrapper>
         </Flex>
     );
@@ -128,12 +124,10 @@ function TabletContent({
     id,
     tablet,
     history,
-    database,
 }: {
     id: string;
     tablet: TTabletStateInfo;
     history: ITabletPreparedHistoryItem[];
-    database?: string;
 }) {
     const isEmpty = !Object.keys(tablet).length;
     const {Overall, HiveId, FollowerId, Type} = tablet;
@@ -155,7 +149,7 @@ function TabletContent({
                 <TabletControls tablet={tablet} />
                 <TabletInfo tablet={tablet} />
             </Flex>
-            <TabletTabs id={id} hiveId={HiveId} history={history} database={database} />
+            <TabletTabs id={id} hiveId={HiveId} history={history} />
         </EmptyStateWrapper>
     );
 }
@@ -164,13 +158,12 @@ function TabletTabs({
     id,
     hiveId,
     history,
-    database,
 }: {
     id: string;
     hiveId?: string;
-    database?: string;
     history: ITabletPreparedHistoryItem[];
 }) {
+    const getTabletPagePath = useTabletPagePath();
     const [{activeTab, ...restParams}, setParams] = useQueryParams(tabletPageQueryParams);
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
 
@@ -208,9 +201,7 @@ function TabletTabs({
                     </TabList>
                 </TabProvider>
             </div>
-            {tabletTab === 'history' ? (
-                <TabletTable history={history} tabletId={id} database={database} />
-            ) : null}
+            {tabletTab === 'history' ? <TabletTable history={history} tabletId={id} /> : null}
             {tabletTab === 'channels' && !noAdvancedInfo ? (
                 <Channels id={id} hiveId={hiveId} />
             ) : null}

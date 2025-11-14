@@ -1,12 +1,13 @@
 import React from 'react';
 
-import type {Column} from '../../../components/PaginatedTable';
+import type {PaginatedTableData} from '../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
+import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {NODES_COLUMNS_TITLES} from '../../../components/nodesColumns/constants';
 import type {NodesColumnId} from '../../../components/nodesColumns/constants';
+import type {NodesColumn} from '../../../components/nodesColumns/types';
 import {useViewerNodesHandlerHasGrouping} from '../../../store/reducers/capabilities/hooks';
-import type {NodesPreparedEntity} from '../../../store/reducers/nodes/types';
-import {useProblemFilter} from '../../../store/reducers/settings/hooks';
+import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField} from '../../../types/api/nodes';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
 import {NodesTable} from '../NodesTable';
@@ -17,18 +18,21 @@ import {NodesControlsWithTableState} from './NodesControlsWithTableState';
 interface NodesComponentProps {
     path?: string;
     database?: string;
+    databaseFullPath?: string;
     scrollContainerRef: React.RefObject<HTMLElement>;
     withPeerRoleFilter?: boolean;
-    columns: Column<NodesPreparedEntity>[];
+    columns: NodesColumn[];
     defaultColumnsIds: NodesColumnId[];
     requiredColumnsIds: NodesColumnId[];
     selectedColumnsKey: string;
     groupByParams: NodesGroupByField[];
+    onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
 }
 
 export function NodesComponent({
     path,
     database,
+    databaseFullPath,
     scrollContainerRef,
     withPeerRoleFilter,
     columns,
@@ -36,9 +40,12 @@ export function NodesComponent({
     requiredColumnsIds,
     selectedColumnsKey,
     groupByParams,
+    onDataFetched,
 }: NodesComponentProps) {
-    const {searchValue, uptimeFilter, peerRoleFilter} = useNodesPageQueryParams(groupByParams);
-    const {problemFilter} = useProblemFilter();
+    const {searchValue, uptimeFilter, peerRoleFilter, withProblems} = useNodesPageQueryParams(
+        groupByParams,
+        withPeerRoleFilter,
+    );
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
@@ -56,25 +63,33 @@ export function NodesComponent({
                     withGroupBySelect={viewerNodesHandlerHasGrouping}
                     groupByParams={groupByParams}
                     withPeerRoleFilter={withPeerRoleFilter}
-                    columnsToSelect={columnsToSelect}
-                    handleSelectedColumnsUpdate={setColumns}
+                />
+            }
+            extraControls={
+                <TableColumnSetup
+                    popupWidth={200}
+                    items={columnsToSelect}
+                    showStatus
+                    onUpdate={setColumns}
                 />
             }
             table={
                 <NodesTable
                     path={path}
                     database={database}
+                    databaseFullPath={databaseFullPath}
                     searchValue={searchValue}
-                    problemFilter={problemFilter}
+                    withProblems={withProblems}
                     uptimeFilter={uptimeFilter}
                     peerRoleFilter={peerRoleFilter}
                     columns={columnsToShow}
                     scrollContainerRef={scrollContainerRef}
+                    onDataFetched={onDataFetched}
                 />
             }
             tableWrapperProps={{
                 scrollContainerRef,
-                scrollDependencies: [searchValue, problemFilter, uptimeFilter, peerRoleFilter],
+                scrollDependencies: [searchValue, withProblems, uptimeFilter, peerRoleFilter],
             }}
         />
     );

@@ -25,10 +25,10 @@ const queryModeSchema = z.nativeEnum(QueryModeIds).catch(QueryModeIds.top);
 const timeFrameSchema = z.nativeEnum(TimeFrameIds).catch(TimeFrameIds.hour);
 
 interface TopQueriesProps {
-    tenantName: string;
+    database: string;
 }
 
-export const TopQueries = ({tenantName}: TopQueriesProps) => {
+export const TopQueries = ({database}: TopQueriesProps) => {
     const dispatch = useTypedDispatch();
     const [rawQueryMode = QueryModeIds.top, setQueryMode] = useQueryParam('queryMode', StringParam);
     const [rawTimeFrame = TimeFrameIds.hour, setTimeFrame] = useQueryParam(
@@ -68,7 +68,7 @@ export const TopQueries = ({tenantName}: TopQueriesProps) => {
 
     return isTopQueries ? (
         <TopQueriesData
-            tenantName={tenantName}
+            database={database}
             timeFrame={timeFrame}
             renderQueryModeControl={renderQueryModeControl}
             handleTimeFrameChange={handleTimeFrameChange}
@@ -77,7 +77,7 @@ export const TopQueries = ({tenantName}: TopQueriesProps) => {
         />
     ) : (
         <RunningQueriesData
-            tenantName={tenantName}
+            database={database}
             renderQueryModeControl={renderQueryModeControl}
             handleTextSearchUpdate={handleTextSearchUpdate}
         />

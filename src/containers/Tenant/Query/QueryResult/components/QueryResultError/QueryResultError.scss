@@ -1,6 +1,5 @@
 .ydb-query-result-error {
     &__message {
-        padding-top: var(--g-spacing-4);
-        padding-left: var(--g-spacing-4);
+        padding: var(--g-spacing-4) var(--g-spacing-4) 0 var(--g-spacing-4);
     }
 }

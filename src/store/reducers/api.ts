@@ -11,6 +11,8 @@ export const api = createApi({
     invalidationBehavior: 'immediately',
     tagTypes: [
         'All',
+        'Conversations',
+        'Events',
         'PDiskData',
         'PreviewData',
         'SchemaTree',

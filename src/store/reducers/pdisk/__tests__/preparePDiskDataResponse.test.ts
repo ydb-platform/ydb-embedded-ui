@@ -255,4 +255,38 @@ describe('preparePDiskDataResponse', () => {
             1,
         );
     });
+
+    test('Should use used size as total for VDisk slot when used size exceeds size limit', () => {
+        const dataWithExceededVDiskUsage: TPDiskInfoResponse = {
+            ...rawData,
+            Whiteboard: {
+                ...rawData.Whiteboard,
+                PDisk: {
+                    ...rawData.Whiteboard?.PDisk,
+                    EnforcedDynamicSlotSize: '15000000000', // 15GB slot size
+                },
+                VDisks: [
+                    {
+                        ...rawData.Whiteboard?.VDisks?.[0],
+                        AllocatedSize: '20000000000', // 20GB used (exceeds 15GB slot size)
+                        AvailableSize: '0', // 0 available, so slot size should be used as limit
+                    },
+                ],
+            },
+            BSC: {
+                ...rawData.BSC,
+                PDisk: {
+                    ...rawData.BSC?.PDisk,
+                    EnforcedDynamicSlotSize: '15000000000', // 15GB slot size
+                },
+            },
+        };
+        const preparedData = preparePDiskDataResponse([dataWithExceededVDiskUsage, {}]);
+
+        const vDiskSlot = preparedData.SlotItems?.find((slot) => slot.SlotType === 'vDisk');
+
+        expect(vDiskSlot?.Used).toEqual(20_000_000_000); // 20GB used
+        // Since used (20GB) > sizeLimit (15GB), total should be set to used size
+        expect(vDiskSlot?.Total).toEqual(20_000_000_000); // Total equals used when used exceeds limit
+    });
 });

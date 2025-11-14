@@ -4,9 +4,8 @@ import {Flex} from '@gravity-ui/uikit';
 import {isEmpty} from 'lodash';
 
 import {InternalLink} from '../../../../../components/InternalLink';
-import {getTabletPagePath} from '../../../../../routes';
+import {useTabletPagePath} from '../../../../../routes';
 import type {Location} from '../../../../../types/api/healthcheck';
-import {useTenantQueryParams} from '../../../useTenantQueryParams';
 import i18n from '../../i18n';
 
 import {NodeInfo} from './NodeInfo';
@@ -58,7 +57,7 @@ export function ComputeLocation({location, hiddenFields = []}: ComputeLocationPr
 
     return (
         <SectionWithTitle title={i18n('label_compute_location')} titleVariant="subheader-2">
-            <Flex direction="column" gap={2}>
+            <Flex direction="column" gap={3}>
                 {fields.map((field) => LocationFieldRenderer[field](location))}
             </Flex>
         </SectionWithTitle>
@@ -70,8 +69,8 @@ interface ComputeSectionProps {
 }
 
 function TabletInfo({location}: ComputeSectionProps) {
+    const getTabletPagePath = useTabletPagePath();
     const {tablet} = location ?? {};
-    const {database} = useTenantQueryParams();
 
     if (!tablet) {
         return null;
@@ -85,9 +84,7 @@ function TabletInfo({location}: ComputeSectionProps) {
                         <IdList
                             ids={tablet.id}
                             renderItem={(id) => (
-                                <InternalLink to={getTabletPagePath(id, {database})}>
-                                    {id}
-                                </InternalLink>
+                                <InternalLink to={getTabletPagePath(id)}>{id}</InternalLink>
                             )}
                         />
                     ) : undefined,

@@ -1,22 +1,35 @@
-import type {PreparedNode} from '../../store/reducers/node/types';
+import {backend} from '../../store';
+import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
+import type {NodeAddress} from '../../types/additionalProps';
+import {uiFactory} from '../../uiFactory/uiFactory';
 import {
     createDeveloperUIInternalPageHref,
     createDeveloperUILinkWithNodeId,
 } from '../developerUI/developerUI';
+import {getBackendFromBalancerAndNodeId} from '../prepareBackend';
 
-import {useAdditionalNodesProps} from './useAdditionalNodesProps';
 import {useIsUserAllowedToMakeChanges} from './useIsUserAllowedToMakeChanges';
+import {useTypedSelector} from './useTypedSelector';
 
-export function useNodeDeveloperUIHref(node?: PreparedNode) {
-    const additionalNodesProps = useAdditionalNodesProps();
+export function useNodeDeveloperUIHref(node?: NodeAddress) {
+    const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
+
+    const {balancer = backend, settings} = useClusterBaseInfo();
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+
+    const useMetaProxy = uiFactory.useMetaProxy && settings?.use_meta_proxy !== false;
 
     if (!isUserAllowedToMakeChanges) {
         return undefined;
     }
 
-    if (additionalNodesProps?.getNodeRef) {
-        const developerUIHref = additionalNodesProps.getNodeRef(node);
+    // Only for multi-cluster version since there is no balancer in single-cluster mode
+    if (!singleClusterMode) {
+        const developerUIHref = getBackendFromBalancerAndNodeId(
+            node?.NodeId,
+            balancer,
+            useMetaProxy,
+        );
         return developerUIHref ? createDeveloperUIInternalPageHref(developerUIHref) : undefined;
     }
 

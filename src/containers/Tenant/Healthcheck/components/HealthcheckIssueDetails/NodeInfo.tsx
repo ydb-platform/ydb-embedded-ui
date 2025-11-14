@@ -1,6 +1,6 @@
 import {InternalLink} from '../../../../../components/InternalLink';
+import {getDefaultNodePath} from '../../../../../routes';
 import type {Location} from '../../../../../types/api/healthcheck';
-import {getDefaultNodePath} from '../../../../Node/NodePages';
 import {useTenantQueryParams} from '../../../useTenantQueryParams';
 import i18n from '../../i18n';
 
@@ -18,7 +18,7 @@ export function NodeInfo({node, title}: NodeInfoProps) {
     }
 
     const nodeLink = node.id ? (
-        <InternalLink to={getDefaultNodePath(node.id, {database})}>{node.id}</InternalLink>
+        <InternalLink to={getDefaultNodePath({id: node.id}, {database})}>{node.id}</InternalLink>
     ) : undefined;
 
     return (

@@ -64,11 +64,11 @@ export const tenantApi = api.injectEndpoints({
         getTenantInfo: builder.query({
             queryFn: async (
                 {
-                    path,
+                    database,
                     clusterName,
                     isMetaDatabasesAvailable,
                 }: {
-                    path: string;
+                    database: string;
                     clusterName?: string;
                     isMetaDatabasesAvailable: boolean;
                 },
@@ -78,21 +78,25 @@ export const tenantApi = api.injectEndpoints({
                     let tenantData: TTenantInfo;
                     if (window.api.meta && clusterName && isMetaDatabasesAvailable) {
                         tenantData = await window.api.meta.getTenantsV2(
-                            {path, clusterName},
+                            {database, clusterName},
                             {signal},
                         );
                     } else if (window.api.meta && clusterName) {
                         tenantData = await window.api.meta.getTenants(
-                            {path, clusterName},
+                            {database, clusterName},
                             {signal},
                         );
                     } else {
-                        tenantData = await window.api.viewer.getTenantInfo({path}, {signal});
+                        tenantData = await window.api.viewer.getTenantInfo({database}, {signal});
                     }
                     const databases = prepareTenants(tenantData.TenantInfo || []);
                     // previous meta versions do not support filtering databases by name
                     const data =
-                        databases.find((tenant) => tenant.Name === path) ?? databases[0] ?? null;
+                        databases.find(
+                            (tenant) => tenant.Name === database || tenant.Id === database,
+                        ) ??
+                        databases[0] ??
+                        null;
                     return {data};
                 } catch (error) {
                     return {error};
@@ -100,46 +104,35 @@ export const tenantApi = api.injectEndpoints({
             },
             providesTags: ['All'],
             serializeQueryArgs: ({queryArgs}) => {
-                const {clusterName, path} = queryArgs;
-                return {clusterName, path};
+                const {clusterName, database} = queryArgs;
+                return {clusterName, database};
             },
-        }),
-
-        getClusterConfig: builder.query({
-            queryFn: async ({database}: {database: string}, {signal}) => {
-                try {
-                    const res = await window.api.viewer.getClusterConfig(database, {signal});
-                    const db = res.Databases[0];
-
-                    return {data: db.FeatureFlags};
-                } catch (error) {
-                    return {error};
-                }
-            },
-            providesTags: ['All'],
         }),
     }),
     overrideExisting: 'throw',
 });
 
-export function useTenantBaseInfo(path: string) {
+export function useTenantBaseInfo(database: string) {
     const clusterNameFromQuery = useClusterNameFromQuery();
     const isMetaDatabasesAvailable = useDatabasesAvailable();
 
-    const {currentData} = tenantApi.useGetTenantInfoQuery(
+    const {currentData, isLoading, isError} = tenantApi.useGetTenantInfoQuery(
         {
-            path,
+            database,
             clusterName: clusterNameFromQuery,
             isMetaDatabasesAvailable,
         },
-        {skip: !path},
+        {skip: !database},
     );
 
-    const {ControlPlane, Name, Id} = currentData || {};
+    const {ControlPlane, Name, Id, Type} = currentData || {};
 
     return {
         controlPlane: ControlPlane,
         name: Name,
         id: Id,
+        databaseType: Type,
+        isLoading,
+        isError,
     };
 }

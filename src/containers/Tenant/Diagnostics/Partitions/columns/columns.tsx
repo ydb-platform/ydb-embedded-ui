@@ -4,13 +4,13 @@ import DataTable from '@gravity-ui/react-data-table';
 import {EntityStatus} from '../../../../../components/EntityStatus/EntityStatus';
 import {MultilineTableHeader} from '../../../../../components/MultilineTableHeader/MultilineTableHeader';
 import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
+import {getDefaultNodePath} from '../../../../../routes';
 import {useTopicDataAvailable} from '../../../../../store/reducers/capabilities/hooks';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {cn} from '../../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
 import {formatBytes, formatMsToUptime} from '../../../../../utils/dataFormatters/dataFormatters';
 import {isNumeric} from '../../../../../utils/utils';
-import {getDefaultNodePath} from '../../../../Node/NodePages';
 import {useDiagnosticsPageLinkGetter} from '../../DiagnosticsPages';
 import {
     ReadLagsHeader,
@@ -213,12 +213,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
         width: 200,
         render: ({row}) =>
             row.partitionNodeId && row.partitionHost ? (
-                <EntityStatus
-                    name={row.partitionHost}
-                    path={getDefaultNodePath(row.partitionNodeId)}
-                    showStatus={false}
-                    hasClipboardButton
-                />
+                <Node host={row.partitionHost} id={row.partitionNodeId} />
             ) : (
                 EMPTY_DATA_PLACEHOLDER
             ),
@@ -234,17 +229,28 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
         width: 200,
         render: ({row}) =>
             row.connectionNodeId && row.connectionHost ? (
-                <EntityStatus
-                    name={row.connectionHost}
-                    path={getDefaultNodePath(row.connectionNodeId)}
-                    showStatus={false}
-                    hasClipboardButton
-                />
+                <Node host={row.connectionHost} id={row.connectionNodeId} />
             ) : (
                 EMPTY_DATA_PLACEHOLDER
             ),
     },
 ];
+
+interface NodeProps {
+    host: string;
+    id: string | number;
+}
+
+function Node({host, id}: NodeProps) {
+    return (
+        <EntityStatus
+            name={host}
+            path={getDefaultNodePath({id})}
+            showStatus={false}
+            hasClipboardButton
+        />
+    );
+}
 
 // Topics without consumers have partitions data with no data corresponding to consumers
 // These columns will be empty and should not be displayed

@@ -1,4 +1,5 @@
 import type {Capability, MetaCapability, SecuritySetting} from '../../../types/api/capabilities';
+import {uiFactory} from '../../../uiFactory/uiFactory';
 import {useTypedSelector} from '../../../utils/hooks';
 import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 
@@ -53,6 +54,10 @@ export const useStorageGroupsHandlerAvailable = () => {
     return useGetFeatureVersion('/storage/groups') > 2;
 };
 
+export const useBlobIndexStatWithVdiskId = () => {
+    return useGetFeatureVersion('/vdisk/blobindexstat') > 1;
+};
+
 export const useStorageGroupsHandlerHasGrouping = () => {
     return useGetFeatureVersion('/storage/groups') > 4;
 };
@@ -86,8 +91,18 @@ export const useClusterDashboardAvailable = () => {
 export const useStreamingAvailable = () => {
     return useGetFeatureVersion('/viewer/query') >= 8;
 };
+export const useBaseConfigAvailable = () => {
+    return useGetFeatureVersion('/viewer/config') >= 1;
+};
+
+export const useConfigAvailable = () => {
+    const isBaseConfigsAvailable = useBaseConfigAvailable();
+    const isFeaturesAvailable = useFeatureFlagsAvailable();
+    return isBaseConfigsAvailable || isFeaturesAvailable;
+};
+
 export const useEditAccessAvailable = () => {
-    return useGetFeatureVersion('/viewer/acl') >= 2;
+    return useGetFeatureVersion('/viewer/acl') >= 2 && !uiFactory.hideGrantAccess;
 };
 
 export const useTopicDataAvailable = () => {
@@ -164,4 +179,12 @@ export const useClusterEventsAvailable = () => {
 
 export const useDatabasesAvailable = () => {
     return useGetMetaFeatureVersion('/meta/databases') >= 1;
+};
+
+export const useMetaLoginAvailable = () => {
+    return useGetMetaFeatureVersion('/meta/login') >= 1;
+};
+
+export const useMetaWhoAmIAvailable = () => {
+    return useGetMetaFeatureVersion('/meta/whoami') >= 1;
 };

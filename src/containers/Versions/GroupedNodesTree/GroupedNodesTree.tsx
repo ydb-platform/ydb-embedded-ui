@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type {NodesPreparedEntity} from '../../../store/reducers/nodes/types';
+import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import {cn} from '../../../utils/cn';
 import type {PreparedVersion} from '../../../utils/versions/types';
 import {NodesTable} from '../NodesTable/NodesTable';
@@ -15,7 +15,7 @@ const b = cn('ydb-versions-grouped-node-tree');
 interface GroupedNodesTreeProps {
     title?: string;
     isDatabase?: boolean;
-    nodes?: NodesPreparedEntity[];
+    nodes?: PreparedStorageNode[];
     items?: GroupedNodesItem[];
     expanded?: boolean;
     versionColor?: string;

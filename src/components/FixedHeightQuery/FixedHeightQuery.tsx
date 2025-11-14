@@ -55,7 +55,7 @@ export const FixedHeightQuery = ({
                               withLabel: false,
                               size: 'xs',
                           }
-                        : false
+                        : undefined
                 }
             />
         </div>

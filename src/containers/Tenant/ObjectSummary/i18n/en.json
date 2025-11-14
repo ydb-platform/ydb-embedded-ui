@@ -12,6 +12,7 @@
   "field_data-size": "Data size",
   "field_row-count": "Row count",
   "field_partitions": "Partitions count",
+  "field_system-view-type": "System view type",
   "field_paths": "Paths",
   "field_shards": "Shards",
   "field_state": "State",

@@ -1,4 +1,5 @@
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
+import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {useViewerNodesHandlerHasGrouping} from '../../../store/reducers/capabilities/hooks';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
@@ -17,7 +18,7 @@ export function StorageNodesComponent({
     scrollContainerRef,
     initialEntitiesCount,
 }: PaginatedStorageProps) {
-    const {searchValue, visibleEntities, nodesUptimeFilter, handleShowAllNodes} =
+    const {nodesSearchValue, visibleEntities, nodesUptimeFilter, handleShowAllNodes} =
         useStorageQueryParams();
 
     const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
@@ -36,8 +37,14 @@ export function StorageNodesComponent({
                 <StorageNodesControlsWithTableState
                     withTypeSelector
                     withGroupBySelect={viewerNodesHandlerHasGrouping}
-                    columnsToSelect={columnsToSelect}
-                    handleSelectedColumnsUpdate={setColumns}
+                />
+            }
+            extraControls={
+                <TableColumnSetup
+                    popupWidth={200}
+                    items={columnsToSelect}
+                    showStatus
+                    onUpdate={setColumns}
                 />
             }
             table={
@@ -45,7 +52,7 @@ export function StorageNodesComponent({
                     database={database}
                     nodeId={nodeId}
                     groupId={groupId}
-                    searchValue={searchValue}
+                    searchValue={nodesSearchValue}
                     visibleEntities={visibleEntities}
                     nodesUptimeFilter={nodesUptimeFilter}
                     onShowAll={handleShowAllNodes}
@@ -58,7 +65,7 @@ export function StorageNodesComponent({
             }
             tableWrapperProps={{
                 scrollContainerRef,
-                scrollDependencies: [searchValue, visibleEntities, nodesUptimeFilter],
+                scrollDependencies: [nodesSearchValue, visibleEntities, nodesUptimeFilter],
             }}
         />
     );

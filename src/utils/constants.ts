@@ -100,11 +100,13 @@ export const SECTION_IDS = {
 export const TENANT_OVERVIEW_TABLES_LIMIT = 3;
 
 export const EMPTY_DATA_PLACEHOLDER = '—';
+export const NON_BREAKING_SPACE = '\u00A0';
 
 export const QUERY_TECHNICAL_MARK = '/*UI-QUERY-EXCLUDE*/';
 
 // ==== Titles ====
 export const DEVELOPER_UI_TITLE = 'Developer UI';
+export const MONITORING_UI_TITLE = 'Monium';
 export const CLUSTER_DEFAULT_TITLE = 'Cluster';
 export const TENANT_DEFAULT_TITLE = 'Database';
 
@@ -115,6 +117,10 @@ export const INVERTED_DISKS_KEY = SETTING_KEYS.INVERTED_DISKS;
 export const SAVED_QUERIES_KEY = SETTING_KEYS.SAVED_QUERIES;
 export const ASIDE_HEADER_COMPACT_KEY = SETTING_KEYS.ASIDE_HEADER_COMPACT;
 export const QUERIES_HISTORY_KEY = 'queries_history';
+
+export const QUERY_EDITOR_CURRENT_QUERY_KEY = 'query_editor_current_query';
+export const QUERY_EDITOR_DIRTY_KEY = 'query_editor_dirty';
+
 export const BINARY_DATA_IN_PLAIN_TEXT_DISPLAY = SETTING_KEYS.BINARY_DATA_IN_PLAIN_TEXT_DISPLAY;
 export const AUTO_REFRESH_INTERVAL = SETTING_KEYS.AUTO_REFRESH_INTERVAL;
 

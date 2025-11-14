@@ -15,7 +15,6 @@ interface ButtonWithConfirmDialogProps<T, K> {
     retryButtonText?: string;
     buttonDisabled?: ButtonProps['disabled'];
     buttonView?: ButtonProps['view'];
-    buttonTitle?: ButtonProps['title'];
     buttonClassName?: ButtonProps['className'];
     withPopover?: boolean;
     popoverContent?: PopoverProps['content'];
@@ -32,7 +31,6 @@ export function ButtonWithConfirmDialog<T, K>({
     retryButtonText,
     buttonDisabled = false,
     buttonView = 'action',
-    buttonTitle,
     buttonClassName,
     withPopover = false,
     popoverContent,
@@ -71,13 +69,13 @@ export function ButtonWithConfirmDialog<T, K>({
                 disabled={buttonDisabled}
                 loading={!buttonDisabled && buttonLoading}
                 className={buttonClassName}
-                title={buttonTitle}
             >
                 {children}
             </Button>
         );
     };
 
+    // keep <span>: if button is disabled, popover won't open without this wrapper
     const renderContent = () => {
         if (withPopover) {
             return (
@@ -86,7 +84,7 @@ export function ButtonWithConfirmDialog<T, K>({
                     placement={popoverPlacement}
                     disabled={popoverDisabled}
                 >
-                    {renderButton()}
+                    <span>{renderButton()}</span>
                 </Popover>
             );
         }

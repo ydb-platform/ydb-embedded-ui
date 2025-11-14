@@ -1,7 +1,5 @@
 import {z} from 'zod';
 
-import {ProblemFilterValues} from '../store/reducers/settings/settings';
-import type {ProblemFilterValue} from '../store/reducers/settings/types';
 import {EFlag} from '../types/api/enums';
 import type {TSystemStateInfo} from '../types/api/nodes';
 import type {TNodeInfo} from '../types/api/nodesList';
@@ -92,10 +90,14 @@ export function prepareNodeSystemState(
     };
 }
 
-export const getProblemParamValue = (problemFilter: ProblemFilterValue | undefined) => {
-    return problemFilter === ProblemFilterValues.PROBLEMS;
-};
-
 export const getUptimeParamValue = (nodesUptimeFilter: NodesUptimeFilterValues | undefined) => {
     return nodesUptimeFilter === NodesUptimeFilterValues.SmallUptime ? HOUR_IN_SECONDS : undefined;
 };
+
+export function checkIsStorageNode<T extends PreparedNodeSystemState>(node?: T) {
+    return Boolean(node?.Roles?.includes('Storage'));
+}
+
+export function checkIsTenantNode<T extends PreparedNodeSystemState>(node?: T) {
+    return Boolean(node?.Tenants);
+}

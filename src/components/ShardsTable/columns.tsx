@@ -13,14 +13,14 @@ import {TOP_SHARDS_COLUMNS_IDS, TOP_SHARDS_COLUMNS_TITLES} from './constants';
 import type {GetShardsColumn} from './types';
 import {prepareDateTimeValue} from './utils';
 
-export const getPathColumn: GetShardsColumn = ({schemaPath = ''}) => {
+export const getPathColumn: GetShardsColumn = ({databaseFullPath = ''}) => {
     return {
         name: TOP_SHARDS_COLUMNS_IDS.Path,
         header: TOP_SHARDS_COLUMNS_TITLES.Path,
         render: ({row}) => {
-            // row.RelativePath - relative schema path
+            // row.RelativePath - relative schema path without start slash
             return (
-                <LinkToSchemaObject path={schemaPath + row.RelativePath}>
+                <LinkToSchemaObject path={`${databaseFullPath}/${row.RelativePath}`}>
                     {row.RelativePath}
                 </LinkToSchemaObject>
             );
@@ -38,7 +38,7 @@ export const getDataSizeColumn: GetShardsColumn = () => {
         align: DataTable.RIGHT,
     };
 };
-export const getTabletIdColumn: GetShardsColumn = ({database}) => {
+export const getTabletIdColumn: GetShardsColumn = () => {
     return {
         name: TOP_SHARDS_COLUMNS_IDS.TabletId,
         header: TOP_SHARDS_COLUMNS_TITLES.TabletId,
@@ -50,7 +50,6 @@ export const getTabletIdColumn: GetShardsColumn = ({database}) => {
                 <TabletNameWrapper
                     tabletId={row.TabletId}
                     followerId={row.FollowerId || undefined}
-                    database={database}
                 />
             );
         },
@@ -77,7 +76,10 @@ export const getCpuCoresColumn: GetShardsColumn = () => {
         render: ({row}) => {
             const usage = Number(row.CPUCores) * 100 || 0;
             return (
-                <UsageLabel value={roundToPrecision(usage, 2)} theme={getUsageSeverity(usage)} />
+                <UsageLabel
+                    value={Math.ceil(roundToPrecision(usage, 2))}
+                    theme={getUsageSeverity(usage)}
+                />
             );
         },
         align: DataTable.LEFT,

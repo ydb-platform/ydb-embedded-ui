@@ -56,8 +56,9 @@ export function prepareWhiteboardVDiskData(
     const actualPDiskId = PDiskId ?? preparedPDisk?.PDiskId;
 
     const vDiskSizeFields = prepareVDiskSizeFields({
-        AvailableSize: AvailableSize ?? PDisk?.AvailableSize,
+        AvailableSize: AvailableSize,
         AllocatedSize: AllocatedSize,
+        SlotSize: PDisk?.EnforcedDynamicSlotSize,
     });
 
     const Severity = calculateVDiskSeverity(vDiskState);
@@ -145,19 +146,30 @@ export function prepareWhiteboardPDiskData(pdiskState: TPDiskStateInfo = {}): Pr
 export function prepareVDiskSizeFields({
     AvailableSize,
     AllocatedSize,
+    SlotSize,
 }: {
     AvailableSize: string | number | undefined;
     AllocatedSize: string | number | undefined;
+    SlotSize: string | number | undefined;
 }) {
-    const available = Number(AvailableSize);
+    const available = Number(AvailableSize ?? 0);
+    // Unlike available, allocated is displayed in UI, it is incorrect to fallback it to 0
     const allocated = Number(AllocatedSize);
-    const total = allocated + available;
-    const allocatedPercent = Math.floor((allocated * 100) / total);
+    const slotSize = Number(SlotSize);
+
+    let sizeLimit = allocated + available;
+
+    // If no available size or available size is 0, slot size should be used as limit
+    if (!available && slotSize) {
+        sizeLimit = slotSize;
+    }
+
+    const allocatedPercent = sizeLimit > 0 ? Math.floor((allocated * 100) / sizeLimit) : NaN;
 
     return {
         AvailableSize: available,
         AllocatedSize: allocated,
-        TotalSize: total,
+        SizeLimit: sizeLimit,
         AllocatedPercent: allocatedPercent,
     };
 }

@@ -75,8 +75,9 @@ export const getSchemaControls =
 
             table: openPreview,
             column_table: openPreview,
+            system_table: openPreview,
 
-            index_table: undefined,
+            index_table: openPreview,
             topic: isTopicPreviewAvailable && !isCdcTopic ? openPreview : undefined,
             stream: undefined,
 
@@ -86,6 +87,8 @@ export const getSchemaControls =
             external_data_source: undefined,
 
             view: openPreview,
+
+            streaming_query: undefined,
         };
 
         return nodeTypeToControls[type];

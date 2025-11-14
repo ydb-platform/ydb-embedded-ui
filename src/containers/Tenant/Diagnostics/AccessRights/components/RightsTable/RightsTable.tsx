@@ -15,9 +15,11 @@ const RIGHT_TABLE_COLUMNS_WIDTH_LS_KEY = 'right-table-columns-width';
 const AccessRightsTableSettings: Settings = {...DEFAULT_TABLE_SETTINGS, dynamicRender: false};
 
 export function RightsTable() {
-    const {path, database} = useCurrentSchema();
+    const {path, database, databaseFullPath} = useCurrentSchema();
     const dialect = useAclSyntax();
-    const data = useTypedSelector((state) => selectPreparedRights(state, path, database, dialect));
+    const data = useTypedSelector((state) =>
+        selectPreparedRights(state, path, database, databaseFullPath, dialect),
+    );
     return (
         <ResizeableDataTable
             columnsWidthLSKey={RIGHT_TABLE_COLUMNS_WIDTH_LS_KEY}

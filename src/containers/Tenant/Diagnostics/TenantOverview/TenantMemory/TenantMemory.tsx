@@ -1,11 +1,12 @@
 import {InfoViewer} from '../../../../../components/InfoViewer/InfoViewer';
 import {ProgressWrapper} from '../../../../../components/ProgressWrapper';
+import {getTenantPath} from '../../../../../routes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {TMemoryStats} from '../../../../../types/api/nodes';
 import {cn} from '../../../../../utils/cn';
 import {formatStorageValuesToGb} from '../../../../../utils/dataFormatters/dataFormatters';
 import {useSearchQuery} from '../../../../../utils/hooks';
-import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
+import {TenantTabsGroups} from '../../../TenantPages';
 import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
 import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
 import i18n from '../i18n';
@@ -17,7 +18,7 @@ import {memoryDashboardConfig} from './memoryDashboardConfig';
 import './TenantMemory.scss';
 
 interface TenantMemoryProps {
-    tenantName: string;
+    database: string;
     memoryStats?: TMemoryStats;
     memoryUsed?: string;
     memoryLimit?: string;
@@ -25,12 +26,7 @@ interface TenantMemoryProps {
 
 const b = cn('tenant-memory');
 
-export function TenantMemory({
-    tenantName,
-    memoryStats,
-    memoryUsed,
-    memoryLimit,
-}: TenantMemoryProps) {
+export function TenantMemory({database, memoryStats, memoryUsed, memoryLimit}: TenantMemoryProps) {
     const query = useSearchQuery();
     const renderMemoryDetails = () => {
         if (memoryStats) {
@@ -64,7 +60,7 @@ export function TenantMemory({
 
     return (
         <div className={b()}>
-            <TenantDashboard database={tenantName} charts={memoryDashboardConfig} />
+            <TenantDashboard database={database} charts={memoryDashboardConfig} />
             {renderMemoryDetails()}
 
             <StatsWrapper
@@ -74,7 +70,7 @@ export function TenantMemory({
                     [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.nodes,
                 })}
             >
-                <TopNodesByMemory tenantName={tenantName} />
+                <TopNodesByMemory database={database} />
             </StatsWrapper>
         </div>
     );

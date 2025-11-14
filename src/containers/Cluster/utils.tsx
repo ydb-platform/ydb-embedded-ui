@@ -1,5 +1,3 @@
-import type {CreateHrefOptions} from '../../routes';
-import routes, {createHref} from '../../routes';
 import {useClusterEventsAvailable} from '../../store/reducers/capabilities/hooks';
 import type {ClusterGroupsStats} from '../../store/reducers/cluster/types';
 import type {ValueOf} from '../../types/common';
@@ -15,6 +13,7 @@ export const clusterTabsIds = {
     versions: 'versions',
     tablets: 'tablets',
     events: 'events',
+    configs: 'configs',
 } as const;
 
 export type ClusterTab = ValueOf<typeof clusterTabsIds>;
@@ -61,16 +60,18 @@ const events = {
         return i18n('tab_events');
     },
 };
+const configs = {
+    id: clusterTabsIds.configs,
+    get title() {
+        return i18n('tab_configs');
+    },
+};
 
-export const clusterTabs = [tenants, nodes, storage, network, tablets, versions, events];
+export const clusterTabs = [tenants, nodes, storage, network, tablets, versions, events, configs];
 
 export function isClusterTab(tab: any): tab is ClusterTab {
     return Object.values(clusterTabsIds).includes(tab);
 }
-
-export const getClusterPath = (activeTab?: ClusterTab, query = {}, options?: CreateHrefOptions) => {
-    return createHref(routes.cluster, activeTab ? {activeTab} : undefined, query, options);
-};
 
 export const getTotalStorageGroupsUsed = (groupStats: ClusterGroupsStats) => {
     return Object.values(groupStats).reduce((acc, data) => {

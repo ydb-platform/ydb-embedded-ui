@@ -4,7 +4,7 @@
     position: relative;
     z-index: 0;
 
-    height: 100%;
+    height: var(--ydb-syntax-highlighter-height, 100%);
 
     &__sticky-container {
         z-index: 1;
@@ -23,6 +23,28 @@
 
         &_visible {
             opacity: 1;
+        }
+    }
+
+    &__content {
+        overflow: auto;
+
+        height: 100%;
+
+        background-color: var(--g-color-base-misc-light);
+        scrollbar-color: var(--g-color-scroll-handle) transparent;
+
+        pre {
+            margin: 0;
+            padding: var(--g-spacing-4) 0 var(--g-spacing-4) var(--g-spacing-4);
+
+            background: transparent !important;
+        }
+
+        code {
+            white-space: pre-wrap;
+            word-break: break-word;
+            @include mixins.text-code-2();
         }
     }
 

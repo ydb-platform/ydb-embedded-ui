@@ -13,7 +13,7 @@ test.describe('Test Tenants page', async () => {
         const tenantsPage = new TenantsPage(page);
 
         // Get table with all tenants
-        await tenantsPage.goto({problemFilter: 'All'});
+        await tenantsPage.goto();
 
         // Check if table is present
         await expect(tenantsPage.table).toBeVisible();

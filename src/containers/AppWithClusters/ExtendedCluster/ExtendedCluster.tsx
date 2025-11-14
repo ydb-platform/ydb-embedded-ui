@@ -4,7 +4,6 @@ import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
 import type {AdditionalClusterProps} from '../../../types/additionalProps';
 import type {GetClusterLinks, GetDatabaseLinks} from '../../../uiFactory/types';
 import {cn} from '../../../utils/cn';
-import {useAdditionalNodesProps} from '../../../utils/hooks/useAdditionalNodesProps';
 import type {GetLogsLink} from '../../../utils/logs';
 import type {GetMonitoringClusterLink, GetMonitoringLink} from '../../../utils/monitoring';
 import {getCleanBalancerValue} from '../../../utils/parseBalancer';
@@ -79,8 +78,6 @@ export function ExtendedCluster({
     getDatabaseLinks,
     getClusterLinks,
 }: ExtendedClusterProps) {
-    const additionalNodesProps = useAdditionalNodesProps();
-
     return (
         <div className={b()}>
             <ClusterComponent
@@ -93,7 +90,6 @@ export function ExtendedCluster({
                     getLogsLink,
                     getDatabaseLinks,
                 })}
-                additionalNodesProps={additionalNodesProps}
             />
         </div>
     );

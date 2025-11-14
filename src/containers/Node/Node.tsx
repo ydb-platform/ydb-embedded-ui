@@ -12,9 +12,10 @@ import {FullNodeViewer} from '../../components/FullNodeViewer/FullNodeViewer';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {InternalLink} from '../../components/InternalLink';
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
-import routes from '../../routes';
+import routes, {getDefaultNodePath} from '../../routes';
 import {
     useCapabilitiesLoaded,
+    useConfigAvailable,
     useDiskPagesAvailable,
 } from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
@@ -22,13 +23,15 @@ import {nodeApi} from '../../store/reducers/node/node';
 import type {PreparedNode} from '../../store/reducers/node/types';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
+import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {checkIsStorageNode} from '../../utils/nodes';
 import {useAppTitle} from '../App/AppTitleContext';
+import {Configs} from '../Configs/Configs';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 import {Tablets} from '../Tablets/Tablets';
 
 import type {NodeTab} from './NodePages';
-import {NODE_TABS, getDefaultNodePath, nodePageQueryParams, nodePageTabSchema} from './NodePages';
-import {NodeNetwork} from './Network/NodeNetwork';
+import {NODE_TABS, nodePageQueryParams, nodePageTabSchema} from './NodePages';
 import NodeStructure from './NodeStructure/NodeStructure';
 import {Threads} from './Threads/Threads';
 import i18n from './i18n';
@@ -37,10 +40,12 @@ import './Node.scss';
 
 const b = cn('node');
 
-const STORAGE_ROLE = 'Storage';
-
 export function Node() {
     const container = React.useRef<HTMLDivElement>(null);
+    const isViewerUser = useIsViewerUser();
+    const hasConfigs = useConfigAvailable();
+
+    const configsAvailable = isViewerUser && hasConfigs;
 
     const dispatch = useTypedDispatch();
 
@@ -67,42 +72,49 @@ export function Node() {
 
     const pageLoading = isLoading || !capabilitiesLoaded;
 
-    const isStorageNode = node?.Roles?.find((el) => el === STORAGE_ROLE);
+    const isStorageNode = checkIsStorageNode(node);
 
     const threadsQuantity = node?.Threads?.length;
 
     const {activeTab, nodeTabs} = React.useMemo(() => {
-        let actualNodeTabs = isStorageNode
-            ? NODE_TABS
-            : NODE_TABS.filter((el) => el.id !== 'storage');
+        const skippedTabs: NodeTab[] = [];
+        if (!isStorageNode) {
+            skippedTabs.push('storage');
+        }
+        if (!configsAvailable) {
+            skippedTabs.push('configs');
+        }
         if (isDiskPagesAvailable) {
-            actualNodeTabs = actualNodeTabs.filter((el) => el.id !== 'structure');
+            skippedTabs.push('structure');
         }
-        // Filter out threads tab if there's no thread data in the API response
         if (!threadsQuantity) {
-            actualNodeTabs = actualNodeTabs.filter((el) => el.id !== 'threads');
+            skippedTabs.push('threads');
         }
+        const actualNodeTabs = NODE_TABS.filter((el) => !skippedTabs.includes(el.id));
 
         const actualActiveTab =
             actualNodeTabs.find(({id}) => id === activeTabId) ?? actualNodeTabs[0];
 
         return {activeTab: actualActiveTab, nodeTabs: actualNodeTabs};
-    }, [isStorageNode, isDiskPagesAvailable, activeTabId, threadsQuantity]);
+    }, [isStorageNode, isDiskPagesAvailable, activeTabId, threadsQuantity, configsAvailable]);
 
-    const tenantName = node?.Tenants?.[0] || tenantNameFromQuery?.toString();
+    const database = tenantNameFromQuery?.toString();
+
+    const databaseName = node?.Tenants?.[0];
 
     React.useEffect(() => {
         // Dispatch only if loaded to get correct node role
         if (!isLoading) {
             dispatch(
                 setHeaderBreadcrumbs('node', {
-                    tenantName,
+                    database,
+                    databaseName,
                     nodeRole: isStorageNode ? 'Storage' : 'Compute',
                     nodeId,
                 }),
             );
         }
-    }, [dispatch, tenantName, nodeId, isLoading, isStorageNode]);
+    }, [dispatch, database, nodeId, isLoading, isStorageNode, databaseName]);
 
     return (
         <div className={b(null)} ref={container}>
@@ -114,7 +126,7 @@ export function Node() {
             {nodeId ? (
                 <NodePageContent
                     nodeId={nodeId}
-                    tenantName={tenantName}
+                    database={database}
                     activeTabId={activeTab.id}
                     tabs={nodeTabs}
                     parentContainer={container}
@@ -187,7 +199,7 @@ function NodePageInfo({node, loading}: NodePageInfoProps) {
 
 interface NodePageContentProps {
     nodeId: string;
-    tenantName?: string;
+    database?: string;
 
     activeTabId: NodeTab;
     tabs: {id: string; title: string}[];
@@ -197,7 +209,7 @@ interface NodePageContentProps {
 
 function NodePageContent({
     nodeId,
-    tenantName,
+    database,
     activeTabId,
     tabs,
     parentContainer,
@@ -209,9 +221,8 @@ function NodePageContent({
                     <TabList className={b('tab-list')} size="l">
                         {tabs.map(({id, title}) => {
                             const path = getDefaultNodePath(
-                                nodeId,
-                                {database: tenantName},
-                                id as NodeTab,
+                                {id: nodeId, activeTab: id as NodeTab},
+                                {database},
                             );
                             return (
                                 <Tab value={id} key={id}>
@@ -232,7 +243,7 @@ function NodePageContent({
             case 'storage': {
                 return (
                     <PaginatedStorage
-                        database={tenantName}
+                        database={database}
                         nodeId={nodeId}
                         scrollContainerRef={parentContainer}
                         viewContext={{
@@ -246,7 +257,7 @@ function NodePageContent({
                     <Tablets
                         scrollContainerRef={parentContainer}
                         nodeId={nodeId}
-                        database={tenantName}
+                        database={database}
                         onlyActive
                     />
                 );
@@ -257,7 +268,17 @@ function NodePageContent({
             }
 
             case 'threads': {
-                return <Threads nodeId={nodeId} />;
+                return (
+                    <Threads
+                        nodeId={nodeId}
+                        scrollContainerRef={parentContainer}
+                        className={b('treads')}
+                    />
+                );
+            }
+
+            case 'configs': {
+                return <Configs database={database} scrollContainerRef={parentContainer} />;
             }
 
             case 'network': {

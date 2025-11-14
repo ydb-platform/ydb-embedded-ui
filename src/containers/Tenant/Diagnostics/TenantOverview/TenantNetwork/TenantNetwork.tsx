@@ -1,11 +1,11 @@
 import {Flex} from '@gravity-ui/uikit';
 
+import {getTenantPath} from '../../../../../routes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
-import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import {cn} from '../../../../../utils/cn';
 import {ENABLE_NETWORK_TABLE_KEY} from '../../../../../utils/constants';
 import {useSearchQuery, useSetting} from '../../../../../utils/hooks';
-import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
+import {TenantTabsGroups} from '../../../TenantPages';
 import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
 import i18n from '../i18n';
 
@@ -17,11 +17,10 @@ import './TenantNetwork.scss';
 const b = cn('tenant-network');
 
 interface TenantNetworkProps {
-    tenantName: string;
-    additionalNodesProps?: AdditionalNodesProps;
+    database: string;
 }
 
-export function TenantNetwork({tenantName, additionalNodesProps}: TenantNetworkProps) {
+export function TenantNetwork({database}: TenantNetworkProps) {
     const query = useSearchQuery();
     const [networkTableEnabled] = useSetting(ENABLE_NETWORK_TABLE_KEY);
 
@@ -37,16 +36,10 @@ export function TenantNetwork({tenantName, additionalNodesProps}: TenantNetworkP
     return (
         <Flex direction="column" gap={4} className={b()}>
             <StatsWrapper title={i18n('title_nodes-by-ping')} allEntitiesLink={allNodesLink}>
-                <TopNodesByPing
-                    tenantName={tenantName}
-                    additionalNodesProps={additionalNodesProps}
-                />
+                <TopNodesByPing database={database} />
             </StatsWrapper>
             <StatsWrapper title={i18n('title_nodes-by-skew')} allEntitiesLink={allNodesLink}>
-                <TopNodesBySkew
-                    tenantName={tenantName}
-                    additionalNodesProps={additionalNodesProps}
-                />
+                <TopNodesBySkew database={database} />
             </StatsWrapper>
         </Flex>
     );

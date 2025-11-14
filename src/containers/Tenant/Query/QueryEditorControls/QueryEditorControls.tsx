@@ -6,6 +6,7 @@ import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import createToast from '../../../../utils/createToast';
 import {useTypedSelector} from '../../../../utils/hooks';
+import {reachMetricaGoal} from '../../../../utils/yaMetrica';
 import {NewSQL} from '../NewSQL/NewSQL';
 import {queryManagerInstance} from '../QueryEditor/helpers';
 import {SaveQuery} from '../SaveQuery/SaveQuery';
@@ -22,7 +23,7 @@ interface QueryEditorControlsProps {
     disabled?: boolean;
     highlightedAction: QueryAction;
     queryId?: string;
-    tenantName: string;
+    database: string;
     isStreamingEnabled?: boolean;
 
     handleGetExplainQueryClick: (text: string) => void;
@@ -75,7 +76,7 @@ export const QueryEditorControls = ({
     isLoading,
     highlightedAction,
     queryId,
-    tenantName,
+    database,
     isStreamingEnabled,
 
     handleSendExecuteClick,
@@ -90,11 +91,12 @@ export const QueryEditorControls = ({
     const [cancelQueryError, setCancelQueryError] = React.useState<boolean>(false);
 
     const onStopButtonClick = React.useCallback(async () => {
+        reachMetricaGoal('stopQuery');
         try {
             if (isStreamingEnabled) {
                 queryManagerInstance.abortQuery();
             } else if (queryId) {
-                await sendCancelQuery({queryId, database: tenantName}).unwrap();
+                await sendCancelQuery({queryId, database}).unwrap();
             }
         } catch {
             createToast({
@@ -113,7 +115,7 @@ export const QueryEditorControls = ({
                 setCancelQueryError(false);
             }, CANCEL_ERROR_ANIMATION_DURATION);
         }
-    }, [isStreamingEnabled, queryId, sendCancelQuery, tenantName]);
+    }, [isStreamingEnabled, queryId, sendCancelQuery, database]);
 
     const isRunHighlighted = highlightedAction === 'execute';
     const isExplainHighlighted = highlightedAction === 'explain';

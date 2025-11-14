@@ -84,12 +84,6 @@ export class TableControls {
         }
     }
 
-    async applyColumnVisibility() {
-        const applyButton = this.columnSetupPopup.locator('button:has-text("Apply")');
-        await applyButton.click();
-        await this.columnSetupPopup.waitFor({state: 'hidden'});
-    }
-
     async getVisibleColumnsCount(): Promise<string> {
         const statusText = await this.columnSetupButton
             .locator('.g-table-column-setup__status')

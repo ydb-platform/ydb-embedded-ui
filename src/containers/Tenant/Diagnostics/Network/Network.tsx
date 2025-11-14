@@ -5,18 +5,14 @@ import {Link} from 'react-router-dom';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {Illustration} from '../../../../components/Illustration';
-import {ProblemFilter} from '../../../../components/ProblemFilter';
+import {ProblemFilter} from '../../../../components/ProblemFilter/ProblemFilter';
+import {getDefaultNodePath} from '../../../../routes';
 import {networkApi} from '../../../../store/reducers/network/network';
-import {
-    ProblemFilterValues,
-    changeFilter,
-    selectProblemFilter,
-} from '../../../../store/reducers/settings/settings';
 import {hideTooltip, showTooltip} from '../../../../store/reducers/tooltip';
 import type {TNetNodeInfo, TNetNodePeerInfo} from '../../../../types/api/netInfo';
 import {cn} from '../../../../utils/cn';
-import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
-import {getDefaultNodePath} from '../../../Node/NodePages';
+import {useAutoRefreshInterval, useTypedDispatch} from '../../../../utils/hooks';
+import {useWithProblemsQueryParam} from '../../../../utils/hooks/useWithProblemsQueryParam';
 
 import {NodeNetwork} from './NodeNetwork/NodeNetwork';
 import {getConnectedNodesCount} from './utils';
@@ -28,20 +24,23 @@ import './Network.scss';
 const b = cn('network');
 
 interface NetworkProps {
-    tenantName: string;
+    database: string;
+    databaseFullPath: string;
 }
-export function Network({tenantName}: NetworkProps) {
+export function Network({database, databaseFullPath}: NetworkProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const filter = useTypedSelector(selectProblemFilter);
-    const dispatch = useTypedDispatch();
+    const {withProblems, handleWithProblemsChange} = useWithProblemsQueryParam();
 
     const [clickedNode, setClickedNode] = React.useState<TNetNodeInfo>();
     const [showId, setShowId] = React.useState(false);
     const [showRacks, setShowRacks] = React.useState(false);
 
-    const {currentData, isFetching, error} = networkApi.useGetNetworkInfoQuery(tenantName, {
-        pollingInterval: autoRefreshInterval,
-    });
+    const {currentData, isFetching, error} = networkApi.useGetNetworkInfoQuery(
+        {database, databaseFullPath},
+        {
+            pollingInterval: autoRefreshInterval,
+        },
+    );
     const loading = isFetching && currentData === undefined;
 
     if (loading) {
@@ -71,10 +70,8 @@ export function Network({tenantName}: NetworkProps) {
                             <div className={b('controls-wrapper')}>
                                 <div className={b('controls')}>
                                     <ProblemFilter
-                                        value={filter}
-                                        onChange={(v) => {
-                                            dispatch(changeFilter(v));
-                                        }}
+                                        value={withProblems}
+                                        onChange={handleWithProblemsChange}
                                         className={b('problem-filter')}
                                     />
                                     <div className={b('checkbox-wrapper')}>
@@ -115,7 +112,7 @@ export function Network({tenantName}: NetworkProps) {
                                         Connectivity of node{' '}
                                         <Link
                                             className={b('link')}
-                                            to={getDefaultNodePath(clickedNode.NodeId)}
+                                            to={getDefaultNodePath({id: clickedNode.NodeId})}
                                         >
                                             {clickedNode.NodeId}
                                         </Link>{' '}
@@ -160,7 +157,7 @@ interface NodesProps {
     onClickNode: (node: TNetNodeInfo | undefined) => void;
 }
 function Nodes({nodes, isRight, showId, showRacks, clickedNode, onClickNode}: NodesProps) {
-    const filter = useTypedSelector(selectProblemFilter);
+    const {withProblems} = useWithProblemsQueryParam();
     const dispatch = useTypedDispatch();
 
     let problemNodesCount = 0;
@@ -184,9 +181,8 @@ function Nodes({nodes, isRight, showId, showRacks, clickedNode, onClickNode}: No
                                       }
 
                                       if (
-                                          (filter === ProblemFilterValues.PROBLEMS &&
-                                              capacity !== connected) ||
-                                          filter === ProblemFilterValues.ALL ||
+                                          (withProblems && capacity !== connected) ||
+                                          !withProblems ||
                                           isRight
                                       ) {
                                           problemNodesCount++;
@@ -244,9 +240,8 @@ function Nodes({nodes, isRight, showId, showRacks, clickedNode, onClickNode}: No
                               }
 
                               if (
-                                  (filter === ProblemFilterValues.PROBLEMS &&
-                                      capacity !== connected) ||
-                                  filter === ProblemFilterValues.ALL ||
+                                  (withProblems && capacity !== connected) ||
+                                  !withProblems ||
                                   isRight
                               ) {
                                   problemNodesCount++;
@@ -297,8 +292,8 @@ function Nodes({nodes, isRight, showId, showRacks, clickedNode, onClickNode}: No
         );
     });
 
-    if (filter === ProblemFilterValues.PROBLEMS && problemNodesCount === 0) {
-        return <Illustration name="thumbsUp" width="200" />;
+    if (withProblems && problemNodesCount === 0) {
+        return <Illustration name="thumbsUp" width={200} />;
     } else {
         return result;
     }

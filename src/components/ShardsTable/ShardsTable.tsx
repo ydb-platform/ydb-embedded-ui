@@ -12,15 +12,13 @@ import type {ShardsColumn} from './types';
 export interface ShardsTableProps
     extends Omit<ResizeableDataTableProps<KeyValueRow>, 'columnsWidthLSKey' | 'columns'> {
     columnsIds: TopShardsColumnId[];
-    database: string;
+    databaseFullPath: string;
     overrideColumns?: ShardsColumn[];
-    schemaPath?: string;
 }
 
 export function ShardsTable({
     columnsIds,
-    schemaPath,
-    database,
+    databaseFullPath,
     overrideColumns = [],
     ...props
 }: ShardsTableProps) {
@@ -33,14 +31,14 @@ export function ShardsTable({
                     return overridedColumn;
                 }
 
-                const column = shardsColumnIdToGetColumn[id]({database, schemaPath});
+                const column = shardsColumnIdToGetColumn[id]({databaseFullPath});
 
                 return {
                     ...column,
                     sortable: isSortableTopShardsColumn(column.name),
                 };
             });
-    }, [columnsIds, database, overrideColumns, schemaPath]);
+    }, [columnsIds, overrideColumns, databaseFullPath]);
 
     return (
         <ResizeableDataTable

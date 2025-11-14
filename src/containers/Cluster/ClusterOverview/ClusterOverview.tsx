@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {ArrowToggle, Disclosure, Flex, Icon, Text} from '@gravity-ui/uikit';
+import {Disclosure, Flex, Icon, Text} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {
@@ -56,35 +56,34 @@ export function ClusterOverview(props: ClusterOverviewProps) {
     }
 
     return (
-        <Flex direction="column" className={b('overview-wrapper', {collapsed: !expandDashboard})}>
-            <Disclosure
-                arrowPosition="end"
-                expanded={expandDashboard}
-                onUpdate={() => setExpandDashboard(!expandDashboard)}
-            >
-                <Disclosure.Summary>
-                    {(disclosureProps) => (
-                        <div {...disclosureProps} className={b('disclosure-summary')}>
-                            <Flex alignItems="center" justifyContent="space-between" width={'100%'}>
-                                <Flex gap={2} alignItems="center">
-                                    <Icon data={overviewIcon} size={16} />
-                                    <Text variant="body-2" color="primary" className={b('title')}>
-                                        {i18n('label_overview')}
-                                    </Text>
-                                </Flex>
-                                {!expandDashboard && <ClusterDashboard {...props} collapsed />}
-                            </Flex>
-                            <ArrowToggle
-                                size={16}
-                                direction={disclosureProps.expanded ? 'top' : 'bottom'}
-                            />
-                        </div>
-                    )}
-                </Disclosure.Summary>
+        <Disclosure
+            arrowPosition="end"
+            size="l"
+            expanded={expandDashboard}
+            onUpdate={() => setExpandDashboard(!expandDashboard)}
+            className={b('overview-wrapper', {collapsed: !expandDashboard})}
+            summary={
+                <Flex
+                    alignItems="center"
+                    justifyContent="space-between"
+                    width={'100%'}
+                    className={b('disclosure-summary')}
+                >
+                    <Flex gap={2} alignItems="center">
+                        <Icon data={overviewIcon} size={16} />
+                        <Text variant="body-2" color="primary" className={b('title')}>
+                            {i18n('label_overview')}
+                        </Text>
+                    </Flex>
+                    {!expandDashboard && <ClusterDashboard {...props} collapsed />}
+                </Flex>
+            }
+        >
+            <div className={b('disclosure-content')}>
                 <ClusterDashboard {...props} />
                 <ClusterInfo {...props} bridgePiles={bridgePiles} />
-            </Disclosure>
-        </Flex>
+            </div>
+        </Disclosure>
     );
 }
 

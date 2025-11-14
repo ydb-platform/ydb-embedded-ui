@@ -21,7 +21,9 @@ export type Capability =
     | '/storage/groups'
     | '/viewer/query'
     | '/viewer/feature_flags'
+    | '/viewer/config'
     | '/viewer/cluster'
+    | '/vdisk/blobindexstat'
     | '/viewer/nodes'
     | '/viewer/acl'
     | '/viewer/topic_data';
@@ -51,4 +53,6 @@ export type MetaCapability =
     | '/meta/update_cluster'
     | '/meta/delete_cluster'
     | '/meta/events'
+    | '/meta/login'
+    | '/meta/whoami'
     | '/meta/databases';

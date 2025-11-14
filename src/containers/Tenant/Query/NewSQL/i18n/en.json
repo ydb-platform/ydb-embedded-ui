@@ -14,6 +14,7 @@
   "action.drop-external-table": "Drop external table",
   "menu.tables": "Tables",
   "menu.topics": "Topics",
+  "menu.streaming-query": "Streaming query",
   "menu.capture": "Change data capture",
   "menu.replication": "Async replication",
   "menu.transfer": "Transfer",
@@ -33,5 +34,9 @@
   "action.alter-async-replication": "Alter async replication",
   "action.drop-async-replication": "Drop async replication",
   "action.alter-transfer": "Alter transfer",
-  "action.drop-transfer": "Drop transfer"
+  "action.drop-transfer": "Drop transfer",
+  "action.create-streaming-query": "Create streaming query",
+  "action.alter-streaming-query-settings": "Alter query settings",
+  "action.alter-streaming-query-text": "Alter query text",
+  "action.drop-streaming-query": "Drop query"
 }

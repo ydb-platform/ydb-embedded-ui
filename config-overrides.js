@@ -17,6 +17,7 @@ module.exports = {
             test: /\.svg$/,
             include: [
                 path.resolve(srcRoot, 'assets/icons'),
+                path.resolve(srcRoot, 'assets/illustrations'),
                 path.resolve(uiKitRoot, 'assets/icons'),
                 uiKitIconsRoot,
             ],
@@ -36,6 +37,7 @@ module.exports = {
         }
         config.plugins.push(
             new MonacoWebpackPlugin({
+                languages: ['yaml'],
                 customLanguages: [
                     {
                         label: 'yql',

@@ -10,7 +10,7 @@ import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {useSlots} from '../../components/slots';
 import type {SlotMap} from '../../components/slots/SlotMap';
 import type {SlotComponent} from '../../components/slots/types';
-import routes from '../../routes';
+import routes, {getClusterPath} from '../../routes';
 import type {RootState} from '../../store';
 import {authenticationApi} from '../../store/reducers/authentication/authentication';
 import {
@@ -20,14 +20,16 @@ import {
     useMetaCapabilitiesQuery,
 } from '../../store/reducers/capabilities/hooks';
 import {nodesListApi} from '../../store/reducers/nodesList';
+import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
+import {useMetaAuth, useMetaAuthUnavailable} from '../../utils/hooks/useMetaAuth';
 import {lazyComponent} from '../../utils/lazyComponent';
 import {isAccessError, isRedirectToAuth} from '../../utils/response';
 import Authentication from '../Authentication/Authentication';
-import {getClusterPath} from '../Cluster/utils';
 import Header from '../Header/Header';
 
+import {useAppTitle} from './AppTitleContext';
 import {
     ClusterSlot,
     ClustersSlot,
@@ -158,7 +160,7 @@ export function Content(props: ContentProps) {
                               exact: true,
                               component: Clusters,
                               slot: ClustersSlot,
-                              wrapper: GetMetaCapabilities,
+                              wrapper: ClustersDataWrapper,
                           })}
                     {/* Single cluster routes */}
                     {routesSlots.map((route) => {
@@ -189,13 +191,39 @@ function DataWrapper({children}: {children: React.ReactNode}) {
     );
 }
 
-function GetUser({children}: {children: React.ReactNode}) {
+function ClustersDataWrapper({children}: {children: React.ReactNode}) {
+    return (
+        <GetMetaCapabilities>
+            <GetMetaUser>{children}</GetMetaUser>
+        </GetMetaCapabilities>
+    );
+}
+
+function GetMetaUser({children}: {children: React.ReactNode}) {
+    const metaAuth = useMetaAuth();
+
+    if (metaAuth) {
+        return <GetUser useMeta>{children}</GetUser>;
+    }
+    return children;
+}
+
+function GetUser({children, useMeta}: {children: React.ReactNode; useMeta?: boolean}) {
     const database = useDatabaseFromQuery();
-    const {isLoading, error} = authenticationApi.useWhoamiQuery({database});
+
+    const {isFetching, error} = authenticationApi.useWhoamiQuery({
+        database,
+        useMeta,
+    });
+    const {appTitle} = useAppTitle();
+
+    const errorProps = error ? {...uiFactory.clusterOrDatabaseAccessError} : undefined;
 
     return (
-        <LoaderWrapper loading={isLoading} size="l">
-            <PageError error={error}>{children}</PageError>
+        <LoaderWrapper loading={isFetching} size="l" delay={0}>
+            <PageError error={error} {...errorProps} errorPageTitle={appTitle}>
+                {children}
+            </PageError>
         </LoaderWrapper>
     );
 }
@@ -255,8 +283,10 @@ function ContentWrapper(props: ContentWrapperProps) {
     const {singleClusterMode, isAuthenticated} = props;
     const authUnavailable = useClusterWithoutAuthInUI();
 
+    const metaAuthUnavailable = useMetaAuthUnavailable();
+
     const renderNotAuthenticated = () => {
-        if (authUnavailable) {
+        if (authUnavailable || metaAuthUnavailable) {
             return <AccessDenied />;
         }
         return <Authentication />;
@@ -264,7 +294,7 @@ function ContentWrapper(props: ContentWrapperProps) {
 
     return (
         <Switch>
-            {!authUnavailable && (
+            {!authUnavailable && !metaAuthUnavailable && (
                 <Route path={routes.auth}>
                     <Authentication closable />
                 </Route>

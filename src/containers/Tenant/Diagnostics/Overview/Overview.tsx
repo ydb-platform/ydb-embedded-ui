@@ -8,10 +8,12 @@ import {EPathType} from '../../../../types/api/schema';
 import {useAutoRefreshInterval} from '../../../../utils/hooks';
 import {ExternalDataSourceInfo} from '../../Info/ExternalDataSource/ExternalDataSource';
 import {ExternalTableInfo} from '../../Info/ExternalTable/ExternalTable';
+import {SystemViewInfo} from '../../Info/SystemView/SystemView';
 import {ViewInfo} from '../../Info/View/View';
 
 import {AsyncReplicationInfo} from './AsyncReplicationInfo';
 import {ChangefeedInfo} from './ChangefeedInfo';
+import {StreamingQueryInfo} from './StreamingQueryInfo';
 import {TableInfo} from './TableInfo';
 import {TopicInfo} from './TopicInfo';
 import {TransferInfo} from './TransferInfo';
@@ -20,13 +22,14 @@ interface OverviewProps {
     type?: EPathType;
     path: string;
     database: string;
+    databaseFullPath: string;
 }
 
-function Overview({type, path, database}: OverviewProps) {
+function Overview({type, path, database, databaseFullPath}: OverviewProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {currentData, isFetching, error} = overviewApi.useGetOverviewQuery(
-        {path, database},
+        {path, database, databaseFullPath},
         {pollingInterval: autoRefreshInterval},
     );
 
@@ -41,23 +44,42 @@ function Overview({type, path, database}: OverviewProps) {
             [EPathType.EPathTypeDir]: undefined,
             [EPathType.EPathTypeResourcePool]: undefined,
             [EPathType.EPathTypeTable]: undefined,
+            [EPathType.EPathTypeSysView]: () => <SystemViewInfo data={data} />,
             [EPathType.EPathTypeSubDomain]: undefined,
             [EPathType.EPathTypeTableIndex]: () => <TableIndexInfo data={data} />,
             [EPathType.EPathTypeExtSubDomain]: undefined,
             [EPathType.EPathTypeColumnStore]: undefined,
             [EPathType.EPathTypeColumnTable]: undefined,
             [EPathType.EPathTypeCdcStream]: () => (
-                <ChangefeedInfo path={path} database={database} data={data} />
+                <ChangefeedInfo
+                    path={path}
+                    database={database}
+                    databaseFullPath={databaseFullPath}
+                    data={data}
+                />
             ),
             [EPathType.EPathTypePersQueueGroup]: () => (
-                <TopicInfo data={data} path={path} database={database} />
+                <TopicInfo
+                    data={data}
+                    path={path}
+                    databaseFullPath={databaseFullPath}
+                    database={database}
+                />
             ),
             [EPathType.EPathTypeExternalTable]: () => <ExternalTableInfo data={data} />,
             [EPathType.EPathTypeExternalDataSource]: () => <ExternalDataSourceInfo data={data} />,
             [EPathType.EPathTypeView]: () => <ViewInfo data={data} />,
             [EPathType.EPathTypeReplication]: () => <AsyncReplicationInfo data={data} />,
             [EPathType.EPathTypeTransfer]: () => (
-                <TransferInfo path={path} database={database} data={data} />
+                <TransferInfo
+                    path={path}
+                    databaseFullPath={databaseFullPath}
+                    database={database}
+                    data={data}
+                />
+            ),
+            [EPathType.EPathTypeStreamingQuery]: () => (
+                <StreamingQueryInfo data={data} path={path} database={database} />
             ),
         };
 

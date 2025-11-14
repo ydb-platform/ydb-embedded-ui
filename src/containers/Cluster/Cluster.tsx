@@ -12,8 +12,11 @@ import {EFlagToDescription} from '../../components/EntityStatusNew/utils';
 import {InternalLink} from '../../components/InternalLink';
 import {NetworkTable} from '../../components/NetworkTable/NetworkTable';
 import {useShouldShowClusterNetworkTable} from '../../components/NetworkTable/hooks';
-import routes, {getLocationObjectFromHref} from '../../routes';
-import {useClusterDashboardAvailable} from '../../store/reducers/capabilities/hooks';
+import routes, {getClusterPath, getLocationObjectFromHref} from '../../routes';
+import {
+    useClusterDashboardAvailable,
+    useConfigAvailable,
+} from '../../store/reducers/capabilities/hooks';
 import {
     INITIAL_DEFAULT_CLUSTER_TAB,
     clusterApi,
@@ -23,16 +26,14 @@ import {
     useClusterBaseInfo,
 } from '../../store/reducers/cluster/cluster';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
-import type {
-    AdditionalClusterProps,
-    AdditionalNodesProps,
-    AdditionalTenantsProps,
-} from '../../types/additionalProps';
+import type {AdditionalClusterProps, AdditionalTenantsProps} from '../../types/additionalProps';
 import {EFlag} from '../../types/api/enums';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useAppTitle} from '../App/AppTitleContext';
+import {Configs} from '../Configs/Configs';
 import {Nodes} from '../Nodes/Nodes';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 import {TabletsTable} from '../Tablets/TabletsTable';
@@ -41,13 +42,7 @@ import {VersionsContainer} from '../Versions/Versions';
 
 import {ClusterOverview} from './ClusterOverview/ClusterOverview';
 import type {ClusterTab} from './utils';
-import {
-    clusterTabs,
-    clusterTabsIds,
-    getClusterPath,
-    isClusterTab,
-    useShouldShowEventsTab,
-} from './utils';
+import {clusterTabs, clusterTabsIds, isClusterTab, useShouldShowEventsTab} from './utils';
 
 import './Cluster.scss';
 
@@ -55,20 +50,19 @@ const b = cn('ydb-cluster');
 
 interface ClusterProps {
     additionalTenantsProps?: AdditionalTenantsProps;
-    additionalNodesProps?: AdditionalNodesProps;
     additionalClusterProps?: AdditionalClusterProps;
 }
 
-export function Cluster({
-    additionalClusterProps,
-    additionalTenantsProps,
-    additionalNodesProps,
-}: ClusterProps) {
+export function Cluster({additionalClusterProps, additionalTenantsProps}: ClusterProps) {
     const container = React.useRef<HTMLDivElement>(null);
     const isClusterDashboardAvailable = useClusterDashboardAvailable();
 
     const shouldShowNetworkTable = useShouldShowClusterNetworkTable();
     const shouldShowEventsTab = useShouldShowEventsTab();
+    const isViewerUser = useIsViewerUser();
+    const isConfigsAvailable = useConfigAvailable();
+
+    const showConfigs = isViewerUser && isConfigsAvailable;
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
@@ -108,17 +102,20 @@ export function Cluster({
     }, [dispatch]);
 
     const actualClusterTabs = React.useMemo(() => {
-        let tabs = clusterTabs;
+        const skippedTabs: ClusterTab[] = [];
 
         if (!shouldShowNetworkTable) {
-            tabs = tabs.filter((tab) => tab.id !== clusterTabsIds.network);
+            skippedTabs.push(clusterTabsIds.network);
         }
         if (!shouldShowEventsTab) {
-            tabs = tabs.filter((tab) => tab.id !== clusterTabsIds.events);
+            skippedTabs.push(clusterTabsIds.events);
+        }
+        if (!showConfigs) {
+            skippedTabs.push(clusterTabsIds.configs);
         }
 
-        return tabs;
-    }, [shouldShowEventsTab, shouldShowNetworkTable]);
+        return clusterTabs.filter((el) => !skippedTabs.includes(el.id));
+    }, [shouldShowEventsTab, shouldShowNetworkTable, showConfigs]);
 
     const getClusterTitle = () => {
         if (infoLoading) {
@@ -172,10 +169,13 @@ export function Cluster({
                     <TabProvider value={activeTabId}>
                         <TabList size="l">
                             {actualClusterTabs.map(({id, title}) => {
-                                const path = getClusterPath(id as ClusterTab, {
-                                    clusterName,
-                                    backend,
-                                });
+                                const path = getClusterPath(
+                                    {activeTab: id as ClusterTab},
+                                    {
+                                        clusterName,
+                                        backend,
+                                    },
+                                );
                                 return (
                                     <Tab key={id} value={id}>
                                         <InternalLink
@@ -198,8 +198,9 @@ export function Cluster({
                     <Switch>
                         <Route
                             path={
-                                getLocationObjectFromHref(getClusterPath(clusterTabsIds.tablets))
-                                    .pathname
+                                getLocationObjectFromHref(
+                                    getClusterPath({activeTab: clusterTabsIds.tablets}),
+                                ).pathname
                             }
                         >
                             <TabletsTable
@@ -210,8 +211,9 @@ export function Cluster({
                         </Route>
                         <Route
                             path={
-                                getLocationObjectFromHref(getClusterPath(clusterTabsIds.tenants))
-                                    .pathname
+                                getLocationObjectFromHref(
+                                    getClusterPath({activeTab: clusterTabsIds.tenants}),
+                                ).pathname
                             }
                         >
                             <Tenants
@@ -221,19 +223,18 @@ export function Cluster({
                         </Route>
                         <Route
                             path={
-                                getLocationObjectFromHref(getClusterPath(clusterTabsIds.nodes))
-                                    .pathname
+                                getLocationObjectFromHref(
+                                    getClusterPath({activeTab: clusterTabsIds.nodes}),
+                                ).pathname
                             }
                         >
-                            <Nodes
-                                scrollContainerRef={container}
-                                additionalNodesProps={additionalNodesProps}
-                            />
+                            <Nodes scrollContainerRef={container} />
                         </Route>
                         <Route
                             path={
-                                getLocationObjectFromHref(getClusterPath(clusterTabsIds.storage))
-                                    .pathname
+                                getLocationObjectFromHref(
+                                    getClusterPath({activeTab: clusterTabsIds.storage}),
+                                ).pathname
                             }
                         >
                             <PaginatedStorage scrollContainerRef={container} />
@@ -242,20 +243,18 @@ export function Cluster({
                             <Route
                                 path={
                                     getLocationObjectFromHref(
-                                        getClusterPath(clusterTabsIds.network),
+                                        getClusterPath({activeTab: clusterTabsIds.network}),
                                     ).pathname
                                 }
                             >
-                                <NetworkTable
-                                    scrollContainerRef={container}
-                                    additionalNodesProps={additionalNodesProps}
-                                />
+                                <NetworkTable scrollContainerRef={container} />
                             </Route>
                         )}
                         <Route
                             path={
-                                getLocationObjectFromHref(getClusterPath(clusterTabsIds.versions))
-                                    .pathname
+                                getLocationObjectFromHref(
+                                    getClusterPath({activeTab: clusterTabsIds.versions}),
+                                ).pathname
                             }
                         >
                             <VersionsContainer cluster={cluster} loading={infoLoading} />
@@ -263,18 +262,35 @@ export function Cluster({
                         {shouldShowEventsTab && (
                             <Route
                                 path={
-                                    getLocationObjectFromHref(getClusterPath(clusterTabsIds.events))
-                                        .pathname
+                                    getLocationObjectFromHref(
+                                        getClusterPath({activeTab: clusterTabsIds.events}),
+                                    ).pathname
                                 }
                             >
-                                {uiFactory.renderEvents?.()}
+                                {uiFactory.renderEvents?.({scrollContainerRef: container})}
+                            </Route>
+                        )}
+                        {showConfigs && (
+                            <Route
+                                path={
+                                    getLocationObjectFromHref(
+                                        getClusterPath({activeTab: clusterTabsIds.configs}),
+                                    ).pathname
+                                }
+                            >
+                                <Configs
+                                    className={b('cluster-configs')}
+                                    scrollContainerRef={container}
+                                />
                             </Route>
                         )}
 
                         <Route
                             render={() => (
                                 <Redirect
-                                    to={getLocationObjectFromHref(getClusterPath(activeTabId))}
+                                    to={getLocationObjectFromHref(
+                                        getClusterPath({activeTab: activeTabId}),
+                                    )}
                                 />
                             )}
                         />

@@ -2,7 +2,7 @@ import React from 'react';
 
 import {useHistory, useLocation} from 'react-router-dom';
 
-import {parseQuery} from '../../../../../routes';
+import {getTenantPath, parseQuery} from '../../../../../routes';
 import {changeUserInput, setIsDirty} from '../../../../../store/reducers/query/query';
 import {
     TENANT_PAGE,
@@ -11,7 +11,7 @@ import {
 } from '../../../../../store/reducers/tenant/constants';
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {useTypedDispatch} from '../../../../../utils/hooks';
-import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
+import {TenantTabsGroups} from '../../../TenantPages';
 import {createQueryInfoItems} from '../utils';
 
 import {NotFoundContainer} from './NotFoundContainer';

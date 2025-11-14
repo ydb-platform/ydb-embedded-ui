@@ -1,14 +1,15 @@
 import React from 'react';
 
 import {Illustration} from '../../components/Illustration';
+import type {PaginatedTableData} from '../../components/PaginatedTable';
 import {ResizeablePaginatedTable} from '../../components/PaginatedTable';
 import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../components/nodesColumns/constants';
-import type {NodesFilters, NodesPreparedEntity} from '../../store/reducers/nodes/types';
-import type {ProblemFilterValue} from '../../store/reducers/settings/types';
+import type {NodesColumn} from '../../components/nodesColumns/types';
+import type {NodesFilters} from '../../store/reducers/nodes/types';
+import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import type {NodesGroupByField, NodesPeerRole} from '../../types/api/nodes';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
 import {renderPaginatedTableErrorMessage} from '../../utils/renderPaginatedTableErrorMessage';
-import type {Column} from '../../utils/tableUtils/types';
 
 import {getNodes} from './getNodes';
 import i18n from './i18n';
@@ -17,26 +18,30 @@ import {getRowClassName} from './shared';
 interface NodesTableProps {
     path?: string;
     database?: string;
+    databaseFullPath?: string;
 
     searchValue: string;
-    problemFilter: ProblemFilterValue;
+    withProblems: boolean;
     uptimeFilter: NodesUptimeFilterValues;
     peerRoleFilter?: NodesPeerRole;
 
     filterGroup?: string;
     filterGroupBy?: NodesGroupByField;
 
-    columns: Column<NodesPreparedEntity>[];
+    columns: NodesColumn[];
     scrollContainerRef: React.RefObject<HTMLElement>;
 
     initialEntitiesCount?: number;
+
+    onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
 }
 
 export function NodesTable({
     path,
     database,
+    databaseFullPath,
     searchValue,
-    problemFilter,
+    withProblems,
     uptimeFilter,
     peerRoleFilter,
     filterGroup,
@@ -44,13 +49,15 @@ export function NodesTable({
     columns,
     scrollContainerRef,
     initialEntitiesCount,
+    onDataFetched,
 }: NodesTableProps) {
     const tableFilters: NodesFilters = React.useMemo(() => {
         return {
             path,
+            databaseFullPath,
             database,
             searchValue,
-            problemFilter,
+            withProblems,
             uptimeFilter,
             peerRoleFilter,
             filterGroup,
@@ -58,9 +65,10 @@ export function NodesTable({
         };
     }, [
         path,
+        databaseFullPath,
         database,
         searchValue,
-        problemFilter,
+        withProblems,
         uptimeFilter,
         peerRoleFilter,
         filterGroup,
@@ -68,8 +76,8 @@ export function NodesTable({
     ]);
 
     const renderEmptyDataMessage = () => {
-        if (problemFilter !== 'All' || uptimeFilter !== NodesUptimeFilterValues.All) {
-            return <Illustration name="thumbsUp" width="200" />;
+        if (withProblems || uptimeFilter !== NodesUptimeFilterValues.All) {
+            return <Illustration name="thumbsUp" width={200} />;
         }
 
         return i18n('empty.default');
@@ -87,6 +95,7 @@ export function NodesTable({
             getRowClassName={getRowClassName}
             filters={tableFilters}
             tableName="nodes"
+            onDataFetched={onDataFetched}
         />
     );
 }

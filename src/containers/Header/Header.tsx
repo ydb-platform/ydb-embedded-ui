@@ -15,6 +15,8 @@ import {useHistory, useLocation} from 'react-router-dom';
 
 import {getConnectToDBDialog} from '../../components/ConnectToDB/ConnectToDBDialog';
 import {InternalLink} from '../../components/InternalLink';
+import {checkIsClustersPage, checkIsTenantPage, getClusterPath} from '../../routes';
+import {environment} from '../../store';
 import {
     useAddClusterFeatureAvailable,
     useDatabasesAvailable,
@@ -22,10 +24,11 @@ import {
     useEditDatabaseFeatureAvailable,
 } from '../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
+import {clustersApi} from '../../store/reducers/clusters/clusters';
 import {tenantApi} from '../../store/reducers/tenant/tenant';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
-import {DEVELOPER_UI_TITLE} from '../../utils/constants';
+import {DEVELOPER_UI_TITLE, MONITORING_UI_TITLE} from '../../utils/constants';
 import {createDeveloperUIInternalPageHref} from '../../utils/developerUI/developerUI';
 import {useTypedSelector} from '../../utils/hooks';
 import {
@@ -36,7 +39,8 @@ import {
     useIsUserAllowedToMakeChanges,
     useIsViewerUser,
 } from '../../utils/hooks/useIsUserAllowedToMakeChanges';
-import {getClusterPath} from '../Cluster/utils';
+import {canShowTenantMonitoring} from '../../utils/monitoringVisibility';
+import {isAccessError} from '../../utils/response';
 
 import {getBreadcrumbs} from './breadcrumbs';
 import {headerKeyset} from './i18n';
@@ -53,39 +57,69 @@ function Header() {
 
     const isMetaDatabasesAvailable = useDatabasesAvailable();
 
-    const {title: clusterTitle} = useClusterBaseInfo();
+    const {title: clusterTitle, monitoring} = useClusterBaseInfo();
 
     const database = useDatabaseFromQuery();
+
     const clusterName = useClusterNameFromQuery();
 
     const location = useLocation();
     const history = useHistory();
 
-    const isDatabasePage = location.pathname === '/tenant';
-    const isClustersPage = location.pathname === '/clusters';
+    const isDatabasePage = checkIsTenantPage(location.pathname);
+    const isClustersPage = checkIsClustersPage(location.pathname);
+
+    const {isLoading: isClustersLoading, error: clustersError} =
+        clustersApi.useGetClustersListQuery(undefined, {
+            skip: !isClustersPage,
+        });
 
     const isAddClusterAvailable =
-        useAddClusterFeatureAvailable() && uiFactory.onAddCluster !== undefined;
+        useAddClusterFeatureAvailable() &&
+        uiFactory.onAddCluster !== undefined &&
+        !isClustersLoading &&
+        !isAccessError(clustersError);
 
     const isEditDBAvailable = useEditDatabaseFeatureAvailable() && uiFactory.onEditDB !== undefined;
     const isDeleteDBAvailable =
         useDeleteDatabaseFeatureAvailable() && uiFactory.onDeleteDB !== undefined;
 
-    const shouldRequestTenantData =
-        database && isDatabasePage && (isEditDBAvailable || isDeleteDBAvailable);
+    const shouldRequestTenantData = database && isDatabasePage;
 
     const params = shouldRequestTenantData
-        ? {path: database, clusterName, isMetaDatabasesAvailable}
+        ? {database, clusterName, isMetaDatabasesAvailable}
         : skipToken;
 
     const {currentData: databaseData, isLoading: isDatabaseDataLoading} =
         tenantApi.useGetTenantInfoQuery(params);
+
+    // Show Monitoring only when:
+    // - ControlPlane exists AND has a non-empty id
+    // - OR ControlPlane is absent, but cluster-level monitoring meta exists
+    const controlPlane = databaseData?.ControlPlane;
+    const canShowMonitoring = canShowTenantMonitoring(controlPlane, monitoring);
+    const monitoringLinkUrl =
+        canShowMonitoring &&
+        monitoring &&
+        uiFactory.getMonitoringLink &&
+        databaseData?.Name &&
+        databaseData?.Type
+            ? uiFactory.getMonitoringLink({
+                  monitoring,
+                  clusterName,
+                  dbName: databaseData.Name,
+                  dbType: databaseData.Type,
+                  controlPlane: databaseData.ControlPlane,
+                  userAttributes: databaseData.UserAttributes,
+              })
+            : null;
 
     const breadcrumbItems = React.useMemo(() => {
         let options = {
             ...pageBreadcrumbsOptions,
             singleClusterMode,
             isViewerUser,
+            environment,
         };
 
         if (clusterTitle) {
@@ -115,6 +149,15 @@ function Header() {
         }
 
         if (isDatabasePage && database) {
+            if (monitoringLinkUrl) {
+                elements.push(
+                    <Button view="flat" href={monitoringLinkUrl} target="_blank">
+                        {MONITORING_UI_TITLE}
+                        <Icon data={ArrowUpRightFromSquare} />
+                    </Button>,
+                );
+            }
+
             elements.push(
                 <Button view={'flat'} onClick={() => getConnectToDBDialog({database})}>
                     <Icon data={PlugConnection} />
@@ -144,7 +187,7 @@ function Header() {
                     action: () => {
                         onDeleteDB({clusterName, databaseData}).then((isDeleted) => {
                             if (isDeleted) {
-                                const path = getClusterPath('tenants');
+                                const path = getClusterPath({activeTab: 'tenants'});
                                 history.push(path);
                             }
                         });

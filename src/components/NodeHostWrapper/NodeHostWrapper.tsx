@@ -1,12 +1,9 @@
-import {getDefaultNodePath} from '../../containers/Node/NodePages';
-import type {GetNodeRefFunc, NodeAddress} from '../../types/additionalProps';
+import {getDefaultNodePath} from '../../routes';
+import type {PreparedStorageNode} from '../../store/reducers/storage/types';
+import type {NodeAddress} from '../../types/additionalProps';
 import type {TNodeInfo, TSystemStateInfo} from '../../types/api/nodes';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {
-    createDeveloperUIInternalPageHref,
-    createDeveloperUILinkWithNodeId,
-} from '../../utils/developerUI/developerUI';
-import {isUnavailableNode} from '../../utils/nodes';
+import {checkIsStorageNode, isUnavailableNode} from '../../utils/nodes';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
 import {NodeEndpointsTooltipContent} from '../TooltipsContent';
 
@@ -18,15 +15,13 @@ export type NodeHostData = NodeAddress &
     };
 
 interface NodeHostWrapperProps {
-    node: NodeHostData;
-    getNodeRef?: GetNodeRefFunc;
+    node: PreparedStorageNode;
     database?: string;
     statusForIcon?: 'SystemState' | 'ConnectStatus';
 }
 
 export const NodeHostWrapper = ({
     node,
-    getNodeRef,
     database,
     statusForIcon = 'SystemState',
 }: NodeHostWrapperProps) => {
@@ -38,24 +33,17 @@ export const NodeHostWrapper = ({
 
     const isNodeAvailable = !isUnavailableNode(node);
 
-    let developerUIInternalHref: string | undefined;
-    if (getNodeRef) {
-        const developerUIHref = getNodeRef(node);
-        developerUIInternalHref = developerUIHref
-            ? createDeveloperUIInternalPageHref(developerUIHref)
-            : undefined;
-    } else if (node.NodeId) {
-        const developerUIHref = createDeveloperUILinkWithNodeId(node.NodeId);
-        developerUIInternalHref = createDeveloperUIInternalPageHref(developerUIHref);
-    }
+    // Storage nodes do not belong to any specific database.
+    // Including a database in the path would filter data on the node page by that database,
+    // but for storage nodes this would result in no data being shown.
+    // Database from node data cannot be used, because we use database ids when uiFactory.useDatabaseId
+    // https://github.com/ydb-platform/ydb-embedded-ui/issues/3006
+    const databaseInPath = checkIsStorageNode(node) ? undefined : (database ?? node.TenantName);
 
     const nodePath = isNodeAvailable
         ? getDefaultNodePath(
-              node.NodeId,
-              {
-                  database: database ?? node.TenantName,
-              },
-              node.TenantName ? 'tablets' : 'storage',
+              {id: node.NodeId, activeTab: node.TenantName ? 'tablets' : 'storage'},
+              {database: databaseInPath},
           )
         : undefined;
 
@@ -66,9 +54,7 @@ export const NodeHostWrapper = ({
             path={nodePath}
             hasClipboardButton
             infoPopoverContent={
-                isNodeAvailable ? (
-                    <NodeEndpointsTooltipContent data={node} nodeHref={developerUIInternalHref} />
-                ) : null
+                isNodeAvailable ? <NodeEndpointsTooltipContent data={node} /> : null
             }
         />
     );

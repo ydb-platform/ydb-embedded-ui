@@ -197,29 +197,32 @@ const prepareStorageNodeData = (
     maximumSlotsPerDisk: number,
     maximumDisksPerNode: number,
 ): PreparedStorageNode => {
+    const {SystemState, NodeId, PDisks, VDisks, ...restNodeParams} = node;
+
     const missing =
-        node.PDisks?.filter((pDisk) => {
+        PDisks?.filter((pDisk) => {
             return pDisk.State !== TPDiskState.Normal;
         }).length || 0;
 
-    const pDisks = node.PDisks?.map((pDisk) => {
+    const pDisks = PDisks?.map((pDisk) => {
         return {
             ...prepareWhiteboardPDiskData(pDisk),
-            NodeId: node.NodeId,
+            NodeId,
         };
     });
-    const vDisks = node.VDisks?.map((vDisk) => {
+    const vDisks = VDisks?.map((vDisk) => {
         return {
             ...prepareWhiteboardVDiskData(vDisk),
-            NodeId: node.NodeId,
+            NodeId,
         };
     });
 
     return {
-        ...prepareNodeSystemState(node.SystemState),
-        NodeId: node.NodeId,
-        DiskSpaceUsage: node.DiskSpaceUsage,
-        PileName: node.PileName,
+        ...restNodeParams,
+        ...prepareNodeSystemState(SystemState),
+        // There is NodeId both in node and its system state
+        // We should use only NodeId from node, since it's always present (there may be no SystemState)
+        NodeId,
         PDisks: pDisks,
         VDisks: vDisks,
         Missing: missing,

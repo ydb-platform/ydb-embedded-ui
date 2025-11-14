@@ -1,6 +1,7 @@
-import {prepareBackendFromBalancer} from './parseBalancer';
+import {isNil} from 'lodash';
 
-import {valueIsDefined} from '.';
+import {createDeveloperUILinkWithNodeId} from './developerUI/developerUI';
+import {prepareBackendFromBalancer} from './parseBalancer';
 
 export const prepareHost = (host?: string) => {
     // add "u-" prefix to cloud din nodes
@@ -8,11 +9,20 @@ export const prepareHost = (host?: string) => {
 };
 
 /** For multi-cluster version */
-export const getBackendFromBalancerAndNodeId = (nodeId?: string | number, balancer?: string) => {
-    if (valueIsDefined(nodeId) && valueIsDefined(balancer)) {
-        const preparedBalancer = prepareBackendFromBalancer(balancer);
-        return `${preparedBalancer}/node/${nodeId}`;
+export const getBackendFromBalancerAndNodeId = (
+    nodeId?: string | number,
+    balancer?: string,
+    useMetaProxy?: boolean,
+) => {
+    if (isNil(nodeId)) {
+        return undefined;
     }
-
+    if (useMetaProxy) {
+        return createDeveloperUILinkWithNodeId(nodeId);
+    }
+    if (!isNil(balancer)) {
+        const preparedBalancer = prepareBackendFromBalancer(balancer);
+        return createDeveloperUILinkWithNodeId(nodeId, preparedBalancer);
+    }
     return undefined;
 };

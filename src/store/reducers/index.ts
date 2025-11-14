@@ -16,7 +16,6 @@ import settings from './settings/settings';
 import shardsWorkload from './shardsWorkload/shardsWorkload';
 import singleClusterMode from './singleClusterMode';
 import tenant from './tenant/tenant';
-import tenants from './tenants/tenants';
 import tooltip from './tooltip';
 
 export const rootReducer = {
@@ -26,7 +25,6 @@ export const rootReducer = {
     tenant,
     tooltip,
     schema,
-    tenants,
     partitions,
     query,
     heatmap,

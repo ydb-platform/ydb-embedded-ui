@@ -1,5 +1,3 @@
-import type {Column} from '@gravity-ui/react-data-table';
-
 import {ResizeableDataTable} from '../../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {
     getHostColumn,
@@ -14,10 +12,11 @@ import {
     NODES_COLUMNS_TO_DATA_FIELDS,
     NODES_COLUMNS_WIDTH_LS_KEY,
 } from '../../../../../components/nodesColumns/constants';
-import type {GetNodesColumnsParams} from '../../../../../components/nodesColumns/types';
+import type {
+    GetNodesColumnsParams,
+    NodesColumn,
+} from '../../../../../components/nodesColumns/types';
 import {nodesApi} from '../../../../../store/reducers/nodes/nodes';
-import type {NodesPreparedEntity} from '../../../../../store/reducers/nodes/types';
-import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import type {NodesRequiredField} from '../../../../../types/api/nodes';
 import {
     TENANT_OVERVIEW_TABLES_LIMIT,
@@ -30,15 +29,15 @@ import i18n from '../i18n';
 
 function getTopNodesByMemoryColumns(
     params: GetNodesColumnsParams,
-): [Column<NodesPreparedEntity>[], NodesRequiredField[]] {
-    const columns = [
-        getNodeIdColumn<NodesPreparedEntity>(),
-        getHostColumn<NodesPreparedEntity>(params),
-        getUptimeColumn<NodesPreparedEntity>(),
-        getLoadColumn<NodesPreparedEntity>(),
-        getMemoryColumn<NodesPreparedEntity>(),
-        getSessionsColumn<NodesPreparedEntity>(),
-        getTabletsColumn<NodesPreparedEntity>(params),
+): [NodesColumn[], NodesRequiredField[]] {
+    const columns: NodesColumn[] = [
+        getNodeIdColumn(),
+        getHostColumn(params),
+        getUptimeColumn(),
+        getLoadColumn(),
+        getMemoryColumn(),
+        getSessionsColumn(),
+        getTabletsColumn(params),
     ];
 
     const columnsIds = columns.map((column) => column.name);
@@ -48,20 +47,16 @@ function getTopNodesByMemoryColumns(
 }
 
 interface TopNodesByMemoryProps {
-    tenantName: string;
-    additionalNodesProps?: AdditionalNodesProps;
+    database: string;
 }
 
-export function TopNodesByMemory({tenantName, additionalNodesProps}: TopNodesByMemoryProps) {
+export function TopNodesByMemory({database}: TopNodesByMemoryProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const [columns, fieldsRequired] = getTopNodesByMemoryColumns({
-        getNodeRef: additionalNodesProps?.getNodeRef,
-        database: tenantName,
-    });
+    const [columns, fieldsRequired] = getTopNodesByMemoryColumns({database});
 
     const {currentData, isFetching, error} = nodesApi.useGetNodesQuery(
         {
-            tenant: tenantName,
+            tenant: database,
             type: 'any',
             tablets: true,
             sort: '-Memory',
@@ -73,7 +68,7 @@ export function TopNodesByMemory({tenantName, additionalNodesProps}: TopNodesByM
 
     const loading = isFetching && currentData === undefined;
 
-    const topNodes = currentData?.Nodes || [];
+    const topNodes = currentData?.nodes || [];
 
     return (
         <TenantOverviewTableLayout loading={loading} error={error} withData={Boolean(currentData)}>

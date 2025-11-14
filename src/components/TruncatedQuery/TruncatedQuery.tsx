@@ -40,7 +40,7 @@ export const TruncatedQuery = ({
                                   copyText: value,
                                   withLabel: false,
                               }
-                            : false
+                            : undefined
                     }
                 />
                 <span className={b('message', {color: 'secondary'})}>{message}</span>
@@ -50,6 +50,7 @@ export const TruncatedQuery = ({
     return (
         <YDBSyntaxHighlighter
             language="yql"
+            className={b()}
             text={value}
             withClipboardButton={
                 hasClipboardButton
@@ -58,7 +59,7 @@ export const TruncatedQuery = ({
                           copyText: value,
                           withLabel: false,
                       }
-                    : false
+                    : undefined
             }
         />
     );

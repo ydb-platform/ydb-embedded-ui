@@ -22,7 +22,9 @@ const uiFactoryBase: UIFactory = {
     useDatabaseId: false,
 };
 
-export function configureUIFactory<H extends string>(overrides: Partial<UIFactory<H>>) {
+export function configureUIFactory<H extends string, T extends string = string>(
+    overrides: Partial<UIFactory<H, T>>,
+) {
     Object.assign(uiFactoryBase, overrides);
 }
 

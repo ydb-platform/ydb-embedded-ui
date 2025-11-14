@@ -1,12 +1,17 @@
-import {Copy, PlugConnection} from '@gravity-ui/icons';
+import {CirclePlus, Copy, DisplayPulse, PlugConnection} from '@gravity-ui/icons';
 import {Flex, Spin} from '@gravity-ui/uikit';
 import copy from 'copy-to-clipboard';
 import type {NavigationTreeNodeType} from 'ydb-ui-components';
 
 import type {SnippetParams} from '../../../components/ConnectToDB/types';
 import type {AppDispatch} from '../../../store';
-import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
-import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
+import {
+    TENANT_DIAGNOSTICS_TABS_IDS,
+    TENANT_PAGES_IDS,
+    TENANT_QUERY_TABS_ID,
+} from '../../../store/reducers/tenant/constants';
+import {setDiagnosticsTab, setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
+import type {IQueryResult} from '../../../types/store/query';
 import createToast from '../../../utils/createToast';
 import {insertSnippetToEditor} from '../../../utils/monaco/insertSnippet';
 import {transformPath} from '../ObjectSummary/transformPath';
@@ -17,6 +22,8 @@ import type {TemplateFn} from './schemaQueryTemplates';
 import {
     addTableIndex,
     alterAsyncReplicationTemplate,
+    alterStreamingQuerySettingsTemplate,
+    alterStreamingQueryText,
     alterTableTemplate,
     alterTopicTemplate,
     alterTransferTemplate,
@@ -24,12 +31,14 @@ import {
     createCdcStreamTemplate,
     createColumnTableTemplate,
     createExternalTableTemplate,
+    createStreamingQueryTemplate,
     createTableTemplate,
     createTopicTemplate,
     createTransferTemplate,
     createViewTemplate,
     dropAsyncReplicationTemplate,
     dropExternalTableTemplate,
+    dropStreamingQueryTemplate,
     dropTableIndex,
     dropTableTemplate,
     dropTopicTemplate,
@@ -48,12 +57,16 @@ interface ActionsAdditionalParams {
     getConnectToDBDialog?: (params: SnippetParams) => Promise<boolean>;
     schemaData?: SchemaData[];
     isSchemaDataLoading?: boolean;
+    hasMonitoring?: boolean;
+    streamingQueryData?: IQueryResult;
+    isStreamingQueryTextLoading?: boolean;
 }
 
 interface BindActionParams {
-    tenantName: string;
+    database: string;
     type: NavigationTreeNodeType;
     path: string;
+    databaseFullPath: string;
     relativePath: string;
 }
 
@@ -68,6 +81,7 @@ const bindActions = (
         getConfirmation,
         getConnectToDBDialog,
         schemaData,
+        streamingQueryData,
     } = additionalEffects;
 
     const inputQuery = (tmpl: TemplateFn) => () => {
@@ -76,7 +90,7 @@ const bindActions = (
             dispatch(setTenantPage(TENANT_PAGES_IDS.query));
             dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
             setActivePath(params.path);
-            insertSnippetToEditor(tmpl({...params, schemaData}));
+            insertSnippetToEditor(tmpl({...params, schemaData, streamingQueryData}));
         };
         if (getConfirmation) {
             const confirmedPromise = getConfirmation();
@@ -96,7 +110,12 @@ const bindActions = (
                   showCreateDirectoryDialog(params.path);
               }
             : undefined,
-        getConnectToDBDialog: () => getConnectToDBDialog?.({database: params.path}),
+        getConnectToDBDialog: () => getConnectToDBDialog?.({database: params.database}),
+        openMonitoring: () => {
+            dispatch(setTenantPage(TENANT_PAGES_IDS.diagnostics));
+            dispatch(setDiagnosticsTab(TENANT_DIAGNOSTICS_TABS_IDS.monitoring));
+            setActivePath(params.path);
+        },
         createTable: inputQuery(createTableTemplate),
         createColumnTable: inputQuery(createColumnTableTemplate),
         createAsyncReplication: inputQuery(createAsyncReplicationTemplate),
@@ -118,6 +137,10 @@ const bindActions = (
         dropTopic: inputQuery(dropTopicTemplate),
         createView: inputQuery(createViewTemplate),
         dropView: inputQuery(dropViewTemplate),
+        createStreamingQuery: inputQuery(createStreamingQueryTemplate),
+        alterStreamingQuerySettings: inputQuery(alterStreamingQuerySettingsTemplate),
+        alterStreamingQueryText: inputQuery(alterStreamingQueryText),
+        dropStreamingQuery: inputQuery(dropStreamingQueryTemplate),
         dropIndex: inputQuery(dropTableIndex),
         addTableIndex: inputQuery(addTableIndex),
         createCdcStream: inputQuery(createCdcStreamTemplate),
@@ -160,23 +183,39 @@ const getActionWithLoader = ({text, action, isLoading}: ActionConfig) => ({
 });
 
 export const getActions =
-    (dispatch: AppDispatch, additionalEffects: ActionsAdditionalParams, rootPath = '') =>
+    (
+        dispatch: AppDispatch,
+        additionalEffects: ActionsAdditionalParams,
+        rootPath = '',
+        database: string,
+    ) =>
     (path: string, type: NavigationTreeNodeType) => {
         const relativePath = transformPath(path, rootPath);
         const actions = bindActions(
-            {path, relativePath, tenantName: rootPath, type},
+            {
+                path,
+                relativePath,
+                database,
+                type,
+                databaseFullPath: rootPath,
+            },
             dispatch,
             additionalEffects,
         );
         const copyItem: ActionsSet[0] = {
             text: i18n('actions.copyPath'),
             action: actions.copyPath,
-            iconEnd: <Copy />,
+            iconStart: <Copy />,
         };
         const connectToDBItem = {
             text: i18n('actions.connectToDB'),
             action: actions.getConnectToDBDialog,
-            iconEnd: <PlugConnection />,
+            iconStart: <PlugConnection />,
+        };
+        const monitoringItem = {
+            text: i18n('actions.openMonitoring'),
+            action: actions.openMonitoring,
+            iconStart: <DisplayPulse />,
         };
 
         const createEntitiesSet = [
@@ -192,6 +231,7 @@ export const getActions =
             },
             {text: i18n('actions.createTopic'), action: actions.createTopic},
             {text: i18n('actions.createView'), action: actions.createView},
+            {text: i18n('actions.createStreamingQuery'), action: actions.createStreamingQuery},
         ];
 
         const alterTableGroupItem = {
@@ -204,14 +244,19 @@ export const getActions =
                 },
             ],
         };
-        const DB_SET: ActionsSet = [[copyItem, connectToDBItem], createEntitiesSet];
+        let DB_SET: ActionsSet = [[copyItem, connectToDBItem], createEntitiesSet];
 
         const DIR_SET: ActionsSet = [[copyItem], createEntitiesSet];
+
+        if (additionalEffects.hasMonitoring) {
+            DB_SET = [[copyItem, connectToDBItem, monitoringItem], createEntitiesSet];
+        }
 
         if (actions.createDirectory) {
             const createDirectoryItem = {
                 text: i18n('actions.createDirectory'),
                 action: actions.createDirectory,
+                iconStart: <CirclePlus />,
             };
 
             DB_SET.splice(1, 0, [createDirectoryItem]);
@@ -277,6 +322,11 @@ export const getActions =
             [{text: i18n('actions.dropView'), action: actions.dropView}],
         ];
 
+        const SYSTEM_VIEW_SET: ActionsSet = [
+            [copyItem],
+            [{text: i18n('actions.selectQuery'), action: actions.selectQuery}],
+        ];
+
         const ASYNC_REPLICATION_SET: ActionsSet = [
             [copyItem],
             [
@@ -297,6 +347,25 @@ export const getActions =
             [copyItem, {text: i18n('actions.dropIndex'), action: actions.dropIndex}],
         ];
 
+        const STREAMING_QUERY_SET: ActionsSet = [
+            [copyItem],
+            [
+                {
+                    text: i18n('actions.alterStreamingQuerySettings'),
+                    action: actions.alterStreamingQuerySettings,
+                },
+                getActionWithLoader({
+                    text: i18n('actions.alterStreamingQueryText'),
+                    action: actions.alterStreamingQueryText,
+                    isLoading: additionalEffects.isStreamingQueryTextLoading,
+                }),
+                {
+                    text: i18n('actions.dropStreamingQuery'),
+                    action: actions.dropStreamingQuery,
+                },
+            ],
+        ];
+
         const JUST_COPY: ActionsSet = [copyItem];
 
         // verbose mapping to guarantee a correct actions set for new node types
@@ -312,6 +381,7 @@ export const getActions =
 
             table: ROW_TABLE_SET,
             column_table: COLUMN_TABLE_SET,
+            system_table: SYSTEM_VIEW_SET,
 
             index_table: JUST_COPY,
             topic: TOPIC_SET,
@@ -323,6 +393,8 @@ export const getActions =
             external_data_source: EXTERNAL_DATA_SOURCE_SET,
 
             view: VIEW_SET,
+
+            streaming_query: STREAMING_QUERY_SET,
         };
 
         return nodeTypeToActions[type];

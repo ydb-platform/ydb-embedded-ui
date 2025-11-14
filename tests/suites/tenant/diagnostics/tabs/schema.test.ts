@@ -1,6 +1,6 @@
 import {expect, test} from '@playwright/test';
 
-import {dsVslotsSchema, tenantName} from '../../../../utils/constants';
+import {database, dsVslotsSchema} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
 import {Diagnostics, DiagnosticsTab} from '../Diagnostics';
 
@@ -8,7 +8,7 @@ test.describe('Diagnostics Schema tab', async () => {
     test('Primary keys header is visible in Schema tab', async ({page}) => {
         const pageQueryParams = {
             schema: dsVslotsSchema,
-            database: tenantName,
+            database,
             tenantPage: 'diagnostics',
         };
         const tenantPage = new TenantPage(page);

@@ -1,6 +1,7 @@
 @use '../../../../styles/mixins.scss';
 
 .tenant-overview {
+    min-width: 1000px;
     height: 100%;
     padding-bottom: 20px;
 
@@ -22,6 +23,10 @@
 
         font-weight: 600;
         line-height: 24px;
+    }
+
+    &__serverless-tag-label {
+        margin-left: var(--g-spacing-1);
     }
 
     &__info {

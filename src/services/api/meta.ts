@@ -1,6 +1,6 @@
 import type {AxiosWrapperOptions} from '@gravity-ui/axios-wrapper';
 
-import {metaBackend as META_BACKEND} from '../../store';
+import {environment as ENVIRONMENT, metaBackend as META_BACKEND} from '../../store';
 import type {MetaCapabilitiesResponse} from '../../types/api/capabilities';
 import type {
     MetaBaseClusterInfo,
@@ -8,6 +8,7 @@ import type {
     MetaClusters,
     MetaTenants,
 } from '../../types/api/meta';
+import type {TUserToken} from '../../types/api/whoami';
 import {parseMetaTenants} from '../parsers/parseMetaTenants';
 
 import type {AxiosOptions, BaseAPIParams} from './base';
@@ -23,9 +24,22 @@ export class MetaAPI extends BaseYdbAPI {
     }
     getPath(path: string, clusterName?: string) {
         if (this.proxyMeta && clusterName) {
-            return `${META_BACKEND}/proxy/cluster/${clusterName}${path}`;
+            const envPrefix = ENVIRONMENT ? `/${ENVIRONMENT}` : '';
+            return `${envPrefix}${META_BACKEND}/proxy/cluster/${clusterName}${path}`;
         }
         return `${META_BACKEND ?? ''}${path}`;
+    }
+
+    metaAuthenticate(params: {user: string; password: string}) {
+        return this.post(this.getPath('/meta/login'), params, {});
+    }
+
+    metaLogout() {
+        return this.post(this.getPath('/meta/logout'), {}, {});
+    }
+
+    metaWhoami() {
+        return this.post<TUserToken>(this.getPath('/meta/whoami'), {}, {});
     }
 
     getMetaCapabilities() {
@@ -43,28 +57,28 @@ export class MetaAPI extends BaseYdbAPI {
     }
 
     getTenants(
-        {clusterName, path}: {clusterName?: string; path?: string},
+        {clusterName, database}: {clusterName?: string; database?: string},
         {signal}: AxiosOptions = {},
     ) {
         return this.get<MetaTenants>(
             this.getPath('/meta/cp_databases', clusterName),
             {
                 cluster_name: clusterName,
-                database_name: path,
+                database_name: database,
             },
             {requestConfig: {signal}},
         ).then(parseMetaTenants);
     }
 
     getTenantsV2(
-        {path, clusterName}: {clusterName?: string; path?: string},
+        {database, clusterName}: {clusterName?: string; database?: string},
         {signal}: AxiosOptions = {},
     ) {
         return this.get<MetaTenants>(
             this.getPath('/meta/databases', clusterName),
             {
                 cluster_name: clusterName,
-                database: path,
+                database,
             },
             {requestConfig: {signal}},
         ).then(parseMetaTenants);

@@ -6,16 +6,16 @@ import type {NodesProps} from '../../../Nodes/Nodes';
 
 import {Network} from './Network';
 
-interface NetworkWrapperProps
-    extends Pick<NodesProps, 'path' | 'scrollContainerRef' | 'additionalNodesProps'> {
+interface NetworkWrapperProps extends Pick<NodesProps, 'path' | 'scrollContainerRef'> {
     database: string;
+    databaseFullPath: string;
 }
 
 export function NetworkWrapper({
     database,
     path,
+    databaseFullPath,
     scrollContainerRef,
-    additionalNodesProps,
 }: NetworkWrapperProps) {
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const shouldUseNetworkNodesTable = useShouldShowDatabaseNetworkTable();
@@ -25,14 +25,14 @@ export function NetworkWrapper({
             return (
                 <NetworkTable
                     path={path}
+                    databaseFullPath={databaseFullPath}
                     database={database}
                     scrollContainerRef={scrollContainerRef}
-                    additionalNodesProps={additionalNodesProps}
                 />
             );
         }
 
-        return <Network tenantName={database} />;
+        return <Network database={database} databaseFullPath={databaseFullPath} />;
     };
 
     return <LoaderWrapper loading={!capabilitiesLoaded}>{renderContent()}</LoaderWrapper>;

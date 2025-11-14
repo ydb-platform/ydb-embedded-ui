@@ -1,15 +1,30 @@
+import type {IQueryResult} from '../../../types/store/query';
+import {
+    getStringifiedData,
+    stripIndentByFirstLine,
+    trimOuterEmptyLines,
+} from '../../../utils/dataFormatters/dataFormatters';
 import type {SchemaData} from '../Schema/SchemaViewer/types';
 
 export interface SchemaQueryParams {
     path: string;
     relativePath: string;
     schemaData?: SchemaData[];
+    streamingQueryData?: IQueryResult;
 }
 
 export type TemplateFn = (params?: SchemaQueryParams) => string;
 
 function normalizeParameter(param: string) {
     return param.replace(/\$/g, '\\$');
+}
+
+function toLF(str: string) {
+    return str.replace(/\r\n?/g, '\n');
+}
+
+function indentBlock(str: string, pad = '    ') {
+    return str.replace(/^/gm, pad);
 }
 
 export const createTableTemplate = (params?: SchemaQueryParams) => {
@@ -296,6 +311,59 @@ export const alterTransferTemplate = (params?: SchemaQueryParams) => {
 
 ALTER TRANSFER ${path} 
 SET USING \\$l;`;
+};
+
+export const createStreamingQueryTemplate = (params?: SchemaQueryParams) => {
+    const streamingQueryName = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}/my_streaming_query\``
+        : '${1:<my_streaming_query>}';
+    return `CREATE STREAMING QUERY ${streamingQueryName} WITH (
+    RUN = TRUE  -- Run the query after creation
+) AS
+DO BEGIN
+    INSERT INTO \${2:<external data source>}.\${3:<sink topic>} 
+    SELECT * FROM \${2:<external data source>}.\${4:<source topic>};
+END DO;`;
+};
+
+export const alterStreamingQuerySettingsTemplate = (params?: SchemaQueryParams) => {
+    const streamingQueryName = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_streaming_query>}';
+    return `ALTER STREAMING QUERY ${streamingQueryName} SET (
+    RUN = FALSE, -- Stop query execution
+    RESOURCE_POOL = "default" -- Workload manager pool for query
+);`;
+};
+
+export const alterStreamingQueryText = (params?: SchemaQueryParams) => {
+    const streamingQueryName = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_streaming_query>}';
+
+    const sysData = params?.streamingQueryData;
+    const rawQueryText = getStringifiedData(sysData?.resultSets?.[0]?.result?.[0]?.Text);
+    let queryText = toLF(rawQueryText);
+    queryText = trimOuterEmptyLines(queryText);
+    queryText = stripIndentByFirstLine(queryText);
+    queryText = normalizeParameter(queryText);
+
+    const bodyQueryText = queryText
+        ? indentBlock(queryText)
+        : indentBlock('${2:<streaming_query_text>}');
+    return `ALTER STREAMING QUERY ${streamingQueryName} SET (
+    FORCE = TRUE, -- Allow to drop last query checkpoint if query state can't be loaded
+) AS
+DO BEGIN
+${bodyQueryText}
+END DO;`;
+};
+
+export const dropStreamingQueryTemplate = (params?: SchemaQueryParams) => {
+    const streamingQueryName = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_streaming_query>}';
+    return `DROP STREAMING QUERY ${streamingQueryName};`;
 };
 
 export const addTableIndex = (params?: SchemaQueryParams) => {

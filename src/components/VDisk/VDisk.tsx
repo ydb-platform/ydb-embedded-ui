@@ -1,12 +1,10 @@
+import {useVDiskPagePath} from '../../routes';
 import {cn} from '../../utils/cn';
 import type {PreparedVDisk} from '../../utils/disks/types';
-import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {DiskStateProgressBar} from '../DiskStateProgressBar/DiskStateProgressBar';
 import {HoverPopup} from '../HoverPopup/HoverPopup';
 import {InternalLink} from '../InternalLink';
 import {VDiskPopup} from '../VDiskPopup/VDiskPopup';
-
-import {getVDiskLink} from './utils';
 
 import './VDisk.scss';
 
@@ -35,10 +33,8 @@ export const VDisk = ({
     delayClose,
     delayOpen,
 }: VDiskProps) => {
-    const database = useDatabaseFromQuery();
-    const vDiskPath = getVDiskLink(data, {
-        database: database,
-    });
+    const getVDiskLink = useVDiskPagePath();
+    const vDiskPath = getVDiskLink({nodeId: data.NodeId, vDiskId: data.StringifiedId});
 
     return (
         <HoverPopup
@@ -46,7 +42,7 @@ export const VDisk = ({
             onShowPopup={onShowPopup}
             onHidePopup={onHidePopup}
             renderPopupContent={() => <VDiskPopup data={data} />}
-            offset={{mainAxis: 5, crossAxis: 0}}
+            offset={{mainAxis: 2, crossAxis: 0}}
             delayClose={delayClose}
             delayOpen={delayOpen}
         >

@@ -10,7 +10,7 @@ import {EntitiesCount} from '../../components/EntitiesCount';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {Illustration} from '../../components/Illustration';
 import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
-import {ProblemFilter} from '../../components/ProblemFilter';
+import {ProblemFilter} from '../../components/ProblemFilter/ProblemFilter';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../components/Search';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
@@ -22,25 +22,21 @@ import {
     useEditDatabaseFeatureAvailable,
 } from '../../store/reducers/capabilities/hooks';
 import {
-    ProblemFilterValues,
-    changeFilter,
-    selectProblemFilter,
-} from '../../store/reducers/settings/settings';
-import type {ProblemFilterValue} from '../../store/reducers/settings/types';
-import {
-    selectFilteredTenants,
-    selectTenants,
-    selectTenantsSearchValue,
-} from '../../store/reducers/tenants/selectors';
-import {setSearchValue, tenantsApi} from '../../store/reducers/tenants/tenants';
+    filterTenantsByDomain,
+    filterTenantsByProblems,
+    filterTenantsBySearch,
+} from '../../store/reducers/tenants/filters';
+import {tenantsApi} from '../../store/reducers/tenants/tenants';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import type {AdditionalTenantsProps} from '../../types/additionalProps';
+import {State} from '../../types/api/tenant';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
 import {
     DEFAULT_TABLE_SETTINGS,
     EMPTY_DATA_PLACEHOLDER,
+    SHOW_DOMAIN_DATABASE_KEY,
     SHOW_NETWORK_UTILIZATION,
 } from '../../utils/constants';
 import {
@@ -48,16 +44,12 @@ import {
     formatNumber,
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
-import {
-    useAutoRefreshInterval,
-    useSetting,
-    useTypedDispatch,
-    useTypedSelector,
-} from '../../utils/hooks';
+import {useAutoRefreshInterval, useSetting} from '../../utils/hooks';
 import {useClusterNameFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {isNumeric} from '../../utils/utils';
 
 import i18n from './i18n';
+import {useTenantsQueryParams} from './useTenantsQueryParams';
 
 import './Tenants.scss';
 
@@ -65,14 +57,29 @@ const b = cn('tenants');
 
 const DATABASES_COLUMNS_WIDTH_LS_KEY = 'databasesTableColumnsWidth';
 
+function formatDatabaseState(state?: State): string {
+    if (!state) {
+        return EMPTY_DATA_PLACEHOLDER;
+    }
+
+    // Map specific state values to user-friendly display names
+    switch (state) {
+        case State.STATE_UNSPECIFIED:
+            return 'Unspecified';
+        case State.PENDING_RESOURCES:
+            return 'Pending';
+        default:
+            // For other states, use capitalized version (first letter uppercase, rest lowercase)
+            return state.charAt(0).toUpperCase() + state.slice(1).toLowerCase();
+    }
+}
+
 interface TenantsProps {
     scrollContainerRef: React.RefObject<HTMLElement>;
     additionalTenantsProps?: AdditionalTenantsProps;
 }
 
 export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsProps) => {
-    const dispatch = useTypedDispatch();
-
     const clusterName = useClusterNameFromQuery();
     const isMetaDatabasesAvailable = useDatabasesAvailable();
     const [autoRefreshInterval] = useAutoRefreshInterval();
@@ -91,31 +98,34 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
     const isDeleteDBAvailable =
         useDeleteDatabaseFeatureAvailable() && uiFactory.onDeleteDB !== undefined;
 
-    const tenants = useTypedSelector((state) => selectTenants(state, clusterName));
-    const searchValue = useTypedSelector(selectTenantsSearchValue);
-    const filteredTenants = useTypedSelector((state) => selectFilteredTenants(state, clusterName));
-    const problemFilter = useTypedSelector(selectProblemFilter);
+    const {search, withProblems, handleSearchChange, handleWithProblemsChange} =
+        useTenantsQueryParams();
 
     const [showNetworkUtilization] = useSetting<boolean>(SHOW_NETWORK_UTILIZATION);
+    const [showDomainDatabase] = useSetting<boolean>(SHOW_DOMAIN_DATABASE_KEY);
 
-    const handleProblemFilterChange = (value: ProblemFilterValue) => {
-        dispatch(changeFilter(value));
-    };
+    // We should apply domain filter before other filters
+    // It is done to ensure proper entities count
+    // It should be 8/8 instead of 8/9 when no filters applied but show domain setting is off
+    const tenants = React.useMemo(() => {
+        const rawTenants = currentData ?? [];
 
-    const handleSearchChange = (value: string) => {
-        dispatch(setSearchValue(value));
-    };
+        return filterTenantsByDomain(rawTenants, showDomainDatabase);
+    }, [currentData, showDomainDatabase]);
+
+    const filteredTenants = React.useMemo(() => {
+        const filteredByProblems = filterTenantsByProblems(tenants, withProblems);
+        const filteredBySearch = filterTenantsBySearch(filteredByProblems, search);
+
+        return filteredBySearch;
+    }, [tenants, withProblems, search]);
 
     const renderCreateDBButton = () => {
         const buttonAvailable = isCreateDBAvailable && clusterName;
 
         if (buttonAvailable && !loading) {
             return (
-                <Button
-                    view="action"
-                    onClick={() => uiFactory.onCreateDB?.({clusterName})}
-                    className={b('create-database')}
-                >
+                <Button view="action" onClick={() => uiFactory.onCreateDB?.({clusterName})}>
                     <Icon data={CirclePlus} />
                     {i18n('create-database')}
                 </Button>
@@ -129,14 +139,14 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
         return (
             <React.Fragment>
                 <Search
-                    value={searchValue}
+                    value={search}
                     onChange={handleSearchChange}
                     placeholder="Database name"
                     className={b('search')}
                 />
-                <ProblemFilter value={problemFilter} onChange={handleProblemFilterChange} />
+                <ProblemFilter value={withProblems} onChange={handleWithProblemsChange} />
                 <EntitiesCount
-                    total={tenants.length}
+                    total={tenants?.length}
                     current={filteredTenants?.length || 0}
                     label={'Databases'}
                     loading={loading}
@@ -195,8 +205,7 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
             {
                 name: 'State',
                 width: 150,
-                render: ({row}) => (row.State ? row.State.toLowerCase() : EMPTY_DATA_PLACEHOLDER),
-                customStyle: () => ({textTransform: 'capitalize'}),
+                render: ({row}) => formatDatabaseState(row.State),
             },
             {
                 name: 'cpu',
@@ -299,8 +308,8 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
             columns.push(actionsColumn);
         }
 
-        if (filteredTenants.length === 0 && problemFilter !== ProblemFilterValues.ALL) {
-            return <Illustration name="thumbsUp" width="200" />;
+        if (filteredTenants.length === 0 && withProblems) {
+            return <Illustration name="thumbsUp" width={200} />;
         }
 
         return (
@@ -325,7 +334,7 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
                 <TableWithControlsLayout.Table
                     scrollContainerRef={scrollContainerRef}
                     loading={loading}
-                    scrollDependencies={[searchValue, problemFilter, sortParams]}
+                    scrollDependencies={[search, withProblems, sortParams]}
                 >
                     {currentData ? renderTable() : null}
                 </TableWithControlsLayout.Table>

@@ -10,15 +10,14 @@ import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/Re
 import {TabletState} from '../../../../components/TabletState/TabletState';
 import {TabletUptime} from '../../../../components/UptimeViewer/UptimeViewer';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../lib';
-import {getTabletPagePath} from '../../../../routes';
+import {useTabletPagePath} from '../../../../routes';
 import type {ITabletPreparedHistoryItem} from '../../../../types/store/tablet';
 
 const TABLET_COLUMNS_WIDTH_LS_KEY = 'tabletTableColumnsWidth';
 
-const getColumns: (props: {
-    database?: string;
-    tabletId: string;
-}) => Column<ITabletPreparedHistoryItem>[] = ({database, tabletId}) => [
+const getColumns: (props: {tabletId: string}) => Column<ITabletPreparedHistoryItem>[] = ({
+    tabletId,
+}) => [
     {
         name: 'Generation',
         align: DataTable.RIGHT,
@@ -41,14 +40,7 @@ const getColumns: (props: {
     {
         name: 'Tablet',
         sortable: false,
-        render: ({row}) => {
-            const tabletPath = getTabletPagePath(tabletId, {
-                database,
-                followerId: row.leader ? undefined : row.followerId?.toString(),
-            });
-            const tabletName = `${tabletId}${row.followerId ? `.${row.followerId}` : ''}`;
-            return <InternalLink to={tabletPath}>{tabletName}</InternalLink>;
-        },
+        render: ({row}) => <TabletLink row={row} tabletId={tabletId} />,
     },
     {
         name: 'Node ID',
@@ -71,6 +63,20 @@ const getColumns: (props: {
     },
 ];
 
+interface TabletLinkProps {
+    row: ITabletPreparedHistoryItem;
+    tabletId: string;
+}
+
+function TabletLink({tabletId, row}: TabletLinkProps) {
+    const getTabletPagePath = useTabletPagePath();
+    const tabletPath = getTabletPagePath(tabletId, {
+        followerId: row.leader ? undefined : row.followerId?.toString(),
+    });
+    const tabletName = `${tabletId}${row.followerId ? `.${row.followerId}` : ''}`;
+    return <InternalLink to={tabletPath}>{tabletName}</InternalLink>;
+}
+
 const TABLE_SETTINGS = {
     displayIndices: false,
     highlightRows: true,
@@ -78,14 +84,13 @@ const TABLE_SETTINGS = {
 
 interface TabletTableProps {
     history: ITabletPreparedHistoryItem[];
-    database?: string;
     tabletId: string;
 }
 
-export const TabletTable = ({history, database, tabletId}: TabletTableProps) => {
+export const TabletTable = ({history, tabletId}: TabletTableProps) => {
     const columns = React.useMemo(() => {
-        return getColumns({database, tabletId});
-    }, [database, tabletId]);
+        return getColumns({tabletId});
+    }, [tabletId]);
 
     return (
         <ResizeableDataTable

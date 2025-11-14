@@ -25,7 +25,11 @@ import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedT
 
 import i18n from './i18n';
 
-function getColumns({database, nodeId}: {database?: string; nodeId?: string | number}) {
+function isFollowerTablet(state: TTabletStateInfo) {
+    return state.Leader === false;
+}
+
+function getColumns({nodeId}: {nodeId?: string | number}) {
     const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
         {
             name: 'Type',
@@ -34,7 +38,7 @@ function getColumns({database, nodeId}: {database?: string; nodeId?: string | nu
                 return i18n('Type');
             },
             render: ({row}) => {
-                const isFollower = row.Leader === false;
+                const isFollower = isFollowerTablet(row);
                 return (
                     <span>
                         {row.Type} {isFollower ? <Text color="secondary">follower</Text> : ''}
@@ -56,7 +60,6 @@ function getColumns({database, nodeId}: {database?: string; nodeId?: string | nu
                 return (
                     <TabletNameWrapper
                         tabletId={row.TabletId}
-                        database={database}
                         followerId={row.FollowerId || undefined}
                     />
                 );
@@ -139,7 +142,8 @@ function getColumns({database, nodeId}: {database?: string; nodeId?: string | nu
 }
 
 function TabletActions(tablet: TTabletStateInfo) {
-    const isDisabledRestart = tablet.State === ETabletState.Stopped;
+    const isFollower = isFollowerTablet(tablet);
+    const isDisabledRestart = tablet.State === ETabletState.Stopped || isFollower;
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const [killTablet] = tabletApi.useKillTabletMutation();
 
@@ -148,10 +152,19 @@ function TabletActions(tablet: TTabletStateInfo) {
         return null;
     }
 
+    let popoverContent: React.ReactNode;
+
+    if (isFollower) {
+        popoverContent = i18n('controls.kill-impossible-follower');
+    } else if (!isUserAllowedToMakeChanges) {
+        popoverContent = i18n('controls.kill-not-allowed');
+    } else {
+        popoverContent = i18n('dialog.kill-header');
+    }
+
     return (
         <ButtonWithConfirmDialog
             buttonView="outlined"
-            buttonTitle={i18n('dialog.kill-header')}
             dialogHeader={i18n('dialog.kill-header')}
             dialogText={i18n('dialog.kill-text')}
             onConfirmAction={() => {
@@ -159,11 +172,7 @@ function TabletActions(tablet: TTabletStateInfo) {
             }}
             buttonDisabled={isDisabledRestart || !isUserAllowedToMakeChanges}
             withPopover
-            popoverContent={
-                isUserAllowedToMakeChanges
-                    ? i18n('dialog.kill-header')
-                    : i18n('controls.kill-not-allowed')
-            }
+            popoverContent={popoverContent}
             popoverPlacement={['right', 'bottom']}
             popoverDisabled={false}
         >
@@ -173,7 +182,6 @@ function TabletActions(tablet: TTabletStateInfo) {
 }
 
 interface TabletsTableProps {
-    database?: string;
     tablets: (TTabletStateInfo & {
         fqdn?: string;
     })[];
@@ -185,7 +193,6 @@ interface TabletsTableProps {
 }
 
 export function TabletsTable({
-    database,
     tablets,
     loading,
     error,
@@ -199,7 +206,7 @@ export function TabletsTable({
     // Track sort state for scroll dependencies
     const [sortParams, setSortParams] = React.useState<SortOrder | SortOrder[] | undefined>();
 
-    const columns = React.useMemo(() => getColumns({database, nodeId}), [database, nodeId]);
+    const columns = React.useMemo(() => getColumns({nodeId}), [nodeId]);
 
     const filteredTablets = React.useMemo(() => {
         return tablets.filter((tablet) => {

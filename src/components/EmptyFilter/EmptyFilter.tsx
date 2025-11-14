@@ -18,7 +18,7 @@ export const EmptyFilter = ({
     message = i18n('default_message'),
     showAll = i18n('default_button_label'),
     onShowAll,
-    image = <Illustration name="thumbsUp" />,
+    image = <Illustration name="thumbsUp" width={200} />,
 }: EmptyFilterProps) => (
     <EmptyState
         image={image}

@@ -1,7 +1,6 @@
 import type {NodesRequestParams} from '../../../types/api/nodes';
 import {api} from '../api';
-
-import {prepareNodesData} from './utils';
+import {prepareStorageNodesResponse} from '../storage/utils';
 
 export const nodesApi = api.injectEndpoints({
     endpoints: (builder) => ({
@@ -17,7 +16,7 @@ export const nodesApi = api.injectEndpoints({
                         },
                         {signal},
                     );
-                    return {data: prepareNodesData(data)};
+                    return {data: prepareStorageNodesResponse(data)};
                 } catch (error) {
                     return {error};
                 }

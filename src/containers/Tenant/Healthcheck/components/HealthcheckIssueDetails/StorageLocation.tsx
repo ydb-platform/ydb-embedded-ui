@@ -4,9 +4,8 @@ import {Flex} from '@gravity-ui/uikit';
 import {isEmpty} from 'lodash';
 
 import {InternalLink} from '../../../../../components/InternalLink';
-import {getPDiskPagePath, getVDiskPagePath} from '../../../../../routes';
+import {getPDiskPagePath, useVDiskPagePath} from '../../../../../routes';
 import type {Location} from '../../../../../types/api/healthcheck';
-import {useDatabaseFromQuery} from '../../../../../utils/hooks/useDatabaseFromQuery';
 import i18n from '../../i18n';
 
 import {NodeInfo} from './NodeInfo';
@@ -65,7 +64,7 @@ export function StorageLocation({location, hiddenFields = []}: StorageLocationPr
 
     return (
         <SectionWithTitle title={i18n('label_storage_location')} titleVariant="subheader-2">
-            <Flex direction="column" gap={2}>
+            <Flex direction="column" gap={3}>
                 {fields.map((field) => LocationFieldRenderer[field](location))}
             </Flex>
         </SectionWithTitle>
@@ -99,7 +98,7 @@ function GroupInfo({location}: StorageSectionProps) {
 }
 
 function VDiskInfo({location}: StorageSectionProps) {
-    const database = useDatabaseFromQuery();
+    const getVDiskPagePath = useVDiskPagePath();
     const {node, pool} = location ?? {};
     const {group} = pool ?? {};
     const {vdisk} = group ?? {};
@@ -119,13 +118,10 @@ function VDiskInfo({location}: StorageSectionProps) {
                             ids={ids}
                             renderItem={(id) => (
                                 <InternalLink
-                                    to={getVDiskPagePath(
-                                        {
-                                            vDiskId: id,
-                                            nodeId: node?.id,
-                                        },
-                                        {database},
-                                    )}
+                                    to={getVDiskPagePath({
+                                        vDiskId: id,
+                                        nodeId: node?.id,
+                                    })}
                                 >
                                     {id}
                                 </InternalLink>
