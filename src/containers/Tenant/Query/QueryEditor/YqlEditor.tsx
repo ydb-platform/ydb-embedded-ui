@@ -13,8 +13,8 @@ import {
     selectUserInput,
     setIsDirty,
 } from '../../../../store/reducers/query/query';
+import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import type {QueryAction} from '../../../../types/store/query';
-import {ENABLE_CODE_ASSISTANT, LAST_USED_QUERY_ACTION_KEY} from '../../../../utils/constants';
 import {
     useEventHandler,
     useSetting,
@@ -50,12 +50,12 @@ export function YqlEditor({
     const [monacoGhostInstance, setMonacoGhostInstance] =
         React.useState<ReturnType<typeof createMonacoGhostInstance>>();
     const historyQueries = useTypedSelector(selectQueriesHistory);
-    const [isCodeAssistEnabled] = useSetting(ENABLE_CODE_ASSISTANT);
+    const [isCodeAssistEnabled] = useSetting(SETTING_KEYS.ENABLE_CODE_ASSISTANT);
 
     const editorOptions = useEditorOptions();
     const updateErrorsHighlighting = useUpdateErrorsHighlighting();
 
-    const [lastUsedQueryAction] = useSetting<QueryAction>(LAST_USED_QUERY_ACTION_KEY);
+    const [lastUsedQueryAction] = useSetting<QueryAction>(SETTING_KEYS.LAST_USED_QUERY_ACTION);
 
     const getLastQueryText = useEventHandler(() => {
         if (!historyQueries || historyQueries.length === 0) {

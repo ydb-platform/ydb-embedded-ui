@@ -1,9 +1,9 @@
 import {Flex} from '@gravity-ui/uikit';
 
 import {getTenantPath} from '../../../../../routes';
+import {SETTING_KEYS} from '../../../../../store/reducers/settings/constants';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {cn} from '../../../../../utils/cn';
-import {ENABLE_NETWORK_TABLE_KEY} from '../../../../../utils/constants';
 import {useSearchQuery, useSetting} from '../../../../../utils/hooks';
 import {TenantTabsGroups} from '../../../TenantPages';
 import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
@@ -22,7 +22,7 @@ interface TenantNetworkProps {
 
 export function TenantNetwork({database}: TenantNetworkProps) {
     const query = useSearchQuery();
-    const [networkTableEnabled] = useSetting(ENABLE_NETWORK_TABLE_KEY);
+    const [networkTableEnabled] = useSetting(SETTING_KEYS.ENABLE_NETWORK_TABLE);
 
     const tab = networkTableEnabled
         ? {[TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.network}

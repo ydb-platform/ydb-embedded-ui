@@ -4,8 +4,8 @@ import {Pulse, Terminal} from '@gravity-ui/icons';
 import {useHistory, useLocation, useRouteMatch} from 'react-router-dom';
 
 import routes, {getTenantPath, parseQuery} from '../../../routes';
+import {SETTING_KEYS} from '../../../store/reducers/settings/constants';
 import {TENANT_PAGE, TENANT_PAGES_IDS} from '../../../store/reducers/tenant/constants';
-import {TENANT_INITIAL_PAGE_KEY} from '../../../utils/constants';
 import {useSetting, useTypedSelector} from '../../../utils/hooks';
 import i18n from '../i18n';
 
@@ -25,7 +25,7 @@ export function useTenantNavigation() {
     const queryParams = parseQuery(location);
     const match = useRouteMatch(routes.tenant);
 
-    const [, setInitialTenantPage] = useSetting<string>(TENANT_INITIAL_PAGE_KEY);
+    const [, setInitialTenantPage] = useSetting<string>(SETTING_KEYS.TENANT_INITIAL_PAGE);
     const {tenantPage} = useTypedSelector((state) => state.tenant);
 
     const menuItems = React.useMemo(() => {

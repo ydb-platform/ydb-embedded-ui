@@ -2,19 +2,19 @@ import {
     useNodesHandlerHasWorkingClusterNetworkStats,
     useViewerNodesHandlerHasNetworkStats,
 } from '../../store/reducers/capabilities/hooks';
-import {ENABLE_NETWORK_TABLE_KEY} from '../../utils/constants';
+import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {useSetting} from '../../utils/hooks';
 
 export function useShouldShowDatabaseNetworkTable() {
     const viewerNodesHasNetworkStats = useViewerNodesHandlerHasNetworkStats();
-    const [networkTableEnabled] = useSetting(ENABLE_NETWORK_TABLE_KEY);
+    const [networkTableEnabled] = useSetting(SETTING_KEYS.ENABLE_NETWORK_TABLE);
 
     return Boolean(viewerNodesHasNetworkStats && networkTableEnabled);
 }
 
 export function useShouldShowClusterNetworkTable() {
     const nodesHasWorkingClusterNetworkStats = useNodesHandlerHasWorkingClusterNetworkStats();
-    const [networkTableEnabled] = useSetting(ENABLE_NETWORK_TABLE_KEY);
+    const [networkTableEnabled] = useSetting(SETTING_KEYS.ENABLE_NETWORK_TABLE);
 
     return Boolean(nodesHasWorkingClusterNetworkStats && networkTableEnabled);
 }

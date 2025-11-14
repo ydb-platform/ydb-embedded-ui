@@ -6,15 +6,12 @@ import {TracingLevelNumber} from '../../../types/api/query';
 import type {QueryAction, QueryRequestParams, QuerySettings} from '../../../types/store/query';
 import type {StreamDataChunk} from '../../../types/store/streaming';
 import {loadFromSessionStorage, saveToSessionStorage} from '../../../utils';
-import {
-    QUERIES_HISTORY_KEY,
-    QUERY_EDITOR_CURRENT_QUERY_KEY,
-    QUERY_EDITOR_DIRTY_KEY,
-} from '../../../utils/constants';
+import {QUERY_EDITOR_CURRENT_QUERY_KEY, QUERY_EDITOR_DIRTY_KEY} from '../../../utils/constants';
 import {isQueryErrorResponse} from '../../../utils/query';
 import {isNumeric} from '../../../utils/utils';
 import type {RootState} from '../../defaultStore';
 import {api} from '../api';
+import {SETTING_KEYS} from '../settings/constants';
 
 import {prepareQueryData} from './prepareQueryData';
 import {
@@ -28,7 +25,7 @@ import {getActionAndSyntaxFromQueryMode, getQueryInHistory, prepareQueryWithPrag
 const MAXIMUM_QUERIES_IN_HISTORY = 20;
 
 const queriesHistoryInitial = settingsManager.readUserSettingsValue(
-    QUERIES_HISTORY_KEY,
+    SETTING_KEYS.QUERIES_HISTORY,
     [],
 ) as string[];
 
@@ -78,7 +75,7 @@ const slice = createSlice({
             const newQueries = [...state.history.queries, {queryText, queryId}].slice(
                 state.history.queries.length >= MAXIMUM_QUERIES_IN_HISTORY ? 1 : 0,
             );
-            settingsManager.setUserSettingsValue(QUERIES_HISTORY_KEY, newQueries);
+            settingsManager.setUserSettingsValue(SETTING_KEYS.QUERIES_HISTORY, newQueries);
             const currentIndex = newQueries.length - 1;
 
             state.history = {
@@ -110,7 +107,7 @@ const slice = createSlice({
                 endTime,
             });
 
-            settingsManager.setUserSettingsValue(QUERIES_HISTORY_KEY, newQueries);
+            settingsManager.setUserSettingsValue(SETTING_KEYS.QUERIES_HISTORY, newQueries);
 
             state.history.queries = newQueries;
         },

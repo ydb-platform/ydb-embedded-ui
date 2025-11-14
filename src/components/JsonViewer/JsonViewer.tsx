@@ -5,7 +5,7 @@ import type * as DT100 from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
 import {ActionTooltip, Button, Flex, Icon} from '@gravity-ui/uikit';
 
-import {CASE_SENSITIVE_JSON_SEARCH} from '../../utils/constants';
+import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {useSetting} from '../../utils/hooks';
 import type {ClipboardButtonProps} from '../ClipboardButton/ClipboardButton';
 import {ClipboardButton} from '../ClipboardButton/ClipboardButton';
@@ -122,7 +122,7 @@ function JsonViewerComponent({
     withClipboardButton,
 }: JsonViewerComponentProps) {
     const [caseSensitiveSearch, setCaseSensitiveSearch] = useSetting(
-        CASE_SENSITIVE_JSON_SEARCH,
+        SETTING_KEYS.CASE_SENSITIVE_JSON_SEARCH,
         false,
     );
 

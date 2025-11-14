@@ -1,10 +1,11 @@
 import type {Store} from '@reduxjs/toolkit';
 import {createSlice} from '@reduxjs/toolkit';
 
-import {DEFAULT_USER_SETTINGS, settingsManager} from '../../../services/settings';
+import {settingsManager} from '../../../services/settings';
 import {parseJson} from '../../../utils/utils';
 import type {AppDispatch} from '../../defaultStore';
 
+import {DEFAULT_USER_SETTINGS} from './constants';
 import type {SettingsState} from './types';
 
 const userSettings = settingsManager.extractSettingsFromLS(DEFAULT_USER_SETTINGS);
@@ -24,17 +25,23 @@ const settingsSlice = createSlice({
         }),
     }),
     selectors: {
-        getSettingValue: (state, name: string) => state.userSettings[name],
+        getSettingValue: (state, name?: string) => {
+            if (!name) {
+                return undefined;
+            }
+
+            return state.userSettings[name];
+        },
     },
 });
 
 export const {getSettingValue} = settingsSlice.selectors;
 
-export const setSettingValue = (name: string, value: unknown) => {
+export const setSettingValue = (name: string | undefined, value: unknown) => {
     return (dispatch: AppDispatch) => {
-        dispatch(settingsSlice.actions.setSettingValue({name, value}));
-
-        settingsManager.setUserSettingsValue(name, value);
+        if (name) {
+            dispatch(settingsSlice.actions.setSettingValue({name, value}));
+        }
     };
 };
 
