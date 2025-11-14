@@ -5,6 +5,7 @@ import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueriesActivityBar} from '../../../../components/QueriesActivityBar/QueriesActivityBar';
 import {useDatabasesAvailable} from '../../../../store/reducers/capabilities/hooks';
+import {useClusterBaseInfo} from '../../../../store/reducers/cluster/cluster';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {
     TENANT_DIAGNOSTICS_TABS_IDS,
@@ -18,11 +19,11 @@ import {
 } from '../../../../store/reducers/tenant/tenant';
 import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
 import type {AdditionalTenantsProps} from '../../../../types/additionalProps';
-import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {getInfoTabLinks} from '../../../../utils/additionalProps';
 import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
+import {canShowTenantMonitoringTab} from '../../../../utils/monitoringVisibility';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
 
 import {HealthcheckPreview} from './Healthcheck/HealthcheckPreview';
@@ -188,7 +189,11 @@ export function TenantOverview({
     };
 
     const links = getInfoTabLinks(additionalTenantProps, Name, Type);
-    const monitoringTabAvailable = Boolean(uiFactory.renderMonitoring);
+    const {monitoring: clusterMonitoring} = useClusterBaseInfo();
+    const monitoringTabAvailable = canShowTenantMonitoringTab(
+        tenant?.ControlPlane,
+        clusterMonitoring,
+    );
 
     const handleOpenMonitoring = () => {
         dispatch(setTenantPage(TENANT_PAGES_IDS.diagnostics));
