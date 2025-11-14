@@ -17,7 +17,7 @@ import {uiFactory} from '../../../uiFactory/uiFactory';
 import {cn} from '../../../utils/cn';
 import {useScrollPosition, useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {useIsViewerUser} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
-import {canShowTenantMonitoring} from '../../../utils/monitoringVisibility';
+import {canShowTenantMonitoringTab} from '../../../utils/monitoringVisibility';
 import {Configs} from '../../Configs/Configs';
 import {Heatmap} from '../../Heatmap';
 import {Nodes} from '../../Nodes/Nodes';
@@ -68,14 +68,13 @@ function Diagnostics({additionalTenantProps}: DiagnosticsProps) {
     const hasConfigs = useConfigAvailable();
     const hasTopicData = useTopicDataAvailable();
     const isViewerUser = useIsViewerUser();
-    const canShowMonitoring = canShowTenantMonitoring(controlPlane, clusterMonitoring);
     const pages = getPagesByType(type, subType, {
         hasTopicData,
         isTopLevel: path === database,
         hasBackups: typeof uiFactory.renderBackups === 'function' && Boolean(controlPlane),
         hasConfigs: isViewerUser && hasConfigs,
         hasAccess: uiFactory.hasAccess,
-        hasMonitoring: typeof uiFactory.renderMonitoring === 'function' && canShowMonitoring,
+        hasMonitoring: canShowTenantMonitoringTab(controlPlane, clusterMonitoring),
         databaseType,
     });
     let activeTab = pages.find((el) => el.id === diagnosticsTab);

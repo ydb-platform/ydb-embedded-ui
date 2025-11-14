@@ -1,5 +1,6 @@
 import type {MetaBaseClusterInfo} from '../types/api/meta';
 import type {ControlPlane} from '../types/api/tenant';
+import {uiFactory} from '../uiFactory/uiFactory';
 
 /**
  * Centralized check for whether Monitoring should be shown for a database.
@@ -15,4 +16,18 @@ export function canShowTenantMonitoring(
         return Boolean(controlPlane.id);
     }
     return Boolean(clusterMonitoring);
+}
+
+/**
+ * Unified visibility check for the Monitoring tab/button.
+ * Combines UI factory capability and tenant/cluster monitoring availability.
+ */
+export function canShowTenantMonitoringTab(
+    controlPlane?: ControlPlane,
+    clusterMonitoring?: MetaBaseClusterInfo['solomon'],
+): boolean {
+    return (
+        Boolean(uiFactory.renderMonitoring) &&
+        canShowTenantMonitoring(controlPlane, clusterMonitoring)
+    );
 }
