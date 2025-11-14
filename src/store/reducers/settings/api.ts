@@ -1,11 +1,12 @@
-import type {Action, ThunkAction} from '@reduxjs/toolkit';
+import {isNil} from 'lodash';
 
 import type {
     GetSettingsParams,
     GetSingleSettingParams,
     SetSingleSettingParams,
+    Setting,
 } from '../../../types/api/settings';
-import type {RootState} from '../../defaultStore';
+import type {AppDispatch} from '../../defaultStore';
 import {api} from '../api';
 
 import {SETTINGS_OPTIONS} from './constants';
@@ -13,7 +14,7 @@ import {SETTINGS_OPTIONS} from './constants';
 export const settingsApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getSingleSetting: builder.query({
-            queryFn: async ({name, user}: GetSingleSettingParams) => {
+            queryFn: async ({name, user}: GetSingleSettingParams, baseApi) => {
                 try {
                     if (!window.api.metaSettings) {
                         throw new Error('MetaSettings API is not available');
@@ -24,12 +25,17 @@ export const settingsApi = api.injectEndpoints({
                         // Directly access options here to avoid them in cache key
                         preventBatching: SETTINGS_OPTIONS[name]?.preventBatching,
                     });
+
+                    const dispatch = baseApi.dispatch as AppDispatch;
+
+                    // Try to sync local value if there is no backend value
+                    syncLocalValueToMetaIfNoData(data, dispatch);
+
                     return {data};
                 } catch (error) {
                     return {error};
                 }
             },
-            providesTags: (_, __, args) => [{type: 'UserData', id: `Setting_${args.name}`}],
         }),
         setSingleSetting: builder.mutation({
             queryFn: async (params: SetSingleSettingParams) => {
@@ -66,14 +72,15 @@ export const settingsApi = api.injectEndpoints({
             },
         }),
         getSettings: builder.query({
-            queryFn: async ({name, user}: GetSettingsParams, {dispatch}) => {
+            queryFn: async ({name, user}: GetSettingsParams, baseApi) => {
                 try {
                     if (!window.api.metaSettings) {
                         throw new Error('MetaSettings API is not available');
                     }
                     const data = await window.api.metaSettings.getSettings({name, user});
 
-                    const patches: ThunkAction<unknown, RootState, unknown, Action>[] = [];
+                    const patches: Promise<void>[] = [];
+                    const dispatch = baseApi.dispatch as AppDispatch;
 
                     // Upsert received data in getSingleSetting cache
                     name.forEach((settingName) => {
@@ -91,11 +98,20 @@ export const settingsApi = api.injectEndpoints({
                                 cacheEntryParams,
                                 newValue,
                             ),
-                        );
+                        ).then(() => {
+                            // Try to sync local value if there is no backend value
+                            // Do it after upsert if finished to ensure proper values update order
+                            // 1. New entry added to cache with nil value
+                            // 2. Positive entry update - local storage value replace nil in cache
+                            // 3.1. Set is successful, local value in cache
+                            // 3.2. Set is not successful, cache value reverted to previous nil
+                            syncLocalValueToMetaIfNoData(settingData, dispatch);
+                        });
 
                         patches.push(patch);
                     });
 
+                    // Wait for all patches for proper loading state
                     await Promise.all(patches);
 
                     return {data};
@@ -107,3 +123,17 @@ export const settingsApi = api.injectEndpoints({
     }),
     overrideExisting: 'throw',
 });
+
+function syncLocalValueToMetaIfNoData(params: Setting, dispatch: AppDispatch) {
+    const localValue = localStorage.getItem(params.name);
+
+    if (isNil(params.value) && !isNil(localValue)) {
+        dispatch(
+            settingsApi.endpoints.setSingleSetting.initiate({
+                name: params.name,
+                user: params.user,
+                value: localValue,
+            }),
+        );
+    }
+}

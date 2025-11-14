@@ -14,7 +14,6 @@ import type {SettingKey} from './constants';
 import {DEFAULT_USER_SETTINGS, SETTINGS_OPTIONS} from './constants';
 import {getSettingValue, setSettingValue} from './settings';
 import {
-    deleteValueFromLS,
     parseSettingValue,
     readSettingValueFromLS,
     setSettingValueToLS,
@@ -80,34 +79,6 @@ export function useSetting<T>(
             dispatch(setSettingValue(name, parsedValue));
         }
     }, [shouldUseMetaSettings, shouldUseOnlyExternalSettings, metaSetting, name, dispatch]);
-
-    // Load local value to backend
-    React.useEffect(() => {
-        const savedValue = readSettingValueFromLS<T>(name);
-
-        const isMetaSettingEmpty = !isSettingLoading && !metaSetting?.value;
-
-        if (shouldUseMetaSettings && isMetaSettingEmpty && savedValue) {
-            setMetaSetting({name, user, value: stringifySettingValue(savedValue)})
-                .unwrap()
-                .then(() => {
-                    if (shouldUseOnlyExternalSettings) {
-                        deleteValueFromLS(name);
-                    }
-                })
-                .catch((error) => {
-                    console.error('Failed to set setting via meta API:', error);
-                });
-        }
-    }, [
-        shouldUseMetaSettings,
-        shouldUseOnlyExternalSettings,
-        metaSetting,
-        isSettingLoading,
-        name,
-        user,
-        setMetaSetting,
-    ]);
 
     const debouncedSetMetaSetting = React.useMemo(
         () =>

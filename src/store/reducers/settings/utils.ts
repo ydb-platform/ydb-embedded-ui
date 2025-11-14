@@ -4,14 +4,14 @@ import {parseJson} from '../../../utils/utils';
 export function stringifySettingValue<T>(value?: T): string {
     return typeof value === 'string' ? value : JSON.stringify(value);
 }
-export function parseSettingValue<T>(value: SettingValue) {
+export function parseSettingValue<T>(value?: SettingValue) {
     try {
         return (typeof value === 'string' ? parseJson(value) : value) as T;
     } catch {
         return undefined;
     }
 }
-export function readSettingValueFromLS<T>(name: string | undefined): T | undefined {
+export function readSettingValueFromLS<T = unknown>(name: string | undefined): T | undefined {
     if (!name) {
         return undefined;
     }
@@ -33,11 +33,4 @@ export function setSettingValueToLS(name: string | undefined, value: unknown): v
         const preparedValue = stringifySettingValue(value);
         localStorage.setItem(name, preparedValue);
     } catch {}
-}
-export function deleteValueFromLS(name: string | undefined) {
-    if (!name) {
-        return;
-    }
-
-    localStorage.removeItem(name);
 }

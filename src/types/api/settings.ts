@@ -6,7 +6,7 @@ export type GetSettingResponse = Record<string, Setting>;
 export interface Setting {
     user: string;
     name: string;
-    value?: string | Record<string, string>;
+    value?: SettingValue;
 }
 export type SettingValue = string | Record<string, string>;
 export interface GetSingleSettingParams {
