@@ -1,4 +1,5 @@
 import type {PlanToSvgQueryParams} from '../../store/reducers/planToSvg';
+import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import type {VDiskBlobIndexStatParams} from '../../store/reducers/vdisk/vdisk';
 import type {
     AccessRightsUpdateRequest,
@@ -38,7 +39,6 @@ import type {DescribeTopicResult, TopicDataRequest, TopicDataResponse} from '../
 import type {VDiskBlobIndexResponse} from '../../types/api/vdiskBlobIndex';
 import type {TUserToken} from '../../types/api/whoami';
 import type {TabletsApiRequestParams} from '../../types/store/tablets';
-import {BINARY_DATA_IN_PLAIN_TEXT_DISPLAY} from '../../utils/constants';
 import type {Nullable} from '../../utils/typecheckers';
 import {settingsManager} from '../settings';
 
@@ -417,7 +417,7 @@ export class ViewerAPI extends BaseYdbAPI {
         {concurrentId, signal, withRetries}: AxiosOptions = {},
     ) {
         const base64 = !settingsManager.readUserSettingsValue(
-            BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
+            SETTING_KEYS.BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
             true,
         );
 

@@ -1,6 +1,6 @@
 import {DoughnutMetrics} from '../../../../components/DoughnutMetrics/DoughnutMetrics';
+import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import {formatBytes} from '../../../../utils/bytesParsers';
-import {SHOW_NETWORK_UTILIZATION} from '../../../../utils/constants';
 import {useSetting} from '../../../../utils/hooks/useSetting';
 import i18n from '../../i18n';
 import type {ClusterMetricsBaseProps} from '../shared';
@@ -23,7 +23,7 @@ export function ClusterMetricsNetwork({
     collapsed,
     ...rest
 }: ClusterMetricsNetworkProps) {
-    const [showNetworkUtilization] = useSetting<boolean>(SHOW_NETWORK_UTILIZATION);
+    const [showNetworkUtilization] = useSetting<boolean>(SETTING_KEYS.SHOW_NETWORK_UTILIZATION);
     if (!showNetworkUtilization) {
         return null;
     }

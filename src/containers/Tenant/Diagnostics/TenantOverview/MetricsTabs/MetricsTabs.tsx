@@ -4,6 +4,7 @@ import {Flex} from '@gravity-ui/uikit';
 import {useLocation} from 'react-router-dom';
 
 import {getTenantPath, parseQuery} from '../../../../../routes';
+import {SETTING_KEYS} from '../../../../../store/reducers/settings/constants';
 import {TENANT_METRICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {TenantMetricsTab} from '../../../../../store/reducers/tenant/types';
 import type {
@@ -13,7 +14,6 @@ import type {
 } from '../../../../../store/reducers/tenants/utils';
 import type {ETenantType} from '../../../../../types/api/tenant';
 import {cn} from '../../../../../utils/cn';
-import {SHOW_NETWORK_UTILIZATION} from '../../../../../utils/constants';
 import {useSetting} from '../../../../../utils/hooks';
 import {calculateMetricAggregates} from '../../../../../utils/metrics';
 // no direct legend formatters needed here – handled in subcomponents
@@ -99,7 +99,7 @@ export function MetricsTabs({
     );
 
     // Pass raw network values; DedicatedMetricsTabs computes percent and legend
-    const [showNetworkUtilization] = useSetting<boolean>(SHOW_NETWORK_UTILIZATION);
+    const [showNetworkUtilization] = useSetting<boolean>(SETTING_KEYS.SHOW_NETWORK_UTILIZATION);
 
     // card variant is handled within subcomponents
 

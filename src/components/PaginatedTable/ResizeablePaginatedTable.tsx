@@ -1,6 +1,7 @@
 import type {ColumnWidthByName} from '@gravity-ui/react-data-table';
 
 import {useTableResize} from '../../utils/hooks/useTableResize';
+import {TableSkeleton} from '../TableSkeleton/TableSkeleton';
 
 import type {PaginatedTableProps} from './PaginatedTable';
 import {PaginatedTable} from './PaginatedTable';
@@ -23,9 +24,14 @@ export function ResizeablePaginatedTable<T, F>({
     columns,
     ...props
 }: ResizeablePaginatedTableProps<T, F>) {
-    const [tableColumnsWidth, setTableColumnsWidth] = useTableResize(columnsWidthLSKey);
+    const [tableColumnsWidth, setTableColumnsWidth, isTableWidthLoading] =
+        useTableResize(columnsWidthLSKey);
 
     const updatedColumns = updateColumnsWidth(columns, tableColumnsWidth);
+
+    if (isTableWidthLoading) {
+        return <TableSkeleton />;
+    }
 
     return (
         <PaginatedTable

@@ -50,6 +50,7 @@ export interface UIFactory<H extends string = CommonIssueType, T extends string 
     useDatabaseId?: boolean;
 
     useMetaProxy?: boolean;
+    useMetaSettings?: boolean;
 
     yaMetricaConfig?: {
         yaMetricaMap: Record<T, number | undefined>;

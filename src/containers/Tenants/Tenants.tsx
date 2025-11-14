@@ -21,6 +21,7 @@ import {
     useDeleteDatabaseFeatureAvailable,
     useEditDatabaseFeatureAvailable,
 } from '../../store/reducers/capabilities/hooks';
+import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {
     filterTenantsByDomain,
     filterTenantsByProblems,
@@ -33,12 +34,7 @@ import {State} from '../../types/api/tenant';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {formatBytes} from '../../utils/bytesParsers';
 import {cn} from '../../utils/cn';
-import {
-    DEFAULT_TABLE_SETTINGS,
-    EMPTY_DATA_PLACEHOLDER,
-    SHOW_DOMAIN_DATABASE_KEY,
-    SHOW_NETWORK_UTILIZATION,
-} from '../../utils/constants';
+import {DEFAULT_TABLE_SETTINGS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {
     formatCPU,
     formatNumber,
@@ -101,8 +97,8 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
     const {search, withProblems, handleSearchChange, handleWithProblemsChange} =
         useTenantsQueryParams();
 
-    const [showNetworkUtilization] = useSetting<boolean>(SHOW_NETWORK_UTILIZATION);
-    const [showDomainDatabase] = useSetting<boolean>(SHOW_DOMAIN_DATABASE_KEY);
+    const [showNetworkUtilization] = useSetting<boolean>(SETTING_KEYS.SHOW_NETWORK_UTILIZATION);
+    const [showDomainDatabase] = useSetting<boolean>(SETTING_KEYS.SHOW_DOMAIN_DATABASE);
 
     // We should apply domain filter before other filters
     // It is done to ensure proper entities count

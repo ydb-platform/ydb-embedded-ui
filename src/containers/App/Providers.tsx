@@ -13,7 +13,7 @@ import {ReactRouter5Adapter} from 'use-query-params/adapters/react-router-5';
 import {ComponentsProvider} from '../../components/ComponentsProvider/ComponentsProvider';
 import {componentsRegistry as defaultComponentsRegistry} from '../../components/ComponentsProvider/componentsRegistry';
 import type {ComponentsRegistry} from '../../components/ComponentsProvider/componentsRegistry';
-import {THEME_KEY} from '../../utils/constants';
+import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {toaster} from '../../utils/createToast';
 import {useSetting} from '../../utils/hooks';
 
@@ -57,7 +57,7 @@ export function Providers({
 }
 
 function Theme({children}: {children: React.ReactNode}) {
-    const [theme] = useSetting<string | undefined>(THEME_KEY);
+    const [theme] = useSetting<string | undefined>(SETTING_KEYS.THEME);
 
     return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 }

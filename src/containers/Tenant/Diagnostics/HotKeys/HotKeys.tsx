@@ -9,9 +9,10 @@ import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {hotKeysApi} from '../../../../store/reducers/hotKeys/hotKeys';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
+import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import type {HotKey} from '../../../../types/api/hotkeys';
 import {cn} from '../../../../utils/cn';
-import {DEFAULT_TABLE_SETTINGS, IS_HOTKEYS_HELP_HIDDEN_KEY} from '../../../../utils/constants';
+import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {useAutoRefreshInterval, useSetting} from '../../../../utils/hooks';
 
 import i18n from './i18n';
@@ -120,7 +121,7 @@ export function HotKeys({path, database, databaseFullPath}: HotKeysProps) {
 }
 
 function HelpCard() {
-    const [helpHidden, setHelpHidden] = useSetting(IS_HOTKEYS_HELP_HIDDEN_KEY);
+    const [helpHidden, setHelpHidden] = useSetting(SETTING_KEYS.IS_HOTKEYS_HELP_HIDDEN);
 
     if (helpHidden) {
         return null;
