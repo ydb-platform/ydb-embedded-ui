@@ -10,7 +10,8 @@ import {
     TENANT_PAGES_IDS,
     TENANT_QUERY_TABS_ID,
 } from '../../../store/reducers/tenant/constants';
-import {setDiagnosticsTab, setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
+import {setDiagnosticsTab, setQueryTab} from '../../../store/reducers/tenant/tenant';
+import type {TenantPage} from '../../../store/reducers/tenant/types';
 import type {IQueryResult} from '../../../types/store/query';
 import createToast from '../../../utils/createToast';
 import {insertSnippetToEditor} from '../../../utils/monaco/insertSnippet';
@@ -53,6 +54,7 @@ import type {YdbNavigationTreeProps} from './types';
 
 interface ActionsAdditionalParams {
     setActivePath: (path: string) => void;
+    setTenantPage: (page: TenantPage) => void;
     showCreateDirectoryDialog?: (path: string) => void;
     getConfirmation?: () => Promise<boolean>;
     getConnectToDBDialog?: (params: SnippetParams) => Promise<boolean>;
@@ -78,6 +80,7 @@ const bindActions = (
 ) => {
     const {
         setActivePath,
+        setTenantPage,
         showCreateDirectoryDialog,
         getConfirmation,
         getConnectToDBDialog,
@@ -88,7 +91,7 @@ const bindActions = (
     const inputQuery = (tmpl: TemplateFn) => () => {
         const applyInsert = () => {
             //order is important here: firstly we should open query tab and initialize editor (it will be set to window.ydbEditor), after that it is possible to insert snippet
-            dispatch(setTenantPage(TENANT_PAGES_IDS.query));
+            setTenantPage(TENANT_PAGES_IDS.query);
             dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
             setActivePath(params.path);
             insertSnippetToEditor(tmpl({...params, schemaData, streamingQueryData}));
@@ -113,7 +116,7 @@ const bindActions = (
             : undefined,
         getConnectToDBDialog: () => getConnectToDBDialog?.({database: params.database}),
         openMonitoring: () => {
-            dispatch(setTenantPage(TENANT_PAGES_IDS.diagnostics));
+            setTenantPage(TENANT_PAGES_IDS.diagnostics);
             dispatch(setDiagnosticsTab(TENANT_DIAGNOSTICS_TABS_IDS.monitoring));
             setActivePath(params.path);
         },

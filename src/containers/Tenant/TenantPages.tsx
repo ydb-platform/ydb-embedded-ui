@@ -1,4 +1,5 @@
 import {TENANT_SUMMARY_TABS_IDS} from '../../store/reducers/tenant/constants';
+import type {TenantPage} from '../../store/reducers/tenant/types';
 import type {paramSetup} from '../../store/state-url-mapping';
 import type {ExtractType} from '../../types/common';
 
@@ -7,6 +8,7 @@ type TenantQueryParams = {
 };
 
 type AdditionalQueryParams = {
+    tenantPage?: TenantPage;
     database?: string;
     name?: string;
     backend?: string;
