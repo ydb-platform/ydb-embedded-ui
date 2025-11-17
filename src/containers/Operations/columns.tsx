@@ -15,6 +15,7 @@ import {parseProtobufTimestampToMs} from '../../utils/timeParsers';
 
 import {COLUMNS_NAMES, COLUMNS_TITLES} from './constants';
 import i18n from './i18n';
+import {getOperationProgress} from './utils';
 
 import './Operations.scss';
 
@@ -28,13 +29,15 @@ export function getColumns({
     kind: OperationKind;
 }): DataTableColumn<TOperation>[] {
     const isBuildIndex = kind === 'buildindex';
+    const isImportOrExport = kind === 'import/s3' || kind === 'export/s3' || kind === 'export/yt';
 
     // Helper function to get description tooltip content
     const getDescriptionTooltip = (operation: TOperation): string => {
-        if (!operation.metadata?.description) {
+        const metadata = operation.metadata as IndexBuildMetadata | undefined;
+        if (!metadata?.description) {
             return '';
         }
-        return JSON.stringify(operation.metadata.description, null, 2);
+        return JSON.stringify(metadata.description, null, 2);
     };
 
     const columns: DataTableColumn<TOperation>[] = [
@@ -72,34 +75,38 @@ export function getColumns({
         },
     ];
 
-    // Add buildindex-specific columns
+    // Add buildindex-specific state column
     if (isBuildIndex) {
-        columns.push(
-            {
-                name: COLUMNS_NAMES.STATE,
-                header: COLUMNS_TITLES[COLUMNS_NAMES.STATE],
-                render: ({row}) => {
-                    const metadata = row.metadata as IndexBuildMetadata | undefined;
-                    if (!metadata?.state) {
-                        return EMPTY_DATA_PLACEHOLDER;
-                    }
-                    return metadata.state;
-                },
+        columns.push({
+            name: COLUMNS_NAMES.STATE,
+            header: COLUMNS_TITLES[COLUMNS_NAMES.STATE],
+            render: ({row}) => {
+                const metadata = row.metadata as IndexBuildMetadata | undefined;
+                if (!metadata?.state) {
+                    return EMPTY_DATA_PLACEHOLDER;
+                }
+                return metadata.state;
             },
-            {
-                name: COLUMNS_NAMES.PROGRESS,
-                header: COLUMNS_TITLES[COLUMNS_NAMES.PROGRESS],
-                render: ({row}) => {
-                    const metadata = row.metadata as IndexBuildMetadata | undefined;
-                    if (metadata?.progress === undefined) {
-                        return EMPTY_DATA_PLACEHOLDER;
-                    }
-                    return `${Math.round(metadata.progress)}%`;
-                },
+        });
+    }
+
+    // Add progress column for operations that have progress data
+    if (isBuildIndex || isImportOrExport) {
+        columns.push({
+            name: COLUMNS_NAMES.PROGRESS,
+            header: COLUMNS_TITLES[COLUMNS_NAMES.PROGRESS],
+            render: ({row}) => {
+                const progress = getOperationProgress(row, (key) => i18n(key as keyof typeof i18n));
+                if (progress === null) {
+                    return EMPTY_DATA_PLACEHOLDER;
+                }
+                return progress;
             },
-        );
-    } else {
-        // Add standard columns for non-buildindex operations
+        });
+    }
+
+    // Add standard columns for non-buildindex operations
+    if (!isBuildIndex) {
         columns.push(
             {
                 name: COLUMNS_NAMES.CREATED_BY,

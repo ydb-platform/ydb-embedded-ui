@@ -88,7 +88,96 @@ export enum IndexBuildState {
     STATE_REJECTED = 'STATE_REJECTED',
 }
 
-export type TOperationMetadata = IndexBuildMetadata;
+/**
+ * Import/Export progress enum
+ *
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/public/api/protos/ydb_import.proto
+ */
+export enum ImportExportProgress {
+    PROGRESS_UNSPECIFIED = 'PROGRESS_UNSPECIFIED',
+    PROGRESS_PREPARING = 'PROGRESS_PREPARING',
+    PROGRESS_TRANSFER_DATA = 'PROGRESS_TRANSFER_DATA',
+    PROGRESS_BUILD_INDEXES = 'PROGRESS_BUILD_INDEXES',
+    PROGRESS_DONE = 'PROGRESS_DONE',
+    PROGRESS_CANCELLATION = 'PROGRESS_CANCELLATION',
+    PROGRESS_CANCELLED = 'PROGRESS_CANCELLED',
+    PROGRESS_CREATE_CHANGEFEEDS = 'PROGRESS_CREATE_CHANGEFEEDS',
+}
+
+/**
+ * Import/Export item progress
+ *
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/public/api/protos/ydb_import.proto
+ */
+export interface ImportExportItemProgress {
+    parts_total?: number;
+    parts_completed?: number;
+    start_time?: IProtobufTimeObject;
+    end_time?: IProtobufTimeObject;
+}
+
+/**
+ * Import from S3 metadata
+ *
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/public/api/protos/ydb_import.proto#L108
+ */
+export interface ImportFromS3Metadata {
+    '@type'?: 'type.googleapis.com/Ydb.Import.ImportFromS3Metadata';
+    settings?: {
+        endpoint?: string;
+        scheme?: string;
+        bucket?: string;
+        items?: Array<{
+            source_prefix?: string;
+            source_path?: string;
+            destination_path?: string;
+        }>;
+        [key: string]: unknown;
+    };
+    progress?: ImportExportProgress | string;
+    items_progress?: ImportExportItemProgress[];
+}
+
+/**
+ * Export to S3 metadata
+ *
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/public/api/protos/ydb_export.proto
+ */
+export interface ExportToS3Metadata {
+    '@type'?: 'type.googleapis.com/Ydb.Export.ExportToS3Metadata';
+    settings?: {
+        endpoint?: string;
+        scheme?: string;
+        bucket?: string;
+        items?: Array<{
+            source_path?: string;
+            destination_prefix?: string;
+        }>;
+        [key: string]: unknown;
+    };
+    progress?: ImportExportProgress | string;
+    items_progress?: ImportExportItemProgress[];
+}
+
+/**
+ * Export to YT metadata
+ *
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/public/api/protos/ydb_export.proto
+ */
+export interface ExportToYtMetadata {
+    '@type'?: 'type.googleapis.com/Ydb.Export.ExportToYtMetadata';
+    settings?: {
+        [key: string]: unknown;
+    };
+    progress?: ImportExportProgress | string;
+    items_progress?: ImportExportItemProgress[];
+}
+
+export type TOperationMetadata =
+    | IndexBuildMetadata
+    | ImportFromS3Metadata
+    | ExportToS3Metadata
+    | ExportToYtMetadata;
 
 export interface TCostInfo {
     consumed_units?: number;
