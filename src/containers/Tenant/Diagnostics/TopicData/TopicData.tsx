@@ -64,9 +64,6 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
     const [truncated, setTruncated] = React.useState(false);
     const [baseEndOffset, setBaseEndOffset] = React.useState<number>();
 
-    const startRef = React.useRef<number>();
-    startRef.current = startOffset;
-
     const {
         selectedPartition,
         selectedOffset,
@@ -213,36 +210,39 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
         (newOffset: number) => {
             const scrollTop = (newOffset - (baseOffset ?? 0)) * DEFAULT_TABLE_ROW_HEIGHT;
             const normalizedScrollTop = Math.max(0, scrollTop);
-            scrollContainerRef.current?.scrollTo({
-                top: normalizedScrollTop,
-                behavior: 'instant',
+            // this is needed to ensure happening after useTableScroll in useLayoutEffect
+            requestAnimationFrame(() => {
+                scrollContainerRef.current?.scrollTo({
+                    top: normalizedScrollTop,
+                    behavior: 'instant',
+                });
             });
         },
         [baseOffset, scrollContainerRef],
     );
 
     //this variable is used to scroll to active offset the very first time on open page
-    const initialActiveOffset = React.useRef(activeOffset);
+    const initialScrollToOffset = React.useRef(selectedOffset ?? activeOffset);
 
     React.useEffect(() => {
-        if (isFetching) {
+        if (isFetching || isNil(baseOffset)) {
             return;
         }
 
         let currentOffset: number | undefined;
-        if (isNil(initialActiveOffset.current)) {
+        if (isNil(initialScrollToOffset.current)) {
             const messages = currentData?.Messages;
             if (messages?.length) {
                 currentOffset = safeParseNumber(messages[0].Offset);
             }
         } else {
-            currentOffset = safeParseNumber(initialActiveOffset.current);
-            initialActiveOffset.current = undefined;
+            currentOffset = safeParseNumber(initialScrollToOffset.current);
+            initialScrollToOffset.current = undefined;
         }
         if (!isNil(currentOffset)) {
             scrollToOffset(currentOffset);
         }
-    }, [currentData, isFetching, scrollToOffset]);
+    }, [currentData, isFetching, scrollToOffset, baseOffset]);
 
     const renderControls = React.useCallback(() => {
         return (
