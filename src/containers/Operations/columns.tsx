@@ -98,7 +98,7 @@ export function getColumns({
             name: COLUMNS_NAMES.PROGRESS,
             header: COLUMNS_TITLES[COLUMNS_NAMES.PROGRESS],
             render: ({row}) => {
-                const progress = getOperationProgress(row, (key) => i18n(key as keyof typeof i18n));
+                const progress = getOperationProgress(row, i18n);
                 if (progress === null) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }

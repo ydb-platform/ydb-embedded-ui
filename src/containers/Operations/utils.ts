@@ -6,6 +6,18 @@ import type {
     TOperation,
 } from '../../types/api/operations';
 
+// i18n keys for import/export progress enum values
+// value_progress_unspecified, value_progress_preparing, etc.
+export type OperationProgressKey =
+    | 'value_progress_unspecified'
+    | 'value_progress_preparing'
+    | 'value_progress_transfer_data'
+    | 'value_progress_build_indexes'
+    | 'value_progress_done'
+    | 'value_progress_cancellation'
+    | 'value_progress_cancelled'
+    | 'value_progress_create_changefeeds';
+
 /**
  * Calculate progress percentage from Import/Export metadata
  *
@@ -53,7 +65,7 @@ export function calculateImportExportProgress(
  */
 export function getOperationProgress(
     operation: TOperation,
-    translateProgress: (key: string) => string,
+    translateProgress: (key: OperationProgressKey) => string,
 ): string | null {
     const metadata = operation.metadata;
 
@@ -70,13 +82,16 @@ export function getOperationProgress(
     }
 
     // Import/Export: calculate from items_progress or show enum value
-    const importExportMetadata = metadata as
-        | ImportFromS3Metadata
-        | ExportToS3Metadata
-        | ExportToYtMetadata
-        | undefined;
+    if (
+        metadata['@type'] === 'type.googleapis.com/Ydb.Import.ImportFromS3Metadata' ||
+        metadata['@type'] === 'type.googleapis.com/Ydb.Export.ExportToS3Metadata' ||
+        metadata['@type'] === 'type.googleapis.com/Ydb.Export.ExportToYtMetadata'
+    ) {
+        const importExportMetadata = metadata as
+            | ImportFromS3Metadata
+            | ExportToS3Metadata
+            | ExportToYtMetadata;
 
-    if (importExportMetadata) {
         // Try to calculate percentage from items_progress
         const calculatedProgress = calculateImportExportProgress(importExportMetadata);
         if (calculatedProgress !== null) {
@@ -90,8 +105,10 @@ export function getOperationProgress(
                     ? importExportMetadata.progress
                     : String(importExportMetadata.progress);
 
-            // Convert PROGRESS_DONE -> progress_done for i18n key
-            const i18nKey = progressValue.toLowerCase();
+            // Backend enums are PROGRESS_DONE, PROGRESS_PREPARING, etc.
+            // Map them to i18n keys value_progress_done, value_progress_preparing, etc.
+            const normalized = progressValue.toLowerCase(); // progress_done
+            const i18nKey = `value_${normalized}` as OperationProgressKey;
 
             // Try to get translated value, fallback to original value
             try {
