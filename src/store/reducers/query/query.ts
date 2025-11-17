@@ -222,6 +222,7 @@ interface SendQueryParams extends QueryRequestParams {
     // flag whether to send new tracing header or not
     // default: not send
     enableTracingLevel?: boolean;
+    base64?: boolean;
 }
 
 // Stream query receives queryId from session chunk.
@@ -239,7 +240,7 @@ export const queryApi = api.injectEndpoints({
     endpoints: (build) => ({
         useStreamQuery: build.mutation<null, StreamQueryParams>({
             queryFn: async (
-                {query, database, querySettings = {}, enableTracingLevel},
+                {query, database, querySettings = {}, enableTracingLevel, base64},
                 {signal, dispatch, getState},
             ) => {
                 const startTime = Date.now();
@@ -294,6 +295,7 @@ export const queryApi = api.injectEndpoints({
                                 : undefined,
                             output_chunk_max_size: DEFAULT_STREAM_CHUNK_SIZE,
                             concurrent_results: DEFAULT_CONCURRENT_RESULTS || undefined,
+                            base64,
                         },
                         {
                             signal,
@@ -343,7 +345,7 @@ export const queryApi = api.injectEndpoints({
                 }
             },
         }),
-        useSendQuery: build.mutation<null, SendQueryParams>({
+        useSendQuery: build.mutation({
             queryFn: async (
                 {
                     actionType = 'execute',
@@ -352,7 +354,8 @@ export const queryApi = api.injectEndpoints({
                     querySettings = {},
                     enableTracingLevel,
                     queryId,
-                },
+                    base64,
+                }: SendQueryParams,
                 {signal, dispatch, getState},
             ) => {
                 const startTime = Date.now();
@@ -396,6 +399,7 @@ export const queryApi = api.injectEndpoints({
                                 ? Number(querySettings.timeout) * 1000
                                 : undefined,
                             query_id: queryId,
+                            base64,
                         },
                         {signal},
                     );
