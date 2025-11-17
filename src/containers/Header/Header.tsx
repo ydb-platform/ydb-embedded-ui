@@ -99,11 +99,7 @@ function Header() {
     const controlPlane = databaseData?.ControlPlane;
     const canShowMonitoring = canShowTenantMonitoring(controlPlane, monitoring);
     const monitoringLinkUrl =
-        canShowMonitoring &&
-        monitoring &&
-        uiFactory.getMonitoringLink &&
-        databaseData?.Name &&
-        databaseData?.Type
+        canShowMonitoring && uiFactory.getMonitoringLink && databaseData?.Name && databaseData?.Type
             ? uiFactory.getMonitoringLink({
                   monitoring,
                   clusterName,
