@@ -21,6 +21,7 @@ import {valueIsDefined} from '../../../../utils';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {getConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {canShowTenantMonitoringTab} from '../../../../utils/monitoringVisibility';
+import {useTenantPage} from '../../TenantNavigation/useTenantNavigation';
 import {getSchemaControls} from '../../utils/controls';
 import {
     isChildlessPathType,
@@ -59,6 +60,8 @@ export function SchemaTree(props: SchemaTreeProps) {
     ] = streamingQueriesApi.useLazyGetStreamingQueryInfoQuery();
 
     const isTopicPreviewAvailable = useTopicDataAvailable();
+
+    const {handleTenantPageChange} = useTenantPage();
 
     const [createDirectoryOpen, setCreateDirectoryOpen] = React.useState(false);
     const [parentPath, setParentPath] = React.useState('');
@@ -149,6 +152,7 @@ export function SchemaTree(props: SchemaTreeProps) {
             dispatch,
             {
                 setActivePath: onActivePathUpdate,
+                setTenantPage: handleTenantPageChange,
                 showCreateDirectoryDialog: createDirectoryFeatureAvailable
                     ? handleOpenCreateDirectoryDialog
                     : undefined,
@@ -216,6 +220,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                     dispatch,
                     {
                         setActivePath: onActivePathUpdate,
+                        setTenantPage: handleTenantPageChange,
                     },
                     undefined,
                     isTopicPreviewAvailable,
