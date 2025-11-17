@@ -2,7 +2,6 @@ import type {
     ExportToS3Metadata,
     ExportToYtMetadata,
     ImportFromS3Metadata,
-    IndexBuildMetadata,
     TOperation,
 } from '../../types/api/operations';
 
@@ -73,9 +72,8 @@ export function getOperationProgress(
         return null;
     }
 
-    // BuildIndex: numeric progress (0-100), discriminated by @type
     if (metadata['@type'] === 'type.googleapis.com/Ydb.Table.IndexBuildMetadata') {
-        const buildIndexMetadata = metadata as IndexBuildMetadata;
+        const buildIndexMetadata = metadata;
         if (typeof buildIndexMetadata.progress === 'number') {
             return `${Math.round(buildIndexMetadata.progress)}%`;
         }
@@ -87,10 +85,7 @@ export function getOperationProgress(
         metadata['@type'] === 'type.googleapis.com/Ydb.Export.ExportToS3Metadata' ||
         metadata['@type'] === 'type.googleapis.com/Ydb.Export.ExportToYtMetadata'
     ) {
-        const importExportMetadata = metadata as
-            | ImportFromS3Metadata
-            | ExportToS3Metadata
-            | ExportToYtMetadata;
+        const importExportMetadata = metadata;
 
         // Try to calculate percentage from items_progress
         const calculatedProgress = calculateImportExportProgress(importExportMetadata);
@@ -105,20 +100,15 @@ export function getOperationProgress(
                     ? importExportMetadata.progress
                     : String(importExportMetadata.progress);
 
-            // Backend enums are PROGRESS_DONE, PROGRESS_PREPARING, etc.
-            // Map them to i18n keys value_progress_done, value_progress_preparing, etc.
             const normalized = progressValue.toLowerCase(); // progress_done
             const i18nKey = `value_${normalized}` as OperationProgressKey;
 
-            // Try to get translated value, fallback to original value
             try {
                 const translated = translateProgress(i18nKey);
                 if (translated && translated !== i18nKey) {
                     return translated;
                 }
-            } catch {
-                // Translation function failed, use original value
-            }
+            } catch {}
 
             return progressValue;
         }
