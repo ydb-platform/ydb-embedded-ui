@@ -61,10 +61,10 @@ export function getOperationProgress(
         return null;
     }
 
-    // BuildIndex: numeric progress (0-100)
-    if ('progress' in metadata && typeof metadata.progress === 'number') {
+    // BuildIndex: numeric progress (0-100), discriminated by @type
+    if (metadata['@type'] === 'type.googleapis.com/Ydb.Table.IndexBuildMetadata') {
         const buildIndexMetadata = metadata as IndexBuildMetadata;
-        if (buildIndexMetadata.progress !== undefined) {
+        if (typeof buildIndexMetadata.progress === 'number') {
             return `${Math.round(buildIndexMetadata.progress)}%`;
         }
     }

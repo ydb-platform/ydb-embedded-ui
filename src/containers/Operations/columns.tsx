@@ -29,11 +29,10 @@ export function getColumns({
     kind: OperationKind;
 }): DataTableColumn<TOperation>[] {
     const isBuildIndex = kind === 'buildindex';
-    const isImportOrExport = kind === 'import/s3' || kind === 'export/s3' || kind === 'export/yt';
+    const isImportOrExport = ['import/s3', 'export/s3', 'export/yt'].includes(kind);
 
-    // Helper function to get description tooltip content
-    const getDescriptionTooltip = (operation: TOperation): string => {
-        const metadata = operation.metadata as IndexBuildMetadata | undefined;
+    // Helper function to get description tooltip content (buildindex-only)
+    const getDescriptionTooltip = (metadata?: IndexBuildMetadata): string => {
         if (!metadata?.description) {
             return '';
         }
@@ -50,7 +49,10 @@ export function getColumns({
                     return EMPTY_DATA_PLACEHOLDER;
                 }
 
-                const tooltipContent = isBuildIndex ? getDescriptionTooltip(row) || row.id : row.id;
+                const tooltipContent = isBuildIndex
+                    ? getDescriptionTooltip(row.metadata as IndexBuildMetadata | undefined) ||
+                      row.id
+                    : row.id;
 
                 return (
                     <CellWithPopover placement={['top', 'bottom']} content={tooltipContent}>
