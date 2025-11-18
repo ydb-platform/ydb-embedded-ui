@@ -4,10 +4,6 @@ import type {QueryState} from '../types';
 describe('QueryResultViewer tab persistence integration', () => {
     const initialState: QueryState = {
         input: '',
-        history: {
-            queries: [],
-            currentIndex: -1,
-        },
     };
 
     test('should save and retrieve tab selection for explain queries', () => {

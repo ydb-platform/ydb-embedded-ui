@@ -62,14 +62,15 @@ export interface QueryState {
     input: string;
     result?: QueryResult;
     isDirty?: boolean;
-    history: {
-        queries: QueryInHistory[];
-        currentIndex: number;
-        filter?: string;
-    };
+    historyFilter?: string;
     tenantPath?: string;
     selectedResultTab?: {
         execute?: string;
         explain?: string;
     };
+}
+
+export interface QueryStats {
+    durationUs?: string | number;
+    endTime?: string | number;
 }

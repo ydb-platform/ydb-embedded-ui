@@ -11,15 +11,13 @@ import {
 } from '../../../../store/reducers/capabilities/hooks';
 import {
     queryApi,
-    saveQueryToHistory,
-    selectQueriesHistory,
-    selectQueriesHistoryCurrentIndex,
     selectResult,
     selectTenantPath,
     setIsDirty,
     setTenantPath,
 } from '../../../../store/reducers/query/query';
 import type {QueryResult} from '../../../../store/reducers/query/types';
+import {useQueriesHistory} from '../../../../store/reducers/query/useQueriesHistory';
 import {setQueryAction} from '../../../../store/reducers/queryActions/queryActions';
 import {selectShowPreview, setShowPreview} from '../../../../store/reducers/schema/schema';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
@@ -77,9 +75,10 @@ export default function QueryEditor(props: QueryEditorProps) {
     const {theme, changeUserInput} = props;
     const savedPath = useTypedSelector(selectTenantPath);
     const result = useTypedSelector(selectResult);
-    const historyQueries = useTypedSelector(selectQueriesHistory);
-    const historyCurrentIndex = useTypedSelector(selectQueriesHistoryCurrentIndex);
     const showPreview = useTypedSelector(selectShowPreview);
+
+    const {historyQueries, historyCurrentIndex, saveQueryToHistory, updateQueryInHistory} =
+        useQueriesHistory();
 
     const isResultLoaded = Boolean(result);
 
@@ -182,6 +181,12 @@ export default function QueryEditor(props: QueryEditorProps) {
                 base64: encodeTextWithBase64,
             });
 
+            query.then(({data}) => {
+                if (data?.queryId) {
+                    updateQueryInHistory(data.queryId, data?.queryStats);
+                }
+            });
+
             queryManagerInstance.registerQuery(query);
         }
 
@@ -190,7 +195,7 @@ export default function QueryEditor(props: QueryEditorProps) {
         // Don't save partial queries in history
         if (!partial) {
             if (text !== historyQueries[historyCurrentIndex]?.queryText) {
-                dispatch(saveQueryToHistory({queryText: text, queryId}));
+                saveQueryToHistory(text, queryId);
             }
             dispatch(setIsDirty(false));
         }

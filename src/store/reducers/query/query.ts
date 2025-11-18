@@ -1,7 +1,6 @@
 import {createSelector, createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
-import {settingsManager} from '../../../services/settings';
 import {TracingLevelNumber} from '../../../types/api/query';
 import type {QueryAction, QueryRequestParams, QuerySettings} from '../../../types/store/query';
 import type {StreamDataChunk} from '../../../types/store/streaming';
@@ -11,7 +10,6 @@ import {isQueryErrorResponse} from '../../../utils/query';
 import {isNumeric} from '../../../utils/utils';
 import type {RootState} from '../../defaultStore';
 import {api} from '../api';
-import {SETTING_KEYS} from '../settings/constants';
 
 import {prepareQueryData} from './prepareQueryData';
 import {
@@ -19,17 +17,8 @@ import {
     setStreamQueryResponse as setStreamQueryResponseReducer,
     setStreamSession as setStreamSessionReducer,
 } from './streamingReducers';
-import type {QueryResult, QueryState} from './types';
-import {getActionAndSyntaxFromQueryMode, getQueryInHistory, prepareQueryWithPragmas} from './utils';
-
-const MAXIMUM_QUERIES_IN_HISTORY = 20;
-
-const queriesHistoryInitial = settingsManager.readUserSettingsValue(
-    SETTING_KEYS.QUERIES_HISTORY,
-    [],
-) as string[];
-
-const sliceLimit = queriesHistoryInitial.length - MAXIMUM_QUERIES_IN_HISTORY;
+import type {QueryResult, QueryState, QueryStats} from './types';
+import {getActionAndSyntaxFromQueryMode, prepareQueryWithPragmas} from './utils';
 
 const rawQuery = loadFromSessionStorage(QUERY_EDITOR_CURRENT_QUERY_KEY);
 const input = typeof rawQuery === 'string' ? rawQuery : '';
@@ -39,16 +28,7 @@ const isDirty = Boolean(loadFromSessionStorage(QUERY_EDITOR_DIRTY_KEY));
 const initialState: QueryState = {
     input,
     isDirty,
-    history: {
-        queries: queriesHistoryInitial
-            .slice(sliceLimit < 0 ? 0 : sliceLimit)
-            .map(getQueryInHistory),
-        currentIndex:
-            queriesHistoryInitial.length > MAXIMUM_QUERIES_IN_HISTORY
-                ? MAXIMUM_QUERIES_IN_HISTORY - 1
-                : queriesHistoryInitial.length - 1,
-        filter: '',
-    },
+    historyFilter: '',
 };
 
 const slice = createSlice({
@@ -66,76 +46,11 @@ const slice = createSlice({
         setQueryResult: (state, action: PayloadAction<QueryResult | undefined>) => {
             state.result = action.payload;
         },
-        saveQueryToHistory: (
-            state,
-            action: PayloadAction<{queryText: string; queryId: string}>,
-        ) => {
-            const {queryText, queryId} = action.payload;
-
-            const newQueries = [...state.history.queries, {queryText, queryId}].slice(
-                state.history.queries.length >= MAXIMUM_QUERIES_IN_HISTORY ? 1 : 0,
-            );
-            settingsManager.setUserSettingsValue(SETTING_KEYS.QUERIES_HISTORY, newQueries);
-            const currentIndex = newQueries.length - 1;
-
-            state.history = {
-                queries: newQueries,
-                currentIndex,
-            };
-        },
-        updateQueryInHistory: (
-            state,
-            action: PayloadAction<{queryId: string; stats: QueryStats}>,
-        ) => {
-            const {queryId, stats} = action.payload;
-
-            if (!stats) {
-                return;
-            }
-
-            const index = state.history.queries.findIndex((item) => item.queryId === queryId);
-
-            if (index === -1) {
-                return;
-            }
-
-            const newQueries = [...state.history.queries];
-            const {durationUs, endTime} = stats;
-            newQueries.splice(index, 1, {
-                ...state.history.queries[index],
-                durationUs,
-                endTime,
-            });
-
-            settingsManager.setUserSettingsValue(SETTING_KEYS.QUERIES_HISTORY, newQueries);
-
-            state.history.queries = newQueries;
-        },
-        goToPreviousQuery: (state) => {
-            const currentIndex = state.history.currentIndex;
-            if (currentIndex <= 0) {
-                return;
-            }
-            const newCurrentIndex = currentIndex - 1;
-            const query = state.history.queries[newCurrentIndex];
-            state.input = query.queryText;
-            state.history.currentIndex = newCurrentIndex;
-        },
-        goToNextQuery: (state) => {
-            const currentIndex = state.history.currentIndex;
-            if (currentIndex >= state.history.queries.length - 1) {
-                return;
-            }
-            const newCurrentIndex = currentIndex + 1;
-            const query = state.history.queries[newCurrentIndex];
-            state.input = query.queryText;
-            state.history.currentIndex = newCurrentIndex;
-        },
         setTenantPath: (state, action: PayloadAction<string>) => {
             state.tenantPath = action.payload;
         },
         setQueryHistoryFilter: (state, action: PayloadAction<string>) => {
-            state.history.filter = action.payload;
+            state.historyFilter = action.payload;
         },
         setResultTab: (
             state,
@@ -152,14 +67,13 @@ const slice = createSlice({
         setStreamQueryResponse: setStreamQueryResponseReducer,
     },
     selectors: {
-        selectQueriesHistoryFilter: (state) => state.history.filter || '',
+        selectQueriesHistoryFilter: (state) => state.historyFilter || '',
         selectTenantPath: (state) => state.tenantPath,
         selectResult: (state) => state.result,
         selectStartTime: (state) => state.result?.startTime,
         selectEndTime: (state) => state.result?.endTime,
         selectUserInput: (state) => state.input,
         selectIsDirty: (state) => state.isDirty,
-        selectQueriesHistoryCurrentIndex: (state) => state.history?.currentIndex,
         selectResultTab: (state) => state.selectedResultTab,
     },
 });
@@ -175,27 +89,10 @@ export const selectQueryDuration = createSelector(
     },
 );
 
-export const selectQueriesHistory = createSelector(
-    [
-        (state: RootState) => state.query.history.queries,
-        (state: RootState) => state.query.history.filter,
-    ],
-    (queries, filter) => {
-        const normalizedFilter = filter?.toLowerCase();
-        return normalizedFilter
-            ? queries.filter((item) => item.queryText.toLowerCase().includes(normalizedFilter))
-            : queries;
-    },
-);
-
 export default slice.reducer;
 export const {
     changeUserInput,
     setQueryResult,
-    saveQueryToHistory,
-    updateQueryInHistory,
-    goToPreviousQuery,
-    goToNextQuery,
     setTenantPath,
     setQueryHistoryFilter,
     addStreamingChunks,
@@ -207,7 +104,6 @@ export const {
 
 export const {
     selectQueriesHistoryFilter,
-    selectQueriesHistoryCurrentIndex,
     selectTenantPath,
     selectResult,
     selectUserInput,
@@ -227,11 +123,6 @@ interface SendQueryParams extends QueryRequestParams {
 
 // Stream query receives queryId from session chunk.
 type StreamQueryParams = Omit<SendQueryParams, 'queryId'>;
-
-interface QueryStats {
-    durationUs?: string | number;
-    endTime?: string | number;
-}
 
 const DEFAULT_STREAM_CHUNK_SIZE = 1000;
 const DEFAULT_CONCURRENT_RESULTS = false;
@@ -421,8 +312,9 @@ export const queryApi = api.injectEndpoints({
                     const data = prepareQueryData(response);
                     data.traceId = response?._meta?.traceId;
 
+                    const queryStats: QueryStats = {};
+
                     if (actionType === 'execute') {
-                        const queryStats: QueryStats = {};
                         if (data.stats) {
                             const {DurationUs, Executions: [{FinishTimeMs}] = [{}]} = data.stats;
                             queryStats.durationUs = DurationUs;
@@ -432,8 +324,6 @@ export const queryApi = api.injectEndpoints({
                             queryStats.durationUs = (now - timeStart) * 1000;
                             queryStats.endTime = now;
                         }
-
-                        dispatch(updateQueryInHistory({stats: queryStats, queryId}));
                     }
 
                     dispatch(
@@ -446,7 +336,7 @@ export const queryApi = api.injectEndpoints({
                             endTime: Date.now(),
                         }),
                     );
-                    return {data: null};
+                    return {data: {queryStats, queryId}};
                 } catch (error) {
                     const state = getState() as RootState;
                     if (state.query.result?.startTime !== startTime) {
