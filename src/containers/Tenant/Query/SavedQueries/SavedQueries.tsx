@@ -11,7 +11,6 @@ import {TableWithControlsLayout} from '../../../../components/TableWithControlsL
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
 import {setIsDirty} from '../../../../store/reducers/query/query';
 import {
-    deleteSavedQuery,
     selectSavedQueriesFilter,
     setQueryNameToEdit,
     setSavedQueriesFilter,
@@ -24,7 +23,7 @@ import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import i18n from '../i18n';
-import {useFilteredSavedQueries} from '../utils/useSavedQueries';
+import {useSavedQueries} from '../utils/useSavedQueries';
 
 import './SavedQueries.scss';
 
@@ -68,7 +67,7 @@ interface SavedQueriesProps {
 }
 
 export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
-    const savedQueries = useFilteredSavedQueries();
+    const {filteredSavedQueries, deleteSavedQuery} = useSavedQueries();
     const dispatch = useTypedDispatch();
     const filter = useTypedSelector(selectSavedQueriesFilter);
 
@@ -86,7 +85,7 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
 
     const onConfirmDeleteClick = () => {
         closeDeleteDialog();
-        dispatch(deleteSavedQuery(queryNameToDelete));
+        deleteSavedQuery(queryNameToDelete);
         setQueryNameToDelete('');
     };
 
@@ -158,7 +157,7 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
                     <ResizeableDataTable
                         columnsWidthLSKey={SAVED_QUERIES_COLUMNS_WIDTH_LS_KEY}
                         columns={columns}
-                        data={savedQueries}
+                        data={filteredSavedQueries}
                         settings={QUERY_TABLE_SETTINGS}
                         emptyDataMessage={i18n(filter ? 'history.empty-search' : 'saved.empty')}
                         rowClassName={() => b('row')}

@@ -46,7 +46,7 @@ export function useCodeAssistHelpers() {
     const [ignoreSuggestion] = codeAssistApi.useIgnoreSuggestionMutation();
     const [sendUserQueriesData] = codeAssistApi.useSendUserQueriesDataMutation();
     const historyQueries = useTypedSelector(selectQueriesHistory);
-    const savedQueries = useSavedQueries();
+    const {savedQueries} = useSavedQueries();
 
     const getCodeAssistSuggestions = React.useCallback(
         async (promptFiles: PromptFile[]) => sendCodeAssistPrompt(promptFiles).unwrap(),
@@ -74,7 +74,7 @@ export function useCodeAssistHelpers() {
                 name: `query${index}.yql`,
                 text: query.queryText,
             })),
-            ...savedQueries.map((query) => ({
+            ...(savedQueries ?? []).map((query) => ({
                 name: query.name,
                 text: query.body,
             })),

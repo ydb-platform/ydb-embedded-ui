@@ -7,10 +7,10 @@ import {Button, Dialog, DropdownMenu, TextInput} from '@gravity-ui/uikit';
 import {setIsDirty} from '../../../../store/reducers/query/query';
 import {
     clearQueryNameToEdit,
-    saveQuery,
     selectQueryName,
     setQueryAction,
 } from '../../../../store/reducers/queryActions/queryActions';
+import type {SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useSavedQueries} from '../utils/useSavedQueries';
@@ -27,10 +27,16 @@ interface SaveQueryProps {
 
 function useSaveQueryHandler(dialogProps?: SaveQueryDialogCommonProps) {
     const dispatch = useTypedDispatch();
+    const {savedQueries, saveQuery} = useSavedQueries();
+
     const onSaveQueryClick = React.useCallback(() => {
-        NiceModal.show(SAVE_QUERY_DIALOG, dialogProps);
+        NiceModal.show(SAVE_QUERY_DIALOG, {
+            ...dialogProps,
+            savedQueries,
+            onSaveQuery: saveQuery,
+        });
         dispatch(clearQueryNameToEdit());
-    }, [dispatch, dialogProps]);
+    }, [dispatch, dialogProps, savedQueries, saveQuery]);
 
     return onSaveQueryClick;
 }
@@ -54,8 +60,10 @@ export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
     const queryNameToEdit = useTypedSelector(selectQueryName);
     const onSaveQueryClick = useSaveQueryHandler();
 
+    const {saveQuery} = useSavedQueries();
+
     const onEditQueryClick = () => {
-        dispatch(saveQuery(queryNameToEdit));
+        saveQuery(queryNameToEdit);
         dispatch(setIsDirty(false));
         dispatch(clearQueryNameToEdit());
     };
@@ -95,10 +103,18 @@ interface SaveQueryDialogCommonProps {
 
 interface SaveQueryDialogProps extends SaveQueryDialogCommonProps {
     open: boolean;
+    savedQueries?: SavedQuery[];
+    onSaveQuery: (name: string | null) => void;
 }
 
-function SaveQueryDialog({onSuccess, onCancel, onClose, open}: SaveQueryDialogProps) {
-    const savedQueries = useSavedQueries();
+function SaveQueryDialog({
+    onSuccess,
+    onCancel,
+    onClose,
+    open,
+    savedQueries,
+    onSaveQuery,
+}: SaveQueryDialogProps) {
     const dispatch = useTypedDispatch();
     const [queryName, setQueryName] = React.useState('');
     const [validationError, setValidationError] = React.useState<string>();
@@ -107,7 +123,7 @@ function SaveQueryDialog({onSuccess, onCancel, onClose, open}: SaveQueryDialogPr
         if (!value) {
             return i18n('error.name-not-empty');
         }
-        if (savedQueries.some((q) => q.name.toLowerCase() === value.trim().toLowerCase())) {
+        if (savedQueries?.some((q) => q.name.toLowerCase() === value.trim().toLowerCase())) {
             return i18n('error.name-exists');
         }
         return undefined;
@@ -131,7 +147,7 @@ function SaveQueryDialog({onSuccess, onCancel, onClose, open}: SaveQueryDialogPr
     };
 
     const onSaveClick = () => {
-        dispatch(saveQuery(queryName));
+        onSaveQuery(queryName);
         dispatch(setIsDirty(false));
         onCloseDialog();
         onSuccess?.();
