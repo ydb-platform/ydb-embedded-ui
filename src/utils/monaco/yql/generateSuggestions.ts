@@ -26,6 +26,7 @@ const suggestionEntityToAutocomplete: Partial<Record<YQLEntity, AutocompleteEnti
     topic: ['pers_queue_group'],
     view: ['view'],
     tableIndex: ['table_index', 'index'],
+    streamingQuery: ['streaming_query'],
 };
 
 const commonSuggestionEntities: AutocompleteEntityType[] = ['dir', 'unknown', 'ext_sub_domain'];
