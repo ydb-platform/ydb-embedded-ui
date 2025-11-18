@@ -14,6 +14,7 @@ import {isClusterInfoV2, isClusterInfoV5} from '../../../types/api/cluster';
 import type {TClusterInfo} from '../../../types/api/cluster';
 import type {IResponseError} from '../../../types/api/error';
 import {valueIsDefined} from '../../../utils';
+import {useResizeObserverTrigger} from '../../../utils/hooks/useResizeObserverTrigger';
 import {useSetting} from '../../../utils/hooks/useSetting';
 import {ClusterInfo} from '../ClusterInfo/ClusterInfo';
 import i18n from '../i18n';
@@ -43,6 +44,9 @@ export function ClusterOverview(props: ClusterOverviewProps) {
     const [expandDashboard, setExpandDashboard] = useSetting<boolean>(
         SETTING_KEYS.EXPAND_CLUSTER_DASHBOARD,
     );
+
+    //needs timeout to ensure layout has been recalculated after Disclosure animations
+    useResizeObserverTrigger([expandDashboard], 110);
     const bridgeModeEnabled = useBridgeModeEnabled();
 
     const bridgePiles = React.useMemo(() => {
