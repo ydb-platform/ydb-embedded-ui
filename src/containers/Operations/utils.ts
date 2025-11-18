@@ -126,28 +126,25 @@ export function getOperationProgress(
     }
 
     if (isIndexBuildMetadata(metadata)) {
-        const buildIndexMetadata = metadata;
-        if (typeof buildIndexMetadata.progress === 'number') {
-            return `${Math.round(buildIndexMetadata.progress)}%`;
+        if (typeof metadata.progress === 'number') {
+            return `${Math.round(metadata.progress)}%`;
         }
     }
 
     // Import/Export: calculate from items_progress or show enum value
     if (isImportExportMetadata(metadata)) {
-        const importExportMetadata = metadata;
-
         // Try to calculate percentage from items_progress
-        const calculatedProgress = calculateImportExportProgress(importExportMetadata);
+        const calculatedProgress = calculateImportExportProgress(metadata);
         if (calculatedProgress !== null) {
             return `${calculatedProgress}%`;
         }
 
         // Fallback to enum progress value
-        if (importExportMetadata.progress) {
+        if (metadata.progress) {
             const progressValue =
-                typeof importExportMetadata.progress === 'string'
-                    ? importExportMetadata.progress
-                    : String(importExportMetadata.progress);
+                typeof metadata.progress === 'string'
+                    ? metadata.progress
+                    : String(metadata.progress);
 
             // Backend enums are usually PROGRESS_DONE, PROGRESS_PREPARING, etc.
             // Normalize by stripping optional PROGRESS_ prefix and lowercasing.
