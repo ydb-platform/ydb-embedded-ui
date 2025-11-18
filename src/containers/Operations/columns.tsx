@@ -15,9 +15,11 @@ import {parseProtobufTimestampToMs} from '../../utils/timeParsers';
 
 import {COLUMNS_NAMES, COLUMNS_TITLES} from './constants';
 import i18n from './i18n';
-import {getOperationProgress} from './utils';
+import {getOperationProgress, isIndexBuildMetadata} from './utils';
 
 import './Operations.scss';
+
+const IMPORT_EXPORT_KINDS: OperationKind[] = ['import/s3', 'export/s3', 'export/yt'];
 
 export function getColumns({
     database,
@@ -29,13 +31,16 @@ export function getColumns({
     kind: OperationKind;
 }): DataTableColumn<TOperation>[] {
     const isBuildIndex = kind === 'buildindex';
-    const isImportOrExport = ['import/s3', 'export/s3', 'export/yt'].includes(kind);
+    const isImportOrExport = IMPORT_EXPORT_KINDS.includes(kind);
 
     // Helper function to get description tooltip content (buildindex-only)
-    const getDescriptionTooltip = (metadata?: IndexBuildMetadata): string => {
-        if (!metadata?.description) {
+    const getDescriptionTooltip = (operation: TOperation): string => {
+        const {metadata} = operation;
+
+        if (!isIndexBuildMetadata(metadata) || !metadata.description) {
             return '';
         }
+
         return JSON.stringify(metadata.description, null, 2);
     };
 
@@ -49,10 +54,7 @@ export function getColumns({
                     return EMPTY_DATA_PLACEHOLDER;
                 }
 
-                const tooltipContent = isBuildIndex
-                    ? getDescriptionTooltip(row.metadata as IndexBuildMetadata | undefined) ||
-                      row.id
-                    : row.id;
+                const tooltipContent = isBuildIndex ? getDescriptionTooltip(row) || row.id : row.id;
 
                 return (
                     <CellWithPopover placement={['top', 'bottom']} content={tooltipContent}>

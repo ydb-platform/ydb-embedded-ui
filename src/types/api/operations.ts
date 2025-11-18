@@ -88,9 +88,18 @@ export enum IndexBuildState {
     STATE_REJECTED = 'STATE_REJECTED',
 }
 
+export const OPERATION_METADATA_TYPE_URLS = {
+    IndexBuild: 'type.googleapis.com/Ydb.Table.IndexBuildMetadata',
+    ImportFromS3: 'type.googleapis.com/Ydb.Import.ImportFromS3Metadata',
+    ExportToS3: 'type.googleapis.com/Ydb.Export.ExportToS3Metadata',
+    ExportToYt: 'type.googleapis.com/Ydb.Export.ExportToYtMetadata',
+} as const;
+
+export type OperationMetadataTypeUrl =
+    (typeof OPERATION_METADATA_TYPE_URLS)[keyof typeof OPERATION_METADATA_TYPE_URLS];
+
 /**
  * Import/Export progress enum
- *
  * source: https://github.com/ydb-platform/ydb/blob/main/ydb/public/api/protos/ydb_import.proto
  */
 export enum ImportExportProgress {
@@ -106,7 +115,6 @@ export enum ImportExportProgress {
 
 /**
  * Import/Export item progress
- *
  * source: https://github.com/ydb-platform/ydb/blob/main/ydb/public/api/protos/ydb_import.proto
  */
 export interface ImportExportItemProgress {
@@ -118,11 +126,10 @@ export interface ImportExportItemProgress {
 
 /**
  * Import from S3 metadata
- *
  * source: https://github.com/ydb-platform/ydb/blob/main/ydb/public/api/protos/ydb_import.proto#L108
  */
 export interface ImportFromS3Metadata {
-    '@type'?: 'type.googleapis.com/Ydb.Import.ImportFromS3Metadata';
+    '@type'?: typeof OPERATION_METADATA_TYPE_URLS.ImportFromS3;
     settings?: {
         endpoint?: string;
         scheme?: string;
@@ -140,11 +147,10 @@ export interface ImportFromS3Metadata {
 
 /**
  * Export to S3 metadata
- *
  * source: https://github.com/ydb-platform/ydb/blob/main/ydb/public/api/protos/ydb_export.proto
  */
 export interface ExportToS3Metadata {
-    '@type'?: 'type.googleapis.com/Ydb.Export.ExportToS3Metadata';
+    '@type'?: typeof OPERATION_METADATA_TYPE_URLS.ExportToS3;
     settings?: {
         endpoint?: string;
         scheme?: string;
@@ -161,11 +167,10 @@ export interface ExportToS3Metadata {
 
 /**
  * Export to YT metadata
- *
  * source: https://github.com/ydb-platform/ydb/blob/main/ydb/public/api/protos/ydb_export.proto
  */
 export interface ExportToYtMetadata {
-    '@type'?: 'type.googleapis.com/Ydb.Export.ExportToYtMetadata';
+    '@type'?: typeof OPERATION_METADATA_TYPE_URLS.ExportToYt;
     settings?: {
         [key: string]: unknown;
     };

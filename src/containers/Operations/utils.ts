@@ -2,8 +2,61 @@ import type {
     ExportToS3Metadata,
     ExportToYtMetadata,
     ImportFromS3Metadata,
+    IndexBuildMetadata,
     TOperation,
 } from '../../types/api/operations';
+import {OPERATION_METADATA_TYPE_URLS} from '../../types/api/operations';
+
+// Type guards for operation metadata kinds
+export function isIndexBuildMetadata(
+    metadata: TOperation['metadata'],
+): metadata is IndexBuildMetadata {
+    if (!metadata) {
+        return false;
+    }
+
+    return metadata['@type'] === OPERATION_METADATA_TYPE_URLS.IndexBuild;
+}
+
+export function isImportFromS3Metadata(
+    metadata: TOperation['metadata'],
+): metadata is ImportFromS3Metadata {
+    if (!metadata) {
+        return false;
+    }
+
+    return metadata['@type'] === OPERATION_METADATA_TYPE_URLS.ImportFromS3;
+}
+
+export function isExportToS3Metadata(
+    metadata: TOperation['metadata'],
+): metadata is ExportToS3Metadata {
+    if (!metadata) {
+        return false;
+    }
+
+    return metadata['@type'] === OPERATION_METADATA_TYPE_URLS.ExportToS3;
+}
+
+export function isExportToYtMetadata(
+    metadata: TOperation['metadata'],
+): metadata is ExportToYtMetadata {
+    if (!metadata) {
+        return false;
+    }
+
+    return metadata['@type'] === OPERATION_METADATA_TYPE_URLS.ExportToYt;
+}
+
+export function isImportExportMetadata(
+    metadata: TOperation['metadata'],
+): metadata is ImportFromS3Metadata | ExportToS3Metadata | ExportToYtMetadata {
+    return (
+        isImportFromS3Metadata(metadata) ||
+        isExportToS3Metadata(metadata) ||
+        isExportToYtMetadata(metadata)
+    );
+}
 
 // i18n keys for import/export progress enum values
 // value_progress_unspecified, value_progress_preparing, etc.
@@ -72,7 +125,7 @@ export function getOperationProgress(
         return null;
     }
 
-    if (metadata['@type'] === 'type.googleapis.com/Ydb.Table.IndexBuildMetadata') {
+    if (isIndexBuildMetadata(metadata)) {
         const buildIndexMetadata = metadata;
         if (typeof buildIndexMetadata.progress === 'number') {
             return `${Math.round(buildIndexMetadata.progress)}%`;
@@ -80,11 +133,7 @@ export function getOperationProgress(
     }
 
     // Import/Export: calculate from items_progress or show enum value
-    if (
-        metadata['@type'] === 'type.googleapis.com/Ydb.Import.ImportFromS3Metadata' ||
-        metadata['@type'] === 'type.googleapis.com/Ydb.Export.ExportToS3Metadata' ||
-        metadata['@type'] === 'type.googleapis.com/Ydb.Export.ExportToYtMetadata'
-    ) {
+    if (isImportExportMetadata(metadata)) {
         const importExportMetadata = metadata;
 
         // Try to calculate percentage from items_progress
