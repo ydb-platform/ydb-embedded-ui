@@ -6,13 +6,8 @@ import throttle from 'lodash/throttle';
 import type Monaco from 'monaco-editor';
 
 import {MonacoEditor} from '../../../../components/MonacoEditor/MonacoEditor';
-import {
-    goToNextQuery,
-    goToPreviousQuery,
-    selectQueriesHistory,
-    selectUserInput,
-    setIsDirty,
-} from '../../../../store/reducers/query/query';
+import {selectUserInput, setIsDirty} from '../../../../store/reducers/query/query';
+import {useQueriesHistory} from '../../../../store/reducers/query/useQueriesHistory';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import type {QueryAction} from '../../../../types/store/query';
 import {
@@ -49,7 +44,7 @@ export function YqlEditor({
     const dispatch = useTypedDispatch();
     const [monacoGhostInstance, setMonacoGhostInstance] =
         React.useState<ReturnType<typeof createMonacoGhostInstance>>();
-    const historyQueries = useTypedSelector(selectQueriesHistory);
+    const {historyQueries, goToPreviousQuery, goToNextQuery} = useQueriesHistory();
     const [isCodeAssistEnabled] = useSetting(SETTING_KEYS.ENABLE_CODE_ASSISTANT);
 
     const editorOptions = useEditorOptions();
@@ -160,7 +155,7 @@ export function YqlEditor({
             contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
             contextMenuOrder: 2,
             run: () => {
-                dispatch(goToPreviousQuery());
+                goToPreviousQuery();
             },
         });
         editor.addAction({
@@ -169,7 +164,7 @@ export function YqlEditor({
             contextMenuGroupId: CONTEXT_MENU_GROUP_ID,
             contextMenuOrder: 3,
             run: () => {
-                dispatch(goToNextQuery());
+                goToNextQuery();
             },
         });
         editor.addAction({
