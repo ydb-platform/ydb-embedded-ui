@@ -68,17 +68,40 @@ export function useTenantPage() {
 
     const handleTenantPageChange = React.useCallback(
         (value?: TenantPage) => {
-            setInitialTenantPage(value);
             setQueryParams({tenantPage: value});
+            setInitialTenantPage(value);
         },
         [setInitialTenantPage, setQueryParams],
     );
 
-    const parsedInitialPage = tenantPageSchema
-        .catch(DEFAULT_USER_SETTINGS[SETTING_KEYS.TENANT_INITIAL_PAGE])
-        .parse(initialTenantPage);
+    const parsedInitialPage = React.useMemo(
+        () =>
+            tenantPageSchema
+                .catch(DEFAULT_USER_SETTINGS[SETTING_KEYS.TENANT_INITIAL_PAGE])
+                .parse(initialTenantPage),
+        [initialTenantPage],
+    );
 
-    const tenantPage = tenantPageSchema.catch(parsedInitialPage).parse(tenantPageFromQuery);
+    const tenantPage = React.useMemo(
+        () => tenantPageSchema.catch(parsedInitialPage).parse(tenantPageFromQuery),
+        [tenantPageFromQuery, parsedInitialPage],
+    );
+
+    React.useEffect(() => {
+        try {
+            // Check whether query has valid tenantPage param
+            const parsedQueryPage = tenantPageSchema.parse(tenantPageFromQuery);
+
+            // Save query page as initial if they differ
+            if (parsedQueryPage !== parsedInitialPage) {
+                setInitialTenantPage(parsedQueryPage);
+            }
+        } catch {
+            // If query page is not valid, set saved page to query
+            // `replaceIn` to not create new history entry when applying previously saved tab
+            setQueryParams({tenantPage: parsedInitialPage}, 'replaceIn');
+        }
+    }, [tenantPageFromQuery, parsedInitialPage, setQueryParams, setInitialTenantPage]);
 
     return {tenantPage, handleTenantPageChange} as const;
 }
