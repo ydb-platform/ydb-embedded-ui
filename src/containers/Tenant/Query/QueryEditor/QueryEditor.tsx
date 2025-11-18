@@ -95,6 +95,12 @@ export default function QueryEditor(props: QueryEditorProps) {
     const [lastExecutedQueryText, setLastExecutedQueryText] = React.useState<string>('');
     const [isQueryStreamingEnabled] = useQueryStreamingSetting();
 
+    const [binaryDataInPlainTextDisplay] = useSetting<boolean>(
+        SETTING_KEYS.BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
+    );
+
+    const encodeTextWithBase64 = !binaryDataInPlainTextDisplay;
+
     const isStreamingEnabled =
         useStreamingAvailable() &&
         isQueryStreamingEnabled &&
@@ -160,6 +166,7 @@ export default function QueryEditor(props: QueryEditorProps) {
                 database,
                 querySettings,
                 enableTracingLevel,
+                base64: encodeTextWithBase64,
             });
 
             queryManagerInstance.registerQuery(query);
@@ -172,6 +179,7 @@ export default function QueryEditor(props: QueryEditorProps) {
                 querySettings,
                 enableTracingLevel,
                 queryId,
+                base64: encodeTextWithBase64,
             });
 
             queryManagerInstance.registerQuery(query);
@@ -212,6 +220,7 @@ export default function QueryEditor(props: QueryEditorProps) {
             querySettings,
             enableTracingLevel,
             queryId,
+            base64: encodeTextWithBase64,
         });
 
         queryManagerInstance.registerQuery(query);
