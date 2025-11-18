@@ -181,11 +181,15 @@ export default function QueryEditor(props: QueryEditorProps) {
                 base64: encodeTextWithBase64,
             });
 
-            query.then(({data}) => {
-                if (data?.queryId) {
-                    updateQueryInHistory(data.queryId, data?.queryStats);
-                }
-            });
+            query
+                .then(({data}) => {
+                    if (data?.queryId) {
+                        updateQueryInHistory(data.queryId, data?.queryStats);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Failed to update query history:', error);
+                });
 
             queryManagerInstance.registerQuery(query);
         }
