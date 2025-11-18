@@ -236,7 +236,7 @@ export const queryApi = api.injectEndpoints({
                 }
             },
         }),
-        useSendQuery: build.mutation({
+        useSendQuery: build.mutation<{queryStats: QueryStats; queryId: string}, SendQueryParams>({
             queryFn: async (
                 {
                     actionType = 'execute',
@@ -246,7 +246,7 @@ export const queryApi = api.injectEndpoints({
                     enableTracingLevel,
                     queryId,
                     base64,
-                }: SendQueryParams,
+                },
                 {signal, dispatch, getState},
             ) => {
                 const startTime = Date.now();

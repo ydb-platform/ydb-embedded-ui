@@ -50,7 +50,7 @@ export function useQueriesHistory() {
             : historyQueries;
     }, [historyQueries, queriesFilter]);
 
-    // These function are used inside Monaco editorDidMount
+    // These functions are used inside Monaco editorDidMount
     // They should be stable to work properly
     const goToPreviousQuery = useEventHandler(() => {
         setCurrentIndex((index) => {
@@ -87,6 +87,7 @@ export function useQueriesHistory() {
             historyQueries.length >= MAXIMUM_QUERIES_IN_HISTORY ? 1 : 0,
         );
         saveHistoryQueries(newQueries);
+        setQueries(newQueries);
         // Update currentIndex to point to the newly added query
         const newCurrentIndex = newQueries.length - 1;
         setCurrentIndex(newCurrentIndex);
@@ -108,6 +109,7 @@ export function useQueriesHistory() {
                 endTime,
             });
             saveHistoryQueries(newQueries);
+            setQueries(newQueries);
         }
     });
 
