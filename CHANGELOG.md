@@ -1,5 +1,19 @@
 # Changelog
 
+## [12.21.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.20.0...v12.21.0) (2025-11-18)
+
+
+### Features
+
+* support streaming query in autocomplete ([#3097](https://github.com/ydb-platform/ydb-embedded-ui/issues/3097)) ([96ceae4](https://github.com/ydb-platform/ydb-embedded-ui/commit/96ceae472eb1fa94e8306dc3cb71bcc8ca48292b))
+
+
+### Bug Fixes
+
+* progress is not shown for export ([#3092](https://github.com/ydb-platform/ydb-embedded-ui/issues/3092)) ([11c971a](https://github.com/ydb-platform/ydb-embedded-ui/commit/11c971acc15d0fcbf51661812c5b0339df6ec901))
+* **QueryEditor:** pass base64 from settings ([#3093](https://github.com/ydb-platform/ydb-embedded-ui/issues/3093)) ([eb54851](https://github.com/ydb-platform/ydb-embedded-ui/commit/eb54851545fb05d26aaa8f8892a0dec4a99205b9))
+* **TopicData:** scroll to offset on load ([#3085](https://github.com/ydb-platform/ydb-embedded-ui/issues/3085)) ([9d0de26](https://github.com/ydb-platform/ydb-embedded-ui/commit/9d0de26404fcede56f8f1814d58b921bd1eb570e))
+
 ## [12.20.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.19.1...v12.20.0) (2025-11-14)
 
 
