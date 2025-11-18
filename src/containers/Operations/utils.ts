@@ -149,8 +149,11 @@ export function getOperationProgress(
                     ? importExportMetadata.progress
                     : String(importExportMetadata.progress);
 
-            const normalized = progressValue.toLowerCase(); // progress_done
-            const i18nKey = `value_${normalized}` as OperationProgressKey;
+            // Backend enums are usually PROGRESS_DONE, PROGRESS_PREPARING, etc.
+            // Normalize by stripping optional PROGRESS_ prefix and lowercasing.
+            // Both "PROGRESS_DONE" and "DONE" will map to "value_progress_done".
+            const base = progressValue.replace(/^PROGRESS_/, '').toLowerCase(); // done
+            const i18nKey = `value_progress_${base}` as OperationProgressKey;
 
             try {
                 const translated = translateProgress(i18nKey);
