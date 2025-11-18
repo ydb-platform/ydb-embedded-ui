@@ -30,6 +30,7 @@ import {
     grantPrivilegeTemplate,
     revokePrivilegeTemplate,
     selectQueryTemplate,
+    showCreateTableTemplate,
     updateTableTemplate,
     upsertQueryTemplate,
 } from './schemaQueryTemplates';
@@ -73,5 +74,6 @@ export const bindActions = (changeUserInput: (input: string) => void) => {
         dropGroup: inputQuery(dropGroupTemplate),
         addTableIndex: inputQuery(addTableIndex),
         dropTableIndex: inputQuery(dropTableIndex),
+        showCreateTable: inputQuery(showCreateTableTemplate),
     };
 };

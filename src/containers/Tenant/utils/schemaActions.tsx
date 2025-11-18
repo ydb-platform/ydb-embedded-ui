@@ -1,4 +1,4 @@
-import {CirclePlus, Copy, DisplayPulse, PlugConnection} from '@gravity-ui/icons';
+import {CirclePlus, Code, Copy, DisplayPulse, PlugConnection} from '@gravity-ui/icons';
 import {Flex, Spin} from '@gravity-ui/uikit';
 import copy from 'copy-to-clipboard';
 import type {NavigationTreeNodeType} from 'ydb-ui-components';
@@ -46,6 +46,7 @@ import {
     dropViewTemplate,
     manageAutoPartitioningTemplate,
     selectQueryTemplate,
+    showCreateTableTemplate,
     upsertQueryTemplate,
 } from './schemaQueryTemplates';
 import type {YdbNavigationTreeProps} from './types';
@@ -128,6 +129,7 @@ const bindActions = (
         dropTable: inputQuery(dropTableTemplate),
         manageAutoPartitioning: inputQuery(manageAutoPartitioningTemplate),
         selectQuery: inputQuery(selectQueryTemplate),
+        showCreateTable: inputQuery(showCreateTableTemplate),
         upsertQuery: inputQuery(upsertQueryTemplate),
         createExternalTable: inputQuery(createExternalTableTemplate),
         dropExternalTable: inputQuery(dropExternalTableTemplate),
@@ -244,6 +246,7 @@ export const getActions =
                 },
             ],
         };
+
         let DB_SET: ActionsSet = [[copyItem, connectToDBItem], createEntitiesSet];
 
         const DIR_SET: ActionsSet = [[copyItem], createEntitiesSet];
@@ -263,6 +266,12 @@ export const getActions =
             DIR_SET.splice(1, 0, [createDirectoryItem]);
         }
 
+        const showCreateTableItem = {
+            text: i18n('actions.showCreateTable'),
+            action: actions.showCreateTable,
+            iconStart: <Code />,
+        };
+
         const ROW_TABLE_SET: ActionsSet = [
             [copyItem],
             [
@@ -281,6 +290,7 @@ export const getActions =
                 {text: i18n('actions.addTableIndex'), action: actions.addTableIndex},
                 {text: i18n('actions.createCdcStream'), action: actions.createCdcStream},
             ],
+            [showCreateTableItem],
         ];
         const COLUMN_TABLE_SET: ActionsSet = [
             [copyItem],
@@ -290,6 +300,7 @@ export const getActions =
                 {text: i18n('actions.selectQuery'), action: actions.selectQuery},
                 {text: i18n('actions.upsertQuery'), action: actions.upsertQuery},
             ],
+            [showCreateTableItem],
         ];
 
         const TOPIC_SET: ActionsSet = [

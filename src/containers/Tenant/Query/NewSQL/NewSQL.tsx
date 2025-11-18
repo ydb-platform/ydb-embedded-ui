@@ -79,6 +79,10 @@ export function NewSQL() {
                     text: i18n('action.drop-index'),
                     action: actions.dropTableIndex,
                 },
+                {
+                    text: i18n('action.show-create-table'),
+                    action: actions.showCreateTable,
+                },
             ],
         },
         {
