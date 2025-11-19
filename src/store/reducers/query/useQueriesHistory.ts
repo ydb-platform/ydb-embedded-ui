@@ -85,7 +85,7 @@ export function useQueriesHistory() {
     const saveQueryToHistory = useEventHandler((queryText: string, queryId: string) => {
         setQueries((currentQueries) => {
             const newQueries = [...currentQueries, {queryText, queryId}].slice(
-                historyQueries.length >= MAXIMUM_QUERIES_IN_HISTORY ? 1 : 0,
+                currentQueries.length >= MAXIMUM_QUERIES_IN_HISTORY ? 1 : 0,
             );
             saveHistoryQueries(newQueries);
 
