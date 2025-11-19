@@ -45,6 +45,7 @@
   "actions.manageAutoPartitioning": "Manage auto partitioning...",
   "actions.addTableIndex": "Add index...",
   "actions.createCdcStream": "Create changefeed...",
+  "actions.showCreateTable": "Show Create SQL...",
   "actions.alterTopic": "Alter topic...",
   "actions.selectQuery": "Select query...",
   "actions.upsertQuery": "Upsert query...",
