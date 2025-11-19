@@ -10,11 +10,11 @@ import {
     setQueryAction,
 } from '../../../../store/reducers/queryActions/queryActions';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
+import {useSetting} from '../../../../store/reducers/settings/useSetting';
 import type {QuerySettings} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {
     useQueryExecutionSettings,
-    useSetting,
     useTypedDispatch,
     useTypedSelector,
 } from '../../../../utils/hooks';
@@ -82,7 +82,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
         resolver: zodResolver(querySettingsValidationSchema),
     });
 
-    const [useShowPlanToSvg] = useSetting<boolean>(SETTING_KEYS.USE_SHOW_PLAN_SVG);
+    const {value: useShowPlanToSvg} = useSetting<boolean>(SETTING_KEYS.USE_SHOW_PLAN_SVG);
     const enableTracingLevel = useTracingLevelOptionAvailable();
 
     const timeout = watch('timeout');

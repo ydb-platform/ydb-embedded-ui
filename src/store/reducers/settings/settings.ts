@@ -1,19 +1,18 @@
 import type {Store} from '@reduxjs/toolkit';
-import {createSlice} from '@reduxjs/toolkit';
+import {createSelector, createSlice} from '@reduxjs/toolkit';
+import {isNil} from 'lodash';
 
-import {settingsManager} from '../../../services/settings';
 import {parseJson} from '../../../utils/utils';
-import type {AppDispatch} from '../../defaultStore';
+import type {AppDispatch, RootState} from '../../defaultStore';
 
-import {DEFAULT_USER_SETTINGS} from './constants';
+import type {SettingKey} from './constants';
+import {DEFAULT_USER_SETTINGS, SETTINGS_OPTIONS} from './constants';
 import type {SettingsState} from './types';
-
-const userSettings = settingsManager.extractSettingsFromLS(DEFAULT_USER_SETTINGS);
-const systemSettings = window.systemSettings || {};
+import {readSettingValueFromLS} from './utils';
 
 export const initialState: SettingsState = {
-    userSettings,
-    systemSettings,
+    userSettings: {},
+    systemSettings: window.systemSettings || {},
 };
 
 const settingsSlice = createSlice({
@@ -24,18 +23,36 @@ const settingsSlice = createSlice({
             state.userSettings[action.payload.name] = action.payload.value;
         }),
     }),
-    selectors: {
-        getSettingValue: (state, name?: string) => {
-            if (!name) {
-                return undefined;
-            }
-
-            return state.userSettings[name];
-        },
-    },
 });
 
-export const {getSettingValue} = settingsSlice.selectors;
+export const getSettingValue = createSelector(
+    (state: RootState) => state.settings.userSettings,
+    (_state: RootState, name?: string) => name,
+    (userSettings, name) => {
+        if (!name) {
+            return undefined;
+        }
+
+        const storeValue = userSettings[name];
+
+        if (!isNil(storeValue)) {
+            return storeValue;
+        }
+
+        const defaultValue = DEFAULT_USER_SETTINGS[name as SettingKey] as unknown;
+
+        // Do not load LS value from always sync values.
+        // In case there is no settings service
+        // Such setting will be loaded from LS with getSingleSetting
+        if (SETTINGS_OPTIONS[name]?.preventSyncWithLS) {
+            return defaultValue;
+        }
+
+        const savedValue = readSettingValueFromLS(name);
+
+        return savedValue;
+    },
+);
 
 export const setSettingValue = (name: string | undefined, value: unknown) => {
     return (dispatch: AppDispatch) => {

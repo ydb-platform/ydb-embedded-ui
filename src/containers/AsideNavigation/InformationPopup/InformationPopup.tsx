@@ -1,8 +1,6 @@
 import {Keyboard} from '@gravity-ui/icons';
 import {Flex, Hotkey, Icon, Link, List, Text} from '@gravity-ui/uikit';
 
-import {settingsManager} from '../../../services/settings';
-import {SETTING_KEYS} from '../../../store/reducers/settings/constants';
 import {cn} from '../../../utils/cn';
 import {SHORTCUTS_HOTKEY} from '../hooks/useHotkeysPanel';
 import i18n from '../i18n';
@@ -16,14 +14,6 @@ export interface InformationPopupProps {
 }
 
 export function InformationPopup({onKeyboardShortcutsClick}: InformationPopupProps) {
-    const getDocumentationLink = () => {
-        const lang = settingsManager.readUserSettingsValue(
-            SETTING_KEYS.LANGUAGE,
-            navigator.language,
-        );
-        return lang === 'ru' ? 'https://ydb.tech/docs/ru/' : 'https://ydb.tech/docs/en/';
-    };
-
     return (
         <div className={b('content', {})}>
             <div className={b('docs')}>
@@ -35,7 +25,7 @@ export function InformationPopup({onKeyboardShortcutsClick}: InformationPopupPro
                         items={[
                             {
                                 text: i18n('help-center.item.documentation'),
-                                url: getDocumentationLink(),
+                                url: 'https://ydb.tech/docs',
                             },
                         ]}
                         filterable={false}

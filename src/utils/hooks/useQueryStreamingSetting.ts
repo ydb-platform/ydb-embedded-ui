@@ -1,10 +1,10 @@
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
+import {useSetting} from '../../store/reducers/settings/useSetting';
 import {OLD_BACKEND_CLUSTER_NAMES} from '../constants';
 
 import {useClusterNameFromQuery} from './useDatabaseFromQuery';
-import {useSetting} from './useSetting';
 
-export const useQueryStreamingSetting = (): [boolean, (value: boolean) => void] => {
+export const useQueryStreamingSetting = () => {
     const clusterName = useClusterNameFromQuery();
 
     const isOldBackendCluster = clusterName && OLD_BACKEND_CLUSTER_NAMES.includes(clusterName);

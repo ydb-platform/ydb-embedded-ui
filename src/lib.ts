@@ -10,12 +10,12 @@ export {configureStore, rootReducer} from './store';
 export {default as appRoutes} from './routes';
 
 export {YdbEmbeddedAPI} from './services/api';
-export {settingsManager} from './services/settings';
 export {getUserSettings} from './containers/UserSettings/settings';
 export {setSettingValue, getSettingValue} from './store/reducers/settings/settings';
 
 export {componentsRegistry} from './components/ComponentsProvider/componentsRegistry';
-export {useSetting, useTypedSelector} from './utils/hooks';
+export {useSetting} from './store/reducers/settings/useSetting';
+export {useTypedSelector} from './utils/hooks';
 export {getMonitoringLink, getMonitoringClusterLink, parseMonitoringData} from './utils/monitoring';
 export {i18n, Lang, registerKeysets} from './utils/i18n';
 export {toaster} from './utils/createToast';

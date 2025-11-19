@@ -73,7 +73,7 @@ export const DEFAULT_USER_SETTINGS = {
     [SETTING_KEYS.ACL_SYNTAX]: AclSyntax.YdbShort,
 } as const satisfies Record<SettingKey, unknown>;
 
-export const SETTINGS_OPTIONS: Record<string, SettingOptions> = {
+export const SETTINGS_OPTIONS: Record<string, SettingOptions | undefined> = {
     [SETTING_KEYS.THEME]: {
         preventBatching: true,
     },

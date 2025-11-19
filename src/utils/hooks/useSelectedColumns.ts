@@ -2,7 +2,7 @@ import React from 'react';
 
 import type {TableColumnSetupItem, TableColumnSetupProps} from '@gravity-ui/uikit';
 
-import {settingsManager} from '../../services/settings';
+import {useSetting} from '../../store/reducers/settings/useSetting';
 
 type OrderedColumn = {id: string; selected?: boolean};
 
@@ -24,24 +24,47 @@ export const useSelectedColumns = <T extends {name: string}>(
     defaultColumnsIds: string[],
     requiredColumnsIds?: string[],
 ) => {
-    const [orderedColumns, setOrderedColumns] = React.useState(() => {
-        const savedColumns = settingsManager.readUserSettingsValue(
-            storageKey,
-            defaultColumnsIds,
-        ) as unknown[];
+    const {value: savedColumns, saveValue: saveColumns} = useSetting<string[] | OrderedColumn[]>(
+        storageKey,
+    );
 
-        const normalizedSavedColumns = savedColumns.map(parseSavedColumn);
+    const normalizeSavedColumns = React.useCallback(
+        (columnsToUse: string[] | OrderedColumn[]) => {
+            const parsedSavedColumns = columnsToUse
+                .map(parseSavedColumn)
+                .filter((column): column is OrderedColumn => Boolean(column));
 
-        return columns.reduce<OrderedColumn[]>((acc, column) => {
-            const savedColumn = normalizedSavedColumns.find((c) => c && c.id === column.name);
-            if (savedColumn) {
-                acc.push(savedColumn);
-            } else {
-                acc.push({id: column.name, selected: false});
+            const needToNormalize =
+                (columnsToUse.length && typeof columnsToUse[0] === 'string') ||
+                parsedSavedColumns.length !== columns.length;
+
+            if (needToNormalize) {
+                return columns.reduce<OrderedColumn[]>((acc, column) => {
+                    const savedColumn = parsedSavedColumns.find((c) => c && c.id === column.name);
+                    if (savedColumn) {
+                        acc.push(savedColumn);
+                    } else {
+                        acc.push({id: column.name, selected: false});
+                    }
+                    return acc;
+                }, []);
             }
-            return acc;
-        }, []);
+
+            return parsedSavedColumns;
+        },
+        [columns],
+    );
+
+    const [orderedColumns, setOrderedColumns] = React.useState(() => {
+        return normalizeSavedColumns(defaultColumnsIds);
     });
+
+    React.useEffect(() => {
+        const rawColumns = savedColumns !== undefined ? savedColumns : defaultColumnsIds;
+        const normalizedColumns = normalizeSavedColumns(rawColumns);
+
+        setOrderedColumns(normalizedColumns);
+    }, [savedColumns, defaultColumnsIds]);
 
     const columnsToSelect = React.useMemo(() => {
         const preparedColumns = orderedColumns.reduce<(TableColumnSetupItem & {column: T})[]>(
@@ -76,10 +99,10 @@ export const useSelectedColumns = <T extends {name: string}>(
         (value) => {
             const preparedColumns = value.map(({id, selected}) => ({id, selected}));
 
-            settingsManager.setUserSettingsValue(storageKey, preparedColumns);
+            saveColumns(preparedColumns);
             setOrderedColumns(preparedColumns);
         },
-        [storageKey],
+        [saveColumns],
     );
 
     return {

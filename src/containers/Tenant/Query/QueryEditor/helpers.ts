@@ -4,10 +4,10 @@ import type {AcceptEvent, DeclineEvent, IgnoreEvent, PromptFile} from '@ydb-plat
 import type Monaco from 'monaco-editor';
 
 import {codeAssistApi} from '../../../../store/reducers/codeAssist/codeAssist';
-import {selectQueriesHistory} from '../../../../store/reducers/query/query';
+import {useQueriesHistory} from '../../../../store/reducers/query/useQueriesHistory';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
+import {useSetting} from '../../../../store/reducers/settings/useSetting';
 import type {TelemetryOpenTabs} from '../../../../types/api/codeAssist';
-import {useSetting, useTypedSelector} from '../../../../utils/hooks';
 import {YQL_LANGUAGE_ID} from '../../../../utils/monaco/constats';
 import {useSavedQueries} from '../utils/useSavedQueries';
 
@@ -23,8 +23,8 @@ const EDITOR_OPTIONS: EditorOptions = {
 };
 
 export function useEditorOptions() {
-    const [enableAutocomplete] = useSetting(SETTING_KEYS.ENABLE_AUTOCOMPLETE);
-    const [autocompleteOnEnter] = useSetting(SETTING_KEYS.AUTOCOMPLETE_ON_ENTER);
+    const {value: enableAutocomplete} = useSetting(SETTING_KEYS.ENABLE_AUTOCOMPLETE);
+    const {value: autocompleteOnEnter} = useSetting(SETTING_KEYS.AUTOCOMPLETE_ON_ENTER);
 
     const options = React.useMemo<EditorOptions>(() => {
         const useAutocomplete = Boolean(enableAutocomplete);
@@ -45,7 +45,7 @@ export function useCodeAssistHelpers() {
     const [discardSuggestion] = codeAssistApi.useDiscardSuggestionMutation();
     const [ignoreSuggestion] = codeAssistApi.useIgnoreSuggestionMutation();
     const [sendUserQueriesData] = codeAssistApi.useSendUserQueriesDataMutation();
-    const historyQueries = useTypedSelector(selectQueriesHistory);
+    const {historyQueries} = useQueriesHistory();
     const {savedQueries} = useSavedQueries();
 
     const getCodeAssistSuggestions = React.useCallback(

@@ -14,8 +14,8 @@ import {ComponentsProvider} from '../../components/ComponentsProvider/Components
 import {componentsRegistry as defaultComponentsRegistry} from '../../components/ComponentsProvider/componentsRegistry';
 import type {ComponentsRegistry} from '../../components/ComponentsProvider/componentsRegistry';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
+import {useSetting} from '../../store/reducers/settings/useSetting';
 import {toaster} from '../../utils/createToast';
-import {useSetting} from '../../utils/hooks';
 
 import {AppTitleProvider} from './AppTitleContext';
 
@@ -57,7 +57,7 @@ export function Providers({
 }
 
 function Theme({children}: {children: React.ReactNode}) {
-    const [theme] = useSetting<string | undefined>(SETTING_KEYS.THEME);
+    const {value: theme} = useSetting<string | undefined>(SETTING_KEYS.THEME);
 
     return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 }
