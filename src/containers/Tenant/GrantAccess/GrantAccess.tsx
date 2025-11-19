@@ -161,8 +161,8 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
                     )}
                 </Flex>
                 {subjectSelected && (
-                    <Flex grow={1} position="relative">
-                        <LoaderWrapper loading={rightsLoading}>
+                    <LoaderWrapper loading={rightsLoading}>
+                        <Flex grow={1} position="relative" qa="access-rights-wrapper">
                             <Rights
                                 inheritedRights={inheritedRightsSet}
                                 rights={currentRightsMap}
@@ -170,8 +170,8 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
                                 handleChangeRightGetter={handleChangeRightGetter}
                                 view={rightView}
                             />
-                        </LoaderWrapper>
-                    </Flex>
+                        </Flex>
+                    </LoaderWrapper>
                 )}
             </Flex>
 
