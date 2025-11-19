@@ -3,7 +3,7 @@ import type {IconProps} from '@gravity-ui/uikit';
 import {createNextState} from '@reduxjs/toolkit';
 
 import {codeAssistBackend} from '../../store';
-import {DEFAULT_USER_SETTINGS, SETTING_KEYS} from '../../store/reducers/settings/constants';
+import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {AclSyntax, OLD_BACKEND_CLUSTER_NAMES, PAGE_IDS, SECTION_IDS} from '../../utils/constants';
 import {Lang} from '../../utils/i18n';
 
@@ -66,7 +66,6 @@ export const languageSetting: SettingProps = {
     title: i18n('settings.language.title'),
     type: 'radio',
     options: languageOptions,
-    defaultValue: DEFAULT_USER_SETTINGS[SETTING_KEYS.LANGUAGE],
     onValueUpdate: () => {
         window.location.reload();
     },

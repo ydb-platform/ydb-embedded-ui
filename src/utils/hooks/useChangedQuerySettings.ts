@@ -1,15 +1,15 @@
 import getChangedQueryExecutionSettings from '../../containers/Tenant/Query/QueryEditorControls/utils/getChangedQueryExecutionSettings';
 import getChangedQueryExecutionSettingsDescription from '../../containers/Tenant/Query/QueryEditorControls/utils/getChangedQueryExecutionSettingsDescription';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
+import {useSetting} from '../../store/reducers/settings/useSetting';
 import {WEEK_IN_SECONDS} from '../constants';
 import {DEFAULT_QUERY_SETTINGS} from '../query';
 
 import {useLastQueryExecutionSettings} from './useLastQueryExecutionSettings';
 import {useQueryExecutionSettings} from './useQueryExecutionSettings';
-import {useSetting} from './useSetting';
 
 export const useChangedQuerySettings = () => {
-    const [bannerLastClosedTimestamp, setBannerLastClosedTimestamp] = useSetting<
+    const {value: bannerLastClosedTimestamp, saveValue: setBannerLastClosedTimestamp} = useSetting<
         number | undefined
     >(SETTING_KEYS.QUERY_SETTINGS_BANNER_LAST_CLOSED);
     const [lastQuerySettings] = useLastQueryExecutionSettings();

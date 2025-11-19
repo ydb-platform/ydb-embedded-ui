@@ -17,7 +17,7 @@ interface TimeoutLabelProps {
 }
 
 export function TimeoutLabel({isDisabled, isChecked, onToggle}: TimeoutLabelProps) {
-    const [isQueryStreamingEnabled] = useQueryStreamingSetting();
+    const {value: isQueryStreamingEnabled} = useQueryStreamingSetting();
 
     if (isQueryStreamingEnabled) {
         return (

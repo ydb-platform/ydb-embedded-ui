@@ -51,9 +51,11 @@ export class YdbEmbeddedAPI {
         withCredentials = false,
         singleClusterMode = true,
         proxyMeta = false,
+        // proxyMeta = true,
         csrfTokenGetter = () => undefined,
         defaults = {},
         useRelativePath = false,
+        // useRelativePath = true,
     }: YdbEmbeddedAPIProps) {
         const axiosParams: AxiosWrapperOptions = {config: {withCredentials, ...defaults}};
         const baseApiParams = {singleClusterMode, proxyMeta, useRelativePath};

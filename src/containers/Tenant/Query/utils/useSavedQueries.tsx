@@ -2,11 +2,16 @@ import React from 'react';
 
 import {selectSavedQueriesFilter} from '../../../../store/reducers/queryActions/queryActions';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
+import {useSetting} from '../../../../store/reducers/settings/useSetting';
 import type {SavedQuery} from '../../../../types/store/query';
-import {useSetting, useTypedSelector} from '../../../../utils/hooks';
+import {useTypedSelector} from '../../../../utils/hooks';
 
 export function useSavedQueries() {
-    const [savedQueries, saveQueries] = useSetting<SavedQuery[]>(SETTING_KEYS.SAVED_QUERIES);
+    const {
+        value: savedQueries,
+        saveValue: saveQueries,
+        isLoading,
+    } = useSetting<SavedQuery[]>(SETTING_KEYS.SAVED_QUERIES);
 
     const filter = useTypedSelector(selectSavedQueriesFilter).trim().toLowerCase();
     const currentInput = useTypedSelector((state) => state.query.input);
@@ -55,7 +60,7 @@ export function useSavedQueries() {
         [savedQueries, saveQueries, currentInput],
     );
 
-    return {savedQueries, filteredSavedQueries, deleteSavedQuery, saveQuery};
+    return {savedQueries, filteredSavedQueries, deleteSavedQuery, saveQuery, isLoading};
 }
 
 function findQueryByName(query: SavedQuery, name: string) {

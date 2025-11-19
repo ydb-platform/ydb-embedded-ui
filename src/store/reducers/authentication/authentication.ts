@@ -33,6 +33,11 @@ export const slice = createSlice({
             state.user = AuthType === 'Login' ? UserSID : undefined;
             state.id = UserID;
 
+            // TODO: test, remove after
+            // state.user = 'root';
+            // state.id = 'root';
+            // TODO: test, remove after
+
             // If ydb version supports this feature,
             // There should be explicit flag in whoami response
             // Otherwise every user is allowed to make changes

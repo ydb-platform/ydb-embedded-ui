@@ -9,13 +9,9 @@ import {MonacoEditor} from '../../../../components/MonacoEditor/MonacoEditor';
 import {selectUserInput, setIsDirty} from '../../../../store/reducers/query/query';
 import {useQueriesHistory} from '../../../../store/reducers/query/useQueriesHistory';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
+import {useSetting} from '../../../../store/reducers/settings/useSetting';
 import type {QueryAction} from '../../../../types/store/query';
-import {
-    useEventHandler,
-    useSetting,
-    useTypedDispatch,
-    useTypedSelector,
-} from '../../../../utils/hooks';
+import {useEventHandler, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {YQL_LANGUAGE_ID} from '../../../../utils/monaco/constats';
 import {useUpdateErrorsHighlighting} from '../../../../utils/monaco/highlightErrors';
 import {QUERY_ACTIONS} from '../../../../utils/query';
@@ -45,12 +41,14 @@ export function YqlEditor({
     const [monacoGhostInstance, setMonacoGhostInstance] =
         React.useState<ReturnType<typeof createMonacoGhostInstance>>();
     const {historyQueries, goToPreviousQuery, goToNextQuery} = useQueriesHistory();
-    const [isCodeAssistEnabled] = useSetting(SETTING_KEYS.ENABLE_CODE_ASSISTANT);
+    const {value: isCodeAssistEnabled} = useSetting(SETTING_KEYS.ENABLE_CODE_ASSISTANT);
 
     const editorOptions = useEditorOptions();
     const updateErrorsHighlighting = useUpdateErrorsHighlighting();
 
-    const [lastUsedQueryAction] = useSetting<QueryAction>(SETTING_KEYS.LAST_USED_QUERY_ACTION);
+    const {value: lastUsedQueryAction} = useSetting<QueryAction>(
+        SETTING_KEYS.LAST_USED_QUERY_ACTION,
+    );
 
     const getLastQueryText = useEventHandler(() => {
         if (!historyQueries || historyQueries.length === 0) {

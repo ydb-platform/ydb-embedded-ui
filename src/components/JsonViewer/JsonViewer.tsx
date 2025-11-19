@@ -6,7 +6,7 @@ import DataTable from '@gravity-ui/react-data-table';
 import {ActionTooltip, Button, Flex, Icon} from '@gravity-ui/uikit';
 
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
-import {useSetting} from '../../utils/hooks';
+import {useSetting} from '../../store/reducers/settings/useSetting';
 import type {ClipboardButtonProps} from '../ClipboardButton/ClipboardButton';
 import {ClipboardButton} from '../ClipboardButton/ClipboardButton';
 
@@ -121,9 +121,8 @@ function JsonViewerComponent({
     toolbarClassName,
     withClipboardButton,
 }: JsonViewerComponentProps) {
-    const [caseSensitiveSearch, setCaseSensitiveSearch] = useSetting(
+    const {value: caseSensitiveSearch, saveValue: setCaseSensitiveSearch} = useSetting<boolean>(
         SETTING_KEYS.CASE_SENSITIVE_JSON_SEARCH,
-        false,
     );
 
     const [collapsedState, setCollapsedState] = React.useState<CollapsedState>(() => {

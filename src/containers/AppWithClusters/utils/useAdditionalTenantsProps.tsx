@@ -2,11 +2,11 @@ import {isNil} from 'lodash';
 
 import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
 import {SETTING_KEYS} from '../../../store/reducers/settings/constants';
+import {useSetting} from '../../../store/reducers/settings/useSetting';
 import type {AdditionalTenantsProps} from '../../../types/additionalProps';
 import type {ETenantType} from '../../../types/api/tenant';
 import type {GetDatabaseLinks} from '../../../uiFactory/types';
 import {uiFactory} from '../../../uiFactory/uiFactory';
-import {useSetting} from '../../../utils/hooks';
 import type {GetLogsLink} from '../../../utils/logs';
 import type {GetMonitoringLink} from '../../../utils/monitoring';
 import {prepareBackendFromBalancer} from '../../../utils/parseBalancer';
@@ -23,7 +23,7 @@ export function useAdditionalTenantsProps({
     getDatabaseLinks,
 }: GetAdditionalTenantsProps) {
     const clusterInfo = useClusterBaseInfo();
-    const [useClusterBalancerAsBackend] = useSetting<boolean>(
+    const {value: useClusterBalancerAsBackend} = useSetting<boolean>(
         SETTING_KEYS.USE_CLUSTER_BALANCER_AS_BACKEND,
     );
 

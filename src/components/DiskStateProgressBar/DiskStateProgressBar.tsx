@@ -1,9 +1,9 @@
 import React from 'react';
 
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
+import {useSetting} from '../../store/reducers/settings/useSetting';
 import {cn} from '../../utils/cn';
 import {getSeverityColor} from '../../utils/disks/helpers';
-import {useSetting} from '../../utils/hooks';
 
 import './DiskStateProgressBar.scss';
 
@@ -30,7 +30,7 @@ export function DiskStateProgressBar({
     content,
     className,
 }: DiskStateProgressBarProps) {
-    const [inverted] = useSetting<boolean | undefined>(SETTING_KEYS.INVERTED_DISKS);
+    const {value: inverted} = useSetting<boolean | undefined>(SETTING_KEYS.INVERTED_DISKS);
 
     const mods: Record<string, boolean | undefined> = {inverted, compact, faded, empty, inactive};
 

@@ -1,12 +1,8 @@
 import React from 'react';
 
-import {
-    useEventHandler,
-    useSetting,
-    useTypedDispatch,
-    useTypedSelector,
-} from '../../../utils/hooks';
+import {useEventHandler, useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 import {SETTING_KEYS} from '../settings/constants';
+import {useSetting} from '../settings/useSetting';
 
 import {changeUserInput, selectQueriesHistoryFilter} from './query';
 import type {QueryInHistory, QueryStats} from './types';
@@ -18,9 +14,11 @@ export function useQueriesHistory() {
     const dispatch = useTypedDispatch();
     const queriesFilter = useTypedSelector(selectQueriesHistoryFilter);
 
-    const [savedHistoryQueries, saveHistoryQueries] = useSetting<QueryInHistory[]>(
-        SETTING_KEYS.QUERIES_HISTORY,
-    );
+    const {
+        value: savedHistoryQueries,
+        saveValue: saveHistoryQueries,
+        isLoading,
+    } = useSetting<QueryInHistory[]>(SETTING_KEYS.QUERIES_HISTORY);
 
     const [historyQueries, setQueries] = React.useState<QueryInHistory[]>([]);
     const [historyCurrentIndex, setCurrentIndex] = React.useState(-1);
@@ -121,5 +119,6 @@ export function useQueriesHistory() {
         goToNextQuery,
         saveQueryToHistory,
         updateQueryInHistory,
+        isLoading,
     };
 }

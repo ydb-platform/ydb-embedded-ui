@@ -9,13 +9,13 @@ import {
 } from '../../../store/reducers/capabilities/hooks';
 import type {ClusterGroupsStats} from '../../../store/reducers/cluster/types';
 import {SETTING_KEYS} from '../../../store/reducers/settings/constants';
+import {useSetting} from '../../../store/reducers/settings/useSetting';
 import type {AdditionalClusterProps} from '../../../types/additionalProps';
 import {isClusterInfoV2, isClusterInfoV5} from '../../../types/api/cluster';
 import type {TClusterInfo} from '../../../types/api/cluster';
 import type {IResponseError} from '../../../types/api/error';
 import {valueIsDefined} from '../../../utils';
 import {useResizeObserverTrigger} from '../../../utils/hooks/useResizeObserverTrigger';
-import {useSetting} from '../../../utils/hooks/useSetting';
 import {ClusterInfo} from '../ClusterInfo/ClusterInfo';
 import i18n from '../i18n';
 import {getTotalStorageGroupsUsed} from '../utils';
@@ -41,7 +41,7 @@ interface ClusterOverviewProps {
 }
 
 export function ClusterOverview(props: ClusterOverviewProps) {
-    const [expandDashboard, setExpandDashboard] = useSetting<boolean>(
+    const {value: expandDashboard, saveValue: setExpandDashboard} = useSetting<boolean>(
         SETTING_KEYS.EXPAND_CLUSTER_DASHBOARD,
     );
 

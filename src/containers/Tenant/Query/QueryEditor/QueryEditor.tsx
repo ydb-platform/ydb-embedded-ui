@@ -21,6 +21,7 @@ import {useQueriesHistory} from '../../../../store/reducers/query/useQueriesHist
 import {setQueryAction} from '../../../../store/reducers/queryActions/queryActions';
 import {selectShowPreview, setShowPreview} from '../../../../store/reducers/schema/schema';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
+import {useSetting} from '../../../../store/reducers/settings/useSetting';
 import type {EPathSubType, EPathType} from '../../../../types/api/schema';
 import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
@@ -32,7 +33,6 @@ import {
     useEventHandler,
     useQueryExecutionSettings,
     useQueryStreamingSetting,
-    useSetting,
     useTypedDispatch,
     useTypedSelector,
 } from '../../../../utils/hooks';
@@ -88,13 +88,12 @@ export default function QueryEditor(props: QueryEditorProps) {
         useLastQueryExecutionSettings();
     const {resetBanner} = useChangedQuerySettings();
 
-    const [lastUsedQueryAction, setLastUsedQueryAction] = useSetting<QueryAction>(
+    const {value: lastUsedQueryAction, saveValue: setLastUsedQueryAction} = useSetting<QueryAction>(
         SETTING_KEYS.LAST_USED_QUERY_ACTION,
     );
     const [lastExecutedQueryText, setLastExecutedQueryText] = React.useState<string>('');
-    const [isQueryStreamingEnabled] = useQueryStreamingSetting();
-
-    const [binaryDataInPlainTextDisplay] = useSetting<boolean>(
+    const {value: isQueryStreamingEnabled} = useQueryStreamingSetting();
+    const {value: binaryDataInPlainTextDisplay} = useSetting<boolean>(
         SETTING_KEYS.BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
     );
 

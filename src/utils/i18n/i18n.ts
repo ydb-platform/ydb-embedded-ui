@@ -7,8 +7,6 @@ enum Lang {
     Ru = 'ru',
 }
 
-const defaultLang = Lang.En;
-
 // Disable russian language while it is not properly supported
 // Force English locale for users who previously selected Russian when the setting was available
 // const currentLang = settingsManager.readUserSettingsValue(LANGUAGE_KEY, defaultLang) as Lang;
@@ -33,4 +31,4 @@ export function registerKeysets<Keyset extends KeysData>(id: string, data: Recor
     return i18n.keyset<Keys>(id);
 }
 
-export {i18n, Lang, currentLang, defaultLang};
+export {i18n, Lang, currentLang};

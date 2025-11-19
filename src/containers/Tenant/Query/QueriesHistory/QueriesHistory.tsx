@@ -36,7 +36,7 @@ interface QueriesHistoryProps {
 function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
     const dispatch = useTypedDispatch();
 
-    const {filteredHistoryQueries} = useQueriesHistory();
+    const {filteredHistoryQueries, isLoading} = useQueriesHistory();
 
     const reversedHistory = React.useMemo(() => {
         return [...filteredHistoryQueries].reverse();
@@ -102,6 +102,7 @@ function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
                 <ResizeableDataTable
                     columnsWidthLSKey={QUERIES_HISTORY_COLUMNS_WIDTH_LS_KEY}
                     columns={columns}
+                    isLoading={isLoading}
                     data={reversedHistory}
                     settings={QUERY_TABLE_SETTINGS}
                     emptyDataMessage={i18n(filter ? 'history.empty-search' : 'history.empty')}

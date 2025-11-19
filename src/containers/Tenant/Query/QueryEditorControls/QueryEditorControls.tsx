@@ -21,7 +21,7 @@ const b = cn('ydb-query-editor-controls');
 interface QueryEditorControlsProps {
     isLoading: boolean;
     disabled?: boolean;
-    highlightedAction: QueryAction;
+    highlightedAction?: QueryAction;
     queryId?: string;
     database: string;
     isStreamingEnabled?: boolean;

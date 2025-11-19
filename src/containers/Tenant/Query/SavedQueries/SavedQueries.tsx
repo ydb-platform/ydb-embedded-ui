@@ -67,7 +67,7 @@ interface SavedQueriesProps {
 }
 
 export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
-    const {filteredSavedQueries, deleteSavedQuery} = useSavedQueries();
+    const {filteredSavedQueries, deleteSavedQuery, isLoading} = useSavedQueries();
     const dispatch = useTypedDispatch();
     const filter = useTypedSelector(selectSavedQueriesFilter);
 
@@ -157,6 +157,7 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
                     <ResizeableDataTable
                         columnsWidthLSKey={SAVED_QUERIES_COLUMNS_WIDTH_LS_KEY}
                         columns={columns}
+                        isLoading={isLoading}
                         data={filteredSavedQueries}
                         settings={QUERY_TABLE_SETTINGS}
                         emptyDataMessage={i18n(filter ? 'history.empty-search' : 'saved.empty')}

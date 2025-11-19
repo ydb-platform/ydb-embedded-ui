@@ -1,44 +1,44 @@
 import React from 'react';
 
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
-
-import {useSetting} from './useSetting';
+import {useSetting} from '../../store/reducers/settings/useSetting';
 
 const IMMEDIATE_UPDATE_INTERVAL = 1;
 const DISABLED_INTERVAL = 0;
 
 export function useAutoRefreshInterval(): [number, (value: number) => void] {
-    const [settingValue, setSettingValue] = useSetting(
+    const {value, saveValue: setSettingValue} = useSetting<number>(
         SETTING_KEYS.AUTO_REFRESH_INTERVAL,
-        DISABLED_INTERVAL,
     );
+    const intervalValue = value ?? DISABLED_INTERVAL;
+
     const [effectiveInterval, setEffectiveInterval] = React.useState(
-        document.visibilityState === 'visible' ? settingValue : DISABLED_INTERVAL,
+        document.visibilityState === 'visible' ? intervalValue : DISABLED_INTERVAL,
     );
 
     const lastHiddenTimeRef = React.useRef<number | null>(null);
 
     React.useEffect(() => {
-        setEffectiveInterval(document.visibilityState === 'visible' ? settingValue : 0);
+        setEffectiveInterval(document.visibilityState === 'visible' ? intervalValue : 0);
 
         const handleVisibilityChange = () => {
             const isVisible = document.visibilityState === 'visible';
             if (isVisible) {
-                // If more than settingValue milliseconds have passed since the page was hidden,
+                // If more than intervalValue milliseconds have passed since the page was hidden,
                 // trigger an immediate update
                 const shouldTriggerImmediate =
                     lastHiddenTimeRef.current &&
-                    settingValue !== DISABLED_INTERVAL &&
-                    Date.now() - lastHiddenTimeRef.current >= settingValue;
+                    intervalValue !== DISABLED_INTERVAL &&
+                    Date.now() - lastHiddenTimeRef.current >= intervalValue;
 
                 if (shouldTriggerImmediate) {
                     setEffectiveInterval(IMMEDIATE_UPDATE_INTERVAL);
 
                     setTimeout(() => {
-                        setEffectiveInterval(settingValue);
+                        setEffectiveInterval(intervalValue);
                     }, 0);
                 } else {
-                    setEffectiveInterval(settingValue);
+                    setEffectiveInterval(intervalValue);
                 }
 
                 lastHiddenTimeRef.current = null;
@@ -50,7 +50,7 @@ export function useAutoRefreshInterval(): [number, (value: number) => void] {
 
         document.addEventListener('visibilitychange', handleVisibilityChange);
         return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-    }, [settingValue]);
+    }, [intervalValue]);
 
     return [effectiveInterval, setSettingValue];
 }
