@@ -83,34 +83,45 @@ export function useQueriesHistory() {
     });
 
     const saveQueryToHistory = useEventHandler((queryText: string, queryId: string) => {
-        const newQueries = [...historyQueries, {queryText, queryId}].slice(
-            historyQueries.length >= MAXIMUM_QUERIES_IN_HISTORY ? 1 : 0,
-        );
-        saveHistoryQueries(newQueries);
-        setQueries(newQueries);
-        // Update currentIndex to point to the newly added query
-        const newCurrentIndex = newQueries.length - 1;
-        setCurrentIndex(newCurrentIndex);
+        setQueries((currentQueries) => {
+            const newQueries = [...currentQueries, {queryText, queryId}].slice(
+                historyQueries.length >= MAXIMUM_QUERIES_IN_HISTORY ? 1 : 0,
+            );
+            saveHistoryQueries(newQueries);
+
+            // Update currentIndex to point to the newly added query
+            const newCurrentIndex = newQueries.length - 1;
+            setCurrentIndex(newCurrentIndex);
+
+            return newQueries;
+        });
     });
 
     const updateQueryInHistory = useEventHandler((queryId: string, stats: QueryStats) => {
-        if (!stats || !historyQueries.length) {
+        if (!stats) {
             return;
         }
 
-        const index = historyQueries.findIndex((item) => item.queryId === queryId);
+        setQueries((currentQueries) => {
+            if (!currentQueries.length) {
+                return currentQueries;
+            }
 
-        if (index !== -1) {
-            const newQueries = [...historyQueries];
-            const {durationUs, endTime} = stats;
-            newQueries.splice(index, 1, {
-                ...historyQueries[index],
-                durationUs,
-                endTime,
-            });
-            saveHistoryQueries(newQueries);
-            setQueries(newQueries);
-        }
+            const index = currentQueries.findIndex((item) => item.queryId === queryId);
+
+            if (index !== -1) {
+                const newQueries = [...currentQueries];
+                const {durationUs, endTime} = stats;
+                newQueries.splice(index, 1, {
+                    ...currentQueries[index],
+                    durationUs,
+                    endTime,
+                });
+                saveHistoryQueries(newQueries);
+                return newQueries;
+            }
+            return currentQueries;
+        });
     });
 
     return {
