@@ -1,6 +1,8 @@
 import React from 'react';
 
-import {Flex, Label} from '@gravity-ui/uikit';
+import {ArrowsRotateLeft, BucketPaint} from '@gravity-ui/icons';
+import type {IconData, LabelProps} from '@gravity-ui/uikit';
+import {Flex} from '@gravity-ui/uikit';
 
 import {useVDiskPagePath} from '../../routes';
 import {selectNodesMap} from '../../store/reducers/nodesList';
@@ -63,8 +65,12 @@ const prepareUnavailableVDiskData = (data: UnavailableDonor, withDeveloperUILink
         });
 
         vdiskData.push({
-            label: vDiskPopupKeyset('label_links'),
-            value: <LinkWithIcon title={'Developer UI'} url={vDiskInternalViewerPath} />,
+            label: null,
+            value: (
+                <div className={b('links')}>
+                    <LinkWithIcon title={'Developer UI'} url={vDiskInternalViewerPath} />
+                </div>
+            ),
         });
     }
 
@@ -97,10 +103,12 @@ const prepareVDiskData = (
         ReadThroughput,
         WriteThroughput,
         StoragePoolName,
+        Donors,
+        DonorMode,
+        Recipient,
     } = data;
 
     const vdiskData: InfoViewerItem[] = [
-        {label: vDiskPopupKeyset('label_vdisk'), value: StringifiedId},
         {
             label: vDiskPopupKeyset('label_state'),
             value: VDiskState ?? vDiskPopupKeyset('context_not-available'),
@@ -109,6 +117,61 @@ const prepareVDiskData = (
 
     if (StoragePoolName) {
         vdiskData.push({label: vDiskPopupKeyset('label_storage-pool'), value: StoragePoolName});
+    }
+
+    if (Donors?.length && getVDiskLinkFn) {
+        vdiskData.push({
+            label: vDiskPopupKeyset('label_donors'),
+            value: (
+                <Flex direction="column">
+                    {Donors.map((donor) => {
+                        if (!valueIsDefined(donor.NodeId) || !valueIsDefined(donor.StringifiedId)) {
+                            return (
+                                <div key={donor.StringifiedId}>
+                                    {donor.StringifiedId ?? EMPTY_DATA_PLACEHOLDER}
+                                </div>
+                            );
+                        }
+
+                        return (
+                            <InternalLink
+                                key={donor.StringifiedId}
+                                to={getVDiskLinkFn({
+                                    nodeId: donor.NodeId,
+                                    vDiskId: donor.StringifiedId,
+                                })}
+                            >
+                                {vDiskPopupKeyset('label_vdisk')} {donor.StringifiedId}
+                            </InternalLink>
+                        );
+                    })}
+                </Flex>
+            ),
+        });
+    }
+
+    if (DonorMode && Recipient && getVDiskLinkFn) {
+        let recipientContent: React.ReactNode;
+
+        if (valueIsDefined(Recipient.NodeId) && valueIsDefined(Recipient.StringifiedId)) {
+            const recipientPath = getVDiskLinkFn({
+                nodeId: Recipient.NodeId,
+                vDiskId: Recipient.StringifiedId,
+            });
+
+            recipientContent = recipientPath ? (
+                <InternalLink to={recipientPath}>
+                    {vDiskPopupKeyset('label_vdisk')} {Recipient.StringifiedId}
+                </InternalLink>
+            ) : (
+                <div>{Recipient.StringifiedId}</div>
+            );
+        }
+
+        vdiskData.push({
+            label: vDiskPopupKeyset('label_recipient'),
+            value: recipientContent,
+        });
     }
 
     if (SatisfactionRank && SatisfactionRank.FreshRank?.Flag !== EFlag.Green) {
@@ -212,9 +275,9 @@ const prepareVDiskData = (
         const vDiskPagePath = getVDiskLinkFn?.({nodeId: NodeId, vDiskId: StringifiedId});
         if (vDiskPagePath) {
             vdiskData.push({
-                label: vDiskPopupKeyset('label_links'),
+                label: null,
                 value: (
-                    <Flex wrap="wrap" gap={2}>
+                    <Flex className={b('links')} wrap="wrap" gap={2}>
                         <LinkWithIcon
                             key={vDiskPagePath}
                             title={vDiskInfoKeyset('vdisk-page')}
@@ -267,29 +330,42 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
         [data, nodeData, isFullData, isUserAllowedToMakeChanges],
     );
 
-    const donorsInfo: InfoViewerItem[] = [];
-    if ('Donors' in data && data.Donors) {
-        const donors = data.Donors;
-        for (const donor of donors) {
-            donorsInfo.push({
-                label: vDiskPopupKeyset('label_vdisk'),
-                value: (
-                    <InternalLink
-                        to={getVDiskLink({nodeId: donor.NodeId, vDiskId: donor.StringifiedId})}
-                    >
-                        {donor.StringifiedId}
-                    </InternalLink>
-                ),
-            });
-        }
+    const vdiskId = isFullVDiskData(data) ? data.StringifiedId : undefined;
+
+    const labelConfig: {
+        showLabel: boolean;
+        labelText?: string;
+        labelIcon?: IconData;
+        labelTheme?: LabelProps['theme'];
+    } = {
+        showLabel: false,
+    };
+
+    if (data.DonorMode) {
+        labelConfig.showLabel = true;
+        labelConfig.labelText = vDiskPopupKeyset('label_donor');
+        labelConfig.labelIcon = BucketPaint;
+        labelConfig.labelTheme = 'unknown';
+    } else if (isFullVDiskData(data) && !data.Replicated) {
+        labelConfig.showLabel = true;
+        labelConfig.labelText = vDiskPopupKeyset('label_replication');
+        labelConfig.labelIcon = ArrowsRotateLeft;
+        labelConfig.labelTheme = 'info';
     }
 
     return (
         <div className={b()}>
-            {data.DonorMode && <Label className={b('donor-label')}>Donor</Label>}
-            <InfoViewer title="VDisk" info={vdiskInfo} size="s" />
+            <InfoViewer
+                title="VDisk"
+                titleSuffix={vdiskId ?? EMPTY_DATA_PLACEHOLDER}
+                info={vdiskInfo}
+                size="s"
+                showLabel={labelConfig.showLabel}
+                labelText={labelConfig.labelText}
+                labelTheme={labelConfig.labelTheme}
+                labelIcon={labelConfig.labelIcon}
+            />
             {pdiskInfo && isViewerUser && <InfoViewer title="PDisk" info={pdiskInfo} size="s" />}
-            {donorsInfo.length > 0 && <InfoViewer title="Donors" info={donorsInfo} size="s" />}
         </div>
     );
 };

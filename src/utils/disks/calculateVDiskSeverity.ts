@@ -13,12 +13,13 @@ export function calculateVDiskSeverity<
         VDiskState?: EVDiskState;
         FrontQueues?: EFlag;
         Replicated?: boolean;
+        DonorMode?: boolean;
     },
 >(vDisk: T) {
-    const {DiskSpace, VDiskState, FrontQueues, Replicated} = vDisk;
+    const {DiskSpace, VDiskState, FrontQueues, Replicated, DonorMode} = vDisk;
 
     // if the disk is not available, this determines its status severity regardless of other features
-    if (!VDiskState) {
+    if (!VDiskState || DonorMode) {
         return NOT_AVAILABLE_SEVERITY;
     }
 

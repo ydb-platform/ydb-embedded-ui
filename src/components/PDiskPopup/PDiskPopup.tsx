@@ -5,6 +5,7 @@ import {Flex} from '@gravity-ui/uikit';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
 import {valueIsDefined} from '../../utils';
+import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {createPDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import type {PreparedPDisk} from '../../utils/disks/types';
@@ -18,6 +19,10 @@ import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {pDiskInfoKeyset} from '../PDiskInfo/i18n';
 import {PDiskPageLink} from '../PDiskPageLink/PDiskPageLink';
 
+import './PDiskPopup.scss';
+
+const b = cn('pdisk-storage-popup');
+
 const errorColors = [EFlag.Orange, EFlag.Red, EFlag.Yellow];
 
 export const preparePDiskData = (
@@ -25,24 +30,9 @@ export const preparePDiskData = (
     nodeData?: {Host?: string; DC?: string},
     withDeveloperUILink?: boolean,
 ) => {
-    const {
-        AvailableSize,
-        TotalSize,
-        State,
-        PDiskId,
-        NodeId,
-        StringifiedId,
-        Path,
-        Realtime,
-        Type,
-        Device,
-    } = data;
+    const {AvailableSize, TotalSize, State, PDiskId, NodeId, Path, Realtime, Type, Device} = data;
 
     const pdiskData: InfoViewerItem[] = [
-        {
-            label: 'PDisk',
-            value: StringifiedId ?? EMPTY_DATA_PLACEHOLDER,
-        },
         {label: 'State', value: State || 'not available'},
         {label: 'Type', value: Type || 'unknown'},
     ];
@@ -84,9 +74,9 @@ export const preparePDiskData = (
         });
 
         pdiskData.push({
-            label: 'Links',
+            label: null,
             value: (
-                <Flex gap={2} wrap="wrap">
+                <Flex className={b('links')} gap={2} wrap="wrap">
                     <PDiskPageLink pDiskId={PDiskId} nodeId={NodeId} />
                     <LinkWithIcon
                         title={pDiskInfoKeyset('developer-ui')}
@@ -114,5 +104,14 @@ export const PDiskPopup = ({data}: PDiskPopupProps) => {
         [data, nodeData, isUserAllowedToMakeChanges],
     );
 
-    return <InfoViewer title="PDisk" info={info} size="s" />;
+    const pdiskId = data.StringifiedId;
+
+    return (
+        <InfoViewer
+            title="PDisk"
+            titleSuffix={pdiskId ?? EMPTY_DATA_PLACEHOLDER}
+            info={info}
+            size="s"
+        />
+    );
 };

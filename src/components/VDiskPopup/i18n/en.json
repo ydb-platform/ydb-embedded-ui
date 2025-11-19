@@ -2,6 +2,7 @@
   "context_not-available": "not available",
   "label_state": "State",
   "label_storage-pool": "StoragePool",
+  "label_donors": "Donors",
   "label_node-id": "NodeId",
   "label_pdisk-id": "PDiskId",
   "label_vslot-id": "VSlotId",
@@ -17,5 +18,9 @@
   "label_unsync-vdisks": "UnsyncVDisks",
   "label_allocated": "Allocated",
   "label_read": "Read",
-  "label_write": "Write"
+  "label_write": "Write",
+
+  "label_donor": "Donor",
+  "label_replication": "Replication",
+  "label_recipient": "Recipient"
 }

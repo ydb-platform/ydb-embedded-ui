@@ -11,11 +11,14 @@ import type {
 } from '../../../types/api/storage';
 import {EVDiskState} from '../../../types/api/vdisk';
 import type {TVDiskStateInfo} from '../../../types/api/vdisk';
+import {valueIsDefined} from '../../../utils';
+import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
 import {getColorSeverity, getSeverityColor} from '../../../utils/disks/helpers';
 import {
     prepareWhiteboardPDiskData,
     prepareWhiteboardVDiskData,
 } from '../../../utils/disks/prepareDisks';
+import type {PreparedVDisk} from '../../../utils/disks/types';
 import {prepareNodeSystemState} from '../../../utils/nodes';
 import {getUsage} from '../../../utils/storage';
 import {parseUsToMs} from '../../../utils/timeParsers';
@@ -275,6 +278,77 @@ export const calculateMaximumDisksPerNode = (
     return maxDisks;
 };
 
+// We need custom key (can't use StringifiedId) because for array of donors in replication's object
+// we have only nodeId, pDiskId, vDiskSlotId -> 3 parameters instead of 5
+const makeVDiskLocationKey = (
+    nodeId?: number,
+    pDiskId?: number,
+    vDiskSlotId?: number,
+): string | undefined => {
+    if (!valueIsDefined(nodeId) || !valueIsDefined(pDiskId) || !valueIsDefined(vDiskSlotId)) {
+        return undefined;
+    }
+
+    return stringifyVdiskId({
+        NodeId: nodeId,
+        PDiskId: pDiskId,
+        VSlotId: vDiskSlotId,
+    });
+};
+
+// Attaches recipient references to donor VDisks based on their Donors relations
+const attachRecipientsToDonors = (nodes: PreparedStorageNode[] | undefined) => {
+    if (!nodes?.length) {
+        return;
+    }
+
+    const vdiskByLocation = new Map<string, PreparedVDisk>();
+
+    nodes.forEach((node) => {
+        node.VDisks?.forEach((vdisk) => {
+            const key = makeVDiskLocationKey(vdisk.NodeId, vdisk.PDiskId, vdisk.VDiskSlotId);
+
+            if (key) {
+                vdiskByLocation.set(key, vdisk);
+            }
+        });
+    });
+
+    nodes.forEach((node) => {
+        node.VDisks?.forEach((replication) => {
+            if (replication.Replicated || !replication.Donors?.length) {
+                return;
+            }
+
+            replication.Donors.forEach((donorRef) => {
+                const key = makeVDiskLocationKey(
+                    donorRef.NodeId,
+                    donorRef.PDiskId,
+                    donorRef.VDiskSlotId,
+                );
+
+                if (!key) {
+                    return;
+                }
+
+                const donor = vdiskByLocation.get(key);
+                if (!donor) {
+                    return;
+                }
+
+                donor.Recipient = {
+                    NodeId: replication.NodeId,
+                    StringifiedId: replication.StringifiedId,
+                };
+
+                // Keep the Donors item in sync with the real donor VDisk: reuse its StringifiedId
+                // instead of the local slot-based id.
+                donorRef.StringifiedId = donor.StringifiedId;
+            });
+        });
+    });
+};
+
 // ==== Prepare responses ====
 
 export const prepareStorageNodesResponse = (data: TNodesInfo): PreparedStorageResponse => {
@@ -296,6 +370,8 @@ export const prepareStorageNodesResponse = (data: TNodesInfo): PreparedStorageRe
     const preparedNodes = Nodes?.map((node) =>
         prepareStorageNodeData(node, maxSlotsPerDisk, maxDisksPerNode),
     );
+
+    attachRecipientsToDonors(preparedNodes);
 
     return {
         nodes: preparedNodes,

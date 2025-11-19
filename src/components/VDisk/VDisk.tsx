@@ -1,4 +1,9 @@
+import {BucketPaint} from '@gravity-ui/icons';
+import {Icon} from '@gravity-ui/uikit';
+
+import {useStorageQueryParams} from '../../containers/Storage/useStorageQueryParams';
 import {useVDiskPagePath} from '../../routes';
+import {STORAGE_TYPES} from '../../store/reducers/storage/constants';
 import {cn} from '../../utils/cn';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {DiskStateProgressBar} from '../DiskStateProgressBar/DiskStateProgressBar';
@@ -33,8 +38,18 @@ export const VDisk = ({
     delayClose,
     delayOpen,
 }: VDiskProps) => {
+    const {storageType} = useStorageQueryParams();
+    const isGroupView = storageType === STORAGE_TYPES.groups;
+
     const getVDiskLink = useVDiskPagePath();
     const vDiskPath = getVDiskLink({nodeId: data.NodeId, vDiskId: data.StringifiedId});
+
+    // Donor and replicating Vdisks have similar data.replicated and data.VDiskState params
+    const isNotReplicating = data.Replicated === false && data.VDiskState === 'OK';
+    // The difference is only in data.donorMode
+    const isDonor = data.DonorMode;
+
+    const isDonorIconShow = isGroupView && isDonor;
 
     return (
         <HoverPopup
@@ -53,7 +68,16 @@ export const VDisk = ({
                         severity={data.Severity}
                         compact={compact}
                         inactive={inactive}
+                        striped={isNotReplicating || isDonor}
+                        faded={isNotReplicating || isDonor}
                         className={progressBarClassName}
+                        content={
+                            isDonorIconShow ? (
+                                <div className={b('donor-icon')}>
+                                    <Icon data={BucketPaint} size={12} />
+                                </div>
+                            ) : null
+                        }
                     />
                 </InternalLink>
             </div>
