@@ -1,6 +1,9 @@
 import type {SettingValue} from '../../../types/api/settings';
 import {parseJson} from '../../../utils/utils';
 
+import type {SettingKey} from './constants';
+import {DEFAULT_USER_SETTINGS, SETTINGS_OPTIONS} from './constants';
+
 export function stringifySettingValue<T>(value?: T): string {
     return typeof value === 'string' ? value : JSON.stringify(value);
 }
@@ -33,4 +36,10 @@ export function setSettingValueToLS(name: string | undefined, value: unknown): v
         const preparedValue = stringifySettingValue(value);
         localStorage.setItem(name, preparedValue);
     } catch {}
+}
+export function getSettingDefault(name: string) {
+    return DEFAULT_USER_SETTINGS[name as SettingKey];
+}
+export function shouldSyncSettingToLS(name: string) {
+    return !SETTINGS_OPTIONS[name]?.preventSyncWithLS;
 }

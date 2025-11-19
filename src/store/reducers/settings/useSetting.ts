@@ -1,22 +1,10 @@
 import React from 'react';
 
-import {skipToken} from '@reduxjs/toolkit/query';
-
-import {uiFactory} from '../../../uiFactory/uiFactory';
-import {useTypedDispatch} from '../../../utils/hooks/useTypedDispatch';
 import {useTypedSelector} from '../../../utils/hooks/useTypedSelector';
 import {selectID, selectUser} from '../authentication/authentication';
 
 import {settingsApi} from './api';
-import type {SettingKey} from './constants';
-import {DEFAULT_USER_SETTINGS, SETTINGS_OPTIONS} from './constants';
-import {getSettingValue, setSettingValue} from './settings';
-import {
-    parseSettingValue,
-    readSettingValueFromLS,
-    setSettingValueToLS,
-    stringifySettingValue,
-} from './utils';
+import {getSettingValue} from './settings';
 
 type SaveSettingValue<T> = (value: T | undefined) => void;
 
@@ -25,70 +13,21 @@ export function useSetting<T>(name?: string): {
     saveValue: SaveSettingValue<T>;
     isLoading: boolean;
 } {
-    const dispatch = useTypedDispatch();
-
-    const preventSyncWithLS = Boolean(name && SETTINGS_OPTIONS[name]?.preventSyncWithLS);
-
     const settingValue = useTypedSelector((state) => getSettingValue(state, name)) as T | undefined;
 
     const authUserSID = useTypedSelector(selectUser);
     const anonymousUserId = useTypedSelector(selectID);
-
     const user = authUserSID || anonymousUserId;
-    const shouldUseMetaSettings = uiFactory.useMetaSettings && user && name;
 
-    const shouldUseOnlyExternalSettings = shouldUseMetaSettings && preventSyncWithLS;
-
-    const params = React.useMemo(() => {
-        return shouldUseMetaSettings ? {user, name} : skipToken;
-    }, [shouldUseMetaSettings, user, name]);
-
-    const {currentData: metaSetting, isLoading: isSettingLoading} =
-        settingsApi.useGetSingleSettingQuery(params);
+    const {isLoading} = settingsApi.useGetSingleSettingQuery({user, name});
 
     const [setMetaSetting] = settingsApi.useSetSingleSettingMutation();
 
-    // Add loading state to settings that are stored externally
-    const isLoading = shouldUseMetaSettings ? isSettingLoading : false;
-
-    // Load initial value
-    React.useEffect(() => {
-        let value = name ? (DEFAULT_USER_SETTINGS[name as SettingKey] as T | undefined) : undefined;
-
-        if (!shouldUseOnlyExternalSettings) {
-            const savedValue = readSettingValueFromLS<T>(name);
-            value = savedValue ?? value;
-        }
-
-        dispatch(setSettingValue(name, value));
-    }, [name, shouldUseOnlyExternalSettings, dispatch]);
-
-    // Sync value from backend with LS and store
-    React.useEffect(() => {
-        if (shouldUseMetaSettings && metaSetting?.value) {
-            if (!shouldUseOnlyExternalSettings) {
-                setSettingValueToLS(name, metaSetting.value);
-            }
-            const parsedValue = parseSettingValue<T>(metaSetting.value);
-            dispatch(setSettingValue(name, parsedValue));
-        }
-    }, [shouldUseMetaSettings, shouldUseOnlyExternalSettings, metaSetting, name, dispatch]);
-
     const saveValue = React.useCallback<SaveSettingValue<T>>(
         (value) => {
-            if (shouldUseMetaSettings) {
-                setMetaSetting({
-                    user,
-                    name: name,
-                    value: stringifySettingValue(value),
-                });
-            }
-
-            if (!shouldUseOnlyExternalSettings) {
-                setSettingValueToLS(name, value);
-            }
+            setMetaSetting({user, name: name, value: value});
         },
-        [shouldUseMetaSettings, shouldUseOnlyExternalSettings, user, name, setMetaSetting],
+        [user, name, setMetaSetting],
     );
 
     return {value: settingValue, saveValue, isLoading} as const;
