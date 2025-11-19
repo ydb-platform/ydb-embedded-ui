@@ -1,9 +1,7 @@
 import React from 'react';
 
 import {skipToken} from '@reduxjs/toolkit/query';
-import {debounce} from 'lodash';
 
-import type {SetSingleSettingParams} from '../../../types/api/settings';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 import {useTypedDispatch} from '../../../utils/hooks/useTypedDispatch';
 import {useTypedSelector} from '../../../utils/hooks/useTypedSelector';
@@ -22,15 +20,11 @@ import {
 
 type SaveSettingValue<T> = (value: T | undefined) => void;
 
-interface UseSettingOptions {
-    /** Time before setting will be set */
-    debounceTime?: number;
-}
-
-export function useSetting<T>(
-    name?: string,
-    {debounceTime = 0}: UseSettingOptions = {},
-): {value: T | undefined; saveValue: SaveSettingValue<T>; isLoading: boolean} {
+export function useSetting<T>(name?: string): {
+    value: T | undefined;
+    saveValue: SaveSettingValue<T>;
+    isLoading: boolean;
+} {
     const dispatch = useTypedDispatch();
 
     const preventSyncWithLS = Boolean(name && SETTINGS_OPTIONS[name]?.preventSyncWithLS);
@@ -80,23 +74,10 @@ export function useSetting<T>(
         }
     }, [shouldUseMetaSettings, shouldUseOnlyExternalSettings, metaSetting, name, dispatch]);
 
-    const debouncedSetMetaSetting = React.useMemo(
-        () =>
-            debounce((params: SetSingleSettingParams) => {
-                setMetaSetting(params);
-            }, debounceTime),
-        [debounceTime, setMetaSetting],
-    );
-
-    // Call debounced func on component unmount
-    React.useEffect(() => {
-        return () => debouncedSetMetaSetting.flush();
-    }, [debouncedSetMetaSetting]);
-
     const saveValue = React.useCallback<SaveSettingValue<T>>(
         (value) => {
             if (shouldUseMetaSettings) {
-                debouncedSetMetaSetting({
+                setMetaSetting({
                     user,
                     name: name,
                     value: stringifySettingValue(value),
@@ -107,7 +88,7 @@ export function useSetting<T>(
                 setSettingValueToLS(name, value);
             }
         },
-        [shouldUseMetaSettings, shouldUseOnlyExternalSettings, user, name, debouncedSetMetaSetting],
+        [shouldUseMetaSettings, shouldUseOnlyExternalSettings, user, name, setMetaSetting],
     );
 
     return {value: settingValue, saveValue, isLoading} as const;

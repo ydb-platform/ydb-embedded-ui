@@ -134,6 +134,8 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
         [setExplicitRightsChanges],
     );
 
+    const rightsLoading = aclIsFetching || availableRightsAreFetching;
+
     const renderSubject = () => {
         if (aclSubject) {
             return <SubjectWithAvatar subject={aclSubject} />;
@@ -144,23 +146,23 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
     const subjectSelected = Boolean(aclSubject || newSubjects.length > 0);
 
     return (
-        <LoaderWrapper loading={aclIsFetching || availableRightsAreFetching}>
-            <div className={block()}>
-                <Flex direction="column">
-                    <Flex gap={4} direction="column" className={block('navigation')}>
-                        {renderSubject()}
-                        {/* wrapper to prevent radio button stretch */}
-                        {subjectSelected && (
-                            <RightsSectionSelector
-                                value={rightView}
-                                onUpdate={setRightsView}
-                                rights={currentRightsMap}
-                                availablePermissions={availablePermissions}
-                            />
-                        )}
-                    </Flex>
+        <Flex direction="column" className={block()} height={'100%'}>
+            <Flex direction="column" grow={1}>
+                <Flex gap={4} direction="column" className={block('navigation')}>
+                    {renderSubject()}
+                    {/* wrapper to prevent radio button stretch */}
                     {subjectSelected && (
-                        <div className={block('rights-wrapper')}>
+                        <RightsSectionSelector
+                            value={rightView}
+                            onUpdate={setRightsView}
+                            rights={currentRightsMap}
+                            availablePermissions={availablePermissions}
+                        />
+                    )}
+                </Flex>
+                {subjectSelected && (
+                    <LoaderWrapper loading={rightsLoading}>
+                        <Flex grow={1} position="relative" qa="access-rights-wrapper">
                             <Rights
                                 inheritedRights={inheritedRightsSet}
                                 rights={currentRightsMap}
@@ -168,21 +170,21 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
                                 handleChangeRightGetter={handleChangeRightGetter}
                                 view={rightView}
                             />
-                        </div>
-                    )}
-                </Flex>
-
-                {subjectSelected && (
-                    <Footer
-                        onCancel={handleCloseDrawer}
-                        onDiscard={handleDiscardRightsChanges}
-                        onSave={handleSaveRightsChanges}
-                        loading={updateRightsResponse.isLoading}
-                        error={updateRightsError}
-                        disabled={!hasChanges}
-                    />
+                        </Flex>
+                    </LoaderWrapper>
                 )}
-            </div>
-        </LoaderWrapper>
+            </Flex>
+
+            {subjectSelected && (
+                <Footer
+                    onCancel={handleCloseDrawer}
+                    onDiscard={handleDiscardRightsChanges}
+                    onSave={handleSaveRightsChanges}
+                    loading={updateRightsResponse.isLoading}
+                    error={updateRightsError}
+                    disabled={!hasChanges}
+                />
+            )}
+        </Flex>
     );
 }

@@ -3,11 +3,11 @@ import type {AxiosWrapperOptions} from '@gravity-ui/axios-wrapper';
 import axiosRetry from 'axios-retry';
 
 import {backend as BACKEND, clusterName} from '../../store';
+import {readSettingValueFromLS} from '../../store/reducers/settings/utils';
 import type {SchemaPathParam} from '../../types/api/common';
 import {DEV_ENABLE_TRACING_FOR_ALL_REQUESTS} from '../../utils/constants';
 import {prepareBackendWithMetaProxy} from '../../utils/parseBalancer';
 import {isRedirectToAuth} from '../../utils/response';
-import {settingsManager} from '../settings';
 
 export type AxiosOptions = {
     concurrentId?: string;
@@ -42,9 +42,7 @@ export class BaseYdbAPI extends AxiosWrapper {
         // Make possible manually enable tracing for all requests
         // For development purposes
         this._axios.interceptors.request.use(function (config) {
-            const enableTracing = settingsManager.readUserSettingsValue(
-                DEV_ENABLE_TRACING_FOR_ALL_REQUESTS,
-            );
+            const enableTracing = readSettingValueFromLS(DEV_ENABLE_TRACING_FOR_ALL_REQUESTS);
 
             if (enableTracing) {
                 config.headers['X-Want-Trace'] = 1;

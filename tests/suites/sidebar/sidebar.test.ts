@@ -130,7 +130,7 @@ test.describe('Test Sidebar', async () => {
 
         // Press Ctrl+K to open hotkeys panel
         await page.keyboard.press('Control+k');
-        await page.waitForTimeout(500); // Wait for animation
+        await page.waitForTimeout(1000); // Wait for animation
 
         // Check if hotkeys panel is visible and has the title
         await expect(sidebar.isHotkeysPanelVisible()).resolves.toBe(true);

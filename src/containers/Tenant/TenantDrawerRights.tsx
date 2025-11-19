@@ -36,7 +36,7 @@ export function TenantDrawerRights({children}: TenantDrawerWrapperProps) {
             isDrawerVisible={Boolean(showGrantAccess)}
             onCloseDrawer={handleCloseDrawer}
             renderDrawerContent={renderDrawerContent}
-            drawerId="tenant-healthcheck-details"
+            drawerId="tenant-grant-access"
             storageKey="tenant-grant-access-drawer-width"
             detectClickOutside
             hideVeil={false}

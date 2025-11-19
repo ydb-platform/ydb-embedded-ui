@@ -1,6 +1,7 @@
 import React from 'react';
 
 import type {ColumnWidthByName, HandleResize} from '@gravity-ui/react-data-table';
+import {debounce} from 'lodash';
 
 import {useSetting} from '../../store/reducers/settings/useSetting';
 
@@ -11,9 +12,20 @@ export const useTableResize = (
         value: sizes,
         saveValue: saveSizes,
         isLoading,
-    } = useSetting<ColumnWidthByName>(localStorageKey, {
-        debounceTime: 300,
-    });
+    } = useSetting<ColumnWidthByName>(localStorageKey);
+
+    const debouncedSaveSizes = React.useMemo(
+        () =>
+            debounce((newSizes: ColumnWidthByName) => {
+                saveSizes(newSizes);
+            }, 300),
+        [saveSizes],
+    );
+
+    // Call debounced func on component unmount
+    React.useEffect(() => {
+        return () => debouncedSaveSizes.flush();
+    }, [debouncedSaveSizes]);
 
     const [actualSizes, setActualSizes] = React.useState(() => {
         return sizes ?? ({} as ColumnWidthByName);
@@ -30,11 +42,11 @@ export const useTableResize = (
                     ...previousSetup,
                     [columnId]: columnWidth,
                 };
-                saveSizes(setup);
+                debouncedSaveSizes(setup);
                 return setup;
             });
         },
-        [saveSizes],
+        [debouncedSaveSizes],
     );
 
     return [actualSizes, handleSetupChange, isLoading];
