@@ -161,10 +161,10 @@ ${filters}LIMIT \${5:10};`;
 };
 
 export const showCreateTableTemplate = (params?: SchemaQueryParams) => {
-    const streamingQueryName = params?.relativePath
+    const tablePath = params?.relativePath
         ? `\`${normalizeParameter(params.relativePath)}\``
         : '${2:<my_table>}';
-    return `SHOW CREATE TABLE ${streamingQueryName};`;
+    return `SHOW CREATE TABLE ${tablePath};`;
 };
 
 export const upsertQueryTemplate = (params?: SchemaQueryParams) => {
