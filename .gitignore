@@ -9,6 +9,11 @@
 /coverage
 playwright-artifacts
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
 # production
 /build
 /dist

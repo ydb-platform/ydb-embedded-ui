@@ -13,10 +13,12 @@ All issue templates are defined in `/ISSUES_TO_CREATE.md`. This document contain
 Uses the GitHub CLI (`gh`) to create issues.
 
 **Prerequisites:**
+
 - GitHub CLI installed: https://cli.github.com/
 - Authenticated with GitHub: `gh auth login`
 
 **Usage:**
+
 ```bash
 ./scripts/create-issues.sh
 ```
@@ -26,11 +28,13 @@ Uses the GitHub CLI (`gh`) to create issues.
 Uses the GitHub REST API to create issues.
 
 **Prerequisites:**
+
 - Python 3.6 or higher
 - `requests` library: `pip install requests`
 - GitHub personal access token with `repo` scope
 
 **Usage:**
+
 ```bash
 # Set your GitHub token
 export GITHUB_TOKEN='your_personal_access_token_here'
@@ -40,6 +44,7 @@ python3 scripts/create-issues.py
 ```
 
 **Creating a Personal Access Token:**
+
 1. Go to https://github.com/settings/tokens
 2. Click "Generate new token (classic)"
 3. Give it a descriptive name
@@ -87,24 +92,30 @@ If you prefer to create issues manually or the scripts don't work for your envir
 ### Bash Script Issues
 
 **Error: "gh: command not found"**
+
 - Install GitHub CLI from https://cli.github.com/
 
 **Error: "GitHub CLI is not authenticated"**
+
 - Run: `gh auth login` and follow the prompts
 
 ### Python Script Issues
 
 **Error: "requests library is not installed"**
+
 - Install it with: `pip install requests` or `pip3 install requests`
 
 **Error: "GITHUB_TOKEN environment variable is not set"**
+
 - Set your token: `export GITHUB_TOKEN='your_token'`
 
 **Error: "Bad credentials"**
+
 - Check that your token is valid and has the correct permissions
 - Tokens expire, you may need to generate a new one
 
 **Error: "Rate limit exceeded"**
+
 - GitHub API has rate limits
 - Authenticated requests have higher limits
 - Wait a few minutes and try again
@@ -112,6 +123,7 @@ If you prefer to create issues manually or the scripts don't work for your envir
 ## Support
 
 For issues with the scripts or questions about the features, please:
+
 1. Check the detailed descriptions in `ISSUES_TO_CREATE.md`
 2. Review the repository's CONTRIBUTING.md
 3. Contact the YDB team at info@ydb.tech
