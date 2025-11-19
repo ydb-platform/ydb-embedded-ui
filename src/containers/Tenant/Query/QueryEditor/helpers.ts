@@ -4,7 +4,7 @@ import type {AcceptEvent, DeclineEvent, IgnoreEvent, PromptFile} from '@ydb-plat
 import type Monaco from 'monaco-editor';
 
 import {codeAssistApi} from '../../../../store/reducers/codeAssist/codeAssist';
-import {useQueriesHistory} from '../../../../store/reducers/query/useQueriesHistory';
+import type {QueryInHistory} from '../../../../store/reducers/query/types';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import type {TelemetryOpenTabs} from '../../../../types/api/codeAssist';
 import {useSetting} from '../../../../utils/hooks';
@@ -39,13 +39,12 @@ export function useEditorOptions() {
     return options;
 }
 
-export function useCodeAssistHelpers() {
+export function useCodeAssistHelpers(historyQueries: QueryInHistory[]) {
     const [sendCodeAssistPrompt] = codeAssistApi.useLazyGetCodeAssistSuggestionsQuery();
     const [acceptSuggestion] = codeAssistApi.useAcceptSuggestionMutation();
     const [discardSuggestion] = codeAssistApi.useDiscardSuggestionMutation();
     const [ignoreSuggestion] = codeAssistApi.useIgnoreSuggestionMutation();
     const [sendUserQueriesData] = codeAssistApi.useSendUserQueriesDataMutation();
-    const {historyQueries} = useQueriesHistory();
     const {savedQueries} = useSavedQueries();
 
     const getCodeAssistSuggestions = React.useCallback(

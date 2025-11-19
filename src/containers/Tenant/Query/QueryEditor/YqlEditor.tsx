@@ -7,7 +7,7 @@ import type Monaco from 'monaco-editor';
 
 import {MonacoEditor} from '../../../../components/MonacoEditor/MonacoEditor';
 import {selectUserInput, setIsDirty} from '../../../../store/reducers/query/query';
-import {useQueriesHistory} from '../../../../store/reducers/query/useQueriesHistory';
+import type {QueryInHistory} from '../../../../store/reducers/query/types';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import type {QueryAction} from '../../../../types/store/query';
 import {
@@ -32,6 +32,9 @@ interface YqlEditorProps {
     theme: string;
     handleGetExplainQueryClick: (text: string) => void;
     handleSendExecuteClick: (text: string, partial?: boolean) => void;
+    historyQueries: QueryInHistory[];
+    goToPreviousQuery: () => void;
+    goToNextQuery: () => void;
 }
 
 export function YqlEditor({
@@ -39,12 +42,14 @@ export function YqlEditor({
     theme,
     handleSendExecuteClick,
     handleGetExplainQueryClick,
+    historyQueries,
+    goToPreviousQuery,
+    goToNextQuery,
 }: YqlEditorProps) {
     const input = useTypedSelector(selectUserInput);
     const dispatch = useTypedDispatch();
     const [monacoGhostInstance, setMonacoGhostInstance] =
         React.useState<ReturnType<typeof createMonacoGhostInstance>>();
-    const {historyQueries, goToPreviousQuery, goToNextQuery} = useQueriesHistory();
     const [isCodeAssistEnabled] = useSetting(SETTING_KEYS.ENABLE_CODE_ASSISTANT);
 
     const editorOptions = useEditorOptions();
@@ -71,7 +76,7 @@ export function YqlEditor({
         window.ydbEditor = undefined;
     };
 
-    const {monacoGhostConfig, prepareUserQueriesCache} = useCodeAssistHelpers();
+    const {monacoGhostConfig, prepareUserQueriesCache} = useCodeAssistHelpers(historyQueries);
 
     React.useEffect(() => {
         if (monacoGhostInstance && isCodeAssistEnabled) {

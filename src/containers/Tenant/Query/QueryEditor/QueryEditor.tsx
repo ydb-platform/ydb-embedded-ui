@@ -77,8 +77,14 @@ export default function QueryEditor(props: QueryEditorProps) {
     const result = useTypedSelector(selectResult);
     const showPreview = useTypedSelector(selectShowPreview);
 
-    const {historyQueries, historyCurrentIndex, saveQueryToHistory, updateQueryInHistory} =
-        useQueriesHistory();
+    const {
+        historyQueries,
+        historyCurrentIndex,
+        saveQueryToHistory,
+        updateQueryInHistory,
+        goToPreviousQuery,
+        goToNextQuery,
+    } = useQueriesHistory();
 
     const isResultLoaded = Boolean(result);
 
@@ -188,6 +194,7 @@ export default function QueryEditor(props: QueryEditorProps) {
                     }
                 })
                 .catch((error) => {
+                    // Do not add query stats for failed query
                     console.error('Failed to update query history:', error);
                 });
 
@@ -288,6 +295,9 @@ export default function QueryEditor(props: QueryEditorProps) {
                                 theme={theme}
                                 handleSendExecuteClick={handleSendExecuteClick}
                                 handleGetExplainQueryClick={handleGetExplainQueryClick}
+                                historyQueries={historyQueries}
+                                goToPreviousQuery={goToPreviousQuery}
+                                goToNextQuery={goToNextQuery}
                             />
                         </div>
                     </div>
