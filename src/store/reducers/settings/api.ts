@@ -53,19 +53,24 @@ export const settingsApi = api.injectEndpoints({
                     return;
                 }
 
-                const shouldUseLocalSettings =
-                    !user || !window.api.metaSettings || shouldSyncSettingToLS(name);
+                const shouldUseLocalSettings = !user || !window.api.metaSettings;
 
                 const defaultValue = getSettingDefault(name);
 
                 // Preload value from LS or default to store
-                if (shouldUseLocalSettings) {
+                if (shouldUseLocalSettings || shouldSyncSettingToLS(name)) {
                     const savedValue = readSettingValueFromLS(name);
                     const value = savedValue ?? defaultValue;
 
                     dispatch(setSettingValue(name, value));
                 } else {
                     dispatch(setSettingValue(name, defaultValue));
+                }
+
+                // Do not process query result when only LS is used
+                // There is not actual api call in this case
+                if (shouldUseLocalSettings) {
+                    return;
                 }
 
                 try {
@@ -77,8 +82,11 @@ export const settingsApi = api.injectEndpoints({
                     const parsedValue = parseSettingValue(data?.value);
 
                     if (isNil(data?.value)) {
+                        // Pass setting params without value if data is empty
+                        const newValue = data ?? {name, user};
+
                         // Try to sync local value if there is no backend value
-                        syncLocalValueToMetaIfNoData({...data}, dispatch);
+                        syncLocalValueToMetaIfNoData(newValue, dispatch);
                     } else {
                         dispatch(setSettingValue(name, parsedValue));
 
@@ -122,15 +130,17 @@ export const settingsApi = api.injectEndpoints({
                     return;
                 }
 
-                // Extract previous value to revert to it if set is not succesfull
+                // Extract previous value to revert to it if set is not successful
                 const previousSettingValue = getSettingValue(getState() as RootState, name);
 
                 // Optimistically update store
                 dispatch(setSettingValue(name, value));
 
+                const shouldUseLocalSettings = !user || !window.api.metaSettings;
+
                 // If local storage settings should be used
-                // Update LS and do not do any further code
-                if (!user || !window.api.metaSettings) {
+                // Update LS and return early
+                if (shouldUseLocalSettings) {
                     setSettingValueToLS(name, value);
                     return;
                 }
@@ -167,24 +177,24 @@ export const settingsApi = api.injectEndpoints({
                             name: settingName,
                             user,
                         };
-                        const newValue = {name: settingName, user, value: settingData?.value};
+                        const newSetting = {name: settingName, user, value: settingData?.value};
 
                         const patch = dispatch(
                             settingsApi.util.upsertQueryData(
                                 'getSingleSetting',
                                 cacheEntryParams,
-                                newValue,
+                                newSetting,
                             ),
                         );
-                        if (isNil(settingData.value)) {
+                        if (isNil(newSetting.value)) {
                             // Try to sync local value if there is no backend value
-                            syncLocalValueToMetaIfNoData(settingData, dispatch);
+                            syncLocalValueToMetaIfNoData(newSetting, dispatch);
                         } else {
-                            const parsedValue = parseSettingValue(settingData.value);
+                            const parsedValue = parseSettingValue(newSetting.value);
                             dispatch(setSettingValue(settingName, parsedValue));
 
                             if (shouldSyncSettingToLS(settingName)) {
-                                setSettingValueToLS(settingName, settingData.value);
+                                setSettingValueToLS(settingName, newSetting.value);
                             }
                         }
 

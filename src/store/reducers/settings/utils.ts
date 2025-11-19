@@ -4,7 +4,7 @@ import {parseJson} from '../../../utils/utils';
 import type {SettingKey} from './constants';
 import {DEFAULT_USER_SETTINGS, SETTINGS_OPTIONS} from './constants';
 
-export function stringifySettingValue<T>(value?: T): string {
+export function stringifySettingValue(value?: unknown): string {
     return typeof value === 'string' ? value : JSON.stringify(value);
 }
 export function parseSettingValue<T>(value?: SettingValue) {
