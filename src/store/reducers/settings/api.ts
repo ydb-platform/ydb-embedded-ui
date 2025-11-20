@@ -6,19 +6,34 @@ import type {
     SetSingleSettingParams,
     Setting,
 } from '../../../types/api/settings';
-import type {AppDispatch} from '../../defaultStore';
+import type {AppDispatch, RootState} from '../../defaultStore';
 import {api} from '../api';
 
 import {SETTINGS_OPTIONS} from './constants';
+import {getSettingValue, setSettingValue} from './settings';
+import {
+    getSettingDefault,
+    parseSettingValue,
+    readSettingValueFromLS,
+    setSettingValueToLS,
+    shouldSyncSettingToLS,
+    stringifySettingValue,
+} from './utils';
+
+const invalidParamsError =
+    'Missing required parameters (name, user) or MetaSettings API is not available';
 
 export const settingsApi = api.injectEndpoints({
     endpoints: (builder) => ({
-        getSingleSetting: builder.query({
-            queryFn: async ({name, user}: GetSingleSettingParams, baseApi) => {
+        getSingleSetting: builder.query<Setting | undefined, Partial<GetSingleSettingParams>>({
+            queryFn: async ({name, user}) => {
                 try {
-                    if (!window.api.metaSettings) {
-                        throw new Error('MetaSettings API is not available');
+                    // In this case localStorage should be used for settings
+                    // Actual value will be loaded to store in onQueryStarted
+                    if (!name || !user || !window.api.metaSettings) {
+                        throw new Error(invalidParamsError);
                     }
+
                     const data = await window.api.metaSettings.getSingleSetting({
                         name,
                         user,
@@ -26,25 +41,82 @@ export const settingsApi = api.injectEndpoints({
                         preventBatching: SETTINGS_OPTIONS[name]?.preventBatching,
                     });
 
-                    const dispatch = baseApi.dispatch as AppDispatch;
-
-                    // Try to sync local value if there is no backend value
-                    syncLocalValueToMetaIfNoData(data, dispatch);
-
                     return {data};
                 } catch (error) {
+                    console.error('Cannot get setting:', error);
                     return {error};
+                }
+            },
+            async onQueryStarted(args, {dispatch, queryFulfilled}) {
+                const {name, user} = args;
+
+                if (!name) {
+                    return;
+                }
+
+                const shouldUseLocalSettings = !user || !window.api.metaSettings;
+
+                const defaultValue = getSettingDefault(name);
+
+                // Preload value from LS or default to store
+                if (shouldUseLocalSettings || shouldSyncSettingToLS(name)) {
+                    const savedValue = readSettingValueFromLS(name);
+                    const value = savedValue ?? defaultValue;
+
+                    dispatch(setSettingValue(name, value));
+                } else {
+                    dispatch(setSettingValue(name, defaultValue));
+                }
+
+                // Do not process query result when only LS is used
+                // There is not actual api call in this case
+                if (shouldUseLocalSettings) {
+                    return;
+                }
+
+                try {
+                    const {data} = await queryFulfilled;
+
+                    // Load api value to store if present
+                    // In case local storage should be used
+                    // query will finish with an error and this code will not run
+                    const parsedValue = parseSettingValue(data?.value);
+
+                    if (isNil(data?.value)) {
+                        // Pass setting params without value if data is empty
+                        const newValue = data ?? {name, user};
+
+                        // Try to sync local value if there is no backend value
+                        syncLocalValueToMetaIfNoData(newValue, dispatch);
+                    } else {
+                        dispatch(setSettingValue(name, parsedValue));
+
+                        if (shouldSyncSettingToLS(name)) {
+                            setSettingValueToLS(name, data.value);
+                        }
+                    }
+                } catch {
+                    // In case of an error there is no value to sync
+                    // LS or default value was loaded to store
                 }
             },
         }),
         setSingleSetting: builder.mutation({
-            queryFn: async (params: SetSingleSettingParams) => {
+            queryFn: async ({
+                name,
+                user,
+                value,
+            }: Partial<Omit<SetSingleSettingParams, 'value'>> & {value: unknown}) => {
                 try {
-                    if (!window.api.metaSettings) {
-                        throw new Error('MetaSettings API is not available');
+                    if (!name || !user || !window.api.metaSettings) {
+                        throw new Error(invalidParamsError);
                     }
 
-                    const data = await window.api.metaSettings.setSingleSetting(params);
+                    const data = await window.api.metaSettings.setSingleSetting({
+                        name,
+                        user,
+                        value: stringifySettingValue(value),
+                    });
 
                     if (data.status !== 'SUCCESS') {
                         throw new Error('Setting status is not SUCCESS');
@@ -52,37 +124,57 @@ export const settingsApi = api.injectEndpoints({
 
                     return {data};
                 } catch (error) {
+                    console.error('Cannot update setting:', error);
                     return {error};
                 }
             },
-            async onQueryStarted(args, {dispatch, queryFulfilled}) {
+            async onQueryStarted(args, {dispatch, queryFulfilled, getState}) {
                 const {name, user, value} = args;
 
-                // Optimistically update existing cache entry
-                const patchResult = dispatch(
-                    settingsApi.util.updateQueryData('getSingleSetting', {name, user}, (draft) => {
-                        return {...draft, name, user, value};
-                    }),
-                );
+                if (!name) {
+                    return;
+                }
+
+                // Extract previous value to revert to it if set is not successful
+                const previousSettingValue = getSettingValue(getState() as RootState, name);
+
+                // Optimistically update store
+                dispatch(setSettingValue(name, value));
+
+                const shouldUseLocalSettings = !user || !window.api.metaSettings;
+
+                // If local storage settings should be used
+                // Update LS and return early
+                if (shouldUseLocalSettings) {
+                    setSettingValueToLS(name, value);
+                    return;
+                }
+
                 try {
                     await queryFulfilled;
+
+                    // If mutation is successful, we can store new value in LS
+                    if (shouldSyncSettingToLS(name)) {
+                        setSettingValueToLS(name, value);
+                    }
                 } catch {
-                    patchResult.undo();
+                    // Set previous value to store in case of error
+                    dispatch(setSettingValue(name, previousSettingValue));
                 }
             },
         }),
         getSettings: builder.query({
-            queryFn: async ({name, user}: GetSettingsParams, baseApi) => {
+            queryFn: async ({name, user}: Partial<GetSettingsParams>, baseApi) => {
                 try {
-                    if (!window.api.metaSettings) {
-                        throw new Error('MetaSettings API is not available');
+                    if (!window.api.metaSettings || !name || !user) {
+                        throw new Error(invalidParamsError);
                     }
                     const data = await window.api.metaSettings.getSettings({name, user});
 
-                    const patches: Promise<void>[] = [];
+                    const patches: Promise<unknown>[] = [];
                     const dispatch = baseApi.dispatch as AppDispatch;
 
-                    // Upsert received data in getSingleSetting cache
+                    // Upsert received data in getSingleSetting cache to prevent further redundant requests
                     name.forEach((settingName) => {
                         const settingData = data[settingName] ?? {};
 
@@ -90,23 +182,26 @@ export const settingsApi = api.injectEndpoints({
                             name: settingName,
                             user,
                         };
-                        const newValue = {name: settingName, user, value: settingData?.value};
+                        const newSetting = {name: settingName, user, value: settingData?.value};
 
                         const patch = dispatch(
                             settingsApi.util.upsertQueryData(
                                 'getSingleSetting',
                                 cacheEntryParams,
-                                newValue,
+                                newSetting,
                             ),
-                        ).then(() => {
+                        );
+                        if (isNil(newSetting.value)) {
                             // Try to sync local value if there is no backend value
-                            // Do it after upsert if finished to ensure proper values update order
-                            // 1. New entry added to cache with nil value
-                            // 2. Positive entry update - local storage value replace nil in cache
-                            // 3.1. Set is successful, local value in cache
-                            // 3.2. Set is not successful, cache value reverted to previous nil
-                            syncLocalValueToMetaIfNoData(settingData, dispatch);
-                        });
+                            syncLocalValueToMetaIfNoData(newSetting, dispatch);
+                        } else {
+                            const parsedValue = parseSettingValue(newSetting.value);
+                            dispatch(setSettingValue(settingName, parsedValue));
+
+                            if (shouldSyncSettingToLS(settingName)) {
+                                setSettingValueToLS(settingName, newSetting.value);
+                            }
+                        }
 
                         patches.push(patch);
                     });
@@ -116,6 +211,7 @@ export const settingsApi = api.injectEndpoints({
 
                     return {data};
                 } catch (error) {
+                    console.error('Cannot get settings:', error);
                     return {error};
                 }
             },
@@ -124,7 +220,11 @@ export const settingsApi = api.injectEndpoints({
     overrideExisting: 'throw',
 });
 
-function syncLocalValueToMetaIfNoData(params: Setting, dispatch: AppDispatch) {
+function syncLocalValueToMetaIfNoData(params: Partial<Setting>, dispatch: AppDispatch) {
+    if (!params.name) {
+        return;
+    }
+
     const localValue = localStorage.getItem(params.name);
 
     if (isNil(params.value) && !isNil(localValue)) {
