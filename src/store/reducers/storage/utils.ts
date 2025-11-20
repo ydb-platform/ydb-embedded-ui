@@ -279,7 +279,7 @@ export const calculateMaximumDisksPerNode = (
 };
 
 // We need custom key (can't use StringifiedId) because for array of donors in replication's object
-// we have only nodeId, pDiskId, vDiskSlotId -> 3 parameters instead of 5
+// we can have only nodeId, pDiskId, vDiskSlotId -> 3 parameters instead of 5
 const makeVDiskLocationKey = (
     nodeId?: number,
     pDiskId?: number,
@@ -342,7 +342,7 @@ const attachRecipientsToDonors = (nodes: PreparedStorageNode[] | undefined) => {
                 };
 
                 // Keep the Donors item in sync with the real donor VDisk: reuse its StringifiedId
-                // instead of the local slot-based id.
+                // instead of the local slot-based id
                 donorRef.StringifiedId = donor.StringifiedId;
             });
         });

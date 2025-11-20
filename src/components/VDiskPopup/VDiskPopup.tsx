@@ -121,7 +121,7 @@ const prepareVDiskData = (
 
     if (Donors?.length && getVDiskLinkFn) {
         vdiskData.push({
-            label: vDiskPopupKeyset('label_donors'),
+            label: vDiskPopupKeyset('label_donor'),
             value: (
                 <Flex direction="column">
                     {Donors.map((donor) => {
