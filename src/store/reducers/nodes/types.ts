@@ -10,6 +10,7 @@ export interface NodesFilters {
     path?: string;
     databaseFullPath?: string;
     database?: string;
+    nodeId?: string;
 
     filterGroup?: string;
     filterGroupBy?: NodesGroupByField;
