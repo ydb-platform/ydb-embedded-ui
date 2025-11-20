@@ -43,6 +43,7 @@ export const settingsApi = api.injectEndpoints({
 
                     return {data};
                 } catch (error) {
+                    console.error('Cannot get setting:', error);
                     return {error};
                 }
             },
@@ -94,7 +95,10 @@ export const settingsApi = api.injectEndpoints({
                             setSettingValueToLS(name, data.value);
                         }
                     }
-                } catch {}
+                } catch {
+                    // In case of an error there is no value to sync
+                    // LS or default value was loaded to store
+                }
             },
         }),
         setSingleSetting: builder.mutation({
@@ -120,6 +124,7 @@ export const settingsApi = api.injectEndpoints({
 
                     return {data};
                 } catch (error) {
+                    console.error('Cannot update setting:', error);
                     return {error};
                 }
             },
@@ -206,6 +211,7 @@ export const settingsApi = api.injectEndpoints({
 
                     return {data};
                 } catch (error) {
+                    console.error('Cannot get settings:', error);
                     return {error};
                 }
             },
