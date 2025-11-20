@@ -5,7 +5,8 @@ import type {NavigationTreeNodeType} from 'ydb-ui-components';
 import {api} from '../../../store/reducers/api';
 import {setShowPreview} from '../../../store/reducers/schema/schema';
 import {TENANT_PAGES_IDS, TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
-import {setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
+import {setQueryTab} from '../../../store/reducers/tenant/tenant';
+import type {TenantPage} from '../../../store/reducers/tenant/types';
 import {EPathSubType} from '../../../types/api/schema';
 import i18n from '../i18n';
 
@@ -15,6 +16,7 @@ import EyeIcon from '@gravity-ui/icons/svgs/eye.svg';
 
 interface ControlsAdditionalEffects {
     setActivePath: (path: string) => void;
+    setTenantPage: (page: TenantPage) => void;
 }
 
 const bindActions = (
@@ -22,13 +24,13 @@ const bindActions = (
     dispatch: React.Dispatch<any>,
     additionalEffects: ControlsAdditionalEffects,
 ) => {
-    const {setActivePath} = additionalEffects;
+    const {setActivePath, setTenantPage} = additionalEffects;
 
     return {
         openPreview: () => {
             dispatch(api.util.invalidateTags(['PreviewData']));
             dispatch(setShowPreview(true));
-            dispatch(setTenantPage(TENANT_PAGES_IDS.query));
+            setTenantPage(TENANT_PAGES_IDS.query);
             dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
             setActivePath(path);
         },
