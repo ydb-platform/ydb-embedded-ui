@@ -21,6 +21,7 @@ const EFlagToLabelTheme: Record<EFlag, LabelProps['theme'] | 'orange'> = {
     [EFlag.Grey]: 'unknown',
     [EFlag.Orange]: 'orange',
     [EFlag.Yellow]: 'warning',
+    [EFlag.DarkGrey]: 'unknown',
 };
 
 const EFlagToStatusName: Record<EFlag, string> = {
@@ -37,6 +38,9 @@ const EFlagToStatusName: Record<EFlag, string> = {
         return i18n('title_green');
     },
     get [EFlag.Grey]() {
+        return i18n('title_grey');
+    },
+    get [EFlag.DarkGrey]() {
         return i18n('title_grey');
     },
     get [EFlag.Blue]() {

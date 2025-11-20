@@ -31,7 +31,7 @@ import type {InfoViewerHeaderLabel, InfoViewerItem} from '../InfoViewer';
 import {InfoViewer} from '../InfoViewer';
 import {InternalLink} from '../InternalLink';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
-import {preparePDiskData} from '../PDiskPopup/PDiskPopup';
+import {preparePDiskData, preparePDiskHeaderLabels} from '../PDiskPopup/PDiskPopup';
 import {vDiskInfoKeyset} from '../VDiskInfo/i18n';
 
 import {vDiskPopupKeyset} from './i18n';
@@ -382,12 +382,17 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
             preparePDiskData(data.PDisk, nodeData, isUserAllowedToMakeChanges),
         [data, nodeData, isFullData, isUserAllowedToMakeChanges],
     );
+    const pdiskHeaderLabels = React.useMemo(
+        () => (isFullData && data.PDisk ? preparePDiskHeaderLabels(data.PDisk) : []),
+        [data, isFullData],
+    );
 
     const vdiskId = isFullData ? data.StringifiedId : undefined;
+    const pdiskId = isFullData ? data.PDisk?.StringifiedId : undefined;
 
-    const headerLabels: InfoViewerHeaderLabel[] = React.useMemo(
+    const vdiskHeaderLabels: InfoViewerHeaderLabel[] = React.useMemo(
         () => (isFullData ? prepareHeaderLabels(data) : []),
-        [data],
+        [data, isFullData],
     );
     return (
         <div className={b()}>
@@ -396,9 +401,17 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
                 titleSuffix={vdiskId ?? EMPTY_DATA_PLACEHOLDER}
                 info={vdiskInfo}
                 size="s"
-                headerLabels={headerLabels}
+                headerLabels={vdiskHeaderLabels}
             />
-            {pdiskInfo && isViewerUser && <InfoViewer title="PDisk" info={pdiskInfo} size="s" />}
+            {pdiskInfo && isViewerUser && (
+                <InfoViewer
+                    title="PDisk"
+                    titleSuffix={pdiskId ?? EMPTY_DATA_PLACEHOLDER}
+                    info={pdiskInfo}
+                    size="s"
+                    headerLabels={pdiskHeaderLabels}
+                />
+            )}
         </div>
     );
 };

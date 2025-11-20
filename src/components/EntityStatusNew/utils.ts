@@ -18,6 +18,9 @@ export const EFlagToDescription: Record<EFlag, string> = {
     get [EFlag.Grey]() {
         return i18n('context_grey');
     },
+    get [EFlag.DarkGrey]() {
+        return i18n('context_grey');
+    },
     get [EFlag.Blue]() {
         return i18n('context_blue');
     },

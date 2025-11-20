@@ -97,7 +97,7 @@ export const preparePDiskData = (
     return pdiskData;
 };
 
-const preparePDiskHeaderLabels = (data: PreparedPDisk): InfoViewerHeaderLabel[] => {
+export const preparePDiskHeaderLabels = (data: PreparedPDisk): InfoViewerHeaderLabel[] => {
     const labels: InfoViewerHeaderLabel[] = [];
     const {State} = data;
 
