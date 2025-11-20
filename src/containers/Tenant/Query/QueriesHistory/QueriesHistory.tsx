@@ -39,7 +39,7 @@ function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
     const {filteredHistoryQueries} = useQueriesHistory();
 
     const reversedHistory = React.useMemo(() => {
-        return [...filteredHistoryQueries].reverse();
+        return filteredHistoryQueries.toReversed();
     }, [filteredHistoryQueries]);
 
     const filter = useTypedSelector(selectQueriesHistoryFilter);
