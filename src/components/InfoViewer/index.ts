@@ -2,4 +2,4 @@ import {InfoViewer} from './InfoViewer';
 
 export {InfoViewer};
 export * from './utils';
-export type {InfoViewerItem} from './InfoViewer';
+export type {InfoViewerItem, InfoViewerHeaderLabel} from './InfoViewer';

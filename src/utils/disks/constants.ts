@@ -1,3 +1,12 @@
+import {
+    ArrowsRotateLeft,
+    BucketPaint,
+    CircleCheck,
+    CircleExclamation,
+    TriangleExclamation,
+} from '@gravity-ui/icons';
+import type {IconData, LabelProps} from '@gravity-ui/uikit';
+
 import type {EFlag} from '../../types/api/enums';
 import {TPDiskState} from '../../types/api/pdisk';
 import {EVDiskState} from '../../types/api/vdisk';
@@ -10,6 +19,7 @@ export const DISK_COLOR_STATE_TO_NUMERIC_SEVERITY: Record<EFlag, number> = {
     Yellow: 3,
     Orange: 4,
     Red: 5,
+    DarkGrey: 6,
 } as const;
 
 type SeverityToColor = Record<number, keyof typeof DISK_COLOR_STATE_TO_NUMERIC_SEVERITY>;
@@ -51,4 +61,34 @@ export const PDISK_STATE_SEVERITY = {
     [TPDiskState.ChunkQuotaError]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
     [TPDiskState.DeviceIoError]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
     [TPDiskState.Stopped]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
+};
+
+export const NUMERIC_SEVERITY_LABEL_THEME: Record<number, LabelProps['theme']> = {
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green]: 'success',
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue]: 'info',
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow]: 'warning',
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Orange]: 'warning',
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red]: 'danger',
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey]: 'unknown',
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.DarkGrey]: 'unknown',
+};
+
+export const NUMERIC_SEVERITY_LABEL_ICON: Record<number, IconData> = {
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green]: CircleCheck,
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue]: ArrowsRotateLeft,
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow]: TriangleExclamation,
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Orange]: TriangleExclamation,
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red]: CircleExclamation,
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.DarkGrey]: BucketPaint,
+};
+
+export const VDISK_LABEL_CONFIG: Record<string, {theme: LabelProps['theme']; icon: IconData}> = {
+    donor: {
+        theme: 'unknown',
+        icon: BucketPaint,
+    },
+    replica: {
+        theme: 'info',
+        icon: ArrowsRotateLeft,
+    },
 };

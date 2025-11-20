@@ -1,0 +1,14 @@
+{
+  "context_not-available": "not available",
+  "label_vdisk": "PDisk",
+  "label_type": "Type",
+  "label_node-id": "Node Id",
+  "label_host": "Host",
+  "label_dc": "DC",
+  "label_path": "Path",
+  "label_available": "Available",
+  "label_realtime": "Realtime",
+  "label_device": "Device",
+  "value_unknown": "unknown",
+  "value_of": "of"
+}

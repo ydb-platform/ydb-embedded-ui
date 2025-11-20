@@ -1,10 +1,11 @@
-import {BucketPaint} from '@gravity-ui/icons';
 import {Icon} from '@gravity-ui/uikit';
 
 import {useStorageQueryParams} from '../../containers/Storage/useStorageQueryParams';
 import {useVDiskPagePath} from '../../routes';
 import {STORAGE_TYPES} from '../../store/reducers/storage/constants';
+import {EVDiskState} from '../../types/api/vdisk';
 import {cn} from '../../utils/cn';
+import {getVDiskStatusIcon} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {DiskStateProgressBar} from '../DiskStateProgressBar/DiskStateProgressBar';
 import {HoverPopup} from '../HoverPopup/HoverPopup';
@@ -44,12 +45,13 @@ export const VDisk = ({
     const getVDiskLink = useVDiskPagePath();
     const vDiskPath = getVDiskLink({nodeId: data.NodeId, vDiskId: data.StringifiedId});
 
-    // Donor and replicating Vdisks have similar data.replicated and data.VDiskState params
-    const isNotReplicating = data.Replicated === false && data.VDiskState === 'OK';
-    // The difference is only in data.donorMode
-    const isDonor = data.DonorMode;
+    const severity = data.Severity;
+    const isDonor = data.VDiskState === EVDiskState.OK && data.DonorMode;
+    const isReplicating =
+        data.Replicated === false && data.VDiskState === EVDiskState.OK && !data.DonorMode;
 
-    const isDonorIconShow = isGroupView && isDonor;
+    const statusIcon = getVDiskStatusIcon(severity);
+    const showIcon = statusIcon && isGroupView;
 
     return (
         <HoverPopup
@@ -65,16 +67,16 @@ export const VDisk = ({
                 <InternalLink to={vDiskPath} className={b('content')}>
                     <DiskStateProgressBar
                         diskAllocatedPercent={data.AllocatedPercent}
-                        severity={data.Severity}
+                        severity={severity}
                         compact={compact}
                         inactive={inactive}
-                        striped={isNotReplicating || isDonor}
-                        faded={isNotReplicating || isDonor}
+                        striped={isReplicating || isDonor}
+                        faded={isReplicating || isDonor}
                         className={progressBarClassName}
                         content={
-                            isDonorIconShow ? (
+                            showIcon ? (
                                 <div className={b('donor-icon')}>
-                                    <Icon data={BucketPaint} size={12} />
+                                    <Icon data={statusIcon} size={12} />
                                 </div>
                             ) : null
                         }

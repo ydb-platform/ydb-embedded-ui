@@ -14,6 +14,12 @@ export interface InfoViewerItem {
     value: React.ReactNode;
 }
 
+export interface InfoViewerHeaderLabel {
+    value: React.ReactNode;
+    icon?: IconData;
+    theme?: LabelProps['theme'];
+}
+
 export interface InfoViewerProps {
     title?: React.ReactNode;
     titleSuffix?: React.ReactNode;
@@ -25,10 +31,7 @@ export interface InfoViewerProps {
     className?: string;
     multilineLabels?: boolean;
     renderEmptyState?: (props?: Pick<InfoViewerProps, 'title' | 'size'>) => React.ReactNode;
-    showLabel?: boolean;
-    labelText?: string;
-    labelIcon?: IconData;
-    labelTheme?: LabelProps['theme'];
+    headerLabels?: InfoViewerHeaderLabel[];
 }
 
 const b = cn('info-viewer');
@@ -44,10 +47,7 @@ export const InfoViewer = ({
     className,
     multilineLabels,
     renderEmptyState,
-    showLabel,
-    labelText,
-    labelIcon,
-    labelTheme,
+    headerLabels,
 }: InfoViewerProps) => {
     if ((!info || !info.length) && renderEmptyState) {
         return <React.Fragment>{renderEmptyState({title, size})}</React.Fragment>;
@@ -72,13 +72,17 @@ export const InfoViewer = ({
                         )}
                     </Flex>
                 )}
-                {showLabel && (
-                    <Label theme={labelTheme}>
-                        <Flex gap="1" alignItems="center">
-                            {labelIcon && <Icon data={labelIcon} size={12} />}
-                            <span>{labelText}</span>
-                        </Flex>
-                    </Label>
+                {headerLabels && headerLabels.length > 0 && (
+                    <Flex gap={1} alignItems="center">
+                        {headerLabels.map((label, index) => (
+                            <Label key={index} theme={label.theme}>
+                                <Flex gap="1" alignItems="center">
+                                    {label.icon && <Icon data={label.icon} size={12} />}
+                                    <span>{label.value}</span>
+                                </Flex>
+                            </Label>
+                        ))}
+                    </Flex>
                 )}
             </Flex>
             {info && info.length > 0 ? (

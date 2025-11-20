@@ -1,7 +1,5 @@
 import React from 'react';
 
-import {ArrowsRotateLeft, BucketPaint} from '@gravity-ui/icons';
-import type {IconData, LabelProps} from '@gravity-ui/uikit';
 import {Flex} from '@gravity-ui/uikit';
 
 import {useVDiskPagePath} from '../../routes';
@@ -13,6 +11,13 @@ import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatUptimeInSeconds} from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
+import {
+    DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
+    NUMERIC_SEVERITY_LABEL_ICON,
+    NUMERIC_SEVERITY_LABEL_THEME,
+    VDISK_LABEL_CONFIG,
+    VDISK_STATE_SEVERITY,
+} from '../../utils/disks/constants';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
@@ -22,7 +27,7 @@ import {
     useIsViewerUser,
 } from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToGB, bytesToSpeed} from '../../utils/utils';
-import type {InfoViewerItem} from '../InfoViewer';
+import type {InfoViewerHeaderLabel, InfoViewerItem} from '../InfoViewer';
 import {InfoViewer} from '../InfoViewer';
 import {InternalLink} from '../InternalLink';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
@@ -38,9 +43,7 @@ const b = cn('vdisk-storage-popup');
 const prepareUnavailableVDiskData = (data: UnavailableDonor, withDeveloperUILink?: boolean) => {
     const {NodeId, PDiskId, VSlotId, StoragePoolName} = data;
 
-    const vdiskData: InfoViewerItem[] = [
-        {label: vDiskPopupKeyset('label_state'), value: vDiskPopupKeyset('context_not-available')},
-    ];
+    const vdiskData: InfoViewerItem[] = [];
 
     if (StoragePoolName) {
         vdiskData.push({label: vDiskPopupKeyset('label_storage-pool'), value: StoragePoolName});
@@ -108,12 +111,7 @@ const prepareVDiskData = (
         Recipient,
     } = data;
 
-    const vdiskData: InfoViewerItem[] = [
-        {
-            label: vDiskPopupKeyset('label_state'),
-            value: VDiskState ?? vDiskPopupKeyset('context_not-available'),
-        },
-    ];
+    const vdiskData: InfoViewerItem[] = [];
 
     if (StoragePoolName) {
         vdiskData.push({label: vDiskPopupKeyset('label_storage-pool'), value: StoragePoolName});
@@ -299,6 +297,61 @@ const prepareVDiskData = (
     return vdiskData;
 };
 
+const prepareHeaderLabels = (data: PreparedVDisk): InfoViewerHeaderLabel[] => {
+    const labels: InfoViewerHeaderLabel[] = [];
+
+    const {VDiskState, DonorMode, Replicated} = data;
+
+    if (!VDiskState) {
+        labels.push({
+            value: vDiskPopupKeyset('context_not-available'),
+        });
+
+        return labels;
+    }
+
+    const isReplica = Replicated === false && VDiskState === EVDiskState.OK;
+    const hasReplicationRole = Boolean(DonorMode || isReplica);
+
+    if (DonorMode) {
+        const config = VDISK_LABEL_CONFIG.donor;
+
+        labels.push({
+            value: vDiskPopupKeyset('label_donor'),
+            theme: config.theme,
+            icon: config.icon,
+        });
+    } else if (isReplica) {
+        const config = VDISK_LABEL_CONFIG.replica;
+
+        labels.push({
+            value: vDiskPopupKeyset('label_replication'),
+            theme: config.theme,
+            icon: config.icon,
+        });
+    }
+
+    const stateSeverity = VDISK_STATE_SEVERITY[VDiskState];
+    const isStateOk = stateSeverity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green;
+
+    if (hasReplicationRole && isStateOk) {
+        return labels;
+    }
+
+    const stateTheme =
+        stateSeverity !== undefined ? NUMERIC_SEVERITY_LABEL_THEME[stateSeverity] : undefined;
+    const stateIcon =
+        stateSeverity !== undefined ? NUMERIC_SEVERITY_LABEL_ICON[stateSeverity] : undefined;
+
+    labels.push({
+        value: VDiskState,
+        theme: stateTheme,
+        icon: stateIcon,
+    });
+
+    return labels;
+};
+
 interface VDiskPopupProps {
     data: PreparedVDisk | UnavailableDonor;
 }
@@ -330,29 +383,12 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
         [data, nodeData, isFullData, isUserAllowedToMakeChanges],
     );
 
-    const vdiskId = isFullVDiskData(data) ? data.StringifiedId : undefined;
+    const vdiskId = isFullData ? data.StringifiedId : undefined;
 
-    const labelConfig: {
-        showLabel: boolean;
-        labelText?: string;
-        labelIcon?: IconData;
-        labelTheme?: LabelProps['theme'];
-    } = {
-        showLabel: false,
-    };
-
-    if (data.DonorMode) {
-        labelConfig.showLabel = true;
-        labelConfig.labelText = vDiskPopupKeyset('label_donor');
-        labelConfig.labelIcon = BucketPaint;
-        labelConfig.labelTheme = 'unknown';
-    } else if (isFullVDiskData(data) && !data.Replicated) {
-        labelConfig.showLabel = true;
-        labelConfig.labelText = vDiskPopupKeyset('label_replication');
-        labelConfig.labelIcon = ArrowsRotateLeft;
-        labelConfig.labelTheme = 'info';
-    }
-
+    const headerLabels: InfoViewerHeaderLabel[] = React.useMemo(
+        () => (isFullData ? prepareHeaderLabels(data) : []),
+        [data],
+    );
     return (
         <div className={b()}>
             <InfoViewer
@@ -360,10 +396,7 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
                 titleSuffix={vdiskId ?? EMPTY_DATA_PLACEHOLDER}
                 info={vdiskInfo}
                 size="s"
-                showLabel={labelConfig.showLabel}
-                labelText={labelConfig.labelText}
-                labelTheme={labelConfig.labelTheme}
-                labelIcon={labelConfig.labelIcon}
+                headerLabels={headerLabels}
             />
             {pdiskInfo && isViewerUser && <InfoViewer title="PDisk" info={pdiskInfo} size="s" />}
         </div>

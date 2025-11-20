@@ -1,6 +1,5 @@
 {
   "context_not-available": "not available",
-  "label_state": "State",
   "label_storage-pool": "StoragePool",
   "label_donor": "Donor",
   "label_node-id": "NodeId",
