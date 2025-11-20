@@ -1,3 +1,5 @@
+import type {IconData} from '@gravity-ui/uikit';
+
 import {valueIsDefined} from '..';
 import type {VDiskBlobIndexStatParams} from '../../store/reducers/vdisk/vdisk';
 import {EFlag} from '../../types/api/enums';
@@ -8,6 +10,7 @@ import {
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
     DISK_NUMERIC_SEVERITY_TO_STATE_COLOR,
     NOT_AVAILABLE_SEVERITY_COLOR,
+    NUMERIC_SEVERITY_LABEL_ICON,
 } from './constants';
 import type {PreparedVDisk} from './types';
 
@@ -54,4 +57,20 @@ export function getVDiskId(params: VDiskBlobIndexStatParams) {
             ? [params.vDiskId]
             : [params.nodeId, params.pDiskId, params.vDiskSlotId];
     return parts.join('-');
+}
+
+export function getVDiskStatusIcon(severity?: number): IconData | undefined {
+    if (severity === undefined) {
+        return undefined;
+    }
+
+    // Display icon only for error and donor
+    if (
+        severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red ||
+        severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.DarkGrey
+    ) {
+        return NUMERIC_SEVERITY_LABEL_ICON[severity];
+    }
+
+    return undefined;
 }

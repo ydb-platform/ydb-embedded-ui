@@ -1,5 +1,11 @@
+import {Icon} from '@gravity-ui/uikit';
+
+import {useStorageQueryParams} from '../../containers/Storage/useStorageQueryParams';
 import {useVDiskPagePath} from '../../routes';
+import {STORAGE_TYPES} from '../../store/reducers/storage/constants';
+import {EVDiskState} from '../../types/api/vdisk';
 import {cn} from '../../utils/cn';
+import {getVDiskStatusIcon} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {DiskStateProgressBar} from '../DiskStateProgressBar/DiskStateProgressBar';
 import {HoverPopup} from '../HoverPopup/HoverPopup';
@@ -33,8 +39,19 @@ export const VDisk = ({
     delayClose,
     delayOpen,
 }: VDiskProps) => {
+    const {storageType} = useStorageQueryParams();
+    const isGroupView = storageType === STORAGE_TYPES.groups;
+
     const getVDiskLink = useVDiskPagePath();
     const vDiskPath = getVDiskLink({nodeId: data.NodeId, vDiskId: data.StringifiedId});
+
+    const severity = data.Severity;
+    const isDonor = data.VDiskState === EVDiskState.OK && data.DonorMode;
+    const isReplicating =
+        data.Replicated === false && data.VDiskState === EVDiskState.OK && !data.DonorMode;
+
+    const statusIcon = getVDiskStatusIcon(severity);
+    const showIcon = statusIcon && isGroupView;
 
     return (
         <HoverPopup
@@ -50,10 +67,19 @@ export const VDisk = ({
                 <InternalLink to={vDiskPath} className={b('content')}>
                     <DiskStateProgressBar
                         diskAllocatedPercent={data.AllocatedPercent}
-                        severity={data.Severity}
+                        severity={severity}
                         compact={compact}
                         inactive={inactive}
+                        striped={isReplicating || isDonor}
+                        faded={isReplicating || isDonor}
                         className={progressBarClassName}
+                        content={
+                            showIcon ? (
+                                <div className={b('donor-icon')}>
+                                    <Icon data={statusIcon} size={12} />
+                                </div>
+                            ) : null
+                        }
                     />
                 </InternalLink>
             </div>

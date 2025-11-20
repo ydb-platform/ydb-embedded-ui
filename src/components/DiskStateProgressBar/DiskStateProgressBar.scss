@@ -45,6 +45,14 @@
         background-color: unset;
     }
 
+    &_striped {
+        overflow: hidden;
+
+        // Inset shadow = border overlay without shrinking the striped fill
+        border: none;
+        box-shadow: 0 0 0 $border-width var(--entity-state-shadow-color) inset;
+    }
+
     &__fill-bar {
         position: absolute;
         top: 0;
@@ -69,6 +77,16 @@
             left: auto;
 
             border-radius: 0 $inner-border-radius $inner-border-radius 0;
+        }
+
+        &_striped {
+            background-image: repeating-linear-gradient(
+                135deg,
+                transparent 0,
+                transparent 4px,
+                var(--entity-state-fill-color) 4px,
+                var(--entity-state-fill-color) 8px
+            );
         }
     }
 
