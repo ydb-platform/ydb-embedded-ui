@@ -1,5 +1,21 @@
 # Changelog
 
+## [12.22.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.21.0...v12.22.0) (2025-11-20)
+
+
+### Features
+
+* add "Show create table" sql snippet ([#3101](https://github.com/ydb-platform/ydb-embedded-ui/issues/3101)) ([a35b54a](https://github.com/ydb-platform/ydb-embedded-ui/commit/a35b54ad4159699176f5ce0316a36d3214692863))
+
+
+### Bug Fixes
+
+* **InformationPopup:** update docs link ([#3112](https://github.com/ydb-platform/ydb-embedded-ui/issues/3112)) ([5908d69](https://github.com/ydb-platform/ydb-embedded-ui/commit/5908d6973d7e6b0461fc6422b2149039db6d8bea))
+* layout shift when open Access drawer ([#3108](https://github.com/ydb-platform/ydb-embedded-ui/issues/3108)) ([4b4a106](https://github.com/ydb-platform/ydb-embedded-ui/commit/4b4a106a6696e9220574f161b23916a24b948f06))
+* **SavedQueries:** move queries manipulations to hook ([#3102](https://github.com/ydb-platform/ydb-embedded-ui/issues/3102)) ([deed421](https://github.com/ydb-platform/ydb-embedded-ui/commit/deed421afc0934fb9a375171e3d5a68176371c13))
+* **TenantNavigation:** use query for tenant page ([#3094](https://github.com/ydb-platform/ydb-embedded-ui/issues/3094)) ([6f81825](https://github.com/ydb-platform/ydb-embedded-ui/commit/6f8182501344a26e23de6b78a89f8eafebf28193))
+* virtualization problems ([#3100](https://github.com/ydb-platform/ydb-embedded-ui/issues/3100)) ([14ec98a](https://github.com/ydb-platform/ydb-embedded-ui/commit/14ec98af78f98f586b65e3017a486fd8d9237e44))
+
 ## [12.21.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.20.0...v12.21.0) (2025-11-18)
 
 
