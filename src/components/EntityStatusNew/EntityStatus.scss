@@ -3,8 +3,8 @@
         color: inherit;
     }
 
-    &_critical.g-label {
-        color: var(--g-color-text-contrast);
-        background-color: var(--g-color-base-danger-heavy);
+    &_orange.g-label {
+        color: var(--g-color-private-orange-500);
+        background-color: var(--g-color-private-orange-100);
     }
 }

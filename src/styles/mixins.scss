@@ -268,12 +268,6 @@
         --entity-state-fill-color: var(--g-color-base-yellow-medium);
     }
 
-    &_orange {
-        --entity-state-font-color: var(--g-color-private-orange-500);
-        --entity-state-border-color: var(--ydb-color-status-orange);
-        --entity-state-background-color: var(--g-color-private-orange-100);
-        --entity-state-fill-color: var(--g-color-private-orange-300);
-    }
     &_red {
         --entity-state-font-color: var(--g-color-text-danger);
         --entity-state-border-color: var(--g-color-base-danger-heavy);

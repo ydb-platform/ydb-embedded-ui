@@ -38,8 +38,8 @@ describe('VDisk state', () => {
             FrontQueues: EFlag.Red, // severity 5, red
         });
 
-        expect(severity1).not.toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
-        expect(severity2).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
+        expect(severity1).not.toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow);
+        expect(severity2).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow);
     });
 
     // prettier-ignore

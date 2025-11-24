@@ -4,11 +4,11 @@ import {Flex, Label} from '@gravity-ui/uikit';
 
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
-import {TPDiskState} from '../../types/api/pdisk';
 import {valueIsDefined} from '../../utils';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {createPDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
-import {getPlaceholderTextByFlag, getSeverityColor} from '../../utils/disks/helpers';
+import {getStateSeverity} from '../../utils/disks/calculatePDiskSeverity';
+import {NUMERIC_SEVERITY_TO_LABEL_VIEW} from '../../utils/disks/constants';
 import type {PreparedPDisk} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
@@ -70,7 +70,7 @@ export const preparePDiskData = (data: PreparedPDisk, nodeData?: {Host?: string;
 
 export const preparePDiskHeaderLabels = (data: PreparedPDisk): YDBDefinitionListHeaderLabel[] => {
     const labels: YDBDefinitionListHeaderLabel[] = [];
-    const {State, Severity} = data;
+    const {State} = data;
 
     if (!State) {
         labels.push({
@@ -81,16 +81,17 @@ export const preparePDiskHeaderLabels = (data: PreparedPDisk): YDBDefinitionList
         return labels;
     }
 
-    const stateStatus = getSeverityColor(Severity);
+    if (State) {
+        const severity = getStateSeverity(State);
+        const {theme, icon} = NUMERIC_SEVERITY_TO_LABEL_VIEW[severity];
 
-    const hasError = State && State !== TPDiskState.Normal;
-    const value = hasError ? State : getPlaceholderTextByFlag(Severity);
-
-    labels.push({
-        id: 'state',
-        value,
-        status: stateStatus,
-    });
+        labels.push({
+            id: 'state',
+            value: State,
+            theme: theme,
+            icon: icon,
+        });
+    }
 
     return labels;
 };

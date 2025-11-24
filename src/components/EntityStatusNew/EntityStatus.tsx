@@ -1,15 +1,48 @@
 import React from 'react';
 
 import type {LabelProps} from '@gravity-ui/uikit';
-import {ActionTooltip, Flex, HelpMark, Icon, Label} from '@gravity-ui/uikit';
+import {ActionTooltip, Flex, HelpMark, Label} from '@gravity-ui/uikit';
 
-import type {EFlag} from '../../types/api/enums';
+import {EFlag} from '../../types/api/enums';
 import {cn} from '../../utils/cn';
-import {getEFlagView} from '../../utils/healthStatus/healthCheck';
+import {StatusIcon} from '../StatusIconNew/StatusIcon';
+
+import i18n from './i18n';
+import {EFlagToDescription} from './utils';
 
 import './EntityStatus.scss';
 
 const b = cn('ydb-entity-status-new');
+
+const EFlagToLabelTheme: Record<EFlag, LabelProps['theme'] | 'orange'> = {
+    [EFlag.Red]: 'danger',
+    [EFlag.Blue]: 'info',
+    [EFlag.Green]: 'success',
+    [EFlag.Grey]: 'unknown',
+    [EFlag.Orange]: 'orange',
+    [EFlag.Yellow]: 'warning',
+};
+
+const EFlagToStatusName: Record<EFlag, string> = {
+    get [EFlag.Red]() {
+        return i18n('title_red');
+    },
+    get [EFlag.Yellow]() {
+        return i18n('title_yellow');
+    },
+    get [EFlag.Orange]() {
+        return i18n('title_orange');
+    },
+    get [EFlag.Green]() {
+        return i18n('title_green');
+    },
+    get [EFlag.Grey]() {
+        return i18n('title_grey');
+    },
+    get [EFlag.Blue]() {
+        return i18n('title_blue');
+    },
+};
 
 interface EntityStatusLabelProps {
     status: EFlag;
@@ -18,8 +51,6 @@ interface EntityStatusLabelProps {
     withStatusName?: boolean;
     size?: LabelProps['size'];
     iconSize?: number;
-    withIcon?: boolean;
-    withTooltip?: boolean;
 }
 
 function EntityStatusLabel({
@@ -29,33 +60,22 @@ function EntityStatusLabel({
     note,
     size = 'm',
     iconSize = 14,
-    withIcon = true,
-    withTooltip = true,
 }: EntityStatusLabelProps) {
-    const {theme, icon, title, description} = getEFlagView(status);
-
-    const label = (
-        <Label
-            className={b({critical: theme === 'critical'})}
-            theme={theme === 'critical' ? undefined : theme}
-            icon={withIcon ? <Icon size={iconSize} data={icon} /> : undefined}
-            size={size}
-        >
-            <Flex gap="2" wrap="nowrap">
-                {children}
-                {withStatusName ? title : null}
-                {note && <HelpMark className={b('note')}>{note}</HelpMark>}
-            </Flex>
-        </Label>
-    );
-
-    if (!withTooltip) {
-        return label;
-    }
-
+    const theme = EFlagToLabelTheme[status];
     return (
-        <ActionTooltip title={description} disabled={Boolean(note)}>
-            {label}
+        <ActionTooltip title={EFlagToDescription[status]} disabled={Boolean(note)}>
+            <Label
+                theme={theme === 'orange' ? undefined : theme}
+                icon={<StatusIcon size={iconSize} status={status} />}
+                size={size}
+                className={b({orange: theme === 'orange'})}
+            >
+                <Flex gap="2" wrap="nowrap">
+                    {children}
+                    {withStatusName ? EFlagToStatusName[status] : null}
+                    {note && <HelpMark className={b('note')}>{note}</HelpMark>}
+                </Flex>
+            </Label>
         </ActionTooltip>
     );
 }

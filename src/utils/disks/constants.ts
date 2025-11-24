@@ -1,11 +1,15 @@
-import {BucketPaint, CircleExclamation} from '@gravity-ui/icons';
+import {
+    ArrowsRotateLeft,
+    BucketPaint,
+    CircleCheck,
+    CircleExclamation,
+    TriangleExclamation,
+} from '@gravity-ui/icons';
 import type {IconData, LabelProps} from '@gravity-ui/uikit';
 
 import type {EFlag} from '../../types/api/enums';
-import {SelfCheckResult} from '../../types/api/healthcheck';
 import {TPDiskState} from '../../types/api/pdisk';
 import {EVDiskState} from '../../types/api/vdisk';
-import {STATUS_VISUAL_CONFIG, STATUS_VISUAL_KEY} from '../healthStatus/common';
 
 // state to numbers to allow ordinal comparison
 export const DISK_COLOR_STATE_TO_NUMERIC_SEVERITY: Record<EFlag, number> = {
@@ -60,26 +64,42 @@ export const PDISK_STATE_SEVERITY = {
     [TPDiskState.Stopped]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
 };
 
-export const DONOR_ICON: IconData = BucketPaint;
-export const DISPLAYED_DISK_ERROR_ICON: IconData = CircleExclamation;
-export const DONOR_THEME: LabelProps['theme'] = 'unknown';
-export const REPLICATION_THEME: LabelProps['theme'] = 'info';
+export interface LabelVisualConfig {
+    theme: LabelProps['theme'];
+    icon: IconData;
+}
 
-export const VDISK_LABEL_CONFIG: Record<string, {theme: LabelProps['theme']; icon: IconData}> = {
+export const NUMERIC_SEVERITY_TO_LABEL_VIEW: Record<number, LabelVisualConfig> = {
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green]: {
+        theme: 'success',
+        icon: CircleCheck,
+    },
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow]: {
+        theme: 'warning',
+        icon: TriangleExclamation,
+    },
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red]: {
+        theme: 'danger',
+        icon: CircleExclamation,
+    },
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue]: {
+        theme: 'info',
+        icon: ArrowsRotateLeft,
+    },
+};
+
+export const DONOR_ICON: IconData = BucketPaint;
+export const DISPLAYED_DISK_ERROR_ICON: IconData =
+    NUMERIC_SEVERITY_TO_LABEL_VIEW[DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red].icon;
+export const DONOR_THEME: LabelProps['theme'] = 'unknown';
+
+export const VDISK_LABEL_CONFIG: Record<string, LabelVisualConfig> = {
     donor: {
         theme: DONOR_THEME,
         icon: DONOR_ICON,
     },
     replica: {
-        theme: REPLICATION_THEME,
-        icon: STATUS_VISUAL_CONFIG[STATUS_VISUAL_KEY.Replicated].icon,
+        theme: NUMERIC_SEVERITY_TO_LABEL_VIEW[DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue].theme,
+        icon: NUMERIC_SEVERITY_TO_LABEL_VIEW[DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue].icon,
     },
-};
-
-export const EFLAG_TO_SELF_CHECK_PLACEHOLDER: Record<number, SelfCheckResult> = {
-    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green]: SelfCheckResult.GOOD,
-    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey]: SelfCheckResult.UNSPECIFIED,
-    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow]: SelfCheckResult.DEGRADED,
-    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Orange]: SelfCheckResult.MAINTENANCE_REQUIRED,
-    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red]: SelfCheckResult.EMERGENCY,
 };

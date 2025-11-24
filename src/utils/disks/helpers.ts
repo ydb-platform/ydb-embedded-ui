@@ -3,17 +3,14 @@ import type {IconData} from '@gravity-ui/uikit';
 import {valueIsDefined} from '..';
 import type {VDiskBlobIndexStatParams} from '../../store/reducers/vdisk/vdisk';
 import {EFlag} from '../../types/api/enums';
-import {SelfCheckResult} from '../../types/api/healthcheck';
 import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
 import {generateEvaluator} from '../generateEvaluator';
-import {SELF_CHECK_TO_TEXT} from '../healthStatus/selfCheck';
 
 import {
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
     DISK_NUMERIC_SEVERITY_TO_STATE_COLOR,
     DISPLAYED_DISK_ERROR_ICON,
     DONOR_ICON,
-    EFLAG_TO_SELF_CHECK_PLACEHOLDER,
     NOT_AVAILABLE_SEVERITY_COLOR,
 } from './constants';
 import type {PreparedVDisk} from './types';
@@ -81,11 +78,4 @@ export function getVDiskStatusIcon(severity?: number, isDonor?: boolean): IconDa
     }
 
     return undefined;
-}
-
-export function getPlaceholderTextByFlag(severity?: number): string {
-    const status = severity
-        ? EFLAG_TO_SELF_CHECK_PLACEHOLDER[severity]
-        : SelfCheckResult.UNSPECIFIED;
-    return SELF_CHECK_TO_TEXT[status];
 }

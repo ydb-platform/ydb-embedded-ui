@@ -3,9 +3,7 @@ import React from 'react';
 import type {DefinitionListProps, IconData, LabelProps} from '@gravity-ui/uikit';
 import {DefinitionList, Flex, Icon, Label} from '@gravity-ui/uikit';
 
-import type {EFlag} from '../../types/api/enums';
 import {cn} from '../../utils/cn';
-import {EntityStatus} from '../EntityStatusNew/EntityStatus';
 
 import i18n from './i18n';
 
@@ -24,7 +22,6 @@ export interface YDBDefinitionListHeaderLabel {
     value: React.ReactNode;
     icon?: IconData;
     theme?: LabelProps['theme'];
-    status?: EFlag;
 }
 
 interface YDBDefinitionListProps extends Omit<DefinitionListProps, 'children'> {
@@ -81,29 +78,20 @@ export function YDBDefinitionList({
                 )}
                 {headerLabels && headerLabels.length > 0 && (
                     <Flex gap={1} alignItems="center">
-                        {headerLabels.map((label) =>
-                            label.status !== undefined ? (
-                                <EntityStatus.Label
-                                    key={label.id}
-                                    status={label.status}
-                                    withStatusName={false}
-                                    size={labelSize}
-                                    iconSize={iconSize}
-                                    withTooltip={false}
-                                >
-                                    {label.value}
-                                </EntityStatus.Label>
-                            ) : (
-                                <Label
-                                    key={label.id}
-                                    theme={label.theme}
-                                    icon={label.icon && <Icon data={label.icon} size={iconSize} />}
-                                    size={labelSize}
-                                >
-                                    {label.value}
-                                </Label>
-                            ),
-                        )}
+                        {headerLabels.map((label) => (
+                            <Label
+                                key={label.id}
+                                theme={label.theme}
+                                icon={
+                                    label.icon ? (
+                                        <Icon data={label.icon} size={iconSize} />
+                                    ) : undefined
+                                }
+                                size={labelSize}
+                            >
+                                {label.value}
+                            </Label>
+                        ))}
                     </Flex>
                 )}
             </Flex>

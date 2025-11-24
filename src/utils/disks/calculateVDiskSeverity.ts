@@ -23,7 +23,10 @@ export function calculateVDiskSeverity<
         return NOT_AVAILABLE_SEVERITY;
     }
 
-    const DiskSpaceSeverity = getColorSeverity(DiskSpace);
+    const DiskSpaceSeverity = Math.min(
+        DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
+        getColorSeverity(DiskSpace),
+    );
     const VDiskSpaceSeverity = getStateSeverity(VDiskState);
     const FrontQueuesSeverity = Math.min(
         DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
@@ -40,7 +43,7 @@ export function calculateVDiskSeverity<
     return severity;
 }
 
-function getStateSeverity(vDiskState?: EVDiskState) {
+export function getStateSeverity(vDiskState?: EVDiskState) {
     if (!vDiskState) {
         return NOT_AVAILABLE_SEVERITY;
     }

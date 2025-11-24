@@ -1,11 +1,4 @@
 {
-  "title_degraded": "Degraded",
-  "title_emergency": "Emergency",
-  "title_maintenance": "Maintenance required",
-  "title_good": "Good",
-  "title_unspecified": "Unspecified",
-  "title_replicated": "Replicated",
-
   "title_red": "Critical",
   "title_blue": "Normal",
   "title_green": "Good",

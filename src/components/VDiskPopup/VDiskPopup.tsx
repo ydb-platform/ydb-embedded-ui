@@ -11,15 +11,13 @@ import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatUptimeInSeconds} from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
+import {getStateSeverity} from '../../utils/disks/calculateVDiskSeverity';
 import {
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
+    NUMERIC_SEVERITY_TO_LABEL_VIEW,
     VDISK_LABEL_CONFIG,
 } from '../../utils/disks/constants';
-import {
-    getPlaceholderTextByFlag,
-    getSeverityColor,
-    isFullVDiskData,
-} from '../../utils/disks/helpers';
+import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
@@ -28,7 +26,6 @@ import {
     useIsViewerUser,
 } from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToGB, bytesToSpeed} from '../../utils/utils';
-import {EntityStatus} from '../EntityStatusNew/EntityStatus';
 import {InternalLink} from '../InternalLink';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {
@@ -36,6 +33,7 @@ import {
     preparePDiskData,
     preparePDiskHeaderLabels,
 } from '../PDiskPopup/PDiskPopup';
+import {StatusIcon} from '../StatusIcon/StatusIcon';
 import {vDiskInfoKeyset} from '../VDiskInfo/i18n';
 import type {
     YDBDefinitionListHeaderLabel,
@@ -119,6 +117,7 @@ const prepareVDiskData = (
         Donors,
         DonorMode,
         Recipient,
+        Severity,
     } = data;
 
     const vdiskData: YDBDefinitionListItem[] = [];
@@ -127,7 +126,8 @@ const prepareVDiskData = (
         vdiskData.push({name: vDiskPopupKeyset('label_storage-pool'), content: StoragePoolName});
     }
 
-    if (Donors?.length) {
+    // it is a healthy replication and it has some donors
+    if (Donors?.length && Severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue) {
         vdiskData.push({
             name: vDiskPopupKeyset('label_donor'),
             content: (
@@ -212,39 +212,17 @@ const prepareVDiskData = (
         });
     }
 
-    if (DiskSpace && DiskSpace !== EFlag.Green) {
+    if (DiskSpace) {
         vdiskData.push({
             name: vDiskPopupKeyset('label_space'),
-            content: (
-                <EntityStatus.Label
-                    status={DiskSpace}
-                    size="xs"
-                    iconSize={12}
-                    withIcon={false}
-                    withStatusName={false}
-                    withTooltip={false}
-                >
-                    {DiskSpace}
-                </EntityStatus.Label>
-            ),
+            content: <StatusIcon mode="icons" status={DiskSpace} />,
         });
     }
 
-    if (FrontQueues && FrontQueues !== EFlag.Green) {
+    if (FrontQueues) {
         vdiskData.push({
             name: vDiskPopupKeyset('label_front-queues'),
-            content: (
-                <EntityStatus.Label
-                    status={FrontQueues}
-                    size="xs"
-                    iconSize={12}
-                    withIcon={false}
-                    withStatusName={false}
-                    withTooltip={false}
-                >
-                    {FrontQueues}
-                </EntityStatus.Label>
-            ),
+            content: <StatusIcon mode="icons" status={FrontQueues} />,
         });
     }
 
@@ -361,7 +339,7 @@ const buildVDiskFooter = (
 const prepareHeaderLabels = (data: PreparedVDisk): YDBDefinitionListHeaderLabel[] => {
     const labels: YDBDefinitionListHeaderLabel[] = [];
 
-    const {VDiskState, DonorMode, Replicated, Severity} = data;
+    const {VDiskState, DonorMode, Severity} = data;
 
     const isReplicatingColor = Severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue;
 
@@ -374,31 +352,34 @@ const prepareHeaderLabels = (data: PreparedVDisk): YDBDefinitionListHeaderLabel[
             theme: donorConfig.theme,
             icon: donorConfig.icon,
         });
-    } else if (!Replicated) {
-        const replicaConfig = VDISK_LABEL_CONFIG.replica;
-
-        labels.push({
-            id: 'replication',
-            value: vDiskPopupKeyset('label_replication'),
-            theme: replicaConfig.theme,
-            icon: replicaConfig.icon,
-        });
     }
 
     if (isReplicatingColor) {
+        if (!DonorMode) {
+            const replicaConfig = VDISK_LABEL_CONFIG.replica;
+
+            labels.push({
+                id: 'replication',
+                value: vDiskPopupKeyset('label_replication'),
+                theme: replicaConfig.theme,
+                icon: replicaConfig.icon,
+            });
+        }
+
         return labels;
     }
 
-    const stateStatus = getSeverityColor(Severity);
+    if (VDiskState) {
+        const severity = getStateSeverity(VDiskState);
+        const {theme, icon} = NUMERIC_SEVERITY_TO_LABEL_VIEW[severity];
 
-    const hasError = VDiskState && VDiskState !== EVDiskState.OK;
-    const stateValue = hasError ? VDiskState : getPlaceholderTextByFlag(Severity);
-
-    labels.push({
-        id: 'state',
-        value: stateValue,
-        status: stateStatus,
-    });
+        labels.push({
+            id: 'state',
+            value: VDiskState,
+            theme: theme,
+            icon: icon,
+        });
+    }
 
     return labels;
 };
