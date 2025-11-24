@@ -10,7 +10,6 @@ import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {createPDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import {getPlaceholderTextByFlag, getSeverityColor} from '../../utils/disks/helpers';
 import type {PreparedPDisk} from '../../utils/disks/types';
-import {getEFlagView} from '../../utils/healthStatus/healthCheck';
 import {useTypedSelector} from '../../utils/hooks';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
@@ -82,7 +81,7 @@ export const preparePDiskHeaderLabels = (data: PreparedPDisk): YDBDefinitionList
         return labels;
     }
 
-    const {theme, icon} = getEFlagView(getSeverityColor(Severity));
+    const stateStatus = getSeverityColor(Severity);
 
     const hasError = State && State !== TPDiskState.Normal;
     const value = hasError ? State : getPlaceholderTextByFlag(Severity);
@@ -90,8 +89,7 @@ export const preparePDiskHeaderLabels = (data: PreparedPDisk): YDBDefinitionList
     labels.push({
         id: 'state',
         value,
-        theme,
-        icon,
+        status: stateStatus,
     });
 
     return labels;

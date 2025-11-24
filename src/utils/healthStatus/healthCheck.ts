@@ -1,7 +1,7 @@
 import {EFlag} from '../../types/api/enums';
 
 import {STATUS_VISUAL_CONFIG, STATUS_VISUAL_KEY} from './common';
-import type {StatusVisualKey} from './common';
+import type {StatusVisualConfig, StatusVisualKey} from './common';
 import i18n from './i18n';
 
 // Healthcheck statuses
@@ -56,7 +56,12 @@ export const EFLAG_TO_DESCRIPTION: Record<EFlag, string> = {
     },
 };
 
-export function getEFlagView(flag: EFlag) {
+export type EFlagView = StatusVisualConfig & {
+    title: string;
+    description: string;
+};
+
+export function getEFlagView(flag: EFlag): EFlagView {
     const visualKey = EFLAG_TO_VISUAL_KEY[flag];
     const {theme, icon} = STATUS_VISUAL_CONFIG[visualKey];
 

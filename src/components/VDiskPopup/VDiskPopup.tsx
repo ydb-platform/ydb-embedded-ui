@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Divider, Flex, Label} from '@gravity-ui/uikit';
+import {Divider, Flex} from '@gravity-ui/uikit';
 
 import {useVDiskPagePath} from '../../routes';
 import {selectNodesMap} from '../../store/reducers/nodesList';
@@ -21,7 +21,6 @@ import {
     isFullVDiskData,
 } from '../../utils/disks/helpers';
 import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
-import {getEFlagView} from '../../utils/healthStatus/healthCheck';
 import {useTypedSelector} from '../../utils/hooks';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {
@@ -29,6 +28,7 @@ import {
     useIsViewerUser,
 } from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToGB, bytesToSpeed} from '../../utils/utils';
+import {EntityStatus} from '../EntityStatusNew/EntityStatus';
 import {InternalLink} from '../InternalLink';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {
@@ -213,20 +213,38 @@ const prepareVDiskData = (
     }
 
     if (DiskSpace && DiskSpace !== EFlag.Green) {
-        const {theme} = getEFlagView(DiskSpace);
-
         vdiskData.push({
             name: vDiskPopupKeyset('label_space'),
-            content: <Label theme={theme}>{DiskSpace}</Label>,
+            content: (
+                <EntityStatus.Label
+                    status={DiskSpace}
+                    size="xs"
+                    iconSize={12}
+                    withIcon={false}
+                    withStatusName={false}
+                    withTooltip={false}
+                >
+                    {DiskSpace}
+                </EntityStatus.Label>
+            ),
         });
     }
 
     if (FrontQueues && FrontQueues !== EFlag.Green) {
-        const {theme} = getEFlagView(FrontQueues);
-
         vdiskData.push({
             name: vDiskPopupKeyset('label_front-queues'),
-            content: <Label theme={theme}>{FrontQueues}</Label>,
+            content: (
+                <EntityStatus.Label
+                    status={FrontQueues}
+                    size="xs"
+                    iconSize={12}
+                    withIcon={false}
+                    withStatusName={false}
+                    withTooltip={false}
+                >
+                    {FrontQueues}
+                </EntityStatus.Label>
+            ),
         });
     }
 
@@ -371,7 +389,7 @@ const prepareHeaderLabels = (data: PreparedVDisk): YDBDefinitionListHeaderLabel[
         return labels;
     }
 
-    const {theme: stateTheme, icon: stateIcon} = getEFlagView(getSeverityColor(Severity));
+    const stateStatus = getSeverityColor(Severity);
 
     const hasError = VDiskState && VDiskState !== EVDiskState.OK;
     const stateValue = hasError ? VDiskState : getPlaceholderTextByFlag(Severity);
@@ -379,8 +397,7 @@ const prepareHeaderLabels = (data: PreparedVDisk): YDBDefinitionListHeaderLabel[
     labels.push({
         id: 'state',
         value: stateValue,
-        theme: stateTheme,
-        icon: stateIcon,
+        status: stateStatus,
     });
 
     return labels;

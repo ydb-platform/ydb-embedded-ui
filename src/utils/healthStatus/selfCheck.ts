@@ -1,7 +1,7 @@
 import {SelfCheckResult} from '../../types/api/healthcheck';
 
 import {STATUS_VISUAL_CONFIG, STATUS_VISUAL_KEY} from './common';
-import type {StatusVisualKey} from './common';
+import type {StatusVisualConfig, StatusVisualKey} from './common';
 import i18n from './i18n';
 
 // Base statuses
@@ -31,7 +31,11 @@ export const SELF_CHECK_TO_TEXT: Record<SelfCheckResult, string> = {
     },
 };
 
-export function getSelfCheckView(status: SelfCheckResult) {
+export type SelfCheckView = StatusVisualConfig & {
+    text: string;
+};
+
+export function getSelfCheckView(status: SelfCheckResult): SelfCheckView {
     const visualKey = SELF_CHECK_TO_VISUAL_KEY[status];
     const {theme, icon} = STATUS_VISUAL_CONFIG[visualKey];
 

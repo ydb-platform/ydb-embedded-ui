@@ -1,3 +1,5 @@
+import {isNil} from 'lodash';
+
 import type {EFlag} from '../../../types/api/enums';
 import type {TNodeInfo, TNodesInfo} from '../../../types/api/nodes';
 import {TPDiskState} from '../../../types/api/pdisk';
@@ -11,7 +13,6 @@ import type {
 } from '../../../types/api/storage';
 import {EVDiskState} from '../../../types/api/vdisk';
 import type {TVDiskStateInfo} from '../../../types/api/vdisk';
-import {valueIsDefined} from '../../../utils';
 import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
 import {getColorSeverity, getSeverityColor} from '../../../utils/disks/helpers';
 import {
@@ -285,7 +286,7 @@ const makeVDiskLocationKey = (
     pDiskId?: number,
     vDiskSlotId?: number,
 ): string | undefined => {
-    if (!valueIsDefined(nodeId) || !valueIsDefined(pDiskId) || !valueIsDefined(vDiskSlotId)) {
+    if (!isNil(nodeId) || !isNil(pDiskId) || !isNil(vDiskSlotId)) {
         return undefined;
     }
 

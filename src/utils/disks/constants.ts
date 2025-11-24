@@ -62,6 +62,7 @@ export const PDISK_STATE_SEVERITY = {
 
 export const DONOR_ICON: IconData = BucketPaint;
 export const DONOR_THEME: LabelProps['theme'] = 'unknown';
+export const REPLICATION_THEME: LabelProps['theme'] = 'info';
 
 export const VDISK_LABEL_CONFIG: Record<string, {theme: LabelProps['theme']; icon: IconData}> = {
     donor: {
@@ -69,7 +70,7 @@ export const VDISK_LABEL_CONFIG: Record<string, {theme: LabelProps['theme']; ico
         icon: DONOR_ICON,
     },
     replica: {
-        theme: STATUS_VISUAL_CONFIG[STATUS_VISUAL_KEY.Replicated].theme,
+        theme: REPLICATION_THEME,
         icon: STATUS_VISUAL_CONFIG[STATUS_VISUAL_KEY.Replicated].icon,
     },
 };

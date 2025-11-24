@@ -19,8 +19,10 @@ export const STATUS_VISUAL_KEY = {
 
 export type StatusVisualKey = (typeof STATUS_VISUAL_KEY)[keyof typeof STATUS_VISUAL_KEY];
 
+export type StatusLabelTheme = LabelProps['theme'] | 'critical';
+
 export interface StatusVisualConfig {
-    theme: LabelProps['theme'];
+    theme: StatusLabelTheme;
     icon: IconData;
 }
 
@@ -42,7 +44,7 @@ export const STATUS_VISUAL_CONFIG: Record<StatusVisualKey, StatusVisualConfig> =
         icon: Flame,
     },
     [STATUS_VISUAL_KEY.DangerCritical]: {
-        theme: 'danger',
+        theme: 'critical',
         icon: CircleXmark,
     },
     [STATUS_VISUAL_KEY.Replicated]: {

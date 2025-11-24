@@ -1,8 +1,4 @@
-.ydb-entity-status-new {
-    &__note {
-        color: inherit;
-    }
-
+.ydb-healthcheck-status {
     &_critical.g-label {
         color: var(--g-color-text-contrast);
         background-color: var(--g-color-base-danger-heavy);
