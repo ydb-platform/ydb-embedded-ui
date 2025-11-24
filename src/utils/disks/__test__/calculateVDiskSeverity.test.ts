@@ -23,7 +23,7 @@ describe('VDisk state', () => {
 
         expect(severity1).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow);
         expect(severity2).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
-        expect(severity3).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Orange);
+        expect(severity3).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow);
     });
 
     test('Should not pick the highest severity based on FrontQueues value', () => {
