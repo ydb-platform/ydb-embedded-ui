@@ -26,7 +26,7 @@ export const viewSchemaApi = api.injectEndpoints({
                         {
                             query: createViewSchemaQuery(relativePath),
                             database,
-                            action: 'execute-scan',
+                            action: 'execute-query',
                             timeout,
                             internal_call: true,
                         },

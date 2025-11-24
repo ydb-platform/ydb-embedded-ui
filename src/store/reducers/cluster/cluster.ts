@@ -98,7 +98,7 @@ export const clusterApi = api.injectEndpoints({
                         const groupsStatsResponse = await window.api.viewer.sendQuery({
                             query: query,
                             database: clusterRoot,
-                            action: 'execute-scan',
+                            action: 'execute-query',
                             internal_call: true,
                         });
 

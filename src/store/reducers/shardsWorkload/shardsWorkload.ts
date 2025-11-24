@@ -46,7 +46,7 @@ function createShardQueryImmediate(
     });
 }
 
-const queryAction = 'execute-scan';
+const queryAction = 'execute-query';
 
 const slice = createSlice({
     name: 'shardsWorkload',
