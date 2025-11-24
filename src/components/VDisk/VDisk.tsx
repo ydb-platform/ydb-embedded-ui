@@ -75,7 +75,7 @@ export const VDisk = ({
                         className={progressBarClassName}
                         content={
                             showIcon ? (
-                                <div className={b('donor-icon')}>
+                                <div className={b('vdisk-icon')}>
                                     <Icon data={statusIcon} size={12} />
                                 </div>
                             ) : null

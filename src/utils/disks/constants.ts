@@ -1,4 +1,4 @@
-import {BucketPaint} from '@gravity-ui/icons';
+import {BucketPaint, CircleExclamation} from '@gravity-ui/icons';
 import type {IconData, LabelProps} from '@gravity-ui/uikit';
 
 import type {EFlag} from '../../types/api/enums';
@@ -61,6 +61,7 @@ export const PDISK_STATE_SEVERITY = {
 };
 
 export const DONOR_ICON: IconData = BucketPaint;
+export const DISPLAYED_DISK_ERROR_ICON: IconData = CircleExclamation;
 export const DONOR_THEME: LabelProps['theme'] = 'unknown';
 export const REPLICATION_THEME: LabelProps['theme'] = 'info';
 
