@@ -62,7 +62,9 @@ interface ActionsAdditionalParams {
     isSchemaDataLoading?: boolean;
     hasMonitoring?: boolean;
     streamingQueryData?: IQueryResult;
+    showCreateTableData?: string;
     isStreamingQueryTextLoading?: boolean;
+    isShowCreateTableLoading?: boolean;
 }
 
 interface BindActionParams {
@@ -86,6 +88,7 @@ const bindActions = (
         getConnectToDBDialog,
         schemaData,
         streamingQueryData,
+        showCreateTableData,
     } = additionalEffects;
 
     const inputQuery = (tmpl: TemplateFn) => () => {
@@ -94,7 +97,9 @@ const bindActions = (
             setTenantPage(TENANT_PAGES_IDS.query);
             dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
             setActivePath(params.path);
-            insertSnippetToEditor(tmpl({...params, schemaData, streamingQueryData}));
+            insertSnippetToEditor(
+                tmpl({...params, schemaData, streamingQueryData, showCreateTableData}),
+            );
         };
         if (getConfirmation) {
             const confirmedPromise = getConfirmation();
@@ -174,9 +179,10 @@ interface ActionConfig {
     text: string;
     action: () => void;
     isLoading?: boolean;
+    iconStart?: React.ReactNode;
 }
 
-const getActionWithLoader = ({text, action, isLoading}: ActionConfig) => ({
+const getActionWithLoader = ({text, action, isLoading, iconStart}: ActionConfig) => ({
     text: (
         <Flex justifyContent="space-between" alignItems="center">
             {text}
@@ -185,6 +191,7 @@ const getActionWithLoader = ({text, action, isLoading}: ActionConfig) => ({
     ),
     action,
     disabled: isLoading,
+    iconStart,
 });
 
 export const getActions =
@@ -269,11 +276,12 @@ export const getActions =
             DIR_SET.splice(1, 0, [createDirectoryItem]);
         }
 
-        const showCreateTableItem = {
+        const showCreateTableItem = getActionWithLoader({
             text: i18n('actions.showCreateTable'),
             action: actions.showCreateTable,
+            isLoading: additionalEffects.isShowCreateTableLoading,
             iconStart: <Code />,
-        };
+        });
 
         const ROW_TABLE_SET: ActionsSet = [
             [copyItem],
