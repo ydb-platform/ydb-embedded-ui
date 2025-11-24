@@ -7,7 +7,33 @@
         @include mixins.info-viewer-title();
     }
 
+    &__title-suffix {
+        color: var(--g-color-text-secondary);
+    }
+
     &__properties-list {
         max-width: calc(100% - 40px);
+    }
+
+    &__footer {
+        margin-top: var(--g-spacing-3);
+    }
+
+    &_compact {
+        .ydb-definition-list__title {
+            margin: 0;
+
+            font-weight: 500;
+        }
+
+        .ydb-definition-list__header {
+            margin-bottom: var(--g-spacing-3);
+        }
+
+        .ydb-definition-list__properties-list {
+            .g-definition-list__item + .g-definition-list__item {
+                margin-top: var(--g-spacing-2);
+            }
+        }
     }
 }

@@ -17,7 +17,6 @@ const EFlagToIcon: Record<EFlag, (props: React.SVGProps<SVGSVGElement>) => React
     [EFlag.Red]: CircleExclamation,
     [EFlag.Green]: CircleCheck,
     [EFlag.Grey]: PlugConnection,
-    [EFlag.DarkGrey]: PlugConnection,
 };
 
 interface StatusIconProps extends Omit<IconProps, 'data'> {

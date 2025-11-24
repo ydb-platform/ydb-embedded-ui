@@ -3,8 +3,8 @@ import {Icon} from '@gravity-ui/uikit';
 import {useStorageQueryParams} from '../../containers/Storage/useStorageQueryParams';
 import {useVDiskPagePath} from '../../routes';
 import {STORAGE_TYPES} from '../../store/reducers/storage/constants';
-import {EVDiskState} from '../../types/api/vdisk';
 import {cn} from '../../utils/cn';
+import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from '../../utils/disks/constants';
 import {getVDiskStatusIcon} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {DiskStateProgressBar} from '../DiskStateProgressBar/DiskStateProgressBar';
@@ -46,11 +46,10 @@ export const VDisk = ({
     const vDiskPath = getVDiskLink({nodeId: data.NodeId, vDiskId: data.StringifiedId});
 
     const severity = data.Severity;
-    const isDonor = data.VDiskState === EVDiskState.OK && data.DonorMode;
-    const isReplicating =
-        data.Replicated === false && data.VDiskState === EVDiskState.OK && !data.DonorMode;
+    const isReplicatingColor = severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue;
+    const isHealthyDonor = data.DonorMode && isReplicatingColor;
 
-    const statusIcon = getVDiskStatusIcon(severity);
+    const statusIcon = getVDiskStatusIcon(severity, data.DonorMode);
     const showIcon = statusIcon && isGroupView;
 
     return (
@@ -70,8 +69,9 @@ export const VDisk = ({
                         severity={severity}
                         compact={compact}
                         inactive={inactive}
-                        striped={isReplicating || isDonor}
-                        faded={isReplicating || isDonor}
+                        striped={isReplicatingColor}
+                        faded={isReplicatingColor}
+                        isDonor={isHealthyDonor}
                         className={progressBarClassName}
                         content={
                             showIcon ? (

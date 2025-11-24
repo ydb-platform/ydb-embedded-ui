@@ -22,7 +22,6 @@ const COLORS_PRIORITY: Record<EFlag, number> = {
     Orange: 2,
     Red: 1,
     Grey: 0,
-    DarkGrey: -1,
 };
 
 const getDCInfo = (cluster: TClusterInfo) => {

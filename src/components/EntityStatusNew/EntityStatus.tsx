@@ -3,50 +3,14 @@ import React from 'react';
 import type {LabelProps} from '@gravity-ui/uikit';
 import {ActionTooltip, Flex, HelpMark, Label} from '@gravity-ui/uikit';
 
-import {EFlag} from '../../types/api/enums';
+import type {EFlag} from '../../types/api/enums';
 import {cn} from '../../utils/cn';
+import {getEFlagView} from '../../utils/healthStatus/healthCheck';
 import {StatusIcon} from '../StatusIconNew/StatusIcon';
-
-import i18n from './i18n';
-import {EFlagToDescription} from './utils';
 
 import './EntityStatus.scss';
 
 const b = cn('ydb-entity-status-new');
-
-const EFlagToLabelTheme: Record<EFlag, LabelProps['theme'] | 'orange'> = {
-    [EFlag.Red]: 'danger',
-    [EFlag.Blue]: 'info',
-    [EFlag.Green]: 'success',
-    [EFlag.Grey]: 'unknown',
-    [EFlag.Orange]: 'orange',
-    [EFlag.Yellow]: 'warning',
-    [EFlag.DarkGrey]: 'unknown',
-};
-
-const EFlagToStatusName: Record<EFlag, string> = {
-    get [EFlag.Red]() {
-        return i18n('title_red');
-    },
-    get [EFlag.Yellow]() {
-        return i18n('title_yellow');
-    },
-    get [EFlag.Orange]() {
-        return i18n('title_orange');
-    },
-    get [EFlag.Green]() {
-        return i18n('title_green');
-    },
-    get [EFlag.Grey]() {
-        return i18n('title_grey');
-    },
-    get [EFlag.DarkGrey]() {
-        return i18n('title_grey');
-    },
-    get [EFlag.Blue]() {
-        return i18n('title_blue');
-    },
-};
 
 interface EntityStatusLabelProps {
     status: EFlag;
@@ -65,18 +29,14 @@ function EntityStatusLabel({
     size = 'm',
     iconSize = 14,
 }: EntityStatusLabelProps) {
-    const theme = EFlagToLabelTheme[status];
+    const {theme, title, description} = getEFlagView(status);
+
     return (
-        <ActionTooltip title={EFlagToDescription[status]} disabled={Boolean(note)}>
-            <Label
-                theme={theme === 'orange' ? undefined : theme}
-                icon={<StatusIcon size={iconSize} status={status} />}
-                size={size}
-                className={b({orange: theme === 'orange'})}
-            >
+        <ActionTooltip title={description} disabled={Boolean(note)}>
+            <Label theme={theme} icon={<StatusIcon size={iconSize} status={status} />} size={size}>
                 <Flex gap="2" wrap="nowrap">
                     {children}
-                    {withStatusName ? EFlagToStatusName[status] : null}
+                    {withStatusName ? title : null}
                     {note && <HelpMark className={b('note')}>{note}</HelpMark>}
                 </Flex>
             </Label>

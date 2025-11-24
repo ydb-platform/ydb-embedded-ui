@@ -8,7 +8,6 @@ import {StringParam, useQueryParams} from 'use-query-params';
 import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
 import {DrawerContextProvider} from '../../components/Drawer/DrawerContext';
 import {EntityStatus} from '../../components/EntityStatusNew/EntityStatus';
-import {EFlagToDescription} from '../../components/EntityStatusNew/utils';
 import {InternalLink} from '../../components/InternalLink';
 import {NetworkTable} from '../../components/NetworkTable/NetworkTable';
 import {useShouldShowClusterNetworkTable} from '../../components/NetworkTable/hooks';
@@ -30,6 +29,7 @@ import type {AdditionalClusterProps, AdditionalTenantsProps} from '../../types/a
 import {EFlag} from '../../types/api/enums';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
+import {EFLAG_TO_DESCRIPTION} from '../../utils/healthStatus/healthCheck';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useAppTitle} from '../App/AppTitleContext';
@@ -128,7 +128,7 @@ export function Cluster({additionalClusterProps, additionalTenantsProps}: Cluste
                 {clusterTitle}
                 <EntityStatus.Label
                     status={clusterStatus}
-                    note={EFlagToDescription[clusterStatus]}
+                    note={EFLAG_TO_DESCRIPTION[clusterStatus]}
                 />
             </EntityStatus>
         );

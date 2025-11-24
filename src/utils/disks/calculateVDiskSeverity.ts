@@ -16,7 +16,7 @@ export function calculateVDiskSeverity<
         DonorMode?: boolean;
     },
 >(vDisk: T) {
-    const {DiskSpace, VDiskState, FrontQueues, Replicated, DonorMode} = vDisk;
+    const {DiskSpace, VDiskState, FrontQueues, Replicated} = vDisk;
 
     // if the disk is not available, this determines its status severity regardless of other features
     if (!VDiskState) {
@@ -26,19 +26,15 @@ export function calculateVDiskSeverity<
     const DiskSpaceSeverity = getColorSeverity(DiskSpace);
     const VDiskSpaceSeverity = getStateSeverity(VDiskState);
     const FrontQueuesSeverity = Math.min(
-        DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Orange,
+        DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
         getColorSeverity(FrontQueues),
     );
 
     let severity = Math.max(DiskSpaceSeverity, VDiskSpaceSeverity, FrontQueuesSeverity);
 
-    const isHealthy = severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green;
-
-    // If VDisk is healthy and not replicated, adjust color based on its role
-    if (isHealthy && Replicated === false) {
-        severity = DonorMode
-            ? DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.DarkGrey // donor
-            : DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue; // replicating
+    // donors are always in the not replicated state since they are leftovers
+    if (Replicated === false && severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green) {
+        severity = DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue;
     }
 
     return severity;
@@ -58,7 +54,7 @@ function getColorSeverity(color?: EFlag) {
     }
 
     // Blue is reserved for not replicated VDisks. DarkGrey is reserved for donors.
-    if (color === EFlag.Blue || color === EFlag.DarkGrey) {
+    if (color === EFlag.Blue) {
         return DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green;
     }
 

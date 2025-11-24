@@ -10,6 +10,9 @@
     --progress-bar-full-height: var(--g-text-body-3-line-height);
     --progress-bar-compact-height: 12px;
 
+    --stripe-width: 4px;
+    --stripe-step: 8px;
+
     position: relative;
     z-index: 0;
 
@@ -83,9 +86,9 @@
             background-image: repeating-linear-gradient(
                 135deg,
                 transparent 0,
-                transparent 4px,
-                var(--entity-state-fill-color) 4px,
-                var(--entity-state-fill-color) 8px
+                transparent var(--stripe-width),
+                var(--entity-state-fill-color) var(--stripe-width),
+                var(--entity-state-fill-color) var(--stripe-step)
             );
         }
     }

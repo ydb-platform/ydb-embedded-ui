@@ -10,16 +10,10 @@
     font-size: var(--ydb-info-viewer-font-size);
     line-height: var(--ydb-info-viewer-line-height);
 
-    &__header {
-        margin: var(--ydb-info-viewer-title-margin);
-    }
-
     &__title {
-        font-weight: var(--ydb-info-viewer-title-font-weight);
-    }
+        margin: var(--ydb-info-viewer-title-margin);
 
-    &__title-suffix {
-        color: var(--g-color-text-secondary);
+        font-weight: var(--ydb-info-viewer-title-font-weight);
     }
 
     &__items {

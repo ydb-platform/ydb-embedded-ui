@@ -1,15 +1,11 @@
-import {
-    ArrowsRotateLeft,
-    BucketPaint,
-    CircleCheck,
-    CircleExclamation,
-    TriangleExclamation,
-} from '@gravity-ui/icons';
+import {BucketPaint} from '@gravity-ui/icons';
 import type {IconData, LabelProps} from '@gravity-ui/uikit';
 
 import type {EFlag} from '../../types/api/enums';
+import {SelfCheckResult} from '../../types/api/healthcheck';
 import {TPDiskState} from '../../types/api/pdisk';
 import {EVDiskState} from '../../types/api/vdisk';
+import {STATUS_VISUAL_CONFIG, STATUS_VISUAL_KEY} from '../healthStatus/common';
 
 // state to numbers to allow ordinal comparison
 export const DISK_COLOR_STATE_TO_NUMERIC_SEVERITY: Record<EFlag, number> = {
@@ -19,8 +15,9 @@ export const DISK_COLOR_STATE_TO_NUMERIC_SEVERITY: Record<EFlag, number> = {
     Yellow: 3,
     Orange: 4,
     Red: 5,
-    DarkGrey: 6,
 } as const;
+
+export const DONOR_COLOR = 'DarkGrey';
 
 type SeverityToColor = Record<number, keyof typeof DISK_COLOR_STATE_TO_NUMERIC_SEVERITY>;
 
@@ -63,32 +60,24 @@ export const PDISK_STATE_SEVERITY = {
     [TPDiskState.Stopped]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
 };
 
-export const NUMERIC_SEVERITY_LABEL_THEME: Record<number, LabelProps['theme']> = {
-    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green]: 'success',
-    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue]: 'info',
-    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow]: 'warning',
-    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Orange]: 'warning',
-    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red]: 'danger',
-    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey]: 'unknown',
-    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.DarkGrey]: 'unknown',
-};
-
-export const NUMERIC_SEVERITY_LABEL_ICON: Record<number, IconData> = {
-    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green]: CircleCheck,
-    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue]: ArrowsRotateLeft,
-    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow]: TriangleExclamation,
-    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Orange]: TriangleExclamation,
-    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red]: CircleExclamation,
-    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.DarkGrey]: BucketPaint,
-};
+export const DONOR_ICON: IconData = BucketPaint;
+export const DONOR_THEME: LabelProps['theme'] = 'unknown';
 
 export const VDISK_LABEL_CONFIG: Record<string, {theme: LabelProps['theme']; icon: IconData}> = {
     donor: {
-        theme: 'unknown',
-        icon: BucketPaint,
+        theme: DONOR_THEME,
+        icon: DONOR_ICON,
     },
     replica: {
-        theme: 'info',
-        icon: ArrowsRotateLeft,
+        theme: STATUS_VISUAL_CONFIG[STATUS_VISUAL_KEY.Replicated].theme,
+        icon: STATUS_VISUAL_CONFIG[STATUS_VISUAL_KEY.Replicated].icon,
     },
+};
+
+export const EFLAG_TO_SELF_CHECK_PLACEHOLDER: Record<number, SelfCheckResult> = {
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green]: SelfCheckResult.GOOD,
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey]: SelfCheckResult.UNSPECIFIED,
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow]: SelfCheckResult.DEGRADED,
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Orange]: SelfCheckResult.MAINTENANCE_REQUIRED,
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red]: SelfCheckResult.EMERGENCY,
 };

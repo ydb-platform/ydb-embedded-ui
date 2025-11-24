@@ -2,6 +2,7 @@ import React from 'react';
 
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {cn} from '../../utils/cn';
+import {DONOR_COLOR} from '../../utils/disks/constants';
 import {getSeverityColor} from '../../utils/disks/helpers';
 import {useSetting} from '../../utils/hooks';
 
@@ -19,6 +20,7 @@ interface DiskStateProgressBarProps {
     striped?: boolean;
     content?: React.ReactNode;
     className?: string;
+    isDonor?: boolean;
 }
 
 export function DiskStateProgressBar({
@@ -31,6 +33,7 @@ export function DiskStateProgressBar({
     content,
     striped,
     className,
+    isDonor,
 }: DiskStateProgressBarProps) {
     const [inverted] = useSetting<boolean | undefined>(SETTING_KEYS.INVERTED_DISKS);
 
@@ -43,9 +46,13 @@ export function DiskStateProgressBar({
         striped,
     };
 
-    const color = severity !== undefined && getSeverityColor(severity);
-    if (color) {
-        mods[color.toLowerCase()] = true;
+    if (isDonor) {
+        mods[DONOR_COLOR.toLocaleLowerCase()] = true;
+    } else {
+        const color = severity !== undefined && getSeverityColor(severity);
+        if (color) {
+            mods[color.toLocaleLowerCase()] = true;
+        }
     }
 
     const renderAllocatedPercent = () => {

@@ -8,5 +8,4 @@ export enum EFlag {
     Yellow = 'Yellow',
     Orange = 'Orange',
     Red = 'Red',
-    DarkGrey = 'DarkGrey',
 }
