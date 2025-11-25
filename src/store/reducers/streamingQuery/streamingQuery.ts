@@ -23,7 +23,7 @@ export const streamingQueriesApi = api.injectEndpoints({
                         {
                             query: getStreamingQueryInfoSQL(path),
                             database,
-                            action: 'execute-scan',
+                            action: 'execute-query',
                             internal_call: true,
                         },
                         {signal, withRetries: true},
