@@ -30,7 +30,8 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
 
     const {currentData, isFetching, error} = overviewApi.useGetOverviewQuery(
         {path, database, databaseFullPath},
-        {pollingInterval: autoRefreshInterval},
+        //overview is not supported for streaming query, data request is inside StreamingQueryInfo
+        {pollingInterval: autoRefreshInterval, skip: type === EPathType.EPathTypeStreamingQuery},
     );
 
     const loading = isFetching && currentData === undefined;
@@ -79,7 +80,7 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
                 />
             ),
             [EPathType.EPathTypeStreamingQuery]: () => (
-                <StreamingQueryInfo data={data} path={path} database={database} />
+                <StreamingQueryInfo path={path} database={database} />
             ),
         };
 

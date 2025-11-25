@@ -11,15 +11,13 @@ import {
 } from '../../../../store/reducers/capabilities/hooks';
 import {
     queryApi,
-    saveQueryToHistory,
-    selectQueriesHistory,
-    selectQueriesHistoryCurrentIndex,
     selectResult,
     selectTenantPath,
     setIsDirty,
     setTenantPath,
 } from '../../../../store/reducers/query/query';
 import type {QueryResult} from '../../../../store/reducers/query/types';
+import type {useQueriesHistory} from '../../../../store/reducers/query/useQueriesHistory';
 import {setQueryAction} from '../../../../store/reducers/queryActions/queryActions';
 import {selectShowPreview, setShowPreview} from '../../../../store/reducers/schema/schema';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
@@ -69,17 +67,24 @@ const initialTenantCommonInfoState = {
 interface QueryEditorProps {
     changeUserInput: (arg: {input: string}) => void;
     theme: string;
+    queriesHistory: ReturnType<typeof useQueriesHistory>;
 }
 
-export default function QueryEditor(props: QueryEditorProps) {
+export default function QueryEditor({theme, changeUserInput, queriesHistory}: QueryEditorProps) {
     const dispatch = useTypedDispatch();
     const {database, path, type, subType, databaseFullPath} = useCurrentSchema();
-    const {theme, changeUserInput} = props;
     const savedPath = useTypedSelector(selectTenantPath);
     const result = useTypedSelector(selectResult);
-    const historyQueries = useTypedSelector(selectQueriesHistory);
-    const historyCurrentIndex = useTypedSelector(selectQueriesHistoryCurrentIndex);
     const showPreview = useTypedSelector(selectShowPreview);
+
+    const {
+        historyQueries,
+        historyCurrentQueryId,
+        saveQueryToHistory,
+        updateQueryInHistory,
+        goToPreviousQuery,
+        goToNextQuery,
+    } = queriesHistory;
 
     const isResultLoaded = Boolean(result);
 
@@ -182,6 +187,17 @@ export default function QueryEditor(props: QueryEditorProps) {
                 base64: encodeTextWithBase64,
             });
 
+            query
+                .then(({data}) => {
+                    if (data?.queryId) {
+                        updateQueryInHistory(data.queryId, data?.queryStats);
+                    }
+                })
+                .catch((error) => {
+                    // Do not add query stats for failed query
+                    console.error('Failed to update query history:', error);
+                });
+
             queryManagerInstance.registerQuery(query);
         }
 
@@ -189,8 +205,11 @@ export default function QueryEditor(props: QueryEditorProps) {
 
         // Don't save partial queries in history
         if (!partial) {
-            if (text !== historyQueries[historyCurrentIndex]?.queryText) {
-                dispatch(saveQueryToHistory({queryText: text, queryId}));
+            const currentQuery = historyCurrentQueryId
+                ? historyQueries.find((q) => q.queryId === historyCurrentQueryId)
+                : null;
+            if (text !== currentQuery?.queryText) {
+                saveQueryToHistory(text, queryId);
             }
             dispatch(setIsDirty(false));
         }
@@ -279,6 +298,9 @@ export default function QueryEditor(props: QueryEditorProps) {
                                 theme={theme}
                                 handleSendExecuteClick={handleSendExecuteClick}
                                 handleGetExplainQueryClick={handleGetExplainQueryClick}
+                                historyQueries={historyQueries}
+                                goToPreviousQuery={goToPreviousQuery}
+                                goToNextQuery={goToNextQuery}
                             />
                         </div>
                     </div>

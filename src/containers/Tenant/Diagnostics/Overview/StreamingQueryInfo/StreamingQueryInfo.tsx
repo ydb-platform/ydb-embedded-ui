@@ -2,12 +2,13 @@ import React from 'react';
 
 import {Label} from '@gravity-ui/uikit';
 
+import {LoaderWrapper} from '../../../../../components/LoaderWrapper/LoaderWrapper';
 import {YDBSyntaxHighlighter} from '../../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {streamingQueriesApi} from '../../../../../store/reducers/streamingQuery/streamingQuery';
 import type {ErrorResponse} from '../../../../../types/api/query';
-import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
+import {EPathType} from '../../../../../types/api/schema';
 import type {IQueryResult} from '../../../../../types/store/query';
 import {
     getStringifiedData,
@@ -21,31 +22,25 @@ import {getEntityName} from '../../../utils';
 import i18n from './i18n';
 
 interface StreamingQueryProps {
-    data?: TEvDescribeSchemeResult;
     database: string;
     path: string;
 }
 
-/** Displays overview for StreamingQuery EPathType */
-export function StreamingQueryInfo({data, database, path}: StreamingQueryProps) {
-    const entityName = getEntityName(data?.PathDescription);
+export function StreamingQueryInfo({database, path}: StreamingQueryProps) {
+    const entityName = getEntityName({Self: {PathType: EPathType.EPathTypeStreamingQuery}});
 
-    if (!data) {
-        return (
-            <div className="error">
-                {i18n('alert_no-data')} {entityName}
-            </div>
-        );
-    }
-
-    const {data: sysData} = streamingQueriesApi.useGetStreamingQueryInfoQuery(
+    const {data: sysData, isFetching} = streamingQueriesApi.useGetStreamingQueryInfoQuery(
         {database, path},
         {skip: !database || !path},
     );
 
     const items = prepareStreamingQueryItems(sysData);
 
-    return <YDBDefinitionList title={entityName} items={items} />;
+    return (
+        <LoaderWrapper loading={isFetching}>
+            <YDBDefinitionList title={entityName} items={items} />
+        </LoaderWrapper>
+    );
 }
 
 const STATE_THEME_MAP: Record<string, React.ComponentProps<typeof Label>['theme']> = {

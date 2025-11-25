@@ -13,7 +13,7 @@ function createShardQuery(path: string, databaseFullPath: string) {
     });
 }
 
-const queryAction = 'execute-scan';
+const queryAction = 'execute-query';
 
 export const topShardsApi = api.injectEndpoints({
     endpoints: (builder) => ({
