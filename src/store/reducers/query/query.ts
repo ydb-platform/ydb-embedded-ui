@@ -28,7 +28,9 @@ const isDirty = Boolean(loadFromSessionStorage(QUERY_EDITOR_DIRTY_KEY));
 const initialState: QueryState = {
     input,
     isDirty,
+
     historyFilter: '',
+    historyCurrentQueryId: undefined,
 };
 
 const slice = createSlice({
@@ -52,6 +54,9 @@ const slice = createSlice({
         setQueryHistoryFilter: (state, action: PayloadAction<string>) => {
             state.historyFilter = action.payload;
         },
+        setHistoryCurrentQueryId: (state, action: PayloadAction<string | undefined>) => {
+            state.historyCurrentQueryId = action.payload;
+        },
         setResultTab: (
             state,
             action: PayloadAction<{queryType: 'execute' | 'explain'; tabId: string}>,
@@ -68,6 +73,7 @@ const slice = createSlice({
     },
     selectors: {
         selectQueriesHistoryFilter: (state) => state.historyFilter || '',
+        selectHistoryCurrentQueryId: (state) => state.historyCurrentQueryId,
         selectTenantPath: (state) => state.tenantPath,
         selectResult: (state) => state.result,
         selectStartTime: (state) => state.result?.startTime,
@@ -95,6 +101,7 @@ export const {
     setQueryResult,
     setTenantPath,
     setQueryHistoryFilter,
+    setHistoryCurrentQueryId,
     addStreamingChunks,
     setStreamQueryResponse,
     setStreamSession,
@@ -104,6 +111,7 @@ export const {
 
 export const {
     selectQueriesHistoryFilter,
+    selectHistoryCurrentQueryId,
     selectTenantPath,
     selectResult,
     selectUserInput,

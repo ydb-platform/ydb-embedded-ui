@@ -8,7 +8,12 @@ import {
 } from '../../../utils/hooks';
 import {SETTING_KEYS} from '../settings/constants';
 
-import {changeUserInput, selectQueriesHistoryFilter} from './query';
+import {
+    changeUserInput,
+    selectHistoryCurrentQueryId,
+    selectQueriesHistoryFilter,
+    setHistoryCurrentQueryId,
+} from './query';
 import type {QueryInHistory, QueryStats} from './types';
 import {getQueryInHistory} from './utils';
 
@@ -17,116 +22,118 @@ const MAXIMUM_QUERIES_IN_HISTORY = 20;
 export function useQueriesHistory() {
     const dispatch = useTypedDispatch();
     const queriesFilter = useTypedSelector(selectQueriesHistoryFilter);
+    const historyCurrentQueryId = useTypedSelector(selectHistoryCurrentQueryId);
 
     const [savedHistoryQueries, saveHistoryQueries] = useSetting<QueryInHistory[]>(
         SETTING_KEYS.QUERIES_HISTORY,
     );
 
-    const [historyQueries, setQueries] = React.useState<QueryInHistory[]>([]);
-    const [historyCurrentIndex, setCurrentIndex] = React.useState(-1);
+    const preparedQueries = React.useMemo(() => {
+        const queries = savedHistoryQueries ?? [];
 
-    React.useEffect(() => {
-        if (!savedHistoryQueries || savedHistoryQueries.length === 0) {
-            setQueries([]);
-            setCurrentIndex(-1);
-        } else {
-            const sliceLimit = savedHistoryQueries.length - MAXIMUM_QUERIES_IN_HISTORY;
-
-            const preparedQueries = savedHistoryQueries
-                .slice(sliceLimit < 0 ? 0 : sliceLimit)
-                .map(getQueryInHistory);
-
-            setQueries(preparedQueries);
-            setCurrentIndex(preparedQueries.length - 1);
-        }
+        return queries.map(getQueryInHistory);
     }, [savedHistoryQueries]);
 
     const filteredHistoryQueries = React.useMemo(() => {
         const normalizedFilter = queriesFilter?.toLowerCase();
         return normalizedFilter
-            ? historyQueries.filter((item) =>
+            ? preparedQueries.filter((item) =>
                   item.queryText.toLowerCase().includes(normalizedFilter),
               )
-            : historyQueries;
-    }, [historyQueries, queriesFilter]);
+            : preparedQueries;
+    }, [preparedQueries, queriesFilter]);
 
     // These functions are used inside Monaco editorDidMount
     // They should be stable to work properly
     const goToPreviousQuery = useEventHandler(() => {
-        setCurrentIndex((index) => {
-            if (historyQueries.length > 0 && index > 0) {
-                const newIndex = index - 1;
-                const query = historyQueries[newIndex];
-
-                if (query) {
-                    dispatch(changeUserInput({input: query.queryText}));
-                    return newIndex;
-                }
-            }
-            return index;
-        });
-    });
-
-    const goToNextQuery = useEventHandler(() => {
-        setCurrentIndex((index) => {
-            if (historyQueries.length > 0 && index < historyQueries.length - 1) {
-                const newIndex = index + 1;
-                const query = historyQueries[newIndex];
-                if (query) {
-                    dispatch(changeUserInput({input: query.queryText}));
-                    return newIndex;
-                }
-            }
-
-            return index;
-        });
-    });
-
-    const saveQueryToHistory = useEventHandler((queryText: string, queryId: string) => {
-        setQueries((currentQueries) => {
-            const newQueries = [...currentQueries, {queryText, queryId}].slice(
-                currentQueries.length >= MAXIMUM_QUERIES_IN_HISTORY ? 1 : 0,
-            );
-            saveHistoryQueries(newQueries);
-
-            // Update currentIndex to point to the newly added query
-            const newCurrentIndex = newQueries.length - 1;
-            setCurrentIndex(newCurrentIndex);
-
-            return newQueries;
-        });
-    });
-
-    const updateQueryInHistory = useEventHandler((queryId: string, stats: QueryStats) => {
-        if (!stats) {
+        if (preparedQueries.length === 0) {
             return;
         }
 
-        setQueries((currentQueries) => {
-            if (!currentQueries.length) {
-                return currentQueries;
-            }
+        let query: QueryInHistory | undefined;
 
-            const index = currentQueries.findIndex((item) => item.queryId === queryId);
+        const currentIndex = preparedQueries.findIndex((q) => q.queryId === historyCurrentQueryId);
 
-            if (index !== -1) {
-                const newQueries = [...currentQueries];
-                const {durationUs, endTime} = stats;
-                newQueries.splice(index, 1, {
-                    ...currentQueries[index],
-                    durationUs,
-                    endTime,
-                });
-                saveHistoryQueries(newQueries);
-                return newQueries;
-            }
-            return currentQueries;
-        });
+        if (currentIndex === -1) {
+            // Query not found, start from last
+            query = preparedQueries.at(-1);
+        } else if (currentIndex === 0) {
+            // At first query, wrap to last
+            query = preparedQueries.at(-1);
+        } else {
+            // Go to previous query
+            query = preparedQueries[currentIndex - 1];
+        }
+
+        if (query) {
+            dispatch(changeUserInput({input: query.queryText}));
+            dispatch(setHistoryCurrentQueryId(query.queryId));
+        }
+    });
+
+    const goToNextQuery = useEventHandler(() => {
+        if (preparedQueries.length === 0) {
+            return;
+        }
+
+        let query: QueryInHistory | undefined;
+
+        const currentIndex = preparedQueries.findIndex((q) => q.queryId === historyCurrentQueryId);
+
+        if (currentIndex === -1) {
+            // Query not found, start from last
+            query = preparedQueries.at(-1);
+        } else if (currentIndex === preparedQueries.length - 1) {
+            // At last query, wrap to first
+            query = preparedQueries[0];
+        } else {
+            // Go to next query
+            query = preparedQueries[currentIndex + 1];
+        }
+
+        if (query) {
+            dispatch(changeUserInput({input: query.queryText}));
+            dispatch(setHistoryCurrentQueryId(query.queryId));
+        }
+    });
+
+    const saveQueryToHistory = useEventHandler((queryText: string, queryId: string) => {
+        if (!queryText) {
+            return;
+        }
+        // +1 to include new query
+        const sliceLimit = preparedQueries.length + 1 - MAXIMUM_QUERIES_IN_HISTORY;
+        const slicedQueries = preparedQueries.slice(sliceLimit < 0 ? 0 : sliceLimit);
+        const newQueries = [...slicedQueries, {queryText, queryId}];
+
+        saveHistoryQueries(newQueries);
+
+        // Update currentQueryId to point to the newly added query
+        dispatch(setHistoryCurrentQueryId(queryId));
+    });
+
+    const updateQueryInHistory = useEventHandler((queryId: string, stats: QueryStats) => {
+        if (!stats || !preparedQueries.length) {
+            return;
+        }
+
+        const index = preparedQueries.findIndex((item) => item.queryId === queryId);
+
+        if (index !== -1) {
+            const newQueries = [...preparedQueries];
+            const {durationUs, endTime} = stats;
+            newQueries[index] = {
+                ...preparedQueries[index],
+                durationUs,
+                endTime,
+            };
+            saveHistoryQueries(newQueries);
+        }
     });
 
     return {
-        historyQueries,
-        historyCurrentIndex,
+        historyQueries: preparedQueries,
+        historyCurrentQueryId,
         filteredHistoryQueries,
         goToPreviousQuery,
         goToNextQuery,

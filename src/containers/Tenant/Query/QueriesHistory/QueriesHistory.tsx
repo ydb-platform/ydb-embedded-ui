@@ -12,7 +12,7 @@ import {
     setQueryHistoryFilter,
 } from '../../../../store/reducers/query/query';
 import type {QueryInHistory} from '../../../../store/reducers/query/types';
-import {useQueriesHistory} from '../../../../store/reducers/query/useQueriesHistory';
+import type {useQueriesHistory} from '../../../../store/reducers/query/useQueriesHistory';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import {cn} from '../../../../utils/cn';
@@ -31,16 +31,15 @@ const QUERIES_HISTORY_COLUMNS_WIDTH_LS_KEY = 'queriesHistoryTableColumnsWidth';
 
 interface QueriesHistoryProps {
     changeUserInput: (value: {input: string}) => void;
+    queriesHistory: ReturnType<typeof useQueriesHistory>;
 }
 
-function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
+function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) {
     const dispatch = useTypedDispatch();
 
-    const {filteredHistoryQueries} = useQueriesHistory();
-
     const reversedHistory = React.useMemo(() => {
-        return filteredHistoryQueries.toReversed();
-    }, [filteredHistoryQueries]);
+        return queriesHistory.filteredHistoryQueries.toReversed();
+    }, [queriesHistory.filteredHistoryQueries]);
 
     const filter = useTypedSelector(selectQueriesHistoryFilter);
 

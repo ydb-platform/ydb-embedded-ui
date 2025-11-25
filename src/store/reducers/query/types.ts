@@ -62,7 +62,10 @@ export interface QueryState {
     input: string;
     result?: QueryResult;
     isDirty?: boolean;
+
     historyFilter?: string;
+    historyCurrentQueryId?: string;
+
     tenantPath?: string;
     selectedResultTab?: {
         execute?: string;
