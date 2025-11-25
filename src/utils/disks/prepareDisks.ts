@@ -17,7 +17,7 @@ export function prepareWhiteboardVDiskData(
         const {NodeId, PDiskId, VSlotId} = vDiskState;
 
         const vDiskId =
-            !isNil(VSlotId) && isNil(PDiskId) && isNil(NodeId)
+            !isNil(VSlotId) && !isNil(PDiskId) && !isNil(NodeId)
                 ? {
                       NodeId,
                       PDiskId,
