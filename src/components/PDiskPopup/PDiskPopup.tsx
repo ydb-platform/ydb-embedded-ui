@@ -136,12 +136,9 @@ export const PDiskPopup = ({data}: PDiskPopupProps) => {
     const database = useDatabaseFromQuery();
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));
-    const nodeData = !isNil(data.NodeId) ? nodesMap?.get(data.NodeId) : undefined;
+    const nodeData = isNil(data.NodeId) ? undefined : nodesMap?.get(data.NodeId);
 
-    const info = React.useMemo(
-        () => preparePDiskData(data, nodeData),
-        [data, nodeData, isUserAllowedToMakeChanges],
-    );
+    const info = React.useMemo(() => preparePDiskData(data, nodeData), [data, nodeData]);
 
     const headerLabels = React.useMemo<YDBDefinitionListHeaderLabel[]>(
         () => preparePDiskHeaderLabels(data),
