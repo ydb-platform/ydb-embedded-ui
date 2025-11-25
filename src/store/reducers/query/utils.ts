@@ -36,7 +36,7 @@ export function getQueryInHistory(rawQuery: string | QueryInHistory) {
         };
     }
 
-    if ('queryId' in rawQuery) {
+    if (rawQuery.queryId) {
         return rawQuery;
     }
     return {
