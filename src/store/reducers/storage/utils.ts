@@ -286,7 +286,7 @@ const makeVDiskLocationKey = (
     pDiskId?: number,
     vDiskSlotId?: number,
 ): string | undefined => {
-    if (!isNil(nodeId) || !isNil(pDiskId) || !isNil(vDiskSlotId)) {
+    if (isNil(nodeId) || isNil(pDiskId) || isNil(vDiskSlotId)) {
         return undefined;
     }
 
@@ -344,7 +344,9 @@ const attachRecipientsToDonors = (nodes: PreparedStorageNode[] | undefined) => {
 
                 // Keep the Donors item in sync with the real donor VDisk: reuse its StringifiedId
                 // instead of the local slot-based id
-                donorRef.StringifiedId = donor.StringifiedId;
+                if (donorRef.StringifiedId !== donor.StringifiedId) {
+                    donorRef.StringifiedId = donor.StringifiedId;
+                }
             });
         });
     });

@@ -1,9 +1,11 @@
 import React from 'react';
 
+import {Flex, Icon} from '@gravity-ui/uikit';
+
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {cn} from '../../utils/cn';
 import {DONOR_COLOR} from '../../utils/disks/constants';
-import {getSeverityColor} from '../../utils/disks/helpers';
+import {getSeverityColor, getVDiskStatusIcon} from '../../utils/disks/helpers';
 import {useSetting} from '../../utils/hooks';
 
 import './DiskStateProgressBar.scss';
@@ -21,6 +23,7 @@ interface DiskStateProgressBarProps {
     content?: React.ReactNode;
     className?: string;
     isDonor?: boolean;
+    withIcon?: boolean;
 }
 
 export function DiskStateProgressBar({
@@ -34,6 +37,7 @@ export function DiskStateProgressBar({
     striped,
     className,
     isDonor,
+    withIcon = false,
 }: DiskStateProgressBarProps) {
     const [inverted] = useSetting<boolean | undefined>(SETTING_KEYS.INVERTED_DISKS);
 
@@ -85,8 +89,23 @@ export function DiskStateProgressBar({
         return null;
     };
 
+    let iconElement: React.ReactNode = null;
+
+    if (withIcon) {
+        const icon = getVDiskStatusIcon(severity, isDonor);
+
+        if (icon) {
+            iconElement = <Icon className={b('icon')} data={icon} size={12} />;
+        }
+    }
+
+    const hasIcon = Boolean(iconElement);
+    const justifyContent = hasIcon ? 'space-between' : 'flex-end';
+
     return (
-        <div
+        <Flex
+            alignItems="center"
+            justifyContent={justifyContent}
             className={b(mods, className)}
             role="meter"
             aria-label="Disk allocated space"
@@ -94,8 +113,9 @@ export function DiskStateProgressBar({
             aria-valuemax={100}
             aria-valuenow={diskAllocatedPercent}
         >
+            {iconElement}
             {renderAllocatedPercent()}
             {renderContent()}
-        </div>
+        </Flex>
     );
 }

@@ -1,11 +1,6 @@
-import {Icon} from '@gravity-ui/uikit';
-
-import {useStorageQueryParams} from '../../containers/Storage/useStorageQueryParams';
 import {useVDiskPagePath} from '../../routes';
-import {STORAGE_TYPES} from '../../store/reducers/storage/constants';
 import {cn} from '../../utils/cn';
 import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from '../../utils/disks/constants';
-import {getVDiskStatusIcon} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {DiskStateProgressBar} from '../DiskStateProgressBar/DiskStateProgressBar';
 import {HoverPopup} from '../HoverPopup/HoverPopup';
@@ -26,6 +21,7 @@ export interface VDiskProps {
     progressBarClassName?: string;
     delayOpen?: number;
     delayClose?: number;
+    withIcon?: boolean;
 }
 
 export const VDisk = ({
@@ -38,19 +34,14 @@ export const VDisk = ({
     progressBarClassName,
     delayClose,
     delayOpen,
+    withIcon = false,
 }: VDiskProps) => {
-    const {storageType} = useStorageQueryParams();
-    const isGroupView = storageType === STORAGE_TYPES.groups;
-
     const getVDiskLink = useVDiskPagePath();
     const vDiskPath = getVDiskLink({nodeId: data.NodeId, vDiskId: data.StringifiedId});
 
     const severity = data.Severity;
     const isReplicatingColor = severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue;
     const isHealthyDonor = data.DonorMode && isReplicatingColor;
-
-    const statusIcon = getVDiskStatusIcon(severity, data.DonorMode);
-    const showIcon = statusIcon && isGroupView;
 
     return (
         <HoverPopup
@@ -73,13 +64,7 @@ export const VDisk = ({
                         faded={isReplicatingColor}
                         isDonor={isHealthyDonor}
                         className={progressBarClassName}
-                        content={
-                            showIcon ? (
-                                <div className={b('vdisk-icon')}>
-                                    <Icon data={statusIcon} size={12} />
-                                </div>
-                            ) : null
-                        }
+                        withIcon={withIcon}
                     />
                 </InternalLink>
             </div>

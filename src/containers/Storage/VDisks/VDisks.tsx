@@ -14,15 +14,17 @@ interface VDisksProps {
     vDisks?: PreparedVDisk[];
     viewContext?: StorageViewContext;
     erasure?: Erasure;
+    withIcon?: boolean;
 }
 
-export function VDisks({vDisks, viewContext, erasure}: VDisksProps) {
+export function VDisks({vDisks, viewContext, erasure, withIcon = false}: VDisksProps) {
     const vDisksWithDCMargins = useVDisksWithDCMargins(vDisks, erasure);
 
     return (
         <div className={b('wrapper')}>
             {vDisks?.map((vDisk, index) => (
                 <VDiskWithDonorsStack
+                    withIcon={withIcon}
                     key={vDisk.StringifiedId}
                     data={vDisk}
                     inactive={!isVdiskActive(vDisk, viewContext)}

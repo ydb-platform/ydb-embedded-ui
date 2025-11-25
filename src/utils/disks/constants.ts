@@ -3,6 +3,7 @@ import {
     BucketPaint,
     CircleCheck,
     CircleExclamation,
+    CircleExclamationFill,
     TriangleExclamation,
 } from '@gravity-ui/icons';
 import type {IconData, LabelProps} from '@gravity-ui/uikit';
@@ -66,7 +67,7 @@ export const PDISK_STATE_SEVERITY = {
 
 export interface LabelVisualConfig {
     theme: LabelProps['theme'];
-    icon: IconData;
+    icon?: IconData;
 }
 
 export const NUMERIC_SEVERITY_TO_LABEL_VIEW: Record<number, LabelVisualConfig> = {
@@ -86,11 +87,13 @@ export const NUMERIC_SEVERITY_TO_LABEL_VIEW: Record<number, LabelVisualConfig> =
         theme: 'info',
         icon: ArrowsRotateLeft,
     },
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey]: {
+        theme: 'normal',
+    },
 };
 
 export const DONOR_ICON: IconData = BucketPaint;
-export const DISPLAYED_DISK_ERROR_ICON: IconData =
-    NUMERIC_SEVERITY_TO_LABEL_VIEW[DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red].icon;
+export const DISPLAYED_DISK_ERROR_ICON: IconData = CircleExclamationFill;
 export const DONOR_THEME: LabelProps['theme'] = 'unknown';
 
 export const VDISK_LABEL_CONFIG: Record<string, LabelVisualConfig> = {

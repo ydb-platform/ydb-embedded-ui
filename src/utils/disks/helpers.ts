@@ -1,6 +1,6 @@
 import type {IconData} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
-import {valueIsDefined} from '..';
 import type {VDiskBlobIndexStatParams} from '../../store/reducers/vdisk/vdisk';
 import {EFlag} from '../../types/api/enums';
 import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
@@ -24,7 +24,7 @@ export function isFullVDiskData(
 const getSpaceFlag = generateEvaluator([EFlag.Green, EFlag.Yellow, EFlag.Red]);
 
 export const getSpaceSeverity = (allocatedPercent?: number) => {
-    return valueIsDefined(allocatedPercent) ? getColorSeverity(getSpaceFlag(allocatedPercent)) : 0;
+    return !isNil(allocatedPercent) ? getColorSeverity(getSpaceFlag(allocatedPercent)) : 0;
 };
 
 export function getSeverityColor(severity: number | undefined) {
@@ -46,7 +46,7 @@ export function getPDiskId({
     nodeId?: string | number | null;
     pDiskId?: string | number | null;
 }) {
-    if (valueIsDefined(nodeId) && valueIsDefined(pDiskId)) {
+    if (!isNil(nodeId) && !isNil(pDiskId)) {
         return `${nodeId}-${pDiskId}`;
     }
     return undefined;

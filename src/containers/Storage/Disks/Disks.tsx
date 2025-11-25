@@ -22,9 +22,10 @@ interface DisksProps {
     vDisks?: PreparedVDisk[];
     viewContext?: StorageViewContext;
     erasure?: Erasure;
+    withIcon?: boolean;
 }
 
-export function Disks({vDisks = [], viewContext, erasure}: DisksProps) {
+export function Disks({vDisks = [], viewContext, erasure, withIcon = false}: DisksProps) {
     const [highlightedVDisk, setHighlightedVDisk] = React.useState<string | undefined>();
 
     const vDisksWithDCMargins = useVDisksWithDCMargins(vDisks, erasure);
@@ -51,6 +52,7 @@ export function Disks({vDisks = [], viewContext, erasure}: DisksProps) {
                         highlightedVDisk={highlightedVDisk}
                         setHighlightedVDisk={setHighlightedVDisk}
                         unavailableVDiskWidth={unavailableVDiskWidth}
+                        withIcon={withIcon}
                     />
                 ))}
             </Flex>
@@ -63,6 +65,7 @@ export function Disks({vDisks = [], viewContext, erasure}: DisksProps) {
                         highlightedVDisk={highlightedVDisk}
                         setHighlightedVDisk={setHighlightedVDisk}
                         withDCMargin={vDisksWithDCMargins.includes(index)}
+                        withIcon={withIcon}
                     />
                 ))}
             </div>
@@ -77,6 +80,7 @@ interface DisksItemProps {
     setHighlightedVDisk: (id: string | undefined) => void;
     unavailableVDiskWidth?: number;
     withDCMargin?: boolean;
+    withIcon?: boolean;
 }
 
 function VDiskItem({
@@ -85,6 +89,7 @@ function VDiskItem({
     inactive,
     setHighlightedVDisk,
     unavailableVDiskWidth,
+    withIcon = false,
 }: DisksItemProps) {
     // Do not show PDisk popup for VDisk
     const vDiskToShow = {...vDisk, PDisk: undefined};
@@ -100,6 +105,7 @@ function VDiskItem({
             <VDisk
                 data={vDiskToShow}
                 compact
+                withIcon={withIcon}
                 inactive={inactive}
                 showPopup={highlightedVDisk === vDiskId}
                 delayOpen={DISKS_POPUP_DEBOUNCE_TIMEOUT}
@@ -112,7 +118,13 @@ function VDiskItem({
     );
 }
 
-function PDiskItem({vDisk, highlightedVDisk, setHighlightedVDisk, withDCMargin}: DisksItemProps) {
+function PDiskItem({
+    vDisk,
+    highlightedVDisk,
+    setHighlightedVDisk,
+    withDCMargin,
+    withIcon = false,
+}: DisksItemProps) {
     const vDiskId = vDisk.StringifiedId;
 
     if (!vDisk.PDisk) {
@@ -129,6 +141,7 @@ function PDiskItem({vDisk, highlightedVDisk, setHighlightedVDisk, withDCMargin}:
             delayClose={DISKS_POPUP_DEBOUNCE_TIMEOUT}
             onShowPopup={() => setHighlightedVDisk(vDiskId)}
             onHidePopup={() => setHighlightedVDisk(undefined)}
+            withIcon={withIcon}
         />
     );
 }

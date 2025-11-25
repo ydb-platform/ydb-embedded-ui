@@ -95,10 +95,21 @@
         position: relative;
         z-index: 2;
 
+        margin-right: var(--g-spacing-1);
+
         font-size: var(--g-text-body-1-font-size);
         // bar height minus borders
         line-height: calc(var(--progress-bar-full-height) - #{$border-width * 2});
 
         color: inherit;
+    }
+
+    &__icon {
+        position: relative;
+        z-index: 2;
+
+        margin-left: var(--g-spacing-1);
+
+        color: var(--entity-state-border-color);
     }
 }

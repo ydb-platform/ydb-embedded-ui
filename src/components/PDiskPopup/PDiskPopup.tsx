@@ -1,10 +1,10 @@
 import React from 'react';
 
-import {Flex, Label} from '@gravity-ui/uikit';
+import {Flex, Label, Progress} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
-import {valueIsDefined} from '../../utils';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {createPDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import {getStateSeverity} from '../../utils/disks/calculatePDiskSeverity';
@@ -50,10 +50,19 @@ export const preparePDiskData = (data: PreparedPDisk, nodeData?: {Host?: string;
         pdiskData.push({name: pDiskPopupKeyset('label_path'), content: Path});
     }
 
-    if (isNumeric(TotalSize)) {
+    if (isNumeric(TotalSize) && isNumeric(AvailableSize)) {
         pdiskData.push({
             name: pDiskPopupKeyset('label_available'),
-            content: `${bytesToGB(AvailableSize)} ${pDiskPopupKeyset('value_of')} ${bytesToGB(TotalSize)}`,
+            content: (
+                <React.Fragment>
+                    <Progress
+                        theme="success"
+                        size="s"
+                        value={Math.min(Math.max((AvailableSize / TotalSize) * 100, 0), 100)}
+                    />
+                    <span>{`${bytesToGB(AvailableSize)} ${pDiskPopupKeyset('value_of')} ${bytesToGB(TotalSize)}`}</span>
+                </React.Fragment>
+            ),
         });
     }
 
@@ -102,7 +111,7 @@ export const buildPDiskFooter = (
 ): React.ReactNode | null => {
     const {NodeId, PDiskId} = data;
 
-    if (!withDeveloperUILink || !valueIsDefined(NodeId) || !valueIsDefined(PDiskId)) {
+    if (!withDeveloperUILink || isNil(NodeId) || isNil(PDiskId)) {
         return null;
     }
 
@@ -127,7 +136,7 @@ export const PDiskPopup = ({data}: PDiskPopupProps) => {
     const database = useDatabaseFromQuery();
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));
-    const nodeData = valueIsDefined(data.NodeId) ? nodesMap?.get(data.NodeId) : undefined;
+    const nodeData = !isNil(data.NodeId) ? nodesMap?.get(data.NodeId) : undefined;
 
     const info = React.useMemo(
         () => preparePDiskData(data, nodeData),

@@ -274,13 +274,15 @@
         --entity-state-background-color: var(--g-color-base-danger-light);
         --entity-state-fill-color: var(--g-color-base-danger-medium);
     }
+
     &_darkgrey {
         --entity-state-font-color: var(--g-color-text-secondary);
-        --entity-state-border-color: var(--g-color-line-generic-hover);
+        --entity-state-border-color: var(--g-color-base-neutral-heavy);
         --entity-state-shadow-color: var(--g-color-base-neutral-light);
         --entity-state-fill-color: var(--g-color-base-neutral-light);
         --entity-state-background-color: transparent;
     }
+
     &__grey {
         --entity-state-font-color: var(--g-color-text-secondary);
         --entity-state-border-color: var(--g-color-line-generic-hover);
