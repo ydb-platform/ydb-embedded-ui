@@ -1,3 +1,5 @@
+import React from 'react';
+
 import type {Column} from '@gravity-ui/react-data-table';
 
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
@@ -5,12 +7,12 @@ import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
 import {
-    selectQueriesHistory,
     selectQueriesHistoryFilter,
     setIsDirty,
     setQueryHistoryFilter,
 } from '../../../../store/reducers/query/query';
 import type {QueryInHistory} from '../../../../store/reducers/query/types';
+import type {useQueriesHistory} from '../../../../store/reducers/query/useQueriesHistory';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import {cn} from '../../../../utils/cn';
@@ -29,14 +31,17 @@ const QUERIES_HISTORY_COLUMNS_WIDTH_LS_KEY = 'queriesHistoryTableColumnsWidth';
 
 interface QueriesHistoryProps {
     changeUserInput: (value: {input: string}) => void;
+    queriesHistory: ReturnType<typeof useQueriesHistory>;
 }
 
-function QueriesHistory({changeUserInput}: QueriesHistoryProps) {
+function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) {
     const dispatch = useTypedDispatch();
 
-    const queriesHistory = useTypedSelector(selectQueriesHistory);
+    const reversedHistory = React.useMemo(() => {
+        return queriesHistory.filteredHistoryQueries.toReversed();
+    }, [queriesHistory.filteredHistoryQueries]);
+
     const filter = useTypedSelector(selectQueriesHistoryFilter);
-    const reversedHistory = [...queriesHistory].reverse();
 
     const applyQueryClick = (query: QueryInHistory) => {
         changeUserInput({input: query.queryText});

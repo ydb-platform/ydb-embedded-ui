@@ -1,3 +1,5 @@
+import {v4 as uuidv4} from 'uuid';
+
 import type {Actions, ErrorResponse} from '../../../types/api/query';
 import type {QueryAction, QueryMode, QuerySyntax} from '../../../types/store/query';
 import type {
@@ -30,9 +32,17 @@ export function getQueryInHistory(rawQuery: string | QueryInHistory) {
     if (typeof rawQuery === 'string') {
         return {
             queryText: rawQuery,
+            queryId: uuidv4(),
         };
     }
-    return rawQuery;
+
+    if (rawQuery.queryId) {
+        return rawQuery;
+    }
+    return {
+        ...rawQuery,
+        queryId: uuidv4(),
+    };
 }
 
 export function isSessionChunk(content: StreamingChunk): content is SessionChunk {
