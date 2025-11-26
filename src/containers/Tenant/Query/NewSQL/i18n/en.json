@@ -36,6 +36,7 @@
   "action.alter-transfer": "Alter transfer",
   "action.drop-transfer": "Drop transfer",
   "action.create-streaming-query": "Create streaming query",
+  "action.show-create-table": "Show Create SQL",
   "action.alter-streaming-query-settings": "Alter query settings",
   "action.alter-streaming-query-text": "Alter query text",
   "action.drop-streaming-query": "Drop query"

@@ -4,6 +4,7 @@ import {ChevronsUp} from '@gravity-ui/icons';
 import {ActionTooltip, Button, Icon} from '@gravity-ui/uikit';
 
 import {cn} from '../../../utils/cn';
+import {useResizeObserverTrigger} from '../../../utils/hooks/useResizeObserverTrigger';
 
 import './ToggleButton.scss';
 
@@ -82,6 +83,7 @@ export function PaneVisibilityToggleButtons({
     initialDirection = 'top',
     className,
 }: ToggleButtonProps) {
+    useResizeObserverTrigger([isCollapsed]);
     return (
         <React.Fragment>
             <ActionTooltip title="Collapse">

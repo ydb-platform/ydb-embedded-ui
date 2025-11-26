@@ -542,7 +542,7 @@ export class Diagnostics {
     }
 
     async isRightsWrapperVisible(): Promise<boolean> {
-        const rightsWrapper = this.page.locator('.ydb-grant-access__rights-wrapper');
+        const rightsWrapper = this.page.getByTestId('access-rights-wrapper');
         return rightsWrapper.isVisible();
     }
 

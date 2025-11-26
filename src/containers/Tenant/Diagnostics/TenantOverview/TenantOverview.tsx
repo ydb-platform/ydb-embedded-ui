@@ -12,11 +12,7 @@ import {
     TENANT_METRICS_TABS_IDS,
     TENANT_PAGES_IDS,
 } from '../../../../store/reducers/tenant/constants';
-import {
-    setDiagnosticsTab,
-    setTenantPage,
-    tenantApi,
-} from '../../../../store/reducers/tenant/tenant';
+import {setDiagnosticsTab, tenantApi} from '../../../../store/reducers/tenant/tenant';
 import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
 import type {AdditionalTenantsProps} from '../../../../types/additionalProps';
 import {getInfoTabLinks} from '../../../../utils/additionalProps';
@@ -24,6 +20,7 @@ import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
 import {canShowTenantMonitoringTab} from '../../../../utils/monitoringVisibility';
+import {useTenantPage} from '../../TenantNavigation/useTenantNavigation';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
 
 import {HealthcheckPreview} from './Healthcheck/HealthcheckPreview';
@@ -52,6 +49,8 @@ export function TenantOverview({
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const clusterName = useClusterNameFromQuery();
     const dispatch = useTypedDispatch();
+
+    const {handleTenantPageChange} = useTenantPage();
 
     const isMetaDatabasesAvailable = useDatabasesAvailable();
 
@@ -196,7 +195,7 @@ export function TenantOverview({
     );
 
     const handleOpenMonitoring = () => {
-        dispatch(setTenantPage(TENANT_PAGES_IDS.diagnostics));
+        handleTenantPageChange(TENANT_PAGES_IDS.diagnostics);
         dispatch(setDiagnosticsTab(TENANT_DIAGNOSTICS_TABS_IDS.monitoring));
     };
 

@@ -1,12 +1,6 @@
 import type {PayloadAction} from '@reduxjs/toolkit';
 import {createSlice} from '@reduxjs/toolkit';
 
-import {settingsManager} from '../../../services/settings';
-import type {SavedQuery} from '../../../types/store/query';
-import type {AppDispatch, GetState} from '../../defaultStore';
-import {SETTING_KEYS} from '../settings/constants';
-import {getSettingValue, setSettingValue} from '../settings/settings';
-
 import type {QueryActions, QueryActionsState} from './types';
 
 const initialState: QueryActionsState = {
@@ -43,42 +37,3 @@ export default slice.reducer;
 export const {setQueryNameToEdit, clearQueryNameToEdit, setQueryAction, setSavedQueriesFilter} =
     slice.actions;
 export const {selectQueryName, selectQueryAction, selectSavedQueriesFilter} = slice.selectors;
-
-export function deleteSavedQuery(queryName: string) {
-    return function deleteSavedQueryThunk(dispatch: AppDispatch, getState: GetState) {
-        const state = getState();
-        const savedQueries =
-            (getSettingValue(state, SETTING_KEYS.SAVED_QUERIES) as SavedQuery[]) ?? [];
-        const newSavedQueries = savedQueries.filter(
-            (el) => el.name.toLowerCase() !== queryName.toLowerCase(),
-        );
-        dispatch(setSettingValue(SETTING_KEYS.SAVED_QUERIES, newSavedQueries));
-        settingsManager.setUserSettingsValue(SETTING_KEYS.SAVED_QUERIES, newSavedQueries);
-    };
-}
-
-export function saveQuery(queryName: string | null) {
-    return function saveQueryThunk(dispatch: AppDispatch, getState: GetState) {
-        const state = getState();
-        const savedQueries =
-            (getSettingValue(state, SETTING_KEYS.SAVED_QUERIES) as SavedQuery[]) ?? [];
-        const queryBody = state.query.input;
-        if (queryName === null) {
-            return;
-        }
-        const nextSavedQueries = [...savedQueries];
-
-        const query = nextSavedQueries.find(
-            (el) => el.name.toLowerCase() === queryName.toLowerCase(),
-        );
-
-        if (query) {
-            query.body = queryBody;
-        } else {
-            nextSavedQueries.push({name: queryName, body: queryBody});
-        }
-
-        dispatch(setSettingValue(SETTING_KEYS.SAVED_QUERIES, nextSavedQueries));
-        settingsManager.setUserSettingsValue(SETTING_KEYS.SAVED_QUERIES, nextSavedQueries);
-    };
-}

@@ -1,4 +1,4 @@
-import {CirclePlus, Copy, DisplayPulse, PlugConnection} from '@gravity-ui/icons';
+import {CirclePlus, Code, Copy, DisplayPulse, PlugConnection} from '@gravity-ui/icons';
 import {Flex, Spin} from '@gravity-ui/uikit';
 import copy from 'copy-to-clipboard';
 import type {NavigationTreeNodeType} from 'ydb-ui-components';
@@ -10,7 +10,8 @@ import {
     TENANT_PAGES_IDS,
     TENANT_QUERY_TABS_ID,
 } from '../../../store/reducers/tenant/constants';
-import {setDiagnosticsTab, setQueryTab, setTenantPage} from '../../../store/reducers/tenant/tenant';
+import {setDiagnosticsTab, setQueryTab} from '../../../store/reducers/tenant/tenant';
+import type {TenantPage} from '../../../store/reducers/tenant/types';
 import type {IQueryResult} from '../../../types/store/query';
 import createToast from '../../../utils/createToast';
 import {insertSnippetToEditor} from '../../../utils/monaco/insertSnippet';
@@ -46,12 +47,14 @@ import {
     dropViewTemplate,
     manageAutoPartitioningTemplate,
     selectQueryTemplate,
+    showCreateTableTemplate,
     upsertQueryTemplate,
 } from './schemaQueryTemplates';
 import type {YdbNavigationTreeProps} from './types';
 
 interface ActionsAdditionalParams {
     setActivePath: (path: string) => void;
+    setTenantPage: (page: TenantPage) => void;
     showCreateDirectoryDialog?: (path: string) => void;
     getConfirmation?: () => Promise<boolean>;
     getConnectToDBDialog?: (params: SnippetParams) => Promise<boolean>;
@@ -77,6 +80,7 @@ const bindActions = (
 ) => {
     const {
         setActivePath,
+        setTenantPage,
         showCreateDirectoryDialog,
         getConfirmation,
         getConnectToDBDialog,
@@ -87,7 +91,7 @@ const bindActions = (
     const inputQuery = (tmpl: TemplateFn) => () => {
         const applyInsert = () => {
             //order is important here: firstly we should open query tab and initialize editor (it will be set to window.ydbEditor), after that it is possible to insert snippet
-            dispatch(setTenantPage(TENANT_PAGES_IDS.query));
+            setTenantPage(TENANT_PAGES_IDS.query);
             dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
             setActivePath(params.path);
             insertSnippetToEditor(tmpl({...params, schemaData, streamingQueryData}));
@@ -112,7 +116,7 @@ const bindActions = (
             : undefined,
         getConnectToDBDialog: () => getConnectToDBDialog?.({database: params.database}),
         openMonitoring: () => {
-            dispatch(setTenantPage(TENANT_PAGES_IDS.diagnostics));
+            setTenantPage(TENANT_PAGES_IDS.diagnostics);
             dispatch(setDiagnosticsTab(TENANT_DIAGNOSTICS_TABS_IDS.monitoring));
             setActivePath(params.path);
         },
@@ -128,6 +132,7 @@ const bindActions = (
         dropTable: inputQuery(dropTableTemplate),
         manageAutoPartitioning: inputQuery(manageAutoPartitioningTemplate),
         selectQuery: inputQuery(selectQueryTemplate),
+        showCreateTable: inputQuery(showCreateTableTemplate),
         upsertQuery: inputQuery(upsertQueryTemplate),
         createExternalTable: inputQuery(createExternalTableTemplate),
         dropExternalTable: inputQuery(dropExternalTableTemplate),
@@ -244,6 +249,7 @@ export const getActions =
                 },
             ],
         };
+
         let DB_SET: ActionsSet = [[copyItem, connectToDBItem], createEntitiesSet];
 
         const DIR_SET: ActionsSet = [[copyItem], createEntitiesSet];
@@ -263,6 +269,12 @@ export const getActions =
             DIR_SET.splice(1, 0, [createDirectoryItem]);
         }
 
+        const showCreateTableItem = {
+            text: i18n('actions.showCreateTable'),
+            action: actions.showCreateTable,
+            iconStart: <Code />,
+        };
+
         const ROW_TABLE_SET: ActionsSet = [
             [copyItem],
             [
@@ -281,6 +293,7 @@ export const getActions =
                 {text: i18n('actions.addTableIndex'), action: actions.addTableIndex},
                 {text: i18n('actions.createCdcStream'), action: actions.createCdcStream},
             ],
+            [showCreateTableItem],
         ];
         const COLUMN_TABLE_SET: ActionsSet = [
             [copyItem],
@@ -290,6 +303,7 @@ export const getActions =
                 {text: i18n('actions.selectQuery'), action: actions.selectQuery},
                 {text: i18n('actions.upsertQuery'), action: actions.upsertQuery},
             ],
+            [showCreateTableItem],
         ];
 
         const TOPIC_SET: ActionsSet = [

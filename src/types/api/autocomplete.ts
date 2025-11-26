@@ -54,4 +54,5 @@ export type AutocompleteEntityType =
     | 'external_data_source'
     | 'view'
     | 'column'
-    | 'index';
+    | 'index'
+    | 'streaming_query';

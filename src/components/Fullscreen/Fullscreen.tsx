@@ -5,6 +5,7 @@ import {Button, Icon} from '@gravity-ui/uikit';
 import {disableFullscreen} from '../../store/reducers/fullscreen';
 import {cn} from '../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useResizeObserverTrigger} from '../../utils/hooks/useResizeObserverTrigger';
 import {Portal} from '../Portal/Portal';
 
 import {useFullscreenContext} from './FullscreenContext';
@@ -62,13 +63,11 @@ export function Fullscreen({children, className}: FullscreenProps) {
             } else {
                 ref.current?.appendChild(container);
             }
-            // Trigger recalculation for components relying on window resize
-            // Dispatch after DOM repaint to ensure correct measurements
-            requestAnimationFrame(() => {
-                window.dispatchEvent(new Event('resize'));
-            });
         }
     }, [container, fullscreenRootRef, isFullscreen]);
+
+    // Trigger resize event when fullscreen state changes to force virtualization recalculation
+    useResizeObserverTrigger([isFullscreen]);
 
     if (!container) {
         return null;
