@@ -19,6 +19,7 @@ import {tableSchemaDataApi} from '../../../../store/reducers/tableSchemaData';
 import {useTenantBaseInfo} from '../../../../store/reducers/tenant/tenant';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
 import {valueIsDefined} from '../../../../utils';
+import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {getConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {canShowTenantMonitoringTab} from '../../../../utils/monitoringVisibility';
@@ -168,9 +169,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                 isSchemaDataLoading: isActionsDataFetching,
                 hasMonitoring,
                 streamingQueryData: streamingSysData,
-                showCreateTableData: showCreateTableData
-                    ? showCreateTableData.toString()
-                    : undefined,
+                showCreateTableData: getStringifiedData(showCreateTableData),
                 isShowCreateTableLoading: isShowCreateTableFetching,
                 isStreamingQueryTextLoading: isStreamingInfoFetching,
             },

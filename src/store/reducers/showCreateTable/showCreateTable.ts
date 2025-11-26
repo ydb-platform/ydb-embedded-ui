@@ -3,7 +3,7 @@ import {isQueryErrorResponse, parseQueryAPIResponse} from '../../../utils/query'
 import {api} from '../api';
 
 function getShowCreateTableSQL(path: string) {
-    const safePath = path.replace(/'/g, "''");
+    const safePath = path.replace(/`/g, '``');
     return `${QUERY_TECHNICAL_MARK}
 SHOW CREATE TABLE \`${safePath}\``;
 }

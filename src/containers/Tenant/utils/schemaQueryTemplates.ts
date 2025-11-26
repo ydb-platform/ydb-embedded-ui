@@ -163,7 +163,7 @@ ${filters}LIMIT \${5:10};`;
 
 export const showCreateTableTemplate = (params?: SchemaQueryParams) => {
     if (params?.showCreateTableData) {
-        return params?.showCreateTableData;
+        return params.showCreateTableData;
     }
     const tablePath = params?.relativePath
         ? `\`${normalizeParameter(params.relativePath)}\``
