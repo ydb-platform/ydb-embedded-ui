@@ -76,7 +76,6 @@ export type OperationProgressKey =
  * Calculates overall progress based on items_progress array:
  * - Sums all parts_total and parts_completed across all items
  * - Returns percentage rounded to nearest integer
- *
  * @param metadata - Import/Export operation metadata
  * @returns Progress percentage (0-100) or null if cannot be calculated
  */
@@ -110,7 +109,6 @@ export function calculateImportExportProgress(
  * Handles different progress formats:
  * - BuildIndex: numeric progress (0-100) -> "75%"
  * - Import/Export: calculated from items_progress -> "45%" or enum value -> "Done"
- *
  * @param operation - Operation to get progress for
  * @param translateProgress - Function to translate progress enum values (i18n)
  * @returns Formatted progress string or null if no progress available

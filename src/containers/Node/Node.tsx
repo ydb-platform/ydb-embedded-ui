@@ -11,13 +11,13 @@ import {ResponseError} from '../../components/Errors/ResponseError';
 import {FullNodeViewer} from '../../components/FullNodeViewer/FullNodeViewer';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {InternalLink} from '../../components/InternalLink';
-import {NetworkTable} from '../../components/NetworkTable/NetworkTable';
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import routes, {getDefaultNodePath} from '../../routes';
 import {
     useCapabilitiesLoaded,
     useConfigAvailable,
     useDiskPagesAvailable,
+    useViewerPeersHandlerAvailable,
 } from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {nodeApi} from '../../store/reducers/node/node';
@@ -28,6 +28,7 @@ import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {checkIsStorageNode} from '../../utils/nodes';
 import {useAppTitle} from '../App/AppTitleContext';
 import {Configs} from '../Configs/Configs';
+import {NodeNetwork} from '../Node/NodeNetwork/NodeNetwork';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 import {Tablets} from '../Tablets/Tablets';
 
@@ -215,6 +216,8 @@ function NodePageContent({
     tabs,
     parentContainer,
 }: NodePageContentProps) {
+    const isPeersHandlerAvailable = useViewerPeersHandlerAvailable();
+
     const renderTabs = () => {
         return (
             <div className={b('tabs')}>
@@ -283,13 +286,11 @@ function NodePageContent({
             }
 
             case 'network': {
-                return (
-                    <NetworkTable
-                        database={database}
-                        scrollContainerRef={parentContainer}
-                        nodeId={nodeId}
-                    />
-                );
+                if (!isPeersHandlerAvailable) {
+                    return i18n('alert_no-peers');
+                }
+
+                return <NodeNetwork nodeId={nodeId} />;
             }
 
             default:

@@ -17,6 +17,7 @@ import type {TNetInfo} from '../../types/api/netInfo';
 import type {NodesRequestParams, TNodesInfo} from '../../types/api/nodes';
 import type {TEvNodesInfo} from '../../types/api/nodesList';
 import type {TEvPDiskStateResponse} from '../../types/api/pdisk';
+import type {PeersRequestParams, TPeersResponse} from '../../types/api/peers';
 import type {
     Actions,
     ErrorResponse,
@@ -136,6 +137,21 @@ export class ViewerAPI extends BaseYdbAPI {
                 fields_required: preparedFieldsRequired,
                 path: this.getSchemaPath(path),
                 storage: isStorage,
+                ...params,
+            },
+            {concurrentId, requestConfig: {signal}},
+        );
+    }
+
+    getNodePeers(
+        {nodeId, filter, ...params}: PeersRequestParams,
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
+        return this.get<TPeersResponse>(
+            this.getPath('/viewer/json/peers?enums=true'),
+            {
+                node_id: nodeId,
+                filter: filter || undefined,
                 ...params,
             },
             {concurrentId, requestConfig: {signal}},

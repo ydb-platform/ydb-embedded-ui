@@ -1,0 +1,11 @@
+{
+  "field_host": "Host",
+  "field_connect-time": "Connect Time",
+  "field_skew": "Skew",
+  "field_ping": "Ping",
+  "field_send": "Send",
+  "field_sent-bytes": "Sent Bytes",
+  "field_receive": "Receive",
+  "field_received-bytes": "Received Bytes",
+  "alert_no-network-data": "No network data"
+}
