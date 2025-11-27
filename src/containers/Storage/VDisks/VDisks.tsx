@@ -17,7 +17,7 @@ interface VDisksProps {
     withIcon?: boolean;
 }
 
-export function VDisks({vDisks, viewContext, erasure, withIcon = false}: VDisksProps) {
+export function VDisks({vDisks, viewContext, erasure, withIcon}: VDisksProps) {
     const vDisksWithDCMargins = useVDisksWithDCMargins(vDisks, erasure);
 
     return (

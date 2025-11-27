@@ -1,6 +1,7 @@
 @use '../../styles/mixins.scss';
 
 .ydb-definition-list {
+    $block: &;
     @include mixins.flex-container();
 
     &__title {
@@ -20,20 +21,18 @@
     }
 
     &_compact {
-        .ydb-definition-list__title {
+        #{$block}__title {
             margin: 0;
 
             font-weight: 500;
         }
 
-        .ydb-definition-list__header {
+        #{$block}__header {
             margin-bottom: var(--g-spacing-3);
         }
 
-        .ydb-definition-list__properties-list {
-            .g-definition-list__item + .g-definition-list__item {
-                margin-top: var(--g-spacing-2);
-            }
+        #{$block}__properties-list {
+            --g-definition-list-item-gap: var(--g-spacing-2);
         }
     }
 }

@@ -17,6 +17,7 @@ import {bytesToGB, isNumeric} from '../../utils/utils';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {pDiskInfoKeyset} from '../PDiskInfo/i18n';
 import {PDiskPageLink} from '../PDiskPageLink/PDiskPageLink';
+import {StatusIcon} from '../StatusIcon/StatusIcon';
 import type {
     YDBDefinitionListHeaderLabel,
     YDBDefinitionListItem,
@@ -67,11 +68,17 @@ export const preparePDiskData = (data: PreparedPDisk, nodeData?: {Host?: string;
     }
 
     if (Realtime && errorColors.includes(Realtime)) {
-        pdiskData.push({name: pDiskPopupKeyset('label_realtime'), content: Realtime});
+        pdiskData.push({
+            name: pDiskPopupKeyset('label_realtime'),
+            content: <StatusIcon mode="icons" status={Realtime} />,
+        });
     }
 
     if (Device && errorColors.includes(Device)) {
-        pdiskData.push({name: pDiskPopupKeyset('label_device'), content: Device});
+        pdiskData.push({
+            name: pDiskPopupKeyset('label_device'),
+            content: <StatusIcon mode="icons" status={Device} />,
+        });
     }
 
     return pdiskData;

@@ -16,7 +16,7 @@ export function VDiskWithDonorsStack({
     data,
     className,
     stackClassName,
-    withIcon = false,
+    withIcon,
     ...restProps
 }: VDiskWithDonorsStackProps) {
     const {Donors: donors, ...restData} = data || {};

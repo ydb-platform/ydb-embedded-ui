@@ -37,7 +37,7 @@ export function DiskStateProgressBar({
     striped,
     className,
     isDonor,
-    withIcon = false,
+    withIcon,
 }: DiskStateProgressBarProps) {
     const [inverted] = useSetting<boolean | undefined>(SETTING_KEYS.INVERTED_DISKS);
 

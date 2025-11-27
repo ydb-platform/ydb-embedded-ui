@@ -25,7 +25,7 @@ interface DisksProps {
     withIcon?: boolean;
 }
 
-export function Disks({vDisks = [], viewContext, erasure, withIcon = false}: DisksProps) {
+export function Disks({vDisks = [], viewContext, erasure, withIcon}: DisksProps) {
     const [highlightedVDisk, setHighlightedVDisk] = React.useState<string | undefined>();
 
     const vDisksWithDCMargins = useVDisksWithDCMargins(vDisks, erasure);
@@ -89,7 +89,7 @@ function VDiskItem({
     inactive,
     setHighlightedVDisk,
     unavailableVDiskWidth,
-    withIcon = false,
+    withIcon,
 }: DisksItemProps) {
     // Do not show PDisk popup for VDisk
     const vDiskToShow = {...vDisk, PDisk: undefined};
@@ -123,7 +123,7 @@ function PDiskItem({
     highlightedVDisk,
     setHighlightedVDisk,
     withDCMargin,
-    withIcon = false,
+    withIcon,
 }: DisksItemProps) {
     const vDiskId = vDisk.StringifiedId;
 

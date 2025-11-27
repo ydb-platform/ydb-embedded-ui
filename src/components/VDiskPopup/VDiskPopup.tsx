@@ -89,6 +89,33 @@ const buildUnavailableVDiskFooter = (
     );
 };
 
+interface VDiskLinkProps {
+    nodeId?: string | number;
+    stringifiedId?: string;
+    getVDiskLinkFn?: (data: {
+        nodeId: string | number;
+        vDiskId: string | undefined;
+    }) => string | undefined;
+}
+
+const VDiskLink = ({nodeId, stringifiedId, getVDiskLinkFn}: VDiskLinkProps) => {
+    if (isNil(stringifiedId)) {
+        return <span>{EMPTY_DATA_PLACEHOLDER}</span>;
+    }
+
+    if (isNil(nodeId)) {
+        return <span>{stringifiedId}</span>;
+    }
+
+    const path = getVDiskLinkFn?.({nodeId, vDiskId: stringifiedId});
+
+    return (
+        <InternalLink to={path}>
+            {vDiskPopupKeyset('label_vdisk')} {stringifiedId}
+        </InternalLink>
+    );
+};
+
 // eslint-disable-next-line complexity
 const prepareVDiskData = (
     data: PreparedVDisk,
@@ -128,55 +155,29 @@ const prepareVDiskData = (
             name: vDiskPopupKeyset('label_donor'),
             content: (
                 <Flex direction="column">
-                    {Donors.map((donor) => {
-                        if (isNil(donor.NodeId) || isNil(donor.StringifiedId)) {
-                            return (
-                                <span key={donor.StringifiedId}>
-                                    {donor.StringifiedId ?? EMPTY_DATA_PLACEHOLDER}
-                                </span>
-                            );
-                        }
-
-                        return (
-                            <InternalLink
-                                key={donor.StringifiedId}
-                                to={getVDiskLinkFn?.({
-                                    nodeId: donor.NodeId,
-                                    vDiskId: donor.StringifiedId,
-                                })}
-                            >
-                                {vDiskPopupKeyset('label_vdisk')} {donor.StringifiedId}
-                            </InternalLink>
-                        );
-                    })}
+                    {Donors.map((donor) => (
+                        <VDiskLink
+                            key={donor.StringifiedId}
+                            nodeId={donor.NodeId}
+                            stringifiedId={donor.StringifiedId}
+                            getVDiskLinkFn={getVDiskLinkFn}
+                        />
+                    ))}
                 </Flex>
             ),
         });
     }
 
     if (DonorMode && Recipient) {
-        let recipientContent: React.ReactNode;
-
-        if (!isNil(Recipient.NodeId) && !isNil(Recipient.StringifiedId)) {
-            const recipientPath = getVDiskLinkFn?.({
-                nodeId: Recipient.NodeId,
-                vDiskId: Recipient.StringifiedId,
-            });
-
-            if (recipientPath) {
-                recipientContent = (
-                    <InternalLink to={recipientPath}>
-                        {vDiskPopupKeyset('label_vdisk')} {Recipient.StringifiedId}
-                    </InternalLink>
-                );
-            } else {
-                recipientContent = `${vDiskPopupKeyset('label_vdisk')} ${Recipient.StringifiedId}`;
-            }
-        }
-
         vdiskData.push({
             name: vDiskPopupKeyset('label_recipient'),
-            content: recipientContent,
+            content: (
+                <VDiskLink
+                    nodeId={Recipient.NodeId}
+                    stringifiedId={Recipient.StringifiedId}
+                    getVDiskLinkFn={getVDiskLinkFn}
+                />
+            ),
         });
     }
 

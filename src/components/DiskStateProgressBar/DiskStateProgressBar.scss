@@ -49,8 +49,16 @@
     }
 
     &_striped {
+        overflow: hidden;
         // Inset shadow = border overlay without shrinking the striped fill
         border: none;
+        background-image: repeating-linear-gradient(
+            135deg,
+            transparent 0,
+            transparent var(--stripe-width),
+            var(--entity-state-fill-color) var(--stripe-width),
+            var(--entity-state-fill-color) var(--stripe-step)
+        );
         box-shadow: 0 0 0 $border-width var(--entity-state-shadow-color) inset;
     }
 
@@ -78,16 +86,6 @@
             left: auto;
 
             border-radius: 0 $inner-border-radius $inner-border-radius 0;
-        }
-
-        &_striped {
-            background-image: repeating-linear-gradient(
-                135deg,
-                transparent 0,
-                transparent var(--stripe-width),
-                var(--entity-state-fill-color) var(--stripe-width),
-                var(--entity-state-fill-color) var(--stripe-step)
-            );
         }
     }
 

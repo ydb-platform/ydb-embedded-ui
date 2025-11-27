@@ -34,7 +34,7 @@ export const VDisk = ({
     progressBarClassName,
     delayClose,
     delayOpen,
-    withIcon = false,
+    withIcon,
 }: VDiskProps) => {
     const getVDiskLink = useVDiskPagePath();
     const vDiskPath = getVDiskLink({nodeId: data.NodeId, vDiskId: data.StringifiedId});
@@ -61,7 +61,6 @@ export const VDisk = ({
                         compact={compact}
                         inactive={inactive}
                         striped={isReplicatingColor}
-                        faded={isReplicatingColor}
                         isDonor={isHealthyDonor}
                         className={progressBarClassName}
                         withIcon={withIcon}
