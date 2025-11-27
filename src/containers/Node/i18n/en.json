@@ -11,7 +11,5 @@
 
   "node": "Node",
   "fqdn": "FQDN",
-  "dc": "DC",
-
-  "alert_no-peers": "No peers found for this node"
+  "dc": "DC"
 }
