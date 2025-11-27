@@ -13,6 +13,7 @@ export function calculateVDiskSeverity<
         VDiskState?: EVDiskState;
         FrontQueues?: EFlag;
         Replicated?: boolean;
+        DonorMode?: boolean;
     },
 >(vDisk: T) {
     const {DiskSpace, VDiskState, FrontQueues, Replicated} = vDisk;
@@ -22,10 +23,13 @@ export function calculateVDiskSeverity<
         return NOT_AVAILABLE_SEVERITY;
     }
 
-    const DiskSpaceSeverity = getColorSeverity(DiskSpace);
+    const DiskSpaceSeverity = Math.min(
+        DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
+        getColorSeverity(DiskSpace),
+    );
     const VDiskSpaceSeverity = getStateSeverity(VDiskState);
     const FrontQueuesSeverity = Math.min(
-        DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Orange,
+        DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
         getColorSeverity(FrontQueues),
     );
 
@@ -39,7 +43,7 @@ export function calculateVDiskSeverity<
     return severity;
 }
 
-function getStateSeverity(vDiskState?: EVDiskState) {
+export function getStateSeverity(vDiskState?: EVDiskState) {
     if (!vDiskState) {
         return NOT_AVAILABLE_SEVERITY;
     }
@@ -52,7 +56,7 @@ function getColorSeverity(color?: EFlag) {
         return NOT_AVAILABLE_SEVERITY;
     }
 
-    // Blue is reserved for not replicated VDisks
+    // Blue is reserved for not replicated VDisks. DarkGrey is reserved for donors.
     if (color === EFlag.Blue) {
         return DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green;
     }

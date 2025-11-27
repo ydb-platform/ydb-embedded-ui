@@ -10,6 +10,9 @@
     --progress-bar-full-height: var(--g-text-body-3-line-height);
     --progress-bar-compact-height: 12px;
 
+    --stripe-width: 4px;
+    --stripe-step: 8px;
+
     position: relative;
     z-index: 0;
 
@@ -45,6 +48,20 @@
         background-color: unset;
     }
 
+    &_striped {
+        overflow: hidden;
+        // Inset shadow = border overlay without shrinking the striped fill
+        border: none;
+        background-image: repeating-linear-gradient(
+            135deg,
+            transparent 0,
+            transparent var(--stripe-width),
+            var(--entity-state-fill-color) var(--stripe-width),
+            var(--entity-state-fill-color) var(--stripe-step)
+        );
+        box-shadow: 0 0 0 $border-width var(--entity-state-shadow-color) inset;
+    }
+
     &__fill-bar {
         position: absolute;
         top: 0;
@@ -76,10 +93,21 @@
         position: relative;
         z-index: 2;
 
+        margin-right: var(--g-spacing-1);
+
         font-size: var(--g-text-body-1-font-size);
         // bar height minus borders
         line-height: calc(var(--progress-bar-full-height) - #{$border-width * 2});
 
         color: inherit;
+    }
+
+    &__icon {
+        position: relative;
+        z-index: 2;
+
+        margin-left: var(--g-spacing-1);
+
+        color: var(--entity-state-border-color);
     }
 }

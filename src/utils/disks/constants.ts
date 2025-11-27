@@ -1,3 +1,13 @@
+import {
+    ArrowsRotateLeft,
+    BucketPaint,
+    CircleCheck,
+    CircleExclamation,
+    CircleExclamationFill,
+    TriangleExclamation,
+} from '@gravity-ui/icons';
+import type {IconData, LabelProps} from '@gravity-ui/uikit';
+
 import type {EFlag} from '../../types/api/enums';
 import {TPDiskState} from '../../types/api/pdisk';
 import {EVDiskState} from '../../types/api/vdisk';
@@ -11,6 +21,8 @@ export const DISK_COLOR_STATE_TO_NUMERIC_SEVERITY: Record<EFlag, number> = {
     Orange: 4,
     Red: 5,
 } as const;
+
+export const DONOR_COLOR = 'DarkGrey';
 
 type SeverityToColor = Record<number, keyof typeof DISK_COLOR_STATE_TO_NUMERIC_SEVERITY>;
 
@@ -51,4 +63,46 @@ export const PDISK_STATE_SEVERITY = {
     [TPDiskState.ChunkQuotaError]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
     [TPDiskState.DeviceIoError]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
     [TPDiskState.Stopped]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
+};
+
+export interface LabelVisualConfig {
+    theme: LabelProps['theme'];
+    icon?: IconData;
+}
+
+export const NUMERIC_SEVERITY_TO_LABEL_VIEW: Record<number, LabelVisualConfig> = {
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green]: {
+        theme: 'success',
+        icon: CircleCheck,
+    },
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow]: {
+        theme: 'warning',
+        icon: TriangleExclamation,
+    },
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red]: {
+        theme: 'danger',
+        icon: CircleExclamation,
+    },
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue]: {
+        theme: 'info',
+        icon: ArrowsRotateLeft,
+    },
+    [DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey]: {
+        theme: 'normal',
+    },
+};
+
+export const DONOR_ICON: IconData = BucketPaint;
+export const DISPLAYED_DISK_ERROR_ICON: IconData = CircleExclamationFill;
+export const DONOR_THEME: LabelProps['theme'] = 'unknown';
+
+export const VDISK_LABEL_CONFIG: Record<string, LabelVisualConfig> = {
+    donor: {
+        theme: DONOR_THEME,
+        icon: DONOR_ICON,
+    },
+    replica: {
+        theme: NUMERIC_SEVERITY_TO_LABEL_VIEW[DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue].theme,
+        icon: NUMERIC_SEVERITY_TO_LABEL_VIEW[DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue].icon,
+    },
 };

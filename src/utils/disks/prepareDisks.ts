@@ -1,6 +1,5 @@
 import {isNil} from 'lodash';
 
-import {valueIsDefined} from '..';
 import type {TPDiskStateInfo} from '../../types/api/pdisk';
 import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
 import {stringifyVdiskId} from '../dataFormatters/dataFormatters';
@@ -18,7 +17,7 @@ export function prepareWhiteboardVDiskData(
         const {NodeId, PDiskId, VSlotId} = vDiskState;
 
         const vDiskId =
-            valueIsDefined(VSlotId) && valueIsDefined(PDiskId) && valueIsDefined(NodeId)
+            !isNil(VSlotId) && !isNil(PDiskId) && !isNil(NodeId)
                 ? {
                       NodeId,
                       PDiskId,

@@ -16,6 +16,7 @@ export function VDiskWithDonorsStack({
     data,
     className,
     stackClassName,
+    withIcon,
     ...restProps
 }: VDiskWithDonorsStackProps) {
     const {Donors: donors, ...restData} = data || {};
@@ -23,7 +24,7 @@ export function VDiskWithDonorsStack({
     const content =
         donors && donors.length > 0 ? (
             <Stack className={stackClassName}>
-                <VDisk data={restData} {...restProps} />
+                <VDisk data={restData} withIcon={withIcon} {...restProps} />
                 {donors.map((donor) => {
                     const isFullData = isFullVDiskData(donor);
 
@@ -32,13 +33,14 @@ export function VDiskWithDonorsStack({
                         <VDisk
                             key={stringifyVdiskId(isFullData ? donor.VDiskId : donor)}
                             data={donor}
+                            withIcon={withIcon}
                             {...restProps}
                         />
                     );
                 })}
             </Stack>
         ) : (
-            <VDisk data={data} {...restProps} />
+            <VDisk withIcon={withIcon} data={data} {...restProps} />
         );
 
     return <div className={className}>{content}</div>;

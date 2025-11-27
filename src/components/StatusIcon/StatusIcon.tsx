@@ -3,6 +3,7 @@ import {
     CircleExclamationFill,
     CircleInfoFill,
     CircleQuestionFill,
+    CircleXmarkFill,
     TriangleExclamationFill,
 } from '@gravity-ui/icons';
 import {Icon} from '@gravity-ui/uikit';
@@ -18,9 +19,9 @@ const icons = {
     [EFlag.Grey]: CircleQuestionFill,
     [EFlag.Green]: CircleCheckFill,
     [EFlag.Blue]: CircleInfoFill,
-    [EFlag.Yellow]: CircleExclamationFill,
-    [EFlag.Orange]: TriangleExclamationFill,
-    [EFlag.Red]: CircleExclamationFill,
+    [EFlag.Yellow]: TriangleExclamationFill,
+    [EFlag.Orange]: CircleExclamationFill,
+    [EFlag.Red]: CircleXmarkFill,
 };
 
 export type StatusIconMode = 'color' | 'icons';
