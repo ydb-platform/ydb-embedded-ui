@@ -85,6 +85,7 @@ export interface PeersRequestParams {
     group?: PeersGroupByField;
     filter_group_by?: PeersFilterGroupByField;
     filter_group?: string;
+    offset?: number;
     limit?: number;
     timeout?: number;
     direct?: boolean;

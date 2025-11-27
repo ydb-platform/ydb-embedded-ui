@@ -290,7 +290,7 @@ function NodePageContent({
                     return i18n('alert_no-peers');
                 }
 
-                return <NodeNetwork nodeId={nodeId} />;
+                return <NodeNetwork nodeId={nodeId} scrollContainerRef={parentContainer} />;
             }
 
             default:

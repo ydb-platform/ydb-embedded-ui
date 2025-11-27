@@ -1,88 +1,73 @@
 import React from 'react';
 
-import {EntitiesCount} from '../../../components/EntitiesCount';
-import {ResponseError} from '../../../components/Errors/ResponseError';
-import {ResizeableDataTable} from '../../../components/ResizeableDataTable/ResizeableDataTable';
+import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
-import {TableWithControlsLayout} from '../../../components/TableWithControlsLayout/TableWithControlsLayout';
-import {NODES_COLUMNS_TITLES} from '../../../components/nodesColumns/constants';
-import {DEFAULT_TABLE_SETTINGS} from '../../../lib';
-import {nodeApi} from '../../../store/reducers/node/node';
+import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
+import {useNodesPageQueryParams} from '../../Nodes/useNodesPageQueryParams';
 
+import {NodeNetworkControlsWithTableState} from './NodeNetworkControls/NodeNetworkControlsWithTableState';
+import {NodeNetworkTable} from './NodeNetworkTable';
 import {getNodeNetworkColumns} from './columns';
 import {
+    NODE_NETWORK_COLUMNS_TITLES,
     NODE_NETWORK_DEFAULT_COLUMNS,
     NODE_NETWORK_REQUIRED_COLUMNS,
     NODE_NETWORK_TABLE_SELECTED_COLUMNS_KEY,
 } from './constants';
-import i18n from './i18n';
-import {mapPeerToNodeNetworkRow} from './nodeNetworkMapper';
 
 interface NodeNetworkProps {
     nodeId: string;
-    scrollContainerRef?: React.RefObject<HTMLDivElement>;
-    className?: string;
+    scrollContainerRef: React.RefObject<HTMLDivElement>;
 }
 
-const NETWORK_COLUMNS_WIDTH_LS_KEY = 'networkTableColumnsWidth';
+export function NodeNetwork({nodeId, scrollContainerRef}: NodeNetworkProps) {
+    const database = useDatabaseFromQuery();
 
-export function NodeNetwork({nodeId, scrollContainerRef, className}: NodeNetworkProps) {
-    const {data, isLoading, error} = nodeApi.useGetNodePeersQuery({nodeId});
-
-    const preparedPeersData = React.useMemo(
-        () => (data?.Peers ?? []).map(mapPeerToNodeNetworkRow),
-        [data],
+    const {searchValue, handleSearchQueryChange} = useNodesPageQueryParams(
+        undefined, // We don't need use groupByParams yet
+        false, // withPeerRoleFilter = false for this tab
     );
 
-    const allColumns = React.useMemo(
-        () => getNodeNetworkColumns({database: data?.Peers?.[0]?.SystemState?.Tenants?.[0]}),
-        [data],
-    );
+    const allColumns = React.useMemo(() => getNodeNetworkColumns({database}), [database]);
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
         allColumns,
         NODE_NETWORK_TABLE_SELECTED_COLUMNS_KEY,
-        NODES_COLUMNS_TITLES,
+        NODE_NETWORK_COLUMNS_TITLES,
         NODE_NETWORK_DEFAULT_COLUMNS,
         NODE_NETWORK_REQUIRED_COLUMNS,
     );
 
-    const totalPeers = data?.FoundPeers;
-
     return (
-        <TableWithControlsLayout fullHeight className={className}>
-            <TableWithControlsLayout.Controls>
+        <PaginatedTableWithLayout
+            controls={
+                <NodeNetworkControlsWithTableState
+                    searchValue={searchValue}
+                    onSearchChange={handleSearchQueryChange}
+                />
+            }
+            extraControls={
                 <TableColumnSetup
+                    popupWidth={200}
                     items={columnsToSelect}
-                    onUpdate={setColumns}
-                    popupWidth={220}
                     showStatus
+                    onUpdate={setColumns}
                 />
-                <EntitiesCount
-                    total={totalPeers}
-                    current={preparedPeersData.length}
-                    label={'Peers'}
-                    loading={isLoading}
+            }
+            table={
+                <NodeNetworkTable
+                    nodeId={nodeId}
+                    searchValue={searchValue}
+                    columns={columnsToShow}
+                    scrollContainerRef={scrollContainerRef}
                 />
-            </TableWithControlsLayout.Controls>
-            <TableWithControlsLayout.Table
-                scrollContainerRef={scrollContainerRef}
-                loading={isLoading}
-            >
-                {error ? (
-                    <ResponseError error={error} />
-                ) : (
-                    <ResizeableDataTable
-                        columnsWidthLSKey={NETWORK_COLUMNS_WIDTH_LS_KEY}
-                        data={preparedPeersData}
-                        columns={columnsToShow}
-                        settings={DEFAULT_TABLE_SETTINGS}
-                        emptyDataMessage={i18n('alert_no-network-data')}
-                        isLoading={isLoading}
-                    />
-                )}
-            </TableWithControlsLayout.Table>
-        </TableWithControlsLayout>
+            }
+            tableWrapperProps={{
+                scrollContainerRef,
+                scrollDependencies: [searchValue],
+            }}
+            fullHeight
+        />
     );
 }

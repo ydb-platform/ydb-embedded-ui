@@ -14,6 +14,7 @@ import {
 } from '../../utils/dataFormatters/dataFormatters';
 import {getUsageSeverity} from '../../utils/generateEvaluator';
 import type {Column} from '../../utils/tableUtils/types';
+import {formatToMs, parseUsToMs} from '../../utils/timeParsers';
 import {bytesToSpeed, isNumeric} from '../../utils/utils';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
 import {MemoryViewer} from '../MemoryViewer/MemoryViewer';
@@ -549,5 +550,35 @@ export function getClockSkewColumn<
         },
         align: DataTable.RIGHT,
         width: 110,
+    };
+}
+
+// Peers columns
+
+export function getPeerSkewColumn<T extends {ClockSkewUs?: string | number}>(): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.ClockSkew,
+        header: NODES_COLUMNS_TITLES.ClockSkew,
+        align: DataTable.RIGHT,
+        width: 110,
+        resizeMinWidth: 90,
+        render: ({row}) =>
+            isNumeric(row.ClockSkewUs)
+                ? formatToMs(parseUsToMs(row.ClockSkewUs))
+                : EMPTY_DATA_PLACEHOLDER,
+    };
+}
+
+export function getPeerPingColumn<T extends {PingTimeUs?: string | number}>(): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.PingTime,
+        header: NODES_COLUMNS_TITLES.PingTime,
+        align: DataTable.RIGHT,
+        width: 110,
+        resizeMinWidth: 90,
+        render: ({row}) =>
+            isNumeric(row.PingTimeUs)
+                ? formatToMs(parseUsToMs(row.PingTimeUs))
+                : EMPTY_DATA_PLACEHOLDER,
     };
 }

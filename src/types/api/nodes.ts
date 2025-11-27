@@ -323,7 +323,9 @@ export type NodesSortValue =
     | `ClockSkew` // v13
     | `PingTime` // v13
     | `SendThroughput` // v13
-    | `ReceiveThroughput`; // v13
+    | `ReceiveThroughput` // v13
+    | `BytesSend` // v13
+    | `BytesReceived`; // v13
 
 export type NodesSort = BackendSortParam<NodesSortValue>;
 
