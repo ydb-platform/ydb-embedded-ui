@@ -1,72 +1,47 @@
+import {isNil} from 'lodash';
+
 import type {FetchData} from '../../../../components/PaginatedTable';
-import type {BackendSortParam} from '../../../../types/api/common';
-import type {PeersSortValue, TPeersResponse} from '../../../../types/api/peers';
+import type {TPeersResponse} from '../../../../types/api/peers';
 import {prepareSortValue} from '../../../../utils/filters';
+import {isNumeric} from '../../../../utils/utils';
+import {getNodeNetworkColumnSortField} from '../constants';
 
 import {mapPeerToNodeNetworkRow} from './nodeNetworkMapper';
 import type {NodePeerRow} from './nodeNetworkMapper';
 
-const NODE_NETWORK_COLUMNS_TO_SORT_FIELDS: Record<string, PeersSortValue | undefined> = {
-    NodeId: 'PeerId',
-    Host: 'PeerName',
-    NodeName: 'PeerName',
-    PileName: 'PileName',
-    Skew: 'ClockSkew',
-    Ping: 'PingTime',
-    SentBytes: 'BytesSend',
-    ReceivedBytes: 'BytesReceived',
-};
-
-function getPeersColumnSortField(columnId?: string): PeersSortValue | undefined {
-    if (!columnId) {
-        return undefined;
-    }
-
-    return NODE_NETWORK_COLUMNS_TO_SORT_FIELDS[columnId];
-}
-
 export interface NodePeersFilters {
-    nodeId: string;
+    nodeId: string | number;
     searchValue?: string;
 }
 
-export const getNodePeers: FetchData<NodePeerRow, NodePeersFilters> = async ({
-    limit,
-    offset,
-    filters,
-    sortParams,
-    signal,
-}) => {
-    const nodeId = filters.nodeId;
-    const searchValue = filters?.searchValue;
+export const getNodePeers: FetchData<NodePeerRow, NodePeersFilters> = async (params) => {
+    const {limit, offset, filters, sortParams} = params;
 
     const {sortOrder, columnId} = sortParams ?? {};
-    const sortField = getPeersColumnSortField(columnId);
-    const sort: BackendSortParam<PeersSortValue> | undefined = sortField
-        ? prepareSortValue(sortField, sortOrder)
-        : undefined;
 
-    const response: TPeersResponse = await window.api.viewer.getNodePeers(
-        {
-            nodeId,
-            filter: searchValue,
-            limit,
-            offset,
-            sort,
-        },
-        {signal},
-    );
+    if (isNil(filters?.nodeId)) {
+        return {data: [], found: 0, total: 0};
+    }
+
+    const {nodeId, searchValue} = filters;
+
+    const sortField = getNodeNetworkColumnSortField(columnId);
+    const sort = sortField ? prepareSortValue(sortField, sortOrder) : undefined;
+
+    const response: TPeersResponse = await window.api.viewer.getNodePeers({
+        nodeId,
+        filter: searchValue,
+        limit,
+        offset,
+        sort,
+    });
 
     const peers = response.Peers ?? [];
     const data: NodePeerRow[] = peers.map(mapPeerToNodeNetworkRow);
 
-    const found = response.FoundPeers !== undefined ? Number(response.FoundPeers) : peers.length;
-
-    const total = response.TotalPeers !== undefined ? Number(response.TotalPeers) : found;
-
     return {
         data,
-        found,
-        total,
+        found: isNumeric(response.FoundPeers) ? Number(response.FoundPeers) : 0,
+        total: isNumeric(response.TotalPeers) ? Number(response.TotalPeers) : 0,
     };
 };

@@ -10,14 +10,17 @@ import {
     getReceiveThroughputColumn,
     getSendThroughputColumn,
 } from '../../../components/nodesColumns/columns';
-import {isSortableNodesColumn} from '../../../components/nodesColumns/constants';
 import type {GetNodesColumnsParams} from '../../../components/nodesColumns/types';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../lib';
 import {formatDateTime} from '../../../utils/dataFormatters/dataFormatters';
 import type {Column} from '../../../utils/tableUtils/types';
 import {bytesToMB, isNumeric} from '../../../utils/utils';
 
-import {NODE_NETWORK_COLUMNS_IDS, NODE_NETWORK_COLUMNS_TITLES} from './constants';
+import {
+    NODE_NETWORK_COLUMNS_IDS,
+    NODE_NETWORK_COLUMNS_TITLES,
+    isSortableNodeNetworkColumn,
+} from './constants';
 import type {NodePeerRow} from './helpers/nodeNetworkMapper';
 
 function getPeerConnectTimeColumn<T extends {ConnectTime?: string}>(): Column<T> {
@@ -32,36 +35,38 @@ function getPeerConnectTimeColumn<T extends {ConnectTime?: string}>(): Column<T>
     };
 }
 
-function getPeerSentBytesColumn<T extends {SentBytes?: string | number}>(): Column<T> {
+function getPeerSentBytesColumn<T extends {BytesSend?: string | number}>(): Column<T> {
     return {
-        name: NODE_NETWORK_COLUMNS_IDS.SentBytes,
-        header: NODE_NETWORK_COLUMNS_TITLES.SentBytes,
+        name: NODE_NETWORK_COLUMNS_IDS.BytesSend,
+        header: NODE_NETWORK_COLUMNS_TITLES.BytesSend,
         align: DataTable.RIGHT,
         width: 140,
         resizeMinWidth: 120,
         render: ({row}) =>
-            isNumeric(row.SentBytes) ? bytesToMB(row.SentBytes) : EMPTY_DATA_PLACEHOLDER,
+            isNumeric(row.BytesSend) ? bytesToMB(row.BytesSend) : EMPTY_DATA_PLACEHOLDER,
     };
 }
 
-function getPeerReceivedBytesColumn<T extends {ReceivedBytes?: string | number}>(): Column<T> {
+function getPeerReceivedBytesColumn<T extends {BytesReceived?: string | number}>(): Column<T> {
     return {
-        name: NODE_NETWORK_COLUMNS_IDS.ReceivedBytes,
-        header: NODE_NETWORK_COLUMNS_TITLES.ReceivedBytes,
+        name: NODE_NETWORK_COLUMNS_IDS.BytesReceived,
+        header: NODE_NETWORK_COLUMNS_TITLES.BytesReceived,
         align: DataTable.RIGHT,
         width: 160,
         resizeMinWidth: 130,
         render: ({row}) =>
-            isNumeric(row.ReceivedBytes) ? bytesToMB(row.ReceivedBytes) : EMPTY_DATA_PLACEHOLDER,
+            isNumeric(row.BytesReceived) ? bytesToMB(row.BytesReceived) : EMPTY_DATA_PLACEHOLDER,
     };
 }
 
 export function getNodeNetworkColumns(params: GetNodesColumnsParams = {}): Column<NodePeerRow>[] {
+    const hostColumn = getHostColumn(params) as unknown as Column<NodePeerRow>;
+
     const cols: Column<NodePeerRow>[] = [
         getNodeIdColumn(),
         getNodeNameColumn(),
         getPileNameColumn(),
-        getHostColumn(params),
+        hostColumn,
         getPeerConnectTimeColumn(),
         getPeerSkewColumn(),
         getPeerPingColumn(),
@@ -72,13 +77,9 @@ export function getNodeNetworkColumns(params: GetNodesColumnsParams = {}): Colum
     ];
 
     return cols.map((column) => {
-        const name = column.name;
-
-        const sortablePeerColumn = name === 'SentBytes' || name === 'ReceivedBytes';
-
         return {
             ...column,
-            sortable: isSortableNodesColumn(name) || sortablePeerColumn,
+            sortable: isSortableNodeNetworkColumn(column.name),
         };
     });
 }

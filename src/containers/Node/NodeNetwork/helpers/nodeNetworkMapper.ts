@@ -1,3 +1,4 @@
+import type {EFlag} from '../../../../types/api/enums';
 import type {TPeerInfo} from '../../../../types/api/peers';
 import {safeParseNumber} from '../../../../utils/utils';
 
@@ -6,13 +7,16 @@ export interface NodePeerRow {
     Host?: string;
     NodeName?: string;
     PileName?: string;
+
+    SystemState?: EFlag;
+
     ConnectTime?: string;
     ClockSkewUs?: number;
     PingTimeUs?: number;
     SendThroughput?: string;
-    SentBytes?: number;
+    BytesSend?: number;
     ReceiveThroughput?: string;
-    ReceivedBytes?: number;
+    BytesReceived?: number;
 }
 
 export function mapPeerToNodeNetworkRow(peer: TPeerInfo): NodePeerRow {
@@ -26,12 +30,15 @@ export function mapPeerToNodeNetworkRow(peer: TPeerInfo): NodePeerRow {
         Host: peer.SystemState?.Host,
         NodeName: peer.SystemState?.NodeName,
         PileName: peer.SystemState?.Location?.BridgePileName,
+
+        SystemState: peer.SystemState?.SystemState,
+
         ConnectTime: peer.Forward?.ConnectTime,
         ClockSkewUs: (fSkewUs - rSkewUs) / 2,
         PingTimeUs: (fPingUs + rPingUs) / 2,
         SendThroughput: peer.Forward?.WriteThroughput,
-        SentBytes: safeParseNumber(peer.Forward?.BytesWritten),
+        BytesSend: safeParseNumber(peer.Forward?.BytesWritten),
         ReceiveThroughput: peer.Reverse?.WriteThroughput,
-        ReceivedBytes: safeParseNumber(peer.Reverse?.BytesWritten),
+        BytesReceived: safeParseNumber(peer.Reverse?.BytesWritten),
     };
 }

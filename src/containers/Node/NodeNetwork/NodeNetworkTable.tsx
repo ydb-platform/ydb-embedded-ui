@@ -7,7 +7,6 @@ import type {Column} from '../../../utils/tableUtils/types';
 
 import {NODE_NETWORK_COLUMNS_WIDTH_LS_KEY} from './constants';
 import {getNodePeers} from './helpers/getNodePeers';
-import type {NodePeersFilters} from './helpers/getNodePeers';
 import type {NodePeerRow} from './helpers/nodeNetworkMapper';
 import i18n from './i18n';
 
@@ -26,7 +25,7 @@ export function NodeNetworkTable({
     scrollContainerRef,
     onDataFetched,
 }: NodeNetworkTableProps) {
-    const filters = React.useMemo<NodePeersFilters>(
+    const filters = React.useMemo(
         () => ({
             nodeId,
             searchValue: searchValue || undefined,
@@ -37,7 +36,7 @@ export function NodeNetworkTable({
     const renderEmptyDataMessage = React.useCallback(() => i18n('alert_no-network-data'), []);
 
     return (
-        <ResizeablePaginatedTable<NodePeerRow, NodePeersFilters>
+        <ResizeablePaginatedTable
             columnsWidthLSKey={NODE_NETWORK_COLUMNS_WIDTH_LS_KEY}
             scrollContainerRef={scrollContainerRef}
             columns={columns}

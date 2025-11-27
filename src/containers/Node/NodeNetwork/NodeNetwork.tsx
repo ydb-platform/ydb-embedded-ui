@@ -2,6 +2,7 @@ import React from 'react';
 
 import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
+import {useBridgeModeEnabled} from '../../../store/reducers/capabilities/hooks';
 import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
 import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
 import {useNodesPageQueryParams} from '../../Nodes/useNodesPageQueryParams';
@@ -10,6 +11,7 @@ import {NodeNetworkControlsWithTableState} from './NodeNetworkControls/NodeNetwo
 import {NodeNetworkTable} from './NodeNetworkTable';
 import {getNodeNetworkColumns} from './columns';
 import {
+    NODE_NETWORK_COLUMNS_IDS,
     NODE_NETWORK_COLUMNS_TITLES,
     NODE_NETWORK_DEFAULT_COLUMNS,
     NODE_NETWORK_REQUIRED_COLUMNS,
@@ -23,13 +25,22 @@ interface NodeNetworkProps {
 
 export function NodeNetwork({nodeId, scrollContainerRef}: NodeNetworkProps) {
     const database = useDatabaseFromQuery();
+    const isBridgeModeEnabled = useBridgeModeEnabled();
 
     const {searchValue, handleSearchQueryChange} = useNodesPageQueryParams(
         undefined, // We don't need use groupByParams yet
         false, // withPeerRoleFilter = false for this tab
     );
 
-    const allColumns = React.useMemo(() => getNodeNetworkColumns({database}), [database]);
+    const allColumns = React.useMemo(() => {
+        const columns = getNodeNetworkColumns({database});
+
+        if (!isBridgeModeEnabled) {
+            return columns.filter((column) => column.name !== NODE_NETWORK_COLUMNS_IDS.PileName);
+        }
+
+        return columns;
+    }, [database, isBridgeModeEnabled]);
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
         allColumns,
