@@ -2,6 +2,7 @@ import React from 'react';
 
 import {EntitiesCount} from '../../../../components/EntitiesCount';
 import {Search} from '../../../../components/Search';
+import i18n from '../i18n';
 
 interface NodeNetworkControlsProps {
     searchValue: string;
@@ -24,13 +25,13 @@ export function NodeNetworkControls({
             <Search
                 value={searchValue}
                 onChange={onSearchChange}
-                placeholder="Search peers"
+                placeholder={i18n('search-placeholder')}
                 width={238}
             />
             <EntitiesCount
                 current={entitiesCountCurrent}
                 total={entitiesCountTotal}
-                label="Peers"
+                label={i18n('field_peers')}
                 loading={entitiesLoading}
             />
         </React.Fragment>
