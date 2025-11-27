@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Flex, Label, Progress} from '@gravity-ui/uikit';
+import {Flex, Label} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
 import {selectNodesMap} from '../../store/reducers/nodesList';
@@ -54,16 +54,7 @@ export const preparePDiskData = (data: PreparedPDisk, nodeData?: {Host?: string;
     if (isNumeric(TotalSize) && isNumeric(AvailableSize)) {
         pdiskData.push({
             name: pDiskPopupKeyset('label_available'),
-            content: (
-                <React.Fragment>
-                    <Progress
-                        theme="success"
-                        size="s"
-                        value={Math.min(Math.max((AvailableSize / TotalSize) * 100, 0), 100)}
-                    />
-                    <span>{`${bytesToGB(AvailableSize)} ${pDiskPopupKeyset('value_of')} ${bytesToGB(TotalSize)}`}</span>
-                </React.Fragment>
-            ),
+            content: `${bytesToGB(AvailableSize)} ${pDiskPopupKeyset('value_of')} ${bytesToGB(TotalSize)}`,
         });
     }
 
