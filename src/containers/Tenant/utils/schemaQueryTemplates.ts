@@ -11,6 +11,7 @@ export interface SchemaQueryParams {
     relativePath: string;
     schemaData?: SchemaData[];
     streamingQueryData?: IQueryResult;
+    showCreateTableData?: string;
 }
 
 export type TemplateFn = (params?: SchemaQueryParams) => string;
@@ -161,6 +162,9 @@ ${filters}LIMIT \${5:10};`;
 };
 
 export const showCreateTableTemplate = (params?: SchemaQueryParams) => {
+    if (params?.showCreateTableData) {
+        return params.showCreateTableData;
+    }
     const tablePath = params?.relativePath
         ? `\`${normalizeParameter(params.relativePath)}\``
         : '${2:<my_table>}';
