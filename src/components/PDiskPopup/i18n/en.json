@@ -1,6 +1,5 @@
 {
-  "context_not-available": "not available",
-  "label_vdisk": "PDisk",
+  "context_not-available": "Not available",
   "label_type": "Type",
   "label_node-id": "Node Id",
   "label_host": "Host",
