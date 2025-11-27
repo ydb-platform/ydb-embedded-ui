@@ -13,11 +13,13 @@ import {
 import {useClusterBaseInfo} from '../../../../store/reducers/cluster/cluster';
 import {selectIsDirty, selectUserInput} from '../../../../store/reducers/query/query';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
+import {showCreateTableApi} from '../../../../store/reducers/showCreateTable/showCreateTable';
 import {streamingQueriesApi} from '../../../../store/reducers/streamingQuery/streamingQuery';
 import {tableSchemaDataApi} from '../../../../store/reducers/tableSchemaData';
 import {useTenantBaseInfo} from '../../../../store/reducers/tenant/tenant';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
 import {valueIsDefined} from '../../../../utils';
+import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {getConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {canShowTenantMonitoringTab} from '../../../../utils/monitoringVisibility';
@@ -28,12 +30,13 @@ import {
     mapPathTypeToNavigationTreeType,
     nodeStreamingQueryTypeToPathType,
     nodeTableTypeToPathType,
+    tableTypeToPathType,
 } from '../../utils/schema';
 import {getActions} from '../../utils/schemaActions';
 import type {DropdownItem, TreeNodeMeta} from '../../utils/types';
 import {CreateDirectoryDialog} from '../CreateDirectoryDialog/CreateDirectoryDialog';
 import {useDispatchTreeKey, useTreeKey} from '../UpdateTreeContext';
-import {isDomain} from '../transformPath';
+import {isDomain, transformPath} from '../transformPath';
 
 interface SchemaTreeProps {
     rootName: string;
@@ -58,6 +61,10 @@ export function SchemaTree(props: SchemaTreeProps) {
         getStreamingQueryInfo,
         {currentData: streamingSysData, isFetching: isStreamingInfoFetching},
     ] = streamingQueriesApi.useLazyGetStreamingQueryInfoQuery();
+    const [
+        getShowCreateTable,
+        {currentData: showCreateTableData, isFetching: isShowCreateTableFetching},
+    ] = showCreateTableApi.useLazyGetShowCreateTableQuery();
 
     const isTopicPreviewAvailable = useTopicDataAvailable();
 
@@ -162,6 +169,8 @@ export function SchemaTree(props: SchemaTreeProps) {
                 isSchemaDataLoading: isActionsDataFetching,
                 hasMonitoring,
                 streamingQueryData: streamingSysData,
+                showCreateTableData: getStringifiedData(showCreateTableData),
+                isShowCreateTableLoading: isShowCreateTableFetching,
                 isStreamingQueryTextLoading: isStreamingInfoFetching,
             },
             databaseFullPath,
@@ -181,6 +190,9 @@ export function SchemaTree(props: SchemaTreeProps) {
         databaseFullPath,
         controlPlane,
         clusterMonitoring,
+        showCreateTableData,
+        isShowCreateTableFetching,
+        handleTenantPageChange,
     ]);
 
     return (
@@ -207,6 +219,12 @@ export function SchemaTree(props: SchemaTreeProps) {
                     const pathType = nodeTableTypeToPathType[type];
                     if (isOpen && pathType) {
                         getTableSchemaDataQuery({path, database, type: pathType, databaseFullPath});
+                    }
+                    const tableType = tableTypeToPathType[type];
+
+                    if (isOpen && tableType) {
+                        const relativePath = transformPath(path, databaseFullPath);
+                        getShowCreateTable({path: relativePath, database});
                     }
 
                     const streamingPathType = nodeStreamingQueryTypeToPathType[type];
