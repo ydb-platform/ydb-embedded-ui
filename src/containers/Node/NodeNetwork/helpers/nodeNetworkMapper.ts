@@ -1,15 +1,10 @@
-import type {EFlag} from '../../../../types/api/enums';
 import type {TPeerInfo} from '../../../../types/api/peers';
+import {prepareNodeSystemState} from '../../../../utils/nodes';
+import type {PreparedNodeSystemState} from '../../../../utils/nodes';
 import {safeParseNumber} from '../../../../utils/utils';
 
-export interface NodePeerRow {
-    NodeId?: number;
-    Host?: string;
-    NodeName?: string;
+export interface NodePeerRow extends PreparedNodeSystemState {
     PileName?: string;
-
-    SystemState?: EFlag;
-
     ConnectTime?: string;
     ClockSkewUs?: number;
     PingTimeUs?: number;
@@ -20,19 +15,16 @@ export interface NodePeerRow {
 }
 
 export function mapPeerToNodeNetworkRow(peer: TPeerInfo): NodePeerRow {
+    const system = prepareNodeSystemState(peer.SystemState);
+
     const fSkewUs = safeParseNumber(peer.Forward?.ClockSkewUs);
     const rSkewUs = safeParseNumber(peer.Reverse?.ClockSkewUs);
     const fPingUs = safeParseNumber(peer.Forward?.PingTimeUs);
     const rPingUs = safeParseNumber(peer.Reverse?.PingTimeUs);
 
     return {
-        NodeId: peer.SystemState?.NodeId,
-        Host: peer.SystemState?.Host,
-        NodeName: peer.SystemState?.NodeName,
+        ...system,
         PileName: peer.SystemState?.Location?.BridgePileName,
-
-        SystemState: peer.SystemState?.SystemState,
-
         ConnectTime: peer.Forward?.ConnectTime,
         ClockSkewUs: (fSkewUs - rSkewUs) / 2,
         PingTimeUs: (fPingUs + rPingUs) / 2,
