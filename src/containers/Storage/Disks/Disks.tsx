@@ -16,7 +16,7 @@ import './Disks.scss';
 
 const b = cn('ydb-storage-disks');
 
-const VDISKS_CONTAINER_WIDTH = 300;
+const VDISKS_CONTAINER_WIDTH = 316;
 
 interface DisksProps {
     vDisks?: PreparedVDisk[];

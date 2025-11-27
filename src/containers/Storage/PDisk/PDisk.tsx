@@ -107,6 +107,7 @@ export const PDisk = ({
                         diskAllocatedPercent={data.AllocatedPercent}
                         severity={data.Severity}
                         className={progressBarClassName}
+                        highlighted={showPopup}
                     />
                 </InternalLink>
             </HoverPopup>

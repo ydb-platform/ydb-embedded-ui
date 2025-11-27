@@ -247,7 +247,7 @@ const getVDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => (
         />
     ),
     align: DataTable.CENTER,
-    width: 780, // usually 8-9 vdisks, this width corresponds to 8 vdisks, column is expanded if more
+    width: 475, // usually 8-9 vdisks, this width corresponds to 8 vdisks, column is expanded if more
     resizeable: false,
     sortable: false,
 });
@@ -267,7 +267,7 @@ const getDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => ({
         );
     },
     align: DataTable.CENTER,
-    width: 900,
+    width: 800,
     resizeable: false,
     sortable: false,
 });

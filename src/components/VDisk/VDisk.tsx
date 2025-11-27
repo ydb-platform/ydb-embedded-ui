@@ -64,6 +64,7 @@ export const VDisk = ({
                         isDonor={isHealthyDonor}
                         className={progressBarClassName}
                         withIcon={withIcon}
+                        highlighted={showPopup}
                     />
                 </InternalLink>
             </div>
