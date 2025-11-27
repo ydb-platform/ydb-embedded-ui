@@ -1,12 +1,13 @@
 import React from 'react';
 
+import {isNil} from 'lodash';
+
 import {DiskStateProgressBar} from '../../../components/DiskStateProgressBar/DiskStateProgressBar';
 import {HoverPopup} from '../../../components/HoverPopup/HoverPopup';
 import {InternalLink} from '../../../components/InternalLink';
 import {PDiskPopup} from '../../../components/PDiskPopup/PDiskPopup';
 import {VDisk} from '../../../components/VDisk/VDisk';
 import {getPDiskPagePath} from '../../../routes';
-import {valueIsDefined} from '../../../utils';
 import {cn} from '../../../utils/cn';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import {DISKS_POPUP_DEBOUNCE_TIMEOUT} from '../shared';
@@ -29,6 +30,7 @@ interface PDiskProps {
     width?: number;
     delayOpen?: number;
     delayClose?: number;
+    withIcon?: boolean;
 }
 
 export const PDisk = ({
@@ -43,10 +45,10 @@ export const PDisk = ({
     width,
     delayOpen = DISKS_POPUP_DEBOUNCE_TIMEOUT,
     delayClose = DISKS_POPUP_DEBOUNCE_TIMEOUT,
+    withIcon,
 }: PDiskProps) => {
     const {NodeId, PDiskId} = data;
-    const pDiskIdsDefined = valueIsDefined(NodeId) && valueIsDefined(PDiskId);
-
+    const pDiskIdsDefined = !isNil(NodeId) && !isNil(PDiskId);
     const anchorRef = React.useRef<HTMLDivElement>(null);
 
     const renderVDisks = () => {
@@ -67,6 +69,7 @@ export const PDisk = ({
                         }}
                     >
                         <VDisk
+                            withIcon={withIcon}
                             data={vdisk}
                             inactive={!isVdiskActive(vdisk, viewContext)}
                             compact
@@ -100,11 +103,11 @@ export const PDisk = ({
             >
                 <InternalLink to={pDiskPath} className={b('content')}>
                     <DiskStateProgressBar
+                        withIcon={withIcon}
                         diskAllocatedPercent={data.AllocatedPercent}
                         severity={data.Severity}
                         className={progressBarClassName}
                     />
-                    <div className={b('media-type')}>{data.Type}</div>
                 </InternalLink>
             </HoverPopup>
         </div>

@@ -19,7 +19,7 @@ export function calculatePDiskSeverity<
     return Math.max(stateSeverity, spaceSeverity);
 }
 
-function getStateSeverity(pDiskState?: TPDiskState) {
+export function getStateSeverity(pDiskState?: TPDiskState) {
     return isSeverityKey(pDiskState) ? PDISK_STATE_SEVERITY[pDiskState] : NOT_AVAILABLE_SEVERITY;
 }
 

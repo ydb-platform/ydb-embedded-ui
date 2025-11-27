@@ -21,6 +21,11 @@ export type PreparedPDisk = Omit<
         SlotSize?: string;
     };
 
+export interface VDiskRecipientRef {
+    NodeId?: number;
+    StringifiedId?: string;
+}
+
 export interface PreparedVDisk
     extends Omit<TVDiskStateInfo, 'PDisk' | 'AvailableSize' | 'AllocatedSize' | 'Donors'> {
     PDisk?: PreparedPDisk;
@@ -33,6 +38,8 @@ export interface PreparedVDisk
     SizeLimit?: number;
 
     Donors?: PreparedVDisk[];
+
+    Recipient?: VDiskRecipientRef;
 }
 
 export type PDiskType = ValueOf<typeof PDISK_TYPES>;

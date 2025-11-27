@@ -1,5 +1,6 @@
 import {useVDiskPagePath} from '../../routes';
 import {cn} from '../../utils/cn';
+import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from '../../utils/disks/constants';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {DiskStateProgressBar} from '../DiskStateProgressBar/DiskStateProgressBar';
 import {HoverPopup} from '../HoverPopup/HoverPopup';
@@ -20,6 +21,7 @@ export interface VDiskProps {
     progressBarClassName?: string;
     delayOpen?: number;
     delayClose?: number;
+    withIcon?: boolean;
 }
 
 export const VDisk = ({
@@ -32,9 +34,14 @@ export const VDisk = ({
     progressBarClassName,
     delayClose,
     delayOpen,
+    withIcon,
 }: VDiskProps) => {
     const getVDiskLink = useVDiskPagePath();
     const vDiskPath = getVDiskLink({nodeId: data.NodeId, vDiskId: data.StringifiedId});
+
+    const severity = data.Severity;
+    const isReplicatingColor = severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue;
+    const isHealthyDonor = data.DonorMode && isReplicatingColor;
 
     return (
         <HoverPopup
@@ -50,10 +57,13 @@ export const VDisk = ({
                 <InternalLink to={vDiskPath} className={b('content')}>
                     <DiskStateProgressBar
                         diskAllocatedPercent={data.AllocatedPercent}
-                        severity={data.Severity}
+                        severity={severity}
                         compact={compact}
                         inactive={inactive}
+                        striped={isReplicatingColor}
+                        isDonor={isHealthyDonor}
                         className={progressBarClassName}
+                        withIcon={withIcon}
                     />
                 </InternalLink>
             </div>

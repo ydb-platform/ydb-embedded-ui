@@ -1,13 +1,13 @@
 import {ShieldKeyhole} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
 import {Flex, Icon, Label, Popover} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
 import {CellWithPopover} from '../../../../components/CellWithPopover/CellWithPopover';
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {StatusIcon} from '../../../../components/StatusIcon/StatusIcon';
 import {UsageLabel} from '../../../../components/UsageLabel/UsageLabel';
 import {useStorageGroupPath} from '../../../../routes';
-import {valueIsDefined} from '../../../../utils';
 import {cn} from '../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER, YDB_POPOVER_CLASS_NAME} from '../../../../utils/constants';
 import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
@@ -123,7 +123,7 @@ const usageColumn: StorageGroupsColumn = {
     width: 85,
     resizeMinWidth: 75,
     render: ({row}) => {
-        return valueIsDefined(row.Usage) ? (
+        return !isNil(row.Usage) ? (
             <UsageLabel value={Math.floor(row.Usage)} theme={getUsageSeverity(row.Usage)} />
         ) : (
             EMPTY_DATA_PLACEHOLDER
@@ -137,7 +137,7 @@ const diskSpaceUsageColumn: StorageGroupsColumn = {
     width: 115,
     resizeMinWidth: 75,
     render: ({row}) => {
-        return valueIsDefined(row.DiskSpaceUsage) ? (
+        return !isNil(row.DiskSpaceUsage) ? (
             <UsageLabel
                 value={Math.floor(row.DiskSpaceUsage)}
                 theme={getUsageSeverity(row.DiskSpaceUsage)}
@@ -215,7 +215,7 @@ const latencyColumn: StorageGroupsColumn = {
     header: STORAGE_GROUPS_COLUMNS_TITLES.Latency,
     width: 100,
     render: ({row}) => {
-        return valueIsDefined(row.LatencyPutTabletLogMs)
+        return !isNil(row.LatencyPutTabletLogMs)
             ? formatToMs(row.LatencyPutTabletLogMs)
             : EMPTY_DATA_PLACEHOLDER;
     },
@@ -227,7 +227,7 @@ const allocationUnitsColumn: StorageGroupsColumn = {
     header: STORAGE_GROUPS_COLUMNS_TITLES.AllocationUnits,
     width: 150,
     render: ({row}) => {
-        return valueIsDefined(row.AllocationUnits)
+        return !isNil(row.AllocationUnits)
             ? formatNumber(row.AllocationUnits)
             : EMPTY_DATA_PLACEHOLDER;
     },
@@ -239,7 +239,12 @@ const getVDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => (
     header: STORAGE_GROUPS_COLUMNS_TITLES.VDisks,
     className: b('vdisks-column'),
     render: ({row}) => (
-        <VDisks vDisks={row.VDisks} viewContext={data?.viewContext} erasure={row.ErasureSpecies} />
+        <VDisks
+            vDisks={row.VDisks}
+            viewContext={data?.viewContext}
+            erasure={row.ErasureSpecies}
+            withIcon
+        />
     ),
     align: DataTable.CENTER,
     width: 780, // usually 8-9 vdisks, this width corresponds to 8 vdisks, column is expanded if more
@@ -257,6 +262,7 @@ const getDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => ({
                 vDisks={row.VDisks}
                 viewContext={data?.viewContext}
                 erasure={row.ErasureSpecies}
+                withIcon
             />
         );
     },

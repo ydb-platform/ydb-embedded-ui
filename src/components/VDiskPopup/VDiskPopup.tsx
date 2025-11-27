@@ -1,16 +1,23 @@
 import React from 'react';
 
-import {Flex, Label} from '@gravity-ui/uikit';
+import {Divider, Flex} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
 import {useVDiskPagePath} from '../../routes';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
 import {EVDiskState} from '../../types/api/vdisk';
-import {valueIsDefined} from '../../utils';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatUptimeInSeconds} from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
+import {getStateSeverity} from '../../utils/disks/calculateVDiskSeverity';
+import {
+    DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
+    NOT_AVAILABLE_SEVERITY,
+    NUMERIC_SEVERITY_TO_LABEL_VIEW,
+    VDISK_LABEL_CONFIG,
+} from '../../utils/disks/constants';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
@@ -20,12 +27,20 @@ import {
     useIsViewerUser,
 } from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToGB, bytesToSpeed} from '../../utils/utils';
-import type {InfoViewerItem} from '../InfoViewer';
-import {InfoViewer} from '../InfoViewer';
 import {InternalLink} from '../InternalLink';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
-import {preparePDiskData} from '../PDiskPopup/PDiskPopup';
+import {
+    buildPDiskFooter,
+    preparePDiskData,
+    preparePDiskHeaderLabels,
+} from '../PDiskPopup/PDiskPopup';
+import {StatusIcon} from '../StatusIcon/StatusIcon';
 import {vDiskInfoKeyset} from '../VDiskInfo/i18n';
+import type {
+    YDBDefinitionListHeaderLabel,
+    YDBDefinitionListItem,
+} from '../YDBDefinitionList/YDBDefinitionList';
+import {YDBDefinitionList} from '../YDBDefinitionList/YDBDefinitionList';
 
 import {vDiskPopupKeyset} from './i18n';
 
@@ -33,58 +48,83 @@ import './VDiskPopup.scss';
 
 const b = cn('vdisk-storage-popup');
 
-const prepareUnavailableVDiskData = (data: UnavailableDonor, withDeveloperUILink?: boolean) => {
+const prepareUnavailableVDiskData = (data: UnavailableDonor) => {
     const {NodeId, PDiskId, VSlotId, StoragePoolName} = data;
 
-    const vdiskData: InfoViewerItem[] = [
-        {label: vDiskPopupKeyset('label_state'), value: vDiskPopupKeyset('context_not-available')},
-    ];
+    const vdiskData: YDBDefinitionListItem[] = [];
 
     if (StoragePoolName) {
-        vdiskData.push({label: vDiskPopupKeyset('label_storage-pool'), value: StoragePoolName});
+        vdiskData.push({name: vDiskPopupKeyset('label_storage-pool'), content: StoragePoolName});
     }
 
     vdiskData.push(
-        {label: vDiskPopupKeyset('label_node-id'), value: NodeId ?? EMPTY_DATA_PLACEHOLDER},
-        {label: vDiskPopupKeyset('label_pdisk-id'), value: PDiskId ?? EMPTY_DATA_PLACEHOLDER},
-        {label: vDiskPopupKeyset('label_vslot-id'), value: VSlotId ?? EMPTY_DATA_PLACEHOLDER},
+        {name: vDiskPopupKeyset('label_node-id'), content: NodeId ?? EMPTY_DATA_PLACEHOLDER},
+        {name: vDiskPopupKeyset('label_pdisk-id'), content: PDiskId ?? EMPTY_DATA_PLACEHOLDER},
+        {name: vDiskPopupKeyset('label_vslot-id'), content: VSlotId ?? EMPTY_DATA_PLACEHOLDER},
     );
 
-    if (
-        withDeveloperUILink &&
-        valueIsDefined(NodeId) &&
-        valueIsDefined(PDiskId) &&
-        valueIsDefined(VSlotId)
-    ) {
-        const vDiskInternalViewerPath = createVDiskDeveloperUILink({
-            nodeId: NodeId,
-            pDiskId: PDiskId,
-            vDiskSlotId: VSlotId,
-        });
+    return vdiskData;
+};
 
-        vdiskData.push({
-            label: vDiskPopupKeyset('label_links'),
-            value: <LinkWithIcon title={'Developer UI'} url={vDiskInternalViewerPath} />,
-        });
+const buildUnavailableVDiskFooter = (
+    data: UnavailableDonor,
+    withDeveloperUILink?: boolean,
+): React.ReactNode | null => {
+    const {NodeId, PDiskId, VSlotId} = data;
+
+    if (!withDeveloperUILink || isNil(NodeId) || isNil(PDiskId) || isNil(VSlotId)) {
+        return null;
     }
 
-    return vdiskData;
+    const vDiskInternalViewerPath = createVDiskDeveloperUILink({
+        nodeId: NodeId,
+        pDiskId: PDiskId,
+        vDiskSlotId: VSlotId,
+    });
+
+    return (
+        <div className={b('links')}>
+            <LinkWithIcon title={'Developer UI'} url={vDiskInternalViewerPath} />
+        </div>
+    );
+};
+
+interface VDiskLinkProps {
+    nodeId?: string | number;
+    stringifiedId?: string;
+    getVDiskLinkFn?: (data: {
+        nodeId: string | number;
+        vDiskId: string | undefined;
+    }) => string | undefined;
+}
+
+const VDiskLink = ({nodeId, stringifiedId, getVDiskLinkFn}: VDiskLinkProps) => {
+    if (isNil(stringifiedId)) {
+        return <span>{EMPTY_DATA_PLACEHOLDER}</span>;
+    }
+
+    if (isNil(nodeId)) {
+        return <span>{stringifiedId}</span>;
+    }
+
+    const path = getVDiskLinkFn?.({nodeId, vDiskId: stringifiedId});
+
+    return (
+        <InternalLink to={path}>
+            {vDiskPopupKeyset('label_vdisk')} {stringifiedId}
+        </InternalLink>
+    );
 };
 
 // eslint-disable-next-line complexity
 const prepareVDiskData = (
     data: PreparedVDisk,
-    withDeveloperUILink: boolean | undefined,
     getVDiskLinkFn?: (data: {
         nodeId: string | number;
         vDiskId: string | undefined;
     }) => string | undefined,
 ) => {
     const {
-        NodeId,
-        PDiskId,
-        VDiskSlotId,
-        StringifiedId,
         VDiskState,
         SatisfactionRank,
         DiskSpace,
@@ -97,143 +137,245 @@ const prepareVDiskData = (
         ReadThroughput,
         WriteThroughput,
         StoragePoolName,
+        Donors,
+        DonorMode,
+        Recipient,
+        Severity,
     } = data;
 
-    const vdiskData: InfoViewerItem[] = [
-        {label: vDiskPopupKeyset('label_vdisk'), value: StringifiedId},
-        {
-            label: vDiskPopupKeyset('label_state'),
-            value: VDiskState ?? vDiskPopupKeyset('context_not-available'),
-        },
-    ];
+    const vdiskData: YDBDefinitionListItem[] = [];
 
     if (StoragePoolName) {
-        vdiskData.push({label: vDiskPopupKeyset('label_storage-pool'), value: StoragePoolName});
+        vdiskData.push({name: vDiskPopupKeyset('label_storage-pool'), content: StoragePoolName});
+    }
+
+    // it is a healthy replication and it has some donors
+    if (Donors?.length && Severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue) {
+        vdiskData.push({
+            name: vDiskPopupKeyset('label_donor'),
+            content: (
+                <Flex direction="column">
+                    {Donors.map((donor) => (
+                        <VDiskLink
+                            key={donor.StringifiedId}
+                            nodeId={donor.NodeId}
+                            stringifiedId={donor.StringifiedId}
+                            getVDiskLinkFn={getVDiskLinkFn}
+                        />
+                    ))}
+                </Flex>
+            ),
+        });
+    }
+
+    if (DonorMode && Recipient) {
+        vdiskData.push({
+            name: vDiskPopupKeyset('label_recipient'),
+            content: (
+                <VDiskLink
+                    nodeId={Recipient.NodeId}
+                    stringifiedId={Recipient.StringifiedId}
+                    getVDiskLinkFn={getVDiskLinkFn}
+                />
+            ),
+        });
     }
 
     if (SatisfactionRank && SatisfactionRank.FreshRank?.Flag !== EFlag.Green) {
         vdiskData.push({
-            label: vDiskPopupKeyset('label_fresh'),
-            value: SatisfactionRank.FreshRank?.Flag,
+            name: vDiskPopupKeyset('label_fresh'),
+            content: SatisfactionRank.FreshRank?.Flag,
         });
     }
 
     if (SatisfactionRank && SatisfactionRank.LevelRank?.Flag !== EFlag.Green) {
         vdiskData.push({
-            label: vDiskPopupKeyset('label_level'),
-            value: SatisfactionRank.LevelRank?.Flag,
+            name: vDiskPopupKeyset('label_level'),
+            content: SatisfactionRank.LevelRank?.Flag,
         });
     }
 
     if (SatisfactionRank && SatisfactionRank.FreshRank?.RankPercent) {
         vdiskData.push({
-            label: vDiskPopupKeyset('label_fresh'),
-            value: SatisfactionRank.FreshRank.RankPercent,
+            name: vDiskPopupKeyset('label_fresh'),
+            content: SatisfactionRank.FreshRank.RankPercent,
         });
     }
 
     if (SatisfactionRank && SatisfactionRank.LevelRank?.RankPercent) {
         vdiskData.push({
-            label: vDiskPopupKeyset('label_level'),
-            value: SatisfactionRank.LevelRank.RankPercent,
+            name: vDiskPopupKeyset('label_level'),
+            content: SatisfactionRank.LevelRank.RankPercent,
         });
     }
 
-    if (DiskSpace && DiskSpace !== EFlag.Green) {
-        vdiskData.push({label: vDiskPopupKeyset('label_space'), value: DiskSpace});
+    if (DiskSpace) {
+        vdiskData.push({
+            name: vDiskPopupKeyset('label_space'),
+            content: <StatusIcon mode="icons" status={DiskSpace} />,
+        });
     }
 
-    if (FrontQueues && FrontQueues !== EFlag.Green) {
-        vdiskData.push({label: vDiskPopupKeyset('label_front-queues'), value: FrontQueues});
+    if (FrontQueues) {
+        vdiskData.push({
+            name: vDiskPopupKeyset('label_front-queues'),
+            content: <StatusIcon mode="icons" status={FrontQueues} />,
+        });
     }
 
     if (Replicated === false && VDiskState === EVDiskState.OK) {
-        vdiskData.push({label: vDiskPopupKeyset('label_replicated'), value: 'NO'});
+        vdiskData.push({name: vDiskPopupKeyset('label_replicated'), content: 'NO'});
 
         // Only show replication progress and time remaining when disk is not replicated and state is OK
-        if (valueIsDefined(ReplicationProgress)) {
+        if (!isNil(ReplicationProgress)) {
             const progressPercent = Math.round(ReplicationProgress * 100);
             vdiskData.push({
-                label: vDiskPopupKeyset('label_progress'),
-                value: `${progressPercent}%`,
+                name: vDiskPopupKeyset('label_progress'),
+                content: `${progressPercent}%`,
             });
         }
 
-        if (valueIsDefined(ReplicationSecondsRemaining)) {
+        if (!isNil(ReplicationSecondsRemaining)) {
             const timeRemaining = formatUptimeInSeconds(ReplicationSecondsRemaining);
             if (timeRemaining) {
                 vdiskData.push({
-                    label: vDiskPopupKeyset('label_remaining'),
-                    value: timeRemaining,
+                    name: vDiskPopupKeyset('label_remaining'),
+                    content: timeRemaining,
                 });
             }
         }
     }
 
     if (UnsyncedVDisks) {
-        vdiskData.push({label: vDiskPopupKeyset('label_unsync-vdisks'), value: UnsyncedVDisks});
+        vdiskData.push({name: vDiskPopupKeyset('label_unsync-vdisks'), content: UnsyncedVDisks});
     }
 
     if (Number(AllocatedSize)) {
         vdiskData.push({
-            label: vDiskPopupKeyset('label_allocated'),
-            value: bytesToGB(AllocatedSize),
+            name: vDiskPopupKeyset('label_allocated'),
+            content: bytesToGB(AllocatedSize),
         });
     }
 
     if (Number(ReadThroughput)) {
         vdiskData.push({
-            label: vDiskPopupKeyset('label_read'),
-            value: bytesToSpeed(ReadThroughput),
+            name: vDiskPopupKeyset('label_read'),
+            content: bytesToSpeed(ReadThroughput),
         });
     }
 
     if (Number(WriteThroughput)) {
         vdiskData.push({
-            label: vDiskPopupKeyset('label_write'),
-            value: bytesToSpeed(WriteThroughput),
+            name: vDiskPopupKeyset('label_write'),
+            content: bytesToSpeed(WriteThroughput),
         });
     }
 
-    if (
-        withDeveloperUILink &&
-        valueIsDefined(NodeId) &&
-        valueIsDefined(PDiskId) &&
-        (valueIsDefined(VDiskSlotId) || valueIsDefined(StringifiedId))
-    ) {
-        const vDiskInternalViewerPath = valueIsDefined(VDiskSlotId)
-            ? createVDiskDeveloperUILink({
-                  nodeId: NodeId,
-                  pDiskId: PDiskId,
-                  vDiskSlotId: VDiskSlotId,
-              })
-            : undefined;
+    return vdiskData;
+};
 
-        const vDiskPagePath = getVDiskLinkFn?.({nodeId: NodeId, vDiskId: StringifiedId});
-        if (vDiskPagePath) {
-            vdiskData.push({
-                label: vDiskPopupKeyset('label_links'),
-                value: (
-                    <Flex wrap="wrap" gap={2}>
-                        <LinkWithIcon
-                            key={vDiskPagePath}
-                            title={vDiskInfoKeyset('vdisk-page')}
-                            url={vDiskPagePath}
-                            external={false}
-                        />
-                        {vDiskInternalViewerPath ? (
-                            <LinkWithIcon
-                                title={vDiskInfoKeyset('developer-ui')}
-                                url={vDiskInternalViewerPath}
-                            />
-                        ) : null}
-                    </Flex>
-                ),
-            });
-        }
+const buildVDiskFooter = (
+    data: PreparedVDisk,
+    withDeveloperUILink?: boolean,
+    getVDiskLinkFn?: (data: {
+        nodeId: string | number;
+        vDiskId: string | undefined;
+    }) => string | undefined,
+): React.ReactNode | null => {
+    if (!withDeveloperUILink) {
+        return null;
     }
 
-    return vdiskData;
+    const {NodeId, PDiskId, VDiskSlotId, StringifiedId} = data;
+
+    if (isNil(NodeId) || isNil(PDiskId) || (isNil(VDiskSlotId) && isNil(StringifiedId))) {
+        return null;
+    }
+
+    const vDiskInternalViewerPath = isNil(VDiskSlotId)
+        ? undefined
+        : createVDiskDeveloperUILink({
+              nodeId: NodeId,
+              pDiskId: PDiskId,
+              vDiskSlotId: VDiskSlotId,
+          });
+
+    const vDiskPagePath = getVDiskLinkFn?.({
+        nodeId: NodeId,
+        vDiskId: StringifiedId,
+    });
+
+    if (!vDiskPagePath) {
+        return null;
+    }
+
+    return (
+        <Flex className={b('links')} wrap="wrap" gap={2}>
+            {vDiskPagePath && (
+                <LinkWithIcon
+                    key={vDiskPagePath}
+                    title={vDiskInfoKeyset('vdisk-page')}
+                    url={vDiskPagePath}
+                    external={false}
+                />
+            )}
+            {vDiskInternalViewerPath && (
+                <LinkWithIcon
+                    title={vDiskInfoKeyset('developer-ui')}
+                    url={vDiskInternalViewerPath}
+                />
+            )}
+        </Flex>
+    );
+};
+
+const prepareHeaderLabels = (data: PreparedVDisk): YDBDefinitionListHeaderLabel[] => {
+    const labels: YDBDefinitionListHeaderLabel[] = [];
+
+    const {VDiskState, DonorMode, Severity} = data;
+
+    const isReplicatingColor = Severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue;
+
+    if (DonorMode) {
+        const donorConfig = VDISK_LABEL_CONFIG.donor;
+
+        labels.push({
+            id: 'donor',
+            value: vDiskPopupKeyset('label_donor'),
+            theme: donorConfig.theme,
+            icon: donorConfig.icon,
+        });
+    }
+
+    if (isReplicatingColor) {
+        if (!DonorMode) {
+            const replicaConfig = VDISK_LABEL_CONFIG.replica;
+
+            labels.push({
+                id: 'replication',
+                value: vDiskPopupKeyset('label_replication'),
+                theme: replicaConfig.theme,
+                icon: replicaConfig.icon,
+            });
+        }
+
+        return labels;
+    }
+
+    const severity = VDiskState ? getStateSeverity(VDiskState) : NOT_AVAILABLE_SEVERITY;
+
+    const {theme: stateTheme, icon: stateIcon} = NUMERIC_SEVERITY_TO_LABEL_VIEW[severity];
+
+    const value = VDiskState ?? vDiskPopupKeyset('label_no-data');
+
+    labels.push({
+        id: 'state',
+        value,
+        theme: stateTheme,
+        icon: stateIcon,
+    });
+
+    return labels;
 };
 
 interface VDiskPopupProps {
@@ -251,45 +393,70 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
 
     const vdiskInfo = React.useMemo(
         () =>
+            isFullData ? prepareVDiskData(data, getVDiskLink) : prepareUnavailableVDiskData(data),
+        [data, isFullData, getVDiskLink],
+    );
+
+    const vdiskHeaderLabels: YDBDefinitionListHeaderLabel[] = React.useMemo(
+        () => (isFullData ? prepareHeaderLabels(data) : []),
+        [data, isFullData],
+    );
+
+    const vdiskFooter = React.useMemo(
+        () =>
             isFullData
-                ? prepareVDiskData(data, isUserAllowedToMakeChanges, getVDiskLink)
-                : prepareUnavailableVDiskData(data, isUserAllowedToMakeChanges),
+                ? buildVDiskFooter(data, isUserAllowedToMakeChanges, getVDiskLink)
+                : buildUnavailableVDiskFooter(data, isUserAllowedToMakeChanges),
         [data, isFullData, isUserAllowedToMakeChanges, getVDiskLink],
     );
 
     const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));
-    const nodeData = valueIsDefined(data.NodeId) ? nodesMap?.get(data.NodeId) : undefined;
+    const nodeData = isNil(data.NodeId) ? undefined : nodesMap?.get(data.NodeId);
     const pdiskInfo = React.useMemo(
-        () =>
-            isFullData &&
-            data.PDisk &&
-            preparePDiskData(data.PDisk, nodeData, isUserAllowedToMakeChanges),
-        [data, nodeData, isFullData, isUserAllowedToMakeChanges],
+        () => isFullData && data.PDisk && preparePDiskData(data.PDisk, nodeData),
+        [data, nodeData, isFullData],
+    );
+    const pdiskHeaderLabels = React.useMemo(
+        () => (isFullData && data.PDisk ? preparePDiskHeaderLabels(data.PDisk) : []),
+        [data, isFullData],
     );
 
-    const donorsInfo: InfoViewerItem[] = [];
-    if ('Donors' in data && data.Donors) {
-        const donors = data.Donors;
-        for (const donor of donors) {
-            donorsInfo.push({
-                label: vDiskPopupKeyset('label_vdisk'),
-                value: (
-                    <InternalLink
-                        to={getVDiskLink({nodeId: donor.NodeId, vDiskId: donor.StringifiedId})}
-                    >
-                        {donor.StringifiedId}
-                    </InternalLink>
-                ),
-            });
-        }
-    }
+    const pdiskFooter = React.useMemo(
+        () =>
+            isFullData && data.PDisk
+                ? buildPDiskFooter(data.PDisk, isUserAllowedToMakeChanges)
+                : null,
+        [data, isFullData, isUserAllowedToMakeChanges],
+    );
+
+    const vdiskId = isFullData ? data.StringifiedId : undefined;
+    const pdiskId = isFullData ? data.PDisk?.StringifiedId : undefined;
 
     return (
         <div className={b()}>
-            {data.DonorMode && <Label className={b('donor-label')}>Donor</Label>}
-            <InfoViewer title="VDisk" info={vdiskInfo} size="s" />
-            {pdiskInfo && isViewerUser && <InfoViewer title="PDisk" info={pdiskInfo} size="s" />}
-            {donorsInfo.length > 0 && <InfoViewer title="Donors" info={donorsInfo} size="s" />}
+            <YDBDefinitionList
+                compact
+                title="VDisk"
+                titleSuffix={vdiskId ?? EMPTY_DATA_PLACEHOLDER}
+                items={vdiskInfo}
+                headerLabels={vdiskHeaderLabels}
+                nameMaxWidth={100}
+                footer={vdiskFooter}
+            />
+            {pdiskInfo && isViewerUser && (
+                <React.Fragment>
+                    <Divider className={b('custom-divider')} />
+                    <YDBDefinitionList
+                        compact
+                        title="PDisk"
+                        titleSuffix={pdiskId ?? EMPTY_DATA_PLACEHOLDER}
+                        items={pdiskInfo}
+                        headerLabels={pdiskHeaderLabels}
+                        footer={pdiskFooter}
+                        nameMaxWidth={100}
+                    />
+                </React.Fragment>
+            )}
         </div>
     );
 };
