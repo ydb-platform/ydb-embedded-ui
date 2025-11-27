@@ -28,7 +28,7 @@ function getPeerConnectTimeColumn<T extends {ConnectTime?: string}>(): Column<T>
         name: NODE_NETWORK_COLUMNS_IDS.ConnectTime,
         header: NODE_NETWORK_COLUMNS_TITLES.ConnectTime,
         align: DataTable.LEFT,
-        width: 150,
+        width: 160,
         resizeMinWidth: 120,
         render: ({row}) =>
             row.ConnectTime ? formatDateTime(row.ConnectTime) : EMPTY_DATA_PLACEHOLDER,

@@ -3,7 +3,7 @@ import React from 'react';
 import {Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
-import {useRouteMatch} from 'react-router-dom';
+import {useHistory, useRouteMatch} from 'react-router-dom';
 import {useQueryParams} from 'use-query-params';
 
 import {EntityPageTitle} from '../../components/EntityPageTitle/EntityPageTitle';
@@ -50,6 +50,7 @@ export function Node() {
     const configsAvailable = isViewerUser && hasConfigs;
 
     const dispatch = useTypedDispatch();
+    const history = useHistory();
 
     const match = useRouteMatch<{id: string; activeTab: string}>(routes.node);
 
@@ -71,6 +72,7 @@ export function Node() {
 
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const isDiskPagesAvailable = useDiskPagesAvailable();
+    const isPeersHandlerAvailable = useViewerPeersHandlerAvailable();
 
     const pageLoading = isLoading || !capabilitiesLoaded;
 
@@ -92,13 +94,23 @@ export function Node() {
         if (!threadsQuantity) {
             skippedTabs.push('threads');
         }
+        if (!isPeersHandlerAvailable) {
+            skippedTabs.push('network');
+        }
         const actualNodeTabs = NODE_TABS.filter((el) => !skippedTabs.includes(el.id));
 
         const actualActiveTab =
             actualNodeTabs.find(({id}) => id === activeTabId) ?? actualNodeTabs[0];
 
         return {activeTab: actualActiveTab, nodeTabs: actualNodeTabs};
-    }, [isStorageNode, isDiskPagesAvailable, activeTabId, threadsQuantity, configsAvailable]);
+    }, [
+        isStorageNode,
+        isDiskPagesAvailable,
+        isPeersHandlerAvailable,
+        activeTabId,
+        threadsQuantity,
+        configsAvailable,
+    ]);
 
     const database = tenantNameFromQuery?.toString();
 
@@ -117,6 +129,18 @@ export function Node() {
             );
         }
     }, [dispatch, database, nodeId, isLoading, isStorageNode, databaseName]);
+
+    React.useEffect(() => {
+        if (!nodeId || !activeTab) {
+            return;
+        }
+
+        if (activeTab.id !== activeTabId) {
+            const path = getDefaultNodePath({id: nodeId, activeTab: activeTab.id}, {database});
+
+            history.replace(path);
+        }
+    }, [nodeId, database, activeTab.id, activeTabId, history, activeTab]);
 
     return (
         <div className={b(null)} ref={container}>
@@ -216,8 +240,6 @@ function NodePageContent({
     tabs,
     parentContainer,
 }: NodePageContentProps) {
-    const isPeersHandlerAvailable = useViewerPeersHandlerAvailable();
-
     const renderTabs = () => {
         return (
             <div className={b('tabs')}>
@@ -286,10 +308,6 @@ function NodePageContent({
             }
 
             case 'network': {
-                if (!isPeersHandlerAvailable) {
-                    return i18n('alert_no-peers');
-                }
-
                 return <NodeNetwork nodeId={nodeId} scrollContainerRef={parentContainer} />;
             }
 

@@ -564,7 +564,7 @@ export function getPeerSkewColumn<T extends {ClockSkewUs?: string | number}>(): 
         resizeMinWidth: 90,
         render: ({row}) =>
             isNumeric(row.ClockSkewUs)
-                ? formatToMs(parseUsToMs(row.ClockSkewUs))
+                ? formatToMs(parseUsToMs(row.ClockSkewUs, 2))
                 : EMPTY_DATA_PLACEHOLDER,
     };
 }
@@ -578,7 +578,7 @@ export function getPeerPingColumn<T extends {PingTimeUs?: string | number}>(): C
         resizeMinWidth: 90,
         render: ({row}) =>
             isNumeric(row.PingTimeUs)
-                ? formatToMs(parseUsToMs(row.PingTimeUs))
+                ? formatToMs(parseUsToMs(row.PingTimeUs, 2))
                 : EMPTY_DATA_PLACEHOLDER,
     };
 }

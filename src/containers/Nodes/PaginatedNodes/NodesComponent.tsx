@@ -27,7 +27,6 @@ interface NodesComponentProps {
     selectedColumnsKey: string;
     groupByParams: NodesGroupByField[];
     onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
-    nodeId?: string;
 }
 
 export function NodesComponent({
@@ -42,7 +41,6 @@ export function NodesComponent({
     selectedColumnsKey,
     groupByParams,
     onDataFetched,
-    nodeId,
 }: NodesComponentProps) {
     const {searchValue, uptimeFilter, peerRoleFilter, withProblems} = useNodesPageQueryParams(
         groupByParams,
@@ -80,7 +78,6 @@ export function NodesComponent({
                     path={path}
                     database={database}
                     databaseFullPath={databaseFullPath}
-                    nodeId={nodeId}
                     searchValue={searchValue}
                     withProblems={withProblems}
                     uptimeFilter={uptimeFilter}

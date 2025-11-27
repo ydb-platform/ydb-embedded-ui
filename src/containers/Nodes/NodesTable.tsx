@@ -20,8 +20,6 @@ interface NodesTableProps {
     database?: string;
     databaseFullPath?: string;
 
-    nodeId?: string;
-
     searchValue: string;
     withProblems: boolean;
     uptimeFilter: NodesUptimeFilterValues;
@@ -42,7 +40,6 @@ export function NodesTable({
     path,
     database,
     databaseFullPath,
-    nodeId,
     searchValue,
     withProblems,
     uptimeFilter,
@@ -59,7 +56,6 @@ export function NodesTable({
             path,
             databaseFullPath,
             database,
-            nodeId,
             searchValue,
             withProblems,
             uptimeFilter,
@@ -71,7 +67,6 @@ export function NodesTable({
         path,
         databaseFullPath,
         database,
-        nodeId,
         searchValue,
         withProblems,
         uptimeFilter,

@@ -148,8 +148,9 @@ export class ViewerAPI extends BaseYdbAPI {
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<TPeersResponse>(
-            this.getPath('/viewer/json/peers?enums=true'),
+            this.getPath('/viewer/json/peers'),
             {
+                enums: true,
                 node_id: nodeId,
                 filter: filter || undefined,
                 ...params,
