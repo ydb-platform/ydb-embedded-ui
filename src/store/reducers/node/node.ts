@@ -26,17 +26,6 @@ export const nodeApi = api.injectEndpoints({
             },
             providesTags: ['All'],
         }),
-        getNodePeers: build.query({
-            queryFn: async ({nodeId}: {nodeId: string}, {signal}) => {
-                try {
-                    const data = await window.api.viewer.getNodePeers({nodeId}, {signal});
-                    return {data};
-                } catch (error) {
-                    return {error};
-                }
-            },
-            providesTags: ['All'],
-        }),
     }),
     overrideExisting: 'throw',
 });
