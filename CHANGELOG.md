@@ -1,5 +1,18 @@
 # Changelog
 
+## [12.23.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.22.0...v12.23.0) (2025-11-28)
+
+
+### Features
+
+* add network tab to node page with peer connectivity visualization ([#2826](https://github.com/ydb-platform/ydb-embedded-ui/issues/2826)) ([6c307d8](https://github.com/ydb-platform/ydb-embedded-ui/commit/6c307d879bb3c76e914c9763d4a0660ddbba7198))
+* **storage:** update vdisk donor/replica visuals and tooltips ([#3110](https://github.com/ydb-platform/ydb-embedded-ui/issues/3110)) ([fa0abe3](https://github.com/ydb-platform/ydb-embedded-ui/commit/fa0abe38b2e8c95ac6449223a930e802d3b38b14))
+
+
+### Bug Fixes
+
+* peer-deps ([#3143](https://github.com/ydb-platform/ydb-embedded-ui/issues/3143)) ([c830f2a](https://github.com/ydb-platform/ydb-embedded-ui/commit/c830f2a63b0950e3968d26cf4dba0ddb574461d7))
+
 ## [12.22.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.21.0...v12.22.0) (2025-11-27)
 
 
