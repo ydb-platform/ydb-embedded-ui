@@ -4,8 +4,8 @@
     }
 
     &__item {
-        width: 90px;
-        margin-right: 6px;
+        width: 55px;
+        margin-right: var(--g-spacing-1);
 
         &_with-dc-margin {
             margin-right: 12px;
