@@ -67,7 +67,6 @@
     "start": "rsbuild dev",
     "dev": "DISABLE_ESLINT_PLUGIN=true TSC_COMPILE_ON_ERROR=true REACT_APP_BACKEND=http://localhost:8765 REACT_APP_META_BACKEND=undefined rsbuild dev",
     "build": "rm -rf build && DISABLE_ESLINT_PLUGIN=true CI=true rsbuild build",
-    "//build:embedded": "echo 'PUBLIC_URL is a setting for create-react-app. Embedded version is built and hosted as is on ydb servers, with no way of knowing the final URL pattern. PUBLIC_URL=. keeps paths to all static relative, allowing servers to handle them as needed'",
     "build:embedded": "GENERATE_SOURCEMAP=false REACT_APP_BACKEND=http://localhost:8765 REACT_APP_META_BACKEND=undefined npm run build",
     "build:embedded-mc": "GENERATE_SOURCEMAP=false PUBLIC_URL=. REACT_APP_BACKEND= REACT_APP_META_BACKEND= npm run build",
     "build:embedded:archive": "npm run build:embedded && mv build embedded-ui && cp CHANGELOG.md embedded-ui/CHANGELOG.md && zip -r embedded-ui.zip embedded-ui && rm -rf embedded-ui",
