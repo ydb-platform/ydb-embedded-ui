@@ -81,6 +81,10 @@ export const useNodesHandlerHasWorkingClusterNetworkStats = () => {
     return useGetFeatureVersion('/viewer/nodes') >= 16;
 };
 
+export const useViewerPeersHandlerAvailable = () => {
+    return useGetFeatureVersion('/viewer/peers') > 0;
+};
+
 export const useFeatureFlagsAvailable = () => {
     return useGetFeatureVersion('/viewer/feature_flags') > 1;
 };

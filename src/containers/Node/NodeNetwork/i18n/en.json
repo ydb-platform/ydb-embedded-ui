@@ -1,0 +1,9 @@
+{
+  "field_connect-time": "Connect Time",
+  "field_sent-bytes": "Sent Bytes",
+  "field_received-bytes": "Received Bytes",
+  "alert_no-network-data": "No network data",
+  "search-placeholder": "Search peers",
+  "field_peers": "Peers",
+  "table_node-peers": "Node Peers"
+}
