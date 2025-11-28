@@ -1,9 +1,12 @@
-export function parseJson(value?: string | null) {
-    if (!value) {
+export function parseJson(value?: unknown) {
+    // 'undefined' is not parsed by JSON.parse
+    if (!value || value === 'undefined') {
         return undefined;
     }
     try {
-        return JSON.parse(value);
+        // Use `as string` here
+        // In case of invalid value it will throw an error and value will be returned as is
+        return JSON.parse(value as string);
     } catch {
         return value;
     }

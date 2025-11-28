@@ -32,7 +32,7 @@ export default [
         },
     },
     {
-        files: ['config-overrides.js', 'commitlint.config.js', 'src/setupProxy.js', '.github/**/*'],
+        files: ['commitlint.config.js', 'src/setupProxy.js', '.github/**/*', 'babel.config.js'],
         languageOptions: {
             globals: {
                 ...globals.node,

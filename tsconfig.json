@@ -2,11 +2,14 @@
   "extends": "@gravity-ui/tsconfig/tsconfig",
   "compilerOptions": {
     "outDir": "build/esm",
+
     "target": "ES2018",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+
     "jsx": "react-jsx",
     "lib": ["dom", "dom.iterable", "esnext"],
+
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "isolatedModules": true,

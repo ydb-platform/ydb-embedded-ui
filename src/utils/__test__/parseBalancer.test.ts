@@ -110,15 +110,6 @@ describe('getCleanBalancerValue', () => {
     });
 });
 describe('prepareBackendFromBalancer', () => {
-    const windowSpy = jest.spyOn(window, 'window', 'get');
-
-    afterEach(() => {
-        windowSpy.mockClear();
-    });
-    afterAll(() => {
-        windowSpy.mockRestore();
-    });
-
     test('should not change full balancer value - only remove viewer pathname', () => {
         const initialValue = 'https://ydb-testing-0000.search.net:8765/viewer/json';
         const result = 'https://ydb-testing-0000.search.net:8765';
@@ -130,11 +121,7 @@ describe('prepareBackendFromBalancer', () => {
         const initialValue = '/proxy/host/ydb-testing-0000.search.net/viewer/json';
         const result = 'https://my-host.ru/proxy/host/ydb-testing-0000.search.net';
 
-        windowSpy.mockImplementation(() => {
-            return {
-                meta_backend: 'https://my-host.ru',
-            } as Window & typeof globalThis;
-        });
+        window.meta_backend = 'https://my-host.ru';
 
         expect(prepareBackendFromBalancer(initialValue)).toBe(result);
     });
@@ -142,11 +129,7 @@ describe('prepareBackendFromBalancer', () => {
         const initialValue = '/proxy/host/ydb-testing-0000.search.net/viewer/json';
         const result = '/meta/proxy/host/ydb-testing-0000.search.net';
 
-        windowSpy.mockImplementation(() => {
-            return {
-                meta_backend: '/meta',
-            } as Window & typeof globalThis;
-        });
+        window.meta_backend = '/meta';
 
         expect(prepareBackendFromBalancer(initialValue)).toBe(result);
     });
@@ -154,11 +137,7 @@ describe('prepareBackendFromBalancer', () => {
         const initialValue = '/proxy/host/ydb-testing-0000.search.net/viewer/json';
         const result = '/proxy/host/ydb-testing-0000.search.net';
 
-        windowSpy.mockImplementation(() => {
-            return {
-                meta_backend: '',
-            } as Window & typeof globalThis;
-        });
+        window.meta_backend = '';
 
         expect(prepareBackendFromBalancer(initialValue)).toBe(result);
     });
@@ -166,11 +145,7 @@ describe('prepareBackendFromBalancer', () => {
         const initialValue = '/proxy/host/ydb-testing-0000.search.net/viewer/json';
         const result = '/proxy/host/ydb-testing-0000.search.net';
 
-        windowSpy.mockImplementation(() => {
-            return {
-                meta_backend: undefined,
-            } as Window & typeof globalThis;
-        });
+        window.meta_backend = undefined;
 
         expect(prepareBackendFromBalancer(initialValue)).toBe(result);
     });
