@@ -345,21 +345,15 @@ const prepareHeaderLabels = (data: PreparedVDisk): YDBDefinitionListHeaderLabel[
             theme: donorConfig.theme,
             icon: donorConfig.icon,
         });
-    }
+    } else if (isReplicatingColor) {
+        const replicaConfig = VDISK_LABEL_CONFIG.replica;
 
-    if (isReplicatingColor) {
-        if (!DonorMode) {
-            const replicaConfig = VDISK_LABEL_CONFIG.replica;
-
-            labels.push({
-                id: 'replication',
-                value: vDiskPopupKeyset('label_replication'),
-                theme: replicaConfig.theme,
-                icon: replicaConfig.icon,
-            });
-        }
-
-        return labels;
+        labels.push({
+            id: 'replication',
+            value: vDiskPopupKeyset('label_replication'),
+            theme: replicaConfig.theme,
+            icon: replicaConfig.icon,
+        });
     }
 
     const severity = VDiskState ? getStateSeverity(VDiskState) : NOT_AVAILABLE_SEVERITY;
