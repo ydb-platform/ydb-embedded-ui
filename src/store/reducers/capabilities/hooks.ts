@@ -30,6 +30,18 @@ export function useCapabilitiesLoaded() {
     return Boolean(data || error);
 }
 
+export function useAllCapablitiesStatus() {
+    const {data, error} = useCapabilitiesQuery();
+
+    useMetaCapabilitiesQuery();
+    // It is always true if there is no meta, since request finishes with an error
+    const metaCapabilitiesLoaded = useMetaCapabilitiesLoaded();
+
+    const capabilitiesLoaded = Boolean(data || error);
+
+    return {error, loading: !capabilitiesLoaded || !metaCapabilitiesLoaded};
+}
+
 const useGetFeatureVersion = (feature: Capability) => {
     const database = useDatabaseFromQuery();
 
