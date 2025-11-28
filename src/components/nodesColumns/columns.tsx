@@ -454,7 +454,7 @@ export function getSendThroughputColumn<T extends {SendThroughput?: string}>(): 
         header: NODES_COLUMNS_TITLES.SendThroughput,
         render: ({row}) =>
             isNumeric(row.SendThroughput)
-                ? bytesToSpeed(row.SendThroughput)
+                ? bytesToSpeed(row.SendThroughput, 1)
                 : EMPTY_DATA_PLACEHOLDER,
         align: DataTable.RIGHT,
         width: 110,
@@ -466,7 +466,7 @@ export function getReceiveThroughputColumn<T extends {ReceiveThroughput?: string
         header: NODES_COLUMNS_TITLES.ReceiveThroughput,
         render: ({row}) =>
             isNumeric(row.ReceiveThroughput)
-                ? bytesToSpeed(row.ReceiveThroughput)
+                ? bytesToSpeed(row.ReceiveThroughput, 1)
                 : EMPTY_DATA_PLACEHOLDER,
         align: DataTable.RIGHT,
         width: 110,
@@ -564,7 +564,7 @@ export function getPeerSkewColumn<T extends {ClockSkewUs?: string | number}>(): 
         resizeMinWidth: 90,
         render: ({row}) =>
             isNumeric(row.ClockSkewUs)
-                ? formatToMs(parseUsToMs(row.ClockSkewUs, 2))
+                ? formatToMs(parseUsToMs(row.ClockSkewUs, 1))
                 : EMPTY_DATA_PLACEHOLDER,
     };
 }
@@ -578,7 +578,7 @@ export function getPeerPingColumn<T extends {PingTimeUs?: string | number}>(): C
         resizeMinWidth: 90,
         render: ({row}) =>
             isNumeric(row.PingTimeUs)
-                ? formatToMs(parseUsToMs(row.PingTimeUs, 2))
+                ? formatToMs(parseUsToMs(row.PingTimeUs))
                 : EMPTY_DATA_PLACEHOLDER,
     };
 }

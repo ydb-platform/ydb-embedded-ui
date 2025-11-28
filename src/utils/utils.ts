@@ -31,12 +31,20 @@ export function bytesToSize(bytes: number) {
     return val.toPrecision(3) + sizes[i];
 }
 
-export function bytesToMB(bytes?: number | string) {
+export function bytesToMB(bytes?: number | string, fractionDigits?: number) {
     const bytesNumber = Number(bytes);
     if (isNaN(bytesNumber)) {
         return '';
     }
+
     const val = bytesNumber / base ** 2;
+
+    if (isNumeric(fractionDigits)) {
+        const rounded = Number(val.toFixed(fractionDigits));
+
+        return String(rounded) + sizes[2];
+    }
+
     if (val < 10) {
         return val.toFixed(2) + sizes[2];
     } else if (val < 100) {
@@ -46,8 +54,8 @@ export function bytesToMB(bytes?: number | string) {
     }
 }
 
-export function bytesToSpeed(bytes?: number | string) {
-    const speed = bytesToMB(bytes);
+export function bytesToSpeed(bytes?: number | string, fractionDigits?: number) {
+    const speed = bytesToMB(bytes, fractionDigits);
     return `${speed}${speed ? 'ps' : ''}`;
 }
 

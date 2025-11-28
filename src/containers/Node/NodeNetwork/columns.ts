@@ -43,7 +43,7 @@ function getPeerSentBytesColumn<T extends {BytesSend?: string | number}>(): Colu
         width: 140,
         resizeMinWidth: 120,
         render: ({row}) =>
-            isNumeric(row.BytesSend) ? bytesToMB(row.BytesSend) : EMPTY_DATA_PLACEHOLDER,
+            isNumeric(row.BytesSend) ? bytesToMB(row.BytesSend, 0) : EMPTY_DATA_PLACEHOLDER,
     };
 }
 
@@ -55,7 +55,7 @@ function getPeerReceivedBytesColumn<T extends {BytesReceived?: string | number}>
         width: 160,
         resizeMinWidth: 130,
         render: ({row}) =>
-            isNumeric(row.BytesReceived) ? bytesToMB(row.BytesReceived) : EMPTY_DATA_PLACEHOLDER,
+            isNumeric(row.BytesReceived) ? bytesToMB(row.BytesReceived, 0) : EMPTY_DATA_PLACEHOLDER,
     };
 }
 
