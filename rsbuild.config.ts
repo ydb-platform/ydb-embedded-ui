@@ -13,6 +13,8 @@ const APP_VARS = [
     'TSC_COMPILE_ON_ERROR',
     'REACT_APP_DISABLE_CHECKS',
 
+    'NODE_ENV',
+
     // Backend configuration
     'REACT_APP_BACKEND',
     'REACT_APP_META_BACKEND',
@@ -78,6 +80,9 @@ export default defineConfig({
             root: './build',
         },
         assetPrefix: '.',
+        sourceMap: {
+            js: process.env.GENERATE_SOURCEMAP !== 'false' ? 'source-map' : false,
+        },
     },
     html: {
         template: './public/index.html',

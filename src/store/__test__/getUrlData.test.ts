@@ -111,7 +111,7 @@ describe('getUrlData', () => {
         });
     });
     describe('single-cluster version with custom backend', () => {
-        test('should parse correclty parse pathname', () => {
+        test('should correctly parse pathname', () => {
             window.history.pushState({}, '', '/cluster');
 
             const result = getUrlData({
