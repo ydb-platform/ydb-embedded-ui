@@ -1,3 +1,5 @@
+import React from 'react';
+
 import type {Capability, MetaCapability, SecuritySetting} from '../../../types/api/capabilities';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 import {useTypedSelector} from '../../../utils/hooks';
@@ -28,6 +30,21 @@ export function useCapabilitiesLoaded() {
     // If capabilities endpoint is not available, request finishes with error
     // That means no new features are available
     return Boolean(data || error);
+}
+
+export function useAllCapabilitiesStatus() {
+    const {data, error} = useCapabilitiesQuery();
+
+    useMetaCapabilitiesQuery();
+    // It is always true if there is no meta, since request finishes with an error
+    const metaCapabilitiesLoaded = useMetaCapabilitiesLoaded();
+
+    const capabilitiesLoaded = Boolean(data || error);
+
+    return React.useMemo(
+        () => ({error, loading: !capabilitiesLoaded || !metaCapabilitiesLoaded}),
+        [error, capabilitiesLoaded, metaCapabilitiesLoaded],
+    );
 }
 
 const useGetFeatureVersion = (feature: Capability) => {
