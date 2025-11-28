@@ -160,7 +160,7 @@ export interface TSystemStateInfo {
     Threads?: TThreadPoolInfo[];
 }
 
-interface TNodeStateInfo {
+export interface TNodeStateInfo {
     PeerName?: string;
     Connected?: boolean;
     NodeId?: number;
@@ -217,6 +217,8 @@ interface TNodeLocation {
     RackNum?: number; // deprecated
     BodyNum?: number; // deprecated
     Body?: number; // deprecated
+
+    BridgePileName?: string;
 
     DataCenter?: string;
     Module?: string;
