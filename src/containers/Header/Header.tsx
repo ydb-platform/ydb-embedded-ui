@@ -19,7 +19,7 @@ import {checkIsClustersPage, checkIsTenantPage, getClusterPath} from '../../rout
 import {environment} from '../../store';
 import {
     useAddClusterFeatureAvailable,
-    useAllCapablitiesStatus,
+    useAllCapabilitiesStatus,
     useDatabasesAvailable,
     useDeleteDatabaseFeatureAvailable,
     useEditDatabaseFeatureAvailable,
@@ -51,7 +51,7 @@ import './Header.scss';
 const b = cn('header');
 
 function Header() {
-    const {loading} = useAllCapablitiesStatus();
+    const {loading} = useAllCapabilitiesStatus();
     const {page, pageBreadcrumbsOptions} = useTypedSelector((state) => state.header);
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();

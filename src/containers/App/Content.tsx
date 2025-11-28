@@ -14,7 +14,7 @@ import routes, {getClusterPath} from '../../routes';
 import type {RootState} from '../../store';
 import {authenticationApi} from '../../store/reducers/authentication/authentication';
 import {
-    useAllCapablitiesStatus,
+    useAllCapabilitiesStatus,
     useClusterWithoutAuthInUI,
     useMetaCapabilitiesLoaded,
     useMetaCapabilitiesQuery,
@@ -235,7 +235,7 @@ function GetNodesList() {
 }
 
 function GetCapabilities({children}: {children: React.ReactNode}) {
-    const {error, loading} = useAllCapablitiesStatus();
+    const {error, loading} = useAllCapabilitiesStatus();
 
     //do nothing, authentication is in progress upon redirect
     if (isRedirectToAuth(error)) {

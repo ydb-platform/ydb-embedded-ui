@@ -1,3 +1,5 @@
+import React from 'react';
+
 import type {Capability, MetaCapability, SecuritySetting} from '../../../types/api/capabilities';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 import {useTypedSelector} from '../../../utils/hooks';
@@ -30,7 +32,7 @@ export function useCapabilitiesLoaded() {
     return Boolean(data || error);
 }
 
-export function useAllCapablitiesStatus() {
+export function useAllCapabilitiesStatus() {
     const {data, error} = useCapabilitiesQuery();
 
     useMetaCapabilitiesQuery();
@@ -39,7 +41,10 @@ export function useAllCapablitiesStatus() {
 
     const capabilitiesLoaded = Boolean(data || error);
 
-    return {error, loading: !capabilitiesLoaded || !metaCapabilitiesLoaded};
+    return React.useMemo(
+        () => ({error, loading: !capabilitiesLoaded || !metaCapabilitiesLoaded}),
+        [error, capabilitiesLoaded, metaCapabilitiesLoaded],
+    );
 }
 
 const useGetFeatureVersion = (feature: Capability) => {
