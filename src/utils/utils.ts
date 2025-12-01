@@ -33,6 +33,23 @@ export function bytesToSize(bytes: number) {
     return val.toPrecision(3) + sizes[i];
 }
 
+function formatMbWithMaxFractionDigits(value: number, fractionDigits?: number): string {
+    if (isNumeric(fractionDigits)) {
+        const fixed = value.toFixed(fractionDigits);
+        const trimmed = fixed.replace(/\.?0+$/, '');
+
+        return trimmed === '' ? '0' : trimmed;
+    }
+
+    if (value < 10) {
+        return value.toFixed(2);
+    } else if (value < 100) {
+        return value.toFixed(1);
+    }
+
+    return value.toFixed();
+}
+
 export function bytesToMB(
     bytes?: number | string,
     fractionDigits?: number,
@@ -45,19 +62,9 @@ export function bytesToMB(
 
     const val = bytesNumber / base ** 2;
 
-    let rounded;
+    const roundedStr = formatMbWithMaxFractionDigits(val, fractionDigits);
 
-    if (isNumeric(fractionDigits)) {
-        rounded = val.toFixed(fractionDigits);
-    } else if (val < 10) {
-        rounded = val.toFixed(2);
-    } else if (val < 100) {
-        rounded = val.toFixed(1);
-    } else {
-        rounded = val.toFixed();
-    }
-
-    const result = withThousandsGrouping ? formatNumber(rounded) : rounded;
+    const result = withThousandsGrouping ? formatNumber(roundedStr) : roundedStr;
 
     return `${result}${sizes[2]}`;
 }
