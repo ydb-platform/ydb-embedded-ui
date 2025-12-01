@@ -50,7 +50,7 @@ function getPeerSentBytesColumn<T extends {BytesSend?: string | number}>(): Colu
         align: DataTable.RIGHT,
         width: 140,
         resizeMinWidth: 120,
-        render: ({row}) => renderSent(row.BytesSend) ?? EMPTY_DATA_PLACEHOLDER,
+        render: ({row}) => renderSent(row.BytesSend) || EMPTY_DATA_PLACEHOLDER,
     };
 }
 
@@ -61,7 +61,7 @@ function getPeerReceivedBytesColumn<T extends {BytesReceived?: string | number}>
         align: DataTable.RIGHT,
         width: 160,
         resizeMinWidth: 130,
-        render: ({row}) => renderSent(row.BytesReceived) ?? EMPTY_DATA_PLACEHOLDER,
+        render: ({row}) => renderSent(row.BytesReceived) || EMPTY_DATA_PLACEHOLDER,
     };
 }
 
