@@ -83,6 +83,8 @@ export default defineConfig({
         sourceMap: {
             js: process.env.GENERATE_SOURCEMAP !== 'false' ? 'source-map' : false,
         },
+        // Inline CSS in development to prevent FOUC
+        injectStyles: process.env.NODE_ENV === 'development',
     },
     html: {
         template: './public/index.html',
