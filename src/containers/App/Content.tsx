@@ -14,6 +14,7 @@ import routes, {getClusterPath} from '../../routes';
 import type {RootState} from '../../store';
 import {authenticationApi} from '../../store/reducers/authentication/authentication';
 import {
+    useAllCapabilitiesLoaded,
     useCapabilitiesQuery,
     useClusterWithoutAuthInUI,
     useMetaCapabilitiesLoaded,
@@ -235,11 +236,10 @@ function GetNodesList() {
 }
 
 function GetCapabilities({children}: {children: React.ReactNode}) {
-    const {data, error} = useCapabilitiesQuery();
+    const {error} = useCapabilitiesQuery();
 
     useMetaCapabilitiesQuery();
-    // It is always true if there is no meta, since request finishes with an error
-    const metaCapabilitiesLoaded = useMetaCapabilitiesLoaded();
+    const capabilitiesLoaded = useAllCapabilitiesLoaded();
 
     //do nothing, authentication is in progress upon redirect
     if (isRedirectToAuth(error)) {
@@ -250,10 +250,8 @@ function GetCapabilities({children}: {children: React.ReactNode}) {
         return <AccessDenied />;
     }
 
-    const capabilitiesLoaded = Boolean(data || error);
-
     return (
-        <LoaderWrapper loading={!capabilitiesLoaded || !metaCapabilitiesLoaded} size="l">
+        <LoaderWrapper loading={!capabilitiesLoaded} size="l">
             {children}
         </LoaderWrapper>
     );
