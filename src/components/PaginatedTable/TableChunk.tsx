@@ -71,7 +71,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     const columnsIds = React.useMemo(
         () =>
             //sort ids to prevent refetch if only order was changed
-            useColumnsIdsInRequest ? columns.map((column) => column.name).toSorted() : undefined,
+            useColumnsIdsInRequest ? columns.map((column) => column.name).toSorted() : [],
         [columns, useColumnsIdsInRequest],
     );
 

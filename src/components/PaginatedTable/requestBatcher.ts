@@ -6,7 +6,7 @@ interface PaginatedTableParams<T, F> {
     filters: F;
     limit: number;
     sortParams?: SortParams;
-    columnsIds?: string[];
+    columnsIds: string[];
     tableName: string;
 }
 
