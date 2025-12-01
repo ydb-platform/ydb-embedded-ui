@@ -33,7 +33,7 @@ export function useGroupsGetter(shouldUseGroupsHandler: boolean) {
             const sort = sortField ? prepareSortValue(sortField, sortOrder) : undefined;
 
             const dataFieldsRequired = getRequiredDataFields(
-                columnsIds,
+                columnsIds ?? Object.keys(GROUPS_COLUMNS_TO_DATA_FIELDS),
                 GROUPS_COLUMNS_TO_DATA_FIELDS,
             );
 

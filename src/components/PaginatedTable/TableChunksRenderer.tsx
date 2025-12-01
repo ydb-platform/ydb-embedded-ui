@@ -29,6 +29,7 @@ export interface TableChunksRendererProps<T, F> {
     renderEmptyDataMessage?: RenderEmptyDataMessage;
     onDataFetched: (data?: PaginatedTableData<T>) => void;
     keepCache: boolean;
+    useColumnsIdsInRequest?: boolean;
 }
 
 export const TableChunksRenderer = <T, F>({
@@ -47,6 +48,7 @@ export const TableChunksRenderer = <T, F>({
     renderEmptyDataMessage,
     onDataFetched,
     keepCache,
+    useColumnsIdsInRequest,
 }: TableChunksRendererProps<T, F>) => {
     const chunkStates = useScrollBasedChunks({
         scrollContainerRef,
@@ -125,6 +127,7 @@ export const TableChunksRenderer = <T, F>({
                     shouldFetch={chunkState.shouldFetch}
                     shouldRender={chunkState.shouldRender}
                     keepCache={keepCache}
+                    useColumnsIdsInRequest={useColumnsIdsInRequest}
                 />
             );
         },
@@ -143,6 +146,7 @@ export const TableChunksRenderer = <T, F>({
             rowHeight,
             sortParams,
             tableName,
+            useColumnsIdsInRequest,
         ],
     );
 

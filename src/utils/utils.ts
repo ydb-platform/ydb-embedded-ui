@@ -1,3 +1,5 @@
+import {formatNumber} from './dataFormatters/dataFormatters';
+
 export function parseJson(value?: string | null) {
     if (!value) {
         return undefined;
@@ -31,7 +33,11 @@ export function bytesToSize(bytes: number) {
     return val.toPrecision(3) + sizes[i];
 }
 
-export function bytesToMB(bytes?: number | string, fractionDigits?: number) {
+export function bytesToMB(
+    bytes?: number | string,
+    fractionDigits?: number,
+    withThousandsGrouping?: boolean,
+) {
     const bytesNumber = Number(bytes);
     if (isNaN(bytesNumber)) {
         return '';
@@ -39,19 +45,21 @@ export function bytesToMB(bytes?: number | string, fractionDigits?: number) {
 
     const val = bytesNumber / base ** 2;
 
+    let rounded;
+
     if (isNumeric(fractionDigits)) {
-        const rounded = Number(val.toFixed(fractionDigits));
-
-        return String(rounded) + sizes[2];
-    }
-
-    if (val < 10) {
-        return val.toFixed(2) + sizes[2];
+        rounded = val.toFixed(fractionDigits);
+    } else if (val < 10) {
+        rounded = val.toFixed(2);
     } else if (val < 100) {
-        return val.toFixed(1) + sizes[2];
+        rounded = val.toFixed(1);
     } else {
-        return val.toFixed() + sizes[2];
+        rounded = val.toFixed();
     }
+
+    const result = withThousandsGrouping ? formatNumber(rounded) : rounded;
+
+    return `${result}${sizes[2]}`;
 }
 
 export function bytesToSpeed(bytes?: number | string, fractionDigits?: number) {
@@ -103,8 +111,6 @@ export function isNumeric(value?: unknown): value is number | string {
 export function toExponential(value: number, precision?: number) {
     return Number(value).toExponential(precision);
 }
-
-export const UNBREAKABLE_GAP = '\xa0';
 
 // Numeric values expected, not numeric value should be displayd as 0
 export function safeParseNumber(value: unknown, defaultValue = 0): number {

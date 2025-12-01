@@ -41,6 +41,7 @@ interface TableChunkProps<T, F> {
     onDataFetched: (data?: PaginatedTableData<T>) => void;
 
     keepCache?: boolean;
+    useColumnsIdsInRequest?: boolean;
 }
 
 // Memoisation prevents chunks rerenders that could cause perfomance issues on big tables
@@ -61,13 +62,18 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     shouldFetch,
     shouldRender,
     keepCache,
+    useColumnsIdsInRequest,
 }: TableChunkProps<T, F>) {
     const [isTimeoutActive, setIsTimeoutActive] = React.useState(true);
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {noBatching} = usePaginatedTableState();
 
-    //sort ids to prevent refetch if only order was changed
-    const columnsIds = columns.map((column) => column.name).toSorted();
+    const columnsIds = React.useMemo(
+        () =>
+            //sort ids to prevent refetch if only order was changed
+            useColumnsIdsInRequest ? columns.map((column) => column.name).toSorted() : undefined,
+        [columns, useColumnsIdsInRequest],
+    );
 
     const queryParams = {
         offset: id * chunkSize,

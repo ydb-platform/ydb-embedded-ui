@@ -43,6 +43,7 @@ export function NodeNetworkTable({
             fetchData={getNodePeers}
             filters={filters}
             tableName={i18n('table_node-peers')}
+            useColumnsIdsInRequest={false}
             renderErrorMessage={renderPaginatedTableErrorMessage}
             renderEmptyDataMessage={renderEmptyDataMessage}
             onDataFetched={onDataFetched}

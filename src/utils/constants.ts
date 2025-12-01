@@ -22,6 +22,8 @@ export const MS_IN_NANOSECONDS = 1000000;
 export const DEFAULT_WARNING_THRESHOLD = 85;
 export const DEFAULT_DANGER_THRESHOLD = 95;
 
+export const UNBREAKABLE_GAP = '\xa0';
+
 const TABLET_SYMBOLS = {
     [EType.OldTxProxy]: 'P',
     [EType.TxProxy]: 'P',

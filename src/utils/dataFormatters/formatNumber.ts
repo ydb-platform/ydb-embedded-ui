@@ -1,5 +1,6 @@
 import i18n from '../bytesParsers/i18n';
-import {UNBREAKABLE_GAP, isNumeric} from '../utils';
+import {UNBREAKABLE_GAP} from '../constants';
+import {isNumeric} from '../utils';
 
 import type {FormatToSizeArgs, FormatValuesArgs} from './common';
 import {formatNumber, roundToPrecision} from './dataFormatters';
