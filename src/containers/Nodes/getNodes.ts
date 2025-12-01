@@ -36,7 +36,7 @@ export const getNodes: FetchData<
     const sortField = getNodesColumnSortField(columnId);
     const sort = sortField ? prepareSortValue(sortField, sortOrder) : undefined;
 
-    const dataFieldsRequired = getRequiredDataFields(columnsIds, NODES_COLUMNS_TO_DATA_FIELDS,);
+    const dataFieldsRequired = getRequiredDataFields(columnsIds, NODES_COLUMNS_TO_DATA_FIELDS);
 
     const schemePathParam =
         !isNil(path) && !isNil(databaseFullPath) ? {path, databaseFullPath} : undefined;
