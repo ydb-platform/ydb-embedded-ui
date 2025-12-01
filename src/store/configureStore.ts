@@ -5,6 +5,7 @@ import {createBrowserHistory} from 'history';
 import {listenForHistoryChange} from 'redux-location-state';
 
 import {YdbEmbeddedAPI} from '../services/api';
+import {parseJson} from '../utils/utils';
 
 import {getUrlData} from './getUrlData';
 import rootReducer from './reducers';
@@ -26,17 +27,19 @@ function _configureStore<
 >(aRootReducer: Reducer<S, A, P>, history: History, preloadedState: P, middleware: M[]) {
     const {locationMiddleware, reducersWithLocation} = getLocationMiddleware(history, aRootReducer);
 
+    const checksDisabled = Boolean(parseJson(window.react_app_disable_checks));
+
     const store = configureReduxStore({
         reducer: reducersWithLocation,
         preloadedState,
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
-                immutableCheck: window.react_app_disable_checks
+                immutableCheck: checksDisabled
                     ? false
                     : {
                           ignoredPaths: ['tooltip.currentHoveredRef'],
                       },
-                serializableCheck: window.react_app_disable_checks
+                serializableCheck: checksDisabled
                     ? false
                     : {
                           ignoredPaths: ['tooltip.currentHoveredRef', 'api'],
@@ -50,12 +53,15 @@ function _configureStore<
     return store;
 }
 
-export const webVersion = window.web_version;
-export const customBackend = window.custom_backend;
-export const metaBackend = window.meta_backend;
-export const codeAssistBackend = window.code_assist_backend;
+// Environment variables are injected into the HTML template (index.html) as string literals.
+// For example: window.web_version = "<%= !process.env.REACT_APP_BACKEND %>" becomes the string "true" or "false".
+// We need to parse these string values back to their proper types (booleans, strings, undefined).
+export const webVersion = Boolean(parseJson(window.web_version));
+export const customBackend = parseJson(window.custom_backend);
+export const metaBackend = parseJson(window.meta_backend);
+export const codeAssistBackend = parseJson(window.code_assist_backend);
 
-const isSingleClusterMode = `${metaBackend}` === 'undefined';
+const isSingleClusterMode = !metaBackend;
 
 export function configureStore({
     aRootReducer = rootReducer,
