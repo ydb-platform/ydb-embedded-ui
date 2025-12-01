@@ -19,6 +19,7 @@ import {checkIsClustersPage, checkIsTenantPage, getClusterPath} from '../../rout
 import {environment} from '../../store';
 import {
     useAddClusterFeatureAvailable,
+    useAllCapabilitiesLoaded,
     useDatabasesAvailable,
     useDeleteDatabaseFeatureAvailable,
     useEditDatabaseFeatureAvailable,
@@ -50,6 +51,7 @@ import './Header.scss';
 const b = cn('header');
 
 function Header() {
+    const capabilitiesLoaded = useAllCapabilitiesLoaded();
     const {page, pageBreadcrumbsOptions} = useTypedSelector((state) => state.header);
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
@@ -242,9 +244,12 @@ function Header() {
         return null;
     };
 
-    const renderHeader = () => {
+    const renderContent = () => {
+        if (!capabilitiesLoaded) {
+            return null;
+        }
         return (
-            <header className={b()}>
+            <React.Fragment>
                 <Breadcrumbs className={b('breadcrumbs')}>
                     {breadcrumbItems.map((item, index) => {
                         const {icon, text, link} = item;
@@ -268,8 +273,12 @@ function Header() {
                 </Breadcrumbs>
 
                 {renderRightControls()}
-            </header>
+            </React.Fragment>
         );
+    };
+
+    const renderHeader = () => {
+        return <header className={b()}>{renderContent()}</header>;
     };
     return renderHeader();
 }
