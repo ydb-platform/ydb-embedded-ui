@@ -71,6 +71,7 @@ export function createHref(
     params?: Record<string, string | number | undefined>,
     query: Query = {},
     options: CreateHrefOptions = {},
+    host = '',
 ) {
     let extendedQuery = query;
     let extendedParams = params ?? {};
@@ -105,7 +106,8 @@ export function createHref(
         // It is needed for external links - <a> or uikit <Link>
         return normalizePathSlashes(`${basename}/${compiledRoute}`);
     }
-    return compiledRoute;
+
+    return `${host}${compiledRoute}`;
 }
 
 // embedded version could be located in some folder (e.g. host/some_folder/app_router_path)
@@ -150,8 +152,9 @@ export const getClusterPath = (
     params?: {activeTab?: ClusterTab; environment?: string},
     query = {},
     options?: CreateHrefOptions,
+    host?: string,
 ) => {
-    return createHref(routes.cluster, params, query, options);
+    return createHref(routes.cluster, params, query, options, host);
 };
 
 export const getTenantPath = (query: TenantQuery, options?: CreateHrefOptions) => {
