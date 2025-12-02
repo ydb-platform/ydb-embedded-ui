@@ -39,9 +39,9 @@ export const stringifyVdiskId = (id?: TVDiskID | TVSlotId) => {
 
 /**
  * It works well only with positive values,
- * if you want to get negative formatted uptime, use some wrapper like getDowntimeFromDateFormatted
+ * if you want to get negative formatted duration, use some wrapper like getDowntimeFromDateFormatted
  */
-export function formatUptimeInSeconds(seconds: number) {
+export function formatDurationSeconds(seconds: number) {
     if (!isNumeric(seconds)) {
         return undefined;
     }
@@ -69,8 +69,8 @@ export function formatUptimeInSeconds(seconds: number) {
     return sign + value;
 }
 
-export const formatMsToUptime = (ms?: number) => {
-    return formatUptimeInSeconds(Number(ms) / 1000);
+export const formatDurationMs = (ms?: number) => {
+    return formatDurationSeconds(Number(ms) / 1000);
 };
 
 export function getUptimeFromDateFormatted(dateFrom?: number | string, dateTo?: number | string) {
@@ -80,7 +80,7 @@ export function getUptimeFromDateFormatted(dateFrom?: number | string, dateTo?: 
     // Prevent wrong negative uptime values
     diff = diff < 0 ? 0 : diff;
 
-    return formatUptimeInSeconds(diff);
+    return formatDurationSeconds(diff);
 }
 
 export function getDowntimeFromDateFormatted(dateFrom?: number | string, dateTo?: number | string) {
@@ -90,7 +90,7 @@ export function getDowntimeFromDateFormatted(dateFrom?: number | string, dateTo?
     // Prevent wrong negative uptime values
     diff = diff < 0 ? 0 : diff;
 
-    return formatUptimeInSeconds(-diff);
+    return formatDurationSeconds(-diff);
 }
 
 function calcTimeDiffInSec(
