@@ -321,7 +321,6 @@ Build artifacts are placed in `/build` directory. For embedded deployments, file
 
 - `REACT_APP_BACKEND` - Backend URL for single-cluster mode
 - `REACT_APP_META_BACKEND` - Meta backend URL for multi-cluster mode
-- `PUBLIC_URL` - Base URL for static assets (use `.` for relative paths)
 - `GENERATE_SOURCEMAP` - Set to `false` for production builds
 
 ## Common Issues & Troubleshooting

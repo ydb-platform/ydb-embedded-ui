@@ -64,12 +64,11 @@
   },
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",
-    "start": "react-app-rewired start",
+    "start": "rsbuild dev",
     "dev": "DISABLE_ESLINT_PLUGIN=true TSC_COMPILE_ON_ERROR=true REACT_APP_BACKEND=http://localhost:8765 REACT_APP_META_BACKEND=undefined npm start",
-    "build": "rm -rf build && DISABLE_ESLINT_PLUGIN=true CI=true react-app-rewired build",
-    "//build:embedded": "echo 'PUBLIC_URL is a setting for create-react-app. Embedded version is built and hosted as is on ydb servers, with no way of knowing the final URL pattern. PUBLIC_URL=. keeps paths to all static relative, allowing servers to handle them as needed'",
-    "build:embedded": "GENERATE_SOURCEMAP=false PUBLIC_URL=. REACT_APP_BACKEND=http://localhost:8765 REACT_APP_META_BACKEND=undefined npm run build",
-    "build:embedded-mc": "GENERATE_SOURCEMAP=false PUBLIC_URL=. REACT_APP_BACKEND= REACT_APP_META_BACKEND= npm run build",
+    "build": "rm -rf build && DISABLE_ESLINT_PLUGIN=true CI=true rsbuild build",
+    "build:embedded": "GENERATE_SOURCEMAP=false REACT_APP_BACKEND=http://localhost:8765 REACT_APP_META_BACKEND=undefined npm run build",
+    "build:embedded-mc": "GENERATE_SOURCEMAP=false REACT_APP_BACKEND= REACT_APP_META_BACKEND= npm run build",
     "build:embedded:archive": "npm run build:embedded && mv build embedded-ui && cp CHANGELOG.md embedded-ui/CHANGELOG.md && zip -r embedded-ui.zip embedded-ui && rm -rf embedded-ui",
     "lint": "run-p lint:*",
     "lint:js": "eslint .",
@@ -78,8 +77,7 @@
     "prettier": "prettier '**/*.{json,yaml,yml,md}'",
     "unused": "npx knip --include dependencies,files,exports,types",
     "package": "rm -rf dist && tsc -p tsconfig.package.json && copyfiles -u 1 'src/**/*.{css,scss,svg}' dist",
-    "test": "react-app-rewired test",
-    "eject": "react-scripts eject",
+    "test": "jest",
     "prepublishOnly": "npm run package",
     "typecheck": "tsc --noEmit",
     "prepare": "husky",
@@ -98,32 +96,13 @@
       "prettier --write"
     ]
   },
-  "jest": {
-    "verbose": true,
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts",
-      "tsx"
-    ],
-    "rootDir": ".",
-    "transform": {
-      "^.+\\.[jt]sx?$": "ts-jest"
-    },
-    "coverageDirectory": "./coverage",
-    "collectCoverageFrom": [
-      "src/**/*.{ts,tsx,js,jsx}"
-    ],
-    "testEnvironment": "jsdom",
-    "moduleNameMapper": {
-      "\\.(css|less|scss|sass)$": "jest-transform-css",
-      "^axios$": "axios/dist/node/axios.cjs"
-    }
-  },
   "browserslist": [
     "extends @gravity-ui/browserslist-config"
   ],
   "devDependencies": {
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
+    "@babel/preset-typescript": "^7.28.5",
     "@commitlint/cli": "^19.6.1",
     "@commitlint/config-conventional": "^19.6.0",
     "@gravity-ui/browserslist-config": "^4.3.0",
@@ -131,11 +110,15 @@
     "@gravity-ui/prettier-config": "^1.1.0",
     "@gravity-ui/stylelint-config": "^5.0.0",
     "@gravity-ui/tsconfig": "^1.0.0",
-    "@playwright/test": "^1.50.1",
+    "@playwright/test": "^1.57.0",
+    "@rsbuild/core": "^1.6.9",
+    "@rsbuild/plugin-react": "^1.4.2",
+    "@rsbuild/plugin-sass": "^1.4.0",
+    "@rsbuild/plugin-svgr": "^1.2.2",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",
     "@testing-library/user-event": "^14.5.2",
-    "@types/jest": "^29.5.14",
+    "@types/jest": "^30.0.0",
     "@types/lodash": "^4.17.14",
     "@types/numeral": "^2.0.5",
     "@types/qrcode": "^1.5.5",
@@ -145,12 +128,15 @@
     "@types/react-router-dom": "^5.3.3",
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/parser": "^8.34.1",
+    "babel-jest": "^30.2.0",
     "copyfiles": "^2.4.1",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "globals": "^16.2.0",
     "http-proxy-middleware": "^2.0.7",
     "husky": "^9.1.7",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
     "jest-transform-css": "^6.0.2",
     "lint-staged": "^15.3.0",
     "mini-css-extract-plugin": "^2.9.2",
@@ -161,17 +147,15 @@
     "prettier": "^3.5.3",
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
-    "react-app-rewired": "^2.2.1",
     "react-dom": "^18.3.1",
-    "react-scripts": "^5.0.1",
     "sass": "^1.83.4",
     "source-map-explorer": "^2.5.3",
     "stylelint": "^16.20.0",
-    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "peerDependencies": {
-    "monaco-yql-languages": ">=1.21.0",
+    "monaco-yql-languages": ">=2.0.0",
     "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
@@ -182,6 +166,7 @@
     "react-dom": "$react-dom",
     "redux": "$redux",
     "typescript": "$typescript",
-    "monaco-editor": "$monaco-editor"
+    "monaco-editor": "$monaco-editor",
+    "canvas": "^2.11.2"
   }
 }
