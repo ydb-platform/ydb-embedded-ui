@@ -166,6 +166,7 @@
     "react-dom": "$react-dom",
     "redux": "$redux",
     "typescript": "$typescript",
-    "monaco-editor": "$monaco-editor"
+    "monaco-editor": "$monaco-editor",
+    "canvas": "^2.11.2"
   }
 }

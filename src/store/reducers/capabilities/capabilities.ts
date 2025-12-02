@@ -30,7 +30,10 @@ export const capabilitiesApi = api.injectEndpoints({
                 } catch (error) {
                     // If capabilities endpoint is not available, there will be an error
                     // That means no new features are available
-                    return {error};
+                    // Serialize the error to make it Redux-compatible
+                    const serializedError =
+                        error instanceof Error ? {message: error.message, name: error.name} : error;
+                    return {error: serializedError};
                 }
             },
         }),

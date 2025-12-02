@@ -9,6 +9,7 @@ import {basename} from '../../store';
 import {authenticationApi} from '../../store/reducers/authentication/authentication';
 import {useLoginWithDatabase} from '../../store/reducers/capabilities/hooks';
 import {cn} from '../../utils/cn';
+import {prepareCommonErrorMessage} from '../../utils/errors';
 import {useMetaAuth} from '../../utils/hooks/useMetaAuth';
 
 import {isDatabaseError, isPasswordError, isUserError} from './utils';
@@ -68,23 +69,28 @@ function Authentication({closable = false}: AuthenticationProps) {
     const [loginError, setLoginError] = React.useState('');
     const [passwordError, setPasswordError] = React.useState('');
     const [databaseError, setDatabaseError] = React.useState('');
+    const [generalError, setGeneralError] = React.useState('');
     const [showPassword, setShowPassword] = React.useState(false);
 
     const onLoginUpdate = (value: string) => {
         setLogin(value);
         setLoginError('');
+        setGeneralError('');
     };
     const onDatabaseUpdate = (value: string) => {
         setDatabase(value);
         setDatabaseError('');
+        setGeneralError('');
     };
 
     const onPassUpdate = (value: string) => {
         setPass(value);
         setPasswordError('');
+        setGeneralError('');
     };
 
     const onLoginClick = () => {
+        setGeneralError('');
         authenticate({user: login, password, database, useMeta})
             .unwrap()
             .then(() => {
@@ -93,6 +99,8 @@ function Authentication({closable = false}: AuthenticationProps) {
                 }
             })
             .catch((error) => {
+                const isInputError =
+                    isUserError(error) || isPasswordError(error) || isDatabaseError(error);
                 if (isUserError(error)) {
                     setLoginError(error.data.error);
                 }
@@ -101,6 +109,11 @@ function Authentication({closable = false}: AuthenticationProps) {
                 }
                 if (isDatabaseError(error)) {
                     setDatabaseError(error.data.error);
+                }
+
+                if (!isInputError) {
+                    const message = prepareCommonErrorMessage(error);
+                    setGeneralError(message);
                 }
             });
     };
@@ -184,6 +197,8 @@ function Authentication({closable = false}: AuthenticationProps) {
                 >
                     Sign in
                 </Button>
+                {/* always preserve place for general error to prevent container height jumping */}
+                <div className={b('general-error')}>{generalError}</div>
             </form>
             {closable && history.length > 1 && (
                 <Button onClick={onClose} className={b('close')}>
