@@ -24,10 +24,6 @@ function toLF(str: string) {
     return str.replace(/\r\n?/g, '\n');
 }
 
-function indentBlock(str: string, pad = '    ') {
-    return str.replace(/^/gm, pad);
-}
-
 export const createTableTemplate = (params?: SchemaQueryParams) => {
     const tableName = params?.relativePath
         ? `\`${normalizeParameter(params.relativePath)}/my_row_table\``
@@ -333,8 +329,10 @@ export const createStreamingQueryTemplate = (params?: SchemaQueryParams) => {
     RUN = TRUE  -- Run the query after creation
 ) AS
 DO BEGIN
-    INSERT INTO \${2:<external data source>}.\${3:<sink topic>} 
-    SELECT * FROM \${2:<external data source>}.\${4:<source topic>};
+
+INSERT INTO \${2:<external data source>}.\${3:<sink topic>} 
+SELECT * FROM \${2:<external data source>}.\${4:<source topic>};
+
 END DO;`;
 };
 
@@ -360,14 +358,14 @@ export const alterStreamingQueryText = (params?: SchemaQueryParams) => {
     queryText = stripIndentByFirstLine(queryText);
     queryText = normalizeParameter(queryText);
 
-    const bodyQueryText = queryText
-        ? indentBlock(queryText)
-        : indentBlock('${2:<streaming_query_text>}');
+    const bodyQueryText = queryText ? queryText : '${2:<streaming_query_text>}';
     return `ALTER STREAMING QUERY ${streamingQueryName} SET (
     FORCE = TRUE, -- Allow to drop last query checkpoint if query state can't be loaded
 ) AS
 DO BEGIN
+
 ${bodyQueryText}
+
 END DO;`;
 };
 
