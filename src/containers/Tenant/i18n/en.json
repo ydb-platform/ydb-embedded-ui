@@ -44,6 +44,7 @@
   "actions.manageColumns": "Manage columns...",
   "actions.manageAutoPartitioning": "Manage auto partitioning...",
   "actions.addTableIndex": "Add index...",
+  "actions.addVectorIndex": "Add vector index...",
   "actions.createCdcStream": "Create changefeed...",
   "actions.showCreateTable": "Show Create SQL...",
   "actions.alterTopic": "Alter topic...",

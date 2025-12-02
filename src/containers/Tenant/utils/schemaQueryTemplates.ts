@@ -385,6 +385,25 @@ export const addTableIndex = (params?: SchemaQueryParams) => {
     return `ALTER TABLE ${path} ADD INDEX \${2:index_name} GLOBAL ON (\${3:<column_name>});`;
 };
 
+export const addVectorIndexTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${2:<my_table>}';
+
+    return `-- docs: https://ydb.tech/docs/en/dev/vector-indexes?version=main#types
+ALTER TABLE ${path}
+ADD INDEX \${1:my_vector_index}
+GLOBAL USING vector_kmeans_tree
+ON (\${3:embedding})
+WITH (
+    distance=cosine,
+    vector_type="uint8",
+    vector_dimension=\${4:512},
+    levels=\${5:2},
+    clusters=\${6:128}
+);`;
+};
+
 export const dropTableIndex = (params?: SchemaQueryParams) => {
     const indexName = params?.relativePath.split('/').pop();
     const path = params?.relativePath.split('/').slice(0, -1).join('/');

@@ -22,6 +22,7 @@ import i18n from '../i18n';
 import type {TemplateFn} from './schemaQueryTemplates';
 import {
     addTableIndex,
+    addVectorIndexTemplate,
     alterAsyncReplicationTemplate,
     alterStreamingQuerySettingsTemplate,
     alterStreamingQueryText,
@@ -152,6 +153,7 @@ const bindActions = (
         alterStreamingQueryText: inputQuery(alterStreamingQueryText),
         dropStreamingQuery: inputQuery(dropStreamingQueryTemplate),
         dropIndex: inputQuery(dropTableIndex),
+        addVectorIndex: inputQuery(addVectorIndexTemplate),
         addTableIndex: inputQuery(addTableIndex),
         createCdcStream: inputQuery(createCdcStreamTemplate),
         copyPath: () => {
@@ -299,6 +301,7 @@ export const getActions =
                     isLoading: additionalEffects.isSchemaDataLoading,
                 }),
                 {text: i18n('actions.addTableIndex'), action: actions.addTableIndex},
+                {text: i18n('actions.addVectorIndex'), action: actions.addVectorIndex},
                 {text: i18n('actions.createCdcStream'), action: actions.createCdcStream},
             ],
             [showCreateTableItem],
