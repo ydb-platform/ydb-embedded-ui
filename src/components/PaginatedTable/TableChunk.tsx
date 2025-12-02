@@ -68,13 +68,13 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {noBatching} = usePaginatedTableState();
 
-    const preserveColsOrderInRequest = shouldSendColumnIds(tableName);
+    const hasColumnsIdsInRequest = shouldSendColumnIds(tableName);
 
     const columnsIds = React.useMemo(
         () =>
-            //sort ids to prevent refetch if only order was changed
-            preserveColsOrderInRequest ? columns.map((column) => column.name).toSorted() : [],
-        [columns, preserveColsOrderInRequest],
+            // sort ids to prevent refetch if only order was changed
+            hasColumnsIdsInRequest ? columns.map((column) => column.name).toSorted() : [],
+        [columns, hasColumnsIdsInRequest],
     );
 
     const queryParams = {
