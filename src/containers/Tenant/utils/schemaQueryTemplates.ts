@@ -385,14 +385,14 @@ export const addTableIndex = (params?: SchemaQueryParams) => {
     return `ALTER TABLE ${path} ADD INDEX \${2:index_name} GLOBAL ON (\${3:<column_name>});`;
 };
 
-export const addVectorIndexTemplate = (params?: SchemaQueryParams) => {
+export const addVectorIndex = (params?: SchemaQueryParams) => {
     const path = params?.relativePath
         ? `\`${normalizeParameter(params.relativePath)}\``
-        : '${2:<my_table>}';
+        : '${1:<my_table>}';
 
     return `-- docs: https://ydb.tech/docs/en/dev/vector-indexes?version=main#types
 ALTER TABLE ${path}
-ADD INDEX \${1:my_vector_index}
+ADD INDEX \${2:my_vector_index}
 GLOBAL USING vector_kmeans_tree
 ON (\${3:embedding})
 WITH (
