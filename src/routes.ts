@@ -71,7 +71,7 @@ export function createHref(
     params?: Record<string, string | number | undefined>,
     query: Query = {},
     options: CreateHrefOptions = {},
-    host = '',
+    domain = '',
 ) {
     let extendedQuery = query;
     let extendedParams = params ?? {};
@@ -104,10 +104,10 @@ export function createHref(
     if (options.withBasename && basename) {
         // For SPA links react-router adds basename itself
         // It is needed for external links - <a> or uikit <Link>
-        return normalizePathSlashes(`${basename}/${compiledRoute}`);
+        return normalizePathSlashes(`${domain}${basename}/${compiledRoute}`);
     }
 
-    return `${host}${compiledRoute}`;
+    return `${domain}${compiledRoute}`;
 }
 
 // embedded version could be located in some folder (e.g. host/some_folder/app_router_path)
@@ -152,9 +152,9 @@ export const getClusterPath = (
     params?: {activeTab?: ClusterTab; environment?: string},
     query = {},
     options?: CreateHrefOptions,
-    host?: string,
+    domain?: string,
 ) => {
-    return createHref(routes.cluster, params, query, options, host);
+    return createHref(routes.cluster, params, query, options, domain);
 };
 
 export const getTenantPath = (query: TenantQuery, options?: CreateHrefOptions) => {
