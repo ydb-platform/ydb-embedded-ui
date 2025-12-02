@@ -3,6 +3,7 @@ import React from 'react';
 import {usePaginatedTableState} from './PaginatedTableContext';
 import {TableChunksRenderer} from './TableChunksRenderer';
 import {TableHead} from './TableHead';
+import type {PaginatedTableId} from './constants';
 import {DEFAULT_TABLE_ROW_HEIGHT} from './constants';
 import {b} from './shared';
 import type {
@@ -22,7 +23,7 @@ export interface PaginatedTableProps<T, F> {
     initialEntitiesCount?: number;
     fetchData: FetchData<T, F>;
     filters?: F;
-    tableName: string;
+    tableName: PaginatedTableId;
     columns: Column<T>[];
     getRowClassName?: GetRowClassName<T>;
     rowHeight?: number;
@@ -33,7 +34,6 @@ export interface PaginatedTableProps<T, F> {
     containerClassName?: string;
     onDataFetched?: (data: PaginatedTableData<T>) => void;
     keepCache?: boolean;
-    useColumnsIdsInRequest?: boolean;
 }
 
 const DEFAULT_PAGINATION_LIMIT = 20;
@@ -54,7 +54,6 @@ export const PaginatedTable = <T, F>({
     containerClassName,
     onDataFetched,
     keepCache = true,
-    useColumnsIdsInRequest = true,
 }: PaginatedTableProps<T, F>) => {
     // Get state and setters from context
     const {tableState, setSortParams, setTotalEntities, setFoundEntities, setIsInitialLoad} =
@@ -124,7 +123,6 @@ export const PaginatedTable = <T, F>({
                     renderEmptyDataMessage={renderEmptyDataMessage}
                     onDataFetched={handleDataFetched}
                     keepCache={keepCache}
-                    useColumnsIdsInRequest={useColumnsIdsInRequest}
                 />
             </tbody>
         </table>

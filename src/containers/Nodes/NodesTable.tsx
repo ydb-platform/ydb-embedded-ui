@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Illustration} from '../../components/Illustration';
 import type {PaginatedTableData} from '../../components/PaginatedTable';
-import {ResizeablePaginatedTable} from '../../components/PaginatedTable';
+import {PAGINATED_TABLE_IDS, ResizeablePaginatedTable} from '../../components/PaginatedTable';
 import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../components/nodesColumns/constants';
 import type {NodesColumn} from '../../components/nodesColumns/types';
 import type {NodesFilters} from '../../store/reducers/nodes/types';
@@ -94,7 +94,7 @@ export function NodesTable({
             renderEmptyDataMessage={renderEmptyDataMessage}
             getRowClassName={getRowClassName}
             filters={tableFilters}
-            tableName="nodes"
+            tableName={PAGINATED_TABLE_IDS.NODES}
             onDataFetched={onDataFetched}
         />
     );

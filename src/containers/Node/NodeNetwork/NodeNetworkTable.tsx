@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {ResizeablePaginatedTable} from '../../../components/PaginatedTable';
+import {PAGINATED_TABLE_IDS, ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import type {PaginatedTableData} from '../../../components/PaginatedTable';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
 import type {Column} from '../../../utils/tableUtils/types';
@@ -42,8 +42,7 @@ export function NodeNetworkTable({
             columns={columns}
             fetchData={getNodePeers}
             filters={filters}
-            tableName={i18n('table_node-peers')}
-            useColumnsIdsInRequest={false}
+            tableName={PAGINATED_TABLE_IDS.NODE_PEERS}
             renderErrorMessage={renderPaginatedTableErrorMessage}
             renderEmptyDataMessage={renderEmptyDataMessage}
             onDataFetched={onDataFetched}

@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {TableChunk} from './TableChunk';
+import type {PaginatedTableId} from './constants';
 import {b} from './shared';
 import type {
     Column,
@@ -22,14 +23,13 @@ export interface TableChunksRendererProps<T, F> {
     columns: Column<T>[];
     fetchData: FetchData<T, F>;
     filters?: F;
-    tableName: string;
+    tableName: PaginatedTableId;
     sortParams?: SortParams;
     getRowClassName?: GetRowClassName<T>;
     renderErrorMessage?: RenderErrorMessage;
     renderEmptyDataMessage?: RenderEmptyDataMessage;
     onDataFetched: (data?: PaginatedTableData<T>) => void;
     keepCache: boolean;
-    useColumnsIdsInRequest?: boolean;
 }
 
 export const TableChunksRenderer = <T, F>({
@@ -48,7 +48,6 @@ export const TableChunksRenderer = <T, F>({
     renderEmptyDataMessage,
     onDataFetched,
     keepCache,
-    useColumnsIdsInRequest,
 }: TableChunksRendererProps<T, F>) => {
     const chunkStates = useScrollBasedChunks({
         scrollContainerRef,
@@ -127,7 +126,6 @@ export const TableChunksRenderer = <T, F>({
                     shouldFetch={chunkState.shouldFetch}
                     shouldRender={chunkState.shouldRender}
                     keepCache={keepCache}
-                    useColumnsIdsInRequest={useColumnsIdsInRequest}
                 />
             );
         },
@@ -146,7 +144,6 @@ export const TableChunksRenderer = <T, F>({
             rowHeight,
             sortParams,
             tableName,
-            useColumnsIdsInRequest,
         ],
     );
 

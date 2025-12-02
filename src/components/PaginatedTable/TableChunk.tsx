@@ -8,6 +8,8 @@ import {ResponseError} from '../Errors/ResponseError';
 
 import {usePaginatedTableState} from './PaginatedTableContext';
 import {EmptyTableRow, LoadingTableRow, TableRow} from './TableRow';
+import type {PaginatedTableId} from './constants';
+import {shouldSendColumnIds} from './constants';
 import i18n from './i18n';
 import type {
     Column,
@@ -32,7 +34,7 @@ interface TableChunkProps<T, F> {
     sortParams?: SortParams;
     shouldFetch: boolean;
     shouldRender: boolean;
-    tableName: string;
+    tableName: PaginatedTableId;
 
     fetchData: FetchData<T, F>;
     getRowClassName?: GetRowClassName<T>;
@@ -41,7 +43,6 @@ interface TableChunkProps<T, F> {
     onDataFetched: (data?: PaginatedTableData<T>) => void;
 
     keepCache?: boolean;
-    useColumnsIdsInRequest?: boolean;
 }
 
 // Memoisation prevents chunks rerenders that could cause perfomance issues on big tables
@@ -62,17 +63,18 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     shouldFetch,
     shouldRender,
     keepCache,
-    useColumnsIdsInRequest,
 }: TableChunkProps<T, F>) {
     const [isTimeoutActive, setIsTimeoutActive] = React.useState(true);
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {noBatching} = usePaginatedTableState();
 
+    const preserveColsOrderInRequest = shouldSendColumnIds(tableName);
+
     const columnsIds = React.useMemo(
         () =>
             //sort ids to prevent refetch if only order was changed
-            useColumnsIdsInRequest ? columns.map((column) => column.name).toSorted() : [],
-        [columns, useColumnsIdsInRequest],
+            preserveColsOrderInRequest ? columns.map((column) => column.name).toSorted() : [],
+        [columns, preserveColsOrderInRequest],
     );
 
     const queryParams = {

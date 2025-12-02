@@ -2,7 +2,7 @@ import React from 'react';
 
 import {LoaderWrapper} from '../../../components/LoaderWrapper/LoaderWrapper';
 import type {RenderErrorMessage} from '../../../components/PaginatedTable';
-import {ResizeablePaginatedTable} from '../../../components/PaginatedTable';
+import {PAGINATED_TABLE_IDS, ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import {
     useCapabilitiesLoaded,
     useStorageGroupsHandlerAvailable,
@@ -103,7 +103,7 @@ export const PaginatedStorageGroupsTable = ({
                 renderErrorMessage={renderErrorMessage}
                 renderEmptyDataMessage={renderEmptyDataMessage}
                 filters={tableFilters}
-                tableName="storage-groups"
+                tableName={PAGINATED_TABLE_IDS.STORAGE_GROUPS}
             />
         </LoaderWrapper>
     );
