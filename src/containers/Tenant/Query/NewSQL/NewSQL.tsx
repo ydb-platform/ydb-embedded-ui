@@ -76,6 +76,10 @@ export function NewSQL() {
                     action: actions.addTableIndex,
                 },
                 {
+                    text: i18n('action.add-vector-index'),
+                    action: actions.addVectorIndex,
+                },
+                {
                     text: i18n('action.drop-index'),
                     action: actions.dropTableIndex,
                 },

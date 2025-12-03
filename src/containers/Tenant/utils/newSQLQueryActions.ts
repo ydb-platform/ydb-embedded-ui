@@ -1,5 +1,6 @@
 import {
     addTableIndex,
+    addVectorIndex,
     alterAsyncReplicationTemplate,
     alterStreamingQuerySettingsTemplate,
     alterStreamingQueryText,
@@ -72,6 +73,7 @@ export const bindActions = (changeUserInput: (input: string) => void) => {
         revokePrivilege: inputQuery(revokePrivilegeTemplate),
         dropUser: inputQuery(dropUserTemplate),
         dropGroup: inputQuery(dropGroupTemplate),
+        addVectorIndex: inputQuery(addVectorIndex),
         addTableIndex: inputQuery(addTableIndex),
         dropTableIndex: inputQuery(dropTableIndex),
         showCreateTable: inputQuery(showCreateTableTemplate),
