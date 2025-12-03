@@ -311,7 +311,6 @@ export const DEFAULT_QUERY_SETTINGS = {
     statisticsMode: STATISTICS_MODES.none,
     tracingLevel: TRACING_LEVELS.off,
     pragmas: defaultPragma,
-    outputChunkMaxSize: 1_000_000,
 };
 
 export const queryModeSchema = z.nativeEnum(QUERY_MODES);
@@ -354,12 +353,7 @@ export const querySettingsRestoreSchema = z
         ),
         outputChunkMaxSize: z.preprocess(
             (val) => (val === '' ? undefined : val),
-            z.coerce
-                .number()
-                .int()
-                .positive()
-                .optional()
-                .catch(DEFAULT_QUERY_SETTINGS.outputChunkMaxSize),
+            z.coerce.number().int().positive().optional(),
         ),
         queryMode: queryModeSchema.catch(DEFAULT_QUERY_SETTINGS.queryMode),
         transactionMode: transactionModeSchema.catch(DEFAULT_QUERY_SETTINGS.transactionMode),
