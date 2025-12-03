@@ -68,7 +68,7 @@ export const SECTION_IDS = {
 export const TENANT_OVERVIEW_TABLES_LIMIT = 3;
 
 export const EMPTY_DATA_PLACEHOLDER = '—';
-export const NON_BREAKING_SPACE = '\u00A0';
+export const UNBREAKABLE_GAP = '\u00A0';
 
 export const QUERY_TECHNICAL_MARK = '/*UI-QUERY-EXCLUDE*/';
 
