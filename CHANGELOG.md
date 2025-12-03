@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.24.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.23.0...v12.24.0) (2025-12-03)
+
+
+### Features
+
+* context menu to create a vector index ([#3155](https://github.com/ydb-platform/ydb-embedded-ui/issues/3155)) ([f91f5d2](https://github.com/ydb-platform/ydb-embedded-ui/commit/f91f5d2ca6eede0c95cc095143a35d2d298394eb))
+
 ## [12.23.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.22.0...v12.23.0) (2025-12-03)
 
 
