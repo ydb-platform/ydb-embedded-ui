@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.24.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.24.0...v12.24.1) (2025-12-03)
+
+
+### Bug Fixes
+
+* github action fix ([#3172](https://github.com/ydb-platform/ydb-embedded-ui/issues/3172)) ([9cc02d1](https://github.com/ydb-platform/ydb-embedded-ui/commit/9cc02d1c257779edd14db5248aa4242d984c2aa5))
+
 ## [12.24.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.23.0...v12.24.0) (2025-12-03)
 
 
