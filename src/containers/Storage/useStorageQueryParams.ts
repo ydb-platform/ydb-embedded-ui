@@ -123,11 +123,11 @@ export function useSaveStorageType() {
         STORAGE_TYPES.groups,
     );
 
-    const normalizedstorageType = queryStorageType ?? savedStorageType;
+    const normalizedStorageType = queryStorageType ?? savedStorageType;
 
     React.useEffect(() => {
-        if (normalizedstorageType !== queryStorageType) {
-            setQueryStorageType(normalizedstorageType);
+        if (normalizedStorageType !== queryStorageType) {
+            setQueryStorageType(normalizedStorageType);
         }
-    }, [normalizedstorageType, queryStorageType, setQueryStorageType]);
+    }, [normalizedStorageType, queryStorageType, setQueryStorageType]);
 }
