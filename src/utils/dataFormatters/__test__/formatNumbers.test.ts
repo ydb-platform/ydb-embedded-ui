@@ -1,4 +1,4 @@
-import {UNBREAKABLE_GAP} from '../../utils';
+import {UNBREAKABLE_GAP} from '../../constants';
 import {formatNumericValues} from '../dataFormatters';
 
 describe('formatNumericValues', () => {

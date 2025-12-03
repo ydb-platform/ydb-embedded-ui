@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type {PaginatedTableData, RenderErrorMessage} from '../../../components/PaginatedTable';
-import {ResizeablePaginatedTable} from '../../../components/PaginatedTable';
+import {PAGINATED_TABLE_IDS, ResizeablePaginatedTable} from '../../../components/PaginatedTable';
 import type {NodesColumn} from '../../../components/nodesColumns/types';
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {PreparedStorageNode, VisibleEntities} from '../../../store/reducers/storage/types';
@@ -109,7 +109,7 @@ export const PaginatedStorageNodesTable = ({
             renderEmptyDataMessage={renderEmptyDataMessage}
             getRowClassName={getRowUnavailableClassName}
             filters={tableFilters}
-            tableName="storage-nodes"
+            tableName={PAGINATED_TABLE_IDS.STORAGE_NODES}
             onDataFetched={onDataFetched}
         />
     );

@@ -3,9 +3,9 @@ import {dateTimeParse, duration} from '@gravity-ui/date-utils';
 import type {TVDiskID, TVSlotId} from '../../types/api/vdisk';
 import {formatBytes as formatBytesCustom, getBytesSizeUnit} from '../bytesParsers/formatBytes';
 import type {BytesSizes} from '../bytesParsers/formatBytes';
-import {HOUR_IN_SECONDS} from '../constants';
+import {HOUR_IN_SECONDS, UNBREAKABLE_GAP} from '../constants';
 import {configuredNumeral} from '../numeral';
-import {UNBREAKABLE_GAP, isNumeric} from '../utils';
+import {isNumeric} from '../utils';
 
 import {formatValues} from './common';
 import {formatNumberWithDigits, getNumberSizeUnit} from './formatNumber';

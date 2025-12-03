@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {TableChunk} from './TableChunk';
+import type {PaginatedTableId} from './constants';
 import {b} from './shared';
 import type {
     Column,
@@ -22,7 +23,7 @@ export interface TableChunksRendererProps<T, F> {
     columns: Column<T>[];
     fetchData: FetchData<T, F>;
     filters?: F;
-    tableName: string;
+    tableName: PaginatedTableId;
     sortParams?: SortParams;
     getRowClassName?: GetRowClassName<T>;
     renderErrorMessage?: RenderErrorMessage;

@@ -1,7 +1,7 @@
-import {GIGABYTE, KILOBYTE, MEGABYTE, TERABYTE} from '../constants';
+import {GIGABYTE, KILOBYTE, MEGABYTE, TERABYTE, UNBREAKABLE_GAP} from '../constants';
 import type {FormatToSizeArgs, FormatValuesArgs} from '../dataFormatters/common';
 import {formatNumber, roundToPrecision} from '../dataFormatters/dataFormatters';
-import {UNBREAKABLE_GAP, isNumeric} from '../utils';
+import {isNumeric} from '../utils';
 
 import i18n from './i18n';
 
