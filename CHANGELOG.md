@@ -1,5 +1,27 @@
 # Changelog
 
+## [12.23.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.22.0...v12.23.0) (2025-12-03)
+
+
+### Features
+
+* add network tab to node page with peer connectivity visualization ([#2826](https://github.com/ydb-platform/ydb-embedded-ui/issues/2826)) ([6c307d8](https://github.com/ydb-platform/ydb-embedded-ui/commit/6c307d879bb3c76e914c9763d4a0660ddbba7198))
+* migrate to rsbuild ([#3137](https://github.com/ydb-platform/ydb-embedded-ui/issues/3137)) ([6450a1f](https://github.com/ydb-platform/ydb-embedded-ui/commit/6450a1f00bc1f1fde647b77c7e1b3619cdaf4531))
+* show general error for auth ([#3154](https://github.com/ydb-platform/ydb-embedded-ui/issues/3154)) ([01159fe](https://github.com/ydb-platform/ydb-embedded-ui/commit/01159feda7c953ad3d1a09cd89fac74016626153))
+* **storage:** update vdisk donor/replica visuals and tooltips ([#3110](https://github.com/ydb-platform/ydb-embedded-ui/issues/3110)) ([fa0abe3](https://github.com/ydb-platform/ydb-embedded-ui/commit/fa0abe38b2e8c95ac6449223a930e802d3b38b14))
+* support cluster_domain in settings ([#3158](https://github.com/ydb-platform/ydb-embedded-ui/issues/3158)) ([bff31a0](https://github.com/ydb-platform/ydb-embedded-ui/commit/bff31a0e8fe4c830c5a0b2088ea164e271a9b1b9))
+
+
+### Bug Fixes
+
+* add setting for query parameter output_chunk_max_size ([#3164](https://github.com/ydb-platform/ydb-embedded-ui/issues/3164)) ([a58e63a](https://github.com/ydb-platform/ydb-embedded-ui/commit/a58e63ab7a1569fdb2afb8e0a14497296918199e))
+* align templates and remove extra indentation ([#3159](https://github.com/ydb-platform/ydb-embedded-ui/issues/3159)) ([2deae10](https://github.com/ydb-platform/ydb-embedded-ui/commit/2deae102ebaea483a4f82594e94a12d6c9483efb))
+* format bytes columns and avoid refetch on column toggle ([#3149](https://github.com/ydb-platform/ydb-embedded-ui/issues/3149)) ([aeaaf3c](https://github.com/ydb-platform/ydb-embedded-ui/commit/aeaaf3c8c708ae94b422309cf921a4851f7fa745))
+* **Header:** wait for capabilities before show content ([#3145](https://github.com/ydb-platform/ydb-embedded-ui/issues/3145)) ([a350ad5](https://github.com/ydb-platform/ydb-embedded-ui/commit/a350ad57f54e37d0277475730993650c011ffdcf))
+* make space distribution blocks full-width ([#3165](https://github.com/ydb-platform/ydb-embedded-ui/issues/3165)) ([d1b9751](https://github.com/ydb-platform/ydb-embedded-ui/commit/d1b9751433871e3c9d4396e484e24f8c99a70d7f))
+* peer-deps ([#3143](https://github.com/ydb-platform/ydb-embedded-ui/issues/3143)) ([c830f2a](https://github.com/ydb-platform/ydb-embedded-ui/commit/c830f2a63b0950e3968d26cf4dba0ddb574461d7))
+* rsbuild issues ([#3152](https://github.com/ydb-platform/ydb-embedded-ui/issues/3152)) ([242a3ed](https://github.com/ydb-platform/ydb-embedded-ui/commit/242a3eda494d30e5bb17d83bec55499d9822f972))
+
 ## [12.22.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.21.0...v12.22.0) (2025-11-27)
 
 
