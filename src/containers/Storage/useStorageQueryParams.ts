@@ -123,7 +123,10 @@ export function useSaveStorageType() {
         STORAGE_TYPES.groups,
     );
 
-    const normalizedStorageType = queryStorageType ?? savedStorageType;
+    const normalizedStorageType = React.useMemo(
+        () => storageTypeSchema.parse(queryStorageType ?? savedStorageType),
+        [queryStorageType, savedStorageType],
+    );
 
     React.useEffect(() => {
         if (normalizedStorageType !== queryStorageType) {
