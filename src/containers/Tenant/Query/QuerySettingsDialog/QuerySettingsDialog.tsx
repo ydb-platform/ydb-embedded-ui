@@ -14,6 +14,7 @@ import type {QuerySettings} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {
     useQueryExecutionSettings,
+    useQueryStreamingSetting,
     useSetting,
     useTypedDispatch,
     useTypedSelector,
@@ -84,6 +85,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
 
     const [useShowPlanToSvg] = useSetting<boolean>(SETTING_KEYS.USE_SHOW_PLAN_SVG);
     const enableTracingLevel = useTracingLevelOptionAvailable();
+    const [isQueryStreamingEnabled] = useQueryStreamingSetting();
 
     const timeout = watch('timeout');
     const queryMode = watch('queryMode');
@@ -220,6 +222,39 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                         />
                     </div>
                 </Flex>
+                {isQueryStreamingEnabled && (
+                    <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
+                        <label htmlFor="outputChunkMaxSize" className={b('field-title')}>
+                            {QUERY_SETTINGS_FIELD_SETTINGS.outputChunkMaxSize.title}
+                        </label>
+                        <div className={b('control-wrapper')}>
+                            <Controller
+                                name="outputChunkMaxSize"
+                                control={control}
+                                render={({field}) => (
+                                    <TextInput
+                                        id="outputChunkMaxSize"
+                                        type="number"
+                                        {...field}
+                                        value={field.value?.toString()}
+                                        className={b('output-chunk-max-size')}
+                                        placeholder="1000000"
+                                        validationState={
+                                            errors.outputChunkMaxSize ? 'invalid' : undefined
+                                        }
+                                        errorMessage={errors.outputChunkMaxSize?.message}
+                                        errorPlacement="inside"
+                                        endContent={
+                                            <span className={b('postfix')}>
+                                                {i18n('form.output.chunk.max.size.bytes')}
+                                            </span>
+                                        }
+                                    />
+                                )}
+                            />
+                        </div>
+                    </Flex>
+                )}
                 <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
                     <label htmlFor="pragmas" className={b('field-title')}>
                         {QUERY_SETTINGS_FIELD_SETTINGS.pragmas.title}
