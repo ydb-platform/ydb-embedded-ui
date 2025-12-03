@@ -246,7 +246,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                         errorPlacement="inside"
                                         endContent={
                                             <span className={b('postfix')}>
-                                                {i18n('form.output-chunk-max-size.bytes')}
+                                                {i18n('form.output.chunk.max.size.bytes')}
                                             </span>
                                         }
                                     />

@@ -6,7 +6,7 @@ import type {QueryAction, QueryRequestParams, QuerySettings} from '../../../type
 import type {StreamDataChunk} from '../../../types/store/streaming';
 import {loadFromSessionStorage, saveToSessionStorage} from '../../../utils';
 import {QUERY_EDITOR_CURRENT_QUERY_KEY, QUERY_EDITOR_DIRTY_KEY} from '../../../utils/constants';
-import {DEFAULT_QUERY_SETTINGS, isQueryErrorResponse} from '../../../utils/query';
+import {isQueryErrorResponse} from '../../../utils/query';
 import {isNumeric} from '../../../utils/utils';
 import type {RootState} from '../../defaultStore';
 import {api} from '../api';
@@ -132,7 +132,6 @@ interface SendQueryParams extends QueryRequestParams {
 // Stream query receives queryId from session chunk.
 type StreamQueryParams = Omit<SendQueryParams, 'queryId'>;
 
-const DEFAULT_STREAM_CHUNK_SIZE = DEFAULT_QUERY_SETTINGS.outputChunkMaxSize;
 const DEFAULT_CONCURRENT_RESULTS = false;
 
 export const queryApi = api.injectEndpoints({
@@ -194,7 +193,7 @@ export const queryApi = api.injectEndpoints({
                                 : undefined,
                             output_chunk_max_size: isNumeric(querySettings.outputChunkMaxSize)
                                 ? Number(querySettings.outputChunkMaxSize)
-                                : DEFAULT_STREAM_CHUNK_SIZE,
+                                : undefined,
                             concurrent_results: DEFAULT_CONCURRENT_RESULTS || undefined,
                             base64,
                         },

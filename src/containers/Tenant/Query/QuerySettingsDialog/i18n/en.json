@@ -6,7 +6,7 @@
   "form.statistics-mode": "Statistics collection mode",
   "form.tracing-level": "Tracing level",
   "form.limit-rows": "Limit rows",
-  "form.output-chunk-max-size": "Output chunk max size",
+  "form.output.chunk.max.size": "Output chunk max size",
   "form.output.chunk.max.size.bytes": "bytes",
   "form.pragmas": "Pragmas",
   "button-done": "Save",
