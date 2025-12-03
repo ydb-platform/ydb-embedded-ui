@@ -237,7 +237,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                         type="number"
                                         {...field}
                                         value={field.value?.toString()}
-                                        className={b('limit-rows')}
+                                        className={b('output-chunk-max-size')}
                                         placeholder="1000000"
                                         validationState={
                                             errors.outputChunkMaxSize ? 'invalid' : undefined
