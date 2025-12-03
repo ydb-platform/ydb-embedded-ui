@@ -221,6 +221,41 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                     </div>
                 </Flex>
                 <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
+                    <label htmlFor="outputChunkMaxSize" className={b('field-title')}>
+                        {QUERY_SETTINGS_FIELD_SETTINGS.outputChunkMaxSize.title}
+                    </label>
+                    <div className={b('control-wrapper')}>
+                        <Controller
+                            name="outputChunkMaxSize"
+                            control={control}
+                            render={({field}) => (
+                                <TextInput
+                                    id="outputChunkMaxSize"
+                                    type="number"
+                                    {...field}
+                                    value={
+                                        field.value !== undefined && field.value !== null
+                                            ? field.value.toString()
+                                            : ''
+                                    }
+                                    className={b('limit-rows')}
+                                    placeholder="1000000"
+                                    validationState={
+                                        errors.outputChunkMaxSize ? 'invalid' : undefined
+                                    }
+                                    errorMessage={errors.outputChunkMaxSize?.message}
+                                    errorPlacement="inside"
+                                    endContent={
+                                        <span className={b('postfix')}>
+                                            {i18n('form.output-chunk-max-size.bytes')}
+                                        </span>
+                                    }
+                                />
+                            )}
+                        />
+                    </div>
+                </Flex>
+                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
                     <label htmlFor="pragmas" className={b('field-title')}>
                         {QUERY_SETTINGS_FIELD_SETTINGS.pragmas.title}
                     </label>
