@@ -8,6 +8,8 @@ import {ResponseError} from '../Errors/ResponseError';
 
 import {usePaginatedTableState} from './PaginatedTableContext';
 import {EmptyTableRow, LoadingTableRow, TableRow} from './TableRow';
+import type {PaginatedTableId} from './constants';
+import {shouldSendColumnIds} from './constants';
 import i18n from './i18n';
 import type {
     Column,
@@ -32,7 +34,7 @@ interface TableChunkProps<T, F> {
     sortParams?: SortParams;
     shouldFetch: boolean;
     shouldRender: boolean;
-    tableName: string;
+    tableName: PaginatedTableId;
 
     fetchData: FetchData<T, F>;
     getRowClassName?: GetRowClassName<T>;
@@ -66,8 +68,14 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {noBatching} = usePaginatedTableState();
 
-    //sort ids to prevent refetch if only order was changed
-    const columnsIds = columns.map((column) => column.name).toSorted();
+    const hasColumnsIdsInRequest = shouldSendColumnIds(tableName);
+
+    const columnsIds = React.useMemo(
+        () =>
+            // sort ids to prevent refetch if only order was changed
+            hasColumnsIdsInRequest ? columns.map((column) => column.name).toSorted() : [],
+        [columns, hasColumnsIdsInRequest],
+    );
 
     const queryParams = {
         offset: id * chunkSize,

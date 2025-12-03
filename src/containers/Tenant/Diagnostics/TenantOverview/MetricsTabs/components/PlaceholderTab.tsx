@@ -1,5 +1,5 @@
 import {cn} from '../../../../../../utils/cn';
-import {NON_BREAKING_SPACE} from '../../../../../../utils/constants';
+import {UNBREAKABLE_GAP} from '../../../../../../utils/constants';
 import {ServerlessTabCard} from '../../TabCard/ServerlessTabCard';
 
 import '../MetricsTabs.scss';
@@ -11,10 +11,10 @@ export function PlaceholderTab() {
         <div className={b('link-container', {placeholder: true})}>
             <div className={b('link')}>
                 <ServerlessTabCard
-                    text={NON_BREAKING_SPACE}
+                    text={UNBREAKABLE_GAP}
                     active={false}
                     helpText={undefined}
-                    subtitle={NON_BREAKING_SPACE}
+                    subtitle={UNBREAKABLE_GAP}
                 />
             </div>
         </div>

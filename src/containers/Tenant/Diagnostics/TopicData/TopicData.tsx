@@ -11,6 +11,7 @@ import {PageError} from '../../../../components/Errors/PageError/PageError';
 import {Fullscreen} from '../../../../components/Fullscreen/Fullscreen';
 import {
     DEFAULT_TABLE_ROW_HEIGHT,
+    PAGINATED_TABLE_IDS,
     ResizeablePaginatedTable,
 } from '../../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../../components/PaginatedTable/PaginatedTableWithLayout';
@@ -354,7 +355,7 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
                             renderErrorMessage={renderPaginatedTableErrorMessage}
                             renderEmptyDataMessage={renderEmptyDataMessage}
                             filters={tableFilters}
-                            tableName="topicData"
+                            tableName={PAGINATED_TABLE_IDS.TOPIC_DATA}
                             rowHeight={DEFAULT_TABLE_ROW_HEIGHT}
                             keepCache={false}
                             getRowClassName={(row) => {
