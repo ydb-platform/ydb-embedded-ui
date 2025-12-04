@@ -19,7 +19,31 @@ import {getOperationProgress, isIndexBuildMetadata} from './utils';
 
 import './Operations.scss';
 
-const IMPORT_EXPORT_KINDS: OperationKind[] = ['import/s3', 'export/s3', 'export/yt'];
+function renderStatusCell(row: TOperation) {
+    const progress = getOperationProgress(row, i18n);
+
+    if (row.ready) {
+        if (!row.status) {
+            return EMPTY_DATA_PLACEHOLDER;
+        }
+
+        return (
+            <Text color={row.status === EStatusCode.SUCCESS ? 'positive' : 'danger'}>
+                {row.status}
+            </Text>
+        );
+    }
+
+    if (row.status && row.status !== EStatusCode.SUCCESS) {
+        return <Text color="danger">{row.status}</Text>;
+    }
+
+    if (progress !== null) {
+        return progress;
+    }
+
+    return i18n('label_in-progress');
+}
 
 export function getColumns({
     database,
@@ -31,7 +55,6 @@ export function getColumns({
     kind: OperationKind;
 }): DataTableColumn<TOperation>[] {
     const isBuildIndex = kind === 'buildindex';
-    const isImportOrExport = IMPORT_EXPORT_KINDS.includes(kind);
 
     // Helper function to get description tooltip content (buildindex-only)
     const getDescriptionTooltip = (operation: TOperation): string => {
@@ -67,14 +90,7 @@ export function getColumns({
             name: COLUMNS_NAMES.STATUS,
             header: COLUMNS_TITLES[COLUMNS_NAMES.STATUS],
             render: ({row}) => {
-                if (!row.status) {
-                    return EMPTY_DATA_PLACEHOLDER;
-                }
-                return (
-                    <Text color={row.status === EStatusCode.SUCCESS ? 'positive' : 'danger'}>
-                        {row.status}
-                    </Text>
-                );
+                return renderStatusCell(row);
             },
         },
     ];
@@ -90,21 +106,6 @@ export function getColumns({
                     return EMPTY_DATA_PLACEHOLDER;
                 }
                 return metadata.state;
-            },
-        });
-    }
-
-    // Add progress column for operations that have progress data
-    if (isBuildIndex || isImportOrExport) {
-        columns.push({
-            name: COLUMNS_NAMES.PROGRESS,
-            header: COLUMNS_TITLES[COLUMNS_NAMES.PROGRESS],
-            render: ({row}) => {
-                const progress = getOperationProgress(row, i18n);
-                if (progress === null) {
-                    return EMPTY_DATA_PLACEHOLDER;
-                }
-                return progress;
             },
         });
     }
