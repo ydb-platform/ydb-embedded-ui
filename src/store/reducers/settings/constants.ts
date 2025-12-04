@@ -2,6 +2,7 @@ import type {ValueOf} from '../../../types/common';
 import {AclSyntax} from '../../../utils/constants';
 import {Lang} from '../../../utils/i18n';
 import {DEFAULT_QUERY_SETTINGS, QUERY_ACTIONS} from '../../../utils/query';
+import {STORAGE_TYPES} from '../storage/constants';
 import {TENANT_PAGES_IDS} from '../tenant/constants';
 
 import type {SettingOptions} from './types';
@@ -36,6 +37,7 @@ export const SETTING_KEYS = {
     QUERY_SETTINGS_BANNER_LAST_CLOSED: 'querySettingsBannerLastClosed',
     QUERY_EXECUTION_SETTINGS: 'queryExecutionSettings',
     ACL_SYNTAX: 'aclSyntax',
+    STORAGE_TYPE: 'storageType',
 } as const;
 
 export type SettingKey = ValueOf<typeof SETTING_KEYS>;
@@ -71,6 +73,7 @@ export const DEFAULT_USER_SETTINGS = {
     [SETTING_KEYS.QUERY_SETTINGS_BANNER_LAST_CLOSED]: undefined,
     [SETTING_KEYS.QUERY_EXECUTION_SETTINGS]: DEFAULT_QUERY_SETTINGS,
     [SETTING_KEYS.ACL_SYNTAX]: AclSyntax.YdbShort,
+    [SETTING_KEYS.STORAGE_TYPE]: STORAGE_TYPES.groups,
 } as const satisfies Record<SettingKey, unknown>;
 
 export const SETTINGS_OPTIONS: Record<string, SettingOptions> = {
