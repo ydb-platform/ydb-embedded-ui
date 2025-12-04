@@ -42,6 +42,7 @@ export const prepareClustersData = (data: MetaClusters): PreparedCluster[] => {
             preparedBackend,
             settings: parsedSettings,
             clusterDomain,
+            clusterExternalName: parsedSettings?.cluster_external_name,
         };
     });
 };

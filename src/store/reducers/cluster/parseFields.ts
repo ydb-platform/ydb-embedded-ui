@@ -70,6 +70,7 @@ export function parseLoggingUrls(
 const settingsSchema = z.object({
     use_meta_proxy: z.boolean().optional(),
     cluster_domain: z.string().optional(),
+    cluster_external_name: z.string().optional(),
 });
 
 export function parseSettingsField(
