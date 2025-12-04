@@ -9,7 +9,7 @@ import {useTopicDataAvailable} from '../../../../../store/reducers/capabilities/
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {cn} from '../../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
-import {formatBytes, formatMsToUptime} from '../../../../../utils/dataFormatters/dataFormatters';
+import {formatBytes, formatDurationMs} from '../../../../../utils/dataFormatters/dataFormatters';
 import {isNumeric} from '../../../../../utils/utils';
 import {useDiagnosticsPageLinkGetter} from '../../DiagnosticsPages';
 import {
@@ -86,7 +86,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
                     PARTITIONS_WRITE_LAGS_SUB_COLUMNS_IDS.PARTITION_WRITE_LAG
                 ],
                 align: DataTable.RIGHT,
-                render: ({row}) => formatMsToUptime(row.partitionWriteLag),
+                render: ({row}) => formatDurationMs(row.partitionWriteLag),
             },
             {
                 name: PARTITIONS_WRITE_LAGS_SUB_COLUMNS_IDS.PARTITION_WRITE_IDLE_TIME,
@@ -94,7 +94,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
                     PARTITIONS_WRITE_LAGS_SUB_COLUMNS_IDS.PARTITION_WRITE_IDLE_TIME
                 ],
                 align: DataTable.RIGHT,
-                render: ({row}) => formatMsToUptime(row.partitionWriteIdleTime),
+                render: ({row}) => formatDurationMs(row.partitionWriteIdleTime),
             },
         ],
     },
@@ -109,7 +109,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
                     PARTITIONS_READ_LAGS_SUB_COLUMNS_IDS.CONSUMER_WRITE_LAG
                 ],
                 align: DataTable.RIGHT,
-                render: ({row}) => formatMsToUptime(row.consumerWriteLag),
+                render: ({row}) => formatDurationMs(row.consumerWriteLag),
             },
             {
                 name: PARTITIONS_READ_LAGS_SUB_COLUMNS_IDS.CONSUMER_READ_LAG,
@@ -117,7 +117,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
                     PARTITIONS_READ_LAGS_SUB_COLUMNS_IDS.CONSUMER_READ_LAG
                 ],
                 align: DataTable.RIGHT,
-                render: ({row}) => formatMsToUptime(row.consumerReadLag),
+                render: ({row}) => formatDurationMs(row.consumerReadLag),
             },
             {
                 name: PARTITIONS_READ_LAGS_SUB_COLUMNS_IDS.CONSUMER_READ_IDLE_TIME,
@@ -125,7 +125,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
                     PARTITIONS_READ_LAGS_SUB_COLUMNS_IDS.CONSUMER_READ_IDLE_TIME
                 ],
                 align: DataTable.RIGHT,
-                render: ({row}) => formatMsToUptime(row.consumerReadIdleTime),
+                render: ({row}) => formatDurationMs(row.consumerReadIdleTime),
             },
         ],
     },
