@@ -20,10 +20,10 @@ export function calculateClusterPath(row: PreparedCluster, activeTab?: ClusterTa
     return getClusterPath(
         {
             activeTab,
-            environment: settings?.auth_service,
+            environment: clusterDomain ? undefined : settings?.auth_service,
         },
         {
-            backend,
+            backend: clusterDomain ? undefined : backend,
             clusterName: clusterDomain && clusterExternalName ? clusterExternalName : clusterName,
         },
         {withBasename: true},
