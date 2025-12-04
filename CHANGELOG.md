@@ -1,5 +1,19 @@
 # Changelog
 
+## [12.25.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.24.1...v12.25.0) (2025-12-04)
+
+
+### Features
+
+* save storage type in user settings ([#3160](https://github.com/ydb-platform/ydb-embedded-ui/issues/3160)) ([23e4856](https://github.com/ydb-platform/ydb-embedded-ui/commit/23e48563c04b18f2c93b5369390e3d90b99f0209))
+* support cluster external name ([#3174](https://github.com/ydb-platform/ydb-embedded-ui/issues/3174)) ([d196984](https://github.com/ydb-platform/ydb-embedded-ui/commit/d196984e62f7dc714046292505e453cfa2097c71))
+* use same duration functions ([#3156](https://github.com/ydb-platform/ydb-embedded-ui/issues/3156)) ([0267e23](https://github.com/ydb-platform/ydb-embedded-ui/commit/0267e239373243fe735c3aa549746931432fefa5))
+
+
+### Bug Fixes
+
+* calculateClusterPath ([#3177](https://github.com/ydb-platform/ydb-embedded-ui/issues/3177)) ([91829ad](https://github.com/ydb-platform/ydb-embedded-ui/commit/91829ad29477693cd5d1fe1ee3e3043f61d50350))
+
 ## [12.24.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.24.0...v12.24.1) (2025-12-03)
 
 

@@ -1,7 +1,7 @@
 import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
 import type {IPreparedTopicStats} from '../../../../../types/store/topic';
 import {cn} from '../../../../../utils/cn';
-import {formatMsToUptime} from '../../../../../utils/dataFormatters/dataFormatters';
+import {formatDurationMs} from '../../../../../utils/dataFormatters/dataFormatters';
 
 import './ConsumersTopicStats.scss';
 
@@ -21,11 +21,11 @@ export const ConsumersTopicStats = ({data}: ConsumersTopicStatsProps) => {
         },
         {
             label: 'Write lag',
-            value: formatMsToUptime(partitionsWriteLag || 0),
+            value: formatDurationMs(partitionsWriteLag || 0),
         },
         {
             label: 'Write idle time',
-            value: formatMsToUptime(partitionsIdleTime || 0),
+            value: formatDurationMs(partitionsIdleTime || 0),
         },
     ];
 

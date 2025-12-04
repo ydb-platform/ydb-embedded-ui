@@ -9,7 +9,7 @@ import {EFlag} from '../../types/api/enums';
 import {EVDiskState} from '../../types/api/vdisk';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {formatUptimeInSeconds} from '../../utils/dataFormatters/dataFormatters';
+import {formatDurationSeconds} from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import {getStateSeverity} from '../../utils/disks/calculateVDiskSeverity';
 import {
@@ -236,7 +236,7 @@ const prepareVDiskData = (
         }
 
         if (!isNil(ReplicationSecondsRemaining)) {
-            const timeRemaining = formatUptimeInSeconds(ReplicationSecondsRemaining);
+            const timeRemaining = formatDurationSeconds(ReplicationSecondsRemaining);
             if (timeRemaining) {
                 vdiskData.push({
                     name: vDiskPopupKeyset('label_remaining'),

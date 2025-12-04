@@ -1,4 +1,3 @@
-import {duration} from '@gravity-ui/date-utils';
 import {Ban, CircleStop} from '@gravity-ui/icons';
 import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
 import {ActionTooltip, Flex, Icon, Text} from '@gravity-ui/uikit';
@@ -8,9 +7,9 @@ import {CellWithPopover} from '../../components/CellWithPopover/CellWithPopover'
 import {operationsApi} from '../../store/reducers/operations';
 import type {IndexBuildMetadata, OperationKind, TOperation} from '../../types/api/operations';
 import {EStatusCode} from '../../types/api/operations';
-import {EMPTY_DATA_PLACEHOLDER, HOUR_IN_SECONDS, SECOND_IN_MS} from '../../utils/constants';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import createToast from '../../utils/createToast';
-import {formatDateTime} from '../../utils/dataFormatters/dataFormatters';
+import {formatDateTime, formatDurationMs} from '../../utils/dataFormatters/dataFormatters';
 import {parseProtobufTimestampToMs} from '../../utils/timeParsers';
 
 import {COLUMNS_NAMES, COLUMNS_TITLES} from './constants';
@@ -159,10 +158,8 @@ export function getColumns({
                         durationValue = Date.now() - createTime;
                     }
 
-                    const durationFormatted =
-                        durationValue > HOUR_IN_SECONDS * SECOND_IN_MS
-                            ? duration(durationValue).format('hh:mm:ss')
-                            : duration(durationValue).format('mm:ss');
+                    const safeDurationMs = durationValue < 0 ? 0 : durationValue;
+                    const durationFormatted = formatDurationMs(safeDurationMs);
 
                     return row.end_time
                         ? durationFormatted
