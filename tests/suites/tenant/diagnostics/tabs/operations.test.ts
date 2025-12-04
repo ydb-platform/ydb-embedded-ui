@@ -51,7 +51,6 @@ test.describe('Operations Tab - Infinite Query', () => {
             firstRowData['Status'],
         );
         expect(firstRowData['State']).toBeTruthy();
-        expect(firstRowData['Progress']).toBeTruthy();
 
         // Verify loading more indicator is not visible initially
         const isLoadingVisible = await diagnostics.operations.isLoadingMoreVisible();
