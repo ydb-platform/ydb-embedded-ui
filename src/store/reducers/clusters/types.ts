@@ -6,6 +6,7 @@ export interface PreparedCluster extends Omit<MetaExtendedClusterInfo, 'settings
     preparedBackend?: string;
     settings?: MetaClusterSettings;
     clusterDomain?: string;
+    clusterExternalName?: string;
 }
 
 export interface ClustersFilters {

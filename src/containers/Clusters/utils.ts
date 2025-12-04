@@ -10,6 +10,7 @@ export function calculateClusterPath(row: PreparedCluster, activeTab?: ClusterTa
         name: clusterName,
         clusterDomain,
         settings,
+        clusterExternalName,
     } = row;
 
     if (useEmbeddedUi && backend) {
@@ -21,7 +22,10 @@ export function calculateClusterPath(row: PreparedCluster, activeTab?: ClusterTa
             activeTab,
             environment: settings?.auth_service,
         },
-        {backend, clusterName},
+        {
+            backend,
+            clusterName: clusterDomain && clusterExternalName ? clusterExternalName : clusterName,
+        },
         {withBasename: true},
         clusterDomain,
     );
