@@ -40,6 +40,8 @@ jobs:
             let reach = null;
             let impact = null;
             let effort = null;
+            let hasHeartXeno = false;
+            let hasFeedback = false;
 
             for (const label of labels) {
               if (reachWeights[label] !== undefined) {
@@ -51,21 +53,39 @@ jobs:
               if (effortWeights[label] !== undefined) {
                 effort = effortWeights[label];
               }
+              if (label === "heart xeno") {
+                hasHeartXeno = true;
+              }
+              if (label === "feedback") {
+                hasFeedback = true;
+              }
             }
+
+            // Fallback default values
+            const defaultReach = 75;   // default to medium reach
+            const defaultImpact = 75;  // default to low impact
+            const defaultEffort = 4;   // default to medium effort
 
             // Calculate priority score using formula: (reach * impact) / effort
-            let finalScore = 0;
-            if (reach !== null && impact !== null && effort !== null) {
-              finalScore = Math.round((reach * impact) / effort);
-            } else {
-              // Fallback to default values if labels are missing
-              const defaultReach = reach || 75;  // default to medium reach
-              const defaultImpact = impact || 75;  // default to low impact
-              const defaultEffort = effort || 4;  // default to medium effort
-              finalScore = Math.round((defaultReach * defaultImpact) / defaultEffort);
+            const effectiveReach = reach || defaultReach;
+            const effectiveImpact = impact || defaultImpact;
+            const effectiveEffort = effort || defaultEffort;
+            let baseScore = Math.round((effectiveReach * effectiveImpact) / effectiveEffort);
+
+            // Add bonus scores for special labels
+            // "heart xeno" adds value equal to defaultImpact
+            // "feedback" adds value equal to defaultReach
+            let bonusScore = 0;
+            if (hasHeartXeno) {
+              bonusScore += defaultImpact;
+            }
+            if (hasFeedback) {
+              bonusScore += defaultReach;
             }
 
-            console.log(`📊 Priority calculation: reach=${reach || 'default'}, impact=${impact || 'default'}, effort=${effort || 'default'} → score=${finalScore}`);
+            let finalScore = baseScore + bonusScore;
+
+            console.log(`📊 Priority calculation: reach=${reach || 'default'}, impact=${impact || 'default'}, effort=${effort || 'default'}, heartXeno=${hasHeartXeno}, feedback=${hasFeedback} → baseScore=${baseScore}, bonus=${bonusScore}, finalScore=${finalScore}`);
 
             const projectNumber = 24;
             const org = "ydb-platform";
