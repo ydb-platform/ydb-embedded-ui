@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.25.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.25.0...v12.25.1) (2025-12-05)
+
+
+### Bug Fixes
+
+* open cluster page in same tab ([#3179](https://github.com/ydb-platform/ydb-embedded-ui/issues/3179)) ([e5b243a](https://github.com/ydb-platform/ydb-embedded-ui/commit/e5b243a8af45516b400be579182d8b6f2bfd5cb3))
+
 ## [12.25.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.24.1...v12.25.0) (2025-12-04)
 
 
