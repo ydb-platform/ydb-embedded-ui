@@ -147,9 +147,7 @@ function ClusterName({row}: ClusterNameProps) {
 
     return (
         <div className={b('cluster-name')}>
-            <ExternalLink href={clusterPath} target={row.clusterDomain ? '_blank' : undefined}>
-                {row.title || row.name}
-            </ExternalLink>
+            <ExternalLink href={clusterPath}>{row.title || row.name}</ExternalLink>
         </div>
     );
 }
@@ -353,11 +351,7 @@ function Versions({row}: VersionsProps) {
     }
     const clusterPath = calculateClusterPath(row, clusterTabsIds.versions);
     return (
-        <ExternalLink
-            className={b('cluster-versions')}
-            href={clusterPath}
-            target={row.clusterDomain ? '_blank' : undefined}
-        >
+        <ExternalLink className={b('cluster-versions')} href={clusterPath}>
             <VersionsBar preparedVersions={preparedVersions} />
         </ExternalLink>
     );
