@@ -252,7 +252,6 @@
         --entity-state-background-color: var(--g-color-base-positive-light);
         --entity-state-fill-color: var(--g-color-base-positive-medium);
 
-        &:hover,
         &#{$block}_highlighted {
             --entity-state-border-color: var(--g-color-base-positive-medium-hover);
             --entity-state-background-color: var(--g-color-base-positive-light-hover);
@@ -267,7 +266,6 @@
         --entity-state-background-color: var(--g-color-base-info-light);
         --entity-state-fill-color: var(--g-color-base-info-medium);
 
-        &:hover,
         &#{$block}_highlighted {
             --entity-state-border-color: var(--g-color-base-info-heavy-hover);
             --entity-state-shadow-color: var(--g-color-base-info-heavy);
@@ -282,7 +280,6 @@
         --entity-state-background-color: var(--g-color-base-warning-light);
         --entity-state-fill-color: var(--g-color-base-warning-medium);
 
-        &:hover,
         &#{$block}_highlighted {
             --entity-state-border-color: var(--g-color-base-warning-medium-hover);
             --entity-state-background-color: var(--g-color-base-warning-light-hover);
@@ -296,7 +293,6 @@
         --entity-state-background-color: var(--g-color-base-danger-light);
         --entity-state-fill-color: var(--g-color-base-danger-medium);
 
-        &:hover,
         &#{$block}_highlighted {
             --entity-state-border-color: var(--g-color-base-danger-heavy-hover);
             --entity-state-background-color: var(--g-color-base-danger-light);
@@ -311,7 +307,6 @@
         --entity-state-fill-color: var(--g-color-base-neutral-light);
         --entity-state-background-color: transparent;
 
-        &:hover,
         &#{$block}_highlighted {
             --entity-state-border-color: var(--g-color-base-neutral-heavy-hover);
             --entity-state-shadow-color: var(--g-color-base-neutral-light-hover);
@@ -324,9 +319,16 @@
         --entity-state-font-color: var(--g-color-text-secondary);
         --entity-state-background-color: var(--g-color-base-neutral-light-hover);
 
-        &:hover,
         &#{$block}_highlighted {
             --entity-state-background-color: var(--g-color-base-neutral-medium);
         }
+    }
+}
+
+@mixin hover-dim-column-class($column-class) {
+    .ydb-paginated-table__table:has(.#{$column-class}:hover)
+        .#{$column-class}_highlighted
+        .storage-disk-progress-bar:not(.storage-disk-progress-bar_highlighted) {
+        opacity: 0.7;
     }
 }

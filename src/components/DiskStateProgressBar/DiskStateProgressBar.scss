@@ -25,18 +25,12 @@
 
     text-align: center;
 
-    opacity: 0.7;
     color: var(--g-color-text-primary);
     border: $border-width solid var(--entity-state-border-color);
     border-radius: $outer-border-radius;
     background-color: var(--entity-state-background-color);
 
     @include mixins.entity-state-colors($block);
-
-    &:hover,
-    &_highlighted {
-        opacity: 1;
-    }
 
     &_compact {
         min-width: 0;
@@ -51,6 +45,10 @@
 
     &_inactive {
         opacity: 0.5;
+    }
+
+    &_darkened {
+        opacity: 0.7;
     }
 
     &_empty {

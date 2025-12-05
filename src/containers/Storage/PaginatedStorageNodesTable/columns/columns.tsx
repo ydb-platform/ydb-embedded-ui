@@ -25,6 +25,7 @@ import {
 import type {NodesColumn} from '../../../../components/nodesColumns/types';
 import {cn} from '../../../../utils/cn';
 import {PDisk} from '../../PDisk/PDisk';
+import {isTopLevelStorageContext} from '../../utils';
 
 import type {GetStorageNodesColumnsParams} from './types';
 
@@ -35,11 +36,17 @@ const b = cn('ydb-storage-nodes-columns');
 export const getPDisksColumn = ({
     viewContext,
     columnsSettings,
+    highlightedPDisk,
+    setHighlightedPDisk,
 }: GetStorageNodesColumnsParams): NodesColumn => {
+    const highlightEnabled = isTopLevelStorageContext(viewContext);
+    const coloredPDisk = highlightEnabled ? highlightedPDisk : undefined;
+    const setColoredPDisk = highlightEnabled ? setHighlightedPDisk : undefined;
+
     return {
         name: NODES_COLUMNS_IDS.PDisks,
         header: NODES_COLUMNS_TITLES.PDisks,
-        className: b('pdisks-column'),
+        className: b('pdisks-column', {highlighted: highlightEnabled}),
         width: columnsSettings?.pDiskContainerWidth,
         render: ({row}) => {
             return (
@@ -49,6 +56,11 @@ export const getPDisksColumn = ({
                             (vdisk) => vdisk.PDiskId === pDisk.PDiskId,
                         );
 
+                        const id = `${row.NodeId}-${pDisk.PDiskId}`;
+
+                        const highlighted = highlightedPDisk === id;
+                        const darkened = Boolean(highlightedPDisk && highlightedPDisk !== id);
+
                         return (
                             <div className={b('pdisks-item')} key={pDisk.PDiskId}>
                                 <PDisk
@@ -56,6 +68,13 @@ export const getPDisksColumn = ({
                                     vDisks={vDisks}
                                     viewContext={viewContext}
                                     width={columnsSettings?.pDiskWidth}
+                                    showPopup={highlighted}
+                                    onShowPopup={() => setColoredPDisk?.(id)}
+                                    onHidePopup={() => setColoredPDisk?.(undefined)}
+                                    highlighted={highlighted}
+                                    darkened={darkened}
+                                    highlightedPDisk={coloredPDisk}
+                                    setHighlightedPDisk={setColoredPDisk}
                                 />
                             </div>
                         );
@@ -73,6 +92,8 @@ export const getStorageNodesColumns = ({
     database,
     viewContext,
     columnsSettings,
+    highlightedPDisk,
+    setHighlightedPDisk,
 }: GetStorageNodesColumnsParams): NodesColumn[] => {
     const columns: NodesColumn[] = [
         getNodeIdColumn(),
@@ -89,7 +110,7 @@ export const getStorageNodesColumns = ({
         getDiskSpaceUsageColumn(),
         getVersionColumn(),
         getMissingDisksColumn(),
-        getPDisksColumn({viewContext, columnsSettings}),
+        getPDisksColumn({viewContext, columnsSettings, highlightedPDisk, setHighlightedPDisk}),
         getTabletsColumn({database}),
     ];
 

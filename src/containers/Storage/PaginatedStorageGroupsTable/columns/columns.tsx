@@ -16,7 +16,7 @@ import {formatToMs} from '../../../../utils/timeParsers';
 import {bytesToGB, bytesToSpeed} from '../../../../utils/utils';
 import {Disks} from '../../Disks/Disks';
 import {VDisks} from '../../VDisks/VDisks';
-import {getDegradedSeverity} from '../../utils';
+import {getDegradedSeverity, isTopLevelStorageContext} from '../../utils';
 import i18n from '../i18n';
 
 import {
@@ -123,10 +123,10 @@ const usageColumn: StorageGroupsColumn = {
     width: 85,
     resizeMinWidth: 75,
     render: ({row}) => {
-        return !isNil(row.Usage) ? (
-            <UsageLabel value={Math.floor(row.Usage)} theme={getUsageSeverity(row.Usage)} />
-        ) : (
+        return isNil(row.Usage) ? (
             EMPTY_DATA_PLACEHOLDER
+        ) : (
+            <UsageLabel value={Math.floor(row.Usage)} theme={getUsageSeverity(row.Usage)} />
         );
     },
     align: DataTable.LEFT,
@@ -137,13 +137,13 @@ const diskSpaceUsageColumn: StorageGroupsColumn = {
     width: 115,
     resizeMinWidth: 75,
     render: ({row}) => {
-        return !isNil(row.DiskSpaceUsage) ? (
+        return isNil(row.DiskSpaceUsage) ? (
+            EMPTY_DATA_PLACEHOLDER
+        ) : (
             <UsageLabel
                 value={Math.floor(row.DiskSpaceUsage)}
                 theme={getUsageSeverity(row.DiskSpaceUsage)}
             />
-        ) : (
-            EMPTY_DATA_PLACEHOLDER
         );
     },
     align: DataTable.LEFT,
@@ -215,9 +215,9 @@ const latencyColumn: StorageGroupsColumn = {
     header: STORAGE_GROUPS_COLUMNS_TITLES.Latency,
     width: 100,
     render: ({row}) => {
-        return !isNil(row.LatencyPutTabletLogMs)
-            ? formatToMs(row.LatencyPutTabletLogMs)
-            : EMPTY_DATA_PLACEHOLDER;
+        return isNil(row.LatencyPutTabletLogMs)
+            ? EMPTY_DATA_PLACEHOLDER
+            : formatToMs(row.LatencyPutTabletLogMs);
     },
     align: DataTable.RIGHT,
 };
@@ -227,50 +227,64 @@ const allocationUnitsColumn: StorageGroupsColumn = {
     header: STORAGE_GROUPS_COLUMNS_TITLES.AllocationUnits,
     width: 150,
     render: ({row}) => {
-        return !isNil(row.AllocationUnits)
-            ? formatNumber(row.AllocationUnits)
-            : EMPTY_DATA_PLACEHOLDER;
+        return isNil(row.AllocationUnits)
+            ? EMPTY_DATA_PLACEHOLDER
+            : formatNumber(row.AllocationUnits);
     },
     align: DataTable.RIGHT,
 };
 
-const getVDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => ({
-    name: STORAGE_GROUPS_COLUMNS_IDS.VDisks,
-    header: STORAGE_GROUPS_COLUMNS_TITLES.VDisks,
-    className: b('vdisks-column'),
-    render: ({row}) => (
-        <VDisks
-            vDisks={row.VDisks}
-            viewContext={data?.viewContext}
-            erasure={row.ErasureSpecies}
-            withIcon
-        />
-    ),
-    align: DataTable.CENTER,
-    width: 475, // usually 8-9 vdisks, this width corresponds to 8 vdisks, column is expanded if more
-    resizeable: false,
-    sortable: false,
-});
+const getVDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => {
+    const highlightEnabled = isTopLevelStorageContext(data?.viewContext);
+    const highlightedVDisk = highlightEnabled ? data?.highlightedVDisksVDisk : undefined;
+    const setHighlightedVDisk = highlightEnabled ? data?.setHighlightedVDisksVDisk : undefined;
 
-const getDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => ({
-    name: STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
-    header: STORAGE_GROUPS_COLUMNS_TITLES.VDisksPDisks,
-    className: b('disks-column'),
-    render: ({row}) => {
-        return (
+    return {
+        name: STORAGE_GROUPS_COLUMNS_IDS.VDisks,
+        header: STORAGE_GROUPS_COLUMNS_TITLES.VDisks,
+        className: b('vdisks-column', {highlighted: highlightEnabled}),
+        render: ({row}) => (
+            <VDisks
+                vDisks={row.VDisks}
+                viewContext={data?.viewContext}
+                erasure={row.ErasureSpecies}
+                withIcon
+                highlightedVDisk={highlightedVDisk}
+                setHighlightedVDisk={setHighlightedVDisk}
+            />
+        ),
+        align: DataTable.CENTER,
+        width: 475, // usually 8-9 vdisks, this width corresponds to 8 vdisks, column is expanded if more
+        resizeable: false,
+        sortable: false,
+    };
+};
+
+const getDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => {
+    const highlightEnabled = isTopLevelStorageContext(data?.viewContext);
+    const highlightedVDisk = highlightEnabled ? data?.highlightedVDisk : undefined;
+    const setHighlightedVDisk = highlightEnabled ? data?.setHighlightedVDisk : undefined;
+
+    return {
+        name: STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
+        header: STORAGE_GROUPS_COLUMNS_TITLES.VDisksPDisks,
+        className: b('disks-column', {highlighted: highlightEnabled}),
+        render: ({row}) => (
             <Disks
                 vDisks={row.VDisks}
                 viewContext={data?.viewContext}
                 erasure={row.ErasureSpecies}
                 withIcon
+                highlightedVDisk={highlightedVDisk}
+                setHighlightedVDisk={setHighlightedVDisk}
             />
-        );
-    },
-    align: DataTable.CENTER,
-    width: 800,
-    resizeable: false,
-    sortable: false,
-});
+        ),
+        align: DataTable.CENTER,
+        width: 800,
+        resizeable: false,
+        sortable: false,
+    };
+};
 
 export const getStorageTopGroupsColumns: StorageColumnsGetter = () => {
     return [groupIdColumn, typeColumn, erasureColumn, usageColumn, usedColumn, limitColumn];

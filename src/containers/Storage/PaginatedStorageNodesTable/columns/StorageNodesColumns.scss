@@ -17,3 +17,5 @@
         flex-shrink: 0;
     }
 }
+
+@include hover-dim-column-class('ydb-storage-nodes-columns__pdisks-column')
