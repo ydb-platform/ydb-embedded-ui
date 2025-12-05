@@ -11,4 +11,7 @@ export interface GetStorageNodesColumnsParams {
     database?: string;
     viewContext?: StorageViewContext;
     columnsSettings?: StorageNodesColumnsSettings;
+
+    highlightedPDisk?: string;
+    setHighlightedPDisk?: (id: string | undefined) => void;
 }

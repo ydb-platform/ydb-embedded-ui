@@ -20,3 +20,6 @@
         font-weight: 500;
     }
 }
+
+@include mixins.hover-dim-column-class('ydb-storage-groups-columns__disks-column');
+@include mixins.hover-dim-column-class('ydb-storage-groups-columns__vdisks-column');

@@ -22,6 +22,8 @@ export interface VDiskProps {
     delayOpen?: number;
     delayClose?: number;
     withIcon?: boolean;
+    highlighted?: boolean;
+    darkened?: boolean;
 }
 
 export const VDisk = ({
@@ -35,13 +37,15 @@ export const VDisk = ({
     delayClose,
     delayOpen,
     withIcon,
+    highlighted,
+    darkened,
 }: VDiskProps) => {
     const getVDiskLink = useVDiskPagePath();
     const vDiskPath = getVDiskLink({nodeId: data.NodeId, vDiskId: data.StringifiedId});
 
     const severity = data.Severity;
     const isReplicatingColor = severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue;
-    const isHealthyDonor = data.DonorMode && isReplicatingColor;
+    const isDonor = data.DonorMode;
 
     return (
         <HoverPopup
@@ -60,10 +64,12 @@ export const VDisk = ({
                         severity={severity}
                         compact={compact}
                         inactive={inactive}
-                        striped={isReplicatingColor}
-                        isDonor={isHealthyDonor}
+                        striped={isReplicatingColor || isDonor}
+                        isDonor={isDonor}
                         className={progressBarClassName}
                         withIcon={withIcon}
+                        highlighted={highlighted}
+                        darkened={darkened}
                     />
                 </InternalLink>
             </div>
