@@ -62,9 +62,7 @@ export function useStorageGroupsSelectedColumns({
         isViewerUser,
         bridgeModeEnabled,
         highlightedVDisk,
-        setHighlightedVDisk,
         highlightedVDisksVDisk,
-        setHighlightedVDisksVDisk,
     ]);
 
     const requiredColumns = React.useMemo(() => {
