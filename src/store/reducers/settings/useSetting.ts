@@ -28,18 +28,18 @@ export function useSetting<T>(name?: string): {
         if (!name) {
             return undefined;
         }
-        if (window.api.metaSettings) {
+        if (window.api?.metaSettings) {
             return settingFromMeta;
         }
         return settingFromLS;
-    }, [settingFromMeta, settingFromLS]);
+    }, [name, settingFromMeta, settingFromLS]);
 
     const saveValue = React.useCallback<SaveSettingValue<T>>(
         (value) => {
             if (!name) {
                 return;
             }
-            if (window.api.metaSettings) {
+            if (window.api?.metaSettings) {
                 setMetaSetting({user, name, value});
             } else {
                 saveSettingToLS(value);

@@ -15,9 +15,9 @@ export const settingsApi = api.injectEndpoints({
         getSingleSetting: builder.query<unknown, Partial<GetSingleSettingParams>>({
             queryFn: async ({name, user}) => {
                 try {
-                    if (!name || !window.api.metaSettings) {
+                    if (!name || !window.api?.metaSettings) {
                         throw new Error(
-                            'Cannot get setting, no MetaSettings API or neccessary params are missing',
+                            'Cannot get setting, no MetaSettings API or necessary params are missing',
                         );
                     }
 
@@ -47,9 +47,9 @@ export const settingsApi = api.injectEndpoints({
                 value,
             }: Partial<Omit<SetSingleSettingParams, 'value'>> & {value: unknown}) => {
                 try {
-                    if (!name || !user || !window.api.metaSettings) {
+                    if (!name || !user || !window.api?.metaSettings) {
                         throw new Error(
-                            'Cannot set setting, no MetaSettings API or neccessary params are missing',
+                            'Cannot set setting, no MetaSettings API or necessary params are missing',
                         );
                     }
 
@@ -89,9 +89,9 @@ export const settingsApi = api.injectEndpoints({
         getSettings: builder.query({
             queryFn: async ({name, user}: Partial<GetSettingsParams>, baseApi) => {
                 try {
-                    if (!window.api.metaSettings || !name || !user) {
+                    if (!window.api?.metaSettings || !name || !user) {
                         throw new Error(
-                            'Cannot get settings, no MetaSettings API or neccessary params are missing',
+                            'Cannot get settings, no MetaSettings API or necessary params are missing',
                         );
                     }
                     const data = await window.api.metaSettings.getSettings({name, user});
@@ -109,17 +109,14 @@ export const settingsApi = api.injectEndpoints({
                             name: settingName,
                             user,
                         };
-                        const newSetting = {
-                            name: settingName,
-                            user,
-                            value: parseSettingValue(settingData?.value) ?? defaultValue,
-                        };
+                        const newSettingValue =
+                            parseSettingValue(settingData?.value) ?? defaultValue;
 
                         const patch = dispatch(
                             settingsApi.util.upsertQueryData(
                                 'getSingleSetting',
                                 cacheEntryParams,
-                                newSetting,
+                                newSettingValue,
                             ),
                         );
 
