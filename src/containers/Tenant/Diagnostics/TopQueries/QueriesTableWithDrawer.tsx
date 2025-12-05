@@ -18,7 +18,8 @@ const b = cn('kv-top-queries');
 interface SimpleTableWithDrawerProps {
     columns: Column<KeyValueRow>[];
     data: KeyValueRow[];
-    loading?: boolean;
+    isFetching?: boolean;
+    isLoading?: boolean;
     onRowClick?: (
         row: KeyValueRow | null,
         index?: number,
@@ -39,7 +40,8 @@ interface SimpleTableWithDrawerProps {
 export function QueriesTableWithDrawer({
     columns,
     data,
-    loading,
+    isFetching,
+    isLoading,
     onRowClick,
     columnsWidthLSKey,
     emptyDataMessage,
@@ -104,7 +106,8 @@ export function QueriesTableWithDrawer({
                 columnsWidthLSKey={columnsWidthLSKey}
                 columns={columns}
                 data={data}
-                isFetching={loading}
+                isFetching={isFetching}
+                isLoading={isLoading}
                 settings={tableSettings}
                 onRowClick={handleRowClick}
                 rowClassName={(row) => b('row', {active: isEqual(row, selectedRow)})}

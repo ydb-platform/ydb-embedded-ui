@@ -1,12 +1,14 @@
 import type {Store} from '@reduxjs/toolkit';
-import {createSlice} from '@reduxjs/toolkit';
+import {createSelector, createSlice} from '@reduxjs/toolkit';
+import {isNil} from 'lodash';
 
 import {settingsManager} from '../../../services/settings';
 import {parseJson} from '../../../utils/utils';
-import type {AppDispatch} from '../../defaultStore';
+import type {AppDispatch, RootState} from '../../defaultStore';
 
 import {DEFAULT_USER_SETTINGS} from './constants';
 import type {SettingsState} from './types';
+import {getSettingDefault, readSettingValueFromLS, setSettingValueToLS} from './utils';
 
 const userSettings = settingsManager.extractSettingsFromLS(DEFAULT_USER_SETTINGS);
 const systemSettings = window.systemSettings || {};
@@ -24,23 +26,39 @@ const settingsSlice = createSlice({
             state.userSettings[action.payload.name] = action.payload.value;
         }),
     }),
-    selectors: {
-        getSettingValue: (state, name?: string) => {
-            if (!name) {
-                return undefined;
-            }
-
-            return state.userSettings[name];
-        },
-    },
 });
 
-export const {getSettingValue} = settingsSlice.selectors;
+/**
+ * Reads LS value or use default when store value undefined
+ *
+ * If there is value in store, returns it
+ */
+export const getSettingValue = createSelector(
+    (state: RootState) => state.settings.userSettings,
+    (_state: RootState, name?: string) => name,
+    (userSettings, name) => {
+        if (!name) {
+            return undefined;
+        }
+
+        const storeValue = userSettings[name];
+
+        if (!isNil(storeValue)) {
+            return storeValue;
+        }
+
+        const defaultValue = getSettingDefault(name);
+        const savedValue = readSettingValueFromLS(name);
+
+        return savedValue ?? defaultValue;
+    },
+);
 
 export const setSettingValue = (name: string | undefined, value: unknown) => {
     return (dispatch: AppDispatch) => {
         if (name) {
             dispatch(settingsSlice.actions.setSettingValue({name, value}));
+            setSettingValueToLS(name, value);
         }
     };
 };

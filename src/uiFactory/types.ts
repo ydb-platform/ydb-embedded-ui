@@ -51,7 +51,6 @@ export interface UIFactory<H extends string = CommonIssueType, T extends string 
 
     useMetaProxy?: boolean;
     useClusterDomain?: boolean;
-    useMetaSettings?: boolean;
 
     yaMetricaConfig?: {
         yaMetricaMap: Record<T, number | undefined>;

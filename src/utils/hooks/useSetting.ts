@@ -1,12 +1,11 @@
 import React from 'react';
 
-import {settingsManager} from '../../services/settings';
 import {getSettingValue, setSettingValue} from '../../store/reducers/settings/settings';
 
 import {useTypedDispatch} from './useTypedDispatch';
 import {useTypedSelector} from './useTypedSelector';
 
-export const useSetting = <T>(key: string, defaultValue?: T): [T, (value: T) => void] => {
+export const useSetting = <T>(key?: string, defaultValue?: T): [T, (value: T) => void] => {
     const dispatch = useTypedDispatch();
 
     const settingValue = useTypedSelector((state) => {
@@ -17,7 +16,6 @@ export const useSetting = <T>(key: string, defaultValue?: T): [T, (value: T) => 
     const setValue = React.useCallback(
         (value: T) => {
             dispatch(setSettingValue(key, value));
-            settingsManager.setUserSettingsValue(key, value);
         },
         [dispatch, key],
     );

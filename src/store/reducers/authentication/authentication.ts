@@ -11,6 +11,7 @@ const initialState: AuthenticationState = {
     isAuthenticated: true,
     user: undefined,
     id: undefined,
+    metaUser: undefined,
 };
 
 export const slice = createSlice({
@@ -45,13 +46,13 @@ export const slice = createSlice({
         selectIsUserAllowedToMakeChanges: (state) => state.isUserAllowedToMakeChanges,
         selectIsViewerUser: (state) => state.isViewerUser,
         selectUser: (state) => state.user,
-        selectID: (state) => state.id,
+        selectMetaUser: (state) => state.metaUser ?? state.id,
     },
 });
 
 export default slice.reducer;
 export const {setIsAuthenticated, setUser} = slice.actions;
-export const {selectIsUserAllowedToMakeChanges, selectIsViewerUser, selectUser, selectID} =
+export const {selectIsUserAllowedToMakeChanges, selectIsViewerUser, selectUser, selectMetaUser} =
     slice.selectors;
 
 export const authenticationApi = api.injectEndpoints({
