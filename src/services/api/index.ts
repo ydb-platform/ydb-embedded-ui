@@ -2,7 +2,6 @@ import type {AxiosWrapperOptions} from '@gravity-ui/axios-wrapper';
 import type {AxiosRequestConfig} from 'axios';
 
 import {codeAssistBackend} from '../../store';
-import {uiFactory} from '../../uiFactory/uiFactory';
 
 import {AuthAPI} from './auth';
 import {CodeAssistAPI} from './codeAssist';
@@ -27,6 +26,7 @@ interface YdbEmbeddedAPIProps {
     proxyMeta: undefined | boolean;
     // this setting allows to use schema object path relative to database in api requests
     useRelativePath: undefined | boolean;
+    useMetaSettings: undefined | boolean;
     csrfTokenGetter: undefined | (() => string | undefined);
     defaults: undefined | AxiosRequestConfig;
 }
@@ -54,6 +54,7 @@ export class YdbEmbeddedAPI {
         csrfTokenGetter = () => undefined,
         defaults = {},
         useRelativePath = false,
+        useMetaSettings = false,
     }: YdbEmbeddedAPIProps) {
         const axiosParams: AxiosWrapperOptions = {config: {withCredentials, ...defaults}};
         const baseApiParams = {singleClusterMode, proxyMeta, useRelativePath};
@@ -62,7 +63,7 @@ export class YdbEmbeddedAPI {
         if (webVersion) {
             this.meta = new MetaAPI(axiosParams, baseApiParams);
         }
-        if (uiFactory.useMetaSettings) {
+        if (useMetaSettings) {
             this.metaSettings = new MetaSettingsAPI(axiosParams, baseApiParams);
         }
 

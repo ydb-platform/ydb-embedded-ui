@@ -2,6 +2,7 @@ import {createSelector} from '@reduxjs/toolkit';
 
 import type {Capability, MetaCapability, SecuritySetting} from '../../../types/api/capabilities';
 import type {AppDispatch, RootState} from '../../defaultStore';
+import {serializeError} from '../../utils';
 
 import {api} from './../api';
 
@@ -30,10 +31,7 @@ export const capabilitiesApi = api.injectEndpoints({
                 } catch (error) {
                     // If capabilities endpoint is not available, there will be an error
                     // That means no new features are available
-                    // Serialize the error to make it Redux-compatible
-                    const serializedError =
-                        error instanceof Error ? {message: error.message, name: error.name} : error;
-                    return {error: serializedError};
+                    return {error: serializeError(error)};
                 }
             },
         }),

@@ -5,4 +5,6 @@ export interface AuthenticationState {
 
     user: string | undefined;
     id: string | undefined;
+
+    metaUser: string | undefined;
 }
