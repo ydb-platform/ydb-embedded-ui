@@ -53,7 +53,7 @@ jobs:
               if (effortWeights[label] !== undefined) {
                 effort = effortWeights[label];
               }
-              if (label === "heart xeno") {
+              if (label === ":heart: xeno") {
                 hasHeartXeno = true;
               }
               if (label === "feedback") {
