@@ -33,6 +33,11 @@ jobs:
               "size/xl": 18
             };
 
+            // Bonus multipliers for special labels
+            const HEART_XENO_MULTIPLIER = 1.5;
+            const FEEDBACK_MULTIPLIER = 1.5;
+            const MAX_PRIORITY_SCORE = 100000;
+
             const issue = context.payload.issue;
             const labels = issue.labels.map(l => l.name);
 
@@ -73,17 +78,16 @@ jobs:
             let baseScore = Math.round((effectiveReach * effectiveImpact) / effectiveEffort);
 
             // Apply bonus multipliers for special labels
-            // "heart xeno" multiplies by defaultImpact
-            // "feedback" multiplies by defaultReach
             let bonusMultiplier = 1;
             if (hasHeartXeno) {
-              bonusMultiplier *= 1.5;
+              bonusMultiplier *= HEART_XENO_MULTIPLIER;
             }
             if (hasFeedback) {
-              bonusMultiplier *= 1.5;
+              bonusMultiplier *= FEEDBACK_MULTIPLIER;
             }
 
-            let finalScore = baseScore * bonusMultiplier;
+            // Calculate final score with cap to prevent excessively large values
+            let finalScore = Math.min(Math.round(baseScore * bonusMultiplier), MAX_PRIORITY_SCORE);
 
             console.log(`📊 Priority calculation: reach=${reach || 'default'}, impact=${impact || 'default'}, effort=${effort || 'default'}, heartXeno=${hasHeartXeno}, feedback=${hasFeedback} → baseScore=${baseScore}, multiplier=${bonusMultiplier}, finalScore=${finalScore}`);
 
