@@ -14,19 +14,18 @@ import {
 
 import {EntityStatus} from '../../components/EntityStatusNew/EntityStatus';
 import {VersionsBar} from '../../components/VersionsBar/VersionsBar';
-import {getClusterPath} from '../../routes';
 import type {PreparedCluster} from '../../store/reducers/clusters/types';
 import {EFlag} from '../../types/api/enums';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatNumber, formatStorageValuesToTb} from '../../utils/dataFormatters/dataFormatters';
-import {createDeveloperUIMonitoringPageHref} from '../../utils/developerUI/developerUI';
 import {getCleanBalancerValue} from '../../utils/parseBalancer';
 import {clusterTabsIds} from '../Cluster/utils';
 
 import {COLUMNS_NAMES, COLUMNS_TITLES} from './constants';
 import i18n from './i18n';
 import {b} from './shared';
+import {calculateClusterPath} from './utils';
 export const CLUSTERS_COLUMNS_WIDTH_LS_KEY = 'clustersTableColumnsWidth';
 
 const EMPTY_CELL = <span className={b('empty-cell')}>{EMPTY_DATA_PLACEHOLDER}</span>;
@@ -144,20 +143,8 @@ interface ClusterNameProps {
 }
 
 function ClusterName({row}: ClusterNameProps) {
-    const {
-        name: clusterName,
-        use_embedded_ui: useEmbeddedUi,
-        preparedBackend: backend,
-        settings,
-    } = row;
-    const clusterPath =
-        useEmbeddedUi && backend
-            ? createDeveloperUIMonitoringPageHref(backend)
-            : getClusterPath(
-                  {environment: settings?.auth_service},
-                  {backend, clusterName},
-                  {withBasename: true},
-              );
+    const clusterPath = calculateClusterPath(row);
+
     return (
         <div className={b('cluster-name')}>
             <ExternalLink href={clusterPath}>{row.title || row.name}</ExternalLink>
@@ -358,24 +345,11 @@ interface VersionsProps {
 }
 
 function Versions({row}: VersionsProps) {
-    const {
-        preparedVersions,
-        name: clusterName,
-        preparedBackend: backend,
-        settings,
-        use_embedded_ui: useEmbeddedUi,
-    } = row;
+    const {preparedVersions} = row;
     if (!preparedVersions.length) {
         return null;
     }
-    const clusterPath =
-        useEmbeddedUi && backend
-            ? createDeveloperUIMonitoringPageHref(backend)
-            : getClusterPath(
-                  {activeTab: clusterTabsIds.versions, environment: settings?.auth_service},
-                  {backend, clusterName},
-                  {withBasename: true},
-              );
+    const clusterPath = calculateClusterPath(row, clusterTabsIds.versions);
     return (
         <ExternalLink className={b('cluster-versions')} href={clusterPath}>
             <VersionsBar preparedVersions={preparedVersions} />

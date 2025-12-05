@@ -24,10 +24,6 @@ function toLF(str: string) {
     return str.replace(/\r\n?/g, '\n');
 }
 
-function indentBlock(str: string, pad = '    ') {
-    return str.replace(/^/gm, pad);
-}
-
 export const createTableTemplate = (params?: SchemaQueryParams) => {
     const tableName = params?.relativePath
         ? `\`${normalizeParameter(params.relativePath)}/my_row_table\``
@@ -333,8 +329,10 @@ export const createStreamingQueryTemplate = (params?: SchemaQueryParams) => {
     RUN = TRUE  -- Run the query after creation
 ) AS
 DO BEGIN
-    INSERT INTO \${2:<external data source>}.\${3:<sink topic>} 
-    SELECT * FROM \${2:<external data source>}.\${4:<source topic>};
+
+INSERT INTO \${2:<external data source>}.\${3:<sink topic>} 
+SELECT * FROM \${2:<external data source>}.\${4:<source topic>};
+
 END DO;`;
 };
 
@@ -360,14 +358,14 @@ export const alterStreamingQueryText = (params?: SchemaQueryParams) => {
     queryText = stripIndentByFirstLine(queryText);
     queryText = normalizeParameter(queryText);
 
-    const bodyQueryText = queryText
-        ? indentBlock(queryText)
-        : indentBlock('${2:<streaming_query_text>}');
+    const bodyQueryText = queryText ? queryText : '${2:<streaming_query_text>}';
     return `ALTER STREAMING QUERY ${streamingQueryName} SET (
     FORCE = TRUE, -- Allow to drop last query checkpoint if query state can't be loaded
 ) AS
 DO BEGIN
+
 ${bodyQueryText}
+
 END DO;`;
 };
 
@@ -383,6 +381,25 @@ export const addTableIndex = (params?: SchemaQueryParams) => {
         ? `\`${normalizeParameter(params.relativePath)}\``
         : '${1:<my_table>}';
     return `ALTER TABLE ${path} ADD INDEX \${2:index_name} GLOBAL ON (\${3:<column_name>});`;
+};
+
+export const addVectorIndex = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_table>}';
+
+    return `-- docs: https://ydb.tech/docs/en/dev/vector-indexes?version=main#types
+ALTER TABLE ${path}
+ADD INDEX \${2:my_vector_index}
+GLOBAL USING vector_kmeans_tree
+ON (\${3:embedding})
+WITH (
+    distance=cosine,
+    vector_type="uint8",
+    vector_dimension=\${4:512},
+    levels=\${5:2},
+    clusters=\${6:128}
+);`;
 };
 
 export const dropTableIndex = (params?: SchemaQueryParams) => {

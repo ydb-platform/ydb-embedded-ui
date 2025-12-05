@@ -7,8 +7,8 @@ import {getPDiskPagePath, useVDiskPagePath} from '../../routes';
 import {EVDiskState} from '../../types/api/vdisk';
 import {cn} from '../../utils/cn';
 import {
+    formatDurationSeconds,
     formatStorageValuesToGb,
-    formatUptimeInSeconds,
 } from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import {getSeverityColor} from '../../utils/disks/helpers';
@@ -165,7 +165,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
             });
         }
         if (!isNil(ReplicationSecondsRemaining)) {
-            const timeRemaining = formatUptimeInSeconds(ReplicationSecondsRemaining);
+            const timeRemaining = formatDurationSeconds(ReplicationSecondsRemaining);
             if (timeRemaining) {
                 rightColumn.push({
                     label: vDiskInfoKeyset('replication-time-remaining'),

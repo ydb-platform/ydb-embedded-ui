@@ -132,7 +132,6 @@ interface SendQueryParams extends QueryRequestParams {
 // Stream query receives queryId from session chunk.
 type StreamQueryParams = Omit<SendQueryParams, 'queryId'>;
 
-const DEFAULT_STREAM_CHUNK_SIZE = 1000;
 const DEFAULT_CONCURRENT_RESULTS = false;
 
 export const queryApi = api.injectEndpoints({
@@ -192,7 +191,9 @@ export const queryApi = api.injectEndpoints({
                             timeout: isNumeric(querySettings.timeout)
                                 ? Number(querySettings.timeout) * 1000
                                 : undefined,
-                            output_chunk_max_size: DEFAULT_STREAM_CHUNK_SIZE,
+                            output_chunk_max_size: isNumeric(querySettings.outputChunkMaxSize)
+                                ? Number(querySettings.outputChunkMaxSize)
+                                : undefined,
                             concurrent_results: DEFAULT_CONCURRENT_RESULTS || undefined,
                             base64,
                         },

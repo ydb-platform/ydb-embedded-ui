@@ -12,9 +12,9 @@ import {
 } from '../../../components/nodesColumns/columns';
 import type {GetNodesColumnsParams} from '../../../components/nodesColumns/types';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../lib';
+import {formatBytes} from '../../../utils/bytesParsers';
 import {formatDateTime} from '../../../utils/dataFormatters/dataFormatters';
 import type {Column} from '../../../utils/tableUtils/types';
-import {bytesToMB, isNumeric} from '../../../utils/utils';
 
 import {
     NODE_NETWORK_COLUMNS_IDS,
@@ -35,6 +35,14 @@ function getPeerConnectTimeColumn<T extends {ConnectTime?: string}>(): Column<T>
     };
 }
 
+function renderBytes(bytes?: number | string) {
+    return formatBytes({
+        value: bytes,
+        size: 'mb',
+        withSizeLabel: true,
+    });
+}
+
 function getPeerSentBytesColumn<T extends {BytesSend?: string | number}>(): Column<T> {
     return {
         name: NODE_NETWORK_COLUMNS_IDS.BytesSend,
@@ -42,8 +50,7 @@ function getPeerSentBytesColumn<T extends {BytesSend?: string | number}>(): Colu
         align: DataTable.RIGHT,
         width: 140,
         resizeMinWidth: 120,
-        render: ({row}) =>
-            isNumeric(row.BytesSend) ? bytesToMB(row.BytesSend, 0) : EMPTY_DATA_PLACEHOLDER,
+        render: ({row}) => renderBytes(row.BytesSend) || EMPTY_DATA_PLACEHOLDER,
     };
 }
 
@@ -54,8 +61,7 @@ function getPeerReceivedBytesColumn<T extends {BytesReceived?: string | number}>
         align: DataTable.RIGHT,
         width: 160,
         resizeMinWidth: 130,
-        render: ({row}) =>
-            isNumeric(row.BytesReceived) ? bytesToMB(row.BytesReceived, 0) : EMPTY_DATA_PLACEHOLDER,
+        render: ({row}) => renderBytes(row.BytesReceived) || EMPTY_DATA_PLACEHOLDER,
     };
 }
 

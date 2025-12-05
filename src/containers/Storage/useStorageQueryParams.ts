@@ -1,9 +1,12 @@
 import React from 'react';
 
-import {StringParam, useQueryParams} from 'use-query-params';
+import {StringParam, useQueryParam, useQueryParams} from 'use-query-params';
 
+import {SETTING_KEYS} from '../../store/reducers/settings/constants';
+import {STORAGE_TYPES} from '../../store/reducers/storage/constants';
 import type {StorageType, VisibleEntities} from '../../store/reducers/storage/types';
 import {storageTypeSchema, visibleEntitiesSchema} from '../../store/reducers/storage/types';
+import {useSetting} from '../../utils/hooks';
 import {NodesUptimeFilterValues, nodesUptimeFilterValuesSchema} from '../../utils/nodes';
 
 import {storageGroupsGroupByParamSchema} from './PaginatedStorageGroupsTable/columns/constants';
@@ -21,6 +24,11 @@ export function useStorageQueryParams() {
         storageNodesGroupBy: StringParam,
         storageGroupsGroupBy: StringParam,
     });
+
+    const [_savedStorageType, setSavedStorageType] = useSetting<StorageType>(
+        SETTING_KEYS.STORAGE_TYPE,
+        STORAGE_TYPES.groups,
+    );
 
     const storageType = storageTypeSchema.parse(queryParams.type);
 
@@ -42,7 +50,7 @@ export function useStorageQueryParams() {
             patch[STORAGE_SEARCH_PARAM_BY_TYPE[storageType]] = queryParams.search;
             setQueryParams(patch, 'replaceIn');
         }
-    }, [queryParams.search, storageType]);
+    }, [queryParams.search, storageType, setQueryParams]);
 
     const handleTextFilterGroupsChange = (value: string) => {
         setQueryParams({groupsSearch: value || undefined}, 'replaceIn');
@@ -56,9 +64,13 @@ export function useStorageQueryParams() {
         setQueryParams({visible: value}, 'replaceIn');
     };
 
-    const handleStorageTypeChange = (value: StorageType) => {
-        setQueryParams({type: value}, 'replaceIn');
-    };
+    const handleStorageTypeChange = React.useCallback(
+        (value: StorageType) => {
+            setQueryParams({type: value}, 'replaceIn');
+            setSavedStorageType(value);
+        },
+        [setQueryParams, setSavedStorageType],
+    );
 
     const handleUptimeFilterChange = (value: NodesUptimeFilterValues) => {
         setQueryParams({uptimeFilter: value}, 'replaceIn');
@@ -102,4 +114,23 @@ export function useStorageQueryParams() {
         handleShowAllGroups,
         handleShowAllNodes,
     };
+}
+
+export function useSaveStorageType() {
+    const [queryStorageType, setQueryStorageType] = useQueryParam('type', StringParam);
+    const [savedStorageType] = useSetting<StorageType>(
+        SETTING_KEYS.STORAGE_TYPE,
+        STORAGE_TYPES.groups,
+    );
+
+    const normalizedStorageType = React.useMemo(
+        () => storageTypeSchema.parse(queryStorageType ?? savedStorageType),
+        [queryStorageType, savedStorageType],
+    );
+
+    React.useEffect(() => {
+        if (normalizedStorageType !== queryStorageType) {
+            setQueryStorageType(normalizedStorageType);
+        }
+    }, [normalizedStorageType, queryStorageType, setQueryStorageType]);
 }

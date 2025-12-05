@@ -1,4 +1,4 @@
-import {UNBREAKABLE_GAP} from '../../../utils/utils';
+import {UNBREAKABLE_GAP} from '../../../utils/constants';
 import {prepareClockSkewValue, preparePingTimeValue} from '../utils';
 
 describe('preparePingTimeValue', () => {

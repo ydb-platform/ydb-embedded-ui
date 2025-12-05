@@ -98,4 +98,6 @@ export interface MetaClusterTraceCheck {
 export interface MetaClusterSettings {
     use_meta_proxy?: boolean;
     auth_service?: string;
+    cluster_domain?: string;
+    cluster_external_name?: string;
 }

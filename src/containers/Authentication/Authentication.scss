@@ -86,4 +86,11 @@
         top: 40px;
         right: 40px;
     }
+    &__general-error {
+        width: 100%;
+        height: var(--g-text-body-1-line-height);
+        margin-top: var(--g-spacing-1);
+
+        color: var(--g-color-text-danger);
+    }
 }

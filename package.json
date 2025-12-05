@@ -1,10 +1,14 @@
 {
   "name": "ydb-embedded-ui",
-  "version": "12.22.0",
+  "version": "12.25.0",
   "files": [
     "dist"
   ],
   "main": "dist/lib.js",
+  "engines": {
+    "node": ">=22.0",
+    "npm": "^10.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "git@github.com:ydb-platform/ydb-embedded-ui.git"

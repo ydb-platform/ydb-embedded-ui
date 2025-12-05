@@ -9,7 +9,7 @@ import {getTenantPath} from '../../../../../routes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {IPreparedConsumerData} from '../../../../../types/store/topic';
 import {cn} from '../../../../../utils/cn';
-import {formatMsToUptime} from '../../../../../utils/dataFormatters/dataFormatters';
+import {formatDurationMs} from '../../../../../utils/dataFormatters/dataFormatters';
 import {TenantTabsGroups} from '../../../TenantPages';
 import {ReadLagsHeader} from '../Headers';
 import {
@@ -57,7 +57,7 @@ export const columns: Column<IPreparedConsumerData>[] = [
                     CONSUMERS_READ_LAGS_SUB_COLUMNS_IDS.WRITE_LAG
                 ],
                 align: DataTable.RIGHT,
-                render: ({row}) => formatMsToUptime(row.writeLag),
+                render: ({row}) => formatDurationMs(row.writeLag),
             },
             {
                 name: CONSUMERS_READ_LAGS_SUB_COLUMNS_IDS.READ_LAG,
@@ -65,7 +65,7 @@ export const columns: Column<IPreparedConsumerData>[] = [
                     CONSUMERS_READ_LAGS_SUB_COLUMNS_IDS.READ_LAG
                 ],
                 align: DataTable.RIGHT,
-                render: ({row}) => formatMsToUptime(row.readLag),
+                render: ({row}) => formatDurationMs(row.readLag),
             },
             {
                 name: CONSUMERS_READ_LAGS_SUB_COLUMNS_IDS.READ_IDLE_TIME,
@@ -73,7 +73,7 @@ export const columns: Column<IPreparedConsumerData>[] = [
                     CONSUMERS_READ_LAGS_SUB_COLUMNS_IDS.READ_IDLE_TIME
                 ],
                 align: DataTable.RIGHT,
-                render: ({row}) => formatMsToUptime(row.readIdleTime),
+                render: ({row}) => formatDurationMs(row.readIdleTime),
             },
         ],
     },

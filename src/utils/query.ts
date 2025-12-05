@@ -330,6 +330,10 @@ export const querySettingsValidationSchema = z.object({
         (val) => (val === '' ? undefined : val),
         z.coerce.number().gt(0).lte(100_000).or(z.undefined()),
     ),
+    outputChunkMaxSize: z.preprocess(
+        (val) => (val === '' ? undefined : val),
+        z.coerce.number().int().positive().or(z.undefined()),
+    ),
     queryMode: queryModeSchema,
     transactionMode: transactionModeSchema,
     statisticsMode: statisticsModeSchema,
@@ -346,6 +350,10 @@ export const querySettingsRestoreSchema = z
         limitRows: z.preprocess(
             (val) => (val === '' ? undefined : val),
             z.coerce.number().gt(0).lte(100_000).optional().catch(DEFAULT_QUERY_SETTINGS.limitRows),
+        ),
+        outputChunkMaxSize: z.preprocess(
+            (val) => (val === '' ? undefined : val),
+            z.coerce.number().int().positive().optional(),
         ),
         queryMode: queryModeSchema.catch(DEFAULT_QUERY_SETTINGS.queryMode),
         transactionMode: transactionModeSchema.catch(DEFAULT_QUERY_SETTINGS.transactionMode),

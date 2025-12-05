@@ -6,6 +6,8 @@
   "form.statistics-mode": "Режим сбора статистики",
   "form.tracing-level": "Tracing level",
   "form.limit-rows": "Лимит строк",
+  "form.output.chunk.max.size": "Максимальный размер чанка",
+  "form.output.chunk.max.size.bytes": "байт",
   "form.pragmas": "Прагмы",
   "tooltip_plan-to-svg-statistics": "Опция статистики установлена в значение \"Full\" из-за включенного эксперимента \"Execution plan\".\n Чтобы отключить его, перейдите в раздел \"Experiments\" в настройках пользователя.",
   "button-done": "Готово",

@@ -3,6 +3,7 @@ import React from 'react';
 import {usePaginatedTableState} from './PaginatedTableContext';
 import {TableChunksRenderer} from './TableChunksRenderer';
 import {TableHead} from './TableHead';
+import type {PaginatedTableId} from './constants';
 import {DEFAULT_TABLE_ROW_HEIGHT} from './constants';
 import {b} from './shared';
 import type {
@@ -22,7 +23,7 @@ export interface PaginatedTableProps<T, F> {
     initialEntitiesCount?: number;
     fetchData: FetchData<T, F>;
     filters?: F;
-    tableName: string;
+    tableName: PaginatedTableId;
     columns: Column<T>[];
     getRowClassName?: GetRowClassName<T>;
     rowHeight?: number;
