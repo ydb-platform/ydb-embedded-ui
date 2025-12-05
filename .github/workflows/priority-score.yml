@@ -72,20 +72,20 @@ jobs:
             const effectiveEffort = effort || defaultEffort;
             let baseScore = Math.round((effectiveReach * effectiveImpact) / effectiveEffort);
 
-            // Add bonus scores for special labels
-            // "heart xeno" adds value equal to defaultImpact
-            // "feedback" adds value equal to defaultReach
-            let bonusScore = 0;
+            // Apply bonus multipliers for special labels
+            // "heart xeno" multiplies by defaultImpact
+            // "feedback" multiplies by defaultReach
+            let bonusMultiplier = 1;
             if (hasHeartXeno) {
-              bonusScore += defaultImpact;
+              bonusMultiplier *= defaultImpact;
             }
             if (hasFeedback) {
-              bonusScore += defaultReach;
+              bonusMultiplier *= defaultReach;
             }
 
-            let finalScore = baseScore + bonusScore;
+            let finalScore = baseScore * bonusMultiplier;
 
-            console.log(`📊 Priority calculation: reach=${reach || 'default'}, impact=${impact || 'default'}, effort=${effort || 'default'}, heartXeno=${hasHeartXeno}, feedback=${hasFeedback} → baseScore=${baseScore}, bonus=${bonusScore}, finalScore=${finalScore}`);
+            console.log(`📊 Priority calculation: reach=${reach || 'default'}, impact=${impact || 'default'}, effort=${effort || 'default'}, heartXeno=${hasHeartXeno}, feedback=${hasFeedback} → baseScore=${baseScore}, multiplier=${bonusMultiplier}, finalScore=${finalScore}`);
 
             const projectNumber = 24;
             const org = "ydb-platform";
