@@ -33,6 +33,11 @@ jobs:
               "size/xl": 18
             };
 
+            // Bonus multipliers for special labels
+            const HEART_XENO_MULTIPLIER = 1.5;
+            const FEEDBACK_MULTIPLIER = 1.5;
+            const MAX_PRIORITY_SCORE = 100000;
+
             const issue = context.payload.issue;
             const labels = issue.labels.map(l => l.name);
 
@@ -40,6 +45,8 @@ jobs:
             let reach = null;
             let impact = null;
             let effort = null;
+            let hasHeartXeno = false;
+            let hasFeedback = false;
 
             for (const label of labels) {
               if (reachWeights[label] !== undefined) {
@@ -51,21 +58,38 @@ jobs:
               if (effortWeights[label] !== undefined) {
                 effort = effortWeights[label];
               }
+              if (label === ":heart: xeno") {
+                hasHeartXeno = true;
+              }
+              if (label === "feedback") {
+                hasFeedback = true;
+              }
             }
+
+            // Fallback default values
+            const defaultReach = 75;   // default to medium reach
+            const defaultImpact = 75;  // default to low impact
+            const defaultEffort = 4;   // default to medium effort
 
             // Calculate priority score using formula: (reach * impact) / effort
-            let finalScore = 0;
-            if (reach !== null && impact !== null && effort !== null) {
-              finalScore = Math.round((reach * impact) / effort);
-            } else {
-              // Fallback to default values if labels are missing
-              const defaultReach = reach || 75;  // default to medium reach
-              const defaultImpact = impact || 75;  // default to low impact
-              const defaultEffort = effort || 4;  // default to medium effort
-              finalScore = Math.round((defaultReach * defaultImpact) / defaultEffort);
+            const effectiveReach = reach || defaultReach;
+            const effectiveImpact = impact || defaultImpact;
+            const effectiveEffort = effort || defaultEffort;
+            let baseScore = Math.round((effectiveReach * effectiveImpact) / effectiveEffort);
+
+            // Apply bonus multipliers for special labels
+            let bonusMultiplier = 1;
+            if (hasHeartXeno) {
+              bonusMultiplier *= HEART_XENO_MULTIPLIER;
+            }
+            if (hasFeedback) {
+              bonusMultiplier *= FEEDBACK_MULTIPLIER;
             }
 
-            console.log(`📊 Priority calculation: reach=${reach || 'default'}, impact=${impact || 'default'}, effort=${effort || 'default'} → score=${finalScore}`);
+            // Calculate final score with cap to prevent excessively large values
+            let finalScore = Math.min(Math.round(baseScore * bonusMultiplier), MAX_PRIORITY_SCORE);
+
+            console.log(`📊 Priority calculation: reach=${reach || 'default'}, impact=${impact || 'default'}, effort=${effort || 'default'}, heartXeno=${hasHeartXeno}, feedback=${hasFeedback} → baseScore=${baseScore}, multiplier=${bonusMultiplier}, finalScore=${finalScore}`);
 
             const projectNumber = 24;
             const org = "ydb-platform";
