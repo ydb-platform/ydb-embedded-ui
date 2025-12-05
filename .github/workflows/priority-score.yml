@@ -77,10 +77,10 @@ jobs:
             // "feedback" multiplies by defaultReach
             let bonusMultiplier = 1;
             if (hasHeartXeno) {
-              bonusMultiplier *= defaultImpact;
+              bonusMultiplier *= 1.5;
             }
             if (hasFeedback) {
-              bonusMultiplier *= defaultReach;
+              bonusMultiplier *= 1.5;
             }
 
             let finalScore = baseScore * bonusMultiplier;
