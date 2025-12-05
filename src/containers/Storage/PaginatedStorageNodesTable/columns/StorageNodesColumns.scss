@@ -1,4 +1,4 @@
-@import '../../../../styles/mixins.scss';
+@use '../../../../styles/mixins.scss';
 
 .ydb-storage-nodes-columns {
     &__pdisks-column {
@@ -18,4 +18,4 @@
     }
 }
 
-@include hover-dim-column-class('ydb-storage-nodes-columns__pdisks-column');
+@include mixins.hover-dim-column-class('ydb-storage-nodes-columns__pdisks-column');
