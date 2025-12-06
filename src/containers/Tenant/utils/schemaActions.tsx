@@ -258,17 +258,6 @@ export const getActions =
                     text: i18n('actions.manageAutoPartitioning'),
                     action: actions.manageAutoPartitioning,
                 },
-            ],
-        };
-
-        const alterColumnTableGroupItem = {
-            text: i18n('actions.alterTable'),
-            items: [
-                {text: i18n('actions.manageColumns'), action: actions.alterTable},
-                {
-                    text: i18n('actions.manageAutoPartitioning'),
-                    action: actions.manageAutoPartitioning,
-                },
                 {
                     text: i18n('actions.manageReadReplicas'),
                     action: actions.manageReadReplicas,
@@ -326,7 +315,7 @@ export const getActions =
         const COLUMN_TABLE_SET: ActionsSet = [
             [copyItem],
             [
-                alterColumnTableGroupItem,
+                alterTableGroupItem,
                 {text: i18n('actions.dropTable'), action: actions.dropTable},
                 {text: i18n('actions.selectQuery'), action: actions.selectQuery},
                 {text: i18n('actions.upsertQuery'), action: actions.upsertQuery},
