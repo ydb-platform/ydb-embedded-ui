@@ -47,6 +47,7 @@ import {
     dropTransferTemplate,
     dropViewTemplate,
     manageAutoPartitioningTemplate,
+    manageReadReplicasTemplate,
     selectQueryTemplate,
     showCreateTableTemplate,
     upsertQueryTemplate,
@@ -137,6 +138,7 @@ const bindActions = (
         alterTable: inputQuery(alterTableTemplate),
         dropTable: inputQuery(dropTableTemplate),
         manageAutoPartitioning: inputQuery(manageAutoPartitioningTemplate),
+        manageReadReplicas: inputQuery(manageReadReplicasTemplate),
         selectQuery: inputQuery(selectQueryTemplate),
         showCreateTable: inputQuery(showCreateTableTemplate),
         upsertQuery: inputQuery(upsertQueryTemplate),
@@ -259,6 +261,21 @@ export const getActions =
             ],
         };
 
+        const alterColumnTableGroupItem = {
+            text: i18n('actions.alterTable'),
+            items: [
+                {text: i18n('actions.manageColumns'), action: actions.alterTable},
+                {
+                    text: i18n('actions.manageAutoPartitioning'),
+                    action: actions.manageAutoPartitioning,
+                },
+                {
+                    text: i18n('actions.manageReadReplicas'),
+                    action: actions.manageReadReplicas,
+                },
+            ],
+        };
+
         let DB_SET: ActionsSet = [[copyItem, connectToDBItem], createEntitiesSet];
 
         const DIR_SET: ActionsSet = [[copyItem], createEntitiesSet];
@@ -309,7 +326,7 @@ export const getActions =
         const COLUMN_TABLE_SET: ActionsSet = [
             [copyItem],
             [
-                alterTableGroupItem,
+                alterColumnTableGroupItem,
                 {text: i18n('actions.dropTable'), action: actions.dropTable},
                 {text: i18n('actions.selectQuery'), action: actions.selectQuery},
                 {text: i18n('actions.upsertQuery'), action: actions.upsertQuery},

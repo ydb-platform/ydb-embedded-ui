@@ -143,6 +143,18 @@ ALTER TABLE ${path} SET
     AUTO_PARTITIONING_MAX_PARTITIONS_COUNT = 100 -- Partitions are split only if their number doesn't exceed the value specified by this parameter.
 )`;
 };
+
+export const manageReadReplicasTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_table>}';
+
+    return `ALTER TABLE ${path} SET 
+(
+   READ_REPLICAS_SETTINGS = 'PER_AZ:1'-- Enable read replicas for stale read, launch one replica in every availability zone. docs: https://clck.ru/3Qh8iQ
+)`;
+};
+
 export const selectQueryTemplate = (params?: SchemaQueryParams) => {
     const path = params?.relativePath
         ? `\`${normalizeParameter(params.relativePath)}\``
