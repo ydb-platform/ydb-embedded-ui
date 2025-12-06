@@ -61,7 +61,6 @@ export function TopicMessage({offset, size, message, scrollContainerRef}: TopicM
             key={String(isFullscreen)}
             collapsedInitially
             value={preparedMessage}
-            maxValueWidth={50}
             toolbarClassName={b('json-viewer-toolbar')}
             scrollContainerRef={scrollContainerRef}
         />

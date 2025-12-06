@@ -37,7 +37,7 @@ interface JsonViewerProps {
     maxValueWidth?: number;
     toolbarClassName?: string;
     withClipboardButton?: Omit<ClipboardButtonProps, 'size' | 'view'>;
-    value: any;
+    value: ReactUnipikaProps['value'];
     scrollContainerRef: React.RefObject<HTMLElement>;
 }
 
@@ -136,6 +136,7 @@ export function JsonViewer({
                 caseInsensitiveSearch={!caseSensitiveSearch}
                 initiallyCollapsed={collapsedInitially}
                 scrollContainerRef={scrollContainerRef}
+                showContainerSize
             />
         </div>
     );
