@@ -151,7 +151,7 @@ export const manageReadReplicasTemplate = (params?: SchemaQueryParams) => {
 
     return `ALTER TABLE ${path} SET 
 (
-   READ_REPLICAS_SETTINGS = 'PER_AZ:1'-- Enable read replicas for stale read, launch one replica in every availability zone. docs: https://clck.ru/3Qh8iQ
+   READ_REPLICAS_SETTINGS = 'PER_AZ:1' -- Enable read replicas for stale read, launch one replica in every availability zone. docs: https://clck.ru/3Qh8iQ
 )`;
 };
 
