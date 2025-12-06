@@ -47,6 +47,7 @@ import {
     dropTransferTemplate,
     dropViewTemplate,
     manageAutoPartitioningTemplate,
+    manageReadReplicasTemplate,
     selectQueryTemplate,
     showCreateTableTemplate,
     upsertQueryTemplate,
@@ -137,6 +138,7 @@ const bindActions = (
         alterTable: inputQuery(alterTableTemplate),
         dropTable: inputQuery(dropTableTemplate),
         manageAutoPartitioning: inputQuery(manageAutoPartitioningTemplate),
+        manageReadReplicas: inputQuery(manageReadReplicasTemplate),
         selectQuery: inputQuery(selectQueryTemplate),
         showCreateTable: inputQuery(showCreateTableTemplate),
         upsertQuery: inputQuery(upsertQueryTemplate),
@@ -255,6 +257,10 @@ export const getActions =
                 {
                     text: i18n('actions.manageAutoPartitioning'),
                     action: actions.manageAutoPartitioning,
+                },
+                {
+                    text: i18n('actions.manageReadReplicas'),
+                    action: actions.manageReadReplicas,
                 },
             ],
         };
