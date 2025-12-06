@@ -27,6 +27,7 @@
     "@gravity-ui/navigation": "^3.3.9",
     "@gravity-ui/paranoid": "^3.0.0",
     "@gravity-ui/react-data-table": "^2.2.1",
+    "@gravity-ui/react-unipika": "^0.5.0",
     "@gravity-ui/table": "^1.10.1",
     "@gravity-ui/uikit": "^7.23.0",
     "@gravity-ui/unipika": "^5.2.1",

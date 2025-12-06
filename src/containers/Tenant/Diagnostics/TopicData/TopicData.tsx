@@ -48,7 +48,7 @@ interface TopicDataProps {
     path: string;
     database: string;
     databaseFullPath: string;
-    scrollContainerRef: React.RefObject<HTMLElement>;
+    scrollContainerRef: React.RefObject<HTMLDivElement>;
 }
 const PAGINATED_TABLE_LIMIT = 50_000;
 
@@ -309,10 +309,14 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
     const renderDrawerContent = React.useCallback(() => {
         return (
             <Fullscreen>
-                <TopicMessageDetails database={database} path={path} />
+                <TopicMessageDetails
+                    database={database}
+                    path={path}
+                    scrollContainerRef={scrollContainerRef}
+                />
             </Fullscreen>
         );
-    }, [database, path]);
+    }, [database, path, scrollContainerRef]);
 
     if (error) {
         return <PageError error={error} position="left" />;

@@ -1,5 +1,6 @@
+import React from 'react';
+
 import {JsonViewer} from '../../../../../../components/JsonViewer/JsonViewer';
-import {useUnipikaConvert} from '../../../../../../components/JsonViewer/unipika/unipika';
 import {cn} from '../../../../../../utils/cn';
 
 import './QueryJSONViewer.scss';
@@ -11,11 +12,11 @@ interface QueryJSONViewerProps {
 }
 
 export function QueryJSONViewer({data}: QueryJSONViewerProps) {
-    const convertedData = useUnipikaConvert(data);
+    const scrollRef = React.useRef(null);
     return (
         <div className={b()}>
-            <div className={b('tree')}>
-                <JsonViewer value={convertedData} />
+            <div className={b('tree')} ref={scrollRef}>
+                <JsonViewer value={data} scrollContainerRef={scrollRef} />
             </div>
         </div>
     );

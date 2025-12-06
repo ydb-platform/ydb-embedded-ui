@@ -5,13 +5,7 @@
   "action_back": "Back",
   "description_search": "Search...",
   "description_matched-rows": "Matched rows",
-  "description_full-value": "Full value",
   "context_case-sensitive-search": "Case sensitive search enadled",
   "context_case-sensitive-search-disabled": "Case sensitive search disabled",
-  "context_items-count": [
-    " {{count}} item ",
-    " {{count}} items ",
-    " {{count}} items ",
-    " {{count}} items "
-  ]
+  "description_unknown-error": "Unknown error while parsing data"
 }
