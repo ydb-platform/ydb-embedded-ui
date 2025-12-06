@@ -7,6 +7,7 @@ interface TopicDataSectionProps {
     title: React.ReactNode;
     className?: string;
     renderToolbar?: () => React.ReactNode;
+    scrollContainerRef?: React.RefObject<HTMLDivElement>;
 }
 
 export function TopicDataSection({
@@ -14,6 +15,7 @@ export function TopicDataSection({
     title,
     className,
     renderToolbar,
+    scrollContainerRef,
 }: TopicDataSectionProps) {
     return (
         <Flex direction="column" className={b('section', className)}>
@@ -26,7 +28,9 @@ export function TopicDataSection({
                 {renderToolbar?.()}
             </Flex>
             <div className={b('section-content')}>
-                <div className={b('section-scroll-container')}>{children}</div>
+                <div className={b('section-scroll-container')} ref={scrollContainerRef}>
+                    {children}
+                </div>
             </div>
         </Flex>
     );

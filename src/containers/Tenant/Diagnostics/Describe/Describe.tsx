@@ -1,6 +1,5 @@
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {JsonViewer} from '../../../../components/JsonViewer/JsonViewer';
-import {useUnipikaConvert} from '../../../../components/JsonViewer/unipika/unipika';
 import {Loader} from '../../../../components/Loader';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {cn} from '../../../../utils/cn';
@@ -14,9 +13,10 @@ interface IDescribeProps {
     path: string;
     database: string;
     databaseFullPath: string;
+    scrollContainerRef: React.RefObject<HTMLElement>;
 }
 
-const Describe = ({path, database, databaseFullPath}: IDescribeProps) => {
+const Describe = ({path, database, databaseFullPath, scrollContainerRef}: IDescribeProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {currentData, isFetching, error} = overviewApi.useGetOverviewQuery(
@@ -25,8 +25,6 @@ const Describe = ({path, database, databaseFullPath}: IDescribeProps) => {
     );
 
     const loading = isFetching && currentData === undefined;
-
-    const convertedValue = useUnipikaConvert(currentData);
 
     if (loading) {
         return <Loader size="m" />;
@@ -42,13 +40,14 @@ const Describe = ({path, database, databaseFullPath}: IDescribeProps) => {
             {currentData ? (
                 <div className={b('result')}>
                     <JsonViewer
-                        value={convertedValue}
+                        value={currentData}
                         withClipboardButton={{
                             withLabel: false,
                             copyText: JSON.stringify(currentData),
                         }}
                         search
                         collapsedInitially
+                        scrollContainerRef={scrollContainerRef}
                     />
                 </div>
             ) : null}

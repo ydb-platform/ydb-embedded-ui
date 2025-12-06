@@ -19,6 +19,7 @@ interface FilterProps {
     onPrevMatch?: (_event: unknown, diff?: number) => void;
     caseSensitive?: boolean;
     onUpdateCaseSensitive: VoidFunction;
+    allMatchPaths?: string[];
 }
 
 export const Filter = React.forwardRef<HTMLInputElement, FilterProps>(function Filter(
@@ -32,10 +33,12 @@ export const Filter = React.forwardRef<HTMLInputElement, FilterProps>(function F
         onPrevMatch,
         caseSensitive,
         onUpdateCaseSensitive,
+        allMatchPaths,
     },
     ref,
 ) {
-    const count = matchedRows.length;
+    const totalMatches = allMatchPaths?.length || 0;
+    const count = totalMatches || matchedRows.length;
     const matchPosition = count ? 1 + (matchIndex % count) : 0;
     return (
         <Flex gap={2} wrap="nowrap">

@@ -50,4 +50,9 @@
         white-space: pre-wrap;
         word-break: break-all;
     }
+    &__message {
+        flex-grow: 1;
+
+        margin-bottom: var(--g-spacing-1);
+    }
 }

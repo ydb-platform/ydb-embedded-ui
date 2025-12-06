@@ -24,9 +24,14 @@ import './TopicMessageDetails.scss';
 interface TopicMessageDetailsProps {
     database: string;
     path: string;
+    scrollContainerRef: React.RefObject<HTMLDivElement>;
 }
 
-export function TopicMessageDetails({database, path}: TopicMessageDetailsProps) {
+export function TopicMessageDetails({
+    database,
+    path,
+    scrollContainerRef,
+}: TopicMessageDetailsProps) {
     const {selectedPartition, activeOffset} = useTopicDataQueryParams();
 
     const queryParams = React.useMemo(() => {
@@ -78,6 +83,7 @@ export function TopicMessageDetails({database, path}: TopicMessageDetailsProps) 
                 message={message}
                 offset={messageDetails.Offset}
                 size={messageDetails.OriginalSize}
+                scrollContainerRef={scrollContainerRef}
             />
         );
     };
@@ -117,7 +123,7 @@ export function TopicMessageDetails({database, path}: TopicMessageDetailsProps) 
         }
 
         return (
-            <Flex direction="column" gap={4}>
+            <Flex direction="column" gap={4} height="100%">
                 {renderMessageGeneralInfo()}
                 {renderMessageMeta()}
                 {renderMessage()}
