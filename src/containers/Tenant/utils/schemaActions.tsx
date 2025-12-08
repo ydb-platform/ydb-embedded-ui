@@ -250,19 +250,23 @@ export const getActions =
             {text: i18n('actions.createStreamingQuery'), action: actions.createStreamingQuery},
         ];
 
-        const alterTableGroupItem = {
+        const manageColumnsItem = {text: i18n('actions.manageColumns'), action: actions.alterTable};
+        const manageAutoPartitioningItem = {
+            text: i18n('actions.manageAutoPartitioning'),
+            action: actions.manageAutoPartitioning,
+        };
+        const manageReadReplicasItem = {
+            text: i18n('actions.manageReadReplicas'),
+            action: actions.manageReadReplicas,
+        };
+
+        const alterRowTableGroupItem = {
             text: i18n('actions.alterTable'),
-            items: [
-                {text: i18n('actions.manageColumns'), action: actions.alterTable},
-                {
-                    text: i18n('actions.manageAutoPartitioning'),
-                    action: actions.manageAutoPartitioning,
-                },
-                {
-                    text: i18n('actions.manageReadReplicas'),
-                    action: actions.manageReadReplicas,
-                },
-            ],
+            items: [manageColumnsItem, manageAutoPartitioningItem, manageReadReplicasItem],
+        };
+        const alterColumnTableGroupItem = {
+            text: i18n('actions.alterTable'),
+            items: [manageColumnsItem, manageAutoPartitioningItem],
         };
 
         let DB_SET: ActionsSet = [[copyItem, connectToDBItem], createEntitiesSet];
@@ -294,7 +298,7 @@ export const getActions =
         const ROW_TABLE_SET: ActionsSet = [
             [copyItem],
             [
-                alterTableGroupItem,
+                alterRowTableGroupItem,
                 {text: i18n('actions.dropTable'), action: actions.dropTable},
                 getActionWithLoader({
                     text: i18n('actions.selectQuery'),
@@ -315,7 +319,7 @@ export const getActions =
         const COLUMN_TABLE_SET: ActionsSet = [
             [copyItem],
             [
-                alterTableGroupItem,
+                alterColumnTableGroupItem,
                 {text: i18n('actions.dropTable'), action: actions.dropTable},
                 {text: i18n('actions.selectQuery'), action: actions.selectQuery},
                 {text: i18n('actions.upsertQuery'), action: actions.upsertQuery},
