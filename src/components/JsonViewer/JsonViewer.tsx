@@ -127,7 +127,6 @@ export function JsonViewer({
 
     return (
         <div className={block()}>
-            {/* @ts-ignore will be fixed shortly in library*/}
             <ReactUnipika
                 value={value}
                 renderToolbar={renderToolbar}

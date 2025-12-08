@@ -5,7 +5,7 @@
   "action_back": "Back",
   "description_search": "Search...",
   "description_matched-rows": "Matched rows",
-  "context_case-sensitive-search": "Case sensitive search enadled",
+  "context_case-sensitive-search": "Case sensitive search enabled",
   "context_case-sensitive-search-disabled": "Case sensitive search disabled",
   "description_unknown-error": "Unknown error while parsing data"
 }
