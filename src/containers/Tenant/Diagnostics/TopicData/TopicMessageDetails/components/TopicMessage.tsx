@@ -4,7 +4,6 @@ import {ArrowDownToLine} from '@gravity-ui/icons';
 import {ActionTooltip, Button, ClipboardButton, Flex, Icon, Text} from '@gravity-ui/uikit';
 
 import {JsonViewer} from '../../../../../../components/JsonViewer/JsonViewer';
-import {unipikaConvert} from '../../../../../../components/JsonViewer/unipika/unipika';
 import ShortyString from '../../../../../../components/ShortyString/ShortyString';
 import {createAndDownloadFile} from '../../../../../../utils/downloadFile';
 import {useTypedSelector} from '../../../../../../utils/hooks';
@@ -20,11 +19,12 @@ interface TopicMessageProps {
     message: string;
     offset?: string | number;
     size?: number;
+    scrollContainerRef: React.RefObject<HTMLDivElement>;
 }
 
-export function TopicMessage({offset, size, message}: TopicMessageProps) {
+export function TopicMessage({offset, size, message, scrollContainerRef}: TopicMessageProps) {
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
-    const {preparedMessage, decodedMessage, convertedMessage} = React.useMemo(() => {
+    const {preparedMessage, decodedMessage, isJson} = React.useMemo(() => {
         let preparedMessage = message;
         let decodedMessage = message;
         try {
@@ -45,26 +45,24 @@ export function TopicMessage({offset, size, message}: TopicMessageProps) {
             console.warn(e);
         }
 
-        let convertedMessage;
+        let isJson = false;
         if (typeof preparedMessage === 'object' && safeParseNumber(size) <= UNIPIKA_MAX_SIZE) {
-            convertedMessage = unipikaConvert(preparedMessage);
+            isJson = true;
         } else if (preparedMessage && typeof preparedMessage === 'object') {
             preparedMessage = JSON.stringify(preparedMessage, null, 2);
         }
 
-        return {preparedMessage, decodedMessage, convertedMessage};
+        return {preparedMessage, decodedMessage, isJson};
     }, [message, size]);
-
-    const isJson = Boolean(convertedMessage);
 
     const messageContent = isJson ? (
         <JsonViewer
             // key is used to reset JsonViewer state to collapsed due to performance issues on close fullscreen mode if nodes quantity is big enough https://github.com/ydb-platform/ydb-embedded-ui/issues/2265
             key={String(isFullscreen)}
             collapsedInitially
-            value={convertedMessage}
-            maxValueWidth={50}
+            value={preparedMessage}
             toolbarClassName={b('json-viewer-toolbar')}
+            scrollContainerRef={scrollContainerRef}
         />
     ) : (
         <div className={b('string-message')}>
@@ -102,6 +100,7 @@ export function TopicMessage({offset, size, message}: TopicMessageProps) {
             title={<MessageTitle truncated={truncated} />}
             renderToolbar={renderToolbar}
             className={b('message')}
+            scrollContainerRef={scrollContainerRef}
         >
             {messageContent}
         </TopicDataSection>

@@ -1,9 +1,7 @@
 @use '../../styles/mixins.scss';
 
 .ydb-json-viewer {
-    --data-table-row-height: 20px;
     --toolbar-background-color: var(--g-color-base-background);
-
     width: 100%;
 
     &__toolbar {
@@ -17,56 +15,32 @@
         background-color: var(--toolbar-background-color);
     }
 
-    &__content {
-        font-family: var(--g-font-family-monospace);
-    }
-
-    &__row {
-        height: 1em;
-    }
-
-    &__cell {
-        position: relative;
-
-        white-space: nowrap !important;
-        * {
-            white-space: nowrap !important;
-        }
-    }
-
-    &__collapsed {
-        position: absolute;
-
-        margin-top: -2px;
-        margin-left: -3ex;
-    }
-
     &__match-counter {
         align-content: center;
 
         text-wrap: nowrap;
     }
-
-    &__key {
-        color: var(--g-color-text-misc);
-    }
-
-    &__value {
-        &_type {
-            &_string {
-                color: var(--color-unipika-string);
-            }
-            &_boolean {
-                color: var(--color-unipika-bool);
-            }
-            &_null {
-                color: var(--color-unipika-null);
-            }
-            &_int64 {
-                color: var(--color-unipika-int);
-            }
-            &_double {
-                color: var(--color-unipika-float);
+    .g-ru-cell {
+        &__key {
+            color: var(--g-color-text-misc);
+        }
+        &__value {
+            &_type {
+                &_string {
+                    color: var(--color-unipika-string);
+                }
+                &_boolean {
+                    color: var(--color-unipika-bool);
+                }
+                &_null {
+                    color: var(--color-unipika-null);
+                }
+                &_int64 {
+                    color: var(--color-unipika-int);
+                }
+                &_double {
+                    color: var(--color-unipika-float);
+                }
             }
         }
     }
@@ -77,39 +51,7 @@
         width: 300px;
     }
 
-    &__filtered {
-        &_highlighted {
-            background-color: var(--g-color-base-generic-medium);
-        }
-        &_clickable {
-            cursor: pointer;
-
-            color: var(--g-color-text-info);
-        }
-    }
-
     &__match-btn {
         margin-left: -1px;
-    }
-
-    &__full-value {
-        overflow: hidden auto;
-
-        max-width: 90vw;
-        max-height: 90vh;
-        margin: var(--g-spacing-3) 0;
-
-        word-break: break-all;
-        @include mixins.body-2-typography();
-    }
-
-    .data-table__head {
-        display: none;
-    }
-
-    .data-table__td {
-        overflow: visible;
-
-        padding: 0;
     }
 }
