@@ -163,7 +163,12 @@ function Diagnostics({additionalTenantProps}: DiagnosticsProps) {
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.describe: {
                 return (
-                    <Describe path={path} databaseFullPath={databaseFullPath} database={database} />
+                    <Describe
+                        path={path}
+                        databaseFullPath={databaseFullPath}
+                        database={database}
+                        scrollContainerRef={containerRef}
+                    />
                 );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.hotKeys: {
@@ -207,7 +212,7 @@ function Diagnostics({additionalTenantProps}: DiagnosticsProps) {
                 );
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.configs: {
-                return <Configs database={database} />;
+                return <Configs database={database} scrollContainerRef={containerRef} />;
             }
             case TENANT_DIAGNOSTICS_TABS_IDS.operations: {
                 return <Operations database={database} scrollContainerRef={containerRef} />;
