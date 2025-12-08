@@ -24,18 +24,18 @@ export function useStorageNodesSelectedColumns({
 }: GetStorageNodesColumnsParams) {
     const bridgeModeEnabled = useBridgeModeEnabled();
 
-    const [highlightedPDisk, setHighlightedPDisk] = React.useState<string | undefined>();
+    const [highlightedDisk, setHighlightedDisk] = React.useState<string | undefined>();
 
     const columns = React.useMemo(() => {
         const all = getStorageNodesColumns({
             database,
             viewContext,
             columnsSettings,
-            highlightedPDisk,
-            setHighlightedPDisk,
+            highlightedDisk,
+            setHighlightedDisk,
         });
         return bridgeModeEnabled ? all : all.filter((c) => c.name !== NODES_COLUMNS_IDS.PileName);
-    }, [database, viewContext, columnsSettings, bridgeModeEnabled, highlightedPDisk]);
+    }, [database, viewContext, columnsSettings, bridgeModeEnabled, highlightedDisk]);
 
     const requiredColumns = React.useMemo(() => {
         if (visibleEntities === VISIBLE_ENTITIES.missing) {

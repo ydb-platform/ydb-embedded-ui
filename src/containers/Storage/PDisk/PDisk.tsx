@@ -33,8 +33,8 @@ interface PDiskProps {
     withIcon?: boolean;
     highlighted?: boolean;
     darkened?: boolean;
-    highlightedPDisk?: string;
-    setHighlightedPDisk?: (id?: string) => void;
+    highlightedDisk?: string;
+    setHighlightedDisk?: (id?: string) => void;
 }
 
 export const PDisk = ({
@@ -52,8 +52,8 @@ export const PDisk = ({
     withIcon,
     highlighted,
     darkened,
-    highlightedPDisk,
-    setHighlightedPDisk,
+    highlightedDisk,
+    setHighlightedDisk,
 }: PDiskProps) => {
     const {NodeId, PDiskId} = data;
     const pDiskIdsDefined = !isNil(NodeId) && !isNil(PDiskId);
@@ -68,8 +68,8 @@ export const PDisk = ({
             <div className={b('vdisks')}>
                 {vDisks.map((vdisk) => {
                     const vDiskId = vdisk.StringifiedId;
-                    const vDiskHighlighted = highlightedPDisk === vDiskId;
-                    const vDiskDarkened = Boolean(highlightedPDisk && highlightedPDisk !== vDiskId);
+                    const vDiskHighlighted = highlightedDisk === vDiskId;
+                    const vDiskDarkened = Boolean(highlightedDisk && highlightedDisk !== vDiskId);
 
                     return (
                         <div
@@ -89,8 +89,8 @@ export const PDisk = ({
                                 delayOpen={delayOpen}
                                 delayClose={delayClose}
                                 showPopup={vDiskHighlighted}
-                                onShowPopup={() => setHighlightedPDisk?.(vDiskId)}
-                                onHidePopup={() => setHighlightedPDisk?.(undefined)}
+                                onShowPopup={() => setHighlightedDisk?.(vDiskId)}
+                                onHidePopup={() => setHighlightedDisk?.(undefined)}
                                 highlighted={vDiskHighlighted}
                                 darkened={vDiskDarkened}
                             />
