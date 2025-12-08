@@ -1,5 +1,19 @@
 # Changelog
 
+## [12.26.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.25.0...v12.26.0) (2025-12-08)
+
+
+### Features
+
+* add bonus scoring for ":heart: xeno" and "feedback" labels ([#3181](https://github.com/ydb-platform/ydb-embedded-ui/issues/3181)) ([0ded083](https://github.com/ydb-platform/ydb-embedded-ui/commit/0ded083945b66fc0385143c21f7042feb0fb7222))
+* use react-unipika library ([#3186](https://github.com/ydb-platform/ydb-embedded-ui/issues/3186)) ([c8c5241](https://github.com/ydb-platform/ydb-embedded-ui/commit/c8c5241073772e62de7691676af3993c33e221fc))
+
+
+### Bug Fixes
+
+* open cluster page in same tab ([#3179](https://github.com/ydb-platform/ydb-embedded-ui/issues/3179)) ([e5b243a](https://github.com/ydb-platform/ydb-embedded-ui/commit/e5b243a8af45516b400be579182d8b6f2bfd5cb3))
+* success workaround for operations list ([#3176](https://github.com/ydb-platform/ydb-embedded-ui/issues/3176)) ([114d92d](https://github.com/ydb-platform/ydb-embedded-ui/commit/114d92d15542c9eba7aefc8582bb3e65fe65dfd3))
+
 ## [12.25.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.24.1...v12.25.0) (2025-12-04)
 
 
