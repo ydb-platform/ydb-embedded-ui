@@ -89,11 +89,11 @@ export class SettingsDialog {
         return options;
     }
 
-    async changeResourcePool(value: string) {
+    async changeResourcePool(label: string) {
         await this.resourcePoolSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.resourcePoolSelect.click();
         await this.selectPopup.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await this.page.locator(`.ydb-query-settings-select__item_type_${value}`).click();
+        await this.selectPopup.getByText(label, {exact: true}).click();
         await this.page.waitForTimeout(1000);
     }
 

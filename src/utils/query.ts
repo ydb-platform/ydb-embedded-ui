@@ -306,6 +306,8 @@ export const defaultPragma = 'PRAGMA OrderedColumns;';
 // Special marker meaning "do not override resource pool in request params"
 export const RESOURCE_POOL_NO_OVERRIDE_VALUE = '__no_pool_override__';
 
+export type ResourcePoolValue = typeof RESOURCE_POOL_NO_OVERRIDE_VALUE | string;
+
 export const DEFAULT_QUERY_SETTINGS = {
     queryMode: QUERY_MODES.query,
     transactionMode: TRANSACTION_MODES.implicit,

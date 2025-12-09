@@ -20,6 +20,7 @@ import {
     useTypedDispatch,
     useTypedSelector,
 } from '../../../../utils/hooks';
+import type {ResourcePoolValue} from '../../../../utils/query';
 import {
     QUERY_MODES,
     RESOURCE_POOL_NO_OVERRIDE_VALUE,
@@ -166,7 +167,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                             name="resourcePool"
                             control={control}
                             render={({field}) => (
-                                <QuerySettingsSelect<string>
+                                <QuerySettingsSelect<ResourcePoolValue>
                                     id="resourcePool"
                                     setting={field.value ?? RESOURCE_POOL_NO_OVERRIDE_VALUE}
                                     disabled={

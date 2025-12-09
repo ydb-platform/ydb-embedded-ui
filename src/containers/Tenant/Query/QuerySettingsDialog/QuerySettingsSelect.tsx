@@ -8,6 +8,7 @@ import type {
     TransactionMode,
 } from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
+import type {ResourcePoolValue} from '../../../../utils/query';
 
 import i18n from './i18n';
 
@@ -19,7 +20,7 @@ export const getOptionHeight = () => -1;
 
 const b = cn('ydb-query-settings-select');
 
-type SelectType = QueryMode | TransactionMode | StatisticsMode | TracingLevel | string;
+type SelectType = QueryMode | TransactionMode | StatisticsMode | TracingLevel | ResourcePoolValue;
 type QuerySettingSelectOption<T> = SelectOption<T> & {isDefault?: boolean};
 
 interface QuerySettingsSelectProps<T extends SelectType> {
