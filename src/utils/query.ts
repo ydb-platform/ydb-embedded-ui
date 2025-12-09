@@ -314,6 +314,7 @@ export const DEFAULT_QUERY_SETTINGS = {
     statisticsMode: STATISTICS_MODES.none,
     tracingLevel: TRACING_LEVELS.off,
     pragmas: defaultPragma,
+    resourcePool: RESOURCE_POOL_NO_OVERRIDE_VALUE,
 };
 
 export const queryModeSchema = z.nativeEnum(QUERY_MODES);
