@@ -31,6 +31,43 @@ const WIDTH_PREDICTION_ROWS_COUNT = 100;
 type RenderCellArgs = {row: KeyValueRow; columnName: string};
 type RenderCell = (args: RenderCellArgs) => React.ReactNode;
 
+interface CreateRenderCellParams {
+    activeCellRef: React.RefObject<{
+        row: KeyValueRow;
+        columnName: string;
+    } | null>;
+    setActiveCell: React.Dispatch<
+        React.SetStateAction<{
+            row: KeyValueRow;
+            columnName: string;
+        } | null>
+    >;
+}
+
+function createRenderCell({activeCellRef, setActiveCell}: CreateRenderCellParams): RenderCell {
+    return ({row, columnName}: RenderCellArgs) => {
+        const isActive = Boolean(
+            activeCellRef.current &&
+                activeCellRef.current.row === row &&
+                activeCellRef.current.columnName === columnName,
+        );
+
+        const value = row[columnName];
+
+        const onToggle = React.useCallback(() => {
+            setActiveCell((prev) => {
+                if (prev && prev.row === row && prev.columnName === columnName) {
+                    return null;
+                }
+
+                return {row, columnName};
+            });
+        }, [row, columnName]);
+
+        return <Cell value={String(value)} isActive={isActive} onToggle={onToggle} />;
+    };
+}
+
 const prepareTypedColumns = (
     columns: ColumnType[],
     data: KeyValueRow[] | undefined,
@@ -104,31 +141,10 @@ export const QueryResultTable = (props: QueryResultTableProps) => {
         activeCellRef.current = activeCell;
     }, [activeCell]);
 
-    const renderCell = React.useCallback(({row, columnName}: RenderCellArgs) => {
-        const isActive = Boolean(
-            activeCellRef.current &&
-                activeCellRef.current.row === row &&
-                activeCellRef.current.columnName === columnName,
-        );
-
-        const value = row[columnName];
-
-        return (
-            <Cell
-                value={String(value)}
-                isActive={isActive}
-                onToggle={() => {
-                    setActiveCell((prev) => {
-                        if (prev && prev.row === row && prev.columnName === columnName) {
-                            return null;
-                        }
-
-                        return {row, columnName};
-                    });
-                }}
-            />
-        );
-    }, []);
+    const renderCell = React.useMemo(
+        () => createRenderCell({activeCellRef, setActiveCell}),
+        [setActiveCell],
+    );
 
     const preparedColumns = React.useMemo(() => {
         return columns

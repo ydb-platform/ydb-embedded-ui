@@ -1,32 +1,32 @@
 import React from 'react';
 
-import {Checkbox, Icon, Loader, Popup} from '@gravity-ui/uikit';
+import {Checkbox, Loader} from '@gravity-ui/uikit';
 import {Link} from 'react-router-dom';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
-import {Illustration} from '../../../../components/Illustration';
 import {ProblemFilter} from '../../../../components/ProblemFilter/ProblemFilter';
 import {getDefaultNodePath} from '../../../../routes';
 import {networkApi} from '../../../../store/reducers/network/network';
-import type {TNetNodeInfo, TNetNodePeerInfo} from '../../../../types/api/netInfo';
+import type {TNetNodeInfo} from '../../../../types/api/netInfo';
 import {cn} from '../../../../utils/cn';
 import {useAutoRefreshInterval} from '../../../../utils/hooks';
 import {useWithProblemsQueryParam} from '../../../../utils/hooks/useWithProblemsQueryParam';
 
-import {NodeNetwork} from './NodeNetwork/NodeNetwork';
-import {getConnectedNodesCount} from './utils';
-
-import networkIcon from '../../../../assets/icons/network.svg';
+import {NetworkPlaceholder} from './NetworkPlaceholder/NetworkPlaceholder';
+import {NodeTooltipPopup} from './NodeTooltipPopup/NodeTooltipPopup';
+import {Nodes} from './Nodes/Nodes';
+import i18n from './i18n';
+import {groupNodesByField} from './utils';
 
 import './Network.scss';
 
 const b = cn('network');
-const tooltipB = cn('node-tooltip');
 
 interface NetworkProps {
     database: string;
     databaseFullPath: string;
 }
+
 export function Network({database, databaseFullPath}: NetworkProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {withProblems, handleWithProblemsChange} = useWithProblemsQueryParam();
@@ -78,8 +78,11 @@ export function Network({database, databaseFullPath}: NetworkProps) {
         setNodeTooltip({anchor: null, data: null});
     }, []);
 
-    const nodesGroupedByType = groupNodesByField(nodes, 'NodeType');
-    const rightNodes = clickedNode ? groupNodesByField(clickedNode.Peers ?? [], 'NodeType') : {};
+    const nodesGroupedByType = React.useMemo(() => groupNodesByField(nodes, 'NodeType'), [nodes]);
+    const rightNodes = React.useMemo(
+        () => (clickedNode ? groupNodesByField(clickedNode.Peers ?? [], 'NodeType') : {}),
+        [clickedNode],
+    );
 
     if (loading) {
         return (
@@ -90,49 +93,15 @@ export function Network({database, databaseFullPath}: NetworkProps) {
     }
 
     if (!error && nodes.length === 0) {
-        return <div className="error">no nodes data</div>;
+        return <div className="error">{i18n('description_no-nodes-data')}</div>;
     }
 
     return (
         <div className={b()}>
-            {nodeTooltip.anchor && nodeTooltip.data ? (
-                <Popup
-                    open
-                    hasArrow
-                    placement={['top', 'bottom', 'left', 'right']}
-                    anchorElement={nodeTooltip.anchor}
-                    onOutsideClick={() => {
-                        setNodeTooltip({anchor: null, data: null});
-                    }}
-                >
-                    <div className={tooltipB()}>
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <td className={tooltipB('label')}>ID</td>
-                                    <td className={tooltipB('value')}>
-                                        {nodeTooltip.data.nodeId || '?'}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td className={tooltipB('label')}>Rack</td>
-                                    <td className={tooltipB('value')}>
-                                        {nodeTooltip.data.rack || '?'}
-                                    </td>
-                                </tr>
-                                {nodeTooltip.data.connected && nodeTooltip.data.capacity ? (
-                                    <tr>
-                                        <td className={tooltipB('label')}>Net</td>
-                                        <td className={tooltipB('value')}>
-                                            {`${nodeTooltip.data.connected} / ${nodeTooltip.data.capacity}`}
-                                        </td>
-                                    </tr>
-                                ) : null}
-                            </tbody>
-                        </table>
-                    </div>
-                </Popup>
-            ) : null}
+            <NodeTooltipPopup
+                nodeTooltip={nodeTooltip}
+                onClose={() => setNodeTooltip({anchor: null, data: null})}
+            />
             {error ? <ResponseError error={error} /> : null}
             {nodes.length > 0 ? (
                 <div className={b('inner')}>
@@ -152,7 +121,7 @@ export function Network({database, databaseFullPath}: NetworkProps) {
                                             }}
                                             checked={showId}
                                         >
-                                            ID
+                                            {i18n('field_id')}
                                         </Checkbox>
                                     </div>
                                     <div className={b('checkbox-wrapper')}>
@@ -162,7 +131,7 @@ export function Network({database, databaseFullPath}: NetworkProps) {
                                             }}
                                             checked={showRacks}
                                         >
-                                            Racks
+                                            {i18n('label_racks')}
                                         </Checkbox>
                                     </div>
                                 </div>
@@ -182,14 +151,14 @@ export function Network({database, databaseFullPath}: NetworkProps) {
                             {clickedNode ? (
                                 <div>
                                     <div className={b('label')}>
-                                        Connectivity of node{' '}
+                                        {i18n('label_connectivity')}{' '}
                                         <Link
                                             className={b('link')}
                                             to={getDefaultNodePath({id: clickedNode.NodeId})}
                                         >
                                             {clickedNode.NodeId}
                                         </Link>{' '}
-                                        to other nodes
+                                        {i18n('label_to-other-nodes')}
                                     </div>
                                     <div className={b('nodes-row')}>
                                         <Nodes
@@ -205,15 +174,7 @@ export function Network({database, databaseFullPath}: NetworkProps) {
                                     </div>
                                 </div>
                             ) : (
-                                <div className={b('placeholder')}>
-                                    <div className={b('placeholder-img')}>
-                                        <Icon data={networkIcon} width={221} height={204} />
-                                    </div>
-
-                                    <div className={b('placeholder-text')}>
-                                        Select node to see its connectivity to other nodes
-                                    </div>
-                                </div>
+                                <NetworkPlaceholder />
                             )}
                         </div>
                     </div>
@@ -221,180 +182,4 @@ export function Network({database, databaseFullPath}: NetworkProps) {
             ) : null}
         </div>
     );
-}
-
-interface NodesProps {
-    nodes: Record<string, (TNetNodeInfo | TNetNodePeerInfo)[]>;
-    isRight?: boolean;
-    showId?: boolean;
-    showRacks?: boolean;
-    clickedNode?: TNetNodeInfo;
-    onClickNode: (node: TNetNodeInfo | undefined) => void;
-}
-function Nodes({
-    nodes,
-    isRight,
-    showId,
-    showRacks,
-    clickedNode,
-    onClickNode,
-    onShowNodeTooltip,
-    onHideNodeTooltip,
-}: NodesProps & {
-    onShowNodeTooltip: (
-        anchor: HTMLDivElement,
-        data: {
-            nodeId: number | string;
-            connected?: number;
-            capacity?: number;
-            rack: string;
-        },
-    ) => void;
-    onHideNodeTooltip: () => void;
-}) {
-    const {withProblems} = useWithProblemsQueryParam();
-
-    let problemNodesCount = 0;
-    const result = Object.keys(nodes).map((key, j) => {
-        const nodesGroupedByRack = groupNodesByField(nodes[key], 'Rack');
-        return (
-            <div key={j} className={b('nodes-container', {right: isRight})}>
-                <div className={b('nodes-title')}>{key} nodes</div>
-                <div className={b('nodes')}>
-                    {showRacks
-                        ? Object.keys(nodesGroupedByRack).map((key, i) => (
-                              <div key={i} className={b('rack-column')}>
-                                  <div className={b('rack-index')}>
-                                      {key === 'undefined' ? '?' : key}
-                                  </div>
-                                  {nodesGroupedByRack[key].map((nodeInfo, index) => {
-                                      let capacity, connected;
-                                      if (!isRight && 'Peers' in nodeInfo && nodeInfo.Peers) {
-                                          capacity = Object.keys(nodeInfo.Peers).length;
-                                          connected = getConnectedNodesCount(nodeInfo.Peers);
-                                      }
-
-                                      if (
-                                          (withProblems && capacity !== connected) ||
-                                          !withProblems ||
-                                          isRight
-                                      ) {
-                                          problemNodesCount++;
-                                          return (
-                                              <NodeNetwork
-                                                  key={index}
-                                                  nodeId={nodeInfo.NodeId}
-                                                  showID={showId}
-                                                  rack={nodeInfo.Rack}
-                                                  status={
-                                                      'ConnectStatus' in nodeInfo
-                                                          ? nodeInfo.ConnectStatus
-                                                          : undefined
-                                                  }
-                                                  capacity={capacity}
-                                                  connected={connected}
-                                                  onMouseEnter={onShowNodeTooltip}
-                                                  onMouseLeave={onHideNodeTooltip}
-                                                  onClick={
-                                                      isRight
-                                                          ? undefined
-                                                          : () => {
-                                                                onClickNode(
-                                                                    clickedNode &&
-                                                                        nodeInfo.NodeId ===
-                                                                            clickedNode.NodeId
-                                                                        ? undefined
-                                                                        : (nodeInfo as TNetNodeInfo),
-                                                                );
-                                                            }
-                                                  }
-                                                  isBlurred={
-                                                      !isRight &&
-                                                      clickedNode &&
-                                                      clickedNode.NodeId !== nodeInfo.NodeId
-                                                  }
-                                              />
-                                          );
-                                      }
-                                      return null;
-                                  })}
-                              </div>
-                          ))
-                        : nodes[key].map((nodeInfo, index) => {
-                              let capacity, connected;
-                              const peers =
-                                  nodeInfo && 'Peers' in nodeInfo ? nodeInfo.Peers : undefined;
-                              if (!isRight && 'Peers' in nodeInfo && nodeInfo.Peers) {
-                                  capacity = nodeInfo.Peers.length;
-                                  connected = getConnectedNodesCount(peers);
-                              }
-
-                              if (
-                                  (withProblems && capacity !== connected) ||
-                                  !withProblems ||
-                                  isRight
-                              ) {
-                                  problemNodesCount++;
-                                  return (
-                                      <NodeNetwork
-                                          key={index}
-                                          nodeId={nodeInfo.NodeId}
-                                          showID={showId}
-                                          rack={nodeInfo.Rack}
-                                          status={
-                                              'ConnectStatus' in nodeInfo
-                                                  ? nodeInfo.ConnectStatus
-                                                  : undefined
-                                          }
-                                          capacity={peers?.length}
-                                          connected={connected}
-                                          onMouseEnter={onShowNodeTooltip}
-                                          onMouseLeave={onHideNodeTooltip}
-                                          onClick={
-                                              isRight
-                                                  ? undefined
-                                                  : () => {
-                                                        onClickNode(
-                                                            clickedNode &&
-                                                                nodeInfo.NodeId ===
-                                                                    clickedNode.NodeId
-                                                                ? undefined
-                                                                : (nodeInfo as TNetNodeInfo),
-                                                        );
-                                                    }
-                                          }
-                                          isBlurred={
-                                              !isRight &&
-                                              clickedNode &&
-                                              clickedNode.NodeId !== nodeInfo.NodeId
-                                          }
-                                      />
-                                  );
-                              }
-                              return null;
-                          })}
-                </div>
-            </div>
-        );
-    });
-
-    if (withProblems && problemNodesCount === 0) {
-        return <Illustration name="thumbsUp" width={200} />;
-    } else {
-        return result;
-    }
-}
-
-function groupNodesByField<T extends Pick<TNetNodeInfo, 'NodeType' | 'Rack'>>(
-    nodes: T[],
-    field: 'NodeType' | 'Rack',
-) {
-    return nodes.reduce<Record<string, T[]>>((acc, node) => {
-        if (acc[node[field]]) {
-            acc[node[field]].push(node);
-        } else {
-            acc[node[field]] = [node];
-        }
-        return acc;
-    }, {});
 }

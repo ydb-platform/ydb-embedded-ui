@@ -7,6 +7,8 @@ import {cn} from '../../../utils/cn';
 import {formatNumber} from '../../../utils/dataFormatters/dataFormatters';
 import {getColorRange, getCurrentMetricLimits} from '../util';
 
+import i18n from './i18n';
+
 import './Histogram.scss';
 
 const b = cn('histogram');
@@ -34,15 +36,15 @@ const HistogramTooltipContent = ({data}: HistogramTooltipContentProps) => {
             <table>
                 <tbody>
                     <tr>
-                        <td className={tooltipB('label')}>Count</td>
+                        <td className={tooltipB('label')}>{i18n('label_count')}</td>
                         <td className={tooltipB('value')}>{count || '?'}</td>
                     </tr>
                     <tr>
-                        <td className={tooltipB('label')}>From</td>
+                        <td className={tooltipB('label')}>{i18n('label_from')}</td>
                         <td className={tooltipB('value')}>{leftBound || '?'}</td>
                     </tr>
                     <tr>
-                        <td className={tooltipB('label')}>To</td>
+                        <td className={tooltipB('label')}>{i18n('label_to')}</td>
                         <td className={tooltipB('value')}>{rightBound || '?'}</td>
                     </tr>
                 </tbody>
@@ -110,50 +112,62 @@ export interface HistogramProps {
 export const Histogram = ({tablets, currentMetric}: HistogramProps) => {
     const {min, max} = getCurrentMetricLimits(currentMetric, tablets);
 
-    const histogramColorRange = getColorRange(50);
-    const step = (max - min) / 50;
+    const {histogramRange, maxCount} = React.useMemo(() => {
+        const histogramColorRange = getColorRange(50);
+        const step = (max - min) / 50;
 
-    const histogramRange: HistogramBarData[] = histogramColorRange.map((item, index) => {
-        return {
-            color: item,
-            count: 0,
-            leftBound: formatNumber(min + index * step),
-            rightBound: formatNumber(min + (index + 1) * step),
-        };
-    });
-
-    let maxCount = 0;
-
-    tablets.forEach((tablet) => {
-        const value = currentMetric && Number(tablet.metrics?.[currentMetric]);
-        const bucketIndex = Math.floor((value as number) / step);
-        const currentBucket = histogramRange[bucketIndex];
-        const nextCountValue = (currentBucket?.count || 0) + 1;
-
-        if (nextCountValue > maxCount) {
-            maxCount = nextCountValue;
+        if (step === 0 || !isFinite(step)) {
+            // Handle edge case where all values are the same
+            return {histogramRange: [], maxCount: 0};
         }
 
-        if (currentBucket) {
-            histogramRange[bucketIndex] = {
-                ...currentBucket,
-                count: nextCountValue,
+        const range: HistogramBarData[] = histogramColorRange.map((item, index) => {
+            return {
+                color: item,
+                count: 0,
+                leftBound: formatNumber(min + index * step),
+                rightBound: formatNumber(min + (index + 1) * step),
             };
-        }
-    });
+        });
+
+        let currentMaxCount = 0;
+
+        tablets.forEach((tablet) => {
+            const value = currentMetric && Number(tablet.metrics?.[currentMetric]);
+            const bucketIndex = Math.floor((value as number) / step);
+            const currentBucket = range[bucketIndex];
+            const nextCountValue = (currentBucket?.count || 0) + 1;
+
+            if (nextCountValue > currentMaxCount) {
+                currentMaxCount = nextCountValue;
+            }
+
+            if (currentBucket) {
+                range[bucketIndex] = {
+                    ...currentBucket,
+                    count: nextCountValue,
+                };
+            }
+        });
+
+        return {histogramRange: range, maxCount: currentMaxCount};
+    }, [tablets, currentMetric, min, max]);
 
     const [tooltipState, setTooltipState] = React.useState<HistogramTooltipState>({
         anchor: null,
         data: null,
     });
 
-    const handleShowTooltip = (anchor: HTMLElement, data: HistogramTooltipData) => {
-        setTooltipState({anchor, data});
-    };
+    const handleShowTooltip = React.useCallback(
+        (anchor: HTMLElement, data: HistogramTooltipData) => {
+            setTooltipState({anchor, data});
+        },
+        [],
+    );
 
-    const handleHideTooltip = () => {
+    const handleHideTooltip = React.useCallback(() => {
         setTooltipState({anchor: null, data: null});
-    };
+    }, []);
 
     const renderHistogramItem = (item: HistogramBarData, index: number) => {
         return (
