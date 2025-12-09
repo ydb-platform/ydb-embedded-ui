@@ -1,8 +1,8 @@
 import React from 'react';
 
 import {EFlag} from '../../../../../types/api/enums';
-import type {ITooltipTemplateType} from '../../../../../types/store/tooltip';
 import {cn} from '../../../../../utils/cn';
+import type {NodeTooltipData} from '../NodeTooltipPopup/NodeTooltipPopup';
 
 import './NodeNetwork.scss';
 
@@ -24,7 +24,7 @@ function getNodeModifier(connected = 0, capacity = 0) {
 function noop() {}
 
 interface NodeNetworkProps {
-    onMouseEnter?: (node: HTMLDivElement, data: any, type: ITooltipTemplateType) => void;
+    onMouseEnter?: (node: HTMLDivElement, data: NodeTooltipData) => void;
     onMouseLeave?: () => void;
     nodeId: number | string;
     connected?: number;
@@ -60,7 +60,9 @@ export function NodeNetwork({
                 blur: isBlurred,
             })}
             onMouseEnter={() => {
-                onMouseEnter(ref.current!, {nodeId, connected, capacity, rack}, 'node');
+                if (ref.current) {
+                    onMouseEnter(ref.current, {nodeId, connected, capacity, rack});
+                }
             }}
             onMouseLeave={() => {
                 onMouseLeave();
