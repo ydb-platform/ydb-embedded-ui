@@ -10,6 +10,7 @@
   "form.output.chunk.max.size.bytes": "байт",
   "form.pragmas": "Прагмы",
   "form.resource-pool": "Пул ресурсов",
+  "form.resource-pool.no-override": "Без переопределения пула",
   "tooltip_plan-to-svg-statistics": "Опция статистики установлена в значение \"Full\" из-за включенного эксперимента \"Execution plan\".\n Чтобы отключить его, перейдите в раздел \"Experiments\" в настройках пользователя.",
   "button-done": "Готово",
   "button-cancel": "Отменить",

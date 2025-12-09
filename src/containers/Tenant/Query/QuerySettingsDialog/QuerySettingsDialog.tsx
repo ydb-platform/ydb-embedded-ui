@@ -151,8 +151,8 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                     settingOptions={[
                                         {
                                             value: '' as never,
-                                            content: `${QUERY_SETTINGS_FIELD_SETTINGS.resourcePool.title}${i18n('description.default')}`,
-                                            text: '',
+                                            content: i18n('form.resource-pool.no-override'),
+                                            text: i18n('form.resource-pool.no-override'),
                                             isDefault: true,
                                         },
                                         ...(resourcePools.map(
