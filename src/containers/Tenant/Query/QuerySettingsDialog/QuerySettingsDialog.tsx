@@ -20,7 +20,11 @@ import {
     useTypedDispatch,
     useTypedSelector,
 } from '../../../../utils/hooks';
-import {QUERY_MODES, querySettingsValidationSchema} from '../../../../utils/query';
+import {
+    QUERY_MODES,
+    RESOURCE_POOL_NO_OVERRIDE_VALUE,
+    querySettingsValidationSchema,
+} from '../../../../utils/query';
 import {useCurrentSchema} from '../../TenantContext';
 
 import {QuerySettingsSelect} from './QuerySettingsSelect';
@@ -31,8 +35,6 @@ import i18n from './i18n';
 import './QuerySettingsDialog.scss';
 
 const b = cn('ydb-query-settings-dialog');
-
-const RESOURCE_POOL_NO_OVERRIDE_VALUE = '__no_pool_override__';
 
 export function QuerySettingsDialog() {
     const dispatch = useTypedDispatch();
@@ -149,13 +151,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                         !resourcePools.length ||
                                         queryMode === QUERY_MODES.pg
                                     }
-                                    onUpdateSetting={(value) =>
-                                        field.onChange(
-                                            value === RESOURCE_POOL_NO_OVERRIDE_VALUE
-                                                ? undefined
-                                                : value,
-                                        )
-                                    }
+                                    onUpdateSetting={(value) => field.onChange(value)}
                                     settingOptions={[
                                         {
                                             value: RESOURCE_POOL_NO_OVERRIDE_VALUE,

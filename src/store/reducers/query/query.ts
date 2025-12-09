@@ -10,7 +10,11 @@ import {
     QUERY_EDITOR_DIRTY_KEY,
     QUERY_TECHNICAL_MARK,
 } from '../../../utils/constants';
-import {isQueryErrorResponse, parseQueryAPIResponse} from '../../../utils/query';
+import {
+    RESOURCE_POOL_NO_OVERRIDE_VALUE,
+    isQueryErrorResponse,
+    parseQueryAPIResponse,
+} from '../../../utils/query';
 import {isNumeric} from '../../../utils/utils';
 import type {RootState} from '../../defaultStore';
 import {api} from '../api';
@@ -209,7 +213,10 @@ export const queryApi = api.injectEndpoints({
                                 : undefined,
                             concurrent_results: DEFAULT_CONCURRENT_RESULTS || undefined,
                             base64,
-                            resource_pool: querySettings.resourcePool || undefined,
+                            resource_pool:
+                                querySettings.resourcePool === RESOURCE_POOL_NO_OVERRIDE_VALUE
+                                    ? undefined
+                                    : querySettings.resourcePool,
                         },
                         {
                             signal,
@@ -314,7 +321,10 @@ export const queryApi = api.injectEndpoints({
                                 : undefined,
                             query_id: queryId,
                             base64,
-                            resource_pool: querySettings.resourcePool || undefined,
+                            resource_pool:
+                                querySettings.resourcePool === RESOURCE_POOL_NO_OVERRIDE_VALUE
+                                    ? undefined
+                                    : querySettings.resourcePool,
                         },
                         {signal},
                     );
