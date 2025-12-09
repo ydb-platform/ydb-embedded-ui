@@ -9,6 +9,7 @@
   "form.output.chunk.max.size": "Output chunk max size",
   "form.output.chunk.max.size.bytes": "bytes",
   "form.pragmas": "Pragmas",
+  "form.resource-pool": "Resource pool",
   "button-done": "Save",
   "tooltip_plan-to-svg-statistics": "Statistics option is set to \"Full\" due to the enabled \"Execution plan\" experiment.\n To disable it, go to the \"Experiments\" section in the user settings.",
   "button-cancel": "Cancel",

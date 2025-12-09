@@ -1,4 +1,4 @@
-import {prepareQueryWithPragmas} from '../utils';
+import {applyResourcePoolPragma, prepareQueryWithPragmas} from '../utils';
 
 describe('prepareQueryWithPragmas', () => {
     test('Should prepend pragmas correctly', () => {
@@ -26,5 +26,33 @@ describe('prepareQueryWithPragmas', () => {
         const expectedResult = prepareQueryWithPragmas(query, pragma);
 
         expect(expectedResult).toBe('PRAGMA OrderedColumns;\n\nSELECT * FROM table;');
+    });
+
+    test('applyResourcePoolPragma should prepend pragma for yql syntax', () => {
+        const query = 'SELECT * FROM table;';
+        const result = applyResourcePoolPragma(query, 'olap', 'yql_v1');
+
+        expect(result).toBe('PRAGMA ResourcePool = "olap";\n\nSELECT * FROM table;');
+    });
+
+    test('applyResourcePoolPragma should not change query when no resource pool is set', () => {
+        const query = 'SELECT * FROM table;';
+        const result = applyResourcePoolPragma(query, undefined, 'yql_v1');
+
+        expect(result).toBe(query);
+    });
+
+    test('applyResourcePoolPragma should not change query for pg syntax', () => {
+        const query = 'SELECT * FROM table;';
+        const result = applyResourcePoolPragma(query, 'olap', 'pg');
+
+        expect(result).toBe(query);
+    });
+
+    test('applyResourcePoolPragma should not duplicate existing ResourcePool pragma', () => {
+        const query = 'PRAGMA ResourcePool = "analytics";\n\nSELECT * FROM table;';
+        const result = applyResourcePoolPragma(query, 'olap', 'yql_v1');
+
+        expect(result).toBe(query);
     });
 });

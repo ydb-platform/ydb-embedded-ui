@@ -5,8 +5,12 @@ import {TracingLevelNumber} from '../../../types/api/query';
 import type {QueryAction, QueryRequestParams, QuerySettings} from '../../../types/store/query';
 import type {StreamDataChunk} from '../../../types/store/streaming';
 import {loadFromSessionStorage, saveToSessionStorage} from '../../../utils';
-import {QUERY_EDITOR_CURRENT_QUERY_KEY, QUERY_EDITOR_DIRTY_KEY} from '../../../utils/constants';
-import {isQueryErrorResponse} from '../../../utils/query';
+import {
+    QUERY_EDITOR_CURRENT_QUERY_KEY,
+    QUERY_EDITOR_DIRTY_KEY,
+    QUERY_TECHNICAL_MARK,
+} from '../../../utils/constants';
+import {isQueryErrorResponse, parseQueryAPIResponse} from '../../../utils/query';
 import {isNumeric} from '../../../utils/utils';
 import type {RootState} from '../../defaultStore';
 import {api} from '../api';
@@ -18,7 +22,11 @@ import {
     setStreamSession as setStreamSessionReducer,
 } from './streamingReducers';
 import type {QueryResult, QueryState, QueryStats} from './types';
-import {getActionAndSyntaxFromQueryMode, prepareQueryWithPragmas} from './utils';
+import {
+    applyResourcePoolPragma,
+    getActionAndSyntaxFromQueryMode,
+    prepareQueryWithPragmas,
+} from './utils';
 
 const rawQuery = loadFromSessionStorage(QUERY_EDITOR_CURRENT_QUERY_KEY);
 const input = typeof rawQuery === 'string' ? rawQuery : '';
@@ -119,6 +127,15 @@ export const {
     selectResultTab,
 } = slice.selectors;
 
+const getResourcePoolsQueryText = () => {
+    return `${QUERY_TECHNICAL_MARK}
+SELECT
+    Name
+FROM \`.sys/resource_pools\`
+ORDER BY Name
+`;
+};
+
 interface SendQueryParams extends QueryRequestParams {
     actionType?: QueryAction;
     queryId: string;
@@ -156,7 +173,11 @@ export const queryApi = api.injectEndpoints({
                     querySettings?.queryMode,
                 );
 
-                const finalQuery = prepareQueryWithPragmas(query, querySettings.pragmas);
+                const finalQuery = applyResourcePoolPragma(
+                    prepareQueryWithPragmas(query, querySettings.pragmas),
+                    querySettings.resourcePool,
+                    syntax,
+                );
 
                 try {
                     let streamDataChunkBatch: StreamDataChunk[] = [];
@@ -273,7 +294,11 @@ export const queryApi = api.injectEndpoints({
                     querySettings?.queryMode,
                 );
 
-                const finalQuery = prepareQueryWithPragmas(query, querySettings.pragmas);
+                const finalQuery = applyResourcePoolPragma(
+                    prepareQueryWithPragmas(query, querySettings.pragmas),
+                    querySettings.resourcePool,
+                    syntax,
+                );
 
                 try {
                     const timeStart = Date.now();
@@ -363,6 +388,35 @@ export const queryApi = api.injectEndpoints({
                         }),
                     );
                     return {error};
+                }
+            },
+        }),
+        getResourcePools: build.query<string[], {database: string}>({
+            queryFn: async ({database}, {signal}) => {
+                try {
+                    const response = await window.api.viewer.sendQuery(
+                        {
+                            query: getResourcePoolsQueryText(),
+                            database,
+                            action: 'execute-query',
+                            internal_call: true,
+                        },
+                        {signal, withRetries: true},
+                    );
+
+                    if (isQueryErrorResponse(response)) {
+                        return {error: response};
+                    }
+
+                    const data = parseQueryAPIResponse(response);
+                    const rows = data.resultSets?.[0]?.result || [];
+                    const pools = rows
+                        .map((row) => row && row.Name)
+                        .filter((name): name is string => Boolean(name));
+
+                    return {data: pools};
+                } catch (error) {
+                    return {error: error || 'Unauthorized'};
                 }
             },
         }),

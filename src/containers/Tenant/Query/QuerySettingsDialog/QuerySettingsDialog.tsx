@@ -5,6 +5,7 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import {Controller, useForm} from 'react-hook-form';
 
 import {useTracingLevelOptionAvailable} from '../../../../store/reducers/capabilities/hooks';
+import {queryApi} from '../../../../store/reducers/query/query';
 import {
     selectQueryAction,
     setQueryAction,
@@ -20,6 +21,7 @@ import {
     useTypedSelector,
 } from '../../../../utils/hooks';
 import {QUERY_MODES, querySettingsValidationSchema} from '../../../../utils/query';
+import {useCurrentSchema} from '../../TenantContext';
 
 import {QuerySettingsSelect} from './QuerySettingsSelect';
 import {QuerySettingsTimeout} from './QuerySettingsTimeout';
@@ -86,6 +88,14 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
     const [useShowPlanToSvg] = useSetting<boolean>(SETTING_KEYS.USE_SHOW_PLAN_SVG);
     const enableTracingLevel = useTracingLevelOptionAvailable();
     const [isQueryStreamingEnabled] = useQueryStreamingSetting();
+    const {database} = useCurrentSchema();
+    const {data: resourcePools = [], isLoading: isResourcePoolsLoading} =
+        queryApi.useGetResourcePoolsQuery(
+            {database},
+            {
+                skip: !database,
+            },
+        );
 
     const timeout = watch('timeout');
     const queryMode = watch('queryMode');
@@ -115,6 +125,45 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                         }
                                     }}
                                     settingOptions={QUERY_SETTINGS_FIELD_SETTINGS.queryMode.options}
+                                />
+                            )}
+                        />
+                    </div>
+                </Flex>
+                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
+                    <label htmlFor="resourcePool" className={b('field-title')}>
+                        {QUERY_SETTINGS_FIELD_SETTINGS.resourcePool.title}
+                    </label>
+                    <div className={b('control-wrapper')}>
+                        <Controller
+                            name="resourcePool"
+                            control={control}
+                            render={({field}) => (
+                                <QuerySettingsSelect
+                                    id="resourcePool"
+                                    setting={(field.value || '') as never}
+                                    disabled={
+                                        isResourcePoolsLoading ||
+                                        !resourcePools.length ||
+                                        queryMode === QUERY_MODES.pg
+                                    }
+                                    onUpdateSetting={(value) => field.onChange(value || undefined)}
+                                    settingOptions={[
+                                        {
+                                            value: '' as never,
+                                            content: `${QUERY_SETTINGS_FIELD_SETTINGS.resourcePool.title}${i18n('description.default')}`,
+                                            text: '',
+                                            isDefault: true,
+                                        },
+                                        ...(resourcePools.map(
+                                            (name) =>
+                                                ({
+                                                    value: name,
+                                                    content: name,
+                                                    text: name,
+                                                }) as never,
+                                        ) as never[]),
+                                    ]}
                                 />
                             )}
                         />
