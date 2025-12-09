@@ -209,7 +209,7 @@ export const queryApi = api.injectEndpoints({
                                 : undefined,
                             concurrent_results: DEFAULT_CONCURRENT_RESULTS || undefined,
                             base64,
-                            resource_pool: querySettings.resourcePool,
+                            resource_pool: querySettings.resourcePool || undefined,
                         },
                         {
                             signal,
@@ -314,7 +314,7 @@ export const queryApi = api.injectEndpoints({
                                 : undefined,
                             query_id: queryId,
                             base64,
-                            resource_pool: querySettings.resourcePool,
+                            resource_pool: querySettings.resourcePool || undefined,
                         },
                         {signal},
                     );
