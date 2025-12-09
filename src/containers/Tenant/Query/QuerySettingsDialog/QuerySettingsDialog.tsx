@@ -123,7 +123,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
     const queryMode = watch('queryMode');
 
     React.useEffect(() => {
-        if (isResourcePoolsLoading || !resourcePools.length) {
+        if (isResourcePoolsLoading) {
             return;
         }
 
@@ -131,7 +131,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
             return;
         }
 
-        if (!resourcePools.includes(resourcePool)) {
+        if (!resourcePools.length || !resourcePools.includes(resourcePool)) {
             setValue('resourcePool', RESOURCE_POOL_NO_OVERRIDE_VALUE);
         }
     }, [isResourcePoolsLoading, resourcePools, resourcePool, setValue]);
