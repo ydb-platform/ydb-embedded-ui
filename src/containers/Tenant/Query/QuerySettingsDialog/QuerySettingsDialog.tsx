@@ -161,7 +161,6 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                             value: RESOURCE_POOL_NO_OVERRIDE_VALUE,
                                             content: i18n('form.resource-pool.no-override'),
                                             text: i18n('form.resource-pool.no-override'),
-                                            isDefault: true,
                                         },
                                         ...resourcePools.map((name) => ({
                                             value: name,
