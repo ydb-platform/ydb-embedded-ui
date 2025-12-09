@@ -119,7 +119,22 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
     );
 
     const timeout = watch('timeout');
+    const resourcePool = watch('resourcePool');
     const queryMode = watch('queryMode');
+
+    React.useEffect(() => {
+        if (isResourcePoolsLoading || !resourcePools.length) {
+            return;
+        }
+
+        if (!resourcePool || resourcePool === RESOURCE_POOL_NO_OVERRIDE_VALUE) {
+            return;
+        }
+
+        if (!resourcePools.includes(resourcePool)) {
+            setValue('resourcePool', RESOURCE_POOL_NO_OVERRIDE_VALUE);
+        }
+    }, [isResourcePoolsLoading, resourcePools, resourcePool, setValue]);
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
