@@ -101,6 +101,22 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
             },
         );
 
+    const resourcePoolOptions = React.useMemo(
+        () => [
+            {
+                value: RESOURCE_POOL_NO_OVERRIDE_VALUE,
+                content: i18n('form.resource-pool.no-override'),
+                text: i18n('form.resource-pool.no-override'),
+            },
+            ...resourcePools.map((name) => ({
+                value: name,
+                content: name,
+                text: name,
+            })),
+        ],
+        [resourcePools],
+    );
+
     const timeout = watch('timeout');
     const queryMode = watch('queryMode');
 
@@ -127,6 +143,13 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                         } else if (mode === 'query') {
                                             setValue('timeout', null);
                                         }
+
+                                        if (mode === QUERY_MODES.pg) {
+                                            setValue(
+                                                'resourcePool',
+                                                RESOURCE_POOL_NO_OVERRIDE_VALUE,
+                                            );
+                                        }
                                     }}
                                     settingOptions={QUERY_SETTINGS_FIELD_SETTINGS.queryMode.options}
                                 />
@@ -152,18 +175,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                         queryMode === QUERY_MODES.pg
                                     }
                                     onUpdateSetting={(value) => field.onChange(value)}
-                                    settingOptions={[
-                                        {
-                                            value: RESOURCE_POOL_NO_OVERRIDE_VALUE,
-                                            content: i18n('form.resource-pool.no-override'),
-                                            text: i18n('form.resource-pool.no-override'),
-                                        },
-                                        ...resourcePools.map((name) => ({
-                                            value: name,
-                                            content: name,
-                                            text: name,
-                                        })),
-                                    ]}
+                                    settingOptions={resourcePoolOptions}
                                 />
                             )}
                         />

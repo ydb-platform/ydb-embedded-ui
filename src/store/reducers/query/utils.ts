@@ -78,23 +78,3 @@ export const prepareQueryWithPragmas = (query: string, pragmas?: string): string
 
     return `${trimmedPragmas}${separator}${query}`;
 };
-
-const RESOURCE_POOL_PRAGMA_REGEXP = /PRAGMA\s+ResourcePool\b/i;
-
-export const applyResourcePoolPragma = (
-    query: string,
-    resourcePool: string | undefined,
-    syntax: QuerySyntax,
-): string => {
-    if (!resourcePool || syntax !== 'yql_v1') {
-        return query;
-    }
-
-    if (RESOURCE_POOL_PRAGMA_REGEXP.test(query)) {
-        return query;
-    }
-
-    const pragmaLine = `PRAGMA ResourcePool = "${resourcePool}";`;
-
-    return `${pragmaLine}\n\n${query}`;
-};
