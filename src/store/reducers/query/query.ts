@@ -214,7 +214,8 @@ export const queryApi = api.injectEndpoints({
                             concurrent_results: DEFAULT_CONCURRENT_RESULTS || undefined,
                             base64,
                             resource_pool:
-                                querySettings.resourcePool === RESOURCE_POOL_NO_OVERRIDE_VALUE
+                                querySettings.resourcePool === RESOURCE_POOL_NO_OVERRIDE_VALUE ||
+                                !querySettings.resourcePool
                                     ? undefined
                                     : querySettings.resourcePool,
                         },
@@ -322,7 +323,8 @@ export const queryApi = api.injectEndpoints({
                             query_id: queryId,
                             base64,
                             resource_pool:
-                                querySettings.resourcePool === RESOURCE_POOL_NO_OVERRIDE_VALUE
+                                querySettings.resourcePool === RESOURCE_POOL_NO_OVERRIDE_VALUE ||
+                                !querySettings.resourcePool
                                     ? undefined
                                     : querySettings.resourcePool,
                         },

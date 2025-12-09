@@ -345,7 +345,7 @@ export const querySettingsValidationSchema = z.object({
     statisticsMode: statisticsModeSchema,
     tracingLevel: tracingLevelSchema,
     pragmas: z.string(),
-    resourcePool: z.string().optional(),
+    resourcePool: z.string(),
 });
 
 export const querySettingsRestoreSchema = z
@@ -367,6 +367,6 @@ export const querySettingsRestoreSchema = z
         statisticsMode: statisticsModeSchema.catch(DEFAULT_QUERY_SETTINGS.statisticsMode),
         tracingLevel: tracingLevelSchema.catch(DEFAULT_QUERY_SETTINGS.tracingLevel),
         pragmas: z.string().catch(DEFAULT_QUERY_SETTINGS.pragmas),
-        resourcePool: z.string().optional().catch(DEFAULT_QUERY_SETTINGS.resourcePool),
+        resourcePool: z.string().catch(DEFAULT_QUERY_SETTINGS.resourcePool),
     })
     .catch(DEFAULT_QUERY_SETTINGS);
