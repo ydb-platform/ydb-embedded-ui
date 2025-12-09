@@ -51,12 +51,23 @@
     }
 
     &__items {
+        position: relative;
+
         overflow: auto;
     }
     &__canvas-container {
         overflow: auto;
 
         cursor: pointer;
+    }
+
+    &__tooltip-anchor {
+        position: absolute;
+
+        width: 1px;
+        height: 1px;
+
+        pointer-events: none;
     }
 
     &__filters {

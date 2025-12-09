@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Checkbox, Popup, Select, useVirtualElementRef} from '@gravity-ui/uikit';
+import {Checkbox, Popup, Select} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {Loader} from '../../components/Loader';
@@ -37,10 +37,7 @@ export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
         position: {left: number; top: number};
     } | null>(null);
     const [isTabletTooltipHovered, setIsTabletTooltipHovered] = React.useState(false);
-
-    const tabletTooltipAnchorRef = useVirtualElementRef({
-        rect: tabletTooltip?.position,
-    });
+    const tabletTooltipAnchorRef = React.useRef<HTMLDivElement | null>(null);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
@@ -133,6 +130,16 @@ export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
 
         return (
             <div ref={itemsContainer} className={b('items')}>
+                {tabletTooltip ? (
+                    <div
+                        ref={tabletTooltipAnchorRef}
+                        className={b('tooltip-anchor')}
+                        style={{
+                            left: tabletTooltip.position.left,
+                            top: tabletTooltip.position.top,
+                        }}
+                    />
+                ) : null}
                 <HeatmapCanvas
                     tablets={sortedTablets}
                     parentRef={itemsContainer}
@@ -158,7 +165,7 @@ export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
                         open
                         hasArrow
                         placement={['top', 'bottom', 'left', 'right']}
-                        anchorRef={tabletTooltipAnchorRef}
+                        anchorElement={tabletTooltipAnchorRef.current}
                         onOutsideClick={handleHideTabletTooltip}
                     >
                         <div

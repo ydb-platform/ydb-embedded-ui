@@ -182,14 +182,17 @@ export const HeatmapCanvas = (props: HeatmapCanvasProps) => {
 
         if (tablet) {
             const {columnsCount} = dimensions;
+            if (!columnsCount) {
+                return;
+            }
             const colIndex = tabletIndex % columnsCount;
             const rowIndex = Math.floor(tabletIndex / columnsCount);
 
             const rectX = colIndex * (TABLET_SIZE + TABLET_PADDING);
             const rectY = rowIndex * (TABLET_SIZE + TABLET_PADDING);
 
-            const left = getOffsetLeft() - parent.scrollLeft + rectX + TABLET_SIZE / 2;
-            const top = getOffsetTop() - parent.scrollTop + rectY + TABLET_SIZE / 2;
+            const left = rectX + TABLET_SIZE / 2;
+            const top = rectY + TABLET_SIZE / 2;
 
             onShowTabletTooltip(tablet, {left, top});
         } else {
