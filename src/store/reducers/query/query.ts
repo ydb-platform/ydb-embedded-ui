@@ -416,7 +416,7 @@ export const queryApi = api.injectEndpoints({
 
                     return {data: pools};
                 } catch (error) {
-                    return {error: error || 'Unauthorized'};
+                    return {error};
                 }
             },
         }),
