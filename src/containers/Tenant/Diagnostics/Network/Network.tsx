@@ -57,7 +57,10 @@ export function Network({database, databaseFullPath}: NetworkProps) {
     const loading = isFetching && currentData === undefined;
 
     const netWorkInfo = currentData;
-    const nodes = (netWorkInfo?.Tenants && netWorkInfo.Tenants[0].Nodes) ?? [];
+    const nodes = React.useMemo(
+        () => (netWorkInfo?.Tenants && netWorkInfo.Tenants[0].Nodes) ?? [],
+        [netWorkInfo],
+    );
 
     const handleShowNodeTooltip = React.useCallback(
         (
@@ -98,10 +101,7 @@ export function Network({database, databaseFullPath}: NetworkProps) {
 
     return (
         <div className={b()}>
-            <NodeTooltipPopup
-                nodeTooltip={nodeTooltip}
-                onClose={() => setNodeTooltip({anchor: null, data: null})}
-            />
+            <NodeTooltipPopup nodeTooltip={nodeTooltip} onClose={handleHideNodeTooltip} />
             {error ? <ResponseError error={error} /> : null}
             {nodes.length > 0 ? (
                 <div className={b('inner')}>

@@ -28,23 +28,44 @@ export const b = cn('ydb-query-result-table');
 
 const WIDTH_PREDICTION_ROWS_COUNT = 100;
 
+type ActiveCellState = {
+    row: KeyValueRow;
+    columnName: string;
+} | null;
+
+type ActiveCellAction = {
+    type: 'toggle';
+    payload: {
+        row: KeyValueRow;
+        columnName: string;
+    };
+};
+
+function activeCellReducer(state: ActiveCellState, action: ActiveCellAction): ActiveCellState {
+    switch (action.type) {
+        case 'toggle':
+            if (
+                state &&
+                state.row === action.payload.row &&
+                state.columnName === action.payload.columnName
+            ) {
+                return null;
+            }
+            return action.payload;
+        default:
+            return state;
+    }
+}
+
 type RenderCellArgs = {row: KeyValueRow; columnName: string};
 type RenderCell = (args: RenderCellArgs) => React.ReactNode;
 
 interface CreateRenderCellParams {
-    activeCellRef: React.RefObject<{
-        row: KeyValueRow;
-        columnName: string;
-    } | null>;
-    setActiveCell: React.Dispatch<
-        React.SetStateAction<{
-            row: KeyValueRow;
-            columnName: string;
-        } | null>
-    >;
+    activeCellRef: React.RefObject<ActiveCellState>;
+    dispatch: React.Dispatch<ActiveCellAction>;
 }
 
-function createRenderCell({activeCellRef, setActiveCell}: CreateRenderCellParams): RenderCell {
+function createRenderCell({activeCellRef, dispatch}: CreateRenderCellParams): RenderCell {
     return ({row, columnName}: RenderCellArgs) => {
         const isActive = Boolean(
             activeCellRef.current &&
@@ -54,15 +75,12 @@ function createRenderCell({activeCellRef, setActiveCell}: CreateRenderCellParams
 
         const value = row[columnName];
 
-        const onToggle = React.useCallback(() => {
-            setActiveCell((prev) => {
-                if (prev && prev.row === row && prev.columnName === columnName) {
-                    return null;
-                }
-
-                return {row, columnName};
+        const onToggle = () => {
+            dispatch({
+                type: 'toggle',
+                payload: {row, columnName},
             });
-        }, [row, columnName]);
+        };
 
         return <Cell value={String(value)} isActive={isActive} onToggle={onToggle} />;
     };
@@ -127,24 +145,15 @@ interface QueryResultTableProps
 export const QueryResultTable = (props: QueryResultTableProps) => {
     const {columns, data, settings: propsSettings} = props;
 
-    const [activeCell, setActiveCell] = React.useState<{
-        row: KeyValueRow;
-        columnName: string;
-    } | null>(null);
+    const [activeCell, dispatch] = React.useReducer(activeCellReducer, null);
 
-    const activeCellRef = React.useRef<{
-        row: KeyValueRow;
-        columnName: string;
-    } | null>(null);
+    const activeCellRef = React.useRef<ActiveCellState>(null);
 
     React.useEffect(() => {
         activeCellRef.current = activeCell;
     }, [activeCell]);
 
-    const renderCell = React.useMemo(
-        () => createRenderCell({activeCellRef, setActiveCell}),
-        [setActiveCell],
-    );
+    const renderCell = React.useMemo(() => createRenderCell({activeCellRef, dispatch}), [dispatch]);
 
     const preparedColumns = React.useMemo(() => {
         return columns

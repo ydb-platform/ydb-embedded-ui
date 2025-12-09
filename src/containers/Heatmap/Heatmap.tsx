@@ -75,6 +75,15 @@ export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
         });
     }, [isTabletTooltipHovered]);
 
+    const handleTooltipMouseEnter = React.useCallback(() => {
+        setIsTabletTooltipHovered(true);
+    }, []);
+
+    const handleTooltipMouseLeave = React.useCallback(() => {
+        setIsTabletTooltipHovered(false);
+        handleHideTabletTooltip();
+    }, [handleHideTabletTooltip]);
+
     const handleMetricChange = (value: string[]) => {
         dispatch(
             setHeatmapOptions({
@@ -153,11 +162,8 @@ export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
                         onOutsideClick={handleHideTabletTooltip}
                     >
                         <div
-                            onMouseEnter={() => setIsTabletTooltipHovered(true)}
-                            onMouseLeave={() => {
-                                setIsTabletTooltipHovered(false);
-                                handleHideTabletTooltip();
-                            }}
+                            onMouseEnter={handleTooltipMouseEnter}
+                            onMouseLeave={handleTooltipMouseLeave}
                         >
                             <TabletTooltipContent data={tabletTooltip.tablet} />
                         </div>

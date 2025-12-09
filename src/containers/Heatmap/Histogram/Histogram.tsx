@@ -133,8 +133,16 @@ export const Histogram = ({tablets, currentMetric}: HistogramProps) => {
         let currentMaxCount = 0;
 
         tablets.forEach((tablet) => {
-            const value = currentMetric && Number(tablet.metrics?.[currentMetric]);
-            const bucketIndex = Math.floor((value as number) / step);
+            const rawValue = currentMetric && tablet.metrics?.[currentMetric];
+            const value = Number(rawValue);
+
+            // Skip invalid values (NaN, undefined, null, or out of range)
+            if (!isFinite(value) || value < min || value > max) {
+                return;
+            }
+
+            // Calculate bucket index with proper bounds checking
+            const bucketIndex = Math.min(Math.floor((value - min) / step), range.length - 1);
             const currentBucket = range[bucketIndex];
             const nextCountValue = (currentBucket?.count || 0) + 1;
 
