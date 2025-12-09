@@ -33,7 +33,7 @@ function _configureStore<
         preloadedState,
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
-                immutableCheck: checksDisabled || undefined,
+                immutableCheck: checksDisabled ? false : undefined,
                 serializableCheck: checksDisabled
                     ? false
                     : {

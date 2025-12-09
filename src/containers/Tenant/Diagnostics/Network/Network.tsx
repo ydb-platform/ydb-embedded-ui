@@ -21,7 +21,7 @@ import networkIcon from '../../../../assets/icons/network.svg';
 import './Network.scss';
 
 const b = cn('network');
-const tooltipB = cn('node-tootltip');
+const tooltipB = cn('node-tooltip');
 
 interface NetworkProps {
     database: string;

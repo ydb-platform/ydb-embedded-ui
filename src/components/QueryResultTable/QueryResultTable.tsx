@@ -95,32 +95,40 @@ export const QueryResultTable = (props: QueryResultTableProps) => {
         columnName: string;
     } | null>(null);
 
-    const renderCell = React.useCallback(
-        ({row, columnName}: RenderCellArgs) => {
-            const isActive = Boolean(
-                activeCell && activeCell.row === row && activeCell.columnName === columnName,
-            );
+    const activeCellRef = React.useRef<{
+        row: KeyValueRow;
+        columnName: string;
+    } | null>(null);
 
-            const value = row[columnName];
+    React.useEffect(() => {
+        activeCellRef.current = activeCell;
+    }, [activeCell]);
 
-            return (
-                <Cell
-                    value={String(value)}
-                    isActive={isActive}
-                    onToggle={() => {
-                        setActiveCell((prev) => {
-                            if (prev && prev.row === row && prev.columnName === columnName) {
-                                return null;
-                            }
+    const renderCell = React.useCallback(({row, columnName}: RenderCellArgs) => {
+        const isActive = Boolean(
+            activeCellRef.current &&
+                activeCellRef.current.row === row &&
+                activeCellRef.current.columnName === columnName,
+        );
 
-                            return {row, columnName};
-                        });
-                    }}
-                />
-            );
-        },
-        [activeCell],
-    );
+        const value = row[columnName];
+
+        return (
+            <Cell
+                value={String(value)}
+                isActive={isActive}
+                onToggle={() => {
+                    setActiveCell((prev) => {
+                        if (prev && prev.row === row && prev.columnName === columnName) {
+                            return null;
+                        }
+
+                        return {row, columnName};
+                    });
+                }}
+            />
+        );
+    }, []);
 
     const preparedColumns = React.useMemo(() => {
         return columns
