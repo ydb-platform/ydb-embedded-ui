@@ -368,6 +368,33 @@ test.describe('Test Query Settings', async () => {
             });
         });
 
+        await page.route(`${backend}/viewer/query?*`, async (route: Route) => {
+            const request = route.request();
+            const postData = request.postData();
+
+            if (!postData) {
+                await route.continue();
+                return;
+            }
+
+            const body = JSON.parse(postData) as Record<string, unknown>;
+            capturedBodies.push(body);
+
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    version: 8,
+                    result: [
+                        {
+                            rows: [],
+                            columns: [],
+                        },
+                    ],
+                }),
+            });
+        });
+
         const queryEditor = new QueryEditor(page);
 
         // Select a concrete resource pool and run a query
@@ -378,6 +405,8 @@ test.describe('Test Query Settings', async () => {
         await queryEditor.clickRunButton();
 
         await expect(async () => {
+            expect(capturedBodies.length).toBeGreaterThan(0);
+
             const lastBody = capturedBodies[capturedBodies.length - 1] as {
                 query?: string;
                 resource_pool?: string;
@@ -395,6 +424,8 @@ test.describe('Test Query Settings', async () => {
         await queryEditor.clickRunButton();
 
         await expect(async () => {
+            expect(capturedBodies.length).toBeGreaterThan(0);
+
             const lastBody = capturedBodies[capturedBodies.length - 1] as {
                 query?: string;
                 resource_pool?: string;
