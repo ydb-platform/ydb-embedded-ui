@@ -1,5 +1,17 @@
 # Changelog
 
+## [12.27.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.26.0...v12.27.0) (2025-12-09)
+
+
+### Features
+
+* add read replicas template for row tables ([#3187](https://github.com/ydb-platform/ydb-embedded-ui/issues/3187)) ([7205874](https://github.com/ydb-platform/ydb-embedded-ui/commit/72058747b1cec62a1ff2fa40bb707b00501b40f0))
+
+
+### Bug Fixes
+
+* correct static paths, put fonts in media folder for monaco icons ([#3193](https://github.com/ydb-platform/ydb-embedded-ui/issues/3193)) ([90e1b53](https://github.com/ydb-platform/ydb-embedded-ui/commit/90e1b53de683bbb17d795f34c4705dab0f00d855))
+
 ## [12.26.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.25.0...v12.26.0) (2025-12-08)
 
 
