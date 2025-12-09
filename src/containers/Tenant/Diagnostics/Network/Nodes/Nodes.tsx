@@ -5,17 +5,11 @@ import type {TNetNodeInfo, TNetNodePeerInfo} from '../../../../../types/api/netI
 import {cn} from '../../../../../utils/cn';
 import {useWithProblemsQueryParam} from '../../../../../utils/hooks/useWithProblemsQueryParam';
 import {NodeNetwork} from '../NodeNetwork/NodeNetwork';
+import type {NodeTooltipData} from '../NodeTooltipPopup/NodeTooltipPopup';
 import i18n from '../i18n';
 import {getConnectedNodesCount, groupNodesByField} from '../utils';
 
 const b = cn('network');
-
-interface NodeTooltipData {
-    nodeId: number | string;
-    connected?: number;
-    capacity?: number;
-    rack: string;
-}
 
 export interface NodesProps {
     nodes: Record<string, (TNetNodeInfo | TNetNodePeerInfo)[]>;

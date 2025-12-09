@@ -61,16 +61,14 @@ type RenderCellArgs = {row: KeyValueRow; columnName: string};
 type RenderCell = (args: RenderCellArgs) => React.ReactNode;
 
 interface CreateRenderCellParams {
-    activeCellRef: React.RefObject<ActiveCellState>;
+    activeCell: ActiveCellState;
     dispatch: React.Dispatch<ActiveCellAction>;
 }
 
-function createRenderCell({activeCellRef, dispatch}: CreateRenderCellParams): RenderCell {
+function createRenderCell({activeCell, dispatch}: CreateRenderCellParams): RenderCell {
     return ({row, columnName}: RenderCellArgs) => {
         const isActive = Boolean(
-            activeCellRef.current &&
-                activeCellRef.current.row === row &&
-                activeCellRef.current.columnName === columnName,
+            activeCell && activeCell.row === row && activeCell.columnName === columnName,
         );
 
         const value = row[columnName];
@@ -147,13 +145,10 @@ export const QueryResultTable = (props: QueryResultTableProps) => {
 
     const [activeCell, dispatch] = React.useReducer(activeCellReducer, null);
 
-    const activeCellRef = React.useRef<ActiveCellState>(null);
-
-    React.useEffect(() => {
-        activeCellRef.current = activeCell;
-    }, [activeCell]);
-
-    const renderCell = React.useMemo(() => createRenderCell({activeCellRef, dispatch}), [dispatch]);
+    const renderCell = React.useMemo(
+        () => createRenderCell({activeCell, dispatch}),
+        [activeCell, dispatch],
+    );
 
     const preparedColumns = React.useMemo(() => {
         return columns

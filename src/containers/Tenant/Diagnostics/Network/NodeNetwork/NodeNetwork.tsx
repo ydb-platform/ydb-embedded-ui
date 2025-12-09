@@ -2,6 +2,7 @@ import React from 'react';
 
 import {EFlag} from '../../../../../types/api/enums';
 import {cn} from '../../../../../utils/cn';
+import type {NodeTooltipData} from '../NodeTooltipPopup/NodeTooltipPopup';
 
 import './NodeNetwork.scss';
 
@@ -21,13 +22,6 @@ function getNodeModifier(connected = 0, capacity = 0) {
 }
 
 function noop() {}
-
-interface NodeTooltipData {
-    nodeId: number | string;
-    connected?: number;
-    capacity?: number;
-    rack: string;
-}
 
 interface NodeNetworkProps {
     onMouseEnter?: (node: HTMLDivElement, data: NodeTooltipData) => void;
