@@ -70,7 +70,7 @@ export const HeatmapCanvas = (props: HeatmapCanvasProps) => {
 
         ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
         tablets.forEach(drawTablet);
-    });
+    }, [tablets, dimensions]);
 
     const tabletsLength = tablets.length;
 
