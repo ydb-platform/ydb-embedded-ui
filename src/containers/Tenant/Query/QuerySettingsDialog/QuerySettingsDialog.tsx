@@ -161,7 +161,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                     <label htmlFor="resourcePool" className={b('field-title')}>
                         {QUERY_SETTINGS_FIELD_SETTINGS.resourcePool.title}
                     </label>
-                    <div className={b('control-wrapper')}>
+                    <div className={b('control-wrapper', {resourcePool: true})}>
                         <Controller
                             name="resourcePool"
                             control={control}
