@@ -6,6 +6,13 @@
         @include mixins.cell-container;
     }
 
+    &__cell-popup {
+        max-width: 300px;
+        padding: 10px;
+
+        word-break: break-word;
+    }
+
     &__message {
         padding: 15px 10px;
     }

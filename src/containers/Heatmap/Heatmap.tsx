@@ -1,12 +1,12 @@
 import React from 'react';
 
-import {Checkbox, Select} from '@gravity-ui/uikit';
+import {Checkbox, Popup, Select, useVirtualElementRef} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {Loader} from '../../components/Loader';
+import {TabletTooltipContent} from '../../components/TooltipsContent';
 import {heatmapApi, setHeatmapOptions} from '../../store/reducers/heatmap';
-import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
-import type {IHeatmapMetricValue} from '../../types/store/heatmap';
+import type {IHeatmapMetricValue, IHeatmapTabletData} from '../../types/store/heatmap';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatNumber} from '../../utils/dataFormatters/dataFormatters';
@@ -32,6 +32,16 @@ export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
 
     const itemsContainer = React.createRef<HTMLDivElement>();
 
+    const [tabletTooltip, setTabletTooltip] = React.useState<{
+        tablet: IHeatmapTabletData;
+        position: {left: number; top: number};
+    } | null>(null);
+    const [isTabletTooltipHovered, setIsTabletTooltipHovered] = React.useState(false);
+
+    const tabletTooltipAnchorRef = useVirtualElementRef({
+        rect: tabletTooltip?.position,
+    });
+
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {currentData, isFetching, error} = heatmapApi.useGetHeatmapTabletsInfoQuery(
@@ -44,13 +54,26 @@ export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
     const {tablets = [], metrics} = currentData || {};
     const {sort, heatmap, currentMetric} = useTypedSelector((state) => state.heatmap);
 
-    const onShowTooltip = (...args: Parameters<typeof showTooltip>) => {
-        dispatch(showTooltip(...args));
-    };
+    const handleShowTabletTooltip = React.useCallback(
+        (tablet: IHeatmapTabletData, position: {left: number; top: number}) => {
+            setTabletTooltip({tablet, position});
+        },
+        [],
+    );
 
-    const onHideTooltip = () => {
-        dispatch(hideTooltip());
-    };
+    const handleHideTabletTooltip = React.useCallback(() => {
+        setTabletTooltip(null);
+    }, []);
+
+    const handleRequestHideTabletTooltip = React.useCallback(() => {
+        setTabletTooltip((prev) => {
+            if (!prev || isTabletTooltipHovered) {
+                return prev;
+            }
+
+            return null;
+        });
+    }, [isTabletTooltipHovered]);
 
     const handleMetricChange = (value: string[]) => {
         dispatch(
@@ -76,14 +99,7 @@ export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
     };
 
     const renderHistogram = () => {
-        return (
-            <Histogram
-                tablets={tablets}
-                currentMetric={currentMetric}
-                showTooltip={onShowTooltip}
-                hideTooltip={onHideTooltip}
-            />
-        );
+        return <Histogram tablets={tablets} currentMetric={currentMetric} />;
     };
 
     const renderHeatmapCanvas = () => {
@@ -111,8 +127,8 @@ export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
                 <HeatmapCanvas
                     tablets={sortedTablets}
                     parentRef={itemsContainer}
-                    showTooltip={onShowTooltip}
-                    hideTooltip={onHideTooltip}
+                    onShowTabletTooltip={handleShowTabletTooltip}
+                    onHideTabletTooltip={handleRequestHideTabletTooltip}
                 />
             </div>
         );
@@ -128,6 +144,25 @@ export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
 
         return (
             <div className={b()}>
+                {tabletTooltip ? (
+                    <Popup
+                        open
+                        hasArrow
+                        placement={['top', 'bottom', 'left', 'right']}
+                        anchorRef={tabletTooltipAnchorRef}
+                        onOutsideClick={handleHideTabletTooltip}
+                    >
+                        <div
+                            onMouseEnter={() => setIsTabletTooltipHovered(true)}
+                            onMouseLeave={() => {
+                                setIsTabletTooltipHovered(false);
+                                handleHideTabletTooltip();
+                            }}
+                        >
+                            <TabletTooltipContent data={tabletTooltip.tablet} />
+                        </div>
+                    </Popup>
+                ) : null}
                 <div className={b('filters')}>
                     <Select
                         className={b('heatmap-select')}

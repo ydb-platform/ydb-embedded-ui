@@ -28,7 +28,14 @@ export const b = cn('ydb-query-result-table');
 
 const WIDTH_PREDICTION_ROWS_COUNT = 100;
 
-const prepareTypedColumns = (columns: ColumnType[], data?: KeyValueRow[]) => {
+type RenderCellArgs = {row: KeyValueRow; columnName: string};
+type RenderCell = (args: RenderCellArgs) => React.ReactNode;
+
+const prepareTypedColumns = (
+    columns: ColumnType[],
+    data: KeyValueRow[] | undefined,
+    renderCell: RenderCell,
+) => {
     if (!columns.length) {
         return [];
     }
@@ -42,14 +49,14 @@ const prepareTypedColumns = (columns: ColumnType[], data?: KeyValueRow[]) => {
             name,
             width: getColumnWidth({data: dataSlice, name}),
             align: columnType === 'number' ? DataTable.RIGHT : DataTable.LEFT,
-            render: ({row}) => <Cell value={String(row[name])} />,
+            render: ({row}) => renderCell({row, columnName: name}),
         };
 
         return column;
     });
 };
 
-const prepareGenericColumns = (data?: KeyValueRow[]) => {
+const prepareGenericColumns = (data: KeyValueRow[] | undefined, renderCell: RenderCell) => {
     if (!data?.length) {
         return [];
     }
@@ -61,7 +68,7 @@ const prepareGenericColumns = (data?: KeyValueRow[]) => {
             name,
             width: getColumnWidth({data: dataSlice, name}),
             align: isNumeric(data[0][name]) ? DataTable.RIGHT : DataTable.LEFT,
-            render: ({row}) => <Cell value={String(row[name])} />,
+            render: ({row}) => renderCell({row, columnName: name}),
         };
 
         return column;
@@ -83,9 +90,43 @@ interface QueryResultTableProps
 export const QueryResultTable = (props: QueryResultTableProps) => {
     const {columns, data, settings: propsSettings} = props;
 
+    const [activeCell, setActiveCell] = React.useState<{
+        row: KeyValueRow;
+        columnName: string;
+    } | null>(null);
+
+    const renderCell = React.useCallback(
+        ({row, columnName}: RenderCellArgs) => {
+            const isActive = Boolean(
+                activeCell && activeCell.row === row && activeCell.columnName === columnName,
+            );
+
+            const value = row[columnName];
+
+            return (
+                <Cell
+                    value={String(value)}
+                    isActive={isActive}
+                    onToggle={() => {
+                        setActiveCell((prev) => {
+                            if (prev && prev.row === row && prev.columnName === columnName) {
+                                return null;
+                            }
+
+                            return {row, columnName};
+                        });
+                    }}
+                />
+            );
+        },
+        [activeCell],
+    );
+
     const preparedColumns = React.useMemo(() => {
-        return columns ? prepareTypedColumns(columns, data) : prepareGenericColumns(data);
-    }, [data, columns]);
+        return columns
+            ? prepareTypedColumns(columns, data, renderCell)
+            : prepareGenericColumns(data, renderCell);
+    }, [columns, data, renderCell]);
 
     const settings = React.useMemo(() => {
         return {

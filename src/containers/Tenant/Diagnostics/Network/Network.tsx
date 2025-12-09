@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Checkbox, Icon, Loader} from '@gravity-ui/uikit';
+import {Checkbox, Icon, Loader, Popup} from '@gravity-ui/uikit';
 import {Link} from 'react-router-dom';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
@@ -8,10 +8,9 @@ import {Illustration} from '../../../../components/Illustration';
 import {ProblemFilter} from '../../../../components/ProblemFilter/ProblemFilter';
 import {getDefaultNodePath} from '../../../../routes';
 import {networkApi} from '../../../../store/reducers/network/network';
-import {hideTooltip, showTooltip} from '../../../../store/reducers/tooltip';
 import type {TNetNodeInfo, TNetNodePeerInfo} from '../../../../types/api/netInfo';
 import {cn} from '../../../../utils/cn';
-import {useAutoRefreshInterval, useTypedDispatch} from '../../../../utils/hooks';
+import {useAutoRefreshInterval} from '../../../../utils/hooks';
 import {useWithProblemsQueryParam} from '../../../../utils/hooks/useWithProblemsQueryParam';
 
 import {NodeNetwork} from './NodeNetwork/NodeNetwork';
@@ -22,6 +21,7 @@ import networkIcon from '../../../../assets/icons/network.svg';
 import './Network.scss';
 
 const b = cn('network');
+const tooltipB = cn('node-tootltip');
 
 interface NetworkProps {
     database: string;
@@ -35,6 +35,19 @@ export function Network({database, databaseFullPath}: NetworkProps) {
     const [showId, setShowId] = React.useState(false);
     const [showRacks, setShowRacks] = React.useState(false);
 
+    const [nodeTooltip, setNodeTooltip] = React.useState<{
+        anchor: HTMLDivElement | null;
+        data: {
+            nodeId: number | string;
+            connected?: number;
+            capacity?: number;
+            rack: string;
+        } | null;
+    }>({
+        anchor: null,
+        data: null,
+    });
+
     const {currentData, isFetching, error} = networkApi.useGetNetworkInfoQuery(
         {database, databaseFullPath},
         {
@@ -42,6 +55,31 @@ export function Network({database, databaseFullPath}: NetworkProps) {
         },
     );
     const loading = isFetching && currentData === undefined;
+
+    const netWorkInfo = currentData;
+    const nodes = (netWorkInfo?.Tenants && netWorkInfo.Tenants[0].Nodes) ?? [];
+
+    const handleShowNodeTooltip = React.useCallback(
+        (
+            anchor: HTMLDivElement,
+            data: {
+                nodeId: number | string;
+                connected?: number;
+                capacity?: number;
+                rack: string;
+            },
+        ) => {
+            setNodeTooltip({anchor, data});
+        },
+        [],
+    );
+
+    const handleHideNodeTooltip = React.useCallback(() => {
+        setNodeTooltip({anchor: null, data: null});
+    }, []);
+
+    const nodesGroupedByType = groupNodesByField(nodes, 'NodeType');
+    const rightNodes = clickedNode ? groupNodesByField(clickedNode.Peers ?? [], 'NodeType') : {};
 
     if (loading) {
         return (
@@ -51,17 +89,50 @@ export function Network({database, databaseFullPath}: NetworkProps) {
         );
     }
 
-    const netWorkInfo = currentData;
-    const nodes = (netWorkInfo?.Tenants && netWorkInfo.Tenants[0].Nodes) ?? [];
     if (!error && nodes.length === 0) {
         return <div className="error">no nodes data</div>;
     }
 
-    const nodesGroupedByType = groupNodesByField(nodes, 'NodeType');
-    const rightNodes = clickedNode ? groupNodesByField(clickedNode.Peers ?? [], 'NodeType') : {};
-
     return (
         <div className={b()}>
+            {nodeTooltip.anchor && nodeTooltip.data ? (
+                <Popup
+                    open
+                    hasArrow
+                    placement={['top', 'bottom', 'left', 'right']}
+                    anchorElement={nodeTooltip.anchor}
+                    onOutsideClick={() => {
+                        setNodeTooltip({anchor: null, data: null});
+                    }}
+                >
+                    <div className={tooltipB()}>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td className={tooltipB('label')}>ID</td>
+                                    <td className={tooltipB('value')}>
+                                        {nodeTooltip.data.nodeId || '?'}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td className={tooltipB('label')}>Rack</td>
+                                    <td className={tooltipB('value')}>
+                                        {nodeTooltip.data.rack || '?'}
+                                    </td>
+                                </tr>
+                                {nodeTooltip.data.connected && nodeTooltip.data.capacity ? (
+                                    <tr>
+                                        <td className={tooltipB('label')}>Net</td>
+                                        <td className={tooltipB('value')}>
+                                            {`${nodeTooltip.data.connected} / ${nodeTooltip.data.capacity}`}
+                                        </td>
+                                    </tr>
+                                ) : null}
+                            </tbody>
+                        </table>
+                    </div>
+                </Popup>
+            ) : null}
             {error ? <ResponseError error={error} /> : null}
             {nodes.length > 0 ? (
                 <div className={b('inner')}>
@@ -102,6 +173,8 @@ export function Network({database, databaseFullPath}: NetworkProps) {
                                 showRacks={showRacks}
                                 clickedNode={clickedNode}
                                 onClickNode={setClickedNode}
+                                onShowNodeTooltip={handleShowNodeTooltip}
+                                onHideNodeTooltip={handleHideNodeTooltip}
                             />
                         </div>
 
@@ -126,6 +199,8 @@ export function Network({database, databaseFullPath}: NetworkProps) {
                                             showRacks={showRacks}
                                             clickedNode={clickedNode}
                                             onClickNode={setClickedNode}
+                                            onShowNodeTooltip={handleShowNodeTooltip}
+                                            onHideNodeTooltip={handleHideNodeTooltip}
                                         />
                                     </div>
                                 </div>
@@ -156,9 +231,28 @@ interface NodesProps {
     clickedNode?: TNetNodeInfo;
     onClickNode: (node: TNetNodeInfo | undefined) => void;
 }
-function Nodes({nodes, isRight, showId, showRacks, clickedNode, onClickNode}: NodesProps) {
+function Nodes({
+    nodes,
+    isRight,
+    showId,
+    showRacks,
+    clickedNode,
+    onClickNode,
+    onShowNodeTooltip,
+    onHideNodeTooltip,
+}: NodesProps & {
+    onShowNodeTooltip: (
+        anchor: HTMLDivElement,
+        data: {
+            nodeId: number | string;
+            connected?: number;
+            capacity?: number;
+            rack: string;
+        },
+    ) => void;
+    onHideNodeTooltip: () => void;
+}) {
     const {withProblems} = useWithProblemsQueryParam();
-    const dispatch = useTypedDispatch();
 
     let problemNodesCount = 0;
     const result = Object.keys(nodes).map((key, j) => {
@@ -199,12 +293,8 @@ function Nodes({nodes, isRight, showId, showRacks, clickedNode, onClickNode}: No
                                                   }
                                                   capacity={capacity}
                                                   connected={connected}
-                                                  onMouseEnter={(...params) => {
-                                                      dispatch(showTooltip(...params));
-                                                  }}
-                                                  onMouseLeave={() => {
-                                                      dispatch(hideTooltip());
-                                                  }}
+                                                  onMouseEnter={onShowNodeTooltip}
+                                                  onMouseLeave={onHideNodeTooltip}
                                                   onClick={
                                                       isRight
                                                           ? undefined
@@ -258,12 +348,8 @@ function Nodes({nodes, isRight, showId, showRacks, clickedNode, onClickNode}: No
                                           }
                                           capacity={peers?.length}
                                           connected={connected}
-                                          onMouseEnter={(...params) => {
-                                              dispatch(showTooltip(...params));
-                                          }}
-                                          onMouseLeave={() => {
-                                              dispatch(hideTooltip());
-                                          }}
+                                          onMouseEnter={onShowNodeTooltip}
+                                          onMouseLeave={onHideNodeTooltip}
                                           onClick={
                                               isRight
                                                   ? undefined
