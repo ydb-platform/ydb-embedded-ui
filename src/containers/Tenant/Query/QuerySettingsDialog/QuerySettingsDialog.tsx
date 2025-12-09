@@ -32,6 +32,8 @@ import './QuerySettingsDialog.scss';
 
 const b = cn('ydb-query-settings-dialog');
 
+const RESOURCE_POOL_NO_OVERRIDE_VALUE = '__no_pool_override__';
+
 export function QuerySettingsDialog() {
     const dispatch = useTypedDispatch();
     const queryAction = useTypedSelector(selectQueryAction);
@@ -141,16 +143,24 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                             render={({field}) => (
                                 <QuerySettingsSelect
                                     id="resourcePool"
-                                    setting={(field.value || '') as never}
+                                    setting={
+                                        (field.value || RESOURCE_POOL_NO_OVERRIDE_VALUE) as never
+                                    }
                                     disabled={
                                         isResourcePoolsLoading ||
                                         !resourcePools.length ||
                                         queryMode === QUERY_MODES.pg
                                     }
-                                    onUpdateSetting={(value) => field.onChange(value || undefined)}
+                                    onUpdateSetting={(value) =>
+                                        field.onChange(
+                                            value === RESOURCE_POOL_NO_OVERRIDE_VALUE
+                                                ? undefined
+                                                : value,
+                                        )
+                                    }
                                     settingOptions={[
                                         {
-                                            value: '' as never,
+                                            value: RESOURCE_POOL_NO_OVERRIDE_VALUE,
                                             content: i18n('form.resource-pool.no-override'),
                                             text: i18n('form.resource-pool.no-override'),
                                             isDefault: true,
