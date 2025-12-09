@@ -141,11 +141,9 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                             name="resourcePool"
                             control={control}
                             render={({field}) => (
-                                <QuerySettingsSelect
+                                <QuerySettingsSelect<string>
                                     id="resourcePool"
-                                    setting={
-                                        (field.value || RESOURCE_POOL_NO_OVERRIDE_VALUE) as never
-                                    }
+                                    setting={field.value ?? RESOURCE_POOL_NO_OVERRIDE_VALUE}
                                     disabled={
                                         isResourcePoolsLoading ||
                                         !resourcePools.length ||
@@ -165,14 +163,11 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                             text: i18n('form.resource-pool.no-override'),
                                             isDefault: true,
                                         },
-                                        ...(resourcePools.map(
-                                            (name) =>
-                                                ({
-                                                    value: name,
-                                                    content: name,
-                                                    text: name,
-                                                }) as never,
-                                        ) as never[]),
+                                        ...resourcePools.map((name) => ({
+                                            value: name,
+                                            content: name,
+                                            text: name,
+                                        })),
                                     ]}
                                 />
                             )}

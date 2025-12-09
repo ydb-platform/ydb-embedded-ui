@@ -19,7 +19,7 @@ export const getOptionHeight = () => -1;
 
 const b = cn('ydb-query-settings-select');
 
-type SelectType = QueryMode | TransactionMode | StatisticsMode | TracingLevel;
+type SelectType = QueryMode | TransactionMode | StatisticsMode | TracingLevel | string;
 type QuerySettingSelectOption<T> = SelectOption<T> & {isDefault?: boolean};
 
 interface QuerySettingsSelectProps<T extends SelectType> {
