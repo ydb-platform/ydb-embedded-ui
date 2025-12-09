@@ -22,11 +22,7 @@ import {
     setStreamSession as setStreamSessionReducer,
 } from './streamingReducers';
 import type {QueryResult, QueryState, QueryStats} from './types';
-import {
-    applyResourcePoolPragma,
-    getActionAndSyntaxFromQueryMode,
-    prepareQueryWithPragmas,
-} from './utils';
+import {getActionAndSyntaxFromQueryMode, prepareQueryWithPragmas} from './utils';
 
 const rawQuery = loadFromSessionStorage(QUERY_EDITOR_CURRENT_QUERY_KEY);
 const input = typeof rawQuery === 'string' ? rawQuery : '';
@@ -173,11 +169,7 @@ export const queryApi = api.injectEndpoints({
                     querySettings?.queryMode,
                 );
 
-                const finalQuery = applyResourcePoolPragma(
-                    prepareQueryWithPragmas(query, querySettings.pragmas),
-                    querySettings.resourcePool,
-                    syntax,
-                );
+                const finalQuery = prepareQueryWithPragmas(query, querySettings.pragmas);
 
                 try {
                     let streamDataChunkBatch: StreamDataChunk[] = [];
@@ -217,6 +209,7 @@ export const queryApi = api.injectEndpoints({
                                 : undefined,
                             concurrent_results: DEFAULT_CONCURRENT_RESULTS || undefined,
                             base64,
+                            resource_pool: querySettings.resourcePool,
                         },
                         {
                             signal,
@@ -294,11 +287,7 @@ export const queryApi = api.injectEndpoints({
                     querySettings?.queryMode,
                 );
 
-                const finalQuery = applyResourcePoolPragma(
-                    prepareQueryWithPragmas(query, querySettings.pragmas),
-                    querySettings.resourcePool,
-                    syntax,
-                );
+                const finalQuery = prepareQueryWithPragmas(query, querySettings.pragmas);
 
                 try {
                     const timeStart = Date.now();
@@ -325,6 +314,7 @@ export const queryApi = api.injectEndpoints({
                                 : undefined,
                             query_id: queryId,
                             base64,
+                            resource_pool: querySettings.resourcePool,
                         },
                         {signal},
                     );
