@@ -78,8 +78,10 @@ export default defineConfig({
     output: {
         distPath: {
             root: './build',
+            // YDB server that serves static files expects fonts to be in media folder
+            font: 'static/media',
         },
-        assetPrefix: '.',
+        assetPrefix: 'auto',
         sourceMap: {
             js: process.env.GENERATE_SOURCEMAP !== 'false' ? 'source-map' : false,
         },
