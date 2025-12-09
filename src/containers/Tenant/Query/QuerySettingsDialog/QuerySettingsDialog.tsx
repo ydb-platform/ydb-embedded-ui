@@ -54,6 +54,13 @@ export function QuerySettingsDialog() {
         [onClose, setQuerySettings],
     );
 
+    const handleResetInvalidResourcePool = React.useCallback(() => {
+        setQuerySettings({
+            ...querySettings,
+            resourcePool: RESOURCE_POOL_NO_OVERRIDE_VALUE,
+        });
+    }, [querySettings, setQuerySettings]);
+
     return (
         <Dialog
             open={queryAction === 'settings'}
@@ -67,6 +74,7 @@ export function QuerySettingsDialog() {
                 initialValues={querySettings}
                 onSubmit={onSubmit}
                 onClose={onClose}
+                onResetInvalidResourcePool={handleResetInvalidResourcePool}
             />
         </Dialog>
     );
@@ -78,7 +86,12 @@ interface QuerySettingsFormProps {
     onClose: () => void;
 }
 
-function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsFormProps) {
+function QuerySettingsForm({
+    initialValues,
+    onSubmit,
+    onClose,
+    onResetInvalidResourcePool,
+}: QuerySettingsFormProps & {onResetInvalidResourcePool: () => void}) {
     const {
         control,
         handleSubmit,
@@ -133,8 +146,9 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
 
         if (!resourcePools.length || !resourcePools.includes(resourcePool)) {
             setValue('resourcePool', RESOURCE_POOL_NO_OVERRIDE_VALUE);
+            onResetInvalidResourcePool();
         }
-    }, [isResourcePoolsLoading, resourcePools, resourcePool, setValue]);
+    }, [isResourcePoolsLoading, resourcePools, resourcePool, onResetInvalidResourcePool, setValue]);
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
