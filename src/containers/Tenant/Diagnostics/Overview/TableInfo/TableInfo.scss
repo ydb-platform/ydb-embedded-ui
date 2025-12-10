@@ -2,8 +2,10 @@
 
 .ydb-diagnostics-table-info {
     &__title {
-        margin-top: 0;
-        @include mixins.info-viewer-title();
+        margin-bottom: 10px;
+
+        font-weight: 600;
+        @include mixins.body-2-typography();
     }
 
     &__progress-bar {
