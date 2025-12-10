@@ -45,12 +45,10 @@ export const settingsApi = api.injectEndpoints({
                 name,
                 user,
                 value,
-            }: Partial<Omit<SetSingleSettingParams, 'value'>> & {value: unknown}) => {
+            }: Omit<SetSingleSettingParams, 'value'> & {value: unknown}) => {
                 try {
-                    if (!name || !user || !window.api?.metaSettings) {
-                        throw new Error(
-                            'Cannot set setting, no MetaSettings API or necessary params are missing',
-                        );
+                    if (!window.api?.metaSettings) {
+                        throw new Error('MetaSettings API is not available');
                     }
 
                     const data = await window.api.metaSettings.setSingleSetting({
@@ -70,10 +68,6 @@ export const settingsApi = api.injectEndpoints({
             },
             async onQueryStarted(args, {dispatch, queryFulfilled}) {
                 const {name, user, value} = args;
-
-                if (!name) {
-                    return;
-                }
 
                 // Optimistically update existing cache entry
                 const patchResult = dispatch(

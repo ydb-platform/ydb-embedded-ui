@@ -1,5 +1,7 @@
 import React from 'react';
 
+import {isNil} from 'lodash';
+
 import {useSetting as useLSSetting} from '../../../utils/hooks';
 import {useTypedSelector} from '../../../utils/hooks/useTypedSelector';
 import {selectMetaUser} from '../authentication/authentication';
@@ -39,10 +41,10 @@ export function useSetting<T>(name?: string): {
             if (!name) {
                 return;
             }
-            if (window.api?.metaSettings) {
-                setMetaSetting({user, name, value});
-            } else {
+            if (isNil(window.api?.metaSettings)) {
                 saveSettingToLS(value);
+            } else if (window.api?.metaSettings && user) {
+                setMetaSetting({user, name, value});
             }
         },
         [user, name, setMetaSetting, saveSettingToLS],
