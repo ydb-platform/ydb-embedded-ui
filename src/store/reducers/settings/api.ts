@@ -3,8 +3,8 @@ import type {
     GetSingleSettingParams,
     SetSingleSettingParams,
 } from '../../../types/api/settings';
+import {serializeReduxError} from '../../../utils/errors/serializeReduxError';
 import type {AppDispatch} from '../../defaultStore';
-import {serializeError} from '../../utils';
 import {api} from '../api';
 
 import {SETTINGS_OPTIONS} from './constants';
@@ -28,7 +28,7 @@ export const settingsApi = api.injectEndpoints({
 
                     return {data: parseSettingValue(data?.value)};
                 } catch (error) {
-                    return {error: serializeError(error)};
+                    return {error: serializeReduxError(error)};
                 }
             },
         }),
@@ -55,7 +55,7 @@ export const settingsApi = api.injectEndpoints({
 
                     return {data};
                 } catch (error) {
-                    return {error: serializeError(error)};
+                    return {error: serializeReduxError(error)};
                 }
             },
             async onQueryStarted(args, {dispatch, queryFulfilled}) {
@@ -109,7 +109,7 @@ export const settingsApi = api.injectEndpoints({
 
                     return {data};
                 } catch (error) {
-                    return {error: serializeError(error)};
+                    return {error: serializeReduxError(error)};
                 }
             },
         }),
