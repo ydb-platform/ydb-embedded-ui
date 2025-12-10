@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {skipToken} from '@reduxjs/toolkit/query';
 import {isNil} from 'lodash';
 
 import {useSetting as useLSSetting} from '../../../utils/hooks';
@@ -18,10 +19,14 @@ export function useSetting<T>(name?: string): {
 } {
     const user = useTypedSelector(selectMetaUser);
 
-    const {currentData: settingFromMeta, isLoading} = settingsApi.useGetSingleSettingQuery({
-        user,
-        name,
-    });
+    const params = React.useMemo(() => {
+        if (user && name && window.api?.metaSettings) {
+            return {user, name};
+        }
+        return skipToken;
+    }, [user, name]);
+
+    const {currentData: settingFromMeta, isLoading} = settingsApi.useGetSingleSettingQuery(params);
 
     const [setMetaSetting] = settingsApi.useSetSingleSettingMutation();
 
@@ -31,9 +36,9 @@ export function useSetting<T>(name?: string): {
         if (!name) {
             return undefined;
         }
-        const defaultValue = getSettingDefault(name) as unknown;
+        const defaultValue = getSettingDefault(name);
 
-        let value;
+        let value: unknown;
 
         if (window.api?.metaSettings) {
             value = settingFromMeta;
@@ -50,7 +55,7 @@ export function useSetting<T>(name?: string): {
             }
             if (isNil(window.api?.metaSettings)) {
                 saveSettingToLS(value);
-            } else if (window.api?.metaSettings && user) {
+            } else if (user) {
                 setMetaSetting({user, name, value});
             }
         },

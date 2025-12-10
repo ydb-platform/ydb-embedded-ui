@@ -12,13 +12,11 @@ import {parseSettingValue, stringifySettingValue} from './utils';
 
 export const settingsApi = api.injectEndpoints({
     endpoints: (builder) => ({
-        getSingleSetting: builder.query<unknown, Partial<GetSingleSettingParams>>({
+        getSingleSetting: builder.query<unknown, GetSingleSettingParams>({
             queryFn: async ({name, user}) => {
                 try {
-                    if (!name || !user || !window.api?.metaSettings) {
-                        throw new Error(
-                            'Cannot get setting, no MetaSettings API or necessary params are missing',
-                        );
+                    if (!window.api?.metaSettings) {
+                        throw new Error('MetaSettings API is not available');
                     }
 
                     const data = await window.api.metaSettings.getSingleSetting({
@@ -75,12 +73,10 @@ export const settingsApi = api.injectEndpoints({
             },
         }),
         getSettings: builder.query({
-            queryFn: async ({name, user}: Partial<GetSettingsParams>, baseApi) => {
+            queryFn: async ({name, user}: GetSettingsParams, baseApi) => {
                 try {
-                    if (!window.api?.metaSettings || !name || !user) {
-                        throw new Error(
-                            'Cannot get settings, no MetaSettings API or necessary params are missing',
-                        );
+                    if (!window.api?.metaSettings) {
+                        throw new Error('MetaSettings API is not available');
                     }
                     const data = await window.api.metaSettings.getSettings({name, user});
 
