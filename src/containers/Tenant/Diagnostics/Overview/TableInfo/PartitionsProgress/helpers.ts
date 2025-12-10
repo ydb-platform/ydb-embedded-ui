@@ -1,5 +1,6 @@
 import {isNil} from 'lodash';
 
+import {FULL_FILL_VALUE} from './PartitionsProgress';
 import i18n from './i18n';
 
 export interface PartitionsProgressCalcResult {
@@ -40,7 +41,7 @@ export function calcPartitionsProgress(
         const mainSegmentUnits = isBelowMin ? 4 : 1;
         const rightSegmentUnits = 0;
 
-        const mainProgressValue = partitionsCount < min ? 0 : 100;
+        const mainProgressValue = partitionsCount < min ? 0 : FULL_FILL_VALUE;
 
         return {
             min,
@@ -77,7 +78,7 @@ export function calcPartitionsProgress(
         if (partitionsCount <= min) {
             mainProgressValue = 0;
         } else if (partitionsCount >= max) {
-            mainProgressValue = 100;
+            mainProgressValue = FULL_FILL_VALUE;
         } else {
             mainProgressValue = ((partitionsCount - min) / range) * 100;
         }

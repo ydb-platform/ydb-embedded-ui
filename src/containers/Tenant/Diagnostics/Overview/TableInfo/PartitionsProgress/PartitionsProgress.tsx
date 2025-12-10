@@ -25,20 +25,17 @@ const SEGMENT_MODS: Record<SegmentPosition, Record<string, boolean>> = {
     right: {right: true},
 };
 
-const FULL_FILL_VALUE = 100;
+export const FULL_FILL_VALUE = 100;
 
 interface SegmentProgressBarProps {
     position: SegmentPosition;
     value: number;
-    tooltip: string;
 }
 
-const SegmentProgressBar = ({position, value, tooltip}: SegmentProgressBarProps) => (
-    <Popover hasArrow placement="top" content={tooltip} className={b('segment-touched')}>
-        <div className={b('segment-bar', SEGMENT_MODS[position])}>
-            <Progress value={value} size="s" />
-        </div>
-    </Popover>
+const SegmentProgressBar = ({position, value}: SegmentProgressBarProps) => (
+    <div className={b('segment-bar', SEGMENT_MODS[position])}>
+        <Progress value={value} size="s" />
+    </div>
 );
 
 export const PartitionsProgress = ({
@@ -81,71 +78,68 @@ export const PartitionsProgress = ({
 
     const maxLabel = isNil(max) ? i18n('value_no-limit') : max;
 
+    let tooltipContent = currentTooltip;
+    if (isBelowMin) {
+        tooltipContent = belowLimitTooltip;
+    } else if (isAboveMax) {
+        tooltipContent = aboveLimitTooltip;
+    }
+
     return (
-        <Flex alignItems="center" gap="0.5" className={b(null, className)}>
-            {isBelowMin && (
-                <Flex
-                    style={{flexGrow: leftSegmentUnits}}
-                    direction="column"
-                    gap="2"
-                    className={b('segment', SEGMENT_MODS.left)}
-                >
-                    <SegmentProgressBar
-                        position="left"
-                        value={FULL_FILL_VALUE}
-                        tooltip={belowLimitTooltip}
-                    />
+        <Popover hasArrow placement="top" content={tooltipContent} className={b('segment-touched')}>
+            <Flex alignItems="center" gap="0.5" className={b(null, className)}>
+                {isBelowMin && (
+                    <Flex
+                        style={{flexGrow: leftSegmentUnits}}
+                        direction="column"
+                        gap="2"
+                        className={b('segment', SEGMENT_MODS.left)}
+                    >
+                        <SegmentProgressBar position="left" value={FULL_FILL_VALUE} />
 
-                    <div className={b('segment-labels', SEGMENT_MODS.left)}>
+                        <div className={b('segment-labels', SEGMENT_MODS.left)}>
+                            <Text variant="body-2" color="secondary">
+                                {partitionsCount}
+                            </Text>
+                        </div>
+                    </Flex>
+                )}
+
+                <Flex
+                    direction="column"
+                    className={b('segment', SEGMENT_MODS.main)}
+                    style={{flexGrow: mainSegmentUnits}}
+                    gap="2"
+                >
+                    <SegmentProgressBar position="main" value={mainProgressValue} />
+
+                    <div className={b('segment-labels', SEGMENT_MODS.main)}>
                         <Text variant="body-2" color="secondary">
-                            {partitionsCount}
+                            {min}
+                        </Text>
+                        <Text variant="body-2" color="secondary">
+                            {maxLabel}
                         </Text>
                     </div>
                 </Flex>
-            )}
 
-            <Flex
-                direction="column"
-                className={b('segment', SEGMENT_MODS.main)}
-                style={{flexGrow: mainSegmentUnits}}
-                gap="2"
-            >
-                <SegmentProgressBar
-                    position="main"
-                    value={mainProgressValue}
-                    tooltip={currentTooltip}
-                />
+                {isAboveMax && (
+                    <Flex
+                        direction="column"
+                        gap="2"
+                        className={b('segment', SEGMENT_MODS.right)}
+                        style={{flexGrow: rightSegmentUnits}}
+                    >
+                        <SegmentProgressBar position="right" value={FULL_FILL_VALUE} />
 
-                <div className={b('segment-labels', SEGMENT_MODS.main)}>
-                    <Text variant="body-2" color="secondary">
-                        {min}
-                    </Text>
-                    <Text variant="body-2" color="secondary">
-                        {maxLabel}
-                    </Text>
-                </div>
+                        <div className={b('segment-labels', SEGMENT_MODS.right)}>
+                            <Text variant="body-2" color="secondary">
+                                {partitionsCount}
+                            </Text>
+                        </div>
+                    </Flex>
+                )}
             </Flex>
-
-            {isAboveMax && (
-                <Flex
-                    direction="column"
-                    gap="2"
-                    className={b('segment', SEGMENT_MODS.right)}
-                    style={{flexGrow: rightSegmentUnits}}
-                >
-                    <SegmentProgressBar
-                        position="right"
-                        value={FULL_FILL_VALUE}
-                        tooltip={aboveLimitTooltip}
-                    />
-
-                    <div className={b('segment-labels', SEGMENT_MODS.right)}>
-                        <Text variant="body-2" color="secondary">
-                            {partitionsCount}
-                        </Text>
-                    </div>
-                </Flex>
-            )}
-        </Flex>
+        </Popover>
     );
 };

@@ -46,7 +46,7 @@ export const TableInfo = ({data, type}: TableInfoProps) => {
             <InfoViewer
                 info={generalInfo}
                 className={b('info-block')}
-                renderEmptyState={() => <div className={b('title')}>{i18n('title')}</div>}
+                renderEmptyState={() => null}
             />
             <div className={b('row')}>
                 {tableStatsInfo ? (
