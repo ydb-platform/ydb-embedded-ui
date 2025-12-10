@@ -1,4 +1,5 @@
 import {Text} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 import omit from 'lodash/omit';
 
 import {toFormattedSize} from '../../../../../components/FormattedBytes/utils';
@@ -19,7 +20,6 @@ import type {
     TTablePartition,
 } from '../../../../../types/api/schema';
 import {EPathType} from '../../../../../types/api/schema';
-import {valueIsDefined} from '../../../../../utils';
 import {formatBytes, formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {formatDurationToShortTimeFormat} from '../../../../../utils/timeParsers';
 import {isNumeric} from '../../../../../utils/utils';
@@ -130,7 +130,7 @@ const prepareTableGeneralInfo = (PartitionConfig: TPartitionConfig, TTLSettings?
         }
     }
 
-    if (valueIsDefined(EnableFilterByKey)) {
+    if (!isNil(EnableFilterByKey)) {
         generalTableInfo.push({
             label: i18n('label.bloom-filter'),
             value: EnableFilterByKey ? i18n('enabled') : i18n('disabled'),
