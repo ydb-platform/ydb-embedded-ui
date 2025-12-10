@@ -8,23 +8,17 @@ import {serializeError} from '../../utils';
 import {api} from '../api';
 
 import {SETTINGS_OPTIONS} from './constants';
-import {getSettingDefault, parseSettingValue, stringifySettingValue} from './utils';
+import {parseSettingValue, stringifySettingValue} from './utils';
 
 export const settingsApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getSingleSetting: builder.query<unknown, Partial<GetSingleSettingParams>>({
             queryFn: async ({name, user}) => {
                 try {
-                    if (!name || !window.api?.metaSettings) {
+                    if (!name || !user || !window.api?.metaSettings) {
                         throw new Error(
                             'Cannot get setting, no MetaSettings API or necessary params are missing',
                         );
-                    }
-
-                    const defaultValue = getSettingDefault(name) as unknown;
-
-                    if (!user) {
-                        return {data: defaultValue};
                     }
 
                     const data = await window.api.metaSettings.getSingleSetting({
@@ -34,7 +28,7 @@ export const settingsApi = api.injectEndpoints({
                         preventBatching: SETTINGS_OPTIONS[name]?.preventBatching,
                     });
 
-                    return {data: parseSettingValue(data?.value) ?? defaultValue};
+                    return {data: parseSettingValue(data?.value)};
                 } catch (error) {
                     return {error: serializeError(error)};
                 }
@@ -97,14 +91,11 @@ export const settingsApi = api.injectEndpoints({
                     name.forEach((settingName) => {
                         const settingData = data[settingName];
 
-                        const defaultValue = getSettingDefault(settingName);
-
                         const cacheEntryParams: GetSingleSettingParams = {
                             name: settingName,
                             user,
                         };
-                        const newSettingValue =
-                            parseSettingValue(settingData?.value) ?? defaultValue;
+                        const newSettingValue = parseSettingValue(settingData?.value);
 
                         const patch = dispatch(
                             settingsApi.util.upsertQueryData(

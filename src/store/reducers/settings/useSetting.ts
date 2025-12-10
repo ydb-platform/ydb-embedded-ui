@@ -7,6 +7,7 @@ import {useTypedSelector} from '../../../utils/hooks/useTypedSelector';
 import {selectMetaUser} from '../authentication/authentication';
 
 import {settingsApi} from './api';
+import {getSettingDefault} from './utils';
 
 type SaveSettingValue<T> = (value: T | undefined) => void;
 
@@ -30,10 +31,16 @@ export function useSetting<T>(name?: string): {
         if (!name) {
             return undefined;
         }
+        const defaultValue = getSettingDefault(name) as unknown;
+
+        let value;
+
         if (window.api?.metaSettings) {
-            return settingFromMeta;
+            value = settingFromMeta;
+        } else {
+            value = settingFromLS;
         }
-        return settingFromLS;
+        return value ?? defaultValue;
     }, [name, settingFromMeta, settingFromLS]);
 
     const saveValue = React.useCallback<SaveSettingValue<T>>(
