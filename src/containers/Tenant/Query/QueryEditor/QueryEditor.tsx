@@ -32,6 +32,7 @@ import {
     useEventHandler,
     useQueryExecutionSettings,
     useQueryStreamingSetting,
+    useResourcePools,
     useSetting,
     useTypedDispatch,
     useTypedSelector,
@@ -88,7 +89,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
 
     const isResultLoaded = Boolean(result);
 
-    const [querySettings] = useQueryExecutionSettings();
+    const [querySettings, setQuerySettings] = useQueryExecutionSettings();
     const enableTracingLevel = useTracingLevelOptionAvailable();
     const [lastQueryExecutionSettings, setLastQueryExecutionSettings] =
         useLastQueryExecutionSettings();
@@ -104,6 +105,12 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
         SETTING_KEYS.BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
     );
 
+    const {
+        resourcePools,
+        normalizedResourcePool,
+        isLoading: isResourcePoolsLoading,
+    } = useResourcePools(database, querySettings.resourcePool);
+
     const encodeTextWithBase64 = !binaryDataInPlainTextDisplay;
 
     const isStreamingEnabled =
@@ -113,6 +120,28 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
 
     const [sendQuery] = queryApi.useUseSendQueryMutation();
     const [streamQuery] = queryApi.useUseStreamQueryMutation();
+
+    // Normalize stored resourcePool if it's not available for current database
+    React.useEffect(() => {
+        if (isResourcePoolsLoading) {
+            return;
+        }
+
+        if (querySettings.resourcePool === normalizedResourcePool) {
+            return;
+        }
+
+        setQuerySettings({
+            ...querySettings,
+            resourcePool: normalizedResourcePool,
+        });
+    }, [
+        isResourcePoolsLoading,
+        normalizedResourcePool,
+        querySettings,
+        resourcePools.length,
+        setQuerySettings,
+    ]);
 
     const tableSettings = React.useMemo(() => {
         return isStreamingEnabled

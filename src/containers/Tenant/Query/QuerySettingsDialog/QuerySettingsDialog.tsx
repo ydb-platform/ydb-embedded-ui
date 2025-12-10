@@ -5,7 +5,6 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import {Controller, useForm} from 'react-hook-form';
 
 import {useTracingLevelOptionAvailable} from '../../../../store/reducers/capabilities/hooks';
-import {queryApi} from '../../../../store/reducers/query/query';
 import {
     selectQueryAction,
     setQueryAction,
@@ -16,6 +15,7 @@ import {cn} from '../../../../utils/cn';
 import {
     useQueryExecutionSettings,
     useQueryStreamingSetting,
+    useResourcePools,
     useSetting,
     useTypedDispatch,
     useTypedSelector,
@@ -54,13 +54,6 @@ export function QuerySettingsDialog() {
         [onClose, setQuerySettings],
     );
 
-    const handleResetInvalidResourcePool = React.useCallback(() => {
-        setQuerySettings({
-            ...querySettings,
-            resourcePool: RESOURCE_POOL_NO_OVERRIDE_VALUE,
-        });
-    }, [querySettings, setQuerySettings]);
-
     return (
         <Dialog
             open={queryAction === 'settings'}
@@ -74,7 +67,6 @@ export function QuerySettingsDialog() {
                 initialValues={querySettings}
                 onSubmit={onSubmit}
                 onClose={onClose}
-                onResetInvalidResourcePool={handleResetInvalidResourcePool}
             />
         </Dialog>
     );
@@ -86,12 +78,7 @@ interface QuerySettingsFormProps {
     onClose: () => void;
 }
 
-function QuerySettingsForm({
-    initialValues,
-    onSubmit,
-    onClose,
-    onResetInvalidResourcePool,
-}: QuerySettingsFormProps & {onResetInvalidResourcePool: () => void}) {
+function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsFormProps) {
     const {
         control,
         handleSubmit,
@@ -107,13 +94,10 @@ function QuerySettingsForm({
     const enableTracingLevel = useTracingLevelOptionAvailable();
     const [isQueryStreamingEnabled] = useQueryStreamingSetting();
     const {database} = useCurrentSchema();
-    const {data: resourcePools = [], isLoading: isResourcePoolsLoading} =
-        queryApi.useGetResourcePoolsQuery(
-            {database},
-            {
-                skip: !database,
-            },
-        );
+    const {resourcePools, isLoading: isResourcePoolsLoading} = useResourcePools(
+        database,
+        initialValues.resourcePool,
+    );
 
     const resourcePoolOptions = React.useMemo(
         () => [
@@ -146,9 +130,8 @@ function QuerySettingsForm({
 
         if (!resourcePools.length || !resourcePools.includes(resourcePool)) {
             setValue('resourcePool', RESOURCE_POOL_NO_OVERRIDE_VALUE);
-            onResetInvalidResourcePool();
         }
-    }, [isResourcePoolsLoading, resourcePools, resourcePool, onResetInvalidResourcePool, setValue]);
+    }, [isResourcePoolsLoading, resourcePools, resourcePool, setValue]);
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
