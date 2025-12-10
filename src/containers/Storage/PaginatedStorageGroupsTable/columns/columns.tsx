@@ -37,7 +37,9 @@ const poolNameColumn: StorageGroupsColumn = {
     render: ({row}) => {
         return row.PoolName ? (
             <CellWithPopover
-                content={row.PoolName}
+                content={
+                    <span style={{direction: 'ltr', unicodeBidi: 'plaintext'}}>{row.PoolName}</span>
+                }
                 placement={['right']}
                 openDelay={0}
                 className={b('pool-name-wrapper')}
