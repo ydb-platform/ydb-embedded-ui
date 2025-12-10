@@ -31,18 +31,12 @@ interface SegmentProgressBarProps {
     position: SegmentPosition;
     value: number;
     tooltip: string;
-    theme?: 'default' | 'danger';
 }
 
-const SegmentProgressBar = ({
-    position,
-    value,
-    tooltip,
-    theme = 'default',
-}: SegmentProgressBarProps) => (
+const SegmentProgressBar = ({position, value, tooltip}: SegmentProgressBarProps) => (
     <Popover hasArrow placement="top" content={tooltip} className={b('segment-touched')}>
         <div className={b('segment-bar', SEGMENT_MODS[position])}>
-            <Progress value={value} size="s" theme={theme} />
+            <Progress value={value} size="s" />
         </div>
     </Popover>
 );
@@ -100,7 +94,6 @@ export const PartitionsProgress = ({
                         position="left"
                         value={FULL_FILL_VALUE}
                         tooltip={belowLimitTooltip}
-                        theme="danger"
                     />
 
                     <div className={b('segment-labels', SEGMENT_MODS.left)}>
@@ -144,7 +137,6 @@ export const PartitionsProgress = ({
                         position="right"
                         value={FULL_FILL_VALUE}
                         tooltip={aboveLimitTooltip}
-                        theme="danger"
                     />
 
                     <div className={b('segment-labels', SEGMENT_MODS.right)}>
