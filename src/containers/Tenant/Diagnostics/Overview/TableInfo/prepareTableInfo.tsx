@@ -15,6 +15,7 @@ import type {
     TColumnTableDescription,
     TEvDescribeSchemeResult,
     TPartitionConfig,
+    TPersQueueGroupDescription,
     TTTLSettings,
 } from '../../../../../types/api/schema';
 import {EPathType} from '../../../../../types/api/schema';
@@ -139,6 +140,31 @@ const prepareTableGeneralInfo = (PartitionConfig: TPartitionConfig, TTLSettings?
     return generalTableInfo;
 };
 
+type PartitionProgressConfig = {
+    minPartitions: number;
+    maxPartitions?: number;
+    partitionsCount: number;
+};
+
+const preparePartitionProgressConfig = (
+    PartitionConfig: TPartitionConfig,
+    PersQueueGroup?: TPersQueueGroupDescription,
+): PartitionProgressConfig => {
+    const {PartitioningPolicy} = PartitionConfig;
+
+    // We are convinced, there is always at least one partition;
+    // fallback and clamp to 1 if value is missing.
+    const minPartitions = Math.max(1, PartitioningPolicy?.MinPartitionsCount ?? 1);
+    const maxPartitions = PartitioningPolicy?.MaxPartitionsCount;
+    const partitionsCount = Math.max(1, PersQueueGroup?.Partitions?.length ?? 1);
+
+    return {
+        minPartitions,
+        maxPartitions,
+        partitionsCount,
+    };
+};
+
 /** Prepares data for Table, ColumnTable and ColumnStore */
 export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathType) => {
     if (!data) {
@@ -152,6 +178,7 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
         TabletMetrics = {},
         Table: {PartitionConfig = {}, TTLSettings} = {},
         ColumnTableDescription = {},
+        PersQueueGroup,
     } = PathDescription;
 
     const {
@@ -181,10 +208,15 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
     const {FollowerGroups, FollowerCount, CrossDataCenterFollowerCount} = PartitionConfig;
 
     let generalInfo: InfoViewerItem[] = [];
+    let partitionProgressConfig: PartitionProgressConfig | undefined;
 
     switch (type) {
         case EPathType.EPathTypeTable: {
             generalInfo = prepareTableGeneralInfo(PartitionConfig, TTLSettings);
+            partitionProgressConfig = preparePartitionProgressConfig(
+                PartitionConfig,
+                PersQueueGroup,
+            );
             break;
         }
         case EPathType.EPathTypeColumnTable: {
@@ -252,5 +284,11 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
         );
     }
 
-    return {generalInfo, tableStatsInfo, tabletMetricsInfo, partitionConfigInfo};
+    return {
+        generalInfo,
+        tableStatsInfo,
+        tabletMetricsInfo,
+        partitionConfigInfo,
+        partitionProgressConfig,
+    };
 };

@@ -3,8 +3,8 @@ import React from 'react';
 import {InfoViewer} from '../../../../../components/InfoViewer';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
-import {EntityTitle} from '../../../EntityTitle/EntityTitle';
 
+import {PartitionsProgress} from './PartitionsProgress/PartitionsProgress';
 import i18n from './i18n';
 import {prepareTableInfo} from './prepareTableInfo';
 
@@ -18,22 +18,30 @@ interface TableInfoProps {
 }
 
 export const TableInfo = ({data, type}: TableInfoProps) => {
-    const title = <EntityTitle data={data?.PathDescription} />;
-
     const {
         generalInfo,
         tableStatsInfo,
         tabletMetricsInfo = [],
         partitionConfigInfo = [],
+        partitionProgressConfig,
     } = React.useMemo(() => prepareTableInfo(data, type), [data, type]);
 
     return (
         <div className={b()}>
+            <div className={b('title')}>{i18n('title')}</div>
+            {partitionProgressConfig && (
+                <div className={b('progress-bar')}>
+                    <PartitionsProgress
+                        minPartitions={partitionProgressConfig.minPartitions}
+                        partitionsCount={partitionProgressConfig.partitionsCount}
+                        maxPartitions={partitionProgressConfig.maxPartitions}
+                    />
+                </div>
+            )}
             <InfoViewer
                 info={generalInfo}
-                title={title}
                 className={b('info-block')}
-                renderEmptyState={() => <div className={b('title')}>{title}</div>}
+                renderEmptyState={() => <div className={b('title')}>{i18n('title')}</div>}
             />
             <div className={b('row')}>
                 {tableStatsInfo ? (
