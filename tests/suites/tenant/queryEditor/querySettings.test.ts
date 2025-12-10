@@ -308,17 +308,6 @@ test.describe('Test Query Settings', async () => {
         expect(value).toBe('olap');
     });
 
-    test('Resource pool is disabled for PG query mode', async ({page}) => {
-        await setupResourcePoolMock(page, ['default', 'olap']);
-
-        const queryEditor = new QueryEditor(page);
-        await queryEditor.clickGearButton();
-
-        await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.pg);
-
-        await expect(queryEditor.settingsDialog.isResourcePoolDisabled()).resolves.toBe(true);
-    });
-
     test('Selected resource pool is sent in API requests and no override omits parameter', async ({
         page,
     }) => {

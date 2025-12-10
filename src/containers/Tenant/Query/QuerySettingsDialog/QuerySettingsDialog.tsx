@@ -154,39 +154,8 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                         } else if (mode === 'query') {
                                             setValue('timeout', null);
                                         }
-
-                                        if (mode === QUERY_MODES.pg) {
-                                            setValue(
-                                                'resourcePool',
-                                                RESOURCE_POOL_NO_OVERRIDE_VALUE,
-                                            );
-                                        }
                                     }}
                                     settingOptions={QUERY_SETTINGS_FIELD_SETTINGS.queryMode.options}
-                                />
-                            )}
-                        />
-                    </div>
-                </Flex>
-                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
-                    <label htmlFor="resourcePool" className={b('field-title')}>
-                        {QUERY_SETTINGS_FIELD_SETTINGS.resourcePool.title}
-                    </label>
-                    <div className={b('control-wrapper', {resourcePool: true})}>
-                        <Controller
-                            name="resourcePool"
-                            control={control}
-                            render={({field}) => (
-                                <QuerySettingsSelect<ResourcePoolValue>
-                                    id="resourcePool"
-                                    setting={field.value ?? RESOURCE_POOL_NO_OVERRIDE_VALUE}
-                                    disabled={
-                                        isResourcePoolsLoading ||
-                                        !resourcePools.length ||
-                                        queryMode === QUERY_MODES.pg
-                                    }
-                                    onUpdateSetting={(value) => field.onChange(value)}
-                                    settingOptions={resourcePoolOptions}
                                 />
                             )}
                         />
@@ -327,6 +296,26 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                         </div>
                     </Flex>
                 )}
+                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
+                    <label htmlFor="resourcePool" className={b('field-title')}>
+                        {QUERY_SETTINGS_FIELD_SETTINGS.resourcePool.title}
+                    </label>
+                    <div className={b('control-wrapper', {resourcePool: true})}>
+                        <Controller
+                            name="resourcePool"
+                            control={control}
+                            render={({field}) => (
+                                <QuerySettingsSelect<ResourcePoolValue>
+                                    id="resourcePool"
+                                    setting={field.value ?? RESOURCE_POOL_NO_OVERRIDE_VALUE}
+                                    disabled={isResourcePoolsLoading || !resourcePools.length}
+                                    onUpdateSetting={(value) => field.onChange(value)}
+                                    settingOptions={resourcePoolOptions}
+                                />
+                            )}
+                        />
+                    </div>
+                </Flex>
                 <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
                     <label htmlFor="pragmas" className={b('field-title')}>
                         {QUERY_SETTINGS_FIELD_SETTINGS.pragmas.title}
