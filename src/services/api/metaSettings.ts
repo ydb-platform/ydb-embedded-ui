@@ -25,7 +25,7 @@ export class MetaSettingsAPI extends BaseMetaAPI {
         preventBatching,
     }: GetSingleSettingParams & {preventBatching?: boolean}) {
         if (preventBatching) {
-            return this.get<Setting>(this.getPath('/meta/user_settings'), {name, user});
+            return this.get<Setting | undefined>(this.getPath('/meta/user_settings'), {name, user});
         }
 
         return new Promise<Setting>((resolve, reject) => {

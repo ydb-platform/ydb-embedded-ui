@@ -76,14 +76,8 @@ export const DEFAULT_USER_SETTINGS = {
     [SETTING_KEYS.STORAGE_TYPE]: STORAGE_TYPES.groups,
 } as const satisfies Record<SettingKey, unknown>;
 
-export const SETTINGS_OPTIONS: Record<string, SettingOptions> = {
+export const SETTINGS_OPTIONS: Record<string, SettingOptions | undefined> = {
     [SETTING_KEYS.THEME]: {
         preventBatching: true,
-    },
-    [SETTING_KEYS.SAVED_QUERIES]: {
-        preventSyncWithLS: true,
-    },
-    [SETTING_KEYS.QUERIES_HISTORY]: {
-        preventSyncWithLS: true,
     },
 } as const;
