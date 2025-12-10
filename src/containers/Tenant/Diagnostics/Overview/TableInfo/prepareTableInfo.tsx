@@ -15,8 +15,8 @@ import type {
     TColumnTableDescription,
     TEvDescribeSchemeResult,
     TPartitionConfig,
-    TPersQueueGroupDescription,
     TTTLSettings,
+    TTablePartition,
 } from '../../../../../types/api/schema';
 import {EPathType} from '../../../../../types/api/schema';
 import {valueIsDefined} from '../../../../../utils';
@@ -148,7 +148,7 @@ type PartitionProgressConfig = {
 
 const preparePartitionProgressConfig = (
     PartitionConfig: TPartitionConfig,
-    PersQueueGroup?: TPersQueueGroupDescription,
+    TablePartitions?: TTablePartition[],
 ): PartitionProgressConfig => {
     const {PartitioningPolicy} = PartitionConfig;
 
@@ -156,7 +156,7 @@ const preparePartitionProgressConfig = (
     // fallback and clamp to 1 if value is missing.
     const minPartitions = Math.max(1, PartitioningPolicy?.MinPartitionsCount ?? 1);
     const maxPartitions = PartitioningPolicy?.MaxPartitionsCount;
-    const partitionsCount = Math.max(1, PersQueueGroup?.Partitions?.length ?? 1);
+    const partitionsCount = TablePartitions?.length ?? 1;
 
     return {
         minPartitions,
@@ -174,11 +174,11 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
     const {PathDescription = {}} = data;
 
     const {
+        TablePartitions,
         TableStats = {},
         TabletMetrics = {},
         Table: {PartitionConfig = {}, TTLSettings} = {},
         ColumnTableDescription = {},
-        PersQueueGroup,
     } = PathDescription;
 
     const {
@@ -215,7 +215,7 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
             generalInfo = prepareTableGeneralInfo(PartitionConfig, TTLSettings);
             partitionProgressConfig = preparePartitionProgressConfig(
                 PartitionConfig,
-                PersQueueGroup,
+                TablePartitions,
             );
             break;
         }
