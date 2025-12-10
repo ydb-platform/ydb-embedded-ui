@@ -93,7 +93,10 @@ export class SettingsDialog {
         await this.resourcePoolSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.resourcePoolSelect.click();
         await this.selectPopup.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await this.selectPopup.getByText(label, {exact: true}).click();
+        const optionTitle = this.selectPopup.locator('.ydb-query-settings-select__item-title', {
+            hasText: label,
+        });
+        await optionTitle.first().click();
         await this.page.waitForTimeout(1000);
     }
 
