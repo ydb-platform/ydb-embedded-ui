@@ -53,7 +53,7 @@ export function useSetting<T>(name?: string): {
             if (!name) {
                 return;
             }
-            if (window.api.metaSettings && user) {
+            if (window.api?.metaSettings && user) {
                 setMetaSetting({user, name, value});
             }
             if (isNil(window.api?.metaSettings)) {
