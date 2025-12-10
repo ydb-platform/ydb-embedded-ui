@@ -3,8 +3,7 @@
         display: flex;
         flex-basis: 0;
 
-        &_left,
-        &_right {
+        &_additional {
             min-width: 20px;
         }
 
@@ -14,30 +13,13 @@
     }
 
     &__segment-bar {
-        &_left,
-        &_right {
+        &_additional {
             --g-progress-filled-background-color: var(--g-color-base-danger-heavy);
         }
 
         &_main {
             --g-progress-filled-background-color: var(--g-color-base-info-heavy);
             --g-progress-empty-background-color: var(--g-color-base-info-light);
-        }
-    }
-
-    &__segment-labels {
-        display: flex;
-
-        &_left {
-            justify-content: flex-start;
-        }
-
-        &_right {
-            justify-content: flex-end;
-        }
-
-        &_main {
-            justify-content: space-between;
         }
     }
 

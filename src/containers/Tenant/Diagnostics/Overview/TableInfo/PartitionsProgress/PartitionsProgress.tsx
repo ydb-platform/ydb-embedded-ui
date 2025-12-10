@@ -17,12 +17,11 @@ interface PartitionsProgressProps {
     className?: string;
 }
 
-type SegmentPosition = 'left' | 'main' | 'right';
+type SegmentPosition = 'main' | 'additional';
 
 const SEGMENT_MODS: Record<SegmentPosition, Record<string, boolean>> = {
-    left: {left: true},
+    additional: {additional: true},
     main: {main: true},
-    right: {right: true},
 };
 
 export const FULL_FILL_VALUE = 100;
@@ -93,15 +92,15 @@ export const PartitionsProgress = ({
                         style={{flexGrow: leftSegmentUnits}}
                         direction="column"
                         gap="2"
-                        className={b('segment', SEGMENT_MODS.left)}
+                        className={b('segment', SEGMENT_MODS.additional)}
                     >
-                        <SegmentProgressBar position="left" value={FULL_FILL_VALUE} />
+                        <SegmentProgressBar position="additional" value={FULL_FILL_VALUE} />
 
-                        <div className={b('segment-labels', SEGMENT_MODS.left)}>
+                        <Flex justifyContent="flex-start">
                             <Text variant="body-2" color="secondary">
                                 {partitionsCount}
                             </Text>
-                        </div>
+                        </Flex>
                     </Flex>
                 )}
 
@@ -113,30 +112,30 @@ export const PartitionsProgress = ({
                 >
                     <SegmentProgressBar position="main" value={mainProgressValue} />
 
-                    <div className={b('segment-labels', SEGMENT_MODS.main)}>
+                    <Flex justifyContent="space-between">
                         <Text variant="body-2" color="secondary">
                             {min}
                         </Text>
                         <Text variant="body-2" color="secondary">
                             {maxLabel}
                         </Text>
-                    </div>
+                    </Flex>
                 </Flex>
 
                 {isAboveMax && (
                     <Flex
                         direction="column"
                         gap="2"
-                        className={b('segment', SEGMENT_MODS.right)}
+                        className={b('segment', SEGMENT_MODS.additional)}
                         style={{flexGrow: rightSegmentUnits}}
                     >
-                        <SegmentProgressBar position="right" value={FULL_FILL_VALUE} />
+                        <SegmentProgressBar position="additional" value={FULL_FILL_VALUE} />
 
-                        <div className={b('segment-labels', SEGMENT_MODS.right)}>
+                        <Flex justifyContent="flex-end">
                             <Text variant="body-2" color="secondary">
                                 {partitionsCount}
                             </Text>
-                        </div>
+                        </Flex>
                     </Flex>
                 )}
             </Flex>
