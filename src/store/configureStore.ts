@@ -74,6 +74,7 @@ export function configureStore({
         proxyMeta: false,
         csrfTokenGetter: undefined,
         useRelativePath: false,
+        useMetaSettings: false,
         defaults: undefined,
     }),
 } = {}) {
