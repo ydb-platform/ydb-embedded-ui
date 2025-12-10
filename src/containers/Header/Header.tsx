@@ -73,7 +73,7 @@ function Header() {
 
     const {isLoading: isClustersLoading, error: clustersError} =
         clustersApi.useGetClustersListQuery(undefined, {
-            skip: !isClustersPage,
+            skip: !isClustersPage || !capabilitiesLoaded,
         });
 
     const isAddClusterAvailable =
@@ -93,7 +93,9 @@ function Header() {
         : skipToken;
 
     const {currentData: databaseData, isLoading: isDatabaseDataLoading} =
-        tenantApi.useGetTenantInfoQuery(params);
+        tenantApi.useGetTenantInfoQuery(params, {
+            skip: !capabilitiesLoaded,
+        });
 
     // Show Monitoring only when:
     // - ControlPlane exists AND has a non-empty id
