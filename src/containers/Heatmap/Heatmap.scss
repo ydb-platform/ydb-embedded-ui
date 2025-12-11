@@ -70,6 +70,10 @@
         pointer-events: none;
     }
 
+    &__tooltip {
+        padding: 10px;
+    }
+
     &__filters {
         display: flex;
         align-items: center;

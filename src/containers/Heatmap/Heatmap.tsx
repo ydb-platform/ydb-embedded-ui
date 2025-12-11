@@ -169,6 +169,7 @@ export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
                         onOutsideClick={handleHideTabletTooltip}
                     >
                         <div
+                            className={b('tooltip')}
                             onMouseEnter={handleTooltipMouseEnter}
                             onMouseLeave={handleTooltipMouseLeave}
                         >
