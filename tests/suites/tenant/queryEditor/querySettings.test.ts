@@ -9,32 +9,36 @@ import {longRunningQuery} from '../constants';
 
 import {ButtonNames, QueryEditor} from './models/QueryEditor';
 
+async function fulfillResourcePools(route: Route, pools: string[]) {
+    await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+            version: 8,
+            result: [
+                {
+                    rows: pools.map((name) => [name]),
+                    columns: [{name: 'Name', type: 'Utf8?'}],
+                },
+            ],
+        }),
+    });
+}
+
 async function setupResourcePoolMock(page: Page, pools: string[] = ['default', 'olap']) {
     await page.route(`${backend}/viewer/json/query?*`, async (route: Route) => {
         const request = route.request();
         const postData = request.postData();
 
         if (postData && postData.includes('.sys/resource_pools')) {
-            await route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify({
-                    version: 8,
-                    result: [
-                        {
-                            rows: pools.map((name) => [name]),
-                            columns: [{name: 'Name', type: 'Utf8?'}],
-                        },
-                    ],
-                }),
-            });
+            await fulfillResourcePools(route, pools);
         } else {
             await route.continue();
         }
     });
 }
 
-test.describe('Test Query Settings', async () => {
+test.describe.only('Test Query Settings', async () => {
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';
 
     test.beforeEach(async ({page}) => {
@@ -323,19 +327,7 @@ test.describe('Test Query Settings', async () => {
             }
 
             if (postData.includes('.sys/resource_pools')) {
-                await route.fulfill({
-                    status: 200,
-                    contentType: 'application/json',
-                    body: JSON.stringify({
-                        version: 8,
-                        result: [
-                            {
-                                rows: [['default'], ['olap']],
-                                columns: [{name: 'Name', type: 'Utf8?'}],
-                            },
-                        ],
-                    }),
-                });
+                await fulfillResourcePools(route, ['default', 'olap']);
                 return;
             }
 
