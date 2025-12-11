@@ -24,7 +24,7 @@ export function isFullVDiskData(
 const getSpaceFlag = generateEvaluator([EFlag.Green, EFlag.Yellow, EFlag.Red]);
 
 export const getSpaceSeverity = (allocatedPercent?: number) => {
-    return !isNil(allocatedPercent) ? getColorSeverity(getSpaceFlag(allocatedPercent)) : 0;
+    return isNil(allocatedPercent) ? 0 : getColorSeverity(getSpaceFlag(allocatedPercent));
 };
 
 export function getSeverityColor(severity: number | undefined) {
@@ -66,10 +66,9 @@ export function getVDiskStatusIcon(severity?: number, isDonor?: boolean): IconDa
     }
 
     const isError = severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red;
-    const isReplicating = severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue;
 
     // Display icon only for error and donor
-    if (isReplicating && isDonor) {
+    if (isDonor) {
         return DONOR_ICON;
     }
 

@@ -28,8 +28,20 @@ export function useStorageGroupsSelectedColumns({
     const isViewerUser = useIsViewerUser();
     const bridgeModeEnabled = useBridgeModeEnabled();
 
+    const [highlightedVDisk, setHighlightedVDisk] = React.useState<string | undefined>();
+
+    const [highlightedVDisksVDisk, setHighlightedVDisksVDisk] = React.useState<
+        string | undefined
+    >();
+
     const columns = React.useMemo(() => {
-        const allColumns = getStorageGroupsColumns({viewContext});
+        const allColumns = getStorageGroupsColumns({
+            viewContext,
+            highlightedVDisk,
+            setHighlightedVDisk,
+            highlightedVDisksVDisk,
+            setHighlightedVDisksVDisk,
+        });
         const filteredByBridge = bridgeModeEnabled
             ? allColumns
             : allColumns.filter((c) => c.name !== STORAGE_GROUPS_COLUMNS_IDS.PileName);
@@ -44,7 +56,14 @@ export function useStorageGroupsSelectedColumns({
             return filteredColumns;
         }
         return filteredColumns.filter((column) => !isViewerGroupsColumn(column.name));
-    }, [isUserAllowedToMakeChanges, viewContext, isViewerUser, bridgeModeEnabled]);
+    }, [
+        isUserAllowedToMakeChanges,
+        viewContext,
+        isViewerUser,
+        bridgeModeEnabled,
+        highlightedVDisk,
+        highlightedVDisksVDisk,
+    ]);
 
     const requiredColumns = React.useMemo(() => {
         if (visibleEntities === VISIBLE_ENTITIES.missing) {
