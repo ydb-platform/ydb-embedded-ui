@@ -96,11 +96,12 @@ export const RunningQueriesData = ({
             </TableWithControlsLayout.Controls>
 
             {error ? <ResponseError error={parseQueryErrorToString(error)} /> : null}
-            <TableWithControlsLayout.Table loading={isLoading}>
+            <TableWithControlsLayout.Table>
                 <QueriesTableWithDrawer
                     columns={columnsToShow}
                     data={rows || []}
-                    loading={isFetching && currentData === undefined}
+                    isFetching={isFetching && currentData === undefined}
+                    isLoading={isLoading}
                     columnsWidthLSKey={RUNNING_QUERIES_COLUMNS_WIDTH_LS_KEY}
                     emptyDataMessage={i18n('no-data')}
                     sortOrder={tableSort}

@@ -1,5 +1,30 @@
 # Changelog
 
+## [12.28.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.27.0...v12.28.0) (2025-12-10)
+
+
+### Features
+
+* **settings:** simplify hook, split meta and LS cases ([#3111](https://github.com/ydb-platform/ydb-embedded-ui/issues/3111)) ([e56ce4d](https://github.com/ydb-platform/ydb-embedded-ui/commit/e56ce4d235185c5856a214b930a35a22d06bd044))
+
+
+### Bug Fixes
+
+* correct favicon path ([#3205](https://github.com/ydb-platform/ydb-embedded-ui/issues/3205)) ([c2d682c](https://github.com/ydb-platform/ydb-embedded-ui/commit/c2d682ca4972c10b97f14da2b6d3086de4706478))
+* **Header:** no requests before capabilities loaded ([#3203](https://github.com/ydb-platform/ydb-embedded-ui/issues/3203)) ([e41fcb4](https://github.com/ydb-platform/ydb-embedded-ui/commit/e41fcb4b6daf8c3606d386d3d4dafd5f387c299a))
+
+## [12.27.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.26.0...v12.27.0) (2025-12-09)
+
+
+### Features
+
+* add read replicas template for row tables ([#3187](https://github.com/ydb-platform/ydb-embedded-ui/issues/3187)) ([7205874](https://github.com/ydb-platform/ydb-embedded-ui/commit/72058747b1cec62a1ff2fa40bb707b00501b40f0))
+
+
+### Bug Fixes
+
+* correct static paths, put fonts in media folder for monaco icons ([#3193](https://github.com/ydb-platform/ydb-embedded-ui/issues/3193)) ([90e1b53](https://github.com/ydb-platform/ydb-embedded-ui/commit/90e1b53de683bbb17d795f34c4705dab0f00d855))
+
 ## [12.26.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.25.0...v12.26.0) (2025-12-08)
 
 

@@ -78,8 +78,12 @@ export default defineConfig({
     output: {
         distPath: {
             root: './build',
+            // YDB server that serves static files expects fonts to be in media folder
+            // and favicon in static folder
+            font: 'static/media',
+            favicon: 'static',
         },
-        assetPrefix: '.',
+        assetPrefix: 'auto',
         sourceMap: {
             js: process.env.GENERATE_SOURCEMAP !== 'false' ? 'source-map' : false,
         },
@@ -88,6 +92,7 @@ export default defineConfig({
     },
     html: {
         template: './public/index.html',
+        favicon: './public/static/favicon.png',
     },
     tools: {
         rspack(config, {appendPlugins}) {
