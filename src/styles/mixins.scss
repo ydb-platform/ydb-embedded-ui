@@ -247,7 +247,6 @@
     --entity-state-font-color: var(--g-color-text-primary);
 
     &_green {
-        --entity-state-font-color: var(--g-color-text-positive);
         --entity-state-border-color: var(--g-color-base-positive-medium);
         --entity-state-background-color: var(--g-color-base-positive-light);
         --entity-state-fill-color: var(--g-color-base-positive-medium);
@@ -260,7 +259,6 @@
     }
 
     &_blue {
-        --entity-state-font-color: var(--g-color-text-info);
         --entity-state-border-color: var(--g-color-base-info-heavy);
         --entity-state-shadow-color: var(--g-color-base-info-medium);
         --entity-state-background-color: var(--g-color-base-info-light);
@@ -275,7 +273,6 @@
     }
 
     &_yellow {
-        --entity-state-font-color: var(--g-color-text-warning);
         --entity-state-border-color: var(--g-color-base-warning-medium);
         --entity-state-background-color: var(--g-color-base-warning-light);
         --entity-state-fill-color: var(--g-color-base-warning-medium);
@@ -288,7 +285,6 @@
     }
 
     &_red {
-        --entity-state-font-color: var(--g-color-text-danger);
         --entity-state-border-color: var(--g-color-base-danger-heavy);
         --entity-state-background-color: var(--g-color-base-danger-light);
         --entity-state-fill-color: var(--g-color-base-danger-medium);
@@ -301,7 +297,6 @@
     }
 
     &_darkgrey {
-        --entity-state-font-color: var(--g-color-text-secondary);
         --entity-state-border-color: var(--g-color-base-neutral-heavy);
         --entity-state-shadow-color: var(--g-color-base-neutral-light);
         --entity-state-fill-color: var(--g-color-base-neutral-light);
@@ -315,9 +310,11 @@
         }
     }
 
-    &__grey {
+    &_grey {
         --entity-state-font-color: var(--g-color-text-secondary);
         --entity-state-background-color: var(--g-color-base-neutral-light-hover);
+        --entity-state-fill-color: transparent;
+        --entity-state-border-color: transparent;
 
         &#{$block}_highlighted {
             --entity-state-background-color: var(--g-color-base-neutral-medium);

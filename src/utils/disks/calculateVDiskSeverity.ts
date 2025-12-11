@@ -3,7 +3,7 @@ import type {EVDiskState} from '../../types/api/vdisk';
 
 import {
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
-    NOT_AVAILABLE_SEVERITY,
+    ERROR_SEVERITY,
     VDISK_STATE_SEVERITY,
 } from './constants';
 
@@ -18,9 +18,9 @@ export function calculateVDiskSeverity<
 >(vDisk: T) {
     const {DiskSpace, VDiskState, FrontQueues, Replicated} = vDisk;
 
-    // if the disk is not available, this determines its status severity regardless of other features
+    // if the VDisk is not available, we consider that disk has an error severity
     if (!VDiskState) {
-        return NOT_AVAILABLE_SEVERITY;
+        return ERROR_SEVERITY;
     }
 
     const DiskSpaceSeverity = Math.min(
@@ -44,16 +44,17 @@ export function calculateVDiskSeverity<
 }
 
 export function getStateSeverity(vDiskState?: EVDiskState) {
+    // if the VDiskState if undefined, we consider that this VDisk has an error
     if (!vDiskState) {
-        return NOT_AVAILABLE_SEVERITY;
+        return ERROR_SEVERITY;
     }
 
-    return VDISK_STATE_SEVERITY[vDiskState] ?? NOT_AVAILABLE_SEVERITY;
+    return VDISK_STATE_SEVERITY[vDiskState] ?? ERROR_SEVERITY;
 }
 
 function getColorSeverity(color?: EFlag) {
     if (!color) {
-        return NOT_AVAILABLE_SEVERITY;
+        return ERROR_SEVERITY;
     }
 
     // Blue is reserved for not replicated VDisks. DarkGrey is reserved for donors.
@@ -61,5 +62,5 @@ function getColorSeverity(color?: EFlag) {
         return DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green;
     }
 
-    return DISK_COLOR_STATE_TO_NUMERIC_SEVERITY[color] ?? NOT_AVAILABLE_SEVERITY;
+    return DISK_COLOR_STATE_TO_NUMERIC_SEVERITY[color] ?? ERROR_SEVERITY;
 }

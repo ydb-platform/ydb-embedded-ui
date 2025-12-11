@@ -33,7 +33,7 @@
     @include mixins.entity-state-colors($block);
 
     &_compact {
-        min-width: 0;
+        min-width: 8px;
         height: var(--progress-bar-compact-height);
 
         border-radius: $outer-compact-border-radius;
@@ -109,7 +109,7 @@
         // bar height minus borders
         line-height: calc(var(--progress-bar-full-height) - #{$border-width * 2});
 
-        color: inherit;
+        color: var(--entity-state-font-color);
     }
 
     &__icon {

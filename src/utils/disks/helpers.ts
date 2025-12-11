@@ -24,7 +24,7 @@ export function isFullVDiskData(
 const getSpaceFlag = generateEvaluator([EFlag.Green, EFlag.Yellow, EFlag.Red]);
 
 export const getSpaceSeverity = (allocatedPercent?: number) => {
-    return !isNil(allocatedPercent) ? getColorSeverity(getSpaceFlag(allocatedPercent)) : 0;
+    return isNil(allocatedPercent) ? 0 : getColorSeverity(getSpaceFlag(allocatedPercent));
 };
 
 export function getSeverityColor(severity: number | undefined) {

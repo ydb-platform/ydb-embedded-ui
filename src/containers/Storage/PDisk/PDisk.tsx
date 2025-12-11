@@ -10,6 +10,7 @@ import {VDisk} from '../../../components/VDisk/VDisk';
 import {getPDiskPagePath} from '../../../routes';
 import {cn} from '../../../utils/cn';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
+import i18n from '../i18n';
 import {DISKS_POPUP_DEBOUNCE_TIMEOUT} from '../shared';
 import type {StorageViewContext} from '../types';
 import {isVdiskActive} from '../utils';
@@ -128,6 +129,7 @@ export const PDisk = ({
                         className={progressBarClassName}
                         highlighted={highlighted}
                         darkened={darkened}
+                        noDataPlaceholder={i18n('no-data')}
                     />
                 </InternalLink>
             </HoverPopup>

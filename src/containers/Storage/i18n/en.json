@@ -7,5 +7,7 @@
   "controls_group-by-placeholder": "Group by:",
 
   "no-nodes": "No such nodes",
-  "no-groups": "No such groups"
+  "no-groups": "No such groups",
+
+  "no-data": "no data"
 }

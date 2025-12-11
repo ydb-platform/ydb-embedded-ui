@@ -26,6 +26,7 @@ interface DiskStateProgressBarProps {
     withIcon?: boolean;
     highlighted?: boolean;
     darkened?: boolean;
+    noDataPlaceholder?: React.ReactNode;
 }
 
 export function DiskStateProgressBar({
@@ -42,6 +43,7 @@ export function DiskStateProgressBar({
     withIcon,
     highlighted,
     darkened,
+    noDataPlaceholder,
 }: DiskStateProgressBarProps) {
     const [inverted] = useSetting<boolean | undefined>(SETTING_KEYS.INVERTED_DISKS);
 
@@ -90,6 +92,10 @@ export function DiskStateProgressBar({
 
         if (!compact && diskAllocatedPercent >= 0) {
             return <div className={b('title')}>{`${Math.floor(diskAllocatedPercent)}%`}</div>;
+        }
+
+        if (!compact && !(diskAllocatedPercent >= 0) && noDataPlaceholder) {
+            return <div className={b('title')}>{noDataPlaceholder}</div>;
         }
 
         return null;
