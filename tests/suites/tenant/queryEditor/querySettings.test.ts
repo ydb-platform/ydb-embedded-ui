@@ -38,7 +38,7 @@ async function setupResourcePoolMock(page: Page, pools: string[] = ['default', '
     });
 }
 
-test.describe.only('Test Query Settings', async () => {
+test.describe('Test Query Settings', async () => {
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';
 
     test.beforeEach(async ({page}) => {
