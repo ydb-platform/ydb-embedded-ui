@@ -4,6 +4,7 @@ import type {EVDiskState} from '../../types/api/vdisk';
 import {
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
     ERROR_SEVERITY,
+    NOT_AVAILABLE_SEVERITY,
     VDISK_STATE_SEVERITY,
 } from './constants';
 
@@ -49,12 +50,14 @@ export function getStateSeverity(vDiskState?: EVDiskState) {
         return ERROR_SEVERITY;
     }
 
-    return VDISK_STATE_SEVERITY[vDiskState] ?? ERROR_SEVERITY;
+    // If some strange value arrives that isn't in the map,
+    // we consider it "not available" and color it gray
+    return VDISK_STATE_SEVERITY[vDiskState] ?? NOT_AVAILABLE_SEVERITY;
 }
 
 function getColorSeverity(color?: EFlag) {
     if (!color) {
-        return ERROR_SEVERITY;
+        return NOT_AVAILABLE_SEVERITY;
     }
 
     // Blue is reserved for not replicated VDisks. DarkGrey is reserved for donors.
@@ -62,5 +65,5 @@ function getColorSeverity(color?: EFlag) {
         return DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green;
     }
 
-    return DISK_COLOR_STATE_TO_NUMERIC_SEVERITY[color] ?? ERROR_SEVERITY;
+    return DISK_COLOR_STATE_TO_NUMERIC_SEVERITY[color] ?? NOT_AVAILABLE_SEVERITY;
 }
