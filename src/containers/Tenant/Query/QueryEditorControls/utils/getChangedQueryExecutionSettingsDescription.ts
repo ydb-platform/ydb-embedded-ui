@@ -1,7 +1,5 @@
 import type {QuerySettings} from '../../../../../types/store/query';
-import {RESOURCE_POOL_NO_OVERRIDE_VALUE} from '../../../../../utils/query';
 import {QUERY_SETTINGS_FIELD_SETTINGS} from '../../QuerySettingsDialog/constants';
-import formI18n from '../../QuerySettingsDialog/i18n';
 
 import getChangedQueryExecutionSettings from './getChangedQueryExecutionSettings';
 
@@ -28,11 +26,7 @@ export default function getChangedQueryExecutionSettingsDescription({
                 result[settings.title] = content;
             }
         } else if (currentValue) {
-            if (key === 'resourcePool' && currentValue === RESOURCE_POOL_NO_OVERRIDE_VALUE) {
-                result[settings.title] = formI18n('form.resource-pool.no-override');
-            } else {
-                result[settings.title] = String(currentValue);
-            }
+            result[settings.title] = String(currentValue);
         }
     });
 
