@@ -133,6 +133,7 @@ export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
             <div ref={itemsContainer} className={b('items')}>
                 {tabletTooltip ? (
                     <div
+                        key={`${tabletTooltip.position.left}-${tabletTooltip.position.top}`}
                         ref={setTabletTooltipAnchorElement}
                         className={b('tooltip-anchor')}
                         style={{
