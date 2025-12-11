@@ -36,7 +36,8 @@ export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
         tablet: IHeatmapTabletData;
         position: {left: number; top: number};
     } | null>(null);
-    const tabletTooltipAnchorRef = React.useRef<HTMLDivElement | null>(null);
+    const [tabletTooltipAnchorElement, setTabletTooltipAnchorElement] =
+        React.useState<HTMLDivElement | null>(null);
     const isTabletTooltipHoveredRef = React.useRef(false);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
@@ -132,7 +133,7 @@ export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
             <div ref={itemsContainer} className={b('items')}>
                 {tabletTooltip ? (
                     <div
-                        ref={tabletTooltipAnchorRef}
+                        ref={setTabletTooltipAnchorElement}
                         className={b('tooltip-anchor')}
                         style={{
                             left: tabletTooltip.position.left,
@@ -165,7 +166,7 @@ export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
                         open
                         hasArrow
                         placement={['top', 'bottom', 'left', 'right']}
-                        anchorElement={tabletTooltipAnchorRef.current}
+                        anchorElement={tabletTooltipAnchorElement}
                         onOutsideClick={handleHideTabletTooltip}
                     >
                         <div
