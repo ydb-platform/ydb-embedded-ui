@@ -236,16 +236,12 @@ export function getCpuColumn<
         sortAccessor: ({PoolStats = []}) => Math.max(...PoolStats.map(({Usage}) => Number(Usage))),
         defaultOrder: DataTable.DESCENDING,
         render: ({row}) => {
-            if (!row.PoolStats) {
-                return EMPTY_DATA_PLACEHOLDER;
-            }
-
             let totalPoolUsage =
                 isNumeric(row.CoresUsed) && isNumeric(row.CoresTotal)
                     ? row.CoresUsed / row.CoresTotal
                     : undefined;
 
-            if (totalPoolUsage === undefined) {
+            if (totalPoolUsage === undefined && row.PoolStats) {
                 let totalThreadsCount = 0;
                 totalPoolUsage = row.PoolStats.reduce((acc, pool) => {
                     totalThreadsCount += Number(pool.Threads);
@@ -259,9 +255,10 @@ export function getCpuColumn<
                 <CellWithPopover
                     placement={['top', 'bottom']}
                     fullWidth
+                    disabled={!row.PoolStats}
                     content={
                         <DefinitionList responsive>
-                            {row.PoolStats.map((pool) =>
+                            {row.PoolStats?.map((pool) =>
                                 isNumeric(pool.Usage) ? (
                                     <DefinitionList.Item key={pool.Name} name={pool.Name}>
                                         {formatPool('Usage', pool.Usage).value}
