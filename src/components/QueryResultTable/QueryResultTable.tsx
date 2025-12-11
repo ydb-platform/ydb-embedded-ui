@@ -28,67 +28,7 @@ export const b = cn('ydb-query-result-table');
 
 const WIDTH_PREDICTION_ROWS_COUNT = 100;
 
-type ActiveCellState = {
-    row: KeyValueRow;
-    columnName: string;
-} | null;
-
-type ActiveCellAction = {
-    type: 'toggle';
-    payload: {
-        row: KeyValueRow;
-        columnName: string;
-    };
-};
-
-function activeCellReducer(state: ActiveCellState, action: ActiveCellAction): ActiveCellState {
-    switch (action.type) {
-        case 'toggle':
-            if (
-                state &&
-                state.row === action.payload.row &&
-                state.columnName === action.payload.columnName
-            ) {
-                return null;
-            }
-            return action.payload;
-        default:
-            return state;
-    }
-}
-
-type RenderCellArgs = {row: KeyValueRow; columnName: string};
-type RenderCell = (args: RenderCellArgs) => React.ReactNode;
-
-interface CreateRenderCellParams {
-    activeCell: ActiveCellState;
-    dispatch: React.Dispatch<ActiveCellAction>;
-}
-
-function createRenderCell({activeCell, dispatch}: CreateRenderCellParams): RenderCell {
-    return ({row, columnName}: RenderCellArgs) => {
-        const isActive = Boolean(
-            activeCell && activeCell.row === row && activeCell.columnName === columnName,
-        );
-
-        const value = row[columnName];
-
-        const onToggle = () => {
-            dispatch({
-                type: 'toggle',
-                payload: {row, columnName},
-            });
-        };
-
-        return <Cell value={String(value)} isActive={isActive} onToggle={onToggle} />;
-    };
-}
-
-const prepareTypedColumns = (
-    columns: ColumnType[],
-    data: KeyValueRow[] | undefined,
-    renderCell: RenderCell,
-) => {
+const prepareTypedColumns = (columns: ColumnType[], data: KeyValueRow[] | undefined) => {
     if (!columns.length) {
         return [];
     }
@@ -102,14 +42,14 @@ const prepareTypedColumns = (
             name,
             width: getColumnWidth({data: dataSlice, name}),
             align: columnType === 'number' ? DataTable.RIGHT : DataTable.LEFT,
-            render: ({row}) => renderCell({row, columnName: name}),
+            render: ({row}) => <Cell value={String(row[name])} />,
         };
 
         return column;
     });
 };
 
-const prepareGenericColumns = (data: KeyValueRow[] | undefined, renderCell: RenderCell) => {
+const prepareGenericColumns = (data: KeyValueRow[] | undefined) => {
     if (!data?.length) {
         return [];
     }
@@ -121,7 +61,7 @@ const prepareGenericColumns = (data: KeyValueRow[] | undefined, renderCell: Rend
             name,
             width: getColumnWidth({data: dataSlice, name}),
             align: isNumeric(data[0][name]) ? DataTable.RIGHT : DataTable.LEFT,
-            render: ({row}) => renderCell({row, columnName: name}),
+            render: ({row}) => <Cell value={String(row[name])} />,
         };
 
         return column;
@@ -143,18 +83,9 @@ interface QueryResultTableProps
 export const QueryResultTable = (props: QueryResultTableProps) => {
     const {columns, data, settings: propsSettings} = props;
 
-    const [activeCell, dispatch] = React.useReducer(activeCellReducer, null);
-
-    const renderCell = React.useMemo(
-        () => createRenderCell({activeCell, dispatch}),
-        [activeCell, dispatch],
-    );
-
     const preparedColumns = React.useMemo(() => {
-        return columns
-            ? prepareTypedColumns(columns, data, renderCell)
-            : prepareGenericColumns(data, renderCell);
-    }, [columns, data, renderCell]);
+        return columns ? prepareTypedColumns(columns, data) : prepareGenericColumns(data);
+    }, [columns, data]);
 
     const settings = React.useMemo(() => {
         return {
