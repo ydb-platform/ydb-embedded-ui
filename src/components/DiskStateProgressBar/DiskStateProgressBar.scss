@@ -30,6 +30,8 @@
     border-radius: $outer-border-radius;
     background-color: var(--entity-state-background-color);
 
+    transition: opacity 300ms ease-in-out;
+
     @include mixins.entity-state-colors($block);
 
     &_compact {
@@ -48,7 +50,7 @@
     }
 
     &_darkened {
-        opacity: 0.7;
+        opacity: 0.8;
     }
 
     &_empty {

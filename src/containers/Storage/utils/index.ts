@@ -51,8 +51,13 @@ export function isVdiskActive(vDisk: PreparedVDisk, viewContext?: StorageViewCon
 }
 
 export function isTopLevelStorageContext(context?: StorageViewContext): boolean {
-    // highlight the disk only where we are not committed to a specific node / p-disk / v-disk slot
-    return isNil(context?.nodeId) && isNil(context?.pDiskId) && isNil(context?.vDiskSlotId);
+    // highlight the disk only where we are not committed to a specific node / p-disk / v-disk slot / group
+    return (
+        isNil(context?.nodeId) &&
+        isNil(context?.pDiskId) &&
+        isNil(context?.vDiskSlotId) &&
+        isNil(context?.groupId)
+    );
 }
 
 const DEFAULT_ENTITIES_COUNT = 10;

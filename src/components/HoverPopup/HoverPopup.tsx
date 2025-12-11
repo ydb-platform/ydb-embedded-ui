@@ -37,7 +37,7 @@ export const HoverPopup = ({
     const [isPopupContentHovered, setIsPopupContentHovered] = React.useState(false);
     const [isFocused, setIsFocused] = React.useState(false);
 
-    const anchor = React.useRef<HTMLDivElement>(null);
+    const anchor = React.useRef<HTMLSpanElement>(null);
 
     const debouncedHandleShowPopup = React.useMemo(
         () =>
@@ -52,10 +52,7 @@ export const HoverPopup = ({
     }, []);
 
     const debouncedHandleHidePopup = React.useMemo(
-        () =>
-            debounce(() => {
-                hidePopup();
-            }, delayClose),
+        () => debounce(hidePopup, delayClose),
         [hidePopup, delayClose],
     );
 
@@ -114,14 +111,18 @@ export const HoverPopup = ({
         prevInternalOpenRef.current = internalOpen;
     }, [internalOpen, onShowPopup, onHidePopup]);
 
+    // Do not render Popup until it is available
+    // to avoid a brief initial render at (0, 0) before positioning is applied.
+    const anchorElement = anchorRef?.current || anchor.current;
+
     return (
         <React.Fragment>
             <span ref={anchor} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
                 {children}
             </span>
-            {open ? (
+            {open && anchorElement ? (
                 <Popup
-                    anchorElement={anchorRef?.current || anchor.current}
+                    anchorElement={anchorElement}
                     onOpenChange={(_open, _event, reason) => {
                         if (reason === 'escape-key') {
                             onPopupEscapeKeyDown();

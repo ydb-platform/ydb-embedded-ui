@@ -7,6 +7,7 @@ import {cn} from '../../utils/cn';
 import {DONOR_COLOR} from '../../utils/disks/constants';
 import {getSeverityColor, getVDiskStatusIcon} from '../../utils/disks/helpers';
 import {useSetting} from '../../utils/hooks';
+import {isNumeric} from '../../utils/utils';
 
 import './DiskStateProgressBar.scss';
 
@@ -67,9 +68,15 @@ export function DiskStateProgressBar({
         }
     }
 
+    const hasAllocatedPercent = isNumeric(diskAllocatedPercent) && diskAllocatedPercent >= 0;
+
     const renderAllocatedPercent = () => {
         if (compact) {
             return <div className={b('fill-bar', mods)} style={{width: '100%'}} />;
+        }
+
+        if (!hasAllocatedPercent) {
+            return null;
         }
 
         // diskAllocatedPercent could be more than 100
@@ -78,11 +85,7 @@ export function DiskStateProgressBar({
             fillWidth = Math.max(100 - diskAllocatedPercent, 0);
         }
 
-        if (diskAllocatedPercent >= 0) {
-            return <div className={b('fill-bar', mods)} style={{width: `${fillWidth}%`}} />;
-        }
-
-        return null;
+        return <div className={b('fill-bar', mods)} style={{width: `${fillWidth}%`}} />;
     };
 
     const renderContent = () => {
@@ -90,11 +93,11 @@ export function DiskStateProgressBar({
             return content;
         }
 
-        if (!compact && diskAllocatedPercent >= 0) {
+        if (!compact && hasAllocatedPercent) {
             return <div className={b('title')}>{`${Math.floor(diskAllocatedPercent)}%`}</div>;
         }
 
-        if (!compact && !(diskAllocatedPercent >= 0) && noDataPlaceholder) {
+        if (!compact && !hasAllocatedPercent && noDataPlaceholder) {
             return <div className={b('title')}>{noDataPlaceholder}</div>;
         }
 
@@ -123,7 +126,7 @@ export function DiskStateProgressBar({
             aria-label="Disk allocated space"
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-valuenow={diskAllocatedPercent}
+            aria-valuenow={hasAllocatedPercent ? diskAllocatedPercent : undefined}
         >
             {iconElement}
             {renderAllocatedPercent()}

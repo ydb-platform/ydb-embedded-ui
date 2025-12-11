@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
@@ -30,15 +32,15 @@ export function VDiskWithDonorsStack({
     const isHighlighted = Boolean(stackId && highlightedVDisk === stackId);
     const isDarkened = Boolean(highlightedVDisk && highlightedVDisk !== stackId);
 
-    const handleShowPopup = () => {
+    const handleShowPopup = React.useCallback(() => {
         if (stackId) {
             setHighlightedVDisk?.(stackId);
         }
-    };
+    }, [stackId, setHighlightedVDisk]);
 
-    const handleHidePopup = () => {
+    const handleHidePopup = React.useCallback(() => {
         setHighlightedVDisk?.(undefined);
-    };
+    }, [setHighlightedVDisk]);
 
     const commonVDiskProps: Partial<VDiskProps> = {
         withIcon,
