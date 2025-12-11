@@ -74,7 +74,7 @@ export const PDisk = ({
 
                     return (
                         <div
-                            key={vdisk.StringifiedId}
+                            key={vDiskId}
                             className={b('vdisks-item')}
                             style={{
                                 // 1 is small enough for empty disks to be of the minimum width
