@@ -1,4 +1,5 @@
 import type {MetaCapabilitiesResponse} from '../../types/api/capabilities';
+import type {MetaEnvironmentsResponse} from '../../types/api/environments';
 import type {
     MetaBaseClusterInfo,
     MetaBaseClusters,
@@ -32,6 +33,10 @@ export class MetaAPI extends BaseMetaAPI {
         );
     }
 
+    getMetaEnvironments() {
+        return this.get<MetaEnvironmentsResponse>(this.getPath('/meta/environments'), {});
+    }
+
     getClustersList(_?: never, {signal}: {signal?: AbortSignal} = {}) {
         return this.get<MetaClusters>(this.getPath('/meta/clusters'), null, {
             requestConfig: {signal},
@@ -54,13 +59,18 @@ export class MetaAPI extends BaseMetaAPI {
     }
 
     getTenantsV2(
-        {database, clusterName}: {clusterName?: string; database?: string},
+        {
+            database,
+            clusterName,
+            environmentName,
+        }: {clusterName?: string; database?: string; environmentName?: string},
         {signal}: AxiosOptions = {},
     ) {
         return this.get<MetaTenants>(
             this.getPath('/meta/databases', clusterName),
             {
                 cluster_name: clusterName,
+                environment_name: environmentName,
                 database,
             },
             {requestConfig: {signal}},

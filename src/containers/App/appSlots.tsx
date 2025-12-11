@@ -2,7 +2,7 @@ import type {RedirectProps, RouteComponentProps} from 'react-router-dom';
 
 import {createSlot} from '../../components/slots';
 import type {Cluster} from '../Cluster/Cluster';
-import type {Clusters} from '../Clusters/Clusters';
+import type {HomePage} from '../HomePage/HomePage';
 import type {Node} from '../Node/Node';
 import type {PDiskPage} from '../PDiskPage/PDiskPage';
 import type {StorageGroupPage} from '../StorageGroupPage/StorageGroupPage';
@@ -10,11 +10,11 @@ import type {Tablet} from '../Tablet';
 import type {Tenant} from '../Tenant/Tenant';
 import type {VDiskPage} from '../VDiskPage/VDiskPage';
 
-export const ClustersSlot = createSlot<{
+export const HomePageSlot = createSlot<{
     children:
         | React.ReactNode
-        | ((props: {component: typeof Clusters} & RouteComponentProps) => React.ReactNode);
-}>('clusters');
+        | ((props: {component: typeof HomePage} & RouteComponentProps) => React.ReactNode);
+}>('homePage');
 export const ClusterSlot = createSlot<{
     children:
         | React.ReactNode

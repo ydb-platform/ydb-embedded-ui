@@ -11,6 +11,7 @@ type AdditionalQueryParams = {
     tenantPage?: TenantPage;
     database?: string;
     name?: string;
+    clusterName?: string;
     backend?: string;
     selectedPartition?: string;
     activeOffset?: string;

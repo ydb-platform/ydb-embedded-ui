@@ -200,3 +200,10 @@ export const useMetaLoginAvailable = () => {
 export const useMetaWhoAmIAvailable = () => {
     return useGetMetaFeatureVersion('/meta/whoami') >= 1;
 };
+
+export const useMetaEnvironmentsAvailable = () => {
+    return (
+        useGetMetaFeatureVersion('/meta/environments') >= 1 &&
+        Boolean(uiFactory.databasesEnvironmentsConfig?.supportedEnvironments?.length)
+    );
+};

@@ -56,4 +56,5 @@ export type MetaCapability =
     | '/meta/events'
     | '/meta/login'
     | '/meta/whoami'
-    | '/meta/databases';
+    | '/meta/databases'
+    | '/meta/environments';

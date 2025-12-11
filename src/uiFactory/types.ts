@@ -25,7 +25,7 @@ export interface UIFactory<H extends string = CommonIssueType, T extends string 
     onEditCluster?: HandleEditCluster;
     onDeleteCluster?: HandleDeleteCluster;
 
-    clustersPageTitle?: string;
+    homePageTitle?: string;
 
     getLogsLink?: GetLogsLink;
     getMonitoringLink?: GetMonitoringLink;
@@ -68,6 +68,8 @@ export interface UIFactory<H extends string = CommonIssueType, T extends string 
         goals: UiMetricaGoals;
         getMetricaName: (goalKey: UiMetricaGoal) => T;
     };
+
+    databasesEnvironmentsConfig?: DatabasesEnvironmentsConfig;
 }
 
 export type HandleCreateDB = (params: {clusterName: string}) => Promise<boolean>;
@@ -120,3 +122,10 @@ export interface UiMetricaGoals {
 }
 
 export type UiMetricaGoal = keyof UiMetricaGoals;
+
+export interface DatabasesEnvironmentsConfig {
+    supportedEnvironments: string[];
+    defaultEnvironment?: string;
+    getEnvironmentTitle?: (env: string) => string | undefined;
+    getEnvironmentDomain?: (env: string) => string | undefined;
+}

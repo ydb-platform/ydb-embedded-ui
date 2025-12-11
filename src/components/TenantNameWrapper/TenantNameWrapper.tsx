@@ -72,6 +72,7 @@ export function TenantNameWrapper({tenant, additionalTenantsProps}: TenantNameWr
             hasClipboardButton
             path={getTenantPath(
                 {
+                    clusterName: tenant.Cluster,
                     database: useDatabaseId ? tenant.Id : tenant.Name,
                     backend,
                 },

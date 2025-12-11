@@ -15,22 +15,25 @@ import {useHistory, useLocation} from 'react-router-dom';
 
 import {getConnectToDBDialog} from '../../components/ConnectToDB/ConnectToDBDialog';
 import {InternalLink} from '../../components/InternalLink';
-import {checkIsClustersPage, checkIsTenantPage, getClusterPath} from '../../routes';
+import type {HomePageTab} from '../../routes';
+import {checkIsHomePage, checkIsTenantPage, getClusterPath} from '../../routes';
 import {environment} from '../../store';
 import {
     useAddClusterFeatureAvailable,
     useDeleteDatabaseFeatureAvailable,
     useEditDatabaseFeatureAvailable,
     useMetaCapabilitiesLoaded,
+    useMetaEnvironmentsAvailable,
 } from '../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import {clustersApi} from '../../store/reducers/clusters/clusters';
+import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {tenantApi} from '../../store/reducers/tenant/tenant';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {DEVELOPER_UI_TITLE, MONITORING_UI_TITLE} from '../../utils/constants';
 import {createDeveloperUIInternalPageHref} from '../../utils/developerUI/developerUI';
-import {useTypedSelector} from '../../utils/hooks';
+import {useSetting, useTypedSelector} from '../../utils/hooks';
 import {
     useClusterNameFromQuery,
     useDatabaseFromQuery,
@@ -42,6 +45,7 @@ import {
 } from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {canShowTenantMonitoring} from '../../utils/monitoringVisibility';
 import {isAccessError} from '../../utils/response';
+import {useHomePageTab} from '../HomePage/useHomePageTab';
 
 import {getBreadcrumbs} from './breadcrumbs';
 import {headerKeyset} from './i18n';
@@ -56,6 +60,14 @@ function Header() {
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const isViewerUser = useIsViewerUser();
+    const databasesPageAvailable = useMetaEnvironmentsAvailable();
+
+    const [savedHomePageTab] = useSetting<HomePageTab | undefined>(SETTING_KEYS.HOME_PAGE_TAB);
+    const [savedDatabasesEnvironment] = useSetting<string | undefined>(
+        SETTING_KEYS.DATABASES_PAGE_ENVIRONMENT,
+    );
+
+    const homePageTabFromPath = useHomePageTab();
 
     const isMetaDatabasesAvailable = useDatabasesV2();
 
@@ -69,11 +81,13 @@ function Header() {
     const history = useHistory();
 
     const isDatabasePage = checkIsTenantPage(location.pathname);
-    const isClustersPage = checkIsClustersPage(location.pathname);
+    const isHomePage = checkIsHomePage(location.pathname);
+    const isDatabasesHomePage = isHomePage && homePageTabFromPath === 'databases';
+    const isClustersHomePage = isHomePage && homePageTabFromPath === 'clusters';
 
     const {isLoading: isClustersLoading, error: clustersError} =
         clustersApi.useGetClustersListQuery(undefined, {
-            skip: !isClustersPage || !metaCapabilitiesLoaded,
+            skip: !isClustersHomePage || !metaCapabilitiesLoaded,
         });
 
     const isAddClusterAvailable =
@@ -120,6 +134,9 @@ function Header() {
             singleClusterMode,
             isViewerUser,
             environment,
+            homePageTab: homePageTabFromPath ?? savedHomePageTab,
+            databasesPageEnvironment: savedDatabasesEnvironment,
+            databasesPageAvailable,
         };
 
         if (clusterTitle) {
@@ -134,12 +151,23 @@ function Header() {
         return breadcrumbs.map((item) => {
             return {...item, action: () => {}};
         });
-    }, [clusterTitle, page, pageBreadcrumbsOptions, singleClusterMode, isViewerUser]);
+    }, [
+        clusterTitle,
+        page,
+        isClustersHomePage,
+        isDatabasesHomePage,
+        homePageTabFromPath,
+        savedHomePageTab,
+        savedDatabasesEnvironment,
+        pageBreadcrumbsOptions,
+        singleClusterMode,
+        isViewerUser,
+    ]);
 
     const renderRightControls = () => {
         const elements: React.ReactNode[] = [];
 
-        if (isClustersPage && isAddClusterAvailable) {
+        if (isClustersHomePage && isAddClusterAvailable) {
             elements.push(
                 <Button view={'flat'} onClick={() => uiFactory.onAddCluster?.()}>
                     <Icon data={CirclePlus} />
@@ -217,7 +245,7 @@ function Header() {
             }
         }
 
-        if (!isClustersPage && isUserAllowedToMakeChanges) {
+        if (!isHomePage && isUserAllowedToMakeChanges) {
             elements.push(
                 <Button view="flat" href={createDeveloperUIInternalPageHref()} target="_blank">
                     {DEVELOPER_UI_TITLE}

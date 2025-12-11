@@ -40,8 +40,6 @@ import {
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
 import {useAutoRefreshInterval, useSetting} from '../../utils/hooks';
-import {useClusterNameFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
-import {useDatabasesV2} from '../../utils/hooks/useDatabasesV2';
 import {isNumeric} from '../../utils/utils';
 
 import i18n from './i18n';
@@ -70,17 +68,26 @@ function formatDatabaseState(state?: State): string {
     }
 }
 
-interface TenantsProps {
+interface TenantsTableProps {
+    clusterName?: string;
+    environmentName?: string;
+    isMetaDatabasesAvailable?: boolean;
+    showDomainDatabase?: boolean;
     scrollContainerRef: React.RefObject<HTMLElement>;
     additionalTenantsProps?: AdditionalTenantsProps;
 }
 
-export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsProps) => {
-    const clusterName = useClusterNameFromQuery();
-    const isMetaDatabasesAvailable = useDatabasesV2();
+export const TenantsTable = ({
+    clusterName,
+    environmentName,
+    isMetaDatabasesAvailable,
+    showDomainDatabase,
+    scrollContainerRef,
+    additionalTenantsProps,
+}: TenantsTableProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tenantsApi.useGetTenantsInfoQuery(
-        {clusterName, isMetaDatabasesAvailable},
+        {clusterName, environmentName, isMetaDatabasesAvailable},
         {pollingInterval: autoRefreshInterval},
     );
     const loading = isFetching && currentData === undefined;
@@ -98,7 +105,6 @@ export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsPro
         useTenantsQueryParams();
 
     const [showNetworkUtilization] = useSetting<boolean>(SETTING_KEYS.SHOW_NETWORK_UTILIZATION);
-    const [showDomainDatabase] = useSetting<boolean>(SETTING_KEYS.SHOW_DOMAIN_DATABASE);
 
     // We should apply domain filter before other filters
     // It is done to ensure proper entities count
