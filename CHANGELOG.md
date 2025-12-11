@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.28.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.28.0...v12.28.1) (2025-12-11)
+
+
+### Bug Fixes
+
+* **capabilities:** capabilities loaded logic ([#3207](https://github.com/ydb-platform/ydb-embedded-ui/issues/3207)) ([8baa10e](https://github.com/ydb-platform/ydb-embedded-ui/commit/8baa10edcee09cda500bfe9475df4884c9753f31))
+
 ## [12.28.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.27.0...v12.28.0) (2025-12-10)
 
 
