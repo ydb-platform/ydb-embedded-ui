@@ -36,8 +36,8 @@ export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
         tablet: IHeatmapTabletData;
         position: {left: number; top: number};
     } | null>(null);
-    const [isTabletTooltipHovered, setIsTabletTooltipHovered] = React.useState(false);
     const tabletTooltipAnchorRef = React.useRef<HTMLDivElement | null>(null);
+    const isTabletTooltipHoveredRef = React.useRef(false);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
@@ -64,20 +64,20 @@ export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
 
     const handleRequestHideTabletTooltip = React.useCallback(() => {
         setTabletTooltip((prev) => {
-            if (!prev || isTabletTooltipHovered) {
+            if (!prev || isTabletTooltipHoveredRef.current) {
                 return prev;
             }
 
             return null;
         });
-    }, [isTabletTooltipHovered]);
+    }, []);
 
     const handleTooltipMouseEnter = React.useCallback(() => {
-        setIsTabletTooltipHovered(true);
+        isTabletTooltipHoveredRef.current = true;
     }, []);
 
     const handleTooltipMouseLeave = React.useCallback(() => {
-        setIsTabletTooltipHovered(false);
+        isTabletTooltipHoveredRef.current = false;
         handleHideTabletTooltip();
     }, [handleHideTabletTooltip]);
 
