@@ -110,7 +110,6 @@ interface RackColumnProps {
     onClickNode: (node: TNetNodeInfo | undefined) => void;
     onShowNodeTooltip: (anchor: HTMLDivElement, data: NodeTooltipData) => void;
     onHideNodeTooltip: () => void;
-    onNodeRendered: () => void;
 }
 
 function RackColumn({
@@ -124,7 +123,6 @@ function RackColumn({
     onClickNode,
     onShowNodeTooltip,
     onHideNodeTooltip,
-    onNodeRendered,
 }: RackColumnProps) {
     return (
         <div key={rackIndex} className={b('rack-column')}>
@@ -133,7 +131,6 @@ function RackColumn({
                 const {capacity, connected} = getNodeCapacityAndConnected(nodeInfo, isRight, true);
 
                 if (shouldShowNode(withProblems, isRight, capacity, connected)) {
-                    onNodeRendered();
                     return (
                         <NodeItem
                             key={index}
@@ -165,7 +162,6 @@ interface FlatNodesListProps {
     onClickNode: (node: TNetNodeInfo | undefined) => void;
     onShowNodeTooltip: (anchor: HTMLDivElement, data: NodeTooltipData) => void;
     onHideNodeTooltip: () => void;
-    onNodeRendered: () => void;
 }
 
 function FlatNodesList({
@@ -177,7 +173,6 @@ function FlatNodesList({
     onClickNode,
     onShowNodeTooltip,
     onHideNodeTooltip,
-    onNodeRendered,
 }: FlatNodesListProps) {
     return (
         <React.Fragment>
@@ -186,7 +181,6 @@ function FlatNodesList({
                 const {capacity, connected} = getNodeCapacityAndConnected(nodeInfo, isRight, false);
 
                 if (shouldShowNode(withProblems, isRight, capacity, connected)) {
-                    onNodeRendered();
                     return (
                         <NodeItem
                             key={index}
@@ -209,6 +203,45 @@ function FlatNodesList({
     );
 }
 
+function countDisplayedNodes(
+    nodes: NodesProps['nodes'],
+    withProblems: boolean,
+    isRight?: boolean,
+    showRacks?: boolean,
+) {
+    let count = 0;
+
+    Object.keys(nodes).forEach((nodeTypeKey) => {
+        if (showRacks) {
+            const nodesGroupedByRack = groupNodesByField(nodes[nodeTypeKey], 'Rack');
+
+            Object.keys(nodesGroupedByRack).forEach((rackKey) => {
+                nodesGroupedByRack[rackKey].forEach((nodeInfo) => {
+                    const {capacity, connected} = getNodeCapacityAndConnected(
+                        nodeInfo,
+                        isRight,
+                        true,
+                    );
+
+                    if (shouldShowNode(withProblems, isRight, capacity, connected)) {
+                        count++;
+                    }
+                });
+            });
+        } else {
+            nodes[nodeTypeKey].forEach((nodeInfo) => {
+                const {capacity, connected} = getNodeCapacityAndConnected(nodeInfo, isRight, false);
+
+                if (shouldShowNode(withProblems, isRight, capacity, connected)) {
+                    count++;
+                }
+            });
+        }
+    });
+
+    return count;
+}
+
 export function Nodes({
     nodes,
     isRight,
@@ -221,10 +254,10 @@ export function Nodes({
 }: NodesProps) {
     const {withProblems} = useWithProblemsQueryParam();
 
-    let problemNodesCount = 0;
-    const incrementCount = () => {
-        problemNodesCount++;
-    };
+    const displayedNodesCount = React.useMemo(
+        () => countDisplayedNodes(nodes, withProblems, isRight, showRacks),
+        [nodes, withProblems, isRight, showRacks],
+    );
 
     const result = Object.keys(nodes).map((nodeTypeKey, j) => {
         const nodesGroupedByRack = groupNodesByField(nodes[nodeTypeKey], 'Rack');
@@ -246,7 +279,6 @@ export function Nodes({
                                 onClickNode={onClickNode}
                                 onShowNodeTooltip={onShowNodeTooltip}
                                 onHideNodeTooltip={onHideNodeTooltip}
-                                onNodeRendered={incrementCount}
                             />
                         ))
                     ) : (
@@ -259,7 +291,6 @@ export function Nodes({
                             onClickNode={onClickNode}
                             onShowNodeTooltip={onShowNodeTooltip}
                             onHideNodeTooltip={onHideNodeTooltip}
-                            onNodeRendered={incrementCount}
                         />
                     )}
                 </div>
@@ -267,7 +298,7 @@ export function Nodes({
         );
     });
 
-    if (withProblems && problemNodesCount === 0) {
+    if (withProblems && displayedNodesCount === 0) {
         return <Illustration name="thumbsUp" width={200} />;
     }
 
