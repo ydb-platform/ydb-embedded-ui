@@ -23,6 +23,7 @@ export class SettingsDialog {
     private timeoutLabel: Locator;
 
     private queryModeSelect: Locator;
+    private resourcePoolSelect: Locator;
     private transactionModeSelect: Locator;
     private statisticsModeSelect: Locator;
     private statisticsModeTooltip: Locator;
@@ -47,6 +48,9 @@ export class SettingsDialog {
         this.queryModeSelect = this.dialog.locator(
             '.ydb-query-settings-dialog__control-wrapper_queryMode',
         );
+        this.resourcePoolSelect = this.dialog.locator(
+            '.ydb-query-settings-dialog__control-wrapper_resourcePool',
+        );
         this.transactionModeSelect = this.dialog.locator(
             '.ydb-query-settings-dialog__control-wrapper_transactionMode',
         );
@@ -64,6 +68,49 @@ export class SettingsDialog {
         await this.selectPopup.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.page.locator(`.ydb-query-settings-select__item_type_${mode}`).click();
         await this.page.waitForTimeout(1000);
+    }
+
+    async getResourcePoolOptions() {
+        await this.resourcePoolSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.resourcePoolSelect.click();
+        await this.selectPopup.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+
+        const items = this.selectPopup.locator('.ydb-query-settings-select__item-title');
+        const count = await items.count();
+        const options: string[] = [];
+
+        for (let index = 0; index < count; index += 1) {
+            const text = await items.nth(index).textContent();
+            if (text) {
+                options.push(text.trim());
+            }
+        }
+
+        return options;
+    }
+
+    async changeResourcePool(label: string) {
+        await this.resourcePoolSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await this.resourcePoolSelect.click();
+        await this.selectPopup.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        const optionTitle = this.selectPopup.locator('.ydb-query-settings-select__item-title', {
+            hasText: label,
+        });
+        await optionTitle.first().click();
+        await this.page.waitForTimeout(1000);
+    }
+
+    async getResourcePoolValue() {
+        await this.resourcePoolSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        const selectedText = await this.resourcePoolSelect
+            .locator('.g-select-control__option-text')
+            .textContent();
+        return selectedText?.trim() || '';
+    }
+
+    async isResourcePoolDisabled() {
+        await this.resourcePoolSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return this.resourcePoolSelect.locator('.g-select-control_disabled').isVisible();
     }
 
     async changeTransactionMode(level: (typeof TRANSACTION_MODES)[keyof typeof TRANSACTION_MODES]) {

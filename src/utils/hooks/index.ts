@@ -10,3 +10,4 @@ export * from './useEventHandler';
 export * from './useDelayed';
 export * from './useAclSyntax';
 export * from './useScrollPosition';
+export * from './useResourcePools';

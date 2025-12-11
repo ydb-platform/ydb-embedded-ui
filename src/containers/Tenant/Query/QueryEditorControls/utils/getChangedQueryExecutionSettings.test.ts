@@ -36,6 +36,7 @@ describe('getChangedQueryExecutionSettings', () => {
             statisticsMode: STATISTICS_MODES.basic,
             tracingLevel: TRACING_LEVELS.basic,
             pragmas: 'PRAGMA TestPragma;',
+            resourcePool: DEFAULT_QUERY_SETTINGS.resourcePool,
         };
         const result = getChangedQueryExecutionSettings(currentSettings, DEFAULT_QUERY_SETTINGS);
         expect(result).toEqual([

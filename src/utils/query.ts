@@ -303,6 +303,11 @@ export const parseQueryErrorToString = (error: unknown) => {
 
 export const defaultPragma = 'PRAGMA OrderedColumns;';
 
+// Special marker meaning "do not override resource pool in request params"
+export const RESOURCE_POOL_NO_OVERRIDE_VALUE = '__no_pool_override__';
+
+export type ResourcePoolValue = typeof RESOURCE_POOL_NO_OVERRIDE_VALUE | string;
+
 export const DEFAULT_QUERY_SETTINGS = {
     queryMode: QUERY_MODES.query,
     transactionMode: TRANSACTION_MODES.implicit,
@@ -311,6 +316,7 @@ export const DEFAULT_QUERY_SETTINGS = {
     statisticsMode: STATISTICS_MODES.none,
     tracingLevel: TRACING_LEVELS.off,
     pragmas: defaultPragma,
+    resourcePool: RESOURCE_POOL_NO_OVERRIDE_VALUE,
 };
 
 export const queryModeSchema = z.nativeEnum(QUERY_MODES);
@@ -339,6 +345,7 @@ export const querySettingsValidationSchema = z.object({
     statisticsMode: statisticsModeSchema,
     tracingLevel: tracingLevelSchema,
     pragmas: z.string(),
+    resourcePool: z.string(),
 });
 
 export const querySettingsRestoreSchema = z
@@ -360,5 +367,6 @@ export const querySettingsRestoreSchema = z
         statisticsMode: statisticsModeSchema.catch(DEFAULT_QUERY_SETTINGS.statisticsMode),
         tracingLevel: tracingLevelSchema.catch(DEFAULT_QUERY_SETTINGS.tracingLevel),
         pragmas: z.string().catch(DEFAULT_QUERY_SETTINGS.pragmas),
+        resourcePool: z.string().catch(DEFAULT_QUERY_SETTINGS.resourcePool),
     })
     .catch(DEFAULT_QUERY_SETTINGS);

@@ -15,11 +15,18 @@ import {cn} from '../../../../utils/cn';
 import {
     useQueryExecutionSettings,
     useQueryStreamingSetting,
+    useResourcePools,
     useSetting,
     useTypedDispatch,
     useTypedSelector,
 } from '../../../../utils/hooks';
-import {QUERY_MODES, querySettingsValidationSchema} from '../../../../utils/query';
+import type {ResourcePoolValue} from '../../../../utils/query';
+import {
+    QUERY_MODES,
+    RESOURCE_POOL_NO_OVERRIDE_VALUE,
+    querySettingsValidationSchema,
+} from '../../../../utils/query';
+import {useCurrentSchema} from '../../TenantContext';
 
 import {QuerySettingsSelect} from './QuerySettingsSelect';
 import {QuerySettingsTimeout} from './QuerySettingsTimeout';
@@ -86,9 +93,43 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
     const [useShowPlanToSvg] = useSetting<boolean>(SETTING_KEYS.USE_SHOW_PLAN_SVG);
     const enableTracingLevel = useTracingLevelOptionAvailable();
     const [isQueryStreamingEnabled] = useQueryStreamingSetting();
+    const {database} = useCurrentSchema();
+    const {resourcePools, isLoading: isResourcePoolsLoading} = useResourcePools(
+        database,
+        initialValues.resourcePool,
+    );
+
+    const resourcePoolOptions = React.useMemo(
+        () => [
+            {
+                value: RESOURCE_POOL_NO_OVERRIDE_VALUE,
+                content: i18n('form.resource-pool.no-override'),
+            },
+            ...resourcePools.map((name) => ({
+                value: name,
+                content: name,
+            })),
+        ],
+        [resourcePools],
+    );
 
     const timeout = watch('timeout');
+    const resourcePool = watch('resourcePool');
     const queryMode = watch('queryMode');
+
+    React.useEffect(() => {
+        if (isResourcePoolsLoading) {
+            return;
+        }
+
+        if (!resourcePool || resourcePool === RESOURCE_POOL_NO_OVERRIDE_VALUE) {
+            return;
+        }
+
+        if (!resourcePools.length || !resourcePools.includes(resourcePool)) {
+            setValue('resourcePool', RESOURCE_POOL_NO_OVERRIDE_VALUE);
+        }
+    }, [isResourcePoolsLoading, resourcePools, resourcePool, setValue]);
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -255,6 +296,26 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                         </div>
                     </Flex>
                 )}
+                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
+                    <label htmlFor="resourcePool" className={b('field-title')}>
+                        {QUERY_SETTINGS_FIELD_SETTINGS.resourcePool.title}
+                    </label>
+                    <div className={b('control-wrapper', {resourcePool: true})}>
+                        <Controller
+                            name="resourcePool"
+                            control={control}
+                            render={({field}) => (
+                                <QuerySettingsSelect<ResourcePoolValue>
+                                    id="resourcePool"
+                                    setting={field.value ?? RESOURCE_POOL_NO_OVERRIDE_VALUE}
+                                    disabled={isResourcePoolsLoading || !resourcePools.length}
+                                    onUpdateSetting={(value) => field.onChange(value)}
+                                    settingOptions={resourcePoolOptions}
+                                />
+                            )}
+                        />
+                    </div>
+                </Flex>
                 <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
                     <label htmlFor="pragmas" className={b('field-title')}>
                         {QUERY_SETTINGS_FIELD_SETTINGS.pragmas.title}

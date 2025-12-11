@@ -157,4 +157,7 @@ export const QUERY_SETTINGS_FIELD_SETTINGS = {
     pragmas: {
         title: formI18n('form.pragmas'),
     },
+    resourcePool: {
+        title: formI18n('form.resource-pool'),
+    },
 } as const;

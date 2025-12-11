@@ -30,7 +30,7 @@ interface HeatmapProps {
 export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
     const dispatch = useTypedDispatch();
 
-    const itemsContainer = React.createRef<HTMLDivElement>();
+    const itemsContainer = React.useRef<HTMLDivElement | null>(null);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
