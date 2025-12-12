@@ -28,7 +28,7 @@ export const b = cn('ydb-query-result-table');
 
 const WIDTH_PREDICTION_ROWS_COUNT = 100;
 
-const prepareTypedColumns = (columns: ColumnType[], data?: KeyValueRow[]) => {
+const prepareTypedColumns = (columns: ColumnType[], data: KeyValueRow[] | undefined) => {
     if (!columns.length) {
         return [];
     }
@@ -49,7 +49,7 @@ const prepareTypedColumns = (columns: ColumnType[], data?: KeyValueRow[]) => {
     });
 };
 
-const prepareGenericColumns = (data?: KeyValueRow[]) => {
+const prepareGenericColumns = (data: KeyValueRow[] | undefined) => {
     if (!data?.length) {
         return [];
     }
@@ -85,7 +85,7 @@ export const QueryResultTable = (props: QueryResultTableProps) => {
 
     const preparedColumns = React.useMemo(() => {
         return columns ? prepareTypedColumns(columns, data) : prepareGenericColumns(data);
-    }, [data, columns]);
+    }, [columns, data]);
 
     const settings = React.useMemo(() => {
         return {

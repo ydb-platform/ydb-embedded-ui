@@ -1,0 +1,11 @@
+{
+  "field_rack": "Rack",
+  "field_net": "Net",
+  "field_id": "ID",
+  "label_nodes": "{{type}} nodes",
+  "label_connectivity": "Connectivity of node",
+  "label_to-other-nodes": "to other nodes",
+  "label_racks": "Racks",
+  "description_placeholder": "Select node to see its connectivity to other nodes",
+  "description_no-nodes-data": "no nodes data"
+}

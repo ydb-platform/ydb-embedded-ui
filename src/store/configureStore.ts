@@ -11,7 +11,6 @@ import {getUrlData} from './getUrlData';
 import rootReducer from './reducers';
 import {api as storeApi} from './reducers/api';
 import {syncUserSettingsFromLS} from './reducers/settings/settings';
-import {UPDATE_REF} from './reducers/tooltip';
 import getLocationMiddleware from './state-url-mapping';
 
 export let backend: string | undefined,
@@ -34,16 +33,12 @@ function _configureStore<
         preloadedState,
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
-                immutableCheck: checksDisabled
-                    ? false
-                    : {
-                          ignoredPaths: ['tooltip.currentHoveredRef'],
-                      },
+                immutableCheck: checksDisabled ? false : undefined,
                 serializableCheck: checksDisabled
                     ? false
                     : {
-                          ignoredPaths: ['tooltip.currentHoveredRef', 'api'],
-                          ignoredActions: [UPDATE_REF, 'api/sendQuery/rejected'],
+                          ignoredPaths: ['api'],
+                          ignoredActions: ['api/sendQuery/rejected'],
                       },
             }).concat(locationMiddleware, ...middleware),
     });

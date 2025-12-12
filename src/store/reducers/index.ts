@@ -16,14 +16,12 @@ import settings from './settings/settings';
 import shardsWorkload from './shardsWorkload/shardsWorkload';
 import singleClusterMode from './singleClusterMode';
 import tenant from './tenant/tenant';
-import tooltip from './tooltip';
 
 export const rootReducer = {
     [api.reducerPath]: api.reducer,
     singleClusterMode,
     cluster,
     tenant,
-    tooltip,
     schema,
     partitions,
     query,
