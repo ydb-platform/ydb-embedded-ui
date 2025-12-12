@@ -1,6 +1,7 @@
 {
-  "tableStats": "Table Stats",
-  "tabletMetrics": "Tablet Metrics",
+  "title": "Partitioning",
+  "tableStats": "Stats",
+  "tabletMetrics": "Metrics",
   "partitionConfig": "Partition Config",
 
   "label.ttl": "TTL for rows",

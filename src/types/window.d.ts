@@ -45,5 +45,7 @@ interface Window {
 
     api: import('../services/api/index').YdbEmbeddedAPI;
 
+    WINDOW_SHOW_TABLE_SETTINGS?: boolean;
+
     [key: `yaCounter${number}`]: any;
 }

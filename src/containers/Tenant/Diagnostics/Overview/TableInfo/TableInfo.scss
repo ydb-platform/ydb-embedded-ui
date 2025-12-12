@@ -2,7 +2,15 @@
 
 .ydb-diagnostics-table-info {
     &__title {
-        @include mixins.info-viewer-title();
+        margin-bottom: 10px;
+
+        font-weight: 600;
+        @include mixins.body-2-typography();
+    }
+
+    &__progress-bar {
+        max-width: 656px;
+        padding: var(--g-spacing-3) 0 var(--g-spacing-4);
     }
 
     &__row {

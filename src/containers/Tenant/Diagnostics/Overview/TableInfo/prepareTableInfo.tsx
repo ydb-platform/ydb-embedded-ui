@@ -1,4 +1,5 @@
 import {Text} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 import omit from 'lodash/omit';
 
 import {toFormattedSize} from '../../../../../components/FormattedBytes/utils';
@@ -16,9 +17,9 @@ import type {
     TEvDescribeSchemeResult,
     TPartitionConfig,
     TTTLSettings,
+    TTablePartition,
 } from '../../../../../types/api/schema';
 import {EPathType} from '../../../../../types/api/schema';
-import {valueIsDefined} from '../../../../../utils';
 import {formatBytes, formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {formatDurationToShortTimeFormat} from '../../../../../utils/timeParsers';
 import {isNumeric} from '../../../../../utils/utils';
@@ -129,7 +130,7 @@ const prepareTableGeneralInfo = (PartitionConfig: TPartitionConfig, TTLSettings?
         }
     }
 
-    if (valueIsDefined(EnableFilterByKey)) {
+    if (!isNil(EnableFilterByKey)) {
         generalTableInfo.push({
             label: i18n('label.bloom-filter'),
             value: EnableFilterByKey ? i18n('enabled') : i18n('disabled'),
@@ -137,6 +138,31 @@ const prepareTableGeneralInfo = (PartitionConfig: TPartitionConfig, TTLSettings?
     }
 
     return generalTableInfo;
+};
+
+type PartitionProgressConfig = {
+    minPartitions: number;
+    maxPartitions?: number;
+    partitionsCount: number;
+};
+
+const preparePartitionProgressConfig = (
+    PartitionConfig: TPartitionConfig,
+    TablePartitions?: TTablePartition[],
+): PartitionProgressConfig => {
+    const {PartitioningPolicy} = PartitionConfig;
+
+    // We are convinced, there is always at least one partition;
+    // fallback and clamp to 1 if value is missing.
+    const minPartitions = Math.max(1, PartitioningPolicy?.MinPartitionsCount ?? 1);
+    const maxPartitions = PartitioningPolicy?.MaxPartitionsCount;
+    const partitionsCount = TablePartitions?.length ?? 1;
+
+    return {
+        minPartitions,
+        maxPartitions,
+        partitionsCount,
+    };
 };
 
 /** Prepares data for Table, ColumnTable and ColumnStore */
@@ -148,6 +174,7 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
     const {PathDescription = {}} = data;
 
     const {
+        TablePartitions,
         TableStats = {},
         TabletMetrics = {},
         Table: {PartitionConfig = {}, TTLSettings} = {},
@@ -181,10 +208,15 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
     const {FollowerGroups, FollowerCount, CrossDataCenterFollowerCount} = PartitionConfig;
 
     let generalInfo: InfoViewerItem[] = [];
+    let partitionProgressConfig: PartitionProgressConfig | undefined;
 
     switch (type) {
         case EPathType.EPathTypeTable: {
             generalInfo = prepareTableGeneralInfo(PartitionConfig, TTLSettings);
+            partitionProgressConfig = preparePartitionProgressConfig(
+                PartitionConfig,
+                TablePartitions,
+            );
             break;
         }
         case EPathType.EPathTypeColumnTable: {
@@ -252,5 +284,11 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
         );
     }
 
-    return {generalInfo, tableStatsInfo, tabletMetricsInfo, partitionConfigInfo};
+    return {
+        generalInfo,
+        tableStatsInfo,
+        tabletMetricsInfo,
+        partitionConfigInfo,
+        partitionProgressConfig,
+    };
 };

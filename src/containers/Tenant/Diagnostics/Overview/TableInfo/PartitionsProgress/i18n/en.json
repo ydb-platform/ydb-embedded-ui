@@ -1,0 +1,10 @@
+{
+  "tooltip_partitions-current": "{{count}} {{partitions}}",
+  "tooltip_partitions-below-limit": "{{count}} {{partitions}}. {{diff}} less than the limit",
+  "tooltip_partitions-above-limit": "{{count}} {{partitions}}. {{diff}} over the limit",
+
+  "value_partition-one": "partition",
+  "value_partition-many": "partitions",
+
+  "value_no-limit": "No limit"
+}
