@@ -148,24 +148,32 @@ export function getRAMColumn<T extends {MemoryUsed?: string; MemoryLimit?: strin
         defaultOrder: DataTable.DESCENDING,
         render: ({row}) => {
             const [memoryUsed, memoryLimit] = formatStorageValues(
-                isNumeric(row.MemoryUsed) ? Number(row.MemoryUsed) : 0,
-                isNumeric(row.MemoryLimit) ? Number(row.MemoryLimit) : 0,
+                isNumeric(row.MemoryUsed) ? Number(row.MemoryUsed) : undefined,
+                isNumeric(row.MemoryLimit) ? Number(row.MemoryLimit) : undefined,
                 'gb',
                 undefined,
                 true,
             );
+
+            const hasData = memoryUsed || memoryLimit;
+
             return (
                 <CellWithPopover
                     placement={['top', 'bottom']}
                     fullWidth
+                    disabled={!hasData}
                     content={
                         <DefinitionList responsive>
-                            <DefinitionList.Item name={i18n('field_memory-used')}>
-                                {memoryUsed}
-                            </DefinitionList.Item>
-                            <DefinitionList.Item name={i18n('field_memory-limit')}>
-                                {memoryLimit}
-                            </DefinitionList.Item>
+                            {memoryUsed && (
+                                <DefinitionList.Item name={i18n('field_memory-used')}>
+                                    {memoryUsed}
+                                </DefinitionList.Item>
+                            )}
+                            {memoryLimit && (
+                                <DefinitionList.Item name={i18n('field_memory-limit')}>
+                                    {memoryLimit}
+                                </DefinitionList.Item>
+                            )}
                         </DefinitionList>
                     }
                 >
