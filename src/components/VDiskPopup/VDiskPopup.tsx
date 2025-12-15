@@ -134,6 +134,7 @@ const prepareVDiskData = (
         ReplicationSecondsRemaining,
         UnsyncedVDisks,
         AllocatedSize,
+        AvailableSize,
         ReadThroughput,
         WriteThroughput,
         StoragePoolName,
@@ -254,6 +255,13 @@ const prepareVDiskData = (
         vdiskData.push({
             name: vDiskPopupKeyset('label_allocated'),
             content: bytesToGB(AllocatedSize),
+        });
+    }
+
+    if (Number(AvailableSize)) {
+        vdiskData.push({
+            name: vDiskPopupKeyset('label_available'),
+            content: bytesToGB(AvailableSize),
         });
     }
 
