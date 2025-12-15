@@ -17,7 +17,6 @@ import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/
 import {TenantNameWrapper} from '../../components/TenantNameWrapper/TenantNameWrapper';
 import {
     useCreateDatabaseFeatureAvailable,
-    useDatabasesAvailable,
     useDeleteDatabaseFeatureAvailable,
     useEditDatabaseFeatureAvailable,
 } from '../../store/reducers/capabilities/hooks';
@@ -42,6 +41,7 @@ import {
 } from '../../utils/dataFormatters/dataFormatters';
 import {useAutoRefreshInterval, useSetting} from '../../utils/hooks';
 import {useClusterNameFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
+import {useDatabasesV2} from '../../utils/hooks/useDatabasesV2';
 import {isNumeric} from '../../utils/utils';
 
 import i18n from './i18n';
@@ -77,7 +77,7 @@ interface TenantsProps {
 
 export const Tenants = ({additionalTenantsProps, scrollContainerRef}: TenantsProps) => {
     const clusterName = useClusterNameFromQuery();
-    const isMetaDatabasesAvailable = useDatabasesAvailable();
+    const isMetaDatabasesAvailable = useDatabasesV2();
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tenantsApi.useGetTenantsInfoQuery(
         {clusterName, isMetaDatabasesAvailable},
