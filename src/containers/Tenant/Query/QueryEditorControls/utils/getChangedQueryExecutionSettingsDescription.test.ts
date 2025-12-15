@@ -58,6 +58,7 @@ describe('getChangedQueryExecutionSettingsDescription', () => {
             statisticsMode: STATISTICS_MODES.profile,
             tracingLevel: TRACING_LEVELS.diagnostic,
             pragmas: 'PRAGMA TestPragma;',
+            resourcePool: DEFAULT_QUERY_SETTINGS.resourcePool,
         };
 
         const result = getChangedQueryExecutionSettingsDescription({

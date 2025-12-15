@@ -1,6 +1,7 @@
 import type {TableGroup} from '../../store/reducers/storage/types';
 import type {TSystemStateInfo} from '../../types/api/nodes';
 
+import {DEFAULT_COLOR} from './getVersionsColors';
 import {getMinorVersion} from './parseVersion';
 import {sortVersions} from './sortVersions';
 import type {PreparedVersion, VersionsDataMap} from './types';
@@ -48,6 +49,7 @@ export function parseNodeGroupsToPreparedVersions(
             version: group.name,
             count: group.count,
             minorVersion,
+            color: data?.color ?? DEFAULT_COLOR,
             ...data,
         };
     });

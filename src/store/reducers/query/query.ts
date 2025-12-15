@@ -5,8 +5,16 @@ import {TracingLevelNumber} from '../../../types/api/query';
 import type {QueryAction, QueryRequestParams, QuerySettings} from '../../../types/store/query';
 import type {StreamDataChunk} from '../../../types/store/streaming';
 import {loadFromSessionStorage, saveToSessionStorage} from '../../../utils';
-import {QUERY_EDITOR_CURRENT_QUERY_KEY, QUERY_EDITOR_DIRTY_KEY} from '../../../utils/constants';
-import {isQueryErrorResponse} from '../../../utils/query';
+import {
+    QUERY_EDITOR_CURRENT_QUERY_KEY,
+    QUERY_EDITOR_DIRTY_KEY,
+    QUERY_TECHNICAL_MARK,
+} from '../../../utils/constants';
+import {
+    RESOURCE_POOL_NO_OVERRIDE_VALUE,
+    isQueryErrorResponse,
+    parseQueryAPIResponse,
+} from '../../../utils/query';
 import {isNumeric} from '../../../utils/utils';
 import type {RootState} from '../../defaultStore';
 import {api} from '../api';
@@ -119,6 +127,15 @@ export const {
     selectResultTab,
 } = slice.selectors;
 
+const getResourcePoolsQueryText = () => {
+    return `${QUERY_TECHNICAL_MARK}
+SELECT
+    Name
+FROM \`.sys/resource_pools\`
+ORDER BY Name
+`;
+};
+
 interface SendQueryParams extends QueryRequestParams {
     actionType?: QueryAction;
     queryId: string;
@@ -196,6 +213,11 @@ export const queryApi = api.injectEndpoints({
                                 : undefined,
                             concurrent_results: DEFAULT_CONCURRENT_RESULTS || undefined,
                             base64,
+                            resource_pool:
+                                querySettings.resourcePool === RESOURCE_POOL_NO_OVERRIDE_VALUE ||
+                                !querySettings.resourcePool
+                                    ? undefined
+                                    : querySettings.resourcePool,
                         },
                         {
                             signal,
@@ -300,6 +322,11 @@ export const queryApi = api.injectEndpoints({
                                 : undefined,
                             query_id: queryId,
                             base64,
+                            resource_pool:
+                                querySettings.resourcePool === RESOURCE_POOL_NO_OVERRIDE_VALUE ||
+                                !querySettings.resourcePool
+                                    ? undefined
+                                    : querySettings.resourcePool,
                         },
                         {signal},
                     );
@@ -362,6 +389,35 @@ export const queryApi = api.injectEndpoints({
                             endTime: Date.now(),
                         }),
                     );
+                    return {error};
+                }
+            },
+        }),
+        getResourcePools: build.query<string[], {database: string}>({
+            queryFn: async ({database}, {signal}) => {
+                try {
+                    const response = await window.api.viewer.sendQuery(
+                        {
+                            query: getResourcePoolsQueryText(),
+                            database,
+                            action: 'execute-query',
+                            internal_call: true,
+                        },
+                        {signal, withRetries: true},
+                    );
+
+                    if (isQueryErrorResponse(response)) {
+                        return {error: response};
+                    }
+
+                    const data = parseQueryAPIResponse(response);
+                    const rows = data.resultSets?.[0]?.result || [];
+                    const pools = rows
+                        .map((row) => row && row.Name)
+                        .filter((name): name is string => Boolean(name));
+
+                    return {data: pools};
+                } catch (error) {
                     return {error};
                 }
             },
