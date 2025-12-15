@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.28.1-hotfix.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.28.1...v12.28.1-hotfix.1) (2025-12-15)
+
+
+### Bug Fixes
+
+* tune databases handler call ([#3221](https://github.com/ydb-platform/ydb-embedded-ui/issues/3221)) ([dd8b229](https://github.com/ydb-platform/ydb-embedded-ui/commit/dd8b229619a9e35ec06d1f3c5e4b0e6ff83638fa))
+
 ## [12.28.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.28.0...v12.28.1) (2025-12-11)
 
 
