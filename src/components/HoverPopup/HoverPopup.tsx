@@ -34,47 +34,44 @@ export const HoverPopup = ({
     delayOpen = DEBOUNCE_TIMEOUT,
 }: HoverPopupProps) => {
     const [isPopupVisible, setIsPopupVisible] = React.useState(false);
-    const [isPopupContentHovered, setIsPopupContentHovered] = React.useState(false);
-    const [isFocused, setIsFocused] = React.useState(false);
-
-    const anchor = React.useRef<HTMLSpanElement>(null);
+    const anchor = React.useRef<HTMLDivElement>(null);
 
     const debouncedHandleShowPopup = React.useMemo(
         () =>
             debounce(() => {
                 setIsPopupVisible(true);
+                onShowPopup?.();
             }, delayOpen),
-        [delayOpen],
+        [onShowPopup, delayOpen],
     );
 
     const hidePopup = React.useCallback(() => {
         setIsPopupVisible(false);
-    }, []);
+        onHidePopup?.();
+    }, [onHidePopup]);
 
     const debouncedHandleHidePopup = React.useMemo(
         () => debounce(hidePopup, delayClose),
         [hidePopup, delayClose],
     );
 
-    const onMouseEnter = () => {
-        debouncedHandleHidePopup.cancel();
-        debouncedHandleShowPopup();
-    };
+    const onMouseEnter = debouncedHandleShowPopup;
 
     const onMouseLeave = () => {
         debouncedHandleShowPopup.cancel();
         debouncedHandleHidePopup();
     };
 
+    const [isPopupContentHovered, setIsPopupContentHovered] = React.useState(false);
+    const [isFocused, setIsFocused] = React.useState(false);
+
     const onPopupMouseEnter = React.useCallback(() => {
         setIsPopupContentHovered(true);
-        debouncedHandleHidePopup.cancel();
-    }, [debouncedHandleHidePopup]);
+    }, []);
 
     const onPopupMouseLeave = React.useCallback(() => {
         setIsPopupContentHovered(false);
-        debouncedHandleHidePopup();
-    }, [debouncedHandleHidePopup]);
+    }, []);
 
     const onPopupContextMenu = React.useCallback(() => {
         setIsFocused(true);
@@ -90,39 +87,16 @@ export const HoverPopup = ({
         hidePopup();
     }, [hidePopup]);
 
-    const internalOpen = isPopupVisible || isPopupContentHovered || isFocused;
-    const open = internalOpen || showPopup;
-
-    const prevInternalOpenRef = React.useRef(internalOpen);
-
-    React.useEffect(() => {
-        const prev = prevInternalOpenRef.current;
-
-        if (prev === internalOpen) {
-            return;
-        }
-
-        if (internalOpen) {
-            onShowPopup?.();
-        } else {
-            onHidePopup?.();
-        }
-
-        prevInternalOpenRef.current = internalOpen;
-    }, [internalOpen, onShowPopup, onHidePopup]);
-
-    // Do not render Popup until it is available
-    // to avoid a brief initial render at (0, 0) before positioning is applied.
-    const anchorElement = anchorRef?.current || anchor.current;
+    const open = isPopupVisible || showPopup || isPopupContentHovered || isFocused;
 
     return (
         <React.Fragment>
             <span ref={anchor} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
                 {children}
             </span>
-            {open && anchorElement ? (
+            {open ? (
                 <Popup
-                    anchorElement={anchorElement}
+                    anchorElement={anchorRef?.current || anchor.current}
                     onOpenChange={(_open, _event, reason) => {
                         if (reason === 'escape-key') {
                             onPopupEscapeKeyDown();

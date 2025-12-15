@@ -12,6 +12,10 @@
         color: var(--g-color-text-secondary);
     }
 
+    &__properties-list {
+        max-width: calc(100% - 40px);
+    }
+
     &__footer {
         margin-top: var(--g-spacing-3);
     }

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
@@ -12,9 +10,6 @@ interface VDiskWithDonorsStackProps extends VDiskProps {
     data?: PreparedVDisk;
     className?: string;
     stackClassName?: string;
-    highlightedVDisk?: string;
-    setHighlightedVDisk?: (id?: string) => void;
-    progressBarClassName?: string;
 }
 
 export function VDiskWithDonorsStack({
@@ -22,54 +17,30 @@ export function VDiskWithDonorsStack({
     className,
     stackClassName,
     withIcon,
-    highlightedVDisk,
-    setHighlightedVDisk,
     ...restProps
 }: VDiskWithDonorsStackProps) {
     const {Donors: donors, ...restData} = data || {};
 
-    const stackId = data?.StringifiedId;
-    const isHighlighted = Boolean(stackId && highlightedVDisk === stackId);
-    const isDarkened = Boolean(highlightedVDisk && highlightedVDisk !== stackId);
-
-    const handleShowPopup = React.useCallback(() => {
-        if (stackId) {
-            setHighlightedVDisk?.(stackId);
-        }
-    }, [stackId, setHighlightedVDisk]);
-
-    const handleHidePopup = React.useCallback(() => {
-        setHighlightedVDisk?.(undefined);
-    }, [setHighlightedVDisk]);
-
-    const commonVDiskProps: Partial<VDiskProps> = {
-        withIcon,
-        showPopup: isHighlighted,
-        highlighted: isHighlighted,
-        darkened: isDarkened,
-        onShowPopup: handleShowPopup,
-        onHidePopup: handleHidePopup,
-        ...restProps,
-    };
-
     const content =
         donors && donors.length > 0 ? (
             <Stack className={stackClassName}>
-                <VDisk data={restData} {...commonVDiskProps} />
+                <VDisk data={restData} withIcon={withIcon} {...restProps} />
                 {donors.map((donor) => {
                     const isFullData = isFullVDiskData(donor);
 
+                    // donor and acceptor are always in the same group
                     return (
                         <VDisk
                             key={stringifyVdiskId(isFullData ? donor.VDiskId : donor)}
                             data={donor}
-                            {...commonVDiskProps}
+                            withIcon={withIcon}
+                            {...restProps}
                         />
                     );
                 })}
             </Stack>
         ) : (
-            <VDisk data={data} withIcon={withIcon} {...commonVDiskProps} />
+            <VDisk withIcon={withIcon} data={data} {...restProps} />
         );
 
     return <div className={className}>{content}</div>;

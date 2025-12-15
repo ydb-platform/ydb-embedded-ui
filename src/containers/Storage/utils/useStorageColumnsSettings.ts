@@ -5,7 +5,7 @@ import type {StorageNodesPaginatedTableData} from '../types';
 
 const PDISK_VDISK_WIDTH = 3;
 const PDISK_GAP_WIDTH = 2;
-const PDISK_MIN_WIDTH = 165;
+const PDISK_MIN_WIDTH = 120;
 const PDISK_MARGIN = 10;
 const MAX_SLOTS_DEFAULT = 1;
 const PAGNATED_TABLE_CELL_HORIZONTAL_PADDING = 10;

@@ -4,11 +4,11 @@
     }
 
     &__item {
-        width: 55px;
-        margin-right: var(--g-spacing-1);
+        width: 90px;
+        margin-right: 6px;
 
         &_with-dc-margin {
-            margin-right: var(--g-spacing-3);
+            margin-right: 12px;
         }
 
         &:last-child {
@@ -20,9 +20,5 @@
                 background: var(--ydb-data-table-color-hover);
             }
         }
-    }
-
-    &__vdisks-progress-bar {
-        border-radius: var(--g-border-radius-m);
     }
 }

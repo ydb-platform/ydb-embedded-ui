@@ -3,7 +3,6 @@ import type {EVDiskState} from '../../types/api/vdisk';
 
 import {
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
-    ERROR_SEVERITY,
     NOT_AVAILABLE_SEVERITY,
     VDISK_STATE_SEVERITY,
 } from './constants';
@@ -19,9 +18,9 @@ export function calculateVDiskSeverity<
 >(vDisk: T) {
     const {DiskSpace, VDiskState, FrontQueues, Replicated} = vDisk;
 
-    // if the VDisk is not available, we consider that disk has an error severity
+    // if the disk is not available, this determines its status severity regardless of other features
     if (!VDiskState) {
-        return ERROR_SEVERITY;
+        return NOT_AVAILABLE_SEVERITY;
     }
 
     const DiskSpaceSeverity = Math.min(
@@ -45,13 +44,10 @@ export function calculateVDiskSeverity<
 }
 
 export function getStateSeverity(vDiskState?: EVDiskState) {
-    // if the VDiskState if undefined, we consider that this VDisk has an error
     if (!vDiskState) {
-        return ERROR_SEVERITY;
+        return NOT_AVAILABLE_SEVERITY;
     }
 
-    // If some strange value arrives that isn't in the map,
-    // we consider it "not available" and color it gray
     return VDISK_STATE_SEVERITY[vDiskState] ?? NOT_AVAILABLE_SEVERITY;
 }
 
