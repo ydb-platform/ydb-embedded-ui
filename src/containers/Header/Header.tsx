@@ -19,10 +19,10 @@ import {checkIsClustersPage, checkIsTenantPage, getClusterPath} from '../../rout
 import {environment} from '../../store';
 import {
     useAddClusterFeatureAvailable,
-    useAllCapabilitiesLoaded,
     useDatabasesAvailable,
     useDeleteDatabaseFeatureAvailable,
     useEditDatabaseFeatureAvailable,
+    useMetaCapabilitiesLoaded,
 } from '../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import {clustersApi} from '../../store/reducers/clusters/clusters';
@@ -51,7 +51,7 @@ import './Header.scss';
 const b = cn('header');
 
 function Header() {
-    const capabilitiesLoaded = useAllCapabilitiesLoaded();
+    const metaCapabilitiesLoaded = useMetaCapabilitiesLoaded();
     const {page, pageBreadcrumbsOptions} = useTypedSelector((state) => state.header);
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
@@ -73,7 +73,7 @@ function Header() {
 
     const {isLoading: isClustersLoading, error: clustersError} =
         clustersApi.useGetClustersListQuery(undefined, {
-            skip: !isClustersPage || !capabilitiesLoaded,
+            skip: !isClustersPage || !metaCapabilitiesLoaded,
         });
 
     const isAddClusterAvailable =
@@ -94,7 +94,7 @@ function Header() {
 
     const {currentData: databaseData, isLoading: isDatabaseDataLoading} =
         tenantApi.useGetTenantInfoQuery(params, {
-            skip: !capabilitiesLoaded,
+            skip: !metaCapabilitiesLoaded,
         });
 
     // Show Monitoring only when:
@@ -247,7 +247,7 @@ function Header() {
     };
 
     const renderContent = () => {
-        if (!capabilitiesLoaded) {
+        if (!metaCapabilitiesLoaded) {
             return null;
         }
         return (

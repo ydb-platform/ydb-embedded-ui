@@ -147,28 +147,33 @@ export function getRAMColumn<T extends {MemoryUsed?: string; MemoryLimit?: strin
         sortAccessor: ({MemoryUsed = 0}) => Number(MemoryUsed),
         defaultOrder: DataTable.DESCENDING,
         render: ({row}) => {
-            const [memoryUsed, memoryLimit] =
-                isNumeric(row.MemoryUsed) && isNumeric(row.MemoryLimit)
-                    ? formatStorageValues(
-                          Number(row.MemoryUsed),
-                          Number(row.MemoryLimit),
-                          'gb',
-                          undefined,
-                          true,
-                      )
-                    : [0, 0];
+            const [memoryUsed, memoryLimit] = formatStorageValues(
+                isNumeric(row.MemoryUsed) ? Number(row.MemoryUsed) : undefined,
+                isNumeric(row.MemoryLimit) ? Number(row.MemoryLimit) : undefined,
+                'gb',
+                undefined,
+                true,
+            );
+
+            const hasData = memoryUsed || memoryLimit;
+
             return (
                 <CellWithPopover
                     placement={['top', 'bottom']}
                     fullWidth
+                    disabled={!hasData}
                     content={
                         <DefinitionList responsive>
-                            <DefinitionList.Item name={i18n('field_memory-used')}>
-                                {memoryUsed}
-                            </DefinitionList.Item>
-                            <DefinitionList.Item name={i18n('field_memory-limit')}>
-                                {memoryLimit}
-                            </DefinitionList.Item>
+                            {memoryUsed && (
+                                <DefinitionList.Item name={i18n('field_memory-used')}>
+                                    {memoryUsed}
+                                </DefinitionList.Item>
+                            )}
+                            {memoryLimit && (
+                                <DefinitionList.Item name={i18n('field_memory-limit')}>
+                                    {memoryLimit}
+                                </DefinitionList.Item>
+                            )}
                         </DefinitionList>
                     }
                 >
@@ -236,16 +241,12 @@ export function getCpuColumn<
         sortAccessor: ({PoolStats = []}) => Math.max(...PoolStats.map(({Usage}) => Number(Usage))),
         defaultOrder: DataTable.DESCENDING,
         render: ({row}) => {
-            if (!row.PoolStats) {
-                return EMPTY_DATA_PLACEHOLDER;
-            }
-
             let totalPoolUsage =
                 isNumeric(row.CoresUsed) && isNumeric(row.CoresTotal)
                     ? row.CoresUsed / row.CoresTotal
                     : undefined;
 
-            if (totalPoolUsage === undefined) {
+            if (totalPoolUsage === undefined && row.PoolStats) {
                 let totalThreadsCount = 0;
                 totalPoolUsage = row.PoolStats.reduce((acc, pool) => {
                     totalThreadsCount += Number(pool.Threads);
@@ -259,9 +260,10 @@ export function getCpuColumn<
                 <CellWithPopover
                     placement={['top', 'bottom']}
                     fullWidth
+                    disabled={!row.PoolStats}
                     content={
                         <DefinitionList responsive>
-                            {row.PoolStats.map((pool) =>
+                            {row.PoolStats?.map((pool) =>
                                 isNumeric(pool.Usage) ? (
                                     <DefinitionList.Item key={pool.Name} name={pool.Name}>
                                         {formatPool('Usage', pool.Usage).value}
