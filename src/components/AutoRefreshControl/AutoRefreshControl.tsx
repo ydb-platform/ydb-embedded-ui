@@ -2,6 +2,7 @@ import {ArrowsRotateLeft} from '@gravity-ui/icons';
 import {Button, Select} from '@gravity-ui/uikit';
 
 import {api} from '../../store/reducers/api';
+import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 
@@ -26,6 +27,7 @@ export function AutoRefreshControl({className, onManualRefresh}: AutoRefreshCont
                 onClick={() => {
                     dispatch(api.util.invalidateTags(['All']));
                     onManualRefresh?.();
+                    uiFactory.onManualRefresh?.();
                 }}
                 aria-label={i18n('Refresh')}
             >

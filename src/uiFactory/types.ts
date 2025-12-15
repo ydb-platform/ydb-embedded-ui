@@ -25,6 +25,8 @@ export interface UIFactory<H extends string = CommonIssueType, T extends string 
     onEditCluster?: HandleEditCluster;
     onDeleteCluster?: HandleDeleteCluster;
 
+    onManualRefresh?: () => void;
+
     clustersPageTitle?: string;
 
     getLogsLink?: GetLogsLink;
