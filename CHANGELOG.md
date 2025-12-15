@@ -1,5 +1,21 @@
 # Changelog
 
+## [12.29.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.28.1...v12.29.0) (2025-12-15)
+
+
+### Features
+
+* specify resource pools when launching a query ([#3198](https://github.com/ydb-platform/ydb-embedded-ui/issues/3198)) ([6c68264](https://github.com/ydb-platform/ydb-embedded-ui/commit/6c682649d17b395ad91ca29758996ace44b0c2c8))
+* **ui:** update Disk indicators visual design across console ([#3142](https://github.com/ydb-platform/ydb-embedded-ui/issues/3142)) ([0859c37](https://github.com/ydb-platform/ydb-embedded-ui/commit/0859c37b8542c32d1aac177ac4de3656ce31b8fb))
+
+
+### Bug Fixes
+
+* cpu and ram columns fallback ([#3211](https://github.com/ydb-platform/ydb-embedded-ui/issues/3211)) ([4349acc](https://github.com/ydb-platform/ydb-embedded-ui/commit/4349acc0f3bae7e4b27acf55b3e44a4d6df5babe))
+* tune databases handler call ([#3221](https://github.com/ydb-platform/ydb-embedded-ui/issues/3221)) ([79d11f0](https://github.com/ydb-platform/ydb-embedded-ui/commit/79d11f0bb46e02104a380f19965cfa95c3a9862a))
+* **ui:** handle unset memory used/limit values ([#3210](https://github.com/ydb-platform/ydb-embedded-ui/issues/3210)) ([25dff18](https://github.com/ydb-platform/ydb-embedded-ui/commit/25dff18fe270eeb7370490b0047c76504e81ce11))
+* **Versions:** always show default color ([#3216](https://github.com/ydb-platform/ydb-embedded-ui/issues/3216)) ([f7594fb](https://github.com/ydb-platform/ydb-embedded-ui/commit/f7594fbefc0537fa074f2465c3d143657b19ffb1))
+
 ## [12.28.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.28.0...v12.28.1) (2025-12-11)
 
 
