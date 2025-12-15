@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.29.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.29.0...v12.29.1) (2025-12-15)
+
+
+### Bug Fixes
+
+* revert disks indicators 0859c37 ([#3225](https://github.com/ydb-platform/ydb-embedded-ui/issues/3225)) ([27d940b](https://github.com/ydb-platform/ydb-embedded-ui/commit/27d940b8eaa74e26309a813e3ae8d8fd24559e6b))
+
 ## [12.29.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.28.1...v12.29.0) (2025-12-15)
 
 
