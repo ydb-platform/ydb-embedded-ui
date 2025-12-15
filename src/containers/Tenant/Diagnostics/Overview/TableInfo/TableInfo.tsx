@@ -31,7 +31,7 @@ export const TableInfo = ({data, type}: TableInfoProps) => {
 
     return (
         <div className={b()}>
-            <div className={b('title')}>{i18n('title')}</div>
+            <div className={b('title')}>{i18n('title_partitioning')}</div>
             {isPartitionsProgressEnabled && partitionProgressConfig && (
                 <div className={b('progress-bar')}>
                     <PartitionsProgress
@@ -53,7 +53,7 @@ export const TableInfo = ({data, type}: TableInfoProps) => {
                             <InfoViewer
                                 key={index}
                                 info={info}
-                                title={index === 0 ? i18n('tableStats') : undefined}
+                                title={index === 0 ? i18n('title_table-stats') : undefined}
                                 className={b('info-block')}
                                 renderEmptyState={() => null}
                             />
@@ -64,13 +64,13 @@ export const TableInfo = ({data, type}: TableInfoProps) => {
                     <div className={b('col')}>
                         <InfoViewer
                             info={tabletMetricsInfo}
-                            title={i18n('tabletMetrics')}
+                            title={i18n('title_tablet-metrics')}
                             className={b('info-block')}
                             renderEmptyState={() => null}
                         />
                         <InfoViewer
                             info={partitionConfigInfo}
-                            title={i18n('partitionConfig')}
+                            title={i18n('title_partition-config')}
                             className={b('info-block')}
                             renderEmptyState={() => null}
                         />

@@ -3,8 +3,9 @@ import {isNil} from 'lodash';
 
 import {cn} from '../../../../../../utils/cn';
 
-import {calcPartitionsProgress, getPartitionsLabel} from './helpers';
+import {getPartitionsTooltip} from './helpers';
 import i18n from './i18n';
+import {FULL_FILL_VALUE, calcPartitionsProgress} from './utils';
 
 import './PartitionsProgress.scss';
 
@@ -23,8 +24,6 @@ const SEGMENT_MODS: Record<SegmentPosition, Record<string, boolean>> = {
     additional: {additional: true},
     main: {main: true},
 };
-
-export const FULL_FILL_VALUE = 100;
 
 interface SegmentProgressBarProps {
     position: SegmentPosition;
@@ -56,36 +55,18 @@ export const PartitionsProgress = ({
         mainProgressValue,
     } = calcPartitionsProgress(minPartitions, maxPartitions, partitionsCount);
 
-    const partitionsLabel = getPartitionsLabel(partitionsCount);
-
-    const belowLimitTooltip = i18n('tooltip_partitions-below-limit', {
+    const tooltip = getPartitionsTooltip({
         count: partitionsCount,
-        diff: partitionsBelowMin,
-        partitions: partitionsLabel,
-    });
-
-    const aboveLimitTooltip = i18n('tooltip_partitions-above-limit', {
-        count: partitionsCount,
-        diff: partitionsAboveMax,
-        partitions: partitionsLabel,
-    });
-
-    const currentTooltip = i18n('tooltip_partitions-current', {
-        count: partitionsCount,
-        partitions: partitionsLabel,
+        belowMin: partitionsBelowMin,
+        aboveMax: partitionsAboveMax,
+        isBelowMin: isBelowMin,
+        isAboveMax: isAboveMax,
     });
 
     const maxLabel = isNil(max) ? i18n('value_no-limit') : max;
 
-    let tooltipContent = currentTooltip;
-    if (isBelowMin) {
-        tooltipContent = belowLimitTooltip;
-    } else if (isAboveMax) {
-        tooltipContent = aboveLimitTooltip;
-    }
-
     return (
-        <Popover hasArrow placement="top" content={tooltipContent} className={b('segment-touched')}>
+        <Popover hasArrow placement="top" content={tooltip} className={b('segment-touched')}>
             <Flex alignItems="center" gap="0.5" className={b(null, className)}>
                 {isBelowMin && (
                     <Flex
