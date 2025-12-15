@@ -128,7 +128,7 @@ describe('prepareGroupsVDisk', () => {
             StringifiedId: '2181038134-22-0-0-0',
             NodeId: 224,
 
-            Severity: 0,
+            Severity: 5,
             DiskSpace: 'Green',
             Status: 'READY',
 

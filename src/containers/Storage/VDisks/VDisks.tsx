@@ -15,9 +15,18 @@ interface VDisksProps {
     viewContext?: StorageViewContext;
     erasure?: Erasure;
     withIcon?: boolean;
+    highlightedVDisk?: string;
+    setHighlightedVDisk?: (id: string | undefined) => void;
 }
 
-export function VDisks({vDisks, viewContext, erasure, withIcon}: VDisksProps) {
+export function VDisks({
+    vDisks,
+    viewContext,
+    erasure,
+    withIcon,
+    highlightedVDisk,
+    setHighlightedVDisk,
+}: VDisksProps) {
     const vDisksWithDCMargins = useVDisksWithDCMargins(vDisks, erasure);
 
     return (
@@ -33,6 +42,9 @@ export function VDisks({vDisks, viewContext, erasure, withIcon}: VDisksProps) {
                     className={b('item', {
                         'with-dc-margin': vDisksWithDCMargins.includes(index),
                     })}
+                    highlightedVDisk={highlightedVDisk}
+                    setHighlightedVDisk={setHighlightedVDisk}
+                    progressBarClassName={b('vdisks-progress-bar')}
                 />
             ))}
         </div>
