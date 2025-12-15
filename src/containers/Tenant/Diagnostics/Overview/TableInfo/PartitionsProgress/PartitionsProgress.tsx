@@ -1,4 +1,4 @@
-import {Flex, Popover, Progress, Text} from '@gravity-ui/uikit';
+import {Flex, Popover, Text} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
 import {cn} from '../../../../../../utils/cn';
@@ -28,13 +28,24 @@ const SEGMENT_MODS: Record<SegmentPosition, Record<string, boolean>> = {
 interface SegmentProgressBarProps {
     position: SegmentPosition;
     value: number;
+    withMinFill?: boolean;
 }
 
-const SegmentProgressBar = ({position, value}: SegmentProgressBarProps) => (
-    <div className={b('segment-bar', SEGMENT_MODS[position])}>
-        <Progress value={value} size="s" />
-    </div>
-);
+const SegmentProgressBar = ({position, value, withMinFill}: SegmentProgressBarProps) => {
+    const width = `${value}%`;
+
+    return (
+        <div
+            className={b('segment-bar', SEGMENT_MODS[position])}
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={FULL_FILL_VALUE}
+            aria-valuenow={value}
+        >
+            <div className={b('segment-fill', {'min-fill': withMinFill})} style={{width}} />
+        </div>
+    );
+};
 
 export const PartitionsProgress = ({
     minPartitions,
@@ -65,6 +76,9 @@ export const PartitionsProgress = ({
 
     const maxLabel = isNil(max) ? i18n('value_no-limit') : max;
 
+    const hasAdditionalSegments = isBelowMin || isAboveMax;
+    const withMinFill = !hasAdditionalSegments;
+
     return (
         <Popover hasArrow placement="top" content={tooltip} className={b('segment-touched')}>
             <Flex alignItems="center" gap="0.5" className={b(null, className)}>
@@ -91,7 +105,11 @@ export const PartitionsProgress = ({
                     style={{flexGrow: mainSegmentUnits}}
                     gap="2"
                 >
-                    <SegmentProgressBar position="main" value={mainProgressValue} />
+                    <SegmentProgressBar
+                        position="main"
+                        value={mainProgressValue}
+                        withMinFill={withMinFill}
+                    />
 
                     <Flex justifyContent="space-between">
                         <Text variant="body-2" color="secondary">
