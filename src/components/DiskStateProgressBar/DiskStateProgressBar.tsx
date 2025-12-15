@@ -7,7 +7,6 @@ import {cn} from '../../utils/cn';
 import {DONOR_COLOR} from '../../utils/disks/constants';
 import {getSeverityColor, getVDiskStatusIcon} from '../../utils/disks/helpers';
 import {useSetting} from '../../utils/hooks';
-import {isNumeric} from '../../utils/utils';
 
 import './DiskStateProgressBar.scss';
 
@@ -25,9 +24,6 @@ interface DiskStateProgressBarProps {
     className?: string;
     isDonor?: boolean;
     withIcon?: boolean;
-    highlighted?: boolean;
-    darkened?: boolean;
-    noDataPlaceholder?: React.ReactNode;
 }
 
 export function DiskStateProgressBar({
@@ -42,9 +38,6 @@ export function DiskStateProgressBar({
     className,
     isDonor,
     withIcon,
-    highlighted,
-    darkened,
-    noDataPlaceholder,
 }: DiskStateProgressBarProps) {
     const [inverted] = useSetting<boolean | undefined>(SETTING_KEYS.INVERTED_DISKS);
 
@@ -55,8 +48,6 @@ export function DiskStateProgressBar({
         empty,
         inactive,
         striped,
-        highlighted,
-        darkened,
     };
 
     if (isDonor) {
@@ -68,15 +59,9 @@ export function DiskStateProgressBar({
         }
     }
 
-    const hasAllocatedPercent = isNumeric(diskAllocatedPercent) && diskAllocatedPercent >= 0;
-
     const renderAllocatedPercent = () => {
         if (compact) {
             return <div className={b('fill-bar', mods)} style={{width: '100%'}} />;
-        }
-
-        if (!hasAllocatedPercent) {
-            return null;
         }
 
         // diskAllocatedPercent could be more than 100
@@ -85,7 +70,11 @@ export function DiskStateProgressBar({
             fillWidth = Math.max(100 - diskAllocatedPercent, 0);
         }
 
-        return <div className={b('fill-bar', mods)} style={{width: `${fillWidth}%`}} />;
+        if (diskAllocatedPercent >= 0) {
+            return <div className={b('fill-bar', mods)} style={{width: `${fillWidth}%`}} />;
+        }
+
+        return null;
     };
 
     const renderContent = () => {
@@ -93,12 +82,8 @@ export function DiskStateProgressBar({
             return content;
         }
 
-        if (!compact && hasAllocatedPercent) {
+        if (!compact && diskAllocatedPercent >= 0) {
             return <div className={b('title')}>{`${Math.floor(diskAllocatedPercent)}%`}</div>;
-        }
-
-        if (!compact && !hasAllocatedPercent && noDataPlaceholder) {
-            return <div className={b('title')}>{noDataPlaceholder}</div>;
         }
 
         return null;
@@ -126,7 +111,7 @@ export function DiskStateProgressBar({
             aria-label="Disk allocated space"
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-valuenow={hasAllocatedPercent ? diskAllocatedPercent : undefined}
+            aria-valuenow={diskAllocatedPercent}
         >
             {iconElement}
             {renderAllocatedPercent()}

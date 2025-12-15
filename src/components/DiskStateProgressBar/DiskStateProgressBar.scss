@@ -4,12 +4,10 @@
     $block: &;
 
     $border-width: 1px;
-    $outer-border-radius: var(--g-border-radius-s);
+    $outer-border-radius: 4px;
     $inner-border-radius: $outer-border-radius - $border-width;
-    $outer-compact-border-radius: var(--g-border-radius-xs);
-    $inner-compact-border-radius: $outer-compact-border-radius - $border-width;
 
-    --progress-bar-full-height: var(--g-text-subheader-2-line-height);
+    --progress-bar-full-height: var(--g-text-body-3-line-height);
     --progress-bar-compact-height: 12px;
 
     --stripe-width: 4px;
@@ -17,8 +15,6 @@
 
     position: relative;
     z-index: 0;
-
-    overflow: hidden;
 
     min-width: 50px;
     height: var(--progress-bar-full-height);
@@ -29,16 +25,13 @@
     border: $border-width solid var(--entity-state-border-color);
     border-radius: $outer-border-radius;
     background-color: var(--entity-state-background-color);
-
-    transition: opacity 300ms ease-in-out;
-
-    @include mixins.entity-state-colors($block);
+    @include mixins.entity-state-colors();
 
     &_compact {
-        min-width: 8px;
+        min-width: 0;
         height: var(--progress-bar-compact-height);
 
-        border-radius: $outer-compact-border-radius;
+        border-radius: 2px;
     }
 
     &_faded {
@@ -47,10 +40,6 @@
 
     &_inactive {
         opacity: 0.5;
-    }
-
-    &_darkened {
-        opacity: 0.8;
     }
 
     &_empty {
@@ -89,7 +78,7 @@
         }
 
         &_compact {
-            border-radius: $inner-compact-border-radius;
+            border-radius: 1px;
         }
 
         &_inverted {
@@ -104,21 +93,20 @@
         position: relative;
         z-index: 2;
 
-        margin-right: var(--g-spacing-half);
+        margin-right: var(--g-spacing-1);
 
-        font-family: var(--g-text-caption-font-family);
-        font-size: var(--g-text-caption-1-font-size);
+        font-size: var(--g-text-body-1-font-size);
         // bar height minus borders
         line-height: calc(var(--progress-bar-full-height) - #{$border-width * 2});
 
-        color: var(--entity-state-font-color);
+        color: inherit;
     }
 
     &__icon {
         position: relative;
         z-index: 2;
 
-        margin-left: calc(var(--g-spacing-1) - $border-width);
+        margin-left: var(--g-spacing-1);
 
         color: var(--entity-state-border-color);
     }

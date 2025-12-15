@@ -6,12 +6,6 @@ export type StorageGroupsColumn = Column<PreparedStorageGroup>;
 
 export interface GetStorageColumnsData {
     viewContext?: StorageViewContext;
-
-    highlightedVDisk?: string;
-    setHighlightedVDisk?: (id: string | undefined) => void;
-
-    highlightedVDisksVDisk?: string;
-    setHighlightedVDisksVDisk?: (id: string | undefined) => void;
 }
 
 export interface GetStorageGroupsColumnsParams {

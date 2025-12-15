@@ -17,7 +17,6 @@
   "label_remaining": "Remaining",
   "label_unsync-vdisks": "UnsyncVDisks",
   "label_allocated": "Allocated",
-  "label_available": "Available",
   "label_read": "Read",
   "label_write": "Write",
   "label_replication": "Replication",
