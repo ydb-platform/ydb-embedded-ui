@@ -4,7 +4,6 @@ import {Button, Flex, HelpMark, Icon, Label} from '@gravity-ui/uikit';
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueriesActivityBar} from '../../../../components/QueriesActivityBar/QueriesActivityBar';
-import {useDatabasesAvailable} from '../../../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo} from '../../../../store/reducers/cluster/cluster';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {
@@ -19,6 +18,7 @@ import {getInfoTabLinks} from '../../../../utils/additionalProps';
 import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
+import {useDatabasesV2} from '../../../../utils/hooks/useDatabasesV2';
 import {canShowTenantMonitoringTab} from '../../../../utils/monitoringVisibility';
 import {useTenantPage} from '../../TenantNavigation/useTenantNavigation';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
@@ -52,7 +52,7 @@ export function TenantOverview({
 
     const {handleTenantPageChange} = useTenantPage();
 
-    const isMetaDatabasesAvailable = useDatabasesAvailable();
+    const isMetaDatabasesAvailable = useDatabasesV2();
 
     const {currentData: tenant, isFetching} = tenantApi.useGetTenantInfoQuery(
         {database, clusterName, isMetaDatabasesAvailable},

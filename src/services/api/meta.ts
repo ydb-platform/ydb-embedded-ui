@@ -43,7 +43,8 @@ export class MetaAPI extends BaseMetaAPI {
         {signal}: AxiosOptions = {},
     ) {
         return this.get<MetaTenants>(
-            this.getPath('/meta/cp_databases', clusterName),
+            // cp_databases never should be proxying to cluster
+            this.getPath('/meta/cp_databases'),
             {
                 cluster_name: clusterName,
                 database_name: database,

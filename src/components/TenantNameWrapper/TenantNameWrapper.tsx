@@ -37,6 +37,7 @@ const getTenantBackend = (
 
 export function TenantNameWrapper({tenant, additionalTenantsProps}: TenantNameWrapperProps) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const {settings} = useClusterBaseInfo();
 
     const backend = getTenantBackend(tenant, additionalTenantsProps);
     const isExternalLink = Boolean(backend);
@@ -60,7 +61,7 @@ export function TenantNameWrapper({tenant, additionalTenantsProps}: TenantNameWr
                 </DefinitionList.Item>
             </DefinitionList>
         ) : null;
-
+    const useDatabaseId = uiFactory.useDatabaseId && settings?.use_meta_proxy !== false;
     return (
         <EntityStatus
             externalLink={isExternalLink}
@@ -71,7 +72,7 @@ export function TenantNameWrapper({tenant, additionalTenantsProps}: TenantNameWr
             hasClipboardButton
             path={getTenantPath(
                 {
-                    database: uiFactory.useDatabaseId ? tenant.Id : tenant.Name,
+                    database: useDatabaseId ? tenant.Id : tenant.Name,
                     backend,
                 },
                 {withBasename: isExternalLink},
