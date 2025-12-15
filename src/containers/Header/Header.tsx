@@ -19,7 +19,6 @@ import {checkIsClustersPage, checkIsTenantPage, getClusterPath} from '../../rout
 import {environment} from '../../store';
 import {
     useAddClusterFeatureAvailable,
-    useDatabasesAvailable,
     useDeleteDatabaseFeatureAvailable,
     useEditDatabaseFeatureAvailable,
     useMetaCapabilitiesLoaded,
@@ -36,6 +35,7 @@ import {
     useClusterNameFromQuery,
     useDatabaseFromQuery,
 } from '../../utils/hooks/useDatabaseFromQuery';
+import {useDatabasesV2} from '../../utils/hooks/useDatabasesV2';
 import {
     useIsUserAllowedToMakeChanges,
     useIsViewerUser,
@@ -57,7 +57,7 @@ function Header() {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const isViewerUser = useIsViewerUser();
 
-    const isMetaDatabasesAvailable = useDatabasesAvailable();
+    const isMetaDatabasesAvailable = useDatabasesV2();
 
     const {title: clusterTitle, monitoring} = useClusterBaseInfo();
 

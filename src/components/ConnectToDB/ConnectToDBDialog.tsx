@@ -4,11 +4,11 @@ import NiceModal from '@ebay/nice-modal-react';
 import {Dialog, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 
-import {useDatabasesAvailable} from '../../store/reducers/capabilities/hooks';
 import {tenantApi} from '../../store/reducers/tenant/tenant';
 import {cn} from '../../utils/cn';
 import {useTypedSelector} from '../../utils/hooks';
 import {useClusterNameFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
+import {useDatabasesV2} from '../../utils/hooks/useDatabasesV2';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {LoaderWrapper} from '../LoaderWrapper/LoaderWrapper';
 import {YDBSyntaxHighlighterLazy} from '../SyntaxHighlighter/lazy';
@@ -49,7 +49,7 @@ function ConnectToDBDialog({
     const clusterName = useClusterNameFromQuery();
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
 
-    const isMetaDatabasesAvailable = useDatabasesAvailable();
+    const isMetaDatabasesAvailable = useDatabasesV2();
 
     // If there is endpoint from props, we don't need to request tenant data
     // Also we should not request tenant data if we are in single cluster mode
