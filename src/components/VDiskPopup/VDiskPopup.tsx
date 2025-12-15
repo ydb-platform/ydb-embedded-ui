@@ -14,7 +14,7 @@ import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
 import {getStateSeverity} from '../../utils/disks/calculateVDiskSeverity';
 import {
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
-    NOT_AVAILABLE_SEVERITY,
+    ERROR_SEVERITY,
     NUMERIC_SEVERITY_TO_LABEL_VIEW,
     VDISK_LABEL_CONFIG,
 } from '../../utils/disks/constants';
@@ -134,6 +134,7 @@ const prepareVDiskData = (
         ReplicationSecondsRemaining,
         UnsyncedVDisks,
         AllocatedSize,
+        AvailableSize,
         ReadThroughput,
         WriteThroughput,
         StoragePoolName,
@@ -257,6 +258,13 @@ const prepareVDiskData = (
         });
     }
 
+    if (Number(AvailableSize)) {
+        vdiskData.push({
+            name: vDiskPopupKeyset('label_available'),
+            content: bytesToGB(AvailableSize),
+        });
+    }
+
     if (Number(ReadThroughput)) {
         vdiskData.push({
             name: vDiskPopupKeyset('label_read'),
@@ -345,24 +353,18 @@ const prepareHeaderLabels = (data: PreparedVDisk): YDBDefinitionListHeaderLabel[
             theme: donorConfig.theme,
             icon: donorConfig.icon,
         });
+    } else if (isReplicatingColor) {
+        const replicaConfig = VDISK_LABEL_CONFIG.replica;
+
+        labels.push({
+            id: 'replication',
+            value: vDiskPopupKeyset('label_replication'),
+            theme: replicaConfig.theme,
+            icon: replicaConfig.icon,
+        });
     }
 
-    if (isReplicatingColor) {
-        if (!DonorMode) {
-            const replicaConfig = VDISK_LABEL_CONFIG.replica;
-
-            labels.push({
-                id: 'replication',
-                value: vDiskPopupKeyset('label_replication'),
-                theme: replicaConfig.theme,
-                icon: replicaConfig.icon,
-            });
-        }
-
-        return labels;
-    }
-
-    const severity = VDiskState ? getStateSeverity(VDiskState) : NOT_AVAILABLE_SEVERITY;
+    const severity = VDiskState ? getStateSeverity(VDiskState) : ERROR_SEVERITY;
 
     const {theme: stateTheme, icon: stateIcon} = NUMERIC_SEVERITY_TO_LABEL_VIEW[severity];
 
