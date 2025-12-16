@@ -154,6 +154,7 @@ export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
 
     const renderContent = () => {
         const {min, max} = getCurrentMetricLimits(currentMetric, tablets);
+        const isTabletTooltipPopupOpen = Boolean(tabletTooltip && tabletTooltipAnchorElement);
 
         let content;
         if (!error || currentData) {
@@ -162,7 +163,7 @@ export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
 
         return (
             <div className={b()}>
-                {tabletTooltip ? (
+                {isTabletTooltipPopupOpen ? (
                     <Popup
                         open
                         hasArrow
@@ -175,7 +176,7 @@ export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
                             onMouseEnter={handleTooltipMouseEnter}
                             onMouseLeave={handleTooltipMouseLeave}
                         >
-                            <TabletTooltipContent data={tabletTooltip.tablet} />
+                            <TabletTooltipContent data={tabletTooltip?.tablet} />
                         </div>
                     </Popup>
                 ) : null}
