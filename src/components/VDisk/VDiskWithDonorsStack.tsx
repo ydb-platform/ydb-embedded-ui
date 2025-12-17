@@ -30,7 +30,6 @@ export function VDiskWithDonorsStack({
 
     const stackId = data?.StringifiedId;
     const isHighlighted = Boolean(stackId && highlightedVDisk === stackId);
-    const isDarkened = Boolean(highlightedVDisk && highlightedVDisk !== stackId);
 
     const handleShowPopup = React.useCallback(() => {
         if (stackId) {
@@ -46,7 +45,6 @@ export function VDiskWithDonorsStack({
         withIcon,
         showPopup: isHighlighted,
         highlighted: isHighlighted,
-        darkened: isDarkened,
         onShowPopup: handleShowPopup,
         onHidePopup: handleHidePopup,
         ...restProps,
