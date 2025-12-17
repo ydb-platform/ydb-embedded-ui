@@ -7,7 +7,6 @@ import {Helmet} from 'react-helmet-async';
 import {componentsRegistry} from '../../components/ComponentsProvider/componentsRegistry';
 import {FullscreenProvider} from '../../components/Fullscreen/FullscreenContext';
 import {useTypedSelector} from '../../utils/hooks';
-import ReduxTooltip from '../ReduxTooltip/ReduxTooltip';
 import type {YDBEmbeddedUISettings} from '../UserSettings/settings';
 
 import {useAppTitle} from './AppTitleContext';
@@ -34,7 +33,6 @@ function App({store, history, children, userSettings, appTitle = defaultAppTitle
         <Providers store={store} history={history} appTitle={appTitle}>
             <AppContent userSettings={userSettings}>{children}</AppContent>
             {ChatPanel && <ChatPanel />}
-            <ReduxTooltip />
         </Providers>
     );
 }

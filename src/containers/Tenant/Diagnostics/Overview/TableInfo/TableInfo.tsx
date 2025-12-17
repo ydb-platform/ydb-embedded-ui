@@ -3,8 +3,8 @@ import React from 'react';
 import {InfoViewer} from '../../../../../components/InfoViewer';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
-import {EntityTitle} from '../../../EntityTitle/EntityTitle';
 
+import {PartitionsProgress} from './PartitionsProgress/PartitionsProgress';
 import i18n from './i18n';
 import {prepareTableInfo} from './prepareTableInfo';
 
@@ -18,22 +18,33 @@ interface TableInfoProps {
 }
 
 export const TableInfo = ({data, type}: TableInfoProps) => {
-    const title = <EntityTitle data={data?.PathDescription} />;
-
     const {
         generalInfo,
         tableStatsInfo,
         tabletMetricsInfo = [],
         partitionConfigInfo = [],
+        partitionProgressConfig,
     } = React.useMemo(() => prepareTableInfo(data, type), [data, type]);
+
+    // Feature flag: show partitions progress only if WINDOW_SHOW_TABLE_SETTINGS is truthy
+    const isPartitionsProgressEnabled = Boolean(window.WINDOW_SHOW_TABLE_SETTINGS);
 
     return (
         <div className={b()}>
+            <div className={b('title')}>{i18n('title_partitioning')}</div>
+            {isPartitionsProgressEnabled && partitionProgressConfig && (
+                <div className={b('progress-bar')}>
+                    <PartitionsProgress
+                        minPartitions={partitionProgressConfig.minPartitions}
+                        partitionsCount={partitionProgressConfig.partitionsCount}
+                        maxPartitions={partitionProgressConfig.maxPartitions}
+                    />
+                </div>
+            )}
             <InfoViewer
                 info={generalInfo}
-                title={title}
                 className={b('info-block')}
-                renderEmptyState={() => <div className={b('title')}>{title}</div>}
+                renderEmptyState={() => null}
             />
             <div className={b('row')}>
                 {tableStatsInfo ? (
@@ -42,7 +53,7 @@ export const TableInfo = ({data, type}: TableInfoProps) => {
                             <InfoViewer
                                 key={index}
                                 info={info}
-                                title={index === 0 ? i18n('tableStats') : undefined}
+                                title={index === 0 ? i18n('title_table-stats') : undefined}
                                 className={b('info-block')}
                                 renderEmptyState={() => null}
                             />
@@ -53,13 +64,13 @@ export const TableInfo = ({data, type}: TableInfoProps) => {
                     <div className={b('col')}>
                         <InfoViewer
                             info={tabletMetricsInfo}
-                            title={i18n('tabletMetrics')}
+                            title={i18n('title_tablet-metrics')}
                             className={b('info-block')}
                             renderEmptyState={() => null}
                         />
                         <InfoViewer
                             info={partitionConfigInfo}
-                            title={i18n('partitionConfig')}
+                            title={i18n('title_partition-config')}
                             className={b('info-block')}
                             renderEmptyState={() => null}
                         />

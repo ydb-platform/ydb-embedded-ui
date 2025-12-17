@@ -1,20 +1,21 @@
 {
-  "tableStats": "Table Stats",
-  "tabletMetrics": "Tablet Metrics",
-  "partitionConfig": "Partition Config",
+  "title_partitioning": "Partitioning",
+  "title_table-stats": "Stats",
+  "title_tablet-metrics": "Metrics",
+  "title_partition-config": "Partition config",
 
-  "label.ttl": "TTL for rows",
-  "value.ttl": "column: '{{columnName}}', expire after: {{expireTime}}",
-  "label.standalone": "Standalone",
-  "label.partitioning": "Partitioning",
-  "label.partitioning-by-size": "Partitioning by size",
-  "value.partitioning-by-size.enabled": "Enabled, split size: {{size}}",
-  "label.partitioning-by-load": "Partitioning by load",
-  "label.partitions-min": "Min number of partitions",
-  "label.partitions-max": "Max number of partitions",
-  "label.read-replicas": "Read replicas (followers)",
-  "label.bloom-filter": "Bloom filter",
+  "field_ttl-for-rows": "TTL for rows",
+  "field_standalone": "Standalone",
+  "field_partitioning": "Partitioning",
+  "field_partitioning-by-size": "Partitioning by size",
+  "field_partitioning-by-load": "Partitioning by load",
+  "field_min-partitions-count": "Min number of partitions",
+  "field_max-partitions-count": "Max number of partitions",
+  "field_read-replicas": "Read replicas (followers)",
+  "field_bloom-filter": "Bloom filter",
 
-  "enabled": "Enabled",
-  "disabled": "Disabled"
+  "value_ttl-config": "column: '{{columnName}}', expire after: {{expireTime}}",
+  "value_partitioning-by-size-enabled": "Enabled, split size: {{size}}",
+  "value_enabled": "Enabled",
+  "value_disabled": "Disabled"
 }

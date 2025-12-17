@@ -1,0 +1,57 @@
+.ydb-partitions-progress {
+    &__segment {
+        display: flex;
+        flex-basis: 0;
+
+        &_additional {
+            min-width: 20px;
+        }
+
+        &_main {
+            min-width: 70px;
+        }
+    }
+
+    &__segment-bar {
+        --segment-filled-bg-color: var(--g-color-base-neutral-heavy);
+        --segment-empty-bg-color: var(--g-color-base-neutral-light);
+        overflow: hidden;
+
+        height: 10px;
+
+        border-radius: var(--g-border-radius-xs);
+        background-color: var(--segment-empty-bg-color);
+
+        &_additional {
+            --segment-filled-bg-color: var(--g-color-base-danger-heavy);
+            --segment-empty-bg-color: var(--g-color-base-danger-light);
+        }
+
+        &_main {
+            --segment-filled-bg-color: var(--g-color-base-info-heavy);
+            --segment-empty-bg-color: var(--g-color-base-info-light);
+        }
+    }
+
+    &__segment-fill {
+        height: 100%;
+
+        background-color: var(--segment-filled-bg-color);
+
+        transition:
+            transform 0.6s ease,
+            width 0.6s ease,
+            background-color 0.6s ease;
+
+        &_min-fill {
+            min-width: 20px;
+        }
+    }
+
+    &__segment-touched {
+        padding: var(--g-spacing-2);
+
+        font-size: var(--g-text-body-2-font-size);
+        line-height: var(--g-text-body-2-line-height);
+    }
+}

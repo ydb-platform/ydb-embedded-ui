@@ -141,3 +141,13 @@
         }
     }
 }
+
+.node-tooltip {
+    padding: 10px;
+
+    &__label {
+        padding-right: 15px;
+
+        color: var(--g-color-text-secondary);
+    }
+}
