@@ -1,5 +1,18 @@
 # Changelog
 
+## [12.30.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.29.1...v12.30.0) (2025-12-17)
+
+
+### Features
+
+* add partitions progress bar to table info ([#3206](https://github.com/ydb-platform/ydb-embedded-ui/issues/3206)) ([9acc9f4](https://github.com/ydb-platform/ydb-embedded-ui/commit/9acc9f45c67f39c7b03cf19f252ac88cb998887f))
+* get rid of ReduxTooltip ([#3192](https://github.com/ydb-platform/ydb-embedded-ui/issues/3192)) ([2a6c613](https://github.com/ydb-platform/ydb-embedded-ui/commit/2a6c6138fa91379d042b54f4cdfe35a11d00bcc8))
+
+
+### Bug Fixes
+
+* possible infinite loop when navigating ([#3236](https://github.com/ydb-platform/ydb-embedded-ui/issues/3236)) ([837e521](https://github.com/ydb-platform/ydb-embedded-ui/commit/837e521abff7d90d1bd562fb01e40e745db80660))
+
 ## [12.29.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.29.0...v12.29.1) (2025-12-15)
 
 
