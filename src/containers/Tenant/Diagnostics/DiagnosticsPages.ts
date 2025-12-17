@@ -1,9 +1,9 @@
 import React from 'react';
 
 import type {LabelProps} from '@gravity-ui/uikit';
-import {StringParam, useQueryParams} from 'use-query-params';
+import {useLocation} from 'react-router-dom';
 
-import {getTenantPath} from '../../../routes';
+import {getTenantPath, parseQuery} from '../../../routes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import type {TenantDiagnosticsTab} from '../../../store/reducers/tenant/types';
 import {EPathSubType, EPathType} from '../../../types/api/schema';
@@ -265,12 +265,8 @@ export const getPagesByType = (
 };
 
 export const useDiagnosticsPageLinkGetter = () => {
-    const [queryParams] = useQueryParams({
-        database: StringParam,
-        schema: StringParam,
-        backend: StringParam,
-        clusterName: StringParam,
-    });
+    const location = useLocation();
+    const queryParams = parseQuery(location);
 
     const getLink = React.useCallback(
         (tab: string, params?: TenantQuery) => {

@@ -71,7 +71,7 @@ export function useTenantPage() {
             setQueryParams({tenantPage: value});
             setInitialTenantPage(value);
         },
-        [setInitialTenantPage, setQueryParams],
+        [setQueryParams, setInitialTenantPage],
     );
 
     const parsedInitialPage = React.useMemo(
@@ -89,19 +89,12 @@ export function useTenantPage() {
 
     React.useEffect(() => {
         try {
-            // Check whether query has valid tenantPage param
-            const parsedQueryPage = tenantPageSchema.parse(tenantPageFromQuery);
-
-            // Save query page as initial if they differ
-            if (parsedQueryPage !== parsedInitialPage) {
-                setInitialTenantPage(parsedQueryPage);
-            }
+            tenantPageSchema.parse(tenantPageFromQuery);
         } catch {
-            // If query page is not valid, set saved page to query
-            // `replaceIn` to not create new history entry when applying previously saved tab
+            // Invalid value in URL - replace with valid fallback
             setQueryParams({tenantPage: parsedInitialPage}, 'replaceIn');
         }
-    }, [tenantPageFromQuery, parsedInitialPage, setQueryParams, setInitialTenantPage]);
+    }, [parsedInitialPage, setQueryParams, tenantPageFromQuery]);
 
     return {tenantPage, handleTenantPageChange} as const;
 }
