@@ -44,7 +44,6 @@ export const getPDisksColumn = ({
         render: ({row}) => {
             return (
                 <PDisks
-                    nodeId={row.NodeId}
                     pDisks={row.PDisks}
                     vDisks={row.VDisks}
                     viewContext={viewContext}
@@ -62,8 +61,6 @@ export const getStorageNodesColumns = ({
     database,
     viewContext,
     columnsSettings,
-    highlightedDisk,
-    setHighlightedDisk,
 }: GetStorageNodesColumnsParams): NodesColumn[] => {
     const columns: NodesColumn[] = [
         getNodeIdColumn(),
@@ -80,7 +77,7 @@ export const getStorageNodesColumns = ({
         getDiskSpaceUsageColumn(),
         getVersionColumn(),
         getMissingDisksColumn(),
-        getPDisksColumn({viewContext, columnsSettings, highlightedDisk, setHighlightedDisk}),
+        getPDisksColumn({viewContext, columnsSettings}),
         getTabletsColumn({database}),
     ];
 

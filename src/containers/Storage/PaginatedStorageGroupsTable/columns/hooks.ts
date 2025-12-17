@@ -29,9 +29,7 @@ export function useStorageGroupsSelectedColumns({
     const bridgeModeEnabled = useBridgeModeEnabled();
 
     const columns = React.useMemo(() => {
-        const allColumns = getStorageGroupsColumns({
-            viewContext,
-        });
+        const allColumns = getStorageGroupsColumns({viewContext});
         const filteredByBridge = bridgeModeEnabled
             ? allColumns
             : allColumns.filter((c) => c.name !== STORAGE_GROUPS_COLUMNS_IDS.PileName);

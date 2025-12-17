@@ -10,14 +10,13 @@ import './PDisks.scss';
 const b = cn('ydb-storage-pdisks');
 
 interface PDisksProps {
-    nodeId: number | string;
     pDisks?: PreparedPDisk[];
     vDisks?: PreparedVDisk[];
     viewContext?: StorageViewContext;
     pDiskWidth?: number;
 }
 
-export function PDisks({nodeId, pDisks = [], vDisks = [], viewContext, pDiskWidth}: PDisksProps) {
+export function PDisks({pDisks = [], vDisks = [], viewContext, pDiskWidth}: PDisksProps) {
     const [highlightedDisk, setHighlightedDisk] = React.useState<string | undefined>();
 
     if (!pDisks.length) {
@@ -27,7 +26,7 @@ export function PDisks({nodeId, pDisks = [], vDisks = [], viewContext, pDiskWidt
     return (
         <div className={b('pdisks-wrapper')}>
             {pDisks.map((pDisk) => {
-                const id = `${nodeId}-${pDisk.PDiskId}`;
+                const id = pDisk.StringifiedId;
 
                 const relatedVDisks = vDisks.filter((vdisk) => vdisk.PDiskId === pDisk.PDiskId);
 
