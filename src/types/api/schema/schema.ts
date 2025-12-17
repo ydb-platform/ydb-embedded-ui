@@ -334,7 +334,7 @@ interface TPathVersion {
     GeneralVersion?: string;
 }
 
-interface TTablePartition {
+export interface TTablePartition {
     /** bytes */
     EndOfRangeKeyPrefix?: unknown;
     IsPoint?: boolean;
