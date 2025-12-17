@@ -36,55 +36,75 @@ async function withRetries<T>(fn: () => Promise<T>, attempts: number, delay: num
 }
 
 type DebounceEntry<T> = {
-    timeoutId: number;
+    timeoutId: number | undefined;
     latestRequest: () => Promise<T>;
     pending: Array<{resolve: (value: T) => void; reject: (error: unknown) => void}>;
+    inFlight: boolean;
 };
 
 const debouncedRemoteWrites = new Map<string, DebounceEntry<unknown>>();
 
+async function flushDebouncedRemoteWrite(key: string) {
+    const entry = debouncedRemoteWrites.get(key);
+    if (!entry || entry.inFlight) {
+        return;
+    }
+
+    entry.inFlight = true;
+    entry.timeoutId = undefined;
+
+    const pending = entry.pending as Array<{
+        resolve: (value: unknown) => void;
+        reject: (error: unknown) => void;
+    }>;
+    entry.pending = [];
+
+    try {
+        const result = await entry.latestRequest();
+        pending.forEach((p) => p.resolve(result));
+    } catch (error) {
+        pending.forEach((p) => p.reject(error));
+    } finally {
+        entry.inFlight = false;
+
+        if (entry.pending.length > 0) {
+            entry.timeoutId = window.setTimeout(() => {
+                flushDebouncedRemoteWrite(key);
+            }, REMOTE_WRITE_DEBOUNCE_MS);
+        } else {
+            debouncedRemoteWrites.delete(key);
+        }
+    }
+}
+
 function scheduleDebouncedRemoteWrite<T>(key: string, request: () => Promise<T>) {
     const existing = debouncedRemoteWrites.get(key) as DebounceEntry<T> | undefined;
     if (existing) {
-        clearTimeout(existing.timeoutId);
+        if (existing.timeoutId !== undefined) {
+            clearTimeout(existing.timeoutId);
+        }
         existing.latestRequest = request;
         return new Promise<T>((resolve, reject) => {
             existing.pending.push({resolve, reject});
-            existing.timeoutId = window.setTimeout(async () => {
-                const entry = debouncedRemoteWrites.get(key) as DebounceEntry<T> | undefined;
-                if (!entry) {
-                    return;
-                }
-                debouncedRemoteWrites.delete(key);
-                try {
-                    const result = await entry.latestRequest();
-                    entry.pending.forEach((p) => p.resolve(result));
-                } catch (error) {
-                    entry.pending.forEach((p) => p.reject(error));
-                }
-            }, REMOTE_WRITE_DEBOUNCE_MS);
+            if (!existing.inFlight) {
+                existing.timeoutId = window.setTimeout(() => {
+                    flushDebouncedRemoteWrite(key);
+                }, REMOTE_WRITE_DEBOUNCE_MS);
+            }
         });
     }
 
     return new Promise<T>((resolve, reject) => {
         const entry: DebounceEntry<T> = {
-            timeoutId: window.setTimeout(async () => {
-                const current = debouncedRemoteWrites.get(key) as DebounceEntry<T> | undefined;
-                if (!current) {
-                    return;
-                }
-                debouncedRemoteWrites.delete(key);
-                try {
-                    const result = await current.latestRequest();
-                    current.pending.forEach((p) => p.resolve(result));
-                } catch (error) {
-                    current.pending.forEach((p) => p.reject(error));
-                }
-            }, REMOTE_WRITE_DEBOUNCE_MS),
+            timeoutId: undefined,
             latestRequest: request,
             pending: [{resolve, reject}],
+            inFlight: false,
         };
         debouncedRemoteWrites.set(key, entry as DebounceEntry<unknown>);
+        entry.timeoutId = window.setTimeout(() => {
+            flushDebouncedRemoteWrite(key);
+        }, REMOTE_WRITE_DEBOUNCE_MS);
     });
 }
 
@@ -181,10 +201,7 @@ export const settingsApi = api.injectEndpoints({
                             ),
                     );
 
-                    const status =
-                        data && typeof data === 'object' && 'status' in data
-                            ? (data as {status?: string}).status
-                            : undefined;
+                    const status = data?.status;
 
                     if (status && status !== 'SUCCESS') {
                         throw new Error('Cannot set setting - status is not SUCCESS');

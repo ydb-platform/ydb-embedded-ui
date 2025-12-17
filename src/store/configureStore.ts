@@ -11,7 +11,7 @@ import {parseJson} from '../utils/utils';
 import {getUrlData} from './getUrlData';
 import rootReducer from './reducers';
 import {api as storeApi} from './reducers/api';
-import {syncUserSettingsFromLS} from './reducers/settings/settings';
+import {preloadUserSettingsFromLS, syncUserSettingsFromLS} from './reducers/settings/settings';
 import getLocationMiddleware from './state-url-mapping';
 
 export let backend: string | undefined,
@@ -45,6 +45,10 @@ function _configureStore<
     });
 
     syncUserSettingsFromLS(store);
+    const userIdFromFactory = uiFactory.settingsBackend?.getUserId?.();
+    if (!userIdFromFactory) {
+        preloadUserSettingsFromLS(store);
+    }
 
     return store;
 }

@@ -70,7 +70,7 @@ export function Cluster({additionalClusterProps, additionalTenantsProps}: Cluste
 
     const dispatch = useTypedDispatch();
 
-    const activeTabId = useClusterTab();
+    const {activeTabId, onClusterTabClick} = useClusterTab();
 
     const [{clusterName, backend}] = useQueryParams({
         clusterName: StringParam,
@@ -184,9 +184,8 @@ export function Cluster({additionalClusterProps, additionalTenantsProps}: Cluste
                                             view="primary"
                                             as="tab"
                                             to={path}
-                                            onClick={() => {
-                                                dispatch(updateDefaultClusterTab(id));
-                                            }}
+                                            data-cluster-tab-id={id}
+                                            onClick={onClusterTabClick}
                                         >
                                             {title}
                                         </InternalLink>
@@ -337,12 +336,27 @@ function useClusterTab() {
         activeTab = defaultTab;
     }
 
-    React.useEffect(() => {
-        if (activeTab !== defaultTabFromStore) {
-            dispatch(updateDefaultClusterTab(activeTab));
-        }
-        setSavedDefaultTab(activeTab);
-    }, [activeTab, defaultTabFromStore, dispatch, setSavedDefaultTab]);
+    const onClusterTabClick = React.useCallback(
+        (event: React.MouseEvent<HTMLElement>) => {
+            if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey) {
+                return;
+            }
 
-    return activeTab;
+            const rawTabId = event.currentTarget.getAttribute('data-cluster-tab-id');
+            if (!rawTabId || !isClusterTab(rawTabId)) {
+                return;
+            }
+
+            if (rawTabId !== defaultTabFromStore) {
+                dispatch(updateDefaultClusterTab(rawTabId));
+            }
+
+            if (rawTabId !== savedDefaultTabValidated) {
+                setSavedDefaultTab(rawTabId);
+            }
+        },
+        [defaultTabFromStore, dispatch, savedDefaultTabValidated, setSavedDefaultTab],
+    );
+
+    return {activeTabId: activeTab, onClusterTabClick} as const;
 }

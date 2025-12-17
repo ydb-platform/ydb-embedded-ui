@@ -100,4 +100,23 @@ export function syncUserSettingsFromLS(store: Store) {
     });
 }
 
+export function preloadUserSettingsFromLS(store: Store) {
+    if (typeof window === 'undefined') {
+        return;
+    }
+
+    Object.keys(DEFAULT_USER_SETTINGS).forEach((name) => {
+        if (!shouldSyncSettingToLS(name)) {
+            return;
+        }
+
+        const savedValue = readSettingValueFromLS(name);
+        if (isNil(savedValue)) {
+            return;
+        }
+
+        store.dispatch(settingsSlice.actions.setSettingValue({name, value: savedValue}));
+    });
+}
+
 export default settingsSlice.reducer;

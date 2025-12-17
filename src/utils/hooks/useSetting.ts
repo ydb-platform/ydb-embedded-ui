@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {getSettingValue} from '../../store/reducers/settings/settings';
 import {useSetting as useStoreSetting} from '../../store/reducers/settings/useSetting';
 
@@ -13,7 +11,7 @@ export const useSetting = <T>(key?: string, defaultValue?: T): [T, (value: T) =>
         return (getSettingValue(state, key) ?? defaultValue) as T;
     });
 
-    const setValue = React.useCallback((value: T) => saveValue(value), [saveValue]);
+    const setValue = saveValue;
 
     return [settingValue, setValue];
 };

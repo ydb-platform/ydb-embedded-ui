@@ -31,6 +31,13 @@ const SAVE_DEBOUNCE_MS = 200;
 
 function SplitPane(props: SplitPaneProps) {
     const [innerSizes, setInnerSizes] = React.useState<number[]>();
+    const {
+        collapsedSizes,
+        triggerCollapse,
+        triggerExpand,
+        defaultSizes: defaultSizesProp,
+        initialSizes,
+    } = props;
     const [savedSizesString, setSavedSizesString] = useSetting<string | undefined>(
         props.defaultSizePaneKey,
     );
@@ -45,17 +52,19 @@ function SplitPane(props: SplitPaneProps) {
         };
     }, [saveSizesStringDebounced]);
 
-    const getDefaultSizePane = () => {
-        const {defaultSizes = sizesDefaultInner, initialSizes} = props;
+    const defaultSizePane = React.useMemo(() => {
         if (initialSizes) {
             return initialSizes;
         }
         const sizes = savedSizesString?.split(',').map(Number);
-        return sizes || defaultSizes;
-    };
-    const setDefaultSizePane = (sizes: number[]) => {
-        saveSizesStringDebounced(sizes.join(','));
-    };
+        return sizes || defaultSizesProp || sizesDefaultInner;
+    }, [defaultSizesProp, initialSizes, savedSizesString]);
+    const setDefaultSizePane = React.useCallback(
+        (sizes: number[]) => {
+            saveSizesStringDebounced(sizes.join(','));
+        },
+        [saveSizesStringDebounced],
+    );
     const onDragHandler = (sizes: number[]) => {
         const {onSplitDragAdditional} = props;
         if (onSplitDragAdditional) {
@@ -73,27 +82,25 @@ function SplitPane(props: SplitPaneProps) {
     };
 
     React.useEffect(() => {
-        const {collapsedSizes, triggerCollapse} = props;
         if (triggerCollapse) {
             const newSizes = collapsedSizes || minSizeDefaultInner;
             setDefaultSizePane(newSizes);
             setInnerSizes(newSizes);
         }
-    }, [props.triggerCollapse]);
+    }, [collapsedSizes, triggerCollapse, setDefaultSizePane]);
 
     React.useEffect(() => {
-        const {triggerExpand, defaultSizes} = props;
-        const newSizes = defaultSizes || sizesDefaultInner;
+        const newSizes = defaultSizesProp || sizesDefaultInner;
         if (triggerExpand) {
             setDefaultSizePane(newSizes);
             setInnerSizes(newSizes);
         }
-    }, [props.triggerExpand]);
+    }, [defaultSizesProp, triggerExpand, setDefaultSizePane]);
     return (
         <React.Fragment>
             <SplitPaneLib
                 direction={props.direction || 'horizontal'}
-                sizes={innerSizes || getDefaultSizePane()}
+                sizes={innerSizes || defaultSizePane}
                 minSize={props.minSize || [0, 0]}
                 onDrag={onDragHandler}
                 className={b(null, props.direction || 'horizontal')}

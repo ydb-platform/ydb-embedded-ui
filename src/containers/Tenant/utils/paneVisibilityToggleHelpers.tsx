@@ -20,7 +20,7 @@ export enum PaneVisibilityActionTypes {
     clear = 'clear',
 }
 
-export function paneVisibilityToggleReducerCreator(_isPaneCollapsedKey: string) {
+export function paneVisibilityToggleReducerCreator() {
     return function paneVisibilityToggleReducer(
         state: InitialPaneState,
         action: PaneVisibilityActionTypes,
