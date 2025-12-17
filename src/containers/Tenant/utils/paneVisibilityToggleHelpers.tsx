@@ -20,22 +20,13 @@ export enum PaneVisibilityActionTypes {
     clear = 'clear',
 }
 
-const setInitialIsPaneCollapsed = (key: string) => {
-    localStorage.setItem(key, 'true');
-};
-
-const deleteInitialIsPaneCollapsed = (key: string) => {
-    localStorage.removeItem(key);
-};
-
-export function paneVisibilityToggleReducerCreator(isPaneCollapsedKey: string) {
+export function paneVisibilityToggleReducerCreator(_isPaneCollapsedKey: string) {
     return function paneVisibilityToggleReducer(
         state: InitialPaneState,
         action: PaneVisibilityActionTypes,
     ) {
         switch (action) {
             case PaneVisibilityActionTypes.triggerCollapse: {
-                setInitialIsPaneCollapsed(isPaneCollapsedKey);
                 return {
                     ...state,
                     triggerCollapse: true,
@@ -44,7 +35,6 @@ export function paneVisibilityToggleReducerCreator(isPaneCollapsedKey: string) {
                 };
             }
             case PaneVisibilityActionTypes.triggerExpand: {
-                deleteInitialIsPaneCollapsed(isPaneCollapsedKey);
                 return {
                     ...state,
                     triggerCollapse: false,
@@ -53,7 +43,6 @@ export function paneVisibilityToggleReducerCreator(isPaneCollapsedKey: string) {
                 };
             }
             case PaneVisibilityActionTypes.clear: {
-                deleteInitialIsPaneCollapsed(isPaneCollapsedKey);
                 return {
                     triggerCollapse: false,
                     triggerExpand: false,

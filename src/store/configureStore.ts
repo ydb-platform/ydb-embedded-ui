@@ -5,6 +5,7 @@ import {createBrowserHistory} from 'history';
 import {listenForHistoryChange} from 'redux-location-state';
 
 import {YdbEmbeddedAPI} from '../services/api';
+import {uiFactory} from '../uiFactory/uiFactory';
 import {parseJson} from '../utils/utils';
 
 import {getUrlData} from './getUrlData';
@@ -19,10 +20,10 @@ export let backend: string | undefined,
     environment: string | undefined;
 
 function _configureStore<
-    S = any,
+    S = unknown,
     A extends Action = UnknownAction,
     P = S,
-    M extends Middleware<{}, S, Dispatch> = any,
+    M extends Middleware<{}, S, Dispatch> = Middleware<{}, S, Dispatch>,
 >(aRootReducer: Reducer<S, A, P>, history: History, preloadedState: P, middleware: M[]) {
     const {locationMiddleware, reducersWithLocation} = getLocationMiddleware(history, aRootReducer);
 
@@ -70,6 +71,7 @@ export function configureStore({
         csrfTokenGetter: undefined,
         useRelativePath: false,
         useMetaSettings: false,
+        metaSettingsBaseUrl: uiFactory.settingsBackend?.getEndpoint?.(),
         defaults: undefined,
     }),
 } = {}) {

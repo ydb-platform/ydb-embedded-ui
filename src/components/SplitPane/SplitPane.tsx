@@ -1,9 +1,11 @@
 import React from 'react';
 
+import {debounce} from 'lodash';
 import type {SplitProps} from 'react-split';
 import SplitPaneLib from 'react-split';
 
 import {cn} from '../../utils/cn';
+import {useSetting} from '../../utils/hooks/useSetting';
 
 import './SplitPane.scss';
 
@@ -25,21 +27,34 @@ interface SplitPaneProps {
 
 const minSizeDefaultInner = [0, 100];
 const sizesDefaultInner = [50, 50];
+const SAVE_DEBOUNCE_MS = 200;
 
 function SplitPane(props: SplitPaneProps) {
     const [innerSizes, setInnerSizes] = React.useState<number[]>();
+    const [savedSizesString, setSavedSizesString] = useSetting<string | undefined>(
+        props.defaultSizePaneKey,
+    );
+
+    const saveSizesStringDebounced = React.useMemo(() => {
+        return debounce((value: string) => setSavedSizesString(value), SAVE_DEBOUNCE_MS);
+    }, [setSavedSizesString]);
+
+    React.useEffect(() => {
+        return () => {
+            saveSizesStringDebounced.cancel();
+        };
+    }, [saveSizesStringDebounced]);
 
     const getDefaultSizePane = () => {
-        const {defaultSizePaneKey, defaultSizes = sizesDefaultInner, initialSizes} = props;
+        const {defaultSizes = sizesDefaultInner, initialSizes} = props;
         if (initialSizes) {
             return initialSizes;
         }
-        const sizes = localStorage.getItem(defaultSizePaneKey)?.split(',').map(Number);
+        const sizes = savedSizesString?.split(',').map(Number);
         return sizes || defaultSizes;
     };
     const setDefaultSizePane = (sizes: number[]) => {
-        const {defaultSizePaneKey} = props;
-        localStorage.setItem(defaultSizePaneKey, sizes.join(','));
+        saveSizesStringDebounced(sizes.join(','));
     };
     const onDragHandler = (sizes: number[]) => {
         const {onSplitDragAdditional} = props;

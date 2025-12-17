@@ -14,10 +14,28 @@ interface PendingRequest {
     reject: (error: unknown) => void;
 }
 
+function joinBaseUrlAndPath(baseUrl: string, path: string) {
+    const normalizedBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    return `${normalizedBaseUrl}${normalizedPath}`;
+}
+
 export class MetaSettingsAPI extends BaseMetaAPI {
     private batchTimeout: NodeJS.Timeout | undefined = undefined;
     private currentUser: string | undefined = undefined;
     private requestQueue: Map<string, PendingRequest[]> | undefined = undefined;
+    private baseUrlOverride: string | undefined;
+
+    setBaseUrlOverride(baseUrlOverride: string | undefined) {
+        this.baseUrlOverride = baseUrlOverride;
+    }
+
+    getPath(path: string, clusterName?: string) {
+        if (this.baseUrlOverride) {
+            return joinBaseUrlAndPath(this.baseUrlOverride, path);
+        }
+        return super.getPath(path, clusterName);
+    }
 
     getSingleSetting({
         name,

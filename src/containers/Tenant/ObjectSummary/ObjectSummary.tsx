@@ -32,6 +32,7 @@ import {
     formatSecondsToHours,
 } from '../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
+import {useSetting} from '../../../utils/hooks/useSetting';
 import {prepareSystemViewType} from '../../../utils/schema';
 import {EntityTitle} from '../EntityTitle/EntityTitle';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
@@ -57,16 +58,6 @@ import {isDomain, transformPath} from './transformPath';
 
 import './ObjectSummary.scss';
 
-const getTenantCommonInfoState = () => {
-    const collapsed = Boolean(localStorage.getItem(DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED));
-
-    return {
-        triggerExpand: false,
-        triggerCollapse: false,
-        collapsed,
-    };
-};
-
 interface ObjectSummaryProps {
     onCollapseSummary: VoidFunction;
     onExpandSummary: VoidFunction;
@@ -82,10 +73,18 @@ export function ObjectSummary({
 
     const dispatch = useTypedDispatch();
     const {handleSchemaChange} = useTenantQueryParams();
+    const [isCommonInfoCollapsed, setIsCommonInfoCollapsed] = useSetting<boolean>(
+        DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED,
+        false,
+    );
     const [commonInfoVisibilityState, dispatchCommonInfoVisibilityState] = React.useReducer(
         paneVisibilityToggleReducerCreator(DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED),
         undefined,
-        getTenantCommonInfoState,
+        () => ({
+            triggerExpand: false,
+            triggerCollapse: false,
+            collapsed: Boolean(isCommonInfoCollapsed),
+        }),
     );
 
     const {summaryTab = TENANT_SUMMARY_TABS_IDS.overview} = useTypedSelector(
@@ -395,13 +394,16 @@ export function ObjectSummary({
     };
 
     const onCollapseInfoHandler = () => {
+        setIsCommonInfoCollapsed(true);
         dispatchCommonInfoVisibilityState(PaneVisibilityActionTypes.triggerCollapse);
     };
     const onExpandInfoHandler = () => {
+        setIsCommonInfoCollapsed(false);
         dispatchCommonInfoVisibilityState(PaneVisibilityActionTypes.triggerExpand);
     };
 
     const onSplitStartDragAdditional = () => {
+        setIsCommonInfoCollapsed(false);
         dispatchCommonInfoVisibilityState(PaneVisibilityActionTypes.clear);
     };
 

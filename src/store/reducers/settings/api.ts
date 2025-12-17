@@ -2,33 +2,93 @@ import type {
     GetSettingsParams,
     GetSingleSettingParams,
     SetSingleSettingParams,
+    Setting,
 } from '../../../types/api/settings';
+import {uiFactory} from '../../../uiFactory/uiFactory';
 import {serializeReduxError} from '../../../utils/errors/serializeReduxError';
 import type {AppDispatch} from '../../defaultStore';
 import {api} from '../api';
 
 import {SETTINGS_OPTIONS} from './constants';
-import {parseSettingValue, stringifySettingValue} from './utils';
+import {handleOptimisticSettingWrite, handleRemoteSettingResult} from './effects';
+import {shouldSyncSettingToLS, stringifySettingValue} from './utils';
+
+async function delayMs(ms: number) {
+    return new Promise<void>((resolve) => setTimeout(resolve, ms));
+}
+
+async function withRetries<T>(fn: () => Promise<T>, attempts: number, delay: number) {
+    let lastError: unknown;
+    for (let attempt = 0; attempt < attempts; attempt++) {
+        try {
+            return await fn();
+        } catch (error) {
+            lastError = error;
+            if (attempt < attempts - 1) {
+                await delayMs(delay);
+            }
+        }
+    }
+    throw lastError;
+}
+
+function resolveRemoteSettingsClientAndUser(user: string) {
+    const userFromFactory = uiFactory.settingsBackend?.getUserId?.();
+    const endpointFromFactory = uiFactory.settingsBackend?.getEndpoint?.();
+
+    if (endpointFromFactory && userFromFactory && window.api?.settingsService) {
+        return {client: window.api.settingsService, user: userFromFactory} as const;
+    }
+
+    if (window.api?.metaSettings) {
+        return {client: window.api.metaSettings, user} as const;
+    }
+
+    return undefined;
+}
 
 export const settingsApi = api.injectEndpoints({
     endpoints: (builder) => ({
-        getSingleSetting: builder.query<unknown, GetSingleSettingParams>({
+        getSingleSetting: builder.query<Setting | undefined, GetSingleSettingParams>({
             queryFn: async ({name, user}) => {
                 try {
-                    if (!window.api?.metaSettings) {
+                    const resolved = resolveRemoteSettingsClientAndUser(user);
+                    if (!resolved) {
                         throw new Error('MetaSettings API is not available');
                     }
 
-                    const data = await window.api.metaSettings.getSingleSetting({
+                    const data = await resolved.client.getSingleSetting({
                         name,
-                        user,
+                        user: resolved.user,
                         // Directly access options here to avoid them in cache key
                         preventBatching: SETTINGS_OPTIONS[name]?.preventBatching,
                     });
 
-                    return {data: parseSettingValue(data?.value)};
+                    return {data};
                 } catch (error) {
                     return {error: serializeReduxError(error)};
+                }
+            },
+            async onQueryStarted(args, {dispatch, queryFulfilled}) {
+                const {name, user} = args;
+                if (!name) {
+                    return;
+                }
+
+                try {
+                    const {data} = await queryFulfilled;
+
+                    handleRemoteSettingResult({
+                        user: resolveRemoteSettingsClientAndUser(user)?.user ?? user,
+                        name,
+                        remoteValue: data?.value,
+                        dispatch,
+                        migrateToRemote: (params) => {
+                            dispatch(settingsApi.endpoints.setSingleSetting.initiate(params));
+                        },
+                    });
+                } catch {
+                    // ignore
                 }
             },
         }),
@@ -39,15 +99,21 @@ export const settingsApi = api.injectEndpoints({
                 value,
             }: Omit<SetSingleSettingParams, 'value'> & {value: unknown}) => {
                 try {
-                    if (!window.api?.metaSettings) {
+                    const resolved = resolveRemoteSettingsClientAndUser(user);
+                    if (!resolved) {
                         throw new Error('MetaSettings API is not available');
                     }
 
-                    const data = await window.api.metaSettings.setSingleSetting({
-                        name,
-                        user,
-                        value: stringifySettingValue(value),
-                    });
+                    const data = await withRetries(
+                        () =>
+                            resolved.client.setSingleSetting({
+                                name,
+                                user: resolved.user,
+                                value: stringifySettingValue(value),
+                            }),
+                        3,
+                        200,
+                    );
 
                     if (data.status !== 'SUCCESS') {
                         throw new Error('Cannot set setting - status is not SUCCESS');
@@ -59,26 +125,29 @@ export const settingsApi = api.injectEndpoints({
                 }
             },
             async onQueryStarted(args, {dispatch, queryFulfilled}) {
-                const {name, user, value} = args;
+                const {name, value} = args;
+                const shouldSyncToLS = shouldSyncSettingToLS(name);
 
-                // Optimistically update existing cache entry
-                const patchResult = dispatch(
-                    settingsApi.util.updateQueryData('getSingleSetting', {name, user}, () => value),
-                );
-                try {
-                    await queryFulfilled;
-                } catch {
-                    patchResult.undo();
-                }
+                await handleOptimisticSettingWrite({
+                    name,
+                    value,
+                    dispatch,
+                    metaSettingsAvailable: Boolean(
+                        window.api?.metaSettings || window.api?.settingsService,
+                    ),
+                    shouldSyncToLS,
+                    awaitRemote: queryFulfilled,
+                });
             },
         }),
-        getSettings: builder.query({
+        getSettings: builder.query<Record<string, Setting>, GetSettingsParams>({
             queryFn: async ({name, user}: GetSettingsParams, baseApi) => {
                 try {
-                    if (!window.api?.metaSettings) {
+                    const resolved = resolveRemoteSettingsClientAndUser(user);
+                    if (!resolved) {
                         throw new Error('MetaSettings API is not available');
                     }
-                    const data = await window.api.metaSettings.getSettings({name, user});
+                    const data = await resolved.client.getSettings({name, user: resolved.user});
 
                     const patches: Promise<unknown>[] = [];
                     const dispatch = baseApi.dispatch as AppDispatch;
@@ -89,19 +158,29 @@ export const settingsApi = api.injectEndpoints({
 
                         const cacheEntryParams: GetSingleSettingParams = {
                             name: settingName,
-                            user,
+                            user: resolved.user,
                         };
-                        const newSettingValue = parseSettingValue(settingData?.value);
+                        const remoteValue = settingData?.value;
 
                         const patch = dispatch(
                             settingsApi.util.upsertQueryData(
                                 'getSingleSetting',
                                 cacheEntryParams,
-                                newSettingValue,
+                                settingData,
                             ),
                         );
 
                         patches.push(patch);
+
+                        handleRemoteSettingResult({
+                            user: resolved.user,
+                            name: settingName,
+                            remoteValue,
+                            dispatch,
+                            migrateToRemote: (params) => {
+                                dispatch(settingsApi.endpoints.setSingleSetting.initiate(params));
+                            },
+                        });
                     });
 
                     // Wait for all patches for proper loading state

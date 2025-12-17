@@ -30,8 +30,10 @@ import type {AdditionalClusterProps, AdditionalTenantsProps} from '../../types/a
 import {EFlag} from '../../types/api/enums';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
+import {DEFAULT_CLUSTER_TAB_KEY} from '../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {useSetting} from '../../utils/hooks/useSetting';
 import {useAppTitle} from '../App/AppTitleContext';
 import {Configs} from '../Configs/Configs';
 import {Nodes} from '../Nodes/Nodes';
@@ -304,7 +306,15 @@ export function Cluster({additionalClusterProps, additionalTenantsProps}: Cluste
 function useClusterTab() {
     const dispatch = useTypedDispatch();
 
-    const defaultTab = useTypedSelector((state) => state.cluster.defaultClusterTab);
+    const defaultTabFromStore = useTypedSelector((state) => state.cluster.defaultClusterTab);
+    const [savedDefaultTab, setSavedDefaultTab] = useSetting<string | undefined>(
+        DEFAULT_CLUSTER_TAB_KEY,
+        INITIAL_DEFAULT_CLUSTER_TAB,
+    );
+    const savedDefaultTabValidated = React.useMemo(() => {
+        return isClusterTab(savedDefaultTab) ? savedDefaultTab : undefined;
+    }, [savedDefaultTab]);
+    const defaultTab = savedDefaultTabValidated ?? defaultTabFromStore;
 
     const shouldShowNetworkTable = useShouldShowClusterNetworkTable();
     const shouldShowEventsTab = useShouldShowEventsTab();
@@ -328,10 +338,11 @@ function useClusterTab() {
     }
 
     React.useEffect(() => {
-        if (activeTab !== defaultTab) {
+        if (activeTab !== defaultTabFromStore) {
             dispatch(updateDefaultClusterTab(activeTab));
         }
-    }, [activeTab, defaultTab, dispatch]);
+        setSavedDefaultTab(activeTab);
+    }, [activeTab, defaultTabFromStore, dispatch, setSavedDefaultTab]);
 
     return activeTab;
 }

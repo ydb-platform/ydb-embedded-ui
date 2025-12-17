@@ -52,6 +52,17 @@ export interface UIFactory<H extends string = CommonIssueType, T extends string 
     useMetaProxy?: boolean;
     useClusterDomain?: boolean;
 
+    settingsBackend?: {
+        /**
+         * Settings service endpoint (base URL) for `/meta/*` settings contract.
+         */
+        getEndpoint?: () => string | undefined;
+        /**
+         * User identifier to scope settings in the remote store (Yandex users).
+         */
+        getUserId?: () => string | undefined;
+    };
+
     yaMetricaConfig?: {
         yaMetricaMap: Record<T, number | undefined>;
         goals: UiMetricaGoals;

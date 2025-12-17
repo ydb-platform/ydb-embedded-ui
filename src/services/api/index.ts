@@ -27,6 +27,7 @@ interface YdbEmbeddedAPIProps {
     // this setting allows to use schema object path relative to database in api requests
     useRelativePath: undefined | boolean;
     useMetaSettings: undefined | boolean;
+    metaSettingsBaseUrl?: string;
     csrfTokenGetter: undefined | (() => string | undefined);
     defaults: undefined | AxiosRequestConfig;
 }
@@ -44,6 +45,7 @@ export class YdbEmbeddedAPI {
 
     meta?: MetaAPI;
     metaSettings?: MetaSettingsAPI;
+    settingsService?: MetaSettingsAPI;
     codeAssist?: CodeAssistAPI;
 
     constructor({
@@ -55,6 +57,7 @@ export class YdbEmbeddedAPI {
         defaults = {},
         useRelativePath = false,
         useMetaSettings = false,
+        metaSettingsBaseUrl,
     }: YdbEmbeddedAPIProps) {
         const axiosParams: AxiosWrapperOptions = {config: {withCredentials, ...defaults}};
         const baseApiParams = {singleClusterMode, proxyMeta, useRelativePath};
@@ -65,6 +68,10 @@ export class YdbEmbeddedAPI {
         }
         if (useMetaSettings) {
             this.metaSettings = new MetaSettingsAPI(axiosParams, baseApiParams);
+        }
+        if (metaSettingsBaseUrl) {
+            this.settingsService = new MetaSettingsAPI(axiosParams, baseApiParams);
+            this.settingsService.setBaseUrlOverride(metaSettingsBaseUrl);
         }
 
         if (webVersion || codeAssistBackend) {
@@ -85,6 +92,7 @@ export class YdbEmbeddedAPI {
             this.auth.setCSRFToken(token);
             this.meta?.setCSRFToken(token);
             this.metaSettings?.setCSRFToken(token);
+            this.settingsService?.setCSRFToken(token);
             this.codeAssist?.setCSRFToken(token);
             this.operation.setCSRFToken(token);
             this.pdisk.setCSRFToken(token);
