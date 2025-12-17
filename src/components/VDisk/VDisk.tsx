@@ -23,7 +23,6 @@ export interface VDiskProps {
     delayClose?: number;
     withIcon?: boolean;
     highlighted?: boolean;
-    darkened?: boolean;
 }
 
 export const VDisk = ({
@@ -38,7 +37,6 @@ export const VDisk = ({
     delayOpen,
     withIcon,
     highlighted,
-    darkened,
 }: VDiskProps) => {
     const getVDiskLink = useVDiskPagePath();
     const vDiskPath = getVDiskLink({nodeId: data.NodeId, vDiskId: data.StringifiedId});
@@ -69,7 +67,6 @@ export const VDisk = ({
                         className={progressBarClassName}
                         withIcon={withIcon}
                         highlighted={highlighted}
-                        darkened={darkened}
                     />
                 </InternalLink>
             </div>
