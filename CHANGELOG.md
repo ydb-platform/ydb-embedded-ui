@@ -1,5 +1,12 @@
 # Changelog
 
+## [12.30.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.30.0...v12.30.1) (2025-12-17)
+
+
+### Bug Fixes
+
+* **useTenantNavigation:** prevent possible collisions ([#3238](https://github.com/ydb-platform/ydb-embedded-ui/issues/3238)) ([90fb627](https://github.com/ydb-platform/ydb-embedded-ui/commit/90fb627da9b7996da3185979cfde9c73cb60a004))
+
 ## [12.30.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.29.1...v12.30.0) (2025-12-17)
 
 
