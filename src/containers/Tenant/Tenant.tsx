@@ -14,6 +14,7 @@ import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useSetting} from '../../utils/hooks/useSetting';
 import {isAccessError} from '../../utils/response';
 import {useAppTitle} from '../App/AppTitleContext';
 
@@ -25,22 +26,12 @@ import i18n from './i18n';
 import {useTenantQueryParams} from './useTenantQueryParams';
 import {
     PaneVisibilityActionTypes,
-    paneVisibilityToggleReducerCreator,
+    paneVisibilityToggleReducer,
 } from './utils/paneVisibilityToggleHelpers';
 
 import './Tenant.scss';
 
 const b = cn('tenant-page');
-
-const getTenantSummaryState = () => {
-    const collapsed = Boolean(localStorage.getItem(DEFAULT_IS_TENANT_SUMMARY_COLLAPSED));
-
-    return {
-        triggerExpand: false,
-        triggerCollapse: false,
-        collapsed,
-    };
-};
 
 interface TenantProps {
     additionalTenantProps?: AdditionalTenantsProps;
@@ -48,10 +39,18 @@ interface TenantProps {
 
 // eslint-disable-next-line complexity
 export function Tenant({additionalTenantProps}: TenantProps) {
+    const [isSummaryCollapsed, setIsSummaryCollapsed] = useSetting<boolean>(
+        DEFAULT_IS_TENANT_SUMMARY_COLLAPSED,
+        false,
+    );
     const [summaryVisibilityState, dispatchSummaryVisibilityAction] = React.useReducer(
-        paneVisibilityToggleReducerCreator(DEFAULT_IS_TENANT_SUMMARY_COLLAPSED),
+        paneVisibilityToggleReducer,
         undefined,
-        getTenantSummaryState,
+        () => ({
+            triggerExpand: false,
+            triggerCollapse: false,
+            collapsed: Boolean(isSummaryCollapsed),
+        }),
     );
 
     const {database, schema} = useTenantQueryParams();
@@ -108,13 +107,16 @@ export function Tenant({additionalTenantProps}: TenantProps) {
     const errorProps = showBlockingError ? uiFactory.clusterOrDatabaseAccessError : undefined;
 
     const onCollapseSummaryHandler = () => {
+        setIsSummaryCollapsed(true);
         dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.triggerCollapse);
     };
     const onExpandSummaryHandler = () => {
+        setIsSummaryCollapsed(false);
         dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.triggerExpand);
     };
 
     const onSplitStartDragAdditional = () => {
+        setIsSummaryCollapsed(false);
         dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.clear);
     };
 

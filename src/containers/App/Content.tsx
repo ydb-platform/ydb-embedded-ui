@@ -31,6 +31,7 @@ import Authentication from '../Authentication/Authentication';
 import Header from '../Header/Header';
 
 import {useAppTitle} from './AppTitleContext';
+import {SettingsBootstrap} from './SettingsBootstrap';
 import {
     ClusterSlot,
     ClustersSlot,
@@ -223,7 +224,7 @@ function GetUser({children, useMeta}: {children: React.ReactNode; useMeta?: bool
     return (
         <LoaderWrapper loading={isFetching} size="l" delay={0}>
             <PageError error={error} {...errorProps} errorPageTitle={appTitle}>
-                {children}
+                <SettingsBootstrap>{children}</SettingsBootstrap>
             </PageError>
         </LoaderWrapper>
     );

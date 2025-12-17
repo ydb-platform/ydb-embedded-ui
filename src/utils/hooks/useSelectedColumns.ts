@@ -2,7 +2,7 @@ import React from 'react';
 
 import type {TableColumnSetupItem, TableColumnSetupProps} from '@gravity-ui/uikit';
 
-import {settingsManager} from '../../services/settings';
+import {useSetting} from './useSetting';
 
 type OrderedColumn = {id: string; selected?: boolean};
 
@@ -24,14 +24,14 @@ export const useSelectedColumns = <T extends {name: string}>(
     defaultColumnsIds: string[],
     requiredColumnsIds?: string[],
 ) => {
-    const [orderedColumns, setOrderedColumns] = React.useState(() => {
-        const savedColumns = settingsManager.readUserSettingsValue(
-            storageKey,
-            defaultColumnsIds,
-        ) as unknown[];
+    const [savedColumns, setSavedColumns] = useSetting<unknown[]>(storageKey, defaultColumnsIds);
 
-        const normalizedSavedColumns = savedColumns.map(parseSavedColumn);
+    const normalizedSavedColumns = React.useMemo(() => {
+        const rawValue = Array.isArray(savedColumns) ? savedColumns : defaultColumnsIds;
+        return rawValue.map(parseSavedColumn);
+    }, [defaultColumnsIds, savedColumns]);
 
+    const orderedColumns = React.useMemo(() => {
         return columns.reduce<OrderedColumn[]>((acc, column) => {
             const savedColumn = normalizedSavedColumns.find((c) => c && c.id === column.name);
             if (savedColumn) {
@@ -41,7 +41,7 @@ export const useSelectedColumns = <T extends {name: string}>(
             }
             return acc;
         }, []);
-    });
+    }, [columns, normalizedSavedColumns]);
 
     const columnsToSelect = React.useMemo(() => {
         const preparedColumns = orderedColumns.reduce<(TableColumnSetupItem & {column: T})[]>(
@@ -76,10 +76,9 @@ export const useSelectedColumns = <T extends {name: string}>(
         (value) => {
             const preparedColumns = value.map(({id, selected}) => ({id, selected}));
 
-            settingsManager.setUserSettingsValue(storageKey, preparedColumns);
-            setOrderedColumns(preparedColumns);
+            setSavedColumns(preparedColumns);
         },
-        [storageKey],
+        [setSavedColumns],
     );
 
     return {

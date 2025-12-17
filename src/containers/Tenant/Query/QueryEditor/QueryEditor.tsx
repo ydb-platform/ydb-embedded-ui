@@ -24,10 +24,7 @@ import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import type {EPathSubType, EPathType} from '../../../../types/api/schema';
 import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
-import {
-    DEFAULT_IS_QUERY_RESULT_COLLAPSED,
-    DEFAULT_SIZE_RESULT_PANE_KEY,
-} from '../../../../utils/constants';
+import {DEFAULT_SIZE_RESULT_PANE_KEY} from '../../../../utils/constants';
 import {
     useEventHandler,
     useQueryExecutionSettings,
@@ -45,7 +42,7 @@ import {useCurrentSchema} from '../../TenantContext';
 import type {InitialPaneState} from '../../utils/paneVisibilityToggleHelpers';
 import {
     PaneVisibilityActionTypes,
-    paneVisibilityToggleReducerCreator,
+    paneVisibilityToggleReducer,
 } from '../../utils/paneVisibilityToggleHelpers';
 import {PreviewContainer} from '../Preview/Preview';
 import {QueryEditorControls} from '../QueryEditorControls/QueryEditorControls';
@@ -160,7 +157,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
     }, [dispatch, database, savedPath]);
 
     const [resultVisibilityState, dispatchResultVisibilityState] = React.useReducer(
-        paneVisibilityToggleReducerCreator(DEFAULT_IS_QUERY_RESULT_COLLAPSED),
+        paneVisibilityToggleReducer,
         initialTenantCommonInfoState,
     );
 

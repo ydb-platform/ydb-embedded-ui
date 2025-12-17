@@ -3,8 +3,10 @@ import React from 'react';
 import {Xmark} from '@gravity-ui/icons';
 import {DrawerItem, Drawer as GravityDrawer} from '@gravity-ui/navigation';
 import {ActionTooltip, Button, Flex, Icon, Text} from '@gravity-ui/uikit';
+import {debounce} from 'lodash';
 
 import {cn} from '../../utils/cn';
+import {useSetting} from '../../utils/hooks/useSetting';
 import {isNumeric} from '../../utils/utils';
 import {CopyLinkButton} from '../CopyLinkButton/CopyLinkButton';
 import {Portal} from '../Portal/Portal';
@@ -16,6 +18,7 @@ import './Drawer.scss';
 const DEFAULT_DRAWER_WIDTH_PERCENTS = 60;
 const DEFAULT_DRAWER_WIDTH = 600;
 const DRAWER_WIDTH_KEY = 'drawer-width';
+const SAVE_DEBOUNCE_MS = 200;
 const b = cn('ydb-drawer');
 
 type DrawerEvent = MouseEvent & {
@@ -49,10 +52,11 @@ const DrawerPaneContentWrapper = ({
     isPercentageWidth,
     hideVeil = true,
 }: DrawerPaneContentWrapperProps) => {
-    const [drawerWidth, setDrawerWidth] = React.useState(() => {
-        const savedWidth = localStorage.getItem(storageKey);
-        return isNumeric(savedWidth) ? Number(savedWidth) : defaultWidth;
+    const [savedWidthString, setSavedWidthString] = useSetting<string | undefined>(storageKey);
+    const [drawerWidth, setDrawerWidth] = React.useState<number | undefined>(() => {
+        return isNumeric(savedWidthString) ? Number(savedWidthString) : defaultWidth;
     });
+    const hasUserResizedRef = React.useRef(false);
 
     const drawerRef = React.useRef<HTMLDivElement>(null);
     const {containerWidth, itemContainerRef} = useDrawerContext();
@@ -65,6 +69,20 @@ const DrawerPaneContentWrapper = ({
         }
         return drawerWidth || DEFAULT_DRAWER_WIDTH;
     }, [containerWidth, isPercentageWidth, drawerWidth]);
+
+    React.useEffect(() => {
+        if (hasUserResizedRef.current) {
+            return;
+        }
+
+        const nextWidth = isNumeric(savedWidthString) ? Number(savedWidthString) : defaultWidth;
+        setDrawerWidth((prevWidth) => {
+            if (prevWidth === nextWidth) {
+                return prevWidth;
+            }
+            return nextWidth;
+        });
+    }, [defaultWidth, savedWidthString]);
 
     React.useEffect(() => {
         if (!detectClickOutside) {
@@ -91,19 +109,31 @@ const DrawerPaneContentWrapper = ({
         };
     }, [isVisible, onClose, detectClickOutside]);
 
+    const saveWidthDebounced = React.useMemo(() => {
+        return debounce((value: string) => setSavedWidthString(value), SAVE_DEBOUNCE_MS);
+    }, [setSavedWidthString]);
+
+    React.useEffect(() => {
+        return () => {
+            saveWidthDebounced.cancel();
+        };
+    }, [saveWidthDebounced]);
+
     const handleResizeDrawer = (width: number) => {
+        hasUserResizedRef.current = true;
         if (isPercentageWidth && containerWidth > 0) {
             const percentageWidth = Math.round((width / containerWidth) * 100);
             setDrawerWidth(percentageWidth);
-            localStorage.setItem(storageKey, percentageWidth.toString());
+            saveWidthDebounced(percentageWidth.toString());
         } else {
             setDrawerWidth(width);
-            localStorage.setItem(storageKey, width.toString());
+            saveWidthDebounced(width.toString());
         }
     };
 
     const handleClickInsideDrawer = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        (event.nativeEvent as DrawerEvent)._capturedInsideDrawer = true;
+        const nativeEvent = event.nativeEvent as DrawerEvent;
+        nativeEvent._capturedInsideDrawer = true;
     };
 
     const itemContainer = itemContainerRef?.current;
@@ -124,7 +154,7 @@ const DrawerPaneContentWrapper = ({
                     visible={isVisible}
                     resizable
                     maxResizeWidth={containerWidth}
-                    width={isPercentageWidth ? calculatedWidth : drawerWidth}
+                    width={calculatedWidth}
                     onResize={handleResizeDrawer}
                     direction={direction}
                     className={b('item')}
