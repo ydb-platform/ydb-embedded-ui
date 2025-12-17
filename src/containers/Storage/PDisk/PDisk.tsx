@@ -33,7 +33,6 @@ interface PDiskProps {
     delayClose?: number;
     withIcon?: boolean;
     highlighted?: boolean;
-    darkened?: boolean;
     highlightedDisk?: string;
     setHighlightedDisk?: (id?: string) => void;
 }
@@ -52,7 +51,6 @@ export const PDisk = ({
     delayClose = DISKS_POPUP_DEBOUNCE_TIMEOUT,
     withIcon,
     highlighted,
-    darkened,
     highlightedDisk,
     setHighlightedDisk,
 }: PDiskProps) => {
@@ -70,7 +68,6 @@ export const PDisk = ({
                 {vDisks.map((vdisk) => {
                     const vDiskId = vdisk.StringifiedId;
                     const vDiskHighlighted = highlightedDisk === vDiskId;
-                    const vDiskDarkened = Boolean(highlightedDisk && highlightedDisk !== vDiskId);
 
                     return (
                         <div
@@ -93,7 +90,6 @@ export const PDisk = ({
                                 onShowPopup={() => setHighlightedDisk?.(vDiskId)}
                                 onHidePopup={() => setHighlightedDisk?.(undefined)}
                                 highlighted={vDiskHighlighted}
-                                darkened={vDiskDarkened}
                             />
                         </div>
                     );
@@ -128,7 +124,6 @@ export const PDisk = ({
                         severity={data.Severity}
                         className={progressBarClassName}
                         highlighted={highlighted}
-                        darkened={darkened}
                         noDataPlaceholder={i18n('no-data')}
                     />
                 </InternalLink>

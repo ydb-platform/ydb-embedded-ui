@@ -1,8 +1,4 @@
-.ydb-storage-nodes-columns {
-    &__pdisks-column {
-        overflow: visible; // to enable stacked disks overflow the row
-    }
-
+.ydb-storage-pdisks {
     &__pdisks-wrapper {
         display: flex;
         gap: 10px;

@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {Flex, useLayoutContext} from '@gravity-ui/uikit';
 
 import {VDisk} from '../../../components/VDisk/VDisk';
@@ -21,19 +23,12 @@ interface DisksProps {
     viewContext?: StorageViewContext;
     erasure?: Erasure;
     withIcon?: boolean;
-    highlightedVDisk?: string;
-    setHighlightedVDisk?: (id?: string) => void;
 }
 
-export function Disks({
-    vDisks = [],
-    viewContext,
-    erasure,
-    withIcon,
-    highlightedVDisk,
-    setHighlightedVDisk,
-}: DisksProps) {
+export function Disks({vDisks = [], viewContext, erasure, withIcon}: DisksProps) {
     const vDisksWithDCMargins = useVDisksWithDCMargins(vDisks, erasure);
+
+    const [highlightedVDisk, setHighlightedVDisk] = React.useState<string | undefined>();
 
     const {
         theme: {spaceBaseSize},
@@ -106,7 +101,6 @@ function VDiskItem({
     const flexGrow = Number(vDiskToShow.AllocatedSize) || 1;
 
     const isHighlighted = highlightedVDisk === vDiskId;
-    const darkened = Boolean(highlightedVDisk && highlightedVDisk !== vDiskId);
 
     return (
         <div style={{flexGrow, minWidth}} className={b('vdisk-item')}>
@@ -122,7 +116,6 @@ function VDiskItem({
                 onHidePopup={() => setHighlightedVDisk?.(undefined)}
                 progressBarClassName={b('vdisk-progress-bar')}
                 highlighted={isHighlighted}
-                darkened={darkened}
             />
         </div>
     );
@@ -138,7 +131,6 @@ function PDiskItem({
     const vDiskId = vDisk.StringifiedId;
 
     const isHighlighted = highlightedVDisk === vDiskId;
-    const darkened = Boolean(highlightedVDisk && highlightedVDisk !== vDiskId);
 
     if (!vDisk.PDisk) {
         return null;
@@ -156,7 +148,6 @@ function PDiskItem({
             onHidePopup={() => setHighlightedVDisk?.(undefined)}
             withIcon={withIcon}
             highlighted={isHighlighted}
-            darkened={darkened}
         />
     );
 }

@@ -39,12 +39,32 @@ export const HoverPopup = ({
 
     const anchor = React.useRef<HTMLSpanElement>(null);
 
+    const reportedOpenRef = React.useRef(false);
+
+    const reportOpen = React.useCallback(
+        (nextOpen: boolean) => {
+            if (reportedOpenRef.current === nextOpen) {
+                return;
+            }
+
+            reportedOpenRef.current = nextOpen;
+
+            if (nextOpen) {
+                onShowPopup?.();
+            } else {
+                onHidePopup?.();
+            }
+        },
+        [onShowPopup, onHidePopup],
+    );
+
     const debouncedHandleShowPopup = React.useMemo(
         () =>
             debounce(() => {
                 setIsPopupVisible(true);
+                reportOpen(true);
             }, delayOpen),
-        [delayOpen],
+        [delayOpen, reportOpen],
     );
 
     const hidePopup = React.useCallback(() => {
@@ -52,8 +72,12 @@ export const HoverPopup = ({
     }, []);
 
     const debouncedHandleHidePopup = React.useMemo(
-        () => debounce(hidePopup, delayClose),
-        [hidePopup, delayClose],
+        () =>
+            debounce(() => {
+                hidePopup();
+                reportOpen(false);
+            }, delayClose),
+        [delayClose, reportOpen, hidePopup],
     );
 
     const onMouseEnter = () => {
@@ -67,9 +91,10 @@ export const HoverPopup = ({
     };
 
     const onPopupMouseEnter = React.useCallback(() => {
-        setIsPopupContentHovered(true);
         debouncedHandleHidePopup.cancel();
-    }, [debouncedHandleHidePopup]);
+        setIsPopupContentHovered(true);
+        reportOpen(true);
+    }, [reportOpen, debouncedHandleHidePopup]);
 
     const onPopupMouseLeave = React.useCallback(() => {
         setIsPopupContentHovered(false);
@@ -78,7 +103,8 @@ export const HoverPopup = ({
 
     const onPopupContextMenu = React.useCallback(() => {
         setIsFocused(true);
-    }, []);
+        reportOpen(true);
+    }, [reportOpen]);
 
     const onPopupBlur = React.useCallback(() => {
         setIsFocused(false);
@@ -88,31 +114,12 @@ export const HoverPopup = ({
         setIsFocused(false);
         setIsPopupContentHovered(false);
         hidePopup();
-    }, [hidePopup]);
+        reportOpen(false);
+    }, [hidePopup, reportOpen]);
 
     const internalOpen = isPopupVisible || isPopupContentHovered || isFocused;
-    const open = internalOpen || showPopup;
+    const open = showPopup ?? internalOpen;
 
-    const prevInternalOpenRef = React.useRef(internalOpen);
-
-    React.useEffect(() => {
-        const prev = prevInternalOpenRef.current;
-
-        if (prev === internalOpen) {
-            return;
-        }
-
-        if (internalOpen) {
-            onShowPopup?.();
-        } else {
-            onHidePopup?.();
-        }
-
-        prevInternalOpenRef.current = internalOpen;
-    }, [internalOpen, onShowPopup, onHidePopup]);
-
-    // Do not render Popup until it is available
-    // to avoid a brief initial render at (0, 0) before positioning is applied.
     const anchorElement = anchorRef?.current || anchor.current;
 
     return (
@@ -120,7 +127,7 @@ export const HoverPopup = ({
             <span ref={anchor} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
                 {children}
             </span>
-            {open && anchorElement ? (
+            {anchorElement ? (
                 <Popup
                     anchorElement={anchorElement}
                     onOpenChange={(_open, _event, reason) => {
@@ -130,7 +137,7 @@ export const HoverPopup = ({
                     }}
                     placement={placement}
                     hasArrow
-                    open
+                    open={open}
                     // bigger offset for easier switching to neighbour nodes
                     // matches the default offset for popup with arrow out of a sense of beauty
                     offset={offset || {mainAxis: 12, crossAxis: 0}}

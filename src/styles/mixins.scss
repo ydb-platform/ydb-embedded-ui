@@ -321,11 +321,3 @@
         }
     }
 }
-
-@mixin hover-dim-column-class($column-class) {
-    .ydb-paginated-table__table:has(.#{$column-class}:hover)
-        .#{$column-class}_highlighted
-        .storage-disk-progress-bar:not(.storage-disk-progress-bar_highlighted) {
-        opacity: 0.8;
-    }
-}

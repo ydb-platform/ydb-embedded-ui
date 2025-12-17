@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {VDiskWithDonorsStack} from '../../../components/VDisk/VDiskWithDonorsStack';
 import type {Erasure} from '../../../types/api/storage';
 import {cn} from '../../../utils/cn';
@@ -15,19 +17,12 @@ interface VDisksProps {
     viewContext?: StorageViewContext;
     erasure?: Erasure;
     withIcon?: boolean;
-    highlightedVDisk?: string;
-    setHighlightedVDisk?: (id: string | undefined) => void;
 }
 
-export function VDisks({
-    vDisks,
-    viewContext,
-    erasure,
-    withIcon,
-    highlightedVDisk,
-    setHighlightedVDisk,
-}: VDisksProps) {
+export function VDisks({vDisks, viewContext, erasure, withIcon}: VDisksProps) {
     const vDisksWithDCMargins = useVDisksWithDCMargins(vDisks, erasure);
+
+    const [highlightedVDisk, setHighlightedVDisk] = React.useState<string | undefined>();
 
     return (
         <div className={b('wrapper')}>

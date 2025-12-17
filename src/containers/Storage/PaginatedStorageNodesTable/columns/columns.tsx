@@ -24,8 +24,7 @@ import {
 } from '../../../../components/nodesColumns/constants';
 import type {NodesColumn} from '../../../../components/nodesColumns/types';
 import {cn} from '../../../../utils/cn';
-import {PDisk} from '../../PDisk/PDisk';
-import {isTopLevelStorageContext} from '../../utils';
+import {PDisks} from '../../PDisks/PDisks';
 
 import type {GetStorageNodesColumnsParams} from './types';
 
@@ -36,50 +35,21 @@ const b = cn('ydb-storage-nodes-columns');
 export const getPDisksColumn = ({
     viewContext,
     columnsSettings,
-    highlightedDisk,
-    setHighlightedDisk,
 }: GetStorageNodesColumnsParams): NodesColumn => {
-    const highlightEnabled = isTopLevelStorageContext(viewContext);
-    const coloredDisk = highlightEnabled ? highlightedDisk : undefined;
-    const setColoredDisk = highlightEnabled ? setHighlightedDisk : undefined;
-
     return {
         name: NODES_COLUMNS_IDS.PDisks,
         header: NODES_COLUMNS_TITLES.PDisks,
-        className: b('pdisks-column', {highlighted: highlightEnabled}),
+        className: b('pdisks-column'),
         width: columnsSettings?.pDiskContainerWidth,
         render: ({row}) => {
             return (
-                <div className={b('pdisks-wrapper')}>
-                    {row.PDisks?.map((pDisk) => {
-                        const vDisks = row.VDisks?.filter(
-                            (vdisk) => vdisk.PDiskId === pDisk.PDiskId,
-                        );
-
-                        const id = `${row.NodeId}-${pDisk.PDiskId}`;
-
-                        const highlighted = coloredDisk === id;
-                        const darkened = Boolean(coloredDisk && coloredDisk !== id);
-
-                        return (
-                            <div className={b('pdisks-item')} key={pDisk.PDiskId}>
-                                <PDisk
-                                    data={pDisk}
-                                    vDisks={vDisks}
-                                    viewContext={viewContext}
-                                    width={columnsSettings?.pDiskWidth}
-                                    showPopup={highlighted}
-                                    onShowPopup={() => setColoredDisk?.(id)}
-                                    onHidePopup={() => setColoredDisk?.(undefined)}
-                                    highlighted={highlighted}
-                                    darkened={darkened}
-                                    highlightedDisk={coloredDisk}
-                                    setHighlightedDisk={setColoredDisk}
-                                />
-                            </div>
-                        );
-                    })}
-                </div>
+                <PDisks
+                    nodeId={row.NodeId}
+                    pDisks={row.PDisks}
+                    vDisks={row.VDisks}
+                    viewContext={viewContext}
+                    pDiskWidth={columnsSettings?.pDiskWidth}
+                />
             );
         },
         align: DataTable.CENTER,

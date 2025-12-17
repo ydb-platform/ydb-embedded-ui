@@ -16,7 +16,7 @@ import {formatToMs} from '../../../../utils/timeParsers';
 import {bytesToGB, bytesToSpeed} from '../../../../utils/utils';
 import {Disks} from '../../Disks/Disks';
 import {VDisks} from '../../VDisks/VDisks';
-import {getDegradedSeverity, isTopLevelStorageContext} from '../../utils';
+import {getDegradedSeverity} from '../../utils';
 import i18n from '../i18n';
 
 import {
@@ -235,22 +235,16 @@ const allocationUnitsColumn: StorageGroupsColumn = {
 };
 
 const getVDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => {
-    const highlightEnabled = isTopLevelStorageContext(data?.viewContext);
-    const highlightedVDisk = highlightEnabled ? data?.highlightedVDisksVDisk : undefined;
-    const setHighlightedVDisk = highlightEnabled ? data?.setHighlightedVDisksVDisk : undefined;
-
     return {
         name: STORAGE_GROUPS_COLUMNS_IDS.VDisks,
         header: STORAGE_GROUPS_COLUMNS_TITLES.VDisks,
-        className: b('vdisks-column', {highlighted: highlightEnabled}),
+        className: b('vdisks-column'),
         render: ({row}) => (
             <VDisks
                 vDisks={row.VDisks}
                 viewContext={data?.viewContext}
                 erasure={row.ErasureSpecies}
                 withIcon
-                highlightedVDisk={highlightedVDisk}
-                setHighlightedVDisk={setHighlightedVDisk}
             />
         ),
         align: DataTable.CENTER,
@@ -261,22 +255,16 @@ const getVDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => {
 };
 
 const getDisksColumn = (data?: GetStorageColumnsData): StorageGroupsColumn => {
-    const highlightEnabled = isTopLevelStorageContext(data?.viewContext);
-    const highlightedVDisk = highlightEnabled ? data?.highlightedVDisk : undefined;
-    const setHighlightedVDisk = highlightEnabled ? data?.setHighlightedVDisk : undefined;
-
     return {
         name: STORAGE_GROUPS_COLUMNS_IDS.VDisksPDisks,
         header: STORAGE_GROUPS_COLUMNS_TITLES.VDisksPDisks,
-        className: b('disks-column', {highlighted: highlightEnabled}),
+        className: b('disks-column'),
         render: ({row}) => (
             <Disks
                 vDisks={row.VDisks}
                 viewContext={data?.viewContext}
                 erasure={row.ErasureSpecies}
                 withIcon
-                highlightedVDisk={highlightedVDisk}
-                setHighlightedVDisk={setHighlightedVDisk}
             />
         ),
         align: DataTable.CENTER,

@@ -43,7 +43,6 @@ export function DiskStateProgressBar({
     isDonor,
     withIcon,
     highlighted,
-    darkened,
     noDataPlaceholder,
 }: DiskStateProgressBarProps) {
     const [inverted] = useSetting<boolean | undefined>(SETTING_KEYS.INVERTED_DISKS);
@@ -56,7 +55,6 @@ export function DiskStateProgressBar({
         inactive,
         striped,
         highlighted,
-        darkened,
     };
 
     if (isDonor) {
