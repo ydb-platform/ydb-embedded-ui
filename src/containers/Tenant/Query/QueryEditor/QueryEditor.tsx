@@ -42,7 +42,7 @@ import {useCurrentSchema} from '../../TenantContext';
 import type {InitialPaneState} from '../../utils/paneVisibilityToggleHelpers';
 import {
     PaneVisibilityActionTypes,
-    paneVisibilityToggleReducerCreator,
+    paneVisibilityToggleReducer,
 } from '../../utils/paneVisibilityToggleHelpers';
 import {PreviewContainer} from '../Preview/Preview';
 import {QueryEditorControls} from '../QueryEditorControls/QueryEditorControls';
@@ -157,7 +157,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
     }, [dispatch, database, savedPath]);
 
     const [resultVisibilityState, dispatchResultVisibilityState] = React.useReducer(
-        paneVisibilityToggleReducerCreator(),
+        paneVisibilityToggleReducer,
         initialTenantCommonInfoState,
     );
 

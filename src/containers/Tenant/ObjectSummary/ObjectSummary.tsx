@@ -44,7 +44,7 @@ import {getSummaryControls} from '../utils/controls';
 import {
     PaneVisibilityActionTypes,
     PaneVisibilityToggleButtons,
-    paneVisibilityToggleReducerCreator,
+    paneVisibilityToggleReducer,
 } from '../utils/paneVisibilityToggleHelpers';
 import {isTableType} from '../utils/schema';
 
@@ -78,7 +78,7 @@ export function ObjectSummary({
         false,
     );
     const [commonInfoVisibilityState, dispatchCommonInfoVisibilityState] = React.useReducer(
-        paneVisibilityToggleReducerCreator(),
+        paneVisibilityToggleReducer,
         undefined,
         () => ({
             triggerExpand: false,

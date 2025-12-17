@@ -23,9 +23,28 @@ import {
 import {shouldSyncSettingToLS, stringifySettingValue} from './utils';
 
 const REMOTE_WRITE_DEBOUNCE_MS = 200;
+const REMOTE_WRITE_IN_FLIGHT_TIMEOUT_MS = 10_000;
 
 async function delayMs(ms: number) {
     return new Promise<void>((resolve) => setTimeout(resolve, ms));
+}
+
+async function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+    return new Promise<T>((resolve, reject) => {
+        const timeoutId = window.setTimeout(() => {
+            reject(new Error('Remote settings write timed out'));
+        }, ms);
+
+        promise
+            .then((value) => {
+                clearTimeout(timeoutId);
+                resolve(value);
+            })
+            .catch((error) => {
+                clearTimeout(timeoutId);
+                reject(error);
+            });
+    });
 }
 
 async function withRetries<T>(fn: () => Promise<T>, attempts: number, delay: number) {
@@ -52,6 +71,13 @@ type DebounceEntry<T> = {
 
 const debouncedRemoteWrites = new Map<string, DebounceEntry<unknown>>();
 
+function triggerFlushDebouncedRemoteWrite(key: string) {
+    // Fire-and-forget: concurrency is serialized by `entry.inFlight`.
+    flushDebouncedRemoteWrite(key).catch(() => {
+        // best-effort
+    });
+}
+
 async function flushDebouncedRemoteWrite(key: string) {
     const entry = debouncedRemoteWrites.get(key);
     if (!entry || entry.inFlight) {
@@ -68,7 +94,7 @@ async function flushDebouncedRemoteWrite(key: string) {
     entry.pending = [];
 
     try {
-        const result = await entry.latestRequest();
+        const result = await withTimeout(entry.latestRequest(), REMOTE_WRITE_IN_FLIGHT_TIMEOUT_MS);
         pending.forEach((p) => p.resolve(result));
     } catch (error) {
         pending.forEach((p) => p.reject(error));
@@ -77,7 +103,7 @@ async function flushDebouncedRemoteWrite(key: string) {
 
         if (entry.pending.length > 0) {
             entry.timeoutId = window.setTimeout(() => {
-                flushDebouncedRemoteWrite(key);
+                triggerFlushDebouncedRemoteWrite(key);
             }, REMOTE_WRITE_DEBOUNCE_MS);
         } else {
             debouncedRemoteWrites.delete(key);
@@ -96,7 +122,7 @@ function scheduleDebouncedRemoteWrite<T>(key: string, request: () => Promise<T>)
             existing.pending.push({resolve, reject});
             if (!existing.inFlight) {
                 existing.timeoutId = window.setTimeout(() => {
-                    flushDebouncedRemoteWrite(key);
+                    triggerFlushDebouncedRemoteWrite(key);
                 }, REMOTE_WRITE_DEBOUNCE_MS);
             }
         });
@@ -111,7 +137,7 @@ function scheduleDebouncedRemoteWrite<T>(key: string, request: () => Promise<T>)
         };
         debouncedRemoteWrites.set(key, entry as DebounceEntry<unknown>);
         entry.timeoutId = window.setTimeout(() => {
-            flushDebouncedRemoteWrite(key);
+            triggerFlushDebouncedRemoteWrite(key);
         }, REMOTE_WRITE_DEBOUNCE_MS);
     });
 }
@@ -120,16 +146,15 @@ function resolveRemoteSettingsClientAndUser(user: string) {
     const userFromFactory = uiFactory.settingsBackend?.getUserId?.();
     const endpointFromFactory = uiFactory.settingsBackend?.getEndpoint?.();
 
-    if (endpointFromFactory && userFromFactory && window.api?.settingsService) {
-        return {
-            client: window.api.settingsService,
-            user: userFromFactory,
-            clientKey: 'service',
-        } as const;
-    }
-
     if (window.api?.metaSettings) {
-        return {client: window.api.metaSettings, user, clientKey: 'meta'} as const;
+        if (endpointFromFactory && userFromFactory) {
+            return {
+                client: window.api.metaSettings,
+                user: userFromFactory,
+            } as const;
+        }
+
+        return {client: window.api.metaSettings, user} as const;
     }
 
     return undefined;
@@ -207,7 +232,7 @@ export const settingsApi = api.injectEndpoints({
                         throw new Error('MetaSettings API is not available');
                     }
 
-                    const debounceKey = `${resolved.clientKey}:${resolved.user}:${name}`;
+                    const debounceKey = `${resolved.user}:${name}`;
 
                     const data = await scheduleDebouncedRemoteWrite<SetSettingResponse>(
                         debounceKey,
@@ -243,9 +268,7 @@ export const settingsApi = api.injectEndpoints({
                     name,
                     value,
                     dispatch,
-                    metaSettingsAvailable: Boolean(
-                        window.api?.metaSettings || window.api?.settingsService,
-                    ),
+                    metaSettingsAvailable: Boolean(window.api?.metaSettings),
                     shouldSyncToLS,
                     awaitRemote: queryFulfilled,
                 });

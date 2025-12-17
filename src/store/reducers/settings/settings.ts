@@ -24,13 +24,7 @@ const settingsSlice = createSlice({
     initialState,
     reducers: (create) => ({
         setSettingValue: create.reducer<{name: string; value: unknown}>((state, action) => {
-            return {
-                ...state,
-                userSettings: {
-                    ...state.userSettings,
-                    [action.payload.name]: action.payload.value,
-                },
-            };
+            state.userSettings[action.payload.name] = action.payload.value;
         }),
     }),
 });

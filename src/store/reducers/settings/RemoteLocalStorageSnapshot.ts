@@ -19,7 +19,6 @@ import {shouldSyncSettingToLS, stringifySettingValue} from './utils';
 
 const DRAWER_WIDTH_KEY = 'drawer-width';
 const LOCAL_STORAGE_REMOTE_SNAPSHOT_PREFIX = 'all-local-storage-';
-const LOCAL_STORAGE_REMOTE_SNAPSHOT_ATTEMPTED_PREFIX = 'all-local-storage-attempted-';
 
 const LOCAL_STORAGE_SETTINGS_KEYS_FOR_SNAPSHOT = Array.from(
     new Set<string>([
@@ -38,7 +37,6 @@ const LOCAL_STORAGE_SETTINGS_KEYS_FOR_SNAPSHOT = Array.from(
 const inFlightSnapshots = new Map<string, Promise<void>>();
 
 export type ResolvedRemoteSettingsForSnapshot = {
-    clientKey: string;
     user: string;
     client: {
         getSingleSetting: (
@@ -52,12 +50,6 @@ function getLocalStorageRemoteSnapshotKey() {
     const hostname = typeof window === 'undefined' ? undefined : window.location?.hostname;
     const safeHostname = hostname || 'unknown';
     return `${LOCAL_STORAGE_REMOTE_SNAPSHOT_PREFIX}${safeHostname}`;
-}
-
-function getLocalStorageRemoteSnapshotAttemptedKey() {
-    const hostname = typeof window === 'undefined' ? undefined : window.location?.hostname;
-    const safeHostname = hostname || 'unknown';
-    return `${LOCAL_STORAGE_REMOTE_SNAPSHOT_ATTEMPTED_PREFIX}${safeHostname}`;
 }
 
 function tryReadLocalStorageString(key: string) {
@@ -99,8 +91,7 @@ export async function snapshotLocalStorageToRemoteOnce(
     resolved: ResolvedRemoteSettingsForSnapshot,
 ) {
     const snapshotKey = getLocalStorageRemoteSnapshotKey();
-    const attemptedKey = getLocalStorageRemoteSnapshotAttemptedKey();
-    const inFlightKey = `${resolved.clientKey}:${resolved.user}:${snapshotKey}`;
+    const inFlightKey = `${resolved.user}:${snapshotKey}`;
 
     const inFlight = inFlightSnapshots.get(inFlightKey);
     if (inFlight) {
@@ -118,15 +109,6 @@ export async function snapshotLocalStorageToRemoteOnce(
             if (existingSnapshot?.value !== undefined && existingSnapshot?.value !== null) {
                 return;
             }
-
-            const existingAttempted = await resolved.client.getSingleSetting({
-                name: attemptedKey,
-                user: resolved.user,
-                preventBatching: true,
-            });
-            if (existingAttempted?.value !== undefined && existingAttempted?.value !== null) {
-                return;
-            }
         } catch {
             return;
         }
@@ -141,17 +123,6 @@ export async function snapshotLocalStorageToRemoteOnce(
 
             const snapshotStatus = snapshotResponse?.status;
             if (snapshotStatus && snapshotStatus !== 'SUCCESS') {
-                return;
-            }
-
-            // Mark "attempted" only after a successful snapshot write.
-            const attemptedResponse = await resolved.client.setSingleSetting({
-                name: attemptedKey,
-                user: resolved.user,
-                value: stringifySettingValue(true),
-            });
-            const attemptedStatus = attemptedResponse?.status;
-            if (attemptedStatus && attemptedStatus !== 'SUCCESS') {
                 return;
             }
         } catch {

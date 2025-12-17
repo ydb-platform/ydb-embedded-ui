@@ -26,7 +26,7 @@ import i18n from './i18n';
 import {useTenantQueryParams} from './useTenantQueryParams';
 import {
     PaneVisibilityActionTypes,
-    paneVisibilityToggleReducerCreator,
+    paneVisibilityToggleReducer,
 } from './utils/paneVisibilityToggleHelpers';
 
 import './Tenant.scss';
@@ -44,7 +44,7 @@ export function Tenant({additionalTenantProps}: TenantProps) {
         false,
     );
     const [summaryVisibilityState, dispatchSummaryVisibilityAction] = React.useReducer(
-        paneVisibilityToggleReducerCreator(),
+        paneVisibilityToggleReducer,
         undefined,
         () => ({
             triggerExpand: false,

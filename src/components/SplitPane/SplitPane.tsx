@@ -56,8 +56,25 @@ function SplitPane(props: SplitPaneProps) {
         if (initialSizes) {
             return initialSizes;
         }
-        const sizes = savedSizesString?.split(',').map(Number);
-        return sizes || defaultSizesProp || sizesDefaultInner;
+        const fallbackSizes = defaultSizesProp || sizesDefaultInner;
+        if (!savedSizesString) {
+            return fallbackSizes;
+        }
+
+        const parts = savedSizesString.split(',');
+        const parsedSizes = parts.map((part) => {
+            const trimmed = part.trim();
+            if (!trimmed) {
+                return Number.NaN;
+            }
+            return Number(trimmed);
+        });
+
+        const expectedLength = fallbackSizes.length;
+        const isValid =
+            parsedSizes.length === expectedLength && parsedSizes.every((v) => Number.isFinite(v));
+
+        return isValid ? parsedSizes : fallbackSizes;
     }, [defaultSizesProp, initialSizes, savedSizesString]);
     const setDefaultSizePane = React.useCallback(
         (sizes: number[]) => {

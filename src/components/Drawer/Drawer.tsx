@@ -56,6 +56,7 @@ const DrawerPaneContentWrapper = ({
     const [drawerWidth, setDrawerWidth] = React.useState<number | undefined>(() => {
         return isNumeric(savedWidthString) ? Number(savedWidthString) : defaultWidth;
     });
+    const hasUserResizedRef = React.useRef(false);
 
     const drawerRef = React.useRef<HTMLDivElement>(null);
     const {containerWidth, itemContainerRef} = useDrawerContext();
@@ -68,6 +69,20 @@ const DrawerPaneContentWrapper = ({
         }
         return drawerWidth || DEFAULT_DRAWER_WIDTH;
     }, [containerWidth, isPercentageWidth, drawerWidth]);
+
+    React.useEffect(() => {
+        if (hasUserResizedRef.current) {
+            return;
+        }
+
+        const nextWidth = isNumeric(savedWidthString) ? Number(savedWidthString) : defaultWidth;
+        setDrawerWidth((prevWidth) => {
+            if (prevWidth === nextWidth) {
+                return prevWidth;
+            }
+            return nextWidth;
+        });
+    }, [defaultWidth, savedWidthString]);
 
     React.useEffect(() => {
         if (!detectClickOutside) {
@@ -105,6 +120,7 @@ const DrawerPaneContentWrapper = ({
     }, [saveWidthDebounced]);
 
     const handleResizeDrawer = (width: number) => {
+        hasUserResizedRef.current = true;
         if (isPercentageWidth && containerWidth > 0) {
             const percentageWidth = Math.round((width / containerWidth) * 100);
             setDrawerWidth(percentageWidth);
@@ -116,7 +132,8 @@ const DrawerPaneContentWrapper = ({
     };
 
     const handleClickInsideDrawer = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        (event.nativeEvent as DrawerEvent)._capturedInsideDrawer = true;
+        const nativeEvent = event.nativeEvent as DrawerEvent;
+        nativeEvent._capturedInsideDrawer = true;
     };
 
     const itemContainer = itemContainerRef?.current;

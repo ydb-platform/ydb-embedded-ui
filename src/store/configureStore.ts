@@ -75,7 +75,9 @@ export function configureStore({
         csrfTokenGetter: undefined,
         useRelativePath: false,
         useMetaSettings: false,
-        metaSettingsBaseUrl: uiFactory.settingsBackend?.getEndpoint?.(),
+        metaSettingsBaseUrl: uiFactory.settingsBackend?.getUserId?.()
+            ? uiFactory.settingsBackend?.getEndpoint?.()
+            : undefined,
         defaults: undefined,
     }),
 } = {}) {

@@ -11,7 +11,5 @@ export const useSetting = <T>(key?: string, defaultValue?: T): [T, (value: T) =>
         return (getSettingValue(state, key) ?? defaultValue) as T;
     });
 
-    const setValue = saveValue;
-
-    return [settingValue, setValue];
+    return [settingValue, saveValue];
 };

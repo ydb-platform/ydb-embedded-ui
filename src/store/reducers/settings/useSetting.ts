@@ -19,11 +19,7 @@ export function useSetting<T>(name?: string): {
 } {
     const fallbackUser = useTypedSelector(selectMetaUser);
     const userFromFactory = uiFactory.settingsBackend?.getUserId?.();
-    const endpointFromFactory = uiFactory.settingsBackend?.getEndpoint?.();
-    const remoteAvailable = Boolean(
-        (endpointFromFactory && userFromFactory && window.api?.settingsService) ||
-            window.api?.metaSettings,
-    );
+    const remoteAvailable = Boolean(window.api?.metaSettings);
     const user = userFromFactory ?? fallbackUser;
     const dispatch = useTypedDispatch();
 
