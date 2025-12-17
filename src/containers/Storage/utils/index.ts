@@ -1,10 +1,9 @@
 import React from 'react';
 
-import {isNil} from 'lodash';
-
 import {selectNodesMap} from '../../../store/reducers/nodesList';
 import type {PreparedStorageGroup} from '../../../store/reducers/storage/types';
 import type {Erasure} from '../../../types/api/storage';
+import {valueIsDefined} from '../../../utils';
 import type {PreparedVDisk} from '../../../utils/disks/types';
 import {generateEvaluator} from '../../../utils/generateEvaluator';
 import {useTypedSelector} from '../../../utils/hooks';
@@ -31,33 +30,23 @@ export const getDegradedSeverity = (group: PreparedStorageGroup) => {
 
 export function isVdiskActive(vDisk: PreparedVDisk, viewContext?: StorageViewContext) {
     let isActive = true;
-    if (!isNil(vDisk.VDiskId?.GroupID) && viewContext?.groupId) {
+    if (valueIsDefined(vDisk.VDiskId?.GroupID) && viewContext?.groupId) {
         isActive &&= String(vDisk.VDiskId.GroupID) === viewContext.groupId;
     }
 
-    if (!isNil(vDisk.NodeId) && viewContext?.nodeId) {
+    if (valueIsDefined(vDisk.NodeId) && viewContext?.nodeId) {
         isActive &&= String(vDisk.NodeId) === viewContext.nodeId;
     }
 
-    if (!isNil(vDisk.PDiskId) && viewContext?.pDiskId) {
+    if (valueIsDefined(vDisk.PDiskId) && viewContext?.pDiskId) {
         isActive &&= String(vDisk.PDiskId) === viewContext.pDiskId;
     }
 
-    if (!isNil(vDisk.VDiskSlotId) && viewContext?.vDiskSlotId) {
+    if (valueIsDefined(vDisk.VDiskSlotId) && viewContext?.vDiskSlotId) {
         isActive &&= String(vDisk.VDiskSlotId) === viewContext.vDiskSlotId;
     }
 
     return isActive;
-}
-
-export function isTopLevelStorageContext(context?: StorageViewContext): boolean {
-    // highlight the disk only where we are not committed to a specific node / p-disk / v-disk slot / group
-    return (
-        isNil(context?.nodeId) &&
-        isNil(context?.pDiskId) &&
-        isNil(context?.vDiskSlotId) &&
-        isNil(context?.groupId)
-    );
 }
 
 const DEFAULT_ENTITIES_COUNT = 10;
@@ -69,7 +58,11 @@ const DEFAULT_ENTITIES_COUNT = 10;
 export function getStorageNodesInitialEntitiesCount(
     context?: StorageViewContext,
 ): number | undefined {
-    if (!isNil(context?.nodeId) || !isNil(context?.pDiskId) || !isNil(context?.vDiskSlotId)) {
+    if (
+        valueIsDefined(context?.nodeId) ||
+        valueIsDefined(context?.pDiskId) ||
+        valueIsDefined(context?.vDiskSlotId)
+    ) {
         return 1;
     }
 
@@ -83,10 +76,10 @@ export function getStorageNodesInitialEntitiesCount(
 export function getStorageGroupsInitialEntitiesCount(
     context?: StorageViewContext,
 ): number | undefined {
-    if (!isNil(context?.groupId)) {
+    if (valueIsDefined(context?.groupId)) {
         return 1;
     }
-    if (!isNil(context?.vDiskSlotId)) {
+    if (valueIsDefined(context?.vDiskSlotId)) {
         return 1;
     }
 
