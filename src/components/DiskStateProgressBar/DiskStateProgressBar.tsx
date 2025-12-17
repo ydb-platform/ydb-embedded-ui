@@ -26,7 +26,6 @@ interface DiskStateProgressBarProps {
     isDonor?: boolean;
     withIcon?: boolean;
     highlighted?: boolean;
-    darkened?: boolean;
     noDataPlaceholder?: React.ReactNode;
 }
 
