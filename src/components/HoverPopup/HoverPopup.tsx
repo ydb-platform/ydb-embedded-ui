@@ -118,7 +118,7 @@ export const HoverPopup = ({
     }, [hidePopup, reportOpen]);
 
     const internalOpen = isPopupVisible || isPopupContentHovered || isFocused;
-    const open = showPopup ?? internalOpen;
+    const open = internalOpen || showPopup;
 
     const anchorElement = anchorRef?.current || anchor.current;
 
