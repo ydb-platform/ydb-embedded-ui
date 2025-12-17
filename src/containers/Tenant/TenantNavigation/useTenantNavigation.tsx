@@ -69,8 +69,9 @@ export function useTenantPage() {
     const handleTenantPageChange = React.useCallback(
         (value?: TenantPage) => {
             setQueryParams({tenantPage: value});
+            setInitialTenantPage(value);
         },
-        [setQueryParams],
+        [setQueryParams, setInitialTenantPage],
     );
 
     const parsedInitialPage = React.useMemo(
@@ -88,20 +89,12 @@ export function useTenantPage() {
 
     React.useEffect(() => {
         try {
-            const parsedQueryPage = tenantPageSchema.parse(tenantPageFromQuery);
-
-            setInitialTenantPage(parsedQueryPage);
+            tenantPageSchema.parse(tenantPageFromQuery);
         } catch {
-            // If query page is not valid, remove it from query
-            setQueryParams({tenantPage: undefined}, 'replaceIn');
+            // Invalid value in URL - replace with valid fallback
+            setQueryParams({tenantPage: parsedInitialPage}, 'replaceIn');
         }
-    }, [tenantPageFromQuery, setQueryParams, setInitialTenantPage]);
-
-    React.useEffect(() => {
-        if (!tenantPageFromQuery) {
-            setQueryParams({tenantPage: parsedInitialPage});
-        }
-    }, [parsedInitialPage, tenantPageFromQuery, setQueryParams]);
+    }, [parsedInitialPage, setQueryParams, tenantPageFromQuery]);
 
     return {tenantPage, handleTenantPageChange} as const;
 }
