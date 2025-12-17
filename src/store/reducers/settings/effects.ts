@@ -10,34 +10,39 @@ import {
     shouldSyncSettingToLS,
 } from './utils';
 
-export type MigrateToRemoteFn = (args: {user: string; name: string; value: unknown}) => void;
+export function getLocalStorageValueToMigrateIfRemoteMissing(args: {
+    name: string;
+    remoteValue: SettingValue | undefined;
+}) {
+    const {name, remoteValue} = args;
 
-export function handleRemoteSettingResult(args: {
-    user: string;
+    if (!shouldSyncSettingToLS(name)) {
+        return undefined;
+    }
+
+    if (!isNil(remoteValue)) {
+        return undefined;
+    }
+
+    const localValue = readSettingValueFromLS(name);
+    return isNil(localValue) ? undefined : localValue;
+}
+
+export function applyRemoteSettingToStoreAndLocalStorage(args: {
     name: string;
     remoteValue: SettingValue | undefined;
     dispatch: (action: unknown) => void;
-    migrateToRemote: MigrateToRemoteFn;
 }) {
-    const {user, name, remoteValue, dispatch, migrateToRemote} = args;
-
-    const shouldUseLS = shouldSyncSettingToLS(name);
+    const {name, remoteValue, dispatch} = args;
 
     if (isNil(remoteValue)) {
-        if (!shouldUseLS) {
-            return;
-        }
-        const localValue = readSettingValueFromLS(name);
-        if (!isNil(localValue)) {
-            migrateToRemote({user, name, value: localValue});
-        }
         return;
     }
 
     const parsedValue = parseSettingValue(remoteValue);
     dispatch(setSettingValueInStore({name, value: parsedValue}));
 
-    if (shouldUseLS) {
+    if (shouldSyncSettingToLS(name)) {
         setSettingValueToLS(name, parsedValue);
     }
 }

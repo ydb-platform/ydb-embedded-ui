@@ -10,8 +10,16 @@ import {serializeReduxError} from '../../../utils/errors/serializeReduxError';
 import type {AppDispatch} from '../../defaultStore';
 import {api} from '../api';
 
+import {
+    shouldSnapshotBeforeOverwriteLocalStorage,
+    snapshotLocalStorageToRemoteOnce,
+} from './RemoteLocalStorageSnapshot';
 import {SETTINGS_OPTIONS} from './constants';
-import {handleOptimisticSettingWrite, handleRemoteSettingResult} from './effects';
+import {
+    applyRemoteSettingToStoreAndLocalStorage,
+    getLocalStorageValueToMigrateIfRemoteMissing,
+    handleOptimisticSettingWrite,
+} from './effects';
 import {shouldSyncSettingToLS, stringifySettingValue} from './utils';
 
 const REMOTE_WRITE_DEBOUNCE_MS = 200;
@@ -157,16 +165,31 @@ export const settingsApi = api.injectEndpoints({
 
                 try {
                     const {data} = await queryFulfilled;
+                    const resolved = resolveRemoteSettingsClientAndUser(user);
+                    const remoteValue = data?.value;
 
-                    handleRemoteSettingResult({
-                        user: resolveRemoteSettingsClientAndUser(user)?.user ?? user,
+                    const shouldSnapshotBeforeOverwrite =
+                        Boolean(resolved) &&
+                        shouldSnapshotBeforeOverwriteLocalStorage({name, remoteValue});
+
+                    if (resolved && shouldSnapshotBeforeOverwrite) {
+                        await snapshotLocalStorageToRemoteOnce(resolved);
+                    }
+
+                    const valueToMigrate = getLocalStorageValueToMigrateIfRemoteMissing({
                         name,
-                        remoteValue: data?.value,
-                        dispatch,
-                        migrateToRemote: (params) => {
-                            dispatch(settingsApi.endpoints.setSingleSetting.initiate(params));
-                        },
+                        remoteValue,
                     });
+                    if (valueToMigrate !== undefined) {
+                        dispatch(
+                            settingsApi.endpoints.setSingleSetting.initiate({
+                                user: resolved?.user ?? user,
+                                name,
+                                value: valueToMigrate,
+                            }),
+                        );
+                    }
+                    applyRemoteSettingToStoreAndLocalStorage({name, remoteValue, dispatch});
                 } catch {
                     // ignore
                 }
@@ -237,6 +260,17 @@ export const settingsApi = api.injectEndpoints({
                     }
                     const data = await resolved.client.getSettings({name, user: resolved.user});
 
+                    const shouldSnapshotBeforeOverwrite = name.some((settingName) => {
+                        const remoteValue = data[settingName]?.value;
+                        return shouldSnapshotBeforeOverwriteLocalStorage({
+                            name: settingName,
+                            remoteValue,
+                        });
+                    });
+                    if (shouldSnapshotBeforeOverwrite) {
+                        await snapshotLocalStorageToRemoteOnce(resolved);
+                    }
+
                     const patches: Promise<unknown>[] = [];
                     const dispatch = baseApi.dispatch as AppDispatch;
 
@@ -260,14 +294,23 @@ export const settingsApi = api.injectEndpoints({
 
                         patches.push(patch);
 
-                        handleRemoteSettingResult({
-                            user: resolved.user,
+                        const valueToMigrate = getLocalStorageValueToMigrateIfRemoteMissing({
+                            name: settingName,
+                            remoteValue,
+                        });
+                        if (valueToMigrate !== undefined) {
+                            dispatch(
+                                settingsApi.endpoints.setSingleSetting.initiate({
+                                    user: resolved.user,
+                                    name: settingName,
+                                    value: valueToMigrate,
+                                }),
+                            );
+                        }
+                        applyRemoteSettingToStoreAndLocalStorage({
                             name: settingName,
                             remoteValue,
                             dispatch,
-                            migrateToRemote: (params) => {
-                                dispatch(settingsApi.endpoints.setSingleSetting.initiate(params));
-                            },
                         });
                     });
 

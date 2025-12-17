@@ -137,7 +137,7 @@ const DrawerPaneContentWrapper = ({
                     visible={isVisible}
                     resizable
                     maxResizeWidth={containerWidth}
-                    width={isPercentageWidth ? calculatedWidth : drawerWidth}
+                    width={calculatedWidth}
                     onResize={handleResizeDrawer}
                     direction={direction}
                     className={b('item')}

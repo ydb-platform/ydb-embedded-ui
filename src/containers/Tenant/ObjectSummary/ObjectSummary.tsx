@@ -78,7 +78,7 @@ export function ObjectSummary({
         false,
     );
     const [commonInfoVisibilityState, dispatchCommonInfoVisibilityState] = React.useReducer(
-        paneVisibilityToggleReducerCreator(DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED),
+        paneVisibilityToggleReducerCreator(),
         undefined,
         () => ({
             triggerExpand: false,
