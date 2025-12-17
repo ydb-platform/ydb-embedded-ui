@@ -69,9 +69,8 @@ export function useTenantPage() {
     const handleTenantPageChange = React.useCallback(
         (value?: TenantPage) => {
             setQueryParams({tenantPage: value});
-            setInitialTenantPage(value);
         },
-        [setInitialTenantPage, setQueryParams],
+        [setQueryParams],
     );
 
     const parsedInitialPage = React.useMemo(
