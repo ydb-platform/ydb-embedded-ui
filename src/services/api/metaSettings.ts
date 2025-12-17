@@ -102,7 +102,7 @@ export class MetaSettingsAPI extends BaseMetaAPI {
                         });
                     } else {
                         pendingRequests.forEach((request) => {
-                            request.resolve({name, user, value: undefined});
+                            request.resolve({value: undefined});
                         });
                     }
                 });

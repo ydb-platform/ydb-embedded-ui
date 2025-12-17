@@ -1,6 +1,7 @@
 import type {
     GetSettingsParams,
     GetSingleSettingParams,
+    SetSettingResponse,
     SetSingleSettingParams,
     Setting,
 } from '../../../types/api/settings';
@@ -12,6 +13,8 @@ import {api} from '../api';
 import {SETTINGS_OPTIONS} from './constants';
 import {handleOptimisticSettingWrite, handleRemoteSettingResult} from './effects';
 import {shouldSyncSettingToLS, stringifySettingValue} from './utils';
+
+const REMOTE_WRITE_DEBOUNCE_MS = 200;
 
 async function delayMs(ms: number) {
     return new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -32,16 +35,73 @@ async function withRetries<T>(fn: () => Promise<T>, attempts: number, delay: num
     throw lastError;
 }
 
+type DebounceEntry<T> = {
+    timeoutId: number;
+    latestRequest: () => Promise<T>;
+    pending: Array<{resolve: (value: T) => void; reject: (error: unknown) => void}>;
+};
+
+const debouncedRemoteWrites = new Map<string, DebounceEntry<unknown>>();
+
+function scheduleDebouncedRemoteWrite<T>(key: string, request: () => Promise<T>) {
+    const existing = debouncedRemoteWrites.get(key) as DebounceEntry<T> | undefined;
+    if (existing) {
+        clearTimeout(existing.timeoutId);
+        existing.latestRequest = request;
+        return new Promise<T>((resolve, reject) => {
+            existing.pending.push({resolve, reject});
+            existing.timeoutId = window.setTimeout(async () => {
+                const entry = debouncedRemoteWrites.get(key) as DebounceEntry<T> | undefined;
+                if (!entry) {
+                    return;
+                }
+                debouncedRemoteWrites.delete(key);
+                try {
+                    const result = await entry.latestRequest();
+                    entry.pending.forEach((p) => p.resolve(result));
+                } catch (error) {
+                    entry.pending.forEach((p) => p.reject(error));
+                }
+            }, REMOTE_WRITE_DEBOUNCE_MS);
+        });
+    }
+
+    return new Promise<T>((resolve, reject) => {
+        const entry: DebounceEntry<T> = {
+            timeoutId: window.setTimeout(async () => {
+                const current = debouncedRemoteWrites.get(key) as DebounceEntry<T> | undefined;
+                if (!current) {
+                    return;
+                }
+                debouncedRemoteWrites.delete(key);
+                try {
+                    const result = await current.latestRequest();
+                    current.pending.forEach((p) => p.resolve(result));
+                } catch (error) {
+                    current.pending.forEach((p) => p.reject(error));
+                }
+            }, REMOTE_WRITE_DEBOUNCE_MS),
+            latestRequest: request,
+            pending: [{resolve, reject}],
+        };
+        debouncedRemoteWrites.set(key, entry as DebounceEntry<unknown>);
+    });
+}
+
 function resolveRemoteSettingsClientAndUser(user: string) {
     const userFromFactory = uiFactory.settingsBackend?.getUserId?.();
     const endpointFromFactory = uiFactory.settingsBackend?.getEndpoint?.();
 
     if (endpointFromFactory && userFromFactory && window.api?.settingsService) {
-        return {client: window.api.settingsService, user: userFromFactory} as const;
+        return {
+            client: window.api.settingsService,
+            user: userFromFactory,
+            clientKey: 'service',
+        } as const;
     }
 
     if (window.api?.metaSettings) {
-        return {client: window.api.metaSettings, user} as const;
+        return {client: window.api.metaSettings, user, clientKey: 'meta'} as const;
     }
 
     return undefined;
@@ -104,18 +164,29 @@ export const settingsApi = api.injectEndpoints({
                         throw new Error('MetaSettings API is not available');
                     }
 
-                    const data = await withRetries(
+                    const debounceKey = `${resolved.clientKey}:${resolved.user}:${name}`;
+
+                    const data = await scheduleDebouncedRemoteWrite<SetSettingResponse>(
+                        debounceKey,
                         () =>
-                            resolved.client.setSingleSetting({
-                                name,
-                                user: resolved.user,
-                                value: stringifySettingValue(value),
-                            }),
-                        3,
-                        200,
+                            withRetries(
+                                () =>
+                                    resolved.client.setSingleSetting({
+                                        name,
+                                        user: resolved.user,
+                                        value: stringifySettingValue(value),
+                                    }),
+                                3,
+                                200,
+                            ),
                     );
 
-                    if (data.status !== 'SUCCESS') {
+                    const status =
+                        data && typeof data === 'object' && 'status' in data
+                            ? (data as {status?: string}).status
+                            : undefined;
+
+                    if (status && status !== 'SUCCESS') {
                         throw new Error('Cannot set setting - status is not SUCCESS');
                     }
 

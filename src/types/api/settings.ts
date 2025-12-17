@@ -1,14 +1,13 @@
-export interface SetSettingResponse {
-    ready: boolean;
-    status: 'SUCCESS';
-}
+export type SetSettingResponse = {ready?: boolean; status?: 'SUCCESS'} | undefined;
+
 export type GetSettingResponse = Record<string, Setting>;
 export interface Setting {
-    user: string;
-    name: string;
+    /**
+     * JSON string representation of the stored value.
+     */
     value?: SettingValue;
 }
-export type SettingValue = string | Record<string, string>;
+export type SettingValue = string;
 export interface GetSingleSettingParams {
     user: string;
     name: string;
