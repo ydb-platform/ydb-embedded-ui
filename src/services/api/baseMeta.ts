@@ -14,10 +14,11 @@ export class BaseMetaAPI extends BaseYdbAPI {
         this.proxyMeta = baseApiParams.proxyMeta;
     }
     getPath(path: string, clusterName?: string) {
+        const metaBackendPrefix = META_BACKEND ?? '';
         if (this.proxyMeta && clusterName) {
             const envPrefix = ENVIRONMENT ? `/${ENVIRONMENT}` : '';
-            return `${envPrefix}${META_BACKEND}/proxy/cluster/${clusterName}${path}`;
+            return `${envPrefix}${metaBackendPrefix}/proxy/cluster/${clusterName}${path}`;
         }
-        return `${META_BACKEND ?? ''}${path}`;
+        return `${metaBackendPrefix}${path}`;
     }
 }
