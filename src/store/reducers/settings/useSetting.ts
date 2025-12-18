@@ -1,14 +1,14 @@
 import React from 'react';
 
 import {skipToken} from '@reduxjs/toolkit/query';
-import {isNil} from 'lodash';
 
-import {useSetting as useLSSetting} from '../../../utils/hooks';
+import {uiFactory} from '../../../uiFactory/uiFactory';
+import {useTypedDispatch} from '../../../utils/hooks/useTypedDispatch';
 import {useTypedSelector} from '../../../utils/hooks/useTypedSelector';
 import {selectMetaUser} from '../authentication/authentication';
 
 import {settingsApi} from './api';
-import {getSettingDefault} from './utils';
+import {getSettingValue, setSettingValue} from './settings';
 
 type SaveSettingValue<T> = (value: T | undefined) => void;
 
@@ -17,51 +17,36 @@ export function useSetting<T>(name?: string): {
     saveValue: SaveSettingValue<T>;
     isLoading: boolean;
 } {
-    const user = useTypedSelector(selectMetaUser);
+    const fallbackUser = useTypedSelector(selectMetaUser);
+    const userFromFactory = uiFactory.settingsBackend?.getUserId?.();
+    const remoteAvailable = Boolean(window.api?.metaSettings);
+    const user = userFromFactory ?? fallbackUser;
+    const dispatch = useTypedDispatch();
 
     const params = React.useMemo(() => {
-        if (user && name && window.api?.metaSettings) {
+        if (user && name && remoteAvailable) {
             return {user, name};
         }
         return skipToken;
-    }, [user, name]);
+    }, [remoteAvailable, user, name]);
 
-    const {currentData: settingFromMeta, isLoading} = settingsApi.useGetSingleSettingQuery(params);
-
+    const {isLoading} = settingsApi.useGetSingleSettingQuery(params);
     const [setMetaSetting] = settingsApi.useSetSingleSettingMutation();
-
-    const [settingFromLS, saveSettingToLS] = useLSSetting(name);
-
-    const settingValue = React.useMemo(() => {
-        if (!name) {
-            return undefined;
-        }
-        const defaultValue = getSettingDefault(name);
-
-        let value: unknown;
-
-        if (window.api?.metaSettings) {
-            value = settingFromMeta;
-        } else {
-            value = settingFromLS;
-        }
-        return value ?? defaultValue;
-    }, [name, settingFromMeta, settingFromLS]);
+    const settingValue = useTypedSelector((state) => getSettingValue(state, name)) as T | undefined;
 
     const saveValue = React.useCallback<SaveSettingValue<T>>(
         (value) => {
             if (!name) {
                 return;
             }
-            if (window.api?.metaSettings && user) {
+            if (remoteAvailable && user) {
                 setMetaSetting({user, name, value});
+                return;
             }
-            if (isNil(window.api?.metaSettings)) {
-                saveSettingToLS(value);
-            }
+            dispatch(setSettingValue(name, value));
         },
-        [user, name, setMetaSetting, saveSettingToLS],
+        [dispatch, remoteAvailable, user, name, setMetaSetting],
     );
 
-    return {value: settingValue as T | undefined, saveValue, isLoading} as const;
+    return {value: settingValue, saveValue, isLoading} as const;
 }

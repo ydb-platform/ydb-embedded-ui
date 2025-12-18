@@ -20,6 +20,7 @@ const uiFactoryBase: UIFactory = {
     },
     hasAccess: true,
     useDatabaseId: false,
+    settingsBackend: undefined,
 };
 
 export function configureUIFactory<H extends string, T extends string = string>(

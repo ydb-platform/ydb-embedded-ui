@@ -2,20 +2,21 @@ import type {Store} from '@reduxjs/toolkit';
 import {createSelector, createSlice} from '@reduxjs/toolkit';
 import {isNil} from 'lodash';
 
-import {settingsManager} from '../../../services/settings';
 import {parseJson} from '../../../utils/utils';
 import type {AppDispatch, RootState} from '../../defaultStore';
 
 import {DEFAULT_USER_SETTINGS} from './constants';
 import type {SettingsState} from './types';
-import {getSettingDefault, readSettingValueFromLS, setSettingValueToLS} from './utils';
-
-const userSettings = settingsManager.extractSettingsFromLS(DEFAULT_USER_SETTINGS);
-const systemSettings = window.systemSettings || {};
+import {
+    getSettingDefault,
+    readSettingValueFromLS,
+    setSettingValueToLS,
+    shouldSyncSettingToLS,
+} from './utils';
 
 export const initialState: SettingsState = {
-    userSettings,
-    systemSettings,
+    userSettings: {},
+    systemSettings: window.systemSettings || {},
 };
 
 const settingsSlice = createSlice({
@@ -27,6 +28,8 @@ const settingsSlice = createSlice({
         }),
     }),
 });
+
+export const setSettingValueInStore = settingsSlice.actions.setSettingValue;
 
 /**
  * Reads LS value or use default when store value undefined
@@ -48,6 +51,10 @@ export const getSettingValue = createSelector(
         }
 
         const defaultValue = getSettingDefault(name);
+        if (!shouldSyncSettingToLS(name)) {
+            return defaultValue;
+        }
+
         const savedValue = readSettingValueFromLS(name);
 
         return savedValue ?? defaultValue;
@@ -58,7 +65,9 @@ export const setSettingValue = (name: string | undefined, value: unknown) => {
     return (dispatch: AppDispatch) => {
         if (name) {
             dispatch(settingsSlice.actions.setSettingValue({name, value}));
-            setSettingValueToLS(name, value);
+            if (shouldSyncSettingToLS(name)) {
+                setSettingValueToLS(name, value);
+            }
         }
     };
 };
@@ -82,6 +91,25 @@ export function syncUserSettingsFromLS(store: Store) {
                 }),
             );
         }
+    });
+}
+
+export function preloadUserSettingsFromLS(store: Store) {
+    if (typeof window === 'undefined') {
+        return;
+    }
+
+    Object.keys(DEFAULT_USER_SETTINGS).forEach((name) => {
+        if (!shouldSyncSettingToLS(name)) {
+            return;
+        }
+
+        const savedValue = readSettingValueFromLS(name);
+        if (isNil(savedValue)) {
+            return;
+        }
+
+        store.dispatch(settingsSlice.actions.setSettingValue({name, value: savedValue}));
     });
 }
 

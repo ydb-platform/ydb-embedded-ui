@@ -1,9 +1,11 @@
 import React from 'react';
 
+import {debounce} from 'lodash';
 import type {SplitProps} from 'react-split';
 import SplitPaneLib from 'react-split';
 
 import {cn} from '../../utils/cn';
+import {useSetting} from '../../utils/hooks/useSetting';
 
 import './SplitPane.scss';
 
@@ -25,22 +27,61 @@ interface SplitPaneProps {
 
 const minSizeDefaultInner = [0, 100];
 const sizesDefaultInner = [50, 50];
+const SAVE_DEBOUNCE_MS = 200;
 
 function SplitPane(props: SplitPaneProps) {
     const [innerSizes, setInnerSizes] = React.useState<number[]>();
+    const {
+        collapsedSizes,
+        triggerCollapse,
+        triggerExpand,
+        defaultSizes: defaultSizesProp,
+        initialSizes,
+    } = props;
+    const [savedSizesString, setSavedSizesString] = useSetting<string | undefined>(
+        props.defaultSizePaneKey,
+    );
 
-    const getDefaultSizePane = () => {
-        const {defaultSizePaneKey, defaultSizes = sizesDefaultInner, initialSizes} = props;
+    const saveSizesStringDebounced = React.useMemo(() => {
+        return debounce((value: string) => setSavedSizesString(value), SAVE_DEBOUNCE_MS);
+    }, [setSavedSizesString]);
+
+    React.useEffect(() => {
+        return () => {
+            saveSizesStringDebounced.cancel();
+        };
+    }, [saveSizesStringDebounced]);
+
+    const defaultSizePane = React.useMemo(() => {
         if (initialSizes) {
             return initialSizes;
         }
-        const sizes = localStorage.getItem(defaultSizePaneKey)?.split(',').map(Number);
-        return sizes || defaultSizes;
-    };
-    const setDefaultSizePane = (sizes: number[]) => {
-        const {defaultSizePaneKey} = props;
-        localStorage.setItem(defaultSizePaneKey, sizes.join(','));
-    };
+        const fallbackSizes = defaultSizesProp || sizesDefaultInner;
+        if (!savedSizesString) {
+            return fallbackSizes;
+        }
+
+        const parts = savedSizesString.split(',');
+        const parsedSizes = parts.map((part) => {
+            const trimmed = part.trim();
+            if (!trimmed) {
+                return Number.NaN;
+            }
+            return Number(trimmed);
+        });
+
+        const expectedLength = fallbackSizes.length;
+        const isValid =
+            parsedSizes.length === expectedLength && parsedSizes.every((v) => Number.isFinite(v));
+
+        return isValid ? parsedSizes : fallbackSizes;
+    }, [defaultSizesProp, initialSizes, savedSizesString]);
+    const setDefaultSizePane = React.useCallback(
+        (sizes: number[]) => {
+            saveSizesStringDebounced(sizes.join(','));
+        },
+        [saveSizesStringDebounced],
+    );
     const onDragHandler = (sizes: number[]) => {
         const {onSplitDragAdditional} = props;
         if (onSplitDragAdditional) {
@@ -58,27 +99,25 @@ function SplitPane(props: SplitPaneProps) {
     };
 
     React.useEffect(() => {
-        const {collapsedSizes, triggerCollapse} = props;
         if (triggerCollapse) {
             const newSizes = collapsedSizes || minSizeDefaultInner;
             setDefaultSizePane(newSizes);
             setInnerSizes(newSizes);
         }
-    }, [props.triggerCollapse]);
+    }, [collapsedSizes, triggerCollapse, setDefaultSizePane]);
 
     React.useEffect(() => {
-        const {triggerExpand, defaultSizes} = props;
-        const newSizes = defaultSizes || sizesDefaultInner;
+        const newSizes = defaultSizesProp || sizesDefaultInner;
         if (triggerExpand) {
             setDefaultSizePane(newSizes);
             setInnerSizes(newSizes);
         }
-    }, [props.triggerExpand]);
+    }, [defaultSizesProp, triggerExpand, setDefaultSizePane]);
     return (
         <React.Fragment>
             <SplitPaneLib
                 direction={props.direction || 'horizontal'}
-                sizes={innerSizes || getDefaultSizePane()}
+                sizes={innerSizes || defaultSizePane}
                 minSize={props.minSize || [0, 0]}
                 onDrag={onDragHandler}
                 className={b(null, props.direction || 'horizontal')}

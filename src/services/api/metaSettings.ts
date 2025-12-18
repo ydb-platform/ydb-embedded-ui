@@ -4,20 +4,38 @@ import type {
     GetSingleSettingParams,
     SetSettingResponse,
     SetSingleSettingParams,
-    Setting,
+    SettingValue,
 } from '../../types/api/settings';
 
 import {BaseMetaAPI} from './baseMeta';
 
 interface PendingRequest {
-    resolve: (value: Setting) => void;
+    resolve: (value: SettingValue | undefined) => void;
     reject: (error: unknown) => void;
+}
+
+function joinBaseUrlAndPath(baseUrl: string, path: string) {
+    const normalizedBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    return `${normalizedBaseUrl}${normalizedPath}`;
 }
 
 export class MetaSettingsAPI extends BaseMetaAPI {
     private batchTimeout: NodeJS.Timeout | undefined = undefined;
     private currentUser: string | undefined = undefined;
     private requestQueue: Map<string, PendingRequest[]> | undefined = undefined;
+    private baseUrlOverride: string | undefined;
+
+    setBaseUrlOverride(baseUrlOverride: string | undefined) {
+        this.baseUrlOverride = baseUrlOverride;
+    }
+
+    getPath(path: string, clusterName?: string) {
+        if (this.baseUrlOverride) {
+            return joinBaseUrlAndPath(this.baseUrlOverride, path);
+        }
+        return super.getPath(path, clusterName);
+    }
 
     getSingleSetting({
         name,
@@ -25,10 +43,13 @@ export class MetaSettingsAPI extends BaseMetaAPI {
         preventBatching,
     }: GetSingleSettingParams & {preventBatching?: boolean}) {
         if (preventBatching) {
-            return this.get<Setting | undefined>(this.getPath('/meta/user_settings'), {name, user});
+            return this.get<SettingValue | undefined>(this.getPath('/meta/user_settings'), {
+                name,
+                user,
+            });
         }
 
-        return new Promise<Setting>((resolve, reject) => {
+        return new Promise<SettingValue | undefined>((resolve, reject) => {
             // Always request settings for current user
             this.currentUser = user;
 
@@ -48,7 +69,12 @@ export class MetaSettingsAPI extends BaseMetaAPI {
     }
 
     setSingleSetting(params: SetSingleSettingParams) {
-        return this.post<SetSettingResponse>(this.getPath('/meta/user_settings'), params, {});
+        return this.post<SetSettingResponse>(
+            this.getPath('/meta/user_settings'),
+            JSON.stringify(params.value),
+            {user: params.user, name: params.name},
+            {headers: {'Content-Type': 'application/json'}},
+        );
     }
     getSettings(params: GetSettingsParams) {
         return this.post<GetSettingResponse>(this.getPath('/meta/get_user_settings'), params, {});
@@ -84,7 +110,7 @@ export class MetaSettingsAPI extends BaseMetaAPI {
                         });
                     } else {
                         pendingRequests.forEach((request) => {
-                            request.resolve({name, user, value: undefined});
+                            request.resolve(undefined);
                         });
                     }
                 });
