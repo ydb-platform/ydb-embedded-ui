@@ -1,3 +1,5 @@
+import {isNil} from 'lodash';
+
 import type {
     GetSingleSettingParams,
     SetSettingResponse,
@@ -79,7 +81,7 @@ export function shouldSnapshotBeforeOverwriteLocalStorage(args: {
     if (!shouldSyncSettingToLS(name)) {
         return false;
     }
-    if (remoteValue === undefined || remoteValue === null) {
+    if (isNil(remoteValue)) {
         return false;
     }
 
@@ -106,7 +108,7 @@ export async function snapshotLocalStorageToRemoteOnce(
                 user: resolved.user,
                 preventBatching: true,
             });
-            if (existingSnapshot?.value !== undefined && existingSnapshot?.value !== null) {
+            if (!isNil(existingSnapshot?.value)) {
                 return;
             }
         } catch {

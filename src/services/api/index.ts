@@ -28,7 +28,6 @@ interface YdbEmbeddedAPIProps {
     // this setting allows to use schema object path relative to database in api requests
     useRelativePath: undefined | boolean;
     useMetaSettings: undefined | boolean;
-    metaSettingsBaseUrl?: string;
     csrfTokenGetter: undefined | (() => string | undefined);
     defaults: undefined | AxiosRequestConfig;
 }

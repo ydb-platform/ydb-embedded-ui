@@ -25,10 +25,6 @@ import {shouldSyncSettingToLS, stringifySettingValue} from './utils';
 const REMOTE_WRITE_DEBOUNCE_MS = 200;
 const REMOTE_WRITE_IN_FLIGHT_TIMEOUT_MS = 10_000;
 
-async function delayMs(ms: number) {
-    return new Promise<void>((resolve) => setTimeout(resolve, ms));
-}
-
 async function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
     return new Promise<T>((resolve, reject) => {
         const timeoutId = window.setTimeout(() => {
@@ -47,21 +43,6 @@ async function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
     });
 }
 
-async function withRetries<T>(fn: () => Promise<T>, attempts: number, delay: number) {
-    let lastError: unknown;
-    for (let attempt = 0; attempt < attempts; attempt++) {
-        try {
-            return await fn();
-        } catch (error) {
-            lastError = error;
-            if (attempt < attempts - 1) {
-                await delayMs(delay);
-            }
-        }
-    }
-    throw lastError;
-}
-
 type DebounceEntry<T> = {
     timeoutId: number | undefined;
     latestRequest: () => Promise<T>;
@@ -70,6 +51,7 @@ type DebounceEntry<T> = {
 };
 
 const debouncedRemoteWrites = new Map<string, DebounceEntry<unknown>>();
+const inFlightLocalStorageMigrations = new Map<string, Promise<void>>();
 
 function triggerFlushDebouncedRemoteWrite(key: string) {
     // Fire-and-forget: concurrency is serialized by `entry.inFlight`.
@@ -87,10 +69,7 @@ async function flushDebouncedRemoteWrite(key: string) {
     entry.inFlight = true;
     entry.timeoutId = undefined;
 
-    const pending = entry.pending as Array<{
-        resolve: (value: unknown) => void;
-        reject: (error: unknown) => void;
-    }>;
+    const pending = entry.pending;
     entry.pending = [];
 
     try {
@@ -160,6 +139,47 @@ function resolveRemoteSettingsClientAndUser(user: string) {
     return undefined;
 }
 
+function scheduleLocalStorageMigrationToRemoteIfMissing(args: {
+    resolved: {
+        client: {setSingleSetting: (params: SetSingleSettingParams) => Promise<SetSettingResponse>};
+        user: string;
+    };
+    name: string;
+    valueToMigrate: unknown;
+}) {
+    const {resolved, name, valueToMigrate} = args;
+    const inFlightKey = `${resolved.user}:${name}`;
+
+    const existing = inFlightLocalStorageMigrations.get(inFlightKey);
+    if (existing) {
+        return existing;
+    }
+
+    const promise = (async () => {
+        try {
+            const data = await resolved.client.setSingleSetting({
+                user: resolved.user,
+                name,
+                value: stringifySettingValue(valueToMigrate),
+            });
+
+            const status = data?.status;
+            if (status && status !== 'SUCCESS') {
+                throw new Error('Cannot migrate setting - status is not SUCCESS');
+            }
+        } catch {
+            // best-effort
+        }
+    })();
+
+    inFlightLocalStorageMigrations.set(inFlightKey, promise);
+    promise.finally(() => {
+        inFlightLocalStorageMigrations.delete(inFlightKey);
+    });
+
+    return promise;
+}
+
 export const settingsApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getSingleSetting: builder.query<Setting | undefined, GetSingleSettingParams>({
@@ -205,14 +225,14 @@ export const settingsApi = api.injectEndpoints({
                         name,
                         remoteValue,
                     });
-                    if (valueToMigrate !== undefined) {
-                        dispatch(
-                            settingsApi.endpoints.setSingleSetting.initiate({
-                                user: resolved?.user ?? user,
-                                name,
-                                value: valueToMigrate,
-                            }),
-                        );
+                    if (resolved && valueToMigrate !== undefined) {
+                        scheduleLocalStorageMigrationToRemoteIfMissing({
+                            resolved,
+                            name,
+                            valueToMigrate,
+                        }).catch(() => {
+                            // best-effort
+                        });
                     }
                     applyRemoteSettingToStoreAndLocalStorage({name, remoteValue, dispatch});
                 } catch {
@@ -237,16 +257,11 @@ export const settingsApi = api.injectEndpoints({
                     const data = await scheduleDebouncedRemoteWrite<SetSettingResponse>(
                         debounceKey,
                         () =>
-                            withRetries(
-                                () =>
-                                    resolved.client.setSingleSetting({
-                                        name,
-                                        user: resolved.user,
-                                        value: stringifySettingValue(value),
-                                    }),
-                                3,
-                                200,
-                            ),
+                            resolved.client.setSingleSetting({
+                                name,
+                                user: resolved.user,
+                                value: stringifySettingValue(value),
+                            }),
                     );
 
                     const status = data?.status;
@@ -322,13 +337,13 @@ export const settingsApi = api.injectEndpoints({
                             remoteValue,
                         });
                         if (valueToMigrate !== undefined) {
-                            dispatch(
-                                settingsApi.endpoints.setSingleSetting.initiate({
-                                    user: resolved.user,
-                                    name: settingName,
-                                    value: valueToMigrate,
-                                }),
-                            );
+                            scheduleLocalStorageMigrationToRemoteIfMissing({
+                                resolved,
+                                name: settingName,
+                                valueToMigrate,
+                            }).catch(() => {
+                                // best-effort
+                            });
                         }
                         applyRemoteSettingToStoreAndLocalStorage({
                             name: settingName,

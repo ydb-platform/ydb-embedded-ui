@@ -49,7 +49,7 @@ export function Tenant({additionalTenantProps}: TenantProps) {
         () => ({
             triggerExpand: false,
             triggerCollapse: false,
-            collapsed: Boolean(isSummaryCollapsed),
+            collapsed: isSummaryCollapsed,
         }),
     );
 

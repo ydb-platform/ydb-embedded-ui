@@ -83,7 +83,7 @@ export function ObjectSummary({
         () => ({
             triggerExpand: false,
             triggerCollapse: false,
-            collapsed: Boolean(isCommonInfoCollapsed),
+            collapsed: isCommonInfoCollapsed,
         }),
     );
 

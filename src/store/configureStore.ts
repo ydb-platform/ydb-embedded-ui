@@ -44,12 +44,6 @@ function _configureStore<
             }).concat(locationMiddleware, ...middleware),
     });
 
-    syncUserSettingsFromLS(store);
-    const userIdFromFactory = uiFactory.settingsBackend?.getUserId?.();
-    if (!userIdFromFactory) {
-        preloadUserSettingsFromLS(store);
-    }
-
     return store;
 }
 
@@ -91,6 +85,12 @@ export function configureStore({
         storeApi.middleware,
     ]);
     listenForHistoryChange(store, history);
+
+    syncUserSettingsFromLS(store);
+    const userIdFromFactory = uiFactory.settingsBackend?.getUserId?.();
+    if (!userIdFromFactory) {
+        preloadUserSettingsFromLS(store);
+    }
 
     window.api = api;
 
