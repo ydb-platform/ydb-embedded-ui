@@ -66,7 +66,12 @@ export class MetaSettingsAPI extends BaseMetaAPI {
     }
 
     setSingleSetting(params: SetSingleSettingParams) {
-        return this.post<SetSettingResponse>(this.getPath('/meta/user_settings'), params, {});
+        return this.post<SetSettingResponse>(
+            this.getPath('/meta/user_settings'),
+            {value: params.value},
+            {user: params.user, name: params.name},
+            {},
+        );
     }
     getSettings(params: GetSettingsParams) {
         return this.post<GetSettingResponse>(this.getPath('/meta/get_user_settings'), params, {});
