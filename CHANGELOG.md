@@ -1,5 +1,12 @@
 # Changelog
 
+## [13.0.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v13.0.0...v13.0.1) (2025-12-18)
+
+
+### Bug Fixes
+
+* check meta_backend ([#3250](https://github.com/ydb-platform/ydb-embedded-ui/issues/3250)) ([8267e16](https://github.com/ydb-platform/ydb-embedded-ui/commit/8267e16505479d08e0e7209139cec518ed411d46))
+
 ## [13.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.30.1...v13.0.0) (2025-12-18)
 
 
