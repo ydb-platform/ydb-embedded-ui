@@ -240,51 +240,84 @@
     }
 }
 
-@mixin entity-state-colors {
+@mixin entity-state-colors($block: null) {
     --entity-state-border-color: var(--g-color-base-misc-heavy);
     --entity-state-background-color: var(--g-color-base-misc-light);
     --entity-state-fill-color: var(--g-color-base-misc-medium);
     --entity-state-font-color: var(--g-color-text-primary);
 
     &_green {
-        --entity-state-font-color: var(--g-color-text-positive);
-        --entity-state-border-color: var(--g-color-base-positive-heavy);
+        --entity-state-border-color: var(--g-color-base-positive-medium);
         --entity-state-background-color: var(--g-color-base-positive-light);
         --entity-state-fill-color: var(--g-color-base-positive-medium);
+
+        &#{$block}_highlighted {
+            --entity-state-border-color: var(--g-color-base-positive-medium-hover);
+            --entity-state-background-color: var(--g-color-base-positive-light-hover);
+            --entity-state-fill-color: var(--g-color-base-positive-heavy);
+        }
     }
 
     &_blue {
-        --entity-state-font-color: var(--g-color-text-info);
         --entity-state-border-color: var(--g-color-base-info-heavy);
-        --entity-state-shadow-color: var(--g-color-base-info-light);
+        --entity-state-shadow-color: var(--g-color-base-info-medium);
         --entity-state-background-color: var(--g-color-base-info-light);
         --entity-state-fill-color: var(--g-color-base-info-medium);
+
+        &#{$block}_highlighted {
+            --entity-state-border-color: var(--g-color-base-info-heavy-hover);
+            --entity-state-shadow-color: var(--g-color-base-info-heavy);
+            --entity-state-background-color: var(--g-color-base-info-light-hover);
+            --entity-state-fill-color: var(--g-color-base-info-medium-hover);
+        }
     }
 
     &_yellow {
-        --entity-state-font-color: var(--g-color-text-warning);
-        --entity-state-border-color: var(--g-color-base-warning-heavy);
-        --entity-state-background-color: var(--g-color-base-yellow-light);
-        --entity-state-fill-color: var(--g-color-base-yellow-medium);
+        --entity-state-border-color: var(--g-color-base-warning-medium);
+        --entity-state-background-color: var(--g-color-base-warning-light);
+        --entity-state-fill-color: var(--g-color-base-warning-medium);
+
+        &#{$block}_highlighted {
+            --entity-state-border-color: var(--g-color-base-warning-medium-hover);
+            --entity-state-background-color: var(--g-color-base-warning-light-hover);
+            --entity-state-fill-color: var(--g-color-base-warning-medium-hover);
+        }
     }
 
     &_red {
-        --entity-state-font-color: var(--g-color-text-danger);
         --entity-state-border-color: var(--g-color-base-danger-heavy);
         --entity-state-background-color: var(--g-color-base-danger-light);
         --entity-state-fill-color: var(--g-color-base-danger-medium);
+
+        &#{$block}_highlighted {
+            --entity-state-border-color: var(--g-color-base-danger-heavy-hover);
+            --entity-state-background-color: var(--g-color-base-danger-light);
+            --entity-state-fill-color: var(--g-color-base-danger-medium-hover);
+        }
     }
 
     &_darkgrey {
-        --entity-state-font-color: var(--g-color-text-secondary);
         --entity-state-border-color: var(--g-color-base-neutral-heavy);
         --entity-state-shadow-color: var(--g-color-base-neutral-light);
         --entity-state-fill-color: var(--g-color-base-neutral-light);
         --entity-state-background-color: transparent;
+
+        &#{$block}_highlighted {
+            --entity-state-border-color: var(--g-color-base-neutral-heavy-hover);
+            --entity-state-shadow-color: var(--g-color-base-neutral-light-hover);
+            --entity-state-fill-color: var(--g-color-base-neutral-light-hover);
+            --entity-state-background-color: transparent;
+        }
     }
 
-    &__grey {
+    &_grey {
         --entity-state-font-color: var(--g-color-text-secondary);
-        --entity-state-border-color: var(--g-color-line-generic-hover);
+        --entity-state-background-color: var(--g-color-base-neutral-light-hover);
+        --entity-state-fill-color: transparent;
+        --entity-state-border-color: transparent;
+
+        &#{$block}_highlighted {
+            --entity-state-background-color: var(--g-color-base-neutral-medium);
+        }
     }
 }

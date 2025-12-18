@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {VDiskWithDonorsStack} from '../../../components/VDisk/VDiskWithDonorsStack';
 import type {Erasure} from '../../../types/api/storage';
 import {cn} from '../../../utils/cn';
@@ -20,6 +22,8 @@ interface VDisksProps {
 export function VDisks({vDisks, viewContext, erasure, withIcon}: VDisksProps) {
     const vDisksWithDCMargins = useVDisksWithDCMargins(vDisks, erasure);
 
+    const [highlightedVDisk, setHighlightedVDisk] = React.useState<string | undefined>();
+
     return (
         <div className={b('wrapper')}>
             {vDisks?.map((vDisk, index) => (
@@ -33,6 +37,9 @@ export function VDisks({vDisks, viewContext, erasure, withIcon}: VDisksProps) {
                     className={b('item', {
                         'with-dc-margin': vDisksWithDCMargins.includes(index),
                     })}
+                    highlightedVDisk={highlightedVDisk}
+                    setHighlightedVDisk={setHighlightedVDisk}
+                    progressBarClassName={b('vdisks-progress-bar')}
                 />
             ))}
         </div>

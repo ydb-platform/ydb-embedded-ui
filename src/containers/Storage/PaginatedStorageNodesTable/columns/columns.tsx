@@ -24,7 +24,7 @@ import {
 } from '../../../../components/nodesColumns/constants';
 import type {NodesColumn} from '../../../../components/nodesColumns/types';
 import {cn} from '../../../../utils/cn';
-import {PDisk} from '../../PDisk/PDisk';
+import {PDisks} from '../../PDisks/PDisks';
 
 import type {GetStorageNodesColumnsParams} from './types';
 
@@ -43,24 +43,12 @@ export const getPDisksColumn = ({
         width: columnsSettings?.pDiskContainerWidth,
         render: ({row}) => {
             return (
-                <div className={b('pdisks-wrapper')}>
-                    {row.PDisks?.map((pDisk) => {
-                        const vDisks = row.VDisks?.filter(
-                            (vdisk) => vdisk.PDiskId === pDisk.PDiskId,
-                        );
-
-                        return (
-                            <div className={b('pdisks-item')} key={pDisk.PDiskId}>
-                                <PDisk
-                                    data={pDisk}
-                                    vDisks={vDisks}
-                                    viewContext={viewContext}
-                                    width={columnsSettings?.pDiskWidth}
-                                />
-                            </div>
-                        );
-                    })}
-                </div>
+                <PDisks
+                    pDisks={row.PDisks}
+                    vDisks={row.VDisks}
+                    viewContext={viewContext}
+                    pDiskWidth={columnsSettings?.pDiskWidth}
+                />
             );
         },
         align: DataTable.CENTER,
