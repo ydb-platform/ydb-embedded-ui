@@ -108,7 +108,9 @@ export async function snapshotLocalStorageToRemoteOnce(
                 user: resolved.user,
                 preventBatching: true,
             });
-            if (!isNil(existingSnapshot)) {
+            // Axios returns `response.data === ''` for HTTP 204 (No Content).
+            // Treat empty string as "missing snapshot" so we can create the backup.
+            if (!isNil(existingSnapshot) && existingSnapshot !== '') {
                 return;
             }
         } catch {
