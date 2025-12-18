@@ -105,14 +105,14 @@ const getClusterBreadcrumbs: GetBreadcrumbs<ClusterBreadcrumbsOptions> = (option
         if (singleClusterMode) {
             return [];
         } else {
-            return getHomePageBreadcrumbs(options, query);
+            return getHomePageBreadcrumbs(options);
         }
     }
 
     let breadcrumbs: RawBreadcrumbItem[] = [];
 
     if (!singleClusterMode) {
-        breadcrumbs = getHomePageBreadcrumbs(options, query);
+        breadcrumbs = getHomePageBreadcrumbs(options);
     }
 
     breadcrumbs.push({

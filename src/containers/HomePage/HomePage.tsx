@@ -73,7 +73,7 @@ export function HomePage() {
         }
 
         return homePageTabSchema.parse(tabFromPath ?? savedHomePageTab);
-    }, [tabFromPath, savedHomePageTab, metaEnvironmentsAvailable]);
+    }, [isViewerUser, tabFromPath, savedHomePageTab, metaEnvironmentsAvailable]);
 
     const initialPageTitle =
         homePageTab === 'clusters' ? i18n('page-title_clusters') : i18n('page-title_databases');
@@ -95,7 +95,13 @@ export function HomePage() {
         ) {
             handleEnvironmentChange(databasesPageEnvironment);
         }
-    }, [databasesPageEnvironment, envParamFromQuery, handleEnvironmentChange]);
+    }, [
+        homePageTab,
+        environments,
+        databasesPageEnvironment,
+        envParamFromQuery,
+        handleEnvironmentChange,
+    ]);
 
     const environmentsTabs = React.useMemo(() => {
         const getEnvironmentTitle = uiFactory.databasesEnvironmentsConfig?.getEnvironmentTitle;
@@ -128,7 +134,7 @@ export function HomePage() {
                 handleEnvironmentChange(value);
             }
         },
-        [history, handleEnvironmentChange],
+        [handleEnvironmentChange],
     );
 
     const renderHelmet = () => {
