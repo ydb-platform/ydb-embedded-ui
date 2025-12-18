@@ -1,5 +1,17 @@
 # Changelog
 
+## [13.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.30.1...v13.0.0) (2025-12-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* userSettings for package ([#3243](https://github.com/ydb-platform/ydb-embedded-ui/issues/3243))
+
+### Features
+
+* update Disk indicators visual design across console ([#3241](https://github.com/ydb-platform/ydb-embedded-ui/issues/3241)) ([7e2a588](https://github.com/ydb-platform/ydb-embedded-ui/commit/7e2a588157372249dbd2a57a8b0829b8fc52a474))
+* userSettings for package ([#3243](https://github.com/ydb-platform/ydb-embedded-ui/issues/3243)) ([c81534b](https://github.com/ydb-platform/ydb-embedded-ui/commit/c81534bea04c13cd23d2a3bdf4c78a1557d78727))
+
 ## [12.30.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.30.0...v12.30.1) (2025-12-17)
 
 
