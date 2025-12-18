@@ -3,7 +3,7 @@ import type {
     GetSingleSettingParams,
     SetSettingResponse,
     SetSingleSettingParams,
-    Setting,
+    SettingValue,
 } from '../../../types/api/settings';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 import {serializeReduxError} from '../../../utils/errors/serializeReduxError';
@@ -182,7 +182,7 @@ function scheduleLocalStorageMigrationToRemoteIfMissing(args: {
 
 export const settingsApi = api.injectEndpoints({
     endpoints: (builder) => ({
-        getSingleSetting: builder.query<Setting | undefined, GetSingleSettingParams>({
+        getSingleSetting: builder.query<SettingValue | undefined, GetSingleSettingParams>({
             queryFn: async ({name, user}) => {
                 try {
                     const resolved = resolveRemoteSettingsClientAndUser(user);
@@ -211,7 +211,7 @@ export const settingsApi = api.injectEndpoints({
                 try {
                     const {data} = await queryFulfilled;
                     const resolved = resolveRemoteSettingsClientAndUser(user);
-                    const remoteValue = data?.value;
+                    const remoteValue = data;
 
                     const shouldSnapshotBeforeOverwrite =
                         Boolean(resolved) &&
@@ -289,7 +289,7 @@ export const settingsApi = api.injectEndpoints({
                 });
             },
         }),
-        getSettings: builder.query<Record<string, Setting>, GetSettingsParams>({
+        getSettings: builder.query<Record<string, SettingValue | undefined>, GetSettingsParams>({
             queryFn: async ({name, user}: GetSettingsParams, baseApi) => {
                 try {
                     const resolved = resolveRemoteSettingsClientAndUser(user);
@@ -299,7 +299,7 @@ export const settingsApi = api.injectEndpoints({
                     const data = await resolved.client.getSettings({name, user: resolved.user});
 
                     const shouldSnapshotBeforeOverwrite = name.some((settingName) => {
-                        const remoteValue = data[settingName]?.value;
+                        const remoteValue = data[settingName];
                         return shouldSnapshotBeforeOverwriteLocalStorage({
                             name: settingName,
                             remoteValue,
@@ -320,7 +320,7 @@ export const settingsApi = api.injectEndpoints({
                             name: settingName,
                             user: resolved.user,
                         };
-                        const remoteValue = settingData?.value;
+                        const remoteValue = settingData;
 
                         const patch = dispatch(
                             settingsApi.util.upsertQueryData(

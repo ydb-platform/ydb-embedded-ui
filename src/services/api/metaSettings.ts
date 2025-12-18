@@ -4,13 +4,13 @@ import type {
     GetSingleSettingParams,
     SetSettingResponse,
     SetSingleSettingParams,
-    Setting,
+    SettingValue,
 } from '../../types/api/settings';
 
 import {BaseMetaAPI} from './baseMeta';
 
 interface PendingRequest {
-    resolve: (value: Setting) => void;
+    resolve: (value: SettingValue | undefined) => void;
     reject: (error: unknown) => void;
 }
 
@@ -43,10 +43,13 @@ export class MetaSettingsAPI extends BaseMetaAPI {
         preventBatching,
     }: GetSingleSettingParams & {preventBatching?: boolean}) {
         if (preventBatching) {
-            return this.get<Setting | undefined>(this.getPath('/meta/user_settings'), {name, user});
+            return this.get<SettingValue | undefined>(this.getPath('/meta/user_settings'), {
+                name,
+                user,
+            });
         }
 
-        return new Promise<Setting>((resolve, reject) => {
+        return new Promise<SettingValue | undefined>((resolve, reject) => {
             // Always request settings for current user
             this.currentUser = user;
 
@@ -68,9 +71,9 @@ export class MetaSettingsAPI extends BaseMetaAPI {
     setSingleSetting(params: SetSingleSettingParams) {
         return this.post<SetSettingResponse>(
             this.getPath('/meta/user_settings'),
-            {value: params.value},
+            JSON.stringify(params.value),
             {user: params.user, name: params.name},
-            {},
+            {headers: {'Content-Type': 'application/json'}},
         );
     }
     getSettings(params: GetSettingsParams) {
@@ -107,7 +110,7 @@ export class MetaSettingsAPI extends BaseMetaAPI {
                         });
                     } else {
                         pendingRequests.forEach((request) => {
-                            request.resolve({value: undefined});
+                            request.resolve(undefined);
                         });
                     }
                 });

@@ -4,7 +4,7 @@ import type {
     GetSingleSettingParams,
     SetSettingResponse,
     SetSingleSettingParams,
-    Setting,
+    SettingValue,
 } from '../../../types/api/settings';
 import {
     DEFAULT_CLUSTER_TAB_KEY,
@@ -43,7 +43,7 @@ export type ResolvedRemoteSettingsForSnapshot = {
     client: {
         getSingleSetting: (
             params: GetSingleSettingParams & {preventBatching?: boolean},
-        ) => Promise<Setting | undefined>;
+        ) => Promise<SettingValue | undefined>;
         setSingleSetting: (params: SetSingleSettingParams) => Promise<SetSettingResponse>;
     };
 };
@@ -108,7 +108,7 @@ export async function snapshotLocalStorageToRemoteOnce(
                 user: resolved.user,
                 preventBatching: true,
             });
-            if (!isNil(existingSnapshot?.value)) {
+            if (!isNil(existingSnapshot)) {
                 return;
             }
         } catch {

@@ -56,20 +56,23 @@ const DrawerPaneContentWrapper = ({
     hideVeil = true,
 }: DrawerPaneContentWrapperProps) => {
     const [savedWidthString, setSavedWidthString] = useSetting<string | undefined>(storageKey);
-    const [drawerWidth, setDrawerWidth] = React.useState<number | undefined>(() => {
+    const [userDrawerWidth, setUserDrawerWidth] = React.useState<number | undefined>(undefined);
+
+    const drawerRef = React.useRef<HTMLDivElement>(null);
+    const {containerWidth, itemContainerRef} = useDrawerContext();
+
+    const derivedDrawerWidth = React.useMemo(() => {
         return normalizeDrawerWidthFromSavedString({
             savedWidthString,
             defaultWidth,
             isPercentageWidth,
-            containerWidth: 0,
+            containerWidth,
             defaultPercents: DEFAULT_DRAWER_WIDTH_PERCENTS,
             defaultPx: DEFAULT_DRAWER_WIDTH,
         });
-    });
-    const hasUserResizedRef = React.useRef(false);
+    }, [containerWidth, defaultWidth, isPercentageWidth, savedWidthString]);
 
-    const drawerRef = React.useRef<HTMLDivElement>(null);
-    const {containerWidth, itemContainerRef} = useDrawerContext();
+    const drawerWidth = userDrawerWidth ?? derivedDrawerWidth;
     // Calculate drawer width based on container width percentage if specified
     const calculatedWidth = React.useMemo(() => {
         if (isPercentageWidth && containerWidth > 0) {
@@ -79,28 +82,6 @@ const DrawerPaneContentWrapper = ({
         }
         return drawerWidth || DEFAULT_DRAWER_WIDTH;
     }, [containerWidth, isPercentageWidth, drawerWidth]);
-
-    React.useEffect(() => {
-        if (hasUserResizedRef.current) {
-            return;
-        }
-
-        const nextWidth = normalizeDrawerWidthFromSavedString({
-            savedWidthString,
-            defaultWidth,
-            isPercentageWidth,
-            containerWidth,
-            defaultPercents: DEFAULT_DRAWER_WIDTH_PERCENTS,
-            defaultPx: DEFAULT_DRAWER_WIDTH,
-        });
-
-        setDrawerWidth((prevWidth) => {
-            if (prevWidth === nextWidth) {
-                return prevWidth;
-            }
-            return nextWidth;
-        });
-    }, [containerWidth, defaultWidth, isPercentageWidth, savedWidthString]);
 
     React.useEffect(() => {
         if (!detectClickOutside) {
@@ -138,14 +119,13 @@ const DrawerPaneContentWrapper = ({
     }, [saveWidthDebounced]);
 
     const handleResizeDrawer = (width: number) => {
-        hasUserResizedRef.current = true;
         const normalized = normalizeDrawerWidthFromResize({
             resizedWidthPx: width,
             isPercentageWidth,
             containerWidth,
         });
 
-        setDrawerWidth(normalized.drawerWidth);
+        setUserDrawerWidth(normalized.drawerWidth);
         saveWidthDebounced(normalized.savedWidthString);
     };
 
