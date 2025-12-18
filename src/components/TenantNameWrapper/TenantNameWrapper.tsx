@@ -16,6 +16,7 @@ import i18n from './i18n';
 interface TenantNameWrapperProps {
     tenant: PreparedTenant;
     additionalTenantsProps?: AdditionalTenantsProps;
+    externalLink?: boolean;
 }
 
 const getTenantBackend = (
@@ -35,12 +36,16 @@ const getTenantBackend = (
     return additionalTenantsProps.prepareTenantBackend(nodeId);
 };
 
-export function TenantNameWrapper({tenant, additionalTenantsProps}: TenantNameWrapperProps) {
+export function TenantNameWrapper({
+    tenant,
+    additionalTenantsProps,
+    externalLink,
+}: TenantNameWrapperProps) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const {settings} = useClusterBaseInfo();
 
     const backend = getTenantBackend(tenant, additionalTenantsProps);
-    const isExternalLink = Boolean(backend);
+    const isExternalLink = externalLink || Boolean(backend);
 
     const links = getDatabaseLinks(additionalTenantsProps, tenant?.Name, tenant?.Type);
     const {monitoring: clusterMonitoring} = useClusterBaseInfo();

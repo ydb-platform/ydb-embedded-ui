@@ -166,6 +166,7 @@ export const TenantsTable = ({
                     <TenantNameWrapper
                         tenant={row}
                         additionalTenantsProps={additionalTenantsProps}
+                        externalLink={Boolean(environmentName)}
                     />
                 ),
                 width: 440,
