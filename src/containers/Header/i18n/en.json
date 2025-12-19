@@ -1,5 +1,6 @@
 {
   "breadcrumbs.clusters": "All clusters",
+  "breadcrumbs.databases": "My Databases",
   "breadcrumbs.tenant": "Database",
   "breadcrumbs.node": "Node",
   "breadcrumbs.pDisk": "PDisk",

@@ -34,7 +34,7 @@ import {useAppTitle} from './AppTitleContext';
 import {SettingsBootstrap} from './SettingsBootstrap';
 import {
     ClusterSlot,
-    ClustersSlot,
+    HomePageSlot,
     NodeSlot,
     PDiskPageSlot,
     RedirectSlot,
@@ -104,7 +104,15 @@ const routesSlots: RouteSlot[] = [
     },
 ];
 
-const Clusters = lazyComponent(() => import('../Clusters/Clusters'), 'Clusters');
+const multiClusterRoutes: RouteSlot[] = [
+    {
+        path: routes.homePage,
+        exact: true,
+        component: lazyComponent(() => import('../HomePage/HomePage'), 'HomePage'),
+        slot: HomePageSlot,
+        wrapper: HomePageDataWrapper,
+    },
+];
 
 function renderRouteSlot(slots: SlotMap, route: RouteSlot) {
     return (
@@ -147,7 +155,7 @@ export function Content(props: ContentProps) {
 
     const redirect = slots.get(RedirectSlot);
     const redirectProps: RedirectProps =
-        redirect?.props ?? (singleClusterMode ? {to: getClusterPath()} : {to: routes.clusters});
+        redirect?.props ?? (singleClusterMode ? {to: getClusterPath()} : {to: routes.homePage});
 
     return (
         <Switch>
@@ -157,12 +165,8 @@ export function Content(props: ContentProps) {
                 <Switch>
                     {singleClusterMode
                         ? null
-                        : renderRouteSlot(slots, {
-                              path: routes.clusters,
-                              exact: true,
-                              component: Clusters,
-                              slot: ClustersSlot,
-                              wrapper: ClustersDataWrapper,
+                        : multiClusterRoutes.map((route) => {
+                              return renderRouteSlot(slots, route);
                           })}
                     {/* Single cluster routes */}
                     {routesSlots.map((route) => {
@@ -193,7 +197,7 @@ function DataWrapper({children}: {children: React.ReactNode}) {
     );
 }
 
-function ClustersDataWrapper({children}: {children: React.ReactNode}) {
+function HomePageDataWrapper({children}: {children: React.ReactNode}) {
     return (
         <GetMetaCapabilities>
             <GetMetaUser>{children}</GetMetaUser>

@@ -2,13 +2,16 @@ import {
     NodesRight as ClusterIcon,
     Cpu as ComputeNodeIcon,
     Database as DatabaseIcon,
+    House,
     HardDrive as StorageNodeIcon,
 } from '@gravity-ui/icons';
 import {isNil} from 'lodash';
 
 import {TabletIcon} from '../../components/TabletIcon/TabletIcon';
-import routes, {
+import {
     getClusterPath,
+    getClustersPath,
+    getDatabasesPath,
     getDefaultNodePath,
     getPDiskPagePath,
     getStorageGroupPath,
@@ -17,7 +20,7 @@ import routes, {
 import type {
     BreadcrumbsOptions,
     ClusterBreadcrumbsOptions,
-    ClustersBreadcrumbsOptions,
+    HomePageBreadcrumbsOptions,
     NodeBreadcrumbsOptions,
     PDiskBreadcrumbsOptions,
     Page,
@@ -31,13 +34,13 @@ import {
     TENANT_PAGE,
     TENANT_PAGES_IDS,
 } from '../../store/reducers/tenant/constants';
-import {CLUSTER_DEFAULT_TITLE, getTabletLabel} from '../../utils/constants';
+import {CLUSTER_DEFAULT_TITLE, UNBREAKABLE_GAP, getTabletLabel} from '../../utils/constants';
 import {TenantTabsGroups} from '../Tenant/TenantPages';
 
 import {headerKeyset} from './i18n';
 
 export interface RawBreadcrumbItem {
-    text: string;
+    text?: string;
     link?: string;
     icon?: JSX.Element;
 }
@@ -54,29 +57,62 @@ const getQueryForTenant = (type: 'nodes' | 'tablets') => ({
     [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS[type],
 });
 
-const getClustersBreadcrumbs: GetBreadcrumbs<ClustersBreadcrumbsOptions> = (options) => {
-    if (!options.isViewerUser) {
-        return [];
+const getHomePageBreadcrumbs: GetBreadcrumbs<HomePageBreadcrumbsOptions> = (options) => {
+    const {isViewerUser, homePageTab, databasesPageEnvironment, databasesPageAvailable} = options;
+
+    // Reset backend and clusterName - we do not need them on home page
+    const clustersPath = getClustersPath({backend: '', clusterName: ''});
+    const databasesPath = getDatabasesPath({
+        env: databasesPageEnvironment,
+        backend: '',
+        clusterName: '',
+    });
+
+    const clustersTitle = headerKeyset('breadcrumbs.clusters');
+    const databasesTitle = headerKeyset('breadcrumbs.databases');
+
+    const icon = <House />;
+
+    // 1. Database user
+    // 1.1. Databases available - return databases with title
+    // 1.2. No databases page - no home page in breadcrumbs at all
+    // 2. There is databases page - return saved page with icon
+    // 3. No databases page - return clusters page with title
+    if (!isViewerUser) {
+        if (databasesPageAvailable) {
+            return [{text: databasesTitle, link: databasesPath}];
+        } else {
+            return [];
+        }
     }
-    return [
-        {
-            text: headerKeyset('breadcrumbs.clusters'),
-            link: routes.clusters,
-        },
-    ];
+    if (databasesPageAvailable) {
+        if (homePageTab === 'clusters') {
+            // icon is not rendered properly without text
+            // Add UNBREAKABLE_GAP as workaround for proper icon placement
+            return [{text: UNBREAKABLE_GAP, link: clustersPath, icon}];
+        } else {
+            return [{text: UNBREAKABLE_GAP, link: databasesPath, icon}];
+        }
+    } else {
+        return [{text: clustersTitle, link: clustersPath}];
+    }
 };
 
 const getClusterBreadcrumbs: GetBreadcrumbs<ClusterBreadcrumbsOptions> = (options, query = {}) => {
     const {clusterName, clusterTab, singleClusterMode, isViewerUser, environment} = options;
 
     if (!isViewerUser) {
-        return [];
+        if (singleClusterMode) {
+            return [];
+        } else {
+            return getHomePageBreadcrumbs(options);
+        }
     }
 
     let breadcrumbs: RawBreadcrumbItem[] = [];
 
     if (!singleClusterMode) {
-        breadcrumbs = getClustersBreadcrumbs(options, query);
+        breadcrumbs = getHomePageBreadcrumbs(options);
     }
 
     breadcrumbs.push({
@@ -228,7 +264,7 @@ const getTabletBreadcrumbs: GetBreadcrumbs<TabletBreadcrumbsOptions> = (options,
 };
 
 const mapPageToGetter = {
-    clusters: getClustersBreadcrumbs,
+    homePage: getHomePageBreadcrumbs,
     cluster: getClusterBreadcrumbs,
     node: getNodeBreadcrumbs,
     pDisk: getPDiskBreadcrumbs,

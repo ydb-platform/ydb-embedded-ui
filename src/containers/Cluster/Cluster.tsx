@@ -39,7 +39,7 @@ import {Configs} from '../Configs/Configs';
 import {Nodes} from '../Nodes/Nodes';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 import {TabletsTable} from '../Tablets/TabletsTable';
-import {Tenants} from '../Tenants/Tenants';
+import {TenantsClusterTab} from '../Tenants/TenantsClusterTab';
 import {VersionsContainer} from '../Versions/Versions';
 
 import {ClusterOverview} from './ClusterOverview/ClusterOverview';
@@ -217,7 +217,7 @@ export function Cluster({additionalClusterProps, additionalTenantsProps}: Cluste
                                 ).pathname
                             }
                         >
-                            <Tenants
+                            <TenantsClusterTab
                                 additionalTenantsProps={additionalTenantsProps}
                                 scrollContainerRef={container}
                             />
