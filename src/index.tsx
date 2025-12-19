@@ -6,6 +6,8 @@ import {history, store} from './store/defaultStore';
 
 import './styles/index.scss';
 
+// test
+
 async function render() {
     let App;
     if (
