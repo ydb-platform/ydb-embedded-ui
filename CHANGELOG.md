@@ -1,5 +1,16 @@
 # Changelog
 
+## [14.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v13.1.0...v14.0.0) (2025-12-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* settings endpoint usage ([#3258](https://github.com/ydb-platform/ydb-embedded-ui/issues/3258))
+
+### Bug Fixes
+
+* settings endpoint usage ([#3258](https://github.com/ydb-platform/ydb-embedded-ui/issues/3258)) ([9b6921a](https://github.com/ydb-platform/ydb-embedded-ui/commit/9b6921a8a2537ad2e35e14be69253eab9c379537))
+
 ## [13.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v13.0.1...v13.1.0) (2025-12-19)
 
 
