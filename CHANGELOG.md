@@ -1,5 +1,12 @@
 # Changelog
 
+## [13.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v13.0.1...v13.1.0) (2025-12-19)
+
+
+### Features
+
+* add databases page ([#3246](https://github.com/ydb-platform/ydb-embedded-ui/issues/3246)) ([680a6d7](https://github.com/ydb-platform/ydb-embedded-ui/commit/680a6d77d942c0ddb382b0502cb8dbd9fc21ef6d))
+
 ## [13.0.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v13.0.0...v13.0.1) (2025-12-18)
 
 
