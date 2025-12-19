@@ -6,6 +6,7 @@ import type {
     SetSingleSettingParams,
     SettingValue,
 } from '../../types/api/settings';
+import {uiFactory} from '../../uiFactory/uiFactory';
 
 import {BaseMetaAPI} from './baseMeta';
 
@@ -24,16 +25,14 @@ export class MetaSettingsAPI extends BaseMetaAPI {
     private batchTimeout: NodeJS.Timeout | undefined = undefined;
     private currentUser: string | undefined = undefined;
     private requestQueue: Map<string, PendingRequest[]> | undefined = undefined;
-    private baseUrlOverride: string | undefined;
-
-    setBaseUrlOverride(baseUrlOverride: string | undefined) {
-        this.baseUrlOverride = baseUrlOverride;
-    }
 
     getPath(path: string, clusterName?: string) {
-        if (this.baseUrlOverride) {
-            return joinBaseUrlAndPath(this.baseUrlOverride, path);
+        const settingsUserId = uiFactory.settingsBackend?.getUserId?.();
+        const metaSettingsBaseUrl = uiFactory.settingsBackend?.getEndpoint?.();
+        if (metaSettingsBaseUrl && settingsUserId) {
+            return joinBaseUrlAndPath(metaSettingsBaseUrl, path);
         }
+
         return super.getPath(path, clusterName);
     }
 

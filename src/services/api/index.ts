@@ -2,7 +2,6 @@ import type {AxiosWrapperOptions} from '@gravity-ui/axios-wrapper';
 import type {AxiosRequestConfig} from 'axios';
 
 import {codeAssistBackend} from '../../store';
-import {uiFactory} from '../../uiFactory/uiFactory';
 
 import {AuthAPI} from './auth';
 import {CodeAssistAPI} from './codeAssist';
@@ -47,7 +46,6 @@ export class YdbEmbeddedAPI {
     metaSettings?: MetaSettingsAPI;
     codeAssist?: CodeAssistAPI;
 
-    // eslint-disable-next-line complexity
     constructor({
         webVersion = false,
         withCredentials = false,
@@ -60,8 +58,6 @@ export class YdbEmbeddedAPI {
     }: YdbEmbeddedAPIProps) {
         const axiosParams: AxiosWrapperOptions = {config: {withCredentials, ...defaults}};
         const baseApiParams = {singleClusterMode, proxyMeta, useRelativePath};
-        const settingsUserId = uiFactory.settingsBackend?.getUserId?.();
-        const metaSettingsBaseUrl = uiFactory.settingsBackend?.getEndpoint?.();
 
         this.auth = new AuthAPI(axiosParams, baseApiParams);
         if (webVersion) {
@@ -69,9 +65,6 @@ export class YdbEmbeddedAPI {
         }
         if (useMetaSettings) {
             this.metaSettings = new MetaSettingsAPI(axiosParams, baseApiParams);
-            if (metaSettingsBaseUrl && settingsUserId) {
-                this.metaSettings.setBaseUrlOverride(metaSettingsBaseUrl);
-            }
         }
 
         if (webVersion || codeAssistBackend) {
