@@ -129,7 +129,7 @@ export function HomePage() {
             if (envDomain) {
                 const newPath = new URL(getDatabasesPath(), envDomain).toString();
 
-                window.open(newPath);
+                window.location.href = newPath;
             } else {
                 handleEnvironmentChange(value);
             }
@@ -150,6 +150,7 @@ export function HomePage() {
             return null;
         }
 
+        // <div> wrapper ensures proper button width
         return (
             <div>
                 <SegmentedRadioGroup
