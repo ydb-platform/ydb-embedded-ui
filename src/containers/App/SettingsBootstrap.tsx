@@ -3,7 +3,7 @@ import React from 'react';
 import {skipToken} from '@reduxjs/toolkit/query';
 
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
-import {selectMetaUser} from '../../store/reducers/authentication/authentication';
+import {selectUser} from '../../store/reducers/authentication/authentication';
 import {settingsApi} from '../../store/reducers/settings/api';
 import {DEFAULT_USER_SETTINGS} from '../../store/reducers/settings/constants';
 import {uiFactory} from '../../uiFactory/uiFactory';
@@ -42,7 +42,7 @@ interface SettingsBootstrapProps {
 }
 
 export function SettingsBootstrap({children}: SettingsBootstrapProps) {
-    const fallbackUser = useTypedSelector(selectMetaUser);
+    const fallbackUser = useTypedSelector(selectUser);
     const userFromFactory = uiFactory.settingsBackend?.getUserId?.();
     const remoteAvailable = Boolean(window.api?.metaSettings);
 

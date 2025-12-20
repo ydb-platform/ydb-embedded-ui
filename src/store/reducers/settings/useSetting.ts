@@ -5,7 +5,7 @@ import {skipToken} from '@reduxjs/toolkit/query';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 import {useTypedDispatch} from '../../../utils/hooks/useTypedDispatch';
 import {useTypedSelector} from '../../../utils/hooks/useTypedSelector';
-import {selectMetaUser} from '../authentication/authentication';
+import {selectUser} from '../authentication/authentication';
 
 import {settingsApi} from './api';
 import {getSettingValue, setSettingValue} from './settings';
@@ -17,7 +17,7 @@ export function useSetting<T>(name?: string): {
     saveValue: SaveSettingValue<T>;
     isLoading: boolean;
 } {
-    const fallbackUser = useTypedSelector(selectMetaUser);
+    const fallbackUser = useTypedSelector(selectUser);
     const userFromFactory = uiFactory.settingsBackend?.getUserId?.();
     const remoteAvailable = Boolean(window.api?.metaSettings);
     const user = userFromFactory ?? fallbackUser;
