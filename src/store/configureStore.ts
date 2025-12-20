@@ -5,7 +5,6 @@ import {createBrowserHistory} from 'history';
 import {listenForHistoryChange} from 'redux-location-state';
 
 import {YdbEmbeddedAPI} from '../services/api';
-import {uiFactory} from '../uiFactory/uiFactory';
 import {parseJson} from '../utils/utils';
 
 import {getUrlData} from './getUrlData';
@@ -87,8 +86,7 @@ export function configureStore({
     listenForHistoryChange(store, history);
 
     syncUserSettingsFromLS(store);
-    const userIdFromFactory = uiFactory.settingsBackend?.getUserId?.();
-    if (!userIdFromFactory) {
+    if (!api.metaSettings) {
         preloadUserSettingsFromLS(store);
     }
 

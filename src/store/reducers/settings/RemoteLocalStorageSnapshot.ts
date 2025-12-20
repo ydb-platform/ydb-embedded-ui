@@ -39,7 +39,7 @@ const LOCAL_STORAGE_SETTINGS_KEYS_FOR_SNAPSHOT = Array.from(
 const inFlightSnapshots = new Map<string, Promise<void>>();
 
 export type ResolvedRemoteSettingsForSnapshot = {
-    user: string;
+    user?: string;
     client: {
         getSingleSetting: (
             params: GetSingleSettingParams & {preventBatching?: boolean},
@@ -93,7 +93,7 @@ export async function snapshotLocalStorageToRemoteOnce(
     resolved: ResolvedRemoteSettingsForSnapshot,
 ) {
     const snapshotKey = getLocalStorageRemoteSnapshotKey();
-    const inFlightKey = `${resolved.user}:${snapshotKey}`;
+    const inFlightKey = snapshotKey;
 
     const inFlight = inFlightSnapshots.get(inFlightKey);
     if (inFlight) {

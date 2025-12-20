@@ -5,7 +5,6 @@ import type {
     SetSingleSettingParams,
     SettingValue,
 } from '../../../types/api/settings';
-import {uiFactory} from '../../../uiFactory/uiFactory';
 import {serializeReduxError} from '../../../utils/errors/serializeReduxError';
 import type {AppDispatch} from '../../defaultStore';
 import {api} from '../api';
@@ -121,18 +120,8 @@ function scheduleDebouncedRemoteWrite<T>(key: string, request: () => Promise<T>)
     });
 }
 
-function resolveRemoteSettingsClientAndUser(user: string) {
-    const userFromFactory = uiFactory.settingsBackend?.getUserId?.();
-    const endpointFromFactory = uiFactory.settingsBackend?.getEndpoint?.();
-
+function resolveRemoteSettingsClientAndUser(user: string | undefined) {
     if (window.api?.metaSettings) {
-        if (endpointFromFactory && userFromFactory) {
-            return {
-                client: window.api.metaSettings,
-                user: userFromFactory,
-            } as const;
-        }
-
         return {client: window.api.metaSettings, user} as const;
     }
 
@@ -142,13 +131,13 @@ function resolveRemoteSettingsClientAndUser(user: string) {
 function scheduleLocalStorageMigrationToRemoteIfMissing(args: {
     resolved: {
         client: {setSingleSetting: (params: SetSingleSettingParams) => Promise<SetSettingResponse>};
-        user: string;
+        user: string | undefined;
     };
     name: string;
     valueToMigrate: unknown;
 }) {
     const {resolved, name, valueToMigrate} = args;
-    const inFlightKey = `${resolved.user}:${name}`;
+    const inFlightKey = name;
 
     const existing = inFlightLocalStorageMigrations.get(inFlightKey);
     if (existing) {
@@ -252,7 +241,7 @@ export const settingsApi = api.injectEndpoints({
                         throw new Error('MetaSettings API is not available');
                     }
 
-                    const debounceKey = `${resolved.user}:${name}`;
+                    const debounceKey = name;
 
                     const data = await scheduleDebouncedRemoteWrite<SetSettingResponse>(
                         debounceKey,
@@ -316,10 +305,9 @@ export const settingsApi = api.injectEndpoints({
                     name.forEach((settingName) => {
                         const settingData = data[settingName];
 
-                        const cacheEntryParams: GetSingleSettingParams = {
-                            name: settingName,
-                            user: resolved.user,
-                        };
+                        const cacheEntryParams: GetSingleSettingParams = resolved.user
+                            ? {name: settingName, user: resolved.user}
+                            : {name: settingName};
                         const remoteValue = settingData;
 
                         const patch = dispatch(

@@ -42,10 +42,11 @@ export class MetaSettingsAPI extends BaseMetaAPI {
         preventBatching,
     }: GetSingleSettingParams & {preventBatching?: boolean}) {
         if (preventBatching) {
-            return this.get<SettingValue | undefined>(this.getPath('/meta/user_settings'), {
-                name,
-                user,
-            });
+            const params: Record<string, string> = {name};
+            if (user) {
+                params.user = user;
+            }
+            return this.get<SettingValue | undefined>(this.getPath('/meta/user_settings'), params);
         }
 
         return new Promise<SettingValue | undefined>((resolve, reject) => {
@@ -68,10 +69,14 @@ export class MetaSettingsAPI extends BaseMetaAPI {
     }
 
     setSingleSetting(params: SetSingleSettingParams) {
+        const requestParams: Record<string, string> = {name: params.name};
+        if (params.user) {
+            requestParams.user = params.user;
+        }
         return this.post<SetSettingResponse>(
             this.getPath('/meta/user_settings'),
             JSON.stringify(params.value),
-            {user: params.user, name: params.name},
+            requestParams,
             {headers: {'Content-Type': 'application/json'}},
         );
     }
@@ -87,7 +92,7 @@ export class MetaSettingsAPI extends BaseMetaAPI {
     }
 
     private flushBatch() {
-        if (!this.requestQueue || !this.requestQueue.size || !this.currentUser) {
+        if (!this.requestQueue || !this.requestQueue.size) {
             return;
         }
 

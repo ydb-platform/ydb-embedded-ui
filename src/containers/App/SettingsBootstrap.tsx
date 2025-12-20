@@ -3,10 +3,8 @@ import React from 'react';
 import {skipToken} from '@reduxjs/toolkit/query';
 
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
-import {selectUser} from '../../store/reducers/authentication/authentication';
 import {settingsApi} from '../../store/reducers/settings/api';
 import {DEFAULT_USER_SETTINGS} from '../../store/reducers/settings/constants';
-import {uiFactory} from '../../uiFactory/uiFactory';
 import {
     DEFAULT_CLUSTER_TAB_KEY,
     DEFAULT_IS_QUERY_RESULT_COLLAPSED,
@@ -16,7 +14,6 @@ import {
     DEFAULT_SIZE_TENANT_KEY,
     DEFAULT_SIZE_TENANT_SUMMARY_KEY,
 } from '../../utils/constants';
-import {useTypedSelector} from '../../utils/hooks/useTypedSelector';
 
 const DRAWER_WIDTH_KEY = 'drawer-width';
 
@@ -42,11 +39,7 @@ interface SettingsBootstrapProps {
 }
 
 export function SettingsBootstrap({children}: SettingsBootstrapProps) {
-    const fallbackUser = useTypedSelector(selectUser);
-    const userFromFactory = uiFactory.settingsBackend?.getUserId?.();
     const remoteAvailable = Boolean(window.api?.metaSettings);
-
-    const user = userFromFactory ?? fallbackUser;
 
     const settingsKeysToPreload = React.useMemo(() => {
         const keys = new Set<string>(Object.keys(DEFAULT_USER_SETTINGS));
@@ -57,11 +50,11 @@ export function SettingsBootstrap({children}: SettingsBootstrapProps) {
     }, []);
 
     const params = React.useMemo(() => {
-        if (user && remoteAvailable) {
-            return {user, name: settingsKeysToPreload};
+        if (remoteAvailable) {
+            return {name: settingsKeysToPreload};
         }
         return skipToken;
-    }, [remoteAvailable, user, settingsKeysToPreload]);
+    }, [remoteAvailable, settingsKeysToPreload]);
 
     const {isLoading} = settingsApi.useGetSettingsQuery(params);
 
