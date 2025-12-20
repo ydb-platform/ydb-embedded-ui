@@ -39,7 +39,6 @@ const LOCAL_STORAGE_SETTINGS_KEYS_FOR_SNAPSHOT = Array.from(
 const inFlightSnapshots = new Map<string, Promise<void>>();
 
 export type ResolvedRemoteSettingsForSnapshot = {
-    user?: string;
     client: {
         getSingleSetting: (
             params: GetSingleSettingParams & {preventBatching?: boolean},
@@ -105,7 +104,6 @@ export async function snapshotLocalStorageToRemoteOnce(
         try {
             const existingSnapshot = await resolved.client.getSingleSetting({
                 name: snapshotKey,
-                user: resolved.user,
                 preventBatching: true,
             });
             // Axios returns `response.data === ''` for HTTP 204 (No Content).
@@ -121,7 +119,6 @@ export async function snapshotLocalStorageToRemoteOnce(
             const payload = buildLocalStorageSnapshotPayload();
             const snapshotResponse = await resolved.client.setSingleSetting({
                 name: snapshotKey,
-                user: resolved.user,
                 value: stringifySettingValue(payload),
             });
 

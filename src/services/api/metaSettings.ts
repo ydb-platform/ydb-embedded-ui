@@ -23,7 +23,6 @@ function joinBaseUrlAndPath(baseUrl: string, path: string) {
 
 export class MetaSettingsAPI extends BaseMetaAPI {
     private batchTimeout: NodeJS.Timeout | undefined = undefined;
-    private currentUser: string | undefined = undefined;
     private requestQueue: Map<string, PendingRequest[]> | undefined = undefined;
 
     getPath(path: string, clusterName?: string) {
@@ -38,21 +37,13 @@ export class MetaSettingsAPI extends BaseMetaAPI {
 
     getSingleSetting({
         name,
-        user,
         preventBatching,
     }: GetSingleSettingParams & {preventBatching?: boolean}) {
         if (preventBatching) {
-            const params: Record<string, string> = {name};
-            if (user) {
-                params.user = user;
-            }
-            return this.get<SettingValue | undefined>(this.getPath('/meta/user_settings'), params);
+            return this.get<SettingValue | undefined>(this.getPath('/meta/user_settings'), {name});
         }
 
         return new Promise<SettingValue | undefined>((resolve, reject) => {
-            // Always request settings for current user
-            this.currentUser = user;
-
             if (!this.requestQueue) {
                 this.initBatch();
             }
@@ -69,14 +60,10 @@ export class MetaSettingsAPI extends BaseMetaAPI {
     }
 
     setSingleSetting(params: SetSingleSettingParams) {
-        const requestParams: Record<string, string> = {name: params.name};
-        if (params.user) {
-            requestParams.user = params.user;
-        }
         return this.post<SetSettingResponse>(
             this.getPath('/meta/user_settings'),
             JSON.stringify(params.value),
-            requestParams,
+            {name: params.name},
             {headers: {'Content-Type': 'application/json'}},
         );
     }
@@ -97,14 +84,13 @@ export class MetaSettingsAPI extends BaseMetaAPI {
         }
 
         const batch = this.requestQueue;
-        const user = this.currentUser;
         clearTimeout(this.batchTimeout);
         this.requestQueue = undefined;
         this.batchTimeout = undefined;
 
         const settingNames = Array.from(batch.keys());
 
-        this.getSettings({user, name: settingNames})
+        this.getSettings({name: settingNames})
             .then((response) => {
                 batch.forEach((pendingRequests, name) => {
                     const settingResult = response[name];
