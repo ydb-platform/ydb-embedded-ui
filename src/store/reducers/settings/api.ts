@@ -5,7 +5,6 @@ import type {
     SetSingleSettingParams,
     SettingValue,
 } from '../../../types/api/settings';
-import {uiFactory} from '../../../uiFactory/uiFactory';
 import {serializeReduxError} from '../../../utils/errors/serializeReduxError';
 import type {AppDispatch} from '../../defaultStore';
 import {api} from '../api';
@@ -121,19 +120,9 @@ function scheduleDebouncedRemoteWrite<T>(key: string, request: () => Promise<T>)
     });
 }
 
-function resolveRemoteSettingsClientAndUser(user: string) {
-    const userFromFactory = uiFactory.settingsBackend?.getUserId?.();
-    const endpointFromFactory = uiFactory.settingsBackend?.getEndpoint?.();
-
+function resolveRemoteSettingsClient() {
     if (window.api?.metaSettings) {
-        if (endpointFromFactory && userFromFactory) {
-            return {
-                client: window.api.metaSettings,
-                user: userFromFactory,
-            } as const;
-        }
-
-        return {client: window.api.metaSettings, user} as const;
+        return {client: window.api.metaSettings} as const;
     }
 
     return undefined;
@@ -142,13 +131,12 @@ function resolveRemoteSettingsClientAndUser(user: string) {
 function scheduleLocalStorageMigrationToRemoteIfMissing(args: {
     resolved: {
         client: {setSingleSetting: (params: SetSingleSettingParams) => Promise<SetSettingResponse>};
-        user: string;
     };
     name: string;
     valueToMigrate: unknown;
 }) {
     const {resolved, name, valueToMigrate} = args;
-    const inFlightKey = `${resolved.user}:${name}`;
+    const inFlightKey = name;
 
     const existing = inFlightLocalStorageMigrations.get(inFlightKey);
     if (existing) {
@@ -158,7 +146,6 @@ function scheduleLocalStorageMigrationToRemoteIfMissing(args: {
     const promise = (async () => {
         try {
             const data = await resolved.client.setSingleSetting({
-                user: resolved.user,
                 name,
                 value: stringifySettingValue(valueToMigrate),
             });
@@ -183,16 +170,15 @@ function scheduleLocalStorageMigrationToRemoteIfMissing(args: {
 export const settingsApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getSingleSetting: builder.query<SettingValue | undefined, GetSingleSettingParams>({
-            queryFn: async ({name, user}) => {
+            queryFn: async ({name}) => {
                 try {
-                    const resolved = resolveRemoteSettingsClientAndUser(user);
+                    const resolved = resolveRemoteSettingsClient();
                     if (!resolved) {
                         throw new Error('MetaSettings API is not available');
                     }
 
                     const data = await resolved.client.getSingleSetting({
                         name,
-                        user: resolved.user,
                         // Directly access options here to avoid them in cache key
                         preventBatching: SETTINGS_OPTIONS[name]?.preventBatching,
                     });
@@ -203,14 +189,14 @@ export const settingsApi = api.injectEndpoints({
                 }
             },
             async onQueryStarted(args, {dispatch, queryFulfilled}) {
-                const {name, user} = args;
+                const {name} = args;
                 if (!name) {
                     return;
                 }
 
                 try {
                     const {data} = await queryFulfilled;
-                    const resolved = resolveRemoteSettingsClientAndUser(user);
+                    const resolved = resolveRemoteSettingsClient();
                     const remoteValue = data;
 
                     const shouldSnapshotBeforeOverwrite =
@@ -243,23 +229,21 @@ export const settingsApi = api.injectEndpoints({
         setSingleSetting: builder.mutation({
             queryFn: async ({
                 name,
-                user,
                 value,
             }: Omit<SetSingleSettingParams, 'value'> & {value: unknown}) => {
                 try {
-                    const resolved = resolveRemoteSettingsClientAndUser(user);
+                    const resolved = resolveRemoteSettingsClient();
                     if (!resolved) {
                         throw new Error('MetaSettings API is not available');
                     }
 
-                    const debounceKey = `${resolved.user}:${name}`;
+                    const debounceKey = name;
 
                     const data = await scheduleDebouncedRemoteWrite<SetSettingResponse>(
                         debounceKey,
                         () =>
                             resolved.client.setSingleSetting({
                                 name,
-                                user: resolved.user,
                                 value: stringifySettingValue(value),
                             }),
                     );
@@ -290,13 +274,13 @@ export const settingsApi = api.injectEndpoints({
             },
         }),
         getSettings: builder.query<Record<string, SettingValue | undefined>, GetSettingsParams>({
-            queryFn: async ({name, user}: GetSettingsParams, baseApi) => {
+            queryFn: async ({name}: GetSettingsParams, baseApi) => {
                 try {
-                    const resolved = resolveRemoteSettingsClientAndUser(user);
+                    const resolved = resolveRemoteSettingsClient();
                     if (!resolved) {
                         throw new Error('MetaSettings API is not available');
                     }
-                    const data = await resolved.client.getSettings({name, user: resolved.user});
+                    const data = await resolved.client.getSettings({name});
 
                     const shouldSnapshotBeforeOverwrite = name.some((settingName) => {
                         const remoteValue = data[settingName];
@@ -316,10 +300,7 @@ export const settingsApi = api.injectEndpoints({
                     name.forEach((settingName) => {
                         const settingData = data[settingName];
 
-                        const cacheEntryParams: GetSingleSettingParams = {
-                            name: settingName,
-                            user: resolved.user,
-                        };
+                        const cacheEntryParams: GetSingleSettingParams = {name: settingName};
                         const remoteValue = settingData;
 
                         const patch = dispatch(

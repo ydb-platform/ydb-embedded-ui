@@ -2,10 +2,8 @@ import React from 'react';
 
 import {skipToken} from '@reduxjs/toolkit/query';
 
-import {uiFactory} from '../../../uiFactory/uiFactory';
 import {useTypedDispatch} from '../../../utils/hooks/useTypedDispatch';
 import {useTypedSelector} from '../../../utils/hooks/useTypedSelector';
-import {selectMetaUser} from '../authentication/authentication';
 
 import {settingsApi} from './api';
 import {getSettingValue, setSettingValue} from './settings';
@@ -17,18 +15,15 @@ export function useSetting<T>(name?: string): {
     saveValue: SaveSettingValue<T>;
     isLoading: boolean;
 } {
-    const fallbackUser = useTypedSelector(selectMetaUser);
-    const userFromFactory = uiFactory.settingsBackend?.getUserId?.();
     const remoteAvailable = Boolean(window.api?.metaSettings);
-    const user = userFromFactory ?? fallbackUser;
     const dispatch = useTypedDispatch();
 
     const params = React.useMemo(() => {
-        if (user && name && remoteAvailable) {
-            return {user, name};
+        if (name && remoteAvailable) {
+            return {name};
         }
         return skipToken;
-    }, [remoteAvailable, user, name]);
+    }, [remoteAvailable, name]);
 
     const {isLoading} = settingsApi.useGetSingleSettingQuery(params);
     const [setMetaSetting] = settingsApi.useSetSingleSettingMutation();
@@ -39,13 +34,13 @@ export function useSetting<T>(name?: string): {
             if (!name) {
                 return;
             }
-            if (remoteAvailable && user) {
-                setMetaSetting({user, name, value});
+            if (remoteAvailable) {
+                setMetaSetting({name, value});
                 return;
             }
             dispatch(setSettingValue(name, value));
         },
-        [dispatch, remoteAvailable, user, name, setMetaSetting],
+        [dispatch, remoteAvailable, name, setMetaSetting],
     );
 
     return {value: settingValue, saveValue, isLoading} as const;
