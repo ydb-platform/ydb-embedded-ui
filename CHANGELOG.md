@@ -1,5 +1,12 @@
 # Changelog
 
+## [14.0.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.0.0...v14.0.1) (2025-12-20)
+
+
+### Bug Fixes
+
+* external users meta backend ([#3260](https://github.com/ydb-platform/ydb-embedded-ui/issues/3260)) ([569ba35](https://github.com/ydb-platform/ydb-embedded-ui/commit/569ba351c0f5e50f1c7221835875e3a6850a4641))
+
 ## [14.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v13.1.0...v14.0.0) (2025-12-19)
 
 
