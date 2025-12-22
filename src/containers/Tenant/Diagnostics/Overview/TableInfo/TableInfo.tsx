@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {InfoViewer} from '../../../../../components/InfoViewer';
+import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
 
@@ -10,7 +10,7 @@ import {prepareTableInfo} from './prepareTableInfo';
 
 import './TableInfo.scss';
 
-const b = cn('ydb-diagnostics-table-info');
+export const b = cn('ydb-diagnostics-table-info');
 
 interface TableInfoProps {
     data?: TEvDescribeSchemeResult;
@@ -19,20 +19,18 @@ interface TableInfoProps {
 
 export const TableInfo = ({data, type}: TableInfoProps) => {
     const {
-        generalInfo,
-        tableStatsInfo,
+        generalInfoLeft = [],
+        generalInfoRight = [],
+        tableStatsInfo = [],
         tabletMetricsInfo = [],
         partitionConfigInfo = [],
         partitionProgressConfig,
     } = React.useMemo(() => prepareTableInfo(data, type), [data, type]);
 
-    // Feature flag: show partitions progress only if WINDOW_SHOW_TABLE_SETTINGS is truthy
-    const isPartitionsProgressEnabled = Boolean(window.WINDOW_SHOW_TABLE_SETTINGS);
-
     return (
         <div className={b()}>
             <div className={b('title')}>{i18n('title_partitioning')}</div>
-            {isPartitionsProgressEnabled && partitionProgressConfig && (
+            {partitionProgressConfig && (
                 <div className={b('progress-bar')}>
                     <PartitionsProgress
                         minPartitions={partitionProgressConfig.minPartitions}
@@ -41,41 +39,71 @@ export const TableInfo = ({data, type}: TableInfoProps) => {
                     />
                 </div>
             )}
-            <InfoViewer
-                info={generalInfo}
-                className={b('info-block')}
-                renderEmptyState={() => null}
-            />
             <div className={b('row')}>
-                {tableStatsInfo ? (
+                <div className={b('col')}>
+                    {generalInfoLeft.length > 0 ? (
+                        <YDBDefinitionList
+                            nameMaxWidth="auto"
+                            responsive
+                            className={b('info-block')}
+                            items={generalInfoLeft}
+                            titleClassname={b('info-title')}
+                        />
+                    ) : null}
+                </div>
+                <div className={b('col')}>
+                    {generalInfoRight.length > 0 ? (
+                        <YDBDefinitionList
+                            nameMaxWidth="auto"
+                            responsive
+                            className={b('info-block')}
+                            items={generalInfoRight}
+                            titleClassname={b('info-title')}
+                        />
+                    ) : null}
+                </div>
+            </div>
+            <div className={b('row')}>
+                {tableStatsInfo?.length ? (
                     <div className={b('col')}>
-                        {tableStatsInfo.map((info, index) => (
-                            <InfoViewer
-                                key={index}
-                                info={info}
-                                title={index === 0 ? i18n('title_table-stats') : undefined}
-                                className={b('info-block')}
-                                renderEmptyState={() => null}
-                            />
-                        ))}
+                        {tableStatsInfo
+                            .filter((items) => items.length > 0)
+                            .map((items, index) => (
+                                <YDBDefinitionList
+                                    key={index}
+                                    items={items}
+                                    title={index === 0 ? i18n('title_table-stats') : undefined}
+                                    className={b('info-block')}
+                                    nameMaxWidth="auto"
+                                    responsive
+                                    titleClassname={b('info-title')}
+                                />
+                            ))}
                     </div>
                 ) : null}
-                {tabletMetricsInfo.length > 0 || partitionConfigInfo.length > 0 ? (
-                    <div className={b('col')}>
-                        <InfoViewer
-                            info={tabletMetricsInfo}
+
+                <div className={b('col')}>
+                    {tabletMetricsInfo.length > 0 ? (
+                        <YDBDefinitionList
+                            items={tabletMetricsInfo}
                             title={i18n('title_tablet-metrics')}
                             className={b('info-block')}
-                            renderEmptyState={() => null}
+                            nameMaxWidth="auto"
+                            titleClassname={b('info-title')}
+                            responsive
                         />
-                        <InfoViewer
-                            info={partitionConfigInfo}
+                    ) : null}
+                    {partitionConfigInfo.length > 0 ? (
+                        <YDBDefinitionList
+                            items={partitionConfigInfo}
                             title={i18n('title_partition-config')}
                             className={b('info-block')}
-                            renderEmptyState={() => null}
+                            nameMaxWidth="auto"
+                            responsive
+                            titleClassname={b('info-title')}
                         />
-                    </div>
-                ) : null}
+                    ) : null}
+                </div>
             </div>
         </div>
     );

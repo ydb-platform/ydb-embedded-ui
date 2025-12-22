@@ -1,16 +1,16 @@
-import {Text} from '@gravity-ui/uikit';
-import {isNil} from 'lodash';
+import {CircleCheckFill, CircleQuestion, CircleXmarkFill} from '@gravity-ui/icons';
+import {Flex, Icon, Label, Popover, Text} from '@gravity-ui/uikit';
 import omit from 'lodash/omit';
 
 import {toFormattedSize} from '../../../../../components/FormattedBytes/utils';
-import type {InfoViewerItem} from '../../../../../components/InfoViewer';
-import {formatObject} from '../../../../../components/InfoViewer';
+import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {
     formatFollowerGroupItem,
     formatPartitionConfigItem,
     formatTableStatsItem,
     formatTabletMetricsItem,
-} from '../../../../../components/InfoViewer/formatters';
+} from '../../../../../components/YDBDefinitionList/formatters/table';
+import {formatObjectToDefinitionItems} from '../../../../../components/YDBDefinitionList/utils';
 import type {
     TColumnDataLifeCycle,
     TColumnTableDescription,
@@ -24,6 +24,12 @@ import {formatBytes, formatNumber} from '../../../../../utils/dataFormatters/dat
 import {formatDurationToShortTimeFormat} from '../../../../../utils/timeParsers';
 import {isNumeric} from '../../../../../utils/utils';
 
+import {b} from './TableInfo';
+import {
+    DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES,
+    DEFAULT_PARTITION_SPLIT_BY_LOAD_THRESHOLD_PERCENT,
+    READ_REPLICAS_MODE,
+} from './constants';
 import i18n from './i18n';
 
 const isInStoreColumnTable = (table: TColumnTableDescription) => {
@@ -39,26 +45,26 @@ const prepareTTL = (ttl: TTTLSettings | TColumnDataLifeCycle) => {
             expireTime: formatDurationToShortTimeFormat(ttl.Enabled.ExpireAfterSeconds * 1000, 1),
         });
 
-        return {label: i18n('field_ttl-for-rows'), value};
+        return {name: i18n('field_ttl-for-rows'), content: value};
     }
     return undefined;
 };
 
 function prepareColumnTableGeneralInfo(columnTable: TColumnTableDescription) {
-    const columnTableGeneralInfo: InfoViewerItem[] = [];
+    const left: YDBDefinitionListItem[] = [];
 
-    columnTableGeneralInfo.push({
-        label: i18n('field_standalone'),
-        value: String(!isInStoreColumnTable(columnTable)),
+    left.push({
+        name: i18n('field_standalone'),
+        content: String(!isInStoreColumnTable(columnTable)),
     });
 
     if (columnTable.Sharding?.HashSharding?.Columns) {
         const columns = columnTable.Sharding.HashSharding.Columns.join(', ');
         const content = `PARTITION BY HASH(${columns})`;
 
-        columnTableGeneralInfo.push({
-            label: i18n('field_partitioning'),
-            value: (
+        left.push({
+            name: i18n('field_partitioning'),
+            content: (
                 <Text variant="code-2" wordBreak="break-word">
                     {content}
                 </Text>
@@ -69,75 +75,139 @@ function prepareColumnTableGeneralInfo(columnTable: TColumnTableDescription) {
     if (columnTable.TtlSettings) {
         const ttlInfo = prepareTTL(columnTable?.TtlSettings);
         if (ttlInfo) {
-            columnTableGeneralInfo.push(ttlInfo);
+            left.push(ttlInfo);
         }
     }
 
-    return columnTableGeneralInfo;
+    return left;
 }
 
-const prepareTableGeneralInfo = (PartitionConfig: TPartitionConfig, TTLSettings?: TTTLSettings) => {
+const renderCurrentPartitionsContent = (progress: PartitionProgressConfig) => {
+    const {minPartitions, maxPartitions, partitionsCount} = progress;
+
+    const isOutOfRange =
+        partitionsCount < minPartitions ||
+        (maxPartitions !== undefined && partitionsCount > maxPartitions);
+
+    return (
+        <Label theme={isOutOfRange ? 'danger' : undefined}>
+            <Flex gap="2" alignItems="center">
+                {formatNumber(partitionsCount)}
+                {isOutOfRange && (
+                    <Popover
+                        placement="auto-start"
+                        content={i18n('hint_current-partitions-out-of-range')}
+                        className={b('partitions-popover')}
+                    >
+                        <Icon data={CircleQuestion} />
+                    </Popover>
+                )}
+            </Flex>
+        </Label>
+    );
+};
+
+const renderBloomFilterStatusIcon = (value: boolean) => {
+    return (
+        <span
+            aria-label={value ? i18n('value_enabled') : i18n('value_disabled')}
+            className={b('status-icon', {state: value ? 'enabled' : 'disabled'})}
+        >
+            <Icon data={value ? CircleCheckFill : CircleXmarkFill} size={16} />
+        </span>
+    );
+};
+
+const renderCompressionGroupsContent = (partitionConfig: TPartitionConfig) => {
+    const families = partitionConfig.ColumnFamilies;
+
+    if (!Array.isArray(families) || families.length === 0) {
+        return <span>{i18n('value_some-groups')}</span>;
+    }
+
+    return (
+        <Flex direction="column" gap={1}>
+            {families.map((family, index) => {
+                const name = family?.Name ? String(family.Name) : i18n('value_default');
+                const id = family.Id ?? `${name}-${index}`;
+
+                return <span key={id}>{name}</span>;
+            })}
+        </Flex>
+    );
+};
+
+const prepareTableGeneralInfo = (
+    PartitionConfig: TPartitionConfig,
+    Progress: PartitionProgressConfig,
+    TTLSettings?: TTTLSettings,
+) => {
     const {PartitioningPolicy = {}, FollowerGroups, EnableFilterByKey} = PartitionConfig;
 
-    const generalTableInfo: InfoViewerItem[] = [];
+    const left: YDBDefinitionListItem[] = [];
+    const right: YDBDefinitionListItem[] = [];
 
-    const partitioningBySize =
-        PartitioningPolicy.SizeToSplit && Number(PartitioningPolicy.SizeToSplit) > 0
-            ? i18n('value_partitioning-by-size-enabled', {
-                  size: formatBytes(PartitioningPolicy.SizeToSplit),
-              })
-            : i18n('value_disabled');
+    // We know some facts about partitions:
+    // for splitting by load: if partitioningByLoad is enabled, we can split by load, default: 50%
+    // for splitting by size: it always will be splitted by 2 GB if user doesn't set anything else
 
-    const partitioningByLoad = PartitioningPolicy.SplitByLoadSettings?.Enabled
-        ? i18n('value_enabled')
-        : i18n('value_disabled');
+    const cpuThreshold =
+        PartitioningPolicy.SplitByLoadSettings?.CpuPercentageThreshold ??
+        DEFAULT_PARTITION_SPLIT_BY_LOAD_THRESHOLD_PERCENT;
 
-    generalTableInfo.push(
-        {label: i18n('field_partitioning-by-size'), value: partitioningBySize},
-        {label: i18n('field_partitioning-by-load'), value: partitioningByLoad},
-        {
-            label: i18n('field_min-partitions-count'),
-            value: formatNumber(PartitioningPolicy.MinPartitionsCount || 0),
-        },
+    const partitioningByLoad = PartitioningPolicy.SplitByLoadSettings?.Enabled ? (
+        <Label>{`${cpuThreshold}%`}</Label>
+    ) : (
+        <Label theme="unknown">{i18n('value_disabled')}</Label>
     );
 
-    if (PartitioningPolicy.MaxPartitionsCount) {
-        generalTableInfo.push({
-            label: i18n('field_max-partitions-count'),
-            value: formatNumber(PartitioningPolicy.MaxPartitionsCount),
-        });
-    }
+    const splitSizeBytes = PartitioningPolicy.SizeToSplit ?? DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES;
 
-    if (FollowerGroups && FollowerGroups.length) {
-        const {RequireAllDataCenters, FollowerCountPerDataCenter, FollowerCount} =
-            FollowerGroups[0];
-
-        let readReplicasConfig: string;
-
-        if (RequireAllDataCenters && FollowerCountPerDataCenter) {
-            readReplicasConfig = `PER_AZ: ${FollowerCount}`;
-        } else {
-            readReplicasConfig = `ANY_AZ: ${FollowerCount}`;
-        }
-
-        generalTableInfo.push({label: i18n('field_read-replicas'), value: readReplicasConfig});
-    }
+    left.push(
+        {
+            name: i18n('field_current-partitions'),
+            content: renderCurrentPartitionsContent(Progress),
+        },
+        {
+            name: i18n('field_partitioning-by-size'),
+            content: <Label>{formatBytes(splitSizeBytes)}</Label>,
+        },
+        {name: i18n('field_partitioning-by-load'), content: partitioningByLoad},
+    );
 
     if (TTLSettings) {
         const ttlInfo = prepareTTL(TTLSettings);
         if (ttlInfo) {
-            generalTableInfo.push(ttlInfo);
+            left.push(ttlInfo);
         }
     }
 
-    if (!isNil(EnableFilterByKey)) {
-        generalTableInfo.push({
-            label: i18n('field_bloom-filter'),
-            value: EnableFilterByKey ? i18n('value_enabled') : i18n('value_disabled'),
-        });
+    let readReplicasConfig;
+    if (FollowerGroups && FollowerGroups.length) {
+        const {RequireAllDataCenters, FollowerCountPerDataCenter, FollowerCount} =
+            FollowerGroups[0];
+
+        readReplicasConfig =
+            RequireAllDataCenters && FollowerCountPerDataCenter
+                ? `${READ_REPLICAS_MODE.PER_AZ}: ${FollowerCount}`
+                : `${READ_REPLICAS_MODE.ANY_AZ}: ${FollowerCount}`;
+    } else {
+        readReplicasConfig = i18n('value_no');
     }
 
-    return generalTableInfo;
+    right.push(
+        {name: i18n('field_read-replicas'), content: readReplicasConfig},
+        {
+            name: i18n('field_bloom-filter'),
+            content: renderBloomFilterStatusIcon(Boolean(EnableFilterByKey)),
+        },
+        {
+            name: i18n('field_compression-groups'),
+            content: renderCompressionGroupsContent(PartitionConfig),
+        },
+    );
+
+    return {left, right};
 };
 
 type PartitionProgressConfig = {
@@ -207,25 +277,33 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
 
     const {FollowerGroups, FollowerCount, CrossDataCenterFollowerCount} = PartitionConfig;
 
-    let generalInfo: InfoViewerItem[] = [];
+    let generalInfoLeft: YDBDefinitionListItem[] = [];
+    let generalInfoRight: YDBDefinitionListItem[] = [];
     let partitionProgressConfig: PartitionProgressConfig | undefined;
 
     switch (type) {
         case EPathType.EPathTypeTable: {
-            generalInfo = prepareTableGeneralInfo(PartitionConfig, TTLSettings);
             partitionProgressConfig = preparePartitionProgressConfig(
                 PartitionConfig,
                 TablePartitions,
             );
+
+            const {left, right} = prepareTableGeneralInfo(
+                PartitionConfig,
+                partitionProgressConfig,
+                TTLSettings,
+            );
+            generalInfoLeft = left;
+            generalInfoRight = right;
             break;
         }
         case EPathType.EPathTypeColumnTable: {
-            generalInfo = prepareColumnTableGeneralInfo(ColumnTableDescription);
+            generalInfoLeft = prepareColumnTableGeneralInfo(ColumnTableDescription);
             break;
         }
     }
 
-    const generalStats = formatObject(formatTableStatsItem, {
+    const generalStats = formatObjectToDefinitionItems(formatTableStatsItem, {
         PartCount,
         RowCount,
         DataSize,
@@ -236,16 +314,16 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
         isNumeric(ByKeyFilterSize) &&
         (PartitionConfig.EnableFilterByKey || Number(ByKeyFilterSize) > 0)
     ) {
-        generalStats.push({label: 'BloomFilterSize', value: toFormattedSize(ByKeyFilterSize)});
+        generalStats.push({name: 'BloomFilterSize', content: toFormattedSize(ByKeyFilterSize)});
     }
 
     const tableStatsInfo = [
         generalStats,
-        formatObject(formatTableStatsItem, {
+        formatObjectToDefinitionItems(formatTableStatsItem, {
             LastAccessTime,
             LastUpdateTime,
         }),
-        formatObject(formatTableStatsItem, {
+        formatObjectToDefinitionItems(formatTableStatsItem, {
             ImmediateTxCompleted,
             PlannedTxCompleted,
             TxRejectedByOverload,
@@ -253,7 +331,7 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
             TxCompleteLagMsec,
             InFlightTxCount,
         }),
-        formatObject(formatTableStatsItem, {
+        formatObjectToDefinitionItems(formatTableStatsItem, {
             RowUpdates,
             RowDeletes,
             RowReads,
@@ -262,7 +340,7 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
         }),
     ];
 
-    const tabletMetricsInfo = formatObject(
+    const tabletMetricsInfo = formatObjectToDefinitionItems(
         formatTabletMetricsItem,
         omit(TabletMetrics, [
             'GroupReadIops',
@@ -272,10 +350,13 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
         ]),
     );
 
-    let partitionConfigInfo: InfoViewerItem[] = [];
+    let partitionConfigInfo: YDBDefinitionListItem[] = [];
 
     if (Array.isArray(FollowerGroups) && FollowerGroups.length > 0) {
-        partitionConfigInfo = formatObject(formatFollowerGroupItem, FollowerGroups[0]);
+        partitionConfigInfo = formatObjectToDefinitionItems(
+            formatFollowerGroupItem,
+            FollowerGroups[0],
+        );
     } else if (FollowerCount !== undefined) {
         partitionConfigInfo.push(formatPartitionConfigItem('FollowerCount', FollowerCount));
     } else if (CrossDataCenterFollowerCount !== undefined) {
@@ -285,7 +366,8 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
     }
 
     return {
-        generalInfo,
+        generalInfoRight,
+        generalInfoLeft,
         tableStatsInfo,
         tabletMetricsInfo,
         partitionConfigInfo,

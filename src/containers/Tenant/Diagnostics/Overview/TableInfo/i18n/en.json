@@ -4,6 +4,7 @@
   "title_tablet-metrics": "Metrics",
   "title_partition-config": "Partition config",
 
+  "field_current-partitions": "Current partitions",
   "field_ttl-for-rows": "TTL for rows",
   "field_standalone": "Standalone",
   "field_partitioning": "Partitioning",
@@ -13,9 +14,15 @@
   "field_max-partitions-count": "Max number of partitions",
   "field_read-replicas": "Read replicas (followers)",
   "field_bloom-filter": "Bloom filter",
+  "field_compression-groups": "Compression & groups",
 
   "value_ttl-config": "column: '{{columnName}}', expire after: {{expireTime}}",
   "value_partitioning-by-size-enabled": "Enabled, split size: {{size}}",
   "value_enabled": "Enabled",
-  "value_disabled": "Disabled"
+  "value_disabled": "Disabled",
+  "value_no": "No",
+  "value_some-groups": "some groups",
+  "value_default": "default",
+
+  "hint_current-partitions-out-of-range": "The current partition size exceeds the limits. To prevent automatic splits and maintain performance, adjust the partition limits"
 }
