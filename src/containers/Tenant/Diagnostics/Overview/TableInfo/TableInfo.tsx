@@ -27,13 +27,10 @@ export const TableInfo = ({data, type}: TableInfoProps) => {
         partitionProgressConfig,
     } = React.useMemo(() => prepareTableInfo(data, type), [data, type]);
 
-    // Feature flag: show partitions progress only if WINDOW_SHOW_TABLE_SETTINGS is truthy
-    const isPartitionsProgressEnabled = Boolean(window.WINDOW_SHOW_TABLE_SETTINGS);
-
     return (
         <div className={b()}>
             <div className={b('title')}>{i18n('title_partitioning')}</div>
-            {isPartitionsProgressEnabled && partitionProgressConfig && (
+            {partitionProgressConfig && (
                 <div className={b('progress-bar')}>
                     <PartitionsProgress
                         minPartitions={partitionProgressConfig.minPartitions}

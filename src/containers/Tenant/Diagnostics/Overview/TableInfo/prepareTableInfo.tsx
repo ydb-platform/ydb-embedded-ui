@@ -9,7 +9,7 @@ import {
     formatPartitionConfigItem,
     formatTableStatsItem,
     formatTabletMetricsItem,
-} from '../../../../../components/YDBDefinitionList/formatters';
+} from '../../../../../components/YDBDefinitionList/formatters/table';
 import {formatObjectToDefinitionItems} from '../../../../../components/YDBDefinitionList/utils';
 import type {
     TColumnDataLifeCycle,

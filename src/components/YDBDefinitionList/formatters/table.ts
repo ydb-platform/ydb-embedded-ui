@@ -1,14 +1,13 @@
-import type {TFollowerGroup, TPartitionConfig, TTableStats} from '../../types/api/schema';
-import type {TMetrics} from '../../types/api/tenant';
+import type {TFollowerGroup, TPartitionConfig, TTableStats} from '../../../types/api/schema';
+import type {TMetrics} from '../../../types/api/tenant';
 import {
     formatBps,
     formatCPU,
     formatDateTime,
     formatNumber,
-} from '../../utils/dataFormatters/dataFormatters';
-import {toFormattedSize} from '../FormattedBytes/utils';
-
-import {createDefinitionFormatter} from './utils';
+} from '../../../utils/dataFormatters/dataFormatters';
+import {toFormattedSize} from '../../FormattedBytes/utils';
+import {createDefinitionFormatter} from '../utils';
 
 export const formatTabletMetricsItem = createDefinitionFormatter<TMetrics>({
     contents: {
