@@ -5,5 +5,3 @@ export const READ_REPLICAS_MODE = {
     PER_AZ: 'PER_AZ',
     ANY_AZ: 'ANY_AZ',
 } as const;
-
-export type ReadReplicasMode = (typeof READ_REPLICAS_MODE)[keyof typeof READ_REPLICAS_MODE];
