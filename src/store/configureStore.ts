@@ -10,7 +10,7 @@ import {parseJson} from '../utils/utils';
 import {getUrlData} from './getUrlData';
 import rootReducer from './reducers';
 import {api as storeApi} from './reducers/api';
-import {syncUserSettingsFromLS} from './reducers/settings/settings';
+import {preloadUserSettingsFromLS, syncUserSettingsFromLS} from './reducers/settings/settings';
 import getLocationMiddleware from './state-url-mapping';
 
 export let backend: string | undefined,
@@ -19,10 +19,10 @@ export let backend: string | undefined,
     environment: string | undefined;
 
 function _configureStore<
-    S = any,
+    S = unknown,
     A extends Action = UnknownAction,
     P = S,
-    M extends Middleware<{}, S, Dispatch> = any,
+    M extends Middleware<{}, S, Dispatch> = Middleware<{}, S, Dispatch>,
 >(aRootReducer: Reducer<S, A, P>, history: History, preloadedState: P, middleware: M[]) {
     const {locationMiddleware, reducersWithLocation} = getLocationMiddleware(history, aRootReducer);
 
@@ -42,8 +42,6 @@ function _configureStore<
                       },
             }).concat(locationMiddleware, ...middleware),
     });
-
-    syncUserSettingsFromLS(store);
 
     return store;
 }
@@ -86,6 +84,11 @@ export function configureStore({
         storeApi.middleware,
     ]);
     listenForHistoryChange(store, history);
+
+    syncUserSettingsFromLS(store);
+    if (!api.metaSettings) {
+        preloadUserSettingsFromLS(store);
+    }
 
     window.api = api;
 

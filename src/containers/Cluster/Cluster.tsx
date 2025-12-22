@@ -30,14 +30,16 @@ import type {AdditionalClusterProps, AdditionalTenantsProps} from '../../types/a
 import {EFlag} from '../../types/api/enums';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
+import {DEFAULT_CLUSTER_TAB_KEY} from '../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {useSetting} from '../../utils/hooks/useSetting';
 import {useAppTitle} from '../App/AppTitleContext';
 import {Configs} from '../Configs/Configs';
 import {Nodes} from '../Nodes/Nodes';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 import {TabletsTable} from '../Tablets/TabletsTable';
-import {Tenants} from '../Tenants/Tenants';
+import {TenantsClusterTab} from '../Tenants/TenantsClusterTab';
 import {VersionsContainer} from '../Versions/Versions';
 
 import {ClusterOverview} from './ClusterOverview/ClusterOverview';
@@ -68,7 +70,7 @@ export function Cluster({additionalClusterProps, additionalTenantsProps}: Cluste
 
     const dispatch = useTypedDispatch();
 
-    const activeTabId = useClusterTab();
+    const {activeTabId, onClusterTabClick} = useClusterTab();
 
     const [{clusterName, backend}] = useQueryParams({
         clusterName: StringParam,
@@ -182,9 +184,8 @@ export function Cluster({additionalClusterProps, additionalTenantsProps}: Cluste
                                             view="primary"
                                             as="tab"
                                             to={path}
-                                            onClick={() => {
-                                                dispatch(updateDefaultClusterTab(id));
-                                            }}
+                                            data-cluster-tab-id={id}
+                                            onClick={onClusterTabClick}
                                         >
                                             {title}
                                         </InternalLink>
@@ -216,7 +217,7 @@ export function Cluster({additionalClusterProps, additionalTenantsProps}: Cluste
                                 ).pathname
                             }
                         >
-                            <Tenants
+                            <TenantsClusterTab
                                 additionalTenantsProps={additionalTenantsProps}
                                 scrollContainerRef={container}
                             />
@@ -304,7 +305,15 @@ export function Cluster({additionalClusterProps, additionalTenantsProps}: Cluste
 function useClusterTab() {
     const dispatch = useTypedDispatch();
 
-    const defaultTab = useTypedSelector((state) => state.cluster.defaultClusterTab);
+    const defaultTabFromStore = useTypedSelector((state) => state.cluster.defaultClusterTab);
+    const [savedDefaultTab, setSavedDefaultTab] = useSetting<string | undefined>(
+        DEFAULT_CLUSTER_TAB_KEY,
+        INITIAL_DEFAULT_CLUSTER_TAB,
+    );
+    const savedDefaultTabValidated = React.useMemo(() => {
+        return isClusterTab(savedDefaultTab) ? savedDefaultTab : undefined;
+    }, [savedDefaultTab]);
+    const defaultTab = savedDefaultTabValidated ?? defaultTabFromStore;
 
     const shouldShowNetworkTable = useShouldShowClusterNetworkTable();
     const shouldShowEventsTab = useShouldShowEventsTab();
@@ -327,11 +336,27 @@ function useClusterTab() {
         activeTab = defaultTab;
     }
 
-    React.useEffect(() => {
-        if (activeTab !== defaultTab) {
-            dispatch(updateDefaultClusterTab(activeTab));
-        }
-    }, [activeTab, defaultTab, dispatch]);
+    const onClusterTabClick = React.useCallback(
+        (event: React.MouseEvent<HTMLElement>) => {
+            if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey) {
+                return;
+            }
 
-    return activeTab;
+            const rawTabId = event.currentTarget.getAttribute('data-cluster-tab-id');
+            if (!rawTabId || !isClusterTab(rawTabId)) {
+                return;
+            }
+
+            if (rawTabId !== defaultTabFromStore) {
+                dispatch(updateDefaultClusterTab(rawTabId));
+            }
+
+            if (rawTabId !== savedDefaultTabValidated) {
+                setSavedDefaultTab(rawTabId);
+            }
+        },
+        [defaultTabFromStore, dispatch, savedDefaultTabValidated, setSavedDefaultTab],
+    );
+
+    return {activeTabId: activeTab, onClusterTabClick} as const;
 }

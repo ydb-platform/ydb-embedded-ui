@@ -1,22 +1,8 @@
 @use '../../styles/mixins.scss';
 
-.clusters {
-    overflow: auto;
-    gap: var(--g-spacing-4);
-
-    padding: var(--g-spacing-4) 0 0 var(--g-spacing-5);
-
+.ydb-clusters {
     @include mixins.body-2-typography();
-    @include mixins.flex-container();
 
-    &__title-wrapper,
-    &__controls-wrapper {
-        padding-right: var(--g-spacing-5);
-    }
-
-    &__autorefresh {
-        margin-left: auto;
-    }
     &__cluster-name {
         white-space: normal;
         text-decoration: none;
@@ -31,17 +17,6 @@
         white-space: normal;
     }
 
-    &__control {
-        width: 200px;
-        margin-right: 15px;
-
-        &_wide {
-            width: 320px;
-        }
-    }
-    &__column-setup {
-        margin-left: auto;
-    }
     &__empty-cell {
         color: var(--g-color-text-secondary);
     }
@@ -57,21 +32,8 @@
     }
 
     &__table-wrapper {
-        overflow: auto;
-
-        @include mixins.flex-container();
-    }
-
-    &__table-content {
-        overflow: auto;
-
-        height: 100%;
-    }
-
-    &__table {
         --data-table-cell-align: top;
         --data-table-cell-vertical-padding: var(--g-spacing-3);
-        @include mixins.freeze-nth-column(1);
     }
 
     &__balancer-copy-icon {

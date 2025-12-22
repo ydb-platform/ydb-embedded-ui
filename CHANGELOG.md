@@ -1,5 +1,49 @@
 # Changelog
 
+## [14.0.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.0.0...v14.0.1) (2025-12-20)
+
+
+### Bug Fixes
+
+* external users meta backend ([#3260](https://github.com/ydb-platform/ydb-embedded-ui/issues/3260)) ([569ba35](https://github.com/ydb-platform/ydb-embedded-ui/commit/569ba351c0f5e50f1c7221835875e3a6850a4641))
+
+## [14.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v13.1.0...v14.0.0) (2025-12-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* settings endpoint usage ([#3258](https://github.com/ydb-platform/ydb-embedded-ui/issues/3258))
+
+### Bug Fixes
+
+* settings endpoint usage ([#3258](https://github.com/ydb-platform/ydb-embedded-ui/issues/3258)) ([9b6921a](https://github.com/ydb-platform/ydb-embedded-ui/commit/9b6921a8a2537ad2e35e14be69253eab9c379537))
+
+## [13.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v13.0.1...v13.1.0) (2025-12-19)
+
+
+### Features
+
+* add databases page ([#3246](https://github.com/ydb-platform/ydb-embedded-ui/issues/3246)) ([680a6d7](https://github.com/ydb-platform/ydb-embedded-ui/commit/680a6d77d942c0ddb382b0502cb8dbd9fc21ef6d))
+
+## [13.0.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v13.0.0...v13.0.1) (2025-12-18)
+
+
+### Bug Fixes
+
+* check meta_backend ([#3250](https://github.com/ydb-platform/ydb-embedded-ui/issues/3250)) ([8267e16](https://github.com/ydb-platform/ydb-embedded-ui/commit/8267e16505479d08e0e7209139cec518ed411d46))
+
+## [13.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.30.1...v13.0.0) (2025-12-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* userSettings for package ([#3243](https://github.com/ydb-platform/ydb-embedded-ui/issues/3243))
+
+### Features
+
+* update Disk indicators visual design across console ([#3241](https://github.com/ydb-platform/ydb-embedded-ui/issues/3241)) ([7e2a588](https://github.com/ydb-platform/ydb-embedded-ui/commit/7e2a588157372249dbd2a57a8b0829b8fc52a474))
+* userSettings for package ([#3243](https://github.com/ydb-platform/ydb-embedded-ui/issues/3243)) ([c81534b](https://github.com/ydb-platform/ydb-embedded-ui/commit/c81534bea04c13cd23d2a3bdf4c78a1557d78727))
+
 ## [12.30.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v12.30.0...v12.30.1) (2025-12-17)
 
 

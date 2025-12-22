@@ -25,7 +25,7 @@ export interface UIFactory<H extends string = CommonIssueType, T extends string 
     onEditCluster?: HandleEditCluster;
     onDeleteCluster?: HandleDeleteCluster;
 
-    clustersPageTitle?: string;
+    homePageTitle?: string;
 
     getLogsLink?: GetLogsLink;
     getMonitoringLink?: GetMonitoringLink;
@@ -52,11 +52,24 @@ export interface UIFactory<H extends string = CommonIssueType, T extends string 
     useMetaProxy?: boolean;
     useClusterDomain?: boolean;
 
+    settingsBackend?: {
+        /**
+         * Settings service endpoint (base URL) for `/meta/*` settings contract.
+         */
+        getEndpoint: () => string | undefined;
+        /**
+         * User identifier to scope settings in the remote store (Yandex users).
+         */
+        getUserId: () => string | undefined;
+    };
+
     yaMetricaConfig?: {
         yaMetricaMap: Record<T, number | undefined>;
         goals: UiMetricaGoals;
         getMetricaName: (goalKey: UiMetricaGoal) => T;
     };
+
+    databasesEnvironmentsConfig?: DatabasesEnvironmentsConfig;
 }
 
 export type HandleCreateDB = (params: {clusterName: string}) => Promise<boolean>;
@@ -109,3 +122,10 @@ export interface UiMetricaGoals {
 }
 
 export type UiMetricaGoal = keyof UiMetricaGoals;
+
+export interface DatabasesEnvironmentsConfig {
+    supportedEnvironments: string[];
+    defaultEnvironment?: string;
+    getEnvironmentTitle?: (env: string) => string | undefined;
+    getEnvironmentDomain?: (env: string) => string | undefined;
+}

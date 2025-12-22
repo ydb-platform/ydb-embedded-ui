@@ -24,6 +24,7 @@ export interface TTenantInfo {
 export interface TTenant {
     Name?: string;
     Id?: string;
+    Cluster?: string;
     Type?: ETenantType;
     State?: State;
     StateStats?: THiveDomainStatsStateCount[];

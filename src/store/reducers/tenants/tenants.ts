@@ -10,15 +10,23 @@ export const tenantsApi = api.injectEndpoints({
             queryFn: async (
                 {
                     clusterName,
+                    environmentName,
                     isMetaDatabasesAvailable,
-                }: {clusterName?: string; isMetaDatabasesAvailable?: boolean},
+                }: {
+                    clusterName?: string;
+                    environmentName?: string;
+                    isMetaDatabasesAvailable?: boolean;
+                },
                 {signal},
             ) => {
                 try {
                     let response: TTenantInfo;
 
                     if (isMetaDatabasesAvailable && window.api.meta) {
-                        response = await window.api.meta.getTenantsV2({clusterName}, {signal});
+                        response = await window.api.meta.getTenantsV2(
+                            {clusterName, environmentName},
+                            {signal},
+                        );
                     } else if (window.api.meta) {
                         response = await window.api.meta.getTenants({clusterName}, {signal});
                     } else {
@@ -36,8 +44,8 @@ export const tenantsApi = api.injectEndpoints({
                 }
             },
             serializeQueryArgs: ({queryArgs}) => {
-                const {clusterName} = queryArgs;
-                return {clusterName};
+                const {clusterName, environmentName} = queryArgs;
+                return {clusterName, environmentName};
             },
             providesTags: ['All'],
         }),

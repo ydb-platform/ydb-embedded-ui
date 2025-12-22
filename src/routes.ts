@@ -6,6 +6,7 @@ import {compile, match} from 'path-to-regexp';
 import qs from 'qs';
 import type {QueryParamConfig} from 'use-query-params';
 import {StringParam} from 'use-query-params';
+import {z} from 'zod';
 
 import type {ClusterTab} from './containers/Cluster/utils';
 import type {NodePageQuery, NodeTab} from './containers/Node/NodePages';
@@ -14,7 +15,6 @@ import {backend, basename, clusterName, environment, webVersion} from './store';
 import {normalizePathSlashes} from './utils';
 import {useDatabaseFromQuery} from './utils/hooks/useDatabaseFromQuery';
 
-export const CLUSTERS = 'clusters';
 export const CLUSTER = 'cluster';
 export const TENANT = 'tenant';
 export const NODE = 'node';
@@ -24,7 +24,7 @@ export const STORAGE_GROUP = 'storageGroup';
 export const TABLET = 'tablet';
 
 const routes = {
-    clusters: `/${CLUSTERS}`,
+    homePage: `/home/:activeTab?`,
     cluster: `/:environment?/${CLUSTER}/:activeTab?`,
     tenant: `/:environment?/${TENANT}`,
     node: `/:environment?/${NODE}/:id/:activeTab?`,
@@ -76,17 +76,26 @@ export function createHref(
     let extendedQuery = query;
     let extendedParams = params ?? {};
 
-    const isBackendInQuery = 'backend' in query && Boolean(query.backend);
+    // if {backend: ""} or {clusterName: ""} in query - it means we want to reset it
+    const isBackendInQuery = typeof query?.backend === 'string';
+    const isClusterNameInQuery = typeof query?.clusterName === 'string';
+
+    // Set params to undefined to prevent backend= and clusterName= in query
+    if (isBackendInQuery && !query.backend) {
+        extendedQuery = {...extendedQuery, backend: undefined};
+    }
+    if (isClusterNameInQuery && !query.clusterName) {
+        extendedQuery = {...extendedQuery, clusterName: undefined};
+    }
+
     if (backend && !isBackendInQuery && webVersion) {
         extendedQuery = {...query, backend};
     }
-
-    const isClusterNameInQuery = 'clusterName' in query && Boolean(query.clusterName);
     if (clusterName && !isClusterNameInQuery && webVersion) {
         extendedQuery = {...extendedQuery, clusterName};
     }
 
-    //if {environment: ""} in params - it meant we want to reset it
+    // if {environment: ""} in params - it means we want to reset it
     const isEnvironmentInParams = typeof params?.environment === 'string';
 
     if (webVersion && environment && !isEnvironmentInParams) {
@@ -122,6 +131,11 @@ export function getLocationObjectFromHref(href: string) {
 }
 
 // ==== Get page path functions ====
+
+export type BaseQueryParams = {
+    clusterName?: string;
+    backend?: string;
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type QueryParamsTypeFromQueryObject<T extends Record<string, QueryParamConfig<any, any>>> = {
@@ -160,6 +174,27 @@ export const getClusterPath = (
 export const getTenantPath = (query: TenantQuery, options?: CreateHrefOptions) => {
     return createHref(routes.tenant, undefined, query, options);
 };
+
+export const homePageTabSchema = z.enum(['clusters', 'databases']).catch('databases');
+export type HomePageTab = z.infer<typeof homePageTabSchema>;
+
+type HomePageQueryParams = BaseQueryParams & {
+    env?: string;
+};
+
+export function getHomePagePath(
+    params?: {activeTab?: HomePageTab},
+    query?: HomePageQueryParams,
+    options?: CreateHrefOptions,
+) {
+    return createHref(routes.homePage, params, query, options);
+}
+export function getDatabasesPath(query?: HomePageQueryParams, options?: CreateHrefOptions) {
+    return getHomePagePath({activeTab: 'databases'}, query, options);
+}
+export function getClustersPath(query?: HomePageQueryParams, options?: CreateHrefOptions) {
+    return getHomePagePath({activeTab: 'clusters'}, query, options);
+}
 
 export const tabletPageQueryParams = {
     database: StringParam,
@@ -212,8 +247,8 @@ export function useTabletPagePath() {
     );
 }
 
-export function checkIsClustersPage(pathname: string) {
-    const matchFn = match(routes.clusters);
+export function checkIsHomePage(pathname: string) {
+    const matchFn = match(routes.homePage);
     return Boolean(matchFn(pathname));
 }
 
