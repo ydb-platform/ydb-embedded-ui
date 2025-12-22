@@ -1,7 +1,15 @@
 import React from 'react';
 
-import {ChevronDown} from '@gravity-ui/icons';
+import {ChevronDown, Persons} from '@gravity-ui/icons';
+import type {DropdownMenuItem} from '@gravity-ui/uikit';
 import {Button, DropdownMenu} from '@gravity-ui/uikit';
+import {
+    AsyncReplicationIcon,
+    StreamingQueryIcon,
+    TableIcon,
+    TopicIcon,
+    TransferIcon,
+} from 'ydb-ui-components';
 
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {insertSnippetToEditor} from '../../../../utils/monaco/insertSnippet';
@@ -18,9 +26,10 @@ export function NewSQL() {
 
     const actions = bindActions(onTemplateClick);
 
-    const items = [
+    const items: DropdownMenuItem[] = [
         {
             text: i18n('menu.tables'),
+            iconStart: <TableIcon />,
             items: [
                 {
                     text: i18n('action.create-row-table'),
@@ -67,13 +76,22 @@ export function NewSQL() {
                     action: actions.addTableIndex,
                 },
                 {
+                    text: i18n('action.add-vector-index'),
+                    action: actions.addVectorIndex,
+                },
+                {
                     text: i18n('action.drop-index'),
                     action: actions.dropTableIndex,
+                },
+                {
+                    text: i18n('action.show-create-table'),
+                    action: actions.showCreateTable,
                 },
             ],
         },
         {
             text: i18n('menu.topics'),
+            iconStart: <TopicIcon />,
             items: [
                 {
                     text: i18n('action.create-topic'),
@@ -90,7 +108,30 @@ export function NewSQL() {
             ],
         },
         {
+            text: i18n('menu.streaming-query'),
+            iconStart: <StreamingQueryIcon />,
+            items: [
+                {
+                    text: i18n('action.create-streaming-query'),
+                    action: actions.createStreamingQuery,
+                },
+                {
+                    text: i18n('action.alter-streaming-query-settings'),
+                    action: actions.alterStreamingQuerySettings,
+                },
+                {
+                    text: i18n('action.alter-streaming-query-text'),
+                    action: actions.alterStreamingQueryText,
+                },
+                {
+                    text: i18n('action.drop-streaming-query'),
+                    action: actions.dropStreamingQuery,
+                },
+            ],
+        },
+        {
             text: i18n('menu.replication'),
+            iconStart: <AsyncReplicationIcon />,
             items: [
                 {
                     text: i18n('action.create-async-replication'),
@@ -108,6 +149,7 @@ export function NewSQL() {
         },
         {
             text: i18n('menu.transfer'),
+            iconStart: <TransferIcon />,
             items: [
                 {
                     text: i18n('action.create-transfer'),
@@ -125,6 +167,7 @@ export function NewSQL() {
         },
         {
             text: i18n('menu.capture'),
+            iconStart: <TopicIcon />,
             items: [
                 {
                     text: i18n('action.create-cdc-stream'),
@@ -134,6 +177,7 @@ export function NewSQL() {
         },
         {
             text: i18n('menu.users'),
+            iconStart: <Persons />,
             items: [
                 {
                     text: i18n('action.create-user'),

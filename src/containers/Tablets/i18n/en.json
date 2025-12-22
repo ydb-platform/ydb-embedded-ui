@@ -10,6 +10,7 @@
   "dialog.kill-header": "Restart tablet",
   "dialog.kill-text": "The tablet will be restarted. Do you want to proceed?",
   "controls.kill-not-allowed": "You don't have enough rights to restart tablet",
+  "controls.kill-impossible-follower": "It's impossible to restart a follower",
   "controls.search-placeholder": "Tablet ID",
   "controls.entities-count-label": "Tablets"
 }

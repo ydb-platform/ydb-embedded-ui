@@ -1,0 +1,24 @@
+@use '../../styles/mixins.scss';
+
+.ydb-configs {
+    --ydb-table-with-controls-layout-controls-height: var(--ydb-configs-controls-height);
+    --configs-padding-bottom: var(--g-spacing-4);
+    --ydb-syntax-highlighter-height: calc(
+        var(--ydb-configs-container-height) - var(
+                --ydb-table-with-controls-layout-controls-height
+            ) - var(--configs-padding-bottom)
+    );
+    max-width: 100%;
+    padding-bottom: var(--configs-padding-bottom);
+
+    &__feature-flags {
+        --ydb-table-with-controls-layout-controls-padding-top: 0px;
+        --data-table-start: calc(
+            var(--sticky-tabs-height, 0px) + var(--ydb-configs-controls-height)
+        );
+        --ydb-table-with-controls-layout-controls-height: 44px;
+    }
+    &__startup {
+        height: var(--ydb-syntax-highlighter-height);
+    }
+}

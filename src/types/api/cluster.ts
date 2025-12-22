@@ -79,6 +79,7 @@ export interface TClusterInfoV5 extends TClusterInfoV2 {
     NetworkUtilization?: number;
     /** value is uint64 */
     NetworkWriteThroughput?: string;
+    BridgeInfo?: TBridgeInfo;
 }
 
 export type TClusterInfo = TClusterInfoV1 | TClusterInfoV2 | TClusterInfoV5;
@@ -94,4 +95,29 @@ function isClusterParticularVersionOrHigher(info: TClusterInfo | undefined, vers
     return Boolean(
         info && 'Version' in info && typeof info.Version === 'number' && info.Version >= version,
     );
+}
+
+export enum BridgePileState {
+    UNSPECIFIED = 'UNSPECIFIED',
+    PRIMARY = 'PRIMARY',
+    PROMOTED = 'PROMOTED',
+    SYNCHRONIZED = 'SYNCHRONIZED',
+    NOT_SYNCHRONIZED = 'NOT_SYNCHRONIZED',
+    SUSPENDED = 'SUSPENDED',
+    DISCONNECTED = 'DISCONNECTED',
+}
+
+export interface TBridgePile {
+    /** unique pile identifier */
+    PileId?: number;
+    /** pile name, e.g., r1 */
+    Name?: string;
+    /** pile state from backend */
+    State?: string;
+    /** number of nodes in the pile */
+    Nodes?: number;
+}
+
+export interface TBridgeInfo {
+    Piles?: TBridgePile[];
 }

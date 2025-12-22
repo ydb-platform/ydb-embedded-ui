@@ -10,7 +10,7 @@ export class PaneWrapper {
 
     constructor(page: Page) {
         this.paneWrapper = page.locator('.query-editor__pane-wrapper');
-        this.radioButton = this.paneWrapper.locator('.g-radio-button');
+        this.radioButton = this.paneWrapper.locator('.g-segmented-radio-group');
     }
 
     async selectTab(tabName: ResultTabNames) {
@@ -29,7 +29,7 @@ export class ResultTable {
 
     constructor(selector: Locator) {
         this.table = selector.locator('.ydb-query-result-sets-viewer__result');
-        this.preview = selector.locator('.kv-preview__result');
+        this.preview = selector.locator('.ydb-preview__result');
         this.resultHead = selector.locator('.ydb-query-result-sets-viewer__head');
         this.resultTitle = selector.locator('.ydb-query-result-sets-viewer__title');
         this.resultWrapper = selector.locator('.ydb-query-result-sets-viewer__result-wrapper');
@@ -71,9 +71,7 @@ export class ResultTable {
     }
 
     async getResultTabs() {
-        const tabs = this.resultWrapper.locator(
-            '.ydb-query-result-sets-viewer__tabs .g-tabs__item',
-        );
+        const tabs = this.resultWrapper.locator('.ydb-query-result-sets-viewer__tabs .g-tab');
         await tabs.first().waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return tabs;
     }

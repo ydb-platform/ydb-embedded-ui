@@ -12,8 +12,8 @@
     &__date-picker {
         min-width: 265px;
     }
-    &__column-setup {
-        margin-left: auto;
+    &__offset-input {
+        width: max-content;
     }
 
     &__row {
@@ -24,5 +24,11 @@
                 background: var(--g-color-base-selection-hover) !important;
             }
         }
+        &_removed {
+            color: var(--g-color-text-secondary);
+        }
+    }
+    &__scroll-button {
+        margin-right: var(--g-spacing-half);
     }
 }

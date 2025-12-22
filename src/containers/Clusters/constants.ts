@@ -11,9 +11,7 @@ export const COLUMNS_NAMES = {
     STORAGE: 'storage',
     HOSTS: 'hosts',
     TENANTS: 'tenants',
-    OWNER: 'owner',
     DESCRIPTION: 'description',
-    BALANCER: 'balancer',
 } as const;
 
 export const DEFAULT_COLUMNS = [
@@ -26,8 +24,6 @@ export const DEFAULT_COLUMNS = [
     COLUMNS_NAMES.STORAGE,
     COLUMNS_NAMES.HOSTS,
     COLUMNS_NAMES.TENANTS,
-    COLUMNS_NAMES.OWNER,
-    COLUMNS_NAMES.BALANCER,
 ];
 
 export const COLUMNS_TITLES = {
@@ -40,8 +36,6 @@ export const COLUMNS_TITLES = {
     [COLUMNS_NAMES.LOAD]: 'Load',
     [COLUMNS_NAMES.STORAGE]: 'Storage',
     [COLUMNS_NAMES.HOSTS]: 'Hosts',
-    [COLUMNS_NAMES.TENANTS]: 'Tenants',
-    [COLUMNS_NAMES.OWNER]: 'Owner',
+    [COLUMNS_NAMES.TENANTS]: 'Databases',
     [COLUMNS_NAMES.DESCRIPTION]: 'Description',
-    [COLUMNS_NAMES.BALANCER]: 'Balancer',
 } as const;

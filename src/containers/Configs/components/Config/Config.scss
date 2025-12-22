@@ -1,0 +1,18 @@
+.ydb-config {
+    height: var(--ydb-syntax-highlighter-height);
+    padding: var(--g-spacing-2) 0 0 0;
+
+    background-color: var(--code-background-color);
+
+    &__scroll-container {
+        overflow: auto;
+
+        max-height: 100%;
+        padding: 0 var(--g-spacing-2) var(--g-spacing-3) var(--g-spacing-3);
+        scrollbar-width: thin;
+        scrollbar-color: var(--g-color-line-generic) transparent;
+    }
+    &__json-viewer-toolbar {
+        background-color: var(--code-background-color);
+    }
+}

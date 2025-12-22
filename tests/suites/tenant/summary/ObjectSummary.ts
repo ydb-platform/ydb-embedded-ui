@@ -8,7 +8,6 @@ import type {RowTableAction} from './types';
 
 export enum ObjectSummaryTab {
     Overview = 'Overview',
-    ACL = 'ACL',
     Schema = 'Schema',
 }
 export class ObjectSummary {
@@ -20,11 +19,6 @@ export class ObjectSummary {
     private treeLoaders: Locator;
     private primaryKeys: Locator;
     private actionsMenu: ActionsMenu;
-    private aclWrapper: Locator;
-    private aclListWrapper: Locator;
-    private effectiveAclListWrapper: Locator;
-    private aclList: Locator;
-    private effectiveAclList: Locator;
     private createDirectoryModal: Locator;
     private createDirectoryInput: Locator;
     private createDirectoryButton: Locator;
@@ -44,13 +38,6 @@ export class ObjectSummary {
         this.schemaViewer = page.locator('.schema-viewer');
         this.primaryKeys = page.locator('.schema-viewer__keys_type_primary');
         this.actionsMenu = new ActionsMenu(page.locator('.g-popup.g-popup_open'));
-        this.aclWrapper = page.locator('.ydb-acl');
-        this.aclListWrapper = this.aclWrapper.locator('.gc-definition-list').first();
-        this.aclList = this.aclListWrapper.locator('dl.gc-definition-list__list').first();
-        this.effectiveAclListWrapper = this.aclWrapper.locator('.gc-definition-list').last();
-        this.effectiveAclList = this.effectiveAclListWrapper
-            .locator('dl.gc-definition-list__list')
-            .first();
         this.createDirectoryModal = page.locator('.g-modal.g-modal_open');
         this.createDirectoryInput = page.locator(
             '.g-text-input__control[placeholder="Relative path"]',
@@ -123,46 +110,6 @@ export class ObjectSummary {
         await this.clickCreateDirectoryButton();
         // Wait for modal to close
         await this.createDirectoryModal.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
-    }
-
-    async waitForAclVisible() {
-        await this.aclWrapper.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return true;
-    }
-
-    async getAccessRights(): Promise<{user: string; rights: string}[]> {
-        await this.waitForAclVisible();
-        const items = await this.aclList.locator('.gc-definition-list__item').all();
-        const result = [];
-
-        for (const item of items) {
-            const user =
-                (await item.locator('.gc-definition-list__term-wrapper span').textContent()) || '';
-            const definitionContent = await item.locator('.gc-definition-list__definition').first();
-            const rights = (await definitionContent.textContent()) || '';
-            result.push({user: user.trim(), rights: rights.trim()});
-        }
-
-        return result;
-    }
-
-    async getEffectiveAccessRights(): Promise<{group: string; permissions: string[]}[]> {
-        await this.waitForAclVisible();
-        const items = await this.effectiveAclList.locator('.gc-definition-list__item').all();
-        const result = [];
-
-        for (const item of items) {
-            const group =
-                (await item.locator('.gc-definition-list__term-wrapper span').textContent()) || '';
-            const definitionContent = await item.locator('.gc-definition-list__definition').first();
-            const permissionElements = await definitionContent.locator('span').all();
-            const permissions = await Promise.all(
-                permissionElements.map(async (el) => ((await el.textContent()) || '').trim()),
-            );
-            result.push({group: group.trim(), permissions});
-        }
-
-        return result;
     }
 
     async isTreeVisible() {
@@ -298,7 +245,8 @@ export class ObjectSummary {
     }
 
     async clickTab(tabName: ObjectSummaryTab): Promise<void> {
-        const tab = this.tabs.locator(`.ydb-object-summary__tab:has-text("${tabName}")`);
+        const dataTab = tabName.toLowerCase();
+        const tab = this.tabs.locator(`button[data-tab="${dataTab}"]`);
         await tab.click();
     }
 

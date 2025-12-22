@@ -1,8 +1,9 @@
 import groupBy from 'lodash/groupBy';
 
-import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
-import type {VersionToColorMap} from '../../types/versions';
-import {getMinorVersion, parseNodesToVersionsValues} from '../../utils/versions';
+import type {PreparedStorageNode} from '../../store/reducers/storage/types';
+import {checkIsStorageNode, checkIsTenantNode} from '../../utils/nodes';
+import {getColorFromVersionsData, parseNodesToPreparedVersions} from '../../utils/versions';
+import type {VersionsDataMap} from '../../utils/versions/types';
 
 import type {GroupedNodesItem} from './types';
 import {GroupByValue} from './types';
@@ -11,8 +12,8 @@ const sortByTitle = (a: GroupedNodesItem, b: GroupedNodesItem) =>
     a.title?.localeCompare(b.title || '') || -1;
 
 export const getGroupedTenantNodes = (
-    nodes: NodesPreparedEntity[] | undefined,
-    versionToColor: VersionToColorMap | undefined,
+    nodes: PreparedStorageNode[] | undefined,
+    versionsDataMap: VersionsDataMap | undefined,
     groupByValue: GroupByValue,
 ): GroupedNodesItem[] | undefined => {
     if (!nodes || !nodes.length) {
@@ -24,15 +25,14 @@ export const getGroupedTenantNodes = (
 
         return Object.keys(dividedByVersion)
             .map<GroupedNodesItem | null>((version) => {
-                const filteredNodes = dividedByVersion[version].filter(({Tenants}) =>
-                    Boolean(Tenants),
-                );
+                const filteredNodes = dividedByVersion[version].filter(checkIsTenantNode);
                 const dividedByTenant = groupBy(filteredNodes, 'Tenants');
 
                 const items = Object.keys(dividedByTenant)
                     .map((tenant) => {
                         return {
                             title: tenant,
+                            isDatabase: true,
                             nodes: dividedByTenant[tenant],
                         };
                     })
@@ -45,19 +45,19 @@ export const getGroupedTenantNodes = (
                 return {
                     title: version,
                     items: items,
-                    versionColor: versionToColor?.get(getMinorVersion(version)),
+                    versionColor: getColorFromVersionsData(version, versionsDataMap),
                 };
             })
             .filter((item): item is GroupedNodesItem => Boolean(item));
     } else {
-        const filteredNodes = nodes.filter(({Tenants}) => Boolean(Tenants));
+        const filteredNodes = nodes.filter(checkIsTenantNode);
         const dividedByTenant = groupBy(filteredNodes, 'Tenants');
 
         return Object.keys(dividedByTenant)
             .map<GroupedNodesItem | null>((tenant) => {
-                const versionsValues = parseNodesToVersionsValues(
+                const preparedVersions = parseNodesToPreparedVersions(
                     dividedByTenant[tenant],
-                    versionToColor,
+                    versionsDataMap,
                 );
 
                 const dividedByVersion = groupBy(dividedByTenant[tenant], 'Version');
@@ -65,7 +65,7 @@ export const getGroupedTenantNodes = (
                     return {
                         title: version,
                         nodes: dividedByVersion[version],
-                        versionColor: versionToColor?.get(getMinorVersion(version)),
+                        versionColor: getColorFromVersionsData(version, versionsDataMap),
                     };
                 });
 
@@ -75,8 +75,9 @@ export const getGroupedTenantNodes = (
 
                 return {
                     title: tenant,
+                    isDatabase: true,
                     items: preparedItems,
-                    versionsValues,
+                    preparedVersions,
                 };
             })
             .filter((item): item is GroupedNodesItem => Boolean(item))
@@ -85,41 +86,44 @@ export const getGroupedTenantNodes = (
 };
 
 export const getGroupedStorageNodes = (
-    nodes: NodesPreparedEntity[] | undefined,
-    versionToColor: VersionToColorMap | undefined,
+    nodes: PreparedStorageNode[] | undefined,
+    versionsDataMap: VersionsDataMap | undefined,
 ): GroupedNodesItem[] | undefined => {
     if (!nodes || !nodes.length) {
         return undefined;
     }
 
-    const storageNodes = nodes.filter(({Roles}) => Roles?.includes('Storage'));
+    const storageNodes = nodes.filter(checkIsStorageNode);
     const storageNodesDividedByVersion = groupBy(storageNodes, 'Version');
 
     return Object.keys(storageNodesDividedByVersion).map((version) => {
         return {
             title: version,
             nodes: storageNodesDividedByVersion[version],
-            versionColor: versionToColor?.get(getMinorVersion(version)),
+            versionColor: getColorFromVersionsData(version, versionsDataMap),
         };
     });
 };
 
 export const getOtherNodes = (
-    nodes: NodesPreparedEntity[] | undefined,
-    versionToColor: VersionToColorMap | undefined,
+    nodes: PreparedStorageNode[] | undefined,
+    versionsDataMap: VersionsDataMap | undefined,
 ): GroupedNodesItem[] | undefined => {
     if (!nodes || !nodes.length) {
         return undefined;
     }
 
-    const otherNodes = nodes.filter(({Roles, Version}) => !Roles && Version);
+    // Nodes that are not included in other groups
+    const otherNodes = nodes.filter(
+        (node) => !checkIsStorageNode(node) && !checkIsTenantNode(node) && node.Version,
+    );
     const otherNodesDividedByVersion = groupBy(otherNodes, 'Version');
 
     return Object.keys(otherNodesDividedByVersion).map((version) => {
         return {
             title: version,
             nodes: otherNodesDividedByVersion[version],
-            versionColor: versionToColor?.get(getMinorVersion(version)),
+            versionColor: getColorFromVersionsData(version, versionsDataMap),
         };
     });
 };

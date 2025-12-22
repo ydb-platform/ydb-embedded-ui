@@ -1,7 +1,8 @@
-import type {BackendSortParam} from './common';
+import type {BackendSortParam, SchemaPathParam} from './common';
 import type {EFlag} from './enums';
 import type {TPDiskStateInfo} from './pdisk';
 import type {TTabletStateInfo} from './tablet';
+import type {TThreadPoolInfo} from './threads';
 import type {TVDiskStateInfo} from './vdisk';
 
 /**
@@ -67,6 +68,9 @@ export interface TNodeInfo {
     ReversePingTimeUs?: string; // Avg
     Peers?: TNodeStateInfo[];
     ReversePeers?: TNodeStateInfo[];
+
+    // Bridge mode
+    PileName?: string;
 }
 
 export interface TNodesGroup {
@@ -152,9 +156,11 @@ export interface TSystemStateInfo {
     SharedCacheStats?: TNodeSharedCache;
     TotalSessions?: number;
     NodeName?: string;
+    /** Detailed thread information when fields_required=-1 is used */
+    Threads?: TThreadPoolInfo[];
 }
 
-interface TNodeStateInfo {
+export interface TNodeStateInfo {
     PeerName?: string;
     Connected?: boolean;
     NodeId?: number;
@@ -212,6 +218,8 @@ interface TNodeLocation {
     BodyNum?: number; // deprecated
     Body?: number; // deprecated
 
+    BridgePileName?: string;
+
     DataCenter?: string;
     Module?: string;
     Rack?: string;
@@ -259,7 +267,8 @@ export type NodesGroupByField =
     | 'ConnectStatus' // v13
     | 'NetworkUtilization' // v13
     | 'ClockSkew' // v13
-    | 'PingTime'; // v13
+    | 'PingTime' // v13
+    | 'PileName';
 
 export type NodesRequiredField =
     | 'NodeId'
@@ -289,7 +298,8 @@ export type NodesRequiredField =
     | `ClockSkew` // v13
     | `PingTime` // v13
     | `SendThroughput` // v13
-    | `ReceiveThroughput`; // v13
+    | `ReceiveThroughput` // v13
+    | 'PileName';
 
 export type NodesSortValue =
     | 'NodeId'
@@ -321,7 +331,9 @@ export interface NodesRequestParams {
     /** @deprecated use database instead */
     tenant?: string;
     database?: string;
-    path?: string;
+
+    path?: SchemaPathParam;
+
     node_id?: string | number;
     group_id?: string | number;
     pool?: string;

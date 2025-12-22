@@ -17,8 +17,16 @@
   "title_network": "Network",
   "title_links": "Links",
   "title_details": "Details",
+  "title_bridge": "Bridge Piles",
   "label_overview": "Overview",
   "label_load": "Load",
+  "field_name": "Name",
+  "field_primary": "Primary",
+  "field_being-promoted": "Being Promoted",
+  "field_state": "State",
+  "field_nodes": "Nodes",
+  "value_yes": "Yes",
+  "value_no": "No",
   "context_of": "of",
   "context_cpu": "CPU load",
   "context_memory": "Memory used",
@@ -28,9 +36,18 @@
     "Storage: {{count}} groups",
     "Storage: {{count}} groups"
   ],
-  "context_network": "Network Evaluation",
+  "context_network": "Network Usage",
   "context_cpu-description": "CPU load is calculated as the cumulative usage across all actor system pools on all nodes in the cluster",
   "context_memory-description": "Memory usage is the total memory consumed by all nodes in the cluster",
   "context_storage-description": "Storage usage is a cumulative usage of raw disk space of all media types",
-  "context_network-description": "Network usage is the average outgoing bandwidth usage across all nodes in the cluster"
+  "context_network-description": "Network usage is the average outgoing bandwidth usage across all nodes in the cluster",
+
+  "tab_databases": "Databases",
+  "tab_nodes": "Nodes",
+  "tab_storage": "Storage",
+  "tab_network": "Network",
+  "tab_versions": "Versions",
+  "tab_tablets": "Tablets",
+  "tab_events": "Events",
+  "tab_configs": "Configs"
 }

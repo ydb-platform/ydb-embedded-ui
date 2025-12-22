@@ -1,8 +1,9 @@
 import {z} from 'zod';
 
 import type {EFlag} from '../../../types/api/enums';
-import type {NodesGroupByField} from '../../../types/api/nodes';
+import type {NodesGroupByField, TNodeInfo} from '../../../types/api/nodes';
 import type {Erasure, GroupsGroupByField} from '../../../types/api/storage';
+import type {TTabletStateInfo} from '../../../types/api/tablet';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import type {NodesUptimeFilterValues, PreparedNodeSystemState} from '../../../utils/nodes';
 
@@ -26,13 +27,14 @@ export interface PreparedStorageNodeFilters {
     filterGroupBy?: NodesGroupByField;
 }
 
-export interface PreparedStorageNode extends PreparedNodeSystemState {
+export interface PreparedStorageNode
+    extends PreparedNodeSystemState,
+        Omit<TNodeInfo, 'SystemState' | 'PDisks' | 'VDisks' | 'Tablets'> {
     NodeId: number;
-
-    DiskSpaceUsage?: number;
 
     PDisks?: PreparedPDisk[];
     VDisks?: PreparedVDisk[];
+    Tablets?: TTabletStateInfo[];
 
     Missing: number;
     MaximumSlotsPerDisk: number;
@@ -54,6 +56,7 @@ export interface PreparedStorageGroupFilters {
 
 export interface PreparedStorageGroup {
     PoolName?: string;
+    PileName?: string;
     MediaType?: string;
     Encryption?: boolean;
     ErasureSpecies?: Erasure;

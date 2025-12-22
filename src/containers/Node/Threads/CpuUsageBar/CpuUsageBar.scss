@@ -1,0 +1,7 @@
+.cpu-usage-bar {
+    &__progress {
+        flex: 1;
+
+        min-width: 60px;
+    }
+}

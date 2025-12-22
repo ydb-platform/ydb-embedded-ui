@@ -151,4 +151,13 @@ export const QUERY_SETTINGS_FIELD_SETTINGS = {
     limitRows: {
         title: formI18n('form.limit-rows'),
     },
+    outputChunkMaxSize: {
+        title: formI18n('form.output.chunk.max.size'),
+    },
+    pragmas: {
+        title: formI18n('form.pragmas'),
+    },
+    resourcePool: {
+        title: formI18n('form.resource-pool'),
+    },
 } as const;

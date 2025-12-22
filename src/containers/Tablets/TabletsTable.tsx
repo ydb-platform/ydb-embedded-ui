@@ -1,15 +1,16 @@
 import React from 'react';
 
 import {ArrowRotateLeft} from '@gravity-ui/icons';
-import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
+import type {Column as DataTableColumn, SortOrder} from '@gravity-ui/react-data-table';
 import {Icon, Text} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 import {StringParam, useQueryParams} from 'use-query-params';
 
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {EntitiesCount} from '../../components/EntitiesCount';
 import {EntityStatus} from '../../components/EntityStatus/EntityStatus';
 import {ResponseError} from '../../components/Errors/ResponseError';
-import {InternalLink} from '../../components/InternalLink';
+import {NodeId} from '../../components/NodeId/NodeId';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../components/Search/Search';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
@@ -21,11 +22,14 @@ import {ETabletState} from '../../types/api/tablet';
 import type {TTabletStateInfo} from '../../types/api/tablet';
 import {DEFAULT_TABLE_SETTINGS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
-import {getDefaultNodePath} from '../Node/NodePages';
 
 import i18n from './i18n';
 
-function getColumns({database}: {database?: string}) {
+function isFollowerTablet(state: TTabletStateInfo) {
+    return state.Leader === false;
+}
+
+function getColumns({nodeId}: {nodeId?: string | number}) {
     const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
         {
             name: 'Type',
@@ -34,7 +38,7 @@ function getColumns({database}: {database?: string}) {
                 return i18n('Type');
             },
             render: ({row}) => {
-                const isFollower = row.Leader === false;
+                const isFollower = isFollowerTablet(row);
                 return (
                     <span>
                         {row.Type} {isFollower ? <Text color="secondary">follower</Text> : ''}
@@ -56,7 +60,6 @@ function getColumns({database}: {database?: string}) {
                 return (
                     <TabletNameWrapper
                         tabletId={row.TabletId}
-                        database={database}
                         followerId={row.FollowerId || undefined}
                     />
                 );
@@ -71,30 +74,40 @@ function getColumns({database}: {database?: string}) {
                 return <TabletState state={row.State} />;
             },
         },
-        {
-            name: 'NodeId',
-            get header() {
-                return i18n('Node ID');
+    ];
+
+    // For node page we don't need to show node columns
+    if (nodeId === undefined) {
+        columns.push(
+            {
+                name: 'NodeId',
+                get header() {
+                    return i18n('Node ID');
+                },
+                render: ({row}) => {
+                    if (isNil(row.NodeId)) {
+                        return EMPTY_DATA_PLACEHOLDER;
+                    }
+                    return <NodeId id={row.NodeId} />;
+                },
+                align: 'right',
             },
-            render: ({row}) => {
-                const nodePath =
-                    row.NodeId === undefined ? undefined : getDefaultNodePath(row.NodeId);
-                return <InternalLink to={nodePath}>{row.NodeId}</InternalLink>;
+            {
+                name: 'fqdn',
+                get header() {
+                    return i18n('Node FQDN');
+                },
+                render: ({row}) => {
+                    if (!row.fqdn) {
+                        return EMPTY_DATA_PLACEHOLDER;
+                    }
+                    return <EntityStatus name={row.fqdn} showStatus={false} hasClipboardButton />;
+                },
             },
-            align: 'right',
-        },
-        {
-            name: 'fqdn',
-            get header() {
-                return i18n('Node FQDN');
-            },
-            render: ({row}) => {
-                if (!row.fqdn) {
-                    return <span>—</span>;
-                }
-                return <EntityStatus name={row.fqdn} showStatus={false} hasClipboardButton />;
-            },
-        },
+        );
+    }
+
+    columns.push(
         {
             name: 'Generation',
             get header() {
@@ -123,12 +136,14 @@ function getColumns({database}: {database?: string}) {
                 return <TabletActions {...row} />;
             },
         },
-    ];
+    );
+
     return columns;
 }
 
 function TabletActions(tablet: TTabletStateInfo) {
-    const isDisabledRestart = tablet.State === ETabletState.Stopped;
+    const isFollower = isFollowerTablet(tablet);
+    const isDisabledRestart = tablet.State === ETabletState.Stopped || isFollower;
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const [killTablet] = tabletApi.useKillTabletMutation();
 
@@ -137,10 +152,19 @@ function TabletActions(tablet: TTabletStateInfo) {
         return null;
     }
 
+    let popoverContent: React.ReactNode;
+
+    if (isFollower) {
+        popoverContent = i18n('controls.kill-impossible-follower');
+    } else if (!isUserAllowedToMakeChanges) {
+        popoverContent = i18n('controls.kill-not-allowed');
+    } else {
+        popoverContent = i18n('dialog.kill-header');
+    }
+
     return (
         <ButtonWithConfirmDialog
             buttonView="outlined"
-            buttonTitle={i18n('dialog.kill-header')}
             dialogHeader={i18n('dialog.kill-header')}
             dialogText={i18n('dialog.kill-text')}
             onConfirmAction={() => {
@@ -148,12 +172,8 @@ function TabletActions(tablet: TTabletStateInfo) {
             }}
             buttonDisabled={isDisabledRestart || !isUserAllowedToMakeChanges}
             withPopover
-            popoverContent={
-                isUserAllowedToMakeChanges
-                    ? i18n('dialog.kill-header')
-                    : i18n('controls.kill-not-allowed')
-            }
-            popoverPlacement={['right', 'auto']}
+            popoverContent={popoverContent}
+            popoverPlacement={['right', 'bottom']}
             popoverDisabled={false}
         >
             <Icon data={ArrowRotateLeft} />
@@ -162,21 +182,31 @@ function TabletActions(tablet: TTabletStateInfo) {
 }
 
 interface TabletsTableProps {
-    database?: string;
     tablets: (TTabletStateInfo & {
         fqdn?: string;
     })[];
     className?: string;
     loading?: boolean;
     error?: unknown;
+    scrollContainerRef: React.RefObject<HTMLElement>;
+    nodeId?: string | number;
 }
 
-export function TabletsTable({database, tablets, loading, error}: TabletsTableProps) {
+export function TabletsTable({
+    tablets,
+    loading,
+    error,
+    scrollContainerRef,
+    nodeId,
+}: TabletsTableProps) {
     const [{tabletsSearch}, setQueryParams] = useQueryParams({
         tabletsSearch: StringParam,
     });
 
-    const columns = React.useMemo(() => getColumns({database}), [database]);
+    // Track sort state for scroll dependencies
+    const [sortParams, setSortParams] = React.useState<SortOrder | SortOrder[] | undefined>();
+
+    const columns = React.useMemo(() => getColumns({nodeId}), [nodeId]);
 
     const filteredTablets = React.useMemo(() => {
         return tablets.filter((tablet) => {
@@ -189,7 +219,7 @@ export function TabletsTable({database, tablets, loading, error}: TabletsTablePr
     };
 
     return (
-        <TableWithControlsLayout>
+        <TableWithControlsLayout fullHeight>
             <TableWithControlsLayout.Controls>
                 <Search
                     placeholder={i18n('controls.search-placeholder')}
@@ -205,12 +235,17 @@ export function TabletsTable({database, tablets, loading, error}: TabletsTablePr
                 />
             </TableWithControlsLayout.Controls>
             {error ? <ResponseError error={error} /> : null}
-            <TableWithControlsLayout.Table loading={loading}>
+            <TableWithControlsLayout.Table
+                scrollContainerRef={scrollContainerRef}
+                scrollDependencies={[tabletsSearch, sortParams]}
+                loading={loading}
+            >
                 <ResizeableDataTable
                     columns={columns}
                     data={filteredTablets}
                     settings={DEFAULT_TABLE_SETTINGS}
                     emptyDataMessage={i18n('noTabletsData')}
+                    onSortChange={setSortParams}
                 />
             </TableWithControlsLayout.Table>
         </TableWithControlsLayout>

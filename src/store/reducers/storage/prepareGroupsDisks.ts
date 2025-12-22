@@ -25,8 +25,9 @@ export function prepareGroupsVDisk(data: TStorageVDisk = {}): PreparedVDisk {
     const Severity = calculateVDiskSeverity(mergedVDiskData);
 
     const vDiskSizeFields = prepareVDiskSizeFields({
-        AvailableSize: mergedVDiskData.AvailableSize ?? PDisk?.AvailableSize,
+        AvailableSize: mergedVDiskData.AvailableSize,
         AllocatedSize: mergedVDiskData.AllocatedSize,
+        SlotSize: PDisk?.SlotSize,
     });
 
     const preparedDonors = bscVDisk.Donors?.map((donor) => {
@@ -55,6 +56,13 @@ export function prepareGroupsPDisk(data: TStoragePDisk & {NodeId?: number} = {})
         ...bscPDisk,
         PDiskId: whiteboardPDisk?.PDiskId,
     };
+
+    if (mergedPDiskData.PDiskId === undefined && bscPDisk.PDiskId) {
+        const id = Number(bscPDisk.PDiskId.split('-')[1]);
+        if (!isNaN(id)) {
+            mergedPDiskData.PDiskId = id;
+        }
+    }
 
     const StringifiedId =
         bscPDisk.PDiskId ||

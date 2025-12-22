@@ -58,13 +58,14 @@ export type FetchData<T, F = undefined, E = {}> = (
 
 export type OnError = (error?: IResponseError) => void;
 
-interface ControlsParams {
+export interface PaginatedTableState {
+    sortParams?: SortParams;
     totalEntities: number;
     foundEntities: number;
-    inited: boolean;
+    isInitialLoad: boolean;
 }
 
-export type RenderControls = (params: ControlsParams) => React.ReactNode;
+export type RenderControls = () => React.ReactNode;
 export type RenderEmptyDataMessage = () => React.ReactNode;
 export type RenderErrorMessage = (error: IResponseError) => React.ReactNode;
 

@@ -16,7 +16,7 @@
             background-color: var(--ydb-color-status-grey);
         }
         &_state_orange {
-            background-color: var(--ydb-color-status-orange);
+            background-color: var(--ydb-color-status-red);
         }
     }
 
@@ -34,7 +34,7 @@
             color: var(--ydb-color-status-yellow);
         }
         &_state_orange {
-            color: var(--ydb-color-status-orange);
+            color: var(--ydb-color-status-red);
         }
         &_state_red {
             color: var(--ydb-color-status-red);

@@ -18,7 +18,7 @@
     }
 
     &__tablets {
-        padding: 0 !important;
+        padding: 0;
 
         .tablets-viewer__grid {
             grid-gap: 20px;
@@ -54,17 +54,8 @@
     }
 
     &__table-wrapper {
+        display: contents;
+
         width: max-content;
-    }
-
-    &__create-database {
-        position: sticky;
-        right: 0;
-
-        margin: 0 0 0 auto;
-    }
-
-    &__remove-db {
-        color: var(--ydb-color-status-red);
     }
 }

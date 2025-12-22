@@ -4,11 +4,7 @@ import type {PopupProps} from '@gravity-ui/uikit';
 import {Popup} from '@gravity-ui/uikit';
 import debounce from 'lodash/debounce';
 
-import {cn} from '../../utils/cn';
-
-import './HoverPopup.scss';
-
-const b = cn('hover-popup');
+import {YDB_POPOVER_CLASS_NAME} from '../../utils/constants';
 
 const DEBOUNCE_TIMEOUT = 100;
 
@@ -16,13 +12,13 @@ type HoverPopupProps = {
     children: React.ReactNode;
     renderPopupContent: () => React.ReactNode;
     showPopup?: boolean;
-    offset?: [number, number];
     anchorRef?: React.RefObject<HTMLElement>;
     onShowPopup?: VoidFunction;
     onHidePopup?: VoidFunction;
     delayOpen?: number;
     delayClose?: number;
-} & Pick<PopupProps, 'placement' | 'contentClassName'>;
+    contentClassName?: string;
+} & Pick<PopupProps, 'placement' | 'offset'>;
 
 export const HoverPopup = ({
     children,
@@ -38,48 +34,77 @@ export const HoverPopup = ({
     delayOpen = DEBOUNCE_TIMEOUT,
 }: HoverPopupProps) => {
     const [isPopupVisible, setIsPopupVisible] = React.useState(false);
-    const anchor = React.useRef<HTMLDivElement>(null);
+    const [isPopupContentHovered, setIsPopupContentHovered] = React.useState(false);
+    const [isFocused, setIsFocused] = React.useState(false);
+
+    const anchor = React.useRef<HTMLSpanElement>(null);
+
+    const reportedOpenRef = React.useRef(false);
+
+    const reportOpen = React.useCallback(
+        (nextOpen: boolean) => {
+            if (reportedOpenRef.current === nextOpen) {
+                return;
+            }
+
+            reportedOpenRef.current = nextOpen;
+
+            if (nextOpen) {
+                onShowPopup?.();
+            } else {
+                onHidePopup?.();
+            }
+        },
+        [onShowPopup, onHidePopup],
+    );
 
     const debouncedHandleShowPopup = React.useMemo(
         () =>
             debounce(() => {
                 setIsPopupVisible(true);
-                onShowPopup?.();
+                reportOpen(true);
             }, delayOpen),
-        [onShowPopup, delayOpen],
+        [delayOpen, reportOpen],
     );
 
     const hidePopup = React.useCallback(() => {
         setIsPopupVisible(false);
-        onHidePopup?.();
-    }, [onHidePopup]);
+    }, []);
 
     const debouncedHandleHidePopup = React.useMemo(
-        () => debounce(hidePopup, delayClose),
-        [hidePopup, delayClose],
+        () =>
+            debounce(() => {
+                hidePopup();
+                reportOpen(false);
+            }, delayClose),
+        [delayClose, reportOpen, hidePopup],
     );
 
-    const onMouseEnter = debouncedHandleShowPopup;
+    const onMouseEnter = () => {
+        debouncedHandleHidePopup.cancel();
+        debouncedHandleShowPopup();
+    };
 
     const onMouseLeave = () => {
         debouncedHandleShowPopup.cancel();
         debouncedHandleHidePopup();
     };
 
-    const [isPopupContentHovered, setIsPopupContentHovered] = React.useState(false);
-    const [isFocused, setIsFocused] = React.useState(false);
-
     const onPopupMouseEnter = React.useCallback(() => {
+        debouncedHandleHidePopup.cancel();
         setIsPopupContentHovered(true);
-    }, []);
+        reportOpen(true);
+    }, [reportOpen, debouncedHandleHidePopup]);
 
     const onPopupMouseLeave = React.useCallback(() => {
         setIsPopupContentHovered(false);
-    }, []);
+        debouncedHandleHidePopup();
+    }, [debouncedHandleHidePopup]);
 
     const onPopupContextMenu = React.useCallback(() => {
         setIsFocused(true);
-    }, []);
+        reportOpen(true);
+    }, [reportOpen]);
 
     const onPopupBlur = React.useCallback(() => {
         setIsFocused(false);
@@ -89,31 +114,43 @@ export const HoverPopup = ({
         setIsFocused(false);
         setIsPopupContentHovered(false);
         hidePopup();
-    }, [hidePopup]);
+        reportOpen(false);
+    }, [hidePopup, reportOpen]);
 
-    const open = isPopupVisible || showPopup || isPopupContentHovered || isFocused;
+    const internalOpen = isPopupVisible || isPopupContentHovered || isFocused;
+    const open = internalOpen || showPopup;
+
+    const anchorElement = anchorRef?.current || anchor.current;
 
     return (
         <React.Fragment>
             <span ref={anchor} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
                 {children}
             </span>
-            {open ? (
+            {anchorElement ? (
                 <Popup
-                    contentClassName={b(null, contentClassName)}
-                    anchorRef={anchorRef || anchor}
-                    onMouseEnter={onPopupMouseEnter}
-                    onMouseLeave={onPopupMouseLeave}
-                    onEscapeKeyDown={onPopupEscapeKeyDown}
-                    onBlur={onPopupBlur}
+                    anchorElement={anchorElement}
+                    onOpenChange={(_open, _event, reason) => {
+                        if (reason === 'escape-key') {
+                            onPopupEscapeKeyDown();
+                        }
+                    }}
                     placement={placement}
                     hasArrow
-                    open
+                    open={open}
                     // bigger offset for easier switching to neighbour nodes
                     // matches the default offset for popup with arrow out of a sense of beauty
-                    offset={offset || [0, 12]}
+                    offset={offset || {mainAxis: 12, crossAxis: 0}}
                 >
-                    <div onContextMenu={onPopupContextMenu}>{renderPopupContent()}</div>
+                    <div
+                        className={contentClassName}
+                        onContextMenu={onPopupContextMenu}
+                        onMouseEnter={onPopupMouseEnter}
+                        onMouseLeave={onPopupMouseLeave}
+                        onBlur={onPopupBlur}
+                    >
+                        <div className={YDB_POPOVER_CLASS_NAME}>{renderPopupContent()}</div>
+                    </div>
                 </Popup>
             ) : null}
         </React.Fragment>

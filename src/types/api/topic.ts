@@ -1,5 +1,3 @@
-/* eslint-disable camelcase */
-
 import type {IProtobufTimeObject} from './common';
 import type {
     Consumer,
@@ -285,6 +283,7 @@ export interface TopicMessage {
 
 export interface TopicMessageEnhanced extends TopicMessage {
     removed?: boolean;
+    notLoaded?: boolean;
 }
 
 export interface TopicMessageMetadataItem {

@@ -1,9 +1,9 @@
 import React from 'react';
 
-import {TableWithControlsLayout} from '../TableWithControlsLayout/TableWithControlsLayout';
-
-import {TableChunk} from './TableChunk';
+import {usePaginatedTableState} from './PaginatedTableContext';
+import {TableChunksRenderer} from './TableChunksRenderer';
 import {TableHead} from './TableHead';
+import type {PaginatedTableId} from './constants';
 import {DEFAULT_TABLE_ROW_HEIGHT} from './constants';
 import {b} from './shared';
 import type {
@@ -12,12 +12,9 @@ import type {
     GetRowClassName,
     HandleTableColumnsResize,
     PaginatedTableData,
-    RenderControls,
     RenderEmptyDataMessage,
     RenderErrorMessage,
-    SortParams,
 } from './types';
-import {useScrollBasedChunks} from './useScrollBasedChunks';
 
 import './PaginatedTable.scss';
 
@@ -26,14 +23,12 @@ export interface PaginatedTableProps<T, F> {
     initialEntitiesCount?: number;
     fetchData: FetchData<T, F>;
     filters?: F;
-    tableName: string;
+    tableName: PaginatedTableId;
     columns: Column<T>[];
     getRowClassName?: GetRowClassName<T>;
     rowHeight?: number;
-    parentRef: React.RefObject<HTMLElement>;
-    initialSortParams?: SortParams;
+    scrollContainerRef: React.RefObject<HTMLElement>;
     onColumnsResize?: HandleTableColumnsResize;
-    renderControls?: RenderControls;
     renderEmptyDataMessage?: RenderEmptyDataMessage;
     renderErrorMessage?: RenderErrorMessage;
     containerClassName?: string;
@@ -52,33 +47,21 @@ export const PaginatedTable = <T, F>({
     columns,
     getRowClassName,
     rowHeight = DEFAULT_TABLE_ROW_HEIGHT,
-    parentRef,
-    initialSortParams,
+    scrollContainerRef,
     onColumnsResize,
-    renderControls,
     renderErrorMessage,
     renderEmptyDataMessage,
     containerClassName,
     onDataFetched,
     keepCache = true,
 }: PaginatedTableProps<T, F>) => {
-    const initialTotal = initialEntitiesCount || 0;
-    const initialFound = initialEntitiesCount || 1;
+    // Get state and setters from context
+    const {tableState, setSortParams, setTotalEntities, setFoundEntities, setIsInitialLoad} =
+        usePaginatedTableState();
 
-    const [sortParams, setSortParams] = React.useState<SortParams | undefined>(initialSortParams);
-    const [totalEntities, setTotalEntities] = React.useState(initialTotal);
-    const [foundEntities, setFoundEntities] = React.useState(initialFound);
-    const [isInitialLoad, setIsInitialLoad] = React.useState(true);
+    const {sortParams, foundEntities} = tableState;
 
     const tableRef = React.useRef<HTMLDivElement>(null);
-
-    const activeChunks = useScrollBasedChunks({
-        parentRef,
-        tableRef,
-        totalItems: foundEntities,
-        rowHeight,
-        chunkSize,
-    });
 
     // this prevent situation when filters are new, but active chunks is not yet recalculated (it will be done to the next rendrer, so we bring filters change on the next render too)
     const [filters, setFilters] = React.useState(rawFilters);
@@ -86,15 +69,6 @@ export const PaginatedTable = <T, F>({
     React.useEffect(() => {
         setFilters(rawFilters);
     }, [rawFilters]);
-
-    const lastChunkSize = React.useMemo(() => {
-        // If foundEntities = 0, there will only first chunk
-        // Display it with 1 row, to display empty data message
-        if (!foundEntities) {
-            return 1;
-        }
-        return foundEntities % chunkSize || chunkSize;
-    }, [foundEntities, chunkSize]);
 
     const handleDataFetched = React.useCallback(
         (data?: PaginatedTableData<T>) => {
@@ -105,67 +79,58 @@ export const PaginatedTable = <T, F>({
                 onDataFetched?.(data);
             }
         },
-        [onDataFetched],
+        [onDataFetched, setFoundEntities, setIsInitialLoad, setTotalEntities],
     );
 
-    // reset table on filters change
+    // Set will-change: transform on scroll container if not already set
     React.useLayoutEffect(() => {
-        setTotalEntities(initialTotal);
-        setFoundEntities(initialFound);
-        setIsInitialLoad(true);
-        if (parentRef?.current) {
-            parentRef.current.scrollTo(0, 0);
+        const scrollContainer = scrollContainerRef.current;
+        if (scrollContainer) {
+            const computedStyle = window.getComputedStyle(scrollContainer);
+            if (computedStyle.willChange !== 'transform') {
+                scrollContainer.style.willChange = 'transform';
+            }
         }
-    }, [rawFilters, initialFound, initialTotal, parentRef]);
+    }, [scrollContainerRef.current]);
 
-    const renderChunks = () => {
-        return activeChunks.map((isActive, index) => (
-            <TableChunk<T, F>
-                key={index}
-                id={index}
-                calculatedCount={index === activeChunks.length - 1 ? lastChunkSize : chunkSize}
-                chunkSize={chunkSize}
-                rowHeight={rowHeight}
-                columns={columns}
-                fetchData={fetchData}
-                filters={filters}
-                tableName={tableName}
-                sortParams={sortParams}
-                getRowClassName={getRowClassName}
-                renderErrorMessage={renderErrorMessage}
-                renderEmptyDataMessage={renderEmptyDataMessage}
-                onDataFetched={handleDataFetched}
-                isActive={isActive}
-                keepCache={keepCache}
-            />
-        ));
-    };
+    // Reset table on initialization and filters change
+    React.useLayoutEffect(() => {
+        const defaultTotal = initialEntitiesCount || 0;
+        const defaultFound = initialEntitiesCount || 1;
+
+        setTotalEntities(defaultTotal);
+        setFoundEntities(defaultFound);
+        setIsInitialLoad(true);
+    }, [initialEntitiesCount, setTotalEntities, setFoundEntities, setIsInitialLoad]);
 
     const renderTable = () => (
         <table className={b('table')}>
             <TableHead columns={columns} onSort={setSortParams} onColumnsResize={onColumnsResize} />
-            {renderChunks()}
+            <tbody>
+                <TableChunksRenderer
+                    scrollContainerRef={scrollContainerRef}
+                    tableRef={tableRef}
+                    foundEntities={foundEntities}
+                    chunkSize={chunkSize}
+                    rowHeight={rowHeight}
+                    columns={columns}
+                    fetchData={fetchData}
+                    filters={filters}
+                    tableName={tableName}
+                    sortParams={sortParams}
+                    getRowClassName={getRowClassName}
+                    renderErrorMessage={renderErrorMessage}
+                    renderEmptyDataMessage={renderEmptyDataMessage}
+                    onDataFetched={handleDataFetched}
+                    keepCache={keepCache}
+                />
+            </tbody>
         </table>
     );
 
-    const renderContent = () => {
-        if (renderControls) {
-            return (
-                <TableWithControlsLayout>
-                    <TableWithControlsLayout.Controls>
-                        {renderControls({inited: !isInitialLoad, totalEntities, foundEntities})}
-                    </TableWithControlsLayout.Controls>
-                    <TableWithControlsLayout.Table>{renderTable()}</TableWithControlsLayout.Table>
-                </TableWithControlsLayout>
-            );
-        }
-
-        return renderTable();
-    };
-
     return (
         <div ref={tableRef} className={b(null, containerClassName)}>
-            {renderContent()}
+            {renderTable()}
         </div>
     );
 };

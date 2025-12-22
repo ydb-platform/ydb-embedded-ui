@@ -1,4 +1,5 @@
 import {Text} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 import omit from 'lodash/omit';
 
 import {toFormattedSize} from '../../../../../components/FormattedBytes/utils';
@@ -16,9 +17,9 @@ import type {
     TEvDescribeSchemeResult,
     TPartitionConfig,
     TTTLSettings,
+    TTablePartition,
 } from '../../../../../types/api/schema';
 import {EPathType} from '../../../../../types/api/schema';
-import {valueIsDefined} from '../../../../../utils';
 import {formatBytes, formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {formatDurationToShortTimeFormat} from '../../../../../utils/timeParsers';
 import {isNumeric} from '../../../../../utils/utils';
@@ -33,12 +34,12 @@ const isInStoreColumnTable = (table: TColumnTableDescription) => {
 const prepareTTL = (ttl: TTTLSettings | TColumnDataLifeCycle) => {
     // ExpireAfterSeconds could be 0
     if (ttl.Enabled && ttl.Enabled.ColumnName && ttl.Enabled.ExpireAfterSeconds !== undefined) {
-        const value = i18n('value.ttl', {
+        const value = i18n('value_ttl-config', {
             columnName: ttl.Enabled.ColumnName,
             expireTime: formatDurationToShortTimeFormat(ttl.Enabled.ExpireAfterSeconds * 1000, 1),
         });
 
-        return {label: i18n('label.ttl'), value};
+        return {label: i18n('field_ttl-for-rows'), value};
     }
     return undefined;
 };
@@ -47,7 +48,7 @@ function prepareColumnTableGeneralInfo(columnTable: TColumnTableDescription) {
     const columnTableGeneralInfo: InfoViewerItem[] = [];
 
     columnTableGeneralInfo.push({
-        label: i18n('label.standalone'),
+        label: i18n('field_standalone'),
         value: String(!isInStoreColumnTable(columnTable)),
     });
 
@@ -56,7 +57,7 @@ function prepareColumnTableGeneralInfo(columnTable: TColumnTableDescription) {
         const content = `PARTITION BY HASH(${columns})`;
 
         columnTableGeneralInfo.push({
-            label: i18n('label.partitioning'),
+            label: i18n('field_partitioning'),
             value: (
                 <Text variant="code-2" wordBreak="break-word">
                     {content}
@@ -82,27 +83,27 @@ const prepareTableGeneralInfo = (PartitionConfig: TPartitionConfig, TTLSettings?
 
     const partitioningBySize =
         PartitioningPolicy.SizeToSplit && Number(PartitioningPolicy.SizeToSplit) > 0
-            ? i18n('value.partitioning-by-size.enabled', {
+            ? i18n('value_partitioning-by-size-enabled', {
                   size: formatBytes(PartitioningPolicy.SizeToSplit),
               })
-            : i18n('disabled');
+            : i18n('value_disabled');
 
     const partitioningByLoad = PartitioningPolicy.SplitByLoadSettings?.Enabled
-        ? i18n('enabled')
-        : i18n('disabled');
+        ? i18n('value_enabled')
+        : i18n('value_disabled');
 
     generalTableInfo.push(
-        {label: i18n('label.partitioning-by-size'), value: partitioningBySize},
-        {label: i18n('label.partitioning-by-load'), value: partitioningByLoad},
+        {label: i18n('field_partitioning-by-size'), value: partitioningBySize},
+        {label: i18n('field_partitioning-by-load'), value: partitioningByLoad},
         {
-            label: i18n('label.partitions-min'),
+            label: i18n('field_min-partitions-count'),
             value: formatNumber(PartitioningPolicy.MinPartitionsCount || 0),
         },
     );
 
     if (PartitioningPolicy.MaxPartitionsCount) {
         generalTableInfo.push({
-            label: i18n('label.partitions-max'),
+            label: i18n('field_max-partitions-count'),
             value: formatNumber(PartitioningPolicy.MaxPartitionsCount),
         });
     }
@@ -119,7 +120,7 @@ const prepareTableGeneralInfo = (PartitionConfig: TPartitionConfig, TTLSettings?
             readReplicasConfig = `ANY_AZ: ${FollowerCount}`;
         }
 
-        generalTableInfo.push({label: i18n('label.read-replicas'), value: readReplicasConfig});
+        generalTableInfo.push({label: i18n('field_read-replicas'), value: readReplicasConfig});
     }
 
     if (TTLSettings) {
@@ -129,14 +130,39 @@ const prepareTableGeneralInfo = (PartitionConfig: TPartitionConfig, TTLSettings?
         }
     }
 
-    if (valueIsDefined(EnableFilterByKey)) {
+    if (!isNil(EnableFilterByKey)) {
         generalTableInfo.push({
-            label: i18n('label.bloom-filter'),
-            value: EnableFilterByKey ? i18n('enabled') : i18n('disabled'),
+            label: i18n('field_bloom-filter'),
+            value: EnableFilterByKey ? i18n('value_enabled') : i18n('value_disabled'),
         });
     }
 
     return generalTableInfo;
+};
+
+type PartitionProgressConfig = {
+    minPartitions: number;
+    maxPartitions?: number;
+    partitionsCount: number;
+};
+
+const preparePartitionProgressConfig = (
+    PartitionConfig: TPartitionConfig,
+    TablePartitions?: TTablePartition[],
+): PartitionProgressConfig => {
+    const {PartitioningPolicy} = PartitionConfig;
+
+    // We are convinced, there is always at least one partition;
+    // fallback and clamp to 1 if value is missing.
+    const minPartitions = Math.max(1, PartitioningPolicy?.MinPartitionsCount ?? 1);
+    const maxPartitions = PartitioningPolicy?.MaxPartitionsCount;
+    const partitionsCount = TablePartitions?.length ?? 1;
+
+    return {
+        minPartitions,
+        maxPartitions,
+        partitionsCount,
+    };
 };
 
 /** Prepares data for Table, ColumnTable and ColumnStore */
@@ -148,6 +174,7 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
     const {PathDescription = {}} = data;
 
     const {
+        TablePartitions,
         TableStats = {},
         TabletMetrics = {},
         Table: {PartitionConfig = {}, TTLSettings} = {},
@@ -181,10 +208,15 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
     const {FollowerGroups, FollowerCount, CrossDataCenterFollowerCount} = PartitionConfig;
 
     let generalInfo: InfoViewerItem[] = [];
+    let partitionProgressConfig: PartitionProgressConfig | undefined;
 
     switch (type) {
         case EPathType.EPathTypeTable: {
             generalInfo = prepareTableGeneralInfo(PartitionConfig, TTLSettings);
+            partitionProgressConfig = preparePartitionProgressConfig(
+                PartitionConfig,
+                TablePartitions,
+            );
             break;
         }
         case EPathType.EPathTypeColumnTable: {
@@ -252,5 +284,11 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
         );
     }
 
-    return {generalInfo, tableStatsInfo, tabletMetricsInfo, partitionConfigInfo};
+    return {
+        generalInfo,
+        tableStatsInfo,
+        tabletMetricsInfo,
+        partitionConfigInfo,
+        partitionProgressConfig,
+    };
 };

@@ -1,4 +1,6 @@
-import type {Actions} from '../../../types/api/query';
+import {v4 as uuidv4} from 'uuid';
+
+import type {Actions, ErrorResponse} from '../../../types/api/query';
 import type {QueryAction, QueryMode, QuerySyntax} from '../../../types/store/query';
 import type {
     QueryResponseChunk,
@@ -30,9 +32,17 @@ export function getQueryInHistory(rawQuery: string | QueryInHistory) {
     if (typeof rawQuery === 'string') {
         return {
             queryText: rawQuery,
+            queryId: uuidv4(),
         };
     }
-    return rawQuery;
+
+    if (rawQuery.queryId) {
+        return rawQuery;
+    }
+    return {
+        ...rawQuery,
+        queryId: uuidv4(),
+    };
 }
 
 export function isSessionChunk(content: StreamingChunk): content is SessionChunk {
@@ -50,3 +60,21 @@ export function isQueryResponseChunk(content: StreamingChunk): content is QueryR
 export function isKeepAliveChunk(content: StreamingChunk): content is SessionChunk {
     return content?.meta?.event === 'KeepAlive';
 }
+
+export function isErrorChunk(content: unknown): content is ErrorResponse {
+    return Boolean(
+        content && typeof content === 'object' && ('error' in content || 'issues' in content),
+    );
+}
+
+export const prepareQueryWithPragmas = (query: string, pragmas?: string): string => {
+    if (!pragmas || !pragmas.trim()) {
+        return query;
+    }
+
+    // Add pragmas at the beginning with proper line separation
+    const trimmedPragmas = pragmas.trim();
+    const separator = trimmedPragmas.endsWith(';') ? '\n\n' : ';\n\n';
+
+    return `${trimmedPragmas}${separator}${query}`;
+};

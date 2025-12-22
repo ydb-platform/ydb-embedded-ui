@@ -12,7 +12,7 @@ export const UserSettings = ({settings: userSettings}: UserSettingsProps) => {
     return (
         <Settings>
             {userSettings.map((page) => {
-                const {id, title, icon, sections = [], showTitle} = page;
+                const {id, title, icon, sections = [], hideTitle} = page;
 
                 return (
                     <Settings.Page key={id} id={id} title={title} icon={icon}>
@@ -23,7 +23,7 @@ export const UserSettings = ({settings: userSettings}: UserSettingsProps) => {
                                 <Settings.Section
                                     key={id}
                                     title={sectionTitle}
-                                    showTitle={showTitle ?? true}
+                                    hideTitle={hideTitle}
                                 >
                                     {sectionSettings.map((setting) => {
                                         if (setting.type === 'info') {

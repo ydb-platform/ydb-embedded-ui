@@ -1,107 +1,129 @@
 import React from 'react';
 
-import {Flex} from '@gravity-ui/uikit';
+import {Flex, Label} from '@gravity-ui/uikit';
+import {isNil} from 'lodash';
 
-import {getPDiskPagePath} from '../../routes';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
-import {valueIsDefined} from '../../utils';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {createPDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
+import {getStateSeverity} from '../../utils/disks/calculatePDiskSeverity';
+import {NUMERIC_SEVERITY_TO_LABEL_VIEW} from '../../utils/disks/constants';
 import type {PreparedPDisk} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
+import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToGB, isNumeric} from '../../utils/utils';
-import {InfoViewer} from '../InfoViewer';
-import type {InfoViewerItem} from '../InfoViewer';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {pDiskInfoKeyset} from '../PDiskInfo/i18n';
+import {PDiskPageLink} from '../PDiskPageLink/PDiskPageLink';
+import {StatusIcon} from '../StatusIcon/StatusIcon';
+import type {
+    YDBDefinitionListHeaderLabel,
+    YDBDefinitionListItem,
+} from '../YDBDefinitionList/YDBDefinitionList';
+import {YDBDefinitionList} from '../YDBDefinitionList/YDBDefinitionList';
+
+import {pDiskPopupKeyset} from './i18n';
 
 const errorColors = [EFlag.Orange, EFlag.Red, EFlag.Yellow];
 
-export const preparePDiskData = (
-    data: PreparedPDisk,
-    nodeData?: {Host?: string; DC?: string},
-    withDeveloperUILink?: boolean,
-) => {
-    const {
-        AvailableSize,
-        TotalSize,
-        State,
-        PDiskId,
-        NodeId,
-        StringifiedId,
-        Path,
-        Realtime,
-        Type,
-        Device,
-    } = data;
+export const preparePDiskData = (data: PreparedPDisk, nodeData?: {Host?: string; DC?: string}) => {
+    const {AvailableSize, TotalSize, NodeId, Path, Realtime, Type, Device} = data;
 
-    const pdiskData: InfoViewerItem[] = [
-        {
-            label: 'PDisk',
-            value: StringifiedId ?? EMPTY_DATA_PLACEHOLDER,
-        },
-        {label: 'State', value: State || 'not available'},
-        {label: 'Type', value: Type || 'unknown'},
+    const pdiskData: YDBDefinitionListItem[] = [
+        {name: pDiskPopupKeyset('label_type'), content: Type || pDiskPopupKeyset('value_unknown')},
     ];
 
     if (NodeId) {
-        pdiskData.push({label: 'Node Id', value: NodeId});
+        pdiskData.push({name: pDiskPopupKeyset('label_node-id'), content: NodeId});
     }
 
     if (nodeData?.Host) {
-        pdiskData.push({label: 'Host', value: nodeData.Host});
+        pdiskData.push({name: pDiskPopupKeyset('label_host'), content: nodeData.Host});
     }
+
     if (nodeData?.DC) {
-        pdiskData.push({label: 'DC', value: nodeData.DC});
+        pdiskData.push({name: pDiskPopupKeyset('label_dc'), content: <Label>{nodeData.DC}</Label>});
     }
 
     if (Path) {
-        pdiskData.push({label: 'Path', value: Path});
+        pdiskData.push({name: pDiskPopupKeyset('label_path'), content: Path});
     }
 
-    if (isNumeric(TotalSize)) {
+    if (isNumeric(TotalSize) && isNumeric(AvailableSize)) {
         pdiskData.push({
-            label: 'Available',
-            value: `${bytesToGB(AvailableSize)} of ${bytesToGB(TotalSize)}`,
+            name: pDiskPopupKeyset('label_available'),
+            content: `${bytesToGB(AvailableSize)} ${pDiskPopupKeyset('value_of')} ${bytesToGB(TotalSize)}`,
         });
     }
 
     if (Realtime && errorColors.includes(Realtime)) {
-        pdiskData.push({label: 'Realtime', value: Realtime});
+        pdiskData.push({
+            name: pDiskPopupKeyset('label_realtime'),
+            content: <StatusIcon mode="icons" status={Realtime} />,
+        });
     }
 
     if (Device && errorColors.includes(Device)) {
-        pdiskData.push({label: 'Device', value: Device});
-    }
-
-    if (withDeveloperUILink && valueIsDefined(NodeId) && valueIsDefined(PDiskId)) {
-        const pDiskInternalViewerPath = createPDiskDeveloperUILink({
-            nodeId: NodeId,
-            pDiskId: PDiskId,
-        });
-
-        const pDiskPagePath = getPDiskPagePath(PDiskId, NodeId);
         pdiskData.push({
-            label: 'Links',
-            value: (
-                <Flex gap={2} wrap="wrap">
-                    <LinkWithIcon
-                        title={pDiskInfoKeyset('pdisk-page')}
-                        url={pDiskPagePath}
-                        external={false}
-                    />
-                    <LinkWithIcon
-                        title={pDiskInfoKeyset('developer-ui')}
-                        url={pDiskInternalViewerPath}
-                    />
-                </Flex>
-            ),
+            name: pDiskPopupKeyset('label_device'),
+            content: <StatusIcon mode="icons" status={Device} />,
         });
     }
 
     return pdiskData;
+};
+
+export const preparePDiskHeaderLabels = (data: PreparedPDisk): YDBDefinitionListHeaderLabel[] => {
+    const labels: YDBDefinitionListHeaderLabel[] = [];
+    const {State} = data;
+
+    if (!State) {
+        labels.push({
+            id: 'state',
+            value: pDiskPopupKeyset('context_not-available'),
+        });
+
+        return labels;
+    }
+
+    if (State) {
+        const severity = getStateSeverity(State);
+        const {theme, icon} = NUMERIC_SEVERITY_TO_LABEL_VIEW[severity];
+
+        labels.push({
+            id: 'state',
+            value: State,
+            theme: theme,
+            icon: icon,
+        });
+    }
+
+    return labels;
+};
+
+export const buildPDiskFooter = (
+    data: PreparedPDisk,
+    withDeveloperUILink?: boolean,
+): React.ReactNode | null => {
+    const {NodeId, PDiskId} = data;
+
+    if (!withDeveloperUILink || isNil(NodeId) || isNil(PDiskId)) {
+        return null;
+    }
+
+    const pDiskInternalViewerPath = createPDiskDeveloperUILink({
+        nodeId: NodeId,
+        pDiskId: PDiskId,
+    });
+
+    return (
+        <Flex gap={2} wrap="wrap">
+            <PDiskPageLink pDiskId={PDiskId} nodeId={NodeId} />
+            <LinkWithIcon title={pDiskInfoKeyset('developer-ui')} url={pDiskInternalViewerPath} />
+        </Flex>
+    );
 };
 
 interface PDiskPopupProps {
@@ -109,13 +131,34 @@ interface PDiskPopupProps {
 }
 
 export const PDiskPopup = ({data}: PDiskPopupProps) => {
+    const database = useDatabaseFromQuery();
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
-    const nodesMap = useTypedSelector(selectNodesMap);
-    const nodeData = valueIsDefined(data.NodeId) ? nodesMap?.get(data.NodeId) : undefined;
-    const info = React.useMemo(
-        () => preparePDiskData(data, nodeData, isUserAllowedToMakeChanges),
-        [data, nodeData, isUserAllowedToMakeChanges],
+    const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));
+    const nodeData = isNil(data.NodeId) ? undefined : nodesMap?.get(data.NodeId);
+
+    const info = React.useMemo(() => preparePDiskData(data, nodeData), [data, nodeData]);
+
+    const headerLabels = React.useMemo<YDBDefinitionListHeaderLabel[]>(
+        () => preparePDiskHeaderLabels(data),
+        [data],
     );
 
-    return <InfoViewer title="PDisk" info={info} size="s" />;
+    const footer = React.useMemo(
+        () => buildPDiskFooter(data, isUserAllowedToMakeChanges),
+        [data, isUserAllowedToMakeChanges],
+    );
+
+    const pdiskId = data.StringifiedId;
+
+    return (
+        <YDBDefinitionList
+            compact
+            title="PDisk"
+            titleSuffix={pdiskId ?? EMPTY_DATA_PLACEHOLDER}
+            items={info}
+            headerLabels={headerLabels}
+            footer={footer}
+            nameMaxWidth={100}
+        />
+    );
 };

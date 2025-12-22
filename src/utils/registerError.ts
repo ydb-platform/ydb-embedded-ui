@@ -12,7 +12,6 @@ export function registerError(error: Error, message?: string, type = 'error') {
             error,
         );
     } else {
-        // eslint-disable-next-line no-console
         console.error(error);
     }
 }

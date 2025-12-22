@@ -1,31 +1,53 @@
 import React from 'react';
 
-import type {
-    ColumnWidthByName,
-    GetSavedColumnWidthByName,
-    HandleResize,
-    SaveColumnWidthByName,
-} from '@gravity-ui/react-data-table';
-import {useTableResize as libUseTableResize} from '@gravity-ui/react-data-table';
+import type {ColumnWidthByName, HandleResize} from '@gravity-ui/react-data-table';
+import {debounce} from 'lodash';
 
-import {settingsManager} from '../../services/settings';
+import {useSetting} from '../../store/reducers/settings/useSetting';
 
-export const useTableResize = (localStorageKey?: string): [ColumnWidthByName, HandleResize] => {
-    const getSizes: GetSavedColumnWidthByName = React.useCallback(() => {
-        if (!localStorageKey) {
-            return {};
-        }
-        return settingsManager.readUserSettingsValue(localStorageKey, {}) as ColumnWidthByName;
-    }, [localStorageKey]);
+export const useTableResize = (
+    localStorageKey?: string,
+): [ColumnWidthByName, HandleResize, boolean] => {
+    const {
+        value: sizes,
+        saveValue: saveSizes,
+        isLoading,
+    } = useSetting<ColumnWidthByName>(localStorageKey);
 
-    const saveSizes: SaveColumnWidthByName = React.useCallback(
-        (value) => {
-            if (localStorageKey) {
-                settingsManager.setUserSettingsValue(localStorageKey, value);
-            }
-        },
-        [localStorageKey],
+    const debouncedSaveSizes = React.useMemo(
+        () =>
+            debounce((newSizes: ColumnWidthByName) => {
+                saveSizes(newSizes);
+            }, 300),
+        [saveSizes],
     );
 
-    return libUseTableResize({saveSizes, getSizes});
+    // Call debounced func on component unmount
+    React.useEffect(() => {
+        return () => debouncedSaveSizes.flush();
+    }, [debouncedSaveSizes]);
+
+    const [actualSizes, setActualSizes] = React.useState(() => {
+        return sizes ?? ({} as ColumnWidthByName);
+    });
+
+    React.useEffect(() => {
+        setActualSizes(sizes ?? {});
+    }, [sizes]);
+
+    const handleSetupChange: HandleResize = React.useCallback(
+        (columnId, columnWidth) => {
+            setActualSizes((previousSetup) => {
+                const setup = {
+                    ...previousSetup,
+                    [columnId]: columnWidth,
+                };
+                debouncedSaveSizes(setup);
+                return setup;
+            });
+        },
+        [debouncedSaveSizes],
+    );
+
+    return [actualSizes, handleSetupChange, isLoading];
 };

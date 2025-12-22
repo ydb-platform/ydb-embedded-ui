@@ -1,5 +1,6 @@
 {
   "slot-id": "VDisk Slot Id",
+  "label_pdisk-id": "PDisk Id",
   "pool-name": "Storage Pool Name",
   "kind": "Kind",
 
@@ -8,6 +9,9 @@
   "instance-guid": "Instance GUID",
 
   "replication-status": "Replicated",
+  "replication-progress": "Replication Progress",
+  "replication-time-remaining": "Time Remaining",
+  "donors": "Donors",
   "state-status": "VDisk State",
   "space-status": "Disk Space",
 
@@ -18,6 +22,7 @@
   "has-unreadable-blobs": "Has Unreadable Blobs",
 
   "size": "Size",
+  "usage": "Usage",
 
   "read-throughput": "Read Throughput",
   "write-throughput": "Write Throughput",

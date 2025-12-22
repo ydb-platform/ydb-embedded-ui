@@ -48,28 +48,40 @@ export const getTabletLabel = (type?: string) => {
     return isTabletType(type) ? TABLET_SYMBOLS[type] : defaultValue;
 };
 
-export const TENANT_OVERVIEW_TABLES_LIMIT = 5;
+// Page IDs Dictionary
+export const PAGE_IDS = {
+    GENERAL: 'generalPage',
+    EDITOR: 'editorPage',
+    EXPERIMENTS: 'experimentsPage',
+    ABOUT: 'aboutPage',
+} as const;
+
+// Section IDs Dictionary
+export const SECTION_IDS = {
+    EXPERIMENTS: 'experimentsSection',
+    GENERAL: 'generalSection',
+    APPEARANCE: 'appearanceSection',
+    DEV_SETTINGS: 'devSettingsSection',
+    ABOUT: 'aboutSettingsSection',
+} as const;
+
+export const TENANT_OVERVIEW_TABLES_LIMIT = 3;
 
 export const EMPTY_DATA_PLACEHOLDER = '—';
+export const UNBREAKABLE_GAP = '\u00A0';
 
 export const QUERY_TECHNICAL_MARK = '/*UI-QUERY-EXCLUDE*/';
 
 // ==== Titles ====
 export const DEVELOPER_UI_TITLE = 'Developer UI';
+export const MONITORING_UI_TITLE = 'Monium';
 export const CLUSTER_DEFAULT_TITLE = 'Cluster';
 export const TENANT_DEFAULT_TITLE = 'Database';
 
 // ==== Settings ====
-export const THEME_KEY = 'theme';
-export const LANGUAGE_KEY = 'language';
-export const INVERTED_DISKS_KEY = 'invertedDisks';
-export const SAVED_QUERIES_KEY = 'saved_queries';
-export const ASIDE_HEADER_COMPACT_KEY = 'asideHeaderCompact';
-export const QUERIES_HISTORY_KEY = 'queries_history';
-export const BINARY_DATA_IN_PLAIN_TEXT_DISPLAY = 'binaryDataInPlainTextDisplay';
-export const AUTO_REFRESH_INTERVAL = 'auto-refresh-interval';
 
-export const CASE_SENSITIVE_JSON_SEARCH = 'caseSensitiveJsonSearch';
+export const QUERY_EDITOR_CURRENT_QUERY_KEY = 'query_editor_current_query';
+export const QUERY_EDITOR_DIRTY_KEY = 'query_editor_dirty';
 
 export const DEFAULT_SIZE_RESULT_PANE_KEY = 'default-size-result-pane';
 export const DEFAULT_SIZE_TENANT_SUMMARY_KEY = 'default-size-tenant-summary-pane';
@@ -98,39 +110,19 @@ export const TENANT_OVERVIEW_TABLES_SETTINGS: Settings = {
     sortable: false,
 } as const;
 
-export const QUERY_EXECUTION_SETTINGS_KEY = 'queryExecutionSettings';
-export const LAST_QUERY_EXECUTION_SETTINGS_KEY = 'last_query_execution_settings';
-export const QUERY_SETTINGS_BANNER_LAST_CLOSED_KEY = 'querySettingsBannerLastClosed';
-export const QUERY_STOPPED_BANNER_CLOSED_KEY = 'queryStoppedBannerClosed';
-
-export const LAST_USED_QUERY_ACTION_KEY = 'last_used_query_action';
-
-export const PARTITIONS_HIDDEN_COLUMNS_KEY = 'partitionsHiddenColumns';
-
-// Remain "tab" in key name for backward compatibility
-export const TENANT_INITIAL_PAGE_KEY = 'saved_tenant_initial_tab';
-
-export const ENABLE_NETWORK_TABLE_KEY = 'enableNetworkTable';
-
-export const USE_SHOW_PLAN_SVG_KEY = 'useShowPlanToSvg';
-
-// Setting to hide domain in database list
-export const SHOW_DOMAIN_DATABASE_KEY = 'showDomainDatabase';
-
-export const USE_CLUSTER_BALANCER_AS_BACKEND_KEY = 'useClusterBalancerAsBacked';
-
-export const ENABLE_AUTOCOMPLETE = 'enableAutocomplete';
-
-export const ENABLE_CODE_ASSISTANT = 'enableCodeAssistant';
-
-export const ENABLE_QUERY_STREAMING = 'enableQueryStreaming';
-
-export const AUTOCOMPLETE_ON_ENTER = 'autocompleteOnEnter';
-
-export const IS_HOTKEYS_HELP_HIDDEN_KEY = 'isHotKeysHelpHidden';
+export const OLD_BACKEND_CLUSTER_NAMES = [
+    'cloud_prod_kikimr_global',
+    'cloud_preprod_kikimr_global',
+    'cloud_prod_kikimr_ydb_public_storage',
+];
 
 export const DEV_ENABLE_TRACING_FOR_ALL_REQUESTS = 'enable_tracing_for_all_requests';
 
-export const SHOW_NETWORK_UTILIZATION = 'enableNetworkUtilization';
+export enum AclSyntax {
+    Kikimr = 'kikimr',
+    YdbShort = 'ydb-short',
+    Ydb = 'ydb',
+    Yql = 'yql',
+}
 
-export const EXPAND_CLUSTER_DASHBOARD = 'expandClusterDashboard';
+export const YDB_POPOVER_CLASS_NAME = 'ydb-popover';

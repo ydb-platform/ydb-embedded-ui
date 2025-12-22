@@ -81,7 +81,9 @@ export class QueryEditor {
         this.executionStatus = this.selector.locator('.kv-query-execution-status .g-text');
         this.resultsControls = this.selector.locator('.ydb-query-result__controls');
         this.elapsedTimeLabel = this.selector.locator('.kv-query-execution-status .g-label__value');
-        this.radioButton = this.selector.locator('.query-editor__pane-wrapper .g-radio-button');
+        this.radioButton = this.selector.locator(
+            '.query-editor__pane-wrapper .g-segmented-radio-group',
+        );
         this.banner = this.page.locator('.ydb-query-settings-banner');
 
         this.settingsDialog = new SettingsDialog(page);
@@ -348,5 +350,30 @@ export class QueryEditor {
         }
 
         throw new Error(`Status did not change to ${expectedStatus} within ${timeout}ms`);
+    }
+
+    async getStatsTabContent() {
+        // First navigate to Stats tab
+        await this.paneWrapper.selectTab(ResultTabNames.Stats);
+
+        // Get the stats content area
+        const statsContent = this.selector.locator('.ydb-query-result__result');
+        await statsContent.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+
+        return statsContent.innerText();
+    }
+
+    async hasStatsJsonViewer() {
+        // First navigate to Stats tab
+        await this.paneWrapper.selectTab(ResultTabNames.Stats);
+
+        // Check for JSON viewer element
+        const jsonViewer = this.selector.locator('.ydb-json-viewer');
+        try {
+            await jsonViewer.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+            return true;
+        } catch {
+            return false;
+        }
     }
 }

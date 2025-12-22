@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-imports */
 import ReactDOM from 'react-dom/client';
 
 import {ErrorBoundary} from './lib';

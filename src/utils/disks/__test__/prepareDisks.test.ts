@@ -90,7 +90,7 @@ describe('prepareWhiteboardVDiskData', () => {
 
             AvailableSize: 188523479040,
             AllocatedSize: 8996782080,
-            TotalSize: 197520261120,
+            SizeLimit: 197520261120,
             AllocatedPercent: 4,
         };
 
@@ -180,29 +180,92 @@ describe('prepareWhiteboardPDiskData', () => {
 });
 
 describe('prepareVDiskSizeFields', () => {
-    test('Should prepare VDisk size fields', () => {
+    test('Should prepare VDisk size fields with allocated + available as size limit', () => {
         expect(
             prepareVDiskSizeFields({
                 AvailableSize: '400',
                 AllocatedSize: '100',
+                SlotSize: '500',
             }),
         ).toEqual({
             AvailableSize: 400,
             AllocatedSize: 100,
-            TotalSize: 500,
-            AllocatedPercent: 20,
+            SizeLimit: 500, // allocated (100) + available (400) = 500
+            AllocatedPercent: 20, // 100 / 500 * 100 = 20%
         });
     });
-    test('Returns NaN if on undefined data', () => {
+
+    test('Should use SlotSize as size limit when AvailableSize is 0', () => {
+        expect(
+            prepareVDiskSizeFields({
+                AvailableSize: '0',
+                AllocatedSize: '500',
+                SlotSize: '500',
+            }),
+        ).toEqual({
+            AvailableSize: 0,
+            AllocatedSize: 500,
+            SizeLimit: 500, // SlotSize is used when available is 0
+            AllocatedPercent: 100, // 500 / 500 * 100 = 100%
+        });
+    });
+
+    test('Should use SlotSize as size limit when AvailableSize is undefined', () => {
+        expect(
+            prepareVDiskSizeFields({
+                AvailableSize: undefined,
+                AllocatedSize: '300',
+                SlotSize: '500',
+            }),
+        ).toEqual({
+            AvailableSize: 0,
+            AllocatedSize: 300,
+            SizeLimit: 500, // SlotSize is used when available is undefined
+            AllocatedPercent: 60, // 300 / 500 * 100 = 60%
+        });
+    });
+
+    test('Should use allocated when SlotSize is undefined and available is 0', () => {
+        expect(
+            prepareVDiskSizeFields({
+                AvailableSize: '0',
+                AllocatedSize: '500',
+                SlotSize: undefined,
+            }),
+        ).toEqual({
+            AvailableSize: 0,
+            AllocatedSize: 500,
+            SizeLimit: 500, // allocated (500)
+            AllocatedPercent: 100, // 500 / 500 * 100 = 100%
+        });
+    });
+
+    test('Should handle case when used size exceeds slot size', () => {
+        expect(
+            prepareVDiskSizeFields({
+                AvailableSize: '0',
+                AllocatedSize: '800',
+                SlotSize: '500',
+            }),
+        ).toEqual({
+            AvailableSize: 0,
+            AllocatedSize: 800,
+            SizeLimit: 500, // SlotSize is used as limit
+            AllocatedPercent: 160, // 800 / 500 * 100 = 160%
+        });
+    });
+
+    test('Should return NaN for undefined data', () => {
         expect(
             prepareVDiskSizeFields({
                 AvailableSize: undefined,
                 AllocatedSize: undefined,
+                SlotSize: undefined,
             }),
         ).toEqual({
-            AvailableSize: NaN,
+            AvailableSize: 0,
             AllocatedSize: NaN,
-            TotalSize: NaN,
+            SizeLimit: NaN,
             AllocatedPercent: NaN,
         });
     });

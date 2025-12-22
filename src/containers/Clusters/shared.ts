@@ -1,3 +1,3 @@
 import {cn} from '../../utils/cn';
 
-export const b = cn('clusters');
+export const b = cn('ydb-clusters');

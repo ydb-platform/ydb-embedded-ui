@@ -28,11 +28,13 @@ export const TENANT_DIAGNOSTICS_TABS_IDS = {
     topicData: 'topicData',
     configs: 'configs',
     operations: 'operations',
+    access: 'access',
+    backups: 'backups',
+    monitoring: 'monitoring',
 } as const;
 
 export const TENANT_SUMMARY_TABS_IDS = {
     overview: 'overview',
-    acl: 'acl',
     schema: 'schema',
 } as const;
 
@@ -40,5 +42,5 @@ export const TENANT_METRICS_TABS_IDS = {
     cpu: 'cpu',
     storage: 'storage',
     memory: 'memory',
-    healthcheck: 'healthcheck',
+    network: 'network',
 } as const;

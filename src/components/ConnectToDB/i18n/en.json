@@ -11,7 +11,7 @@
   "docs_dotnet": "https://ydb.tech/docs/en/dev/example-app/example-dotnet",
   "docs_go": "https://ydb.tech/docs/en/dev/example-app/go",
   "docs_java": "https://ydb.tech/docs/en/dev/example-app/java",
-  "docs_nodejs": "https://ydb.tech/docs/en/dev/example-app/example-nodejs",
+  "docs_nodejs": "https://github.com/ydb-platform/ydb-js-examples",
   "docs_php": "https://ydb.tech/docs/en/dev/example-app/example-php",
   "docs_python": "https://ydb.tech/docs/en/dev/example-app/python"
 }

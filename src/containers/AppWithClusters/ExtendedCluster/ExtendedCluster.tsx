@@ -1,18 +1,14 @@
 import {ClipboardButton} from '@gravity-ui/uikit';
-import {isNil} from 'lodash';
 
 import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
-import type {AdditionalClusterProps, AdditionalTenantsProps} from '../../../types/additionalProps';
-import type {ETenantType} from '../../../types/api/tenant';
+import type {AdditionalClusterProps} from '../../../types/additionalProps';
+import type {GetClusterLinks, GetDatabaseLinks} from '../../../uiFactory/types';
 import {cn} from '../../../utils/cn';
-import {USE_CLUSTER_BALANCER_AS_BACKEND_KEY} from '../../../utils/constants';
-import {useSetting} from '../../../utils/hooks';
-import {useAdditionalNodesProps} from '../../../utils/hooks/useAdditionalNodesProps';
 import type {GetLogsLink} from '../../../utils/logs';
 import type {GetMonitoringClusterLink, GetMonitoringLink} from '../../../utils/monitoring';
-import {getCleanBalancerValue, prepareBackendFromBalancer} from '../../../utils/parseBalancer';
-import {getBackendFromBalancerAndNodeId} from '../../../utils/prepareBackend';
+import {getCleanBalancerValue} from '../../../utils/parseBalancer';
 import type {Cluster} from '../../Cluster/Cluster';
+import {useAdditionalTenantsProps} from '../utils/useAdditionalTenantsProps';
 
 import './ExtendedCluster.scss';
 
@@ -33,26 +29,30 @@ const getAdditionalBalancerInfo = (balancer: string) => {
 };
 
 interface GetAdditionalClusterProps {
-    clusterName: string | undefined;
-    monitoring: string | undefined;
-    balancer: string | undefined;
     getMonitoringClusterLink?: GetMonitoringClusterLink;
+    getClusterLinks?: GetClusterLinks;
 }
 
-const getAdditionalClusterProps = ({
-    clusterName,
-    monitoring,
-    balancer,
+const useAdditionalClusterProps = ({
     getMonitoringClusterLink,
+    getClusterLinks,
 }: GetAdditionalClusterProps) => {
-    const additionalClusterProps: AdditionalClusterProps = {};
+    const clusterInfo = useClusterBaseInfo();
+    const {name: clusterName, balancer, monitoring} = clusterInfo;
 
+    const additionalClusterProps: AdditionalClusterProps = {};
+    additionalClusterProps.links = [];
     if (monitoring && getMonitoringClusterLink) {
         const clusterLink = getMonitoringClusterLink(monitoring, clusterName);
 
         if (clusterLink) {
-            additionalClusterProps.links = [{title: 'Monitoring', url: clusterLink}];
+            additionalClusterProps.links.push({title: 'Monitoring', url: clusterLink});
         }
+    }
+
+    if (getClusterLinks) {
+        const clusterLinks = getClusterLinks({clusterInfo});
+        additionalClusterProps.links.push(...clusterLinks);
     }
 
     if (balancer) {
@@ -62,106 +62,34 @@ const getAdditionalClusterProps = ({
     return additionalClusterProps;
 };
 
-interface GetAdditionalTenantsProps {
-    clusterName: string | undefined;
-    monitoring: string | undefined;
-    balancer: string | undefined;
-    logging: string | undefined;
-    useClusterBalancerAsBackend: boolean | undefined;
-    getMonitoringLink?: GetMonitoringLink;
-    getLogsLink?: GetLogsLink;
-}
-
-const getAdditionalTenantsProps = ({
-    clusterName,
-    monitoring,
-    balancer,
-    logging,
-    useClusterBalancerAsBackend,
-    getMonitoringLink,
-    getLogsLink,
-}: GetAdditionalTenantsProps) => {
-    const additionalTenantsProps: AdditionalTenantsProps = {};
-
-    additionalTenantsProps.prepareTenantBackend = (nodeId) => {
-        // Balancer value is used to create path, so it's necessary
-        if (!balancer) {
-            return undefined;
-        }
-
-        if (useClusterBalancerAsBackend) {
-            return prepareBackendFromBalancer(balancer);
-        }
-
-        if (isNil(nodeId)) {
-            return undefined;
-        }
-
-        return getBackendFromBalancerAndNodeId(nodeId, balancer) ?? undefined;
-    };
-
-    if (monitoring && getMonitoringLink) {
-        additionalTenantsProps.getMonitoringLink = (dbName?: string, dbType?: ETenantType) => {
-            if (dbName && dbType) {
-                return getMonitoringLink({monitoring, dbName, dbType, clusterName});
-            }
-
-            return null;
-        };
-    }
-
-    if (logging && getLogsLink) {
-        additionalTenantsProps.getLogsLink = (dbName?: string) => {
-            if (dbName) {
-                return getLogsLink({
-                    dbName,
-                    logging,
-                });
-            }
-
-            return null;
-        };
-    }
-
-    return additionalTenantsProps;
-};
-
 interface ExtendedClusterProps {
     component: typeof Cluster;
     getMonitoringLink?: GetMonitoringLink;
     getMonitoringClusterLink?: GetMonitoringClusterLink;
     getLogsLink?: GetLogsLink;
+    getDatabaseLinks?: GetDatabaseLinks;
+    getClusterLinks?: GetClusterLinks;
 }
 export function ExtendedCluster({
     component: ClusterComponent,
     getMonitoringLink,
     getMonitoringClusterLink,
     getLogsLink,
+    getDatabaseLinks,
+    getClusterLinks,
 }: ExtendedClusterProps) {
-    const additionalNodesProps = useAdditionalNodesProps();
-    const {name, balancer, monitoring, logging} = useClusterBaseInfo();
-
-    const [useClusterBalancerAsBackend] = useSetting<boolean>(USE_CLUSTER_BALANCER_AS_BACKEND_KEY);
-
     return (
         <div className={b()}>
             <ClusterComponent
-                additionalClusterProps={getAdditionalClusterProps({
-                    clusterName: name,
-                    monitoring,
-                    balancer,
+                additionalClusterProps={useAdditionalClusterProps({
                     getMonitoringClusterLink,
+                    getClusterLinks,
                 })}
-                additionalTenantsProps={getAdditionalTenantsProps({
-                    clusterName: name,
-                    monitoring,
-                    balancer,
-                    logging,
-                    useClusterBalancerAsBackend,
+                additionalTenantsProps={useAdditionalTenantsProps({
                     getMonitoringLink,
                     getLogsLink,
+                    getDatabaseLinks,
                 })}
-                additionalNodesProps={additionalNodesProps}
             />
         </div>
     );

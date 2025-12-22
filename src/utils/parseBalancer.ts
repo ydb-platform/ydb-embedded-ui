@@ -1,7 +1,9 @@
+import {environment} from '../store';
+
 import {normalizePathSlashes} from '.';
 
 const protocolRegex = /^http[s]?:\/\//;
-const viewerPathnameRegex = /\/viewer\/json$/;
+const viewerPathnameRegex = /\/viewer(\/json)?$/;
 
 export const removeViewerPathname = (value: string) => {
     return value.replace(viewerPathnameRegex, '');
@@ -65,8 +67,25 @@ export function prepareBackendFromBalancer(rawBalancer: string) {
 
     // Use meta_backend if it is defined to form backend url
     if (window.meta_backend) {
-        return normalizePathSlashes(`${window.meta_backend}/${preparedBalancer}`);
+        const metaBackend = window.meta_backend;
+        const envPrefix = environment ? `/${environment}` : '';
+
+        // If meta_backend is a full URL (has protocol), don't add environment prefix
+        if (protocolRegex.test(metaBackend)) {
+            return normalizePathSlashes(`${metaBackend}/${preparedBalancer}`);
+        }
+
+        // For relative meta_backend, include environment prefix
+        return normalizePathSlashes(`${envPrefix}/${metaBackend}/${preparedBalancer}`);
     }
 
     return preparedBalancer;
+}
+
+export function prepareBackendWithMetaProxy({clusterName}: {clusterName?: string}) {
+    if (!clusterName) {
+        return undefined;
+    }
+
+    return prepareBackendFromBalancer(`/proxy/cluster/${clusterName}`);
 }

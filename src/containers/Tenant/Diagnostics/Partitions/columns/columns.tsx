@@ -4,12 +4,13 @@ import DataTable from '@gravity-ui/react-data-table';
 import {EntityStatus} from '../../../../../components/EntityStatus/EntityStatus';
 import {MultilineTableHeader} from '../../../../../components/MultilineTableHeader/MultilineTableHeader';
 import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
+import {getDefaultNodePath} from '../../../../../routes';
 import {useTopicDataAvailable} from '../../../../../store/reducers/capabilities/hooks';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import {cn} from '../../../../../utils/cn';
-import {formatBytes, formatMsToUptime} from '../../../../../utils/dataFormatters/dataFormatters';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../../utils/constants';
+import {formatBytes, formatDurationMs} from '../../../../../utils/dataFormatters/dataFormatters';
 import {isNumeric} from '../../../../../utils/utils';
-import {getDefaultNodePath} from '../../../../Node/NodePages';
 import {useDiagnosticsPageLinkGetter} from '../../DiagnosticsPages';
 import {
     ReadLagsHeader,
@@ -45,7 +46,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
         ),
         sortAccessor: (row) => isNumeric(row.partitionId) && Number(row.partitionId),
         align: DataTable.LEFT,
-        render: ({row}) => <PartitionId id={row.partitionId} />,
+        render: ({row}) => <PartitionId id={String(row.partitionId)} />,
     },
     {
         name: PARTITIONS_COLUMNS_IDS.STORE_SIZE,
@@ -85,7 +86,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
                     PARTITIONS_WRITE_LAGS_SUB_COLUMNS_IDS.PARTITION_WRITE_LAG
                 ],
                 align: DataTable.RIGHT,
-                render: ({row}) => formatMsToUptime(row.partitionWriteLag),
+                render: ({row}) => formatDurationMs(row.partitionWriteLag),
             },
             {
                 name: PARTITIONS_WRITE_LAGS_SUB_COLUMNS_IDS.PARTITION_WRITE_IDLE_TIME,
@@ -93,7 +94,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
                     PARTITIONS_WRITE_LAGS_SUB_COLUMNS_IDS.PARTITION_WRITE_IDLE_TIME
                 ],
                 align: DataTable.RIGHT,
-                render: ({row}) => formatMsToUptime(row.partitionWriteIdleTime),
+                render: ({row}) => formatDurationMs(row.partitionWriteIdleTime),
             },
         ],
     },
@@ -108,7 +109,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
                     PARTITIONS_READ_LAGS_SUB_COLUMNS_IDS.CONSUMER_WRITE_LAG
                 ],
                 align: DataTable.RIGHT,
-                render: ({row}) => formatMsToUptime(row.consumerWriteLag),
+                render: ({row}) => formatDurationMs(row.consumerWriteLag),
             },
             {
                 name: PARTITIONS_READ_LAGS_SUB_COLUMNS_IDS.CONSUMER_READ_LAG,
@@ -116,7 +117,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
                     PARTITIONS_READ_LAGS_SUB_COLUMNS_IDS.CONSUMER_READ_LAG
                 ],
                 align: DataTable.RIGHT,
-                render: ({row}) => formatMsToUptime(row.consumerReadLag),
+                render: ({row}) => formatDurationMs(row.consumerReadLag),
             },
             {
                 name: PARTITIONS_READ_LAGS_SUB_COLUMNS_IDS.CONSUMER_READ_IDLE_TIME,
@@ -124,7 +125,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
                     PARTITIONS_READ_LAGS_SUB_COLUMNS_IDS.CONSUMER_READ_IDLE_TIME
                 ],
                 align: DataTable.RIGHT,
-                render: ({row}) => formatMsToUptime(row.consumerReadIdleTime),
+                render: ({row}) => formatDurationMs(row.consumerReadIdleTime),
             },
         ],
     },
@@ -182,7 +183,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
             row.readSessionId ? (
                 <EntityStatus name={row.readSessionId} showStatus={false} hasClipboardButton />
             ) : (
-                '–'
+                EMPTY_DATA_PLACEHOLDER
             ),
     },
     {
@@ -198,7 +199,7 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
             row.readerName ? (
                 <EntityStatus name={row.readerName} showStatus={false} hasClipboardButton />
             ) : (
-                '–'
+                EMPTY_DATA_PLACEHOLDER
             ),
     },
     {
@@ -212,14 +213,9 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
         width: 200,
         render: ({row}) =>
             row.partitionNodeId && row.partitionHost ? (
-                <EntityStatus
-                    name={row.partitionHost}
-                    path={getDefaultNodePath(row.partitionNodeId)}
-                    showStatus={false}
-                    hasClipboardButton
-                />
+                <Node host={row.partitionHost} id={row.partitionNodeId} />
             ) : (
-                '–'
+                EMPTY_DATA_PLACEHOLDER
             ),
     },
     {
@@ -233,17 +229,28 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
         width: 200,
         render: ({row}) =>
             row.connectionNodeId && row.connectionHost ? (
-                <EntityStatus
-                    name={row.connectionHost}
-                    path={getDefaultNodePath(row.connectionNodeId)}
-                    showStatus={false}
-                    hasClipboardButton
-                />
+                <Node host={row.connectionHost} id={row.connectionNodeId} />
             ) : (
-                '–'
+                EMPTY_DATA_PLACEHOLDER
             ),
     },
 ];
+
+interface NodeProps {
+    host: string;
+    id: string | number;
+}
+
+function Node({host, id}: NodeProps) {
+    return (
+        <EntityStatus
+            name={host}
+            path={getDefaultNodePath({id})}
+            showStatus={false}
+            hasClipboardButton
+        />
+    );
+}
 
 // Topics without consumers have partitions data with no data corresponding to consumers
 // These columns will be empty and should not be displayed

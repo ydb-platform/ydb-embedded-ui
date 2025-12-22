@@ -12,7 +12,7 @@ export const defaultDashboardConfig: ChartConfig[] = [
         ],
     },
     {
-        title: i18n('charts.transaction-latency', {percentile: ''}),
+        title: i18n('charts.queries-latency', {percentile: ''}),
         metrics: [
             {
                 target: 'queries.latencies.p50',

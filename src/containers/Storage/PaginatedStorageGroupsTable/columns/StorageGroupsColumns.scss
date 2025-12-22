@@ -1,0 +1,20 @@
+.ydb-storage-groups-columns {
+    &__vdisks-column,
+    &__disks-column {
+        overflow: visible; // to enable stacked disks overflow the row
+    }
+
+    &__pool-name-wrapper {
+        direction: rtl;
+    }
+
+    &__pool-name {
+        unicode-bidi: plaintext;
+    }
+
+    &__group-id {
+        margin-right: var(--g-spacing-1);
+
+        font-weight: 500;
+    }
+}

@@ -9,6 +9,9 @@ export const TOPIC_DATA_COLUMNS_TITLES: Record<TopicDataColumnId, string> = {
     get offset() {
         return i18n('label_offset');
     },
+    get partition() {
+        return i18n('label_partition');
+    },
     get timestampCreate() {
         return i18n('label_timestamp-create');
     },

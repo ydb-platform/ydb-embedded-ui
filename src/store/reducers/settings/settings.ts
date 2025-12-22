@@ -1,51 +1,74 @@
 import type {Store} from '@reduxjs/toolkit';
-import {createSlice} from '@reduxjs/toolkit';
+import {createSelector, createSlice} from '@reduxjs/toolkit';
+import {isNil} from 'lodash';
 
-import {DEFAULT_USER_SETTINGS, settingsManager} from '../../../services/settings';
 import {parseJson} from '../../../utils/utils';
-import type {AppDispatch} from '../../defaultStore';
+import type {AppDispatch, RootState} from '../../defaultStore';
 
-import type {ProblemFilterValue, SettingsState} from './types';
-
-export const ProblemFilterValues = {
-    ALL: 'All',
-    PROBLEMS: 'With problems',
-} as const;
-
-const userSettings = settingsManager.extractSettingsFromLS(DEFAULT_USER_SETTINGS);
-const systemSettings = window.systemSettings || {};
+import {DEFAULT_USER_SETTINGS} from './constants';
+import type {SettingsState} from './types';
+import {
+    getSettingDefault,
+    readSettingValueFromLS,
+    setSettingValueToLS,
+    shouldSyncSettingToLS,
+} from './utils';
 
 export const initialState: SettingsState = {
-    problemFilter: ProblemFilterValues.ALL,
-    userSettings,
-    systemSettings,
+    userSettings: {},
+    systemSettings: window.systemSettings || {},
 };
 
 const settingsSlice = createSlice({
     name: 'settings',
     initialState,
     reducers: (create) => ({
-        changeFilter: create.reducer<ProblemFilterValue>((state, action) => {
-            state.problemFilter = action.payload;
-        }),
         setSettingValue: create.reducer<{name: string; value: unknown}>((state, action) => {
             state.userSettings[action.payload.name] = action.payload.value;
         }),
     }),
-    selectors: {
-        getSettingValue: (state, name: string) => state.userSettings[name],
-        selectProblemFilter: (state) => state.problemFilter,
-    },
 });
 
-export const {changeFilter} = settingsSlice.actions;
-export const {getSettingValue, selectProblemFilter} = settingsSlice.selectors;
+export const setSettingValueInStore = settingsSlice.actions.setSettingValue;
 
-export const setSettingValue = (name: string, value: unknown) => {
+/**
+ * Reads LS value or use default when store value undefined
+ *
+ * If there is value in store, returns it
+ */
+export const getSettingValue = createSelector(
+    (state: RootState) => state.settings.userSettings,
+    (_state: RootState, name?: string) => name,
+    (userSettings, name) => {
+        if (!name) {
+            return undefined;
+        }
+
+        const storeValue = userSettings[name];
+
+        if (!isNil(storeValue)) {
+            return storeValue;
+        }
+
+        const defaultValue = getSettingDefault(name);
+        if (!shouldSyncSettingToLS(name)) {
+            return defaultValue;
+        }
+
+        const savedValue = readSettingValueFromLS(name);
+
+        return savedValue ?? defaultValue;
+    },
+);
+
+export const setSettingValue = (name: string | undefined, value: unknown) => {
     return (dispatch: AppDispatch) => {
-        dispatch(settingsSlice.actions.setSettingValue({name, value}));
-
-        settingsManager.setUserSettingsValue(name, value);
+        if (name) {
+            dispatch(settingsSlice.actions.setSettingValue({name, value}));
+            if (shouldSyncSettingToLS(name)) {
+                setSettingValueToLS(name, value);
+            }
+        }
     };
 };
 
@@ -68,6 +91,25 @@ export function syncUserSettingsFromLS(store: Store) {
                 }),
             );
         }
+    });
+}
+
+export function preloadUserSettingsFromLS(store: Store) {
+    if (typeof window === 'undefined') {
+        return;
+    }
+
+    Object.keys(DEFAULT_USER_SETTINGS).forEach((name) => {
+        if (!shouldSyncSettingToLS(name)) {
+            return;
+        }
+
+        const savedValue = readSettingValueFromLS(name);
+        if (isNil(savedValue)) {
+            return;
+        }
+
+        store.dispatch(settingsSlice.actions.setSettingValue({name, value: savedValue}));
     });
 }
 

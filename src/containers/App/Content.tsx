@@ -10,28 +10,31 @@ import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {useSlots} from '../../components/slots';
 import type {SlotMap} from '../../components/slots/SlotMap';
 import type {SlotComponent} from '../../components/slots/types';
-import routes from '../../routes';
+import routes, {getClusterPath} from '../../routes';
 import type {RootState} from '../../store';
 import {authenticationApi} from '../../store/reducers/authentication/authentication';
 import {
-    useCapabilitiesLoaded,
+    useAllCapabilitiesLoaded,
     useCapabilitiesQuery,
     useClusterWithoutAuthInUI,
     useMetaCapabilitiesLoaded,
     useMetaCapabilitiesQuery,
 } from '../../store/reducers/capabilities/hooks';
 import {nodesListApi} from '../../store/reducers/nodesList';
+import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
+import {useMetaAuth, useMetaAuthUnavailable} from '../../utils/hooks/useMetaAuth';
 import {lazyComponent} from '../../utils/lazyComponent';
+import {isAccessError, isRedirectToAuth} from '../../utils/response';
 import Authentication from '../Authentication/Authentication';
-import {getClusterPath} from '../Cluster/utils';
 import Header from '../Header/Header';
-import type {RawBreadcrumbItem} from '../Header/breadcrumbs';
 
+import {useAppTitle} from './AppTitleContext';
+import {SettingsBootstrap} from './SettingsBootstrap';
 import {
     ClusterSlot,
-    ClustersSlot,
+    HomePageSlot,
     NodeSlot,
     PDiskPageSlot,
     RedirectSlot,
@@ -41,7 +44,6 @@ import {
     TenantSlot,
     VDiskPageSlot,
 } from './appSlots';
-import i18n from './i18n';
 
 import './App.scss';
 
@@ -102,7 +104,15 @@ const routesSlots: RouteSlot[] = [
     },
 ];
 
-const Clusters = lazyComponent(() => import('../Clusters/Clusters'), 'Clusters');
+const multiClusterRoutes: RouteSlot[] = [
+    {
+        path: routes.homePage,
+        exact: true,
+        component: lazyComponent(() => import('../HomePage/HomePage'), 'HomePage'),
+        slot: HomePageSlot,
+        wrapper: HomePageDataWrapper,
+    },
+];
 
 function renderRouteSlot(slots: SlotMap, route: RouteSlot) {
     return (
@@ -145,28 +155,20 @@ export function Content(props: ContentProps) {
 
     const redirect = slots.get(RedirectSlot);
     const redirectProps: RedirectProps =
-        redirect?.props ?? (singleClusterMode ? {to: getClusterPath()} : {to: routes.clusters});
-
-    let mainPage: RawBreadcrumbItem | undefined;
-    if (!singleClusterMode) {
-        mainPage = {text: i18n('pages.clusters'), link: routes.clusters};
-    }
+        redirect?.props ?? (singleClusterMode ? {to: getClusterPath()} : {to: routes.homePage});
 
     return (
         <Switch>
-            {singleClusterMode
-                ? null
-                : renderRouteSlot(slots, {
-                      path: routes.clusters,
-                      exact: true,
-                      component: Clusters,
-                      slot: ClustersSlot,
-                  })}
             {additionalRoutes?.rendered}
-            {/* Single cluster routes */}
-            <Route key="single-cluster">
-                <Header mainPage={mainPage} />
+            <Route>
+                <Header />
                 <Switch>
+                    {singleClusterMode
+                        ? null
+                        : multiClusterRoutes.map((route) => {
+                              return renderRouteSlot(slots, route);
+                          })}
+                    {/* Single cluster routes */}
                     {routesSlots.map((route) => {
                         return renderRouteSlot(slots, route);
                     })}
@@ -195,32 +197,80 @@ function DataWrapper({children}: {children: React.ReactNode}) {
     );
 }
 
-function GetUser({children}: {children: React.ReactNode}) {
+function HomePageDataWrapper({children}: {children: React.ReactNode}) {
+    return (
+        <GetMetaCapabilities>
+            <GetMetaUser>{children}</GetMetaUser>
+        </GetMetaCapabilities>
+    );
+}
+
+function GetMetaUser({children}: {children: React.ReactNode}) {
+    const metaAuth = useMetaAuth();
+
+    if (metaAuth) {
+        return <GetUser useMeta>{children}</GetUser>;
+    }
+    return children;
+}
+
+function GetUser({children, useMeta}: {children: React.ReactNode; useMeta?: boolean}) {
     const database = useDatabaseFromQuery();
-    const {isLoading, error} = authenticationApi.useWhoamiQuery({database});
+
+    const {isFetching, error} = authenticationApi.useWhoamiQuery({
+        database,
+        useMeta,
+    });
+    const {appTitle} = useAppTitle();
+
+    const errorProps = error ? {...uiFactory.clusterOrDatabaseAccessError} : undefined;
 
     return (
-        <LoaderWrapper loading={isLoading} size="l">
-            <PageError error={error}>{children}</PageError>
+        <LoaderWrapper loading={isFetching} size="l" delay={0}>
+            <PageError error={error} {...errorProps} errorPageTitle={appTitle}>
+                <SettingsBootstrap>{children}</SettingsBootstrap>
+            </PageError>
         </LoaderWrapper>
     );
 }
 
 function GetNodesList() {
-    nodesListApi.useGetNodesListQuery(undefined);
+    const database = useDatabaseFromQuery();
+    nodesListApi.useGetNodesListQuery({database}, undefined);
     return null;
 }
 
 function GetCapabilities({children}: {children: React.ReactNode}) {
-    useCapabilitiesQuery();
-    const capabilitiesLoaded = useCapabilitiesLoaded();
+    const {error} = useCapabilitiesQuery();
 
+    useMetaCapabilitiesQuery();
+    const capabilitiesLoaded = useAllCapabilitiesLoaded();
+
+    //do nothing, authentication is in progress upon redirect
+    if (isRedirectToAuth(error)) {
+        return null;
+    }
+
+    if (isAccessError(error)) {
+        return <AccessDenied />;
+    }
+
+    return (
+        <LoaderWrapper loading={!capabilitiesLoaded} size="l">
+            {children}
+        </LoaderWrapper>
+    );
+}
+
+// Only for Clusters page, there is no need to request cluster capabilities there (GetCapabilities)
+// This wrapper is not used in GetCapabilities so the page does not wait for 2 consecutive capabilities requests
+function GetMetaCapabilities({children}: {children: React.ReactNode}) {
     useMetaCapabilitiesQuery();
     // It is always true if there is no meta, since request finishes with an error
     const metaCapabilitiesLoaded = useMetaCapabilitiesLoaded();
 
     return (
-        <LoaderWrapper loading={!capabilitiesLoaded || !metaCapabilitiesLoaded} size="l">
+        <LoaderWrapper loading={!metaCapabilitiesLoaded} size="l">
             {children}
         </LoaderWrapper>
     );
@@ -236,8 +286,10 @@ function ContentWrapper(props: ContentWrapperProps) {
     const {singleClusterMode, isAuthenticated} = props;
     const authUnavailable = useClusterWithoutAuthInUI();
 
+    const metaAuthUnavailable = useMetaAuthUnavailable();
+
     const renderNotAuthenticated = () => {
-        if (authUnavailable) {
+        if (authUnavailable || metaAuthUnavailable) {
             return <AccessDenied />;
         }
         return <Authentication />;
@@ -245,7 +297,7 @@ function ContentWrapper(props: ContentWrapperProps) {
 
     return (
         <Switch>
-            {!authUnavailable && (
+            {!authUnavailable && !metaAuthUnavailable && (
                 <Route path={routes.auth}>
                     <Authentication closable />
                 </Route>

@@ -3,6 +3,7 @@ import type {EVDiskState} from '../../types/api/vdisk';
 
 import {
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
+    ERROR_SEVERITY,
     NOT_AVAILABLE_SEVERITY,
     VDISK_STATE_SEVERITY,
 } from './constants';
@@ -13,19 +14,23 @@ export function calculateVDiskSeverity<
         VDiskState?: EVDiskState;
         FrontQueues?: EFlag;
         Replicated?: boolean;
+        DonorMode?: boolean;
     },
 >(vDisk: T) {
     const {DiskSpace, VDiskState, FrontQueues, Replicated} = vDisk;
 
-    // if the disk is not available, this determines its status severity regardless of other features
+    // if the VDisk is not available, we consider that disk has an error severity
     if (!VDiskState) {
-        return NOT_AVAILABLE_SEVERITY;
+        return ERROR_SEVERITY;
     }
 
-    const DiskSpaceSeverity = getColorSeverity(DiskSpace);
+    const DiskSpaceSeverity = Math.min(
+        DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
+        getColorSeverity(DiskSpace),
+    );
     const VDiskSpaceSeverity = getStateSeverity(VDiskState);
     const FrontQueuesSeverity = Math.min(
-        DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Orange,
+        DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
         getColorSeverity(FrontQueues),
     );
 
@@ -39,11 +44,14 @@ export function calculateVDiskSeverity<
     return severity;
 }
 
-function getStateSeverity(vDiskState?: EVDiskState) {
+export function getStateSeverity(vDiskState?: EVDiskState) {
+    // if the VDiskState if undefined, we consider that this VDisk has an error
     if (!vDiskState) {
-        return NOT_AVAILABLE_SEVERITY;
+        return ERROR_SEVERITY;
     }
 
+    // If some strange value arrives that isn't in the map,
+    // we consider it "not available" and color it gray
     return VDISK_STATE_SEVERITY[vDiskState] ?? NOT_AVAILABLE_SEVERITY;
 }
 
@@ -52,7 +60,7 @@ function getColorSeverity(color?: EFlag) {
         return NOT_AVAILABLE_SEVERITY;
     }
 
-    // Blue is reserved for not replicated VDisks
+    // Blue is reserved for not replicated VDisks. DarkGrey is reserved for donors.
     if (color === EFlag.Blue) {
         return DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green;
     }

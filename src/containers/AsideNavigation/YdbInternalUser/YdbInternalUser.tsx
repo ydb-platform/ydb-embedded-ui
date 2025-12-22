@@ -7,6 +7,7 @@ import {authenticationApi} from '../../../store/reducers/authentication/authenti
 import {useClusterWithoutAuthInUI} from '../../../store/reducers/capabilities/hooks';
 import {cn} from '../../../utils/cn';
 import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
+import {useMetaAuth, useMetaAuthUnavailable} from '../../../utils/hooks/useMetaAuth';
 import i18n from '../i18n';
 
 import './YdbInternalUser.scss';
@@ -16,6 +17,8 @@ const b = cn('kv-ydb-internal-user');
 export function YdbInternalUser({login}: {login?: string}) {
     const [logout] = authenticationApi.useLogoutMutation();
     const authUnavailable = useClusterWithoutAuthInUI();
+    const metaAuthUnavailable = useMetaAuthUnavailable();
+    const metaAuth = useMetaAuth();
     const database = useDatabaseFromQuery();
 
     const history = useHistory();
@@ -29,11 +32,11 @@ export function YdbInternalUser({login}: {login?: string}) {
     };
 
     const handleLogout = () => {
-        logout(undefined);
+        logout({useMeta: metaAuth});
     };
 
     const renderLoginButton = () => {
-        if (authUnavailable) {
+        if (authUnavailable || metaAuthUnavailable) {
             return null;
         }
         return (

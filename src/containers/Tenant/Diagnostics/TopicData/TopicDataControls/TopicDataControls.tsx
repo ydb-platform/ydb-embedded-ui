@@ -4,19 +4,19 @@ import type {Value} from '@gravity-ui/date-components';
 import {RelativeDatePicker} from '@gravity-ui/date-components';
 import {dateTimeParse} from '@gravity-ui/date-utils';
 import {CircleChevronDownFill} from '@gravity-ui/icons';
-import type {TableColumnSetupItem} from '@gravity-ui/uikit';
 import {
     ActionTooltip,
     Button,
+    Flex,
+    HelpMark,
     Icon,
-    RadioButton,
+    SegmentedRadioGroup,
     Select,
-    TableColumnSetup,
     Text,
 } from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
-import {DebouncedInput} from '../../../../../components/DebouncedInput/DebouncedTextInput';
+import {DebouncedNumberInput} from '../../../../../components/DebouncedInput/DebouncedNumerInput';
 import type {PreparedPartitionData} from '../../../../../store/reducers/partitions/types';
 import {formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {prepareErrorMessage} from '../../../../../utils/prepareErrorMessage';
@@ -28,21 +28,19 @@ import {TopicDataFilterValues} from '../utils/types';
 import type {TopicDataFilterValue} from '../utils/types';
 
 interface TopicDataControlsProps {
-    columnsToSelect: TableColumnSetupItem[];
-    handleSelectedColumnsUpdate: (updated: TableColumnSetupItem[]) => void;
-
     partitions?: PreparedPartitionData[];
     partitionsLoading: boolean;
     partitionsError: unknown;
 
     startOffset?: number;
     endOffset?: number;
+    truncatedData?: boolean;
     scrollToOffset: (offset: number) => void;
+    handlePartitionChange?: (value: string[]) => void;
 }
 
 export function TopicDataControls({
-    columnsToSelect,
-    handleSelectedColumnsUpdate,
+    handlePartitionChange,
 
     startOffset,
     endOffset,
@@ -50,31 +48,14 @@ export function TopicDataControls({
     partitionsLoading,
     partitionsError,
     scrollToOffset,
+    truncatedData,
 }: TopicDataControlsProps) {
-    const {
-        selectedPartition,
-        handleSelectedPartitionChange: handleSelectedPartitionParamChange,
-        handleSelectedOffsetChange,
-        handleStartTimestampChange,
-    } = useTopicDataQueryParams();
+    const {selectedPartition} = useTopicDataQueryParams();
 
     const partitionsToSelect = partitions?.map(({partitionId}) => ({
-        content: partitionId,
-        value: partitionId,
+        content: String(partitionId),
+        value: String(partitionId),
     }));
-
-    const handleSelectedPartitionChange = React.useCallback(
-        (value: string[]) => {
-            handleSelectedPartitionParamChange(value[0]);
-            handleSelectedOffsetChange(undefined);
-            handleStartTimestampChange(undefined);
-        },
-        [
-            handleSelectedPartitionParamChange,
-            handleStartTimestampChange,
-            handleSelectedOffsetChange,
-        ],
-    );
 
     return (
         <React.Fragment>
@@ -83,7 +64,7 @@ export function TopicDataControls({
                 label={i18n('label_partition-id')}
                 options={partitionsToSelect}
                 value={selectedPartition ? [selectedPartition] : undefined}
-                onUpdate={handleSelectedPartitionChange}
+                onUpdate={handlePartitionChange}
                 filterable={partitions && partitions.length > 5}
                 disabled={!partitions || !partitions.length}
                 errorPlacement="inside"
@@ -93,19 +74,14 @@ export function TopicDataControls({
             />
             <TopicDataStartControls scrollToOffset={scrollToOffset} />
 
-            {!isNil(startOffset) && !isNil(endOffset) && (
-                <Text color="secondary" whiteSpace="nowrap">
-                    {formatNumber(startOffset)}—{formatNumber(endOffset - 1)}
-                </Text>
+            {!isNil(startOffset) && !isNil(endOffset) && endOffset > startOffset && (
+                <Flex gap={1}>
+                    <Text color="secondary" whiteSpace="nowrap">
+                        {formatNumber(startOffset)}—{formatNumber(endOffset - 1)}
+                    </Text>
+                    {truncatedData && <HelpMark>{i18n('description_last-messages')}</HelpMark>}
+                </Flex>
             )}
-            <TableColumnSetup
-                className={b('column-setup')}
-                popupWidth={242}
-                items={columnsToSelect}
-                showStatus
-                onUpdate={handleSelectedColumnsUpdate}
-                sortable={false}
-            />
         </React.Fragment>
     );
 }
@@ -119,10 +95,21 @@ function TopicDataStartControls({scrollToOffset}: TopicDataStartControlsProps) {
         selectedOffset,
         startTimestamp,
         topicDataFilter,
+        activeOffset,
         handleSelectedOffsetChange,
         handleStartTimestampChange,
         handleTopicDataFilterChange,
     } = useTopicDataQueryParams();
+
+    const inputRef = React.useRef<HTMLInputElement>(null);
+
+    const isDrawerVisible = !isNil(activeOffset);
+
+    React.useEffect(() => {
+        if (isDrawerVisible) {
+            inputRef.current?.blur();
+        }
+    }, [isDrawerVisible]);
 
     const onFilterChange = React.useCallback(
         (value: TopicDataFilterValue) => {
@@ -136,7 +123,7 @@ function TopicDataStartControls({scrollToOffset}: TopicDataStartControlsProps) {
         [handleTopicDataFilterChange, handleSelectedOffsetChange, handleStartTimestampChange],
     );
     const onStartOffsetChange = React.useCallback(
-        (value: string) => {
+        (value: number | null) => {
             handleSelectedOffsetChange(value);
         },
         [handleSelectedOffsetChange],
@@ -163,26 +150,33 @@ function TopicDataStartControls({scrollToOffset}: TopicDataStartControlsProps) {
 
     return (
         <React.Fragment>
-            <RadioButton<TopicDataFilterValue> value={topicDataFilter} onUpdate={onFilterChange}>
-                <RadioButton.Option value="TIMESTAMP">
+            <SegmentedRadioGroup<TopicDataFilterValue>
+                value={topicDataFilter}
+                onUpdate={onFilterChange}
+            >
+                <SegmentedRadioGroup.Option value="TIMESTAMP">
                     {TopicDataFilterValues.TIMESTAMP}
-                </RadioButton.Option>
-                <RadioButton.Option value="OFFSET">
+                </SegmentedRadioGroup.Option>
+                <SegmentedRadioGroup.Option value="OFFSET">
                     {TopicDataFilterValues.OFFSET}
-                </RadioButton.Option>
-            </RadioButton>
+                </SegmentedRadioGroup.Option>
+            </SegmentedRadioGroup>
             {topicDataFilter === 'OFFSET' && (
-                <DebouncedInput
-                    value={selectedOffset ? String(selectedOffset) : ''}
+                <DebouncedNumberInput
+                    controlRef={inputRef}
+                    className={b('offset-input')}
+                    max={Number.MAX_SAFE_INTEGER}
+                    min={0}
+                    value={isNil(selectedOffset) ? null : safeParseNumber(selectedOffset)}
                     onUpdate={onStartOffsetChange}
                     label={i18n('label_from')}
                     placeholder={i18n('label_offset')}
-                    type="number"
                     debounce={600}
                     endContent={
                         <ActionTooltip title={i18n('action_scroll-selected')}>
                             <Button
-                                disabled={isNil(selectedOffset) || selectedOffset === ''}
+                                disabled={isNil(selectedOffset)}
+                                className={b('scroll-button')}
                                 view="flat-action"
                                 size="xs"
                                 onClick={() => {

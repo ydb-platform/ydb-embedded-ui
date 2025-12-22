@@ -9,7 +9,7 @@ import {TENANT_OVERVIEW_TABLES_LIMIT} from '../../../../utils/constants';
 import {b} from './utils';
 
 interface TenantOverviewTableLayoutProps {
-    title: React.ReactNode;
+    title?: React.ReactNode;
     loading?: boolean;
     error?: unknown;
     tableClassNameModifiers?: NoStrictEntityMods;
@@ -38,7 +38,7 @@ export function TenantOverviewTableLayout({
     };
     return (
         <React.Fragment>
-            <div className={b('title')}>{title}</div>
+            {title && <div className={b('title')}>{title}</div>}
             {error ? <ResponseError error={error} /> : null}
             <div className={b('table', tableClassNameModifiers)}>{renderContent()}</div>
         </React.Fragment>

@@ -1,50 +1,8 @@
 @use '../../styles/mixins.scss';
 
-.clusters {
-    overflow: auto;
-
-    padding-top: 15px;
-
+.ydb-clusters {
     @include mixins.body-2-typography();
-    @include mixins.flex-container();
-    &__autorefresh {
-        margin-left: auto;
-    }
-    &__cluster {
-        display: flex;
-        align-items: center;
-    }
-    &__cluster-status {
-        width: 18px;
-        height: 18px;
-        margin-right: 8px;
 
-        border-radius: 3px;
-
-        & span {
-            display: flex;
-            align-items: center;
-        }
-
-        &_type_green {
-            background-color: var(--ydb-color-status-green);
-        }
-        &_type_yellow {
-            background-color: var(--ydb-color-status-yellow);
-        }
-        &_type_blue {
-            background-color: var(--ydb-color-status-blue);
-        }
-        &_type_red {
-            background: var(--ydb-color-status-red);
-        }
-        &_type_grey {
-            background: var(--ydb-color-status-grey);
-        }
-        &_type_orange {
-            background: var(--ydb-color-status-orange);
-        }
-    }
     &__cluster-name {
         white-space: normal;
         text-decoration: none;
@@ -54,88 +12,17 @@
     &__cluster-versions {
         text-decoration: none;
     }
-    &__cluster-version {
-        overflow: hidden;
 
-        text-overflow: ellipsis;
-    }
     &__cluster-dc {
         white-space: normal;
     }
 
-    &__controls {
-        display: flex;
-
-        margin-bottom: 20px;
-    }
-    &__control {
-        width: 200px;
-        margin-right: 15px;
-
-        &_wide {
-            width: 300px;
-        }
-    }
     &__empty-cell {
         color: var(--g-color-text-secondary);
-    }
-    &__tooltip-content {
-        word-break: break-all;
     }
 
     & .g-progress__item {
         transition: none;
-    }
-
-    &__aggregation,
-    &__controls {
-        margin-right: 15px;
-        margin-left: 15px;
-    }
-
-    &__aggregation {
-        display: flex;
-        align-items: center;
-
-        width: max-content;
-        height: 46px;
-        margin-bottom: 20px;
-        padding: 10px 20px;
-
-        border: 1px solid var(--g-color-line-generic);
-        border-radius: 10px;
-        background: var(--g-color-base-generic-ultralight);
-    }
-
-    &__aggregation-value-container {
-        display: flex;
-        align-items: center;
-
-        max-width: 230px;
-
-        font-size: var(--g-text-subheader-3-font-size);
-        line-height: var(--g-text-subheader-3-line-height);
-    }
-
-    &__aggregation-value-container:not(:last-child) {
-        margin-right: 30px;
-    }
-
-    &__aggregation-label {
-        margin-right: 8px;
-
-        font-weight: 200;
-
-        color: var(--g-color-text-complementary);
-    }
-
-    &__text {
-        color: var(--g-color-text-primary);
-        @include mixins.body-2-typography();
-
-        &::first-letter {
-            color: var(--g-color-text-danger);
-        }
     }
 
     &__description {
@@ -145,45 +32,20 @@
     }
 
     &__table-wrapper {
-        overflow: auto;
-
-        padding-left: 5px;
-        @include mixins.flex-container();
+        --data-table-cell-align: top;
+        --data-table-cell-vertical-padding: var(--g-spacing-3);
     }
 
-    &__table-content {
-        overflow: auto;
+    &__balancer-copy-icon {
+        color: var(--g-color-text-secondary);
+    }
+    &__search-icon {
+        margin: 0 var(--g-spacing-1);
 
-        height: 100%;
+        color: var(--g-color-text-secondary);
     }
 
-    &__table {
-        @include mixins.freeze-nth-column(1);
-    }
-
-    &__balancer-cell {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-    }
-
-    &__balancer-text {
-        display: inline-block;
-        overflow: hidden;
-
-        max-width: 92%;
-        margin-right: 5px;
-
-        text-overflow: ellipsis;
-        overflow-wrap: break-word !important;
-    }
-    &__balancer-icon {
-        display: flex;
-        align-items: center;
-    }
-
-    &__error {
-        margin-left: 15px;
-        @include mixins.body-2-typography();
+    &__progress {
+        --g-progress-filled-background-color: var(--ydb-color-status-green);
     }
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import type {HelpMarkProps} from '@gravity-ui/uikit';
+import type {PopupProps} from '@gravity-ui/uikit';
 import {HelpMark} from '@gravity-ui/uikit';
 
 import {ResizeHandler} from './ResizeHandler';
@@ -53,7 +53,7 @@ const ColumnSortIcon = ({sortOrder, sortable, defaultSortOrder}: ColumnSortIconP
     }
 };
 
-const columnAlignToHelpMarkPlacement: Record<AlignType, Required<HelpMarkProps['placement']>> = {
+const columnAlignToHelpMarkPlacement: Record<AlignType, Required<PopupProps['placement']>> = {
     left: 'right',
     right: 'left',
     center: 'right',
@@ -135,7 +135,9 @@ export const TableHeadCell = <T,>({
                     <div className={b('head-cell-content')}>{content}</div>
                     {column.note && (
                         <HelpMark
-                            placement={columnAlignToHelpMarkPlacement[column.align]}
+                            popoverProps={{
+                                placement: columnAlignToHelpMarkPlacement[column.align],
+                            }}
                             className={b('head-cell-note')}
                         >
                             {column.note}

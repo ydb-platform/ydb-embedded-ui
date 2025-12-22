@@ -7,13 +7,9 @@ import {
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {getEntityName} from '../../../utils';
 import {TopicStats} from '../TopicStats';
-import {prepareTopicSchemaInfo} from '../utils';
 
-const prepareChangefeedInfo = (
-    changefeedData?: TEvDescribeSchemeResult,
-    topicData?: TEvDescribeSchemeResult,
-): Array<InfoViewerItem> => {
-    if (!changefeedData && !topicData) {
+const prepareChangefeedInfo = (changefeedData?: TEvDescribeSchemeResult): Array<InfoViewerItem> => {
+    if (!changefeedData) {
         return [];
     }
 
@@ -25,38 +21,36 @@ const prepareChangefeedInfo = (
         Mode,
         Format,
     });
-    const topicInfo = prepareTopicSchemaInfo(topicData);
-
-    const info = [...changefeedInfo, ...topicInfo];
 
     const createStep = changefeedData?.PathDescription?.Self?.CreateStep;
 
     if (Number(createStep)) {
-        info.unshift(formatCommonItem('CreateStep', createStep));
+        changefeedInfo.unshift(formatCommonItem('CreateStep', createStep));
     }
 
-    return info;
+    return changefeedInfo;
 };
 
 interface ChangefeedProps {
     path: string;
+    databaseFullPath: string;
     database: string;
     data?: TEvDescribeSchemeResult;
     topic?: TEvDescribeSchemeResult;
 }
 
 /** Displays overview for CDCStream EPathType */
-export const ChangefeedInfo = ({path, database, data, topic}: ChangefeedProps) => {
+export const ChangefeedInfo = ({path, database, data, databaseFullPath}: ChangefeedProps) => {
     const entityName = getEntityName(data?.PathDescription);
 
-    if (!data || !topic) {
+    if (!data) {
         return <div className="error">No {entityName} data</div>;
     }
 
     return (
         <div>
-            <InfoViewer title={entityName} info={prepareChangefeedInfo(data, topic)} />
-            <TopicStats path={path} database={database} />
+            <InfoViewer title={entityName} info={prepareChangefeedInfo(data)} />
+            <TopicStats path={path} databaseFullPath={databaseFullPath} database={database} />
         </div>
     );
 };

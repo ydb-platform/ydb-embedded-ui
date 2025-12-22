@@ -1,56 +1,80 @@
-import {Flex, Loader} from '@gravity-ui/uikit';
+import {DisplayPulse} from '@gravity-ui/icons';
+import {Button, Flex, HelpMark, Icon, Label} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
-import {LogsButton} from '../../../../components/LogsButton/LogsButton';
-import {MonitoringButton} from '../../../../components/MonitoringButton/MonitoringButton';
+import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
+import {QueriesActivityBar} from '../../../../components/QueriesActivityBar/QueriesActivityBar';
+import {useClusterBaseInfo} from '../../../../store/reducers/cluster/cluster';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
-import {TENANT_METRICS_TABS_IDS} from '../../../../store/reducers/tenant/constants';
-import {tenantApi} from '../../../../store/reducers/tenant/tenant';
+import {
+    TENANT_DIAGNOSTICS_TABS_IDS,
+    TENANT_METRICS_TABS_IDS,
+    TENANT_PAGES_IDS,
+} from '../../../../store/reducers/tenant/constants';
+import {setDiagnosticsTab, tenantApi} from '../../../../store/reducers/tenant/tenant';
 import {calculateTenantMetrics} from '../../../../store/reducers/tenants/utils';
-import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../../types/additionalProps';
+import type {AdditionalTenantsProps} from '../../../../types/additionalProps';
+import {getInfoTabLinks} from '../../../../utils/additionalProps';
 import {TENANT_DEFAULT_TITLE} from '../../../../utils/constants';
-import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
+import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useClusterNameFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
+import {useDatabasesV2} from '../../../../utils/hooks/useDatabasesV2';
+import {canShowTenantMonitoringTab} from '../../../../utils/monitoringVisibility';
+import {useTenantPage} from '../../TenantNavigation/useTenantNavigation';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
 
-import {DefaultOverviewContent} from './DefaultOverviewContent/DefaultOverviewContent';
-import {HealthcheckDetails} from './Healthcheck/HealthcheckDetails';
-import {MetricsCards} from './MetricsCards/MetricsCards';
+import {HealthcheckPreview} from './Healthcheck/HealthcheckPreview';
+import {MetricsTabs} from './MetricsTabs/MetricsTabs';
 import {TenantCpu} from './TenantCpu/TenantCpu';
 import {TenantMemory} from './TenantMemory/TenantMemory';
+import {TenantNetwork} from './TenantNetwork/TenantNetwork';
 import {TenantStorage} from './TenantStorage/TenantStorage';
+import i18n from './i18n';
 import {b} from './utils';
 
 import './TenantOverview.scss';
 
 interface TenantOverviewProps {
-    tenantName: string;
+    database: string;
+    databaseFullPath: string;
     additionalTenantProps?: AdditionalTenantsProps;
-    additionalNodesProps?: AdditionalNodesProps;
 }
 
 export function TenantOverview({
-    tenantName,
+    database,
+    databaseFullPath,
     additionalTenantProps,
-    additionalNodesProps,
 }: TenantOverviewProps) {
     const {metricsTab} = useTypedSelector((state) => state.tenant);
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const clusterName = useClusterNameFromQuery();
+    const dispatch = useTypedDispatch();
+
+    const {handleTenantPageChange} = useTenantPage();
+
+    const isMetaDatabasesAvailable = useDatabasesV2();
 
     const {currentData: tenant, isFetching} = tenantApi.useGetTenantInfoQuery(
-        {path: tenantName, clusterName},
+        {database, clusterName, isMetaDatabasesAvailable},
         {pollingInterval: autoRefreshInterval},
     );
     const tenantLoading = isFetching && tenant === undefined;
     const {Name, Type, Overall} = tenant || {};
+    const isServerless = Type === 'Serverless';
+    const activeMetricsTab =
+        isServerless &&
+        metricsTab !== TENANT_METRICS_TABS_IDS.cpu &&
+        metricsTab !== TENANT_METRICS_TABS_IDS.storage
+            ? TENANT_METRICS_TABS_IDS.cpu
+            : metricsTab;
 
     const tenantType = mapDatabaseTypeToDBName(Type);
     // FIXME: remove after correct data is added to tenantInfo
     const {currentData: tenantSchemaData} = overviewApi.useGetOverviewQuery(
         {
-            path: tenantName,
-            database: tenantName,
+            path: databaseFullPath,
+            database,
+            databaseFullPath,
         },
         {
             pollingInterval: autoRefreshInterval,
@@ -87,6 +111,8 @@ export function TenantOverview({
         memoryStats,
         blobStorageStats,
         tabletStorageStats,
+        networkUtilization,
+        networkThroughput,
     } = calculateTenantMetrics(tenantData);
 
     const storageMetrics = {
@@ -98,7 +124,7 @@ export function TenantOverview({
 
     const renderName = () => {
         return (
-            <div className={b('tenant-name-wrapper')}>
+            <Flex alignItems="center" style={{overflow: 'hidden'}}>
                 <EntityStatus
                     status={Overall}
                     name={Name || TENANT_DEFAULT_TITLE}
@@ -106,73 +132,126 @@ export function TenantOverview({
                     hasClipboardButton={Boolean(tenant)}
                     clipboardButtonAlwaysVisible
                 />
-            </div>
+                {isServerless ? (
+                    <div className={b('serverless-tag')}>
+                        <Label theme="clear" size="s" className={b('serverless-tag-label')}>
+                            <Flex alignItems="center" gap="2">
+                                {i18n('value_serverless')}
+                                <HelpMark iconSize="s" className={b('serverless-tag-tooltip')}>
+                                    {i18n('context_serverless-tooltip')}
+                                </HelpMark>
+                            </Flex>
+                        </Label>
+                    </div>
+                ) : null}
+            </Flex>
         );
     };
 
     const renderTabContent = () => {
-        switch (metricsTab) {
+        switch (activeMetricsTab) {
             case TENANT_METRICS_TABS_IDS.cpu: {
                 return (
                     <TenantCpu
-                        tenantName={tenantName}
-                        additionalNodesProps={additionalNodesProps}
+                        database={database}
+                        databaseType={Type}
+                        databaseFullPath={databaseFullPath}
                     />
                 );
             }
             case TENANT_METRICS_TABS_IDS.storage: {
-                return <TenantStorage tenantName={tenantName} metrics={storageMetrics} />;
+                return (
+                    <TenantStorage
+                        database={database}
+                        metrics={storageMetrics}
+                        databaseType={Type}
+                    />
+                );
             }
             case TENANT_METRICS_TABS_IDS.memory: {
                 return (
                     <TenantMemory
-                        tenantName={tenantName}
+                        database={database}
                         memoryUsed={tenantData.MemoryUsed}
                         memoryLimit={tenantData.MemoryLimit}
                         memoryStats={tenantData.MemoryStats}
                     />
                 );
             }
-            case TENANT_METRICS_TABS_IDS.healthcheck: {
-                return <HealthcheckDetails tenantName={tenantName} />;
+            case TENANT_METRICS_TABS_IDS.network: {
+                return <TenantNetwork database={database} />;
             }
             default: {
-                return <DefaultOverviewContent database={tenantName} />;
+                return null;
             }
         }
     };
 
-    if (tenantLoading) {
-        return (
-            <div className={b('loader')}>
-                <Loader size="m" />
-            </div>
-        );
-    }
+    const links = getInfoTabLinks(additionalTenantProps, Name, Type);
+    const {monitoring: clusterMonitoring} = useClusterBaseInfo();
+    const monitoringTabAvailable = canShowTenantMonitoringTab(
+        tenant?.ControlPlane,
+        clusterMonitoring,
+    );
 
-    const monitoringLink = additionalTenantProps?.getMonitoringLink?.(Name, Type);
-    const logsLink = additionalTenantProps?.getLogsLink?.(Name);
+    const handleOpenMonitoring = () => {
+        handleTenantPageChange(TENANT_PAGES_IDS.diagnostics);
+        dispatch(setDiagnosticsTab(TENANT_DIAGNOSTICS_TABS_IDS.monitoring));
+    };
 
     return (
-        <div className={b()}>
-            <div className={b('info')}>
-                <div className={b('top-label')}>{tenantType}</div>
-                <Flex alignItems="center" gap="1" className={b('top')}>
-                    {renderName()}
-                    <Flex gap="2">
-                        {monitoringLink && <MonitoringButton href={monitoringLink} />}
-                        {logsLink && <LogsButton href={logsLink} />}
+        <LoaderWrapper loading={tenantLoading}>
+            <div className={b()}>
+                <div className={b('info')}>
+                    <Flex alignItems="center" gap="2" className={b('top-label')}>
+                        {tenantType}
+                        {monitoringTabAvailable && (
+                            <Button view="normal" onClick={handleOpenMonitoring}>
+                                <Icon data={DisplayPulse} size={16} />
+                                {i18n('action_open-monitoring')}
+                            </Button>
+                        )}
                     </Flex>
-                </Flex>
-                <MetricsCards
-                    poolsCpuStats={poolsStats}
-                    memoryStats={memoryStats}
-                    blobStorageStats={blobStorageStats}
-                    tabletStorageStats={tabletStorageStats}
-                    tenantName={tenantName}
-                />
+                    <Flex alignItems="center" gap="1" className={b('top')}>
+                        {renderName()}
+                        {links.length > 0 && (
+                            <Flex gap="2">
+                                {links.map(({title, url, icon}) => (
+                                    <Button
+                                        key={title}
+                                        href={url}
+                                        target="_blank"
+                                        size="xs"
+                                        title={title}
+                                    >
+                                        <Icon data={icon} />
+                                    </Button>
+                                ))}
+                            </Flex>
+                        )}
+                    </Flex>
+                    <Flex direction="column" gap={4}>
+                        {!isServerless && <HealthcheckPreview database={database} />}
+                        <QueriesActivityBar database={database} />
+                        <MetricsTabs
+                            poolsCpuStats={poolsStats}
+                            memoryStats={memoryStats}
+                            blobStorageStats={blobStorageStats}
+                            tabletStorageStats={tabletStorageStats}
+                            networkUtilization={networkUtilization}
+                            networkThroughput={networkThroughput}
+                            storageGroupsCount={
+                                tenantData.StorageGroups
+                                    ? Number(tenantData.StorageGroups)
+                                    : undefined
+                            }
+                            databaseType={Type}
+                            activeTab={activeMetricsTab}
+                        />
+                    </Flex>
+                </div>
+                <div className={b('tab-content')}>{renderTabContent()}</div>
             </div>
-            {renderTabContent()}
-        </div>
+        </LoaderWrapper>
     );
 }

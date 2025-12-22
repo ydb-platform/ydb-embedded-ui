@@ -1,3 +1,4 @@
+import {transformPath} from '../../../containers/Tenant/ObjectSummary/transformPath';
 import {isQueryErrorResponse} from '../../../utils/query';
 import {api} from '../api';
 
@@ -11,19 +12,23 @@ export const viewSchemaApi = api.injectEndpoints({
             queryFn: async ({
                 database,
                 path,
+                databaseFullPath,
                 timeout,
             }: {
                 database: string;
                 path: string;
+                databaseFullPath: string;
                 timeout?: number;
             }) => {
                 try {
+                    const relativePath = transformPath(path, databaseFullPath);
                     const response = await window.api.viewer.sendQuery(
                         {
-                            query: createViewSchemaQuery(path),
+                            query: createViewSchemaQuery(relativePath),
                             database,
-                            action: 'execute-scan',
+                            action: 'execute-query',
                             timeout,
+                            internal_call: true,
                         },
                         {withRetries: true},
                     );

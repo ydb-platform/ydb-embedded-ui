@@ -4,11 +4,18 @@ import {NoSearchResults} from '@gravity-ui/illustrations';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {isNil} from 'lodash';
 
-import type {RenderControls} from '../../../../components/PaginatedTable';
+import {DrawerWrapper} from '../../../../components/Drawer';
+import {EmptyFilter} from '../../../../components/EmptyFilter/EmptyFilter';
+import {EnableFullscreenButton} from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
+import {PageError} from '../../../../components/Errors/PageError/PageError';
+import {Fullscreen} from '../../../../components/Fullscreen/Fullscreen';
 import {
     DEFAULT_TABLE_ROW_HEIGHT,
+    PAGINATED_TABLE_IDS,
     ResizeablePaginatedTable,
 } from '../../../../components/PaginatedTable';
+import {PaginatedTableWithLayout} from '../../../../components/PaginatedTable/PaginatedTableWithLayout';
+import {TableColumnSetup} from '../../../../components/TableColumnSetup/TableColumnSetup';
 import {partitionsApi} from '../../../../store/reducers/partitions/partitions';
 import {topicApi} from '../../../../store/reducers/topic';
 import type {TopicDataRequest} from '../../../../types/api/topic';
@@ -16,9 +23,9 @@ import {useAutoRefreshInterval} from '../../../../utils/hooks';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 import {renderPaginatedTableErrorMessage} from '../../../../utils/renderPaginatedTableErrorMessage';
 import {safeParseNumber} from '../../../../utils/utils';
-import {EmptyFilter} from '../../../Storage/EmptyFilter/EmptyFilter';
 
 import {TopicDataControls} from './TopicDataControls/TopicDataControls';
+import {TopicMessageDetails} from './TopicMessageDetails/TopicMessageDetails';
 import {
     DEFAULT_TOPIC_DATA_COLUMNS,
     REQUIRED_TOPIC_DATA_COLUMNS,
@@ -40,10 +47,14 @@ import './TopicData.scss';
 interface TopicDataProps {
     path: string;
     database: string;
-    parentRef: React.RefObject<HTMLElement>;
+    databaseFullPath: string;
+    scrollContainerRef: React.RefObject<HTMLDivElement>;
 }
+const PAGINATED_TABLE_LIMIT = 50_000;
 
-export function TopicData({parentRef, path, database}: TopicDataProps) {
+const columns = getAllColumns();
+
+export function TopicData({scrollContainerRef, path, database, databaseFullPath}: TopicDataProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const [startOffset, setStartOffset] = React.useState<number>();
     const [endOffset, setEndOffset] = React.useState<number>();
@@ -51,19 +62,19 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
     const [emptyData, setEmptyData] = React.useState(false);
 
     const [baseOffset, setBaseOffset] = React.useState<number>();
+    const [truncated, setTruncated] = React.useState(false);
     const [baseEndOffset, setBaseEndOffset] = React.useState<number>();
-
-    const startRef = React.useRef<number>();
-    startRef.current = startOffset;
 
     const {
         selectedPartition,
         selectedOffset,
         startTimestamp,
         topicDataFilter,
+        activeOffset,
         handleSelectedOffsetChange,
         handleStartTimestampChange,
         handleSelectedPartitionChange,
+        handleActiveOffsetChange,
     } = useTopicDataQueryParams();
 
     React.useEffect(() => {
@@ -94,36 +105,62 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
         isLoading: partitionsLoading,
         error: partitionsError,
     } = partitionsApi.useGetPartitionsQuery(
-        {path, database},
+        {path, database, databaseFullPath},
         {pollingInterval: autoRefreshInterval},
     );
 
+    const prevSelectedPartition = React.useRef(selectedPartition);
+
     React.useEffect(() => {
+        const selectedPartitionChanged = selectedPartition !== prevSelectedPartition.current;
         const selectedPartitionData = partitions?.find(
             ({partitionId}) => partitionId === selectedPartition,
         );
         if (selectedPartitionData) {
-            if (!baseOffset) {
-                setBaseOffset(safeParseNumber(selectedPartitionData.startOffset));
+            let endOffset = baseEndOffset;
+            if (!baseEndOffset || selectedPartitionChanged) {
+                endOffset = safeParseNumber(selectedPartitionData.endOffset);
+                setBaseEndOffset(endOffset);
             }
-            if (!baseEndOffset) {
-                setBaseEndOffset(safeParseNumber(selectedPartitionData.endOffset));
+            if (!baseOffset || selectedPartitionChanged) {
+                const partitionStartOffset = safeParseNumber(selectedPartitionData.startOffset);
+                const newStartOffset = Math.max(
+                    (endOffset ?? 0) - PAGINATED_TABLE_LIMIT,
+                    partitionStartOffset,
+                );
+
+                setTruncated(newStartOffset !== partitionStartOffset);
+                setBaseOffset(newStartOffset);
             }
         }
-    }, [selectedPartition, partitions, baseOffset, baseEndOffset, startOffset, endOffset]);
+        if (selectedPartitionChanged) {
+            prevSelectedPartition.current = selectedPartition;
+        }
+    }, [selectedPartition, partitions, baseEndOffset, baseOffset]);
 
     React.useEffect(() => {
         if (partitions && partitions.length && isNil(selectedPartition)) {
-            handleSelectedPartitionChange(partitions[0].partitionId);
+            const firstPartitionId = partitions[0].partitionId;
+            handleSelectedPartitionChange(
+                isNil(firstPartitionId) ? undefined : String(firstPartitionId),
+            );
         }
     }, [partitions, selectedPartition, handleSelectedPartitionChange]);
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
-        getAllColumns(),
+        columns,
         TOPIC_DATA_SELECTED_COLUMNS_LS_KEY,
         TOPIC_DATA_COLUMNS_TITLES,
         DEFAULT_TOPIC_DATA_COLUMNS,
         REQUIRED_TOPIC_DATA_COLUMNS,
+    );
+
+    const setBoundOffsets = React.useCallback(
+        ({startOffset, endOffset}: {startOffset: number; endOffset: number}) => {
+            setStartOffset(startOffset);
+            setEndOffset(endOffset);
+        },
+        [],
     );
 
     React.useEffect(() => {
@@ -137,10 +174,12 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
             setEmptyData(true);
         }
         if (currentData) {
-            setStartOffset(safeParseNumber(currentData.StartOffset));
-            setEndOffset(safeParseNumber(currentData.EndOffset));
+            setBoundOffsets({
+                startOffset: safeParseNumber(currentData.StartOffset),
+                endOffset: safeParseNumber(currentData.EndOffset),
+            });
         }
-    }, [isFetching, currentData, error]);
+    }, [isFetching, currentData, error, setBoundOffsets]);
 
     const tableFilters = React.useMemo(
         () => ({
@@ -160,48 +199,89 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
         }
     }, [handleSelectedOffsetChange, handleStartTimestampChange, topicDataFilter]);
 
+    const handlePartitionChange = React.useCallback(
+        (value: string[]) => {
+            handleSelectedPartitionChange(value[0]);
+            resetFilters();
+        },
+        [handleSelectedPartitionChange, resetFilters],
+    );
+
     const scrollToOffset = React.useCallback(
         (newOffset: number) => {
             const scrollTop = (newOffset - (baseOffset ?? 0)) * DEFAULT_TABLE_ROW_HEIGHT;
             const normalizedScrollTop = Math.max(0, scrollTop);
-            parentRef.current?.scrollTo({
-                top: normalizedScrollTop,
-                behavior: 'instant',
+            // this is needed to ensure happening after useTableScroll in useLayoutEffect
+            requestAnimationFrame(() => {
+                scrollContainerRef.current?.scrollTo({
+                    top: normalizedScrollTop,
+                    behavior: 'instant',
+                });
             });
         },
-        [baseOffset, parentRef],
+        [baseOffset, scrollContainerRef],
     );
 
+    //this variable is used to scroll to active offset the very first time on open page
+    const initialScrollToOffset = React.useRef(selectedOffset ?? activeOffset);
+
     React.useEffect(() => {
-        if (isFetching) {
+        if (isFetching || isNil(baseOffset)) {
             return;
         }
-        const messages = currentData?.Messages;
-        if (messages?.length) {
-            const messageOffset = safeParseNumber(messages[0].Offset);
-            //scroll when table is already rendered and calculated it's state
-            setTimeout(() => {
-                scrollToOffset(messageOffset);
-            }, 0);
-        }
-    }, [currentData, isFetching, scrollToOffset]);
 
-    const renderControls: RenderControls = () => {
+        let currentOffset: number | undefined;
+        if (isNil(initialScrollToOffset.current)) {
+            const messages = currentData?.Messages;
+            if (messages?.length) {
+                currentOffset = safeParseNumber(messages[0].Offset);
+            }
+        } else {
+            currentOffset = safeParseNumber(initialScrollToOffset.current);
+            initialScrollToOffset.current = undefined;
+        }
+        if (!isNil(currentOffset)) {
+            scrollToOffset(currentOffset);
+        }
+    }, [currentData, isFetching, scrollToOffset, baseOffset]);
+
+    const renderControls = React.useCallback(() => {
         return (
             <TopicDataControls
                 // component has uncontrolled components inside, so it should be rerendered on filters reset
                 key={controlsKey}
-                columnsToSelect={columnsToSelect}
-                handleSelectedColumnsUpdate={setColumns}
+                handlePartitionChange={handlePartitionChange}
                 partitions={partitions}
                 partitionsLoading={partitionsLoading}
                 partitionsError={partitionsError}
                 startOffset={startOffset}
                 endOffset={endOffset}
+                truncatedData={truncated}
                 scrollToOffset={scrollToOffset}
             />
         );
-    };
+    }, [
+        controlsKey,
+        endOffset,
+        partitions,
+        partitionsError,
+        partitionsLoading,
+        scrollToOffset,
+        startOffset,
+        truncated,
+        handlePartitionChange,
+    ]);
+
+    const renderExtraControls = React.useCallback(() => {
+        return (
+            <TableColumnSetup
+                popupWidth={242}
+                items={columnsToSelect}
+                showStatus
+                onUpdate={setColumns}
+            />
+        );
+    }, [columnsToSelect, setColumns]);
 
     const renderEmptyDataMessage = () => {
         const hasFilters = selectedOffset || startTimestamp;
@@ -218,33 +298,88 @@ export function TopicData({parentRef, path, database}: TopicDataProps) {
     };
 
     const getTopicData = React.useMemo(
-        () => generateTopicDataGetter({setEndOffset, setStartOffset, baseOffset}),
-        [baseOffset],
+        () => generateTopicDataGetter({setBoundOffsets, baseOffset}),
+        [baseOffset, setBoundOffsets],
     );
+
+    const closeDrawer = React.useCallback(() => {
+        handleActiveOffsetChange(undefined);
+    }, [handleActiveOffsetChange]);
+
+    const renderDrawerContent = React.useCallback(() => {
+        return (
+            <Fullscreen>
+                <TopicMessageDetails
+                    database={database}
+                    path={path}
+                    scrollContainerRef={scrollContainerRef}
+                />
+            </Fullscreen>
+        );
+    }, [database, path, scrollContainerRef]);
+
+    if (error) {
+        return <PageError error={error} position="left" />;
+    }
 
     return (
         !isNil(baseOffset) &&
         !isNil(baseEndOffset) && (
-            <ResizeablePaginatedTable
-                columnsWidthLSKey={TOPIC_DATA_COLUMNS_WIDTH_LS_KEY}
-                parentRef={parentRef}
-                columns={columnsToShow}
-                fetchData={getTopicData}
-                initialEntitiesCount={baseEndOffset - baseOffset}
-                limit={TOPIC_DATA_FETCH_LIMIT}
-                renderControls={renderControls}
-                renderErrorMessage={renderPaginatedTableErrorMessage}
-                renderEmptyDataMessage={renderEmptyDataMessage}
-                filters={tableFilters}
-                tableName="topicData"
-                rowHeight={DEFAULT_TABLE_ROW_HEIGHT}
-                keepCache={false}
-                getRowClassName={(row) => {
-                    return b('row', {
-                        active: Boolean(selectedOffset && String(row.Offset) === selectedOffset),
-                    });
-                }}
-            />
+            <DrawerWrapper
+                isDrawerVisible={!isNil(activeOffset)}
+                onCloseDrawer={closeDrawer}
+                renderDrawerContent={renderDrawerContent}
+                drawerId="topic-data-details"
+                storageKey="topic-data-details-drawer-width"
+                detectClickOutside
+                isPercentageWidth
+                drawerControls={[
+                    {type: 'copyLink', link: window.location.href},
+                    {
+                        type: 'custom',
+                        node: <EnableFullscreenButton disabled={Boolean(error)} view="flat" />,
+                        key: 'fullscreen',
+                    },
+                    {type: 'close'},
+                ]}
+                title={i18n('label_message')}
+                headerClassName={b('drawer-header')}
+            >
+                <PaginatedTableWithLayout
+                    controls={renderControls()}
+                    extraControls={renderExtraControls()}
+                    table={
+                        <ResizeablePaginatedTable
+                            columnsWidthLSKey={TOPIC_DATA_COLUMNS_WIDTH_LS_KEY}
+                            scrollContainerRef={scrollContainerRef}
+                            columns={columnsToShow}
+                            fetchData={getTopicData}
+                            initialEntitiesCount={baseEndOffset - baseOffset}
+                            limit={TOPIC_DATA_FETCH_LIMIT}
+                            renderErrorMessage={renderPaginatedTableErrorMessage}
+                            renderEmptyDataMessage={renderEmptyDataMessage}
+                            filters={tableFilters}
+                            tableName={PAGINATED_TABLE_IDS.TOPIC_DATA}
+                            rowHeight={DEFAULT_TABLE_ROW_HEIGHT}
+                            keepCache={false}
+                            getRowClassName={(row) => {
+                                return b('row', {
+                                    active: Boolean(
+                                        safeParseNumber(row.Offset) === selectedOffset ||
+                                            String(row.Offset) === activeOffset,
+                                    ),
+                                    removed: row.removed,
+                                });
+                            }}
+                        />
+                    }
+                    tableWrapperProps={{
+                        scrollContainerRef,
+                        scrollDependencies: [baseOffset, baseEndOffset, tableFilters],
+                    }}
+                    noBatching
+                />
+            </DrawerWrapper>
         )
     );
 }

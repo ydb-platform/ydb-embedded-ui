@@ -1,17 +1,14 @@
 import React from 'react';
 
-import {StringParam, useQueryParam} from 'use-query-params';
-
 import {MetricChart} from '../../../../../components/MetricChart';
 import type {
     ChartDataStatus,
     ChartOptions,
     MetricDescription,
 } from '../../../../../components/MetricChart';
-import {TimeFrameSelector} from '../../../../../components/TimeFrameSelector/TimeFrameSelector';
+import {useGraphShardExists} from '../../../../../store/reducers/capabilities/hooks';
 import {cn} from '../../../../../utils/cn';
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
-import type {TimeFrame} from '../../../../../utils/timeframes';
 
 import './TenantDashboard.scss';
 
@@ -32,14 +29,23 @@ interface TenantDashboardProps {
 }
 
 export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
-    const [isDashboardHidden, setIsDashboardHidden] = React.useState<boolean>(true);
+    const graphShardExists = useGraphShardExists();
 
-    const [timeFrame = '1h', setTimeframe] = useQueryParam('timeframe', StringParam);
+    const [hasSuccessfulChart, setHasSuccessfulChart] = React.useState<boolean>(false);
+
+    const isDashboardHidden = React.useMemo(() => {
+        return !graphShardExists && !hasSuccessfulChart;
+    }, [graphShardExists, hasSuccessfulChart]);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     // Refetch data only if dashboard successfully loaded
     const shouldRefresh = isDashboardHidden ? 0 : autoRefreshInterval;
+
+    // Do not render charts at all when GraphShard capability explicitly says it's absent
+    if (graphShardExists === false) {
+        return null;
+    }
 
     /**
      * Charts should be hidden, if they are not enabled:
@@ -47,12 +53,14 @@ export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
      * 2. ydb version does not have /viewer/json/render endpoint (400, 404, CORS error, etc.)
      *
      * If at least one chart successfully loaded, dashboard should be shown
-     * @link https://github.com/ydb-platform/ydb-embedded-ui/issues/659
+     * This fallback behavior is only used when GraphShardExists capability is not available or false
+     * Link: https://github.com/ydb-platform/ydb-embedded-ui/issues/659
      * @todo disable only for specific errors ('GraphShard is not enabled') after ydb-stable-24 is generally used
      */
     const handleChartDataStatusChange = (chartStatus: ChartDataStatus) => {
+        // Always track successful chart loads for fallback behavior
         if (chartStatus === 'success') {
-            setIsDashboardHidden(false);
+            setHasSuccessfulChart(true);
         }
     };
 
@@ -61,31 +69,24 @@ export const TenantDashboard = ({database, charts}: TenantDashboardProps) => {
     const chartHeight = CHART_WIDTH / 1.5;
 
     const renderContent = () => {
-        return charts.map((chartConfig) => {
-            const chartId = chartConfig.metrics.map(({target}) => target).join('&');
-            return (
-                <MetricChart
-                    key={chartId}
-                    database={database}
-                    title={chartConfig.title}
-                    metrics={chartConfig.metrics}
-                    timeFrame={timeFrame as TimeFrame}
-                    chartOptions={chartConfig.options}
-                    autorefresh={shouldRefresh}
-                    width={chartWidth}
-                    height={chartHeight}
-                    onChartDataStatusChange={handleChartDataStatusChange}
-                    isChartVisible={!isDashboardHidden}
-                />
-            );
-        });
+        return charts.map((chartConfig, index) => (
+            <MetricChart
+                key={index}
+                database={database}
+                metrics={chartConfig.metrics}
+                chartOptions={chartConfig.options}
+                autorefresh={shouldRefresh}
+                width={chartWidth}
+                height={chartHeight}
+                onChartDataStatusChange={handleChartDataStatusChange}
+                isChartVisible={!isDashboardHidden}
+                title={chartConfig.title}
+            />
+        ));
     };
 
     return (
         <div className={b(null)} style={{display: isDashboardHidden ? 'none' : undefined}}>
-            <div className={b('controls')}>
-                <TimeFrameSelector value={timeFrame as TimeFrame} onChange={setTimeframe} />
-            </div>
             <div className={b('charts')}>{renderContent()}</div>
         </div>
     );

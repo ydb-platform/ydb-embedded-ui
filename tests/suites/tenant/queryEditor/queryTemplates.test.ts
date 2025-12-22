@@ -1,6 +1,6 @@
 import {expect, test} from '@playwright/test';
 
-import {dsVslotsSchema, dsVslotsTableName, tenantName} from '../../../utils/constants';
+import {database, dsVslotsSchema, dsVslotsTableName} from '../../../utils/constants';
 import {TenantPage} from '../TenantPage';
 import {SavedQueriesTable} from '../savedQueries/models/SavedQueriesTable';
 import {ObjectSummary} from '../summary/ObjectSummary';
@@ -20,7 +20,7 @@ test.describe('Query Templates', () => {
     test.beforeEach(async ({page}) => {
         const pageQueryParams = {
             schema: dsVslotsSchema,
-            database: tenantName,
+            database,
             general: 'query',
         };
         const tenantPage = new TenantPage(page);

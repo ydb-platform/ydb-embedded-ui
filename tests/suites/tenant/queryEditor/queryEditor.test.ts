@@ -2,7 +2,7 @@ import {expect, test} from '@playwright/test';
 
 import {QUERY_MODES, STATISTICS_MODES} from '../../../../src/utils/query';
 import {getClipboardContent} from '../../../utils/clipboard';
-import {tenantName} from '../../../utils/constants';
+import {database} from '../../../utils/constants';
 import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {NavigationTabs, TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 import {
@@ -11,6 +11,7 @@ import {
     longRunningStreamQuery,
     longTableSelect,
     longerRunningStreamQuery,
+    simpleQuery,
 } from '../constants';
 
 import {
@@ -27,8 +28,8 @@ test.describe('Test Query Editor', async () => {
 
     test.beforeEach(async ({page}) => {
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             general: 'query',
         };
 
@@ -379,7 +380,9 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isResultsControlsCollapsed()).resolves.toBe(false);
     });
 
-    test('Copy result button copies to clipboard', async ({page}) => {
+    test('Copy result button copies to clipboard', async ({page, browserName}) => {
+        // Skip this test in Safari due to clipboard permission issues
+        test.skip(browserName === 'webkit', 'Clipboard API not fully supported in Safari');
         const queryEditor = new QueryEditor(page);
         const query = 'SELECT 42 as answer;';
 
@@ -406,5 +409,43 @@ test.describe('Test Query Editor', async () => {
 
         // Verify clipboard contains the query result
         expect(clipboardContent).toContain('42');
+    });
+
+    test.describe('Statistics Modes Tests', async () => {
+        test('Stats tab shows no stats message when STATISTICS_MODES.none', async ({page}) => {
+            const queryEditor = new QueryEditor(page);
+
+            // Set query and configure statistics mode to none
+            await queryEditor.setQuery(simpleQuery);
+            await queryEditor.clickGearButton();
+            await queryEditor.settingsDialog.changeStatsLevel(STATISTICS_MODES.none);
+            await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+
+            // Execute query
+            await queryEditor.clickRunButton();
+            await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+
+            // Check Stats tab content
+            const statsContent = await queryEditor.getStatsTabContent();
+            expect(statsContent).toContain('There is no Stats for the request');
+        });
+
+        test('Stats tab shows JSON viewer when STATISTICS_MODES.basic', async ({page}) => {
+            const queryEditor = new QueryEditor(page);
+
+            // Set query and configure statistics mode to basic
+            await queryEditor.setQuery(simpleQuery);
+            await queryEditor.clickGearButton();
+            await queryEditor.settingsDialog.changeStatsLevel(STATISTICS_MODES.basic);
+            await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+
+            // Execute query
+            await queryEditor.clickRunButton();
+            await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+
+            // Check that Stats tab contains JSON viewer
+            const hasJsonViewer = await queryEditor.hasStatsJsonViewer();
+            expect(hasJsonViewer).toBe(true);
+        });
     });
 });

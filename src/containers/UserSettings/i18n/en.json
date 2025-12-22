@@ -38,7 +38,7 @@
 
   "settings.enableNetworkTable.title": "Enable network table",
 
-  "settings.showNetworkUtilization.title": "Show cluster network utilization",
+  "settings.showNetworkUtilization.title": "Show network utilization",
 
   "settings.useShowPlanToSvg.title": "Execution plan",
   "settings.useShowPlanToSvg.description": " Show \"Execution plan\" button in query result widow. Opens svg with execution plan in a new window.",
@@ -47,6 +47,12 @@
 
   "settings.useClusterBalancerAsBackend.title": "Use cluster balancer as backend",
   "settings.useClusterBalancerAsBackend.description": "By default random cluster node is used as backend. It causes saved links to become invalid after some time, when node is restarted. Using balancer as backend fixes it",
+
+  "settings.aclSyntax.title": "ACL syntax format",
+  "settings.aclSyntax.option-kikimr": "KiKiMr",
+  "settings.aclSyntax.option-ydb-short": "YDB Short",
+  "settings.aclSyntax.option-ydb": "YDB",
+  "settings.aclSyntax.option-yql": "YQL",
 
   "settings.about.interfaceVersionInfoField.title": "Interface version"
 }

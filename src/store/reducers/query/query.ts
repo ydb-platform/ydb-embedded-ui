@@ -1,12 +1,20 @@
 import {createSelector, createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 
-import {settingsManager} from '../../../services/settings';
 import {TracingLevelNumber} from '../../../types/api/query';
 import type {QueryAction, QueryRequestParams, QuerySettings} from '../../../types/store/query';
 import type {StreamDataChunk} from '../../../types/store/streaming';
-import {QUERIES_HISTORY_KEY} from '../../../utils/constants';
-import {isQueryErrorResponse} from '../../../utils/query';
+import {loadFromSessionStorage, saveToSessionStorage} from '../../../utils';
+import {
+    QUERY_EDITOR_CURRENT_QUERY_KEY,
+    QUERY_EDITOR_DIRTY_KEY,
+    QUERY_TECHNICAL_MARK,
+} from '../../../utils/constants';
+import {
+    RESOURCE_POOL_NO_OVERRIDE_VALUE,
+    isQueryErrorResponse,
+    parseQueryAPIResponse,
+} from '../../../utils/query';
 import {isNumeric} from '../../../utils/utils';
 import type {RootState} from '../../defaultStore';
 import {api} from '../api';
@@ -17,31 +25,20 @@ import {
     setStreamQueryResponse as setStreamQueryResponseReducer,
     setStreamSession as setStreamSessionReducer,
 } from './streamingReducers';
-import type {QueryResult, QueryState} from './types';
-import {getActionAndSyntaxFromQueryMode, getQueryInHistory} from './utils';
+import type {QueryResult, QueryState, QueryStats} from './types';
+import {getActionAndSyntaxFromQueryMode, prepareQueryWithPragmas} from './utils';
 
-const MAXIMUM_QUERIES_IN_HISTORY = 20;
+const rawQuery = loadFromSessionStorage(QUERY_EDITOR_CURRENT_QUERY_KEY);
+const input = typeof rawQuery === 'string' ? rawQuery : '';
 
-const queriesHistoryInitial = settingsManager.readUserSettingsValue(
-    QUERIES_HISTORY_KEY,
-    [],
-) as string[];
-
-const sliceLimit = queriesHistoryInitial.length - MAXIMUM_QUERIES_IN_HISTORY;
+const isDirty = Boolean(loadFromSessionStorage(QUERY_EDITOR_DIRTY_KEY));
 
 const initialState: QueryState = {
-    input: '',
-    isDirty: false,
-    history: {
-        queries: queriesHistoryInitial
-            .slice(sliceLimit < 0 ? 0 : sliceLimit)
-            .map(getQueryInHistory),
-        currentIndex:
-            queriesHistoryInitial.length > MAXIMUM_QUERIES_IN_HISTORY
-                ? MAXIMUM_QUERIES_IN_HISTORY - 1
-                : queriesHistoryInitial.length - 1,
-        filter: '',
-    },
+    input,
+    isDirty,
+
+    historyFilter: '',
+    historyCurrentQueryId: undefined,
 };
 
 const slice = createSlice({
@@ -50,105 +47,48 @@ const slice = createSlice({
     reducers: {
         changeUserInput: (state, action: PayloadAction<{input: string}>) => {
             state.input = action.payload.input;
+            saveToSessionStorage(QUERY_EDITOR_CURRENT_QUERY_KEY, action.payload.input);
         },
         setIsDirty: (state, action: PayloadAction<boolean>) => {
             state.isDirty = action.payload;
+            saveToSessionStorage(QUERY_EDITOR_DIRTY_KEY, action.payload);
         },
         setQueryResult: (state, action: PayloadAction<QueryResult | undefined>) => {
             state.result = action.payload;
-        },
-        saveQueryToHistory: (
-            state,
-            action: PayloadAction<{queryText: string; queryId: string}>,
-        ) => {
-            const {queryText, queryId} = action.payload;
-
-            const newQueries = [...state.history.queries, {queryText, queryId}].slice(
-                state.history.queries.length >= MAXIMUM_QUERIES_IN_HISTORY ? 1 : 0,
-            );
-            settingsManager.setUserSettingsValue(QUERIES_HISTORY_KEY, newQueries);
-            const currentIndex = newQueries.length - 1;
-
-            state.history = {
-                queries: newQueries,
-                currentIndex,
-            };
-        },
-        updateQueryInHistory: (
-            state,
-            action: PayloadAction<{queryId: string; stats: QueryStats}>,
-        ) => {
-            const {queryId, stats} = action.payload;
-
-            if (!stats) {
-                return;
-            }
-
-            const index = state.history.queries.findIndex((item) => item.queryId === queryId);
-
-            if (index === -1) {
-                return;
-            }
-
-            const newQueries = [...state.history.queries];
-            const {durationUs, endTime} = stats;
-            newQueries.splice(index, 1, {
-                ...state.history.queries[index],
-                durationUs,
-                endTime,
-            });
-
-            settingsManager.setUserSettingsValue(QUERIES_HISTORY_KEY, newQueries);
-
-            state.history.queries = newQueries;
-        },
-        goToPreviousQuery: (state) => {
-            const currentIndex = state.history.currentIndex;
-            if (currentIndex <= 0) {
-                return;
-            }
-            const newCurrentIndex = currentIndex - 1;
-            const query = state.history.queries[newCurrentIndex];
-            state.input = query.queryText;
-            state.history.currentIndex = newCurrentIndex;
-        },
-        goToNextQuery: (state) => {
-            const currentIndex = state.history.currentIndex;
-            if (currentIndex >= state.history.queries.length - 1) {
-                return;
-            }
-            const newCurrentIndex = currentIndex + 1;
-            const query = state.history.queries[newCurrentIndex];
-            state.input = query.queryText;
-            state.history.currentIndex = newCurrentIndex;
         },
         setTenantPath: (state, action: PayloadAction<string>) => {
             state.tenantPath = action.payload;
         },
         setQueryHistoryFilter: (state, action: PayloadAction<string>) => {
-            state.history.filter = action.payload;
+            state.historyFilter = action.payload;
+        },
+        setHistoryCurrentQueryId: (state, action: PayloadAction<string | undefined>) => {
+            state.historyCurrentQueryId = action.payload;
+        },
+        setResultTab: (
+            state,
+            action: PayloadAction<{queryType: 'execute' | 'explain'; tabId: string}>,
+        ) => {
+            const {queryType, tabId} = action.payload;
+            if (!state.selectedResultTab) {
+                state.selectedResultTab = {};
+            }
+            state.selectedResultTab[queryType] = tabId;
         },
         setStreamSession: setStreamSessionReducer,
         addStreamingChunks: addStreamingChunksReducer,
         setStreamQueryResponse: setStreamQueryResponseReducer,
     },
     selectors: {
-        selectQueriesHistoryFilter: (state) => state.history.filter || '',
+        selectQueriesHistoryFilter: (state) => state.historyFilter || '',
+        selectHistoryCurrentQueryId: (state) => state.historyCurrentQueryId,
         selectTenantPath: (state) => state.tenantPath,
         selectResult: (state) => state.result,
         selectStartTime: (state) => state.result?.startTime,
         selectEndTime: (state) => state.result?.endTime,
-        selectQueriesHistory: (state) => {
-            const items = state.history.queries;
-            const filter = state.history.filter?.toLowerCase();
-
-            return filter
-                ? items.filter((item) => item.queryText.toLowerCase().includes(filter))
-                : items;
-        },
         selectUserInput: (state) => state.input,
         selectIsDirty: (state) => state.isDirty,
-        selectQueriesHistoryCurrentIndex: (state) => state.history?.currentIndex,
+        selectResultTab: (state) => state.selectedResultTab,
     },
 });
 
@@ -167,27 +107,34 @@ export default slice.reducer;
 export const {
     changeUserInput,
     setQueryResult,
-    saveQueryToHistory,
-    updateQueryInHistory,
-    goToPreviousQuery,
-    goToNextQuery,
     setTenantPath,
     setQueryHistoryFilter,
+    setHistoryCurrentQueryId,
     addStreamingChunks,
     setStreamQueryResponse,
     setStreamSession,
     setIsDirty,
+    setResultTab,
 } = slice.actions;
 
 export const {
     selectQueriesHistoryFilter,
-    selectQueriesHistoryCurrentIndex,
-    selectQueriesHistory,
+    selectHistoryCurrentQueryId,
     selectTenantPath,
     selectResult,
     selectUserInput,
     selectIsDirty,
+    selectResultTab,
 } = slice.selectors;
+
+const getResourcePoolsQueryText = () => {
+    return `${QUERY_TECHNICAL_MARK}
+SELECT
+    Name
+FROM \`.sys/resource_pools\`
+ORDER BY Name
+`;
+};
 
 interface SendQueryParams extends QueryRequestParams {
     actionType?: QueryAction;
@@ -196,24 +143,19 @@ interface SendQueryParams extends QueryRequestParams {
     // flag whether to send new tracing header or not
     // default: not send
     enableTracingLevel?: boolean;
+    base64?: boolean;
 }
 
 // Stream query receives queryId from session chunk.
 type StreamQueryParams = Omit<SendQueryParams, 'queryId'>;
 
-interface QueryStats {
-    durationUs?: string | number;
-    endTime?: string | number;
-}
-
-const DEFAULT_STREAM_CHUNK_SIZE = 1000;
 const DEFAULT_CONCURRENT_RESULTS = false;
 
 export const queryApi = api.injectEndpoints({
     endpoints: (build) => ({
         useStreamQuery: build.mutation<null, StreamQueryParams>({
             queryFn: async (
-                {query, database, querySettings = {}, enableTracingLevel},
+                {query, database, querySettings = {}, enableTracingLevel, base64},
                 {signal, dispatch, getState},
             ) => {
                 const startTime = Date.now();
@@ -231,6 +173,8 @@ export const queryApi = api.injectEndpoints({
                     querySettings?.queryMode,
                 );
 
+                const finalQuery = prepareQueryWithPragmas(query, querySettings.pragmas);
+
                 try {
                     let streamDataChunkBatch: StreamDataChunk[] = [];
                     let batchTimeout: number | null = null;
@@ -245,7 +189,7 @@ export const queryApi = api.injectEndpoints({
 
                     await window.api.streaming.streamQuery(
                         {
-                            query,
+                            query: finalQuery,
                             database,
                             action,
                             syntax,
@@ -264,8 +208,16 @@ export const queryApi = api.injectEndpoints({
                             timeout: isNumeric(querySettings.timeout)
                                 ? Number(querySettings.timeout) * 1000
                                 : undefined,
-                            output_chunk_max_size: DEFAULT_STREAM_CHUNK_SIZE,
+                            output_chunk_max_size: isNumeric(querySettings.outputChunkMaxSize)
+                                ? Number(querySettings.outputChunkMaxSize)
+                                : undefined,
                             concurrent_results: DEFAULT_CONCURRENT_RESULTS || undefined,
+                            base64,
+                            resource_pool:
+                                querySettings.resourcePool === RESOURCE_POOL_NO_OVERRIDE_VALUE ||
+                                !querySettings.resourcePool
+                                    ? undefined
+                                    : querySettings.resourcePool,
                         },
                         {
                             signal,
@@ -296,6 +248,10 @@ export const queryApi = api.injectEndpoints({
                     return {data: null};
                 } catch (error) {
                     const state = getState() as RootState;
+                    if (state.query.result?.startTime !== startTime) {
+                        // This query is no longer current, don't update state
+                        return {error};
+                    }
                     dispatch(
                         setQueryResult({
                             ...state.query.result,
@@ -311,7 +267,7 @@ export const queryApi = api.injectEndpoints({
                 }
             },
         }),
-        useSendQuery: build.mutation<null, SendQueryParams>({
+        useSendQuery: build.mutation<{queryStats: QueryStats; queryId: string}, SendQueryParams>({
             queryFn: async (
                 {
                     actionType = 'execute',
@@ -320,8 +276,9 @@ export const queryApi = api.injectEndpoints({
                     querySettings = {},
                     enableTracingLevel,
                     queryId,
+                    base64,
                 },
-                {signal, dispatch},
+                {signal, dispatch, getState},
             ) => {
                 const startTime = Date.now();
                 dispatch(
@@ -338,11 +295,13 @@ export const queryApi = api.injectEndpoints({
                     querySettings?.queryMode,
                 );
 
+                const finalQuery = prepareQueryWithPragmas(query, querySettings.pragmas);
+
                 try {
                     const timeStart = Date.now();
                     const response = await window.api.viewer.sendQuery(
                         {
-                            query,
+                            query: finalQuery,
                             database,
                             action,
                             syntax,
@@ -362,6 +321,12 @@ export const queryApi = api.injectEndpoints({
                                 ? Number(querySettings.timeout) * 1000
                                 : undefined,
                             query_id: queryId,
+                            base64,
+                            resource_pool:
+                                querySettings.resourcePool === RESOURCE_POOL_NO_OVERRIDE_VALUE ||
+                                !querySettings.resourcePool
+                                    ? undefined
+                                    : querySettings.resourcePool,
                         },
                         {signal},
                     );
@@ -383,8 +348,9 @@ export const queryApi = api.injectEndpoints({
                     const data = prepareQueryData(response);
                     data.traceId = response?._meta?.traceId;
 
+                    const queryStats: QueryStats = {};
+
                     if (actionType === 'execute') {
-                        const queryStats: QueryStats = {};
                         if (data.stats) {
                             const {DurationUs, Executions: [{FinishTimeMs}] = [{}]} = data.stats;
                             queryStats.durationUs = DurationUs;
@@ -394,8 +360,6 @@ export const queryApi = api.injectEndpoints({
                             queryStats.durationUs = (now - timeStart) * 1000;
                             queryStats.endTime = now;
                         }
-
-                        dispatch(updateQueryInHistory({stats: queryStats, queryId}));
                     }
 
                     dispatch(
@@ -408,8 +372,13 @@ export const queryApi = api.injectEndpoints({
                             endTime: Date.now(),
                         }),
                     );
-                    return {data: null};
+                    return {data: {queryStats, queryId}};
                 } catch (error) {
+                    const state = getState() as RootState;
+                    if (state.query.result?.startTime !== startTime) {
+                        // This query is no longer current, don't update state
+                        return {error};
+                    }
                     dispatch(
                         setQueryResult({
                             type: actionType,
@@ -420,6 +389,35 @@ export const queryApi = api.injectEndpoints({
                             endTime: Date.now(),
                         }),
                     );
+                    return {error};
+                }
+            },
+        }),
+        getResourcePools: build.query<string[], {database: string}>({
+            queryFn: async ({database}, {signal}) => {
+                try {
+                    const response = await window.api.viewer.sendQuery(
+                        {
+                            query: getResourcePoolsQueryText(),
+                            database,
+                            action: 'execute-query',
+                            internal_call: true,
+                        },
+                        {signal, withRetries: true},
+                    );
+
+                    if (isQueryErrorResponse(response)) {
+                        return {error: response};
+                    }
+
+                    const data = parseQueryAPIResponse(response);
+                    const rows = data.resultSets?.[0]?.result || [];
+                    const pools = rows
+                        .map((row) => row && row.Name)
+                        .filter((name): name is string => Boolean(name));
+
+                    return {data: pools};
+                } catch (error) {
                     return {error};
                 }
             },

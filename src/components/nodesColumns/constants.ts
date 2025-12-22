@@ -8,6 +8,7 @@ export const NODES_COLUMNS_WIDTH_LS_KEY = 'nodesTableColumnsWidth';
 export const NODES_COLUMNS_IDS = {
     NodeId: 'NodeId',
     Host: 'Host',
+    NetworkHost: 'NetworkHost',
     Database: 'Database',
     NodeName: 'NodeName',
     DC: 'DC',
@@ -31,6 +32,7 @@ export const NODES_COLUMNS_IDS = {
     Missing: 'Missing',
     Tablets: 'Tablets',
     PDisks: 'PDisks',
+    PileName: 'PileName',
 } as const;
 
 export type NodesColumnId = ValueOf<typeof NODES_COLUMNS_IDS>;
@@ -42,6 +44,12 @@ export function isMonitoringUserNodesColumn(columnId: string): boolean {
     return MONITORING_USER_COLUMNS_IDS.includes(columnId as NodesColumnId);
 }
 
+// Columns, that should displayed only for users with isViewerAllowed:true
+const VIEWER_USER_COLUMNS_IDS: NodesColumnId[] = ['LoadAverage', 'PDisks'];
+export function isViewerUserNodesColumn(columnId: string): boolean {
+    return VIEWER_USER_COLUMNS_IDS.some((el) => el === columnId);
+}
+
 // This code is running when module is initialized and correct language may not be set yet
 // get functions guarantee that i18n fields will be inited on render with current render language
 export const NODES_COLUMNS_TITLES = {
@@ -49,6 +57,9 @@ export const NODES_COLUMNS_TITLES = {
         return i18n('node-id');
     },
     get Host() {
+        return i18n('host');
+    },
+    get NetworkHost() {
         return i18n('host');
     },
     get Database() {
@@ -120,6 +131,9 @@ export const NODES_COLUMNS_TITLES = {
     get PDisks() {
         return i18n('pdisks');
     },
+    get PileName() {
+        return i18n('field_pile-name');
+    },
 } as const satisfies Record<NodesColumnId, string>;
 
 const NODES_COLUMNS_GROUP_BY_TITLES = {
@@ -168,6 +182,9 @@ const NODES_COLUMNS_GROUP_BY_TITLES = {
     get PingTime() {
         return i18n('ping-time');
     },
+    get PileName() {
+        return i18n('field_pile-name');
+    },
 } as const satisfies Record<NodesGroupByField, string>;
 
 export function getNodesGroupByFieldTitle(groupByField: NodesGroupByField) {
@@ -179,6 +196,7 @@ export function getNodesGroupByFieldTitle(groupByField: NodesGroupByField) {
 export const NODES_COLUMNS_TO_DATA_FIELDS: Record<NodesColumnId, NodesRequiredField[]> = {
     NodeId: ['NodeId'],
     Host: ['Host', 'Rack', 'Database', 'SystemState'],
+    NetworkHost: ['Host', 'Rack', 'Database', 'SystemState', 'ConnectStatus'],
     Database: ['Database'],
     NodeName: ['NodeName'],
     DC: ['DC'],
@@ -202,11 +220,13 @@ export const NODES_COLUMNS_TO_DATA_FIELDS: Record<NodesColumnId, NodesRequiredFi
     Missing: ['Missing'],
     Tablets: ['Tablets', 'Database'],
     PDisks: ['PDisks'],
+    PileName: ['PileName'],
 };
 
 const NODES_COLUMNS_TO_SORT_FIELDS: Record<NodesColumnId, NodesSortValue | undefined> = {
     NodeId: 'NodeId',
     Host: 'Host',
+    NetworkHost: 'Host',
     Database: 'Database',
     NodeName: 'NodeName',
     DC: 'DC',
@@ -230,6 +250,7 @@ const NODES_COLUMNS_TO_SORT_FIELDS: Record<NodesColumnId, NodesSortValue | undef
     Missing: 'Missing',
     Tablets: undefined,
     PDisks: undefined,
+    PileName: undefined,
 };
 
 export function getNodesColumnSortField(columnId?: string) {

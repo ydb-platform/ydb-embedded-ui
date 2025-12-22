@@ -134,6 +134,7 @@
     &__head-cell-content-container {
         display: inline-flex;
         overflow: hidden;
+        align-items: center;
         gap: var(--g-spacing-1);
 
         .g-help-mark__button {
@@ -201,5 +202,11 @@
 
     &__row-skeleton::after {
         display: none !important;
+    }
+
+    tbody > tr:last-child {
+        td {
+            border-bottom: unset;
+        }
     }
 }

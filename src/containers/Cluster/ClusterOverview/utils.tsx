@@ -34,8 +34,7 @@ export function getDiagramValues({
 }) {
     const parsedValue = parseFloat(String(value));
     const parsedCapacity = parseFloat(String(capacity));
-    let fillWidth = (parsedValue / parsedCapacity) * 100 || 0;
-    fillWidth = fillWidth > 100 ? 100 : fillWidth;
+    const fillWidth = (parsedValue / parsedCapacity) * 100 || 0;
 
     const legend = legendFormatter({
         value: parsedValue,

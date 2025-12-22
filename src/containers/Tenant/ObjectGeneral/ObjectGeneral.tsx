@@ -1,47 +1,33 @@
 import {useThemeValue} from '@gravity-ui/uikit';
 
 import {TENANT_PAGES_IDS} from '../../../store/reducers/tenant/constants';
-import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../../types/additionalProps';
-import type {EPathType} from '../../../types/api/schema';
+import type {AdditionalTenantsProps} from '../../../types/additionalProps';
 import {cn} from '../../../utils/cn';
-import {useTypedSelector} from '../../../utils/hooks';
 import Diagnostics from '../Diagnostics/Diagnostics';
 import {Query} from '../Query/Query';
 import {TenantNavigation} from '../TenantNavigation/TenantNavigation';
+import {useTenantPage} from '../TenantNavigation/useTenantNavigation';
 
 import './ObjectGeneral.scss';
 
 const b = cn('object-general');
 
 interface ObjectGeneralProps {
-    type?: EPathType;
-    tenantName: string;
-    path: string;
     additionalTenantProps?: AdditionalTenantsProps;
-    additionalNodesProps?: AdditionalNodesProps;
 }
 
-function ObjectGeneral(props: ObjectGeneralProps) {
+function ObjectGeneral({additionalTenantProps}: ObjectGeneralProps) {
     const theme = useThemeValue();
 
-    const {tenantPage} = useTypedSelector((state) => state.tenant);
+    const {tenantPage} = useTenantPage();
 
     const renderPageContent = () => {
-        const {type, additionalTenantProps, additionalNodesProps, tenantName, path} = props;
         switch (tenantPage) {
             case TENANT_PAGES_IDS.query: {
-                return <Query tenantName={tenantName} path={path} theme={theme} type={type} />;
+                return <Query theme={theme} />;
             }
             default: {
-                return (
-                    <Diagnostics
-                        type={type}
-                        tenantName={tenantName}
-                        path={path}
-                        additionalTenantProps={additionalTenantProps}
-                        additionalNodesProps={additionalNodesProps}
-                    />
-                );
+                return <Diagnostics additionalTenantProps={additionalTenantProps} />;
             }
         }
     };

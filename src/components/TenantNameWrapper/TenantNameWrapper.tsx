@@ -1,9 +1,13 @@
 import {DefinitionList, Flex} from '@gravity-ui/uikit';
 
-import {getTenantPath} from '../../containers/Tenant/TenantPages';
+import {getTenantPath} from '../../routes';
+import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import type {AdditionalTenantsProps} from '../../types/additionalProps';
+import {uiFactory} from '../../uiFactory/uiFactory';
+import {getDatabaseLinks} from '../../utils/additionalProps';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {canShowTenantMonitoring} from '../../utils/monitoringVisibility';
 import {EntityStatus} from '../EntityStatus/EntityStatus';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 
@@ -12,6 +16,7 @@ import i18n from './i18n';
 interface TenantNameWrapperProps {
     tenant: PreparedTenant;
     additionalTenantsProps?: AdditionalTenantsProps;
+    externalLink?: boolean;
 }
 
 const getTenantBackend = (
@@ -31,34 +36,37 @@ const getTenantBackend = (
     return additionalTenantsProps.prepareTenantBackend(nodeId);
 };
 
-export function TenantNameWrapper({tenant, additionalTenantsProps}: TenantNameWrapperProps) {
+export function TenantNameWrapper({
+    tenant,
+    additionalTenantsProps,
+    externalLink,
+}: TenantNameWrapperProps) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const {settings} = useClusterBaseInfo();
 
     const backend = getTenantBackend(tenant, additionalTenantsProps);
-    const isExternalLink = Boolean(backend);
+    const isExternalLink = externalLink || Boolean(backend);
 
-    const monitoringLink = additionalTenantsProps?.getMonitoringLink?.(tenant.Name, tenant.Type);
-    const logsLink = additionalTenantsProps?.getLogsLink?.(tenant.Name);
+    const links = getDatabaseLinks(additionalTenantsProps, tenant?.Name, tenant?.Type);
+    const {monitoring: clusterMonitoring} = useClusterBaseInfo();
+    const showMonitoring = canShowTenantMonitoring(tenant?.ControlPlane, clusterMonitoring);
+    const filteredLinks = showMonitoring
+        ? links
+        : links.filter(({title}) => title !== i18n('field_monitoring-link'));
 
     const infoPopoverContent =
-        (monitoringLink || logsLink) && isUserAllowedToMakeChanges ? (
+        filteredLinks.length > 0 && isUserAllowedToMakeChanges ? (
             <DefinitionList responsive>
                 <DefinitionList.Item name={i18n('field_links')}>
                     <Flex gap={2} wrap="wrap">
-                        {monitoringLink && (
-                            <LinkWithIcon
-                                title={i18n('field_monitoring-link')}
-                                url={monitoringLink}
-                            />
-                        )}
-                        {logsLink && (
-                            <LinkWithIcon title={i18n('field_logs-link')} url={logsLink} />
-                        )}
+                        {filteredLinks.map(({title, url}) => (
+                            <LinkWithIcon key={title} title={title} url={url} />
+                        ))}
                     </Flex>
                 </DefinitionList.Item>
             </DefinitionList>
         ) : null;
-
+    const useDatabaseId = uiFactory.useDatabaseId && settings?.use_meta_proxy !== false;
     return (
         <EntityStatus
             externalLink={isExternalLink}
@@ -69,7 +77,8 @@ export function TenantNameWrapper({tenant, additionalTenantsProps}: TenantNameWr
             hasClipboardButton
             path={getTenantPath(
                 {
-                    database: tenant.Name,
+                    clusterName: tenant.Cluster,
+                    database: useDatabaseId ? tenant.Id : tenant.Name,
                     backend,
                 },
                 {withBasename: isExternalLink},

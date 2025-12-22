@@ -11,6 +11,8 @@ export const api = createApi({
     invalidationBehavior: 'immediately',
     tagTypes: [
         'All',
+        'Conversations',
+        'Events',
         'PDiskData',
         'PreviewData',
         'SchemaTree',
@@ -18,6 +20,10 @@ export const api = createApi({
         'Tablet',
         'UserData',
         'VDiskData',
+        'VDiskBlobIndexStat',
+        'AccessRights',
+        'Backups',
+        'BackupsSchedule',
     ],
 });
 

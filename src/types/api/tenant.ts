@@ -24,6 +24,7 @@ export interface TTenantInfo {
 export interface TTenant {
     Name?: string;
     Id?: string;
+    Cluster?: string;
     Type?: ETenantType;
     State?: State;
     StateStats?: THiveDomainStatsStateCount[];
@@ -62,6 +63,11 @@ export interface TTenant {
 
     StorageUsage?: TStorageUsage[];
     QuotaUsage?: TStorageUsage[];
+
+    /** value is float */
+    NetworkUtilization?: number;
+    /** value is uint64 */
+    NetworkWriteThroughput?: string;
 }
 
 export interface THiveDomainStatsStateCount {

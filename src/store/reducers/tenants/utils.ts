@@ -1,22 +1,28 @@
+import {isNil} from 'lodash';
+
 import type {PoolName, TPoolStats} from '../../../types/api/nodes';
 import type {TTenant} from '../../../types/api/tenant';
 import {EType} from '../../../types/api/tenant';
-import {DEFAULT_DANGER_THRESHOLD, DEFAULT_WARNING_THRESHOLD} from '../../../utils/constants';
-import {isNumeric} from '../../../utils/utils';
+import {
+    DEFAULT_DANGER_THRESHOLD,
+    DEFAULT_WARNING_THRESHOLD,
+    EMPTY_DATA_PLACEHOLDER,
+} from '../../../utils/constants';
+import {isNumeric, safeParseNumber} from '../../../utils/utils';
 
 import {METRIC_STATUS} from './contants';
 import type {PreparedTenant} from './types';
 
 const getControlPlaneValue = (tenant: TTenant) => {
     const parts = tenant.Name?.split('/');
-    const defaultValue = parts?.length ? parts[parts.length - 1] : '—';
+    const defaultValue = parts?.length ? parts[parts.length - 1] : EMPTY_DATA_PLACEHOLDER;
     const controlPlaneName = tenant.ControlPlane?.name;
 
     return controlPlaneName ?? defaultValue;
 };
 
 export interface TenantMetricStats<T = string> {
-    name: T;
+    name?: T;
     usage?: number;
     limit?: number;
     used?: number;
@@ -60,6 +66,8 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
         DatabaseQuotas = {},
         StorageUsage,
         QuotaUsage,
+        NetworkUtilization,
+        NetworkWriteThroughput,
     } = tenant;
 
     const cpu = Number(CoresUsed) * 1_000_000 || 0;
@@ -140,6 +148,14 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
         },
     ];
 
+    // Expose raw network utilization and throughput for consumers.
+    const networkUtilization = isNil(NetworkUtilization)
+        ? undefined
+        : safeParseNumber(NetworkUtilization);
+    const networkThroughput = isNil(NetworkWriteThroughput)
+        ? undefined
+        : safeParseNumber(NetworkWriteThroughput);
+
     return {
         memory,
         blobStorage,
@@ -153,6 +169,8 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
         memoryStats,
         blobStorageStats,
         tabletStorageStats,
+        networkUtilization,
+        networkThroughput,
     };
 };
 

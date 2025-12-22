@@ -3,8 +3,11 @@ import type {Locator, Page} from '@playwright/test';
 import {retryAction} from '../../../utils/retryAction';
 import {MemoryViewer} from '../../memoryViewer/MemoryViewer';
 import {NodesPage} from '../../nodes/NodesPage';
+import type {Sidebar} from '../../sidebar/Sidebar';
 import {StoragePage} from '../../storage/StoragePage';
 import {VISIBILITY_TIMEOUT} from '../TenantPage';
+
+import {OperationsTable} from './tabs/OperationsModel';
 
 export enum DiagnosticsTab {
     Info = 'Info',
@@ -17,6 +20,8 @@ export enum DiagnosticsTab {
     HotKeys = 'Hot keys',
     Describe = 'Describe',
     Storage = 'Storage',
+    Operations = 'Operations',
+    Access = 'Access',
 }
 
 export class Table {
@@ -120,6 +125,27 @@ export class Table {
         });
         return true;
     }
+
+    async clickRow(row: number) {
+        const rowElement = this.table.locator(`tr.data-table__row:nth-child(${row})`);
+        await rowElement.click();
+    }
+
+    async getRowPosition(row: number) {
+        const rowElement = this.table.locator(`tr.data-table__row:nth-child(${row})`);
+        return await rowElement.boundingBox();
+    }
+
+    async isRowVisible(row: number) {
+        const rowElement = this.table.locator(`tr.data-table__row:nth-child(${row})`);
+        const boundingBox = await rowElement.boundingBox();
+        if (!boundingBox) {
+            return false;
+        }
+
+        const viewportHeight = await rowElement.page().evaluate(() => window.innerHeight);
+        return boundingBox.y >= 0 && boundingBox.y + boundingBox.height <= viewportHeight;
+    }
 }
 
 export enum QueriesSwitch {
@@ -204,11 +230,40 @@ export const TopShardsHistoricalColumns = [
     TOP_SHARDS_COLUMNS_IDS.IntervalEnd,
 ];
 
+export const ACL_SYNTAX_TEST_CONFIGS = [
+    {
+        syntax: 'YQL' as const,
+        patterns: {
+            USERS: 'CONNECT',
+            'METADATA-READERS': 'LIST',
+            'DATA-READERS': 'SELECT ROW',
+        },
+    },
+    {
+        syntax: 'KiKiMr' as const,
+        patterns: {
+            USERS: 'ConnectDatabase',
+            'METADATA-READERS': 'List',
+            'DATA-READERS': 'SelectRow',
+        },
+    },
+    {
+        syntax: 'YDB Short' as const,
+        patterns: {
+            USERS: 'connect',
+            'METADATA-READERS': 'list',
+            'DATA-READERS': 'select_row',
+        },
+    },
+];
+
 export class Diagnostics {
     table: Table;
     storage: StoragePage;
     nodes: NodesPage;
     memoryViewer: MemoryViewer;
+    operations: OperationsTable;
+    private page: Page;
 
     private tabs: Locator;
     private schemaViewer: Locator;
@@ -222,11 +277,18 @@ export class Diagnostics {
     private memoryCard: Locator;
     private healthcheckCard: Locator;
     private tableRadioButton: Locator;
+    private fixedHeightQueryElements: Locator;
+    private copyLinkButton: Locator;
+    private ownerCard: Locator;
+    private changeOwnerButton: Locator;
+    private grantAccessButton: Locator;
 
     constructor(page: Page) {
+        this.page = page;
         this.storage = new StoragePage(page);
         this.nodes = new NodesPage(page);
         this.memoryViewer = new MemoryViewer(page);
+        this.operations = new OperationsTable(page);
         this.tabs = page.locator('.kv-tenant-diagnostics__tabs');
         this.tableControls = page.locator('.ydb-table-with-controls-layout__controls');
         this.schemaViewer = page.locator('.schema-viewer');
@@ -236,14 +298,19 @@ export class Diagnostics {
         this.autoRefreshSelect = page.locator('.g-select');
         this.table = new Table(page.locator('.object-general'));
         this.tableRadioButton = page.locator(
-            '.ydb-table-with-controls-layout__controls .g-radio-button',
+            '.ydb-table-with-controls-layout__controls .g-segmented-radio-group',
         );
+        this.fixedHeightQueryElements = page.locator('.ydb-fixed-height-query');
+        this.copyLinkButton = page.locator('.ydb-copy-link-button__icon');
 
         // Info tab cards
-        this.cpuCard = page.locator('.metrics-cards__tab:has-text("CPU")');
-        this.storageCard = page.locator('.metrics-cards__tab:has-text("Storage")');
-        this.memoryCard = page.locator('.metrics-cards__tab:has-text("Memory")');
-        this.healthcheckCard = page.locator('.metrics-cards__tab:has-text("Healthcheck")');
+        this.cpuCard = page.locator('.tenant-metrics-tabs__link-container:has-text("CPU")');
+        this.storageCard = page.locator('.tenant-metrics-tabs__link-container:has-text("Storage")');
+        this.memoryCard = page.locator('.tenant-metrics-tabs__link-container:has-text("Memory")');
+        this.healthcheckCard = page.locator('.ydb-healthcheck-preview');
+        this.ownerCard = page.locator('.ydb-access-rights__owner-card');
+        this.changeOwnerButton = page.locator('.ydb-access-rights__owner-card button');
+        this.grantAccessButton = page.locator('button:has-text("Grant Access")');
     }
 
     async isSchemaViewerVisible() {
@@ -257,13 +324,13 @@ export class Diagnostics {
     }
 
     async clickTab(tabName: DiagnosticsTab): Promise<void> {
-        const tab = this.tabs.locator(`.kv-tenant-diagnostics__tab:has-text("${tabName}")`);
+        const tab = this.tabs.locator(`.g-tab:has-text("${tabName}")`);
         await tab.click();
     }
 
     async clickRadioSwitch(radioName: QueriesSwitch): Promise<void> {
         const option = this.tableControls.locator(
-            `.g-radio-button__option:has-text("${radioName}")`,
+            `.g-segmented-radio-group__option:has-text("${radioName}")`,
         );
 
         await option.evaluate((el) => (el as HTMLElement).click());
@@ -301,52 +368,68 @@ export class Diagnostics {
         await this.cpuCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.storageCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.memoryCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await this.healthcheckCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return true;
     }
 
     async getResourceUtilization() {
-        const cpuSystem = await this.cpuCard
-            .locator('.ydb-metrics-card__metric:has-text("System") .progress-viewer__text')
+        // Get aggregated metrics from the new TabCard structure
+        const cpuPercentage = await this.cpuCard
+            .locator('.ydb-doughnut-metrics__value')
             .textContent();
-        const cpuUser = await this.cpuCard
-            .locator('.ydb-metrics-card__metric:has-text("User") .progress-viewer__text')
+        const cpuUsage = await this.cpuCard.locator('.g-text_variant_subheader-2').textContent();
+
+        const storagePercentage = await this.storageCard
+            .locator('.ydb-doughnut-metrics__value')
             .textContent();
-        const cpuIC = await this.cpuCard
-            .locator('.ydb-metrics-card__metric:has-text("IC") .progress-viewer__text')
+        const storageUsage = await this.storageCard
+            .locator('.g-text_variant_subheader-2')
             .textContent();
-        const storage = await this.storageCard
-            .locator('.ydb-metrics-card__metric:has-text("SSD") .progress-viewer__text')
+
+        const memoryPercentage = await this.memoryCard
+            .locator('.ydb-doughnut-metrics__value')
             .textContent();
-        const memory = await this.memoryCard
-            .locator('.ydb-metrics-card__metric:has-text("Process") .progress-viewer__text')
+        const memoryUsage = await this.memoryCard
+            .locator('.g-text_variant_subheader-2')
             .textContent();
 
         return {
             cpu: {
-                system: cpuSystem?.trim() || '',
-                user: cpuUser?.trim() || '',
-                ic: cpuIC?.trim() || '',
+                percentage: cpuPercentage?.trim() || '',
+                usage: cpuUsage?.trim() || '',
             },
-            storage: storage?.trim() || '',
-            memory: memory?.trim() || '',
+            storage: {
+                percentage: storagePercentage?.trim() || '',
+                usage: storageUsage?.trim() || '',
+            },
+            memory: {
+                percentage: memoryPercentage?.trim() || '',
+                usage: memoryUsage?.trim() || '',
+            },
         };
     }
 
     async getHealthcheckStatus() {
-        const statusElement = this.healthcheckCard.locator(
-            '.healthcheck__self-check-status-indicator',
-        );
-        return (await statusElement.textContent())?.trim() || '';
+        const statusElement = this.healthcheckCard.locator('.ydb-healthcheck-preview__icon');
+        return await statusElement.isVisible();
+    }
+
+    async hasHealthcheckStatusClass(className: string) {
+        const statusElement = this.healthcheckCard.locator('.ydb-healthcheck-preview__icon');
+        const classList = await statusElement.evaluate((el) => Array.from(el.classList));
+        return classList.includes(className);
     }
 
     async selectTopShardsMode(mode: TopShardsMode): Promise<void> {
-        const option = this.tableRadioButton.locator(`.g-radio-button__option:has-text("${mode}")`);
+        const option = this.tableRadioButton.locator(
+            `.g-segmented-radio-group__option:has-text("${mode}")`,
+        );
         await option.evaluate((el) => (el as HTMLElement).click());
     }
 
     async getSelectedTableMode(): Promise<string> {
-        const checkedOption = this.tableRadioButton.locator('.g-radio-button__option_checked');
+        const checkedOption = this.tableRadioButton.locator(
+            '.g-segmented-radio-group__option_checked',
+        );
         return (await checkedOption.textContent())?.trim() || '';
     }
 
@@ -368,5 +451,196 @@ export class Diagnostics {
             .locator('.g-select-control__option-text')
             .textContent();
         return selectedText?.trim() || '';
+    }
+
+    async getFixedHeightQueryElementsCount(): Promise<number> {
+        return await this.fixedHeightQueryElements.count();
+    }
+
+    async getFixedHeightQueryElementHeight(index: number): Promise<string> {
+        const element = this.fixedHeightQueryElements.nth(index);
+        return await element.evaluate((el) => {
+            return window.getComputedStyle(el).height;
+        });
+    }
+
+    async clickCopyLinkButton(): Promise<void> {
+        await this.copyLinkButton.first().click();
+    }
+
+    async isCopyLinkButtonVisible(): Promise<boolean> {
+        return await this.copyLinkButton.first().isVisible();
+    }
+
+    async isRowActive(rowIndex: number): Promise<boolean> {
+        const rowElement = this.dataTable.locator(`tr.data-table__row:nth-child(${rowIndex})`);
+        const rowElementClass = await rowElement.getAttribute('class');
+        return rowElementClass?.includes('kv-top-queries__row_active') || false;
+    }
+
+    async isOwnerCardVisible(): Promise<boolean> {
+        await this.ownerCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return true;
+    }
+
+    async getOwnerName(): Promise<string> {
+        const ownerNameElement = this.ownerCard.locator('.ydb-subject-with-avatar__subject');
+
+        return await ownerNameElement.innerText();
+    }
+
+    async clickChangeOwnerButton(): Promise<void> {
+        await this.changeOwnerButton.click();
+    }
+
+    async changeOwner(newOwnerName: string): Promise<void> {
+        await this.clickChangeOwnerButton();
+
+        // Wait for the dialog to appear
+        const dialog = this.page.locator('.g-dialog');
+        await dialog.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+
+        // Wait for the owner input field to appear
+        const ownerInput = dialog.locator('input[placeholder="Enter subject"]');
+        await ownerInput.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+
+        // Clear the input and type the new owner name
+        await ownerInput.clear();
+        await ownerInput.fill(newOwnerName);
+
+        // Click the Apply button
+        const applyButton = dialog.locator('button:has-text("Apply")');
+
+        // Wait for the button to be enabled
+        await this.page.waitForTimeout(500);
+        // Wait for the button to become enabled
+        await this.page.waitForSelector('.g-dialog button:has-text("Apply"):not([disabled])', {
+            timeout: VISIBILITY_TIMEOUT,
+        });
+        await applyButton.click();
+
+        // Wait for the dialog to close and changes to be applied
+        await dialog.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
+        await this.page.waitForTimeout(500);
+    }
+
+    async clickGrantAccessButton(): Promise<void> {
+        await this.grantAccessButton.click();
+    }
+
+    async isGrantAccessDrawerVisible(): Promise<boolean> {
+        const grantAccessDialog = this.page.locator('.ydb-grant-access');
+        await grantAccessDialog.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return true;
+    }
+
+    async enterSubjectInGrantAccessDialog(subject: string): Promise<void> {
+        const subjectInput = this.page.locator('.ydb-grant-access input[name="subjectInput"]');
+        await subjectInput.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await subjectInput.fill(subject);
+        await subjectInput.press('Enter');
+    }
+
+    async isRightsWrapperVisible(): Promise<boolean> {
+        const rightsWrapper = this.page.getByTestId('access-rights-wrapper');
+        return rightsWrapper.isVisible();
+    }
+
+    async isApplyButtonDisabled(): Promise<boolean> {
+        const applyButton = this.page.locator('.ydb-grant-access__footer-button:has-text("Apply")');
+        await applyButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return await applyButton.isDisabled();
+    }
+
+    async clickFullAccessSwitch(): Promise<void> {
+        const fullAccessCard = this.page.locator('.ydb-grant-access__single-right').first();
+        await fullAccessCard.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        const switchElement = fullAccessCard.locator('.g-switch__indicator');
+        await switchElement.click();
+    }
+
+    async clickApplyButton(): Promise<void> {
+        const applyButton = this.page.locator('button:has-text("Apply")');
+        await applyButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await applyButton.click();
+    }
+
+    async isSubjectInRightsTable(subject: string): Promise<boolean> {
+        const rightsTable = this.page.locator('.ydb-access-rights__rights-table');
+        await rightsTable.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+
+        const rows = rightsTable.locator('.data-table__row');
+
+        await rows
+            .filter({hasText: subject})
+            .waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return true;
+    }
+
+    async getEffectiveRightsFromTable(): Promise<Record<string, string>> {
+        const rightsTable = this.page.locator('.ydb-access-rights__rights-table');
+        await rightsTable.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+
+        const rows = await rightsTable.locator('tbody tr').all();
+        const rights: Record<string, string> = {};
+
+        for (const row of rows) {
+            const cells = await row.locator('td').all();
+            if (cells.length >= 3) {
+                // Get the subject name from the avatar component
+                const subjectElement = cells[0].locator('.ydb-subject-with-avatar__subject');
+                const subject = await subjectElement.textContent();
+                const effectiveRights = await cells[2].textContent();
+                if (subject && effectiveRights) {
+                    rights[subject.trim()] = effectiveRights.trim();
+                }
+            }
+        }
+
+        return rights;
+    }
+
+    async waitForTableDataToLoad(): Promise<void> {
+        // Wait for the table to be visible and have at least one row of data
+        const rightsTable = this.page.locator('.ydb-access-rights__rights-table');
+        await rightsTable.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await rightsTable
+            .locator('tbody tr')
+            .first()
+            .waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        // Additional small delay to ensure data is fully loaded
+        await this.page.waitForTimeout(500);
+    }
+
+    async getPermissionLabelsInGrantDialog(): Promise<string[]> {
+        const labels = await this.page
+            .locator('.ydb-grant-access__rights-wrapper .g-switch__text')
+            .all();
+        const texts: string[] = [];
+        for (const label of labels) {
+            const text = await label.textContent();
+            if (text) {
+                texts.push(text.trim());
+            }
+        }
+        return texts;
+    }
+
+    async switchAclSyntaxAndGetRights(
+        sidebar: Sidebar,
+        syntax: 'KiKiMr' | 'YDB Short' | 'YDB' | 'YQL',
+    ): Promise<Record<string, string>> {
+        // Switch syntax
+        await sidebar.clickSettings();
+        await sidebar.selectAclSyntax(syntax);
+        await sidebar.closeDrawer();
+
+        // Refresh the page data by navigating away and back
+        await this.clickTab(DiagnosticsTab.Info);
+        await this.clickTab(DiagnosticsTab.Access);
+        await this.waitForTableDataToLoad();
+
+        // Get and return the rights
+        return await this.getEffectiveRightsFromTable();
     }
 }

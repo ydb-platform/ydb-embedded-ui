@@ -1,7 +1,7 @@
 @import '../../../styles/mixins.scss';
 
 .pdisk-storage {
-    --pdisk-vdisk-width: 3px;
+    --pdisk-vdisk-width: 8px;
     --pdisk-gap-width: 2px;
 
     position: relative;
@@ -48,18 +48,5 @@
         --ydb-stack-offset-y: -2px;
         --ydb-stack-offset-x-hover: 0px;
         --ydb-stack-offset-y-hover: -7px;
-    }
-
-    &__media-type {
-        position: absolute;
-        top: 50%;
-        right: 4px;
-
-        font-size: var(--g-text-body-1-font-size);
-        line-height: var(--g-text-body-1-line-height);
-
-        color: var(--g-color-text-secondary);
-
-        transform: translateY(-50%);
     }
 }

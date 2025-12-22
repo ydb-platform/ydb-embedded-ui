@@ -1,14 +1,12 @@
 import React from 'react';
 
-import type {SelectOption, TableColumnSetupItem, TableColumnSetupProps} from '@gravity-ui/uikit';
-import {Select, TableColumnSetup} from '@gravity-ui/uikit';
+import type {SelectOption} from '@gravity-ui/uikit';
+import {Select} from '@gravity-ui/uikit';
 import escapeRegExp from 'lodash/escapeRegExp';
 
 import {Search} from '../../../../../components/Search/Search';
-import type {ValueOf} from '../../../../../types/common';
 import {b} from '../Partitions';
 import i18n from '../i18n';
-import {PARTITIONS_COLUMNS_IDS, PARTITIONS_COLUMNS_TITLES} from '../utils/constants';
 import type {PreparedPartitionDataWithHosts} from '../utils/types';
 
 interface PartitionsControlsProps {
@@ -18,9 +16,6 @@ interface PartitionsControlsProps {
     selectDisabled: boolean;
     partitions: PreparedPartitionDataWithHosts[] | undefined;
     onSearchChange: (filteredPartitions: PreparedPartitionDataWithHosts[]) => void;
-    hiddenColumns: string[];
-    onHiddenColumnsChange: (newHiddenColumns: string[]) => void;
-    initialColumnsIds: string[];
 }
 
 export const PartitionsControls = ({
@@ -30,9 +25,6 @@ export const PartitionsControls = ({
     selectDisabled,
     partitions,
     onSearchChange,
-    hiddenColumns,
-    onHiddenColumnsChange,
-    initialColumnsIds,
 }: PartitionsControlsProps) => {
     const [generalSearchValue, setGeneralSearchValue] = React.useState('');
     const [partitionIdSearchValue, setPartitionIdSearchValue] = React.useState('');
@@ -56,7 +48,7 @@ export const PartitionsControls = ({
                 connectionHost,
             } = partition;
 
-            const isPartitionIdMatch = partitionIdRe.test(partitionId);
+            const isPartitionIdMatch = partitionIdRe.test(String(partitionId));
 
             const otherValues = [
                 readerName,
@@ -90,26 +82,6 @@ export const PartitionsControls = ({
         return [{value: '', content: i18n('controls.consumerSelector.emptyOption')}, ...options];
     }, [consumers]);
 
-    const columnsToSelect = React.useMemo(() => {
-        const columns: TableColumnSetupItem[] = [];
-        for (const id of initialColumnsIds) {
-            const isId = id === PARTITIONS_COLUMNS_IDS.PARTITION_ID;
-            const column: TableColumnSetupItem = {
-                title: PARTITIONS_COLUMNS_TITLES[id as ValueOf<typeof PARTITIONS_COLUMNS_IDS>],
-                selected: Boolean(!hiddenColumns.includes(id)),
-                id: id,
-                required: isId,
-                sticky: isId ? 'start' : undefined,
-            };
-            if (isId) {
-                columns.unshift(column);
-            } else {
-                columns.push(column);
-            }
-        }
-        return columns;
-    }, [initialColumnsIds, hiddenColumns]);
-
     const handleConsumerSelectChange = (value: string[]) => {
         // Do not set empty string to state
         onSelectedConsumerChange(value[0] || undefined);
@@ -121,23 +93,6 @@ export const PartitionsControls = ({
 
     const handleGeneralSearchChange = (value: string) => {
         setGeneralSearchValue(value);
-    };
-
-    const handleTableColumnsSetupChange: TableColumnSetupProps['onUpdate'] = (value) => {
-        const result = [...hiddenColumns];
-
-        // Process current set of columns
-        // This way we do not remove from hidden these columns, that are not displayed currently
-        // The reasons: set of columns differs for partitions with and without consumers
-        value.forEach((el) => {
-            if (!el.selected && !hiddenColumns.includes(el.id)) {
-                result.push(el.id);
-            } else if (el.selected && hiddenColumns.includes(el.id)) {
-                result.splice(hiddenColumns.indexOf(el.id));
-            }
-        });
-
-        onHiddenColumnsChange(result);
     };
 
     const renderOption = (option: SelectOption) => {
@@ -170,14 +125,6 @@ export const PartitionsControls = ({
                 placeholder={i18n('controls.generalSearch')}
                 className={b('search', {general: true})}
                 value={generalSearchValue}
-            />
-            <TableColumnSetup
-                key="TableColumnSetup"
-                popupWidth={242}
-                items={columnsToSelect}
-                showStatus
-                onUpdate={handleTableColumnsSetupChange}
-                sortable={false}
             />
         </React.Fragment>
     );

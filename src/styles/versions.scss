@@ -1,0 +1,130 @@
+.g-root {
+    &_theme_light,
+    &_theme_light-hc {
+        --versions-default-color: #d5d5d5;
+
+        --versions-orange-1: #ff5512;
+        --versions-orange-2: #ff753a;
+        --versions-orange-3: #ffa16b;
+        --versions-orange-4: #ffc497;
+
+        --versions-yellow-1: #fed018;
+        --versions-yellow-2: #faca1c;
+        --versions-yellow-3: #f6d66d;
+        --versions-yellow-4: #f8e09f;
+
+        --versions-green-1: #26ee79;
+        --versions-green-2: #33ff77;
+        --versions-green-3: #8eff78;
+        --versions-green-4: #c4ffa7;
+
+        --versions-lightblue-1: #21c7ff;
+        --versions-lightblue-2: #38cdff;
+        --versions-lightblue-3: #60d7ff;
+        --versions-lightblue-4: #79ddff;
+
+        --versions-blue-1: #386bff;
+        --versions-blue-2: #4070ff;
+        --versions-blue-3: #658bff;
+        --versions-blue-4: #a1b9ff;
+
+        --versions-violet-1: #d107e3;
+        --versions-violet-2: #d836f9;
+        --versions-violet-3: #e563ff;
+        --versions-violet-4: #dc92ff;
+
+        --versions-pink-1: #ff499e;
+        --versions-pink-2: #ff5ca8;
+        --versions-pink-3: #fe8ac0;
+        --versions-pink-4: #ff9dcb;
+
+        --versions-caramel-1: #dd7709;
+        --versions-caramel-2: #ea8312;
+        --versions-caramel-3: #f1a757;
+        --versions-caramel-4: #ffc484;
+
+        --versions-moss-1: #53920a;
+        --versions-moss-2: #6eb818;
+        --versions-moss-3: #8dd43c;
+        --versions-moss-4: #b4ea76;
+
+        --versions-turquoise-1: #19b5b8;
+        --versions-turquoise-2: #38cacd;
+        --versions-turquoise-3: #51e5e8;
+        --versions-turquoise-4: #98f4f6;
+
+        --versions-barbie-1: #f35fc4;
+        --versions-barbie-2: #f17acc;
+        --versions-barbie-3: #ff86d9;
+        --versions-barbie-4: #ffa4e3;
+
+        --versions-night-1: #5616ea;
+        --versions-night-2: #6934e4;
+        --versions-night-3: #7c48f6;
+        --versions-night-4: #a179ff;
+    }
+    &_theme_dark,
+    &_theme_dark-hc {
+        --versions-default-color: #656469;
+
+        --versions-orange-1: #ff5512;
+        --versions-orange-2: #ff753a;
+        --versions-orange-3: #ffa16b;
+        --versions-orange-4: #ffc497;
+
+        --versions-yellow-1: #fed018;
+        --versions-yellow-2: #fae41c;
+        --versions-yellow-3: #f6e66d;
+        --versions-yellow-4: #f8ef9f;
+
+        --versions-green-1: #26ee79;
+        --versions-green-2: #33ff77;
+        --versions-green-3: #8eff78;
+        --versions-green-4: #c4ffa7;
+
+        --versions-lightblue-1: #00b8f6;
+        --versions-lightblue-2: #41d0ff;
+        --versions-lightblue-3: #87e1ff;
+        --versions-lightblue-4: #b5e8f9;
+
+        --versions-blue-1: #2059ff;
+        --versions-blue-2: #4070ff;
+        --versions-blue-3: #658bff;
+        --versions-blue-4: #a1b9ff;
+
+        --versions-violet-1: #a10aff;
+        --versions-violet-2: #b845ff;
+        --versions-violet-3: #c76cff;
+        --versions-violet-4: #dfacff;
+
+        --versions-pink-1: #ed2a7a;
+        --versions-pink-2: #fe398a;
+        --versions-pink-3: #fb6ba6;
+        --versions-pink-4: #ff90be;
+
+        --versions-caramel-1: #bc6c15;
+        --versions-caramel-2: #d67e1e;
+        --versions-caramel-3: #f9a243;
+        --versions-caramel-4: #ffb96d;
+
+        --versions-moss-1: #478500;
+        --versions-moss-2: #5fa90c;
+        --versions-moss-3: #76ba28;
+        --versions-moss-4: #a3e855;
+
+        --versions-turquoise-1: #009ea0;
+        --versions-turquoise-2: #1dc7ca;
+        --versions-turquoise-3: #3debee;
+        --versions-turquoise-4: #6ff3f5;
+
+        --versions-barbie-1: #ee55be;
+        --versions-barbie-2: #ff6bd0;
+        --versions-barbie-3: #ff86d9;
+        --versions-barbie-4: #ffa4e3;
+
+        --versions-night-1: #5b1fe6;
+        --versions-night-2: #7a41ff;
+        --versions-night-3: #9973f3;
+        --versions-night-4: #a179ff;
+    }
+}

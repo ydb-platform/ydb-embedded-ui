@@ -1,7 +1,6 @@
 import React from 'react';
 
 import {Helmet} from 'react-helmet-async';
-import {StringParam, useQueryParams} from 'use-query-params';
 
 import {PageError} from '../../components/Errors/PageError/PageError';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
@@ -9,95 +8,90 @@ import SplitPane from '../../components/SplitPane';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {overviewApi} from '../../store/reducers/overview/overview';
 import {selectSchemaObjectData} from '../../store/reducers/schema/schema';
-import type {AdditionalNodesProps, AdditionalTenantsProps} from '../../types/additionalProps';
+import {useTenantBaseInfo} from '../../store/reducers/tenant/tenant';
+import type {AdditionalTenantsProps} from '../../types/additionalProps';
+import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {DEFAULT_IS_TENANT_SUMMARY_COLLAPSED, DEFAULT_SIZE_TENANT_KEY} from '../../utils/constants';
 import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
+import {useSetting} from '../../utils/hooks/useSetting';
 import {isAccessError} from '../../utils/response';
+import {useAppTitle} from '../App/AppTitleContext';
 
 import ObjectGeneral from './ObjectGeneral/ObjectGeneral';
 import {ObjectSummary} from './ObjectSummary/ObjectSummary';
+import {TenantContextProvider} from './TenantContext';
+import {TenantDrawerWrapper} from './TenantDrawerWrappers';
 import i18n from './i18n';
+import {useTenantQueryParams} from './useTenantQueryParams';
 import {
     PaneVisibilityActionTypes,
-    paneVisibilityToggleReducerCreator,
+    paneVisibilityToggleReducer,
 } from './utils/paneVisibilityToggleHelpers';
 
 import './Tenant.scss';
 
 const b = cn('tenant-page');
 
-const getTenantSummaryState = () => {
-    const collapsed = Boolean(localStorage.getItem(DEFAULT_IS_TENANT_SUMMARY_COLLAPSED));
-
-    return {
-        triggerExpand: false,
-        triggerCollapse: false,
-        collapsed,
-    };
-};
-
 interface TenantProps {
     additionalTenantProps?: AdditionalTenantsProps;
-    additionalNodesProps?: AdditionalNodesProps;
 }
 
-export function Tenant(props: TenantProps) {
+// eslint-disable-next-line complexity
+export function Tenant({additionalTenantProps}: TenantProps) {
+    const [isSummaryCollapsed, setIsSummaryCollapsed] = useSetting<boolean>(
+        DEFAULT_IS_TENANT_SUMMARY_COLLAPSED,
+        false,
+    );
     const [summaryVisibilityState, dispatchSummaryVisibilityAction] = React.useReducer(
-        paneVisibilityToggleReducerCreator(DEFAULT_IS_TENANT_SUMMARY_COLLAPSED),
+        paneVisibilityToggleReducer,
         undefined,
-        getTenantSummaryState,
+        () => ({
+            triggerExpand: false,
+            triggerCollapse: false,
+            collapsed: isSummaryCollapsed,
+        }),
     );
 
-    // TODO: name is used together with database to keep old links valid
-    // Remove it after some time - 1-2 weeks
-    const [{database, name, schema}, setQuery] = useQueryParams({
-        database: StringParam,
-        name: StringParam,
-        schema: StringParam,
-    });
+    const {database, schema} = useTenantQueryParams();
 
-    React.useEffect(() => {
-        if (name && !database) {
-            setQuery({database: name, name: undefined}, 'replaceIn');
-        }
-    }, [database, name, setQuery]);
+    const {name, isLoading: tenantBaseInfoLoading} = useTenantBaseInfo(database ?? '');
 
-    const tenantName = database ?? name;
-
-    if (!tenantName) {
+    if (!database) {
         throw new Error('Tenant name is not defined');
     }
 
     const previousTenant = React.useRef<string>();
     React.useEffect(() => {
-        if (previousTenant.current !== tenantName) {
+        if (previousTenant.current !== database) {
             const register = async () => {
                 const {registerYQLCompletionItemProvider} = await import(
                     '../../utils/monaco/yql/yql.completionItemProvider'
                 );
-                registerYQLCompletionItemProvider(tenantName);
+                registerYQLCompletionItemProvider(database);
             };
             register().catch(console.error);
-            previousTenant.current = tenantName;
+            previousTenant.current = database;
         }
-    }, [tenantName]);
+    }, [database]);
 
-    const dispatch = useTypedDispatch();
-    React.useEffect(() => {
-        dispatch(setHeaderBreadcrumbs('tenant', {tenantName}));
-    }, [tenantName, dispatch]);
+    const databaseName = name ?? '';
 
-    const path = schema ?? tenantName;
+    const path = schema ?? databaseName;
 
     const {
         currentData: currentItem,
         error,
         isLoading,
-    } = overviewApi.useGetOverviewQuery({path, database: tenantName});
+    } = overviewApi.useGetOverviewQuery({path, database, databaseFullPath: databaseName});
+
+    const dispatch = useTypedDispatch();
+    React.useEffect(() => {
+        dispatch(setHeaderBreadcrumbs('tenant', {databaseName, database}));
+    }, [databaseName, database, dispatch]);
 
     const preloadedData = useTypedSelector((state) =>
-        selectSchemaObjectData(state, path, tenantName),
+        selectSchemaObjectData(state, path, database, databaseName),
     );
 
     // Use preloaded data if there is no current item data yet
@@ -110,58 +104,64 @@ export function Tenant(props: TenantProps) {
 
     const showBlockingError = isAccessError(error);
 
+    const errorProps = showBlockingError ? uiFactory.clusterOrDatabaseAccessError : undefined;
+
     const onCollapseSummaryHandler = () => {
+        setIsSummaryCollapsed(true);
         dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.triggerCollapse);
     };
     const onExpandSummaryHandler = () => {
+        setIsSummaryCollapsed(false);
         dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.triggerExpand);
     };
 
     const onSplitStartDragAdditional = () => {
+        setIsSummaryCollapsed(false);
         dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.clear);
     };
 
     const [initialLoading, setInitialLoading] = React.useState(true);
-    if (initialLoading && !isLoading) {
+    if (initialLoading && !isLoading && !tenantBaseInfoLoading) {
         setInitialLoading(false);
     }
 
     const title = path || i18n('page.title');
+    const {appTitle} = useAppTitle();
     return (
         <div className={b()}>
             <Helmet
-                defaultTitle={`${title} — YDB Monitoring`}
-                titleTemplate={`%s — ${title} — YDB Monitoring`}
+                defaultTitle={`${title} — ${appTitle}`}
+                titleTemplate={`%s — ${title} — ${appTitle}`}
             />
             <LoaderWrapper loading={initialLoading}>
-                <PageError error={showBlockingError ? error : undefined}>
-                    <SplitPane
-                        defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
-                        defaultSizes={[25, 75]}
-                        triggerCollapse={summaryVisibilityState.triggerCollapse}
-                        triggerExpand={summaryVisibilityState.triggerExpand}
-                        minSize={[36, 200]}
-                        onSplitStartDragAdditional={onSplitStartDragAdditional}
+                <PageError error={showBlockingError ? error : undefined} {...errorProps}>
+                    <TenantContextProvider
+                        database={database}
+                        path={path}
+                        type={currentPathType}
+                        subType={currentPathSubType}
+                        databaseFullPath={databaseName}
                     >
-                        <ObjectSummary
-                            type={currentPathType}
-                            subType={currentPathSubType}
-                            tenantName={tenantName}
-                            path={path}
-                            onCollapseSummary={onCollapseSummaryHandler}
-                            onExpandSummary={onExpandSummaryHandler}
-                            isCollapsed={summaryVisibilityState.collapsed}
-                        />
-                        <div className={b('main')}>
-                            <ObjectGeneral
-                                type={currentPathType}
-                                additionalTenantProps={props.additionalTenantProps}
-                                additionalNodesProps={props.additionalNodesProps}
-                                tenantName={tenantName}
-                                path={path}
-                            />
-                        </div>
-                    </SplitPane>
+                        <TenantDrawerWrapper>
+                            <SplitPane
+                                defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
+                                defaultSizes={[25, 75]}
+                                triggerCollapse={summaryVisibilityState.triggerCollapse}
+                                triggerExpand={summaryVisibilityState.triggerExpand}
+                                minSize={[36, 200]}
+                                onSplitStartDragAdditional={onSplitStartDragAdditional}
+                            >
+                                <ObjectSummary
+                                    onCollapseSummary={onCollapseSummaryHandler}
+                                    onExpandSummary={onExpandSummaryHandler}
+                                    isCollapsed={summaryVisibilityState.collapsed}
+                                />
+                                <div className={b('main')}>
+                                    <ObjectGeneral additionalTenantProps={additionalTenantProps} />
+                                </div>
+                            </SplitPane>
+                        </TenantDrawerWrapper>
+                    </TenantContextProvider>
                 </PageError>
             </LoaderWrapper>
         </div>

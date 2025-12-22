@@ -1,10 +1,9 @@
 import React from 'react';
 
-import type {TabsItemProps} from '@gravity-ui/uikit';
-import {Tabs} from '@gravity-ui/uikit';
+import {Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {Helmet} from 'react-helmet-async';
-import {useRouteMatch} from 'react-router-dom';
+import {useHistory, useRouteMatch} from 'react-router-dom';
 import {useQueryParams} from 'use-query-params';
 
 import {EntityPageTitle} from '../../components/EntityPageTitle/EntityPageTitle';
@@ -13,34 +12,45 @@ import {FullNodeViewer} from '../../components/FullNodeViewer/FullNodeViewer';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {InternalLink} from '../../components/InternalLink';
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
-import routes from '../../routes';
+import routes, {getDefaultNodePath} from '../../routes';
 import {
     useCapabilitiesLoaded,
+    useConfigAvailable,
     useDiskPagesAvailable,
+    useViewerPeersHandlerAvailable,
 } from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {nodeApi} from '../../store/reducers/node/node';
 import type {PreparedNode} from '../../store/reducers/node/types';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
+import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {checkIsStorageNode} from '../../utils/nodes';
+import {useAppTitle} from '../App/AppTitleContext';
+import {Configs} from '../Configs/Configs';
+import {NodeNetwork} from '../Node/NodeNetwork/NodeNetwork';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 import {Tablets} from '../Tablets/Tablets';
 
 import type {NodeTab} from './NodePages';
-import {NODE_TABS, getDefaultNodePath, nodePageQueryParams, nodePageTabSchema} from './NodePages';
+import {NODE_TABS, nodePageQueryParams, nodePageTabSchema} from './NodePages';
 import NodeStructure from './NodeStructure/NodeStructure';
+import {Threads} from './Threads/Threads';
 import i18n from './i18n';
 
 import './Node.scss';
 
 const b = cn('node');
 
-const STORAGE_ROLE = 'Storage';
-
 export function Node() {
     const container = React.useRef<HTMLDivElement>(null);
+    const isViewerUser = useIsViewerUser();
+    const hasConfigs = useConfigAvailable();
+
+    const configsAvailable = isViewerUser && hasConfigs;
 
     const dispatch = useTypedDispatch();
+    const history = useHistory();
 
     const match = useRouteMatch<{id: string; activeTab: string}>(routes.node);
 
@@ -53,7 +63,7 @@ export function Node() {
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    const params = nodeId ? {nodeId} : skipToken;
+    const params = nodeId ? {nodeId, database: tenantNameFromQuery?.toString()} : skipToken;
     const {
         currentData: node,
         isLoading,
@@ -62,39 +72,75 @@ export function Node() {
 
     const capabilitiesLoaded = useCapabilitiesLoaded();
     const isDiskPagesAvailable = useDiskPagesAvailable();
+    const isPeersHandlerAvailable = useViewerPeersHandlerAvailable();
 
     const pageLoading = isLoading || !capabilitiesLoaded;
 
-    const isStorageNode = node?.Roles?.find((el) => el === STORAGE_ROLE);
+    const isStorageNode = checkIsStorageNode(node);
+
+    const threadsQuantity = node?.Threads?.length;
 
     const {activeTab, nodeTabs} = React.useMemo(() => {
-        let actulaNodeTabs = isStorageNode
-            ? NODE_TABS
-            : NODE_TABS.filter((el) => el.id !== 'storage');
-        if (isDiskPagesAvailable) {
-            actulaNodeTabs = actulaNodeTabs.filter((el) => el.id !== 'structure');
+        const skippedTabs: NodeTab[] = [];
+        if (!isStorageNode) {
+            skippedTabs.push('storage');
         }
+        if (!configsAvailable) {
+            skippedTabs.push('configs');
+        }
+        if (isDiskPagesAvailable) {
+            skippedTabs.push('structure');
+        }
+        if (!threadsQuantity) {
+            skippedTabs.push('threads');
+        }
+        if (!isPeersHandlerAvailable) {
+            skippedTabs.push('network');
+        }
+        const actualNodeTabs = NODE_TABS.filter((el) => !skippedTabs.includes(el.id));
 
         const actualActiveTab =
-            actulaNodeTabs.find(({id}) => id === activeTabId) ?? actulaNodeTabs[0];
+            actualNodeTabs.find(({id}) => id === activeTabId) ?? actualNodeTabs[0];
 
-        return {activeTab: actualActiveTab, nodeTabs: actulaNodeTabs};
-    }, [isStorageNode, isDiskPagesAvailable, activeTabId]);
+        return {activeTab: actualActiveTab, nodeTabs: actualNodeTabs};
+    }, [
+        isStorageNode,
+        isDiskPagesAvailable,
+        isPeersHandlerAvailable,
+        activeTabId,
+        threadsQuantity,
+        configsAvailable,
+    ]);
 
-    const tenantName = node?.Tenants?.[0] || tenantNameFromQuery?.toString();
+    const database = tenantNameFromQuery?.toString();
+
+    const databaseName = node?.Tenants?.[0];
 
     React.useEffect(() => {
         // Dispatch only if loaded to get correct node role
         if (!isLoading) {
             dispatch(
                 setHeaderBreadcrumbs('node', {
-                    tenantName,
+                    database,
+                    databaseName,
                     nodeRole: isStorageNode ? 'Storage' : 'Compute',
                     nodeId,
                 }),
             );
         }
-    }, [dispatch, tenantName, nodeId, isLoading, isStorageNode]);
+    }, [dispatch, database, nodeId, isLoading, isStorageNode, databaseName]);
+
+    React.useEffect(() => {
+        if (!nodeId || !activeTab) {
+            return;
+        }
+
+        if (activeTab.id !== activeTabId) {
+            const path = getDefaultNodePath({id: nodeId, activeTab: activeTab.id}, {database});
+
+            history.replace(path);
+        }
+    }, [nodeId, database, activeTab.id, activeTabId, history, activeTab]);
 
     return (
         <div className={b(null)} ref={container}>
@@ -106,7 +152,7 @@ export function Node() {
             {nodeId ? (
                 <NodePageContent
                     nodeId={nodeId}
-                    tenantName={tenantName}
+                    database={database}
                     activeTabId={activeTab.id}
                     tabs={nodeTabs}
                     parentContainer={container}
@@ -122,12 +168,10 @@ interface NodePageHelmetProps {
 }
 
 function NodePageHelmet({node, activeTabTitle}: NodePageHelmetProps) {
+    const {appTitle} = useAppTitle();
     const host = node?.Host ? node.Host : i18n('node');
     return (
-        <Helmet
-            titleTemplate={`%s — ${host} — YDB Monitoring`}
-            defaultTitle={`${host} — YDB Monitoring`}
-        >
+        <Helmet titleTemplate={`%s — ${host} — ${appTitle}`} defaultTitle={`${host} — ${appTitle}`}>
             <title>{activeTabTitle}</title>
         </Helmet>
     );
@@ -181,17 +225,17 @@ function NodePageInfo({node, loading}: NodePageInfoProps) {
 
 interface NodePageContentProps {
     nodeId: string;
-    tenantName?: string;
+    database?: string;
 
     activeTabId: NodeTab;
-    tabs: TabsItemProps[];
+    tabs: {id: string; title: string}[];
 
     parentContainer: React.RefObject<HTMLDivElement>;
 }
 
 function NodePageContent({
     nodeId,
-    tenantName,
+    database,
     activeTabId,
     tabs,
     parentContainer,
@@ -199,23 +243,23 @@ function NodePageContent({
     const renderTabs = () => {
         return (
             <div className={b('tabs')}>
-                <Tabs
-                    size="l"
-                    items={tabs}
-                    activeTab={activeTabId}
-                    wrapTo={({id}, tabNode) => {
-                        const path = getDefaultNodePath(
-                            nodeId,
-                            {database: tenantName},
-                            id as NodeTab,
-                        );
-                        return (
-                            <InternalLink to={path} key={id}>
-                                {tabNode}
-                            </InternalLink>
-                        );
-                    }}
-                />
+                <TabProvider value={activeTabId}>
+                    <TabList className={b('tab-list')} size="l">
+                        {tabs.map(({id, title}) => {
+                            const path = getDefaultNodePath(
+                                {id: nodeId, activeTab: id as NodeTab},
+                                {database},
+                            );
+                            return (
+                                <Tab value={id} key={id}>
+                                    <InternalLink to={path} as="tab">
+                                        {title}
+                                    </InternalLink>
+                                </Tab>
+                            );
+                        })}
+                    </TabList>
+                </TabProvider>
             </div>
         );
     };
@@ -225,8 +269,9 @@ function NodePageContent({
             case 'storage': {
                 return (
                     <PaginatedStorage
+                        database={database}
                         nodeId={nodeId}
-                        parentRef={parentContainer}
+                        scrollContainerRef={parentContainer}
                         viewContext={{
                             nodeId: nodeId,
                         }}
@@ -234,11 +279,36 @@ function NodePageContent({
                 );
             }
             case 'tablets': {
-                return <Tablets nodeId={nodeId} database={tenantName} />;
+                return (
+                    <Tablets
+                        scrollContainerRef={parentContainer}
+                        nodeId={nodeId}
+                        database={database}
+                        onlyActive
+                    />
+                );
             }
 
             case 'structure': {
                 return <NodeStructure nodeId={nodeId} />;
+            }
+
+            case 'threads': {
+                return (
+                    <Threads
+                        nodeId={nodeId}
+                        scrollContainerRef={parentContainer}
+                        className={b('treads')}
+                    />
+                );
+            }
+
+            case 'configs': {
+                return <Configs database={database} scrollContainerRef={parentContainer} />;
+            }
+
+            case 'network': {
+                return <NodeNetwork nodeId={nodeId} scrollContainerRef={parentContainer} />;
             }
 
             default:

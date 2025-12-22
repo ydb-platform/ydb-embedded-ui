@@ -2,7 +2,7 @@ on:
   push:
     branches:
       - main
-      - hotfix/v[0-9]+.[0-9]+.[0-9]+ # match branches in format hotfix/v6.20.10
+      - hotfix/v[0-9]+.[0-9]+.[0-9]+* # match branches in format hotfix/v6.20.10 and hotfix/v6.20.10-hotfix.1
 
 name: Release
 
@@ -14,7 +14,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - run: npm ci
       - run: npm test
       - uses: googleapis/release-please-action@v4

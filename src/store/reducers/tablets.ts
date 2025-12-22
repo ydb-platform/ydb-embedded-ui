@@ -42,7 +42,7 @@ const selectGetTabletsInfo = createSelector(
 
 export const selectTabletsWithFqdn = createSelector(
     (state: RootState, params: TabletsApiRequestParams) => selectGetTabletsInfo(state, params),
-    (state: RootState) => selectNodesMap(state),
+    (state: RootState, params: TabletsApiRequestParams) => selectNodesMap(state, params.database),
     (data, nodeHostsMap): (TTabletStateInfo & {fqdn?: string})[] => {
         if (!data?.TabletStateInfo) {
             return [];

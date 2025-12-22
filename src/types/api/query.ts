@@ -326,6 +326,9 @@ export interface SendQueryParams<Action extends Actions> {
     timeout?: Timeout;
     query_id?: string;
     limit_rows?: number;
+    internal_call?: boolean;
+    base64?: boolean;
+    resource_pool?: string;
 }
 
 export interface StreamQueryParams<Action extends Actions> extends SendQueryParams<Action> {

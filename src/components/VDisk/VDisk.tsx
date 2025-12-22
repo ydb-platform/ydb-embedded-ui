@@ -1,11 +1,11 @@
+import {useVDiskPagePath} from '../../routes';
 import {cn} from '../../utils/cn';
+import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from '../../utils/disks/constants';
 import type {PreparedVDisk} from '../../utils/disks/types';
 import {DiskStateProgressBar} from '../DiskStateProgressBar/DiskStateProgressBar';
 import {HoverPopup} from '../HoverPopup/HoverPopup';
 import {InternalLink} from '../InternalLink';
 import {VDiskPopup} from '../VDiskPopup/VDiskPopup';
-
-import {getVDiskLink} from './utils';
 
 import './VDisk.scss';
 
@@ -21,6 +21,8 @@ export interface VDiskProps {
     progressBarClassName?: string;
     delayOpen?: number;
     delayClose?: number;
+    withIcon?: boolean;
+    highlighted?: boolean;
 }
 
 export const VDisk = ({
@@ -33,8 +35,15 @@ export const VDisk = ({
     progressBarClassName,
     delayClose,
     delayOpen,
+    withIcon,
+    highlighted,
 }: VDiskProps) => {
-    const vDiskPath = getVDiskLink(data);
+    const getVDiskLink = useVDiskPagePath();
+    const vDiskPath = getVDiskLink({nodeId: data.NodeId, vDiskId: data.StringifiedId});
+
+    const severity = data.Severity;
+    const isReplicatingColor = severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue;
+    const isDonor = data.DonorMode;
 
     return (
         <HoverPopup
@@ -42,7 +51,7 @@ export const VDisk = ({
             onShowPopup={onShowPopup}
             onHidePopup={onHidePopup}
             renderPopupContent={() => <VDiskPopup data={data} />}
-            offset={[0, 5]}
+            offset={{mainAxis: 2, crossAxis: 0}}
             delayClose={delayClose}
             delayOpen={delayOpen}
         >
@@ -50,10 +59,14 @@ export const VDisk = ({
                 <InternalLink to={vDiskPath} className={b('content')}>
                     <DiskStateProgressBar
                         diskAllocatedPercent={data.AllocatedPercent}
-                        severity={data.Severity}
+                        severity={severity}
                         compact={compact}
                         inactive={inactive}
+                        striped={isReplicatingColor || isDonor}
+                        isDonor={isDonor}
                         className={progressBarClassName}
+                        withIcon={withIcon}
+                        highlighted={highlighted}
                     />
                 </InternalLink>
             </div>

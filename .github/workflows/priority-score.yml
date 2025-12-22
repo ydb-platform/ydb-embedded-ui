@@ -1,0 +1,196 @@
+name: Update Calculated Priority
+
+on:
+  issues:
+    types: [opened, labeled, unlabeled, edited]
+
+jobs:
+  update-priority:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update CalculatedPriority field
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.YDBOT_TOKEN }}
+          script: |
+            // Priority estimation based on reach/impact/effort methodology
+            const reachWeights = {
+              "reach:high": 100,
+              "reach:medium": 75,
+              "reach:low": 50
+            };
+
+            const impactWeights = {
+              "impact:high": 200,
+              "impact:medium": 137.5,
+              "impact:low": 75
+            };
+
+            const effortWeights = {
+              "size/l": 9,
+              "size/m": 4,
+              "size/s": 1,
+              "size/xl": 18
+            };
+
+            // Bonus multipliers for special labels
+            const HEART_XENO_MULTIPLIER = 1.5;
+            const FEEDBACK_MULTIPLIER = 1.5;
+            const MAX_PRIORITY_SCORE = 100000;
+
+            const issue = context.payload.issue;
+            const labels = issue.labels.map(l => l.name);
+
+            // Find reach, impact, and effort values from labels
+            let reach = null;
+            let impact = null;
+            let effort = null;
+            let hasHeartXeno = false;
+            let hasFeedback = false;
+
+            for (const label of labels) {
+              if (reachWeights[label] !== undefined) {
+                reach = reachWeights[label];
+              }
+              if (impactWeights[label] !== undefined) {
+                impact = impactWeights[label];
+              }
+              if (effortWeights[label] !== undefined) {
+                effort = effortWeights[label];
+              }
+              if (label === ":heart: xeno") {
+                hasHeartXeno = true;
+              }
+              if (label === "feedback") {
+                hasFeedback = true;
+              }
+            }
+
+            // Fallback default values
+            const defaultReach = 75;   // default to medium reach
+            const defaultImpact = 75;  // default to low impact
+            const defaultEffort = 4;   // default to medium effort
+
+            // Calculate priority score using formula: (reach * impact) / effort
+            const effectiveReach = reach || defaultReach;
+            const effectiveImpact = impact || defaultImpact;
+            const effectiveEffort = effort || defaultEffort;
+            let baseScore = Math.round((effectiveReach * effectiveImpact) / effectiveEffort);
+
+            // Apply bonus multipliers for special labels
+            let bonusMultiplier = 1;
+            if (hasHeartXeno) {
+              bonusMultiplier *= HEART_XENO_MULTIPLIER;
+            }
+            if (hasFeedback) {
+              bonusMultiplier *= FEEDBACK_MULTIPLIER;
+            }
+
+            // Calculate final score with cap to prevent excessively large values
+            let finalScore = Math.min(Math.round(baseScore * bonusMultiplier), MAX_PRIORITY_SCORE);
+
+            console.log(`📊 Priority calculation: reach=${reach || 'default'}, impact=${impact || 'default'}, effort=${effort || 'default'}, heartXeno=${hasHeartXeno}, feedback=${hasFeedback} → baseScore=${baseScore}, multiplier=${bonusMultiplier}, finalScore=${finalScore}`);
+
+            const projectNumber = 24;
+            const org = "ydb-platform";
+            const issueNumber = issue.number;
+            const repoName = context.repo.repo;
+            const repoOwner = context.repo.owner;
+
+            const projectQuery = await github.graphql(`
+              query($org: String!, $number: Int!) {
+                organization(login: $org) {
+                  projectV2(number: $number) {
+                    id
+                    fields(first: 50) {
+                      nodes {
+                        ... on ProjectV2Field {
+                          id
+                          name
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            `, { org, number: projectNumber });
+
+            const projectId = projectQuery.organization.projectV2.id;
+            const field = projectQuery.organization.projectV2.fields.nodes.find(f => f.name === "CalculatedPriority");
+            if (!field) {
+              core.setFailed("Field 'CalculatedPriority' not found.");
+              return;
+            }
+            const fieldId = field.id;
+
+            // Now paginate to find the matching item
+            let item = null;
+            let cursor = null;
+            let hasNextPage = true;
+
+            while (hasNextPage && !item) {
+              const response = await github.graphql(`
+                query($org: String!, $number: Int!, $after: String) {
+                  organization(login: $org) {
+                    projectV2(number: $number) {
+                      items(first: 100, after: $after) {
+                        pageInfo {
+                          hasNextPage
+                          endCursor
+                        }
+                        nodes {
+                          id
+                          content {
+                            __typename
+                            ... on Issue {
+                              number
+                              repository {
+                                name
+                                owner { login }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              `, { org, number: projectNumber, after: cursor });
+
+              const items = response.organization.projectV2.items.nodes;
+
+              item = items.find(n =>
+                n.content?.__typename === "Issue" &&
+                n.content?.number === issueNumber &&
+                n.content?.repository?.name === repoName &&
+                n.content?.repository?.owner?.login === repoOwner
+              );
+
+              hasNextPage = response.organization.projectV2.items.pageInfo.hasNextPage;
+              cursor = response.organization.projectV2.items.pageInfo.endCursor;
+            }
+
+            if (!item) {
+              console.log(`Issue #${issueNumber} not found in project (repo=${repoName}).`);
+              return;
+            }
+
+            // Update field
+            await github.graphql(`
+              mutation($input: UpdateProjectV2ItemFieldValueInput!) {
+                updateProjectV2ItemFieldValue(input: $input) {
+                  projectV2Item {
+                    id
+                  }
+                }
+              }
+            `, {
+              input: {
+                projectId,
+                itemId: item.id,
+                fieldId,
+                value: { number: finalScore }
+              }
+            });
+
+            console.log(`✅ Updated CalculatedPriority of issue #${issueNumber} to ${finalScore}`);

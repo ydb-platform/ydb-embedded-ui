@@ -1,19 +1,13 @@
 @use '../../../../styles/mixins.scss';
 
 .tenant-overview {
-    overflow: auto;
-
+    min-width: 1000px;
     height: 100%;
     padding-bottom: 20px;
 
-    &__loader {
-        display: flex;
-        justify-content: center;
-    }
-    &__tenant-name-wrapper {
-        display: flex;
-        overflow: hidden;
-        align-items: center;
+    // Make header font size smaller using project typography
+    .data-table__th {
+        @include mixins.subheader-1-typography();
     }
 
     &__top {
@@ -31,19 +25,23 @@
         line-height: 24px;
     }
 
+    &__serverless-tag-label {
+        margin-left: var(--g-spacing-1);
+    }
+
     &__info {
         position: sticky;
         left: 0;
 
-        width: max-content;
+        width: 100%;
     }
 
     &__title {
-        margin-bottom: 10px;
+        margin-bottom: var(--g-spacing-2);
 
-        font-weight: 700;
+        font-weight: 500;
 
-        @include mixins.body-2-typography();
+        @include mixins.subheader-1-typography();
     }
 
     &__table {
@@ -63,5 +61,18 @@
     &__memory-info {
         width: 300px;
         margin-bottom: 36px;
+    }
+
+    &__tab-content {
+        overflow: auto;
+
+        margin-top: -1px;
+        padding: var(--g-spacing-4);
+
+        border: 1px solid var(--g-color-line-generic);
+        border-top: 0;
+        border-radius: var(--g-border-radius-s);
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
     }
 }

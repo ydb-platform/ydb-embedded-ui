@@ -1,16 +1,23 @@
 import React from 'react';
 
-import {HelpPopover} from '@gravity-ui/components';
-import {ClipboardButton, DefinitionList, Flex, Tabs} from '@gravity-ui/uikit';
+import {
+    ClipboardButton,
+    DefinitionList,
+    Flex,
+    HelpMark,
+    Tab,
+    TabList,
+    TabProvider,
+} from '@gravity-ui/uikit';
 import qs from 'qs';
-import {Link, useLocation} from 'react-router-dom';
-import {StringParam, useQueryParam} from 'use-query-params';
+import {useLocation} from 'react-router-dom';
 
 import {AsyncReplicationState} from '../../../components/AsyncReplicationState';
 import {toFormattedSize} from '../../../components/FormattedBytes/utils';
+import {InternalLink} from '../../../components/InternalLink';
 import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
 import SplitPane from '../../../components/SplitPane';
-import {createExternalUILink} from '../../../routes';
+import {createExternalUILink, getTenantPath} from '../../../routes';
 import {overviewApi} from '../../../store/reducers/overview/overview';
 import {TENANT_SUMMARY_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setSummaryTab} from '../../../store/reducers/tenant/tenant';
@@ -25,17 +32,21 @@ import {
     formatSecondsToHours,
 } from '../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
-import {Acl} from '../Acl/Acl';
+import {useSetting} from '../../../utils/hooks/useSetting';
+import {prepareSystemViewType} from '../../../utils/schema';
 import {EntityTitle} from '../EntityTitle/EntityTitle';
 import {SchemaViewer} from '../Schema/SchemaViewer/SchemaViewer';
-import {TENANT_INFO_TABS, TENANT_SCHEMA_TAB, TenantTabsGroups, getTenantPath} from '../TenantPages';
+import {useCurrentSchema} from '../TenantContext';
+import {useTenantPage} from '../TenantNavigation/useTenantNavigation';
+import {TENANT_INFO_TABS, TENANT_SCHEMA_TAB, TenantTabsGroups} from '../TenantPages';
+import {useTenantQueryParams} from '../useTenantQueryParams';
 import {getSummaryControls} from '../utils/controls';
 import {
     PaneVisibilityActionTypes,
     PaneVisibilityToggleButtons,
-    paneVisibilityToggleReducerCreator,
+    paneVisibilityToggleReducer,
 } from '../utils/paneVisibilityToggleHelpers';
-import {isIndexTableType, isTableType} from '../utils/schema';
+import {isTableType} from '../utils/schema';
 
 import {ObjectTree} from './ObjectTree';
 import {SchemaActions} from './SchemaActions';
@@ -47,46 +58,40 @@ import {isDomain, transformPath} from './transformPath';
 
 import './ObjectSummary.scss';
 
-const getTenantCommonInfoState = () => {
-    const collapsed = Boolean(localStorage.getItem(DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED));
-
-    return {
-        triggerExpand: false,
-        triggerCollapse: false,
-        collapsed,
-    };
-};
-
 interface ObjectSummaryProps {
-    type?: EPathType;
-    subType?: EPathSubType;
-    tenantName: string;
-    path: string;
     onCollapseSummary: VoidFunction;
     onExpandSummary: VoidFunction;
     isCollapsed: boolean;
 }
 
 export function ObjectSummary({
-    type,
-    subType,
-    tenantName,
-    path,
     onCollapseSummary,
     onExpandSummary,
     isCollapsed,
 }: ObjectSummaryProps) {
+    const {path, database, type, databaseFullPath} = useCurrentSchema();
+
     const dispatch = useTypedDispatch();
-    const [, setCurrentPath] = useQueryParam('schema', StringParam);
+    const {handleSchemaChange} = useTenantQueryParams();
+    const [isCommonInfoCollapsed, setIsCommonInfoCollapsed] = useSetting<boolean>(
+        DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED,
+        false,
+    );
     const [commonInfoVisibilityState, dispatchCommonInfoVisibilityState] = React.useReducer(
-        paneVisibilityToggleReducerCreator(DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED),
+        paneVisibilityToggleReducer,
         undefined,
-        getTenantCommonInfoState,
+        () => ({
+            triggerExpand: false,
+            triggerCollapse: false,
+            collapsed: isCommonInfoCollapsed,
+        }),
     );
 
     const {summaryTab = TENANT_SUMMARY_TABS_IDS.overview} = useTypedSelector(
         (state) => state.tenant,
     );
+
+    const {handleTenantPageChange} = useTenantPage();
 
     const location = useLocation();
 
@@ -96,7 +101,8 @@ export function ObjectSummary({
 
     const {currentData: currentObjectData} = overviewApi.useGetOverviewQuery({
         path,
-        database: tenantName,
+        database,
+        databaseFullPath,
     });
     const currentSchemaData = currentObjectData?.PathDescription?.Self;
 
@@ -119,23 +125,23 @@ export function ObjectSummary({
                     justifyContent="space-between"
                     alignItems="center"
                 >
-                    <Tabs
-                        size="l"
-                        items={tabsItems}
-                        activeTab={summaryTab}
-                        wrapTo={({id}, node) => {
-                            const tabPath = getTenantPath({
-                                ...queryParams,
-                                [TenantTabsGroups.summaryTab]: id,
-                            });
-                            return (
-                                <Link to={tabPath} key={id} className={b('tab')}>
-                                    {node}
-                                </Link>
-                            );
-                        }}
-                        allowNotSelected
-                    />
+                    <TabProvider value={summaryTab}>
+                        <TabList size="l">
+                            {tabsItems.map(({id, title}) => {
+                                const tabPath = getTenantPath({
+                                    ...queryParams,
+                                    [TenantTabsGroups.summaryTab]: id,
+                                });
+                                return (
+                                    <Tab key={id} value={id}>
+                                        <InternalLink to={tabPath} as="tab">
+                                            {title}
+                                        </InternalLink>
+                                    </Tab>
+                                );
+                            })}
+                        </TabList>
+                    </TabProvider>
                     {summaryTab === TENANT_SUMMARY_TABS_IDS.schema && <SchemaActions />}
                 </Flex>
             </div>
@@ -228,6 +234,12 @@ export function ObjectSummary({
                 {
                     name: i18n('field_partitions'),
                     content: PathDescription?.TablePartitions?.length,
+                },
+            ],
+            [EPathType.EPathTypeSysView]: () => [
+                {
+                    name: i18n('field_system-view-type'),
+                    content: prepareSystemViewType(PathDescription?.SysViewDescription?.Type),
                 },
             ],
             [EPathType.EPathTypeSubDomain]: getDatabaseOverview,
@@ -333,6 +345,7 @@ export function ObjectSummary({
                     },
                 ];
             },
+            [EPathType.EPathTypeStreamingQuery]: undefined,
         };
 
         const pathTypeOverview = (PathType && getPathTypeOverview[PathType]?.()) || [];
@@ -364,11 +377,15 @@ export function ObjectSummary({
 
     const renderTabContent = () => {
         switch (summaryTab) {
-            case TENANT_SUMMARY_TABS_IDS.acl: {
-                return <Acl path={path} database={tenantName} />;
-            }
             case TENANT_SUMMARY_TABS_IDS.schema: {
-                return <SchemaViewer type={type} path={path} tenantName={tenantName} />;
+                return (
+                    <SchemaViewer
+                        type={type}
+                        path={path}
+                        database={database}
+                        databaseFullPath={databaseFullPath}
+                    />
+                );
             }
             default: {
                 return renderObjectOverview();
@@ -377,26 +394,29 @@ export function ObjectSummary({
     };
 
     const onCollapseInfoHandler = () => {
+        setIsCommonInfoCollapsed(true);
         dispatchCommonInfoVisibilityState(PaneVisibilityActionTypes.triggerCollapse);
     };
     const onExpandInfoHandler = () => {
+        setIsCommonInfoCollapsed(false);
         dispatchCommonInfoVisibilityState(PaneVisibilityActionTypes.triggerExpand);
     };
 
     const onSplitStartDragAdditional = () => {
+        setIsCommonInfoCollapsed(false);
         dispatchCommonInfoVisibilityState(PaneVisibilityActionTypes.clear);
     };
 
-    const relativePath = transformPath(path, tenantName);
+    const relativePath = transformPath(path, databaseFullPath);
 
     const renderCommonInfoControls = () => {
-        const showPreview = isTableType(type) && !isIndexTableType(subType);
+        const showPreview = isTableType(type);
         return (
             <React.Fragment>
                 {showPreview &&
                     getSummaryControls(
                         dispatch,
-                        {setActivePath: setCurrentPath},
+                        {setActivePath: handleSchemaChange, setTenantPage: handleTenantPageChange},
                         'm',
                     )(path, 'preview')}
                 <ClipboardButton
@@ -430,7 +450,7 @@ export function ObjectSummary({
         }
         return (
             <div className={b('entity-type', {error: true})}>
-                <HelpPopover content={message} offset={{left: 0}} />
+                <HelpMark content={message} />
             </div>
         );
     };
@@ -449,7 +469,11 @@ export function ObjectSummary({
                             minSize={[200, 52]}
                             collapsedSizes={[100, 0]}
                         >
-                            <ObjectTree tenantName={tenantName} path={path} />
+                            <ObjectTree
+                                database={database}
+                                path={path}
+                                databaseFullPath={databaseFullPath}
+                            />
                             <div className={b('info')}>
                                 <div className={b('sticky-top')}>
                                     <div className={b('info-header')}>

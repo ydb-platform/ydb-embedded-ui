@@ -8,14 +8,25 @@ import type {RootState} from '../defaultStore';
 
 import {api} from './api';
 
-export const TOPIC_MESSAGE_SIZE_LIMIT = 1000;
+export const TOPIC_MESSAGE_SIZE_LIMIT = 100;
 
 export const topicApi = api.injectEndpoints({
     endpoints: (build) => ({
         getTopic: build.query({
-            queryFn: async (params: {path: string; database: string}) => {
+            queryFn: async ({
+                path,
+                database,
+                databaseFullPath,
+            }: {
+                path: string;
+                database: string;
+                databaseFullPath: string;
+            }) => {
                 try {
-                    const data = await window.api.viewer.getTopic(params);
+                    const data = await window.api.viewer.getTopic({
+                        path: {path, databaseFullPath},
+                        database,
+                    });
                     // On older version it can return HTML page of Developer UI with an error
                     if (typeof data !== 'object') {
                         return {error: {}};
@@ -48,17 +59,21 @@ export const topicApi = api.injectEndpoints({
 const createGetTopicSelector = createSelector(
     (path: string) => path,
     (_path: string, database: string) => database,
-    (path, database) => topicApi.endpoints.getTopic.select({path, database}),
+    (_path: string, _database: string, databaseFullPath: string) => databaseFullPath,
+    (path, database, databaseFullPath) =>
+        topicApi.endpoints.getTopic.select({path, database, databaseFullPath}),
 );
 
 const selectTopicStats = createSelector(
     (state: RootState) => state,
-    (_state: RootState, path: string, database: string) => createGetTopicSelector(path, database),
+    (_state: RootState, path: string, database: string, databaseFullPath: string) =>
+        createGetTopicSelector(path, database, databaseFullPath),
     (state, selectGetTopic) => selectGetTopic(state).data?.topic_stats,
 );
 const selectConsumers = createSelector(
     (state: RootState) => state,
-    (_state: RootState, path: string, database: string) => createGetTopicSelector(path, database),
+    (_state: RootState, path: string, database: string, databaseFullPath: string) =>
+        createGetTopicSelector(path, database, databaseFullPath),
     (state, selectGetTopic) => selectGetTopic(state).data?.consumers,
 );
 

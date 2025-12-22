@@ -3,11 +3,13 @@ import React from 'react';
 import ChartKit, {settings} from '@gravity-ui/chartkit';
 import type {YagrWidgetData} from '@gravity-ui/chartkit/yagr';
 import {YagrPlugin} from '@gravity-ui/chartkit/yagr';
+import {Flex} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 import type {TimeFrame} from '../../utils/timeframes';
 import {ResponseError} from '../Errors/ResponseError';
 import {Loader} from '../Loader';
+import {TimeFrameDropdown} from '../TimeFrameDropdown/TimeFrameDropdown';
 
 import {colorToRGBA, colors} from './colors';
 import {getDefaultDataFormatter} from './getDefaultDataFormatter';
@@ -22,6 +24,9 @@ import type {
 import './MetricChart.scss';
 
 const b = cn('ydb-metric-chart');
+
+// Constants
+const DEFAULT_EFFECTIVE_WIDTH = 600; // Used for maxDataPoints calculation when using fullWidth
 
 settings.set({plugins: [YagrPlugin]});
 
@@ -102,18 +107,13 @@ const emptyChartData: PreparedMetricsData = {timeline: [], metrics: []};
 
 interface DiagnosticsChartProps {
     database: string;
-
-    title?: string;
     metrics: MetricDescription[];
-    timeFrame?: TimeFrame;
 
+    defaultTimeFrame?: TimeFrame;
     autorefresh?: number;
-
     height?: number;
     width?: number;
-
     chartOptions?: ChartOptions;
-
     onChartDataStatusChange?: OnChartDataStatusChange;
 
     /**
@@ -122,20 +122,28 @@ interface DiagnosticsChartProps {
      * Pass isChartVisible prop to ensure proper chart render
      */
     isChartVisible?: boolean;
+
+    /** Chart title displayed in the toolbar */
+    title: string;
 }
 
 export const MetricChart = ({
     database,
-    title,
     metrics,
-    timeFrame = '1h',
+    defaultTimeFrame = '1h',
     autorefresh,
     width = 400,
     height = width / 1.5,
     chartOptions,
     onChartDataStatusChange,
     isChartVisible,
+    title,
 }: DiagnosticsChartProps) => {
+    const [timeFrame, setTimeFrame] = React.useState<TimeFrame>(defaultTimeFrame);
+
+    // Use a reasonable default for maxDataPoints when fullWidth is true
+    const maxDataPoints = DEFAULT_EFFECTIVE_WIDTH / 2;
+
     const {currentData, error, isFetching, status} = chartApi.useGetChartDataQuery(
         // maxDataPoints param is calculated based on width
         // should be width > maxDataPoints to prevent points that cannot be selected
@@ -144,7 +152,7 @@ export const MetricChart = ({
             database,
             metrics,
             timeFrame,
-            maxDataPoints: width / 2,
+            maxDataPoints,
         },
         {pollingInterval: autorefresh},
     );
@@ -156,6 +164,13 @@ export const MetricChart = ({
     }, [status, onChartDataStatusChange]);
 
     const convertedData = prepareWidgetData(currentData || emptyChartData, chartOptions);
+
+    const renderToolbar = () => (
+        <Flex className={b('toolbar')} justifyContent="space-between" alignItems="center">
+            <div>{title}</div>
+            <TimeFrameDropdown value={timeFrame} onChange={setTimeFrame} />
+        </Flex>
+    );
 
     const renderContent = () => {
         if (loading) {
@@ -176,13 +191,12 @@ export const MetricChart = ({
 
     return (
         <div
-            className={b(null)}
+            className={b()}
             style={{
                 height,
-                width,
             }}
         >
-            <div className={b('title')}>{title}</div>
+            {renderToolbar()}
             {renderContent()}
         </div>
     );

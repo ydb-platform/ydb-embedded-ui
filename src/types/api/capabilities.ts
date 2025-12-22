@@ -5,6 +5,12 @@ export interface CapabilitiesResponse {
     Capabilities: Record<Partial<Capability>, number>;
     Settings?: {
         Security?: Record<Partial<SecuritySetting>, boolean>;
+        Database?: {
+            GraphShardExists?: boolean;
+        };
+        Cluster?: {
+            BridgeModeEnabled?: boolean;
+        };
     };
 }
 
@@ -15,8 +21,12 @@ export type Capability =
     | '/storage/groups'
     | '/viewer/query'
     | '/viewer/feature_flags'
+    | '/viewer/config'
     | '/viewer/cluster'
+    | '/vdisk/blobindexstat'
     | '/viewer/nodes'
+    | '/viewer/peers'
+    | '/viewer/acl'
     | '/viewer/topic_data';
 
 export type SecuritySetting = 'UseLoginProvider' | 'DomainLoginOnly';
@@ -39,4 +49,12 @@ export type MetaCapability =
     | '/meta/delete_database'
     | '/meta/simulate_database'
     | '/meta/start_database'
-    | '/meta/stop_database';
+    | '/meta/stop_database'
+    | '/meta/create_cluster'
+    | '/meta/update_cluster'
+    | '/meta/delete_cluster'
+    | '/meta/events'
+    | '/meta/login'
+    | '/meta/whoami'
+    | '/meta/databases'
+    | '/meta/environments';

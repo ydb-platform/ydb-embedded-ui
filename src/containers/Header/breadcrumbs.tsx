@@ -2,14 +2,25 @@ import {
     NodesRight as ClusterIcon,
     Cpu as ComputeNodeIcon,
     Database as DatabaseIcon,
+    House,
     HardDrive as StorageNodeIcon,
 } from '@gravity-ui/icons';
+import {isNil} from 'lodash';
 
 import {TabletIcon} from '../../components/TabletIcon/TabletIcon';
-import {getPDiskPagePath} from '../../routes';
+import {
+    getClusterPath,
+    getClustersPath,
+    getDatabasesPath,
+    getDefaultNodePath,
+    getPDiskPagePath,
+    getStorageGroupPath,
+    getTenantPath,
+} from '../../routes';
 import type {
     BreadcrumbsOptions,
     ClusterBreadcrumbsOptions,
+    HomePageBreadcrumbsOptions,
     NodeBreadcrumbsOptions,
     PDiskBreadcrumbsOptions,
     Page,
@@ -23,21 +34,22 @@ import {
     TENANT_PAGE,
     TENANT_PAGES_IDS,
 } from '../../store/reducers/tenant/constants';
-import {CLUSTER_DEFAULT_TITLE, getTabletLabel} from '../../utils/constants';
-import {getClusterPath} from '../Cluster/utils';
-import {getDefaultNodePath} from '../Node/NodePages';
-import {TenantTabsGroups, getTenantPath} from '../Tenant/TenantPages';
+import {CLUSTER_DEFAULT_TITLE, UNBREAKABLE_GAP, getTabletLabel} from '../../utils/constants';
+import {TenantTabsGroups} from '../Tenant/TenantPages';
 
 import {headerKeyset} from './i18n';
 
 export interface RawBreadcrumbItem {
-    text: string;
+    text?: string;
     link?: string;
     icon?: JSX.Element;
 }
 
 interface GetBreadcrumbs<T, U = AnyRecord> {
-    (options: T, query?: U): RawBreadcrumbItem[];
+    (
+        options: T & {singleClusterMode: boolean; isViewerUser?: boolean},
+        query?: U,
+    ): RawBreadcrumbItem[];
 }
 
 const getQueryForTenant = (type: 'nodes' | 'tablets') => ({
@@ -45,25 +57,80 @@ const getQueryForTenant = (type: 'nodes' | 'tablets') => ({
     [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS[type],
 });
 
-const getClusterBreadcrumbs: GetBreadcrumbs<ClusterBreadcrumbsOptions> = (options, query = {}) => {
-    const {clusterName, clusterTab} = options;
+const getHomePageBreadcrumbs: GetBreadcrumbs<HomePageBreadcrumbsOptions> = (options) => {
+    const {isViewerUser, homePageTab, databasesPageEnvironment, databasesPageAvailable} = options;
 
-    return [
-        {
-            text: clusterName || CLUSTER_DEFAULT_TITLE,
-            link: getClusterPath(clusterTab, query),
-            icon: <ClusterIcon />,
-        },
-    ];
+    // Reset backend and clusterName - we do not need them on home page
+    const clustersPath = getClustersPath({backend: '', clusterName: ''});
+    const databasesPath = getDatabasesPath({
+        env: databasesPageEnvironment,
+        backend: '',
+        clusterName: '',
+    });
+
+    const clustersTitle = headerKeyset('breadcrumbs.clusters');
+    const databasesTitle = headerKeyset('breadcrumbs.databases');
+
+    const icon = <House />;
+
+    // 1. Database user
+    // 1.1. Databases available - return databases with title
+    // 1.2. No databases page - no home page in breadcrumbs at all
+    // 2. There is databases page - return saved page with icon
+    // 3. No databases page - return clusters page with title
+    if (!isViewerUser) {
+        if (databasesPageAvailable) {
+            return [{text: databasesTitle, link: databasesPath}];
+        } else {
+            return [];
+        }
+    }
+    if (databasesPageAvailable) {
+        if (homePageTab === 'clusters') {
+            // icon is not rendered properly without text
+            // Add UNBREAKABLE_GAP as workaround for proper icon placement
+            return [{text: UNBREAKABLE_GAP, link: clustersPath, icon}];
+        } else {
+            return [{text: UNBREAKABLE_GAP, link: databasesPath, icon}];
+        }
+    } else {
+        return [{text: clustersTitle, link: clustersPath}];
+    }
+};
+
+const getClusterBreadcrumbs: GetBreadcrumbs<ClusterBreadcrumbsOptions> = (options, query = {}) => {
+    const {clusterName, clusterTab, singleClusterMode, isViewerUser, environment} = options;
+
+    if (!isViewerUser) {
+        if (singleClusterMode) {
+            return [];
+        } else {
+            return getHomePageBreadcrumbs(options);
+        }
+    }
+
+    let breadcrumbs: RawBreadcrumbItem[] = [];
+
+    if (!singleClusterMode) {
+        breadcrumbs = getHomePageBreadcrumbs(options);
+    }
+
+    breadcrumbs.push({
+        text: clusterName || CLUSTER_DEFAULT_TITLE,
+        link: getClusterPath({activeTab: clusterTab, environment}, query),
+        icon: <ClusterIcon />,
+    });
+
+    return breadcrumbs;
 };
 
 const getTenantBreadcrumbs: GetBreadcrumbs<TenantBreadcrumbsOptions> = (options, query = {}) => {
-    const {tenantName} = options;
+    const {databaseName, database} = options;
 
     const breadcrumbs = getClusterBreadcrumbs(options, query);
 
-    const text = tenantName || headerKeyset('breadcrumbs.tenant');
-    const link = tenantName ? getTenantPath({...query, database: tenantName}) : undefined;
+    const text = databaseName || headerKeyset('breadcrumbs.tenant');
+    const link = database ? getTenantPath({...query, database}) : undefined;
 
     const lastItem = {text, link, icon: <DatabaseIcon />};
     breadcrumbs.push(lastItem);
@@ -72,11 +139,11 @@ const getTenantBreadcrumbs: GetBreadcrumbs<TenantBreadcrumbsOptions> = (options,
 };
 
 const getNodeBreadcrumbs: GetBreadcrumbs<NodeBreadcrumbsOptions> = (options, query = {}) => {
-    const {nodeId, nodeRole, nodeActiveTab, tenantName} = options;
+    const {nodeId, nodeRole, nodeActiveTab, database} = options;
 
     const tenantQuery = getQueryForTenant(nodeActiveTab === 'tablets' ? 'tablets' : 'nodes');
 
-    const breadcrumbs = tenantName
+    const breadcrumbs = database
         ? getTenantBreadcrumbs(options, {...query, ...tenantQuery})
         : getClusterBreadcrumbs(options, query);
 
@@ -88,7 +155,7 @@ const getNodeBreadcrumbs: GetBreadcrumbs<NodeBreadcrumbsOptions> = (options, que
     const lastItem = {
         text,
         link: nodeId
-            ? getDefaultNodePath(nodeId, {database: tenantName, ...query}, nodeActiveTab)
+            ? getDefaultNodePath({id: nodeId, activeTab: nodeActiveTab}, {database, ...query})
             : undefined,
         icon: getNodeIcon(nodeRole),
     };
@@ -110,6 +177,9 @@ function getNodeIcon(nodeRole: 'Storage' | 'Compute' | undefined) {
 }
 
 const getPDiskBreadcrumbs: GetBreadcrumbs<PDiskBreadcrumbsOptions> = (options, query = {}) => {
+    if (!options.isViewerUser) {
+        return [];
+    }
     const {nodeId, pDiskId, nodeRole} = options;
 
     const breadcrumbs = getNodeBreadcrumbs({
@@ -134,35 +204,38 @@ const getPDiskBreadcrumbs: GetBreadcrumbs<PDiskBreadcrumbsOptions> = (options, q
     return breadcrumbs;
 };
 
-const getVDiskBreadcrumbs: GetBreadcrumbs<VDiskBreadcrumbsOptions> = (options, query = {}) => {
-    const {vDiskSlotId} = options;
+const getStorageGroupBreadcrumbs: GetBreadcrumbs<StorageGroupBreadcrumbsOptions> = (
+    options,
+    query = {},
+) => {
+    const {groupId, database} = options;
 
-    const breadcrumbs = getPDiskBreadcrumbs(options, query);
+    const breadcrumbs = database
+        ? getTenantBreadcrumbs(options, query)
+        : getClusterBreadcrumbs(options, query);
 
-    let text = headerKeyset('breadcrumbs.vDisk');
-    if (vDiskSlotId) {
-        text += ` ${vDiskSlotId}`;
+    let text = headerKeyset('breadcrumbs.storageGroup');
+    if (!isNil(groupId)) {
+        text += ` ${groupId}`;
     }
 
     const lastItem = {
         text,
+        link: isNil(groupId) ? undefined : getStorageGroupPath(groupId, {database}),
     };
     breadcrumbs.push(lastItem);
 
     return breadcrumbs;
 };
 
-const getStorageGroupBreadcrumbs: GetBreadcrumbs<StorageGroupBreadcrumbsOptions> = (
-    options,
-    query = {},
-) => {
-    const {groupId} = options;
+const getVDiskBreadcrumbs: GetBreadcrumbs<VDiskBreadcrumbsOptions> = (options, query = {}) => {
+    const {vDiskId} = options;
 
-    const breadcrumbs = getClusterBreadcrumbs(options, query);
+    const breadcrumbs = getStorageGroupBreadcrumbs(options, query);
 
-    let text = headerKeyset('breadcrumbs.storageGroup');
-    if (groupId) {
-        text += ` ${groupId}`;
+    let text = headerKeyset('breadcrumbs.vDisk');
+    if (vDiskId) {
+        text += ` ${vDiskId}`;
     }
 
     const lastItem = {
@@ -174,9 +247,9 @@ const getStorageGroupBreadcrumbs: GetBreadcrumbs<StorageGroupBreadcrumbsOptions>
 };
 
 const getTabletBreadcrumbs: GetBreadcrumbs<TabletBreadcrumbsOptions> = (options, query = {}) => {
-    const {tabletId, tabletType, tenantName} = options;
+    const {tabletId, tabletType, database} = options;
 
-    const breadcrumbs = tenantName
+    const breadcrumbs = database
         ? getTenantBreadcrumbs(options, query)
         : getClusterBreadcrumbs(options, query);
 
@@ -191,6 +264,7 @@ const getTabletBreadcrumbs: GetBreadcrumbs<TabletBreadcrumbsOptions> = (options,
 };
 
 const mapPageToGetter = {
+    homePage: getHomePageBreadcrumbs,
     cluster: getClusterBreadcrumbs,
     node: getNodeBreadcrumbs,
     pDisk: getPDiskBreadcrumbs,
@@ -202,7 +276,7 @@ const mapPageToGetter = {
 
 export const getBreadcrumbs = (
     page: Page,
-    options: BreadcrumbsOptions,
+    options: BreadcrumbsOptions & {singleClusterMode: boolean; isViewerUser?: boolean},
     rawBreadcrumbs: RawBreadcrumbItem[] = [],
     query = {},
 ) => {

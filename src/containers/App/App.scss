@@ -1,5 +1,9 @@
 @use '../../styles/mixins.scss';
 
+@forward '../../styles/drawer.scss';
+@forward '../../styles/versions.scss';
+@forward '../../styles/unipika.scss';
+
 @import url('https://fonts.googleapis.com/css2?family=Rubik&display=swap');
 
 * {
@@ -18,6 +22,7 @@
 html,
 body,
 #root {
+    --g-scrollbar-width: 8px;
     overflow: auto;
 
     box-sizing: border-box;
@@ -33,10 +38,13 @@ body,
     --tenant-object-info-max-value-width: 300px;
     --diagnostics-section-title-margin: 20px;
     --diagnostics-section-margin: 30px;
-    --diagnostics-section-table-width: 872px;
+    --diagnostics-section-table-width: 100%;
 }
 
 .g-root {
+    --g-scrollbar-width: 8px;
+    --header-height: 40px;
+
     --ydb-data-table-color-hover: var(--g-color-base-simple-hover-solid);
 
     // Colors for tablets, status icons and progress bars
@@ -49,6 +57,12 @@ body,
     --ydb-color-status-black: var(--g-color-base-misc-heavy);
 
     --g-popover-max-width: 500px;
+
+    -webkit-overflow-scrolling: touch;
+    ::-webkit-scrollbar-corner,
+    ::-webkit-scrollbar-thumb {
+        border-radius: 8px;
+    }
 
     &_theme_light,
     &_theme_light-hc {
@@ -115,4 +129,19 @@ body,
 
 .app_embedded {
     font-family: 'Rubik', sans-serif;
+}
+
+.g-tab__title {
+    display: inline-flex;
+    align-items: center;
+
+    height: 100%;
+}
+
+.ydb-popover {
+    padding: var(--g-spacing-4);
+}
+
+.g-definition-list__copy-container {
+    align-items: baseline;
 }

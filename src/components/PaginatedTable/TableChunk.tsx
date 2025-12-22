@@ -6,7 +6,10 @@ import {getArray} from '../../utils';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {ResponseError} from '../Errors/ResponseError';
 
+import {usePaginatedTableState} from './PaginatedTableContext';
 import {EmptyTableRow, LoadingTableRow, TableRow} from './TableRow';
+import type {PaginatedTableId} from './constants';
+import {shouldSendColumnIds} from './constants';
 import i18n from './i18n';
 import type {
     Column,
@@ -29,8 +32,9 @@ interface TableChunkProps<T, F> {
     columns: Column<T>[];
     filters?: F;
     sortParams?: SortParams;
-    isActive: boolean;
-    tableName: string;
+    shouldFetch: boolean;
+    shouldRender: boolean;
+    tableName: PaginatedTableId;
 
     fetchData: FetchData<T, F>;
     getRowClassName?: GetRowClassName<T>;
@@ -56,13 +60,22 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     renderErrorMessage,
     renderEmptyDataMessage,
     onDataFetched,
-    isActive,
+    shouldFetch,
+    shouldRender,
     keepCache,
 }: TableChunkProps<T, F>) {
     const [isTimeoutActive, setIsTimeoutActive] = React.useState(true);
     const [autoRefreshInterval] = useAutoRefreshInterval();
+    const {noBatching} = usePaginatedTableState();
 
-    const columnsIds = columns.map((column) => column.name);
+    const hasColumnsIdsInRequest = shouldSendColumnIds(tableName);
+
+    const columnsIds = React.useMemo(
+        () =>
+            // sort ids to prevent refetch if only order was changed
+            hasColumnsIdsInRequest ? columns.map((column) => column.name).toSorted() : [],
+        [columns, hasColumnsIdsInRequest],
+    );
 
     const queryParams = {
         offset: id * chunkSize,
@@ -72,10 +85,11 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
         sortParams,
         columnsIds,
         tableName,
+        noBatching,
     };
 
     tableDataApi.useFetchTableChunkQuery(queryParams, {
-        skip: isTimeoutActive || !isActive,
+        skip: isTimeoutActive || !shouldFetch,
         pollingInterval: autoRefreshInterval,
         refetchOnMountOrArgChange: !keepCache,
     });
@@ -85,7 +99,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
     React.useEffect(() => {
         let timeout = 0;
 
-        if (isActive && isTimeoutActive) {
+        if (shouldFetch && isTimeoutActive) {
             timeout = window.setTimeout(() => {
                 setIsTimeoutActive(false);
             }, DEBOUNCE_TIMEOUT);
@@ -94,10 +108,10 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
         return () => {
             window.clearTimeout(timeout);
         };
-    }, [isActive, isTimeoutActive]);
+    }, [shouldFetch, isTimeoutActive]);
 
     React.useEffect(() => {
-        if (currentData && isActive) {
+        if (currentData) {
             onDataFetched({
                 ...currentData,
                 data: currentData.data as T[],
@@ -105,20 +119,16 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
                 total: currentData.total || 0,
             });
         }
-    }, [currentData, isActive, onDataFetched]);
+    }, [currentData, onDataFetched]);
 
     const dataLength = currentData?.data?.length || calculatedCount;
 
     const renderContent = () => {
-        if (!isActive) {
-            return null;
-        }
-
         if (!currentData) {
             if (error) {
                 const errorData = error as IResponseError;
                 return (
-                    <EmptyTableRow columns={columns}>
+                    <EmptyTableRow columns={columns} height={dataLength * rowHeight}>
                         {renderErrorMessage ? (
                             renderErrorMessage(errorData)
                         ) : (
@@ -136,7 +146,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
         // Data is loaded, but there are no entities in the chunk
         if (!currentData.data?.length) {
             return (
-                <EmptyTableRow columns={columns}>
+                <EmptyTableRow columns={columns} height={dataLength * rowHeight}>
                     {renderEmptyDataMessage ? renderEmptyDataMessage() : i18n('empty')}
                 </EmptyTableRow>
             );
@@ -153,18 +163,5 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
         ));
     };
 
-    return (
-        <tbody
-            id={id.toString()}
-            style={{
-                height: `${dataLength * rowHeight}px`,
-                // Default display: table-row-group doesn't work in Safari and breaks the table
-                // display: block works in Safari, but disconnects thead and tbody cell grids
-                // Hack to make it work in all cases
-                display: isActive ? 'table-row-group' : 'block',
-            }}
-        >
-            {renderContent()}
-        </tbody>
-    );
+    return shouldRender ? renderContent() : null;
 });

@@ -7,13 +7,16 @@ import {
     TriangleExclamationFill,
 } from '@gravity-ui/icons';
 import type {IconData} from '@gravity-ui/uikit';
-import {ArrowToggle, Button, Icon, Link} from '@gravity-ui/uikit';
+import {ArrowToggle, Button, Flex, Icon, Link} from '@gravity-ui/uikit';
 
 import ShortyString from '../../../../components/ShortyString/ShortyString';
 import type {ErrorResponse, IssueMessage} from '../../../../types/api/query';
 import {cn} from '../../../../utils/cn';
 import {isNumeric} from '../../../../utils/utils';
 
+import {IssuesDialog} from './IssuesDialog';
+import {getIssuePosition, getMostSevere, hasRootIssues, normalizeRoots} from './helpers';
+import i18n from './i18n';
 import type {SEVERITY} from './models';
 import {getSeverity} from './models';
 
@@ -28,46 +31,125 @@ interface ResultIssuesProps {
     hideSeverity?: boolean;
 }
 
+function ErrorStringMessage({message}: {message: string}) {
+    return <div className={blockWrapper('error-message')}>{message}</div>;
+}
+
 export function ResultIssues({data, hideSeverity}: ResultIssuesProps) {
-    const [showIssues, setShowIssues] = React.useState(false);
+    const roots = normalizeRoots(data);
 
-    const issues = typeof data === 'string' ? undefined : data?.issues;
-    const hasIssues = Array.isArray(issues) && issues.length > 0;
+    const [expanded, setExpanded] = React.useState<Record<number, boolean>>({});
 
-    const renderTitle = () => {
-        let content;
-        if (typeof data === 'string') {
-            content = data;
-        } else {
-            const severity = getSeverity(data?.error?.severity);
-            content = (
-                <React.Fragment>
-                    {hideSeverity ? null : (
-                        <React.Fragment>
-                            <IssueSeverity severity={severity} />{' '}
-                        </React.Fragment>
-                    )}
-                    <span className={blockWrapper('error-message-text')}>
-                        {data?.error?.message}
-                    </span>
-                </React.Fragment>
-            );
-        }
+    const onToggleInline = (idx: number) => setExpanded((p) => ({...p, [idx]: !p[idx]}));
 
-        return content;
-    };
+    if (typeof data === 'string') {
+        return <ErrorStringMessage message={data} />;
+    }
 
     return (
         <div className={blockWrapper()}>
-            <div className={blockWrapper('error-message')}>
-                {renderTitle()}
-                {hasIssues && (
-                    <Button view="normal" onClick={() => setShowIssues(!showIssues)}>
-                        {showIssues ? 'Hide details' : 'Show details'}
-                    </Button>
-                )}
+            <Flex direction="column" gap="2">
+                {roots.map((root, idx) => {
+                    const hasIssues = hasRootIssues(root.issues);
+
+                    return (
+                        <React.Fragment key={idx}>
+                            <ErrorPreviewItem
+                                severity={getSeverity(root.severity)}
+                                message={root.message || ''}
+                                hideSeverity={hideSeverity}
+                                hasIssues={hasIssues}
+                                expanded={expanded[idx]}
+                                onClick={() => onToggleInline(idx)}
+                            />
+                            {expanded[idx] && hasIssues && (
+                                <Issues hideSeverity={hideSeverity} issues={root.issues} />
+                            )}
+                        </React.Fragment>
+                    );
+                })}
+            </Flex>
+        </div>
+    );
+}
+
+export function ResultIssuesModal({data, hideSeverity}: ResultIssuesProps) {
+    const roots = normalizeRoots(data);
+
+    const [open, setOpen] = React.useState(false);
+    const [currentIssues, setCurrentIssues] = React.useState<IssueMessage[] | null>(null);
+
+    const openDialog = (issues?: IssueMessage[]) => {
+        setCurrentIssues(issues ?? []);
+        setOpen(true);
+    };
+    const closeDialog = () => setOpen(false);
+
+    if (typeof data === 'string') {
+        return <ErrorStringMessage message={data} />;
+    }
+
+    return (
+        <React.Fragment>
+            <div className={blockWrapper()}>
+                <Flex direction="column" gap="2">
+                    {roots.map((root, idx) => {
+                        const hasIssues = hasRootIssues(root.issues);
+
+                        return (
+                            <ErrorPreviewItem
+                                key={idx}
+                                severity={getSeverity(root.severity)}
+                                message={root.message || ''}
+                                hideSeverity={hideSeverity}
+                                hasIssues={hasIssues}
+                                onClick={() => openDialog(root.issues)}
+                            />
+                        );
+                    })}
+                </Flex>
             </div>
-            {hasIssues && showIssues && <Issues hideSeverity={hideSeverity} issues={issues} />}
+
+            <IssuesDialog
+                open={open}
+                issues={currentIssues ?? []}
+                hideSeverity={hideSeverity}
+                onClose={closeDialog}
+                textButtonCancel={i18n('action_close')}
+            />
+        </React.Fragment>
+    );
+}
+
+interface ErrorPreviewItemProps {
+    severity: SEVERITY;
+    message?: string;
+    hideSeverity?: boolean;
+    hasIssues?: boolean;
+    expanded?: boolean;
+    onClick: () => void;
+}
+
+export function ErrorPreviewItem({
+    severity,
+    message,
+    hideSeverity,
+    hasIssues,
+    expanded,
+    onClick,
+}: ErrorPreviewItemProps) {
+    const buttonLabel = expanded ? i18n('action_hide-details') : i18n('action_show-details');
+
+    return (
+        <div className={blockWrapper('error-message')}>
+            {hideSeverity ? null : <IssueSeverity severity={severity} />}
+            <span className={blockWrapper('error-message-text')}>{message}</span>
+
+            {hasIssues && (
+                <Button view="normal" size="s" onClick={onClick}>
+                    {buttonLabel}
+                </Button>
+            )}
         </div>
     );
 }
@@ -77,10 +159,7 @@ interface IssuesProps {
     hideSeverity?: boolean;
 }
 export function Issues({issues, hideSeverity}: IssuesProps) {
-    const mostSevereIssue = issues?.reduce((result, issue) => {
-        const severity = issue.severity ?? 10;
-        return Math.min(result, severity);
-    }, 10);
+    const mostSevereIssue = getMostSevere(issues);
     return (
         <div className={blockIssues(null)}>
             {issues?.map((issue, index) => (
@@ -88,7 +167,7 @@ export function Issues({issues, hideSeverity}: IssuesProps) {
                     key={index}
                     hideSeverity={hideSeverity}
                     issue={issue}
-                    expanded={issue === mostSevereIssue}
+                    expanded={issue.severity === mostSevereIssue}
                 />
             ))}
         </div>
@@ -109,7 +188,7 @@ function Issue({
     const severity = getSeverity(issue.severity);
 
     const issues = issue.issues;
-    const hasIssues = Array.isArray(issues) && issues.length > 0;
+    const hasIssues = hasRootIssues(issues);
 
     const arrowDirection = isExpand ? 'bottom' : 'right';
 
@@ -133,7 +212,9 @@ function Issue({
                 {hideSeverity ? null : <IssueSeverity severity={severity} />}
                 <IssueText issue={issue} />
                 {issue.issue_code ? (
-                    <span className={blockIssue('code')}>Code: {issue.issue_code}</span>
+                    <span className={blockIssue('code')}>
+                        {i18n('field_code')}: {issue.issue_code}
+                    </span>
                 ) : null}
             </div>
             {hasIssues && isExpand && (
@@ -158,12 +239,15 @@ function IssueText({issue}: IssueTextProps) {
         return (
             <span className={blockIssue('message')}>
                 {position && (
-                    <span className={blockIssue('place-text')} title="Position">
+                    <span className={blockIssue('place-text')} title={i18n('field_position')}>
                         {position}
                     </span>
                 )}
                 <div className={blockIssue('message-text')}>
-                    <ShortyString value={issue.message} expandLabel={'Show full message'} />
+                    <ShortyString
+                        value={issue.message}
+                        expandLabel={i18n('action_show-full-message')}
+                    />
                 </div>
             </span>
         );
@@ -184,7 +268,7 @@ function IssueText({issue}: IssueTextProps) {
     };
 
     return (
-        <Link href="#" extraProps={{draggable: false}} onClick={onIssueClickHandler} view="primary">
+        <Link href="#" onClick={onIssueClickHandler} view="primary" draggable={false}>
             {getIssue()}
         </Link>
     );
@@ -216,15 +300,4 @@ function IssueSeverity({severity}: {severity: SEVERITY}) {
             <span className={blockIssueSeverity('title')}>{shortenSeverity}</span>
         </span>
     );
-}
-
-function getIssuePosition(issue: IssueMessage): string {
-    const {position} = issue;
-    if (typeof position !== 'object' || position === null || !isNumeric(position.row)) {
-        return '';
-    }
-
-    const {row, column} = position;
-
-    return isNumeric(column) ? `${row}:${column}` : `line ${row}`;
 }

@@ -1,21 +1,25 @@
 import React from 'react';
 
-import {Checkbox, RadioButton} from '@gravity-ui/uikit';
+import {ChevronsCollapseVertical, ChevronsExpandVertical} from '@gravity-ui/icons';
+import {Button, Flex, Icon, Select, Text} from '@gravity-ui/uikit';
+import {StringParam, useQueryParams} from 'use-query-params';
+import {z} from 'zod';
 
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
+import {VersionsBar} from '../../components/VersionsBar/VersionsBar';
 import {nodesApi} from '../../store/reducers/nodes/nodes';
-import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
+import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import type {TClusterInfo} from '../../types/api/cluster';
-import type {VersionToColorMap, VersionValue} from '../../types/versions';
 import {cn} from '../../utils/cn';
 import {useAutoRefreshInterval} from '../../utils/hooks';
-import {VersionsBar} from '../Cluster/VersionsBar/VersionsBar';
+import type {PreparedVersion, VersionsDataMap} from '../../utils/versions/types';
 
 import {GroupedNodesTree} from './GroupedNodesTree/GroupedNodesTree';
 import {getGroupedStorageNodes, getGroupedTenantNodes, getOtherNodes} from './groupNodes';
 import i18n from './i18n';
+import type {GroupedNodesItem} from './types';
 import {GroupByValue} from './types';
-import {useGetVersionValues, useVersionToColorMap} from './utils';
+import {useGetPreparedVersions, useVersionsDataMap} from './utils';
 
 import './Versions.scss';
 
@@ -32,134 +36,147 @@ export function VersionsContainer({cluster, loading}: VersionsContainerProps) {
         {tablets: false, fieldsRequired: ['SystemState', 'SubDomainKey']},
         {pollingInterval: autoRefreshInterval},
     );
-    const versionToColor = useVersionToColorMap();
+    const versionsDataMap = useVersionsDataMap(cluster);
 
-    const versionsValues = useGetVersionValues({cluster, versionToColor, clusterLoading: loading});
+    const preparedVersions = useGetPreparedVersions({
+        cluster,
+        versionsDataMap,
+        clusterLoading: loading,
+    });
 
     return (
         <LoaderWrapper loading={loading || isNodesLoading}>
             <Versions
-                versionsValues={versionsValues}
-                nodes={currentData?.Nodes}
-                versionToColor={versionToColor}
+                preparedVersions={preparedVersions}
+                nodes={currentData?.nodes}
+                versionsDataMap={versionsDataMap}
             />
         </LoaderWrapper>
     );
 }
 
 interface VersionsProps {
-    nodes?: NodesPreparedEntity[];
-    versionsValues: VersionValue[];
-    versionToColor?: VersionToColorMap;
+    nodes?: PreparedStorageNode[];
+    preparedVersions: PreparedVersion[];
+    versionsDataMap?: VersionsDataMap;
 }
 
-function Versions({versionsValues, nodes, versionToColor}: VersionsProps) {
-    const [groupByValue, setGroupByValue] = React.useState<GroupByValue>(GroupByValue.VERSION);
-    const [expanded, setExpanded] = React.useState(false);
+const groupByValueSchema = z.nativeEnum(GroupByValue).catch(GroupByValue.VERSION);
+
+function Versions({preparedVersions, nodes, versionsDataMap}: VersionsProps) {
+    const [{groupBy: rawGroupByValue}, setQueryParams] = useQueryParams({
+        groupBy: StringParam,
+    });
+
+    const groupByValue = groupByValueSchema.parse(rawGroupByValue);
+
+    const tenantNodes = React.useMemo(() => {
+        return getGroupedTenantNodes(nodes, versionsDataMap, groupByValue);
+    }, [groupByValue, nodes, versionsDataMap]);
+    const storageNodes = React.useMemo(() => {
+        return getGroupedStorageNodes(nodes, versionsDataMap);
+    }, [nodes, versionsDataMap]);
+    const otherNodes = React.useMemo(() => {
+        return getOtherNodes(nodes, versionsDataMap);
+    }, [nodes, versionsDataMap]);
 
     const handleGroupByValueChange = (value: string) => {
-        setGroupByValue(value as GroupByValue);
+        setQueryParams({groupBy: value as GroupByValue}, 'replaceIn');
     };
 
     const renderGroupControl = () => {
+        const options = [
+            {value: GroupByValue.TENANT, content: i18n('title_database')},
+            {value: GroupByValue.VERSION, content: i18n('title_version')},
+        ];
         return (
-            <div className={b('group')}>
-                <span className={b('label')}>Group by:</span>
-                <RadioButton value={groupByValue} onUpdate={handleGroupByValueChange}>
-                    <RadioButton.Option value={GroupByValue.TENANT}>
-                        {GroupByValue.TENANT}
-                    </RadioButton.Option>
-                    <RadioButton.Option value={GroupByValue.VERSION}>
-                        {GroupByValue.VERSION}
-                    </RadioButton.Option>
-                </RadioButton>
-            </div>
+            <Select
+                label={i18n('group-by')}
+                value={[groupByValue]}
+                options={options}
+                onUpdate={(values) => handleGroupByValueChange(values[0])}
+                width={200}
+                size="m"
+            />
         );
     };
-    const renderControls = () => {
-        return (
-            <div className={b('controls')}>
-                {renderGroupControl()}
-                <Checkbox
-                    className={b('checkbox')}
-                    onChange={() => setExpanded((value) => !value)}
-                    checked={expanded}
-                >
-                    All expanded
-                </Checkbox>
-            </div>
-        );
-    };
-
-    const tenantNodes = getGroupedTenantNodes(nodes, versionToColor, groupByValue);
-    const storageNodes = getGroupedStorageNodes(nodes, versionToColor);
-    const otherNodes = getOtherNodes(nodes, versionToColor);
-    const storageNodesContent = storageNodes?.length ? (
-        <React.Fragment>
-            <h4>{i18n('title_storage')}</h4>
-            {storageNodes.map(({title, nodes: itemNodes, items, versionColor}) => (
-                <GroupedNodesTree
-                    key={`storage-nodes-${title}`}
-                    title={title}
-                    nodes={itemNodes}
-                    items={items}
-                    versionColor={versionColor}
-                />
-            ))}
-        </React.Fragment>
-    ) : null;
-    const tenantNodesContent = tenantNodes?.length ? (
-        <React.Fragment>
-            <h4>{i18n('title_database')}</h4>
-            {renderControls()}
-            {tenantNodes.map(({title, nodes: itemNodes, items, versionColor, versionsValues}) => (
-                <GroupedNodesTree
-                    key={`tenant-nodes-${title}`}
-                    title={title}
-                    nodes={itemNodes}
-                    items={items}
-                    expanded={expanded}
-                    versionColor={versionColor}
-                    versionsValues={versionsValues}
-                />
-            ))}
-        </React.Fragment>
-    ) : null;
-    const otherNodesContent = otherNodes?.length ? (
-        <React.Fragment>
-            <h4>{i18n('title_other')}</h4>
-            {otherNodes.map(({title, nodes: itemNodes, items, versionColor, versionsValues}) => (
-                <GroupedNodesTree
-                    key={`other-nodes-${title}`}
-                    title={title}
-                    nodes={itemNodes}
-                    items={items}
-                    versionColor={versionColor}
-                    versionsValues={versionsValues}
-                />
-            ))}
-        </React.Fragment>
-    ) : null;
-
-    const overallContent = (
-        <React.Fragment>
-            <h4>{i18n('title_overall')}</h4>
-            <div className={b('overall-wrapper')}>
-                <VersionsBar
-                    progressClassName={b('overall-progress')}
-                    versionsValues={versionsValues.filter((el) => el.title !== 'unknown')}
-                    size="m"
-                />
-            </div>
-        </React.Fragment>
-    );
 
     return (
-        <div className={b()}>
-            {overallContent}
-            {storageNodesContent}
-            {tenantNodesContent}
-            {otherNodesContent}
-        </div>
+        <Flex className={b()} direction={'column'} gap={6}>
+            <Flex gap={3} direction={'column'} className={b('overall')}>
+                <Text variant="subheader-3">{i18n('title_overall')}</Text>
+                <VersionsBar preparedVersions={preparedVersions} size="m" />
+            </Flex>
+
+            <VersionsSection sectionTitle={i18n('title_storage-nodes')} nodes={storageNodes} />
+            <VersionsSection
+                sectionTitle={i18n('title_database-nodes')}
+                nodes={tenantNodes}
+                renderControls={renderGroupControl}
+            />
+            <VersionsSection sectionTitle={i18n('title_other-nodes')} nodes={otherNodes} />
+        </Flex>
+    );
+}
+
+function VersionsSection({
+    sectionTitle,
+    renderControls,
+    nodes,
+}: {
+    sectionTitle: string;
+    renderControls?: () => React.ReactNode;
+    nodes?: GroupedNodesItem[];
+}) {
+    const [expanded, setExpanded] = React.useState(false);
+
+    if (!nodes?.length) {
+        return null;
+    }
+
+    const renderExpandButton = () => {
+        return (
+            <Button onClick={() => setExpanded((value) => !value)}>
+                <Icon data={expanded ? ChevronsCollapseVertical : ChevronsExpandVertical} />
+                {expanded ? i18n('action_collapse') : i18n('action_expand')}
+            </Button>
+        );
+    };
+
+    const renderNodes = () => {
+        return nodes.map(
+            ({
+                title,
+                isDatabase,
+                nodes: itemNodes,
+                items,
+                versionColor,
+                preparedVersions: nodesVersions,
+            }) => (
+                <GroupedNodesTree
+                    key={title}
+                    title={title}
+                    isDatabase={isDatabase}
+                    nodes={itemNodes}
+                    items={items}
+                    versionColor={versionColor}
+                    expanded={expanded}
+                    preparedVersions={nodesVersions}
+                />
+            ),
+        );
+    };
+
+    return (
+        <Flex gap={3} direction={'column'}>
+            <Flex justifyContent={'space-between'}>
+                <Flex gap={3}>
+                    <Text variant="subheader-3">{sectionTitle}</Text>
+                    {renderControls?.()}
+                </Flex>
+                {renderExpandButton()}
+            </Flex>
+            {renderNodes()}
+        </Flex>
     );
 }

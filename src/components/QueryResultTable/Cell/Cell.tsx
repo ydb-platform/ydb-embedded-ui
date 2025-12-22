@@ -1,7 +1,7 @@
 import React from 'react';
 
-import {showTooltip} from '../../../store/reducers/tooltip';
-import {useTypedDispatch} from '../../../utils/hooks';
+import {Popup} from '@gravity-ui/uikit';
+
 import {b} from '../QueryResultTable';
 
 interface CellProps {
@@ -12,14 +12,31 @@ interface CellProps {
 export const Cell = React.memo(function Cell(props: CellProps) {
     const {className, value} = props;
 
-    const dispatch = useTypedDispatch();
+    const [open, setOpen] = React.useState(false);
+    const anchorRef = React.useRef<HTMLSpanElement | null>(null);
+
+    const handleToggle = React.useCallback(() => {
+        setOpen((prevOpen) => !prevOpen);
+    }, []);
+
+    const handleClose = React.useCallback(() => {
+        setOpen(false);
+    }, []);
 
     return (
-        <span
-            className={b('cell', className)}
-            onClick={(e) => dispatch(showTooltip(e.target, value, 'cell'))}
-        >
-            {value}
-        </span>
+        <React.Fragment>
+            <Popup
+                open={open}
+                hasArrow
+                placement={['top', 'bottom']}
+                anchorRef={anchorRef}
+                onOutsideClick={handleClose}
+            >
+                <div className={b('cell-popup')}>{value}</div>
+            </Popup>
+            <span ref={anchorRef} className={b('cell', className)} onClick={handleToggle}>
+                {value}
+            </span>
+        </React.Fragment>
     );
 });

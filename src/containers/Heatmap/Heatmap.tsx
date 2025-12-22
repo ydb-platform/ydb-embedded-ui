@@ -1,13 +1,14 @@
 import React from 'react';
 
-import {Checkbox, Select} from '@gravity-ui/uikit';
+import {Checkbox, Popup, Select} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {Loader} from '../../components/Loader';
+import {TabletTooltipContent} from '../../components/TooltipsContent';
 import {heatmapApi, setHeatmapOptions} from '../../store/reducers/heatmap';
-import {hideTooltip, showTooltip} from '../../store/reducers/tooltip';
-import type {IHeatmapMetricValue} from '../../types/store/heatmap';
+import type {IHeatmapMetricValue, IHeatmapTabletData} from '../../types/store/heatmap';
 import {cn} from '../../utils/cn';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatNumber} from '../../utils/dataFormatters/dataFormatters';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 
@@ -22,18 +23,27 @@ const COLORS_RANGE = getColorRange(COLORS_RANGE_SIZE);
 
 interface HeatmapProps {
     database: string;
+    databaseFullPath: string;
     path: string;
 }
 
-export const Heatmap = ({path, database}: HeatmapProps) => {
+export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
     const dispatch = useTypedDispatch();
 
-    const itemsContainer = React.createRef<HTMLDivElement>();
+    const itemsContainer = React.useRef<HTMLDivElement | null>(null);
+
+    const [tabletTooltip, setTabletTooltip] = React.useState<{
+        tablet: IHeatmapTabletData;
+        position: {left: number; top: number};
+    } | null>(null);
+    const [tabletTooltipAnchorElement, setTabletTooltipAnchorElement] =
+        React.useState<HTMLDivElement | null>(null);
+    const isTabletTooltipHoveredRef = React.useRef(false);
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {currentData, isFetching, error} = heatmapApi.useGetHeatmapTabletsInfoQuery(
-        {path, database},
+        {path, database, databaseFullPath},
         {pollingInterval: autoRefreshInterval},
     );
 
@@ -42,13 +52,35 @@ export const Heatmap = ({path, database}: HeatmapProps) => {
     const {tablets = [], metrics} = currentData || {};
     const {sort, heatmap, currentMetric} = useTypedSelector((state) => state.heatmap);
 
-    const onShowTooltip = (...args: Parameters<typeof showTooltip>) => {
-        dispatch(showTooltip(...args));
-    };
+    const handleShowTabletTooltip = React.useCallback(
+        (tablet: IHeatmapTabletData, position: {left: number; top: number}) => {
+            setTabletTooltip({tablet, position});
+        },
+        [],
+    );
 
-    const onHideTooltip = () => {
-        dispatch(hideTooltip());
-    };
+    const handleHideTabletTooltip = React.useCallback(() => {
+        setTabletTooltip(null);
+    }, []);
+
+    const handleRequestHideTabletTooltip = React.useCallback(() => {
+        setTabletTooltip((prev) => {
+            if (!prev || isTabletTooltipHoveredRef.current) {
+                return prev;
+            }
+
+            return null;
+        });
+    }, []);
+
+    const handleTooltipMouseEnter = React.useCallback(() => {
+        isTabletTooltipHoveredRef.current = true;
+    }, []);
+
+    const handleTooltipMouseLeave = React.useCallback(() => {
+        isTabletTooltipHoveredRef.current = false;
+        handleHideTabletTooltip();
+    }, [handleHideTabletTooltip]);
 
     const handleMetricChange = (value: string[]) => {
         dispatch(
@@ -74,14 +106,7 @@ export const Heatmap = ({path, database}: HeatmapProps) => {
     };
 
     const renderHistogram = () => {
-        return (
-            <Histogram
-                tablets={tablets}
-                currentMetric={currentMetric}
-                showTooltip={onShowTooltip}
-                hideTooltip={onHideTooltip}
-            />
-        );
+        return <Histogram tablets={tablets} currentMetric={currentMetric} />;
     };
 
     const renderHeatmapCanvas = () => {
@@ -106,11 +131,22 @@ export const Heatmap = ({path, database}: HeatmapProps) => {
 
         return (
             <div ref={itemsContainer} className={b('items')}>
+                {tabletTooltip ? (
+                    <div
+                        key={`${tabletTooltip.position.left}-${tabletTooltip.position.top}`}
+                        ref={setTabletTooltipAnchorElement}
+                        className={b('tooltip-anchor')}
+                        style={{
+                            left: tabletTooltip.position.left,
+                            top: tabletTooltip.position.top,
+                        }}
+                    />
+                ) : null}
                 <HeatmapCanvas
                     tablets={sortedTablets}
                     parentRef={itemsContainer}
-                    showTooltip={onShowTooltip}
-                    hideTooltip={onHideTooltip}
+                    onShowTabletTooltip={handleShowTabletTooltip}
+                    onHideTabletTooltip={handleRequestHideTabletTooltip}
                 />
             </div>
         );
@@ -118,6 +154,7 @@ export const Heatmap = ({path, database}: HeatmapProps) => {
 
     const renderContent = () => {
         const {min, max} = getCurrentMetricLimits(currentMetric, tablets);
+        const isTabletTooltipPopupOpen = Boolean(tabletTooltip && tabletTooltipAnchorElement);
 
         let content;
         if (!error || currentData) {
@@ -126,6 +163,23 @@ export const Heatmap = ({path, database}: HeatmapProps) => {
 
         return (
             <div className={b()}>
+                {isTabletTooltipPopupOpen ? (
+                    <Popup
+                        open
+                        hasArrow
+                        placement={['top', 'bottom', 'left', 'right']}
+                        anchorElement={tabletTooltipAnchorElement}
+                        onOutsideClick={handleHideTabletTooltip}
+                    >
+                        <div
+                            className={b('tooltip')}
+                            onMouseEnter={handleTooltipMouseEnter}
+                            onMouseLeave={handleTooltipMouseLeave}
+                        >
+                            <TabletTooltipContent data={tabletTooltip?.tablet} />
+                        </div>
+                    </Popup>
+                ) : null}
                 <div className={b('filters')}>
                     <Select
                         className={b('heatmap-select')}
@@ -148,13 +202,13 @@ export const Heatmap = ({path, database}: HeatmapProps) => {
                         <div className={b('limits-block')}>
                             <div className={b('limits-title')}>min:</div>
                             <div className={b('limits-value')}>
-                                {Number.isInteger(min) ? formatNumber(min) : '—'}
+                                {Number.isInteger(min) ? formatNumber(min) : EMPTY_DATA_PLACEHOLDER}
                             </div>
                         </div>
                         <div className={b('limits-block')}>
                             <div className={b('limits-title')}>max:</div>
                             <div className={b('limits-value')}>
-                                {Number.isInteger(max) ? formatNumber(max) : '—'}
+                                {Number.isInteger(max) ? formatNumber(max) : EMPTY_DATA_PLACEHOLDER}
                             </div>
                         </div>
                         <div className={b('limits-block')}>

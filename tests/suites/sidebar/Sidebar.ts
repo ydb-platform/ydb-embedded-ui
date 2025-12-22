@@ -20,7 +20,7 @@ export class Sidebar {
         this.logoButton = this.sidebarContainer.locator('.gn-logo__btn-logo');
         this.footer = this.sidebarContainer.locator('.gn-aside-header__footer');
         this.drawer = page.locator('.gn-drawer');
-        this.popupContent = page.locator('.g-popup__content');
+        this.popupContent = page.locator('.information-popup__content');
         this.hotkeysButton = this.popupContent.locator('text=Keyboard shortcuts');
         this.hotkeysPanel = page.locator('.gn-hotkeys-panel__drawer-item');
         this.drawerMenu = page.locator('.gn-settings-menu');
@@ -69,6 +69,7 @@ export class Sidebar {
 
     async clickSettings() {
         await this.settingsButton.click();
+        await this.drawer.waitFor({state: 'visible'});
     }
 
     async clickInformation() {
@@ -175,5 +176,60 @@ export class Sidebar {
             .filter({hasText: title});
         const switchControl = experimentItem.locator('xpath=../../..//input[@type="checkbox"]');
         return switchControl.isChecked();
+    }
+
+    async closeDrawer(): Promise<void> {
+        await this.drawer.page().keyboard.press('Escape');
+        await this.drawer.waitFor({state: 'hidden'});
+    }
+
+    // ACL Syntax methods
+    async getAclSyntaxRadioGroup(): Promise<Locator> {
+        // First, find the settings item that contains the ACL syntax title
+        const aclSettingsItem = this.drawer
+            .locator('.gn-settings__item')
+            .filter({hasText: 'ACL syntax format'});
+
+        // Then find the radio button group within that item
+        return aclSettingsItem.locator('.g-segmented-radio-group');
+    }
+
+    async getSelectedAclSyntax(): Promise<string> {
+        const radioGroup = await this.getAclSyntaxRadioGroup();
+        const checkedOption = radioGroup.locator('.g-segmented-radio-group__option_checked');
+        const text = await checkedOption.textContent();
+        return text?.trim() || '';
+    }
+
+    async selectAclSyntax(syntax: 'KiKiMr' | 'YDB Short' | 'YDB' | 'YQL'): Promise<void> {
+        // Ensure drawer is visible first
+        await this.drawer.waitFor({state: 'visible'});
+
+        const radioGroup = await this.getAclSyntaxRadioGroup();
+        const option = radioGroup.locator(`.g-segmented-radio-group__option:has-text("${syntax}")`);
+        await option.click();
+        // Small delay to ensure the setting is saved
+        await this.drawer.page().waitForTimeout(100);
+    }
+
+    async getAclSyntaxOptions(): Promise<string[]> {
+        const radioGroup = await this.getAclSyntaxRadioGroup();
+        const options = radioGroup.locator('.g-segmented-radio-group__option');
+        const count = await options.count();
+        const texts: string[] = [];
+        for (let i = 0; i < count; i++) {
+            const text = await options.nth(i).textContent();
+            if (text) {
+                texts.push(text.trim());
+            }
+        }
+        return texts;
+    }
+
+    async isAclSyntaxSettingVisible(): Promise<boolean> {
+        const aclSetting = this.drawer
+            .locator('.gn-settings__item')
+            .filter({hasText: 'ACL syntax format'});
+        return aclSetting.isVisible();
     }
 }

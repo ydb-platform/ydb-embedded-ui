@@ -2,19 +2,22 @@ import {parseMultipart} from '@mjackson/multipart-parser';
 import qs from 'qs';
 
 import {
+    isErrorChunk,
     isKeepAliveChunk,
     isQueryResponseChunk,
     isSessionChunk,
     isStreamDataChunk,
 } from '../../store/reducers/query/utils';
+import {readSettingValueFromLS} from '../../store/reducers/settings/utils';
 import type {Actions, StreamQueryParams} from '../../types/api/query';
-import type {QueryResponseChunk, SessionChunk, StreamDataChunk} from '../../types/store/streaming';
-import {
-    BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
-    DEV_ENABLE_TRACING_FOR_ALL_REQUESTS,
-} from '../../utils/constants';
+import type {
+    QueryResponseChunk,
+    SessionChunk,
+    StreamDataChunk,
+    StreamingChunk,
+} from '../../types/store/streaming';
+import {DEV_ENABLE_TRACING_FOR_ALL_REQUESTS} from '../../utils/constants';
 import {isRedirectToAuth} from '../../utils/response';
-import {settingsManager} from '../settings';
 
 import {BaseYdbAPI} from './base';
 
@@ -28,14 +31,17 @@ export interface StreamQueryOptions {
 }
 
 export class StreamingAPI extends BaseYdbAPI {
+    private csrfToken?: string;
+
+    setCSRFToken = (token: string) => {
+        this.csrfToken = token;
+    };
+
     async streamQuery<Action extends Actions>(
         params: StreamQueryParams<Action>,
         options: StreamQueryOptions,
     ) {
-        const base64 = !settingsManager.readUserSettingsValue(
-            BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
-            true,
-        );
+        const base64 = params.base64;
 
         const queryParams = qs.stringify(
             {timeout: params.timeout, base64, schema: 'multipart'},
@@ -48,13 +54,15 @@ export class StreamingAPI extends BaseYdbAPI {
             'Content-Type': 'application/json',
         });
 
+        if (this.csrfToken) {
+            headers.set('X-CSRF-Token', this.csrfToken);
+        }
+
         if (params.tracingLevel) {
             headers.set('X-Trace-Verbosity', String(params.tracingLevel));
         }
 
-        const enableTracing = settingsManager.readUserSettingsValue(
-            DEV_ENABLE_TRACING_FOR_ALL_REQUESTS,
-        );
+        const enableTracing = readSettingValueFromLS(DEV_ENABLE_TRACING_FOR_ALL_REQUESTS);
 
         if (enableTracing) {
             headers.set('X-Want-Trace', '1');
@@ -64,6 +72,7 @@ export class StreamingAPI extends BaseYdbAPI {
             method: 'POST',
             signal: options.signal,
             headers,
+            credentials: this._axios.defaults.withCredentials ? 'include' : 'same-origin',
             body: JSON.stringify(body),
         });
 
@@ -83,23 +92,33 @@ export class StreamingAPI extends BaseYdbAPI {
         const traceId = response.headers.get('traceresponse')?.split('-')[1];
 
         await parseMultipart(response.body, {boundary: BOUNDARY}, async (part) => {
-            try {
-                const chunk = JSON.parse(await part.text());
+            const text = await part.text();
 
-                if (isSessionChunk(chunk)) {
-                    const sessionChunk = chunk;
-                    sessionChunk.meta.trace_id = traceId;
-                    options.onSessionChunk(chunk);
-                } else if (isStreamDataChunk(chunk)) {
-                    options.onStreamDataChunk(chunk);
-                } else if (isQueryResponseChunk(chunk)) {
-                    options.onQueryResponseChunk(chunk);
-                } else if (isKeepAliveChunk(chunk)) {
-                    // Logging for debug purposes
-                    console.log('Received keep alive chunk');
-                }
+            let chunk: unknown;
+            try {
+                chunk = JSON.parse(text);
             } catch (e) {
                 throw new Error(`Error parsing chunk: ${e}`);
+            }
+
+            if (isErrorChunk(chunk)) {
+                await response.body?.cancel().catch(() => {});
+                throw chunk;
+            }
+
+            const streamingChunk = chunk as StreamingChunk;
+
+            if (isSessionChunk(streamingChunk)) {
+                const sessionChunk = streamingChunk;
+                sessionChunk.meta.trace_id = traceId;
+                options.onSessionChunk(streamingChunk);
+            } else if (isStreamDataChunk(streamingChunk)) {
+                options.onStreamDataChunk(streamingChunk);
+            } else if (isQueryResponseChunk(streamingChunk)) {
+                options.onQueryResponseChunk(streamingChunk);
+            } else if (isKeepAliveChunk(streamingChunk)) {
+                // Logging for debug purposes
+                console.info('Received keep alive chunk');
             }
         });
     }

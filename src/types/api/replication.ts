@@ -1,5 +1,3 @@
-/* eslint-disable camelcase */
-
 import type {TIssueMessage} from './operations';
 
 /**

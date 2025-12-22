@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Button, Dialog, Flex, TextInput, Tooltip} from '@gravity-ui/uikit';
+import {Button, Dialog, Flex, TextArea, TextInput, Tooltip} from '@gravity-ui/uikit';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {Controller, useForm} from 'react-hook-form';
 
@@ -9,16 +9,24 @@ import {
     selectQueryAction,
     setQueryAction,
 } from '../../../../store/reducers/queryActions/queryActions';
+import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import type {QuerySettings} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
-import {USE_SHOW_PLAN_SVG_KEY} from '../../../../utils/constants';
 import {
     useQueryExecutionSettings,
+    useQueryStreamingSetting,
+    useResourcePools,
     useSetting,
     useTypedDispatch,
     useTypedSelector,
 } from '../../../../utils/hooks';
-import {QUERY_MODES, querySettingsValidationSchema} from '../../../../utils/query';
+import type {ResourcePoolValue} from '../../../../utils/query';
+import {
+    QUERY_MODES,
+    RESOURCE_POOL_NO_OVERRIDE_VALUE,
+    querySettingsValidationSchema,
+} from '../../../../utils/query';
+import {useCurrentSchema} from '../../TenantContext';
 
 import {QuerySettingsSelect} from './QuerySettingsSelect';
 import {QuerySettingsTimeout} from './QuerySettingsTimeout';
@@ -82,11 +90,46 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
         resolver: zodResolver(querySettingsValidationSchema),
     });
 
-    const [useShowPlanToSvg] = useSetting<boolean>(USE_SHOW_PLAN_SVG_KEY);
+    const [useShowPlanToSvg] = useSetting<boolean>(SETTING_KEYS.USE_SHOW_PLAN_SVG);
     const enableTracingLevel = useTracingLevelOptionAvailable();
+    const [isQueryStreamingEnabled] = useQueryStreamingSetting();
+    const {database} = useCurrentSchema();
+    const {resourcePools, isLoading: isResourcePoolsLoading} = useResourcePools(
+        database,
+        initialValues.resourcePool,
+    );
+
+    const resourcePoolOptions = React.useMemo(
+        () => [
+            {
+                value: RESOURCE_POOL_NO_OVERRIDE_VALUE,
+                content: i18n('form.resource-pool.no-override'),
+            },
+            ...resourcePools.map((name) => ({
+                value: name,
+                content: name,
+            })),
+        ],
+        [resourcePools],
+    );
 
     const timeout = watch('timeout');
+    const resourcePool = watch('resourcePool');
     const queryMode = watch('queryMode');
+
+    React.useEffect(() => {
+        if (isResourcePoolsLoading) {
+            return;
+        }
+
+        if (!resourcePool || resourcePool === RESOURCE_POOL_NO_OVERRIDE_VALUE) {
+            return;
+        }
+
+        if (!resourcePools.length || !resourcePools.includes(resourcePool)) {
+            setValue('resourcePool', RESOURCE_POOL_NO_OVERRIDE_VALUE);
+        }
+    }, [isResourcePoolsLoading, resourcePools, resourcePool, setValue]);
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -215,6 +258,82 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                             {i18n('form.limit.rows')}
                                         </span>
                                     }
+                                />
+                            )}
+                        />
+                    </div>
+                </Flex>
+                {isQueryStreamingEnabled && (
+                    <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
+                        <label htmlFor="outputChunkMaxSize" className={b('field-title')}>
+                            {QUERY_SETTINGS_FIELD_SETTINGS.outputChunkMaxSize.title}
+                        </label>
+                        <div className={b('control-wrapper')}>
+                            <Controller
+                                name="outputChunkMaxSize"
+                                control={control}
+                                render={({field}) => (
+                                    <TextInput
+                                        id="outputChunkMaxSize"
+                                        type="number"
+                                        {...field}
+                                        value={field.value?.toString()}
+                                        className={b('output-chunk-max-size')}
+                                        placeholder="1000000"
+                                        validationState={
+                                            errors.outputChunkMaxSize ? 'invalid' : undefined
+                                        }
+                                        errorMessage={errors.outputChunkMaxSize?.message}
+                                        errorPlacement="inside"
+                                        endContent={
+                                            <span className={b('postfix')}>
+                                                {i18n('form.output.chunk.max.size.bytes')}
+                                            </span>
+                                        }
+                                    />
+                                )}
+                            />
+                        </div>
+                    </Flex>
+                )}
+                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
+                    <label htmlFor="resourcePool" className={b('field-title')}>
+                        {QUERY_SETTINGS_FIELD_SETTINGS.resourcePool.title}
+                    </label>
+                    <div className={b('control-wrapper', {resourcePool: true})}>
+                        <Controller
+                            name="resourcePool"
+                            control={control}
+                            render={({field}) => (
+                                <QuerySettingsSelect<ResourcePoolValue>
+                                    id="resourcePool"
+                                    setting={field.value ?? RESOURCE_POOL_NO_OVERRIDE_VALUE}
+                                    disabled={isResourcePoolsLoading || !resourcePools.length}
+                                    onUpdateSetting={(value) => field.onChange(value)}
+                                    settingOptions={resourcePoolOptions}
+                                />
+                            )}
+                        />
+                    </div>
+                </Flex>
+                <Flex direction="row" alignItems="flex-start" className={b('dialog-row')}>
+                    <label htmlFor="pragmas" className={b('field-title')}>
+                        {QUERY_SETTINGS_FIELD_SETTINGS.pragmas.title}
+                    </label>
+                    <div className={b('control-wrapper')}>
+                        <Controller
+                            name="pragmas"
+                            control={control}
+                            render={({field}) => (
+                                <TextArea
+                                    id="pragmas"
+                                    {...field}
+                                    className={b('pragmas')}
+                                    placeholder="PRAGMA OrderedColumns;"
+                                    rows={3}
+                                    validationState={errors.pragmas ? 'invalid' : undefined}
+                                    errorMessage={errors.pragmas?.message}
+                                    errorPlacement="inside"
                                 />
                             )}
                         />

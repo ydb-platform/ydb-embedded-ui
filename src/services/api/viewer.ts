@@ -1,8 +1,14 @@
 import type {PlanToSvgQueryParams} from '../../store/reducers/planToSvg';
-import type {TMetaInfo} from '../../types/api/acl';
+import type {VDiskBlobIndexStatParams} from '../../store/reducers/vdisk/vdisk';
+import type {
+    AccessRightsUpdateRequest,
+    AvailablePermissionsResponse,
+    TMetaInfo,
+} from '../../types/api/acl';
 import type {TQueryAutocomplete} from '../../types/api/autocomplete';
 import type {CapabilitiesResponse} from '../../types/api/capabilities';
 import type {TClusterInfo} from '../../types/api/cluster';
+import type {SchemaPathParam} from '../../types/api/common';
 import type {DescribeConsumerResult} from '../../types/api/consumer';
 import type {FeatureFlagConfigs} from '../../types/api/featureFlags';
 import type {HealthCheckAPIResponse} from '../../types/api/healthcheck';
@@ -11,6 +17,7 @@ import type {TNetInfo} from '../../types/api/netInfo';
 import type {NodesRequestParams, TNodesInfo} from '../../types/api/nodes';
 import type {TEvNodesInfo} from '../../types/api/nodesList';
 import type {TEvPDiskStateResponse} from '../../types/api/pdisk';
+import type {PeersRequestParams, TPeersResponse} from '../../types/api/peers';
 import type {
     Actions,
     ErrorResponse,
@@ -29,14 +36,13 @@ import type {
 } from '../../types/api/tablet';
 import type {TTenantInfo, TTenants} from '../../types/api/tenant';
 import type {DescribeTopicResult, TopicDataRequest, TopicDataResponse} from '../../types/api/topic';
-import type {TEvVDiskStateResponse} from '../../types/api/vdisk';
+import type {VDiskBlobIndexResponse} from '../../types/api/vdiskBlobIndex';
 import type {TUserToken} from '../../types/api/whoami';
-import {BINARY_DATA_IN_PLAIN_TEXT_DISPLAY} from '../../utils/constants';
+import type {TabletsApiRequestParams} from '../../types/store/tablets';
 import type {Nullable} from '../../utils/typecheckers';
-import {settingsManager} from '../settings';
 
-import {BaseYdbAPI} from './base';
 import type {AxiosOptions} from './base';
+import {BaseYdbAPI} from './base';
 
 export class ViewerAPI extends BaseYdbAPI {
     getClusterCapabilities({database}: {database?: string}) {
@@ -55,11 +61,16 @@ export class ViewerAPI extends BaseYdbAPI {
     }
 
     /** id=. returns data about node that fullfills request */
-    getNodeInfo(id?: string | number, {concurrentId, timeout, signal}: AxiosOptions = {}) {
+    getNodeInfo(
+        {nodeId, database}: {nodeId?: string | number; database?: string},
+        {concurrentId, timeout, signal}: AxiosOptions = {},
+    ) {
         return this.get<TEvSystemStateResponse>(
             this.getPath('/viewer/json/sysinfo?enums=true'),
             {
-                node_id: id,
+                node_id: nodeId,
+                database,
+                fields_required: -1,
             },
             {concurrentId, requestConfig: {signal}, timeout},
         );
@@ -77,15 +88,12 @@ export class ViewerAPI extends BaseYdbAPI {
         );
     }
 
-    getTenantInfo(
-        {path, database = path}: {path: string; database?: string},
-        {concurrentId, signal}: AxiosOptions = {},
-    ) {
+    getTenantInfo({database}: {database: string}, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<TTenantInfo>(
             this.getPath('/viewer/json/tenantinfo'),
             {
                 database,
-                path,
+                path: database,
                 tablets: false,
                 storage: true,
                 memory: true,
@@ -97,15 +105,21 @@ export class ViewerAPI extends BaseYdbAPI {
     getNodes(
         {
             type = 'any',
-            tablets = false,
+            tablets,
             database,
             tenant,
             fieldsRequired,
             filter,
+            path,
+            storage,
             ...params
         }: NodesRequestParams,
         {concurrentId, signal}: AxiosOptions = {},
     ) {
+        // This param determines whether we need VDisks to be returned
+        // We need them only together with PDisks
+        const isStorage = storage ?? fieldsRequired?.includes('PDisks');
+
         const preparedFieldsRequired = Array.isArray(fieldsRequired)
             ? this.prepareArrayRequestParam(fieldsRequired)
             : fieldsRequired;
@@ -114,13 +128,31 @@ export class ViewerAPI extends BaseYdbAPI {
             this.getPath('/viewer/json/nodes?enums=true'),
             {
                 type,
-                tablets,
+                // Use tablets for backward compatibility even if fieldsRequired is passed
+                tablets: tablets ?? fieldsRequired?.includes('Tablets'),
                 // Do not send empty string
                 filter: filter || undefined,
                 // TODO: remove after remove tenant param
                 database: database || tenant,
-                tenant: tenant || database,
                 fields_required: preparedFieldsRequired,
+                path: this.getSchemaPath(path),
+                storage: isStorage,
+                ...params,
+            },
+            {concurrentId, requestConfig: {signal}},
+        );
+    }
+
+    getNodePeers(
+        {nodeId, filter, ...params}: PeersRequestParams,
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
+        return this.get<TPeersResponse>(
+            this.getPath('/viewer/json/peers'),
+            {
+                enums: true,
+                node_id: nodeId,
+                filter: filter || undefined,
                 ...params,
             },
             {concurrentId, requestConfig: {signal}},
@@ -128,7 +160,7 @@ export class ViewerAPI extends BaseYdbAPI {
     }
 
     getTabletsInfo(
-        {nodeId, path, database}: {nodeId?: string | number; path?: string; database?: string},
+        {nodeId, path, database, filter}: TabletsApiRequestParams,
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<TEvTabletStateResponse>(
@@ -136,22 +168,23 @@ export class ViewerAPI extends BaseYdbAPI {
             {
                 database,
                 node_id: nodeId,
-                path,
+                path: this.getSchemaPath(path),
                 enums: true,
+                filter,
             },
             {concurrentId, requestConfig: {signal}},
         );
     }
 
     getSchema(
-        {path, database}: {path: string; database: string},
+        {path, database}: {path: SchemaPathParam; database: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<Nullable<TEvDescribeSchemeResult>>(
             this.getPath('/viewer/json/describe'),
             {
                 database,
-                path,
+                path: this.getSchemaPath(path),
                 enums: true,
                 backup: false,
                 private: true,
@@ -165,14 +198,14 @@ export class ViewerAPI extends BaseYdbAPI {
     }
 
     getDescribe(
-        {path, database, timeout}: {path: string; database: string; timeout?: number},
+        {path, database, timeout}: {path: SchemaPathParam; database: string; timeout?: number},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<Nullable<TEvDescribeSchemeResult>>(
             this.getPath('/viewer/json/describe'),
             {
                 database,
-                path,
+                path: this.getSchemaPath(path),
                 enums: true,
                 partition_stats: true,
                 subs: 0,
@@ -182,29 +215,72 @@ export class ViewerAPI extends BaseYdbAPI {
     }
 
     getSchemaAcl(
-        {path, database}: {path: string; database: string},
+        {path, database, dialect}: {path: SchemaPathParam; database: string; dialect: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<TMetaInfo>(
             this.getPath('/viewer/json/acl'),
             {
                 database,
-                path,
+                path: this.getSchemaPath(path),
                 merge_rules: true,
+                dialect,
+            },
+            {concurrentId, requestConfig: {signal}},
+        );
+    }
+    getAvailablePermissions(
+        {path, database, dialect}: {path: SchemaPathParam; database: string; dialect: string},
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
+        return this.get<AvailablePermissionsResponse>(
+            this.getPath('/viewer/json/acl'),
+            {
+                database,
+                path: this.getSchemaPath(path),
+                merge_rules: true,
+                dialect,
+                list_permissions: true,
+            },
+            {concurrentId, requestConfig: {signal}},
+        );
+    }
+    updateAccessRights(
+        {
+            path,
+            database,
+            rights,
+            dialect,
+        }: {
+            path: SchemaPathParam;
+            database: string;
+            rights: AccessRightsUpdateRequest;
+            dialect: string;
+        },
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
+        return this.post<AccessRightsUpdateRequest>(
+            this.getPath('/viewer/json/acl'),
+            rights,
+            {
+                database,
+                path: this.getSchemaPath(path),
+                merge_rules: true,
+                dialect,
             },
             {concurrentId, requestConfig: {signal}},
         );
     }
 
     getHeatmapData(
-        {path, database}: {path: string; database: string},
+        {path, database}: {path: SchemaPathParam; database: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<Nullable<TEvDescribeSchemeResult>>(
             this.getPath('/viewer/json/describe'),
             {
                 database,
-                path,
+                path: this.getSchemaPath(path),
                 enums: true,
                 backup: false,
                 children: false,
@@ -216,7 +292,7 @@ export class ViewerAPI extends BaseYdbAPI {
     }
 
     getNetwork(
-        {path, database}: {path: string; database: string},
+        {path, database}: {path: SchemaPathParam; database: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<TNetInfo>(
@@ -224,14 +300,14 @@ export class ViewerAPI extends BaseYdbAPI {
             {
                 enums: true,
                 database,
-                path,
+                path: this.getSchemaPath(path),
             },
             {concurrentId, requestConfig: {signal}},
         );
     }
 
     getReplication(
-        {path, database}: {path: string; database: string},
+        {path, database}: {path: SchemaPathParam; database: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<DescribeReplicationResult>(
@@ -240,14 +316,14 @@ export class ViewerAPI extends BaseYdbAPI {
                 enums: true,
                 include_stats: true,
                 database,
-                path,
+                path: this.getSchemaPath(path),
             },
             {concurrentId, requestConfig: {signal}},
         );
     }
 
     getTopic(
-        {path, database}: {path: string; database: string},
+        {path, database}: {path: SchemaPathParam; database: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<DescribeTopicResult>(
@@ -256,7 +332,7 @@ export class ViewerAPI extends BaseYdbAPI {
                 enums: true,
                 include_stats: true,
                 database,
-                path,
+                path: this.getSchemaPath(path),
             },
             {concurrentId, requestConfig: {signal}},
         );
@@ -270,7 +346,7 @@ export class ViewerAPI extends BaseYdbAPI {
     }
 
     getConsumer(
-        {path, consumer, database}: {path: string; consumer: string; database: string},
+        {path, consumer, database}: {path: SchemaPathParam; consumer: string; database: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<DescribeConsumerResult>(
@@ -279,7 +355,7 @@ export class ViewerAPI extends BaseYdbAPI {
                 enums: true,
                 include_stats: true,
                 database,
-                path,
+                path: this.getSchemaPath(path),
                 consumer,
             },
             {concurrentId: concurrentId || 'getConsumer', requestConfig: {signal}},
@@ -323,11 +399,12 @@ export class ViewerAPI extends BaseYdbAPI {
         );
     }
 
-    getNodesList({concurrentId, signal}: AxiosOptions = {}) {
+    getNodesList({database}: {database?: string}, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<TEvNodesInfo>(
             this.getPath('/viewer/json/nodelist'),
             {
                 enums: true,
+                database,
             },
             {
                 concurrentId,
@@ -354,10 +431,7 @@ export class ViewerAPI extends BaseYdbAPI {
         params: SendQueryParams<Action>,
         {concurrentId, signal, withRetries}: AxiosOptions = {},
     ) {
-        const base64 = !settingsManager.readUserSettingsValue(
-            BINARY_DATA_IN_PLAIN_TEXT_DISPLAY,
-            true,
-        );
+        const base64 = params.base64;
 
         return this.post<QueryAPIResponse<Action> | ErrorResponse | null>(
             this.getPath('/viewer/json/query'),
@@ -380,40 +454,48 @@ export class ViewerAPI extends BaseYdbAPI {
     }
 
     getHotKeys(
-        {path, database, enableSampling}: {path: string; database: string; enableSampling: boolean},
+        {
+            path,
+            database,
+            enableSampling,
+        }: {path: SchemaPathParam; database: string; enableSampling: boolean},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<JsonHotKeysResponse>(
             this.getPath('/viewer/json/hotkeys'),
             {
                 database,
-                path,
+                path: this.getSchemaPath(path),
                 enable_sampling: enableSampling,
             },
             {concurrentId: concurrentId || 'getHotKeys', requestConfig: {signal}},
         );
     }
 
-    getTabletDescribe(tenantId: TDomainKey, {concurrentId, signal}: AxiosOptions = {}) {
+    getTabletDescribe(
+        tenantId: TDomainKey,
+        database?: string,
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
         return this.get<Nullable<TEvDescribeSchemeResult>>(
             this.getPath('/viewer/json/describe'),
             {
                 schemeshard_id: tenantId?.SchemeShard,
                 path_id: tenantId?.PathId,
+                database,
             },
             {concurrentId, requestConfig: {signal}},
         );
     }
 
     getStorageInfo(
-        {tenant, database, nodeId, groupId, pDiskId, filter, ...params}: StorageRequestParams,
+        {database, nodeId, groupId, pDiskId, filter, ...params}: StorageRequestParams,
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<TStorageInfo>(
             this.getPath(`/viewer/json/storage?enums=true`),
             {
-                database: database || tenant,
-                tenant: tenant || database,
+                database,
                 node_id: nodeId,
                 group_id: groupId,
                 pdisk_id: pDiskId,
@@ -459,7 +541,7 @@ export class ViewerAPI extends BaseYdbAPI {
         );
     }
 
-    getClusterConfig(database?: string, {concurrentId, signal}: AxiosOptions = {}) {
+    getFeatureFlags(database?: string, {concurrentId, signal}: AxiosOptions = {}) {
         return this.get<FeatureFlagConfigs>(
             this.getPath('/viewer/feature_flags'),
             {
@@ -468,37 +550,51 @@ export class ViewerAPI extends BaseYdbAPI {
             {concurrentId, requestConfig: {signal}},
         );
     }
+    getConfig(database?: string, {concurrentId, signal}: AxiosOptions = {}) {
+        return this.get<Record<string, unknown>>(
+            this.getPath('/viewer/config'),
+            {
+                database,
+            },
+            {concurrentId, requestConfig: {signal}},
+        );
+    }
 
-    getVDiskInfo(
-        {
-            vDiskSlotId,
-            pDiskId,
-            nodeId,
-        }: {
-            vDiskSlotId: string | number;
-            pDiskId: string | number;
-            nodeId: string | number;
-        },
+    getVDiskBlobIndexStat(
+        {database, ...rest}: VDiskBlobIndexStatParams,
         {concurrentId, signal}: AxiosOptions = {},
     ) {
-        return this.get<TEvVDiskStateResponse>(
-            this.getPath('/viewer/json/vdiskinfo?enums=true'),
+        const params =
+            'vDiskId' in rest
+                ? {vdisk_id: rest.vDiskId}
+                : {
+                      node_id: rest.nodeId,
+                      pdisk_id: rest.pDiskId,
+                      vslot_id: rest.vDiskSlotId,
+                  };
+        return this.get<VDiskBlobIndexResponse>(
+            this.getPath('/vdisk/blobindexstat'),
             {
-                node_id: nodeId,
-                filter: `(PDiskId=${pDiskId};VDiskSlotId=${vDiskSlotId})`,
+                ...params,
+                database,
             },
             {concurrentId, requestConfig: {signal}},
         );
     }
 
     getNodeWhiteboardPDiskInfo(
-        {nodeId, pDiskId}: {nodeId: string | number; pDiskId: string | number},
+        {
+            nodeId,
+            pDiskId,
+            database,
+        }: {nodeId: string | number; pDiskId: string | number; database?: string},
         {concurrentId, signal}: AxiosOptions = {},
     ) {
         return this.get<TEvPDiskStateResponse>(
             this.getPath('/viewer/json/pdiskinfo?enums=true'),
             {
                 filter: `(NodeId=${nodeId}${pDiskId ? `;PDiskId=${pDiskId}` : ''})`,
+                database,
             },
             {concurrentId, requestConfig: {signal}},
         );
@@ -527,7 +623,7 @@ export class ViewerAPI extends BaseYdbAPI {
     ) {
         return this.get<HealthCheckAPIResponse>(
             this.getPath('/viewer/json/healthcheck?merge_records=true'),
-            {database, tenant: database, max_level: maxLevel},
+            {database, max_level: maxLevel},
             {concurrentId, requestConfig: {signal}},
         );
     }

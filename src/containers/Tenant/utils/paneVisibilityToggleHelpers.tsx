@@ -4,6 +4,7 @@ import {ChevronsUp} from '@gravity-ui/icons';
 import {ActionTooltip, Button, Icon} from '@gravity-ui/uikit';
 
 import {cn} from '../../../utils/cn';
+import {useResizeObserverTrigger} from '../../../utils/hooks/useResizeObserverTrigger';
 
 import './ToggleButton.scss';
 
@@ -19,50 +20,37 @@ export enum PaneVisibilityActionTypes {
     clear = 'clear',
 }
 
-const setInitialIsPaneCollapsed = (key: string) => {
-    localStorage.setItem(key, 'true');
-};
-
-const deleteInitialIsPaneCollapsed = (key: string) => {
-    localStorage.removeItem(key);
-};
-
-export function paneVisibilityToggleReducerCreator(isPaneCollapsedKey: string) {
-    return function paneVisibilityToggleReducer(
-        state: InitialPaneState,
-        action: PaneVisibilityActionTypes,
-    ) {
-        switch (action) {
-            case PaneVisibilityActionTypes.triggerCollapse: {
-                setInitialIsPaneCollapsed(isPaneCollapsedKey);
-                return {
-                    ...state,
-                    triggerCollapse: true,
-                    triggerExpand: false,
-                    collapsed: true,
-                };
-            }
-            case PaneVisibilityActionTypes.triggerExpand: {
-                deleteInitialIsPaneCollapsed(isPaneCollapsedKey);
-                return {
-                    ...state,
-                    triggerCollapse: false,
-                    triggerExpand: true,
-                    collapsed: false,
-                };
-            }
-            case PaneVisibilityActionTypes.clear: {
-                deleteInitialIsPaneCollapsed(isPaneCollapsedKey);
-                return {
-                    triggerCollapse: false,
-                    triggerExpand: false,
-                    collapsed: false,
-                };
-            }
-            default:
-                return state;
+export function paneVisibilityToggleReducer(
+    state: InitialPaneState,
+    action: PaneVisibilityActionTypes,
+) {
+    switch (action) {
+        case PaneVisibilityActionTypes.triggerCollapse: {
+            return {
+                ...state,
+                triggerCollapse: true,
+                triggerExpand: false,
+                collapsed: true,
+            };
         }
-    };
+        case PaneVisibilityActionTypes.triggerExpand: {
+            return {
+                ...state,
+                triggerCollapse: false,
+                triggerExpand: true,
+                collapsed: false,
+            };
+        }
+        case PaneVisibilityActionTypes.clear: {
+            return {
+                triggerCollapse: false,
+                triggerExpand: false,
+                collapsed: false,
+            };
+        }
+        default:
+            return state;
+    }
 }
 
 interface ToggleButtonProps {
@@ -82,6 +70,7 @@ export function PaneVisibilityToggleButtons({
     initialDirection = 'top',
     className,
 }: ToggleButtonProps) {
+    useResizeObserverTrigger([isCollapsed]);
     return (
         <React.Fragment>
             <ActionTooltip title="Collapse">

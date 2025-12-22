@@ -1,12 +1,11 @@
 import React from 'react';
 
-import {TreeView} from 'ydb-ui-components';
-
-import type {NodesPreparedEntity} from '../../../store/reducers/nodes/types';
-import type {VersionValue} from '../../../types/versions';
+import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import {cn} from '../../../utils/cn';
+import type {PreparedVersion} from '../../../utils/versions/types';
 import {NodesTable} from '../NodesTable/NodesTable';
 import {NodesTreeTitle} from '../NodesTreeTitle/NodesTreeTitle';
+import {VersionsBlock} from '../VersionsBlock/VersionsBlock';
 import type {GroupedNodesItem} from '../types';
 
 import './GroupedNodesTree.scss';
@@ -15,83 +14,80 @@ const b = cn('ydb-versions-grouped-node-tree');
 
 interface GroupedNodesTreeProps {
     title?: string;
-    nodes?: NodesPreparedEntity[];
+    isDatabase?: boolean;
+    nodes?: PreparedStorageNode[];
     items?: GroupedNodesItem[];
     expanded?: boolean;
     versionColor?: string;
-    versionsValues?: VersionValue[];
-    level?: number;
+    preparedVersions?: PreparedVersion[];
 }
 
 export const GroupedNodesTree = ({
     title,
+    isDatabase,
     nodes,
     items,
     expanded = false,
     versionColor,
-    versionsValues,
-    level = 0,
+    preparedVersions,
 }: GroupedNodesTreeProps) => {
-    const [isOpened, toggleBlock] = React.useState(false);
+    const [isOpened, setIsOpened] = React.useState(false);
 
     React.useEffect(() => {
-        toggleBlock(expanded);
+        setIsOpened(expanded);
     }, [expanded]);
 
-    const groupTitle = (
-        <NodesTreeTitle
-            title={title}
-            nodes={nodes}
-            items={items}
-            versionColor={versionColor}
-            versionsValues={versionsValues}
-        />
-    );
-
     const toggleCollapsed = () => {
-        toggleBlock((value) => !value);
+        setIsOpened((value) => !value);
     };
 
-    if (items) {
+    const renderHeader = () => {
         return (
-            <div className={b({'first-level': level === 0})}>
-                <TreeView
-                    key={title}
-                    name={groupTitle}
-                    collapsed={!isOpened}
-                    hasArrow={true}
-                    onClick={toggleCollapsed}
-                    onArrowClick={toggleCollapsed}
-                >
-                    {items.map((item, index) => (
-                        <GroupedNodesTree
-                            key={index}
-                            title={item.title}
-                            nodes={item.nodes}
-                            expanded={expanded}
-                            versionColor={item.versionColor}
-                            level={level + 1}
-                        />
-                    ))}
-                </TreeView>
-            </div>
+            <NodesTreeTitle
+                title={title}
+                isDatabase={isDatabase}
+                expanded={isOpened}
+                nodes={nodes}
+                items={items}
+                versionColor={versionColor}
+                preparedVersions={preparedVersions}
+                onClick={toggleCollapsed}
+            />
         );
-    }
+    };
+
+    const renderItemsContent = () => {
+        return items?.map((item, index) => (
+            <GroupedNodesTree
+                key={index}
+                title={item.title}
+                isDatabase={item.isDatabase}
+                nodes={item.nodes}
+                expanded={expanded}
+                versionColor={item.versionColor}
+                preparedVersions={item.preparedVersions}
+            />
+        ));
+    };
+
+    const renderNodesContent = () => {
+        return <NodesTable nodes={nodes || []} />;
+    };
+
+    const renderContent = () => {
+        if (items) {
+            return renderItemsContent();
+        }
+        return renderNodesContent();
+    };
 
     return (
-        <div className={b({'first-level': level === 0})}>
-            <TreeView
-                key={title}
-                name={groupTitle}
-                collapsed={!isOpened}
-                hasArrow
-                onClick={toggleCollapsed}
-                onArrowClick={toggleCollapsed}
-            >
-                <div className={b('dt-wrapper')}>
-                    <NodesTable nodes={nodes || []} />
-                </div>
-            </TreeView>
+        <div className={b('wrapper')}>
+            <VersionsBlock
+                expanded={isOpened}
+                renderHeader={renderHeader}
+                renderContent={renderContent}
+            />
         </div>
     );
 };

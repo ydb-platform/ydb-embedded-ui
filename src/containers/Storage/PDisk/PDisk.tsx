@@ -1,14 +1,17 @@
 import React from 'react';
 
+import {isNil} from 'lodash';
+
 import {DiskStateProgressBar} from '../../../components/DiskStateProgressBar/DiskStateProgressBar';
 import {HoverPopup} from '../../../components/HoverPopup/HoverPopup';
 import {InternalLink} from '../../../components/InternalLink';
 import {PDiskPopup} from '../../../components/PDiskPopup/PDiskPopup';
 import {VDisk} from '../../../components/VDisk/VDisk';
 import {getPDiskPagePath} from '../../../routes';
-import {valueIsDefined} from '../../../utils';
 import {cn} from '../../../utils/cn';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
+import i18n from '../i18n';
+import {DISKS_POPUP_DEBOUNCE_TIMEOUT} from '../shared';
 import type {StorageViewContext} from '../types';
 import {isVdiskActive} from '../utils';
 
@@ -26,6 +29,12 @@ interface PDiskProps {
     progressBarClassName?: string;
     viewContext?: StorageViewContext;
     width?: number;
+    delayOpen?: number;
+    delayClose?: number;
+    withIcon?: boolean;
+    highlighted?: boolean;
+    highlightedDisk?: string;
+    setHighlightedDisk?: (id?: string) => void;
 }
 
 export const PDisk = ({
@@ -38,10 +47,15 @@ export const PDisk = ({
     progressBarClassName,
     viewContext,
     width,
+    delayOpen = DISKS_POPUP_DEBOUNCE_TIMEOUT,
+    delayClose = DISKS_POPUP_DEBOUNCE_TIMEOUT,
+    withIcon,
+    highlighted,
+    highlightedDisk,
+    setHighlightedDisk,
 }: PDiskProps) => {
     const {NodeId, PDiskId} = data;
-    const pDiskIdsDefined = valueIsDefined(NodeId) && valueIsDefined(PDiskId);
-
+    const pDiskIdsDefined = !isNil(NodeId) && !isNil(PDiskId);
     const anchorRef = React.useRef<HTMLDivElement>(null);
 
     const renderVDisks = () => {
@@ -51,25 +65,35 @@ export const PDisk = ({
 
         return (
             <div className={b('vdisks')}>
-                {vDisks.map((vdisk) => (
-                    <div
-                        key={vdisk.StringifiedId}
-                        className={b('vdisks-item')}
-                        style={{
-                            // 1 is small enough for empty disks to be of the minimum width
-                            // but if all of them are empty, `flex-grow: 1` would size them evenly
-                            flexGrow: Number(vdisk.AllocatedSize) || 1,
-                        }}
-                    >
-                        <VDisk
-                            data={vdisk}
-                            inactive={!isVdiskActive(vdisk, viewContext)}
-                            compact
-                            delayClose={200}
-                            delayOpen={200}
-                        />
-                    </div>
-                ))}
+                {vDisks.map((vdisk) => {
+                    const vDiskId = vdisk.StringifiedId;
+                    const vDiskHighlighted = highlightedDisk === vDiskId;
+
+                    return (
+                        <div
+                            key={vDiskId}
+                            className={b('vdisks-item')}
+                            style={{
+                                // 1 is small enough for empty disks to be of the minimum width
+                                // but if all of them are empty, `flex-grow: 1` would size them evenly
+                                flexGrow: Number(vdisk.AllocatedSize) || 1,
+                            }}
+                        >
+                            <VDisk
+                                withIcon={withIcon}
+                                data={vdisk}
+                                inactive={!isVdiskActive(vdisk, viewContext)}
+                                compact
+                                delayOpen={delayOpen}
+                                delayClose={delayClose}
+                                showPopup={vDiskHighlighted}
+                                onShowPopup={() => setHighlightedDisk?.(vDiskId)}
+                                onHidePopup={() => setHighlightedDisk?.(undefined)}
+                                highlighted={vDiskHighlighted}
+                            />
+                        </div>
+                    );
+                })}
             </div>
         );
     };
@@ -85,20 +109,23 @@ export const PDisk = ({
             {renderVDisks()}
             <HoverPopup
                 showPopup={showPopup}
-                offset={[0, 5]}
+                offset={{mainAxis: 2, crossAxis: 0}}
                 anchorRef={anchorRef}
                 onShowPopup={onShowPopup}
                 onHidePopup={onHidePopup}
                 renderPopupContent={() => <PDiskPopup data={data} />}
-                delayClose={200}
+                delayOpen={delayOpen}
+                delayClose={delayClose}
             >
                 <InternalLink to={pDiskPath} className={b('content')}>
                     <DiskStateProgressBar
+                        withIcon={withIcon}
                         diskAllocatedPercent={data.AllocatedPercent}
                         severity={data.Severity}
                         className={progressBarClassName}
+                        highlighted={highlighted}
+                        noDataPlaceholder={i18n('no-data')}
                     />
-                    <div className={b('media-type')}>{data.Type}</div>
                 </InternalLink>
             </HoverPopup>
         </div>

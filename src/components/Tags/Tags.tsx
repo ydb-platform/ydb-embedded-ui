@@ -12,7 +12,12 @@ interface TagsProps {
 export const Tags = ({tags, className = '', gap = 1}: TagsProps) => {
     return (
         <Flex className={className} gap={gap} wrap="wrap" alignItems="center">
-            {tags && tags.map((tag, tagIndex) => <Label key={tagIndex}>{tag}</Label>)}
+            {tags &&
+                tags.map((tag, tagIndex) => (
+                    <Label size="s" key={tagIndex}>
+                        {tag}
+                    </Label>
+                ))}
         </Flex>
     );
 };

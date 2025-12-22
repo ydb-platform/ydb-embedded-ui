@@ -6,13 +6,13 @@ import {InfoViewer} from '../../../../components/InfoViewer';
 import {LinkWithIcon} from '../../../../components/LinkWithIcon/LinkWithIcon';
 import {TabletState} from '../../../../components/TabletState/TabletState';
 import {TabletUptime} from '../../../../components/UptimeViewer/UptimeViewer';
-import {getTabletPagePath} from '../../../../routes';
+import {getDefaultNodePath, useTabletPagePath} from '../../../../routes';
 import {ETabletState} from '../../../../types/api/tablet';
 import type {TTabletStateInfo} from '../../../../types/api/tablet';
 import {cn} from '../../../../utils/cn';
 import {createTabletDeveloperUIHref} from '../../../../utils/developerUI/developerUI';
+import {useDatabaseFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
 import {useIsUserAllowedToMakeChanges} from '../../../../utils/hooks/useIsUserAllowedToMakeChanges';
-import {getDefaultNodePath} from '../../../Node/NodePages';
 import {hasHive} from '../../utils';
 
 import {tabletInfoKeyset} from './i18n';
@@ -26,7 +26,9 @@ interface TabletInfoProps {
 }
 
 export const TabletInfo = ({tablet}: TabletInfoProps) => {
+    const getTabletPagePath = useTabletPagePath();
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const database = useDatabaseFromQuery();
 
     const {
         ChangeTime,
@@ -80,7 +82,10 @@ export const TabletInfo = ({tablet}: TabletInfoProps) => {
         {
             label: tabletInfoKeyset('field_node'),
             value: (
-                <Link className={b('link')} to={getDefaultNodePath(String(NodeId))}>
+                <Link
+                    className={b('link')}
+                    to={getDefaultNodePath({id: String(NodeId)}, {database})}
+                >
                     {NodeId}
                 </Link>
             ),

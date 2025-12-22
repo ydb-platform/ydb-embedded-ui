@@ -1,14 +1,16 @@
 .ydb-drawer {
     &__drawer-container {
+        --gn-drawer-item-position: absolute;
         position: relative;
 
         overflow: hidden;
 
+        width: 100%;
         height: 100%;
     }
 
     &__item {
-        z-index: 4;
+        z-index: var(--gn-drawer-item-z-index);
 
         height: 100%;
     }
@@ -23,7 +25,7 @@
         top: 0;
         left: 0;
 
-        padding: var(--g-spacing-4) var(--g-spacing-4) 0 var(--g-spacing-6);
+        padding: var(--g-spacing-4) var(--g-spacing-4) 0 var(--g-spacing-4);
 
         background-color: var(--g-color-base-background);
     }
@@ -34,5 +36,10 @@
         flex-direction: column;
 
         height: 100%;
+        //split-pane resizer size
+        margin-left: var(--g-spacing-2);
+    }
+    &__click-handler {
+        display: contents;
     }
 }

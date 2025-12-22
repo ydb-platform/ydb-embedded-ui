@@ -1,23 +1,19 @@
 import React from 'react';
 
-import {shallowEqual} from 'react-redux';
-
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {TableIndexInfo} from '../../../../components/InfoViewer/schemaInfo';
 import {Loader} from '../../../../components/Loader';
-import {
-    selectSchemaMergedChildrenPaths,
-    useGetMultiOverviewQuery,
-} from '../../../../store/reducers/overview/overview';
+import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {EPathType} from '../../../../types/api/schema';
-import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
+import {useAutoRefreshInterval} from '../../../../utils/hooks';
 import {ExternalDataSourceInfo} from '../../Info/ExternalDataSource/ExternalDataSource';
 import {ExternalTableInfo} from '../../Info/ExternalTable/ExternalTable';
+import {SystemViewInfo} from '../../Info/SystemView/SystemView';
 import {ViewInfo} from '../../Info/View/View';
-import {isEntityWithMergedImplementation} from '../../utils/schema';
 
 import {AsyncReplicationInfo} from './AsyncReplicationInfo';
 import {ChangefeedInfo} from './ChangefeedInfo';
+import {StreamingQueryInfo} from './StreamingQueryInfo';
 import {TableInfo} from './TableInfo';
 import {TopicInfo} from './TopicInfo';
 import {TransferInfo} from './TransferInfo';
@@ -26,42 +22,22 @@ interface OverviewProps {
     type?: EPathType;
     path: string;
     database: string;
+    databaseFullPath: string;
 }
 
-function Overview({type, path, database}: OverviewProps) {
+function Overview({type, path, database, databaseFullPath}: OverviewProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
-    const isEntityWithMergedImpl = isEntityWithMergedImplementation(type);
-
-    // shallowEqual prevents rerenders when new schema data is loaded
-    const mergedChildrenPaths = useTypedSelector(
-        (state) => selectSchemaMergedChildrenPaths(state, path, type, database),
-        shallowEqual,
+    const {currentData, isFetching, error} = overviewApi.useGetOverviewQuery(
+        {path, database, databaseFullPath},
+        //overview is not supported for streaming query, data request is inside StreamingQueryInfo
+        {pollingInterval: autoRefreshInterval, skip: type === EPathType.EPathTypeStreamingQuery},
     );
 
-    let paths: string[] = [];
-    if (!isEntityWithMergedImpl) {
-        paths = [path];
-    } else if (mergedChildrenPaths) {
-        paths = [path, ...mergedChildrenPaths];
-    }
-
-    const {
-        mergedDescribe,
-        loading: entityLoading,
-        error,
-    } = useGetMultiOverviewQuery({
-        paths,
-        database,
-        autoRefreshInterval,
-    });
-
-    const rawData = mergedDescribe[path];
-
-    const entityNotReady = isEntityWithMergedImpl && !mergedChildrenPaths;
+    const loading = isFetching && currentData === undefined;
 
     const renderContent = () => {
-        const data = rawData ?? undefined;
+        const data = currentData ?? undefined;
         // verbose mapping to guarantee a correct render for new path types
         // TS will error when a new type is added but not mapped here
         const pathTypeToComponent: Record<EPathType, (() => React.ReactNode) | undefined> = {
@@ -69,48 +45,56 @@ function Overview({type, path, database}: OverviewProps) {
             [EPathType.EPathTypeDir]: undefined,
             [EPathType.EPathTypeResourcePool]: undefined,
             [EPathType.EPathTypeTable]: undefined,
+            [EPathType.EPathTypeSysView]: () => <SystemViewInfo data={data} />,
             [EPathType.EPathTypeSubDomain]: undefined,
             [EPathType.EPathTypeTableIndex]: () => <TableIndexInfo data={data} />,
             [EPathType.EPathTypeExtSubDomain]: undefined,
             [EPathType.EPathTypeColumnStore]: undefined,
             [EPathType.EPathTypeColumnTable]: undefined,
-            [EPathType.EPathTypeCdcStream]: () => {
-                const topicPath = mergedChildrenPaths?.[0];
-                if (topicPath) {
-                    return (
-                        <ChangefeedInfo
-                            path={path}
-                            database={database}
-                            data={data}
-                            topic={mergedDescribe?.[topicPath] ?? undefined}
-                        />
-                    );
-                }
-                return undefined;
-            },
+            [EPathType.EPathTypeCdcStream]: () => (
+                <ChangefeedInfo
+                    path={path}
+                    database={database}
+                    databaseFullPath={databaseFullPath}
+                    data={data}
+                />
+            ),
             [EPathType.EPathTypePersQueueGroup]: () => (
-                <TopicInfo data={data} path={path} database={database} />
+                <TopicInfo
+                    data={data}
+                    path={path}
+                    databaseFullPath={databaseFullPath}
+                    database={database}
+                />
             ),
             [EPathType.EPathTypeExternalTable]: () => <ExternalTableInfo data={data} />,
             [EPathType.EPathTypeExternalDataSource]: () => <ExternalDataSourceInfo data={data} />,
             [EPathType.EPathTypeView]: () => <ViewInfo data={data} />,
             [EPathType.EPathTypeReplication]: () => <AsyncReplicationInfo data={data} />,
             [EPathType.EPathTypeTransfer]: () => (
-                <TransferInfo path={path} database={database} data={data} />
+                <TransferInfo
+                    path={path}
+                    databaseFullPath={databaseFullPath}
+                    database={database}
+                    data={data}
+                />
+            ),
+            [EPathType.EPathTypeStreamingQuery]: () => (
+                <StreamingQueryInfo path={path} database={database} />
             ),
         };
 
         return (type && pathTypeToComponent[type]?.()) || <TableInfo data={data} type={type} />;
     };
 
-    if (entityLoading || entityNotReady) {
+    if (loading) {
         return <Loader size="m" />;
     }
 
     return (
         <React.Fragment>
             {error ? <ResponseError error={error} /> : null}
-            {error && !rawData ? null : renderContent()}
+            {error && !currentData ? null : renderContent()}
         </React.Fragment>
     );
 }

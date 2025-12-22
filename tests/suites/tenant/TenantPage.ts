@@ -31,7 +31,7 @@ export class TenantPage extends PageModel {
         super(page, tenantPage);
 
         this.navigation = page.locator('.ydb-tenant-navigation');
-        this.radioGroup = this.navigation.locator('.g-radio-button');
+        this.radioGroup = this.navigation.locator('.g-segmented-radio-group');
         this.diagnosticsContainer = page.locator('.kv-tenant-diagnostics');
         this.emptyState = page.locator('.empty-state');
         this.emptyStateTitle = this.emptyState.locator('.empty-state__title');

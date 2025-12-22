@@ -1,5 +1,3 @@
-import type {Column} from '@gravity-ui/react-data-table';
-
 import {ResizeableDataTable} from '../../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {
     getHostColumn,
@@ -11,36 +9,34 @@ import {
     NODES_COLUMNS_TO_DATA_FIELDS,
     NODES_COLUMNS_WIDTH_LS_KEY,
 } from '../../../../../components/nodesColumns/constants';
-import type {GetNodesColumnsParams} from '../../../../../components/nodesColumns/types';
+import type {
+    GetNodesColumnsParams,
+    NodesColumn,
+} from '../../../../../components/nodesColumns/types';
 import {nodesApi} from '../../../../../store/reducers/nodes/nodes';
-import type {NodesPreparedEntity} from '../../../../../store/reducers/nodes/types';
-import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
-import type {AdditionalNodesProps} from '../../../../../types/additionalProps';
 import type {NodesRequiredField} from '../../../../../types/api/nodes';
 import {
     TENANT_OVERVIEW_TABLES_LIMIT,
     TENANT_OVERVIEW_TABLES_SETTINGS,
 } from '../../../../../utils/constants';
-import {useAutoRefreshInterval, useSearchQuery} from '../../../../../utils/hooks';
+import {useAutoRefreshInterval} from '../../../../../utils/hooks';
 import {getRequiredDataFields} from '../../../../../utils/tableUtils/getRequiredDataFields';
-import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
-import {getSectionTitle} from '../getSectionTitle';
 import i18n from '../i18n';
 
 function getTopNodesByLoadColumns(
     params: GetNodesColumnsParams,
-): [Column<NodesPreparedEntity>[], NodesRequiredField[]] {
-    const hostColumn = {
-        ...getHostColumn<NodesPreparedEntity>(params),
+): [NodesColumn[], NodesRequiredField[]] {
+    const hostColumn: NodesColumn = {
+        ...getHostColumn(params),
         width: undefined,
     };
 
-    const columns = [
-        getLoadColumn<NodesPreparedEntity>(),
-        getNodeIdColumn<NodesPreparedEntity>(),
+    const columns: NodesColumn[] = [
+        getLoadColumn(),
+        getNodeIdColumn(),
         hostColumn,
-        getVersionColumn<NodesPreparedEntity>(),
+        getVersionColumn(),
     ];
 
     const columnsIds = columns.map((column) => column.name);
@@ -50,22 +46,16 @@ function getTopNodesByLoadColumns(
 }
 
 interface TopNodesByLoadProps {
-    tenantName: string;
-    additionalNodesProps?: AdditionalNodesProps;
+    database: string;
 }
 
-export function TopNodesByLoad({tenantName, additionalNodesProps}: TopNodesByLoadProps) {
-    const query = useSearchQuery();
-
+export function TopNodesByLoad({database}: TopNodesByLoadProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const [columns, fieldsRequired] = getTopNodesByLoadColumns({
-        getNodeRef: additionalNodesProps?.getNodeRef,
-        database: tenantName,
-    });
+    const [columns, fieldsRequired] = getTopNodesByLoadColumns({database});
 
     const {currentData, isFetching, error} = nodesApi.useGetNodesQuery(
         {
-            tenant: tenantName,
+            tenant: database,
             type: 'any',
             sort: '-LoadAverage',
             limit: TENANT_OVERVIEW_TABLES_LIMIT,
@@ -77,24 +67,10 @@ export function TopNodesByLoad({tenantName, additionalNodesProps}: TopNodesByLoa
 
     const loading = isFetching && currentData === undefined;
 
-    const topNodes = currentData?.Nodes || [];
-
-    const title = getSectionTitle({
-        entity: i18n('nodes'),
-        postfix: i18n('by-load'),
-        link: getTenantPath({
-            ...query,
-            [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.nodes,
-        }),
-    });
+    const topNodes = currentData?.nodes || [];
 
     return (
-        <TenantOverviewTableLayout
-            title={title}
-            loading={loading}
-            error={error}
-            withData={Boolean(currentData)}
-        >
+        <TenantOverviewTableLayout loading={loading} error={error} withData={Boolean(currentData)}>
             <ResizeableDataTable
                 columnsWidthLSKey={NODES_COLUMNS_WIDTH_LS_KEY}
                 data={topNodes}

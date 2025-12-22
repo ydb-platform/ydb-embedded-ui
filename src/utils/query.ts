@@ -231,6 +231,10 @@ export function isQueryErrorResponse(data: unknown): data is ErrorResponse {
     return Boolean(data && typeof data === 'object' && 'error' in data && 'issues' in data);
 }
 
+export function isErrorResponse(data: unknown): data is ErrorResponse {
+    return Boolean(data && typeof data === 'object' && 'issues' in data);
+}
+
 // Although schema is set in request, if schema is not supported default schema for the version will be used
 // So we should additionally parse response
 export function parseQueryAPIResponse(
@@ -297,6 +301,13 @@ export const parseQueryErrorToString = (error: unknown) => {
     return parsedError?.error?.message;
 };
 
+export const defaultPragma = 'PRAGMA OrderedColumns;';
+
+// Special marker meaning "do not override resource pool in request params"
+export const RESOURCE_POOL_NO_OVERRIDE_VALUE = '__no_pool_override__';
+
+export type ResourcePoolValue = typeof RESOURCE_POOL_NO_OVERRIDE_VALUE | string;
+
 export const DEFAULT_QUERY_SETTINGS = {
     queryMode: QUERY_MODES.query,
     transactionMode: TRANSACTION_MODES.implicit,
@@ -304,6 +315,8 @@ export const DEFAULT_QUERY_SETTINGS = {
     limitRows: 10000,
     statisticsMode: STATISTICS_MODES.none,
     tracingLevel: TRACING_LEVELS.off,
+    pragmas: defaultPragma,
+    resourcePool: RESOURCE_POOL_NO_OVERRIDE_VALUE,
 };
 
 export const queryModeSchema = z.nativeEnum(QUERY_MODES);
@@ -323,10 +336,16 @@ export const querySettingsValidationSchema = z.object({
         (val) => (val === '' ? undefined : val),
         z.coerce.number().gt(0).lte(100_000).or(z.undefined()),
     ),
+    outputChunkMaxSize: z.preprocess(
+        (val) => (val === '' ? undefined : val),
+        z.coerce.number().int().positive().or(z.undefined()),
+    ),
     queryMode: queryModeSchema,
     transactionMode: transactionModeSchema,
     statisticsMode: statisticsModeSchema,
     tracingLevel: tracingLevelSchema,
+    pragmas: z.string(),
+    resourcePool: z.string(),
 });
 
 export const querySettingsRestoreSchema = z
@@ -339,9 +358,15 @@ export const querySettingsRestoreSchema = z
             (val) => (val === '' ? undefined : val),
             z.coerce.number().gt(0).lte(100_000).optional().catch(DEFAULT_QUERY_SETTINGS.limitRows),
         ),
+        outputChunkMaxSize: z.preprocess(
+            (val) => (val === '' ? undefined : val),
+            z.coerce.number().int().positive().optional(),
+        ),
         queryMode: queryModeSchema.catch(DEFAULT_QUERY_SETTINGS.queryMode),
         transactionMode: transactionModeSchema.catch(DEFAULT_QUERY_SETTINGS.transactionMode),
         statisticsMode: statisticsModeSchema.catch(DEFAULT_QUERY_SETTINGS.statisticsMode),
         tracingLevel: tracingLevelSchema.catch(DEFAULT_QUERY_SETTINGS.tracingLevel),
+        pragmas: z.string().catch(DEFAULT_QUERY_SETTINGS.pragmas),
+        resourcePool: z.string().catch(DEFAULT_QUERY_SETTINGS.resourcePool),
     })
     .catch(DEFAULT_QUERY_SETTINGS);

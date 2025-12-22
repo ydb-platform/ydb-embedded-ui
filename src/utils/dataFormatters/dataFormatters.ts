@@ -3,9 +3,9 @@ import {dateTimeParse, duration} from '@gravity-ui/date-utils';
 import type {TVDiskID, TVSlotId} from '../../types/api/vdisk';
 import {formatBytes as formatBytesCustom, getBytesSizeUnit} from '../bytesParsers/formatBytes';
 import type {BytesSizes} from '../bytesParsers/formatBytes';
-import {HOUR_IN_SECONDS} from '../constants';
+import {HOUR_IN_SECONDS, UNBREAKABLE_GAP} from '../constants';
 import {configuredNumeral} from '../numeral';
-import {UNBREAKABLE_GAP, isNumeric} from '../utils';
+import {isNumeric} from '../utils';
 
 import {formatValues} from './common';
 import {formatNumberWithDigits, getNumberSizeUnit} from './formatNumber';
@@ -39,9 +39,9 @@ export const stringifyVdiskId = (id?: TVDiskID | TVSlotId) => {
 
 /**
  * It works well only with positive values,
- * if you want to get negative formatted uptime, use some wrapper like getDowntimeFromDateFormatted
+ * if you want to get negative formatted duration, use some wrapper like getDowntimeFromDateFormatted
  */
-export function formatUptimeInSeconds(seconds: number) {
+export function formatDurationSeconds(seconds: number) {
     if (!isNumeric(seconds)) {
         return undefined;
     }
@@ -69,8 +69,8 @@ export function formatUptimeInSeconds(seconds: number) {
     return sign + value;
 }
 
-export const formatMsToUptime = (ms?: number) => {
-    return formatUptimeInSeconds(Number(ms) / 1000);
+export const formatDurationMs = (ms?: number) => {
+    return formatDurationSeconds(Number(ms) / 1000);
 };
 
 export function getUptimeFromDateFormatted(dateFrom?: number | string, dateTo?: number | string) {
@@ -80,7 +80,7 @@ export function getUptimeFromDateFormatted(dateFrom?: number | string, dateTo?: 
     // Prevent wrong negative uptime values
     diff = diff < 0 ? 0 : diff;
 
-    return formatUptimeInSeconds(diff);
+    return formatDurationSeconds(diff);
 }
 
 export function getDowntimeFromDateFormatted(dateFrom?: number | string, dateTo?: number | string) {
@@ -90,7 +90,7 @@ export function getDowntimeFromDateFormatted(dateFrom?: number | string, dateTo?
     // Prevent wrong negative uptime values
     diff = diff < 0 ? 0 : diff;
 
-    return formatUptimeInSeconds(-diff);
+    return formatDurationSeconds(-diff);
 }
 
 function calcTimeDiffInSec(
@@ -160,13 +160,13 @@ export const formatPercent = (number?: unknown, precision = 2) => {
         return '';
     }
 
-    // Numeral doesn't work well with very low numbers (for example 2e-27)
-    // We can receive such numbers from backend in float fields
-    // So we need apply toFixed before configuration
-    const preparedNumber = Number(number).toFixed(precision);
-    const configuredNumber = configuredNumeral(preparedNumber);
+    // Round precision for very low numbers (e.g. 2e-27 from backend)
+    // Pass as number, not string, to avoid locale decimal separator issues
+    const numberValue = Number(number);
+    const roundedNumber = Number(numberValue.toFixed(precision));
+
     const format = '0.[00]%';
-    return configuredNumber.format(format);
+    return configuredNumeral(roundedNumber).format(format);
 };
 
 export const formatSecondsToHours = (seconds: number) => {
@@ -240,4 +240,46 @@ export function getStringifiedData(value: unknown) {
     } else {
         return value.toString();
     }
+}
+
+// Delete outer empty lines, saving first line spaces
+export function trimOuterEmptyLines(str: string) {
+    const lines = str.split('\n');
+
+    let start = 0;
+    while (start < lines.length && lines[start].trim() === '') {
+        start++;
+    }
+
+    let end = lines.length - 1;
+    while (end >= start && lines[end].trim() === '') {
+        end--;
+    }
+
+    return lines.slice(start, end + 1).join('\n');
+}
+
+// Remove from each line exactly as many leading spaces
+// as from the first non-empty line
+export function stripIndentByFirstLine(str: string) {
+    const lines = str.split('\n');
+    if (lines.length === 0) {
+        return str;
+    }
+
+    const firstIdx = lines.findIndex((l) => l.trim() !== '');
+    if (firstIdx === -1) {
+        return str;
+    }
+
+    const firstLine = lines[firstIdx];
+    const match = firstLine.match(/^ +/);
+    const leadSpaces = match ? match[0].length : 0;
+    if (leadSpaces === 0) {
+        return str;
+    }
+
+    const re = new RegExp(`^ {0,${leadSpaces}}`);
+    const res = lines.map((line) => line.replace(re, ''));
+    return res.join('\n');
 }

@@ -1,6 +1,7 @@
 import DataTable from '@gravity-ui/react-data-table';
 import {DefinitionList} from '@gravity-ui/uikit';
 
+import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import type {TMemoryStats, TPoolStats} from '../../types/api/nodes';
 import type {TTabletStateInfo} from '../../types/api/tablet';
 import {valueIsDefined} from '../../utils';
@@ -13,11 +14,11 @@ import {
 } from '../../utils/dataFormatters/dataFormatters';
 import {getUsageSeverity} from '../../utils/generateEvaluator';
 import type {Column} from '../../utils/tableUtils/types';
+import {formatToMs, parseUsToMs} from '../../utils/timeParsers';
 import {bytesToSpeed, isNumeric} from '../../utils/utils';
 import {CellWithPopover} from '../CellWithPopover/CellWithPopover';
 import {MemoryViewer} from '../MemoryViewer/MemoryViewer';
 import {NodeHostWrapper} from '../NodeHostWrapper/NodeHostWrapper';
-import type {NodeHostData, StatusForIcon} from '../NodeHostWrapper/NodeHostWrapper';
 import {PoolsGraph} from '../PoolsGraph/PoolsGraph';
 import {ProgressViewer} from '../ProgressViewer/ProgressViewer';
 import {TabletsStatistic} from '../TabletsStatistic';
@@ -44,21 +45,32 @@ export function getNodeIdColumn<T extends {NodeId?: string | number}>(): Column<
         align: DataTable.RIGHT,
     };
 }
-export function getHostColumn<T extends NodeHostData>(
-    {getNodeRef, database}: GetNodesColumnsParams,
-    {statusForIcon = 'SystemState'}: {statusForIcon?: StatusForIcon} = {},
-): Column<T> {
+export function getHostColumn<T extends PreparedStorageNode>({
+    database,
+}: GetNodesColumnsParams): Column<T> {
     return {
         name: NODES_COLUMNS_IDS.Host,
         header: NODES_COLUMNS_TITLES.Host,
         render: ({row}) => {
+            return <NodeHostWrapper node={row} database={database} />;
+        },
+        width: 350,
+        align: DataTable.LEFT,
+    };
+}
+
+// Different column for different set of required fields
+// ConnectStatus is required here, it makes handler to return network stats
+// On versions before 25-1-2 ConnectStatus also makes handler to return peers - it can significantly increase response size
+export function getNetworkHostColumn<T extends PreparedStorageNode>({
+    database,
+}: GetNodesColumnsParams): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.NetworkHost,
+        header: NODES_COLUMNS_TITLES.NetworkHost,
+        render: ({row}) => {
             return (
-                <NodeHostWrapper
-                    node={row}
-                    getNodeRef={getNodeRef}
-                    database={database}
-                    statusForIcon={statusForIcon}
-                />
+                <NodeHostWrapper node={row} database={database} statusForIcon={'ConnectStatus'} />
             );
         },
         width: 350,
@@ -89,6 +101,16 @@ export function getRackColumn<T extends {Rack?: string}>(): Column<T> {
         header: NODES_COLUMNS_TITLES.Rack,
         align: DataTable.LEFT,
         render: ({row}) => row.Rack || EMPTY_DATA_PLACEHOLDER,
+        width: 100,
+    };
+}
+
+export function getPileNameColumn<T extends {PileName?: string}>(): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.PileName,
+        header: i18n('field_pile-name'),
+        align: DataTable.LEFT,
+        render: ({row}) => row.PileName || EMPTY_DATA_PLACEHOLDER,
         width: 100,
     };
 }
@@ -125,28 +147,33 @@ export function getRAMColumn<T extends {MemoryUsed?: string; MemoryLimit?: strin
         sortAccessor: ({MemoryUsed = 0}) => Number(MemoryUsed),
         defaultOrder: DataTable.DESCENDING,
         render: ({row}) => {
-            const [memoryUsed, memoryLimit] =
-                isNumeric(row.MemoryUsed) && isNumeric(row.MemoryLimit)
-                    ? formatStorageValues(
-                          Number(row.MemoryUsed),
-                          Number(row.MemoryLimit),
-                          'gb',
-                          undefined,
-                          true,
-                      )
-                    : [0, 0];
+            const [memoryUsed, memoryLimit] = formatStorageValues(
+                isNumeric(row.MemoryUsed) ? Number(row.MemoryUsed) : undefined,
+                isNumeric(row.MemoryLimit) ? Number(row.MemoryLimit) : undefined,
+                'gb',
+                undefined,
+                true,
+            );
+
+            const hasData = memoryUsed || memoryLimit;
+
             return (
                 <CellWithPopover
-                    placement={['top', 'auto']}
+                    placement={['top', 'bottom']}
                     fullWidth
+                    disabled={!hasData}
                     content={
                         <DefinitionList responsive>
-                            <DefinitionList.Item name={i18n('field_memory-used')}>
-                                {memoryUsed}
-                            </DefinitionList.Item>
-                            <DefinitionList.Item name={i18n('field_memory-limit')}>
-                                {memoryLimit}
-                            </DefinitionList.Item>
+                            {memoryUsed && (
+                                <DefinitionList.Item name={i18n('field_memory-used')}>
+                                    {memoryUsed}
+                                </DefinitionList.Item>
+                            )}
+                            {memoryLimit && (
+                                <DefinitionList.Item name={i18n('field_memory-limit')}>
+                                    {memoryLimit}
+                                </DefinitionList.Item>
+                            )}
                         </DefinitionList>
                     }
                 >
@@ -214,16 +241,12 @@ export function getCpuColumn<
         sortAccessor: ({PoolStats = []}) => Math.max(...PoolStats.map(({Usage}) => Number(Usage))),
         defaultOrder: DataTable.DESCENDING,
         render: ({row}) => {
-            if (!row.PoolStats) {
-                return EMPTY_DATA_PLACEHOLDER;
-            }
-
             let totalPoolUsage =
                 isNumeric(row.CoresUsed) && isNumeric(row.CoresTotal)
                     ? row.CoresUsed / row.CoresTotal
                     : undefined;
 
-            if (totalPoolUsage === undefined) {
+            if (totalPoolUsage === undefined && row.PoolStats) {
                 let totalThreadsCount = 0;
                 totalPoolUsage = row.PoolStats.reduce((acc, pool) => {
                     totalThreadsCount += Number(pool.Threads);
@@ -235,11 +258,12 @@ export function getCpuColumn<
 
             return (
                 <CellWithPopover
-                    placement={['top', 'auto']}
+                    placement={['top', 'bottom']}
                     fullWidth
+                    disabled={!row.PoolStats}
                     content={
                         <DefinitionList responsive>
-                            {row.PoolStats.map((pool) =>
+                            {row.PoolStats?.map((pool) =>
                                 isNumeric(pool.Usage) ? (
                                     <DefinitionList.Item key={pool.Name} name={pool.Name}>
                                         {formatPool('Usage', pool.Usage).value}
@@ -403,8 +427,7 @@ export function getNetworkUtilizationColumn<
 
             return (
                 <CellWithPopover
-                    placement={['top', 'auto']}
-                    fullWidth
+                    placement={['top', 'bottom']}
                     content={
                         <DefinitionList responsive>
                             <DefinitionList.Item key={'NetworkUtilization'} name={i18n('sum')}>
@@ -433,7 +456,7 @@ export function getSendThroughputColumn<T extends {SendThroughput?: string}>(): 
         header: NODES_COLUMNS_TITLES.SendThroughput,
         render: ({row}) =>
             isNumeric(row.SendThroughput)
-                ? bytesToSpeed(row.SendThroughput)
+                ? bytesToSpeed(row.SendThroughput, 1)
                 : EMPTY_DATA_PLACEHOLDER,
         align: DataTable.RIGHT,
         width: 110,
@@ -445,7 +468,7 @@ export function getReceiveThroughputColumn<T extends {ReceiveThroughput?: string
         header: NODES_COLUMNS_TITLES.ReceiveThroughput,
         render: ({row}) =>
             isNumeric(row.ReceiveThroughput)
-                ? bytesToSpeed(row.ReceiveThroughput)
+                ? bytesToSpeed(row.ReceiveThroughput, 1)
                 : EMPTY_DATA_PLACEHOLDER,
         align: DataTable.RIGHT,
         width: 110,
@@ -470,8 +493,7 @@ export function getPingTimeColumn<
 
             return (
                 <CellWithPopover
-                    placement={['top', 'auto']}
-                    fullWidth
+                    placement={['top', 'bottom']}
                     content={
                         <DefinitionList responsive>
                             <DefinitionList.Item key={'PingTimeUs'} name={i18n('avg')}>
@@ -509,8 +531,7 @@ export function getClockSkewColumn<
 
             return (
                 <CellWithPopover
-                    placement={['top', 'auto']}
-                    fullWidth
+                    placement={['top', 'bottom']}
                     content={
                         <DefinitionList responsive>
                             <DefinitionList.Item key={'ClockSkewUs'} name={i18n('avg')}>
@@ -531,5 +552,35 @@ export function getClockSkewColumn<
         },
         align: DataTable.RIGHT,
         width: 110,
+    };
+}
+
+// Peers columns
+
+export function getPeerSkewColumn<T extends {ClockSkewUs?: string | number}>(): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.ClockSkew,
+        header: NODES_COLUMNS_TITLES.ClockSkew,
+        align: DataTable.RIGHT,
+        width: 110,
+        resizeMinWidth: 90,
+        render: ({row}) =>
+            isNumeric(row.ClockSkewUs)
+                ? formatToMs(parseUsToMs(row.ClockSkewUs, 1))
+                : EMPTY_DATA_PLACEHOLDER,
+    };
+}
+
+export function getPeerPingColumn<T extends {PingTimeUs?: string | number}>(): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.PingTime,
+        header: NODES_COLUMNS_TITLES.PingTime,
+        align: DataTable.RIGHT,
+        width: 110,
+        resizeMinWidth: 90,
+        render: ({row}) =>
+            isNumeric(row.PingTimeUs)
+                ? formatToMs(parseUsToMs(row.PingTimeUs))
+                : EMPTY_DATA_PLACEHOLDER,
     };
 }

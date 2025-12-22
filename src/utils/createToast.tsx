@@ -1,25 +1,25 @@
-import {toaster} from '@gravity-ui/uikit/toaster-singleton-react-18';
+import type {ToastProps} from '@gravity-ui/uikit';
+import {Toaster} from '@gravity-ui/uikit';
+
+const toaster = new Toaster();
 
 export {toaster};
 
-interface CreateToastProps {
-    name?: string;
-    title?: string;
-    content?: string;
-    type: 'error' | 'success';
-    autoHiding?: number | false;
-    className?: string;
-}
-
-function createToast({name, title, type, content, autoHiding, className}: CreateToastProps) {
+function createToast({
+    name,
+    title = 'Request succeeded',
+    theme = 'success',
+    isClosable,
+    autoHiding,
+    ...restProps
+}: ToastProps) {
     return toaster.add({
-        name: name ?? 'Request succeeded',
-        title: title ?? 'Request succeeded',
-        theme: type === 'error' ? 'danger' : 'success',
-        content: content,
-        isClosable: true,
-        autoHiding: autoHiding ?? (type === 'success' ? 5000 : false),
-        className,
+        name: name,
+        title: title,
+        theme: theme,
+        isClosable: isClosable ?? true,
+        autoHiding: autoHiding ?? (theme === 'success' ? 5000 : false),
+        ...restProps,
     });
 }
 

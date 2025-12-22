@@ -1,0 +1,19 @@
+{
+  "td-feature-flag": "Feature flag",
+  "td-default": "Default",
+  "td-current": "Current",
+
+  "enabled": "Enabled",
+  "disabled": "Disabled",
+  "flag-touched": "Flag is changed",
+
+  "search-placeholder": "Search...",
+  "search-empty": "Empty search result",
+  "no-data": "No data",
+
+  "title_current": "Current",
+  "title_startup": "Startup",
+  "title_features": "Feature flags",
+
+  "action_copy-config": "Copy config"
+}

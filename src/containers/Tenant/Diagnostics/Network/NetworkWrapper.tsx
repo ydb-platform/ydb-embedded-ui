@@ -1,61 +1,38 @@
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
-import {
-    useCapabilitiesLoaded,
-    useViewerNodesHandlerHasNetworkStats,
-} from '../../../../store/reducers/capabilities/hooks';
-import {ENABLE_NETWORK_TABLE_KEY} from '../../../../utils/constants';
-import {useSetting} from '../../../../utils/hooks';
+import {NetworkTable} from '../../../../components/NetworkTable/NetworkTable';
+import {useShouldShowDatabaseNetworkTable} from '../../../../components/NetworkTable/hooks';
+import {useCapabilitiesLoaded} from '../../../../store/reducers/capabilities/hooks';
 import type {NodesProps} from '../../../Nodes/Nodes';
-import {Nodes} from '../../../Nodes/Nodes';
 
 import {Network} from './Network';
-import {getNetworkTableNodesColumns} from './NetworkTable/columns';
-import {
-    NETWORK_DEFAULT_NODES_COLUMNS,
-    NETWORK_NODES_GROUP_BY_PARAMS,
-    NETWORK_NODES_TABLE_SELECTED_COLUMNS_KEY,
-    NETWORK_REQUIRED_NODES_COLUMNS,
-} from './NetworkTable/constants';
 
-interface NetworkWrapperProps
-    extends Pick<NodesProps, 'path' | 'parentRef' | 'additionalNodesProps'> {
+interface NetworkWrapperProps extends Pick<NodesProps, 'path' | 'scrollContainerRef'> {
     database: string;
+    databaseFullPath: string;
 }
 
 export function NetworkWrapper({
     database,
     path,
-    parentRef,
-    additionalNodesProps,
+    databaseFullPath,
+    scrollContainerRef,
 }: NetworkWrapperProps) {
     const capabilitiesLoaded = useCapabilitiesLoaded();
-    const viewerNodesHasNetworkStats = useViewerNodesHandlerHasNetworkStats();
-    const [networkTableEnabled] = useSetting(ENABLE_NETWORK_TABLE_KEY);
-
-    const shouldUseNetworkNodesTable = viewerNodesHasNetworkStats && networkTableEnabled;
+    const shouldUseNetworkNodesTable = useShouldShowDatabaseNetworkTable();
 
     const renderContent = () => {
         if (shouldUseNetworkNodesTable) {
             return (
-                <Nodes
+                <NetworkTable
                     path={path}
+                    databaseFullPath={databaseFullPath}
                     database={database}
-                    parentRef={parentRef}
-                    withPeerRoleFilter
-                    additionalNodesProps={additionalNodesProps}
-                    columns={getNetworkTableNodesColumns({
-                        database: database,
-                        getNodeRef: additionalNodesProps?.getNodeRef,
-                    })}
-                    defaultColumnsIds={NETWORK_DEFAULT_NODES_COLUMNS}
-                    requiredColumnsIds={NETWORK_REQUIRED_NODES_COLUMNS}
-                    selectedColumnsKey={NETWORK_NODES_TABLE_SELECTED_COLUMNS_KEY}
-                    groupByParams={NETWORK_NODES_GROUP_BY_PARAMS}
+                    scrollContainerRef={scrollContainerRef}
                 />
             );
         }
 
-        return <Network tenantName={database} />;
+        return <Network database={database} databaseFullPath={databaseFullPath} />;
     };
 
     return <LoaderWrapper loading={!capabilitiesLoaded}>{renderContent()}</LoaderWrapper>;

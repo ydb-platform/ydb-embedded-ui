@@ -5,19 +5,19 @@ import DataTable from '@gravity-ui/react-data-table';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {InternalLink} from '../../../../components/InternalLink/InternalLink';
+import {NodeId} from '../../../../components/NodeId/NodeId';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TabletState} from '../../../../components/TabletState/TabletState';
 import {TabletUptime} from '../../../../components/UptimeViewer/UptimeViewer';
-import {getTabletPagePath} from '../../../../routes';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../lib';
+import {useTabletPagePath} from '../../../../routes';
 import type {ITabletPreparedHistoryItem} from '../../../../types/store/tablet';
-import {getDefaultNodePath} from '../../../Node/NodePages';
 
 const TABLET_COLUMNS_WIDTH_LS_KEY = 'tabletTableColumnsWidth';
 
-const getColumns: (props: {
-    database?: string;
-    tabletId: string;
-}) => Column<ITabletPreparedHistoryItem>[] = ({database, tabletId}) => [
+const getColumns: (props: {tabletId: string}) => Column<ITabletPreparedHistoryItem>[] = ({
+    tabletId,
+}) => [
     {
         name: 'Generation',
         align: DataTable.RIGHT,
@@ -40,21 +40,14 @@ const getColumns: (props: {
     {
         name: 'Tablet',
         sortable: false,
-        render: ({row}) => {
-            const tabletPath = getTabletPagePath(tabletId, {
-                database,
-                followerId: row.leader ? undefined : row.followerId?.toString(),
-            });
-            const tabletName = `${tabletId}${row.followerId ? `.${row.followerId}` : ''}`;
-            return <InternalLink to={tabletPath}>{tabletName}</InternalLink>;
-        },
+        render: ({row}) => <TabletLink row={row} tabletId={tabletId} />,
     },
     {
         name: 'Node ID',
         align: DataTable.RIGHT,
         sortable: false,
         render: ({row}) => {
-            return <InternalLink to={getDefaultNodePath(row.nodeId)}>{row.nodeId}</InternalLink>;
+            return <NodeId id={row.nodeId} />;
         },
     },
     {
@@ -63,12 +56,26 @@ const getColumns: (props: {
         width: 300,
         render: ({row}) => {
             if (!row.fqdn) {
-                return <span>—</span>;
+                return EMPTY_DATA_PLACEHOLDER;
             }
             return <EntityStatus name={row.fqdn} showStatus={false} hasClipboardButton />;
         },
     },
 ];
+
+interface TabletLinkProps {
+    row: ITabletPreparedHistoryItem;
+    tabletId: string;
+}
+
+function TabletLink({tabletId, row}: TabletLinkProps) {
+    const getTabletPagePath = useTabletPagePath();
+    const tabletPath = getTabletPagePath(tabletId, {
+        followerId: row.leader ? undefined : row.followerId?.toString(),
+    });
+    const tabletName = `${tabletId}${row.followerId ? `.${row.followerId}` : ''}`;
+    return <InternalLink to={tabletPath}>{tabletName}</InternalLink>;
+}
 
 const TABLE_SETTINGS = {
     displayIndices: false,
@@ -77,14 +84,13 @@ const TABLE_SETTINGS = {
 
 interface TabletTableProps {
     history: ITabletPreparedHistoryItem[];
-    database?: string;
     tabletId: string;
 }
 
-export const TabletTable = ({history, database, tabletId}: TabletTableProps) => {
+export const TabletTable = ({history, tabletId}: TabletTableProps) => {
     const columns = React.useMemo(() => {
-        return getColumns({database, tabletId});
-    }, [database, tabletId]);
+        return getColumns({tabletId});
+    }, [tabletId]);
 
     return (
         <ResizeableDataTable

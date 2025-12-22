@@ -91,7 +91,7 @@ describe('prepareGroupsVDisk', () => {
 
             AllocatedSize: 30943477760,
             AvailableSize: 234461593600,
-            TotalSize: 265405071360,
+            SizeLimit: 265405071360,
             AllocatedPercent: 11,
 
             Donors: undefined,
@@ -128,13 +128,13 @@ describe('prepareGroupsVDisk', () => {
             StringifiedId: '2181038134-22-0-0-0',
             NodeId: 224,
 
-            Severity: 0,
+            Severity: 5,
             DiskSpace: 'Green',
             Status: 'READY',
 
             AllocatedSize: 30943477760,
             AvailableSize: 234461593600,
-            TotalSize: 265405071360,
+            SizeLimit: 265405071360,
             AllocatedPercent: 11,
 
             PDisk: {
@@ -236,7 +236,7 @@ describe('prepareGroupsVDisk', () => {
 
             AllocatedSize: 30943477760,
             AvailableSize: 234461593600,
-            TotalSize: 265405071360,
+            SizeLimit: 265405071360,
             AllocatedPercent: 11,
 
             Donors: undefined,
@@ -359,6 +359,7 @@ describe('prepareGroupsPDisk', () => {
 
         const expectedResult = {
             NodeId: 224,
+            PDiskId: 1001,
             StringifiedId: '224-1001',
 
             Path: '/dev/disk/by-partlabel/kikimr_nvme_04',

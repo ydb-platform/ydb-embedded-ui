@@ -1,0 +1,96 @@
+import React from 'react';
+
+import type {PaginatedTableData} from '../../../components/PaginatedTable';
+import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/PaginatedTableWithLayout';
+import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
+import {NODES_COLUMNS_TITLES} from '../../../components/nodesColumns/constants';
+import type {NodesColumnId} from '../../../components/nodesColumns/constants';
+import type {NodesColumn} from '../../../components/nodesColumns/types';
+import {useViewerNodesHandlerHasGrouping} from '../../../store/reducers/capabilities/hooks';
+import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
+import type {NodesGroupByField} from '../../../types/api/nodes';
+import {useSelectedColumns} from '../../../utils/hooks/useSelectedColumns';
+import {NodesTable} from '../NodesTable';
+import {useNodesPageQueryParams} from '../useNodesPageQueryParams';
+
+import {NodesControlsWithTableState} from './NodesControlsWithTableState';
+
+interface NodesComponentProps {
+    path?: string;
+    database?: string;
+    databaseFullPath?: string;
+    scrollContainerRef: React.RefObject<HTMLElement>;
+    withPeerRoleFilter?: boolean;
+    columns: NodesColumn[];
+    defaultColumnsIds: NodesColumnId[];
+    requiredColumnsIds: NodesColumnId[];
+    selectedColumnsKey: string;
+    groupByParams: NodesGroupByField[];
+    onDataFetched?: (data: PaginatedTableData<PreparedStorageNode>) => void;
+}
+
+export function NodesComponent({
+    path,
+    database,
+    databaseFullPath,
+    scrollContainerRef,
+    withPeerRoleFilter,
+    columns,
+    defaultColumnsIds,
+    requiredColumnsIds,
+    selectedColumnsKey,
+    groupByParams,
+    onDataFetched,
+}: NodesComponentProps) {
+    const {searchValue, uptimeFilter, peerRoleFilter, withProblems} = useNodesPageQueryParams(
+        groupByParams,
+        withPeerRoleFilter,
+    );
+    const viewerNodesHandlerHasGrouping = useViewerNodesHandlerHasGrouping();
+
+    const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
+        columns,
+        selectedColumnsKey,
+        NODES_COLUMNS_TITLES,
+        defaultColumnsIds,
+        requiredColumnsIds,
+    );
+
+    return (
+        <PaginatedTableWithLayout
+            controls={
+                <NodesControlsWithTableState
+                    withGroupBySelect={viewerNodesHandlerHasGrouping}
+                    groupByParams={groupByParams}
+                    withPeerRoleFilter={withPeerRoleFilter}
+                />
+            }
+            extraControls={
+                <TableColumnSetup
+                    popupWidth={200}
+                    items={columnsToSelect}
+                    showStatus
+                    onUpdate={setColumns}
+                />
+            }
+            table={
+                <NodesTable
+                    path={path}
+                    database={database}
+                    databaseFullPath={databaseFullPath}
+                    searchValue={searchValue}
+                    withProblems={withProblems}
+                    uptimeFilter={uptimeFilter}
+                    peerRoleFilter={peerRoleFilter}
+                    columns={columnsToShow}
+                    scrollContainerRef={scrollContainerRef}
+                    onDataFetched={onDataFetched}
+                />
+            }
+            tableWrapperProps={{
+                scrollContainerRef,
+                scrollDependencies: [searchValue, withProblems, uptimeFilter, peerRoleFilter],
+            }}
+        />
+    );
+}

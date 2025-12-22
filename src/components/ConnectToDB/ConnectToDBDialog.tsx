@@ -1,13 +1,14 @@
 import React from 'react';
 
 import NiceModal from '@ebay/nice-modal-react';
-import {Dialog, Tabs} from '@gravity-ui/uikit';
+import {Dialog, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 
 import {tenantApi} from '../../store/reducers/tenant/tenant';
 import {cn} from '../../utils/cn';
 import {useTypedSelector} from '../../utils/hooks';
 import {useClusterNameFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
+import {useDatabasesV2} from '../../utils/hooks/useDatabasesV2';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {LoaderWrapper} from '../LoaderWrapper/LoaderWrapper';
 import {YDBSyntaxHighlighterLazy} from '../SyntaxHighlighter/lazy';
@@ -27,7 +28,7 @@ const connectionTabs: {id: SnippetLanguage; title: string}[] = [
     {id: 'csharp', title: 'C# (.NET)'},
     {id: 'go', title: 'Go'},
     {id: 'java', title: 'Java'},
-    {id: 'javascript', title: 'Node JS'},
+    {id: 'javascript', title: 'JavaScript/TypeScript'},
     {id: 'php', title: 'PHP'},
     {id: 'python', title: 'Python'},
 ];
@@ -48,16 +49,20 @@ function ConnectToDBDialog({
     const clusterName = useClusterNameFromQuery();
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
 
+    const isMetaDatabasesAvailable = useDatabasesV2();
+
     // If there is endpoint from props, we don't need to request tenant data
     // Also we should not request tenant data if we are in single cluster mode
     // Since there is no ControlPlane data in this case
     const shouldRequestTenantData = database && !endpointFromProps && !singleClusterMode;
-    const params = shouldRequestTenantData ? {path: database, clusterName} : skipToken;
+    const params = shouldRequestTenantData
+        ? {database, clusterName, isMetaDatabasesAvailable}
+        : skipToken;
     const {currentData: tenantData, isLoading: isTenantDataLoading} =
         tenantApi.useGetTenantInfoQuery(params);
     const endpoint = endpointFromProps ?? tenantData?.ControlPlane?.endpoint;
 
-    const snippet = getSnippetCode(activeTab, {database, endpoint});
+    const snippet = getSnippetCode(activeTab, {database: tenantData?.Name, endpoint});
     const docsLink = getDocsLink(activeTab);
 
     return (
@@ -65,14 +70,15 @@ function ConnectToDBDialog({
             <Dialog.Header caption={i18n('header')} />
             <Dialog.Body>
                 <div>{i18n('connection-info-message')}</div>
-                <Tabs
-                    size="m"
-                    allowNotSelected={false}
-                    activeTab={activeTab}
-                    items={connectionTabs}
-                    onSelectTab={(tab) => setActiveTab(tab as SnippetLanguage)}
-                    className={b('dialog-tabs')}
-                />
+                <TabProvider value={activeTab}>
+                    <TabList className={b('dialog-tabs')}>
+                        {connectionTabs.map(({id, title}) => (
+                            <Tab key={id} value={id} onClick={() => setActiveTab(id)}>
+                                {title}
+                            </Tab>
+                        ))}
+                    </TabList>
+                </TabProvider>
                 <div className={b('snippet-container')}>
                     <LoaderWrapper loading={isTenantDataLoading}>
                         <YDBSyntaxHighlighterLazy

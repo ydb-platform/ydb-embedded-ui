@@ -3,8 +3,8 @@ import React from 'react';
 import {Helmet} from 'react-helmet-async';
 
 import {changeUserInput} from '../../../store/reducers/query/query';
+import {useQueriesHistory} from '../../../store/reducers/query/useQueriesHistory';
 import {TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
-import type {EPathType} from '../../../types/api/schema';
 import {cn} from '../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
 
@@ -19,15 +19,14 @@ const b = cn('ydb-query');
 
 interface QueryProps {
     theme: string;
-    tenantName: string;
-    path: string;
-    type?: EPathType;
 }
 
 export const Query = (props: QueryProps) => {
     const dispatch = useTypedDispatch();
 
     const {queryTab = TENANT_QUERY_TABS_ID.newQuery} = useTypedSelector((state) => state.tenant);
+
+    const queriesHistory = useQueriesHistory();
 
     const handleUserInputChange = (value: {input: string}) => {
         dispatch(changeUserInput(value));
@@ -41,10 +40,21 @@ export const Query = (props: QueryProps) => {
     const renderContent = () => {
         switch (queryTab) {
             case TENANT_QUERY_TABS_ID.newQuery: {
-                return <QueryEditor changeUserInput={handleUserInputChange} {...props} />;
+                return (
+                    <QueryEditor
+                        changeUserInput={handleUserInputChange}
+                        queriesHistory={queriesHistory}
+                        {...props}
+                    />
+                );
             }
             case TENANT_QUERY_TABS_ID.history: {
-                return <QueriesHistory changeUserInput={handleUserInputChange} />;
+                return (
+                    <QueriesHistory
+                        changeUserInput={handleUserInputChange}
+                        queriesHistory={queriesHistory}
+                    />
+                );
             }
             case TENANT_QUERY_TABS_ID.saved: {
                 return <SavedQueries changeUserInput={handleUserInputChange} />;

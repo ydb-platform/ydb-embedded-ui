@@ -1,5 +1,6 @@
 import React from 'react';
 
+import type {HotkeysGroup} from '@gravity-ui/navigation';
 import {HotkeysPanel as UIKitHotkeysPanel} from '@gravity-ui/navigation';
 import {Hotkey} from '@gravity-ui/uikit';
 import hotkeys from 'hotkeys-js';
@@ -13,7 +14,7 @@ export const isMac = () => navigator.platform.toUpperCase().includes('MAC');
 
 export const SHORTCUTS_HOTKEY = isMac() ? 'cmd+K' : 'ctrl+K';
 
-export const HOTKEYS = [
+export const DEFAULT_HOTKEY_GROUPS: HotkeysGroup[] = [
     {
         title: 'Query Editor',
         items: [
@@ -24,14 +25,6 @@ export const HOTKEYS = [
             {
                 title: i18n('hotkeys.execute-selected-query'),
                 value: isMac() ? 'cmd+shift+enter' : 'ctrl+shift+enter',
-            },
-            {
-                title: i18n('hotkeys.previous-query'),
-                value: isMac() ? 'cmd+arrowUp' : 'ctrl+arrowUp',
-            },
-            {
-                title: i18n('hotkeys.next-query'),
-                value: isMac() ? 'cmd+arrowDown' : 'ctrl+arrowDown',
             },
             {
                 title: i18n('hotkeys.save-query'),
@@ -48,6 +41,7 @@ export const HOTKEYS = [
 export interface HotkeysPanelProps {
     visible: boolean;
     closePanel: () => void;
+    hotkeyGroups?: HotkeysGroup[];
 }
 
 /**
@@ -60,7 +54,11 @@ export interface HotkeysPanelProps {
  * This wrapper ensures the component mounts first, then sets visible=true in a subsequent render cycle
  * to make transition actually happen.
  */
-export const HotkeysPanelWrapper = ({visible: propsVisible, closePanel}: HotkeysPanelProps) => {
+export const HotkeysPanelWrapper = ({
+    visible: propsVisible,
+    closePanel,
+    hotkeyGroups = DEFAULT_HOTKEY_GROUPS,
+}: HotkeysPanelProps) => {
     const [visible, setVisible] = React.useState(false);
 
     React.useEffect(() => {
@@ -70,8 +68,9 @@ export const HotkeysPanelWrapper = ({visible: propsVisible, closePanel}: Hotkeys
     return (
         <UIKitHotkeysPanel
             visible={visible}
-            hotkeys={HOTKEYS}
+            hotkeys={hotkeyGroups}
             className={b('hotkeys-panel')}
+            drawerItemClassName={b('hotkeys-drawer')}
             title={
                 <div className={b('hotkeys-panel-title')}>
                     {i18n('hotkeys.title')}
@@ -87,9 +86,15 @@ interface UseHotkeysPanel {
     isPanelVisible: boolean;
     openPanel: () => void;
     closePanel: () => void;
+    hotkeyGroups?: HotkeysGroup[];
 }
 
-export const useHotkeysPanel = ({isPanelVisible, openPanel, closePanel}: UseHotkeysPanel) => {
+export const useHotkeysPanel = ({
+    isPanelVisible,
+    openPanel,
+    closePanel,
+    hotkeyGroups = DEFAULT_HOTKEY_GROUPS,
+}: UseHotkeysPanel) => {
     React.useEffect(() => {
         hotkeys(SHORTCUTS_HOTKEY, openPanel);
 
@@ -102,8 +107,14 @@ export const useHotkeysPanel = ({isPanelVisible, openPanel, closePanel}: UseHotk
     }, [openPanel]);
 
     const renderPanel = React.useCallback(
-        () => <HotkeysPanelWrapper visible={isPanelVisible} closePanel={closePanel} />,
-        [isPanelVisible, closePanel],
+        () => (
+            <HotkeysPanelWrapper
+                visible={isPanelVisible}
+                closePanel={closePanel}
+                hotkeyGroups={hotkeyGroups}
+            />
+        ),
+        [isPanelVisible, closePanel, hotkeyGroups],
     );
 
     return {

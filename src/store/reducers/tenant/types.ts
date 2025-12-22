@@ -19,9 +19,8 @@ export type TenantSummaryTab = ValueOf<typeof TENANT_SUMMARY_TABS_IDS>;
 export type TenantMetricsTab = ValueOf<typeof TENANT_METRICS_TABS_IDS>;
 
 export interface TenantState {
-    tenantPage: TenantPage;
     queryTab?: TenantQueryTab;
-    diagnosticsTab?: TenantDiagnosticsTab;
+    diagnosticsTab: TenantDiagnosticsTab;
     summaryTab?: TenantSummaryTab;
-    metricsTab?: TenantMetricsTab;
+    metricsTab: TenantMetricsTab;
 }

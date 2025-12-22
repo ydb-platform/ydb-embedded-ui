@@ -1,9 +1,12 @@
-export function parseJson(value?: string | null) {
-    if (!value) {
+export function parseJson(value?: unknown) {
+    // 'undefined' is not parsed by JSON.parse
+    if (!value || value === 'undefined') {
         return undefined;
     }
     try {
-        return JSON.parse(value);
+        // Use `as string` here
+        // In case of invalid value it will throw an error and value will be returned as is
+        return JSON.parse(value as string);
     } catch {
         return value;
     }
@@ -31,12 +34,20 @@ export function bytesToSize(bytes: number) {
     return val.toPrecision(3) + sizes[i];
 }
 
-function bytesToMB(bytes?: number | string) {
+export function bytesToMB(bytes?: number | string, fractionDigits?: number) {
     const bytesNumber = Number(bytes);
     if (isNaN(bytesNumber)) {
         return '';
     }
+
     const val = bytesNumber / base ** 2;
+
+    if (isNumeric(fractionDigits)) {
+        const rounded = Number(val.toFixed(fractionDigits));
+
+        return String(rounded) + sizes[2];
+    }
+
     if (val < 10) {
         return val.toFixed(2) + sizes[2];
     } else if (val < 100) {
@@ -46,8 +57,8 @@ function bytesToMB(bytes?: number | string) {
     }
 }
 
-export function bytesToSpeed(bytes?: number | string) {
-    const speed = bytesToMB(bytes);
+export function bytesToSpeed(bytes?: number | string, fractionDigits?: number) {
+    const speed = bytesToMB(bytes, fractionDigits);
     return `${speed}${speed ? 'ps' : ''}`;
 }
 
@@ -95,8 +106,6 @@ export function isNumeric(value?: unknown): value is number | string {
 export function toExponential(value: number, precision?: number) {
     return Number(value).toExponential(precision);
 }
-
-export const UNBREAKABLE_GAP = '\xa0';
 
 // Numeric values expected, not numeric value should be displayd as 0
 export function safeParseNumber(value: unknown, defaultValue = 0): number {

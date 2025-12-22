@@ -24,7 +24,7 @@ export * from './utils/constants';
 
 export {default as reportWebVitals} from './reportWebVitals';
 
-export type {SettingsObject} from './services/settings';
+export type {SettingsObject} from './store/reducers/settings/types';
 export type {
     YDBEmbeddedUISettings,
     SettingsPage,
@@ -33,3 +33,5 @@ export type {
 export type {SettingProps, SettingsInfoFieldProps} from './containers/UserSettings/Setting';
 export type {AsideNavigationProps} from './containers/AsideNavigation/AsideNavigation';
 export type {GetMonitoringLink, GetMonitoringClusterLink} from './utils/monitoring';
+
+export {configureUIFactory} from './uiFactory/uiFactory';

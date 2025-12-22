@@ -1,4 +1,4 @@
-import {RadioButton} from '@gravity-ui/uikit';
+import {SegmentedRadioGroup} from '@gravity-ui/uikit';
 
 import {VISIBLE_ENTITIES} from '../../../store/reducers/storage/constants';
 import type {VisibleEntities} from '../../../store/reducers/storage/types';
@@ -18,16 +18,16 @@ const storageVisibleEntitiesFilterQa = 'storage-visible-entities-filter';
 
 export const StorageVisibleEntitiesFilter = ({value, onChange}: StorageProblemFilterProps) => {
     return (
-        <RadioButton value={value} onUpdate={onChange} qa={storageVisibleEntitiesFilterQa}>
-            <RadioButton.Option value={VISIBLE_ENTITIES.missing}>
+        <SegmentedRadioGroup value={value} onUpdate={onChange} qa={storageVisibleEntitiesFilterQa}>
+            <SegmentedRadioGroup.Option value={VISIBLE_ENTITIES.missing}>
                 {VisibleEntitiesTitles[VISIBLE_ENTITIES.missing]}
-            </RadioButton.Option>
-            <RadioButton.Option value={VISIBLE_ENTITIES.space}>
+            </SegmentedRadioGroup.Option>
+            <SegmentedRadioGroup.Option value={VISIBLE_ENTITIES.space}>
                 {VisibleEntitiesTitles[VISIBLE_ENTITIES.space]}
-            </RadioButton.Option>
-            <RadioButton.Option value={VISIBLE_ENTITIES.all}>
+            </SegmentedRadioGroup.Option>
+            <SegmentedRadioGroup.Option value={VISIBLE_ENTITIES.all}>
                 {VisibleEntitiesTitles[VISIBLE_ENTITIES.all]}
-            </RadioButton.Option>
-        </RadioButton>
+            </SegmentedRadioGroup.Option>
+        </SegmentedRadioGroup>
     );
 };

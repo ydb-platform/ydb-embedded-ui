@@ -10,10 +10,12 @@
   "action.delete-rows": "Delete rows",
   "action.drop-table": "Drop table",
   "action.add-index": "Add index",
+  "action.add-vector-index": "Add vector index",
   "action.drop-index": "Drop index",
   "action.drop-external-table": "Drop external table",
   "menu.tables": "Tables",
   "menu.topics": "Topics",
+  "menu.streaming-query": "Streaming query",
   "menu.capture": "Change data capture",
   "menu.replication": "Async replication",
   "menu.transfer": "Transfer",
@@ -33,5 +35,10 @@
   "action.alter-async-replication": "Alter async replication",
   "action.drop-async-replication": "Drop async replication",
   "action.alter-transfer": "Alter transfer",
-  "action.drop-transfer": "Drop transfer"
+  "action.drop-transfer": "Drop transfer",
+  "action.create-streaming-query": "Create streaming query",
+  "action.show-create-table": "Show Create SQL",
+  "action.alter-streaming-query-settings": "Alter query settings",
+  "action.alter-streaming-query-text": "Alter query text",
+  "action.drop-streaming-query": "Drop query"
 }

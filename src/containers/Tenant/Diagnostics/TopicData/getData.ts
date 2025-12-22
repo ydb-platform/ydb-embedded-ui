@@ -5,7 +5,6 @@ import {TOPIC_MESSAGE_SIZE_LIMIT} from '../../../../store/reducers/topic';
 import type {
     TopicDataRequest,
     TopicDataResponse,
-    TopicMessage,
     TopicMessageEnhanced,
 } from '../../../../types/api/topic';
 import {safeParseNumber} from '../../../../utils/utils';
@@ -16,8 +15,7 @@ import type {TopicDataFilters} from './utils/types';
 const emptyData = {data: [], total: 0, found: 0};
 
 interface GetTopicDataProps {
-    setStartOffset: (offset: number) => void;
-    setEndOffset: (offset: number) => void;
+    setBoundOffsets: (props: {startOffset: number; endOffset: number}) => void;
     baseOffset?: number;
 }
 
@@ -49,7 +47,7 @@ export function prepareResponse(response: TopicDataResponse, offset: number) {
         } else {
             normalizedMessages.push({
                 Offset: currentOffset,
-                removed: true,
+                notLoaded: true,
             });
         }
         j++;
@@ -57,12 +55,8 @@ export function prepareResponse(response: TopicDataResponse, offset: number) {
     return {start, end, messages: normalizedMessages};
 }
 
-export const generateTopicDataGetter = ({
-    setStartOffset,
-    setEndOffset,
-    baseOffset = 0,
-}: GetTopicDataProps) => {
-    const getTopicData: FetchData<TopicMessage, TopicDataFilters> = async ({
+export const generateTopicDataGetter = ({setBoundOffsets, baseOffset = 0}: GetTopicDataProps) => {
+    const getTopicData: FetchData<TopicMessageEnhanced, TopicDataFilters> = async ({
         limit,
         offset: tableOffset,
         filters,
@@ -93,8 +87,7 @@ export const generateTopicDataGetter = ({
         const {start, end, messages} = prepareResponse(response, normalizedOffset);
 
         //need to update start and end offsets every time data is fetched to show fresh data in parent component
-        setStartOffset(start);
-        setEndOffset(end);
+        setBoundOffsets({startOffset: start, endOffset: end});
 
         const quantity = end - baseOffset;
 

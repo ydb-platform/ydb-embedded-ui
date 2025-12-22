@@ -1,20 +1,12 @@
-import type {MetaExtendedClusterInfo} from '../../../types/api/meta';
-import type {ExtendedMetaClusterVersion} from '../../../utils/clusterVersionColors';
+import type {MetaClusterSettings, MetaExtendedClusterInfo} from '../../../types/api/meta';
+import type {PreparedVersion} from '../../../utils/versions/types';
 
-export interface PreparedCluster extends MetaExtendedClusterInfo {
-    preparedVersions: ExtendedMetaClusterVersion[];
+export interface PreparedCluster extends Omit<MetaExtendedClusterInfo, 'settings'> {
+    preparedVersions: PreparedVersion[];
     preparedBackend?: string;
-}
-
-export interface ClusterDataAggregation {
-    NodesTotal: number;
-    NodesAlive: number;
-    Hosts: number;
-    Tenants: number;
-    LoadAverage: number;
-    NumberOfCpus: number;
-    StorageUsed: number;
-    StorageTotal: number;
+    settings?: MetaClusterSettings;
+    clusterDomain?: string;
+    clusterExternalName?: string;
 }
 
 export interface ClustersFilters {

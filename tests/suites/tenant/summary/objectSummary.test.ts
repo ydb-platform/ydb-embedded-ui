@@ -4,10 +4,10 @@ import {wait} from '../../../../src/utils';
 import {getClipboardContent} from '../../../utils/clipboard';
 import {
     backend,
+    database,
     dsStoragePoolsTableName,
     dsVslotsSchema,
     dsVslotsTableName,
-    tenantName,
 } from '../../../utils/constants';
 import {TenantPage} from '../TenantPage';
 import {QueryEditor} from '../queryEditor/models/QueryEditor';
@@ -19,7 +19,7 @@ test.describe('Object Summary', async () => {
     test.beforeEach(async ({page}) => {
         const pageQueryParams = {
             schema: dsVslotsSchema,
-            database: tenantName,
+            database,
             general: 'query',
         };
         const tenantPage = new TenantPage(page);
@@ -158,50 +158,10 @@ test.describe('Object Summary', async () => {
         expect(vslotsColumns).not.toEqual(storagePoolsColumns);
     });
 
-    test('ACL tab shows correct access rights', async ({page}) => {
-        const pageQueryParams = {
-            schema: '/local/.sys_health',
-            database: '/local',
-            summaryTab: 'acl',
-            tenantPage: 'query',
-        };
-        const tenantPage = new TenantPage(page);
-        await tenantPage.goto(pageQueryParams);
-
-        const objectSummary = new ObjectSummary(page);
-        await objectSummary.waitForAclVisible();
-
-        // Check Access Rights
-        const accessRights = await objectSummary.getAccessRights();
-        expect(accessRights).toEqual([{user: 'root@builtin', rights: 'Owner'}]);
-
-        // Check Effective Access Rights
-        const effectiveRights = await objectSummary.getEffectiveAccessRights();
-        expect(effectiveRights).toEqual([
-            {group: 'USERS', permissions: ['ConnectDatabase']},
-            {group: 'METADATA-READERS', permissions: ['List']},
-            {group: 'DATA-READERS', permissions: ['SelectRow']},
-            {group: 'DATA-WRITERS', permissions: ['UpdateRow', 'EraseRow']},
-            {
-                group: 'DDL-ADMINS',
-                permissions: [
-                    'WriteAttributes',
-                    'CreateDirectory',
-                    'CreateTable',
-                    'CreateQueue',
-                    'RemoveSchema',
-                    'AlterSchema',
-                ],
-            },
-            {group: 'ACCESS-ADMINS', permissions: ['GrantAccessRights']},
-            {group: 'DATABASE-ADMINS', permissions: ['Manage']},
-        ]);
-    });
-
     test('Copy path copies correct path to clipboard', async ({page}) => {
         const pageQueryParams = {
             schema: dsVslotsSchema,
-            database: tenantName,
+            database,
             general: 'query',
         };
         const tenantPage = new TenantPage(page);
@@ -227,8 +187,8 @@ test.describe('Object Summary', async () => {
 
     test('Create directory in local node', async ({page}) => {
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             general: 'query',
         };
         const tenantPage = new TenantPage(page);
@@ -253,8 +213,8 @@ test.describe('Object Summary', async () => {
 
     test('Refresh button updates tree view after creating table', async ({page}) => {
         const pageQueryParams = {
-            schema: tenantName,
-            database: tenantName,
+            schema: database,
+            database,
             general: 'query',
         };
         const tenantPage = new TenantPage(page);

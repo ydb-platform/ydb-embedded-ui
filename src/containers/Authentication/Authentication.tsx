@@ -5,9 +5,12 @@ import {Button, Link as ExternalLink, Icon, TextInput} from '@gravity-ui/uikit';
 import {useHistory, useLocation} from 'react-router-dom';
 
 import {parseQuery} from '../../routes';
+import {basename} from '../../store';
 import {authenticationApi} from '../../store/reducers/authentication/authentication';
 import {useLoginWithDatabase} from '../../store/reducers/capabilities/hooks';
 import {cn} from '../../utils/cn';
+import {prepareCommonErrorMessage} from '../../utils/errors';
+import {useMetaAuth} from '../../utils/hooks/useMetaAuth';
 
 import {isDatabaseError, isPasswordError, isUserError} from './utils';
 
@@ -27,9 +30,38 @@ function Authentication({closable = false}: AuthenticationProps) {
 
     const needDatabase = useLoginWithDatabase();
 
-    const [authenticate, {isLoading}] = authenticationApi.useAuthenticateMutation(undefined);
+    const [authenticate, {isLoading}] = authenticationApi.useAuthenticateMutation();
 
     const {returnUrl, database: databaseFromQuery} = parseQuery(location);
+
+    const path = React.useMemo(() => {
+        let path: string | undefined;
+
+        if (returnUrl) {
+            const decodedUrl = decodeURIComponent(returnUrl.toString());
+
+            // to prevent page reload we use router history
+            // history navigates relative to origin
+            // so we remove origin to make it work properly
+            const url = new URL(decodedUrl);
+            let pathname = url.pathname;
+
+            // Remove basename from pathname since history.replace expects paths relative to basename
+            if (basename && pathname.startsWith(basename)) {
+                pathname = pathname.slice(basename.length);
+            }
+
+            // Ensure pathname starts with /
+            if (pathname && !pathname.startsWith('/')) {
+                pathname = '/' + pathname;
+            }
+
+            path = pathname + url.search;
+        }
+        return path;
+    }, [returnUrl]);
+
+    const useMeta = useMetaAuth(path);
 
     const [login, setLogin] = React.useState('');
     const [database, setDatabase] = React.useState(databaseFromQuery?.toString() ?? '');
@@ -37,38 +69,38 @@ function Authentication({closable = false}: AuthenticationProps) {
     const [loginError, setLoginError] = React.useState('');
     const [passwordError, setPasswordError] = React.useState('');
     const [databaseError, setDatabaseError] = React.useState('');
+    const [generalError, setGeneralError] = React.useState('');
     const [showPassword, setShowPassword] = React.useState(false);
 
     const onLoginUpdate = (value: string) => {
         setLogin(value);
         setLoginError('');
+        setGeneralError('');
     };
     const onDatabaseUpdate = (value: string) => {
         setDatabase(value);
         setDatabaseError('');
+        setGeneralError('');
     };
 
     const onPassUpdate = (value: string) => {
         setPass(value);
         setPasswordError('');
+        setGeneralError('');
     };
 
     const onLoginClick = () => {
-        authenticate({user: login, password, database})
+        setGeneralError('');
+        authenticate({user: login, password, database, useMeta})
             .unwrap()
             .then(() => {
-                if (returnUrl) {
-                    const decodedUrl = decodeURIComponent(returnUrl.toString());
-
-                    // to prevent page reload we use router history
-                    // history navigates relative to origin
-                    // so we remove origin to make it work properly
-                    const url = new URL(decodedUrl);
-                    const path = url.pathname + url.search;
+                if (path) {
                     history.replace(path);
                 }
             })
             .catch((error) => {
+                const isInputError =
+                    isUserError(error) || isPasswordError(error) || isDatabaseError(error);
                 if (isUserError(error)) {
                     setLoginError(error.data.error);
                 }
@@ -77,6 +109,11 @@ function Authentication({closable = false}: AuthenticationProps) {
                 }
                 if (isDatabaseError(error)) {
                     setDatabaseError(error.data.error);
+                }
+
+                if (!isInputError) {
+                    const message = prepareCommonErrorMessage(error);
+                    setGeneralError(message);
                 }
             });
     };
@@ -160,6 +197,8 @@ function Authentication({closable = false}: AuthenticationProps) {
                 >
                     Sign in
                 </Button>
+                {/* always preserve place for general error to prevent container height jumping */}
+                <div className={b('general-error')}>{generalError}</div>
             </form>
             {closable && history.length > 1 && (
                 <Button onClick={onClose} className={b('close')}>

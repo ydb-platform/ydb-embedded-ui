@@ -9,7 +9,9 @@ import type {AuthenticationState} from './types';
 
 const initialState: AuthenticationState = {
     isAuthenticated: true,
-    user: '',
+    user: undefined,
+    id: undefined,
+    metaUser: undefined,
 };
 
 export const slice = createSlice({
@@ -22,37 +24,51 @@ export const slice = createSlice({
             state.isAuthenticated = isAuthenticated;
 
             if (!isAuthenticated) {
-                state.user = '';
+                state.user = undefined;
             }
         },
         setUser: (state, action: PayloadAction<TUserToken>) => {
-            const {UserSID, AuthType, IsMonitoringAllowed} = action.payload;
+            const {UserSID, UserID, AuthType, IsMonitoringAllowed, IsViewerAllowed} =
+                action.payload;
 
             state.user = AuthType === 'Login' ? UserSID : undefined;
+            state.id = UserID;
 
             // If ydb version supports this feature,
             // There should be explicit flag in whoami response
             // Otherwise every user is allowed to make changes
             // Anyway there will be guards on backend
             state.isUserAllowedToMakeChanges = IsMonitoringAllowed !== false;
+            state.isViewerUser = IsViewerAllowed;
         },
     },
     selectors: {
         selectIsUserAllowedToMakeChanges: (state) => state.isUserAllowedToMakeChanges,
+        selectIsViewerUser: (state) => state.isViewerUser,
         selectUser: (state) => state.user,
+        selectMetaUser: (state) => state.metaUser ?? state.id,
     },
 });
 
 export default slice.reducer;
 export const {setIsAuthenticated, setUser} = slice.actions;
-export const {selectIsUserAllowedToMakeChanges, selectUser} = slice.selectors;
+export const {selectIsUserAllowedToMakeChanges, selectIsViewerUser, selectUser, selectMetaUser} =
+    slice.selectors;
 
 export const authenticationApi = api.injectEndpoints({
     endpoints: (build) => ({
         whoami: build.query({
-            queryFn: async ({database}: {database?: string}, {dispatch}) => {
+            queryFn: async (
+                {database, useMeta}: {database?: string; useMeta?: boolean},
+                {dispatch},
+            ) => {
                 try {
-                    const data = await window.api.viewer.whoami({database});
+                    let data: TUserToken;
+                    if (useMeta && window.api.meta) {
+                        data = await window.api.meta.metaWhoami();
+                    } else {
+                        data = await window.api.viewer.whoami({database});
+                    }
                     dispatch(setUser(data));
                     return {data};
                 } catch (error) {
@@ -66,11 +82,17 @@ export const authenticationApi = api.injectEndpoints({
         }),
         authenticate: build.mutation({
             queryFn: async (
-                params: {user: string; password: string; database?: string},
+                params: {user: string; password: string; database?: string; useMeta?: boolean},
                 {dispatch},
             ) => {
                 try {
-                    const data = await window.api.auth.authenticate(params);
+                    const {useMeta, ...rest} = params;
+                    let data;
+                    if (useMeta) {
+                        data = await window.api.meta?.metaAuthenticate(rest);
+                    } else {
+                        data = await window.api.auth.authenticate(rest);
+                    }
                     dispatch(setIsAuthenticated(true));
                     return {data};
                 } catch (error) {
@@ -80,9 +102,14 @@ export const authenticationApi = api.injectEndpoints({
             invalidatesTags: (_, error) => (error ? [] : ['UserData']),
         }),
         logout: build.mutation({
-            queryFn: async (_, {dispatch}) => {
+            queryFn: async ({useMeta}: {useMeta?: boolean}, {dispatch}) => {
                 try {
-                    const data = await window.api.auth.logout();
+                    let data;
+                    if (useMeta && window.api.meta) {
+                        data = await window.api.meta.metaLogout();
+                    } else {
+                        data = await window.api.auth.logout();
+                    }
                     dispatch(setIsAuthenticated(false));
                     return {data};
                 } catch (error) {

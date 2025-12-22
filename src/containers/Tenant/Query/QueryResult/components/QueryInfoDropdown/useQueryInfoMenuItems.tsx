@@ -89,7 +89,7 @@ export function useQueryInfoMenuItems({
                         createToast({
                             title: i18n('text_error-plan-svg', {error: errorMessage}),
                             name: 'plan-svg-error',
-                            type: 'error',
+                            theme: 'danger',
                         });
                         return null;
                     });
@@ -119,7 +119,7 @@ export function useQueryInfoMenuItems({
                             description={i18n('text_open-execution-plan_description')}
                         />
                     ),
-                    icon: <ArrowUpRightFromSquare className={b('icon')} />,
+                    iconStart: <ArrowUpRightFromSquare className={b('icon')} />,
                     action: handleOpenInNewTab,
                     className: b('menu-item'),
                 },
@@ -130,7 +130,7 @@ export function useQueryInfoMenuItems({
                             description={i18n('text_download_description')}
                         />
                     ),
-                    icon: <ArrowDownToLine className={b('icon')} />,
+                    iconStart: <ArrowDownToLine className={b('icon')} />,
                     action: handleDownload,
                     className: b('menu-item'),
                 },
@@ -160,7 +160,7 @@ export function useQueryInfoMenuItems({
                             description={i18n('text_diagnostics_description')}
                         />
                     ),
-                    icon: <ArrowDownToLine className={b('icon')} />,
+                    iconStart: <ArrowDownToLine className={b('icon')} />,
                     action: handleDiagnosticsDownload,
                     className: b('menu-item'),
                 },

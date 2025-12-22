@@ -1,0 +1,58 @@
+@use '../../../../../styles/mixins.scss';
+
+.ydb-diagnostics-message-details {
+    width: 100%;
+    height: 100%;
+    padding: var(--g-spacing-4);
+
+    @include mixins.body-2-typography();
+
+    &__list {
+        --g-definition-list-item-gap: var(--g-spacing-1);
+    }
+    &__details {
+        padding-right: var(--g-spacing-4);
+    }
+    &__section {
+        border-radius: var(--g-border-radius-m) var(--g-border-radius-m) var(--g-border-radius-xs)
+            var(--g-border-radius-xs);
+        background-color: var(--code-background-color);
+    }
+    &__section-title-wrapper {
+        padding: var(--g-spacing-half) var(--g-spacing-2) var(--g-spacing-half) var(--g-spacing-3);
+
+        line-height: 28px;
+
+        border-bottom: 1px solid var(--g-color-line-generic);
+    }
+    &__section-content {
+        padding: var(--g-spacing-2) 0 0 0;
+    }
+    &__section-scroll-container {
+        overflow: auto;
+
+        max-height: 60vh;
+        padding: 0 var(--g-spacing-2) var(--g-spacing-3) var(--g-spacing-3);
+        scrollbar-width: thin;
+        scrollbar-color: var(--g-color-line-generic) transparent;
+    }
+    &__message-meta {
+        padding-right: var(--g-spacing-9);
+    }
+
+    &__json-viewer-toolbar {
+        background-color: var(--code-background-color);
+    }
+
+    &__string-message {
+        overflow: hidden;
+
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+    &__message {
+        flex-grow: 1;
+
+        margin-bottom: var(--g-spacing-1);
+    }
+}

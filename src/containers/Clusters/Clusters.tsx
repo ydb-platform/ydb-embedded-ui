@@ -1,30 +1,33 @@
 import React from 'react';
 
+import {Magnifier} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
-import {Select, TableColumnSetup} from '@gravity-ui/uikit';
-import {Helmet} from 'react-helmet-async';
+import {Icon, Select} from '@gravity-ui/uikit';
 
-import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
 import {ResponseError} from '../../components/Errors/ResponseError';
-import {Loader} from '../../components/Loader';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../components/Search';
+import {TableColumnSetup} from '../../components/TableColumnSetup/TableColumnSetup';
+import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
+import {
+    useDeleteClusterFeatureAvailable,
+    useEditClusterFeatureAvailable,
+} from '../../store/reducers/capabilities/hooks';
 import {changeClustersFilters, clustersApi} from '../../store/reducers/clusters/clusters';
 import {
-    aggregateClustersInfo,
     filterClusters,
     selectClusterNameFilter,
     selectServiceFilter,
     selectStatusFilter,
     selectVersionFilter,
 } from '../../store/reducers/clusters/selectors';
+import {uiFactory} from '../../uiFactory/uiFactory';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {getMinorVersion} from '../../utils/versions';
 
-import {ClustersStatistics} from './ClustersStatistics';
-import {CLUSTERS_COLUMNS, CLUSTERS_COLUMNS_WIDTH_LS_KEY} from './columns';
+import {CLUSTERS_COLUMNS_WIDTH_LS_KEY, getClustersColumns} from './columns';
 import {
     CLUSTERS_SELECTED_COLUMNS_KEY,
     COLUMNS_NAMES,
@@ -36,13 +39,22 @@ import {b} from './shared';
 
 import './Clusters.scss';
 
-export function Clusters() {
+interface ClustersProps {
+    scrollContainerRef: React.RefObject<HTMLElement>;
+}
+
+export function Clusters({scrollContainerRef}: ClustersProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const query = clustersApi.useGetClustersListQuery(undefined, {
         pollingInterval: autoRefreshInterval,
     });
 
     const dispatch = useTypedDispatch();
+
+    const isEditClusterAvailable =
+        useEditClusterFeatureAvailable() && uiFactory.onEditCluster !== undefined;
+    const isDeleteClusterAvailable =
+        useDeleteClusterFeatureAvailable() && uiFactory.onDeleteCluster !== undefined;
 
     const clusterName = useTypedSelector(selectClusterNameFilter);
     const status = useTypedSelector(selectStatusFilter);
@@ -62,8 +74,12 @@ export function Clusters() {
         dispatch(changeClustersFilters({version: value}));
     };
 
+    const rawColumns = React.useMemo(() => {
+        return getClustersColumns({isEditClusterAvailable, isDeleteClusterAvailable});
+    }, [isDeleteClusterAvailable, isEditClusterAvailable]);
+
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
-        CLUSTERS_COLUMNS,
+        rawColumns,
         CLUSTERS_SELECTED_COLUMNS_KEY,
         COLUMNS_TITLES,
         DEFAULT_COLUMNS,
@@ -99,11 +115,6 @@ export function Clusters() {
         return filterClusters(clusters ?? [], {clusterName, status, service, version});
     }, [clusterName, clusters, service, status, version]);
 
-    const aggregation = React.useMemo(
-        () => aggregateClustersInfo(filteredClusters),
-        [filteredClusters],
-    );
-
     const statuses = React.useMemo(() => {
         return Array.from(
             new Set(
@@ -114,91 +125,95 @@ export function Clusters() {
             .map((el) => ({value: el, content: el}));
     }, [clusters]);
 
-    return (
-        <div className={b()}>
-            <Helmet>
-                <title>{i18n('page_title')}</title>
-            </Helmet>
+    const renderControls = () => {
+        return (
+            <React.Fragment>
+                <Search
+                    placeholder={i18n('controls_search-placeholder')}
+                    endContent={<Icon data={Magnifier} className={b('search-icon')} />}
+                    onChange={changeClusterName}
+                    value={clusterName}
+                    width={320}
+                />
+                <Select
+                    multiple
+                    filterable
+                    hasClear
+                    placeholder={i18n('controls_select-placeholder')}
+                    label={i18n('controls_status-select-label')}
+                    value={status}
+                    options={statuses}
+                    onUpdate={changeStatus}
+                    width={200}
+                />
+                <Select
+                    multiple
+                    filterable
+                    hasClear
+                    placeholder={i18n('controls_select-placeholder')}
+                    label={i18n('controls_service-select-label')}
+                    value={service}
+                    options={servicesToSelect}
+                    onUpdate={changeService}
+                    width={200}
+                />
+                <Select
+                    multiple
+                    filterable
+                    hasClear
+                    placeholder={i18n('controls_select-placeholder')}
+                    label={i18n('controls_version-select-label')}
+                    value={version}
+                    options={versions}
+                    onUpdate={changeVersion}
+                    width={200}
+                />
+            </React.Fragment>
+        );
+    };
 
-            <ClustersStatistics stats={aggregation} count={filteredClusters.length} />
-            <div className={b('controls')}>
-                <div className={b('control', {wide: true})}>
-                    <Search
-                        placeholder={i18n('controls_search-placeholder')}
-                        onChange={changeClusterName}
-                        value={clusterName}
-                    />
-                </div>
-                <div className={b('control')}>
-                    <Select
-                        multiple
-                        filterable
-                        hasClear
-                        placeholder={i18n('controls_select-placeholder')}
-                        label={i18n('controls_status-select-label')}
-                        value={status}
-                        options={statuses}
-                        onUpdate={changeStatus}
-                        width="max"
-                    />
-                </div>
-                <div className={b('control')}>
-                    <Select
-                        multiple
-                        filterable
-                        hasClear
-                        placeholder={i18n('controls_select-placeholder')}
-                        label={i18n('controls_service-select-label')}
-                        value={service}
-                        options={servicesToSelect}
-                        onUpdate={changeService}
-                        width="max"
-                    />
-                </div>
-                <div className={b('control')}>
-                    <Select
-                        multiple
-                        filterable
-                        hasClear
-                        placeholder={i18n('controls_select-placeholder')}
-                        label={i18n('controls_version-select-label')}
-                        value={version}
-                        options={versions}
-                        onUpdate={changeVersion}
-                        width="max"
-                    />
-                </div>
-                <div className={b('control')}>
-                    <TableColumnSetup
-                        key="TableColumnSetup"
-                        popupWidth={242}
-                        items={columnsToSelect}
-                        showStatus
-                        onUpdate={setColumns}
-                        sortable={false}
-                    />
-                </div>
-                <AutoRefreshControl className={b('autorefresh')} />
-            </div>
-            {query.isError ? <ResponseError error={query.error} className={b('error')} /> : null}
-            {query.isLoading ? <Loader size="l" /> : null}
-            {query.fulfilledTimeStamp ? (
-                <div className={b('table-wrapper')}>
-                    <div className={b('table-content')}>
-                        <ResizeableDataTable
-                            columnsWidthLSKey={CLUSTERS_COLUMNS_WIDTH_LS_KEY}
-                            wrapperClassName={b('table')}
-                            data={filteredClusters}
-                            columns={columnsToShow}
-                            settings={{...DEFAULT_TABLE_SETTINGS, dynamicRender: false}}
-                            initialSortOrder={{
-                                columnId: COLUMNS_NAMES.TITLE,
-                                order: DataTable.ASCENDING,
-                            }}
-                        />
-                    </div>
-                </div>
-            ) : null}
-        </div>
+    const renderColumnSetup = () => {
+        return (
+            <TableColumnSetup
+                className={b('column-setup')}
+                key="TableColumnSetup"
+                popupWidth={242}
+                items={columnsToSelect}
+                showStatus
+                onUpdate={setColumns}
+            />
+        );
+    };
+
+    const renderContent = () => {
+        return (
+            <ResizeableDataTable
+                isLoading={query.isLoading}
+                columnsWidthLSKey={CLUSTERS_COLUMNS_WIDTH_LS_KEY}
+                wrapperClassName={b('table')}
+                data={filteredClusters}
+                columns={columnsToShow}
+                settings={{...DEFAULT_TABLE_SETTINGS, dynamicRender: false}}
+                initialSortOrder={{
+                    columnId: COLUMNS_NAMES.TITLE,
+                    order: DataTable.ASCENDING,
+                }}
+            />
+        );
+    };
+
+    return (
+        <TableWithControlsLayout fullHeight className={b(null)}>
+            <TableWithControlsLayout.Controls renderExtraControls={renderColumnSetup}>
+                {renderControls()}
+            </TableWithControlsLayout.Controls>
+            {query.isError ? <ResponseError error={query.error} /> : null}
+            <TableWithControlsLayout.Table
+                scrollContainerRef={scrollContainerRef}
+                className={b('table-wrapper')}
+            >
+                {renderContent()}
+            </TableWithControlsLayout.Table>
+        </TableWithControlsLayout>
     );
 }

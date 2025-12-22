@@ -4,17 +4,18 @@ import {skipToken} from '@reduxjs/toolkit/query';
 
 import type {ClusterTab} from '../../../containers/Cluster/utils';
 import {clusterTabsIds, isClusterTab} from '../../../containers/Cluster/utils';
-import {parseTraceFields} from '../../../services/parsers/parseMetaCluster';
 import {isClusterInfoV2} from '../../../types/api/cluster';
 import type {TClusterInfo} from '../../../types/api/cluster';
 import type {TTabletStateInfo} from '../../../types/api/tablet';
-import {CLUSTER_DEFAULT_TITLE, DEFAULT_CLUSTER_TAB_KEY} from '../../../utils/constants';
+import {CLUSTER_DEFAULT_TITLE} from '../../../utils/constants';
 import {useClusterNameFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
+import {useIsViewerUser} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {isQueryErrorResponse} from '../../../utils/query';
 import type {RootState} from '../../defaultStore';
 import {api} from '../api';
 import {selectNodesMap} from '../nodesList';
 
+import {parseCoresUrl, parseLoggingUrls, parseSettingsField, parseTraceField} from './parseFields';
 import type {ClusterGroupsStats, ClusterState} from './types';
 import {
     createSelectClusterGroupsQuery,
@@ -23,17 +24,10 @@ import {
     parseGroupsStatsQueryResponse,
 } from './utils';
 
-const defaultClusterTabLS = localStorage.getItem(DEFAULT_CLUSTER_TAB_KEY);
-
-let defaultClusterTab: ClusterTab;
-if (isClusterTab(defaultClusterTabLS)) {
-    defaultClusterTab = defaultClusterTabLS;
-} else {
-    defaultClusterTab = clusterTabsIds.tenants;
-}
+export const INITIAL_DEFAULT_CLUSTER_TAB = clusterTabsIds.tenants;
 
 const initialState: ClusterState = {
-    defaultClusterTab,
+    defaultClusterTab: INITIAL_DEFAULT_CLUSTER_TAB,
 };
 const clusterSlice = createSlice({
     name: 'cluster',
@@ -48,7 +42,6 @@ const clusterSlice = createSlice({
 export function updateDefaultClusterTab(tab: string) {
     return (dispatch: Dispatch) => {
         if (isClusterTab(tab)) {
-            localStorage.setItem(DEFAULT_CLUSTER_TAB_KEY, tab);
             dispatch(clusterSlice.actions.setDefaultClusterTab(tab));
         }
     };
@@ -95,7 +88,8 @@ export const clusterApi = api.injectEndpoints({
                         const groupsStatsResponse = await window.api.viewer.sendQuery({
                             query: query,
                             database: clusterRoot,
-                            action: 'execute-scan',
+                            action: 'execute-query',
+                            internal_call: true,
                         });
 
                         if (isQueryErrorResponse(groupsStatsResponse)) {
@@ -137,26 +131,38 @@ export const clusterApi = api.injectEndpoints({
 
 export function useClusterBaseInfo() {
     const clusterNameFromQuery = useClusterNameFromQuery();
+    const isViewerUser = useIsViewerUser();
 
-    const {currentData} = clusterApi.useGetClusterBaseInfoQuery(clusterNameFromQuery ?? skipToken);
+    const {currentData} = clusterApi.useGetClusterBaseInfoQuery(clusterNameFromQuery || skipToken, {
+        skip: !isViewerUser,
+    });
 
-    const {solomon: monitoring, name, title, trace_view: traceView, ...data} = currentData || {};
+    const {solomon: monitoring, name, title, ...data} = currentData || {};
 
     // name is used for requests, title is used for display
     // Example:
     // Name: ydb_vla_dev02
     // Title: YDB DEV VLA02
     const clusterName = name ?? clusterNameFromQuery ?? undefined;
-    const clusterTitle = title ?? clusterName;
+    const clusterTitle = title || clusterName;
 
     return {
         ...data,
-        ...parseTraceFields({traceView}),
+
+        monitoring,
+
         name: clusterName,
         title: clusterTitle,
-        monitoring,
+
+        traceView: parseTraceField(data.trace_view),
+        cores: parseCoresUrl(data.cores),
+        logging: parseLoggingUrls(data.logging),
+
+        settings: parseSettingsField(data.settings),
     };
 }
+
+export type ClusterInfo = ReturnType<typeof useClusterBaseInfo> & Record<string, unknown>;
 
 const createClusterInfoSelector = createSelector(
     (clusterName?: string) => clusterName,

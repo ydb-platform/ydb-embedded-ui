@@ -1,14 +1,20 @@
-import {ArrowToggle, Disclosure, Flex, Icon, Text} from '@gravity-ui/uikit';
+import React from 'react';
+
+import {Disclosure, Flex, Icon, Text} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../../components/Errors/ResponseError';
-import {useClusterDashboardAvailable} from '../../../store/reducers/capabilities/hooks';
+import {
+    useBridgeModeEnabled,
+    useClusterDashboardAvailable,
+} from '../../../store/reducers/capabilities/hooks';
 import type {ClusterGroupsStats} from '../../../store/reducers/cluster/types';
+import {SETTING_KEYS} from '../../../store/reducers/settings/constants';
 import type {AdditionalClusterProps} from '../../../types/additionalProps';
 import {isClusterInfoV2, isClusterInfoV5} from '../../../types/api/cluster';
 import type {TClusterInfo} from '../../../types/api/cluster';
 import type {IResponseError} from '../../../types/api/error';
 import {valueIsDefined} from '../../../utils';
-import {EXPAND_CLUSTER_DASHBOARD} from '../../../utils/constants';
+import {useResizeObserverTrigger} from '../../../utils/hooks/useResizeObserverTrigger';
 import {useSetting} from '../../../utils/hooks/useSetting';
 import {ClusterInfo} from '../ClusterInfo/ClusterInfo';
 import i18n from '../i18n';
@@ -35,41 +41,55 @@ interface ClusterOverviewProps {
 }
 
 export function ClusterOverview(props: ClusterOverviewProps) {
-    const [expandDashboard, setExpandDashboard] = useSetting<boolean>(EXPAND_CLUSTER_DASHBOARD);
+    const [expandDashboard, setExpandDashboard] = useSetting<boolean>(
+        SETTING_KEYS.EXPAND_CLUSTER_DASHBOARD,
+    );
+
+    //needs timeout to ensure layout has been recalculated after Disclosure animations
+    useResizeObserverTrigger([expandDashboard], 110);
+    const bridgeModeEnabled = useBridgeModeEnabled();
+
+    const bridgePiles = React.useMemo(() => {
+        if (!bridgeModeEnabled || !isClusterInfoV5(props.cluster)) {
+            return undefined;
+        }
+
+        const {BridgeInfo} = props.cluster;
+        return BridgeInfo?.Piles?.length ? BridgeInfo.Piles : undefined;
+    }, [props.cluster, bridgeModeEnabled]);
     if (props.error) {
         return <ResponseError error={props.error} className={b('error')} />;
     }
 
     return (
-        <Flex direction="column" className={b('overview-wrapper', {collapsed: !expandDashboard})}>
-            <Disclosure
-                arrowPosition="end"
-                expanded={expandDashboard}
-                onUpdate={() => setExpandDashboard(!expandDashboard)}
-            >
-                <Disclosure.Summary>
-                    {(disclosureProps) => (
-                        <div {...disclosureProps} className={b('disclosure-summary')}>
-                            <Flex alignItems="center" justifyContent="space-between" width={'100%'}>
-                                <Flex gap={2} alignItems="center">
-                                    <Icon data={overviewIcon} size={16} />
-                                    <Text variant="body-2" color="primary" className={b('title')}>
-                                        {i18n('label_overview')}
-                                    </Text>
-                                </Flex>
-                                {!expandDashboard && <ClusterDashboard {...props} collapsed />}
-                            </Flex>
-                            <ArrowToggle
-                                size={16}
-                                direction={disclosureProps.expanded ? 'top' : 'bottom'}
-                            />
-                        </div>
-                    )}
-                </Disclosure.Summary>
+        <Disclosure
+            arrowPosition="end"
+            size="l"
+            expanded={expandDashboard}
+            onUpdate={() => setExpandDashboard(!expandDashboard)}
+            className={b('overview-wrapper', {collapsed: !expandDashboard})}
+            summary={
+                <Flex
+                    alignItems="center"
+                    justifyContent="space-between"
+                    width={'100%'}
+                    className={b('disclosure-summary')}
+                >
+                    <Flex gap={2} alignItems="center">
+                        <Icon data={overviewIcon} size={16} />
+                        <Text variant="body-2" color="primary" className={b('title')}>
+                            {i18n('label_overview')}
+                        </Text>
+                    </Flex>
+                    {!expandDashboard && <ClusterDashboard {...props} collapsed />}
+                </Flex>
+            }
+        >
+            <div className={b('disclosure-content')}>
                 <ClusterDashboard {...props} />
-                <ClusterInfo {...props} />
-            </Disclosure>
-        </Flex>
+                <ClusterInfo {...props} bridgePiles={bridgePiles} />
+            </div>
+        </Disclosure>
     );
 }
 
@@ -93,7 +113,7 @@ function ClusterDoughnuts({cluster, groupStats = {}, loading, collapsed}: Cluste
     if (loading) {
         return <ClusterDashboardSkeleton collapsed={collapsed} />;
     }
-    const metricsCards = [];
+    const metricsCards: React.ReactNode[] = [];
     if (isClusterInfoV2(cluster)) {
         const {CoresUsed, NumberOfCpus, CoresTotal} = cluster;
         const total = CoresTotal ?? NumberOfCpus;

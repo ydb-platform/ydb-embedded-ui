@@ -1,22 +1,30 @@
+@use '../../../../../styles/mixins.scss';
+
 .ydb-diagnostics-topic-data-columns {
-    &__timestamp-ms {
-        color: var(--g-color-text-secondary);
-    }
+    &__offset {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--g-spacing-1);
 
-    &__ts-diff_danger {
-        color: var(--g-color-text-danger);
+        width: 100%;
+        height: 100%;
     }
-    &__message_clickable {
-        cursor: pointer;
-
-        color: var(--g-color-text-info);
+    &__offset_link {
+        @extend .link;
     }
     &__offset_removed {
+        cursor: not-allowed;
         text-decoration: line-through;
     }
 
     &__message_invalid,
     &__truncated {
         font-style: italic;
+    }
+    &__help {
+        white-space: pre-wrap;
+    }
+    &__help-popover {
+        display: flex;
     }
 }

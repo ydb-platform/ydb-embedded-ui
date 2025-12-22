@@ -1,12 +1,13 @@
-import type {NodesPreparedEntity} from '../../store/reducers/nodes/types';
-import type {VersionValue} from '../../types/versions';
+import type {PreparedStorageNode} from '../../store/reducers/storage/types';
+import type {PreparedVersion} from '../../utils/versions/types';
 
 export interface GroupedNodesItem {
     title?: string;
-    nodes?: NodesPreparedEntity[];
+    isDatabase?: boolean;
+    nodes?: PreparedStorageNode[];
     items?: GroupedNodesItem[];
     versionColor?: string;
-    versionsValues?: VersionValue[];
+    preparedVersions?: PreparedVersion[];
 }
 
 export enum GroupByValue {

@@ -4,7 +4,7 @@ import type {
     RelativeRangeDatePickerProps,
     RelativeRangeDatePickerValue,
 } from '@gravity-ui/date-components';
-import {RelativeRangeDatePicker} from '@gravity-ui/date-components';
+import {DEFAULT_TIME_PRESETS, RelativeRangeDatePicker} from '@gravity-ui/date-components';
 
 import {cn} from '../../utils/cn';
 
@@ -57,6 +57,8 @@ export const DateRange = ({from, to, className, defaultValue, onChange}: DateRan
                 onUpdate={handleUpdate}
                 placeholder={`${i18n('date-time-format')} - ${i18n('date-time-format')}`}
                 withApplyButton
+                docs={DEFAULT_TIME_PRESETS}
+                withHeader
             />
         </div>
     );

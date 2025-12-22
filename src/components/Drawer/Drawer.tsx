@@ -3,19 +3,30 @@ import React from 'react';
 import {Xmark} from '@gravity-ui/icons';
 import {DrawerItem, Drawer as GravityDrawer} from '@gravity-ui/navigation';
 import {ActionTooltip, Button, Flex, Icon, Text} from '@gravity-ui/uikit';
+import {debounce} from 'lodash';
 
 import {cn} from '../../utils/cn';
-import {isNumeric} from '../../utils/utils';
+import {useSetting} from '../../utils/hooks/useSetting';
 import {CopyLinkButton} from '../CopyLinkButton/CopyLinkButton';
+import {Portal} from '../Portal/Portal';
 
 import {useDrawerContext} from './DrawerContext';
+import {
+    normalizeDrawerWidthFromResize,
+    normalizeDrawerWidthFromSavedString,
+} from './DrawerWidthUtils';
+
+import './Drawer.scss';
 
 const DEFAULT_DRAWER_WIDTH_PERCENTS = 60;
 const DEFAULT_DRAWER_WIDTH = 600;
 const DRAWER_WIDTH_KEY = 'drawer-width';
+const SAVE_DEBOUNCE_MS = 200;
 const b = cn('ydb-drawer');
 
-import './Drawer.scss';
+type DrawerEvent = MouseEvent & {
+    _capturedInsideDrawer?: boolean;
+};
 
 interface DrawerPaneContentWrapperProps {
     isVisible: boolean;
@@ -28,6 +39,7 @@ interface DrawerPaneContentWrapperProps {
     detectClickOutside?: boolean;
     defaultWidth?: number;
     isPercentageWidth?: boolean;
+    hideVeil?: boolean;
 }
 
 const DrawerPaneContentWrapper = ({
@@ -41,14 +53,26 @@ const DrawerPaneContentWrapper = ({
     className,
     detectClickOutside = false,
     isPercentageWidth,
+    hideVeil = true,
 }: DrawerPaneContentWrapperProps) => {
-    const [drawerWidth, setDrawerWidth] = React.useState(() => {
-        const savedWidth = localStorage.getItem(storageKey);
-        return isNumeric(savedWidth) ? Number(savedWidth) : defaultWidth;
-    });
+    const [savedWidthString, setSavedWidthString] = useSetting<string | undefined>(storageKey);
+    const [userDrawerWidth, setUserDrawerWidth] = React.useState<number | undefined>(undefined);
 
     const drawerRef = React.useRef<HTMLDivElement>(null);
-    const {containerWidth} = useDrawerContext();
+    const {containerWidth, itemContainerRef} = useDrawerContext();
+
+    const derivedDrawerWidth = React.useMemo(() => {
+        return normalizeDrawerWidthFromSavedString({
+            savedWidthString,
+            defaultWidth,
+            isPercentageWidth,
+            containerWidth,
+            defaultPercents: DEFAULT_DRAWER_WIDTH_PERCENTS,
+            defaultPx: DEFAULT_DRAWER_WIDTH,
+        });
+    }, [containerWidth, defaultWidth, isPercentageWidth, savedWidthString]);
+
+    const drawerWidth = userDrawerWidth ?? derivedDrawerWidth;
     // Calculate drawer width based on container width percentage if specified
     const calculatedWidth = React.useMemo(() => {
         if (isPercentageWidth && containerWidth > 0) {
@@ -64,7 +88,11 @@ const DrawerPaneContentWrapper = ({
             return undefined;
         }
 
-        const handleClickOutside = (event: MouseEvent) => {
+        const handleClickOutside = (event: DrawerEvent) => {
+            //skip if event is captured inside drawer or not triggered by user
+            if (event._capturedInsideDrawer || !event.isTrusted) {
+                return;
+            }
             if (
                 isVisible &&
                 drawerRef.current &&
@@ -80,42 +108,66 @@ const DrawerPaneContentWrapper = ({
         };
     }, [isVisible, onClose, detectClickOutside]);
 
+    const saveWidthDebounced = React.useMemo(() => {
+        return debounce((value: string) => setSavedWidthString(value), SAVE_DEBOUNCE_MS);
+    }, [setSavedWidthString]);
+
+    React.useEffect(() => {
+        return () => {
+            saveWidthDebounced.cancel();
+        };
+    }, [saveWidthDebounced]);
+
     const handleResizeDrawer = (width: number) => {
-        if (isPercentageWidth && containerWidth > 0) {
-            const percentageWidth = Math.round((width / containerWidth) * 100);
-            setDrawerWidth(percentageWidth);
-            localStorage.setItem(storageKey, percentageWidth.toString());
-        } else {
-            setDrawerWidth(width);
-            localStorage.setItem(storageKey, width.toString());
-        }
+        const normalized = normalizeDrawerWidthFromResize({
+            resizedWidthPx: width,
+            isPercentageWidth,
+            containerWidth,
+        });
+
+        setUserDrawerWidth(normalized.drawerWidth);
+        saveWidthDebounced(normalized.savedWidthString);
     };
 
+    const handleClickInsideDrawer = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        const nativeEvent = event.nativeEvent as DrawerEvent;
+        nativeEvent._capturedInsideDrawer = true;
+    };
+
+    const itemContainer = itemContainerRef?.current;
+    if (!itemContainer) {
+        return null;
+    }
+
     return (
-        <GravityDrawer
-            onEscape={onClose}
-            onVeilClick={onClose}
-            hideVeil
-            className={b('container', className)}
-        >
-            <DrawerItem
-                id={drawerId}
-                visible={isVisible}
-                resizable
-                maxResizeWidth={containerWidth}
-                width={isPercentageWidth ? calculatedWidth : drawerWidth}
-                onResize={handleResizeDrawer}
-                direction={direction}
-                className={b('item')}
-                ref={detectClickOutside ? drawerRef : undefined}
+        <Portal container={itemContainer}>
+            <GravityDrawer
+                onEscape={onClose}
+                onVeilClick={onClose}
+                hideVeil={hideVeil}
+                className={b('container', className)}
             >
-                {children}
-            </DrawerItem>
-        </GravityDrawer>
+                <DrawerItem
+                    id={drawerId}
+                    visible={isVisible}
+                    resizable
+                    maxResizeWidth={containerWidth}
+                    width={calculatedWidth}
+                    onResize={handleResizeDrawer}
+                    direction={direction}
+                    className={b('item')}
+                    ref={detectClickOutside ? drawerRef : undefined}
+                >
+                    <div className={b('click-handler')} onClickCapture={handleClickInsideDrawer}>
+                        {children}
+                    </div>
+                </DrawerItem>
+            </GravityDrawer>
+        </Portal>
     );
 };
 
-type DrawerControl =
+export type DrawerControl =
     | {type: 'close'}
     | {type: 'copyLink'; link: string}
     | {type: 'custom'; node: React.ReactNode; key: string};
@@ -135,6 +187,7 @@ interface DrawerPaneProps {
     drawerControls?: DrawerControl[];
     title?: React.ReactNode;
     headerClassName?: string;
+    hideVeil?: boolean;
 }
 
 export const DrawerWrapper = ({
@@ -152,6 +205,7 @@ export const DrawerWrapper = ({
     drawerControls = [],
     title,
     headerClassName,
+    hideVeil,
 }: DrawerPaneProps) => {
     React.useEffect(() => {
         return () => {
@@ -184,7 +238,11 @@ export const DrawerWrapper = ({
         }
 
         return (
-            <Flex justifyContent="space-between" className={b('header-wrapper', headerClassName)}>
+            <Flex
+                justifyContent="space-between"
+                alignItems="center"
+                className={b('header-wrapper', headerClassName)}
+            >
                 <Text variant="subheader-2">{title}</Text>
                 <Flex className={b('controls')}>{controls}</Flex>
             </Flex>
@@ -195,6 +253,7 @@ export const DrawerWrapper = ({
         <React.Fragment>
             {children}
             <DrawerPaneContentWrapper
+                hideVeil={hideVeil}
                 isVisible={isDrawerVisible}
                 onClose={onCloseDrawer}
                 drawerId={drawerId}
@@ -205,10 +264,12 @@ export const DrawerWrapper = ({
                 detectClickOutside={detectClickOutside}
                 isPercentageWidth={isPercentageWidth}
             >
-                <div className={b('content-wrapper')}>
-                    {renderDrawerHeader()}
-                    {renderDrawerContent()}
-                </div>
+                {isDrawerVisible ? (
+                    <div className={b('content-wrapper')}>
+                        {renderDrawerHeader()}
+                        {renderDrawerContent()}
+                    </div>
+                ) : null}
             </DrawerPaneContentWrapper>
         </React.Fragment>
     );

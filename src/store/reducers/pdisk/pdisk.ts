@@ -45,7 +45,7 @@ export const pDiskApi = api.injectEndpoints({
                 try {
                     const response = await Promise.all([
                         diskInfoPromise,
-                        window.api.viewer.getNodeInfo(nodeId, {signal}),
+                        window.api.viewer.getNodeInfo({nodeId}, {signal}),
                     ]);
                     const data = preparePDiskDataResponse(response);
                     return {data};

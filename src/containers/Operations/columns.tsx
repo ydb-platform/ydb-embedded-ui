@@ -1,4 +1,3 @@
-import {duration} from '@gravity-ui/date-utils';
 import {Ban, CircleStop} from '@gravity-ui/icons';
 import type {Column as DataTableColumn} from '@gravity-ui/react-data-table';
 import {ActionTooltip, Flex, Icon, Text} from '@gravity-ui/uikit';
@@ -6,26 +5,68 @@ import {ActionTooltip, Flex, Icon, Text} from '@gravity-ui/uikit';
 import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {CellWithPopover} from '../../components/CellWithPopover/CellWithPopover';
 import {operationsApi} from '../../store/reducers/operations';
-import type {TOperation} from '../../types/api/operations';
+import type {IndexBuildMetadata, OperationKind, TOperation} from '../../types/api/operations';
 import {EStatusCode} from '../../types/api/operations';
-import {EMPTY_DATA_PLACEHOLDER, HOUR_IN_SECONDS, SECOND_IN_MS} from '../../utils/constants';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import createToast from '../../utils/createToast';
-import {formatDateTime} from '../../utils/dataFormatters/dataFormatters';
+import {formatDateTime, formatDurationMs} from '../../utils/dataFormatters/dataFormatters';
 import {parseProtobufTimestampToMs} from '../../utils/timeParsers';
 
 import {COLUMNS_NAMES, COLUMNS_TITLES} from './constants';
 import i18n from './i18n';
+import {getOperationProgress, isIndexBuildMetadata} from './utils';
 
 import './Operations.scss';
+
+function renderStatusCell(row: TOperation) {
+    const progress = getOperationProgress(row, i18n);
+
+    if (row.ready) {
+        if (!row.status) {
+            return EMPTY_DATA_PLACEHOLDER;
+        }
+
+        return (
+            <Text color={row.status === EStatusCode.SUCCESS ? 'positive' : 'danger'}>
+                {row.status}
+            </Text>
+        );
+    }
+
+    if (row.status && row.status !== EStatusCode.SUCCESS) {
+        return <Text color="danger">{row.status}</Text>;
+    }
+
+    if (progress !== null) {
+        return progress;
+    }
+
+    return i18n('label_in-progress');
+}
 
 export function getColumns({
     database,
     refreshTable,
+    kind,
 }: {
     database: string;
     refreshTable: VoidFunction;
+    kind: OperationKind;
 }): DataTableColumn<TOperation>[] {
-    return [
+    const isBuildIndex = kind === 'buildindex';
+
+    // Helper function to get description tooltip content (buildindex-only)
+    const getDescriptionTooltip = (operation: TOperation): string => {
+        const {metadata} = operation;
+
+        if (!isIndexBuildMetadata(metadata) || !metadata.description) {
+            return '';
+        }
+
+        return JSON.stringify(metadata.description, null, 2);
+    };
+
+    const columns: DataTableColumn<TOperation>[] = [
         {
             name: COLUMNS_NAMES.ID,
             header: COLUMNS_TITLES[COLUMNS_NAMES.ID],
@@ -34,8 +75,11 @@ export function getColumns({
                 if (!row.id) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
+
+                const tooltipContent = isBuildIndex ? getDescriptionTooltip(row) || row.id : row.id;
+
                 return (
-                    <CellWithPopover placement={['top', 'bottom']} content={row.id}>
+                    <CellWithPopover placement={['top', 'bottom']} content={tooltipContent}>
                         {row.id}
                     </CellWithPopover>
                 );
@@ -45,103 +89,104 @@ export function getColumns({
             name: COLUMNS_NAMES.STATUS,
             header: COLUMNS_TITLES[COLUMNS_NAMES.STATUS],
             render: ({row}) => {
-                if (!row.status) {
-                    return EMPTY_DATA_PLACEHOLDER;
-                }
-                return (
-                    <Text color={row.status === EStatusCode.SUCCESS ? 'positive' : 'danger'}>
-                        {row.status}
-                    </Text>
-                );
-            },
-        },
-        {
-            name: COLUMNS_NAMES.CREATED_BY,
-            header: COLUMNS_TITLES[COLUMNS_NAMES.CREATED_BY],
-            render: ({row}) => {
-                if (!row.created_by) {
-                    return EMPTY_DATA_PLACEHOLDER;
-                }
-                return row.created_by;
-            },
-        },
-        {
-            name: COLUMNS_NAMES.CREATE_TIME,
-            header: COLUMNS_TITLES[COLUMNS_NAMES.CREATE_TIME],
-            render: ({row}) => {
-                if (!row.create_time) {
-                    return EMPTY_DATA_PLACEHOLDER;
-                }
-                return formatDateTime(parseProtobufTimestampToMs(row.create_time));
-            },
-            sortAccessor: (row) =>
-                row.create_time ? parseProtobufTimestampToMs(row.create_time) : 0,
-        },
-        {
-            name: COLUMNS_NAMES.END_TIME,
-            header: COLUMNS_TITLES[COLUMNS_NAMES.END_TIME],
-            render: ({row}) => {
-                if (!row.end_time) {
-                    return EMPTY_DATA_PLACEHOLDER;
-                }
-                return formatDateTime(parseProtobufTimestampToMs(row.end_time));
-            },
-            sortAccessor: (row) =>
-                row.end_time ? parseProtobufTimestampToMs(row.end_time) : Number.MAX_SAFE_INTEGER,
-        },
-        {
-            name: COLUMNS_NAMES.DURATION,
-            header: COLUMNS_TITLES[COLUMNS_NAMES.DURATION],
-            render: ({row}) => {
-                let durationValue = 0;
-                if (!row.create_time) {
-                    return EMPTY_DATA_PLACEHOLDER;
-                }
-                const createTime = parseProtobufTimestampToMs(row.create_time);
-                if (row.end_time) {
-                    const endTime = parseProtobufTimestampToMs(row.end_time);
-                    durationValue = endTime - createTime;
-                } else {
-                    durationValue = Date.now() - createTime;
-                }
-
-                const durationFormatted =
-                    durationValue > HOUR_IN_SECONDS * SECOND_IN_MS
-                        ? duration(durationValue).format('hh:mm:ss')
-                        : duration(durationValue).format('mm:ss');
-
-                return row.end_time
-                    ? durationFormatted
-                    : i18n('label_duration-ongoing', {value: durationFormatted});
-            },
-            sortAccessor: (row) => {
-                if (!row.create_time) {
-                    return 0;
-                }
-                const createTime = parseProtobufTimestampToMs(row.create_time);
-                if (row.end_time) {
-                    const endTime = parseProtobufTimestampToMs(row.end_time);
-                    return endTime - createTime;
-                }
-                return Date.now() - createTime;
-            },
-        },
-        {
-            name: 'Actions',
-            sortable: false,
-            resizeable: false,
-            header: '',
-            render: ({row}) => {
-                return (
-                    <OperationsActions
-                        operation={row}
-                        database={database}
-                        refreshTable={refreshTable}
-                    />
-                );
+                return renderStatusCell(row);
             },
         },
     ];
+
+    // Add buildindex-specific state column
+    if (isBuildIndex) {
+        columns.push({
+            name: COLUMNS_NAMES.STATE,
+            header: COLUMNS_TITLES[COLUMNS_NAMES.STATE],
+            render: ({row}) => {
+                const metadata = row.metadata as IndexBuildMetadata | undefined;
+                if (!metadata?.state) {
+                    return EMPTY_DATA_PLACEHOLDER;
+                }
+                return metadata.state;
+            },
+        });
+    }
+
+    // Add standard columns for non-buildindex operations
+    if (!isBuildIndex) {
+        columns.push(
+            {
+                name: COLUMNS_NAMES.CREATED_BY,
+                header: COLUMNS_TITLES[COLUMNS_NAMES.CREATED_BY],
+                render: ({row}) => {
+                    if (!row.created_by) {
+                        return EMPTY_DATA_PLACEHOLDER;
+                    }
+                    return row.created_by;
+                },
+            },
+            {
+                name: COLUMNS_NAMES.CREATE_TIME,
+                header: COLUMNS_TITLES[COLUMNS_NAMES.CREATE_TIME],
+                render: ({row}) => {
+                    if (!row.create_time) {
+                        return EMPTY_DATA_PLACEHOLDER;
+                    }
+                    return formatDateTime(parseProtobufTimestampToMs(row.create_time));
+                },
+            },
+            {
+                name: COLUMNS_NAMES.END_TIME,
+                header: COLUMNS_TITLES[COLUMNS_NAMES.END_TIME],
+                render: ({row}) => {
+                    if (!row.end_time) {
+                        return EMPTY_DATA_PLACEHOLDER;
+                    }
+                    return formatDateTime(parseProtobufTimestampToMs(row.end_time));
+                },
+            },
+            {
+                name: COLUMNS_NAMES.DURATION,
+                header: COLUMNS_TITLES[COLUMNS_NAMES.DURATION],
+                render: ({row}) => {
+                    let durationValue = 0;
+                    if (!row.create_time) {
+                        return EMPTY_DATA_PLACEHOLDER;
+                    }
+                    const createTime = parseProtobufTimestampToMs(row.create_time);
+                    if (row.end_time) {
+                        const endTime = parseProtobufTimestampToMs(row.end_time);
+                        durationValue = endTime - createTime;
+                    } else {
+                        durationValue = Date.now() - createTime;
+                    }
+
+                    const safeDurationMs = durationValue < 0 ? 0 : durationValue;
+                    const durationFormatted = formatDurationMs(safeDurationMs);
+
+                    return row.end_time
+                        ? durationFormatted
+                        : i18n('label_duration-ongoing', {value: durationFormatted});
+                },
+            },
+        );
+    }
+
+    // Add Actions column
+    columns.push({
+        name: 'Actions',
+        sortable: false,
+        resizeable: false,
+        header: '',
+        render: ({row}) => {
+            return (
+                <OperationsActions
+                    operation={row}
+                    database={database}
+                    refreshTable={refreshTable}
+                />
+            );
+        },
+    });
+
+    return columns;
 }
 
 interface OperationsActionsProps {
@@ -151,7 +196,7 @@ interface OperationsActionsProps {
 }
 
 function OperationsActions({operation, database, refreshTable}: OperationsActionsProps) {
-    const [cancelOperation, {isLoading: isLoadingCancel}] =
+    const [cancelOperation, {isLoading: isCancelLoading}] =
         operationsApi.useCancelOperationMutation();
     const [forgetOperation, {isLoading: isForgetLoading}] =
         operationsApi.useForgetOperationMutation();
@@ -161,9 +206,16 @@ function OperationsActions({operation, database, refreshTable}: OperationsAction
         return null;
     }
 
+    const isForgetButtonDisabled = isForgetLoading;
+    const isCancelButtonDisabled = isCancelLoading || operation.ready === true;
+
     return (
         <Flex gap="2">
-            <ActionTooltip title={i18n('header_forget')} placement={['left', 'auto']}>
+            <ActionTooltip
+                title={i18n('header_forget')}
+                placement={['left', 'bottom']}
+                disabled={isForgetButtonDisabled}
+            >
                 <div>
                     <ButtonWithConfirmDialog
                         buttonView="outlined"
@@ -176,20 +228,25 @@ function OperationsActions({operation, database, refreshTable}: OperationsAction
                                     createToast({
                                         name: 'Forgotten',
                                         title: i18n('text_forgotten', {id}),
-                                        type: 'success',
+                                        theme: 'success',
                                     });
                                     refreshTable();
                                 })
                         }
-                        buttonDisabled={isLoadingCancel}
+                        buttonDisabled={isForgetButtonDisabled}
                     >
                         <Icon data={Ban} />
                     </ButtonWithConfirmDialog>
                 </div>
             </ActionTooltip>
-            <ActionTooltip title={i18n('header_cancel')} placement={['right', 'auto']}>
+            <ActionTooltip
+                title={i18n('header_cancel')}
+                placement={['right', 'bottom']}
+                disabled={isCancelButtonDisabled}
+            >
                 <div>
                     <ButtonWithConfirmDialog
+                        popoverDisabled={isCancelButtonDisabled}
                         buttonView="outlined"
                         dialogHeader={i18n('header_cancel')}
                         dialogText={i18n('text_cancel')}
@@ -200,12 +257,12 @@ function OperationsActions({operation, database, refreshTable}: OperationsAction
                                     createToast({
                                         name: 'Cancelled',
                                         title: i18n('text_cancelled', {id}),
-                                        type: 'success',
+                                        theme: 'success',
                                     });
                                     refreshTable();
                                 })
                         }
-                        buttonDisabled={isForgetLoading}
+                        buttonDisabled={isCancelButtonDisabled}
                     >
                         <Icon data={CircleStop} />
                     </ButtonWithConfirmDialog>

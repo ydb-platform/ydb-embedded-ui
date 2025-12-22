@@ -1,15 +1,15 @@
-import type {NodesGroup} from '../../store/reducers/nodes/types';
+import type {TableGroup} from '../../store/reducers/storage/types';
 import type {TSystemStateInfo} from '../../types/api/nodes';
-import type {VersionToColorMap, VersionValue} from '../../types/versions';
 
+import {DEFAULT_COLOR} from './getVersionsColors';
 import {getMinorVersion} from './parseVersion';
+import {sortVersions} from './sortVersions';
+import type {PreparedVersion, VersionsDataMap} from './types';
 
-const MIN_VALUE = 0.5;
-
-export const parseNodesToVersionsValues = (
+export const parseNodesToPreparedVersions = (
     nodes: TSystemStateInfo[] = [],
-    versionsToColor?: VersionToColorMap,
-): VersionValue[] => {
+    versionsDataMap?: VersionsDataMap,
+): PreparedVersion[] => {
     const versionsCount = nodes.reduce<Record<string, number>>((acc, node) => {
         if (node.Version) {
             if (acc[node.Version]) {
@@ -20,50 +20,39 @@ export const parseNodesToVersionsValues = (
         }
         return acc;
     }, {});
-    const result = Object.keys(versionsCount).map((version) => {
-        const value = (versionsCount[version] / nodes.length) * 100;
+    const preparedVersions = Object.keys(versionsCount).map((version) => {
+        const minorVersion = getMinorVersion(version);
+        const data = versionsDataMap?.get(minorVersion);
+
         return {
             title: version,
             version: version,
-            color: versionsToColor?.get(getMinorVersion(version)),
-            value: value < MIN_VALUE ? MIN_VALUE : value,
+            count: versionsCount[version],
+            minorVersion,
+            ...data,
         };
     });
-    return normalizeResult(result);
+
+    return sortVersions(preparedVersions);
 };
 
-export function parseNodeGroupsToVersionsValues(
-    groups: NodesGroup[],
-    versionsToColor?: VersionToColorMap,
-    total?: number,
-) {
-    const normalizedTotal = total ?? groups.reduce((acc, group) => acc + group.count, 0);
-    const result = groups.map((group) => {
-        const value = (group.count / normalizedTotal) * 100;
+export function parseNodeGroupsToPreparedVersions(
+    groups: TableGroup[],
+    versionsDataMap?: VersionsDataMap,
+): PreparedVersion[] {
+    const preparedVersions = groups.map((group) => {
+        const minorVersion = getMinorVersion(group.name);
+        const data = versionsDataMap?.get(minorVersion);
+
         return {
             title: group.name,
             version: group.name,
-            color: versionsToColor?.get(getMinorVersion(group.name)),
-            value: value < MIN_VALUE ? MIN_VALUE : value,
+            count: group.count,
+            minorVersion,
+            color: data?.color ?? DEFAULT_COLOR,
+            ...data,
         };
     });
-    const normalized = normalizeResult(result);
-    return normalized;
-}
 
-function normalizeResult(data: VersionValue[]) {
-    let maximum = data[0].value;
-    let maximumIndex = 0;
-    let total = 0;
-    data.forEach((item, index) => {
-        total += item.value;
-        if (item.value > maximum) {
-            maximum = item.value;
-            maximumIndex = index;
-        }
-    });
-    const result = [...data];
-    //Progress breakes if sum of values more than 100, so we need to subtrackt difference appeared because of MIN_VALUE from the biggest value in set
-    result[maximumIndex] = {...data[maximumIndex], value: maximum + 100 - total};
-    return result;
+    return sortVersions(preparedVersions);
 }

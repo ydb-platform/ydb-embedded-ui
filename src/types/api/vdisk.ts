@@ -1,15 +1,5 @@
 import type {EFlag} from './enums';
 import type {TPDiskStateInfo} from './pdisk';
-
-/**
- * endpoint: /viewer/json/vdiskinfo
- */
-export interface TEvVDiskStateResponse {
-    VDiskStateInfo?: TVDiskStateInfo[];
-    ResponseTime?: string;
-    ResponseDuration?: number;
-}
-
 /**
  * Node whiteboard VDisk data
  *

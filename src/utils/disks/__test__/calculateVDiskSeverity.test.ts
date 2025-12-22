@@ -23,7 +23,7 @@ describe('VDisk state', () => {
 
         expect(severity1).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow);
         expect(severity2).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
-        expect(severity3).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Orange);
+        expect(severity3).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow);
     });
 
     test('Should not pick the highest severity based on FrontQueues value', () => {
@@ -39,7 +39,7 @@ describe('VDisk state', () => {
         });
 
         expect(severity1).not.toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
-        expect(severity2).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
+        expect(severity2).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow);
     });
 
     // prettier-ignore
@@ -67,15 +67,15 @@ describe('VDisk state', () => {
             VDiskState: EVDiskState.OK, DiskSpace: EFlag.Green, FrontQueues: EFlag.Green
         });
 
-        // unavailable disks display with the grey color
-        expect(severity1).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey);
-        expect(severity2).not.toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey);
-        expect(severity3).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey);
-        expect(severity4).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey);
-        expect(severity5).not.toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey);
-        expect(severity6).not.toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey);
-        expect(severity7).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey);
-        expect(severity8).not.toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey);
+        // unavailable vDisks display with the red color (with error)
+        expect(severity1).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
+        expect(severity2).not.toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
+        expect(severity3).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
+        expect(severity4).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
+        expect(severity5).not.toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
+        expect(severity6).not.toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
+        expect(severity7).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
+        expect(severity8).not.toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
     });
 
     test('Should display as unavailable when no VDiskState is provided even if DiskSpace or FrontQueues flags are not green', () => {
@@ -84,8 +84,8 @@ describe('VDisk state', () => {
             FrontQueues: EFlag.Yellow,
         });
 
-        // unavailable disks display with the grey color
-        expect(severity1).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey);
+        // unavailable vDisks display with the red color
+        expect(severity1).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
     });
 
     test('Should display replicating VDisks in OK state with a distinct color', () => {

@@ -14,6 +14,14 @@
 
     &__row {
         cursor: pointer;
+
+        &_active {
+            background-color: var(--g-color-base-selection);
+
+            &:hover {
+                background: var(--g-color-base-selection-hover) !important;
+            }
+        }
     }
 
     &__query {
@@ -31,5 +39,26 @@
         max-width: 200px;
 
         text-overflow: ellipsis;
+    }
+
+    &__drawer {
+        margin-top: calc(-1 * var(--g-spacing-4));
+    }
+
+    &__empty-state-icon {
+        color: var(--g-color-text-primary);
+    }
+
+    &__not-found-container {
+        height: 100%;
+        padding: var(--g-spacing-5) 0;
+    }
+
+    &__not-found-description {
+        margin-top: var(--g-spacing-2);
+    }
+
+    &__not-found-close {
+        margin-top: var(--g-spacing-5);
     }
 }

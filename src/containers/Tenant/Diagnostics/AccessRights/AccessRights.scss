@@ -1,0 +1,74 @@
+.ydb-access-rights {
+    $block: &;
+    &__header {
+        position: sticky;
+        left: 0;
+
+        margin-bottom: var(--g-spacing-3);
+    }
+    &__owner-card {
+        width: max-content;
+        padding: var(--g-spacing-2) var(--g-spacing-3);
+    }
+
+    &__icon-wrapper {
+        position: absolute;
+        right: -2px;
+        bottom: -2px;
+
+        height: 16px;
+
+        color: var(--g-color-base-warning-heavy);
+        border-radius: 50%;
+        background: var(--g-color-base-background);
+        aspect-ratio: 1;
+    }
+    &__owner-divider {
+        height: 24px;
+    }
+    &__owner-description {
+        max-width: 391px;
+    }
+    &__dialog-content-wrapper {
+        position: relative;
+
+        height: 46px;
+    }
+    &__dialog-error {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+
+        overflow: hidden;
+
+        max-width: 100%;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    &__rights-wrapper {
+        position: relative;
+
+        width: 100%;
+        height: 100%;
+    }
+    &__rights-actions {
+        position: absolute;
+        right: 0;
+
+        visibility: hidden;
+
+        height: 100%;
+        padding-left: var(--g-spacing-2);
+
+        background-color: var(--ydb-data-table-color-hover);
+    }
+    &__rights-table {
+        .data-table__row:hover {
+            #{$block}__rights-actions {
+                visibility: visible;
+            }
+        }
+    }
+}

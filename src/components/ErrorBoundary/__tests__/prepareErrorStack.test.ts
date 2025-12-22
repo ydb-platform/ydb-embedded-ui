@@ -26,19 +26,8 @@ describe('prepareErrorStack', () => {
     at recoverFromConcurrentError (/static/js/bundle.js:107887:24)
     at performConcurrentWorkOnRoot (/static/js/bundle.js:107800:26)`;
 
-        // Mock window.location.origin that is used inside prepareErrorStack
-        const windowSpy = jest.spyOn(window, 'window', 'get');
-        windowSpy.mockImplementation(() => {
-            return {
-                location: {
-                    origin: 'http://localhost:3000',
-                },
-            } as Window & typeof globalThis;
-        });
-
+        // localhost:3000 is set in jest-environment jsdom config
         expect(prepareErrorStack(stack, {trim: false, maxLines: undefined})).toBe(preparedStack);
-
-        windowSpy.mockRestore();
     });
 
     test('Limit trace to maxLines', () => {

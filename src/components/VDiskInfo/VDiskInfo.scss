@@ -1,4 +1,8 @@
 .ydb-vdisk-info {
+    &__info {
+        width: 500px;
+    }
+
     &__title {
         display: flex;
         flex-direction: row;

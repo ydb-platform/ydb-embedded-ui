@@ -19,7 +19,7 @@ export const tabletApi = api.injectEndpoints({
                     const [tabletResponseData, historyResponseData, nodesList] = await Promise.all([
                         window.api.viewer.getTablet({id, database, followerId}, {signal}),
                         window.api.viewer.getTabletHistory({id, database}, {signal}),
-                        window.api.viewer.getNodesList({signal}),
+                        window.api.viewer.getNodesList({database}, {signal}),
                     ]);
                     const nodeHostsMap = prepareNodesMap(nodesList);
 
@@ -67,11 +67,18 @@ export const tabletApi = api.injectEndpoints({
             },
         }),
         getTabletDescribe: build.query({
-            queryFn: async ({tenantId}: {tenantId: TDomainKey}, {signal}) => {
+            queryFn: async (
+                {tenantId, database}: {tenantId: TDomainKey; database?: string},
+                {signal},
+            ) => {
                 try {
-                    const tabletDescribe = await window.api.viewer.getTabletDescribe(tenantId, {
-                        signal,
-                    });
+                    const tabletDescribe = await window.api.viewer.getTabletDescribe(
+                        tenantId,
+                        database,
+                        {
+                            signal,
+                        },
+                    );
                     const {SchemeShard, PathId} = tenantId;
                     const tenantPath = tabletDescribe?.Path || `${SchemeShard}:${PathId}`;
 

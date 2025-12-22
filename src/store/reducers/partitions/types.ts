@@ -2,7 +2,7 @@ import type {ProcessSpeedStats} from '../../../utils/bytesParsers';
 
 // Fields that could be undefined corresponds to partitions without consumers
 export interface PreparedPartitionData {
-    partitionId: string;
+    partitionId: string | number;
     storeSize: string;
 
     writeSpeed: ProcessSpeedStats;

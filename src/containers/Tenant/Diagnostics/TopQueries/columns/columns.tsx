@@ -1,14 +1,13 @@
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column, OrderType} from '@gravity-ui/react-data-table';
 
-import {YDBSyntaxHighlighter} from '../../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
-import {TruncatedQuery} from '../../../../../components/TruncatedQuery/TruncatedQuery';
+import {FixedHeightQuery} from '../../../../../components/FixedHeightQuery/FixedHeightQuery';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../../lib';
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {cn} from '../../../../../utils/cn';
 import {formatDateTime, formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {generateHash} from '../../../../../utils/generateHash';
 import {formatToMs, parseUsToMs} from '../../../../../utils/timeParsers';
-import {MAX_QUERY_HEIGHT} from '../../../utils/constants';
 
 import {
     QUERIES_COLUMNS_IDS,
@@ -34,10 +33,22 @@ const queryTextColumn: Column<KeyValueRow> = {
     header: QUERIES_COLUMNS_TITLES.QueryText,
     render: ({row}) => (
         <div className={b('query')}>
-            <TruncatedQuery
+            <FixedHeightQuery value={row.QueryText?.toString()} lines={3} hasClipboardButton />
+        </div>
+    ),
+    width: 500,
+};
+
+const queryTextColumnWithMaxHeight: Column<KeyValueRow> = {
+    name: QUERIES_COLUMNS_IDS.QueryText,
+    header: QUERIES_COLUMNS_TITLES.QueryText,
+    render: ({row}) => (
+        <div className={b('query')}>
+            <FixedHeightQuery
                 value={row.QueryText?.toString()}
-                maxQueryHeight={MAX_QUERY_HEIGHT}
+                lines={6}
                 hasClipboardButton
+                mode="max"
             />
         </div>
     ),
@@ -71,24 +82,9 @@ const readBytesColumn: Column<KeyValueRow> = {
 const userSIDColumn: Column<KeyValueRow> = {
     name: QUERIES_COLUMNS_IDS.UserSID,
     header: QUERIES_COLUMNS_TITLES.UserSID,
-    render: ({row}) => <div className={b('user-sid')}>{row.UserSID || '–'}</div>,
+    render: ({row}) => <div className={b('user-sid')}>{row.UserSID || EMPTY_DATA_PLACEHOLDER}</div>,
     align: DataTable.LEFT,
     width: 120,
-};
-
-const oneLineQueryTextColumn: Column<KeyValueRow> = {
-    name: QUERIES_COLUMNS_IDS.OneLineQueryText,
-    header: QUERIES_COLUMNS_TITLES.OneLineQueryText,
-    render: ({row}) => (
-        <YDBSyntaxHighlighter
-            language="yql"
-            text={row.QueryText?.toString() || ''}
-            withClipboardButton={{
-                withLabel: false,
-            }}
-        />
-    ),
-    width: 500,
 };
 
 const queryHashColumn: Column<KeyValueRow> = {
@@ -125,7 +121,9 @@ const requestUnitsColumn: Column<KeyValueRow> = {
 const applicationColumn: Column<KeyValueRow> = {
     name: QUERIES_COLUMNS_IDS.ApplicationName,
     header: QUERIES_COLUMNS_TITLES.ApplicationName,
-    render: ({row}) => <div className={b('user-sid')}>{row.ApplicationName || '–'}</div>,
+    render: ({row}) => (
+        <div className={b('user-sid')}>{row.ApplicationName || EMPTY_DATA_PLACEHOLDER}</div>
+    ),
 };
 
 export function getTopQueriesColumns() {
@@ -149,7 +147,7 @@ export function getTopQueriesColumns() {
 }
 
 export function getTenantOverviewTopQueriesColumns() {
-    return [queryHashColumn, oneLineQueryTextColumn, cpuTimeUsColumn];
+    return [queryHashColumn, queryTextColumnWithMaxHeight, cpuTimeUsColumn];
 }
 export function getRunningQueriesColumns() {
     const columns = [

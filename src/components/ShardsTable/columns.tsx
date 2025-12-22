@@ -1,11 +1,10 @@
 import DataTable from '@gravity-ui/react-data-table';
 
-import {getDefaultNodePath} from '../../containers/Node/NodePages';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatNumber, roundToPrecision} from '../../utils/dataFormatters/dataFormatters';
 import {getUsageSeverity} from '../../utils/generateEvaluator';
-import {InternalLink} from '../InternalLink';
 import {LinkToSchemaObject} from '../LinkToSchemaObject/LinkToSchemaObject';
+import {NodeId} from '../NodeId/NodeId';
 import {TabletNameWrapper} from '../TabletNameWrapper/TabletNameWrapper';
 import {UsageLabel} from '../UsageLabel/UsageLabel';
 
@@ -14,14 +13,14 @@ import {TOP_SHARDS_COLUMNS_IDS, TOP_SHARDS_COLUMNS_TITLES} from './constants';
 import type {GetShardsColumn} from './types';
 import {prepareDateTimeValue} from './utils';
 
-export const getPathColumn: GetShardsColumn = ({schemaPath = ''}) => {
+export const getPathColumn: GetShardsColumn = ({databaseFullPath = ''}) => {
     return {
         name: TOP_SHARDS_COLUMNS_IDS.Path,
         header: TOP_SHARDS_COLUMNS_TITLES.Path,
         render: ({row}) => {
-            // row.RelativePath - relative schema path
+            // row.RelativePath - relative schema path without start slash
             return (
-                <LinkToSchemaObject path={schemaPath + row.RelativePath}>
+                <LinkToSchemaObject path={`${databaseFullPath}/${row.RelativePath}`}>
                     {row.RelativePath}
                 </LinkToSchemaObject>
             );
@@ -65,7 +64,7 @@ export const getNodeIdColumn: GetShardsColumn = () => {
             if (!row.NodeId) {
                 return EMPTY_DATA_PLACEHOLDER;
             }
-            return <InternalLink to={getDefaultNodePath(row.NodeId)}>{row.NodeId}</InternalLink>;
+            return <NodeId id={row.NodeId} />;
         },
         align: DataTable.RIGHT,
     };
@@ -77,10 +76,13 @@ export const getCpuCoresColumn: GetShardsColumn = () => {
         render: ({row}) => {
             const usage = Number(row.CPUCores) * 100 || 0;
             return (
-                <UsageLabel value={roundToPrecision(usage, 2)} theme={getUsageSeverity(usage)} />
+                <UsageLabel
+                    value={Math.ceil(roundToPrecision(usage, 2))}
+                    theme={getUsageSeverity(usage)}
+                />
             );
         },
-        align: DataTable.RIGHT,
+        align: DataTable.LEFT,
         width: 110,
         resizeMinWidth: 110,
     };

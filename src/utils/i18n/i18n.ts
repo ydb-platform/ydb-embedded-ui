@@ -2,16 +2,17 @@ import type {KeysData} from '@gravity-ui/i18n';
 import {I18N} from '@gravity-ui/i18n';
 import {configure as configureUiKit} from '@gravity-ui/uikit';
 
-import {settingsManager} from '../../services/settings';
-import {LANGUAGE_KEY} from '../constants';
-
 enum Lang {
     En = 'en',
     Ru = 'ru',
 }
 
 const defaultLang = Lang.En;
-const currentLang = settingsManager.readUserSettingsValue(LANGUAGE_KEY, defaultLang) as Lang;
+
+// Disable russian language while it is not properly supported
+// Force English locale for users who previously selected Russian when the setting was available
+// const currentLang = settingsManager.readUserSettingsValue(LANGUAGE_KEY, defaultLang) as Lang;
+const currentLang = Lang.En;
 
 const i18n = new I18N({
     lang: currentLang,

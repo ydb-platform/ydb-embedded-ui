@@ -4,10 +4,10 @@ import type {AcceptEvent, DeclineEvent, IgnoreEvent, PromptFile} from '@ydb-plat
 import type Monaco from 'monaco-editor';
 
 import {codeAssistApi} from '../../../../store/reducers/codeAssist/codeAssist';
-import {selectQueriesHistory} from '../../../../store/reducers/query/query';
+import type {QueryInHistory} from '../../../../store/reducers/query/types';
+import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import type {TelemetryOpenTabs} from '../../../../types/api/codeAssist';
-import {AUTOCOMPLETE_ON_ENTER, ENABLE_AUTOCOMPLETE} from '../../../../utils/constants';
-import {useSetting, useTypedSelector} from '../../../../utils/hooks';
+import {useSetting} from '../../../../utils/hooks';
 import {YQL_LANGUAGE_ID} from '../../../../utils/monaco/constats';
 import {useSavedQueries} from '../utils/useSavedQueries';
 
@@ -23,8 +23,8 @@ const EDITOR_OPTIONS: EditorOptions = {
 };
 
 export function useEditorOptions() {
-    const [enableAutocomplete] = useSetting(ENABLE_AUTOCOMPLETE);
-    const [autocompleteOnEnter] = useSetting(AUTOCOMPLETE_ON_ENTER);
+    const [enableAutocomplete] = useSetting(SETTING_KEYS.ENABLE_AUTOCOMPLETE);
+    const [autocompleteOnEnter] = useSetting(SETTING_KEYS.AUTOCOMPLETE_ON_ENTER);
 
     const options = React.useMemo<EditorOptions>(() => {
         const useAutocomplete = Boolean(enableAutocomplete);
@@ -39,14 +39,13 @@ export function useEditorOptions() {
     return options;
 }
 
-export function useCodeAssistHelpers() {
+export function useCodeAssistHelpers(historyQueries: QueryInHistory[]) {
     const [sendCodeAssistPrompt] = codeAssistApi.useLazyGetCodeAssistSuggestionsQuery();
     const [acceptSuggestion] = codeAssistApi.useAcceptSuggestionMutation();
     const [discardSuggestion] = codeAssistApi.useDiscardSuggestionMutation();
     const [ignoreSuggestion] = codeAssistApi.useIgnoreSuggestionMutation();
     const [sendUserQueriesData] = codeAssistApi.useSendUserQueriesDataMutation();
-    const historyQueries = useTypedSelector(selectQueriesHistory);
-    const savedQueries = useSavedQueries();
+    const {savedQueries} = useSavedQueries();
 
     const getCodeAssistSuggestions = React.useCallback(
         async (promptFiles: PromptFile[]) => sendCodeAssistPrompt(promptFiles).unwrap(),
@@ -74,7 +73,7 @@ export function useCodeAssistHelpers() {
                 name: `query${index}.yql`,
                 text: query.queryText,
             })),
-            ...savedQueries.map((query) => ({
+            ...(savedQueries ?? []).map((query) => ({
                 name: query.name,
                 text: query.body,
             })),

@@ -1,6 +1,7 @@
 import fs from 'fs';
 
 import {getTestStatus, readTestResults} from '../utils/results';
+
 import type {TestResults, TestResultsInfo, TestStatusInfo} from './types';
 
 jest.mock('fs');

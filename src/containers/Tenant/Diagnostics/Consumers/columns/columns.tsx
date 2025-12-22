@@ -4,11 +4,13 @@ import qs from 'qs';
 
 import {InternalLink} from '../../../../../components/InternalLink';
 import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
+import {EMPTY_DATA_PLACEHOLDER} from '../../../../../lib';
+import {getTenantPath} from '../../../../../routes';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../../../store/reducers/tenant/constants';
 import type {IPreparedConsumerData} from '../../../../../types/store/topic';
 import {cn} from '../../../../../utils/cn';
-import {formatMsToUptime} from '../../../../../utils/dataFormatters/dataFormatters';
-import {TenantTabsGroups, getTenantPath} from '../../../TenantPages';
+import {formatDurationMs} from '../../../../../utils/dataFormatters/dataFormatters';
+import {TenantTabsGroups} from '../../../TenantPages';
 import {ReadLagsHeader} from '../Headers';
 import {
     CONSUMERS_COLUMNS_IDS,
@@ -30,24 +32,10 @@ export const columns: Column<IPreparedConsumerData>[] = [
         align: DataTable.LEFT,
         render: ({row}) => {
             if (!row.name) {
-                return '–';
+                return EMPTY_DATA_PLACEHOLDER;
             }
 
-            const queryParams = qs.parse(location.search, {
-                ignoreQueryPrefix: true,
-            });
-
-            return (
-                <InternalLink
-                    to={getTenantPath({
-                        ...queryParams,
-                        [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.partitions,
-                        selectedConsumer: row.name,
-                    })}
-                >
-                    {row.name}
-                </InternalLink>
-            );
+            return <Consumer name={row.name} />;
         },
     },
     {
@@ -69,7 +57,7 @@ export const columns: Column<IPreparedConsumerData>[] = [
                     CONSUMERS_READ_LAGS_SUB_COLUMNS_IDS.WRITE_LAG
                 ],
                 align: DataTable.RIGHT,
-                render: ({row}) => formatMsToUptime(row.writeLag),
+                render: ({row}) => formatDurationMs(row.writeLag),
             },
             {
                 name: CONSUMERS_READ_LAGS_SUB_COLUMNS_IDS.READ_LAG,
@@ -77,7 +65,7 @@ export const columns: Column<IPreparedConsumerData>[] = [
                     CONSUMERS_READ_LAGS_SUB_COLUMNS_IDS.READ_LAG
                 ],
                 align: DataTable.RIGHT,
-                render: ({row}) => formatMsToUptime(row.readLag),
+                render: ({row}) => formatDurationMs(row.readLag),
             },
             {
                 name: CONSUMERS_READ_LAGS_SUB_COLUMNS_IDS.READ_IDLE_TIME,
@@ -85,8 +73,29 @@ export const columns: Column<IPreparedConsumerData>[] = [
                     CONSUMERS_READ_LAGS_SUB_COLUMNS_IDS.READ_IDLE_TIME
                 ],
                 align: DataTable.RIGHT,
-                render: ({row}) => formatMsToUptime(row.readIdleTime),
+                render: ({row}) => formatDurationMs(row.readIdleTime),
             },
         ],
     },
 ];
+
+interface ConsumerProps {
+    name: string;
+}
+
+function Consumer({name}: ConsumerProps) {
+    const queryParams = qs.parse(location.search, {
+        ignoreQueryPrefix: true,
+    });
+    return (
+        <InternalLink
+            to={getTenantPath({
+                ...queryParams,
+                [TenantTabsGroups.diagnosticsTab]: TENANT_DIAGNOSTICS_TABS_IDS.partitions,
+                selectedConsumer: name,
+            })}
+        >
+            {name}
+        </InternalLink>
+    );
+}

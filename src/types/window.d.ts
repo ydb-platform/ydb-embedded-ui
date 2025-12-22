@@ -41,7 +41,11 @@ interface Window {
 
     react_app_disable_checks?: boolean;
 
-    systemSettings?: import('../services/settings').SettingsObject;
+    systemSettings?: import('../store/reducers/settings/types').SettingsObject;
 
     api: import('../services/api/index').YdbEmbeddedAPI;
+
+    WINDOW_SHOW_TABLE_SETTINGS?: boolean;
+
+    [key: `yaCounter${number}`]: any;
 }

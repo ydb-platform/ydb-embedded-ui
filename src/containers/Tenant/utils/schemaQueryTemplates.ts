@@ -1,15 +1,27 @@
+import type {IQueryResult} from '../../../types/store/query';
+import {
+    getStringifiedData,
+    stripIndentByFirstLine,
+    trimOuterEmptyLines,
+} from '../../../utils/dataFormatters/dataFormatters';
 import type {SchemaData} from '../Schema/SchemaViewer/types';
 
 export interface SchemaQueryParams {
     path: string;
     relativePath: string;
     schemaData?: SchemaData[];
+    streamingQueryData?: IQueryResult;
+    showCreateTableData?: string;
 }
 
 export type TemplateFn = (params?: SchemaQueryParams) => string;
 
 function normalizeParameter(param: string) {
     return param.replace(/\$/g, '\\$');
+}
+
+function toLF(str: string) {
+    return str.replace(/\r\n?/g, '\n');
 }
 
 export const createTableTemplate = (params?: SchemaQueryParams) => {
@@ -131,6 +143,18 @@ ALTER TABLE ${path} SET
     AUTO_PARTITIONING_MAX_PARTITIONS_COUNT = 100 -- Partitions are split only if their number doesn't exceed the value specified by this parameter.
 )`;
 };
+
+export const manageReadReplicasTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_table>}';
+
+    return `ALTER TABLE ${path} SET 
+(
+   READ_REPLICAS_SETTINGS = 'PER_AZ:1' -- Enable read replicas for stale read, launch one replica in every availability zone. docs: https://clck.ru/3Qh8iQ
+)`;
+};
+
 export const selectQueryTemplate = (params?: SchemaQueryParams) => {
     const path = params?.relativePath
         ? `\`${normalizeParameter(params.relativePath)}\``
@@ -144,6 +168,17 @@ export const selectQueryTemplate = (params?: SchemaQueryParams) => {
 FROM ${path}
 ${filters}LIMIT \${5:10};`;
 };
+
+export const showCreateTableTemplate = (params?: SchemaQueryParams) => {
+    if (params?.showCreateTableData) {
+        return params.showCreateTableData;
+    }
+    const tablePath = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${2:<my_table>}';
+    return `SHOW CREATE TABLE ${tablePath};`;
+};
+
 export const upsertQueryTemplate = (params?: SchemaQueryParams) => {
     const path = params?.relativePath
         ? `\`${normalizeParameter(params.relativePath)}\``
@@ -298,11 +333,85 @@ ALTER TRANSFER ${path}
 SET USING \\$l;`;
 };
 
+export const createStreamingQueryTemplate = (params?: SchemaQueryParams) => {
+    const streamingQueryName = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}/my_streaming_query\``
+        : '${1:<my_streaming_query>}';
+    return `CREATE STREAMING QUERY ${streamingQueryName} WITH (
+    RUN = TRUE  -- Run the query after creation
+) AS
+DO BEGIN
+
+INSERT INTO \${2:<external data source>}.\${3:<sink topic>} 
+SELECT * FROM \${2:<external data source>}.\${4:<source topic>};
+
+END DO;`;
+};
+
+export const alterStreamingQuerySettingsTemplate = (params?: SchemaQueryParams) => {
+    const streamingQueryName = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_streaming_query>}';
+    return `ALTER STREAMING QUERY ${streamingQueryName} SET (
+    RUN = FALSE, -- Stop query execution
+    RESOURCE_POOL = "default" -- Workload manager pool for query
+);`;
+};
+
+export const alterStreamingQueryText = (params?: SchemaQueryParams) => {
+    const streamingQueryName = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_streaming_query>}';
+
+    const sysData = params?.streamingQueryData;
+    const rawQueryText = getStringifiedData(sysData?.resultSets?.[0]?.result?.[0]?.Text);
+    let queryText = toLF(rawQueryText);
+    queryText = trimOuterEmptyLines(queryText);
+    queryText = stripIndentByFirstLine(queryText);
+    queryText = normalizeParameter(queryText);
+
+    const bodyQueryText = queryText ? queryText : '${2:<streaming_query_text>}';
+    return `ALTER STREAMING QUERY ${streamingQueryName} SET (
+    FORCE = TRUE, -- Allow to drop last query checkpoint if query state can't be loaded
+) AS
+DO BEGIN
+
+${bodyQueryText}
+
+END DO;`;
+};
+
+export const dropStreamingQueryTemplate = (params?: SchemaQueryParams) => {
+    const streamingQueryName = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_streaming_query>}';
+    return `DROP STREAMING QUERY ${streamingQueryName};`;
+};
+
 export const addTableIndex = (params?: SchemaQueryParams) => {
     const path = params?.relativePath
         ? `\`${normalizeParameter(params.relativePath)}\``
         : '${1:<my_table>}';
     return `ALTER TABLE ${path} ADD INDEX \${2:index_name} GLOBAL ON (\${3:<column_name>});`;
+};
+
+export const addVectorIndex = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_table>}';
+
+    return `-- docs: https://ydb.tech/docs/en/dev/vector-indexes?version=main#types
+ALTER TABLE ${path}
+ADD INDEX \${2:my_vector_index}
+GLOBAL USING vector_kmeans_tree
+ON (\${3:embedding})
+WITH (
+    distance=cosine,
+    vector_type="uint8",
+    vector_dimension=\${4:512},
+    levels=\${5:2},
+    clusters=\${6:128}
+);`;
 };
 
 export const dropTableIndex = (params?: SchemaQueryParams) => {

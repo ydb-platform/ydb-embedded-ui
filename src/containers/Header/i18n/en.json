@@ -1,5 +1,7 @@
 {
-  "breadcrumbs.tenant": "Tenant",
+  "breadcrumbs.clusters": "All clusters",
+  "breadcrumbs.databases": "My Databases",
+  "breadcrumbs.tenant": "Database",
   "breadcrumbs.node": "Node",
   "breadcrumbs.pDisk": "PDisk",
   "breadcrumbs.vDisk": "VDisk",
@@ -7,5 +9,10 @@
   "breadcrumbs.tablets": "Tablets",
   "breadcrumbs.storageGroup": "Storage Group",
 
-  "connect": "Connect"
+  "connect": "Connect",
+  "add-cluster": "Add Cluster",
+
+  "action_edit-db": "Edit database",
+  "action_delete-db": "Delete database",
+  "action_manage": "Manage"
 }

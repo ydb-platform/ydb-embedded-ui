@@ -17,6 +17,14 @@ that cannot be merged.
 To make a contribution you should submit a pull request. There will probably be discussion about the pull request and,
 if any changes are needed, we would love to work with you to get your pull request merged.
 
+## Development Guidelines
+
+When making changes to coding conventions or project patterns:
+- Update `AGENTS.md` - This is the primary documentation for human developers
+- Update `.github/copilot-instructions.md` - This contains the same information formatted for GitHub Copilot
+
+Both files should be kept in sync to ensure consistent code generation and review by both humans and AI assistants.
+
 ## Other questions
 
 If you have any questions, please mail us at info@ydb.tech.
