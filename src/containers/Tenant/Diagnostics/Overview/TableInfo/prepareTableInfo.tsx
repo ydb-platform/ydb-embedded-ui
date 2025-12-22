@@ -103,15 +103,37 @@ const renderCurrentPartitionsContent = (progress: PartitionProgressConfig) => {
     );
 };
 
+const renderCompressionGroupsContent = (partitionConfig: TPartitionConfig) => {
+    const families = partitionConfig.ColumnFamilies;
+
+    if (!Array.isArray(families) || families.length === 0) {
+        return <span>{i18n('value_some-groups')}</span>;
+    }
+
+    return (
+        <Flex direction="column" gap={1}>
+            {families.map((family) => {
+                const name = family?.Name ? String(family.Name) : i18n('value_default');
+
+                return <span key={family.Id}>{name}</span>;
+            })}
+        </Flex>
+    );
+};
+
 const prepareTableGeneralInfo = (
     PartitionConfig: TPartitionConfig,
-    progress: PartitionProgressConfig,
+    Progress: PartitionProgressConfig,
     TTLSettings?: TTTLSettings,
 ) => {
     const {PartitioningPolicy = {}, FollowerGroups, EnableFilterByKey} = PartitionConfig;
 
     const left: YDBDefinitionListItem[] = [];
     const right: YDBDefinitionListItem[] = [];
+
+    // We know some facts about partitions:
+    // for splitting by load: if partitioningByLoad is enabled, we can split by load, default: 50%
+    // for splitting by size: it always will be splitted by 2 GB if user doesn't set anything else
 
     const partitioningByLoad = PartitioningPolicy.SplitByLoadSettings?.Enabled ? (
         <Label>{PartitioningPolicy.SplitByLoadSettings.CpuPercentageThreshold ?? '50%'}</Label>
@@ -122,7 +144,7 @@ const prepareTableGeneralInfo = (
     left.push(
         {
             name: i18n('field_current-partitions'),
-            content: renderCurrentPartitionsContent(progress),
+            content: renderCurrentPartitionsContent(Progress),
         },
         {
             name: i18n('field_partitioning-by-size'),
@@ -156,6 +178,10 @@ const prepareTableGeneralInfo = (
         {
             name: i18n('field_bloom-filter'),
             content: <StatusIcon value={Boolean(EnableFilterByKey)} />,
+        },
+        {
+            name: i18n('field_compression-groups'),
+            content: renderCompressionGroupsContent(PartitionConfig),
         },
     );
 
