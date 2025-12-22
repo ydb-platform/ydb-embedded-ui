@@ -1,4 +1,4 @@
-import {CircleQuestion} from '@gravity-ui/icons';
+import {CircleCheckFill, CircleQuestion, CircleXmarkFill} from '@gravity-ui/icons';
 import {Flex, Icon, Label, Popover, Text} from '@gravity-ui/uikit';
 import omit from 'lodash/omit';
 
@@ -24,8 +24,12 @@ import {formatBytes, formatNumber} from '../../../../../utils/dataFormatters/dat
 import {formatDurationToShortTimeFormat} from '../../../../../utils/timeParsers';
 import {isNumeric} from '../../../../../utils/utils';
 
-import {StatusIcon} from './StatusIcon/StatusIcon';
 import {b} from './TableInfo';
+import {
+    DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES,
+    DEFAULT_PARTITION_SPLIT_BY_LOAD_THRESHOLD_PERCENT,
+    READ_REPLICAS_MODE,
+} from './constants';
 import i18n from './i18n';
 
 const isInStoreColumnTable = (table: TColumnTableDescription) => {
@@ -103,6 +107,17 @@ const renderCurrentPartitionsContent = (progress: PartitionProgressConfig) => {
     );
 };
 
+const renderBLoomFilterStatusIcon = (value: boolean) => {
+    return (
+        <span
+            aria-label={value ? i18n('value_enabled') : i18n('value_disabled')}
+            className={b('status-icon', {state: value ? 'enabled' : 'disabled'})}
+        >
+            <Icon data={value ? CircleCheckFill : CircleXmarkFill} size={16} />
+        </span>
+    );
+};
+
 const renderCompressionGroupsContent = (partitionConfig: TPartitionConfig) => {
     const families = partitionConfig.ColumnFamilies;
 
@@ -112,10 +127,11 @@ const renderCompressionGroupsContent = (partitionConfig: TPartitionConfig) => {
 
     return (
         <Flex direction="column" gap={1}>
-            {families.map((family) => {
+            {families.map((family, index) => {
                 const name = family?.Name ? String(family.Name) : i18n('value_default');
+                const id = family.Id ?? `${name}-${index}`;
 
-                return <span key={family.Id}>{name}</span>;
+                return <span key={id}>{name}</span>;
             })}
         </Flex>
     );
@@ -135,11 +151,17 @@ const prepareTableGeneralInfo = (
     // for splitting by load: if partitioningByLoad is enabled, we can split by load, default: 50%
     // for splitting by size: it always will be splitted by 2 GB if user doesn't set anything else
 
+    const cpuThreshold =
+        PartitioningPolicy.SplitByLoadSettings?.CpuPercentageThreshold ??
+        DEFAULT_PARTITION_SPLIT_BY_LOAD_THRESHOLD_PERCENT;
+
     const partitioningByLoad = PartitioningPolicy.SplitByLoadSettings?.Enabled ? (
-        <Label>{PartitioningPolicy.SplitByLoadSettings.CpuPercentageThreshold ?? '50%'}</Label>
+        <Label>{`${cpuThreshold}%`}</Label>
     ) : (
         <Label theme="unknown">{i18n('value_disabled')}</Label>
     );
+
+    const splitSizeBytes = PartitioningPolicy.SizeToSplit ?? DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES;
 
     left.push(
         {
@@ -148,7 +170,7 @@ const prepareTableGeneralInfo = (
         },
         {
             name: i18n('field_partitioning-by-size'),
-            content: <Label>{formatBytes(PartitioningPolicy.SizeToSplit) || '2 GB'}</Label>,
+            content: <Label>{formatBytes(splitSizeBytes)}</Label>,
         },
         {name: i18n('field_partitioning-by-load'), content: partitioningByLoad},
     );
@@ -167,8 +189,8 @@ const prepareTableGeneralInfo = (
 
         readReplicasConfig =
             RequireAllDataCenters && FollowerCountPerDataCenter
-                ? `PER_AZ: ${FollowerCount}`
-                : `ANY_AZ: ${FollowerCount}`;
+                ? `${READ_REPLICAS_MODE.PER_AZ}: ${FollowerCount}`
+                : `${READ_REPLICAS_MODE.ANY_AZ}: ${FollowerCount}`;
     } else {
         readReplicasConfig = i18n('value_no');
     }
@@ -177,7 +199,7 @@ const prepareTableGeneralInfo = (
         {name: i18n('field_read-replicas'), content: readReplicasConfig},
         {
             name: i18n('field_bloom-filter'),
-            content: <StatusIcon value={Boolean(EnableFilterByKey)} />,
+            content: renderBLoomFilterStatusIcon(Boolean(EnableFilterByKey)),
         },
         {
             name: i18n('field_compression-groups'),

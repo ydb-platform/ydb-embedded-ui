@@ -50,4 +50,17 @@
         font-size: var(--g-text-body-1-font-size);
         line-height: var(--g-text-body-1-line-height);
     }
+
+    &__status-icon {
+        display: inline-flex;
+        align-items: center;
+
+        &_state_enabled {
+            color: var(--g-color-base-positive-heavy);
+        }
+
+        &_state_disabled {
+            color: var(--g-color-base-neutral-medium);
+        }
+    }
 }

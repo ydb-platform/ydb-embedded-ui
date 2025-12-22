@@ -10,10 +10,6 @@ type ContentFormatters<T> = {
     [key in keyof T]?: (value: T[key]) => React.ReactNode;
 };
 
-type CopyTextFormatters<T> = {
-    [key in keyof T]?: (value: T[key]) => string | undefined;
-};
-
 function formatName<Shape>(key: keyof Shape, map: NameMap<Shape>) {
     return map[key] ?? String(key);
 }
@@ -32,7 +28,6 @@ function formatContent<Shape, Key extends keyof Shape>(
 interface CreateDefinitionFormatterOptions<Shape> {
     contents?: ContentFormatters<Shape>;
     names?: NameMap<Shape>;
-    copyTexts?: CopyTextFormatters<Shape>;
     defaultContentFormatter?: (value: Shape[keyof Shape]) => React.ReactNode;
 }
 
