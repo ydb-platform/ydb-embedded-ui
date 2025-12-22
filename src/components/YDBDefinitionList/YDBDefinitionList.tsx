@@ -24,16 +24,18 @@ export interface YDBDefinitionListHeaderLabel {
     theme?: LabelProps['theme'];
 }
 
-interface YDBDefinitionListProps extends Omit<DefinitionListProps, 'children'> {
+interface YDBDefinitionListProps extends Omit<DefinitionListProps, 'children' | 'nameMaxWidth'> {
     title?: React.ReactNode;
     titleSuffix?: React.ReactNode;
     titleSeparator?: React.ReactNode;
+    titleClassname?: string;
     items: YDBDefinitionListItem[];
     headerLabels?: YDBDefinitionListHeaderLabel[];
     iconSize?: number;
     labelSize?: LabelProps['size'];
     footer?: React.ReactNode;
     compact?: boolean;
+    nameMaxWidth?: DefinitionListProps['nameMaxWidth'] | 'auto';
 }
 
 /** DefinitionList with predefined styles and layout */
@@ -49,6 +51,7 @@ export function YDBDefinitionList({
     compact,
     nameMaxWidth = 220,
     className,
+    titleClassname,
     ...restProps
 }: YDBDefinitionListProps) {
     const hasHeader = Boolean(title || titleSuffix || (headerLabels && headerLabels.length));
@@ -67,7 +70,7 @@ export function YDBDefinitionList({
             >
                 {title && (
                     <Flex gap="1" alignItems="center">
-                        <div className={b('title')}>{title}</div>
+                        <div className={b('title', titleClassname)}>{title}</div>
                         {titleSuffix && (
                             <React.Fragment>
                                 <div className={b('title-suffix')}>{titleSeparator}</div>
@@ -100,11 +103,13 @@ export function YDBDefinitionList({
 
     const renderContent = () => {
         if (items.length) {
+            const definitionListProps =
+                nameMaxWidth === 'auto' ? restProps : {...restProps, nameMaxWidth};
+
             return (
                 <DefinitionList
-                    nameMaxWidth={nameMaxWidth}
                     className={b('properties-list', className)}
-                    {...restProps}
+                    {...definitionListProps}
                 >
                     {items.map((item) => (
                         <DefinitionList.Item key={item.name} children={item.content} {...item} />

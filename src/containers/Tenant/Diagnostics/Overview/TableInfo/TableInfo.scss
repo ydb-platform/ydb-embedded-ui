@@ -18,24 +18,36 @@
         flex-wrap: wrap;
         justify-content: flex-start;
         align-items: flex-start;
+        gap: var(--g-spacing-9);
+
+        &:not(:last-child) {
+            margin-bottom: var(--g-spacing-1);
+        }
     }
 
     &__col {
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
-        align-items: flex-start;
+        align-items: stretch;
 
-        &:not(:last-child) {
-            margin-right: 50px;
-        }
+        width: 310px;
     }
 
     &__info-block {
-        margin-bottom: 20px;
+        --g-definition-list-item-gap: var(--g-spacing-3);
+        margin-bottom: var(--g-spacing-4);
+    }
 
-        .info-viewer__items {
-            grid-template-columns: minmax(max-content, 280px);
-        }
+    &__info-title {
+        margin: 0 0 var(--g-spacing-4);
+    }
+
+    &__partitions-popover {
+        max-width: 360px;
+        padding: var(--g-spacing-2);
+
+        font-size: var(--g-text-body-1-font-size);
+        line-height: var(--g-text-body-1-line-height);
     }
 }
