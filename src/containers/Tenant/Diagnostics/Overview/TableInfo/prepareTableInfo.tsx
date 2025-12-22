@@ -107,7 +107,7 @@ const renderCurrentPartitionsContent = (progress: PartitionProgressConfig) => {
     );
 };
 
-const renderBLoomFilterStatusIcon = (value: boolean) => {
+const renderBloomFilterStatusIcon = (value: boolean) => {
     return (
         <span
             aria-label={value ? i18n('value_enabled') : i18n('value_disabled')}
@@ -199,7 +199,7 @@ const prepareTableGeneralInfo = (
         {name: i18n('field_read-replicas'), content: readReplicasConfig},
         {
             name: i18n('field_bloom-filter'),
-            content: renderBLoomFilterStatusIcon(Boolean(EnableFilterByKey)),
+            content: renderBloomFilterStatusIcon(Boolean(EnableFilterByKey)),
         },
         {
             name: i18n('field_compression-groups'),
