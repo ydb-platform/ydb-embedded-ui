@@ -36,7 +36,7 @@ export const TableInfo = ({data, type}: TableInfoProps) => {
 
     const handleExpandedChange = React.useCallback((value: boolean) => setExpanded(value), []);
 
-    const hasMoreLeft = tableStatsInfo.length > 0;
+    const hasMoreLeft = tableStatsInfo.some((items) => items.length > 0);
     const hasMoreRight = tabletMetricsInfo.length > 0 || partitionConfigInfo.length > 0;
     const hasMore = hasMoreLeft || hasMoreRight;
 
