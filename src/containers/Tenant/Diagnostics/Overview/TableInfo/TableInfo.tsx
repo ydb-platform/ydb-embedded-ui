@@ -127,7 +127,7 @@ export const TableInfo = ({data, type}: TableInfoProps) => {
                                     .filter((items) => items.length > 0)
                                     .map((items, index) => (
                                         <YDBDefinitionList
-                                            key={`table-stats-more-${index}`}
+                                            key={index}
                                             items={items}
                                             className={b('info-block')}
                                             nameMaxWidth="auto"
