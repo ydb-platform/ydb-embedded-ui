@@ -1,5 +1,15 @@
 # Changelog
 
+## [14.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.0.1...v14.1.0) (2025-12-23)
+
+
+### Features
+
+* add partitioning settings UI ([#3263](https://github.com/ydb-platform/ydb-embedded-ui/issues/3263)) ([059ef4d](https://github.com/ydb-platform/ydb-embedded-ui/commit/059ef4d71c89ec38997bd131840694d209eab604))
+* add show more expandable section ([#3265](https://github.com/ydb-platform/ydb-embedded-ui/issues/3265)) ([1322ef0](https://github.com/ydb-platform/ydb-embedded-ui/commit/1322ef020a66ea9fdf1d3f2b413dc18f9546dabf))
+* improve Go snippets in connect to DB dialog ([#2268](https://github.com/ydb-platform/ydb-embedded-ui/issues/2268)) ([2857ffb](https://github.com/ydb-platform/ydb-embedded-ui/commit/2857ffb356af03510a6a7b3037981b8b1fab23d0))
+* use relative path based on cluster settings ([#3266](https://github.com/ydb-platform/ydb-embedded-ui/issues/3266)) ([3e610e6](https://github.com/ydb-platform/ydb-embedded-ui/commit/3e610e6cf3d641919cc0786afb28e79f2581c261))
+
 ## [14.0.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.0.0...v14.0.1) (2025-12-20)
 
 
