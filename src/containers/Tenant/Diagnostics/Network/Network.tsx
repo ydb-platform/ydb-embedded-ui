@@ -6,6 +6,7 @@ import {Link} from 'react-router-dom';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ProblemFilter} from '../../../../components/ProblemFilter/ProblemFilter';
 import {getDefaultNodePath} from '../../../../routes';
+import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {networkApi} from '../../../../store/reducers/network/network';
 import type {TNetNodeInfo} from '../../../../types/api/netInfo';
 import {cn} from '../../../../utils/cn';
@@ -28,6 +29,7 @@ interface NetworkProps {
 }
 
 export function Network({database, databaseFullPath}: NetworkProps) {
+    const useMetaProxy = useClusterWithProxy();
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {withProblems, handleWithProblemsChange} = useWithProblemsQueryParam();
 
@@ -49,7 +51,7 @@ export function Network({database, databaseFullPath}: NetworkProps) {
     });
 
     const {currentData, isFetching, error} = networkApi.useGetNetworkInfoQuery(
-        {database, databaseFullPath},
+        {database, databaseFullPath, useMetaProxy},
         {
             pollingInterval: autoRefreshInterval,
         },

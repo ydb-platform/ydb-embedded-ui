@@ -17,14 +17,16 @@ export const topicApi = api.injectEndpoints({
                 path,
                 database,
                 databaseFullPath,
+                useMetaProxy,
             }: {
                 path: string;
                 database: string;
                 databaseFullPath: string;
+                useMetaProxy?: boolean;
             }) => {
                 try {
                     const data = await window.api.viewer.getTopic({
-                        path: {path, databaseFullPath},
+                        path: {path, databaseFullPath, useMetaProxy},
                         database,
                     });
                     // On older version it can return HTML page of Developer UI with an error
@@ -60,20 +62,32 @@ const createGetTopicSelector = createSelector(
     (path: string) => path,
     (_path: string, database: string) => database,
     (_path: string, _database: string, databaseFullPath: string) => databaseFullPath,
-    (path, database, databaseFullPath) =>
-        topicApi.endpoints.getTopic.select({path, database, databaseFullPath}),
+    (_path: string, _database: string, _databaseFullPath: string, useMetaProxy?: boolean) =>
+        useMetaProxy,
+    (path, database, databaseFullPath, useMetaProxy) =>
+        topicApi.endpoints.getTopic.select({path, database, databaseFullPath, useMetaProxy}),
 );
 
 const selectTopicStats = createSelector(
     (state: RootState) => state,
-    (_state: RootState, path: string, database: string, databaseFullPath: string) =>
-        createGetTopicSelector(path, database, databaseFullPath),
+    (
+        _state: RootState,
+        path: string,
+        database: string,
+        databaseFullPath: string,
+        useMetaProxy?: boolean,
+    ) => createGetTopicSelector(path, database, databaseFullPath, useMetaProxy),
     (state, selectGetTopic) => selectGetTopic(state).data?.topic_stats,
 );
 const selectConsumers = createSelector(
     (state: RootState) => state,
-    (_state: RootState, path: string, database: string, databaseFullPath: string) =>
-        createGetTopicSelector(path, database, databaseFullPath),
+    (
+        _state: RootState,
+        path: string,
+        database: string,
+        databaseFullPath: string,
+        useMetaProxy?: boolean,
+    ) => createGetTopicSelector(path, database, databaseFullPath, useMetaProxy),
     (state, selectGetTopic) => selectGetTopic(state).data?.consumers,
 );
 

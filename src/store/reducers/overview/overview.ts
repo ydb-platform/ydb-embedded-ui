@@ -9,13 +9,20 @@ export const overviewApi = api.injectEndpoints({
                     database,
                     timeout,
                     databaseFullPath,
-                }: {path: string; database: string; timeout?: number; databaseFullPath: string},
+                    useMetaProxy,
+                }: {
+                    path: string;
+                    database: string;
+                    timeout?: number;
+                    databaseFullPath: string;
+                    useMetaProxy?: boolean;
+                },
                 {signal},
             ) => {
                 try {
                     const data = await window.api.viewer.getDescribe(
                         {
-                            path: {path, databaseFullPath},
+                            path: {path, databaseFullPath, useMetaProxy},
                             database,
                             timeout,
                         },

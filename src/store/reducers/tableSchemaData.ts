@@ -17,6 +17,7 @@ interface GetTableSchemaDataParams {
     database: string;
     databaseFullPath: string;
     type: EPathType;
+    useMetaProxy?: boolean;
 }
 
 const TABLE_SCHEMA_TIMEOUT = SECOND_IN_MS * 5;
@@ -24,7 +25,7 @@ const TABLE_SCHEMA_TIMEOUT = SECOND_IN_MS * 5;
 export const tableSchemaDataApi = api.injectEndpoints({
     endpoints: (build) => ({
         getTableSchemaData: build.query<SchemaData[], GetTableSchemaDataParams>({
-            queryFn: async ({path, database, type, databaseFullPath}, {dispatch}) => {
+            queryFn: async ({path, database, type, databaseFullPath, useMetaProxy}, {dispatch}) => {
                 try {
                     if (isViewType(type)) {
                         const response = await dispatch(
@@ -50,6 +51,7 @@ export const tableSchemaDataApi = api.injectEndpoints({
                             database,
                             timeout: TABLE_SCHEMA_TIMEOUT,
                             databaseFullPath,
+                            useMetaProxy,
                         }),
                     );
                     const result = prepareSchemaData(type, schemaData.data);

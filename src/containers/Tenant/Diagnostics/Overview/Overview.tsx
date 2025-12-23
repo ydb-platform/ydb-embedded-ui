@@ -3,6 +3,7 @@ import React from 'react';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {TableIndexInfo} from '../../../../components/InfoViewer/schemaInfo';
 import {Loader} from '../../../../components/Loader';
+import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {EPathType} from '../../../../types/api/schema';
 import {useAutoRefreshInterval} from '../../../../utils/hooks';
@@ -27,9 +28,10 @@ interface OverviewProps {
 
 function Overview({type, path, database, databaseFullPath}: OverviewProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
+    const useMetaProxy = useClusterWithProxy();
 
     const {currentData, isFetching, error} = overviewApi.useGetOverviewQuery(
-        {path, database, databaseFullPath},
+        {path, database, databaseFullPath, useMetaProxy},
         //overview is not supported for streaming query, data request is inside StreamingQueryInfo
         {pollingInterval: autoRefreshInterval, skip: type === EPathType.EPathTypeStreamingQuery},
     );

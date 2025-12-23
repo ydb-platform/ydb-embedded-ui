@@ -5,6 +5,7 @@ import {Helmet} from 'react-helmet-async';
 import {PageError} from '../../components/Errors/PageError/PageError';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import SplitPane from '../../components/SplitPane';
+import {useClusterWithProxy} from '../../store/reducers/cluster/cluster';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {overviewApi} from '../../store/reducers/overview/overview';
 import {selectSchemaObjectData} from '../../store/reducers/schema/schema';
@@ -43,6 +44,7 @@ export function Tenant({additionalTenantProps}: TenantProps) {
         DEFAULT_IS_TENANT_SUMMARY_COLLAPSED,
         false,
     );
+    const useMetaProxy = useClusterWithProxy();
     const [summaryVisibilityState, dispatchSummaryVisibilityAction] = React.useReducer(
         paneVisibilityToggleReducer,
         undefined,
@@ -83,7 +85,12 @@ export function Tenant({additionalTenantProps}: TenantProps) {
         currentData: currentItem,
         error,
         isLoading,
-    } = overviewApi.useGetOverviewQuery({path, database, databaseFullPath: databaseName});
+    } = overviewApi.useGetOverviewQuery({
+        path,
+        database,
+        databaseFullPath: databaseName,
+        useMetaProxy,
+    });
 
     const dispatch = useTypedDispatch();
     React.useEffect(() => {
@@ -91,7 +98,7 @@ export function Tenant({additionalTenantProps}: TenantProps) {
     }, [databaseName, database, dispatch]);
 
     const preloadedData = useTypedSelector((state) =>
-        selectSchemaObjectData(state, path, database, databaseName),
+        selectSchemaObjectData(state, path, database, databaseName, useMetaProxy),
     );
 
     // Use preloaded data if there is no current item data yet

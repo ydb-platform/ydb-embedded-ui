@@ -3,6 +3,7 @@ import {Flex, Label, Text} from '@gravity-ui/uikit';
 import {YDBSyntaxHighlighter} from '../../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
 import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
+import {useClusterWithProxy} from '../../../../../store/reducers/cluster/cluster';
 import {replicationApi} from '../../../../../store/reducers/replication';
 import type {DescribeReplicationResult} from '../../../../../types/api/replication';
 import type {TEvDescribeSchemeResult} from '../../../../../types/api/schema';
@@ -21,6 +22,7 @@ interface TransferProps {
 /** Displays overview for Transfer EPathType */
 export function TransferInfo({path, database, data, databaseFullPath}: TransferProps) {
     const entityName = getEntityName(data?.PathDescription);
+    const useMetaProxy = useClusterWithProxy();
 
     if (!data) {
         return (
@@ -31,7 +33,7 @@ export function TransferInfo({path, database, data, databaseFullPath}: TransferP
     }
 
     const {data: replicationData} = replicationApi.useGetReplicationQuery(
-        {path, database, databaseFullPath},
+        {path, database, databaseFullPath, useMetaProxy},
         {},
     );
     const transferItems = prepareTransferItems(data, replicationData);

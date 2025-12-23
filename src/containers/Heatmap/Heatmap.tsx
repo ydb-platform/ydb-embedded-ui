@@ -5,6 +5,7 @@ import {Checkbox, Popup, Select} from '@gravity-ui/uikit';
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {Loader} from '../../components/Loader';
 import {TabletTooltipContent} from '../../components/TooltipsContent';
+import {useClusterWithProxy} from '../../store/reducers/cluster/cluster';
 import {heatmapApi, setHeatmapOptions} from '../../store/reducers/heatmap';
 import type {IHeatmapMetricValue, IHeatmapTabletData} from '../../types/store/heatmap';
 import {cn} from '../../utils/cn';
@@ -29,6 +30,7 @@ interface HeatmapProps {
 
 export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
     const dispatch = useTypedDispatch();
+    const useMetaProxy = useClusterWithProxy();
 
     const itemsContainer = React.useRef<HTMLDivElement | null>(null);
 
@@ -43,7 +45,7 @@ export const Heatmap = ({path, database, databaseFullPath}: HeatmapProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {currentData, isFetching, error} = heatmapApi.useGetHeatmapTabletsInfoQuery(
-        {path, database, databaseFullPath},
+        {path, database, databaseFullPath, useMetaProxy},
         {pollingInterval: autoRefreshInterval},
     );
 

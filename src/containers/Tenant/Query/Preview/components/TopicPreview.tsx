@@ -4,6 +4,7 @@ import {Flex, Text} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {isNil} from 'lodash';
 
+import {useClusterWithProxy} from '../../../../../store/reducers/cluster/cluster';
 import {partitionsApi} from '../../../../../store/reducers/partitions/partitions';
 import {topicApi} from '../../../../../store/reducers/topic';
 import type {TopicDataRequest} from '../../../../../types/api/topic';
@@ -18,11 +19,12 @@ import {TopicPreviewTable} from './TopicPreviewTable';
 const TOPIC_PREVIEW_LIMIT = 100;
 
 export function TopicPreview({database, path, databaseFullPath}: PreviewContainerProps) {
+    const useMetaProxy = useClusterWithProxy();
     const {
         data: partitions,
         isLoading: partitionsLoading,
         error: partitionsError,
-    } = partitionsApi.useGetPartitionsQuery({path, database, databaseFullPath});
+    } = partitionsApi.useGetPartitionsQuery({path, database, databaseFullPath, useMetaProxy});
 
     const firstPartition = React.useMemo(() => {
         return partitions?.[0];

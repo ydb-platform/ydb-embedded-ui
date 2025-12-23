@@ -6,4 +6,4 @@ export interface IProtobufTimeObject {
 
 export type BackendSortParam<T extends string> = `-${T}` | `+${T}` | T;
 
-export type SchemaPathParam = {path: string; databaseFullPath: string};
+export type SchemaPathParam = {path: string; databaseFullPath: string; useMetaProxy?: boolean};

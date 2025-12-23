@@ -113,6 +113,7 @@ export type RenderMonitoring = (props: {
     database: string;
     path: string;
     databaseFullPath?: string;
+    useMetaProxy?: boolean;
     additionalTenantProps?: AdditionalTenantsProps;
     scrollContainerRef: React.RefObject<HTMLDivElement>;
 }) => React.ReactNode;

@@ -10,7 +10,7 @@ import {
     useCreateDirectoryFeatureAvailable,
     useTopicDataAvailable,
 } from '../../../../store/reducers/capabilities/hooks';
-import {useClusterBaseInfo} from '../../../../store/reducers/cluster/cluster';
+import {useClusterBaseInfo, useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {selectIsDirty, selectUserInput} from '../../../../store/reducers/query/query';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
 import {showCreateTableApi} from '../../../../store/reducers/showCreateTable/showCreateTable';
@@ -51,6 +51,7 @@ export function SchemaTree(props: SchemaTreeProps) {
     const createDirectoryFeatureAvailable = useCreateDirectoryFeatureAvailable();
     const {rootName, rootType, currentPath, onActivePathUpdate, databaseFullPath, database} = props;
     const dispatch = useTypedDispatch();
+    const useMetaProxy = useClusterWithProxy();
     const input = useTypedSelector(selectUserInput);
     const isDirty = useTypedSelector(selectIsDirty);
     const [
@@ -86,7 +87,7 @@ export function SchemaTree(props: SchemaTreeProps) {
             do {
                 const promise = dispatch(
                     schemaApi.endpoints.getSchema.initiate(
-                        {path, database, databaseFullPath},
+                        {path, database, databaseFullPath, useMetaProxy},
                         {forceRefetch: true},
                     ),
                 );
@@ -127,7 +128,7 @@ export function SchemaTree(props: SchemaTreeProps) {
 
             return childItems;
         },
-        [dispatch, database, databaseFullPath],
+        [dispatch, database, databaseFullPath, useMetaProxy],
     );
     React.useEffect(() => {
         // if the cached path is not in the current tree, show root
@@ -218,7 +219,13 @@ export function SchemaTree(props: SchemaTreeProps) {
                 onActionsOpenToggle={({path, type, isOpen}) => {
                     const pathType = nodeTableTypeToPathType[type];
                     if (isOpen && pathType) {
-                        getTableSchemaDataQuery({path, database, type: pathType, databaseFullPath});
+                        getTableSchemaDataQuery({
+                            path,
+                            database,
+                            type: pathType,
+                            databaseFullPath,
+                            useMetaProxy,
+                        });
                     }
                     const tableType = tableTypeToPathType[type];
 

@@ -4,7 +4,7 @@ import {Button, Flex, HelpMark, Icon, Label} from '@gravity-ui/uikit';
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueriesActivityBar} from '../../../../components/QueriesActivityBar/QueriesActivityBar';
-import {useClusterBaseInfo} from '../../../../store/reducers/cluster/cluster';
+import {useClusterBaseInfo, useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {
     TENANT_DIAGNOSTICS_TABS_IDS,
@@ -48,6 +48,7 @@ export function TenantOverview({
     const {metricsTab} = useTypedSelector((state) => state.tenant);
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const clusterName = useClusterNameFromQuery();
+    const useMetaProxy = useClusterWithProxy();
     const dispatch = useTypedDispatch();
 
     const {handleTenantPageChange} = useTenantPage();
@@ -75,6 +76,7 @@ export function TenantOverview({
             path: databaseFullPath,
             database,
             databaseFullPath,
+            useMetaProxy,
         },
         {
             pollingInterval: autoRefreshInterval,

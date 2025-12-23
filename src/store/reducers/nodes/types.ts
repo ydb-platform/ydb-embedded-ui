@@ -9,6 +9,7 @@ export interface NodesFilters {
 
     path?: string;
     databaseFullPath?: string;
+    useMetaProxy?: boolean;
     database?: string;
     nodeId?: string;
 
