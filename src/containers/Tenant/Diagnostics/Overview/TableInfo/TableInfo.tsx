@@ -34,6 +34,8 @@ export const TableInfo = ({data, type}: TableInfoProps) => {
 
     const [expanded, setExpanded] = React.useState(false);
 
+    const handleExpandedChange = React.useCallback((value: boolean) => setExpanded(value), []);
+
     const hasMoreLeft = tableStatsInfo.length > 0;
     const hasMoreRight = tabletMetricsInfo.length > 0 || partitionConfigInfo.length > 0;
     const hasMore = hasMoreLeft || hasMoreRight;
@@ -107,7 +109,7 @@ export const TableInfo = ({data, type}: TableInfoProps) => {
                 <Disclosure
                     className={b('show-more-disclosure')}
                     expanded={expanded}
-                    onUpdate={setExpanded}
+                    onUpdate={handleExpandedChange}
                 >
                     <Disclosure.Summary>
                         {(props) => (
