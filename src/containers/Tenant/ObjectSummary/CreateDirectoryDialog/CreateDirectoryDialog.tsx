@@ -3,6 +3,7 @@ import React from 'react';
 import {Dialog, TextInput} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
+import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
 import {cn} from '../../../../utils/cn';
 import i18n from '../../i18n';
@@ -41,6 +42,7 @@ export function CreateDirectoryDialog({
     parentPath,
     onSuccess,
 }: CreateDirectoryDialogProps) {
+    const useMetaProxy = useClusterWithProxy();
     const [validationError, setValidationError] = React.useState('');
     const [relativePath, setRelativePath] = React.useState('');
     const [create, response] = schemaApi.useCreateDirectoryMutation();
@@ -69,6 +71,7 @@ export function CreateDirectoryDialog({
             database,
             databaseFullPath,
             path,
+            useMetaProxy,
         })
             .unwrap()
             .then(() => {

@@ -6,6 +6,7 @@ import {Button, Flex, Icon} from '@gravity-ui/uikit';
 import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {useEditAccessAvailable} from '../../../../store/reducers/capabilities/hooks';
+import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {schemaAclApi} from '../../../../store/reducers/schemaAcl/schemaAcl';
 import {useAclSyntax, useAutoRefreshInterval} from '../../../../utils/hooks';
 import {useCurrentSchema} from '../../TenantContext';
@@ -20,11 +21,12 @@ import './AccessRights.scss';
 
 export function AccessRights() {
     const {path, database, databaseFullPath} = useCurrentSchema();
+    const useMetaProxy = useClusterWithProxy();
     const editable = useEditAccessAvailable();
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const dialect = useAclSyntax();
     const {isFetching, currentData, error} = schemaAclApi.useGetSchemaAclQuery(
-        {path, database, dialect, databaseFullPath},
+        {path, database, dialect, databaseFullPath, useMetaProxy},
         {
             pollingInterval: autoRefreshInterval,
         },

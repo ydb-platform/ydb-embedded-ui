@@ -4,6 +4,7 @@ import NiceModal from '@ebay/nice-modal-react';
 import {Dialog, Flex, Text} from '@gravity-ui/uikit';
 
 import {SubjectWithAvatar} from '../../../../../../components/SubjectWithAvatar/SubjectWithAvatar';
+import {useClusterWithProxy} from '../../../../../../store/reducers/cluster/cluster';
 import {
     schemaAclApi,
     selectSubjectExplicitRights,
@@ -77,9 +78,18 @@ function RevokeAllRightsDialog({
     databaseFullPath,
     subject,
 }: RevokeAllRightsDialogProps) {
+    const useMetaProxy = useClusterWithProxy();
     const dialect = useAclSyntax();
     const subjectExplicitRights = useTypedSelector((state) =>
-        selectSubjectExplicitRights(state, subject, path, database, databaseFullPath, dialect),
+        selectSubjectExplicitRights(
+            state,
+            subject,
+            path,
+            database,
+            databaseFullPath,
+            dialect,
+            useMetaProxy,
+        ),
     );
 
     const [requestErrorMessage, setRequestErrorMessage] = React.useState('');

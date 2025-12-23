@@ -2,6 +2,7 @@ import {CircleXmark, Pencil} from '@gravity-ui/icons';
 import {ActionTooltip, Button, Flex, Icon} from '@gravity-ui/uikit';
 
 import {useEditAccessAvailable} from '../../../../../../store/reducers/capabilities/hooks';
+import {useClusterWithProxy} from '../../../../../../store/reducers/cluster/cluster';
 import {selectSubjectExplicitRights} from '../../../../../../store/reducers/schemaAcl/schemaAcl';
 import {useAclSyntax, useTypedSelector} from '../../../../../../utils/hooks';
 import {useCurrentSchema} from '../../../../TenantContext';
@@ -50,9 +51,18 @@ function GrantRightsToSubject({subject}: ActionProps) {
 
 function RevokeAllRights({subject}: ActionProps) {
     const {path, database, databaseFullPath} = useCurrentSchema();
+    const useMetaProxy = useClusterWithProxy();
     const dialect = useAclSyntax();
     const subjectExplicitRights = useTypedSelector((state) =>
-        selectSubjectExplicitRights(state, subject, path, database, databaseFullPath, dialect),
+        selectSubjectExplicitRights(
+            state,
+            subject,
+            path,
+            database,
+            databaseFullPath,
+            dialect,
+            useMetaProxy,
+        ),
     );
     const noRightsToRevoke = subjectExplicitRights.length === 0;
 

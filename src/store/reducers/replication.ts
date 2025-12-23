@@ -7,14 +7,16 @@ export const replicationApi = api.injectEndpoints({
                 path,
                 database,
                 databaseFullPath,
+                useMetaProxy,
             }: {
                 path: string;
                 database: string;
                 databaseFullPath: string;
+                useMetaProxy?: boolean;
             }) => {
                 try {
                     const data = await window.api.viewer.getReplication({
-                        path: {path, databaseFullPath},
+                        path: {path, databaseFullPath, useMetaProxy},
                         database,
                     });
                     // On older version it can return HTML page of Developer UI with an error

@@ -5,6 +5,7 @@ import type {PaginatedTableData} from '../../components/PaginatedTable';
 import {PAGINATED_TABLE_IDS, ResizeablePaginatedTable} from '../../components/PaginatedTable';
 import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../components/nodesColumns/constants';
 import type {NodesColumn} from '../../components/nodesColumns/types';
+import {useClusterWithProxy} from '../../store/reducers/cluster/cluster';
 import type {NodesFilters} from '../../store/reducers/nodes/types';
 import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import type {NodesGroupByField, NodesPeerRole} from '../../types/api/nodes';
@@ -51,10 +52,12 @@ export function NodesTable({
     initialEntitiesCount,
     onDataFetched,
 }: NodesTableProps) {
+    const useMetaProxy = useClusterWithProxy();
     const tableFilters: NodesFilters = React.useMemo(() => {
         return {
             path,
             databaseFullPath,
+            useMetaProxy,
             database,
             searchValue,
             withProblems,
@@ -66,6 +69,7 @@ export function NodesTable({
     }, [
         path,
         databaseFullPath,
+        useMetaProxy,
         database,
         searchValue,
         withProblems,

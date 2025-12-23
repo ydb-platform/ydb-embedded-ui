@@ -4,12 +4,16 @@ export const networkApi = api.injectEndpoints({
     endpoints: (build) => ({
         getNetworkInfo: build.query({
             queryFn: async (
-                {database, databaseFullPath}: {database: string; databaseFullPath: string},
+                {
+                    database,
+                    databaseFullPath,
+                    useMetaProxy,
+                }: {database: string; databaseFullPath: string; useMetaProxy?: boolean},
                 {signal},
             ) => {
                 try {
                     const data = await window.api.viewer.getNetwork(
-                        {path: {path: databaseFullPath, databaseFullPath}, database},
+                        {path: {path: databaseFullPath, databaseFullPath, useMetaProxy}, database},
                         {signal},
                     );
                     return {data};

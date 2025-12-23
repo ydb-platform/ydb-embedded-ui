@@ -13,17 +13,19 @@ export const schemaAclApi = api.injectEndpoints({
                     database,
                     dialect,
                     databaseFullPath,
+                    useMetaProxy,
                 }: {
                     path: string;
                     database: string;
                     dialect: string;
                     databaseFullPath: string;
+                    useMetaProxy?: boolean;
                 },
                 {signal},
             ) => {
                 try {
                     const data = await window.api.viewer.getSchemaAcl(
-                        {path: {path, databaseFullPath}, database, dialect},
+                        {path: {path, databaseFullPath, useMetaProxy}, database, dialect},
                         {signal},
                     );
                     return {
@@ -46,16 +48,22 @@ export const schemaAclApi = api.injectEndpoints({
                     database,
                     dialect,
                     databaseFullPath,
+                    useMetaProxy,
                 }: {
                     database: string;
                     databaseFullPath: string;
                     dialect: string;
+                    useMetaProxy?: boolean;
                 },
                 {signal},
             ) => {
                 try {
                     const data = await window.api.viewer.getAvailablePermissions(
-                        {path: {path: databaseFullPath, databaseFullPath}, database, dialect},
+                        {
+                            path: {path: databaseFullPath, databaseFullPath, useMetaProxy},
+                            database,
+                            dialect,
+                        },
                         {signal},
                     );
 
@@ -74,19 +82,21 @@ export const schemaAclApi = api.injectEndpoints({
                 path,
                 rights,
                 dialect,
+                useMetaProxy,
             }: {
                 database: string;
                 databaseFullPath: string;
                 path: string;
                 rights: AccessRightsUpdateRequest;
                 dialect: string;
+                useMetaProxy?: boolean;
             }) => {
                 try {
                     const data = await window.api.viewer.updateAccessRights({
                         database,
                         rights,
                         dialect,
-                        path: {path, databaseFullPath},
+                        path: {path, databaseFullPath, useMetaProxy},
                     });
                     return {data};
                 } catch (error) {
@@ -104,8 +114,21 @@ const createGetSchemaAclSelector = createSelector(
     (_path: string, database: string) => database,
     (_path: string, _database: string, databaseFullPath: string) => databaseFullPath,
     (_path: string, _database: string, _databaseFullPath: string, dialect: string) => dialect,
-    (path, database, databaseFullPath, dialect) =>
-        schemaAclApi.endpoints.getSchemaAcl.select({path, database, databaseFullPath, dialect}),
+    (
+        _path: string,
+        _database: string,
+        _databaseFullPath: string,
+        _dialect: string,
+        useMetaProxy?: boolean,
+    ) => useMetaProxy,
+    (path, database, databaseFullPath, dialect, useMetaProxy) =>
+        schemaAclApi.endpoints.getSchemaAcl.select({
+            path,
+            database,
+            databaseFullPath,
+            dialect,
+            useMetaProxy,
+        }),
 );
 
 export const selectSchemaOwner = createSelector(
@@ -116,7 +139,8 @@ export const selectSchemaOwner = createSelector(
         database: string,
         databaseFullPath: string,
         dialect: string,
-    ) => createGetSchemaAclSelector(path, database, databaseFullPath, dialect),
+        useMetaProxy?: boolean,
+    ) => createGetSchemaAclSelector(path, database, databaseFullPath, dialect, useMetaProxy),
     (state, selectGetSchemaAcl) => selectGetSchemaAcl(state).data?.owner,
 );
 
@@ -128,13 +152,20 @@ const selectAccessRights = createSelector(
         database: string,
         databaseFullPath: string,
         dialect: string,
-    ) => createGetSchemaAclSelector(path, database, databaseFullPath, dialect),
+        useMetaProxy?: boolean,
+    ) => createGetSchemaAclSelector(path, database, databaseFullPath, dialect, useMetaProxy),
     (state, selectGetSchemaAcl) => selectGetSchemaAcl(state).data,
 );
 
 const selectRightsMap = createSelector(
-    (state: RootState, path: string, database: string, databaseFullPath: string, dialect: string) =>
-        selectAccessRights(state, path, database, databaseFullPath, dialect),
+    (
+        state: RootState,
+        path: string,
+        database: string,
+        databaseFullPath: string,
+        dialect: string,
+        useMetaProxy?: boolean,
+    ) => selectAccessRights(state, path, database, databaseFullPath, dialect, useMetaProxy),
     (data) => {
         if (!data) {
             return null;
@@ -180,8 +211,14 @@ const selectRightsMap = createSelector(
 );
 
 export const selectPreparedRights = createSelector(
-    (state: RootState, path: string, database: string, databaseFullPath: string, dialect: string) =>
-        selectRightsMap(state, path, database, databaseFullPath, dialect),
+    (
+        state: RootState,
+        path: string,
+        database: string,
+        databaseFullPath: string,
+        dialect: string,
+        useMetaProxy?: boolean,
+    ) => selectRightsMap(state, path, database, databaseFullPath, dialect, useMetaProxy),
     (data) => {
         if (!data) {
             return null;
@@ -204,7 +241,8 @@ export const selectSubjectExplicitRights = createSelector(
             database: string,
             databaseFullPath: string,
             dialect: string,
-        ) => selectRightsMap(state, path, database, databaseFullPath, dialect),
+            useMetaProxy?: boolean,
+        ) => selectRightsMap(state, path, database, databaseFullPath, dialect, useMetaProxy),
     ],
     (subject, rightsMap) => {
         if (!subject || !rightsMap) {
@@ -226,7 +264,8 @@ export const selectSubjectInheritedRights = createSelector(
             database: string,
             databaseFullPath: string,
             dialect: string,
-        ) => selectRightsMap(state, path, database, databaseFullPath, dialect),
+            useMetaProxy?: boolean,
+        ) => selectRightsMap(state, path, database, databaseFullPath, dialect, useMetaProxy),
     ],
     (subject, rightsMap) => {
         if (!subject || !rightsMap) {
@@ -247,18 +286,26 @@ const createGetAvailablePermissionsSelector = createSelector(
     (database: string) => database,
     (_database: string, databaseFullPath: string) => databaseFullPath,
     (_database: string, _databaseFullPath: string, dialect: string) => dialect,
-    (database, databaseFullPath, dialect) =>
+    (_database: string, _databaseFullPath: string, _dialect: string, useMetaProxy?: boolean) =>
+        useMetaProxy,
+    (database, databaseFullPath, dialect, useMetaProxy) =>
         schemaAclApi.endpoints.getAvailablePermissions.select({
             database,
             dialect,
             databaseFullPath,
+            useMetaProxy,
         }),
 );
 
 // Then create the main selector that extracts the available permissions data
 export const selectAvailablePermissions = createSelector(
     (state: RootState) => state,
-    (_state: RootState, database: string, databaseFullPath: string, dialect: string) =>
-        createGetAvailablePermissionsSelector(database, databaseFullPath, dialect),
+    (
+        _state: RootState,
+        database: string,
+        databaseFullPath: string,
+        dialect: string,
+        useMetaProxy?: boolean,
+    ) => createGetAvailablePermissionsSelector(database, databaseFullPath, dialect, useMetaProxy),
     (state, selectGetAvailablePermissions) => selectGetAvailablePermissions(state).data,
 );

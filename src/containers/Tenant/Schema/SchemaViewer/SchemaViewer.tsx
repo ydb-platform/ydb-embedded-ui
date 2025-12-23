@@ -2,6 +2,7 @@ import React from 'react';
 
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../../../components/TableSkeleton/TableSkeleton';
+import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {viewSchemaApi} from '../../../../store/reducers/viewSchema/viewSchema';
 import type {EPathType} from '../../../../types/api/schema';
@@ -45,13 +46,14 @@ export const SchemaViewer = ({
     databaseFullPath,
 }: SchemaViewerProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
+    const useMetaProxy = useClusterWithProxy();
 
     // Refresh table only in Diagnostics
     const pollingInterval = extended ? autoRefreshInterval : undefined;
 
     const {currentData: tableSchemaData, isFetching: isTableSchemaFetching} =
         overviewApi.useGetOverviewQuery(
-            {path, database, databaseFullPath},
+            {path, database, databaseFullPath, useMetaProxy},
             {pollingInterval, skip: isViewType(type)},
         );
     const {currentData: viewColumnsData, isFetching: isViewSchemaFetching} =

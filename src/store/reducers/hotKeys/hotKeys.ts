@@ -5,13 +5,17 @@ export const hotKeysApi = api.injectEndpoints({
     endpoints: (builder) => ({
         getHotKeys: builder.query<
             HotKey[] | null,
-            {path: string; database: string; databaseFullPath: string}
+            {path: string; database: string; databaseFullPath: string; useMetaProxy?: boolean}
         >({
-            queryFn: async ({path, database, databaseFullPath}, {signal}) => {
+            queryFn: async ({path, database, databaseFullPath, useMetaProxy}, {signal}) => {
                 try {
                     // Send request that will trigger hot keys sampling (enable_sampling = true)
                     const initialResponse = await window.api.viewer.getHotKeys(
-                        {path: {path, databaseFullPath}, database, enableSampling: true},
+                        {
+                            path: {path, databaseFullPath, useMetaProxy},
+                            database,
+                            enableSampling: true,
+                        },
                         {signal},
                     );
 
@@ -33,7 +37,11 @@ export const hotKeysApi = api.injectEndpoints({
 
                     // And request these samples (enable_sampling = false)
                     const response = await window.api.viewer.getHotKeys(
-                        {path: {path, databaseFullPath}, database, enableSampling: false},
+                        {
+                            path: {path, databaseFullPath, useMetaProxy},
+                            database,
+                            enableSampling: false,
+                        },
                         {signal},
                     );
                     return {data: response.hotkeys ?? null};

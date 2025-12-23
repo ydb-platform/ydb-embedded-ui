@@ -6,6 +6,7 @@ import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {Loader} from '../../../../components/Loader';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
+import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {
     selectPreparedConsumersData,
     selectPreparedTopicStats,
@@ -34,20 +35,21 @@ interface ConsumersProps {
 
 export const Consumers = ({path, database, type, databaseFullPath}: ConsumersProps) => {
     const isCdcStream = isCdcStreamEntityType(type);
+    const useMetaProxy = useClusterWithProxy();
 
     const [searchValue, setSearchValue] = React.useState('');
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = topicApi.useGetTopicQuery(
-        {path, database, databaseFullPath},
+        {path, database, databaseFullPath, useMetaProxy},
         {pollingInterval: autoRefreshInterval},
     );
     const loading = isFetching && currentData === undefined;
     const consumers = useTypedSelector((state) =>
-        selectPreparedConsumersData(state, path, database, databaseFullPath),
+        selectPreparedConsumersData(state, path, database, databaseFullPath, useMetaProxy),
     );
     const topic = useTypedSelector((state) =>
-        selectPreparedTopicStats(state, path, database, databaseFullPath),
+        selectPreparedTopicStats(state, path, database, databaseFullPath, useMetaProxy),
     );
 
     const dataToRender = React.useMemo(() => {

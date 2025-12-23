@@ -4,6 +4,7 @@ import {Flex} from '@gravity-ui/uikit';
 
 import {LoaderWrapper} from '../../../components/LoaderWrapper/LoaderWrapper';
 import {SubjectWithAvatar} from '../../../components/SubjectWithAvatar/SubjectWithAvatar';
+import {useClusterWithProxy} from '../../../store/reducers/cluster/cluster';
 import {
     schemaAclApi,
     selectAvailablePermissions,
@@ -36,6 +37,7 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
     const [rightView, setRightsView] = React.useState<RightsView>('Groups');
 
     const {path, database, databaseFullPath} = useCurrentSchema();
+    const useMetaProxy = useClusterWithProxy();
     const dialect = useAclSyntax();
     const {currentRightsMap, setExplicitRightsChanges, rightsToGrant, rightsToRevoke, hasChanges} =
         useRights({aclSubject: aclSubject ?? undefined, path, database, databaseFullPath});
@@ -45,6 +47,7 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
             database,
             databaseFullPath,
             dialect,
+            useMetaProxy,
         },
         {skip: !aclSubject},
     );
@@ -52,6 +55,7 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
         database,
         databaseFullPath,
         dialect,
+        useMetaProxy,
     });
     const [updateRights, updateRightsResponse] = schemaAclApi.useUpdateAccessMutation();
 
@@ -65,6 +69,7 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
             database,
             databaseFullPath,
             dialect,
+            useMetaProxy,
         ),
     );
 
@@ -122,7 +127,7 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
     ]);
 
     const availablePermissions = useTypedSelector((state) =>
-        selectAvailablePermissions(state, database, databaseFullPath, dialect),
+        selectAvailablePermissions(state, database, databaseFullPath, dialect, useMetaProxy),
     );
     const handleChangeRightGetter = React.useCallback(
         (right: string) => {

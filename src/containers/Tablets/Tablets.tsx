@@ -3,6 +3,7 @@ import React from 'react';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {isNil} from 'lodash';
 
+import {useClusterWithProxy} from '../../store/reducers/cluster/cluster';
 import {selectTabletsWithFqdn, tabletsApi} from '../../store/reducers/tablets';
 import {ETabletState} from '../../types/api/tablet';
 import type {TabletsApiRequestParams} from '../../types/store/tablets';
@@ -48,16 +49,17 @@ export function Tablets({
     scrollContainerRef,
 }: TabletsProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
+    const useMetaProxy = useClusterWithProxy();
 
     let params: TabletsApiRequestParams = {};
     const filter = onlyActive ? `(State=[${activeStatuses.join(',')}])` : undefined;
 
     const schemaPathParam = React.useMemo(() => {
         if (!isNil(path) && !isNil(databaseFullPath)) {
-            return {path, databaseFullPath};
+            return {path, databaseFullPath, useMetaProxy};
         }
         return undefined;
-    }, [path, databaseFullPath]);
+    }, [path, databaseFullPath, useMetaProxy]);
 
     if (valueIsDefined(nodeId)) {
         params = {nodeId, database, filter};

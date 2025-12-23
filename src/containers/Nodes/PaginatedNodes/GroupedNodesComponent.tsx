@@ -9,6 +9,7 @@ import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumn
 import {NODES_COLUMNS_TITLES} from '../../../components/nodesColumns/constants';
 import type {NodesColumnId} from '../../../components/nodesColumns/constants';
 import type {NodesColumn} from '../../../components/nodesColumns/types';
+import {useClusterWithProxy} from '../../../store/reducers/cluster/cluster';
 import {nodesApi} from '../../../store/reducers/nodes/nodes';
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
 import type {NodesGroupByField, NodesPeerRole} from '../../../types/api/nodes';
@@ -121,6 +122,7 @@ export function GroupedNodesComponent({
         groupByParams,
         withPeerRoleFilter,
     );
+    const useMetaProxy = useClusterWithProxy();
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
@@ -133,10 +135,10 @@ export function GroupedNodesComponent({
 
     const schemaPathParam = React.useMemo(() => {
         if (!isNil(path) && !isNil(databaseFullPath)) {
-            return {path, databaseFullPath};
+            return {path, databaseFullPath, useMetaProxy};
         }
         return undefined;
-    }, [path, databaseFullPath]);
+    }, [path, databaseFullPath, useMetaProxy]);
 
     const {currentData, isFetching, error} = nodesApi.useGetNodesQuery(
         {
