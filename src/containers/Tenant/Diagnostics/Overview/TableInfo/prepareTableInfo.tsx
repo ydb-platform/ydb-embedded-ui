@@ -33,7 +33,7 @@ import {
 } from './constants';
 import i18n from './i18n';
 
-const ALWAYS_METRICS_KEYS = ['CPU', 'Memory', 'ReadThroughput', 'Network'] as const;
+const GENERAL_METRICS_KEYS = ['CPU', 'Memory', 'ReadThroughput', 'Network'] as const;
 
 const isInStoreColumnTable = (table: TColumnTableDescription) => {
     // SchemaPresetId could be 0
@@ -347,13 +347,13 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
 
     const generalMetrics = formatObjectToDefinitionItems(
         formatTabletMetricsItem,
-        pick(TabletMetrics, ALWAYS_METRICS_KEYS),
+        pick(TabletMetrics, GENERAL_METRICS_KEYS),
     );
 
     const tabletMetricsInfo = formatObjectToDefinitionItems(
         formatTabletMetricsItem,
         omit(TabletMetrics, [
-            ...ALWAYS_METRICS_KEYS,
+            ...GENERAL_METRICS_KEYS,
             'GroupReadIops',
             'GroupReadThroughput',
             'GroupWriteIops',
