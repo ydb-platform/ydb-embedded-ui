@@ -1,5 +1,8 @@
 import React from 'react';
 
+import {ChevronDown, ChevronUp} from '@gravity-ui/icons';
+import {Button, Disclosure, Icon} from '@gravity-ui/uikit';
+
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
@@ -21,11 +24,19 @@ export const TableInfo = ({data, type}: TableInfoProps) => {
     const {
         generalInfoLeft = [],
         generalInfoRight = [],
+        generalStats = [],
         tableStatsInfo = [],
+        generalMetrics = [],
         tabletMetricsInfo = [],
         partitionConfigInfo = [],
         partitionProgressConfig,
     } = React.useMemo(() => prepareTableInfo(data, type), [data, type]);
+
+    const [expanded, setExpanded] = React.useState(false);
+
+    const hasMoreLeft = tableStatsInfo.length > 0;
+    const hasMoreRight = tabletMetricsInfo.length > 0 || partitionConfigInfo.length > 0;
+    const hasMore = hasMoreLeft || hasMoreRight;
 
     return (
         <div className={b()}>
@@ -39,7 +50,7 @@ export const TableInfo = ({data, type}: TableInfoProps) => {
                     />
                 </div>
             )}
-            <div className={b('row')}>
+            <div className={b('row', {'general-info': true})}>
                 <div className={b('col')}>
                     {generalInfoLeft.length > 0 ? (
                         <YDBDefinitionList
@@ -63,40 +74,26 @@ export const TableInfo = ({data, type}: TableInfoProps) => {
                     ) : null}
                 </div>
             </div>
-            <div className={b('row')}>
-                {tableStatsInfo?.length ? (
-                    <div className={b('col')}>
-                        {tableStatsInfo
-                            .filter((items) => items.length > 0)
-                            .map((items, index) => (
-                                <YDBDefinitionList
-                                    key={index}
-                                    items={items}
-                                    title={index === 0 ? i18n('title_table-stats') : undefined}
-                                    className={b('info-block')}
-                                    nameMaxWidth="auto"
-                                    responsive
-                                    titleClassname={b('info-title')}
-                                />
-                            ))}
-                    </div>
-                ) : null}
 
+            <div className={b('row')}>
                 <div className={b('col')}>
-                    {tabletMetricsInfo.length > 0 ? (
+                    {generalStats.length > 0 ? (
                         <YDBDefinitionList
-                            items={tabletMetricsInfo}
-                            title={i18n('title_tablet-metrics')}
+                            items={generalStats}
+                            title={i18n('title_table-stats')}
                             className={b('info-block')}
                             nameMaxWidth="auto"
-                            titleClassname={b('info-title')}
                             responsive
+                            titleClassname={b('info-title')}
                         />
                     ) : null}
-                    {partitionConfigInfo.length > 0 ? (
+                </div>
+
+                <div className={b('col')}>
+                    {generalMetrics.length > 0 ? (
                         <YDBDefinitionList
-                            items={partitionConfigInfo}
-                            title={i18n('title_partition-config')}
+                            items={generalMetrics}
+                            title={i18n('title_tablet-metrics')}
                             className={b('info-block')}
                             nameMaxWidth="auto"
                             responsive
@@ -105,6 +102,62 @@ export const TableInfo = ({data, type}: TableInfoProps) => {
                     ) : null}
                 </div>
             </div>
+
+            {hasMore ? (
+                <Disclosure
+                    className={b('show-more-disclosure')}
+                    expanded={expanded}
+                    onUpdate={setExpanded}
+                >
+                    <Disclosure.Summary>
+                        {(props) => (
+                            <Button {...props} view="normal" size="s">
+                                {expanded ? i18n('button_show-less') : i18n('button_show-more')}
+                                <Icon data={expanded ? ChevronUp : ChevronDown} size={16} />
+                            </Button>
+                        )}
+                    </Disclosure.Summary>
+
+                    <Disclosure.Details>
+                        <div className={b('row')}>
+                            <div className={b('col')}>
+                                {tableStatsInfo
+                                    .filter((items) => items.length > 0)
+                                    .map((items, index) => (
+                                        <YDBDefinitionList
+                                            key={`table-stats-more-${index}`}
+                                            items={items}
+                                            className={b('info-block')}
+                                            nameMaxWidth="auto"
+                                            responsive
+                                        />
+                                    ))}
+                            </div>
+
+                            <div className={b('col')}>
+                                {tabletMetricsInfo.length > 0 ? (
+                                    <YDBDefinitionList
+                                        items={tabletMetricsInfo}
+                                        className={b('info-block')}
+                                        nameMaxWidth="auto"
+                                        responsive
+                                    />
+                                ) : null}
+                                {partitionConfigInfo.length > 0 ? (
+                                    <YDBDefinitionList
+                                        items={partitionConfigInfo}
+                                        title={i18n('title_partition-config')}
+                                        className={b('info-block')}
+                                        nameMaxWidth="auto"
+                                        responsive
+                                        titleClassname={b('info-title')}
+                                    />
+                                ) : null}
+                            </div>
+                        </div>
+                    </Disclosure.Details>
+                </Disclosure>
+            ) : null}
         </div>
     );
 };
