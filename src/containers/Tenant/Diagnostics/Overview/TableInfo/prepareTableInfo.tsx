@@ -1,6 +1,7 @@
 import {CircleCheckFill, CircleQuestion, CircleXmarkFill} from '@gravity-ui/icons';
 import {Flex, Icon, Label, Popover, Text} from '@gravity-ui/uikit';
 import omit from 'lodash/omit';
+import pick from 'lodash/pick';
 
 import {toFormattedSize} from '../../../../../components/FormattedBytes/utils';
 import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
@@ -31,6 +32,8 @@ import {
     READ_REPLICAS_MODE,
 } from './constants';
 import i18n from './i18n';
+
+const GENERAL_METRICS_KEYS = ['CPU', 'Memory', 'ReadThroughput', 'Network'] as const;
 
 const isInStoreColumnTable = (table: TColumnTableDescription) => {
     // SchemaPresetId could be 0
@@ -310,15 +313,17 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
         IndexSize,
     });
 
+    const bloomFilterItems: YDBDefinitionListItem[] = [];
+
     if (
         isNumeric(ByKeyFilterSize) &&
         (PartitionConfig.EnableFilterByKey || Number(ByKeyFilterSize) > 0)
     ) {
-        generalStats.push({name: 'BloomFilterSize', content: toFormattedSize(ByKeyFilterSize)});
+        bloomFilterItems.push({name: 'BloomFilterSize', content: toFormattedSize(ByKeyFilterSize)});
     }
 
     const tableStatsInfo = [
-        generalStats,
+        ...(bloomFilterItems.length > 0 ? [bloomFilterItems] : []),
         formatObjectToDefinitionItems(formatTableStatsItem, {
             LastAccessTime,
             LastUpdateTime,
@@ -340,9 +345,15 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
         }),
     ];
 
+    const generalMetrics = formatObjectToDefinitionItems(
+        formatTabletMetricsItem,
+        pick(TabletMetrics, GENERAL_METRICS_KEYS),
+    );
+
     const tabletMetricsInfo = formatObjectToDefinitionItems(
         formatTabletMetricsItem,
         omit(TabletMetrics, [
+            ...GENERAL_METRICS_KEYS,
             'GroupReadIops',
             'GroupReadThroughput',
             'GroupWriteIops',
@@ -368,8 +379,13 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
     return {
         generalInfoRight,
         generalInfoLeft,
+
+        generalStats,
         tableStatsInfo,
+
+        generalMetrics,
         tabletMetricsInfo,
+
         partitionConfigInfo,
         partitionProgressConfig,
     };

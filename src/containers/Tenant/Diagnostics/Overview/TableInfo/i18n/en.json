@@ -4,6 +4,9 @@
   "title_tablet-metrics": "Metrics",
   "title_partition-config": "Partition config",
 
+  "button_show-more": "Show more",
+  "button_show-less": "Show less",
+
   "field_current-partitions": "Current partitions",
   "field_ttl-for-rows": "TTL for rows",
   "field_standalone": "Standalone",
