@@ -81,13 +81,19 @@ export function useStorageQueryParams() {
         setQueryParams({uptimeFilter: value}, 'replaceIn');
     };
 
-    const handleStorageGroupsGroupByParamChange = (value: string) => {
-        setQueryParams({storageGroupsGroupBy: value || undefined}, 'replaceIn');
-    };
+    const handleStorageGroupsGroupByParamChange = React.useCallback(
+        (value: string) => {
+            setQueryParams({storageGroupsGroupBy: value || undefined}, 'replaceIn');
+        },
+        [setQueryParams],
+    );
 
-    const handleStorageNodesGroupByParamChange = (value: string) => {
-        setQueryParams({storageNodesGroupBy: value || undefined}, 'replaceIn');
-    };
+    const handleStorageNodesGroupByParamChange = React.useCallback(
+        (value: string) => {
+            setQueryParams({storageNodesGroupBy: value || undefined}, 'replaceIn');
+        },
+        [setQueryParams],
+    );
 
     const handleShowAllGroups = () => {
         handleVisibleEntitiesChange('all');
