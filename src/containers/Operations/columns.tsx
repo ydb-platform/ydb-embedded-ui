@@ -109,65 +109,63 @@ export function getColumns({
         });
     }
 
-    // Add standard columns for non-buildindex operations
-    if (!isBuildIndex) {
-        columns.push(
-            {
-                name: COLUMNS_NAMES.CREATED_BY,
-                header: COLUMNS_TITLES[COLUMNS_NAMES.CREATED_BY],
-                render: ({row}) => {
-                    if (!row.created_by) {
-                        return EMPTY_DATA_PLACEHOLDER;
-                    }
-                    return row.created_by;
-                },
+    // Add standard columns
+    columns.push(
+        {
+            name: COLUMNS_NAMES.CREATED_BY,
+            header: COLUMNS_TITLES[COLUMNS_NAMES.CREATED_BY],
+            render: ({row}) => {
+                if (!row.created_by) {
+                    return EMPTY_DATA_PLACEHOLDER;
+                }
+                return row.created_by;
             },
-            {
-                name: COLUMNS_NAMES.CREATE_TIME,
-                header: COLUMNS_TITLES[COLUMNS_NAMES.CREATE_TIME],
-                render: ({row}) => {
-                    if (!row.create_time) {
-                        return EMPTY_DATA_PLACEHOLDER;
-                    }
-                    return formatDateTime(parseProtobufTimestampToMs(row.create_time));
-                },
+        },
+        {
+            name: COLUMNS_NAMES.CREATE_TIME,
+            header: COLUMNS_TITLES[COLUMNS_NAMES.CREATE_TIME],
+            render: ({row}) => {
+                if (!row.create_time) {
+                    return EMPTY_DATA_PLACEHOLDER;
+                }
+                return formatDateTime(parseProtobufTimestampToMs(row.create_time));
             },
-            {
-                name: COLUMNS_NAMES.END_TIME,
-                header: COLUMNS_TITLES[COLUMNS_NAMES.END_TIME],
-                render: ({row}) => {
-                    if (!row.end_time) {
-                        return EMPTY_DATA_PLACEHOLDER;
-                    }
-                    return formatDateTime(parseProtobufTimestampToMs(row.end_time));
-                },
+        },
+        {
+            name: COLUMNS_NAMES.END_TIME,
+            header: COLUMNS_TITLES[COLUMNS_NAMES.END_TIME],
+            render: ({row}) => {
+                if (!row.end_time) {
+                    return EMPTY_DATA_PLACEHOLDER;
+                }
+                return formatDateTime(parseProtobufTimestampToMs(row.end_time));
             },
-            {
-                name: COLUMNS_NAMES.DURATION,
-                header: COLUMNS_TITLES[COLUMNS_NAMES.DURATION],
-                render: ({row}) => {
-                    let durationValue = 0;
-                    if (!row.create_time) {
-                        return EMPTY_DATA_PLACEHOLDER;
-                    }
-                    const createTime = parseProtobufTimestampToMs(row.create_time);
-                    if (row.end_time) {
-                        const endTime = parseProtobufTimestampToMs(row.end_time);
-                        durationValue = endTime - createTime;
-                    } else {
-                        durationValue = Date.now() - createTime;
-                    }
+        },
+        {
+            name: COLUMNS_NAMES.DURATION,
+            header: COLUMNS_TITLES[COLUMNS_NAMES.DURATION],
+            render: ({row}) => {
+                let durationValue = 0;
+                if (!row.create_time) {
+                    return EMPTY_DATA_PLACEHOLDER;
+                }
+                const createTime = parseProtobufTimestampToMs(row.create_time);
+                if (row.end_time) {
+                    const endTime = parseProtobufTimestampToMs(row.end_time);
+                    durationValue = endTime - createTime;
+                } else {
+                    durationValue = Date.now() - createTime;
+                }
 
-                    const safeDurationMs = durationValue < 0 ? 0 : durationValue;
-                    const durationFormatted = formatDurationMs(safeDurationMs);
+                const safeDurationMs = durationValue < 0 ? 0 : durationValue;
+                const durationFormatted = formatDurationMs(safeDurationMs);
 
-                    return row.end_time
-                        ? durationFormatted
-                        : i18n('label_duration-ongoing', {value: durationFormatted});
-                },
+                return row.end_time
+                    ? durationFormatted
+                    : i18n('label_duration-ongoing', {value: durationFormatted});
             },
-        );
-    }
+        },
+    );
 
     // Add Actions column
     columns.push({
