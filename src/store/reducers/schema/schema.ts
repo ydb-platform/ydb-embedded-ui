@@ -35,12 +35,12 @@ export const schemaApi = api.injectEndpoints({
     endpoints: (builder) => ({
         createDirectory: builder.mutation<
             unknown,
-            {database: string; path: string; databaseFullPath: string}
+            {database: string; path: string; databaseFullPath: string; useMetaProxy?: boolean}
         >({
-            queryFn: async ({database, path, databaseFullPath}, {signal}) => {
+            queryFn: async ({database, path, databaseFullPath, useMetaProxy}, {signal}) => {
                 try {
                     const data = await window.api.scheme.createSchemaDirectory(
-                        {database, path: {path, databaseFullPath}},
+                        {database, path: {path, databaseFullPath, useMetaProxy}},
                         {signal},
                     );
                     return {data};
@@ -51,12 +51,12 @@ export const schemaApi = api.injectEndpoints({
         }),
         getSchema: builder.query<
             {[path: string]: TEvDescribeSchemeResult & {partial?: boolean}},
-            {path: string; database: string; databaseFullPath: string}
+            {path: string; database: string; databaseFullPath: string; useMetaProxy?: boolean}
         >({
-            queryFn: async ({path, database, databaseFullPath}, {signal}) => {
+            queryFn: async ({path, database, databaseFullPath, useMetaProxy}, {signal}) => {
                 try {
                     const data = await window.api.viewer.getSchema(
-                        {path: {path, databaseFullPath}, database},
+                        {path: {path, databaseFullPath, useMetaProxy}, database},
                         {signal},
                     );
                     if (!data) {
@@ -102,15 +102,18 @@ export function useGetSchemaQuery({
     path,
     database,
     databaseFullPath,
+    useMetaProxy,
 }: {
     path: string;
     database: string;
     databaseFullPath: string;
+    useMetaProxy?: boolean;
 }) {
     const {currentData, isFetching, error, refetch, originalArgs} = schemaApi.useGetSchemaQuery({
         path,
         database,
         databaseFullPath,
+        useMetaProxy,
     });
 
     const data = currentData?.[path];
@@ -132,16 +135,23 @@ const getSchemaSelector = createSelector(
         (path: string) => path,
         (_path: string, database: string) => database,
         (_path: string, _database: string, databaseFullPath: string) => databaseFullPath,
+        (_path: string, _database: string, _databaseFullPath: string, useMetaProxy?: boolean) =>
+            useMetaProxy,
     ],
-    (path, database, databaseFullPath) =>
-        schemaApi.endpoints.getSchema.select({path, database, databaseFullPath}),
+    (path, database, databaseFullPath, useMetaProxy) =>
+        schemaApi.endpoints.getSchema.select({path, database, databaseFullPath, useMetaProxy}),
 );
 
 export const selectSchemaObjectData = createSelector(
     (state: RootState) => state,
     (_state: RootState, path: string) => path,
-    (_state: RootState, path: string, database: string, databaseFullPath: string) =>
-        getSchemaSelector(path, database, databaseFullPath),
+    (
+        _state: RootState,
+        path: string,
+        database: string,
+        databaseFullPath: string,
+        useMetaProxy?: boolean,
+    ) => getSchemaSelector(path, database, databaseFullPath, useMetaProxy),
     (state, path, selectSchemaData) => {
         return selectSchemaData(state).data?.[path];
     },

@@ -20,7 +20,7 @@
         align-items: flex-start;
         gap: var(--g-spacing-9);
 
-        &:not(:last-child) {
+        &_general-info {
             margin-bottom: var(--g-spacing-1);
         }
     }
@@ -62,5 +62,11 @@
         &_state_disabled {
             color: var(--g-color-base-neutral-medium);
         }
+    }
+
+    &__show-more-disclosure {
+        display: flex;
+        flex-direction: column-reverse;
+        align-items: flex-start;
     }
 }

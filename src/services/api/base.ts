@@ -94,8 +94,8 @@ export class BaseYdbAPI extends AxiosWrapper {
     }
 
     getSchemaPath(params?: SchemaPathParam) {
-        const {path, databaseFullPath} = params ?? {};
-        if (!this.useRelativePath || !path || !databaseFullPath) {
+        const {path, databaseFullPath, useMetaProxy} = params ?? {};
+        if (!this.useRelativePath || !path || !databaseFullPath || !useMetaProxy) {
             return path;
         }
 

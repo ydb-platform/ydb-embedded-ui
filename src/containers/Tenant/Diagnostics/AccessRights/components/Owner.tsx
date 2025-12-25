@@ -3,6 +3,7 @@ import {ActionTooltip, Button, Card, Divider, Flex, Icon, Text} from '@gravity-u
 
 import {SubjectWithAvatar} from '../../../../../components/SubjectWithAvatar/SubjectWithAvatar';
 import {useEditAccessAvailable} from '../../../../../store/reducers/capabilities/hooks';
+import {useClusterWithProxy} from '../../../../../store/reducers/cluster/cluster';
 import {selectSchemaOwner} from '../../../../../store/reducers/schemaAcl/schemaAcl';
 import {useAclSyntax, useTypedSelector} from '../../../../../utils/hooks';
 import {useCurrentSchema} from '../../../TenantContext';
@@ -14,9 +15,10 @@ import {getChangeOwnerDialog} from './ChangeOwnerDialog';
 export function Owner() {
     const editable = useEditAccessAvailable();
     const {path, database, databaseFullPath} = useCurrentSchema();
+    const useMetaProxy = useClusterWithProxy();
     const dialect = useAclSyntax();
     const owner = useTypedSelector((state) =>
-        selectSchemaOwner(state, path, database, databaseFullPath, dialect),
+        selectSchemaOwner(state, path, database, databaseFullPath, dialect, useMetaProxy),
     );
 
     if (!owner) {

@@ -18,6 +18,7 @@ import {InternalLink} from '../../../components/InternalLink';
 import {LinkWithIcon} from '../../../components/LinkWithIcon/LinkWithIcon';
 import SplitPane from '../../../components/SplitPane';
 import {createExternalUILink, getTenantPath} from '../../../routes';
+import {useClusterWithProxy} from '../../../store/reducers/cluster/cluster';
 import {overviewApi} from '../../../store/reducers/overview/overview';
 import {TENANT_SUMMARY_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import {setSummaryTab} from '../../../store/reducers/tenant/tenant';
@@ -70,7 +71,7 @@ export function ObjectSummary({
     isCollapsed,
 }: ObjectSummaryProps) {
     const {path, database, type, databaseFullPath} = useCurrentSchema();
-
+    const useMetaProxy = useClusterWithProxy();
     const dispatch = useTypedDispatch();
     const {handleSchemaChange} = useTenantQueryParams();
     const [isCommonInfoCollapsed, setIsCommonInfoCollapsed] = useSetting<boolean>(
@@ -103,6 +104,7 @@ export function ObjectSummary({
         path,
         database,
         databaseFullPath,
+        useMetaProxy,
     });
     const currentSchemaData = currentObjectData?.PathDescription?.Self;
 

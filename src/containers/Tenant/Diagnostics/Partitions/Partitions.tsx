@@ -6,6 +6,7 @@ import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableColumnSetup} from '../../../../components/TableColumnSetup/TableColumnSetup';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
+import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {nodesListApi, selectNodesMap} from '../../../../store/reducers/nodesList';
 import {partitionsApi, setSelectedConsumer} from '../../../../store/reducers/partitions/partitions';
 import {selectConsumersNames, topicApi} from '../../../../store/reducers/topic';
@@ -32,13 +33,14 @@ interface PartitionsProps {
 
 export const Partitions = ({path, database, databaseFullPath}: PartitionsProps) => {
     const dispatch = useTypedDispatch();
+    const useMetaProxy = useClusterWithProxy();
 
     const [partitionsToRender, setPartitionsToRender] = React.useState<
         PreparedPartitionDataWithHosts[]
     >([]);
 
     const consumers = useTypedSelector((state) =>
-        selectConsumersNames(state, path, database, databaseFullPath),
+        selectConsumersNames(state, path, database, databaseFullPath, useMetaProxy),
     );
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {selectedConsumer} = useTypedSelector((state) => state.partitions);
@@ -46,7 +48,7 @@ export const Partitions = ({path, database, databaseFullPath}: PartitionsProps) 
         currentData: topicData,
         isFetching: topicIsFetching,
         error: topicError,
-    } = topicApi.useGetTopicQuery({path, database, databaseFullPath});
+    } = topicApi.useGetTopicQuery({path, database, databaseFullPath, useMetaProxy});
     const topicLoading = topicIsFetching && topicData === undefined;
     const {
         currentData: nodesData,
@@ -60,7 +62,7 @@ export const Partitions = ({path, database, databaseFullPath}: PartitionsProps) 
 
     const params = topicLoading
         ? skipToken
-        : {path, database, consumerName: selectedConsumer, databaseFullPath};
+        : {path, database, consumerName: selectedConsumer, databaseFullPath, useMetaProxy};
     const {
         currentData: partitionsData,
         isFetching: partitionsIsFetching,

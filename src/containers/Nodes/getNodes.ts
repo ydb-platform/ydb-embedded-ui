@@ -24,6 +24,7 @@ export const getNodes: FetchData<
     const {
         path,
         databaseFullPath,
+        useMetaProxy,
         database,
         searchValue,
         withProblems,
@@ -39,7 +40,9 @@ export const getNodes: FetchData<
     const dataFieldsRequired = getRequiredDataFields(columnsIds, NODES_COLUMNS_TO_DATA_FIELDS);
 
     const schemePathParam =
-        !isNil(path) && !isNil(databaseFullPath) ? {path, databaseFullPath} : undefined;
+        !isNil(path) && !isNil(databaseFullPath)
+            ? {path, databaseFullPath, useMetaProxy}
+            : undefined;
 
     const response = await window.api.viewer.getNodes({
         type,

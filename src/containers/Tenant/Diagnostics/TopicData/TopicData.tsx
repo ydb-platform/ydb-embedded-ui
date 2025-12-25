@@ -16,6 +16,7 @@ import {
 } from '../../../../components/PaginatedTable';
 import {PaginatedTableWithLayout} from '../../../../components/PaginatedTable/PaginatedTableWithLayout';
 import {TableColumnSetup} from '../../../../components/TableColumnSetup/TableColumnSetup';
+import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {partitionsApi} from '../../../../store/reducers/partitions/partitions';
 import {topicApi} from '../../../../store/reducers/topic';
 import type {TopicDataRequest} from '../../../../types/api/topic';
@@ -56,6 +57,7 @@ const columns = getAllColumns();
 
 export function TopicData({scrollContainerRef, path, database, databaseFullPath}: TopicDataProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
+    const useMetaProxy = useClusterWithProxy();
     const [startOffset, setStartOffset] = React.useState<number>();
     const [endOffset, setEndOffset] = React.useState<number>();
     const [controlsKey, setControlsKey] = React.useState(0);
@@ -105,7 +107,7 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
         isLoading: partitionsLoading,
         error: partitionsError,
     } = partitionsApi.useGetPartitionsQuery(
-        {path, database, databaseFullPath},
+        {path, database, databaseFullPath, useMetaProxy},
         {pollingInterval: autoRefreshInterval},
     );
 

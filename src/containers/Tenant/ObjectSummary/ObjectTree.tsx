@@ -1,4 +1,5 @@
 import {Loader} from '../../../components/Loader';
+import {useClusterWithProxy} from '../../../store/reducers/cluster/cluster';
 import {useGetSchemaQuery} from '../../../store/reducers/schema/schema';
 import {useTenantQueryParams} from '../useTenantQueryParams';
 
@@ -21,10 +22,12 @@ function prepareSchemaRootName(name: string | undefined, fallback: string): stri
 }
 
 export function ObjectTree({database, path, databaseFullPath}: ObjectTreeProps) {
+    const useMetaProxy = useClusterWithProxy();
     const {data: tenantData = {}, isLoading} = useGetSchemaQuery({
         path: databaseFullPath,
         databaseFullPath,
         database,
+        useMetaProxy,
     });
     const pathData = tenantData?.PathDescription?.Self;
 

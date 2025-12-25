@@ -162,6 +162,11 @@ export function useClusterBaseInfo() {
     };
 }
 
+export function useClusterWithProxy() {
+    const {settings} = useClusterBaseInfo();
+    return settings?.use_meta_proxy !== false;
+}
+
 export type ClusterInfo = ReturnType<typeof useClusterBaseInfo> & Record<string, unknown>;
 
 const createClusterInfoSelector = createSelector(

@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {useClusterWithProxy} from '../../../store/reducers/cluster/cluster';
 import {selectSubjectExplicitRights} from '../../../store/reducers/schemaAcl/schemaAcl';
 import {useAclSyntax, useTypedSelector} from '../../../utils/hooks';
 
@@ -11,6 +12,7 @@ interface UseRightsProps {
 }
 
 export function useRights({aclSubject, path, database, databaseFullPath}: UseRightsProps) {
+    const useMetaProxy = useClusterWithProxy();
     const dialect = useAclSyntax();
     const subjectExplicitRights = useTypedSelector((state) =>
         selectSubjectExplicitRights(
@@ -20,6 +22,7 @@ export function useRights({aclSubject, path, database, databaseFullPath}: UseRig
             database,
             databaseFullPath,
             dialect,
+            useMetaProxy,
         ),
     );
     const [explicitRightsChanges, setExplicitRightsChanges] = React.useState(

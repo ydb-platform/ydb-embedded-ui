@@ -7,6 +7,7 @@ import {LabelWithPopover} from '../../../../../components/LabelWithPopover';
 import {LagPopoverContent} from '../../../../../components/LagPopoverContent';
 import {Loader} from '../../../../../components/Loader';
 import {SpeedMultiMeter} from '../../../../../components/SpeedMultiMeter';
+import {useClusterWithProxy} from '../../../../../store/reducers/cluster/cluster';
 import {selectPreparedTopicStats, topicApi} from '../../../../../store/reducers/topic';
 import type {IPreparedTopicStats} from '../../../../../types/store/topic';
 import {cn} from '../../../../../utils/cn';
@@ -78,14 +79,15 @@ interface TopicStatsProps {
 }
 
 export const TopicStats = ({path, database, databaseFullPath}: TopicStatsProps) => {
+    const useMetaProxy = useClusterWithProxy();
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = topicApi.useGetTopicQuery(
-        {path, database, databaseFullPath},
+        {path, database, databaseFullPath, useMetaProxy},
         {pollingInterval: autoRefreshInterval},
     );
     const loading = isFetching && currentData === undefined;
     const data = useTypedSelector((state) =>
-        selectPreparedTopicStats(state, path, database, databaseFullPath),
+        selectPreparedTopicStats(state, path, database, databaseFullPath, useMetaProxy),
     );
 
     if (loading) {
