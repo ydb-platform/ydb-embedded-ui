@@ -30,6 +30,11 @@ export function useStorageQueryParams() {
         STORAGE_TYPES.groups,
     );
 
+    const [blobMetricsEnabled] = useSetting<boolean>(
+        SETTING_KEYS.ENABLE_BLOB_STORAGE_CAPACITY_METRICS,
+        false,
+    );
+
     const storageType = storageTypeSchema.parse(queryParams.type);
 
     const visibleEntities = visibleEntitiesSchema.parse(queryParams.visible);
@@ -77,11 +82,11 @@ export function useStorageQueryParams() {
     };
 
     const handleStorageGroupsGroupByParamChange = (value: string) => {
-        setQueryParams({storageGroupsGroupBy: value}, 'replaceIn');
+        setQueryParams({storageGroupsGroupBy: value || undefined}, 'replaceIn');
     };
 
     const handleStorageNodesGroupByParamChange = (value: string) => {
-        setQueryParams({storageNodesGroupBy: value}, 'replaceIn');
+        setQueryParams({storageNodesGroupBy: value || undefined}, 'replaceIn');
     };
 
     const handleShowAllGroups = () => {
@@ -92,6 +97,31 @@ export function useStorageQueryParams() {
         handleVisibleEntitiesChange('all');
         handleUptimeFilterChange(NodesUptimeFilterValues.All);
     };
+
+    React.useEffect(() => {
+        if (blobMetricsEnabled) {
+            return;
+        }
+
+        const patch: Record<string, string | undefined> = {};
+
+        if (queryParams.storageGroupsGroupBy === 'CapacityAlert') {
+            patch.storageGroupsGroupBy = undefined;
+        }
+
+        if (queryParams.storageNodesGroupBy === 'CapacityAlert') {
+            patch.storageNodesGroupBy = undefined;
+        }
+
+        if (Object.keys(patch).length > 0) {
+            setQueryParams(patch, 'replaceIn');
+        }
+    }, [
+        blobMetricsEnabled,
+        queryParams.storageGroupsGroupBy,
+        queryParams.storageNodesGroupBy,
+        setQueryParams,
+    ]);
 
     return {
         storageType,

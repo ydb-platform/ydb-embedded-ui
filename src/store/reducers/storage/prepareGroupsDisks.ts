@@ -83,6 +83,8 @@ export function prepareGroupsPDisk(data: TStoragePDisk & {NodeId?: number} = {})
 
     const SlotSize = bscPDisk.SlotSize ?? whiteboardPDisk?.EnforcedDynamicSlotSize;
 
+    const PDiskUsage = whiteboardPDisk?.PDiskUsage;
+
     return {
         ...mergedPDiskData,
         StringifiedId,
@@ -93,5 +95,6 @@ export function prepareGroupsPDisk(data: TStoragePDisk & {NodeId?: number} = {})
         Type,
         Severity,
         SlotSize,
+        PDiskUsage,
     };
 }

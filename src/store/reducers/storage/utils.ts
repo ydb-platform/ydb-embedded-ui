@@ -14,7 +14,12 @@ import type {
 import {EVDiskState} from '../../../types/api/vdisk';
 import type {TVDiskStateInfo} from '../../../types/api/vdisk';
 import {stringifyVdiskId} from '../../../utils/dataFormatters/dataFormatters';
-import {getColorSeverity, getSeverityColor} from '../../../utils/disks/helpers';
+import {
+    getCapacityAlertSeverity,
+    getColorSeverity,
+    getSeverityCapacityAlert,
+    getSeverityColor,
+} from '../../../utils/disks/helpers';
 import {
     prepareWhiteboardPDiskData,
     prepareWhiteboardVDiskData,
@@ -194,6 +199,19 @@ const prepareStorageGroups = (
     return preparedGroups;
 };
 
+// Returns max value ignoring undefined. Returns undefined for empty input
+const maxDefined = (values: Array<number | undefined>): number | undefined => {
+    const defined = values.filter((value): value is number => value !== undefined);
+
+    return defined.length ? Math.max(...defined) : undefined;
+};
+
+// For metrics that are already in percent and must be converted to ratio (percent / 100)
+const maxPercentToRatio = (values: Array<number | undefined>): number | undefined => {
+    const max = maxDefined(values);
+    return max === undefined ? undefined : max / 100;
+};
+
 // ==== Prepare nodes ====
 
 const prepareStorageNodeData = (
@@ -221,6 +239,18 @@ const prepareStorageNodeData = (
         };
     });
 
+    const MaxPDiskUsage = isNil(pDisks)
+        ? undefined
+        : maxPercentToRatio(pDisks?.map((pDisk) => pDisk.PDiskUsage));
+    const MaxVDiskSlotUsage = isNil(vDisks)
+        ? undefined
+        : maxPercentToRatio(vDisks?.map((vDisk) => vDisk.VDiskSlotUsage));
+
+    const maxCapacityAlertSeverity = isNil(vDisks)
+        ? undefined
+        : maxDefined(vDisks?.map((vDisk) => getCapacityAlertSeverity(vDisk.CapacityAlert)));
+    const CapacityAlert = getSeverityCapacityAlert(maxCapacityAlertSeverity);
+
     return {
         ...restNodeParams,
         ...prepareNodeSystemState(SystemState),
@@ -232,6 +262,9 @@ const prepareStorageNodeData = (
         Missing: missing,
         MaximumSlotsPerDisk: maximumSlotsPerDisk,
         MaximumDisksPerNode: maximumDisksPerNode,
+        MaxPDiskUsage,
+        MaxVDiskSlotUsage,
+        CapacityAlert,
     };
 };
 
@@ -419,6 +452,16 @@ export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStor
 
         const diskSpaceStatus = getGroupDiskSpaceStatus(group);
 
+        const MaxPDiskUsage = maxPercentToRatio(vDisks.map((vDisk) => vDisk.PDisk?.PDiskUsage));
+        const MaxVDiskSlotUsage = maxPercentToRatio(vDisks.map((vDisk) => vDisk.VDiskSlotUsage));
+        const MaxVDiskRawUsage = maxPercentToRatio(vDisks.map((vDisk) => vDisk.VDiskRawUsage));
+        const MaxNormalizedOccupancy = maxPercentToRatio(
+            vDisks.map((vDisk) => vDisk.NormalizedOccupancy),
+        );
+        const maxCapacityAlertSeverity = maxDefined(
+            vDisks.map((vDisk) => getCapacityAlertSeverity(vDisk.CapacityAlert)),
+        );
+
         return {
             ...group,
             Usage,
@@ -438,6 +481,12 @@ export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStor
             VDisks: vDisks,
 
             DiskSpace: diskSpaceStatus,
+
+            MaxPDiskUsage,
+            MaxVDiskRawUsage,
+            MaxVDiskSlotUsage,
+            MaxNormalizedOccupancy,
+            CapacityAlert: getSeverityCapacityAlert(maxCapacityAlertSeverity),
         };
     });
 

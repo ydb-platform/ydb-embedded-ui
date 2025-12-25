@@ -4,6 +4,7 @@ import type {EFlag} from '../../../types/api/enums';
 import type {NodesGroupByField, TNodeInfo} from '../../../types/api/nodes';
 import type {Erasure, GroupsGroupByField} from '../../../types/api/storage';
 import type {TTabletStateInfo} from '../../../types/api/tablet';
+import type {ECapacityAlert} from '../../../types/api/vdisk';
 import type {PreparedPDisk, PreparedVDisk} from '../../../utils/disks/types';
 import type {NodesUptimeFilterValues, PreparedNodeSystemState} from '../../../utils/nodes';
 
@@ -39,6 +40,10 @@ export interface PreparedStorageNode
     Missing: number;
     MaximumSlotsPerDisk: number;
     MaximumDisksPerNode: number;
+
+    MaxPDiskUsage?: number;
+    MaxVDiskSlotUsage?: number;
+    CapacityAlert?: ECapacityAlert;
 }
 
 export interface PreparedStorageGroupFilters {
@@ -97,6 +102,12 @@ export interface PreparedStorageGroup {
     LatencyPutTabletLogMs?: number;
     LatencyPutUserDataMs?: number;
     LatencyGetFastMs?: number;
+
+    MaxPDiskUsage?: number;
+    MaxVDiskSlotUsage?: number;
+    MaxVDiskRawUsage?: number;
+    MaxNormalizedOccupancy?: number;
+    CapacityAlert?: ECapacityAlert;
 }
 
 export type TableGroup = {

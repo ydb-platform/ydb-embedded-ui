@@ -1,0 +1,7 @@
+{
+  "pdisk-usage": "PDisk Usage",
+  "vdisk-slot-usage": "VDisk Slot Usage",
+  "vdisk-raw-usage": "VDisk Raw Usage",
+  "normalized-occupancy": "Normalized Occupancy",
+  "capacity-alert": "Capacity Alert"
+}

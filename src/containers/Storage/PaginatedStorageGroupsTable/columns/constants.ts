@@ -1,6 +1,10 @@
 import type {SelectOption} from '@gravity-ui/uikit';
 import {z} from 'zod';
 
+import {
+    CAPACITY_METRICS_COLUMN_IDS,
+    CAPACITY_METRICS_COLUMN_TITLES,
+} from '../../../../components/capacityMetricsColumns/constants';
 import type {
     GroupsGroupByField,
     GroupsRequiredField,
@@ -32,6 +36,7 @@ export const STORAGE_GROUPS_COLUMNS_IDS = {
     VDisksPDisks: 'VDisksPDisks',
     Degraded: 'Degraded',
     State: 'State',
+    ...CAPACITY_METRICS_COLUMN_IDS,
 } as const;
 
 export type StorageGroupsColumnId = ValueOf<typeof STORAGE_GROUPS_COLUMNS_IDS>;
@@ -60,6 +65,18 @@ export const DEFAULT_STORAGE_GROUPS_COLUMNS: StorageGroupsColumnId[] = [
 const VIEWER_USER_COLUMNS_IDS: StorageGroupsColumnId[] = ['DiskSpace'];
 export function isViewerGroupsColumn(columnId: string): boolean {
     return VIEWER_USER_COLUMNS_IDS.some((el) => el === columnId);
+}
+
+const CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS: StorageGroupsColumnId[] = [
+    'PDiskUsage',
+    'VDiskSlotUsage',
+    'VDiskRawUsage',
+    'NormalizedOccupancy',
+    'CapacityAlert',
+];
+
+export function isCapacityMetricsUserGroupsColumn(columnId: string): boolean {
+    return CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS.some((el) => el === columnId);
 }
 
 export const REQUIRED_STORAGE_GROUPS_COLUMNS: StorageGroupsColumnId[] = ['GroupId'];
@@ -121,6 +138,21 @@ export const STORAGE_GROUPS_COLUMNS_TITLES = {
     get State() {
         return i18n('state');
     },
+    get PDiskUsage() {
+        return CAPACITY_METRICS_COLUMN_TITLES.PDiskUsage;
+    },
+    get VDiskSlotUsage() {
+        return CAPACITY_METRICS_COLUMN_TITLES.VDiskSlotUsage;
+    },
+    get VDiskRawUsage() {
+        return CAPACITY_METRICS_COLUMN_TITLES.VDiskRawUsage;
+    },
+    get NormalizedOccupancy() {
+        return CAPACITY_METRICS_COLUMN_TITLES.NormalizedOccupancy;
+    },
+    get CapacityAlert() {
+        return CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert;
+    },
 } as const satisfies Record<StorageGroupsColumnId, string>;
 
 const STORAGE_GROUPS_COLUMNS_GROUP_BY_TITLES = {
@@ -160,6 +192,9 @@ const STORAGE_GROUPS_COLUMNS_GROUP_BY_TITLES = {
     get Latency() {
         return i18n('latency');
     },
+    get CapacityAlert() {
+        return CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert;
+    },
 } as const satisfies Record<GroupsGroupByField, string>;
 
 const STORAGE_GROUPS_GROUP_BY_PARAMS = [
@@ -173,6 +208,7 @@ const STORAGE_GROUPS_GROUP_BY_PARAMS = [
     'State',
     'MissingDisks',
     'Latency',
+    'CapacityAlert',
 ] as const satisfies GroupsGroupByField[];
 
 export const STORAGE_GROUPS_GROUP_BY_OPTIONS: SelectOption[] = STORAGE_GROUPS_GROUP_BY_PARAMS.map(
@@ -213,6 +249,11 @@ export const GROUPS_COLUMNS_TO_DATA_FIELDS: Record<StorageGroupsColumnId, Groups
     VDisksPDisks: ['VDisk', 'PDisk', 'Read', 'Write'],
     Degraded: ['MissingDisks'],
     State: ['State'],
+    PDiskUsage: ['VDisk', 'PDisk', 'Read', 'Write'],
+    VDiskSlotUsage: ['VDisk', 'Read', 'Write'],
+    VDiskRawUsage: ['VDisk', 'Read', 'Write'],
+    NormalizedOccupancy: ['VDisk', 'Read', 'Write'],
+    CapacityAlert: ['VDisk', 'Read', 'Write'],
 };
 
 const STORAGE_GROUPS_COLUMNS_TO_SORT_FIELDS: Record<
@@ -237,6 +278,11 @@ const STORAGE_GROUPS_COLUMNS_TO_SORT_FIELDS: Record<
     VDisksPDisks: undefined,
     Degraded: 'Degraded',
     State: 'State',
+    PDiskUsage: undefined,
+    VDiskSlotUsage: undefined,
+    VDiskRawUsage: undefined,
+    NormalizedOccupancy: undefined,
+    CapacityAlert: undefined,
 };
 
 export function getStorageGroupsColumnSortField(columnId?: string) {

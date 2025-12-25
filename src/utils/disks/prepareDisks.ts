@@ -44,6 +44,10 @@ export function prepareWhiteboardVDiskData(
         Donors,
         AvailableSize,
         AllocatedSize,
+        VDiskSlotUsage,
+        VDiskRawUsage,
+        NormalizedOccupancy,
+        CapacityAlert,
         ...restVDiskFields
     } = vDiskState;
 
@@ -99,6 +103,11 @@ export function prepareWhiteboardVDiskData(
 
         Severity,
         StringifiedId,
+
+        VDiskRawUsage,
+        VDiskSlotUsage,
+        NormalizedOccupancy,
+        CapacityAlert,
     };
 }
 
@@ -111,6 +120,7 @@ export function prepareWhiteboardPDiskData(pdiskState: TPDiskStateInfo = {}): Pr
         PDiskId,
         NodeId,
         EnforcedDynamicSlotSize,
+        PDiskUsage,
         ...restPDiskFields
     } = pdiskState;
 
@@ -139,6 +149,7 @@ export function prepareWhiteboardPDiskData(pdiskState: TPDiskStateInfo = {}): Pr
         State,
         Severity,
         SlotSize: EnforcedDynamicSlotSize,
+        PDiskUsage,
     };
 }
 

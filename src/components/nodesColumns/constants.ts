@@ -1,5 +1,9 @@
 import type {NodesGroupByField, NodesRequiredField, NodesSortValue} from '../../types/api/nodes';
 import type {ValueOf} from '../../types/common';
+import {
+    CAPACITY_METRICS_COLUMN_IDS,
+    CAPACITY_METRICS_COLUMN_TITLES,
+} from '../capacityMetricsColumns/constants';
 
 import i18n from './i18n';
 
@@ -33,6 +37,9 @@ export const NODES_COLUMNS_IDS = {
     Tablets: 'Tablets',
     PDisks: 'PDisks',
     PileName: 'PileName',
+    PDiskUsage: CAPACITY_METRICS_COLUMN_IDS.PDiskUsage,
+    VDiskSlotUsage: CAPACITY_METRICS_COLUMN_IDS.VDiskSlotUsage,
+    CapacityAlert: CAPACITY_METRICS_COLUMN_IDS.CapacityAlert,
 } as const;
 
 export type NodesColumnId = ValueOf<typeof NODES_COLUMNS_IDS>;
@@ -134,6 +141,15 @@ export const NODES_COLUMNS_TITLES = {
     get PileName() {
         return i18n('field_pile-name');
     },
+    get PDiskUsage() {
+        return CAPACITY_METRICS_COLUMN_TITLES.PDiskUsage;
+    },
+    get VDiskSlotUsage() {
+        return CAPACITY_METRICS_COLUMN_TITLES.VDiskSlotUsage;
+    },
+    get CapacityAlert() {
+        return CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert;
+    },
 } as const satisfies Record<NodesColumnId, string>;
 
 const NODES_COLUMNS_GROUP_BY_TITLES = {
@@ -185,6 +201,9 @@ const NODES_COLUMNS_GROUP_BY_TITLES = {
     get PileName() {
         return i18n('field_pile-name');
     },
+    get CapacityAlert() {
+        return CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert;
+    },
 } as const satisfies Record<NodesGroupByField, string>;
 
 export function getNodesGroupByFieldTitle(groupByField: NodesGroupByField) {
@@ -221,6 +240,9 @@ export const NODES_COLUMNS_TO_DATA_FIELDS: Record<NodesColumnId, NodesRequiredFi
     Tablets: ['Tablets', 'Database'],
     PDisks: ['PDisks'],
     PileName: ['PileName'],
+    PDiskUsage: ['PDisks'],
+    VDiskSlotUsage: ['PDisks'],
+    CapacityAlert: ['PDisks'],
 };
 
 const NODES_COLUMNS_TO_SORT_FIELDS: Record<NodesColumnId, NodesSortValue | undefined> = {
@@ -251,6 +273,9 @@ const NODES_COLUMNS_TO_SORT_FIELDS: Record<NodesColumnId, NodesSortValue | undef
     Tablets: undefined,
     PDisks: undefined,
     PileName: undefined,
+    PDiskUsage: undefined,
+    VDiskSlotUsage: undefined,
+    CapacityAlert: undefined,
 };
 
 export function getNodesColumnSortField(columnId?: string) {

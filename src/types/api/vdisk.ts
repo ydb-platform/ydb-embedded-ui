@@ -82,6 +82,10 @@ export interface TVDiskStateInfo {
      * Write bytes per second to PDisk for TEvVPut blobs and replication bytes only
      */
     WriteThroughput?: string;
+    VDiskSlotUsage?: number;
+    NormalizedOccupancy?: number;
+    VDiskRawUsage?: number;
+    CapacityAlert?: ECapacityAlert;
 }
 
 export interface TVSlotId {
@@ -159,3 +163,15 @@ export type EVDiskStatus =
     | 'INIT_PENDING' // initialization in process
     | 'REPLICATING' // the disk accepts queries, but not all the data was replicated
     | 'READY'; // the disk is fully operational and does not affect group fault tolerance
+
+export enum ECapacityAlert {
+    GREEN = 'GREEN',
+    CYAN = 'CYAN',
+    LIGHTYELLOWMOVE = 'LIGHTYELLOWMOVE',
+    YELLOWSTOP = 'YELLOWSTOP',
+    LIGHTORANGE = 'LIGHTORANGE',
+    PREORANGE = 'PREORANGE',
+    ORANGE = 'ORANGE',
+    RED = 'RED',
+    BLACK = 'BLACK',
+}

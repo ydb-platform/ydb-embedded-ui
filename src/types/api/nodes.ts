@@ -268,7 +268,8 @@ export type NodesGroupByField =
     | 'NetworkUtilization' // v13
     | 'ClockSkew' // v13
     | 'PingTime' // v13
-    | 'PileName';
+    | 'PileName'
+    | 'CapacityAlert';
 
 export type NodesRequiredField =
     | 'NodeId'

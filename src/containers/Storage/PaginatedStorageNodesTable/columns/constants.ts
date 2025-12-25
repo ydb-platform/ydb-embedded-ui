@@ -26,7 +26,18 @@ const STORAGE_NODES_GROUP_BY_PARAMS = [
     'Uptime',
     'Missing',
     'DiskSpaceUsage',
+    'CapacityAlert',
 ] as const satisfies NodesGroupByField[];
+
+const CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS: NodesColumnId[] = [
+    'PDiskUsage',
+    'VDiskSlotUsage',
+    'CapacityAlert',
+];
+
+export function isCapacityMetricsUserNodesColumn(columnId: string): boolean {
+    return CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS.some((el) => el === columnId);
+}
 
 export const STORAGE_NODES_GROUP_BY_OPTIONS: SelectOption[] = STORAGE_NODES_GROUP_BY_PARAMS.map(
     (param) => {

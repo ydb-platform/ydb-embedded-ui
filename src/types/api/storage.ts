@@ -286,7 +286,8 @@ export type GroupsGroupByField =
     | 'MediaType'
     | 'MissingDisks'
     | 'State'
-    | 'Latency';
+    | 'Latency'
+    | 'CapacityAlert';
 
 export type GroupsRequiredField =
     | 'GroupId' // always required

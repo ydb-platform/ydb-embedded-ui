@@ -128,6 +128,11 @@ export const enableQueryStreamingOldBackendSetting: SettingProps = {
     description: i18n('settings.editor.queryStreaming.description'),
 };
 
+export const enableBlobStorageCapacityMetricsSetting: SettingProps = {
+    settingKey: SETTING_KEYS.ENABLE_BLOB_STORAGE_CAPACITY_METRICS,
+    title: i18n('settings.enableBlobStorageCapacityMetrics.title'),
+};
+
 export function applyClusterSpecificQueryStreamingSetting(
     settings: YDBEmbeddedUISettings,
     clusterName?: string,
@@ -222,6 +227,7 @@ export const experimentsSection: SettingsSection = {
         useShowPlanToSvgTables,
         enableQueryStreamingSetting,
         showNetworkUtilizationSetting,
+        enableBlobStorageCapacityMetricsSetting,
     ],
 };
 

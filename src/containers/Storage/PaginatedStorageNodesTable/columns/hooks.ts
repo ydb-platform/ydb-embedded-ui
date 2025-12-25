@@ -5,7 +5,9 @@ import {
     NODES_COLUMNS_TITLES,
 } from '../../../../components/nodesColumns/constants';
 import {useBridgeModeEnabled} from '../../../../store/reducers/capabilities/hooks';
+import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import {VISIBLE_ENTITIES} from '../../../../store/reducers/storage/constants';
+import {useSetting} from '../../../../utils/hooks';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 
 import {getStorageNodesColumns} from './columns';
@@ -13,6 +15,7 @@ import {
     DEFAULT_STORAGE_NODES_COLUMNS,
     REQUIRED_STORAGE_NODES_COLUMNS,
     STORAGE_NODES_SELECTED_COLUMNS_LS_KEY,
+    isCapacityMetricsUserNodesColumn,
 } from './constants';
 import type {GetStorageNodesColumnsParams} from './types';
 
@@ -23,6 +26,10 @@ export function useStorageNodesSelectedColumns({
     columnsSettings,
 }: GetStorageNodesColumnsParams) {
     const bridgeModeEnabled = useBridgeModeEnabled();
+    const [blobMetricsEnabled] = useSetting<boolean>(
+        SETTING_KEYS.ENABLE_BLOB_STORAGE_CAPACITY_METRICS,
+        false,
+    );
 
     const columns = React.useMemo(() => {
         const all = getStorageNodesColumns({
@@ -30,8 +37,17 @@ export function useStorageNodesSelectedColumns({
             viewContext,
             columnsSettings,
         });
-        return bridgeModeEnabled ? all : all.filter((c) => c.name !== NODES_COLUMNS_IDS.PileName);
-    }, [database, viewContext, columnsSettings, bridgeModeEnabled]);
+
+        const filteredByBridge = bridgeModeEnabled
+            ? all
+            : all.filter((column) => column.name !== NODES_COLUMNS_IDS.PileName);
+
+        const filteredByBlobMetrics = blobMetricsEnabled
+            ? filteredByBridge
+            : filteredByBridge.filter((column) => !isCapacityMetricsUserNodesColumn(column.name));
+
+        return filteredByBlobMetrics;
+    }, [database, viewContext, columnsSettings, bridgeModeEnabled, blobMetricsEnabled]);
 
     const requiredColumns = React.useMemo(() => {
         if (visibleEntities === VISIBLE_ENTITIES.missing) {

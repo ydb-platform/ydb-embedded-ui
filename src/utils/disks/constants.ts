@@ -10,7 +10,7 @@ import type {IconData, LabelProps} from '@gravity-ui/uikit';
 
 import type {EFlag} from '../../types/api/enums';
 import {TPDiskState} from '../../types/api/pdisk';
-import {EVDiskState} from '../../types/api/vdisk';
+import {ECapacityAlert, EVDiskState} from '../../types/api/vdisk';
 
 // state to numbers to allow ordinal comparison
 export const DISK_COLOR_STATE_TO_NUMERIC_SEVERITY: Record<EFlag, number> = {
@@ -108,3 +108,25 @@ export const VDISK_LABEL_CONFIG: Record<string, LabelVisualConfig> = {
         icon: NUMERIC_SEVERITY_TO_LABEL_VIEW[DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue].icon,
     },
 };
+
+export const CAPACITY_ALERT_TO_NUMERIC_SEVERITY: Record<ECapacityAlert, number> = {
+    GREEN: 0, // = no flags
+    CYAN: 1,
+    LIGHTYELLOWMOVE: 2,
+    YELLOWSTOP: 3,
+    LIGHTORANGE: 4,
+    PREORANGE: 5,
+    ORANGE: 6,
+    RED: 7,
+    BLACK: 8,
+} as const;
+
+type SeverityToAlert = Record<number, ECapacityAlert>;
+
+export const NUMERIC_SEVERITY_TO_CAPACITY_ALERT = Object.entries(
+    CAPACITY_ALERT_TO_NUMERIC_SEVERITY,
+).reduce<SeverityToAlert>((acc, [alert, severity]) => {
+    return {...acc, [severity]: alert as ECapacityAlert};
+}, {});
+
+export const DEFAULT_CAPACITY_ALERT = ECapacityAlert.GREEN;

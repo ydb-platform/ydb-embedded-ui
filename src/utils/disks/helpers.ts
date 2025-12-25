@@ -3,15 +3,18 @@ import {isNil} from 'lodash';
 
 import type {VDiskBlobIndexStatParams} from '../../store/reducers/vdisk/vdisk';
 import {EFlag} from '../../types/api/enums';
-import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
+import type {ECapacityAlert, TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
 import {generateEvaluator} from '../generateEvaluator';
 
 import {
+    CAPACITY_ALERT_TO_NUMERIC_SEVERITY,
+    DEFAULT_CAPACITY_ALERT,
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
     DISK_NUMERIC_SEVERITY_TO_STATE_COLOR,
     DISPLAYED_DISK_ERROR_ICON,
     DONOR_ICON,
     NOT_AVAILABLE_SEVERITY_COLOR,
+    NUMERIC_SEVERITY_TO_CAPACITY_ALERT,
 } from './constants';
 import type {PreparedVDisk} from './types';
 
@@ -37,6 +40,18 @@ export function getSeverityColor(severity: number | undefined) {
 
 export function getColorSeverity(color?: EFlag) {
     return color ? DISK_COLOR_STATE_TO_NUMERIC_SEVERITY[color] : 0;
+}
+
+export function getSeverityCapacityAlert(severity: number | undefined) {
+    if (severity === undefined) {
+        return DEFAULT_CAPACITY_ALERT;
+    }
+
+    return NUMERIC_SEVERITY_TO_CAPACITY_ALERT[severity] || DEFAULT_CAPACITY_ALERT;
+}
+
+export function getCapacityAlertSeverity(capacityAlert?: ECapacityAlert) {
+    return capacityAlert ? CAPACITY_ALERT_TO_NUMERIC_SEVERITY[capacityAlert] : 0;
 }
 
 export function getPDiskId({

@@ -40,6 +40,7 @@ export const SETTING_KEYS = {
     QUERY_EXECUTION_SETTINGS: 'queryExecutionSettings',
     ACL_SYNTAX: 'aclSyntax',
     STORAGE_TYPE: 'storageType',
+    ENABLE_BLOB_STORAGE_CAPACITY_METRICS: 'blobStorageCapacityMetrics',
 } as const;
 
 export type SettingKey = ValueOf<typeof SETTING_KEYS>;
@@ -78,6 +79,7 @@ export const DEFAULT_USER_SETTINGS = {
     [SETTING_KEYS.QUERY_EXECUTION_SETTINGS]: DEFAULT_QUERY_SETTINGS,
     [SETTING_KEYS.ACL_SYNTAX]: AclSyntax.YdbShort,
     [SETTING_KEYS.STORAGE_TYPE]: STORAGE_TYPES.groups,
+    [SETTING_KEYS.ENABLE_BLOB_STORAGE_CAPACITY_METRICS]: false,
 } as const satisfies Record<SettingKey, unknown>;
 
 export const SETTINGS_OPTIONS: Record<string, SettingOptions | undefined> = {

@@ -6,6 +6,8 @@ import {EntitiesCount} from '../../../components/EntitiesCount/EntitiesCount';
 import {usePaginatedTableState} from '../../../components/PaginatedTable/PaginatedTableContext';
 import {Search} from '../../../components/Search/Search';
 import {useBridgeModeEnabled} from '../../../store/reducers/capabilities/hooks';
+import {SETTING_KEYS} from '../../../store/reducers/settings/constants';
+import {useSetting} from '../../../utils/hooks';
 import {useIsUserAllowedToMakeChanges} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {STORAGE_GROUPS_GROUP_BY_OPTIONS} from '../PaginatedStorageGroupsTable/columns/constants';
 import {StorageTypeFilter} from '../StorageTypeFilter/StorageTypeFilter';
@@ -44,12 +46,24 @@ export function StorageGroupsControls({
 
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const bridgeModeEnabled = useBridgeModeEnabled();
+    const [blobMetricsEnabled] = useSetting<boolean>(
+        SETTING_KEYS.ENABLE_BLOB_STORAGE_CAPACITY_METRICS,
+        false,
+    );
+
     const groupByOptions = React.useMemo(() => {
-        if (bridgeModeEnabled) {
-            return STORAGE_GROUPS_GROUP_BY_OPTIONS;
+        let options = STORAGE_GROUPS_GROUP_BY_OPTIONS;
+
+        if (!bridgeModeEnabled) {
+            options = options.filter((opt) => opt.value !== 'PileName');
         }
-        return STORAGE_GROUPS_GROUP_BY_OPTIONS.filter((opt) => opt.value !== 'PileName');
-    }, [bridgeModeEnabled]);
+
+        if (!blobMetricsEnabled) {
+            options = options.filter((opt) => opt.value !== 'CapacityAlert');
+        }
+
+        return options;
+    }, [bridgeModeEnabled, blobMetricsEnabled]);
 
     const handleGroupBySelectUpdate = (value: string[]) => {
         handleStorageGroupsGroupByParamChange(value[0]);
