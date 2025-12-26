@@ -3,7 +3,7 @@ import {isNil} from 'lodash';
 
 import {EMPTY_DATA_PLACEHOLDER} from '../../lib';
 import {getCapacityAlertColor} from '../../utils/capacityAlert/colors';
-import {formatPercent} from '../../utils/dataFormatters/dataFormatters';
+import {formatPercent, roundToPrecision} from '../../utils/dataFormatters/dataFormatters';
 import type {Column} from '../../utils/tableUtils/types';
 import {isNumeric} from '../../utils/utils';
 
@@ -78,7 +78,7 @@ export function getNormalizedOccupancyColumn<
         width: 200,
         render: ({row}) => {
             return isNumeric(row.MaxNormalizedOccupancy)
-                ? formatPercent(row.MaxNormalizedOccupancy, 4)
+                ? roundToPrecision(row.MaxNormalizedOccupancy, 2)
                 : EMPTY_DATA_PLACEHOLDER;
         },
         align: DataTable.RIGHT,
