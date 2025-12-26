@@ -30,8 +30,8 @@ const STORAGE_NODES_GROUP_BY_PARAMS = [
 ] as const satisfies NodesGroupByField[];
 
 const CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS: NodesColumnId[] = [
-    'PDiskUsage',
-    'VDiskSlotUsage',
+    'MaxPDiskUsage',
+    'MaxVDiskSlotUsage',
     'CapacityAlert',
 ];
 

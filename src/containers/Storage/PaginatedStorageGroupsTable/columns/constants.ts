@@ -68,10 +68,10 @@ export function isViewerGroupsColumn(columnId: string): boolean {
 }
 
 const CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS: StorageGroupsColumnId[] = [
-    'PDiskUsage',
-    'VDiskSlotUsage',
-    'VDiskRawUsage',
-    'NormalizedOccupancy',
+    'MaxPDiskUsage',
+    'MaxVDiskSlotUsage',
+    'MaxVDiskRawUsage',
+    'MaxNormalizedOccupancy',
     'CapacityAlert',
 ];
 
@@ -138,17 +138,17 @@ export const STORAGE_GROUPS_COLUMNS_TITLES = {
     get State() {
         return i18n('state');
     },
-    get PDiskUsage() {
-        return CAPACITY_METRICS_COLUMN_TITLES.PDiskUsage;
+    get MaxPDiskUsage() {
+        return CAPACITY_METRICS_COLUMN_TITLES.MaxPDiskUsage;
     },
-    get VDiskSlotUsage() {
-        return CAPACITY_METRICS_COLUMN_TITLES.VDiskSlotUsage;
+    get MaxVDiskSlotUsage() {
+        return CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskSlotUsage;
     },
-    get VDiskRawUsage() {
-        return CAPACITY_METRICS_COLUMN_TITLES.VDiskRawUsage;
+    get MaxVDiskRawUsage() {
+        return CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskRawUsage;
     },
-    get NormalizedOccupancy() {
-        return CAPACITY_METRICS_COLUMN_TITLES.NormalizedOccupancy;
+    get MaxNormalizedOccupancy() {
+        return CAPACITY_METRICS_COLUMN_TITLES.MaxNormalizedOccupancy;
     },
     get CapacityAlert() {
         return CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert;
@@ -249,11 +249,11 @@ export const GROUPS_COLUMNS_TO_DATA_FIELDS: Record<StorageGroupsColumnId, Groups
     VDisksPDisks: ['VDisk', 'PDisk', 'Read', 'Write'],
     Degraded: ['MissingDisks'],
     State: ['State'],
-    PDiskUsage: ['VDisk', 'PDisk', 'Read', 'Write'],
-    VDiskSlotUsage: ['VDisk', 'Read', 'Write'],
-    VDiskRawUsage: ['VDisk', 'Read', 'Write'],
-    NormalizedOccupancy: ['VDisk', 'Read', 'Write'],
-    CapacityAlert: ['VDisk', 'Read', 'Write'],
+    MaxPDiskUsage: ['MaxPDiskUsage'],
+    MaxVDiskSlotUsage: ['MaxVDiskSlotUsage'],
+    MaxVDiskRawUsage: ['MaxVDiskRawUsage'],
+    MaxNormalizedOccupancy: ['MaxNormalizedOccupancy'],
+    CapacityAlert: ['CapacityAlert'],
 };
 
 const STORAGE_GROUPS_COLUMNS_TO_SORT_FIELDS: Record<
@@ -278,10 +278,10 @@ const STORAGE_GROUPS_COLUMNS_TO_SORT_FIELDS: Record<
     VDisksPDisks: undefined,
     Degraded: 'Degraded',
     State: 'State',
-    PDiskUsage: undefined,
-    VDiskSlotUsage: undefined,
-    VDiskRawUsage: undefined,
-    NormalizedOccupancy: undefined,
+    MaxPDiskUsage: 'MaxPDiskUsage',
+    MaxVDiskSlotUsage: 'MaxVDiskSlotUsage',
+    MaxVDiskRawUsage: 'MaxVDiskRawUsage',
+    MaxNormalizedOccupancy: 'MaxNormalizedOccupancy',
     CapacityAlert: undefined,
 };
 

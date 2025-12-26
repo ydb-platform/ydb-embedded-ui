@@ -37,8 +37,8 @@ export const NODES_COLUMNS_IDS = {
     Tablets: 'Tablets',
     PDisks: 'PDisks',
     PileName: 'PileName',
-    PDiskUsage: CAPACITY_METRICS_COLUMN_IDS.PDiskUsage,
-    VDiskSlotUsage: CAPACITY_METRICS_COLUMN_IDS.VDiskSlotUsage,
+    PDiskUsage: CAPACITY_METRICS_COLUMN_IDS.MaxPDiskUsage,
+    VDiskSlotUsage: CAPACITY_METRICS_COLUMN_IDS.MaxVDiskSlotUsage,
     CapacityAlert: CAPACITY_METRICS_COLUMN_IDS.CapacityAlert,
 } as const;
 
@@ -141,11 +141,11 @@ export const NODES_COLUMNS_TITLES = {
     get PileName() {
         return i18n('field_pile-name');
     },
-    get PDiskUsage() {
-        return CAPACITY_METRICS_COLUMN_TITLES.PDiskUsage;
+    get MaxPDiskUsage() {
+        return CAPACITY_METRICS_COLUMN_TITLES.MaxPDiskUsage;
     },
-    get VDiskSlotUsage() {
-        return CAPACITY_METRICS_COLUMN_TITLES.VDiskSlotUsage;
+    get MaxVDiskSlotUsage() {
+        return CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskSlotUsage;
     },
     get CapacityAlert() {
         return CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert;
@@ -240,9 +240,9 @@ export const NODES_COLUMNS_TO_DATA_FIELDS: Record<NodesColumnId, NodesRequiredFi
     Tablets: ['Tablets', 'Database'],
     PDisks: ['PDisks'],
     PileName: ['PileName'],
-    PDiskUsage: ['PDisks'],
-    VDiskSlotUsage: ['PDisks'],
-    CapacityAlert: ['PDisks'],
+    MaxPDiskUsage: ['MaxPDiskUsage'],
+    MaxVDiskSlotUsage: ['MaxVDiskSlotUsage'],
+    CapacityAlert: ['CapacityAlert'],
 };
 
 const NODES_COLUMNS_TO_SORT_FIELDS: Record<NodesColumnId, NodesSortValue | undefined> = {
@@ -273,8 +273,8 @@ const NODES_COLUMNS_TO_SORT_FIELDS: Record<NodesColumnId, NodesSortValue | undef
     Tablets: undefined,
     PDisks: undefined,
     PileName: undefined,
-    PDiskUsage: undefined,
-    VDiskSlotUsage: undefined,
+    MaxPDiskUsage: 'MaxPDiskUsage',
+    MaxVDiskSlotUsage: 'MaxVDiskSlotUsage',
     CapacityAlert: undefined,
 };
 

@@ -189,6 +189,13 @@ export interface TGroupsStorageGroupInfo {
     LatencyGetFast?: string;
 
     VDisks?: TStorageVDisk[];
+
+    // Capacity metrics experiment
+    MaxPDiskUsage?: number;
+    MaxVDiskSlotUsage?: number;
+    MaxVDiskRawUsage?: number;
+    MaxNormalizedOccupancy?: number;
+    CapacityAlert?: ECapacityAlert;
 }
 
 /**
@@ -261,7 +268,12 @@ export type StorageV2SortValue =
     | 'AllocationUnits'
     | 'Latency'
     | 'DiskSpaceUsage'
-    | 'State';
+    | 'State'
+    | 'MaxPDiskUsage'
+    | 'MaxVDiskSlotUsage'
+    | 'MaxVDiskRawUsage'
+    | 'MaxNormalizedOccupancy'
+    | 'CapacityAlert';
 
 /**
  * Values to sort /storage/groups response
@@ -310,7 +322,12 @@ export type GroupsRequiredField =
     | 'Write'
     | 'PDisk'
     | 'VDisk'
-    | 'Latency';
+    | 'Latency'
+    | 'MaxPDiskUsage'
+    | 'MaxVDiskSlotUsage'
+    | 'MaxVDiskRawUsage'
+    | 'MaxNormalizedOccupancy'
+    | 'CapacityAlert';
 
 interface BaseStorageRequestParams {
     database?: string;
@@ -347,4 +364,16 @@ export interface GroupsRequestParams extends BaseStorageRequestParams {
      * 50% - BSC timeout
      */
     timeout?: number;
+}
+
+export enum ECapacityAlert {
+    GREEN = 'GREEN',
+    CYAN = 'CYAN',
+    LIGHTYELLOWMOVE = 'LIGHTYELLOWMOVE',
+    YELLOWSTOP = 'YELLOWSTOP',
+    LIGHTORANGE = 'LIGHTORANGE',
+    PREORANGE = 'PREORANGE',
+    ORANGE = 'ORANGE',
+    RED = 'RED',
+    BLACK = 'BLACK',
 }

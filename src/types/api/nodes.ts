@@ -71,6 +71,11 @@ export interface TNodeInfo {
 
     // Bridge mode
     PileName?: string;
+
+    // Capacity metrics experiment
+    MaxPDiskUsage?: number;
+    MaxVDiskSlotUsage?: number;
+    CapacityAlert?: string;
 }
 
 export interface TNodesGroup {
@@ -300,7 +305,10 @@ export type NodesRequiredField =
     | `PingTime` // v13
     | `SendThroughput` // v13
     | `ReceiveThroughput` // v13
-    | 'PileName';
+    | 'PileName'
+    | 'MaxPDiskUsage'
+    | 'MaxVDiskSlotUsage'
+    | 'CapacityAlert';
 
 export type NodesSortValue =
     | 'NodeId'
@@ -324,7 +332,10 @@ export type NodesSortValue =
     | `ClockSkew` // v13
     | `PingTime` // v13
     | `SendThroughput` // v13
-    | `ReceiveThroughput`; // v13
+    | `ReceiveThroughput` // v13
+    | `MaxPDiskUsage`
+    | `MaxVDiskSlotUsage`
+    | `CapacityAlert`;
 
 export type NodesSort = BackendSortParam<NodesSortValue>;
 

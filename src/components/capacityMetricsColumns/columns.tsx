@@ -3,7 +3,7 @@ import {isNil} from 'lodash';
 
 import {EMPTY_DATA_PLACEHOLDER} from '../../lib';
 import {cn} from '../../utils/cn';
-import {roundToPrecision} from '../../utils/dataFormatters/dataFormatters';
+import {formatPercent} from '../../utils/dataFormatters/dataFormatters';
 import type {Column} from '../../utils/tableUtils/types';
 import {isNumeric} from '../../utils/utils';
 
@@ -15,12 +15,12 @@ const b = cn('ydb-capacity-metrics-columns');
 
 export function getPDiskUsageColumn<T extends {MaxPDiskUsage?: number}>(): Column<T> {
     return {
-        name: CAPACITY_METRICS_COLUMN_IDS.PDiskUsage,
-        header: CAPACITY_METRICS_COLUMN_TITLES.PDiskUsage,
+        name: CAPACITY_METRICS_COLUMN_IDS.MaxPDiskUsage,
+        header: CAPACITY_METRICS_COLUMN_TITLES.MaxPDiskUsage,
         width: 150,
         render: ({row}) => {
             return isNumeric(row.MaxPDiskUsage)
-                ? roundToPrecision(row.MaxPDiskUsage, 4)
+                ? formatPercent(row.MaxPDiskUsage, 4)
                 : EMPTY_DATA_PLACEHOLDER;
         },
         align: DataTable.CENTER,
@@ -29,12 +29,12 @@ export function getPDiskUsageColumn<T extends {MaxPDiskUsage?: number}>(): Colum
 
 export function getVDiskSlotUsageColumn<T extends {MaxVDiskSlotUsage?: number}>(): Column<T> {
     return {
-        name: CAPACITY_METRICS_COLUMN_IDS.VDiskSlotUsage,
-        header: CAPACITY_METRICS_COLUMN_TITLES.VDiskSlotUsage,
-        width: 150,
+        name: CAPACITY_METRICS_COLUMN_IDS.MaxVDiskSlotUsage,
+        header: CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskSlotUsage,
+        width: 200,
         render: ({row}) => {
             return isNumeric(row.MaxVDiskSlotUsage)
-                ? roundToPrecision(row.MaxVDiskSlotUsage, 4)
+                ? formatPercent(row.MaxVDiskSlotUsage, 4)
                 : EMPTY_DATA_PLACEHOLDER;
         },
         align: DataTable.CENTER,
@@ -61,12 +61,12 @@ export function getCapacityAlertColumn<T extends {CapacityAlert?: string}>(): Co
 
 export function getVDiskRawUsageColumn<T extends {MaxVDiskRawUsage?: number}>(): Column<T> {
     return {
-        name: CAPACITY_METRICS_COLUMN_IDS.VDiskRawUsage,
-        header: CAPACITY_METRICS_COLUMN_TITLES.VDiskRawUsage,
-        width: 150,
+        name: CAPACITY_METRICS_COLUMN_IDS.MaxVDiskRawUsage,
+        header: CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskRawUsage,
+        width: 200,
         render: ({row}) => {
             return isNumeric(row.MaxVDiskRawUsage)
-                ? roundToPrecision(row.MaxVDiskRawUsage, 4)
+                ? formatPercent(row.MaxVDiskRawUsage, 4)
                 : EMPTY_DATA_PLACEHOLDER;
         },
         align: DataTable.CENTER,
@@ -77,12 +77,12 @@ export function getNormalizedOccupancyColumn<
     T extends {MaxNormalizedOccupancy?: number},
 >(): Column<T> {
     return {
-        name: CAPACITY_METRICS_COLUMN_IDS.NormalizedOccupancy,
-        header: CAPACITY_METRICS_COLUMN_TITLES.NormalizedOccupancy,
+        name: CAPACITY_METRICS_COLUMN_IDS.MaxNormalizedOccupancy,
+        header: CAPACITY_METRICS_COLUMN_TITLES.MaxNormalizedOccupancy,
         width: 200,
         render: ({row}) => {
             return isNumeric(row.MaxNormalizedOccupancy)
-                ? roundToPrecision(row.MaxNormalizedOccupancy, 5)
+                ? formatPercent(row.MaxNormalizedOccupancy, 4)
                 : EMPTY_DATA_PLACEHOLDER;
         },
         align: DataTable.CENTER,
