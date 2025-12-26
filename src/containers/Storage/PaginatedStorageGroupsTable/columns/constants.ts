@@ -42,16 +42,12 @@ export const STORAGE_GROUPS_COLUMNS_IDS = {
 export type StorageGroupsColumnId = ValueOf<typeof STORAGE_GROUPS_COLUMNS_IDS>;
 
 // Columns, that should displayed only for users with isMonitoringAllowed:true
-const MONITORING_USER_COLUMNS_IDS: StorageGroupsColumnId[] = [
+export const MONITORING_USER_COLUMNS_IDS: StorageGroupsColumnId[] = [
     'DiskSpaceUsage',
     'Latency',
     'AllocationUnits',
     'VDisksPDisks',
 ];
-
-export function isMonitoringUserGroupsColumn(columnId: string): boolean {
-    return MONITORING_USER_COLUMNS_IDS.includes(columnId as StorageGroupsColumnId);
-}
 
 export const DEFAULT_STORAGE_GROUPS_COLUMNS: StorageGroupsColumnId[] = [
     'GroupId',
@@ -62,22 +58,15 @@ export const DEFAULT_STORAGE_GROUPS_COLUMNS: StorageGroupsColumnId[] = [
 ];
 
 // Columns, that should displayed only for users with isViewerAllowed:true
-const VIEWER_USER_COLUMNS_IDS: StorageGroupsColumnId[] = ['DiskSpace'];
-export function isViewerGroupsColumn(columnId: string): boolean {
-    return VIEWER_USER_COLUMNS_IDS.some((el) => el === columnId);
-}
+export const VIEWER_USER_COLUMNS_IDS: StorageGroupsColumnId[] = ['DiskSpace'];
 
-const CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS: StorageGroupsColumnId[] = [
+export const CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS: StorageGroupsColumnId[] = [
     'MaxPDiskUsage',
     'MaxVDiskSlotUsage',
     'MaxVDiskRawUsage',
     'MaxNormalizedOccupancy',
     'CapacityAlert',
 ];
-
-export function isCapacityMetricsUserGroupsColumn(columnId: string): boolean {
-    return CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS.some((el) => el === columnId);
-}
 
 export const REQUIRED_STORAGE_GROUPS_COLUMNS: StorageGroupsColumnId[] = ['GroupId'];
 

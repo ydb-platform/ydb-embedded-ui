@@ -164,6 +164,35 @@ export function applyClusterSpecificQueryStreamingSetting(
     });
 }
 
+export function applyBlobStorageCapacityMetricsSettingAvailability(
+    settings: YDBEmbeddedUISettings,
+    available: boolean,
+): YDBEmbeddedUISettings {
+    if (available) {
+        return settings;
+    }
+
+    return settings.map((page) => {
+        if (page.id !== PAGE_IDS.EXPERIMENTS) {
+            return page;
+        }
+
+        return createNextState(page, (draft) => {
+            const section = draft.sections.find((s) => s.id === SECTION_IDS.EXPERIMENTS);
+
+            if (!section) {
+                return;
+            }
+
+            section.settings = section.settings.filter(
+                (s) =>
+                    !('settingKey' in s) ||
+                    s.settingKey !== SETTING_KEYS.ENABLE_BLOB_STORAGE_CAPACITY_METRICS,
+            );
+        });
+    });
+}
+
 export const showNetworkUtilizationSetting: SettingProps = {
     settingKey: SETTING_KEYS.SHOW_NETWORK_UTILIZATION,
     title: i18n('settings.showNetworkUtilization.title'),

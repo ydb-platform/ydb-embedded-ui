@@ -6,8 +6,7 @@ import {EntitiesCount} from '../../../components/EntitiesCount/EntitiesCount';
 import {usePaginatedTableState} from '../../../components/PaginatedTable/PaginatedTableContext';
 import {Search} from '../../../components/Search/Search';
 import {UptimeFilter} from '../../../components/UptimeFIlter';
-import {SETTING_KEYS} from '../../../store/reducers/settings/constants';
-import {useSetting} from '../../../utils/hooks';
+import {useBlobStorageCapacityMetricsEnabled} from '../../../store/reducers/capabilities/hooks';
 import {STORAGE_NODES_GROUP_BY_OPTIONS} from '../PaginatedStorageNodesTable/columns/constants';
 import {StorageTypeFilter} from '../StorageTypeFilter/StorageTypeFilter';
 import {StorageVisibleEntitiesFilter} from '../StorageVisibleEntitiesFilter/StorageVisibleEntitiesFilter';
@@ -45,16 +44,16 @@ export function StorageNodesControls({
         handleStorageNodesGroupByParamChange,
     } = useStorageQueryParams();
 
-    const [blobMetricsEnabled] = useSetting<boolean>(
-        SETTING_KEYS.ENABLE_BLOB_STORAGE_CAPACITY_METRICS,
-        false,
-    );
+    const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
 
     const nodesGroupByOptions = React.useMemo(() => {
-        if (blobMetricsEnabled) {
-            return STORAGE_NODES_GROUP_BY_OPTIONS;
+        const skippedValues: string[] = [];
+
+        if (!blobMetricsEnabled) {
+            skippedValues.push('CapacityAlert');
         }
-        return STORAGE_NODES_GROUP_BY_OPTIONS.filter((opt) => opt.value !== 'CapacityAlert');
+
+        return STORAGE_NODES_GROUP_BY_OPTIONS.filter((opt) => !skippedValues.includes(opt.value));
     }, [blobMetricsEnabled]);
 
     const handleGroupBySelectUpdate = (value: string[]) => {

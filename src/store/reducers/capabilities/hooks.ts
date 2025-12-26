@@ -1,7 +1,8 @@
 import type {Capability, MetaCapability, SecuritySetting} from '../../../types/api/capabilities';
 import {uiFactory} from '../../../uiFactory/uiFactory';
-import {useTypedSelector} from '../../../utils/hooks';
+import {useSetting, useTypedSelector} from '../../../utils/hooks';
 import {useDatabaseFromQuery} from '../../../utils/hooks/useDatabaseFromQuery';
+import {SETTING_KEYS} from '../settings/constants';
 
 import {
     capabilitiesApi,
@@ -206,4 +207,18 @@ export const useMetaEnvironmentsAvailable = () => {
         useGetMetaFeatureVersion('/meta/environments') >= 1 &&
         Boolean(uiFactory.databasesEnvironmentsConfig?.supportedEnvironments?.length)
     );
+};
+
+export const useBlobStorageCapacityMetricsAvailable = () => {
+    const hasStorageGroups = useGetFeatureVersion('/storage/groups') >= 10;
+    const hasViewerNodes = useGetFeatureVersion('/viewer/nodes') >= 20;
+
+    return hasStorageGroups && hasViewerNodes;
+};
+
+export const useBlobStorageCapacityMetricsEnabled = () => {
+    const available = useBlobStorageCapacityMetricsAvailable();
+    const [enabled] = useSetting(SETTING_KEYS.ENABLE_BLOB_STORAGE_CAPACITY_METRICS, false);
+
+    return enabled && available;
 };

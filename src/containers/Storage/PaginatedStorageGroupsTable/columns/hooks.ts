@@ -1,9 +1,10 @@
 import React from 'react';
 
-import {useBridgeModeEnabled} from '../../../../store/reducers/capabilities/hooks';
-import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
+import {
+    useBlobStorageCapacityMetricsEnabled,
+    useBridgeModeEnabled,
+} from '../../../../store/reducers/capabilities/hooks';
 import {VISIBLE_ENTITIES} from '../../../../store/reducers/storage/constants';
-import {useSetting} from '../../../../utils/hooks';
 import {
     useIsUserAllowedToMakeChanges,
     useIsViewerUser,
@@ -11,15 +12,16 @@ import {
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 
 import {getStorageGroupsColumns} from './columns';
+import type {StorageGroupsColumnId} from './constants';
 import {
+    CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS,
     DEFAULT_STORAGE_GROUPS_COLUMNS,
+    MONITORING_USER_COLUMNS_IDS,
     REQUIRED_STORAGE_GROUPS_COLUMNS,
     STORAGE_GROUPS_COLUMNS_IDS,
     STORAGE_GROUPS_COLUMNS_TITLES,
     STORAGE_GROUPS_SELECTED_COLUMNS_LS_KEY,
-    isCapacityMetricsUserGroupsColumn,
-    isMonitoringUserGroupsColumn,
-    isViewerGroupsColumn,
+    VIEWER_USER_COLUMNS_IDS,
 } from './constants';
 import type {GetStorageGroupsColumnsParams} from './types';
 
@@ -30,40 +32,37 @@ export function useStorageGroupsSelectedColumns({
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const isViewerUser = useIsViewerUser();
     const bridgeModeEnabled = useBridgeModeEnabled();
-    const [blobMetricsEnabled] = useSetting<boolean>(
-        SETTING_KEYS.ENABLE_BLOB_STORAGE_CAPACITY_METRICS,
-        false,
-    );
+    const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
+
+    const skippedColumnIds = React.useMemo(() => {
+        const skipped: StorageGroupsColumnId[] = [];
+
+        if (!bridgeModeEnabled) {
+            skipped.push(STORAGE_GROUPS_COLUMNS_IDS.PileName);
+        }
+
+        if (!blobMetricsEnabled) {
+            skipped.push(...CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS);
+        }
+
+        if (!isUserAllowedToMakeChanges) {
+            skipped.push(...MONITORING_USER_COLUMNS_IDS);
+
+            if (!isViewerUser) {
+                skipped.push(...VIEWER_USER_COLUMNS_IDS);
+            }
+        }
+
+        return skipped;
+    }, [bridgeModeEnabled, blobMetricsEnabled, isUserAllowedToMakeChanges, isViewerUser]);
 
     const columns = React.useMemo(() => {
         const allColumns = getStorageGroupsColumns({viewContext});
-        const filteredByBridge = bridgeModeEnabled
-            ? allColumns
-            : allColumns.filter((column) => column.name !== STORAGE_GROUPS_COLUMNS_IDS.PileName);
 
-        const filteredByCapacityMetrics = blobMetricsEnabled
-            ? filteredByBridge
-            : filteredByBridge.filter((column) => !isCapacityMetricsUserGroupsColumn(column.name));
-
-        if (isUserAllowedToMakeChanges) {
-            return filteredByCapacityMetrics;
-        }
-        const filteredColumns = filteredByCapacityMetrics.filter(
-            (column) => !isMonitoringUserGroupsColumn(column.name),
+        return allColumns.filter(
+            (column) => !skippedColumnIds.includes(column.name as StorageGroupsColumnId),
         );
-
-        if (isViewerUser) {
-            return filteredColumns;
-        }
-
-        return filteredColumns.filter((column) => !isViewerGroupsColumn(column.name));
-    }, [
-        isUserAllowedToMakeChanges,
-        viewContext,
-        isViewerUser,
-        bridgeModeEnabled,
-        blobMetricsEnabled,
-    ]);
+    }, [viewContext, skippedColumnIds]);
 
     const requiredColumns = React.useMemo(() => {
         if (visibleEntities === VISIBLE_ENTITIES.missing) {

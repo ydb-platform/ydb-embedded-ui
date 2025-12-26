@@ -2,6 +2,7 @@ import React from 'react';
 
 import {StringParam, useQueryParam, useQueryParams} from 'use-query-params';
 
+import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabilities/hooks';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {STORAGE_TYPES} from '../../store/reducers/storage/constants';
 import type {StorageType, VisibleEntities} from '../../store/reducers/storage/types';
@@ -30,10 +31,7 @@ export function useStorageQueryParams() {
         STORAGE_TYPES.groups,
     );
 
-    const [blobMetricsEnabled] = useSetting<boolean>(
-        SETTING_KEYS.ENABLE_BLOB_STORAGE_CAPACITY_METRICS,
-        false,
-    );
+    const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
 
     const storageType = storageTypeSchema.parse(queryParams.type);
 

@@ -1,8 +1,8 @@
 import DataTable from '@gravity-ui/react-data-table';
 import {isNil} from 'lodash';
 
-import {EMPTY_DATA_PLACEHOLDER} from '../../lib';
 import {getCapacityAlertColor} from '../../utils/capacityAlert/colors';
+import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatPercent} from '../../utils/dataFormatters/dataFormatters';
 import type {Column} from '../../utils/tableUtils/types';
 import {isNumeric} from '../../utils/utils';
