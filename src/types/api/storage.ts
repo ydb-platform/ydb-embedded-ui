@@ -1,5 +1,5 @@
 import type {BackendSortParam} from './common';
-import type {EFlag} from './enums';
+import type {ECapacityAlert, EFlag} from './enums';
 import type {EDecommitStatus, EDriveStatus, TPDiskStateInfo} from './pdisk';
 import type {EVDiskStatus, TVDiskStateInfo} from './vdisk';
 
@@ -364,16 +364,4 @@ export interface GroupsRequestParams extends BaseStorageRequestParams {
      * 50% - BSC timeout
      */
     timeout?: number;
-}
-
-export enum ECapacityAlert {
-    GREEN = 'GREEN',
-    CYAN = 'CYAN',
-    LIGHTYELLOWMOVE = 'LIGHTYELLOWMOVE',
-    YELLOWSTOP = 'YELLOWSTOP',
-    LIGHTORANGE = 'LIGHTORANGE',
-    PREORANGE = 'PREORANGE',
-    ORANGE = 'ORANGE',
-    RED = 'RED',
-    BLACK = 'BLACK',
 }

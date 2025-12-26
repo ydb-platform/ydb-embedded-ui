@@ -1,5 +1,5 @@
 import type {BackendSortParam, SchemaPathParam} from './common';
-import type {EFlag} from './enums';
+import type {ECapacityAlert, EFlag} from './enums';
 import type {TPDiskStateInfo} from './pdisk';
 import type {TTabletStateInfo} from './tablet';
 import type {TThreadPoolInfo} from './threads';
@@ -75,7 +75,7 @@ export interface TNodeInfo {
     // Capacity metrics experiment
     MaxPDiskUsage?: number;
     MaxVDiskSlotUsage?: number;
-    CapacityAlert?: string;
+    CapacityAlert?: ECapacityAlert;
 }
 
 export interface TNodesGroup {
