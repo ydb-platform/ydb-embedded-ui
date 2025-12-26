@@ -3,7 +3,7 @@ import {isNil} from 'lodash';
 
 import {EMPTY_DATA_PLACEHOLDER} from '../../lib';
 import {getCapacityAlertColor} from '../../utils/capacityAlert/colors';
-import {formatPercent, roundToPrecision} from '../../utils/dataFormatters/dataFormatters';
+import {formatPercent} from '../../utils/dataFormatters/dataFormatters';
 import type {Column} from '../../utils/tableUtils/types';
 import {isNumeric} from '../../utils/utils';
 
@@ -16,7 +16,7 @@ export function getPDiskUsageColumn<T extends {MaxPDiskUsage?: number}>(): Colum
         width: 150,
         render: ({row}) => {
             return isNumeric(row.MaxPDiskUsage)
-                ? formatPercent(row.MaxPDiskUsage, 4)
+                ? formatPercent(row.MaxPDiskUsage, 2, {fixed: true})
                 : EMPTY_DATA_PLACEHOLDER;
         },
         align: DataTable.RIGHT,
@@ -30,7 +30,7 @@ export function getVDiskSlotUsageColumn<T extends {MaxVDiskSlotUsage?: number}>(
         width: 180,
         render: ({row}) => {
             return isNumeric(row.MaxVDiskSlotUsage)
-                ? formatPercent(row.MaxVDiskSlotUsage, 4)
+                ? formatPercent(row.MaxVDiskSlotUsage, 2, {fixed: true})
                 : EMPTY_DATA_PLACEHOLDER;
         },
         align: DataTable.RIGHT,
@@ -62,7 +62,7 @@ export function getVDiskRawUsageColumn<T extends {MaxVDiskRawUsage?: number}>():
         width: 180,
         render: ({row}) => {
             return isNumeric(row.MaxVDiskRawUsage)
-                ? formatPercent(row.MaxVDiskRawUsage, 4)
+                ? formatPercent(row.MaxVDiskRawUsage, 2, {fixed: true})
                 : EMPTY_DATA_PLACEHOLDER;
         },
         align: DataTable.RIGHT,
@@ -78,7 +78,7 @@ export function getNormalizedOccupancyColumn<
         width: 200,
         render: ({row}) => {
             return isNumeric(row.MaxNormalizedOccupancy)
-                ? roundToPrecision(row.MaxNormalizedOccupancy, 2)
+                ? Number(row.MaxNormalizedOccupancy).toFixed(2)
                 : EMPTY_DATA_PLACEHOLDER;
         },
         align: DataTable.RIGHT,
