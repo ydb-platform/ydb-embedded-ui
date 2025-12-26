@@ -474,7 +474,7 @@ export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStor
             MaxPDiskUsage: normalizeMaxPercent(MaxPDiskUsage),
             MaxVDiskRawUsage: normalizeMaxPercent(MaxVDiskRawUsage),
             MaxVDiskSlotUsage: normalizeMaxPercent(MaxVDiskSlotUsage),
-            MaxNormalizedOccupancy: normalizeMaxPercent(MaxNormalizedOccupancy),
+            MaxNormalizedOccupancy,
             CapacityAlert,
         };
     });

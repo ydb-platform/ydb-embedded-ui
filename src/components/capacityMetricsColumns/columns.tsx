@@ -2,16 +2,12 @@ import DataTable from '@gravity-ui/react-data-table';
 import {isNil} from 'lodash';
 
 import {EMPTY_DATA_PLACEHOLDER} from '../../lib';
-import {cn} from '../../utils/cn';
+import {getCapacityAlertColor} from '../../utils/capacityAlert/colors';
 import {formatPercent} from '../../utils/dataFormatters/dataFormatters';
 import type {Column} from '../../utils/tableUtils/types';
 import {isNumeric} from '../../utils/utils';
 
 import {CAPACITY_METRICS_COLUMN_IDS, CAPACITY_METRICS_COLUMN_TITLES} from './constants';
-
-import './CapacityMetricsColumns.scss';
-
-const b = cn('ydb-capacity-metrics-columns');
 
 export function getPDiskUsageColumn<T extends {MaxPDiskUsage?: number}>(): Column<T> {
     return {
@@ -23,7 +19,7 @@ export function getPDiskUsageColumn<T extends {MaxPDiskUsage?: number}>(): Colum
                 ? formatPercent(row.MaxPDiskUsage, 4)
                 : EMPTY_DATA_PLACEHOLDER;
         },
-        align: DataTable.CENTER,
+        align: DataTable.RIGHT,
     };
 }
 
@@ -31,13 +27,13 @@ export function getVDiskSlotUsageColumn<T extends {MaxVDiskSlotUsage?: number}>(
     return {
         name: CAPACITY_METRICS_COLUMN_IDS.MaxVDiskSlotUsage,
         header: CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskSlotUsage,
-        width: 200,
+        width: 180,
         render: ({row}) => {
             return isNumeric(row.MaxVDiskSlotUsage)
                 ? formatPercent(row.MaxVDiskSlotUsage, 4)
                 : EMPTY_DATA_PLACEHOLDER;
         },
-        align: DataTable.CENTER,
+        align: DataTable.RIGHT,
     };
 }
 
@@ -51,9 +47,9 @@ export function getCapacityAlertColumn<T extends {CapacityAlert?: string}>(): Co
                 return EMPTY_DATA_PLACEHOLDER;
             }
 
-            const capacityClassName = row.CapacityAlert.toLocaleLowerCase();
+            const color = getCapacityAlertColor(row.CapacityAlert);
 
-            return <span className={b(capacityClassName)}>{row.CapacityAlert}</span>;
+            return <span style={color ? {color} : undefined}>{row.CapacityAlert}</span>;
         },
         align: DataTable.CENTER,
     };
@@ -63,13 +59,13 @@ export function getVDiskRawUsageColumn<T extends {MaxVDiskRawUsage?: number}>():
     return {
         name: CAPACITY_METRICS_COLUMN_IDS.MaxVDiskRawUsage,
         header: CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskRawUsage,
-        width: 200,
+        width: 180,
         render: ({row}) => {
             return isNumeric(row.MaxVDiskRawUsage)
                 ? formatPercent(row.MaxVDiskRawUsage, 4)
                 : EMPTY_DATA_PLACEHOLDER;
         },
-        align: DataTable.CENTER,
+        align: DataTable.RIGHT,
     };
 }
 
@@ -85,6 +81,6 @@ export function getNormalizedOccupancyColumn<
                 ? formatPercent(row.MaxNormalizedOccupancy, 4)
                 : EMPTY_DATA_PLACEHOLDER;
         },
-        align: DataTable.CENTER,
+        align: DataTable.RIGHT,
     };
 }

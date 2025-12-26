@@ -275,7 +275,7 @@ const NODES_COLUMNS_TO_SORT_FIELDS: Record<NodesColumnId, NodesSortValue | undef
     PileName: undefined,
     MaxPDiskUsage: 'MaxPDiskUsage',
     MaxVDiskSlotUsage: 'MaxVDiskSlotUsage',
-    CapacityAlert: undefined,
+    CapacityAlert: 'CapacityAlert',
 };
 
 export function getNodesColumnSortField(columnId?: string) {

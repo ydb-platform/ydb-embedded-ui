@@ -282,7 +282,7 @@ const STORAGE_GROUPS_COLUMNS_TO_SORT_FIELDS: Record<
     MaxVDiskSlotUsage: 'MaxVDiskSlotUsage',
     MaxVDiskRawUsage: 'MaxVDiskRawUsage',
     MaxNormalizedOccupancy: 'MaxNormalizedOccupancy',
-    CapacityAlert: undefined,
+    CapacityAlert: 'CapacityAlert',
 };
 
 export function getStorageGroupsColumnSortField(columnId?: string) {

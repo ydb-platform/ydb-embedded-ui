@@ -308,9 +308,9 @@ export const getStorageGroupsColumns: StorageColumnsGetter = (data) => {
         getDisksColumn(data),
         getPDiskUsageColumn<PreparedStorageGroup>(),
         getVDiskSlotUsageColumn<PreparedStorageGroup>(),
-        getCapacityAlertColumn<PreparedStorageGroup>(),
         getNormalizedOccupancyColumn<PreparedStorageGroup>(),
         getVDiskRawUsageColumn<PreparedStorageGroup>(),
+        getCapacityAlertColumn<PreparedStorageGroup>(),
     ];
 
     return columns.map((column) => ({
