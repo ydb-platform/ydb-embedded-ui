@@ -1,5 +1,5 @@
 import type {BackendSortParam, SchemaPathParam} from './common';
-import type {EFlag} from './enums';
+import type {ECapacityAlert, EFlag} from './enums';
 import type {TPDiskStateInfo} from './pdisk';
 import type {TTabletStateInfo} from './tablet';
 import type {TThreadPoolInfo} from './threads';
@@ -71,6 +71,11 @@ export interface TNodeInfo {
 
     // Bridge mode
     PileName?: string;
+
+    // Capacity metrics experiment
+    MaxPDiskUsage?: number;
+    MaxVDiskSlotUsage?: number;
+    CapacityAlert?: ECapacityAlert;
 }
 
 export interface TNodesGroup {
@@ -268,7 +273,8 @@ export type NodesGroupByField =
     | 'NetworkUtilization' // v13
     | 'ClockSkew' // v13
     | 'PingTime' // v13
-    | 'PileName';
+    | 'PileName'
+    | 'CapacityAlert';
 
 export type NodesRequiredField =
     | 'NodeId'
@@ -299,7 +305,10 @@ export type NodesRequiredField =
     | `PingTime` // v13
     | `SendThroughput` // v13
     | `ReceiveThroughput` // v13
-    | 'PileName';
+    | 'PileName'
+    | 'MaxPDiskUsage'
+    | 'MaxVDiskSlotUsage'
+    | 'CapacityAlert';
 
 export type NodesSortValue =
     | 'NodeId'
@@ -323,7 +332,10 @@ export type NodesSortValue =
     | `ClockSkew` // v13
     | `PingTime` // v13
     | `SendThroughput` // v13
-    | `ReceiveThroughput`; // v13
+    | `ReceiveThroughput` // v13
+    | `MaxPDiskUsage`
+    | `MaxVDiskSlotUsage`
+    | `CapacityAlert`;
 
 export type NodesSort = BackendSortParam<NodesSortValue>;
 

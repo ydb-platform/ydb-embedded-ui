@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-import type {EFlag} from '../../../types/api/enums';
+import type {ECapacityAlert, EFlag} from '../../../types/api/enums';
 import type {NodesGroupByField, TNodeInfo} from '../../../types/api/nodes';
 import type {Erasure, GroupsGroupByField} from '../../../types/api/storage';
 import type {TTabletStateInfo} from '../../../types/api/tablet';
@@ -39,6 +39,10 @@ export interface PreparedStorageNode
     Missing: number;
     MaximumSlotsPerDisk: number;
     MaximumDisksPerNode: number;
+
+    MaxPDiskUsage?: number;
+    MaxVDiskSlotUsage?: number;
+    CapacityAlert?: ECapacityAlert;
 }
 
 export interface PreparedStorageGroupFilters {
@@ -97,6 +101,12 @@ export interface PreparedStorageGroup {
     LatencyPutTabletLogMs?: number;
     LatencyPutUserDataMs?: number;
     LatencyGetFastMs?: number;
+
+    MaxPDiskUsage?: number;
+    MaxVDiskSlotUsage?: number;
+    MaxVDiskRawUsage?: number;
+    MaxNormalizedOccupancy?: number;
+    CapacityAlert?: ECapacityAlert;
 }
 
 export type TableGroup = {

@@ -1,0 +1,7 @@
+{
+  "field_pdisk-usage": "PDisk Usage",
+  "field_vdisk-slot-usage": "VDisk Slot Usage",
+  "field_vdisk-raw-usage": "VDisk Raw Usage",
+  "field_normalized-occupancy": "Normalized Occupancy",
+  "field_capacity-alert": "Capacity Alert"
+}

@@ -16,6 +16,7 @@ interface TableGroupProps {
     count: string | number;
     expanded: boolean;
     onIsExpandedChange: (name: string, isExpanded: boolean) => void;
+    titleColor?: string;
 }
 
 export const TableGroup = ({
@@ -25,6 +26,7 @@ export const TableGroup = ({
     count,
     expanded = false,
     onIsExpandedChange,
+    titleColor,
 }: TableGroupProps) => {
     const toggleCollapsed = () => {
         onIsExpandedChange(title, !expanded);
@@ -36,7 +38,12 @@ export const TableGroup = ({
                 <div className={b('title-wrapper')}>
                     <ArrowToggle direction={expanded ? 'top' : 'bottom'} />
                     <div className={b('title')}>
-                        <Text variant="subheader-2">{title}</Text>
+                        <Text
+                            variant="subheader-2"
+                            style={titleColor ? {color: titleColor} : undefined}
+                        >
+                            {title}
+                        </Text>
                         <Text variant="body-2" color="secondary" className={b('count')}>
                             {entityName}: <Label theme="normal">{count}</Label>
                         </Text>

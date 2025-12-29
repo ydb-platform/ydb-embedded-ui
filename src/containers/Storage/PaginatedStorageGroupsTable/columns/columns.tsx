@@ -7,7 +7,15 @@ import {CellWithPopover} from '../../../../components/CellWithPopover/CellWithPo
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {StatusIcon} from '../../../../components/StatusIcon/StatusIcon';
 import {UsageLabel} from '../../../../components/UsageLabel/UsageLabel';
+import {
+    getCapacityAlertColumn,
+    getNormalizedOccupancyColumn,
+    getPDiskUsageColumn,
+    getVDiskRawUsageColumn,
+    getVDiskSlotUsageColumn,
+} from '../../../../components/capacityMetricsColumns/columns';
 import {useStorageGroupPath} from '../../../../routes';
+import type {PreparedStorageGroup} from '../../../../store/reducers/storage/types';
 import {cn} from '../../../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER, YDB_POPOVER_CLASS_NAME} from '../../../../utils/constants';
 import {formatNumber} from '../../../../utils/dataFormatters/dataFormatters';
@@ -90,7 +98,7 @@ const erasureColumn: StorageGroupsColumn = {
     header: STORAGE_GROUPS_COLUMNS_TITLES.Erasure,
     width: 100,
     sortAccessor: (row) => row.ErasureSpecies,
-    render: ({row}) => (row.ErasureSpecies ? row.ErasureSpecies : '-'),
+    render: ({row}) => (row.ErasureSpecies ? row.ErasureSpecies : EMPTY_DATA_PLACEHOLDER),
     align: DataTable.LEFT,
 };
 
@@ -154,7 +162,7 @@ const groupIdColumn: StorageGroupsColumn = {
     header: STORAGE_GROUPS_COLUMNS_TITLES.GroupId,
     width: 140,
     render: ({row}) => {
-        return row.GroupId ? <GroupId id={row.GroupId} /> : '-';
+        return row.GroupId ? <GroupId id={row.GroupId} /> : EMPTY_DATA_PLACEHOLDER;
     },
     sortAccessor: (row) => Number(row.GroupId),
     align: DataTable.LEFT,
@@ -195,7 +203,7 @@ const readColumn: StorageGroupsColumn = {
     header: STORAGE_GROUPS_COLUMNS_TITLES.Read,
     width: 100,
     render: ({row}) => {
-        return row.Read ? bytesToSpeed(row.Read) : '-';
+        return row.Read ? bytesToSpeed(row.Read) : EMPTY_DATA_PLACEHOLDER;
     },
     align: DataTable.RIGHT,
 };
@@ -205,7 +213,7 @@ const writeColumn: StorageGroupsColumn = {
     header: STORAGE_GROUPS_COLUMNS_TITLES.Write,
     width: 100,
     render: ({row}) => {
-        return row.Write ? bytesToSpeed(row.Write) : '-';
+        return row.Write ? bytesToSpeed(row.Write) : EMPTY_DATA_PLACEHOLDER;
     },
     align: DataTable.RIGHT,
 };
@@ -298,6 +306,11 @@ export const getStorageGroupsColumns: StorageColumnsGetter = (data) => {
         allocationUnitsColumn,
         getVDisksColumn(data),
         getDisksColumn(data),
+        getPDiskUsageColumn<PreparedStorageGroup>(),
+        getVDiskSlotUsageColumn<PreparedStorageGroup>(),
+        getVDiskRawUsageColumn<PreparedStorageGroup>(),
+        getNormalizedOccupancyColumn<PreparedStorageGroup>(),
+        getCapacityAlertColumn<PreparedStorageGroup>(),
     ];
 
     return columns.map((column) => ({
