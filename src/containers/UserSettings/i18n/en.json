@@ -54,5 +54,7 @@
   "settings.aclSyntax.option-ydb": "YDB",
   "settings.aclSyntax.option-yql": "YQL",
 
-  "settings.about.interfaceVersionInfoField.title": "Interface version"
+  "settings.about.interfaceVersionInfoField.title": "Interface version",
+
+  "settings.enableBlobStorageCapacityMetrics.title": "Blob storage capacity metrics"
 }

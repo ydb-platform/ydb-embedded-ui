@@ -128,6 +128,11 @@ export const enableQueryStreamingOldBackendSetting: SettingProps = {
     description: i18n('settings.editor.queryStreaming.description'),
 };
 
+export const enableBlobStorageCapacityMetricsSetting: SettingProps = {
+    settingKey: SETTING_KEYS.ENABLE_BLOB_STORAGE_CAPACITY_METRICS,
+    title: i18n('settings.enableBlobStorageCapacityMetrics.title'),
+};
+
 export function applyClusterSpecificQueryStreamingSetting(
     settings: YDBEmbeddedUISettings,
     clusterName?: string,
@@ -156,6 +161,35 @@ export function applyClusterSpecificQueryStreamingSetting(
             });
         }
         return page;
+    });
+}
+
+export function applyBlobStorageCapacityMetricsSettingAvailability(
+    settings: YDBEmbeddedUISettings,
+    available: boolean,
+): YDBEmbeddedUISettings {
+    if (available) {
+        return settings;
+    }
+
+    return settings.map((page) => {
+        if (page.id !== PAGE_IDS.EXPERIMENTS) {
+            return page;
+        }
+
+        return createNextState(page, (draft) => {
+            const section = draft.sections.find((s) => s.id === SECTION_IDS.EXPERIMENTS);
+
+            if (!section) {
+                return;
+            }
+
+            section.settings = section.settings.filter(
+                (s) =>
+                    !('settingKey' in s) ||
+                    s.settingKey !== SETTING_KEYS.ENABLE_BLOB_STORAGE_CAPACITY_METRICS,
+            );
+        });
     });
 }
 
@@ -222,6 +256,7 @@ export const experimentsSection: SettingsSection = {
         useShowPlanToSvgTables,
         enableQueryStreamingSetting,
         showNetworkUtilizationSetting,
+        enableBlobStorageCapacityMetricsSetting,
     ],
 };
 

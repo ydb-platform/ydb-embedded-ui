@@ -31,7 +31,6 @@ export function useGroupsGetter(shouldUseGroupsHandler: boolean) {
 
             const sortField = getStorageGroupsColumnSortField(columnId);
             const sort = sortField ? prepareSortValue(sortField, sortOrder) : undefined;
-
             const dataFieldsRequired = getRequiredDataFields(
                 columnsIds,
                 GROUPS_COLUMNS_TO_DATA_FIELDS,

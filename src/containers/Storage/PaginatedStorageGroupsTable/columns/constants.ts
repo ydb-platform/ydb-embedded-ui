@@ -1,6 +1,10 @@
 import type {SelectOption} from '@gravity-ui/uikit';
 import {z} from 'zod';
 
+import {
+    CAPACITY_METRICS_COLUMN_IDS,
+    CAPACITY_METRICS_COLUMN_TITLES,
+} from '../../../../components/capacityMetricsColumns/constants';
 import type {
     GroupsGroupByField,
     GroupsRequiredField,
@@ -32,21 +36,18 @@ export const STORAGE_GROUPS_COLUMNS_IDS = {
     VDisksPDisks: 'VDisksPDisks',
     Degraded: 'Degraded',
     State: 'State',
+    ...CAPACITY_METRICS_COLUMN_IDS,
 } as const;
 
 export type StorageGroupsColumnId = ValueOf<typeof STORAGE_GROUPS_COLUMNS_IDS>;
 
 // Columns, that should displayed only for users with isMonitoringAllowed:true
-const MONITORING_USER_COLUMNS_IDS: StorageGroupsColumnId[] = [
+export const MONITORING_USER_COLUMNS_IDS: StorageGroupsColumnId[] = [
     'DiskSpaceUsage',
     'Latency',
     'AllocationUnits',
     'VDisksPDisks',
 ];
-
-export function isMonitoringUserGroupsColumn(columnId: string): boolean {
-    return MONITORING_USER_COLUMNS_IDS.includes(columnId as StorageGroupsColumnId);
-}
 
 export const DEFAULT_STORAGE_GROUPS_COLUMNS: StorageGroupsColumnId[] = [
     'GroupId',
@@ -57,10 +58,15 @@ export const DEFAULT_STORAGE_GROUPS_COLUMNS: StorageGroupsColumnId[] = [
 ];
 
 // Columns, that should displayed only for users with isViewerAllowed:true
-const VIEWER_USER_COLUMNS_IDS: StorageGroupsColumnId[] = ['DiskSpace'];
-export function isViewerGroupsColumn(columnId: string): boolean {
-    return VIEWER_USER_COLUMNS_IDS.some((el) => el === columnId);
-}
+export const VIEWER_USER_COLUMNS_IDS: StorageGroupsColumnId[] = ['DiskSpace'];
+
+export const CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS: StorageGroupsColumnId[] = [
+    'MaxPDiskUsage',
+    'MaxVDiskSlotUsage',
+    'MaxVDiskRawUsage',
+    'MaxNormalizedOccupancy',
+    'CapacityAlert',
+];
 
 export const REQUIRED_STORAGE_GROUPS_COLUMNS: StorageGroupsColumnId[] = ['GroupId'];
 
@@ -121,6 +127,21 @@ export const STORAGE_GROUPS_COLUMNS_TITLES = {
     get State() {
         return i18n('state');
     },
+    get MaxPDiskUsage() {
+        return CAPACITY_METRICS_COLUMN_TITLES.MaxPDiskUsage;
+    },
+    get MaxVDiskSlotUsage() {
+        return CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskSlotUsage;
+    },
+    get MaxVDiskRawUsage() {
+        return CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskRawUsage;
+    },
+    get MaxNormalizedOccupancy() {
+        return CAPACITY_METRICS_COLUMN_TITLES.MaxNormalizedOccupancy;
+    },
+    get CapacityAlert() {
+        return CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert;
+    },
 } as const satisfies Record<StorageGroupsColumnId, string>;
 
 const STORAGE_GROUPS_COLUMNS_GROUP_BY_TITLES = {
@@ -160,6 +181,9 @@ const STORAGE_GROUPS_COLUMNS_GROUP_BY_TITLES = {
     get Latency() {
         return i18n('latency');
     },
+    get CapacityAlert() {
+        return CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert;
+    },
 } as const satisfies Record<GroupsGroupByField, string>;
 
 const STORAGE_GROUPS_GROUP_BY_PARAMS = [
@@ -173,6 +197,7 @@ const STORAGE_GROUPS_GROUP_BY_PARAMS = [
     'State',
     'MissingDisks',
     'Latency',
+    'CapacityAlert',
 ] as const satisfies GroupsGroupByField[];
 
 export const STORAGE_GROUPS_GROUP_BY_OPTIONS: SelectOption[] = STORAGE_GROUPS_GROUP_BY_PARAMS.map(
@@ -213,6 +238,11 @@ export const GROUPS_COLUMNS_TO_DATA_FIELDS: Record<StorageGroupsColumnId, Groups
     VDisksPDisks: ['VDisk', 'PDisk', 'Read', 'Write'],
     Degraded: ['MissingDisks'],
     State: ['State'],
+    MaxPDiskUsage: ['MaxPDiskUsage'],
+    MaxVDiskSlotUsage: ['MaxVDiskSlotUsage'],
+    MaxVDiskRawUsage: ['MaxVDiskRawUsage'],
+    MaxNormalizedOccupancy: ['MaxNormalizedOccupancy'],
+    CapacityAlert: ['CapacityAlert'],
 };
 
 const STORAGE_GROUPS_COLUMNS_TO_SORT_FIELDS: Record<
@@ -237,6 +267,11 @@ const STORAGE_GROUPS_COLUMNS_TO_SORT_FIELDS: Record<
     VDisksPDisks: undefined,
     Degraded: 'Degraded',
     State: 'State',
+    MaxPDiskUsage: 'MaxPDiskUsage',
+    MaxVDiskSlotUsage: 'MaxVDiskSlotUsage',
+    MaxVDiskRawUsage: 'MaxVDiskRawUsage',
+    MaxNormalizedOccupancy: 'MaxNormalizedOccupancy',
+    CapacityAlert: 'CapacityAlert',
 };
 
 export function getStorageGroupsColumnSortField(columnId?: string) {

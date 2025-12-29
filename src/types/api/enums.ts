@@ -9,3 +9,16 @@ export enum EFlag {
     Orange = 'Orange',
     Red = 'Red',
 }
+
+// СapacityAlert for capacity storage metrics
+export enum ECapacityAlert {
+    GREEN = 'GREEN',
+    CYAN = 'CYAN',
+    LIGHTYELLOWMOVE = 'LIGHTYELLOWMOVE',
+    YELLOWSTOP = 'YELLOWSTOP',
+    LIGHTORANGE = 'LIGHTORANGE',
+    PREORANGE = 'PREORANGE',
+    ORANGE = 'ORANGE',
+    RED = 'RED',
+    BLACK = 'BLACK',
+}

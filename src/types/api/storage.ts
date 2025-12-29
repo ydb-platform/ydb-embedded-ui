@@ -1,5 +1,5 @@
 import type {BackendSortParam} from './common';
-import type {EFlag} from './enums';
+import type {ECapacityAlert, EFlag} from './enums';
 import type {EDecommitStatus, EDriveStatus, TPDiskStateInfo} from './pdisk';
 import type {EVDiskStatus, TVDiskStateInfo} from './vdisk';
 
@@ -189,6 +189,13 @@ export interface TGroupsStorageGroupInfo {
     LatencyGetFast?: string;
 
     VDisks?: TStorageVDisk[];
+
+    // Capacity metrics experiment
+    MaxPDiskUsage?: number;
+    MaxVDiskSlotUsage?: number;
+    MaxVDiskRawUsage?: number;
+    MaxNormalizedOccupancy?: number;
+    CapacityAlert?: ECapacityAlert;
 }
 
 /**
@@ -261,7 +268,12 @@ export type StorageV2SortValue =
     | 'AllocationUnits'
     | 'Latency'
     | 'DiskSpaceUsage'
-    | 'State';
+    | 'State'
+    | 'MaxPDiskUsage'
+    | 'MaxVDiskSlotUsage'
+    | 'MaxVDiskRawUsage'
+    | 'MaxNormalizedOccupancy'
+    | 'CapacityAlert';
 
 /**
  * Values to sort /storage/groups response
@@ -286,7 +298,8 @@ export type GroupsGroupByField =
     | 'MediaType'
     | 'MissingDisks'
     | 'State'
-    | 'Latency';
+    | 'Latency'
+    | 'CapacityAlert';
 
 export type GroupsRequiredField =
     | 'GroupId' // always required
@@ -309,7 +322,12 @@ export type GroupsRequiredField =
     | 'Write'
     | 'PDisk'
     | 'VDisk'
-    | 'Latency';
+    | 'Latency'
+    | 'MaxPDiskUsage'
+    | 'MaxVDiskSlotUsage'
+    | 'MaxVDiskRawUsage'
+    | 'MaxNormalizedOccupancy'
+    | 'CapacityAlert';
 
 interface BaseStorageRequestParams {
     database?: string;

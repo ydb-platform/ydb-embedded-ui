@@ -5,6 +5,7 @@ import {PaginatedTableWithLayout} from '../../../components/PaginatedTable/Pagin
 import {TableColumnSetup} from '../../../components/TableColumnSetup/TableColumnSetup';
 import {storageApi} from '../../../store/reducers/storage/storage';
 import type {GroupsGroupByField} from '../../../types/api/storage';
+import {getCapacityAlertColor} from '../../../utils/capacityAlert/colors';
 import {useAutoRefreshInterval} from '../../../utils/hooks';
 import {renderPaginatedTableErrorMessage} from '../../../utils/renderPaginatedTableErrorMessage';
 import type {PaginatedStorageProps} from '../PaginatedStorage';
@@ -51,6 +52,8 @@ export const StorageGroupGroup = React.memo(function StorageGroupGroup({
     onIsExpandedChange,
     handleShowAllGroups,
 }: StorageGroupGroupProps) {
+    const titleColor = filterGroupBy === 'CapacityAlert' ? getCapacityAlertColor(name) : undefined;
+
     return (
         <TableGroup
             key={name}
@@ -59,6 +62,7 @@ export const StorageGroupGroup = React.memo(function StorageGroupGroup({
             entityName={i18n('groups')}
             expanded={isExpanded}
             onIsExpandedChange={onIsExpandedChange}
+            titleColor={titleColor}
         >
             <PaginatedTableWithLayout
                 initialState={{sortParams: undefined}}

@@ -1,9 +1,14 @@
 import React from 'react';
 
 import {ErrorBoundary} from '../../components/ErrorBoundary/ErrorBoundary';
+import {useBlobStorageCapacityMetricsAvailable} from '../../store/reducers/capabilities/hooks';
 import {useClusterNameFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {Navigation} from '../AsideNavigation/Navigation';
-import {applyClusterSpecificQueryStreamingSetting, getUserSettings} from '../UserSettings/settings';
+import {
+    applyBlobStorageCapacityMetricsSettingAvailability,
+    applyClusterSpecificQueryStreamingSetting,
+    getUserSettings,
+} from '../UserSettings/settings';
 import type {YDBEmbeddedUISettings} from '../UserSettings/settings';
 
 interface NavigationWrapperProps {
@@ -19,6 +24,8 @@ export function NavigationWrapper({
 }: NavigationWrapperProps) {
     const clusterName = useClusterNameFromQuery();
 
+    const blobMetricsAvailable = useBlobStorageCapacityMetricsAvailable();
+
     let finalUserSettings: YDBEmbeddedUISettings;
 
     if (userSettings) {
@@ -31,6 +38,12 @@ export function NavigationWrapper({
             clusterName,
         });
     }
+
+    // Hide the Blob Storage Capacity Metrics experiment if the backend doesn't support it
+    finalUserSettings = applyBlobStorageCapacityMetricsSettingAvailability(
+        finalUserSettings,
+        blobMetricsAvailable,
+    );
 
     return (
         <Navigation userSettings={finalUserSettings}>

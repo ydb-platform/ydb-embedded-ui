@@ -32,6 +32,21 @@ import type {
     TableGroup,
 } from './types';
 
+// Normalizes "Max*" capacity metrics that come from API as a percentage in the 0..100 range.
+// Important: `0` is a valid value and must be preserved (do not treat it as falsy).
+const normalizeMaxPercent = (value: number | string | null | undefined): number | undefined => {
+    if (isNil(value)) {
+        return undefined;
+    }
+
+    const num = Number(value);
+    if (Number.isNaN(num)) {
+        return undefined;
+    }
+
+    return num / 100;
+};
+
 // ==== Prepare groups ====
 
 function getGroupDiskSpaceStatus(group: TStorageGroupInfo | TGroupsStorageGroupInfo): EFlag {
@@ -201,7 +216,16 @@ const prepareStorageNodeData = (
     maximumSlotsPerDisk: number,
     maximumDisksPerNode: number,
 ): PreparedStorageNode => {
-    const {SystemState, NodeId, PDisks, VDisks, ...restNodeParams} = node;
+    const {
+        SystemState,
+        NodeId,
+        PDisks,
+        VDisks,
+        MaxPDiskUsage,
+        MaxVDiskSlotUsage,
+        CapacityAlert,
+        ...restNodeParams
+    } = node;
 
     const missing =
         PDisks?.filter((pDisk) => {
@@ -232,6 +256,9 @@ const prepareStorageNodeData = (
         Missing: missing,
         MaximumSlotsPerDisk: maximumSlotsPerDisk,
         MaximumDisksPerNode: maximumDisksPerNode,
+        MaxPDiskUsage: normalizeMaxPercent(MaxPDiskUsage),
+        MaxVDiskSlotUsage: normalizeMaxPercent(MaxVDiskSlotUsage),
+        CapacityAlert,
     };
 };
 
@@ -413,6 +440,11 @@ export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStor
             LatencyPutTabletLog,
             LatencyPutUserData,
             LatencyGetFast,
+            MaxPDiskUsage,
+            MaxVDiskSlotUsage,
+            MaxVDiskRawUsage,
+            MaxNormalizedOccupancy,
+            CapacityAlert,
         } = group;
 
         const vDisks = VDisks.map(prepareGroupsVDisk);
@@ -438,6 +470,12 @@ export function prepareGroupsResponse(data: StorageGroupsResponse): PreparedStor
             VDisks: vDisks,
 
             DiskSpace: diskSpaceStatus,
+
+            MaxPDiskUsage: normalizeMaxPercent(MaxPDiskUsage),
+            MaxVDiskRawUsage: normalizeMaxPercent(MaxVDiskRawUsage),
+            MaxVDiskSlotUsage: normalizeMaxPercent(MaxVDiskSlotUsage),
+            MaxNormalizedOccupancy,
+            CapacityAlert,
         };
     });
 

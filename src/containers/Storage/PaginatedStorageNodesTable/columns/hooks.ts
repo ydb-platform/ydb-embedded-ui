@@ -1,15 +1,20 @@
 import React from 'react';
 
+import type {NodesColumnId} from '../../../../components/nodesColumns/constants';
 import {
     NODES_COLUMNS_IDS,
     NODES_COLUMNS_TITLES,
 } from '../../../../components/nodesColumns/constants';
-import {useBridgeModeEnabled} from '../../../../store/reducers/capabilities/hooks';
+import {
+    useBlobStorageCapacityMetricsEnabled,
+    useBridgeModeEnabled,
+} from '../../../../store/reducers/capabilities/hooks';
 import {VISIBLE_ENTITIES} from '../../../../store/reducers/storage/constants';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
 
 import {getStorageNodesColumns} from './columns';
 import {
+    CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS,
     DEFAULT_STORAGE_NODES_COLUMNS,
     REQUIRED_STORAGE_NODES_COLUMNS,
     STORAGE_NODES_SELECTED_COLUMNS_LS_KEY,
@@ -23,15 +28,27 @@ export function useStorageNodesSelectedColumns({
     columnsSettings,
 }: GetStorageNodesColumnsParams) {
     const bridgeModeEnabled = useBridgeModeEnabled();
+    const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
+
+    const skippedColumnIds = React.useMemo(() => {
+        const skipped: NodesColumnId[] = [];
+
+        if (!bridgeModeEnabled) {
+            skipped.push(NODES_COLUMNS_IDS.PileName);
+        }
+
+        if (!blobMetricsEnabled) {
+            skipped.push(...CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS);
+        }
+
+        return skipped;
+    }, [bridgeModeEnabled, blobMetricsEnabled]);
 
     const columns = React.useMemo(() => {
-        const all = getStorageNodesColumns({
-            database,
-            viewContext,
-            columnsSettings,
-        });
-        return bridgeModeEnabled ? all : all.filter((c) => c.name !== NODES_COLUMNS_IDS.PileName);
-    }, [database, viewContext, columnsSettings, bridgeModeEnabled]);
+        const allColumns = getStorageNodesColumns({database, viewContext, columnsSettings});
+
+        return allColumns.filter((column) => !skippedColumnIds.some((id) => id === column.name));
+    }, [database, viewContext, columnsSettings, skippedColumnIds]);
 
     const requiredColumns = React.useMemo(() => {
         if (visibleEntities === VISIBLE_ENTITIES.missing) {

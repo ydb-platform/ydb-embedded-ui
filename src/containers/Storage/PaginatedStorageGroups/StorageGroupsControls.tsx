@@ -5,7 +5,10 @@ import {Select, Text} from '@gravity-ui/uikit';
 import {EntitiesCount} from '../../../components/EntitiesCount/EntitiesCount';
 import {usePaginatedTableState} from '../../../components/PaginatedTable/PaginatedTableContext';
 import {Search} from '../../../components/Search/Search';
-import {useBridgeModeEnabled} from '../../../store/reducers/capabilities/hooks';
+import {
+    useBlobStorageCapacityMetricsEnabled,
+    useBridgeModeEnabled,
+} from '../../../store/reducers/capabilities/hooks';
 import {useIsUserAllowedToMakeChanges} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {STORAGE_GROUPS_GROUP_BY_OPTIONS} from '../PaginatedStorageGroupsTable/columns/constants';
 import {StorageTypeFilter} from '../StorageTypeFilter/StorageTypeFilter';
@@ -44,12 +47,23 @@ export function StorageGroupsControls({
 
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const bridgeModeEnabled = useBridgeModeEnabled();
+    const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
+
     const groupByOptions = React.useMemo(() => {
-        if (bridgeModeEnabled) {
-            return STORAGE_GROUPS_GROUP_BY_OPTIONS;
+        const skippedValues: string[] = [];
+
+        if (!bridgeModeEnabled) {
+            skippedValues.push('PileName');
         }
-        return STORAGE_GROUPS_GROUP_BY_OPTIONS.filter((opt) => opt.value !== 'PileName');
-    }, [bridgeModeEnabled]);
+
+        if (!blobMetricsEnabled) {
+            skippedValues.push('CapacityAlert');
+        }
+
+        return STORAGE_GROUPS_GROUP_BY_OPTIONS.filter(
+            (option) => !skippedValues.includes(option.value),
+        );
+    }, [bridgeModeEnabled, blobMetricsEnabled]);
 
     const handleGroupBySelectUpdate = (value: string[]) => {
         handleStorageGroupsGroupByParamChange(value[0]);

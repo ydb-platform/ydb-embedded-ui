@@ -2,6 +2,7 @@ import React from 'react';
 
 import {StringParam, useQueryParam, useQueryParams} from 'use-query-params';
 
+import {useBlobStorageCapacityMetricsEnabled} from '../../store/reducers/capabilities/hooks';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {STORAGE_TYPES} from '../../store/reducers/storage/constants';
 import type {StorageType, VisibleEntities} from '../../store/reducers/storage/types';
@@ -29,6 +30,8 @@ export function useStorageQueryParams() {
         SETTING_KEYS.STORAGE_TYPE,
         STORAGE_TYPES.groups,
     );
+
+    const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
 
     const storageType = storageTypeSchema.parse(queryParams.type);
 
@@ -76,13 +79,19 @@ export function useStorageQueryParams() {
         setQueryParams({uptimeFilter: value}, 'replaceIn');
     };
 
-    const handleStorageGroupsGroupByParamChange = (value: string) => {
-        setQueryParams({storageGroupsGroupBy: value}, 'replaceIn');
-    };
+    const handleStorageGroupsGroupByParamChange = React.useCallback(
+        (value: string) => {
+            setQueryParams({storageGroupsGroupBy: value || undefined}, 'replaceIn');
+        },
+        [setQueryParams],
+    );
 
-    const handleStorageNodesGroupByParamChange = (value: string) => {
-        setQueryParams({storageNodesGroupBy: value}, 'replaceIn');
-    };
+    const handleStorageNodesGroupByParamChange = React.useCallback(
+        (value: string) => {
+            setQueryParams({storageNodesGroupBy: value || undefined}, 'replaceIn');
+        },
+        [setQueryParams],
+    );
 
     const handleShowAllGroups = () => {
         handleVisibleEntitiesChange('all');
@@ -92,6 +101,31 @@ export function useStorageQueryParams() {
         handleVisibleEntitiesChange('all');
         handleUptimeFilterChange(NodesUptimeFilterValues.All);
     };
+
+    React.useEffect(() => {
+        if (blobMetricsEnabled) {
+            return;
+        }
+
+        const patch: Record<string, string | undefined> = {};
+
+        if (queryParams.storageGroupsGroupBy === 'CapacityAlert') {
+            patch.storageGroupsGroupBy = undefined;
+        }
+
+        if (queryParams.storageNodesGroupBy === 'CapacityAlert') {
+            patch.storageNodesGroupBy = undefined;
+        }
+
+        if (Object.keys(patch).length > 0) {
+            setQueryParams(patch, 'replaceIn');
+        }
+    }, [
+        blobMetricsEnabled,
+        queryParams.storageGroupsGroupBy,
+        queryParams.storageNodesGroupBy,
+        setQueryParams,
+    ]);
 
     return {
         storageType,

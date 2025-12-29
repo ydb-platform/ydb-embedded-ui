@@ -1,6 +1,11 @@
 import DataTable from '@gravity-ui/react-data-table';
 
 import {
+    getCapacityAlertColumn,
+    getPDiskUsageColumn,
+    getVDiskSlotUsageColumn,
+} from '../../../../components/capacityMetricsColumns/columns';
+import {
     getCpuColumn,
     getDataCenterColumn,
     getDiskSpaceUsageColumn,
@@ -79,6 +84,9 @@ export const getStorageNodesColumns = ({
         getMissingDisksColumn(),
         getPDisksColumn({viewContext, columnsSettings}),
         getTabletsColumn({database}),
+        getPDiskUsageColumn(),
+        getVDiskSlotUsageColumn(),
+        getCapacityAlertColumn(),
     ];
 
     const sortableColumns = columns.map((column) => ({
