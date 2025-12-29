@@ -22,7 +22,6 @@ import {
     STORAGE_GROUPS_COLUMNS_TITLES,
     STORAGE_GROUPS_SELECTED_COLUMNS_LS_KEY,
     VIEWER_USER_COLUMNS_IDS,
-    isStorageGroupsColumnId,
 } from './constants';
 import type {GetStorageGroupsColumnsParams} from './types';
 
@@ -60,10 +59,7 @@ export function useStorageGroupsSelectedColumns({
     const columns = React.useMemo(() => {
         const allColumns = getStorageGroupsColumns({viewContext});
 
-        return allColumns.filter((column) => {
-            const columnName = column.name;
-            return !isStorageGroupsColumnId(columnName) || !skippedColumnIds.includes(columnName);
-        });
+        return allColumns.filter((column) => !skippedColumnIds.some((id) => id === column.name));
     }, [viewContext, skippedColumnIds]);
 
     const requiredColumns = React.useMemo(() => {

@@ -281,7 +281,3 @@ export function getStorageGroupsColumnSortField(columnId?: string) {
 export function isSortableStorageGroupsColumn(columnId: string) {
     return Boolean(getStorageGroupsColumnSortField(columnId));
 }
-
-export function isStorageGroupsColumnId(column: string): column is StorageGroupsColumnId {
-    return Object.values(STORAGE_GROUPS_COLUMNS_IDS).includes(column as StorageGroupsColumnId);
-}
