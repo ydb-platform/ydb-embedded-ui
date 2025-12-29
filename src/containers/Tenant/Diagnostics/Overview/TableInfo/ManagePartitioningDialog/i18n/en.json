@@ -1,0 +1,14 @@
+{
+  "title_manage-partitioning": "Manage partitioning",
+  "title_partitioning": "Partitioning",
+  "title_limits": "Limits",
+
+  "field_split-size": "Split Size",
+  "context_split-size-maximum": "{{maxGb}} GB maximum",
+  "field_load": "Load",
+  "field_minimum": "Minimum",
+  "field_maximum": "Maximum",
+
+  "action_cancel": "Cancel",
+  "action_apply": "Apply"
+}

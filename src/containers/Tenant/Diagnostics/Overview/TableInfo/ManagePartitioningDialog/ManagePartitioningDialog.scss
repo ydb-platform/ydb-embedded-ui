@@ -1,0 +1,23 @@
+.manage-partitioning-dialog {
+    &__row {
+        width: 100%;
+    }
+
+    &__hint,
+    &__label {
+        color: var(--g-color-text-secondary);
+    }
+
+    &__label {
+        width: 100%;
+        max-width: 80px;
+    }
+
+    &__input {
+        max-width: 150px;
+    }
+
+    &__postfix {
+        padding-inline-end: var(--g-spacing-half);
+    }
+}

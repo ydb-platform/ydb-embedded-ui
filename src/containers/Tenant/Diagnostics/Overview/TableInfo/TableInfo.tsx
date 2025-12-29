@@ -1,12 +1,13 @@
 import React from 'react';
 
-import {ChevronDown, ChevronUp} from '@gravity-ui/icons';
-import {Button, Disclosure, Icon} from '@gravity-ui/uikit';
+import {ChevronDown, ChevronUp, Gear} from '@gravity-ui/icons';
+import {Button, Disclosure, Flex, Icon} from '@gravity-ui/uikit';
 
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
 
+import {openManagePartitioningDialog} from './ManagePartitioningDialog/ManagePartitioningDialog';
 import {PartitionsProgress} from './PartitionsProgress/PartitionsProgress';
 import i18n from './i18n';
 import {prepareTableInfo} from './prepareTableInfo';
@@ -30,6 +31,7 @@ export const TableInfo = ({data, type}: TableInfoProps) => {
         tabletMetricsInfo = [],
         partitionConfigInfo = [],
         partitionProgressConfig,
+        managePartitioningDialogConfig,
     } = React.useMemo(() => prepareTableInfo(data, type), [data, type]);
 
     const [expanded, setExpanded] = React.useState(false);
@@ -40,9 +42,25 @@ export const TableInfo = ({data, type}: TableInfoProps) => {
     const hasMoreRight = tabletMetricsInfo.length > 0 || partitionConfigInfo.length > 0;
     const hasMore = hasMoreLeft || hasMoreRight;
 
+    const handleOpenManagePartitioning = React.useCallback(() => {
+        openManagePartitioningDialog({initialValue: managePartitioningDialogConfig});
+    }, [managePartitioningDialogConfig]);
+
     return (
         <div className={b()}>
-            <div className={b('title')}>{i18n('title_partitioning')}</div>
+            <Flex
+                className={b('header')}
+                justifyContent="space-between"
+                alignItems="center"
+                gap="2"
+            >
+                <div className={b('title')}>{i18n('title_partitioning')}</div>
+                {managePartitioningDialogConfig && (
+                    <Button view="normal" size="s" onClick={handleOpenManagePartitioning}>
+                        <Icon data={Gear} size={16} />
+                    </Button>
+                )}
+            </Flex>
             {partitionProgressConfig && (
                 <div className={b('progress-bar')}>
                     <PartitionsProgress

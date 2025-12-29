@@ -21,10 +21,13 @@ import type {
     TTablePartition,
 } from '../../../../../types/api/schema';
 import {EPathType} from '../../../../../types/api/schema';
-import {formatBytes, formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
+import {formatBytes, getBytesSizeUnit} from '../../../../../utils/bytesParsers';
+import {formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {formatDurationToShortTimeFormat} from '../../../../../utils/timeParsers';
 import {isNumeric} from '../../../../../utils/utils';
 
+import type {ManagePartitioningValue} from './ManagePartitioningDialog/ManagePartitioningDialog';
+import {DEFAULT_MANAGE_PARTITIONING_VALUE} from './ManagePartitioningDialog/constants';
 import {b} from './TableInfo';
 import {
     DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES,
@@ -51,6 +54,15 @@ const prepareTTL = (ttl: TTTLSettings | TColumnDataLifeCycle) => {
         return {name: i18n('field_ttl-for-rows'), content: value};
     }
     return undefined;
+};
+
+const prepareSplitByLoadConfig = (policy?: TPartitionConfig['PartitioningPolicy']) => {
+    const splitByLoadEnabled = Boolean(policy?.SplitByLoadSettings?.Enabled);
+    const cpuThreshold =
+        policy?.SplitByLoadSettings?.CpuPercentageThreshold ??
+        DEFAULT_PARTITION_SPLIT_BY_LOAD_THRESHOLD_PERCENT;
+
+    return {splitByLoadEnabled, cpuThreshold};
 };
 
 function prepareColumnTableGeneralInfo(columnTable: TColumnTableDescription) {
@@ -154,11 +166,9 @@ const prepareTableGeneralInfo = (
     // for splitting by load: if partitioningByLoad is enabled, we can split by load, default: 50%
     // for splitting by size: it always will be splitted by 2 GB if user doesn't set anything else
 
-    const cpuThreshold =
-        PartitioningPolicy.SplitByLoadSettings?.CpuPercentageThreshold ??
-        DEFAULT_PARTITION_SPLIT_BY_LOAD_THRESHOLD_PERCENT;
+    const {splitByLoadEnabled, cpuThreshold} = prepareSplitByLoadConfig(PartitioningPolicy);
 
-    const partitioningByLoad = PartitioningPolicy.SplitByLoadSettings?.Enabled ? (
+    const partitioningByLoad = splitByLoadEnabled ? (
         <Label>{`${cpuThreshold}%`}</Label>
     ) : (
         <Label theme="unknown">{i18n('value_disabled')}</Label>
@@ -173,7 +183,7 @@ const prepareTableGeneralInfo = (
         },
         {
             name: i18n('field_partitioning-by-size'),
-            content: <Label>{formatBytes(splitSizeBytes)}</Label>,
+            content: <Label>{formatBytes({value: splitSizeBytes})}</Label>,
         },
         {name: i18n('field_partitioning-by-load'), content: partitioningByLoad},
     );
@@ -238,6 +248,32 @@ const preparePartitionProgressConfig = (
     };
 };
 
+const prepareManagePartitioningDialogConfig = (
+    partitionConfig?: TPartitionConfig,
+    progress?: PartitionProgressConfig,
+) => {
+    const policy = partitionConfig?.PartitioningPolicy;
+
+    const {splitByLoadEnabled, cpuThreshold} = prepareSplitByLoadConfig(policy);
+
+    const bytes = Number(policy?.SizeToSplit ?? DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES);
+    const size = formatBytes({
+        value: bytes,
+        withSizeLabel: false,
+    });
+
+    const unit = getBytesSizeUnit(bytes);
+
+    return {
+        splitSize: size,
+        splitUnit: unit,
+        loadEnabled: splitByLoadEnabled,
+        loadPercent: String(cpuThreshold),
+        minimum: String(progress?.minPartitions),
+        maximum: String(progress?.maxPartitions ?? DEFAULT_MANAGE_PARTITIONING_VALUE.maximum),
+    };
+};
+
 /** Prepares data for Table, ColumnTable and ColumnStore */
 export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathType) => {
     if (!data) {
@@ -283,12 +319,18 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
     let generalInfoLeft: YDBDefinitionListItem[] = [];
     let generalInfoRight: YDBDefinitionListItem[] = [];
     let partitionProgressConfig: PartitionProgressConfig | undefined;
+    let managePartitioningDialogConfig: ManagePartitioningValue | undefined;
 
     switch (type) {
         case EPathType.EPathTypeTable: {
             partitionProgressConfig = preparePartitionProgressConfig(
                 PartitionConfig,
                 TablePartitions,
+            );
+
+            managePartitioningDialogConfig = prepareManagePartitioningDialogConfig(
+                PartitionConfig,
+                partitionProgressConfig,
             );
 
             const {left, right} = prepareTableGeneralInfo(
@@ -298,6 +340,7 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
             );
             generalInfoLeft = left;
             generalInfoRight = right;
+
             break;
         }
         case EPathType.EPathTypeColumnTable: {
@@ -388,5 +431,6 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
 
         partitionConfigInfo,
         partitionProgressConfig,
+        managePartitioningDialogConfig,
     };
 };

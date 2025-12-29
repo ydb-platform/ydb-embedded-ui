@@ -17,7 +17,7 @@
   "field_max-partitions-count": "Max number of partitions",
   "field_read-replicas": "Read replicas (followers)",
   "field_bloom-filter": "Bloom filter",
-  "field_compression-groups": "Compression & groups",
+  "field_compression-groups": "Compression & families",
 
   "value_ttl-config": "column: '{{columnName}}', expire after: {{expireTime}}",
   "value_partitioning-by-size-enabled": "Enabled, split size: {{size}}",

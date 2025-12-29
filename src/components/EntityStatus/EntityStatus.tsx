@@ -38,7 +38,6 @@ function defaultRenderName(name?: string) {
     return name ?? '';
 }
 
-// eslint-disable-next-line complexity
 export function EntityStatus({
     status = EFlag.Grey,
     name = '',
