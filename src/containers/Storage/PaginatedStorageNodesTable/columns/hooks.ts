@@ -4,6 +4,7 @@ import type {NodesColumnId} from '../../../../components/nodesColumns/constants'
 import {
     NODES_COLUMNS_IDS,
     NODES_COLUMNS_TITLES,
+    isStorageNodesColumnId,
 } from '../../../../components/nodesColumns/constants';
 import {
     useBlobStorageCapacityMetricsEnabled,
@@ -31,7 +32,7 @@ export function useStorageNodesSelectedColumns({
     const blobMetricsEnabled = useBlobStorageCapacityMetricsEnabled();
 
     const skippedColumnIds = React.useMemo(() => {
-        const skipped: string[] = [];
+        const skipped: NodesColumnId[] = [];
 
         if (!bridgeModeEnabled) {
             skipped.push(NODES_COLUMNS_IDS.PileName);
@@ -47,9 +48,10 @@ export function useStorageNodesSelectedColumns({
     const columns = React.useMemo(() => {
         const allColumns = getStorageNodesColumns({database, viewContext, columnsSettings});
 
-        return allColumns.filter(
-            (column) => !skippedColumnIds.includes(column.name as NodesColumnId),
-        );
+        return allColumns.filter((column) => {
+            const columnName = column.name;
+            return !isStorageNodesColumnId(columnName) || !skippedColumnIds.includes(columnName);
+        });
     }, [database, viewContext, columnsSettings, skippedColumnIds]);
 
     const requiredColumns = React.useMemo(() => {

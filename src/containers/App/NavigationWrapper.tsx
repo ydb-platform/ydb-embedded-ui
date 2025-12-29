@@ -31,22 +31,19 @@ export function NavigationWrapper({
     if (userSettings) {
         // Apply cluster-specific logic to externally provided settings
         finalUserSettings = applyClusterSpecificQueryStreamingSetting(userSettings, clusterName);
-        finalUserSettings = applyBlobStorageCapacityMetricsSettingAvailability(
-            finalUserSettings,
-            blobMetricsAvailable,
-        );
     } else {
         // Generate settings internally with cluster-specific logic
         finalUserSettings = getUserSettings({
             singleClusterMode,
             clusterName,
         });
-
-        finalUserSettings = applyBlobStorageCapacityMetricsSettingAvailability(
-            finalUserSettings,
-            blobMetricsAvailable,
-        );
     }
+
+    // Hide the Blob Storage Capacity Metrics experiment if the backend doesn't support it
+    finalUserSettings = applyBlobStorageCapacityMetricsSettingAvailability(
+        finalUserSettings,
+        blobMetricsAvailable,
+    );
 
     return (
         <Navigation userSettings={finalUserSettings}>

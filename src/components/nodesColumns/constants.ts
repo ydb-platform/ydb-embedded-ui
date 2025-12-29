@@ -285,3 +285,7 @@ export function getNodesColumnSortField(columnId?: string) {
 export function isSortableNodesColumn(columnId: string) {
     return Boolean(getNodesColumnSortField(columnId));
 }
+
+export function isStorageNodesColumnId(column: string): column is NodesColumnId {
+    return Object.values(NODES_COLUMNS_IDS).includes(column as NodesColumnId);
+}
