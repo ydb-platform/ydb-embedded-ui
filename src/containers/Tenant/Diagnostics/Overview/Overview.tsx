@@ -86,7 +86,11 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
             ),
         };
 
-        return (type && pathTypeToComponent[type]?.()) || <TableInfo data={data} type={type} />;
+        return (
+            (type && pathTypeToComponent[type]?.()) || (
+                <TableInfo path={path} data={data} type={type} database={database} />
+            )
+        );
     };
 
     if (loading) {

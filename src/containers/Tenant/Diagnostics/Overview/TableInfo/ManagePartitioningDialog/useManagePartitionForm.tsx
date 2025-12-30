@@ -24,10 +24,5 @@ export function useManagePartitioningForm(params: {
         mode: 'onChange',
     });
 
-    React.useEffect(() => {
-        form.reset(toFormValues(getManagePartitioningInitialValues(initialValue)));
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [initialValue]);
-
     return form;
 }

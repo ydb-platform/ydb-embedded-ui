@@ -1,4 +1,9 @@
 .manage-partitioning-dialog {
+    &__body {
+        padding-top: var(--g-spacing-3);
+        padding-bottom: 0;
+    }
+
     &__row {
         width: 100%;
     }
@@ -14,7 +19,7 @@
     }
 
     &__input {
-        max-width: 150px;
+        max-width: 212px;
     }
 
     &__postfix {

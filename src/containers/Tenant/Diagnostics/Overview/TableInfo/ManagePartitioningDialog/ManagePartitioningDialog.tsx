@@ -7,6 +7,7 @@ import {Controller} from 'react-hook-form';
 
 import type {BytesSizes} from '../../../../../../utils/bytesParsers';
 import {cn} from '../../../../../../utils/cn';
+import {prepareErrorMessage} from '../../../../../../utils/prepareErrorMessage';
 import {DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES} from '../constants';
 
 import {DEFAULT_MAX_SPLIT_SIZE_GB, UNIT_OPTIONS} from './constants';
@@ -29,7 +30,6 @@ export interface ManagePartitioningValue {
 
 interface CommonDialogProps {
     initialValue?: ManagePartitioningValue;
-    progress?: boolean;
     onApply?: (value: ManagePartitioningValue) => void | Promise<void>;
 }
 
@@ -47,11 +47,13 @@ export const MANAGE_PARTITIONING_DIALOG = 'manage-partitioning-dialog';
 function ManagePartitioningDialog({
     onClose,
     open,
-    progress,
     renderButtons,
     initialValue,
     onApply,
 }: ManagePartitioningDialogProps) {
+    const [apiError, setApiError] = React.useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = React.useState(false);
+
     const {
         control,
         handleSubmit,
@@ -72,7 +74,15 @@ function ManagePartitioningDialog({
     const loadEnabled = watch('loadEnabled');
 
     const handleApply = handleSubmit(async (data) => {
-        await onApply?.(toManagePartitioningValue(data));
+        setApiError(null);
+        setIsSubmitting(true);
+        try {
+            await onApply?.(toManagePartitioningValue(data));
+        } catch (e) {
+            setApiError(prepareErrorMessage(e));
+        } finally {
+            setIsSubmitting(false);
+        }
     });
 
     return (
@@ -82,7 +92,7 @@ function ManagePartitioningDialog({
             />
 
             <form onSubmit={handleApply}>
-                <Dialog.Body>
+                <Dialog.Body className={b('body')}>
                     <Flex direction="column" gap="3" alignItems="flex-start">
                         <Text variant="subheader-1">{i18n('title_partitioning')}</Text>
 
@@ -220,6 +230,11 @@ function ManagePartitioningDialog({
                                 )}
                             />
                         </Flex>
+                        {apiError && (
+                            <Text color="danger" title={apiError}>
+                                <div>{apiError}</div>
+                            </Text>
+                        )}
                     </Flex>
                 </Dialog.Body>
 
@@ -227,11 +242,11 @@ function ManagePartitioningDialog({
                     textButtonApply={i18n('action_apply')}
                     textButtonCancel={i18n('action_cancel')}
                     onClickButtonCancel={onClose}
-                    loading={progress}
+                    loading={isSubmitting}
                     renderButtons={renderButtons}
                     propsButtonApply={{
                         type: 'submit',
-                        disabled: progress || !isValid,
+                        disabled: isSubmitting || !isValid,
                     }}
                 />
             </form>

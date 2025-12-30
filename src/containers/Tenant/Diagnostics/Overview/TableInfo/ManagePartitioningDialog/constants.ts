@@ -28,12 +28,3 @@ export const DEFAULT_MANAGE_PARTITIONING_VALUE: ManagePartitioningValue = {
     minimum: '40',
     maximum: '1000',
 };
-
-export const splitToBytes = (splitSize: string, splitUnit: BytesSizes): number | null => {
-    const n = Number(splitSize.replace(/\s/g, '').replace(',', '.'));
-    if (!Number.isFinite(n) || n < 0) {
-        return null;
-    }
-
-    return n * sizes[splitUnit].value;
-};

@@ -10,5 +10,11 @@
   "field_maximum": "Maximum",
 
   "action_cancel": "Cancel",
-  "action_apply": "Apply"
+  "action_apply": "Apply",
+
+  "error_invalid-unit": "Invalid unit",
+  "error_value-greater-maximum": "Value must not be greater than maximum",
+  "error_percent": "Must be between 0 and 100",
+  "error_minimum-greater-maximum": "Minimum must not be greater than maximum",
+  "error_maximum-less-minimum": "Maximum must not be less than minimum"
 }
