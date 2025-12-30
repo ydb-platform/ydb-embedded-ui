@@ -5,7 +5,7 @@ import {isNumeric} from '../utils';
 
 import i18n from './i18n';
 
-const sizes = {
+export const sizes = {
     b: {
         value: 1,
         label: i18n('b'),
