@@ -85,6 +85,16 @@ function ManagePartitioningDialog({
         }
     });
 
+    const unitOptions = React.useMemo(
+        () =>
+            UNIT_OPTIONS.map((unit) => (
+                <Select.Option key={unit.value} value={unit.value}>
+                    {unit.label}
+                </Select.Option>
+            )),
+        [],
+    );
+
     return (
         <Dialog size="s" onClose={onClose} open={open}>
             <Dialog.Header
@@ -128,14 +138,7 @@ function ManagePartitioningDialog({
                                                             )
                                                         }
                                                     >
-                                                        {UNIT_OPTIONS.map((unit) => (
-                                                            <Select.Option
-                                                                key={unit.value}
-                                                                value={unit.value}
-                                                            >
-                                                                {unit.label}
-                                                            </Select.Option>
-                                                        ))}
+                                                        {unitOptions}
                                                     </Select>
                                                 )}
                                             />
