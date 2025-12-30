@@ -59,9 +59,7 @@ export function useStorageGroupsSelectedColumns({
     const columns = React.useMemo(() => {
         const allColumns = getStorageGroupsColumns({viewContext});
 
-        return allColumns.filter(
-            (col) => !skippedColumnIds.includes(col.name as StorageGroupsColumnId),
-        );
+        return allColumns.filter((column) => !skippedColumnIds.some((id) => id === column.name));
     }, [viewContext, skippedColumnIds]);
 
     const requiredColumns = React.useMemo(() => {
