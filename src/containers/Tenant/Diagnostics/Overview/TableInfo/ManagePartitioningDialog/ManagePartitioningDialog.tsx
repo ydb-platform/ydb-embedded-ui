@@ -177,9 +177,15 @@ function ManagePartitioningDialog({
                                             value={String(field.value)}
                                             onUpdate={field.onChange}
                                             disabled={!loadEnabled}
-                                            errorMessage={errors.loadPercent?.message}
+                                            errorMessage={
+                                                loadEnabled
+                                                    ? errors.loadPercent?.message
+                                                    : undefined
+                                            }
                                             validationState={
-                                                errors.loadPercent ? 'invalid' : undefined
+                                                loadEnabled && errors.loadPercent
+                                                    ? 'invalid'
+                                                    : undefined
                                             }
                                             endContent={<span className={b('postfix')}>%</span>}
                                         />
