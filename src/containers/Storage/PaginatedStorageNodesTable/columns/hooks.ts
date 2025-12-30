@@ -47,7 +47,7 @@ export function useStorageNodesSelectedColumns({
     const columns = React.useMemo(() => {
         const allColumns = getStorageNodesColumns({database, viewContext, columnsSettings});
 
-        return allColumns.filter((column) => !skippedColumnIds.some((id) => id === column.name));
+        return allColumns.filter((col) => !skippedColumnIds.includes(col.name as NodesColumnId));
     }, [database, viewContext, columnsSettings, skippedColumnIds]);
 
     const requiredColumns = React.useMemo(() => {
