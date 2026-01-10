@@ -15,9 +15,9 @@ We use the following symbols as abbreviations:
 
 1. ✅ ㉔ **Capacity diagnostics** – a set of signals on a database info tab to easily diagnose CPU or storage shortage
 1. ✅ ㉔ **Basic built-in charts** – support for charts display for most popular signals: resource consumption, requests and latency
-1. 🔥 ㉔ **Display Table Hot Keys** – on a tab **Hot Keys** for a [column-oriented](https://ydb.tech/docs/en/concepts/datamodel/table#olap-data-types) and [row-oriented table](https://ydb.tech/docs/en/concepts/datamodel/table#row-orineted_table) display Hot Keys based on query statistics
+1. ✅ ㉔ **Display Table Hot Keys** – on a tab **Hot Keys** for a [column-oriented](https://ydb.tech/docs/en/concepts/datamodel/table#olap-data-types) and [row-oriented table](https://ydb.tech/docs/en/concepts/datamodel/table#row-orineted_table) display Hot Keys based on query statistics
 1. ✅ **Tablets Tab** – improved list of tablets in database and cluster with filters and search
-1. ㉕ **Network diagnostics** – display signals about cluster network performance and help to discover reasons for potential problems
+1. ✅ **Network diagnostics** – display signals about cluster network performance and help to discover reasons for potential problems
 
 ## Cluster Administration
 
@@ -31,7 +31,7 @@ We use the following symbols as abbreviations:
 ## Query and Schema Development
 
 1. ✅ **Autocompletion** – autosuggestions to complete sql keywords and schema elements' names
-1. ㉔ **Support VIEWS** – basic support for new schema object type – `VIEW`
+1. ✅ **Support VIEWS** – basic support for new schema object type – `VIEW`
 1. ✅ **Support Asyncronous Replication** – basic support for new feature – cluster-to-cluster asyncrounous replication
 1. ✅ **Display Keys and Column Families** – add wider schema tab in Diagnostics mode with information about column families, primary and partitioning keys.
 1. ✅ **Enhance Column Tables support** – display all parameters from `CREATE TABLE` statement on info Tab, add create/alter queries templates
