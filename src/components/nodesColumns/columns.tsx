@@ -86,6 +86,7 @@ export function getNodeNameColumn<T extends {NodeName?: string}>(): Column<T> {
         width: 200,
     };
 }
+
 export function getDatabaseColumn<T extends {Database?: string}>(): Column<T> {
     return {
         name: NODES_COLUMNS_IDS.Database,
