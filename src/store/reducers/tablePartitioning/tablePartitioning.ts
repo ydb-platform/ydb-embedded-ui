@@ -7,7 +7,7 @@ import {isQueryErrorResponse} from '../../../utils/query';
 import {api} from '../api';
 
 function alterPartitioningSQL(path: string, values: UpdateTablePartitioningValues) {
-    const safePath = path.replace(/'/g, "''");
+    const safePath = path.replace(/`/g, '``');
 
     const byLoad = values.splitByLoad ? 'ENABLED' : 'DISABLED';
 
