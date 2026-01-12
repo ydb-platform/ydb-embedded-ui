@@ -1,5 +1,5 @@
 import DataTable from '@gravity-ui/react-data-table';
-import {DefinitionList} from '@gravity-ui/uikit';
+import {ActionTooltip, DefinitionList} from '@gravity-ui/uikit';
 
 import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import type {TMemoryStats, TPoolStats} from '../../types/api/nodes';
@@ -92,7 +92,14 @@ export function getDatabaseColumn<T extends {Database?: string}>(): Column<T> {
         name: NODES_COLUMNS_IDS.Database,
         header: NODES_COLUMNS_TITLES.Database,
         align: DataTable.LEFT,
-        render: ({row}) => row.Database || EMPTY_DATA_PLACEHOLDER,
+        render: ({row}) =>
+            row.Database ? (
+                <ActionTooltip title={row.Database}>
+                    <span>{row.Database}</span>
+                </ActionTooltip>
+            ) : (
+                EMPTY_DATA_PLACEHOLDER
+            ),
         width: 200,
     };
 }
