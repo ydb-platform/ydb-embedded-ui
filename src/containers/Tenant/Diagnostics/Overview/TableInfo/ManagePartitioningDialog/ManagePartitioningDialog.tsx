@@ -3,34 +3,24 @@ import React from 'react';
 import * as NiceModal from '@ebay/nice-modal-react';
 import type {DialogFooterProps} from '@gravity-ui/uikit';
 import {Dialog, Flex, Select, Switch, Text, TextInput} from '@gravity-ui/uikit';
-import {Controller} from 'react-hook-form';
+import {Controller, useWatch} from 'react-hook-form';
 
-import type {BytesSizes} from '../../../../../../utils/bytesParsers';
 import {cn} from '../../../../../../utils/cn';
 import {prepareErrorMessage} from '../../../../../../utils/prepareErrorMessage';
 import {DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES} from '../constants';
 
 import {DEFAULT_MAX_SPLIT_SIZE_GB, UNIT_OPTIONS} from './constants';
 import i18n from './i18n';
+import type {ManagePartitioningFormState} from './types';
 import {useManagePartitioningForm} from './useManagePartitionForm';
-import {toManagePartitioningValue} from './utils';
 
 import './ManagePartitioningDialog.scss';
 
 const b = cn('manage-partitioning-dialog');
 
-export interface ManagePartitioningValue {
-    splitSize: string;
-    splitUnit: BytesSizes;
-    loadEnabled: boolean;
-    loadPercent: string;
-    minimum: string;
-    maximum: string;
-}
-
 interface CommonDialogProps {
-    initialValue?: ManagePartitioningValue;
-    onApply?: (value: ManagePartitioningValue) => void | Promise<void>;
+    initialValue?: ManagePartitioningFormState;
+    onApply?: (value: ManagePartitioningFormState) => void | Promise<void>;
 }
 
 interface ManagePartitioningDialogNiceModalProps extends CommonDialogProps, DialogFooterProps {
@@ -57,7 +47,6 @@ function ManagePartitioningDialog({
     const {
         control,
         handleSubmit,
-        watch,
         trigger,
         formState: {errors, isValid},
     } = useManagePartitioningForm({
@@ -65,21 +54,15 @@ function ManagePartitioningDialog({
         maxSplitSizeBytes: DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES,
     });
 
-    const splitUnit = watch('splitUnit');
-
-    React.useEffect(() => {
-        trigger('splitSize');
-    }, [splitUnit, trigger]);
-
-    const loadEnabled = watch('loadEnabled');
+    const loadEnabled = useWatch({control, name: 'loadEnabled'});
 
     const handleApply = handleSubmit(async (data) => {
         setApiError(null);
         setIsSubmitting(true);
         try {
-            await onApply?.(toManagePartitioningValue(data));
-        } catch (e) {
-            setApiError(prepareErrorMessage(e));
+            await onApply?.(data);
+        } catch (error) {
+            setApiError(prepareErrorMessage(error));
         } finally {
             setIsSubmitting(false);
         }
@@ -117,7 +100,7 @@ function ManagePartitioningDialog({
                                 render={({field}) => (
                                     <TextInput
                                         type="number"
-                                        value={String(field.value)}
+                                        value={field.value}
                                         onUpdate={field.onChange}
                                         className={b('input')}
                                         errorMessage={errors.splitSize?.message}
@@ -132,11 +115,14 @@ function ManagePartitioningDialog({
                                                         size="s"
                                                         width={65}
                                                         value={[unitField.value]}
-                                                        onUpdate={(v) =>
-                                                            unitField.onChange(
-                                                                v?.[0] ?? unitField.value,
-                                                            )
-                                                        }
+                                                        onUpdate={(v) => {
+                                                            const nextUnit =
+                                                                v?.[0] ?? unitField.value;
+                                                            unitField.onChange(nextUnit);
+
+                                                            // Force validation of splitSize, because its constraints depend on unit
+                                                            trigger('splitSize');
+                                                        }}
                                                     >
                                                         {unitOptions}
                                                     </Select>
@@ -174,7 +160,7 @@ function ManagePartitioningDialog({
                                     render={({field}) => (
                                         <TextInput
                                             type="number"
-                                            value={String(field.value)}
+                                            value={field.value}
                                             onUpdate={field.onChange}
                                             disabled={!loadEnabled}
                                             errorMessage={
@@ -209,7 +195,7 @@ function ManagePartitioningDialog({
                                 render={({field}) => (
                                     <TextInput
                                         type="number"
-                                        value={String(field.value)}
+                                        value={field.value}
                                         onUpdate={field.onChange}
                                         className={b('input')}
                                         errorMessage={errors.minimum?.message}
@@ -230,7 +216,7 @@ function ManagePartitioningDialog({
                                 render={({field}) => (
                                     <TextInput
                                         type="number"
-                                        value={String(field.value)}
+                                        value={field.value}
                                         onUpdate={field.onChange}
                                         className={b('input')}
                                         errorMessage={errors.maximum?.message}
@@ -295,9 +281,9 @@ NiceModal.register(MANAGE_PARTITIONING_DIALOG, ManagePartitioningDialogNiceModal
 
 export function openManagePartitioningDialog(
     props?: Omit<ManagePartitioningDialogNiceModalProps, 'id'>,
-): Promise<ManagePartitioningValue | null> {
+): Promise<ManagePartitioningFormState | null> {
     return NiceModal.show(MANAGE_PARTITIONING_DIALOG, {
         id: MANAGE_PARTITIONING_DIALOG,
         ...props,
-    }) as Promise<ManagePartitioningValue | null>;
+    }) as Promise<ManagePartitioningFormState | null>;
 }

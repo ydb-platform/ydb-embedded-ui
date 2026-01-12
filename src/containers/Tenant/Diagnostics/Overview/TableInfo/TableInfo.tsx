@@ -10,7 +10,6 @@ import {cn} from '../../../../../utils/cn';
 import createToast from '../../../../../utils/createToast';
 
 import {openManagePartitioningDialog} from './ManagePartitioningDialog/ManagePartitioningDialog';
-import {toFormValues} from './ManagePartitioningDialog/utils';
 import {PartitionsProgress} from './PartitionsProgress/PartitionsProgress';
 import i18n from './i18n';
 import {prepareTableInfo} from './prepareTableInfo';
@@ -53,19 +52,17 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
     const handleOpenManagePartitioning = React.useCallback(() => {
         openManagePartitioningDialog({
             initialValue: managePartitioningDialogConfig,
-            onApply: (value) => {
-                return updatePartitioning(
-                    prepareUpdatePartitioningRequest(toFormValues(value), database, path),
-                )
-                    .unwrap()
-                    .then(() => {
-                        createToast({
-                            name: 'updateTablePartitioning',
-                            content: i18n('toast_partitioning-updated'),
-                            autoHiding: 3000,
-                            isClosable: true,
-                        });
-                    });
+            onApply: async (value) => {
+                await updatePartitioning(
+                    prepareUpdatePartitioningRequest(value, database, path),
+                ).unwrap();
+
+                createToast({
+                    name: 'updateTablePartitioning',
+                    content: i18n('toast_partitioning-updated'),
+                    autoHiding: 3000,
+                    isClosable: true,
+                });
             },
         });
     }, [managePartitioningDialogConfig, database, path, updatePartitioning]);

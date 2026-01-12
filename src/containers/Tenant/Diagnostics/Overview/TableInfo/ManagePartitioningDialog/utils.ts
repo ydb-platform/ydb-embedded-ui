@@ -1,26 +1,16 @@
-import {isNil} from 'lodash';
 import {z} from 'zod';
 
 import type {BytesSizes} from '../../../../../../utils/bytesParsers';
 import {sizes} from '../../../../../../utils/bytesParsers';
 import {DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES} from '../constants';
 
-import type {ManagePartitioningValue} from './ManagePartitioningDialog';
 import {DEFAULT_MANAGE_PARTITIONING_VALUE} from './constants';
 import i18n from './i18n';
-
-export type ManagePartitioningFormValues = {
-    splitSize: number;
-    splitUnit: BytesSizes;
-    loadEnabled: boolean;
-    loadPercent?: number;
-    minimum: number;
-    maximum: number;
-};
+import type {ManagePartitioningFormState} from './types';
 
 export function getManagePartitioningInitialValues(
-    initialData: Partial<ManagePartitioningValue> = {},
-): ManagePartitioningValue {
+    initialData: Partial<ManagePartitioningFormState> = {},
+): ManagePartitioningFormState {
     return {
         ...DEFAULT_MANAGE_PARTITIONING_VALUE,
         ...initialData,
@@ -30,23 +20,53 @@ export function getManagePartitioningInitialValues(
 export const splitToBytes = (splitSize: number, splitUnit: BytesSizes) =>
     splitSize * sizes[splitUnit].value;
 
-export const splitUnitSchema = z.custom<BytesSizes>((v) => {
-    return v in sizes;
+export const splitUnitSchema = z.custom<BytesSizes>((value) => {
+    return value in sizes;
 }, i18n('error_invalid-unit'));
+
+const emptyToUndefined = (value: unknown) => (value === '' ? undefined : value);
+
+// Required positive number (> 0)
+const requiredPositiveNumber = (requiredMessage: string) =>
+    z.preprocess(
+        emptyToUndefined,
+        z.coerce
+            .number({
+                required_error: requiredMessage,
+                invalid_type_error: requiredMessage,
+            })
+            .gt(0),
+    );
+
+// Required positive integer (> 0)
+const requiredPositiveInt = (requiredMessage: string) =>
+    z.preprocess(
+        emptyToUndefined,
+        z.coerce
+            .number({
+                required_error: requiredMessage,
+                invalid_type_error: requiredMessage,
+            })
+            .int()
+            .gt(0),
+    );
+
+// Optional number (empty -> undefined)
+const optionalNumber = () => z.preprocess(emptyToUndefined, z.coerce.number().optional());
 
 export const managePartitioningSchema = (
     maxSplitSizeBytes = DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES,
 ) =>
     z
         .object({
-            splitSize: z.coerce.number().gt(0),
+            splitSize: requiredPositiveNumber(i18n('error_required')),
             splitUnit: splitUnitSchema,
 
             loadEnabled: z.boolean(),
-            loadPercent: z.coerce.number().optional(),
+            loadPercent: optionalNumber(),
 
-            minimum: z.coerce.number().int().gt(0),
-            maximum: z.coerce.number().int().gt(0),
+            minimum: requiredPositiveInt(i18n('error_required')),
+            maximum: requiredPositiveInt(i18n('error_required')),
         })
         .superRefine((data, ctx) => {
             const bytes = splitToBytes(data.splitSize, data.splitUnit);
@@ -60,7 +80,13 @@ export const managePartitioningSchema = (
 
             if (data.loadEnabled) {
                 const p = data.loadPercent;
-                if (isNil(p) || p <= 0 || p > 100) {
+                if (p === undefined) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        path: ['loadPercent'],
+                        message: i18n('error_required'),
+                    });
+                } else if (p <= 0 || p > 100) {
                     ctx.addIssue({
                         code: z.ZodIssueCode.custom,
                         path: ['loadPercent'],
@@ -82,27 +108,3 @@ export const managePartitioningSchema = (
                 });
             }
         });
-
-export function toFormValues(value: ManagePartitioningValue): ManagePartitioningFormValues {
-    return {
-        splitSize: Number(value.splitSize),
-        splitUnit: value.splitUnit,
-        loadEnabled: Boolean(value.loadEnabled),
-        loadPercent: value.loadPercent === '' ? undefined : Number(value.loadPercent),
-        minimum: Number(value.minimum),
-        maximum: Number(value.maximum),
-    };
-}
-
-export function toManagePartitioningValue(
-    data: ManagePartitioningFormValues,
-): ManagePartitioningValue {
-    return {
-        splitSize: String(data.splitSize),
-        splitUnit: data.splitUnit,
-        loadEnabled: data.loadEnabled,
-        loadPercent: String(data.loadPercent ?? ''),
-        minimum: String(data.minimum),
-        maximum: String(data.maximum),
-    };
-}

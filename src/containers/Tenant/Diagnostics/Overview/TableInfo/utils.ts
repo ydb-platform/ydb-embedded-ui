@@ -1,23 +1,23 @@
 import type {UpdateTablePartitioningParams} from '../../../../../types/store/partitioning';
 import {sizes} from '../../../../../utils/bytesParsers';
 
-import type {ManagePartitioningFormValues} from './ManagePartitioningDialog/utils';
+import type {ManagePartitioningFormState} from './ManagePartitioningDialog/types';
 
 export function prepareUpdatePartitioningRequest(
-    value: ManagePartitioningFormValues,
+    value: ManagePartitioningFormState,
     database: string,
     path: string,
 ): UpdateTablePartitioningParams {
-    const bytes = value.splitSize * sizes[value.splitUnit].value;
+    const bytes = Number(value.splitSize) * sizes[value.splitUnit].value;
     const partitionSizeMb = Math.round(bytes / sizes.mb.value);
 
     return {
         value: {
             partitionSizeMb,
-            minPartitions: value.minimum,
-            maxPartitions: value.maximum,
+            minPartitions: Number(value.minimum),
+            maxPartitions: Number(value.maximum),
             splitByLoad: value.loadEnabled,
-            loadPercent: value.loadEnabled ? value.loadPercent : undefined,
+            loadPercent: value.loadEnabled ? Number(value.loadPercent) : undefined,
         },
         database,
         path,

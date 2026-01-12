@@ -5,7 +5,7 @@ import {
     DEFAULT_PARTITION_SPLIT_BY_LOAD_THRESHOLD_PERCENT,
 } from '../constants';
 
-import type {ManagePartitioningValue} from './ManagePartitioningDialog';
+import type {ManagePartitioningFormState} from './types';
 
 export const UNIT_OPTIONS: Array<{value: BytesSizes; label: string}> = (
     Object.keys(sizes) as BytesSizes[]
@@ -20,7 +20,7 @@ export const DEFAULT_MAX_SPLIT_SIZE_GB = formatBytes({
     withSizeLabel: false,
 });
 
-export const DEFAULT_MANAGE_PARTITIONING_VALUE: ManagePartitioningValue = {
+export const DEFAULT_MANAGE_PARTITIONING_VALUE: ManagePartitioningFormState = {
     splitSize: DEFAULT_MAX_SPLIT_SIZE_GB,
     splitUnit: 'gb',
     loadEnabled: true,

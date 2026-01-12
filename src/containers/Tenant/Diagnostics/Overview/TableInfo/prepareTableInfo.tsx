@@ -26,8 +26,8 @@ import {formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {formatDurationToShortTimeFormat} from '../../../../../utils/timeParsers';
 import {isNumeric} from '../../../../../utils/utils';
 
-import type {ManagePartitioningValue} from './ManagePartitioningDialog/ManagePartitioningDialog';
 import {DEFAULT_MANAGE_PARTITIONING_VALUE} from './ManagePartitioningDialog/constants';
+import type {ManagePartitioningFormState} from './ManagePartitioningDialog/types';
 import {b} from './TableInfo';
 import {
     DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES,
@@ -319,7 +319,7 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
     let generalInfoLeft: YDBDefinitionListItem[] = [];
     let generalInfoRight: YDBDefinitionListItem[] = [];
     let partitionProgressConfig: PartitionProgressConfig | undefined;
-    let managePartitioningDialogConfig: ManagePartitioningValue | undefined;
+    let managePartitioningDialogConfig: ManagePartitioningFormState | undefined;
 
     switch (type) {
         case EPathType.EPathTypeTable: {
