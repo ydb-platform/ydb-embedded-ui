@@ -1,6 +1,6 @@
 {
   "context_not-available": "not available",
-  "label_no-data": "No data",
+  "label_no-data": "—",
   "label_storage-pool": "StoragePool",
   "label_donor": "Donor",
   "label_node-id": "NodeId",
