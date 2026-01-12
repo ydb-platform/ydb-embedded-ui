@@ -3,7 +3,7 @@ import React from 'react';
 import * as NiceModal from '@ebay/nice-modal-react';
 import type {DialogFooterProps} from '@gravity-ui/uikit';
 import {Dialog, Flex, Select, Switch, Text, TextInput} from '@gravity-ui/uikit';
-import {Controller, useWatch} from 'react-hook-form';
+import {Controller} from 'react-hook-form';
 
 import {cn} from '../../../../../../utils/cn';
 import {prepareErrorMessage} from '../../../../../../utils/prepareErrorMessage';
@@ -53,8 +53,6 @@ function ManagePartitioningDialog({
         initialValue,
         maxSplitSizeBytes: DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES,
     });
-
-    const loadEnabled = useWatch({control, name: 'loadEnabled'});
 
     const handleApply = handleSubmit(async (data) => {
         setApiError(null);
@@ -151,30 +149,6 @@ function ManagePartitioningDialog({
                                     control={control}
                                     render={({field}) => (
                                         <Switch checked={field.value} onUpdate={field.onChange} />
-                                    )}
-                                />
-
-                                <Controller
-                                    name="loadPercent"
-                                    control={control}
-                                    render={({field}) => (
-                                        <TextInput
-                                            type="number"
-                                            value={field.value}
-                                            onUpdate={field.onChange}
-                                            disabled={!loadEnabled}
-                                            errorMessage={
-                                                loadEnabled
-                                                    ? errors.loadPercent?.message
-                                                    : undefined
-                                            }
-                                            validationState={
-                                                loadEnabled && errors.loadPercent
-                                                    ? 'invalid'
-                                                    : undefined
-                                            }
-                                            endContent={<span className={b('postfix')}>%</span>}
-                                        />
                                     )}
                                 />
                             </Flex>

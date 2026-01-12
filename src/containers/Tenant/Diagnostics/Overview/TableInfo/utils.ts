@@ -17,7 +17,6 @@ export function prepareUpdatePartitioningRequest(
             minPartitions: Number(value.minimum),
             maxPartitions: Number(value.maximum),
             splitByLoad: value.loadEnabled,
-            loadPercent: value.loadEnabled ? Number(value.loadPercent) : undefined,
         },
         database,
         path,

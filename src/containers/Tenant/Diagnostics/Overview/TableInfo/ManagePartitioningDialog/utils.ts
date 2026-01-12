@@ -51,9 +51,6 @@ const requiredPositiveInt = (requiredMessage: string) =>
             .gt(0),
     );
 
-// Optional number (empty -> undefined)
-const optionalNumber = () => z.preprocess(emptyToUndefined, z.coerce.number().optional());
-
 export const managePartitioningSchema = (
     maxSplitSizeBytes = DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES,
 ) =>
@@ -63,7 +60,6 @@ export const managePartitioningSchema = (
             splitUnit: splitUnitSchema,
 
             loadEnabled: z.boolean(),
-            loadPercent: optionalNumber(),
 
             minimum: requiredPositiveInt(i18n('error_required')),
             maximum: requiredPositiveInt(i18n('error_required')),
@@ -76,23 +72,6 @@ export const managePartitioningSchema = (
                     path: ['splitSize'],
                     message: i18n('error_value-greater-maximum'),
                 });
-            }
-
-            if (data.loadEnabled) {
-                const p = data.loadPercent;
-                if (p === undefined) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        path: ['loadPercent'],
-                        message: i18n('error_required'),
-                    });
-                } else if (p <= 0 || p > 100) {
-                    ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
-                        path: ['loadPercent'],
-                        message: i18n('error_percent'),
-                    });
-                }
             }
 
             if (data.minimum > data.maximum) {

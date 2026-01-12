@@ -3,7 +3,6 @@ export interface UpdateTablePartitioningValues {
     minPartitions: number;
     maxPartitions: number;
     splitByLoad: boolean;
-    loadPercent?: number;
 }
 
 export interface UpdateTablePartitioningParams {

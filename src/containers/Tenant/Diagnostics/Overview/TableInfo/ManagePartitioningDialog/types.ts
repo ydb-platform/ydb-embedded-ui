@@ -5,7 +5,6 @@ export interface ManagePartitioningFormState {
     splitSize: string;
     splitUnit: BytesSizes;
     loadEnabled: boolean;
-    loadPercent: string;
     minimum: string;
     maximum: string;
 }

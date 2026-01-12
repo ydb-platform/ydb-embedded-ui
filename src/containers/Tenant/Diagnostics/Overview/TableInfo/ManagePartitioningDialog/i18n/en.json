@@ -15,7 +15,6 @@
   "error_invalid-unit": "Invalid unit",
   "error_required": "The field is required",
   "error_value-greater-maximum": "Value must not be greater than maximum",
-  "error_percent": "Must be between 0 and 100",
   "error_minimum-greater-maximum": "Minimum must not be greater than maximum",
   "error_maximum-less-minimum": "Maximum must not be less than minimum"
 }

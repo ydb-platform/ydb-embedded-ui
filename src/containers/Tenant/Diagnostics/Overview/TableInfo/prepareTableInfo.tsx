@@ -29,11 +29,7 @@ import {isNumeric} from '../../../../../utils/utils';
 import {DEFAULT_MANAGE_PARTITIONING_VALUE} from './ManagePartitioningDialog/constants';
 import type {ManagePartitioningFormState} from './ManagePartitioningDialog/types';
 import {b} from './TableInfo';
-import {
-    DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES,
-    DEFAULT_PARTITION_SPLIT_BY_LOAD_THRESHOLD_PERCENT,
-    READ_REPLICAS_MODE,
-} from './constants';
+import {DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES, READ_REPLICAS_MODE} from './constants';
 import i18n from './i18n';
 
 const GENERAL_METRICS_KEYS = ['CPU', 'Memory', 'ReadThroughput', 'Network'] as const;
@@ -54,15 +50,6 @@ const prepareTTL = (ttl: TTTLSettings | TColumnDataLifeCycle) => {
         return {name: i18n('field_ttl-for-rows'), content: value};
     }
     return undefined;
-};
-
-const prepareSplitByLoadConfig = (policy?: TPartitionConfig['PartitioningPolicy']) => {
-    const splitByLoadEnabled = Boolean(policy?.SplitByLoadSettings?.Enabled);
-    const cpuThreshold =
-        policy?.SplitByLoadSettings?.CpuPercentageThreshold ??
-        DEFAULT_PARTITION_SPLIT_BY_LOAD_THRESHOLD_PERCENT;
-
-    return {splitByLoadEnabled, cpuThreshold};
 };
 
 function prepareColumnTableGeneralInfo(columnTable: TColumnTableDescription) {
@@ -162,18 +149,14 @@ const prepareTableGeneralInfo = (
     const left: YDBDefinitionListItem[] = [];
     const right: YDBDefinitionListItem[] = [];
 
-    // We know some facts about partitions:
-    // for splitting by load: if partitioningByLoad is enabled, we can split by load, default: 50%
-    // for splitting by size: it always will be splitted by 2 GB if user doesn't set anything else
-
-    const {splitByLoadEnabled, cpuThreshold} = prepareSplitByLoadConfig(PartitioningPolicy);
+    const splitByLoadEnabled = Boolean(PartitioningPolicy?.SplitByLoadSettings?.Enabled);
 
     const partitioningByLoad = splitByLoadEnabled ? (
-        <Label>{`${cpuThreshold}%`}</Label>
+        <Label>{i18n('value_enabled')}</Label>
     ) : (
         <Label theme="unknown">{i18n('value_disabled')}</Label>
     );
-
+    // for splitting by size: it always will be splitted by 2 GB if user doesn't set anything else
     const splitSizeBytes = PartitioningPolicy.SizeToSplit ?? DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES;
 
     left.push(
@@ -254,7 +237,7 @@ const prepareManagePartitioningDialogConfig = (
 ) => {
     const policy = partitionConfig?.PartitioningPolicy;
 
-    const {splitByLoadEnabled, cpuThreshold} = prepareSplitByLoadConfig(policy);
+    const splitByLoadEnabled = Boolean(policy?.SplitByLoadSettings?.Enabled);
 
     const bytes = Number(policy?.SizeToSplit ?? DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES);
     const size = formatBytes({
@@ -268,7 +251,6 @@ const prepareManagePartitioningDialogConfig = (
         splitSize: size,
         splitUnit: unit,
         loadEnabled: splitByLoadEnabled,
-        loadPercent: String(cpuThreshold),
         minimum: String(progress?.minPartitions),
         maximum: String(progress?.maxPartitions ?? DEFAULT_MANAGE_PARTITIONING_VALUE.maximum),
     };
