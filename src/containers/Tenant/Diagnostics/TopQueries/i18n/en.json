@@ -1,5 +1,5 @@
 {
-  "no-data": "No data",
+  "no-data": "—",
   "filter.text.placeholder": "Search by query text or userSID...",
   "mode_top": "Top",
   "mode_running": "Running",

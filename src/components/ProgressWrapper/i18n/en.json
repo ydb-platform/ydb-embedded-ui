@@ -1,4 +1,4 @@
 {
-  "alert_no-data": "No data",
+  "alert_no-data": "—",
   "context_capacity-usage": "{{value}} of {{capacity}}"
 }
