@@ -120,6 +120,8 @@ export type RenderMonitoring = (props: {
 export interface UiMetricaGoals {
     runQuery?: string;
     stopQuery?: string;
+    openManagePartitioning?: string;
+    applyManagePartitioning?: string;
 }
 
 export type UiMetricaGoal = keyof UiMetricaGoals;

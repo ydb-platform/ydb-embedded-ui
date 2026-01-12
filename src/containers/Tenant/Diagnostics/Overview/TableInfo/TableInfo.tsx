@@ -8,6 +8,7 @@ import {tablePartitioningApi} from '../../../../../store/reducers/tablePartition
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
 import createToast from '../../../../../utils/createToast';
+import {reachMetricaGoal} from '../../../../../utils/yaMetrica';
 
 import {openManagePartitioningDialog} from './ManagePartitioningDialog/ManagePartitioningDialog';
 import {PartitionsProgress} from './PartitionsProgress/PartitionsProgress';
@@ -50,9 +51,11 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
     const [updatePartitioning] = tablePartitioningApi.useUpdateTablePartitioningMutation();
 
     const handleOpenManagePartitioning = React.useCallback(() => {
+        reachMetricaGoal('openManagePartitioning');
         openManagePartitioningDialog({
             initialValue: managePartitioningDialogConfig,
             onApply: async (value) => {
+                reachMetricaGoal('applyManagePartitioning');
                 await updatePartitioning(
                     prepareUpdatePartitioningRequest(value, database, path),
                 ).unwrap();
@@ -152,7 +155,7 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
                 >
                     <Disclosure.Summary>
                         {(props) => (
-                            <Button {...props} view="normal" size="s">
+                            <Button onClick={props.onClick} view="normal" size="s">
                                 {expanded ? i18n('button_show-less') : i18n('button_show-more')}
                                 <Icon data={expanded ? ChevronUp : ChevronDown} size={16} />
                             </Button>

@@ -170,7 +170,10 @@ function ManagePartitioningDialog({
                                     <TextInput
                                         type="number"
                                         value={field.value}
-                                        onUpdate={field.onChange}
+                                        onUpdate={(next) => {
+                                            field.onChange(next);
+                                            trigger('maximum'); // revalidate dependent field to clear stale error
+                                        }}
                                         className={b('input')}
                                         errorMessage={errors.minimum?.message}
                                         validationState={errors.minimum ? 'invalid' : undefined}
@@ -191,7 +194,10 @@ function ManagePartitioningDialog({
                                     <TextInput
                                         type="number"
                                         value={field.value}
-                                        onUpdate={field.onChange}
+                                        onUpdate={(next) => {
+                                            field.onChange(next);
+                                            trigger('minimum'); // revalidate dependent field to clear stale error
+                                        }}
                                         className={b('input')}
                                         errorMessage={errors.maximum?.message}
                                         validationState={errors.maximum ? 'invalid' : undefined}
