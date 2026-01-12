@@ -86,6 +86,15 @@ export function getNodeNameColumn<T extends {NodeName?: string}>(): Column<T> {
         width: 200,
     };
 }
+export function getDatabaseColumn<T extends {Database?: string}>(): Column<T> {
+    return {
+        name: NODES_COLUMNS_IDS.Database,
+        header: NODES_COLUMNS_TITLES.Database,
+        align: DataTable.LEFT,
+        render: ({row}) => row.Database || EMPTY_DATA_PLACEHOLDER,
+        width: 200,
+    };
+}
 export function getDataCenterColumn<T extends {DC?: string}>(): Column<T> {
     return {
         name: NODES_COLUMNS_IDS.DC,
