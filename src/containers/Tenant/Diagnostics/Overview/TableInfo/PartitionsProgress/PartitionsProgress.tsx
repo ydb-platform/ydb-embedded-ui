@@ -114,7 +114,7 @@ export const PartitionsProgress = ({
                         withMinFill={withMinFill}
                     />
 
-                    <Flex justifyContent="space-between">
+                    <Flex justifyContent="space-between" gap="2">
                         <Text variant="body-2" color="secondary">
                             {minLabel}
                         </Text>
