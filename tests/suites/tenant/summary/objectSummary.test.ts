@@ -82,8 +82,11 @@ test.describe('Object Summary', async () => {
         const objectSummary = new ObjectSummary(page);
         const queryEditor = new QueryEditor(page);
 
+        const tableName = await queryEditor.createNewFakeTable();
+        await objectSummary.clickRefreshButton();
+
         await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
-        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.AddIndex);
+        await objectSummary.clickActionMenuItem(tableName, RowTableAction.AddIndex);
         await page.waitForTimeout(500);
 
         await expect(queryEditor.editorTextArea).toBeVisible();
@@ -91,16 +94,21 @@ test.describe('Object Summary', async () => {
     });
 
     test('Select and Upsert actions show loading state', async ({page}) => {
+        const objectSummary = new ObjectSummary(page);
+        const queryEditor = new QueryEditor(page);
+
+        const tableName = await queryEditor.createNewFakeTable();
+        await objectSummary.clickRefreshButton();
+
+        await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
+
         await page.route(`${backend}/viewer/json/describe?*`, async (route) => {
             await wait(1000);
             await route.continue();
         });
 
-        const objectSummary = new ObjectSummary(page);
-        await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
-
         // Open actions menu
-        await objectSummary.clickActionsButton(dsStoragePoolsTableName);
+        await objectSummary.clickActionsButton(tableName);
         await expect(objectSummary.isActionsMenuVisible()).resolves.toBe(true);
 
         // Verify loading states
@@ -116,7 +124,10 @@ test.describe('Object Summary', async () => {
         const objectSummary = new ObjectSummary(page);
         const queryEditor = new QueryEditor(page);
 
-        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.SelectQuery);
+        const tableName = await queryEditor.createNewFakeTable();
+        await objectSummary.clickRefreshButton();
+
+        await objectSummary.clickActionMenuItem(tableName, RowTableAction.SelectQuery);
 
         const selectContent = await queryEditor.editorTextArea.inputValue();
         expect(selectContent).toContain('SELECT');
@@ -128,7 +139,10 @@ test.describe('Object Summary', async () => {
         const objectSummary = new ObjectSummary(page);
         const queryEditor = new QueryEditor(page);
 
-        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.UpsertQuery);
+        const tableName = await queryEditor.createNewFakeTable();
+        await objectSummary.clickRefreshButton();
+
+        await objectSummary.clickActionMenuItem(tableName, RowTableAction.UpsertQuery);
 
         const upsertContent = await queryEditor.editorTextArea.inputValue();
         expect(upsertContent).toContain('UPSERT INTO');
@@ -224,12 +238,7 @@ test.describe('Object Summary', async () => {
         const queryEditor = new QueryEditor(page);
         await expect(objectSummary.isTreeVisible()).resolves.toBe(true);
 
-        const tableName = `a_test_table_${Date.now()}`;
-
-        // Create table by executing query
-        await queryEditor.setQuery(`CREATE TABLE \`${tableName}\` (id Int32, PRIMARY KEY(id));`);
-        await queryEditor.clickRunButton();
-        await queryEditor.waitForStatus('Completed');
+        const tableName = await queryEditor.createNewFakeTable();
 
         // Verify table is not visible before refresh
         try {
