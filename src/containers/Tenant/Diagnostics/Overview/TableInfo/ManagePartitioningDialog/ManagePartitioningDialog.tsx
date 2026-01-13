@@ -44,6 +44,7 @@ function SplitUnitSelect(props: {
             control={props.control}
             render={({field}) => (
                 <Select<UnitOptionsType>
+                    view="normal"
                     size="s"
                     width={65}
                     options={UNIT_OPTIONS}
@@ -138,19 +139,17 @@ function ManagePartitioningDialog({
                                 {i18n('field_load')}
                             </label>
 
-                            <Flex className={b('input')} gap="3" alignItems="center">
-                                <Controller
-                                    name="loadEnabled"
-                                    control={control}
-                                    render={({field}) => (
-                                        <Switch
-                                            id="loadEnabled"
-                                            checked={field.value}
-                                            onUpdate={field.onChange}
-                                        />
-                                    )}
-                                />
-                            </Flex>
+                            <Controller
+                                name="loadEnabled"
+                                control={control}
+                                render={({field}) => (
+                                    <Switch
+                                        id="loadEnabled"
+                                        checked={field.value}
+                                        onUpdate={field.onChange}
+                                    />
+                                )}
+                            />
                         </Flex>
 
                         <Text variant="subheader-1">{i18n('title_limits')}</Text>
