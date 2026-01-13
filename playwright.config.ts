@@ -40,6 +40,7 @@ const config: PlaywrightTestConfig = {
                 contextOptions: {permissions: ['clipboard-read', 'clipboard-write']},
             },
         },
+        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3308
         // {
         //     name: 'safari',
         //     use: {
