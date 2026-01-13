@@ -1,7 +1,8 @@
 import {z} from 'zod';
 
 import type {BytesSizes} from '../../../../../../utils/bytesParsers';
-import {sizes} from '../../../../../../utils/bytesParsers';
+import {convertToBytes, sizes} from '../../../../../../utils/bytesParsers';
+import {preprocessEmptyStringToUndefined} from '../../../../../../utils/zod/zodParsers';
 import {DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES} from '../constants';
 
 import {DEFAULT_MANAGE_PARTITIONING_VALUE} from './constants';
@@ -17,19 +18,13 @@ export function getManagePartitioningInitialValues(
     };
 }
 
-export const splitToBytes = (splitSize: number, splitUnit: BytesSizes) =>
-    splitSize * sizes[splitUnit].value;
-
 export const splitUnitSchema = z.custom<BytesSizes>((value) => {
     return value in sizes;
 }, i18n('error_invalid-unit'));
 
-const emptyToUndefined = (value: unknown) => (value === '' ? undefined : value);
-
 // Required positive number (> 0)
 const requiredPositiveNumber = (requiredMessage: string) =>
-    z.preprocess(
-        emptyToUndefined,
+    preprocessEmptyStringToUndefined(
         z.coerce
             .number({
                 required_error: requiredMessage,
@@ -40,8 +35,7 @@ const requiredPositiveNumber = (requiredMessage: string) =>
 
 // Required positive integer (> 0)
 const requiredPositiveInt = (requiredMessage: string) =>
-    z.preprocess(
-        emptyToUndefined,
+    preprocessEmptyStringToUndefined(
         z.coerce
             .number({
                 required_error: requiredMessage,
@@ -65,7 +59,7 @@ export const managePartitioningSchema = (
             maximum: requiredPositiveInt(i18n('error_required')),
         })
         .superRefine((data, ctx) => {
-            const bytes = splitToBytes(data.splitSize, data.splitUnit);
+            const bytes = convertToBytes(data.splitSize, data.splitUnit);
             if (bytes > maxSplitSizeBytes) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,

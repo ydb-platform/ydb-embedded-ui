@@ -3,20 +3,22 @@ import React from 'react';
 import * as NiceModal from '@ebay/nice-modal-react';
 import type {DialogFooterProps} from '@gravity-ui/uikit';
 import {Dialog, Flex, Select, Switch, Text, TextInput} from '@gravity-ui/uikit';
+import type {Control, UseFormTrigger} from 'react-hook-form';
 import {Controller} from 'react-hook-form';
 
 import {cn} from '../../../../../../utils/cn';
 import {prepareErrorMessage} from '../../../../../../utils/prepareErrorMessage';
 import {DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES} from '../constants';
 
-import {DEFAULT_MAX_SPLIT_SIZE_GB, UNIT_OPTIONS} from './constants';
+import type {UnitOptionsType} from './constants';
+import {DEFAULT_MAX_SPLIT_SIZE_GB, MANAGE_PARTITIONING_DIALOG, UNIT_OPTIONS} from './constants';
 import i18n from './i18n';
 import type {ManagePartitioningFormState} from './types';
 import {useManagePartitioningForm} from './useManagePartitionForm';
 
 import './ManagePartitioningDialog.scss';
 
-const b = cn('manage-partitioning-dialog');
+const b = cn(MANAGE_PARTITIONING_DIALOG);
 
 interface CommonDialogProps {
     initialValue?: ManagePartitioningFormState;
@@ -32,7 +34,31 @@ interface ManagePartitioningDialogProps extends CommonDialogProps, DialogFooterP
     open: boolean;
 }
 
-export const MANAGE_PARTITIONING_DIALOG = 'manage-partitioning-dialog';
+function SplitUnitSelect(props: {
+    control: Control<ManagePartitioningFormState>;
+    trigger: UseFormTrigger<ManagePartitioningFormState>;
+}) {
+    return (
+        <Controller
+            name="splitUnit"
+            control={props.control}
+            render={({field}) => (
+                <Select<UnitOptionsType>
+                    className={b('select')}
+                    size="s"
+                    width={65}
+                    options={UNIT_OPTIONS}
+                    value={[field.value]}
+                    onUpdate={(value) => {
+                        const nextUnit = value?.[0] ?? field.value;
+                        field.onChange(nextUnit);
+                        props.trigger('splitSize');
+                    }}
+                />
+            )}
+        />
+    );
+}
 
 function ManagePartitioningDialog({
     onClose,
@@ -66,16 +92,6 @@ function ManagePartitioningDialog({
         }
     });
 
-    const unitOptions = React.useMemo(
-        () =>
-            UNIT_OPTIONS.map((unit) => (
-                <Select.Option key={unit.value} value={unit.value}>
-                    {unit.label}
-                </Select.Option>
-            )),
-        [],
-    );
-
     return (
         <Dialog size="s" onClose={onClose} open={open}>
             <Dialog.Header
@@ -88,15 +104,16 @@ function ManagePartitioningDialog({
                         <Text variant="subheader-1">{i18n('title_partitioning')}</Text>
 
                         <Flex className={b('row')} gap="3" alignItems="center">
-                            <Text variant="body-1" className={b('label')}>
+                            <label htmlFor="splitSize" className={b('label')}>
                                 {i18n('field_split-size')}
-                            </Text>
+                            </label>
 
                             <Controller
                                 name="splitSize"
                                 control={control}
                                 render={({field}) => (
                                     <TextInput
+                                        id="splitSize"
                                         type="number"
                                         value={field.value}
                                         onUpdate={field.onChange}
@@ -104,28 +121,7 @@ function ManagePartitioningDialog({
                                         errorMessage={errors.splitSize?.message}
                                         validationState={errors.splitSize ? 'invalid' : undefined}
                                         endContent={
-                                            <Controller
-                                                name="splitUnit"
-                                                control={control}
-                                                render={({field: unitField}) => (
-                                                    <Select
-                                                        className={b('select')}
-                                                        size="s"
-                                                        width={65}
-                                                        value={[unitField.value]}
-                                                        onUpdate={(v) => {
-                                                            const nextUnit =
-                                                                v?.[0] ?? unitField.value;
-                                                            unitField.onChange(nextUnit);
-
-                                                            // Force validation of splitSize, because its constraints depend on unit
-                                                            trigger('splitSize');
-                                                        }}
-                                                    >
-                                                        {unitOptions}
-                                                    </Select>
-                                                )}
-                                            />
+                                            <SplitUnitSelect control={control} trigger={trigger} />
                                         }
                                     />
                                 )}
@@ -139,16 +135,20 @@ function ManagePartitioningDialog({
                         </Flex>
 
                         <Flex className={b('row')} gap="3" alignItems="center">
-                            <Text variant="body-1" className={b('label')}>
+                            <label htmlFor="loadEnabled" className={b('label')}>
                                 {i18n('field_load')}
-                            </Text>
+                            </label>
 
                             <Flex className={b('input')} gap="3" alignItems="center">
                                 <Controller
                                     name="loadEnabled"
                                     control={control}
                                     render={({field}) => (
-                                        <Switch checked={field.value} onUpdate={field.onChange} />
+                                        <Switch
+                                            id="loadEnabled"
+                                            checked={field.value}
+                                            onUpdate={field.onChange}
+                                        />
                                     )}
                                 />
                             </Flex>
@@ -159,15 +159,16 @@ function ManagePartitioningDialog({
                         </Text>
 
                         <Flex className={b('row')} gap="3" alignItems="center">
-                            <Text variant="body-1" className={b('label')}>
+                            <label htmlFor="minimum" className={b('label')}>
                                 {i18n('field_minimum')}
-                            </Text>
+                            </label>
 
                             <Controller
                                 name="minimum"
                                 control={control}
                                 render={({field}) => (
                                     <TextInput
+                                        id="minimum"
                                         type="number"
                                         value={field.value}
                                         onUpdate={(next) => {
@@ -183,15 +184,16 @@ function ManagePartitioningDialog({
                         </Flex>
 
                         <Flex className={b('row')} gap="3" alignItems="center">
-                            <Text variant="body-1" className={b('label')}>
+                            <label htmlFor="maximum" className={b('label')}>
                                 {i18n('field_maximum')}
-                            </Text>
+                            </label>
 
                             <Controller
                                 name="maximum"
                                 control={control}
                                 render={({field}) => (
                                     <TextInput
+                                        id="maximum"
                                         type="number"
                                         value={field.value}
                                         onUpdate={(next) => {

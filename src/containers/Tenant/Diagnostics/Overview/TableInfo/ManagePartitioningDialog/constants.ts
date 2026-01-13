@@ -4,11 +4,11 @@ import {DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES} from '../constants';
 
 import type {ManagePartitioningFormState} from './types';
 
-export const UNIT_OPTIONS: Array<{value: BytesSizes; label: string}> = (
-    Object.keys(sizes) as BytesSizes[]
-).map((value) => ({
+export type UnitOptionsType = Array<{value: BytesSizes; content: string}>;
+
+export const UNIT_OPTIONS: UnitOptionsType = (Object.keys(sizes) as BytesSizes[]).map((value) => ({
     value,
-    label: sizes[value].label,
+    content: sizes[value].label,
 }));
 
 export const DEFAULT_MAX_SPLIT_SIZE_GB = formatBytes({
@@ -24,3 +24,5 @@ export const DEFAULT_MANAGE_PARTITIONING_VALUE: ManagePartitioningFormState = {
     minimum: '40',
     maximum: '1000',
 };
+
+export const MANAGE_PARTITIONING_DIALOG = 'manage-partitioning-dialog';

@@ -87,9 +87,14 @@ function prepareColumnTableGeneralInfo(columnTable: TColumnTableDescription) {
 const renderCurrentPartitionsContent = (progress: PartitionProgressConfig) => {
     const {minPartitions, maxPartitions, partitionsCount} = progress;
 
-    const isOutOfRange =
-        partitionsCount < minPartitions ||
-        (maxPartitions !== undefined && partitionsCount > maxPartitions);
+    const isBelowMin = partitionsCount < minPartitions;
+    const isAboveMax = maxPartitions !== undefined && partitionsCount > maxPartitions;
+
+    const isOutOfRange = isBelowMin || isAboveMax;
+
+    const content = isBelowMin
+        ? i18n('hint_current-partitions-below-limits')
+        : i18n('hint_current-partitions-exceeds-limits');
 
     return (
         <Label theme={isOutOfRange ? 'danger' : undefined}>
@@ -98,7 +103,7 @@ const renderCurrentPartitionsContent = (progress: PartitionProgressConfig) => {
                 {isOutOfRange && (
                     <Popover
                         placement="auto-start"
-                        content={i18n('hint_current-partitions-out-of-range')}
+                        content={content}
                         className={b('partitions-popover')}
                     >
                         <Icon data={CircleQuestion} />

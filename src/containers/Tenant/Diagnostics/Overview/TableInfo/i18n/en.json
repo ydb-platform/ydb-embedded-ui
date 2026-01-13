@@ -27,7 +27,8 @@
   "value_some-groups": "some groups",
   "value_default": "default",
 
-  "hint_current-partitions-out-of-range": "The current partition size exceeds the limits. To prevent automatic splits and maintain performance, adjust the partition limits",
+  "hint_current-partitions-below-limits": "The current partition size is below the limits. To prevent automatic splits and maintain performance, adjust the partition limits",
+  "hint_current-partitions-exceeds-limits": "The current partition size exceeds the limits. To prevent automatic splits and maintain performance, adjust the partition limits",
 
   "toast_partitioning-updated": "Partitioning settings applied"
 }

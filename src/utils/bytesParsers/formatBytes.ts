@@ -91,3 +91,5 @@ export const formatBytes = ({
 
     return result;
 };
+
+export const convertToBytes = (value: number, unit: BytesSizes) => value * sizes[unit].value;
