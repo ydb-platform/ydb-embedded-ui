@@ -16,5 +16,6 @@
   "error_required": "The field is required",
   "error_value-greater-maximum": "Value must not be greater than maximum",
   "error_minimum-greater-maximum": "Minimum must not be greater than maximum",
-  "error_maximum-less-minimum": "Maximum must not be less than minimum"
+  "error_maximum-less-minimum": "Maximum must not be less than minimum",
+  "error_value-too-small": "Value must be at least 1 MB"
 }

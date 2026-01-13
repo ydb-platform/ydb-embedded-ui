@@ -9,6 +9,12 @@ import {DEFAULT_MANAGE_PARTITIONING_VALUE} from './constants';
 import i18n from './i18n';
 import type {ManagePartitioningFormState} from './types';
 
+export function splitToPartitionSizeMb(splitSize: number, splitUnit: BytesSizes) {
+    const bytes = convertToBytes(splitSize, splitUnit);
+    const partitionSizeMb = Math.round(bytes / sizes.mb.value);
+    return {bytes, partitionSizeMb};
+}
+
 export function getManagePartitioningInitialValues(
     initialData: Partial<ManagePartitioningFormState> = {},
 ): ManagePartitioningFormState {
@@ -59,12 +65,21 @@ export const managePartitioningSchema = (
             maximum: requiredPositiveInt(i18n('error_required')),
         })
         .superRefine((data, ctx) => {
-            const bytes = convertToBytes(data.splitSize, data.splitUnit);
+            const {bytes, partitionSizeMb} = splitToPartitionSizeMb(data.splitSize, data.splitUnit);
+
             if (bytes > maxSplitSizeBytes) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     path: ['splitSize'],
                     message: i18n('error_value-greater-maximum'),
+                });
+            }
+
+            if (partitionSizeMb < 1) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ['splitSize'],
+                    message: i18n('error_value-too-small'),
                 });
             }
 

@@ -1,15 +1,14 @@
 import type {UpdateTablePartitioningParams} from '../../../../../types/store/partitioning';
-import {convertToBytes, sizes} from '../../../../../utils/bytesParsers';
 
 import type {ManagePartitioningFormState} from './ManagePartitioningDialog/types';
+import {splitToPartitionSizeMb} from './ManagePartitioningDialog/utils';
 
 export function prepareUpdatePartitioningRequest(
     value: ManagePartitioningFormState,
     database: string,
     path: string,
 ): UpdateTablePartitioningParams {
-    const bytes = convertToBytes(Number(value.splitSize), value.splitUnit);
-    const partitionSizeMb = Math.round(bytes / sizes.mb.value);
+    const {partitionSizeMb} = splitToPartitionSizeMb(Number(value.splitSize), value.splitUnit);
 
     return {
         value: {

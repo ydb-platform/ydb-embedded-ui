@@ -2,15 +2,14 @@ import React from 'react';
 
 import * as NiceModal from '@ebay/nice-modal-react';
 import type {DialogFooterProps} from '@gravity-ui/uikit';
-import {Dialog, Flex, Select, Switch, Text, TextInput} from '@gravity-ui/uikit';
-import type {Control, UseFormTrigger} from 'react-hook-form';
+import {Dialog, Flex, Switch, Text, TextInput} from '@gravity-ui/uikit';
 import {Controller} from 'react-hook-form';
 
 import {cn} from '../../../../../../utils/cn';
 import {prepareErrorMessage} from '../../../../../../utils/prepareErrorMessage';
 import {DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES} from '../constants';
 
-import type {UnitOptionsType} from './constants';
+import {SplitUnitSelect} from './SplitUnitSelect';
 import {DEFAULT_MAX_SPLIT_SIZE_GB, MANAGE_PARTITIONING_DIALOG, UNIT_OPTIONS} from './constants';
 import i18n from './i18n';
 import type {ManagePartitioningFormState} from './types';
@@ -32,32 +31,6 @@ interface ManagePartitioningDialogNiceModalProps extends CommonDialogProps, Dial
 interface ManagePartitioningDialogProps extends CommonDialogProps, DialogFooterProps {
     onClose: () => void;
     open: boolean;
-}
-
-function SplitUnitSelect(props: {
-    control: Control<ManagePartitioningFormState>;
-    trigger: UseFormTrigger<ManagePartitioningFormState>;
-}) {
-    return (
-        <Controller
-            name="splitUnit"
-            control={props.control}
-            render={({field}) => (
-                <Select<UnitOptionsType>
-                    view="normal"
-                    size="s"
-                    width={65}
-                    options={UNIT_OPTIONS}
-                    value={[field.value]}
-                    onUpdate={(value) => {
-                        const nextUnit = value?.[0] ?? field.value;
-                        field.onChange(nextUnit);
-                        props.trigger('splitSize');
-                    }}
-                />
-            )}
-        />
-    );
 }
 
 function ManagePartitioningDialog({
@@ -121,7 +94,20 @@ function ManagePartitioningDialog({
                                         errorMessage={errors.splitSize?.message}
                                         validationState={errors.splitSize ? 'invalid' : undefined}
                                         endContent={
-                                            <SplitUnitSelect control={control} trigger={trigger} />
+                                            <Controller
+                                                name="splitUnit"
+                                                control={control}
+                                                render={({field: unitField}) => (
+                                                    <SplitUnitSelect
+                                                        value={unitField.value}
+                                                        options={UNIT_OPTIONS}
+                                                        onChange={(nextUnit) => {
+                                                            unitField.onChange(nextUnit);
+                                                            trigger('splitSize');
+                                                        }}
+                                                    />
+                                                )}
+                                            />
                                         }
                                     />
                                 )}
