@@ -44,7 +44,6 @@ function SplitUnitSelect(props: {
             control={props.control}
             render={({field}) => (
                 <Select<UnitOptionsType>
-                    className={b('select')}
                     size="s"
                     width={65}
                     options={UNIT_OPTIONS}
@@ -154,9 +153,7 @@ function ManagePartitioningDialog({
                             </Flex>
                         </Flex>
 
-                        <Text variant="subheader-1" className={b('section-title')}>
-                            {i18n('title_limits')}
-                        </Text>
+                        <Text variant="subheader-1">{i18n('title_limits')}</Text>
 
                         <Flex className={b('row')} gap="3" alignItems="center">
                             <label htmlFor="minimum" className={b('label')}>
