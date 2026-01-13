@@ -110,6 +110,17 @@ export class QueryEditor {
         await this.clickExplainButton();
     }
 
+    async createNewFakeTable() {
+        const tableName = `a_test_table_${Date.now()}`;
+        await this.run(
+            `CREATE TABLE \`${tableName}\` (id Int32, name Text, expire_at Datetime, updated_on Datetime, PRIMARY KEY(id));`,
+            'query',
+        );
+        await this.waitForStatus('Completed');
+
+        return tableName;
+    }
+
     async gearButtonText() {
         await this.gearButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return this.gearButton.innerText();

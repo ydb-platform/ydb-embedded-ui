@@ -30,7 +30,7 @@ test.describe('Test Query Editor', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            general: 'query',
+            tenantPage: 'query',
         };
 
         const tenantPage = new TenantPage(page);
