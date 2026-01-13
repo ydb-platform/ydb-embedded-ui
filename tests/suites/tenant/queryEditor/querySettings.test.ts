@@ -45,7 +45,7 @@ test.describe('Test Query Settings', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            general: 'query',
+            tenantPage: 'query',
         };
 
         const tenantPage = new TenantPage(page);
