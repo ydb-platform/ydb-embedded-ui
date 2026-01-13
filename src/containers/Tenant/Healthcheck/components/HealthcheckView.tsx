@@ -26,6 +26,14 @@ export function HealthcheckView({
     const {view, handleHealthcheckViewChange, handleIssuesFilterChange} = useTenantQueryParams();
 
     const issuesTypes = React.useMemo(() => Object.keys(issuesCount), [issuesCount]);
+    const normalizedSortOrder = React.useMemo(
+        () =>
+            sortOrder.filter((type) => {
+                // only "Unknown" option should be hidden if no such issues are presented. Othewise option should be shown with count 0
+                return type !== 'unknown' || (type === 'unknown' && issuesCount[type] > 0);
+            }),
+        [issuesCount, sortOrder],
+    );
 
     React.useEffect(() => {
         if (view) {
@@ -58,14 +66,14 @@ export function HealthcheckView({
 
     return (
         <SegmentedRadioGroup
-            value={view}
+            value={view ?? normalizedSortOrder[0]}
             onUpdate={(newView) => {
                 handleHealthcheckViewChange(newView);
                 handleIssuesFilterChange('');
             }}
             className={b('control-wrapper')}
         >
-            {sortOrder.map((type) => renderHealthcheckViewOption(type))}
+            {normalizedSortOrder.map((type) => renderHealthcheckViewOption(type))}
         </SegmentedRadioGroup>
     );
 }
