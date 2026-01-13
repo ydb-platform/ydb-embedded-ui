@@ -1,6 +1,6 @@
 import {expect, test} from '@playwright/test';
 
-import {database, dsVslotsSchema, dsVslotsTableName} from '../../../utils/constants';
+import {database} from '../../../utils/constants';
 import {TenantPage} from '../TenantPage';
 import {SavedQueriesTable} from '../savedQueries/models/SavedQueriesTable';
 import {ObjectSummary} from '../summary/ObjectSummary';
@@ -19,9 +19,9 @@ import {UnsavedChangesModal} from './models/UnsavedChangesModal';
 test.describe('Query Templates', () => {
     test.beforeEach(async ({page}) => {
         const pageQueryParams = {
-            schema: dsVslotsSchema,
+            schema: database,
             database,
-            general: 'query',
+            tenantPage: 'query',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
@@ -89,15 +89,18 @@ test.describe('Query Templates', () => {
         const unsavedChangesModal = new UnsavedChangesModal(page);
         const queryEditor = new QueryEditor(page);
 
+        const tableName = await queryEditor.createNewFakeTable();
+        await objectSummary.clickRefreshButton();
+
         // First action - Add index
-        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.AddIndex);
+        await objectSummary.clickActionMenuItem(tableName, RowTableAction.AddIndex);
         await page.waitForTimeout(500);
 
         // First set some content
         await queryEditor.setQuery('SELECT 1;');
 
         // Try to switch to Select query
-        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.SelectQuery);
+        await objectSummary.clickActionMenuItem(tableName, RowTableAction.SelectQuery);
         await page.waitForTimeout(500);
 
         // Verify unsaved changes modal appears
@@ -109,14 +112,17 @@ test.describe('Query Templates', () => {
         const unsavedChangesModal = new UnsavedChangesModal(page);
         const queryEditor = new QueryEditor(page);
 
+        const tableName = await queryEditor.createNewFakeTable();
+        await objectSummary.clickRefreshButton();
+
         // First action - Add index
-        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.AddIndex);
+        await objectSummary.clickActionMenuItem(tableName, RowTableAction.AddIndex);
         await page.waitForTimeout(500);
 
         await queryEditor.setQuery('SELECT 1;');
 
         // Try to switch to Select query
-        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.SelectQuery);
+        await objectSummary.clickActionMenuItem(tableName, RowTableAction.SelectQuery);
         await page.waitForTimeout(500);
 
         // Click Cancel in the modal
@@ -131,8 +137,11 @@ test.describe('Query Templates', () => {
         const unsavedChangesModal = new UnsavedChangesModal(page);
         const queryEditor = new QueryEditor(page);
 
+        const tableName = await queryEditor.createNewFakeTable();
+        await objectSummary.clickRefreshButton();
+
         // First action - Add index
-        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.AddIndex);
+        await objectSummary.clickActionMenuItem(tableName, RowTableAction.AddIndex);
         await page.waitForTimeout(500);
 
         await queryEditor.setQuery('SELECT 1;');
@@ -140,7 +149,7 @@ test.describe('Query Templates', () => {
         const initialContent = await queryEditor.editorTextArea.inputValue();
 
         // Try to switch to Select query
-        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.SelectQuery);
+        await objectSummary.clickActionMenuItem(tableName, RowTableAction.SelectQuery);
         await page.waitForTimeout(500);
 
         // Click Don't save in the modal
@@ -159,14 +168,17 @@ test.describe('Query Templates', () => {
         const saveQueryDialog = new SaveQueryDialog(page);
         const savedQueriesTable = new SavedQueriesTable(page);
 
+        const tableName = await queryEditor.createNewFakeTable();
+        await objectSummary.clickRefreshButton();
+
         // First action - Add index
-        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.AddIndex);
+        await objectSummary.clickActionMenuItem(tableName, RowTableAction.AddIndex);
         await page.waitForTimeout(500);
 
         await queryEditor.setQuery('SELECT 1;');
 
         // Try to switch to Select query
-        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.SelectQuery);
+        await objectSummary.clickActionMenuItem(tableName, RowTableAction.SelectQuery);
         await page.waitForTimeout(500);
 
         // Click Save query in the modal
@@ -225,13 +237,17 @@ test.describe('Query Templates', () => {
     test('Switching between templates does not trigger unsaved changes modal', async ({page}) => {
         const objectSummary = new ObjectSummary(page);
         const tenantPage = new TenantPage(page);
+        const queryEditor = new QueryEditor(page);
+
+        const tableName = await queryEditor.createNewFakeTable();
+        await objectSummary.clickRefreshButton();
 
         // First select a template (Add Index)
-        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.AddIndex);
+        await objectSummary.clickActionMenuItem(tableName, RowTableAction.AddIndex);
         await page.waitForTimeout(500);
 
         // Without editing the template, switch to another template (Select Query)
-        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.SelectQuery);
+        await objectSummary.clickActionMenuItem(tableName, RowTableAction.SelectQuery);
         await page.waitForTimeout(500);
 
         // Verify unsaved changes modal does not appear
@@ -246,6 +262,9 @@ test.describe('Query Templates', () => {
         const queryEditor = new QueryEditor(page);
         const tenantPage = new TenantPage(page);
 
+        const tableName = await queryEditor.createNewFakeTable();
+        await objectSummary.clickRefreshButton();
+
         // First, run a query to ensure we have history to select from
         const testQuery = 'SELECT 1 AS test_column;';
         await queryEditor.setQuery(testQuery);
@@ -253,7 +272,7 @@ test.describe('Query Templates', () => {
         await page.waitForTimeout(1000); // Wait for the query to complete
 
         // Next, select a template
-        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.AddIndex);
+        await objectSummary.clickActionMenuItem(tableName, RowTableAction.AddIndex);
         await page.waitForTimeout(500);
 
         // Navigate to history tab
