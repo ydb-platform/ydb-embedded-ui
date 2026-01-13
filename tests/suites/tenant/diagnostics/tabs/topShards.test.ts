@@ -2,6 +2,7 @@ import {expect, test} from '@playwright/test';
 
 import {database} from '../../../../utils/constants';
 import {TenantPage} from '../../TenantPage';
+import {QueryEditor} from '../../queryEditor/models/QueryEditor';
 import {
     Diagnostics,
     TopShardsHistoricalColumns,
@@ -11,6 +12,22 @@ import {
 import {setupTopShardsHistoryMock} from '../mocks';
 
 test.describe('Diagnostics TopShards tab', async () => {
+    test.beforeEach(async ({page}) => {
+        const queryEditorParams = {
+            schema: database,
+            database,
+            tenantPage: 'query',
+        };
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto(queryEditorParams);
+
+        const queryEditor = new QueryEditor(page);
+
+        // Create table so TopShards always has some content
+        await queryEditor.createNewFakeTable();
+    });
+
     test('TopShards tab defaults to Immediate mode', async ({page}) => {
         const pageQueryParams = {
             schema: database,
