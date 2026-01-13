@@ -14,7 +14,7 @@ test.describe('Test Query Execution Status', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            general: 'query',
+            tenantPage: 'query',
         };
 
         const tenantPage = new TenantPage(page);

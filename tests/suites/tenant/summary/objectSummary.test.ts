@@ -20,7 +20,7 @@ test.describe('Object Summary', async () => {
         const pageQueryParams = {
             schema: dsVslotsSchema,
             database,
-            general: 'query',
+            tenantPage: 'query',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
@@ -173,14 +173,6 @@ test.describe('Object Summary', async () => {
     });
 
     test('Copy path copies correct path to clipboard', async ({page}) => {
-        const pageQueryParams = {
-            schema: dsVslotsSchema,
-            database,
-            general: 'query',
-        };
-        const tenantPage = new TenantPage(page);
-        await tenantPage.goto(pageQueryParams);
-
         const objectSummary = new ObjectSummary(page);
         await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.CopyPath);
 
@@ -203,7 +195,7 @@ test.describe('Object Summary', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            general: 'query',
+            tenantPage: 'query',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
@@ -229,7 +221,7 @@ test.describe('Object Summary', async () => {
         const pageQueryParams = {
             schema: database,
             database,
-            general: 'query',
+            tenantPage: 'query',
         };
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);

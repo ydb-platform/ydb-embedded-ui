@@ -15,7 +15,7 @@ test.describe('Query History', () => {
         const pageQueryParams = {
             schema: database,
             database,
-            general: 'query',
+            tenantPage: 'query',
         };
 
         tenantPage = new TenantPage(page);
