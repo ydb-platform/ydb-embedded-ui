@@ -29,7 +29,7 @@ export function HealthcheckView({
     const normalizedSortOrder = React.useMemo(
         () =>
             sortOrder.filter((type) => {
-                // only "Unknown" option should be hidden if no such issues are presented. Othewise option should be shown with count 0
+                // only "Unknown" option should be hidden if no such issues are presented. Otherwise option should be shown with count 0
                 return type !== 'unknown' || (type === 'unknown' && issuesCount[type] > 0);
             }),
         [issuesCount, sortOrder],
