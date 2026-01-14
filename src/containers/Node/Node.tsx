@@ -99,7 +99,7 @@ export function Node() {
         }
         let actualNodeTabs = NODE_TABS;
 
-        // Do not reset tab when capabilities is not fully loaded
+        // Return all tabs during loading, filter based on capabilities after loading completes
         if (!pageLoading) {
             actualNodeTabs = NODE_TABS.filter((el) => !skippedTabs.includes(el.id));
         }
