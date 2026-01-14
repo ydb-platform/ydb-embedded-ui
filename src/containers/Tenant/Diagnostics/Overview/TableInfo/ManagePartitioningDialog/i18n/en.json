@@ -1,0 +1,21 @@
+{
+  "title_manage-partitioning": "Manage partitioning",
+  "title_partitioning": "Partitioning",
+  "title_limits": "Limits",
+
+  "field_split-size": "Split Size",
+  "context_split-size-maximum": "{{maxGb}} GB maximum",
+  "field_load": "Load",
+  "field_minimum": "Minimum",
+  "field_maximum": "Maximum",
+
+  "action_cancel": "Cancel",
+  "action_apply": "Apply",
+
+  "error_invalid-unit": "Invalid unit",
+  "error_required": "The field is required",
+  "error_value-greater-maximum": "Value must not be greater than maximum",
+  "error_minimum-greater-maximum": "Minimum must not be greater than maximum",
+  "error_maximum-less-minimum": "Maximum must not be less than minimum",
+  "error_value-too-small": "Value must be at least 1 MB"
+}

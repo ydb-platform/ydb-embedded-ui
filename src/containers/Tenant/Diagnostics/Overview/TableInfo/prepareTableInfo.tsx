@@ -21,16 +21,15 @@ import type {
     TTablePartition,
 } from '../../../../../types/api/schema';
 import {EPathType} from '../../../../../types/api/schema';
-import {formatBytes, formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
+import {formatBytes, getBytesSizeUnit} from '../../../../../utils/bytesParsers';
+import {formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {formatDurationToShortTimeFormat} from '../../../../../utils/timeParsers';
 import {isNumeric} from '../../../../../utils/utils';
 
+import {DEFAULT_MANAGE_PARTITIONING_VALUE} from './ManagePartitioningDialog/constants';
+import type {ManagePartitioningFormState} from './ManagePartitioningDialog/types';
 import {b} from './TableInfo';
-import {
-    DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES,
-    DEFAULT_PARTITION_SPLIT_BY_LOAD_THRESHOLD_PERCENT,
-    READ_REPLICAS_MODE,
-} from './constants';
+import {DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES, READ_REPLICAS_MODE} from './constants';
 import i18n from './i18n';
 
 const GENERAL_METRICS_KEYS = ['CPU', 'Memory', 'ReadThroughput', 'Network'] as const;
@@ -88,9 +87,14 @@ function prepareColumnTableGeneralInfo(columnTable: TColumnTableDescription) {
 const renderCurrentPartitionsContent = (progress: PartitionProgressConfig) => {
     const {minPartitions, maxPartitions, partitionsCount} = progress;
 
-    const isOutOfRange =
-        partitionsCount < minPartitions ||
-        (maxPartitions !== undefined && partitionsCount > maxPartitions);
+    const isBelowMin = partitionsCount < minPartitions;
+    const isAboveMax = maxPartitions !== undefined && partitionsCount > maxPartitions;
+
+    const isOutOfRange = isBelowMin || isAboveMax;
+
+    const content = isBelowMin
+        ? i18n('hint_current-partitions-below-limits')
+        : i18n('hint_current-partitions-exceeds-limits');
 
     return (
         <Label theme={isOutOfRange ? 'danger' : undefined}>
@@ -99,7 +103,7 @@ const renderCurrentPartitionsContent = (progress: PartitionProgressConfig) => {
                 {isOutOfRange && (
                     <Popover
                         placement="auto-start"
-                        content={i18n('hint_current-partitions-out-of-range')}
+                        content={content}
                         className={b('partitions-popover')}
                     >
                         <Icon data={CircleQuestion} />
@@ -150,20 +154,14 @@ const prepareTableGeneralInfo = (
     const left: YDBDefinitionListItem[] = [];
     const right: YDBDefinitionListItem[] = [];
 
-    // We know some facts about partitions:
-    // for splitting by load: if partitioningByLoad is enabled, we can split by load, default: 50%
-    // for splitting by size: it always will be splitted by 2 GB if user doesn't set anything else
+    const splitByLoadEnabled = Boolean(PartitioningPolicy?.SplitByLoadSettings?.Enabled);
 
-    const cpuThreshold =
-        PartitioningPolicy.SplitByLoadSettings?.CpuPercentageThreshold ??
-        DEFAULT_PARTITION_SPLIT_BY_LOAD_THRESHOLD_PERCENT;
-
-    const partitioningByLoad = PartitioningPolicy.SplitByLoadSettings?.Enabled ? (
-        <Label>{`${cpuThreshold}%`}</Label>
+    const partitioningByLoad = splitByLoadEnabled ? (
+        <Label>{i18n('value_enabled')}</Label>
     ) : (
         <Label theme="unknown">{i18n('value_disabled')}</Label>
     );
-
+    // for splitting by size: it always will be splitted by 2 GB if user doesn't set anything else
     const splitSizeBytes = PartitioningPolicy.SizeToSplit ?? DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES;
 
     left.push(
@@ -173,7 +171,7 @@ const prepareTableGeneralInfo = (
         },
         {
             name: i18n('field_partitioning-by-size'),
-            content: <Label>{formatBytes(splitSizeBytes)}</Label>,
+            content: <Label>{formatBytes({value: splitSizeBytes})}</Label>,
         },
         {name: i18n('field_partitioning-by-load'), content: partitioningByLoad},
     );
@@ -238,6 +236,31 @@ const preparePartitionProgressConfig = (
     };
 };
 
+const prepareManagePartitioningDialogConfig = (
+    partitionConfig?: TPartitionConfig,
+    progress?: PartitionProgressConfig,
+) => {
+    const policy = partitionConfig?.PartitioningPolicy;
+
+    const splitByLoadEnabled = Boolean(policy?.SplitByLoadSettings?.Enabled);
+
+    const bytes = Number(policy?.SizeToSplit ?? DEFAULT_PARTITION_SIZE_TO_SPLIT_BYTES);
+    const size = formatBytes({
+        value: bytes,
+        withSizeLabel: false,
+    });
+
+    const unit = getBytesSizeUnit(bytes);
+
+    return {
+        splitSize: size,
+        splitUnit: unit,
+        loadEnabled: splitByLoadEnabled,
+        minimum: String(progress?.minPartitions),
+        maximum: String(progress?.maxPartitions ?? DEFAULT_MANAGE_PARTITIONING_VALUE.maximum),
+    };
+};
+
 /** Prepares data for Table, ColumnTable and ColumnStore */
 export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathType) => {
     if (!data) {
@@ -283,12 +306,18 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
     let generalInfoLeft: YDBDefinitionListItem[] = [];
     let generalInfoRight: YDBDefinitionListItem[] = [];
     let partitionProgressConfig: PartitionProgressConfig | undefined;
+    let managePartitioningDialogConfig: ManagePartitioningFormState | undefined;
 
     switch (type) {
         case EPathType.EPathTypeTable: {
             partitionProgressConfig = preparePartitionProgressConfig(
                 PartitionConfig,
                 TablePartitions,
+            );
+
+            managePartitioningDialogConfig = prepareManagePartitioningDialogConfig(
+                PartitionConfig,
+                partitionProgressConfig,
             );
 
             const {left, right} = prepareTableGeneralInfo(
@@ -298,6 +327,7 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
             );
             generalInfoLeft = left;
             generalInfoRight = right;
+
             break;
         }
         case EPathType.EPathTypeColumnTable: {
@@ -388,5 +418,6 @@ export const prepareTableInfo = (data?: TEvDescribeSchemeResult, type?: EPathTyp
 
         partitionConfigInfo,
         partitionProgressConfig,
+        managePartitioningDialogConfig,
     };
 };

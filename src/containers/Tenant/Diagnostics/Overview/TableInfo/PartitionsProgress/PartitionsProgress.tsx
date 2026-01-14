@@ -2,6 +2,7 @@ import {Flex, Popover, Text} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
 import {cn} from '../../../../../../utils/cn';
+import {formatNumber} from '../../../../../../utils/dataFormatters/dataFormatters';
 
 import {getPartitionsTooltip} from './helpers';
 import i18n from './i18n';
@@ -74,7 +75,9 @@ export const PartitionsProgress = ({
         isAboveMax: isAboveMax,
     });
 
-    const maxLabel = isNil(max) ? i18n('value_no-limit') : max;
+    const minLabel = formatNumber(min);
+    const maxLabel = isNil(max) ? i18n('value_no-limit') : formatNumber(max);
+    const currentLabel = formatNumber(partitionsCount);
 
     const hasAdditionalSegments = isBelowMin || isAboveMax;
     const withMinFill = !hasAdditionalSegments;
@@ -93,7 +96,7 @@ export const PartitionsProgress = ({
 
                         <Flex justifyContent="flex-start">
                             <Text variant="body-2" color="secondary">
-                                {partitionsCount}
+                                {currentLabel}
                             </Text>
                         </Flex>
                     </Flex>
@@ -111,9 +114,9 @@ export const PartitionsProgress = ({
                         withMinFill={withMinFill}
                     />
 
-                    <Flex justifyContent="space-between">
+                    <Flex justifyContent="space-between" gap="2">
                         <Text variant="body-2" color="secondary">
-                            {min}
+                            {minLabel}
                         </Text>
                         <Text variant="body-2" color="secondary">
                             {maxLabel}
@@ -132,7 +135,7 @@ export const PartitionsProgress = ({
 
                         <Flex justifyContent="flex-end">
                             <Text variant="body-2" color="secondary">
-                                {partitionsCount}
+                                {currentLabel}
                             </Text>
                         </Flex>
                     </Flex>

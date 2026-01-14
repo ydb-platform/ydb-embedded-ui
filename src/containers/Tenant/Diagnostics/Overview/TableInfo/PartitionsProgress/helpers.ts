@@ -1,3 +1,5 @@
+import {formatNumber} from '../../../../../../utils/dataFormatters/dataFormatters';
+
 import i18n from './i18n';
 
 export const getPartitionsNoun = (count: number) =>
@@ -12,24 +14,28 @@ export function getPartitionsTooltip(params: {
 }) {
     const partitions = getPartitionsNoun(params.count);
 
+    const countLabel = formatNumber(params.count);
+    const belowLabel = formatNumber(params.belowMin);
+    const aboveLabel = formatNumber(params.aboveMax);
+
     if (params.isBelowMin) {
         return i18n('tooltip_partitions-below-limit', {
-            count: params.count,
-            diff: params.belowMin,
+            count: countLabel,
+            diff: belowLabel,
             partitions,
         });
     }
 
     if (params.isAboveMax) {
         return i18n('tooltip_partitions-above-limit', {
-            count: params.count,
-            diff: params.aboveMax,
+            count: countLabel,
+            diff: aboveLabel,
             partitions,
         });
     }
 
     return i18n('tooltip_partitions-current', {
-        count: params.count,
+        count: countLabel,
         partitions,
     });
 }
