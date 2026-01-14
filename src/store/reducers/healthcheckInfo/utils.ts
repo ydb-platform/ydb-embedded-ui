@@ -14,11 +14,31 @@ export const hcStatusToColorFlag: Record<StatusFlag, EFlag> = {
     [StatusFlag.RED]: EFlag.Red,
 };
 
+function getTypeForUI(type?: string) {
+    if (type?.startsWith('STORAGE') || type?.startsWith('COMPUTE')) {
+        return type;
+    } else {
+        return 'unknown';
+    }
+}
+
+function extendIssue(
+    issue: IssueLog,
+    rootTypeForUI?: string,
+    fields?: {parent: IssuesTree},
+): IssuesTree {
+    return {
+        ...issue,
+        rootTypeForUI: rootTypeForUI ?? getTypeForUI(issue.type),
+        ...fields,
+    };
+}
+
 export function getLeavesFromTree(issues: IssueLog[], root: IssueLog): IssuesTree[] {
     const result: IssuesTree[] = [];
 
     if (!root.reason || root.reason.length === 0) {
-        return [root];
+        return [extendIssue(root)];
     }
 
     for (const issueId of root.reason) {
@@ -28,13 +48,13 @@ export function getLeavesFromTree(issues: IssueLog[], root: IssueLog): IssuesTre
         }
         const stack: IssuesTree[] = [directChild];
 
-        const directChildType = directChild.type;
+        const directChildType = getTypeForUI(directChild.type);
 
         while (stack.length > 0) {
             const currentNode = stack.pop()!;
 
             if (!currentNode.reason || currentNode.reason.length === 0) {
-                result.push(currentNode);
+                result.push(extendIssue(currentNode, directChildType));
                 continue;
             }
 
@@ -43,12 +63,7 @@ export function getLeavesFromTree(issues: IssueLog[], root: IssueLog): IssuesTre
                 if (!child) {
                     continue;
                 }
-                const extendedChild = {
-                    ...child,
-                    parent: currentNode,
-                    firstParentType: directChildType,
-                };
-                stack.push(extendedChild);
+                stack.push(extendIssue(child, directChildType, {parent: currentNode}));
             }
         }
     }

@@ -5,7 +5,7 @@ import i18n from './i18n';
 
 export const b = cn('ydb-healthcheck');
 
-export type CommonIssueType = 'compute' | 'storage';
+export type CommonIssueType = 'compute' | 'storage' | 'unknown';
 
 const HealthcheckViewTitles = {
     get storage() {
@@ -14,9 +14,12 @@ const HealthcheckViewTitles = {
     get compute() {
         return i18n('label_compute');
     },
+    get unknown() {
+        return i18n('label_unknown');
+    },
 };
 
-const DefaultSortOrder: CommonIssueType[] = ['storage', 'compute'];
+const DefaultSortOrder: CommonIssueType[] = ['storage', 'compute', 'unknown'];
 
 export function getHealthckechViewTitles() {
     return HealthcheckViewTitles;
@@ -32,10 +35,11 @@ export function countHealthcheckIssuesByType(
     const result: Record<CommonIssueType, number> = {
         storage: 0,
         compute: 0,
+        unknown: 0,
     };
 
     for (const issue of issueTrees) {
-        const type = issue.firstParentType ?? issue.type;
+        const type = issue.rootTypeForUI ?? issue.type;
         if (!type) {
             continue;
         }
@@ -43,6 +47,8 @@ export function countHealthcheckIssuesByType(
             result.storage++;
         } else if (type.startsWith('COMPUTE')) {
             result.compute++;
+        } else {
+            result.unknown++;
         }
     }
     return result;
