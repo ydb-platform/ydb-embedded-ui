@@ -8,7 +8,7 @@ import {SaveQueryDialog} from './queryEditor/models/SaveQueryDialog';
 import {UnsavedChangesModal} from './queryEditor/models/UnsavedChangesModal';
 import {SavedQueriesTable} from './savedQueries/models/SavedQueriesTable';
 
-export const VISIBILITY_TIMEOUT = 10 * 1000;
+export const VISIBILITY_TIMEOUT = 2 * 1000;
 
 export enum NavigationTabs {
     Query = 'Query',

@@ -6,13 +6,13 @@ const baseUrl = process.env.PLAYWRIGHT_BASE_URL;
 const config: PlaywrightTestConfig = {
     globalSetup: './tests/playwrightSetup.ts',
     testDir: './tests/suites',
-    timeout: 2 * 60 * 1000,
+    timeout: 30 * 1000,
     outputDir: './playwright-artifacts/test-results',
     reporter: [
         ['html', {outputFolder: './playwright-artifacts/playwright-report'}],
         ['json', {outputFile: './playwright-artifacts/test-results.json'}],
     ],
-    retries: process.env.CI ? 2 : 0,
+    retries: 1,
     // If there is no url provided, playwright starts webServer with the app in dev mode
     webServer: baseUrl
         ? undefined
@@ -20,6 +20,8 @@ const config: PlaywrightTestConfig = {
               command: 'npm run dev',
               env: {
                   REACT_APP_DISABLE_CHECKS: 'true',
+                  // Use 127.0.0.1 instead of localhost for Safari/WebKit compatibility
+                  REACT_APP_BACKEND: 'http://127.0.0.1:8765',
               },
               port: 3000,
               reuseExistingServer: !process.env.CI,
@@ -34,20 +36,14 @@ const config: PlaywrightTestConfig = {
     },
     projects: [
         {
-            name: 'chromium',
+            name: 'safari',
             use: {
-                ...devices['Desktop Chrome'],
-                contextOptions: {permissions: ['clipboard-read', 'clipboard-write']},
+                ...devices['Desktop Safari'],
+                browserName: 'webkit',
+                baseURL: baseUrl || 'http://127.0.0.1:3000/',
+                contextOptions: {permissions: ['clipboard-read']},
             },
         },
-        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3308
-        // {
-        //     name: 'safari',
-        //     use: {
-        //         ...devices['Desktop Safari'],
-        //         contextOptions: {permissions: ['clipboard-read']},
-        //     },
-        // },
     ],
 };
 
