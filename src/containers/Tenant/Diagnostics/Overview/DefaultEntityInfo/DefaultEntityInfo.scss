@@ -1,0 +1,7 @@
+@use '../../../../../styles/mixins.scss';
+
+.default-entity-info {
+    &__title {
+        @include mixins.info-viewer-title();
+    }
+}
