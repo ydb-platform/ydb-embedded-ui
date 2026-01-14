@@ -1,5 +1,21 @@
 # Changelog
 
+## [14.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.1.0...v14.2.0) (2026-01-13)
+
+
+### Features
+
+* add Database column to nodes table ([#3289](https://github.com/ydb-platform/ydb-embedded-ui/issues/3289)) ([0c49c99](https://github.com/ydb-platform/ydb-embedded-ui/commit/0c49c99f28c465802b829c9a80bd7a0b35e248b0))
+* add StartTime/EndTime/UserSID for buildindex operation ([#3271](https://github.com/ydb-platform/ydb-embedded-ui/issues/3271)) ([2b50c8e](https://github.com/ydb-platform/ydb-embedded-ui/commit/2b50c8e428ab397808d766ab265024f115c15fdf))
+* **storage:** add blob capacity metrics experiment and CapacityAlert… ([#3276](https://github.com/ydb-platform/ydb-embedded-ui/issues/3276)) ([b50d9cf](https://github.com/ydb-platform/ydb-embedded-ui/commit/b50d9cf1c2671eb1483d0455bd9627cefc240983))
+
+
+### Bug Fixes
+
+* fix e2e tests for sysviews ([#3298](https://github.com/ydb-platform/ydb-embedded-ui/issues/3298)) ([a88e08c](https://github.com/ydb-platform/ydb-embedded-ui/commit/a88e08c73d8ef2579aed4682a52c813b5faa3e34))
+* remove max width for result cell ([#3277](https://github.com/ydb-platform/ydb-embedded-ui/issues/3277)) ([2a9f3ba](https://github.com/ydb-platform/ydb-embedded-ui/commit/2a9f3ba258c6ed9bc3e529f0fae3a59e27a5778f))
+* vdisk items overflow pdisk item ([#3274](https://github.com/ydb-platform/ydb-embedded-ui/issues/3274)) ([2dd68e2](https://github.com/ydb-platform/ydb-embedded-ui/commit/2dd68e21acaa3302e6497bd503384f8f2014577c))
+
 ## [14.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.0.1...v14.1.0) (2025-12-23)
 
 
