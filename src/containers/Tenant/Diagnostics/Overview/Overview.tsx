@@ -14,6 +14,7 @@ import {ViewInfo} from '../../Info/View/View';
 
 import {AsyncReplicationInfo} from './AsyncReplicationInfo';
 import {ChangefeedInfo} from './ChangefeedInfo';
+import {DefaultEntityInfo} from './DefaultEntityInfo';
 import {StreamingQueryInfo} from './StreamingQueryInfo';
 import {TableInfo} from './TableInfo';
 import {TopicInfo} from './TopicInfo';
@@ -46,13 +47,19 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
             [EPathType.EPathTypeInvalid]: undefined,
             [EPathType.EPathTypeDir]: undefined,
             [EPathType.EPathTypeResourcePool]: undefined,
-            [EPathType.EPathTypeTable]: undefined,
+            [EPathType.EPathTypeTable]: () => (
+                <TableInfo path={path} data={data} type={type} database={database} />
+            ),
             [EPathType.EPathTypeSysView]: () => <SystemViewInfo data={data} />,
             [EPathType.EPathTypeSubDomain]: undefined,
             [EPathType.EPathTypeTableIndex]: () => <TableIndexInfo data={data} />,
             [EPathType.EPathTypeExtSubDomain]: undefined,
-            [EPathType.EPathTypeColumnStore]: undefined,
-            [EPathType.EPathTypeColumnTable]: undefined,
+            [EPathType.EPathTypeColumnStore]: () => (
+                <TableInfo path={path} data={data} type={type} database={database} />
+            ),
+            [EPathType.EPathTypeColumnTable]: () => (
+                <TableInfo path={path} data={data} type={type} database={database} />
+            ),
             [EPathType.EPathTypeCdcStream]: () => (
                 <ChangefeedInfo
                     path={path}
@@ -86,11 +93,7 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
             ),
         };
 
-        return (
-            (type && pathTypeToComponent[type]?.()) || (
-                <TableInfo path={path} data={data} type={type} database={database} />
-            )
-        );
+        return (type && pathTypeToComponent[type]?.()) || <DefaultEntityInfo data={data} />;
     };
 
     if (loading) {

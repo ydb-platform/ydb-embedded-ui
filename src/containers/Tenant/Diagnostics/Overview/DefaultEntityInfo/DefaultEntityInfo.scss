@@ -1,0 +1,8 @@
+@use '../../../../../styles/mixins.scss';
+
+.default-entity-info {
+    &__title {
+        font-weight: 600;
+        @include mixins.body-2-typography();
+    }
+}

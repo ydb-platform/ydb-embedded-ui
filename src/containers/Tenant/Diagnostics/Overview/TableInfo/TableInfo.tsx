@@ -10,7 +10,7 @@ import {cn} from '../../../../../utils/cn';
 import createToast from '../../../../../utils/createToast';
 import {reachMetricaGoal} from '../../../../../utils/yaMetrica';
 import {EntityTitle} from '../../../EntityTitle/EntityTitle';
-import {isPartitioningEntityType} from '../../../utils/schema';
+import {isRowTableType} from '../../../utils/schema';
 
 import {openManagePartitioningDialog} from './ManagePartitioningDialog/ManagePartitioningDialog';
 import {PartitionsProgress} from './PartitionsProgress/PartitionsProgress';
@@ -29,8 +29,10 @@ interface TableInfoProps {
     path: string;
 }
 
-const TableInfoHeader = ({type, data}: {type?: EPathType; data?: TEvDescribeSchemeResult}) => {
-    const title: React.ReactNode = isPartitioningEntityType(type) ? (
+const TableInfoHeader = ({data}: {data?: TEvDescribeSchemeResult}) => {
+    const actualType = data?.PathDescription?.Self?.PathType;
+    const isRowTable = isRowTableType(actualType);
+    const title: React.ReactNode = isRowTable ? (
         i18n('title_partitioning')
     ) : (
         <EntityTitle data={data?.PathDescription} />
@@ -90,7 +92,7 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
                 alignItems="center"
                 gap="2"
             >
-                <TableInfoHeader type={type} data={data} />
+                <TableInfoHeader data={data} />
                 {managePartitioningDialogConfig && (
                     <Button view="normal" size="s" onClick={handleOpenManagePartitioning}>
                         <Icon data={Gear} size={16} />
