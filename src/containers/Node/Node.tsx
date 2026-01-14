@@ -78,7 +78,7 @@ export function Node() {
 
     const isStorageNode = checkIsStorageNode(node);
 
-    const threadsQuantity = node?.Threads?.length;
+    const hasThreads = Boolean(node?.Threads?.length);
 
     const {activeTab, nodeTabs} = React.useMemo(() => {
         const skippedTabs: NodeTab[] = [];
@@ -91,13 +91,18 @@ export function Node() {
         if (isDiskPagesAvailable) {
             skippedTabs.push('structure');
         }
-        if (!threadsQuantity) {
+        if (!hasThreads) {
             skippedTabs.push('threads');
         }
         if (!isPeersHandlerAvailable) {
             skippedTabs.push('network');
         }
-        const actualNodeTabs = NODE_TABS.filter((el) => !skippedTabs.includes(el.id));
+        let actualNodeTabs = NODE_TABS;
+
+        // Return all tabs during loading, filter based on capabilities after loading completes
+        if (!pageLoading) {
+            actualNodeTabs = NODE_TABS.filter((el) => !skippedTabs.includes(el.id));
+        }
 
         const actualActiveTab =
             actualNodeTabs.find(({id}) => id === activeTabId) ?? actualNodeTabs[0];
@@ -108,8 +113,9 @@ export function Node() {
         isDiskPagesAvailable,
         isPeersHandlerAvailable,
         activeTabId,
-        threadsQuantity,
+        hasThreads,
         configsAvailable,
+        pageLoading,
     ]);
 
     const database = tenantNameFromQuery?.toString();
@@ -149,7 +155,7 @@ export function Node() {
             {<NodePageTitle node={node} />}
             {error ? <ResponseError error={error} className={b('error')} /> : null}
             {<NodePageInfo node={node} loading={pageLoading} />}
-            {nodeId ? (
+            {!pageLoading && nodeId ? (
                 <NodePageContent
                     nodeId={nodeId}
                     database={database}
