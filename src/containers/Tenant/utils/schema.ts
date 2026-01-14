@@ -304,5 +304,9 @@ export const isChildlessPathType = (type?: EPathType, subType?: EPathSubType) =>
 
 export const isExternalTableType = (type?: EPathType) => type === EPathType.EPathTypeExternalTable;
 export const isRowTableType = (type?: EPathType) => type === EPathType.EPathTypeTable;
+export const isColumnTableType = (type?: EPathType) => type === EPathType.EPathTypeColumnTable;
 export const isViewType = (type?: EPathType) => type === EPathType.EPathTypeView;
 export const isSystemViewType = (type?: EPathType) => type === EPathType.EPathTypeSysView;
+
+export const isPartitioningEntityType = (type?: EPathType) =>
+    isRowTableType(type) || isColumnTableType(type);
