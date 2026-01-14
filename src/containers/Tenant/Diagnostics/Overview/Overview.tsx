@@ -43,23 +43,22 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
         const data = currentData ?? undefined;
         // verbose mapping to guarantee a correct render for new path types
         // TS will error when a new type is added but not mapped here
+
+        const renderTableInfo = () => (
+            <TableInfo path={path} data={data} type={type} database={database} />
+        );
+
         const pathTypeToComponent: Record<EPathType, (() => React.ReactNode) | undefined> = {
             [EPathType.EPathTypeInvalid]: undefined,
             [EPathType.EPathTypeDir]: undefined,
             [EPathType.EPathTypeResourcePool]: undefined,
-            [EPathType.EPathTypeTable]: () => (
-                <TableInfo path={path} data={data} type={type} database={database} />
-            ),
+            [EPathType.EPathTypeTable]: renderTableInfo,
             [EPathType.EPathTypeSysView]: () => <SystemViewInfo data={data} />,
             [EPathType.EPathTypeSubDomain]: undefined,
             [EPathType.EPathTypeTableIndex]: () => <TableIndexInfo data={data} />,
             [EPathType.EPathTypeExtSubDomain]: undefined,
-            [EPathType.EPathTypeColumnStore]: () => (
-                <TableInfo path={path} data={data} type={type} database={database} />
-            ),
-            [EPathType.EPathTypeColumnTable]: () => (
-                <TableInfo path={path} data={data} type={type} database={database} />
-            ),
+            [EPathType.EPathTypeColumnStore]: renderTableInfo,
+            [EPathType.EPathTypeColumnTable]: renderTableInfo,
             [EPathType.EPathTypeCdcStream]: () => (
                 <ChangefeedInfo
                     path={path}

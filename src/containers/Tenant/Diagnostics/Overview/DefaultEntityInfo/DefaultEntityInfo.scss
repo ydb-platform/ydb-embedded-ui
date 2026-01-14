@@ -2,7 +2,6 @@
 
 .default-entity-info {
     &__title {
-        font-weight: 600;
-        @include mixins.body-2-typography();
+        @include mixins.info-viewer-title();
     }
 }
