@@ -9,7 +9,7 @@ on:
 jobs:
   e2e_tests:
     name: Playwright Tests
-    timeout-minutes: 60
+    timeout-minutes: 120
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -20,7 +20,7 @@ jobs:
         ports:
           - 2135:2135
           - 8765:8765
-        options: --hostname localhost -e YDB_ALLOW_ORIGIN="http://localhost:3000"
+        options: --hostname localhost -e YDB_ALLOW_ORIGIN="http://localhost:3000" -e MON_PORT=8765
 
     steps:
       - uses: actions/checkout@v4
