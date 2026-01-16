@@ -1,4 +1,4 @@
-import {DisplayPulse} from '@gravity-ui/icons';
+import {ChartAreaStacked} from '@gravity-ui/icons';
 import {Button, Flex, HelpMark, Icon, Label} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
@@ -209,7 +209,7 @@ export function TenantOverview({
                         {tenantType}
                         {monitoringTabAvailable && (
                             <Button view="normal" onClick={handleOpenMonitoring}>
-                                <Icon data={DisplayPulse} size={16} />
+                                <Icon data={ChartAreaStacked} size={16} />
                                 {i18n('action_open-monitoring')}
                             </Button>
                         )}

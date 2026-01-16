@@ -4,6 +4,7 @@ import {Flex, SegmentedRadioGroup, Text} from '@gravity-ui/uikit';
 import {Helmet} from 'react-helmet-async';
 import {Redirect, Route, Switch, useHistory} from 'react-router-dom';
 
+import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
 import {PageError} from '../../components/Errors/PageError/PageError';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import type {HomePageTab} from '../../routes';
@@ -81,6 +82,9 @@ export function HomePage() {
     const showBlockingError = isAccessError(environmentsError);
     const errorProps = showBlockingError ? uiFactory.clusterOrDatabaseAccessError : undefined;
 
+    const hasEnvironmentsTabs =
+        homePageTab === 'databases' && environments && environments?.length > 1;
+
     React.useEffect(() => {
         dispatch(setHeaderBreadcrumbs('homePage', {}));
     }, [dispatch]);
@@ -146,7 +150,7 @@ export function HomePage() {
     };
 
     const renderDBEnvironmentsTabs = () => {
-        if (homePageTab === 'clusters' || !environments || environments?.length <= 1) {
+        if (!hasEnvironmentsTabs) {
             return null;
         }
 
@@ -171,10 +175,16 @@ export function HomePage() {
     };
 
     const renderTabs = () => {
-        if (noEnvironmentsAvailable) {
+        if (noEnvironmentsAvailable || (!isViewerUser && !hasEnvironmentsTabs)) {
             return (
-                <Flex gap={4} direction="column" className={b('controls-wrapper')}>
+                <Flex
+                    gap={4}
+                    direction={'row'}
+                    justifyContent={'space-between'}
+                    className={b('controls-wrapper')}
+                >
                     <Text variant="header-1">{pageTitleWithFactory}</Text>
+                    <AutoRefreshControl />
                 </Flex>
             );
         }
@@ -182,21 +192,31 @@ export function HomePage() {
             return (
                 <Flex gap={4} direction="column" className={b('controls-wrapper')}>
                     <Text variant="header-1">{pageTitleWithFactory}</Text>
-                    {renderDBEnvironmentsTabs()}
+                    <Flex direction={'row'} justifyContent={'space-between'}>
+                        {renderDBEnvironmentsTabs()}
+                        <AutoRefreshControl />
+                    </Flex>
                 </Flex>
             );
         }
         return (
-            <Flex gap={4} className={b('controls-wrapper')}>
-                <SegmentedRadioGroup size="l" value={homePageTab} onUpdate={handleTabChange}>
-                    <SegmentedRadioGroup.Option value="clusters">
-                        {i18n('value_all-clusters')}
-                    </SegmentedRadioGroup.Option>
-                    <SegmentedRadioGroup.Option value="databases">
-                        {i18n('value_my-databases')}
-                    </SegmentedRadioGroup.Option>
-                </SegmentedRadioGroup>
-                {renderDBEnvironmentsTabs()}
+            <Flex
+                direction={'row'}
+                justifyContent={'space-between'}
+                className={b('controls-wrapper')}
+            >
+                <Flex gap={4} direction={'row'}>
+                    <SegmentedRadioGroup size="l" value={homePageTab} onUpdate={handleTabChange}>
+                        <SegmentedRadioGroup.Option value="clusters">
+                            {i18n('value_all-clusters')}
+                        </SegmentedRadioGroup.Option>
+                        <SegmentedRadioGroup.Option value="databases">
+                            {i18n('value_my-databases')}
+                        </SegmentedRadioGroup.Option>
+                    </SegmentedRadioGroup>
+                    {renderDBEnvironmentsTabs()}
+                </Flex>
+                <AutoRefreshControl />
             </Flex>
         );
     };

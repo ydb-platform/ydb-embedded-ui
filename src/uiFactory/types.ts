@@ -124,9 +124,31 @@ export interface UiMetricaGoals {
 
 export type UiMetricaGoal = keyof UiMetricaGoals;
 
+/**
+ * Configuration for managing database environments in multi-cluster mode.
+ * Affects environments that are shown on Databases tab on HomePage
+ */
 export interface DatabasesEnvironmentsConfig {
-    supportedEnvironments: string[];
-    defaultEnvironment?: string;
+    /** The environment to select by default when no environment is specified */
+    getDefaultEnvironment?: () => string | undefined;
+
+    /**
+     * Environments can work in two modes:
+     *
+     * 1. **Filtered backend list**: If `getEnvironments` is not provided, the list of environments
+     *    is fetched from the backend and filtered by `getSupportedEnvironments`. Only environments
+     *    that exist in both the backend response and `getSupportedEnvironments` will be shown.
+     *
+     * 2. **Determined list**: If `getEnvironments` is provided, it returns the list of
+     *    available environments, ignoring the backend response.
+     *    Backend response with `getSupportedEnvironments` is used as fallback if function returns nothing
+     */
+    getSupportedEnvironments: () => string[] | undefined;
+    getEnvironments?: () => string[] | undefined;
+
+    /** Custom display title for each environment (falls back to environment name) */
     getEnvironmentTitle?: (env: string) => string | undefined;
+
+    /** If provided, clicking an environment tab will redirect to that domain instead of changing the environment in the current context */
     getEnvironmentDomain?: (env: string) => string | undefined;
 }

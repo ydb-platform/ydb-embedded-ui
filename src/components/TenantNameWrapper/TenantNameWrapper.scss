@@ -1,0 +1,22 @@
+.ydb-database-name-wrapper {
+    &__db-name {
+        white-space: normal;
+        text-decoration: none;
+
+        color: var(--g-color-text-link);
+    }
+    &__path-copy-icon {
+        color: var(--g-color-text-secondary);
+    }
+    &__db-path-wrapper {
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+        direction: rtl;
+
+        color: var(--g-color-text-secondary);
+    }
+    &__db-path {
+        unicode-bidi: plaintext;
+    }
+}

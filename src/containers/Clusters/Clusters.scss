@@ -3,6 +3,14 @@
 .ydb-clusters {
     @include mixins.body-2-typography();
 
+    &__controls {
+        padding-bottom: var(--g-spacing-2);
+    }
+
+    &__clusters-count {
+        padding-bottom: var(--g-spacing-2);
+    }
+
     &__cluster-name {
         white-space: normal;
         text-decoration: none;
