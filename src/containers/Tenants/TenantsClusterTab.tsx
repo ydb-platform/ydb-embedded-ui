@@ -23,9 +23,11 @@ export function TenantsClusterTab({scrollContainerRef, additionalTenantsProps}: 
             clusterName={clusterName}
             environmentName={undefined}
             isMetaDatabasesAvailable={isMetaDatabasesAvailable}
-            showDomainDatabase={showDomainDatabase}
             scrollContainerRef={scrollContainerRef}
             additionalTenantsProps={additionalTenantsProps}
+            showDomainDatabase={showDomainDatabase}
+            showPoolsColumn
+            showWithProblemsFilter
         />
     );
 }

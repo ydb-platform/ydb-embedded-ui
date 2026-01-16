@@ -1,4 +1,4 @@
-import {CirclePlus, Code, Copy, DisplayPulse, PlugConnection} from '@gravity-ui/icons';
+import {ChartAreaStacked, CirclePlus, Code, Copy, PlugConnection} from '@gravity-ui/icons';
 import {Flex, Spin} from '@gravity-ui/uikit';
 import copy from 'copy-to-clipboard';
 import type {NavigationTreeNodeType} from 'ydb-ui-components';
@@ -231,7 +231,7 @@ export const getActions =
         const monitoringItem = {
             text: i18n('actions.openMonitoring'),
             action: actions.openMonitoring,
-            iconStart: <DisplayPulse />,
+            iconStart: <ChartAreaStacked />,
         };
 
         const createEntitiesSet = [

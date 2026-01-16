@@ -29,7 +29,7 @@ export function useDatabasesPageEnvironment(environments?: string[]) {
         if (pageEnvironment && environments?.includes(pageEnvironment)) {
             return pageEnvironment;
         }
-        const factoryDefault = uiFactory.databasesEnvironmentsConfig?.defaultEnvironment;
+        const factoryDefault = uiFactory.databasesEnvironmentsConfig?.getDefaultEnvironment?.();
         if (factoryDefault && environments?.includes(factoryDefault)) {
             return factoryDefault;
         }

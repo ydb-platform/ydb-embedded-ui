@@ -2,5 +2,7 @@
   "field_links": "Links",
   "field_monitoring-link": "Monitoring",
   "field_logs-link": "Logs",
-  "context_unknown": "unknown database"
+  "context_unknown": "unknown database",
+  "action_edit": "Edit",
+  "action_remove": "Remove"
 }

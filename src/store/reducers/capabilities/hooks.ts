@@ -205,7 +205,7 @@ export const useMetaWhoAmIAvailable = () => {
 export const useMetaEnvironmentsAvailable = () => {
     return (
         useGetMetaFeatureVersion('/meta/environments') >= 1 &&
-        Boolean(uiFactory.databasesEnvironmentsConfig?.supportedEnvironments?.length)
+        Boolean(uiFactory.databasesEnvironmentsConfig)
     );
 };
 

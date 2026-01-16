@@ -28,7 +28,7 @@
     &__type {
         display: flex;
         flex-direction: row;
-        align-items: center;
+        align-items: flex-start;
         gap: 10px;
     }
 
@@ -54,6 +54,8 @@
     }
 
     &__table-wrapper {
+        --data-table-cell-align: top;
+        --data-table-cell-vertical-padding: 10px;
         display: contents;
 
         width: max-content;
