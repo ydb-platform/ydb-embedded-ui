@@ -179,8 +179,8 @@ export function HomePage() {
             return (
                 <Flex
                     gap={4}
-                    direction={'row'}
-                    justifyContent={'space-between'}
+                    direction="row"
+                    justifyContent="space-between"
                     className={b('controls-wrapper')}
                 >
                     <Text variant="header-1">{pageTitleWithFactory}</Text>
@@ -192,7 +192,7 @@ export function HomePage() {
             return (
                 <Flex gap={4} direction="column" className={b('controls-wrapper')}>
                     <Text variant="header-1">{pageTitleWithFactory}</Text>
-                    <Flex direction={'row'} justifyContent={'space-between'}>
+                    <Flex direction="row" justifyContent="space-between">
                         {renderDBEnvironmentsTabs()}
                         <AutoRefreshControl />
                     </Flex>
@@ -200,12 +200,8 @@ export function HomePage() {
             );
         }
         return (
-            <Flex
-                direction={'row'}
-                justifyContent={'space-between'}
-                className={b('controls-wrapper')}
-            >
-                <Flex gap={4} direction={'row'}>
+            <Flex direction="row" justifyContent="space-between" className={b('controls-wrapper')}>
+                <Flex gap={4} direction="row">
                     <SegmentedRadioGroup size="l" value={homePageTab} onUpdate={handleTabChange}>
                         <SegmentedRadioGroup.Option value="clusters">
                             {i18n('value_all-clusters')}
@@ -245,9 +241,11 @@ export function HomePage() {
                         clusterName={undefined}
                         environmentName={databasesPageEnvironment}
                         isMetaDatabasesAvailable={true}
-                        showDomainDatabase={true}
                         scrollContainerRef={scrollContainerRef}
                         additionalTenantsProps={undefined}
+                        showDomainDatabase={true}
+                        showPoolsColumn={false}
+                        showWithProblemsFilter={false}
                     />
                 </Route>
             </Switch>

@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {ArrowUpRightFromSquare, Pencil, TrashBin} from '@gravity-ui/icons';
 import type {DropdownMenuItem} from '@gravity-ui/uikit';
 import {ClipboardButton, DropdownMenu, Flex, Icon, Link, Text} from '@gravity-ui/uikit';
@@ -69,13 +71,12 @@ export function TenantNameWrapper({
     const dbName = tenant.controlPlaneName;
     const dbPath = tenant.Name ?? i18n('context_unknown');
     const dbStatus = tenant.Overall;
-    const dbType = tenant.Type;
 
-    const renderActions = () => {
+    const dbActions = React.useMemo(() => {
         const menuItems: DropdownMenuItem[][] = [];
 
         if (!isUserAllowedToMakeChanges) {
-            return null;
+            return [];
         }
 
         const linksItems: DropdownMenuItem[] = [];
@@ -93,7 +94,7 @@ export function TenantNameWrapper({
         }
 
         // Do not show edit and delete actions for domain
-        if (dbType !== 'Domain' && clusterName) {
+        if (tenant.Type !== 'Domain' && clusterName) {
             const manageDbItems: DropdownMenuItem[] = [];
             if (isEditDBAvailable) {
                 manageDbItems.push({
@@ -126,21 +127,32 @@ export function TenantNameWrapper({
             }
         }
 
-        if (!menuItems.length) {
+        return menuItems;
+    }, [
+        isUserAllowedToMakeChanges,
+        filteredLinks,
+        clusterName,
+        isEditDBAvailable,
+        isDeleteDBAvailable,
+        tenant,
+    ]);
+
+    const renderActions = React.useCallback(() => {
+        if (!dbActions.length) {
             return null;
         }
 
         return (
             <DropdownMenu
-                items={menuItems}
+                items={dbActions}
                 defaultSwitcherProps={{view: 'flat-secondary', size: 'xs'}}
                 size="s"
                 menuProps={{size: 'l'}}
             />
         );
-    };
+    }, [dbActions]);
 
-    const renderName = () => {
+    const renderName = React.useCallback(() => {
         if (isExternalLink) {
             return (
                 <Link href={dbUrl} target="_blank">
@@ -149,18 +161,19 @@ export function TenantNameWrapper({
             );
         }
         return <InternalLink to={dbUrl}>{dbName}</InternalLink>;
-    };
-    const renderStatus = () => {
-        return <EntityStatus.Label status={dbStatus ?? EFlag.Grey} size="xs" />;
-    };
+    }, [isExternalLink, dbUrl, dbName]);
 
-    const renderPath = () => {
+    const renderStatus = React.useCallback(() => {
+        return <EntityStatus.Label status={dbStatus ?? EFlag.Grey} size="xs" />;
+    }, [dbStatus]);
+
+    const renderPath = React.useCallback(() => {
         if (!dbPath) {
             return null;
         }
 
         return (
-            <Flex gap={0.5} alignItems={'baseline'}>
+            <Flex gap={0.5} alignItems="baseline">
                 <span className={b('db-path-wrapper')}>
                     <Text variant="caption-2" color="secondary" className={b('db-path')}>
                         {dbPath}
@@ -169,11 +182,11 @@ export function TenantNameWrapper({
                 <ClipboardButton size="xs" text={dbPath} className={b('path-copy-icon')} />
             </Flex>
         );
-    };
+    }, [dbPath]);
 
     return (
-        <Flex direction={'column'} gap={0.5}>
-            <Flex alignItems={'flex-start'} justifyContent={'space-between'} gap={1}>
+        <Flex direction="column" gap={0.5}>
+            <Flex alignItems="flex-start" justifyContent="space-between" gap={1}>
                 <div className={b('db-name')}>{renderName()}</div>
                 <Flex gap={1}>
                     {renderStatus()}

@@ -185,7 +185,7 @@ export const TenantsTable = ({
         );
     };
 
-    const renderTable = () => {
+    const databasesColumns = React.useMemo(() => {
         const columns: Column<PreparedTenant>[] = [
             {
                 name: 'Name',
@@ -327,6 +327,17 @@ export const TenantsTable = ({
             });
         }
 
+        return columns;
+    }, [
+        clusterName,
+        additionalTenantsProps,
+        environmentName,
+        handleSearchChange,
+        showNetworkUtilization,
+        showPoolsColumn,
+    ]);
+
+    const renderTable = () => {
         if (filteredTenants.length === 0 && withProblems) {
             return <Illustration name="thumbsUp" width={200} />;
         }
@@ -335,7 +346,7 @@ export const TenantsTable = ({
             <ResizeableDataTable
                 columnsWidthLSKey={DATABASES_COLUMNS_WIDTH_LS_KEY}
                 data={filteredTenants}
-                columns={columns}
+                columns={databasesColumns}
                 settings={DEFAULT_TABLE_SETTINGS}
                 emptyDataMessage="No such tenants"
                 onSortChange={setSortParams}
