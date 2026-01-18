@@ -1,3 +1,33 @@
 export {default} from './slice';
-export * from './slice';
 export {queryApi} from './api';
+
+export {
+    addQueryTab,
+    addStreamingChunks,
+    changeUserInput,
+    closeQueryTab,
+    renameQueryTab,
+    selectActiveTab,
+    selectActiveTabId,
+    selectHistoryCurrentQueryId,
+    selectIsDirty,
+    selectLastExecutedQueryText,
+    selectQueriesHistoryFilter,
+    selectQueryDuration,
+    selectResult,
+    selectResultTab,
+    selectTabsById,
+    selectTabsOrder,
+    selectTenantPath,
+    selectUserInput,
+    setActiveQueryTab,
+    setHistoryCurrentQueryId,
+    setIsDirty,
+    setLastExecutedQueryText,
+    setQueryHistoryFilter,
+    setQueryResult,
+    setResultTab,
+    setStreamQueryResponse,
+    setStreamSession,
+    setTenantPath,
+} from './slice';
