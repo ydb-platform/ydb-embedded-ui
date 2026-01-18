@@ -9,20 +9,24 @@ import {
     useStreamingAvailable,
     useTracingLevelOptionAvailable,
 } from '../../../../store/reducers/capabilities/hooks';
+import type {useQueriesHistory} from '../../../../store/reducers/query/hooks';
 import {
     queryApi,
+    selectActiveTabId,
+    selectLastExecutedQueryText,
     selectResult,
     selectTenantPath,
     setIsDirty,
+    setLastExecutedQueryText,
     setTenantPath,
 } from '../../../../store/reducers/query/query';
 import type {QueryResult} from '../../../../store/reducers/query/types';
-import type {useQueriesHistory} from '../../../../store/reducers/query/useQueriesHistory';
 import {setQueryAction} from '../../../../store/reducers/queryActions/queryActions';
 import {selectShowPreview, setShowPreview} from '../../../../store/reducers/schema/schema';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import type {EPathSubType, EPathType} from '../../../../types/api/schema';
 import type {QueryAction} from '../../../../types/store/query';
+import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_SIZE_RESULT_PANE_KEY} from '../../../../utils/constants';
 import {
@@ -49,6 +53,7 @@ import {QueryEditorControls} from '../QueryEditorControls/QueryEditorControls';
 import {QueryResultViewer} from '../QueryResult/QueryResultViewer';
 import {QuerySettingsDialog} from '../QuerySettingsDialog/QuerySettingsDialog';
 
+import {EditorTabs} from './EditorTabs';
 import {YqlEditor} from './YqlEditor';
 import {queryManagerInstance} from './helpers';
 
@@ -72,6 +77,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
     const dispatch = useTypedDispatch();
     const {database, path, type, subType, databaseFullPath} = useCurrentSchema();
     const savedPath = useTypedSelector(selectTenantPath);
+    const activeTabId = useTypedSelector(selectActiveTabId);
     const result = useTypedSelector(selectResult);
     const showPreview = useTypedSelector(selectShowPreview);
 
@@ -95,7 +101,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
     const [lastUsedQueryAction, setLastUsedQueryAction] = useSetting<QueryAction>(
         SETTING_KEYS.LAST_USED_QUERY_ACTION,
     );
-    const [lastExecutedQueryText, setLastExecutedQueryText] = React.useState<string>('');
+    const lastExecutedQueryText = useTypedSelector(selectLastExecutedQueryText) || '';
     const [isQueryStreamingEnabled] = useQueryStreamingSetting();
 
     const [binaryDataInPlainTextDisplay] = useSetting<boolean>(
@@ -117,6 +123,8 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
 
     const [sendQuery] = queryApi.useUseSendQueryMutation();
     const [streamQuery] = queryApi.useUseStreamQueryMutation();
+
+    const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
 
     // Normalize stored resourcePool if it's not available for current database
     React.useEffect(() => {
@@ -175,7 +183,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
 
     const handleSendExecuteClick = useEventHandler((text: string, partial?: boolean) => {
         setLastUsedQueryAction(QUERY_ACTIONS.execute);
-        setLastExecutedQueryText(text);
+        dispatch(setLastExecutedQueryText({tabId: activeTabId, queryText: text}));
         if (!isEqual(lastQueryExecutionSettings, querySettings)) {
             resetBanner();
             setLastQueryExecutionSettings(querySettings);
@@ -183,7 +191,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
         const queryId = uuidv4();
 
         // Abort previous query if there was any
-        queryManagerInstance.abortQuery();
+        queryManagerInstance.abortQuery(activeTabId);
 
         if (isStreamingEnabled) {
             reachMetricaGoal('runQuery', {
@@ -192,6 +200,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
                 ...querySettings,
             });
             const query = streamQuery({
+                tabId: activeTabId,
                 actionType: 'execute',
                 query: text,
                 database,
@@ -200,10 +209,11 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
                 base64: encodeTextWithBase64,
             });
 
-            queryManagerInstance.registerQuery(query);
+            queryManagerInstance.registerQuery(activeTabId, query);
         } else {
             reachMetricaGoal('runQuery', {actionType: 'execute', ...querySettings});
             const query = sendQuery({
+                tabId: activeTabId,
                 actionType: 'execute',
                 query: text,
                 database,
@@ -224,7 +234,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
                     console.error('Failed to update query history:', error);
                 });
 
-            queryManagerInstance.registerQuery(query);
+            queryManagerInstance.registerQuery(activeTabId, query);
         }
 
         dispatch(setShowPreview(false));
@@ -248,7 +258,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
 
     const handleGetExplainQueryClick = useEventHandler((text: string) => {
         setLastUsedQueryAction(QUERY_ACTIONS.explain);
-        setLastExecutedQueryText(text);
+        dispatch(setLastExecutedQueryText({tabId: activeTabId, queryText: text}));
         if (!isEqual(lastQueryExecutionSettings, querySettings)) {
             resetBanner();
             setLastQueryExecutionSettings(querySettings);
@@ -259,6 +269,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
         reachMetricaGoal('runQuery', {actionType: 'explain', ...querySettings});
 
         const query = sendQuery({
+            tabId: activeTabId,
             actionType: 'explain',
             query: text,
             database,
@@ -268,7 +279,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
             base64: encodeTextWithBase64,
         });
 
-        queryManagerInstance.registerQuery(query);
+        queryManagerInstance.registerQuery(activeTabId, query);
 
         dispatch(setShowPreview(false));
 
@@ -317,11 +328,13 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
                         top: true,
                     })}
                 >
+                    {isMultiTabEnabled ? <EditorTabs /> : null}
                     <div className={b('monaco-wrapper')}>
                         <div className={b('monaco')}>
                             <YqlEditor
                                 changeUserInput={changeUserInput}
                                 theme={theme}
+                                isMultiTabEnabled={isMultiTabEnabled}
                                 handleSendExecuteClick={handleSendExecuteClick}
                                 handleGetExplainQueryClick={handleGetExplainQueryClick}
                                 historyQueries={historyQueries}

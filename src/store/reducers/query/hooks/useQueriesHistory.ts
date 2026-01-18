@@ -5,17 +5,16 @@ import {
     useSetting,
     useTypedDispatch,
     useTypedSelector,
-} from '../../../utils/hooks';
-import {SETTING_KEYS} from '../settings/constants';
-
+} from '../../../../utils/hooks';
+import {SETTING_KEYS} from '../../settings/constants';
 import {
     changeUserInput,
     selectHistoryCurrentQueryId,
     selectQueriesHistoryFilter,
     setHistoryCurrentQueryId,
-} from './query';
-import type {QueryInHistory, QueryStats} from './types';
-import {getQueryInHistory} from './utils';
+} from '../query';
+import type {QueryInHistory, QueryStats} from '../types';
+import {getQueryInHistory} from '../utils';
 
 const MAXIMUM_QUERIES_IN_HISTORY = 20;
 

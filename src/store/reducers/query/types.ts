@@ -58,10 +58,21 @@ export interface QueryResult {
     isLoading: boolean;
 }
 
-export interface QueryState {
+export interface QueryTabState {
+    id: string;
+    title: string;
     input: string;
+    isDirty: boolean;
+    createdAt: number;
+    updatedAt: number;
+    lastExecutedQueryText?: string;
     result?: QueryResult;
-    isDirty?: boolean;
+}
+
+export interface QueryState {
+    activeTabId: string;
+    tabsOrder: string[];
+    tabsById: Record<string, QueryTabState>;
 
     historyFilter?: string;
     historyCurrentQueryId?: string;

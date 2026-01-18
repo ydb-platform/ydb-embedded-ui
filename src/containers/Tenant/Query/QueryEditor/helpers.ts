@@ -114,22 +114,35 @@ export function useCodeAssistHelpers(historyQueries: QueryInHistory[]) {
     };
 }
 
+type AbortablePromiseLike = {abort: VoidFunction} & PromiseLike<unknown>;
+
 class QueryManager {
-    private query: {abort: VoidFunction} | null;
+    private readonly queries = new Map<string, {abort: VoidFunction}>();
 
-    constructor() {
-        this.query = null;
+    registerQuery(tabId: string, query: AbortablePromiseLike) {
+        this.queries.set(tabId, query);
+
+        const queryRef = query;
+        Promise.resolve(query).finally(() => {
+            if (this.queries.get(tabId) === queryRef) {
+                this.queries.delete(tabId);
+            }
+        });
     }
 
-    registerQuery(query: {abort: VoidFunction}) {
-        this.query = query;
-    }
-
-    abortQuery() {
-        if (this.query) {
-            this.query.abort();
-            this.query = null;
+    abortQuery(tabId: string) {
+        const query = this.queries.get(tabId);
+        if (query) {
+            query.abort();
+            this.queries.delete(tabId);
         }
+    }
+
+    abortAll() {
+        for (const query of this.queries.values()) {
+            query.abort();
+        }
+        this.queries.clear();
     }
 }
 

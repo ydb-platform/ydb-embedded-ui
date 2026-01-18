@@ -2,8 +2,8 @@ import React from 'react';
 
 import {Helmet} from 'react-helmet-async';
 
+import {useQueriesHistory} from '../../../store/reducers/query/hooks';
 import {changeUserInput} from '../../../store/reducers/query/query';
-import {useQueriesHistory} from '../../../store/reducers/query/useQueriesHistory';
 import {TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import {cn} from '../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
