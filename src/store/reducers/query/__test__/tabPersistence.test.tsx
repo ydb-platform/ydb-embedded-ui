@@ -3,7 +3,18 @@ import type {QueryState} from '../types';
 
 describe('QueryResultViewer tab persistence integration', () => {
     const initialState: QueryState = {
-        input: '',
+        activeTabId: 'tab-1',
+        tabsOrder: ['tab-1'],
+        tabsById: {
+            'tab-1': {
+                id: 'tab-1',
+                title: '',
+                input: '',
+                isDirty: false,
+                createdAt: 0,
+                updatedAt: 0,
+            },
+        },
     };
 
     test('should save and retrieve tab selection for explain queries', () => {
