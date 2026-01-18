@@ -39,6 +39,8 @@ export interface UIFactory<H extends string = CommonIssueType, T extends string 
     renderMonitoring?: RenderMonitoring;
     clusterOrDatabaseAccessError?: Partial<EmptyStateProps>;
 
+    enableMultiTabQueryEditor?: boolean;
+
     healthcheck: {
         getHealthckechViewTitles: GetHealthcheckViewTitles<H>;
         getHealthcheckViewsOrder: GetHealthcheckViewsOrder<H>;

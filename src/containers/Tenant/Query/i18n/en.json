@@ -53,6 +53,28 @@
   "action.explain": "Explain",
   "action.open-shortcuts": "Open Keyboard Shortcuts Panel",
 
+  "editor-tabs.untitled": "Untitled",
+  "editor-tabs.default-title": "Query {{index}}",
+  "editor-tabs.duplicate-title": "{{title}} copy",
+  "editor-tabs.rename": "Rename tab",
+  "editor-tabs.duplicate": "Duplicate tab",
+  "editor-tabs.add-to-favorites": "Add to favorites",
+  "editor-tabs.save-query-as": "Save query as...",
+  "editor-tabs.share-query": "Share query",
+  "editor-tabs.close": "Close tab",
+  "editor-tabs.close-other-tabs": "Close other tabs",
+  "editor-tabs.close-all-tabs": "Close all tabs",
+  "editor-tabs.rename-dialog.title": "Rename tab",
+  "editor-tabs.rename-dialog.input-placeholder": "Tab name",
+  "editor-tabs.rename-dialog.error-empty": "Tab name can't be empty",
+  "editor-tabs.rename-dialog.apply": "Rename",
+  "editor-tabs.rename-dialog.cancel": "Cancel",
+
+  "editor-tabs.action.new-tab": "New editor tab",
+  "editor-tabs.action.close-tab": "Close editor tab",
+  "editor-tabs.action.next-tab": "Next editor tab",
+  "editor-tabs.action.previous-tab": "Previous editor tab",
+
   "filter.text.placeholder": "Search by query text...",
 
   "gear.tooltip": "Query execution settings have been changed for ",
