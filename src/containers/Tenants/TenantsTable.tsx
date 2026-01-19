@@ -4,7 +4,7 @@ import {CirclePlus} from '@gravity-ui/icons';
 import type {Column, SortOrder} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
 import type {LabelProps} from '@gravity-ui/uikit';
-import {Button, Icon, Label} from '@gravity-ui/uikit';
+import {Button, Flex, Icon, Label} from '@gravity-ui/uikit';
 
 import {EntitiesCount} from '../../components/EntitiesCount';
 import {ResponseError} from '../../components/Errors/ResponseError';
@@ -13,6 +13,7 @@ import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
 import {ProblemFilter} from '../../components/ProblemFilter/ProblemFilter';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../components/Search';
+import {TableColumnSetup} from '../../components/TableColumnSetup/TableColumnSetup';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TenantNameWrapper} from '../../components/TenantNameWrapper/TenantNameWrapper';
 import {useCreateDatabaseFeatureAvailable} from '../../store/reducers/capabilities/hooks';
@@ -36,8 +37,16 @@ import {
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
 import {useAutoRefreshInterval, useSetting} from '../../utils/hooks';
+import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {isNumeric} from '../../utils/utils';
 
+import {
+    DATABASES_COLUMNS_IDS,
+    DATABASES_COLUMNS_TITLES,
+    DATABASES_DEFAULT_COLUMNS,
+    DATABASES_REQUIRED_COLUMNS,
+    DATABASES_SELECTED_COLUMNS_KEY,
+} from './constants';
 import i18n from './i18n';
 import {useTenantsQueryParams} from './useTenantsQueryParams';
 
@@ -185,11 +194,11 @@ export const TenantsTable = ({
         );
     };
 
-    const databasesColumns = React.useMemo(() => {
+    const rawDatabasesColumns = React.useMemo(() => {
         const columns: Column<PreparedTenant>[] = [
             {
-                name: 'Name',
-                header: 'Database',
+                name: DATABASES_COLUMNS_IDS.Name,
+                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.Name],
                 render: ({row}) => (
                     <TenantNameWrapper
                         tenant={row}
@@ -203,7 +212,8 @@ export const TenantsTable = ({
                 defaultOrder: DataTable.DESCENDING,
             },
             {
-                name: 'Type',
+                name: DATABASES_COLUMNS_IDS.Type,
+                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.Type],
                 width: 200,
                 resizeMinWidth: 150,
                 render: ({row}) => {
@@ -225,7 +235,8 @@ export const TenantsTable = ({
                 },
             },
             {
-                name: 'State',
+                name: DATABASES_COLUMNS_IDS.State,
+                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.State],
                 width: 150,
                 render: ({row}) => (
                     <Label theme={databaseStateToLabelTheme(row.State)}>
@@ -234,8 +245,8 @@ export const TenantsTable = ({
                 ),
             },
             {
-                name: 'cpu',
-                header: 'CPU',
+                name: DATABASES_COLUMNS_IDS.CPU,
+                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.CPU],
                 width: 80,
                 render: ({row}) => {
                     // Don't show values below 0.01 when formatted
@@ -248,8 +259,8 @@ export const TenantsTable = ({
                 defaultOrder: DataTable.DESCENDING,
             },
             {
-                name: 'memory',
-                header: 'Memory',
+                name: DATABASES_COLUMNS_IDS.Memory,
+                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.Memory],
                 width: 120,
                 render: ({row}) =>
                     row.memory ? formatStorageValuesToGb(row.memory) : EMPTY_DATA_PLACEHOLDER,
@@ -257,8 +268,8 @@ export const TenantsTable = ({
                 defaultOrder: DataTable.DESCENDING,
             },
             {
-                name: 'storage',
-                header: 'Storage',
+                name: DATABASES_COLUMNS_IDS.Storage,
+                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.Storage],
                 width: 120,
                 render: ({row}) =>
                     row.storage ? formatStorageValuesToGb(row.storage) : EMPTY_DATA_PLACEHOLDER,
@@ -269,8 +280,8 @@ export const TenantsTable = ({
 
         if (showNetworkUtilization) {
             columns.push({
-                name: 'Network',
-                header: 'Network',
+                name: DATABASES_COLUMNS_IDS.Network,
+                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.Network],
                 width: 120,
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
@@ -294,8 +305,8 @@ export const TenantsTable = ({
 
         columns.push(
             {
-                name: 'nodesCount',
-                header: 'Nodes',
+                name: DATABASES_COLUMNS_IDS.NodesCount,
+                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.NodesCount],
                 width: 100,
                 render: ({row}) =>
                     row.nodesCount ? formatNumber(row.nodesCount) : EMPTY_DATA_PLACEHOLDER,
@@ -303,8 +314,8 @@ export const TenantsTable = ({
                 defaultOrder: DataTable.DESCENDING,
             },
             {
-                name: 'groupsCount',
-                header: 'Groups',
+                name: DATABASES_COLUMNS_IDS.GroupsCount,
+                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.GroupsCount],
                 width: 100,
                 render: ({row}) =>
                     row.groupsCount ? formatNumber(row.groupsCount) : EMPTY_DATA_PLACEHOLDER,
@@ -315,8 +326,8 @@ export const TenantsTable = ({
 
         if (showPoolsColumn) {
             columns.push({
-                name: 'PoolStats',
-                header: 'Pools',
+                name: DATABASES_COLUMNS_IDS.PoolStats,
+                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.PoolStats],
                 width: 100,
                 resizeMinWidth: 60,
                 sortAccessor: ({PoolStats = []}) =>
@@ -337,6 +348,14 @@ export const TenantsTable = ({
         showPoolsColumn,
     ]);
 
+    const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
+        rawDatabasesColumns,
+        DATABASES_SELECTED_COLUMNS_KEY,
+        DATABASES_COLUMNS_TITLES,
+        DATABASES_DEFAULT_COLUMNS,
+        DATABASES_REQUIRED_COLUMNS,
+    );
+
     const renderTable = () => {
         if (filteredTenants.length === 0 && withProblems) {
             return <Illustration name="thumbsUp" width={200} />;
@@ -346,7 +365,7 @@ export const TenantsTable = ({
             <ResizeableDataTable
                 columnsWidthLSKey={DATABASES_COLUMNS_WIDTH_LS_KEY}
                 data={filteredTenants}
-                columns={databasesColumns}
+                columns={columnsToShow}
                 settings={DEFAULT_TABLE_SETTINGS}
                 emptyDataMessage="No such tenants"
                 onSortChange={setSortParams}
@@ -354,10 +373,30 @@ export const TenantsTable = ({
         );
     };
 
+    const renderColumnSetup = () => {
+        return (
+            <TableColumnSetup
+                popupWidth={200}
+                items={columnsToSelect}
+                showStatus
+                onUpdate={setColumns}
+            />
+        );
+    };
+
+    const renderExtraControls = () => {
+        return (
+            <Flex direction="row" gap={3}>
+                {renderCreateDBButton()}
+                {renderColumnSetup()}
+            </Flex>
+        );
+    };
+
     return (
         <div className={b('table-wrapper')}>
             <TableWithControlsLayout fullHeight>
-                <TableWithControlsLayout.Controls renderExtraControls={renderCreateDBButton}>
+                <TableWithControlsLayout.Controls renderExtraControls={renderExtraControls}>
                     {renderControls()}
                 </TableWithControlsLayout.Controls>
                 {error ? <ResponseError error={error} /> : null}

@@ -175,8 +175,6 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     const renderColumnSetup = () => {
         return (
             <TableColumnSetup
-                className={b('column-setup')}
-                key="TableColumnSetup"
                 popupWidth={242}
                 items={columnsToSelect}
                 showStatus
