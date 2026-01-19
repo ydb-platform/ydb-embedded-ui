@@ -1,10 +1,10 @@
 import React from 'react';
 
-import {CirclePlus, Pencil, TrashBin} from '@gravity-ui/icons';
+import {CirclePlus} from '@gravity-ui/icons';
 import type {Column, SortOrder} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
-import type {DropdownMenuItem} from '@gravity-ui/uikit';
-import {Button, DropdownMenu, Icon} from '@gravity-ui/uikit';
+import type {LabelProps} from '@gravity-ui/uikit';
+import {Button, Flex, Icon, Label} from '@gravity-ui/uikit';
 
 import {EntitiesCount} from '../../components/EntitiesCount';
 import {ResponseError} from '../../components/Errors/ResponseError';
@@ -13,13 +13,10 @@ import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
 import {ProblemFilter} from '../../components/ProblemFilter/ProblemFilter';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../components/Search';
+import {TableColumnSetup} from '../../components/TableColumnSetup/TableColumnSetup';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TenantNameWrapper} from '../../components/TenantNameWrapper/TenantNameWrapper';
-import {
-    useCreateDatabaseFeatureAvailable,
-    useDeleteDatabaseFeatureAvailable,
-    useEditDatabaseFeatureAvailable,
-} from '../../store/reducers/capabilities/hooks';
+import {useCreateDatabaseFeatureAvailable} from '../../store/reducers/capabilities/hooks';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {
     filterTenantsByDomain,
@@ -40,8 +37,16 @@ import {
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
 import {useAutoRefreshInterval, useSetting} from '../../utils/hooks';
+import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
 import {isNumeric} from '../../utils/utils';
 
+import {
+    DATABASES_COLUMNS_IDS,
+    DATABASES_COLUMNS_TITLES,
+    DATABASES_DEFAULT_COLUMNS,
+    DATABASES_REQUIRED_COLUMNS,
+    DATABASES_SELECTED_COLUMNS_KEY,
+} from './constants';
 import i18n from './i18n';
 import {useTenantsQueryParams} from './useTenantsQueryParams';
 
@@ -68,22 +73,51 @@ function formatDatabaseState(state?: State): string {
     }
 }
 
+function databaseStateToLabelTheme(state?: State): LabelProps['theme'] {
+    switch (state) {
+        case 'CREATING':
+        case 'CONFIGURING': {
+            return 'info';
+        }
+        case 'RUNNING': {
+            return 'success';
+        }
+        case 'REMOVING': {
+            return 'danger';
+        }
+        case 'PENDING_RESOURCES': {
+            return 'warning';
+        }
+        case 'STATE_UNSPECIFIED':
+        default: {
+            return 'unknown';
+        }
+    }
+}
+
 interface TenantsTableProps {
     clusterName?: string;
     environmentName?: string;
+
     isMetaDatabasesAvailable?: boolean;
-    showDomainDatabase?: boolean;
+
     scrollContainerRef: React.RefObject<HTMLElement>;
     additionalTenantsProps?: AdditionalTenantsProps;
+
+    showDomainDatabase?: boolean;
+    showWithProblemsFilter?: boolean;
+    showPoolsColumn?: boolean;
 }
 
 export const TenantsTable = ({
     clusterName,
     environmentName,
     isMetaDatabasesAvailable,
-    showDomainDatabase,
     scrollContainerRef,
     additionalTenantsProps,
+    showDomainDatabase,
+    showWithProblemsFilter,
+    showPoolsColumn,
 }: TenantsTableProps) => {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tenantsApi.useGetTenantsInfoQuery(
@@ -97,9 +131,6 @@ export const TenantsTable = ({
 
     const isCreateDBAvailable =
         useCreateDatabaseFeatureAvailable() && uiFactory.onCreateDB !== undefined;
-    const isEditDBAvailable = useEditDatabaseFeatureAvailable() && uiFactory.onEditDB !== undefined;
-    const isDeleteDBAvailable =
-        useDeleteDatabaseFeatureAvailable() && uiFactory.onDeleteDB !== undefined;
 
     const {search, withProblems, handleSearchChange, handleWithProblemsChange} =
         useTenantsQueryParams();
@@ -116,7 +147,11 @@ export const TenantsTable = ({
     }, [currentData, showDomainDatabase]);
 
     const filteredTenants = React.useMemo(() => {
-        const filteredByProblems = filterTenantsByProblems(tenants, withProblems);
+        let filteredByProblems = tenants;
+        if (showWithProblemsFilter) {
+            filteredByProblems = filterTenantsByProblems(tenants, withProblems);
+        }
+
         const filteredBySearch = filterTenantsBySearch(filteredByProblems, search);
 
         return filteredBySearch;
@@ -146,7 +181,9 @@ export const TenantsTable = ({
                     placeholder="Database name"
                     className={b('search')}
                 />
-                <ProblemFilter value={withProblems} onChange={handleWithProblemsChange} />
+                {showWithProblemsFilter ? (
+                    <ProblemFilter value={withProblems} onChange={handleWithProblemsChange} />
+                ) : null}
                 <EntitiesCount
                     total={tenants?.length}
                     current={filteredTenants?.length || 0}
@@ -157,14 +194,15 @@ export const TenantsTable = ({
         );
     };
 
-    const renderTable = () => {
+    const rawDatabasesColumns = React.useMemo(() => {
         const columns: Column<PreparedTenant>[] = [
             {
-                name: 'Name',
-                header: 'Database',
+                name: DATABASES_COLUMNS_IDS.Name,
+                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.Name],
                 render: ({row}) => (
                     <TenantNameWrapper
                         tenant={row}
+                        clusterName={clusterName}
                         additionalTenantsProps={additionalTenantsProps}
                         externalLink={Boolean(environmentName)}
                     />
@@ -174,17 +212,8 @@ export const TenantsTable = ({
                 defaultOrder: DataTable.DESCENDING,
             },
             {
-                name: 'controlPlaneName',
-                header: 'Name',
-                render: ({row}) => {
-                    return row.controlPlaneName;
-                },
-                width: 200,
-                sortable: true,
-                defaultOrder: DataTable.DESCENDING,
-            },
-            {
-                name: 'Type',
+                name: DATABASES_COLUMNS_IDS.Type,
+                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.Type],
                 width: 200,
                 resizeMinWidth: 150,
                 render: ({row}) => {
@@ -206,13 +235,18 @@ export const TenantsTable = ({
                 },
             },
             {
-                name: 'State',
+                name: DATABASES_COLUMNS_IDS.State,
+                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.State],
                 width: 150,
-                render: ({row}) => formatDatabaseState(row.State),
+                render: ({row}) => (
+                    <Label theme={databaseStateToLabelTheme(row.State)}>
+                        {formatDatabaseState(row.State)}
+                    </Label>
+                ),
             },
             {
-                name: 'cpu',
-                header: 'CPU',
+                name: DATABASES_COLUMNS_IDS.CPU,
+                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.CPU],
                 width: 80,
                 render: ({row}) => {
                     // Don't show values below 0.01 when formatted
@@ -225,8 +259,8 @@ export const TenantsTable = ({
                 defaultOrder: DataTable.DESCENDING,
             },
             {
-                name: 'memory',
-                header: 'Memory',
+                name: DATABASES_COLUMNS_IDS.Memory,
+                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.Memory],
                 width: 120,
                 render: ({row}) =>
                     row.memory ? formatStorageValuesToGb(row.memory) : EMPTY_DATA_PLACEHOLDER,
@@ -234,8 +268,8 @@ export const TenantsTable = ({
                 defaultOrder: DataTable.DESCENDING,
             },
             {
-                name: 'storage',
-                header: 'Storage',
+                name: DATABASES_COLUMNS_IDS.Storage,
+                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.Storage],
                 width: 120,
                 render: ({row}) =>
                     row.storage ? formatStorageValuesToGb(row.storage) : EMPTY_DATA_PLACEHOLDER,
@@ -246,8 +280,8 @@ export const TenantsTable = ({
 
         if (showNetworkUtilization) {
             columns.push({
-                name: 'Network',
-                header: 'Network',
+                name: DATABASES_COLUMNS_IDS.Network,
+                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.Network],
                 width: 120,
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
@@ -271,8 +305,8 @@ export const TenantsTable = ({
 
         columns.push(
             {
-                name: 'nodesCount',
-                header: 'Nodes',
+                name: DATABASES_COLUMNS_IDS.NodesCount,
+                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.NodesCount],
                 width: 100,
                 render: ({row}) =>
                     row.nodesCount ? formatNumber(row.nodesCount) : EMPTY_DATA_PLACEHOLDER,
@@ -280,17 +314,20 @@ export const TenantsTable = ({
                 defaultOrder: DataTable.DESCENDING,
             },
             {
-                name: 'groupsCount',
-                header: 'Groups',
+                name: DATABASES_COLUMNS_IDS.GroupsCount,
+                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.GroupsCount],
                 width: 100,
                 render: ({row}) =>
                     row.groupsCount ? formatNumber(row.groupsCount) : EMPTY_DATA_PLACEHOLDER,
                 align: DataTable.RIGHT,
                 defaultOrder: DataTable.DESCENDING,
             },
-            {
-                name: 'PoolStats',
-                header: 'Pools',
+        );
+
+        if (showPoolsColumn) {
+            columns.push({
+                name: DATABASES_COLUMNS_IDS.PoolStats,
+                header: DATABASES_COLUMNS_TITLES[DATABASES_COLUMNS_IDS.PoolStats],
                 width: 100,
                 resizeMinWidth: 60,
                 sortAccessor: ({PoolStats = []}) =>
@@ -298,19 +335,28 @@ export const TenantsTable = ({
                 defaultOrder: DataTable.DESCENDING,
                 align: DataTable.LEFT,
                 render: ({row}) => <PoolsGraph pools={row.PoolStats} />,
-            },
-        );
-
-        if (clusterName && (isDeleteDBAvailable || isEditDBAvailable)) {
-            const actionsColumn = getDBActionsColumn({
-                clusterName,
-                isDeleteDBAvailable,
-                isEditDBAvailable,
             });
-
-            columns.push(actionsColumn);
         }
 
+        return columns;
+    }, [
+        clusterName,
+        additionalTenantsProps,
+        environmentName,
+        handleSearchChange,
+        showNetworkUtilization,
+        showPoolsColumn,
+    ]);
+
+    const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
+        rawDatabasesColumns,
+        DATABASES_SELECTED_COLUMNS_KEY,
+        DATABASES_COLUMNS_TITLES,
+        DATABASES_DEFAULT_COLUMNS,
+        DATABASES_REQUIRED_COLUMNS,
+    );
+
+    const renderTable = () => {
         if (filteredTenants.length === 0 && withProblems) {
             return <Illustration name="thumbsUp" width={200} />;
         }
@@ -319,7 +365,7 @@ export const TenantsTable = ({
             <ResizeableDataTable
                 columnsWidthLSKey={DATABASES_COLUMNS_WIDTH_LS_KEY}
                 data={filteredTenants}
-                columns={columns}
+                columns={columnsToShow}
                 settings={DEFAULT_TABLE_SETTINGS}
                 emptyDataMessage="No such tenants"
                 onSortChange={setSortParams}
@@ -327,10 +373,30 @@ export const TenantsTable = ({
         );
     };
 
+    const renderColumnSetup = () => {
+        return (
+            <TableColumnSetup
+                popupWidth={200}
+                items={columnsToSelect}
+                showStatus
+                onUpdate={setColumns}
+            />
+        );
+    };
+
+    const renderExtraControls = () => {
+        return (
+            <Flex direction="row" gap={3}>
+                {renderCreateDBButton()}
+                {renderColumnSetup()}
+            </Flex>
+        );
+    };
+
     return (
         <div className={b('table-wrapper')}>
             <TableWithControlsLayout fullHeight>
-                <TableWithControlsLayout.Controls renderExtraControls={renderCreateDBButton}>
+                <TableWithControlsLayout.Controls renderExtraControls={renderExtraControls}>
                     {renderControls()}
                 </TableWithControlsLayout.Controls>
                 {error ? <ResponseError error={error} /> : null}
@@ -345,61 +411,3 @@ export const TenantsTable = ({
         </div>
     );
 };
-
-function getDBActionsColumn({
-    clusterName,
-    isEditDBAvailable,
-    isDeleteDBAvailable,
-}: {
-    clusterName: string;
-    isEditDBAvailable?: boolean;
-    isDeleteDBAvailable?: boolean;
-}) {
-    return {
-        name: 'actions',
-        header: '',
-        width: 40,
-        resizeable: false,
-        align: DataTable.CENTER,
-        render: ({row}) => {
-            const menuItems: (DropdownMenuItem | DropdownMenuItem[])[] = [];
-
-            // Do not show edit and delete actions for domain
-            if (row.Type === 'Domain') {
-                return null;
-            }
-
-            if (isEditDBAvailable) {
-                menuItems.push({
-                    text: i18n('edit'),
-                    iconStart: <Pencil />,
-                    action: () => {
-                        uiFactory.onEditDB?.({
-                            clusterName,
-                            databaseData: row,
-                        });
-                    },
-                });
-            }
-            if (isDeleteDBAvailable) {
-                menuItems.push({
-                    text: i18n('remove'),
-                    iconStart: <TrashBin />,
-                    action: () => {
-                        uiFactory.onDeleteDB?.({
-                            clusterName,
-                            databaseData: row,
-                        });
-                    },
-                    theme: 'danger',
-                });
-            }
-
-            if (!menuItems.length) {
-                return null;
-            }
-
-            return <DropdownMenu items={menuItems} />;
-        },
-    } satisfies Column<PreparedTenant>;
-}

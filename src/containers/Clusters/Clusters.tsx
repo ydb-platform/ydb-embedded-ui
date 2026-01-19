@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Magnifier} from '@gravity-ui/icons';
 import DataTable from '@gravity-ui/react-data-table';
-import {Icon, Select} from '@gravity-ui/uikit';
+import {Icon, Select, Text} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
@@ -175,13 +175,19 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     const renderColumnSetup = () => {
         return (
             <TableColumnSetup
-                className={b('column-setup')}
-                key="TableColumnSetup"
                 popupWidth={242}
                 items={columnsToSelect}
                 showStatus
                 onUpdate={setColumns}
             />
+        );
+    };
+
+    const renderClustersCount = () => {
+        return (
+            <Text variant="body-1" color="hint" className={b('clusters-count')}>
+                {i18n('clusters-count', {count: filteredClusters.length})}
+            </Text>
         );
     };
 
@@ -204,10 +210,14 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
 
     return (
         <TableWithControlsLayout fullHeight className={b(null)}>
-            <TableWithControlsLayout.Controls renderExtraControls={renderColumnSetup}>
+            <TableWithControlsLayout.Controls
+                className={b('controls')}
+                renderExtraControls={renderColumnSetup}
+            >
                 {renderControls()}
             </TableWithControlsLayout.Controls>
             {query.isError ? <ResponseError error={query.error} /> : null}
+            {renderClustersCount()}
             <TableWithControlsLayout.Table
                 scrollContainerRef={scrollContainerRef}
                 className={b('table-wrapper')}
