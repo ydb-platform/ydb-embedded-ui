@@ -1,5 +1,22 @@
 # Changelog
 
+## [14.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.2.0...v14.3.0) (2026-01-19)
+
+
+### Features
+
+* **HomePage:** finish databases tab ([#3324](https://github.com/ydb-platform/ydb-embedded-ui/issues/3324)) ([7fd5828](https://github.com/ydb-platform/ydb-embedded-ui/commit/7fd5828e4ca068fd54c15e4dfd56e84c588648fc))
+* implement manage partitioning modal ([#3283](https://github.com/ydb-platform/ydb-embedded-ui/issues/3283)) ([de019e7](https://github.com/ydb-platform/ydb-embedded-ui/commit/de019e7f77b4d159dfee3228d63859d9e1256630))
+* show unknown healthcheck issues ([#3303](https://github.com/ydb-platform/ydb-embedded-ui/issues/3303)) ([67fb7b8](https://github.com/ydb-platform/ydb-embedded-ui/commit/67fb7b8850364f58b23ea9d667bc1930b61dd4ee))
+
+
+### Bug Fixes
+
+* display Partitioning title only for row-oriented tables ([#3319](https://github.com/ydb-platform/ydb-embedded-ui/issues/3319)) ([32597f0](https://github.com/ydb-platform/ydb-embedded-ui/commit/32597f0339e7c6cb88e12fb2a262ede856457dcf))
+* **Node:** wait for capabilities before tabs ([#3314](https://github.com/ydb-platform/ydb-embedded-ui/issues/3314)) ([9c0cb57](https://github.com/ydb-platform/ydb-embedded-ui/commit/9c0cb5703cea5c25c3314a120ad32015032a7f5b))
+* show "Partitioning" title only for row-oriented and column tables ([#3318](https://github.com/ydb-platform/ydb-embedded-ui/issues/3318)) ([5fe172f](https://github.com/ydb-platform/ydb-embedded-ui/commit/5fe172fc6bc09e91f8ccb0a3484741ad86fda989))
+* **TablePreview:** pass base64 setting ([#3331](https://github.com/ydb-platform/ydb-embedded-ui/issues/3331)) ([f448d3a](https://github.com/ydb-platform/ydb-embedded-ui/commit/f448d3a2ee284cafdd97a2f3be359f7ccb2998ce))
+
 ## [14.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.1.0...v14.2.0) (2026-01-13)
 
 
