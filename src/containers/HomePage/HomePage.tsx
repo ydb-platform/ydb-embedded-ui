@@ -131,7 +131,7 @@ export function HomePage() {
             const envDomain = uiFactory.databasesEnvironmentsConfig?.getEnvironmentDomain?.(value);
 
             if (envDomain) {
-                const newPath = new URL(getDatabasesPath(), envDomain).toString();
+                const newPath = new URL(getDatabasesPath({env: value}), envDomain).toString();
 
                 window.location.href = newPath;
             } else {
