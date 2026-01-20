@@ -8,14 +8,17 @@ on:
 
 permissions:
   issues: write
+  contents: read
 
 jobs:
   create-release-issue:
     runs-on: ubuntu-latest
+    if: github.repository == 'ydb-platform/ydb-embedded-ui'
     steps:
       - name: Create weekly release issue
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const title = 'Release a new version of ydb-embedded-ui';
             const body = `## Release Checklist
@@ -30,10 +33,113 @@ jobs:
             - [ ] **Update yandex ydb-embedded-ui**
             `;
 
-            await github.rest.issues.create({
+            // Check if an open issue with this title already exists
+            const existingIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'area/duty',
+              per_page: 100
+            });
+
+            const duplicateIssue = existingIssues.data.find(issue => issue.title === title);
+
+            if (duplicateIssue) {
+              console.log(`Issue already exists: #${duplicateIssue.number}`);
+              console.log(`Skipping creation to avoid duplicates`);
+              return;
+            }
+
+            // Create the issue
+            const issue = await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: title,
               body: body,
               labels: ['area/duty', 'size/m']
             });
+
+            console.log(`Created issue #${issue.data.number}`);
+
+            // Add issue to project and set current iteration
+            try {
+              const projectNumber = 24;
+              const orgName = 'ydb-platform';
+
+              // Get project and iteration data in one query
+              const projectData = await github.graphql(`
+                query($org: String!, $number: Int!) {
+                  organization(login: $org) {
+                    projectV2(number: $number) {
+                      id
+                      field(name: "Iteration") {
+                        ... on ProjectV2IterationField {
+                          id
+                          configuration {
+                            iterations {
+                              id
+                              title
+                              startDate
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              `, { org: orgName, number: projectNumber });
+
+              const project = projectData.organization.projectV2;
+              
+              // Add issue to project
+              const addResult = await github.graphql(`
+                mutation($projectId: ID!, $contentId: ID!) {
+                  addProjectV2ItemById(input: {projectId: $projectId, contentId: $contentId}) {
+                    item { id }
+                  }
+                }
+              `, {
+                projectId: project.id,
+                contentId: issue.data.node_id
+              });
+
+              console.log(`Added issue to project`);
+
+              // Set current iteration if field exists
+              if (project.field) {
+                const today = new Date();
+                const currentIteration = project.field.configuration.iterations
+                  .filter(iter => new Date(iter.startDate) <= today)
+                  .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0];
+
+                if (currentIteration) {
+                  await github.graphql(`
+                    mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $iterationId: String!) {
+                      updateProjectV2ItemFieldValue(
+                        input: {
+                          projectId: $projectId
+                          itemId: $itemId
+                          fieldId: $fieldId
+                          value: { iterationId: $iterationId }
+                        }
+                      ) {
+                        projectV2Item { id }
+                      }
+                    }
+                  `, {
+                    projectId: project.id,
+                    itemId: addResult.addProjectV2ItemById.item.id,
+                    fieldId: project.field.id,
+                    iterationId: currentIteration.id
+                  });
+
+                  console.log(`Set iteration to: ${currentIteration.title}`);
+                } else {
+                  console.log('No current iteration found');
+                }
+              } else {
+                console.log('Iteration field not found in project');
+              }
+            } catch (error) {
+              console.error('Error adding to project:', error);
+            }
