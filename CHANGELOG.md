@@ -1,5 +1,13 @@
 # Changelog
 
+## [14.3.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.3.0...v14.3.1) (2026-01-20)
+
+
+### Bug Fixes
+
+* **HomePage:** pass env in tabs databases path ([#3335](https://github.com/ydb-platform/ydb-embedded-ui/issues/3335)) ([668f1f9](https://github.com/ydb-platform/ydb-embedded-ui/commit/668f1f9abde91bdbb1b41f4191a559c71664cec4))
+* reset params when navigate clusters ([#3334](https://github.com/ydb-platform/ydb-embedded-ui/issues/3334)) ([48f577e](https://github.com/ydb-platform/ydb-embedded-ui/commit/48f577eb92ca537fd6023951a133f547c163fffe))
+
 ## [14.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.2.0...v14.3.0) (2026-01-19)
 
 
