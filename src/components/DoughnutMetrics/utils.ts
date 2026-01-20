@@ -1,6 +1,6 @@
 // Constants
 export const SIZE_CONFIG = {
-    small: {width: 65, strokeWidth: 12, textVariant: 'subheader-1'},
+    small: {width: 65, strokeWidth: 8, textVariant: 'subheader-1'},
     medium: {width: 100, strokeWidth: 16, textVariant: 'subheader-2'},
     large: {width: 130, strokeWidth: 20, textVariant: 'subheader-3'},
 } as const;
