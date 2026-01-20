@@ -66,6 +66,7 @@ export interface CreateHrefOptions {
     withBasename?: boolean;
 }
 
+// eslint-disable-next-line complexity
 export function createHref(
     route: string,
     params?: Record<string, string | number | undefined>,
