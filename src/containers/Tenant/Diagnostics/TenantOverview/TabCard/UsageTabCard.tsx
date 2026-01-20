@@ -42,7 +42,7 @@ export function UsageTabCard({
     active,
 }: UsageTabCardProps) {
     const diagram = React.useMemo(
-        () => getDiagramValues({value, capacity: limit, legendFormatter}),
+        () => getDiagramValues({value, capacity: limit, legendFormatter, percentPrecision: 1}),
         [value, limit, legendFormatter],
     );
 
