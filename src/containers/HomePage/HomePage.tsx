@@ -46,9 +46,7 @@ export function HomePage() {
     const metaEnvironmentsAvailable = useMetaEnvironmentsAvailable();
     const isViewerUser = useIsViewerUser();
 
-    const [savedHomePageTab, saveHomePageTab] = useSetting<string | undefined>(
-        SETTING_KEYS.HOME_PAGE_TAB,
-    );
+    const [savedHomePageTab, saveHomePageTab] = useSetting<HomePageTab>(SETTING_KEYS.HOME_PAGE_TAB);
 
     const {
         data: environments,
@@ -73,7 +71,7 @@ export function HomePage() {
             return 'databases';
         }
 
-        return homePageTabSchema.parse(tabFromPath ?? savedHomePageTab);
+        return homePageTabSchema.catch(savedHomePageTab).parse(tabFromPath);
     }, [isViewerUser, tabFromPath, savedHomePageTab, metaEnvironmentsAvailable]);
 
     const initialPageTitle =

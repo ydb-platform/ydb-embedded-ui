@@ -17,23 +17,26 @@ export function useDatabasesPageEnvironment(environments?: string[]) {
     const metaEnvironmentsAvailable = useMetaEnvironmentsAvailable();
 
     const databasesPageEnvironment = React.useMemo<string | undefined>(() => {
-        if (!metaEnvironmentsAvailable) {
+        if (!metaEnvironmentsAvailable || !environments) {
             return undefined;
         }
-        if (!environments) {
+
+        // Do not use environment with external domain
+        // if it comes from query or settings
+        if (isSameDomainValidEnv(envParamFromQuery, environments)) {
+            return envParamFromQuery;
+        }
+        if (isSameDomainValidEnv(savedEnvironment, environments)) {
             return savedEnvironment;
         }
 
-        const pageEnvironment = envParamFromQuery ?? savedEnvironment;
-
-        if (pageEnvironment && environments?.includes(pageEnvironment)) {
-            return pageEnvironment;
-        }
         const factoryDefault = uiFactory.databasesEnvironmentsConfig?.getDefaultEnvironment?.();
-        if (factoryDefault && environments?.includes(factoryDefault)) {
+        if (isSameDomainValidEnv(factoryDefault, environments)) {
             return factoryDefault;
         }
-        return environments?.[0];
+
+        // Return first env that does not have specified external domain
+        return environments.find((env) => !getEnvDomain(env));
     }, [metaEnvironmentsAvailable, envParamFromQuery, savedEnvironment, environments]);
 
     const handleEnvironmentChange = React.useCallback(
@@ -49,4 +52,14 @@ export function useDatabasesPageEnvironment(environments?: string[]) {
         envParamFromQuery,
         handleEnvironmentChange,
     };
+}
+
+function isSameDomainValidEnv(
+    env: string | null | undefined,
+    environments: string[],
+): env is string {
+    return Boolean(env && environments.includes(env) && !getEnvDomain(env));
+}
+function getEnvDomain(env: string) {
+    return uiFactory.databasesEnvironmentsConfig?.getEnvironmentDomain?.(env);
 }
