@@ -5,35 +5,37 @@ import {createMonacoGhostInstance} from '@ydb-platform/monaco-ghost';
 import throttle from 'lodash/throttle';
 import type Monaco from 'monaco-editor';
 
-import {MonacoEditor} from '../../../../components/MonacoEditor/MonacoEditor';
+import {MonacoEditor} from '../../../../../components/MonacoEditor/MonacoEditor';
 import {
     closeQueryTab,
     renameQueryTab,
     selectActiveTab,
     selectUserInput,
     setIsDirty,
-} from '../../../../store/reducers/query/query';
-import type {QueryInHistory} from '../../../../store/reducers/query/types';
-import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
-import type {QueryAction} from '../../../../types/store/query';
+} from '../../../../../store/reducers/query/query';
+import type {QueryInHistory} from '../../../../../store/reducers/query/types';
+import {SETTING_KEYS} from '../../../../../store/reducers/settings/constants';
+import type {QueryAction} from '../../../../../types/store/query';
 import {
     useEventHandler,
     useSetting,
     useTypedDispatch,
     useTypedSelector,
-} from '../../../../utils/hooks';
-import {YQL_LANGUAGE_ID} from '../../../../utils/monaco/constats';
-import {useUpdateErrorsHighlighting} from '../../../../utils/monaco/highlightErrors';
-import {QUERY_ACTIONS} from '../../../../utils/query';
-import {SAVE_QUERY_DIALOG} from '../SaveQuery/SaveQuery';
-import i18n from '../i18n';
-import {useSavedQueries} from '../utils/useSavedQueries';
+} from '../../../../../utils/hooks';
+import {YQL_LANGUAGE_ID} from '../../../../../utils/monaco/constats';
+import {useUpdateErrorsHighlighting} from '../../../../../utils/monaco/highlightErrors';
+import {QUERY_ACTIONS} from '../../../../../utils/query';
+import {SAVE_QUERY_DIALOG} from '../../SaveQuery/SaveQuery';
+import i18n from '../../i18n';
+import {useSavedQueries} from '../../utils/useSavedQueries';
+import {RENAME_TAB_DIALOG} from '../EditorTabs/RenameTabDialog';
+import {useCodeAssistHelpers} from '../hooks/useCodeAssistHelpers';
+import {useEditorOptions} from '../hooks/useEditorOptions';
+import {useQueryTabsActions} from '../hooks/useQueryTabsActions';
+import {queryManagerInstance} from '../utils/queryManager';
+import {TabsManager} from '../utils/tabsManager';
 
-import {RENAME_TAB_DIALOG} from './RenameTabDialog';
-import {queryManagerInstance, useCodeAssistHelpers, useEditorOptions} from './helpers';
 import {getKeyBindings} from './keybindings';
-import {MonacoTabsManager} from './monacoTabsManager';
-import {useQueryTabsActions} from './useQueryTabsActions';
 
 const CONTEXT_MENU_GROUP_ID = 'navigation';
 
@@ -92,7 +94,7 @@ export function YqlEditor({
 
     const editorRef = React.useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
     const monacoRef = React.useRef<typeof Monaco | null>(null);
-    const monacoTabsManagerRef = React.useRef(new MonacoTabsManager());
+    const tabsManagerRef = React.useRef(new TabsManager());
     const programmaticValueRef = React.useRef<string | null>(null);
     const skipDirtyOnceRef = React.useRef(false);
 
@@ -107,7 +109,7 @@ export function YqlEditor({
             return;
         }
 
-        monacoTabsManagerRef.current.setActiveTabModel({
+        tabsManagerRef.current.setActiveTabModel({
             tabId: activeTabId,
             nextValue: input,
             editor,
@@ -123,7 +125,7 @@ export function YqlEditor({
             return;
         }
 
-        monacoTabsManagerRef.current.disposeRemovedTabs(tabsOrder);
+        tabsManagerRef.current.disposeRemovedTabs(tabsOrder);
     }, [isMultiTabEnabled, tabsOrder]);
 
     const [lastUsedQueryAction] = useSetting<QueryAction>(SETTING_KEYS.LAST_USED_QUERY_ACTION);
@@ -194,7 +196,7 @@ export function YqlEditor({
 
     const editorWillUnmount = () => {
         window.ydbEditor = undefined;
-        monacoTabsManagerRef.current.disposeAll();
+        tabsManagerRef.current.disposeAll();
         editorRef.current = null;
         monacoRef.current = null;
     };
@@ -217,7 +219,7 @@ export function YqlEditor({
         monacoRef.current = monaco;
 
         if (isMultiTabEnabled) {
-            monacoTabsManagerRef.current.setActiveTabModel({
+            tabsManagerRef.current.setActiveTabModel({
                 tabId: activeTabId,
                 nextValue: input,
                 editor,

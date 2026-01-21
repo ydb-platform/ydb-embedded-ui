@@ -20,17 +20,17 @@ import {
     closeQueryTab,
     renameQueryTab,
     setActiveQueryTab,
-} from '../../../../store/reducers/query/query';
-import type {QueryTabState} from '../../../../store/reducers/query/types';
-import {cn} from '../../../../utils/cn';
-import {useTypedDispatch} from '../../../../utils/hooks';
-import {SAVE_QUERY_DIALOG} from '../SaveQuery/SaveQuery';
-import i18n from '../i18n';
-import {useSavedQueries} from '../utils/useSavedQueries';
+} from '../../../../../store/reducers/query/query';
+import type {QueryTabState} from '../../../../../store/reducers/query/types';
+import {cn} from '../../../../../utils/cn';
+import {useTypedDispatch} from '../../../../../utils/hooks';
+import {SAVE_QUERY_DIALOG} from '../../SaveQuery/SaveQuery';
+import i18n from '../../i18n';
+import {useSavedQueries} from '../../utils/useSavedQueries';
+import {useQueryTabsActions} from '../hooks/useQueryTabsActions';
+import {queryManagerInstance} from '../utils/queryManager';
 
 import {RENAME_TAB_DIALOG} from './RenameTabDialog';
-import {queryManagerInstance} from './helpers';
-import {useQueryTabsActions} from './useQueryTabsActions';
 
 const b = cn('query-editor');
 

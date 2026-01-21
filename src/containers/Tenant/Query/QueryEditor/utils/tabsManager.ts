@@ -1,10 +1,10 @@
 import type Monaco from 'monaco-editor';
 
-import {YQL_LANGUAGE_ID} from '../../../../utils/monaco/constats';
+import {YQL_LANGUAGE_ID} from '../../../../../utils/monaco/constats';
 
 type MonacoApi = typeof Monaco;
 
-export class MonacoTabsManager {
+export class TabsManager {
     private readonly modelsByTabId = new Map<string, Monaco.editor.ITextModel>();
     private readonly viewStatesByTabId = new Map<
         string,

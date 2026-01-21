@@ -53,9 +53,9 @@ import {QueryEditorControls} from '../QueryEditorControls/QueryEditorControls';
 import {QueryResultViewer} from '../QueryResult/QueryResultViewer';
 import {QuerySettingsDialog} from '../QuerySettingsDialog/QuerySettingsDialog';
 
-import {EditorTabs} from './EditorTabs';
-import {YqlEditor} from './YqlEditor';
-import {queryManagerInstance} from './helpers';
+import {EditorTabs} from './EditorTabs/EditorTabs';
+import {YqlEditor} from './YqlEditor/YqlEditor';
+import {queryManagerInstance} from './utils/queryManager';
 
 import './QueryEditor.scss';
 

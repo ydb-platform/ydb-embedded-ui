@@ -10,11 +10,10 @@ import {
     selectTabsById,
     selectTabsOrder,
     setActiveQueryTab,
-} from '../../../../store/reducers/query/query';
-import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
-import i18n from '../i18n';
-
-import {queryManagerInstance} from './helpers';
+} from '../../../../../store/reducers/query/query';
+import {useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
+import i18n from '../../i18n';
+import {queryManagerInstance} from '../utils/queryManager';
 
 export function useQueryTabsActions() {
     const dispatch = useTypedDispatch();
