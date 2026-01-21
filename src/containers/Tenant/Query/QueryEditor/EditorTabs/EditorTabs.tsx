@@ -13,22 +13,13 @@ import {
 } from '@gravity-ui/icons';
 import type {DropdownMenuItem} from '@gravity-ui/uikit';
 import {Button, DropdownMenu, Flex, Loader, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
-import {v4 as uuidv4} from 'uuid';
 
-import {
-    addQueryTab,
-    closeQueryTab,
-    renameQueryTab,
-    setActiveQueryTab,
-} from '../../../../../store/reducers/query/query';
 import type {QueryTabState} from '../../../../../store/reducers/query/types';
 import {cn} from '../../../../../utils/cn';
-import {useTypedDispatch} from '../../../../../utils/hooks';
 import {SAVE_QUERY_DIALOG} from '../../SaveQuery/SaveQuery';
 import i18n from '../../i18n';
 import {useSavedQueries} from '../../utils/useSavedQueries';
 import {useQueryTabsActions} from '../hooks/useQueryTabsActions';
-import {queryManagerInstance} from '../utils/queryManager';
 
 import {RENAME_TAB_DIALOG} from './RenameTabDialog';
 
@@ -210,79 +201,41 @@ function EditorTabItem({
 }
 
 export function EditorTabs() {
-    const dispatch = useTypedDispatch();
-    const {activeTabId, tabsOrder, tabsById, handleTabSwitch, handleNewTabClick} =
-        useQueryTabsActions();
+    const {
+        activeTabId,
+        tabsOrder,
+        tabsById,
+        handleTabSwitch,
+        handleActivateTab,
+        handleNewTabClick,
+        handleCloseTab,
+        handleCloseOtherTabs,
+        handleCloseAllTabs,
+        handleDuplicateTab,
+        handleRenameTab: renameTab,
+    } = useQueryTabsActions();
 
     const {savedQueries, saveQuery} = useSavedQueries();
 
-    const handleActivateTab = React.useCallback(
-        (tabId: string) => {
-            dispatch(setActiveQueryTab({tabId}));
-        },
-        [dispatch],
-    );
-
-    const closeTab = React.useCallback(
-        (tabId: string) => {
-            queryManagerInstance.abortQuery(tabId);
-            dispatch(closeQueryTab({tabId}));
-        },
-        [dispatch],
-    );
-
-    const handleCloseOtherTabs = React.useCallback(
-        (baseTabId: string) => {
-            tabsOrder.filter((tabId) => tabId !== baseTabId).forEach(closeTab);
-        },
-        [closeTab, tabsOrder],
-    );
-
-    const handleCloseAllTabs = React.useCallback(() => {
-        tabsOrder.forEach(closeTab);
-    }, [closeTab, tabsOrder]);
-
     const handleSaveQueryAs = React.useCallback(
         (tabId: string) => {
-            dispatch(setActiveQueryTab({tabId}));
+            handleActivateTab(tabId);
             NiceModal.show(SAVE_QUERY_DIALOG, {
                 savedQueries,
                 onSaveQuery: saveQuery,
             });
         },
-        [dispatch, savedQueries, saveQuery],
+        [handleActivateTab, savedQueries, saveQuery],
     );
 
     const handleRenameTab = React.useCallback(
         (tabId: string, currentTitle: string) => {
             NiceModal.show(RENAME_TAB_DIALOG, {
                 title: currentTitle,
-                onRename: (title: string) => dispatch(renameQueryTab({tabId, title})),
+                onRename: (title: string) => renameTab(tabId, title),
             });
         },
-        [dispatch],
-    );
-
-    const handleDuplicateTab = React.useCallback(
-        (tabId: string) => {
-            const tab = tabsById[tabId];
-            if (!tab) {
-                return;
-            }
-
-            const newTabId = uuidv4();
-            const baseTitle = tab.title || i18n('editor-tabs.untitled');
-
-            dispatch(
-                addQueryTab({
-                    tabId: newTabId,
-                    title: i18n('editor-tabs.duplicate-title', {title: baseTitle}),
-                    input: tab.input,
-                    makeActive: true,
-                }),
-            );
-        },
-        [dispatch, tabsById],
+        [renameTab],
     );
 
     const renderEditorTab = React.useCallback(
@@ -299,7 +252,7 @@ export function EditorTabs() {
                     tab={tab}
                     isActive={tabId === activeTabId}
                     onActivate={handleActivateTab}
-                    onCloseTab={closeTab}
+                    onCloseTab={handleCloseTab}
                     onDuplicateTab={handleDuplicateTab}
                     onRenameTab={handleRenameTab}
                     onSaveQueryAs={handleSaveQueryAs}
@@ -310,8 +263,8 @@ export function EditorTabs() {
         },
         [
             activeTabId,
-            closeTab,
             handleActivateTab,
+            handleCloseTab,
             handleCloseAllTabs,
             handleCloseOtherTabs,
             handleDuplicateTab,

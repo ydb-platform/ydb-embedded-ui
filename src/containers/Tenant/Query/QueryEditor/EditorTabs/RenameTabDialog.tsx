@@ -41,12 +41,7 @@ function RenameTabDialog({
         handleClose();
     }, [handleClose, nextTitle, onRename]);
 
-    React.useEffect(() => {
-        if (open) {
-            setNextTitle(title);
-            setErrorMessage(undefined);
-        }
-    }, [open, title]);
+    const controlRef = React.useRef<null | HTMLInputElement>(null);
 
     return (
         <Dialog
@@ -55,6 +50,7 @@ function RenameTabDialog({
             size="s"
             onClose={handleClose}
             onEnterKeyDown={handleApply}
+            initialFocus={controlRef}
         >
             <Dialog.Header caption={i18n('editor-tabs.rename-dialog.title')} />
             <Dialog.Body>
@@ -62,7 +58,7 @@ function RenameTabDialog({
                     value={nextTitle}
                     onUpdate={handleTitleChange}
                     placeholder={i18n('editor-tabs.rename-dialog.input-placeholder')}
-                    autoFocus
+                    controlRef={controlRef}
                     hasClear
                     autoComplete={false}
                     validationState={errorMessage ? 'invalid' : undefined}

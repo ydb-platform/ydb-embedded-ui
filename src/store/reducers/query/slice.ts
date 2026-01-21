@@ -88,9 +88,49 @@ function createTabStateFromPersisted({
 
 function createInitialTabsState(): Pick<QueryState, 'activeTabId' | 'tabsOrder' | 'tabsById'> {
     const rawTabs = loadFromSessionStorage(QUERY_EDITOR_CURRENT_QUERY_KEY);
-    const persistedTabs = isQueryTabsPersistedState(rawTabs) ? rawTabs : undefined;
-
     const rawDirty = loadFromSessionStorage(QUERY_EDITOR_DIRTY_KEY);
+
+    // Backward-compatible migration:
+    // Previously `QUERY_EDITOR_CURRENT_QUERY_KEY` stored a plain string query text.
+    // New format expects `QueryTabsPersistedState`. If legacy string is detected, migrate to a
+    // single-tab persisted state and overwrite sessionStorage in the new format.
+    if (typeof rawTabs === 'string') {
+        const tabId = uuidv4();
+        const legacyDirty = typeof rawDirty === 'boolean' ? rawDirty : false;
+
+        const tab = createDefaultTabState({tabId, input: rawTabs});
+        tab.isDirty = legacyDirty;
+
+        const persistedState: QueryTabsPersistedState = {
+            activeTabId: tabId,
+            tabsOrder: [tabId],
+            tabsById: {
+                [tabId]: {
+                    id: tabId,
+                    title: tab.title,
+                    input: tab.input,
+                    createdAt: tab.createdAt,
+                    updatedAt: tab.updatedAt,
+                },
+            },
+        };
+        saveToSessionStorage(QUERY_EDITOR_CURRENT_QUERY_KEY, persistedState);
+
+        const persistedDirtyState: QueryTabsDirtyPersistedState = {
+            [tabId]: legacyDirty,
+        };
+        saveToSessionStorage(QUERY_EDITOR_DIRTY_KEY, persistedDirtyState);
+
+        return {
+            activeTabId: tabId,
+            tabsOrder: [tabId],
+            tabsById: {
+                [tabId]: tab,
+            },
+        };
+    }
+
+    const persistedTabs = isQueryTabsPersistedState(rawTabs) ? rawTabs : undefined;
     const persistedDirty = isQueryTabsDirtyPersistedState(rawDirty) ? rawDirty : undefined;
 
     if (!persistedTabs || Object.keys(persistedTabs.tabsById).length === 0) {

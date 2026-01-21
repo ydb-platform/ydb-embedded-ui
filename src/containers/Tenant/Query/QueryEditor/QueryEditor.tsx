@@ -55,7 +55,7 @@ import {QuerySettingsDialog} from '../QuerySettingsDialog/QuerySettingsDialog';
 
 import {EditorTabs} from './EditorTabs/EditorTabs';
 import {YqlEditor} from './YqlEditor/YqlEditor';
-import {queryManagerInstance} from './utils/queryManager';
+import {queryExecutionManagerInstance} from './utils/queryExecutionManager';
 
 import './QueryEditor.scss';
 
@@ -124,7 +124,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
     const [sendQuery] = queryApi.useUseSendQueryMutation();
     const [streamQuery] = queryApi.useUseStreamQueryMutation();
 
-    const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
+    const isMultiTabQueryEditorEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
 
     // Normalize stored resourcePool if it's not available for current database
     React.useEffect(() => {
@@ -191,7 +191,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
         const queryId = uuidv4();
 
         // Abort previous query if there was any
-        queryManagerInstance.abortQuery(activeTabId);
+        queryExecutionManagerInstance.abortQuery(activeTabId);
 
         if (isStreamingEnabled) {
             reachMetricaGoal('runQuery', {
@@ -209,7 +209,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
                 base64: encodeTextWithBase64,
             });
 
-            queryManagerInstance.registerQuery(activeTabId, query);
+            queryExecutionManagerInstance.registerQuery(activeTabId, query);
         } else {
             reachMetricaGoal('runQuery', {actionType: 'execute', ...querySettings});
             const query = sendQuery({
@@ -234,7 +234,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
                     console.error('Failed to update query history:', error);
                 });
 
-            queryManagerInstance.registerQuery(activeTabId, query);
+            queryExecutionManagerInstance.registerQuery(activeTabId, query);
         }
 
         dispatch(setShowPreview(false));
@@ -279,7 +279,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
             base64: encodeTextWithBase64,
         });
 
-        queryManagerInstance.registerQuery(activeTabId, query);
+        queryExecutionManagerInstance.registerQuery(activeTabId, query);
 
         dispatch(setShowPreview(false));
 
@@ -328,13 +328,12 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
                         top: true,
                     })}
                 >
-                    {isMultiTabEnabled ? <EditorTabs /> : null}
+                    {isMultiTabQueryEditorEnabled ? <EditorTabs /> : null}
                     <div className={b('monaco-wrapper')}>
                         <div className={b('monaco')}>
                             <YqlEditor
                                 changeUserInput={changeUserInput}
                                 theme={theme}
-                                isMultiTabEnabled={isMultiTabEnabled}
                                 handleSendExecuteClick={handleSendExecuteClick}
                                 handleGetExplainQueryClick={handleGetExplainQueryClick}
                                 historyQueries={historyQueries}

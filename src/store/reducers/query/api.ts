@@ -141,30 +141,18 @@ export const queryApi = api.injectEndpoints({
                             action,
                             syntax,
                             stats: querySettings.statisticsMode,
-                            tracingLevel:
-                                querySettings.tracingLevel && enableTracingLevel
-                                    ? TracingLevelNumber[querySettings.tracingLevel]
-                                    : undefined,
-                            limit_rows: isNumeric(querySettings.limitRows)
-                                ? Number(querySettings.limitRows)
-                                : undefined,
-                            transaction_mode:
-                                querySettings.transactionMode === 'implicit'
-                                    ? undefined
-                                    : querySettings.transactionMode,
-                            timeout: isNumeric(querySettings.timeout)
-                                ? Number(querySettings.timeout) * 1000
-                                : undefined,
+                            tracingLevel: getTracingLevelParam(querySettings, enableTracingLevel),
+                            limit_rows: getLimitRowsParam(querySettings.limitRows),
+                            transaction_mode: getTransactionModeParam(
+                                querySettings.transactionMode,
+                            ),
+                            timeout: getTimeoutMsParam(querySettings.timeout),
                             output_chunk_max_size: isNumeric(querySettings.outputChunkMaxSize)
                                 ? Number(querySettings.outputChunkMaxSize)
                                 : undefined,
                             concurrent_results: DEFAULT_CONCURRENT_RESULTS || undefined,
                             base64,
-                            resource_pool:
-                                querySettings.resourcePool === RESOURCE_POOL_NO_OVERRIDE_VALUE ||
-                                !querySettings.resourcePool
-                                    ? undefined
-                                    : querySettings.resourcePool,
+                            resource_pool: getResourcePoolParam(querySettings.resourcePool),
                         },
                         {
                             signal,

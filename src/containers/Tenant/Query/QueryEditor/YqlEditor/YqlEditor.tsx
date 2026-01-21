@@ -16,6 +16,7 @@ import {
 import type {QueryInHistory} from '../../../../../store/reducers/query/types';
 import {SETTING_KEYS} from '../../../../../store/reducers/settings/constants';
 import type {QueryAction} from '../../../../../types/store/query';
+import {uiFactory} from '../../../../../uiFactory/uiFactory';
 import {
     useEventHandler,
     useSetting,
@@ -32,7 +33,7 @@ import {RENAME_TAB_DIALOG} from '../EditorTabs/RenameTabDialog';
 import {useCodeAssistHelpers} from '../hooks/useCodeAssistHelpers';
 import {useEditorOptions} from '../hooks/useEditorOptions';
 import {useQueryTabsActions} from '../hooks/useQueryTabsActions';
-import {queryManagerInstance} from '../utils/queryManager';
+import {queryExecutionManagerInstance} from '../utils/queryExecutionManager';
 import {TabsManager} from '../utils/tabsManager';
 
 import {getKeyBindings} from './keybindings';
@@ -55,7 +56,6 @@ function isSnippetController(value: unknown): value is SnippetController {
 interface YqlEditorProps {
     changeUserInput: (arg: {input: string}) => void;
     theme: string;
-    isMultiTabEnabled: boolean;
     handleGetExplainQueryClick: (text: string) => void;
     handleSendExecuteClick: (text: string, partial?: boolean) => void;
     historyQueries: QueryInHistory[];
@@ -66,7 +66,6 @@ interface YqlEditorProps {
 export function YqlEditor({
     changeUserInput,
     theme,
-    isMultiTabEnabled,
     handleSendExecuteClick,
     handleGetExplainQueryClick,
     historyQueries,
@@ -98,8 +97,10 @@ export function YqlEditor({
     const programmaticValueRef = React.useRef<string | null>(null);
     const skipDirtyOnceRef = React.useRef(false);
 
+    const isMultiTabQueryEditorEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
+
     React.useEffect(() => {
-        if (!isMultiTabEnabled) {
+        if (!isMultiTabQueryEditorEnabled) {
             return;
         }
 
@@ -118,15 +119,15 @@ export function YqlEditor({
                 programmaticValueRef.current = nextValue;
             },
         });
-    }, [activeTabId, input, isMultiTabEnabled]);
+    }, [activeTabId, input, isMultiTabQueryEditorEnabled]);
 
     React.useEffect(() => {
-        if (!isMultiTabEnabled) {
+        if (!isMultiTabQueryEditorEnabled) {
             return;
         }
 
         tabsManagerRef.current.disposeRemovedTabs(tabsOrder);
-    }, [isMultiTabEnabled, tabsOrder]);
+    }, [isMultiTabQueryEditorEnabled, tabsOrder]);
 
     const [lastUsedQueryAction] = useSetting<QueryAction>(SETTING_KEYS.LAST_USED_QUERY_ACTION);
 
@@ -163,7 +164,7 @@ export function YqlEditor({
 
     const closeTabById = React.useCallback(
         (tabId: string) => {
-            queryManagerInstance.abortQuery(tabId);
+            queryExecutionManagerInstance.abortQuery(tabId);
             dispatch(closeQueryTab({tabId}));
         },
         [dispatch],
@@ -218,7 +219,7 @@ export function YqlEditor({
         editorRef.current = editor;
         monacoRef.current = monaco;
 
-        if (isMultiTabEnabled) {
+        if (isMultiTabQueryEditorEnabled) {
             tabsManagerRef.current.setActiveTabModel({
                 tabId: activeTabId,
                 nextValue: input,
@@ -237,9 +238,10 @@ export function YqlEditor({
                 editor.getContribution<Monaco.editor.IEditorContribution>('snippetController2');
             if (isSnippetController(contribution)) {
                 editor.focus();
-                editor.setValue('');
-                contribution.insert(snippet);
                 skipDirtyOnceRef.current = true;
+                editor.setValue('');
+                skipDirtyOnceRef.current = true;
+                contribution.insert(snippet);
                 dispatch(setIsDirty(false));
             }
         });
@@ -318,12 +320,7 @@ export function YqlEditor({
             id: 'save-query',
             label: i18n('action.save-query'),
             keybindings: [keybindings.saveQuery],
-            run: () => {
-                NiceModal.show(SAVE_QUERY_DIALOG, {
-                    savedQueries,
-                    onSaveQuery: saveQuery,
-                });
-            },
+            run: () => handleSaveQueryAsAction(),
         });
         editor.addAction({
             id: 'openKeyboardShortcutsPanel',
@@ -338,7 +335,7 @@ export function YqlEditor({
             },
         });
 
-        if (isMultiTabEnabled) {
+        if (isMultiTabQueryEditorEnabled) {
             editor.addAction({
                 id: 'newEditorTab',
                 label: i18n('editor-tabs.action.new-tab'),

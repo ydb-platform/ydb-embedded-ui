@@ -1,13 +1,16 @@
-type AbortablePromiseLike = {abort: VoidFunction} & PromiseLike<unknown>;
+type AbortablePromiseLike = PromiseLike<unknown> & {
+    abort: VoidFunction;
+    finally: (onFinally?: (() => void) | null) => PromiseLike<unknown>;
+};
 
-class QueryManager {
+class QueryExecutionManager {
     private readonly queries = new Map<string, {abort: VoidFunction}>();
 
     registerQuery(tabId: string, query: AbortablePromiseLike) {
         this.queries.set(tabId, query);
 
         const queryRef = query;
-        Promise.resolve(query).finally(() => {
+        query.finally(() => {
             if (this.queries.get(tabId) === queryRef) {
                 this.queries.delete(tabId);
             }
@@ -30,4 +33,4 @@ class QueryManager {
     }
 }
 
-export const queryManagerInstance = new QueryManager();
+export const queryExecutionManagerInstance = new QueryExecutionManager();

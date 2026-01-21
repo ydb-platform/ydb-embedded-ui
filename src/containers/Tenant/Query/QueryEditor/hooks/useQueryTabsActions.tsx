@@ -13,14 +13,13 @@ import {
 } from '../../../../../store/reducers/query/query';
 import {useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
 import i18n from '../../i18n';
-import {queryManagerInstance} from '../utils/queryManager';
+import {queryExecutionManagerInstance} from '../utils/queryExecutionManager';
 
 export function useQueryTabsActions() {
     const dispatch = useTypedDispatch();
     const activeTabId = useTypedSelector(selectActiveTabId);
     const tabsOrder = useTypedSelector(selectTabsOrder);
     const tabsById = useTypedSelector(selectTabsById);
-    const activeTab = tabsById[activeTabId];
 
     const handleTabSwitch = React.useCallback(
         (tabId: string) => {
@@ -29,38 +28,57 @@ export function useQueryTabsActions() {
         [dispatch],
     );
 
-    const closeTab = React.useCallback(
+    const handleActivateTab = handleTabSwitch;
+
+    const handleCloseTab = React.useCallback(
         (tabId: string) => {
-            queryManagerInstance.abortQuery(tabId);
+            queryExecutionManagerInstance.abortQuery(tabId);
             dispatch(closeQueryTab({tabId}));
         },
         [dispatch],
     );
 
     const handleCloseActiveTab = React.useCallback(() => {
-        closeTab(activeTabId);
-    }, [activeTabId, closeTab]);
+        handleCloseTab(activeTabId);
+    }, [activeTabId, handleCloseTab]);
 
-    const handleDuplicateActiveTab = React.useCallback(() => {
-        if (!activeTab) {
-            return;
-        }
-
-        const tabId = uuidv4();
-        dispatch(
-            addQueryTab({
-                tabId,
-                title: i18n('editor-tabs.duplicate-title', {title: activeTab.title}),
-                input: activeTab.input,
-            }),
-        );
-    }, [activeTab, dispatch]);
-
-    const handleRenameActiveTab = React.useCallback(
-        (title: string) => {
-            dispatch(renameQueryTab({tabId: activeTabId, title}));
+    const handleCloseOtherTabs = React.useCallback(
+        (baseTabId: string) => {
+            tabsOrder.filter((tabId) => tabId !== baseTabId).forEach(handleCloseTab);
         },
-        [activeTabId, dispatch],
+        [handleCloseTab, tabsOrder],
+    );
+
+    const handleCloseAllTabs = React.useCallback(() => {
+        tabsOrder.forEach(handleCloseTab);
+    }, [handleCloseTab, tabsOrder]);
+
+    const handleDuplicateTab = React.useCallback(
+        (baseTabId: string) => {
+            const tab = tabsById[baseTabId];
+            if (!tab) {
+                return;
+            }
+
+            const baseTitle = tab.title || i18n('editor-tabs.untitled');
+            const tabId = uuidv4();
+            dispatch(
+                addQueryTab({
+                    tabId,
+                    title: i18n('editor-tabs.duplicate-title', {title: baseTitle}),
+                    input: tab.input,
+                    makeActive: true,
+                }),
+            );
+        },
+        [dispatch, tabsById],
+    );
+
+    const handleRenameTab = React.useCallback(
+        (tabId: string, title: string) => {
+            dispatch(renameQueryTab({tabId, title}));
+        },
+        [dispatch],
     );
 
     const handleNewTabClick = React.useCallback(() => {
@@ -105,10 +123,14 @@ export function useQueryTabsActions() {
         tabsOrder,
         tabsById,
         handleTabSwitch,
+        handleActivateTab,
         handleNewTabClick,
+        handleCloseTab,
         handleCloseActiveTab,
-        handleDuplicateActiveTab,
-        handleRenameActiveTab,
+        handleCloseOtherTabs,
+        handleCloseAllTabs,
+        handleDuplicateTab,
+        handleRenameTab,
         handleNextTab,
         handlePreviousTab,
     };

@@ -8,7 +8,7 @@ import createToast from '../../../../utils/createToast';
 import {useTypedSelector} from '../../../../utils/hooks';
 import {reachMetricaGoal} from '../../../../utils/yaMetrica';
 import {NewSQL} from '../NewSQL/NewSQL';
-import {queryManagerInstance} from '../QueryEditor/utils/queryManager';
+import {queryExecutionManagerInstance} from '../QueryEditor/utils/queryExecutionManager';
 import {SaveQuery} from '../SaveQuery/SaveQuery';
 import i18n from '../i18n';
 
@@ -95,7 +95,7 @@ export const QueryEditorControls = ({
         reachMetricaGoal('stopQuery');
         try {
             if (isStreamingEnabled) {
-                queryManagerInstance.abortQuery(activeTabId);
+                queryExecutionManagerInstance.abortQuery(activeTabId);
             } else if (queryId) {
                 await sendCancelQuery({queryId, database}).unwrap();
             }
@@ -116,7 +116,7 @@ export const QueryEditorControls = ({
                 setCancelQueryError(false);
             }, CANCEL_ERROR_ANIMATION_DURATION);
         }
-    }, [isStreamingEnabled, queryId, sendCancelQuery, database]);
+    }, [isStreamingEnabled, queryId, sendCancelQuery, database, activeTabId]);
 
     const isRunHighlighted = highlightedAction === 'execute';
     const isExplainHighlighted = highlightedAction === 'explain';
