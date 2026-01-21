@@ -189,10 +189,16 @@ export function YqlEditor({
     });
 
     const handleSaveQueryAsAction = useEventHandler(() => {
-        NiceModal.show(SAVE_QUERY_DIALOG, {
-            savedQueries,
-            onSaveQuery: saveQuery,
-        });
+        const commonModalProps = {savedQueries, onSaveQuery: saveQuery} as const;
+        if (activeTab?.isTitleUserDefined) {
+            NiceModal.show(SAVE_QUERY_DIALOG, {
+                ...commonModalProps,
+                defaultQueryName: activeTab.title,
+            });
+            return;
+        }
+
+        NiceModal.show(SAVE_QUERY_DIALOG, commonModalProps);
     });
 
     const editorWillUnmount = () => {

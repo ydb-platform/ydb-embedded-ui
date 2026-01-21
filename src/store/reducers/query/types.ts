@@ -61,6 +61,11 @@ export interface QueryResult {
 export interface QueryTabState {
     id: string;
     title: string;
+    /**
+     * True only when the user explicitly renamed the tab via UI.
+     * Used for UX decisions (e.g. prefilling "Save as" name).
+     */
+    isTitleUserDefined?: boolean;
     input: string;
     isDirty: boolean;
     createdAt: number;

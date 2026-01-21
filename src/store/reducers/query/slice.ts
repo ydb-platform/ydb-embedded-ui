@@ -24,6 +24,7 @@ function persistTabsStateToSessionStorage(state: QueryState) {
         persistedTabsById[tabId] = {
             id: tabId,
             title: tab.title,
+            isTitleUserDefined: Boolean(tab.isTitleUserDefined),
             input: tab.input,
             createdAt: tab.createdAt,
             updatedAt: tab.updatedAt,
@@ -60,6 +61,7 @@ function createDefaultTabState({
     return {
         id: tabId,
         title,
+        isTitleUserDefined: false,
         input,
         isDirty: false,
         createdAt: now,
@@ -79,6 +81,7 @@ function createTabStateFromPersisted({
     return {
         id: tabId,
         title: persistedTab.title,
+        isTitleUserDefined: persistedTab.isTitleUserDefined ?? false,
         input: persistedTab.input,
         isDirty,
         createdAt: persistedTab.createdAt,
@@ -108,6 +111,7 @@ function createInitialTabsState(): Pick<QueryState, 'activeTabId' | 'tabsOrder' 
                 [tabId]: {
                     id: tabId,
                     title: tab.title,
+                    isTitleUserDefined: false,
                     input: tab.input,
                     createdAt: tab.createdAt,
                     updatedAt: tab.updatedAt,
@@ -266,6 +270,7 @@ const slice = createSlice({
             state.tabsById[tabId] = {
                 id: tabId,
                 title,
+                isTitleUserDefined: false,
                 input,
                 isDirty: false,
                 createdAt: now,
@@ -322,6 +327,7 @@ const slice = createSlice({
             }
 
             tab.title = title;
+            tab.isTitleUserDefined = true;
             tab.updatedAt = Date.now();
             persistTabsStateToSessionStorage(state);
         },

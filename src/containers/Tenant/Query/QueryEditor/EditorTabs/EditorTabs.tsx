@@ -220,12 +220,20 @@ export function EditorTabs() {
     const handleSaveQueryAs = React.useCallback(
         (tabId: string) => {
             handleActivateTab(tabId);
-            NiceModal.show(SAVE_QUERY_DIALOG, {
-                savedQueries,
-                onSaveQuery: saveQuery,
-            });
+            const tab = tabsById[tabId];
+            const commonModalProps = {savedQueries, onSaveQuery: saveQuery} as const;
+
+            if (tab?.isTitleUserDefined) {
+                NiceModal.show(SAVE_QUERY_DIALOG, {
+                    ...commonModalProps,
+                    defaultQueryName: tab.title,
+                });
+                return;
+            }
+
+            NiceModal.show(SAVE_QUERY_DIALOG, commonModalProps);
         },
-        [handleActivateTab, savedQueries, saveQuery],
+        [handleActivateTab, savedQueries, saveQuery, tabsById],
     );
 
     const handleRenameTab = React.useCallback(

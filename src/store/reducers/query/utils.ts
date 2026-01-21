@@ -92,6 +92,7 @@ function isStringArray(value: unknown): value is string[] {
 export interface QueryTabPersistedState {
     id: string;
     title: string;
+    isTitleUserDefined?: boolean;
     input: string;
     createdAt: number;
     updatedAt: number;
@@ -107,6 +108,10 @@ export type QueryTabsDirtyPersistedState = Record<string, boolean>;
 
 function isQueryTabPersistedState(value: unknown): value is QueryTabPersistedState {
     if (!isRecord(value)) {
+        return false;
+    }
+
+    if ('isTitleUserDefined' in value && typeof value.isTitleUserDefined !== 'boolean') {
         return false;
     }
 
