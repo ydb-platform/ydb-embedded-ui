@@ -176,7 +176,7 @@ export const getTenantPath = (query: TenantQuery, options?: CreateHrefOptions) =
     return createHref(routes.tenant, undefined, query, options);
 };
 
-export const homePageTabSchema = z.enum(['clusters', 'databases']).catch('databases');
+export const homePageTabSchema = z.enum(['clusters', 'databases']);
 export type HomePageTab = z.infer<typeof homePageTabSchema>;
 
 type HomePageQueryParams = BaseQueryParams & {
