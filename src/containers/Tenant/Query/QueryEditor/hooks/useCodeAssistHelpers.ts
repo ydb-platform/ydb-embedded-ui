@@ -1,43 +1,12 @@
 import React from 'react';
 
 import type {AcceptEvent, DeclineEvent, IgnoreEvent, PromptFile} from '@ydb-platform/monaco-ghost';
-import type Monaco from 'monaco-editor';
 
-import {codeAssistApi} from '../../../../store/reducers/codeAssist/codeAssist';
-import type {QueryInHistory} from '../../../../store/reducers/query/types';
-import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
-import type {TelemetryOpenTabs} from '../../../../types/api/codeAssist';
-import {useSetting} from '../../../../utils/hooks';
-import {YQL_LANGUAGE_ID} from '../../../../utils/monaco/constats';
-import {useSavedQueries} from '../utils/useSavedQueries';
-
-export type EditorOptions = Monaco.editor.IEditorOptions & Monaco.editor.IGlobalEditorOptions;
-
-const EDITOR_OPTIONS: EditorOptions = {
-    automaticLayout: true,
-    selectOnLineNumbers: true,
-    minimap: {
-        enabled: false,
-    },
-    fixedOverflowWidgets: true,
-};
-
-export function useEditorOptions() {
-    const [enableAutocomplete] = useSetting(SETTING_KEYS.ENABLE_AUTOCOMPLETE);
-    const [autocompleteOnEnter] = useSetting(SETTING_KEYS.AUTOCOMPLETE_ON_ENTER);
-
-    const options = React.useMemo<EditorOptions>(() => {
-        const useAutocomplete = Boolean(enableAutocomplete);
-        return {
-            quickSuggestions: useAutocomplete,
-            suggestOnTriggerCharacters: useAutocomplete,
-            acceptSuggestionOnEnter: autocompleteOnEnter ? 'on' : 'off',
-            ...EDITOR_OPTIONS,
-        };
-    }, [enableAutocomplete, autocompleteOnEnter]);
-
-    return options;
-}
+import {codeAssistApi} from '../../../../../store/reducers/codeAssist/codeAssist';
+import type {QueryInHistory} from '../../../../../store/reducers/query/types';
+import type {TelemetryOpenTabs} from '../../../../../types/api/codeAssist';
+import {YQL_LANGUAGE_ID} from '../../../../../utils/monaco/constats';
+import {useSavedQueries} from '../../utils/useSavedQueries';
 
 export function useCodeAssistHelpers(historyQueries: QueryInHistory[]) {
     const [sendCodeAssistPrompt] = codeAssistApi.useLazyGetCodeAssistSuggestionsQuery();
@@ -113,24 +82,3 @@ export function useCodeAssistHelpers(historyQueries: QueryInHistory[]) {
         monacoGhostConfig,
     };
 }
-
-class QueryManager {
-    private query: {abort: VoidFunction} | null;
-
-    constructor() {
-        this.query = null;
-    }
-
-    registerQuery(query: {abort: VoidFunction}) {
-        this.query = query;
-    }
-
-    abortQuery() {
-        if (this.query) {
-            this.query.abort();
-            this.query = null;
-        }
-    }
-}
-
-export const queryManagerInstance = new QueryManager();

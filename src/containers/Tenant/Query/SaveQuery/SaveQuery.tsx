@@ -4,7 +4,7 @@ import NiceModal from '@ebay/nice-modal-react';
 import type {ButtonButtonProps, ButtonProps} from '@gravity-ui/uikit';
 import {Button, Dialog, DropdownMenu, TextInput} from '@gravity-ui/uikit';
 
-import {setIsDirty} from '../../../../store/reducers/query/query';
+import {selectActiveTab, setIsDirty} from '../../../../store/reducers/query/query';
 import {
     clearQueryNameToEdit,
     selectQueryName,
@@ -21,6 +21,8 @@ import './SaveQuery.scss';
 
 const b = cn('ydb-save-query');
 
+export const SAVE_QUERY_DIALOG = 'save-query-dialog';
+
 interface SaveQueryProps {
     buttonProps?: ButtonProps;
 }
@@ -28,15 +30,27 @@ interface SaveQueryProps {
 function useSaveQueryHandler(dialogProps?: SaveQueryDialogCommonProps) {
     const dispatch = useTypedDispatch();
     const {savedQueries, saveQuery} = useSavedQueries();
+    const activeTab = useTypedSelector(selectActiveTab);
 
     const onSaveQueryClick = React.useCallback(() => {
+        const computedDefaultQueryName = activeTab?.isTitleUserDefined
+            ? activeTab.title
+            : undefined;
         NiceModal.show(SAVE_QUERY_DIALOG, {
             ...dialogProps,
+            defaultQueryName: dialogProps?.defaultQueryName ?? computedDefaultQueryName,
             savedQueries,
             onSaveQuery: saveQuery,
         });
         dispatch(clearQueryNameToEdit());
-    }, [dispatch, dialogProps, savedQueries, saveQuery]);
+    }, [
+        activeTab?.isTitleUserDefined,
+        activeTab?.title,
+        dispatch,
+        dialogProps,
+        savedQueries,
+        saveQuery,
+    ]);
 
     return onSaveQueryClick;
 }
@@ -99,6 +113,7 @@ interface SaveQueryDialogCommonProps {
     onSuccess?: () => void;
     onCancel?: () => void;
     onClose?: () => void;
+    defaultQueryName?: string;
 }
 
 interface SaveQueryDialogProps extends SaveQueryDialogCommonProps {
@@ -111,12 +126,13 @@ function SaveQueryDialog({
     onSuccess,
     onCancel,
     onClose,
+    defaultQueryName,
     open,
     savedQueries,
     onSaveQuery,
 }: SaveQueryDialogProps) {
     const dispatch = useTypedDispatch();
-    const [queryName, setQueryName] = React.useState('');
+    const [queryName, setQueryName] = React.useState(defaultQueryName ?? '');
     const [validationError, setValidationError] = React.useState<string>();
 
     const validateQueryName = (value: string) => {
@@ -159,9 +175,9 @@ function SaveQueryDialog({
             <form
                 onSubmit={(e) => {
                     e.preventDefault();
-                    const validationError = validateQueryName(queryName);
-                    setValidationError(validationError);
-                    if (!validationError) {
+                    const nextValidationError = validateQueryName(queryName);
+                    setValidationError(nextValidationError);
+                    if (!nextValidationError) {
                         onSaveClick();
                     }
                 }}
@@ -199,8 +215,6 @@ function SaveQueryDialog({
         </Dialog>
     );
 }
-
-export const SAVE_QUERY_DIALOG = 'save-query-dialog';
 
 export const SaveQueryDialogNiceModal = NiceModal.create((props: SaveQueryDialogProps) => {
     const modal = NiceModal.useModal();

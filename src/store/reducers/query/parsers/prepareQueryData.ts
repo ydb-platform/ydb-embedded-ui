@@ -1,8 +1,8 @@
-import type {ExecuteResponse, ExplainResponse} from '../../../types/api/query';
-import {parseQueryAPIResponse} from '../../../utils/query';
+import type {ExecuteResponse, ExplainResponse} from '../../../../types/api/query';
+import {parseQueryAPIResponse} from '../../../../utils/query';
+import type {PreparedQueryData} from '../types';
 
 import {preparePlanData} from './preparePlanData';
-import type {PreparedQueryData} from './types';
 
 export function prepareQueryData(
     response: ExplainResponse | ExecuteResponse | null,
