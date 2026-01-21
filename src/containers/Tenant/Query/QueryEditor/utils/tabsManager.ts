@@ -17,9 +17,8 @@ export class TabsManager {
         nextValue: string;
         editor: Monaco.editor.IStandaloneCodeEditor;
         monaco: MonacoApi;
-        onBeforeSetValue?: (nextValue: string) => void;
     }) {
-        const {tabId, nextValue, editor, monaco, onBeforeSetValue} = params;
+        const {tabId, nextValue, editor, monaco} = params;
 
         const prevTabId = this.activeTabId;
         const isTabSwitch = Boolean(prevTabId && prevTabId !== tabId);
@@ -29,7 +28,6 @@ export class TabsManager {
 
         const model = this.getOrCreateModel(tabId, nextValue, monaco);
         if (model.getValue() !== nextValue) {
-            onBeforeSetValue?.(nextValue);
             model.setValue(nextValue);
         }
 

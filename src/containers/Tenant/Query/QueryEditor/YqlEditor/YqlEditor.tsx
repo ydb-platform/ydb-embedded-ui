@@ -94,8 +94,6 @@ export function YqlEditor({
     const editorRef = React.useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
     const monacoRef = React.useRef<typeof Monaco | null>(null);
     const tabsManagerRef = React.useRef(new TabsManager());
-    const programmaticValueRef = React.useRef<string | null>(null);
-    const skipDirtyOnceRef = React.useRef(false);
 
     const isMultiTabQueryEditorEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
 
@@ -115,9 +113,6 @@ export function YqlEditor({
             nextValue: input,
             editor,
             monaco,
-            onBeforeSetValue: (nextValue) => {
-                programmaticValueRef.current = nextValue;
-            },
         });
     }, [activeTabId, input, isMultiTabQueryEditorEnabled]);
 
@@ -231,9 +226,6 @@ export function YqlEditor({
                 nextValue: input,
                 editor,
                 monaco,
-                onBeforeSetValue: (nextValue) => {
-                    programmaticValueRef.current = nextValue;
-                },
             });
         }
 
@@ -244,9 +236,7 @@ export function YqlEditor({
                 editor.getContribution<Monaco.editor.IEditorContribution>('snippetController2');
             if (isSnippetController(contribution)) {
                 editor.focus();
-                skipDirtyOnceRef.current = true;
                 editor.setValue('');
-                skipDirtyOnceRef.current = true;
                 contribution.insert(snippet);
                 dispatch(setIsDirty(false));
             }
@@ -395,16 +385,7 @@ export function YqlEditor({
 
     const onChange = (newValue: string) => {
         updateErrorsHighlighting();
-        if (programmaticValueRef.current === newValue) {
-            programmaticValueRef.current = null;
-            return;
-        }
         changeUserInput({input: newValue});
-        if (skipDirtyOnceRef.current) {
-            skipDirtyOnceRef.current = false;
-            dispatch(setIsDirty(false));
-            return;
-        }
         dispatch(setIsDirty(true));
     };
     return (
