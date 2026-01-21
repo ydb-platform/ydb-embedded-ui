@@ -296,6 +296,8 @@ const slice = createSlice({
             if (isLastTab) {
                 const tab = state.tabsById[tabId];
                 tab.input = '';
+                tab.title = '';
+                tab.isTitleUserDefined = false;
                 tab.isDirty = false;
                 tab.result = undefined;
                 tab.lastExecutedQueryText = undefined;
