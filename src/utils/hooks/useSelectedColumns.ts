@@ -28,19 +28,28 @@ export const useSelectedColumns = <T extends {name: string}>(
 
     const normalizedSavedColumns = React.useMemo(() => {
         const rawValue = Array.isArray(savedColumns) ? savedColumns : defaultColumnsIds;
-        return rawValue.map(parseSavedColumn);
+        return rawValue.map(parseSavedColumn).filter((c): c is OrderedColumn => c !== undefined);
     }, [defaultColumnsIds, savedColumns]);
 
     const orderedColumns = React.useMemo(() => {
-        return columns.reduce<OrderedColumn[]>((acc, column) => {
-            const savedColumn = normalizedSavedColumns.find((c) => c && c.id === column.name);
-            if (savedColumn) {
-                acc.push(savedColumn);
-            } else {
-                acc.push({id: column.name, selected: false});
+        const columnsSet = new Set(columns.map((col) => col.name));
+        const ordered: OrderedColumn[] = [];
+        const addedIds = new Set<string>();
+
+        normalizedSavedColumns.forEach((savedCol) => {
+            if (columnsSet.has(savedCol.id)) {
+                ordered.push(savedCol);
+                addedIds.add(savedCol.id);
             }
-            return acc;
-        }, []);
+        });
+
+        columns.forEach((column) => {
+            if (!addedIds.has(column.name)) {
+                ordered.push({id: column.name, selected: false});
+            }
+        });
+
+        return ordered;
     }, [columns, normalizedSavedColumns]);
 
     const columnsToSelect = React.useMemo(() => {
