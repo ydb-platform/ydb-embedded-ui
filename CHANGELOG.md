@@ -1,5 +1,15 @@
 # Changelog
 
+## [14.3.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.3.1...v14.3.2) (2026-01-21)
+
+
+### Bug Fixes
+
+* code background in light theme ([#3337](https://github.com/ydb-platform/ydb-embedded-ui/issues/3337)) ([bcca588](https://github.com/ydb-platform/ydb-embedded-ui/commit/bcca5880c954d02b47056653a315fb82e2944a74))
+* columns order ([#3342](https://github.com/ydb-platform/ydb-embedded-ui/issues/3342)) ([3754330](https://github.com/ydb-platform/ydb-embedded-ui/commit/37543302f2eb811219703575f0a4d6c47a1f302f))
+* **HomePage:** show correct environment and default page ([#3354](https://github.com/ydb-platform/ydb-embedded-ui/issues/3354)) ([fdb5b31](https://github.com/ydb-platform/ydb-embedded-ui/commit/fdb5b317e9fb52915ad81c6687fdee5dc77a91dd))
+* **Tenant:** tune doughnuts to fit values ([#3338](https://github.com/ydb-platform/ydb-embedded-ui/issues/3338)) ([8812c4e](https://github.com/ydb-platform/ydb-embedded-ui/commit/8812c4e0f12f439dfd2d248cdb37e85161b0dbc1))
+
 ## [14.3.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.3.0...v14.3.1) (2026-01-20)
 
 
