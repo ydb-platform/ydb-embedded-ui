@@ -155,12 +155,16 @@ export function TenantNameWrapper({
     const renderName = React.useCallback(() => {
         if (isExternalLink) {
             return (
-                <Link href={dbUrl} target="_blank">
+                <Link href={dbUrl} target="_blank" className={b('db-name')}>
                     {dbName}
                 </Link>
             );
         }
-        return <InternalLink to={dbUrl}>{dbName}</InternalLink>;
+        return (
+            <InternalLink to={dbUrl} className={b('db-name')}>
+                {dbName}
+            </InternalLink>
+        );
     }, [isExternalLink, dbUrl, dbName]);
 
     const renderStatus = React.useCallback(() => {
@@ -187,7 +191,7 @@ export function TenantNameWrapper({
     return (
         <Flex direction="column" gap={0.5}>
             <Flex alignItems="flex-start" justifyContent="space-between" gap={1}>
-                <div className={b('db-name')}>{renderName()}</div>
+                <div className={b('db-name-wrapper')}>{renderName()}</div>
                 <Flex gap={1}>
                     {renderStatus()}
                     {renderActions()}

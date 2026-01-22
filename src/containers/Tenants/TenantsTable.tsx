@@ -208,6 +208,7 @@ export const TenantsTable = ({
                     />
                 ),
                 width: 440,
+                resizeMinWidth: 200,
                 sortable: true,
                 defaultOrder: DataTable.DESCENDING,
             },
