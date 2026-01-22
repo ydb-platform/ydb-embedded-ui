@@ -1,8 +1,9 @@
 .ydb-database-name-wrapper {
     &__db-name-wrapper {
-        text-decoration: none;
-
         color: var(--g-color-text-link);
+    }
+    &__db-name {
+        text-decoration: none;
     }
     &__db-path-wrapper,
     &__path-copy-icon {
