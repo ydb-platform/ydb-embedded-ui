@@ -42,7 +42,14 @@ const prepareTypedColumns = (columns: ColumnType[], data: KeyValueRow[] | undefi
             name,
             width: getColumnWidth({data: dataSlice, name}),
             align: columnType === 'number' ? DataTable.RIGHT : DataTable.LEFT,
-            render: ({row}) => <Cell value={String(row[name])} />,
+            render: ({row}) => {
+                const data = row[name];
+                const normalizedData =
+                    columnType === 'string' && typeof data === 'string'
+                        ? JSON.stringify(data)
+                        : String(data);
+                return <Cell value={normalizedData} />;
+            },
         };
 
         return column;
