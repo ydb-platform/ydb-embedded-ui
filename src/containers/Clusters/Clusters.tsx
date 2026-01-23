@@ -184,6 +184,9 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
     };
 
     const renderClustersCount = () => {
+        if (query.isLoading) {
+            return null;
+        }
         return (
             <Text variant="body-1" color="hint" className={b('clusters-count')}>
                 {i18n('clusters-count', {count: filteredClusters.length})}
