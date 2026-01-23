@@ -1,5 +1,19 @@
 # Changelog
 
+## [14.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.3.2...v14.4.0) (2026-01-23)
+
+
+### Features
+
+* tabs architecture ([#3325](https://github.com/ydb-platform/ydb-embedded-ui/issues/3325)) ([99a9dfc](https://github.com/ydb-platform/ydb-embedded-ui/commit/99a9dfc58ca8aeab5c93f67a7bdebb72f5138205))
+
+
+### Bug Fixes
+
+* **Clusters:** do not display 0 count while loading ([#3369](https://github.com/ydb-platform/ydb-embedded-ui/issues/3369)) ([5670af1](https://github.com/ydb-platform/ydb-embedded-ui/commit/5670af14083dce1bbf5e8155ad80195011853a11))
+* show bytes correct ([#3368](https://github.com/ydb-platform/ydb-embedded-ui/issues/3368)) ([fdf7b6a](https://github.com/ydb-platform/ydb-embedded-ui/commit/fdf7b6ace9cc6317d18dbce0fe5da701ddf9bc91))
+* **TenantsTable:** fix db name column overflow ([#3359](https://github.com/ydb-platform/ydb-embedded-ui/issues/3359)) ([04ba05d](https://github.com/ydb-platform/ydb-embedded-ui/commit/04ba05d9e8137ede07061b3a0312ee3e02117fb1))
+
 ## [14.3.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.3.1...v14.3.2) (2026-01-21)
 
 
