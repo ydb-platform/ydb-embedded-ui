@@ -27,13 +27,10 @@ jobs:
           NPM_TOKEN: ''
       - run: npm run build:embedded:archive
       - run: gh release upload ${{ github.event.release.tag_name }} $ASSET_NAME.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.YDB_PLATFORM_BOT_TOKEN_REPO }}
       - name: Embedded UI Refresh Event Dispatch
         uses: peter-evans/repository-dispatch@v2
         continue-on-error: true
         with:
-          token: ${{ secrets.YDB_PLATFORM_BOT_TOKEN_REPO }}
           repository: ydb-platform/ydb
           event-type: embedded_ui_refresh
           client-payload: |
