@@ -30,13 +30,6 @@ jobs:
           target-branch: ${{ github.ref_name }}
 
       # Publication steps - only run if release was created
-      - name: Setup npm registry
-        if: steps.release.outputs.release_created == 'true'
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          registry-url: https://registry.npmjs.org
-
       - name: Publish to npm
         if: steps.release.outputs.release_created == 'true'
         run: npm publish
