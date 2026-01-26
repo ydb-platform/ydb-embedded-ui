@@ -6,17 +6,54 @@ on:
 
 name: Release
 
+permissions:
+  contents: write
+  id-token: write
+  packages: write
+
 jobs:
   release:
     if: github.repository == 'ydb-platform/ydb-embedded-ui'
     runs-on: ubuntu-latest
+    env:
+      ASSET_NAME: embedded-ui
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
       - run: npm ci
       - run: npm test
-      - uses: googleapis/release-please-action@v4
+      - id: release
+        uses: googleapis/release-please-action@v4
         with:
           target-branch: ${{ github.ref_name }}
+
+      # Publication steps - only run if release was created
+      - name: Publish to npm
+        if: steps.release.outputs.release_created == 'true'
+        run: npm publish
+
+      - name: Build embedded archive
+        if: steps.release.outputs.release_created == 'true'
+        run: npm run build:embedded:archive
+
+      - name: Upload archive to release
+        if: steps.release.outputs.release_created == 'true'
+        run: gh release upload ${{ steps.release.outputs.tag_name }} $ASSET_NAME.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Embedded UI Refresh Event Dispatch
+        if: steps.release.outputs.release_created == 'true'
+        uses: peter-evans/repository-dispatch@v2
+        continue-on-error: true
+        with:
+          repository: ydb-platform/ydb
+          event-type: embedded_ui_refresh
+          client-payload: |
+            {
+              "tag_name": "${{ steps.release.outputs.tag_name }}",
+              "asset_name": "${{ env.ASSET_NAME }}",
+              "repository": "${{ github.repository }}"
+            }
