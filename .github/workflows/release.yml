@@ -19,5 +19,4 @@ jobs:
       - run: npm test
       - uses: googleapis/release-please-action@v4
         with:
-          token: ${{ secrets.YDB_PLATFORM_BOT_TOKEN_REPO }}
           target-branch: ${{ github.ref_name }}
