@@ -1,5 +1,12 @@
 import {parseCoresUrl, parseLoggingUrls, parseTraceField} from '../parseFields';
 
+// Mock console.error to avoid Jest issues with error logging
+const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+afterAll(() => {
+    consoleErrorSpy.mockRestore();
+});
+
 describe('parseCoresUrl', () => {
     test('It should parse stringified json with cores url', () => {
         expect(parseCoresUrl('{"url":"https://coredumps.com?cluster=my_cluster"}')).toEqual({
