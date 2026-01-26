@@ -1,5 +1,14 @@
 {
   "create-database": "Create database",
-  "remove": "Remove",
-  "edit": "Edit"
+
+  "column-name": "Database",
+  "column-type": "Type",
+  "column-state": "State",
+  "column-cpu": "CPU",
+  "column-memory": "Memory",
+  "column-storage": "Storage",
+  "column-network": "Network",
+  "column-nodes": "Nodes",
+  "column-groups": "Groups",
+  "column-pools": "Pools"
 }

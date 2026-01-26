@@ -1,15 +1,22 @@
 import React from 'react';
 
-import {ChevronDown, ChevronUp} from '@gravity-ui/icons';
-import {Button, Disclosure, Icon} from '@gravity-ui/uikit';
+import {ChevronDown, ChevronUp, Gear} from '@gravity-ui/icons';
+import {Button, Disclosure, Flex, Icon} from '@gravity-ui/uikit';
 
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
+import {tablePartitioningApi} from '../../../../../store/reducers/tablePartitioning/tablePartitioning';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../../types/api/schema';
 import {cn} from '../../../../../utils/cn';
+import createToast from '../../../../../utils/createToast';
+import {reachMetricaGoal} from '../../../../../utils/yaMetrica';
+import {EntityTitle} from '../../../EntityTitle/EntityTitle';
+import {isRowTableType} from '../../../utils/schema';
 
+import {openManagePartitioningDialog} from './ManagePartitioningDialog/ManagePartitioningDialog';
 import {PartitionsProgress} from './PartitionsProgress/PartitionsProgress';
 import i18n from './i18n';
 import {prepareTableInfo} from './prepareTableInfo';
+import {prepareUpdatePartitioningRequest} from './utils';
 
 import './TableInfo.scss';
 
@@ -18,9 +25,23 @@ export const b = cn('ydb-diagnostics-table-info');
 interface TableInfoProps {
     data?: TEvDescribeSchemeResult;
     type?: EPathType;
+    database: string;
+    path: string;
 }
 
-export const TableInfo = ({data, type}: TableInfoProps) => {
+const TableInfoHeader = ({data}: {data?: TEvDescribeSchemeResult}) => {
+    const actualType = data?.PathDescription?.Self?.PathType;
+    const isRowTable = isRowTableType(actualType);
+    const title: React.ReactNode = isRowTable ? (
+        i18n('title_partitioning')
+    ) : (
+        <EntityTitle data={data?.PathDescription} />
+    );
+
+    return <div className={b('title')}>{title}</div>;
+};
+
+export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
     const {
         generalInfoLeft = [],
         generalInfoRight = [],
@@ -30,6 +51,7 @@ export const TableInfo = ({data, type}: TableInfoProps) => {
         tabletMetricsInfo = [],
         partitionConfigInfo = [],
         partitionProgressConfig,
+        managePartitioningDialogConfig,
     } = React.useMemo(() => prepareTableInfo(data, type), [data, type]);
 
     const [expanded, setExpanded] = React.useState(false);
@@ -40,9 +62,43 @@ export const TableInfo = ({data, type}: TableInfoProps) => {
     const hasMoreRight = tabletMetricsInfo.length > 0 || partitionConfigInfo.length > 0;
     const hasMore = hasMoreLeft || hasMoreRight;
 
+    const [updatePartitioning] = tablePartitioningApi.useUpdateTablePartitioningMutation();
+
+    const handleOpenManagePartitioning = React.useCallback(() => {
+        reachMetricaGoal('openManagePartitioning');
+        openManagePartitioningDialog({
+            initialValue: managePartitioningDialogConfig,
+            onApply: async (value) => {
+                reachMetricaGoal('applyManagePartitioning');
+                await updatePartitioning(
+                    prepareUpdatePartitioningRequest(value, database, path),
+                ).unwrap();
+
+                createToast({
+                    name: 'updateTablePartitioning',
+                    content: i18n('toast_partitioning-updated'),
+                    autoHiding: 3000,
+                    isClosable: true,
+                });
+            },
+        });
+    }, [managePartitioningDialogConfig, database, path, updatePartitioning]);
+
     return (
         <div className={b()}>
-            <div className={b('title')}>{i18n('title_partitioning')}</div>
+            <Flex
+                className={b('header')}
+                justifyContent="space-between"
+                alignItems="center"
+                gap="2"
+            >
+                <TableInfoHeader data={data} />
+                {managePartitioningDialogConfig && (
+                    <Button view="normal" size="s" onClick={handleOpenManagePartitioning}>
+                        <Icon data={Gear} size={16} />
+                    </Button>
+                )}
+            </Flex>
             {partitionProgressConfig && (
                 <div className={b('progress-bar')}>
                     <PartitionsProgress
@@ -113,7 +169,7 @@ export const TableInfo = ({data, type}: TableInfoProps) => {
                 >
                     <Disclosure.Summary>
                         {(props) => (
-                            <Button {...props} view="normal" size="s">
+                            <Button onClick={props.onClick} view="normal" size="s">
                                 {expanded ? i18n('button_show-less') : i18n('button_show-more')}
                                 <Icon data={expanded ? ChevronUp : ChevronDown} size={16} />
                             </Button>

@@ -1,6 +1,7 @@
 import {
     getCpuColumn,
     getDataCenterColumn,
+    getDatabaseColumn,
     getHostColumn,
     getLoadAverageColumn,
     getMemoryColumn,
@@ -23,6 +24,7 @@ export function getNodesColumns(params: GetNodesColumnsParams): NodesColumn[] {
         getNodeIdColumn(),
         getHostColumn(params),
         getNodeNameColumn(),
+        getDatabaseColumn(),
         getDataCenterColumn(),
         getPileNameColumn(),
         getRackColumn(),

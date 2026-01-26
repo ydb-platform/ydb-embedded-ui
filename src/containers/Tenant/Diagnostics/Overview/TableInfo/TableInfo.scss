@@ -1,15 +1,21 @@
 @use '../../../../../styles/mixins.scss';
 
 .ydb-diagnostics-table-info {
-    &__title {
-        margin-bottom: 10px;
+    $progress-bar-max-width: 656px;
+    $column-width: 310px;
+    $partitions-popover-max-width: 360px;
 
-        font-weight: 600;
-        @include mixins.body-2-typography();
+    &__header {
+        max-width: $progress-bar-max-width;
+        margin-bottom: 10px;
+    }
+
+    &__title {
+        @include mixins.info-viewer-title();
     }
 
     &__progress-bar {
-        max-width: 656px;
+        max-width: $progress-bar-max-width;
         padding: var(--g-spacing-3) 0 var(--g-spacing-4);
     }
 
@@ -31,7 +37,7 @@
         justify-content: flex-start;
         align-items: stretch;
 
-        width: 310px;
+        width: $column-width;
     }
 
     &__info-block {
@@ -44,7 +50,7 @@
     }
 
     &__partitions-popover {
-        max-width: 360px;
+        max-width: $partitions-popover-max-width;
         padding: var(--g-spacing-2);
 
         font-size: var(--g-text-body-1-font-size);

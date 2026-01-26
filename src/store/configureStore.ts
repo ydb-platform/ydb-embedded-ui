@@ -18,6 +18,23 @@ export let backend: string | undefined,
     clusterName: string | undefined,
     environment: string | undefined;
 
+function getUrlDataAndSetParams({
+    singleClusterMode,
+    customBackend,
+    allowedEnvironments,
+}: {
+    singleClusterMode: boolean;
+    customBackend?: string;
+    allowedEnvironments?: string[];
+}) {
+    const params = getUrlData({
+        singleClusterMode,
+        customBackend,
+        allowedEnvironments,
+    });
+    ({basename, clusterName, environment, backend} = params);
+}
+
 function _configureStore<
     S = unknown,
     A extends Action = UnknownAction,
@@ -71,14 +88,20 @@ export function configureStore({
         defaults: undefined,
     }),
 } = {}) {
-    const params = getUrlData({
+    getUrlDataAndSetParams({
         singleClusterMode,
         customBackend,
         allowedEnvironments: environments,
     });
-    ({basename, clusterName, environment} = params);
-    backend = params.backend;
     const history = createBrowserHistory({basename});
+
+    history.listen(() => {
+        getUrlDataAndSetParams({
+            singleClusterMode,
+            customBackend,
+            allowedEnvironments: environments,
+        });
+    });
 
     const store = _configureStore(aRootReducer, history, {singleClusterMode}, [
         storeApi.middleware,

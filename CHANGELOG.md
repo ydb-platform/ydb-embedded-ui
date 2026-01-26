@@ -1,5 +1,70 @@
 # Changelog
 
+## [14.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.3.2...v14.4.0) (2026-01-23)
+
+
+### Features
+
+* tabs architecture ([#3325](https://github.com/ydb-platform/ydb-embedded-ui/issues/3325)) ([99a9dfc](https://github.com/ydb-platform/ydb-embedded-ui/commit/99a9dfc58ca8aeab5c93f67a7bdebb72f5138205))
+
+
+### Bug Fixes
+
+* **Clusters:** do not display 0 count while loading ([#3369](https://github.com/ydb-platform/ydb-embedded-ui/issues/3369)) ([5670af1](https://github.com/ydb-platform/ydb-embedded-ui/commit/5670af14083dce1bbf5e8155ad80195011853a11))
+* show bytes correct ([#3368](https://github.com/ydb-platform/ydb-embedded-ui/issues/3368)) ([fdf7b6a](https://github.com/ydb-platform/ydb-embedded-ui/commit/fdf7b6ace9cc6317d18dbce0fe5da701ddf9bc91))
+* **TenantsTable:** fix db name column overflow ([#3359](https://github.com/ydb-platform/ydb-embedded-ui/issues/3359)) ([04ba05d](https://github.com/ydb-platform/ydb-embedded-ui/commit/04ba05d9e8137ede07061b3a0312ee3e02117fb1))
+
+## [14.3.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.3.1...v14.3.2) (2026-01-21)
+
+
+### Bug Fixes
+
+* code background in light theme ([#3337](https://github.com/ydb-platform/ydb-embedded-ui/issues/3337)) ([bcca588](https://github.com/ydb-platform/ydb-embedded-ui/commit/bcca5880c954d02b47056653a315fb82e2944a74))
+* columns order ([#3342](https://github.com/ydb-platform/ydb-embedded-ui/issues/3342)) ([3754330](https://github.com/ydb-platform/ydb-embedded-ui/commit/37543302f2eb811219703575f0a4d6c47a1f302f))
+* **HomePage:** show correct environment and default page ([#3354](https://github.com/ydb-platform/ydb-embedded-ui/issues/3354)) ([fdb5b31](https://github.com/ydb-platform/ydb-embedded-ui/commit/fdb5b317e9fb52915ad81c6687fdee5dc77a91dd))
+* **Tenant:** tune doughnuts to fit values ([#3338](https://github.com/ydb-platform/ydb-embedded-ui/issues/3338)) ([8812c4e](https://github.com/ydb-platform/ydb-embedded-ui/commit/8812c4e0f12f439dfd2d248cdb37e85161b0dbc1))
+
+## [14.3.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.3.0...v14.3.1) (2026-01-20)
+
+
+### Bug Fixes
+
+* **HomePage:** pass env in tabs databases path ([#3335](https://github.com/ydb-platform/ydb-embedded-ui/issues/3335)) ([668f1f9](https://github.com/ydb-platform/ydb-embedded-ui/commit/668f1f9abde91bdbb1b41f4191a559c71664cec4))
+* reset params when navigate clusters ([#3334](https://github.com/ydb-platform/ydb-embedded-ui/issues/3334)) ([48f577e](https://github.com/ydb-platform/ydb-embedded-ui/commit/48f577eb92ca537fd6023951a133f547c163fffe))
+
+## [14.3.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.2.0...v14.3.0) (2026-01-19)
+
+
+### Features
+
+* **HomePage:** finish databases tab ([#3324](https://github.com/ydb-platform/ydb-embedded-ui/issues/3324)) ([7fd5828](https://github.com/ydb-platform/ydb-embedded-ui/commit/7fd5828e4ca068fd54c15e4dfd56e84c588648fc))
+* implement manage partitioning modal ([#3283](https://github.com/ydb-platform/ydb-embedded-ui/issues/3283)) ([de019e7](https://github.com/ydb-platform/ydb-embedded-ui/commit/de019e7f77b4d159dfee3228d63859d9e1256630))
+* show unknown healthcheck issues ([#3303](https://github.com/ydb-platform/ydb-embedded-ui/issues/3303)) ([67fb7b8](https://github.com/ydb-platform/ydb-embedded-ui/commit/67fb7b8850364f58b23ea9d667bc1930b61dd4ee))
+
+
+### Bug Fixes
+
+* display Partitioning title only for row-oriented tables ([#3319](https://github.com/ydb-platform/ydb-embedded-ui/issues/3319)) ([32597f0](https://github.com/ydb-platform/ydb-embedded-ui/commit/32597f0339e7c6cb88e12fb2a262ede856457dcf))
+* **Node:** wait for capabilities before tabs ([#3314](https://github.com/ydb-platform/ydb-embedded-ui/issues/3314)) ([9c0cb57](https://github.com/ydb-platform/ydb-embedded-ui/commit/9c0cb5703cea5c25c3314a120ad32015032a7f5b))
+* show "Partitioning" title only for row-oriented and column tables ([#3318](https://github.com/ydb-platform/ydb-embedded-ui/issues/3318)) ([5fe172f](https://github.com/ydb-platform/ydb-embedded-ui/commit/5fe172fc6bc09e91f8ccb0a3484741ad86fda989))
+* **TablePreview:** pass base64 setting ([#3331](https://github.com/ydb-platform/ydb-embedded-ui/issues/3331)) ([f448d3a](https://github.com/ydb-platform/ydb-embedded-ui/commit/f448d3a2ee284cafdd97a2f3be359f7ccb2998ce))
+
+## [14.2.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.1.0...v14.2.0) (2026-01-13)
+
+
+### Features
+
+* add Database column to nodes table ([#3289](https://github.com/ydb-platform/ydb-embedded-ui/issues/3289)) ([0c49c99](https://github.com/ydb-platform/ydb-embedded-ui/commit/0c49c99f28c465802b829c9a80bd7a0b35e248b0))
+* add StartTime/EndTime/UserSID for buildindex operation ([#3271](https://github.com/ydb-platform/ydb-embedded-ui/issues/3271)) ([2b50c8e](https://github.com/ydb-platform/ydb-embedded-ui/commit/2b50c8e428ab397808d766ab265024f115c15fdf))
+* **storage:** add blob capacity metrics experiment and CapacityAlert… ([#3276](https://github.com/ydb-platform/ydb-embedded-ui/issues/3276)) ([b50d9cf](https://github.com/ydb-platform/ydb-embedded-ui/commit/b50d9cf1c2671eb1483d0455bd9627cefc240983))
+
+
+### Bug Fixes
+
+* fix e2e tests for sysviews ([#3298](https://github.com/ydb-platform/ydb-embedded-ui/issues/3298)) ([a88e08c](https://github.com/ydb-platform/ydb-embedded-ui/commit/a88e08c73d8ef2579aed4682a52c813b5faa3e34))
+* remove max width for result cell ([#3277](https://github.com/ydb-platform/ydb-embedded-ui/issues/3277)) ([2a9f3ba](https://github.com/ydb-platform/ydb-embedded-ui/commit/2a9f3ba258c6ed9bc3e529f0fae3a59e27a5778f))
+* vdisk items overflow pdisk item ([#3274](https://github.com/ydb-platform/ydb-embedded-ui/issues/3274)) ([2dd68e2](https://github.com/ydb-platform/ydb-embedded-ui/commit/2dd68e21acaa3302e6497bd503384f8f2014577c))
+
 ## [14.1.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.0.1...v14.1.0) (2025-12-23)
 
 

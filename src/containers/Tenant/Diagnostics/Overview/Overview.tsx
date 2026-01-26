@@ -14,6 +14,7 @@ import {ViewInfo} from '../../Info/View/View';
 
 import {AsyncReplicationInfo} from './AsyncReplicationInfo';
 import {ChangefeedInfo} from './ChangefeedInfo';
+import {DefaultEntityInfo} from './DefaultEntityInfo';
 import {StreamingQueryInfo} from './StreamingQueryInfo';
 import {TableInfo} from './TableInfo';
 import {TopicInfo} from './TopicInfo';
@@ -42,17 +43,22 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
         const data = currentData ?? undefined;
         // verbose mapping to guarantee a correct render for new path types
         // TS will error when a new type is added but not mapped here
+
+        const renderTableInfo = () => (
+            <TableInfo path={path} data={data} type={type} database={database} />
+        );
+
         const pathTypeToComponent: Record<EPathType, (() => React.ReactNode) | undefined> = {
             [EPathType.EPathTypeInvalid]: undefined,
             [EPathType.EPathTypeDir]: undefined,
             [EPathType.EPathTypeResourcePool]: undefined,
-            [EPathType.EPathTypeTable]: undefined,
+            [EPathType.EPathTypeTable]: renderTableInfo,
             [EPathType.EPathTypeSysView]: () => <SystemViewInfo data={data} />,
             [EPathType.EPathTypeSubDomain]: undefined,
             [EPathType.EPathTypeTableIndex]: () => <TableIndexInfo data={data} />,
             [EPathType.EPathTypeExtSubDomain]: undefined,
-            [EPathType.EPathTypeColumnStore]: undefined,
-            [EPathType.EPathTypeColumnTable]: undefined,
+            [EPathType.EPathTypeColumnStore]: renderTableInfo,
+            [EPathType.EPathTypeColumnTable]: renderTableInfo,
             [EPathType.EPathTypeCdcStream]: () => (
                 <ChangefeedInfo
                     path={path}
@@ -86,7 +92,7 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
             ),
         };
 
-        return (type && pathTypeToComponent[type]?.()) || <TableInfo data={data} type={type} />;
+        return (type && pathTypeToComponent[type]?.()) || <DefaultEntityInfo data={data} />;
     };
 
     if (loading) {

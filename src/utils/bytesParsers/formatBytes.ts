@@ -5,7 +5,7 @@ import {isNumeric} from '../utils';
 
 import i18n from './i18n';
 
-const sizes = {
+export const sizes = {
     b: {
         value: 1,
         label: i18n('b'),
@@ -91,3 +91,5 @@ export const formatBytes = ({
 
     return result;
 };
+
+export const convertToBytes = (value: number, unit: BytesSizes) => value * sizes[unit].value;

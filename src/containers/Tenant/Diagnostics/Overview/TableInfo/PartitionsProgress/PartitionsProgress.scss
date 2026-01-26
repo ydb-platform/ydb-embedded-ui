@@ -4,11 +4,11 @@
         flex-basis: 0;
 
         &_additional {
-            min-width: 20px;
+            flex-basis: 20px;
         }
 
         &_main {
-            min-width: 70px;
+            flex-basis: 70px;
         }
     }
 

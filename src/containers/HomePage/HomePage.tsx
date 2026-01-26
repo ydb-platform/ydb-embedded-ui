@@ -4,6 +4,7 @@ import {Flex, SegmentedRadioGroup, Text} from '@gravity-ui/uikit';
 import {Helmet} from 'react-helmet-async';
 import {Redirect, Route, Switch, useHistory} from 'react-router-dom';
 
+import {AutoRefreshControl} from '../../components/AutoRefreshControl/AutoRefreshControl';
 import {PageError} from '../../components/Errors/PageError/PageError';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import type {HomePageTab} from '../../routes';
@@ -45,9 +46,7 @@ export function HomePage() {
     const metaEnvironmentsAvailable = useMetaEnvironmentsAvailable();
     const isViewerUser = useIsViewerUser();
 
-    const [savedHomePageTab, saveHomePageTab] = useSetting<string | undefined>(
-        SETTING_KEYS.HOME_PAGE_TAB,
-    );
+    const [savedHomePageTab, saveHomePageTab] = useSetting<HomePageTab>(SETTING_KEYS.HOME_PAGE_TAB);
 
     const {
         data: environments,
@@ -72,7 +71,7 @@ export function HomePage() {
             return 'databases';
         }
 
-        return homePageTabSchema.parse(tabFromPath ?? savedHomePageTab);
+        return homePageTabSchema.catch(savedHomePageTab).parse(tabFromPath);
     }, [isViewerUser, tabFromPath, savedHomePageTab, metaEnvironmentsAvailable]);
 
     const initialPageTitle =
@@ -80,6 +79,9 @@ export function HomePage() {
     const pageTitleWithFactory = uiFactory.homePageTitle ?? initialPageTitle;
     const showBlockingError = isAccessError(environmentsError);
     const errorProps = showBlockingError ? uiFactory.clusterOrDatabaseAccessError : undefined;
+
+    const hasEnvironmentsTabs =
+        homePageTab === 'databases' && environments && environments?.length > 1;
 
     React.useEffect(() => {
         dispatch(setHeaderBreadcrumbs('homePage', {}));
@@ -127,7 +129,7 @@ export function HomePage() {
             const envDomain = uiFactory.databasesEnvironmentsConfig?.getEnvironmentDomain?.(value);
 
             if (envDomain) {
-                const newPath = new URL(getDatabasesPath(), envDomain).toString();
+                const newPath = new URL(getDatabasesPath({env: value}), envDomain).toString();
 
                 window.location.href = newPath;
             } else {
@@ -146,7 +148,7 @@ export function HomePage() {
     };
 
     const renderDBEnvironmentsTabs = () => {
-        if (homePageTab === 'clusters' || !environments || environments?.length <= 1) {
+        if (!hasEnvironmentsTabs) {
             return null;
         }
 
@@ -171,10 +173,16 @@ export function HomePage() {
     };
 
     const renderTabs = () => {
-        if (noEnvironmentsAvailable) {
+        if (noEnvironmentsAvailable || (!isViewerUser && !hasEnvironmentsTabs)) {
             return (
-                <Flex gap={4} direction="column" className={b('controls-wrapper')}>
+                <Flex
+                    gap={4}
+                    direction="row"
+                    justifyContent="space-between"
+                    className={b('controls-wrapper')}
+                >
                     <Text variant="header-1">{pageTitleWithFactory}</Text>
+                    <AutoRefreshControl />
                 </Flex>
             );
         }
@@ -182,21 +190,27 @@ export function HomePage() {
             return (
                 <Flex gap={4} direction="column" className={b('controls-wrapper')}>
                     <Text variant="header-1">{pageTitleWithFactory}</Text>
-                    {renderDBEnvironmentsTabs()}
+                    <Flex direction="row" justifyContent="space-between">
+                        {renderDBEnvironmentsTabs()}
+                        <AutoRefreshControl />
+                    </Flex>
                 </Flex>
             );
         }
         return (
-            <Flex gap={4} className={b('controls-wrapper')}>
-                <SegmentedRadioGroup size="l" value={homePageTab} onUpdate={handleTabChange}>
-                    <SegmentedRadioGroup.Option value="clusters">
-                        {i18n('value_all-clusters')}
-                    </SegmentedRadioGroup.Option>
-                    <SegmentedRadioGroup.Option value="databases">
-                        {i18n('value_my-databases')}
-                    </SegmentedRadioGroup.Option>
-                </SegmentedRadioGroup>
-                {renderDBEnvironmentsTabs()}
+            <Flex direction="row" justifyContent="space-between" className={b('controls-wrapper')}>
+                <Flex gap={4} direction="row">
+                    <SegmentedRadioGroup size="l" value={homePageTab} onUpdate={handleTabChange}>
+                        <SegmentedRadioGroup.Option value="clusters">
+                            {i18n('value_all-clusters')}
+                        </SegmentedRadioGroup.Option>
+                        <SegmentedRadioGroup.Option value="databases">
+                            {i18n('value_my-databases')}
+                        </SegmentedRadioGroup.Option>
+                    </SegmentedRadioGroup>
+                    {renderDBEnvironmentsTabs()}
+                </Flex>
+                <AutoRefreshControl />
             </Flex>
         );
     };
@@ -225,9 +239,11 @@ export function HomePage() {
                         clusterName={undefined}
                         environmentName={databasesPageEnvironment}
                         isMetaDatabasesAvailable={true}
-                        showDomainDatabase={true}
                         scrollContainerRef={scrollContainerRef}
                         additionalTenantsProps={undefined}
+                        showDomainDatabase={true}
+                        showPoolsColumn={false}
+                        showWithProblemsFilter={false}
                     />
                 </Route>
             </Switch>

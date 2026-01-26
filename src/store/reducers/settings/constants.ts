@@ -1,3 +1,4 @@
+import type {HomePageTab} from '../../../routes';
 import type {ValueOf} from '../../../types/common';
 import {AclSyntax} from '../../../utils/constants';
 import {Lang} from '../../../utils/i18n';
@@ -54,7 +55,7 @@ export const DEFAULT_USER_SETTINGS = {
     [SETTING_KEYS.SAVED_QUERIES]: [],
     [SETTING_KEYS.QUERIES_HISTORY]: [],
     [SETTING_KEYS.TENANT_INITIAL_PAGE]: TENANT_PAGES_IDS.query,
-    [SETTING_KEYS.HOME_PAGE_TAB]: undefined,
+    [SETTING_KEYS.HOME_PAGE_TAB]: 'clusters' satisfies HomePageTab,
     [SETTING_KEYS.DATABASES_PAGE_ENVIRONMENT]: undefined,
     [SETTING_KEYS.LAST_USED_QUERY_ACTION]: QUERY_ACTIONS.execute,
     [SETTING_KEYS.ASIDE_HEADER_COMPACT]: true,

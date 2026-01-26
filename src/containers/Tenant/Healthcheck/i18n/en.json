@@ -2,6 +2,7 @@
   "description_no-data": "No healthcheck data",
   "label_storage": "Storage",
   "label_compute": "Compute",
+  "label_unknown": "Unknown",
   "description_search-issue": "Search issue...",
   "action_refresh": "Refresh",
   "description_minutes": "{{count}} min ago",

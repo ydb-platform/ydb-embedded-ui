@@ -20,6 +20,7 @@ import type {
 } from '../types/store/query';
 
 import {isAxiosResponse, isNetworkError} from './response';
+import {preprocessEmptyStringToUndefined} from './zod/zodParsers';
 
 export const TRANSACTION_MODES = {
     serializable: 'serializable-read-write',
@@ -114,11 +115,12 @@ export const getColumnType = (type: string) => {
             return 'number';
         case YQLType.String:
         case YQLType.Utf8:
+        case YQLType.Uuid:
+            return 'string';
         case YQLType.Json:
         case YQLType.JsonDocument:
         case YQLType.Yson:
-        case YQLType.Uuid:
-            return 'string';
+            return 'json';
         case YQLType.Date:
         case YQLType.Datetime:
         case YQLType.Timestamp:
@@ -326,18 +328,13 @@ export const tracingLevelSchema = z.nativeEnum(TRACING_LEVELS);
 
 // timeout = null is for timeout switched off state
 export const querySettingsValidationSchema = z.object({
-    timeout: z
-        .preprocess(
-            (val) => (val === '' ? undefined : val),
-            z.coerce.number().positive().or(z.undefined()).or(z.null()),
-        )
-        .or(z.literal('')),
-    limitRows: z.preprocess(
-        (val) => (val === '' ? undefined : val),
+    timeout: preprocessEmptyStringToUndefined(
+        z.coerce.number().positive().or(z.undefined()).or(z.null()),
+    ).or(z.literal('')),
+    limitRows: preprocessEmptyStringToUndefined(
         z.coerce.number().gt(0).lte(100_000).or(z.undefined()),
     ),
-    outputChunkMaxSize: z.preprocess(
-        (val) => (val === '' ? undefined : val),
+    outputChunkMaxSize: preprocessEmptyStringToUndefined(
         z.coerce.number().int().positive().or(z.undefined()),
     ),
     queryMode: queryModeSchema,
@@ -350,16 +347,13 @@ export const querySettingsValidationSchema = z.object({
 
 export const querySettingsRestoreSchema = z
     .object({
-        timeout: z.preprocess(
-            (val) => (val === '' ? undefined : val),
+        timeout: preprocessEmptyStringToUndefined(
             z.coerce.number().positive().or(z.null()).optional(),
         ),
-        limitRows: z.preprocess(
-            (val) => (val === '' ? undefined : val),
+        limitRows: preprocessEmptyStringToUndefined(
             z.coerce.number().gt(0).lte(100_000).optional().catch(DEFAULT_QUERY_SETTINGS.limitRows),
         ),
-        outputChunkMaxSize: z.preprocess(
-            (val) => (val === '' ? undefined : val),
+        outputChunkMaxSize: preprocessEmptyStringToUndefined(
             z.coerce.number().int().positive().optional(),
         ),
         queryMode: queryModeSchema.catch(DEFAULT_QUERY_SETTINGS.queryMode),

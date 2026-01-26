@@ -46,7 +46,7 @@ export function UtilizationTabCard({
     active,
 }: UtilizationTabCardProps) {
     const {status, percents, fill} = React.useMemo(
-        () => calculateBaseDiagramValues({fillWidth: fillPercent}),
+        () => calculateBaseDiagramValues({fillWidth: fillPercent, percentPrecision: 1}),
         [fillPercent],
     );
 

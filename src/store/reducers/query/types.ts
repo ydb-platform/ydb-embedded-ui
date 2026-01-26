@@ -58,10 +58,26 @@ export interface QueryResult {
     isLoading: boolean;
 }
 
-export interface QueryState {
+export interface QueryTabState {
+    id: string;
+    title: string;
+    /**
+     * True only when the user explicitly renamed the tab via UI.
+     * Used for UX decisions (e.g. prefilling "Save as" name).
+     */
+    isTitleUserDefined?: boolean;
     input: string;
+    isDirty: boolean;
+    createdAt: number;
+    updatedAt: number;
+    lastExecutedQueryText?: string;
     result?: QueryResult;
-    isDirty?: boolean;
+}
+
+export interface QueryState {
+    activeTabId: string;
+    tabsOrder: string[];
+    tabsById: Record<string, QueryTabState>;
 
     historyFilter?: string;
     historyCurrentQueryId?: string;

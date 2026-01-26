@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {selectUserInput} from '../../../../store/reducers/query/query';
 import {selectSavedQueriesFilter} from '../../../../store/reducers/queryActions/queryActions';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import type {SavedQuery} from '../../../../types/store/query';
@@ -9,7 +10,7 @@ export function useSavedQueries() {
     const [savedQueries, saveQueries] = useSetting<SavedQuery[]>(SETTING_KEYS.SAVED_QUERIES);
 
     const filter = useTypedSelector(selectSavedQueriesFilter).trim().toLowerCase();
-    const currentInput = useTypedSelector((state) => state.query.input);
+    const currentInput = useTypedSelector(selectUserInput);
 
     const filteredSavedQueries = React.useMemo(() => {
         const queries = savedQueries ?? [];

@@ -9,6 +9,14 @@ export const getUrlData = ({
     customBackend?: string;
     allowedEnvironments?: string[];
 }) => {
+    console.info('🔍 getUrlData called:', {
+        'window.location.href': window.location.href,
+        'window.location.search': window.location.search,
+        'window.location.pathname': window.location.pathname,
+        singleClusterMode: singleClusterMode,
+        customBackend: customBackend,
+    });
+
     // UI could be located in "monitoring" or "ui" folders
     // my-host:8765/some/path/monitoring/react-router-path or my-host:8765/some/path/ui/react-router-path
     const parsedPrefix = window.location.pathname.match(/.*(?=\/(monitoring|ui)\/)/) || [];

@@ -1,14 +1,14 @@
 import React from 'react';
 
 import {cancelQueryApi} from '../../../../store/reducers/cancelQuery';
-import {selectUserInput} from '../../../../store/reducers/query/query';
+import {selectActiveTabId, selectUserInput} from '../../../../store/reducers/query/query';
 import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import createToast from '../../../../utils/createToast';
 import {useTypedSelector} from '../../../../utils/hooks';
 import {reachMetricaGoal} from '../../../../utils/yaMetrica';
 import {NewSQL} from '../NewSQL/NewSQL';
-import {queryManagerInstance} from '../QueryEditor/helpers';
+import {queryExecutionManagerInstance} from '../QueryEditor/utils/queryExecutionManager';
 import {SaveQuery} from '../SaveQuery/SaveQuery';
 import i18n from '../i18n';
 
@@ -84,6 +84,7 @@ export const QueryEditorControls = ({
     handleGetExplainQueryClick,
 }: QueryEditorControlsProps) => {
     const input = useTypedSelector(selectUserInput);
+    const activeTabId = useTypedSelector(selectActiveTabId);
     const [sendCancelQuery, cancelQueryResponse] = cancelQueryApi.useCancelQueryMutation();
     const [isStoppable, setIsStoppable] = React.useState(isLoading);
     const stopButtonAppearRef = React.useRef<number | null>(null);
@@ -94,7 +95,7 @@ export const QueryEditorControls = ({
         reachMetricaGoal('stopQuery');
         try {
             if (isStreamingEnabled) {
-                queryManagerInstance.abortQuery();
+                queryExecutionManagerInstance.abortQuery(activeTabId);
             } else if (queryId) {
                 await sendCancelQuery({queryId, database}).unwrap();
             }
@@ -115,7 +116,7 @@ export const QueryEditorControls = ({
                 setCancelQueryError(false);
             }, CANCEL_ERROR_ANIMATION_DURATION);
         }
-    }, [isStreamingEnabled, queryId, sendCancelQuery, database]);
+    }, [isStreamingEnabled, queryId, sendCancelQuery, database, activeTabId]);
 
     const isRunHighlighted = highlightedAction === 'execute';
     const isExplainHighlighted = highlightedAction === 'explain';

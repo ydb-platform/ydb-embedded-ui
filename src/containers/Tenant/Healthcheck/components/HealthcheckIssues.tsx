@@ -40,7 +40,7 @@ export function Issues({issues}: IssuesProps) {
         () =>
             view
                 ? filteredIssues.filter((issue) => {
-                      const type = issue.firstParentType || issue.type;
+                      const type = issue.rootTypeForUI || issue.type;
                       return type?.toLowerCase().startsWith(view);
                   })
                 : [],
