@@ -35,9 +35,13 @@ export function getNodesColumns(params: GetNodesColumnsParams): NodesColumn[] {
         getMemoryColumn(),
         getLoadAverageColumn(),
         getVersionColumn(),
-        getPDisksColumn(params),
-        getTabletsColumn(params),
     ];
+
+    //pdisk column should be only for cluster, not for database
+    if (!params.database) {
+        columns.push(getPDisksColumn(params));
+    }
+    columns.push(getTabletsColumn(params));
 
     return columns.map((column) => {
         return {...column, sortable: isSortableNodesColumn(column.name)};
