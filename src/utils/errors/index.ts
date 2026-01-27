@@ -5,6 +5,7 @@ import i18n from './i18n';
 /**
  * Prepares a consistent error message from various error types
  * @param err - The error object to process
+ * @param defaultMessage - Optional fallback message used when a specific error message cannot be determined
  * @returns A formatted error message string
  */
 export function prepareCommonErrorMessage(err: unknown, defaultMessage?: string): string {
