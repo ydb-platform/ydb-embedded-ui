@@ -6,9 +6,6 @@
 ### Bug Fixes
 
 * tests ([#3377](https://github.com/ydb-platform/ydb-embedded-ui/issues/3377)) ([dc1f3b5](https://github.com/ydb-platform/ydb-embedded-ui/commit/dc1f3b576cf9c01941932751111bc24f20c9b43f))
-* workflow ([#3381](https://github.com/ydb-platform/ydb-embedded-ui/issues/3381)) ([32430ad](https://github.com/ydb-platform/ydb-embedded-ui/commit/32430add7e25925ae4c83206f9843d60b434faf8))
-* workflows ([#3373](https://github.com/ydb-platform/ydb-embedded-ui/issues/3373)) ([0adbdf1](https://github.com/ydb-platform/ydb-embedded-ui/commit/0adbdf1d4f72673e7e012c356a949b04c6353ecb))
-* workflows ([#3376](https://github.com/ydb-platform/ydb-embedded-ui/issues/3376)) ([19a10b3](https://github.com/ydb-platform/ydb-embedded-ui/commit/19a10b3c19f83c3c635b9adacc6b1cb94c8f3158))
 
 ## [14.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.3.2...v14.4.0) (2026-01-23)
 
