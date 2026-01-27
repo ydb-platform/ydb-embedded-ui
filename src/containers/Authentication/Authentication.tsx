@@ -12,6 +12,7 @@ import {cn} from '../../utils/cn';
 import {prepareCommonErrorMessage} from '../../utils/errors';
 import {useMetaAuth} from '../../utils/hooks/useMetaAuth';
 
+import i18n from './i18n';
 import {isDatabaseError, isPasswordError, isUserError} from './utils';
 
 import ydbLogoIcon from '../../assets/icons/ydb.svg';
@@ -112,7 +113,10 @@ function Authentication({closable = false}: AuthenticationProps) {
                 }
 
                 if (!isInputError) {
-                    const message = prepareCommonErrorMessage(error);
+                    const message = prepareCommonErrorMessage(
+                        error,
+                        i18n('description_default-error'),
+                    );
                     setGeneralError(message);
                 }
             });
