@@ -1,5 +1,12 @@
 # Changelog
 
+## [14.4.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.4.0...v14.4.1) (2026-01-26)
+
+
+### Bug Fixes
+
+* tests ([#3377](https://github.com/ydb-platform/ydb-embedded-ui/issues/3377)) ([dc1f3b5](https://github.com/ydb-platform/ydb-embedded-ui/commit/dc1f3b576cf9c01941932751111bc24f20c9b43f))
+
 ## [14.4.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.3.2...v14.4.0) (2026-01-23)
 
 
