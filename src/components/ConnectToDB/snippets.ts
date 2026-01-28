@@ -2,7 +2,7 @@ import type {SnippetLanguage, SnippetParams} from './types';
 import {prepareEndpoint} from './utils';
 
 export function getBashSnippetCode({database, endpoint}: SnippetParams) {
-    return `ydb -e ${endpoint || '<endpoint>'} --token-file ~/my_token
+    return `ydb -e ${endpoint || '<endpoint>'} --token-file ~/my_token \\
     -d ${database ?? '/<database>'} table query execute -q 'SELECT "Hello, world!"'`;
 }
 
@@ -42,7 +42,7 @@ import (
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	
+
 	db, err := ydb.Open(context.Background(),
 		"${endpoint ?? '<endpoint>'}${database ?? '/<database>'}",
 		ydb.WithAccessTokenCredentials(os.Getenv("YDB_ACCESS_TOKEN_CREDENTIALS")),
