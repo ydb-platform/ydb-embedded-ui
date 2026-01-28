@@ -8,27 +8,6 @@
 
     height: 100%;
 
-    &__tab-badge {
-        margin-left: var(--g-spacing-2);
-    }
-
-    &__header-wrapper {
-        padding: 0 var(--g-spacing-5);
-
-        background-color: var(--g-color-base-background);
-    }
-
-    &__tabs {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        @include mixins.tabs-wrapper-styles();
-        & .g-tabs_direction_horizontal {
-            box-shadow: unset;
-        }
-    }
-
     &__page-wrapper {
         --ydb-configs-controls-height: 46px;
         --ydb-configs-container-height: 100cqh;

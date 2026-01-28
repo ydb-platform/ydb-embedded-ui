@@ -10,7 +10,7 @@ import {EPathSubType, EPathType} from '../../../types/api/schema';
 import type {ETenantType} from '../../../types/api/tenant';
 import type {TenantQuery} from '../TenantPages';
 import {TenantTabsGroups} from '../TenantPages';
-import {isDatabaseEntityType, isEntityWithTopicData} from '../utils/schema';
+import {isDatabaseEntityType} from '../utils/schema';
 
 interface Badge {
     text: string;
@@ -18,7 +18,7 @@ interface Badge {
     size?: LabelProps['size'];
 }
 
-type Page = {
+export type Page = {
     id: TenantDiagnosticsTab;
     title: string;
     badge?: Badge;
@@ -228,14 +228,14 @@ function getDatabasePages(databaseType?: ETenantType) {
     return databaseType === 'Serverless' ? SERVERLESS_DATABASE_PAGES : DATABASE_PAGES;
 }
 
-function applyFilters(pages: Page[], type?: EPathType, options: GetPagesOptions = {}) {
-    let result = pages;
-
-    if (isEntityWithTopicData(type) && !options.hasTopicData) {
-        result = result.filter((p) => p.id !== TENANT_DIAGNOSTICS_TABS_IDS.topicData);
-    }
+function applyFilters(pages: Page[], options: GetPagesOptions = {}) {
+    const result = pages;
 
     const removals: TenantDiagnosticsTab[] = [];
+
+    if (!options.hasTopicData) {
+        removals.push(TENANT_DIAGNOSTICS_TABS_IDS.topicData);
+    }
     if (!options.hasBackups) {
         removals.push(TENANT_DIAGNOSTICS_TABS_IDS.backups);
     }
@@ -261,7 +261,7 @@ export const getPagesByType = (
     const dbContext = isDatabaseEntityType(type) || options?.isTopLevel;
     const seeded = dbContext ? getDatabasePages(options?.databaseType) : base;
 
-    return applyFilters(seeded, type, options);
+    return applyFilters(seeded, options);
 };
 
 export const useDiagnosticsPageLinkGetter = () => {

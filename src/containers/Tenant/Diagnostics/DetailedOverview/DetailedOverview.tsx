@@ -24,34 +24,29 @@ function DetailedOverview({
     path,
     additionalTenantProps,
 }: DetailedOverviewProps) {
-    const renderTenantOverview = () => {
-        return (
-            <div className={b('section')}>
+    const isTenant = databaseFullPath === path;
+
+    const renderContent = () => {
+        if (isTenant) {
+            return (
                 <TenantOverview
                     database={database}
                     databaseFullPath={databaseFullPath}
                     additionalTenantProps={additionalTenantProps}
                 />
-            </div>
+            );
+        }
+        return (
+            <Overview
+                type={type}
+                path={path}
+                database={database}
+                databaseFullPath={databaseFullPath}
+            />
         );
     };
 
-    const isTenant = databaseFullPath === path;
-
-    return (
-        <div className={b()}>
-            {isTenant ? (
-                renderTenantOverview()
-            ) : (
-                <Overview
-                    type={type}
-                    path={path}
-                    database={database}
-                    databaseFullPath={databaseFullPath}
-                />
-            )}
-        </div>
-    );
+    return <div className={b()}>{renderContent()}</div>;
 }
 
 export default DetailedOverview;
