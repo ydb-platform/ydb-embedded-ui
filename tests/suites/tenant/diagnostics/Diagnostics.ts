@@ -46,7 +46,7 @@ export class Table {
         return (
             (await noDataCell.isVisible()) &&
             (await this.getRowCount()) === 1 &&
-            (await noDataCell.innerText()) === 'No data'
+            (await noDataCell.innerText()) === '—'
         );
     }
 
