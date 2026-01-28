@@ -47,6 +47,7 @@ export interface TTabletStateInfo {
     TenantId?: TDomainKey;
     /** fixed64 */
     HiveId?: string;
+    EndOfRangeKeyPrefix?: string;
 }
 
 interface TCustomTabletAttribute {
