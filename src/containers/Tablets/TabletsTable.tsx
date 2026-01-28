@@ -29,7 +29,13 @@ function isFollowerTablet(state: TTabletStateInfo) {
     return state.Leader === false;
 }
 
-function getColumns({nodeId}: {nodeId?: string | number}) {
+function getColumns({
+    nodeId,
+    showEndOfRange,
+}: {
+    nodeId?: string | number;
+    showEndOfRange?: boolean;
+}) {
     const columns: DataTableColumn<TTabletStateInfo & {fqdn?: string}>[] = [
         {
             name: 'Type',
@@ -127,16 +133,33 @@ function getColumns({nodeId}: {nodeId?: string | number}) {
             align: 'right',
             width: 120,
         },
-        {
-            name: 'Actions',
-            sortable: false,
-            resizeable: false,
-            header: '',
-            render: ({row}) => {
-                return <TabletActions {...row} />;
-            },
-        },
     );
+
+    if (nodeId === undefined && showEndOfRange) {
+        columns.push({
+            name: 'EndOfRangeKeyPrefix',
+            get header() {
+                return i18n('End Range');
+            },
+            width: 350,
+            render: ({row}) => {
+                if (!row.EndOfRangeKeyPrefix) {
+                    return EMPTY_DATA_PLACEHOLDER;
+                }
+                return row.EndOfRangeKeyPrefix;
+            },
+        });
+    }
+
+    columns.push({
+        name: 'Actions',
+        sortable: false,
+        resizeable: false,
+        header: '',
+        render: ({row}) => {
+            return <TabletActions {...row} />;
+        },
+    });
 
     return columns;
 }
@@ -206,13 +229,21 @@ export function TabletsTable({
     // Track sort state for scroll dependencies
     const [sortParams, setSortParams] = React.useState<SortOrder | SortOrder[] | undefined>();
 
-    const columns = React.useMemo(() => getColumns({nodeId}), [nodeId]);
-
-    const filteredTablets = React.useMemo(() => {
-        return tablets.filter((tablet) => {
-            return String(tablet.TabletId).includes(tabletsSearch ?? '');
-        });
+    const {filteredTablets, showEndOfRange} = React.useMemo(() => {
+        let showEnd = false;
+        return {
+            filteredTablets: tablets.filter((tablet) => {
+                showEnd = showEnd || Boolean(tablet.EndOfRangeKeyPrefix);
+                return String(tablet.TabletId).includes(tabletsSearch ?? '');
+            }),
+            showEndOfRange: showEnd,
+        };
     }, [tablets, tabletsSearch]);
+
+    const columns = React.useMemo(
+        () => getColumns({nodeId, showEndOfRange}),
+        [nodeId, showEndOfRange],
+    );
 
     const handleSearchQueryChange = (value: string) => {
         setQueryParams({tabletsSearch: value || undefined}, 'replaceIn');

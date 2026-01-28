@@ -5,6 +5,7 @@
   "State": "State",
   "Node ID": "Node ID",
   "Node FQDN": "Node FQDN",
+  "End Range": "End Range",
   "Generation": "Generation",
   "Uptime": "Uptime",
   "dialog.kill-header": "Restart tablet",
