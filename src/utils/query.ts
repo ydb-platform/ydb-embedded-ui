@@ -114,13 +114,13 @@ export const getColumnType = (type: string) => {
         case YQLType.Decimal:
             return 'number';
         case YQLType.String:
+            return 'binary-string';
         case YQLType.Utf8:
-        case YQLType.Uuid:
-            return 'string';
         case YQLType.Json:
         case YQLType.JsonDocument:
         case YQLType.Yson:
-            return 'json';
+        case YQLType.Uuid:
+            return 'string';
         case YQLType.Date:
         case YQLType.Datetime:
         case YQLType.Timestamp:
