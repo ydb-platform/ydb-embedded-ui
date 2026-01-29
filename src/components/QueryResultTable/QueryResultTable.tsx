@@ -45,8 +45,8 @@ const prepareTypedColumns = (columns: ColumnType[], data: KeyValueRow[] | undefi
             render: ({row}) => {
                 const data = row[name];
                 const normalizedData =
-                    columnType === 'string' && typeof data === 'string'
-                        ? JSON.stringify(data)
+                    columnType === 'binary-string' && typeof data === 'string'
+                        ? JSON.stringify(data).slice(1, -1)
                         : String(data);
                 return <Cell value={normalizedData} />;
             },
