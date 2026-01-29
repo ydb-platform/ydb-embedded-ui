@@ -1,5 +1,15 @@
 # Changelog
 
+## [14.4.4](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.4.3...v14.4.4) (2026-01-29)
+
+
+### Bug Fixes
+
+* **ConnectToDB:** correct multiline bash snippet ([#3393](https://github.com/ydb-platform/ydb-embedded-ui/issues/3393)) ([704ca31](https://github.com/ydb-platform/ydb-embedded-ui/commit/704ca31969671f78bff78c29162727eb140d9f04))
+* show bytes correct without quotes ([#3396](https://github.com/ydb-platform/ydb-embedded-ui/issues/3396)) ([3cedd5b](https://github.com/ydb-platform/ydb-embedded-ui/commit/3cedd5b22124d951c3b44e0fa2d9dbb4d2c83151))
+* do not show pdisks for database nodes ([#3388](https://github.com/ydb-platform/ydb-embedded-ui/issues/3388)) ([2eac53c](https://github.com/ydb-platform/ydb-embedded-ui/commit/2eac53ccde43ae7c60f498c136b0136b9ff4026d))
+
+
 ## [14.4.3](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.4.2...v14.4.3) (2026-01-27)
 
 
