@@ -18,6 +18,7 @@ import DetailedOverview from './DetailedOverview/DetailedOverview';
 import {HotKeys} from './HotKeys/HotKeys';
 import {NetworkWrapper} from './Network/NetworkWrapper';
 import {Partitions} from './Partitions/Partitions';
+import {TenantOverview} from './TenantOverview/TenantOverview';
 import {TopQueries} from './TopQueries/TopQueries';
 import {TopShards} from './TopShards/TopShards';
 import {TopicData} from './TopicData/TopicData';
@@ -45,6 +46,15 @@ export function renderDiagnosticsTabContent({
     scrollContainerRef,
 }: DiagnosticsTabContentOptions) {
     switch (activeTabId) {
+        case TENANT_DIAGNOSTICS_TABS_IDS.database: {
+            return (
+                <TenantOverview
+                    database={database}
+                    databaseFullPath={databaseFullPath}
+                    additionalTenantProps={additionalTenantProps}
+                />
+            );
+        }
         case TENANT_DIAGNOSTICS_TABS_IDS.overview: {
             return (
                 <DetailedOverview

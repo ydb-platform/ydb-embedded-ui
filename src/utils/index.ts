@@ -38,3 +38,17 @@ export function loadFromSessionStorage(key: string): unknown {
         return null;
     }
 }
+
+/**
+ * Checks if a feature flag is enabled in localStorage.
+ * The flag is considered enabled only if its value is exactly 'true'.
+ * @param flagName - The name of the flag in localStorage
+ * @returns true if the flag is set to 'true', false otherwise
+ */
+export function isLocalStorageFlagEnabled(flagName: string): boolean {
+    try {
+        return localStorage.getItem(flagName) === 'true';
+    } catch {
+        return false;
+    }
+}

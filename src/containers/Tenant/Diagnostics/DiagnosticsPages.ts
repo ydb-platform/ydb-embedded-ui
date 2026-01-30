@@ -24,6 +24,8 @@ export type Page = {
     badge?: Badge;
 };
 
+export type DatabasePagesDisplay = 'all' | 'diagnostics' | 'schema';
+
 interface GetPagesOptions {
     hasTopicData?: boolean;
     isTopLevel?: boolean;
@@ -32,7 +34,13 @@ interface GetPagesOptions {
     hasAccess?: boolean;
     hasMonitoring?: boolean;
     databaseType?: ETenantType;
+    databasePagesDisplay?: DatabasePagesDisplay;
 }
+
+const database = {
+    id: TENANT_DIAGNOSTICS_TABS_IDS.database,
+    title: 'Overview',
+};
 
 const overview = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.overview,
@@ -133,7 +141,7 @@ const ASYNC_REPLICATION_PAGES = [overview, tablets, describe, access];
 
 const TRANSFER_PAGES = [overview, tablets, describe, access];
 
-const DATABASE_PAGES = [
+const ALL_DB_PAGES = [
     overview,
     monitoring,
     topQueries,
@@ -149,7 +157,20 @@ const DATABASE_PAGES = [
     backups,
 ];
 
-const SERVERLESS_DATABASE_PAGES = [
+const SCHEMA_DB_PAGES = [overview, topShards, nodes, tablets, describe, access];
+
+const DIAGNOSTICS_DB_PAGES = [
+    database,
+    monitoring,
+    topQueries,
+    storage,
+    network,
+    configs,
+    operations,
+    backups,
+];
+
+const ALL_SERVERLESS_DB_PAGES = [
     overview,
     monitoring,
     topQueries,
@@ -159,6 +180,10 @@ const SERVERLESS_DATABASE_PAGES = [
     configs,
     operations,
 ];
+
+const SCHEMA_SERVERLESS_DB_PAGES = [overview, topShards, tablets, describe];
+
+const DIAGNOSTICS_SERVERLESS_DB_PAGES = [database, monitoring, topQueries, configs, operations];
 
 const TABLE_PAGES = [overview, schema, topShards, nodes, graph, tablets, hotKeys, describe, access];
 const COLUMN_TABLE_PAGES = [overview, schema, topShards, nodes, tablets, describe, access];
@@ -182,9 +207,9 @@ const STREAMING_QUERY_PAGES = [overview, describe, access];
 const pathTypeToPages: Record<EPathType, Page[] | undefined> = {
     [EPathType.EPathTypeInvalid]: undefined,
 
-    [EPathType.EPathTypeSubDomain]: DATABASE_PAGES,
-    [EPathType.EPathTypeExtSubDomain]: DATABASE_PAGES,
-    [EPathType.EPathTypeColumnStore]: DATABASE_PAGES,
+    [EPathType.EPathTypeSubDomain]: ALL_DB_PAGES,
+    [EPathType.EPathTypeExtSubDomain]: ALL_DB_PAGES,
+    [EPathType.EPathTypeColumnStore]: ALL_DB_PAGES,
 
     [EPathType.EPathTypeTable]: TABLE_PAGES,
     [EPathType.EPathTypeColumnTable]: COLUMN_TABLE_PAGES,
@@ -224,8 +249,24 @@ function computeInitialPages(type?: EPathType, subType?: EPathSubType) {
     return subTypePages || typePages || DIR_PAGES;
 }
 
-function getDatabasePages(databaseType?: ETenantType) {
-    return databaseType === 'Serverless' ? SERVERLESS_DATABASE_PAGES : DATABASE_PAGES;
+function getDatabasePages(databaseType?: ETenantType, databasePagesDisplay?: DatabasePagesDisplay) {
+    if (databaseType === 'Serverless') {
+        if (databasePagesDisplay === 'diagnostics') {
+            return DIAGNOSTICS_SERVERLESS_DB_PAGES;
+        }
+        if (databasePagesDisplay === 'schema') {
+            return SCHEMA_SERVERLESS_DB_PAGES;
+        }
+        return ALL_SERVERLESS_DB_PAGES;
+    }
+
+    if (databasePagesDisplay === 'diagnostics') {
+        return DIAGNOSTICS_DB_PAGES;
+    }
+    if (databasePagesDisplay === 'schema') {
+        return SCHEMA_DB_PAGES;
+    }
+    return ALL_DB_PAGES;
 }
 
 function applyFilters(pages: Page[], options: GetPagesOptions = {}) {
@@ -259,7 +300,9 @@ export const getPagesByType = (
 ) => {
     const base = computeInitialPages(type, subType);
     const dbContext = isDatabaseEntityType(type) || options?.isTopLevel;
-    const seeded = dbContext ? getDatabasePages(options?.databaseType) : base;
+    const seeded = dbContext
+        ? getDatabasePages(options?.databaseType, options?.databasePagesDisplay)
+        : base;
 
     return applyFilters(seeded, options);
 };
