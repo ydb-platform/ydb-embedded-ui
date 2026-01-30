@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {isLocalStorageFlagEnabled} from '../../../utils';
 import {TENANT_NAVIGATION_V2_FLAG} from '../../../utils/constants';
 
