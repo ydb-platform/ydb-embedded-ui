@@ -289,7 +289,7 @@ export class Diagnostics {
         this.nodes = new NodesPage(page);
         this.memoryViewer = new MemoryViewer(page);
         this.operations = new OperationsTable(page);
-        this.tabs = page.locator('.kv-tenant-diagnostics__tabs');
+        this.tabs = page.locator('.ydb-database-diagnostics-tabs__tabs');
         this.tableControls = page.locator('.ydb-table-with-controls-layout__controls');
         this.schemaViewer = page.locator('.schema-viewer');
         this.dataTable = page.locator('.data-table__table');
