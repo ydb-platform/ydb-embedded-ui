@@ -53,6 +53,7 @@ export interface UIFactory<H extends string = CommonIssueType, T extends string 
 
     useMetaProxy?: boolean;
     useClusterDomain?: boolean;
+    clustersDomain?: string;
 
     settingsBackend?: {
         /**
