@@ -12,6 +12,7 @@ import type {ClusterTab} from './containers/Cluster/utils';
 import type {NodePageQuery, NodeTab} from './containers/Node/NodePages';
 import type {TenantQuery} from './containers/Tenant/TenantPages';
 import {backend, basename, clusterName, environment, webVersion} from './store';
+import {uiFactory} from './uiFactory/uiFactory';
 import {normalizePathSlashes} from './utils';
 import {useDatabaseFromQuery} from './utils/hooks/useDatabaseFromQuery';
 
@@ -188,7 +189,9 @@ export function getHomePagePath(
     query?: HomePageQueryParams,
     options?: CreateHrefOptions,
 ) {
-    return createHref(routes.homePage, params, query, options);
+    const isCLustersTab = params?.activeTab === 'clusters';
+    const clustersDomain = isCLustersTab ? uiFactory.clustersDomain : undefined;
+    return createHref(routes.homePage, params, query, options, clustersDomain);
 }
 export function getDatabasesPath(query?: HomePageQueryParams, options?: CreateHrefOptions) {
     return getHomePagePath({activeTab: 'databases'}, query, options);
