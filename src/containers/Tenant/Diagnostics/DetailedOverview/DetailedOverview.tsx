@@ -1,6 +1,7 @@
 import type {AdditionalTenantsProps} from '../../../../types/additionalProps';
 import type {EPathType} from '../../../../types/api/schema';
 import {cn} from '../../../../utils/cn';
+import {useNavigationV2Enabled} from '../../utils/useNavigationV2Enabled';
 import Overview from '../Overview/Overview';
 import {TenantOverview} from '../TenantOverview/TenantOverview';
 
@@ -24,34 +25,30 @@ function DetailedOverview({
     path,
     additionalTenantProps,
 }: DetailedOverviewProps) {
-    const renderTenantOverview = () => {
-        return (
-            <div className={b('section')}>
+    const isTenant = databaseFullPath === path;
+    const isV2Enabled = useNavigationV2Enabled();
+
+    const renderContent = () => {
+        if (isTenant && !isV2Enabled) {
+            return (
                 <TenantOverview
                     database={database}
                     databaseFullPath={databaseFullPath}
                     additionalTenantProps={additionalTenantProps}
                 />
-            </div>
+            );
+        }
+        return (
+            <Overview
+                type={type}
+                path={path}
+                database={database}
+                databaseFullPath={databaseFullPath}
+            />
         );
     };
 
-    const isTenant = databaseFullPath === path;
-
-    return (
-        <div className={b()}>
-            {isTenant ? (
-                renderTenantOverview()
-            ) : (
-                <Overview
-                    type={type}
-                    path={path}
-                    database={database}
-                    databaseFullPath={databaseFullPath}
-                />
-            )}
-        </div>
-    );
+    return <div className={b()}>{renderContent()}</div>;
 }
 
 export default DetailedOverview;

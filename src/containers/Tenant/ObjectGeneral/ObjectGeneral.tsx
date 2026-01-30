@@ -5,8 +5,10 @@ import type {AdditionalTenantsProps} from '../../../types/additionalProps';
 import {cn} from '../../../utils/cn';
 import Diagnostics from '../Diagnostics/Diagnostics';
 import {Query} from '../Query/Query';
+import {useCurrentSchema} from '../TenantContext';
 import {TenantNavigation} from '../TenantNavigation/TenantNavigation';
 import {useTenantPage} from '../TenantNavigation/useTenantNavigation';
+import {useNavigationV2Enabled} from '../utils/useNavigationV2Enabled';
 
 import './ObjectGeneral.scss';
 
@@ -18,6 +20,8 @@ interface ObjectGeneralProps {
 
 function ObjectGeneral({additionalTenantProps}: ObjectGeneralProps) {
     const theme = useThemeValue();
+    const isV2Enabled = useNavigationV2Enabled();
+    const {path, database, type, subType, databaseFullPath} = useCurrentSchema();
 
     const {tenantPage} = useTenantPage();
 
@@ -26,15 +30,27 @@ function ObjectGeneral({additionalTenantProps}: ObjectGeneralProps) {
             case TENANT_PAGES_IDS.query: {
                 return <Query theme={theme} />;
             }
+            case TENANT_PAGES_IDS.schema:
+            case TENANT_PAGES_IDS.diagnostics:
             default: {
-                return <Diagnostics additionalTenantProps={additionalTenantProps} />;
+                return (
+                    <Diagnostics
+                        path={path}
+                        database={database}
+                        type={type}
+                        subType={subType}
+                        databaseFullPath={databaseFullPath}
+                        additionalTenantProps={additionalTenantProps}
+                        databasePagesDisplay={isV2Enabled ? 'schema' : 'all'}
+                    />
+                );
             }
         }
     };
 
     return (
         <div className={b()}>
-            <TenantNavigation />
+            {!isV2Enabled && <TenantNavigation />}
             {renderPageContent()}
         </div>
     );

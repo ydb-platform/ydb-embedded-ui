@@ -2,6 +2,7 @@
   "page.title": "Database",
   "pages.query": "Query",
   "pages.diagnostics": "Diagnostics",
+  "pages.schema": "Schema",
   "summary.navigation": "Navigation",
   "summary.showPreview": "Show preview",
   "summary.source-type": "Source Type",

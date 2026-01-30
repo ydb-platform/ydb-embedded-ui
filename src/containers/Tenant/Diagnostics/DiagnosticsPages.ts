@@ -10,7 +10,9 @@ import {EPathSubType, EPathType} from '../../../types/api/schema';
 import type {ETenantType} from '../../../types/api/tenant';
 import type {TenantQuery} from '../TenantPages';
 import {TenantTabsGroups} from '../TenantPages';
-import {isDatabaseEntityType, isEntityWithTopicData} from '../utils/schema';
+import {isDatabaseEntityType} from '../utils/schema';
+
+import i18n from './i18n';
 
 interface Badge {
     text: string;
@@ -18,11 +20,13 @@ interface Badge {
     size?: LabelProps['size'];
 }
 
-type Page = {
+export type Page = {
     id: TenantDiagnosticsTab;
     title: string;
     badge?: Badge;
 };
+
+export type DatabasePagesDisplay = 'all' | 'diagnostics' | 'schema';
 
 interface GetPagesOptions {
     hasTopicData?: boolean;
@@ -32,98 +36,104 @@ interface GetPagesOptions {
     hasAccess?: boolean;
     hasMonitoring?: boolean;
     databaseType?: ETenantType;
+    databasePagesDisplay?: DatabasePagesDisplay;
 }
+
+const database = {
+    id: TENANT_DIAGNOSTICS_TABS_IDS.database,
+    title: i18n('title_database-overview'),
+};
 
 const overview = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.overview,
-    title: 'Info',
+    title: i18n('title_info'),
 };
 
 const schema = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.schema,
-    title: 'Schema',
+    title: i18n('title_schema'),
 };
 
 const topQueries = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.topQueries,
-    title: 'Queries',
+    title: i18n('title_queries'),
 };
 
 const topShards = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.topShards,
-    title: 'Top shards',
+    title: i18n('title_top-shards'),
 };
 const access = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.access,
-    title: 'Access',
+    title: i18n('title_access'),
 };
 const backups = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.backups,
-    title: 'Backups',
+    title: i18n('title_backups'),
 };
 
 const nodes = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.nodes,
-    title: 'Nodes',
+    title: i18n('title_nodes'),
 };
 
 const tablets = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.tablets,
-    title: 'Tablets',
+    title: i18n('title_tablets'),
 };
 const storage = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.storage,
-    title: 'Storage',
+    title: i18n('title_storage'),
 };
 const network = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.network,
-    title: 'Network',
+    title: i18n('title_network'),
 };
 
 const describe = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.describe,
-    title: 'Describe',
+    title: i18n('title_describe'),
 };
 
 const hotKeys = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.hotKeys,
-    title: 'Hot keys',
+    title: i18n('title_hot-keys'),
 };
 
 const graph = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.graph,
-    title: 'Graph',
+    title: i18n('title_graph'),
 };
 
 const consumers = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.consumers,
-    title: 'Consumers',
+    title: i18n('title_consumers'),
 };
 
 const partitions = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.partitions,
-    title: 'Partitions',
+    title: i18n('title_partitions'),
 };
 const topicData = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.topicData,
-    title: 'Data',
+    title: i18n('title_data'),
 };
 
 const configs = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.configs,
-    title: 'Configs',
+    title: i18n('title_configs'),
 };
 
 const operations = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.operations,
-    title: 'Operations',
+    title: i18n('title_operations'),
 };
 
 const monitoring = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.monitoring,
-    title: 'Monitoring',
+    title: i18n('title_monitoring'),
     badge: {
-        text: 'New',
+        text: i18n('value_new'),
         theme: 'normal' as const,
         size: 'xs' as const,
     },
@@ -133,7 +143,7 @@ const ASYNC_REPLICATION_PAGES = [overview, tablets, describe, access];
 
 const TRANSFER_PAGES = [overview, tablets, describe, access];
 
-const DATABASE_PAGES = [
+const ALL_DB_PAGES = [
     overview,
     monitoring,
     topQueries,
@@ -149,7 +159,20 @@ const DATABASE_PAGES = [
     backups,
 ];
 
-const SERVERLESS_DATABASE_PAGES = [
+const SCHEMA_DB_PAGES = [overview, topShards, nodes, tablets, describe, access];
+
+const DIAGNOSTICS_DB_PAGES = [
+    database,
+    monitoring,
+    topQueries,
+    storage,
+    network,
+    configs,
+    operations,
+    backups,
+];
+
+const ALL_SERVERLESS_DB_PAGES = [
     overview,
     monitoring,
     topQueries,
@@ -159,6 +182,10 @@ const SERVERLESS_DATABASE_PAGES = [
     configs,
     operations,
 ];
+
+const SCHEMA_SERVERLESS_DB_PAGES = [overview, topShards, tablets, describe];
+
+const DIAGNOSTICS_SERVERLESS_DB_PAGES = [database, monitoring, topQueries, configs, operations];
 
 const TABLE_PAGES = [overview, schema, topShards, nodes, graph, tablets, hotKeys, describe, access];
 const COLUMN_TABLE_PAGES = [overview, schema, topShards, nodes, tablets, describe, access];
@@ -182,9 +209,9 @@ const STREAMING_QUERY_PAGES = [overview, describe, access];
 const pathTypeToPages: Record<EPathType, Page[] | undefined> = {
     [EPathType.EPathTypeInvalid]: undefined,
 
-    [EPathType.EPathTypeSubDomain]: DATABASE_PAGES,
-    [EPathType.EPathTypeExtSubDomain]: DATABASE_PAGES,
-    [EPathType.EPathTypeColumnStore]: DATABASE_PAGES,
+    [EPathType.EPathTypeSubDomain]: ALL_DB_PAGES,
+    [EPathType.EPathTypeExtSubDomain]: ALL_DB_PAGES,
+    [EPathType.EPathTypeColumnStore]: ALL_DB_PAGES,
 
     [EPathType.EPathTypeTable]: TABLE_PAGES,
     [EPathType.EPathTypeColumnTable]: COLUMN_TABLE_PAGES,
@@ -224,18 +251,34 @@ function computeInitialPages(type?: EPathType, subType?: EPathSubType) {
     return subTypePages || typePages || DIR_PAGES;
 }
 
-function getDatabasePages(databaseType?: ETenantType) {
-    return databaseType === 'Serverless' ? SERVERLESS_DATABASE_PAGES : DATABASE_PAGES;
-}
-
-function applyFilters(pages: Page[], type?: EPathType, options: GetPagesOptions = {}) {
-    let result = pages;
-
-    if (isEntityWithTopicData(type) && !options.hasTopicData) {
-        result = result.filter((p) => p.id !== TENANT_DIAGNOSTICS_TABS_IDS.topicData);
+function getDatabasePages(databaseType?: ETenantType, databasePagesDisplay?: DatabasePagesDisplay) {
+    if (databaseType === 'Serverless') {
+        if (databasePagesDisplay === 'diagnostics') {
+            return DIAGNOSTICS_SERVERLESS_DB_PAGES;
+        }
+        if (databasePagesDisplay === 'schema') {
+            return SCHEMA_SERVERLESS_DB_PAGES;
+        }
+        return ALL_SERVERLESS_DB_PAGES;
     }
 
+    if (databasePagesDisplay === 'diagnostics') {
+        return DIAGNOSTICS_DB_PAGES;
+    }
+    if (databasePagesDisplay === 'schema') {
+        return SCHEMA_DB_PAGES;
+    }
+    return ALL_DB_PAGES;
+}
+
+function applyFilters(pages: Page[], options: GetPagesOptions = {}) {
+    const result = pages;
+
     const removals: TenantDiagnosticsTab[] = [];
+
+    if (!options.hasTopicData) {
+        removals.push(TENANT_DIAGNOSTICS_TABS_IDS.topicData);
+    }
     if (!options.hasBackups) {
         removals.push(TENANT_DIAGNOSTICS_TABS_IDS.backups);
     }
@@ -259,9 +302,11 @@ export const getPagesByType = (
 ) => {
     const base = computeInitialPages(type, subType);
     const dbContext = isDatabaseEntityType(type) || options?.isTopLevel;
-    const seeded = dbContext ? getDatabasePages(options?.databaseType) : base;
+    const seeded = dbContext
+        ? getDatabasePages(options?.databaseType, options?.databasePagesDisplay)
+        : base;
 
-    return applyFilters(seeded, type, options);
+    return applyFilters(seeded, options);
 };
 
 export const useDiagnosticsPageLinkGetter = () => {
