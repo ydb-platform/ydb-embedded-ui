@@ -1,5 +1,12 @@
 # Changelog
 
+## [14.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.4.4...v14.5.0) (2026-01-30)
+
+
+### Features
+
+* **Tablets:** display the range of the PK ([#3394](https://github.com/ydb-platform/ydb-embedded-ui/issues/3394)) ([d56c92a](https://github.com/ydb-platform/ydb-embedded-ui/commit/d56c92a1f9273cc742f31958256c799bb82a8e58))
+
 ## [14.4.4](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.4.3...v14.4.4) (2026-01-29)
 
 
