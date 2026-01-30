@@ -12,6 +12,8 @@ import type {TenantQuery} from '../TenantPages';
 import {TenantTabsGroups} from '../TenantPages';
 import {isDatabaseEntityType} from '../utils/schema';
 
+import i18n from './i18n';
+
 interface Badge {
     text: string;
     theme?: LabelProps['theme'];
@@ -39,99 +41,99 @@ interface GetPagesOptions {
 
 const database = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.database,
-    title: 'Overview',
+    title: i18n('title_database-overview'),
 };
 
 const overview = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.overview,
-    title: 'Info',
+    title: i18n('title_info'),
 };
 
 const schema = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.schema,
-    title: 'Schema',
+    title: i18n('title_schema'),
 };
 
 const topQueries = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.topQueries,
-    title: 'Queries',
+    title: i18n('title_queries'),
 };
 
 const topShards = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.topShards,
-    title: 'Top shards',
+    title: i18n('title_top-shards'),
 };
 const access = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.access,
-    title: 'Access',
+    title: i18n('title_access'),
 };
 const backups = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.backups,
-    title: 'Backups',
+    title: i18n('title_backups'),
 };
 
 const nodes = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.nodes,
-    title: 'Nodes',
+    title: i18n('title_nodes'),
 };
 
 const tablets = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.tablets,
-    title: 'Tablets',
+    title: i18n('title_tablets'),
 };
 const storage = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.storage,
-    title: 'Storage',
+    title: i18n('title_storage'),
 };
 const network = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.network,
-    title: 'Network',
+    title: i18n('title_network'),
 };
 
 const describe = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.describe,
-    title: 'Describe',
+    title: i18n('title_describe'),
 };
 
 const hotKeys = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.hotKeys,
-    title: 'Hot keys',
+    title: i18n('title_hot-keys'),
 };
 
 const graph = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.graph,
-    title: 'Graph',
+    title: i18n('title_graph'),
 };
 
 const consumers = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.consumers,
-    title: 'Consumers',
+    title: i18n('title_consumers'),
 };
 
 const partitions = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.partitions,
-    title: 'Partitions',
+    title: i18n('title_partitions'),
 };
 const topicData = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.topicData,
-    title: 'Data',
+    title: i18n('title_data'),
 };
 
 const configs = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.configs,
-    title: 'Configs',
+    title: i18n('title_configs'),
 };
 
 const operations = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.operations,
-    title: 'Operations',
+    title: i18n('title_operations'),
 };
 
 const monitoring = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.monitoring,
-    title: 'Monitoring',
+    title: i18n('title_monitoring'),
     badge: {
-        text: 'New',
+        text: i18n('value_new'),
         theme: 'normal' as const,
         size: 'xs' as const,
     },

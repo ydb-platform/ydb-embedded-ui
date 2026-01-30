@@ -1,3 +1,24 @@
 {
-  "no-data": "No data"
+  "no-data": "No data",
+  "title_database-overview": "Overview",
+  "title_info": "Info",
+  "title_schema": "Schema",
+  "title_queries": "Queries",
+  "title_top-shards": "Top shards",
+  "title_access": "Access",
+  "title_backups": "Backups",
+  "title_nodes": "Nodes",
+  "title_tablets": "Tablets",
+  "title_storage": "Storage",
+  "title_network": "Network",
+  "title_describe": "Describe",
+  "title_hot-keys": "Hot keys",
+  "title_graph": "Graph",
+  "title_consumers": "Consumers",
+  "title_partitions": "Partitions",
+  "title_data": "Data",
+  "title_configs": "Configs",
+  "title_operations": "Operations",
+  "title_monitoring": "Monitoring",
+  "value_new": "New"
 }
