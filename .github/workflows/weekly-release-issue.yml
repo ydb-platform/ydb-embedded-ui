@@ -31,6 +31,10 @@ jobs:
                - After merging, the new library version will be automatically published to npm
 
             - [ ] **Update yandex ydb-embedded-ui**
+
+            - [ ] **Update embedded UI in YDB**
+              - Run [action](https://github.com/ydb-platform/ydb/actions/workflows/embedded_ui_refresh.yaml) to update embedded UI in YDB
+              - Merge created PR
             `;
 
             // Check if an open issue with this title already exists
