@@ -14,7 +14,6 @@ import {skipToken} from '@reduxjs/toolkit/query';
 import {useHistory, useLocation} from 'react-router-dom';
 
 import {getConnectToDBDialog} from '../../components/ConnectToDB/ConnectToDBDialog';
-import {InternalLink} from '../../components/InternalLink';
 import type {HomePageTab} from '../../routes';
 import {checkIsHomePage, checkIsTenantPage, getClusterPath} from '../../routes';
 import {environment} from '../../store';
@@ -47,6 +46,7 @@ import {canShowTenantMonitoring} from '../../utils/monitoringVisibility';
 import {isAccessError} from '../../utils/response';
 import {useHomePageTab} from '../HomePage/useHomePageTab';
 
+import {BreadcrumbLink} from './BreadcrumbLink';
 import {getBreadcrumbs} from './breadcrumbs';
 import {headerKeyset} from './i18n';
 
@@ -293,12 +293,11 @@ function Header() {
                                 className={b('breadcrumbs-item', {active: isLast})}
                                 disabled={isLast}
                             >
-                                <InternalLink to={isLast ? undefined : link} as="tab">
-                                    <Flex alignItems="center" gap={1}>
-                                        {icon}
-                                        {text}
-                                    </Flex>
-                                </InternalLink>
+                                <BreadcrumbLink
+                                    icon={icon}
+                                    text={text}
+                                    link={isLast ? undefined : link}
+                                />
                             </Breadcrumbs.Item>
                         );
                     })}
