@@ -1,3 +1,5 @@
+import {uiFactory} from '../../uiFactory/uiFactory';
+import {useIsUserAllowedToMakeChanges} from '../hooks/useIsUserAllowedToMakeChanges';
 import {pad9} from '../utils';
 
 function getCurrentHost() {
@@ -62,4 +64,10 @@ export function createTabletDeveloperUIHref(
 ) {
     const subPage = tabletPage ? `/${tabletPage}` : '';
     return `${host}/tablets${subPage}?${searchParam}=${tabletId}`;
+}
+
+export function useHasDeveloperUi() {
+    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const isDeveloperUiAllowed = uiFactory.hasDeveloperUi;
+    return isUserAllowedToMakeChanges && isDeveloperUiAllowed;
 }

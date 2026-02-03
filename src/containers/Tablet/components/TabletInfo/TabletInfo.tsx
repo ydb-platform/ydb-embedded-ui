@@ -10,9 +10,11 @@ import {getDefaultNodePath, useTabletPagePath} from '../../../../routes';
 import {ETabletState} from '../../../../types/api/tablet';
 import type {TTabletStateInfo} from '../../../../types/api/tablet';
 import {cn} from '../../../../utils/cn';
-import {createTabletDeveloperUIHref} from '../../../../utils/developerUI/developerUI';
+import {
+    createTabletDeveloperUIHref,
+    useHasDeveloperUi,
+} from '../../../../utils/developerUI/developerUI';
 import {useDatabaseFromQuery} from '../../../../utils/hooks/useDatabaseFromQuery';
-import {useIsUserAllowedToMakeChanges} from '../../../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {hasHive} from '../../utils';
 
 import {tabletInfoKeyset} from './i18n';
@@ -27,7 +29,7 @@ interface TabletInfoProps {
 
 export const TabletInfo = ({tablet}: TabletInfoProps) => {
     const getTabletPagePath = useTabletPagePath();
-    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const hasDeveloperUi = useHasDeveloperUi();
     const database = useDatabaseFromQuery();
 
     const {
@@ -106,7 +108,7 @@ export const TabletInfo = ({tablet}: TabletInfoProps) => {
     };
 
     const renderLinks = () => {
-        if (!isUserAllowedToMakeChanges || !TabletId) {
+        if (!hasDeveloperUi || !TabletId) {
             return null;
         }
         return (

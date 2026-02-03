@@ -31,17 +31,17 @@ import {tenantApi} from '../../store/reducers/tenant/tenant';
 import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {DEVELOPER_UI_TITLE, MONITORING_UI_TITLE} from '../../utils/constants';
-import {createDeveloperUIInternalPageHref} from '../../utils/developerUI/developerUI';
+import {
+    createDeveloperUIInternalPageHref,
+    useHasDeveloperUi,
+} from '../../utils/developerUI/developerUI';
 import {useSetting, useTypedSelector} from '../../utils/hooks';
 import {
     useClusterNameFromQuery,
     useDatabaseFromQuery,
 } from '../../utils/hooks/useDatabaseFromQuery';
 import {useDatabasesV2} from '../../utils/hooks/useDatabasesV2';
-import {
-    useIsUserAllowedToMakeChanges,
-    useIsViewerUser,
-} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {canShowTenantMonitoring} from '../../utils/monitoringVisibility';
 import {isAccessError} from '../../utils/response';
 import {useHomePageTab} from '../HomePage/useHomePageTab';
@@ -58,7 +58,7 @@ function Header() {
     const metaCapabilitiesLoaded = useMetaCapabilitiesLoaded();
     const {page, pageBreadcrumbsOptions} = useTypedSelector((state) => state.header);
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
-    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const hasDeveloperUi = useHasDeveloperUi();
     const isViewerUser = useIsViewerUser();
     const databasesPageAvailable = useMetaEnvironmentsAvailable();
 
@@ -247,7 +247,7 @@ function Header() {
             }
         }
 
-        if (!isHomePage && isUserAllowedToMakeChanges) {
+        if (!isHomePage && hasDeveloperUi) {
             elements.push(
                 <Button view="flat" href={createDeveloperUIInternalPageHref()} target="_blank">
                     {DEVELOPER_UI_TITLE}

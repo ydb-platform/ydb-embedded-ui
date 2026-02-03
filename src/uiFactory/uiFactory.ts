@@ -22,6 +22,7 @@ const uiFactoryBase: UIFactory = {
     useDatabaseId: false,
     settingsBackend: undefined,
     enableMultiTabQueryEditor: false,
+    hasDeveloperUi: true,
 };
 
 export function configureUIFactory<H extends string, T extends string = string>(

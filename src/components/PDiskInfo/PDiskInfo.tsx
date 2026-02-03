@@ -3,9 +3,8 @@ import {Flex} from '@gravity-ui/uikit';
 import {valueIsDefined} from '../../utils';
 import {formatBytes} from '../../utils/bytesParsers';
 import {formatStorageValuesToGb} from '../../utils/dataFormatters/dataFormatters';
-import {createPDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
+import {createPDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import type {PreparedPDisk} from '../../utils/disks/types';
-import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import type {InfoViewerItem} from '../InfoViewer';
 import {InfoViewer} from '../InfoViewer/InfoViewer';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
@@ -19,7 +18,7 @@ interface GetPDiskInfoOptions<T extends PreparedPDisk> {
     pDisk?: T;
     nodeId?: number | string | null;
     withPDiskPageLink?: boolean;
-    isUserAllowedToMakeChanges?: boolean;
+    hasDeveloperUi?: boolean;
 }
 
 // eslint-disable-next-line complexity
@@ -27,7 +26,7 @@ function getPDiskInfo<T extends PreparedPDisk>({
     pDisk,
     nodeId,
     withPDiskPageLink,
-    isUserAllowedToMakeChanges,
+    hasDeveloperUi,
 }: GetPDiskInfoOptions<T>) {
     const {
         PDiskId,
@@ -144,9 +143,7 @@ function getPDiskInfo<T extends PreparedPDisk>({
     const additionalInfo: InfoViewerItem[] = [];
 
     const shouldDisplayLinks =
-        (withPDiskPageLink || isUserAllowedToMakeChanges) &&
-        valueIsDefined(PDiskId) &&
-        valueIsDefined(nodeId);
+        (withPDiskPageLink || hasDeveloperUi) && valueIsDefined(PDiskId) && valueIsDefined(nodeId);
 
     if (shouldDisplayLinks) {
         const pDiskInternalViewerPath = createPDiskDeveloperUILink({
@@ -159,7 +156,7 @@ function getPDiskInfo<T extends PreparedPDisk>({
             value: (
                 <Flex wrap="wrap" gap={2}>
                     {withPDiskPageLink && <PDiskPageLink pDiskId={PDiskId} nodeId={nodeId} />}
-                    {isUserAllowedToMakeChanges && (
+                    {hasDeveloperUi && (
                         <LinkWithIcon
                             title={pDiskInfoKeyset('developer-ui')}
                             url={pDiskInternalViewerPath}
@@ -183,13 +180,13 @@ export function PDiskInfo<T extends PreparedPDisk>({
     withPDiskPageLink,
     className,
 }: PDiskInfoProps<T>) {
-    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const hasDeveloperUi = useHasDeveloperUi();
 
     const [generalInfo, statusInfo, spaceInfo, additionalInfo] = getPDiskInfo({
         pDisk,
         nodeId,
         withPDiskPageLink,
-        isUserAllowedToMakeChanges,
+        hasDeveloperUi,
     });
 
     return (

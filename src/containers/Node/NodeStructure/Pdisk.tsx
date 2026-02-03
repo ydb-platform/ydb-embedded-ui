@@ -21,8 +21,10 @@ import {valueIsDefined} from '../../../utils';
 import {cn} from '../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
 import {formatStorageValuesToGb} from '../../../utils/dataFormatters/dataFormatters';
-import {createVDiskDeveloperUILink} from '../../../utils/developerUI/developerUI';
-import {useIsUserAllowedToMakeChanges} from '../../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {
+    createVDiskDeveloperUILink,
+    useHasDeveloperUi,
+} from '../../../utils/developerUI/developerUI';
 import i18n from '../i18n';
 
 import {PDiskTitleBadge} from './PDiskTitleBadge';
@@ -176,7 +178,7 @@ export function PDisk({
     nodeId,
     unfolded: unfoldedFromProps,
 }: PDiskProps) {
-    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const hasDeveloperUi = useHasDeveloperUi();
 
     const [unfolded, setUnfolded] = React.useState(unfoldedFromProps ?? false);
 
@@ -201,7 +203,7 @@ export function PDisk({
                     nodeId,
                     pDiskId: PDiskId,
                     selectedVdiskId,
-                    withDeveloperUILink: isUserAllowedToMakeChanges,
+                    withDeveloperUILink: hasDeveloperUi,
                 })}
                 settings={{...DEFAULT_TABLE_SETTINGS, dynamicRender: false}}
                 rowClassName={(row) => {
