@@ -6,13 +6,12 @@ import {isNil} from 'lodash';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {createPDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
+import {createPDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import {getStateSeverity} from '../../utils/disks/calculatePDiskSeverity';
 import {NUMERIC_SEVERITY_TO_LABEL_VIEW} from '../../utils/disks/constants';
 import type {PreparedPDisk} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
-import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToGB, isNumeric} from '../../utils/utils';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {pDiskInfoKeyset} from '../PDiskInfo/i18n';
@@ -109,19 +108,26 @@ export const buildPDiskFooter = (
 ): React.ReactNode | null => {
     const {NodeId, PDiskId} = data;
 
-    if (!withDeveloperUILink || isNil(NodeId) || isNil(PDiskId)) {
+    if (isNil(NodeId) || isNil(PDiskId)) {
         return null;
     }
 
-    const pDiskInternalViewerPath = createPDiskDeveloperUILink({
-        nodeId: NodeId,
-        pDiskId: PDiskId,
-    });
+    const pDiskInternalViewerPath = withDeveloperUILink
+        ? createPDiskDeveloperUILink({
+              nodeId: NodeId,
+              pDiskId: PDiskId,
+          })
+        : undefined;
 
     return (
         <Flex gap={2} wrap="wrap">
             <PDiskPageLink pDiskId={PDiskId} nodeId={NodeId} />
-            <LinkWithIcon title={pDiskInfoKeyset('developer-ui')} url={pDiskInternalViewerPath} />
+            {pDiskInternalViewerPath && (
+                <LinkWithIcon
+                    title={pDiskInfoKeyset('developer-ui')}
+                    url={pDiskInternalViewerPath}
+                />
+            )}
         </Flex>
     );
 };
@@ -132,7 +138,7 @@ interface PDiskPopupProps {
 
 export const PDiskPopup = ({data}: PDiskPopupProps) => {
     const database = useDatabaseFromQuery();
-    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const hasDeveloperUi = useHasDeveloperUi();
     const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));
     const nodeData = isNil(data.NodeId) ? undefined : nodesMap?.get(data.NodeId);
 
@@ -144,8 +150,8 @@ export const PDiskPopup = ({data}: PDiskPopupProps) => {
     );
 
     const footer = React.useMemo(
-        () => buildPDiskFooter(data, isUserAllowedToMakeChanges),
-        [data, isUserAllowedToMakeChanges],
+        () => buildPDiskFooter(data, hasDeveloperUi),
+        [data, hasDeveloperUi],
     );
 
     const pdiskId = data.StringifiedId;

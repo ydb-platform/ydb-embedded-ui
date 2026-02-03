@@ -10,7 +10,7 @@ import {EVDiskState} from '../../types/api/vdisk';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatDurationSeconds} from '../../utils/dataFormatters/dataFormatters';
-import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
+import {createVDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import {getStateSeverity} from '../../utils/disks/calculateVDiskSeverity';
 import {
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
@@ -22,10 +22,7 @@ import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
 import {useTypedSelector} from '../../utils/hooks';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
-import {
-    useIsUserAllowedToMakeChanges,
-    useIsViewerUser,
-} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
+import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToGB, bytesToSpeed} from '../../utils/utils';
 import {InternalLink} from '../InternalLink';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
@@ -388,7 +385,7 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
     const isFullData = isFullVDiskData(data);
     const isViewerUser = useIsViewerUser();
 
-    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const hasDeveloperUi = useHasDeveloperUi();
     const getVDiskLink = useVDiskPagePath();
 
     const database = useDatabaseFromQuery();
@@ -407,9 +404,9 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
     const vdiskFooter = React.useMemo(
         () =>
             isFullData
-                ? buildVDiskFooter(data, isUserAllowedToMakeChanges, getVDiskLink)
-                : buildUnavailableVDiskFooter(data, isUserAllowedToMakeChanges),
-        [data, isFullData, isUserAllowedToMakeChanges, getVDiskLink],
+                ? buildVDiskFooter(data, hasDeveloperUi, getVDiskLink)
+                : buildUnavailableVDiskFooter(data, hasDeveloperUi),
+        [data, isFullData, hasDeveloperUi, getVDiskLink],
     );
 
     const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));
@@ -424,11 +421,8 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
     );
 
     const pdiskFooter = React.useMemo(
-        () =>
-            isFullData && data.PDisk
-                ? buildPDiskFooter(data.PDisk, isUserAllowedToMakeChanges)
-                : null,
-        [data, isFullData, isUserAllowedToMakeChanges],
+        () => (isFullData && data.PDisk ? buildPDiskFooter(data.PDisk, hasDeveloperUi) : null),
+        [data, isFullData, hasDeveloperUi],
     );
 
     const vdiskId = isFullData ? data.StringifiedId : undefined;

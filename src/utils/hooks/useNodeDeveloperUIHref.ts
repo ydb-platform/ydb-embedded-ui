@@ -5,21 +5,20 @@ import {uiFactory} from '../../uiFactory/uiFactory';
 import {
     createDeveloperUIInternalPageHref,
     createDeveloperUILinkWithNodeId,
+    useHasDeveloperUi,
 } from '../developerUI/developerUI';
 import {getBackendFromBalancerAndNodeId} from '../prepareBackend';
 
-import {useIsUserAllowedToMakeChanges} from './useIsUserAllowedToMakeChanges';
 import {useTypedSelector} from './useTypedSelector';
 
 export function useNodeDeveloperUIHref(node?: NodeAddress) {
     const singleClusterMode = useTypedSelector((state) => state.singleClusterMode);
 
     const {balancer = backend, settings} = useClusterBaseInfo();
-    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
-
+    const hasDeveloperUi = useHasDeveloperUi();
     const useMetaProxy = uiFactory.useMetaProxy && settings?.use_meta_proxy !== false;
 
-    if (!isUserAllowedToMakeChanges) {
+    if (!hasDeveloperUi) {
         return undefined;
     }
 

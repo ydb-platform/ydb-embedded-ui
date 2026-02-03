@@ -49,6 +49,8 @@ export interface UIFactory<H extends string = CommonIssueType, T extends string 
     hasAccess?: boolean;
     hideGrantAccess?: boolean;
 
+    hasDeveloperUi?: boolean;
+
     useDatabaseId?: boolean;
 
     useMetaProxy?: boolean;

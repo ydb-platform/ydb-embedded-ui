@@ -10,10 +10,9 @@ import {
     formatDurationSeconds,
     formatStorageValuesToGb,
 } from '../../utils/dataFormatters/dataFormatters';
-import {createVDiskDeveloperUILink} from '../../utils/developerUI/developerUI';
+import {createVDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import {getSeverityColor} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
-import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToSpeed} from '../../utils/utils';
 import {InfoViewer} from '../InfoViewer';
 import {InternalLink} from '../InternalLink';
@@ -43,7 +42,8 @@ export function VDiskInfo<T extends PreparedVDisk>({
     className,
     wrap,
 }: VDiskInfoProps<T>) {
-    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
+    const hasDeveloperUi = useHasDeveloperUi();
+
     const getVDiskPagePath = useVDiskPagePath();
 
     const {
@@ -255,7 +255,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
         );
     }
 
-    if (isUserAllowedToMakeChanges && !isNil(NodeId) && !isNil(VDiskSlotId) && !isNil(PDiskId)) {
+    if (hasDeveloperUi && !isNil(NodeId) && !isNil(VDiskSlotId) && !isNil(PDiskId)) {
         const vDiskInternalViewerPath = createVDiskDeveloperUILink({
             nodeId: NodeId,
             pDiskId: PDiskId,
