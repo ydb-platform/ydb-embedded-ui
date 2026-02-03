@@ -164,7 +164,7 @@ export function useSaveStorageType() {
 
     React.useEffect(() => {
         if (normalizedStorageType !== queryStorageType) {
-            setQueryStorageType(normalizedStorageType);
+            setQueryStorageType(normalizedStorageType, 'replaceIn');
         }
     }, [normalizedStorageType, queryStorageType, setQueryStorageType]);
 }
