@@ -68,7 +68,7 @@ export function TopicPreviewTable({messages}: TopicPreviewTableProps) {
             settings={DEFAULT_TABLE_SETTINGS}
             rowKey={getRowIndex}
             wrapperClassName={b('table-wrapper')}
-            emptyDataMessage="No data"
+            emptyDataMessage={EMPTY_DATA_PLACEHOLDER}
         />
     );
 }
