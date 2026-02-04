@@ -12,7 +12,7 @@ test.describe('Saved Queries', () => {
         const pageQueryParams = {
             schema: dsVslotsSchema,
             database,
-            general: 'query',
+            tenantPage: 'query',
         };
 
         tenantPage = new TenantPage(page);
