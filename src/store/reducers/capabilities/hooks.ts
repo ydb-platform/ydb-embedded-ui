@@ -203,10 +203,7 @@ export const useMetaWhoAmIAvailable = () => {
 };
 
 export const useMetaEnvironmentsAvailable = () => {
-    return (
-        useGetMetaFeatureVersion('/meta/environments') >= 1 &&
-        Boolean(uiFactory.databasesEnvironmentsConfig)
-    );
+    return Boolean(uiFactory.databasesEnvironmentsConfig);
 };
 
 export const useBlobStorageCapacityMetricsAvailable = () => {
