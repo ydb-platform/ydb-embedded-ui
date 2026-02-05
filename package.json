@@ -29,7 +29,7 @@
     "@gravity-ui/react-data-table": "^2.2.1",
     "@gravity-ui/react-unipika": "^0.5.1",
     "@gravity-ui/table": "^1.10.1",
-    "@gravity-ui/uikit": "^7.30.0",
+    "@gravity-ui/uikit": "^7.31.1",
     "@gravity-ui/unipika": "^5.2.1",
     "@gravity-ui/websql-autocomplete": "^13.14.0",
     "@hookform/resolvers": "^3.10.0",
