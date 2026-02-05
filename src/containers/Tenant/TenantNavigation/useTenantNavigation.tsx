@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Pulse, Terminal} from '@gravity-ui/icons';
+import {Code, Database, FolderTree, Pulse, Terminal} from '@gravity-ui/icons';
 import {useLocation, useRouteMatch} from 'react-router-dom';
 import {StringParam, useQueryParams} from 'use-query-params';
 
@@ -9,22 +9,32 @@ import {DEFAULT_USER_SETTINGS, SETTING_KEYS} from '../../../store/reducers/setti
 import {TENANT_PAGE, TENANT_PAGES_IDS} from '../../../store/reducers/tenant/constants';
 import {tenantPageSchema} from '../../../store/reducers/tenant/types';
 import type {TenantPage} from '../../../store/reducers/tenant/types';
+import {TENANT_NAVIGATION_V2_FLAG} from '../../../utils/constants';
 import {useSetting} from '../../../utils/hooks';
+import {isLocalStorageFlagEnabled} from '../../../utils/index';
 import i18n from '../i18n';
 
 type TenantPages = keyof typeof TENANT_PAGES_IDS;
 
 const pagesList: Array<TenantPages> = ['query', 'diagnostics'];
+const pagesListV2: Array<TenantPages> = ['diagnostics', 'schema', 'query'];
 
 const mapPageToIcon = {
     query: Terminal,
     diagnostics: Pulse,
 };
 
+const mapPageToIcon2 = {
+    diagnostics: Database,
+    schema: FolderTree,
+    query: Code,
+};
+
 export function useTenantNavigation() {
     const location = useLocation();
     const queryParams = parseQuery(location);
     const match = useRouteMatch(routes.tenant);
+    const isV2Enabled = isLocalStorageFlagEnabled(TENANT_NAVIGATION_V2_FLAG);
 
     const {tenantPage, handleTenantPageChange} = useTenantPage();
 
@@ -33,14 +43,19 @@ export function useTenantNavigation() {
             return [];
         }
 
-        const items = pagesList.map((key) => {
+        const pages = isV2Enabled ? pagesListV2 : pagesList;
+
+        const items = pages.map((key) => {
             const pageId = TENANT_PAGES_IDS[key];
             const pagePath = getTenantPath({...queryParams, [TENANT_PAGE]: pageId});
+            const icon = isV2Enabled
+                ? mapPageToIcon2[key as keyof typeof mapPageToIcon2]
+                : mapPageToIcon[key as keyof typeof mapPageToIcon];
 
             const nextItem = {
                 id: pageId,
                 title: i18n(`pages.${key}`),
-                icon: mapPageToIcon[key],
+                icon,
                 path: pagePath,
                 current: tenantPage === pageId,
                 onForward: () => {
@@ -52,7 +67,7 @@ export function useTenantNavigation() {
         });
 
         return items;
-    }, [tenantPage, handleTenantPageChange, match, queryParams]);
+    }, [tenantPage, handleTenantPageChange, match, queryParams, isV2Enabled]);
 
     return menuItems;
 }

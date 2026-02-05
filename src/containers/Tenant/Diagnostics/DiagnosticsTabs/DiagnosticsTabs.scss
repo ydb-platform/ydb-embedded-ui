@@ -1,0 +1,24 @@
+@use '../../../../styles/mixins.scss';
+
+.ydb-database-diagnostics-tabs {
+    &__header-wrapper {
+        padding: 0 var(--g-spacing-5);
+
+        background-color: var(--g-color-base-background);
+    }
+
+    &__tabs {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        @include mixins.tabs-wrapper-styles();
+        & .g-tabs_direction_horizontal {
+            box-shadow: unset;
+        }
+    }
+
+    &__tab-badge {
+        margin-left: var(--g-spacing-2);
+    }
+}

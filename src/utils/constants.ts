@@ -118,6 +118,8 @@ export const OLD_BACKEND_CLUSTER_NAMES = [
 
 export const DEV_ENABLE_TRACING_FOR_ALL_REQUESTS = 'enable_tracing_for_all_requests';
 
+export const TENANT_NAVIGATION_V2_FLAG = 'enableTenantNavigationV2';
+
 export enum AclSyntax {
     Kikimr = 'kikimr',
     YdbShort = 'ydb-short',

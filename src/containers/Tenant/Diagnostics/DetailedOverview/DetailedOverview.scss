@@ -6,26 +6,6 @@
     width: 100%;
     height: 100%;
 
-    &__section {
-        display: flex;
-        flex: 1 0 calc(50% - 10px);
-        flex-direction: column;
-
-        min-width: 300px;
-    }
-
-    &__modal {
-        & .g-modal__content {
-            position: relative;
-        }
-    }
-
-    &__close-modal-button {
-        position: absolute;
-        top: 23px;
-        right: 13px;
-    }
-
     // Delete padding for all query text on Diagnostics -> Info tab
     pre {
         padding: 0;

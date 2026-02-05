@@ -9,6 +9,7 @@ import {useClusterWithProxy} from '../../store/reducers/cluster/cluster';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {overviewApi} from '../../store/reducers/overview/overview';
 import {selectSchemaObjectData} from '../../store/reducers/schema/schema';
+import {TENANT_PAGES_IDS} from '../../store/reducers/tenant/constants';
 import {useTenantBaseInfo} from '../../store/reducers/tenant/tenant';
 import type {AdditionalTenantsProps} from '../../types/additionalProps';
 import {uiFactory} from '../../uiFactory/uiFactory';
@@ -19,16 +20,19 @@ import {useSetting} from '../../utils/hooks/useSetting';
 import {isAccessError} from '../../utils/response';
 import {useAppTitle} from '../App/AppTitleContext';
 
+import Diagnostics from './Diagnostics/Diagnostics';
 import ObjectGeneral from './ObjectGeneral/ObjectGeneral';
 import {ObjectSummary} from './ObjectSummary/ObjectSummary';
 import {TenantContextProvider} from './TenantContext';
 import {TenantDrawerWrapper} from './TenantDrawerWrappers';
+import {useTenantPage} from './TenantNavigation/useTenantNavigation';
 import i18n from './i18n';
 import {useTenantQueryParams} from './useTenantQueryParams';
 import {
     PaneVisibilityActionTypes,
     paneVisibilityToggleReducer,
 } from './utils/paneVisibilityToggleHelpers';
+import {useNavigationV2Enabled} from './utils/useNavigationV2Enabled';
 
 import './Tenant.scss';
 
@@ -132,8 +136,49 @@ export function Tenant({additionalTenantProps}: TenantProps) {
         setInitialLoading(false);
     }
 
+    const isV2Enabled = useNavigationV2Enabled();
+    const {tenantPage} = useTenantPage();
+    const showDatabaseDiagnostics = isV2Enabled && tenantPage === TENANT_PAGES_IDS.diagnostics;
+
     const title = path || i18n('page.title');
     const {appTitle} = useAppTitle();
+
+    const renderContent = () => {
+        if (showDatabaseDiagnostics) {
+            return (
+                <div className={b('main')}>
+                    <Diagnostics
+                        database={database}
+                        path={databaseName}
+                        databaseFullPath={databaseName}
+                        databasePagesDisplay="diagnostics"
+                        additionalTenantProps={additionalTenantProps}
+                    />
+                </div>
+            );
+        }
+
+        return (
+            <SplitPane
+                defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
+                defaultSizes={[25, 75]}
+                triggerCollapse={summaryVisibilityState.triggerCollapse}
+                triggerExpand={summaryVisibilityState.triggerExpand}
+                minSize={[36, 200]}
+                onSplitStartDragAdditional={onSplitStartDragAdditional}
+            >
+                <ObjectSummary
+                    onCollapseSummary={onCollapseSummaryHandler}
+                    onExpandSummary={onExpandSummaryHandler}
+                    isCollapsed={summaryVisibilityState.collapsed}
+                />
+                <div className={b('main')}>
+                    <ObjectGeneral additionalTenantProps={additionalTenantProps} />
+                </div>
+            </SplitPane>
+        );
+    };
+
     return (
         <div className={b()}>
             <Helmet
@@ -149,25 +194,7 @@ export function Tenant({additionalTenantProps}: TenantProps) {
                         subType={currentPathSubType}
                         databaseFullPath={databaseName}
                     >
-                        <TenantDrawerWrapper>
-                            <SplitPane
-                                defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
-                                defaultSizes={[25, 75]}
-                                triggerCollapse={summaryVisibilityState.triggerCollapse}
-                                triggerExpand={summaryVisibilityState.triggerExpand}
-                                minSize={[36, 200]}
-                                onSplitStartDragAdditional={onSplitStartDragAdditional}
-                            >
-                                <ObjectSummary
-                                    onCollapseSummary={onCollapseSummaryHandler}
-                                    onExpandSummary={onExpandSummaryHandler}
-                                    isCollapsed={summaryVisibilityState.collapsed}
-                                />
-                                <div className={b('main')}>
-                                    <ObjectGeneral additionalTenantProps={additionalTenantProps} />
-                                </div>
-                            </SplitPane>
-                        </TenantDrawerWrapper>
+                        <TenantDrawerWrapper>{renderContent()}</TenantDrawerWrapper>
                     </TenantContextProvider>
                 </PageError>
             </LoaderWrapper>
