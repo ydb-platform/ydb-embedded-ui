@@ -1,5 +1,15 @@
 # Changelog
 
+## [14.5.0-hotfix.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.5.0...v14.5.0-hotfix.1) (2026-02-06)
+
+
+### Bug Fixes
+
+* **HomePage:** check if envs enabled only by uiFactory ([#3435](https://github.com/ydb-platform/ydb-embedded-ui/issues/3435)) ([038eb6c](https://github.com/ydb-platform/ydb-embedded-ui/commit/038eb6ce8411e3fbe3b2cb14f15e4c05033f04b3))
+* **Storage:** do not add history entry on type param ([#3418](https://github.com/ydb-platform/ydb-embedded-ui/issues/3418)) ([5158e11](https://github.com/ydb-platform/ydb-embedded-ui/commit/5158e117b1142de1c6bd8d58456a739e7d3cdc3a))
+* **VDisk:** display donor and vdisk popups separately ([#3444](https://github.com/ydb-platform/ydb-embedded-ui/issues/3444)) ([4bc3b52](https://github.com/ydb-platform/ydb-embedded-ui/commit/4bc3b52ee5efd48c2ce79c5b1e7d954210afb16b))
+* **VDiskPopup:** prevent NaN replication progress ([#3443](https://github.com/ydb-platform/ydb-embedded-ui/issues/3443)) ([7536c43](https://github.com/ydb-platform/ydb-embedded-ui/commit/7536c436b5557e7cc0b3a1ac0cd7ead489d78d95))
+
 ## [14.5.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.4.4...v14.5.0) (2026-02-02)
 
 
