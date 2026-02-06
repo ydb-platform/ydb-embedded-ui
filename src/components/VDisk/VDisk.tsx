@@ -54,6 +54,8 @@ export const VDisk = ({
             offset={{mainAxis: 2, crossAxis: 0}}
             delayClose={delayClose}
             delayOpen={delayOpen}
+            // Allow all placement options, component should choose first available
+            placement={['top', 'bottom', 'left', 'right']}
         >
             <div className={b()}>
                 <InternalLink to={vDiskPath} className={b('content')}>

@@ -43,7 +43,6 @@ export function VDiskWithDonorsStack({
 
     const commonVDiskProps: Partial<VDiskProps> = {
         withIcon,
-        showPopup: isHighlighted,
         highlighted: isHighlighted,
         onShowPopup: handleShowPopup,
         onHidePopup: handleHidePopup,

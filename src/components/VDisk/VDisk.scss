@@ -1,9 +1,10 @@
 .ydb-vdisk-component {
-    border-radius: 4px; // to match interactive area with disk shape
+    border-radius: var(--g-border-radius-s); // to match interactive area with disk shape
 
     &__content {
         display: block;
 
-        border-radius: 4px; // to match interactive area with disk shape
+        border-radius: var(--g-border-radius-s); // to match interactive area with disk shape
+        background: var(--g-color-base-background);
     }
 }
