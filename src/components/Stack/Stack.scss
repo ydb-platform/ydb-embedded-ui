@@ -3,13 +3,11 @@
     --ydb-stack-offset-x: 4px;
     --ydb-stack-offset-y: 4px;
     --ydb-stack-offset-x-hover: 4px;
-    --ydb-stack-offset-y-hover: 6px;
+    --ydb-stack-offset-y-hover: 8px;
 
     position: relative;
 
     &__layer {
-        background: var(--g-color-base-background);
-
         transition: transform 0.1s ease-out;
 
         &:first-child {
