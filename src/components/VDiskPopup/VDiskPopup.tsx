@@ -228,7 +228,7 @@ const prepareVDiskData = (
         vdiskData.push({name: vDiskPopupKeyset('label_replicated'), content: 'NO'});
 
         // Only show replication progress and time remaining when disk is not replicated and state is OK
-        if (!isNil(ReplicationProgress)) {
+        if (!isNil(ReplicationProgress) && !isNaN(Number(ReplicationProgress))) {
             const progressPercent = Math.round(ReplicationProgress * 100);
             vdiskData.push({
                 name: vDiskPopupKeyset('label_progress'),
