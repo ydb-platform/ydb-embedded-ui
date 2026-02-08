@@ -40,22 +40,22 @@
         min-width: 80px;
         max-width: 146px;
 
-        border: 1px solid var(--tab-inactive-border-color);
+        border: 1px solid var(--multitab-tab-inactive-border-color);
         border-bottom: 0;
         border-radius: var(--g-border-radius-xs) var(--g-border-radius-xs) 0 0;
-        background: var(--tab-inactive-background-color);
+        background: var(--multitab-tab-inactive-background-color);
     }
 
     .g-tab:hover,
     .g-tab.editor-tab-item__tab-root_menuOpen {
-        border-color: var(--tab-active-border-color);
-        background-color: var(--tab-active-background-color);
+        border-color: var(--multitab-tab-active-border-color);
+        background-color: var(--multitab-tab-active-background-color);
     }
 
     .g-tab_active,
     .g-tab_active:hover {
-        border-color: var(--tab-active-border-color);
-        background-color: var(--tab-active-background-color);
+        border-color: var(--multitab-tab-active-border-color);
+        background-color: var(--multitab-tab-active-background-color);
     }
 
     .g-tab__content {
