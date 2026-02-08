@@ -1,0 +1,58 @@
+.tab-execution-status-indicator {
+    position: absolute;
+    right: 3px;
+    bottom: 1px;
+    left: 3px;
+
+    height: 1.5px;
+
+    pointer-events: none;
+
+    border-radius: 1px;
+
+    transform: translateY(-50%);
+
+    &_done {
+        background-color: var(--g-color-text-positive);
+    }
+
+    &_failed {
+        background-color: var(--g-color-text-danger);
+    }
+
+    &_stopped {
+        background-color: var(--g-color-base-warning-heavy);
+    }
+
+    &_in_progress {
+        background-image: linear-gradient(
+            90deg,
+            #0d8dfa 0%,
+            #0057a2 25%,
+            #0d8dfa 50%,
+            #0057a2 75%,
+            #0d8dfa 100%
+        );
+        background-size: 200% 100%;
+
+        animation: tab-execution-status-indicator-progress-sweep 1.2s linear infinite;
+    }
+}
+
+@keyframes tab-execution-status-indicator-progress-sweep {
+    0% {
+        background-position: 200% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tab-execution-status-indicator_in_progress {
+        background-position: 0% 50%;
+        background-size: 100% 100%;
+
+        animation: none;
+    }
+}
