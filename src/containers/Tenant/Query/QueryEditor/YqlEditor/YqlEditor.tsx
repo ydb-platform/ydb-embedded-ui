@@ -61,6 +61,7 @@ interface YqlEditorProps {
     historyQueries: QueryInHistory[];
     goToPreviousQuery: () => void;
     goToNextQuery: () => void;
+    onEditorReady?: () => void;
 }
 
 export function YqlEditor({
@@ -71,6 +72,7 @@ export function YqlEditor({
     historyQueries,
     goToPreviousQuery,
     goToNextQuery,
+    onEditorReady,
 }: YqlEditorProps) {
     const input = useTypedSelector(selectUserInput);
     const activeTab = useTypedSelector(selectActiveTab);
@@ -80,6 +82,7 @@ export function YqlEditor({
         tabsOrder,
         handleNewTabClick,
         handleCloseActiveTab,
+        handleDuplicateTab,
         handleNextTab,
         handlePreviousTab,
     } = useQueryTabsActions();
@@ -155,6 +158,10 @@ export function YqlEditor({
 
     const handlePreviousTabAction = useEventHandler(() => {
         handlePreviousTab();
+    });
+
+    const handleDuplicateActiveTabAction = useEventHandler(() => {
+        handleDuplicateTab(activeTabId);
     });
 
     const closeTabById = React.useCallback(
@@ -351,6 +358,12 @@ export function YqlEditor({
                 run: () => handleRenameTabAction(),
             });
             editor.addAction({
+                id: 'duplicateEditorTab',
+                label: i18n('editor-tabs.duplicate'),
+                keybindings: [keybindings.duplicateTab],
+                run: () => handleDuplicateActiveTabAction(),
+            });
+            editor.addAction({
                 id: 'nextEditorTab',
                 label: i18n('editor-tabs.action.next-tab'),
                 keybindings: [keybindings.nextTab],
@@ -381,12 +394,14 @@ export function YqlEditor({
                 run: () => handleSaveQueryAsAction(),
             });
         }
+
+        onEditorReady?.();
     };
 
     const onChange = (newValue: string) => {
         updateErrorsHighlighting();
         changeUserInput({input: newValue});
-        dispatch(setIsDirty(true));
+        dispatch(setIsDirty(newValue.length > 0));
     };
     return (
         <MonacoEditor
