@@ -2,23 +2,27 @@
   "navigation-item.information": "Information",
   "navigation-item.settings": "Settings",
   "navigation-item.account": "Account",
-
   "help-center.header.title": "Documentation",
   "help-center.item.documentation": "View documentation",
   "help-center.footer.shortcuts": "Keyboard shortcuts",
-
   "account.user": "YDB User",
-
   "account.login": "Login",
   "account.logout": "Logout",
-
   "hotkeys.title": "Keyboard shortcuts",
   "hotkeys.execute-query": "Execute query",
   "hotkeys.execute-selected-query": "Execute selected query",
   "hotkeys.save-query": "Save query",
   "hotkeys.save-selected-query": "Save selected query",
-
   "alert.new-nav-title": "Navigation is here now",
   "alert.new-nav-message": "Clear separate three workspaces",
-  "alert.button-got-it": "Got it!"
+  "alert.button-got-it": "Got it!",
+  "hotkeys.new-tab": "New tab",
+  "hotkeys.close-tab": "Close tab",
+  "hotkeys.rename-tab": "Rename tab",
+  "hotkeys.duplicate-tab": "Duplicate tab",
+  "hotkeys.next-tab": "Next tab",
+  "hotkeys.previous-tab": "Previous tab",
+  "hotkeys.close-other-tabs": "Close other tabs",
+  "hotkeys.close-all-tabs": "Close all tabs",
+  "hotkeys.save-query-as": "Save query as"
 }

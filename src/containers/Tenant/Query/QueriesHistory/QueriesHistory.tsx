@@ -1,6 +1,7 @@
 import React from 'react';
 
 import NiceModal from '@ebay/nice-modal-react';
+import {v4 as uuidv4} from 'uuid';
 
 import {DrawerWrapper} from '../../../../components/Drawer';
 import type {DrawerControl} from '../../../../components/Drawer/Drawer';
@@ -14,10 +15,12 @@ import {
     setHistoryCurrentQueryId,
     setIsDirty,
     setQueryHistoryFilter,
+    setQueryTabContent,
 } from '../../../../store/reducers/query/query';
 import type {QueryInHistory} from '../../../../store/reducers/query/types';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
+import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {valueIsDefined} from '../../../../utils';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
@@ -43,6 +46,7 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
     const [showQueryPreview, setShowQueryPreview] = React.useState(false);
     const [selectedId, setSelectedId] = React.useState<string | null>(null);
     const {savedQueries, saveQuery} = useSavedQueries();
+    const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
 
     const sortedHistory = React.useMemo(() => {
         return queriesHistory.filteredHistoryQueries.toReversed().toSorted((a, b) => {
@@ -65,12 +69,24 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
 
     const applyQueryClick = React.useCallback(
         (query: QueryInHistory) => {
-            changeUserInput({input: query.queryText});
+            if (isMultiTabEnabled) {
+                const firstLine = query.queryText.trim().split('\n')[0] || query.queryText;
+
+                dispatch(
+                    setQueryTabContent({
+                        tabId: uuidv4(),
+                        title: firstLine,
+                        input: query.queryText,
+                    }),
+                );
+            } else {
+                changeUserInput({input: query.queryText});
+            }
             dispatch(setIsDirty(false));
             dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
             dispatch(setHistoryCurrentQueryId(query.queryId));
         },
-        [changeUserInput, dispatch],
+        [changeUserInput, dispatch, isMultiTabEnabled],
     );
 
     const handleSaveQuery = React.useCallback(
@@ -94,7 +110,7 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
         [],
     );
 
-    const onQueryClick = useChangeInputWithConfirmation(applyQueryClick);
+    const onQueryClick = useChangeInputWithConfirmation(applyQueryClick, isMultiTabEnabled);
 
     const onChangeFilter = (value: string) => {
         dispatch(setQueryHistoryFilter(value));

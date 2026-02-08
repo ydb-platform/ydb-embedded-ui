@@ -3,10 +3,28 @@ import ReactDOM from 'react-dom/client';
 import {ErrorBoundary} from './lib';
 import reportWebVitals from './reportWebVitals';
 import {history, store} from './store/defaultStore';
+import {configureUIFactory} from './uiFactory/uiFactory';
 
 import './styles/index.scss';
 
+const E2E_QUERY_EDITOR_MODE_PARAM = 'e2eQueryEditorMode';
+
+function applyE2EQueryEditorModeOverride() {
+    const params = new URLSearchParams(window.location.search);
+    const mode = params.get(E2E_QUERY_EDITOR_MODE_PARAM);
+
+    if (mode === 'single-tab') {
+        configureUIFactory({enableMultiTabQueryEditor: false});
+    }
+
+    if (mode === 'multi-tab') {
+        configureUIFactory({enableMultiTabQueryEditor: true});
+    }
+}
+
 async function render() {
+    applyE2EQueryEditorModeOverride();
+
     let App;
     if (
         process.env.REACT_APP_META_BACKEND === undefined ||

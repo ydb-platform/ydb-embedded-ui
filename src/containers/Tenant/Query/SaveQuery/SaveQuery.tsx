@@ -4,15 +4,25 @@ import NiceModal from '@ebay/nice-modal-react';
 import type {ButtonButtonProps, ButtonProps} from '@gravity-ui/uikit';
 import {Button, Dialog, DropdownMenu, TextInput} from '@gravity-ui/uikit';
 
-import {selectActiveTab, selectUserInput, setIsDirty} from '../../../../store/reducers/query/query';
+import {
+    renameQueryTab,
+    selectActiveTab,
+    selectActiveTabSavedQueryName,
+    selectUserInput,
+    setActiveTabSavedQueryName,
+    setIsDirty,
+} from '../../../../store/reducers/query/query';
 import {
     clearQueryNameToEdit,
     selectQueryName,
     setQueryAction,
+    setQueryNameToEdit,
 } from '../../../../store/reducers/queryActions/queryActions';
 import type {SavedQuery} from '../../../../types/store/query';
+import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {getTabTitleForSave} from '../utils/queryTabTitles';
 import {useSavedQueries} from '../utils/useSavedQueries';
 
 import i18n from './i18n';
@@ -27,30 +37,48 @@ interface SaveQueryProps {
     buttonProps?: ButtonProps;
 }
 
-function useSaveQueryHandler(dialogProps: SaveQueryDialogCommonProps) {
+export function useSaveQueryWithTabSync() {
     const dispatch = useTypedDispatch();
-    const {savedQueries, saveQuery} = useSavedQueries();
+    const {saveQuery} = useSavedQueries();
     const activeTab = useTypedSelector(selectActiveTab);
+    const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
+
+    return React.useCallback(
+        (queryName: string | null, queryBody: string) => {
+            saveQuery(queryName, queryBody);
+
+            if (activeTab && queryName) {
+                dispatch(renameQueryTab({tabId: activeTab.id, title: queryName}));
+                if (isMultiTabEnabled) {
+                    dispatch(setActiveTabSavedQueryName(queryName));
+                } else {
+                    dispatch(setQueryNameToEdit(queryName));
+                }
+            }
+        },
+        [activeTab, dispatch, isMultiTabEnabled, saveQuery],
+    );
+}
+
+function useSaveQueryHandler(dialogProps: SaveQueryDialogCommonProps) {
+    const {savedQueries} = useSavedQueries();
+    const activeTab = useTypedSelector(selectActiveTab);
+    const dispatch = useTypedDispatch();
+    const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
+    const handleSaveQuery = useSaveQueryWithTabSync();
 
     const onSaveQueryClick = React.useCallback(() => {
-        const computedDefaultQueryName = activeTab?.isTitleUserDefined
-            ? activeTab.title
-            : undefined;
+        const computedDefaultQueryName = getTabTitleForSave(activeTab);
         NiceModal.show(SAVE_QUERY_DIALOG, {
             ...dialogProps,
             defaultQueryName: dialogProps.defaultQueryName ?? computedDefaultQueryName,
             savedQueries,
-            onSaveQuery: saveQuery,
+            onSaveQuery: handleSaveQuery,
         });
-        dispatch(clearQueryNameToEdit());
-    }, [
-        activeTab?.isTitleUserDefined,
-        activeTab?.title,
-        dispatch,
-        dialogProps,
-        savedQueries,
-        saveQuery,
-    ]);
+        if (!isMultiTabEnabled) {
+            dispatch(clearQueryNameToEdit());
+        }
+    }, [activeTab, dialogProps, dispatch, handleSaveQuery, isMultiTabEnabled, savedQueries]);
 
     return onSaveQueryClick;
 }
@@ -59,28 +87,37 @@ interface SaveQueryButtonProps extends ButtonButtonProps {
     dialogProps: SaveQueryDialogCommonProps;
 }
 
-export function SaveQueryButton({dialogProps, ...buttonProps}: SaveQueryButtonProps) {
+export function SaveQueryButton({dialogProps, children, ...buttonProps}: SaveQueryButtonProps) {
     const onSaveQueryClick = useSaveQueryHandler(dialogProps);
 
     return (
         <Button onClick={onSaveQueryClick} {...buttonProps}>
-            {i18n('action.save')}
+            {children ?? i18n('action.save')}
         </Button>
     );
 }
 
 export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
     const dispatch = useTypedDispatch();
+    const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
+    const activeTabSavedQueryName = useTypedSelector(selectActiveTabSavedQueryName);
     const queryNameToEdit = useTypedSelector(selectQueryName);
     const currentInput = useTypedSelector(selectUserInput);
     const onSaveQueryClick = useSaveQueryHandler({queryBody: currentInput});
+    const currentSavedQueryName = isMultiTabEnabled ? activeTabSavedQueryName : queryNameToEdit;
 
     const {saveQuery} = useSavedQueries();
 
     const onEditQueryClick = () => {
-        saveQuery(queryNameToEdit, currentInput);
+        saveQuery(currentSavedQueryName ?? null, currentInput);
+        if (currentSavedQueryName) {
+            if (isMultiTabEnabled) {
+                dispatch(setActiveTabSavedQueryName(currentSavedQueryName));
+            } else {
+                dispatch(setQueryNameToEdit(currentSavedQueryName));
+            }
+        }
         dispatch(setIsDirty(false));
-        dispatch(clearQueryNameToEdit());
     };
 
     const renderSaveDropdownMenu = () => {
@@ -107,7 +144,7 @@ export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
         );
     };
 
-    return queryNameToEdit ? (
+    return currentSavedQueryName ? (
         renderSaveDropdownMenu()
     ) : (
         <SaveQueryButton dialogProps={{queryBody: currentInput}} />
@@ -141,7 +178,7 @@ function SaveQueryDialog({
     const dispatch = useTypedDispatch();
     const [queryName, setQueryName] = React.useState(defaultQueryName ?? '');
     const [validationError, setValidationError] = React.useState<string>();
-    const inputRef = React.useRef<HTMLInputElement>(null);
+    const controlRef = React.useRef<HTMLInputElement>(null);
 
     const validateQueryName = (value: string) => {
         if (!value) {
@@ -178,7 +215,14 @@ function SaveQueryDialog({
     };
 
     return (
-        <Dialog open={open} size="s" onClose={onCloseWithoutSave} initialFocus={inputRef}>
+        <Dialog
+            open={open}
+            hasCloseButton={true}
+            size="s"
+            onClose={onCloseWithoutSave}
+            initialFocus={controlRef}
+            className={b()}
+        >
             <Dialog.Header caption={i18n('action.save')} />
             <form
                 onSubmit={(e) => {
@@ -195,13 +239,13 @@ function SaveQueryDialog({
                     <div className={b('dialog-row')}>
                         <div className={b('control-wrapper')}>
                             <TextInput
-                                controlRef={inputRef}
                                 id="queryName"
+                                aria-label={i18n('input-label')}
                                 placeholder={i18n('input-placeholder')}
                                 value={queryName}
                                 onUpdate={handleQueryNameChange}
+                                controlRef={controlRef}
                                 hasClear
-                                autoFocus
                                 autoComplete={false}
                                 validationState={validationError ? 'invalid' : undefined}
                                 errorMessage={validationError}

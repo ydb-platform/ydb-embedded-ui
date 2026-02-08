@@ -11,6 +11,12 @@ export class SaveQueryDialog {
         this.dialogFooter = page.locator('.ydb-save-query__dialog-body + .g-dialog-footer');
     }
 
+    async getQueryName() {
+        const input = this.dialogBody.locator('#queryName');
+        await input.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return input.inputValue();
+    }
+
     async setQueryName(name: string) {
         const input = this.dialogBody.locator('#queryName');
         await input.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
@@ -24,6 +30,12 @@ export class SaveQueryDialog {
         const saveButton = this.dialogFooter.getByRole('button', {name: 'Save', exact: true});
         await saveButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await saveButton.click();
+    }
+
+    async clickCancel() {
+        const cancelButton = this.dialogFooter.getByRole('button', {name: 'Cancel', exact: true});
+        await cancelButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await cancelButton.click();
     }
 
     async isVisible() {

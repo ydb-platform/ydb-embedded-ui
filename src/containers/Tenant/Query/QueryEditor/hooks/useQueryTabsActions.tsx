@@ -7,19 +7,58 @@ import {
     closeQueryTab,
     renameQueryTab,
     selectActiveTabId,
+    selectNewTabCounter,
     selectTabsById,
     selectTabsOrder,
     setActiveQueryTab,
 } from '../../../../../store/reducers/query/query';
+import type {QueryTabState} from '../../../../../store/reducers/query/types';
 import {useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
+import {getRunningQueryConfirmation} from '../../../../../utils/hooks/withConfirmation/RunningQueryDialog';
+import {getConfirmation} from '../../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
+import {reachMetricaGoal} from '../../../../../utils/yaMetrica';
+import {getSaveChangesConfirmation} from '../../SaveChangesDialog/SaveChangesDialog';
 import i18n from '../../i18n';
+import {getNewQueryTitle, getTabTitleForSave} from '../../utils/queryTabTitles';
+import {useSavedQueries} from '../../utils/useSavedQueries';
 import {queryExecutionManagerInstance} from '../utils/queryExecutionManager';
+
+/**
+ * Yields to the event loop before dispatching active tab change.
+ * This lets pending browser events from DropdownMenu (close, focus restoration)
+ * settle before we switch tabs to show the confirmation dialog.
+ */
+async function activateTabAndWait(
+    dispatch: ReturnType<typeof useTypedDispatch>,
+    tabId: string,
+): Promise<void> {
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    dispatch(setActiveQueryTab({tabId}));
+}
 
 export function useQueryTabsActions() {
     const dispatch = useTypedDispatch();
     const activeTabId = useTypedSelector(selectActiveTabId);
     const tabsOrder = useTypedSelector(selectTabsOrder);
     const tabsById = useTypedSelector(selectTabsById);
+    const newTabCounter = useTypedSelector(selectNewTabCounter);
+    const {savedQueries, saveQuery} = useSavedQueries();
+
+    const getDirtyConfirmation = React.useCallback(
+        (tab: QueryTabState): Promise<boolean> => {
+            if (tab.savedQueryName || !tab.isTitleUserDefined) {
+                return getSaveChangesConfirmation({
+                    defaultQueryName: getTabTitleForSave(tab) ?? '',
+                    existingQueryName: tab.savedQueryName,
+                    queryBody: tab.input,
+                    savedQueries: savedQueries ?? [],
+                    onSaveQuery: saveQuery,
+                });
+            }
+            return getConfirmation();
+        },
+        [savedQueries, saveQuery],
+    );
 
     const handleTabSwitch = React.useCallback(
         (tabId: string) => {
@@ -30,7 +69,7 @@ export function useQueryTabsActions() {
 
     const handleActivateTab = handleTabSwitch;
 
-    const handleCloseTab = React.useCallback(
+    const closeTabImmediate = React.useCallback(
         (tabId: string) => {
             queryExecutionManagerInstance.abortQuery(tabId);
             dispatch(closeQueryTab({tabId}));
@@ -38,20 +77,92 @@ export function useQueryTabsActions() {
         [dispatch],
     );
 
+    const handleCloseTab = React.useCallback(
+        async (tabId: string) => {
+            const tab = tabsById[tabId];
+            if (tab?.result?.isLoading) {
+                const confirmed = await getRunningQueryConfirmation();
+                if (!confirmed) {
+                    return;
+                }
+            }
+            if (tab?.isDirty) {
+                const confirmed = await getDirtyConfirmation(tab);
+                if (!confirmed) {
+                    return;
+                }
+            }
+            reachMetricaGoal('closeQueryTab', {type: 'single', tabsCount: tabsOrder.length});
+            closeTabImmediate(tabId);
+        },
+        [closeTabImmediate, getDirtyConfirmation, tabsById, tabsOrder.length],
+    );
+
     const handleCloseActiveTab = React.useCallback(() => {
         handleCloseTab(activeTabId);
     }, [activeTabId, handleCloseTab]);
 
     const handleCloseOtherTabs = React.useCallback(
-        (baseTabId: string) => {
-            tabsOrder.filter((tabId) => tabId !== baseTabId).forEach(handleCloseTab);
+        async (baseTabId: string) => {
+            const tabsToClose = tabsOrder.filter((tabId) => tabId !== baseTabId);
+            const needsConfirm = (id: string) =>
+                tabsById[id]?.isDirty || Boolean(tabsById[id]?.result?.isLoading);
+            const confirmTabIds = tabsToClose.filter(needsConfirm);
+            const cleanTabIds = tabsToClose.filter((id) => !needsConfirm(id));
+
+            cleanTabIds.forEach(closeTabImmediate);
+
+            for (const tabId of confirmTabIds) {
+                await activateTabAndWait(dispatch, tabId);
+                const tab = tabsById[tabId];
+                if (tab?.result?.isLoading) {
+                    const confirmed = await getRunningQueryConfirmation();
+                    if (!confirmed) {
+                        break;
+                    }
+                }
+                if (tab?.isDirty) {
+                    const confirmed = await getDirtyConfirmation(tab);
+                    if (!confirmed) {
+                        break;
+                    }
+                }
+                closeTabImmediate(tabId);
+            }
+
+            reachMetricaGoal('closeQueryTab', {type: 'other', tabsCount: tabsOrder.length});
         },
-        [handleCloseTab, tabsOrder],
+        [closeTabImmediate, dispatch, getDirtyConfirmation, tabsById, tabsOrder],
     );
 
-    const handleCloseAllTabs = React.useCallback(() => {
-        tabsOrder.forEach(handleCloseTab);
-    }, [handleCloseTab, tabsOrder]);
+    const handleCloseAllTabs = React.useCallback(async () => {
+        const needsConfirm = (id: string) =>
+            tabsById[id]?.isDirty || Boolean(tabsById[id]?.result?.isLoading);
+        const confirmTabIds = tabsOrder.filter(needsConfirm);
+        const cleanTabIds = tabsOrder.filter((id) => !needsConfirm(id));
+
+        cleanTabIds.forEach(closeTabImmediate);
+
+        for (const tabId of confirmTabIds) {
+            await activateTabAndWait(dispatch, tabId);
+            const tab = tabsById[tabId];
+            if (tab?.result?.isLoading) {
+                const confirmed = await getRunningQueryConfirmation();
+                if (!confirmed) {
+                    break;
+                }
+            }
+            if (tab?.isDirty) {
+                const confirmed = await getDirtyConfirmation(tab);
+                if (!confirmed) {
+                    break;
+                }
+            }
+            closeTabImmediate(tabId);
+        }
+
+        reachMetricaGoal('closeQueryTab', {type: 'all', tabsCount: tabsOrder.length});
+    }, [closeTabImmediate, dispatch, getDirtyConfirmation, tabsById, tabsOrder]);
 
     const handleDuplicateTab = React.useCallback(
         (baseTabId: string) => {
@@ -60,7 +171,8 @@ export function useQueryTabsActions() {
                 return;
             }
 
-            const baseTitle = tab.title || i18n('editor-tabs.untitled');
+            reachMetricaGoal('duplicateQueryTab', {tabsCount: tabsOrder.length});
+            const baseTitle = tab.title || i18n('editor-tabs.default-title');
             const tabId = uuidv4();
             dispatch(
                 addQueryTab({
@@ -71,7 +183,7 @@ export function useQueryTabsActions() {
                 }),
             );
         },
-        [dispatch, tabsById],
+        [dispatch, tabsById, tabsOrder.length],
     );
 
     const handleRenameTab = React.useCallback(
@@ -82,15 +194,16 @@ export function useQueryTabsActions() {
     );
 
     const handleNewTabClick = React.useCallback(() => {
+        reachMetricaGoal('createQueryTab', {tabsCount: tabsOrder.length});
         const tabId = uuidv4();
-        const nextIndex = tabsOrder.length + 1;
         dispatch(
             addQueryTab({
                 tabId,
-                title: i18n('editor-tabs.default-title', {index: nextIndex}),
+                title: getNewQueryTitle(newTabCounter),
+                newTabCounter: newTabCounter + 1,
             }),
         );
-    }, [dispatch, tabsOrder.length]);
+    }, [dispatch, newTabCounter, tabsOrder.length]);
 
     const activateAdjacentTab = React.useCallback(
         (direction: -1 | 1) => {

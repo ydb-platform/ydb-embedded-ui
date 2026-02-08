@@ -5,6 +5,7 @@ import {VISIBILITY_TIMEOUT} from '../../TenantPage';
 import {QueriesHistoryTable} from '../../queryHistory/models/QueriesHistoryTable';
 import {SavedQueriesTable} from '../../savedQueries/models/SavedQueriesTable';
 
+import {EditorTabsBar} from './EditorTabsBar';
 import {QueryTabsNavigation} from './QueryTabsNavigation';
 import {PaneWrapper, ResultTable} from './ResultTable';
 import {SettingsDialog} from './SettingsDialog';
@@ -20,7 +21,7 @@ export enum ButtonNames {
     Explain = 'Explain',
     Cancel = 'Cancel',
     Save = 'Save',
-    Edit = 'Edit',
+    Edit = 'Edit query',
     Stop = 'Stop',
 }
 
@@ -43,6 +44,7 @@ export enum QueryTabs {
 
 export class QueryEditor {
     settingsDialog: SettingsDialog;
+    editorTabs: EditorTabsBar;
     paneWrapper: PaneWrapper;
     queryTabs: QueryTabsNavigation;
     resultTable: ResultTable;
@@ -77,7 +79,7 @@ export class QueryEditor {
         this.stopBanner = this.selector.locator('.ydb-query-stopped-banner');
         this.explainButton = this.selector.getByRole('button', {name: ButtonNames.Explain});
         this.saveButton = this.selector.getByRole('button', {name: ButtonNames.Save});
-        this.editButton = this.selector.getByRole('button', {name: ButtonNames.Edit});
+        this.editButton = this.selector.getByRole('button', {name: ButtonNames.Edit, exact: true});
         this.dropdownMenu = page.locator('.g-dropdown-menu__menu');
         this.gearButton = this.selector.locator('.ydb-query-editor-button__gear-button');
         this.executionStatus = this.selector
@@ -93,6 +95,7 @@ export class QueryEditor {
         this.banner = this.page.locator('.ydb-query-settings-banner');
 
         this.settingsDialog = new SettingsDialog(page);
+        this.editorTabs = new EditorTabsBar(page);
         this.resultTable = new ResultTable(this.selector);
         this.paneWrapper = new PaneWrapper(page);
         this.queryTabs = new QueryTabsNavigation(page);
@@ -147,14 +150,38 @@ export class QueryEditor {
         await this.explainButton.click();
     }
 
+    async focusHotkeysTarget() {
+        const addTabButton = this.page.getByRole('button', {name: 'New editor tab'});
+        await addTabButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await addTabButton.focus();
+    }
+
     async clickSaveButton() {
         await this.saveButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.saveButton.click();
     }
 
+    async isSaveButtonVisible(timeout = VISIBILITY_TIMEOUT) {
+        try {
+            await this.saveButton.waitFor({state: 'visible', timeout});
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
     async clickEditButton() {
         await this.editButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.editButton.click();
+    }
+
+    async isEditButtonVisible(timeout = VISIBILITY_TIMEOUT) {
+        try {
+            await this.editButton.waitFor({state: 'visible', timeout});
+            return true;
+        } catch {
+            return false;
+        }
     }
 
     async clickSaveAsNewEditButton() {

@@ -4,12 +4,13 @@ import {Pencil, TrashBin} from '@gravity-ui/icons';
 import type {Column} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
 import {ActionTooltip, Button, Dialog, Icon} from '@gravity-ui/uikit';
+import {v4 as uuidv4} from 'uuid';
 
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
-import {setIsDirty} from '../../../../store/reducers/query/query';
+import {setIsDirty, setQueryTabContent} from '../../../../store/reducers/query/query';
 import {
     selectSavedQueriesFilter,
     setQueryNameToEdit,
@@ -18,6 +19,7 @@ import {
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import type {SavedQuery} from '../../../../types/store/query';
+import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
@@ -70,6 +72,7 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
     const {filteredSavedQueries, deleteSavedQuery} = useSavedQueries();
     const dispatch = useTypedDispatch();
     const filter = useTypedSelector(selectSavedQueriesFilter);
+    const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
 
     const [isDeleteDialogVisible, setIsDeleteDialogVisible] = React.useState(false);
     const [queryNameToDelete, setQueryNameToDelete] = React.useState<string>('');
@@ -91,15 +94,28 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
 
     const applyQueryClick = React.useCallback(
         ({queryText, queryName}: {queryText: string; queryName: string}) => {
-            changeUserInput({input: queryText});
-            dispatch(setIsDirty(false));
-            dispatch(setQueryNameToEdit(queryName));
-            dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
+            if (isMultiTabEnabled) {
+                dispatch(
+                    setQueryTabContent({
+                        tabId: uuidv4(),
+                        title: queryName,
+                        input: queryText,
+                        savedQueryName: queryName,
+                    }),
+                );
+                dispatch(setIsDirty(false));
+                dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
+            } else {
+                changeUserInput({input: queryText});
+                dispatch(setIsDirty(false));
+                dispatch(setQueryNameToEdit(queryName));
+                dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
+            }
         },
-        [changeUserInput, dispatch],
+        [changeUserInput, dispatch, isMultiTabEnabled],
     );
 
-    const onQueryClick = useChangeInputWithConfirmation(applyQueryClick);
+    const onQueryClick = useChangeInputWithConfirmation(applyQueryClick, isMultiTabEnabled);
 
     const onDeleteQueryClick = (queryName: string) => {
         return (event: React.MouseEvent) => {

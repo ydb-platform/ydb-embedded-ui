@@ -2,21 +2,24 @@ import {expect, test} from '@playwright/test';
 import {v4 as uuidv4} from 'uuid';
 
 import {database, dsVslotsSchema} from '../../../utils/constants';
-import {TenantPage} from '../TenantPage';
+import {QueryEditorMode, TenantPage} from '../TenantPage';
+import {
+    AsyncReplicationTemplates,
+    NewSqlDropdownMenu,
+    TemplateCategory,
+} from '../queryEditor/models/NewSqlDropdownMenu';
 import {QueryTabs} from '../queryEditor/models/QueryEditor';
 
 test.describe('Saved Queries', () => {
     let tenantPage: TenantPage;
 
     test.beforeEach(async ({page}) => {
-        const pageQueryParams = {
+        tenantPage = new TenantPage(page);
+        await tenantPage.gotoQueryEditor({
             schema: dsVslotsSchema,
             database,
-            tenantPage: 'query',
-        };
-
-        tenantPage = new TenantPage(page);
-        await tenantPage.goto(pageQueryParams);
+            mode: QueryEditorMode.MultiTab,
+        });
     });
 
     test('View list of saved queries', async () => {
@@ -60,6 +63,20 @@ test.describe('Saved Queries', () => {
         expect(row?.query.trim()).toBe(testQuery.trim());
     });
 
+    test('Saving a query updates the active tab title and action button state', async () => {
+        const testQuery = 'SELECT 3 AS titled_query;';
+        const queryName = await tenantPage.saveQuery(testQuery, `Saved Title ${uuidv4()}`);
+
+        await expect(tenantPage.queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe(
+            queryName,
+        );
+        await expect(tenantPage.queryEditor.isEditButtonVisible()).resolves.toBe(true);
+        await expect(tenantPage.queryEditor.isSaveButtonVisible(1000)).resolves.toBe(false);
+        await expect
+            .poll(() => tenantPage.queryEditor.getEditorContent(), {timeout: 5000})
+            .toBe(testQuery);
+    });
+
     test('No unsaved changes modal when opening another query after saving', async () => {
         // Save first query
         const firstQuery = 'SELECT 4 AS first_query;';
@@ -87,28 +104,23 @@ test.describe('Saved Queries', () => {
         expect(secondEditorValue.trim()).toBe(secondQuery.trim());
     });
 
-    test('Unsaved changes modal appears when selecting a saved query after modifications', async () => {
-        // Save a query
+    test('Opening a saved query after modifications opens a new tab without modal', async () => {
         const originalQuery = 'SELECT 6 AS original_query;';
         const queryName = await tenantPage.saveQuery(originalQuery, `Modified Query ${uuidv4()}`);
 
-        // Save another query to have one to select
-        const anotherQuery = 'SELECT 7 AS another_saved_query;';
-        await tenantPage.saveQuery(anotherQuery, `Another Saved Query ${uuidv4()}`);
+        await tenantPage.queryEditor.setQuery('SELECT 8 AS modified_query;');
+        const initialTabCount = await tenantPage.queryEditor.editorTabs.getTabCount();
 
-        // Replace the current query
-        const newQuery = 'SELECT 8 AS modified_query;';
-        await tenantPage.queryEditor.setQuery(newQuery);
-
-        // Open the saved query
         await tenantPage.openSavedQuery(queryName);
 
-        // Verify unsaved changes modal appears when selecting a row
-        const isModalVisible = await tenantPage.isUnsavedChangesModalVisible();
-        expect(isModalVisible).toBe(true);
-
-        // Dismiss the modal
-        await tenantPage.unsavedChangesModal.clickCancel();
+        const isModalHidden = await tenantPage.isUnsavedChangesModalHidden();
+        expect(isModalHidden).toBe(true);
+        await expect(
+            tenantPage.queryEditor.editorTabs.waitForTabCount(initialTabCount + 1),
+        ).resolves.toBe(true);
+        await expect(tenantPage.queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe(
+            queryName,
+        );
     });
 
     test('No unsaved changes modal when switching from saved query to another query', async () => {
@@ -143,5 +155,34 @@ test.describe('Saved Queries', () => {
         // Verify the query was loaded correctly
         const currentQuery = await tenantPage.queryEditor.editorTextArea.inputValue();
         expect(currentQuery.trim()).toBe(anotherQuery.trim());
+    });
+
+    test('Opening a saved query reuses the current untouched template tab', async ({page}) => {
+        const query = 'SELECT 10 AS saved_from_template;';
+        const queryName = await tenantPage.saveQuery(query, `Saved Query ${uuidv4()}`);
+        const newSqlDropdown = new NewSqlDropdownMenu(page);
+
+        await tenantPage.queryEditor.editorTabs.clickAddTab();
+        await expect(tenantPage.queryEditor.editorTabs.waitForTabCount(2)).resolves.toBe(true);
+
+        await newSqlDropdown.clickNewSqlButton();
+        await newSqlDropdown.hoverCategory(TemplateCategory.AsyncReplication);
+        await newSqlDropdown.selectTemplate(AsyncReplicationTemplates.Create);
+
+        await expect(tenantPage.queryEditor.editorTabs.waitForTabCount(2)).resolves.toBe(true);
+        const templateTabId = await tenantPage.queryEditor.editorTabs.getActiveTabId();
+
+        await tenantPage.openSavedQuery(queryName);
+
+        await expect(tenantPage.isUnsavedChangesModalHidden()).resolves.toBe(true);
+        await expect(tenantPage.queryEditor.editorTabs.waitForTabCount(2)).resolves.toBe(true);
+        const afterTabId = await tenantPage.queryEditor.editorTabs.getActiveTabId();
+        expect(afterTabId).toBe(templateTabId);
+        await expect(tenantPage.queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe(
+            queryName,
+        );
+        await expect
+            .poll(() => tenantPage.queryEditor.getEditorContent(), {timeout: 5000})
+            .toBe(query);
     });
 });

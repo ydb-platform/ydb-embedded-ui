@@ -15,6 +15,11 @@ export enum NavigationTabs {
     Diagnostics = 'Diagnostics',
 }
 
+export enum QueryEditorMode {
+    SingleTab = 'single-tab',
+    MultiTab = 'multi-tab',
+}
+
 export class TenantPage extends PageModel {
     queryEditor: QueryEditor;
     saveQueryDialog: SaveQueryDialog;
@@ -62,10 +67,36 @@ export class TenantPage extends PageModel {
         await tabInput.click();
     }
 
+    async gotoQueryEditor({
+        schema,
+        database,
+        mode,
+    }: {
+        schema: string;
+        database: string;
+        mode?: QueryEditorMode;
+    }) {
+        return this.goto({
+            schema,
+            database,
+            tenantPage: 'query',
+            e2eQueryEditorMode: mode,
+        });
+    }
+
     async saveQuery(queryText: string, name?: string): Promise<string> {
         const queryName = name || `Query ${Date.now()}`;
         await this.queryEditor.setQuery(queryText);
-        await this.queryEditor.clickSaveButton();
+
+        if (await this.queryEditor.isSaveButtonVisible(1000)) {
+            await this.queryEditor.clickSaveButton();
+        } else if (await this.queryEditor.isEditButtonVisible(1000)) {
+            await this.queryEditor.clickEditButton();
+            await this.queryEditor.clickSaveAsNewEditButton();
+        } else {
+            throw new Error('Neither Save nor Edit query button is available');
+        }
+
         await this.saveQueryDialog.setQueryName(queryName);
         await this.saveQueryDialog.clickSave();
         return queryName;

@@ -6,17 +6,17 @@ export class UnsavedChangesModal {
     private modal: Locator;
 
     constructor(page: Page) {
-        this.modal = page.locator('.confirmation-dialog');
+        this.modal = page.locator('.g-dialog').filter({hasText: 'Save changes to query?'});
     }
 
     async clickSaveQuery() {
-        const saveButton = this.modal.getByRole('button', {name: 'Save query'});
+        const saveButton = this.modal.getByRole('button', {name: 'Save changes'});
         await saveButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await saveButton.click();
     }
 
     async clickDontSave() {
-        const dontSaveButton = this.modal.getByRole('button', {name: "Don't save"});
+        const dontSaveButton = this.modal.getByRole('button', {name: "Don't Save"});
         await dontSaveButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await dontSaveButton.click();
     }

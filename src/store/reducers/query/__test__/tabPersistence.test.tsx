@@ -15,6 +15,7 @@ describe('QueryResultViewer tab persistence integration', () => {
                 updatedAt: 0,
             },
         },
+        newTabCounter: 0,
     };
 
     test('should save and retrieve tab selection for explain queries', () => {

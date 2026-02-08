@@ -3,56 +3,13 @@ import React from 'react';
 import NiceModal from '@ebay/nice-modal-react';
 
 import {useTypedSelector} from '..';
-import {CONFIRMATION_DIALOG} from '../../../components/ConfirmationDialog/ConfirmationDialog';
-import {SaveQueryButton} from '../../../containers/Tenant/Query/SaveQuery/SaveQuery';
 import {selectIsDirty, selectUserInput} from '../../../store/reducers/query/query';
 
-import i18n from './i18n';
-
-function ExtendedSaveQueryButton() {
-    const modal = NiceModal.useModal(CONFIRMATION_DIALOG);
-    const currentInput = useTypedSelector(selectUserInput);
-
-    const closeModal = React.useCallback(() => {
-        modal.hide();
-        modal.remove();
-    }, [modal]);
-    const handleSaveQuerySuccess = React.useCallback(() => {
-        modal.resolve(true);
-        closeModal();
-    }, [modal, closeModal]);
-    const handleCancelQuerySave = React.useCallback(() => {
-        modal.resolve(false);
-        closeModal();
-    }, [closeModal, modal]);
-
-    const dialogProps = React.useMemo(
-        () => ({
-            onSuccess: handleSaveQuerySuccess,
-            onCancel: handleCancelQuerySave,
-            queryBody: currentInput,
-        }),
-        [handleSaveQuerySuccess, handleCancelQuerySave, currentInput],
-    );
-
-    return <SaveQueryButton view="action" size="l" dialogProps={dialogProps} />;
-}
+import {UNSAVED_CHANGES_DIALOG} from './UnsavedChangesDialog';
 
 export async function getConfirmation(): Promise<boolean> {
-    return await NiceModal.show(CONFIRMATION_DIALOG, {
-        id: CONFIRMATION_DIALOG,
-        caption: i18n('context_unsaved-changes-warning'),
-        textButtonApply: i18n('action_apply'),
-        propsButtonApply: {view: 'l'},
-        renderButtons: (buttonApply: React.ReactNode, buttonCancel: React.ReactNode) => {
-            return (
-                <React.Fragment>
-                    {buttonCancel}
-                    <ExtendedSaveQueryButton />
-                    {buttonApply}
-                </React.Fragment>
-            );
-        },
+    return await NiceModal.show(UNSAVED_CHANGES_DIALOG, {
+        id: UNSAVED_CHANGES_DIALOG,
     });
 }
 
@@ -66,14 +23,17 @@ export function changeInputWithConfirmation<T>(callback: (args: T) => void) {
     };
 }
 
-export function useChangeInputWithConfirmation<T>(callback: (args: T) => void) {
+export function useChangeInputWithConfirmation<T>(
+    callback: (args: T) => void,
+    skipConfirmation?: boolean,
+) {
     const userInput = useTypedSelector(selectUserInput);
     const isDirty = useTypedSelector(selectIsDirty);
     const callbackWithConfirmation = React.useMemo(
         () => changeInputWithConfirmation<T>(callback),
         [callback],
     );
-    if (!userInput || !isDirty) {
+    if (skipConfirmation || !userInput || !isDirty) {
         return callback;
     }
     return callbackWithConfirmation;

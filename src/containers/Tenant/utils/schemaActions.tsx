@@ -1,10 +1,12 @@
 import {ChartAreaStacked, CirclePlus, Code, Copy, PlugConnection} from '@gravity-ui/icons';
 import {Flex, Spin} from '@gravity-ui/uikit';
 import copy from 'copy-to-clipboard';
+import {v4 as uuidv4} from 'uuid';
 import type {NavigationTreeNodeType} from 'ydb-ui-components';
 
 import type {SnippetParams} from '../../../components/ConnectToDB/types';
 import type {AppDispatch} from '../../../store';
+import {setQueryTabContent} from '../../../store/reducers/query/query';
 import {
     TENANT_DIAGNOSTICS_TABS_IDS,
     TENANT_PAGES_IDS,
@@ -12,6 +14,8 @@ import {
 } from '../../../store/reducers/tenant/constants';
 import {setDiagnosticsTab, setQueryTab} from '../../../store/reducers/tenant/tenant';
 import type {TenantPage} from '../../../store/reducers/tenant/types';
+import type {IQueryResult} from '../../../types/store/query';
+import {uiFactory} from '../../../uiFactory/uiFactory';
 import createToast from '../../../utils/createToast';
 import {insertSnippetToEditor} from '../../../utils/monaco/insertSnippet';
 import {transformPath} from '../ObjectSummary/transformPath';
@@ -25,6 +29,7 @@ import {
     addVectorIndex,
     alterAsyncReplicationTemplate,
     alterStreamingQuerySettingsTemplate,
+    alterStreamingQueryText,
     alterTableTemplate,
     alterTopicTemplate,
     alterTransferTemplate,
@@ -54,6 +59,11 @@ import {
 } from './schemaQueryTemplates';
 import type {YdbNavigationTreeProps} from './types';
 
+const TRAILING_ELLIPSIS = /\.{3}$/;
+function stripEllipsis(text: string): string {
+    return text.replace(TRAILING_ELLIPSIS, '').trim();
+}
+
 interface ActionsAdditionalParams {
     setActivePath: (path: string) => void;
     setTenantPage: (page: TenantPage) => void;
@@ -63,7 +73,9 @@ interface ActionsAdditionalParams {
     schemaData?: SchemaData[];
     isSchemaDataLoading?: boolean;
     hasMonitoring?: boolean;
+    streamingQueryData?: IQueryResult;
     showCreateTableData?: string;
+    isStreamingQueryTextLoading?: boolean;
     isShowCreateTableLoading?: boolean;
 }
 
@@ -87,16 +99,36 @@ const bindActions = (
         getConfirmation,
         getConnectToDBDialog,
         schemaData,
+        streamingQueryData,
         showCreateTableData,
     } = additionalEffects;
 
-    const inputQuery = (tmpl: TemplateFn) => () => {
+    const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
+
+    const inputQuery = (tmpl: TemplateFn, templateName?: string) => () => {
+        const snippet = tmpl({
+            ...params,
+            schemaData,
+            streamingQueryData,
+            showCreateTableData,
+        });
+
         const applyInsert = () => {
-            //order is important here: firstly we should open query tab and initialize editor (it will be set to window.ydbEditor), after that it is possible to insert snippet
             setTenantPage(TENANT_PAGES_IDS.query);
             dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
             setActivePath(params.path);
-            insertSnippetToEditor(tmpl({...params, schemaData, showCreateTableData}));
+
+            if (isMultiTabEnabled && templateName) {
+                dispatch(
+                    setQueryTabContent({
+                        tabId: uuidv4(),
+                        title: templateName,
+                        pendingSnippet: snippet,
+                    }),
+                );
+            } else {
+                insertSnippetToEditor(snippet);
+            }
         };
         if (getConfirmation) {
             const confirmedPromise = getConfirmation();
@@ -122,38 +154,93 @@ const bindActions = (
             dispatch(setDiagnosticsTab(TENANT_DIAGNOSTICS_TABS_IDS.monitoring));
             setActivePath(params.path);
         },
-        createTable: inputQuery(createTableTemplate),
-        createColumnTable: inputQuery(createColumnTableTemplate),
-        createAsyncReplication: inputQuery(createAsyncReplicationTemplate),
-        alterAsyncReplication: inputQuery(alterAsyncReplicationTemplate),
-        dropAsyncReplication: inputQuery(dropAsyncReplicationTemplate),
-        createTransfer: inputQuery(createTransferTemplate),
-        alterTransfer: inputQuery(alterTransferTemplate),
-        dropTransfer: inputQuery(dropTransferTemplate),
-        alterTable: inputQuery(alterTableTemplate),
-        dropTable: inputQuery(dropTableTemplate),
-        manageAutoPartitioning: inputQuery(manageAutoPartitioningTemplate),
-        manageReadReplicas: inputQuery(manageReadReplicasTemplate),
-        manageTTL: inputQuery(manageTTLTemplate),
-        selectQuery: inputQuery(selectQueryTemplate),
-        showCreateTable: inputQuery(showCreateTableTemplate),
-        upsertQuery: inputQuery(upsertQueryTemplate),
-        createExternalTable: inputQuery(createExternalTableTemplate),
-        dropExternalTable: inputQuery(dropExternalTableTemplate),
-        selectQueryFromExternalTable: inputQuery(selectQueryTemplate),
-        createTopic: inputQuery(createTopicTemplate),
-        alterTopic: inputQuery(alterTopicTemplate),
-        dropTopic: inputQuery(dropTopicTemplate),
-        createView: inputQuery(createViewTemplate),
-        dropView: inputQuery(dropViewTemplate),
-        createStreamingQuery: inputQuery(createStreamingQueryTemplate),
-        alterStreamingQuerySettings: inputQuery(alterStreamingQuerySettingsTemplate),
-        dropStreamingQuery: inputQuery(dropStreamingQueryTemplate),
-        dropIndex: inputQuery(dropTableIndex),
-        addFulltextIndex: inputQuery(addFulltextIndex),
-        addVectorIndex: inputQuery(addVectorIndex),
-        addTableIndex: inputQuery(addTableIndex),
-        createCdcStream: inputQuery(createCdcStreamTemplate),
+        createTable: inputQuery(createTableTemplate, stripEllipsis(i18n('actions.createTable'))),
+        createColumnTable: inputQuery(
+            createColumnTableTemplate,
+            stripEllipsis(i18n('actions.createColumnTable')),
+        ),
+        createAsyncReplication: inputQuery(
+            createAsyncReplicationTemplate,
+            stripEllipsis(i18n('actions.createAsyncReplication')),
+        ),
+        alterAsyncReplication: inputQuery(
+            alterAsyncReplicationTemplate,
+            stripEllipsis(i18n('actions.alterReplication')),
+        ),
+        dropAsyncReplication: inputQuery(
+            dropAsyncReplicationTemplate,
+            stripEllipsis(i18n('actions.dropReplication')),
+        ),
+        createTransfer: inputQuery(
+            createTransferTemplate,
+            stripEllipsis(i18n('actions.createTransfer')),
+        ),
+        alterTransfer: inputQuery(
+            alterTransferTemplate,
+            stripEllipsis(i18n('actions.alterTransfer')),
+        ),
+        dropTransfer: inputQuery(dropTransferTemplate, stripEllipsis(i18n('actions.dropTransfer'))),
+        alterTable: inputQuery(alterTableTemplate, stripEllipsis(i18n('actions.alterTable'))),
+        dropTable: inputQuery(dropTableTemplate, stripEllipsis(i18n('actions.dropTable'))),
+        manageAutoPartitioning: inputQuery(
+            manageAutoPartitioningTemplate,
+            stripEllipsis(i18n('actions.manageAutoPartitioning')),
+        ),
+        manageReadReplicas: inputQuery(
+            manageReadReplicasTemplate,
+            stripEllipsis(i18n('actions.manageReadReplicas')),
+        ),
+        manageTTL: inputQuery(manageTTLTemplate, stripEllipsis(i18n('actions.manageTTL'))),
+        selectQuery: inputQuery(selectQueryTemplate, stripEllipsis(i18n('actions.selectQuery'))),
+        showCreateTable: inputQuery(
+            showCreateTableTemplate,
+            stripEllipsis(i18n('actions.showCreateTable')),
+        ),
+        upsertQuery: inputQuery(upsertQueryTemplate, stripEllipsis(i18n('actions.upsertQuery'))),
+        createExternalTable: inputQuery(
+            createExternalTableTemplate,
+            stripEllipsis(i18n('actions.createExternalTable')),
+        ),
+        dropExternalTable: inputQuery(
+            dropExternalTableTemplate,
+            stripEllipsis(i18n('actions.dropTable')),
+        ),
+        selectQueryFromExternalTable: inputQuery(
+            selectQueryTemplate,
+            stripEllipsis(i18n('actions.selectQuery')),
+        ),
+        createTopic: inputQuery(createTopicTemplate, stripEllipsis(i18n('actions.createTopic'))),
+        alterTopic: inputQuery(alterTopicTemplate, stripEllipsis(i18n('actions.alterTopic'))),
+        dropTopic: inputQuery(dropTopicTemplate, stripEllipsis(i18n('actions.dropTopic'))),
+        createView: inputQuery(createViewTemplate, stripEllipsis(i18n('actions.createView'))),
+        dropView: inputQuery(dropViewTemplate, stripEllipsis(i18n('actions.dropView'))),
+        createStreamingQuery: inputQuery(
+            createStreamingQueryTemplate,
+            stripEllipsis(i18n('actions.createStreamingQuery')),
+        ),
+        addFulltextIndex: inputQuery(
+            addFulltextIndex,
+            stripEllipsis(i18n('actions.addFulltextIndex')),
+        ),
+        alterStreamingQuerySettings: inputQuery(
+            alterStreamingQuerySettingsTemplate,
+            stripEllipsis(i18n('actions.alterStreamingQuerySettings')),
+        ),
+        alterStreamingQueryText: inputQuery(
+            alterStreamingQueryText,
+            stripEllipsis(i18n('actions.alterStreamingQueryText')),
+        ),
+        dropStreamingQuery: inputQuery(
+            dropStreamingQueryTemplate,
+            stripEllipsis(i18n('actions.dropStreamingQuery')),
+        ),
+        dropIndex: inputQuery(dropTableIndex, i18n('actions.dropIndex')),
+        addVectorIndex: inputQuery(addVectorIndex, stripEllipsis(i18n('actions.addVectorIndex'))),
+        addTableIndex: inputQuery(addTableIndex, stripEllipsis(i18n('actions.addTableIndex'))),
+        createCdcStream: inputQuery(
+            createCdcStreamTemplate,
+            stripEllipsis(i18n('actions.createCdcStream')),
+        ),
         copyPath: () => {
             try {
                 copy(params.relativePath);
@@ -391,6 +478,10 @@ export const getActions =
         const STREAMING_QUERY_SET: ActionsSet = [
             [copyItem],
             [
+                {
+                    text: i18n('actions.alterStreamingQueryText'),
+                    action: actions.alterStreamingQueryText,
+                },
                 {
                     text: i18n('actions.alterStreamingQuerySettings'),
                     action: actions.alterStreamingQuerySettings,
