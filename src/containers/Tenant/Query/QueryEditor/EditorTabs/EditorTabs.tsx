@@ -1,213 +1,24 @@
 import React from 'react';
 
 import NiceModal from '@ebay/nice-modal-react';
-import {
-    CirclePlus,
-    Copy,
-    Ellipsis,
-    FloppyDisk,
-    PaperPlane,
-    Pencil,
-    StarFill,
-    Xmark,
-} from '@gravity-ui/icons';
-import type {DropdownMenuItem} from '@gravity-ui/uikit';
-import {
-    ActionTooltip,
-    Button,
-    DropdownMenu,
-    Flex,
-    Loader,
-    Tab,
-    TabList,
-    TabProvider,
-} from '@gravity-ui/uikit';
+import {Plus} from '@gravity-ui/icons';
+import {ActionTooltip, Button, Flex, Icon, TabList, TabProvider} from '@gravity-ui/uikit';
 
-import type {QueryTabState} from '../../../../../store/reducers/query/types';
 import {cn} from '../../../../../utils/cn';
+import {reachMetricaGoal} from '../../../../../utils/yaMetrica';
 import {SAVE_QUERY_DIALOG} from '../../SaveQuery/SaveQuery';
 import i18n from '../../i18n';
+import {getTabTitleForSave} from '../../utils/queryTabTitles';
 import {useSavedQueries} from '../../utils/useSavedQueries';
+import {HOTKEY_LABELS} from '../constants';
 import {useQueryTabsActions} from '../hooks/useQueryTabsActions';
 
-import {RENAME_TAB_DIALOG} from './RenameTabDialog';
+import {EditorTabItem} from './EditorTabItem';
+import {RENAME_QUERY_DIALOG} from './RenameQueryDialog';
 
-const b = cn('query-editor');
+import './EditorTabs.scss';
 
-interface EditorTabItemProps {
-    tabId: string;
-    tab: QueryTabState;
-    isActive: boolean;
-    onActivate: (tabId: string) => void;
-    onCloseTab: (tabId: string) => void;
-    onDuplicateTab: (tabId: string) => void;
-    onRenameTab: (tabId: string, currentTitle: string) => void;
-    onSaveQueryAs: (tabId: string) => void;
-    onCloseOtherTabs: (tabId: string) => void;
-    onCloseAllTabs: () => void;
-}
-
-function EditorTabItem({
-    tabId,
-    tab,
-    isActive,
-    onActivate,
-    onCloseTab,
-    onDuplicateTab,
-    onRenameTab,
-    onSaveQueryAs,
-    onCloseOtherTabs,
-    onCloseAllTabs,
-}: EditorTabItemProps) {
-    const title = tab.title || i18n('editor-tabs.untitled');
-    const isDirty = Boolean(tab.isDirty);
-    const isLoading = Boolean(tab.result?.isLoading);
-
-    const handleMenuSwitcherClick = React.useCallback(
-        (event: React.MouseEvent<HTMLElement>) => {
-            event.stopPropagation();
-            onActivate(tabId);
-        },
-        [onActivate, tabId],
-    );
-
-    const handleCloseClick = React.useCallback(
-        (event: React.MouseEvent<HTMLElement>) => {
-            event.stopPropagation();
-            onCloseTab(tabId);
-        },
-        [onCloseTab, tabId],
-    );
-
-    const handleRenameClick = React.useCallback(() => {
-        onRenameTab(tabId, tab.title);
-    }, [onRenameTab, tab.title, tabId]);
-
-    const handleDuplicateClick = React.useCallback(() => {
-        onDuplicateTab(tabId);
-    }, [onDuplicateTab, tabId]);
-
-    const handleSaveQueryAsClick = React.useCallback(() => {
-        onSaveQueryAs(tabId);
-    }, [onSaveQueryAs, tabId]);
-
-    const handleCloseOtherTabsClick = React.useCallback(() => {
-        onCloseOtherTabs(tabId);
-    }, [onCloseOtherTabs, tabId]);
-
-    const handleCloseAllTabsClick = React.useCallback(() => {
-        onCloseAllTabs();
-    }, [onCloseAllTabs]);
-
-    const tabMenuItems = React.useMemo<DropdownMenuItem[][]>(() => {
-        const shortcut = (value: string) => <span>{value}</span>;
-
-        return [
-            [
-                {
-                    text: i18n('editor-tabs.rename'),
-                    iconStart: <Pencil />,
-                    iconEnd: shortcut('⌘T'),
-                    action: handleRenameClick,
-                },
-                {
-                    text: i18n('editor-tabs.duplicate'),
-                    iconStart: <Copy />,
-                    action: handleDuplicateClick,
-                },
-            ],
-            [
-                {
-                    text: i18n('editor-tabs.add-to-favorites'),
-                    iconStart: <StarFill />,
-                    disabled: true,
-                    action: () => {},
-                },
-                {
-                    text: i18n('editor-tabs.save-query-as'),
-                    iconStart: <FloppyDisk />,
-                    iconEnd: shortcut('⌘⇧S'),
-                    action: handleSaveQueryAsClick,
-                },
-                {
-                    text: i18n('editor-tabs.share-query'),
-                    iconStart: <PaperPlane />,
-                    disabled: true,
-                    action: () => {},
-                },
-            ],
-            [
-                {
-                    text: i18n('editor-tabs.close'),
-                    iconStart: <Xmark />,
-                    iconEnd: shortcut('⌘⌫'),
-                    action: () => onCloseTab(tabId),
-                },
-                {
-                    text: i18n('editor-tabs.close-other-tabs'),
-                    iconStart: <Xmark />,
-                    iconEnd: shortcut('⌘⇧⌫'),
-                    action: handleCloseOtherTabsClick,
-                },
-                {
-                    text: i18n('editor-tabs.close-all-tabs'),
-                    iconStart: <Xmark />,
-                    iconEnd: shortcut('⌘⌥⌫'),
-                    action: handleCloseAllTabsClick,
-                },
-            ],
-        ];
-    }, [
-        handleCloseAllTabsClick,
-        handleCloseOtherTabsClick,
-        handleDuplicateClick,
-        handleRenameClick,
-        handleSaveQueryAsClick,
-        onCloseTab,
-        tabId,
-    ]);
-
-    const renderTabMenuSwitcher = React.useCallback((props: React.HTMLAttributes<HTMLElement>) => {
-        return (
-            <span {...props} className={b('editor-tab-action', {menu: true})}>
-                <Ellipsis />
-            </span>
-        );
-    }, []);
-
-    return (
-        <Tab value={tabId}>
-            <Flex className={b('editor-tab')} alignItems="center" gap={1}>
-                <span className={b('editor-tab-title')}>{title}</span>
-                {isDirty ? <span className={b('editor-tab-indicator', {dirty: true})} /> : null}
-                {isLoading ? (
-                    <span className={b('editor-tab-indicator', {loading: true})}>
-                        <Loader size="s" />
-                    </span>
-                ) : null}
-                <Flex className={b('editor-tab-actions')} alignItems="center" gap={0}>
-                    <span
-                        className={b('editor-tab-action', {close: true, active: isActive})}
-                        onClick={handleCloseClick}
-                    >
-                        <Xmark />
-                    </span>
-                    <DropdownMenu
-                        items={tabMenuItems}
-                        onSwitcherClick={handleMenuSwitcherClick}
-                        renderSwitcher={renderTabMenuSwitcher}
-                        switcherWrapperClassName={b('editor-tab-menu-switcher')}
-                        popupProps={{
-                            placement: ['bottom-start', 'top-start'],
-                            floatingStyles: {width: 264},
-                        }}
-                        size="m"
-                    />
-                </Flex>
-            </Flex>
-        </Tab>
-    );
-}
+const b = cn('editor-tabs');
 
 export function EditorTabs() {
     const {
@@ -228,77 +39,67 @@ export function EditorTabs() {
 
     const handleSaveQueryAs = React.useCallback(
         (tabId: string) => {
+            reachMetricaGoal('saveQueryFromTab', {tabsCount: tabsOrder.length});
             handleActivateTab(tabId);
             const tab = tabsById[tabId];
             const queryBody = tab?.input ?? '';
-            const commonModalProps = {savedQueries, onSaveQuery: saveQuery, queryBody} as const;
+            const defaultQueryName = getTabTitleForSave(tab);
 
-            if (tab?.isTitleUserDefined) {
-                NiceModal.show(SAVE_QUERY_DIALOG, {
-                    ...commonModalProps,
-                    defaultQueryName: tab.title,
-                });
-                return;
-            }
-
-            NiceModal.show(SAVE_QUERY_DIALOG, commonModalProps);
+            NiceModal.show(SAVE_QUERY_DIALOG, {
+                savedQueries,
+                onSaveQuery: saveQuery,
+                queryBody,
+                defaultQueryName,
+            });
         },
-        [handleActivateTab, savedQueries, saveQuery, tabsById],
+        [handleActivateTab, savedQueries, saveQuery, tabsById, tabsOrder.length],
     );
 
     const handleRenameTab = React.useCallback(
         (tabId: string, currentTitle: string) => {
-            NiceModal.show(RENAME_TAB_DIALOG, {
+            reachMetricaGoal('renameQueryTab', {tabsCount: tabsOrder.length});
+            NiceModal.show(RENAME_QUERY_DIALOG, {
                 title: currentTitle,
                 onRename: (title: string) => renameTab(tabId, title),
             });
         },
-        [renameTab],
-    );
-
-    const renderEditorTab = React.useCallback(
-        (tabId: string) => {
-            const tab = tabsById[tabId];
-            if (!tab) {
-                return null;
-            }
-
-            return (
-                <EditorTabItem
-                    key={tabId}
-                    tabId={tabId}
-                    tab={tab}
-                    isActive={tabId === activeTabId}
-                    onActivate={handleActivateTab}
-                    onCloseTab={handleCloseTab}
-                    onDuplicateTab={handleDuplicateTab}
-                    onRenameTab={handleRenameTab}
-                    onSaveQueryAs={handleSaveQueryAs}
-                    onCloseOtherTabs={handleCloseOtherTabs}
-                    onCloseAllTabs={handleCloseAllTabs}
-                />
-            );
-        },
-        [
-            activeTabId,
-            handleActivateTab,
-            handleCloseTab,
-            handleCloseAllTabs,
-            handleCloseOtherTabs,
-            handleDuplicateTab,
-            handleRenameTab,
-            handleSaveQueryAs,
-            tabsById,
-        ],
+        [renameTab, tabsOrder.length],
     );
 
     return (
-        <Flex className={b('editor-tabs')} alignItems="center" justifyContent="space-between">
+        <Flex className={b()} alignItems="center">
             <TabProvider value={activeTabId} onUpdate={handleTabSwitch}>
-                <TabList size="m">{tabsOrder.map(renderEditorTab)}</TabList>
+                <TabList size="m">
+                    {tabsOrder.map((tabId) => {
+                        const tab = tabsById[tabId];
+                        if (!tab) {
+                            return null;
+                        }
+
+                        return (
+                            <EditorTabItem
+                                key={tabId}
+                                tabId={tabId}
+                                tab={tab}
+                                isActive={tabId === activeTabId}
+                                onActivate={handleActivateTab}
+                                onCloseTab={handleCloseTab}
+                                onDuplicateTab={handleDuplicateTab}
+                                onRenameTab={handleRenameTab}
+                                onSaveQueryAs={handleSaveQueryAs}
+                                onCloseOtherTabs={handleCloseOtherTabs}
+                                onCloseAllTabs={handleCloseAllTabs}
+                            />
+                        );
+                    })}
+                </TabList>
             </TabProvider>
-            <Flex className={b('editor-tabs-actions')} alignItems="center" gap={1}>
-                <ActionTooltip title={i18n('editor-tabs.action.new-tab')}>
+            <div className={b('add-icon-button')}>
+                <ActionTooltip
+                    title={i18n('editor-tabs.action.new-tab')}
+                    placement={['top-start', 'top-end', 'bottom-start', 'bottom-end']}
+                    hotkey={HOTKEY_LABELS.newTab}
+                >
                     <Button
                         view="flat-secondary"
                         size="xs"
@@ -306,11 +107,11 @@ export function EditorTabs() {
                         aria-label={i18n('editor-tabs.action.new-tab')}
                     >
                         <Button.Icon>
-                            <CirclePlus />
+                            <Icon data={Plus} size={12} />
                         </Button.Icon>
                     </Button>
                 </ActionTooltip>
-            </Flex>
+            </div>
         </Flex>
     );
 }

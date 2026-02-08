@@ -119,6 +119,7 @@ export interface QueryTabPersistedState {
     title: string;
     isTitleUserDefined?: boolean;
     input: string;
+    savedInput?: string;
     createdAt: number;
     updatedAt: number;
 }
@@ -127,6 +128,7 @@ export interface QueryTabsPersistedState {
     activeTabId: string;
     tabsOrder: string[];
     tabsById: Record<string, QueryTabPersistedState>;
+    newTabCounter?: number;
 }
 
 export type QueryTabsDirtyPersistedState = Record<string, boolean>;
@@ -137,6 +139,10 @@ function isQueryTabPersistedState(value: unknown): value is QueryTabPersistedSta
     }
 
     if ('isTitleUserDefined' in value && typeof value.isTitleUserDefined !== 'boolean') {
+        return false;
+    }
+
+    if ('savedInput' in value && typeof value.savedInput !== 'string') {
         return false;
     }
 
@@ -173,4 +179,19 @@ export function isQueryTabsDirtyPersistedState(
     }
 
     return Object.values(value).every((item) => typeof item === 'boolean');
+}
+
+export function getUniqueTabTitle(
+    tabsById: Record<string, {title: string}>,
+    baseTitle: string,
+): string {
+    const existingTitles = new Set(Object.values(tabsById).map((tab) => tab.title));
+    if (!existingTitles.has(baseTitle)) {
+        return baseTitle;
+    }
+    let counter = 2;
+    while (existingTitles.has(`${baseTitle} ${counter}`)) {
+        counter++;
+    }
+    return `${baseTitle} ${counter}`;
 }

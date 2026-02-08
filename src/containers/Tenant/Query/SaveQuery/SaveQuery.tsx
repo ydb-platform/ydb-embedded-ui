@@ -13,6 +13,7 @@ import {
 import type {SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {getTabTitleForSave} from '../utils/queryTabTitles';
 import {useSavedQueries} from '../utils/useSavedQueries';
 
 import i18n from './i18n';
@@ -33,9 +34,7 @@ function useSaveQueryHandler(dialogProps: SaveQueryDialogCommonProps) {
     const activeTab = useTypedSelector(selectActiveTab);
 
     const onSaveQueryClick = React.useCallback(() => {
-        const computedDefaultQueryName = activeTab?.isTitleUserDefined
-            ? activeTab.title
-            : undefined;
+        const computedDefaultQueryName = getTabTitleForSave(activeTab);
         NiceModal.show(SAVE_QUERY_DIALOG, {
             ...dialogProps,
             defaultQueryName: dialogProps.defaultQueryName ?? computedDefaultQueryName,
@@ -43,14 +42,7 @@ function useSaveQueryHandler(dialogProps: SaveQueryDialogCommonProps) {
             onSaveQuery: saveQuery,
         });
         dispatch(clearQueryNameToEdit());
-    }, [
-        activeTab?.isTitleUserDefined,
-        activeTab?.title,
-        dispatch,
-        dialogProps,
-        savedQueries,
-        saveQuery,
-    ]);
+    }, [activeTab, dispatch, dialogProps, savedQueries, saveQuery]);
 
     return onSaveQueryClick;
 }
@@ -59,12 +51,12 @@ interface SaveQueryButtonProps extends ButtonButtonProps {
     dialogProps: SaveQueryDialogCommonProps;
 }
 
-export function SaveQueryButton({dialogProps, ...buttonProps}: SaveQueryButtonProps) {
+export function SaveQueryButton({dialogProps, children, ...buttonProps}: SaveQueryButtonProps) {
     const onSaveQueryClick = useSaveQueryHandler(dialogProps);
 
     return (
         <Button onClick={onSaveQueryClick} {...buttonProps}>
-            {i18n('action.save')}
+            {children ?? i18n('action.save')}
         </Button>
     );
 }
@@ -141,7 +133,7 @@ function SaveQueryDialog({
     const dispatch = useTypedDispatch();
     const [queryName, setQueryName] = React.useState(defaultQueryName ?? '');
     const [validationError, setValidationError] = React.useState<string>();
-    const inputRef = React.useRef<HTMLInputElement>(null);
+    const controlRef = React.useRef<HTMLInputElement>(null);
 
     const validateQueryName = (value: string) => {
         if (!value) {
@@ -178,7 +170,14 @@ function SaveQueryDialog({
     };
 
     return (
-        <Dialog open={open} size="s" onClose={onCloseWithoutSave} initialFocus={inputRef}>
+        <Dialog
+            open={open}
+            hasCloseButton={true}
+            size="s"
+            onClose={onCloseWithoutSave}
+            initialFocus={controlRef}
+            className={b()}
+        >
             <Dialog.Header caption={i18n('action.save')} />
             <form
                 onSubmit={(e) => {
@@ -195,13 +194,13 @@ function SaveQueryDialog({
                     <div className={b('dialog-row')}>
                         <div className={b('control-wrapper')}>
                             <TextInput
-                                controlRef={inputRef}
                                 id="queryName"
+                                aria-label={i18n('input-label')}
                                 placeholder={i18n('input-placeholder')}
                                 value={queryName}
                                 onUpdate={handleQueryNameChange}
+                                controlRef={controlRef}
                                 hasClear
-                                autoFocus
                                 autoComplete={false}
                                 validationState={validationError ? 'invalid' : undefined}
                                 errorMessage={validationError}

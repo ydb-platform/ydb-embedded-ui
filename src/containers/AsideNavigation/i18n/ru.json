@@ -2,19 +2,24 @@
   "navigation-item.information": "Информация",
   "navigation-item.settings": "Настройки",
   "navigation-item.account": "Аккаунт",
-
   "help-center.header.title": "Документация",
   "help-center.item.documentation": "Посмотреть документацию",
   "help-center.footer.shortcuts": "Горячие клавиши",
-
   "account.user": "Пользователь YDB",
-
   "account.login": "Войти",
   "account.logout": "Выйти",
-
   "hotkeys.title": "Быстрые клавиши",
   "hotkeys.execute-query": "Выполнить запрос",
   "hotkeys.execute-selected-query": "Выполнить выбранный запрос",
   "hotkeys.save-query": "Сохранить запрос",
-  "hotkeys.save-selected-query": "Сохранить выбранный запрос"
+  "hotkeys.save-selected-query": "Сохранить выбранный запрос",
+  "hotkeys.new-tab": "Новая вкладка",
+  "hotkeys.close-tab": "Закрыть вкладку",
+  "hotkeys.rename-tab": "Переименовать вкладку",
+  "hotkeys.duplicate-tab": "Дублировать вкладку",
+  "hotkeys.next-tab": "Следующая вкладка",
+  "hotkeys.previous-tab": "Предыдущая вкладка",
+  "hotkeys.close-other-tabs": "Закрыть другие вкладки",
+  "hotkeys.close-all-tabs": "Закрыть все вкладки",
+  "hotkeys.save-query-as": "Сохранить запрос как"
 }

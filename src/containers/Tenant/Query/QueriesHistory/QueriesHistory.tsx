@@ -1,6 +1,7 @@
 import React from 'react';
 
 import NiceModal from '@ebay/nice-modal-react';
+import {v4 as uuidv4} from 'uuid';
 
 import {DrawerWrapper} from '../../../../components/Drawer';
 import type {DrawerControl} from '../../../../components/Drawer/Drawer';
@@ -10,15 +11,19 @@ import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import type {useQueriesHistory} from '../../../../store/reducers/query/hooks';
 import {
+    addQueryTab,
     selectQueriesHistoryFilter,
+    selectTabsById,
     setHistoryCurrentQueryId,
     setIsDirty,
     setQueryHistoryFilter,
 } from '../../../../store/reducers/query/query';
 import type {QueryInHistory} from '../../../../store/reducers/query/types';
+import {getUniqueTabTitle} from '../../../../store/reducers/query/utils';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import {valueIsDefined} from '../../../../utils';
+import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
@@ -43,6 +48,8 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
     const [showQueryPreview, setShowQueryPreview] = React.useState(false);
     const [selectedId, setSelectedId] = React.useState<string | null>(null);
     const {savedQueries, saveQuery} = useSavedQueries();
+    const tabsById = useTypedSelector(selectTabsById);
+    const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
 
     const sortedHistory = React.useMemo(() => {
         return queriesHistory.filteredHistoryQueries.toReversed().toSorted((a, b) => {
@@ -65,12 +72,26 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
 
     const applyQueryClick = React.useCallback(
         (query: QueryInHistory) => {
-            changeUserInput({input: query.queryText});
+            if (isMultiTabEnabled) {
+                const firstLine = query.queryText.trim().split('\n')[0] || query.queryText;
+                const title = getUniqueTabTitle(tabsById, firstLine);
+
+                dispatch(
+                    addQueryTab({
+                        tabId: uuidv4(),
+                        title,
+                        input: query.queryText,
+                        makeActive: true,
+                    }),
+                );
+            } else {
+                changeUserInput({input: query.queryText});
+            }
             dispatch(setIsDirty(false));
             dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
             dispatch(setHistoryCurrentQueryId(query.queryId));
         },
-        [changeUserInput, dispatch],
+        [changeUserInput, dispatch, isMultiTabEnabled, tabsById],
     );
 
     const handleSaveQuery = React.useCallback(
@@ -94,7 +115,7 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
         [],
     );
 
-    const onQueryClick = useChangeInputWithConfirmation(applyQueryClick);
+    const onQueryClick = useChangeInputWithConfirmation(applyQueryClick, isMultiTabEnabled);
 
     const onChangeFilter = (value: string) => {
         dispatch(setQueryHistoryFilter(value));

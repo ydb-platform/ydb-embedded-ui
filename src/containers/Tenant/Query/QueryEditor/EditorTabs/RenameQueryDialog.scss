@@ -1,12 +1,13 @@
-.ydb-save-query {
+.rename-query-dialog {
     &__dialog-row {
         display: flex;
         align-items: flex-start;
 
         & + & {
-            margin-top: var(--g-spacing-4);
+            margin-top: var(--g-text-body-1-line-height);
         }
     }
+
     &__control-wrapper {
         display: flex;
         flex-grow: 1;

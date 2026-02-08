@@ -1,6 +1,8 @@
 import React from 'react';
 
+import NiceModal from '@ebay/nice-modal-react';
 import type {Settings} from '@gravity-ui/react-data-table';
+import {Loader} from '@gravity-ui/uikit';
 import {isEqual} from 'lodash';
 import {v4 as uuidv4} from 'uuid';
 
@@ -12,6 +14,8 @@ import {
 import type {useQueriesHistory} from '../../../../store/reducers/query/hooks';
 import {
     queryApi,
+    renameQueryTab,
+    selectActiveTab,
     selectActiveTabId,
     selectLastExecutedQueryText,
     selectResult,
@@ -56,9 +60,15 @@ import {PreviewContainer} from '../Preview/Preview';
 import {QueryEditorControls} from '../QueryEditorControls/QueryEditorControls';
 import {QueryResultViewer} from '../QueryResult/QueryResultViewer';
 import {QuerySettingsDialog} from '../QuerySettingsDialog/QuerySettingsDialog';
+import {SAVE_QUERY_DIALOG} from '../SaveQuery/SaveQuery';
+import {getTabTitleForSave} from '../utils/queryTabTitles';
+import {useSavedQueries} from '../utils/useSavedQueries';
 
 import {EditorTabs} from './EditorTabs/EditorTabs';
+import {RENAME_QUERY_DIALOG} from './EditorTabs/RenameQueryDialog';
 import {YqlEditor} from './YqlEditor/YqlEditor';
+import {useEditorTabsGlobalHotkeys} from './hooks/useEditorTabsGlobalHotkeys';
+import {useQueryTabsActions} from './hooks/useQueryTabsActions';
 import {queryExecutionManagerInstance} from './utils/queryExecutionManager';
 
 import './QueryEditor.scss';
@@ -129,6 +139,63 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
     const [streamQuery] = queryApi.useUseStreamQueryMutation();
 
     const isMultiTabQueryEditorEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
+
+    const {
+        activeTabId: tabsActiveTabId,
+        handleNewTabClick,
+        handleCloseActiveTab,
+        handleCloseOtherTabs: closeOtherTabs,
+        handleCloseAllTabs,
+        handleDuplicateTab,
+        handleNextTab,
+        handlePreviousTab,
+    } = useQueryTabsActions();
+
+    const activeTab = useTypedSelector(selectActiveTab);
+    const {savedQueries, saveQuery} = useSavedQueries();
+
+    const handleGlobalRenameTab = React.useCallback(() => {
+        const tabIdToRename = tabsActiveTabId;
+        NiceModal.show(RENAME_QUERY_DIALOG, {
+            title: activeTab?.title || '',
+            onRename: (title: string) => {
+                dispatch(renameQueryTab({tabId: tabIdToRename, title}));
+            },
+        });
+    }, [tabsActiveTabId, activeTab?.title, dispatch]);
+
+    const handleGlobalDuplicateTab = React.useCallback(() => {
+        handleDuplicateTab(tabsActiveTabId);
+    }, [handleDuplicateTab, tabsActiveTabId]);
+
+    const handleGlobalCloseOtherTabs = React.useCallback(() => {
+        closeOtherTabs(tabsActiveTabId);
+    }, [closeOtherTabs, tabsActiveTabId]);
+
+    const handleGlobalSaveQueryAs = React.useCallback(() => {
+        const defaultQueryName = getTabTitleForSave(activeTab);
+
+        NiceModal.show(SAVE_QUERY_DIALOG, {
+            savedQueries,
+            onSaveQuery: saveQuery,
+            defaultQueryName,
+        });
+    }, [activeTab, savedQueries, saveQuery]);
+
+    useEditorTabsGlobalHotkeys(isMultiTabQueryEditorEnabled, {
+        handleNewTab: handleNewTabClick,
+        handleCloseActiveTab,
+        handleRenameTab: handleGlobalRenameTab,
+        handleDuplicateTab: handleGlobalDuplicateTab,
+        handleNextTab,
+        handlePreviousTab,
+        handleCloseOtherTabs: handleGlobalCloseOtherTabs,
+        handleCloseAllTabs,
+        handleSaveQueryAs: handleGlobalSaveQueryAs,
+    });
+
+    const [isEditorReady, setIsEditorReady] = React.useState(false);
+    const handleEditorReady = React.useCallback(() => setIsEditorReady(true), []);
 
     // Normalize stored resourcePool if it's not available for current database
     React.useEffect(() => {
@@ -394,7 +461,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
     };
 
     return (
-        <div className={b()}>
+        <div className={b({multiTab: isMultiTabQueryEditorEnabled})}>
             <SplitPane
                 direction="vertical"
                 defaultSizePaneKey={DEFAULT_SIZE_RESULT_PANE_KEY}
@@ -407,8 +474,14 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
                 <div
                     className={b('pane-wrapper', {
                         top: true,
+                        loading: isMultiTabQueryEditorEnabled && !isEditorReady,
                     })}
                 >
+                    {isMultiTabQueryEditorEnabled && !isEditorReady ? (
+                        <div className={b('editor-loader')}>
+                            <Loader size="l" />
+                        </div>
+                    ) : null}
                     {isMultiTabQueryEditorEnabled ? <EditorTabs /> : null}
                     <div className={b('monaco-wrapper')}>
                         <div className={b('monaco')}>
@@ -420,6 +493,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
                                 historyQueries={historyQueries}
                                 goToPreviousQuery={goToPreviousQuery}
                                 goToNextQuery={goToNextQuery}
+                                onEditorReady={handleEditorReady}
                             />
                         </div>
                     </div>

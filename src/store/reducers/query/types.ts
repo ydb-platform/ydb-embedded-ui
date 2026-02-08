@@ -81,17 +81,29 @@ export interface QueryTabState {
      */
     isTitleUserDefined?: boolean;
     input: string;
+    /**
+     * The "clean" baseline input used to compute isDirty.
+     * undefined = unknown baseline (e.g. tab loaded as dirty from persistence) — stays dirty until explicit reset.
+     */
+    savedInput?: string;
     isDirty: boolean;
     createdAt: number;
     updatedAt: number;
     lastExecutedQueryText?: string;
     result?: QueryResult;
+    /**
+     * Snippet text to be inserted into the editor after the tab model is switched.
+     * Used when creating a new tab from templates (schema actions, New SQL).
+     * Cleared after insertion by the editor component.
+     */
+    pendingSnippet?: string;
 }
 
 export interface QueryState {
     activeTabId: string;
     tabsOrder: string[];
     tabsById: Record<string, QueryTabState>;
+    newTabCounter: number;
 
     historyFilter?: string;
     historyCurrentQueryId?: string;
