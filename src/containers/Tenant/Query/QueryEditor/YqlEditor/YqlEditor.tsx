@@ -61,6 +61,7 @@ interface YqlEditorProps {
     historyQueries: QueryInHistory[];
     goToPreviousQuery: () => void;
     goToNextQuery: () => void;
+    onEditorReady?: () => void;
 }
 
 export function YqlEditor({
@@ -71,6 +72,7 @@ export function YqlEditor({
     historyQueries,
     goToPreviousQuery,
     goToNextQuery,
+    onEditorReady,
 }: YqlEditorProps) {
     const input = useTypedSelector(selectUserInput);
     const activeTab = useTypedSelector(selectActiveTab);
@@ -381,6 +383,8 @@ export function YqlEditor({
                 run: () => handleSaveQueryAsAction(),
             });
         }
+
+        onEditorReady?.();
     };
 
     const onChange = (newValue: string) => {
