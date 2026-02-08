@@ -60,7 +60,7 @@ export function useQueryTabsActions() {
                 return;
             }
 
-            const baseTitle = tab.title || i18n('editor-tabs.untitled');
+            const baseTitle = tab.title || i18n('editor-tabs.default-title', {index: 1});
             const tabId = uuidv4();
             dispatch(
                 addQueryTab({

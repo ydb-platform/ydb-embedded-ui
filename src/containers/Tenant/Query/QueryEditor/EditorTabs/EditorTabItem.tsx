@@ -16,6 +16,15 @@ import './EditorTabItem.scss';
 
 const b = cn('editor-tab-item');
 
+const HOTKEY_LABELS = {
+    renameTab: 'mod+alt+r',
+    duplicateTab: 'mod+alt+c',
+    closeTab: 'mod+backspace',
+    closeOtherTabs: 'mod+alt+backspace',
+    closeAllTabs: 'mod+shift+backspace',
+    saveQueryAs: 'mod+shift+s',
+} as const;
+
 function getTabExecutionStatus(tab: QueryTabState): TabExecutionStatus | undefined {
     const result = tab.result;
     if (!result) {
@@ -58,7 +67,7 @@ export function EditorTabItem({
     onCloseOtherTabs,
     onCloseAllTabs,
 }: EditorTabItemProps) {
-    const title = tab.title || i18n('editor-tabs.untitled');
+    const title = tab.title || i18n('editor-tabs.default-title', {index: 1});
     const isDirty = Boolean(tab.isDirty);
     const executionStatus = getTabExecutionStatus(tab);
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -120,12 +129,13 @@ export function EditorTabItem({
                 {
                     text: i18n('editor-tabs.rename'),
                     iconStart: <Pencil />,
-                    iconEnd: <Hotkey value="mod+t" />,
+                    iconEnd: <Hotkey value={HOTKEY_LABELS.renameTab} />,
                     action: handleRenameClick,
                 },
                 {
                     text: i18n('editor-tabs.duplicate'),
                     iconStart: <Copy />,
+                    iconEnd: <Hotkey value={HOTKEY_LABELS.duplicateTab} />,
                     action: handleDuplicateClick,
                 },
             ],
@@ -133,7 +143,7 @@ export function EditorTabItem({
                 {
                     text: i18n('editor-tabs.save-query-as'),
                     iconStart: <FloppyDisk />,
-                    iconEnd: <Hotkey value="mod+shift+s" />,
+                    iconEnd: <Hotkey value={HOTKEY_LABELS.saveQueryAs} />,
                     action: handleSaveQueryAsClick,
                 },
             ],
@@ -141,19 +151,19 @@ export function EditorTabItem({
                 {
                     text: i18n('editor-tabs.close'),
                     iconStart: <Xmark />,
-                    iconEnd: <Hotkey value="mod+backspace" />,
+                    iconEnd: <Hotkey value={HOTKEY_LABELS.closeTab} />,
                     action: () => onCloseTab(tabId),
                 },
                 {
                     text: i18n('editor-tabs.close-other-tabs'),
                     iconStart: <Xmark />,
-                    iconEnd: <Hotkey value="mod+shift+backspace" />,
+                    iconEnd: <Hotkey value={HOTKEY_LABELS.closeOtherTabs} />,
                     action: handleCloseOtherTabsClick,
                 },
                 {
                     text: i18n('editor-tabs.close-all-tabs'),
                     iconStart: <Xmark />,
-                    iconEnd: <Hotkey value="mod+alt+backspace" />,
+                    iconEnd: <Hotkey value={HOTKEY_LABELS.closeAllTabs} />,
                     action: handleCloseAllTabsClick,
                 },
             ],
