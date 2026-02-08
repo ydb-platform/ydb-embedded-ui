@@ -1,6 +1,7 @@
 import React from 'react';
 
 import type {Settings} from '@gravity-ui/react-data-table';
+import {Loader} from '@gravity-ui/uikit';
 import {isEqual} from 'lodash';
 import {v4 as uuidv4} from 'uuid';
 
@@ -125,6 +126,9 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
     const [streamQuery] = queryApi.useUseStreamQueryMutation();
 
     const isMultiTabQueryEditorEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
+
+    const [isEditorReady, setIsEditorReady] = React.useState(false);
+    const handleEditorReady = React.useCallback(() => setIsEditorReady(true), []);
 
     // Normalize stored resourcePool if it's not available for current database
     React.useEffect(() => {
@@ -313,7 +317,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
     };
 
     return (
-        <div className={b()}>
+        <div className={b({multiTab: isMultiTabQueryEditorEnabled})}>
             <SplitPane
                 direction="vertical"
                 defaultSizePaneKey={DEFAULT_SIZE_RESULT_PANE_KEY}
@@ -326,8 +330,14 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
                 <div
                     className={b('pane-wrapper', {
                         top: true,
+                        loading: isMultiTabQueryEditorEnabled && !isEditorReady,
                     })}
                 >
+                    {isMultiTabQueryEditorEnabled && !isEditorReady ? (
+                        <div className={b('editor-loader')}>
+                            <Loader size="l" />
+                        </div>
+                    ) : null}
                     {isMultiTabQueryEditorEnabled ? <EditorTabs /> : null}
                     <div className={b('monaco-wrapper')}>
                         <div className={b('monaco')}>
@@ -339,6 +349,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
                                 historyQueries={historyQueries}
                                 goToPreviousQuery={goToPreviousQuery}
                                 goToNextQuery={goToNextQuery}
+                                onEditorReady={handleEditorReady}
                             />
                         </div>
                     </div>

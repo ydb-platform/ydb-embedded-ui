@@ -67,11 +67,25 @@ body,
     &_theme_light,
     &_theme_light-hc {
         --code-background-color: var(--g-color-base-simple-hover-solid);
+
+        // Multi-tab query editor
+        --multitab-tab-inactive-background-color: var(--g-color-base-background);
+        --multitab-tab-inactive-border-color: var(--g-color-base-generic);
+        --multitab-tab-active-background-color: var(--g-color-base-generic);
+        --multitab-tab-active-border-color: transparent;
+        --multitab-code-background-color: var(--g-color-base-generic);
     }
     &_theme_dark,
     &_theme_dark-hc {
         // monaco background - vscDarkPlus theme
         --code-background-color: #1e1e1e;
+
+        // Multi-tab query editor
+        --multitab-tab-inactive-background-color: #373a47;
+        --multitab-tab-inactive-border-color: transparent;
+        --multitab-tab-active-background-color: #1e1e1e;
+        --multitab-tab-active-border-color: transparent;
+        --multitab-code-background-color: #1e1e1e;
     }
 }
 
