@@ -6,11 +6,12 @@ import {Hotkey} from '@gravity-ui/uikit';
 import hotkeys from 'hotkeys-js';
 
 import {cn} from '../../../utils/cn';
+import {isMacOS} from '../../../utils/platform';
 import i18n from '../i18n';
 
 const b = cn('kv-navigation');
 
-export const isMac = () => navigator.platform.toUpperCase().includes('MAC');
+export const isMac = isMacOS;
 
 export const SHORTCUTS_HOTKEY = isMac() ? 'cmd+K' : 'ctrl+K';
 
