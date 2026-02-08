@@ -1,0 +1,185 @@
+.editor-tab-item {
+    &__tab {
+        display: flex;
+        align-items: center;
+
+        width: 100%;
+        max-width: 200px;
+    }
+
+    // Override Gravity UI Tab to match design: borders, backgrounds, rounded corners.
+    &__tab-root {
+        position: relative;
+
+        overflow: hidden;
+
+        min-width: 60px;
+        max-width: 200px;
+        padding-bottom: 3px; // 1px for border, 2px for padding
+
+        border: 1px solid var(--multitab-tab-inactive-border-color);
+        border-bottom: 0;
+        border-radius: var(--g-border-radius-xs) var(--g-border-radius-xs) 0 0;
+        background: var(--multitab-tab-inactive-background-color);
+
+        &:hover,
+        &_menuOpen {
+            border-color: var(--multitab-tab-active-border-color);
+            background-color: var(--multitab-tab-active-background-color);
+        }
+
+        &.g-tab_active,
+        &.g-tab_active:hover {
+            border-color: var(--multitab-tab-active-border-color);
+            background-color: var(--multitab-tab-active-background-color);
+        }
+
+        .g-tab__content {
+            height: 100%;
+            padding: 2px var(--g-spacing-2);
+        }
+
+        .g-tab__title {
+            display: flex;
+            align-items: center;
+
+            min-width: 0;
+
+            font-family: var(--g-text-caption-font-family);
+            font-size: var(--g-text-caption-2-font-size);
+            font-weight: var(--g-text-caption-font-weight);
+            line-height: var(--g-text-caption-2-line-height);
+
+            color: var(--g-color-text-complementary);
+        }
+    }
+
+    &__tab-root:hover &__tab-dirty,
+    &__tab-root_menuOpen &__tab-dirty {
+        display: none;
+    }
+
+    &__tab-title {
+        overflow: hidden;
+        flex: 1 1 auto;
+
+        min-width: 0;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    &__tab-additional {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+
+        display: flex;
+        align-items: center;
+
+        padding-right: 0;
+
+        pointer-events: none;
+
+        background-color: var(--multitab-tab-inactive-background-color);
+
+        &::before {
+            position: absolute;
+            top: 0;
+            right: 100%;
+            bottom: 0;
+
+            display: none;
+
+            width: 16px;
+
+            content: '';
+
+            background: linear-gradient(
+                to right,
+                transparent,
+                var(--multitab-tab-inactive-background-color)
+            );
+        }
+    }
+
+    &__tab-additional_dirty {
+        padding-right: var(--g-spacing-2);
+
+        &::before {
+            display: block;
+        }
+    }
+
+    &__tab-root.g-tab_active &__tab-additional_dirty {
+        background-color: var(--multitab-tab-active-background-color);
+
+        &::before {
+            background: linear-gradient(
+                to right,
+                transparent,
+                var(--multitab-tab-active-background-color)
+            );
+        }
+    }
+
+    &__tab-root:hover &__tab-additional,
+    &__tab-root_menuOpen &__tab-additional {
+        padding-right: var(--g-spacing-1);
+
+        background-color: var(--multitab-tab-active-background-color);
+    }
+
+    &__tab-root:hover &__tab-additional::before,
+    &__tab-root_menuOpen &__tab-additional::before {
+        display: block;
+
+        background: linear-gradient(
+            to right,
+            transparent,
+            var(--multitab-tab-active-background-color)
+        );
+    }
+
+    &__tab-root:hover &__tab-action,
+    &__tab-root_menuOpen &__tab-action {
+        display: flex;
+
+        pointer-events: auto;
+    }
+
+    &__tab-dirty {
+        flex-shrink: 0;
+
+        width: 6px;
+        height: 6px;
+        margin-left: var(--g-spacing-2);
+
+        border-radius: 50%;
+        background-color: var(--g-color-text-complementary);
+    }
+
+    &__tab-action {
+        display: none;
+        justify-content: center;
+        align-items: center;
+
+        width: 20px;
+        height: 20px;
+
+        cursor: pointer;
+
+        color: var(--g-color-text-secondary);
+        border-radius: var(--g-border-radius-xs);
+
+        &:hover {
+            background-color: var(--multitab-tab-action-hover-color);
+        }
+    }
+
+    &__tab-menu-switcher {
+        display: inline-flex;
+        align-items: center;
+    }
+}

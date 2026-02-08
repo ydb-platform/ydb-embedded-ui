@@ -11,149 +11,31 @@
 
     @include mixins.query-data-table;
 
+    &_multiTab {
+        --code-background-color: var(--multitab-code-background-color);
+
+        /* stylelint-disable declaration-no-important */
+        .monaco-editor,
+        .monaco-editor .margin,
+        .monaco-editor-background {
+            background-color: var(--code-background-color) !important;
+        }
+
+        .monaco-editor,
+        .monaco-editor .overflow-guard {
+            border: none !important;
+            outline: none !important;
+        }
+
+        .query-editor__monaco {
+            border: none !important;
+        }
+
+        /* stylelint-enable declaration-no-important */
+    }
+
     & .data-table__box .data-table__table-wrapper {
         padding-bottom: 0;
-    }
-
-    &__editor-tabs {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        width: 100%;
-        height: 32px;
-        padding: 0;
-
-        // Override UIKit Tabs to match Figma: 32px height, 3px gaps, filled backgrounds.
-        // Tab internals are from @gravity-ui/uikit (`TabList`/`Tab`).
-        .g-tab-list {
-            overflow: hidden;
-            flex-wrap: nowrap;
-            align-items: center;
-
-            box-shadow: none;
-        }
-
-        .g-tab-list {
-            --g-tabs-item-height: 32px;
-            --g-tabs-item-gap: 3px;
-            --g-tabs-item-border-width: 0px;
-        }
-
-        .g-tab {
-            min-width: 90px;
-            max-width: 200px;
-
-            border-block-end: 0;
-            border-radius: var(--g-border-radius-xs) var(--g-border-radius-xs) 0 0;
-            background-color: var(--g-color-base-generic-medium-hover);
-        }
-
-        .g-tab:hover {
-            background-color: var(--g-color-base-generic-hover);
-        }
-
-        .g-tab_active,
-        .g-tab_active:hover {
-            background-color: var(--g-color-base-generic);
-        }
-
-        .g-tab__content {
-            height: 100%;
-            padding: 2px 16px;
-
-            border-radius: 0;
-        }
-
-        .g-tab__title {
-            display: flex;
-            align-items: center;
-
-            min-width: 0;
-
-            font-family: var(--g-text-caption-font-family);
-            font-size: var(--g-text-caption-2-font-size);
-            font-weight: var(--g-text-caption-font-weight);
-            line-height: var(--g-text-caption-2-line-height);
-
-            color: var(--g-color-text-complementary);
-        }
-    }
-
-    &__editor-tabs-actions {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    &__editor-tab {
-        display: flex;
-        align-items: center;
-
-        width: 100%;
-        max-width: 200px;
-    }
-
-    &__editor-tab-title {
-        overflow: hidden;
-        flex: 1 1 auto;
-
-        min-width: 0;
-
-        white-space: nowrap;
-        text-overflow: ellipsis;
-    }
-
-    &__editor-tab-actions {
-        display: flex;
-        flex-shrink: 0;
-        align-items: center;
-    }
-
-    &__editor-tab-action {
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-
-        width: 20px;
-        height: 20px;
-
-        cursor: pointer;
-
-        color: var(--g-color-text-secondary);
-        border-radius: var(--g-border-radius-xs);
-
-        &:hover {
-            background-color: var(--g-color-base-generic-hover);
-        }
-
-        &_close {
-            margin-right: 2px;
-        }
-    }
-
-    &__editor-tab-menu-switcher {
-        display: inline-flex;
-        align-items: center;
-    }
-
-    &__editor-tab-indicator {
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-
-        width: 8px;
-        height: 8px;
-
-        &_dirty {
-            border-radius: 50%;
-            background-color: var(--g-color-base-info-medium);
-        }
-
-        &_loading {
-            width: auto;
-            height: auto;
-        }
     }
 
     &__monaco {
@@ -177,6 +59,7 @@
     }
 
     &__pane-wrapper {
+        position: relative;
         z-index: 2;
 
         display: flex;
@@ -189,5 +72,29 @@
 
             border-bottom: 1px solid var(--g-color-line-generic);
         }
+
+        &_loading > *:not(.query-editor__editor-loader) {
+            visibility: hidden;
+        }
+    }
+
+    &__editor-loader {
+        position: absolute;
+        z-index: 1;
+        inset: 0;
+
+        display: flex;
+        visibility: visible;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+.g-root_theme_dark .query-editor_multiTab,
+.g-root_theme_dark-hc .query-editor_multiTab,
+.g-root_theme_light .query-editor_multiTab,
+.g-root_theme_light-hc .query-editor_multiTab {
+    .monaco-editor .view-overlays .current-line {
+        background-color: var(--g-color-base-generic-ultralight) !important;
     }
 }

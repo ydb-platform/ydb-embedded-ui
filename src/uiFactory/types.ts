@@ -127,6 +127,11 @@ export interface UiMetricaGoals {
     stopQuery?: string;
     openManagePartitioning?: string;
     applyManagePartitioning?: string;
+    createQueryTab?: string;
+    closeQueryTab?: string;
+    duplicateQueryTab?: string;
+    renameQueryTab?: string;
+    saveQueryFromTab?: string;
 }
 
 export type UiMetricaGoal = keyof UiMetricaGoals;

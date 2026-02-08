@@ -3,7 +3,7 @@
   "action.edit": "Edit query",
   "action.save-as-new": "Save as new",
   "action.edit-existing": "Edit existing",
-  "description": "The query will be saved in your browser",
+  "description": "This query will be stored in your Saved queries list, accessible only from this browser.",
   "input-label": "Query name",
   "input-placeholder": "Enter query name",
   "button-apply": "Save",

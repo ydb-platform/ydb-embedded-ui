@@ -7,19 +7,30 @@ import {
     closeQueryTab,
     renameQueryTab,
     selectActiveTabId,
+    selectNewTabCounter,
     selectTabsById,
     selectTabsOrder,
     setActiveQueryTab,
 } from '../../../../../store/reducers/query/query';
 import {useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
+import {getConfirmation} from '../../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
+import {reachMetricaGoal} from '../../../../../utils/yaMetrica';
 import i18n from '../../i18n';
 import {queryExecutionManagerInstance} from '../utils/queryExecutionManager';
+
+function getNewQueryTitle(counter: number): string {
+    if (counter === 0) {
+        return i18n('editor-tabs.default-title');
+    }
+    return i18n('editor-tabs.default-title-indexed', {index: counter});
+}
 
 export function useQueryTabsActions() {
     const dispatch = useTypedDispatch();
     const activeTabId = useTypedSelector(selectActiveTabId);
     const tabsOrder = useTypedSelector(selectTabsOrder);
     const tabsById = useTypedSelector(selectTabsById);
+    const newTabCounter = useTypedSelector(selectNewTabCounter);
 
     const handleTabSwitch = React.useCallback(
         (tabId: string) => {
@@ -30,7 +41,7 @@ export function useQueryTabsActions() {
 
     const handleActivateTab = handleTabSwitch;
 
-    const handleCloseTab = React.useCallback(
+    const closeTabImmediate = React.useCallback(
         (tabId: string) => {
             queryExecutionManagerInstance.abortQuery(tabId);
             dispatch(closeQueryTab({tabId}));
@@ -38,20 +49,52 @@ export function useQueryTabsActions() {
         [dispatch],
     );
 
+    const handleCloseTab = React.useCallback(
+        async (tabId: string) => {
+            const tab = tabsById[tabId];
+            if (tab?.isDirty) {
+                const confirmed = await getConfirmation();
+                if (!confirmed) {
+                    return;
+                }
+            }
+            reachMetricaGoal('closeQueryTab', {type: 'single', tabsCount: tabsOrder.length});
+            closeTabImmediate(tabId);
+        },
+        [closeTabImmediate, tabsById, tabsOrder.length],
+    );
+
     const handleCloseActiveTab = React.useCallback(() => {
         handleCloseTab(activeTabId);
     }, [activeTabId, handleCloseTab]);
 
     const handleCloseOtherTabs = React.useCallback(
-        (baseTabId: string) => {
-            tabsOrder.filter((tabId) => tabId !== baseTabId).forEach(handleCloseTab);
+        async (baseTabId: string) => {
+            const tabsToClose = tabsOrder.filter((tabId) => tabId !== baseTabId);
+            const hasDirtyTabs = tabsToClose.some((tabId) => tabsById[tabId]?.isDirty);
+            if (hasDirtyTabs) {
+                const confirmed = await getConfirmation();
+                if (!confirmed) {
+                    return;
+                }
+            }
+            reachMetricaGoal('closeQueryTab', {type: 'other', tabsCount: tabsOrder.length});
+            tabsToClose.forEach(closeTabImmediate);
         },
-        [handleCloseTab, tabsOrder],
+        [closeTabImmediate, tabsById, tabsOrder],
     );
 
-    const handleCloseAllTabs = React.useCallback(() => {
-        tabsOrder.forEach(handleCloseTab);
-    }, [handleCloseTab, tabsOrder]);
+    const handleCloseAllTabs = React.useCallback(async () => {
+        const hasDirtyTabs = tabsOrder.some((tabId) => tabsById[tabId]?.isDirty);
+        if (hasDirtyTabs) {
+            const confirmed = await getConfirmation();
+            if (!confirmed) {
+                return;
+            }
+        }
+        reachMetricaGoal('closeQueryTab', {type: 'all', tabsCount: tabsOrder.length});
+        tabsOrder.forEach(closeTabImmediate);
+    }, [closeTabImmediate, tabsById, tabsOrder]);
 
     const handleDuplicateTab = React.useCallback(
         (baseTabId: string) => {
@@ -60,7 +103,8 @@ export function useQueryTabsActions() {
                 return;
             }
 
-            const baseTitle = tab.title || i18n('editor-tabs.untitled');
+            reachMetricaGoal('duplicateQueryTab', {tabsCount: tabsOrder.length});
+            const baseTitle = tab.title || i18n('editor-tabs.default-title');
             const tabId = uuidv4();
             dispatch(
                 addQueryTab({
@@ -71,7 +115,7 @@ export function useQueryTabsActions() {
                 }),
             );
         },
-        [dispatch, tabsById],
+        [dispatch, tabsById, tabsOrder.length],
     );
 
     const handleRenameTab = React.useCallback(
@@ -82,15 +126,16 @@ export function useQueryTabsActions() {
     );
 
     const handleNewTabClick = React.useCallback(() => {
+        reachMetricaGoal('createQueryTab', {tabsCount: tabsOrder.length});
         const tabId = uuidv4();
-        const nextIndex = tabsOrder.length + 1;
         dispatch(
             addQueryTab({
                 tabId,
-                title: i18n('editor-tabs.default-title', {index: nextIndex}),
+                title: getNewQueryTitle(newTabCounter),
+                newTabCounter: newTabCounter + 1,
             }),
         );
-    }, [dispatch, tabsOrder.length]);
+    }, [dispatch, newTabCounter, tabsOrder.length]);
 
     const activateAdjacentTab = React.useCallback(
         (direction: -1 | 1) => {
