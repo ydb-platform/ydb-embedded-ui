@@ -11,6 +11,24 @@
 
     @include mixins.query-data-table;
 
+    &_multiTab {
+        --code-background-color: var(--multitab-code-background-color);
+
+        /* stylelint-disable declaration-no-important */
+        .monaco-editor,
+        .monaco-editor .margin,
+        .monaco-editor-background {
+            background-color: var(--code-background-color) !important;
+        }
+
+        .monaco-editor,
+        .monaco-editor .overflow-guard {
+            border: none !important;
+            outline: none !important;
+        }
+        /* stylelint-enable declaration-no-important */
+    }
+
     & .data-table__box .data-table__table-wrapper {
         padding-bottom: 0;
     }

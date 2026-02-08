@@ -317,7 +317,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
     };
 
     return (
-        <div className={b()}>
+        <div className={b({multiTab: isMultiTabQueryEditorEnabled})}>
             <SplitPane
                 direction="vertical"
                 defaultSizePaneKey={DEFAULT_SIZE_RESULT_PANE_KEY}
