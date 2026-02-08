@@ -73,7 +73,7 @@ body,
         --multitab-tab-inactive-border-color: var(--g-color-base-generic);
         --multitab-tab-active-background-color: var(--g-color-base-generic);
         --multitab-tab-active-border-color: transparent;
-        --multitab-code-background-color: var(--g-color-base-generic);
+        --multitab-code-background-color: var(--g-color-base-simple-hover-solid);
     }
     &_theme_dark,
     &_theme_dark-hc {
@@ -83,8 +83,11 @@ body,
         // Multi-tab query editor
         --multitab-tab-inactive-background-color: #373a47;
         --multitab-tab-inactive-border-color: transparent;
-        --multitab-tab-active-background-color: #1e1e1e;
+        --multitab-tab-active-background-color: var(--code-background-color);
         --multitab-tab-active-border-color: transparent;
+        // Cannot use var(--code-background-color) here — it would create a circular
+        // dependency with QueryEditor.scss which overrides --code-background-color
+        // with var(--multitab-code-background-color) in multi-tab mode.
         --multitab-code-background-color: #1e1e1e;
     }
 }

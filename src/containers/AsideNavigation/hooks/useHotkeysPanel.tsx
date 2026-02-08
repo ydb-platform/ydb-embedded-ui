@@ -11,9 +11,7 @@ import i18n from '../i18n';
 
 const b = cn('kv-navigation');
 
-export const isMac = isMacOS;
-
-export const SHORTCUTS_HOTKEY = isMac() ? 'cmd+K' : 'ctrl+K';
+export const SHORTCUTS_HOTKEY = isMacOS() ? 'cmd+K' : 'ctrl+K';
 
 export const DEFAULT_HOTKEY_GROUPS: HotkeysGroup[] = [
     {
@@ -21,19 +19,19 @@ export const DEFAULT_HOTKEY_GROUPS: HotkeysGroup[] = [
         items: [
             {
                 title: i18n('hotkeys.execute-query'),
-                value: isMac() ? 'cmd+enter' : 'ctrl+enter',
+                value: isMacOS() ? 'cmd+enter' : 'ctrl+enter',
             },
             {
                 title: i18n('hotkeys.execute-selected-query'),
-                value: isMac() ? 'cmd+shift+enter' : 'ctrl+shift+enter',
+                value: isMacOS() ? 'cmd+shift+enter' : 'ctrl+shift+enter',
             },
             {
                 title: i18n('hotkeys.save-query'),
-                value: isMac() ? 'cmd+s' : 'ctrl+s',
+                value: isMacOS() ? 'cmd+s' : 'ctrl+s',
             },
             {
                 title: i18n('hotkeys.save-selected-query'),
-                value: isMac() ? 'cmd+shift+s' : 'ctrl+shift+s',
+                value: isMacOS() ? 'cmd+shift+s' : 'ctrl+shift+s',
             },
         ],
     },

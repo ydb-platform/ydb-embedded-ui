@@ -27,11 +27,11 @@
     &_in_progress {
         background-image: linear-gradient(
             90deg,
-            #0d8dfa 0%,
-            #0057a2 25%,
-            #0d8dfa 50%,
-            #0057a2 75%,
-            #0d8dfa 100%
+            var(--g-color-private-blue-550-solid) 0%,
+            var(--g-color-private-blue-700-solid) 25%,
+            var(--g-color-private-blue-550-solid) 50%,
+            var(--g-color-private-blue-700-solid) 75%,
+            var(--g-color-private-blue-550-solid) 100%
         );
         background-size: 200% 100%;
 
