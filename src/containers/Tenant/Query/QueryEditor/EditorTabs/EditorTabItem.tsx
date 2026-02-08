@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Copy, Ellipsis, FloppyDisk, Pencil, Xmark} from '@gravity-ui/icons';
 import type {DropdownMenuItem} from '@gravity-ui/uikit';
-import {DropdownMenu, Flex, Tab, Text} from '@gravity-ui/uikit';
+import {DropdownMenu, Flex, Hotkey, Tab, Text} from '@gravity-ui/uikit';
 
 import type {QueryTabState} from '../../../../../store/reducers/query/types';
 import {cn} from '../../../../../utils/cn';
@@ -31,35 +31,6 @@ function getTabExecutionStatus(tab: QueryTabState): TabExecutionStatus | undefin
     }
 
     return 'done';
-}
-
-function isMacOS() {
-    return typeof navigator !== 'undefined' && navigator.platform.toUpperCase().includes('MAC');
-}
-
-function formatShortcut(parts: Array<'ctrlCmd' | 'alt' | 'shift' | 'backspace' | 't' | 's'>) {
-    const onMac = isMacOS();
-    const formattedParts = parts.map((part) => {
-        if (part === 'ctrlCmd') {
-            return onMac ? '⌘' : 'Ctrl';
-        }
-        if (part === 'alt') {
-            return onMac ? '⌥' : 'Alt';
-        }
-        if (part === 'shift') {
-            return onMac ? '⇧' : 'Shift';
-        }
-        if (part === 'backspace') {
-            return onMac ? '⌫' : 'Backspace';
-        }
-        return part.toUpperCase();
-    });
-
-    if (onMac) {
-        return formattedParts.join('');
-    }
-
-    return formattedParts.join(' + ');
 }
 
 export interface EditorTabItemProps {
@@ -144,19 +115,12 @@ export function EditorTabItem({
     }, [onCloseAllTabs]);
 
     const tabMenuItems = React.useMemo<DropdownMenuItem[][]>(() => {
-        const shortcut = (value: string) => <span>{value}</span>;
-        const renameShortcut = formatShortcut(['ctrlCmd', 't']);
-        const saveAsShortcut = formatShortcut(['ctrlCmd', 'shift', 's']);
-        const closeShortcut = formatShortcut(['ctrlCmd', 'backspace']);
-        const closeOtherShortcut = formatShortcut(['ctrlCmd', 'shift', 'backspace']);
-        const closeAllShortcut = formatShortcut(['ctrlCmd', 'alt', 'backspace']);
-
         return [
             [
                 {
                     text: i18n('editor-tabs.rename'),
                     iconStart: <Pencil />,
-                    iconEnd: shortcut(renameShortcut),
+                    iconEnd: <Hotkey value="mod+t" />,
                     action: handleRenameClick,
                 },
                 {
@@ -169,7 +133,7 @@ export function EditorTabItem({
                 {
                     text: i18n('editor-tabs.save-query-as'),
                     iconStart: <FloppyDisk />,
-                    iconEnd: shortcut(saveAsShortcut),
+                    iconEnd: <Hotkey value="mod+shift+s" />,
                     action: handleSaveQueryAsClick,
                 },
             ],
@@ -177,19 +141,19 @@ export function EditorTabItem({
                 {
                     text: i18n('editor-tabs.close'),
                     iconStart: <Xmark />,
-                    iconEnd: shortcut(closeShortcut),
+                    iconEnd: <Hotkey value="mod+backspace" />,
                     action: () => onCloseTab(tabId),
                 },
                 {
                     text: i18n('editor-tabs.close-other-tabs'),
                     iconStart: <Xmark />,
-                    iconEnd: shortcut(closeOtherShortcut),
+                    iconEnd: <Hotkey value="mod+shift+backspace" />,
                     action: handleCloseOtherTabsClick,
                 },
                 {
                     text: i18n('editor-tabs.close-all-tabs'),
                     iconStart: <Xmark />,
-                    iconEnd: shortcut(closeAllShortcut),
+                    iconEnd: <Hotkey value="mod+alt+backspace" />,
                     action: handleCloseAllTabsClick,
                 },
             ],
