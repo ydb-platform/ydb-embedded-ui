@@ -20,7 +20,7 @@ Hint: we divide our audience into the following categories:
 - core developers (who contribute to YDB itself);
 - ydb oncall/sre team who runs managed services and does capacity planning;
 - db administrators who diagnose issues with databases, add resources, examine performance bottlenecks
-- developers who write sql queriers, create schema objects, diagnose query plans
+- developers who write SQL queries, create schema objects, diagnose query plans
 - security engnieers who review audit logs etc
 
 **Research/Testing Needs**: If this task involves significant UX changes (e.g., new flows, complex interactions), specify required user research, interviews, or usability testing. Propose specific users/stakeholders for testing (e.g., internal Yandex Cloud users, external beta testers, or key customers). If not applicable, mark as N/A.
