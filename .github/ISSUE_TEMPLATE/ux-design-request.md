@@ -19,7 +19,7 @@ Hint: we divide our audience into the following categories:
 
 - core developers (who contribute to YDB itself);
 - ydb oncall/sre team who runs managed services and does capacity planning;
-- db administrators who add diagnose issues with databases, add resources, examine performance bottlenecks
+- db administrators who diagnose issues with databases, add resources, examine performance bottlenecks
 - developers who write sql queriers, create schema objects, diagnose query plans
 - security engnieers who review audit logs etc
 
