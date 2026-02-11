@@ -112,13 +112,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isExplainButtonEnabled()).resolves.toBe(true);
     });
 
-    test('Stop button and elapsed time label appear when query is running', async ({
-        page,
-        browserName,
-    }) => {
-        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3385
-        test.skip(browserName === 'webkit');
-
+    test.only('Stop button and elapsed time label appear when query is running', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         await queryEditor.setQuery(longRunningQuery);
@@ -128,10 +122,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isElapsedTimeVisible()).resolves.toBe(true);
     });
 
-    test('Query streaming finishes in reasonable time', async ({page, browserName}) => {
-        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3385
-        test.skip(browserName === 'webkit');
-
+    test.only('Query streaming finishes in reasonable time', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
@@ -141,13 +132,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
     });
 
-    test('Query execution is terminated when stop button is clicked', async ({
-        page,
-        browserName,
-    }) => {
-        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3385
-        test.skip(browserName === 'webkit');
-
+    test.only('Query execution is terminated when stop button is clicked', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         await queryEditor.setQuery(longRunningQuery);
@@ -159,13 +144,9 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.waitForStatus('Stopped')).resolves.toBe(true);
     });
 
-    test('Streaming query shows some results and banner when stop button is clicked', async ({
+    test.only('Streaming query shows some results and banner when stop button is clicked', async ({
         page,
-        browserName,
     }) => {
-        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3385
-        test.skip(browserName === 'webkit');
-
         // Safari in playwright has problem with painting an array
         // of million values for frequently appearing rows.
         // But still need them for heavy responses to simulate
@@ -192,10 +173,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.waitForStatus('Stopped')).resolves.toBe(true);
     });
 
-    test('Stop button is not visible for quick queries', async ({page, browserName}) => {
-        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3385
-        test.skip(browserName === 'webkit');
-
+    test.only('Stop button is not visible for quick queries', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         const quickQuery = 'SELECT 1;';
@@ -206,10 +184,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
     });
 
-    test('Stop button works for Execute mode', async ({page, browserName}) => {
-        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3385
-        test.skip(browserName === 'webkit');
-
+    test.only('Stop button works for Execute mode', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         // Test for Execute mode
@@ -221,10 +196,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
     });
 
-    test('Stop button works for Explain mode', async ({page, browserName}) => {
-        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3385
-        test.skip(browserName === 'webkit');
-
+    test.only('Stop button works for Explain mode', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         // Test for Execute mode
