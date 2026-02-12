@@ -7,7 +7,7 @@ import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {NavigationTabs, TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 import {
     createTableQuery,
-    longRunningQuery,
+    longRunningExplainQuery,
     longRunningStreamQuery,
     longTableSelect,
     longerRunningStreamQuery,
@@ -115,7 +115,7 @@ test.describe('Test Query Editor', async () => {
     test.only('Stop button and elapsed time label appear when query is running', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
-        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.setQuery(longRunningStreamQuery);
         await queryEditor.clickRunButton();
 
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
@@ -135,7 +135,7 @@ test.describe('Test Query Editor', async () => {
     test.only('Query execution is terminated when stop button is clicked', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
-        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.setQuery(longRunningStreamQuery);
         await queryEditor.clickRunButton();
 
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
@@ -188,7 +188,7 @@ test.describe('Test Query Editor', async () => {
         const queryEditor = new QueryEditor(page);
 
         // Test for Execute mode
-        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.setQuery(longRunningStreamQuery);
         await queryEditor.clickRunButton();
 
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
@@ -200,7 +200,7 @@ test.describe('Test Query Editor', async () => {
         const queryEditor = new QueryEditor(page);
 
         // Test for Execute mode
-        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.setQuery(longRunningExplainQuery);
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.data);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);

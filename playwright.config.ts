@@ -17,12 +17,13 @@ const config: PlaywrightTestConfig = {
     webServer: baseUrl
         ? undefined
         : {
-              command: 'npm run dev',
+              command: 'npm run build:embedded && npx rsbuild preview',
               env: {
                   REACT_APP_DISABLE_CHECKS: 'true',
               },
               port: 3000,
               reuseExistingServer: !process.env.CI,
+              timeout: 3 * 60 * 1000,
           },
     use: {
         baseURL: baseUrl || 'http://localhost:3000/',

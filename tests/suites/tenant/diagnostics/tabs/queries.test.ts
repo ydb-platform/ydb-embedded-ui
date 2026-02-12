@@ -4,7 +4,7 @@ import {prepareQueryWithPragmas} from '../../../../../src/store/reducers/query/u
 import {defaultPragma} from '../../../../../src/utils/query';
 import {database} from '../../../../utils/constants';
 import {NavigationTabs, TenantPage} from '../../TenantPage';
-import {longRunningQuery, longRunningStreamQuery} from '../../constants';
+import {longRunningStreamQuery} from '../../constants';
 import {QueryEditor} from '../../queryEditor/models/QueryEditor';
 import {
     Diagnostics,
@@ -43,7 +43,7 @@ test.describe('Diagnostics Queries tab', async () => {
 
         const queryEditor = new QueryEditor(page);
 
-        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.setQuery(longRunningStreamQuery);
         await queryEditor.clickRunButton();
         await page.waitForTimeout(500);
         const statusElement = await queryEditor.getExecutionStatus();
@@ -53,7 +53,7 @@ test.describe('Diagnostics Queries tab', async () => {
         const diagnostics = new Diagnostics(page);
         await diagnostics.clickTab(DiagnosticsTab.Queries);
         await diagnostics.clickRadioSwitch(QueriesSwitch.Running);
-        const finalQueryText = prepareQueryWithPragmas(longRunningQuery, defaultPragma);
+        const finalQueryText = prepareQueryWithPragmas(longRunningStreamQuery, defaultPragma);
         expect(
             await diagnostics.table.waitForCellValueByHeader(1, 'Query text', finalQueryText),
         ).toBe(true);
