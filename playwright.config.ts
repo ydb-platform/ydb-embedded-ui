@@ -9,6 +9,7 @@ const config: PlaywrightTestConfig = {
     timeout: 30 * 1000,
     outputDir: './playwright-artifacts/test-results',
     reporter: [
+        ['line'],
         ['html', {outputFolder: './playwright-artifacts/playwright-report'}],
         ['json', {outputFile: './playwright-artifacts/test-results.json'}],
     ],
