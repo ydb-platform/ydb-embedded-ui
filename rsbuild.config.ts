@@ -16,6 +16,7 @@ const APP_VARS = [
     'NODE_ENV',
 
     // Backend configuration
+    'PLAYWRIGHT_APP_BACKEND',
     'REACT_APP_BACKEND',
     'REACT_APP_META_BACKEND',
     'META_YDB_BACKEND',
