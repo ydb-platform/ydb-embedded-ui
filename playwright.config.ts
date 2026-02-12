@@ -20,7 +20,7 @@ const config: PlaywrightTestConfig = {
               command: 'npm run build:embedded && npx rsbuild preview',
               env: {
                   REACT_APP_DISABLE_CHECKS: 'true',
-                  REACT_APP_BACKEND: 'http://localhost:8765',
+                  PLAYWRIGHT_APP_BACKEND: 'http://localhost:8765',
               },
               port: 3000,
               reuseExistingServer: !process.env.CI,
