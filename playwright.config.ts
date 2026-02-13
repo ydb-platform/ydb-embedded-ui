@@ -22,6 +22,8 @@ const config: PlaywrightTestConfig = {
               env: {
                   REACT_APP_DISABLE_CHECKS: 'true',
                   PLAYWRIGHT_APP_BACKEND: 'http://localhost:8765',
+                  // Force absolute asset URLs in E2E to support deep-link entry routes (e.g. /cluster/*).
+                  E2E_ASSET_PREFIX: '/',
               },
               port: 3000,
               reuseExistingServer: !process.env.CI,

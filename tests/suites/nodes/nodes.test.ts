@@ -4,8 +4,9 @@ import {backend} from '../../utils/constants';
 import {NodePage} from '../nodes/NodePage';
 import {NodesPage} from '../nodes/NodesPage';
 import {ClusterNodesTable} from '../paginatedTable/paginatedTable';
+import {VISIBILITY_TIMEOUT} from '../tenant/TenantPage';
 
-test.describe.only('Test Nodes page', async () => {
+test.describe('Test Nodes page', async () => {
     test('Nodes page is OK', async ({page}) => {
         const nodesPage = new NodesPage(page);
         const response = await nodesPage.goto();
@@ -23,7 +24,7 @@ test.describe.only('Test Nodes page', async () => {
     });
 });
 
-test.describe.only('Test Nodes Paginated Table', async () => {
+test.describe('Test Nodes Paginated Table', async () => {
     test.beforeEach(async ({page}) => {
         const nodesPage = new NodesPage(page);
         const response = await nodesPage.goto();
@@ -62,16 +63,15 @@ test.describe.only('Test Nodes Paginated Table', async () => {
         await nodesTable.waitForTableToLoad();
         await nodesTable.waitForTableData();
 
-        const rowData = await nodesTable.getRowData(0);
-        const host = rowData['Host'];
-
         await nodesPage.selectGroupByOption('Host');
         await nodesPage.waitForTableGroupsLoaded();
 
-        await nodesPage.selectTableGroup(host).isVisible();
+        await expect(nodesPage.getFirstTableGroup()).toBeVisible({timeout: VISIBILITY_TIMEOUT});
 
-        await nodesPage.expandTableGroup(host);
-        await nodesPage.selectTableGroupContent(host).isVisible();
+        await nodesPage.expandFirstTableGroup();
+        await expect(nodesPage.getFirstTableGroupContent()).toBeVisible({
+            timeout: VISIBILITY_TIMEOUT,
+        });
     });
 
     test('Node count is displayed correctly', async ({page}) => {
@@ -195,7 +195,7 @@ test.describe.only('Test Nodes Paginated Table', async () => {
     });
 });
 
-test.describe.only('Test Node Page Threads Tab', async () => {
+test.describe('Test Node Page Threads Tab', async () => {
     test('Threads tab is hidden when node has no thread data', async ({page}) => {
         // Mock the node API to return no thread data
         await page.route(`**/viewer/json/sysinfo?*`, async (route) => {
