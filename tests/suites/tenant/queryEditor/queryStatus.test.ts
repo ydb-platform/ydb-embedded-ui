@@ -3,7 +3,7 @@ import {expect, test} from '@playwright/test';
 import {STATISTICS_MODES} from '../../../../src/utils/query';
 import {database} from '../../../utils/constants';
 import {TenantPage} from '../TenantPage';
-import {longRunningQuery} from '../constants';
+import {longRunningStreamQuery} from '../constants';
 
 import {QueryEditor} from './models/QueryEditor';
 
@@ -25,7 +25,7 @@ test.describe('Test Query Execution Status', async () => {
         const queryEditor = new QueryEditor(page);
 
         // Ensure page is loaded
-        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.setQuery(longRunningStreamQuery);
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.changeStatsLevel(STATISTICS_MODES.profile);
 
@@ -35,7 +35,7 @@ test.describe('Test Query Execution Status', async () => {
     test('Running query status for running query', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
-        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.setQuery(longRunningStreamQuery);
         await queryEditor.clickRunButton();
         await page.waitForTimeout(500);
 

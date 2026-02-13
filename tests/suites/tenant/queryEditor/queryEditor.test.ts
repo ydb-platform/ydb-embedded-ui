@@ -7,7 +7,7 @@ import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {NavigationTabs, TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 import {
     createTableQuery,
-    longRunningQuery,
+    longRunningExplainQuery,
     longRunningStreamQuery,
     longTableSelect,
     longerRunningStreamQuery,
@@ -112,26 +112,17 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isExplainButtonEnabled()).resolves.toBe(true);
     });
 
-    test('Stop button and elapsed time label appear when query is running', async ({
-        page,
-        browserName,
-    }) => {
-        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3385
-        test.skip(browserName === 'webkit');
-
+    test('Stop button and elapsed time label appear when query is running', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
-        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.setQuery(longRunningStreamQuery);
         await queryEditor.clickRunButton();
 
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
         await expect(queryEditor.isElapsedTimeVisible()).resolves.toBe(true);
     });
 
-    test('Query streaming finishes in reasonable time', async ({page, browserName}) => {
-        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3385
-        test.skip(browserName === 'webkit');
-
+    test('Query streaming finishes in reasonable time', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
@@ -141,16 +132,10 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
     });
 
-    test('Query execution is terminated when stop button is clicked', async ({
-        page,
-        browserName,
-    }) => {
-        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3385
-        test.skip(browserName === 'webkit');
-
+    test('Query execution is terminated when stop button is clicked', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
-        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.setQuery(longRunningStreamQuery);
         await queryEditor.clickRunButton();
 
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
@@ -161,11 +146,7 @@ test.describe('Test Query Editor', async () => {
 
     test('Streaming query shows some results and banner when stop button is clicked', async ({
         page,
-        browserName,
     }) => {
-        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3385
-        test.skip(browserName === 'webkit');
-
         // Safari in playwright has problem with painting an array
         // of million values for frequently appearing rows.
         // But still need them for heavy responses to simulate
@@ -192,10 +173,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.waitForStatus('Stopped')).resolves.toBe(true);
     });
 
-    test('Stop button is not visible for quick queries', async ({page, browserName}) => {
-        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3385
-        test.skip(browserName === 'webkit');
-
+    test('Stop button is not visible for quick queries', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         const quickQuery = 'SELECT 1;';
@@ -206,14 +184,11 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
     });
 
-    test('Stop button works for Execute mode', async ({page, browserName}) => {
-        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3385
-        test.skip(browserName === 'webkit');
-
+    test('Stop button works for Execute mode', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         // Test for Execute mode
-        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.setQuery(longRunningStreamQuery);
         await queryEditor.clickRunButton();
 
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
@@ -221,14 +196,11 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
     });
 
-    test('Stop button works for Explain mode', async ({page, browserName}) => {
-        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3385
-        test.skip(browserName === 'webkit');
-
+    test('Stop button works for Explain mode', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         // Test for Execute mode
-        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.setQuery(longRunningExplainQuery);
         await queryEditor.clickGearButton();
         await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.data);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);

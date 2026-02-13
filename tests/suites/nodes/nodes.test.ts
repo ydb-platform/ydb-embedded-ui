@@ -4,6 +4,7 @@ import {backend} from '../../utils/constants';
 import {NodePage} from '../nodes/NodePage';
 import {NodesPage} from '../nodes/NodesPage';
 import {ClusterNodesTable} from '../paginatedTable/paginatedTable';
+import {VISIBILITY_TIMEOUT} from '../tenant/TenantPage';
 
 test.describe('Test Nodes page', async () => {
     test('Nodes page is OK', async ({page}) => {
@@ -62,16 +63,15 @@ test.describe('Test Nodes Paginated Table', async () => {
         await nodesTable.waitForTableToLoad();
         await nodesTable.waitForTableData();
 
-        const rowData = await nodesTable.getRowData(0);
-        const host = rowData['Host'];
-
         await nodesPage.selectGroupByOption('Host');
         await nodesPage.waitForTableGroupsLoaded();
 
-        await nodesPage.selectTableGroup(host).isVisible();
+        await expect(nodesPage.getFirstTableGroup()).toBeVisible({timeout: VISIBILITY_TIMEOUT});
 
-        await nodesPage.expandTableGroup(host);
-        await nodesPage.selectTableGroupContent(host).isVisible();
+        await nodesPage.expandFirstTableGroup();
+        await expect(nodesPage.getFirstTableGroupContent()).toBeVisible({
+            timeout: VISIBILITY_TIMEOUT,
+        });
     });
 
     test('Node count is displayed correctly', async ({page}) => {
