@@ -35,6 +35,7 @@ const config: PlaywrightTestConfig = {
         video: 'retain-on-failure',
         screenshot: 'only-on-failure',
     },
+    workers: 1,
     projects: [
         {
             name: 'chromium',

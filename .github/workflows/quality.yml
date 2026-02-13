@@ -9,7 +9,7 @@ on:
 jobs:
   e2e_tests:
     name: Playwright Tests
-    timeout-minutes: 60
+    timeout-minutes: 120
     runs-on: ubuntu-latest
     permissions:
       contents: read
