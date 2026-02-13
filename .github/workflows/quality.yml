@@ -8,11 +8,17 @@ on:
 
 jobs:
   e2e_tests:
-    name: Playwright Tests
+    name: Playwright Tests (${{ matrix.project }}, shard ${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
     timeout-minutes: 120
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium, safari]
+        shardIndex: [1, 2, 3, 4]
+        shardTotal: [4]
 
     services:
       backend:
@@ -42,7 +48,7 @@ jobs:
 
       - name: Run Playwright tests
         id: run_tests
-        run: npm run test:e2e
+        run: npm run test:e2e -- --project=${{ matrix.project }} --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
         env:
           CI: true
           PLAYWRIGHT_VIDEO: 'on'
@@ -51,7 +57,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-artifacts
+          name: playwright-artifacts-${{ matrix.project }}-${{ matrix.shardIndex }}
           path: playwright-artifacts
           retention-days: 5
 
@@ -181,8 +187,8 @@ jobs:
       - name: Download Playwright artifacts
         uses: actions/download-artifact@v4
         with:
-          name: playwright-artifacts
-          path: playwright-artifacts
+          pattern: playwright-artifacts-*
+          path: playwright-artifacts-shards
 
       - name: Copy new report
         run: |
@@ -193,11 +199,96 @@ jobs:
           fi
           rm -rf gh-pages/$REPORT_DIR
           mkdir -p gh-pages/$REPORT_DIR
-          cp -r playwright-artifacts/playwright-report/* gh-pages/$REPORT_DIR/
-          # Also copy test-results.json if it exists
-          if [ -f "playwright-artifacts/test-results.json" ]; then
-            cp playwright-artifacts/test-results.json gh-pages/$REPORT_DIR/
-          fi
+
+          # Publish per-shard HTML reports under subfolders and create an index page.
+          INDEX_FILE="gh-pages/$REPORT_DIR/index.html"
+          cat > "$INDEX_FILE" <<'EOF'
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <meta charset="utf-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <title>Playwright E2E Reports</title>
+            </head>
+            <body>
+              <h1>Playwright E2E Reports</h1>
+              <p>Per-shard reports:</p>
+              <ul>
+          EOF
+
+          for shard_dir in playwright-artifacts-shards/playwright-artifacts-*; do
+            if [ ! -d "$shard_dir" ]; then
+              continue
+            fi
+            shard_name="$(basename "$shard_dir")"
+
+            report_src="$shard_dir/playwright-artifacts/playwright-report"
+            if [ -d "$report_src" ]; then
+              mkdir -p "gh-pages/$REPORT_DIR/$shard_name"
+              cp -r "$report_src/"* "gh-pages/$REPORT_DIR/$shard_name/"
+              echo "                <li><a href=\"./$shard_name/\">$shard_name</a></li>" >> "$INDEX_FILE"
+            fi
+          done
+
+          cat >> "$INDEX_FILE" <<'EOF'
+              </ul>
+            </body>
+          </html>
+          EOF
+
+          # Merge shard test-results.json into a single file for PR description comparisons.
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+
+          const root = path.resolve('playwright-artifacts-shards');
+          const outPath = path.resolve('gh-pages', process.env.REPORT_DIR || '', 'test-results.json');
+
+          function walk(dir, files) {
+            const entries = fs.readdirSync(dir, { withFileTypes: true });
+            for (const entry of entries) {
+              const full = path.join(dir, entry.name);
+              if (entry.isDirectory()) {
+                walk(full, files);
+              } else if (
+                entry.isFile() &&
+                entry.name === 'test-results.json' &&
+                full.includes(`${path.sep}playwright-artifacts${path.sep}`)
+              ) {
+                files.push(full);
+              }
+            }
+          }
+
+          const files = [];
+          if (fs.existsSync(root)) {
+            walk(root, files);
+          }
+
+          const merged = {
+            stats: { expected: 0, unexpected: 0, flaky: 0, skipped: 0 },
+            suites: [],
+            errors: [],
+          };
+
+          for (const file of files) {
+            const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+            const stats = data.stats || {};
+            merged.stats.expected += Number(stats.expected) || 0;
+            merged.stats.unexpected += Number(stats.unexpected) || 0;
+            merged.stats.flaky += Number(stats.flaky) || 0;
+            merged.stats.skipped += Number(stats.skipped) || 0;
+            if (Array.isArray(data.suites)) merged.suites.push(...data.suites);
+            if (Array.isArray(data.errors)) merged.errors.push(...data.errors);
+          }
+
+          // Ensure output directory exists.
+          fs.mkdirSync(path.dirname(outPath), { recursive: true });
+          fs.writeFileSync(outPath, JSON.stringify(merged, null, 2));
+          console.log(`Merged ${files.length} shard result files into ${outPath}`);
+          NODE
+        env:
+          REPORT_DIR: ${{ github.event_name == 'pull_request' && github.event.pull_request.number || 'main' }}
 
       - name: Deploy report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -223,8 +314,60 @@ jobs:
       - name: Download Playwright artifacts
         uses: actions/download-artifact@v4
         with:
-          name: playwright-artifacts
-          path: playwright-artifacts
+          pattern: playwright-artifacts-*
+          path: playwright-artifacts-shards
+
+      - name: Merge shard test results
+        run: |
+          mkdir -p playwright-artifacts
+          node - <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+
+          const root = path.resolve('playwright-artifacts-shards');
+          const outPath = path.resolve('playwright-artifacts', 'test-results.json');
+
+          function walk(dir, files) {
+            const entries = fs.readdirSync(dir, { withFileTypes: true });
+            for (const entry of entries) {
+              const full = path.join(dir, entry.name);
+              if (entry.isDirectory()) {
+                walk(full, files);
+              } else if (
+                entry.isFile() &&
+                entry.name === 'test-results.json' &&
+                full.includes(`${path.sep}playwright-artifacts${path.sep}`)
+              ) {
+                files.push(full);
+              }
+            }
+          }
+
+          const files = [];
+          if (fs.existsSync(root)) {
+            walk(root, files);
+          }
+
+          const merged = {
+            stats: { expected: 0, unexpected: 0, flaky: 0, skipped: 0 },
+            suites: [],
+            errors: [],
+          };
+
+          for (const file of files) {
+            const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+            const stats = data.stats || {};
+            merged.stats.expected += Number(stats.expected) || 0;
+            merged.stats.unexpected += Number(stats.unexpected) || 0;
+            merged.stats.flaky += Number(stats.flaky) || 0;
+            merged.stats.skipped += Number(stats.skipped) || 0;
+            if (Array.isArray(data.suites)) merged.suites.push(...data.suites);
+            if (Array.isArray(data.errors)) merged.errors.push(...data.errors);
+          }
+
+          fs.writeFileSync(outPath, JSON.stringify(merged, null, 2));
+          console.log(`Merged ${files.length} shard result files into ${outPath}`);
+          NODE
 
       - name: Fetch gh-pages branch
         run: |
