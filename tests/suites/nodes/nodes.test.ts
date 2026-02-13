@@ -5,7 +5,7 @@ import {NodePage} from '../nodes/NodePage';
 import {NodesPage} from '../nodes/NodesPage';
 import {ClusterNodesTable} from '../paginatedTable/paginatedTable';
 
-test.describe('Test Nodes page', async () => {
+test.describe.only('Test Nodes page', async () => {
     test('Nodes page is OK', async ({page}) => {
         const nodesPage = new NodesPage(page);
         const response = await nodesPage.goto();
@@ -23,7 +23,7 @@ test.describe('Test Nodes page', async () => {
     });
 });
 
-test.describe('Test Nodes Paginated Table', async () => {
+test.describe.only('Test Nodes Paginated Table', async () => {
     test.beforeEach(async ({page}) => {
         const nodesPage = new NodesPage(page);
         const response = await nodesPage.goto();
@@ -195,7 +195,7 @@ test.describe('Test Nodes Paginated Table', async () => {
     });
 });
 
-test.describe('Test Node Page Threads Tab', async () => {
+test.describe.only('Test Node Page Threads Tab', async () => {
     test('Threads tab is hidden when node has no thread data', async ({page}) => {
         // Mock the node API to return no thread data
         await page.route(`**/viewer/json/sysinfo?*`, async (route) => {

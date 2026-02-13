@@ -23,7 +23,7 @@ import {
 } from './models/QueryEditor';
 import {executeSelectedQueryWithKeybinding} from './utils';
 
-test.describe.only('Test Query Editor', async () => {
+test.describe('Test Query Editor', async () => {
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';
 
     test.beforeEach(async ({page}) => {
