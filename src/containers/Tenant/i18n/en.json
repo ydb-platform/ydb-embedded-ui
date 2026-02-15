@@ -45,6 +45,7 @@
   "actions.manageColumns": "Manage columns...",
   "actions.manageAutoPartitioning": "Manage auto partitioning...",
   "actions.manageReadReplicas": "Add read-only replicas...",
+  "actions.manageTTL": "Manage TTL...",
   "actions.addTableIndex": "Add index...",
   "actions.addVectorIndex": "Add vector index...",
   "actions.createCdcStream": "Create changefeed...",

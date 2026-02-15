@@ -155,6 +155,25 @@ export const manageReadReplicasTemplate = (params?: SchemaQueryParams) => {
 )`;
 };
 
+export const manageTTLTemplate = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_table>}';
+
+    return `-- Configure Time to Live (TTL) for automatic row deletion, see docs for more 
+-- https://ydb.tech/docs/en/yql/reference/syntax/create_table/with#time-to-live
+
+ALTER TABLE ${path} SET (
+    TTL = Interval("PT24H") ON \${2:column_name} -- Enable background deletion of expired rows. Supported types: Date, Datetime, Timestamp
+    -- Interval format: ISO 8601 duration, e.g., "PT1H" (1 hour), "PT24H" (24 hours), "P1D" (1 day)
+    -- Examples:
+    --   TTL = Interval("PT1H") ON created_at  -- Delete rows 1 hour after created_at
+    --   TTL = Interval("P7D") ON expire_at    -- Delete rows 7 days after expire_at
+    -- To disable TTL:
+    --   TTL = Interval("PT0S") ON column_name -- Set interval to 0 to disable TTL
+)`;
+};
+
 export const selectQueryTemplate = (params?: SchemaQueryParams) => {
     const path = params?.relativePath
         ? `\`${normalizeParameter(params.relativePath)}\``
