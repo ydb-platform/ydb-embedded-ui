@@ -160,7 +160,7 @@ export const manageTTLTemplate = (params?: SchemaQueryParams) => {
         ? `\`${normalizeParameter(params.relativePath)}\``
         : '${1:<my_table>}';
 
-    return `-- Configure Time to Live (TTL) for automatic row deletion, see docs for more 
+    return `-- Configure Time to Live (TTL) for automatic row deletion, see docs for more information
 -- https://ydb.tech/docs/en/yql/reference/syntax/create_table/with#time-to-live
 
 ALTER TABLE ${path} SET (
