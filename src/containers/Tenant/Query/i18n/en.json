@@ -53,7 +53,8 @@
   "action.explain": "Explain",
   "action.open-shortcuts": "Open Keyboard Shortcuts Panel",
 
-  "editor-tabs.default-title": "Query {{index}}",
+  "editor-tabs.default-title": "New Query",
+  "editor-tabs.default-title-indexed": "New Query {{index}}",
   "editor-tabs.duplicate-title": "{{title}} copy",
   "editor-tabs.rename": "Rename tab",
   "editor-tabs.duplicate": "Duplicate tab",

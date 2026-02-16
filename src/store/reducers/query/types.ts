@@ -78,6 +78,7 @@ export interface QueryState {
     activeTabId: string;
     tabsOrder: string[];
     tabsById: Record<string, QueryTabState>;
+    newTabCounter: number;
 
     historyFilter?: string;
     historyCurrentQueryId?: string;

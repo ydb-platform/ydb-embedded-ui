@@ -67,7 +67,7 @@ export function EditorTabItem({
     onCloseOtherTabs,
     onCloseAllTabs,
 }: EditorTabItemProps) {
-    const title = tab.title || i18n('editor-tabs.default-title', {index: 1});
+    const title = tab.title || i18n('editor-tabs.default-title');
     const isDirty = Boolean(tab.isDirty);
     const executionStatus = getTabExecutionStatus(tab);
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);

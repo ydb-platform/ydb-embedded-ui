@@ -102,6 +102,7 @@ export interface QueryTabsPersistedState {
     activeTabId: string;
     tabsOrder: string[];
     tabsById: Record<string, QueryTabPersistedState>;
+    newTabCounter?: number;
 }
 
 export type QueryTabsDirtyPersistedState = Record<string, boolean>;

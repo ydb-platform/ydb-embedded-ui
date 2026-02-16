@@ -7,6 +7,7 @@ import {
     closeQueryTab,
     renameQueryTab,
     selectActiveTabId,
+    selectNewTabCounter,
     selectTabsById,
     selectTabsOrder,
     setActiveQueryTab,
@@ -15,11 +16,19 @@ import {useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
 import i18n from '../../i18n';
 import {queryExecutionManagerInstance} from '../utils/queryExecutionManager';
 
+function getNewQueryTitle(counter: number): string {
+    if (counter === 0) {
+        return i18n('editor-tabs.default-title');
+    }
+    return i18n('editor-tabs.default-title-indexed', {index: counter});
+}
+
 export function useQueryTabsActions() {
     const dispatch = useTypedDispatch();
     const activeTabId = useTypedSelector(selectActiveTabId);
     const tabsOrder = useTypedSelector(selectTabsOrder);
     const tabsById = useTypedSelector(selectTabsById);
+    const newTabCounter = useTypedSelector(selectNewTabCounter);
 
     const handleTabSwitch = React.useCallback(
         (tabId: string) => {
@@ -60,7 +69,7 @@ export function useQueryTabsActions() {
                 return;
             }
 
-            const baseTitle = tab.title || i18n('editor-tabs.default-title', {index: 1});
+            const baseTitle = tab.title || i18n('editor-tabs.default-title');
             const tabId = uuidv4();
             dispatch(
                 addQueryTab({
@@ -83,14 +92,14 @@ export function useQueryTabsActions() {
 
     const handleNewTabClick = React.useCallback(() => {
         const tabId = uuidv4();
-        const nextIndex = tabsOrder.length + 1;
         dispatch(
             addQueryTab({
                 tabId,
-                title: i18n('editor-tabs.default-title', {index: nextIndex}),
+                title: getNewQueryTitle(newTabCounter),
+                newTabCounter: newTabCounter + 1,
             }),
         );
-    }, [dispatch, tabsOrder.length]);
+    }, [dispatch, newTabCounter]);
 
     const activateAdjacentTab = React.useCallback(
         (direction: -1 | 1) => {

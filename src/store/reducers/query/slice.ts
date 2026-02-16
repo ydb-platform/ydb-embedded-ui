@@ -35,6 +35,7 @@ function persistTabsStateToSessionStorage(state: QueryState) {
         activeTabId: state.activeTabId,
         tabsOrder: state.tabsOrder,
         tabsById: persistedTabsById,
+        newTabCounter: state.newTabCounter,
     };
 
     saveToSessionStorage(QUERY_EDITOR_CURRENT_QUERY_KEY, persistedState);
@@ -89,7 +90,10 @@ function createTabStateFromPersisted({
     };
 }
 
-function createInitialTabsState(): Pick<QueryState, 'activeTabId' | 'tabsOrder' | 'tabsById'> {
+function createInitialTabsState(): Pick<
+    QueryState,
+    'activeTabId' | 'tabsOrder' | 'tabsById' | 'newTabCounter'
+> {
     const rawTabs = loadFromSessionStorage(QUERY_EDITOR_CURRENT_QUERY_KEY);
     const rawDirty = loadFromSessionStorage(QUERY_EDITOR_DIRTY_KEY);
 
@@ -131,6 +135,7 @@ function createInitialTabsState(): Pick<QueryState, 'activeTabId' | 'tabsOrder' 
             tabsById: {
                 [tabId]: tab,
             },
+            newTabCounter: 1,
         };
     }
 
@@ -145,6 +150,7 @@ function createInitialTabsState(): Pick<QueryState, 'activeTabId' | 'tabsOrder' 
             tabsById: {
                 [tabId]: createDefaultTabState({tabId}),
             },
+            newTabCounter: 1,
         };
     }
 
@@ -162,6 +168,7 @@ function createInitialTabsState(): Pick<QueryState, 'activeTabId' | 'tabsOrder' 
             tabsById: {
                 [tabId]: createDefaultTabState({tabId}),
             },
+            newTabCounter: 1,
         };
     }
 
@@ -182,10 +189,16 @@ function createInitialTabsState(): Pick<QueryState, 'activeTabId' | 'tabsOrder' 
         ? persistedTabs.activeTabId
         : tabsOrder[0];
 
+    const newTabCounter =
+        typeof persistedTabs.newTabCounter === 'number'
+            ? persistedTabs.newTabCounter
+            : tabsOrder.length;
+
     return {
         activeTabId,
         tabsOrder,
         tabsById,
+        newTabCounter,
     };
 }
 
@@ -254,9 +267,10 @@ const slice = createSlice({
                 title: string;
                 input?: string;
                 makeActive?: boolean;
+                newTabCounter?: number;
             }>,
         ) => {
-            const {tabId, title, input = '', makeActive = true} = action.payload;
+            const {tabId, title, input = '', makeActive = true, newTabCounter} = action.payload;
 
             if (state.tabsById[tabId]) {
                 if (makeActive) {
@@ -280,6 +294,10 @@ const slice = createSlice({
 
             if (makeActive) {
                 state.activeTabId = tabId;
+            }
+
+            if (newTabCounter !== undefined) {
+                state.newTabCounter = newTabCounter;
             }
 
             persistTabsStateToSessionStorage(state);
@@ -369,6 +387,7 @@ const slice = createSlice({
         selectActiveTabId: (state) => state.activeTabId,
         selectTabsOrder: (state) => state.tabsOrder,
         selectTabsById: (state) => state.tabsById,
+        selectNewTabCounter: (state) => state.newTabCounter,
         selectActiveTab: (state) => state.tabsById[state.activeTabId],
         selectQueriesHistoryFilter: (state) => state.historyFilter || '',
         selectHistoryCurrentQueryId: (state) => state.historyCurrentQueryId,
@@ -428,4 +447,5 @@ export const {
     selectIsDirty,
     selectResultTab,
     selectLastExecutedQueryText,
+    selectNewTabCounter,
 } = slice.selectors;
