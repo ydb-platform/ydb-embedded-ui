@@ -10,8 +10,7 @@
         margin-left: 3px;
     }
 
-    // Override UIKit Tabs to match Figma: 32px height, 3px gaps, filled backgrounds.
-    // Tab internals are from @gravity-ui/uikit (`TabList`/`Tab`).
+    // Override UIKit TabList to match Figma: 32px height, 3px gaps, hidden scrollbar.
     .g-tab-list {
         display: inline-flex;
         overflow-x: auto;
@@ -32,48 +31,5 @@
         --g-tabs-item-height: 32px;
         --g-tabs-item-gap: 3px;
         --g-tabs-item-border-width: 0px;
-    }
-
-    .g-tab {
-        position: relative;
-
-        min-width: 80px;
-        max-width: 146px;
-
-        border: 1px solid var(--multitab-tab-inactive-border-color);
-        border-bottom: 0;
-        border-radius: var(--g-border-radius-xs) var(--g-border-radius-xs) 0 0;
-        background: var(--multitab-tab-inactive-background-color);
-    }
-
-    .g-tab:hover,
-    .g-tab.editor-tab-item__tab-root_menuOpen {
-        border-color: var(--multitab-tab-active-border-color);
-        background-color: var(--multitab-tab-active-background-color);
-    }
-
-    .g-tab_active,
-    .g-tab_active:hover {
-        border-color: var(--multitab-tab-active-border-color);
-        background-color: var(--multitab-tab-active-background-color);
-    }
-
-    .g-tab__content {
-        height: 100%;
-        padding: 2px var(--g-spacing-1) 2px var(--g-spacing-4);
-    }
-
-    .g-tab__title {
-        display: flex;
-        align-items: center;
-
-        min-width: 0;
-
-        font-family: var(--g-text-caption-font-family);
-        font-size: var(--g-text-caption-2-font-size);
-        font-weight: var(--g-text-caption-font-weight);
-        line-height: var(--g-text-caption-2-line-height);
-
-        color: var(--g-color-text-complementary);
     }
 }

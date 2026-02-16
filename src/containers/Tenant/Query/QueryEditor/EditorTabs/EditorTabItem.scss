@@ -1,10 +1,58 @@
 .editor-tab-item {
     &__tab {
+        position: relative;
+
         display: flex;
         align-items: center;
 
         width: 100%;
-        max-width: 146px;
+        max-width: 200px;
+    }
+
+    // Override Gravity UI Tab to match design: borders, backgrounds, rounded corners.
+    &__tab-root {
+        position: relative;
+
+        min-width: 90px;
+        max-width: 200px;
+
+        border: 1px solid var(--multitab-tab-inactive-border-color);
+        border-bottom: 0;
+        border-radius: var(--g-border-radius-xs) var(--g-border-radius-xs) 0 0;
+        background: var(--multitab-tab-inactive-background-color);
+
+        &:hover,
+        &_menuOpen {
+            border-color: var(--multitab-tab-active-border-color);
+            background-color: var(--multitab-tab-active-background-color);
+        }
+
+        &.g-tab_active,
+        &.g-tab_active:hover {
+            border-color: var(--multitab-tab-active-border-color);
+            background-color: var(--multitab-tab-active-background-color);
+        }
+
+        .g-tab__content {
+            position: relative;
+
+            height: 100%;
+            padding: 2px var(--g-spacing-4);
+        }
+
+        .g-tab__title {
+            display: flex;
+            align-items: center;
+
+            min-width: 0;
+
+            font-family: var(--g-text-caption-font-family);
+            font-size: var(--g-text-caption-2-font-size);
+            font-weight: var(--g-text-caption-font-weight);
+            line-height: var(--g-text-caption-2-line-height);
+
+            color: var(--g-color-text-complementary);
+        }
     }
 
     &__tab-root:hover &__tab-dirty,
@@ -23,15 +71,41 @@
     }
 
     &__tab-additional {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+
+        display: flex;
         align-items: center;
 
-        width: 40px;
+        padding-inline: var(--g-spacing-half);
 
         pointer-events: none;
 
-        &_dirty {
-            opacity: 1;
+        background-color: var(--multitab-tab-inactive-background-color);
+
+        &::before {
+            display: none;
+
+            font-family: var(--g-text-caption-font-family);
+            font-size: var(--g-text-caption-2-font-size);
+            line-height: var(--g-text-caption-2-line-height);
+            content: '\2026';
+
+            color: var(--g-color-text-complementary);
         }
+    }
+
+    &__tab-root:hover &__tab-additional,
+    &__tab-root_menuOpen &__tab-additional,
+    &__tab-root.g-tab_active &__tab-additional {
+        background-color: var(--multitab-tab-active-background-color);
+    }
+
+    &__tab-root:hover &__tab-additional::before,
+    &__tab-root_menuOpen &__tab-additional::before {
+        display: inline;
     }
 
     &__tab-root:hover &__tab-action,
@@ -46,7 +120,6 @@
 
         width: 6px;
         height: 6px;
-        margin-left: var(--g-spacing-half);
 
         border-radius: 50%;
         background-color: var(--g-color-text-complementary);
