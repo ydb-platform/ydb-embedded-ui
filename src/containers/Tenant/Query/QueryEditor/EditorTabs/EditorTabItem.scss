@@ -1,7 +1,5 @@
 .editor-tab-item {
     &__tab {
-        position: relative;
-
         display: flex;
         align-items: center;
 
@@ -12,6 +10,8 @@
     // Override Gravity UI Tab to match design: borders, backgrounds, rounded corners.
     &__tab-root {
         position: relative;
+
+        overflow: hidden;
 
         min-width: 90px;
         max-width: 200px;
@@ -34,8 +34,6 @@
         }
 
         .g-tab__content {
-            position: relative;
-
             height: 100%;
             padding: 2px var(--g-spacing-4);
         }
@@ -73,27 +71,33 @@
     &__tab-additional {
         position: absolute;
         top: 0;
-        right: 0;
+        right: var(--g-spacing-1);
         bottom: 0;
 
         display: flex;
         align-items: center;
-
-        padding-inline: var(--g-spacing-half);
 
         pointer-events: none;
 
         background-color: var(--multitab-tab-inactive-background-color);
 
         &::before {
+            position: absolute;
+            top: 0;
+            right: 100%;
+            bottom: 0;
+
             display: none;
 
-            font-family: var(--g-text-caption-font-family);
-            font-size: var(--g-text-caption-2-font-size);
-            line-height: var(--g-text-caption-2-line-height);
-            content: '\2026';
+            width: 16px;
 
-            color: var(--g-color-text-complementary);
+            content: '';
+
+            background: linear-gradient(
+                to right,
+                transparent,
+                var(--multitab-tab-inactive-background-color)
+            );
         }
     }
 
@@ -105,7 +109,13 @@
 
     &__tab-root:hover &__tab-additional::before,
     &__tab-root_menuOpen &__tab-additional::before {
-        display: inline;
+        display: block;
+
+        background: linear-gradient(
+            to right,
+            transparent,
+            var(--multitab-tab-active-background-color)
+        );
     }
 
     &__tab-root:hover &__tab-action,
