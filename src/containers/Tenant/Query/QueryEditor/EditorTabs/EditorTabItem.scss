@@ -120,7 +120,7 @@
 
     &__tab-root:hover &__tab-action,
     &__tab-root_menuOpen &__tab-action {
-        display: inline-flex;
+        display: flex;
 
         pointer-events: auto;
     }

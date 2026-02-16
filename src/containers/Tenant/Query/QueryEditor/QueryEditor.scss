@@ -90,12 +90,11 @@
     }
 }
 
-/* stylelint-disable declaration-no-important */
-
+.g-root_theme_dark .query-editor_multiTab,
+.g-root_theme_dark-hc .query-editor_multiTab,
 .g-root_theme_light .query-editor_multiTab,
 .g-root_theme_light-hc .query-editor_multiTab {
     .monaco-editor .view-overlays .current-line {
         background-color: var(--g-color-base-generic-ultralight) !important;
     }
 }
-/* stylelint-enable declaration-no-important */
