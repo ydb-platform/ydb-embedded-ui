@@ -9,6 +9,7 @@ const config: PlaywrightTestConfig = {
     timeout: 30 * 1000,
     outputDir: './playwright-artifacts/test-results',
     reporter: [
+        ['line'],
         ['html', {outputFolder: './playwright-artifacts/playwright-report'}],
         ['json', {outputFile: './playwright-artifacts/test-results.json'}],
     ],
@@ -17,12 +18,16 @@ const config: PlaywrightTestConfig = {
     webServer: baseUrl
         ? undefined
         : {
-              command: 'npm run dev',
+              command: 'npm run build:embedded && npx rsbuild preview',
               env: {
                   REACT_APP_DISABLE_CHECKS: 'true',
+                  PLAYWRIGHT_APP_BACKEND: 'http://localhost:8765',
+                  // Force absolute asset URLs in E2E to support deep-link entry routes (e.g. /cluster/*).
+                  E2E_ASSET_PREFIX: '/',
               },
               port: 3000,
               reuseExistingServer: !process.env.CI,
+              timeout: 3 * 60 * 1000,
           },
     use: {
         baseURL: baseUrl || 'http://localhost:3000/',
@@ -32,6 +37,7 @@ const config: PlaywrightTestConfig = {
         video: 'retain-on-failure',
         screenshot: 'only-on-failure',
     },
+    workers: 1,
     projects: [
         {
             name: 'chromium',

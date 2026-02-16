@@ -16,6 +16,7 @@ const APP_VARS = [
     'NODE_ENV',
 
     // Backend configuration
+    'PLAYWRIGHT_APP_BACKEND',
     'REACT_APP_BACKEND',
     'REACT_APP_META_BACKEND',
     'META_YDB_BACKEND',
@@ -83,7 +84,9 @@ export default defineConfig({
             font: 'static/media',
             favicon: 'static',
         },
-        assetPrefix: 'auto',
+        // Default is 'auto' (relative paths). For E2E we may need absolute '/static/*' paths
+        // to avoid 404s when the initial navigation is a deep route like '/cluster/*'.
+        assetPrefix: process.env.E2E_ASSET_PREFIX || 'auto',
         sourceMap: {
             js: process.env.GENERATE_SOURCEMAP !== 'false' ? 'source-map' : false,
         },

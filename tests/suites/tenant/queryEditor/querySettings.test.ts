@@ -5,7 +5,7 @@ import {QUERY_MODES, TRANSACTION_MODES} from '../../../../src/utils/query';
 import {backend, database} from '../../../utils/constants';
 import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
-import {longRunningQuery} from '../constants';
+import {longRunningStreamQuery} from '../constants';
 
 import {ButtonNames, QueryEditor} from './models/QueryEditor';
 
@@ -100,7 +100,7 @@ test.describe('Test Query Settings', async () => {
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         // Execute a script
-        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.setQuery(longRunningStreamQuery);
         await queryEditor.clickRunButton();
         await page.waitForTimeout(500);
 
