@@ -17,7 +17,7 @@
 
 ### Bug Fixes
 
-* **Clusters:** do not display 0 count while loading ([#3369](https://github.com/ydb-platform/ydb-embedded-ui/issues/3369)) ([5670af1](https://github.com/ydb-platform/ydb-embedded-ui/commit/5670af14083dce1bbf5e8155ad80195011853a11))
+* **Clusters:** do not display 0 count when loading ([#3369](https://github.com/ydb-platform/ydb-embedded-ui/issues/3369)) ([5670af1](https://github.com/ydb-platform/ydb-embedded-ui/commit/5670af14083dce1bbf5e8155ad80195011853a11))
 * show bytes correct ([#3368](https://github.com/ydb-platform/ydb-embedded-ui/issues/3368)) ([fdf7b6a](https://github.com/ydb-platform/ydb-embedded-ui/commit/fdf7b6ace9cc6317d18dbce0fe5da701ddf9bc91))
 * **TenantsTable:** fix db name column overflow ([#3359](https://github.com/ydb-platform/ydb-embedded-ui/issues/3359)) ([04ba05d](https://github.com/ydb-platform/ydb-embedded-ui/commit/04ba05d9e8137ede07061b3a0312ee3e02117fb1))
 
