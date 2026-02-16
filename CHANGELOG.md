@@ -1,5 +1,12 @@
 # Changelog
 
+## [14.4.2-hotfix.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.4.2...v14.4.2-hotfix.1) (2026-02-16)
+
+
+### Bug Fixes
+
+* **VDiskPopup:** prevent NaN replication progress ([#3443](https://github.com/ydb-platform/ydb-embedded-ui/issues/3443)) ([8c9d08e](https://github.com/ydb-platform/ydb-embedded-ui/commit/8c9d08e99d124dbf9f6d264b97f171003d2c0bd4))
+
 ## [14.4.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.4.1...v14.4.2) (2026-01-27)
 
 
