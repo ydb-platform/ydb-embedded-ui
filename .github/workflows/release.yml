@@ -34,7 +34,29 @@ jobs:
       # Publication steps - only run if release was created
       - name: Publish to npm
         if: steps.release.outputs.release_created == 'true'
-        run: npm publish
+        run: |
+          VERSION="${{ steps.release.outputs.tag_name }}"
+          # Remove 'v' prefix if present
+          VERSION="${VERSION#v}"
+
+          # Determine npm dist-tag based on version
+          if [[ "$VERSION" =~ -hotfix\. ]]; then
+            # Hotfix versions get their own tag
+            echo "Publishing hotfix version $VERSION with tag 'hotfix'"
+            npm publish --tag hotfix
+          elif [[ "$VERSION" =~ -(alpha|beta|rc)\. ]]; then
+            # Alpha/beta/rc versions get 'next' tag
+            echo "Publishing prerelease version $VERSION with tag 'next'"
+            npm publish --tag next
+          elif [[ "$VERSION" =~ - ]]; then
+            # Other prerelease versions (e.g., -canary, -dev) get 'next' tag
+            echo "Publishing prerelease version $VERSION with tag 'next'"
+            npm publish --tag next
+          else
+            # Stable versions get 'latest' tag
+            echo "Publishing stable version $VERSION with tag 'latest'"
+            npm publish --tag latest
+          fi
 
       - name: Build embedded archive
         if: steps.release.outputs.release_created == 'true'
