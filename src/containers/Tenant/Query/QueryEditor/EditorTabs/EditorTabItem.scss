@@ -104,9 +104,29 @@
         }
     }
 
+    &__tab-additional_dirty {
+        padding-right: var(--g-spacing-2);
+
+        &::before {
+            display: block;
+        }
+    }
+
+    &__tab-root.g-tab_active &__tab-additional_dirty {
+        background-color: var(--multitab-tab-active-background-color);
+
+        &::before {
+            background: linear-gradient(
+                to right,
+                transparent,
+                var(--multitab-tab-active-background-color)
+            );
+        }
+    }
+
     &__tab-root:hover &__tab-additional,
     &__tab-root_menuOpen &__tab-additional {
-        padding-right: var(--g-spacing-half);
+        padding-right: var(--g-spacing-1);
 
         background-color: var(--multitab-tab-active-background-color);
     }
