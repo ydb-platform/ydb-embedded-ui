@@ -193,8 +193,8 @@ export function EditorTabItem({
                 <Text variant="caption-2" className={b('tab-title')}>
                     {title}
                 </Text>
+                {isDirty ? <div className={b('tab-dirty', {active: isActive})} /> : null}
                 <Flex className={b('tab-additional', {dirty: isDirty})} alignItems="center" gap={0}>
-                    {isDirty ? <div className={b('tab-dirty', {active: isActive})} /> : null}
                     <span className={b('tab-action', {active: isActive})}>
                         <DropdownMenu
                             items={tabMenuItems}
