@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Copy, Ellipsis, FloppyDisk, Pencil, Xmark} from '@gravity-ui/icons';
 import type {DropdownMenuItem} from '@gravity-ui/uikit';
-import {DropdownMenu, Flex, Hotkey, Tab, Text} from '@gravity-ui/uikit';
+import {DropdownMenu, Flex, Hotkey, Icon, Tab, Text} from '@gravity-ui/uikit';
 
 import type {QueryTabState} from '../../../../../store/reducers/query/types';
 import {cn} from '../../../../../utils/cn';
@@ -208,14 +208,14 @@ export function EditorTabItem({
                                 floatingStyles: {width: 264},
                                 onTransitionOutComplete: handleMenuTransitionOutComplete,
                             }}
-                            size="m"
+                            size="s"
                         />
                     </span>
                     <span
                         className={b('tab-action', {close: true, active: isActive})}
                         onClick={handleCloseClick}
                     >
-                        <Xmark />
+                        <Icon data={Xmark} size={12} />
                     </span>
                 </Flex>
             </Flex>
