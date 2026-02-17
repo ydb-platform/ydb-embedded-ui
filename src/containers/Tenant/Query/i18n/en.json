@@ -68,6 +68,7 @@
   "editor-tabs.rename-query-dialog.description": "Give it a meaningful name",
   "editor-tabs.rename-query-dialog.input-placeholder": "Query name",
   "editor-tabs.rename-query-dialog.error-empty": "Query name can't be empty",
+  "editor-tabs.rename-query-dialog.error-min-length": "Name must be at least 3 characters",
   "editor-tabs.rename-query-dialog.apply": "Apply",
   "editor-tabs.rename-query-dialog.cancel": "Cancel",
 

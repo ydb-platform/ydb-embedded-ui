@@ -42,6 +42,11 @@ function RenameQueryDialog({
             return;
         }
 
+        if (normalizedTitle.length < 3) {
+            setErrorMessage(i18n('editor-tabs.rename-query-dialog.error-min-length'));
+            return;
+        }
+
         onRename(normalizedTitle);
         handleClose();
     }, [handleClose, nextTitle, onRename]);
