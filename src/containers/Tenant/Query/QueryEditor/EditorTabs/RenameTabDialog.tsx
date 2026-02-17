@@ -56,6 +56,7 @@ function RenameTabDialog({
             onClose={handleClose}
             onEnterKeyDown={handleApply}
             initialFocus={controlRef}
+            className={b()}
         >
             <Dialog.Header caption={i18n('editor-tabs.rename-query-dialog.title')} />
             <Dialog.Body>
