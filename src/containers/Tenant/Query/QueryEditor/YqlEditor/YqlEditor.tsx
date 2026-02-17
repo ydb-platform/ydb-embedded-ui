@@ -401,7 +401,7 @@ export function YqlEditor({
     const onChange = (newValue: string) => {
         updateErrorsHighlighting();
         changeUserInput({input: newValue});
-        dispatch(setIsDirty(newValue.length > 0));
+        dispatch(setIsDirty(true));
     };
     return (
         <MonacoEditor
