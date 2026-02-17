@@ -185,12 +185,10 @@ function SaveQueryDialog({
                 <Dialog.Body className={b('dialog-body')}>
                     <div className={b('dialog-row')}>{i18n('description')}</div>
                     <div className={b('dialog-row')}>
-                        <label htmlFor="queryName" className={b('field-title', 'required')}>
-                            {i18n('input-label')}
-                        </label>
                         <div className={b('control-wrapper')}>
                             <TextInput
                                 id="queryName"
+                                aria-label={i18n('input-label')}
                                 placeholder={i18n('input-placeholder')}
                                 value={queryName}
                                 onUpdate={handleQueryNameChange}
