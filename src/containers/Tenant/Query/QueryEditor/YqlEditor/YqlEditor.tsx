@@ -29,7 +29,7 @@ import {QUERY_ACTIONS} from '../../../../../utils/query';
 import {SAVE_QUERY_DIALOG} from '../../SaveQuery/SaveQuery';
 import i18n from '../../i18n';
 import {useSavedQueries} from '../../utils/useSavedQueries';
-import {RENAME_QUERY_DIALOG} from '../EditorTabs/RenameTabDialog';
+import {RENAME_QUERY_DIALOG} from '../EditorTabs/RenameQueryDialog';
 import {useCodeAssistHelpers} from '../hooks/useCodeAssistHelpers';
 import {useEditorOptions} from '../hooks/useEditorOptions';
 import {useQueryTabsActions} from '../hooks/useQueryTabsActions';

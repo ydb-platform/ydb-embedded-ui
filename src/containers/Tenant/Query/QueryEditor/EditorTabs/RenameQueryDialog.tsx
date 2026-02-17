@@ -8,21 +8,21 @@ import i18n from '../../i18n';
 
 export const RENAME_QUERY_DIALOG = 'rename-query-dialog';
 
-import './RenameTabDialog.scss';
+import './RenameQueryDialog.scss';
 
 const b = cn('rename-query-dialog');
 
-export interface RenameTabDialogNiceModalProps {
+export interface RenameQueryDialogNiceModalProps {
     title: string;
     onRename: (title: string) => void;
 }
 
-function RenameTabDialog({
+function RenameQueryDialog({
     open,
     title,
     onRename,
     onClose,
-}: RenameTabDialogNiceModalProps & {open: boolean; onClose: VoidFunction}) {
+}: RenameQueryDialogNiceModalProps & {open: boolean; onClose: VoidFunction}) {
     const [nextTitle, setNextTitle] = React.useState(title);
     const [errorMessage, setErrorMessage] = React.useState<string>();
 
@@ -88,15 +88,17 @@ function RenameTabDialog({
     );
 }
 
-export const RenameTabDialogNiceModal = NiceModal.create((props: RenameTabDialogNiceModalProps) => {
-    const modal = NiceModal.useModal();
+export const RenameQueryDialogNiceModal = NiceModal.create(
+    (props: RenameQueryDialogNiceModalProps) => {
+        const modal = NiceModal.useModal();
 
-    const handleClose = React.useCallback(() => {
-        modal.hide();
-        modal.remove();
-    }, [modal]);
+        const handleClose = React.useCallback(() => {
+            modal.hide();
+            modal.remove();
+        }, [modal]);
 
-    return <RenameTabDialog {...props} open={modal.visible} onClose={handleClose} />;
-});
+        return <RenameQueryDialog {...props} open={modal.visible} onClose={handleClose} />;
+    },
+);
 
-NiceModal.register(RENAME_QUERY_DIALOG, RenameTabDialogNiceModal);
+NiceModal.register(RENAME_QUERY_DIALOG, RenameQueryDialogNiceModal);

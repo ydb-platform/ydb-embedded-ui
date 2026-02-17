@@ -10,7 +10,7 @@ import {useSavedQueries} from '../../utils/useSavedQueries';
 import {useQueryTabsActions} from '../hooks/useQueryTabsActions';
 
 import {EditorTabItem} from './EditorTabItem';
-import {RENAME_QUERY_DIALOG} from './RenameTabDialog';
+import {RENAME_QUERY_DIALOG} from './RenameQueryDialog';
 
 import './EditorTabs.scss';
 
