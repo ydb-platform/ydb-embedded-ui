@@ -127,7 +127,7 @@ export function EditorTabItem({
         return [
             [
                 {
-                    text: i18n('editor-tabs.rename'),
+                    text: i18n('editor-tabs.rename-query'),
                     iconStart: <Pencil />,
                     iconEnd: <Hotkey value={HOTKEY_LABELS.renameTab} />,
                     action: handleRenameClick,

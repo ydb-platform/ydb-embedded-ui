@@ -10,7 +10,7 @@ import {useSavedQueries} from '../../utils/useSavedQueries';
 import {useQueryTabsActions} from '../hooks/useQueryTabsActions';
 
 import {EditorTabItem} from './EditorTabItem';
-import {RENAME_TAB_DIALOG} from './RenameTabDialog';
+import {RENAME_QUERY_DIALOG} from './RenameTabDialog';
 
 import './EditorTabs.scss';
 
@@ -54,7 +54,7 @@ export function EditorTabs() {
 
     const handleRenameTab = React.useCallback(
         (tabId: string, currentTitle: string) => {
-            NiceModal.show(RENAME_TAB_DIALOG, {
+            NiceModal.show(RENAME_QUERY_DIALOG, {
                 title: currentTitle,
                 onRename: (title: string) => renameTab(tabId, title),
             });

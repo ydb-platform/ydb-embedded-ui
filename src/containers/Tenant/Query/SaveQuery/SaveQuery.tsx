@@ -170,7 +170,7 @@ function SaveQueryDialog({
     };
 
     return (
-        <Dialog open={open} hasCloseButton={false} size="s" onClose={onCloseWithoutSave}>
+        <Dialog open={open} hasCloseButton={true} size="s" onClose={onCloseWithoutSave}>
             <Dialog.Header caption={i18n('action.save')} />
             <form
                 onSubmit={(e) => {

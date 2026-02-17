@@ -1,0 +1,17 @@
+.rename-query-dialog {
+    &__dialog-row {
+        display: flex;
+        align-items: flex-start;
+
+        & + & {
+            margin-top: var(--g-text-body-1-line-height);
+        }
+    }
+
+    &__control-wrapper {
+        display: flex;
+        flex-grow: 1;
+
+        min-height: 48px;
+    }
+}

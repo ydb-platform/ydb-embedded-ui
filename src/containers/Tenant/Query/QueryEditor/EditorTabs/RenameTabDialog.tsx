@@ -3,9 +3,14 @@ import React from 'react';
 import NiceModal from '@ebay/nice-modal-react';
 import {Dialog, TextInput} from '@gravity-ui/uikit';
 
+import {cn} from '../../../../../utils/cn';
 import i18n from '../../i18n';
 
-export const RENAME_TAB_DIALOG = 'rename-tab-dialog';
+export const RENAME_QUERY_DIALOG = 'rename-query-dialog';
+
+import './RenameTabDialog.scss';
+
+const b = cn('rename-query-dialog');
 
 export interface RenameTabDialogNiceModalProps {
     title: string;
@@ -33,7 +38,7 @@ function RenameTabDialog({
     const handleApply = React.useCallback(() => {
         const normalizedTitle = nextTitle.trim();
         if (!normalizedTitle) {
-            setErrorMessage(i18n('editor-tabs.rename-dialog.error-empty'));
+            setErrorMessage(i18n('editor-tabs.rename-query-dialog.error-empty'));
             return;
         }
 
@@ -46,28 +51,35 @@ function RenameTabDialog({
     return (
         <Dialog
             open={open}
-            hasCloseButton={false}
+            hasCloseButton={true}
             size="s"
             onClose={handleClose}
             onEnterKeyDown={handleApply}
             initialFocus={controlRef}
         >
-            <Dialog.Header caption={i18n('editor-tabs.rename-dialog.title')} />
+            <Dialog.Header caption={i18n('editor-tabs.rename-query-dialog.title')} />
             <Dialog.Body>
-                <TextInput
-                    value={nextTitle}
-                    onUpdate={handleTitleChange}
-                    placeholder={i18n('editor-tabs.rename-dialog.input-placeholder')}
-                    controlRef={controlRef}
-                    hasClear
-                    autoComplete={false}
-                    validationState={errorMessage ? 'invalid' : undefined}
-                    errorMessage={errorMessage}
-                />
+                <div className={b('dialog-row')}>
+                    {i18n('editor-tabs.rename-query-dialog.description')}
+                </div>
+                <div className={b('dialog-row')}>
+                    <div className={b('control-wrapper')}>
+                        <TextInput
+                            value={nextTitle}
+                            onUpdate={handleTitleChange}
+                            placeholder={i18n('editor-tabs.rename-query-dialog.input-placeholder')}
+                            controlRef={controlRef}
+                            hasClear
+                            autoComplete={false}
+                            validationState={errorMessage ? 'invalid' : undefined}
+                            errorMessage={errorMessage}
+                        />
+                    </div>
+                </div>
             </Dialog.Body>
             <Dialog.Footer
-                textButtonApply={i18n('editor-tabs.rename-dialog.apply')}
-                textButtonCancel={i18n('editor-tabs.rename-dialog.cancel')}
+                textButtonApply={i18n('editor-tabs.rename-query-dialog.apply')}
+                textButtonCancel={i18n('editor-tabs.rename-query-dialog.cancel')}
                 onClickButtonApply={handleApply}
                 onClickButtonCancel={handleClose}
             />
@@ -86,4 +98,4 @@ export const RenameTabDialogNiceModal = NiceModal.create((props: RenameTabDialog
     return <RenameTabDialog {...props} open={modal.visible} onClose={handleClose} />;
 });
 
-NiceModal.register(RENAME_TAB_DIALOG, RenameTabDialogNiceModal);
+NiceModal.register(RENAME_QUERY_DIALOG, RenameTabDialogNiceModal);

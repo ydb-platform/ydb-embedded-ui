@@ -29,7 +29,7 @@ import {QUERY_ACTIONS} from '../../../../../utils/query';
 import {SAVE_QUERY_DIALOG} from '../../SaveQuery/SaveQuery';
 import i18n from '../../i18n';
 import {useSavedQueries} from '../../utils/useSavedQueries';
-import {RENAME_TAB_DIALOG} from '../EditorTabs/RenameTabDialog';
+import {RENAME_QUERY_DIALOG} from '../EditorTabs/RenameTabDialog';
 import {useCodeAssistHelpers} from '../hooks/useCodeAssistHelpers';
 import {useEditorOptions} from '../hooks/useEditorOptions';
 import {useQueryTabsActions} from '../hooks/useQueryTabsActions';
@@ -182,7 +182,7 @@ export function YqlEditor({
 
     const handleRenameTabAction = useEventHandler(() => {
         const tabIdToRename = activeTabId;
-        NiceModal.show(RENAME_TAB_DIALOG, {
+        NiceModal.show(RENAME_QUERY_DIALOG, {
             title: activeTab?.title || '',
             onRename: (title: string) => {
                 dispatch(renameQueryTab({tabId: tabIdToRename, title}));
@@ -353,7 +353,7 @@ export function YqlEditor({
             });
             editor.addAction({
                 id: 'renameEditorTab',
-                label: i18n('editor-tabs.rename'),
+                label: i18n('editor-tabs.rename-query'),
                 keybindings: [keybindings.renameTab],
                 run: () => handleRenameTabAction(),
             });
