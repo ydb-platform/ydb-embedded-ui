@@ -15,6 +15,7 @@
 
         min-width: 90px;
         max-width: 200px;
+        padding-bottom: 3px; // 1px for border, 2px for padding
 
         border: 1px solid var(--multitab-tab-inactive-border-color);
         border-bottom: 0;
