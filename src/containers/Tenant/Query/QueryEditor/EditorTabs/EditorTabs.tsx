@@ -2,7 +2,7 @@ import React from 'react';
 
 import NiceModal from '@ebay/nice-modal-react';
 import {Plus} from '@gravity-ui/icons';
-import {Button, Flex, TabList, TabProvider} from '@gravity-ui/uikit';
+import {Button, Flex, Icon, TabList, TabProvider} from '@gravity-ui/uikit';
 
 import {cn} from '../../../../../utils/cn';
 import {SAVE_QUERY_DIALOG} from '../../SaveQuery/SaveQuery';
@@ -90,10 +90,10 @@ export function EditorTabs() {
                     })}
                 </TabList>
             </TabProvider>
-            <div className={b('add')}>
+            <div className={b('add-icon-button')}>
                 <Button view="flat-secondary" size="xs" onClick={handleNewTabClick}>
                     <Button.Icon>
-                        <Plus />
+                        <Icon data={Plus} size={12} />
                     </Button.Icon>
                 </Button>
             </div>

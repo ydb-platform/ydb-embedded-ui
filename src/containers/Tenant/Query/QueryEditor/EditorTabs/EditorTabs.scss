@@ -6,8 +6,8 @@
     height: 32px;
     padding: 0;
 
-    &__add {
-        margin-left: 3px;
+    &__add-icon-button {
+        margin-left: var(--g-spacing-1);
     }
 
     // Override UIKit TabList to match Figma: 32px height, 3px gaps, hidden scrollbar.
