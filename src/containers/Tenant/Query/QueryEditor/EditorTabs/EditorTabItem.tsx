@@ -72,6 +72,13 @@ export function EditorTabItem({
     const executionStatus = getTabExecutionStatus(tab);
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     const [isMenuClosing, setIsMenuClosing] = React.useState(false);
+    const tabRef = React.useRef<HTMLButtonElement>(null);
+
+    React.useEffect(() => {
+        if (isActive && tabRef.current) {
+            tabRef.current.scrollIntoView({block: 'nearest', inline: 'nearest'});
+        }
+    }, [isActive, executionStatus]);
 
     const handleMenuSwitcherClick = React.useCallback(
         (event: React.MouseEvent<HTMLElement>) => {
@@ -187,7 +194,11 @@ export function EditorTabItem({
     }, []);
 
     return (
-        <Tab value={tabId} className={b('tab-root', {menuOpen: isMenuOpen || isMenuClosing})}>
+        <Tab
+            ref={tabRef}
+            value={tabId}
+            className={b('tab-root', {menuOpen: isMenuOpen || isMenuClosing})}
+        >
             <Flex className={b('tab')} alignItems="center" gap={1}>
                 <TabExecutionStatusIndicator status={executionStatus} />
                 <Text variant="caption-2" className={b('tab-title')}>
