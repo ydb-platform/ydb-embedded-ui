@@ -3,6 +3,9 @@ name: Node.js CI
 on:
   pull_request:
     branches: ['**']
+  pull_request_target:
+    branches: ['**']
+    types: [opened, synchronize, reopened]
   merge_group:
     types: [checks_requested]
 
@@ -13,6 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
@@ -30,6 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
