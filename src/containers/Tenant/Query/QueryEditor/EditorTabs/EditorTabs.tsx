@@ -5,6 +5,7 @@ import {Plus} from '@gravity-ui/icons';
 import {Button, Flex, Icon, TabList, TabProvider} from '@gravity-ui/uikit';
 
 import {cn} from '../../../../../utils/cn';
+import {reachMetricaGoal} from '../../../../../utils/yaMetrica';
 import {SAVE_QUERY_DIALOG} from '../../SaveQuery/SaveQuery';
 import {useSavedQueries} from '../../utils/useSavedQueries';
 import {useQueryTabsActions} from '../hooks/useQueryTabsActions';
@@ -35,6 +36,7 @@ export function EditorTabs() {
 
     const handleSaveQueryAs = React.useCallback(
         (tabId: string) => {
+            reachMetricaGoal('saveQueryFromTab', {tabsCount: tabsOrder.length});
             handleActivateTab(tabId);
             const tab = tabsById[tabId];
             const commonModalProps = {savedQueries, onSaveQuery: saveQuery} as const;
@@ -49,17 +51,18 @@ export function EditorTabs() {
 
             NiceModal.show(SAVE_QUERY_DIALOG, commonModalProps);
         },
-        [handleActivateTab, savedQueries, saveQuery, tabsById],
+        [handleActivateTab, savedQueries, saveQuery, tabsById, tabsOrder.length],
     );
 
     const handleRenameTab = React.useCallback(
         (tabId: string, currentTitle: string) => {
+            reachMetricaGoal('renameQueryTab', {tabsCount: tabsOrder.length});
             NiceModal.show(RENAME_QUERY_DIALOG, {
                 title: currentTitle,
                 onRename: (title: string) => renameTab(tabId, title),
             });
         },
-        [renameTab],
+        [renameTab, tabsOrder.length],
     );
 
     return (
