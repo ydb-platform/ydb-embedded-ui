@@ -94,6 +94,7 @@ export interface QueryTabPersistedState {
     title: string;
     isTitleUserDefined?: boolean;
     input: string;
+    savedInput?: string;
     createdAt: number;
     updatedAt: number;
 }
@@ -113,6 +114,10 @@ function isQueryTabPersistedState(value: unknown): value is QueryTabPersistedSta
     }
 
     if ('isTitleUserDefined' in value && typeof value.isTitleUserDefined !== 'boolean') {
+        return false;
+    }
+
+    if ('savedInput' in value && typeof value.savedInput !== 'string') {
         return false;
     }
 

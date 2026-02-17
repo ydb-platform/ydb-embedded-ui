@@ -13,6 +13,7 @@ import {
     setActiveQueryTab,
 } from '../../../../../store/reducers/query/query';
 import {useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
+import {getConfirmation} from '../../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import i18n from '../../i18n';
 import {queryExecutionManagerInstance} from '../utils/queryExecutionManager';
 
@@ -39,7 +40,7 @@ export function useQueryTabsActions() {
 
     const handleActivateTab = handleTabSwitch;
 
-    const handleCloseTab = React.useCallback(
+    const closeTabImmediate = React.useCallback(
         (tabId: string) => {
             queryExecutionManagerInstance.abortQuery(tabId);
             dispatch(closeQueryTab({tabId}));
@@ -47,20 +48,49 @@ export function useQueryTabsActions() {
         [dispatch],
     );
 
+    const handleCloseTab = React.useCallback(
+        async (tabId: string) => {
+            const tab = tabsById[tabId];
+            if (tab?.isDirty) {
+                const confirmed = await getConfirmation();
+                if (!confirmed) {
+                    return;
+                }
+            }
+            closeTabImmediate(tabId);
+        },
+        [closeTabImmediate, tabsById],
+    );
+
     const handleCloseActiveTab = React.useCallback(() => {
         handleCloseTab(activeTabId);
     }, [activeTabId, handleCloseTab]);
 
     const handleCloseOtherTabs = React.useCallback(
-        (baseTabId: string) => {
-            tabsOrder.filter((tabId) => tabId !== baseTabId).forEach(handleCloseTab);
+        async (baseTabId: string) => {
+            const tabsToClose = tabsOrder.filter((tabId) => tabId !== baseTabId);
+            const hasDirtyTabs = tabsToClose.some((tabId) => tabsById[tabId]?.isDirty);
+            if (hasDirtyTabs) {
+                const confirmed = await getConfirmation();
+                if (!confirmed) {
+                    return;
+                }
+            }
+            tabsToClose.forEach(closeTabImmediate);
         },
-        [handleCloseTab, tabsOrder],
+        [closeTabImmediate, tabsById, tabsOrder],
     );
 
-    const handleCloseAllTabs = React.useCallback(() => {
-        tabsOrder.forEach(handleCloseTab);
-    }, [handleCloseTab, tabsOrder]);
+    const handleCloseAllTabs = React.useCallback(async () => {
+        const hasDirtyTabs = tabsOrder.some((tabId) => tabsById[tabId]?.isDirty);
+        if (hasDirtyTabs) {
+            const confirmed = await getConfirmation();
+            if (!confirmed) {
+                return;
+            }
+        }
+        tabsOrder.forEach(closeTabImmediate);
+    }, [closeTabImmediate, tabsById, tabsOrder]);
 
     const handleDuplicateTab = React.useCallback(
         (baseTabId: string) => {

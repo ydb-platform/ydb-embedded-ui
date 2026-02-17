@@ -7,7 +7,6 @@ import type Monaco from 'monaco-editor';
 
 import {MonacoEditor} from '../../../../../components/MonacoEditor/MonacoEditor';
 import {
-    closeQueryTab,
     renameQueryTab,
     selectActiveTab,
     selectUserInput,
@@ -33,7 +32,6 @@ import {RENAME_QUERY_DIALOG} from '../EditorTabs/RenameQueryDialog';
 import {useCodeAssistHelpers} from '../hooks/useCodeAssistHelpers';
 import {useEditorOptions} from '../hooks/useEditorOptions';
 import {useQueryTabsActions} from '../hooks/useQueryTabsActions';
-import {queryExecutionManagerInstance} from '../utils/queryExecutionManager';
 import {TabsManager} from '../utils/tabsManager';
 
 import {getKeyBindings} from './keybindings';
@@ -82,6 +80,8 @@ export function YqlEditor({
         tabsOrder,
         handleNewTabClick,
         handleCloseActiveTab,
+        handleCloseOtherTabs,
+        handleCloseAllTabs,
         handleDuplicateTab,
         handleNextTab,
         handlePreviousTab,
@@ -164,20 +164,12 @@ export function YqlEditor({
         handleDuplicateTab(activeTabId);
     });
 
-    const closeTabById = React.useCallback(
-        (tabId: string) => {
-            queryExecutionManagerInstance.abortQuery(tabId);
-            dispatch(closeQueryTab({tabId}));
-        },
-        [dispatch],
-    );
-
     const handleCloseOtherTabsAction = useEventHandler(() => {
-        tabsOrder.filter((tabId) => tabId !== activeTabId).forEach(closeTabById);
+        handleCloseOtherTabs(activeTabId);
     });
 
     const handleCloseAllTabsAction = useEventHandler(() => {
-        tabsOrder.forEach(closeTabById);
+        handleCloseAllTabs();
     });
 
     const handleRenameTabAction = useEventHandler(() => {
@@ -401,7 +393,6 @@ export function YqlEditor({
     const onChange = (newValue: string) => {
         updateErrorsHighlighting();
         changeUserInput({input: newValue});
-        dispatch(setIsDirty(true));
     };
     return (
         <MonacoEditor

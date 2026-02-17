@@ -67,6 +67,11 @@ export interface QueryTabState {
      */
     isTitleUserDefined?: boolean;
     input: string;
+    /**
+     * The "clean" baseline input used to compute isDirty.
+     * undefined = unknown baseline (e.g. tab loaded as dirty from persistence) — stays dirty until explicit reset.
+     */
+    savedInput?: string;
     isDirty: boolean;
     createdAt: number;
     updatedAt: number;

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Copy, Ellipsis, FloppyDisk, Pencil, Xmark} from '@gravity-ui/icons';
+import {Copy, Ellipsis, FloppyDisk, FontCursor, Xmark} from '@gravity-ui/icons';
 import type {DropdownMenuItem} from '@gravity-ui/uikit';
 import {DropdownMenu, Flex, Hotkey, Icon, Tab, Text} from '@gravity-ui/uikit';
 
@@ -128,7 +128,7 @@ export function EditorTabItem({
             [
                 {
                     text: i18n('editor-tabs.rename-query'),
-                    iconStart: <Pencil />,
+                    iconStart: <FontCursor />,
                     iconEnd: <Hotkey value={HOTKEY_LABELS.renameTab} />,
                     action: handleRenameClick,
                 },
@@ -209,6 +209,7 @@ export function EditorTabItem({
                                 onTransitionOutComplete: handleMenuTransitionOutComplete,
                             }}
                             size="s"
+                            menuProps={{size: 'l'}}
                         />
                     </span>
                     <span

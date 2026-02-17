@@ -26,6 +26,7 @@ function persistTabsStateToSessionStorage(state: QueryState) {
             title: tab.title,
             isTitleUserDefined: Boolean(tab.isTitleUserDefined),
             input: tab.input,
+            savedInput: tab.savedInput,
             createdAt: tab.createdAt,
             updatedAt: tab.updatedAt,
         };
@@ -64,6 +65,7 @@ function createDefaultTabState({
         title,
         isTitleUserDefined: false,
         input,
+        savedInput: input,
         isDirty: false,
         createdAt: now,
         updatedAt: now,
@@ -84,6 +86,7 @@ function createTabStateFromPersisted({
         title: persistedTab.title,
         isTitleUserDefined: persistedTab.isTitleUserDefined ?? false,
         input: persistedTab.input,
+        savedInput: persistedTab.savedInput ?? (isDirty ? undefined : persistedTab.input),
         isDirty,
         createdAt: persistedTab.createdAt,
         updatedAt: persistedTab.updatedAt,
@@ -107,6 +110,9 @@ function createInitialTabsState(): Pick<
 
         const tab = createDefaultTabState({tabId, input: rawTabs});
         tab.isDirty = legacyDirty;
+        if (legacyDirty) {
+            tab.savedInput = undefined;
+        }
 
         const persistedState: QueryTabsPersistedState = {
             activeTabId: tabId,
@@ -227,6 +233,12 @@ const slice = createSlice({
 
             tab.input = action.payload.input;
             tab.updatedAt = Date.now();
+
+            if (tab.savedInput !== undefined) {
+                tab.isDirty = tab.input !== tab.savedInput;
+                persistDirtyStateToSessionStorage(state);
+            }
+
             persistTabsStateToSessionStorage(state);
         },
         setIsDirty: (state, action: PayloadAction<boolean>) => {
@@ -236,6 +248,11 @@ const slice = createSlice({
             }
 
             tab.isDirty = action.payload;
+
+            if (!action.payload) {
+                tab.savedInput = tab.input;
+            }
+
             persistDirtyStateToSessionStorage(state);
         },
         setQueryResult: (
@@ -286,6 +303,7 @@ const slice = createSlice({
                 title,
                 isTitleUserDefined: false,
                 input,
+                savedInput: input,
                 isDirty: false,
                 createdAt: now,
                 updatedAt: now,
@@ -314,6 +332,7 @@ const slice = createSlice({
             if (isLastTab) {
                 const tab = state.tabsById[tabId];
                 tab.input = '';
+                tab.savedInput = '';
                 tab.title = '';
                 tab.isTitleUserDefined = false;
                 tab.isDirty = false;

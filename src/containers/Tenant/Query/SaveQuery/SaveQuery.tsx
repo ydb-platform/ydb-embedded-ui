@@ -134,6 +134,7 @@ function SaveQueryDialog({
     const dispatch = useTypedDispatch();
     const [queryName, setQueryName] = React.useState(defaultQueryName ?? '');
     const [validationError, setValidationError] = React.useState<string>();
+    const controlRef = React.useRef<HTMLInputElement>(null);
 
     const validateQueryName = (value: string) => {
         if (!value) {
@@ -175,6 +176,7 @@ function SaveQueryDialog({
             hasCloseButton={true}
             size="s"
             onClose={onCloseWithoutSave}
+            initialFocus={controlRef}
             className={b()}
         >
             <Dialog.Header caption={i18n('action.save')} />
@@ -198,8 +200,8 @@ function SaveQueryDialog({
                                 placeholder={i18n('input-placeholder')}
                                 value={queryName}
                                 onUpdate={handleQueryNameChange}
+                                controlRef={controlRef}
                                 hasClear
-                                autoFocus
                                 autoComplete={false}
                                 validationState={validationError ? 'invalid' : undefined}
                                 errorMessage={validationError}
