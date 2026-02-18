@@ -1,38 +1,101 @@
-name: Node.js CI
-
 on:
-  pull_request:
-    branches: ['**']
-  merge_group:
-    types: [checks_requested]
+  push:
+    branches:
+      - main
+      - hotfix/v[0-9]+.[0-9]+.[0-9]+* # match branches in format hotfix/v6.20.10 and hotfix/v6.20.10-hotfix.1
+  workflow_dispatch:
+
+name: Release
+
+permissions:
+  contents: write
+  id-token: write
+  packages: write
+  pull-requests: write
 
 jobs:
-  verify_files:
-    name: Verify Files
+  release:
+    if: github.repository == 'ydb-platform/ydb-embedded-ui'
     runs-on: ubuntu-latest
+    env:
+      ASSET_NAME: embedded-ui
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npm run typecheck
-      - run: npm run lint
-      - run: npm run build:embedded # check that build works
-      - run: npm run package # check that package build works
-
-  unit_tests:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
+          node-version: 24
       - run: npm ci
       - run: npm test
+      - id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          target-branch: ${{ github.ref_name }}
+
+      # Mark hotfix releases as not latest in GitHub
+      - name: Do not mark hotfix release as latest
+        if: steps.release.outputs.release_created == 'true'
+        run: |
+          VERSION="${{ steps.release.outputs.tag_name }}"
+          # Remove 'v' prefix if present
+          VERSION="${VERSION#v}"
+
+          # Check if this is a hotfix version
+          if [[ "$VERSION" =~ -hotfix\. ]]; then
+            echo "Marking release ${{ steps.release.outputs.tag_name }} as not latest"
+            gh release edit ${{ steps.release.outputs.tag_name }} --latest=false
+          else
+            echo "Release ${{ steps.release.outputs.tag_name }} is not a hotfix, keeping as latest"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Publication steps - only run if release was created
+      - name: Publish to npm
+        if: steps.release.outputs.release_created == 'true'
+        run: |
+          VERSION="${{ steps.release.outputs.tag_name }}"
+          # Remove 'v' prefix if present
+          VERSION="${VERSION#v}"
+
+          # Determine npm dist-tag based on version
+          if [[ "$VERSION" =~ -hotfix\. ]]; then
+            # Hotfix versions get their own tag
+            echo "Publishing hotfix version $VERSION with tag 'hotfix'"
+            npm publish --tag hotfix
+          elif [[ "$VERSION" =~ -(alpha|beta|rc)\. ]]; then
+            # Alpha/beta/rc versions get 'next' tag
+            echo "Publishing prerelease version $VERSION with tag 'next'"
+            npm publish --tag next
+          elif [[ "$VERSION" =~ - ]]; then
+            # Other prerelease versions (e.g., -canary, -dev) get 'next' tag
+            echo "Publishing prerelease version $VERSION with tag 'next'"
+            npm publish --tag next
+          else
+            # Stable versions get 'latest' tag
+            echo "Publishing stable version $VERSION with tag 'latest'"
+            npm publish --tag latest
+          fi
+
+      - name: Build embedded archive
+        if: steps.release.outputs.release_created == 'true'
+        run: npm run build:embedded:archive
+
+      - name: Upload archive to release
+        if: steps.release.outputs.release_created == 'true'
+        run: gh release upload ${{ steps.release.outputs.tag_name }} $ASSET_NAME.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Embedded UI Refresh Event Dispatch
+        if: steps.release.outputs.release_created == 'true'
+        uses: peter-evans/repository-dispatch@v2
+        continue-on-error: true
+        with:
+          repository: ydb-platform/ydb
+          event-type: embedded_ui_refresh
+          client-payload: |
+            {
+              "tag_name": "${{ steps.release.outputs.tag_name }}",
+              "asset_name": "${{ env.ASSET_NAME }}",
+              "repository": "${{ github.repository }}"
+            }
