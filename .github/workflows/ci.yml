@@ -2,6 +2,10 @@ name: Node.js CI
 
 on:
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
     branches: ['**']
   merge_group:
     types: [checks_requested]
