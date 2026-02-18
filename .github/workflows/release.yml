@@ -31,24 +31,6 @@ jobs:
         with:
           target-branch: ${{ github.ref_name }}
 
-      # Mark hotfix releases as not latest in GitHub
-      - name: Do not mark hotfix release as latest
-        if: steps.release.outputs.release_created == 'true'
-        run: |
-          VERSION="${{ steps.release.outputs.tag_name }}"
-          # Remove 'v' prefix if present
-          VERSION="${VERSION#v}"
-
-          # Check if this is a hotfix version
-          if [[ "$VERSION" =~ -hotfix\. ]]; then
-            echo "Marking release ${{ steps.release.outputs.tag_name }} as not latest"
-            gh release edit ${{ steps.release.outputs.tag_name }} --latest=false
-          else
-            echo "Release ${{ steps.release.outputs.tag_name }} is not a hotfix, keeping as latest"
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       # Publication steps - only run if release was created
       - name: Publish to npm
         if: steps.release.outputs.release_created == 'true'
