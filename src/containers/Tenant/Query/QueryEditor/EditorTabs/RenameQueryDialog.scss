@@ -1,4 +1,4 @@
-.ydb-save-query {
+.rename-query-dialog {
     &__dialog-row {
         display: flex;
         align-items: flex-start;
@@ -7,21 +7,7 @@
             margin-top: var(--g-text-body-1-line-height);
         }
     }
-    &__field-title {
-        margin-right: 12px;
 
-        font-weight: 500;
-        line-height: 28px;
-        white-space: nowrap;
-
-        &.required {
-            &::after {
-                content: '*';
-
-                color: var(--g-color-text-danger);
-            }
-        }
-    }
     &__control-wrapper {
         display: flex;
         flex-grow: 1;

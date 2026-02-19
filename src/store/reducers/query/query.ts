@@ -12,6 +12,7 @@ export {
     selectHistoryCurrentQueryId,
     selectIsDirty,
     selectLastExecutedQueryText,
+    selectNewTabCounter,
     selectQueriesHistoryFilter,
     selectQueryDuration,
     selectResult,

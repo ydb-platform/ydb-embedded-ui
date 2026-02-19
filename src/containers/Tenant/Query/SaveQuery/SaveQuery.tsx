@@ -134,6 +134,7 @@ function SaveQueryDialog({
     const dispatch = useTypedDispatch();
     const [queryName, setQueryName] = React.useState(defaultQueryName ?? '');
     const [validationError, setValidationError] = React.useState<string>();
+    const controlRef = React.useRef<HTMLInputElement>(null);
 
     const validateQueryName = (value: string) => {
         if (!value) {
@@ -170,7 +171,14 @@ function SaveQueryDialog({
     };
 
     return (
-        <Dialog open={open} hasCloseButton={false} size="s" onClose={onCloseWithoutSave}>
+        <Dialog
+            open={open}
+            hasCloseButton={true}
+            size="s"
+            onClose={onCloseWithoutSave}
+            initialFocus={controlRef}
+            className={b()}
+        >
             <Dialog.Header caption={i18n('action.save')} />
             <form
                 onSubmit={(e) => {
@@ -185,17 +193,15 @@ function SaveQueryDialog({
                 <Dialog.Body className={b('dialog-body')}>
                     <div className={b('dialog-row')}>{i18n('description')}</div>
                     <div className={b('dialog-row')}>
-                        <label htmlFor="queryName" className={b('field-title', 'required')}>
-                            {i18n('input-label')}
-                        </label>
                         <div className={b('control-wrapper')}>
                             <TextInput
                                 id="queryName"
+                                aria-label={i18n('input-label')}
                                 placeholder={i18n('input-placeholder')}
                                 value={queryName}
                                 onUpdate={handleQueryNameChange}
+                                controlRef={controlRef}
                                 hasClear
-                                autoFocus
                                 autoComplete={false}
                                 validationState={validationError ? 'invalid' : undefined}
                                 errorMessage={validationError}

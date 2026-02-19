@@ -21,7 +21,8 @@ const uiFactoryBase: UIFactory = {
     hasAccess: true,
     useDatabaseId: false,
     settingsBackend: undefined,
-    enableMultiTabQueryEditor: false,
+    // TODO: Remove before merge
+    enableMultiTabQueryEditor: true,
     hasDeveloperUi: true,
 };
 
