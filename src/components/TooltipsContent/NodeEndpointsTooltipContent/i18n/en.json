@@ -1,6 +1,7 @@
 {
   "field_rack": "Rack",
   "field_host": "Host",
+  "field_links": "Links",
   "context_developer-ui": "Developer UI",
   "field_database": "Database",
   "field_roles": "Roles"

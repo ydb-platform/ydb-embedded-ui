@@ -30,5 +30,20 @@
         #{$block}__properties-list {
             --g-definition-list-item-gap: var(--g-spacing-2);
         }
+
+        .g-definition-list {
+            --_--copy-button: var(--g-spacing-6);
+        }
+
+        .g-definition-list__copy-button {
+            --g-button-icon-space: 12px;
+            --g-button-icon-offset: 4px;
+            --g-button-height: 20px;
+
+            svg {
+                width: 14px;
+                height: 14px;
+            }
+        }
     }
 }

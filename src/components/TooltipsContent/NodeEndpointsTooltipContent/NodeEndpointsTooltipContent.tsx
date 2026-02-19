@@ -1,84 +1,82 @@
-import type {DefinitionListItemProps} from '@gravity-ui/uikit';
-import {DefinitionList} from '@gravity-ui/uikit';
+import React from 'react';
 
 import type {PreparedStorageNode} from '../../../store/reducers/storage/types';
-import {cn} from '../../../utils/cn';
 import {useNodeDeveloperUIHref} from '../../../utils/hooks/useNodeDeveloperUIHref';
 import {LinkWithIcon} from '../../LinkWithIcon/LinkWithIcon';
+import type {YDBDefinitionListItem} from '../../YDBDefinitionList/YDBDefinitionList';
+import {YDBDefinitionList} from '../../YDBDefinitionList/YDBDefinitionList';
 
 import i18n from './i18n';
-
-import './NodeEndpointsTooltipContent.scss';
-
-const b = cn('ydb-node-endpoints-tooltip-content');
 
 interface NodeEdpointsTooltipProps {
     data?: PreparedStorageNode;
 }
 
-export const NodeEndpointsTooltipContent = ({data}: NodeEdpointsTooltipProps) => {
-    const developerUIInternalHref = useNodeDeveloperUIHref(data);
-
-    const info: (DefinitionListItemProps & {key: string})[] = [];
+const prepareNodeEndpointsData = (data?: PreparedStorageNode): YDBDefinitionListItem[] => {
+    const info: YDBDefinitionListItem[] = [];
 
     if (data?.Roles?.length) {
         info.push({
             name: i18n('field_roles'),
-            children: data.Roles.join(', '),
-            key: 'Roles',
+            content: data.Roles.join(', '),
         });
     }
+    const database = data?.Tenants?.[0];
 
-    if (data?.Tenants?.[0]) {
+    if (database) {
         info.push({
             name: i18n('field_database'),
-            children: data.Tenants[0],
-            key: 'Database',
+            content: database,
+            copyText: database,
         });
     }
 
     if (data?.Host) {
         info.push({
             name: i18n('field_host'),
-            children: data.Host,
+            content: data.Host,
             copyText: data.Host,
-            key: 'Host',
         });
     }
 
     if (data?.Rack) {
-        info.push({name: i18n('field_rack'), children: data.Rack, key: 'Rack'});
+        info.push({
+            name: i18n('field_rack'),
+            content: data.Rack,
+        });
     }
 
     if (data?.Endpoints && data.Endpoints.length) {
         data.Endpoints.forEach(({Name, Address}) => {
             if (Name && Address) {
-                info.push({name: Name, children: Address, key: Name});
+                info.push({name: Name, content: Address});
             }
         });
     }
 
-    if (developerUIInternalHref) {
-        info.push({
-            name: 'Links',
-            children: (
-                <LinkWithIcon title={i18n('context_developer-ui')} url={developerUIInternalHref} />
-            ),
-            key: 'developerUi',
-        });
-    }
+    return info;
+};
 
-    return (
-        <div className={b('list-container')}>
-            <DefinitionList responsive>
-                {info.map(({children, key, ...rest}) => {
-                    return (
-                        <DefinitionList.Item key={key} {...rest}>
-                            <div className={b('definition')}>{children}</div>
-                        </DefinitionList.Item>
-                    );
-                })}
-            </DefinitionList>
-        </div>
-    );
+export const NodeEndpointsTooltipContent = ({data}: NodeEdpointsTooltipProps) => {
+    const developerUIInternalHref = useNodeDeveloperUIHref(data);
+
+    const info = React.useMemo(() => {
+        const items = prepareNodeEndpointsData(data);
+
+        if (developerUIInternalHref) {
+            items.push({
+                name: i18n('field_links'),
+                content: (
+                    <LinkWithIcon
+                        title={i18n('context_developer-ui')}
+                        url={developerUIInternalHref}
+                    />
+                ),
+            });
+        }
+
+        return items;
+    }, [data, developerUIInternalHref]);
+
+    return <YDBDefinitionList items={info} compact responsive nameMaxWidth="auto" />;
 };

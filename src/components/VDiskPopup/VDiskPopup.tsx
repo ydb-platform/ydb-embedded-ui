@@ -51,13 +51,29 @@ const prepareUnavailableVDiskData = (data: UnavailableDonor) => {
     const vdiskData: YDBDefinitionListItem[] = [];
 
     if (StoragePoolName) {
-        vdiskData.push({name: vDiskPopupKeyset('label_storage-pool'), content: StoragePoolName});
+        vdiskData.push({
+            name: vDiskPopupKeyset('label_storage-pool'),
+            content: StoragePoolName,
+            copyText: StoragePoolName,
+        });
     }
 
     vdiskData.push(
-        {name: vDiskPopupKeyset('label_node-id'), content: NodeId ?? EMPTY_DATA_PLACEHOLDER},
-        {name: vDiskPopupKeyset('label_pdisk-id'), content: PDiskId ?? EMPTY_DATA_PLACEHOLDER},
-        {name: vDiskPopupKeyset('label_vslot-id'), content: VSlotId ?? EMPTY_DATA_PLACEHOLDER},
+        {
+            name: vDiskPopupKeyset('label_node-id'),
+            content: NodeId ?? EMPTY_DATA_PLACEHOLDER,
+            copyText: NodeId,
+        },
+        {
+            name: vDiskPopupKeyset('label_pdisk-id'),
+            content: PDiskId ?? EMPTY_DATA_PLACEHOLDER,
+            copyText: PDiskId,
+        },
+        {
+            name: vDiskPopupKeyset('label_vslot-id'),
+            content: VSlotId ?? EMPTY_DATA_PLACEHOLDER,
+            copyText: VSlotId,
+        },
     );
 
     return vdiskData;
@@ -144,7 +160,11 @@ const prepareVDiskData = (
     const vdiskData: YDBDefinitionListItem[] = [];
 
     if (StoragePoolName) {
-        vdiskData.push({name: vDiskPopupKeyset('label_storage-pool'), content: StoragePoolName});
+        vdiskData.push({
+            name: vDiskPopupKeyset('label_storage-pool'),
+            content: StoragePoolName,
+            copyText: StoragePoolName,
+        });
     }
 
     // it is a healthy replication and it has some donors

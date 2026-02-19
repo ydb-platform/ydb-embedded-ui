@@ -14,7 +14,7 @@ const b = cn('ydb-definition-list');
 export type YDBDefinitionListItem = {
     name: string;
     content: React.ReactNode;
-    copyText?: string;
+    copyText?: string | number;
 };
 
 export interface YDBDefinitionListHeaderLabel {
@@ -111,9 +111,24 @@ export function YDBDefinitionList({
                     className={b('properties-list', className)}
                     {...definitionListProps}
                 >
-                    {items.map((item) => (
-                        <DefinitionList.Item key={item.name} children={item.content} {...item} />
-                    ))}
+                    {items.map((item) => {
+                        const {name, content, copyText, ...rest} = item;
+                        let normalizedCopyText: string | undefined;
+                        if (typeof copyText === 'string') {
+                            normalizedCopyText = copyText || undefined;
+                        } else if (typeof copyText === 'number') {
+                            normalizedCopyText = String(copyText);
+                        }
+                        return (
+                            <DefinitionList.Item
+                                key={name}
+                                name={name}
+                                children={content}
+                                copyText={normalizedCopyText}
+                                {...rest}
+                            />
+                        );
+                    })}
                 </DefinitionList>
             );
         }
