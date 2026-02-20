@@ -188,7 +188,7 @@ export function EditorTabItem({
     const renderTabMenuSwitcher = React.useCallback((props: React.HTMLAttributes<HTMLElement>) => {
         return (
             <span {...props} className={b('tab-action', {menu: true})}>
-                <Ellipsis />
+                <Icon data={Ellipsis} size={12} />
             </span>
         );
     }, []);
