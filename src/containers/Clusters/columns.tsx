@@ -193,6 +193,12 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
         sortable: true,
     },
     {
+        name: COLUMNS_NAMES.DOMAIN,
+        header: COLUMNS_TITLES[COLUMNS_NAMES.DOMAIN],
+        width: 170,
+        sortable: true,
+    },
+    {
         name: COLUMNS_NAMES.DC,
         header: COLUMNS_TITLES[COLUMNS_NAMES.DC],
         width: 120,
