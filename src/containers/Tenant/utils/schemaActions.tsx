@@ -48,6 +48,7 @@ import {
     dropViewTemplate,
     manageAutoPartitioningTemplate,
     manageReadReplicasTemplate,
+    manageTTLTemplate,
     selectQueryTemplate,
     showCreateTableTemplate,
     upsertQueryTemplate,
@@ -139,6 +140,7 @@ const bindActions = (
         dropTable: inputQuery(dropTableTemplate),
         manageAutoPartitioning: inputQuery(manageAutoPartitioningTemplate),
         manageReadReplicas: inputQuery(manageReadReplicasTemplate),
+        manageTTL: inputQuery(manageTTLTemplate),
         selectQuery: inputQuery(selectQueryTemplate),
         showCreateTable: inputQuery(showCreateTableTemplate),
         upsertQuery: inputQuery(upsertQueryTemplate),
@@ -259,14 +261,23 @@ export const getActions =
             text: i18n('actions.manageReadReplicas'),
             action: actions.manageReadReplicas,
         };
+        const manageTTLItem = {
+            text: i18n('actions.manageTTL'),
+            action: actions.manageTTL,
+        };
 
         const alterRowTableGroupItem = {
             text: i18n('actions.alterTable'),
-            items: [manageColumnsItem, manageAutoPartitioningItem, manageReadReplicasItem],
+            items: [
+                manageColumnsItem,
+                manageAutoPartitioningItem,
+                manageReadReplicasItem,
+                manageTTLItem,
+            ],
         };
         const alterColumnTableGroupItem = {
             text: i18n('actions.alterTable'),
-            items: [manageColumnsItem, manageAutoPartitioningItem],
+            items: [manageColumnsItem, manageAutoPartitioningItem, manageTTLItem],
         };
 
         let DB_SET: ActionsSet = [[copyItem, connectToDBItem], createEntitiesSet];
