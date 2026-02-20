@@ -36,6 +36,10 @@ const isMatchesByVersion = (clusterData: PreparedCluster, selectedVersions: stri
     );
 };
 
+export const splitNameIntoParts = (name: string | undefined): string[] => {
+    return name?.toLowerCase().match(/[a-zA-Z]+|\d+/g) || [];
+};
+
 const isMatchesByTextQuery = (clusterData: PreparedCluster, searchQuery = '') => {
     if (!searchQuery) {
         return true;
@@ -44,15 +48,14 @@ const isMatchesByTextQuery = (clusterData: PreparedCluster, searchQuery = '') =>
     const preparedSearchQuery = searchQuery.toLowerCase();
     const searchTokens = preparedSearchQuery.split(' ');
 
-    // splits a string into words, treating digits as a separate word
-    // 'my_cluster env-dev vla03' => ['my', 'cluster', 'env', 'dev', 'vla', '03']
-    const splitRegExp = /[^\d\s]+|\d+|[^-\s]+|[^_\s]+/g;
-
-    const clusterNameParts = clusterData.title?.toLowerCase().match(splitRegExp) || [];
+    const clusterNameParts = splitNameIntoParts(clusterData.title);
 
     const filteredByName = searchTokens.every((token) => {
         const escapedToken = escapeRegExp(token);
-        const startsWithTokenRegExp = new RegExp(`^${escapedToken}|[\\s\\-_]${escapedToken}`, 'i');
+        const startsWithTokenRegExp = new RegExp(
+            `^${escapedToken}|[^a-zA-Z0-9]${escapedToken}`,
+            'i',
+        );
 
         // both tests are required so that both searches '03' and 'vla03' would match 'YDB DEV VLA03'
         return (
@@ -65,7 +68,9 @@ const isMatchesByTextQuery = (clusterData: PreparedCluster, searchQuery = '') =>
     );
     const filteredByHost = Boolean(clusterData.hosts && clusterData.hosts[preparedSearchQuery]);
 
-    return filteredByName || filteredByVersion || filteredByHost;
+    const filteredByDomain = clusterData.domain?.toLowerCase().includes(preparedSearchQuery);
+
+    return filteredByName || filteredByVersion || filteredByHost || filteredByDomain;
 };
 
 export function filterClusters(clusters: PreparedCluster[], filters: ClustersFilters) {

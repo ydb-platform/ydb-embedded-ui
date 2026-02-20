@@ -32,6 +32,7 @@ export interface MetaBaseClusterInfo {
     location?: string;
     image?: string;
     title?: string;
+    domain?: string;
     mvp_token?: string;
     name?: string;
     status?: string;
