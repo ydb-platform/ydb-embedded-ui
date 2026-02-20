@@ -155,3 +155,18 @@ export function isQueryTabsDirtyPersistedState(
 
     return Object.values(value).every((item) => typeof item === 'boolean');
 }
+
+export function getUniqueTabTitle(
+    tabsById: Record<string, {title: string}>,
+    baseTitle: string,
+): string {
+    const existingTitles = new Set(Object.values(tabsById).map((tab) => tab.title));
+    if (!existingTitles.has(baseTitle)) {
+        return baseTitle;
+    }
+    let counter = 1;
+    while (existingTitles.has(`${baseTitle} ${counter}`)) {
+        counter++;
+    }
+    return `${baseTitle} ${counter}`;
+}

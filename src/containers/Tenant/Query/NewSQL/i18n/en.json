@@ -40,5 +40,6 @@
   "action.show-create-table": "Show Create SQL",
   "action.alter-streaming-query-settings": "Alter query settings",
   "action.alter-streaming-query-text": "Alter query text",
-  "action.drop-streaming-query": "Drop query"
+  "action.drop-streaming-query": "Drop query",
+  "action.create-view": "Create view"
 }

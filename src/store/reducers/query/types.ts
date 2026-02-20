@@ -77,6 +77,12 @@ export interface QueryTabState {
     updatedAt: number;
     lastExecutedQueryText?: string;
     result?: QueryResult;
+    /**
+     * Snippet text to be inserted into the editor after the tab model is switched.
+     * Used when creating a new tab from templates (schema actions, New SQL).
+     * Cleared after insertion by the editor component.
+     */
+    pendingSnippet?: string;
 }
 
 export interface QueryState {

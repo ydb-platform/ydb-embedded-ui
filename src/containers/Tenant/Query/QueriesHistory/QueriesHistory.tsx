@@ -1,6 +1,7 @@
 import React from 'react';
 
 import type {Column} from '@gravity-ui/react-data-table';
+import {v4 as uuidv4} from 'uuid';
 
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
@@ -8,13 +9,17 @@ import {TableWithControlsLayout} from '../../../../components/TableWithControlsL
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
 import type {useQueriesHistory} from '../../../../store/reducers/query/hooks';
 import {
+    addQueryTab,
     selectQueriesHistoryFilter,
+    selectTabsById,
     setIsDirty,
     setQueryHistoryFilter,
 } from '../../../../store/reducers/query/query';
 import type {QueryInHistory} from '../../../../store/reducers/query/types';
+import {getUniqueTabTitle} from '../../../../store/reducers/query/utils';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
+import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {cn} from '../../../../utils/cn';
 import {formatDateTime} from '../../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
@@ -36,6 +41,8 @@ interface QueriesHistoryProps {
 
 function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) {
     const dispatch = useTypedDispatch();
+    const tabsById = useTypedSelector(selectTabsById);
+    const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
 
     const reversedHistory = React.useMemo(() => {
         return queriesHistory.filteredHistoryQueries.toReversed();
@@ -44,9 +51,24 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
     const filter = useTypedSelector(selectQueriesHistoryFilter);
 
     const applyQueryClick = (query: QueryInHistory) => {
-        changeUserInput({input: query.queryText});
-        dispatch(setIsDirty(false));
-        dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
+        if (isMultiTabEnabled) {
+            const firstLine = query.queryText.trim().split('\n')[0];
+            const title = getUniqueTabTitle(tabsById, firstLine);
+            dispatch(
+                addQueryTab({
+                    tabId: uuidv4(),
+                    title,
+                    input: query.queryText,
+                    makeActive: true,
+                }),
+            );
+            dispatch(setIsDirty(false));
+            dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
+        } else {
+            changeUserInput({input: query.queryText});
+            dispatch(setIsDirty(false));
+            dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
+        }
     };
 
     const onQueryClick = useChangeInputWithConfirmation(applyQueryClick);

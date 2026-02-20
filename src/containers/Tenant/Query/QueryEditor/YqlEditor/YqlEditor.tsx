@@ -7,8 +7,10 @@ import type Monaco from 'monaco-editor';
 
 import {MonacoEditor} from '../../../../../components/MonacoEditor/MonacoEditor';
 import {
+    clearPendingSnippet,
     renameQueryTab,
     selectActiveTab,
+    selectActiveTabPendingSnippet,
     selectUserInput,
     setIsDirty,
 } from '../../../../../store/reducers/query/query';
@@ -74,6 +76,7 @@ export function YqlEditor({
 }: YqlEditorProps) {
     const input = useTypedSelector(selectUserInput);
     const activeTab = useTypedSelector(selectActiveTab);
+    const pendingSnippet = useTypedSelector(selectActiveTabPendingSnippet);
     const {savedQueries, saveQuery} = useSavedQueries();
     const {
         activeTabId,
@@ -126,6 +129,28 @@ export function YqlEditor({
 
         tabsManagerRef.current.disposeRemovedTabs(tabsOrder);
     }, [isMultiTabQueryEditorEnabled, tabsOrder]);
+
+    React.useEffect(() => {
+        if (!isMultiTabQueryEditorEnabled || !pendingSnippet) {
+            return;
+        }
+
+        const editor = editorRef.current;
+        if (!editor) {
+            return;
+        }
+
+        const contribution =
+            editor.getContribution<Monaco.editor.IEditorContribution>('snippetController2');
+        if (isSnippetController(contribution)) {
+            editor.focus();
+            editor.setValue('');
+            contribution.insert(pendingSnippet);
+            dispatch(setIsDirty(false));
+        }
+
+        dispatch(clearPendingSnippet({tabId: activeTabId}));
+    }, [activeTabId, pendingSnippet, isMultiTabQueryEditorEnabled, dispatch]);
 
     const [lastUsedQueryAction] = useSetting<QueryAction>(SETTING_KEYS.LAST_USED_QUERY_ACTION);
 

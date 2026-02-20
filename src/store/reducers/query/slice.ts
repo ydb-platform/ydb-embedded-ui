@@ -285,9 +285,17 @@ const slice = createSlice({
                 input?: string;
                 makeActive?: boolean;
                 newTabCounter?: number;
+                pendingSnippet?: string;
             }>,
         ) => {
-            const {tabId, title, input = '', makeActive = true, newTabCounter} = action.payload;
+            const {
+                tabId,
+                title,
+                input = '',
+                makeActive = true,
+                newTabCounter,
+                pendingSnippet,
+            } = action.payload;
 
             if (state.tabsById[tabId]) {
                 if (makeActive) {
@@ -307,6 +315,7 @@ const slice = createSlice({
                 isDirty: false,
                 createdAt: now,
                 updatedAt: now,
+                pendingSnippet,
             };
             state.tabsOrder.push(tabId);
 
@@ -379,6 +388,12 @@ const slice = createSlice({
             state.activeTabId = tabId;
             persistTabsStateToSessionStorage(state);
         },
+        clearPendingSnippet: (state, action: PayloadAction<{tabId: string}>) => {
+            const tab = state.tabsById[action.payload.tabId];
+            if (tab) {
+                delete tab.pendingSnippet;
+            }
+        },
         setTenantPath: (state, action: PayloadAction<string>) => {
             state.tenantPath = action.payload;
         },
@@ -419,6 +434,7 @@ const slice = createSlice({
         selectResultTab: (state) => state.selectedResultTab,
         selectLastExecutedQueryText: (state) =>
             state.tabsById[state.activeTabId]?.lastExecutedQueryText,
+        selectActiveTabPendingSnippet: (state) => state.tabsById[state.activeTabId]?.pendingSnippet,
     },
 });
 
@@ -443,6 +459,7 @@ export const {
     closeQueryTab,
     renameQueryTab,
     setActiveQueryTab,
+    clearPendingSnippet,
     setTenantPath,
     setQueryHistoryFilter,
     setHistoryCurrentQueryId,
@@ -467,4 +484,5 @@ export const {
     selectResultTab,
     selectLastExecutedQueryText,
     selectNewTabCounter,
+    selectActiveTabPendingSnippet,
 } = slice.selectors;
