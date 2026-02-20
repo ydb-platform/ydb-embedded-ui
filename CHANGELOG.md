@@ -1,5 +1,13 @@
 # Changelog
 
+## [14.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.6.0...v14.7.0) (2026-02-20)
+
+
+### Features
+
+* add copyText to some elements in popups ([#3496](https://github.com/ydb-platform/ydb-embedded-ui/issues/3496)) ([0dce071](https://github.com/ydb-platform/ydb-embedded-ui/commit/0dce071da8923bf8e8ea2c99334f7f15ff27f62b))
+* **Clusters:** add domain and improve search ([#3500](https://github.com/ydb-platform/ydb-embedded-ui/issues/3500)) ([86cb651](https://github.com/ydb-platform/ydb-embedded-ui/commit/86cb6511b98d33aa19a7e92c6a42b9802da809e0))
+
 ## [14.6.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.5.0...v14.6.0) (2026-02-06)
 
 
