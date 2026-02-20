@@ -190,7 +190,7 @@ export function QueryResultViewer({
             <ClipboardButton
                 text={copyText}
                 view="flat-secondary"
-                title={i18n('action.copy', {activeSection})}
+                tooltipInitialText={i18n('action.copy', {activeSection})}
             />
         );
     };

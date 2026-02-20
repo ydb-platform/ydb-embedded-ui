@@ -35,11 +35,19 @@ export const preparePDiskData = (data: PreparedPDisk, nodeData?: {Host?: string;
     ];
 
     if (NodeId) {
-        pdiskData.push({name: pDiskPopupKeyset('label_node-id'), content: NodeId});
+        pdiskData.push({
+            name: pDiskPopupKeyset('label_node-id'),
+            content: NodeId,
+            copyText: NodeId,
+        });
     }
 
     if (nodeData?.Host) {
-        pdiskData.push({name: pDiskPopupKeyset('label_host'), content: nodeData.Host});
+        pdiskData.push({
+            name: pDiskPopupKeyset('label_host'),
+            content: nodeData.Host,
+            copyText: nodeData.Host,
+        });
     }
 
     if (nodeData?.DC) {
@@ -47,7 +55,7 @@ export const preparePDiskData = (data: PreparedPDisk, nodeData?: {Host?: string;
     }
 
     if (Path) {
-        pdiskData.push({name: pDiskPopupKeyset('label_path'), content: Path});
+        pdiskData.push({name: pDiskPopupKeyset('label_path'), content: Path, copyText: Path});
     }
 
     if (isNumeric(TotalSize) && isNumeric(AvailableSize)) {
