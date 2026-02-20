@@ -36,6 +36,10 @@ const isMatchesByVersion = (clusterData: PreparedCluster, selectedVersions: stri
     );
 };
 
+export const splitNameIntoParts = (name: string | undefined): string[] => {
+    return name?.toLowerCase().match(/[a-zA-Z]+|\d+/g) || [];
+};
+
 const isMatchesByTextQuery = (clusterData: PreparedCluster, searchQuery = '') => {
     if (!searchQuery) {
         return true;
@@ -44,12 +48,7 @@ const isMatchesByTextQuery = (clusterData: PreparedCluster, searchQuery = '') =>
     const preparedSearchQuery = searchQuery.toLowerCase();
     const searchTokens = preparedSearchQuery.split(' ');
 
-    // splits a string into alphabetic and numeric words
-    // 'my_cluster env-dev vla03' => ['my', 'cluster', 'env', 'dev', 'vla', '03']
-    // 'Cloud Prod YDB Public (ru-central1)' => ['cloud', 'prod', 'ydb', 'public', 'ru', 'central', '1']
-    const splitRegExp = /[a-zA-Z]+|\d+/g;
-
-    const clusterNameParts = clusterData.title?.toLowerCase().match(splitRegExp) || [];
+    const clusterNameParts = splitNameIntoParts(clusterData.title);
 
     const filteredByName = searchTokens.every((token) => {
         const escapedToken = escapeRegExp(token);
