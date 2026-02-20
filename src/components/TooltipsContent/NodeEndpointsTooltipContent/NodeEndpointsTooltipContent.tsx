@@ -49,7 +49,7 @@ const prepareNodeEndpointsData = (data?: PreparedStorageNode): YDBDefinitionList
     if (data?.Endpoints && data.Endpoints.length) {
         data.Endpoints.forEach(({Name, Address}) => {
             if (Name && Address) {
-                info.push({name: Name, content: Address});
+                info.push({name: Name, content: Address, copyText: Address});
             }
         });
     }

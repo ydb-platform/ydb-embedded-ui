@@ -111,7 +111,7 @@ export function YDBDefinitionList({
                     className={b('properties-list', className)}
                     {...definitionListProps}
                 >
-                    {items.map((item) => {
+                    {items.map((item, index) => {
                         const {name, content, copyText, ...rest} = item;
                         let normalizedCopyText: string | undefined;
                         if (typeof copyText === 'string') {
@@ -121,7 +121,7 @@ export function YDBDefinitionList({
                         }
                         return (
                             <DefinitionList.Item
-                                key={name}
+                                key={name + index}
                                 name={name}
                                 children={content}
                                 copyText={normalizedCopyText}
