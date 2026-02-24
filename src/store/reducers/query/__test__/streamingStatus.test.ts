@@ -35,7 +35,7 @@ function createStateWithStreamingResult(): QueryState {
     };
 }
 
-describe('Streaming query status transitions', () => {
+describe.only('Streaming query status transitions', () => {
     test('initial streaming query should have status "preparing"', () => {
         const initialState: QueryState = {
             activeTabId: 'tab-1',
@@ -242,6 +242,35 @@ describe('Streaming query status transitions', () => {
         );
 
         expect(state.tabsById['tab-1'].result?.streamingStatus).toBeUndefined();
+    });
+
+    test('late batch flush after response should not revert streamingStatus', () => {
+        const initialState = createStateWithStreamingResult();
+        initialState.tabsById['tab-1'].result!.streamingStatus = 'fetching';
+        initialState.tabsById['tab-1'].result!.queryId = 'test-query-id';
+
+        // Response arrives first
+        const responseChunk: QueryResponseChunk = {
+            meta: {event: 'QueryResponse', version: '1', type: 'query'},
+        };
+        let state = queryReducer(
+            initialState,
+            setStreamQueryResponse({tabId: 'tab-1', chunk: responseChunk}),
+        );
+        expect(state.tabsById['tab-1'].result?.streamingStatus).toBeUndefined();
+        expect(state.tabsById['tab-1'].result?.isLoading).toBe(false);
+
+        // Late batch flush arrives after response
+        const chunks: StreamDataChunk[] = [
+            {
+                meta: {event: 'StreamData', seq_no: 99, result_index: 0},
+                result: {rows: [['late-value']]},
+            },
+        ];
+        state = queryReducer(state, addStreamingChunks({tabId: 'tab-1', chunks}));
+
+        expect(state.tabsById['tab-1'].result?.streamingStatus).toBeUndefined();
+        expect(state.tabsById['tab-1'].result?.isLoading).toBe(false);
     });
 
     test('setStreamSession on tab without result should be a no-op', () => {

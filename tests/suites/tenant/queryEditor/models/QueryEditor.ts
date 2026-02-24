@@ -350,17 +350,37 @@ export class QueryEditor {
     async waitForStatus(expectedStatus: string, timeout = VISIBILITY_TIMEOUT) {
         await this.executionStatus.waitFor({state: 'visible', timeout});
 
-        // Keep checking status until it matches or times out
         const startTime = Date.now();
         while (Date.now() - startTime < timeout) {
             const status = await this.executionStatus.innerText();
             if (status === expectedStatus) {
                 return true;
             }
-            await this.page.waitForTimeout(100); // Small delay between checks
+            await this.page.waitForTimeout(100);
         }
 
         throw new Error(`Status did not change to ${expectedStatus} within ${timeout}ms`);
+    }
+
+    async collectStatusTransitions(terminalStatus: string, timeout = VISIBILITY_TIMEOUT) {
+        await this.executionStatus.waitFor({state: 'visible', timeout});
+
+        const observed: string[] = [];
+        const startTime = Date.now();
+        while (Date.now() - startTime < timeout) {
+            const status = await this.executionStatus.innerText();
+            if (observed.length === 0 || observed[observed.length - 1] !== status) {
+                observed.push(status);
+            }
+            if (status === terminalStatus) {
+                return observed;
+            }
+            await this.page.waitForTimeout(50);
+        }
+
+        throw new Error(
+            `Did not reach "${terminalStatus}" within ${timeout}ms. Observed: [${observed.join(' → ')}]`,
+        );
     }
 
     async getStatsTabContent() {

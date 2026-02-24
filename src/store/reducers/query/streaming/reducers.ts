@@ -80,7 +80,10 @@ export const addStreamingChunks = (
 
     const data = tab.result.data ?? (tab.result.data = prepareQueryData(null));
     data.resultSets = data.resultSets || [];
-    tab.result.streamingStatus = 'fetching';
+
+    if (tab.result.isLoading) {
+        tab.result.streamingStatus = 'fetching';
+    }
 
     // Merge chunks by result index
     const mergedChunks = chunks.reduce((acc: Map<number, StreamDataChunk>, chunk) => {
