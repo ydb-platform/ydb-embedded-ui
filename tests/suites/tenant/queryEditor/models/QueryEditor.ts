@@ -362,6 +362,23 @@ export class QueryEditor {
         throw new Error(`Status did not change to ${expectedStatus} within ${timeout}ms`);
     }
 
+    async waitForAnyStatus(expectedStatuses: string[], timeout = VISIBILITY_TIMEOUT) {
+        await this.executionStatus.waitFor({state: 'visible', timeout});
+
+        const startTime = Date.now();
+        while (Date.now() - startTime < timeout) {
+            const status = await this.executionStatus.innerText();
+            if (expectedStatuses.includes(status)) {
+                return status;
+            }
+            await this.page.waitForTimeout(100);
+        }
+
+        throw new Error(
+            `Status did not match any of [${expectedStatuses.join(', ')}] within ${timeout}ms`,
+        );
+    }
+
     async collectStatusTransitions(terminalStatus: string, timeout = VISIBILITY_TIMEOUT) {
         await this.executionStatus.waitFor({state: 'visible', timeout});
 

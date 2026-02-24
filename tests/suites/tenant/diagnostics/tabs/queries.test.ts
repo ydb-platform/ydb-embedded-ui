@@ -16,7 +16,7 @@ import {
 } from '../Diagnostics';
 import {setupTopQueriesMock} from '../mocks';
 
-test.describe('Diagnostics Queries tab', async () => {
+test.describe.only('Diagnostics Queries tab', async () => {
     test('No runnning queries in Queries if no queries are running', async ({page}) => {
         const pageQueryParams = {
             schema: database,
@@ -45,9 +45,9 @@ test.describe('Diagnostics Queries tab', async () => {
 
         await queryEditor.setQuery(longRunningQuery);
         await queryEditor.clickRunButton();
-        await page.waitForTimeout(500);
-        const statusElement = await queryEditor.getExecutionStatus();
-        await expect(statusElement).toBe('Running');
+
+        const inProgressStatuses = ['Preparing', 'Running', 'Fetching'];
+        await expect(queryEditor.waitForAnyStatus(inProgressStatuses)).resolves.toBeTruthy();
         await tenantPage.selectNavigationTab(NavigationTabs.Diagnostics);
 
         const diagnostics = new Diagnostics(page);

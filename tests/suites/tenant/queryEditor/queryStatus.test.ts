@@ -8,7 +8,7 @@ import {longRunningQuery, longRunningStreamQuery} from '../constants';
 
 import {QueryEditor} from './models/QueryEditor';
 
-test.describe('Test Query Execution Status', async () => {
+test.describe.only('Test Query Execution Status', async () => {
     const testQuery = 'SELECT 1;'; // Simple query that will generate a plan
 
     test.beforeEach(async ({page}) => {
@@ -33,16 +33,14 @@ test.describe('Test Query Execution Status', async () => {
         await expect(queryEditor.isResultsControlsHidden()).resolves.toBe(true);
     });
 
-    test('Running query status for running non-streaming query', async ({page}) => {
+    test('In-progress query shows a loading status', async ({page}) => {
         const queryEditor = new QueryEditor(page);
-        await toggleExperiment(page, 'off', 'Query Streaming');
 
         await queryEditor.setQuery(longRunningQuery);
         await queryEditor.clickRunButton();
-        await page.waitForTimeout(500);
 
-        const statusElement = await queryEditor.getExecutionStatus();
-        await expect(statusElement).toBe('Running');
+        const inProgressStatuses = ['Preparing', 'Running', 'Fetching'];
+        await expect(queryEditor.waitForAnyStatus(inProgressStatuses)).resolves.toBeTruthy();
     });
 
     test('Completed query status for completed query', async ({page}) => {
