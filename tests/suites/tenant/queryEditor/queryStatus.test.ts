@@ -4,7 +4,7 @@ import {STATISTICS_MODES} from '../../../../src/utils/query';
 import {database} from '../../../utils/constants';
 import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {TenantPage} from '../TenantPage';
-import {longRunningQuery, longRunningStreamQuery} from '../constants';
+import {longRunningQuery, streamingStatusQuery} from '../constants';
 
 import {QueryEditor} from './models/QueryEditor';
 
@@ -75,7 +75,7 @@ test.describe('Test Query Execution Status', async () => {
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
-        await queryEditor.setQuery(longRunningStreamQuery);
+        await queryEditor.setQuery(streamingStatusQuery);
         await queryEditor.clickRunButton();
 
         await expect(queryEditor.waitForStatus('Fetching')).resolves.toBe(true);
@@ -90,7 +90,7 @@ test.describe('Test Query Execution Status', async () => {
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
-        await queryEditor.setQuery(longRunningStreamQuery);
+        await queryEditor.setQuery(streamingStatusQuery);
         await queryEditor.clickRunButton();
 
         await expect(queryEditor.waitForStatus('Fetching')).resolves.toBe(true);
@@ -103,7 +103,7 @@ test.describe('Test Query Execution Status', async () => {
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
-        await queryEditor.setQuery(longRunningStreamQuery);
+        await queryEditor.setQuery(streamingStatusQuery);
         await queryEditor.clickRunButton();
 
         const validStreamingStatuses = ['Preparing', 'Running', 'Fetching', 'Completed'];
