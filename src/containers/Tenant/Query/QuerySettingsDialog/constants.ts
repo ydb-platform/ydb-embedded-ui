@@ -1,4 +1,3 @@
-import type {StatisticsMode} from '../../../../types/store/query';
 import {
     QUERY_MODES,
     QUERY_MODES_TITLES,
@@ -162,8 +161,3 @@ export const QUERY_SETTINGS_FIELD_SETTINGS = {
         title: formI18n('form.resource-pool'),
     },
 } as const;
-
-export const STATISTICS_MODES_WITH_SVG: StatisticsMode[] = [
-    STATISTICS_MODES.full,
-    STATISTICS_MODES.profile,
-];

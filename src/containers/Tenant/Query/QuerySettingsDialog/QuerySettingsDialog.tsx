@@ -24,13 +24,14 @@ import type {ResourcePoolValue} from '../../../../utils/query';
 import {
     QUERY_MODES,
     RESOURCE_POOL_NO_OVERRIDE_VALUE,
+    STATISTICS_MODES_WITH_SVG,
     querySettingsValidationSchema,
 } from '../../../../utils/query';
 import {useCurrentSchema} from '../../TenantContext';
 
 import {QuerySettingsSelect} from './QuerySettingsSelect';
 import {QuerySettingsTimeout} from './QuerySettingsTimeout';
-import {QUERY_SETTINGS_FIELD_SETTINGS, STATISTICS_MODES_WITH_SVG} from './constants';
+import {QUERY_SETTINGS_FIELD_SETTINGS} from './constants';
 import i18n from './i18n';
 
 import './QuerySettingsDialog.scss';

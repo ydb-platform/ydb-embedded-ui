@@ -2,16 +2,21 @@ import React from 'react';
 
 import {useTracingLevelOptionAvailable} from '../../store/reducers/capabilities/hooks';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
-import type {QuerySettings} from '../../types/store/query';
+import type {QuerySettings, StatisticsMode} from '../../types/store/query';
 import {
     DEFAULT_QUERY_SETTINGS,
     QUERY_MODES,
     STATISTICS_MODES,
+    STATISTICS_MODES_WITH_SVG,
     querySettingsRestoreSchema,
 } from '../query';
 
 import {useQueryStreamingSetting} from './useQueryStreamingSetting';
 import {useSetting} from './useSetting';
+
+function getSvgStatisticsMode(mode: StatisticsMode): StatisticsMode {
+    return STATISTICS_MODES_WITH_SVG.includes(mode) ? mode : STATISTICS_MODES.full;
+}
 
 export const useQueryExecutionSettings = () => {
     const enableTracingLevel = useTracingLevelOptionAvailable();
@@ -41,7 +46,9 @@ export const useQueryExecutionSettings = () => {
             enableQueryStreaming && validatedSettings.queryMode === QUERY_MODES.query
                 ? validatedSettings.timeout || null
                 : validatedSettings.timeout || undefined,
-        statisticsMode: useShowPlanToSvg ? STATISTICS_MODES.full : validatedSettings.statisticsMode,
+        statisticsMode: useShowPlanToSvg
+            ? getSvgStatisticsMode(validatedSettings.statisticsMode)
+            : validatedSettings.statisticsMode,
         tracingLevel: enableTracingLevel
             ? validatedSettings.tracingLevel
             : DEFAULT_QUERY_SETTINGS.tracingLevel,
