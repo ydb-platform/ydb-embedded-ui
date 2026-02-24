@@ -177,13 +177,12 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
     }, []);
 
     React.useEffect(() => {
-        // Only expand to default size if the pane is collapsed.
-        // If the user has manually resized the pane, keep their layout.
-        if (!collapsedRef.current) {
-            return;
-        }
         if (showPreview || isResultLoaded) {
-            dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
+            // Only expand to default size if the pane is collapsed.
+            // If the user has manually resized the pane, keep their layout.
+            if (collapsedRef.current) {
+                dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
+            }
         } else {
             dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerCollapse);
         }
