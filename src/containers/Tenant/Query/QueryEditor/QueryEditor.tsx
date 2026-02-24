@@ -90,8 +90,6 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
         goToNextQuery,
     } = queriesHistory;
 
-    const isResultLoaded = Boolean(result);
-
     const [querySettings, setQuerySettings] = useQueryExecutionSettings();
     const enableTracingLevel = useTracingLevelOptionAvailable();
     const [lastQueryExecutionSettings, setLastQueryExecutionSettings] =
@@ -174,12 +172,12 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
     }, []);
 
     React.useEffect(() => {
-        if (showPreview || isResultLoaded) {
+        // Only expand to default size if the pane is collapsed.
+        // If the user has manually resized the pane, keep their layout.
+        if (resultVisibilityState.collapsed && showPreview) {
             dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
-        } else {
-            dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerCollapse);
         }
-    }, [showPreview, isResultLoaded]);
+    }, [showPreview, resultVisibilityState.collapsed]);
 
     const handleSendExecuteClick = useEventHandler((text: string, partial?: boolean) => {
         setLastUsedQueryAction(QUERY_ACTIONS.execute);
@@ -249,7 +247,11 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
             }
             dispatch(setIsDirty(false));
         }
-        dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
+        // Only reset pane to default size if it's currently collapsed.
+        // If the user has manually resized the pane, respect their layout.
+        if (resultVisibilityState.collapsed) {
+            dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
+        }
     });
 
     const handleSettingsClick = () => {
@@ -283,7 +285,11 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
 
         dispatch(setShowPreview(false));
 
-        dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
+        // Only reset pane to default size if it's currently collapsed.
+        // If the user has manually resized the pane, respect their layout.
+        if (resultVisibilityState.collapsed) {
+            dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
+        }
     });
 
     const onCollapseResultHandler = () => {
