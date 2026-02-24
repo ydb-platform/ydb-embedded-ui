@@ -30,7 +30,7 @@ import {useCurrentSchema} from '../../TenantContext';
 
 import {QuerySettingsSelect} from './QuerySettingsSelect';
 import {QuerySettingsTimeout} from './QuerySettingsTimeout';
-import {QUERY_SETTINGS_FIELD_SETTINGS} from './constants';
+import {QUERY_SETTINGS_FIELD_SETTINGS, STATISTICS_MODES_WITH_SVG} from './constants';
 import i18n from './i18n';
 
 import './QuerySettingsDialog.scss';
@@ -131,6 +131,16 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
         }
     }, [isResourcePoolsLoading, resourcePools, resourcePool, setValue]);
 
+    const queryStatisticsOptions = React.useMemo(() => {
+        return QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.options.map((option) => {
+            if (!useShowPlanToSvg) {
+                return option;
+            }
+            const isDisabled = !STATISTICS_MODES_WITH_SVG.includes(option.value);
+            return {...option, disabled: isDisabled};
+        });
+    }, [useShowPlanToSvg]);
+
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
             <Dialog.Body className={b('dialog-body')}>
@@ -222,12 +232,9 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                 render={({field}) => (
                                     <QuerySettingsSelect
                                         id="statisticsMode"
-                                        disabled={useShowPlanToSvg}
                                         setting={field.value}
                                         onUpdateSetting={field.onChange}
-                                        settingOptions={
-                                            QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.options
-                                        }
+                                        settingOptions={queryStatisticsOptions}
                                     />
                                 )}
                             />
