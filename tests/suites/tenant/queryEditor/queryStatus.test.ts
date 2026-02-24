@@ -4,11 +4,11 @@ import {STATISTICS_MODES} from '../../../../src/utils/query';
 import {database} from '../../../utils/constants';
 import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {TenantPage} from '../TenantPage';
-import {longRunningQuery, longerRunningStreamQuery} from '../constants';
+import {longRunningQuery, longRunningStreamQuery} from '../constants';
 
 import {QueryEditor} from './models/QueryEditor';
 
-test.describe('Test Query Execution Status', async () => {
+test.describe.only('Test Query Execution Status', async () => {
     const testQuery = 'SELECT 1;'; // Simple query that will generate a plan
 
     test.beforeEach(async ({page}) => {
@@ -76,11 +76,9 @@ test.describe('Test Query Execution Status', async () => {
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
-        await queryEditor.setQuery(longerRunningStreamQuery);
+        await queryEditor.setQuery(longRunningStreamQuery);
         await queryEditor.clickRunButton();
 
-        // longerRunningStreamQuery generates a large result set
-        // After data starts arriving, status should be "Fetching"
         await expect(queryEditor.waitForStatus('Fetching')).resolves.toBe(true);
     });
 
@@ -93,13 +91,10 @@ test.describe('Test Query Execution Status', async () => {
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
-        await queryEditor.setQuery(longerRunningStreamQuery);
+        await queryEditor.setQuery(longRunningStreamQuery);
         await queryEditor.clickRunButton();
 
-        // Wait for fetching phase
         await expect(queryEditor.waitForStatus('Fetching')).resolves.toBe(true);
-
-        // Eventually should complete
         await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
     });
 });
