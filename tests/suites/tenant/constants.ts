@@ -7,19 +7,21 @@ export const longTableSelect = (limit?: number) =>
 
 // 400 is pretty enough
 export const longRunningQuery = new Array(400).fill(simpleQuery).join('');
-export const longRunningStreamQuery = `$sample = AsList(AsStruct(ListFromRange(1, 100000) AS value1, ListFromRange(1, 1000) AS value2, CAST(1 AS Uint32) AS id));
+// 3K × 3K = 9M rows — completes in ~3s locally, enough for streaming + Top queries tests
+export const longRunningStreamQuery = `$sample = AsList(AsStruct(ListFromRange(1, 3000) AS value1, ListFromRange(1, 3000) AS value2, CAST(1 AS Uint32) AS id));
 
 SELECT value1, value2, id FROM as_table($sample) FLATTEN BY (value1);
 `;
-export const longerRunningStreamQuery = `$sample = AsList(AsStruct(ListFromRange(1, 1000000) AS value1, ListFromRange(1, 10000) AS value2, CAST(1 AS Uint32) AS id));
+// 10K × 10K = 100M rows — heavy enough to still be running after 1s (for stop-query tests)
+export const longerRunningStreamQuery = `$sample = AsList(AsStruct(ListFromRange(1, 10000) AS value1, ListFromRange(1, 10000) AS value2, CAST(1 AS Uint32) AS id));
 
 SELECT value1, value2, id FROM as_table($sample) FLATTEN BY (value1);
 `;
-// Lighter streaming query for status transition tests (5K × 50 = 250K rows)
-// Produces multiple streaming chunks but completes in seconds on CI
-export const streamingStatusQuery = `$sample = AsList(AsStruct(ListFromRange(1, 5000) AS value1, ListFromRange(1, 50) AS value2, CAST(1 AS Uint32) AS id));
-
-SELECT value1, value2, id FROM as_table($sample) FLATTEN BY (value1);
+// Light query for streaming status transition tests
+// Used with small output_chunk_max_size to produce many streaming chunks
+export const streamingStatusQuery = `$data = ListFromRange(1, 500000);
+SELECT x, Digest::Sha256(CAST(x AS String)) AS hash
+FROM AS_TABLE(AsList(AsStruct($data AS x))) FLATTEN BY x;
 `;
 export const selectFromMyRowTableQuery = 'select * from `my_row_table`';
 
