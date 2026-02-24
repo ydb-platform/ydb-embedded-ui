@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Copy, Ellipsis, FloppyDisk, FontCursor, Xmark} from '@gravity-ui/icons';
 import type {DropdownMenuItem} from '@gravity-ui/uikit';
-import {DropdownMenu, Flex, Hotkey, Icon, Tab, Text} from '@gravity-ui/uikit';
+import {ActionTooltip, DropdownMenu, Flex, Hotkey, Icon, Tab, Text} from '@gravity-ui/uikit';
 
 import type {QueryTabState} from '../../../../../store/reducers/query/types';
 import {cn} from '../../../../../utils/cn';
@@ -16,7 +16,8 @@ import './EditorTabItem.scss';
 
 const b = cn('editor-tab-item');
 
-const HOTKEY_LABELS = {
+export const HOTKEY_LABELS = {
+    newTab: 'mod+alt+t',
     renameTab: 'mod+alt+r',
     duplicateTab: 'mod+alt+c',
     closeTab: 'mod+backspace',
@@ -223,12 +224,18 @@ export function EditorTabItem({
                             menuProps={{size: 'l'}}
                         />
                     </span>
-                    <span
-                        className={b('tab-action', {close: true, active: isActive})}
-                        onClick={handleCloseClick}
+                    <ActionTooltip
+                        title={i18n('editor-tabs.close')}
+                        placement={['top-start', 'top-end', 'bottom-start', 'bottom-end']}
+                        hotkey={HOTKEY_LABELS.closeTab}
                     >
-                        <Icon data={Xmark} size={12} />
-                    </span>
+                        <span
+                            className={b('tab-action', {close: true, active: isActive})}
+                            onClick={handleCloseClick}
+                        >
+                            <Icon data={Xmark} size={12} />
+                        </span>
+                    </ActionTooltip>
                 </Flex>
             </Flex>
         </Tab>

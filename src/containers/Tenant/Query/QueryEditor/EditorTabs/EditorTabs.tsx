@@ -2,15 +2,16 @@ import React from 'react';
 
 import NiceModal from '@ebay/nice-modal-react';
 import {Plus} from '@gravity-ui/icons';
-import {Button, Flex, Icon, TabList, TabProvider} from '@gravity-ui/uikit';
+import {ActionTooltip, Button, Flex, Icon, TabList, TabProvider} from '@gravity-ui/uikit';
 
 import {cn} from '../../../../../utils/cn';
 import {reachMetricaGoal} from '../../../../../utils/yaMetrica';
 import {SAVE_QUERY_DIALOG} from '../../SaveQuery/SaveQuery';
+import i18n from '../../i18n';
 import {useSavedQueries} from '../../utils/useSavedQueries';
 import {useQueryTabsActions} from '../hooks/useQueryTabsActions';
 
-import {EditorTabItem} from './EditorTabItem';
+import {EditorTabItem, HOTKEY_LABELS} from './EditorTabItem';
 import {RENAME_QUERY_DIALOG} from './RenameQueryDialog';
 
 import './EditorTabs.scss';
@@ -94,11 +95,17 @@ export function EditorTabs() {
                 </TabList>
             </TabProvider>
             <div className={b('add-icon-button')}>
-                <Button view="flat-secondary" size="xs" onClick={handleNewTabClick}>
-                    <Button.Icon>
-                        <Icon data={Plus} size={12} />
-                    </Button.Icon>
-                </Button>
+                <ActionTooltip
+                    title={i18n('editor-tabs.action.new-tab')}
+                    placement={['top-start', 'top-end', 'bottom-start', 'bottom-end']}
+                    hotkey={HOTKEY_LABELS.newTab}
+                >
+                    <Button view="flat-secondary" size="xs" onClick={handleNewTabClick}>
+                        <Button.Icon>
+                            <Icon data={Plus} size={12} />
+                        </Button.Icon>
+                    </Button>
+                </ActionTooltip>
             </div>
         </Flex>
     );
