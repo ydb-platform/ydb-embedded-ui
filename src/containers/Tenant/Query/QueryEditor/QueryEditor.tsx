@@ -169,6 +169,9 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
         initialTenantCommonInfoState,
     );
 
+    const collapsedRef = React.useRef(resultVisibilityState.collapsed);
+    collapsedRef.current = resultVisibilityState.collapsed;
+
     React.useEffect(() => {
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerCollapse);
     }, []);
@@ -176,7 +179,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
     React.useEffect(() => {
         // Only expand to default size if the pane is collapsed.
         // If the user has manually resized the pane, keep their layout.
-        if (!resultVisibilityState.collapsed) {
+        if (!collapsedRef.current) {
             return;
         }
         if (showPreview || isResultLoaded) {
@@ -184,7 +187,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
         } else {
             dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerCollapse);
         }
-    }, [showPreview, resultVisibilityState.collapsed, isResultLoaded]);
+    }, [showPreview, isResultLoaded]);
 
     const handleSendExecuteClick = useEventHandler((text: string, partial?: boolean) => {
         setLastUsedQueryAction(QUERY_ACTIONS.execute);
