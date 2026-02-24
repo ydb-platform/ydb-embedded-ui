@@ -35,6 +35,7 @@ test.describe.only('Test Query Execution Status', async () => {
 
     test('Running query status for running non-streaming query', async ({page}) => {
         const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'off', 'Query Streaming');
 
         await queryEditor.setQuery(longRunningQuery);
         await queryEditor.clickRunButton();
