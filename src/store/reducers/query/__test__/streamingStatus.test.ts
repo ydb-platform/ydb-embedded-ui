@@ -35,7 +35,7 @@ function createStateWithStreamingResult(): QueryState {
     };
 }
 
-describe.only('Streaming query status transitions', () => {
+describe('Streaming query status transitions', () => {
     test('initial streaming query should have status "preparing"', () => {
         const initialState: QueryState = {
             activeTabId: 'tab-1',
