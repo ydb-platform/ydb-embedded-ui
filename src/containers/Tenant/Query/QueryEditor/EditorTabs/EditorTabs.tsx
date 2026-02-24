@@ -9,9 +9,10 @@ import {reachMetricaGoal} from '../../../../../utils/yaMetrica';
 import {SAVE_QUERY_DIALOG} from '../../SaveQuery/SaveQuery';
 import i18n from '../../i18n';
 import {useSavedQueries} from '../../utils/useSavedQueries';
+import {HOTKEY_LABELS} from '../constants';
 import {useQueryTabsActions} from '../hooks/useQueryTabsActions';
 
-import {EditorTabItem, HOTKEY_LABELS} from './EditorTabItem';
+import {EditorTabItem} from './EditorTabItem';
 import {RENAME_QUERY_DIALOG} from './RenameQueryDialog';
 
 import './EditorTabs.scss';

@@ -5,6 +5,7 @@ import {HotkeysPanel as UIKitHotkeysPanel} from '@gravity-ui/navigation';
 import {Hotkey} from '@gravity-ui/uikit';
 import hotkeys from 'hotkeys-js';
 
+import {HOTKEY_LABELS} from '../../../containers/Tenant/Query/QueryEditor/constants';
 import {cn} from '../../../utils/cn';
 import {isMacOS} from '../../../utils/platform';
 import i18n from '../i18n';
@@ -36,6 +37,21 @@ export const DEFAULT_HOTKEY_GROUPS: HotkeysGroup[] = [
         ],
     },
 ];
+
+export const EDITOR_TABS_HOTKEY_GROUP: HotkeysGroup = {
+    title: 'Editor Tabs',
+    items: [
+        {title: i18n('hotkeys.new-tab'), value: HOTKEY_LABELS.newTab},
+        {title: i18n('hotkeys.close-tab'), value: HOTKEY_LABELS.closeTab},
+        {title: i18n('hotkeys.rename-tab'), value: HOTKEY_LABELS.renameTab},
+        {title: i18n('hotkeys.duplicate-tab'), value: HOTKEY_LABELS.duplicateTab},
+        {title: i18n('hotkeys.next-tab'), value: HOTKEY_LABELS.nextTab},
+        {title: i18n('hotkeys.previous-tab'), value: HOTKEY_LABELS.previousTab},
+        {title: i18n('hotkeys.close-other-tabs'), value: HOTKEY_LABELS.closeOtherTabs},
+        {title: i18n('hotkeys.close-all-tabs'), value: HOTKEY_LABELS.closeAllTabs},
+        {title: i18n('hotkeys.save-query-as'), value: HOTKEY_LABELS.saveQueryAs},
+    ],
+};
 
 export interface HotkeysPanelProps {
     visible: boolean;

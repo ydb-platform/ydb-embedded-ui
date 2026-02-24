@@ -8,6 +8,7 @@ import type {QueryTabState} from '../../../../../store/reducers/query/types';
 import {cn} from '../../../../../utils/cn';
 import i18n from '../../i18n';
 import {isQueryCancelledError} from '../../utils/isQueryCancelledError';
+import {HOTKEY_LABELS} from '../constants';
 
 import type {TabExecutionStatus} from './TabExecutionStatusIndicator';
 import {TabExecutionStatusIndicator} from './TabExecutionStatusIndicator';
@@ -15,16 +16,6 @@ import {TabExecutionStatusIndicator} from './TabExecutionStatusIndicator';
 import './EditorTabItem.scss';
 
 const b = cn('editor-tab-item');
-
-export const HOTKEY_LABELS = {
-    newTab: 'mod+alt+t',
-    renameTab: 'mod+alt+r',
-    duplicateTab: 'mod+alt+c',
-    closeTab: 'mod+backspace',
-    closeOtherTabs: 'mod+alt+backspace',
-    closeAllTabs: 'mod+shift+backspace',
-    saveQueryAs: 'mod+shift+s',
-} as const;
 
 function getTabExecutionStatus(tab: QueryTabState): TabExecutionStatus | undefined {
     const result = tab.result;

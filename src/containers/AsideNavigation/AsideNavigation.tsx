@@ -7,11 +7,16 @@ import type {IconData} from '@gravity-ui/uikit';
 import {useHistory} from 'react-router-dom';
 
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
+import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {useSetting} from '../../utils/hooks';
 
 import {InformationPopup} from './InformationPopup';
-import {useHotkeysPanel} from './hooks/useHotkeysPanel';
+import {
+    DEFAULT_HOTKEY_GROUPS,
+    EDITOR_TABS_HOTKEY_GROUP,
+    useHotkeysPanel,
+} from './hooks/useHotkeysPanel';
 import i18n from './i18n';
 
 import userSecret from '../../assets/icons/user-secret.svg';
@@ -91,10 +96,18 @@ export function AsideNavigation(props: AsideNavigationProps) {
         setVisiblePanel(undefined);
     }, []);
 
+    const hotkeyGroups = React.useMemo(() => {
+        if (uiFactory.enableMultiTabQueryEditor) {
+            return [...DEFAULT_HOTKEY_GROUPS, EDITOR_TABS_HOTKEY_GROUP];
+        }
+        return DEFAULT_HOTKEY_GROUPS;
+    }, []);
+
     const {renderPanel: renderHotkeysPanel} = useHotkeysPanel({
         isPanelVisible: visiblePanel === Panel.Hotkeys,
         closePanel,
         openPanel: openHotkeysPanel,
+        hotkeyGroups,
     });
 
     const renderInformationPopup = () => {

@@ -1,5 +1,6 @@
 import React from 'react';
 
+import NiceModal from '@ebay/nice-modal-react';
 import type {Settings} from '@gravity-ui/react-data-table';
 import {Loader} from '@gravity-ui/uikit';
 import {isEqual} from 'lodash';
@@ -13,6 +14,8 @@ import {
 import type {useQueriesHistory} from '../../../../store/reducers/query/hooks';
 import {
     queryApi,
+    renameQueryTab,
+    selectActiveTab,
     selectActiveTabId,
     selectLastExecutedQueryText,
     selectResult,
@@ -53,9 +56,14 @@ import {PreviewContainer} from '../Preview/Preview';
 import {QueryEditorControls} from '../QueryEditorControls/QueryEditorControls';
 import {QueryResultViewer} from '../QueryResult/QueryResultViewer';
 import {QuerySettingsDialog} from '../QuerySettingsDialog/QuerySettingsDialog';
+import {SAVE_QUERY_DIALOG} from '../SaveQuery/SaveQuery';
+import {useSavedQueries} from '../utils/useSavedQueries';
 
 import {EditorTabs} from './EditorTabs/EditorTabs';
+import {RENAME_QUERY_DIALOG} from './EditorTabs/RenameQueryDialog';
 import {YqlEditor} from './YqlEditor/YqlEditor';
+import {useEditorTabsGlobalHotkeys} from './hooks/useEditorTabsGlobalHotkeys';
+import {useQueryTabsActions} from './hooks/useQueryTabsActions';
 import {queryExecutionManagerInstance} from './utils/queryExecutionManager';
 
 import './QueryEditor.scss';
@@ -126,6 +134,62 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
     const [streamQuery] = queryApi.useUseStreamQueryMutation();
 
     const isMultiTabQueryEditorEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
+
+    const {
+        activeTabId: tabsActiveTabId,
+        handleNewTabClick,
+        handleCloseActiveTab,
+        handleCloseOtherTabs: closeOtherTabs,
+        handleCloseAllTabs,
+        handleDuplicateTab,
+        handleNextTab,
+        handlePreviousTab,
+    } = useQueryTabsActions();
+
+    const activeTab = useTypedSelector(selectActiveTab);
+    const {savedQueries, saveQuery} = useSavedQueries();
+
+    const handleGlobalRenameTab = React.useCallback(() => {
+        const tabIdToRename = tabsActiveTabId;
+        NiceModal.show(RENAME_QUERY_DIALOG, {
+            title: activeTab?.title || '',
+            onRename: (title: string) => {
+                dispatch(renameQueryTab({tabId: tabIdToRename, title}));
+            },
+        });
+    }, [tabsActiveTabId, activeTab?.title, dispatch]);
+
+    const handleGlobalDuplicateTab = React.useCallback(() => {
+        handleDuplicateTab(tabsActiveTabId);
+    }, [handleDuplicateTab, tabsActiveTabId]);
+
+    const handleGlobalCloseOtherTabs = React.useCallback(() => {
+        closeOtherTabs(tabsActiveTabId);
+    }, [closeOtherTabs, tabsActiveTabId]);
+
+    const handleGlobalSaveQueryAs = React.useCallback(() => {
+        const commonModalProps = {savedQueries, onSaveQuery: saveQuery} as const;
+        if (activeTab?.isTitleUserDefined) {
+            NiceModal.show(SAVE_QUERY_DIALOG, {
+                ...commonModalProps,
+                defaultQueryName: activeTab.title,
+            });
+            return;
+        }
+        NiceModal.show(SAVE_QUERY_DIALOG, commonModalProps);
+    }, [activeTab?.isTitleUserDefined, activeTab?.title, savedQueries, saveQuery]);
+
+    useEditorTabsGlobalHotkeys(isMultiTabQueryEditorEnabled, {
+        handleNewTab: handleNewTabClick,
+        handleCloseActiveTab,
+        handleRenameTab: handleGlobalRenameTab,
+        handleDuplicateTab: handleGlobalDuplicateTab,
+        handleNextTab,
+        handlePreviousTab,
+        handleCloseOtherTabs: handleGlobalCloseOtherTabs,
+        handleCloseAllTabs,
+        handleSaveQueryAs: handleGlobalSaveQueryAs,
+    });
 
     const [isEditorReady, setIsEditorReady] = React.useState(false);
     const handleEditorReady = React.useCallback(() => setIsEditorReady(true), []);
