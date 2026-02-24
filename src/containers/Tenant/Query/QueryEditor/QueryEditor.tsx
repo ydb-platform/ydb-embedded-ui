@@ -90,6 +90,8 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
         goToNextQuery,
     } = queriesHistory;
 
+    const isResultLoaded = Boolean(result);
+
     const [querySettings, setQuerySettings] = useQueryExecutionSettings();
     const enableTracingLevel = useTracingLevelOptionAvailable();
     const [lastQueryExecutionSettings, setLastQueryExecutionSettings] =
@@ -174,10 +176,15 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
     React.useEffect(() => {
         // Only expand to default size if the pane is collapsed.
         // If the user has manually resized the pane, keep their layout.
-        if (resultVisibilityState.collapsed && showPreview) {
-            dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
+        if (resultVisibilityState.collapsed) {
+            return;
         }
-    }, [showPreview, resultVisibilityState.collapsed]);
+        if (showPreview || isResultLoaded) {
+            dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
+        } else {
+            dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerCollapse);
+        }
+    }, [showPreview, resultVisibilityState.collapsed, isResultLoaded]);
 
     const handleSendExecuteClick = useEventHandler((text: string, partial?: boolean) => {
         setLastUsedQueryAction(QUERY_ACTIONS.execute);
