@@ -1,4 +1,5 @@
 {
   "action_apply": "Don't save",
-  "context_unsaved-changes-warning": "You have unsaved changes in query editor.\nDo you want to proceed?"
+  "context_unsaved-changes-warning": "You have unsaved changes in query editor.\nDo you want to proceed?",
+  "context_unsaved-tab-warning": "You have unsaved changes in '{{tabTitle}}'.\nDo you want to proceed?"
 }

@@ -18,6 +18,19 @@ import {reachMetricaGoal} from '../../../../../utils/yaMetrica';
 import i18n from '../../i18n';
 import {queryExecutionManagerInstance} from '../utils/queryExecutionManager';
 
+/**
+ * Yields to the event loop before dispatching active tab change.
+ * This lets pending browser events from DropdownMenu (close, focus restoration)
+ * settle before we switch tabs to show the confirmation dialog.
+ */
+async function activateTabAndWait(
+    dispatch: ReturnType<typeof useTypedDispatch>,
+    tabId: string,
+): Promise<void> {
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    dispatch(setActiveQueryTab({tabId}));
+}
+
 function getNewQueryTitle(counter: number): string {
     if (counter === 0) {
         return i18n('editor-tabs.default-title');
@@ -71,30 +84,44 @@ export function useQueryTabsActions() {
     const handleCloseOtherTabs = React.useCallback(
         async (baseTabId: string) => {
             const tabsToClose = tabsOrder.filter((tabId) => tabId !== baseTabId);
-            const hasDirtyTabs = tabsToClose.some((tabId) => tabsById[tabId]?.isDirty);
-            if (hasDirtyTabs) {
-                const confirmed = await getConfirmation();
+            const dirtyTabIds = tabsToClose.filter((id) => tabsById[id]?.isDirty);
+            const cleanTabIds = tabsToClose.filter((id) => !tabsById[id]?.isDirty);
+
+            cleanTabIds.forEach(closeTabImmediate);
+
+            for (const tabId of dirtyTabIds) {
+                const tab = tabsById[tabId];
+                await activateTabAndWait(dispatch, tabId);
+                const confirmed = await getConfirmation(tab?.title);
                 if (!confirmed) {
-                    return;
+                    break;
                 }
+                closeTabImmediate(tabId);
             }
+
             reachMetricaGoal('closeQueryTab', {type: 'other', tabsCount: tabsOrder.length});
-            tabsToClose.forEach(closeTabImmediate);
         },
-        [closeTabImmediate, tabsById, tabsOrder],
+        [closeTabImmediate, dispatch, tabsById, tabsOrder],
     );
 
     const handleCloseAllTabs = React.useCallback(async () => {
-        const hasDirtyTabs = tabsOrder.some((tabId) => tabsById[tabId]?.isDirty);
-        if (hasDirtyTabs) {
-            const confirmed = await getConfirmation();
+        const dirtyTabIds = tabsOrder.filter((id) => tabsById[id]?.isDirty);
+        const cleanTabIds = tabsOrder.filter((id) => !tabsById[id]?.isDirty);
+
+        cleanTabIds.forEach(closeTabImmediate);
+
+        for (const tabId of dirtyTabIds) {
+            const tab = tabsById[tabId];
+            await activateTabAndWait(dispatch, tabId);
+            const confirmed = await getConfirmation(tab?.title);
             if (!confirmed) {
-                return;
+                break;
             }
+            closeTabImmediate(tabId);
         }
+
         reachMetricaGoal('closeQueryTab', {type: 'all', tabsCount: tabsOrder.length});
-        tabsOrder.forEach(closeTabImmediate);
-    }, [closeTabImmediate, tabsById, tabsOrder]);
+    }, [closeTabImmediate, dispatch, tabsById, tabsOrder]);
 
     const handleDuplicateTab = React.useCallback(
         (baseTabId: string) => {

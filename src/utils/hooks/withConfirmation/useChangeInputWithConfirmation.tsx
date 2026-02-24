@@ -36,10 +36,12 @@ function ExtendedSaveQueryButton() {
     return <SaveQueryButton view="action" size="l" dialogProps={dialogProps} />;
 }
 
-export async function getConfirmation(): Promise<boolean> {
+export async function getConfirmation(tabTitle?: string): Promise<boolean> {
     return await NiceModal.show(CONFIRMATION_DIALOG, {
         id: CONFIRMATION_DIALOG,
-        caption: i18n('context_unsaved-changes-warning'),
+        caption: tabTitle
+            ? i18n('context_unsaved-tab-warning', {tabTitle})
+            : i18n('context_unsaved-changes-warning'),
         textButtonApply: i18n('action_apply'),
         propsButtonApply: {view: 'l'},
         renderButtons: (buttonApply: React.ReactNode, buttonCancel: React.ReactNode) => {
