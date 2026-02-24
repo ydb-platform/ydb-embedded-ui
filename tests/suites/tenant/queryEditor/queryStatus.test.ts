@@ -2,8 +2,9 @@ import {expect, test} from '@playwright/test';
 
 import {STATISTICS_MODES} from '../../../../src/utils/query';
 import {database} from '../../../utils/constants';
+import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {TenantPage} from '../TenantPage';
-import {longRunningQuery} from '../constants';
+import {longRunningQuery, longerRunningStreamQuery} from '../constants';
 
 import {QueryEditor} from './models/QueryEditor';
 
@@ -32,7 +33,7 @@ test.describe('Test Query Execution Status', async () => {
         await expect(queryEditor.isResultsControlsHidden()).resolves.toBe(true);
     });
 
-    test('Running query status for running query', async ({page}) => {
+    test('Running query status for running non-streaming query', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         await queryEditor.setQuery(longRunningQuery);
@@ -64,5 +65,41 @@ test.describe('Test Query Execution Status', async () => {
 
         const statusElement = await queryEditor.getExecutionStatus();
         await expect(statusElement).toBe('Failed');
+    });
+
+    test('Streaming query shows "Fetching" status while receiving data', async ({
+        page,
+        browserName,
+    }) => {
+        test.skip(browserName === 'webkit');
+
+        const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'on', 'Query Streaming');
+
+        await queryEditor.setQuery(longerRunningStreamQuery);
+        await queryEditor.clickRunButton();
+
+        // longerRunningStreamQuery generates a large result set
+        // After data starts arriving, status should be "Fetching"
+        await expect(queryEditor.waitForStatus('Fetching')).resolves.toBe(true);
+    });
+
+    test('Streaming query transitions from "Fetching" to "Completed"', async ({
+        page,
+        browserName,
+    }) => {
+        test.skip(browserName === 'webkit');
+
+        const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'on', 'Query Streaming');
+
+        await queryEditor.setQuery(longerRunningStreamQuery);
+        await queryEditor.clickRunButton();
+
+        // Wait for fetching phase
+        await expect(queryEditor.waitForStatus('Fetching')).resolves.toBe(true);
+
+        // Eventually should complete
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
     });
 });

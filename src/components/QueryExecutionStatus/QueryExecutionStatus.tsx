@@ -7,6 +7,7 @@ import {Icon, Label, Spin, Text} from '@gravity-ui/uikit';
 
 import {isQueryCancelledError} from '../../containers/Tenant/Query/utils/isQueryCancelledError';
 import {selectQueryDuration} from '../../store/reducers/query/query';
+import type {StreamingStatus} from '../../store/reducers/query/types';
 import {cn} from '../../utils/cn';
 import {HOUR_IN_SECONDS, SECOND_IN_MS} from '../../utils/constants';
 import {useTypedSelector} from '../../utils/hooks';
@@ -22,9 +23,21 @@ interface QueryExecutionStatusProps {
     className?: string;
     error?: unknown;
     loading?: boolean;
+    streamingStatus?: StreamingStatus;
 }
 
-export const QueryExecutionStatus = ({className, error, loading}: QueryExecutionStatusProps) => {
+const STREAMING_STATUS_LABELS: Record<StreamingStatus, string> = {
+    preparing: 'Preparing',
+    running: 'Running',
+    fetching: 'Fetching',
+};
+
+export const QueryExecutionStatus = ({
+    className,
+    error,
+    loading,
+    streamingStatus,
+}: QueryExecutionStatusProps) => {
     let icon: React.ReactNode;
     let label: string;
     let theme: LabelProps['theme'];
@@ -47,7 +60,7 @@ export const QueryExecutionStatus = ({className, error, loading}: QueryExecution
         theme = 'info';
         textColor = 'info-heavy';
         icon = <Spin size="xs" />;
-        label = 'Running';
+        label = streamingStatus ? STREAMING_STATUS_LABELS[streamingStatus] : 'Running';
     } else if (isAxiosError(error) && error.code === 'ECONNABORTED') {
         theme = 'danger';
         textColor = 'danger-heavy';
