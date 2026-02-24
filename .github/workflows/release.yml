@@ -30,6 +30,7 @@ jobs:
         uses: googleapis/release-please-action@v4
         with:
           target-branch: ${{ github.ref_name }}
+          token: ${{ secrets.YDB_PLATFORM_BOT_TOKEN_REPO }}
 
       # Publication steps - only run if release was created
       - name: Publish to npm
