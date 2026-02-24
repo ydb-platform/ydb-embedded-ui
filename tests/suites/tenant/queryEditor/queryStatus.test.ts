@@ -8,7 +8,7 @@ import {longRunningQuery, longRunningStreamQuery} from '../constants';
 
 import {QueryEditor} from './models/QueryEditor';
 
-test.describe.only('Test Query Execution Status', async () => {
+test.describe('Test Query Execution Status', async () => {
     const testQuery = 'SELECT 1;'; // Simple query that will generate a plan
 
     test.beforeEach(async ({page}) => {
