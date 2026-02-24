@@ -140,7 +140,7 @@ test.describe('Test Plan to SVG functionality', async () => {
         await expect(page.locator('text="Download Execution Plan"')).toBeVisible();
     });
 
-    test('Statistics setting becomes disabled when execution plan experiment is enabled', async ({
+    test('Some statistics options becomes disabled when execution plan experiment is enabled', async ({
         page,
     }) => {
         const queryEditor = new QueryEditor(page);
@@ -148,8 +148,19 @@ test.describe('Test Plan to SVG functionality', async () => {
         // Open settings dialog
         await queryEditor.clickGearButton();
 
-        // Statistics is enabled
-        await expect(queryEditor.settingsDialog.isStatisticsSelectDisabled()).resolves.toBe(false);
+        // All statistics options are enabled before experiment
+        await expect(
+            queryEditor.settingsDialog.isStatisticsOptionDisabled(STATISTICS_MODES.none),
+        ).resolves.toBe(false);
+        await expect(
+            queryEditor.settingsDialog.isStatisticsOptionDisabled(STATISTICS_MODES.basic),
+        ).resolves.toBe(false);
+        await expect(
+            queryEditor.settingsDialog.isStatisticsOptionDisabled(STATISTICS_MODES.full),
+        ).resolves.toBe(false);
+        await expect(
+            queryEditor.settingsDialog.isStatisticsOptionDisabled(STATISTICS_MODES.profile),
+        ).resolves.toBe(false);
 
         await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
 
@@ -159,8 +170,21 @@ test.describe('Test Plan to SVG functionality', async () => {
         // Open settings dialog
         await queryEditor.clickGearButton();
 
-        // Verify statistics mode is disabled
-        await expect(queryEditor.settingsDialog.isStatisticsSelectDisabled()).resolves.toBe(true);
+        // Options not compatible with SVG are disabled
+        await expect(
+            queryEditor.settingsDialog.isStatisticsOptionDisabled(STATISTICS_MODES.none),
+        ).resolves.toBe(true);
+        await expect(
+            queryEditor.settingsDialog.isStatisticsOptionDisabled(STATISTICS_MODES.basic),
+        ).resolves.toBe(true);
+
+        // Options compatible with SVG remain enabled
+        await expect(
+            queryEditor.settingsDialog.isStatisticsOptionDisabled(STATISTICS_MODES.full),
+        ).resolves.toBe(false);
+        await expect(
+            queryEditor.settingsDialog.isStatisticsOptionDisabled(STATISTICS_MODES.profile),
+        ).resolves.toBe(false);
     });
 
     test('Statistics mode changes when toggling execution plan experiment', async ({page}) => {

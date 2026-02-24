@@ -1,5 +1,6 @@
 import type {Locator, Page} from '@playwright/test';
 
+import type {StatisticsMode} from '../../../../../src/types/store/query';
 import type {
     QUERY_MODES,
     STATISTICS_MODES,
@@ -223,9 +224,17 @@ export class SettingsDialog {
         return await this.timeoutLabel.isVisible();
     }
 
-    async isStatisticsSelectDisabled() {
+    async isStatisticsOptionDisabled(mode: StatisticsMode) {
         await this.statisticsModeSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return this.statisticsModeSelect.locator('.g-select-control_disabled').isVisible();
+        await this.statisticsModeSelect.click();
+        await this.selectPopup.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        const option = this.selectPopup.locator(`.ydb-query-settings-select__item_type_${mode}`);
+        const isDisabled = await option
+            .evaluate((el) => el.classList.contains('ydb-query-settings-select__item_disabled'))
+            .catch(() => false);
+        // Close the popup by pressing Escape
+        await this.page.keyboard.press('Escape');
+        return isDisabled;
     }
 
     async hoverStatisticsSelect() {
