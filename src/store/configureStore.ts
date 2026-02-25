@@ -50,12 +50,22 @@ function _configureStore<
         preloadedState,
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
-                immutableCheck: checksDisabled ? false : undefined,
+                immutableCheck: checksDisabled
+                    ? false
+                    : {
+                          ignoredPaths: ['query.tabsById'],
+                      },
                 serializableCheck: checksDisabled
                     ? false
                     : {
-                          ignoredPaths: ['api'],
-                          ignoredActions: ['api/sendQuery/rejected'],
+                          ignoredPaths: ['api', 'query.tabsById'],
+                          ignoredActions: [
+                              'api/sendQuery/rejected',
+                              'query/addStreamingChunks',
+                              'query/setStreamSession',
+                              'query/setStreamQueryResponse',
+                              'query/setQueryResult',
+                          ],
                       },
             }).concat(locationMiddleware, ...middleware),
     });
