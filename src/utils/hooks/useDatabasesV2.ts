@@ -1,9 +1,9 @@
-import {useDatabasesAvailable} from '../../store/reducers/capabilities/hooks';
+import {useEmMetaEvailable} from '../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 
 export function useDatabasesV2() {
     const {settings} = useClusterBaseInfo();
-    const isMetaDatabasesAvailable = useDatabasesAvailable();
+    const isMetaDatabasesAvailable = useEmMetaEvailable();
 
     return settings?.use_meta_proxy !== false && isMetaDatabasesAvailable;
 }

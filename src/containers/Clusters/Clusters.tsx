@@ -9,10 +9,7 @@ import {ResizeableDataTable} from '../../components/ResizeableDataTable/Resizeab
 import {Search} from '../../components/Search';
 import {TableColumnSetup} from '../../components/TableColumnSetup/TableColumnSetup';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
-import {
-    useDeleteClusterFeatureAvailable,
-    useEditClusterFeatureAvailable,
-} from '../../store/reducers/capabilities/hooks';
+import {useEmMetaEvailable} from '../../store/reducers/capabilities/hooks';
 import {changeClustersFilters, clustersApi} from '../../store/reducers/clusters/clusters';
 import {
     filterClusters,
@@ -51,10 +48,9 @@ export function Clusters({scrollContainerRef}: ClustersProps) {
 
     const dispatch = useTypedDispatch();
 
-    const isEditClusterAvailable =
-        useEditClusterFeatureAvailable() && uiFactory.onEditCluster !== undefined;
-    const isDeleteClusterAvailable =
-        useDeleteClusterFeatureAvailable() && uiFactory.onDeleteCluster !== undefined;
+    const emMetaAvailable = useEmMetaEvailable();
+    const isEditClusterAvailable = emMetaAvailable && uiFactory.onEditCluster !== undefined;
+    const isDeleteClusterAvailable = emMetaAvailable && uiFactory.onDeleteCluster !== undefined;
 
     const clusterName = useTypedSelector(selectClusterNameFilter);
     const status = useTypedSelector(selectStatusFilter);
