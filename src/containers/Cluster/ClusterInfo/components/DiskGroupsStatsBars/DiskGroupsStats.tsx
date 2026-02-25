@@ -18,16 +18,21 @@ interface GroupsStatsPopupContentProps {
 function DiskGroupStats({stats, storageType}: GroupsStatsPopupContentProps) {
     const {erasure} = stats;
 
+    const availableGroups = stats.totalGroups - stats.createdGroups;
+
+    const availableGroupsString =
+        availableGroups === 1
+            ? i18n('title_available-one')
+            : i18n('title_available-other', {
+                  count: formatNumber(stats.totalGroups - stats.createdGroups),
+              });
+
     return (
         <Flex direction="column" gap={2}>
             <Flex justifyContent="space-between" alignItems="center">
                 <Text variant="subheader-1">{storageType}</Text>
                 <Flex gap={4} wrap="nowrap" alignItems="center">
-                    <Label theme="normal">
-                        {i18n('title_available', {
-                            count: formatNumber(stats.totalGroups - stats.createdGroups),
-                        })}
-                    </Label>
+                    <Label theme="normal">{availableGroupsString}</Label>
                     <Text color="secondary">
                         {i18n('title_allocated', {
                             used: formatNumber(stats.createdGroups),
