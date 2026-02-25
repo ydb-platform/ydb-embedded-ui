@@ -87,7 +87,7 @@ export const ClusterInfo = ({
     };
 
     const renderStorageGroupsSection = () => {
-        if (loading || !groupStats) {
+        if (loading || Object.keys(groupStats).length === 0) {
             return null;
         }
         return (

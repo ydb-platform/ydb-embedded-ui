@@ -45,6 +45,7 @@ function DiskGroupStats({stats, storageType}: GroupsStatsPopupContentProps) {
                 value={stats.createdGroups}
                 total={stats.totalGroups}
                 labelStart={erasure}
+                ariaLabel={i18n('context_storage-group-allocation-progress')}
             />
         </Flex>
     );

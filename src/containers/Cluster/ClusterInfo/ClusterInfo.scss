@@ -40,7 +40,7 @@
         &_no-details {
             @container overview-wrapper (min-width: 1342px) {
                 grid-template-areas: 'storage' 'bridge';
-                grid-template-columns: var(--cluster-overview-section) 1fr;
+                grid-template-columns: auto;
             }
         }
     }

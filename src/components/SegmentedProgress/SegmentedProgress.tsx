@@ -11,9 +11,16 @@ export interface SegmentedProgressProps {
     total: number;
     className?: string;
     labelStart?: string;
+    ariaLabel?: string;
 }
 
-export function SegmentedProgress({value, total, className, labelStart}: SegmentedProgressProps) {
+export function SegmentedProgress({
+    value,
+    total,
+    className,
+    labelStart,
+    ariaLabel,
+}: SegmentedProgressProps) {
     const percentUsed = total > 0 ? (value / total) * 100 : 0;
     const normalizedUsed =
         percentUsed < 1 ? Math.round(percentUsed * 10) / 10 : Math.round(percentUsed);
@@ -25,6 +32,7 @@ export function SegmentedProgress({value, total, className, labelStart}: Segment
                 wrap="nowrap"
                 className={b(null, className)}
                 role="progressbar"
+                aria-label={ariaLabel}
                 aria-valuemin={0}
                 aria-valuemax={100}
                 aria-valuenow={normalizedUsed}
