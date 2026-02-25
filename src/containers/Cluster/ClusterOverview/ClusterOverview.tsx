@@ -113,8 +113,9 @@ function ClusterDoughnuts({cluster, loading, collapsed}: ClusterOverviewProps) {
         return <ClusterDashboardSkeleton collapsed={collapsed} />;
     }
     const metricsCards: React.ReactNode[] = [];
-    if (isClusterInfoV2(cluster)) {
-        const {CoresUsed, NumberOfCpus, CoresTotal, MapStorageUsed, MapStorageTotal} = cluster;
+    const isClusterV2 = isClusterInfoV2(cluster);
+    if (isClusterV2) {
+        const {CoresUsed, NumberOfCpus, CoresTotal} = cluster;
         const total = CoresTotal ?? NumberOfCpus;
         if (valueIsDefined(CoresUsed) && valueIsDefined(total)) {
             metricsCards.push(
@@ -126,26 +127,31 @@ function ClusterDoughnuts({cluster, loading, collapsed}: ClusterOverviewProps) {
                 />,
             );
         }
-        if (valueIsDefined(MapStorageUsed) && valueIsDefined(MapStorageTotal)) {
-            const storageTypes = Array.from(
-                new Set(Object.keys(MapStorageUsed).concat(Object.keys(MapStorageTotal))),
-            );
-            storageTypes.forEach((storageType) => {
-                const used = MapStorageUsed[storageType];
-                const total = MapStorageTotal[storageType];
-                if (valueIsDefined(used) && valueIsDefined(total)) {
-                    metricsCards.push(
-                        <ClusterMetricsStorage
-                            type={storageType}
-                            key={`map-storage-${storageType}`}
-                            value={used}
-                            capacity={total}
-                            collapsed={collapsed}
-                        />,
-                    );
-                }
-            });
-        }
+    }
+    if (
+        isClusterV2 &&
+        valueIsDefined(cluster.MapStorageUsed) &&
+        valueIsDefined(cluster.MapStorageTotal)
+    ) {
+        const {MapStorageUsed, MapStorageTotal} = cluster;
+        const storageTypes = Array.from(
+            new Set(Object.keys(MapStorageUsed).concat(Object.keys(MapStorageTotal))),
+        );
+        storageTypes.forEach((storageType) => {
+            const used = MapStorageUsed[storageType];
+            const total = MapStorageTotal[storageType];
+            if (valueIsDefined(used) && valueIsDefined(total)) {
+                metricsCards.push(
+                    <ClusterMetricsStorage
+                        type={storageType}
+                        key={`map-storage-${storageType}`}
+                        value={used}
+                        capacity={total}
+                        collapsed={collapsed}
+                    />,
+                );
+            }
+        });
     } else {
         const {StorageTotal, StorageUsed} = cluster;
         if (valueIsDefined(StorageTotal) && valueIsDefined(StorageUsed)) {

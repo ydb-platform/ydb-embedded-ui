@@ -24,7 +24,7 @@ function DiskGroupStats({stats, storageType}: GroupsStatsPopupContentProps) {
         availableGroups === 1
             ? i18n('title_available-one')
             : i18n('title_available-other', {
-                  count: formatNumber(stats.totalGroups - stats.createdGroups),
+                  count: formatNumber(availableGroups),
               });
 
     return (

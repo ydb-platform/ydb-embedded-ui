@@ -1,3 +1,5 @@
+import React from 'react';
+
 import {Flex, Text} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
@@ -22,8 +24,18 @@ export function SegmentedProgress({
     ariaLabel,
 }: SegmentedProgressProps) {
     const percentUsed = total > 0 ? (value / total) * 100 : 0;
-    const normalizedUsed =
-        percentUsed < 1 ? Math.round(percentUsed * 10) / 10 : Math.round(percentUsed);
+    const normalizedUsed = React.useMemo(() => {
+        if (percentUsed < 0) {
+            return 0;
+        }
+        if (percentUsed > 100) {
+            return 100;
+        }
+        if (percentUsed < 1) {
+            return Math.round(percentUsed * 10) / 10;
+        }
+        return Math.round(percentUsed);
+    }, [percentUsed]);
     return (
         <Flex direction="column" gap={1}>
             <Flex
