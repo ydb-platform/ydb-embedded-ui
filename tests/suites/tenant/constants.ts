@@ -18,9 +18,9 @@ export const longerRunningStreamQuery = `$data = ListFromRange(1, 20000000);
 SELECT
     Digest::Sha256(CAST(x AS String)) AS h1,
     Digest::Blake2B(CAST(x AS String)) AS h2,
-    Digest::Md5Hex(CAST(x AS String)) AS h3,
-    Digest::Sha1(CAST(x AS String)) AS h4,
-    Digest::Argon2(CAST(x AS String), "salt1234") AS hash
+    Digest::Argon2(CAST(x AS String), "salt1237") AS h3,
+    Digest::Argon2(CAST(x AS String), "salt1236") AS h4,
+    Digest::Argon2(CAST(x AS String), "salt1234") AS h5
 FROM AS_TABLE(AsList(AsStruct($data AS x))) FLATTEN BY x;
 `;
 // Light query for streaming status transition tests
