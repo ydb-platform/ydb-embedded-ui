@@ -7,13 +7,13 @@ import {getDiagramValues} from '../utils';
 import {ClusterMetricsCardContent} from './ClusterMetricsCard';
 
 interface ClusterMetricsStorageProps extends ClusterMetricsCommonProps {
-    groups: number;
+    type?: string;
 }
 
 export function ClusterMetricsStorage({
     value,
+    type,
     capacity,
-    groups,
     collapsed,
     ...rest
 }: ClusterMetricsStorageProps) {
@@ -24,16 +24,24 @@ export function ClusterMetricsStorage({
         ...rest,
     });
 
+    const normalizedType = type === 'ROT' ? 'HDD' : type;
+
+    const title = type
+        ? i18n('title_storage-by-type', {type: normalizedType})
+        : i18n('title_storage');
+
     return (
         <ClusterMetricsCardContent
             status={status}
             fillWidth={fill}
-            title={i18n('title_storage')}
+            title={title}
             collapsed={collapsed}
             legend={{
                 main: legend,
-                secondary: i18n('context_storage', {count: groups}),
-                note: i18n('context_storage-description'),
+                secondary: title,
+                note: type
+                    ? i18n('context_storage-by-type-description')
+                    : i18n('context_storage-total-description'),
             }}
         >
             <DoughnutMetrics.Value>{percents}</DoughnutMetrics.Value>

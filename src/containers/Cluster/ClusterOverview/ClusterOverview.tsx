@@ -18,7 +18,6 @@ import {useResizeObserverTrigger} from '../../../utils/hooks/useResizeObserverTr
 import {useSetting} from '../../../utils/hooks/useSetting';
 import {ClusterInfo} from '../ClusterInfo/ClusterInfo';
 import i18n from '../i18n';
-import {getTotalStorageGroupsUsed} from '../utils';
 
 import {ClusterDashboardSkeleton} from './components/ClusterMetricsCard';
 import {ClusterMetricsCores} from './components/ClusterMetricsCores';
@@ -109,13 +108,13 @@ function ClusterDashboard({collapsed, ...props}: ClusterDashboardProps) {
     );
 }
 
-function ClusterDoughnuts({cluster, groupStats = {}, loading, collapsed}: ClusterOverviewProps) {
+function ClusterDoughnuts({cluster, loading, collapsed}: ClusterOverviewProps) {
     if (loading) {
         return <ClusterDashboardSkeleton collapsed={collapsed} />;
     }
     const metricsCards: React.ReactNode[] = [];
     if (isClusterInfoV2(cluster)) {
-        const {CoresUsed, NumberOfCpus, CoresTotal} = cluster;
+        const {CoresUsed, NumberOfCpus, CoresTotal, MapStorageUsed, MapStorageTotal} = cluster;
         const total = CoresTotal ?? NumberOfCpus;
         if (valueIsDefined(CoresUsed) && valueIsDefined(total)) {
             metricsCards.push(
@@ -127,20 +126,40 @@ function ClusterDoughnuts({cluster, groupStats = {}, loading, collapsed}: Cluste
                 />,
             );
         }
+        if (valueIsDefined(MapStorageUsed) && valueIsDefined(MapStorageTotal)) {
+            const storageTypes = Array.from(
+                new Set(Object.keys(MapStorageUsed).concat(Object.keys(MapStorageTotal))),
+            );
+            storageTypes.forEach((storageType) => {
+                const used = MapStorageUsed[storageType];
+                const total = MapStorageTotal[storageType];
+                if (valueIsDefined(used) && valueIsDefined(total)) {
+                    metricsCards.push(
+                        <ClusterMetricsStorage
+                            type={storageType}
+                            key={`map-storage-${storageType}`}
+                            value={used}
+                            capacity={total}
+                            collapsed={collapsed}
+                        />,
+                    );
+                }
+            });
+        }
+    } else {
+        const {StorageTotal, StorageUsed} = cluster;
+        if (valueIsDefined(StorageTotal) && valueIsDefined(StorageUsed)) {
+            metricsCards.push(
+                <ClusterMetricsStorage
+                    key="storage"
+                    value={StorageUsed}
+                    capacity={StorageTotal}
+                    collapsed={collapsed}
+                />,
+            );
+        }
     }
-    const {StorageTotal, StorageUsed} = cluster;
-    if (valueIsDefined(StorageTotal) && valueIsDefined(StorageUsed)) {
-        const total = getTotalStorageGroupsUsed(groupStats);
-        metricsCards.push(
-            <ClusterMetricsStorage
-                key="storage"
-                value={StorageUsed}
-                capacity={StorageTotal}
-                groups={total}
-                collapsed={collapsed}
-            />,
-        );
-    }
+
     const {MemoryTotal, MemoryUsed} = cluster;
     if (valueIsDefined(MemoryTotal) && valueIsDefined(MemoryUsed)) {
         metricsCards.push(

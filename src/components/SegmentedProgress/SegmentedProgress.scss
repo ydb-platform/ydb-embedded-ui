@@ -1,0 +1,18 @@
+.ydb-segmented-progress {
+    min-width: 498px;
+    height: 10px;
+
+    &__section {
+        min-width: 10px;
+        height: 100%;
+
+        border-radius: var(--g-border-radius-xs);
+        background-color: var(--g-color-sfx-shadow);
+    }
+    &__section_used {
+        background-color: var(--g-color-base-misc-heavy);
+    }
+    &__label {
+        margin-left: auto;
+    }
+}

@@ -2,22 +2,93 @@
 
 .cluster-info {
     --g-definition-list-item-gap: var(--g-spacing-3);
+    --cluster-overview-section: 652px;
+    --cluster-overview-vertical-padding: var(--g-spacing-4);
+
     padding: var(--g-spacing-4) 0 var(--g-spacing-2);
 
     @include mixins.body-2-typography();
 
-    &__skeleton {
-        margin-top: 5px;
-    }
-
-    &__dc {
+    &__skeleton-title {
+        width: 100px;
         height: 20px;
     }
 
-    &__clipboard-button {
-        display: flex;
-        align-items: center;
+    &__skeleton-section {
+        width: 100%;
+        height: 164px;
 
-        margin-left: 5px;
+        @container overview-wrapper (min-width: 804px) {
+            width: var(--cluster-overview-section);
+        }
+    }
+
+    &__sections {
+        display: flex;
+        flex-direction: column;
+        gap: var(--g-spacing-3);
+
+        @container overview-wrapper (min-width: 1342px) {
+            display: grid;
+            align-items: start;
+            grid-template-areas:
+                'details storage'
+                'bridge storage';
+            grid-template-columns: auto 1fr;
+        }
+
+        &_no-details {
+            @container overview-wrapper (min-width: 1342px) {
+                grid-template-areas: 'storage' 'bridge';
+                grid-template-columns: var(--cluster-overview-section) 1fr;
+            }
+        }
+    }
+
+    &__detail-section {
+        @container overview-wrapper (min-width: 1104px) {
+            grid-area: details;
+        }
+    }
+
+    &__storage-section {
+        @container overview-wrapper (min-width: 1104px) {
+            grid-area: storage;
+        }
+    }
+
+    &__bridge-section {
+        @container overview-wrapper (min-width: 1104px) {
+            grid-area: bridge;
+        }
+    }
+
+    &__section {
+        width: 100%;
+        min-width: max-content;
+        padding: var(--cluster-overview-vertical-padding);
+
+        @container overview-wrapper (min-width: 804px) {
+            width: var(--cluster-overview-section);
+        }
+    }
+
+    &__section_compact {
+        padding: var(--g-spacing-3) var(--cluster-overview-vertical-padding);
+    }
+
+    &__section_filled {
+        --g-card-background-color: var(--g-color-base-misc-light);
+    }
+
+    &__details {
+        @container overview-wrapper (min-width: 804px) {
+            max-width: calc(
+                var(--cluster-overview-section) - var(--cluster-overview-vertical-padding) * 2
+            );
+        }
+    }
+    &__details-value {
+        word-break: break-all;
     }
 }

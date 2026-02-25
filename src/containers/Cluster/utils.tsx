@@ -73,16 +73,6 @@ export function isClusterTab(tab: any): tab is ClusterTab {
     return Object.values(clusterTabsIds).includes(tab);
 }
 
-export const getTotalStorageGroupsUsed = (groupStats: ClusterGroupsStats) => {
-    return Object.values(groupStats).reduce((acc, data) => {
-        Object.values(data).forEach((erasureStats) => {
-            acc += erasureStats.createdGroups;
-        });
-
-        return acc;
-    }, 0);
-};
-
 export function useShouldShowEventsTab() {
     return useEmMetaAvailable() && uiFactory.renderEvents;
 }
