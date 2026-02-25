@@ -90,9 +90,8 @@ export function useQueryTabsActions() {
             cleanTabIds.forEach(closeTabImmediate);
 
             for (const tabId of dirtyTabIds) {
-                const tab = tabsById[tabId];
                 await activateTabAndWait(dispatch, tabId);
-                const confirmed = await getConfirmation(tab?.title);
+                const confirmed = await getConfirmation();
                 if (!confirmed) {
                     break;
                 }
@@ -111,9 +110,8 @@ export function useQueryTabsActions() {
         cleanTabIds.forEach(closeTabImmediate);
 
         for (const tabId of dirtyTabIds) {
-            const tab = tabsById[tabId];
             await activateTabAndWait(dispatch, tabId);
-            const confirmed = await getConfirmation(tab?.title);
+            const confirmed = await getConfirmation();
             if (!confirmed) {
                 break;
             }

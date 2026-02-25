@@ -59,12 +59,12 @@ interface SaveQueryButtonProps extends ButtonButtonProps {
     dialogProps?: SaveQueryDialogCommonProps;
 }
 
-export function SaveQueryButton({dialogProps, ...buttonProps}: SaveQueryButtonProps) {
+export function SaveQueryButton({dialogProps, children, ...buttonProps}: SaveQueryButtonProps) {
     const onSaveQueryClick = useSaveQueryHandler(dialogProps);
 
     return (
         <Button onClick={onSaveQueryClick} {...buttonProps}>
-            {i18n('action.save')}
+            {children ?? i18n('action.save')}
         </Button>
     );
 }

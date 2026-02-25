@@ -71,7 +71,7 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
         }
     };
 
-    const onQueryClick = useChangeInputWithConfirmation(applyQueryClick);
+    const onQueryClick = useChangeInputWithConfirmation(applyQueryClick, isMultiTabEnabled);
 
     const onChangeFilter = (value: string) => {
         dispatch(setQueryHistoryFilter(value));

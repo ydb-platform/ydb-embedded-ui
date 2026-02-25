@@ -18,6 +18,7 @@ import {streamingQueriesApi} from '../../../../store/reducers/streamingQuery/str
 import {tableSchemaDataApi} from '../../../../store/reducers/tableSchemaData';
 import {useTenantBaseInfo} from '../../../../store/reducers/tenant/tenant';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
+import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {valueIsDefined} from '../../../../utils';
 import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
@@ -52,6 +53,7 @@ export function SchemaTree(props: SchemaTreeProps) {
     const {rootName, rootType, currentPath, onActivePathUpdate, databaseFullPath, database} = props;
     const dispatch = useTypedDispatch();
     const useMetaProxy = useClusterWithProxy();
+    const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
     const input = useTypedSelector(selectUserInput);
     const isDirty = useTypedSelector(selectIsDirty);
     const [
@@ -164,7 +166,8 @@ export function SchemaTree(props: SchemaTreeProps) {
                 showCreateDirectoryDialog: createDirectoryFeatureAvailable
                     ? handleOpenCreateDirectoryDialog
                     : undefined,
-                getConfirmation: input && isDirty ? getConfirmation : undefined,
+                getConfirmation:
+                    input && isDirty && !isMultiTabEnabled ? getConfirmation : undefined,
                 getConnectToDBDialog,
                 schemaData: actionsSchemaData,
                 isSchemaDataLoading: isActionsDataFetching,
@@ -178,22 +181,23 @@ export function SchemaTree(props: SchemaTreeProps) {
             database,
         );
     }, [
-        actionsSchemaData,
-        createDirectoryFeatureAvailable,
-        dispatch,
-        input,
-        isActionsDataFetching,
-        isDirty,
-        isStreamingInfoFetching,
-        onActivePathUpdate,
-        streamingSysData,
-        database,
-        databaseFullPath,
         controlPlane,
         clusterMonitoring,
+        dispatch,
+        onActivePathUpdate,
+        handleTenantPageChange,
+        createDirectoryFeatureAvailable,
+        input,
+        isDirty,
+        isMultiTabEnabled,
+        actionsSchemaData,
+        isActionsDataFetching,
+        streamingSysData,
         showCreateTableData,
         isShowCreateTableFetching,
-        handleTenantPageChange,
+        isStreamingInfoFetching,
+        databaseFullPath,
+        database,
     ]);
 
     return (

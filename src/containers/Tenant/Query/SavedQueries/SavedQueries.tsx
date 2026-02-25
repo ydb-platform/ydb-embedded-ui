@@ -119,7 +119,7 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
         [changeUserInput, dispatch, isMultiTabEnabled, tabsById],
     );
 
-    const onQueryClick = useChangeInputWithConfirmation(applyQueryClick);
+    const onQueryClick = useChangeInputWithConfirmation(applyQueryClick, isMultiTabEnabled);
 
     const onDeleteQueryClick = (queryName: string) => {
         return (event: React.MouseEvent) => {

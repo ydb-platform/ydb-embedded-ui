@@ -11,6 +11,7 @@ import {
     TransferIcon,
 } from 'ydb-ui-components';
 
+import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {insertSnippetToEditor} from '../../../../utils/monaco/insertSnippet';
 import {bindActions} from '../../utils/newSQLQueryActions';
@@ -18,11 +19,13 @@ import {bindActions} from '../../utils/newSQLQueryActions';
 import i18n from './i18n';
 
 export function NewSQL() {
+    const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
+
     const insertTemplate = React.useCallback((input: string) => {
         insertSnippetToEditor(input);
     }, []);
 
-    const onTemplateClick = useChangeInputWithConfirmation(insertTemplate);
+    const onTemplateClick = useChangeInputWithConfirmation(insertTemplate, isMultiTabEnabled);
 
     const actions = bindActions(onTemplateClick);
 
