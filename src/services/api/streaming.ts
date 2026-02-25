@@ -170,6 +170,7 @@ export class StreamingAPI extends BaseYdbAPI {
                     sharedWorker.terminate();
                     sharedWorker = null;
                 }
+                workerCreationFailed = true;
                 if (!settled) {
                     settled = true;
                     reject(new Error(event.message || 'Worker error'));
