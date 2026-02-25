@@ -20,6 +20,7 @@ import {DEV_ENABLE_TRACING_FOR_ALL_REQUESTS} from '../../utils/constants';
 import {isRedirectToAuth} from '../../utils/response';
 
 import {BaseYdbAPI} from './base';
+import type {StreamWorkerRequest, StreamWorkerResponse} from './streaming.worker.types';
 
 const BOUNDARY = 'boundary';
 
@@ -28,6 +29,34 @@ export interface StreamQueryOptions {
     onStreamDataChunk: (chunk: StreamDataChunk) => void;
     onQueryResponseChunk: (chunk: QueryResponseChunk) => void;
     onSessionChunk: (chunk: SessionChunk) => void;
+}
+
+let sharedWorker: Worker | null = null;
+let workerCreationFailed = false;
+
+function getOrCreateWorker(): Worker | null {
+    if (workerCreationFailed) {
+        return null;
+    }
+
+    if (sharedWorker) {
+        return sharedWorker;
+    }
+
+    try {
+        sharedWorker = new Worker(new URL('./streaming.worker.ts', import.meta.url));
+        return sharedWorker;
+    } catch {
+        workerCreationFailed = true;
+        return null;
+    }
+}
+
+let requestCounter = 0;
+
+function generateRequestId(): string {
+    requestCounter += 1;
+    return `stream-${requestCounter}-${Date.now()}`;
 }
 
 export class StreamingAPI extends BaseYdbAPI {
@@ -41,6 +70,16 @@ export class StreamingAPI extends BaseYdbAPI {
         params: StreamQueryParams<Action>,
         options: StreamQueryOptions,
     ) {
+        const worker = getOrCreateWorker();
+
+        if (worker) {
+            return this.streamQueryViaWorker(params, options, worker);
+        }
+
+        return this.streamQueryOnMainThread(params, options);
+    }
+
+    private buildRequestParams<Action extends Actions>(params: StreamQueryParams<Action>) {
         const base64 = params.base64;
 
         const queryParams = qs.stringify(
@@ -48,32 +87,144 @@ export class StreamingAPI extends BaseYdbAPI {
             {encoder: encodeURIComponent},
         );
 
-        const body = {...params, base64, schema: 'multipart'};
-        const headers = new Headers({
+        const url = `${this.getPath('/viewer/query')}?${queryParams}`;
+
+        const headers: Record<string, string> = {
             Accept: 'multipart/form-data',
             'Content-Type': 'application/json',
-        });
+        };
 
         if (this.csrfToken) {
-            headers.set('X-CSRF-Token', this.csrfToken);
+            headers['X-CSRF-Token'] = this.csrfToken;
         }
 
         if (params.tracingLevel) {
-            headers.set('X-Trace-Verbosity', String(params.tracingLevel));
+            headers['X-Trace-Verbosity'] = String(params.tracingLevel);
         }
 
         const enableTracing = readSettingValueFromLS(DEV_ENABLE_TRACING_FOR_ALL_REQUESTS);
-
         if (enableTracing) {
-            headers.set('X-Want-Trace', '1');
+            headers['X-Want-Trace'] = '1';
         }
 
-        const response = await fetch(`${this.getPath('/viewer/query')}?${queryParams}`, {
+        const body = {...params, base64, schema: 'multipart'};
+        const credentials: RequestCredentials = this._axios.defaults.withCredentials
+            ? 'include'
+            : 'same-origin';
+
+        return {url, headers, body: JSON.stringify(body), credentials};
+    }
+
+    private async streamQueryViaWorker<Action extends Actions>(
+        params: StreamQueryParams<Action>,
+        options: StreamQueryOptions,
+        worker: Worker,
+    ) {
+        const {url, headers, body, credentials} = this.buildRequestParams(params);
+        const requestId = generateRequestId();
+
+        return new Promise<void>((resolve, reject) => {
+            let settled = false;
+
+            function handleMessage(event: MessageEvent<StreamWorkerResponse>) {
+                const msg = event.data;
+                if (msg.requestId !== requestId) {
+                    return;
+                }
+
+                switch (msg.type) {
+                    case 'session':
+                        options.onSessionChunk(msg.chunk);
+                        break;
+                    case 'data':
+                        options.onStreamDataChunk(msg.chunk);
+                        break;
+                    case 'response':
+                        options.onQueryResponseChunk(msg.chunk);
+                        break;
+                    case 'keepalive':
+                        break;
+                    case 'auth-redirect':
+                        cleanup();
+                        settled = true;
+                        window.location.assign(msg.authUrl);
+                        resolve();
+                        break;
+                    case 'error':
+                        cleanup();
+                        settled = true;
+                        reject(msg.error);
+                        break;
+                    case 'done':
+                        cleanup();
+                        settled = true;
+                        resolve();
+                        break;
+                }
+            }
+
+            function handleError(event: ErrorEvent) {
+                cleanup();
+                if (!settled) {
+                    settled = true;
+                    reject(new Error(event.message || 'Worker error'));
+                }
+            }
+
+            function cleanup() {
+                worker.removeEventListener('message', handleMessage);
+                worker.removeEventListener('error', handleError);
+                if (options.signal) {
+                    options.signal.removeEventListener('abort', handleAbort);
+                }
+            }
+
+            function handleAbort() {
+                const abortMessage: StreamWorkerRequest = {type: 'abort', requestId};
+                worker.postMessage(abortMessage);
+                cleanup();
+                if (!settled) {
+                    settled = true;
+                    reject(new DOMException('The operation was aborted.', 'AbortError'));
+                }
+            }
+
+            worker.addEventListener('message', handleMessage);
+            worker.addEventListener('error', handleError);
+
+            if (options.signal) {
+                if (options.signal.aborted) {
+                    reject(new DOMException('The operation was aborted.', 'AbortError'));
+                    return;
+                }
+                options.signal.addEventListener('abort', handleAbort);
+            }
+
+            const startMessage: StreamWorkerRequest = {
+                type: 'start',
+                requestId,
+                url,
+                headers,
+                body,
+                credentials,
+            };
+            worker.postMessage(startMessage);
+        });
+    }
+
+    /** Fallback: original main-thread implementation for environments without Worker support */
+    private async streamQueryOnMainThread<Action extends Actions>(
+        params: StreamQueryParams<Action>,
+        options: StreamQueryOptions,
+    ) {
+        const {url, headers: headersRecord, body, credentials} = this.buildRequestParams(params);
+
+        const response = await fetch(url, {
             method: 'POST',
             signal: options.signal,
-            headers,
-            credentials: this._axios.defaults.withCredentials ? 'include' : 'same-origin',
-            body: JSON.stringify(body),
+            headers: headersRecord,
+            credentials,
+            body,
         });
 
         if (!response.ok) {
@@ -117,7 +268,6 @@ export class StreamingAPI extends BaseYdbAPI {
             } else if (isQueryResponseChunk(streamingChunk)) {
                 options.onQueryResponseChunk(streamingChunk);
             } else if (isKeepAliveChunk(streamingChunk)) {
-                // Logging for debug purposes
                 console.info('Received keep alive chunk');
             }
         });
