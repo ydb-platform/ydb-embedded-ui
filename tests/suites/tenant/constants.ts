@@ -9,13 +9,18 @@ export const longTableSelect = (limit?: number) =>
 export const longRunningQuery = new Array(400).fill(simpleQuery).join('');
 // 2M sequential rows with Sha256 — enough CPU time for streaming + Top queries system tables
 export const longRunningStreamQuery = `$data = ListFromRange(1, 2000000);
-SELECT x, Digest::Sha256(CAST(x AS String)) AS hash
+SELECT Digest::Sha256(CAST(x AS String)), Digest::Sha256(CAST(x AS String)) AS hash
 FROM AS_TABLE(AsList(AsStruct($data AS x))) FLATTEN BY x;
 `;
 // 20M sequential rows with Sha256 — no cross join so rows stream in pipeline immediately.
 // Large row count ensures streaming lasts 10s+ on CI (enough time to click stop).
 export const longerRunningStreamQuery = `$data = ListFromRange(1, 20000000);
-SELECT x, Digest::Sha256(CAST(x AS String)) AS hash
+SELECT
+    Digest::Sha256(CAST(x AS String)) AS h1,
+    Digest::Blake2B(CAST(x AS String)) AS h2,
+    Digest::Md5Hex(CAST(x AS String)) AS h3,
+    Digest::Sha1(CAST(x AS String)) AS h4,
+    Digest::Argon2(CAST(x AS String), "salt1234") AS hash
 FROM AS_TABLE(AsList(AsStruct($data AS x))) FLATTEN BY x;
 `;
 // Light query for streaming status transition tests

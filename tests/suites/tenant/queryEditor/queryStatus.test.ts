@@ -72,7 +72,7 @@ test.describe.only('Test Query Execution Status', async () => {
 
         // Small chunk size forces many streaming chunks, making status transitions observable
         await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeOutputChunkMaxSize(50);
+        await queryEditor.settingsDialog.changeOutputChunkMaxSize(10);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         await queryEditor.setQuery(streamingStatusQuery);
@@ -86,7 +86,7 @@ test.describe.only('Test Query Execution Status', async () => {
         await toggleExperiment(page, 'on', 'Query Streaming');
 
         await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeOutputChunkMaxSize(50);
+        await queryEditor.settingsDialog.changeOutputChunkMaxSize(10);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         await queryEditor.setQuery(streamingStatusQuery);
@@ -101,7 +101,7 @@ test.describe.only('Test Query Execution Status', async () => {
         await toggleExperiment(page, 'on', 'Query Streaming');
 
         await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeOutputChunkMaxSize(50);
+        await queryEditor.settingsDialog.changeOutputChunkMaxSize(10);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         await queryEditor.setQuery(streamingStatusQuery);

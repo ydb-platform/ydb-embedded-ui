@@ -159,7 +159,7 @@ test.describe.only('Test Query Editor', async () => {
 
         // Small chunk size forces many streaming roundtrips, extending the Fetching phase
         await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeOutputChunkMaxSize(50);
+        await queryEditor.settingsDialog.changeOutputChunkMaxSize(10);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         await queryEditor.setQuery(longerRunningStreamQuery);
