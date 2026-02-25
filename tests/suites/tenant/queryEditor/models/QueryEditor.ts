@@ -240,6 +240,7 @@ export class QueryEditor {
     }
 
     async setQuery(query: string, timeout = VISIBILITY_TIMEOUT) {
+        await this.waitForEditorReady(timeout);
         await this.editorTextArea.waitFor({state: 'visible', timeout});
 
         await this.editorTextArea.evaluate(() => {
@@ -256,6 +257,10 @@ export class QueryEditor {
         }
 
         await this.editorTextArea.fill(query);
+    }
+
+    async waitForEditorReady(timeout = VISIBILITY_TIMEOUT) {
+        await this.page.waitForFunction(() => Boolean(window.ydbEditor), null, {timeout});
     }
 
     async selectResultTypeRadio(type: ExplainResultType) {

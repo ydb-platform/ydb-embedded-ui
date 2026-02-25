@@ -15,12 +15,13 @@ $t2 = SELECT value AS v2 FROM AS_TABLE(AsList(AsStruct($list2 AS value))) FLATTE
 SELECT a.v1, b.v2, Digest::Sha256(CAST(a.v1 AS String) || CAST(b.v2 AS String)) AS hash
 FROM $t1 AS a CROSS JOIN $t2 AS b;
 `;
-// 2000 × 2000 = 4M rows via CROSS JOIN with Sha256 hashing — heavy enough to still be running after 1s on CI (for stop-query tests)
-export const longerRunningStreamQuery = `$list1 = ListFromRange(1, 2000);
-$list2 = ListFromRange(1, 2000);
+// 5000 × 5000 = 25M rows via CROSS JOIN with triple-chained Sha256 hashing
+// Must be heavy enough so the query is still running when the stop button is clicked (~15s+ on CI)
+export const longerRunningStreamQuery = `$list1 = ListFromRange(1, 5000);
+$list2 = ListFromRange(1, 5000);
 $t1 = SELECT value AS v1 FROM AS_TABLE(AsList(AsStruct($list1 AS value))) FLATTEN BY value;
 $t2 = SELECT value AS v2 FROM AS_TABLE(AsList(AsStruct($list2 AS value))) FLATTEN BY value;
-SELECT a.v1, b.v2, Digest::Sha256(CAST(a.v1 AS String) || CAST(b.v2 AS String)) AS hash
+SELECT a.v1, b.v2, Digest::Sha256(Digest::Sha256(Digest::Sha256(CAST(a.v1 AS String) || CAST(b.v2 AS String)))) AS hash
 FROM $t1 AS a CROSS JOIN $t2 AS b;
 `;
 // Light query for streaming status transition tests
