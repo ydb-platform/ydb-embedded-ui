@@ -7,15 +7,21 @@ export const longTableSelect = (limit?: number) =>
 
 // 400 is pretty enough
 export const longRunningQuery = new Array(400).fill(simpleQuery).join('');
-// 3K × 3K = 9M rows — completes in ~3s locally, enough for streaming + Top queries tests
-export const longRunningStreamQuery = `$sample = AsList(AsStruct(ListFromRange(1, 3000) AS value1, ListFromRange(1, 3000) AS value2, CAST(1 AS Uint32) AS id));
-
-SELECT value1, value2, id FROM as_table($sample) FLATTEN BY (value1);
+// 300 × 300 = 90K rows via CROSS JOIN with Sha256 hashing — ~4s locally, enough for streaming + Top queries tests
+export const longRunningStreamQuery = `$list1 = ListFromRange(1, 300);
+$list2 = ListFromRange(1, 300);
+$t1 = SELECT value AS v1 FROM AS_TABLE(AsList(AsStruct($list1 AS value))) FLATTEN BY value;
+$t2 = SELECT value AS v2 FROM AS_TABLE(AsList(AsStruct($list2 AS value))) FLATTEN BY value;
+SELECT a.v1, b.v2, Digest::Sha256(CAST(a.v1 AS String) || CAST(b.v2 AS String)) AS hash
+FROM $t1 AS a CROSS JOIN $t2 AS b;
 `;
-// 10K × 10K = 100M rows — heavy enough to still be running after 1s (for stop-query tests)
-export const longerRunningStreamQuery = `$sample = AsList(AsStruct(ListFromRange(1, 10000) AS value1, ListFromRange(1, 10000) AS value2, CAST(1 AS Uint32) AS id));
-
-SELECT value1, value2, id FROM as_table($sample) FLATTEN BY (value1);
+// 1000 × 1000 = 1M rows via CROSS JOIN with Sha256 hashing — heavy enough to still be running after 1s (for stop-query tests)
+export const longerRunningStreamQuery = `$list1 = ListFromRange(1, 1000);
+$list2 = ListFromRange(1, 1000);
+$t1 = SELECT value AS v1 FROM AS_TABLE(AsList(AsStruct($list1 AS value))) FLATTEN BY value;
+$t2 = SELECT value AS v2 FROM AS_TABLE(AsList(AsStruct($list2 AS value))) FLATTEN BY value;
+SELECT a.v1, b.v2, Digest::Sha256(CAST(a.v1 AS String) || CAST(b.v2 AS String)) AS hash
+FROM $t1 AS a CROSS JOIN $t2 AS b;
 `;
 // Light query for streaming status transition tests
 // Used with small output_chunk_max_size to produce many streaming chunks
