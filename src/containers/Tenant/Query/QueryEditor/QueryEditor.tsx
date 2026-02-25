@@ -90,6 +90,8 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
         goToNextQuery,
     } = queriesHistory;
 
+    const isResultLoaded = Boolean(result);
+
     const [querySettings, setQuerySettings] = useQueryExecutionSettings();
     const enableTracingLevel = useTracingLevelOptionAvailable();
     const [lastQueryExecutionSettings, setLastQueryExecutionSettings] =
@@ -167,17 +169,24 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
         initialTenantCommonInfoState,
     );
 
+    const collapsedRef = React.useRef(resultVisibilityState.collapsed);
+    collapsedRef.current = resultVisibilityState.collapsed;
+
     React.useEffect(() => {
         dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerCollapse);
     }, []);
 
     React.useEffect(() => {
-        // Only expand to default size if the pane is collapsed.
-        // If the user has manually resized the pane, keep their layout.
-        if (resultVisibilityState.collapsed && showPreview) {
-            dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
+        if (showPreview || isResultLoaded) {
+            // Only expand to default size if the pane is collapsed.
+            // If the user has manually resized the pane, keep their layout.
+            if (collapsedRef.current) {
+                dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
+            }
+        } else {
+            dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerCollapse);
         }
-    }, [showPreview, resultVisibilityState.collapsed]);
+    }, [showPreview, isResultLoaded]);
 
     const handleSendExecuteClick = useEventHandler((text: string, partial?: boolean) => {
         setLastUsedQueryAction(QUERY_ACTIONS.execute);
