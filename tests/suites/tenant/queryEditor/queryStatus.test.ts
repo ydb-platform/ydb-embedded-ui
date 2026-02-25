@@ -2,10 +2,11 @@ import {expect, test} from '@playwright/test';
 
 import {STATISTICS_MODES} from '../../../../src/utils/query';
 import {database} from '../../../utils/constants';
+import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {TenantPage} from '../TenantPage';
-import {longRunningQuery} from '../constants';
+import {longRunningQuery, streamingStatusQuery} from '../constants';
 
-import {QueryEditor} from './models/QueryEditor';
+import {ButtonNames, QueryEditor} from './models/QueryEditor';
 
 test.describe('Test Query Execution Status', async () => {
     const testQuery = 'SELECT 1;'; // Simple query that will generate a plan
@@ -32,15 +33,14 @@ test.describe('Test Query Execution Status', async () => {
         await expect(queryEditor.isResultsControlsHidden()).resolves.toBe(true);
     });
 
-    test('Running query status for running query', async ({page}) => {
+    test('In-progress query shows a loading status', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         await queryEditor.setQuery(longRunningQuery);
         await queryEditor.clickRunButton();
-        await page.waitForTimeout(500);
 
-        const statusElement = await queryEditor.getExecutionStatus();
-        await expect(statusElement).toBe('Running');
+        const inProgressStatuses = ['Preparing', 'Running', 'Fetching'];
+        await expect(queryEditor.waitForAnyStatus(inProgressStatuses)).resolves.toBeTruthy();
     });
 
     test('Completed query status for completed query', async ({page}) => {
@@ -64,5 +64,73 @@ test.describe('Test Query Execution Status', async () => {
 
         const statusElement = await queryEditor.getExecutionStatus();
         await expect(statusElement).toBe('Failed');
+    });
+
+    test('Streaming query shows "Fetching" status while receiving data', async ({
+        page,
+        browserName,
+    }) => {
+        test.skip(browserName === 'webkit');
+
+        const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'on', 'Query Streaming');
+
+        // Small chunk size forces many streaming chunks, making status transitions observable
+        await queryEditor.clickGearButton();
+        await queryEditor.settingsDialog.changeOutputChunkMaxSize(10);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+
+        await queryEditor.setQuery(streamingStatusQuery);
+        await queryEditor.clickRunButton();
+
+        await expect(queryEditor.waitForStatus('Fetching')).resolves.toBe(true);
+    });
+
+    test('Streaming query transitions from "Fetching" to "Completed"', async ({
+        page,
+        browserName,
+    }) => {
+        test.skip(browserName === 'webkit');
+
+        const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'on', 'Query Streaming');
+
+        await queryEditor.clickGearButton();
+        await queryEditor.settingsDialog.changeOutputChunkMaxSize(10);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+
+        await queryEditor.setQuery(streamingStatusQuery);
+        await queryEditor.clickRunButton();
+
+        await expect(queryEditor.waitForStatus('Fetching')).resolves.toBe(true);
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+    });
+
+    test('Streaming query status transitions follow correct order', async ({page, browserName}) => {
+        test.skip(browserName === 'webkit');
+
+        const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'on', 'Query Streaming');
+
+        await queryEditor.clickGearButton();
+        await queryEditor.settingsDialog.changeOutputChunkMaxSize(10);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+
+        await queryEditor.setQuery(streamingStatusQuery);
+        await queryEditor.clickRunButton();
+
+        const validStreamingStatuses = ['Preparing', 'Running', 'Fetching', 'Completed'];
+        const transitions = await queryEditor.collectStatusTransitions('Completed');
+
+        for (let i = 0; i < transitions.length; i++) {
+            expect(validStreamingStatuses).toContain(transitions[i]);
+            if (i > 0) {
+                const prevIndex = validStreamingStatuses.indexOf(transitions[i - 1]);
+                const currIndex = validStreamingStatuses.indexOf(transitions[i]);
+                expect(currIndex).toBeGreaterThan(prevIndex);
+            }
+        }
+
+        expect(transitions[transitions.length - 1]).toBe('Completed');
     });
 });

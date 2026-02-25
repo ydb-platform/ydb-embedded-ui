@@ -45,9 +45,9 @@ test.describe('Diagnostics Queries tab', async () => {
 
         await queryEditor.setQuery(longRunningQuery);
         await queryEditor.clickRunButton();
-        await page.waitForTimeout(500);
-        const statusElement = await queryEditor.getExecutionStatus();
-        await expect(statusElement).toBe('Running');
+
+        const inProgressStatuses = ['Preparing', 'Running', 'Fetching'];
+        await expect(queryEditor.waitForAnyStatus(inProgressStatuses)).resolves.toBeTruthy();
         await tenantPage.selectNavigationTab(NavigationTabs.Diagnostics);
 
         const diagnostics = new Diagnostics(page);
@@ -119,9 +119,6 @@ test.describe('Diagnostics Queries tab', async () => {
         // Wait for the query to complete
         await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
 
-        // Give some time for the queries to be recorded in the system
-        await page.waitForTimeout(2000);
-
         // Now navigate to diagnostics to check Top queries
         await tenantPage.selectNavigationTab(NavigationTabs.Diagnostics);
 
@@ -132,9 +129,12 @@ test.describe('Diagnostics Queries tab', async () => {
         const radioOption = await diagnostics.getSelectedTableMode();
         expect(radioOption?.trim()).toBe(QueriesSwitch.Top);
 
-        // Verify table has data
+        // Per-minute system table populates much faster than per-hour in fresh Docker instances
+        await diagnostics.selectQueryPeriod(QueryPeriod.PerMinute);
+
+        // Wait for system tables to be populated — retry with refresh
         await expect(diagnostics.table.isVisible()).resolves.toBe(true);
-        await expect(diagnostics.table.getRowCount()).resolves.toBeGreaterThan(0);
+        await diagnostics.table.waitForDataRows(() => diagnostics.clickRefreshButton());
 
         // Verify first row has non-empty values for key columns (test first 4 columns)
         for (const column of QueryTopColumns.slice(0, 4)) {

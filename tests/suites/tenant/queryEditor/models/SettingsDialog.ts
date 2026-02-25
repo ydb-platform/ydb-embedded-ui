@@ -14,6 +14,7 @@ export class SettingsDialog {
     private page: Page;
     private selectPopup: Locator;
     private limitRowsInput: Locator;
+    private outputChunkMaxSizeInput: Locator;
     private limitRowsErrorIcon: Locator;
     private limitRowsErrorPopover: Locator;
     private timeoutInput: Locator;
@@ -33,6 +34,9 @@ export class SettingsDialog {
         this.dialog = page.locator('.ydb-query-settings-dialog');
 
         this.limitRowsInput = this.dialog.locator('.ydb-query-settings-dialog__limit-rows input');
+        this.outputChunkMaxSizeInput = this.dialog.locator(
+            '.ydb-query-settings-dialog__output-chunk-max-size input',
+        );
         this.limitRowsErrorIcon = this.dialog.locator(
             '.ydb-query-settings-dialog__limit-rows [data-qa="control-error-icon-qa"]',
         );
@@ -149,6 +153,11 @@ export class SettingsDialog {
 
     async getLimitRowsValue() {
         return await this.limitRowsInput.inputValue();
+    }
+
+    async changeOutputChunkMaxSize(size: number) {
+        await this.outputChunkMaxSizeInput.fill(size.toString());
+        await this.page.waitForTimeout(1000);
     }
 
     async isLimitRowsError() {

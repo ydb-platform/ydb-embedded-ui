@@ -48,6 +48,8 @@ export interface PreparedQueryData extends IQueryResult {
     simplifiedPlan?: SimplifiedPlan;
 }
 
+export type StreamingStatus = 'preparing' | 'running' | 'fetching';
+
 export interface QueryResult {
     type: QueryAction;
     data?: PreparedQueryData;
@@ -56,6 +58,7 @@ export interface QueryResult {
     startTime?: number;
     endTime?: number;
     isLoading: boolean;
+    streamingStatus?: StreamingStatus;
 }
 
 export interface QueryTabState {

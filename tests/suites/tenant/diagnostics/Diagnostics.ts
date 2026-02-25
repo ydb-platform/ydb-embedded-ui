@@ -55,6 +55,32 @@ export class Table {
         return rows.count();
     }
 
+    async hasDataRows() {
+        const noDataCell = this.table.locator('td.data-table__no-data');
+        const noDataVisible = await noDataCell.isVisible().catch(() => false);
+        if (noDataVisible) {
+            return false;
+        }
+        return (await this.getRowCount()) > 0;
+    }
+
+    async waitForDataRows(refreshFn?: () => Promise<void>, maxAttempts = 5, delay = 2000) {
+        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+            if (await this.hasDataRows()) {
+                return true;
+            }
+            if (attempt < maxAttempts) {
+                if (refreshFn) {
+                    await refreshFn();
+                }
+                await new Promise((resolve) => setTimeout(resolve, delay));
+            }
+        }
+        throw new Error(
+            `Table still has no data rows after ${maxAttempts} attempts (${maxAttempts * delay}ms total)`,
+        );
+    }
+
     async getCellValue(row: number, col: number) {
         const cell = this.table.locator(`tr:nth-child(${row}) td:nth-child(${col})`);
         return cell.innerText();

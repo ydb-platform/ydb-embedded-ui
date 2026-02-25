@@ -7,13 +7,22 @@ export const longTableSelect = (limit?: number) =>
 
 // 400 is pretty enough
 export const longRunningQuery = new Array(400).fill(simpleQuery).join('');
-export const longRunningStreamQuery = `$sample = AsList(AsStruct(ListFromRange(1, 100000) AS value1, ListFromRange(1, 1000) AS value2, CAST(1 AS Uint32) AS id));
-
-SELECT value1, value2, id FROM as_table($sample) FLATTEN BY (value1);
+// 2M sequential rows with Sha256 — enough CPU time for streaming + Top queries system tables
+export const longRunningStreamQuery = `$data = ListFromRange(1, 2000000);
+SELECT x, Digest::Sha256(CAST(x AS String)) AS hash
+FROM AS_TABLE(AsList(AsStruct($data AS x))) FLATTEN BY x;
 `;
-export const longerRunningStreamQuery = `$sample = AsList(AsStruct(ListFromRange(1, 1000000) AS value1, ListFromRange(1, 10000) AS value2, CAST(1 AS Uint32) AS id));
-
-SELECT value1, value2, id FROM as_table($sample) FLATTEN BY (value1);
+// 20M sequential rows with Sha256 — no cross join so rows stream in pipeline immediately.
+// Large row count ensures streaming lasts 10s+ on CI (enough time to click stop).
+export const longerRunningStreamQuery = `$data = ListFromRange(1, 20000000);
+SELECT x, Digest::Sha256(CAST(x AS String)) AS hash
+FROM AS_TABLE(AsList(AsStruct($data AS x))) FLATTEN BY x;
+`;
+// Light query for streaming status transition tests
+// Used with small output_chunk_max_size to produce many streaming chunks
+export const streamingStatusQuery = `$data = ListFromRange(1, 500000);
+SELECT x, Digest::Sha256(CAST(x AS String)) AS hash
+FROM AS_TABLE(AsList(AsStruct($data AS x))) FLATTEN BY x;
 `;
 export const selectFromMyRowTableQuery = 'select * from `my_row_table`';
 

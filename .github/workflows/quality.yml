@@ -37,8 +37,23 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Playwright deps
-        run: npm run test:e2e:install
+      - name: Get Playwright version
+        id: playwright-version
+        run: echo "version=$(npx playwright --version | tr ' ' '-')" >> $GITHUB_OUTPUT
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ steps.playwright-version.outputs.version }}-ubuntu
+
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install
+
+      - name: Install Playwright system deps
+        run: npx playwright install-deps
 
       - name: Run Playwright tests
         id: run_tests

@@ -125,7 +125,7 @@ export function QueryResultViewer({
         return getDefaultSection();
     }, [selectedTabs, resultType, isExecute]);
 
-    const {error, isLoading, data = {}} = result;
+    const {error, isLoading, streamingStatus, data = {}} = result;
     const {preparedPlan, simplifiedPlan, stats, resultSets, ast} = data;
 
     React.useEffect(() => {
@@ -312,7 +312,11 @@ export function QueryResultViewer({
                         onUpdate={onSelectSection}
                     />
                 ) : null}
-                <QueryExecutionStatus error={error} loading={isLoading} />
+                <QueryExecutionStatus
+                    error={error}
+                    loading={isLoading}
+                    streamingStatus={streamingStatus}
+                />
                 {data?.traceId && isExecute ? <TraceButton traceId={data.traceId} /> : null}
             </div>
         );

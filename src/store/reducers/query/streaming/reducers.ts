@@ -23,6 +23,7 @@ export const setStreamSession = (
     const data = tab.result.data ?? (tab.result.data = prepareQueryData(null));
 
     tab.result.isLoading = true;
+    tab.result.streamingStatus = 'running';
     tab.result.queryId = chunk.meta.query_id;
     data.traceId = chunk.meta.trace_id;
 };
@@ -40,6 +41,7 @@ export const setStreamQueryResponse = (
     const data = tab.result.data ?? (tab.result.data = prepareQueryData(null));
 
     tab.result.isLoading = false;
+    tab.result.streamingStatus = undefined;
 
     if ('error' in chunk) {
         tab.result.error = chunk;
@@ -78,6 +80,10 @@ export const addStreamingChunks = (
 
     const data = tab.result.data ?? (tab.result.data = prepareQueryData(null));
     data.resultSets = data.resultSets || [];
+
+    if (tab.result.isLoading) {
+        tab.result.streamingStatus = 'fetching';
+    }
 
     // Merge chunks by result index
     const mergedChunks = chunks.reduce((acc: Map<number, StreamDataChunk>, chunk) => {

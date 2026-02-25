@@ -52,6 +52,7 @@ export class QueryEditor {
 
     private page: Page;
     private selector: Locator;
+    private monacoEditor: Locator;
     private runButton: Locator;
     private explainButton: Locator;
     private stopButton: Locator;
@@ -69,6 +70,7 @@ export class QueryEditor {
     constructor(page: Page) {
         this.page = page;
         this.selector = page.locator('.query-editor');
+        this.monacoEditor = this.selector.locator('.query-editor__monaco .monaco-editor');
         this.editorTextArea = this.selector.locator('.query-editor__monaco textarea');
         this.runButton = this.selector.getByRole('button', {name: ButtonNames.Run});
         this.stopButton = this.selector.getByRole('button', {name: ButtonNames.Stop});
@@ -240,6 +242,7 @@ export class QueryEditor {
     }
 
     async setQuery(query: string, timeout = VISIBILITY_TIMEOUT) {
+        await this.waitForEditorReady();
         await this.editorTextArea.waitFor({state: 'visible', timeout});
 
         await this.editorTextArea.evaluate(() => {
@@ -256,6 +259,10 @@ export class QueryEditor {
         }
 
         await this.editorTextArea.fill(query);
+    }
+
+    async waitForEditorReady() {
+        await this.monacoEditor.waitFor({state: 'visible'});
     }
 
     async selectResultTypeRadio(type: ExplainResultType) {
@@ -350,17 +357,54 @@ export class QueryEditor {
     async waitForStatus(expectedStatus: string, timeout = VISIBILITY_TIMEOUT) {
         await this.executionStatus.waitFor({state: 'visible', timeout});
 
-        // Keep checking status until it matches or times out
         const startTime = Date.now();
         while (Date.now() - startTime < timeout) {
             const status = await this.executionStatus.innerText();
             if (status === expectedStatus) {
                 return true;
             }
-            await this.page.waitForTimeout(100); // Small delay between checks
+            await this.page.waitForTimeout(100);
         }
 
         throw new Error(`Status did not change to ${expectedStatus} within ${timeout}ms`);
+    }
+
+    async waitForAnyStatus(expectedStatuses: string[], timeout = VISIBILITY_TIMEOUT) {
+        await this.executionStatus.waitFor({state: 'visible', timeout});
+
+        const startTime = Date.now();
+        while (Date.now() - startTime < timeout) {
+            const status = await this.executionStatus.innerText();
+            if (expectedStatuses.includes(status)) {
+                return status;
+            }
+            await this.page.waitForTimeout(100);
+        }
+
+        throw new Error(
+            `Status did not match any of [${expectedStatuses.join(', ')}] within ${timeout}ms`,
+        );
+    }
+
+    async collectStatusTransitions(terminalStatus: string, timeout = VISIBILITY_TIMEOUT) {
+        await this.executionStatus.waitFor({state: 'visible', timeout});
+
+        const observed: string[] = [];
+        const startTime = Date.now();
+        while (Date.now() - startTime < timeout) {
+            const status = await this.executionStatus.innerText();
+            if (observed.length === 0 || observed[observed.length - 1] !== status) {
+                observed.push(status);
+            }
+            if (status === terminalStatus) {
+                return observed;
+            }
+            await this.page.waitForTimeout(50);
+        }
+
+        throw new Error(
+            `Did not reach "${terminalStatus}" within ${timeout}ms. Observed: [${observed.join(' → ')}]`,
+        );
     }
 
     async getStatsTabContent() {

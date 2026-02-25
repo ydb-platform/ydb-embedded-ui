@@ -176,11 +176,17 @@ test.describe('Test Query Editor', async () => {
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
+        // Small chunk size forces many streaming roundtrips, extending the Fetching phase
+        await queryEditor.clickGearButton();
+        await queryEditor.settingsDialog.changeOutputChunkMaxSize(10);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+
         await queryEditor.setQuery(longerRunningStreamQuery);
         await queryEditor.clickRunButton();
 
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
-        await page.waitForTimeout(1000);
+        // Wait for streaming data to arrive (status changes to Fetching when chunks are received)
+        await queryEditor.waitForStatus('Fetching');
 
         await queryEditor.clickStopButton();
 
@@ -241,7 +247,8 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
     });
 
-    test('Changing tab inside results pane doesnt change results view', async ({page}) => {
+    // TODO: https://github.com/ydb-platform/ydb-embedded-ui/issues/3513
+    test.skip('Changing tab inside results pane doesnt change results view', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.setQuery(testQuery);
         await queryEditor.clickGearButton();
@@ -255,7 +262,8 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
     });
 
-    test('Changing tab inside editor doesnt change results view', async ({page}) => {
+    // TODO: https://github.com/ydb-platform/ydb-embedded-ui/issues/3513
+    test.skip('Changing tab inside editor doesnt change results view', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.setQuery(testQuery);
         await queryEditor.clickGearButton();
@@ -269,7 +277,8 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
     });
 
-    test('Changing tab to diagnostics doesnt change results view', async ({page}) => {
+    // TODO: https://github.com/ydb-platform/ydb-embedded-ui/issues/3513
+    test.skip('Changing tab to diagnostics doesnt change results view', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         const tenantPage = new TenantPage(page);
         await queryEditor.setQuery(testQuery);

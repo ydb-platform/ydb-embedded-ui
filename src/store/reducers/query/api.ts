@@ -111,6 +111,7 @@ export const queryApi = api.injectEndpoints({
                             queryId: '',
                             isLoading: true,
                             startTime,
+                            streamingStatus: 'preparing',
                         },
                     }),
                 );
@@ -199,6 +200,7 @@ export const queryApi = api.injectEndpoints({
                                 startTime,
                                 endTime: Date.now(),
                                 queryId: currentTabResult?.queryId || '',
+                                streamingStatus: undefined,
                             },
                         }),
                     );
