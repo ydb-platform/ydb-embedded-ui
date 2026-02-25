@@ -100,7 +100,7 @@ test.describe('Diagnostics Queries tab', async () => {
         ]);
     });
 
-    test.only('Query tab first row has values for all columns in Top mode', async ({page}) => {
+    test('Query tab first row has values for all columns in Top mode', async ({page}) => {
         // First, run some CPU-intensive queries to generate data
         const pageQueryParams = {
             schema: database,
