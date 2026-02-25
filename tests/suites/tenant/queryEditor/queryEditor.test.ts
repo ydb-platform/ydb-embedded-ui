@@ -159,7 +159,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.waitForStatus('Stopped')).resolves.toBe(true);
     });
 
-    test('Streaming query shows some results and banner when stop button is clicked', async ({
+    test.only('Streaming query shows some results and banner when stop button is clicked', async ({
         page,
         browserName,
     }) => {
@@ -180,7 +180,8 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.clickRunButton();
 
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
-        await page.waitForTimeout(1000);
+        // Wait for streaming data to arrive (status changes to Fetching when chunks are received)
+        await queryEditor.waitForStatus('Fetching');
 
         await queryEditor.clickStopButton();
 

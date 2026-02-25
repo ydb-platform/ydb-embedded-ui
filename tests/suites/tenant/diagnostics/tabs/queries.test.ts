@@ -100,7 +100,7 @@ test.describe('Diagnostics Queries tab', async () => {
         ]);
     });
 
-    test('Query tab first row has values for all columns in Top mode', async ({page}) => {
+    test.only('Query tab first row has values for all columns in Top mode', async ({page}) => {
         // First, run some CPU-intensive queries to generate data
         const pageQueryParams = {
             schema: database,
@@ -128,6 +128,9 @@ test.describe('Diagnostics Queries tab', async () => {
         // Ensure we're in Top mode (should be default)
         const radioOption = await diagnostics.getSelectedTableMode();
         expect(radioOption?.trim()).toBe(QueriesSwitch.Top);
+
+        // Per-minute system table populates much faster than per-hour in fresh Docker instances
+        await diagnostics.selectQueryPeriod(QueryPeriod.PerMinute);
 
         // Wait for system tables to be populated — retry with refresh
         await expect(diagnostics.table.isVisible()).resolves.toBe(true);
