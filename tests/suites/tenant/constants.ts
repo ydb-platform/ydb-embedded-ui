@@ -7,22 +7,16 @@ export const longTableSelect = (limit?: number) =>
 
 // 400 is pretty enough
 export const longRunningQuery = new Array(400).fill(simpleQuery).join('');
-// 500 × 500 = 250K rows via CROSS JOIN with Sha256 hashing — enough CPU time for streaming + Top queries tests
-export const longRunningStreamQuery = `$list1 = ListFromRange(1, 500);
-$list2 = ListFromRange(1, 500);
-$t1 = SELECT value AS v1 FROM AS_TABLE(AsList(AsStruct($list1 AS value))) FLATTEN BY value;
-$t2 = SELECT value AS v2 FROM AS_TABLE(AsList(AsStruct($list2 AS value))) FLATTEN BY value;
-SELECT a.v1, b.v2, Digest::Sha256(CAST(a.v1 AS String) || CAST(b.v2 AS String)) AS hash
-FROM $t1 AS a CROSS JOIN $t2 AS b;
+// 2M sequential rows with Sha256 — enough CPU time for streaming + Top queries system tables
+export const longRunningStreamQuery = `$data = ListFromRange(1, 2000000);
+SELECT x, Digest::Sha256(CAST(x AS String)) AS hash
+FROM AS_TABLE(AsList(AsStruct($data AS x))) FLATTEN BY x;
 `;
-// 5000 × 5000 = 25M rows via CROSS JOIN with triple-chained Sha256 hashing
-// Must be heavy enough so the query is still running when the stop button is clicked (~15s+ on CI)
-export const longerRunningStreamQuery = `$list1 = ListFromRange(1, 5000);
-$list2 = ListFromRange(1, 5000);
-$t1 = SELECT value AS v1 FROM AS_TABLE(AsList(AsStruct($list1 AS value))) FLATTEN BY value;
-$t2 = SELECT value AS v2 FROM AS_TABLE(AsList(AsStruct($list2 AS value))) FLATTEN BY value;
-SELECT a.v1, b.v2, Digest::Sha256(Digest::Sha256(Digest::Sha256(CAST(a.v1 AS String) || CAST(b.v2 AS String)))) AS hash
-FROM $t1 AS a CROSS JOIN $t2 AS b;
+// 20M sequential rows with Sha256 — no cross join so rows stream in pipeline immediately.
+// Large row count ensures streaming lasts 10s+ on CI (enough time to click stop).
+export const longerRunningStreamQuery = `$data = ListFromRange(1, 20000000);
+SELECT x, Digest::Sha256(CAST(x AS String)) AS hash
+FROM AS_TABLE(AsList(AsStruct($data AS x))) FLATTEN BY x;
 `;
 // Light query for streaming status transition tests
 // Used with small output_chunk_max_size to produce many streaming chunks

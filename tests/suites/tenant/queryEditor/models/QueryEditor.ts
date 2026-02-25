@@ -52,6 +52,7 @@ export class QueryEditor {
 
     private page: Page;
     private selector: Locator;
+    private monacoEditor: Locator;
     private runButton: Locator;
     private explainButton: Locator;
     private stopButton: Locator;
@@ -69,6 +70,7 @@ export class QueryEditor {
     constructor(page: Page) {
         this.page = page;
         this.selector = page.locator('.query-editor');
+        this.monacoEditor = this.selector.locator('.query-editor__monaco .monaco-editor');
         this.editorTextArea = this.selector.locator('.query-editor__monaco textarea');
         this.runButton = this.selector.getByRole('button', {name: ButtonNames.Run});
         this.stopButton = this.selector.getByRole('button', {name: ButtonNames.Stop});
@@ -240,7 +242,7 @@ export class QueryEditor {
     }
 
     async setQuery(query: string, timeout = VISIBILITY_TIMEOUT) {
-        await this.waitForEditorReady(timeout);
+        await this.waitForEditorReady();
         await this.editorTextArea.waitFor({state: 'visible', timeout});
 
         await this.editorTextArea.evaluate(() => {
@@ -259,8 +261,8 @@ export class QueryEditor {
         await this.editorTextArea.fill(query);
     }
 
-    async waitForEditorReady(timeout = VISIBILITY_TIMEOUT) {
-        await this.page.waitForFunction(() => Boolean(window.ydbEditor), null, {timeout});
+    async waitForEditorReady() {
+        await this.monacoEditor.waitFor({state: 'visible'});
     }
 
     async selectResultTypeRadio(type: ExplainResultType) {
