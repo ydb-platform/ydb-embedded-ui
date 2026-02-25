@@ -85,8 +85,11 @@ async function handleStreamRequest(msg: {
             const streamingChunk = chunk as StreamingChunk;
 
             if (isSessionChunk(streamingChunk)) {
-                streamingChunk.meta.trace_id = traceId;
-                postResponse({type: 'session', requestId, chunk: streamingChunk});
+                const sessionWithTrace = {
+                    ...streamingChunk,
+                    meta: {...streamingChunk.meta, trace_id: traceId},
+                };
+                postResponse({type: 'session', requestId, chunk: sessionWithTrace});
             } else if (isStreamDataChunk(streamingChunk)) {
                 postResponse({type: 'data', requestId, chunk: streamingChunk});
             } else if (isQueryResponseChunk(streamingChunk)) {

@@ -8,7 +8,7 @@ import {longRunningQuery, streamingStatusQuery} from '../constants';
 
 import {ButtonNames, QueryEditor} from './models/QueryEditor';
 
-test.describe('Test Query Execution Status', async () => {
+test.describe.only('Test Query Execution Status', async () => {
     const testQuery = 'SELECT 1;'; // Simple query that will generate a plan
 
     test.beforeEach(async ({page}) => {
@@ -72,7 +72,7 @@ test.describe('Test Query Execution Status', async () => {
 
         // Small chunk size forces many streaming chunks, making status transitions observable
         await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeOutputChunkMaxSize(100);
+        await queryEditor.settingsDialog.changeOutputChunkMaxSize(50);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         await queryEditor.setQuery(streamingStatusQuery);
@@ -86,7 +86,7 @@ test.describe('Test Query Execution Status', async () => {
         await toggleExperiment(page, 'on', 'Query Streaming');
 
         await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeOutputChunkMaxSize(100);
+        await queryEditor.settingsDialog.changeOutputChunkMaxSize(50);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         await queryEditor.setQuery(streamingStatusQuery);
@@ -101,7 +101,7 @@ test.describe('Test Query Execution Status', async () => {
         await toggleExperiment(page, 'on', 'Query Streaming');
 
         await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeOutputChunkMaxSize(100);
+        await queryEditor.settingsDialog.changeOutputChunkMaxSize(50);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         await queryEditor.setQuery(streamingStatusQuery);

@@ -46,7 +46,8 @@ function getOrCreateWorker(): Worker | null {
     try {
         sharedWorker = new Worker(new URL('./streaming.worker.ts', import.meta.url));
         return sharedWorker;
-    } catch {
+    } catch (e) {
+        console.warn('[StreamingAPI] Worker creation failed, falling back to main thread:', e);
         workerCreationFailed = true;
         return null;
     }
@@ -165,6 +166,10 @@ export class StreamingAPI extends BaseYdbAPI {
 
             function handleError(event: ErrorEvent) {
                 cleanup();
+                if (sharedWorker === worker) {
+                    sharedWorker.terminate();
+                    sharedWorker = null;
+                }
                 if (!settled) {
                     settled = true;
                     reject(new Error(event.message || 'Worker error'));

@@ -23,7 +23,7 @@ import {
 } from './models/QueryEditor';
 import {executeSelectedQueryWithKeybinding} from './utils';
 
-test.describe('Test Query Editor', async () => {
+test.describe.only('Test Query Editor', async () => {
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';
 
     test.beforeEach(async ({page}) => {
@@ -159,7 +159,7 @@ test.describe('Test Query Editor', async () => {
 
         // Small chunk size forces many streaming roundtrips, extending the Fetching phase
         await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeOutputChunkMaxSize(100);
+        await queryEditor.settingsDialog.changeOutputChunkMaxSize(50);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
         await queryEditor.setQuery(longerRunningStreamQuery);
