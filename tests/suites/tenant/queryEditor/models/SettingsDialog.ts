@@ -79,19 +79,22 @@ export class SettingsDialog {
         await this.resourcePoolSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.resourcePoolSelect.click();
         await this.selectPopup.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        try {
+            const items = this.selectPopup.locator('.ydb-query-settings-select__item-title');
+            const count = await items.count();
+            const options: string[] = [];
 
-        const items = this.selectPopup.locator('.ydb-query-settings-select__item-title');
-        const count = await items.count();
-        const options: string[] = [];
-
-        for (let index = 0; index < count; index += 1) {
-            const text = await items.nth(index).textContent();
-            if (text) {
-                options.push(text.trim());
+            for (let index = 0; index < count; index += 1) {
+                const text = await items.nth(index).textContent();
+                if (text) {
+                    options.push(text.trim());
+                }
             }
-        }
 
-        return options;
+            return options;
+        } finally {
+            await this.page.keyboard.press('Escape');
+        }
     }
 
     async changeResourcePool(label: string) {
@@ -228,13 +231,16 @@ export class SettingsDialog {
         await this.statisticsModeSelect.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await this.statisticsModeSelect.click();
         await this.selectPopup.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        const option = this.selectPopup.locator(`.ydb-query-settings-select__item_type_${mode}`);
-        const isDisabled = await option
-            .evaluate((el) => el.classList.contains('ydb-query-settings-select__item_disabled'))
-            .catch(() => false);
-        // Close the popup by pressing Escape
-        await this.page.keyboard.press('Escape');
-        return isDisabled;
+        try {
+            const option = this.selectPopup.locator(
+                `.ydb-query-settings-select__item_type_${mode}`,
+            );
+            return await option
+                .evaluate((el) => el.classList.contains('ydb-query-settings-select__item_disabled'))
+                .catch(() => false);
+        } finally {
+            await this.page.keyboard.press('Escape');
+        }
     }
 
     async hoverStatisticsSelect() {
