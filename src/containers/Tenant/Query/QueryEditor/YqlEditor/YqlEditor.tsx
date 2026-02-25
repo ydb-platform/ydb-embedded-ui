@@ -29,6 +29,7 @@ import {useUpdateErrorsHighlighting} from '../../../../../utils/monaco/highlight
 import {QUERY_ACTIONS} from '../../../../../utils/query';
 import {SAVE_QUERY_DIALOG} from '../../SaveQuery/SaveQuery';
 import i18n from '../../i18n';
+import {getTabTitleForSave} from '../../utils/queryTabTitles';
 import {useSavedQueries} from '../../utils/useSavedQueries';
 import {RENAME_QUERY_DIALOG} from '../EditorTabs/RenameQueryDialog';
 import {useCodeAssistHelpers} from '../hooks/useCodeAssistHelpers';
@@ -208,16 +209,13 @@ export function YqlEditor({
     });
 
     const handleSaveQueryAsAction = useEventHandler(() => {
-        const commonModalProps = {savedQueries, onSaveQuery: saveQuery} as const;
-        if (activeTab?.isTitleUserDefined) {
-            NiceModal.show(SAVE_QUERY_DIALOG, {
-                ...commonModalProps,
-                defaultQueryName: activeTab.title,
-            });
-            return;
-        }
+        const defaultQueryName = getTabTitleForSave(activeTab);
 
-        NiceModal.show(SAVE_QUERY_DIALOG, commonModalProps);
+        NiceModal.show(SAVE_QUERY_DIALOG, {
+            savedQueries,
+            onSaveQuery: saveQuery,
+            defaultQueryName,
+        });
     });
 
     const editorWillUnmount = () => {

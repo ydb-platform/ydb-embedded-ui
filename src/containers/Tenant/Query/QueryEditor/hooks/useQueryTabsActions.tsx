@@ -16,6 +16,7 @@ import {useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
 import {getConfirmation} from '../../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {reachMetricaGoal} from '../../../../../utils/yaMetrica';
 import i18n from '../../i18n';
+import {getNewQueryTitle} from '../../utils/queryTabTitles';
 import {queryExecutionManagerInstance} from '../utils/queryExecutionManager';
 
 /**
@@ -29,13 +30,6 @@ async function activateTabAndWait(
 ): Promise<void> {
     await new Promise<void>((resolve) => setTimeout(resolve, 0));
     dispatch(setActiveQueryTab({tabId}));
-}
-
-function getNewQueryTitle(counter: number): string {
-    if (counter === 0) {
-        return i18n('editor-tabs.default-title');
-    }
-    return i18n('editor-tabs.default-title-indexed', {index: counter});
 }
 
 export function useQueryTabsActions() {

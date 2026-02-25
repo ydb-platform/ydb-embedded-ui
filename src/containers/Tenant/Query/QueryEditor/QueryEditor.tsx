@@ -57,6 +57,7 @@ import {QueryEditorControls} from '../QueryEditorControls/QueryEditorControls';
 import {QueryResultViewer} from '../QueryResult/QueryResultViewer';
 import {QuerySettingsDialog} from '../QuerySettingsDialog/QuerySettingsDialog';
 import {SAVE_QUERY_DIALOG} from '../SaveQuery/SaveQuery';
+import {getTabTitleForSave} from '../utils/queryTabTitles';
 import {useSavedQueries} from '../utils/useSavedQueries';
 
 import {EditorTabs} from './EditorTabs/EditorTabs';
@@ -168,16 +169,14 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
     }, [closeOtherTabs, tabsActiveTabId]);
 
     const handleGlobalSaveQueryAs = React.useCallback(() => {
-        const commonModalProps = {savedQueries, onSaveQuery: saveQuery} as const;
-        if (activeTab?.isTitleUserDefined) {
-            NiceModal.show(SAVE_QUERY_DIALOG, {
-                ...commonModalProps,
-                defaultQueryName: activeTab.title,
-            });
-            return;
-        }
-        NiceModal.show(SAVE_QUERY_DIALOG, commonModalProps);
-    }, [activeTab?.isTitleUserDefined, activeTab?.title, savedQueries, saveQuery]);
+        const defaultQueryName = getTabTitleForSave(activeTab);
+
+        NiceModal.show(SAVE_QUERY_DIALOG, {
+            savedQueries,
+            onSaveQuery: saveQuery,
+            defaultQueryName,
+        });
+    }, [activeTab, savedQueries, saveQuery]);
 
     useEditorTabsGlobalHotkeys(isMultiTabQueryEditorEnabled, {
         handleNewTab: handleNewTabClick,

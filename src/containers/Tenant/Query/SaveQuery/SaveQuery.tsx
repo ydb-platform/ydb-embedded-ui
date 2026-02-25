@@ -13,6 +13,7 @@ import {
 import type {SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {getTabTitleForSave} from '../utils/queryTabTitles';
 import {useSavedQueries} from '../utils/useSavedQueries';
 
 import i18n from './i18n';
@@ -33,9 +34,7 @@ function useSaveQueryHandler(dialogProps?: SaveQueryDialogCommonProps) {
     const activeTab = useTypedSelector(selectActiveTab);
 
     const onSaveQueryClick = React.useCallback(() => {
-        const computedDefaultQueryName = activeTab?.isTitleUserDefined
-            ? activeTab.title
-            : undefined;
+        const computedDefaultQueryName = getTabTitleForSave(activeTab);
         NiceModal.show(SAVE_QUERY_DIALOG, {
             ...dialogProps,
             defaultQueryName: dialogProps?.defaultQueryName ?? computedDefaultQueryName,
@@ -43,14 +42,7 @@ function useSaveQueryHandler(dialogProps?: SaveQueryDialogCommonProps) {
             onSaveQuery: saveQuery,
         });
         dispatch(clearQueryNameToEdit());
-    }, [
-        activeTab?.isTitleUserDefined,
-        activeTab?.title,
-        dispatch,
-        dialogProps,
-        savedQueries,
-        saveQuery,
-    ]);
+    }, [activeTab, dispatch, dialogProps, savedQueries, saveQuery]);
 
     return onSaveQueryClick;
 }

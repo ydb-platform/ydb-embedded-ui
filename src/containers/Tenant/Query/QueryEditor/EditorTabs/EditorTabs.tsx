@@ -8,6 +8,7 @@ import {cn} from '../../../../../utils/cn';
 import {reachMetricaGoal} from '../../../../../utils/yaMetrica';
 import {SAVE_QUERY_DIALOG} from '../../SaveQuery/SaveQuery';
 import i18n from '../../i18n';
+import {getTabTitleForSave} from '../../utils/queryTabTitles';
 import {useSavedQueries} from '../../utils/useSavedQueries';
 import {HOTKEY_LABELS} from '../constants';
 import {useQueryTabsActions} from '../hooks/useQueryTabsActions';
@@ -41,17 +42,13 @@ export function EditorTabs() {
             reachMetricaGoal('saveQueryFromTab', {tabsCount: tabsOrder.length});
             handleActivateTab(tabId);
             const tab = tabsById[tabId];
-            const commonModalProps = {savedQueries, onSaveQuery: saveQuery} as const;
+            const defaultQueryName = getTabTitleForSave(tab);
 
-            if (tab?.isTitleUserDefined) {
-                NiceModal.show(SAVE_QUERY_DIALOG, {
-                    ...commonModalProps,
-                    defaultQueryName: tab.title,
-                });
-                return;
-            }
-
-            NiceModal.show(SAVE_QUERY_DIALOG, commonModalProps);
+            NiceModal.show(SAVE_QUERY_DIALOG, {
+                savedQueries,
+                onSaveQuery: saveQuery,
+                defaultQueryName,
+            });
         },
         [handleActivateTab, savedQueries, saveQuery, tabsById, tabsOrder.length],
     );
