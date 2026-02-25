@@ -189,14 +189,15 @@ export class StreamingAPI extends BaseYdbAPI {
                 }
             }
 
+            if (options.signal?.aborted) {
+                reject(new DOMException('The operation was aborted.', 'AbortError'));
+                return;
+            }
+
             worker.addEventListener('message', handleMessage);
             worker.addEventListener('error', handleError);
 
             if (options.signal) {
-                if (options.signal.aborted) {
-                    reject(new DOMException('The operation was aborted.', 'AbortError'));
-                    return;
-                }
                 options.signal.addEventListener('abort', handleAbort);
             }
 
