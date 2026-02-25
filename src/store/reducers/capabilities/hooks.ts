@@ -168,7 +168,7 @@ export const useMetaEnvironmentsAvailable = () => {
     return Boolean(uiFactory.databasesEnvironmentsConfig);
 };
 
-export const useEmMetaEvailable = () => {
+export const useEmMetaAvailable = () => {
     return Boolean(uiFactory.emMetaAvailable);
 };
 

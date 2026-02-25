@@ -5,7 +5,7 @@ import type {DropdownMenuItem} from '@gravity-ui/uikit';
 import {ClipboardButton, DropdownMenu, Flex, Icon, Link, Text} from '@gravity-ui/uikit';
 
 import {getTenantPath} from '../../routes';
-import {useEmMetaEvailable} from '../../store/reducers/capabilities/hooks';
+import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import type {AdditionalTenantsProps} from '../../types/additionalProps';
@@ -39,7 +39,7 @@ export function TenantNameWrapper({
     externalLink,
 }: TenantNameWrapperProps) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
-    const emMetaAvailable = useEmMetaEvailable();
+    const emMetaAvailable = useEmMetaAvailable();
     const isEditDBAvailable = emMetaAvailable && uiFactory.onEditDB !== undefined;
     const isDeleteDBAvailable = emMetaAvailable && uiFactory.onDeleteDB !== undefined;
 

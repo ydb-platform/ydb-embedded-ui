@@ -18,7 +18,7 @@ import type {HomePageTab} from '../../routes';
 import {checkIsHomePage, checkIsTenantPage, getClusterPath} from '../../routes';
 import {environment} from '../../store';
 import {
-    useEmMetaEvailable,
+    useEmMetaAvailable,
     useMetaCapabilitiesLoaded,
     useMetaEnvironmentsAvailable,
 } from '../../store/reducers/capabilities/hooks';
@@ -88,7 +88,7 @@ function Header() {
             skip: !isClustersHomePage || !metaCapabilitiesLoaded,
         });
 
-    const emMetaAvailable = useEmMetaEvailable();
+    const emMetaAvailable = useEmMetaAvailable();
     const isAddClusterAvailable =
         emMetaAvailable &&
         uiFactory.onAddCluster !== undefined &&
