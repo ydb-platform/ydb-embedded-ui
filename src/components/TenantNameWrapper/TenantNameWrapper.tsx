@@ -155,7 +155,7 @@ export function TenantNameWrapper({
     const renderName = React.useCallback(() => {
         if (isExternalLink) {
             return (
-                <Link href={dbUrl} target="_blank" className={b('db-name')}>
+                <Link href={dbUrl} className={b('db-name')}>
                     {dbName}
                 </Link>
             );
