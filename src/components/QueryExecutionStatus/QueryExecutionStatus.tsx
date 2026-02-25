@@ -13,6 +13,7 @@ import {HOUR_IN_SECONDS, SECOND_IN_MS} from '../../utils/constants';
 import {useTypedSelector} from '../../utils/hooks';
 import {isAxiosError} from '../../utils/response';
 
+import i18n from './i18n';
 import {useElapsedDuration} from './useElapsedDuration';
 
 import './QueryExecutionStatus.scss';
@@ -27,9 +28,9 @@ interface QueryExecutionStatusProps {
 }
 
 const STREAMING_STATUS_LABELS: Record<StreamingStatus, string> = {
-    preparing: 'Preparing',
-    running: 'Running',
-    fetching: 'Fetching',
+    preparing: i18n('value_preparing'),
+    running: i18n('value_running'),
+    fetching: i18n('value_fetching'),
 };
 
 export const QueryExecutionStatus = ({
