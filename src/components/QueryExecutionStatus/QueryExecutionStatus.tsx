@@ -61,7 +61,7 @@ export const QueryExecutionStatus = ({
         theme = 'info';
         textColor = 'info-heavy';
         icon = <Spin size="xs" />;
-        label = streamingStatus ? STREAMING_STATUS_LABELS[streamingStatus] : 'Running';
+        label = streamingStatus ? STREAMING_STATUS_LABELS[streamingStatus] : i18n('value_running');
     } else if (isAxiosError(error) && error.code === 'ECONNABORTED') {
         theme = 'danger';
         textColor = 'danger-heavy';
