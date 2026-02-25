@@ -1,5 +1,12 @@
 import {parseMultipart} from '@mjackson/multipart-parser';
 
+import {
+    isErrorChunk,
+    isKeepAliveChunk,
+    isQueryResponseChunk,
+    isSessionChunk,
+    isStreamDataChunk,
+} from '../../store/reducers/query/utils';
 import type {StreamingChunk} from '../../types/store/streaming';
 
 import type {StreamWorkerRequest, StreamWorkerResponse} from './streaming.worker.types';
@@ -10,28 +17,6 @@ const activeRequests = new Map<string, AbortController>();
 
 function postResponse(message: StreamWorkerResponse) {
     self.postMessage(message);
-}
-
-function isSessionChunk(content: StreamingChunk): boolean {
-    return content?.meta?.event === 'SessionCreated';
-}
-
-function isStreamDataChunk(content: StreamingChunk): boolean {
-    return content?.meta?.event === 'StreamData';
-}
-
-function isQueryResponseChunk(content: StreamingChunk): boolean {
-    return content?.meta?.event === 'QueryResponse';
-}
-
-function isKeepAliveChunk(content: StreamingChunk): boolean {
-    return content?.meta?.event === 'KeepAlive';
-}
-
-function isErrorChunk(content: unknown): boolean {
-    return Boolean(
-        content && typeof content === 'object' && ('error' in content || 'issues' in content),
-    );
 }
 
 function isAuthRedirectResponse(status: number, data: unknown): data is {authUrl: string} {
@@ -94,22 +79,18 @@ async function handleStreamRequest(msg: {
 
             if (isErrorChunk(chunk)) {
                 await response.body?.cancel().catch(() => {});
-                postResponse({type: 'error', requestId, error: chunk});
-                return;
+                throw chunk;
             }
 
             const streamingChunk = chunk as StreamingChunk;
 
             if (isSessionChunk(streamingChunk)) {
-                // Set traceId on session chunk just like main-thread version does
-                if ('meta' in streamingChunk && streamingChunk.meta.event === 'SessionCreated') {
-                    streamingChunk.meta.trace_id = traceId;
-                }
-                postResponse({type: 'session', requestId, chunk: streamingChunk as never});
+                streamingChunk.meta.trace_id = traceId;
+                postResponse({type: 'session', requestId, chunk: streamingChunk});
             } else if (isStreamDataChunk(streamingChunk)) {
-                postResponse({type: 'data', requestId, chunk: streamingChunk as never});
+                postResponse({type: 'data', requestId, chunk: streamingChunk});
             } else if (isQueryResponseChunk(streamingChunk)) {
-                postResponse({type: 'response', requestId, chunk: streamingChunk as never});
+                postResponse({type: 'response', requestId, chunk: streamingChunk});
             } else if (isKeepAliveChunk(streamingChunk)) {
                 postResponse({type: 'keepalive', requestId});
             }
