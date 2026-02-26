@@ -10,7 +10,7 @@ import type {
 } from '../../../types/store/streaming';
 import {parseUsToMs} from '../../../utils/timeParsers';
 
-import type {EnhancedQuery, QueryInHistory} from './types';
+import type {EnhancedQueryInHistory, QueryInHistory} from './types';
 
 export function getActionAndSyntaxFromQueryMode(
     baseAction: QueryAction = 'execute',
@@ -37,7 +37,7 @@ export function getQueryInHistory(rawQuery: string | QueryInHistory) {
         };
     }
 
-    const enhancedQuery: EnhancedQuery = {...rawQuery};
+    const enhancedQuery: EnhancedQueryInHistory = {...rawQuery};
     if (enhancedQuery.durationUs && enhancedQuery.endTime) {
         enhancedQuery.startTime =
             Number(enhancedQuery.endTime) - parseUsToMs(enhancedQuery.durationUs);

@@ -19,7 +19,7 @@ export interface QueryInHistory {
     durationUs?: string | number;
 }
 
-export interface EnhancedQuery extends QueryInHistory {
+export interface EnhancedQueryInHistory extends QueryInHistory {
     startTime?: number;
 }
 
