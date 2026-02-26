@@ -53,6 +53,9 @@ npm test                       # Run unit tests
 npm test -- --watch           # Run tests in watch mode
 npm run test:e2e              # Run Playwright E2E tests
 npm run test:e2e:local        # Run E2E against local dev server
+
+# Run specific test file (requires TS_NODE workaround for jest.config.ts):
+TS_NODE_COMPILER_OPTIONS='{"module":"commonjs","moduleResolution":"node"}' npx jest --testPathPatterns='<pattern>' --watchAll=false
 ```
 
 ## Architecture Overview

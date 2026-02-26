@@ -1,6 +1,8 @@
 {
   "403.title": "Access denied",
-  "403.description": "You don’t have the necessary roles to view this page.",
+  "403.description": "You don't have the necessary roles to view this page.",
   "responseError.defaultMessage": "Response error",
-  "error.title": "Error"
+  "error.title": "Error",
+  "action_show-details": "Show details",
+  "action_hide-details": "Hide details"
 }

@@ -3,10 +3,10 @@ import React from 'react';
 import {CircleXmarkFill, TriangleExclamationFill} from '@gravity-ui/icons';
 import {Checkbox, Dialog, Icon} from '@gravity-ui/uikit';
 
-import {ResultIssues} from '../../containers/Tenant/Query/Issues/Issues';
 import type {IResponseError} from '../../types/api/error';
 import {cn} from '../../utils/cn';
 import {isResponseError, isResponseErrorWithIssues} from '../../utils/response';
+import {ResultIssues} from '../ResultIssues/ResultIssues';
 
 import {criticalActionDialogKeyset} from './i18n';
 

@@ -3,6 +3,7 @@ import React from 'react';
 import {Label} from '@gravity-ui/uikit';
 
 import {LoaderWrapper} from '../../../../../components/LoaderWrapper/LoaderWrapper';
+import {ResultIssuesModal} from '../../../../../components/ResultIssues/ResultIssues';
 import {YDBSyntaxHighlighter} from '../../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
@@ -16,7 +17,6 @@ import {
     trimOuterEmptyLines,
 } from '../../../../../utils/dataFormatters/dataFormatters';
 import {isErrorResponse} from '../../../../../utils/query';
-import {ResultIssuesModal} from '../../../Query/Issues/Issues';
 import {getEntityName} from '../../../utils';
 
 import i18n from './i18n';

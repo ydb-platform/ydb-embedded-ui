@@ -1,6 +1,6 @@
 import {Dialog} from '@gravity-ui/uikit';
 
-import type {IssueMessage} from '../../../../types/api/query';
+import type {IssueMessage} from '../../types/api/query';
 
 import {Issues} from './Issues';
 

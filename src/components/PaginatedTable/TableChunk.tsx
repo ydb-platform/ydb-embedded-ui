@@ -132,7 +132,7 @@ export const TableChunk = typedMemo(function TableChunk<T, F>({
                         {renderErrorMessage ? (
                             renderErrorMessage(errorData)
                         ) : (
-                            <ResponseError error={errorData} />
+                            <ResponseError error={errorData} withDetails={false} />
                         )}
                     </EmptyTableRow>
                 );

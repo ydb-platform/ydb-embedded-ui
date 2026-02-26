@@ -1,5 +1,5 @@
-import type {ErrorResponse, IssueMessage} from '../../../../types/api/query';
-import {isNumeric} from '../../../../utils/utils';
+import type {ErrorResponse, IssueMessage} from '../../types/api/query';
+import {isNumeric} from '../../utils/utils';
 
 export function hasRootIssues(issues?: IssueMessage[]): issues is IssueMessage[] {
     return Array.isArray(issues) && issues.length > 0;

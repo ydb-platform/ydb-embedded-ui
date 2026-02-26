@@ -121,6 +121,7 @@ export function CreateDirectoryDialog({
                         <ResponseError
                             error={response.error}
                             defaultMessage={i18n('schema.tree.dialog.invalid')}
+                            withDetails={false}
                         />
                     )}
                 </Dialog.Body>

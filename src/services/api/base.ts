@@ -70,9 +70,21 @@ export class BaseYdbAPI extends AxiosWrapper {
             return response;
         });
 
-        // Interceptor to process OIDC auth
+        // Interceptor to enrich error responses with metadata and process OIDC auth
         this._axios.interceptors.response.use(null, function (error) {
             const response = error.response;
+
+            // Enrich HTTP error responses with request metadata for ErrorDetails UI
+            if (response) {
+                const traceHeader = response.headers?.['traceresponse'];
+                const traceId = traceHeader ? String(traceHeader).split('-')[1] : undefined;
+
+                response._meta = {
+                    traceId,
+                    requestUrl: error.config?.url,
+                    method: error.config?.method?.toUpperCase(),
+                };
+            }
 
             // OIDC proxy returns 401 response with authUrl in it
             // authUrl - external auth service link, after successful auth additional cookies will be appended

@@ -184,7 +184,9 @@ export const MetricChart = ({
         return (
             <div className={b('chart')}>
                 <ChartKit type="yagr" data={convertedData} />
-                {error ? <ResponseError className={b('error')} error={error} /> : null}
+                {error ? (
+                    <ResponseError className={b('error')} error={error} withDetails={false} />
+                ) : null}
             </div>
         );
     };

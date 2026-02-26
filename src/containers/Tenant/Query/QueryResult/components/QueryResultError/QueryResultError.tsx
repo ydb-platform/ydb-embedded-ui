@@ -1,7 +1,7 @@
+import {ResultIssues} from '../../../../../../components/ResultIssues/ResultIssues';
 import {cn} from '../../../../../../utils/cn';
 import {parseQueryError} from '../../../../../../utils/query';
 import {isNetworkError} from '../../../../../../utils/response';
-import {ResultIssues} from '../../../Issues/Issues';
 import {isQueryCancelledError} from '../../../utils/isQueryCancelledError';
 
 import './QueryResultError.scss';

@@ -1,8 +1,16 @@
+export interface IResponseErrorMeta {
+    traceId?: string;
+    requestUrl?: string;
+    method?: string;
+    errorCode?: string;
+}
+
 export interface IResponseError<T = unknown> {
     data?: T;
     status?: number;
     statusText?: string;
     isCancelled?: boolean;
+    _meta?: IResponseErrorMeta;
 }
 
 // Error on offline backend or requests blocked by CORS

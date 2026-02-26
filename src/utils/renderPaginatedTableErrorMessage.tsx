@@ -7,5 +7,5 @@ export const renderPaginatedTableErrorMessage: RenderErrorMessage = (error) => {
         return <AccessDenied position="left" />;
     }
 
-    return <ResponseError error={error} />;
+    return <ResponseError error={error} withDetails={false} />;
 };
