@@ -44,7 +44,7 @@ export const ClusterInfo = ({
     const noDetails = (error && !cluster) || (!info.length && !linksList.length);
 
     const renderDetailSection = () => {
-        if (loading && !noDetails) {
+        if (loading) {
             return (
                 <InfoSection className={b('detail-section')}>
                     <Skeleton className={b('skeleton-title')} />
