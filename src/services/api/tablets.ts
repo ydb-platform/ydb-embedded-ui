@@ -47,7 +47,7 @@ export class TabletsAPI extends BaseYdbAPI {
     }
 
     killTablet(id: string) {
-        return this.get<string>(
+        return this.post<unknown>(
             this.getPath(`/tablets?KillTabletID=${id}`),
             {},
             {requestConfig: {'axios-retry': {retries: 0}}},
@@ -55,7 +55,7 @@ export class TabletsAPI extends BaseYdbAPI {
     }
 
     stopTablet(id: string, hiveId: string) {
-        return this.get<string>(
+        return this.post<unknown>(
             this.getPath(`/tablets/app?TabletID=${hiveId}&page=StopTablet&tablet=${id}`),
             {},
             {requestConfig: {'axios-retry': {retries: 0}}},
@@ -63,7 +63,7 @@ export class TabletsAPI extends BaseYdbAPI {
     }
 
     resumeTablet(id: string, hiveId: string) {
-        return this.get<string>(
+        return this.post<unknown>(
             this.getPath(`/tablets/app?TabletID=${hiveId}&page=ResumeTablet&tablet=${id}`),
             {},
             {requestConfig: {'axios-retry': {retries: 0}}},
