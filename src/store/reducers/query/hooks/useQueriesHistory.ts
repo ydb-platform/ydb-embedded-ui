@@ -111,24 +111,30 @@ export function useQueriesHistory() {
         dispatch(setHistoryCurrentQueryId(queryId));
     });
 
-    const updateQueryInHistory = useEventHandler((queryId: string, stats: QueryStats) => {
-        if (!stats || !preparedQueries.length) {
-            return;
-        }
+    const updateQueryInHistory = useEventHandler(
+        (queryId: string, stats?: QueryStats, operationId?: string, realQueryId?: string) => {
+            if (!stats || !preparedQueries.length) {
+                return;
+            }
 
-        const index = preparedQueries.findIndex((item) => item.queryId === queryId);
+            const index = preparedQueries.findIndex((item) => item.queryId === queryId);
 
-        if (index !== -1) {
-            const newQueries = [...preparedQueries];
-            const {durationUs, endTime} = stats;
-            newQueries[index] = {
-                ...preparedQueries[index],
-                durationUs,
-                endTime,
-            };
-            saveHistoryQueries(newQueries);
-        }
-    });
+            if (index !== -1) {
+                const newQueries = [...preparedQueries];
+                const {durationUs, endTime} = stats;
+
+                newQueries[index] = {
+                    ...preparedQueries[index],
+                    queryId,
+                    durationUs,
+                    endTime,
+                    operationId,
+                    realQueryId,
+                };
+                saveHistoryQueries(newQueries);
+            }
+        },
+    );
 
     return {
         historyQueries: preparedQueries,

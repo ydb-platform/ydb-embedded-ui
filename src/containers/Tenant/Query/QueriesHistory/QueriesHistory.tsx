@@ -1,31 +1,32 @@
 import React from 'react';
 
-import type {Column} from '@gravity-ui/react-data-table';
+import {isEqual} from 'lodash';
 
+import {DrawerWrapper} from '../../../../components/Drawer';
+import type {DrawerControl} from '../../../../components/Drawer/Drawer';
+import {QueryDetails} from '../../../../components/QueryDetails/QueryDetails';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
-import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
 import type {useQueriesHistory} from '../../../../store/reducers/query/hooks';
 import {
     selectQueriesHistoryFilter,
+    setHistoryCurrentQueryId,
     setIsDirty,
     setQueryHistoryFilter,
 } from '../../../../store/reducers/query/query';
-import type {QueryInHistory} from '../../../../store/reducers/query/types';
+import type {EnhancedQueryInHistory, QueryInHistory} from '../../../../store/reducers/query/types';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
-import {cn} from '../../../../utils/cn';
-import {formatDateTime} from '../../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
-import {formatToMs, parseUsToMs} from '../../../../utils/timeParsers';
-import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
+import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import i18n from '../i18n';
 
-import './QueriesHistory.scss';
+import {getColumns, getQueryInfoItems} from './columns';
+import {b} from './shared';
 
-const b = cn('ydb-queries-history');
+import './QueriesHistory.scss';
 
 const QUERIES_HISTORY_COLUMNS_WIDTH_LS_KEY = 'queriesHistoryTableColumnsWidth';
 
@@ -36,18 +37,47 @@ interface QueriesHistoryProps {
 
 function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) {
     const dispatch = useTypedDispatch();
+    const [showQueryPreview, setShowQueryPreview] = React.useState(false);
+    const [selectedRow, setSelectedRow] = React.useState<EnhancedQueryInHistory | null>(null);
 
-    const reversedHistory = React.useMemo(() => {
-        return queriesHistory.filteredHistoryQueries.toReversed();
+    const sortedHistory = React.useMemo(() => {
+        return queriesHistory.filteredHistoryQueries.toSorted((a, b) => {
+            if (!a.startTime && !b.startTime) {
+                return 0;
+            }
+            if (!a.startTime) {
+                return 1;
+            }
+            if (!b.startTime) {
+                return -1;
+            }
+            return b.startTime - a.startTime;
+        });
     }, [queriesHistory.filteredHistoryQueries]);
+
+    const drawerControls: DrawerControl[] = React.useMemo(() => [{type: 'close'}], []);
 
     const filter = useTypedSelector(selectQueriesHistoryFilter);
 
-    const applyQueryClick = (query: QueryInHistory) => {
-        changeUserInput({input: query.queryText});
-        dispatch(setIsDirty(false));
-        dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
-    };
+    const applyQueryClick = React.useCallback(
+        (query: QueryInHistory) => {
+            changeUserInput({input: query.queryText});
+            dispatch(setIsDirty(false));
+            dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
+            dispatch(setHistoryCurrentQueryId(query.queryId));
+        },
+        [changeUserInput, dispatch],
+    );
+
+    const handleShowPreview = React.useCallback(
+        (query: QueryInHistory, _index?: number, event?: React.MouseEvent<HTMLTableRowElement>) => {
+            event?.stopPropagation();
+            setShowQueryPreview(true);
+
+            setSelectedRow(query);
+        },
+        [],
+    );
 
     const onQueryClick = useChangeInputWithConfirmation(applyQueryClick);
 
@@ -55,37 +85,27 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
         dispatch(setQueryHistoryFilter(value));
     };
 
-    const columns: Column<QueryInHistory>[] = [
-        {
-            name: 'queryText',
-            header: i18n('history.queryText'),
-            render: ({row}) => {
-                return (
-                    <div className={b('query')}>
-                        <TruncatedQuery value={row.queryText} maxQueryHeight={MAX_QUERY_HEIGHT} />
-                    </div>
-                );
-            },
-            sortable: false,
-            width: 600,
-        },
-        {
-            name: 'EndTime',
-            header: i18n('history.endTime'),
-            render: ({row}) => (row.endTime ? formatDateTime(row.endTime.toString()) : '-'),
-            align: 'right',
-            width: 200,
-            sortable: false,
-        },
-        {
-            name: 'Duration',
-            header: i18n('history.duration'),
-            render: ({row}) => (row.durationUs ? formatToMs(parseUsToMs(row.durationUs)) : '-'),
-            align: 'right',
-            width: 150,
-            sortable: false,
-        },
-    ];
+    const columns = React.useMemo(() => {
+        return getColumns({
+            openInEditor: onQueryClick,
+        });
+    }, [onQueryClick]);
+
+    const handleCloseDrawer = React.useCallback(() => {
+        setShowQueryPreview(false);
+    }, []);
+
+    const renderDrawerContent = React.useCallback(
+        () =>
+            selectedRow ? (
+                <QueryDetails
+                    queryText={selectedRow?.queryText}
+                    onOpenInEditor={() => applyQueryClick(selectedRow)}
+                    infoItems={getQueryInfoItems(selectedRow)}
+                />
+            ) : null,
+        [selectedRow, applyQueryClick],
+    );
 
     return (
         <TableWithControlsLayout className={b()}>
@@ -98,15 +118,27 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
                 />
             </TableWithControlsLayout.Controls>
             <TableWithControlsLayout.Table>
-                <ResizeableDataTable
-                    columnsWidthLSKey={QUERIES_HISTORY_COLUMNS_WIDTH_LS_KEY}
-                    columns={columns}
-                    data={reversedHistory}
-                    settings={QUERY_TABLE_SETTINGS}
-                    emptyDataMessage={i18n(filter ? 'history.empty-search' : 'history.empty')}
-                    onRowClick={(row) => onQueryClick(row)}
-                    rowClassName={() => b('table-row')}
-                />
+                <DrawerWrapper
+                    isDrawerVisible={showQueryPreview}
+                    onCloseDrawer={handleCloseDrawer}
+                    renderDrawerContent={renderDrawerContent}
+                    drawerId={'query-history-preview'}
+                    detectClickOutside
+                    isPercentageWidth
+                    drawerControls={drawerControls}
+                    title={i18n('title_query-details')}
+                    defaultWidth={50}
+                >
+                    <ResizeableDataTable
+                        columnsWidthLSKey={QUERIES_HISTORY_COLUMNS_WIDTH_LS_KEY}
+                        columns={columns}
+                        data={sortedHistory}
+                        settings={QUERY_TABLE_SETTINGS}
+                        emptyDataMessage={i18n(filter ? 'history.empty-search' : 'history.empty')}
+                        rowClassName={(row) => b('table-row', {active: isEqual(row, selectedRow)})}
+                        onRowClick={handleShowPreview}
+                    />
+                </DrawerWrapper>
             </TableWithControlsLayout.Table>
         </TableWithControlsLayout>
     );

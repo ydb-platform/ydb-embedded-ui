@@ -1,14 +1,5 @@
 import {isQueryErrorResponse, parseQueryError} from '../../../../utils/query';
-import {isResponseError} from '../../../../utils/response';
-
-function isAbortError(error: unknown): error is {name: string} {
-    return (
-        typeof error === 'object' &&
-        error !== null &&
-        'name' in error &&
-        error.name === 'AbortError'
-    );
-}
+import {isAbortError, isResponseError} from '../../../../utils/response';
 
 export function isQueryCancelledError(error: unknown): boolean {
     if (isAbortError(error)) {

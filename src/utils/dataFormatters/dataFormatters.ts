@@ -69,8 +69,28 @@ export function formatDurationSeconds(seconds: number) {
     return sign + value;
 }
 
-export const formatDurationMs = (ms?: number) => {
-    return formatDurationSeconds(Number(ms) / 1000);
+export const formatDurationMs = (ms?: number, withMs?: boolean) => {
+    if (!withMs) {
+        return formatDurationSeconds(Number(ms) / 1000);
+    }
+    if (!isNumeric(ms)) {
+        return undefined;
+    }
+
+    const sign = Number(ms) < 0 ? '-' : '';
+    const d = duration(Math.abs(Number(ms)), 'ms').rescale();
+
+    let value: string;
+
+    if (Math.floor(d.asDays()) > 0) {
+        value = d.format(`d[${i18n('d')}${UNBREAKABLE_GAP}]hh:mm:ss[.]SSS`);
+    } else if (d.hours() > 0) {
+        value = d.format('h[h]mm:ss[.]SSS');
+    } else {
+        value = d.format('mm:ss[.]SSS');
+    }
+
+    return sign + value;
 };
 
 export function getUptimeFromDateFormatted(dateFrom?: number | string, dateTo?: number | string) {

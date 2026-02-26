@@ -291,6 +291,9 @@ export const parseQueryError = (error: unknown): ErrorResponse | string | undefi
         if ('data' in error && isQueryErrorResponse(error.data)) {
             return error.data;
         }
+        if ('message' in error && typeof error.message === 'string') {
+            return error.message;
+        }
 
         return error.statusText;
     }
@@ -369,3 +372,7 @@ export const querySettingsRestoreSchema = z
         resourcePool: z.string().catch(DEFAULT_QUERY_SETTINGS.resourcePool),
     })
     .catch(DEFAULT_QUERY_SETTINGS);
+
+export function isStreamingSupportedForMode(mode: QueryMode) {
+    return mode === QUERY_MODES.query;
+}

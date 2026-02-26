@@ -1,6 +1,31 @@
 import type {IProtobufTimeObject} from './common';
 
 /**
+ * Execution mode for script/query execution
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/public/api/protos/ydb_query.proto
+ */
+export enum ExecMode {
+    EXEC_MODE_UNSPECIFIED = 'EXEC_MODE_UNSPECIFIED',
+    EXEC_MODE_PARSE = 'EXEC_MODE_PARSE',
+    EXEC_MODE_VALIDATE = 'EXEC_MODE_VALIDATE',
+    EXEC_MODE_EXPLAIN = 'EXEC_MODE_EXPLAIN',
+    EXEC_MODE_EXECUTE = 'EXEC_MODE_EXECUTE',
+}
+
+/**
+ * Execution status for script/query execution
+ * source: https://github.com/ydb-platform/ydb/blob/main/ydb/public/api/protos/ydb_query.proto
+ */
+export enum ExecStatus {
+    EXEC_STATUS_UNSPECIFIED = 'EXEC_STATUS_UNSPECIFIED',
+    EXEC_STATUS_STARTING = 'EXEC_STATUS_STARTING',
+    EXEC_STATUS_RUNNING = 'EXEC_STATUS_RUNNING',
+    EXEC_STATUS_COMPLETED = 'EXEC_STATUS_COMPLETED',
+    EXEC_STATUS_FAILED = 'EXEC_STATUS_FAILED',
+    EXEC_STATUS_CANCELLED = 'EXEC_STATUS_CANCELLED',
+}
+
+/**
  * endpoint: /operation/list
  *
  * source: https://github.com/ydb-platform/ydb/blob/main/ydb/public/api/protos/ydb_operation.proto

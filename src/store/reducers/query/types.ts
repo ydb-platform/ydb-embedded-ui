@@ -11,10 +11,16 @@ import type {IQueryResult, QueryAction} from '../../../types/store/query';
 
 export interface QueryInHistory {
     queryId?: string;
+    operationId?: string;
+    realQueryId?: string;
     queryText: string;
     syntax?: string;
     endTime?: string | number;
     durationUs?: string | number;
+}
+
+export interface EnhancedQuery extends QueryInHistory {
+    startTime?: number;
 }
 
 export interface PreparedPlan {
@@ -55,6 +61,7 @@ export interface QueryResult {
     data?: PreparedQueryData;
     error?: unknown;
     queryId: string;
+    operationId?: string;
     startTime?: number;
     endTime?: number;
     isLoading: boolean;
@@ -95,4 +102,6 @@ export interface QueryState {
 export interface QueryStats {
     durationUs?: string | number;
     endTime?: string | number;
+    status?: 'COMPLETED' | 'FAILED' | 'STOPPED';
+    operationId?: string;
 }

@@ -1,11 +1,12 @@
 import {Code} from '@gravity-ui/icons';
 import {Button, Flex, Icon} from '@gravity-ui/uikit';
 
-import type {InfoViewerItem} from '../../../../../components/InfoViewer';
-import {InfoViewer} from '../../../../../components/InfoViewer';
-import {YDBSyntaxHighlighter} from '../../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
-import {cn} from '../../../../../utils/cn';
-import i18n from '../i18n';
+import {cn} from '../../utils/cn';
+import {YDBSyntaxHighlighter} from '../SyntaxHighlighter/YDBSyntaxHighlighter';
+import type {YDBDefinitionListItem} from '../YDBDefinitionList/YDBDefinitionList';
+import {YDBDefinitionList} from '../YDBDefinitionList/YDBDefinitionList';
+
+import i18n from './i18n';
 
 import './QueryDetails.scss';
 
@@ -13,7 +14,7 @@ const b = cn('ydb-query-details');
 
 interface QueryDetailsProps {
     queryText: string;
-    infoItems: InfoViewerItem[];
+    infoItems?: YDBDefinitionListItem[];
     onOpenInEditor: () => void;
 }
 
@@ -21,11 +22,16 @@ export const QueryDetails = ({queryText, infoItems, onOpenInEditor}: QueryDetail
     return (
         <Flex direction="column" className={b()}>
             <Flex direction="column" className={b('content')}>
-                <InfoViewer info={infoItems} />
+                {infoItems && infoItems.length > 0 && (
+                    <YDBDefinitionList
+                        items={infoItems}
+                        wrapperClassName={b('query-details-info')}
+                    />
+                )}
 
                 <div className={b('query-content')}>
                     <div className={b('query-header')}>
-                        <div className={b('query-title')}>{i18n('query-details.query.title')}</div>
+                        <div className={b('query-title')}>{i18n('title_query-details')}</div>
                         <Button
                             view="flat-secondary"
                             size="m"
@@ -33,7 +39,7 @@ export const QueryDetails = ({queryText, infoItems, onOpenInEditor}: QueryDetail
                             className={b('editor-button')}
                         >
                             <Icon data={Code} size={16} />
-                            {i18n('query-details.open-in-editor')}
+                            {i18n('action_open-in-editor')}
                         </Button>
                     </div>
                     <YDBSyntaxHighlighter

@@ -8,8 +8,9 @@ import type {
     StreamDataChunk,
     StreamingChunk,
 } from '../../../types/store/streaming';
+import {parseUsToMs} from '../../../utils/timeParsers';
 
-import type {QueryInHistory} from './types';
+import type {EnhancedQuery, QueryInHistory} from './types';
 
 export function getActionAndSyntaxFromQueryMode(
     baseAction: QueryAction = 'execute',
@@ -36,13 +37,15 @@ export function getQueryInHistory(rawQuery: string | QueryInHistory) {
         };
     }
 
-    if (rawQuery.queryId) {
-        return rawQuery;
+    const enhancedQuery: EnhancedQuery = {...rawQuery};
+    if (enhancedQuery.durationUs && enhancedQuery.endTime) {
+        enhancedQuery.startTime =
+            Number(enhancedQuery.endTime) - parseUsToMs(enhancedQuery.durationUs);
     }
-    return {
-        ...rawQuery,
-        queryId: uuidv4(),
-    };
+    if (!enhancedQuery.queryId) {
+        enhancedQuery.queryId = uuidv4();
+    }
+    return enhancedQuery;
 }
 
 export function isSessionChunk(content: StreamingChunk): content is SessionChunk {
