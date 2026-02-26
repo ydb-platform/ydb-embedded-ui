@@ -1,5 +1,4 @@
 import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
-import type {ClusterGroupsStats} from '../../store/reducers/cluster/types';
 import type {ValueOf} from '../../types/common';
 import {uiFactory} from '../../uiFactory/uiFactory';
 
