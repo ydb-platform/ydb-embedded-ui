@@ -24,6 +24,7 @@ import type {ResourcePoolValue} from '../../../../utils/query';
 import {
     QUERY_MODES,
     RESOURCE_POOL_NO_OVERRIDE_VALUE,
+    STATISTICS_MODES_WITH_SVG,
     querySettingsValidationSchema,
 } from '../../../../utils/query';
 import {useCurrentSchema} from '../../TenantContext';
@@ -131,6 +132,16 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
         }
     }, [isResourcePoolsLoading, resourcePools, resourcePool, setValue]);
 
+    const queryStatisticsOptions = React.useMemo(() => {
+        return QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.options.map((option) => {
+            if (!useShowPlanToSvg) {
+                return option;
+            }
+            const isDisabled = !STATISTICS_MODES_WITH_SVG.includes(option.value);
+            return {...option, disabled: isDisabled};
+        });
+    }, [useShowPlanToSvg]);
+
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
             <Dialog.Body className={b('dialog-body')}>
@@ -222,12 +233,9 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                 render={({field}) => (
                                     <QuerySettingsSelect
                                         id="statisticsMode"
-                                        disabled={useShowPlanToSvg}
                                         setting={field.value}
                                         onUpdateSetting={field.onChange}
-                                        settingOptions={
-                                            QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.options
-                                        }
+                                        settingOptions={queryStatisticsOptions}
                                     />
                                 )}
                             />

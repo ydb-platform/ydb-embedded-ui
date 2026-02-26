@@ -15,5 +15,8 @@
 
     &__item {
         padding: var(--g-spacing-1) 0;
+        &_disabled {
+            color: var(--g-color-text-secondary);
+        }
     }
 }
