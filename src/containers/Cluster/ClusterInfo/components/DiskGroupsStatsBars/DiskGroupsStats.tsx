@@ -1,86 +1,81 @@
-import type {ProgressTheme} from '@gravity-ui/uikit';
-import {DefinitionList, Flex, Progress, Text} from '@gravity-ui/uikit';
+import React from 'react';
 
-import type {DiskErasureGroupsStats} from '../../../../../store/reducers/cluster/types';
-import {formatBytes, getBytesSizeUnit} from '../../../../../utils/bytesParsers';
-import {cn} from '../../../../../utils/cn';
+import {Flex, Label, Text} from '@gravity-ui/uikit';
+
+import {SegmentedProgress} from '../../../../../components/SegmentedProgress/SegmentedProgress';
+import type {
+    ClusterGroupsStats,
+    DiskErasureGroupsStats,
+} from '../../../../../store/reducers/cluster/types';
 import {formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
-import type {ProgressStatus} from '../../../../../utils/progress';
-import {calculateProgressStatus} from '../../../../../utils/progress';
 import i18n from '../../../i18n';
-
-import './DiskGroupsStats.scss';
-
-const b = cn('ydb-disk-groups-stats');
 
 interface GroupsStatsPopupContentProps {
     stats: DiskErasureGroupsStats;
     storageType: string;
 }
 
-const calculatedStatusToProgressTheme: Record<ProgressStatus, ProgressTheme> = {
-    good: 'success',
-    warning: 'warning',
-    danger: 'danger',
-};
+function DiskGroupStats({stats, storageType}: GroupsStatsPopupContentProps) {
+    const {erasure} = stats;
 
-export function DiskGroupsStats({stats, storageType}: GroupsStatsPopupContentProps) {
-    const {erasure, allocatedSize, availableSize} = stats;
+    const availableGroups = stats.totalGroups - stats.createdGroups;
 
-    const sizeToConvert = getBytesSizeUnit(Math.max(allocatedSize, availableSize));
+    const availableGroupsString =
+        availableGroups === 1
+            ? i18n('title_available-one')
+            : i18n('title_available-other', {
+                  count: formatNumber(availableGroups),
+              });
 
-    const convertedAllocatedSize = formatBytes({value: allocatedSize, size: sizeToConvert});
-    const convertedAvailableSize = formatBytes({value: availableSize, size: sizeToConvert});
-
-    const usage = Math.floor((allocatedSize / (allocatedSize + availableSize)) * 100);
-
-    const info = [
-        {
-            name: i18n('erasure'),
-            content: erasure,
-        },
-        {
-            name: i18n('allocated'),
-            content: convertedAllocatedSize,
-        },
-        {
-            name: i18n('available'),
-            content: convertedAvailableSize,
-        },
-        {
-            name: i18n('usage'),
-            content: (
-                <Flex gap={2} alignItems="center">
-                    <Progress
-                        theme={
-                            calculatedStatusToProgressTheme[
-                                calculateProgressStatus({fillWidth: usage})
-                            ]
-                        }
-                        className={b('progress')}
-                        value={usage}
-                        size="s"
-                    />
-                    <Text color="secondary">{usage}%</Text>
-                </Flex>
-            ),
-        },
-    ];
     return (
-        <Flex direction="column" gap={3} className={b()}>
-            <Text variant="body-2">
-                {storageType}{' '}
-                <Text color="secondary" variant="body-2">
-                    {`${formatNumber(stats.createdGroups)} ${i18n('context_of')} ${formatNumber(stats.totalGroups)}`}
-                </Text>
-            </Text>
-            <DefinitionList nameMaxWidth={160}>
-                {info.map(({name, content}) => (
-                    <DefinitionList.Item key={name} name={name}>
-                        {content}
-                    </DefinitionList.Item>
-                ))}
-            </DefinitionList>
+        <Flex direction="column" gap={2}>
+            <Flex justifyContent="space-between" alignItems="center">
+                <Text variant="subheader-1">{storageType}</Text>
+                <Flex gap={4} wrap="nowrap" alignItems="center">
+                    <Label theme="normal">{availableGroupsString}</Label>
+                    <Text color="secondary">
+                        {i18n('title_allocated', {
+                            used: formatNumber(stats.createdGroups),
+                            total: formatNumber(stats.totalGroups),
+                        })}
+                    </Text>
+                </Flex>
+            </Flex>
+            <SegmentedProgress
+                value={stats.createdGroups}
+                total={stats.totalGroups}
+                labelStart={erasure}
+                ariaLabel={i18n('context_storage-group-allocation-progress')}
+            />
+        </Flex>
+    );
+}
+
+interface StorageGroupStatsProps {
+    groupStats: ClusterGroupsStats;
+}
+
+export function StorageGroupStats({groupStats}: StorageGroupStatsProps) {
+    const stats = React.useMemo(() => {
+        const result: React.ReactNode[] = [];
+
+        Object.entries(groupStats).forEach(([storageType, stats]) => {
+            Object.values(stats).forEach((erasureStats) => {
+                result.push(
+                    <DiskGroupStats
+                        key={`${storageType}|${erasureStats.erasure}`}
+                        stats={erasureStats}
+                        storageType={storageType}
+                    />,
+                );
+            });
+        });
+        return result;
+    }, [groupStats]);
+
+    return (
+        <Flex direction="column" gap={5}>
+            {stats}
         </Flex>
     );
 }

@@ -12,7 +12,7 @@ export class ClusterPage extends PageModel {
         super(page, clusterPage);
 
         this.clusterInfo = this.selector.locator('.cluster-info');
-        this.bridgeSection = this.clusterInfo.locator('.cluster-info__bridge-table');
+        this.bridgeSection = this.clusterInfo.locator('.cluster-info__bridge-section');
         this.pileCards = this.bridgeSection.locator('.bridge-info-table__pile-card');
     }
 

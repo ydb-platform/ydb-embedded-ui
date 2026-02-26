@@ -66,6 +66,11 @@ export class TableControls {
         await this.columnSetupPopup.waitFor({state: 'visible'});
     }
 
+    async closeColumnSetup() {
+        await this.page.keyboard.press('Escape');
+        await this.columnSetupPopup.waitFor({state: 'hidden'});
+    }
+
     async setColumnChecked(columnName: string) {
         const columnOption = this.columnSetupPopup.locator(`[data-list-item="${columnName}"]`);
         const checkIcon = columnOption.locator('.g-icon.g-color-text_color_info');

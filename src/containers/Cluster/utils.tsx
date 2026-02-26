@@ -1,5 +1,4 @@
 import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
-import type {ClusterGroupsStats} from '../../store/reducers/cluster/types';
 import type {ValueOf} from '../../types/common';
 import {uiFactory} from '../../uiFactory/uiFactory';
 
@@ -72,16 +71,6 @@ export const clusterTabs = [tenants, nodes, storage, network, tablets, versions,
 export function isClusterTab(tab: any): tab is ClusterTab {
     return Object.values(clusterTabsIds).includes(tab);
 }
-
-export const getTotalStorageGroupsUsed = (groupStats: ClusterGroupsStats) => {
-    return Object.values(groupStats).reduce((acc, data) => {
-        Object.values(data).forEach((erasureStats) => {
-            acc += erasureStats.createdGroups;
-        });
-
-        return acc;
-    }, 0);
-};
 
 export function useShouldShowEventsTab() {
     return useEmMetaAvailable() && uiFactory.renderEvents;
