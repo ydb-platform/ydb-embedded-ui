@@ -16,7 +16,7 @@ import {Search} from '../../components/Search';
 import {TableColumnSetup} from '../../components/TableColumnSetup/TableColumnSetup';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TenantNameWrapper} from '../../components/TenantNameWrapper/TenantNameWrapper';
-import {useCreateDatabaseFeatureAvailable} from '../../store/reducers/capabilities/hooks';
+import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {
     filterTenantsByDomain,
@@ -129,8 +129,7 @@ export const TenantsTable = ({
     // Track sort state for scroll dependencies
     const [sortParams, setSortParams] = React.useState<SortOrder | SortOrder[] | undefined>();
 
-    const isCreateDBAvailable =
-        useCreateDatabaseFeatureAvailable() && uiFactory.onCreateDB !== undefined;
+    const isCreateDBAvailable = useEmMetaAvailable() && uiFactory.onCreateDB !== undefined;
 
     const {search, withProblems, handleSearchChange, handleWithProblemsChange} =
         useTenantsQueryParams();

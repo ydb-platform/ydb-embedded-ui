@@ -5,10 +5,7 @@ import type {DropdownMenuItem} from '@gravity-ui/uikit';
 import {ClipboardButton, DropdownMenu, Flex, Icon, Link, Text} from '@gravity-ui/uikit';
 
 import {getTenantPath} from '../../routes';
-import {
-    useDeleteDatabaseFeatureAvailable,
-    useEditDatabaseFeatureAvailable,
-} from '../../store/reducers/capabilities/hooks';
+import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo} from '../../store/reducers/cluster/cluster';
 import type {PreparedTenant} from '../../store/reducers/tenants/types';
 import type {AdditionalTenantsProps} from '../../types/additionalProps';
@@ -42,9 +39,9 @@ export function TenantNameWrapper({
     externalLink,
 }: TenantNameWrapperProps) {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
-    const isEditDBAvailable = useEditDatabaseFeatureAvailable() && uiFactory.onEditDB !== undefined;
-    const isDeleteDBAvailable =
-        useDeleteDatabaseFeatureAvailable() && uiFactory.onDeleteDB !== undefined;
+    const emMetaAvailable = useEmMetaAvailable();
+    const isEditDBAvailable = emMetaAvailable && uiFactory.onEditDB !== undefined;
+    const isDeleteDBAvailable = emMetaAvailable && uiFactory.onDeleteDB !== undefined;
 
     const {settings} = useClusterBaseInfo();
 

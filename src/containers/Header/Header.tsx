@@ -18,9 +18,7 @@ import type {HomePageTab} from '../../routes';
 import {checkIsHomePage, checkIsTenantPage, getClusterPath} from '../../routes';
 import {environment} from '../../store';
 import {
-    useAddClusterFeatureAvailable,
-    useDeleteDatabaseFeatureAvailable,
-    useEditDatabaseFeatureAvailable,
+    useEmMetaAvailable,
     useMetaCapabilitiesLoaded,
     useMetaEnvironmentsAvailable,
 } from '../../store/reducers/capabilities/hooks';
@@ -90,15 +88,15 @@ function Header() {
             skip: !isClustersHomePage || !metaCapabilitiesLoaded,
         });
 
+    const emMetaAvailable = useEmMetaAvailable();
     const isAddClusterAvailable =
-        useAddClusterFeatureAvailable() &&
+        emMetaAvailable &&
         uiFactory.onAddCluster !== undefined &&
         !isClustersLoading &&
         !isAccessError(clustersError);
 
-    const isEditDBAvailable = useEditDatabaseFeatureAvailable() && uiFactory.onEditDB !== undefined;
-    const isDeleteDBAvailable =
-        useDeleteDatabaseFeatureAvailable() && uiFactory.onDeleteDB !== undefined;
+    const isEditDBAvailable = emMetaAvailable && uiFactory.onEditDB !== undefined;
+    const isDeleteDBAvailable = emMetaAvailable && uiFactory.onDeleteDB !== undefined;
 
     const shouldRequestTenantData = database && isDatabasePage;
 

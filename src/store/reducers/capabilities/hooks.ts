@@ -160,50 +160,16 @@ export function useMetaCapabilitiesLoaded() {
     return Boolean(data || error);
 }
 
-const useGetMetaFeatureVersion = (feature: MetaCapability) => {
+export const useGetMetaFeatureVersion = (feature: MetaCapability) => {
     return useTypedSelector((state) => selectMetaCapabilityVersion(state, feature) || 0);
-};
-
-export const useCreateDatabaseFeatureAvailable = () => {
-    return useGetMetaFeatureVersion('/meta/create_database') >= 1;
-};
-
-export const useEditDatabaseFeatureAvailable = () => {
-    return useGetMetaFeatureVersion('/meta/update_database') >= 1;
-};
-
-export const useDeleteDatabaseFeatureAvailable = () => {
-    return useGetMetaFeatureVersion('/meta/delete_database') >= 1;
-};
-
-export const useAddClusterFeatureAvailable = () => {
-    return useGetMetaFeatureVersion('/meta/create_cluster') >= 1;
-};
-export const useEditClusterFeatureAvailable = () => {
-    return useGetMetaFeatureVersion('/meta/update_cluster') >= 1;
-};
-export const useDeleteClusterFeatureAvailable = () => {
-    return useGetMetaFeatureVersion('/meta/delete_cluster') >= 1;
-};
-
-export const useClusterEventsAvailable = () => {
-    return useGetMetaFeatureVersion('/meta/events') >= 1;
-};
-
-export const useDatabasesAvailable = () => {
-    return useGetMetaFeatureVersion('/meta/databases') >= 1;
-};
-
-export const useMetaLoginAvailable = () => {
-    return useGetMetaFeatureVersion('/meta/login') >= 1;
-};
-
-export const useMetaWhoAmIAvailable = () => {
-    return useGetMetaFeatureVersion('/meta/whoami') >= 1;
 };
 
 export const useMetaEnvironmentsAvailable = () => {
     return Boolean(uiFactory.databasesEnvironmentsConfig);
+};
+
+export const useEmMetaAvailable = () => {
+    return Boolean(uiFactory.emMetaAvailable);
 };
 
 export const useBlobStorageCapacityMetricsAvailable = () => {

@@ -1,4 +1,4 @@
-import {useClusterEventsAvailable} from '../../store/reducers/capabilities/hooks';
+import {useEmMetaAvailable} from '../../store/reducers/capabilities/hooks';
 import type {ClusterGroupsStats} from '../../store/reducers/cluster/types';
 import type {ValueOf} from '../../types/common';
 import {uiFactory} from '../../uiFactory/uiFactory';
@@ -84,5 +84,5 @@ export const getTotalStorageGroupsUsed = (groupStats: ClusterGroupsStats) => {
 };
 
 export function useShouldShowEventsTab() {
-    return useClusterEventsAvailable() && uiFactory.renderEvents;
+    return useEmMetaAvailable() && uiFactory.renderEvents;
 }

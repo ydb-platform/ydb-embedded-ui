@@ -53,6 +53,8 @@ export interface UIFactory<H extends string = CommonIssueType, T extends string 
 
     useDatabaseId?: boolean;
 
+    emMetaAvailable?: boolean;
+
     useMetaProxy?: boolean;
     useClusterDomain?: boolean;
     clustersDomain?: string;
