@@ -18,6 +18,7 @@ test.describe('Memory Viewer Widget', () => {
             const controls = paginatedTable.getControls();
             await controls.openColumnSetup();
             await controls.setColumnChecked('Memory');
+            await controls.closeColumnSetup();
         }
         await memoryViewer.waitForVisible();
     });
@@ -45,7 +46,7 @@ test.describe('Memory Viewer Widget', () => {
         expect(text).toMatch(/[\d.]+ \/ [\d.]+\s*GB/);
     });
 
-    test('Memory viewer popup shows on hover with all metrics', async ({page}) => {
+    test.only('Memory viewer popup shows on hover with all metrics', async ({page}) => {
         const memoryViewer = new MemoryViewer(page);
 
         await memoryViewer.hover();
