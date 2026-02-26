@@ -46,7 +46,7 @@ test.describe('Memory Viewer Widget', () => {
         expect(text).toMatch(/[\d.]+ \/ [\d.]+\s*GB/);
     });
 
-    test.only('Memory viewer popup shows on hover with all metrics', async ({page}) => {
+    test('Memory viewer popup shows on hover with all metrics', async ({page}) => {
         const memoryViewer = new MemoryViewer(page);
 
         await memoryViewer.hover();
