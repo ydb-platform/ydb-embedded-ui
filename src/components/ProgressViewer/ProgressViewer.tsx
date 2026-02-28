@@ -1,5 +1,6 @@
 import {useTheme} from '@gravity-ui/uikit';
 
+import {EMPTY_DATA_PLACEHOLDER} from '../../lib';
 import {cn} from '../../utils/cn';
 import {calculateProgressStatus, defaultFormatProgressValues} from '../../utils/progress';
 import type {FormatProgressViewerValues} from '../../utils/progress';
@@ -103,5 +104,5 @@ export function ProgressViewer({
         );
     }
 
-    return <div className={`${b({size})} ${className} error`}>no data</div>;
+    return <div className={`${b({size})} ${className} error`}>{EMPTY_DATA_PLACEHOLDER}</div>;
 }
