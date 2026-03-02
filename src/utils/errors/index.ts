@@ -1,5 +1,8 @@
 import {isNetworkError, isResponseError} from '../response';
 
+export {extractErrorDetails} from './extractErrorDetails';
+export type {ErrorDetails} from './extractErrorDetails';
+
 import i18n from './i18n';
 
 /**
@@ -39,8 +42,10 @@ export function prepareCommonErrorMessage(err: unknown, defaultMessage?: string)
             typeof err.data.message === 'string'
         ) {
             return err.data.message;
-        } else if (typeof err.data === 'string') {
+        } else if (typeof err.data === 'string' && err.data) {
             return err.data;
+        } else if (err.statusText) {
+            return err.statusText;
         } else if (err.status === 403) {
             return i18n('access-forbidden');
         }

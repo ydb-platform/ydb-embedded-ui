@@ -33,7 +33,9 @@ export class OperationsTable extends BaseModel {
         // PageError component also uses empty-state but with error illustration
         this.pageErrorState = page.locator('.kv-tenant-diagnostics .empty-state');
         this.pageErrorTitle = this.pageErrorState.locator('.empty-state__title');
-        this.pageErrorDescription = this.pageErrorState.locator('.empty-state__description .error');
+        this.pageErrorDescription = this.pageErrorState.locator(
+            '.empty-state__description .response-error',
+        );
     }
 
     async waitForTableVisible() {
