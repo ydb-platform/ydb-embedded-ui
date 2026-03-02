@@ -2,8 +2,15 @@ import React from 'react';
 // Query result viewer with tab persistence functionality
 
 import type {Settings} from '@gravity-ui/react-data-table';
-import type {ControlGroupOption} from '@gravity-ui/uikit';
-import {ClipboardButton, Flex, SegmentedRadioGroup, Text} from '@gravity-ui/uikit';
+import type {ControlGroupOption, CopyToClipboardStatus} from '@gravity-ui/uikit';
+import {
+    ActionTooltip,
+    Button,
+    ClipboardIcon,
+    Flex,
+    SegmentedRadioGroup,
+    Text,
+} from '@gravity-ui/uikit';
 
 import {EnableFullscreenButton} from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import {Fullscreen} from '../../../../components/Fullscreen/Fullscreen';
@@ -17,12 +24,11 @@ import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import type {ValueOf} from '../../../../types/common';
 import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
-import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
 import {useSetting, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 import {QuerySettingsBanner} from '../QuerySettingsBanner/QuerySettingsBanner';
 import {QueryStoppedBanner} from '../QueryStoppedBanner/QueryStoppedBanner';
-import {getPreparedResult} from '../utils/getPreparedResult';
+import {copyResultToClipboard, copyTextDataToClipboard} from '../utils/copyToClipboard';
 import {isQueryCancelledError} from '../utils/isQueryCancelledError';
 
 import {Ast} from './components/Ast/Ast';
@@ -39,6 +45,8 @@ import i18n from './i18n';
 import './QueryResultViewer.scss';
 
 const b = cn('ydb-query-result');
+
+const COPY_STATUS_RESET_TIMEOUT = 1500;
 
 const RESULT_OPTIONS_IDS = {
     result: 'result',
@@ -155,43 +163,95 @@ export function QueryResultViewer({
         });
     }, [isExecute, isExplain]);
 
-    const getStatsToCopy = () => {
+    const [copyStatus, setCopyStatus] = React.useState<CopyToClipboardStatus>('pending');
+    const copyTimeoutRef = React.useRef<number>();
+
+    React.useEffect(() => {
+        return () => window.clearTimeout(copyTimeoutRef.current);
+    }, []);
+
+    const hasCopyableData = React.useCallback((): boolean => {
+        switch (activeSection) {
+            case RESULT_OPTIONS_IDS.result:
+                return Boolean(data?.resultSets?.[selectedResultSet]?.result?.length);
+            case RESULT_OPTIONS_IDS.json:
+                return Boolean(preparedPlan?.pristine);
+            case RESULT_OPTIONS_IDS.simplified:
+                return Boolean(simplifiedPlan?.pristine);
+            case RESULT_OPTIONS_IDS.stats:
+                return Boolean(stats);
+            case RESULT_OPTIONS_IDS.ast:
+                return Boolean(ast);
+            default:
+                return false;
+        }
+    }, [
+        activeSection,
+        data?.resultSets,
+        selectedResultSet,
+        preparedPlan?.pristine,
+        simplifiedPlan?.pristine,
+        stats,
+        ast,
+    ]);
+
+    const handleCopy = React.useCallback(async () => {
+        window.clearTimeout(copyTimeoutRef.current);
+
+        let success = false;
         switch (activeSection) {
             case RESULT_OPTIONS_IDS.result: {
                 const currentResult = data?.resultSets?.[selectedResultSet];
-                const textResults = getPreparedResult(currentResult?.result);
-                return textResults;
+                success = await copyResultToClipboard(currentResult?.result);
+                break;
             }
-            case RESULT_OPTIONS_IDS.json: {
-                return preparedPlan?.pristine;
-            }
+            case RESULT_OPTIONS_IDS.json:
+                success = await copyTextDataToClipboard(preparedPlan?.pristine);
+                break;
             case RESULT_OPTIONS_IDS.simplified:
-                return simplifiedPlan?.pristine;
+                success = await copyTextDataToClipboard(simplifiedPlan?.pristine);
+                break;
             case RESULT_OPTIONS_IDS.stats:
-                return stats;
+                success = await copyTextDataToClipboard(stats);
+                break;
             case RESULT_OPTIONS_IDS.ast:
-                return ast;
-            default:
-                return undefined;
+                success = await copyTextDataToClipboard(ast);
+                break;
         }
-    };
 
-    const renderClipboardButton = () => {
-        if (isLoading) {
+        setCopyStatus(success ? 'success' : 'error');
+        copyTimeoutRef.current = window.setTimeout(() => {
+            setCopyStatus('pending');
+        }, COPY_STATUS_RESET_TIMEOUT);
+    }, [
+        activeSection,
+        data?.resultSets,
+        selectedResultSet,
+        preparedPlan?.pristine,
+        simplifiedPlan?.pristine,
+        stats,
+        ast,
+    ]);
+
+    const renderCopyButton = () => {
+        if (isLoading || !hasCopyableData()) {
             return null;
         }
 
-        const statsToCopy = getStatsToCopy();
-        const copyText = getStringifiedData(statsToCopy);
-        if (!copyText) {
-            return null;
-        }
         return (
-            <ClipboardButton
-                text={copyText}
-                view="flat-secondary"
-                tooltipInitialText={i18n('action.copy', {activeSection})}
-            />
+            <ActionTooltip
+                title={
+                    copyStatus === 'success'
+                        ? i18n('action.copy-success')
+                        : i18n('action.copy', {activeSection})
+                }
+            >
+                <Button view="flat-secondary" onClick={handleCopy}>
+                    <Button.Icon>
+                        <ClipboardIcon status={copyStatus} size={16} />
+                    </Button.Icon>
+                </Button>
+            </ActionTooltip>
         );
     };
 
@@ -326,7 +386,7 @@ export function QueryResultViewer({
         return (
             <div className={b('controls-right')}>
                 {renderQueryInfoDropdown()}
-                {renderClipboardButton()}
+                {renderCopyButton()}
                 <EnableFullscreenButton />
                 <PaneVisibilityToggleButtons
                     onCollapse={onCollapseResults}

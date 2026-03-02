@@ -8,6 +8,7 @@
   "action.json": "JSON",
   "action.ast": "AST",
   "action.copy": "Copy {{activeSection}}",
+  "action.copy-success": "Copied",
   "trace": "Trace",
   "title.truncated": "Truncated",
   "title.result": "Result",
@@ -19,10 +20,8 @@
   "text_diagnostics": "Download Diagnostics",
   "text_diagnostics_description": "JSON",
   "text_error-plan-svg": "Error: {{error}}",
-
   "error.title": "Query Failed",
   "error.description": "An error occurred, please see the Result tab for details",
-
   "stopped.title": "Query stopped",
   "stopped.description": "Query was stopped"
 }
