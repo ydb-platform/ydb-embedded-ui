@@ -6,6 +6,7 @@ import {TenantPage} from '../tenant/TenantPage';
 
 import {ErrorDisplayModel} from './ErrorDisplayModel';
 import {
+    setup400JsonCodeOnlyMock,
     setup400PlainTextMock,
     setup401CapabilitiesNoAuthUrlMock,
     setup429HtmlMock,
@@ -312,6 +313,27 @@ test.describe.only('Error Display — ResponseError with Details', () => {
         );
         await page.screenshot({
             path: `${FULL_PAGE_DIR}/full-whoami-network.png`,
+            fullPage: true,
+        });
+    });
+
+    test('HTTP 400 — JSON body with only code field shows code as message', async ({page}) => {
+        await setup400JsonCodeOnlyMock(page);
+
+        const clusterPage = new ClusterPage(page);
+        await clusterPage.goto();
+
+        const errorDisplay = new ErrorDisplayModel(page);
+        await errorDisplay.waitForResponseError();
+
+        const errorText = await errorDisplay.getResponseErrorText();
+        expect(errorText).toContain('NEED_RESET');
+
+        await expect(errorDisplay.getResponseErrorLocator()).toHaveScreenshot(
+            'error-400-json-code-only.png',
+        );
+        await page.screenshot({
+            path: `${FULL_PAGE_DIR}/full-400-json-code-only.png`,
             fullPage: true,
         });
     });

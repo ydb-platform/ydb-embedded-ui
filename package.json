@@ -16,7 +16,6 @@
   "dependencies": {
     "@bem-react/classname": "^1.6.0",
     "@ebay/nice-modal-react": "^1.2.13",
-    "@fontsource/inter": "^5.2.8",
     "@gravity-ui/axios-wrapper": "^1.5.1",
     "@gravity-ui/chartkit": "^7.1.0",
     "@gravity-ui/components": "^4.18.0",

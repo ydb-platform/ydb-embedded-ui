@@ -110,6 +110,20 @@ export async function setup502WithProxyMock(page: Page) {
     });
 }
 
+export async function setup400JsonCodeOnlyMock(page: Page) {
+    await page.route(CLUSTER_ROUTE, async (route) => {
+        await route.fulfill({
+            status: 400,
+            contentType: 'application/json',
+            body: JSON.stringify({code: 'NEED_RESET'}),
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Expose-Headers': EXPOSED_HEADERS,
+            },
+        });
+    });
+}
+
 const CAPABILITIES_ROUTE = `${backend}/viewer/capabilities*`;
 
 export async function setup401CapabilitiesNoAuthUrlMock(page: Page) {
