@@ -6,9 +6,7 @@ const VISIBILITY_TIMEOUT = 10 * 1000;
 
 export class ErrorDisplayModel extends BaseModel {
     private responseError: Locator;
-    private detailsTrigger: Locator;
-    private detailsContent: Locator;
-    private issuesSection: Locator;
+    private fieldsDefinitionList: Locator;
     private issuesTrigger: Locator;
     private accessDeniedState: Locator;
     private accessDeniedTitle: Locator;
@@ -17,12 +15,10 @@ export class ErrorDisplayModel extends BaseModel {
         super(page, page.locator('body'));
 
         this.responseError = page.locator('.response-error');
-        this.detailsTrigger = this.responseError
-            .locator('.response-error__details > .response-error__details-trigger')
-            .first();
-        this.detailsContent = this.responseError.locator('.response-error__details-content');
-        this.issuesSection = this.responseError.locator('.response-error__issues');
-        this.issuesTrigger = this.issuesSection.locator('.response-error__details-trigger');
+        this.fieldsDefinitionList = this.responseError.locator('.response-error__fields');
+        this.issuesTrigger = this.responseError.locator(
+            '.response-error__issues .response-error__details-trigger',
+        );
         this.accessDeniedState = page.locator('.empty-state');
         this.accessDeniedTitle = this.accessDeniedState.locator('.empty-state__title');
     }
@@ -39,22 +35,8 @@ export class ErrorDisplayModel extends BaseModel {
         return this.responseError.innerText();
     }
 
-    async isDetailsButtonVisible(): Promise<boolean> {
-        return this.detailsTrigger.isVisible();
-    }
-
-    async expandDetails(): Promise<void> {
-        await this.detailsTrigger.click();
-        await this.detailsContent.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-    }
-
-    async getDetailsText(): Promise<string> {
-        return this.detailsContent.innerText();
-    }
-
     async getDetailValue(label: string): Promise<string | null> {
-        const definitionList = this.detailsContent.locator('.g-definition-list');
-        const items = definitionList.locator('.g-definition-list__item');
+        const items = this.fieldsDefinitionList.locator('.g-definition-list__item');
         const count = await items.count();
 
         for (let i = 0; i < count; i++) {
@@ -66,8 +48,12 @@ export class ErrorDisplayModel extends BaseModel {
         return null;
     }
 
-    async isIssuesSectionVisible(): Promise<boolean> {
-        return this.issuesSection.isVisible();
+    async isFieldsVisible(): Promise<boolean> {
+        return this.fieldsDefinitionList.isVisible();
+    }
+
+    async isIssuesTriggerVisible(): Promise<boolean> {
+        return this.issuesTrigger.isVisible();
     }
 
     async expandIssues(): Promise<void> {
@@ -75,7 +61,9 @@ export class ErrorDisplayModel extends BaseModel {
     }
 
     async getIssuesText(): Promise<string> {
-        return this.issuesSection.innerText();
+        const issuesContainer = this.responseError.locator('.kv-issues');
+        await issuesContainer.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return issuesContainer.innerText();
     }
 
     async waitForAccessDenied(): Promise<void> {
