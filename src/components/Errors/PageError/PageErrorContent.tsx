@@ -8,16 +8,6 @@ import i18n from '../i18n';
 
 const b = cn('ydb-page-error');
 
-function formatStatusLine(status?: number, statusText?: string): string | undefined {
-    if (!status) {
-        return undefined;
-    }
-    if (statusText) {
-        return `${status} ${statusText}`;
-    }
-    return String(status);
-}
-
 function formatUrlLine(method?: string, requestUrl?: string): string | undefined {
     if (!requestUrl) {
         return undefined;
@@ -28,88 +18,113 @@ function formatUrlLine(method?: string, requestUrl?: string): string | undefined
     return requestUrl;
 }
 
+interface ErrorFieldsListProps {
+    details: ErrorDetails;
+    message: string;
+    dataMessage?: string;
+    className?: string;
+}
+
+function ErrorFieldsList({details, message, dataMessage, className}: ErrorFieldsListProps) {
+    const {requestUrl, method, errorCode, traceId, requestId, proxyName, workerName, responseBody} =
+        details;
+
+    const urlLine = formatUrlLine(method, requestUrl);
+    const isBodyRedundant =
+        responseBody && (responseBody === message || responseBody === dataMessage);
+
+    return (
+        <DefinitionList nameMaxWidth={130} className={className}>
+            {urlLine && (
+                <DefinitionList.Item name={i18n('error-details.label_url')} copyText={urlLine}>
+                    {urlLine}
+                </DefinitionList.Item>
+            )}
+            {errorCode && (
+                <DefinitionList.Item
+                    name={i18n('error-details.label_error-code')}
+                    copyText={errorCode}
+                >
+                    {errorCode}
+                </DefinitionList.Item>
+            )}
+            {traceId && (
+                <DefinitionList.Item name="Trace-ID" copyText={traceId}>
+                    {traceId}
+                </DefinitionList.Item>
+            )}
+            {requestId && (
+                <DefinitionList.Item name="Request-ID" copyText={requestId}>
+                    {requestId}
+                </DefinitionList.Item>
+            )}
+            {proxyName && (
+                <DefinitionList.Item name="x-proxy-name" copyText={proxyName}>
+                    {proxyName}
+                </DefinitionList.Item>
+            )}
+            {workerName && (
+                <DefinitionList.Item name="x-worker-name" copyText={workerName}>
+                    {workerName}
+                </DefinitionList.Item>
+            )}
+            {responseBody && !isBodyRedundant && (
+                <DefinitionList.Item
+                    name={i18n('error-details.label_response-body')}
+                    copyText={responseBody}
+                >
+                    {responseBody}
+                </DefinitionList.Item>
+            )}
+        </DefinitionList>
+    );
+}
+
 interface PageErrorContentProps {
     message: string;
+    dataMessage?: string;
     details: ErrorDetails | null;
 }
 
-export function PageErrorContent({message, details}: PageErrorContentProps) {
-    const {
-        requestUrl,
-        method,
-        errorCode,
-        traceId,
-        requestId,
-        proxyName,
-        workerName,
-        hasIssues,
-        issues,
-        status,
-        statusText,
-    } = details ?? {};
+export function PageErrorContent({message, dataMessage, details}: PageErrorContentProps) {
+    const isBodyRedundant =
+        details?.responseBody &&
+        (details.responseBody === message || details.responseBody === dataMessage);
+    const hasFields = details
+        ? Boolean(
+              details.requestUrl ||
+                  details.errorCode ||
+                  details.traceId ||
+                  details.requestId ||
+                  details.proxyName ||
+                  details.workerName ||
+                  (details.responseBody && !isBodyRedundant),
+          )
+        : false;
 
-    const urlLine = formatUrlLine(method, requestUrl);
-    const statusLine = formatStatusLine(status, statusText);
-
-    const hasFields = Boolean(
-        statusLine || urlLine || errorCode || traceId || requestId || proxyName || workerName,
-    );
-    const hasIssueData = hasIssues && issues && issues.length > 0;
+    const hasIssueData = details?.hasIssues && details.issues && details.issues.length > 0;
+    const showDataMessage = Boolean(dataMessage) && dataMessage !== message;
 
     return (
         <Flex direction="column" gap={3}>
-            <Text variant="body-1">{message}</Text>
+            <Text variant="body-2">{message}</Text>
 
-            {hasFields && (
-                <DefinitionList nameMaxWidth={130} className={b('fields')}>
-                    {statusLine && (
-                        <DefinitionList.Item
-                            name={i18n('error-details.label_status')}
-                            copyText={statusLine}
-                        >
-                            {statusLine}
-                        </DefinitionList.Item>
-                    )}
-                    {urlLine && (
-                        <DefinitionList.Item
-                            name={i18n('error-details.label_url')}
-                            copyText={urlLine}
-                        >
-                            {urlLine}
-                        </DefinitionList.Item>
-                    )}
-                    {errorCode && (
-                        <DefinitionList.Item
-                            name={i18n('error-details.label_error-code')}
-                            copyText={errorCode}
-                        >
-                            {errorCode}
-                        </DefinitionList.Item>
-                    )}
-                    {traceId && (
-                        <DefinitionList.Item name="Trace-ID" copyText={traceId}>
-                            {traceId}
-                        </DefinitionList.Item>
-                    )}
-                    {requestId && (
-                        <DefinitionList.Item name="Request-ID" copyText={requestId}>
-                            {requestId}
-                        </DefinitionList.Item>
-                    )}
-                    {proxyName && (
-                        <DefinitionList.Item name="x-proxy-name" copyText={proxyName}>
-                            {proxyName}
-                        </DefinitionList.Item>
-                    )}
-                    {workerName && (
-                        <DefinitionList.Item name="x-worker-name" copyText={workerName}>
-                            {workerName}
-                        </DefinitionList.Item>
-                    )}
-                </DefinitionList>
+            {showDataMessage && (
+                <Text variant="body-1" color="secondary">
+                    {dataMessage}
+                </Text>
             )}
 
-            {hasIssueData && <IssuesSection issues={issues} />}
+            {hasFields && details && (
+                <ErrorFieldsList
+                    details={details}
+                    message={message}
+                    dataMessage={dataMessage}
+                    className={b('fields')}
+                />
+            )}
+
+            {hasIssueData && <IssuesSection issues={details.issues!} />}
         </Flex>
     );
 }

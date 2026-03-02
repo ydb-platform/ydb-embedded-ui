@@ -5,9 +5,17 @@ import {BaseModel} from '../../models/BaseModel';
 const VISIBILITY_TIMEOUT = 10 * 1000;
 
 export class ErrorDisplayModel extends BaseModel {
+    // Inline error (ResponseError on cluster page)
     private responseError: Locator;
     private fieldsDefinitionList: Locator;
     private issuesTrigger: Locator;
+
+    // Full-page error (PageError — blocks entire page)
+    private pageError: Locator;
+    private pageErrorBody: Locator;
+    private pageErrorFields: Locator;
+
+    // Access denied
     private accessDeniedState: Locator;
     private accessDeniedTitle: Locator;
 
@@ -19,6 +27,11 @@ export class ErrorDisplayModel extends BaseModel {
         this.issuesTrigger = this.responseError.locator(
             '.response-error__issues .response-error__details-trigger',
         );
+
+        this.pageError = page.locator('.ydb-page-error');
+        this.pageErrorBody = this.pageError.locator('.ydb-page-error__body');
+        this.pageErrorFields = this.pageError.locator('.ydb-page-error__fields');
+
         this.accessDeniedState = page.locator('.empty-state');
         this.accessDeniedTitle = this.accessDeniedState.locator('.empty-state__title');
     }
@@ -85,5 +98,36 @@ export class ErrorDisplayModel extends BaseModel {
         } catch {
             return false;
         }
+    }
+
+    // --- Full-page PageError methods ---
+
+    async waitForPageError(): Promise<void> {
+        await this.pageError.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+    }
+
+    getPageErrorLocator(): Locator {
+        return this.pageError;
+    }
+
+    async getPageErrorBodyText(): Promise<string> {
+        return this.pageErrorBody.innerText();
+    }
+
+    async isPageErrorFieldsVisible(): Promise<boolean> {
+        return this.pageErrorFields.isVisible();
+    }
+
+    async getPageErrorDetailValue(label: string): Promise<string | null> {
+        const items = this.pageErrorFields.locator('.g-definition-list__item');
+        const count = await items.count();
+
+        for (let i = 0; i < count; i++) {
+            const name = await items.nth(i).locator('dt').textContent();
+            if (name?.trim() === label) {
+                return (await items.nth(i).locator('dd').textContent())?.trim() ?? null;
+            }
+        }
+        return null;
     }
 }

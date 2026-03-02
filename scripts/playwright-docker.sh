@@ -10,6 +10,7 @@ if [ ! -d "node_modules/@playwright/test" ]; then
   exit 1
 fi
 
+
 PLAYWRIGHT_VERSION=$(node -e "console.log(require('@playwright/test/package.json').version)")
 DOCKER_IMAGE="mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION}-noble"
 
@@ -18,6 +19,7 @@ echo "Using Playwright Docker image: ${DOCKER_IMAGE}"
 # NOTE: --network host only works on Linux.
 # On macOS/Windows Docker Desktop, localhost inside the container does not reach the host.
 # Use PLAYWRIGHT_BASE_URL=http://host.docker.internal:PORT as a workaround on those platforms.
+
 docker run --rm --network host \
   -v "${PROJECT_DIR}:/work" \
   -v "ydb-embedded-ui-node-modules:/work/node_modules" \

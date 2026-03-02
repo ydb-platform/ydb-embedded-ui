@@ -109,3 +109,74 @@ export async function setup502WithProxyMock(page: Page) {
         });
     });
 }
+
+const CAPABILITIES_ROUTE = `${backend}/viewer/capabilities*`;
+
+export async function setup401CapabilitiesNoAuthUrlMock(page: Page) {
+    await page.route(CAPABILITIES_ROUTE, async (route) => {
+        await route.fulfill({
+            status: 401,
+            contentType: 'application/json; charset=utf-8',
+            body: JSON.stringify({code: 'NEED_RESET'}),
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Expose-Headers': EXPOSED_HEADERS,
+                'x-request-id': 'test-req-id-e2e-401-caps',
+            },
+        });
+    });
+}
+
+const WHOAMI_ROUTE = `${backend}/viewer/json/whoami*`;
+
+export async function setupWhoami500Mock(page: Page) {
+    await page.route(WHOAMI_ROUTE, async (route) => {
+        await route.fulfill({
+            status: 500,
+            contentType: 'application/json',
+            body: JSON.stringify({error: 'Authentication service unavailable'}),
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Expose-Headers': EXPOSED_HEADERS,
+                traceresponse: '00-whoamitrace1122334455667788aabb-9900112233445566-00',
+                'x-request-id': 'test-req-id-e2e-whoami-500',
+            },
+        });
+    });
+}
+
+export async function setupWhoami503TextBodyMock(page: Page) {
+    await page.route(WHOAMI_ROUTE, async (route) => {
+        await route.fulfill({
+            status: 503,
+            contentType: 'text/plain',
+            body: 'Database connection pool exhausted',
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Expose-Headers': EXPOSED_HEADERS,
+                'x-worker-name': 'auth-worker-03.example.net:8765',
+            },
+        });
+    });
+}
+
+export async function setupWhoamiNetworkErrorMock(page: Page) {
+    await page.route(WHOAMI_ROUTE, async (route) => {
+        await route.abort('failed');
+    });
+}
+
+export async function setupWhoami401NoAuthUrlMock(page: Page) {
+    await page.route(WHOAMI_ROUTE, async (route) => {
+        await route.fulfill({
+            status: 401,
+            contentType: 'application/json; charset=utf-8',
+            body: JSON.stringify({code: 'NEED_RESET'}),
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Expose-Headers': EXPOSED_HEADERS,
+                'x-request-id': 'test-req-id-e2e-401-whoami',
+            },
+        });
+    });
+}

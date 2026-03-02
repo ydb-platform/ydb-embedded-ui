@@ -31,6 +31,18 @@ describe('prepareCommonErrorMessage', () => {
         expect(prepareCommonErrorMessage(error)).toBe('Throughput limit exceeded');
     });
 
+    test('should return data.error.message for response errors with error object', () => {
+        const error = {
+            status: 429,
+            data: {
+                error: {issue_code: 200803, severity: 1, message: 'Throughput limit exceeded'},
+                issues: [{issue_code: 200803, severity: 1, message: 'Throughput limit exceeded'}],
+                status: 'OVERLOADED',
+            },
+        };
+        expect(prepareCommonErrorMessage(error)).toBe('Throughput limit exceeded');
+    });
+
     test('should return data string for response errors with non-empty string data', () => {
         const error = {
             status: 400,
