@@ -244,6 +244,70 @@ export async function setupMockStreamingFetch(
     );
 }
 
+export interface MockStreamingHttpErrorOptions {
+    /** HTTP status code (default: 502) */
+    status?: number;
+    /** HTTP status text (default: 'Bad Gateway') */
+    statusText?: string;
+    /** Response body (default: HTML error page) */
+    body?: string;
+    /** Content-Type header (default: 'text/html') */
+    contentType?: string;
+}
+
+/**
+ * Monkey-patches `window.fetch` to intercept streaming query requests and return
+ * a non-OK HTTP response with the specified body (plain text or HTML).
+ *
+ * Useful for testing proxy error scenarios where the response body is not JSON.
+ */
+export async function setupMockStreamingHttpError(
+    page: Page,
+    options: MockStreamingHttpErrorOptions = {},
+): Promise<void> {
+    const status = options.status ?? 502;
+    const statusText = options.statusText ?? 'Bad Gateway';
+    const body = options.body ?? '<html><body><h1>502 Bad Gateway</h1><p>nginx</p></body></html>';
+    const contentType = options.contentType ?? 'text/html';
+
+    await page.evaluate(
+        ({status: s, statusText: st, body: b, contentType: ct}) => {
+            const originalFetch = window.fetch;
+            (window as unknown as Record<string, unknown>).__originalFetch = originalFetch;
+
+            window.fetch = function (
+                input: RequestInfo | URL,
+                init?: RequestInit,
+            ): Promise<Response> {
+                let url: string;
+                if (typeof input === 'string') {
+                    url = input;
+                } else if (input instanceof URL) {
+                    url = input.href;
+                } else {
+                    url = input.url;
+                }
+
+                const isStreamingQuery =
+                    url.includes('/viewer/query') && url.includes('schema=multipart');
+
+                if (!isStreamingQuery) {
+                    return originalFetch.call(window, input, init);
+                }
+
+                return Promise.resolve(
+                    new Response(b, {
+                        status: s,
+                        statusText: st,
+                        headers: {'Content-Type': ct},
+                    }),
+                );
+            };
+        },
+        {status, statusText, body, contentType},
+    );
+}
+
 /**
  * Restores the original `window.fetch` that was captured by `setupMockStreamingFetch`.
  * Safe to call even if the mock was never installed (no-op in that case).

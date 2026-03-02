@@ -1,6 +1,24 @@
 {
+  "401.title": "Authentication required",
+  "401.description": "The server could not verify your identity. Please check your credentials or contact your administrator.",
   "403.title": "Access denied",
-  "403.description": "You don’t have the necessary roles to view this page.",
+  "403.description": "You don't have permissions to view this resource. Contact to your administrator.",
   "responseError.defaultMessage": "Response error",
-  "error.title": "Error"
+  "error.title": "Error",
+  "error-details.label_url": "URL",
+  "error-details.label_error-code": "Code",
+  "error-details.label_message": "Message",
+  "error-details.label_error-phase": "Phase",
+  "error-details.phase_connection": "Connection failed",
+  "error-details.phase_stream": "Connection interrupted during data transfer",
+  "error-details.label_network-type": "Network",
+  "error-details.network_offline": "No internet connection",
+  "error-details.label_trace-id": "Trace-ID",
+  "error-details.label_request-id": "Request-ID",
+  "error-details.label_proxy-name": "x-proxy-name",
+  "error-details.label_worker-name": "x-worker-name",
+  "error-details.label_issues": "Issues ({{count}})",
+  "error-details.button_issues": "Issues",
+  "error-details.button_response": "Response",
+  "error-details.button_report-problem": "Report a problem"
 }

@@ -4,7 +4,6 @@ import {
     TENANT_OVERVIEW_TABLES_SETTINGS,
 } from '../../../../../utils/constants';
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
-import {parseQueryErrorToString} from '../../../../../utils/query';
 import {QueriesTableWithDrawer} from '../../TopQueries/QueriesTableWithDrawer';
 import {getTenantOverviewTopQueriesColumns} from '../../TopQueries/columns/columns';
 import {TOP_QUERIES_COLUMNS_WIDTH_LS_KEY} from '../../TopQueries/columns/constants';
@@ -36,11 +35,7 @@ export function TopQueries({database}: TopQueriesProps) {
     const data = currentData?.resultSets?.[0]?.result || [];
 
     return (
-        <TenantOverviewTableLayout
-            loading={loading}
-            error={parseQueryErrorToString(error)}
-            withData={Boolean(currentData)}
-        >
+        <TenantOverviewTableLayout loading={loading} error={error} withData={Boolean(currentData)}>
             <QueriesTableWithDrawer
                 columnsWidthLSKey={TOP_QUERIES_COLUMNS_WIDTH_LS_KEY}
                 data={data}

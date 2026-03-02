@@ -1,9 +1,9 @@
 import React from 'react';
 
-import {Illustration} from '../../../../../components/Illustration';
 import type {TNetNodeInfo, TNetNodePeerInfo} from '../../../../../types/api/netInfo';
 import {cn} from '../../../../../utils/cn';
 import {useWithProblemsQueryParam} from '../../../../../utils/hooks/useWithProblemsQueryParam';
+import {getIllustration} from '../../../../../utils/illustrations';
 import {NodeNetwork} from '../NodeNetwork/NodeNetwork';
 import type {NodeTooltipData} from '../NodeTooltipPopup/NodeTooltipPopup';
 import i18n from '../i18n';
@@ -252,6 +252,8 @@ export function Nodes({
     onShowNodeTooltip,
     onHideNodeTooltip,
 }: NodesProps) {
+    const SuccessImage = getIllustration('SuccessOperation');
+
     const {withProblems} = useWithProblemsQueryParam();
 
     const displayedNodesCount = React.useMemo(
@@ -299,7 +301,7 @@ export function Nodes({
     });
 
     if (withProblems && displayedNodesCount === 0) {
-        return <Illustration name="thumbsUp" width={200} />;
+        return <SuccessImage width={200} height={200} />;
     }
 
     return result;

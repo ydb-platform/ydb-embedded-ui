@@ -1,10 +1,10 @@
 import React from 'react';
 
-import {NoSearchResults} from '@gravity-ui/illustrations';
 import {Flex} from '@gravity-ui/uikit';
 
 import {EmptyState} from '../../../../components/EmptyState';
 import type {IssuesTree} from '../../../../store/reducers/healthcheckInfo/types';
+import {getIllustration} from '../../../../utils/illustrations';
 import {useTenantQueryParams} from '../../useTenantQueryParams';
 import i18n from '../i18n';
 
@@ -15,6 +15,8 @@ interface IssuesProps {
 }
 
 export function Issues({issues}: IssuesProps) {
+    const NoSearchResultsImage = getIllustration('NoSearchResults');
+
     const {view, issuesFilter} = useTenantQueryParams();
 
     const filteredIssues = React.useMemo(() => {
@@ -51,7 +53,7 @@ export function Issues({issues}: IssuesProps) {
         return (
             <Flex grow={1} justifyContent="center" alignItems="center">
                 <EmptyState
-                    image={<NoSearchResults width={100} height={100} />}
+                    image={<NoSearchResultsImage width={100} height={100} />}
                     position="center"
                     size="xs"
                     title={i18n('label_no-issues')}

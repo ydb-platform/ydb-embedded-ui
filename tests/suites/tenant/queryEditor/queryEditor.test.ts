@@ -6,6 +6,7 @@ import {database} from '../../../utils/constants';
 import {
     cleanupMockStreamingFetch,
     setupMockStreamingFetch,
+    setupMockStreamingHttpError,
 } from '../../../utils/mockStreamingFetch';
 import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {NavigationTabs, TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
@@ -95,6 +96,22 @@ test.describe('Test Query Editor', async () => {
         await expect(errorMessage).toContain('Column references are not allowed without FROM');
     });
 
+    test('Error on non-Result tab shows Query Failed message for failed run', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+
+        const invalidQuery = 'Select d';
+        await queryEditor.setQuery(invalidQuery);
+        await queryEditor.clickRunButton();
+
+        await expect(queryEditor.waitForStatus('Failed')).resolves.toBe(true);
+
+        // Switch to Explain tab — execute errors should show simple "Query Failed" with redirect
+        await queryEditor.paneWrapper.selectTab(ResultTabNames.ExplainPlan);
+
+        const resultArea = queryEditor.getResultAreaLocator();
+        await expect(resultArea).toHaveScreenshot('query-error-on-explain-tab.png');
+    });
+
     test('Error is displayed for invalid query for explain', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
@@ -146,6 +163,46 @@ test.describe('Test Query Editor', async () => {
         expect(resultCount).toBeGreaterThan(0);
         const resultView = queryEditor.resultTable.getResultWrapperLocator();
         await expect(resultView).toHaveScreenshot('streaming-query-completed.png');
+    });
+
+    test('Streaming non-JSON HTTP error shows actual error body, not empty object', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'on', 'Query Streaming');
+
+        const htmlBody = '<html><body><h1>502 Bad Gateway</h1><p>nginx</p></body></html>';
+        await setupMockStreamingHttpError(page, {
+            status: 502,
+            statusText: 'Bad Gateway',
+            body: htmlBody,
+        });
+
+        await queryEditor.setQuery('SELECT 1;');
+        await queryEditor.clickRunButton();
+
+        await expect(queryEditor.waitForStatus('Failed')).resolves.toBe(true);
+
+        // The error alert should show "502 Bad Gateway" title
+        const errorAlert = queryEditor.getResultAreaLocator().locator('.g-alert');
+        await expect(errorAlert).toBeVisible({timeout: VISIBILITY_TIMEOUT});
+        await expect(errorAlert).toContainText('502 Bad Gateway');
+
+        // Click the "Response" expand button to reveal the body section
+        const responseButton = errorAlert.getByRole('button', {name: 'Response'});
+        await expect(responseButton).toBeVisible({timeout: VISIBILITY_TIMEOUT});
+        await responseButton.click();
+
+        // The response body section should show the actual HTML content, not "{}"
+        const responseBody = errorAlert.locator('.response-body-section__code');
+        await expect(responseBody).toBeVisible({timeout: VISIBILITY_TIMEOUT});
+        await expect(responseBody).toContainText('502 Bad Gateway');
+        await expect(responseBody).not.toContainText('{}');
+
+        // Screenshot for visual verification
+        await expect(queryEditor.getResultAreaLocator()).toHaveScreenshot(
+            'streaming-non-json-error.png',
+        );
     });
 
     test('Query execution is terminated when stop button is clicked', async ({page}) => {

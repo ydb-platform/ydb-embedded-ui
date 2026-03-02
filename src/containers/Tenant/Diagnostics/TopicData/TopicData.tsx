@@ -1,6 +1,5 @@
 import React from 'react';
 
-import {NoSearchResults} from '@gravity-ui/illustrations';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {isNil} from 'lodash';
 
@@ -22,6 +21,7 @@ import {topicApi} from '../../../../store/reducers/topic';
 import type {TopicDataRequest} from '../../../../types/api/topic';
 import {useAutoRefreshInterval} from '../../../../utils/hooks';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
+import {getIllustration} from '../../../../utils/illustrations';
 import {renderPaginatedTableErrorMessage} from '../../../../utils/renderPaginatedTableErrorMessage';
 import {safeParseNumber} from '../../../../utils/utils';
 
@@ -56,6 +56,8 @@ const PAGINATED_TABLE_LIMIT = 50_000;
 const columns = getAllColumns();
 
 export function TopicData({scrollContainerRef, path, database, databaseFullPath}: TopicDataProps) {
+    const NoSearchResultsImage = getIllustration('NoSearchResults');
+
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const useMetaProxy = useClusterWithProxy();
     const [startOffset, setStartOffset] = React.useState<number>();
@@ -294,7 +296,7 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
                 message={i18n('description_nothing-found')}
                 onShowAll={hasFilters ? resetFilters : undefined}
                 showAll={i18n('action_show-all')}
-                image={<NoSearchResults width={230} height={230} />}
+                image={<NoSearchResultsImage width={230} height={230} />}
             />
         );
     };

@@ -15,7 +15,6 @@ import type {ShardsWorkloadFilters} from '../../../../store/reducers/shardsWorkl
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../../../utils/constants';
 import {useAutoRefreshInterval, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
-import {parseQueryErrorToString} from '../../../../utils/query';
 
 import {Filters} from './Filters';
 import i18n from './i18n';
@@ -161,7 +160,7 @@ export const TopShards = ({database, path, databaseFullPath}: TopShardsProps) =>
                 <div className={b('hint')}>{i18n('description')}</div>
             )}
 
-            {error ? <ResponseError error={parseQueryErrorToString(error)} /> : null}
+            {error ? <ResponseError error={error} /> : null}
             <TableWithControlsLayout.Table loading={loading}>
                 {renderContent()}
             </TableWithControlsLayout.Table>

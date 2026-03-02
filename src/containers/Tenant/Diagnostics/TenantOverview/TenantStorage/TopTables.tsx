@@ -11,7 +11,6 @@ import type {KeyValueRow} from '../../../../../types/api/query';
 import {formatBytes, getBytesSizeUnit} from '../../../../../utils/bytesParsers';
 import {TENANT_OVERVIEW_TABLES_SETTINGS} from '../../../../../utils/constants';
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
-import {parseQueryErrorToString} from '../../../../../utils/query';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 
 interface TopTablesProps {
@@ -56,11 +55,7 @@ export function TopTables({database}: TopTablesProps) {
     const columns = React.useMemo(() => getColumns(size), [size]);
 
     return (
-        <TenantOverviewTableLayout
-            loading={loading}
-            error={parseQueryErrorToString(error)}
-            withData={Boolean(currentData)}
-        >
+        <TenantOverviewTableLayout loading={loading} error={error} withData={Boolean(currentData)}>
             <ResizeableDataTable
                 columnsWidthLSKey={TOP_TABLES_COLUMNS_WIDTH_LS_KEY}
                 data={data}

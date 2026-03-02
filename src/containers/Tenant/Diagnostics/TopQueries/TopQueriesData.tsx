@@ -16,7 +16,6 @@ import type {KeyValueRow} from '../../../../types/api/query';
 import {cn} from '../../../../utils/cn';
 import {useAutoRefreshInterval, useTypedSelector} from '../../../../utils/hooks';
 import {useSelectedColumns} from '../../../../utils/hooks/useSelectedColumns';
-import {parseQueryErrorToString} from '../../../../utils/query';
 
 import {QueriesTableWithDrawer} from './QueriesTableWithDrawer';
 import {getTopQueriesColumns} from './columns/columns';
@@ -161,7 +160,7 @@ export const TopQueriesData = ({
                 />
             </TableWithControlsLayout.Controls>
 
-            {error ? <ResponseError error={parseQueryErrorToString(error)} /> : null}
+            {error ? <ResponseError error={error} /> : null}
             <TableWithControlsLayout.Table>
                 <QueriesTableWithDrawer
                     columns={columnsToShow}

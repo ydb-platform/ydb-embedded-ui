@@ -1,7 +1,9 @@
+import React from 'react';
+
 import {Button} from '@gravity-ui/uikit';
 
+import {getIllustration} from '../../utils/illustrations';
 import {EmptyState} from '../EmptyState';
-import {Illustration} from '../Illustration';
 
 import i18n from './i18n';
 
@@ -18,19 +20,30 @@ export const EmptyFilter = ({
     message = i18n('default_message'),
     showAll = i18n('default_button_label'),
     onShowAll,
-    image = <Illustration name="thumbsUp" width={200} />,
-}: EmptyFilterProps) => (
-    <EmptyState
-        image={image}
-        position="left"
-        title={title}
-        description={message}
-        actions={
-            onShowAll && [
-                <Button key="show-all" onClick={onShowAll}>
-                    {showAll}
-                </Button>,
-            ]
+    image,
+}: EmptyFilterProps) => {
+    const SuccessImage = getIllustration('SuccessOperation');
+
+    const resolvedImage = React.useMemo(() => {
+        if (image !== undefined) {
+            return image;
         }
-    />
-);
+        return <SuccessImage width={200} height={200} />;
+    }, [image, SuccessImage]);
+
+    return (
+        <EmptyState
+            image={resolvedImage}
+            position="left"
+            title={title}
+            description={message}
+            actions={
+                onShowAll && [
+                    <Button key="show-all" onClick={onShowAll}>
+                        {showAll}
+                    </Button>,
+                ]
+            }
+        />
+    );
+};

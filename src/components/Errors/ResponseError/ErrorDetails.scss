@@ -1,0 +1,53 @@
+@use '../../../styles/mixins.scss';
+
+.error-details {
+    min-width: 0;
+    margin-top: var(--g-spacing-3);
+
+    color: var(--g-color-text-primary);
+
+    @include mixins.body-1-typography();
+
+    &__fields {
+        min-width: 0;
+
+        .g-definition-list {
+            padding-inline-end: 0;
+        }
+
+        .g-definition-list__copy-button {
+            position: static;
+
+            opacity: 1;
+        }
+
+        .g-definition-list__copy-container {
+            align-items: center;
+        }
+    }
+
+    &__field-value {
+        word-break: break-all;
+    }
+
+    &__details-trigger {
+        all: unset;
+
+        display: inline-flex;
+        align-items: center;
+
+        padding: var(--g-spacing-half) 0;
+
+        cursor: pointer;
+
+        color: var(--g-color-text-secondary);
+
+        &:hover {
+            color: var(--g-color-text-primary);
+        }
+    }
+
+    &__issues {
+        margin-top: var(--g-spacing-2);
+    }
+}

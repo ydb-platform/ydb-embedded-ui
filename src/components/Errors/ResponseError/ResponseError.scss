@@ -1,0 +1,13 @@
+.response-error {
+    max-width: 600px;
+
+    .g-alert__text-content,
+    .g-alert__message,
+    .g-flex {
+        min-width: 0;
+    }
+
+    &__data-message {
+        display: block;
+    }
+}
