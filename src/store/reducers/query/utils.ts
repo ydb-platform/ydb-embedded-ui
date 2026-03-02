@@ -8,7 +8,6 @@ import type {
     StreamDataChunk,
     StreamingChunk,
 } from '../../../types/store/streaming';
-import {parseUsToMs} from '../../../utils/timeParsers';
 
 import type {EnhancedQueryInHistory, QueryInHistory} from './types';
 
@@ -40,7 +39,7 @@ export function getQueryInHistory(rawQuery: string | QueryInHistory): EnhancedQu
     const enhancedQuery: EnhancedQueryInHistory = {...rawQuery};
     if (enhancedQuery.durationUs && enhancedQuery.endTime) {
         enhancedQuery.startTime =
-            Number(enhancedQuery.endTime) - parseUsToMs(enhancedQuery.durationUs);
+            Number(enhancedQuery.endTime) - Math.round(Number(enhancedQuery.durationUs) / 1000);
     }
     if (!enhancedQuery.queryId) {
         enhancedQuery.queryId = uuidv4();
