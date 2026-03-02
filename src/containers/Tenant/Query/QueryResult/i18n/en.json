@@ -9,6 +9,7 @@
   "action.ast": "AST",
   "action.copy": "Copy {{activeSection}}",
   "action.copy-success": "Copied",
+  "action.copy-error": "Copy failed",
   "trace": "Trace",
   "title.truncated": "Truncated",
   "title.result": "Result",

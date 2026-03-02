@@ -6,7 +6,7 @@ import {TenantPage} from '../TenantPage';
 
 import {QueryEditor} from './models/QueryEditor';
 
-test.describe.only('Copy query result', () => {
+test.describe('Copy query result', () => {
     test.beforeEach(async ({page}) => {
         const pageQueryParams = {
             schema: database,

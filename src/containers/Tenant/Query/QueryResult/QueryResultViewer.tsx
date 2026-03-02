@@ -223,19 +223,23 @@ export function QueryResultViewer({
         ast,
     ]);
 
+    const getCopyTooltipTitle = (status: CopyToClipboardStatus): string => {
+        if (status === 'success') {
+            return i18n('action.copy-success');
+        }
+        if (status === 'error') {
+            return i18n('action.copy-error');
+        }
+        return i18n('action.copy', {activeSection});
+    };
+
     const renderCopyButton = () => {
         if (isLoading || !hasCopyableData()) {
             return null;
         }
 
         return (
-            <ActionTooltip
-                title={
-                    copyStatus === 'success'
-                        ? i18n('action.copy-success')
-                        : i18n('action.copy', {activeSection})
-                }
-            >
+            <ActionTooltip title={getCopyTooltipTitle(copyStatus)}>
                 <Button
                     view="flat-secondary"
                     onClick={handleCopy}
