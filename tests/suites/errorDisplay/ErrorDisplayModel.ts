@@ -5,8 +5,6 @@ import {BaseModel} from '../../models/BaseModel';
 const VISIBILITY_TIMEOUT = 10 * 1000;
 
 export class ErrorDisplayModel extends BaseModel {
-    private pageError: Locator;
-    private pageErrorTitle: Locator;
     private responseError: Locator;
     private detailsTrigger: Locator;
     private detailsContent: Locator;
@@ -18,9 +16,7 @@ export class ErrorDisplayModel extends BaseModel {
     constructor(page: Page) {
         super(page, page.locator('body'));
 
-        this.pageError = page.locator('.ydb-page-error .empty-state');
-        this.pageErrorTitle = this.pageError.locator('.empty-state__title');
-        this.responseError = this.pageError.locator('.empty-state__description .response-error');
+        this.responseError = page.locator('.response-error');
         this.detailsTrigger = this.responseError
             .locator('.response-error__details > .response-error__details-trigger')
             .first();
@@ -31,16 +27,12 @@ export class ErrorDisplayModel extends BaseModel {
         this.accessDeniedTitle = this.accessDeniedState.locator('.empty-state__title');
     }
 
-    async waitForPageError(): Promise<void> {
-        await this.pageError.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-    }
-
     async waitForResponseError(): Promise<void> {
         await this.responseError.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
     }
 
-    async getPageErrorTitle(): Promise<string> {
-        return this.pageErrorTitle.innerText();
+    getResponseErrorLocator(): Locator {
+        return this.responseError;
     }
 
     async getResponseErrorText(): Promise<string> {
@@ -88,6 +80,10 @@ export class ErrorDisplayModel extends BaseModel {
 
     async waitForAccessDenied(): Promise<void> {
         await this.accessDeniedState.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+    }
+
+    getAccessDeniedLocator(): Locator {
+        return this.accessDeniedState;
     }
 
     async getAccessDeniedTitle(): Promise<string> {
