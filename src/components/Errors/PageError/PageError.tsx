@@ -1,23 +1,30 @@
 import React from 'react';
 
+import {Text} from '@gravity-ui/uikit';
+
 import {cn} from '../../../utils/cn';
+import {extractErrorDetails, prepareCommonErrorMessage} from '../../../utils/errors';
 import {isAccessError, isRedirectToAuth} from '../../../utils/response';
 import type {EmptyStateProps} from '../../EmptyState';
-import {EMPTY_STATE_SIZES, EmptyState} from '../../EmptyState';
+import {EmptyState} from '../../EmptyState';
 import {Illustration} from '../../Illustration';
 import {AccessDenied} from '../403';
-import {ResponseError} from '../ResponseError';
 import i18n from '../i18n';
+
+import {PageErrorContent} from './PageErrorContent';
 
 import './PageError.scss';
 
 const b = cn('ydb-page-error');
+
+const ILLUSTRATION_SIZE = 230;
 
 interface PageErrorProps extends Omit<EmptyStateProps, 'image' | 'title'> {
     title?: React.ReactNode;
     error: unknown;
     children?: React.ReactNode;
     errorPageTitle?: string;
+    defaultMessage?: string;
 }
 
 export function PageError({
@@ -25,12 +32,11 @@ export function PageError({
     description,
     error,
     children,
-    size = 'm',
     errorPageTitle,
-    ...restProps
+    defaultMessage,
+    className,
 }: PageErrorProps) {
     if (isRedirectToAuth(error)) {
-        // Do not show an error, because we redirect to auth anyway.
         return null;
     }
 
@@ -39,23 +45,50 @@ export function PageError({
             <AccessDenied
                 title={title}
                 description={description}
-                {...restProps}
                 pageTitle={errorPageTitle}
-                className={b()}
+                className={b(null, className)}
             />
         );
     }
 
     if (error || description) {
+        const details = extractErrorDetails(error);
+        const statusCode = details?.status;
+        const errorTitle = title || (statusCode ? String(statusCode) : i18n('error.title'));
+        const message = prepareCommonErrorMessage(
+            error,
+            defaultMessage ?? i18n('responseError.defaultMessage'),
+        );
+
+        if (description) {
+            return (
+                <EmptyState
+                    image={<Illustration name="error" width={ILLUSTRATION_SIZE} />}
+                    title={errorTitle}
+                    description={description}
+                    pageTitle={errorPageTitle}
+                    className={b(null, className)}
+                />
+            );
+        }
+
         return (
-            <EmptyState
-                image={<Illustration name="error" width={EMPTY_STATE_SIZES[size]} />}
-                title={title || i18n('error.title')}
-                description={error ? <ResponseError error={error} /> : description}
-                pageTitle={errorPageTitle}
-                className={b()}
-                {...restProps}
-            />
+            <div className={b(null, className)}>
+                {errorPageTitle && (
+                    <Text variant="header-1" className={b('page-title')}>
+                        {errorPageTitle}
+                    </Text>
+                )}
+                <div className={b('layout')}>
+                    <div className={b('illustration')}>
+                        <Illustration name="error" width={ILLUSTRATION_SIZE} />
+                    </div>
+                    <div className={b('body')}>
+                        <Text variant={statusCode ? 'display-1' : 'header-1'}>{errorTitle}</Text>
+                        <PageErrorContent message={message} details={details} />
+                    </div>
+                </div>
+            </div>
         );
     }
 

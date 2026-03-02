@@ -5,6 +5,9 @@ import reportWebVitals from './reportWebVitals';
 import {history, store} from './store/defaultStore';
 
 import './styles/index.scss';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
 
 async function render() {
     let App;

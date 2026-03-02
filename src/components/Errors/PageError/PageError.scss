@@ -1,7 +1,60 @@
 .ydb-page-error {
-    display: grid;
-    align-items: center;
-    grid-template-rows: min-content auto;
-
     height: 100%;
+    padding: var(--g-spacing-10);
+
+    &__page-title {
+        margin-bottom: var(--g-spacing-5);
+    }
+
+    &__layout {
+        display: flex;
+        justify-content: center;
+        align-items: start;
+        gap: 40px;
+    }
+
+    &__illustration {
+        padding-top: var(--g-spacing-1);
+
+        color: var(--g-color-base-info-light-hover);
+
+        .g-root_theme_dark & {
+            color: var(--g-color-base-generic);
+        }
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+
+        min-width: 0;
+        padding-top: 50px;
+    }
+
+    &__fields {
+        .g-definition-list__item-content {
+            overflow: hidden;
+
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+    }
+
+    &__details-trigger {
+        all: unset;
+
+        display: inline-flex;
+        align-items: center;
+
+        padding: var(--g-spacing-half) 0;
+
+        cursor: pointer;
+
+        color: var(--g-color-text-secondary);
+
+        &:hover {
+            color: var(--g-color-text-primary);
+        }
+    }
 }

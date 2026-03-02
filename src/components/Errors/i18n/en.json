@@ -3,7 +3,6 @@
   "403.description": "You don't have the necessary roles to view this page.",
   "responseError.defaultMessage": "Response error",
   "error.title": "Error",
-  "error-details.summary": "Details",
   "error-details.label_status": "Status",
   "error-details.label_url": "URL",
   "error-details.label_error-code": "Code",

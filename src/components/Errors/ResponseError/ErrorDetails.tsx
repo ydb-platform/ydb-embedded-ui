@@ -1,7 +1,6 @@
 import {ArrowToggle, DefinitionList, Disclosure, Flex, Text} from '@gravity-ui/uikit';
 
 import {Issues} from '../../../containers/Tenant/Query/Issues/Issues';
-import type {IssueMessage} from '../../../types/api/query';
 import {cn} from '../../../utils/cn';
 import type {ErrorDetails as ErrorDetailsData} from '../../../utils/errors/extractErrorDetails';
 import i18n from '../i18n';
@@ -48,78 +47,101 @@ export function ErrorDetailsContent({details}: ErrorDetailsProps) {
     const statusLine = status ? formatStatusLine(status, statusText) : undefined;
     const issueCount = issues?.length ?? 0;
 
+    const hasFields = Boolean(
+        statusLine || urlLine || errorCode || traceId || requestId || proxyName || workerName,
+    );
+    const hasIssueData = hasIssues && issues && issues.length > 0;
+
+    if (!hasFields && !hasIssueData) {
+        return null;
+    }
+
     return (
-        <Disclosure className={b('details')}>
-            <Disclosure.Summary>
-                {(props) => (
-                    <button {...props} className={b('details-trigger')}>
-                        <Flex alignItems="center" gap={1}>
-                            <ArrowToggle
-                                direction={props.expanded ? 'bottom' : 'right'}
-                                size={14}
-                            />
-                            <Text variant="body-1">{i18n('error-details.summary')}</Text>
-                        </Flex>
-                    </button>
-                )}
-            </Disclosure.Summary>
-            <div className={b('details-content')}>
-                <DefinitionList nameMaxWidth={130}>
-                    {statusLine && (
-                        <DefinitionList.Item
-                            name={i18n('error-details.label_status')}
-                            copyText={statusLine}
-                        >
-                            {statusLine}
-                        </DefinitionList.Item>
-                    )}
-                    {urlLine && (
-                        <DefinitionList.Item
-                            name={i18n('error-details.label_url')}
-                            copyText={urlLine}
-                        >
-                            {urlLine}
-                        </DefinitionList.Item>
-                    )}
-                    {errorCode && (
-                        <DefinitionList.Item
-                            name={i18n('error-details.label_error-code')}
-                            copyText={errorCode}
-                        >
-                            {errorCode}
-                        </DefinitionList.Item>
-                    )}
-                    {traceId && (
-                        <DefinitionList.Item name="traceresponse" copyText={traceId}>
-                            {traceId}
-                        </DefinitionList.Item>
-                    )}
-                    {requestId && (
-                        <DefinitionList.Item name="x-request-id" copyText={requestId}>
-                            {requestId}
-                        </DefinitionList.Item>
-                    )}
-                    {proxyName && (
-                        <DefinitionList.Item name="x-proxy-name" copyText={proxyName}>
-                            {proxyName}
-                        </DefinitionList.Item>
-                    )}
-                    {workerName && (
-                        <DefinitionList.Item name="x-worker-name" copyText={workerName}>
-                            {workerName}
-                        </DefinitionList.Item>
-                    )}
-                </DefinitionList>
-                {hasIssues && issues && issues.length > 0 && (
-                    <ErrorIssuesSection issues={issues} count={issueCount} />
-                )}
-            </div>
-        </Disclosure>
+        <Flex direction="column" gap={2} className={b('details')}>
+            {hasFields && (
+                <ErrorFieldsList
+                    statusLine={statusLine}
+                    urlLine={urlLine}
+                    errorCode={errorCode}
+                    traceId={traceId}
+                    requestId={requestId}
+                    proxyName={proxyName}
+                    workerName={workerName}
+                />
+            )}
+            {hasIssueData && <ErrorIssuesSection issues={issues} count={issueCount} />}
+        </Flex>
+    );
+}
+
+interface ErrorFieldsListProps {
+    statusLine?: string;
+    urlLine?: string;
+    errorCode?: string;
+    traceId?: string;
+    requestId?: string;
+    proxyName?: string;
+    workerName?: string;
+}
+
+function ErrorFieldsList({
+    statusLine,
+    urlLine,
+    errorCode,
+    traceId,
+    requestId,
+    proxyName,
+    workerName,
+}: ErrorFieldsListProps) {
+    return (
+        <DefinitionList nameMaxWidth={130} className={b('fields')}>
+            {statusLine && (
+                <DefinitionList.Item
+                    name={i18n('error-details.label_status')}
+                    copyText={statusLine}
+                >
+                    {statusLine}
+                </DefinitionList.Item>
+            )}
+            {urlLine && (
+                <DefinitionList.Item name={i18n('error-details.label_url')} copyText={urlLine}>
+                    {urlLine}
+                </DefinitionList.Item>
+            )}
+            {errorCode && (
+                <DefinitionList.Item
+                    name={i18n('error-details.label_error-code')}
+                    copyText={errorCode}
+                >
+                    {errorCode}
+                </DefinitionList.Item>
+            )}
+            {traceId && (
+                <DefinitionList.Item name="Trace-ID" copyText={traceId}>
+                    {traceId}
+                </DefinitionList.Item>
+            )}
+            {requestId && (
+                <DefinitionList.Item name="Request-ID" copyText={requestId}>
+                    {requestId}
+                </DefinitionList.Item>
+            )}
+            {proxyName && (
+                <DefinitionList.Item name="x-proxy-name" copyText={proxyName}>
+                    {proxyName}
+                </DefinitionList.Item>
+            )}
+            {workerName && (
+                <DefinitionList.Item name="x-worker-name" copyText={workerName}>
+                    {workerName}
+                </DefinitionList.Item>
+            )}
+        </DefinitionList>
     );
 }
 
 interface ErrorIssuesSectionProps {
-    issues: IssueMessage[];
+    issues: NonNullable<ErrorDetailsData['issues']>;
     count: number;
 }
 

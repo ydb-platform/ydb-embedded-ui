@@ -28,8 +28,7 @@ test.describe.only('Error Display — ResponseError with Details', () => {
         const errorText = await errorDisplay.getResponseErrorText();
         expect(errorText).toContain('Cluster not found');
 
-        expect(await errorDisplay.isDetailsButtonVisible()).toBe(true);
-        await errorDisplay.expandDetails();
+        expect(await errorDisplay.isFieldsVisible()).toBe(true);
 
         const status = await errorDisplay.getDetailValue('Status');
         expect(status).toContain('400');
@@ -38,11 +37,11 @@ test.describe.only('Error Display — ResponseError with Details', () => {
         expect(url).toBeTruthy();
         expect(url).toContain('/viewer/json/cluster');
 
-        const traceId = await errorDisplay.getDetailValue('traceresponse');
+        const traceId = await errorDisplay.getDetailValue('Trace-ID');
         expect(traceId).toBeTruthy();
         expect(traceId).toContain('aabbccdd11223344');
 
-        const requestId = await errorDisplay.getDetailValue('x-request-id');
+        const requestId = await errorDisplay.getDetailValue('Request-ID');
         expect(requestId).toBe('test-req-id-e2e-400');
 
         await expect(errorDisplay.getResponseErrorLocator()).toHaveScreenshot(
@@ -62,8 +61,7 @@ test.describe.only('Error Display — ResponseError with Details', () => {
         const errorText = await errorDisplay.getResponseErrorText();
         expect(errorText).toContain('Service Unavailable');
 
-        expect(await errorDisplay.isDetailsButtonVisible()).toBe(true);
-        await errorDisplay.expandDetails();
+        expect(await errorDisplay.isFieldsVisible()).toBe(true);
 
         const status = await errorDisplay.getDetailValue('Status');
         expect(status).toContain('503');
@@ -91,13 +89,12 @@ test.describe.only('Error Display — ResponseError with Details', () => {
         const errorText = await errorDisplay.getResponseErrorText();
         expect(errorText).toContain('Throughput limit exceeded');
 
-        expect(await errorDisplay.isDetailsButtonVisible()).toBe(true);
-        await errorDisplay.expandDetails();
+        expect(await errorDisplay.isFieldsVisible()).toBe(true);
 
         const status = await errorDisplay.getDetailValue('Status');
         expect(status).toContain('429');
 
-        expect(await errorDisplay.isIssuesSectionVisible()).toBe(true);
+        expect(await errorDisplay.isIssuesTriggerVisible()).toBe(true);
         await errorDisplay.expandIssues();
 
         const issuesText = await errorDisplay.getIssuesText();
@@ -120,13 +117,12 @@ test.describe.only('Error Display — ResponseError with Details', () => {
         const errorText = await errorDisplay.getResponseErrorText();
         expect(errorText).toContain('429 Too Many Requests');
 
-        expect(await errorDisplay.isDetailsButtonVisible()).toBe(true);
-        await errorDisplay.expandDetails();
+        expect(await errorDisplay.isFieldsVisible()).toBe(true);
 
         const status = await errorDisplay.getDetailValue('Status');
         expect(status).toContain('429');
 
-        expect(await errorDisplay.isIssuesSectionVisible()).toBe(false);
+        expect(await errorDisplay.isIssuesTriggerVisible()).toBe(false);
 
         await expect(errorDisplay.getResponseErrorLocator()).toHaveScreenshot(
             'error-429-html-body.png',
@@ -145,8 +141,7 @@ test.describe.only('Error Display — ResponseError with Details', () => {
         const errorText = await errorDisplay.getResponseErrorText();
         expect(errorText).toContain('Internal server error');
 
-        expect(await errorDisplay.isDetailsButtonVisible()).toBe(true);
-        await errorDisplay.expandDetails();
+        expect(await errorDisplay.isFieldsVisible()).toBe(true);
 
         const status = await errorDisplay.getDetailValue('Status');
         expect(status).toContain('500');
@@ -166,8 +161,7 @@ test.describe.only('Error Display — ResponseError with Details', () => {
         const errorText = await errorDisplay.getResponseErrorText();
         expect(errorText.toLowerCase()).toContain('network');
 
-        expect(await errorDisplay.isDetailsButtonVisible()).toBe(true);
-        await errorDisplay.expandDetails();
+        expect(await errorDisplay.isFieldsVisible()).toBe(true);
 
         const errorCode = await errorDisplay.getDetailValue('Code');
         expect(errorCode).toBe('ERR_NETWORK');
@@ -211,19 +205,18 @@ test.describe.only('Error Display — ResponseError with Details', () => {
         const errorText = await errorDisplay.getResponseErrorText();
         expect(errorText).toContain('Bad Gateway');
 
-        expect(await errorDisplay.isDetailsButtonVisible()).toBe(true);
-        await errorDisplay.expandDetails();
+        expect(await errorDisplay.isFieldsVisible()).toBe(true);
 
         const status = await errorDisplay.getDetailValue('Status');
         expect(status).toContain('502');
 
-        const traceId = await errorDisplay.getDetailValue('traceresponse');
+        const traceId = await errorDisplay.getDetailValue('Trace-ID');
         expect(traceId).toContain('e2etest00112233');
 
         const proxyName = await errorDisplay.getDetailValue('x-proxy-name');
         expect(proxyName).toContain('test-proxy-node');
 
-        const requestId = await errorDisplay.getDetailValue('x-request-id');
+        const requestId = await errorDisplay.getDetailValue('Request-ID');
         expect(requestId).toContain('test-req-id-e2e-502');
 
         await expect(errorDisplay.getResponseErrorLocator()).toHaveScreenshot(

@@ -7,7 +7,18 @@
         color: var(--g-color-text-primary);
     }
 
+    &__fields {
+        .g-definition-list__item-content {
+            overflow: hidden;
+
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+    }
+
     &__details-trigger {
+        all: unset;
+
         display: inline-flex;
         align-items: center;
 
@@ -16,16 +27,10 @@
         cursor: pointer;
 
         color: var(--g-color-text-secondary);
-        all: unset;
 
         &:hover {
             color: var(--g-color-text-primary);
         }
-    }
-
-    &__details-content {
-        padding-top: var(--g-spacing-1);
-        padding-left: var(--g-spacing-5);
     }
 
     &__issues {
