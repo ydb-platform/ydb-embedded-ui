@@ -248,7 +248,7 @@ test.describe('Test Query Editor', async () => {
     });
 
     // TODO: https://github.com/ydb-platform/ydb-embedded-ui/issues/3513
-    test.only('Changing tab inside results pane doesnt change results view', async ({page}) => {
+    test('Changing tab inside results pane doesnt change results view', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.setQuery(testQuery);
         await queryEditor.clickGearButton();
@@ -263,7 +263,7 @@ test.describe('Test Query Editor', async () => {
     });
 
     // TODO: https://github.com/ydb-platform/ydb-embedded-ui/issues/3513
-    test.only('Changing tab inside editor doesnt change results view', async ({page}) => {
+    test('Changing tab inside editor doesnt change results view', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.setQuery(testQuery);
         await queryEditor.clickGearButton();
