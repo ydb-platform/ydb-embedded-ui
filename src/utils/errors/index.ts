@@ -36,6 +36,10 @@ function extractResponseDataMessage(data: unknown): string | undefined {
         return data.message;
     }
 
+    if ('code' in data && typeof data.code === 'string') {
+        return data.code;
+    }
+
     return undefined;
 }
 
