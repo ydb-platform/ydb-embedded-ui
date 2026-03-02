@@ -25,7 +25,6 @@ import {
     addVectorIndex,
     alterAsyncReplicationTemplate,
     alterStreamingQuerySettingsTemplate,
-    alterStreamingQueryText,
     alterTableTemplate,
     alterTopicTemplate,
     alterTransferTemplate,
@@ -66,7 +65,6 @@ interface ActionsAdditionalParams {
     hasMonitoring?: boolean;
     streamingQueryData?: IQueryResult;
     showCreateTableData?: string;
-    isStreamingQueryTextLoading?: boolean;
     isShowCreateTableLoading?: boolean;
 }
 
@@ -154,7 +152,6 @@ const bindActions = (
         dropView: inputQuery(dropViewTemplate),
         createStreamingQuery: inputQuery(createStreamingQueryTemplate),
         alterStreamingQuerySettings: inputQuery(alterStreamingQuerySettingsTemplate),
-        alterStreamingQueryText: inputQuery(alterStreamingQueryText),
         dropStreamingQuery: inputQuery(dropStreamingQueryTemplate),
         dropIndex: inputQuery(dropTableIndex),
         addVectorIndex: inputQuery(addVectorIndex),
@@ -400,11 +397,6 @@ export const getActions =
                     text: i18n('actions.alterStreamingQuerySettings'),
                     action: actions.alterStreamingQuerySettings,
                 },
-                getActionWithLoader({
-                    text: i18n('actions.alterStreamingQueryText'),
-                    action: actions.alterStreamingQueryText,
-                    isLoading: additionalEffects.isStreamingQueryTextLoading,
-                }),
                 {
                     text: i18n('actions.dropStreamingQuery'),
                     action: actions.dropStreamingQuery,

@@ -58,10 +58,8 @@ export function SchemaTree(props: SchemaTreeProps) {
         getTableSchemaDataQuery,
         {currentData: actionsSchemaData, isFetching: isActionsDataFetching},
     ] = tableSchemaDataApi.useLazyGetTableSchemaDataQuery();
-    const [
-        getStreamingQueryInfo,
-        {currentData: streamingSysData, isFetching: isStreamingInfoFetching},
-    ] = streamingQueriesApi.useLazyGetStreamingQueryInfoQuery();
+    const [getStreamingQueryInfo, {currentData: streamingSysData}] =
+        streamingQueriesApi.useLazyGetStreamingQueryInfoQuery();
     const [
         getShowCreateTable,
         {currentData: showCreateTableData, isFetching: isShowCreateTableFetching},
@@ -172,7 +170,6 @@ export function SchemaTree(props: SchemaTreeProps) {
                 streamingQueryData: streamingSysData,
                 showCreateTableData: getStringifiedData(showCreateTableData),
                 isShowCreateTableLoading: isShowCreateTableFetching,
-                isStreamingQueryTextLoading: isStreamingInfoFetching,
             },
             databaseFullPath,
             database,
@@ -184,7 +181,6 @@ export function SchemaTree(props: SchemaTreeProps) {
         input,
         isActionsDataFetching,
         isDirty,
-        isStreamingInfoFetching,
         onActivePathUpdate,
         streamingSysData,
         database,
