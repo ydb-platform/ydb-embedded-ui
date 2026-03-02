@@ -256,7 +256,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
                     }
                 })
                 .catch((error) => {
-                    //save in history failed query only if is has operationId. It means that query is saved in server side and its results may be retrieved.
+                    // save in history failed query only if it has operationId. It means that query is saved in server side and its results may be retrieved.
                     if (error?.extra?.operationId) {
                         updateQueryInHistory(
                             error.extra.historyQueryId,
@@ -287,7 +287,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
 
             query
                 .then(({data}) => {
-                    //save in history failed query only if is has operationId. It means that query is saved in server side and its results may be retrieved.
+                    // save in history failed query only if it has operationId. It means that query is saved in server side and its results may be retrieved.
                     if (data?.historyQueryId) {
                         updateQueryInHistory(
                             data.historyQueryId,
@@ -298,7 +298,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
                     }
                 })
                 .catch((error) => {
-                    //save in history failed query only if is has operationId. It means that query is saved in server side and its results may be retrieved.
+                    // save in history failed query only if it has operationId. It means that query is saved in server side and its results may be retrieved.
                     if (error?.extra?.operationId) {
                         updateQueryInHistory(
                             error.extra.historyQueryId,

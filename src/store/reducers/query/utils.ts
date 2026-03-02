@@ -29,7 +29,7 @@ export function getActionAndSyntaxFromQueryMode(
     return {action, syntax};
 }
 
-export function getQueryInHistory(rawQuery: string | QueryInHistory) {
+export function getQueryInHistory(rawQuery: string | QueryInHistory): EnhancedQueryInHistory {
     if (typeof rawQuery === 'string') {
         return {
             queryText: rawQuery,
