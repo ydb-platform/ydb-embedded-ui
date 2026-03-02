@@ -37,6 +37,8 @@ interface MetricsTabsProps {
     networkUtilization?: number;
     networkThroughput?: number;
     storageGroupsCount?: number;
+    controlPlaneNodesCount?: number;
+    coresTotal?: number;
     databaseType?: ETenantType;
     activeTab: TenantMetricsTab;
 }
@@ -49,6 +51,8 @@ export function MetricsTabs({
     networkUtilization,
     networkThroughput,
     storageGroupsCount,
+    controlPlaneNodesCount,
+    coresTotal,
     databaseType,
     activeTab,
 }: MetricsTabsProps) {
@@ -76,8 +80,7 @@ export function MetricsTabs({
 
     // Use only pools that directly indicate resources available to perform user queries
     const cpuPools = React.useMemo(
-        () =>
-            (poolsCpuStats || []).filter((pool) => !(pool.name === 'Batch' || pool.name === 'IO')),
+        () => (poolsCpuStats || []).filter((pool) => pool.name !== 'IO'),
         [poolsCpuStats],
     );
     const cpuMetrics = React.useMemo(() => calculateMetricAggregates(cpuPools), [cpuPools]);
@@ -140,7 +143,11 @@ export function MetricsTabs({
                 to={tabLinks[TENANT_METRICS_TABS_IDS.cpu]}
                 active={activeTab === TENANT_METRICS_TABS_IDS.cpu}
                 isServerless={Boolean(isServerless)}
-                cpu={{totalUsed: cpuMetrics.totalUsed, totalLimit: cpuMetrics.totalLimit}}
+                cpu={{
+                    totalUsed: cpuMetrics.totalUsed,
+                    totalLimit: coresTotal ?? cpuMetrics.totalLimit,
+                }}
+                controlPlaneNodesCount={controlPlaneNodesCount}
             />
             <StorageTab
                 to={tabLinks[TENANT_METRICS_TABS_IDS.storage]}

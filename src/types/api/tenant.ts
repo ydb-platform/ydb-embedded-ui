@@ -53,6 +53,7 @@ export interface TTenant {
     MemoryStats?: TMemoryStats;
     /** double */
     CoresUsed?: number; // Actual cpu consumption
+    CoresTotal?: number;
     /** uint64 */
     StorageGroups?: string;
 
@@ -133,7 +134,26 @@ export interface ControlPlane {
     name?: string;
     id?: string;
     endpoint?: string;
+
     folder_id?: string;
+    location_id?: string;
+    resource_preset_id?: string;
+
+    scale_policy?: {
+        fixed_scale: {
+            size: number;
+        };
+    };
+
+    storage_config?: {
+        storage_options: [
+            {
+                storage_type_id: 'ssd' | 'hdd';
+                group_count: number;
+            },
+        ];
+        storage_size_limit: number;
+    };
 }
 /** incomplete */
 interface UserAttributes {
