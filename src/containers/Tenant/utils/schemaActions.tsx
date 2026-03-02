@@ -12,7 +12,6 @@ import {
 } from '../../../store/reducers/tenant/constants';
 import {setDiagnosticsTab, setQueryTab} from '../../../store/reducers/tenant/tenant';
 import type {TenantPage} from '../../../store/reducers/tenant/types';
-import type {IQueryResult} from '../../../types/store/query';
 import createToast from '../../../utils/createToast';
 import {insertSnippetToEditor} from '../../../utils/monaco/insertSnippet';
 import {transformPath} from '../ObjectSummary/transformPath';
@@ -63,7 +62,6 @@ interface ActionsAdditionalParams {
     schemaData?: SchemaData[];
     isSchemaDataLoading?: boolean;
     hasMonitoring?: boolean;
-    streamingQueryData?: IQueryResult;
     showCreateTableData?: string;
     isShowCreateTableLoading?: boolean;
 }
@@ -88,7 +86,6 @@ const bindActions = (
         getConfirmation,
         getConnectToDBDialog,
         schemaData,
-        streamingQueryData,
         showCreateTableData,
     } = additionalEffects;
 
@@ -98,9 +95,7 @@ const bindActions = (
             setTenantPage(TENANT_PAGES_IDS.query);
             dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
             setActivePath(params.path);
-            insertSnippetToEditor(
-                tmpl({...params, schemaData, streamingQueryData, showCreateTableData}),
-            );
+            insertSnippetToEditor(tmpl({...params, schemaData, showCreateTableData}));
         };
         if (getConfirmation) {
             const confirmedPromise = getConfirmation();

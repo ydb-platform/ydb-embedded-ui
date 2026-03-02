@@ -14,7 +14,6 @@ import {useClusterBaseInfo, useClusterWithProxy} from '../../../../store/reducer
 import {selectIsDirty, selectUserInput} from '../../../../store/reducers/query/query';
 import {schemaApi} from '../../../../store/reducers/schema/schema';
 import {showCreateTableApi} from '../../../../store/reducers/showCreateTable/showCreateTable';
-import {streamingQueriesApi} from '../../../../store/reducers/streamingQuery/streamingQuery';
 import {tableSchemaDataApi} from '../../../../store/reducers/tableSchemaData';
 import {useTenantBaseInfo} from '../../../../store/reducers/tenant/tenant';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
@@ -28,7 +27,6 @@ import {getSchemaControls} from '../../utils/controls';
 import {
     isChildlessPathType,
     mapPathTypeToNavigationTreeType,
-    nodeStreamingQueryTypeToPathType,
     nodeTableTypeToPathType,
     tableTypeToPathType,
 } from '../../utils/schema';
@@ -58,8 +56,6 @@ export function SchemaTree(props: SchemaTreeProps) {
         getTableSchemaDataQuery,
         {currentData: actionsSchemaData, isFetching: isActionsDataFetching},
     ] = tableSchemaDataApi.useLazyGetTableSchemaDataQuery();
-    const [getStreamingQueryInfo, {currentData: streamingSysData}] =
-        streamingQueriesApi.useLazyGetStreamingQueryInfoQuery();
     const [
         getShowCreateTable,
         {currentData: showCreateTableData, isFetching: isShowCreateTableFetching},
@@ -167,7 +163,6 @@ export function SchemaTree(props: SchemaTreeProps) {
                 schemaData: actionsSchemaData,
                 isSchemaDataLoading: isActionsDataFetching,
                 hasMonitoring,
-                streamingQueryData: streamingSysData,
                 showCreateTableData: getStringifiedData(showCreateTableData),
                 isShowCreateTableLoading: isShowCreateTableFetching,
             },
@@ -182,7 +177,6 @@ export function SchemaTree(props: SchemaTreeProps) {
         isActionsDataFetching,
         isDirty,
         onActivePathUpdate,
-        streamingSysData,
         database,
         databaseFullPath,
         controlPlane,
@@ -228,11 +222,6 @@ export function SchemaTree(props: SchemaTreeProps) {
                     if (isOpen && tableType) {
                         const relativePath = transformPath(path, databaseFullPath);
                         getShowCreateTable({path: relativePath, database});
-                    }
-
-                    const streamingPathType = nodeStreamingQueryTypeToPathType[type];
-                    if (isOpen && streamingPathType) {
-                        getStreamingQueryInfo({database, path}, true); // preferCacheValue = true
                     }
 
                     return [];
