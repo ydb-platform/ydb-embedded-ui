@@ -2,5 +2,10 @@
   "403.title": "Доступ запрещен",
   "403.description": "У вас недостаточно прав для просмотра данной страницы.",
   "responseError.defaultMessage": "Ошибка запроса",
-  "error.title": "Ошибка"
+  "error.title": "Ошибка",
+  "error-details.summary": "Детали",
+  "error-details.label_status": "Статус",
+  "error-details.label_url": "URL",
+  "error-details.label_error-code": "Код",
+  "error-details.label_issues": "Issues ({{count}})"
 }

@@ -1,0 +1,32 @@
+.response-error {
+    color: var(--g-color-text-danger);
+
+    &__details {
+        margin-top: var(--g-spacing-2);
+    }
+
+    &__details-trigger {
+        display: inline-flex;
+        align-items: center;
+
+        padding: var(--g-spacing-half) 0;
+
+        cursor: pointer;
+
+        color: var(--g-color-text-secondary);
+        all: unset;
+
+        &:hover {
+            color: var(--g-color-text-primary);
+        }
+    }
+
+    &__details-content {
+        padding-top: var(--g-spacing-1);
+        padding-left: var(--g-spacing-5);
+    }
+
+    &__issues {
+        margin-top: var(--g-spacing-2);
+    }
+}
