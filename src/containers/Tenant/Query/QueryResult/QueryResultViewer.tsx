@@ -1,5 +1,4 @@
 import React from 'react';
-// Query result viewer with tab persistence functionality
 
 import type {Settings} from '@gravity-ui/react-data-table';
 import type {ControlGroupOption, CopyToClipboardStatus} from '@gravity-ui/uikit';
@@ -115,23 +114,21 @@ export function QueryResultViewer({
 
     const [selectedResultSet, setSelectedResultSet] = React.useState(0);
     const [useShowPlanToSvg] = useSetting<boolean>(SETTING_KEYS.USE_SHOW_PLAN_SVG);
+    const [copyStatus, setCopyStatus] = React.useState<CopyToClipboardStatus>('pending');
+    const copyTimeoutRef = React.useRef<number>();
 
-    // Get the saved tab for the current query type, or use default
-    const getDefaultSection = (): SectionID => {
-        return isExecute ? RESULT_OPTIONS_IDS.result : RESULT_OPTIONS_IDS.schema;
-    };
+    const defaultSection = isExecute ? RESULT_OPTIONS_IDS.result : RESULT_OPTIONS_IDS.schema;
 
     const activeSection: SectionID = React.useMemo(() => {
         const savedTab = selectedTabs?.[resultType];
         if (savedTab) {
-            // Validate that the saved tab is valid for the current result type
             const validSections = isExecute ? EXECUTE_SECTIONS : EXPLAIN_SECTIONS;
             if (validSections.includes(savedTab as SectionID)) {
                 return savedTab as SectionID;
             }
         }
-        return getDefaultSection();
-    }, [selectedTabs, resultType, isExecute]);
+        return defaultSection;
+    }, [selectedTabs, resultType, isExecute, defaultSection]);
 
     const {error, isLoading, streamingStatus, data = {}} = result;
     const {preparedPlan, simplifiedPlan, stats, resultSets, ast} = data;
@@ -139,36 +136,29 @@ export function QueryResultViewer({
     React.useEffect(() => {
         return () => {
             dispatch(disableFullscreen());
+            window.clearTimeout(copyTimeoutRef.current);
         };
     }, [dispatch]);
 
     const onSelectSection = (value: SectionID) => {
         dispatch(setResultTab({queryType: resultType, tabId: value}));
+        setCopyStatus('pending');
+        window.clearTimeout(copyTimeoutRef.current);
     };
 
     const radioButtonOptions: ControlGroupOption<SectionID>[] = React.useMemo(() => {
         let sections: SectionID[] = [];
-
         if (isExecute) {
             sections = EXECUTE_SECTIONS;
         } else if (isExplain) {
             sections = EXPLAIN_SECTIONS;
         }
 
-        return sections.map((section) => {
-            return {
-                value: section,
-                content: RESULT_OPTIONS_TITLES[section],
-            };
-        });
+        return sections.map((section) => ({
+            value: section,
+            content: RESULT_OPTIONS_TITLES[section],
+        }));
     }, [isExecute, isExplain]);
-
-    const [copyStatus, setCopyStatus] = React.useState<CopyToClipboardStatus>('pending');
-    const copyTimeoutRef = React.useRef<number>();
-
-    React.useEffect(() => {
-        return () => window.clearTimeout(copyTimeoutRef.current);
-    }, []);
 
     const hasCopyableData = React.useCallback((): boolean => {
         switch (activeSection) {
@@ -246,7 +236,11 @@ export function QueryResultViewer({
                         : i18n('action.copy', {activeSection})
                 }
             >
-                <Button view="flat-secondary" onClick={handleCopy}>
+                <Button
+                    view="flat-secondary"
+                    onClick={handleCopy}
+                    aria-label={i18n('action.copy', {activeSection})}
+                >
                     <Button.Icon>
                         <ClipboardIcon status={copyStatus} size={16} />
                     </Button.Icon>
@@ -301,6 +295,35 @@ export function QueryResultViewer({
         );
     };
 
+    const renderNonResultSection = () => {
+        switch (activeSection) {
+            case RESULT_OPTIONS_IDS.schema:
+                return preparedPlan?.nodes?.length ? (
+                    <Graph theme={theme} explain={preparedPlan} />
+                ) : (
+                    renderStubMessage()
+                );
+            case RESULT_OPTIONS_IDS.json:
+                return preparedPlan?.pristine ? (
+                    <QueryJSONViewer data={preparedPlan.pristine} />
+                ) : (
+                    renderStubMessage()
+                );
+            case RESULT_OPTIONS_IDS.simplified:
+                return simplifiedPlan?.plan?.length ? (
+                    <SimplifiedPlan plan={simplifiedPlan.plan} />
+                ) : (
+                    renderStubMessage()
+                );
+            case RESULT_OPTIONS_IDS.stats:
+                return stats ? <QueryJSONViewer data={stats} /> : renderStubMessage();
+            case RESULT_OPTIONS_IDS.ast:
+                return ast ? <Ast ast={ast} theme={theme} /> : renderStubMessage();
+            default:
+                return null;
+        }
+    };
+
     const renderResultSection = () => {
         const isStopped = isQueryCancelledError(error);
 
@@ -328,38 +351,7 @@ export function QueryResultViewer({
             );
         }
 
-        if (activeSection === RESULT_OPTIONS_IDS.schema) {
-            if (!preparedPlan?.nodes?.length) {
-                return renderStubMessage();
-            }
-            return <Graph theme={theme} explain={preparedPlan} />;
-        }
-        if (activeSection === RESULT_OPTIONS_IDS.json) {
-            if (!preparedPlan?.pristine) {
-                return renderStubMessage();
-            }
-            return <QueryJSONViewer data={preparedPlan?.pristine} />;
-        }
-        if (activeSection === RESULT_OPTIONS_IDS.simplified) {
-            if (!simplifiedPlan?.plan?.length) {
-                return renderStubMessage();
-            }
-            return <SimplifiedPlan plan={simplifiedPlan.plan} />;
-        }
-        if (activeSection === RESULT_OPTIONS_IDS.stats) {
-            if (!stats) {
-                return renderStubMessage();
-            }
-            return <QueryJSONViewer data={stats} />;
-        }
-        if (activeSection === RESULT_OPTIONS_IDS.ast) {
-            if (!ast) {
-                return renderStubMessage();
-            }
-            return <Ast ast={ast} theme={theme} />;
-        }
-
-        return null;
+        return renderNonResultSection();
     };
 
     const renderLeftControls = () => {
