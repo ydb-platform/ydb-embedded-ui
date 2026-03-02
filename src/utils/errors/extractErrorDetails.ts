@@ -117,20 +117,7 @@ function isShortPlainText(value: string): boolean {
     return value.length <= MAX_DATA_MESSAGE_LENGTH && !value.trimStart().startsWith('<');
 }
 
-function extractDataMessage(data: unknown): string | undefined {
-    if (!data) {
-        return undefined;
-    }
-
-    if (typeof data === 'string') {
-        const trimmed = data.trim();
-        return trimmed && isShortPlainText(trimmed) ? trimmed : undefined;
-    }
-
-    if (typeof data !== 'object') {
-        return undefined;
-    }
-
+export function extractMessageFromObject(data: object): string | undefined {
     if ('error' in data && typeof data.error === 'string') {
         return data.error;
     }
@@ -151,6 +138,23 @@ function extractDataMessage(data: unknown): string | undefined {
 
     if ('code' in data && typeof data.code === 'string') {
         return data.code;
+    }
+
+    return undefined;
+}
+
+function extractDataMessage(data: unknown): string | undefined {
+    if (!data) {
+        return undefined;
+    }
+
+    if (typeof data === 'string') {
+        const trimmed = data.trim();
+        return trimmed && isShortPlainText(trimmed) ? trimmed : undefined;
+    }
+
+    if (typeof data === 'object') {
+        return extractMessageFromObject(data);
     }
 
     return undefined;

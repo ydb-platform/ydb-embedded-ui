@@ -3,6 +3,7 @@ import {isNetworkError, isResponseError} from '../response';
 export {extractErrorDetails} from './extractErrorDetails';
 export type {ErrorDetails} from './extractErrorDetails';
 
+import {extractMessageFromObject} from './extractErrorDetails';
 import i18n from './i18n';
 
 function extractResponseDataMessage(data: unknown): string | undefined {
@@ -14,30 +15,8 @@ function extractResponseDataMessage(data: unknown): string | undefined {
         return data || undefined;
     }
 
-    if (typeof data !== 'object') {
-        return undefined;
-    }
-
-    if ('error' in data && typeof data.error === 'string') {
-        return data.error;
-    }
-
-    if (
-        'error' in data &&
-        data.error &&
-        typeof data.error === 'object' &&
-        'message' in data.error &&
-        typeof data.error.message === 'string'
-    ) {
-        return data.error.message;
-    }
-
-    if ('message' in data && typeof data.message === 'string') {
-        return data.message;
-    }
-
-    if ('code' in data && typeof data.code === 'string') {
-        return data.code;
+    if (typeof data === 'object') {
+        return extractMessageFromObject(data);
     }
 
     return undefined;
