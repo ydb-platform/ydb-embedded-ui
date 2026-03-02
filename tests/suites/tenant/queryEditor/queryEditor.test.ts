@@ -247,7 +247,6 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
     });
 
-    // TODO: https://github.com/ydb-platform/ydb-embedded-ui/issues/3513
     test('Changing tab inside results pane doesnt change results view', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.setQuery(testQuery);
@@ -262,7 +261,6 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
     });
 
-    // TODO: https://github.com/ydb-platform/ydb-embedded-ui/issues/3513
     test('Changing tab inside editor doesnt change results view', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await queryEditor.setQuery(testQuery);
@@ -277,8 +275,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
     });
 
-    // TODO: https://github.com/ydb-platform/ydb-embedded-ui/issues/3513
-    test.skip('Changing tab to diagnostics doesnt change results view', async ({page}) => {
+    test('Changing tab to diagnostics doesnt change results view', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         const tenantPage = new TenantPage(page);
         await queryEditor.setQuery(testQuery);
