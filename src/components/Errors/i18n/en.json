@@ -6,5 +6,6 @@
   "error-details.label_status": "Status",
   "error-details.label_url": "URL",
   "error-details.label_error-code": "Code",
+  "error-details.label_response-body": "Response",
   "error-details.label_issues": "Issues ({{count}})"
 }

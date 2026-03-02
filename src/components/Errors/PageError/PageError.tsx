@@ -53,12 +53,12 @@ export function PageError({
 
     if (error || description) {
         const details = extractErrorDetails(error);
-        const statusCode = details?.status;
-        const errorTitle = title || (statusCode ? String(statusCode) : i18n('error.title'));
-        const message = prepareCommonErrorMessage(
+        const errorTitle = title || i18n('error.title');
+        const fallbackMessage = prepareCommonErrorMessage(
             error,
             defaultMessage ?? i18n('responseError.defaultMessage'),
         );
+        const message = details?.title || fallbackMessage;
 
         if (description) {
             return (
@@ -84,8 +84,12 @@ export function PageError({
                         <Illustration name="error" width={ILLUSTRATION_SIZE} />
                     </div>
                     <div className={b('body')}>
-                        <Text variant={statusCode ? 'display-1' : 'header-1'}>{errorTitle}</Text>
-                        <PageErrorContent message={message} details={details} />
+                        <Text variant="subheader-3">{errorTitle}</Text>
+                        <PageErrorContent
+                            message={message}
+                            dataMessage={details?.dataMessage}
+                            details={details}
+                        />
                     </div>
                 </div>
             </div>

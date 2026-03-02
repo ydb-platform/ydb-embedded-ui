@@ -7,13 +7,6 @@ import i18n from '../i18n';
 
 const b = cn('response-error');
 
-function formatStatusLine(status: number, statusText?: string): string {
-    if (statusText) {
-        return `${status} ${statusText}`;
-    }
-    return String(status);
-}
-
 function formatUrlLine(method?: string, requestUrl?: string): string | undefined {
     if (!requestUrl) {
         return undefined;
@@ -28,31 +21,28 @@ interface ErrorDetailsProps {
     details: ErrorDetailsData;
 }
 
-export function ErrorDetailsContent({details}: ErrorDetailsProps) {
-    const {
-        status,
-        statusText,
-        requestUrl,
-        method,
-        errorCode,
-        traceId,
-        requestId,
-        proxyName,
-        workerName,
-        hasIssues,
-        issues,
-    } = details;
+function computeDetailsSections(details: ErrorDetailsData) {
+    const {requestUrl, method, responseBody, dataMessage, title, hasIssues, issues} = details;
 
     const urlLine = formatUrlLine(method, requestUrl);
-    const statusLine = status ? formatStatusLine(status, statusText) : undefined;
+    const hasIssueData = Boolean(hasIssues && issues && issues.length > 0);
+    const isBodyRedundant =
+        Boolean(responseBody) && (responseBody === dataMessage || responseBody === title);
+    const showResponseBody = Boolean(responseBody) && !hasIssueData && !isBodyRedundant;
+
+    return {urlLine, hasIssueData, showResponseBody};
+}
+
+export function ErrorDetailsContent({details}: ErrorDetailsProps) {
+    const {errorCode, traceId, requestId, proxyName, workerName, responseBody, issues} = details;
+    const {urlLine, hasIssueData, showResponseBody} = computeDetailsSections(details);
     const issueCount = issues?.length ?? 0;
 
     const hasFields = Boolean(
-        statusLine || urlLine || errorCode || traceId || requestId || proxyName || workerName,
+        urlLine || errorCode || traceId || requestId || proxyName || workerName,
     );
-    const hasIssueData = hasIssues && issues && issues.length > 0;
 
-    if (!hasFields && !hasIssueData) {
+    if (!hasFields && !hasIssueData && !showResponseBody) {
         return null;
     }
 
@@ -60,7 +50,6 @@ export function ErrorDetailsContent({details}: ErrorDetailsProps) {
         <Flex direction="column" gap={2} className={b('details')}>
             {hasFields && (
                 <ErrorFieldsList
-                    statusLine={statusLine}
                     urlLine={urlLine}
                     errorCode={errorCode}
                     traceId={traceId}
@@ -69,13 +58,13 @@ export function ErrorDetailsContent({details}: ErrorDetailsProps) {
                     workerName={workerName}
                 />
             )}
-            {hasIssueData && <ErrorIssuesSection issues={issues} count={issueCount} />}
+            {showResponseBody && <ResponseBodySection body={responseBody!} />}
+            {hasIssueData && issues && <ErrorIssuesSection issues={issues} count={issueCount} />}
         </Flex>
     );
 }
 
 interface ErrorFieldsListProps {
-    statusLine?: string;
     urlLine?: string;
     errorCode?: string;
     traceId?: string;
@@ -85,7 +74,6 @@ interface ErrorFieldsListProps {
 }
 
 function ErrorFieldsList({
-    statusLine,
     urlLine,
     errorCode,
     traceId,
@@ -95,14 +83,6 @@ function ErrorFieldsList({
 }: ErrorFieldsListProps) {
     return (
         <DefinitionList nameMaxWidth={130} className={b('fields')}>
-            {statusLine && (
-                <DefinitionList.Item
-                    name={i18n('error-details.label_status')}
-                    copyText={statusLine}
-                >
-                    {statusLine}
-                </DefinitionList.Item>
-            )}
             {urlLine && (
                 <DefinitionList.Item name={i18n('error-details.label_url')} copyText={urlLine}>
                     {urlLine}
@@ -137,6 +117,35 @@ function ErrorFieldsList({
                 </DefinitionList.Item>
             )}
         </DefinitionList>
+    );
+}
+
+interface ResponseBodySectionProps {
+    body: string;
+}
+
+function ResponseBodySection({body}: ResponseBodySectionProps) {
+    return (
+        <Disclosure className={b('response-body')}>
+            <Disclosure.Summary>
+                {(props) => (
+                    <button {...props} className={b('details-trigger')}>
+                        <Flex alignItems="center" gap={1}>
+                            <ArrowToggle
+                                direction={props.expanded ? 'bottom' : 'right'}
+                                size={14}
+                            />
+                            <Text variant="body-1">
+                                {i18n('error-details.label_response-body')}
+                            </Text>
+                        </Flex>
+                    </button>
+                )}
+            </Disclosure.Summary>
+            <Text variant="code-1" className={b('response-body-content')}>
+                {body}
+            </Text>
+        </Disclosure>
     );
 }
 
