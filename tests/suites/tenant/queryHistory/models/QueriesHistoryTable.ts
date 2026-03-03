@@ -29,9 +29,17 @@ export class QueriesHistoryTable {
     async selectQuery(query: string) {
         const row = await this.getQueryRow(query);
         await row.hover();
-        const openInEditorButton = row.locator('.ydb-queries-history__actions button');
+        const openInEditorButton = row.locator('[data-qa="open-in-editor-button"]');
         await openInEditorButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await openInEditorButton.click();
+    }
+
+    async clickSaveButton(query: string) {
+        const row = await this.getQueryRow(query);
+        await row.hover();
+        const saveButton = row.locator('[data-qa="save-query-button"]');
+        await saveButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await saveButton.click();
     }
 
     async clickRow(query: string) {

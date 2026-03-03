@@ -71,6 +71,7 @@ export function getColumns({openInEditor, saveQuery}: QueryActions) {
                     <Flex className={b('actions')} gap={2}>
                         <ActionTooltip title={i18n('action.save-query')}>
                             <Button
+                                qa="save-query-button"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     saveQuery();
@@ -80,6 +81,7 @@ export function getColumns({openInEditor, saveQuery}: QueryActions) {
                             </Button>
                         </ActionTooltip>
                         <Button
+                            qa="open-in-editor-button"
                             view="action"
                             onClick={() => {
                                 openInEditor(row);
