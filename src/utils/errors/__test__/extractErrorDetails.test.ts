@@ -248,10 +248,17 @@ describe('extractErrorDetails', () => {
     });
 
     test('should set title from status alone when statusText is missing', () => {
+        const error = {status: 502};
+        const details = extractErrorDetails(error);
+
+        expect(details?.title).toBe('502');
+    });
+
+    test('should return undefined title for 403 without statusText to allow localized fallback', () => {
         const error = {status: 403};
         const details = extractErrorDetails(error);
 
-        expect(details?.title).toBe('403');
+        expect(details?.title).toBeUndefined();
     });
 
     test('should set title from message for network errors with errorCode', () => {

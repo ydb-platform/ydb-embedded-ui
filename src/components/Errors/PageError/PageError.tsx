@@ -40,6 +40,7 @@ export function PageError({
             <AccessDenied
                 title={title}
                 description={description}
+                size={size}
                 {...restProps}
                 pageTitle={errorPageTitle}
                 className={b(null, restProps.className)}
@@ -59,6 +60,7 @@ export function PageError({
                         description
                     )
                 }
+                size={size}
                 {...restProps}
                 pageTitle={errorPageTitle}
                 className={b(null, restProps.className)}

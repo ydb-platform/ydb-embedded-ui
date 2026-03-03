@@ -169,6 +169,9 @@ function formatTitle(
     if (status && statusText) {
         return `${status} ${statusText}`;
     }
+    if (status === 403) {
+        return undefined;
+    }
     if (status) {
         return String(status);
     }
