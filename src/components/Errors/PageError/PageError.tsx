@@ -18,6 +18,7 @@ interface PageErrorProps extends Omit<EmptyStateProps, 'image' | 'title'> {
     error: unknown;
     children?: React.ReactNode;
     errorPageTitle?: string;
+    defaultMessage?: string;
 }
 
 export function PageError({
@@ -27,10 +28,10 @@ export function PageError({
     children,
     size = 'm',
     errorPageTitle,
+    defaultMessage,
     ...restProps
 }: PageErrorProps) {
     if (isRedirectToAuth(error)) {
-        // Do not show an error, because we redirect to auth anyway.
         return null;
     }
 
@@ -41,7 +42,7 @@ export function PageError({
                 description={description}
                 {...restProps}
                 pageTitle={errorPageTitle}
-                className={b()}
+                className={b(null, restProps.className)}
             />
         );
     }
@@ -51,10 +52,16 @@ export function PageError({
             <EmptyState
                 image={<Illustration name="error" width={EMPTY_STATE_SIZES[size]} />}
                 title={title || i18n('error.title')}
-                description={error ? <ResponseError error={error} /> : description}
-                pageTitle={errorPageTitle}
-                className={b()}
+                description={
+                    error ? (
+                        <ResponseError error={error} defaultMessage={defaultMessage} />
+                    ) : (
+                        description
+                    )
+                }
                 {...restProps}
+                pageTitle={errorPageTitle}
+                className={b(null, restProps.className)}
             />
         );
     }

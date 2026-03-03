@@ -1,4 +1,10 @@
-import {isResponseError, isResponseErrorWithIssues} from '../response';
+import {
+    isAccessError,
+    isNetworkError,
+    isRedirectToAuth,
+    isResponseError,
+    isResponseErrorWithIssues,
+} from '../response';
 
 describe('isResponseError', () => {
     test('should return false on incorrect data', () => {
@@ -55,5 +61,66 @@ describe('isResponseErrorWithIssues', () => {
                 data: {issues: [{message: 'Some error'}]},
             }),
         ).toBe(true);
+    });
+});
+
+describe('isNetworkError', () => {
+    test('should return false for non-objects', () => {
+        expect(isNetworkError(null)).toBe(false);
+        expect(isNetworkError(undefined)).toBe(false);
+        expect(isNetworkError('Network Error')).toBe(false);
+        expect(isNetworkError(42)).toBe(false);
+    });
+    test('should return true for message "Network Error"', () => {
+        expect(isNetworkError({message: 'Network Error'})).toBe(true);
+    });
+    test('should return true case-insensitively', () => {
+        expect(isNetworkError({message: 'network error'})).toBe(true);
+        expect(isNetworkError({message: 'NETWORK ERROR'})).toBe(true);
+    });
+    test('should return false for other error messages', () => {
+        expect(isNetworkError({message: 'timeout of 600000ms exceeded'})).toBe(false);
+        expect(isNetworkError({message: 'Request failed'})).toBe(false);
+    });
+});
+
+describe('isAccessError', () => {
+    test('should return true for status 401', () => {
+        expect(isAccessError({status: 401})).toBe(true);
+    });
+    test('should return true for status 403', () => {
+        expect(isAccessError({status: 403})).toBe(true);
+    });
+    test('should return false for other statuses', () => {
+        expect(isAccessError({status: 500})).toBe(false);
+        expect(isAccessError({status: 429})).toBe(false);
+        expect(isAccessError({status: 200})).toBe(false);
+    });
+    test('should return false for non-objects', () => {
+        expect(isAccessError(null)).toBe(false);
+        expect(isAccessError(undefined)).toBe(false);
+        expect(isAccessError('forbidden')).toBe(false);
+    });
+});
+
+describe('isRedirectToAuth', () => {
+    test('should return true for 401 with authUrl', () => {
+        expect(
+            isRedirectToAuth({status: 401, data: {authUrl: 'https://auth.example.com/login'}}),
+        ).toBe(true);
+    });
+    test('should return false for 401 without authUrl', () => {
+        expect(isRedirectToAuth({status: 401, data: {code: 'NEED_RESET'}})).toBe(false);
+    });
+    test('should return false for 401 with empty authUrl', () => {
+        expect(isRedirectToAuth({status: 401, data: {authUrl: ''}})).toBe(false);
+    });
+    test('should return false for 403 with authUrl', () => {
+        expect(
+            isRedirectToAuth({status: 403, data: {authUrl: 'https://auth.example.com/login'}}),
+        ).toBe(false);
+    });
+    test('should return false for 401 without data', () => {
+        expect(isRedirectToAuth({status: 401})).toBe(false);
     });
 });
