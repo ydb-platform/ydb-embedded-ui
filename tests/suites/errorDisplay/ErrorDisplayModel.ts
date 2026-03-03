@@ -22,7 +22,7 @@ export class ErrorDisplayModel extends BaseModel {
     constructor(page: Page) {
         super(page, page.locator('body'));
 
-        this.responseError = page.locator('.response-error');
+        this.responseError = page.locator('.response-error').first();
         this.fieldsDefinitionList = this.responseError.locator('.response-error__fields');
         this.issuesTrigger = this.responseError.locator(
             '.response-error__issues .response-error__details-trigger',

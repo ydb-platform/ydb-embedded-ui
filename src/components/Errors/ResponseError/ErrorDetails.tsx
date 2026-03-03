@@ -22,9 +22,10 @@ export function ErrorDetailsContent({details}: ErrorDetailsProps) {
 
     const isBodyRedundant =
         Boolean(responseBody) && redundantValues.some((v) => v === responseBody);
-    const showResponseBody = Boolean(responseBody) && !hasIssueData && !isBodyRedundant;
+    const visibleResponseBody =
+        responseBody && !hasIssueData && !isBodyRedundant ? responseBody : undefined;
 
-    if (!hasFields && !hasIssueData && !showResponseBody) {
+    if (!hasFields && !hasIssueData && !visibleResponseBody) {
         return null;
     }
 
@@ -37,7 +38,7 @@ export function ErrorDetailsContent({details}: ErrorDetailsProps) {
                     className={b('fields')}
                 />
             )}
-            {showResponseBody && <ResponseBodySection body={responseBody!} />}
+            {visibleResponseBody && <ResponseBodySection body={visibleResponseBody} />}
             {hasIssueData && issues && (
                 <IssuesSection
                     issues={issues}
