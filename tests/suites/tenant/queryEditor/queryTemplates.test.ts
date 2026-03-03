@@ -300,10 +300,12 @@ test.describe('Query Templates', () => {
         await objectSummary.clickRefreshButton();
 
         await objectSummary.clickActionMenuItem(tableName, RowTableAction.AddVectorIndex);
-        await page.waitForTimeout(500);
+
+        await expect
+            .poll(() => queryEditor.getEditorContent(), {timeout: 5000})
+            .toContain('vector_kmeans_tree');
 
         const editorContent = await queryEditor.getEditorContent();
-        expect(editorContent).toContain('vector_kmeans_tree');
         expect(editorContent).toContain('overlap_clusters');
     });
 });
