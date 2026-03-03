@@ -1,3 +1,5 @@
+import type React from 'react';
+
 import {FloppyDisk} from '@gravity-ui/icons';
 import type {Column} from '@gravity-ui/react-data-table';
 import type {TextProps} from '@gravity-ui/uikit';
@@ -29,7 +31,11 @@ export function getColumns({openInEditor, saveQuery}: QueryActions) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
                 const startTime = Number(row.endTime) - parseUsToMs(row.durationUs);
-                return <Text variant="body-1">{formatDateTime(startTime.toString())}</Text>;
+                return (
+                    <Text variant="body-1" as="div">
+                        {formatDateTime(startTime.toString())}
+                    </Text>
+                );
             },
             width: 200,
             sortable: false,
@@ -41,7 +47,7 @@ export function getColumns({openInEditor, saveQuery}: QueryActions) {
                 if (!valueIsDefined(durationUs)) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
-                return <QueryDuration durationUs={durationUs} />;
+                return <QueryDuration durationUs={durationUs} as="div" />;
             },
 
             align: 'right',
@@ -124,9 +130,10 @@ export function getQueryInfoItems(query: EnhancedQueryInHistory) {
 interface QueryDurationProps {
     durationUs: string | number;
     textVariant?: TextProps['variant'];
+    as?: React.ElementType;
 }
 
-function QueryDuration({durationUs, textVariant = 'body-1'}: QueryDurationProps) {
+function QueryDuration({durationUs, textVariant = 'body-1', as}: QueryDurationProps) {
     const formatted = formatDurationMs(parseUsToMs(durationUs), true);
     if (!valueIsDefined(formatted)) {
         return EMPTY_DATA_PLACEHOLDER;
@@ -134,7 +141,7 @@ function QueryDuration({durationUs, textVariant = 'body-1'}: QueryDurationProps)
     const splitted = formatted.split('.');
     const ms = splitted.pop();
     return (
-        <Text variant={textVariant}>
+        <Text variant={textVariant} as={as}>
             {splitted.join('.')}
             <Text color="secondary" variant={textVariant}>
                 .{ms}
