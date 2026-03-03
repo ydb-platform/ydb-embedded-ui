@@ -3,16 +3,19 @@
 .ydb-queries-history {
     $block: &;
     --ydb-table-with-controls-layout-controls-height: 44px;
+    --ydb-table-with-controls-layout-controls-padding-top: 0;
     --data-table-row-height: 64px;
     --data-table-cell-align: top;
     overflow: auto;
 
     height: 100%;
-    padding: 0 20px;
+    padding: 0 0 var(--g-spacing-5) var(--g-spacing-5);
 
     @include mixins.text-body-1();
 
     @include mixins.flex-container();
+
+    @include mixins.freeze-nth-column(4, 0, 0, 'right');
 
     .data-table__th {
         height: 40px;
@@ -24,9 +27,8 @@
         }
     }
 
-    .ydb-table-with-controls-layout__controls {
-        height: var(--ydb-table-with-controls-layout-controls-height);
-        padding-top: 0;
+    &__table-with-controls {
+        width: fit-content;
     }
 
     &__search {
@@ -37,10 +39,13 @@
         cursor: pointer;
 
         &_active {
-            background-color: var(--g-color-base-selection);
-
+            .data-table__td {
+                background-color: var(--g-color-base-selection);
+            }
             &:hover {
-                background: var(--g-color-base-selection-hover) !important;
+                .data-table__td {
+                    background: var(--g-color-base-selection-hover) !important;
+                }
             }
         }
     }

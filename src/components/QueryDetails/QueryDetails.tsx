@@ -45,7 +45,7 @@ export const QueryDetails = ({queryText, infoItems, onOpenInEditor}: QueryDetail
                     <YDBSyntaxHighlighter
                         language="yql"
                         text={queryText}
-                        withClipboardButton={{alwaysVisible: true, withLabel: false}}
+                        withClipboardButton={{alwaysVisible: true, withLabel: false, size: 'm'}}
                     />
                 </div>
             </Flex>

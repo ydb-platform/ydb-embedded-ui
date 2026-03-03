@@ -176,18 +176,18 @@
     }
 }
 
-@mixin freeze-nth-column($nth: 1, $left: 0) {
-    $border-width: 1px;
+@mixin freeze-nth-column($nth: 1, $coordinate: 0, $border-width: 1px, $side: left) {
     $clearance-width: 1px; /* Delete clearance and cancel column shadow for previous columns */
+    $border-side: if($side == left, right, left);
 
     /* Freeze td */
     & .data-table__td:nth-child(#{$nth}),
     & .data-table__head-row:first-child .data-table__th:nth-child(#{$nth}) {
         position: sticky;
         z-index: 2000;
-        left: $left;
+        #{$side}: $coordinate;
 
-        border-right: $border-width solid var(--g-color-line-generic);
+        border-#{$border-side}: $border-width solid var(--g-color-line-generic);
         background-color: var(--g-color-base-background);
     }
     .data-table__row:hover .data-table__td:nth-child(#{$nth}) {
@@ -201,7 +201,7 @@
             box-shadow: unset;
 
             @if $i < $nth {
-                border-right: unset;
+                border-#{$border-side}: unset;
             }
         }
     }

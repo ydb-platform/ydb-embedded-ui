@@ -171,13 +171,7 @@ function SaveQueryDialog({
     };
 
     return (
-        <Dialog
-            open={open}
-            hasCloseButton={false}
-            size="s"
-            onClose={onCloseWithoutSave}
-            initialFocus={inputRef}
-        >
+        <Dialog open={open} size="s" onClose={onCloseWithoutSave} initialFocus={inputRef}>
             <Dialog.Header caption={i18n('action.save')} />
             <form
                 onSubmit={(e) => {
@@ -192,9 +186,6 @@ function SaveQueryDialog({
                 <Dialog.Body className={b('dialog-body')}>
                     <div className={b('dialog-row')}>{i18n('description')}</div>
                     <div className={b('dialog-row')}>
-                        <label htmlFor="queryName" className={b('field-title', 'required')}>
-                            {i18n('input-label')}
-                        </label>
                         <div className={b('control-wrapper')}>
                             <TextInput
                                 controlRef={inputRef}

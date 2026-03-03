@@ -105,6 +105,7 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
 
     const handleCloseDrawer = React.useCallback(() => {
         setShowQueryPreview(false);
+        setSelectedRow(null);
     }, []);
 
     const renderDrawerContent = React.useCallback(
@@ -120,39 +121,45 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
     );
 
     return (
-        <TableWithControlsLayout className={b()}>
-            <TableWithControlsLayout.Controls>
-                <Search
-                    value={filter}
-                    onChange={onChangeFilter}
-                    placeholder={i18n('filter.text.placeholder')}
-                    className={b('search')}
-                />
-            </TableWithControlsLayout.Controls>
-            <TableWithControlsLayout.Table>
-                <DrawerWrapper
-                    isDrawerVisible={showQueryPreview}
-                    onCloseDrawer={handleCloseDrawer}
-                    renderDrawerContent={renderDrawerContent}
-                    drawerId={'query-history-preview'}
-                    detectClickOutside
-                    isPercentageWidth
-                    drawerControls={drawerControls}
-                    title={i18n('title_query-details')}
-                    defaultWidth={50}
-                >
-                    <ResizeableDataTable
-                        columnsWidthLSKey={QUERIES_HISTORY_COLUMNS_WIDTH_LS_KEY}
-                        columns={columns}
-                        data={sortedHistory}
-                        settings={QUERY_TABLE_SETTINGS}
-                        emptyDataMessage={i18n(filter ? 'history.empty-search' : 'history.empty')}
-                        rowClassName={(row) => b('table-row', {active: isEqual(row, selectedRow)})}
-                        onRowClick={handleShowPreview}
+        <div className={b()}>
+            <TableWithControlsLayout className={b('table-with-controls')}>
+                <TableWithControlsLayout.Controls>
+                    <Search
+                        value={filter}
+                        onChange={onChangeFilter}
+                        placeholder={i18n('filter.text.placeholder')}
+                        className={b('search')}
                     />
-                </DrawerWrapper>
-            </TableWithControlsLayout.Table>
-        </TableWithControlsLayout>
+                </TableWithControlsLayout.Controls>
+                <TableWithControlsLayout.Table>
+                    <DrawerWrapper
+                        isDrawerVisible={showQueryPreview}
+                        onCloseDrawer={handleCloseDrawer}
+                        renderDrawerContent={renderDrawerContent}
+                        drawerId={'query-history-preview'}
+                        detectClickOutside
+                        isPercentageWidth
+                        drawerControls={drawerControls}
+                        title={i18n('title_query-details')}
+                        defaultWidth={50}
+                    >
+                        <ResizeableDataTable
+                            columnsWidthLSKey={QUERIES_HISTORY_COLUMNS_WIDTH_LS_KEY}
+                            columns={columns}
+                            data={sortedHistory}
+                            settings={QUERY_TABLE_SETTINGS}
+                            emptyDataMessage={i18n(
+                                filter ? 'history.empty-search' : 'history.empty',
+                            )}
+                            rowClassName={(row) =>
+                                b('table-row', {active: isEqual(row, selectedRow)})
+                            }
+                            onRowClick={handleShowPreview}
+                        />
+                    </DrawerWrapper>
+                </TableWithControlsLayout.Table>
+            </TableWithControlsLayout>
+        </div>
     );
 }
 
