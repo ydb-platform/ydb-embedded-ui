@@ -13,6 +13,7 @@ const config: PlaywrightTestConfig = {
         ['json', {outputFile: './playwright-artifacts/test-results.json'}],
     ],
     retries: process.env.CI ? 1 : 0,
+    workers: process.env.CI ? 2 : undefined,
     // If there is no url provided, playwright starts webServer with the app in dev mode
     webServer: baseUrl
         ? undefined
@@ -29,7 +30,9 @@ const config: PlaywrightTestConfig = {
         testIdAttribute: 'data-qa',
         trace: 'on-first-retry',
         // Always record video and take screenshots on main branch, otherwise only on failure
-        video: 'retain-on-failure',
+        video:
+            (process.env.PLAYWRIGHT_VIDEO as 'on' | 'off' | 'retain-on-failure' | undefined) ||
+            'retain-on-failure',
         screenshot: 'only-on-failure',
     },
     projects: [

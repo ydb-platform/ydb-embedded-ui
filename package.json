@@ -88,7 +88,10 @@
     "prepare": "husky",
     "test:e2e:install": "npx playwright install --with-deps",
     "test:e2e": "npx playwright test --config=playwright.config.ts",
-    "test:e2e:local": "PLAYWRIGHT_BASE_URL=http://localhost:3000/ npm run test:e2e"
+    "test:e2e:update-snapshots": "npx playwright test --config=playwright.config.ts --update-snapshots",
+    "test:e2e:local": "PLAYWRIGHT_BASE_URL=http://localhost:3000/ npm run test:e2e",
+    "test:e2e:docker": "bash scripts/playwright-docker.sh",
+    "test:e2e:docker:update-snapshots": "bash scripts/playwright-docker.sh --update-snapshots"
   },
   "lint-staged": {
     "*.{scss, css}": [
