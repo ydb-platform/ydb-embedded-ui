@@ -8,11 +8,16 @@ on:
 
 jobs:
   e2e_tests:
-    name: Playwright Tests
-    timeout-minutes: 60
+    name: Playwright Tests (${{ matrix.shard }}/${{ matrix.shardTotal }})
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+        shardTotal: [4]
 
     services:
       backend:
@@ -38,11 +43,52 @@ jobs:
         run: npm ci
 
       - name: Run Playwright tests
-        id: run_tests
-        run: bash scripts/playwright-docker.sh
+        run: bash scripts/playwright-docker.sh --shard=${{ matrix.shard }}/${{ matrix.shardTotal }}
         env:
           CI: 'true'
           PLAYWRIGHT_VIDEO: 'on'
+
+      - name: Upload blob report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blob-report-${{ matrix.shard }}
+          path: blob-report
+          retention-days: 1
+
+  merge_reports:
+    name: Merge Playwright Reports
+    if: always()
+    needs: [e2e_tests]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download blob reports
+        uses: actions/download-artifact@v4
+        with:
+          path: all-blob-reports
+          pattern: blob-report-*
+          merge-multiple: true
+
+      - name: Merge reports
+        run: |
+          npx playwright merge-reports --reporter='html,json' ./all-blob-reports
+          mkdir -p playwright-artifacts
+          mv playwright-report playwright-artifacts/playwright-report
+          mv test-results.json playwright-artifacts/test-results.json
 
       - name: Upload Playwright artifacts
         if: always()
@@ -56,24 +102,12 @@ jobs:
         if: always()
         id: test-results
         run: |
-          echo "Current directory: $(pwd)"
-          echo "Listing playwright-artifacts directory:"
-          ls -R playwright-artifacts
-
-          if [ -f "playwright-artifacts/test-results.json" ]; then          
-            echo "Parsing JSON file:"
+          if [ -f "playwright-artifacts/test-results.json" ]; then
             total=$(jq '.stats.expected + .stats.unexpected + .stats.flaky + .stats.skipped' playwright-artifacts/test-results.json)
             passed=$(jq '.stats.expected' playwright-artifacts/test-results.json)
             failed=$(jq '.stats.unexpected' playwright-artifacts/test-results.json)
             flaky=$(jq '.stats.flaky' playwright-artifacts/test-results.json)
             skipped=$(jq '.stats.skipped' playwright-artifacts/test-results.json)
-
-            echo "Parsed values:"
-            echo "Total: $total"
-            echo "Passed: $passed"
-            echo "Failed: $failed"
-            echo "Flaky: $flaky"
-            echo "Skipped: $skipped"
           else
             echo "test-results.json file not found"
             total=0
@@ -154,7 +188,7 @@ jobs:
 
   deploy_report:
     name: Deploy Test Report
-    needs: [e2e_tests]
+    needs: [merge_reports]
     if: always() && (github.event_name == 'push' && github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository))
     runs-on: ubuntu-latest
     permissions:
@@ -206,7 +240,7 @@ jobs:
 
   update_pr:
     name: Update PR Description
-    needs: [e2e_tests, bundle_size]
+    needs: [merge_reports, bundle_size]
     if: always() && github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     permissions:
