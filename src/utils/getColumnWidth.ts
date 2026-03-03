@@ -1,4 +1,3 @@
-import {EMPTY_DATA_PLACEHOLDER} from './constants';
 export const MAX_COLUMN_WIDTH = 600;
 export const HEADER_PADDING = 20;
 export const SORT_ICON_TO_CHARACTERS = 2;
@@ -23,14 +22,10 @@ export function getColumnWidth({
 
     if (data) {
         for (const row of data) {
-            const raw = row[name];
-
-            const cellText =
-                raw === null || raw === undefined || (typeof raw === 'string' && raw.trim() === '')
-                    ? EMPTY_DATA_PLACEHOLDER
-                    : String(raw);
-
-            const cellLength = cellText.length;
+            let cellLength = 0;
+            if (row[name]) {
+                cellLength = String(row[name]).length;
+            }
 
             maxColumnContentLength = Math.max(maxColumnContentLength, cellLength);
 

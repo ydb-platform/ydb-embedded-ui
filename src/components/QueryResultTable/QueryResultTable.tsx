@@ -5,7 +5,7 @@ import type {Column, Settings} from '@gravity-ui/react-data-table';
 
 import type {ColumnType, KeyValueRow} from '../../types/api/query';
 import {cn} from '../../utils/cn';
-import {DEFAULT_TABLE_SETTINGS, EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
+import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
 import {getColumnWidth} from '../../utils/getColumnWidth';
 import {getColumnType} from '../../utils/query';
 import {isNumeric} from '../../utils/utils';
@@ -43,19 +43,12 @@ const prepareTypedColumns = (columns: ColumnType[], data: KeyValueRow[] | undefi
             width: getColumnWidth({data: dataSlice, name}),
             align: columnType === 'number' ? DataTable.RIGHT : DataTable.LEFT,
             render: ({row}) => {
-                const cell = row[name];
-                if (
-                    cell === null ||
-                    cell === undefined ||
-                    (typeof cell === 'string' && cell.trim() === '')
-                ) {
-                    return <Cell value={EMPTY_DATA_PLACEHOLDER} />;
-                }
-                if (columnType === 'binary-string' && typeof cell === 'string') {
-                    const normalizedBinaryString = JSON.stringify(cell).slice(1, -1);
-                    return <Cell value={normalizedBinaryString} />;
-                }
-                return <Cell value={String(cell)} />;
+                const data = row[name];
+                const normalizedData =
+                    columnType === 'binary-string' && typeof data === 'string'
+                        ? JSON.stringify(data).slice(1, -1)
+                        : String(data);
+                return <Cell value={normalizedData} />;
             },
         };
 
@@ -75,19 +68,7 @@ const prepareGenericColumns = (data: KeyValueRow[] | undefined) => {
             name,
             width: getColumnWidth({data: dataSlice, name}),
             align: isNumeric(data[0][name]) ? DataTable.RIGHT : DataTable.LEFT,
-            render: ({row}) => {
-                const cell = row[name];
-
-                if (
-                    cell === null ||
-                    cell === undefined ||
-                    (typeof cell === 'string' && cell.trim() === '')
-                ) {
-                    return <Cell value={EMPTY_DATA_PLACEHOLDER} />;
-                }
-
-                return <Cell value={String(cell)} />;
-            },
+            render: ({row}) => <Cell value={String(row[name])} />,
         };
 
         return column;
