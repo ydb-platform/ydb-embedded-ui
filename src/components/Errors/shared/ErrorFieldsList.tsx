@@ -15,16 +15,13 @@ function formatUrlLine(method?: string, requestUrl?: string): string | undefined
 
 interface ErrorFieldsListProps {
     details: ErrorDetails;
-    redundantValues?: string[];
     className?: string;
 }
 
-export function ErrorFieldsList({details, redundantValues = [], className}: ErrorFieldsListProps) {
-    const {requestUrl, method, errorCode, traceId, requestId, proxyName, workerName, responseBody} =
-        details;
+export function ErrorFieldsList({details, className}: ErrorFieldsListProps) {
+    const {requestUrl, method, errorCode, traceId, requestId, proxyName, workerName} = details;
 
     const urlLine = formatUrlLine(method, requestUrl);
-    const isBodyRedundant = !responseBody || redundantValues.some((v) => v === responseBody);
 
     return (
         <DefinitionList nameMaxWidth={130} className={className}>
@@ -42,49 +39,40 @@ export function ErrorFieldsList({details, redundantValues = [], className}: Erro
                 </DefinitionList.Item>
             )}
             {traceId && (
-                <DefinitionList.Item name="Trace-ID" copyText={traceId}>
+                <DefinitionList.Item name={i18n('error-details.label_trace-id')} copyText={traceId}>
                     {traceId}
                 </DefinitionList.Item>
             )}
             {requestId && (
-                <DefinitionList.Item name="Request-ID" copyText={requestId}>
+                <DefinitionList.Item
+                    name={i18n('error-details.label_request-id')}
+                    copyText={requestId}
+                >
                     {requestId}
                 </DefinitionList.Item>
             )}
             {proxyName && (
-                <DefinitionList.Item name="x-proxy-name" copyText={proxyName}>
+                <DefinitionList.Item
+                    name={i18n('error-details.label_proxy-name')}
+                    copyText={proxyName}
+                >
                     {proxyName}
                 </DefinitionList.Item>
             )}
             {workerName && (
-                <DefinitionList.Item name="x-worker-name" copyText={workerName}>
-                    {workerName}
-                </DefinitionList.Item>
-            )}
-            {responseBody && !isBodyRedundant && (
                 <DefinitionList.Item
-                    name={i18n('error-details.label_response-body')}
-                    copyText={responseBody}
+                    name={i18n('error-details.label_worker-name')}
+                    copyText={workerName}
                 >
-                    {responseBody}
+                    {workerName}
                 </DefinitionList.Item>
             )}
         </DefinitionList>
     );
 }
 
-export function hasVisibleFields(details: ErrorDetails, redundantValues: string[] = []): boolean {
-    const {requestUrl, errorCode, traceId, requestId, proxyName, workerName, responseBody} =
-        details;
-    const isBodyRedundant = !responseBody || redundantValues.some((v) => v === responseBody);
+export function hasVisibleFields(details: ErrorDetails): boolean {
+    const {requestUrl, errorCode, traceId, requestId, proxyName, workerName} = details;
 
-    return Boolean(
-        requestUrl ||
-            errorCode ||
-            traceId ||
-            requestId ||
-            proxyName ||
-            workerName ||
-            (responseBody && !isBodyRedundant),
-    );
+    return Boolean(requestUrl || errorCode || traceId || requestId || proxyName || workerName);
 }

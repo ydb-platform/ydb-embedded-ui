@@ -17,9 +17,9 @@ export function ErrorDetailsContent({details}: ErrorDetailsProps) {
     const issueCount = issues?.length ?? 0;
     const hasIssueData = Boolean(hasIssues && issues && issueCount > 0);
 
-    const redundantValues = [title, dataMessage].filter(Boolean) as string[];
-    const hasFields = hasVisibleFields(details, redundantValues);
+    const hasFields = hasVisibleFields(details);
 
+    const redundantValues = [title, dataMessage].filter(Boolean) as string[];
     const isBodyRedundant =
         Boolean(responseBody) && redundantValues.some((v) => v === responseBody);
     const visibleResponseBody =
@@ -31,13 +31,7 @@ export function ErrorDetailsContent({details}: ErrorDetailsProps) {
 
     return (
         <Flex direction="column" gap={2} className={b('details')}>
-            {hasFields && (
-                <ErrorFieldsList
-                    details={details}
-                    redundantValues={redundantValues}
-                    className={b('fields')}
-                />
-            )}
+            {hasFields && <ErrorFieldsList details={details} className={b('fields')} />}
             {visibleResponseBody && <ResponseBodySection body={visibleResponseBody} />}
             {hasIssueData && issues && (
                 <IssuesSection
