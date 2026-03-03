@@ -7,6 +7,11 @@ const config: PlaywrightTestConfig = {
     globalSetup: './tests/playwrightSetup.ts',
     testDir: './tests/suites',
     timeout: 30 * 1000,
+    expect: {
+        toHaveScreenshot: {
+            maxDiffPixelRatio: 0.01,
+        },
+    },
     outputDir: './playwright-artifacts/test-results',
     reporter: process.env.CI
         ? [['blob', {outputDir: './blob-report'}]]
