@@ -7,6 +7,7 @@ This file provides guidance to AI coding assistants when working with this codeb
 YDB Embedded UI is a web-based monitoring and management interface for YDB (Yet another DataBase) clusters. It provides comprehensive tools for viewing database diagnostics, managing storage/nodes/tablets, executing queries, and monitoring cluster health.
 
 The project serves dual purposes:
+
 - **Standalone application**: Built and deployed as a web UI (embedded into YDB servers or served independently)
 - **Distributable library**: Published as an npm package (`src/lib.ts` exports) for embedding into other applications via `npm run package`
 
@@ -206,6 +207,7 @@ REACT_APP_BACKEND=http://your-cluster:8765  # Single cluster mode
 ### CI Pipeline
 
 The following checks run on every PR (`ci.yml`):
+
 1. `npm run typecheck` — TypeScript type checking
 2. `npm run lint` — All linters (ESLint + Stylelint + Prettier)
 3. `npm run build:embedded` — Verify embedded build works
@@ -213,6 +215,7 @@ The following checks run on every PR (`ci.yml`):
 5. `npm test` — Unit tests
 
 Additional quality checks (`quality.yml`):
+
 - Playwright E2E tests (against a `local-ydb:nightly` Docker service)
 - Bundle size comparison (current branch vs. main)
 
@@ -304,6 +307,7 @@ Uses BEM naming convention with `cn()` utility from `utils/cn` (wraps `@bem-reac
 See `i18n-naming-ruleset.md` in the repo root for all i18n conventions (naming and usage).
 
 The i18n system uses `@gravity-ui/i18n`. Each component with user-facing strings has an `i18n/` subdirectory containing:
+
 - `en.json` — English translations
 - `index.ts` — Registers the keyset using `registerKeysets()` from `src/utils/i18n`
 
