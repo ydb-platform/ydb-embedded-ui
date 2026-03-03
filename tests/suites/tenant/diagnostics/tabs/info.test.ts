@@ -228,5 +228,8 @@ test.describe('Diagnostics Info tab', async () => {
         await expect(indexSettings.getByText('Clusters')).toBeVisible();
         await expect(indexSettings.getByText('Levels')).toBeVisible();
         await expect(indexSettings.getByText('Vector Dimension')).toBeVisible();
+
+        // Visual snapshot of vector index info with all settings
+        await expect(infoContent).toHaveScreenshot('vector-index-info-overlap-clusters.png');
     });
 });
