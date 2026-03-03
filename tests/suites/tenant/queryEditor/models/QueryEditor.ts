@@ -190,6 +190,16 @@ export class QueryEditor {
         await this.editorTextArea.focus();
     }
 
+    async getEditorContent(): Promise<string> {
+        return this.editorTextArea.evaluate(() => {
+            const editor = window.ydbEditor;
+            if (editor) {
+                return editor.getValue();
+            }
+            return '';
+        });
+    }
+
     async selectText(startLine: number, startColumn: number, endLine: number, endColumn: number) {
         await this.editorTextArea.evaluate(
             (_, coords) => {

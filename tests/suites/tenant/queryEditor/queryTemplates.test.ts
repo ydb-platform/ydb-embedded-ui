@@ -302,7 +302,7 @@ test.describe('Query Templates', () => {
         await objectSummary.clickActionMenuItem(tableName, RowTableAction.AddVectorIndex);
         await page.waitForTimeout(500);
 
-        const editorContent = await queryEditor.editorTextArea.inputValue();
+        const editorContent = await queryEditor.getEditorContent();
         expect(editorContent).toContain('vector_kmeans_tree');
         expect(editorContent).toContain('overlap_clusters');
     });
