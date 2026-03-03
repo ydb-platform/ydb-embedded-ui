@@ -236,12 +236,17 @@ The project uses Gravity UI (`@gravity-ui/uikit`) as the primary component libra
 - **Fragments**: Must use `React.Fragment` — JSX fragment shorthand (`<></>`) is forbidden
 
 ```typescript
-// ✅ Correct
+// ✅ Correct — hooks accessed via default import
 import React from 'react';
 import type {FC} from 'react';
 
-// ❌ Wrong
-import {useState} from 'react';
+const [count, setCount] = React.useState(0);
+React.useEffect(() => {
+  /* ... */
+}, []);
+
+// ❌ Wrong — named value imports from 'react' are forbidden
+import {useState, useEffect} from 'react';
 import * as React from 'react';
 ```
 
