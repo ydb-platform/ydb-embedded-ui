@@ -55,6 +55,7 @@ export interface TVectorIndexSettings {
 export interface TKMeansTreeSettings {
     clusters?: number;
     levels?: number;
+    overlap_clusters?: number;
     settings?: TVectorIndexSettings;
 }
 
