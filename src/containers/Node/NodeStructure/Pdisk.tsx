@@ -126,16 +126,17 @@ function getColumns({
             header: vDiskTableColumnsNames[VDiskTableColumnsIds.Size],
             width: 170,
             render: ({row}) => {
-                const value = row.AllocatedSize;
+                const allocated = row.AllocatedSize;
+                const available = row.AvailableSize;
 
-                if (!isNumeric(value)) {
+                if (!isNumeric(allocated) || !isNumeric(available)) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
 
                 return (
                     <ProgressViewer
-                        value={value}
-                        capacity={Number(row.AllocatedSize) + Number(row.AvailableSize)}
+                        value={allocated}
+                        capacity={Number(allocated) + Number(available)}
                         formatValues={formatStorageValuesToGb}
                         colorizeProgress={true}
                     />
