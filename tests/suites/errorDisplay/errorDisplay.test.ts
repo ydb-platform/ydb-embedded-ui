@@ -22,7 +22,7 @@ import {
 
 const FULL_PAGE_DIR = 'playwright-artifacts/full-page-screenshots';
 
-test.describe('Error Display — ResponseError with Details', () => {
+test.describe.only('Error Display — ResponseError with Details', () => {
     test('HTTP 400 — plain text error with traceresponse and x-request-id', async ({page}) => {
         await setup400PlainTextMock(page);
 

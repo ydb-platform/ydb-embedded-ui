@@ -10,9 +10,9 @@ export class ErrorDisplayModel extends BaseModel {
     private fieldsDefinitionList: Locator;
     private issuesTrigger: Locator;
 
-    // Full-page error (PageError — blocks entire page)
+    // Full-page error (PageError — blocks entire page, wraps ResponseError inside EmptyState)
     private pageError: Locator;
-    private pageErrorBody: Locator;
+    private pageErrorResponseError: Locator;
     private pageErrorFields: Locator;
 
     // Access denied
@@ -29,8 +29,8 @@ export class ErrorDisplayModel extends BaseModel {
         );
 
         this.pageError = page.locator('.ydb-page-error');
-        this.pageErrorBody = this.pageError.locator('.ydb-page-error__body');
-        this.pageErrorFields = this.pageError.locator('.ydb-page-error__fields');
+        this.pageErrorResponseError = this.pageError.locator('.response-error');
+        this.pageErrorFields = this.pageError.locator('.response-error__fields');
 
         this.accessDeniedState = page.locator('.empty-state');
         this.accessDeniedTitle = this.accessDeniedState.locator('.empty-state__title');
@@ -111,7 +111,7 @@ export class ErrorDisplayModel extends BaseModel {
     }
 
     async getPageErrorBodyText(): Promise<string> {
-        return this.pageErrorBody.innerText();
+        return this.pageErrorResponseError.innerText();
     }
 
     async isPageErrorFieldsVisible(): Promise<boolean> {
