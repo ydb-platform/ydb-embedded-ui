@@ -78,7 +78,7 @@ export function MetricsTabs({
         }),
     };
 
-    // Use only pools that directly indicate resources available to perform user queries
+    // Sum CPU usage from all pools except the IO pool
     const cpuPools = React.useMemo(
         () => (poolsCpuStats || []).filter((pool) => pool.name !== 'IO'),
         [poolsCpuStats],
@@ -145,7 +145,7 @@ export function MetricsTabs({
                 isServerless={Boolean(isServerless)}
                 cpu={{
                     totalUsed: cpuMetrics.totalUsed,
-                    totalLimit: coresTotal ?? cpuMetrics.totalLimit,
+                    totalLimit: coresTotal && coresTotal > 0 ? coresTotal : cpuMetrics.totalLimit,
                 }}
                 controlPlaneNodesCount={controlPlaneNodesCount}
             />

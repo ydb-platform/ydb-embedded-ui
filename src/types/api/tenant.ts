@@ -141,18 +141,18 @@ export interface ControlPlane {
 
     scale_policy?: {
         fixed_scale: {
-            size: number;
+            size?: number;
         };
     };
 
     storage_config?: {
-        storage_options: [
+        storage_options?: [
             {
-                storage_type_id: 'ssd' | 'hdd';
-                group_count: number;
+                storage_type_id?: 'ssd' | 'hdd';
+                group_count?: number;
             },
         ];
-        storage_size_limit: number;
+        storage_size_limit?: number;
     };
 }
 /** incomplete */

@@ -19,10 +19,9 @@ interface CpuTabProps {
 }
 
 export function CpuTab({to, active, isServerless, cpu, controlPlaneNodesCount}: CpuTabProps) {
-    const dedicatedDatabaseUsageText =
-        !controlPlaneNodesCount || isNaN(Number(controlPlaneNodesCount))
-            ? i18n('context_cpu-load')
-            : i18n('context_cpu-nodes-count', {count: controlPlaneNodesCount});
+    const dedicatedDatabaseUsageText = !controlPlaneNodesCount
+        ? i18n('context_cpu-load')
+        : i18n('context_cpu-nodes-count', {count: controlPlaneNodesCount});
 
     return (
         <div className={b('link-container', {active})}>
