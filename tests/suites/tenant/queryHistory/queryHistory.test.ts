@@ -7,7 +7,7 @@ import {QueryEditor, QueryTabs} from '../queryEditor/models/QueryEditor';
 
 import executeQueryWithKeybinding from './utils';
 
-test.describe.only('Query History', () => {
+test.describe('Query History', () => {
     let tenantPage: TenantPage;
     let queryEditor: QueryEditor;
 
