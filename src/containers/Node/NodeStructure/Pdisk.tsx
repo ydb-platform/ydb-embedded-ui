@@ -19,12 +19,13 @@ import {EVDiskState} from '../../../types/api/vdisk';
 import type {ValueOf} from '../../../types/common';
 import {valueIsDefined} from '../../../utils';
 import {cn} from '../../../utils/cn';
-import {DEFAULT_TABLE_SETTINGS} from '../../../utils/constants';
+import {DEFAULT_TABLE_SETTINGS, EMPTY_DATA_PLACEHOLDER} from '../../../utils/constants';
 import {formatStorageValuesToGb} from '../../../utils/dataFormatters/dataFormatters';
 import {
     createVDiskDeveloperUILink,
     useHasDeveloperUi,
 } from '../../../utils/developerUI/developerUI';
+import {isNumeric} from '../../../utils/utils';
 import i18n from '../i18n';
 
 import {PDiskTitleBadge} from './PDiskTitleBadge';
@@ -125,9 +126,15 @@ function getColumns({
             header: vDiskTableColumnsNames[VDiskTableColumnsIds.Size],
             width: 170,
             render: ({row}) => {
+                const value = row.AllocatedSize;
+
+                if (!isNumeric(value)) {
+                    return EMPTY_DATA_PLACEHOLDER;
+                }
+
                 return (
                     <ProgressViewer
-                        value={row.AllocatedSize}
+                        value={value}
                         capacity={Number(row.AllocatedSize) + Number(row.AvailableSize)}
                         formatValues={formatStorageValuesToGb}
                         colorizeProgress={true}
