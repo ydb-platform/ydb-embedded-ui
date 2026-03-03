@@ -137,25 +137,27 @@ src/
 - **PREFER** direct event handlers and callbacks over useEffect for user interactions
 
 ```typescript
-// ✅ REQUIRED patterns
-const displaySegments = useMemo(() => segments.filter((segment) => segment.visible), [segments]);
-const handleClick = useCallback(() => {
-  // logic
-}, [dependency]);
+// ✅ REQUIRED patterns — real examples from the codebase
 
-// ✅ PREFER direct callbacks over useEffect
-const handleInputChange = useCallback(
-  (value: string) => {
-    setSearchTerm(value);
-    onSearchChange?.(value);
-  },
-  [onSearchChange],
-);
+// Memoize computed data (src/components/ShardsTable/ShardsTable.tsx)
+const columns = React.useMemo(() => {
+  return columnsIds
+    .filter((id) => id in shardsColumnIdToGetColumn)
+    .map((id) => {
+      const overridedColumn = overrideColumns.find((column) => column.name === id);
+      if (overridedColumn) {
+        return overridedColumn;
+      }
+      return shardsColumnIdToGetColumn[id]();
+    });
+}, [columnsIds, overrideColumns]);
 
-// ❌ AVOID unnecessary useEffect
-// useEffect(() => {
-//   onSearchChange?.(searchTerm);
-// }, [searchTerm, onSearchChange]);
+// ✅ PREFER direct callbacks over useEffect — clears error on input change
+// (src/containers/Tenant/Query/QueryEditor/EditorTabs/RenameTabDialog.tsx)
+const handleTitleChange = React.useCallback((value: string) => {
+  setNextTitle(value);
+  setErrorMessage(undefined);
+}, []);
 ```
 
 ### Display Safety
@@ -328,14 +330,14 @@ The i18n system uses `@gravity-ui/i18n`. Each component with user-facing strings
 - `index.ts` — Registers the keyset using `registerKeysets()` from `src/utils/i18n`
 
 ```typescript
-// src/components/MyComponent/i18n/index.ts
+// Real example: src/components/StorageGroupInfo/i18n/index.ts
 import {registerKeysets} from '../../../utils/i18n';
 
 import en from './en.json';
 
-const COMPONENT = 'my-component';
+const COMPONENT = 'storage-group-info';
 
-export const myComponentKeyset = registerKeysets(COMPONENT, {en});
+export const storageGroupInfoKeyset = registerKeysets(COMPONENT, {en});
 ```
 
 ### Performance Considerations
@@ -366,21 +368,30 @@ Uses React Router v5 hooks (`useHistory`, `useParams`, etc.). Always validate ro
 - Use `z.enum([...]).catch(defaultValue)` pattern for safe parsing with fallbacks
 
 ```typescript
-// ✅ PREFERRED pattern for URL parameters
-const sortColumnSchema = z.enum(['column1', 'column2', 'column3']).catch('column1');
+// ✅ Zod schema with fallback (src/containers/Versions/Versions.tsx)
+const groupByValueSchema = z.nativeEnum(GroupByValue).catch(GroupByValue.VERSION);
 
+// ✅ Custom QueryParamConfig (src/containers/Tenant/Diagnostics/TopQueries/hooks/useSortParam.ts)
 const SortOrderParam: QueryParamConfig<SortOrder[]> = {
-  encode: (value) => (value ? encodeURIComponent(JSON.stringify(value)) : undefined),
+  encode: (value) => {
+    if (value === undefined || value === null || !Array.isArray(value)) {
+      return undefined;
+    }
+    return encodeURIComponent(JSON.stringify(value));
+  },
   decode: (value) => {
+    if (typeof value !== 'string' || !value) {
+      return [];
+    }
     try {
-      return value ? JSON.parse(decodeURIComponent(value)) : [];
+      return JSON.parse(decodeURIComponent(value));
     } catch {
       return [];
     }
   },
 };
 
-const [urlParam, setUrlParam] = useQueryParam('sort', SortOrderParam);
+const [urlSortParam, setUrlSortParam] = useQueryParam<SortOrder[]>(paramName, SortOrderParam);
 ```
 
 ### UIFactory Pattern
