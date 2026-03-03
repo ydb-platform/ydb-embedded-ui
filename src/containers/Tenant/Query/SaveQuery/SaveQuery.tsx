@@ -134,6 +134,7 @@ function SaveQueryDialog({
     const dispatch = useTypedDispatch();
     const [queryName, setQueryName] = React.useState(defaultQueryName ?? '');
     const [validationError, setValidationError] = React.useState<string>();
+    const inputRef = React.useRef<HTMLInputElement>(null);
 
     const validateQueryName = (value: string) => {
         if (!value) {
@@ -170,7 +171,13 @@ function SaveQueryDialog({
     };
 
     return (
-        <Dialog open={open} hasCloseButton={false} size="s" onClose={onCloseWithoutSave}>
+        <Dialog
+            open={open}
+            hasCloseButton={false}
+            size="s"
+            onClose={onCloseWithoutSave}
+            initialFocus={inputRef}
+        >
             <Dialog.Header caption={i18n('action.save')} />
             <form
                 onSubmit={(e) => {
@@ -190,6 +197,7 @@ function SaveQueryDialog({
                         </label>
                         <div className={b('control-wrapper')}>
                             <TextInput
+                                controlRef={inputRef}
                                 id="queryName"
                                 placeholder={i18n('input-placeholder')}
                                 value={queryName}

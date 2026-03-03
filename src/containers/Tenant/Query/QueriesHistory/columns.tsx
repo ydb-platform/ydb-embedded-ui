@@ -1,6 +1,7 @@
+import {FloppyDisk} from '@gravity-ui/icons';
 import type {Column} from '@gravity-ui/react-data-table';
 import type {TextProps} from '@gravity-ui/uikit';
-import {Button, Flex, Text} from '@gravity-ui/uikit';
+import {ActionTooltip, Button, Flex, Icon, Text} from '@gravity-ui/uikit';
 
 import {YDBSyntaxHighlighter} from '../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
 import type {YDBDefinitionListItem} from '../../../../components/YDBDefinitionList/YDBDefinitionList';
@@ -15,9 +16,10 @@ import {b} from './shared';
 
 type QueryActions = {
     openInEditor: (query: QueryInHistory) => void;
+    saveQuery: VoidFunction;
 };
 
-export function getColumns({openInEditor}: QueryActions) {
+export function getColumns({openInEditor, saveQuery}: QueryActions) {
     const columns: Column<QueryInHistory>[] = [
         {
             name: 'startTime',
@@ -67,6 +69,16 @@ export function getColumns({openInEditor}: QueryActions) {
             render: ({row}) => {
                 return (
                     <Flex className={b('actions')} gap={2}>
+                        <ActionTooltip title={i18n('action.save-query')}>
+                            <Button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    saveQuery();
+                                }}
+                            >
+                                <Icon data={FloppyDisk} />
+                            </Button>
+                        </ActionTooltip>
                         <Button
                             view="action"
                             onClick={() => {
@@ -79,7 +91,6 @@ export function getColumns({openInEditor}: QueryActions) {
                 );
             },
             sortable: false,
-            width: 100,
             resizeable: false,
         },
     ];

@@ -1,5 +1,6 @@
 import React from 'react';
 
+import NiceModal from '@ebay/nice-modal-react';
 import {isEqual} from 'lodash';
 
 import {DrawerWrapper} from '../../../../components/Drawer';
@@ -21,7 +22,9 @@ import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
+import {SAVE_QUERY_DIALOG} from '../SaveQuery/SaveQuery';
 import i18n from '../i18n';
+import {useSavedQueries} from '../utils/useSavedQueries';
 
 import {getColumns, getQueryInfoItems} from './columns';
 import {b} from './shared';
@@ -39,6 +42,7 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
     const dispatch = useTypedDispatch();
     const [showQueryPreview, setShowQueryPreview] = React.useState(false);
     const [selectedRow, setSelectedRow] = React.useState<EnhancedQueryInHistory | null>(null);
+    const {savedQueries, saveQuery} = useSavedQueries();
 
     const sortedHistory = React.useMemo(() => {
         return queriesHistory.filteredHistoryQueries.toSorted((a, b) => {
@@ -69,6 +73,13 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
         [changeUserInput, dispatch],
     );
 
+    const handleSaveQuery = React.useCallback(() => {
+        NiceModal.show(SAVE_QUERY_DIALOG, {
+            savedQueries,
+            onSaveQuery: saveQuery,
+        });
+    }, [savedQueries, saveQuery]);
+
     const handleShowPreview = React.useCallback(
         (query: QueryInHistory, _index?: number, event?: React.MouseEvent<HTMLTableRowElement>) => {
             event?.stopPropagation();
@@ -88,8 +99,9 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
     const columns = React.useMemo(() => {
         return getColumns({
             openInEditor: onQueryClick,
+            saveQuery: handleSaveQuery,
         });
-    }, [onQueryClick]);
+    }, [onQueryClick, handleSaveQuery]);
 
     const handleCloseDrawer = React.useCallback(() => {
         setShowQueryPreview(false);
