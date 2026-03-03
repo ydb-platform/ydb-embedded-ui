@@ -164,6 +164,12 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         const proxyName = await errorDisplay.getDetailValue('x-proxy-name');
         expect(proxyName).toContain('test-proxy-node');
 
+        expect(await errorDisplay.isResponseBodyTriggerVisible()).toBe(true);
+        await errorDisplay.expandResponseBody();
+
+        const responseBody = await errorDisplay.getResponseBodyText();
+        expect(responseBody).toContain('Rate limit exceeded');
+
         await expect(errorDisplay.getResponseErrorLocator()).toHaveScreenshot(
             'error-storage-group-429-html.png',
         );
@@ -183,6 +189,12 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
 
         const errorText = await errorDisplay.getResponseErrorText();
         expect(errorText).toContain('NEED_RESET');
+
+        expect(await errorDisplay.isResponseBodyTriggerVisible()).toBe(true);
+        await errorDisplay.expandResponseBody();
+
+        const responseBody = await errorDisplay.getResponseBodyText();
+        expect(responseBody).toContain('NEED_RESET');
 
         await expect(errorDisplay.getResponseErrorLocator()).toHaveScreenshot(
             'error-tablet-400-code-only.png',
@@ -217,6 +229,12 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
 
         const requestId = await errorDisplay.getPageErrorDetailValue('Request-ID');
         expect(requestId).toBe('test-req-id-e2e-whoami-500');
+
+        expect(await errorDisplay.isPageErrorResponseBodyTriggerVisible()).toBe(true);
+        await errorDisplay.expandPageErrorResponseBody();
+
+        const responseBody = await errorDisplay.getPageErrorResponseBodyText();
+        expect(responseBody).toContain('Authentication service unavailable');
 
         await expect(errorDisplay.getPageErrorLocator()).toHaveScreenshot(
             'error-full-page-whoami-500.png',
