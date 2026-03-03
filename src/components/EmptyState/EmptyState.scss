@@ -11,6 +11,7 @@
     &__wrapper {
         display: grid;
         grid-template-areas: 'image content';
+        grid-template-columns: auto 1fr;
 
         &_size_xs {
             width: 321px;
