@@ -51,8 +51,9 @@ npm run unused      # Find unused code
 ```bash
 npm test                       # Run unit tests
 npm test -- --watch           # Run tests in watch mode
-npm run test:e2e              # Run Playwright E2E tests
-npm run test:e2e:local        # Run E2E against local dev server
+npm run test:e2e                      # Run Playwright E2E tests
+npm run test:e2e:docker:update-snapshots     # Update E2E visual regression screenshots
+npm run test:e2e:local                # Run E2E against local dev server
 ```
 
 ## Architecture Overview
