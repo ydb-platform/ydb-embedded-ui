@@ -27,11 +27,15 @@ const config: PlaywrightTestConfig = {
               port: 3000,
               reuseExistingServer: !process.env.CI,
           },
+    expect: {
+        timeout: 10_000,
+    },
     use: {
         baseURL: baseUrl || 'http://localhost:3000/',
         testIdAttribute: 'data-qa',
         trace: 'on-first-retry',
-        // Always record video and take screenshots on main branch, otherwise only on failure
+        navigationTimeout: 15_000,
+        actionTimeout: 10_000,
         video:
             (process.env.PLAYWRIGHT_VIDEO as 'on' | 'off' | 'retain-on-failure' | undefined) ||
             'retain-on-failure',

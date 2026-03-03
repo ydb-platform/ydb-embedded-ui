@@ -40,9 +40,26 @@ jobs:
           cache: npm
 
       - name: Install dependencies
+        timeout-minutes: 5
         run: npm ci
 
+      - name: Wait for backend to be ready
+        timeout-minutes: 3
+        run: |
+          echo "Waiting for YDB backend to become ready..."
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:8765/viewer/json/healthcheck > /dev/null 2>&1; then
+              echo "Backend is ready (attempt $i)"
+              exit 0
+            fi
+            echo "Attempt $i/60: backend not ready yet, retrying in 3s..."
+            sleep 3
+          done
+          echo "Error: backend did not become ready within timeout" >&2
+          exit 1
+
       - name: Run Playwright tests
+        timeout-minutes: 20
         run: bash scripts/playwright-docker.sh --shard=${{ matrix.shard }}/${{ matrix.shardTotal }}
         env:
           CI: 'true'

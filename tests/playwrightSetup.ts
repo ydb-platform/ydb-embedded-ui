@@ -3,6 +3,7 @@ import {chromium} from '@playwright/test';
 import config from '../playwright.config';
 
 import {PageModel} from './models/PageModel';
+import {backend} from './utils/constants';
 
 const baseURL = (config.use?.baseURL || 'http://localhost:3000/').replace(/\/?$/, '/');
 
@@ -18,6 +19,30 @@ const WARMUP_PAGES = [
     // Query editor (triggers Monaco Editor lazy load + YDB query session init)
     'tenant?schema=/local&database=/local&tenantPage=query',
 ];
+
+const BACKEND_READINESS_TIMEOUT = 60_000;
+const BACKEND_READINESS_INTERVAL = 2_000;
+
+async function waitForBackend() {
+    const healthUrl = `${backend}/viewer/json/healthcheck`;
+    const start = Date.now();
+
+    while (Date.now() - start < BACKEND_READINESS_TIMEOUT) {
+        try {
+            const response = await fetch(healthUrl, {signal: AbortSignal.timeout(5_000)});
+            if (response.ok) {
+                return;
+            }
+        } catch {
+            // Backend not ready yet
+        }
+        await new Promise((resolve) => setTimeout(resolve, BACKEND_READINESS_INTERVAL));
+    }
+
+    throw new Error(
+        `Backend did not become ready within ${BACKEND_READINESS_TIMEOUT / 1000}s at ${healthUrl}`,
+    );
+}
 
 async function waitForPageReady(page: PageModel) {
     try {
@@ -78,6 +103,8 @@ async function warmupApplication(page: PageModel) {
 }
 
 export default async function globalSetup() {
+    await waitForBackend();
+
     const browser = await chromium.launch();
     const page = await browser.newPage();
     const appPage = new PageModel(page, baseURL);
