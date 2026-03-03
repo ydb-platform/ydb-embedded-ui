@@ -49,11 +49,12 @@ jobs:
         run: |
           docker run --rm --network host \
             -v ${{ github.workspace }}:/work \
+            -v ydb-embedded-ui-node-modules:/work/node_modules \
             -w /work \
             -e CI=true \
             -e PLAYWRIGHT_VIDEO=on \
             mcr.microsoft.com/playwright:v${{ steps.playwright-version.outputs.version }}-noble \
-            npx playwright test --config=playwright.config.ts
+            /bin/bash -c "npm ci && npx playwright test --config=playwright.config.ts"
 
       - name: Upload Playwright artifacts
         if: always()

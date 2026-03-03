@@ -10,8 +10,6 @@ DOCKER_IMAGE="mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION}-noble"
 
 echo "Using Playwright Docker image: ${DOCKER_IMAGE}"
 
-EXTRA_ARGS="${*:-}"
-
 docker run --rm --network host \
   -v "${PROJECT_DIR}:/work" \
   -v "ydb-embedded-ui-node-modules:/work/node_modules" \
@@ -21,4 +19,4 @@ docker run --rm --network host \
   -e PLAYWRIGHT_APP_BACKEND="${PLAYWRIGHT_APP_BACKEND:-}" \
   -e PLAYWRIGHT_BASE_URL="${PLAYWRIGHT_BASE_URL:-}" \
   "${DOCKER_IMAGE}" \
-  /bin/bash -c "npm ci && npx playwright test --config=playwright.config.ts ${EXTRA_ARGS}"
+  /bin/bash -c 'npm ci && npx playwright test --config=playwright.config.ts "$@"' -- "$@"
