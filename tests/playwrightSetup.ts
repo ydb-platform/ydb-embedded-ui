@@ -4,7 +4,7 @@ import config from '../playwright.config';
 
 import {PageModel} from './models/PageModel';
 
-const baseURL = config.use?.baseURL || 'http://localhost:3000/';
+const baseURL = (config.use?.baseURL || 'http://localhost:3000/').replace(/\/?$/, '/');
 
 const WARMUP_PAGES = [
     // Cluster overview (tenants list)
