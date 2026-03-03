@@ -236,16 +236,27 @@ The project uses Gravity UI (`@gravity-ui/uikit`) as the primary component libra
 - **Fragments**: Must use `React.Fragment` — JSX fragment shorthand (`<></>`) is forbidden
 
 ```typescript
-// ✅ Correct — hooks accessed via default import
+// ✅ Correct — real pattern from the codebase (src/components/SplitPane/SplitPane.tsx)
 import React from 'react';
-import type {FC} from 'react';
 
-const [count, setCount] = React.useState(0);
-React.useEffect(() => {
-  /* ... */
-}, []);
+import type {SplitProps} from 'react-split';
 
-// ❌ Wrong — named value imports from 'react' are forbidden
+// Hooks are accessed via React.* inside component bodies
+function SplitPane(props: SplitPaneProps) {
+  const [innerSizes, setInnerSizes] = React.useState<number[]>();
+
+  React.useEffect(() => {
+    return () => {
+      saveSizesStringDebounced.cancel();
+    };
+  }, [saveSizesStringDebounced]);
+
+  const defaultSizePane = React.useMemo(() => {
+    /* ... */
+  }, [initialSizes, defaultSizesProp]);
+}
+
+// ❌ Wrong — named value imports from 'react' are forbidden by ESLint
 import {useState, useEffect} from 'react';
 import * as React from 'react';
 ```
