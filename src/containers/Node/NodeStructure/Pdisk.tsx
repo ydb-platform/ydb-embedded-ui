@@ -127,16 +127,15 @@ function getColumns({
             width: 170,
             render: ({row}) => {
                 const allocated = row.AllocatedSize;
-                const available = row.AvailableSize;
 
-                if (!isNumeric(allocated) || !isNumeric(available)) {
+                if (!isNumeric(allocated)) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
 
                 return (
                     <ProgressViewer
                         value={allocated}
-                        capacity={Number(allocated) + Number(available)}
+                        capacity={Number(row.AllocatedSize) + Number(row.AvailableSize)}
                         formatValues={formatStorageValuesToGb}
                         colorizeProgress={true}
                     />
