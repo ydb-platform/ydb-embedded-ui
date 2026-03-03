@@ -9,11 +9,15 @@ export class ErrorDisplayModel extends BaseModel {
     private responseError: Locator;
     private fieldsDefinitionList: Locator;
     private issuesTrigger: Locator;
+    private responseTrigger: Locator;
+    private responseBodyContent: Locator;
 
     // Full-page error (PageError — blocks entire page, wraps ResponseError inside EmptyState)
     private pageError: Locator;
     private pageErrorResponseError: Locator;
     private pageErrorFields: Locator;
+    private pageErrorResponseTrigger: Locator;
+    private pageErrorResponseBodyContent: Locator;
 
     // Access denied
     private accessDeniedState: Locator;
@@ -27,10 +31,22 @@ export class ErrorDisplayModel extends BaseModel {
         this.issuesTrigger = this.responseError.locator(
             '.response-error__issues .response-error__details-trigger',
         );
+        this.responseTrigger = this.responseError.locator(
+            '.response-error__response-body .response-error__details-trigger',
+        );
+        this.responseBodyContent = this.responseError.locator(
+            '.response-error__response-body-content',
+        );
 
         this.pageError = page.locator('.ydb-page-error');
         this.pageErrorResponseError = this.pageError.locator('.response-error');
         this.pageErrorFields = this.pageError.locator('.response-error__fields');
+        this.pageErrorResponseTrigger = this.pageError.locator(
+            '.response-error__response-body .response-error__details-trigger',
+        );
+        this.pageErrorResponseBodyContent = this.pageError.locator(
+            '.response-error__response-body-content',
+        );
 
         this.accessDeniedState = page.locator('.empty-state');
         this.accessDeniedTitle = this.accessDeniedState.locator('.empty-state__title');
@@ -77,6 +93,19 @@ export class ErrorDisplayModel extends BaseModel {
         const issuesContainer = this.responseError.locator('.kv-issues');
         await issuesContainer.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return issuesContainer.innerText();
+    }
+
+    async isResponseBodyTriggerVisible(): Promise<boolean> {
+        return this.responseTrigger.isVisible();
+    }
+
+    async expandResponseBody(): Promise<void> {
+        await this.responseTrigger.click();
+    }
+
+    async getResponseBodyText(): Promise<string> {
+        await this.responseBodyContent.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return this.responseBodyContent.innerText();
     }
 
     async waitForAccessDenied(): Promise<void> {
@@ -129,5 +158,21 @@ export class ErrorDisplayModel extends BaseModel {
             }
         }
         return null;
+    }
+
+    async isPageErrorResponseBodyTriggerVisible(): Promise<boolean> {
+        return this.pageErrorResponseTrigger.isVisible();
+    }
+
+    async expandPageErrorResponseBody(): Promise<void> {
+        await this.pageErrorResponseTrigger.click();
+    }
+
+    async getPageErrorResponseBodyText(): Promise<string> {
+        await this.pageErrorResponseBodyContent.waitFor({
+            state: 'visible',
+            timeout: VISIBILITY_TIMEOUT,
+        });
+        return this.pageErrorResponseBodyContent.innerText();
     }
 }
