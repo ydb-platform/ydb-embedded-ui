@@ -30,7 +30,9 @@ const config: PlaywrightTestConfig = {
         testIdAttribute: 'data-qa',
         trace: 'on-first-retry',
         // Always record video and take screenshots on main branch, otherwise only on failure
-        video: 'retain-on-failure',
+        video:
+            (process.env.PLAYWRIGHT_VIDEO as 'on' | 'off' | 'retain-on-failure' | undefined) ??
+            'retain-on-failure',
         screenshot: 'only-on-failure',
     },
     projects: [
