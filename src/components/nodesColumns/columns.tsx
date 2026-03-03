@@ -194,16 +194,20 @@ export function getRAMColumn<T extends {MemoryUsed?: string; MemoryLimit?: strin
                         </DefinitionList>
                     }
                 >
-                    <ProgressViewer
-                        value={row.MemoryUsed}
-                        capacity={row.MemoryLimit}
-                        formatValues={(value, total) =>
-                            formatStorageValues(value, total, 'gb', undefined, true)
-                        }
-                        className={b('column-ram')}
-                        colorizeProgress
-                        hideCapacity
-                    />
+                    {isNumeric(row.MemoryUsed) ? (
+                        <ProgressViewer
+                            value={row.MemoryUsed}
+                            capacity={row.MemoryLimit}
+                            formatValues={(value, total) =>
+                                formatStorageValues(value, total, 'gb', undefined, true)
+                            }
+                            className={b('column-ram')}
+                            colorizeProgress
+                            hideCapacity
+                        />
+                    ) : (
+                        EMPTY_DATA_PLACEHOLDER
+                    )}
                 </CellWithPopover>
             );
         },
@@ -220,9 +224,17 @@ export function getMemoryColumn<
         header: NODES_COLUMNS_TITLES.Memory,
         defaultOrder: DataTable.DESCENDING,
         render: ({row}) => {
-            return row.MemoryStats ? (
-                <MemoryViewer formatValues={formatStorageValuesToGb} stats={row.MemoryStats} />
-            ) : (
+            if (row.MemoryStats) {
+                return (
+                    <MemoryViewer formatValues={formatStorageValuesToGb} stats={row.MemoryStats} />
+                );
+            }
+
+            if (!isNumeric(row.MemoryUsed)) {
+                return EMPTY_DATA_PLACEHOLDER;
+            }
+
+            return (
                 <ProgressViewer
                     value={row.MemoryUsed}
                     capacity={row.MemoryLimit}
@@ -290,13 +302,17 @@ export function getCpuColumn<
                         </DefinitionList>
                     }
                 >
-                    <ProgressViewer
-                        className={b('column-cpu')}
-                        value={totalPoolUsage}
-                        capacity={1}
-                        colorizeProgress
-                        percents
-                    />
+                    {isNumeric(totalPoolUsage) ? (
+                        <ProgressViewer
+                            className={b('column-cpu')}
+                            value={totalPoolUsage}
+                            capacity={1}
+                            colorizeProgress
+                            percents
+                        />
+                    ) : (
+                        EMPTY_DATA_PLACEHOLDER
+                    )}
                 </CellWithPopover>
             );
         },
@@ -311,18 +327,25 @@ export function getLoadAverageColumn<T extends {LoadAveragePercents?: number[]}>
         header: NODES_COLUMNS_TITLES.LoadAverage,
         sortAccessor: ({LoadAveragePercents = []}) => LoadAveragePercents[0],
         defaultOrder: DataTable.DESCENDING,
-        render: ({row}) => (
-            <ProgressViewer
-                value={
-                    row.LoadAveragePercents && row.LoadAveragePercents.length > 0
-                        ? row.LoadAveragePercents[0]
-                        : undefined
-                }
-                percents={true}
-                colorizeProgress={true}
-                capacity={100}
-            />
-        ),
+        render: ({row}) => {
+            const value =
+                row.LoadAveragePercents && row.LoadAveragePercents.length > 0
+                    ? row.LoadAveragePercents[0]
+                    : undefined;
+
+            if (!isNumeric(value)) {
+                return EMPTY_DATA_PLACEHOLDER;
+            }
+
+            return (
+                <ProgressViewer
+                    value={value}
+                    percents={true}
+                    colorizeProgress={true}
+                    capacity={100}
+                />
+            );
+        },
         align: DataTable.LEFT,
         width: 170,
         resizeMinWidth: 170,
