@@ -37,24 +37,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Get Playwright version
-        id: playwright-version
-        run: echo "version=$(node -e "console.log(require('@playwright/test/package.json').version)")" >> $GITHUB_OUTPUT
-
-      - name: Pull Playwright Docker image
-        run: docker pull mcr.microsoft.com/playwright:v${{ steps.playwright-version.outputs.version }}-noble
-
       - name: Run Playwright tests
         id: run_tests
-        run: |
-          docker run --rm --network host \
-            -v ${{ github.workspace }}:/work \
-            -v ydb-embedded-ui-node-modules:/work/node_modules \
-            -w /work \
-            -e CI=true \
-            -e PLAYWRIGHT_VIDEO=on \
-            mcr.microsoft.com/playwright:v${{ steps.playwright-version.outputs.version }}-noble \
-            /bin/bash -c "npm ci && npx playwright test --config=playwright.config.ts"
+        run: bash scripts/playwright-docker.sh
+        env:
+          CI: 'true'
+          PLAYWRIGHT_VIDEO: 'on'
 
       - name: Upload Playwright artifacts
         if: always()
