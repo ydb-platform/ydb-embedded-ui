@@ -60,7 +60,7 @@ export function TenantOverview({
         {pollingInterval: autoRefreshInterval},
     );
     const tenantLoading = isFetching && tenant === undefined;
-    const {Name, Type, Overall} = tenant || {};
+    const {Name, Type, Overall, ControlPlane, CoresTotal} = tenant || {};
     const isServerless = Type === 'Serverless';
     const activeMetricsTab =
         isServerless &&
@@ -68,6 +68,8 @@ export function TenantOverview({
         metricsTab !== TENANT_METRICS_TABS_IDS.storage
             ? TENANT_METRICS_TABS_IDS.cpu
             : metricsTab;
+
+    const controlPlaneNodesCount = ControlPlane?.scale_policy?.fixed_scale?.size;
 
     const tenantType = mapDatabaseTypeToDBName(Type);
     // FIXME: remove after correct data is added to tenantInfo
@@ -247,6 +249,8 @@ export function TenantOverview({
                                     ? Number(tenantData.StorageGroups)
                                     : undefined
                             }
+                            controlPlaneNodesCount={controlPlaneNodesCount}
+                            coresTotal={CoresTotal}
                             databaseType={Type}
                             activeTab={activeMetricsTab}
                         />
