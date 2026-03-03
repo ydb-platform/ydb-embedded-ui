@@ -29,6 +29,11 @@
             height: 230px;
         }
 
+        &_size_l {
+            width: 800px;
+            height: 280px;
+        }
+
         &_position_center {
             position: relative;
 
@@ -59,7 +64,8 @@
             @include mixins.lead-typography();
         }
 
-        &_size_m {
+        &_size_m,
+        &_size_l {
             @include mixins.header-2-typography();
         }
     }
