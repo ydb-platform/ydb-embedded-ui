@@ -84,11 +84,7 @@ jobs:
           merge-multiple: true
 
       - name: Merge reports
-        run: |
-          npx playwright merge-reports --reporter='html,json' ./all-blob-reports
-          mkdir -p playwright-artifacts
-          mv playwright-report playwright-artifacts/playwright-report
-          mv test-results.json playwright-artifacts/test-results.json
+        run: npx playwright merge-reports --config=merge.config.ts ./all-blob-reports
 
       - name: Upload Playwright artifacts
         if: always()
