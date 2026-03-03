@@ -187,7 +187,7 @@ test.describe('Diagnostics Info tab', async () => {
                                     Settings: {
                                         clusters: 128,
                                         levels: 2,
-                                        overlap_clusters: 4,
+                                        overlap_clusters: 3,
                                         settings: {
                                             metric: 'cosine',
                                             vector_type: 'VECTOR_TYPE_FLOAT',
@@ -222,7 +222,7 @@ test.describe('Diagnostics Info tab', async () => {
         // Check Index Settings section contains Overlap Clusters
         const indexSettings = infoContent.locator('.info-viewer');
         await expect(indexSettings.getByText('Overlap Clusters')).toBeVisible();
-        await expect(indexSettings.getByText('4')).toBeVisible();
+        await expect(indexSettings.getByText('3')).toBeVisible();
 
         // Also verify other vector index settings are displayed
         await expect(indexSettings.getByText('Clusters')).toBeVisible();

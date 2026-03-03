@@ -398,7 +398,7 @@ WITH (
     vector_dimension=\${4:512},
     levels=\${5:2},
     clusters=\${6:128},
-    overlap_clusters=\${7:4}
+    overlap_clusters=\${7:3}
 );`;
 };
 
