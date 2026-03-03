@@ -283,7 +283,7 @@ API endpoints are injected using RTK Query's `injectEndpoints` pattern. Queries 
 ### Common UI Components
 
 - **Notifications**: Use `createToast` utility for user notifications
-- **Error Display**: Use `ResponseError` component for API errors; `PageError` for full-page errors; `403` for access denied
+- **Error Display**: Use `ResponseError` component for API errors; `PageError` for full-page errors; `AccessDenied` (`src/components/Errors/403`) for access denied
 - **Loading States**: Use `Loader` and `TableSkeleton` components
 
 ### Class Names Convention
@@ -298,7 +298,7 @@ Uses BEM naming convention with `cn()` utility from `utils/cn` (wraps `@bem-reac
 ### Common Utilities
 
 - **Formatters**: `src/utils/dataFormatters/` - `formatBytes()`, `formatDateTime()`
-- **Parsers**: `src/utils/bytesParsers/` - Byte value parsing utilities
+- **Parsers**: `src/utils/bytesParsers/` - Byte value parsing utilities; `src/utils/timeParsers/` - Time/duration parsing utilities
 - **Query Utils**: `src/utils/query.ts` - SQL/YQL query helpers
 - **Hooks**: `src/utils/hooks/` - `useTypedSelector`, `useTypedDispatch`, `useSetting`, `useSearchQuery`, `useTableSort`, `useSelectedColumns`, etc.
 
