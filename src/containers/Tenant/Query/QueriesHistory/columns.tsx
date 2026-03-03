@@ -18,7 +18,7 @@ import {b} from './shared';
 
 type QueryActions = {
     openInEditor: (query: QueryInHistory) => void;
-    saveQuery: VoidFunction;
+    saveQuery: (queryBody: string) => void;
 };
 
 export function getColumns({openInEditor, saveQuery}: QueryActions) {
@@ -80,7 +80,7 @@ export function getColumns({openInEditor, saveQuery}: QueryActions) {
                                 qa="save-query-button"
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    saveQuery();
+                                    saveQuery(row.queryText);
                                 }}
                             >
                                 <Icon data={FloppyDisk} />

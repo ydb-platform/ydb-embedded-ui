@@ -73,12 +73,16 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
         [changeUserInput, dispatch],
     );
 
-    const handleSaveQuery = React.useCallback(() => {
-        NiceModal.show(SAVE_QUERY_DIALOG, {
-            savedQueries,
-            onSaveQuery: saveQuery,
-        });
-    }, [savedQueries, saveQuery]);
+    const handleSaveQuery = React.useCallback(
+        (queryBody: string) => {
+            NiceModal.show(SAVE_QUERY_DIALOG, {
+                savedQueries,
+                onSaveQuery: saveQuery,
+                queryBody,
+            });
+        },
+        [savedQueries, saveQuery],
+    );
 
     const handleShowPreview = React.useCallback(
         (query: QueryInHistory, _index?: number, event?: React.MouseEvent<HTMLTableRowElement>) => {
