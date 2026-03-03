@@ -191,6 +191,10 @@ export class QueryEditor {
     }
 
     async getEditorContent(): Promise<string> {
+        await this.waitForEditorReady();
+        await this.page.waitForFunction(() => Boolean(window.ydbEditor), null, {
+            timeout: VISIBILITY_TIMEOUT,
+        });
         return this.editorTextArea.evaluate(() => {
             const editor = window.ydbEditor;
             if (editor) {
