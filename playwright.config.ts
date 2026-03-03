@@ -15,7 +15,7 @@ const config: PlaywrightTestConfig = {
               ['json', {outputFile: './playwright-artifacts/test-results.json'}],
           ],
     retries: process.env.CI ? 2 : 0,
-    workers: process.env.CI ? 1 : undefined,
+    workers: process.env.CI ? 2 : undefined,
     // If there is no url provided, playwright starts webServer with the app in dev mode
     webServer: baseUrl
         ? undefined
