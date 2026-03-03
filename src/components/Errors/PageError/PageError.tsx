@@ -59,9 +59,9 @@ export function PageError({
                         description
                     )
                 }
+                {...restProps}
                 pageTitle={errorPageTitle}
                 className={b(null, restProps.className)}
-                {...restProps}
             />
         );
     }
