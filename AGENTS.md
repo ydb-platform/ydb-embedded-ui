@@ -12,11 +12,11 @@ YDB Embedded UI is a web-based monitoring and management interface for YDB (Yet 
 - **State Management**: Redux Toolkit 2.x with RTK Query
 - **UI Components**: Gravity UI (@gravity-ui/uikit) 7.x
 - **Routing**: React Router v5 (not v6)
-- **Build Tool**: Create React App with react-app-rewired
+- **Build Tool**: Rsbuild (Rspack-based build system)
 - **Code Editor**: Monaco Editor 0.52
 - **Testing**: Jest + React Testing Library (unit), Playwright (E2E)
 - **Package Manager**: npm
-- **Node Version**: 18+ recommended
+- **Node/NPM Version**: Node >=22.0 and npm ^10.0.0
 
 ## Essential Development Commands
 
