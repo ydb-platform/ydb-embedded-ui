@@ -7,7 +7,7 @@ import {QueryEditor, QueryTabs} from '../queryEditor/models/QueryEditor';
 
 import executeQueryWithKeybinding from './utils';
 
-test.describe('Query History', () => {
+test.describe.only('Query History', () => {
     let tenantPage: TenantPage;
     let queryEditor: QueryEditor;
 
@@ -109,6 +109,28 @@ test.describe('Query History', () => {
         await queryEditor.resultTable.isVisible();
         const value = await queryEditor.resultTable.getCellValue(1, 2);
         expect(value).toBe('42');
+    });
+
+    test('Clicking a row opens query preview drawer', async ({page}) => {
+        const testQuery = 'SELECT 99 AS preview_test;';
+
+        // Execute the query
+        await queryEditor.run(testQuery, QUERY_MODES.script);
+
+        // Navigate to the history tab
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.isVisible();
+
+        // Click the row to open the preview drawer
+        await queryEditor.historyQueries.clickRow(testQuery);
+
+        // Verify the query preview drawer is visible
+        const drawer = page.locator('.ydb-query-details');
+        await expect(drawer).toBeVisible({timeout: VISIBILITY_TIMEOUT});
+
+        // Verify the query text is displayed in the preview
+        const queryText = drawer.locator('.ydb-syntax-highlighter');
+        await expect(queryText).toContainText(testQuery);
     });
 
     test('Can search in query history', async () => {

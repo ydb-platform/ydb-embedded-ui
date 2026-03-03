@@ -28,6 +28,14 @@ export class QueriesHistoryTable {
 
     async selectQuery(query: string) {
         const row = await this.getQueryRow(query);
+        await row.hover();
+        const openInEditorButton = row.locator('.ydb-queries-history__actions button');
+        await openInEditorButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await openInEditorButton.click();
+    }
+
+    async clickRow(query: string) {
+        const row = await this.getQueryRow(query);
         await row.click();
     }
 
