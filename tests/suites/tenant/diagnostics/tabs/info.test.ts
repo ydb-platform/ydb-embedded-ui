@@ -225,7 +225,7 @@ test.describe('Diagnostics Info tab', async () => {
         await expect(indexSettings.getByText('3')).toBeVisible();
 
         // Also verify other vector index settings are displayed
-        await expect(indexSettings.getByText('Clusters')).toBeVisible();
+        await expect(indexSettings.getByText('Clusters', {exact: true})).toBeVisible();
         await expect(indexSettings.getByText('Levels')).toBeVisible();
         await expect(indexSettings.getByText('Vector Dimension')).toBeVisible();
 
