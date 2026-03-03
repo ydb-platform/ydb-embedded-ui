@@ -3,9 +3,12 @@
   "403.description": "You don't have the necessary roles to view this page.",
   "responseError.defaultMessage": "Response error",
   "error.title": "Error",
-  "error-details.label_status": "Status",
   "error-details.label_url": "URL",
   "error-details.label_error-code": "Code",
+  "error-details.label_trace-id": "Trace-ID",
+  "error-details.label_request-id": "Request-ID",
+  "error-details.label_proxy-name": "x-proxy-name",
+  "error-details.label_worker-name": "x-worker-name",
   "error-details.label_response-body": "Response",
   "error-details.label_issues": "Issues ({{count}})"
 }

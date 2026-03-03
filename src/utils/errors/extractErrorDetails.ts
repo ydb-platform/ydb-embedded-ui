@@ -117,7 +117,7 @@ function isShortPlainText(value: string): boolean {
     return value.length <= MAX_DATA_MESSAGE_LENGTH && !value.trimStart().startsWith('<');
 }
 
-export function extractMessageFromObject(data: object): string | undefined {
+function extractMessageFromObject(data: object): string | undefined {
     if ('error' in data && typeof data.error === 'string') {
         return data.error;
     }
@@ -143,7 +143,7 @@ export function extractMessageFromObject(data: object): string | undefined {
     return undefined;
 }
 
-function extractDataMessage(data: unknown): string | undefined {
+export function extractDataMessage(data: unknown): string | undefined {
     if (!data) {
         return undefined;
     }

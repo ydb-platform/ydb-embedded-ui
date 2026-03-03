@@ -1,26 +1,10 @@
 import {isNetworkError, isResponseError} from '../response';
 
-export {extractErrorDetails} from './extractErrorDetails';
-export type {ErrorDetails} from './extractErrorDetails';
-
-import {extractMessageFromObject} from './extractErrorDetails';
+import {extractDataMessage} from './extractErrorDetails';
 import i18n from './i18n';
 
-function extractResponseDataMessage(data: unknown): string | undefined {
-    if (!data) {
-        return undefined;
-    }
-
-    if (typeof data === 'string') {
-        return data || undefined;
-    }
-
-    if (typeof data === 'object') {
-        return extractMessageFromObject(data);
-    }
-
-    return undefined;
-}
+export {extractErrorDetails} from './extractErrorDetails';
+export type {ErrorDetails} from './extractErrorDetails';
 
 /**
  * Prepares a consistent error message from various error types
@@ -42,15 +26,15 @@ export function prepareCommonErrorMessage(err: unknown, defaultMessage?: string)
     }
 
     if (isResponseError(err)) {
-        const dataMessage = extractResponseDataMessage(err.data);
+        const dataMessage = extractDataMessage(err.data);
         if (dataMessage) {
             return dataMessage;
         }
-        if (err.statusText) {
-            return err.statusText;
-        }
         if (err.status === 403) {
             return i18n('access-forbidden');
+        }
+        if (err.statusText) {
+            return err.statusText;
         }
     }
 

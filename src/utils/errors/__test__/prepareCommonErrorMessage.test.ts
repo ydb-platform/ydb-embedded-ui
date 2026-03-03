@@ -84,6 +84,33 @@ describe('prepareCommonErrorMessage', () => {
         expect(prepareCommonErrorMessage(error)).toBe('Access forbidden');
     });
 
+    test('should return localised "Access forbidden" for 403 with statusText', () => {
+        const error = {
+            status: 403,
+            statusText: 'Forbidden',
+            data: '',
+        };
+        expect(prepareCommonErrorMessage(error)).toBe('Access forbidden');
+    });
+
+    test('should return statusText when data is HTML', () => {
+        const error = {
+            status: 429,
+            statusText: 'Too Many Requests',
+            data: '<html><body><h1>429 Too Many Requests</h1></body></html>',
+        };
+        expect(prepareCommonErrorMessage(error)).toBe('Too Many Requests');
+    });
+
+    test('should return statusText when data is too long', () => {
+        const error = {
+            status: 500,
+            statusText: 'Internal Server Error',
+            data: 'x'.repeat(300),
+        };
+        expect(prepareCommonErrorMessage(error)).toBe('Internal Server Error');
+    });
+
     test('should return defaultMessage when provided and no specific message found', () => {
         const error = {status: 418};
         expect(prepareCommonErrorMessage(error, 'Custom default')).toBe('Custom default');
