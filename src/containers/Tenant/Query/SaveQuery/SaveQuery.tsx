@@ -126,7 +126,6 @@ interface SaveQueryDialogProps extends SaveQueryDialogCommonProps {
     open: boolean;
     savedQueries?: SavedQuery[];
     onSaveQuery: (name: string | null, body: string) => void;
-    queryBody: string;
 }
 
 function SaveQueryDialog({
