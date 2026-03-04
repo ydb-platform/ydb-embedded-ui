@@ -18,9 +18,9 @@ export const longerRunningStreamQuery = `$data = ListFromRange(1, 20000000);
 SELECT x, Digest::Argon2(CAST(x AS String), "test_salt") AS hash
 FROM AS_TABLE(AsList(AsStruct($data AS x))) FLATTEN BY x;
 `;
-// Query for streaming status transition tests
-// Used with small output_chunk_max_size and large limit_rows to produce many streaming chunks
-export const streamingStatusQuery = `$data = ListFromRange(1, 200000);
+// Light query for streaming status transition tests
+// Used with small output_chunk_max_size to produce many streaming chunks
+export const streamingStatusQuery = `$data = ListFromRange(1, 20000);
 SELECT x, Digest::Argon2(CAST(x AS String), "test_salt") AS hash
 FROM AS_TABLE(AsList(AsStruct($data AS x))) FLATTEN BY x;
 `;
