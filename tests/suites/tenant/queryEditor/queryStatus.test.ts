@@ -66,12 +66,7 @@ test.describe('Test Query Execution Status', async () => {
         await expect(statusElement).toBe('Failed');
     });
 
-    test('Streaming query shows "Fetching" status while receiving data', async ({
-        page,
-        browserName,
-    }) => {
-        test.skip(browserName === 'webkit');
-
+    test('Streaming query shows "Fetching" status while receiving data', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
@@ -86,12 +81,7 @@ test.describe('Test Query Execution Status', async () => {
         await expect(queryEditor.waitForStatus('Fetching')).resolves.toBe(true);
     });
 
-    test('Streaming query transitions from "Fetching" to "Completed"', async ({
-        page,
-        browserName,
-    }) => {
-        test.skip(browserName === 'webkit');
-
+    test('Streaming query transitions from "Fetching" to "Completed"', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
@@ -106,9 +96,7 @@ test.describe('Test Query Execution Status', async () => {
         await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
     });
 
-    test('Streaming query status transitions follow correct order', async ({page, browserName}) => {
-        test.skip(browserName === 'webkit');
-
+    test('Streaming query status transitions follow correct order', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
