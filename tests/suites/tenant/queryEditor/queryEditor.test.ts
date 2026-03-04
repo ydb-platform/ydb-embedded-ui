@@ -168,7 +168,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.resultTable.getResultTitleText()).resolves.toBe('Result');
         await expect(
             Promise.resolve(Number(await queryEditor.resultTable.getResultTitleCount())),
-        ).resolves.toBeGreaterThan(100);
+        ).resolves.toBeGreaterThan(0);
         await expect(queryEditor.waitForStatus('Stopped')).resolves.toBe(true);
     });
 

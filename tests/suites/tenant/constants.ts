@@ -12,12 +12,22 @@ export const longRunningStreamQuery = `$data = ListFromRange(1, 50000);
 SELECT x, Digest::Argon2(CAST(x AS String), "test_salt") AS hash
 FROM AS_TABLE(AsList(AsStruct($data AS x))) FLATTEN BY x;
 `;
-// 5M rows with Argon2 — Argon2 is slower per-row than Sha256 so fewer rows than before
-// but still enough to ensure streaming lasts 10s+ on CI (enough time to click stop).
-export const longerRunningStreamQuery = `$data = ListFromRange(1, 5000000);
-SELECT x, Digest::Argon2(CAST(x AS String), "test_salt") AS hash
-FROM AS_TABLE(AsList(AsStruct($data AS x))) FLATTEN BY x;
-`;
+// 100K rows × 50 Argon2 calls per row = 5M total Argon2 calls.
+// Same total computation as the previous 5M-row query, but 50× fewer output rows.
+// Each row outputs only integers (x + sum of hash lengths) ≈ 25 bytes,
+// so Safari is not overwhelmed by streaming events with small chunk size.
+const LONGER_RUNNING_ARGON2_PER_ROW = 50;
+const LONGER_RUNNING_STREAM_ROWS = 100000;
+
+const longerRunningArgon2Sum = Array.from(
+    {length: LONGER_RUNNING_ARGON2_PER_ROW},
+    (_, i) => `LENGTH(Digest::Argon2(CAST(x AS String), "salt_${String(i).padStart(2, '0')}"))`,
+).join(' + ');
+
+export const longerRunningStreamQuery =
+    `$data = ListFromRange(1, ${LONGER_RUNNING_STREAM_ROWS});\n` +
+    `SELECT x, ${longerRunningArgon2Sum} AS v\n` +
+    `FROM AS_TABLE(AsList(AsStruct($data AS x))) FLATTEN BY x;\n`;
 // Light query for streaming status transition tests
 // Used with small output_chunk_max_size to produce many streaming chunks
 export const streamingStatusQuery = `$data = ListFromRange(1, 20000);
