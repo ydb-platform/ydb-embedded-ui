@@ -2,6 +2,7 @@
   "title_index-settings": "Index Settings",
 
   "field_clusters": "Clusters",
+  "field_overlap_clusters": "Overlap Clusters",
   "field_levels": "Levels",
   "field_vector_dimension": "Vector Dimension",
   "field_vector_type": "Vector Type",
