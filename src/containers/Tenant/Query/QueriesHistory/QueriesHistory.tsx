@@ -15,7 +15,7 @@ import {
     setIsDirty,
     setQueryHistoryFilter,
 } from '../../../../store/reducers/query/query';
-import type {EnhancedQueryInHistory, QueryInHistory} from '../../../../store/reducers/query/types';
+import type {QueryInHistory} from '../../../../store/reducers/query/types';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import {valueIsDefined} from '../../../../utils';
@@ -41,7 +41,7 @@ interface QueriesHistoryProps {
 function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) {
     const dispatch = useTypedDispatch();
     const [showQueryPreview, setShowQueryPreview] = React.useState(false);
-    const [selectedRow, setSelectedRow] = React.useState<EnhancedQueryInHistory | null>(null);
+    const [selectedId, setSelectedId] = React.useState<string | null>(null);
     const {savedQueries, saveQuery} = useSavedQueries();
 
     const sortedHistory = React.useMemo(() => {
@@ -89,7 +89,7 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
             event?.stopPropagation();
             setShowQueryPreview(true);
 
-            setSelectedRow(query);
+            setSelectedId(query.queryId);
         },
         [],
     );
@@ -109,19 +109,23 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
 
     const handleCloseDrawer = React.useCallback(() => {
         setShowQueryPreview(false);
-        setSelectedRow(null);
+        setSelectedId(null);
     }, []);
+
+    const selectedQuery = React.useMemo(() => {
+        return sortedHistory.find((query) => query.queryId === selectedId);
+    }, [sortedHistory, selectedId]);
 
     const renderDrawerContent = React.useCallback(
         () =>
-            selectedRow ? (
+            selectedQuery ? (
                 <QueryDetails
-                    queryText={selectedRow?.queryText}
-                    onOpenInEditor={() => applyQueryClick(selectedRow)}
-                    infoItems={getQueryInfoItems(selectedRow)}
+                    queryText={selectedQuery.queryText}
+                    onOpenInEditor={() => applyQueryClick(selectedQuery)}
+                    infoItems={getQueryInfoItems(selectedQuery)}
                 />
             ) : null,
-        [selectedRow, applyQueryClick],
+        [applyQueryClick, selectedQuery],
     );
 
     return (
@@ -156,7 +160,7 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
                                 filter ? 'history.empty-search' : 'history.empty',
                             )}
                             rowClassName={(row) =>
-                                b('table-row', {active: row.queryId === selectedRow?.queryId})
+                                b('table-row', {active: row.queryId === selectedId})
                             }
                             onRowClick={handleShowPreview}
                         />

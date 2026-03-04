@@ -10,7 +10,7 @@ import type {
 import type {IQueryResult, QueryAction} from '../../../types/store/query';
 
 export interface QueryInHistory {
-    queryId?: string;
+    queryId: string;
     operationId?: string;
     realQueryId?: string;
     queryText: string;
