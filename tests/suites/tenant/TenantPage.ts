@@ -9,6 +9,9 @@ import {UnsavedChangesModal} from './queryEditor/models/UnsavedChangesModal';
 import {SavedQueriesTable} from './savedQueries/models/SavedQueriesTable';
 
 export const VISIBILITY_TIMEOUT = 10 * 1000;
+// Streaming operations in Safari take longer due to slower HTTP streaming processing.
+// Use this timeout for streaming-specific waits (status transitions, stop button visibility).
+export const STREAMING_TIMEOUT = 20 * 1000;
 
 export enum NavigationTabs {
     Query = 'Query',

@@ -128,8 +128,8 @@ export class QueryEditor {
         return this.gearButton.innerText();
     }
 
-    async clickStopButton() {
-        await this.stopButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+    async clickStopButton(timeout = VISIBILITY_TIMEOUT) {
+        await this.stopButton.waitFor({state: 'visible', timeout});
         await this.stopButton.click();
     }
 
@@ -295,8 +295,8 @@ export class QueryEditor {
         return true;
     }
 
-    async isStopButtonVisible() {
-        await this.stopButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+    async isStopButtonVisible(timeout = VISIBILITY_TIMEOUT) {
+        await this.stopButton.waitFor({state: 'visible', timeout});
         return true;
     }
 

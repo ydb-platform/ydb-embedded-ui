@@ -4,7 +4,7 @@ import {QUERY_MODES, STATISTICS_MODES} from '../../../../src/utils/query';
 import {getClipboardContent} from '../../../utils/clipboard';
 import {database} from '../../../utils/constants';
 import {toggleExperiment} from '../../../utils/toggleExperiment';
-import {NavigationTabs, TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
+import {NavigationTabs, STREAMING_TIMEOUT, TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 import {
     createTableQuery,
     longRunningQuery,
@@ -147,6 +147,7 @@ test.describe('Test Query Editor', async () => {
     test('Streaming query shows some results and banner when stop button is clicked', async ({
         page,
     }) => {
+        test.slow();
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
@@ -160,11 +161,11 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.setQuery(longerRunningStreamQuery);
         await queryEditor.clickRunButton();
 
-        await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+        await expect(queryEditor.isStopButtonVisible(STREAMING_TIMEOUT)).resolves.toBe(true);
         // Wait for streaming data to arrive (status changes to Fetching when chunks are received)
-        await queryEditor.waitForStatus('Fetching');
+        await queryEditor.waitForStatus('Fetching', STREAMING_TIMEOUT);
 
-        await queryEditor.clickStopButton();
+        await queryEditor.clickStopButton(STREAMING_TIMEOUT);
 
         await expect(queryEditor.isStopBannerVisible()).resolves.toBe(true);
         await expect(queryEditor.resultTable.getResultTitleText()).resolves.toBe('Result');

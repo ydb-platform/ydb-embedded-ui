@@ -3,7 +3,7 @@ import {expect, test} from '@playwright/test';
 import {STATISTICS_MODES} from '../../../../src/utils/query';
 import {database} from '../../../utils/constants';
 import {toggleExperiment} from '../../../utils/toggleExperiment';
-import {TenantPage} from '../TenantPage';
+import {STREAMING_TIMEOUT, TenantPage} from '../TenantPage';
 import {longRunningQuery, streamingStatusQuery} from '../constants';
 
 import {ButtonNames, QueryEditor} from './models/QueryEditor';
@@ -67,6 +67,7 @@ test.describe('Test Query Execution Status', async () => {
     });
 
     test('Streaming query shows "Fetching" status while receiving data', async ({page}) => {
+        test.slow();
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
@@ -78,10 +79,11 @@ test.describe('Test Query Execution Status', async () => {
         await queryEditor.setQuery(streamingStatusQuery);
         await queryEditor.clickRunButton();
 
-        await expect(queryEditor.waitForStatus('Fetching')).resolves.toBe(true);
+        await expect(queryEditor.waitForStatus('Fetching', STREAMING_TIMEOUT)).resolves.toBe(true);
     });
 
     test('Streaming query transitions from "Fetching" to "Completed"', async ({page}) => {
+        test.slow();
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
@@ -92,11 +94,12 @@ test.describe('Test Query Execution Status', async () => {
         await queryEditor.setQuery(streamingStatusQuery);
         await queryEditor.clickRunButton();
 
-        await expect(queryEditor.waitForStatus('Fetching')).resolves.toBe(true);
-        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+        await expect(queryEditor.waitForStatus('Fetching', STREAMING_TIMEOUT)).resolves.toBe(true);
+        await expect(queryEditor.waitForStatus('Completed', STREAMING_TIMEOUT)).resolves.toBe(true);
     });
 
     test('Streaming query status transitions follow correct order', async ({page}) => {
+        test.slow();
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
@@ -108,7 +111,10 @@ test.describe('Test Query Execution Status', async () => {
         await queryEditor.clickRunButton();
 
         const validStreamingStatuses = ['Preparing', 'Running', 'Fetching', 'Completed'];
-        const transitions = await queryEditor.collectStatusTransitions('Completed');
+        const transitions = await queryEditor.collectStatusTransitions(
+            'Completed',
+            STREAMING_TIMEOUT,
+        );
 
         for (let i = 0; i < transitions.length; i++) {
             expect(validStreamingStatuses).toContain(transitions[i]);
