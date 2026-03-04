@@ -1,5 +1,12 @@
 # Changelog
 
+## [14.9.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.8.0...v14.9.0) (2026-03-04)
+
+
+### Features
+
+* overlap clusters parameter UI ([#3547](https://github.com/ydb-platform/ydb-embedded-ui/issues/3547)) ([50fa1dd](https://github.com/ydb-platform/ydb-embedded-ui/commit/50fa1ddda8b13c6bd788a74cb2da0a2bca78f4f0))
+
 ## [14.8.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.7.0...v14.8.0) (2026-03-04)
 
 
