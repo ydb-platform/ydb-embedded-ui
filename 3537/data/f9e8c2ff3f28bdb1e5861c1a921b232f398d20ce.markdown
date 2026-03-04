@@ -1,0 +1,233 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e5]:
+    - generic [ref=e8]:
+      - img [ref=e13] [cursor=pointer]:
+        - img [ref=e14]
+      - generic [ref=e18]:
+        - button "Information" [ref=e19] [cursor=pointer]:
+          - img [ref=e22]:
+            - img [ref=e23]
+          - generic "Information":
+            - generic: Information
+        - button "Settings" [ref=e25] [cursor=pointer]:
+          - img [ref=e28]:
+            - img [ref=e29]
+          - generic "Settings":
+            - generic: Settings
+        - button "Account" [ref=e31] [cursor=pointer]:
+          - img [ref=e34]:
+            - img [ref=e35]
+          - generic "Account":
+            - generic: Account
+      - button "Expand" [ref=e37] [cursor=pointer]:
+        - img [ref=e38]:
+          - img [ref=e39]
+    - generic [ref=e41]:
+      - banner [ref=e42]:
+        - list [ref=e43]:
+          - listitem [ref=e44]:
+            - link "Cluster" [ref=e45] [cursor=pointer]:
+              - link "Cluster" [ref=e46]:
+                - /url: /cluster
+                - generic [ref=e47]:
+                  - img [ref=e48]
+                  - text: Cluster
+            - generic [ref=e50]: /
+          - listitem [ref=e51]:
+            - link "/local" [disabled] [ref=e52]:
+              - generic [ref=e54]:
+                - img [ref=e55]
+                - text: /local
+        - generic [ref=e57]:
+          - button "Connect" [ref=e58] [cursor=pointer]:
+            - img [ref=e61]:
+              - img [ref=e62]
+            - generic [ref=e64]: Connect
+          - separator [ref=e65]
+          - link "Developer UI" [ref=e66] [cursor=pointer]:
+            - /url: http://localhost:8765/internal
+            - img [ref=e69]:
+              - img [ref=e70]
+            - generic [ref=e72]: Developer UI
+      - main [ref=e73]:
+        - generic [ref=e76]:
+          - generic [ref=e77]:
+            - generic [ref=e79]:
+              - generic [ref=e80]:
+                - generic [ref=e81]: Navigation
+                - generic [ref=e85]:
+                  - generic [ref=e88] [cursor=pointer]:
+                    - button [ref=e89]
+                    - generic [ref=e91]:
+                      - img [ref=e93]
+                      - generic [ref=e95]: /local
+                  - generic [ref=e98] [cursor=pointer]:
+                    - button [ref=e99]
+                    - generic [ref=e101]:
+                      - img [ref=e103]
+                      - generic [ref=e105]: .metadata
+                  - generic [ref=e108] [cursor=pointer]:
+                    - button [ref=e109]
+                    - generic [ref=e111]:
+                      - img [ref=e113]
+                      - generic [ref=e115]: .sys
+                  - generic [ref=e120] [cursor=pointer]:
+                    - img [ref=e122]
+                    - generic [ref=e124]: .sys_health
+                  - generic [ref=e129] [cursor=pointer]:
+                    - img [ref=e131]
+                    - generic [ref=e133]: a_test_table_1772571478612
+                  - generic [ref=e138] [cursor=pointer]:
+                    - img [ref=e140]
+                    - generic [ref=e142]: a_test_table_1772571493641
+                  - generic [ref=e147] [cursor=pointer]:
+                    - img [ref=e149]
+                    - generic [ref=e151]: a_test_table_1772571508539
+                  - generic [ref=e156] [cursor=pointer]:
+                    - img [ref=e158]
+                    - generic [ref=e160]: a_test_table_1772571522623
+                  - generic [ref=e165] [cursor=pointer]:
+                    - img [ref=e167]
+                    - generic [ref=e169]: a_test_table_1772571553147
+                  - generic [ref=e174] [cursor=pointer]:
+                    - img [ref=e176]
+                    - generic [ref=e178]: a_test_table_1772571568241
+                  - generic [ref=e183] [cursor=pointer]:
+                    - img [ref=e185]
+                    - generic [ref=e187]: my_row_table
+              - generic [ref=e189]:
+                - generic [ref=e190]:
+                  - generic [ref=e191]:
+                    - generic [ref=e192]:
+                      - generic [ref=e193]: Table
+                      - generic [ref=e194]: a_test_table_1772571568241
+                    - generic [ref=e195]:
+                      - button "Open preview" [ref=e196] [cursor=pointer]:
+                        - img [ref=e199]:
+                          - img [ref=e200]
+                      - button "Copy" [ref=e202] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                      - button [ref=e203] [cursor=pointer]:
+                        - img [ref=e206]:
+                          - img [ref=e207]
+                  - tablist [ref=e211]:
+                    - tab "Overview" [selected] [ref=e212] [cursor=pointer]:
+                      - link "Overview" [ref=e215]:
+                        - /url: /tenant?queryTab=history&diagnosticsTab=overview&schema=/local/a_test_table_1772571568241&database=/local&tenantPage=query&summaryTab=overview
+                    - tab "Schema" [ref=e216] [cursor=pointer]:
+                      - link "Schema" [ref=e219]:
+                        - /url: /tenant?queryTab=history&diagnosticsTab=overview&schema=/local/a_test_table_1772571568241&database=/local&tenantPage=query&summaryTab=schema
+                - generic [ref=e220]:
+                  - generic [ref=e221]: Table
+                  - generic [ref=e222]:
+                    - generic [ref=e223]:
+                      - term [ref=e224]:
+                        - generic [ref=e225]: Type
+                      - definition [ref=e227]:
+                        - generic [ref=e228]: Table
+                    - generic [ref=e229]:
+                      - term [ref=e230]:
+                        - generic [ref=e231]: Id
+                      - definition [ref=e233]:
+                        - generic [ref=e234]: "65"
+                    - generic [ref=e235]:
+                      - term [ref=e236]:
+                        - generic [ref=e237]: Version
+                      - definition [ref=e239]:
+                        - generic [ref=e240]: "3"
+                    - generic [ref=e241]:
+                      - term [ref=e242]:
+                        - generic [ref=e243]: Created
+                      - definition [ref=e245]:
+                        - generic [ref=e246]: 2026-03-03 20:59
+                    - generic [ref=e247]:
+                      - term [ref=e248]:
+                        - generic [ref=e249]: Data size
+                      - definition [ref=e251]:
+                        - generic [ref=e252]: 0 B
+                    - generic [ref=e253]:
+                      - term [ref=e254]:
+                        - generic [ref=e255]: Row count
+                      - definition [ref=e257]:
+                        - generic [ref=e258]: "0"
+                    - generic [ref=e259]:
+                      - term [ref=e260]:
+                        - generic [ref=e261]: Partitions count
+                      - definition [ref=e263]:
+                        - generic [ref=e264]: "1"
+            - generic [ref=e265]:
+              - button [ref=e266] [cursor=pointer]:
+                - img [ref=e269]:
+                  - img [ref=e270]
+              - button [ref=e272] [cursor=pointer]:
+                - img [ref=e275]:
+                  - img [ref=e276]
+          - generic [ref=e280]:
+            - radiogroup [ref=e282]:
+              - generic [ref=e283]:
+                - radio "Query" [checked] [ref=e284]
+                - generic [ref=e286]:
+                  - img [ref=e287]:
+                    - img [ref=e288]
+                  - generic [ref=e290]: Query
+              - generic [ref=e291] [cursor=pointer]:
+                - radio "Diagnostics" [ref=e292]
+                - generic [ref=e294]:
+                  - img [ref=e295]:
+                    - img [ref=e296]
+                  - generic [ref=e300]: Diagnostics
+            - generic [ref=e301]:
+              - tablist [ref=e303]:
+                - tab "Editor" [ref=e304] [cursor=pointer]:
+                  - link "Editor" [ref=e307]:
+                    - /url: /tenant?queryTab=newQuery&diagnosticsTab=overview&schema=/local/a_test_table_1772571568241&database=/local&tenantPage=query
+                - tab "History" [selected] [ref=e308] [cursor=pointer]:
+                  - link "History" [ref=e311]:
+                    - /url: /tenant?queryTab=history&diagnosticsTab=overview&schema=/local/a_test_table_1772571568241&database=/local&tenantPage=query
+                - tab "Saved" [ref=e312] [cursor=pointer]:
+                  - link "Saved" [ref=e315]:
+                    - /url: /tenant?queryTab=saved&diagnosticsTab=overview&schema=/local/a_test_table_1772571568241&database=/local&tenantPage=query
+              - generic [ref=e317]:
+                - textbox "Search by query text..." [ref=e322]
+                - generic [ref=e325]:
+                  - table [ref=e328]:
+                    - rowgroup [ref=e329]:
+                      - row "Query text End time Duration" [ref=e330]:
+                        - columnheader "Query text" [ref=e331]:
+                          - generic [ref=e332]: Query text
+                        - columnheader "End time" [ref=e333]:
+                          - generic [ref=e334]: End time
+                        - columnheader "Duration" [ref=e335]:
+                          - generic [ref=e336]: Duration
+                  - table [ref=e339]:
+                    - rowgroup:
+                      - row "Query text End time Duration":
+                        - columnheader "Query text":
+                          - generic: Query text
+                        - columnheader "End time":
+                          - generic: End time
+                        - columnheader "Duration":
+                          - generic: Duration
+                    - rowgroup [ref=e340]:
+                      - row "SELECT 1 AS test_column; - -" [ref=e341] [cursor=pointer]:
+                        - cell "SELECT 1 AS test_column;" [ref=e342]:
+                          - code [ref=e347]:
+                            - generic [ref=e348]: SELECT 1 AS test_column;
+                        - cell "-" [ref=e349]
+                        - cell "-" [ref=e350]
+                      - 'row "CREATE TABLE `a_test_table_1772571568241` (id Int32, name Text, expire_at Datetime, updated_on Datetime, PRIMARY KEY(id)); - -" [ref=e351] [cursor=pointer]':
+                        - 'cell "CREATE TABLE `a_test_table_1772571568241` (id Int32, name Text, expire_at Datetime, updated_on Datetime, PRIMARY KEY(id));" [ref=e352]':
+                          - code [ref=e357]:
+                            - generic [ref=e358]: "CREATE TABLE `a_test_table_1772571568241` (id Int32, name Text, expire_at Datetime, updated_on Datetime, PRIMARY KEY(id));"
+                        - cell "-" [ref=e359]
+                        - cell "-" [ref=e360]
+  - generic [ref=e361]:
+    - alert
+    - alert
+```

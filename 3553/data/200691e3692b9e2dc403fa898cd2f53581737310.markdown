@@ -1,0 +1,83 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - generic [ref=e18]:
+      - button "Information" [ref=e19] [cursor=pointer]:
+        - img [ref=e22]:
+          - img [ref=e23]
+        - generic "Information":
+          - generic: Information
+      - button "Settings" [ref=e25] [cursor=pointer]:
+        - img [ref=e28]:
+          - img [ref=e29]
+        - generic "Settings":
+          - generic: Settings
+      - button "Account" [ref=e31] [cursor=pointer]:
+        - img [ref=e34]:
+          - img [ref=e35]
+        - generic "Account":
+          - generic: Account
+    - button "Expand" [ref=e37] [cursor=pointer]:
+      - img [ref=e38]:
+        - img [ref=e39]
+  - generic [ref=e41]:
+    - banner [ref=e42]:
+      - list
+    - main [ref=e43]:
+      - generic [ref=e44]:
+        - generic [ref=e45]: YDB Monitoring
+        - generic [ref=e46]:
+          - img [ref=e49]:
+            - img [ref=e50]
+          - generic [ref=e60]:
+            - generic [ref=e61]: Error
+            - generic [ref=e63]:
+              - text: 500 Internal Server Error
+              - generic [ref=e64]: Authentication service unavailable
+              - generic [ref=e65]:
+                - generic [ref=e66]:
+                  - generic [ref=e67]:
+                    - term [ref=e68]:
+                      - generic [ref=e69]: URL
+                    - definition [ref=e71]:
+                      - generic [ref=e72]:
+                        - text: GET http://localhost:8765/viewer/json/whoami
+                        - button "Copy" [ref=e73] [cursor=pointer]:
+                          - generic:
+                            - generic:
+                              - img:
+                                - img
+                  - generic [ref=e74]:
+                    - term [ref=e75]:
+                      - generic [ref=e76]: Trace-ID
+                    - definition [ref=e78]:
+                      - generic [ref=e79]:
+                        - text: whoamitrace1122334455667788aabb
+                        - button "Copy" [ref=e80] [cursor=pointer]:
+                          - generic:
+                            - generic:
+                              - img:
+                                - img
+                  - generic [ref=e81]:
+                    - term [ref=e82]:
+                      - generic [ref=e83]: Request-ID
+                    - definition [ref=e85]:
+                      - generic [ref=e86]:
+                        - text: test-req-id-e2e-whoami-500
+                        - button "Copy" [ref=e87] [cursor=pointer]:
+                          - generic:
+                            - generic:
+                              - img:
+                                - img
+                - generic [ref=e88]:
+                  - button "Response" [active] [ref=e89] [cursor=pointer]:
+                    - generic [ref=e90]:
+                      - img [ref=e92]:
+                        - img [ref=e93]
+                      - generic [ref=e95]: Response
+                  - region "Response" [ref=e96]: "{\"error\":\"Authentication service unavailable\"}"
+```

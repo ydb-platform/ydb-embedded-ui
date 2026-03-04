@@ -1,0 +1,90 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e5]:
+  - generic [ref=e8]:
+    - img [ref=e13] [cursor=pointer]:
+      - img [ref=e14]
+    - generic [ref=e18]:
+      - button "Information" [ref=e19] [cursor=pointer]:
+        - img [ref=e22]:
+          - img [ref=e23]
+        - generic "Information":
+          - generic: Information
+      - button "Settings" [ref=e25] [cursor=pointer]:
+        - img [ref=e28]:
+          - img [ref=e29]
+        - generic "Settings":
+          - generic: Settings
+      - button "Account" [ref=e31] [cursor=pointer]:
+        - img [ref=e34]:
+          - img [ref=e35]
+        - generic "Account":
+          - generic: Account
+    - button "Expand" [ref=e37] [cursor=pointer]:
+      - img [ref=e38]:
+        - img [ref=e39]
+  - generic [ref=e41]:
+    - banner [ref=e42]:
+      - list [ref=e43]:
+        - listitem [ref=e44]:
+          - link "Cluster" [disabled] [ref=e45]:
+            - generic [ref=e47]:
+              - img [ref=e48]
+              - text: Cluster
+      - link "Developer UI" [ref=e51] [cursor=pointer]:
+        - /url: http://localhost:8765/internal
+        - img [ref=e54]:
+          - img [ref=e55]
+        - generic [ref=e57]: Developer UI
+    - main [ref=e58]:
+      - generic [ref=e60]:
+        - generic [ref=e63]:
+          - button "Refresh" [ref=e64] [cursor=pointer]:
+            - img [ref=e67]
+          - group [ref=e70] [cursor=pointer]:
+            - combobox [ref=e71]:
+              - generic [ref=e72]: None
+            - img [ref=e73]:
+              - img [ref=e74]
+        - generic [ref=e77]:
+          - button "Overview" [expanded] [ref=e78] [cursor=pointer]:
+            - img [ref=e80]:
+              - img [ref=e81]
+            - generic [ref=e84]:
+              - img [ref=e85]:
+                - img [ref=e86]
+              - generic [ref=e88]: Overview
+          - region "Overview" [ref=e89]
+        - tablist [ref=e97]:
+          - tab "Databases" [selected] [ref=e98] [cursor=pointer]:
+            - link "Databases" [ref=e101]:
+              - /url: /cluster/tenants
+          - tab "Nodes" [ref=e102] [cursor=pointer]:
+            - link "Nodes" [ref=e105]:
+              - /url: /cluster/nodes
+          - tab "Storage" [ref=e106] [cursor=pointer]:
+            - link "Storage" [ref=e109]:
+              - /url: /cluster/storage
+          - tab "Tablets" [ref=e110] [cursor=pointer]:
+            - link "Tablets" [ref=e113]:
+              - /url: /cluster/tablets
+          - tab "Versions" [ref=e114] [cursor=pointer]:
+            - link "Versions" [ref=e117]:
+              - /url: /cluster/versions
+        - generic [ref=e121]:
+          - generic [ref=e122]:
+            - textbox "Database name" [active] [ref=e125]
+            - radiogroup [ref=e126]:
+              - generic [ref=e127]:
+                - radio "All" [checked] [ref=e128]
+                - generic [ref=e129]: All
+              - generic [ref=e130] [cursor=pointer]:
+                - radio "With problems" [ref=e131]
+                - generic [ref=e132]: With problems
+            - generic [ref=e135]: "Databases: ..."
+          - button "10/10" [ref=e139] [cursor=pointer]:
+            - img [ref=e142]:
+              - img [ref=e143]
+            - generic [ref=e146]: 10/10
+```
