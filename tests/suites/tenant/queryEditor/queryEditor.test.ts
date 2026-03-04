@@ -112,13 +112,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isExplainButtonEnabled()).resolves.toBe(true);
     });
 
-    test('Stop button and elapsed time label appear when query is running', async ({
-        page,
-        browserName,
-    }) => {
-        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3385
-        test.skip(browserName === 'webkit');
-
+    test('Stop button and elapsed time label appear when query is running', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         await queryEditor.setQuery(longRunningQuery);
@@ -128,10 +122,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isElapsedTimeVisible()).resolves.toBe(true);
     });
 
-    test('Query streaming finishes in reasonable time', async ({page, browserName}) => {
-        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3385
-        test.skip(browserName === 'webkit');
-
+    test('Query streaming finishes in reasonable time', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
@@ -141,13 +132,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
     });
 
-    test('Query execution is terminated when stop button is clicked', async ({
-        page,
-        browserName,
-    }) => {
-        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3385
-        test.skip(browserName === 'webkit');
-
+    test('Query execution is terminated when stop button is clicked', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         await queryEditor.setQuery(longRunningQuery);
@@ -161,18 +146,7 @@ test.describe('Test Query Editor', async () => {
 
     test('Streaming query shows some results and banner when stop button is clicked', async ({
         page,
-        browserName,
     }) => {
-        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3385
-        test.skip(browserName === 'webkit');
-
-        // Safari in playwright has problem with painting an array
-        // of million values for frequently appearing rows.
-        // But still need them for heavy responses to simulate
-        // long running queries. Setting their display to none resolves the issue.
-        await page.addStyleTag({
-            content: '.ydb-query-result-sets-viewer__result tr td:nth-child(3n) { display: none; }',
-        });
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
@@ -198,10 +172,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.waitForStatus('Stopped')).resolves.toBe(true);
     });
 
-    test('Stop button is not visible for quick queries', async ({page, browserName}) => {
-        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3385
-        test.skip(browserName === 'webkit');
-
+    test('Stop button is not visible for quick queries', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         const quickQuery = 'SELECT 1;';
@@ -212,10 +183,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
     });
 
-    test('Stop button works for Execute mode', async ({page, browserName}) => {
-        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3385
-        test.skip(browserName === 'webkit');
-
+    test('Stop button works for Execute mode', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         // Test for Execute mode
@@ -227,10 +195,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
     });
 
-    test('Stop button works for Explain mode', async ({page, browserName}) => {
-        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3385
-        test.skip(browserName === 'webkit');
-
+    test('Stop button works for Explain mode', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         // Test for Execute mode
