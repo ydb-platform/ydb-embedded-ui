@@ -21,7 +21,8 @@ const LONGER_RUNNING_STREAM_ROWS = 100000;
 
 const longerRunningArgon2Sum = Array.from(
     {length: LONGER_RUNNING_ARGON2_PER_ROW},
-    (_, i) => `LENGTH(Digest::Argon2(CAST(x AS String), "salt_${String(i).padStart(2, '0')}"))`,
+    (_, i) =>
+        `LENGTH(Digest::Argon2(CAST(x AS String), "test_query_salt_${String(i).padStart(2, '0')}"))`,
 ).join(' + ');
 
 export const longerRunningStreamQuery =
