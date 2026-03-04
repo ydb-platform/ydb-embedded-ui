@@ -1,5 +1,12 @@
 # Changelog
 
+## [14.9.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.9.0...v14.9.1) (2026-03-04)
+
+
+### Bug Fixes
+
+* make timeout in query fit into uint32 ([#3568](https://github.com/ydb-platform/ydb-embedded-ui/issues/3568)) ([19a2930](https://github.com/ydb-platform/ydb-embedded-ui/commit/19a2930a2d9e9cdac2a9756f6dce55c480dd7060))
+
 ## [14.9.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.8.0...v14.9.0) (2026-03-04)
 
 
