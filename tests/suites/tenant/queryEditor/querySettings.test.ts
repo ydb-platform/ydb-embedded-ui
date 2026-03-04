@@ -352,6 +352,89 @@ test.describe('Test Query Settings', async () => {
         await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
     });
 
+    test('Timeout in seconds is sent as milliseconds in API request and omitted when disabled', async ({
+        page,
+    }) => {
+        const capturedBodies: Array<Record<string, unknown>> = [];
+
+        await page.route(`${backend}/viewer/json/query?*`, async (route: Route) => {
+            const request = route.request();
+            const postData = request.postData();
+
+            if (!postData) {
+                await route.continue();
+                return;
+            }
+
+            if (postData.includes('.sys/resource_pools')) {
+                await route.continue();
+                return;
+            }
+
+            const body = JSON.parse(postData) as Record<string, unknown>;
+            capturedBodies.push(body);
+
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    version: 8,
+                    result: [
+                        {
+                            rows: [],
+                            columns: [],
+                        },
+                    ],
+                }),
+            });
+        });
+
+        const queryEditor = new QueryEditor(page);
+        const timeoutSeconds = 120;
+
+        // Switch to scan mode (non-streaming, timeout always enabled) and set timeout
+        await queryEditor.clickGearButton();
+        await queryEditor.settingsDialog.changeQueryMode(QUERY_MODES.scan);
+        await queryEditor.settingsDialog.changeTimeout(timeoutSeconds);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+
+        // Run a query
+        await queryEditor.setQuery('SELECT 1;');
+        await queryEditor.clickRunButton();
+
+        // Verify timeout is sent as milliseconds
+        await expect(async () => {
+            expect(capturedBodies.length).toBeGreaterThan(0);
+
+            const lastBody = capturedBodies[capturedBodies.length - 1] as {
+                query?: string;
+                timeout?: number;
+            };
+
+            expect(lastBody.query).toContain('SELECT 1;');
+            expect(lastBody.timeout).toBe(timeoutSeconds * 1000);
+        }).toPass({timeout: VISIBILITY_TIMEOUT});
+
+        // Clear timeout and run another query
+        await queryEditor.clickGearButton();
+        await queryEditor.settingsDialog.clearTimeout();
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+
+        await queryEditor.setQuery('SELECT 2;');
+        await queryEditor.clickRunButton();
+
+        // Verify timeout is omitted from the request
+        await expect(async () => {
+            const lastBody = capturedBodies[capturedBodies.length - 1] as {
+                query?: string;
+                timeout?: number;
+            };
+
+            expect(lastBody.query).toContain('SELECT 2;');
+            expect(lastBody.timeout).toBeUndefined();
+        }).toPass({timeout: VISIBILITY_TIMEOUT});
+    });
+
     test('When Query Streaming is off, timeout has label and input is visible by default', async ({
         page,
     }) => {
