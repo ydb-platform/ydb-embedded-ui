@@ -27,7 +27,7 @@ export function getColumns({openInEditor, saveQuery}: QueryActions) {
             name: 'startTime',
             header: i18n('history.startTime'),
             render: ({row}) => {
-                if (!row.endTime || row.durationUs === undefined) {
+                if (!valueIsDefined(row.endTime) || !valueIsDefined(row.durationUs)) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
                 const startTime = Number(row.endTime) - parseUsToMs(row.durationUs);

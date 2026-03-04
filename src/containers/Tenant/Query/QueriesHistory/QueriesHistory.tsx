@@ -1,7 +1,6 @@
 import React from 'react';
 
 import NiceModal from '@ebay/nice-modal-react';
-import {isEqual} from 'lodash';
 
 import {DrawerWrapper} from '../../../../components/Drawer';
 import type {DrawerControl} from '../../../../components/Drawer/Drawer';
@@ -157,7 +156,7 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
                                 filter ? 'history.empty-search' : 'history.empty',
                             )}
                             rowClassName={(row) =>
-                                b('table-row', {active: isEqual(row, selectedRow)})
+                                b('table-row', {active: row.queryId === selectedRow?.queryId})
                             }
                             onRowClick={handleShowPreview}
                         />

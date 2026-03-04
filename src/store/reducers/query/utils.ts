@@ -8,6 +8,7 @@ import type {
     StreamDataChunk,
     StreamingChunk,
 } from '../../../types/store/streaming';
+import {valueIsDefined} from '../../../utils';
 
 import type {EnhancedQueryInHistory, QueryInHistory} from './types';
 
@@ -37,7 +38,7 @@ export function getQueryInHistory(rawQuery: string | QueryInHistory): EnhancedQu
     }
 
     const enhancedQuery: EnhancedQueryInHistory = {...rawQuery};
-    if (enhancedQuery.durationUs && enhancedQuery.endTime) {
+    if (valueIsDefined(enhancedQuery.durationUs) && valueIsDefined(enhancedQuery.endTime)) {
         enhancedQuery.startTime =
             Number(enhancedQuery.endTime) - Math.round(Number(enhancedQuery.durationUs) / 1000);
     }
