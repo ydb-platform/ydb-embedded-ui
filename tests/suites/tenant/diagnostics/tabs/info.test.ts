@@ -157,4 +157,79 @@ test.describe('Diagnostics Info tab', async () => {
         );
         expect(isGood).toBe(true);
     });
+
+    test('Info tab displays overlap_clusters for vector index', async ({page}) => {
+        const mockIndexPath = '/local/test_table/my_vector_index';
+
+        // Mock describe API to return a vector index with overlap_clusters
+        await page.route(`**/viewer/json/describe?*`, async (route) => {
+            const url = new URL(route.request().url());
+            const path = url.searchParams.get('path');
+
+            if (path === mockIndexPath) {
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({
+                        Status: 'StatusSuccess',
+                        Path: mockIndexPath,
+                        PathDescription: {
+                            Self: {
+                                Name: 'my_vector_index',
+                                PathType: 'EPathTypeTableIndex',
+                            },
+                            TableIndex: {
+                                Name: 'my_vector_index',
+                                Type: 'EIndexTypeGlobalVectorKmeansTree',
+                                State: 'EIndexStateReady',
+                                KeyColumnNames: ['embedding'],
+                                VectorIndexKmeansTreeDescription: {
+                                    Settings: {
+                                        clusters: 128,
+                                        levels: 2,
+                                        overlap_clusters: 3,
+                                        settings: {
+                                            metric: 'cosine',
+                                            vector_type: 'VECTOR_TYPE_FLOAT',
+                                            vector_dimension: 512,
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    }),
+                });
+            } else {
+                await route.continue();
+            }
+        });
+
+        const pageQueryParams = {
+            schema: mockIndexPath,
+            database,
+            tenantPage: 'diagnostics',
+        };
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto(pageQueryParams);
+
+        const diagnostics = new Diagnostics(page);
+        await diagnostics.clickTab(DiagnosticsTab.Info);
+
+        // Verify vector index settings are displayed including overlap_clusters
+        const infoContent = page.locator('.ydb-diagnostics-table-info');
+        await infoContent.waitFor({state: 'visible', timeout: 10000});
+
+        // Check Index Settings section contains Overlap Clusters
+        const indexSettings = infoContent.locator('.info-viewer');
+        await expect(indexSettings.getByText('Overlap Clusters')).toBeVisible();
+        await expect(indexSettings.getByText('3')).toBeVisible();
+
+        // Also verify other vector index settings are displayed
+        await expect(indexSettings.getByText('Clusters', {exact: true})).toBeVisible();
+        await expect(indexSettings.getByText('Levels')).toBeVisible();
+        await expect(indexSettings.getByText('Vector Dimension')).toBeVisible();
+
+        // Visual snapshot of vector index info with all settings
+        await expect(infoContent).toHaveScreenshot('vector-index-info-overlap-clusters.png');
+    });
 });

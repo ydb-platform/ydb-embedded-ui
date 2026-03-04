@@ -52,21 +52,26 @@ export function buildVectorIndexSettingsInfo(
     }
 
     const kMeansTreeSettingsFormatter = createInfoFormatter<
-        Pick<TKMeansTreeSettings, 'clusters' | 'levels'>
+        Pick<TKMeansTreeSettings, 'clusters' | 'levels' | 'overlap_clusters'>
     >({
         values: {
             clusters: (v) => (typeof v === 'number' ? formatNumber(v) : v),
             levels: (v) => (typeof v === 'number' ? formatNumber(v) : v),
+            overlap_clusters: (v) => (typeof v === 'number' ? formatNumber(v) : v),
         },
         labels: {
             clusters: i18n('field_clusters'),
             levels: i18n('field_levels'),
+            overlap_clusters: i18n('field_overlap_clusters'),
         },
     });
 
-    const {clusters, levels, settings} = kMeansTreeSettings;
+    const {clusters, levels, overlap_clusters, settings} = kMeansTreeSettings;
     if (clusters !== undefined) {
         info.push(kMeansTreeSettingsFormatter('clusters', clusters));
+    }
+    if (overlap_clusters !== undefined) {
+        info.push(kMeansTreeSettingsFormatter('overlap_clusters', overlap_clusters));
     }
     if (levels !== undefined) {
         info.push(kMeansTreeSettingsFormatter('levels', levels));

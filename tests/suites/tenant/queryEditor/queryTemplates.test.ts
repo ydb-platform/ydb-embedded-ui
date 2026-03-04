@@ -291,4 +291,21 @@ test.describe('Query Templates', () => {
         const editorValue = await queryEditor.editorTextArea.inputValue();
         expect(editorValue.trim()).toBe(testQuery.trim());
     });
+
+    test('Add vector index template contains overlap_clusters parameter', async ({page}) => {
+        const objectSummary = new ObjectSummary(page);
+        const queryEditor = new QueryEditor(page);
+
+        const tableName = await queryEditor.createNewFakeTable();
+        await objectSummary.clickRefreshButton();
+
+        await objectSummary.clickActionMenuItem(tableName, RowTableAction.AddVectorIndex);
+
+        await expect
+            .poll(() => queryEditor.getEditorContent(), {timeout: 5000})
+            .toContain('vector_kmeans_tree');
+
+        const editorContent = await queryEditor.getEditorContent();
+        expect(editorContent).toContain('overlap_clusters');
+    });
 });
