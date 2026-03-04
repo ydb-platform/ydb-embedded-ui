@@ -310,6 +310,10 @@ export const parseQueryErrorToString = (error: unknown) => {
 
 export const defaultPragma = 'PRAGMA OrderedColumns;';
 
+// Backend parses timeout as ui32 milliseconds: FromStringWithDefault<ui32>(params.Get("timeout"), 60000)
+// Max safe seconds value: floor(uint32_max / 1000) = floor(4294967295 / 1000) = 4294967
+export const MAX_QUERY_TIMEOUT_SECONDS = 4_294_967;
+
 // Special marker meaning "do not override resource pool in request params"
 export const RESOURCE_POOL_NO_OVERRIDE_VALUE = '__no_pool_override__';
 
@@ -334,7 +338,7 @@ export const tracingLevelSchema = z.nativeEnum(TRACING_LEVELS);
 // timeout = null is for timeout switched off state
 export const querySettingsValidationSchema = z.object({
     timeout: preprocessEmptyStringToUndefined(
-        z.coerce.number().positive().or(z.undefined()).or(z.null()),
+        z.coerce.number().positive().max(MAX_QUERY_TIMEOUT_SECONDS).or(z.undefined()).or(z.null()),
     ).or(z.literal('')),
     limitRows: preprocessEmptyStringToUndefined(
         z.coerce.number().gt(0).lte(100_000).or(z.undefined()),
@@ -353,7 +357,13 @@ export const querySettingsValidationSchema = z.object({
 export const querySettingsRestoreSchema = z
     .object({
         timeout: preprocessEmptyStringToUndefined(
-            z.coerce.number().positive().or(z.null()).optional(),
+            z.coerce
+                .number()
+                .positive()
+                .transform((v) => Math.min(v, MAX_QUERY_TIMEOUT_SECONDS))
+                .or(z.null())
+                .optional()
+                .catch(DEFAULT_QUERY_SETTINGS.timeout),
         ),
         limitRows: preprocessEmptyStringToUndefined(
             z.coerce.number().gt(0).lte(100_000).optional().catch(DEFAULT_QUERY_SETTINGS.limitRows),
