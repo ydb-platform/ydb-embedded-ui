@@ -150,8 +150,10 @@ test.describe('Test Query Editor', async () => {
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
-        // Small chunk size forces many streaming roundtrips, extending the Fetching phase
+        // Large row limit + small chunk size forces many streaming roundtrips,
+        // extending the Fetching phase so there's enough time to click Stop
         await queryEditor.clickGearButton();
+        await queryEditor.settingsDialog.changeLimitRows(100000);
         await queryEditor.settingsDialog.changeOutputChunkMaxSize(10);
         await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
 
