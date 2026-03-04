@@ -31,7 +31,7 @@ const config: PlaywrightTestConfig = {
         baseURL: baseUrl || 'http://localhost:3000/',
         testIdAttribute: 'data-qa',
         trace: 'on-first-retry',
-        // Always record video and take screenshots on main branch, otherwise only on failure
+        // Record video only on failure by default, can be overridden via PLAYWRIGHT_VIDEO env var
         video:
             (process.env.PLAYWRIGHT_VIDEO as 'on' | 'off' | 'retain-on-failure' | undefined) ||
             'retain-on-failure',

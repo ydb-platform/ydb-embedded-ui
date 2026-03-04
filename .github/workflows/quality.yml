@@ -46,7 +46,6 @@ jobs:
         run: bash scripts/playwright-docker.sh --shard=${{ matrix.shard }}/${{ matrix.shardTotal }}
         env:
           CI: 'true'
-          PLAYWRIGHT_VIDEO: 'on'
 
       - name: Upload blob report
         if: always()
