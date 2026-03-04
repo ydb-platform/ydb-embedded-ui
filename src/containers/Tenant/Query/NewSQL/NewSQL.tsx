@@ -80,6 +80,10 @@ export function NewSQL() {
                     action: actions.addVectorIndex,
                 },
                 {
+                    text: i18n('action.add-fulltext-index'),
+                    action: actions.addFulltextIndex,
+                },
+                {
                     text: i18n('action.drop-index'),
                     action: actions.dropTableIndex,
                 },

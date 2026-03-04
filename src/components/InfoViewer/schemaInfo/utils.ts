@@ -143,6 +143,8 @@ export function buildFulltextIndexSettingsInfo(
                 v === true ? i18n('filter_enabled') : i18n('filter_disabled'),
             filter_length_min: (v) => (typeof v === 'number' ? formatNumber(v) : v),
             filter_length_max: (v) => (typeof v === 'number' ? formatNumber(v) : v),
+            use_filter_snowball: (v) =>
+                v === true ? i18n('filter_enabled') : i18n('filter_disabled'),
         },
         labels: {
             tokenizer: i18n('field_tokenizer'),
@@ -156,6 +158,7 @@ export function buildFulltextIndexSettingsInfo(
             use_filter_length: i18n('field_use_filter_length'),
             filter_length_min: i18n('field_filter_length_min'),
             filter_length_max: i18n('field_filter_length_max'),
+            use_filter_snowball: i18n('field_use_filter_snowball'),
         },
     });
 
@@ -173,6 +176,7 @@ export function buildFulltextIndexSettingsInfo(
         use_filter_length,
         filter_length_min,
         filter_length_max,
+        use_filter_snowball,
     } = analyzers ?? {};
     if (tokenizer !== undefined) {
         info.push(fulltextIndexAnalyzersFormatter('tokenizer', tokenizer));
@@ -210,6 +214,9 @@ export function buildFulltextIndexSettingsInfo(
     }
     if (filter_length_max !== undefined) {
         info.push(fulltextIndexAnalyzersFormatter('filter_length_max', filter_length_max));
+    }
+    if (use_filter_snowball !== undefined) {
+        info.push(fulltextIndexAnalyzersFormatter('use_filter_snowball', use_filter_snowball));
     }
 
     return info;

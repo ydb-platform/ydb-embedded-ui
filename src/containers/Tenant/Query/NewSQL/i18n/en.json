@@ -11,6 +11,7 @@
   "action.drop-table": "Drop table",
   "action.add-index": "Add index",
   "action.add-vector-index": "Add vector index",
+  "action.add-fulltext-index": "Add fulltext index",
   "action.drop-index": "Drop index",
   "action.drop-external-table": "Drop external table",
   "menu.tables": "Tables",

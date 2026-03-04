@@ -6,6 +6,7 @@ export enum RowTableAction {
     UpsertQuery = 'Upsert query...',
     AddIndex = 'Add index...',
     AddVectorIndex = 'Add vector index...',
+    AddFulltextIndex = 'Add fulltext index...',
     CreateChangefeed = 'Create changefeed...',
     CreateDirectory = 'Create directory',
 }

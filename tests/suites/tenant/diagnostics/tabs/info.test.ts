@@ -232,4 +232,82 @@ test.describe('Diagnostics Info tab', async () => {
         // Visual snapshot of vector index info with all settings
         await expect(infoContent).toHaveScreenshot('vector-index-info-overlap-clusters.png');
     });
+
+    test('Info tab displays fulltext index settings with use_filter_snowball', async ({page}) => {
+        const mockIndexPath = '/local/test_table/my_fulltext_index';
+
+        // Mock describe API to return a fulltext index with all settings
+        await page.route(`**/viewer/json/describe?*`, async (route) => {
+            const url = new URL(route.request().url());
+            const path = url.searchParams.get('path');
+
+            if (path === mockIndexPath) {
+                await route.fulfill({
+                    status: 200,
+                    contentType: 'application/json',
+                    body: JSON.stringify({
+                        Status: 'StatusSuccess',
+                        Path: mockIndexPath,
+                        PathDescription: {
+                            Self: {
+                                Name: 'my_fulltext_index',
+                                PathType: 'EPathTypeTableIndex',
+                            },
+                            TableIndex: {
+                                Name: 'my_fulltext_index',
+                                Type: 'EIndexTypeGlobalFulltext',
+                                State: 'EIndexStateReady',
+                                KeyColumnNames: ['text_column'],
+                                FulltextIndexDescription: {
+                                    Settings: {
+                                        layout: 'FLAT_RELEVANCE',
+                                        columns: [
+                                            {
+                                                column: 'text_column',
+                                                analyzers: {
+                                                    tokenizer: 'standard',
+                                                    language: 'english',
+                                                    use_filter_lowercase: true,
+                                                    use_filter_stopwords: true,
+                                                    use_filter_snowball: true,
+                                                },
+                                            },
+                                        ],
+                                    },
+                                },
+                            },
+                        },
+                    }),
+                });
+            } else {
+                await route.continue();
+            }
+        });
+
+        const pageQueryParams = {
+            schema: mockIndexPath,
+            database,
+            tenantPage: 'diagnostics',
+        };
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto(pageQueryParams);
+
+        const diagnostics = new Diagnostics(page);
+        await diagnostics.clickTab(DiagnosticsTab.Info);
+
+        // Verify fulltext index settings are displayed
+        const infoContent = page.locator('.ydb-diagnostics-table-info');
+        await infoContent.waitFor({state: 'visible', timeout: 10000});
+
+        // Check Index Settings section contains fulltext-specific fields
+        const indexSettings = infoContent.locator('.info-viewer');
+        await expect(indexSettings.getByText('Tokenizer')).toBeVisible();
+        await expect(indexSettings.getByText('Language')).toBeVisible();
+        await expect(indexSettings.getByText('Filter Snowball')).toBeVisible();
+        await expect(indexSettings.getByText('Filter Lowercase')).toBeVisible();
+        await expect(indexSettings.getByText('Filter Stopwords')).toBeVisible();
+
+        // Visual snapshot of fulltext index info with all settings
+        await expect(infoContent).toHaveScreenshot('fulltext-index-info-settings.png');
+    });
 });

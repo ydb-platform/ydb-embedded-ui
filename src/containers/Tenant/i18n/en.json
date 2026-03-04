@@ -48,6 +48,7 @@
   "actions.manageTTL": "Manage TTL...",
   "actions.addTableIndex": "Add index...",
   "actions.addVectorIndex": "Add vector index...",
+  "actions.addFulltextIndex": "Add fulltext index...",
   "actions.createCdcStream": "Create changefeed...",
   "actions.showCreateTable": "Show Create SQL...",
   "actions.alterTopic": "Alter topic...",
