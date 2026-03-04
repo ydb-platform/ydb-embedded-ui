@@ -17,7 +17,7 @@
   "form.timeout.seconds": "sec",
   "form.limit.rows": "rows",
   "form.timeout.disabled": "Not available to turn off in this query type",
-  "form.validation.timeout": "Must be positive",
+  "form.validation.timeout": "Must be a positive number not exceeding 4294967 seconds",
   "form.validation.limitRows": "Must be between 1 and 100000",
   "description.default": " (default)",
   "docs": "Documentation"

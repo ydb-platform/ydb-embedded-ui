@@ -3,6 +3,7 @@ import type {QueryAction, QueryRequestParams, QuerySettings} from '../../../type
 import type {StreamDataChunk} from '../../../types/store/streaming';
 import {QUERY_TECHNICAL_MARK} from '../../../utils/constants';
 import {
+    MAX_QUERY_TIMEOUT_SECONDS,
     RESOURCE_POOL_NO_OVERRIDE_VALUE,
     isQueryErrorResponse,
     parseQueryAPIResponse,
@@ -38,7 +39,11 @@ function getLimitRowsParam(limitRows: unknown): number | undefined {
 }
 
 function getTimeoutMsParam(timeoutSeconds: unknown): number | undefined {
-    return isNumeric(timeoutSeconds) ? Number(timeoutSeconds) * 1000 : undefined;
+    if (!isNumeric(timeoutSeconds)) {
+        return undefined;
+    }
+    const clamped = Math.min(Number(timeoutSeconds), MAX_QUERY_TIMEOUT_SECONDS);
+    return clamped * 1000;
 }
 
 function getTransactionModeParam(

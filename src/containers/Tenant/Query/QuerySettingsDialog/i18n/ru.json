@@ -17,7 +17,7 @@
   "form.timeout.seconds": "сек",
   "form.limit.rows": "строк",
   "form.timeout.disabled": "Невозможно выключить для текущего типа запроса",
-  "form.validation.timeout": "Таймаут должен быть положительным",
+  "form.validation.timeout": "Таймаут должен быть положительным числом, не превышающим 4294967 секунд",
   "form.validation.limitRows": "Лимит строк должен быть между 1 и 100000",
   "description.default": " (default)",
   "docs": "Документация"
