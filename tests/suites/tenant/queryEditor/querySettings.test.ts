@@ -1,7 +1,11 @@
 import {expect, test} from '@playwright/test';
 import type {Page, Route} from '@playwright/test';
 
-import {QUERY_MODES, TRANSACTION_MODES} from '../../../../src/utils/query';
+import {
+    MAX_QUERY_TIMEOUT_SECONDS,
+    QUERY_MODES,
+    TRANSACTION_MODES,
+} from '../../../../src/utils/query';
 import {backend, database} from '../../../utils/constants';
 import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
@@ -255,6 +259,97 @@ test.describe('Test Query Settings', async () => {
         // Close dialog
         await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
         await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
+    });
+
+    test('Shows error for timeout exceeding maximum', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+
+        await queryEditor.clickGearButton();
+        await expect(queryEditor.settingsDialog.isVisible()).resolves.toBe(true);
+
+        // Enable timeout
+        await queryEditor.settingsDialog.clickTimeoutSwitch();
+        await expect(queryEditor.settingsDialog.isTimeoutInputVisible()).resolves.toBe(true);
+
+        // Enter a value exceeding MAX_QUERY_TIMEOUT_SECONDS
+        await queryEditor.settingsDialog.changeTimeout(MAX_QUERY_TIMEOUT_SECONDS + 1);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+
+        // Dialog should stay open with validation error
+        await expect(queryEditor.settingsDialog.isTimeoutError()).resolves.toBe(true);
+        await expect(queryEditor.settingsDialog.getTimeoutErrorMessage()).resolves.toBe(
+            `Number must be less than or equal to ${MAX_QUERY_TIMEOUT_SECONDS}`,
+        );
+
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
+    });
+
+    test('Shows error for negative timeout', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+
+        await queryEditor.clickGearButton();
+        await expect(queryEditor.settingsDialog.isVisible()).resolves.toBe(true);
+
+        // Enable timeout
+        await queryEditor.settingsDialog.clickTimeoutSwitch();
+        await expect(queryEditor.settingsDialog.isTimeoutInputVisible()).resolves.toBe(true);
+
+        // Enter a negative value
+        await queryEditor.settingsDialog.changeTimeout(-10);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+
+        // Dialog should stay open with validation error
+        await expect(queryEditor.settingsDialog.isTimeoutError()).resolves.toBe(true);
+
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
+    });
+
+    test('Accepts timeout at exactly MAX_QUERY_TIMEOUT_SECONDS', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+
+        await queryEditor.clickGearButton();
+        await expect(queryEditor.settingsDialog.isVisible()).resolves.toBe(true);
+
+        // Enable timeout
+        await queryEditor.settingsDialog.clickTimeoutSwitch();
+        await expect(queryEditor.settingsDialog.isTimeoutInputVisible()).resolves.toBe(true);
+
+        // Enter exactly the max value
+        await queryEditor.settingsDialog.changeTimeout(MAX_QUERY_TIMEOUT_SECONDS);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+
+        // Dialog should close (no error)
+        await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
+
+        // Reopen and verify value persisted
+        await queryEditor.clickGearButton();
+        await expect(queryEditor.settingsDialog.getTimeoutValue()).resolves.toBe(
+            MAX_QUERY_TIMEOUT_SECONDS.toString(),
+        );
+
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
+    });
+
+    test('Persists valid timeout value', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        const validTimeout = 300;
+
+        await queryEditor.clickGearButton();
+        await expect(queryEditor.settingsDialog.isVisible()).resolves.toBe(true);
+
+        // Enable timeout and set value
+        await queryEditor.settingsDialog.clickTimeoutSwitch();
+        await queryEditor.settingsDialog.changeTimeout(validTimeout);
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        await expect(queryEditor.settingsDialog.isHidden()).resolves.toBe(true);
+
+        // Reopen and verify
+        await queryEditor.clickGearButton();
+        await expect(queryEditor.settingsDialog.getTimeoutValue()).resolves.toBe(
+            validTimeout.toString(),
+        );
+
+        await queryEditor.settingsDialog.clickButton(ButtonNames.Cancel);
     });
 
     test('When Query Streaming is off, timeout has label and input is visible by default', async ({

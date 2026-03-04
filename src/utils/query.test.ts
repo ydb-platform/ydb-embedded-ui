@@ -6,7 +6,14 @@ import type {
     TKqpStatsQuery,
 } from '../types/api/query';
 
-import {parseQueryAPIResponse, parseQueryExplainPlan} from './query';
+import {
+    DEFAULT_QUERY_SETTINGS,
+    MAX_QUERY_TIMEOUT_SECONDS,
+    parseQueryAPIResponse,
+    parseQueryExplainPlan,
+    querySettingsRestoreSchema,
+    querySettingsValidationSchema,
+} from './query';
 
 describe('API utils', () => {
     describe('json/viewer/query', () => {
@@ -348,6 +355,134 @@ describe('API utils', () => {
                 const parsedPlan = parseQueryExplainPlan(rawPlan);
                 expect(parsedPlan).toEqual(rawPlan);
             });
+        });
+    });
+
+    describe('querySettingsValidationSchema — timeout', () => {
+        const validBase = {
+            timeout: 60,
+            limitRows: 10000,
+            queryMode: DEFAULT_QUERY_SETTINGS.queryMode,
+            transactionMode: DEFAULT_QUERY_SETTINGS.transactionMode,
+            statisticsMode: DEFAULT_QUERY_SETTINGS.statisticsMode,
+            tracingLevel: DEFAULT_QUERY_SETTINGS.tracingLevel,
+            pragmas: DEFAULT_QUERY_SETTINGS.pragmas,
+            resourcePool: DEFAULT_QUERY_SETTINGS.resourcePool,
+        };
+
+        function parseTimeout(timeout: unknown) {
+            return querySettingsValidationSchema.safeParse({...validBase, timeout});
+        }
+
+        test('accepts a positive number within range', () => {
+            const result = parseTimeout(300);
+            expect(result.success).toBe(true);
+            if (result.success) {
+                expect(result.data.timeout).toBe(300);
+            }
+        });
+
+        test('accepts number at exactly MAX_QUERY_TIMEOUT_SECONDS', () => {
+            const result = parseTimeout(MAX_QUERY_TIMEOUT_SECONDS);
+            expect(result.success).toBe(true);
+            if (result.success) {
+                expect(result.data.timeout).toBe(MAX_QUERY_TIMEOUT_SECONDS);
+            }
+        });
+
+        test('accepts null (timeout switched off)', () => {
+            const result = parseTimeout(null);
+            expect(result.success).toBe(true);
+            if (result.success) {
+                expect(result.data.timeout).toBeNull();
+            }
+        });
+
+        test('accepts undefined', () => {
+            const result = parseTimeout(undefined);
+            expect(result.success).toBe(true);
+            if (result.success) {
+                expect(result.data.timeout).toBeUndefined();
+            }
+        });
+
+        test('accepts empty string (preprocessed to undefined)', () => {
+            const result = parseTimeout('');
+            expect(result.success).toBe(true);
+            if (result.success) {
+                expect(result.data.timeout).toBeUndefined();
+            }
+        });
+
+        test('rejects number exceeding MAX_QUERY_TIMEOUT_SECONDS', () => {
+            const result = parseTimeout(MAX_QUERY_TIMEOUT_SECONDS + 1);
+            expect(result.success).toBe(false);
+        });
+
+        test('rejects a very large number (would overflow uint32 in ms)', () => {
+            const result = parseTimeout(5_000_000_000);
+            expect(result.success).toBe(false);
+        });
+
+        test('rejects zero', () => {
+            const result = parseTimeout(0);
+            expect(result.success).toBe(false);
+        });
+
+        test('rejects negative number', () => {
+            const result = parseTimeout(-10);
+            expect(result.success).toBe(false);
+        });
+    });
+
+    describe('querySettingsRestoreSchema — timeout', () => {
+        const validBase = {
+            limitRows: 10000,
+            queryMode: DEFAULT_QUERY_SETTINGS.queryMode,
+            transactionMode: DEFAULT_QUERY_SETTINGS.transactionMode,
+            statisticsMode: DEFAULT_QUERY_SETTINGS.statisticsMode,
+            tracingLevel: DEFAULT_QUERY_SETTINGS.tracingLevel,
+            pragmas: DEFAULT_QUERY_SETTINGS.pragmas,
+            resourcePool: DEFAULT_QUERY_SETTINGS.resourcePool,
+        };
+
+        function restoreTimeout(timeout: unknown) {
+            return querySettingsRestoreSchema.parse({...validBase, timeout});
+        }
+
+        test('restores a valid positive number', () => {
+            const result = restoreTimeout(120);
+            expect(result.timeout).toBe(120);
+        });
+
+        test('restores null (timeout off)', () => {
+            const result = restoreTimeout(null);
+            expect(result.timeout).toBeNull();
+        });
+
+        test('restores undefined', () => {
+            const result = restoreTimeout(undefined);
+            expect(result.timeout).toBeUndefined();
+        });
+
+        test('clamps number exceeding MAX_QUERY_TIMEOUT_SECONDS', () => {
+            const result = restoreTimeout(MAX_QUERY_TIMEOUT_SECONDS + 1000);
+            expect(result.timeout).toBe(MAX_QUERY_TIMEOUT_SECONDS);
+        });
+
+        test('clamps a very large saved value to MAX_QUERY_TIMEOUT_SECONDS', () => {
+            const result = restoreTimeout(99_999_999_999);
+            expect(result.timeout).toBe(MAX_QUERY_TIMEOUT_SECONDS);
+        });
+
+        test('clamps negative value to MAX_QUERY_TIMEOUT_SECONDS', () => {
+            const result = restoreTimeout(-500);
+            expect(result.timeout).toBe(MAX_QUERY_TIMEOUT_SECONDS);
+        });
+
+        test('clamps zero to MAX_QUERY_TIMEOUT_SECONDS', () => {
+            const result = restoreTimeout(0);
+            expect(result.timeout).toBe(MAX_QUERY_TIMEOUT_SECONDS);
         });
     });
 });
