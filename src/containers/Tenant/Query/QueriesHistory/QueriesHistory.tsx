@@ -19,6 +19,7 @@ import {
 import type {EnhancedQueryInHistory, QueryInHistory} from '../../../../store/reducers/query/types';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
+import {valueIsDefined} from '../../../../utils';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
@@ -46,13 +47,13 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
 
     const sortedHistory = React.useMemo(() => {
         return queriesHistory.filteredHistoryQueries.toSorted((a, b) => {
-            if (!a.startTime && !b.startTime) {
+            if (!valueIsDefined(a.startTime) && !valueIsDefined(b.startTime)) {
                 return 0;
             }
-            if (!a.startTime) {
+            if (!valueIsDefined(a.startTime)) {
                 return 1;
             }
-            if (!b.startTime) {
+            if (!valueIsDefined(b.startTime)) {
                 return -1;
             }
             return b.startTime - a.startTime;
