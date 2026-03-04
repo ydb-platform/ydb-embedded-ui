@@ -12,9 +12,9 @@ export const longRunningStreamQuery = `$data = ListFromRange(1, 50000);
 SELECT x, Digest::Argon2(CAST(x AS String), "test_salt") AS hash
 FROM AS_TABLE(AsList(AsStruct($data AS x))) FLATTEN BY x;
 `;
-// 5M rows with Argon2 — Argon2 is slower per-row than Sha256 so fewer rows than before
-// but still enough to ensure streaming lasts 10s+ on CI (enough time to click stop).
-export const longerRunningStreamQuery = `$data = ListFromRange(1, 5000000);
+// 20M rows with Argon2 — Argon2 is slower per-row than Sha256 so fewer rows than before
+// but still enough to ensure streaming lasts long on CI (enough time to click stop).
+export const longerRunningStreamQuery = `$data = ListFromRange(1, 20000000);
 SELECT x, Digest::Argon2(CAST(x AS String), "test_salt") AS hash
 FROM AS_TABLE(AsList(AsStruct($data AS x))) FLATTEN BY x;
 `;
