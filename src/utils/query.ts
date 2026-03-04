@@ -360,10 +360,10 @@ export const querySettingsRestoreSchema = z
             z.coerce
                 .number()
                 .positive()
-                .max(MAX_QUERY_TIMEOUT_SECONDS)
+                .transform((v) => Math.min(v, MAX_QUERY_TIMEOUT_SECONDS))
                 .or(z.null())
                 .optional()
-                .catch(MAX_QUERY_TIMEOUT_SECONDS),
+                .catch(DEFAULT_QUERY_SETTINGS.timeout),
         ),
         limitRows: preprocessEmptyStringToUndefined(
             z.coerce.number().gt(0).lte(100_000).optional().catch(DEFAULT_QUERY_SETTINGS.limitRows),

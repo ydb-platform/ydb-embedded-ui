@@ -475,14 +475,19 @@ describe('API utils', () => {
             expect(result.timeout).toBe(MAX_QUERY_TIMEOUT_SECONDS);
         });
 
-        test('clamps negative value to MAX_QUERY_TIMEOUT_SECONDS', () => {
+        test('falls back to null for negative value', () => {
             const result = restoreTimeout(-500);
-            expect(result.timeout).toBe(MAX_QUERY_TIMEOUT_SECONDS);
+            expect(result.timeout).toBeNull();
         });
 
-        test('clamps zero to MAX_QUERY_TIMEOUT_SECONDS', () => {
+        test('falls back to null for zero', () => {
             const result = restoreTimeout(0);
-            expect(result.timeout).toBe(MAX_QUERY_TIMEOUT_SECONDS);
+            expect(result.timeout).toBeNull();
+        });
+
+        test('falls back to null for corrupted string', () => {
+            const result = restoreTimeout('garbage');
+            expect(result.timeout).toBeNull();
         });
     });
 });

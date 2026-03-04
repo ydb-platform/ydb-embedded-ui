@@ -42,8 +42,11 @@ function getTimeoutMsParam(timeoutSeconds: unknown): number | undefined {
     if (!isNumeric(timeoutSeconds)) {
         return undefined;
     }
-    const clamped = Math.min(Number(timeoutSeconds), MAX_QUERY_TIMEOUT_SECONDS);
-    return clamped * 1000;
+    const seconds = Number(timeoutSeconds);
+    if (seconds <= 0) {
+        return undefined;
+    }
+    return Math.min(seconds, MAX_QUERY_TIMEOUT_SECONDS) * 1000;
 }
 
 function getTransactionModeParam(
