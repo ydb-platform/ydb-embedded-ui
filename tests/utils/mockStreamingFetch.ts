@@ -116,7 +116,7 @@ export async function setupMockStreamingFetch(
                 }
 
                 function encodeClosingBoundary(): Uint8Array {
-                    return encoder.encode(`--${BOUNDARY}--`);
+                    return encoder.encode(`--${BOUNDARY}--\r\n`);
                 }
 
                 // Determine how the stream should end
