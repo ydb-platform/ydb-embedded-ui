@@ -12,7 +12,16 @@ import {
     Xmark,
 } from '@gravity-ui/icons';
 import type {DropdownMenuItem} from '@gravity-ui/uikit';
-import {Button, DropdownMenu, Flex, Loader, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
+import {
+    ActionTooltip,
+    Button,
+    DropdownMenu,
+    Flex,
+    Loader,
+    Tab,
+    TabList,
+    TabProvider,
+} from '@gravity-ui/uikit';
 
 import type {QueryTabState} from '../../../../../store/reducers/query/types';
 import {cn} from '../../../../../utils/cn';
@@ -289,11 +298,18 @@ export function EditorTabs() {
                 <TabList size="m">{tabsOrder.map(renderEditorTab)}</TabList>
             </TabProvider>
             <Flex className={b('editor-tabs-actions')} alignItems="center" gap={1}>
-                <Button view="flat-secondary" size="xs" onClick={handleNewTabClick}>
-                    <Button.Icon>
-                        <CirclePlus />
-                    </Button.Icon>
-                </Button>
+                <ActionTooltip title="New tab">
+                    <Button
+                        view="flat-secondary"
+                        size="xs"
+                        onClick={handleNewTabClick}
+                        aria-label="New tab"
+                    >
+                        <Button.Icon>
+                            <CirclePlus />
+                        </Button.Icon>
+                    </Button>
+                </ActionTooltip>
             </Flex>
         </Flex>
     );
