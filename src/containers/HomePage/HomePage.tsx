@@ -259,7 +259,7 @@ export function HomePage() {
         >
             <LoaderWrapper loading={environmentsLoading}>
                 {renderHelmet()}
-                <GetMetaUser displayWhoamiError={homePageTab !== 'databases'}>
+                <GetMetaUser>
                     <Flex direction="column" className={b()} ref={scrollContainerRef}>
                         {renderTabs()}
                         <Flex className={b('content-wrapper')}>{renderContent()}</Flex>
