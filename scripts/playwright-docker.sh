@@ -5,12 +5,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 cd "$PROJECT_DIR"
 
-if [ ! -d "node_modules/@playwright/test" ]; then
-  echo "Error: @playwright/test not found. Run 'npm ci' first." >&2
+PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').packages['node_modules/@playwright/test'].version)")
+if [ -z "$PLAYWRIGHT_VERSION" ]; then
+  echo "Error: Could not determine Playwright version from package-lock.json" >&2
   exit 1
 fi
-
-PLAYWRIGHT_VERSION=$(node -e "console.log(require('@playwright/test/package.json').version)")
 DOCKER_IMAGE="mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION}-noble"
 
 echo "Using Playwright Docker image: ${DOCKER_IMAGE}"
