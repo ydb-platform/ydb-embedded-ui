@@ -45,17 +45,17 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
     const {savedQueries, saveQuery} = useSavedQueries();
 
     const sortedHistory = React.useMemo(() => {
-        return queriesHistory.filteredHistoryQueries.toSorted((a, b) => {
-            if (!valueIsDefined(a.startTime) && !valueIsDefined(b.startTime)) {
-                return 0;
+        return queriesHistory.filteredHistoryQueries.toReversed().toSorted((a, b) => {
+            if (valueIsDefined(a.startTime) && valueIsDefined(b.startTime)) {
+                return b.startTime - a.startTime;
             }
-            if (!valueIsDefined(a.startTime)) {
+            if (valueIsDefined(a.startTime)) {
                 return -1;
             }
-            if (!valueIsDefined(b.startTime)) {
+            if (valueIsDefined(b.startTime)) {
                 return 1;
             }
-            return b.startTime - a.startTime;
+            return 0;
         });
     }, [queriesHistory.filteredHistoryQueries]);
 
