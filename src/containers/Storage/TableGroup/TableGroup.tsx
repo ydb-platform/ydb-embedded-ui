@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {ActionTooltip, ArrowToggle, Label, Text} from '@gravity-ui/uikit';
+import {ArrowToggle, Label, Text} from '@gravity-ui/uikit';
 
 import {cn} from '../../../utils/cn';
 
@@ -34,24 +34,22 @@ export const TableGroup = ({
 
     const renderTitle = () => {
         return (
-            <ActionTooltip title={title}>
-                <button onClick={toggleCollapsed} className={b('button')} aria-label={title}>
-                    <div className={b('title-wrapper')}>
-                        <ArrowToggle direction={expanded ? 'top' : 'bottom'} />
-                        <div className={b('title')}>
-                            <Text
-                                variant="subheader-2"
-                                style={titleColor ? {color: titleColor} : undefined}
-                            >
-                                {title}
-                            </Text>
-                            <Text variant="body-2" color="secondary" className={b('count')}>
-                                {entityName}: <Label theme="normal">{count}</Label>
-                            </Text>
-                        </div>
+            <button onClick={toggleCollapsed} className={b('button')} aria-label={title}>
+                <div className={b('title-wrapper')}>
+                    <ArrowToggle direction={expanded ? 'top' : 'bottom'} />
+                    <div className={b('title')}>
+                        <Text
+                            variant="subheader-2"
+                            style={titleColor ? {color: titleColor} : undefined}
+                        >
+                            {title}
+                        </Text>
+                        <Text variant="body-2" color="secondary" className={b('count')}>
+                            {entityName}: <Label theme="normal">{count}</Label>
+                        </Text>
                     </div>
-                </button>
-            </ActionTooltip>
+                </div>
+            </button>
         );
     };
 
