@@ -1,6 +1,4 @@
 {
-  "controls.query-mode-selector_type": "Query type:",
-
   "tabs.newQuery": "Editor",
   "tabs.history": "History",
   "tabs.saved": "Saved",
@@ -84,7 +82,11 @@
 
   "toaster.stop-error": "Something went wrong. Unable to stop request processing. Please wait.",
 
-  "history.queryText": "Query text",
-  "history.endTime": "End time",
-  "history.duration": "Duration"
+  "history.queryText": "Query",
+  "history.startTime": "Run",
+  "history.duration": "Run time",
+  "history.status": "Status",
+
+  "action_open-in-editor": "Open in editor",
+  "title_query-details": "Query"
 }

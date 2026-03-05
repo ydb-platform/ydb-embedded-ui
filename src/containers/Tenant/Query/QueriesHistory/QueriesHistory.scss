@@ -1,17 +1,34 @@
 @use '../../../../styles/mixins.scss';
 
 .ydb-queries-history {
+    $block: &;
     --ydb-table-with-controls-layout-controls-height: 44px;
+    --ydb-table-with-controls-layout-controls-padding-top: 0;
+    --data-table-row-height: 64px;
+    --data-table-cell-align: top;
     overflow: auto;
 
     height: 100%;
-    padding: 0 20px;
+    padding: 0 0 var(--g-spacing-5) var(--g-spacing-5);
+
+    @include mixins.text-body-1();
 
     @include mixins.flex-container();
 
-    .ydb-table-with-controls-layout__controls {
-        height: var(--ydb-table-with-controls-layout-controls-height);
-        padding-top: 0;
+    @include mixins.freeze-nth-column(5, 0, 0, 'right');
+
+    .data-table__th {
+        height: 40px;
+    }
+
+    .data-table__row:hover {
+        #{$block}__actions {
+            visibility: visible;
+        }
+    }
+
+    &__table-with-controls {
+        width: fit-content;
     }
 
     &__search {
@@ -20,13 +37,48 @@
 
     &__table-row {
         cursor: pointer;
+
+        &_active {
+            .data-table__td {
+                background-color: var(--g-color-base-selection);
+            }
+            &:hover {
+                .data-table__td {
+                    background: var(--g-color-base-selection-hover) !important;
+                }
+            }
+        }
     }
 
     &__query {
+        --ydb-syntax-highlighter-height: 54px;
+        --ydb-syntax-highlighter-content-overflow: hidden;
         overflow: hidden;
         flex-grow: 1;
 
         white-space: pre;
-        text-overflow: ellipsis;
+
+        pre {
+            padding: 0;
+            @include mixins.text-code-1();
+        }
+        code {
+            display: inline-flex;
+            flex-direction: column;
+
+            width: 100%;
+
+            white-space: pre;
+            .line {
+                display: inline-block;
+                overflow: hidden;
+
+                text-overflow: ellipsis;
+            }
+        }
+    }
+
+    &__actions {
+        visibility: hidden;
     }
 }

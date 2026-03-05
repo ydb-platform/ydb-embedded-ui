@@ -1,0 +1,9 @@
+{
+  "value_preparing": "Preparing",
+  "value_running": "Running",
+  "value_fetching": "Fetching",
+  "value_completed": "Completed",
+  "value_failed": "Failed",
+  "value_stopped": "Stopped",
+  "value_aborted": "Connection aborted"
+}

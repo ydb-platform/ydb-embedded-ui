@@ -2,6 +2,7 @@ import React from 'react';
 
 import {useHistory, useLocation} from 'react-router-dom';
 
+import {QueryDetails} from '../../../../../components/QueryDetails/QueryDetails';
 import {getTenantPath, parseQuery} from '../../../../../routes';
 import {changeUserInput, setIsDirty} from '../../../../../store/reducers/query/query';
 import {
@@ -15,7 +16,6 @@ import {TenantTabsGroups} from '../../../TenantPages';
 import {createQueryInfoItems} from '../utils';
 
 import {NotFoundContainer} from './NotFoundContainer';
-import {QueryDetails} from './QueryDetails';
 
 interface QueryDetailsDrawerContentProps {
     // Three cases:

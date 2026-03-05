@@ -5,9 +5,9 @@ import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import type {QuerySettings, StatisticsMode} from '../../types/store/query';
 import {
     DEFAULT_QUERY_SETTINGS,
-    QUERY_MODES,
     STATISTICS_MODES,
     STATISTICS_MODES_WITH_SVG,
+    isStreamingSupportedForMode,
     querySettingsRestoreSchema,
 } from '../query';
 
@@ -43,7 +43,7 @@ export const useQueryExecutionSettings = () => {
     const settings: QuerySettings = {
         ...validatedSettings,
         timeout:
-            enableQueryStreaming && validatedSettings.queryMode === QUERY_MODES.query
+            enableQueryStreaming && isStreamingSupportedForMode(validatedSettings.queryMode)
                 ? validatedSettings.timeout || null
                 : validatedSettings.timeout || undefined,
         statisticsMode: useShowPlanToSvg

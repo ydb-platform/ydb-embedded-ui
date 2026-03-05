@@ -184,7 +184,7 @@ export function YqlEditor({
     });
 
     const handleSaveQueryAsAction = useEventHandler(() => {
-        const commonModalProps = {savedQueries, onSaveQuery: saveQuery} as const;
+        const commonModalProps = {savedQueries, onSaveQuery: saveQuery, queryBody: input} as const;
         if (activeTab?.isTitleUserDefined) {
             NiceModal.show(SAVE_QUERY_DIALOG, {
                 ...commonModalProps,

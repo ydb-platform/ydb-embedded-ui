@@ -4,6 +4,8 @@ import {QUERY_MODES} from '../../../../src/utils/query';
 import {database} from '../../../utils/constants';
 import {TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 import {QueryEditor, QueryTabs} from '../queryEditor/models/QueryEditor';
+import {SaveQueryDialog} from '../queryEditor/models/SaveQueryDialog';
+import {SavedQueriesTable} from '../savedQueries/models/SavedQueriesTable';
 
 import executeQueryWithKeybinding from './utils';
 
@@ -109,6 +111,28 @@ test.describe('Query History', () => {
         await queryEditor.resultTable.isVisible();
         const value = await queryEditor.resultTable.getCellValue(1, 2);
         expect(value).toBe('42');
+    });
+
+    test('Clicking a row opens query preview drawer', async ({page}) => {
+        const testQuery = 'SELECT 99 AS preview_test;';
+
+        // Execute the query
+        await queryEditor.run(testQuery, QUERY_MODES.script);
+
+        // Navigate to the history tab
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.isVisible();
+
+        // Click the row to open the preview drawer
+        await queryEditor.historyQueries.clickRow(testQuery);
+
+        // Verify the query preview drawer is visible
+        const drawer = page.locator('.ydb-query-details');
+        await expect(drawer).toBeVisible({timeout: VISIBILITY_TIMEOUT});
+
+        // Verify the query text is displayed in the preview
+        const queryText = drawer.locator('.ydb-syntax-highlighter');
+        await expect(queryText).toContainText(testQuery);
     });
 
     test('Can search in query history', async () => {
@@ -243,5 +267,38 @@ test.describe('Query History', () => {
         // Verify query is loaded in editor
         const editorValue = await queryEditor.editorTextArea.inputValue();
         expect(editorValue.trim()).toBe(query.trim());
+    });
+
+    test('Can save query from history using save button', async ({page}) => {
+        const testQuery = 'SELECT 100 AS save_from_history_test;';
+        const queryName = `Saved From History ${Date.now()}`;
+
+        // Execute the query
+        await queryEditor.run(testQuery, QUERY_MODES.script);
+
+        // Navigate to the history tab
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.isVisible();
+
+        // Click the save button on the query row
+        await queryEditor.historyQueries.clickSaveButton(testQuery);
+
+        // Verify save query dialog appears
+        const saveQueryDialog = new SaveQueryDialog(page);
+        const isDialogVisible = await saveQueryDialog.isVisible();
+        expect(isDialogVisible).toBe(true);
+
+        // Fill in the query name and save
+        await saveQueryDialog.setQueryName(queryName);
+        await saveQueryDialog.clickSave();
+
+        // Navigate to the saved queries tab to verify the query was saved
+        await queryEditor.queryTabs.selectTab(QueryTabs.Saved);
+        const savedQueriesTable = new SavedQueriesTable(page);
+        await savedQueriesTable.isVisible();
+
+        // Verify the saved query exists
+        const savedRow = await savedQueriesTable.getQueryRow(queryName);
+        await expect(savedRow).toBeVisible({timeout: VISIBILITY_TIMEOUT});
     });
 });
