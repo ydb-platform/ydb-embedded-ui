@@ -1,5 +1,14 @@
 # Changelog
 
+## [14.9.1-hotfix.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.9.1...v14.9.1-hotfix.1) (2026-03-05)
+
+
+### Bug Fixes
+
+* . ([3810cc2](https://github.com/ydb-platform/ydb-embedded-ui/commit/3810cc28787b1121d67cb24673dff1dc53cf6552))
+* **HomePage:** always require whoami for databases ([#3573](https://github.com/ydb-platform/ydb-embedded-ui/issues/3573)) ([217c617](https://github.com/ydb-platform/ydb-embedded-ui/commit/217c6172b02afea7f295341e8d44a67df05e9097))
+* hotfix ([c2c894d](https://github.com/ydb-platform/ydb-embedded-ui/commit/c2c894d2dd8e4ccb5ec7ab3f524c7f00ef02c163))
+
 ## [14.9.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.9.0...v14.9.1) (2026-03-04)
 
 
