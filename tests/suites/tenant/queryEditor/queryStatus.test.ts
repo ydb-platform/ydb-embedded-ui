@@ -2,11 +2,12 @@ import {expect, test} from '@playwright/test';
 
 import {STATISTICS_MODES} from '../../../../src/utils/query';
 import {database} from '../../../utils/constants';
+import {setupMockStreamingFetch} from '../../../utils/mockStreamingFetch';
 import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {TenantPage} from '../TenantPage';
-import {longRunningQuery, streamingStatusQuery} from '../constants';
+import {longRunningQuery} from '../constants';
 
-import {ButtonNames, QueryEditor} from './models/QueryEditor';
+import {QueryEditor} from './models/QueryEditor';
 
 test.describe('Test Query Execution Status', async () => {
     const testQuery = 'SELECT 1;'; // Simple query that will generate a plan
@@ -70,12 +71,10 @@ test.describe('Test Query Execution Status', async () => {
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
-        // Small chunk size forces many streaming chunks, making status transitions observable
-        await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeOutputChunkMaxSize(10);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        // Mock fetch — real small-chunk streaming freezes Safari's main thread
+        await setupMockStreamingFetch(page);
 
-        await queryEditor.setQuery(streamingStatusQuery);
+        await queryEditor.setQuery('SELECT 1;');
         await queryEditor.clickRunButton();
 
         await expect(queryEditor.waitForStatus('Fetching')).resolves.toBe(true);
@@ -85,11 +84,10 @@ test.describe('Test Query Execution Status', async () => {
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
-        await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeOutputChunkMaxSize(10);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        // Mock completes after 10 data chunks then sends QueryResponse
+        await setupMockStreamingFetch(page, {totalChunks: 10});
 
-        await queryEditor.setQuery(streamingStatusQuery);
+        await queryEditor.setQuery('SELECT 1;');
         await queryEditor.clickRunButton();
 
         await expect(queryEditor.waitForStatus('Fetching')).resolves.toBe(true);
@@ -100,11 +98,10 @@ test.describe('Test Query Execution Status', async () => {
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
-        await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeOutputChunkMaxSize(10);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        // Mock completes after 10 data chunks then sends QueryResponse
+        await setupMockStreamingFetch(page, {totalChunks: 10});
 
-        await queryEditor.setQuery(streamingStatusQuery);
+        await queryEditor.setQuery('SELECT 1;');
         await queryEditor.clickRunButton();
 
         const validStreamingStatuses = ['Preparing', 'Running', 'Fetching', 'Completed'];
@@ -120,5 +117,18 @@ test.describe('Test Query Execution Status', async () => {
         }
 
         expect(transitions[transitions.length - 1]).toBe('Completed');
+    });
+
+    test('Streaming query shows "Failed" status on server error', async ({page}) => {
+        const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'on', 'Query Streaming');
+
+        // Mock sends 3 data chunks then a QueryResponse with error/issues fields
+        await setupMockStreamingFetch(page, {errorAfterChunks: 3});
+
+        await queryEditor.setQuery('SELECT 1;');
+        await queryEditor.clickRunButton();
+
+        await expect(queryEditor.waitForStatus('Failed')).resolves.toBe(true);
     });
 });

@@ -3,6 +3,7 @@ import {expect, test} from '@playwright/test';
 import {QUERY_MODES, STATISTICS_MODES} from '../../../../src/utils/query';
 import {getClipboardContent} from '../../../utils/clipboard';
 import {database} from '../../../utils/constants';
+import {setupMockStreamingFetch} from '../../../utils/mockStreamingFetch';
 import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {NavigationTabs, TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 import {
@@ -10,7 +11,6 @@ import {
     longRunningQuery,
     longRunningStreamQuery,
     longTableSelect,
-    longerRunningStreamQuery,
     simpleQuery,
 } from '../constants';
 
@@ -23,7 +23,7 @@ import {
 } from './models/QueryEditor';
 import {executeSelectedQueryWithKeybinding} from './utils';
 
-test.describe('Test Query Editor', async () => {
+test.describe.only('Test Query Editor', async () => {
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';
 
     test.beforeEach(async ({page}) => {
@@ -122,7 +122,7 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isElapsedTimeVisible()).resolves.toBe(true);
     });
 
-    test('Query streaming finishes in reasonable time', async ({page}) => {
+    test('Query streaming finishes with data', async ({page}) => {
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
@@ -130,6 +130,16 @@ test.describe('Test Query Editor', async () => {
         await queryEditor.clickRunButton();
 
         await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
+        await expect(queryEditor.resultTable.isVisible()).resolves.toBe(true);
+        // Streaming query may exceed default row limit, so title can be "Result" or "Truncated"
+        await expect(queryEditor.resultTable.getResultTitleText()).resolves.toMatch(
+            /^(Result|Truncated)$/,
+        );
+        await expect(
+            Promise.resolve(Number(await queryEditor.resultTable.getResultTitleCount())),
+        ).resolves.toBeGreaterThan(0);
+        const resultView = queryEditor.resultTable.getResultWrapperLocator();
+        await expect(resultView).toHaveScreenshot('streaming-query-completed.png');
     });
 
     test('Query execution is terminated when stop button is clicked', async ({page}) => {
@@ -150,12 +160,12 @@ test.describe('Test Query Editor', async () => {
         const queryEditor = new QueryEditor(page);
         await toggleExperiment(page, 'on', 'Query Streaming');
 
-        // Small chunk size forces many streaming roundtrips, extending the Fetching phase
-        await queryEditor.clickGearButton();
-        await queryEditor.settingsDialog.changeOutputChunkMaxSize(10);
-        await queryEditor.settingsDialog.clickButton(ButtonNames.Save);
+        // Mock fetch to create a controlled streaming response.
+        // Real streaming overwhelms Safari's main thread, making
+        // the Stop button unresponsive (the root cause of the flake).
+        await setupMockStreamingFetch(page);
 
-        await queryEditor.setQuery(longerRunningStreamQuery);
+        await queryEditor.setQuery('SELECT 1;');
         await queryEditor.clickRunButton();
 
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);

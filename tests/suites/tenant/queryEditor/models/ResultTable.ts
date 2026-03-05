@@ -35,6 +35,10 @@ export class ResultTable {
         this.resultWrapper = selector.locator('.ydb-query-result-sets-viewer__result-wrapper');
     }
 
+    getResultWrapperLocator(): Locator {
+        return this.resultWrapper;
+    }
+
     async isVisible() {
         await this.table.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return true;
