@@ -205,6 +205,8 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
         let historyQueryId = historyCurrentQueryId ?? uuidv4();
         const newQueryId = uuidv4();
 
+        const startTime = Date.now();
+
         // Don't save partial queries in history
         if (!partial) {
             const currentQuery = historyCurrentQueryId
@@ -213,7 +215,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
             // if it is query with results stored in server (has operationId) save every launch into history
             if (text !== currentQuery?.queryText || currentQuery?.operationId) {
                 historyQueryId = newQueryId;
-                saveQueryToHistory(text, newQueryId);
+                saveQueryToHistory(text, newQueryId, startTime);
             }
             dispatch(setIsDirty(false));
         }
@@ -236,6 +238,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
             const query = streamQuery({
                 tabId: activeTabId,
                 actionType: 'execute',
+                startTime,
                 query: text,
                 database,
                 querySettings,
@@ -256,8 +259,15 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
                     }
                 })
                 .catch((error) => {
-                    // save in history failed query only if it has operationId. It means that query is saved in server side and its results may be retrieved.
-                    if (error?.extra?.operationId) {
+                    if (error?.name === 'AbortError') {
+                        updateQueryInHistory(historyQueryId, {
+                            startTime,
+                            durationUs: (Date.now() - startTime) * 1000,
+                            status: 'stopped',
+                        });
+                        return;
+                    }
+                    if (error?.extra?.historyQueryId) {
                         updateQueryInHistory(
                             error.extra.historyQueryId,
                             error.extra.queryStats,
@@ -276,6 +286,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
             const query = sendQuery({
                 tabId: activeTabId,
                 actionType: 'execute',
+                startTime,
                 query: text,
                 database,
                 querySettings,
@@ -298,8 +309,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
                     }
                 })
                 .catch((error) => {
-                    // save in history failed query only if it has operationId. It means that query is saved in server side and its results may be retrieved.
-                    if (error?.extra?.operationId) {
+                    if (error?.extra?.historyQueryId) {
                         updateQueryInHistory(
                             error.extra.historyQueryId,
                             error.extra.queryStats,
@@ -332,9 +342,12 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
 
         reachMetricaGoal('runQuery', {actionType: 'explain', ...querySettings});
 
+        const startTime = Date.now();
+
         const query = sendQuery({
             tabId: activeTabId,
             actionType: 'explain',
+            startTime,
             query: text,
             database,
             querySettings,

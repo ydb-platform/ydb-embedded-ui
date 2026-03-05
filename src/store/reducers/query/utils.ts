@@ -10,7 +10,7 @@ import type {
 } from '../../../types/store/streaming';
 import {valueIsDefined} from '../../../utils';
 
-import type {EnhancedQueryInHistory, QueryInHistory} from './types';
+import type {QueryExecutionStatusType, QueryInHistory, RawQueryInHistory} from './types';
 
 export function getActionAndSyntaxFromQueryMode(
     baseAction: QueryAction = 'execute',
@@ -29,7 +29,22 @@ export function getActionAndSyntaxFromQueryMode(
     return {action, syntax};
 }
 
-export function getQueryInHistory(rawQuery: string | QueryInHistory): EnhancedQueryInHistory {
+const QUERY_EXECUTION_STATUS_VALUES: QueryExecutionStatusType[] = [
+    'loading',
+    'completed',
+    'failed',
+    'stopped',
+    'aborted',
+];
+
+function isQueryExecutionStatusType(value: unknown): value is QueryExecutionStatusType {
+    return (
+        typeof value === 'string' &&
+        QUERY_EXECUTION_STATUS_VALUES.includes(value as QueryExecutionStatusType)
+    );
+}
+
+export function getQueryInHistory(rawQuery: string | RawQueryInHistory): QueryInHistory {
     if (typeof rawQuery === 'string') {
         return {
             queryText: rawQuery,
@@ -37,8 +52,15 @@ export function getQueryInHistory(rawQuery: string | QueryInHistory): EnhancedQu
         };
     }
 
-    const enhancedQuery: EnhancedQueryInHistory = {...rawQuery};
-    if (valueIsDefined(enhancedQuery.durationUs) && valueIsDefined(enhancedQuery.endTime)) {
+    const enhancedQuery: QueryInHistory = {
+        ...rawQuery,
+        status: isQueryExecutionStatusType(rawQuery.status) ? rawQuery.status : undefined,
+    };
+    if (
+        !valueIsDefined(enhancedQuery.startTime) &&
+        valueIsDefined(enhancedQuery.durationUs) &&
+        valueIsDefined(enhancedQuery.endTime)
+    ) {
         enhancedQuery.startTime =
             Number(enhancedQuery.endTime) - Math.round(Number(enhancedQuery.durationUs) / 1000);
     }

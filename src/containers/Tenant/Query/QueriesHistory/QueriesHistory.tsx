@@ -50,10 +50,10 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
                 return 0;
             }
             if (!valueIsDefined(a.startTime)) {
-                return 1;
+                return -1;
             }
             if (!valueIsDefined(b.startTime)) {
-                return -1;
+                return 1;
             }
             return b.startTime - a.startTime;
         });

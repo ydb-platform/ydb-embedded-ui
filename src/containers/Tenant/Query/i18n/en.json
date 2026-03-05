@@ -85,6 +85,7 @@
   "history.queryText": "Query",
   "history.startTime": "Run",
   "history.duration": "Run time",
+  "history.status": "Status",
 
   "action_open-in-editor": "Open in editor",
   "title_query-details": "Query"

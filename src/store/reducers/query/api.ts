@@ -63,12 +63,16 @@ function createExecuteQueryStats(
     status?: QueryStats['status'],
 ): QueryStats {
     if (data.stats) {
-        const {DurationUs, Executions: [{FinishTimeMs}] = [{}]} = data.stats;
-        return {durationUs: DurationUs, endTime: FinishTimeMs, status};
+        const {DurationUs, Executions: [{StartTimeMs}] = [{}]} = data.stats;
+        return {
+            startTime: Number(StartTimeMs),
+            durationUs: DurationUs,
+            status,
+        };
     }
 
     const now = Date.now();
-    return {durationUs: (now - timeStart) * 1000, endTime: now, status};
+    return {startTime: timeStart, durationUs: (now - timeStart) * 1000, status};
 }
 
 const getResourcePoolsQueryText = () => {
@@ -84,6 +88,7 @@ interface SendQueryParams extends QueryRequestParams {
     tabId: string;
     actionType?: QueryAction;
     queryId: string;
+    startTime: number;
     historyQueryId?: string;
     querySettings?: Partial<QuerySettings>;
     // flag whether to send new tracing header or not
@@ -108,9 +113,11 @@ export const queryApi = api.injectEndpoints({
             },
             StreamQueryParams
         >({
+            // eslint-disable-next-line complexity
             queryFn: async (
                 {
                     tabId,
+                    startTime,
                     query,
                     database,
                     querySettings = {},
@@ -120,7 +127,6 @@ export const queryApi = api.injectEndpoints({
                 },
                 {signal, dispatch, getState},
             ) => {
-                const startTime = Date.now();
                 dispatch(
                     setQueryResult({
                         tabId,
@@ -140,8 +146,6 @@ export const queryApi = api.injectEndpoints({
                 );
 
                 const finalQuery = prepareQueryWithPragmas(query, querySettings.pragmas);
-
-                const timeStart = Date.now();
 
                 try {
                     let streamDataChunkBatch: StreamDataChunk[] = [];
@@ -206,8 +210,8 @@ export const queryApi = api.injectEndpoints({
 
                     const queryStats: QueryStats = createExecuteQueryStats(
                         currentTabResult?.data ?? {},
-                        timeStart,
-                        'COMPLETED',
+                        startTime,
+                        'completed',
                     );
 
                     return {
@@ -224,8 +228,8 @@ export const queryApi = api.injectEndpoints({
 
                     const queryStats: QueryStats = createExecuteQueryStats(
                         currentTabResult?.data ?? {},
-                        timeStart,
-                        'FAILED',
+                        startTime,
+                        'failed',
                     );
                     const queryId = currentTabResult?.queryId || '';
 
@@ -241,7 +245,7 @@ export const queryApi = api.injectEndpoints({
 
                     if (currentTabResult?.startTime !== startTime) {
                         // This query is no longer current, don't update state
-                        return err;
+                        return {error: err};
                     }
 
                     dispatch(
@@ -260,7 +264,7 @@ export const queryApi = api.injectEndpoints({
                         }),
                     );
 
-                    return err;
+                    return {error: err};
                 }
             },
         }),
@@ -272,6 +276,7 @@ export const queryApi = api.injectEndpoints({
                 {
                     tabId,
                     actionType = 'execute',
+                    startTime,
                     query,
                     database,
                     querySettings = {},
@@ -282,7 +287,6 @@ export const queryApi = api.injectEndpoints({
                 },
                 {signal, dispatch, getState},
             ) => {
-                const startTime = Date.now();
                 dispatch(
                     setQueryResult({
                         tabId,
@@ -302,7 +306,6 @@ export const queryApi = api.injectEndpoints({
 
                 const finalQuery = prepareQueryWithPragmas(query, querySettings.pragmas);
 
-                const timeStart = Date.now();
                 try {
                     const response = await window.api.viewer.sendQuery(
                         {
@@ -327,7 +330,7 @@ export const queryApi = api.injectEndpoints({
                     if (isQueryErrorResponse(response)) {
                         const queryStats: QueryStats =
                             actionType === 'execute'
-                                ? createExecuteQueryStats({}, timeStart, 'FAILED')
+                                ? createExecuteQueryStats({}, startTime, 'failed')
                                 : {};
 
                         dispatch(
@@ -360,7 +363,7 @@ export const queryApi = api.injectEndpoints({
 
                     const queryStats: QueryStats =
                         actionType === 'execute'
-                            ? createExecuteQueryStats(data, timeStart, 'COMPLETED')
+                            ? createExecuteQueryStats(data, startTime, 'completed')
                             : {};
 
                     dispatch(
@@ -385,8 +388,8 @@ export const queryApi = api.injectEndpoints({
                         actionType === 'execute'
                             ? createExecuteQueryStats(
                                   currentTabResult?.data ?? {},
-                                  timeStart,
-                                  'FAILED',
+                                  startTime,
+                                  'failed',
                               )
                             : {};
 
@@ -401,7 +404,7 @@ export const queryApi = api.injectEndpoints({
 
                     if (currentTabResult?.startTime !== startTime) {
                         // This query is no longer current, don't update state
-                        return err;
+                        return {error: err};
                     }
 
                     dispatch(
@@ -418,7 +421,7 @@ export const queryApi = api.injectEndpoints({
                             },
                         }),
                     );
-                    return err;
+                    return {error: err};
                 }
             },
         }),

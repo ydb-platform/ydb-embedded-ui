@@ -9,18 +9,22 @@ import type {
 } from '../../../types/api/query';
 import type {IQueryResult, QueryAction} from '../../../types/store/query';
 
-export interface QueryInHistory {
+export type QueryExecutionStatusType = 'loading' | 'completed' | 'failed' | 'stopped' | 'aborted';
+
+export interface RawQueryInHistory {
     queryId: string;
     operationId?: string;
     realQueryId?: string;
     queryText: string;
     syntax?: string;
+    startTime?: number;
     endTime?: string | number;
     durationUs?: string | number;
+    status?: string;
 }
 
-export interface EnhancedQueryInHistory extends QueryInHistory {
-    startTime?: number;
+export interface QueryInHistory extends RawQueryInHistory {
+    status?: QueryExecutionStatusType;
 }
 
 export interface PreparedPlan {
@@ -100,8 +104,9 @@ export interface QueryState {
 }
 
 export interface QueryStats {
+    startTime?: number;
     durationUs?: string | number;
     endTime?: string | number;
-    status?: 'COMPLETED' | 'FAILED' | 'STOPPED';
+    status?: QueryExecutionStatusType;
     operationId?: string;
 }

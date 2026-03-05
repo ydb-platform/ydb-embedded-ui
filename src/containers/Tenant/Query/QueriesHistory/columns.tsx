@@ -5,9 +5,10 @@ import type {Column} from '@gravity-ui/react-data-table';
 import type {TextProps} from '@gravity-ui/uikit';
 import {ActionTooltip, Button, Flex, Icon, Text} from '@gravity-ui/uikit';
 
+import {QueryExecutionLabel} from '../../../../components/QueryExecutionLabel';
 import {YDBSyntaxHighlighter} from '../../../../components/SyntaxHighlighter/YDBSyntaxHighlighter';
 import type {YDBDefinitionListItem} from '../../../../components/YDBDefinitionList/YDBDefinitionList';
-import type {EnhancedQueryInHistory, QueryInHistory} from '../../../../store/reducers/query/types';
+import type {QueryInHistory} from '../../../../store/reducers/query/types';
 import {valueIsDefined} from '../../../../utils';
 import {EMPTY_DATA_PLACEHOLDER} from '../../../../utils/constants';
 import {formatDateTime, formatDurationMs} from '../../../../utils/dataFormatters/dataFormatters';
@@ -27,10 +28,15 @@ export function getColumns({openInEditor, saveQuery}: QueryActions) {
             name: 'startTime',
             header: i18n('history.startTime'),
             render: ({row}) => {
-                if (!valueIsDefined(row.endTime) || !valueIsDefined(row.durationUs)) {
+                let startTime: number | undefined;
+                if (valueIsDefined(row.startTime)) {
+                    startTime = row.startTime;
+                } else if (valueIsDefined(row.endTime) && valueIsDefined(row.durationUs)) {
+                    startTime = Number(row.endTime) - parseUsToMs(row.durationUs);
+                }
+                if (!valueIsDefined(startTime)) {
                     return EMPTY_DATA_PLACEHOLDER;
                 }
-                const startTime = Number(row.endTime) - parseUsToMs(row.durationUs);
                 return (
                     <Text variant="body-1" as="div">
                         {formatDateTime(startTime.toString())}
@@ -38,6 +44,17 @@ export function getColumns({openInEditor, saveQuery}: QueryActions) {
                 );
             },
             width: 200,
+            sortable: false,
+        },
+        {
+            name: 'Status',
+            header: i18n('history.status'),
+            render: ({row: {status}}) => {
+                if (!status) {
+                    return EMPTY_DATA_PLACEHOLDER;
+                }
+                return <QueryExecutionLabel status={status} size="xs" iconSize={12} />;
+            },
             sortable: false,
         },
         {
@@ -107,7 +124,7 @@ export function getColumns({openInEditor, saveQuery}: QueryActions) {
     return columns;
 }
 
-export function getQueryInfoItems(query: EnhancedQueryInHistory) {
+export function getQueryInfoItems(query: QueryInHistory) {
     const items: YDBDefinitionListItem[] = [];
 
     const {startTime, durationUs} = query;
