@@ -61,6 +61,7 @@ export const QueryExecutionStatus = ({
             streamingStatus={streamingStatus}
             className={className}
             value={formattedDuration}
+            qa="ydb-query-execution-status"
         />
     );
 };

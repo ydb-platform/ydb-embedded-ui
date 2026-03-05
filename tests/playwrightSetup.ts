@@ -71,7 +71,10 @@ async function warmupApplication(page: PageModel) {
         await runButton.click();
 
         // Wait for execution to complete
-        await page.page.waitForSelector('.kv-query-execution-status .g-text', {timeout: 15000});
+        await page.page.waitForSelector(
+            '[data-qa="ydb-query-execution-status"] .g-label__content',
+            {timeout: 15000},
+        );
     } catch {
         // Non-critical: query warmup failure doesn't block tests
     }

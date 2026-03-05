@@ -12,6 +12,7 @@ interface QueryExecutionLabelProps {
     value?: string;
     size?: LabelProps['size'];
     iconSize?: number;
+    qa?: string;
 }
 
 export const QueryExecutionLabel = ({
@@ -21,13 +22,14 @@ export const QueryExecutionLabel = ({
     value,
     size = 'm',
     iconSize = 16,
+    qa,
 }: QueryExecutionLabelProps) => {
     const {icon, label, theme} = getQueryExecutionLabelAppearance(status, streamingStatus, {
         iconSize,
     });
 
     return (
-        <Label theme={theme} size={size} className={className} icon={icon} value={value}>
+        <Label theme={theme} size={size} className={className} icon={icon} value={value} qa={qa}>
             {label}
         </Label>
     );

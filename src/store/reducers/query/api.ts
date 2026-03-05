@@ -1,6 +1,7 @@
 import {TracingLevelNumber} from '../../../types/api/query';
 import type {QueryAction, QueryRequestParams, QuerySettings} from '../../../types/store/query';
 import type {StreamDataChunk} from '../../../types/store/streaming';
+import {valueIsDefined} from '../../../utils';
 import {QUERY_TECHNICAL_MARK} from '../../../utils/constants';
 import {
     RESOURCE_POOL_NO_OVERRIDE_VALUE,
@@ -65,7 +66,7 @@ function createExecuteQueryStats(
     if (data.stats) {
         const {DurationUs, Executions: [{StartTimeMs}] = [{}]} = data.stats;
         return {
-            startTime: Number(StartTimeMs),
+            startTime: valueIsDefined(StartTimeMs) ? Number(StartTimeMs) : timeStart,
             durationUs: DurationUs,
             status,
         };
