@@ -121,11 +121,11 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
             selectedQuery ? (
                 <QueryDetails
                     queryText={selectedQuery.queryText}
-                    onOpenInEditor={() => applyQueryClick(selectedQuery)}
+                    onOpenInEditor={() => onQueryClick(selectedQuery)}
                     infoItems={getQueryInfoItems(selectedQuery)}
                 />
             ) : null,
-        [applyQueryClick, selectedQuery],
+        [onQueryClick, selectedQuery],
     );
 
     return (

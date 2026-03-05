@@ -132,7 +132,7 @@ export function getQueryInfoItems(query: QueryInHistory) {
     if (valueIsDefined(startTime)) {
         items.push({
             name: i18n('history.startTime'),
-            content: formatDateTime(query.startTime),
+            content: formatDateTime(startTime),
         });
     }
     if (valueIsDefined(durationUs)) {
