@@ -298,12 +298,12 @@ export function EditorTabs() {
                 <TabList size="m">{tabsOrder.map(renderEditorTab)}</TabList>
             </TabProvider>
             <Flex className={b('editor-tabs-actions')} alignItems="center" gap={1}>
-                <ActionTooltip title="New tab">
+                <ActionTooltip title={i18n('editor-tabs.action.new-tab')}>
                     <Button
                         view="flat-secondary"
                         size="xs"
                         onClick={handleNewTabClick}
-                        aria-label="New tab"
+                        aria-label={i18n('editor-tabs.action.new-tab')}
                     >
                         <Button.Icon>
                             <CirclePlus />

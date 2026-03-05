@@ -1,3 +1,6 @@
 {
-  "description_default-error": "Unknown error occurred"
+  "description_default-error": "Unknown error occurred",
+  "action_show-password": "Show password",
+  "action_hide-password": "Hide password",
+  "action_close": "Close"
 }

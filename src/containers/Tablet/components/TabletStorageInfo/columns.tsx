@@ -31,12 +31,22 @@ function GroupIdCell<TData>({row, name, hasExpand}: GroupIdCellProps<TData>) {
     return (
         <Flex gap={1} alignItems="flex-start" className={b('name-wrapper')}>
             {isExpandable && (
-                <ActionTooltip title={isExpanded ? 'Collapse' : 'Expand'}>
+                <ActionTooltip
+                    title={
+                        isExpanded
+                            ? tabletInfoKeyset('action_collapse')
+                            : tabletInfoKeyset('action_expand')
+                    }
+                >
                     <Button
                         view="flat"
                         size="xs"
                         onClick={row.getToggleExpandedHandler()}
-                        aria-label={isExpanded ? 'Collapse' : 'Expand'}
+                        aria-label={
+                            isExpanded
+                                ? tabletInfoKeyset('action_collapse')
+                                : tabletInfoKeyset('action_expand')
+                        }
                     >
                         <Button.Icon>
                             <ArrowToggle direction={isExpanded ? 'bottom' : 'right'} size={14} />

@@ -129,17 +129,17 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
                         <TruncatedQuery value={query.body} maxQueryHeight={MAX_QUERY_HEIGHT} />
                     </div>
                     <span className={b('controls')}>
-                        <ActionTooltip title={'Edit'}>
-                            <Button view="flat-secondary" aria-label="Edit">
+                        <ActionTooltip title={i18n('action.edit')}>
+                            <Button view="flat-secondary" aria-label={i18n('action.edit')}>
                                 <Icon data={Pencil} />
                             </Button>
                         </ActionTooltip>
 
-                        <ActionTooltip title="Delete">
+                        <ActionTooltip title={i18n('delete-dialog.delete')}>
                             <Button
                                 view="flat-secondary"
                                 onClick={onDeleteQueryClick(query.name)}
-                                aria-label="Delete"
+                                aria-label={i18n('delete-dialog.delete')}
                             >
                                 <Icon data={TrashBin} />
                             </Button>

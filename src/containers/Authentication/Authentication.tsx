@@ -170,12 +170,22 @@ function Authentication({closable = false}: AuthenticationProps) {
                         onKeyDown={onEnterClick}
                         size="l"
                     />
-                    <ActionTooltip title={showPassword ? 'Hide password' : 'Show password'}>
+                    <ActionTooltip
+                        title={
+                            showPassword
+                                ? i18n('action_hide-password')
+                                : i18n('action_show-password')
+                        }
+                    >
                         <Button
                             onClick={onTogglePasswordVisibility}
                             size="l"
                             className={b('show-password-button')}
-                            aria-label={showPassword ? 'Hide password' : 'Show password'}
+                            aria-label={
+                                showPassword
+                                    ? i18n('action_hide-password')
+                                    : i18n('action_show-password')
+                            }
                         >
                             <Icon data={showPassword ? EyeSlash : Eye} size={16} />
                         </Button>
@@ -208,8 +218,12 @@ function Authentication({closable = false}: AuthenticationProps) {
                 <div className={b('general-error')}>{generalError}</div>
             </form>
             {closable && history.length > 1 && (
-                <ActionTooltip title="Close">
-                    <Button onClick={onClose} className={b('close')} aria-label="Close">
+                <ActionTooltip title={i18n('action_close')}>
+                    <Button
+                        onClick={onClose}
+                        className={b('close')}
+                        aria-label={i18n('action_close')}
+                    >
                         <Icon data={Xmark} size={24} />
                     </Button>
                 </ActionTooltip>

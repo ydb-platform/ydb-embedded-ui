@@ -6,6 +6,7 @@ import type {Row} from '@tanstack/react-table';
 import type {SimlifiedPlanOperatorOtherParams} from '../../../../../../types/api/query';
 
 import {OperationParams} from './OperationParams';
+import {tabletInfoKeyset} from './i18n';
 import {block} from './utils';
 
 const LEVEL_PADDING = 25;
@@ -101,12 +102,22 @@ export function OperationCell<TData>({row, depth = 0, params}: OperationCellProp
             {dividers}
             <Flex gap={1} className={block('operation-content')}>
                 {isExpandable && (
-                    <ActionTooltip title={isExpanded ? 'Collapse' : 'Expand'}>
+                    <ActionTooltip
+                        title={
+                            isExpanded
+                                ? tabletInfoKeyset('action_collapse')
+                                : tabletInfoKeyset('action_expand')
+                        }
+                    >
                         <Button
                             view="flat"
                             size="xs"
                             onClick={row.getToggleExpandedHandler()}
-                            aria-label={isExpanded ? 'Collapse' : 'Expand'}
+                            aria-label={
+                                isExpanded
+                                    ? tabletInfoKeyset('action_collapse')
+                                    : tabletInfoKeyset('action_expand')
+                            }
                         >
                             <Button.Icon>
                                 <ArrowToggle

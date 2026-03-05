@@ -49,6 +49,7 @@
   "action.stop": "Stop",
   "action.run": "Run",
   "action.explain": "Explain",
+  "action.edit": "Edit",
   "action.open-shortcuts": "Open Keyboard Shortcuts Panel",
 
   "editor-tabs.untitled": "Untitled",
