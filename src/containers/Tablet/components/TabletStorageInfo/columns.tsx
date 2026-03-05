@@ -1,4 +1,4 @@
-import {ArrowToggle, Button, Flex} from '@gravity-ui/uikit';
+import {ActionTooltip, ArrowToggle, Button, Flex} from '@gravity-ui/uikit';
 import type {CellContext, ColumnDef, Row} from '@tanstack/react-table';
 
 import {ColumnHeader} from '../../../../components/Table/Table';
@@ -26,17 +26,23 @@ interface GroupIdCellProps<TData> {
 
 function GroupIdCell<TData>({row, name, hasExpand}: GroupIdCellProps<TData>) {
     const isExpandable = row.getCanExpand();
+    const isExpanded = row.getIsExpanded();
+
     return (
         <Flex gap={1} alignItems="flex-start" className={b('name-wrapper')}>
             {isExpandable && (
-                <Button view="flat" size="xs" onClick={row.getToggleExpandedHandler()}>
-                    <Button.Icon>
-                        <ArrowToggle
-                            direction={row.getIsExpanded() ? 'bottom' : 'right'}
-                            size={14}
-                        />
-                    </Button.Icon>
-                </Button>
+                <ActionTooltip title={isExpanded ? 'Collapse' : 'Expand'}>
+                    <Button
+                        view="flat"
+                        size="xs"
+                        onClick={row.getToggleExpandedHandler()}
+                        aria-label={isExpanded ? 'Collapse' : 'Expand'}
+                    >
+                        <Button.Icon>
+                            <ArrowToggle direction={isExpanded ? 'bottom' : 'right'} size={14} />
+                        </Button.Icon>
+                    </Button>
+                </ActionTooltip>
             )}
             <div className={b('name-content', {'no-control': hasExpand && !isExpandable})}>
                 {name}
