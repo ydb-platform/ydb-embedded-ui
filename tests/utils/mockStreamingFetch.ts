@@ -111,8 +111,17 @@ export async function setupMockStreamingFetch(
                 }
 
                 function encodePart(json: string): Uint8Array {
-                    const body = `--${BOUNDARY}\r\nContent-Type: application/json\r\nContent-Length: ${json.length}\r\n\r\n${json}\r\n`;
-                    return encoder.encode(body);
+                    const jsonBytes = encoder.encode(json);
+                    const header = `--${BOUNDARY}\r\nContent-Type: application/json\r\nContent-Length: ${jsonBytes.byteLength}\r\n\r\n`;
+                    const headerBytes = encoder.encode(header);
+                    const suffix = encoder.encode('\r\n');
+                    const part = new Uint8Array(
+                        headerBytes.byteLength + jsonBytes.byteLength + suffix.byteLength,
+                    );
+                    part.set(headerBytes, 0);
+                    part.set(jsonBytes, headerBytes.byteLength);
+                    part.set(suffix, headerBytes.byteLength + jsonBytes.byteLength);
+                    return part;
                 }
 
                 function encodeClosingBoundary(): Uint8Array {
@@ -123,7 +132,7 @@ export async function setupMockStreamingFetch(
                 const shouldError = errorAfter !== null;
                 const chunkLimit = shouldError ? errorAfter : total;
 
-                let intervalId: ReturnType<typeof setInterval>;
+                let intervalId: number;
                 let chunkIndex = 0;
 
                 const stream = new ReadableStream<Uint8Array>({
@@ -132,11 +141,11 @@ export async function setupMockStreamingFetch(
                         controller.enqueue(encodePart(sessionJSON));
 
                         // Deliver data chunks at steady intervals
-                        intervalId = setInterval(() => {
+                        intervalId = window.setInterval(() => {
                             try {
                                 // Check if we should terminate
                                 if (chunkLimit !== null && chunkIndex >= chunkLimit) {
-                                    clearInterval(intervalId);
+                                    window.clearInterval(intervalId);
                                     const responseJSON = shouldError
                                         ? errorResponseJSON
                                         : queryResponseJSON;
@@ -149,14 +158,13 @@ export async function setupMockStreamingFetch(
                                 controller.enqueue(encodePart(dataChunkJSON(chunkIndex)));
                                 chunkIndex++;
                             } catch {
-                                clearInterval(intervalId);
+                                window.clearInterval(intervalId);
                             }
                         }, interval);
 
-                        // React to AbortSignal
                         if (signal) {
-                            signal.addEventListener('abort', () => {
-                                clearInterval(intervalId);
+                            const onAbort = () => {
+                                window.clearInterval(intervalId);
                                 try {
                                     controller.error(
                                         new DOMException(
@@ -167,11 +175,18 @@ export async function setupMockStreamingFetch(
                                 } catch {
                                     // stream may already be errored/closed
                                 }
-                            });
+                            };
+
+                            if (signal.aborted) {
+                                onAbort();
+                                return;
+                            }
+
+                            signal.addEventListener('abort', onAbort, {once: true});
                         }
                     },
                     cancel() {
-                        clearInterval(intervalId);
+                        window.clearInterval(intervalId);
                     },
                 });
 

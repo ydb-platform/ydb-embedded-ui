@@ -135,9 +135,8 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.resultTable.getResultTitleText()).resolves.toMatch(
             /^(Result|Truncated)$/,
         );
-        await expect(
-            Promise.resolve(Number(await queryEditor.resultTable.getResultTitleCount())),
-        ).resolves.toBeGreaterThan(0);
+        const resultCount = Number(await queryEditor.resultTable.getResultTitleCount());
+        expect(resultCount).toBeGreaterThan(0);
         const resultView = queryEditor.resultTable.getResultWrapperLocator();
         await expect(resultView).toHaveScreenshot('streaming-query-completed.png');
     });
@@ -176,9 +175,8 @@ test.describe('Test Query Editor', async () => {
 
         await expect(queryEditor.isStopBannerVisible()).resolves.toBe(true);
         await expect(queryEditor.resultTable.getResultTitleText()).resolves.toBe('Result');
-        await expect(
-            Promise.resolve(Number(await queryEditor.resultTable.getResultTitleCount())),
-        ).resolves.toBeGreaterThan(0);
+        const stoppedResultCount = Number(await queryEditor.resultTable.getResultTitleCount());
+        expect(stoppedResultCount).toBeGreaterThan(0);
         await expect(queryEditor.waitForStatus('Stopped')).resolves.toBe(true);
     });
 
