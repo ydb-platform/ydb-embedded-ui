@@ -10,7 +10,7 @@ jobs:
   e2e_tests:
     name: Playwright Tests (${{ matrix.shard }}/${{ matrix.shardTotal }})
     timeout-minutes: 30
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     permissions:
       contents: read
     strategy:
@@ -59,7 +59,7 @@ jobs:
     name: Merge Playwright Reports
     if: always()
     needs: [e2e_tests]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -95,7 +95,7 @@ jobs:
 
   bundle_size:
     name: Check Bundle Size
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     if: github.event_name == 'pull_request'
     outputs:
       current_size: ${{ steps.current_size.outputs.size }}
@@ -160,7 +160,7 @@ jobs:
     name: Deploy Test Report
     needs: [merge_reports]
     if: always() && (github.event_name == 'push' && github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository))
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     permissions:
       contents: write
       pages: write
@@ -212,7 +212,7 @@ jobs:
     name: Update PR Description
     needs: [merge_reports, bundle_size]
     if: always() && github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     permissions:
       pull-requests: write
 

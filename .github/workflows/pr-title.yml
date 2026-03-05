@@ -13,7 +13,7 @@ on:
 jobs:
   verify_title:
     name: Verify Title
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     if: ${{github.event.action != 'checks_requested'}}
     steps:
       - name: Checkout

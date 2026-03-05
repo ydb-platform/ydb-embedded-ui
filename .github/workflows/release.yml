@@ -16,7 +16,7 @@ permissions:
 jobs:
   release:
     if: github.repository == 'ydb-platform/ydb-embedded-ui'
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     env:
       ASSET_NAME: embedded-ui
     steps:

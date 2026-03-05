@@ -6,7 +6,7 @@ on:
 
 jobs:
   update-priority:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64]
     steps:
       - name: Update CalculatedPriority field
         uses: actions/github-script@v7
