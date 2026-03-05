@@ -3,7 +3,10 @@ import {expect, test} from '@playwright/test';
 import {QUERY_MODES, STATISTICS_MODES} from '../../../../src/utils/query';
 import {getClipboardContent} from '../../../utils/clipboard';
 import {database} from '../../../utils/constants';
-import {setupMockStreamingFetch} from '../../../utils/mockStreamingFetch';
+import {
+    cleanupMockStreamingFetch,
+    setupMockStreamingFetch,
+} from '../../../utils/mockStreamingFetch';
 import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {NavigationTabs, TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 import {
@@ -35,6 +38,10 @@ test.describe('Test Query Editor', async () => {
 
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
+    });
+
+    test.afterEach(async ({page}) => {
+        await cleanupMockStreamingFetch(page);
     });
 
     test('Run button executes YQL script', async ({page}) => {

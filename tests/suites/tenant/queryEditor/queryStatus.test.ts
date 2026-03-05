@@ -2,7 +2,10 @@ import {expect, test} from '@playwright/test';
 
 import {STATISTICS_MODES} from '../../../../src/utils/query';
 import {database} from '../../../utils/constants';
-import {setupMockStreamingFetch} from '../../../utils/mockStreamingFetch';
+import {
+    cleanupMockStreamingFetch,
+    setupMockStreamingFetch,
+} from '../../../utils/mockStreamingFetch';
 import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {TenantPage} from '../TenantPage';
 import {longRunningQuery} from '../constants';
@@ -21,6 +24,10 @@ test.describe('Test Query Execution Status', async () => {
 
         const tenantPage = new TenantPage(page);
         await tenantPage.goto(pageQueryParams);
+    });
+
+    test.afterEach(async ({page}) => {
+        await cleanupMockStreamingFetch(page);
     });
 
     test('No query status when no query was executed', async ({page}) => {

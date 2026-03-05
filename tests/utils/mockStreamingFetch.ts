@@ -42,6 +42,7 @@ export async function setupMockStreamingFetch(
     await page.evaluate(
         ({chunkIntervalMs: interval, totalChunks: total, errorAfterChunks: errorAfter}) => {
             const originalFetch = window.fetch;
+            (window as unknown as Record<string, unknown>).__originalFetch = originalFetch;
 
             window.fetch = function (
                 input: RequestInfo | URL,
@@ -132,7 +133,7 @@ export async function setupMockStreamingFetch(
                 const shouldError = errorAfter !== null;
                 const chunkLimit = shouldError ? errorAfter : total;
 
-                let intervalId: number;
+                let intervalId: number | undefined;
                 let chunkIndex = 0;
 
                 const stream = new ReadableStream<Uint8Array>({
@@ -157,8 +158,15 @@ export async function setupMockStreamingFetch(
 
                                 controller.enqueue(encodePart(dataChunkJSON(chunkIndex)));
                                 chunkIndex++;
-                            } catch {
+                            } catch (error) {
                                 window.clearInterval(intervalId);
+                                try {
+                                    controller.error(
+                                        error instanceof Error ? error : new Error(String(error)),
+                                    );
+                                } catch {
+                                    // stream may already be errored/closed
+                                }
                             }
                         }, interval);
 
@@ -200,4 +208,18 @@ export async function setupMockStreamingFetch(
         },
         {chunkIntervalMs, totalChunks, errorAfterChunks},
     );
+}
+
+/**
+ * Restores the original `window.fetch` that was captured by `setupMockStreamingFetch`.
+ * Safe to call even if the mock was never installed (no-op in that case).
+ */
+export async function cleanupMockStreamingFetch(page: Page): Promise<void> {
+    await page.evaluate(() => {
+        const w = window as unknown as Record<string, unknown>;
+        if (typeof w.__originalFetch === 'function') {
+            window.fetch = w.__originalFetch as typeof window.fetch;
+            delete w.__originalFetch;
+        }
+    });
 }
