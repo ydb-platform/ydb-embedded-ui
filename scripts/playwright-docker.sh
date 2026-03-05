@@ -27,4 +27,18 @@ docker run --rm --network host \
   -e PLAYWRIGHT_APP_BACKEND="${PLAYWRIGHT_APP_BACKEND:-}" \
   -e PLAYWRIGHT_BASE_URL="${PLAYWRIGHT_BASE_URL:-}" \
   "${DOCKER_IMAGE}" \
-  /bin/bash -c 'npm ci && npx playwright test --config=playwright.config.ts "$@"' -- "$@"
+  /bin/bash -c '
+    LOCK_HASH=$(sha256sum package-lock.json | cut -d" " -f1)
+    STORED_HASH=""
+    if [ -f node_modules/.package-lock-hash ]; then
+      STORED_HASH=$(cat node_modules/.package-lock-hash)
+    fi
+    if [ "$LOCK_HASH" != "$STORED_HASH" ]; then
+      echo "package-lock.json changed, running npm ci..."
+      npm ci
+      echo "$LOCK_HASH" > node_modules/.package-lock-hash
+    else
+      echo "node_modules up to date, skipping npm ci"
+    fi
+    npx playwright test --config=playwright.config.ts "$@"
+  ' -- "$@"
