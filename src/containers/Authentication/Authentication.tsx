@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {Eye, EyeSlash, Xmark} from '@gravity-ui/icons';
-import {Button, Link as ExternalLink, Icon, TextInput} from '@gravity-ui/uikit';
+import {ActionTooltip, Button, Link as ExternalLink, Icon, TextInput} from '@gravity-ui/uikit';
 import {useHistory, useLocation} from 'react-router-dom';
 
 import {parseQuery} from '../../routes';
@@ -170,13 +170,16 @@ function Authentication({closable = false}: AuthenticationProps) {
                         onKeyDown={onEnterClick}
                         size="l"
                     />
-                    <Button
-                        onClick={onTogglePasswordVisibility}
-                        size="l"
-                        className={b('show-password-button')}
-                    >
-                        <Icon data={showPassword ? EyeSlash : Eye} size={16} />
-                    </Button>
+                    <ActionTooltip title={showPassword ? 'Hide password' : 'Show password'}>
+                        <Button
+                            onClick={onTogglePasswordVisibility}
+                            size="l"
+                            className={b('show-password-button')}
+                            aria-label={showPassword ? 'Hide password' : 'Show password'}
+                        >
+                            <Icon data={showPassword ? EyeSlash : Eye} size={16} />
+                        </Button>
+                    </ActionTooltip>
                 </div>
                 {needDatabase && (
                     <div className={b('field-wrapper')}>
@@ -205,9 +208,11 @@ function Authentication({closable = false}: AuthenticationProps) {
                 <div className={b('general-error')}>{generalError}</div>
             </form>
             {closable && history.length > 1 && (
-                <Button onClick={onClose} className={b('close')}>
-                    <Icon data={Xmark} size={24} />
-                </Button>
+                <ActionTooltip title="Close">
+                    <Button onClick={onClose} className={b('close')} aria-label="Close">
+                        <Icon data={Xmark} size={24} />
+                    </Button>
+                </ActionTooltip>
             )}
         </section>
     );
