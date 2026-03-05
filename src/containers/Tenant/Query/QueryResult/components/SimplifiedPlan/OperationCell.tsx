@@ -4,9 +4,9 @@ import {ActionTooltip, ArrowToggle, Button, Flex} from '@gravity-ui/uikit';
 import type {Row} from '@tanstack/react-table';
 
 import type {SimlifiedPlanOperatorOtherParams} from '../../../../../../types/api/query';
+import i18n from '../../../i18n';
 
 import {OperationParams} from './OperationParams';
-import {tabletInfoKeyset} from './i18n';
 import {block} from './utils';
 
 const LEVEL_PADDING = 25;
@@ -102,22 +102,12 @@ export function OperationCell<TData>({row, depth = 0, params}: OperationCellProp
             {dividers}
             <Flex gap={1} className={block('operation-content')}>
                 {isExpandable && (
-                    <ActionTooltip
-                        title={
-                            isExpanded
-                                ? tabletInfoKeyset('action_collapse')
-                                : tabletInfoKeyset('action_expand')
-                        }
-                    >
+                    <ActionTooltip title={i18n(isExpanded ? 'action.collapse' : 'action.expand')}>
                         <Button
                             view="flat"
                             size="xs"
                             onClick={row.getToggleExpandedHandler()}
-                            aria-label={
-                                isExpanded
-                                    ? tabletInfoKeyset('action_collapse')
-                                    : tabletInfoKeyset('action_expand')
-                            }
+                            aria-label={i18n(isExpanded ? 'action.collapse' : 'action.expand')}
                         >
                             <Button.Icon>
                                 <ArrowToggle

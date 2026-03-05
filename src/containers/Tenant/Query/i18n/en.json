@@ -50,6 +50,8 @@
   "action.run": "Run",
   "action.explain": "Explain",
   "action.edit": "Edit",
+  "action.expand": "Expand",
+  "action.collapse": "Collapse",
   "action.open-shortcuts": "Open Keyboard Shortcuts Panel",
 
   "editor-tabs.untitled": "Untitled",
