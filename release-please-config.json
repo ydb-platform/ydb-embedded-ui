@@ -6,7 +6,7 @@
   "pull-request-title-pattern": "chore(${branch}): release ${version}",
   "packages": {
     ".": {
-      "release-as": "14.9.1-hotfix.1" // The string you need to add
+      "release-as": "14.9.1-hotfix.1"
     }
   }
 }
