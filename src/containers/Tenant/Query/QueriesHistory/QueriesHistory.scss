@@ -15,7 +15,7 @@
 
     @include mixins.flex-container();
 
-    @include mixins.freeze-nth-column(4, 0, 0, 'right');
+    @include mixins.freeze-nth-column(5, 0, 0, 'right');
 
     .data-table__th {
         height: 40px;
