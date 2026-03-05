@@ -1,6 +1,7 @@
 import {TracingLevelNumber} from '../../../types/api/query';
 import type {QueryAction, QueryRequestParams, QuerySettings} from '../../../types/store/query';
 import type {StreamDataChunk} from '../../../types/store/streaming';
+import {valueIsDefined} from '../../../utils';
 import {QUERY_TECHNICAL_MARK} from '../../../utils/constants';
 import {
     MAX_QUERY_TIMEOUT_SECONDS,
@@ -68,14 +69,19 @@ function getResourcePoolParam(resourcePool: unknown): string | undefined {
 function createExecuteQueryStats(
     data: ReturnType<typeof prepareQueryData>,
     timeStart: number,
+    status?: QueryStats['status'],
 ): QueryStats {
     if (data.stats) {
-        const {DurationUs, Executions: [{FinishTimeMs}] = [{}]} = data.stats;
-        return {durationUs: DurationUs, endTime: FinishTimeMs};
+        const {DurationUs, Executions: [{StartTimeMs}] = [{}]} = data.stats;
+        return {
+            startTime: valueIsDefined(StartTimeMs) ? Number(StartTimeMs) : timeStart,
+            durationUs: DurationUs,
+            status,
+        };
     }
 
     const now = Date.now();
-    return {durationUs: (now - timeStart) * 1000, endTime: now};
+    return {startTime: timeStart, durationUs: (now - timeStart) * 1000, status};
 }
 
 const getResourcePoolsQueryText = () => {
@@ -91,6 +97,8 @@ interface SendQueryParams extends QueryRequestParams {
     tabId: string;
     actionType?: QueryAction;
     queryId: string;
+    startTime: number;
+    historyQueryId?: string;
     querySettings?: Partial<QuerySettings>;
     // flag whether to send new tracing header or not
     // default: not send
@@ -105,12 +113,29 @@ const DEFAULT_CONCURRENT_RESULTS = false;
 
 export const queryApi = api.injectEndpoints({
     endpoints: (build) => ({
-        useStreamQuery: build.mutation<null, StreamQueryParams>({
+        useStreamQuery: build.mutation<
+            {
+                queryStats: QueryStats;
+                queryId: string | undefined;
+                operationId: string | undefined;
+                historyQueryId?: string;
+            },
+            StreamQueryParams
+        >({
+            // eslint-disable-next-line complexity
             queryFn: async (
-                {tabId, query, database, querySettings = {}, enableTracingLevel, base64},
+                {
+                    tabId,
+                    startTime,
+                    query,
+                    database,
+                    querySettings = {},
+                    enableTracingLevel,
+                    base64,
+                    historyQueryId,
+                },
                 {signal, dispatch, getState},
             ) => {
-                const startTime = Date.now();
                 dispatch(
                     setQueryResult({
                         tabId,
@@ -189,14 +214,49 @@ export const queryApi = api.injectEndpoints({
                         flushBatch();
                     }
 
-                    return {data: null};
+                    const state = getState() as RootState;
+                    const currentTabResult = state.query.tabsById[tabId]?.result;
+
+                    const queryStats: QueryStats = createExecuteQueryStats(
+                        currentTabResult?.data ?? {},
+                        startTime,
+                        'completed',
+                    );
+
+                    return {
+                        data: {
+                            queryStats,
+                            queryId: currentTabResult?.queryId,
+                            operationId: currentTabResult?.operationId,
+                            historyQueryId,
+                        },
+                    };
                 } catch (error) {
                     const state = getState() as RootState;
                     const currentTabResult = state.query.tabsById[tabId]?.result;
+
+                    const queryStats: QueryStats = createExecuteQueryStats(
+                        currentTabResult?.data ?? {},
+                        startTime,
+                        'failed',
+                    );
+                    const queryId = currentTabResult?.queryId || '';
+
+                    const err = {
+                        error,
+                        extra: {
+                            queryStats,
+                            queryId,
+                            operationId: currentTabResult?.operationId,
+                            historyQueryId,
+                        },
+                    };
+
                     if (currentTabResult?.startTime !== startTime) {
                         // This query is no longer current, don't update state
-                        return {error};
+                        return {error: err};
                     }
+
                     dispatch(
                         setQueryResult({
                             tabId,
@@ -212,25 +272,30 @@ export const queryApi = api.injectEndpoints({
                             },
                         }),
                     );
-                    return {error};
+
+                    return {error: err};
                 }
             },
         }),
-        useSendQuery: build.mutation<{queryStats: QueryStats; queryId: string}, SendQueryParams>({
+        useSendQuery: build.mutation<
+            {queryStats: QueryStats; queryId: string; historyQueryId?: string},
+            SendQueryParams
+        >({
             queryFn: async (
                 {
                     tabId,
                     actionType = 'execute',
+                    startTime,
                     query,
                     database,
                     querySettings = {},
                     enableTracingLevel,
                     queryId,
                     base64,
+                    historyQueryId,
                 },
                 {signal, dispatch, getState},
             ) => {
-                const startTime = Date.now();
                 dispatch(
                     setQueryResult({
                         tabId,
@@ -251,7 +316,6 @@ export const queryApi = api.injectEndpoints({
                 const finalQuery = prepareQueryWithPragmas(query, querySettings.pragmas);
 
                 try {
-                    const timeStart = Date.now();
                     const response = await window.api.viewer.sendQuery(
                         {
                             query: finalQuery,
@@ -273,6 +337,11 @@ export const queryApi = api.injectEndpoints({
                     );
 
                     if (isQueryErrorResponse(response)) {
+                        const queryStats: QueryStats =
+                            actionType === 'execute'
+                                ? createExecuteQueryStats({}, startTime, 'failed')
+                                : {};
+
                         dispatch(
                             setQueryResult({
                                 tabId,
@@ -286,14 +355,25 @@ export const queryApi = api.injectEndpoints({
                                 },
                             }),
                         );
-                        return {error: response};
+                        return {
+                            error: {
+                                error: response,
+                                extra: {
+                                    queryStats,
+                                    queryId,
+                                    historyQueryId,
+                                },
+                            },
+                        };
                     }
 
                     const data = prepareQueryData(response);
                     data.traceId = response?._meta?.traceId;
 
                     const queryStats: QueryStats =
-                        actionType === 'execute' ? createExecuteQueryStats(data, timeStart) : {};
+                        actionType === 'execute'
+                            ? createExecuteQueryStats(data, startTime, 'completed')
+                            : {};
 
                     dispatch(
                         setQueryResult({
@@ -308,17 +388,39 @@ export const queryApi = api.injectEndpoints({
                             },
                         }),
                     );
-                    return {data: {queryStats, queryId}};
+                    return {data: {queryStats, queryId, historyQueryId}};
                 } catch (error) {
                     const state = getState() as RootState;
-                    if (state.query.tabsById[tabId]?.result?.startTime !== startTime) {
+                    const currentTabResult = state.query.tabsById[tabId]?.result;
+
+                    const queryStats: QueryStats =
+                        actionType === 'execute'
+                            ? createExecuteQueryStats(
+                                  currentTabResult?.data ?? {},
+                                  startTime,
+                                  'failed',
+                              )
+                            : {};
+
+                    const err = {
+                        error,
+                        extra: {
+                            queryStats,
+                            queryId,
+                            historyQueryId,
+                        },
+                    };
+
+                    if (currentTabResult?.startTime !== startTime) {
                         // This query is no longer current, don't update state
-                        return {error};
+                        return {error: err};
                     }
+
                     dispatch(
                         setQueryResult({
                             tabId,
                             result: {
+                                ...currentTabResult,
                                 type: actionType,
                                 error,
                                 isLoading: false,
@@ -328,7 +430,7 @@ export const queryApi = api.injectEndpoints({
                             },
                         }),
                     );
-                    return {error};
+                    return {error: err};
                 }
             },
         }),

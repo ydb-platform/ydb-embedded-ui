@@ -8,8 +8,9 @@ import type {
     StreamDataChunk,
     StreamingChunk,
 } from '../../../types/store/streaming';
+import {valueIsDefined} from '../../../utils';
 
-import type {QueryInHistory} from './types';
+import type {QueryExecutionStatusType, QueryInHistory, RawQueryInHistory} from './types';
 
 export function getActionAndSyntaxFromQueryMode(
     baseAction: QueryAction = 'execute',
@@ -28,7 +29,22 @@ export function getActionAndSyntaxFromQueryMode(
     return {action, syntax};
 }
 
-export function getQueryInHistory(rawQuery: string | QueryInHistory) {
+const QUERY_EXECUTION_STATUS_VALUES: QueryExecutionStatusType[] = [
+    'loading',
+    'completed',
+    'failed',
+    'stopped',
+    'aborted',
+];
+
+function isQueryExecutionStatusType(value: unknown): value is QueryExecutionStatusType {
+    return (
+        typeof value === 'string' &&
+        QUERY_EXECUTION_STATUS_VALUES.includes(value as QueryExecutionStatusType)
+    );
+}
+
+export function getQueryInHistory(rawQuery: string | RawQueryInHistory): QueryInHistory {
     if (typeof rawQuery === 'string') {
         return {
             queryText: rawQuery,
@@ -36,13 +52,22 @@ export function getQueryInHistory(rawQuery: string | QueryInHistory) {
         };
     }
 
-    if (rawQuery.queryId) {
-        return rawQuery;
-    }
-    return {
+    const enhancedQuery: QueryInHistory = {
         ...rawQuery,
-        queryId: uuidv4(),
+        status: isQueryExecutionStatusType(rawQuery.status) ? rawQuery.status : undefined,
     };
+    if (
+        !valueIsDefined(enhancedQuery.startTime) &&
+        valueIsDefined(enhancedQuery.durationUs) &&
+        valueIsDefined(enhancedQuery.endTime)
+    ) {
+        enhancedQuery.startTime =
+            Number(enhancedQuery.endTime) - Math.round(Number(enhancedQuery.durationUs) / 1000);
+    }
+    if (!enhancedQuery.queryId) {
+        enhancedQuery.queryId = uuidv4();
+    }
+    return enhancedQuery;
 }
 
 export function isSessionChunk(content: StreamingChunk): content is SessionChunk {

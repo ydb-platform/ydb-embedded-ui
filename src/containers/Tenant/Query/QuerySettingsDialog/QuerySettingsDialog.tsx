@@ -22,9 +22,9 @@ import {
 } from '../../../../utils/hooks';
 import type {ResourcePoolValue} from '../../../../utils/query';
 import {
-    QUERY_MODES,
     RESOURCE_POOL_NO_OVERRIDE_VALUE,
     STATISTICS_MODES_WITH_SVG,
+    isStreamingSupportedForMode,
     querySettingsValidationSchema,
 } from '../../../../utils/query';
 import {useCurrentSchema} from '../../TenantContext';
@@ -359,7 +359,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                 onToggle={(enabled) => field.onChange(enabled ? '' : null)}
                                 validationState={errors.timeout ? 'invalid' : undefined}
                                 errorMessage={errors.timeout?.message}
-                                isDisabled={queryMode !== QUERY_MODES.query}
+                                isDisabled={!isStreamingSupportedForMode(queryMode)}
                             />
                         )}
                     />

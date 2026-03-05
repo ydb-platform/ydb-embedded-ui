@@ -4,6 +4,15 @@ import type {IResponseError, NetworkError} from '../types/api/error';
 import type {TIssueMessage} from '../types/api/operations';
 import type {IssueMessage} from '../types/api/query';
 
+export function isAbortError(error: unknown): error is {name: 'AbortError'} {
+    return (
+        typeof error === 'object' &&
+        error !== null &&
+        'name' in error &&
+        error.name === 'AbortError'
+    );
+}
+
 export function isResponseError(error: unknown): error is IResponseError {
     if (!error || typeof error !== 'object') {
         return false;

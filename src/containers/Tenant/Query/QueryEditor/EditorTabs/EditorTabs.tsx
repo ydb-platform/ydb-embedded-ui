@@ -221,7 +221,8 @@ export function EditorTabs() {
         (tabId: string) => {
             handleActivateTab(tabId);
             const tab = tabsById[tabId];
-            const commonModalProps = {savedQueries, onSaveQuery: saveQuery} as const;
+            const queryBody = tab?.input ?? '';
+            const commonModalProps = {savedQueries, onSaveQuery: saveQuery, queryBody} as const;
 
             if (tab?.isTitleUserDefined) {
                 NiceModal.show(SAVE_QUERY_DIALOG, {

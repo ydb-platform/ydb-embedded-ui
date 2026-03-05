@@ -1,7 +1,9 @@
+import type {EStatusCode, ExecMode, ExecStatus} from '../api/operations';
 import type {
     ArrayRow,
     ColumnType,
     ErrorResponse,
+    IssueMessage,
     QueryPlan,
     ScriptPlan,
     TKqpStatsQuery,
@@ -17,6 +19,31 @@ export interface SessionChunk {
         // Custom client-set property.
         trace_id?: string;
     };
+}
+
+export interface ScriptResponseChunk {
+    status: EStatusCode;
+    exec_status: ExecStatus;
+    exec_mode: ExecMode;
+
+    operation_id?: string;
+    execution_id?: string;
+
+    issues?: {
+        issues?: IssueMessage[];
+    };
+
+    meta?: {
+        event: 'ScriptResponse';
+    };
+}
+
+export interface OperationResponseChunk {
+    meta?: {
+        event: 'OperationResponse';
+    };
+    ready: boolean;
+    id: string;
 }
 
 export interface KeepAliveChunk {
@@ -57,4 +84,10 @@ export interface BaseQueryResponseChunk {
 export type QueryResponseChunk = BaseQueryResponseChunk &
     (SuccessQueryResponseData | ErrorQueryResponseData);
 
-export type StreamingChunk = SessionChunk | StreamDataChunk | QueryResponseChunk | KeepAliveChunk;
+export type StreamingChunk =
+    | SessionChunk
+    | ScriptResponseChunk
+    | OperationResponseChunk
+    | StreamDataChunk
+    | QueryResponseChunk
+    | KeepAliveChunk;

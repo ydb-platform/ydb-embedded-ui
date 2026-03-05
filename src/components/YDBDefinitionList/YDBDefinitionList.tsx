@@ -36,6 +36,7 @@ interface YDBDefinitionListProps extends Omit<DefinitionListProps, 'children' | 
     footer?: React.ReactNode;
     compact?: boolean;
     nameMaxWidth?: DefinitionListProps['nameMaxWidth'] | 'auto';
+    wrapperClassName?: string;
 }
 
 /** DefinitionList with predefined styles and layout */
@@ -52,6 +53,7 @@ export function YDBDefinitionList({
     nameMaxWidth = 220,
     className,
     titleClassname,
+    wrapperClassName,
     ...restProps
 }: YDBDefinitionListProps) {
     const hasHeader = Boolean(title || titleSuffix || (headerLabels && headerLabels.length));
@@ -145,7 +147,7 @@ export function YDBDefinitionList({
     };
 
     return (
-        <div className={b({compact})}>
+        <div className={b({compact}, wrapperClassName)}>
             {renderHeader()}
             {renderContent()}
             {renderFooter()}
