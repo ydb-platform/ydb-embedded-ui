@@ -58,3 +58,6 @@ export const codecNumberToName: Record<number, string> = {
 };
 
 export const TOPIC_DATA_FETCH_LIMIT = 20;
+
+export const TOPIC_DATA_DEFAULT_PAGE_SIZE = 100_000;
+export const TOPIC_DATA_MIN_TOTAL_FOR_PAGINATION = 100_000;

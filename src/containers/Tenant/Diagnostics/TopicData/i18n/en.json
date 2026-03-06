@@ -31,6 +31,5 @@
   "label_download": "Save message to file",
   "label_truncated": "Truncated {{size}}",
   "description_not-loaded-message": "Message was not fetched in table due to problems with big messages.\nYou can view it in side panel by clicking on Offset",
-  "description_removed-message": "Message was deleted due to retention",
-  "description_last-messages": "Only last 50 000 messages from any partition are displayed"
+  "description_removed-message": "Message was deleted due to retention"
 }

@@ -26,6 +26,7 @@ export interface TopicDataFilters {
     database: string;
     path: string;
     isEmpty: boolean;
+    currentPage?: number;
 }
 
 export const TopicDataFilterValues = {

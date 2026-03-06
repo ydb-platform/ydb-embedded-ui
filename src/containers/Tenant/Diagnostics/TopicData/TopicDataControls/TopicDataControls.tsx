@@ -8,7 +8,6 @@ import {
     ActionTooltip,
     Button,
     Flex,
-    HelpMark,
     Icon,
     SegmentedRadioGroup,
     Select,
@@ -34,7 +33,6 @@ interface TopicDataControlsProps {
 
     startOffset?: number;
     endOffset?: number;
-    truncatedData?: boolean;
     scrollToOffset: (offset: number) => void;
     handlePartitionChange?: (value: string[]) => void;
 }
@@ -48,7 +46,6 @@ export function TopicDataControls({
     partitionsLoading,
     partitionsError,
     scrollToOffset,
-    truncatedData,
 }: TopicDataControlsProps) {
     const {selectedPartition} = useTopicDataQueryParams();
 
@@ -79,7 +76,6 @@ export function TopicDataControls({
                     <Text color="secondary" whiteSpace="nowrap">
                         {formatNumber(startOffset)}—{formatNumber(endOffset - 1)}
                     </Text>
-                    {truncatedData && <HelpMark>{i18n('description_last-messages')}</HelpMark>}
                 </Flex>
             )}
         </React.Fragment>

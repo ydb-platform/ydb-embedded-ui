@@ -10,6 +10,7 @@ export interface PaginatedTableWithLayoutProps {
     controls?: React.ReactNode;
     extraControls?: React.ReactNode;
     table: React.ReactNode;
+    footer?: React.ReactNode;
     tableWrapperProps?: Omit<TableWrapperProps, 'children'>;
     error?: React.ReactNode;
     initialState?: Partial<PaginatedTableState>;
@@ -69,10 +70,19 @@ const ErrorSection = ({error}: {error?: React.ReactNode}) => {
     return <React.Fragment>{error}</React.Fragment>;
 };
 
+const FooterSection = ({footer}: {footer?: React.ReactNode}) => {
+    if (!footer) {
+        return null;
+    }
+
+    return <TableWithControlsLayout.Footer>{footer}</TableWithControlsLayout.Footer>;
+};
+
 export const PaginatedTableWithLayout = ({
     controls,
     extraControls,
     table,
+    footer,
     tableWrapperProps,
     error,
     initialState,
@@ -85,6 +95,7 @@ export const PaginatedTableWithLayout = ({
                 <ControlsSection controls={controls} extraControls={extraControls} />
                 <ErrorSection error={error} />
                 <TableWrapper table={table} tableWrapperProps={tableWrapperProps} />
+                <FooterSection footer={footer} />
             </TableWithControlsLayout>
         </PaginatedTableProvider>
     );
