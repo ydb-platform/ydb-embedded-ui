@@ -1,0 +1,304 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e5]:
+    - generic [ref=e8]:
+      - img [ref=e13] [cursor=pointer]:
+        - img [ref=e14]
+      - generic [ref=e18]:
+        - button "Information" [ref=e19] [cursor=pointer]:
+          - img [ref=e22]:
+            - img [ref=e23]
+          - generic "Information":
+            - generic: Information
+        - button "Settings" [ref=e25] [cursor=pointer]:
+          - img [ref=e28]:
+            - img [ref=e29]
+          - generic "Settings":
+            - generic: Settings
+        - button "Account" [ref=e31] [cursor=pointer]:
+          - img [ref=e34]:
+            - img [ref=e35]
+          - generic "Account":
+            - generic: Account
+      - button "Expand" [ref=e37] [cursor=pointer]:
+        - img [ref=e38]:
+          - img [ref=e39]
+    - generic [ref=e41]:
+      - banner [ref=e42]:
+        - list [ref=e43]:
+          - listitem [ref=e44]:
+            - link "Cluster" [ref=e45] [cursor=pointer]:
+              - link "Cluster" [ref=e46]:
+                - /url: /cluster
+                - generic [ref=e47]:
+                  - img [ref=e48]
+                  - text: Cluster
+            - generic [ref=e50]: /
+          - listitem [ref=e51]:
+            - link "/local" [disabled] [ref=e52]:
+              - generic [ref=e54]:
+                - img [ref=e55]
+                - text: /local
+        - generic [ref=e57]:
+          - button "Connect" [ref=e58] [cursor=pointer]:
+            - img [ref=e61]:
+              - img [ref=e62]
+            - generic [ref=e64]: Connect
+          - separator [ref=e65]
+          - link "Developer UI" [ref=e66] [cursor=pointer]:
+            - /url: http://localhost:8765/internal
+            - img [ref=e69]:
+              - img [ref=e70]
+            - generic [ref=e72]: Developer UI
+      - main [ref=e73]:
+        - generic [ref=e76]:
+          - generic [ref=e77]:
+            - generic [ref=e79]:
+              - generic [ref=e80]:
+                - generic [ref=e81]: Navigation
+                - generic [ref=e85]:
+                  - generic [ref=e88] [cursor=pointer]:
+                    - button [ref=e89]
+                    - generic [ref=e91]:
+                      - img [ref=e93]
+                      - generic [ref=e95]: /local
+                  - generic [ref=e98] [cursor=pointer]:
+                    - button [ref=e99]
+                    - generic [ref=e101]:
+                      - img [ref=e103]
+                      - generic [ref=e105]: .metadata
+                  - generic [ref=e108] [cursor=pointer]:
+                    - button [ref=e109]
+                    - generic [ref=e111]:
+                      - img [ref=e113]
+                      - generic [ref=e115]: .sys
+                  - generic [ref=e120] [cursor=pointer]:
+                    - img [ref=e122]
+                    - generic [ref=e124]: .sys_health
+                  - generic [ref=e129] [cursor=pointer]:
+                    - img [ref=e131]
+                    - generic [ref=e133]: a_test_table_1772716475901
+                  - generic [ref=e138] [cursor=pointer]:
+                    - img [ref=e140]
+                    - generic [ref=e142]: a_test_table_1772716492121
+                  - generic [ref=e147] [cursor=pointer]:
+                    - img [ref=e149]
+                    - generic [ref=e151]: my_row_table
+              - generic [ref=e153]:
+                - generic [ref=e154]:
+                  - generic [ref=e155]:
+                    - generic [ref=e156]:
+                      - generic [ref=e157]: domain
+                      - generic [ref=e158]: /local
+                    - generic [ref=e159]:
+                      - button "Copy" [ref=e160] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                      - button [ref=e161] [cursor=pointer]:
+                        - img [ref=e164]:
+                          - img [ref=e165]
+                  - tablist [ref=e169]:
+                    - tab "Overview" [selected] [ref=e170] [cursor=pointer]:
+                      - link "Overview" [ref=e173]:
+                        - /url: /tenant?diagnosticsTab=overview&schema=/local&database=/local&tenantPage=query&summaryTab=overview
+                - generic [ref=e174]:
+                  - generic [ref=e175]: Directory
+                  - generic [ref=e176]:
+                    - generic [ref=e177]:
+                      - term [ref=e178]:
+                        - generic [ref=e179]: Type
+                      - definition [ref=e181]:
+                        - generic [ref=e182]: Domain
+                    - generic [ref=e183]:
+                      - term [ref=e184]:
+                        - generic [ref=e185]: Id
+                      - definition [ref=e187]:
+                        - generic [ref=e188]: "1"
+                    - generic [ref=e189]:
+                      - term [ref=e190]:
+                        - generic [ref=e191]: Version
+                      - definition [ref=e193]:
+                        - generic [ref=e194]: "43"
+                    - generic [ref=e195]:
+                      - term [ref=e196]:
+                        - generic [ref=e197]: Created
+                      - definition [ref=e199]:
+                        - generic [ref=e200]: 2026-03-05 13:12
+            - generic [ref=e201]:
+              - button [ref=e202] [cursor=pointer]:
+                - img [ref=e205]:
+                  - img [ref=e206]
+              - button [ref=e208] [cursor=pointer]:
+                - img [ref=e211]:
+                  - img [ref=e212]
+          - generic [ref=e216]:
+            - radiogroup [ref=e218]:
+              - generic [ref=e219]:
+                - radio "Query" [checked] [ref=e220]
+                - generic [ref=e222]:
+                  - img [ref=e223]:
+                    - img [ref=e224]
+                  - generic [ref=e226]: Query
+              - generic [ref=e227] [cursor=pointer]:
+                - radio "Diagnostics" [ref=e228]
+                - generic [ref=e230]:
+                  - img [ref=e231]:
+                    - img [ref=e232]
+                  - generic [ref=e236]: Diagnostics
+            - generic [ref=e237]:
+              - tablist [ref=e239]:
+                - tab "Editor" [selected] [ref=e240] [cursor=pointer]:
+                  - link "Editor" [ref=e243]:
+                    - /url: /tenant?diagnosticsTab=overview&schema=/local&database=/local&tenantPage=query&queryTab=newQuery
+                - tab "History" [ref=e244] [cursor=pointer]:
+                  - link "History" [ref=e247]:
+                    - /url: /tenant?diagnosticsTab=overview&schema=/local&database=/local&tenantPage=query&queryTab=history
+                - tab "Saved" [ref=e248] [cursor=pointer]:
+                  - link "Saved" [ref=e251]:
+                    - /url: /tenant?diagnosticsTab=overview&schema=/local&database=/local&tenantPage=query&queryTab=saved
+              - generic [ref=e254]:
+                - generic [ref=e255]:
+                  - code [ref=e259]:
+                    - generic [ref=e260]:
+                      - generic [ref=e262]:
+                        - generic [ref=e264]: "1"
+                        - generic [ref=e266]: "2"
+                        - generic [ref=e268]: "3"
+                        - generic [ref=e271]: "4"
+                      - generic [ref=e278]:
+                        - generic [ref=e280]: $data = ListFromRange(1, 20000);
+                        - generic [ref=e282]: SELECT x, Digest::Argon2(CAST(x AS String), "test_salt") AS hash
+                        - generic [ref=e284]: FROM AS_TABLE(AsList(AsStruct($data AS x))) FLATTEN BY x;
+                      - textbox "Editor content" [ref=e287]: $data = ListFromRange(1, 20000); SELECT x, Digest::Argon2(CAST(x AS String), "test_salt") AS hash FROM AS_TABLE(AsList(AsStruct($data AS x))) FLATTEN BY x;
+                  - generic [ref=e288]:
+                    - generic [ref=e289]:
+                      - button "Run" [ref=e290] [cursor=pointer]:
+                        - img [ref=e293]:
+                          - img [ref=e294]
+                        - generic [ref=e296]: Run
+                      - button "Explain" [ref=e297] [cursor=pointer]:
+                        - img [ref=e300]:
+                          - img [ref=e301]
+                        - generic [ref=e305]: Explain
+                      - button "(1)" [pressed] [ref=e306] [cursor=pointer]:
+                        - img [ref=e309]:
+                          - img [ref=e310]
+                        - generic [ref=e313]: (1)
+                    - generic [ref=e314]:
+                      - button "New query" [ref=e316] [cursor=pointer]:
+                        - img [ref=e319]
+                        - generic [ref=e321]: New query
+                      - button "Save query" [ref=e322] [cursor=pointer]:
+                        - generic [ref=e323]: Save query
+                - generic [ref=e325]:
+                  - generic [ref=e326]:
+                    - generic [ref=e327]:
+                      - radiogroup [ref=e328]:
+                        - generic [ref=e329]:
+                          - radio "Result" [checked] [ref=e330]
+                          - generic [ref=e331]: Result
+                        - generic [ref=e332] [cursor=pointer]:
+                          - radio "Computation Graph" [ref=e333]
+                          - generic [ref=e334]: Computation Graph
+                        - generic [ref=e335] [cursor=pointer]:
+                          - radio "Explain" [ref=e336]
+                          - generic [ref=e337]: Explain
+                        - generic [ref=e338] [cursor=pointer]:
+                          - radio "Stats" [ref=e339]
+                          - generic [ref=e340]: Stats
+                      - generic [ref=e341]:
+                        - img [ref=e343]:
+                          - img [ref=e344]
+                        - generic [ref=e346]:
+                          - generic [ref=e347]: Completed
+                          - generic [ref=e348]:
+                            - generic [ref=e349]: ":"
+                            - generic [ref=e350]: 00:02.906
+                    - generic [ref=e351]:
+                      - button [ref=e353] [cursor=pointer]:
+                        - img [ref=e356]
+                      - button "Copy result" [ref=e358] [cursor=pointer]:
+                        - generic:
+                          - generic:
+                            - img:
+                              - img
+                      - button [ref=e359] [cursor=pointer]:
+                        - img [ref=e362]:
+                          - img [ref=e363]
+                      - button [ref=e365] [cursor=pointer]:
+                        - img [ref=e368]:
+                          - img [ref=e369]
+                  - generic [ref=e375]:
+                    - generic [ref=e376]:
+                      - generic [ref=e377]: Result
+                      - generic [ref=e378]: "10000"
+                    - generic [ref=e380]:
+                      - table [ref=e383]:
+                        - rowgroup [ref=e384]:
+                          - row "# x hash" [ref=e385]:
+                            - columnheader "#" [ref=e386]:
+                              - generic [ref=e387]: "#"
+                            - columnheader "x" [ref=e388]:
+                              - generic [ref=e389]: x
+                            - columnheader "hash" [ref=e390]:
+                              - generic [ref=e391]: hash
+                      - table [ref=e396]:
+                        - rowgroup:
+                          - row "# x hash":
+                            - columnheader "#":
+                              - generic: "#"
+                            - columnheader "x":
+                              - generic: x
+                            - columnheader "hash":
+                              - generic: hash
+                        - rowgroup [ref=e397]:
+                          - 'row "1 1 \\u0013\\\\��7.�z\\f3df�8��z�\\u0012`��sb�6QJ�h#," [ref=e398]':
+                            - cell "1" [ref=e399]
+                            - cell "1" [ref=e400]:
+                              - generic [ref=e401] [cursor=pointer]: "1"
+                            - 'cell "\\u0013\\\\��7.�z\\f3df�8��z�\\u0012`��sb�6QJ�h#," [ref=e402]':
+                              - generic [ref=e403] [cursor=pointer]: "\\u0013\\\\��7.�z\\f3df�8��z�\\u0012`��sb�6QJ�h#,"
+                          - row "2 2 �����<�M�\\u00102\\u0006�ɞ夕�x��b�ޑ�B\\u0006�" [ref=e404]:
+                            - cell "2" [ref=e405]
+                            - cell "2" [ref=e406]:
+                              - generic [ref=e407] [cursor=pointer]: "2"
+                            - cell "�����<�M�\\u00102\\u0006�ɞ夕�x��b�ޑ�B\\u0006�" [ref=e408]:
+                              - generic [ref=e409] [cursor=pointer]: �����<�M�\u00102\u0006�ɞ夕�x��b�ޑ�B\u0006�
+                          - row "3 3 ��aM8�z�AH0Eϊ 6�\\u0004�$8\\r�40�\\u0000���X" [ref=e410]:
+                            - cell "3" [ref=e411]
+                            - cell "3" [ref=e412]:
+                              - generic [ref=e413] [cursor=pointer]: "3"
+                            - cell "��aM8�z�AH0Eϊ 6�\\u0004�$8\\r�40�\\u0000���X" [ref=e414]:
+                              - generic [ref=e415] [cursor=pointer]: ��aM8�z�AH0Eϊ 6�\u0004�$8\r�40�\u0000���X
+                          - 'row "4 4 �\\u001a�\\u0019v�N�B�z����٢�lRH?~\\u0000��\\u001f:" [ref=e416]':
+                            - cell "4" [ref=e417]
+                            - cell "4" [ref=e418]:
+                              - generic [ref=e419] [cursor=pointer]: "4"
+                            - 'cell "�\\u001a�\\u0019v�N�B�z����٢�lRH?~\\u0000��\\u001f:" [ref=e420]':
+                              - generic [ref=e421] [cursor=pointer]: "�\\u001a�\\u0019v�N\x7f�B�z����٢�lRH?~\\u0000��\\u001f:"
+                          - row "5 5 Y���S;�N66���O8,�\\u001c\\u0006ڹC���c�x.��'" [ref=e422]:
+                            - cell "5" [ref=e423]
+                            - cell "5" [ref=e424]:
+                              - generic [ref=e425] [cursor=pointer]: "5"
+                            - cell "Y���S;�N66���O8,�\\u001c\\u0006ڹC���c�x.��'" [ref=e426]:
+                              - generic [ref=e427] [cursor=pointer]: Y���S;�N66���O8,�\u001c\u0006ڹC���c�x.��'
+                          - row "6 6 ���\\u001e��\\u001f�\\u001e�'�9�YfG����n�\\\\\\r�E�)��" [ref=e428]:
+                            - cell "6" [ref=e429]
+                            - cell "6" [ref=e430]:
+                              - generic [ref=e431] [cursor=pointer]: "6"
+                            - cell "���\\u001e��\\u001f�\\u001e�'�9�YfG����n�\\\\\\r�E�)��" [ref=e432]:
+                              - generic [ref=e433] [cursor=pointer]: ���\u001e��\u001f�\u001e�'�9�YfG����n�\\\r�E�)��
+                          - row "7 7 ��\\u0012\\\\�����mM����b�)<��˥�0d�8^�ߙ" [ref=e434]:
+                            - cell "7" [ref=e435]
+                            - cell "7" [ref=e436]:
+                              - generic [ref=e437] [cursor=pointer]: "7"
+                            - cell "��\\u0012\\\\�����mM����b�)<��˥�0d�8^�ߙ" [ref=e438]:
+                              - generic [ref=e439] [cursor=pointer]: ��\u0012\\�����mM����b�)<��˥�0d�8^�ߙ
+  - generic [ref=e440]:
+    - alert
+    - alert
+```
