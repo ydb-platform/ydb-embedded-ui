@@ -27,7 +27,7 @@
     }
 
     &__content {
-        overflow: auto;
+        overflow: var(--ydb-syntax-highlighter-content-overflow, auto);
 
         height: 100%;
 
@@ -39,12 +39,13 @@
             padding: var(--g-spacing-4) 0 var(--g-spacing-4) var(--g-spacing-4);
 
             background: transparent !important;
+
+            @include mixins.text-code-2();
         }
 
         code {
             white-space: pre-wrap;
             word-break: break-word;
-            @include mixins.text-code-2();
         }
     }
 

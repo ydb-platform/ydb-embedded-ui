@@ -5,14 +5,12 @@ import type {RedirectProps} from 'react-router-dom';
 import {Redirect, Route, Switch} from 'react-router-dom';
 
 import {AccessDenied} from '../../components/Errors/403';
-import {PageError} from '../../components/Errors/PageError/PageError';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {useSlots} from '../../components/slots';
 import type {SlotMap} from '../../components/slots/SlotMap';
 import type {SlotComponent} from '../../components/slots/types';
 import routes, {getClusterPath} from '../../routes';
 import type {RootState} from '../../store';
-import {authenticationApi} from '../../store/reducers/authentication/authentication';
 import {
     useAllCapabilitiesLoaded,
     useCapabilitiesQuery,
@@ -21,17 +19,15 @@ import {
     useMetaCapabilitiesQuery,
 } from '../../store/reducers/capabilities/hooks';
 import {nodesListApi} from '../../store/reducers/nodesList';
-import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
-import {useMetaAuth, useMetaAuthUnavailable} from '../../utils/hooks/useMetaAuth';
+import {useMetaAuthUnavailable} from '../../utils/hooks/useMetaAuth';
 import {lazyComponent} from '../../utils/lazyComponent';
 import {isAccessError, isRedirectToAuth} from '../../utils/response';
 import Authentication from '../Authentication/Authentication';
+import {GetUser} from '../GetUserWrapper/GetUserWrapper';
 import Header from '../Header/Header';
 
-import {useAppTitle} from './AppTitleContext';
-import {SettingsBootstrap} from './SettingsBootstrap';
 import {
     ClusterSlot,
     HomePageSlot,
@@ -198,40 +194,8 @@ function DataWrapper({children}: {children: React.ReactNode}) {
 }
 
 function HomePageDataWrapper({children}: {children: React.ReactNode}) {
-    return (
-        <GetMetaCapabilities>
-            <GetMetaUser>{children}</GetMetaUser>
-        </GetMetaCapabilities>
-    );
-}
-
-function GetMetaUser({children}: {children: React.ReactNode}) {
-    const metaAuth = useMetaAuth();
-
-    if (metaAuth) {
-        return <GetUser useMeta>{children}</GetUser>;
-    }
-    return children;
-}
-
-function GetUser({children, useMeta}: {children: React.ReactNode; useMeta?: boolean}) {
-    const database = useDatabaseFromQuery();
-
-    const {isFetching, error} = authenticationApi.useWhoamiQuery({
-        database,
-        useMeta,
-    });
-    const {appTitle} = useAppTitle();
-
-    const errorProps = error ? {...uiFactory.clusterOrDatabaseAccessError} : undefined;
-
-    return (
-        <LoaderWrapper loading={isFetching} size="l" delay={0}>
-            <PageError error={error} {...errorProps} errorPageTitle={appTitle}>
-                <SettingsBootstrap>{children}</SettingsBootstrap>
-            </PageError>
-        </LoaderWrapper>
-    );
+    // Home page content is wrapped with GetMetaUser inside component
+    return <GetMetaCapabilities>{children}</GetMetaCapabilities>;
 }
 
 function GetNodesList() {

@@ -80,9 +80,13 @@ export class QueryEditor {
         this.editButton = this.selector.getByRole('button', {name: ButtonNames.Edit});
         this.dropdownMenu = page.locator('.g-dropdown-menu__menu');
         this.gearButton = this.selector.locator('.ydb-query-editor-button__gear-button');
-        this.executionStatus = this.selector.locator('.kv-query-execution-status .g-text');
+        this.executionStatus = this.selector
+            .getByTestId('ydb-query-execution-status')
+            .locator('.g-label__content');
         this.resultsControls = this.selector.locator('.ydb-query-result__controls');
-        this.elapsedTimeLabel = this.selector.locator('.kv-query-execution-status .g-label__value');
+        this.elapsedTimeLabel = this.selector
+            .getByTestId('ydb-query-execution-status')
+            .locator('.g-label__key');
         this.radioButton = this.selector.locator(
             '.query-editor__pane-wrapper .g-segmented-radio-group',
         );
@@ -188,6 +192,20 @@ export class QueryEditor {
 
     async focusEditor() {
         await this.editorTextArea.focus();
+    }
+
+    async getEditorContent(): Promise<string> {
+        await this.waitForEditorReady();
+        await this.page.waitForFunction(() => Boolean(window.ydbEditor), null, {
+            timeout: VISIBILITY_TIMEOUT,
+        });
+        return this.editorTextArea.evaluate(() => {
+            const editor = window.ydbEditor;
+            if (editor) {
+                return editor.getValue();
+            }
+            return '';
+        });
     }
 
     async selectText(startLine: number, startColumn: number, endLine: number, endColumn: number) {

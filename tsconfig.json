@@ -1,5 +1,11 @@
 {
   "extends": "@gravity-ui/tsconfig/tsconfig",
+  "ts-node": {
+    "compilerOptions": {
+      "module": "commonjs",
+      "moduleResolution": "node"
+    }
+  },
   "compilerOptions": {
     "outDir": "build/esm",
 

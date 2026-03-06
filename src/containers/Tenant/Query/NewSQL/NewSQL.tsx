@@ -120,10 +120,6 @@ export function NewSQL() {
                     action: actions.alterStreamingQuerySettings,
                 },
                 {
-                    text: i18n('action.alter-streaming-query-text'),
-                    action: actions.alterStreamingQueryText,
-                },
-                {
                     text: i18n('action.drop-streaming-query'),
                     action: actions.dropStreamingQuery,
                 },

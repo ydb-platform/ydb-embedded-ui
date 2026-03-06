@@ -1,6 +1,5 @@
 import React from 'react';
 
-import {selectUserInput} from '../../../../store/reducers/query/query';
 import {selectSavedQueriesFilter} from '../../../../store/reducers/queryActions/queryActions';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import type {SavedQuery} from '../../../../types/store/query';
@@ -10,7 +9,6 @@ export function useSavedQueries() {
     const [savedQueries, saveQueries] = useSetting<SavedQuery[]>(SETTING_KEYS.SAVED_QUERIES);
 
     const filter = useTypedSelector(selectSavedQueriesFilter).trim().toLowerCase();
-    const currentInput = useTypedSelector(selectUserInput);
 
     const filteredSavedQueries = React.useMemo(() => {
         const queries = savedQueries ?? [];
@@ -32,7 +30,7 @@ export function useSavedQueries() {
     );
 
     const saveQuery = React.useCallback(
-        (queryName: string | null) => {
+        (queryName: string | null, queryBody: string) => {
             if (!queryName) {
                 return;
             }
@@ -45,15 +43,15 @@ export function useSavedQueries() {
             if (queryIndex >= 0) {
                 nextSavedQueries[queryIndex] = {
                     ...currentQueries[queryIndex],
-                    body: currentInput,
+                    body: queryBody,
                 };
             } else {
-                nextSavedQueries.push({name: queryName, body: currentInput});
+                nextSavedQueries.push({name: queryName, body: queryBody});
             }
 
             saveQueries(nextSavedQueries);
         },
-        [savedQueries, saveQueries, currentInput],
+        [savedQueries, saveQueries],
     );
 
     return {savedQueries, filteredSavedQueries, deleteSavedQuery, saveQuery};

@@ -6,11 +6,13 @@ import i18n from './i18n';
 
 import './InfoViewer.scss';
 
+/** @deprecated Use {@link YDBDefinitionList} instead */
 export interface InfoViewerItem {
     label: React.ReactNode;
     value: React.ReactNode;
 }
 
+/** @deprecated Use {@link YDBDefinitionList} instead */
 export interface InfoViewerProps {
     title?: React.ReactNode;
     info?: InfoViewerItem[];
@@ -24,6 +26,7 @@ export interface InfoViewerProps {
 
 const b = cn('info-viewer');
 
+/** @deprecated Use {@link YDBDefinitionList} instead */
 export const InfoViewer = ({
     title,
     info,

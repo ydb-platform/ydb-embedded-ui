@@ -4,7 +4,7 @@ import NiceModal from '@ebay/nice-modal-react';
 import type {ButtonButtonProps, ButtonProps} from '@gravity-ui/uikit';
 import {Button, Dialog, DropdownMenu, TextInput} from '@gravity-ui/uikit';
 
-import {selectActiveTab, setIsDirty} from '../../../../store/reducers/query/query';
+import {selectActiveTab, selectUserInput, setIsDirty} from '../../../../store/reducers/query/query';
 import {
     clearQueryNameToEdit,
     selectQueryName,
@@ -27,7 +27,7 @@ interface SaveQueryProps {
     buttonProps?: ButtonProps;
 }
 
-function useSaveQueryHandler(dialogProps?: SaveQueryDialogCommonProps) {
+function useSaveQueryHandler(dialogProps: SaveQueryDialogCommonProps) {
     const dispatch = useTypedDispatch();
     const {savedQueries, saveQuery} = useSavedQueries();
     const activeTab = useTypedSelector(selectActiveTab);
@@ -38,7 +38,7 @@ function useSaveQueryHandler(dialogProps?: SaveQueryDialogCommonProps) {
             : undefined;
         NiceModal.show(SAVE_QUERY_DIALOG, {
             ...dialogProps,
-            defaultQueryName: dialogProps?.defaultQueryName ?? computedDefaultQueryName,
+            defaultQueryName: dialogProps.defaultQueryName ?? computedDefaultQueryName,
             savedQueries,
             onSaveQuery: saveQuery,
         });
@@ -56,7 +56,7 @@ function useSaveQueryHandler(dialogProps?: SaveQueryDialogCommonProps) {
 }
 
 interface SaveQueryButtonProps extends ButtonButtonProps {
-    dialogProps?: SaveQueryDialogCommonProps;
+    dialogProps: SaveQueryDialogCommonProps;
 }
 
 export function SaveQueryButton({dialogProps, ...buttonProps}: SaveQueryButtonProps) {
@@ -72,12 +72,13 @@ export function SaveQueryButton({dialogProps, ...buttonProps}: SaveQueryButtonPr
 export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
     const dispatch = useTypedDispatch();
     const queryNameToEdit = useTypedSelector(selectQueryName);
-    const onSaveQueryClick = useSaveQueryHandler();
+    const currentInput = useTypedSelector(selectUserInput);
+    const onSaveQueryClick = useSaveQueryHandler({queryBody: currentInput});
 
     const {saveQuery} = useSavedQueries();
 
     const onEditQueryClick = () => {
-        saveQuery(queryNameToEdit);
+        saveQuery(queryNameToEdit, currentInput);
         dispatch(setIsDirty(false));
         dispatch(clearQueryNameToEdit());
     };
@@ -106,7 +107,11 @@ export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
         );
     };
 
-    return queryNameToEdit ? renderSaveDropdownMenu() : <SaveQueryButton />;
+    return queryNameToEdit ? (
+        renderSaveDropdownMenu()
+    ) : (
+        <SaveQueryButton dialogProps={{queryBody: currentInput}} />
+    );
 }
 
 interface SaveQueryDialogCommonProps {
@@ -114,12 +119,13 @@ interface SaveQueryDialogCommonProps {
     onCancel?: () => void;
     onClose?: () => void;
     defaultQueryName?: string;
+    queryBody: string;
 }
 
 interface SaveQueryDialogProps extends SaveQueryDialogCommonProps {
     open: boolean;
     savedQueries?: SavedQuery[];
-    onSaveQuery: (name: string | null) => void;
+    onSaveQuery: (name: string | null, body: string) => void;
 }
 
 function SaveQueryDialog({
@@ -130,10 +136,12 @@ function SaveQueryDialog({
     open,
     savedQueries,
     onSaveQuery,
+    queryBody,
 }: SaveQueryDialogProps) {
     const dispatch = useTypedDispatch();
     const [queryName, setQueryName] = React.useState(defaultQueryName ?? '');
     const [validationError, setValidationError] = React.useState<string>();
+    const inputRef = React.useRef<HTMLInputElement>(null);
 
     const validateQueryName = (value: string) => {
         if (!value) {
@@ -163,14 +171,14 @@ function SaveQueryDialog({
     };
 
     const onSaveClick = () => {
-        onSaveQuery(queryName);
+        onSaveQuery(queryName, queryBody);
         dispatch(setIsDirty(false));
         onCloseDialog();
         onSuccess?.();
     };
 
     return (
-        <Dialog open={open} hasCloseButton={false} size="s" onClose={onCloseWithoutSave}>
+        <Dialog open={open} size="s" onClose={onCloseWithoutSave} initialFocus={inputRef}>
             <Dialog.Header caption={i18n('action.save')} />
             <form
                 onSubmit={(e) => {
@@ -185,11 +193,9 @@ function SaveQueryDialog({
                 <Dialog.Body className={b('dialog-body')}>
                     <div className={b('dialog-row')}>{i18n('description')}</div>
                     <div className={b('dialog-row')}>
-                        <label htmlFor="queryName" className={b('field-title', 'required')}>
-                            {i18n('input-label')}
-                        </label>
                         <div className={b('control-wrapper')}>
                             <TextInput
+                                controlRef={inputRef}
                                 id="queryName"
                                 placeholder={i18n('input-placeholder')}
                                 value={queryName}

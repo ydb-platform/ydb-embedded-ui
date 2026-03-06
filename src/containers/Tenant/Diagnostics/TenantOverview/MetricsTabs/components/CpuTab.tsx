@@ -15,9 +15,14 @@ interface CpuTabProps {
     active: boolean;
     isServerless: boolean;
     cpu: {totalUsed: number; totalLimit: number};
+    controlPlaneNodesCount?: number;
 }
 
-export function CpuTab({to, active, isServerless, cpu}: CpuTabProps) {
+export function CpuTab({to, active, isServerless, cpu, controlPlaneNodesCount}: CpuTabProps) {
+    const dedicatedDatabaseUsageText = !controlPlaneNodesCount
+        ? i18n('context_cpu-load')
+        : i18n('context_cpu-nodes-count', {count: controlPlaneNodesCount});
+
     return (
         <div className={b('link-container', {active})}>
             <Link to={to} className={b('link')}>
@@ -30,7 +35,7 @@ export function CpuTab({to, active, isServerless, cpu}: CpuTabProps) {
                     />
                 ) : (
                     <UsageTabCard
-                        text={i18n('context_cpu-load')}
+                        text={dedicatedDatabaseUsageText}
                         value={cpu.totalUsed}
                         limit={cpu.totalLimit}
                         legendFormatter={formatCoresLegend}

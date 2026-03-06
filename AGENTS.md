@@ -6,17 +6,28 @@ This file provides guidance to AI coding assistants when working with this codeb
 
 YDB Embedded UI is a web-based monitoring and management interface for YDB (Yet another DataBase) clusters. It provides comprehensive tools for viewing database diagnostics, managing storage/nodes/tablets, executing queries, and monitoring cluster health.
 
+The project serves dual purposes:
+
+- **Standalone application**: Built and deployed as a web UI (embedded into YDB servers or served independently)
+- **Distributable library**: Published as an npm package (`src/lib.ts` exports) for embedding into other applications via `npm run package`
+
 ## Tech Stack
 
 - **Framework**: React 18.3 with TypeScript 5.x
 - **State Management**: Redux Toolkit 2.x with RTK Query
-- **UI Components**: Gravity UI (@gravity-ui/uikit) 7.x
+- **UI Components**: Gravity UI (`@gravity-ui/uikit` 7.x, `@gravity-ui/components`, `@gravity-ui/navigation`, `@gravity-ui/table`)
 - **Routing**: React Router v5 (not v6)
-- **Build Tool**: Create React App with react-app-rewired
-- **Code Editor**: Monaco Editor 0.52
-- **Testing**: Jest + React Testing Library (unit), Playwright (E2E)
+- **Build Tool**: Rsbuild (`@rsbuild/core`) — configured in `rsbuild.config.ts`
+- **Code Editor**: Monaco Editor 0.52 with `@ydb-platform/monaco-ghost` for ghost text
+- **Syntax Highlighting**: Shiki (for non-editor code highlighting)
+- **Charts**: `@gravity-ui/chartkit`
+- **Forms**: `react-hook-form` with `@hookform/resolvers` and Zod for complex forms; Gravity UI form components for simple forms
+- **Tables**: Custom `PaginatedTable` component (virtual scrolling); `@gravity-ui/table` + `@tanstack/react-table` for specialized tables
+- **Keyboard Shortcuts**: `hotkeys-js`
+- **Split Panes**: `react-split`
+- **Testing**: Jest 30 + React Testing Library (unit), Playwright 1.x (E2E)
 - **Package Manager**: npm
-- **Node Version**: 18+ recommended
+- **Node Version**: 22+ required (`engines` field enforces `>=22.0`)
 
 ## Essential Development Commands
 
@@ -35,24 +46,27 @@ npm run build:embedded          # Build for embedding in YDB servers
 npm run build:embedded:archive  # Build embedded version + create zip
 npm run build:embedded-mc       # Build multi-cluster embedded version
 npm run analyze                 # Analyze bundle size with source-map-explorer
-npm run package                 # Build library distribution
+npm run package                 # Build library distribution (output: dist/)
 ```
 
 ### Code Quality (Run these before committing!)
 
 ```bash
-npm run lint        # Run all linters (JS/TS + CSS)
+npm run lint        # Run all linters (JS/TS + CSS + Prettier)
 npm run typecheck   # TypeScript type checking
-npm run unused      # Find unused code
+npm run unused      # Find unused code (uses knip)
 ```
 
 ### Testing
 
 ```bash
-npm test                       # Run unit tests
+npm test                       # Run unit tests (Jest 30)
 npm test -- --watch           # Run tests in watch mode
-npm run test:e2e              # Run Playwright E2E tests
-npm run test:e2e:local        # Run E2E against local dev server
+npm run test:e2e                             # Run Playwright E2E tests
+npm run test:e2e:update-snapshots            # Update E2E snapshots (local browsers)
+npm run test:e2e:docker                      # Run E2E tests in Docker
+npm run test:e2e:docker:update-snapshots     # Update E2E snapshots in Docker
+npm run test:e2e:local                       # Run E2E against local dev server
 ```
 
 ## Architecture Overview
@@ -63,33 +77,48 @@ npm run test:e2e:local        # Run E2E against local dev server
 - State organized by feature domains in `src/store/reducers/`
 - API endpoints injected using RTK Query's `injectEndpoints` pattern
 - Each domain has its reducer file (e.g., `cluster.ts`, `tenant.ts`)
+- Base RTK Query API created in `src/store/reducers/api.ts` with `fakeBaseQuery` (all endpoints use `queryFn`)
 
 ### API Architecture
 
 Modular API service pattern with domain-specific modules:
 
-- `YdbEmbeddedAPI` is the main API class
-- Modules: `ViewerAPI`, `StorageAPI`, `TabletsAPI`, `SchemeAPI`, etc.
+- `YdbEmbeddedAPI` is the main API class (`src/services/api/index.ts`)
+- **Modules**: `AuthAPI`, `CodeAssistAPI`, `MetaAPI`, `MetaSettingsAPI`, `OperationAPI`, `PDiskAPI`, `SchemeAPI`, `StorageAPI`, `StreamingAPI`, `TabletsAPI`, `VDiskAPI`, `ViewerAPI`
 - API services in `src/services/api/` directory
+- All API calls go through `window.api` global object with domain-specific modules
 
 ### Component Organization
 
 ```
 src/
-├── components/     # Reusable UI components
-├── containers/     # Feature-specific containers
+├── assets/         # Static assets (images, icons)
+├── components/     # Reusable UI components (~110 components)
+├── containers/     # Feature-specific containers (App, Cluster, Tenant, Node, Storage, etc.)
 ├── services/       # API services and parsers
+│   ├── api/        # API module classes
+│   └── parsers/    # Response data parsers
 ├── store/          # Redux store and reducers
+│   └── reducers/   # Feature-domain reducers with RTK Query endpoints
+├── styles/         # Global styles and theme variables
 ├── types/          # TypeScript definitions
-└── utils/          # Utility functions
+│   └── api/        # API response types (prefixed with 'T')
+├── uiFactory/      # UIFactory pattern for extensibility
+└── utils/          # Utility functions, hooks, formatters
+    ├── hooks/      # Custom React hooks
+    ├── i18n/       # Internationalization setup
+    ├── dataFormatters/ # Data formatting utilities
+    └── monaco/     # Monaco Editor utilities
 ```
 
 ### Key Architectural Patterns
 
-1. **Component Registry Pattern**: Runtime registration of extensible components
-2. **Slots Pattern**: Component composition with extensibility points
-3. **Feature-based Organization**: Features grouped with their state, API, and components
-4. **Separation of Concerns**: Clear separation between UI and business logic
+1. **Component Registry Pattern**: Runtime registration of extensible components via `componentsRegistry`
+2. **Slots Pattern**: Component composition with extensibility points (`AppSlots`)
+3. **UIFactory Pattern**: `configureUIFactory()` in `src/uiFactory/uiFactory.ts` allows customizing monitoring links, healthcheck views, feature flags, and more when using the library
+4. **Feature-based Organization**: Features grouped with their state, API, and components
+5. **Separation of Concerns**: Clear separation between UI and business logic
+6. **Library Export Pattern**: `src/lib.ts` exports key components, utilities, and configuration functions for use as an npm package
 
 ## Critical Bug Prevention Patterns
 
@@ -108,25 +137,27 @@ src/
 - **PREFER** direct event handlers and callbacks over useEffect for user interactions
 
 ```typescript
-// ✅ REQUIRED patterns
-const displaySegments = useMemo(() => segments.filter((segment) => segment.visible), [segments]);
-const handleClick = useCallback(() => {
-  // logic
-}, [dependency]);
+// ✅ REQUIRED patterns — real examples from the codebase
 
-// ✅ PREFER direct callbacks over useEffect
-const handleInputChange = useCallback(
-  (value: string) => {
-    setSearchTerm(value);
-    onSearchChange?.(value);
-  },
-  [onSearchChange],
-);
+// Memoize computed data (src/components/ShardsTable/ShardsTable.tsx)
+const columns = React.useMemo(() => {
+  return columnsIds
+    .filter((id) => id in shardsColumnIdToGetColumn)
+    .map((id) => {
+      const overridedColumn = overrideColumns.find((column) => column.name === id);
+      if (overridedColumn) {
+        return overridedColumn;
+      }
+      return shardsColumnIdToGetColumn[id]();
+    });
+}, [columnsIds, overrideColumns]);
 
-// ❌ AVOID unnecessary useEffect
-// useEffect(() => {
-//   onSearchChange?.(searchTerm);
-// }, [searchTerm, onSearchChange]);
+// ✅ PREFER direct callbacks over useEffect — clears error on input change
+// (src/containers/Tenant/Query/QueryEditor/EditorTabs/RenameTabDialog.tsx)
+const handleTitleChange = React.useCallback((value: string) => {
+  setNextTitle(value);
+  setErrorMessage(undefined);
+}, []);
 ```
 
 ### Display Safety
@@ -170,20 +201,78 @@ REACT_APP_BACKEND=http://your-cluster:8765  # Single cluster mode
 
 ### Before Committing
 
-- The project uses Husky pre-commit hooks that automatically run linting
-- Commit messages must follow conventional commit format
+- The project uses Husky pre-commit hooks that automatically run `lint-staged`
+- Commit messages must follow conventional commit format (enforced by commitlint)
+- PR titles must also follow conventional commit format with lowercase subjects, max 72 characters (e.g., `fix: update api endpoints`, `feat: add new component`)
 - Always run `npm run lint` and `npm run typecheck` to catch issues early
+
+### CI Pipeline
+
+The following checks run on every PR (`ci.yml`):
+
+1. `npm run typecheck` — TypeScript type checking
+2. `npm run lint` — All linters (ESLint + Stylelint + Prettier)
+3. `npm run build:embedded` — Verify embedded build works
+4. `npm run package` — Verify library package build works
+5. `npm test` — Unit tests
+
+Additional quality checks (`quality.yml`):
+
+- Playwright E2E tests (against a `local-ydb:nightly` Docker service)
+- Bundle size comparison (current branch vs. main)
 
 ### UI Framework
 
-The project uses Gravity UI (@gravity-ui/uikit) as the primary component library. When adding new UI components, prefer using Gravity UI components over custom implementations.
+The project uses Gravity UI (`@gravity-ui/uikit`) as the primary component library. When adding new UI components, prefer using Gravity UI components over custom implementations. Additional Gravity UI packages are available: `@gravity-ui/components`, `@gravity-ui/navigation`, `@gravity-ui/table`, `@gravity-ui/date-components`.
+
+### Linting & Formatting
+
+- **ESLint**: Flat config (`eslint.config.mjs`) based on `@gravity-ui/eslint-config`
+- **Stylelint**: Based on `@gravity-ui/stylelint-config` with order and prettier plugins
+- **Prettier**: Uses `@gravity-ui/prettier-config`
+
+### Import Conventions (ESLint-enforced)
+
+- **TypeScript `import type`**: Must use separate top-level type imports (`consistent-type-imports` with `separate-type-imports` style)
+- **React imports**: Must use `import React from 'react'` — named imports, namespace imports, and non-`React` default names are forbidden
+- **Fragments**: Must use `React.Fragment` — JSX fragment shorthand (`<></>`) is forbidden
+
+```typescript
+// ✅ Correct — real pattern from the codebase (src/components/SplitPane/SplitPane.tsx)
+import React from 'react';
+
+import type {SplitProps} from 'react-split';
+
+// Hooks are accessed via React.* inside component bodies
+function SplitPane(props: SplitPaneProps) {
+  const [innerSizes, setInnerSizes] = React.useState<number[]>();
+
+  React.useEffect(() => {
+    return () => {
+      saveSizesStringDebounced.cancel();
+    };
+  }, [saveSizesStringDebounced]);
+
+  const defaultSizePane = React.useMemo(() => {
+    /* ... */
+  }, [initialSizes, defaultSizesProp]);
+}
+
+// ❌ Wrong — named value imports from 'react' are forbidden by ESLint
+import {useState, useEffect} from 'react';
+import * as React from 'react';
+```
 
 ### Testing Patterns
 
 - Unit tests are colocated with source files in `__test__` directories
+- Unit tests use Jest 30 with `babel-jest` transform and `jsdom` environment
 - E2E tests use Playwright with page objects pattern in `tests/` directory
+  - Page models in `tests/models/` (`BaseModel.ts`, `PageModel.ts`)
+  - Test suites in `tests/suites/`
+- E2E tests run against both **Chromium** and **Safari** projects
+- The `data-qa` attribute is used for test element selection (configured via Playwright's `testIdAttribute`)
 - When writing tests, follow existing patterns in the codebase
-- E2E tests use CSS class selectors for element selection
 - Test artifacts are stored in `./playwright-artifacts/` directory
 - Environment variables for E2E tests:
   - `PLAYWRIGHT_BASE_URL` - Override test URL
@@ -199,25 +288,25 @@ The project uses Gravity UI (@gravity-ui/uikit) as the primary component library
 
 ### API Calls
 
-All API calls go through `window.api` global object with domain-specific modules (viewer, schema, storage, etc.)
+All API calls go through `window.api` global object with domain-specific modules (e.g., `window.api.viewer`, `window.api.storage`, `window.api.tablets`).
 
 ### Table Implementation
 
-Use `PaginatedTable` component for data grids with virtual scrolling. Tables require columns, fetchData function, and a unique tableName.
+Use `PaginatedTable` component for data grids with virtual scrolling. Tables require columns, fetchData function, and a unique tableName. For specialized use cases, `@gravity-ui/table` with `@tanstack/react-table` is also available.
 
 ### Redux Toolkit Query Pattern
 
-API endpoints are injected using RTK Query's `injectEndpoints` pattern. Queries wrap `window.api` calls and provide hooks with loading states, error handling, and caching.
+API endpoints are injected using RTK Query's `injectEndpoints` pattern. Queries wrap `window.api` calls and provide hooks with loading states, error handling, and caching. The base API uses `fakeBaseQuery` — all endpoints must use `queryFn`.
 
 ### Common UI Components
 
 - **Notifications**: Use `createToast` utility for user notifications
-- **Error Display**: Use `ResponseError` component for API errors
+- **Error Display**: Use `ResponseError` component for API errors; `PageError` for full-page errors; `AccessDenied` (`src/components/Errors/403`) for access denied
 - **Loading States**: Use `Loader` and `TableSkeleton` components
 
 ### Class Names Convention
 
-Uses BEM naming convention with `cn()` utility from `utils/cn`. Create a block function with component name and use it for element and modifier classes.
+Uses BEM naming convention with `cn()` utility from `utils/cn` (wraps `@bem-react/classname`). Create a block function with component name and use it for element and modifier classes.
 
 ### Type Naming Convention
 
@@ -227,12 +316,29 @@ Uses BEM naming convention with `cn()` utility from `utils/cn`. Create a block f
 ### Common Utilities
 
 - **Formatters**: `src/utils/dataFormatters/` - `formatBytes()`, `formatDateTime()`
-- **Parsers**: `src/utils/timeParsers/` - Time parsing utilities
+- **Parsers**: `src/utils/bytesParsers/` - Byte value parsing utilities; `src/utils/timeParsers/` - Time/duration parsing utilities
 - **Query Utils**: `src/utils/query.ts` - SQL/YQL query helpers
+- **Hooks**: `src/utils/hooks/` - `useTypedSelector`, `useTypedDispatch`, `useSetting`, `useSearchQuery`, `useTableSort`, `useSelectedColumns`, etc.
 
 ### Internationalization (i18n)
 
 See `i18n-naming-ruleset.md` in the repo root for all i18n conventions (naming and usage).
+
+The i18n system uses `@gravity-ui/i18n`. Each component with user-facing strings has an `i18n/` subdirectory containing:
+
+- `en.json` — English translations
+- `index.ts` — Registers the keyset using `registerKeysets()` from `src/utils/i18n`
+
+```typescript
+// Real example: src/components/StorageGroupInfo/i18n/index.ts
+import {registerKeysets} from '../../../utils/i18n';
+
+import en from './en.json';
+
+const COMPONENT = 'storage-group-info';
+
+export const storageGroupInfoKeyset = registerKeysets(COMPONENT, {en});
+```
 
 ### Performance Considerations
 
@@ -243,7 +349,8 @@ See `i18n-naming-ruleset.md` in the repo root for all i18n conventions (naming a
 
 ### Form Handling Pattern
 
-Always use controlled components with validation. Clear errors on user input and validate before submission. Use Gravity UI form components with proper error states.
+- **Simple forms**: Use controlled Gravity UI form components with validation. Clear errors on user input and validate before submission.
+- **Complex forms**: Use `react-hook-form` with `@hookform/resolvers` and Zod schemas for validation (e.g., `QuerySettingsDialog`, `ManagePartitioningDialog`).
 
 ### Dialog/Modal Pattern
 
@@ -261,22 +368,35 @@ Uses React Router v5 hooks (`useHistory`, `useParams`, etc.). Always validate ro
 - Use `z.enum([...]).catch(defaultValue)` pattern for safe parsing with fallbacks
 
 ```typescript
-// ✅ PREFERRED pattern for URL parameters
-const sortColumnSchema = z.enum(['column1', 'column2', 'column3']).catch('column1');
+// ✅ Zod schema with fallback (src/containers/Versions/Versions.tsx)
+const groupByValueSchema = z.nativeEnum(GroupByValue).catch(GroupByValue.VERSION);
 
+// ✅ Custom QueryParamConfig (src/containers/Tenant/Diagnostics/TopQueries/hooks/useSortParam.ts)
 const SortOrderParam: QueryParamConfig<SortOrder[]> = {
-  encode: (value) => (value ? encodeURIComponent(JSON.stringify(value)) : undefined),
+  encode: (value) => {
+    if (value === undefined || value === null || !Array.isArray(value)) {
+      return undefined;
+    }
+    return encodeURIComponent(JSON.stringify(value));
+  },
   decode: (value) => {
+    if (typeof value !== 'string' || !value) {
+      return [];
+    }
     try {
-      return value ? JSON.parse(decodeURIComponent(value)) : [];
+      return JSON.parse(decodeURIComponent(value));
     } catch {
       return [];
     }
   },
 };
 
-const [urlParam, setUrlParam] = useQueryParam('sort', SortOrderParam);
+const [urlSortParam, setUrlSortParam] = useQueryParam<SortOrder[]>(paramName, SortOrderParam);
 ```
+
+### UIFactory Pattern
+
+The `uiFactory` in `src/uiFactory/uiFactory.ts` provides an extensibility layer for customizing the UI when using the project as a library. Use `configureUIFactory()` to override defaults like monitoring links, healthcheck views, feature flags, and access control.
 
 ### Critical Rules
 
@@ -290,6 +410,9 @@ const [urlParam, setUrlParam] = useQueryParam('sort', SortOrderParam);
 - **ALWAYS** validate route params exist before use
 - **ALWAYS** follow i18n naming rules from `i18n-naming-ruleset.md`
 - **ALWAYS** use Zod schemas for URL parameter validation with fallbacks
+- **ALWAYS** use separate `import type` for type-only imports
+- **ALWAYS** use `import React from 'react'` (not named imports from react)
+- **ALWAYS** use `React.Fragment` instead of `<></>`
 - **PREFER** `use-query-params` over `redux-location-state` for new URL parameter handling
 
 ### Debugging Tips

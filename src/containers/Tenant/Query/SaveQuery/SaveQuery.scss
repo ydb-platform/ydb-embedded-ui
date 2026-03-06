@@ -4,22 +4,7 @@
         align-items: flex-start;
 
         & + & {
-            margin-top: var(--g-text-body-1-line-height);
-        }
-    }
-    &__field-title {
-        margin-right: 12px;
-
-        font-weight: 500;
-        line-height: 28px;
-        white-space: nowrap;
-
-        &.required {
-            &::after {
-                content: '*';
-
-                color: var(--g-color-text-danger);
-            }
+            margin-top: var(--g-spacing-4);
         }
     }
     &__control-wrapper {

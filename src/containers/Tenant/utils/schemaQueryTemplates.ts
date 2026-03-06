@@ -1,9 +1,4 @@
 import type {IQueryResult} from '../../../types/store/query';
-import {
-    getStringifiedData,
-    stripIndentByFirstLine,
-    trimOuterEmptyLines,
-} from '../../../utils/dataFormatters/dataFormatters';
 import type {SchemaData} from '../Schema/SchemaViewer/types';
 
 export interface SchemaQueryParams {
@@ -18,10 +13,6 @@ export type TemplateFn = (params?: SchemaQueryParams) => string;
 
 function normalizeParameter(param: string) {
     return param.replace(/\$/g, '\\$');
-}
-
-function toLF(str: string) {
-    return str.replace(/\r\n?/g, '\n');
 }
 
 export const createTableTemplate = (params?: SchemaQueryParams) => {
@@ -377,29 +368,6 @@ export const alterStreamingQuerySettingsTemplate = (params?: SchemaQueryParams) 
 );`;
 };
 
-export const alterStreamingQueryText = (params?: SchemaQueryParams) => {
-    const streamingQueryName = params?.relativePath
-        ? `\`${normalizeParameter(params.relativePath)}\``
-        : '${1:<my_streaming_query>}';
-
-    const sysData = params?.streamingQueryData;
-    const rawQueryText = getStringifiedData(sysData?.resultSets?.[0]?.result?.[0]?.Text);
-    let queryText = toLF(rawQueryText);
-    queryText = trimOuterEmptyLines(queryText);
-    queryText = stripIndentByFirstLine(queryText);
-    queryText = normalizeParameter(queryText);
-
-    const bodyQueryText = queryText ? queryText : '${2:<streaming_query_text>}';
-    return `ALTER STREAMING QUERY ${streamingQueryName} SET (
-    FORCE = TRUE, -- Allow to drop last query checkpoint if query state can't be loaded
-) AS
-DO BEGIN
-
-${bodyQueryText}
-
-END DO;`;
-};
-
 export const dropStreamingQueryTemplate = (params?: SchemaQueryParams) => {
     const streamingQueryName = params?.relativePath
         ? `\`${normalizeParameter(params.relativePath)}\``
@@ -429,7 +397,8 @@ WITH (
     vector_type="uint8",
     vector_dimension=\${4:512},
     levels=\${5:2},
-    clusters=\${6:128}
+    clusters=\${6:128},
+    overlap_clusters=\${7:3}
 );`;
 };
 

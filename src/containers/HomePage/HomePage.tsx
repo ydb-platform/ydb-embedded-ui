@@ -25,6 +25,7 @@ import {useSetting, useTypedDispatch} from '../../utils/hooks';
 import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {isAccessError} from '../../utils/response';
 import {Clusters} from '../Clusters/Clusters';
+import {GetMetaUser} from '../GetUserWrapper/GetUserWrapper';
 import {TenantsTable} from '../Tenants/TenantsTable';
 
 import i18n from './i18n';
@@ -258,10 +259,12 @@ export function HomePage() {
         >
             <LoaderWrapper loading={environmentsLoading}>
                 {renderHelmet()}
-                <Flex direction="column" className={b()} ref={scrollContainerRef}>
-                    {renderTabs()}
-                    <Flex className={b('content-wrapper')}>{renderContent()}</Flex>
-                </Flex>
+                <GetMetaUser>
+                    <Flex direction="column" className={b()} ref={scrollContainerRef}>
+                        {renderTabs()}
+                        <Flex className={b('content-wrapper')}>{renderContent()}</Flex>
+                    </Flex>
+                </GetMetaUser>
             </LoaderWrapper>
         </PageError>
     );

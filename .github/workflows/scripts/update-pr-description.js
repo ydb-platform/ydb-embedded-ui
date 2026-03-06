@@ -18,7 +18,7 @@ async function updatePRDescription(github, context) {
 
     // Get test status and report URL
     const {status, statusColor} = getTestStatus(currentResults);
-    const reportUrl = `https://${context.repo.owner}.github.io/${context.repo.repo}/${context.issue.number}/`;
+    const reportUrl = `https://${context.repo.owner}.github.io/${context.repo.repo}/${context.issue.number}/?t=${Date.now()}`;
 
     // Get bundle size information
     const bundleInfo = getBundleInfo();

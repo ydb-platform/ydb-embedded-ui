@@ -1,6 +1,7 @@
-@import '../../../../../styles/mixins.scss';
+@use '../../styles/mixins.scss';
 
 .ydb-query-details {
+    --g-definition-list-item-gap: var(--g-spacing-2);
     flex: 1;
 
     color: var(--g-color-text-primary);
@@ -26,6 +27,10 @@
     &__query-title {
         font-size: 14px;
         font-weight: 500;
+    }
+
+    &__query-details-info {
+        flex-grow: 0;
     }
 
     &__query-content {

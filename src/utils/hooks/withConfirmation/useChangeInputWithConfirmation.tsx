@@ -11,6 +11,7 @@ import i18n from './i18n';
 
 function ExtendedSaveQueryButton() {
     const modal = NiceModal.useModal(CONFIRMATION_DIALOG);
+    const currentInput = useTypedSelector(selectUserInput);
 
     const closeModal = React.useCallback(() => {
         modal.hide();
@@ -29,8 +30,9 @@ function ExtendedSaveQueryButton() {
         () => ({
             onSuccess: handleSaveQuerySuccess,
             onCancel: handleCancelQuerySave,
+            queryBody: currentInput,
         }),
-        [handleSaveQuerySuccess, handleCancelQuerySave],
+        [handleSaveQuerySuccess, handleCancelQuerySave, currentInput],
     );
 
     return <SaveQueryButton view="action" size="l" dialogProps={dialogProps} />;

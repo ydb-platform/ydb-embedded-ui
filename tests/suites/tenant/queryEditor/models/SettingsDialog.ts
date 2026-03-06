@@ -24,6 +24,9 @@ export class SettingsDialog {
     private timeoutHintPopover: Locator;
     private timeoutLabel: Locator;
 
+    private timeoutErrorIcon: Locator;
+    private timeoutErrorPopover: Locator;
+
     private queryModeSelect: Locator;
     private resourcePoolSelect: Locator;
     private transactionModeSelect: Locator;
@@ -48,6 +51,10 @@ export class SettingsDialog {
         this.timeoutSwitchHint = this.dialog.locator('.ydb-timeout-label__question-icon');
         this.timeoutHintPopover = this.page.locator('.g-help-mark__popover');
         this.timeoutLabel = this.dialog.locator('.ydb-timeout-label__label-title');
+        this.timeoutErrorIcon = this.dialog.locator(
+            '.ydb-query-settings-timeout__input [data-qa="control-error-icon-qa"]',
+        );
+        this.timeoutErrorPopover = this.page.locator('.g-popover-legacy__tooltip-content');
 
         // Define distinct locators for selects
         this.queryModeSelect = this.dialog.locator(
@@ -225,6 +232,33 @@ export class SettingsDialog {
 
     async isTimeoutLabelVisible() {
         return await this.timeoutLabel.isVisible();
+    }
+
+    async changeTimeout(value: number) {
+        const input = this.timeoutInput.locator('input');
+        await input.fill(value.toString());
+        await this.page.waitForTimeout(500);
+    }
+
+    async clearTimeout() {
+        const input = this.timeoutInput.locator('input');
+        await input.clear();
+        await this.page.waitForTimeout(500);
+    }
+
+    async getTimeoutValue() {
+        const input = this.timeoutInput.locator('input');
+        return await input.inputValue();
+    }
+
+    async isTimeoutError() {
+        return await this.timeoutErrorIcon.isVisible();
+    }
+
+    async getTimeoutErrorMessage() {
+        await this.timeoutErrorIcon.hover();
+        await this.timeoutErrorPopover.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        return await this.timeoutErrorPopover.textContent();
     }
 
     async isStatisticsOptionDisabled(mode: StatisticsMode) {

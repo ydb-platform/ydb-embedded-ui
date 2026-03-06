@@ -40,7 +40,11 @@ import {
 } from '../../../../utils/hooks';
 import {useChangedQuerySettings} from '../../../../utils/hooks/useChangedQuerySettings';
 import {useLastQueryExecutionSettings} from '../../../../utils/hooks/useLastQueryExecutionSettings';
-import {DEFAULT_QUERY_SETTINGS, QUERY_ACTIONS, QUERY_MODES} from '../../../../utils/query';
+import {
+    DEFAULT_QUERY_SETTINGS,
+    QUERY_ACTIONS,
+    isStreamingSupportedForMode,
+} from '../../../../utils/query';
 import {reachMetricaGoal} from '../../../../utils/yaMetrica';
 import {useCurrentSchema} from '../../TenantContext';
 import type {InitialPaneState} from '../../utils/paneVisibilityToggleHelpers';
@@ -119,7 +123,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
     const isStreamingEnabled =
         useStreamingAvailable() &&
         isQueryStreamingEnabled &&
-        querySettings.queryMode === QUERY_MODES.query;
+        isStreamingSupportedForMode(querySettings.queryMode);
 
     const [sendQuery] = queryApi.useUseSendQueryMutation();
     const [streamQuery] = queryApi.useUseStreamQueryMutation();
@@ -195,7 +199,32 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
             resetBanner();
             setLastQueryExecutionSettings(querySettings);
         }
-        const queryId = uuidv4();
+
+        dispatch(setShowPreview(false));
+
+        let historyQueryId = historyCurrentQueryId ?? uuidv4();
+        const newQueryId = uuidv4();
+
+        const startTime = Date.now();
+
+        // Don't save partial queries in history
+        if (!partial) {
+            const currentQuery = historyCurrentQueryId
+                ? historyQueries.find((q) => q.queryId === historyCurrentQueryId)
+                : null;
+            // if it is query with results stored in server (has operationId) save every launch into history
+            if (text !== currentQuery?.queryText || currentQuery?.operationId) {
+                historyQueryId = newQueryId;
+                saveQueryToHistory(text, newQueryId, startTime);
+            }
+            dispatch(setIsDirty(false));
+        }
+
+        // Only reset pane to default size if it's currently collapsed.
+        // If the user has manually resized the pane, respect their layout.
+        if (resultVisibilityState.collapsed) {
+            dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
+        }
 
         // Abort previous query if there was any
         queryExecutionManagerInstance.abortQuery(activeTabId);
@@ -209,12 +238,47 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
             const query = streamQuery({
                 tabId: activeTabId,
                 actionType: 'execute',
+                startTime,
                 query: text,
                 database,
                 querySettings,
                 enableTracingLevel,
                 base64: encodeTextWithBase64,
+                historyQueryId,
             });
+            query
+                .unwrap()
+                .then((data) => {
+                    if (data.historyQueryId) {
+                        updateQueryInHistory(
+                            data.historyQueryId,
+                            data.queryStats,
+                            data.operationId,
+                            data.queryId,
+                        );
+                    }
+                })
+                .catch((error) => {
+                    if (error?.name === 'AbortError') {
+                        updateQueryInHistory(historyQueryId, {
+                            startTime,
+                            durationUs: (Date.now() - startTime) * 1000,
+                            status: 'stopped',
+                        });
+                        return;
+                    }
+                    if (error?.extra?.historyQueryId) {
+                        updateQueryInHistory(
+                            error.extra.historyQueryId,
+                            error.extra.queryStats,
+                            error.extra.operationId,
+                            error.extra.queryId,
+                        );
+                    } else {
+                        // Do not add query stats for failed query
+                        console.error('Failed to update query history:', error);
+                    }
+                });
 
             queryExecutionManagerInstance.registerQuery(activeTabId, query);
         } else {
@@ -222,44 +286,43 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
             const query = sendQuery({
                 tabId: activeTabId,
                 actionType: 'execute',
+                startTime,
                 query: text,
                 database,
                 querySettings,
                 enableTracingLevel,
-                queryId,
+                queryId: newQueryId,
+                historyQueryId: historyQueryId,
                 base64: encodeTextWithBase64,
             });
 
             query
                 .then(({data}) => {
-                    if (data?.queryId) {
-                        updateQueryInHistory(data.queryId, data?.queryStats);
+                    // save in history failed query only if it has operationId. It means that query is saved in server side and its results may be retrieved.
+                    if (data?.historyQueryId) {
+                        updateQueryInHistory(
+                            data.historyQueryId,
+                            data?.queryStats,
+                            undefined,
+                            data.queryId,
+                        );
                     }
                 })
                 .catch((error) => {
-                    // Do not add query stats for failed query
-                    console.error('Failed to update query history:', error);
+                    if (error?.extra?.historyQueryId) {
+                        updateQueryInHistory(
+                            error.extra.historyQueryId,
+                            error.extra.queryStats,
+                            error.extra.operationId,
+                            error.extra.queryId,
+                        );
+                    } else {
+                        // Do not add query stats for failed query
+                        console.error('Failed to update query history:', error);
+                    }
                 });
 
             queryExecutionManagerInstance.registerQuery(activeTabId, query);
-        }
-
-        dispatch(setShowPreview(false));
-
-        // Don't save partial queries in history
-        if (!partial) {
-            const currentQuery = historyCurrentQueryId
-                ? historyQueries.find((q) => q.queryId === historyCurrentQueryId)
-                : null;
-            if (text !== currentQuery?.queryText) {
-                saveQueryToHistory(text, queryId);
-            }
-            dispatch(setIsDirty(false));
-        }
-        // Only reset pane to default size if it's currently collapsed.
-        // If the user has manually resized the pane, respect their layout.
-        if (resultVisibilityState.collapsed) {
-            dispatchResultVisibilityState(PaneVisibilityActionTypes.triggerExpand);
         }
     });
 
@@ -279,9 +342,12 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
 
         reachMetricaGoal('runQuery', {actionType: 'explain', ...querySettings});
 
+        const startTime = Date.now();
+
         const query = sendQuery({
             tabId: activeTabId,
             actionType: 'explain',
+            startTime,
             query: text,
             database,
             querySettings,

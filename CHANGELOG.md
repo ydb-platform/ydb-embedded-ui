@@ -1,5 +1,44 @@
 # Changelog
 
+## [14.9.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.9.1...v14.9.2) (2026-03-05)
+
+
+### Bug Fixes
+
+* **HomePage:** always require whoami for databases ([#3573](https://github.com/ydb-platform/ydb-embedded-ui/issues/3573)) ([34b78f6](https://github.com/ydb-platform/ydb-embedded-ui/commit/34b78f63aaf3508003a6ba2859dde247e03b51c1))
+
+## [14.9.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.9.0...v14.9.1) (2026-03-04)
+
+
+### Bug Fixes
+
+* make timeout in query fit into uint32 ([#3568](https://github.com/ydb-platform/ydb-embedded-ui/issues/3568)) ([19a2930](https://github.com/ydb-platform/ydb-embedded-ui/commit/19a2930a2d9e9cdac2a9756f6dce55c480dd7060))
+
+## [14.9.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.8.0...v14.9.0) (2026-03-04)
+
+
+### Features
+
+* overlap clusters parameter UI ([#3547](https://github.com/ydb-platform/ydb-embedded-ui/issues/3547)) ([50fa1dd](https://github.com/ydb-platform/ydb-embedded-ui/commit/50fa1ddda8b13c6bd788a74cb2da0a2bca78f4f0))
+
+## [14.8.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.7.0...v14.8.0) (2026-03-04)
+
+
+### Features
+
+* **Cluster:** redesign cluster dashboard ([#3518](https://github.com/ydb-platform/ydb-embedded-ui/issues/3518)) ([8e7bfca](https://github.com/ydb-platform/ydb-embedded-ui/commit/8e7bfcaef4fd27e36d40f1e30ad1c4785211d938))
+* matrix tests ([#3546](https://github.com/ydb-platform/ydb-embedded-ui/issues/3546)) ([dfa8877](https://github.com/ydb-platform/ydb-embedded-ui/commit/dfa8877ff97f17f51962643e87d5c86ec47d59cf))
+* **QuerySettings:** select statistics mode if svg plan active ([#3510](https://github.com/ydb-platform/ydb-embedded-ui/issues/3510)) ([4324b9c](https://github.com/ydb-platform/ydb-embedded-ui/commit/4324b9cf4a4374d3f257de96317548661a0c3872))
+
+
+### Bug Fixes
+
+* **CpuTab:** use CoresTotal as limit, show nodes, include Batch pool ([#3540](https://github.com/ydb-platform/ydb-embedded-ui/issues/3540)) ([0402abf](https://github.com/ydb-platform/ydb-embedded-ui/commit/0402abfdc546c0705ea309ce01dcbce7d648c8d1))
+* gh-pages report caching ([#3549](https://github.com/ydb-platform/ydb-embedded-ui/issues/3549)) ([97ed241](https://github.com/ydb-platform/ydb-embedded-ui/commit/97ed241a6a40350c0a7292f58b017363f6c9598b))
+* **HomePage:** render databases when whoami returns 403 ([#3541](https://github.com/ydb-platform/ydb-embedded-ui/issues/3541)) ([df28d7c](https://github.com/ydb-platform/ydb-embedded-ui/commit/df28d7cc625c7f9126fbacbc719e6a0cb227494d))
+* remove "alter streaming query text" snippet ([#3534](https://github.com/ydb-platform/ydb-embedded-ui/issues/3534)) ([2df36f3](https://github.com/ydb-platform/ydb-embedded-ui/commit/2df36f39d5afb76075b35471f5b8fd590bb9a621))
+* use EMPTY_DATA_PLACEHOLDER instead of hardcoded “no data” ([#3532](https://github.com/ydb-platform/ydb-embedded-ui/issues/3532)) ([6372d9b](https://github.com/ydb-platform/ydb-embedded-ui/commit/6372d9bfb459158f816ecbf868535d451b55b95b))
+
 ## [14.7.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.6.0...v14.7.0) (2026-02-26)
 
 
