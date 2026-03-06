@@ -84,25 +84,24 @@
 
                 content: '';
 
-                box-shadow: 0 0 var(--ydb-nav-animation-size) 0 transparent;
-
                 animation: ydb-nav-highlight-blink 2s ease-in-out 3s 2 forwards;
             }
         }
 
         &_diagnostics {
+            border-radius: var(--ydb-nav-bg-radius) var(--ydb-nav-bg-radius) 0 0;
+        }
+        &_diagnostics#{&}_with-animation {
             margin-top: var(
                 --ydb-nav-animation-size
             ); /* add space at the top for proper shadow animation */
-
-            border-radius: var(--ydb-nav-bg-radius) var(--ydb-nav-bg-radius) 0 0;
 
             &::before {
                 border-radius: var(--ydb-nav-bg-radius) var(--ydb-nav-bg-radius) 0 0;
             }
         }
 
-        &_schema {
+        &_schema#{&}_with-animation {
             &::before {
                 top: calc(
                     -1 * var(--ydb-nav-animation-size)
@@ -117,11 +116,12 @@
         }
 
         &_query {
+            border-radius: 0 0 var(--ydb-nav-bg-radius) var(--ydb-nav-bg-radius);
+        }
+        &_query#{&}_with-animation {
             margin-bottom: var(
                 --ydb-nav-animation-size
             ); /* add space at the bottom for proper shadow animation */
-
-            border-radius: 0 0 var(--ydb-nav-bg-radius) var(--ydb-nav-bg-radius);
 
             &::before {
                 top: calc(
