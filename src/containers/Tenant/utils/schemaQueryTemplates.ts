@@ -382,6 +382,23 @@ export const addTableIndex = (params?: SchemaQueryParams) => {
     return `ALTER TABLE ${path} ADD INDEX \${2:index_name} GLOBAL ON (\${3:<column_name>});`;
 };
 
+export const addFulltextIndex = (params?: SchemaQueryParams) => {
+    const path = params?.relativePath
+        ? `\`${normalizeParameter(params.relativePath)}\``
+        : '${1:<my_table>}';
+
+    return `ALTER TABLE ${path}
+ADD INDEX \${2:my_fulltext_index}
+GLOBAL USING fulltext_relevance
+ON (\${3:text_column})
+WITH (
+    tokenizer=standard,
+    use_filter_lowercase=true,
+    use_filter_snowball=true,
+    language='\${4:english}'
+);`;
+};
+
 export const addVectorIndex = (params?: SchemaQueryParams) => {
     const path = params?.relativePath
         ? `\`${normalizeParameter(params.relativePath)}\``

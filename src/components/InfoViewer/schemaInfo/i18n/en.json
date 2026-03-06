@@ -23,6 +23,7 @@
   "field_use_filter_length": "Filter Length",
   "field_filter_length_min": "Filter Length Min",
   "field_filter_length_max": "Filter Length Max",
+  "field_use_filter_snowball": "Filter Snowball",
   "filter_enabled": "Enabled",
   "filter_disabled": "Disabled",
 

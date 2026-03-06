@@ -308,4 +308,25 @@ test.describe('Query Templates', () => {
         const editorContent = await queryEditor.getEditorContent();
         expect(editorContent).toContain('overlap_clusters');
     });
+
+    test('Add fulltext index template contains fulltext_relevance and use_filter_snowball', async ({
+        page,
+    }) => {
+        const objectSummary = new ObjectSummary(page);
+        const queryEditor = new QueryEditor(page);
+
+        const tableName = await queryEditor.createNewFakeTable();
+        await objectSummary.clickRefreshButton();
+
+        await objectSummary.clickActionMenuItem(tableName, RowTableAction.AddFulltextIndex);
+
+        await expect
+            .poll(() => queryEditor.getEditorContent(), {timeout: 5000})
+            .toContain('fulltext_relevance');
+
+        const editorContent = await queryEditor.getEditorContent();
+        expect(editorContent).toContain('use_filter_snowball');
+        expect(editorContent).toContain('tokenizer');
+        expect(editorContent).toContain('use_filter_lowercase');
+    });
 });

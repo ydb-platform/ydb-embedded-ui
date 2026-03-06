@@ -1,4 +1,5 @@
 import {
+    addFulltextIndex,
     addTableIndex,
     addVectorIndex,
     alterAsyncReplicationTemplate,
@@ -71,6 +72,7 @@ export const bindActions = (changeUserInput: (input: string) => void) => {
         revokePrivilege: inputQuery(revokePrivilegeTemplate),
         dropUser: inputQuery(dropUserTemplate),
         dropGroup: inputQuery(dropGroupTemplate),
+        addFulltextIndex: inputQuery(addFulltextIndex),
         addVectorIndex: inputQuery(addVectorIndex),
         addTableIndex: inputQuery(addTableIndex),
         dropTableIndex: inputQuery(dropTableIndex),
