@@ -1,9 +1,10 @@
 import React from 'react';
 
-import {ArrowToggle, Button, Flex} from '@gravity-ui/uikit';
+import {ActionTooltip, ArrowToggle, Button, Flex} from '@gravity-ui/uikit';
 import type {Row} from '@tanstack/react-table';
 
 import type {SimlifiedPlanOperatorOtherParams} from '../../../../../../types/api/query';
+import i18n from '../../../i18n';
 
 import {OperationParams} from './OperationParams';
 import {block} from './utils';
@@ -88,6 +89,8 @@ export function OperationCell<TData>({row, depth = 0, params}: OperationCellProp
         () => getDividers(lines, hasVisibleSubNodes),
         [lines, hasVisibleSubNodes],
     );
+    const isExpandable = row.getCanExpand();
+    const isExpanded = row.getIsExpanded();
 
     return (
         <div
@@ -98,15 +101,22 @@ export function OperationCell<TData>({row, depth = 0, params}: OperationCellProp
         >
             {dividers}
             <Flex gap={1} className={block('operation-content')}>
-                {row.getCanExpand() && (
-                    <Button view="flat" size="xs" onClick={row.getToggleExpandedHandler()}>
-                        <Button.Icon>
-                            <ArrowToggle
-                                direction={row.getIsExpanded() ? 'bottom' : 'right'}
-                                size={14}
-                            />
-                        </Button.Icon>
-                    </Button>
+                {isExpandable && (
+                    <ActionTooltip title={i18n(isExpanded ? 'action.collapse' : 'action.expand')}>
+                        <Button
+                            view="flat"
+                            size="xs"
+                            onClick={row.getToggleExpandedHandler()}
+                            aria-label={i18n(isExpanded ? 'action.collapse' : 'action.expand')}
+                        >
+                            <Button.Icon>
+                                <ArrowToggle
+                                    direction={isExpanded ? 'bottom' : 'right'}
+                                    size={14}
+                                />
+                            </Button.Icon>
+                        </Button>
+                    </ActionTooltip>
                 )}
                 <div className={block('operation-name-content')}>
                     {/* wrapper to inline elements */}
