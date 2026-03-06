@@ -46,17 +46,24 @@ export function Navigation({children, userSettings}: NavigationProps) {
                 onItemClick: item.onForward,
                 tooltipText: item.title,
                 itemWrapper: (params, makeItem, options) => {
-                    const cnParams = {
-                        active: item.current,
+                    const baseCnParams = {
                         compact: options.compact,
                         expanded: !options.compact,
                         diagnostics: item.id === 'diagnostics',
                         schema: item.id === 'schema',
                         query: item.id === 'query',
+                    };
+
+                    const wrapperCnParams = {
+                        ...baseCnParams,
                         // TODO: animation should be shown for two weeks after a release
                         // Probably should be sync with new navigation notification when it is added
                         // https://github.com/ydb-platform/ydb-embedded-ui/issues/3587
                         ['with-animation']: true,
+                    };
+                    const buttonCnParams = {
+                        ...baseCnParams,
+                        active: item.current,
                     };
 
                     // span1: full width wrapper to ensure proper button position
@@ -64,11 +71,9 @@ export function Navigation({children, userSettings}: NavigationProps) {
                     // span3: button wrapper for proper active and hover colors
                     return (
                         <span className={b('nav-item-wrapper')}>
-                            <span className={b('nav-item-bg', cnParams)}>
-                                <span className={b('button-wrapper', cnParams)}>
-                                    {makeItem({
-                                        ...params,
-                                    })}
+                            <span className={b('nav-item-bg', wrapperCnParams)}>
+                                <span className={b('button-wrapper', buttonCnParams)}>
+                                    {makeItem(params)}
                                 </span>
                             </span>
                         </span>
