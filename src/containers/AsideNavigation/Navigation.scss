@@ -84,7 +84,7 @@
 
                 content: '';
 
-                box-shadow: 0 0 5px 0 transparent;
+                box-shadow: 0 0 var(--ydb-nav-animation-size) 0 transparent;
 
                 animation: ydb-nav-highlight-blink 2s ease-in-out 3s 2 forwards;
             }
