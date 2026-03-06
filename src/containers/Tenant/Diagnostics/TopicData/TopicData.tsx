@@ -457,6 +457,7 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
                     extraControls={renderExtraControls()}
                     table={
                         <ResizeablePaginatedTable
+                            fetchOverscan={1}
                             columnsWidthLSKey={TOPIC_DATA_COLUMNS_WIDTH_LS_KEY}
                             scrollContainerRef={scrollContainerRef}
                             columns={columnsToShow}

@@ -30,6 +30,8 @@ export interface TableChunksRendererProps<T, F> {
     renderEmptyDataMessage?: RenderEmptyDataMessage;
     onDataFetched: (data?: PaginatedTableData<T>) => void;
     keepCache: boolean;
+    fetchOverscan?: number;
+    throttleDelay?: number;
 }
 
 export const TableChunksRenderer = <T, F>({
@@ -48,6 +50,8 @@ export const TableChunksRenderer = <T, F>({
     renderEmptyDataMessage,
     onDataFetched,
     keepCache,
+    fetchOverscan,
+    throttleDelay,
 }: TableChunksRendererProps<T, F>) => {
     const chunkStates = useScrollBasedChunks({
         scrollContainerRef,
@@ -55,6 +59,8 @@ export const TableChunksRenderer = <T, F>({
         totalItems: foundEntities || 1,
         rowHeight,
         chunkSize,
+        fetchOverscan,
+        throttleDelay,
     });
 
     const lastChunkSize = React.useMemo(() => {
