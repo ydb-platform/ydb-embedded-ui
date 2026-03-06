@@ -94,12 +94,12 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
             >
                 <TableInfoHeader data={data} />
                 {managePartitioningDialogConfig && (
-                    <ActionTooltip title={i18n('title_partition-config')}>
+                    <ActionTooltip title={i18n('action_manage-partition-config')}>
                         <Button
                             view="normal"
                             size="s"
                             onClick={handleOpenManagePartitioning}
-                            aria-label={i18n('title_partition-config')}
+                            aria-label={i18n('action_manage-partition-config')}
                         >
                             <Icon data={Gear} size={16} />
                         </Button>
