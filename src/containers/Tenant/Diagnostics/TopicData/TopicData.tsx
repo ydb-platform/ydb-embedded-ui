@@ -266,6 +266,11 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
                 return;
             }
 
+            // Guard: offset is out of partition range — nothing to navigate to
+            if (newOffset < baseOffset || newOffset >= endOffset) {
+                return;
+            }
+
             if (usePagination) {
                 // Calculate which page this offset belongs to (1-based)
                 const absoluteRow = newOffset - baseOffset;
@@ -298,9 +303,10 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
     // Handle pending scroll after page change.
     // Uses scrollToOffsetRef to always call the latest version without adding scrollToOffset to deps.
     React.useEffect(() => {
-        if (!isNil(pendingScrollOffset.current)) {
-            scrollToOffsetRef.current(pendingScrollOffset.current);
+        const pending = pendingScrollOffset.current;
+        if (!isNil(pending)) {
             pendingScrollOffset.current = undefined;
+            scrollToOffsetRef.current(pending);
         }
     }, [currentPage]);
 
