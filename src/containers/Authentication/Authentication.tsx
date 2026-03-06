@@ -135,7 +135,10 @@ function Authentication({closable = false}: AuthenticationProps) {
     const onTogglePasswordVisibility = () => {
         setShowPassword((prev) => !prev);
     };
-
+    const passwordButtonTitle = showPassword
+        ? i18n('action_hide-password')
+        : i18n('action_show-password');
+    const closeButtonTitle = i18n('action_close');
     return (
         <section className={b()}>
             <form className={b('form-wrapper')}>
@@ -170,22 +173,12 @@ function Authentication({closable = false}: AuthenticationProps) {
                         onKeyDown={onEnterClick}
                         size="l"
                     />
-                    <ActionTooltip
-                        title={
-                            showPassword
-                                ? i18n('action_hide-password')
-                                : i18n('action_show-password')
-                        }
-                    >
+                    <ActionTooltip title={passwordButtonTitle}>
                         <Button
                             onClick={onTogglePasswordVisibility}
                             size="l"
                             className={b('show-password-button')}
-                            aria-label={
-                                showPassword
-                                    ? i18n('action_hide-password')
-                                    : i18n('action_show-password')
-                            }
+                            aria-label={passwordButtonTitle}
                         >
                             <Icon data={showPassword ? EyeSlash : Eye} size={16} />
                         </Button>
@@ -218,12 +211,8 @@ function Authentication({closable = false}: AuthenticationProps) {
                 <div className={b('general-error')}>{generalError}</div>
             </form>
             {closable && history.length > 1 && (
-                <ActionTooltip title={i18n('action_close')}>
-                    <Button
-                        onClick={onClose}
-                        className={b('close')}
-                        aria-label={i18n('action_close')}
-                    >
+                <ActionTooltip title={closeButtonTitle}>
+                    <Button onClick={onClose} className={b('close')} aria-label={closeButtonTitle}>
                         <Icon data={Xmark} size={24} />
                     </Button>
                 </ActionTooltip>

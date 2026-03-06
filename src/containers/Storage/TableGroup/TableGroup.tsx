@@ -34,7 +34,7 @@ export const TableGroup = ({
 
     const renderTitle = () => {
         return (
-            <button onClick={toggleCollapsed} className={b('button')} aria-label={title}>
+            <button onClick={toggleCollapsed} className={b('button')}>
                 <div className={b('title-wrapper')}>
                     <ArrowToggle direction={expanded ? 'top' : 'bottom'} />
                     <div className={b('title')}>

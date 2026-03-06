@@ -27,26 +27,19 @@ interface GroupIdCellProps<TData> {
 function GroupIdCell<TData>({row, name, hasExpand}: GroupIdCellProps<TData>) {
     const isExpandable = row.getCanExpand();
     const isExpanded = row.getIsExpanded();
+    const toggleTitle = isExpanded
+        ? tabletInfoKeyset('action_collapse')
+        : tabletInfoKeyset('action_expand');
 
     return (
         <Flex gap={1} alignItems="flex-start" className={b('name-wrapper')}>
             {isExpandable && (
-                <ActionTooltip
-                    title={
-                        isExpanded
-                            ? tabletInfoKeyset('action_collapse')
-                            : tabletInfoKeyset('action_expand')
-                    }
-                >
+                <ActionTooltip title={toggleTitle}>
                     <Button
                         view="flat"
                         size="xs"
                         onClick={row.getToggleExpandedHandler()}
-                        aria-label={
-                            isExpanded
-                                ? tabletInfoKeyset('action_collapse')
-                                : tabletInfoKeyset('action_expand')
-                        }
+                        aria-label={toggleTitle}
                     >
                         <Button.Icon>
                             <ArrowToggle direction={isExpanded ? 'bottom' : 'right'} size={14} />
