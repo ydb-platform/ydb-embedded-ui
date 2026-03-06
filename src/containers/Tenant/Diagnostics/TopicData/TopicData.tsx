@@ -69,21 +69,9 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
     const [emptyData, setEmptyData] = React.useState(false);
 
     const [baseOffset, setBaseOffset] = React.useState<number>();
-    const [baseEndOffset, setBaseEndOffset] = React.useState<number>();
 
     // Pagination state (1-based, matching Gravity UI Pagination)
     const [currentPage, setCurrentPage] = React.useState(1);
-
-    // Scroll to top synchronously before paint when page changes
-    const prevPage = React.useRef(currentPage);
-    React.useLayoutEffect(() => {
-        if (prevPage.current !== currentPage) {
-            prevPage.current = currentPage;
-            if (scrollContainerRef.current) {
-                scrollContainerRef.current.scrollTop = 0;
-            }
-        }
-    }, [currentPage, scrollContainerRef]);
 
     // Ref to store pending scroll target after page change
     const pendingScrollOffset = React.useRef<number | undefined>();
@@ -100,6 +88,21 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
         handleActiveOffsetChange,
     } = useTopicDataQueryParams();
 
+    // Scroll to top synchronously before paint when page or partition changes
+    const prevPage = React.useRef(currentPage);
+    const prevPartition = React.useRef(selectedPartition);
+    React.useLayoutEffect(() => {
+        const pageChanged = prevPage.current !== currentPage;
+        const partitionChanged = prevPartition.current !== selectedPartition;
+        if (pageChanged || partitionChanged) {
+            prevPage.current = currentPage;
+            prevPartition.current = selectedPartition;
+            if (scrollContainerRef.current) {
+                scrollContainerRef.current.scrollTop = 0;
+            }
+        }
+    }, [currentPage, selectedPartition, scrollContainerRef]);
+
     React.useEffect(() => {
         return () => {
             handleSelectedPartitionChange(undefined);
@@ -110,16 +113,16 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
 
     // Total number of offsets in the partition
     const totalOffsets = React.useMemo(() => {
-        if (isNil(baseOffset) || isNil(baseEndOffset)) {
+        if (isNil(baseOffset) || isNil(endOffset)) {
             return 0;
         }
-        return Math.max(baseEndOffset - baseOffset, 0);
-    }, [baseOffset, baseEndOffset]);
+        return Math.max(endOffset - baseOffset, 0);
+    }, [baseOffset, endOffset]);
 
     const usePagination = totalOffsets > TOPIC_DATA_MIN_TOTAL_FOR_PAGINATION;
 
-    // Compute baseOffset for the current page
-    // When pagination is active: baseOffset + currentPage * TOPIC_DATA_DEFAULT_PAGE_SIZE
+    // Compute pageStartOffset for the current page
+    // When pagination is active: baseOffset + (currentPage - 1) * TOPIC_DATA_DEFAULT_PAGE_SIZE
     // When pagination is not active: baseOffset (show all offsets)
     const pageStartOffset = React.useMemo(() => {
         if (isNil(baseOffset)) {
@@ -165,20 +168,17 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
             ({partitionId}) => partitionId === selectedPartition,
         );
         if (selectedPartitionData) {
-            let currentEndOffset = baseEndOffset;
-            if (!baseEndOffset || selectedPartitionChanged) {
-                currentEndOffset = safeParseNumber(selectedPartitionData.endOffset);
-                setBaseEndOffset(currentEndOffset);
+            if (isNil(endOffset) || selectedPartitionChanged) {
+                setEndOffset(safeParseNumber(selectedPartitionData.endOffset));
             }
             if (isNil(baseOffset) || selectedPartitionChanged) {
-                const partitionStartOffset = safeParseNumber(selectedPartitionData.startOffset);
-                setBaseOffset(partitionStartOffset);
+                setBaseOffset(safeParseNumber(selectedPartitionData.startOffset));
             }
         }
         if (selectedPartitionChanged) {
             prevSelectedPartition.current = selectedPartition;
         }
-    }, [selectedPartition, partitions, baseEndOffset, baseOffset]);
+    }, [selectedPartition, partitions, endOffset, baseOffset]);
 
     React.useEffect(() => {
         if (partitions && partitions.length && isNil(selectedPartition)) {
@@ -191,15 +191,15 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
 
     // Number of entities on the current page
     const pageEntitiesCount = React.useMemo(() => {
-        if (isNil(pageStartOffset) || isNil(baseEndOffset)) {
+        if (isNil(pageStartOffset) || isNil(endOffset)) {
             return 0;
         }
-        const remaining = baseEndOffset - pageStartOffset;
-        if (!usePagination) {
-            return remaining;
-        }
-        return Math.min(TOPIC_DATA_DEFAULT_PAGE_SIZE, remaining);
-    }, [pageStartOffset, baseEndOffset, usePagination]);
+        const remaining = endOffset - pageStartOffset;
+        const result = usePagination
+            ? Math.max(Math.min(TOPIC_DATA_DEFAULT_PAGE_SIZE, remaining), 0)
+            : Math.max(remaining, 0);
+        return result;
+    }, [pageStartOffset, endOffset, usePagination]);
 
     const {columnsToShow, columnsToSelect, setColumns} = useSelectedColumns(
         columns,
@@ -262,7 +262,7 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
 
     const scrollToOffset = React.useCallback(
         (newOffset: number) => {
-            if (isNil(baseOffset) || isNil(baseEndOffset) || isNil(pageStartOffset)) {
+            if (isNil(baseOffset) || isNil(endOffset) || isNil(pageStartOffset)) {
                 return;
             }
 
@@ -286,14 +286,7 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
                 behavior: 'instant',
             });
         },
-        [
-            pageStartOffset,
-            baseOffset,
-            baseEndOffset,
-            usePagination,
-            currentPage,
-            scrollContainerRef,
-        ],
+        [pageStartOffset, baseOffset, endOffset, usePagination, currentPage, scrollContainerRef],
     );
 
     // Keep a ref to the latest scrollToOffset to avoid stale closure in useEffect
@@ -322,7 +315,7 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
     }, [selectedOffset]);
 
     React.useEffect(() => {
-        if (isFetching || isNil(baseOffset)) {
+        if (isFetching || isNil(baseOffset) || isNil(endOffset)) {
             return;
         }
 
@@ -343,7 +336,7 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
                 scrollToOffsetRef.current(safeParseNumber(firstMessage.Offset));
             }
         }
-    }, [currentData, isFetching, baseOffset]);
+    }, [currentData, isFetching, baseOffset, endOffset]);
 
     const handlePaginationUpdate = React.useCallback((page: number) => {
         setCurrentPage(page);
@@ -431,7 +424,7 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
 
     return (
         !isNil(baseOffset) &&
-        !isNil(baseEndOffset) && (
+        !isNil(endOffset) && (
             <DrawerWrapper
                 isDrawerVisible={!isNil(activeOffset)}
                 onCloseDrawer={closeDrawer}
@@ -483,6 +476,7 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
                     }
                     tableWrapperProps={{
                         scrollContainerRef,
+                        scrollDependencies: [selectedPartition, pageStartOffset, tableFilters],
                     }}
                     footer={
                         usePagination ? (

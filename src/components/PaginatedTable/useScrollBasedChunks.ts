@@ -50,13 +50,22 @@ export const useScrollBasedChunks = ({
     totalItems,
     rowHeight,
     chunkSize,
-    renderOverscan = DEFAULT_RENDER_OVERSCAN,
+    renderOverscan: rawRenderOverscan = DEFAULT_RENDER_OVERSCAN,
     fetchOverscan = DEFAULT_FETCH_OVERSCAN,
 }: UseScrollBasedChunksProps): ChunkState[] => {
-    const chunksCount = React.useMemo(
-        () => Math.ceil(totalItems / chunkSize),
-        [chunkSize, totalItems],
-    );
+    const renderOverscan = Math.min(fetchOverscan, rawRenderOverscan);
+    const chunksCount = React.useMemo(() => {
+        if (
+            !chunkSize ||
+            chunkSize <= 0 ||
+            !Number.isFinite(totalItems) ||
+            Number.isNaN(totalItems) ||
+            totalItems < 0
+        ) {
+            return 0;
+        }
+        return Math.ceil(totalItems / chunkSize);
+    }, [chunkSize, totalItems]);
 
     const [visibleStartChunk, setVisibleStartChunk] = React.useState(0);
     const [visibleEndChunk, setVisibleEndChunk] = React.useState(0);

@@ -31,7 +31,6 @@ export interface TableChunksRendererProps<T, F> {
     onDataFetched: (data?: PaginatedTableData<T>) => void;
     keepCache: boolean;
     fetchOverscan?: number;
-    throttleDelay?: number;
 }
 
 export const TableChunksRenderer = <T, F>({
@@ -51,7 +50,6 @@ export const TableChunksRenderer = <T, F>({
     onDataFetched,
     keepCache,
     fetchOverscan,
-    throttleDelay,
 }: TableChunksRendererProps<T, F>) => {
     const chunkStates = useScrollBasedChunks({
         scrollContainerRef,
@@ -60,7 +58,6 @@ export const TableChunksRenderer = <T, F>({
         rowHeight,
         chunkSize,
         fetchOverscan,
-        throttleDelay,
     });
 
     const lastChunkSize = React.useMemo(() => {
