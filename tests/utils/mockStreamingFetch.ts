@@ -16,6 +16,13 @@ export interface MockStreamingOptions {
      * errorAfterChunks are set.
      */
     errorAfterChunks?: number;
+    /**
+     * When true, the SessionCreated part is delivered in two halves with a
+     * 100 ms pause between them, simulating a partial network delivery.
+     * Useful for verifying that `readPartText` correctly accumulates bytes
+     * when the body arrives across multiple ReadableStream chunks.
+     */
+    splitSessionPart?: boolean;
 }
 
 /**
@@ -38,9 +45,15 @@ export async function setupMockStreamingFetch(
     const chunkIntervalMs = options.chunkIntervalMs ?? 200;
     const totalChunks = options.totalChunks ?? null;
     const errorAfterChunks = options.errorAfterChunks ?? null;
+    const splitSessionPart = options.splitSessionPart ?? false;
 
     await page.evaluate(
-        ({chunkIntervalMs: interval, totalChunks: total, errorAfterChunks: errorAfter}) => {
+        ({
+            chunkIntervalMs: interval,
+            totalChunks: total,
+            errorAfterChunks: errorAfter,
+            splitSessionPart: splitSession,
+        }) => {
             const originalFetch = window.fetch;
             (window as unknown as Record<string, unknown>).__originalFetch = originalFetch;
 
@@ -138,8 +151,17 @@ export async function setupMockStreamingFetch(
 
                 const stream = new ReadableStream<Uint8Array>({
                     start(controller) {
-                        // Send session chunk immediately
-                        controller.enqueue(encodePart(sessionJSON));
+                        const sessionPart = encodePart(sessionJSON);
+
+                        if (splitSession) {
+                            const mid = Math.floor(sessionPart.byteLength / 2);
+                            controller.enqueue(sessionPart.subarray(0, mid));
+                            setTimeout(() => {
+                                controller.enqueue(sessionPart.subarray(mid));
+                            }, 100);
+                        } else {
+                            controller.enqueue(sessionPart);
+                        }
 
                         // Deliver data chunks at steady intervals
                         intervalId = window.setInterval(() => {
@@ -206,7 +228,7 @@ export async function setupMockStreamingFetch(
                 });
             }
         },
-        {chunkIntervalMs, totalChunks, errorAfterChunks},
+        {chunkIntervalMs, totalChunks, errorAfterChunks, splitSessionPart},
     );
 }
 
