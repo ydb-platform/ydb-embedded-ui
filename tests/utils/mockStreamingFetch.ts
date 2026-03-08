@@ -147,54 +147,65 @@ export async function setupMockStreamingFetch(
                 const chunkLimit = shouldError ? errorAfter : total;
 
                 let intervalId: number | undefined;
+                let splitTimeoutId: ReturnType<typeof setTimeout> | undefined;
                 let chunkIndex = 0;
 
                 const stream = new ReadableStream<Uint8Array>({
                     start(controller) {
                         const sessionPart = encodePart(sessionJSON);
 
+                        const startDataChunks = () => {
+                            intervalId = window.setInterval(() => {
+                                try {
+                                    // Check if we should terminate
+                                    if (chunkLimit !== null && chunkIndex >= chunkLimit) {
+                                        window.clearInterval(intervalId);
+                                        const responseJSON = shouldError
+                                            ? errorResponseJSON
+                                            : queryResponseJSON;
+                                        controller.enqueue(encodePart(responseJSON));
+                                        controller.enqueue(encodeClosingBoundary());
+                                        controller.close();
+                                        return;
+                                    }
+
+                                    controller.enqueue(encodePart(dataChunkJSON(chunkIndex)));
+                                    chunkIndex++;
+                                } catch (error) {
+                                    window.clearInterval(intervalId);
+                                    try {
+                                        controller.error(
+                                            error instanceof Error
+                                                ? error
+                                                : new Error(String(error)),
+                                        );
+                                    } catch {
+                                        // stream may already be errored/closed
+                                    }
+                                }
+                            }, interval);
+                        };
+
                         if (splitSession) {
                             const mid = Math.floor(sessionPart.byteLength / 2);
                             controller.enqueue(sessionPart.subarray(0, mid));
-                            setTimeout(() => {
-                                controller.enqueue(sessionPart.subarray(mid));
+                            splitTimeoutId = setTimeout(() => {
+                                try {
+                                    controller.enqueue(sessionPart.subarray(mid));
+                                } catch {
+                                    return;
+                                }
+                                startDataChunks();
                             }, 100);
                         } else {
                             controller.enqueue(sessionPart);
+                            startDataChunks();
                         }
-
-                        // Deliver data chunks at steady intervals
-                        intervalId = window.setInterval(() => {
-                            try {
-                                // Check if we should terminate
-                                if (chunkLimit !== null && chunkIndex >= chunkLimit) {
-                                    window.clearInterval(intervalId);
-                                    const responseJSON = shouldError
-                                        ? errorResponseJSON
-                                        : queryResponseJSON;
-                                    controller.enqueue(encodePart(responseJSON));
-                                    controller.enqueue(encodeClosingBoundary());
-                                    controller.close();
-                                    return;
-                                }
-
-                                controller.enqueue(encodePart(dataChunkJSON(chunkIndex)));
-                                chunkIndex++;
-                            } catch (error) {
-                                window.clearInterval(intervalId);
-                                try {
-                                    controller.error(
-                                        error instanceof Error ? error : new Error(String(error)),
-                                    );
-                                } catch {
-                                    // stream may already be errored/closed
-                                }
-                            }
-                        }, interval);
 
                         if (signal) {
                             const onAbort = () => {
                                 window.clearInterval(intervalId);
+                                clearTimeout(splitTimeoutId);
                                 try {
                                     controller.error(
                                         new DOMException(
@@ -217,6 +228,7 @@ export async function setupMockStreamingFetch(
                     },
                     cancel() {
                         window.clearInterval(intervalId);
+                        clearTimeout(splitTimeoutId);
                     },
                 });
 

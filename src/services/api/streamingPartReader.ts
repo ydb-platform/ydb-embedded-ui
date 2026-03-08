@@ -16,8 +16,10 @@ export async function readPartText(part: MultipartPart): Promise<string> {
             if (done) {
                 break;
             }
-            buffer.set(value, offset);
-            offset += value.byteLength;
+            const remaining = contentLength - offset;
+            const slice = value.byteLength <= remaining ? value : value.subarray(0, remaining);
+            buffer.set(slice, offset);
+            offset += slice.byteLength;
         }
 
         return new TextDecoder().decode(buffer.subarray(0, offset));

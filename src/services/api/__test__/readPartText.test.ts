@@ -111,6 +111,17 @@ describe('readPartText', () => {
         expect(result).toBe(json);
     });
 
+    test('clamps chunk that exceeds remaining buffer capacity', async () => {
+        const json = '{"ok":true}';
+        const bytes = toBytes(json);
+        const oversized = new Uint8Array(bytes.byteLength + 20);
+        oversized.set(bytes, 0);
+
+        const part = createFakePart([oversized], bytes.byteLength);
+        const result = await readPartText(part);
+        expect(result).toBe(json);
+    });
+
     test('handles async delivery with delays between chunks', async () => {
         const json = '{"delayed":"chunks"}';
         const bytes = toBytes(json);
