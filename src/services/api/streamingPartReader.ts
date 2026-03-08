@@ -1,8 +1,11 @@
 import type {MultipartPart} from '@mjackson/multipart-parser';
 
+const MAX_PART_SIZE = 64 * 1024 * 1024;
+let decoder: TextDecoder | undefined;
+
 export async function readPartText(part: MultipartPart): Promise<string> {
     const contentLength = part.headers.contentLength;
-    if (contentLength === null || contentLength <= 0) {
+    if (contentLength === null || contentLength <= 0 || contentLength > MAX_PART_SIZE) {
         return part.text();
     }
 
@@ -22,7 +25,8 @@ export async function readPartText(part: MultipartPart): Promise<string> {
             offset += slice.byteLength;
         }
 
-        return new TextDecoder().decode(buffer.subarray(0, offset));
+        decoder ??= new TextDecoder();
+        return decoder.decode(buffer.subarray(0, offset));
     } finally {
         reader.releaseLock();
     }
