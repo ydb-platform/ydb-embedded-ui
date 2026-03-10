@@ -482,4 +482,37 @@ describe('extractErrorDetails', () => {
 
         expect(details?.errorPhase).toBeUndefined();
     });
+
+    test('should extract networkOnline false from enriched connection error', () => {
+        const error = Object.assign(new TypeError('Failed to fetch'), {
+            config: {url: '/viewer/query', method: 'POST'},
+            errorPhase: 'connection',
+            networkOnline: false,
+        });
+        const details = extractErrorDetails(error);
+
+        expect(details?.networkOnline).toBe(false);
+        expect(details?.errorPhase).toBe('connection');
+    });
+
+    test('should extract networkOnline true when online but server unreachable', () => {
+        const error = Object.assign(new TypeError('Failed to fetch'), {
+            config: {url: '/viewer/query', method: 'POST'},
+            errorPhase: 'connection',
+            networkOnline: true,
+        });
+        const details = extractErrorDetails(error);
+
+        expect(details?.networkOnline).toBe(true);
+    });
+
+    test('should not set networkOnline when not present on error', () => {
+        const error = Object.assign(new TypeError('Failed to fetch'), {
+            config: {url: '/viewer/query', method: 'POST'},
+            errorPhase: 'connection',
+        });
+        const details = extractErrorDetails(error);
+
+        expect(details?.networkOnline).toBeUndefined();
+    });
 });

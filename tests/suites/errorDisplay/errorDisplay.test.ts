@@ -1,6 +1,10 @@
 import {expect, test} from '@playwright/test';
 
 import {database} from '../../utils/constants';
+import {
+    cleanupMockStreamingFetch,
+    setupMockStreamingNonJsonChunk,
+} from '../../utils/mockStreamingFetch';
 import {toggleExperiment} from '../../utils/toggleExperiment';
 import {ClusterPage} from '../cluster/ClusterPage';
 import {TenantPage} from '../tenant/TenantPage';
@@ -662,5 +666,45 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
             path: `${FULL_PAGE_DIR}/full-streaming-query-network.png`,
             fullPage: true,
         });
+    });
+
+    test('Streaming query — non-JSON chunk shows parse error with raw text preview', async ({
+        page,
+    }) => {
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({schema: database, database, tenantPage: 'query'});
+
+        await setupMockStreamingNonJsonChunk(page);
+
+        try {
+            const queryEditor = new QueryEditor(page);
+            await queryEditor.setQuery('SELECT 1;');
+            await queryEditor.clickRunButton();
+
+            const errorDisplay = new ErrorDisplayModel(page);
+            await errorDisplay.waitForResponseError();
+
+            const errorText = await errorDisplay.getResponseErrorText();
+            expect(errorText).toContain('Error parsing chunk');
+            expect(errorText).toContain('504 Gateway Timeout');
+
+            expect(await errorDisplay.isFieldsVisible()).toBe(true);
+
+            const workerName = await errorDisplay.getDetailValue('x-worker-name');
+            expect(workerName).toContain('stream-worker-parse-error');
+
+            const url = await errorDisplay.getDetailValue('URL');
+            expect(url).toContain('/viewer/query');
+
+            await expect(errorDisplay.getResponseErrorLocator()).toHaveScreenshot(
+                'error-streaming-query-non-json-chunk.png',
+            );
+            await page.screenshot({
+                path: `${FULL_PAGE_DIR}/full-streaming-query-non-json-chunk.png`,
+                fullPage: true,
+            });
+        } finally {
+            await cleanupMockStreamingFetch(page);
+        }
     });
 });

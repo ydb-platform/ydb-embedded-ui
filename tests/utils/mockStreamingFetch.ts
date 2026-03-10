@@ -308,6 +308,113 @@ export async function setupMockStreamingHttpError(
     );
 }
 
+export interface MockStreamingNonJsonChunkOptions {
+    /** The non-JSON content to send as a multipart chunk body (default: truncated HTML) */
+    body?: string;
+    /** Trace headers to include on the HTTP 200 response */
+    headers?: Record<string, string>;
+}
+
+/**
+ * Monkey-patches `window.fetch` to intercept streaming query requests and return
+ * an HTTP 200 multipart stream where the second chunk contains non-JSON content
+ * (e.g. HTML injected by a proxy). The first chunk is a valid SessionCreated,
+ * so the stream starts normally before hitting the parse error.
+ *
+ * Exercises the JSON.parse error path inside the parseMultipart callback.
+ */
+export async function setupMockStreamingNonJsonChunk(
+    page: Page,
+    options: MockStreamingNonJsonChunkOptions = {},
+): Promise<void> {
+    const garbageBody =
+        options.body ?? '<html><body><h1>504 Gateway Timeout</h1><p>nginx</p></body></html>';
+    const responseHeaders = options.headers ?? {
+        'x-worker-name': 'stream-worker-parse-error.example.net:8765',
+    };
+
+    await page.evaluate(
+        ({garbageBody: garbage, responseHeaders: rHeaders}) => {
+            const originalFetch = window.fetch;
+            (window as unknown as Record<string, unknown>).__originalFetch = originalFetch;
+
+            window.fetch = function (
+                input: RequestInfo | URL,
+                init?: RequestInit,
+            ): Promise<Response> {
+                let url: string;
+                if (typeof input === 'string') {
+                    url = input;
+                } else if (input instanceof URL) {
+                    url = input.href;
+                } else {
+                    url = input.url;
+                }
+
+                const isStreamingQuery =
+                    url.includes('/viewer/query') && url.includes('schema=multipart');
+
+                if (!isStreamingQuery) {
+                    return originalFetch.call(window, input, init);
+                }
+
+                const encoder = new TextEncoder();
+                const BOUNDARY = 'boundary';
+
+                const sessionJSON = JSON.stringify({
+                    version: 10,
+                    meta: {
+                        node_id: 1,
+                        event: 'SessionCreated',
+                        query_id: 'mock-query-1',
+                        session_id: 'mock-session-1',
+                    },
+                });
+
+                function encodePart(content: string): Uint8Array {
+                    const contentBytes = encoder.encode(content);
+                    const header = `--${BOUNDARY}\r\nContent-Type: application/json\r\nContent-Length: ${contentBytes.byteLength}\r\n\r\n`;
+                    const headerBytes = encoder.encode(header);
+                    const suffix = encoder.encode('\r\n');
+                    const part = new Uint8Array(
+                        headerBytes.byteLength + contentBytes.byteLength + suffix.byteLength,
+                    );
+                    part.set(headerBytes, 0);
+                    part.set(contentBytes, headerBytes.byteLength);
+                    part.set(suffix, headerBytes.byteLength + contentBytes.byteLength);
+                    return part;
+                }
+
+                const stream = new ReadableStream<Uint8Array>({
+                    start(controller) {
+                        controller.enqueue(encodePart(sessionJSON));
+                        setTimeout(() => {
+                            try {
+                                controller.enqueue(encodePart(garbage));
+                                controller.enqueue(encoder.encode(`--${BOUNDARY}--\r\n`));
+                                controller.close();
+                            } catch {
+                                // stream may already be closed
+                            }
+                        }, 100);
+                    },
+                });
+
+                return Promise.resolve(
+                    new Response(stream, {
+                        status: 200,
+                        headers: {
+                            'Content-Type': `multipart/form-data; boundary=${BOUNDARY}`,
+                            ...rHeaders,
+                        },
+                    }),
+                );
+            };
+        },
+        {garbageBody, responseHeaders},
+    );
+}
+
 /**
  * Restores the original `window.fetch` that was captured by `setupMockStreamingFetch`.
  * Safe to call even if the mock was never installed (no-op in that case).

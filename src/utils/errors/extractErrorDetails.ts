@@ -285,6 +285,10 @@ function extractDiagnosticFields(error: object, existingFieldCount: number): Par
         result.errorPhase = errorRecord.errorPhase as 'connection' | 'stream';
     }
 
+    if ('networkOnline' in error && typeof errorRecord.networkOnline === 'boolean') {
+        result.networkOnline = errorRecord.networkOnline;
+    }
+
     return result;
 }
 

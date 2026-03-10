@@ -119,6 +119,7 @@ export class StreamingAPI extends BaseYdbAPI {
             Object.assign(enriched, {
                 config: {url, method: 'POST'},
                 errorPhase: 'connection',
+                networkOnline: navigator.onLine,
             });
             throw enriched;
         }
@@ -143,7 +144,14 @@ export class StreamingAPI extends BaseYdbAPI {
         }
 
         if (!response.body) {
-            throw new Error('Empty response body');
+            const error = new Error('Empty response body');
+            Object.assign(error, {
+                status: response.status,
+                statusText: response.statusText,
+                config: {url, method: 'POST'},
+                headers: extractResponseHeaders(response),
+            });
+            throw error;
         }
 
         const traceId = response.headers.get('traceresponse')?.split('-')[1];
@@ -156,7 +164,8 @@ export class StreamingAPI extends BaseYdbAPI {
                 try {
                     chunk = JSON.parse(text);
                 } catch (e) {
-                    throw new Error(`Error parsing chunk: ${e}`);
+                    const preview = text.length > 200 ? text.slice(0, 200) + '…' : text;
+                    throw new Error(`Error parsing chunk: ${e}\nRaw: ${preview}`);
                 }
 
                 if (isErrorChunk(chunk)) {
@@ -185,7 +194,7 @@ export class StreamingAPI extends BaseYdbAPI {
             const enriched =
                 streamError instanceof Error ? streamError : new Error(String(streamError));
             Object.assign(enriched, {
-                config: {url: response.url, method: 'POST'},
+                config: {url, method: 'POST'},
                 headers: extractResponseHeaders(response),
                 errorPhase: 'stream',
             });
