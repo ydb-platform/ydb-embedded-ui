@@ -1,5 +1,21 @@
 # Changelog
 
+## [14.10.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.9.2...v14.10.0) (2026-03-10)
+
+
+### Features
+
+* fulltext index UI ([#3561](https://github.com/ydb-platform/ydb-embedded-ui/issues/3561)) ([a6d0b3d](https://github.com/ydb-platform/ydb-embedded-ui/commit/a6d0b3d77fd65f2297b80160eeaada935a0e7e40))
+
+
+### Bug Fixes
+
+* invalid error on large query stop ([#3539](https://github.com/ydb-platform/ydb-embedded-ui/issues/3539)) ([bdc8dca](https://github.com/ydb-platform/ydb-embedded-ui/commit/bdc8dca2ac5287edff5cb0de0b8bcf7cf3fd7d62))
+* long running query ([#3570](https://github.com/ydb-platform/ydb-embedded-ui/issues/3570)) ([12cba27](https://github.com/ydb-platform/ydb-embedded-ui/commit/12cba2732a31867348396ae444abdb38f914ed49))
+* more accurate streaming statuses ([#3593](https://github.com/ydb-platform/ydb-embedded-ui/issues/3593)) ([b04ab9b](https://github.com/ydb-platform/ydb-embedded-ui/commit/b04ab9b6a6ec93ddd058a619448dd171c99ac1b2))
+* replace native button titles with ActionTooltip ([#3578](https://github.com/ydb-platform/ydb-embedded-ui/issues/3578)) ([efcbc90](https://github.com/ydb-platform/ydb-embedded-ui/commit/efcbc90cce9277d4be3fdf4eee4e7b79e44935c6))
+* **SegmentedProgress:** tune colors ([#3590](https://github.com/ydb-platform/ydb-embedded-ui/issues/3590)) ([10627a7](https://github.com/ydb-platform/ydb-embedded-ui/commit/10627a7cdc2e77262757e8609d8cd52cdff4468a))
+
 ## [14.9.2](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.9.1...v14.9.2) (2026-03-05)
 
 
