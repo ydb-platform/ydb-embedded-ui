@@ -349,7 +349,7 @@ export class QueryEditor {
     }
 
     async clickCopyResultButton() {
-        const copyButton = this.resultsControls.locator('button[aria-label="Copy result"]');
+        const copyButton = this.resultsControls.locator('button[aria-label*="Copy"]');
         await copyButton.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await copyButton.click();
     }

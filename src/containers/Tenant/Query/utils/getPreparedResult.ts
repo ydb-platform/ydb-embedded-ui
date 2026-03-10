@@ -1,24 +1,28 @@
 import type {KeyValueRow} from '../../../../types/api/query';
 
-export function getPreparedResult(data: KeyValueRow[] | undefined) {
-    const columnDivider = '\t';
-    const rowDivider = '\n';
+const COLUMN_DIVIDER = '\t';
+const ROW_DIVIDER = '\n';
 
+/** Builds TSV data as BlobPart[] to avoid the V8 max string length limit. */
+export function buildTsvBlobParts(data: KeyValueRow[] | undefined): BlobPart[] {
     if (!data?.length) {
-        return '';
+        return [];
     }
 
     const columnHeaders = Object.keys(data[0]);
-    const rows = [columnHeaders.map(escapeValue).join(columnDivider)];
+    const parts: BlobPart[] = [columnHeaders.map(escapeValue).join(COLUMN_DIVIDER)];
+
     for (const row of data) {
-        const value = [];
+        parts.push(ROW_DIVIDER);
+        const values = [];
         for (const column of columnHeaders) {
             const v = row[column];
-            value.push(escapeValue(typeof v === 'object' ? JSON.stringify(v) : `${v}`));
+            values.push(escapeValue(typeof v === 'object' ? JSON.stringify(v) : `${v}`));
         }
-        rows.push(value.join(columnDivider));
+        parts.push(values.join(COLUMN_DIVIDER));
     }
-    return rows.join(rowDivider);
+
+    return parts;
 }
 
 function escapeValue(value: string) {
