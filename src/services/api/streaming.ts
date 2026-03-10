@@ -20,6 +20,7 @@ import {DEV_ENABLE_TRACING_FOR_ALL_REQUESTS} from '../../utils/constants';
 import {isRedirectToAuth} from '../../utils/response';
 
 import {BaseYdbAPI} from './base';
+import {readPartText} from './streamingPartReader';
 
 const BOUNDARY = 'boundary';
 
@@ -92,7 +93,7 @@ export class StreamingAPI extends BaseYdbAPI {
         const traceId = response.headers.get('traceresponse')?.split('-')[1];
 
         await parseMultipart(response.body, {boundary: BOUNDARY}, async (part) => {
-            const text = await part.text();
+            const text = await readPartText(part);
 
             let chunk: unknown;
             try {
