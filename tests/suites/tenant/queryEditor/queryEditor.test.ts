@@ -194,7 +194,7 @@ test.describe('Test Query Editor', async () => {
         await responseButton.click();
 
         // The response body section should show the actual HTML content, not "{}"
-        const responseBody = errorAlert.locator('.response-body-section__code');
+        const responseBody = errorAlert.locator('.ydb-response-body-section__code');
         await expect(responseBody).toBeVisible({timeout: VISIBILITY_TIMEOUT});
         await expect(responseBody).toContainText('502 Bad Gateway');
         await expect(responseBody).not.toContainText('{}');
