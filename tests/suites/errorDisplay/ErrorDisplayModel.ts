@@ -28,26 +28,28 @@ export class ErrorDisplayModel extends BaseModel {
     constructor(page: Page) {
         super(page, page.locator('body'));
 
-        this.responseError = page.locator('.response-error').first();
-        this.fieldsDefinitionList = this.responseError.locator('.error-details__fields');
+        this.responseError = page.locator('.ydb-response-error').first();
+        this.fieldsDefinitionList = this.responseError.locator('.ydb-error-details__fields');
         this.issuesTrigger = this.responseError.locator(
-            '.error-details__issues .error-details__details-trigger',
+            '.ydb-error-details__issues .ydb-error-details__details-trigger',
         );
         this.detailsToggleButton = this.responseError.locator(
-            '.error-details button.g-button_view_outlined',
+            '.ydb-error-details button.g-button_view_outlined',
         );
-        this.responseBodyContent = this.responseError.locator('.response-body-section__content');
+        this.responseBodyContent = this.responseError.locator(
+            '.ydb-response-body-section__content',
+        );
 
         this.pageError = page.locator('.ydb-page-error');
         this.pageErrorPageTitle = this.pageError.locator('.g-text_variant_header-1').first();
         this.pageErrorTitle = this.pageError.locator('.empty-state__title');
         this.pageErrorDescription = this.pageError.locator('.empty-state__description');
-        this.pageErrorFields = this.pageError.locator('.error-details__fields');
+        this.pageErrorFields = this.pageError.locator('.ydb-error-details__fields');
         this.pageErrorDetailsToggleButton = this.pageError.locator(
-            '.error-details button.g-button_view_outlined',
+            '.ydb-error-details button.g-button_view_outlined',
         );
         this.pageErrorResponseBodyContent = this.pageError.locator(
-            '.response-body-section__content',
+            '.ydb-response-body-section__content',
         );
 
         this.accessDeniedState = page.locator('.empty-state');
@@ -117,6 +119,10 @@ export class ErrorDisplayModel extends BaseModel {
         return this.responseBodyContent.isVisible();
     }
 
+    async waitForResponseBodyContentHidden(): Promise<void> {
+        await this.responseBodyContent.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
+    }
+
     async getResponseBodyText(): Promise<string> {
         await this.responseBodyContent.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         return this.responseBodyContent.innerText();
@@ -125,6 +131,11 @@ export class ErrorDisplayModel extends BaseModel {
     async isIssuesContentVisible(): Promise<boolean> {
         const issuesContainer = this.responseError.locator('.kv-issues');
         return issuesContainer.isVisible();
+    }
+
+    async waitForIssuesContentHidden(): Promise<void> {
+        const issuesContainer = this.responseError.locator('.kv-issues');
+        await issuesContainer.waitFor({state: 'hidden', timeout: VISIBILITY_TIMEOUT});
     }
 
     async waitForAccessDenied(): Promise<void> {

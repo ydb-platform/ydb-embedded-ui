@@ -1,7 +1,5 @@
-import React from 'react';
-
 import {ChevronDown, ChevronUp} from '@gravity-ui/icons';
-import {Button, Flex, Icon} from '@gravity-ui/uikit';
+import {Button, Disclosure, Flex, Icon} from '@gravity-ui/uikit';
 
 import {cn} from '../../../utils/cn';
 import type {ErrorDetails as ErrorDetailsData} from '../../../utils/errors/extractErrorDetails';
@@ -12,7 +10,7 @@ import {ResponseBodySection} from '../shared/ResponseBodySection';
 
 import './ErrorDetails.scss';
 
-const b = cn('error-details');
+const b = cn('ydb-error-details');
 
 interface ExpandableContent {
     visibleResponseBody?: string;
@@ -43,11 +41,6 @@ export function ErrorDetailsContent({details, renderedTitle}: ErrorDetailsProps)
     const {visibleResponseBody, hasIssueData} = getExpandableContent(details);
 
     const hasExpandableContent = Boolean(visibleResponseBody) || hasIssueData;
-    const [expanded, setExpanded] = React.useState(false);
-
-    const handleToggle = React.useCallback(() => {
-        setExpanded((prev) => !prev);
-    }, []);
 
     const expandButtonLabel = hasIssueData
         ? i18n('error-details.button_issues')
@@ -68,20 +61,26 @@ export function ErrorDetailsContent({details, renderedTitle}: ErrorDetailsProps)
                 />
             )}
             {hasExpandableContent && (
-                <Flex gap={2}>
-                    <Button view="outlined" size="m" onClick={handleToggle}>
-                        {expandButtonLabel}
-                        <Icon data={expanded ? ChevronUp : ChevronDown} size={16} />
-                    </Button>
-                </Flex>
-            )}
-            {expanded && visibleResponseBody && <ResponseBodySection body={visibleResponseBody} />}
-            {expanded && hasIssueData && details.issues && (
-                <IssuesSection
-                    issues={details.issues}
-                    triggerClassName={b('details-trigger')}
-                    disclosureClassName={b('issues')}
-                />
+                <Disclosure>
+                    <Disclosure.Summary>
+                        {(props) => (
+                            <Button view="outlined" size="m" onClick={props.onClick}>
+                                {expandButtonLabel}
+                                <Icon data={props.expanded ? ChevronUp : ChevronDown} size={16} />
+                            </Button>
+                        )}
+                    </Disclosure.Summary>
+                    <div className={b('expandable-content')}>
+                        {visibleResponseBody && <ResponseBodySection body={visibleResponseBody} />}
+                        {hasIssueData && details.issues && (
+                            <IssuesSection
+                                issues={details.issues}
+                                triggerClassName={b('details-trigger')}
+                                disclosureClassName={b('issues')}
+                            />
+                        )}
+                    </div>
+                </Disclosure>
             )}
         </Flex>
     );

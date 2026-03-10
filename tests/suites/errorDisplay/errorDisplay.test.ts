@@ -249,6 +249,7 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
 
         // Click to collapse
         await errorDisplay.clickToggleButton();
+        await errorDisplay.waitForResponseBodyContentHidden();
         expect(await errorDisplay.isResponseBodyContentVisible()).toBe(false);
     });
 
@@ -277,6 +278,7 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
 
         // Click toggle button to collapse the entire section
         await errorDisplay.clickToggleButton();
+        await errorDisplay.waitForIssuesContentHidden();
         expect(await errorDisplay.isIssuesContentVisible()).toBe(false);
     });
 

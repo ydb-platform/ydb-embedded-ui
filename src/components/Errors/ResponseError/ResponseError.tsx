@@ -13,7 +13,7 @@ import {ErrorDetailsContent} from './ErrorDetails';
 
 import './ResponseError.scss';
 
-const b = cn('response-error');
+const b = cn('ydb-response-error');
 
 interface ResponseErrorProps {
     error?: unknown;
@@ -81,7 +81,7 @@ export function ResponseErrorMessage({
     renderedTitle,
 }: ResponseErrorMessageProps) {
     return (
-        <Flex direction="column" gap={2}>
+        <Flex direction="column" gap={2} className={b('message')}>
             {showSubtitle && (
                 <Text variant="body-1" className={b('data-message')}>
                     {subtitle}

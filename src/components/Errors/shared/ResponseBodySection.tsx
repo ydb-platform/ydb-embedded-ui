@@ -5,7 +5,7 @@ import {ClipboardButton} from '../../ClipboardButton/ClipboardButton';
 
 import './ResponseBodySection.scss';
 
-const b = cn('response-body-section');
+const b = cn('ydb-response-body-section');
 
 interface ResponseBodySectionProps {
     body: string;

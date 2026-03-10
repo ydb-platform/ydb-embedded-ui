@@ -30,7 +30,7 @@ export class OperationsTable extends BaseModel {
         this.accessDeniedState = page.locator('.kv-tenant-diagnostics .empty-state');
         this.accessDeniedTitle = this.accessDeniedState.locator('.empty-state__title');
         // ResponseError is an inline Alert component
-        this.responseError = page.locator('.kv-tenant-diagnostics .response-error');
+        this.responseError = page.locator('.kv-tenant-diagnostics .ydb-response-error');
         this.responseErrorTitle = this.responseError.locator('.g-alert__title');
     }
 

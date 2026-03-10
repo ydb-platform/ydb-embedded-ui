@@ -1,6 +1,6 @@
 @use '../../../styles/mixins.scss';
 
-.error-details {
+.ydb-error-details {
     min-width: 0;
     margin-top: var(--g-spacing-3);
 
@@ -45,6 +45,10 @@
         &:hover {
             color: var(--g-color-text-primary);
         }
+    }
+
+    &__expandable-content {
+        padding-top: var(--g-spacing-2);
     }
 
     &__issues {
