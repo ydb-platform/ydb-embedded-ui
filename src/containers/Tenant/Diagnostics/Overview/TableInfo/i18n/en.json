@@ -3,6 +3,7 @@
   "title_table-stats": "Stats",
   "title_tablet-metrics": "Metrics",
   "title_partition-config": "Partition config",
+  "action_manage-partition-config": "Manage partition config",
 
   "button_show-more": "Show more",
   "button_show-less": "Show less",

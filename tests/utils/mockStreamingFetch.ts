@@ -16,6 +16,13 @@ export interface MockStreamingOptions {
      * errorAfterChunks are set.
      */
     errorAfterChunks?: number;
+    /**
+     * When true, the SessionCreated part is delivered in two halves with a
+     * 100 ms pause between them, simulating a partial network delivery.
+     * Useful for verifying that `readPartText` correctly accumulates bytes
+     * when the body arrives across multiple ReadableStream chunks.
+     */
+    splitSessionPart?: boolean;
 }
 
 /**
@@ -38,9 +45,15 @@ export async function setupMockStreamingFetch(
     const chunkIntervalMs = options.chunkIntervalMs ?? 200;
     const totalChunks = options.totalChunks ?? null;
     const errorAfterChunks = options.errorAfterChunks ?? null;
+    const splitSessionPart = options.splitSessionPart ?? false;
 
     await page.evaluate(
-        ({chunkIntervalMs: interval, totalChunks: total, errorAfterChunks: errorAfter}) => {
+        ({
+            chunkIntervalMs: interval,
+            totalChunks: total,
+            errorAfterChunks: errorAfter,
+            splitSessionPart: splitSession,
+        }) => {
             const originalFetch = window.fetch;
             (window as unknown as Record<string, unknown>).__originalFetch = originalFetch;
 
@@ -134,45 +147,65 @@ export async function setupMockStreamingFetch(
                 const chunkLimit = shouldError ? errorAfter : total;
 
                 let intervalId: number | undefined;
+                let splitTimeoutId: ReturnType<typeof setTimeout> | undefined;
                 let chunkIndex = 0;
 
                 const stream = new ReadableStream<Uint8Array>({
                     start(controller) {
-                        // Send session chunk immediately
-                        controller.enqueue(encodePart(sessionJSON));
+                        const sessionPart = encodePart(sessionJSON);
 
-                        // Deliver data chunks at steady intervals
-                        intervalId = window.setInterval(() => {
-                            try {
-                                // Check if we should terminate
-                                if (chunkLimit !== null && chunkIndex >= chunkLimit) {
+                        const startDataChunks = () => {
+                            intervalId = window.setInterval(() => {
+                                try {
+                                    // Check if we should terminate
+                                    if (chunkLimit !== null && chunkIndex >= chunkLimit) {
+                                        window.clearInterval(intervalId);
+                                        const responseJSON = shouldError
+                                            ? errorResponseJSON
+                                            : queryResponseJSON;
+                                        controller.enqueue(encodePart(responseJSON));
+                                        controller.enqueue(encodeClosingBoundary());
+                                        controller.close();
+                                        return;
+                                    }
+
+                                    controller.enqueue(encodePart(dataChunkJSON(chunkIndex)));
+                                    chunkIndex++;
+                                } catch (error) {
                                     window.clearInterval(intervalId);
-                                    const responseJSON = shouldError
-                                        ? errorResponseJSON
-                                        : queryResponseJSON;
-                                    controller.enqueue(encodePart(responseJSON));
-                                    controller.enqueue(encodeClosingBoundary());
-                                    controller.close();
+                                    try {
+                                        controller.error(
+                                            error instanceof Error
+                                                ? error
+                                                : new Error(String(error)),
+                                        );
+                                    } catch {
+                                        // stream may already be errored/closed
+                                    }
+                                }
+                            }, interval);
+                        };
+
+                        if (splitSession) {
+                            const mid = Math.floor(sessionPart.byteLength / 2);
+                            controller.enqueue(sessionPart.subarray(0, mid));
+                            splitTimeoutId = setTimeout(() => {
+                                try {
+                                    controller.enqueue(sessionPart.subarray(mid));
+                                } catch {
                                     return;
                                 }
-
-                                controller.enqueue(encodePart(dataChunkJSON(chunkIndex)));
-                                chunkIndex++;
-                            } catch (error) {
-                                window.clearInterval(intervalId);
-                                try {
-                                    controller.error(
-                                        error instanceof Error ? error : new Error(String(error)),
-                                    );
-                                } catch {
-                                    // stream may already be errored/closed
-                                }
-                            }
-                        }, interval);
+                                startDataChunks();
+                            }, 100);
+                        } else {
+                            controller.enqueue(sessionPart);
+                            startDataChunks();
+                        }
 
                         if (signal) {
                             const onAbort = () => {
                                 window.clearInterval(intervalId);
+                                clearTimeout(splitTimeoutId);
                                 try {
                                     controller.error(
                                         new DOMException(
@@ -195,6 +228,7 @@ export async function setupMockStreamingFetch(
                     },
                     cancel() {
                         window.clearInterval(intervalId);
+                        clearTimeout(splitTimeoutId);
                     },
                 });
 
@@ -206,7 +240,7 @@ export async function setupMockStreamingFetch(
                 });
             }
         },
-        {chunkIntervalMs, totalChunks, errorAfterChunks},
+        {chunkIntervalMs, totalChunks, errorAfterChunks, splitSessionPart},
     );
 }
 

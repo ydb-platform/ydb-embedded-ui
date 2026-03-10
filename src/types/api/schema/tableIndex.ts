@@ -75,6 +75,7 @@ export interface TFulltextIndexAnalyzers {
     use_filter_length?: boolean;
     filter_length_min?: number;
     filter_length_max?: number;
+    use_filter_snowball?: boolean;
 }
 
 export interface TFulltextIndexColumnAnalyzers {

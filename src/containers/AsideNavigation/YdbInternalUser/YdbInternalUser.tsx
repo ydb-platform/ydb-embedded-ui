@@ -1,5 +1,5 @@
 import {ArrowRightFromSquare, ArrowRightToSquare} from '@gravity-ui/icons';
-import {Button, Icon} from '@gravity-ui/uikit';
+import {ActionTooltip, Button, Icon} from '@gravity-ui/uikit';
 import {useHistory} from 'react-router-dom';
 
 import routes, {createHref} from '../../../routes';
@@ -40,9 +40,15 @@ export function YdbInternalUser({login}: {login?: string}) {
             return null;
         }
         return (
-            <Button view="flat-secondary" title={i18n('account.login')} onClick={handleLoginClick}>
-                <Icon data={ArrowRightToSquare} />
-            </Button>
+            <ActionTooltip title={i18n('account.login')}>
+                <Button
+                    view="flat-secondary"
+                    onClick={handleLoginClick}
+                    aria-label={i18n('account.login')}
+                >
+                    <Icon data={ArrowRightToSquare} />
+                </Button>
+            </ActionTooltip>
         );
     };
 
@@ -53,9 +59,15 @@ export function YdbInternalUser({login}: {login?: string}) {
                 {login && <div className={b('username')}>{login}</div>}
             </div>
             {login ? (
-                <Button view="flat-secondary" title={i18n('account.logout')} onClick={handleLogout}>
-                    <Icon data={ArrowRightFromSquare} />
-                </Button>
+                <ActionTooltip title={i18n('account.logout')}>
+                    <Button
+                        view="flat-secondary"
+                        onClick={handleLogout}
+                        aria-label={i18n('account.logout')}
+                    >
+                        <Icon data={ArrowRightFromSquare} />
+                    </Button>
+                </ActionTooltip>
             ) : (
                 renderLoginButton()
             )}

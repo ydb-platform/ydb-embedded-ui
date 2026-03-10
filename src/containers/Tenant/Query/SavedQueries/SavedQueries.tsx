@@ -3,7 +3,7 @@ import React from 'react';
 import {Pencil, TrashBin} from '@gravity-ui/icons';
 import type {Column} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
-import {Button, Dialog, Icon} from '@gravity-ui/uikit';
+import {ActionTooltip, Button, Dialog, Icon} from '@gravity-ui/uikit';
 
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
@@ -129,12 +129,21 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
                         <TruncatedQuery value={query.body} maxQueryHeight={MAX_QUERY_HEIGHT} />
                     </div>
                     <span className={b('controls')}>
-                        <Button view="flat-secondary">
-                            <Icon data={Pencil} />
-                        </Button>
-                        <Button view="flat-secondary" onClick={onDeleteQueryClick(query.name)}>
-                            <Icon data={TrashBin} />
-                        </Button>
+                        <ActionTooltip title={i18n('action.edit')}>
+                            <Button view="flat-secondary" aria-label={i18n('action.edit')}>
+                                <Icon data={Pencil} />
+                            </Button>
+                        </ActionTooltip>
+
+                        <ActionTooltip title={i18n('delete-dialog.delete')}>
+                            <Button
+                                view="flat-secondary"
+                                onClick={onDeleteQueryClick(query.name)}
+                                aria-label={i18n('delete-dialog.delete')}
+                            >
+                                <Icon data={TrashBin} />
+                            </Button>
+                        </ActionTooltip>
                     </span>
                 </div>
             ),

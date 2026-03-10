@@ -123,7 +123,27 @@ test.describe('Test Query Execution Status', async () => {
             }
         }
 
+        expect(transitions).toContain('Running');
         expect(transitions[transitions.length - 1]).toBe('Completed');
+    });
+
+    test('Streaming query reaches "Running" when SessionCreated arrives in split chunks', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+        await toggleExperiment(page, 'on', 'Query Streaming');
+
+        await setupMockStreamingFetch(page, {
+            totalChunks: 5,
+            splitSessionPart: true,
+            chunkIntervalMs: 1000,
+        });
+
+        await queryEditor.setQuery(testQuery);
+        await queryEditor.clickRunButton();
+
+        await expect(queryEditor.waitForStatus('Running')).resolves.toBe(true);
+        await expect(queryEditor.waitForStatus('Completed')).resolves.toBe(true);
     });
 
     test('Streaming query shows "Failed" status on server error', async ({page}) => {

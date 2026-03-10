@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {ChevronDown, ChevronUp, Gear} from '@gravity-ui/icons';
-import {Button, Disclosure, Flex, Icon} from '@gravity-ui/uikit';
+import {ActionTooltip, Button, Disclosure, Flex, Icon} from '@gravity-ui/uikit';
 
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {tablePartitioningApi} from '../../../../../store/reducers/tablePartitioning/tablePartitioning';
@@ -94,9 +94,16 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
             >
                 <TableInfoHeader data={data} />
                 {managePartitioningDialogConfig && (
-                    <Button view="normal" size="s" onClick={handleOpenManagePartitioning}>
-                        <Icon data={Gear} size={16} />
-                    </Button>
+                    <ActionTooltip title={i18n('action_manage-partition-config')}>
+                        <Button
+                            view="normal"
+                            size="s"
+                            onClick={handleOpenManagePartitioning}
+                            aria-label={i18n('action_manage-partition-config')}
+                        >
+                            <Icon data={Gear} size={16} />
+                        </Button>
+                    </ActionTooltip>
                 )}
             </Flex>
             {partitionProgressConfig && (
