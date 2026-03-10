@@ -19,7 +19,6 @@ import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import {selectResultTab, setResultTab} from '../../../../store/reducers/query/query';
 import type {QueryResult} from '../../../../store/reducers/query/types';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
-import type {ValueOf} from '../../../../types/common';
 import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {useSetting, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
@@ -35,6 +34,8 @@ import {QueryInfoDropdown} from './components/QueryInfoDropdown/QueryInfoDropdow
 import {QueryResultError} from './components/QueryResultError/QueryResultError';
 import {ResultSetsViewer} from './components/ResultSetsViewer/ResultSetsViewer';
 import {TraceButton} from './components/TraceButton/TraceButton';
+import {RESULT_OPTIONS_IDS} from './constants';
+import type {SectionID} from './constants';
 import i18n from './i18n';
 
 import './QueryResultViewer.scss';
@@ -42,17 +43,6 @@ import './QueryResultViewer.scss';
 const b = cn('ydb-query-result');
 
 const COPY_STATUS_RESET_TIMEOUT = 1500;
-
-const RESULT_OPTIONS_IDS = {
-    result: 'result',
-    schema: 'schema',
-    simplified: 'simplified',
-    json: 'json',
-    stats: 'stats',
-    ast: 'ast',
-} as const;
-
-type SectionID = ValueOf<typeof RESULT_OPTIONS_IDS>;
 
 const RESULT_OPTIONS_TITLES: Record<SectionID, string> = {
     get result() {
