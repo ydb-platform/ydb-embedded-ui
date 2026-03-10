@@ -63,6 +63,7 @@ export interface AsideNavigationProps {
         defaultFooterItems: React.ReactNode[],
         ctx: {compact: boolean; asideRef: React.RefObject<HTMLDivElement>},
     ) => React.ReactNode[];
+    className?: string;
 }
 
 enum Panel {
@@ -112,7 +113,8 @@ export function AsideNavigation(props: AsideNavigationProps) {
                 menuItems={props.menuItems}
                 compact={compact}
                 onChangeCompact={setIsCompact}
-                className={b()}
+                multipleTooltip={true}
+                className={b(null, props.className)}
                 renderContent={() => props.content}
                 renderFooter={({compact: footerCompact, asideRef}) => {
                     const defaultFooterItems = [
