@@ -1,5 +1,18 @@
 # Changelog
 
+## [14.11.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.10.0...v14.11.0) (2026-03-11)
+
+
+### Features
+
+* improve errors diagnostics ([#3537](https://github.com/ydb-platform/ydb-embedded-ui/issues/3537)) ([3ce7547](https://github.com/ydb-platform/ydb-embedded-ui/commit/3ce7547cffd406c11d22e4638567874ec128e683))
+* **Navigation:** add colors and animation to v2 navigation items ([#3588](https://github.com/ydb-platform/ydb-embedded-ui/issues/3588)) ([1f2a08c](https://github.com/ydb-platform/ydb-embedded-ui/commit/1f2a08c4bc1a8a9635499f1261147db77c75601a))
+
+
+### Bug Fixes
+
+* **GrantAccess:** fix api request payload ([#3608](https://github.com/ydb-platform/ydb-embedded-ui/issues/3608)) ([511ac1b](https://github.com/ydb-platform/ydb-embedded-ui/commit/511ac1b3d96d3e40346a66a326fabf3eea3a5d54))
+
 ## [14.10.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.9.2...v14.10.0) (2026-03-10)
 
 
