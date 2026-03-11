@@ -10,6 +10,7 @@ import {
     selectAvailablePermissions,
     selectSubjectInheritedRights,
 } from '../../../store/reducers/schemaAcl/schemaAcl';
+import type {AccessRightsUpdateRequest} from '../../../types/api/acl';
 import createToast from '../../../utils/createToast';
 import {useAclSyntax, useTypedSelector} from '../../../utils/hooks';
 import {prepareErrorMessage} from '../../../utils/prepareErrorMessage';
@@ -82,23 +83,28 @@ export function GrantAccess({handleCloseDrawer}: GrantAccessProps) {
         if (!subjects.length) {
             return;
         }
+
+        const newRights: AccessRightsUpdateRequest = {};
+        if (rightsToGrant.length) {
+            newRights.AddAccess = subjects.map((subj) => ({
+                AccessRights: rightsToGrant,
+                Subject: subj,
+                AccessType: 'Allow',
+            }));
+        }
+        if (rightsToRevoke.length) {
+            newRights.RemoveAccess = subjects.map((subj) => ({
+                AccessRights: rightsToRevoke,
+                Subject: subj,
+                AccessType: 'Allow',
+            }));
+        }
         updateRights({
             path,
             database,
             databaseFullPath,
             dialect,
-            rights: {
-                AddAccess: subjects.map((subj) => ({
-                    AccessRights: rightsToGrant,
-                    Subject: subj,
-                    AccessType: 'Allow',
-                })),
-                RemoveAccess: subjects.map((subj) => ({
-                    AccessRights: rightsToRevoke,
-                    Subject: subj,
-                    AccessType: 'Allow',
-                })),
-            },
+            rights: newRights,
         })
             .unwrap()
             .then(() => {
