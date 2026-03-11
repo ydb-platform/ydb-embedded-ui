@@ -25,13 +25,25 @@ export function isResponseError(error: unknown): error is IResponseError {
     return hasData || hasStatus || hasStatusText || isCancelled;
 }
 
+const NETWORK_ERROR_MESSAGES = [
+    'network error', // Axios
+    'failed to fetch', // Chrome/Edge/Chromium
+    'load failed', // Safari
+] as const;
+
 export const isNetworkError = (error: unknown): error is NetworkError => {
-    return Boolean(
-        error &&
-            typeof error === 'object' &&
-            'message' in error &&
-            typeof error.message === 'string' &&
-            error.message.toLowerCase() === 'network error',
+    if (
+        !error ||
+        typeof error !== 'object' ||
+        !('message' in error) ||
+        typeof error.message !== 'string'
+    ) {
+        return false;
+    }
+    const msg = error.message.toLowerCase();
+    return (
+        NETWORK_ERROR_MESSAGES.some((pattern) => msg === pattern) ||
+        msg.startsWith('networkerror when attempting to fetch resource') // Firefox
     );
 };
 
@@ -51,6 +63,14 @@ export function isAxiosError(error: unknown): error is AxiosErrorObject {
 
 export function isAccessError(error: unknown): error is IResponseError {
     return Boolean(isResponseError(error) && (error.status === 403 || error.status === 401));
+}
+
+export function isUnauthenticatedError(error: unknown): error is IResponseError {
+    return Boolean(isResponseError(error) && error.status === 401);
+}
+
+export function isForbiddenError(error: unknown): error is IResponseError {
+    return Boolean(isResponseError(error) && error.status === 403);
 }
 
 export function isRedirectToAuth(error: unknown): error is {status: 401; data: {authUrl: string}} {

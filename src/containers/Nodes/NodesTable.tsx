@@ -1,6 +1,5 @@
 import React from 'react';
 
-import {Illustration} from '../../components/Illustration';
 import type {PaginatedTableData} from '../../components/PaginatedTable';
 import {PAGINATED_TABLE_IDS, ResizeablePaginatedTable} from '../../components/PaginatedTable';
 import {NODES_COLUMNS_WIDTH_LS_KEY} from '../../components/nodesColumns/constants';
@@ -9,6 +8,7 @@ import {useClusterWithProxy} from '../../store/reducers/cluster/cluster';
 import type {NodesFilters} from '../../store/reducers/nodes/types';
 import type {PreparedStorageNode} from '../../store/reducers/storage/types';
 import type {NodesGroupByField, NodesPeerRole} from '../../types/api/nodes';
+import {getIllustration} from '../../utils/illustrations';
 import {NodesUptimeFilterValues} from '../../utils/nodes';
 import {renderPaginatedTableErrorMessage} from '../../utils/renderPaginatedTableErrorMessage';
 
@@ -52,6 +52,8 @@ export function NodesTable({
     initialEntitiesCount,
     onDataFetched,
 }: NodesTableProps) {
+    const SuccessImage = getIllustration('SuccessOperation');
+
     const useMetaProxy = useClusterWithProxy();
     const tableFilters: NodesFilters = React.useMemo(() => {
         return {
@@ -81,7 +83,7 @@ export function NodesTable({
 
     const renderEmptyDataMessage = () => {
         if (withProblems || uptimeFilter !== NodesUptimeFilterValues.All) {
-            return <Illustration name="thumbsUp" width={200} />;
+            return <SuccessImage width={200} height={200} />;
         }
 
         return i18n('empty.default');

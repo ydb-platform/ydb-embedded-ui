@@ -13,32 +13,29 @@ import {
 
 import {EnableFullscreenButton} from '../../../../components/EnableFullscreenButton/EnableFullscreenButton';
 import {Fullscreen} from '../../../../components/Fullscreen/Fullscreen';
-import {Illustration} from '../../../../components/Illustration';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueryExecutionStatus} from '../../../../components/QueryExecutionStatus';
 import {disableFullscreen} from '../../../../store/reducers/fullscreen';
 import {selectResultTab, setResultTab} from '../../../../store/reducers/query/query';
 import type {QueryResult} from '../../../../store/reducers/query/types';
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
-import type {ValueOf} from '../../../../types/common';
 import type {QueryAction} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {useSetting, useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {getIllustration} from '../../../../utils/illustrations';
 import {PaneVisibilityToggleButtons} from '../../utils/paneVisibilityToggleHelpers';
 import {QuerySettingsBanner} from '../QuerySettingsBanner/QuerySettingsBanner';
 import {QueryStoppedBanner} from '../QueryStoppedBanner/QueryStoppedBanner';
 import {copyResultToClipboard, copyTextDataToClipboard} from '../utils/copyToClipboard';
 import {isQueryCancelledError} from '../utils/isQueryCancelledError';
 
-import {Ast} from './components/Ast/Ast';
-import {Graph} from './components/Graph/Graph';
+import {PlanSection} from './components/PlanSection/PlanSection';
 import {QueryInfoDropdown} from './components/QueryInfoDropdown/QueryInfoDropdown';
-import {QueryJSONViewer} from './components/QueryJSONViewer/QueryJSONViewer';
 import {QueryResultError} from './components/QueryResultError/QueryResultError';
 import {ResultSetsViewer} from './components/ResultSetsViewer/ResultSetsViewer';
-import {SimplifiedPlan} from './components/SimplifiedPlan/SimplifiedPlan';
-import {StubMessage} from './components/Stub/Stub';
 import {TraceButton} from './components/TraceButton/TraceButton';
+import {RESULT_OPTIONS_IDS} from './constants';
+import type {SectionID} from './constants';
 import i18n from './i18n';
 
 import './QueryResultViewer.scss';
@@ -46,17 +43,6 @@ import './QueryResultViewer.scss';
 const b = cn('ydb-query-result');
 
 const COPY_STATUS_RESET_TIMEOUT = 1500;
-
-const RESULT_OPTIONS_IDS = {
-    result: 'result',
-    schema: 'schema',
-    simplified: 'simplified',
-    json: 'json',
-    stats: 'stats',
-    ast: 'ast',
-} as const;
-
-type SectionID = ValueOf<typeof RESULT_OPTIONS_IDS>;
 
 const RESULT_OPTIONS_TITLES: Record<SectionID, string> = {
     get result() {
@@ -106,6 +92,8 @@ export function QueryResultViewer({
     onCollapseResults,
     onExpandResults,
 }: ExecuteResultProps) {
+    const InternalErrorImage = getIllustration('InternalError');
+
     const dispatch = useTypedDispatch();
     const selectedTabs = useTypedSelector(selectResultTab);
 
@@ -117,8 +105,6 @@ export function QueryResultViewer({
     const [copyStatus, setCopyStatus] = React.useState<CopyToClipboardStatus>('pending');
     const copyTimeoutRef = React.useRef<number>();
 
-    const defaultSection = isExecute ? RESULT_OPTIONS_IDS.result : RESULT_OPTIONS_IDS.schema;
-
     const activeSection: SectionID = React.useMemo(() => {
         const savedTab = selectedTabs?.[resultType];
         if (savedTab) {
@@ -127,8 +113,8 @@ export function QueryResultViewer({
                 return savedTab as SectionID;
             }
         }
-        return defaultSection;
-    }, [selectedTabs, resultType, isExecute, defaultSection]);
+        return isExecute ? RESULT_OPTIONS_IDS.result : RESULT_OPTIONS_IDS.schema;
+    }, [selectedTabs, resultType, isExecute]);
 
     const {error, isLoading, streamingStatus, data = {}} = result;
     const {preparedPlan, simplifiedPlan, stats, resultSets, ast} = data;
@@ -273,20 +259,10 @@ export function QueryResultViewer({
         );
     };
 
-    const renderStubMessage = () => {
-        return (
-            <StubMessage
-                message={i18n('description.empty-result', {
-                    activeSection: RESULT_OPTIONS_TITLES[activeSection],
-                })}
-            />
-        );
-    };
-
     const renderCommonErrorView = (isStopped: boolean) => {
         return (
             <Flex justifyContent="center" alignItems="center" width="100%" gap={8}>
-                <Illustration name="error" className={b('illustration')} />
+                <InternalErrorImage width={230} height={230} className={b('illustration')} />
                 <Flex direction="column" gap={2}>
                     <Text variant="subheader-2">
                         {isStopped ? i18n('stopped.title') : i18n('error.title')}
@@ -297,35 +273,6 @@ export function QueryResultViewer({
                 </Flex>
             </Flex>
         );
-    };
-
-    const renderNonResultSection = () => {
-        switch (activeSection) {
-            case RESULT_OPTIONS_IDS.schema:
-                return preparedPlan?.nodes?.length ? (
-                    <Graph theme={theme} explain={preparedPlan} />
-                ) : (
-                    renderStubMessage()
-                );
-            case RESULT_OPTIONS_IDS.json:
-                return preparedPlan?.pristine ? (
-                    <QueryJSONViewer data={preparedPlan.pristine} />
-                ) : (
-                    renderStubMessage()
-                );
-            case RESULT_OPTIONS_IDS.simplified:
-                return simplifiedPlan?.plan?.length ? (
-                    <SimplifiedPlan plan={simplifiedPlan.plan} />
-                ) : (
-                    renderStubMessage()
-                );
-            case RESULT_OPTIONS_IDS.stats:
-                return stats ? <QueryJSONViewer data={stats} /> : renderStubMessage();
-            case RESULT_OPTIONS_IDS.ast:
-                return ast ? <Ast ast={ast} theme={theme} /> : renderStubMessage();
-            default:
-                return null;
-        }
     };
 
     const renderResultSection = () => {
@@ -348,14 +295,23 @@ export function QueryResultViewer({
         }
 
         if (error) {
-            return isExecute || isStopped ? (
-                renderCommonErrorView(isStopped)
-            ) : (
-                <QueryResultError error={error} />
-            );
+            if (isExecute || isStopped) {
+                return renderCommonErrorView(isStopped);
+            }
+            return <QueryResultError error={error} />;
         }
 
-        return renderNonResultSection();
+        return (
+            <PlanSection
+                activeSection={activeSection}
+                sectionTitle={RESULT_OPTIONS_TITLES[activeSection]}
+                preparedPlan={preparedPlan}
+                simplifiedPlan={simplifiedPlan}
+                stats={stats}
+                ast={ast}
+                theme={theme}
+            />
+        );
     };
 
     const renderLeftControls = () => {

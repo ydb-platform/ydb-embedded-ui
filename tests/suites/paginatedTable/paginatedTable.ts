@@ -227,6 +227,30 @@ export class PaginatedTable {
         }, this.scrollContainer);
     }
 
+    async scrollToPosition(pixels: number) {
+        await this.page.evaluate(
+            ({selector, top}) => {
+                const container = document.querySelector(selector);
+                if (container) {
+                    container.scrollTo({top, behavior: 'instant'});
+                }
+            },
+            {selector: this.scrollContainer, top: pixels},
+        );
+    }
+
+    getErrorRowLocator(): Locator {
+        return this.tableSelector.locator('.ydb-paginated-table__row_empty .ydb-response-error');
+    }
+
+    async waitForErrorInTable(timeout = VISIBILITY_TIMEOUT) {
+        await this.getErrorRowLocator().first().waitFor({state: 'visible', timeout});
+    }
+
+    getTableContainerLocator(): Locator {
+        return this.tableSelector;
+    }
+
     private async getColumnIndex(columnName: string): Promise<number> {
         const count = await this.headCells.count();
         for (let i = 0; i < count; i++) {

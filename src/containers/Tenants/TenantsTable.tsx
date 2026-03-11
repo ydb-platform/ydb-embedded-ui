@@ -8,7 +8,6 @@ import {Button, Flex, Icon, Label} from '@gravity-ui/uikit';
 
 import {EntitiesCount} from '../../components/EntitiesCount';
 import {ResponseError} from '../../components/Errors/ResponseError';
-import {Illustration} from '../../components/Illustration';
 import {PoolsGraph} from '../../components/PoolsGraph/PoolsGraph';
 import {ProblemFilter} from '../../components/ProblemFilter/ProblemFilter';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
@@ -38,6 +37,7 @@ import {
 } from '../../utils/dataFormatters/dataFormatters';
 import {useAutoRefreshInterval, useSetting} from '../../utils/hooks';
 import {useSelectedColumns} from '../../utils/hooks/useSelectedColumns';
+import {getIllustration} from '../../utils/illustrations';
 import {isNumeric} from '../../utils/utils';
 
 import {
@@ -119,6 +119,8 @@ export const TenantsTable = ({
     showWithProblemsFilter,
     showPoolsColumn,
 }: TenantsTableProps) => {
+    const SuccessImage = getIllustration('SuccessOperation');
+
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const {currentData, isFetching, error} = tenantsApi.useGetTenantsInfoQuery(
         {clusterName, environmentName, isMetaDatabasesAvailable},
@@ -358,7 +360,7 @@ export const TenantsTable = ({
 
     const renderTable = () => {
         if (filteredTenants.length === 0 && withProblems) {
-            return <Illustration name="thumbsUp" width={200} />;
+            return <SuccessImage width={200} height={200} />;
         }
 
         return (

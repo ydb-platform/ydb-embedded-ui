@@ -13,7 +13,11 @@ export interface NetworkError {
     description?: unknown;
     fileName?: unknown;
     lineNumber?: unknown;
-    message: 'Network Error';
+    message:
+        | 'Network Error' // Axios
+        | 'Failed to fetch' // Chrome/Edge
+        | 'Load failed' // Safari
+        | (string & {}); // Firefox and other variants
     name?: string;
     number?: unknown;
     stack?: string;

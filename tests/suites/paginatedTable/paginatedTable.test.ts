@@ -2,7 +2,12 @@ import {expect, test} from '@playwright/test';
 
 import {NodesPage} from '../nodes/NodesPage';
 
-import {setupEmptyNodesMock, setupLargeNodesMock, setupNodesMock} from './mocks';
+import {
+    setupEmptyNodesMock,
+    setupLargeNodesMock,
+    setupNodesMock,
+    setupNodesWithChunkErrorMock,
+} from './mocks';
 import {ClusterNodesTable} from './paginatedTable';
 
 test.describe('PaginatedTable', () => {
@@ -141,5 +146,36 @@ test.describe('PaginatedTable', () => {
         const finalRowCount = await paginatedTable.getRowCount();
         const lastRowData = await paginatedTable.getRowData(finalRowCount - 1);
         expect(lastRowData['Host']).toBe('host-9999.test'); // Last node in 1000 nodes (0-999)
+    });
+
+    test('displays inline error when a chunk fails to load', async ({page}) => {
+        await setupNodesWithChunkErrorMock(page);
+
+        const nodesPage = new NodesPage(page);
+        await nodesPage.goto();
+
+        const paginatedTable = new ClusterNodesTable(page);
+        await paginatedTable.waitForTableVisible();
+        await paginatedTable.waitForTableData();
+
+        const firstRowData = await paginatedTable.getRowData(0);
+        expect(firstRowData['Host']).toBe('host-0.test');
+
+        // chunkSize=20, rowHeight=40 → chunk 10 starts at offset 200 (8000px)
+        await paginatedTable.scrollToPosition(8000);
+
+        await paginatedTable.waitForErrorInTable();
+
+        const errorRow = paginatedTable.getErrorRowLocator();
+        await expect(errorRow.first()).toBeVisible();
+
+        const errorText = await errorRow.first().innerText();
+        expect(errorText).toContain('Internal error');
+
+        await expect(errorRow.first()).toHaveScreenshot('error-paginated-table-chunk-500.png');
+        await page.screenshot({
+            path: 'playwright-artifacts/full-page-screenshots/full-paginated-table-chunk-error.png',
+            fullPage: true,
+        });
     });
 });

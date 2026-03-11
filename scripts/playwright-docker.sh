@@ -17,6 +17,7 @@ echo "Using Playwright Docker image: ${DOCKER_IMAGE}"
 # NOTE: --network host only works on Linux.
 # On macOS/Windows Docker Desktop, localhost inside the container does not reach the host.
 # Use PLAYWRIGHT_BASE_URL=http://host.docker.internal:PORT as a workaround on those platforms.
+
 docker run --rm --network host \
   -v "${PROJECT_DIR}:/work" \
   -v "ydb-embedded-ui-node-modules:/work/node_modules" \

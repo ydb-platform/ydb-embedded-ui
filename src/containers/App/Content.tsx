@@ -4,6 +4,7 @@ import {connect} from 'react-redux';
 import type {RedirectProps} from 'react-router-dom';
 import {Redirect, Route, Switch} from 'react-router-dom';
 
+import {Unauthenticated} from '../../components/Errors/401';
 import {AccessDenied} from '../../components/Errors/403';
 import {LoaderWrapper} from '../../components/LoaderWrapper/LoaderWrapper';
 import {useSlots} from '../../components/slots';
@@ -23,7 +24,7 @@ import {cn} from '../../utils/cn';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useMetaAuthUnavailable} from '../../utils/hooks/useMetaAuth';
 import {lazyComponent} from '../../utils/lazyComponent';
-import {isAccessError, isRedirectToAuth} from '../../utils/response';
+import {isForbiddenError, isRedirectToAuth, isUnauthenticatedError} from '../../utils/response';
 import Authentication from '../Authentication/Authentication';
 import {GetUser} from '../GetUserWrapper/GetUserWrapper';
 import Header from '../Header/Header';
@@ -215,7 +216,11 @@ function GetCapabilities({children}: {children: React.ReactNode}) {
         return null;
     }
 
-    if (isAccessError(error)) {
+    if (isUnauthenticatedError(error)) {
+        return <Unauthenticated />;
+    }
+
+    if (isForbiddenError(error)) {
         return <AccessDenied />;
     }
 

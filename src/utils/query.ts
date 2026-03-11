@@ -301,16 +301,6 @@ export const parseQueryError = (error: unknown): ErrorResponse | string | undefi
     return undefined;
 };
 
-export const parseQueryErrorToString = (error: unknown) => {
-    const parsedError = parseQueryError(error);
-
-    if (typeof parsedError === 'string') {
-        return parsedError;
-    }
-
-    return parsedError?.error?.message;
-};
-
 export const defaultPragma = 'PRAGMA OrderedColumns;';
 
 // Backend parses timeout as ui32 milliseconds: FromStringWithDefault<ui32>(params.Get("timeout"), 60000)

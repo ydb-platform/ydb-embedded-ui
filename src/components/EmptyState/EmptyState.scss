@@ -11,6 +11,7 @@
     &__wrapper {
         display: grid;
         grid-template-areas: 'image content';
+        grid-template-columns: auto 1fr;
 
         &_size_xs {
             width: 321px;
@@ -27,6 +28,11 @@
         &_size_m {
             width: 600px;
             height: 230px;
+        }
+
+        &_size_l {
+            width: 900px;
+            min-height: 280px;
         }
 
         &_position_center {
@@ -62,6 +68,10 @@
         &_size_m {
             @include mixins.header-2-typography();
         }
+
+        &_size_l {
+            @include mixins.subheader-3-typography();
+        }
     }
 
     &__description {
@@ -71,5 +81,11 @@
     &__content {
         align-self: center;
         grid-area: content;
+
+        &_position-top {
+            align-self: start;
+
+            padding-top: 50px;
+        }
     }
 }

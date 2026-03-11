@@ -1,11 +1,11 @@
 import React from 'react';
 
-import {InternalError} from '@gravity-ui/illustrations';
 import {DefinitionList, Flex, Text} from '@gravity-ui/uikit';
 import QRCode from 'qrcode';
 import {ErrorBoundary as ErrorBoundaryBase} from 'react-error-boundary';
 
 import {cn} from '../../utils/cn';
+import {getIllustration} from '../../utils/illustrations';
 import {registerError} from '../../utils/registerError';
 import {useComponent} from '../ComponentsProvider/ComponentsProvider';
 
@@ -53,10 +53,12 @@ export function ErrorBoundaryFallback({error}: ErrorBoundaryFallbackProps) {
         });
     }, [error]);
 
+    const InternalErrorImage = getIllustration('InternalError');
+
     return (
         <Flex direction="column" gap={4} className={b(null)}>
             <Flex direction="row" alignItems="center" gap={10}>
-                <InternalError width={230} height={230} />
+                <InternalErrorImage width={230} height={230} />
                 <Flex direction="column" gap={5}>
                     <Flex direction="column" gap={2}>
                         <Text variant="subheader-3">{i18n('error-title')}</Text>

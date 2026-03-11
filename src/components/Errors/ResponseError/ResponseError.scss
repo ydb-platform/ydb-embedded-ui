@@ -1,0 +1,16 @@
+.ydb-response-error {
+    max-width: 600px;
+
+    .g-alert__text-content,
+    .g-alert__message {
+        min-width: 0;
+    }
+
+    &__message {
+        min-width: 0;
+    }
+
+    &__data-message {
+        display: block;
+    }
+}

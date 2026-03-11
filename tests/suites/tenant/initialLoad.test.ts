@@ -38,7 +38,7 @@ test.describe('Tenant initial load', () => {
         await tenantPage.goto(pageQueryParams);
 
         await expect(await tenantPage.isEmptyStateVisible()).toBeTruthy();
-        await expect(await tenantPage.getEmptyStateTitle()).toBe('Access denied');
+        await expect(await tenantPage.getEmptyStateTitle()).toBe('Authentication required');
     });
 
     test('Tenant page shows error message when describe returns 403', async ({page}) => {

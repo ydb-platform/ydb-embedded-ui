@@ -5,12 +5,12 @@ import {Flex, Icon} from '@gravity-ui/uikit';
 import {ResponseError} from '../../../components/Errors/ResponseError';
 import {Fullscreen} from '../../../components/Fullscreen/Fullscreen';
 import {HealthcheckStatus} from '../../../components/HealthcheckStatus/HealthcheckStatus';
-import {Illustration} from '../../../components/Illustration';
 import {Loader} from '../../../components/Loader';
 import type {IssuesTree} from '../../../store/reducers/healthcheckInfo/types';
 import {SelfCheckResult} from '../../../types/api/healthcheck';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 import {useTypedSelector} from '../../../utils/hooks';
+import {getIllustration} from '../../../utils/illustrations';
 import {HEALTHCHECK_RESULT_TO_TEXT} from '../constants';
 
 import {HealthcheckFilter} from './components/HealthcheckFilter';
@@ -37,6 +37,8 @@ export function Healthcheck({
     database,
     countIssueTypes = uiFactory.healthcheck.countHealthcheckIssuesByType,
 }: HealthcheckDetailsProps) {
+    const SuccessImage = getIllustration('SuccessOperation');
+
     const fullscreen = useTypedSelector((state) => state.fullscreen);
     const {loading, error, selfCheckResult, fulfilledTimeStamp, leavesIssues, refetch} =
         useHealthcheck(database);
@@ -76,7 +78,7 @@ export function Healthcheck({
         if (selfCheckResult === SelfCheckResult.GOOD && (!leavesIssues || !leavesIssues.length)) {
             return (
                 <Flex direction="column" gap={1} className={b('stub-wrapper')}>
-                    <Illustration name="thumbsUp" width={200} />
+                    <SuccessImage width={200} height={200} />
                     {HEALTHCHECK_RESULT_TO_TEXT[selfCheckResult]}
                 </Flex>
             );

@@ -56,7 +56,16 @@ export class YdbEmbeddedAPI {
         useRelativePath = false,
         useMetaSettings = false,
     }: YdbEmbeddedAPIProps) {
-        const axiosParams: AxiosWrapperOptions = {config: {withCredentials, ...defaults}};
+        const axiosParams: AxiosWrapperOptions = {
+            config: {
+                withCredentials,
+                ...defaults,
+                transitional: {
+                    ...defaults?.transitional,
+                    clarifyTimeoutError: true,
+                },
+            },
+        };
         const baseApiParams = {singleClusterMode, proxyMeta, useRelativePath};
 
         this.auth = new AuthAPI(axiosParams, baseApiParams);

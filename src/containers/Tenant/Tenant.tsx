@@ -186,7 +186,12 @@ export function Tenant({additionalTenantProps}: TenantProps) {
                 titleTemplate={`%s — ${title} — ${appTitle}`}
             />
             <LoaderWrapper loading={initialLoading}>
-                <PageError error={showBlockingError ? error : undefined} {...errorProps}>
+                <PageError
+                    error={showBlockingError ? error : undefined}
+                    {...errorProps}
+                    size="l"
+                    illustrationSize="m"
+                >
                     <TenantContextProvider
                         database={database}
                         path={path}

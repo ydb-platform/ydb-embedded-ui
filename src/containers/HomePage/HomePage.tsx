@@ -255,6 +255,8 @@ export function HomePage() {
         <PageError
             error={showBlockingError ? environmentsError : undefined}
             {...errorProps}
+            size="l"
+            illustrationSize="m"
             errorPageTitle={pageTitleWithFactory}
         >
             <LoaderWrapper loading={environmentsLoading}>

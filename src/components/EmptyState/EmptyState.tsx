@@ -22,6 +22,7 @@ export interface EmptyStateProps {
     actions?: React.ReactNode[];
     size?: keyof typeof EMPTY_STATE_SIZES;
     position?: 'left' | 'center';
+    contentPosition?: 'center' | 'top';
     pageTitle?: string;
     className?: string;
 }
@@ -33,6 +34,7 @@ export const EmptyState = ({
     actions,
     size = 'm',
     position = 'center',
+    contentPosition = 'center',
     pageTitle,
     className,
 }: EmptyStateProps) => {
@@ -51,7 +53,11 @@ export const EmptyState = ({
                         />
                     )}
                 </div>
-                <Flex gap={5} className={block('content')} direction="column">
+                <Flex
+                    gap={5}
+                    className={block('content', {'position-top': contentPosition === 'top'})}
+                    direction="column"
+                >
                     <Flex gap={3} direction="column">
                         <div className={block('title', {size})}>{title}</div>
                         {description ? (

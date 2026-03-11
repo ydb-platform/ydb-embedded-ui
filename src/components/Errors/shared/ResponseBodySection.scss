@@ -1,0 +1,38 @@
+.ydb-response-body-section {
+    overflow: hidden;
+
+    min-width: 0;
+
+    border-radius: var(--g-border-radius-m);
+
+    &__header {
+        padding: var(--g-spacing-half) var(--g-spacing-2) var(--g-spacing-half) var(--g-spacing-3);
+
+        border-bottom: 1px solid var(--g-color-line-generic);
+        border-radius: var(--g-border-radius-m) var(--g-border-radius-m) 0 0;
+        background-color: var(--g-color-base-generic);
+    }
+
+    &__language {
+        user-select: none;
+    }
+
+    &__content {
+        overflow: auto;
+
+        max-height: 200px;
+        padding: var(--g-spacing-2);
+
+        background-color: var(--g-color-base-generic);
+    }
+
+    &__code {
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+
+    &__copy-button {
+        margin-bottom: var(--g-spacing-1);
+        margin-inline-start: auto;
+    }
+}

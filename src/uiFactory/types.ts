@@ -16,6 +16,15 @@ import type {ETenantType} from '../types/api/tenant';
 import type {GetLogsLink} from '../utils/logs';
 import type {GetMonitoringClusterLink, GetMonitoringLink} from '../utils/monitoring';
 
+export type IllustrationComponent = React.ComponentType<React.SVGProps<SVGSVGElement>>;
+
+export type IllustrationName =
+    | 'InternalError'
+    | 'AccessDenied'
+    | 'Unauthenticated'
+    | 'NoSearchResults'
+    | 'SuccessOperation';
+
 export interface UIFactory<H extends string = CommonIssueType, T extends string = string> {
     onCreateDB?: HandleCreateDB;
     onEditDB?: HandleEditDB;
@@ -77,6 +86,10 @@ export interface UIFactory<H extends string = CommonIssueType, T extends string 
     };
 
     databasesEnvironmentsConfig?: DatabasesEnvironmentsConfig;
+
+    getReportProblemUrl?: GetReportProblemUrl;
+
+    illustrations?: Partial<Record<IllustrationName, IllustrationComponent>>;
 }
 
 export type HandleCreateDB = (params: {clusterName: string}) => Promise<boolean>;
@@ -161,3 +174,9 @@ export interface DatabasesEnvironmentsConfig {
     /** If provided, clicking an environment tab will redirect to that domain instead of changing the environment in the current context */
     getEnvironmentDomain?: (env: string) => string | undefined;
 }
+
+export type GetReportProblemUrl = (params: {
+    errorTitle?: string;
+    requestUrl?: string;
+    traceId?: string;
+}) => string | undefined;

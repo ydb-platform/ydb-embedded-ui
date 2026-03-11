@@ -86,6 +86,58 @@ export const setupEmptyNodesMock = async (page: Page) => {
     });
 };
 
+const EXPOSED_HEADERS = [
+    'traceresponse',
+    'x-trace-id',
+    'x-request-id',
+    'x-proxy-name',
+    'x-worker-name',
+].join(', ');
+
+const CHUNK_ERROR_OFFSET = 200;
+const CHUNK_ERROR_TOTAL_NODES = 500;
+
+export const setupNodesWithChunkErrorMock = async (page: Page) => {
+    await page.route(`${backend}/viewer/json/nodes?*`, async (route) => {
+        const url = new URL(route.request().url());
+        const offset = parseInt(url.searchParams.get('offset') || '0', 10);
+        const limit = parseInt(url.searchParams.get('limit') || '50', 10);
+
+        await new Promise((resolve) => setTimeout(resolve, MOCK_DELAY));
+
+        if (offset + limit > CHUNK_ERROR_OFFSET) {
+            await route.fulfill({
+                status: 500,
+                contentType: 'application/json',
+                body: JSON.stringify({error: 'Internal error: tablet unavailable'}),
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Expose-Headers': EXPOSED_HEADERS,
+                    traceresponse: '00-chunkerrtrace112233445566778899-aabb112233445566-00',
+                    'x-worker-name': 'storage-worker-07.example.net:8765',
+                },
+            });
+            return;
+        }
+
+        const nodes = await generateNodeMock({
+            offset,
+            limit: Math.min(limit, CHUNK_ERROR_TOTAL_NODES - offset),
+        });
+
+        await route.fulfill({
+            status: 200,
+            contentType: 'application/json',
+            body: JSON.stringify({
+                Overall: 'Green',
+                Nodes: nodes,
+                TotalNodes: CHUNK_ERROR_TOTAL_NODES.toString(),
+                FoundNodes: CHUNK_ERROR_TOTAL_NODES.toString(),
+            }),
+        });
+    });
+};
+
 export const setupLargeNodesMock = async (page: Page, totalNodes = 1000) => {
     await page.route(`${backend}/viewer/json/nodes?*`, async (route) => {
         const url = new URL(route.request().url());

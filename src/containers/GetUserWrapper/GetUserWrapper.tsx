@@ -33,7 +33,13 @@ export function GetUser({
 
     return (
         <LoaderWrapper loading={isFetching} size="l" delay={0}>
-            <PageError error={errorToDisplay} {...errorProps} errorPageTitle={appTitle}>
+            <PageError
+                error={errorToDisplay}
+                {...errorProps}
+                size="l"
+                illustrationSize="m"
+                errorPageTitle={appTitle}
+            >
                 <SettingsBootstrap>{children}</SettingsBootstrap>
             </PageError>
         </LoaderWrapper>

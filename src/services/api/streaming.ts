@@ -17,10 +17,44 @@ import type {
     StreamingChunk,
 } from '../../types/store/streaming';
 import {DEV_ENABLE_TRACING_FOR_ALL_REQUESTS} from '../../utils/constants';
+import {USEFUL_HEADERS} from '../../utils/errors/extractErrorDetails';
 import {isRedirectToAuth} from '../../utils/response';
 
 import {BaseYdbAPI} from './base';
 import {readPartText} from './streamingPartReader';
+
+/**
+ * Extracts useful headers from a fetch Response into a plain object.
+ * Only includes headers that extractErrorDetails knows how to use.
+ */
+function extractResponseHeaders(response: Response): Record<string, string> {
+    const result: Record<string, string> = {};
+    const headerNames = USEFUL_HEADERS.map(({header}) => header);
+    for (const name of headerNames) {
+        const value = response.headers.get(name);
+        if (value) {
+            result[name] = value;
+        }
+    }
+    return result;
+}
+
+/**
+ * Creates a structured error from a fetch Response.
+ * Returns a real Error (with stack trace and instanceof support) enriched
+ * with the fields that extractErrorDetails expects (status, statusText, headers, data, config).
+ */
+function createStreamingResponseError(response: Response, responseData: unknown): Error {
+    const message = `${response.status} ${response.statusText || 'Error'}`;
+    const error = new Error(message);
+    return Object.assign(error, {
+        status: response.status,
+        statusText: response.statusText,
+        data: responseData,
+        headers: extractResponseHeaders(response),
+        config: {url: response.url, method: 'POST'},
+    });
+}
 
 const BOUNDARY = 'boundary';
 
@@ -69,58 +103,102 @@ export class StreamingAPI extends BaseYdbAPI {
             headers.set('X-Want-Trace', '1');
         }
 
-        const response = await fetch(`${this.getPath('/viewer/query')}?${queryParams}`, {
-            method: 'POST',
-            signal: options.signal,
-            headers,
-            credentials: this._axios.defaults.withCredentials ? 'include' : 'same-origin',
-            body: JSON.stringify(body),
-        });
+        const url = `${this.getPath('/viewer/query')}?${queryParams}`;
+        let response: Response;
+        try {
+            response = await fetch(url, {
+                method: 'POST',
+                signal: options.signal,
+                headers,
+                credentials: this._axios.defaults.withCredentials ? 'include' : 'same-origin',
+                body: JSON.stringify(body),
+            });
+        } catch (fetchError) {
+            const enriched =
+                fetchError instanceof Error ? fetchError : new Error(String(fetchError));
+            Object.assign(enriched, {
+                config: {url, method: 'POST'},
+                errorPhase: 'connection',
+                networkOnline: navigator.onLine,
+            });
+            throw enriched;
+        }
 
         if (!response.ok) {
-            const responseData = await response.json().catch(() => ({}));
+            const responseData = await response
+                .text()
+                .then((text) => {
+                    try {
+                        return JSON.parse(text) as unknown;
+                    } catch {
+                        return text || undefined;
+                    }
+                })
+                .catch(() => undefined);
             if (isRedirectToAuth({status: response.status, data: responseData})) {
-                window.location.assign(responseData.authUrl);
+                const data = responseData as {authUrl: string};
+                window.location.assign(data.authUrl);
                 return;
             }
-            throw new Error(`${response.status}`);
+            throw createStreamingResponseError(response, responseData);
         }
 
         if (!response.body) {
-            throw new Error('Empty response body');
+            const error = new Error('Empty response body');
+            Object.assign(error, {
+                status: response.status,
+                statusText: response.statusText,
+                config: {url, method: 'POST'},
+                headers: extractResponseHeaders(response),
+            });
+            throw error;
         }
 
         const traceId = response.headers.get('traceresponse')?.split('-')[1];
 
-        await parseMultipart(response.body, {boundary: BOUNDARY}, async (part) => {
-            const text = await readPartText(part);
+        try {
+            await parseMultipart(response.body, {boundary: BOUNDARY}, async (part) => {
+                const text = await readPartText(part);
 
-            let chunk: unknown;
-            try {
-                chunk = JSON.parse(text);
-            } catch (e) {
-                throw new Error(`Error parsing chunk: ${e}`);
+                let chunk: unknown;
+                try {
+                    chunk = JSON.parse(text);
+                } catch (e) {
+                    const preview = text.length > 200 ? text.slice(0, 200) + '…' : text;
+                    throw new Error(`Error parsing chunk: ${e}\nRaw: ${preview}`);
+                }
+
+                if (isErrorChunk(chunk)) {
+                    await response.body?.cancel().catch(() => {});
+                    throw chunk;
+                }
+
+                const streamingChunk = chunk as StreamingChunk;
+
+                if (isSessionChunk(streamingChunk)) {
+                    const sessionChunk = streamingChunk;
+                    sessionChunk.meta.trace_id = traceId;
+                    options.onSessionChunk(streamingChunk);
+                } else if (isStreamDataChunk(streamingChunk)) {
+                    options.onStreamDataChunk(streamingChunk);
+                } else if (isQueryResponseChunk(streamingChunk)) {
+                    options.onQueryResponseChunk(streamingChunk);
+                } else if (isKeepAliveChunk(streamingChunk)) {
+                    console.info('Received keep alive chunk');
+                }
+            });
+        } catch (streamError) {
+            if (isErrorChunk(streamError)) {
+                throw streamError;
             }
-
-            if (isErrorChunk(chunk)) {
-                await response.body?.cancel().catch(() => {});
-                throw chunk;
-            }
-
-            const streamingChunk = chunk as StreamingChunk;
-
-            if (isSessionChunk(streamingChunk)) {
-                const sessionChunk = streamingChunk;
-                sessionChunk.meta.trace_id = traceId;
-                options.onSessionChunk(streamingChunk);
-            } else if (isStreamDataChunk(streamingChunk)) {
-                options.onStreamDataChunk(streamingChunk);
-            } else if (isQueryResponseChunk(streamingChunk)) {
-                options.onQueryResponseChunk(streamingChunk);
-            } else if (isKeepAliveChunk(streamingChunk)) {
-                // Logging for debug purposes
-                console.info('Received keep alive chunk');
-            }
-        });
+            const enriched =
+                streamError instanceof Error ? streamError : new Error(String(streamError));
+            Object.assign(enriched, {
+                config: {url, method: 'POST'},
+                headers: extractResponseHeaders(response),
+                errorPhase: 'stream',
+            });
+            throw enriched;
+        }
     }
 }

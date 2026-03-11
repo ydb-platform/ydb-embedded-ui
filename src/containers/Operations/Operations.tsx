@@ -1,10 +1,13 @@
 import React from 'react';
 
-import {PageError} from '../../components/Errors/PageError/PageError';
+import {Unauthenticated} from '../../components/Errors/401';
+import {AccessDenied} from '../../components/Errors/403';
+import {ResponseError} from '../../components/Errors/ResponseError';
 import {ResizeableDataTable} from '../../components/ResizeableDataTable/ResizeableDataTable';
 import {TableSkeleton} from '../../components/TableSkeleton/TableSkeleton';
 import {TableWithControlsLayout} from '../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
+import {isForbiddenError, isRedirectToAuth, isUnauthenticatedError} from '../../utils/response';
 
 import {OperationsControls} from './OperationsControls';
 import {getColumns} from './columns';
@@ -38,41 +41,56 @@ export function Operations({database, scrollContainerRef}: OperationsProps) {
         };
     }, []);
 
-    if (error) {
-        return <PageError error={error} position="left" />;
+    if (isRedirectToAuth(error)) {
+        return null;
     }
 
+    if (isUnauthenticatedError(error)) {
+        return <Unauthenticated />;
+    }
+
+    if (isForbiddenError(error)) {
+        return <AccessDenied />;
+    }
+
+    const hasNoData = operations.length === 0;
+
     return (
-        <TableWithControlsLayout>
-            <TableWithControlsLayout.Controls>
-                <OperationsControls
-                    kind={kind}
-                    searchValue={searchValue}
-                    handleKindChange={handleKindChange}
-                    handleSearchChange={handleSearchChange}
-                />
-            </TableWithControlsLayout.Controls>
-            <TableWithControlsLayout.Table loading={isLoading} className={b('table')}>
-                {operations.length > 0 || isLoading ? (
-                    <ResizeableDataTable
-                        columns={getColumns({database, refreshTable, kind})}
-                        columnsWidthLSKey={OPERATIONS_SELECTED_COLUMNS_KEY}
-                        data={operations}
-                        settings={settings}
-                        emptyDataMessage={i18n('title_empty')}
-                    />
-                ) : (
-                    <div>{i18n('title_empty')}</div>
-                )}
-                {isLoadingMore && (
-                    <TableSkeleton
-                        showHeader={false}
-                        rows={3}
-                        delay={0}
-                        className={b('loading-more')}
-                    />
-                )}
-            </TableWithControlsLayout.Table>
-        </TableWithControlsLayout>
+        <React.Fragment>
+            {error ? <ResponseError error={error} /> : null}
+            {error && hasNoData && !isLoading ? null : (
+                <TableWithControlsLayout>
+                    <TableWithControlsLayout.Controls>
+                        <OperationsControls
+                            kind={kind}
+                            searchValue={searchValue}
+                            handleKindChange={handleKindChange}
+                            handleSearchChange={handleSearchChange}
+                        />
+                    </TableWithControlsLayout.Controls>
+                    <TableWithControlsLayout.Table loading={isLoading} className={b('table')}>
+                        {!hasNoData || isLoading ? (
+                            <ResizeableDataTable
+                                columns={getColumns({database, refreshTable, kind})}
+                                columnsWidthLSKey={OPERATIONS_SELECTED_COLUMNS_KEY}
+                                data={operations}
+                                settings={settings}
+                                emptyDataMessage={i18n('title_empty')}
+                            />
+                        ) : (
+                            <div>{i18n('title_empty')}</div>
+                        )}
+                        {isLoadingMore && (
+                            <TableSkeleton
+                                showHeader={false}
+                                rows={3}
+                                delay={0}
+                                className={b('loading-more')}
+                            />
+                        )}
+                    </TableWithControlsLayout.Table>
+                </TableWithControlsLayout>
+            )}
+        </React.Fragment>
     );
 }

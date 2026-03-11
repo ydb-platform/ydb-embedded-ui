@@ -4,11 +4,11 @@ import {Xmark} from '@gravity-ui/icons';
 import {Button, Flex, Icon, Text} from '@gravity-ui/uikit';
 
 import {EnableFullscreenButton} from '../../../../../components/EnableFullscreenButton/EnableFullscreenButton';
+import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import {Fullscreen} from '../../../../../components/Fullscreen/Fullscreen';
 import {LoaderWrapper} from '../../../../../components/LoaderWrapper/LoaderWrapper';
 import {setShowPreview} from '../../../../../store/reducers/schema/schema';
 import {useTypedDispatch} from '../../../../../utils/hooks';
-import {parseQueryErrorToString} from '../../../../../utils/query';
 import i18n from '../../i18n';
 import {b} from '../shared';
 
@@ -61,11 +61,7 @@ export function Preview({
 
     const renderContent = () => {
         if (error) {
-            return (
-                <div className={b('message-container', 'error')}>
-                    {parseQueryErrorToString(error)}
-                </div>
-            );
+            return <ResponseError error={error} />;
         }
         return renderResult?.();
     };

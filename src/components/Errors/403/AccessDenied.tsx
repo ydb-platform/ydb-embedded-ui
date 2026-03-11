@@ -1,6 +1,6 @@
-import {EMPTY_STATE_SIZES, EmptyState} from '../../EmptyState';
+import {getIllustration} from '../../../utils/illustrations';
 import type {EmptyStateProps} from '../../EmptyState';
-import {Illustration} from '../../Illustration';
+import {EMPTY_STATE_SIZES, EmptyState} from '../../EmptyState';
 import i18n from '../i18n';
 
 interface AccessDeniedProps extends Omit<EmptyStateProps, 'title'> {
@@ -14,11 +14,16 @@ export const AccessDenied = ({
     size = 'm',
     ...restProps
 }: AccessDeniedProps) => {
+    const AccessDeniedImage = getIllustration('AccessDenied');
+    const illustrationSize = EMPTY_STATE_SIZES[size];
     return (
         <EmptyState
-            image={image || <Illustration name="403" width={EMPTY_STATE_SIZES[size]} />}
+            image={
+                image || <AccessDeniedImage width={illustrationSize} height={illustrationSize} />
+            }
             title={title || i18n('403.title')}
             description={description || i18n('403.description')}
+            size={size}
             {...restProps}
         />
     );

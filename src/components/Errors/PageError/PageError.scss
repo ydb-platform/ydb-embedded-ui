@@ -1,7 +1,11 @@
 .ydb-page-error {
     display: grid;
-    align-items: center;
+    align-items: start;
     grid-template-rows: min-content auto;
 
     height: 100%;
+
+    .empty-state__wrapper {
+        margin-top: 100px;
+    }
 }

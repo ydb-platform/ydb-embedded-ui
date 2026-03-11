@@ -180,17 +180,13 @@ test.describe('Operations Tab - Infinite Query', () => {
         // Wait a bit for potential loading
         await page.waitForTimeout(2000);
 
-        // Wait for error state to be visible
-        const isPageErrorVisible = await diagnostics.operations.isPageErrorVisible();
-        expect(isPageErrorVisible).toBe(true);
+        // Wait for error state to be visible (ResponseError alert)
+        const isResponseErrorVisible = await diagnostics.operations.isResponseErrorVisible();
+        expect(isResponseErrorVisible).toBe(true);
 
-        // Verify the error title
-        const errorTitle = await diagnostics.operations.getPageErrorTitle();
-        expect(errorTitle).toBe('Error');
-
-        // Verify the error description shows network error
-        const errorDescription = await diagnostics.operations.getPageErrorDescription();
-        expect(errorDescription.toLowerCase()).toContain('network');
+        // Verify the error title shows network error
+        const errorTitle = await diagnostics.operations.getResponseErrorTitle();
+        expect(errorTitle.toLowerCase()).toContain('network');
     });
 
     test('handles malformed response without operations array', async ({page}) => {

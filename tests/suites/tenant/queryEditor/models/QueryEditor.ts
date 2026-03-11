@@ -425,6 +425,10 @@ export class QueryEditor {
         );
     }
 
+    getResultAreaLocator() {
+        return this.selector.locator('.ydb-query-result__result');
+    }
+
     async getStatsTabContent() {
         // First navigate to Stats tab
         await this.paneWrapper.selectTab(ResultTabNames.Stats);

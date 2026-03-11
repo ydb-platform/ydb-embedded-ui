@@ -3,7 +3,6 @@ import type {TopShardsColumnId} from '../../../../../components/ShardsTable/cons
 import {topShardsApi} from '../../../../../store/reducers/tenantOverview/topShards/tenantOverviewTopShards';
 import {TENANT_OVERVIEW_TABLES_SETTINGS} from '../../../../../utils/constants';
 import {useAutoRefreshInterval} from '../../../../../utils/hooks';
-import {parseQueryErrorToString} from '../../../../../utils/query';
 import {TenantOverviewTableLayout} from '../TenantOverviewTableLayout';
 const columnsIds: TopShardsColumnId[] = ['TabletId', 'Path', 'CPUCores'];
 
@@ -26,11 +25,7 @@ export const TopShards = ({database, databaseFullPath}: TopShardsProps) => {
     const data = currentData?.resultSets?.[0]?.result || [];
 
     return (
-        <TenantOverviewTableLayout
-            loading={loading}
-            error={parseQueryErrorToString(error)}
-            withData={Boolean(currentData)}
-        >
+        <TenantOverviewTableLayout loading={loading} error={error} withData={Boolean(currentData)}>
             <ShardsTable
                 data={data}
                 databaseFullPath={databaseFullPath}
