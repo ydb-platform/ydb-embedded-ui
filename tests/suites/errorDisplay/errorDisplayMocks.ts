@@ -168,8 +168,6 @@ export async function setupWhoamiHybridNetworkErrorMock(page: Page) {
                 return currentApi;
             },
             set(value) {
-                currentApi = value;
-
                 if (
                     !value ||
                     typeof value !== 'object' ||
@@ -177,39 +175,46 @@ export async function setupWhoamiHybridNetworkErrorMock(page: Page) {
                     !value.viewer ||
                     typeof value.viewer !== 'object'
                 ) {
+                    currentApi = value;
                     return;
                 }
 
                 const viewer = value.viewer as {whoami?: (params?: {database?: string}) => unknown};
 
                 if (typeof viewer.whoami !== 'function') {
+                    currentApi = value;
                     return;
                 }
 
-                viewer.whoami = async ({database}: {database?: string} = {}) => {
-                    const query = `?database=${database ?? '3'}`;
+                const patchedViewer = {
+                    ...viewer,
+                    whoami: async ({database}: {database?: string} = {}) => {
+                        const query = `?database=${database ?? '3'}`;
 
-                    throw Object.assign(new Error('Network Error'), {
-                        name: 'AxiosError',
-                        code: 'ERR_NETWORK',
-                        config: {
-                            url: `/api/meta3/proxy/cluster/test-cluster/viewer/json/whoami${query}`,
-                            method: 'get',
-                        },
-                        response: {
-                            status: 404,
-                            statusText: 'Not Found',
-                            data: '',
-                            headers: {
-                                traceresponse:
-                                    '00-11112222333344445555666677778888-9999aaaabbbbcccc-00',
-                                'x-request-id': 'test-request-id-404-hybrid',
-                                'x-proxy-name': 'https://test-proxy-node.example.test:443',
-                                'x-trace-id': '11112222333344445555666677778888',
+                        throw Object.assign(new Error('Network Error'), {
+                            name: 'AxiosError',
+                            code: 'ERR_NETWORK',
+                            config: {
+                                url: `/api/meta3/proxy/cluster/test-cluster/viewer/json/whoami${query}`,
+                                method: 'get',
                             },
-                        },
-                    });
+                            response: {
+                                status: 404,
+                                statusText: 'Not Found',
+                                data: '',
+                                headers: {
+                                    traceresponse:
+                                        '00-11112222333344445555666677778888-9999aaaabbbbcccc-00',
+                                    'x-request-id': 'test-request-id-404-hybrid',
+                                    'x-proxy-name': 'https://test-proxy-node.example.test:443',
+                                    'x-trace-id': '11112222333344445555666677778888',
+                                },
+                            },
+                        });
+                    },
                 };
+
+                currentApi = {...value, viewer: patchedViewer};
             },
         });
     });

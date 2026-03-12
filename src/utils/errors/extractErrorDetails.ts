@@ -67,7 +67,11 @@ function normalizeErrorSource(error: Record<string, unknown>): Record<string, un
 
     const response = error.response as Record<string, unknown>;
     const normalized: Record<string, unknown> = {...error};
-    if (!('message' in normalized) && 'message' in error && typeof error.message === 'string') {
+    if (
+        !('message' in normalized) &&
+        Object.prototype.hasOwnProperty.call(error, 'message') &&
+        typeof error.message === 'string'
+    ) {
         normalized.message = error.message;
     }
     if (!('name' in normalized) && 'name' in error && typeof error.name === 'string') {
