@@ -17,6 +17,7 @@ import {
     longTableSelect,
     simpleQuery,
 } from '../constants';
+import executeQueryWithKeybinding from '../queryHistory/utils';
 
 import {
     ButtonNames,
@@ -282,6 +283,32 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
         await queryEditor.clickStopButton();
         await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
+    });
+
+    test('Stop button appears when query is started via hotkey', async ({page, browserName}) => {
+        const queryEditor = new QueryEditor(page);
+
+        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.focusEditor();
+        await executeQueryWithKeybinding(page, browserName);
+
+        await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+        await expect(queryEditor.isElapsedTimeVisible()).resolves.toBe(true);
+    });
+
+    test('Query started via hotkey is terminated when stop button is clicked', async ({
+        page,
+        browserName,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+
+        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.focusEditor();
+        await executeQueryWithKeybinding(page, browserName);
+
+        await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+        await queryEditor.clickStopButton();
+        await expect(queryEditor.waitForStatus('Stopped')).resolves.toBe(true);
     });
 
     test('Changing tab inside results pane doesnt change results view', async ({page}) => {
