@@ -189,8 +189,7 @@ export async function setupWhoamiHybridNetworkErrorMock(page: Page) {
                 viewer.whoami = async ({database}: {database?: string} = {}) => {
                     const query = `?database=${database ?? '3'}`;
 
-                    throw {
-                        message: 'Network Error',
+                    throw Object.assign(new Error('Network Error'), {
                         name: 'AxiosError',
                         code: 'ERR_NETWORK',
                         config: {
@@ -209,7 +208,7 @@ export async function setupWhoamiHybridNetworkErrorMock(page: Page) {
                                 'x-trace-id': '11112222333344445555666677778888',
                             },
                         },
-                    };
+                    });
                 };
             },
         });

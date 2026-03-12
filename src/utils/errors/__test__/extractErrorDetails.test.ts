@@ -170,8 +170,7 @@ describe('extractErrorDetails', () => {
     });
 
     test('should extract nested response details from hybrid network error', () => {
-        const error = {
-            message: 'Network Error',
+        const error = Object.assign(new Error('Network Error'), {
             name: 'AxiosError',
             code: 'ERR_NETWORK',
             config: {
@@ -189,13 +188,14 @@ describe('extractErrorDetails', () => {
                     'x-trace-id': '11112222333344445555666677778888',
                 },
             },
-        };
+        });
         const details = extractErrorDetails(error);
 
         expect(details).toEqual(
             expect.objectContaining({
                 status: 404,
                 statusText: 'Not Found',
+                title: '404 Not Found',
                 errorCode: 'ERR_NETWORK',
                 traceId: '11112222333344445555666677778888',
                 requestId: 'test-request-id-404-hybrid',

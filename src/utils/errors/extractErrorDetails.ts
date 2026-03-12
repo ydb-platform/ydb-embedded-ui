@@ -57,7 +57,7 @@ function hasConfig(error: Record<string, unknown>): boolean {
 }
 
 function hasData(error: Record<string, unknown>): boolean {
-    return 'data' in error;
+    return 'data' in error && error.data !== undefined;
 }
 
 function normalizeErrorSource(error: Record<string, unknown>): Record<string, unknown> {
@@ -66,7 +66,13 @@ function normalizeErrorSource(error: Record<string, unknown>): Record<string, un
     }
 
     const response = error.response as Record<string, unknown>;
-    const normalized = {...error};
+    const normalized: Record<string, unknown> = {...error};
+    if (!('message' in normalized) && 'message' in error && typeof error.message === 'string') {
+        normalized.message = error.message;
+    }
+    if (!('name' in normalized) && 'name' in error && typeof error.name === 'string') {
+        normalized.name = error.name;
+    }
 
     if (!hasStatus(normalized) && hasStatus(response)) {
         normalized.status = response.status;
