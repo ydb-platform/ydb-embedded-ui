@@ -1,5 +1,18 @@
 # Changelog
 
+## [14.12.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.11.0...v14.12.0) (2026-03-12)
+
+
+### Features
+
+* **TopicData:** add pagination ([#3584](https://github.com/ydb-platform/ydb-embedded-ui/issues/3584)) ([95b0ee8](https://github.com/ydb-platform/ydb-embedded-ui/commit/95b0ee8d8f3342d1ad7892f9032cba34bc6b7e93))
+
+
+### Bug Fixes
+
+* add error diagnostics case ([#3613](https://github.com/ydb-platform/ydb-embedded-ui/issues/3613)) ([012ef8b](https://github.com/ydb-platform/ydb-embedded-ui/commit/012ef8b4febcaa9f911c52bfc3fc26e2561ed574))
+* stop button doesnt appear if run query via hotkeys ([#3611](https://github.com/ydb-platform/ydb-embedded-ui/issues/3611)) ([6cc8bc4](https://github.com/ydb-platform/ydb-embedded-ui/commit/6cc8bc4d0f30027177d6b095c0b1271e5cc20aa9))
+
 ## [14.11.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.10.0...v14.11.0) (2026-03-11)
 
 
