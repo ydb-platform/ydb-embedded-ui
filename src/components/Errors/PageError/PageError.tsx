@@ -14,6 +14,8 @@ import {AccessDenied} from '../403';
 import {ResponseErrorMessage, useErrorInfo} from '../ResponseError';
 import i18n from '../i18n';
 
+import {resolvePageErrorSubtitle} from './utils';
+
 import './PageError.scss';
 
 const b = cn('ydb-page-error');
@@ -120,6 +122,14 @@ function PageErrorContent({
     } = useErrorInfo(error, defaultMessage);
 
     const resolvedTitle = titleProp || errorTitle || i18n('error.title');
+    const {resolvedSubtitle, resolvedShowSubtitle} = resolvePageErrorSubtitle({
+        hasTitleOverride: Boolean(titleProp),
+        errorTitle,
+        resolvedTitleString: typeof resolvedTitle === 'string' ? resolvedTitle : undefined,
+        subtitle,
+        showSubtitle,
+        details,
+    });
 
     const reportProblemUrl = React.useMemo(() => {
         if (!uiFactory.getReportProblemUrl) {
@@ -163,8 +173,8 @@ function PageErrorContent({
             description={
                 error ? (
                     <ResponseErrorMessage
-                        subtitle={subtitle}
-                        showSubtitle={showSubtitle}
+                        subtitle={resolvedSubtitle}
+                        showSubtitle={resolvedShowSubtitle}
                         details={details}
                         renderedTitle={
                             typeof resolvedTitle === 'string' ? resolvedTitle : undefined

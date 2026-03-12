@@ -169,6 +169,44 @@ describe('extractErrorDetails', () => {
         expect(details?.status).toBeUndefined();
     });
 
+    test('should extract nested response details from hybrid network error', () => {
+        const error = Object.assign(new Error('Network Error'), {
+            name: 'AxiosError',
+            code: 'ERR_NETWORK',
+            config: {
+                url: '/api/meta3/proxy/cluster/test-cluster/viewer/json/whoami?database=test-db',
+                method: 'get',
+            },
+            response: {
+                status: 404,
+                statusText: 'Not Found',
+                data: '',
+                headers: {
+                    traceresponse: '00-11112222333344445555666677778888-9999aaaabbbbcccc-00',
+                    'x-request-id': 'test-request-id-404-hybrid',
+                    'x-proxy-name': 'https://test-proxy-node.example.test:443',
+                    'x-trace-id': '11112222333344445555666677778888',
+                },
+            },
+        });
+        const details = extractErrorDetails(error);
+
+        expect(details).toEqual(
+            expect.objectContaining({
+                status: 404,
+                statusText: 'Not Found',
+                title: '404 Not Found',
+                errorCode: 'ERR_NETWORK',
+                traceId: '11112222333344445555666677778888',
+                requestId: 'test-request-id-404-hybrid',
+                proxyName: 'https://test-proxy-node.example.test:443',
+                requestUrl:
+                    '/api/meta3/proxy/cluster/test-cluster/viewer/json/whoami?database=test-db',
+                method: 'GET',
+            }),
+        );
+    });
+
     test('should extract errorCode for timeout error', () => {
         const error = {
             message: 'timeout of 600000ms exceeded',

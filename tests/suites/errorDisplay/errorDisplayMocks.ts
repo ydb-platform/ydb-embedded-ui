@@ -156,6 +156,70 @@ export async function setupWhoamiNetworkErrorMock(page: Page) {
     });
 }
 
+export async function setupWhoamiHybridNetworkErrorMock(page: Page) {
+    await page.addInitScript(() => {
+        const originalApiDescriptor = Object.getOwnPropertyDescriptor(window, 'api');
+        let currentApi: unknown;
+
+        Object.defineProperty(window, 'api', {
+            configurable: true,
+            enumerable: originalApiDescriptor?.enumerable ?? true,
+            get() {
+                return currentApi;
+            },
+            set(value) {
+                if (
+                    !value ||
+                    typeof value !== 'object' ||
+                    !('viewer' in value) ||
+                    !value.viewer ||
+                    typeof value.viewer !== 'object'
+                ) {
+                    currentApi = value;
+                    return;
+                }
+
+                const viewer = value.viewer as {whoami?: (params?: {database?: string}) => unknown};
+
+                if (typeof viewer.whoami !== 'function') {
+                    currentApi = value;
+                    return;
+                }
+
+                const patchedViewer = {
+                    ...viewer,
+                    whoami: async ({database}: {database?: string} = {}) => {
+                        const query = `?database=${database ?? '3'}`;
+
+                        throw Object.assign(new Error('Network Error'), {
+                            name: 'AxiosError',
+                            code: 'ERR_NETWORK',
+                            config: {
+                                url: `/api/meta3/proxy/cluster/test-cluster/viewer/json/whoami${query}`,
+                                method: 'get',
+                            },
+                            response: {
+                                status: 404,
+                                statusText: 'Not Found',
+                                data: '',
+                                headers: {
+                                    traceresponse:
+                                        '00-11112222333344445555666677778888-9999aaaabbbbcccc-00',
+                                    'x-request-id': 'test-request-id-404-hybrid',
+                                    'x-proxy-name': 'https://test-proxy-node.example.test:443',
+                                    'x-trace-id': '11112222333344445555666677778888',
+                                },
+                            },
+                        });
+                    },
+                };
+
+                currentApi = {...value, viewer: patchedViewer};
+            },
+        });
+    });
+}
+
 export async function setupWhoami502HtmlMock(page: Page) {
     const html =
         '<html><body><h1>502 Bad Gateway</h1><p>The upstream server returned an invalid response</p></body></html>';

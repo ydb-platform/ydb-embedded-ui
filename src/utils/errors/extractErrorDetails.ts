@@ -40,6 +40,67 @@ function extractTraceIdFromTraceresponse(value: string): string {
     return parts.length >= 2 ? parts[1] : value;
 }
 
+function hasStatus(error: Record<string, unknown>): boolean {
+    return typeof error.status === 'number';
+}
+
+function hasStatusText(error: Record<string, unknown>): boolean {
+    return typeof error.statusText === 'string';
+}
+
+function hasHeaders(error: Record<string, unknown>): boolean {
+    return Boolean('headers' in error && error.headers && typeof error.headers === 'object');
+}
+
+function hasConfig(error: Record<string, unknown>): boolean {
+    return Boolean('config' in error && error.config && typeof error.config === 'object');
+}
+
+function hasData(error: Record<string, unknown>): boolean {
+    return 'data' in error && error.data !== undefined;
+}
+
+function normalizeErrorSource(error: Record<string, unknown>): Record<string, unknown> {
+    if (!('response' in error) || !error.response || typeof error.response !== 'object') {
+        return error;
+    }
+
+    const response = error.response as Record<string, unknown>;
+    const normalized: Record<string, unknown> = {...error};
+    if (
+        !('message' in normalized) &&
+        Object.prototype.hasOwnProperty.call(error, 'message') &&
+        typeof error.message === 'string'
+    ) {
+        normalized.message = error.message;
+    }
+    if (!('name' in normalized) && 'name' in error && typeof error.name === 'string') {
+        normalized.name = error.name;
+    }
+
+    if (!hasStatus(normalized) && hasStatus(response)) {
+        normalized.status = response.status;
+    }
+
+    if (!hasStatusText(normalized) && hasStatusText(response)) {
+        normalized.statusText = response.statusText;
+    }
+
+    if (!hasData(normalized) && hasData(response)) {
+        normalized.data = response.data;
+    }
+
+    if (!hasHeaders(normalized) && hasHeaders(response)) {
+        normalized.headers = response.headers;
+    }
+
+    if (!hasConfig(normalized) && hasConfig(response)) {
+        normalized.config = response.config;
+    }
+
+    return normalized;
+}
+
 function extractHeaders(headers: unknown): Partial<ErrorDetails> {
     if (!headers || typeof headers !== 'object') {
         return {};
@@ -308,24 +369,25 @@ export function extractErrorDetails(error: unknown): ErrorDetails | null {
         return null;
     }
 
+    const normalizedError = normalizeErrorSource(error as Record<string, unknown>);
     const details: ErrorDetails = {
-        ...extractBasicProperties(error as Record<string, unknown>),
+        ...extractBasicProperties(normalizedError),
     };
 
     // ErrorResponse has error.error.message at top level (not in .data)
-    if (!details.dataMessage && 'error' in error) {
-        const msg = extractDataMessage(error);
+    if (!details.dataMessage && 'error' in normalizedError) {
+        const msg = extractDataMessage(normalizedError);
         if (msg) {
             details.dataMessage = msg;
         }
     }
 
-    if ('headers' in error) {
-        Object.assign(details, extractHeaders(error.headers));
+    if ('headers' in normalizedError) {
+        Object.assign(details, extractHeaders(normalizedError.headers));
     }
 
-    if ('config' in error) {
-        const {url, method} = extractConfig(error.config);
+    if ('config' in normalizedError) {
+        const {url, method} = extractConfig(normalizedError.config);
         if (url) {
             details.requestUrl = url;
         }
@@ -334,8 +396,8 @@ export function extractErrorDetails(error: unknown): ErrorDetails | null {
         }
     }
 
-    Object.assign(details, extractIssues(error));
-    Object.assign(details, extractDiagnosticFields(error, Object.keys(details).length));
+    Object.assign(details, extractIssues(normalizedError));
+    Object.assign(details, extractDiagnosticFields(normalizedError, Object.keys(details).length));
 
     const hasAnyDetail = Object.keys(details).length > 0;
     return hasAnyDetail ? details : null;
