@@ -39,6 +39,7 @@ export function YDBSyntaxHighlighter({
         let cancelled = false;
 
         setIsLoading(true);
+        setHighlightedHtml('');
 
         async function highlight() {
             try {
