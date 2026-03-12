@@ -59,5 +59,6 @@ export const codecNumberToName: Record<number, string> = {
 
 export const TOPIC_DATA_FETCH_LIMIT = 30;
 
+//this limitations seems to be sound: its big enough to scroll through offsets without changing page, alse it fits within the browsers container height limits
 export const TOPIC_DATA_DEFAULT_PAGE_SIZE = 100_000;
 export const TOPIC_DATA_MIN_TOTAL_FOR_PAGINATION = 100_000;
