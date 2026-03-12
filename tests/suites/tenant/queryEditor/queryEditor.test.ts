@@ -8,6 +8,10 @@ import {
     setupMockStreamingFetch,
     setupMockStreamingHttpError,
 } from '../../../utils/mockStreamingFetch';
+import {
+    executeQueryWithKeybinding,
+    executeSelectedQueryWithKeybinding,
+} from '../../../utils/queryHotkeys';
 import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {NavigationTabs, TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 import {
@@ -17,7 +21,6 @@ import {
     longTableSelect,
     simpleQuery,
 } from '../constants';
-import executeQueryWithKeybinding from '../queryHistory/utils';
 
 import {
     ButtonNames,
@@ -26,7 +29,6 @@ import {
     QueryTabs,
     ResultTabNames,
 } from './models/QueryEditor';
-import {executeSelectedQueryWithKeybinding} from './utils';
 
 test.describe('Test Query Editor', async () => {
     const testQuery = 'SELECT 1, 2, 3, 4, 5;';
@@ -285,26 +287,40 @@ test.describe('Test Query Editor', async () => {
         await expect(queryEditor.isStopButtonHidden()).resolves.toBe(true);
     });
 
-    test('Stop button appears when query is started via hotkey', async ({page, browserName}) => {
+    test('Stop button appears when query is started via hotkey', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         await queryEditor.setQuery(longRunningQuery);
         await queryEditor.focusEditor();
-        await executeQueryWithKeybinding(page, browserName);
+        await executeQueryWithKeybinding(page);
 
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
         await expect(queryEditor.isElapsedTimeVisible()).resolves.toBe(true);
     });
 
-    test('Query started via hotkey is terminated when stop button is clicked', async ({
-        page,
-        browserName,
-    }) => {
+    test('Query started via hotkey is terminated when stop button is clicked', async ({page}) => {
         const queryEditor = new QueryEditor(page);
 
         await queryEditor.setQuery(longRunningQuery);
         await queryEditor.focusEditor();
-        await executeQueryWithKeybinding(page, browserName);
+        await executeQueryWithKeybinding(page);
+
+        await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+        await queryEditor.clickStopButton();
+        await expect(queryEditor.waitForStatus('Stopped')).resolves.toBe(true);
+    });
+
+    test('Stop button stays available after switching away and back during running query', async ({
+        page,
+    }) => {
+        const queryEditor = new QueryEditor(page);
+
+        await queryEditor.setQuery(longRunningQuery);
+        await queryEditor.clickRunButton();
+        await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.queryTabs.selectTab(QueryTabs.Editor);
 
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
         await queryEditor.clickStopButton();

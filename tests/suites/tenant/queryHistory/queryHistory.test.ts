@@ -2,12 +2,11 @@ import {expect, test} from '@playwright/test';
 
 import {QUERY_MODES} from '../../../../src/utils/query';
 import {database} from '../../../utils/constants';
+import {executeQueryWithKeybinding} from '../../../utils/queryHotkeys';
 import {TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 import {QueryEditor, QueryTabs} from '../queryEditor/models/QueryEditor';
 import {SaveQueryDialog} from '../queryEditor/models/SaveQueryDialog';
 import {SavedQueriesTable} from '../savedQueries/models/SavedQueriesTable';
-
-import executeQueryWithKeybinding from './utils';
 
 test.describe('Query History', () => {
     let tenantPage: TenantPage;
@@ -68,7 +67,7 @@ test.describe('Query History', () => {
         }
     });
 
-    test('Query executed with keybinding is saved in history', async ({page, browserName}) => {
+    test('Query executed with keybinding is saved in history', async ({page}) => {
         const testQuery = 'SELECT 1 AS keybinding_test;';
 
         // Focus on the query editor
@@ -78,7 +77,7 @@ test.describe('Query History', () => {
         await page.keyboard.type(testQuery);
 
         // Use the keybinding to execute the query
-        await executeQueryWithKeybinding(page, browserName);
+        await executeQueryWithKeybinding(page);
 
         // Wait for query results
         await queryEditor.resultTable.isVisible();

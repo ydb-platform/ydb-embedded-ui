@@ -170,7 +170,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
         }
     }, [dispatch, database, savedPath]);
 
-    const [isStoppable, setIsStoppable] = React.useState(false);
+    const [isStoppable, setIsStoppable] = React.useState(Boolean(result?.isLoading));
     const stopButtonAppearRef = React.useRef<number | null>(null);
 
     const runSetStoppableTimeout = React.useCallback(() => {
