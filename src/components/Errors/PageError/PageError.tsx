@@ -120,6 +120,14 @@ function PageErrorContent({
     } = useErrorInfo(error, defaultMessage);
 
     const resolvedTitle = titleProp || errorTitle || i18n('error.title');
+    const shouldShowHttpSubtitle =
+        Boolean(titleProp) &&
+        details?.errorCode === 'ERR_NETWORK' &&
+        details.status !== undefined &&
+        Boolean(errorTitle) &&
+        errorTitle !== resolvedTitle;
+    const resolvedSubtitle = shouldShowHttpSubtitle ? errorTitle : subtitle;
+    const resolvedShowSubtitle = shouldShowHttpSubtitle || showSubtitle;
 
     const reportProblemUrl = React.useMemo(() => {
         if (!uiFactory.getReportProblemUrl) {
@@ -163,8 +171,8 @@ function PageErrorContent({
             description={
                 error ? (
                     <ResponseErrorMessage
-                        subtitle={subtitle}
-                        showSubtitle={showSubtitle}
+                        subtitle={resolvedSubtitle}
+                        showSubtitle={resolvedShowSubtitle}
                         details={details}
                         renderedTitle={
                             typeof resolvedTitle === 'string' ? resolvedTitle : undefined
