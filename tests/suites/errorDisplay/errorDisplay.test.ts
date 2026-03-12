@@ -28,6 +28,7 @@ import {
     setupWhoami500Mock,
     setupWhoami502HtmlMock,
     setupWhoami503TextMock,
+    setupWhoamiHybridNetworkErrorMock,
     setupWhoamiNetworkErrorMock,
 } from './errorDisplayMocks';
 
@@ -43,6 +44,7 @@ const FULL_PAGE_DIR = 'playwright-artifacts/full-page-screenshots';
 //   Full-page: Whoami → 500 JSON + trace headers
 //   Full-page: Whoami → 502 HTML body + x-proxy-name + x-trace-id
 //   Full-page: Whoami → 503 text body + x-worker-name
+//   Full-page: Whoami → hybrid ERR_NETWORK + nested 404/headers
 //   Full-page: Whoami → network error (ERR_NETWORK)
 //   Access:    Tenant → 403 AccessDenied
 //   Access:    Capabilities → 401 Unauthenticated
@@ -399,6 +401,51 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         );
         await page.screenshot({
             path: `${FULL_PAGE_DIR}/full-whoami-network.png`,
+            fullPage: true,
+        });
+    });
+
+    test('Full-page — whoami hybrid network error restores 404 and response headers', async ({
+        page,
+    }) => {
+        await setupWhoamiHybridNetworkErrorMock(page);
+
+        const clusterPage = new ClusterPage(page);
+        await clusterPage.goto();
+
+        const errorDisplay = new ErrorDisplayModel(page);
+        await errorDisplay.waitForPageError();
+
+        const title = await errorDisplay.getPageErrorTitle();
+        expect(title).toContain('404');
+        expect(title).toContain('Not Found');
+
+        const bodyText = await errorDisplay.getPageErrorBodyText();
+        expect(bodyText).toContain('Network Error');
+
+        expect(await errorDisplay.isPageErrorFieldsVisible()).toBe(true);
+
+        const errorCode = await errorDisplay.getPageErrorDetailValue('Code');
+        expect(errorCode).toBe('ERR_NETWORK');
+
+        const url = await errorDisplay.getPageErrorDetailValue('URL');
+        expect(url).toContain('/api/meta3/proxy/cluster/test-cluster/viewer/json/whoami');
+        expect(url).toContain('database=3');
+
+        const traceId = await errorDisplay.getPageErrorDetailValue('Trace-ID');
+        expect(traceId).toBe('11112222333344445555666677778888');
+
+        const requestId = await errorDisplay.getPageErrorDetailValue('Request-ID');
+        expect(requestId).toBe('test-request-id-404-hybrid');
+
+        const proxyName = await errorDisplay.getPageErrorDetailValue('x-proxy-name');
+        expect(proxyName).toBe('https://test-proxy-node.example.test:443');
+
+        await expect(errorDisplay.getPageErrorLocator()).toHaveScreenshot(
+            'error-full-page-whoami-hybrid-network.png',
+        );
+        await page.screenshot({
+            path: `${FULL_PAGE_DIR}/full-whoami-hybrid-network.png`,
             fullPage: true,
         });
     });
