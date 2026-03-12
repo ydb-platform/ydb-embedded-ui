@@ -48,8 +48,15 @@ export const FixedHeightQuery = ({
             }
             newLineCount += 1;
             if (newLineCount === lines) {
+                let postfix = '';
+                // Add additional empty line at the end if there are more lines
+                // to ensure proper truncation marker
+                if (trimmedValue.indexOf('\n', searchFromIndex + 1) !== -1) {
+                    postfix = '\n ';
+                }
+
                 // Return everything up to (but not including) the Nth newline
-                return trimmedValue.slice(0, nextNewlineIndex);
+                return trimmedValue.slice(0, nextNewlineIndex) + postfix;
             }
             searchFromIndex = nextNewlineIndex + 1;
         }
