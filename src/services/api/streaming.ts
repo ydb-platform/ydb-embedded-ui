@@ -22,6 +22,7 @@ import {isRedirectToAuth} from '../../utils/response';
 
 import {BaseYdbAPI} from './base';
 import {readPartText} from './streamingPartReader';
+import {isNeedResetResponse, processNeedResetStatus} from './utils/needReset';
 
 /**
  * Extracts useful headers from a fetch Response into a plain object.
@@ -139,6 +140,9 @@ export class StreamingAPI extends BaseYdbAPI {
                 const data = responseData as {authUrl: string};
                 window.location.assign(data.authUrl);
                 return;
+            }
+            if (isNeedResetResponse(responseData)) {
+                processNeedResetStatus();
             }
             throw createStreamingResponseError(response, responseData);
         }
