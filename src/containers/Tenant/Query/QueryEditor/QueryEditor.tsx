@@ -65,6 +65,8 @@ import './QueryEditor.scss';
 
 const b = cn('query-editor');
 
+const STOP_APPEAR_TIMEOUT = 400;
+
 const initialTenantCommonInfoState = {
     triggerExpand: false,
     triggerCollapse: false,
@@ -168,6 +170,28 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
         }
     }, [dispatch, database, savedPath]);
 
+    const [isStoppable, setIsStoppable] = React.useState(Boolean(result?.isLoading));
+    const stopButtonAppearRef = React.useRef<number | null>(null);
+
+    const runSetStoppableTimeout = React.useCallback(() => {
+        if (stopButtonAppearRef.current) {
+            window.clearTimeout(stopButtonAppearRef.current);
+        }
+
+        setIsStoppable(false);
+        stopButtonAppearRef.current = window.setTimeout(() => {
+            setIsStoppable(true);
+        }, STOP_APPEAR_TIMEOUT);
+    }, []);
+
+    React.useEffect(() => {
+        return () => {
+            if (stopButtonAppearRef.current) {
+                window.clearTimeout(stopButtonAppearRef.current);
+            }
+        };
+    }, []);
+
     const [resultVisibilityState, dispatchResultVisibilityState] = React.useReducer(
         paneVisibilityToggleReducer,
         initialTenantCommonInfoState,
@@ -193,6 +217,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
     }, [showPreview, isResultLoaded]);
 
     const handleSendExecuteClick = useEventHandler((text: string, partial?: boolean) => {
+        runSetStoppableTimeout();
         setLastUsedQueryAction(QUERY_ACTIONS.execute);
         dispatch(setLastExecutedQueryText({tabId: activeTabId, queryText: text}));
         if (!isEqual(lastQueryExecutionSettings, querySettings)) {
@@ -331,6 +356,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
     };
 
     const handleGetExplainQueryClick = useEventHandler((text: string) => {
+        runSetStoppableTimeout();
         setLastUsedQueryAction(QUERY_ACTIONS.explain);
         dispatch(setLastExecutedQueryText({tabId: activeTabId, queryText: text}));
         if (!isEqual(lastQueryExecutionSettings, querySettings)) {
@@ -384,6 +410,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
                 handleSendExecuteClick={handleSendExecuteClick}
                 onSettingsButtonClick={handleSettingsClick}
                 isLoading={Boolean(result?.isLoading)}
+                isStoppable={isStoppable}
                 handleGetExplainQueryClick={handleGetExplainQueryClick}
                 highlightedAction={lastUsedQueryAction}
                 database={database}

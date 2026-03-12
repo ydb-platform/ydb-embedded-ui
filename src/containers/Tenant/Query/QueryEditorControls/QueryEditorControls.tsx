@@ -20,6 +20,7 @@ const b = cn('ydb-query-editor-controls');
 
 interface QueryEditorControlsProps {
     isLoading: boolean;
+    isStoppable: boolean;
     disabled?: boolean;
     highlightedAction: QueryAction;
     queryId?: string;
@@ -31,7 +32,6 @@ interface QueryEditorControlsProps {
     onSettingsButtonClick: () => void;
 }
 
-const STOP_APPEAR_TIMEOUT = 400;
 const STOP_AUTO_HIDE_TIMEOUT = 5000;
 
 interface ActionButtonProps {
@@ -74,6 +74,7 @@ const CANCEL_ERROR_ANIMATION_DURATION = 500;
 export const QueryEditorControls = ({
     disabled,
     isLoading,
+    isStoppable,
     highlightedAction,
     queryId,
     database,
@@ -86,8 +87,6 @@ export const QueryEditorControls = ({
     const input = useTypedSelector(selectUserInput);
     const activeTabId = useTypedSelector(selectActiveTabId);
     const [sendCancelQuery, cancelQueryResponse] = cancelQueryApi.useCancelQueryMutation();
-    const [isStoppable, setIsStoppable] = React.useState(isLoading);
-    const stopButtonAppearRef = React.useRef<number | null>(null);
     const cancelErrorAnimationRef = React.useRef<number | null>(null);
     const [cancelQueryError, setCancelQueryError] = React.useState<boolean>(false);
 
@@ -121,33 +120,16 @@ export const QueryEditorControls = ({
     const isRunHighlighted = highlightedAction === 'execute';
     const isExplainHighlighted = highlightedAction === 'explain';
 
-    const runSetStoppableTimeout = React.useCallback(() => {
-        if (stopButtonAppearRef.current) {
-            window.clearTimeout(stopButtonAppearRef.current);
-        }
-
-        setIsStoppable(false);
-        stopButtonAppearRef.current = window.setTimeout(() => {
-            setIsStoppable(true);
-        }, STOP_APPEAR_TIMEOUT);
-    }, []);
-
     const onRunButtonClick = React.useCallback(() => {
         handleSendExecuteClick(input);
-        runSetStoppableTimeout();
-    }, [handleSendExecuteClick, input, runSetStoppableTimeout]);
+    }, [handleSendExecuteClick, input]);
 
     const onExplainButtonClick = React.useCallback(() => {
         handleGetExplainQueryClick(input);
-        runSetStoppableTimeout();
-    }, [handleGetExplainQueryClick, input, runSetStoppableTimeout]);
+    }, [handleGetExplainQueryClick, input]);
 
     React.useEffect(() => {
         return () => {
-            if (stopButtonAppearRef.current) {
-                window.clearTimeout(stopButtonAppearRef.current);
-            }
-
             if (cancelErrorAnimationRef.current) {
                 window.clearTimeout(cancelErrorAnimationRef.current);
             }

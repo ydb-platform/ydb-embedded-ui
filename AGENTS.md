@@ -148,9 +148,13 @@ const columns = React.useMemo(() => {
       if (overridedColumn) {
         return overridedColumn;
       }
-      return shardsColumnIdToGetColumn[id]();
+      const column = shardsColumnIdToGetColumn[id]({databaseFullPath});
+      return {
+        ...column,
+        sortable: isSortableTopShardsColumn(column.name),
+      };
     });
-}, [columnsIds, overrideColumns]);
+}, [columnsIds, overrideColumns, databaseFullPath]);
 
 // ✅ PREFER direct callbacks over useEffect — clears error on input change
 // (src/containers/Tenant/Query/QueryEditor/EditorTabs/RenameTabDialog.tsx)
@@ -208,18 +212,25 @@ REACT_APP_BACKEND=http://your-cluster:8765  # Single cluster mode
 
 ### CI Pipeline
 
-The following checks run on every PR (`ci.yml`):
+The following checks run on every PR and merge group (`ci.yml`):
+
+**Job: Verify Files** — runs sequentially:
 
 1. `npm run typecheck` — TypeScript type checking
 2. `npm run lint` — All linters (ESLint + Stylelint + Prettier)
 3. `npm run build:embedded` — Verify embedded build works
 4. `npm run package` — Verify library package build works
-5. `npm test` — Unit tests
 
-Additional quality checks (`quality.yml`):
+**Job: Unit Tests** — runs in parallel with Verify Files:
 
-- Playwright E2E tests (against a `local-ydb:nightly` Docker service)
-- Bundle size comparison (current branch vs. main)
+5. `npm test` — Unit tests (Jest 30)
+
+Additional quality checks (`quality.yml`) — run on PRs and pushes to main:
+
+- Playwright E2E tests (against a `local-ydb:nightly` Docker service, sharded across 8 parallel runners)
+- Bundle size comparison (current branch vs. main, on PRs only)
+- Test report deployment to GitHub Pages
+- Automatic PR description updates with test results and bundle size diff
 
 ### UI Framework
 
@@ -227,7 +238,7 @@ The project uses Gravity UI (`@gravity-ui/uikit`) as the primary component libra
 
 ### Linting & Formatting
 
-- **ESLint**: Flat config (`eslint.config.mjs`) based on `@gravity-ui/eslint-config`
+- **ESLint**: Flat config (`eslint.config.mjs`) based on `@gravity-ui/eslint-config`, plus `src/.eslintrc` for source-specific rules (React.FC ban, axios import restrictions, lib import restrictions)
 - **Stylelint**: Based on `@gravity-ui/stylelint-config` with order and prettier plugins
 - **Prettier**: Uses `@gravity-ui/prettier-config`
 
@@ -236,6 +247,9 @@ The project uses Gravity UI (`@gravity-ui/uikit`) as the primary component libra
 - **TypeScript `import type`**: Must use separate top-level type imports (`consistent-type-imports` with `separate-type-imports` style)
 - **React imports**: Must use `import React from 'react'` — named imports, namespace imports, and non-`React` default names are forbidden
 - **Fragments**: Must use `React.Fragment` — JSX fragment shorthand (`<></>`) is forbidden
+- **React.FC**: Forbidden — do not use `React.FC` for component typing
+- **isAxiosError**: Must import from `utils/response`, not directly from `axios`
+- **lib imports**: Direct imports from `.*/**/lib` paths are forbidden — use direct component imports instead
 
 ```typescript
 // ✅ Correct — real pattern from the codebase (src/components/SplitPane/SplitPane.tsx)
