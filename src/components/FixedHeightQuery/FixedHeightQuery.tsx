@@ -29,9 +29,32 @@ export const FixedHeightQuery = ({
 }: FixedHeightQueryProps) => {
     const heightValue = `${lines * LINE_HEIGHT + FIXED_PADDING}px`;
 
-    // Remove empty lines from the beginning (lines with only whitespace are considered empty)
-    const trimmedValue = value.replace(/^(\s*\n)+/, '');
-    const valueToDisplay = trimmedValue.split('\n').slice(0, lines).join('\n');
+    const valueToDisplay = React.useMemo(() => {
+        // Remove empty lines from the beginning (lines with only whitespace are considered empty)
+        const trimmedValue = value.replace(/^(\s*\n)+/, '');
+
+        if (!trimmedValue) {
+            return '';
+        }
+
+        let newLineCount = 0;
+        let searchFromIndex = 0;
+
+        while (newLineCount < lines) {
+            const nextNewlineIndex = trimmedValue.indexOf('\n', searchFromIndex);
+            if (nextNewlineIndex === -1) {
+                // Fewer than `lines` newlines; return the whole string
+                return trimmedValue;
+            }
+            newLineCount += 1;
+            if (newLineCount === lines) {
+                // Return everything up to (but not including) the Nth newline
+                return trimmedValue.slice(0, nextNewlineIndex);
+            }
+            searchFromIndex = nextNewlineIndex + 1;
+        }
+        return trimmedValue;
+    }, [value, lines]);
 
     const heightStyle = mode === 'fixed' ? {height: heightValue} : {maxHeight: heightValue};
 
