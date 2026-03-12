@@ -54,7 +54,11 @@ export function YDBSyntaxHighlighter({
             }
         }
 
-        highlight();
+        // Start highlighting in next render cycle, when content is initially rendered
+        // For big queries highlighting may take some time, so we show not highlighted component first
+        setTimeout(() => {
+            highlight();
+        }, 0);
 
         return () => {
             cancelled = true;

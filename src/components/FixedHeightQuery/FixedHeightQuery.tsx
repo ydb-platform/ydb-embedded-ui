@@ -31,6 +31,7 @@ export const FixedHeightQuery = ({
 
     // Remove empty lines from the beginning (lines with only whitespace are considered empty)
     const trimmedValue = value.replace(/^(\s*\n)+/, '');
+    const valueToDisplay = trimmedValue.split('\n').slice(0, lines).join('\n');
 
     const heightStyle = mode === 'fixed' ? {height: heightValue} : {maxHeight: heightValue};
 
@@ -46,7 +47,7 @@ export const FixedHeightQuery = ({
         >
             <YDBSyntaxHighlighter
                 language="yql"
-                text={trimmedValue}
+                text={valueToDisplay}
                 withClipboardButton={
                     hasClipboardButton
                         ? {
