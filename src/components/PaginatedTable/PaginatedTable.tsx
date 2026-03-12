@@ -34,6 +34,7 @@ export interface PaginatedTableProps<T, F> {
     containerClassName?: string;
     onDataFetched?: (data: PaginatedTableData<T>) => void;
     keepCache?: boolean;
+    fetchOverscan?: number;
 }
 
 const DEFAULT_PAGINATION_LIMIT = 20;
@@ -54,6 +55,7 @@ export const PaginatedTable = <T, F>({
     containerClassName,
     onDataFetched,
     keepCache = true,
+    fetchOverscan,
 }: PaginatedTableProps<T, F>) => {
     // Get state and setters from context
     const {tableState, setSortParams, setTotalEntities, setFoundEntities, setIsInitialLoad} =
@@ -123,6 +125,7 @@ export const PaginatedTable = <T, F>({
                     renderEmptyDataMessage={renderEmptyDataMessage}
                     onDataFetched={handleDataFetched}
                     keepCache={keepCache}
+                    fetchOverscan={fetchOverscan}
                 />
             </tbody>
         </table>

@@ -17,6 +17,8 @@ const emptyData = {data: [], total: 0, found: 0};
 interface GetTopicDataProps {
     setBoundOffsets: (props: {startOffset: number; endOffset: number}) => void;
     baseOffset?: number;
+    /** Maximum number of entities to report (page size). When set, caps total/found. */
+    maxEntities?: number;
 }
 
 export function prepareResponse(response: TopicDataResponse, offset: number) {
@@ -55,7 +57,11 @@ export function prepareResponse(response: TopicDataResponse, offset: number) {
     return {start, end, messages: normalizedMessages};
 }
 
-export const generateTopicDataGetter = ({setBoundOffsets, baseOffset = 0}: GetTopicDataProps) => {
+export const generateTopicDataGetter = ({
+    setBoundOffsets,
+    baseOffset = 0,
+    maxEntities,
+}: GetTopicDataProps) => {
     const getTopicData: FetchData<TopicMessageEnhanced, TopicDataFilters> = async ({
         limit,
         offset: tableOffset,
@@ -65,7 +71,7 @@ export const generateTopicDataGetter = ({setBoundOffsets, baseOffset = 0}: GetTo
             return emptyData;
         }
 
-        const {partition, isEmpty, ...rest} = filters;
+        const {partition, isEmpty, currentPage: _currentPage, ...rest} = filters;
 
         if (isNil(partition) || partition === '' || isEmpty) {
             return emptyData;
@@ -89,7 +95,12 @@ export const generateTopicDataGetter = ({setBoundOffsets, baseOffset = 0}: GetTo
         //need to update start and end offsets every time data is fetched to show fresh data in parent component
         setBoundOffsets({startOffset: start, endOffset: end});
 
-        const quantity = end - baseOffset;
+        let quantity = Math.max(end - baseOffset, 0);
+
+        // Cap quantity to maxEntities (page size) when pagination is active
+        if (!isNil(maxEntities) && quantity > maxEntities) {
+            quantity = maxEntities;
+        }
 
         return {
             data: messages,

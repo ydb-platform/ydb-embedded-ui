@@ -73,3 +73,17 @@ TableWithControlsLayout.Table = function Table({
         </div>
     );
 };
+
+TableWithControlsLayout.Footer = function TableFooter({
+    children,
+    className,
+}: {
+    children: React.ReactNode;
+    className?: string;
+}) {
+    return (
+        <div className={b('footer-wrapper')}>
+            <div className={b('footer', className)}>{children}</div>
+        </div>
+    );
+};
