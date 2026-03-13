@@ -95,7 +95,7 @@ export const ClusterInfo = ({
                 <Text as="div" variant="subheader-2" className={b('section-title')}>
                     {i18n('title_storage-groups')}
                 </Text>
-                <Card view="filled" className={b('section', {compact: true, filled: true})}>
+                <Card view="filled" className={b('section', {compact: true})}>
                     <StorageGroupStats groupStats={groupStats} />
                 </Card>
             </InfoSection>

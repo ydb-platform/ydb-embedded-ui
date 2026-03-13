@@ -32,7 +32,7 @@ function DiskGroupStats({stats, storageType}: GroupsStatsPopupContentProps) {
             <Flex justifyContent="space-between" alignItems="center">
                 <Text variant="subheader-1">{storageType}</Text>
                 <Flex gap={4} wrap="nowrap" alignItems="center">
-                    <Label theme="normal">{availableGroupsString}</Label>
+                    <Label theme="info">{availableGroupsString}</Label>
                     <Text color="secondary">
                         {i18n('title_allocated', {
                             used: formatNumber(stats.createdGroups),
