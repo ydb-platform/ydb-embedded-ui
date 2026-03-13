@@ -19,11 +19,12 @@ interface TopicMessageProps {
     message: string;
     offset?: string | number;
     size?: number;
-    scrollContainerRef: React.RefObject<HTMLDivElement>;
 }
 
-export function TopicMessage({offset, size, message, scrollContainerRef}: TopicMessageProps) {
+export function TopicMessage({offset, size, message}: TopicMessageProps) {
     const isFullscreen = useTypedSelector((state) => state.fullscreen);
+    const sectionScrollRef = React.useRef<HTMLDivElement>(null);
+
     const {preparedMessage, decodedMessage, isJson} = React.useMemo(() => {
         let preparedMessage = message;
         let decodedMessage = message;
@@ -62,7 +63,7 @@ export function TopicMessage({offset, size, message, scrollContainerRef}: TopicM
             collapsedInitially
             value={preparedMessage}
             toolbarClassName={b('json-viewer-toolbar')}
-            scrollContainerRef={scrollContainerRef}
+            scrollContainerRef={sectionScrollRef}
         />
     ) : (
         <div className={b('string-message')}>
@@ -100,7 +101,7 @@ export function TopicMessage({offset, size, message, scrollContainerRef}: TopicM
             title={<MessageTitle truncated={truncated} />}
             renderToolbar={renderToolbar}
             className={b('message')}
-            scrollContainerRef={scrollContainerRef}
+            scrollContainerRef={sectionScrollRef}
         >
             {messageContent}
         </TopicDataSection>
