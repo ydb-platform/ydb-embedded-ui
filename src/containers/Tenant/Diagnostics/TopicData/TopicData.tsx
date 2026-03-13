@@ -240,14 +240,10 @@ export function TopicData({scrollContainerRef, path, database, databaseFullPath}
     const renderDrawerContent = React.useCallback(() => {
         return (
             <Fullscreen>
-                <TopicMessageDetails
-                    database={database}
-                    path={path}
-                    scrollContainerRef={scrollContainerRef}
-                />
+                <TopicMessageDetails database={database} path={path} />
             </Fullscreen>
         );
-    }, [database, path, scrollContainerRef]);
+    }, [database, path]);
 
     const handlePaginationUpdate = React.useCallback(
         (page: number) => {
