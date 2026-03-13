@@ -1,5 +1,12 @@
 # Changelog
 
+## [14.12.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.12.0...v14.12.1) (2026-03-13)
+
+
+### Bug Fixes
+
+* **TopicData:** scroll behaviour ([#3620](https://github.com/ydb-platform/ydb-embedded-ui/issues/3620)) ([718f309](https://github.com/ydb-platform/ydb-embedded-ui/commit/718f30989ea6b7f35c12a8fd261e425edc2edf39))
+
 ## [14.12.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.11.0...v14.12.0) (2026-03-12)
 
 
