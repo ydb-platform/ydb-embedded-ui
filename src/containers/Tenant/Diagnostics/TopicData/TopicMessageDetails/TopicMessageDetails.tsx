@@ -24,14 +24,9 @@ import './TopicMessageDetails.scss';
 interface TopicMessageDetailsProps {
     database: string;
     path: string;
-    scrollContainerRef: React.RefObject<HTMLDivElement>;
 }
 
-export function TopicMessageDetails({
-    database,
-    path,
-    scrollContainerRef,
-}: TopicMessageDetailsProps) {
+export function TopicMessageDetails({database, path}: TopicMessageDetailsProps) {
     const {selectedPartition, activeOffset} = useTopicDataQueryParams();
 
     const queryParams = React.useMemo(() => {
@@ -83,7 +78,6 @@ export function TopicMessageDetails({
                 message={message}
                 offset={messageDetails.Offset}
                 size={messageDetails.OriginalSize}
-                scrollContainerRef={scrollContainerRef}
             />
         );
     };
