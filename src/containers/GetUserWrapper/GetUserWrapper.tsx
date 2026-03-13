@@ -9,6 +9,8 @@ import {useMetaAuth} from '../../utils/hooks/useMetaAuth';
 import {useAppTitle} from '../App/AppTitleContext';
 import {SettingsBootstrap} from '../App/SettingsBootstrap';
 
+import {useHandleVisibilityChange} from './useHandleVisibilityChange';
+
 export function GetUser({
     children,
     useMeta,
@@ -21,10 +23,13 @@ export function GetUser({
 }) {
     const database = useDatabaseFromQuery();
 
-    const {isFetching, error} = authenticationApi.useWhoamiQuery({
+    const {isFetching, error, refetch} = authenticationApi.useWhoamiQuery({
         database,
         useMeta,
     });
+
+    useHandleVisibilityChange(refetch);
+
     const {appTitle} = useAppTitle();
 
     const errorToDisplay = displayWhoamiError ? error : undefined;
