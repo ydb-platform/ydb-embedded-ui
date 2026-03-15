@@ -311,7 +311,7 @@ const slice = createSlice({
                 title,
                 isTitleUserDefined: false,
                 input,
-                savedInput: undefined,
+                savedInput: input,
                 isDirty: false,
                 createdAt: now,
                 updatedAt: now,
