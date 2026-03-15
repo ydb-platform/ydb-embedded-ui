@@ -25,6 +25,7 @@ function persistTabsStateToSessionStorage(state: QueryState) {
             id: tabId,
             title: tab.title,
             isTitleUserDefined: Boolean(tab.isTitleUserDefined),
+            isTouched: Boolean(tab.isTouched),
             input: tab.input,
             savedInput: tab.savedInput,
             createdAt: tab.createdAt,
@@ -85,6 +86,7 @@ function createTabStateFromPersisted({
         id: tabId,
         title: persistedTab.title,
         isTitleUserDefined: persistedTab.isTitleUserDefined ?? false,
+        isTouched: persistedTab.isTouched ?? false,
         input: persistedTab.input,
         savedInput: persistedTab.savedInput ?? (isDirty ? undefined : persistedTab.input),
         isDirty,
@@ -232,6 +234,7 @@ const slice = createSlice({
             }
 
             tab.input = action.payload.input;
+            tab.isTouched = true;
             tab.updatedAt = Date.now();
 
             if (tab.savedInput !== undefined) {
@@ -276,6 +279,8 @@ const slice = createSlice({
             }
 
             tab.lastExecutedQueryText = action.payload.queryText;
+            tab.isTouched = true;
+            persistTabsStateToSessionStorage(state);
         },
         addQueryTab: (
             state,
@@ -330,6 +335,49 @@ const slice = createSlice({
             persistTabsStateToSessionStorage(state);
             persistDirtyStateToSessionStorage(state);
         },
+        setQueryTabContent: (
+            state,
+            action: PayloadAction<{
+                tabId: string;
+                title: string;
+                input?: string;
+                pendingSnippet?: string;
+            }>,
+        ) => {
+            const {tabId, title, input = '', pendingSnippet} = action.payload;
+            const activeTab = getActiveTab(state);
+
+            if (activeTab && !activeTab.isTouched) {
+                activeTab.title = title;
+                activeTab.isTitleUserDefined = false;
+                activeTab.isTouched = undefined;
+                activeTab.input = input;
+                activeTab.savedInput = input;
+                activeTab.isDirty = false;
+                activeTab.result = undefined;
+                activeTab.lastExecutedQueryText = undefined;
+                activeTab.pendingSnippet = pendingSnippet;
+                activeTab.updatedAt = Date.now();
+            } else {
+                const now = Date.now();
+                state.tabsById[tabId] = {
+                    id: tabId,
+                    title,
+                    isTitleUserDefined: false,
+                    input,
+                    savedInput: input,
+                    isDirty: false,
+                    createdAt: now,
+                    updatedAt: now,
+                    pendingSnippet,
+                };
+                state.tabsOrder.push(tabId);
+                state.activeTabId = tabId;
+            }
+
+            persistTabsStateToSessionStorage(state);
+            persistDirtyStateToSessionStorage(state);
+        },
         closeQueryTab: (state, action: PayloadAction<{tabId: string}>) => {
             const {tabId} = action.payload;
 
@@ -344,6 +392,7 @@ const slice = createSlice({
                 tab.savedInput = undefined;
                 tab.title = '';
                 tab.isTitleUserDefined = false;
+                tab.isTouched = undefined;
                 tab.isDirty = false;
                 tab.result = undefined;
                 tab.lastExecutedQueryText = undefined;
@@ -376,6 +425,7 @@ const slice = createSlice({
 
             tab.title = title;
             tab.isTitleUserDefined = true;
+            tab.isTouched = true;
             tab.updatedAt = Date.now();
             persistTabsStateToSessionStorage(state);
         },
@@ -456,6 +506,7 @@ export const {
     setQueryResult,
     setLastExecutedQueryText,
     addQueryTab,
+    setQueryTabContent,
     closeQueryTab,
     renameQueryTab,
     setActiveQueryTab,

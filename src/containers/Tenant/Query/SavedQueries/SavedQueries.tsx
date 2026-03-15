@@ -10,8 +10,7 @@ import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/Re
 import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
-import {addQueryTab, selectTabsById, setIsDirty} from '../../../../store/reducers/query/query';
-import {getUniqueTabTitle} from '../../../../store/reducers/query/utils';
+import {setIsDirty, setQueryTabContent} from '../../../../store/reducers/query/query';
 import {
     selectSavedQueriesFilter,
     setQueryNameToEdit,
@@ -73,7 +72,6 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
     const {filteredSavedQueries, deleteSavedQuery} = useSavedQueries();
     const dispatch = useTypedDispatch();
     const filter = useTypedSelector(selectSavedQueriesFilter);
-    const tabsById = useTypedSelector(selectTabsById);
     const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
 
     const [isDeleteDialogVisible, setIsDeleteDialogVisible] = React.useState(false);
@@ -97,13 +95,11 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
     const applyQueryClick = React.useCallback(
         ({queryText, queryName}: {queryText: string; queryName: string}) => {
             if (isMultiTabEnabled) {
-                const title = getUniqueTabTitle(tabsById, queryName);
                 dispatch(
-                    addQueryTab({
+                    setQueryTabContent({
                         tabId: uuidv4(),
-                        title,
+                        title: queryName,
                         input: queryText,
-                        makeActive: true,
                     }),
                 );
                 dispatch(setIsDirty(false));
@@ -116,7 +112,7 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
                 dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
             }
         },
-        [changeUserInput, dispatch, isMultiTabEnabled, tabsById],
+        [changeUserInput, dispatch, isMultiTabEnabled],
     );
 
     const onQueryClick = useChangeInputWithConfirmation(applyQueryClick, isMultiTabEnabled);

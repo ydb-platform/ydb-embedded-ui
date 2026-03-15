@@ -6,9 +6,7 @@ import type {NavigationTreeNodeType} from 'ydb-ui-components';
 
 import type {SnippetParams} from '../../../components/ConnectToDB/types';
 import type {AppDispatch} from '../../../store';
-import {store} from '../../../store/defaultStore';
-import {addQueryTab, selectTabsById} from '../../../store/reducers/query/query';
-import {getUniqueTabTitle} from '../../../store/reducers/query/utils';
+import {setQueryTabContent} from '../../../store/reducers/query/query';
 import {
     TENANT_DIAGNOSTICS_TABS_IDS,
     TENANT_PAGES_IDS,
@@ -121,14 +119,11 @@ const bindActions = (
             setActivePath(params.path);
 
             if (isMultiTabEnabled && templateName) {
-                const tabsById = selectTabsById(store.getState());
-                const title = getUniqueTabTitle(tabsById, templateName);
                 dispatch(
-                    addQueryTab({
+                    setQueryTabContent({
                         tabId: uuidv4(),
-                        title,
+                        title: templateName,
                         pendingSnippet: snippet,
-                        makeActive: true,
                     }),
                 );
             } else {

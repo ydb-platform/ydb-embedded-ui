@@ -87,6 +87,7 @@ export interface QueryTabState {
      */
     savedInput?: string;
     isDirty: boolean;
+    isTouched?: boolean;
     createdAt: number;
     updatedAt: number;
     lastExecutedQueryText?: string;

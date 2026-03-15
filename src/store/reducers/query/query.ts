@@ -29,6 +29,7 @@ export {
     setLastExecutedQueryText,
     setQueryHistoryFilter,
     setQueryResult,
+    setQueryTabContent,
     setResultTab,
     setStreamQueryResponse,
     setStreamSession,

@@ -6,12 +6,10 @@ import {v4 as uuidv4} from 'uuid';
 import {QueryDetails} from '../../../../../components/QueryDetails/QueryDetails';
 import {getTenantPath, parseQuery} from '../../../../../routes';
 import {
-    addQueryTab,
     changeUserInput,
-    selectTabsById,
     setIsDirty,
+    setQueryTabContent,
 } from '../../../../../store/reducers/query/query';
-import {getUniqueTabTitle} from '../../../../../store/reducers/query/utils';
 import {
     TENANT_PAGE,
     TENANT_PAGES_IDS,
@@ -19,7 +17,7 @@ import {
 } from '../../../../../store/reducers/tenant/constants';
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {uiFactory} from '../../../../../uiFactory/uiFactory';
-import {useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
+import {useTypedDispatch} from '../../../../../utils/hooks';
 import {TenantTabsGroups} from '../../../TenantPages';
 import {createQueryInfoItems} from '../utils';
 
@@ -38,7 +36,6 @@ export const QueryDetailsDrawerContent = ({row, onClose}: QueryDetailsDrawerCont
     const dispatch = useTypedDispatch();
     const location = useLocation();
     const history = useHistory();
-    const tabsById = useTypedSelector(selectTabsById);
     const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
 
     const handleOpenInEditor = React.useCallback(() => {
@@ -47,13 +44,11 @@ export const QueryDetailsDrawerContent = ({row, onClose}: QueryDetailsDrawerCont
 
             if (isMultiTabEnabled) {
                 const firstLine = input.trim().split('\n')[0];
-                const title = getUniqueTabTitle(tabsById, firstLine);
                 dispatch(
-                    addQueryTab({
+                    setQueryTabContent({
                         tabId: uuidv4(),
-                        title,
+                        title: firstLine,
                         input,
-                        makeActive: true,
                     }),
                 );
                 dispatch(setIsDirty(false));
@@ -72,7 +67,7 @@ export const QueryDetailsDrawerContent = ({row, onClose}: QueryDetailsDrawerCont
 
             history.push(queryPath);
         }
-    }, [dispatch, history, isMultiTabEnabled, location, row, tabsById]);
+    }, [dispatch, history, isMultiTabEnabled, location, row]);
 
     if (row) {
         return (

@@ -1,8 +1,7 @@
 import {v4 as uuidv4} from 'uuid';
 
 import {store} from '../../../store/defaultStore';
-import {addQueryTab, selectTabsById} from '../../../store/reducers/query/query';
-import {getUniqueTabTitle} from '../../../store/reducers/query/utils';
+import {setQueryTabContent} from '../../../store/reducers/query/query';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 import i18n from '../Query/NewSQL/i18n';
 
@@ -52,14 +51,11 @@ export const bindActions = (changeUserInput: (input: string) => void) => {
         const snippet = query();
 
         if (isMultiTabEnabled && tabTitle) {
-            const tabsById = selectTabsById(store.getState());
-            const title = getUniqueTabTitle(tabsById, tabTitle);
             store.dispatch(
-                addQueryTab({
+                setQueryTabContent({
                     tabId: uuidv4(),
-                    title,
+                    title: tabTitle,
                     pendingSnippet: snippet,
-                    makeActive: true,
                 }),
             );
         } else {
