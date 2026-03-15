@@ -59,12 +59,12 @@ describe('getTabTitleForSave', () => {
         expect(getTabTitleForSave(createTab({title: ''}))).toBeUndefined();
     });
 
-    test('returns undefined for tab with default "New Query" title', () => {
-        expect(getTabTitleForSave(createTab({title: 'New Query'}))).toBeUndefined();
+    test('returns title for tab with default "New Query" title', () => {
+        expect(getTabTitleForSave(createTab({title: 'New Query'}))).toBe('New Query');
     });
 
-    test('returns undefined for tab with indexed default title', () => {
-        expect(getTabTitleForSave(createTab({title: 'New Query 3'}))).toBeUndefined();
+    test('returns title for tab with indexed default title', () => {
+        expect(getTabTitleForSave(createTab({title: 'New Query 3'}))).toBe('New Query 3');
     });
 
     test('returns title for user-defined tab', () => {

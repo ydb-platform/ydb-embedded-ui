@@ -25,20 +25,8 @@ export function isDefaultNewQueryTitle(title: string): boolean {
 
 /**
  * Returns the tab title suitable for pre-filling the "Save query" dialog name,
- * or undefined if the tab has no meaningful title (empty or default "New Query").
+ * or undefined if the tab is missing or has no title.
  */
 export function getTabTitleForSave(tab: QueryTabState | undefined): string | undefined {
-    if (!tab?.title) {
-        return undefined;
-    }
-
-    if (tab.isTitleUserDefined) {
-        return tab.title;
-    }
-
-    if (isDefaultNewQueryTitle(tab.title)) {
-        return undefined;
-    }
-
-    return tab.title;
+    return tab?.title || undefined;
 }
