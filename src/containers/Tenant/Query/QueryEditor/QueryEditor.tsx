@@ -178,6 +178,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
         NiceModal.show(SAVE_QUERY_DIALOG, {
             savedQueries,
             onSaveQuery: saveQuery,
+            queryBody: activeTab?.input ?? '',
             defaultQueryName,
         });
     }, [activeTab, savedQueries, saveQuery]);

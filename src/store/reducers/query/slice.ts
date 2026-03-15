@@ -66,7 +66,7 @@ function createDefaultTabState({
         title,
         isTitleUserDefined: false,
         input,
-        savedInput: undefined,
+        savedInput: input,
         isDirty: false,
         createdAt: now,
         updatedAt: now,
@@ -389,7 +389,7 @@ const slice = createSlice({
             if (isLastTab) {
                 const tab = state.tabsById[tabId];
                 tab.input = '';
-                tab.savedInput = undefined;
+                tab.savedInput = '';
                 tab.title = '';
                 tab.isTitleUserDefined = false;
                 tab.isTouched = undefined;

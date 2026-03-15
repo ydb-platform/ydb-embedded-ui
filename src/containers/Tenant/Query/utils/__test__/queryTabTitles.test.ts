@@ -55,8 +55,8 @@ describe('getTabTitleForSave', () => {
         expect(getTabTitleForSave(undefined)).toBeUndefined();
     });
 
-    test('returns undefined for tab with empty title', () => {
-        expect(getTabTitleForSave(createTab({title: ''}))).toBeUndefined();
+    test('returns default title for tab with empty title', () => {
+        expect(getTabTitleForSave(createTab({title: ''}))).toBe('New Query');
     });
 
     test('returns title for tab with default "New Query" title', () => {

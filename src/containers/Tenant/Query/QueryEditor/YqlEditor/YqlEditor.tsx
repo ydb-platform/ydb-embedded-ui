@@ -270,7 +270,9 @@ export function YqlEditor({
         }
 
         initResizeHandler(editor);
-        initUserPrompt(editor, getLastQueryText);
+        if (!isMultiTabQueryEditorEnabled) {
+            initUserPrompt(editor, getLastQueryText);
+        }
         editor.focus();
         editor.addAction({
             id: 'sendQuery',
