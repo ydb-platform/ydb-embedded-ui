@@ -13,6 +13,7 @@ import {
     setActiveQueryTab,
 } from '../../../../../store/reducers/query/query';
 import {useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
+import {getRunningQueryConfirmation} from '../../../../../utils/hooks/withConfirmation/RunningQueryDialog';
 import {getConfirmation} from '../../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {reachMetricaGoal} from '../../../../../utils/yaMetrica';
 import i18n from '../../i18n';
@@ -59,6 +60,12 @@ export function useQueryTabsActions() {
     const handleCloseTab = React.useCallback(
         async (tabId: string) => {
             const tab = tabsById[tabId];
+            if (tab?.result?.isLoading) {
+                const confirmed = await getRunningQueryConfirmation();
+                if (!confirmed) {
+                    return;
+                }
+            }
             if (tab?.isDirty) {
                 const confirmed = await getConfirmation();
                 if (!confirmed) {
@@ -78,16 +85,27 @@ export function useQueryTabsActions() {
     const handleCloseOtherTabs = React.useCallback(
         async (baseTabId: string) => {
             const tabsToClose = tabsOrder.filter((tabId) => tabId !== baseTabId);
-            const dirtyTabIds = tabsToClose.filter((id) => tabsById[id]?.isDirty);
-            const cleanTabIds = tabsToClose.filter((id) => !tabsById[id]?.isDirty);
+            const needsConfirm = (id: string) =>
+                tabsById[id]?.isDirty || Boolean(tabsById[id]?.result?.isLoading);
+            const confirmTabIds = tabsToClose.filter(needsConfirm);
+            const cleanTabIds = tabsToClose.filter((id) => !needsConfirm(id));
 
             cleanTabIds.forEach(closeTabImmediate);
 
-            for (const tabId of dirtyTabIds) {
+            for (const tabId of confirmTabIds) {
                 await activateTabAndWait(dispatch, tabId);
-                const confirmed = await getConfirmation();
-                if (!confirmed) {
-                    break;
+                const tab = tabsById[tabId];
+                if (tab?.result?.isLoading) {
+                    const confirmed = await getRunningQueryConfirmation();
+                    if (!confirmed) {
+                        break;
+                    }
+                }
+                if (tab?.isDirty) {
+                    const confirmed = await getConfirmation();
+                    if (!confirmed) {
+                        break;
+                    }
                 }
                 closeTabImmediate(tabId);
             }
@@ -98,16 +116,27 @@ export function useQueryTabsActions() {
     );
 
     const handleCloseAllTabs = React.useCallback(async () => {
-        const dirtyTabIds = tabsOrder.filter((id) => tabsById[id]?.isDirty);
-        const cleanTabIds = tabsOrder.filter((id) => !tabsById[id]?.isDirty);
+        const needsConfirm = (id: string) =>
+            tabsById[id]?.isDirty || Boolean(tabsById[id]?.result?.isLoading);
+        const confirmTabIds = tabsOrder.filter(needsConfirm);
+        const cleanTabIds = tabsOrder.filter((id) => !needsConfirm(id));
 
         cleanTabIds.forEach(closeTabImmediate);
 
-        for (const tabId of dirtyTabIds) {
+        for (const tabId of confirmTabIds) {
             await activateTabAndWait(dispatch, tabId);
-            const confirmed = await getConfirmation();
-            if (!confirmed) {
-                break;
+            const tab = tabsById[tabId];
+            if (tab?.result?.isLoading) {
+                const confirmed = await getRunningQueryConfirmation();
+                if (!confirmed) {
+                    break;
+                }
+            }
+            if (tab?.isDirty) {
+                const confirmed = await getConfirmation();
+                if (!confirmed) {
+                    break;
+                }
             }
             closeTabImmediate(tabId);
         }

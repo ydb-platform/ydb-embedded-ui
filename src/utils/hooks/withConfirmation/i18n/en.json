@@ -3,5 +3,8 @@
   "context_changes-will-be-lost": "Your changes will be lost if you don't save them",
   "action_dont-save": "Don't Save",
   "action_cancel": "Cancel",
-  "action_save-changes": "Save changes"
+  "action_save-changes": "Save changes",
+  "title_query-is-running": "Query is running",
+  "context_query-will-be-stopped": "Closing this tab will stop the running query",
+  "action_stop-and-close": "Stop & Close"
 }
