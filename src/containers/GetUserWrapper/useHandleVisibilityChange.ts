@@ -1,6 +1,5 @@
 import React from 'react';
 
-let inactiveSince: null | number = null;
 const INACTIVE_DEFAULT_TIMEOUT = 5 * 60 * 1000;
 
 /**
@@ -14,20 +13,21 @@ const INACTIVE_DEFAULT_TIMEOUT = 5 * 60 * 1000;
  * @param onVisible - Callback invoked when the tab becomes visible after the inactivity threshold (e.g. whoami / token check)
  */
 export function useHandleVisibilityChange(onVisible: () => void) {
+    const inactiveSinceRef = React.useRef<number | null>(null);
+
     React.useEffect(() => {
         const handleVisibilityChange = () => {
             const isVisible = document.visibilityState === 'visible';
 
             if (!isVisible) {
-                inactiveSince = Date.now();
-            } else {
-                if (inactiveSince) {
-                    const timePassed = Date.now() - inactiveSince;
-                    if (timePassed >= INACTIVE_DEFAULT_TIMEOUT) {
-                        onVisible();
-                    }
-                    inactiveSince = null;
+                inactiveSinceRef.current = Date.now();
+            } else if (inactiveSinceRef.current !== null) {
+                const timePassed = Date.now() - inactiveSinceRef.current;
+
+                if (timePassed >= INACTIVE_DEFAULT_TIMEOUT) {
+                    onVisible();
                 }
+                inactiveSinceRef.current = null;
             }
         };
 

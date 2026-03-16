@@ -9,7 +9,7 @@ import {DEV_ENABLE_TRACING_FOR_ALL_REQUESTS} from '../../utils/constants';
 import {prepareBackendWithMetaProxy} from '../../utils/parseBalancer';
 import {isRedirectToAuth} from '../../utils/response';
 
-import {isNeedResetResponse} from './utils/needReset';
+import {isNeedResetResponse, processNeedReset} from './utils/needReset';
 
 export type AxiosOptions = {
     concurrentId?: string;
@@ -84,7 +84,7 @@ export class BaseYdbAPI extends AxiosWrapper {
             }
 
             if (isNeedResetResponse(response?.data) && document.visibilityState === 'visible') {
-                window.location.reload();
+                processNeedReset();
             }
 
             return Promise.reject(error);
