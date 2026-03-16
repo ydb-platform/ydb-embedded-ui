@@ -24,10 +24,10 @@ export function useHandleVisibilityChange(onVisible: () => void) {
             } else if (inactiveSinceRef.current !== null) {
                 const timePassed = Date.now() - inactiveSinceRef.current;
 
+                inactiveSinceRef.current = null;
                 if (timePassed >= INACTIVE_DEFAULT_TIMEOUT) {
                     onVisible();
                 }
-                inactiveSinceRef.current = null;
             }
         };
 

@@ -143,7 +143,6 @@ export class StreamingAPI extends BaseYdbAPI {
             }
             if (isNeedResetResponse(responseData) && document.visibilityState === 'visible') {
                 processNeedReset();
-                return;
             }
             throw createStreamingResponseError(response, responseData);
         }

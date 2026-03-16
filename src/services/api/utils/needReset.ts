@@ -21,7 +21,7 @@ export function processNeedReset() {
             window.location.reload();
         }
     } catch {
-        // If sessionStorage is unavailable, fall back to a single reload attempt
+        // If sessionStorage is unavailable, fall back to unconditional reload
         window.location.reload();
     }
 }
