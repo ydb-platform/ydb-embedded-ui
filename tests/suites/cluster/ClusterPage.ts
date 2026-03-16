@@ -25,6 +25,15 @@ export class ClusterPage extends PageModel {
         }
     }
 
+    async isClusterInfoVisible(): Promise<boolean> {
+        try {
+            await this.clusterInfo.waitFor({state: 'visible', timeout: 3000});
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
     async getPileCardsCount(): Promise<number> {
         return await this.pileCards.count();
     }

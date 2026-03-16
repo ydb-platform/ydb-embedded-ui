@@ -124,7 +124,7 @@ export async function setupStorageGroup429HtmlMock(page: Page) {
 export async function setupTablet400JsonCodeOnlyMock(page: Page) {
     await mockRoute(page, ROUTES.tabletInfo, {
         status: 400,
-        body: JSON.stringify({code: 'NEED_RESET'}),
+        body: JSON.stringify({code: 'NOT_FOUND'}),
     });
 }
 
@@ -244,10 +244,41 @@ export async function setupCapabilities401Mock(page: Page) {
     await mockRoute(page, ROUTES.capabilities, {
         status: 401,
         contentType: 'application/json; charset=utf-8',
-        body: JSON.stringify({code: 'NEED_RESET'}),
+        body: JSON.stringify({error: 'Unauthorized'}),
         headers: {
             'x-request-id': 'test-req-id-e2e-401-caps',
         },
+    });
+}
+
+/**
+ * First whoami request returns 401 with NEED_RESET (triggers location.reload());
+ * subsequent whoami requests return 200 so the page can load after reload.
+ */
+export async function setupWhoami401NeedResetMock(page: Page) {
+    let whoamiCallCount = 0;
+    await page.route(ROUTES.whoami, async (route: Route) => {
+        if (whoamiCallCount === 0) {
+            whoamiCallCount = 1;
+
+            await route.fulfill({
+                status: 401,
+                contentType: 'application/json; charset=utf-8',
+                body: JSON.stringify({code: 'NEED_RESET'}),
+                headers: {
+                    'x-request-id': 'test-req-id-e2e-401-need-reset',
+                },
+            });
+        } else {
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    UserID: 'e2e-user-after-reset',
+                    IsViewerAllowed: true,
+                }),
+            });
+        }
     });
 }
 
