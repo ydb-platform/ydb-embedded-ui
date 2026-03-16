@@ -52,6 +52,7 @@
     }
 
     &__storage-section {
+        --g-card-border-radius: var(--g-border-radius-s);
         @container overview-wrapper (min-width: 1104px) {
             grid-area: storage;
         }
@@ -75,10 +76,6 @@
 
     &__section_compact {
         padding: var(--g-spacing-3) var(--cluster-overview-vertical-padding);
-    }
-
-    &__section_filled {
-        --g-card-background-color: var(--g-color-base-misc-light);
     }
 
     &__details {
