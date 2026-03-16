@@ -29,7 +29,9 @@ export function TopicMessage({offset, size, message}: TopicMessageProps) {
         let preparedMessage = message;
         let decodedMessage = message;
         try {
-            decodedMessage = atob(message);
+            const binary = atob(message);
+            const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+            decodedMessage = new TextDecoder('utf-8').decode(bytes);
         } catch (e) {
             console.warn(e);
         }
