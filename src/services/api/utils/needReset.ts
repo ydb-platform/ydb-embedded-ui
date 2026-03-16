@@ -2,10 +2,3 @@
 export function isNeedResetResponse(data: unknown): data is {code: 'NEED_RESET'} {
     return Boolean(data && data instanceof Object && 'code' in data && data.code === 'NEED_RESET');
 }
-
-export function processNeedResetStatus() {
-    // Reload only if tab is active
-    if (document.visibilityState === 'visible') {
-        window.location.reload();
-    }
-}
