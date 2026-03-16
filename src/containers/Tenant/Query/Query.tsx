@@ -69,7 +69,7 @@ export const Query = (props: QueryProps) => {
     };
 
     return (
-        <div className={b({['with-top-navigation']: !isV2NavigationEnabled})}>
+        <div className={b({'with-top-navigation': !isV2NavigationEnabled})}>
             {activeTab ? (
                 <Helmet>
                     <title>{activeTab.title}</title>
