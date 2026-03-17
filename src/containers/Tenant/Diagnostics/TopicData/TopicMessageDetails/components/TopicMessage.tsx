@@ -14,6 +14,7 @@ import {MESSAGE_SIZE_LIMIT, b} from '../shared';
 import {TopicDataSection} from './TopicDataSection';
 
 const UNIPIKA_MAX_SIZE = 1_000_000;
+const utf8Decoder = new TextDecoder('utf-8');
 
 interface TopicMessageProps {
     message: string;
@@ -29,7 +30,12 @@ export function TopicMessage({offset, size, message}: TopicMessageProps) {
         let preparedMessage = message;
         let decodedMessage = message;
         try {
-            decodedMessage = atob(message);
+            const binary = atob(message);
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) {
+                bytes[i] = binary.charCodeAt(i);
+            }
+            decodedMessage = utf8Decoder.decode(bytes);
         } catch (e) {
             console.warn(e);
         }
