@@ -45,18 +45,15 @@ export function useQueryTabsActions() {
 
     const getCurrentTab = useEventHandler((tabId: string) => tabsById[tabId]);
 
-    const getDirtyConfirmation = React.useCallback(
-        (tab: QueryTabState): Promise<boolean> => {
-            return getSaveChangesConfirmation({
-                defaultQueryName: getTabTitleForSave(tab) ?? '',
-                existingQueryName: tab.savedQueryName,
-                queryBody: tab.input,
-                savedQueries: savedQueries ?? [],
-                onSaveQuery: saveQuery,
-            });
-        },
-        [savedQueries, saveQuery],
-    );
+    const getDirtyConfirmation = useEventHandler((tab: QueryTabState): Promise<boolean> => {
+        return getSaveChangesConfirmation({
+            defaultQueryName: getTabTitleForSave(tab) ?? '',
+            existingQueryName: tab.savedQueryName,
+            queryBody: tab.input,
+            savedQueries: savedQueries ?? [],
+            onSaveQuery: saveQuery,
+        });
+    });
 
     const handleTabSwitch = React.useCallback(
         (tabId: string) => {

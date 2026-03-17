@@ -465,4 +465,30 @@ test.describe('Editor tabs', () => {
         await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query');
         await expect.poll(() => queryEditor.getEditorContent(), {timeout: 5000}).toBe('');
     });
+
+    test('Close all tabs validates duplicate saved query names across consecutive save dialogs', async ({
+        page,
+    }) => {
+        const saveChangesDialog = new SaveChangesDialog(page);
+        const duplicateQueryName = `Duplicate Save ${Date.now()}`;
+
+        await queryEditor.setQuery('SELECT 1 AS first_dirty_tab;');
+        await queryEditor.editorTabs.clickAddTab();
+        await queryEditor.setQuery('SELECT 2 AS second_dirty_tab;');
+
+        await queryEditor.editorTabs.openTabMenu('New Query 1');
+        await queryEditor.editorTabs.clickMenuAction('Close all tabs');
+
+        await expect(saveChangesDialog.isVisible()).resolves.toBe(true);
+        await saveChangesDialog.setQueryName(duplicateQueryName);
+        await saveChangesDialog.clickSave();
+
+        await expect(saveChangesDialog.isVisible()).resolves.toBe(true);
+        await saveChangesDialog.setQueryName(duplicateQueryName);
+        await saveChangesDialog.clickSave();
+
+        await expect(saveChangesDialog.getValidationError()).resolves.toBe(
+            'This name already exists',
+        );
+    });
 });

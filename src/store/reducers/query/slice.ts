@@ -220,6 +220,32 @@ function getActiveTab(state: QueryState): QueryTabState | undefined {
     return state.tabsById[state.activeTabId];
 }
 
+function getSetQueryTabContentTitle({
+    tabsById,
+    activeTab,
+    title,
+    ensureUniqueTitle,
+}: {
+    tabsById: QueryState['tabsById'];
+    activeTab: QueryTabState | undefined;
+    title: string;
+    ensureUniqueTitle?: boolean;
+}) {
+    if (!ensureUniqueTitle) {
+        return title;
+    }
+
+    if (activeTab && !activeTab.isTouched) {
+        const tabsWithoutActiveTab = Object.fromEntries(
+            Object.entries(tabsById).filter(([tabId]) => tabId !== activeTab.id),
+        );
+
+        return getUniqueTabTitle(tabsWithoutActiveTab, title);
+    }
+
+    return getUniqueTabTitle(tabsById, title);
+}
+
 const initialTabsState = createInitialTabsState();
 
 const initialState: QueryState = {
@@ -367,9 +393,15 @@ const slice = createSlice({
                 ensureUniqueTitle,
             } = action.payload;
             const activeTab = getActiveTab(state);
+            const nextTitle = getSetQueryTabContentTitle({
+                tabsById: state.tabsById,
+                activeTab,
+                title,
+                ensureUniqueTitle,
+            });
 
             if (activeTab && !activeTab.isTouched) {
-                activeTab.title = title;
+                activeTab.title = nextTitle;
                 activeTab.isTitleUserDefined = false;
                 activeTab.isTouched = undefined;
                 activeTab.input = input;
@@ -382,9 +414,6 @@ const slice = createSlice({
                 activeTab.updatedAt = Date.now();
             } else {
                 const now = Date.now();
-                const nextTitle = ensureUniqueTitle
-                    ? getUniqueTabTitle(state.tabsById, title)
-                    : title;
                 state.tabsById[tabId] = {
                     id: tabId,
                     title: nextTitle,
