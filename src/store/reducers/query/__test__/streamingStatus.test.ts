@@ -32,6 +32,7 @@ function createStateWithStreamingResult(): QueryState {
                 },
             },
         },
+        newTabCounter: 0,
     };
 }
 
@@ -50,6 +51,7 @@ describe('Streaming query status transitions', () => {
                     updatedAt: 0,
                 },
             },
+            newTabCounter: 0,
         };
 
         const state = queryReducer(
@@ -145,6 +147,7 @@ describe('Streaming query status transitions', () => {
                     updatedAt: 0,
                 },
             },
+            newTabCounter: 0,
         };
 
         // Step 1: Query starts → preparing
@@ -226,6 +229,7 @@ describe('Streaming query status transitions', () => {
                     updatedAt: 0,
                 },
             },
+            newTabCounter: 0,
         };
 
         const state = queryReducer(
@@ -287,6 +291,7 @@ describe('Streaming query status transitions', () => {
                     updatedAt: 0,
                 },
             },
+            newTabCounter: 0,
         };
 
         const sessionChunk: SessionChunk = {

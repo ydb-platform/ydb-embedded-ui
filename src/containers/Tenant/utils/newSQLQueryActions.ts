@@ -56,6 +56,7 @@ export const bindActions = (changeUserInput: (input: string) => void) => {
                     tabId: uuidv4(),
                     title: tabTitle,
                     pendingSnippet: snippet,
+                    ensureUniqueTitle: true,
                 }),
             );
         } else {

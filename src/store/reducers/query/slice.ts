@@ -355,9 +355,17 @@ const slice = createSlice({
                 input?: string;
                 pendingSnippet?: string;
                 savedQueryName?: string;
+                ensureUniqueTitle?: boolean;
             }>,
         ) => {
-            const {tabId, title, input = '', pendingSnippet, savedQueryName} = action.payload;
+            const {
+                tabId,
+                title,
+                input = '',
+                pendingSnippet,
+                savedQueryName,
+                ensureUniqueTitle,
+            } = action.payload;
             const activeTab = getActiveTab(state);
 
             if (activeTab && !activeTab.isTouched) {
@@ -374,10 +382,12 @@ const slice = createSlice({
                 activeTab.updatedAt = Date.now();
             } else {
                 const now = Date.now();
-                const uniqueTitle = getUniqueTabTitle(state.tabsById, title);
+                const nextTitle = ensureUniqueTitle
+                    ? getUniqueTabTitle(state.tabsById, title)
+                    : title;
                 state.tabsById[tabId] = {
                     id: tabId,
-                    title: uniqueTitle,
+                    title: nextTitle,
                     isTitleUserDefined: false,
                     input,
                     savedInput: input,

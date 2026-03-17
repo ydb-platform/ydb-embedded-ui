@@ -124,6 +124,7 @@ const bindActions = (
                         tabId: uuidv4(),
                         title: templateName,
                         pendingSnippet: snippet,
+                        ensureUniqueTitle: true,
                     }),
                 );
             } else {

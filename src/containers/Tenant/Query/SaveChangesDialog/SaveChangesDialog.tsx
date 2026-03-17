@@ -110,7 +110,6 @@ function SaveChangesDialog({
                     onClickButtonCancel={onCancel}
                     textButtonApply={i18n('action.save')}
                     propsButtonApply={{type: 'submit'}}
-                    onClickButtonApply={handleSubmit}
                 >
                     <Button
                         view="outlined"
