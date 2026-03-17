@@ -6,11 +6,10 @@ import {
     cleanupMockStreamingFetch,
     setupMockStreamingFetch,
 } from '../../../utils/mockStreamingFetch';
+import {waitForBeforeUnloadDialog} from '../../../utils/queryHotkeys';
 import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {QueryEditorMode, TenantPage} from '../TenantPage';
 import {longRunningStreamQuery} from '../constants';
-
-import {waitForBeforeUnloadDialog} from './utils';
 
 const QUERIES_HISTORY_SETTING_KEY = 'queries_history';
 

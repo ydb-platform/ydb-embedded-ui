@@ -5,6 +5,7 @@ import {
     cleanupMockStreamingFetch,
     setupMockStreamingFetch,
 } from '../../../utils/mockStreamingFetch';
+import {pressTabHotkey} from '../../../utils/queryHotkeys';
 import {toggleExperiment} from '../../../utils/toggleExperiment';
 import {QueryEditorMode, TenantPage} from '../TenantPage';
 import {longRunningStreamQuery} from '../constants';
@@ -14,7 +15,6 @@ import {RenameQueryDialog} from './models/RenameQueryDialog';
 import {RunningQueryDialog} from './models/RunningQueryDialog';
 import {SaveChangesDialog} from './models/SaveChangesDialog';
 import {SaveQueryDialog} from './models/SaveQueryDialog';
-import {pressTabHotkey} from './utils';
 
 test.describe('Editor tabs', () => {
     let tenantPage: TenantPage;
@@ -237,6 +237,25 @@ test.describe('Editor tabs', () => {
         await saveQueryDialog.clickCancel();
     });
 
+    test('Save query as action validates minimum query name length', async ({page}) => {
+        const saveQueryDialog = new SaveQueryDialog(page);
+
+        await queryEditor.setQuery('SELECT 1;');
+        const activeTabId = await queryEditor.editorTabs.getActiveTabId();
+
+        await queryEditor.editorTabs.openTabMenuById(activeTabId!);
+        await queryEditor.editorTabs.clickMenuAction('Save query as...');
+
+        await expect(saveQueryDialog.isVisible()).resolves.toBe(true);
+        await saveQueryDialog.setQueryName('AB');
+        await saveQueryDialog.clickSave();
+
+        await expect(saveQueryDialog.getValidationError()).resolves.toBe(
+            'Name must be at least 3 characters',
+        );
+        await expect(saveQueryDialog.isVisible()).resolves.toBe(true);
+    });
+
     test('Save query as action in tab menu saves query and updates tab state', async ({page}) => {
         const saveQueryDialog = new SaveQueryDialog(page);
         const queryText = 'SELECT 1 AS saved_from_tab_menu;';
@@ -356,6 +375,28 @@ test.describe('Editor tabs', () => {
 
         await expect(queryEditor.editorTabs.waitForTabCount(1)).resolves.toBe(true);
         await expect(queryEditor.editorTabs.isTabSelected('New Query 1')).resolves.toBe(true);
+    });
+
+    test('Shows save changes dialog when closing a dirty user-renamed tab', async ({page}) => {
+        const renameQueryDialog = new RenameQueryDialog(page);
+        const saveChangesDialog = new SaveChangesDialog(page);
+        const nextTitle = 'Daily report';
+
+        await queryEditor.setQuery('SELECT 1;');
+        await queryEditor.editorTabs.openTabMenu('New Query');
+        await queryEditor.editorTabs.clickMenuAction('Rename');
+
+        await expect(renameQueryDialog.isVisible()).resolves.toBe(true);
+        await renameQueryDialog.setTitle(nextTitle);
+        await renameQueryDialog.clickApply();
+        await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe(nextTitle);
+
+        await queryEditor.editorTabs.closeTab(nextTitle);
+        await expect(saveChangesDialog.isVisible()).resolves.toBe(true);
+        await saveChangesDialog.clickCancel();
+
+        await expect(queryEditor.editorTabs.getTabCount()).resolves.toBe(1);
+        await expect(queryEditor.editorTabs.isTabSelected(nextTitle)).resolves.toBe(true);
     });
 
     test('Shows confirmation when closing a running tab and stops it after confirmation', async ({

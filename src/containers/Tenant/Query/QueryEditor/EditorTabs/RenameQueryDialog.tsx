@@ -5,6 +5,7 @@ import {Dialog, TextInput} from '@gravity-ui/uikit';
 
 import {cn} from '../../../../../utils/cn';
 import i18n from '../../i18n';
+import {getQueryNameValidationError} from '../../utils/QueryNameValidation';
 
 export const RENAME_QUERY_DIALOG = 'rename-query-dialog';
 
@@ -37,13 +38,14 @@ function RenameQueryDialog({
 
     const handleApply = React.useCallback(() => {
         const normalizedTitle = nextTitle.trim();
-        if (!normalizedTitle) {
-            setErrorMessage(i18n('editor-tabs.rename-query-dialog.error-empty'));
-            return;
-        }
+        const validationError = getQueryNameValidationError(normalizedTitle);
 
-        if (normalizedTitle.length < 3) {
-            setErrorMessage(i18n('editor-tabs.rename-query-dialog.error-min-length'));
+        if (validationError) {
+            setErrorMessage(
+                validationError === 'not-empty'
+                    ? i18n('editor-tabs.rename-query-dialog.error-empty')
+                    : i18n('editor-tabs.rename-query-dialog.error-min-length'),
+            );
             return;
         }
 

@@ -22,6 +22,7 @@ import type {SavedQuery} from '../../../../types/store/query';
 import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
+import {getQueryNameValidationError} from '../utils/QueryNameValidation';
 import {getTabTitleForSave} from '../utils/queryTabTitles';
 import {useSavedQueries} from '../utils/useSavedQueries';
 
@@ -181,8 +182,11 @@ function SaveQueryDialog({
     const controlRef = React.useRef<HTMLInputElement>(null);
 
     const validateQueryName = (value: string) => {
-        if (!value) {
-            return i18n('error.name-not-empty');
+        const validationError = getQueryNameValidationError(value);
+        if (validationError) {
+            return validationError === 'not-empty'
+                ? i18n('error.name-not-empty')
+                : i18n('error.name-min-length');
         }
         if (savedQueries?.some((q) => q.name.toLowerCase() === value.trim().toLowerCase())) {
             return i18n('error.name-exists');

@@ -11,7 +11,11 @@ import {
     setStreamSession as setStreamSessionReducer,
 } from './streaming/reducers';
 import type {QueryResult, QueryState, QueryTabState} from './types';
-import {isQueryTabsDirtyPersistedState, isQueryTabsPersistedState} from './utils';
+import {
+    getUniqueTabTitle,
+    isQueryTabsDirtyPersistedState,
+    isQueryTabsPersistedState,
+} from './utils';
 import type {
     QueryTabPersistedState,
     QueryTabsDirtyPersistedState,
@@ -370,9 +374,10 @@ const slice = createSlice({
                 activeTab.updatedAt = Date.now();
             } else {
                 const now = Date.now();
+                const uniqueTitle = getUniqueTabTitle(state.tabsById, title);
                 state.tabsById[tabId] = {
                     id: tabId,
-                    title,
+                    title: uniqueTitle,
                     isTitleUserDefined: false,
                     input,
                     savedInput: input,

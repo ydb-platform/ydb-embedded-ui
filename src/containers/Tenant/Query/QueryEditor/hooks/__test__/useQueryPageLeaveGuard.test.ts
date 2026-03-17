@@ -1,7 +1,10 @@
+import React from 'react';
+
+import {configureStore} from '@reduxjs/toolkit';
 import {renderHook} from '@testing-library/react';
+import {Provider} from 'react-redux';
 
 import type {QueryTabState} from '../../../../../../store/reducers/query/types';
-import * as hooks from '../../../../../../utils/hooks';
 import {
     getQueryPageLeaveState,
     useBeforeUnloadPrompt,
@@ -138,27 +141,21 @@ describe('useQueryPageLeaveGuard', () => {
             }),
             second: createTabState('second'),
         };
-        type MockRootState = {
-            query: {
-                tabsOrder: string[];
-                tabsById: typeof tabsById;
-            };
-        };
-
-        const useTypedSelectorMock = jest.spyOn(hooks, 'useTypedSelector').mockImplementation(((
-            selector: (state: MockRootState) => unknown,
-        ) =>
-            selector({
+        const store = configureStore({
+            reducer: () => ({
                 query: {
                     tabsOrder,
                     tabsById,
                 },
-            })) as unknown as typeof hooks.useTypedSelector);
+            }),
+        });
 
-        renderHook(() => useQueryPageLeaveGuard(false));
+        const wrapper = ({children}: {children: React.ReactNode}) => {
+            return React.createElement(Provider, {store, children});
+        };
+
+        renderHook(() => useQueryPageLeaveGuard(false), {wrapper});
 
         expect(window.onbeforeunload).toBeNull();
-
-        useTypedSelectorMock.mockRestore();
     });
 });

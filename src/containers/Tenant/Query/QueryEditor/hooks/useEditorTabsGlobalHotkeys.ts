@@ -35,7 +35,7 @@ export function useEditorTabsGlobalHotkeys(
 
     React.useEffect(() => {
         if (!enabled) {
-            return;
+            return undefined;
         }
 
         const bindings: Array<{combo: string; handler: (e: KeyboardEvent) => void}> = [
@@ -109,8 +109,8 @@ export function useEditorTabsGlobalHotkeys(
         }
 
         return () => {
-            for (const {combo} of bindings) {
-                hotkeys.unbind(combo);
+            for (const {combo, handler} of bindings) {
+                hotkeys.unbind(combo, handler);
             }
         };
     }, [enabled]);

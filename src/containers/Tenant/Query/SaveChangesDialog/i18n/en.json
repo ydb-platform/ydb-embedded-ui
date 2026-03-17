@@ -5,5 +5,6 @@
   "action.cancel": "Cancel",
   "action.save": "Save",
   "error.name-not-empty": "Name should not be empty",
+  "error.name-min-length": "Name must be at least 3 characters",
   "error.name-exists": "This name already exists"
 }

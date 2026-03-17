@@ -13,9 +13,8 @@ import {
     setActiveQueryTab,
 } from '../../../../../store/reducers/query/query';
 import type {QueryTabState} from '../../../../../store/reducers/query/types';
-import {useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
+import {useEventHandler, useTypedDispatch, useTypedSelector} from '../../../../../utils/hooks';
 import {getRunningQueryConfirmation} from '../../../../../utils/hooks/withConfirmation/RunningQueryDialog';
-import {getConfirmation} from '../../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {reachMetricaGoal} from '../../../../../utils/yaMetrica';
 import {getSaveChangesConfirmation} from '../../SaveChangesDialog/SaveChangesDialog';
 import i18n from '../../i18n';
@@ -44,18 +43,17 @@ export function useQueryTabsActions() {
     const newTabCounter = useTypedSelector(selectNewTabCounter);
     const {savedQueries, saveQuery} = useSavedQueries();
 
+    const getCurrentTab = useEventHandler((tabId: string) => tabsById[tabId]);
+
     const getDirtyConfirmation = React.useCallback(
         (tab: QueryTabState): Promise<boolean> => {
-            if (tab.savedQueryName || !tab.isTitleUserDefined) {
-                return getSaveChangesConfirmation({
-                    defaultQueryName: getTabTitleForSave(tab) ?? '',
-                    existingQueryName: tab.savedQueryName,
-                    queryBody: tab.input,
-                    savedQueries: savedQueries ?? [],
-                    onSaveQuery: saveQuery,
-                });
-            }
-            return getConfirmation();
+            return getSaveChangesConfirmation({
+                defaultQueryName: getTabTitleForSave(tab) ?? '',
+                existingQueryName: tab.savedQueryName,
+                queryBody: tab.input,
+                savedQueries: savedQueries ?? [],
+                onSaveQuery: saveQuery,
+            });
         },
         [savedQueries, saveQuery],
     );
@@ -79,15 +77,16 @@ export function useQueryTabsActions() {
 
     const handleCloseTab = React.useCallback(
         async (tabId: string) => {
-            const tab = tabsById[tabId];
+            const tab = getCurrentTab(tabId);
             if (tab?.result?.isLoading) {
                 const confirmed = await getRunningQueryConfirmation();
                 if (!confirmed) {
                     return;
                 }
             }
-            if (tab?.isDirty) {
-                const confirmed = await getDirtyConfirmation(tab);
+            const currentTab = getCurrentTab(tabId);
+            if (currentTab?.isDirty) {
+                const confirmed = await getDirtyConfirmation(currentTab);
                 if (!confirmed) {
                     return;
                 }
@@ -95,74 +94,59 @@ export function useQueryTabsActions() {
             reachMetricaGoal('closeQueryTab', {type: 'single', tabsCount: tabsOrder.length});
             closeTabImmediate(tabId);
         },
-        [closeTabImmediate, getDirtyConfirmation, tabsById, tabsOrder.length],
+        [closeTabImmediate, getCurrentTab, getDirtyConfirmation, tabsOrder.length],
     );
 
     const handleCloseActiveTab = React.useCallback(() => {
         handleCloseTab(activeTabId);
     }, [activeTabId, handleCloseTab]);
 
-    const handleCloseOtherTabs = React.useCallback(
-        async (baseTabId: string) => {
-            const tabsToClose = tabsOrder.filter((tabId) => tabId !== baseTabId);
+    const closeTabsWithConfirmation = React.useCallback(
+        async (tabIds: string[]) => {
             const needsConfirm = (id: string) =>
-                tabsById[id]?.isDirty || Boolean(tabsById[id]?.result?.isLoading);
-            const confirmTabIds = tabsToClose.filter(needsConfirm);
-            const cleanTabIds = tabsToClose.filter((id) => !needsConfirm(id));
+                getCurrentTab(id)?.isDirty || Boolean(getCurrentTab(id)?.result?.isLoading);
+            const confirmTabIds = tabIds.filter(needsConfirm);
+            const cleanTabIds = tabIds.filter((id) => !needsConfirm(id));
 
             cleanTabIds.forEach(closeTabImmediate);
 
             for (const tabId of confirmTabIds) {
                 await activateTabAndWait(dispatch, tabId);
-                const tab = tabsById[tabId];
+                const tab = getCurrentTab(tabId);
                 if (tab?.result?.isLoading) {
                     const confirmed = await getRunningQueryConfirmation();
                     if (!confirmed) {
                         break;
                     }
                 }
-                if (tab?.isDirty) {
-                    const confirmed = await getDirtyConfirmation(tab);
+                const currentTab = getCurrentTab(tabId);
+                if (currentTab?.isDirty) {
+                    const confirmed = await getDirtyConfirmation(currentTab);
                     if (!confirmed) {
                         break;
                     }
                 }
                 closeTabImmediate(tabId);
             }
+        },
+        [closeTabImmediate, dispatch, getCurrentTab, getDirtyConfirmation],
+    );
+
+    const handleCloseOtherTabs = React.useCallback(
+        async (baseTabId: string) => {
+            const tabsToClose = tabsOrder.filter((tabId) => tabId !== baseTabId);
+            await closeTabsWithConfirmation(tabsToClose);
 
             reachMetricaGoal('closeQueryTab', {type: 'other', tabsCount: tabsOrder.length});
         },
-        [closeTabImmediate, dispatch, getDirtyConfirmation, tabsById, tabsOrder],
+        [closeTabsWithConfirmation, tabsOrder],
     );
 
     const handleCloseAllTabs = React.useCallback(async () => {
-        const needsConfirm = (id: string) =>
-            tabsById[id]?.isDirty || Boolean(tabsById[id]?.result?.isLoading);
-        const confirmTabIds = tabsOrder.filter(needsConfirm);
-        const cleanTabIds = tabsOrder.filter((id) => !needsConfirm(id));
-
-        cleanTabIds.forEach(closeTabImmediate);
-
-        for (const tabId of confirmTabIds) {
-            await activateTabAndWait(dispatch, tabId);
-            const tab = tabsById[tabId];
-            if (tab?.result?.isLoading) {
-                const confirmed = await getRunningQueryConfirmation();
-                if (!confirmed) {
-                    break;
-                }
-            }
-            if (tab?.isDirty) {
-                const confirmed = await getDirtyConfirmation(tab);
-                if (!confirmed) {
-                    break;
-                }
-            }
-            closeTabImmediate(tabId);
-        }
+        await closeTabsWithConfirmation(tabsOrder);
 
         reachMetricaGoal('closeQueryTab', {type: 'all', tabsCount: tabsOrder.length});
-    }, [closeTabImmediate, dispatch, getDirtyConfirmation, tabsById, tabsOrder]);
+    }, [closeTabsWithConfirmation, tabsOrder]);
 
     const handleDuplicateTab = React.useCallback(
         (baseTabId: string) => {

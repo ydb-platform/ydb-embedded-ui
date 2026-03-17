@@ -5,6 +5,7 @@ import {Button, Dialog, TextInput} from '@gravity-ui/uikit';
 
 import type {SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
+import {getQueryNameValidationError} from '../utils/QueryNameValidation';
 
 import i18n from './i18n';
 
@@ -44,8 +45,11 @@ function SaveChangesDialog({
 
     const validateQueryName = React.useCallback(
         (value: string) => {
-            if (!value) {
-                return i18n('error.name-not-empty');
+            const validationError = getQueryNameValidationError(value);
+            if (validationError) {
+                return validationError === 'not-empty'
+                    ? i18n('error.name-not-empty')
+                    : i18n('error.name-min-length');
             }
             const normalizedValue = value.trim().toLowerCase();
             const normalizedExistingQueryName = existingQueryName?.trim().toLowerCase();
