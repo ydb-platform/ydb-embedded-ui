@@ -11,6 +11,7 @@
 
     --progress-bar-full-height: var(--g-text-subheader-2-line-height);
     --progress-bar-compact-height: 12px;
+    --ydb-progress-bar-font-color: var(--g-color-text-primary);
 
     --stripe-width: 4px;
     --stripe-step: 8px;
@@ -31,6 +32,11 @@
     background-color: var(--entity-state-background-color);
 
     @include mixins.entity-state-colors($block);
+
+    &_darkgrey,
+    &_grey {
+        --ydb-progress-bar-font-color: var(--g-color-text-secondary);
+    }
 
     &_compact {
         min-width: 8px;
@@ -105,7 +111,7 @@
         // bar height minus borders
         line-height: calc(var(--progress-bar-full-height) - #{$border-width * 2});
 
-        color: var(--entity-state-font-color);
+        color: var(--ydb-progress-bar-font-color);
     }
 
     &__icon {
