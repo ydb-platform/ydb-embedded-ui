@@ -38,8 +38,10 @@ export function YDBSyntaxHighlighter({
     React.useEffect(() => {
         let cancelled = false;
 
+        setIsLoading(true);
+        setHighlightedHtml('');
+
         async function highlight() {
-            setIsLoading(true);
             try {
                 const html = await highlightCode(text, language, themeType);
                 if (!cancelled) {
@@ -54,10 +56,15 @@ export function YDBSyntaxHighlighter({
             }
         }
 
-        highlight();
+        // Start highlighting in next render cycle, when content is initially rendered
+        // For big queries highlighting may take some time, so we show not highlighted component first
+        const timeoutId = setTimeout(() => {
+            highlight();
+        }, 0);
 
         return () => {
             cancelled = true;
+            clearTimeout(timeoutId);
         };
     }, [text, language, themeType]);
 
