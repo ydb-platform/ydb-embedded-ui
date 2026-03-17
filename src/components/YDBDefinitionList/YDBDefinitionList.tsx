@@ -4,6 +4,7 @@ import type {DefinitionListProps, IconData, LabelProps} from '@gravity-ui/uikit'
 import {DefinitionList, Flex, Icon, Label} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
+import {InfoViewerTitle} from '../InfoViewerTitle/InfoViewerTitle';
 
 import i18n from './i18n';
 
@@ -72,7 +73,7 @@ export function YDBDefinitionList({
             >
                 {title && (
                     <Flex gap="1" alignItems="center">
-                        <div className={b('title', titleClassname)}>{title}</div>
+                        <InfoViewerTitle className={titleClassname}>{title}</InfoViewerTitle>
                         {titleSuffix && (
                             <React.Fragment>
                                 <div className={b('title-suffix')}>{titleSeparator}</div>

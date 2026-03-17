@@ -1,0 +1,17 @@
+{
+  "title_type": "Type",
+  "title_domain": "Domain",
+  "title_sub-domain": "SubDomain",
+  "description_sub-domain": "Internal YDB type. All user-created databases are SubDomains. Domain type is used only for top-level cluster directories.",
+  "description_domain": "Internal YDB type. Domain is top-level cluster directory.",
+  "title_id": "ID",
+  "title_version": "Version",
+  "title_created": "Created",
+  "title_path": "Full Path",
+  "title_limits-and-usage": "Limits & usage",
+  "title_paths": "Paths",
+  "title_shards": "Shards",
+  "description_paths": "Total number of schema objects (tables, directories, indexes, views, etc.)",
+  "description_shards": "Number of data shards (tablets) currently used by tables in this database",
+  "text_count": "{{count}} of {{limit}}"
+}

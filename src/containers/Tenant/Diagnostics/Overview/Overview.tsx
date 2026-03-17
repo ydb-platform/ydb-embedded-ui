@@ -11,9 +11,12 @@ import {ExternalDataSourceInfo} from '../../Info/ExternalDataSource/ExternalData
 import {ExternalTableInfo} from '../../Info/ExternalTable/ExternalTable';
 import {SystemViewInfo} from '../../Info/SystemView/SystemView';
 import {ViewInfo} from '../../Info/View/View';
+import {isDomain} from '../../ObjectSummary/transformPath';
+import {useNavigationV2Enabled} from '../../utils/useNavigationV2Enabled';
 
 import {AsyncReplicationInfo} from './AsyncReplicationInfo';
 import {ChangefeedInfo} from './ChangefeedInfo';
+import {DatabaseInfo} from './DatabaseInfo/DatabaseInfo';
 import {DefaultEntityInfo} from './DefaultEntityInfo';
 import {StreamingQueryInfo} from './StreamingQueryInfo';
 import {TableInfo} from './TableInfo';
@@ -30,6 +33,8 @@ interface OverviewProps {
 function Overview({type, path, database, databaseFullPath}: OverviewProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const useMetaProxy = useClusterWithProxy();
+
+    const isV2Navigation = useNavigationV2Enabled();
 
     const {currentData, isFetching, error} = overviewApi.useGetOverviewQuery(
         {path, database, databaseFullPath, useMetaProxy},
@@ -91,6 +96,15 @@ function Overview({type, path, database, databaseFullPath}: OverviewProps) {
                 <StreamingQueryInfo path={path} database={database} />
             ),
         };
+
+        const isDatabase =
+            type === EPathType.EPathTypeSubDomain ||
+            type === EPathType.EPathTypeExtSubDomain ||
+            isDomain(path, type);
+
+        if (isV2Navigation && isDatabase) {
+            return <DatabaseInfo data={data} path={path} />;
+        }
 
         return (type && pathTypeToComponent[type]?.()) || <DefaultEntityInfo data={data} />;
     };

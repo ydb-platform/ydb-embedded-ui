@@ -13,6 +13,7 @@ export interface SegmentedProgressProps {
     total: number;
     className?: string;
     labelStart?: string;
+    labelEnd?: string;
     ariaLabel?: string;
 }
 
@@ -21,6 +22,7 @@ export function SegmentedProgress({
     total,
     className,
     labelStart,
+    labelEnd,
     ariaLabel,
 }: SegmentedProgressProps) {
     const percentUsed = total > 0 ? (value / total) * 100 : 0;
@@ -60,7 +62,7 @@ export function SegmentedProgress({
             <Flex width="100%">
                 {labelStart && <Text color="secondary">{labelStart}</Text>}
                 <Text color="secondary" className={b('label')}>
-                    {normalizedUsed}%
+                    {labelEnd ?? `${normalizedUsed}%`}
                 </Text>
             </Flex>
         </Flex>
