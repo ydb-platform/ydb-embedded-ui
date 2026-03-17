@@ -238,6 +238,8 @@
     }
 }
 
+/* Before changing: verify usages in the internal version */
+
 @mixin entity-state-colors($block: null) {
     --entity-state-border-color: var(--g-color-base-misc-heavy);
     --entity-state-background-color: var(--g-color-base-misc-light);
