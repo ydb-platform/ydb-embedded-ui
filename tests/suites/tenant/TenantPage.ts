@@ -76,11 +76,21 @@ export class TenantPage extends PageModel {
         database: string;
         mode?: QueryEditorMode;
     }) {
+        await this.page.addInitScript(
+            ({nextMode}) => {
+                if (nextMode) {
+                    window.e2eQueryEditorMode = nextMode;
+                } else {
+                    delete window.e2eQueryEditorMode;
+                }
+            },
+            {nextMode: mode},
+        );
+
         return this.goto({
             schema,
             database,
             tenantPage: 'query',
-            e2eQueryEditorMode: mode,
         });
     }
 

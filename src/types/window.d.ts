@@ -40,6 +40,7 @@ interface Window {
     code_assist_backend?: string;
 
     react_app_disable_checks?: boolean;
+    e2eQueryEditorMode?: 'single-tab' | 'multi-tab';
 
     systemSettings?: import('../store/reducers/settings/types').SettingsObject;
 

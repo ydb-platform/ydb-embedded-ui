@@ -7,17 +7,18 @@ import {configureUIFactory} from './uiFactory/uiFactory';
 
 import './styles/index.scss';
 
-const E2E_QUERY_EDITOR_MODE_PARAM = 'e2eQueryEditorMode';
+const E2E_UI_OVERRIDES_ENABLED = process.env.REACT_APP_E2E_UI_OVERRIDES === 'true';
 
 function applyE2EQueryEditorModeOverride() {
-    const params = new URLSearchParams(window.location.search);
-    const mode = params.get(E2E_QUERY_EDITOR_MODE_PARAM);
+    if (!E2E_UI_OVERRIDES_ENABLED) {
+        return;
+    }
+
+    const mode = window['e2eQueryEditorMode'];
 
     if (mode === 'single-tab') {
         configureUIFactory({enableMultiTabQueryEditor: false});
-    }
-
-    if (mode === 'multi-tab') {
+    } else if (mode === 'multi-tab') {
         configureUIFactory({enableMultiTabQueryEditor: true});
     }
 }
