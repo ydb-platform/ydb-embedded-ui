@@ -97,12 +97,9 @@ export function AsideNavigation(props: AsideNavigationProps) {
         setVisiblePanel(undefined);
     }, []);
 
-    const hotkeyGroups = React.useMemo(() => {
-        if (uiFactory.enableMultiTabQueryEditor) {
-            return [...DEFAULT_HOTKEY_GROUPS, EDITOR_TABS_HOTKEY_GROUP];
-        }
-        return DEFAULT_HOTKEY_GROUPS;
-    }, []);
+    const hotkeyGroups = uiFactory.enableMultiTabQueryEditor
+        ? [...DEFAULT_HOTKEY_GROUPS, EDITOR_TABS_HOTKEY_GROUP]
+        : DEFAULT_HOTKEY_GROUPS;
 
     const {renderPanel: renderHotkeysPanel} = useHotkeysPanel({
         isPanelVisible: visiblePanel === Panel.Hotkeys,

@@ -7,9 +7,9 @@ import {cn} from '../../../../../utils/cn';
 import i18n from '../../i18n';
 import {getQueryNameValidationError} from '../../utils/QueryNameValidation';
 
-export const RENAME_QUERY_DIALOG = 'rename-query-dialog';
-
 import './RenameQueryDialog.scss';
+
+export const RENAME_QUERY_DIALOG = 'rename-query-dialog';
 
 const b = cn('rename-query-dialog');
 

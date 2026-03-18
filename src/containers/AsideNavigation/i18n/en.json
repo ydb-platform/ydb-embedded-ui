@@ -9,6 +9,8 @@
   "account.login": "Login",
   "account.logout": "Logout",
   "hotkeys.title": "Keyboard shortcuts",
+  "hotkeys.query-editor-group-title": "Query Editor",
+  "hotkeys.editor-tabs-group-title": "Editor Tabs",
   "hotkeys.execute-query": "Execute query",
   "hotkeys.execute-selected-query": "Execute selected query",
   "hotkeys.save-query": "Save query",

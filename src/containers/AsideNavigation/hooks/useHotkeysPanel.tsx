@@ -16,7 +16,7 @@ export const SHORTCUTS_HOTKEY = isMacOS() ? 'cmd+K' : 'ctrl+K';
 
 export const DEFAULT_HOTKEY_GROUPS: HotkeysGroup[] = [
     {
-        title: 'Query Editor',
+        title: i18n('hotkeys.query-editor-group-title'),
         items: [
             {
                 title: i18n('hotkeys.execute-query'),
@@ -39,7 +39,7 @@ export const DEFAULT_HOTKEY_GROUPS: HotkeysGroup[] = [
 ];
 
 export const EDITOR_TABS_HOTKEY_GROUP: HotkeysGroup = {
-    title: 'Editor Tabs',
+    title: i18n('hotkeys.editor-tabs-group-title'),
     items: [
         {title: i18n('hotkeys.new-tab'), value: HOTKEY_LABELS.newTab},
         {title: i18n('hotkeys.close-tab'), value: HOTKEY_LABELS.closeTab},

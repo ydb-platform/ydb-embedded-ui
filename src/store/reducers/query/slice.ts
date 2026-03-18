@@ -289,6 +289,7 @@ const slice = createSlice({
 
             if (!action.payload) {
                 tab.savedInput = tab.input;
+                persistTabsStateToSessionStorage(state);
             }
 
             persistDirtyStateToSessionStorage(state);

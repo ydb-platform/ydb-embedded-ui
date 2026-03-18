@@ -237,7 +237,7 @@ test.describe('Editor tabs', () => {
         await saveQueryDialog.clickCancel();
     });
 
-    test('Save query as action validates minimum query name length', async ({page}) => {
+    test('Save query as action validates empty query name', async ({page}) => {
         const saveQueryDialog = new SaveQueryDialog(page);
 
         await queryEditor.setQuery('SELECT 1;');
@@ -247,11 +247,11 @@ test.describe('Editor tabs', () => {
         await queryEditor.editorTabs.clickMenuAction('Save query as...');
 
         await expect(saveQueryDialog.isVisible()).resolves.toBe(true);
-        await saveQueryDialog.setQueryName('AB');
+        await saveQueryDialog.setQueryName('');
         await saveQueryDialog.clickSave();
 
         await expect(saveQueryDialog.getValidationError()).resolves.toBe(
-            'Name must be at least 3 characters',
+            'Name should not be empty',
         );
         await expect(saveQueryDialog.isVisible()).resolves.toBe(true);
     });
