@@ -33,11 +33,11 @@ export const useQueryExecutionSettings = () => {
             setSettings({
                 ...settings,
                 statisticsMode: useShowPlanToSvg
-                    ? validatedSettings.statisticsMode
+                    ? getSvgStatisticsMode(settings.statisticsMode)
                     : settings.statisticsMode,
             });
         },
-        [setSettings, useShowPlanToSvg, validatedSettings.statisticsMode],
+        [setSettings, useShowPlanToSvg],
     );
 
     const settings: QuerySettings = {
