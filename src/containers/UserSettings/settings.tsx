@@ -133,6 +133,12 @@ export const enableBlobStorageCapacityMetricsSetting: SettingProps = {
     title: i18n('settings.enableBlobStorageCapacityMetrics.title'),
 };
 
+export const enableTenantNavigationV2Setting: SettingProps = {
+    settingKey: SETTING_KEYS.ENABLE_TENANT_NAVIGATION_V2,
+    title: i18n('settings.enableTenantNavigationV2.title'),
+    description: i18n('settings.enableTenantNavigationV2.description'),
+};
+
 export function applyClusterSpecificQueryStreamingSetting(
     settings: YDBEmbeddedUISettings,
     clusterName?: string,
@@ -257,6 +263,7 @@ export const experimentsSection: SettingsSection = {
         enableQueryStreamingSetting,
         showNetworkUtilizationSetting,
         enableBlobStorageCapacityMetricsSetting,
+        enableTenantNavigationV2Setting,
     ],
 };
 

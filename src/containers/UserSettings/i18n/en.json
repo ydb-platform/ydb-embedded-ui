@@ -56,5 +56,8 @@
 
   "settings.about.interfaceVersionInfoField.title": "Interface version",
 
-  "settings.enableBlobStorageCapacityMetrics.title": "Blob storage capacity metrics"
+  "settings.enableBlobStorageCapacityMetrics.title": "Blob storage capacity metrics",
+
+  "settings.enableTenantNavigationV2.title": "New database navigation",
+  "settings.enableTenantNavigationV2.description": "Puts navigation buttons in the left panel and spreads database tabs between diagnostics page and schema page."
 }
