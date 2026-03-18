@@ -11,6 +11,7 @@ interface EntityPageTitleProps {
     status?: EFlag;
     id: React.ReactNode;
     className?: string;
+    metaInfo?: React.ReactNode;
 }
 
 export function EntityPageTitle({
@@ -18,12 +19,14 @@ export function EntityPageTitle({
     status = EFlag.Grey,
     id,
     className,
+    metaInfo,
 }: EntityPageTitleProps) {
     return (
         <div className={b(null, className)}>
             <span className={b('prefix')}>{entityName}</span>
             <StatusIcon className={b('icon')} status={status} size="s" />
             {id}
+            {metaInfo}
         </div>
     );
 }

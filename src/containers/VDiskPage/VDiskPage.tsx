@@ -1,7 +1,7 @@
 import React from 'react';
 
 import {ArrowsOppositeToDots} from '@gravity-ui/icons';
-import {Icon, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
+import {Flex, Icon, Label, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {isNil} from 'lodash';
 import {Helmet} from 'react-helmet-async';
@@ -23,6 +23,7 @@ import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
 import type {ModifyDiskResponse} from '../../types/api/modifyDisk';
 import type {TVDiskID} from '../../types/api/vdisk';
 import {cn} from '../../utils/cn';
+import {VDISK_LABEL_CONFIG} from '../../utils/disks/constants';
 import {getSeverityColor} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
@@ -205,14 +206,33 @@ export function VDiskPage() {
         );
     };
 
+    const renderTitleMeta = () => {
+        if (!vDiskData?.DonorMode) {
+            return null;
+        }
+        const donorLabelConfig = VDISK_LABEL_CONFIG.donor;
+        return (
+            <Label
+                theme={donorLabelConfig.theme}
+                icon={donorLabelConfig.icon ? <Icon data={donorLabelConfig.icon} /> : undefined}
+                size="m"
+            >
+                {vDiskPageKeyset('label_donor')}
+            </Label>
+        );
+    };
+
     const renderPageTitle = () => {
         return (
-            <EntityPageTitle
-                className={vDiskPageCn('title')}
-                entityName={vDiskPageKeyset('vdisk')}
-                status={getSeverityColor(Severity)}
-                id={vDiskId}
-            />
+            <Flex gap={2} alignItems="center">
+                <EntityPageTitle
+                    className={vDiskPageCn('title')}
+                    entityName={vDiskPageKeyset('vdisk')}
+                    status={getSeverityColor(Severity)}
+                    id={vDiskId}
+                    metaInfo={renderTitleMeta()}
+                />
+            </Flex>
         );
     };
 
@@ -222,7 +242,9 @@ export function VDiskPage() {
                 <ButtonWithConfirmDialog
                     onConfirmAction={handleEvictVDisk}
                     onConfirmActionSuccess={handleAfterEvictVDisk}
-                    buttonDisabled={!vDiskIdParamsDefined || !isUserAllowedToMakeChanges}
+                    buttonDisabled={
+                        !vDiskIdParamsDefined || !isUserAllowedToMakeChanges || vDiskData?.DonorMode
+                    }
                     buttonView="normal"
                     dialogHeader={vDiskPageKeyset('evict-vdisk-dialog-header')}
                     dialogText={vDiskPageKeyset('evict-vdisk-dialog-text')}

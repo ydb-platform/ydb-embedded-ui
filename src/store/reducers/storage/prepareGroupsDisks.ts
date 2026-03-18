@@ -31,10 +31,18 @@ export function prepareGroupsVDisk(data: TStorageVDisk = {}): PreparedVDisk {
     });
 
     const preparedDonors = bscVDisk.Donors?.map((donor) => {
-        return prepareGroupsVDisk({
+        const preparedDonor = prepareGroupsVDisk({
             ...donor,
             Whiteboard: {...donor.Whiteboard, DonorMode: true},
         });
+
+        // Set Recipient reference on the donor pointing back to this VDisk
+        preparedDonor.Recipient = {
+            NodeId: mergedVDiskData.NodeId,
+            StringifiedId,
+        };
+
+        return preparedDonor;
     });
 
     return {

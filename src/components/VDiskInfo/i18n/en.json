@@ -12,6 +12,7 @@
   "replication-progress": "Replication Progress",
   "replication-time-remaining": "Time Remaining",
   "donors": "Donors",
+  "label_recipient": "Recipient",
   "state-status": "VDisk State",
   "space-status": "Disk Space",
 

@@ -1,5 +1,6 @@
 import type {StorageGroupsResponse} from '../../../types/api/storage';
 import type {TEvSystemStateResponse} from '../../../types/api/systemState';
+import type {PreparedVDisk} from '../../../utils/disks/types';
 import {prepareNodeSystemState} from '../../../utils/nodes';
 import {prepareGroupsVDisk} from '../storage/prepareGroupsDisks';
 
@@ -13,25 +14,44 @@ export function prepareVDiskDataResponse(
     vDiskId: string,
 ): VDiskData {
     const rawVDisk = storageGroupResponse?.StorageGroups?.[0].VDisks?.find(
-        ({VDiskId}) => VDiskId === vDiskId,
+        ({VDiskId, Donors}) =>
+            VDiskId === vDiskId || Donors?.some(({VDiskId: donorId}) => donorId === vDiskId),
     );
 
     const preparedVDisk = prepareGroupsVDisk(rawVDisk);
-    const preparedPDisk = preparedVDisk.PDisk;
+
+    let currentVDisk: PreparedVDisk = {};
+
+    if (preparedVDisk.StringifiedId === vDiskId) {
+        currentVDisk = preparedVDisk;
+    } else {
+        for (const donor of preparedVDisk.Donors ?? []) {
+            if (donor.StringifiedId === vDiskId) {
+                currentVDisk = donor;
+                currentVDisk.Recipient = {
+                    NodeId: preparedVDisk.NodeId,
+                    StringifiedId: preparedVDisk.StringifiedId,
+                };
+                break;
+            }
+        }
+    }
+
+    const preparedPDisk = currentVDisk.PDisk;
 
     const rawNode = nodeResponse?.SystemStateInfo?.[0];
     const preparedNode = prepareNodeSystemState(rawNode);
 
-    const NodeId = preparedVDisk.NodeId ?? preparedPDisk?.NodeId ?? preparedNode.NodeId;
+    const NodeId = currentVDisk.NodeId ?? preparedPDisk?.NodeId ?? preparedNode.NodeId;
     const NodeHost = preparedNode.Host;
     const NodeType = preparedNode.Roles?.[0];
     const NodeDC = preparedNode.DC;
 
-    const PDiskId = preparedVDisk.PDiskId ?? preparedPDisk?.PDiskId;
+    const PDiskId = currentVDisk.PDiskId ?? preparedPDisk?.PDiskId;
     const PDiskType = preparedPDisk?.Type;
 
     return {
-        ...preparedVDisk,
+        ...currentVDisk,
 
         NodeId,
         NodeHost,

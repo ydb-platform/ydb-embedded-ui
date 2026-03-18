@@ -70,6 +70,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
         PDiskId,
         StringifiedId,
         NodeId,
+        Recipient,
     } = data || {};
 
     const leftColumn = [];
@@ -206,9 +207,23 @@ export function VDiskInfo<T extends PreparedVDisk>({
             value: HasUnreadableBlobs ? vDiskInfoKeyset('yes') : vDiskInfoKeyset('no'),
         });
     }
+    if (!isNil(Recipient) && !isNil(Recipient.StringifiedId)) {
+        const recipientPath = getVDiskPagePath({
+            nodeId: Recipient.NodeId,
+            vDiskId: Recipient.StringifiedId,
+        });
+        rightColumn.push({
+            label: vDiskInfoKeyset('label_recipient'),
+            value: recipientPath ? (
+                <InternalLink to={recipientPath}>{Recipient.StringifiedId}</InternalLink>
+            ) : (
+                Recipient.StringifiedId
+            ),
+        });
+    }
 
     // Show donors list when replication is in progress
-    if (Replicated === false && VDiskState === EVDiskState.OK && Donors?.length) {
+    if (Replicated === false && Donors?.length) {
         const donorLinks = Donors.map((donor, index) => {
             const {StringifiedId: id, NodeId: dNodeId} = donor;
 

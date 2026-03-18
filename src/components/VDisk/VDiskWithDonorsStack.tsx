@@ -26,7 +26,7 @@ export function VDiskWithDonorsStack({
     setHighlightedVDisk,
     ...restProps
 }: VDiskWithDonorsStackProps) {
-    const {Donors: donors, ...restData} = data || {};
+    const donors = data?.Donors;
 
     const stackId = data?.StringifiedId;
     const isHighlighted = Boolean(stackId && highlightedVDisk === stackId);
@@ -41,18 +41,25 @@ export function VDiskWithDonorsStack({
         setHighlightedVDisk?.(undefined);
     }, [setHighlightedVDisk]);
 
-    const commonVDiskProps: Partial<VDiskProps> = {
+    const mainVDiskProps: Partial<VDiskProps> = {
         withIcon,
+        showPopup: isHighlighted,
         highlighted: isHighlighted,
         onShowPopup: handleShowPopup,
         onHidePopup: handleHidePopup,
         ...restProps,
     };
 
+    const donorVDiskProps: Partial<VDiskProps> = {
+        withIcon,
+        highlighted: isHighlighted,
+        ...restProps,
+    };
+
     const content =
         donors && donors.length > 0 ? (
             <Stack className={stackClassName}>
-                <VDisk data={restData} {...commonVDiskProps} />
+                <VDisk data={data} {...mainVDiskProps} />
                 {donors.map((donor) => {
                     const isFullData = isFullVDiskData(donor);
 
@@ -60,13 +67,13 @@ export function VDiskWithDonorsStack({
                         <VDisk
                             key={stringifyVdiskId(isFullData ? donor.VDiskId : donor)}
                             data={donor}
-                            {...commonVDiskProps}
+                            {...donorVDiskProps}
                         />
                     );
                 })}
             </Stack>
         ) : (
-            <VDisk data={data} withIcon={withIcon} {...commonVDiskProps} />
+            <VDisk data={data} withIcon={withIcon} {...mainVDiskProps} />
         );
 
     return <div className={className}>{content}</div>;

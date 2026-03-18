@@ -154,7 +154,6 @@ const prepareVDiskData = (
         Donors,
         DonorMode,
         Recipient,
-        Severity,
     } = data;
 
     const vdiskData: YDBDefinitionListItem[] = [];
@@ -167,12 +166,12 @@ const prepareVDiskData = (
         });
     }
 
-    // it is a healthy replication and it has some donors
-    if (Donors?.length && Severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue) {
+    // Show donors if they exist
+    if (Donors?.length) {
         vdiskData.push({
             name: vDiskPopupKeyset('label_donor'),
             content: (
-                <Flex direction="column">
+                <Flex direction="column" gap={1}>
                     {Donors.map((donor) => (
                         <VDiskLink
                             key={donor.StringifiedId}
