@@ -65,7 +65,7 @@ function Authentication({closable = false}: AuthenticationProps) {
     const useMeta = useMetaAuth(path);
 
     const [login, setLogin] = React.useState('');
-    const [database, setDatabase] = React.useState(databaseFromQuery?.toString() ?? '');
+    const [database, setDatabase] = React.useState(databaseFromQuery?.toString() || undefined);
     const [password, setPass] = React.useState('');
     const [loginError, setLoginError] = React.useState('');
     const [passwordError, setPasswordError] = React.useState('');
