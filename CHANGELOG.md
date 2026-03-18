@@ -1,5 +1,18 @@
 # Changelog
 
+## [14.12.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.12.0...v14.12.1) (2026-03-18)
+
+
+### Bug Fixes
+
+* @gravity-ui/react-unipika -&gt; 0.5.2 ([#3634](https://github.com/ydb-platform/ydb-embedded-ui/issues/3634)) ([49209ec](https://github.com/ydb-platform/ydb-embedded-ui/commit/49209ec4cda45b36de9fe2fbcaf3f13124a3b189))
+* **ClusterInfo:** storage groups stats view ([#3623](https://github.com/ydb-platform/ydb-embedded-ui/issues/3623)) ([51b2d89](https://github.com/ydb-platform/ydb-embedded-ui/commit/51b2d893b657ac3ad22546676b1350fb142c15a4))
+* **FixedHeightQuery:** highlight only rendered lines, postpone highlight ([#3617](https://github.com/ydb-platform/ydb-embedded-ui/issues/3617)) ([0c487f5](https://github.com/ydb-platform/ydb-embedded-ui/commit/0c487f58e4a33e12baf94b937285eebad74a35fc))
+* **QueryEditor:** save statisticsMode ([#3635](https://github.com/ydb-platform/ydb-embedded-ui/issues/3635)) ([c904c9b](https://github.com/ydb-platform/ydb-embedded-ui/commit/c904c9b02db651325a95649f1dabe1552c566749))
+* return font color to entity-state-colors mixin ([#3628](https://github.com/ydb-platform/ydb-embedded-ui/issues/3628)) ([a0796cf](https://github.com/ydb-platform/ydb-embedded-ui/commit/a0796cf4aec955d49bc10f11c5cb96caebe1240b))
+* **TopicData:** scroll behaviour ([#3620](https://github.com/ydb-platform/ydb-embedded-ui/issues/3620)) ([718f309](https://github.com/ydb-platform/ydb-embedded-ui/commit/718f30989ea6b7f35c12a8fd261e425edc2edf39))
+* **TopicMessage:** decode base64 as utf-8 to fix non-ascii characters ([#3627](https://github.com/ydb-platform/ydb-embedded-ui/issues/3627)) ([b4beacd](https://github.com/ydb-platform/ydb-embedded-ui/commit/b4beacdd24e4ea9a281d36997af8ad8ac3e9d8af))
+
 ## [14.12.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.11.0...v14.12.0) (2026-03-12)
 
 
