@@ -9,6 +9,8 @@ import {DEV_ENABLE_TRACING_FOR_ALL_REQUESTS} from '../../utils/constants';
 import {prepareBackendWithMetaProxy} from '../../utils/parseBalancer';
 import {isRedirectToAuth} from '../../utils/response';
 
+import {isNeedResetResponse, processNeedReset} from './utils/needReset';
+
 export type AxiosOptions = {
     concurrentId?: string;
     signal?: AbortSignal;
@@ -70,7 +72,7 @@ export class BaseYdbAPI extends AxiosWrapper {
             return response;
         });
 
-        // Interceptor to process OIDC auth
+        // Interceptor to process OIDC auth and NEED_RESET
         this._axios.interceptors.response.use(null, function (error) {
             const response = error.response;
 
@@ -79,6 +81,10 @@ export class BaseYdbAPI extends AxiosWrapper {
             // that will allow access to clusters where OIDC proxy is a balancer
             if (isRedirectToAuth(response)) {
                 window.location.assign(response.data.authUrl);
+            }
+
+            if (isNeedResetResponse(response?.data) && document.visibilityState === 'visible') {
+                processNeedReset();
             }
 
             return Promise.reject(error);

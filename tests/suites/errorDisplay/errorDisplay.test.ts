@@ -25,6 +25,7 @@ import {
     setupStreamingQueryNetworkErrorMock,
     setupTablet400JsonCodeOnlyMock,
     setupVDisk429WithIssuesMock,
+    setupWhoami401NeedResetMock,
     setupWhoami500Mock,
     setupWhoami502HtmlMock,
     setupWhoami503TextMock,
@@ -206,13 +207,13 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         await errorDisplay.waitForResponseError();
 
         const errorText = await errorDisplay.getResponseErrorText();
-        expect(errorText).toContain('NEED_RESET');
+        expect(errorText).toContain('NOT_FOUND');
 
         expect(await errorDisplay.isResponseBodyTriggerVisible()).toBe(true);
         await errorDisplay.expandResponseBody();
 
         const responseBody = await errorDisplay.getResponseBodyText();
-        expect(responseBody).toContain('NEED_RESET');
+        expect(responseBody).toContain('NOT_FOUND');
 
         await expect(errorDisplay.getResponseErrorLocator()).toHaveScreenshot(
             'error-tablet-400-code-only.png',
@@ -531,6 +532,36 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
             path: `${FULL_PAGE_DIR}/full-cluster-401-capabilities.png`,
             fullPage: true,
         });
+    });
+    test('Cluster — 401 whoami with NEED_RESET causes page to reload', async ({page}) => {
+        await setupWhoami401NeedResetMock(page);
+
+        let whoamiCalls = 0;
+        let whoamiCalls200 = 0;
+        let whoamiCalls401 = 0;
+
+        page.on('response', (resp) => {
+            if (resp.url().includes('/viewer/json/whoami')) {
+                whoamiCalls++;
+
+                if (resp.status() === 200) {
+                    whoamiCalls200++;
+                }
+                if (resp.status() === 401) {
+                    whoamiCalls401++;
+                }
+            }
+        });
+
+        const clusterPage = new ClusterPage(page);
+        await clusterPage.goto();
+        await page.waitForLoadState('networkidle');
+
+        expect(whoamiCalls).toBe(2);
+        expect(whoamiCalls200).toBe(1);
+        expect(whoamiCalls401).toBe(1);
+
+        expect(await clusterPage.isClusterInfoVisible()).toBe(true);
     });
 
     // --- Query result errors (non-streaming, ResponseError in query result pane) ---
