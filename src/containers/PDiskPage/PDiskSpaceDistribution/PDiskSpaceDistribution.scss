@@ -1,3 +1,5 @@
+@use '../../../styles/mixins.scss';
+
 .ydb-pdisk-space-distribution {
     .storage-disk-progress-bar {
         height: 100%;
@@ -48,7 +50,12 @@
         font-weight: 600;
     }
 
+    &__info-title {
+        margin-top: 0;
+    }
+
     &__vdisk-popup {
-        padding: var(--g-spacing-half) var(--g-spacing-2) var(--g-spacing-2);
+        --g-definition-list-item-gap: var(--g-spacing-2);
+        @include mixins.body-2-typography();
     }
 }

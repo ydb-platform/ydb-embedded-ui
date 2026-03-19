@@ -1,10 +1,10 @@
 import {DiskStateProgressBar} from '../../../components/DiskStateProgressBar/DiskStateProgressBar';
 import {HoverPopup} from '../../../components/HoverPopup/HoverPopup';
-import type {InfoViewerItem} from '../../../components/InfoViewer';
-import {InfoViewer} from '../../../components/InfoViewer';
 import {InternalLink} from '../../../components/InternalLink';
 import {ProgressViewer} from '../../../components/ProgressViewer/ProgressViewer';
 import {VDiskInfo} from '../../../components/VDiskInfo/VDiskInfo';
+import type {YDBDefinitionListItem} from '../../../components/YDBDefinitionList/YDBDefinitionList';
+import {YDBDefinitionList} from '../../../components/YDBDefinitionList/YDBDefinitionList';
 import {useVDiskPagePath} from '../../../routes';
 import type {
     EmptySlotData,
@@ -97,7 +97,13 @@ function Slot<T extends SlotItemType>({item, nodeId, getVDiskPagePath}: SlotProp
 
             return (
                 <HoverPopup
-                    renderPopupContent={() => <VDiskInfo data={item.SlotData} withTitle />}
+                    renderPopupContent={() => (
+                        <VDiskInfo
+                            data={item.SlotData}
+                            withTitle
+                            titleClassName={b('info-title')}
+                        />
+                    )}
                     contentClassName={b('vdisk-popup')}
                     placement={['right', 'top']}
                 >
@@ -211,10 +217,10 @@ interface LogInfoProps {
 function LogInfo({data}: LogInfoProps) {
     const {LogTotalSize, LogUsedSize, SystemSize} = data;
 
-    const info: InfoViewerItem[] = [
+    const items: YDBDefinitionListItem[] = [
         {
-            label: pDiskPageKeyset('label.log-size'),
-            value: (
+            name: pDiskPageKeyset('label.log-size'),
+            content: (
                 <ProgressViewer
                     value={LogUsedSize}
                     capacity={LogTotalSize}
@@ -225,13 +231,19 @@ function LogInfo({data}: LogInfoProps) {
     ];
 
     if (valueIsDefined(SystemSize)) {
-        info.push({
-            label: pDiskPageKeyset('label.system-size'),
-            value: formatBytes({value: SystemSize}),
+        items.push({
+            name: pDiskPageKeyset('label.system-size'),
+            content: formatBytes({value: SystemSize}),
         });
     }
 
-    return <InfoViewer title={pDiskPageKeyset('log')} info={info} />;
+    return (
+        <YDBDefinitionList
+            titleClassname={b('info-title')}
+            title={pDiskPageKeyset('log')}
+            items={items}
+        />
+    );
 }
 
 interface EmptySlotInfoProps {
@@ -241,12 +253,18 @@ interface EmptySlotInfoProps {
 function EmptySlotInfo({data}: EmptySlotInfoProps) {
     const {Size} = data;
 
-    const info: InfoViewerItem[] = [
+    const items: YDBDefinitionListItem[] = [
         {
-            label: pDiskPageKeyset('label.slot-size'),
-            value: formatBytes({value: Size}),
+            name: pDiskPageKeyset('label.slot-size'),
+            content: formatBytes({value: Size}),
         },
     ];
 
-    return <InfoViewer title={pDiskPageKeyset('empty-slot')} info={info} />;
+    return (
+        <YDBDefinitionList
+            titleClassname={b('info-title')}
+            title={pDiskPageKeyset('empty-slot')}
+            items={items}
+        />
+    );
 }
