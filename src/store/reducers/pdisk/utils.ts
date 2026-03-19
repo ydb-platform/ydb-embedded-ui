@@ -36,6 +36,7 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
         SystemSize,
         ExpectedSlotCount,
         SlotSize,
+        NumActiveSlots,
     } = preparedPDisk;
 
     let logSlot: SlotItem<'log'> | undefined;
@@ -94,8 +95,12 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
 
     let emptySlots: SlotItem<'empty'>[] = [];
 
-    if (ExpectedSlotCount && ExpectedSlotCount > vdisksSlots.length) {
-        const emptySlotsCount = ExpectedSlotCount - vdisksSlots.length;
+    // Use NumActiveSlots from API if available, otherwise fallback to vdisksSlots.length
+    // NumActiveSlots accounts for VDisks that occupy multiple physical slots (GroupSizeInUnits > 1)
+    const occupiedSlots = NumActiveSlots ?? vdisksSlots.length;
+
+    if (ExpectedSlotCount && ExpectedSlotCount > occupiedSlots) {
+        const emptySlotsCount = ExpectedSlotCount - occupiedSlots;
 
         let emptySlotSize = Number(SlotSize);
 
