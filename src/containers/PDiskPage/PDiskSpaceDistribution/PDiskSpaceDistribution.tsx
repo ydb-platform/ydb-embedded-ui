@@ -17,6 +17,7 @@ import {valueIsDefined} from '../../../utils';
 import {formatBytes} from '../../../utils/bytesParsers';
 import {cn} from '../../../utils/cn';
 import {formatStorageValuesToGb} from '../../../utils/dataFormatters/dataFormatters';
+import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from '../../../utils/disks/constants';
 import {pDiskPageKeyset} from '../i18n';
 
 import {isEmptySlot, isLogSlot, isVDiskSlot} from './utils';
@@ -95,6 +96,9 @@ function Slot<T extends SlotItemType>({item, nodeId, getVDiskPagePath}: SlotProp
                 vDiskId: item.SlotData.StringifiedId,
             });
 
+            const isReplicatingColor = item.Severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue;
+            const isDonor = item.SlotData.DonorMode;
+
             return (
                 <HoverPopup
                     renderPopupContent={() => (
@@ -112,6 +116,8 @@ function Slot<T extends SlotItemType>({item, nodeId, getVDiskPagePath}: SlotProp
                             className={b('slot')}
                             severity={item.Severity}
                             diskAllocatedPercent={item.UsagePercent}
+                            striped={isReplicatingColor || isDonor}
+                            isDonor={isDonor}
                             content={
                                 <SlotContent
                                     id={item.Id}
