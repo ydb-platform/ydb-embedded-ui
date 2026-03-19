@@ -112,6 +112,8 @@ describe('preparePDiskDataResponse', () => {
     test('Should correctly retrieve slots', () => {
         const preparedData = preparePDiskDataResponse([rawData, {}]);
 
+        // rawData has NumActiveSlots: 1, ExpectedSlotCount: 16
+        // So: 1 log + 1 vdisk + (16 - 1) empty = 1 + 1 + 15 = 17 total
         expect(preparedData.SlotItems?.length).toEqual(17);
         expect(preparedData.SlotItems?.filter((slot) => slot.SlotType === 'log').length).toEqual(1);
         expect(preparedData.SlotItems?.filter((slot) => slot.SlotType === 'vDisk').length).toEqual(
@@ -288,5 +290,67 @@ describe('preparePDiskDataResponse', () => {
         expect(vDiskSlot?.Used).toEqual(20_000_000_000); // 20GB used
         // Since used (20GB) > sizeLimit (15GB), total should be set to used size
         expect(vDiskSlot?.Total).toEqual(20_000_000_000); // Total equals used when used exceeds limit
+    });
+
+    test('Should use NumActiveSlots when calculating empty slots', () => {
+        // Scenario: 1 VDisk that occupies 2 physical slots (GroupSizeInUnits: 2)
+        const dataWithMultiSlotVDisk: TPDiskInfoResponse = {
+            ...rawData,
+            Whiteboard: {
+                ...rawData.Whiteboard,
+                PDisk: {
+                    ...rawData.Whiteboard?.PDisk,
+                    NumActiveSlots: 2, // VDisk occupies 2 slots
+                },
+            },
+            BSC: {
+                ...rawData.BSC,
+                PDisk: {
+                    ...rawData.BSC?.PDisk,
+                    ExpectedSlotCount: 18,
+                    NumActiveSlots: 2, // VDisk occupies 2 slots
+                },
+            },
+        };
+        const preparedData = preparePDiskDataResponse([dataWithMultiSlotVDisk, {}]);
+
+        // Expected: 1 log + 1 vdisk + 16 empty = 18 total
+        // (18 expected - 2 active slots = 16 empty)
+        expect(preparedData.SlotItems?.length).toEqual(18);
+        expect(preparedData.SlotItems?.filter((slot) => slot.SlotType === 'log').length).toEqual(1);
+        expect(preparedData.SlotItems?.filter((slot) => slot.SlotType === 'vDisk').length).toEqual(
+            1,
+        );
+        expect(preparedData.SlotItems?.filter((slot) => slot.SlotType === 'empty').length).toEqual(
+            16,
+        );
+    });
+
+    test('Should fallback to vdisksSlots.length when NumActiveSlots is undefined', () => {
+        const dataWithoutNumActiveSlots: TPDiskInfoResponse = {
+            ...rawData,
+            Whiteboard: {
+                ...rawData.Whiteboard,
+                PDisk: {
+                    ...rawData.Whiteboard?.PDisk,
+                    NumActiveSlots: undefined,
+                },
+            },
+            BSC: {
+                ...rawData.BSC,
+                PDisk: {
+                    ...rawData.BSC?.PDisk,
+                    NumActiveSlots: undefined,
+                },
+            },
+        };
+        const preparedData = preparePDiskDataResponse([dataWithoutNumActiveSlots, {}]);
+
+        // When NumActiveSlots is undefined, fallback to vdisksSlots.length (1)
+        // Expected: 1 log + 1 vdisk + (16 - 1) empty = 1 + 1 + 15 = 17 total
+        expect(preparedData.SlotItems?.length).toEqual(17);
+        expect(preparedData.SlotItems?.filter((slot) => slot.SlotType === 'empty').length).toEqual(
+            15,
+        );
     });
 });

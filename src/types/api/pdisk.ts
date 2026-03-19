@@ -48,6 +48,7 @@ export interface TPDiskStateInfo {
     /** uint64 */
     EnforcedDynamicSlotSize?: string;
     ExpectedSlotCount?: number;
+    NumActiveSlots?: number;
 }
 
 export enum TPDiskState {
