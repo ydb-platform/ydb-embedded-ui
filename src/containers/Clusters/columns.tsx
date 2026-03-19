@@ -20,6 +20,7 @@ import {uiFactory} from '../../uiFactory/uiFactory';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatNumber, formatStorageValuesToTb} from '../../utils/dataFormatters/dataFormatters';
 import {getCleanBalancerValue} from '../../utils/parseBalancer';
+import type {PreparedVersion} from '../../utils/versions/types';
 import {clusterTabsIds} from '../Cluster/utils';
 
 import {COLUMNS_NAMES, COLUMNS_TITLES} from './constants';
@@ -29,6 +30,18 @@ import {calculateClusterPath} from './utils';
 export const CLUSTERS_COLUMNS_WIDTH_LS_KEY = 'clustersTableColumnsWidth';
 
 const EMPTY_CELL = <span className={b('empty-cell')}>{EMPTY_DATA_PLACEHOLDER}</span>;
+
+/**
+ * Helper function to get the first version from a sorted list of prepared versions
+ * Used as sortAccessor for version columns
+ */
+function getFirstVersion(preparedVersions: PreparedVersion[]): string | undefined {
+    const versions = preparedVersions
+        .map((item) => item.version.replace(/^[0-9]\+\./g, ''))
+        .sort((v1, v2) => v1.localeCompare(v2));
+
+    return versions[0] || undefined;
+}
 
 interface ClustersColumnsParams {
     isEditClusterAvailable?: boolean;
@@ -158,13 +171,7 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
         header: COLUMNS_TITLES[COLUMNS_NAMES.VERSIONS],
         width: 400,
         defaultOrder: DataTable.DESCENDING,
-        sortAccessor: ({preparedVersions}) => {
-            const versions = preparedVersions
-                .map((item) => item.version.replace(/^[0-9]\+\./g, ''))
-                .sort((v1, v2) => v1.localeCompare(v2));
-
-            return versions[0] || undefined;
-        },
+        sortAccessor: ({preparedVersions}) => getFirstVersion(preparedVersions),
         render: ({row}) => {
             const {versions = []} = row;
 
@@ -174,7 +181,27 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
                 return EMPTY_CELL;
             }
 
-            return <Versions row={row} />;
+            return <Versions row={row} preparedVersions={row.preparedVersions} />;
+        },
+    },
+    {
+        name: COLUMNS_NAMES.COMPUTE_NODES_VERSIONS,
+        header: COLUMNS_TITLES[COLUMNS_NAMES.COMPUTE_NODES_VERSIONS],
+        width: 400,
+        defaultOrder: DataTable.DESCENDING,
+        sortAccessor: ({preparedComputeVersions}) => getFirstVersion(preparedComputeVersions),
+        render: ({row}) => {
+            return <Versions row={row} preparedVersions={row.preparedComputeVersions} />;
+        },
+    },
+    {
+        name: COLUMNS_NAMES.STORAGE_NODES_VERSIONS,
+        header: COLUMNS_TITLES[COLUMNS_NAMES.STORAGE_NODES_VERSIONS],
+        width: 400,
+        defaultOrder: DataTable.DESCENDING,
+        sortAccessor: ({preparedStorageVersions}) => getFirstVersion(preparedStorageVersions),
+        render: ({row}) => {
+            return <Versions row={row} preparedVersions={row.preparedStorageVersions} />;
         },
     },
     {
@@ -348,12 +375,12 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
 
 interface VersionsProps {
     row: PreparedCluster;
+    preparedVersions: PreparedVersion[];
 }
 
-function Versions({row}: VersionsProps) {
-    const {preparedVersions} = row;
+function Versions({row, preparedVersions}: VersionsProps) {
     if (!preparedVersions.length) {
-        return null;
+        return EMPTY_CELL;
     }
     const clusterPath = calculateClusterPath(row, clusterTabsIds.versions);
     return (

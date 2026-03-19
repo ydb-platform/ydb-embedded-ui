@@ -3,6 +3,8 @@ export const CLUSTERS_SELECTED_COLUMNS_KEY = 'selectedColumns';
 export const COLUMNS_NAMES = {
     TITLE: 'title',
     VERSIONS: 'versions',
+    COMPUTE_NODES_VERSIONS: 'computeNodesVersions',
+    STORAGE_NODES_VERSIONS: 'storageNodesVersions',
     DC: 'dc',
     SERVICE: 'service',
     DOMAIN: 'domain',
@@ -30,6 +32,8 @@ export const DEFAULT_COLUMNS = [
 export const COLUMNS_TITLES = {
     [COLUMNS_NAMES.TITLE]: 'Cluster',
     [COLUMNS_NAMES.VERSIONS]: 'Versions',
+    [COLUMNS_NAMES.COMPUTE_NODES_VERSIONS]: 'Compute nodes versions',
+    [COLUMNS_NAMES.STORAGE_NODES_VERSIONS]: 'Storage nodes versions',
     [COLUMNS_NAMES.DC]: 'DC',
     [COLUMNS_NAMES.SERVICE]: 'Service',
     [COLUMNS_NAMES.DOMAIN]: 'Domain',

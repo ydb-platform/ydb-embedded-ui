@@ -36,9 +36,23 @@ export const prepareClustersData = (data: MetaClusters): PreparedCluster[] => {
                 ? prepareBackendFromBalancer(cluster.balancer)
                 : undefined;
 
+        // Split versions by role in a single pass
+        const {versions = []} = cluster;
+        const computeVersions = [];
+        const storageVersions = [];
+        for (const version of versions) {
+            if (version.role === 'compute') {
+                computeVersions.push(version);
+            } else if (version.role === 'storage') {
+                storageVersions.push(version);
+            }
+        }
+
         return {
             ...cluster,
-            preparedVersions: prepareClusterVersions(cluster.versions, versionsData),
+            preparedVersions: prepareClusterVersions(versions, versionsData),
+            preparedComputeVersions: prepareClusterVersions(computeVersions, versionsData),
+            preparedStorageVersions: prepareClusterVersions(storageVersions, versionsData),
             preparedBackend,
             settings: parsedSettings,
             clusterDomain,

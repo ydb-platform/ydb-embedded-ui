@@ -3,6 +3,8 @@ import type {PreparedVersion} from '../../../utils/versions/types';
 
 export interface PreparedCluster extends Omit<MetaExtendedClusterInfo, 'settings'> {
     preparedVersions: PreparedVersion[];
+    preparedComputeVersions: PreparedVersion[];
+    preparedStorageVersions: PreparedVersion[];
     preparedBackend?: string;
     settings?: MetaClusterSettings;
     clusterDomain?: string;
