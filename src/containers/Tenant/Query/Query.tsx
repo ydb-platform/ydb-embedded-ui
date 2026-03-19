@@ -7,6 +7,7 @@ import {changeUserInput} from '../../../store/reducers/query/query';
 import {TENANT_QUERY_TABS_ID} from '../../../store/reducers/tenant/constants';
 import {cn} from '../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
+import {useNavigationV2Enabled} from '../utils/useNavigationV2Enabled';
 
 import QueriesHistory from './QueriesHistory/QueriesHistory';
 import QueryEditor from './QueryEditor/QueryEditor';
@@ -23,6 +24,8 @@ interface QueryProps {
 
 export const Query = (props: QueryProps) => {
     const dispatch = useTypedDispatch();
+
+    const isV2NavigationEnabled = useNavigationV2Enabled();
 
     const {queryTab = TENANT_QUERY_TABS_ID.newQuery} = useTypedSelector((state) => state.tenant);
 
@@ -66,7 +69,7 @@ export const Query = (props: QueryProps) => {
     };
 
     return (
-        <div className={b()}>
+        <div className={b({'with-top-navigation': !isV2NavigationEnabled})}>
             {activeTab ? (
                 <Helmet>
                     <title>{activeTab.title}</title>
