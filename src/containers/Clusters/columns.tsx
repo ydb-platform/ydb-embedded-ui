@@ -378,7 +378,7 @@ function Versions({row, preparedVersions}: VersionsProps) {
         return EMPTY_CELL;
     }
     const clusterPath = calculateClusterPath(row, clusterTabsIds.versions);
-    const clusterPath = calculateClusterPath(row, clusterTabsIds.versions);
+
     return (
         <ExternalLink className={b('cluster-versions')} href={clusterPath}>
             <VersionsBar preparedVersions={preparedVersions} />
