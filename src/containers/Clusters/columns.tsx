@@ -20,6 +20,7 @@ import {uiFactory} from '../../uiFactory/uiFactory';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatNumber, formatStorageValuesToTb} from '../../utils/dataFormatters/dataFormatters';
 import {getCleanBalancerValue} from '../../utils/parseBalancer';
+import type {PreparedVersion} from '../../utils/versions/types';
 import {clusterTabsIds} from '../Cluster/utils';
 
 import {COLUMNS_NAMES, COLUMNS_TITLES} from './constants';
@@ -29,6 +30,50 @@ import {calculateClusterPath} from './utils';
 export const CLUSTERS_COLUMNS_WIDTH_LS_KEY = 'clustersTableColumnsWidth';
 
 const EMPTY_CELL = <span className={b('empty-cell')}>{EMPTY_DATA_PLACEHOLDER}</span>;
+
+/**
+ * Helper function to get the first version from a list of prepared versions
+ * Strips numeric prefixes (e.g., "1.2.3." -> "2.3.") and sorts the versions
+ * Used as sortAccessor for version columns
+ */
+export function getFirstVersion(preparedVersions: PreparedVersion[]): string | undefined {
+    const versions = preparedVersions
+        .map((item) => item.version.replace(/^\d+\./, ''))
+        .sort((v1, v2) => {
+            // Split versions into components (dots or dashes)
+            const parts1 = v1.split(/[.-]/);
+            const parts2 = v2.split(/[.-]/);
+
+            // Compare each component
+            const maxLength = Math.max(parts1.length, parts2.length);
+            for (let i = 0; i < maxLength; i++) {
+                const part1 = parts1[i] || '';
+                const part2 = parts2[i] || '';
+
+                // Check if both parts are purely numeric
+                const isNum1 = /^\d+$/.test(part1);
+                const isNum2 = /^\d+$/.test(part2);
+
+                // If both are purely numeric, compare numerically
+                if (isNum1 && isNum2) {
+                    const num1 = parseInt(part1, 10);
+                    const num2 = parseInt(part2, 10);
+                    if (num1 !== num2) {
+                        return num1 - num2;
+                    }
+                } else {
+                    // Otherwise, compare lexicographically
+                    const comparison = part1.localeCompare(part2);
+                    if (comparison !== 0) {
+                        return comparison;
+                    }
+                }
+            }
+            return 0;
+        });
+
+    return versions[0] || undefined;
+}
 
 interface ClustersColumnsParams {
     isEditClusterAvailable?: boolean;
@@ -158,23 +203,29 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
         header: COLUMNS_TITLES[COLUMNS_NAMES.VERSIONS],
         width: 400,
         defaultOrder: DataTable.DESCENDING,
-        sortAccessor: ({preparedVersions}) => {
-            const versions = preparedVersions
-                .map((item) => item.version.replace(/^[0-9]\+\./g, ''))
-                .sort((v1, v2) => v1.localeCompare(v2));
-
-            return versions[0] || undefined;
-        },
+        sortAccessor: ({preparedVersions}) => getFirstVersion(preparedVersions),
         render: ({row}) => {
-            const {versions = []} = row;
-
-            const hasErrors = !versions.length || versions.some((item) => !item.version);
-
-            if (hasErrors) {
-                return EMPTY_CELL;
-            }
-
-            return <Versions row={row} />;
+            return <Versions row={row} preparedVersions={row.preparedVersions} />;
+        },
+    },
+    {
+        name: COLUMNS_NAMES.COMPUTE_NODES_VERSIONS,
+        header: COLUMNS_TITLES[COLUMNS_NAMES.COMPUTE_NODES_VERSIONS],
+        width: 400,
+        defaultOrder: DataTable.DESCENDING,
+        sortAccessor: ({preparedComputeVersions}) => getFirstVersion(preparedComputeVersions),
+        render: ({row}) => {
+            return <Versions row={row} preparedVersions={row.preparedComputeVersions} />;
+        },
+    },
+    {
+        name: COLUMNS_NAMES.STORAGE_NODES_VERSIONS,
+        header: COLUMNS_TITLES[COLUMNS_NAMES.STORAGE_NODES_VERSIONS],
+        width: 400,
+        defaultOrder: DataTable.DESCENDING,
+        sortAccessor: ({preparedStorageVersions}) => getFirstVersion(preparedStorageVersions),
+        render: ({row}) => {
+            return <Versions row={row} preparedVersions={row.preparedStorageVersions} />;
         },
     },
     {
@@ -348,14 +399,17 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
 
 interface VersionsProps {
     row: PreparedCluster;
+    preparedVersions: PreparedVersion[];
 }
 
-function Versions({row}: VersionsProps) {
-    const {preparedVersions} = row;
-    if (!preparedVersions.length) {
-        return null;
+function Versions({row, preparedVersions}: VersionsProps) {
+    const hasErrors = !preparedVersions.length || preparedVersions.some((item) => !item.version);
+
+    if (hasErrors) {
+        return EMPTY_CELL;
     }
     const clusterPath = calculateClusterPath(row, clusterTabsIds.versions);
+
     return (
         <ExternalLink className={b('cluster-versions')} href={clusterPath}>
             <VersionsBar preparedVersions={preparedVersions} />

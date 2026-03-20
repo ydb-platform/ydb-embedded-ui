@@ -25,5 +25,20 @@
   "page_title": "Clusters",
 
   "edit-cluster": "Edit Cluster",
-  "remove-cluster": "Remove Cluster"
+  "remove-cluster": "Remove Cluster",
+
+  "field_cluster": "Cluster",
+  "field_versions": "Versions",
+  "field_compute-versions": "Compute versions",
+  "field_storage-versions": "Storage versions",
+  "field_dc": "DC",
+  "field_service": "Service",
+  "field_domain": "Domain",
+  "field_status": "Status",
+  "field_nodes": "Nodes",
+  "field_load": "Load",
+  "field_storage": "Storage",
+  "field_hosts": "Hosts",
+  "field_databases": "Databases",
+  "field_description": "Description"
 }

@@ -32,49 +32,78 @@ export const useSelectedColumns = <T extends {name: string}>(
     }, [defaultColumnsIds, savedColumns]);
 
     const orderedColumns = React.useMemo(() => {
-        const columnsSet = new Set(columns.map((col) => col.name));
-        const ordered: OrderedColumn[] = [];
-        const addedIds = new Set<string>();
+        // Use saved columns order if user has customized it, otherwise use columns definition order
+        const hasSavedOrder = savedColumns !== defaultColumnsIds && Array.isArray(savedColumns);
 
-        normalizedSavedColumns.forEach((savedCol) => {
-            if (columnsSet.has(savedCol.id)) {
-                ordered.push(savedCol);
-                addedIds.add(savedCol.id);
+        if (hasSavedOrder) {
+            // Preserve user's custom order from savedColumns
+            const columnsMap = new Map(columns.map((col) => [col.name, col]));
+            const result: OrderedColumn[] = [];
+            const processedIds = new Set<string>();
+
+            // First, add columns in saved order
+            for (const savedCol of normalizedSavedColumns) {
+                if (columnsMap.has(savedCol.id)) {
+                    result.push(savedCol);
+                    processedIds.add(savedCol.id);
+                }
             }
-        });
 
-        columns.forEach((column) => {
-            if (!addedIds.has(column.name)) {
-                ordered.push({id: column.name, selected: false});
-            }
-        });
-
-        return ordered;
-    }, [columns, normalizedSavedColumns]);
-
-    const columnsToSelect = React.useMemo(() => {
-        const preparedColumns = orderedColumns.reduce<(TableColumnSetupItem & {column: T})[]>(
-            (acc, {id, selected}) => {
-                const isRequired = requiredColumnsIds?.includes(id);
-                const column = columns.find((c) => c.name === id);
-                if (column) {
-                    acc.push({
-                        id,
-                        title: columnsTitles[id],
-                        selected: selected || isRequired,
-                        required: isRequired,
-                        sticky: isRequired ? 'start' : undefined,
-                        column,
+            // Then, append any new columns that weren't in saved data (in columns definition order)
+            for (const column of columns) {
+                if (!processedIds.has(column.name)) {
+                    result.push({
+                        id: column.name,
+                        selected: false,
                     });
                 }
-                return acc;
-            },
-            [],
-        );
+            }
+
+            return result;
+        }
+
+        // No saved order - use columns definition order with saved selection state
+        const savedColumnsMap = new Map(normalizedSavedColumns.map((col) => [col.id, col]));
+        return columns.map((column) => {
+            const savedCol = savedColumnsMap.get(column.name);
+            return {
+                id: column.name,
+                selected: savedCol?.selected ?? false,
+            };
+        });
+    }, [columns, normalizedSavedColumns, savedColumns, defaultColumnsIds]);
+
+    const columnsToSelect = React.useMemo(() => {
+        const preparedColumns = orderedColumns.reduce<
+            (TableColumnSetupItem & {column: T; originalIndex: number})[]
+        >((acc, {id, selected}, index) => {
+            const isRequired = requiredColumnsIds?.includes(id);
+            const column = columns.find((c) => c.name === id);
+            if (column) {
+                acc.push({
+                    id,
+                    title: columnsTitles[id],
+                    selected: Boolean(selected) || Boolean(isRequired),
+                    required: isRequired,
+                    sticky: isRequired ? 'start' : undefined,
+                    column,
+                    originalIndex: index,
+                });
+            }
+            return acc;
+        }, []);
         //required columns should be first to properly render columns settings
-        return preparedColumns.toSorted(
-            (a, b) => Number(Boolean(b.required)) - Number(Boolean(a.required)),
-        );
+        //preserve original order for non-required columns
+        const sorted = preparedColumns.toSorted((a, b) => {
+            const aReq = Number(Boolean(a.required));
+            const bReq = Number(Boolean(b.required));
+            if (aReq !== bReq) {
+                return bReq - aReq;
+            }
+            return a.originalIndex - b.originalIndex;
+        });
+        // Remove originalIndex from the public return value
+        return sorted.map(({originalIndex: _, ...item}) => item);
     }, [columns, columnsTitles, requiredColumnsIds, orderedColumns]);
 
     const columnsToShow = React.useMemo(() => {
