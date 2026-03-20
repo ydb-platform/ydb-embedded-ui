@@ -32,8 +32,8 @@ export const DEFAULT_COLUMNS = [
 export const COLUMNS_TITLES = {
     [COLUMNS_NAMES.TITLE]: 'Cluster',
     [COLUMNS_NAMES.VERSIONS]: 'Versions',
-    [COLUMNS_NAMES.COMPUTE_NODES_VERSIONS]: 'Compute nodes versions',
-    [COLUMNS_NAMES.STORAGE_NODES_VERSIONS]: 'Storage nodes versions',
+    [COLUMNS_NAMES.COMPUTE_NODES_VERSIONS]: 'Compute versions',
+    [COLUMNS_NAMES.STORAGE_NODES_VERSIONS]: 'Storage versions',
     [COLUMNS_NAMES.DC]: 'DC',
     [COLUMNS_NAMES.SERVICE]: 'Service',
     [COLUMNS_NAMES.DOMAIN]: 'Domain',
