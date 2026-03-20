@@ -36,10 +36,39 @@ const EMPTY_CELL = <span className={b('empty-cell')}>{EMPTY_DATA_PLACEHOLDER}</s
  * Strips numeric prefixes (e.g., "1.2.3." -> "2.3.") and sorts the versions
  * Used as sortAccessor for version columns
  */
-function getFirstVersion(preparedVersions: PreparedVersion[]): string | undefined {
+export function getFirstVersion(preparedVersions: PreparedVersion[]): string | undefined {
     const versions = preparedVersions
         .map((item) => item.version.replace(/^\d+\./, ''))
-        .sort((v1, v2) => v1.localeCompare(v2));
+        .sort((v1, v2) => {
+            // Split versions into components (dots or dashes)
+            const parts1 = v1.split(/[.-]/);
+            const parts2 = v2.split(/[.-]/);
+
+            // Compare each component
+            const maxLength = Math.max(parts1.length, parts2.length);
+            for (let i = 0; i < maxLength; i++) {
+                const part1 = parts1[i] || '';
+                const part2 = parts2[i] || '';
+
+                // Try to parse as numbers
+                const num1 = parseInt(part1, 10);
+                const num2 = parseInt(part2, 10);
+
+                // If both are valid numbers, compare numerically
+                if (!isNaN(num1) && !isNaN(num2)) {
+                    if (num1 !== num2) {
+                        return num1 - num2;
+                    }
+                } else {
+                    // Otherwise, compare lexicographically
+                    const comparison = part1.localeCompare(part2);
+                    if (comparison !== 0) {
+                        return comparison;
+                    }
+                }
+            }
+            return 0;
+        });
 
     return versions[0] || undefined;
 }
