@@ -32,9 +32,39 @@ export const useSelectedColumns = <T extends {name: string}>(
     }, [defaultColumnsIds, savedColumns]);
 
     const orderedColumns = React.useMemo(() => {
+        const columnsMap = new Map(columns.map((col) => [col.name, col]));
         const savedColumnsMap = new Map(normalizedSavedColumns.map((col) => [col.id, col]));
 
-        // Preserve the original columns order, but use saved selection state
+        // Use saved columns order if user has customized it, otherwise use columns definition order
+        const hasSavedOrder = savedColumns !== defaultColumnsIds && Array.isArray(savedColumns);
+
+        if (hasSavedOrder) {
+            // Preserve user's custom order from savedColumns
+            const result: OrderedColumn[] = [];
+            const processedIds = new Set<string>();
+
+            // First, add columns in saved order
+            for (const savedCol of normalizedSavedColumns) {
+                if (columnsMap.has(savedCol.id)) {
+                    result.push(savedCol);
+                    processedIds.add(savedCol.id);
+                }
+            }
+
+            // Then, append any new columns that weren't in saved data (in columns definition order)
+            for (const column of columns) {
+                if (!processedIds.has(column.name)) {
+                    result.push({
+                        id: column.name,
+                        selected: false,
+                    });
+                }
+            }
+
+            return result;
+        }
+
+        // No saved order - use columns definition order with saved selection state
         return columns.map((column) => {
             const savedCol = savedColumnsMap.get(column.name);
             return {
@@ -42,7 +72,7 @@ export const useSelectedColumns = <T extends {name: string}>(
                 selected: savedCol?.selected ?? false,
             };
         });
-    }, [columns, normalizedSavedColumns]);
+    }, [columns, normalizedSavedColumns, savedColumns, defaultColumnsIds]);
 
     const columnsToSelect = React.useMemo(() => {
         const preparedColumns = orderedColumns.reduce<

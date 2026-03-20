@@ -32,12 +32,13 @@ export const CLUSTERS_COLUMNS_WIDTH_LS_KEY = 'clustersTableColumnsWidth';
 const EMPTY_CELL = <span className={b('empty-cell')}>{EMPTY_DATA_PLACEHOLDER}</span>;
 
 /**
- * Helper function to get the first version from a sorted list of prepared versions
+ * Helper function to get the first version from a list of prepared versions
+ * Strips numeric prefixes (e.g., "1.2.3." -> "2.3.") and sorts the versions
  * Used as sortAccessor for version columns
  */
 function getFirstVersion(preparedVersions: PreparedVersion[]): string | undefined {
     const versions = preparedVersions
-        .map((item) => item.version.replace(/^[0-9]\+\./g, ''))
+        .map((item) => item.version.replace(/^\d+\./, ''))
         .sort((v1, v2) => v1.localeCompare(v2));
 
     return versions[0] || undefined;

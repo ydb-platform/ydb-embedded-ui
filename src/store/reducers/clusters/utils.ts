@@ -1,4 +1,4 @@
-import type {MetaClusters} from '../../../types/api/meta';
+import type {MetaClusterVersion, MetaClusters} from '../../../types/api/meta';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 import {prepareBackendFromBalancer} from '../../../utils/parseBalancer';
 import {
@@ -38,8 +38,8 @@ export const prepareClustersData = (data: MetaClusters): PreparedCluster[] => {
 
         // Split versions by role in a single pass
         const {versions = []} = cluster;
-        const computeVersions = [];
-        const storageVersions = [];
+        const computeVersions: MetaClusterVersion[] = [];
+        const storageVersions: MetaClusterVersion[] = [];
         for (const version of versions) {
             if (version.role === 'compute') {
                 computeVersions.push(version);

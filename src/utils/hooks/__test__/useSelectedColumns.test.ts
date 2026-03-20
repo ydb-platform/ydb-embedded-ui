@@ -36,12 +36,35 @@ describe('useSelectedColumns', () => {
         jest.clearAllMocks();
     });
 
-    test('preserves original column order in columnsToSelect', () => {
+    test('uses columns definition order when no custom order saved (default columns)', () => {
         const setSavedColumns = jest.fn();
+        // When savedColumns equals defaultColumnsIds, use columns definition order
+        useSetting.mockReturnValue([defaultColumnsIds, setSavedColumns]);
+
+        const {result} = renderHook(() =>
+            useSelectedColumns(columns, 'test-key', columnsTitles, defaultColumnsIds),
+        );
+
+        const {columnsToSelect} = result.current;
+
+        // Columns should be in original definition order: col1, col2, col3, col4, col5
+        expect(columnsToSelect.map((c) => c.id)).toEqual(['col1', 'col2', 'col3', 'col4', 'col5']);
+
+        // Check selection state from defaultColumnsIds
+        expect(columnsToSelect[0].selected).toBe(true); // col1
+        expect(columnsToSelect[1].selected).toBe(true); // col2
+        expect(columnsToSelect[2].selected).toBe(true); // col3
+        expect(columnsToSelect[3].selected).toBe(false); // col4
+        expect(columnsToSelect[4].selected).toBe(false); // col5
+    });
+
+    test('preserves user custom column order when saved', () => {
+        const setSavedColumns = jest.fn();
+        // User has customized order: col3, col1, col2, col4, col5
         useSetting.mockReturnValue([
             [
-                {id: 'col1', selected: true},
                 {id: 'col3', selected: true},
+                {id: 'col1', selected: true},
                 {id: 'col2', selected: false},
                 {id: 'col4', selected: false},
                 {id: 'col5', selected: false},
@@ -55,19 +78,47 @@ describe('useSelectedColumns', () => {
 
         const {columnsToSelect} = result.current;
 
-        // Columns should be in original order: col1, col2, col3, col4, col5
-        expect(columnsToSelect.map((c) => c.id)).toEqual(['col1', 'col2', 'col3', 'col4', 'col5']);
+        // Columns should preserve user's custom order: col3, col1, col2, col4, col5
+        expect(columnsToSelect.map((c) => c.id)).toEqual(['col3', 'col1', 'col2', 'col4', 'col5']);
 
         // Check selection state
-        expect(columnsToSelect[0].selected).toBe(true); // col1
-        expect(columnsToSelect[1].selected).toBe(false); // col2
-        expect(columnsToSelect[2].selected).toBe(true); // col3
+        expect(columnsToSelect[0].selected).toBe(true); // col3
+        expect(columnsToSelect[1].selected).toBe(true); // col1
+        expect(columnsToSelect[2].selected).toBe(false); // col2
         expect(columnsToSelect[3].selected).toBe(false); // col4
         expect(columnsToSelect[4].selected).toBe(false); // col5
     });
 
-    test('required columns are first, then others in original order', () => {
+    test('appends new columns to the end when user has custom order', () => {
         const setSavedColumns = jest.fn();
+        // User saved order with only col1, col2, col3
+        // col4 and col5 are new columns added later
+        useSetting.mockReturnValue([
+            [
+                {id: 'col2', selected: true},
+                {id: 'col1', selected: false},
+                {id: 'col3', selected: true},
+            ],
+            setSavedColumns,
+        ]);
+
+        const {result} = renderHook(() =>
+            useSelectedColumns(columns, 'test-key', columnsTitles, defaultColumnsIds),
+        );
+
+        const {columnsToSelect} = result.current;
+
+        // Should preserve saved order (col2, col1, col3) and append new columns (col4, col5)
+        expect(columnsToSelect.map((c) => c.id)).toEqual(['col2', 'col1', 'col3', 'col4', 'col5']);
+
+        // New columns should be unselected by default
+        expect(columnsToSelect[3].selected).toBe(false); // col4
+        expect(columnsToSelect[4].selected).toBe(false); // col5
+    });
+
+    test('required columns are first, then others in saved custom order', () => {
+        const setSavedColumns = jest.fn();
+        // User has custom order: col2, col4, col1, col3, col5
         useSetting.mockReturnValue([
             [
                 {id: 'col2', selected: true},
@@ -93,8 +144,8 @@ describe('useSelectedColumns', () => {
 
         const {columnsToSelect} = result.current;
 
-        // Required column (col3) should be first, then others in original order
-        expect(columnsToSelect.map((c) => c.id)).toEqual(['col3', 'col1', 'col2', 'col4', 'col5']);
+        // Required column (col3) should be first, then others in saved custom order
+        expect(columnsToSelect.map((c) => c.id)).toEqual(['col3', 'col2', 'col4', 'col1', 'col5']);
 
         // col3 should be required and selected
         expect(columnsToSelect[0].required).toBe(true);
@@ -129,12 +180,13 @@ describe('useSelectedColumns', () => {
         expect(columnsToSelect[1].required).toBe(true); // col4
     });
 
-    test('columnsToShow contains only selected columns', () => {
+    test('columnsToShow contains only selected columns in saved order', () => {
         const setSavedColumns = jest.fn();
+        // User has custom order: col3, col1, col2 (col3 and col1 selected)
         useSetting.mockReturnValue([
             [
-                {id: 'col1', selected: true},
                 {id: 'col3', selected: true},
+                {id: 'col1', selected: true},
                 {id: 'col2', selected: false},
             ],
             setSavedColumns,
@@ -146,8 +198,8 @@ describe('useSelectedColumns', () => {
 
         const {columnsToShow} = result.current;
 
-        // Only selected columns
-        expect(columnsToShow.map((c) => c.name)).toEqual(['col1', 'col3']);
+        // Only selected columns in saved order: col3, col1
+        expect(columnsToShow.map((c) => c.name)).toEqual(['col3', 'col1']);
     });
 
     test('setColumns callback updates saved columns', () => {
@@ -177,10 +229,10 @@ describe('useSelectedColumns', () => {
         ]);
     });
 
-    test('handles legacy string format for saved columns', () => {
+    test('handles legacy string format for saved columns with custom order', () => {
         const setSavedColumns = jest.fn();
-        // Legacy format: array of strings (all selected)
-        useSetting.mockReturnValue([['col1', 'col3'], setSavedColumns]);
+        // Legacy format: array of strings (all selected) with custom order: col3, col1
+        useSetting.mockReturnValue([['col3', 'col1'], setSavedColumns]);
 
         const {result} = renderHook(() =>
             useSelectedColumns(columns, 'test-key', columnsTitles, defaultColumnsIds),
@@ -188,10 +240,15 @@ describe('useSelectedColumns', () => {
 
         const {columnsToSelect} = result.current;
 
-        // Should parse legacy format correctly
-        expect(columnsToSelect[0].selected).toBe(true); // col1
-        expect(columnsToSelect[1].selected).toBe(false); // col2
-        expect(columnsToSelect[2].selected).toBe(true); // col3
+        // Should preserve legacy custom order: col3, col1, then append others
+        expect(columnsToSelect.map((c) => c.id)).toEqual(['col3', 'col1', 'col2', 'col4', 'col5']);
+
+        // Check selection state
+        expect(columnsToSelect[0].selected).toBe(true); // col3
+        expect(columnsToSelect[1].selected).toBe(true); // col1
+        expect(columnsToSelect[2].selected).toBe(false); // col2
+        expect(columnsToSelect[3].selected).toBe(false); // col4
+        expect(columnsToSelect[4].selected).toBe(false); // col5
     });
 
     test('uses default columns when saved columns is not an array', () => {
@@ -212,8 +269,9 @@ describe('useSelectedColumns', () => {
         expect(columnsToSelect[4].selected).toBe(false); // col5
     });
 
-    test('filters out saved columns that no longer exist', () => {
+    test('filters out saved columns that no longer exist and preserves order', () => {
         const setSavedColumns = jest.fn();
+        // User had custom order with a column that no longer exists
         useSetting.mockReturnValue([
             [
                 {id: 'col1', selected: true},
@@ -229,7 +287,15 @@ describe('useSelectedColumns', () => {
 
         const {columnsToSelect} = result.current;
 
-        // Should only include existing columns
+        // Should preserve saved order (col1, col2) and append new columns (col3, col4, col5)
+        // 'nonexistent' is filtered out
         expect(columnsToSelect.map((c) => c.id)).toEqual(['col1', 'col2', 'col3', 'col4', 'col5']);
+
+        // Check selection state
+        expect(columnsToSelect[0].selected).toBe(true); // col1
+        expect(columnsToSelect[1].selected).toBe(false); // col2
+        expect(columnsToSelect[2].selected).toBe(false); // col3 (new)
+        expect(columnsToSelect[3].selected).toBe(false); // col4 (new)
+        expect(columnsToSelect[4].selected).toBe(false); // col5 (new)
     });
 });
