@@ -32,13 +32,12 @@ export const useSelectedColumns = <T extends {name: string}>(
     }, [defaultColumnsIds, savedColumns]);
 
     const orderedColumns = React.useMemo(() => {
-        const columnsMap = new Map(columns.map((col) => [col.name, col]));
-
         // Use saved columns order if user has customized it, otherwise use columns definition order
         const hasSavedOrder = savedColumns !== defaultColumnsIds && Array.isArray(savedColumns);
 
         if (hasSavedOrder) {
             // Preserve user's custom order from savedColumns
+            const columnsMap = new Map(columns.map((col) => [col.name, col]));
             const result: OrderedColumn[] = [];
             const processedIds = new Set<string>();
 
