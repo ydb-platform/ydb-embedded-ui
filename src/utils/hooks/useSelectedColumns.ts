@@ -33,7 +33,6 @@ export const useSelectedColumns = <T extends {name: string}>(
 
     const orderedColumns = React.useMemo(() => {
         const columnsMap = new Map(columns.map((col) => [col.name, col]));
-        const savedColumnsMap = new Map(normalizedSavedColumns.map((col) => [col.id, col]));
 
         // Use saved columns order if user has customized it, otherwise use columns definition order
         const hasSavedOrder = savedColumns !== defaultColumnsIds && Array.isArray(savedColumns);
@@ -65,6 +64,7 @@ export const useSelectedColumns = <T extends {name: string}>(
         }
 
         // No saved order - use columns definition order with saved selection state
+        const savedColumnsMap = new Map(normalizedSavedColumns.map((col) => [col.id, col]));
         return columns.map((column) => {
             const savedCol = savedColumnsMap.get(column.name);
             return {
@@ -95,7 +95,7 @@ export const useSelectedColumns = <T extends {name: string}>(
         }, []);
         //required columns should be first to properly render columns settings
         //preserve original order for non-required columns
-        return preparedColumns.toSorted((a, b) => {
+        const sorted = preparedColumns.toSorted((a, b) => {
             const aReq = Number(Boolean(a.required));
             const bReq = Number(Boolean(b.required));
             if (aReq !== bReq) {
@@ -103,6 +103,8 @@ export const useSelectedColumns = <T extends {name: string}>(
             }
             return a.originalIndex - b.originalIndex;
         });
+        // Remove originalIndex from the public return value
+        return sorted.map(({originalIndex: _, ...item}) => item);
     }, [columns, columnsTitles, requiredColumnsIds, orderedColumns]);
 
     const columnsToShow = React.useMemo(() => {
