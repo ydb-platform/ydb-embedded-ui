@@ -372,13 +372,12 @@ interface VersionsProps {
 }
 
 function Versions({row, preparedVersions}: VersionsProps) {
-    const {versions = []} = row;
+    const hasErrors = !preparedVersions.length || preparedVersions.some((item) => !item.version);
 
-    const hasErrors = !versions.length || versions.some((item) => !item.version);
-
-    if (!preparedVersions.length || hasErrors) {
+    if (hasErrors) {
         return EMPTY_CELL;
     }
+    const clusterPath = calculateClusterPath(row, clusterTabsIds.versions);
     const clusterPath = calculateClusterPath(row, clusterTabsIds.versions);
     return (
         <ExternalLink className={b('cluster-versions')} href={clusterPath}>
