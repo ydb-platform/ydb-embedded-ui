@@ -174,14 +174,6 @@ const CLUSTERS_COLUMNS: Column<PreparedCluster>[] = [
         defaultOrder: DataTable.DESCENDING,
         sortAccessor: ({preparedVersions}) => getFirstVersion(preparedVersions),
         render: ({row}) => {
-            const {versions = []} = row;
-
-            const hasErrors = !versions.length || versions.some((item) => !item.version);
-
-            if (hasErrors) {
-                return EMPTY_CELL;
-            }
-
             return <Versions row={row} preparedVersions={row.preparedVersions} />;
         },
     },
@@ -380,7 +372,11 @@ interface VersionsProps {
 }
 
 function Versions({row, preparedVersions}: VersionsProps) {
-    if (!preparedVersions.length) {
+    const {versions = []} = row;
+
+    const hasErrors = !versions.length || versions.some((item) => !item.version);
+
+    if (!preparedVersions.length || hasErrors) {
         return EMPTY_CELL;
     }
     const clusterPath = calculateClusterPath(row, clusterTabsIds.versions);
