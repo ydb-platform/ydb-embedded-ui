@@ -50,12 +50,14 @@ export function getFirstVersion(preparedVersions: PreparedVersion[]): string | u
                 const part1 = parts1[i] || '';
                 const part2 = parts2[i] || '';
 
-                // Try to parse as numbers
-                const num1 = parseInt(part1, 10);
-                const num2 = parseInt(part2, 10);
+                // Check if both parts are purely numeric
+                const isNum1 = /^\d+$/.test(part1);
+                const isNum2 = /^\d+$/.test(part2);
 
-                // If both are valid numbers, compare numerically
-                if (!isNaN(num1) && !isNaN(num2)) {
+                // If both are purely numeric, compare numerically
+                if (isNum1 && isNum2) {
+                    const num1 = parseInt(part1, 10);
+                    const num2 = parseInt(part2, 10);
                     if (num1 !== num2) {
                         return num1 - num2;
                     }

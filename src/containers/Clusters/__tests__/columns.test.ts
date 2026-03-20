@@ -125,4 +125,62 @@ describe('getFirstVersion', () => {
         // Numeric 10 should come before text (alpha, beta)
         expect(result).toBe('3.1.10');
     });
+
+    it('should handle versions with numeric prefixes in text (edge case)', () => {
+        const preparedVersions: PreparedVersion[] = [
+            {version: '24.3.1.10a', count: 1},
+            {version: '24.3.1.10b', count: 1},
+            {version: '24.3.1.10', count: 1},
+        ];
+
+        const result = getFirstVersion(preparedVersions);
+
+        // After stripping: 3.1.10, 3.1.10a, 3.1.10b
+        // With regex check, '10' is purely numeric, '10a' and '10b' are not
+        // Numeric should come first, then lexicographic: 10 < 10a < 10b
+        expect(result).toBe('3.1.10');
+    });
+
+    it('should distinguish between versions with same numeric prefix but different suffixes', () => {
+        const preparedVersions: PreparedVersion[] = [
+            {version: '24.3.1.10rc1', count: 1},
+            {version: '24.3.1.10rc2', count: 1},
+            {version: '24.3.1.10', count: 1},
+        ];
+
+        const result = getFirstVersion(preparedVersions);
+
+        // After stripping: 3.1.10, 3.1.10rc1, 3.1.10rc2
+        // '10' is purely numeric, '10rc1' and '10rc2' are not
+        // Should return the purely numeric version first
+        expect(result).toBe('3.1.10');
+    });
+
+    it('should handle git commit hash versions', () => {
+        const preparedVersions: PreparedVersion[] = [
+            {version: 'cuttablethistory.8a4298b', count: 1},
+            {version: 'group-status-2dc.8b9e273', count: 1},
+            {version: 'fix-disk-space-coding.fa93a44', count: 1},
+        ];
+
+        const result = getFirstVersion(preparedVersions);
+
+        // After stripping first component (none starts with digit, so no stripping):
+        // Lexicographic sort: cuttablethistory < fix-disk-space-coding < group-status-2dc
+        expect(result).toBe('cuttablethistory.8a4298b');
+    });
+
+    it('should handle mixed standard versions and git hash versions', () => {
+        const preparedVersions: PreparedVersion[] = [
+            {version: '24.3.1.46', count: 1},
+            {version: 'fix-disk-space.fa93a44', count: 1},
+            {version: '24.3.1.9', count: 1},
+        ];
+
+        const result = getFirstVersion(preparedVersions);
+
+        // After stripping: 3.1.9, 3.1.46, fix-disk-space.fa93a44
+        // Numeric components come first: 3 < fix (lexicographically)
+        expect(result).toBe('3.1.9');
+    });
 });
