@@ -18,7 +18,7 @@ import {RENAME_QUERY_DIALOG} from './RenameQueryDialog';
 
 import './EditorTabs.scss';
 
-const b = cn('editor-tabs');
+const b = cn('ydb-editor-tabs');
 
 export function EditorTabs() {
     const {

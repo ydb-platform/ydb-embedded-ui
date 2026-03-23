@@ -11,7 +11,7 @@ import './RenameQueryDialog.scss';
 
 export const RENAME_QUERY_DIALOG = 'rename-query-dialog';
 
-const b = cn('rename-query-dialog');
+const b = cn('ydb-rename-query-dialog');
 
 export interface RenameQueryDialogNiceModalProps {
     title: string;

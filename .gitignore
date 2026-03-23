@@ -9,6 +9,9 @@
 /coverage
 playwright-artifacts
 
+# ai-workflow
+plans/
+
 # production
 /build
 /dist

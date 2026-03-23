@@ -6,7 +6,7 @@ export class RenameQueryDialog {
     private dialog: Locator;
 
     constructor(page: Page) {
-        this.dialog = page.locator('.rename-query-dialog');
+        this.dialog = page.locator('.ydb-rename-query-dialog');
     }
 
     async isVisible() {

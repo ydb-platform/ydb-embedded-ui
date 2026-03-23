@@ -1,4 +1,4 @@
-.tab-execution-status-indicator {
+.ydb-tab-execution-status-indicator {
     position: absolute;
     z-index: 1;
     right: 2px;
@@ -36,11 +36,11 @@
         );
         background-size: 200% 100%;
 
-        animation: tab-execution-status-indicator-progress-sweep 1.2s linear infinite;
+        animation: ydb-tab-execution-status-indicator-progress-sweep 1.2s linear infinite;
     }
 }
 
-@keyframes tab-execution-status-indicator-progress-sweep {
+@keyframes ydb-tab-execution-status-indicator-progress-sweep {
     0% {
         background-position: 200% 50%;
     }
@@ -50,7 +50,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .tab-execution-status-indicator_in_progress {
+    .ydb-tab-execution-status-indicator_in_progress {
         background-position: 0% 50%;
         background-size: 100% 100%;
 

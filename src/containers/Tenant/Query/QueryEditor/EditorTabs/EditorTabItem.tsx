@@ -15,7 +15,7 @@ import {TabExecutionStatusIndicator} from './TabExecutionStatusIndicator';
 
 import './EditorTabItem.scss';
 
-const b = cn('editor-tab-item');
+const b = cn('ydb-editor-tab-item');
 
 function getTabExecutionStatus(tab: QueryTabState): TabExecutionStatus | undefined {
     const result = tab.result;

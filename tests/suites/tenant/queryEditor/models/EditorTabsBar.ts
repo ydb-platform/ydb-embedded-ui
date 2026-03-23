@@ -18,7 +18,7 @@ export class EditorTabsBar {
 
     constructor(page: Page) {
         this.page = page;
-        this.root = page.locator('.editor-tabs');
+        this.root = page.locator('.ydb-editor-tabs');
         this.tabs = this.root.locator('[role="tab"]');
         this.addTabButton = this.root.getByRole('button', {name: 'New editor tab'});
         this.menu = page.locator('.g-dropdown-menu__menu');
@@ -46,13 +46,13 @@ export class EditorTabsBar {
 
     async getTabTitles() {
         await this.isVisible();
-        return this.root.locator('.editor-tab-item__tab-title').allInnerTexts();
+        return this.root.locator('.ydb-editor-tab-item__tab-title').allInnerTexts();
     }
 
     async getActiveTabTitle() {
         const activeTab = this.root.locator('[role="tab"][aria-selected="true"]');
         await activeTab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return activeTab.locator('.editor-tab-item__tab-title').innerText();
+        return activeTab.locator('.ydb-editor-tab-item__tab-title').innerText();
     }
 
     async selectTab(title: string) {
@@ -69,14 +69,14 @@ export class EditorTabsBar {
     async closeTab(title: string) {
         const tab = this.getTabByTitle(title);
         await this.clickTabMainArea(tab);
-        await tab.locator('.editor-tab-item__tab-action_close').click();
+        await tab.locator('.ydb-editor-tab-item__tab-action_close').click();
     }
 
     async openTabMenu(title: string) {
         const tab = this.getTabByTitle(title);
         await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await tab.hover();
-        await tab.locator('.editor-tab-item__tab-menu-switcher').click();
+        await tab.locator('.ydb-editor-tab-item__tab-menu-switcher').click();
         await this.menu.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
     }
 
@@ -129,21 +129,21 @@ export class EditorTabsBar {
     async closeTabById(tabId: string) {
         const tab = this.getTabById(tabId);
         await this.clickTabMainArea(tab);
-        await tab.locator('.editor-tab-item__tab-action_close').click();
+        await tab.locator('.ydb-editor-tab-item__tab-action_close').click();
     }
 
     async openTabMenuById(tabId: string) {
         const tab = this.getTabById(tabId);
         await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await tab.hover();
-        await tab.locator('.editor-tab-item__tab-menu-switcher').click();
+        await tab.locator('.ydb-editor-tab-item__tab-menu-switcher').click();
         await this.menu.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
     }
 
     async getTabTitleById(tabId: string): Promise<string> {
         const tab = this.getTabById(tabId);
         await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        return tab.locator('.editor-tab-item__tab-title').innerText();
+        return tab.locator('.ydb-editor-tab-item__tab-title').innerText();
     }
 
     private getTabById(tabId: string): Locator {
@@ -174,7 +174,7 @@ export class EditorTabsBar {
 
     private getTabTitleLocator(title: string) {
         return this.root
-            .locator('.editor-tab-item__tab-title')
+            .locator('.ydb-editor-tab-item__tab-title')
             .filter({
                 hasText: new RegExp(`^${escapeRegExp(title)}$`),
             })
