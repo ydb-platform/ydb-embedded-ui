@@ -11,10 +11,13 @@ import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
 import {useMultiTabQueryEditorEnabled} from '../../../../store/reducers/capabilities/hooks';
-import {setIsDirty, setQueryTabContent} from '../../../../store/reducers/query/query';
+import {
+    applySavedQueryToActiveTab,
+    setIsDirty,
+    setQueryTabContent,
+} from '../../../../store/reducers/query/query';
 import {
     selectSavedQueriesFilter,
-    setQueryNameToEdit,
     setSavedQueriesFilter,
 } from '../../../../store/reducers/queryActions/queryActions';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
@@ -64,11 +67,7 @@ const DeleteDialog = ({visible, queryName, onCancelClick, onConfirmClick}: Delet
 
 const SAVED_QUERIES_COLUMNS_WIDTH_LS_KEY = 'savedQueriesTableColumnsWidth';
 
-interface SavedQueriesProps {
-    changeUserInput: (value: {input: string}) => void;
-}
-
-export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
+export const SavedQueries = () => {
     const {filteredSavedQueries, deleteSavedQuery} = useSavedQueries();
     const dispatch = useTypedDispatch();
     const filter = useTypedSelector(selectSavedQueriesFilter);
@@ -106,13 +105,17 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
                 dispatch(setIsDirty(false));
                 dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
             } else {
-                changeUserInput({input: queryText});
-                dispatch(setIsDirty(false));
-                dispatch(setQueryNameToEdit(queryName));
+                dispatch(
+                    applySavedQueryToActiveTab({
+                        title: queryName,
+                        input: queryText,
+                        savedQueryName: queryName,
+                    }),
+                );
                 dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
             }
         },
-        [changeUserInput, dispatch, isMultiTabEnabled],
+        [dispatch, isMultiTabEnabled],
     );
 
     const onQueryClick = useChangeInputWithConfirmation(applyQueryClick, isMultiTabEnabled);

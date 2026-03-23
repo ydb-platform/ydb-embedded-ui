@@ -36,7 +36,7 @@ export function EditorTabs() {
     } = useQueryTabsActions();
 
     const {savedQueries} = useSavedQueries();
-    const handleSaveQuery = useSaveQueryWithTabSync();
+    const createSaveQueryHandler = useSaveQueryWithTabSync();
 
     const handleSaveQueryAs = React.useCallback(
         (tabId: string) => {
@@ -47,12 +47,12 @@ export function EditorTabs() {
 
             NiceModal.show(SAVE_QUERY_DIALOG, {
                 savedQueries,
-                onSaveQuery: handleSaveQuery,
+                onSaveQuery: createSaveQueryHandler(tabId),
                 queryBody,
                 defaultQueryName,
             });
         },
-        [handleSaveQuery, savedQueries, tabsById, tabsOrder.length],
+        [createSaveQueryHandler, savedQueries, tabsById, tabsOrder.length],
     );
 
     const handleRenameTab = React.useCallback(

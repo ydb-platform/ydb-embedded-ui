@@ -4,21 +4,15 @@ import NiceModal from '@ebay/nice-modal-react';
 import type {ButtonButtonProps, ButtonProps} from '@gravity-ui/uikit';
 import {Button, Dialog, DropdownMenu, TextInput} from '@gravity-ui/uikit';
 
-import {useMultiTabQueryEditorEnabled} from '../../../../store/reducers/capabilities/hooks';
 import {
-    renameQueryTab,
     selectActiveTab,
     selectActiveTabSavedQueryName,
     selectUserInput,
-    setActiveTabSavedQueryName,
     setIsDirty,
+    setQueryTabSavedQueryName,
+    syncSavedQueryTab,
 } from '../../../../store/reducers/query/query';
-import {
-    clearQueryNameToEdit,
-    selectQueryName,
-    setQueryAction,
-    setQueryNameToEdit,
-} from '../../../../store/reducers/queryActions/queryActions';
+import {setQueryAction} from '../../../../store/reducers/queryActions/queryActions';
 import type {SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
@@ -41,44 +35,45 @@ export function useSaveQueryWithTabSync() {
     const dispatch = useTypedDispatch();
     const {saveQuery} = useSavedQueries();
     const activeTab = useTypedSelector(selectActiveTab);
-    const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
 
     return React.useCallback(
-        (queryName: string | null, queryBody: string) => {
-            saveQuery(queryName, queryBody);
+        (tabId?: string) => {
+            const targetTabId = tabId ?? activeTab?.id;
 
-            if (activeTab && queryName) {
-                dispatch(renameQueryTab({tabId: activeTab.id, title: queryName}));
-                if (isMultiTabEnabled) {
-                    dispatch(setActiveTabSavedQueryName(queryName));
-                } else {
-                    dispatch(setQueryNameToEdit(queryName));
+            return (queryName: string | null, queryBody: string) => {
+                saveQuery(queryName, queryBody);
+
+                if (targetTabId && queryName) {
+                    dispatch(
+                        syncSavedQueryTab({
+                            tabId: targetTabId,
+                            title: queryName,
+                            savedQueryName: queryName,
+                        }),
+                    );
                 }
-            }
+            };
         },
-        [activeTab, dispatch, isMultiTabEnabled, saveQuery],
+        [activeTab, dispatch, saveQuery],
     );
 }
 
 function useSaveQueryHandler(dialogProps: SaveQueryDialogCommonProps) {
     const {savedQueries} = useSavedQueries();
     const activeTab = useTypedSelector(selectActiveTab);
-    const dispatch = useTypedDispatch();
-    const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
-    const handleSaveQuery = useSaveQueryWithTabSync();
+    const createSaveQueryHandler = useSaveQueryWithTabSync();
 
     const onSaveQueryClick = React.useCallback(() => {
         const computedDefaultQueryName = getTabTitleForSave(activeTab);
+        const handleSaveQuery = createSaveQueryHandler(activeTab?.id);
+
         NiceModal.show(SAVE_QUERY_DIALOG, {
             ...dialogProps,
             defaultQueryName: dialogProps.defaultQueryName ?? computedDefaultQueryName,
             savedQueries,
             onSaveQuery: handleSaveQuery,
         });
-        if (!isMultiTabEnabled) {
-            dispatch(clearQueryNameToEdit());
-        }
-    }, [activeTab, dialogProps, dispatch, handleSaveQuery, isMultiTabEnabled, savedQueries]);
+    }, [activeTab, createSaveQueryHandler, dialogProps, savedQueries]);
 
     return onSaveQueryClick;
 }
@@ -99,23 +94,23 @@ export function SaveQueryButton({dialogProps, children, ...buttonProps}: SaveQue
 
 export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
     const dispatch = useTypedDispatch();
-    const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
+    const activeTab = useTypedSelector(selectActiveTab);
     const activeTabSavedQueryName = useTypedSelector(selectActiveTabSavedQueryName);
-    const queryNameToEdit = useTypedSelector(selectQueryName);
     const currentInput = useTypedSelector(selectUserInput);
     const onSaveQueryClick = useSaveQueryHandler({queryBody: currentInput});
-    const currentSavedQueryName = isMultiTabEnabled ? activeTabSavedQueryName : queryNameToEdit;
+    const currentSavedQueryName = activeTabSavedQueryName;
 
     const {saveQuery} = useSavedQueries();
 
     const onEditQueryClick = () => {
         saveQuery(currentSavedQueryName ?? null, currentInput);
-        if (currentSavedQueryName) {
-            if (isMultiTabEnabled) {
-                dispatch(setActiveTabSavedQueryName(currentSavedQueryName));
-            } else {
-                dispatch(setQueryNameToEdit(currentSavedQueryName));
-            }
+        if (activeTab && currentSavedQueryName) {
+            dispatch(
+                setQueryTabSavedQueryName({
+                    tabId: activeTab.id,
+                    savedQueryName: currentSavedQueryName,
+                }),
+            );
         }
         dispatch(setIsDirty(false));
     };

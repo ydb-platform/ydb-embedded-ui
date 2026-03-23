@@ -26,6 +26,7 @@ export enum ButtonNames {
 }
 
 export enum EditSavedSubMenuNames {
+    EditExisting = 'Edit existing',
     SaveAsNew = 'Save as new',
 }
 
@@ -188,6 +189,15 @@ export class QueryEditor {
         const menuItem = this.dropdownMenu
             .getByRole('menuitem')
             .filter({hasText: EditSavedSubMenuNames.SaveAsNew});
+
+        await menuItem.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await menuItem.click();
+    }
+
+    async clickEditExistingButton() {
+        const menuItem = this.dropdownMenu
+            .getByRole('menuitem')
+            .filter({hasText: EditSavedSubMenuNames.EditExisting});
 
         await menuItem.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
         await menuItem.click();

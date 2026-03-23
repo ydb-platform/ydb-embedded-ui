@@ -156,7 +156,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
 
     const activeTab = useTypedSelector(selectActiveTab);
     const {savedQueries} = useSavedQueries();
-    const handleSaveQuery = useSaveQueryWithTabSync();
+    const createSaveQueryHandler = useSaveQueryWithTabSync();
 
     const handleGlobalRenameTab = React.useCallback(() => {
         const tabIdToRename = tabsActiveTabId;
@@ -181,11 +181,11 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
 
         NiceModal.show(SAVE_QUERY_DIALOG, {
             savedQueries,
-            onSaveQuery: handleSaveQuery,
+            onSaveQuery: createSaveQueryHandler(activeTab?.id),
             queryBody: activeTab?.input ?? '',
             defaultQueryName,
         });
-    }, [activeTab, handleSaveQuery, savedQueries]);
+    }, [activeTab, createSaveQueryHandler, savedQueries]);
 
     useEditorTabsGlobalHotkeys(isMultiTabQueryEditorEnabled, {
         handleNewTab: handleNewTabClick,

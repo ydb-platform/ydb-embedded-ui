@@ -79,7 +79,7 @@ export function YqlEditor({
     const activeTab = useTypedSelector(selectActiveTab);
     const pendingSnippet = useTypedSelector(selectActiveTabPendingSnippet);
     const {savedQueries} = useSavedQueries();
-    const handleSaveQuery = useSaveQueryWithTabSync();
+    const createSaveQueryHandler = useSaveQueryWithTabSync();
     const {
         activeTabId,
         tabsOrder,
@@ -214,7 +214,7 @@ export function YqlEditor({
 
         NiceModal.show(SAVE_QUERY_DIALOG, {
             savedQueries,
-            onSaveQuery: handleSaveQuery,
+            onSaveQuery: createSaveQueryHandler(activeTab?.id),
             queryBody: input,
             defaultQueryName,
         });

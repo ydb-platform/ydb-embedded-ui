@@ -434,6 +434,30 @@ const slice = createSlice({
             persistTabsStateToSessionStorage(state);
             persistDirtyStateToSessionStorage(state);
         },
+        applySavedQueryToActiveTab: (
+            state,
+            action: PayloadAction<{title: string; input: string; savedQueryName: string}>,
+        ) => {
+            const activeTab = getActiveTab(state);
+            if (!activeTab) {
+                return;
+            }
+
+            activeTab.title = action.payload.title;
+            activeTab.isTitleUserDefined = false;
+            activeTab.isTouched = undefined;
+            activeTab.input = action.payload.input;
+            activeTab.savedInput = action.payload.input;
+            activeTab.isDirty = false;
+            activeTab.result = undefined;
+            activeTab.lastExecutedQueryText = undefined;
+            activeTab.pendingSnippet = undefined;
+            activeTab.savedQueryName = action.payload.savedQueryName;
+            activeTab.updatedAt = Date.now();
+
+            persistTabsStateToSessionStorage(state);
+            persistDirtyStateToSessionStorage(state);
+        },
         closeQueryTab: (state, action: PayloadAction<{tabId: string}>) => {
             const {tabId} = action.payload;
 
@@ -486,6 +510,35 @@ const slice = createSlice({
             tab.updatedAt = Date.now();
             persistTabsStateToSessionStorage(state);
         },
+        syncSavedQueryTab: (
+            state,
+            action: PayloadAction<{tabId: string; title: string; savedQueryName: string}>,
+        ) => {
+            const {tabId, title, savedQueryName} = action.payload;
+            const tab = state.tabsById[tabId];
+            if (!tab) {
+                return;
+            }
+
+            tab.title = title;
+            tab.savedQueryName = savedQueryName;
+            tab.isTitleUserDefined = true;
+            tab.isTouched = true;
+            tab.updatedAt = Date.now();
+            persistTabsStateToSessionStorage(state);
+        },
+        setQueryTabSavedQueryName: (
+            state,
+            action: PayloadAction<{tabId: string; savedQueryName: string | undefined}>,
+        ) => {
+            const tab = state.tabsById[action.payload.tabId];
+            if (!tab) {
+                return;
+            }
+
+            tab.savedQueryName = action.payload.savedQueryName;
+            persistTabsStateToSessionStorage(state);
+        },
         setActiveQueryTab: (state, action: PayloadAction<{tabId: string}>) => {
             const {tabId} = action.payload;
             if (!state.tabsById[tabId]) {
@@ -493,15 +546,6 @@ const slice = createSlice({
             }
 
             state.activeTabId = tabId;
-            persistTabsStateToSessionStorage(state);
-        },
-        setActiveTabSavedQueryName: (state, action: PayloadAction<string | undefined>) => {
-            const tab = getActiveTab(state);
-            if (!tab) {
-                return;
-            }
-
-            tab.savedQueryName = action.payload;
             persistTabsStateToSessionStorage(state);
         },
         clearPendingSnippet: (state, action: PayloadAction<{tabId: string}>) => {
@@ -574,10 +618,12 @@ export const {
     setLastExecutedQueryText,
     addQueryTab,
     setQueryTabContent,
+    applySavedQueryToActiveTab,
     closeQueryTab,
     renameQueryTab,
+    syncSavedQueryTab,
+    setQueryTabSavedQueryName,
     setActiveQueryTab,
-    setActiveTabSavedQueryName,
     clearPendingSnippet,
     setTenantPath,
     setQueryHistoryFilter,

@@ -9,6 +9,7 @@ import {
     TemplateCategory,
 } from '../queryEditor/models/NewSqlDropdownMenu';
 import {QueryTabs} from '../queryEditor/models/QueryEditor';
+import {RenameQueryDialog} from '../queryEditor/models/RenameQueryDialog';
 
 test.describe('Saved Queries', () => {
     let tenantPage: TenantPage;
@@ -75,6 +76,186 @@ test.describe('Saved Queries', () => {
         await expect
             .poll(() => tenantPage.queryEditor.getEditorContent(), {timeout: 5000})
             .toBe(testQuery);
+    });
+
+    test('Single-tab opening a saved query updates save action state from tab data', async () => {
+        await tenantPage.gotoQueryEditor({
+            schema: dsVslotsSchema,
+            database,
+            mode: QueryEditorMode.SingleTab,
+        });
+
+        const testQuery = 'SELECT 13 AS single_tab_saved_query;';
+        const queryName = await tenantPage.saveQuery(testQuery, `Single Tab Saved ${uuidv4()}`);
+
+        await tenantPage.openSavedQuery(queryName);
+
+        await expect(tenantPage.queryEditor.isEditButtonVisible()).resolves.toBe(true);
+        await expect(tenantPage.queryEditor.isSaveButtonVisible(1000)).resolves.toBe(false);
+        await expect
+            .poll(() => tenantPage.queryEditor.getEditorContent(), {timeout: 5000})
+            .toBe(testQuery);
+    });
+
+    test('Single-tab edit existing keeps saved query binding on the active tab', async () => {
+        await tenantPage.gotoQueryEditor({
+            schema: dsVslotsSchema,
+            database,
+            mode: QueryEditorMode.SingleTab,
+        });
+
+        const originalQuery = 'SELECT 14 AS single_tab_edit_existing;';
+        const updatedQuery = 'SELECT 15 AS single_tab_edit_existing_updated;';
+        const queryName = await tenantPage.saveQuery(originalQuery, `Single Tab Edit ${uuidv4()}`);
+
+        await tenantPage.openSavedQuery(queryName);
+        await tenantPage.queryEditor.setQuery(updatedQuery);
+
+        await tenantPage.queryEditor.clickEditButton();
+        await tenantPage.queryEditor.clickEditExistingButton();
+
+        await expect(tenantPage.queryEditor.isEditButtonVisible()).resolves.toBe(true);
+        await expect(tenantPage.queryEditor.isSaveButtonVisible(1000)).resolves.toBe(false);
+        await expect
+            .poll(() => tenantPage.queryEditor.getEditorContent(), {timeout: 5000})
+            .toBe(updatedQuery);
+
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.Saved);
+        await tenantPage.savedQueriesTable.isVisible();
+
+        const row = await tenantPage.savedQueriesTable.getRowByName(queryName);
+        expect(row).not.toBe(null);
+        expect(row?.query.trim()).toBe(updatedQuery.trim());
+    });
+
+    test('Single-tab save as new creates a new saved query and keeps the editor bound to it', async () => {
+        await tenantPage.gotoQueryEditor({
+            schema: dsVslotsSchema,
+            database,
+            mode: QueryEditorMode.SingleTab,
+        });
+
+        const originalQuery = 'SELECT 16 AS single_tab_save_as_new_original;';
+        const nextQuery = 'SELECT 17 AS single_tab_save_as_new_copy;';
+        const originalQueryName = await tenantPage.saveQuery(
+            originalQuery,
+            `Single Tab Original ${uuidv4()}`,
+        );
+        const nextQueryName = `Single Tab Copy ${uuidv4()}`;
+
+        await tenantPage.openSavedQuery(originalQueryName);
+        await tenantPage.queryEditor.setQuery(nextQuery);
+
+        await tenantPage.queryEditor.clickEditButton();
+        await tenantPage.queryEditor.clickSaveAsNewEditButton();
+        await tenantPage.saveQueryDialog.setQueryName(nextQueryName);
+        await tenantPage.saveQueryDialog.clickSave();
+
+        await expect(tenantPage.queryEditor.isEditButtonVisible()).resolves.toBe(true);
+        await expect(tenantPage.queryEditor.isSaveButtonVisible(1000)).resolves.toBe(false);
+
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.Saved);
+        await tenantPage.savedQueriesTable.isVisible();
+
+        const originalRow = await tenantPage.savedQueriesTable.getRowByName(originalQueryName);
+        const nextRow = await tenantPage.savedQueriesTable.getRowByName(nextQueryName);
+
+        expect(originalRow).not.toBe(null);
+        expect(nextRow).not.toBe(null);
+        expect(originalRow?.query.trim()).toBe(originalQuery.trim());
+        expect(nextRow?.query.trim()).toBe(nextQuery.trim());
+
+        await tenantPage.openSavedQuery(nextQueryName);
+        await expect(tenantPage.queryEditor.isEditButtonVisible()).resolves.toBe(true);
+        await expect
+            .poll(() => tenantPage.queryEditor.getEditorContent(), {timeout: 5000})
+            .toBe(nextQuery);
+    });
+
+    test('Save As from a non-active tab updates the correct tab', async () => {
+        const firstQuery = 'SELECT 11 AS first_tab_query;';
+        const secondQuery = 'SELECT 12 AS second_tab_query;';
+        const queryName = `Saved From Inactive Tab ${uuidv4()}`;
+
+        await tenantPage.queryEditor.setQuery(firstQuery);
+        const firstTabId = await tenantPage.queryEditor.editorTabs.getActiveTabId();
+
+        await tenantPage.queryEditor.editorTabs.clickAddTab();
+        await expect(tenantPage.queryEditor.editorTabs.waitForTabCount(2)).resolves.toBe(true);
+
+        const secondTabId = await tenantPage.queryEditor.editorTabs.getActiveTabId();
+        await tenantPage.queryEditor.setQuery(secondQuery);
+
+        expect(firstTabId).not.toBe(null);
+        expect(secondTabId).not.toBe(null);
+
+        if (!firstTabId || !secondTabId) {
+            throw new Error('Expected both editor tabs to be available');
+        }
+
+        const secondTabTitleBeforeSave =
+            await tenantPage.queryEditor.editorTabs.getTabTitleById(secondTabId);
+
+        await tenantPage.queryEditor.editorTabs.openTabMenuById(firstTabId);
+        await tenantPage.queryEditor.editorTabs.clickMenuAction('Save query as...');
+
+        await tenantPage.saveQueryDialog.setQueryName(queryName);
+        await tenantPage.saveQueryDialog.clickSave();
+
+        await expect(tenantPage.queryEditor.editorTabs.getActiveTabId()).resolves.toBe(firstTabId);
+        await expect(tenantPage.queryEditor.editorTabs.getTabTitleById(firstTabId)).resolves.toBe(
+            queryName,
+        );
+        await expect(tenantPage.queryEditor.editorTabs.getTabTitleById(secondTabId)).resolves.toBe(
+            secondTabTitleBeforeSave,
+        );
+        await expect
+            .poll(() => tenantPage.queryEditor.getEditorContent(), {timeout: 5000})
+            .toBe(firstQuery);
+
+        await tenantPage.queryEditor.queryTabs.selectTab(QueryTabs.Saved);
+        await tenantPage.savedQueriesTable.isVisible();
+
+        const row = await tenantPage.savedQueriesTable.getRowByName(queryName);
+        expect(row).not.toBe(null);
+        expect(row?.query.trim()).toBe(firstQuery.trim());
+    });
+
+    test('Rename from a non-active tab updates the correct tab', async ({page}) => {
+        const renameQueryDialog = new RenameQueryDialog(page);
+        const nextTitle = `Renamed Inactive Tab ${uuidv4()}`;
+
+        await tenantPage.queryEditor.setQuery('SELECT 18 AS rename_first_tab;');
+        const firstTabId = await tenantPage.queryEditor.editorTabs.getActiveTabId();
+
+        await tenantPage.queryEditor.editorTabs.clickAddTab();
+        await expect(tenantPage.queryEditor.editorTabs.waitForTabCount(2)).resolves.toBe(true);
+
+        const secondTabId = await tenantPage.queryEditor.editorTabs.getActiveTabId();
+        await tenantPage.queryEditor.setQuery('SELECT 19 AS rename_second_tab;');
+
+        expect(firstTabId).not.toBe(null);
+        expect(secondTabId).not.toBe(null);
+
+        if (!firstTabId || !secondTabId) {
+            throw new Error('Expected both editor tabs to be available');
+        }
+
+        const secondTabTitleBeforeRename =
+            await tenantPage.queryEditor.editorTabs.getTabTitleById(secondTabId);
+
+        await tenantPage.queryEditor.editorTabs.openTabMenuById(firstTabId);
+        await tenantPage.queryEditor.editorTabs.clickMenuAction('Rename');
+        await renameQueryDialog.setTitle(nextTitle);
+        await renameQueryDialog.clickApply();
+
+        await expect(tenantPage.queryEditor.editorTabs.getActiveTabId()).resolves.toBe(firstTabId);
+        await expect(tenantPage.queryEditor.editorTabs.getTabTitleById(firstTabId)).resolves.toBe(
+            nextTitle,
+        );
+        await expect(tenantPage.queryEditor.editorTabs.getTabTitleById(secondTabId)).resolves.toBe(
+            secondTabTitleBeforeRename,
+        );
     });
 
     test('No unsaved changes modal when opening another query after saving', async () => {

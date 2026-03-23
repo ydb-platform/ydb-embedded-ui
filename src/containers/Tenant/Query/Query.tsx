@@ -60,7 +60,7 @@ export const Query = (props: QueryProps) => {
                 );
             }
             case TENANT_QUERY_TABS_ID.saved: {
-                return <SavedQueries changeUserInput={handleUserInputChange} />;
+                return <SavedQueries />;
             }
             default: {
                 return null;
