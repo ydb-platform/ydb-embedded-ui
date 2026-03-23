@@ -131,6 +131,53 @@ test.describe('Editor tabs', () => {
         await expect.poll(() => queryEditor.getEditorContent(), {timeout: 5000}).toBe('SELECT 2;');
     });
 
+    test('Opening tab menu on an inactive tab does not activate it', async () => {
+        await queryEditor.setQuery('SELECT 1;');
+        await queryEditor.editorTabs.clickAddTab();
+        await queryEditor.setQuery('SELECT 2;');
+        await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query 1');
+
+        await queryEditor.editorTabs.openTabMenu('New Query');
+
+        await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query 1');
+    });
+
+    test('Rename from tab menu activates the selected tab before opening the dialog', async ({
+        page,
+    }) => {
+        const renameQueryDialog = new RenameQueryDialog(page);
+
+        await queryEditor.setQuery('SELECT 1;');
+        await queryEditor.editorTabs.clickAddTab();
+        await queryEditor.setQuery('SELECT 2;');
+        await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query 1');
+
+        await queryEditor.editorTabs.openTabMenu('New Query');
+        await queryEditor.editorTabs.clickMenuAction('Rename');
+
+        await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query');
+        await expect(renameQueryDialog.isVisible()).resolves.toBe(true);
+        await renameQueryDialog.clickCancel();
+    });
+
+    test('Save query as from tab menu activates the selected tab before opening the dialog', async ({
+        page,
+    }) => {
+        const saveQueryDialog = new SaveQueryDialog(page);
+
+        await queryEditor.setQuery('SELECT 1;');
+        await queryEditor.editorTabs.clickAddTab();
+        await queryEditor.setQuery('SELECT 2;');
+        await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query 1');
+
+        await queryEditor.editorTabs.openTabMenu('New Query');
+        await queryEditor.editorTabs.clickMenuAction('Save query as...');
+
+        await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query');
+        await expect(saveQueryDialog.isVisible()).resolves.toBe(true);
+        await saveQueryDialog.clickCancel();
+    });
+
     test('Closes a clean active tab and activates the adjacent one', async () => {
         await queryEditor.editorTabs.clickAddTab();
 
@@ -148,6 +195,7 @@ test.describe('Editor tabs', () => {
         const nextTitle = 'Daily Metrics Query';
 
         await queryEditor.setQuery('SELECT 1;');
+        await queryEditor.editorTabs.selectTab('New Query');
         await queryEditor.editorTabs.openTabMenu('New Query');
         await queryEditor.editorTabs.clickMenuAction('Rename');
 
@@ -168,6 +216,7 @@ test.describe('Editor tabs', () => {
         const nextTitle = 'Daily Metrics Query';
 
         await queryEditor.setQuery('SELECT 1;');
+        await queryEditor.editorTabs.selectTab('New Query');
         await queryEditor.editorTabs.openTabMenu('New Query');
         await queryEditor.editorTabs.clickMenuAction('Rename');
 
@@ -383,6 +432,7 @@ test.describe('Editor tabs', () => {
         const nextTitle = 'Daily report';
 
         await queryEditor.setQuery('SELECT 1;');
+        await queryEditor.editorTabs.selectTab('New Query');
         await queryEditor.editorTabs.openTabMenu('New Query');
         await queryEditor.editorTabs.clickMenuAction('Rename');
 
@@ -434,6 +484,7 @@ test.describe('Editor tabs', () => {
         await queryEditor.setQuery('SELECT 1;');
         await queryEditor.editorTabs.clickAddTab();
         await queryEditor.editorTabs.clickAddTab();
+        await queryEditor.editorTabs.selectTab('New Query 2');
 
         await queryEditor.editorTabs.openTabMenu('New Query 2');
         await queryEditor.editorTabs.clickMenuAction('Close other tabs');

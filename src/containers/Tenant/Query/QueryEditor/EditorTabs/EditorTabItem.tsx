@@ -72,13 +72,9 @@ export function EditorTabItem({
         }
     }, [isActive, executionStatus]);
 
-    const handleMenuSwitcherClick = React.useCallback(
-        (event: React.MouseEvent<HTMLElement>) => {
-            event.stopPropagation();
-            onActivate(tabId);
-        },
-        [onActivate, tabId],
-    );
+    const handleMenuSwitcherClick = React.useCallback((event: React.MouseEvent<HTMLElement>) => {
+        event.stopPropagation();
+    }, []);
 
     const handleMenuOpenToggle = React.useCallback((open: boolean) => {
         if (open) {
@@ -113,20 +109,23 @@ export function EditorTabItem({
     );
 
     const handleRenameClick = React.useCallback(() => {
+        onActivate(tabId);
         onRenameTab(tabId, title);
-    }, [onRenameTab, tabId, title]);
+    }, [onActivate, onRenameTab, tabId, title]);
 
     const handleDuplicateClick = React.useCallback(() => {
         onDuplicateTab(tabId);
     }, [onDuplicateTab, tabId]);
 
     const handleSaveQueryAsClick = React.useCallback(() => {
+        onActivate(tabId);
         onSaveQueryAs(tabId);
-    }, [onSaveQueryAs, tabId]);
+    }, [onActivate, onSaveQueryAs, tabId]);
 
     const handleCloseOtherTabsClick = React.useCallback(() => {
+        onActivate(tabId);
         onCloseOtherTabs(tabId);
-    }, [onCloseOtherTabs, tabId]);
+    }, [onActivate, onCloseOtherTabs, tabId]);
 
     const handleCloseAllTabsClick = React.useCallback(() => {
         onCloseAllTabs();

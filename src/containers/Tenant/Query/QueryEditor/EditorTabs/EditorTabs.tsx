@@ -41,7 +41,6 @@ export function EditorTabs() {
     const handleSaveQueryAs = React.useCallback(
         (tabId: string) => {
             reachMetricaGoal('saveQueryFromTab', {tabsCount: tabsOrder.length});
-            handleActivateTab(tabId);
             const tab = tabsById[tabId];
             const queryBody = tab?.input ?? '';
             const defaultQueryName = getTabTitleForSave(tab);
@@ -53,7 +52,7 @@ export function EditorTabs() {
                 defaultQueryName,
             });
         },
-        [handleActivateTab, handleSaveQuery, savedQueries, tabsById, tabsOrder.length],
+        [handleSaveQuery, savedQueries, tabsById, tabsOrder.length],
     );
 
     const handleRenameTab = React.useCallback(

@@ -7,6 +7,7 @@ function escapeRegExp(value: string) {
 }
 
 const TAB_QA_PREFIX = 'query-editor-tab-';
+const SAFE_TAB_CLICK_OFFSET_X = 12;
 
 export class EditorTabsBar {
     private page: Page;
@@ -56,8 +57,7 @@ export class EditorTabsBar {
 
     async selectTab(title: string) {
         const tab = this.getTabByTitle(title);
-        await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await tab.click();
+        await this.clickTabMainArea(tab);
     }
 
     async isTabSelected(title: string) {
@@ -68,15 +68,14 @@ export class EditorTabsBar {
 
     async closeTab(title: string) {
         const tab = this.getTabByTitle(title);
-        await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await tab.click();
+        await this.clickTabMainArea(tab);
         await tab.locator('.editor-tab-item__tab-action_close').click();
     }
 
     async openTabMenu(title: string) {
         const tab = this.getTabByTitle(title);
         await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await tab.click();
+        await tab.hover();
         await tab.locator('.editor-tab-item__tab-menu-switcher').click();
         await this.menu.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
     }
@@ -124,21 +123,19 @@ export class EditorTabsBar {
 
     async selectTabById(tabId: string) {
         const tab = this.getTabById(tabId);
-        await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await tab.click();
+        await this.clickTabMainArea(tab);
     }
 
     async closeTabById(tabId: string) {
         const tab = this.getTabById(tabId);
-        await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await tab.click();
+        await this.clickTabMainArea(tab);
         await tab.locator('.editor-tab-item__tab-action_close').click();
     }
 
     async openTabMenuById(tabId: string) {
         const tab = this.getTabById(tabId);
         await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
-        await tab.click();
+        await tab.hover();
         await tab.locator('.editor-tab-item__tab-menu-switcher').click();
         await this.menu.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
     }
@@ -153,6 +150,15 @@ export class EditorTabsBar {
         return this.root.locator(`[data-qa="${TAB_QA_PREFIX}${tabId}"]`);
     }
 
+    private async clickTabMainArea(tab: Locator) {
+        await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+
+        const boundingBox = await tab.boundingBox();
+        const clickY = boundingBox ? Math.max(1, Math.floor(boundingBox.height / 2)) : 8;
+
+        await tab.click({position: {x: SAFE_TAB_CLICK_OFFSET_X, y: clickY}});
+    }
+
     private extractTabId(dataQa: string | null): string | null {
         if (!dataQa?.startsWith(TAB_QA_PREFIX)) {
             return null;
@@ -163,9 +169,15 @@ export class EditorTabsBar {
     // --- Title-based methods (kept for backward compatibility) ---
 
     private getTabByTitle(title: string) {
-        const titleLocator = this.root.locator('.editor-tab-item__tab-title').filter({
-            hasText: new RegExp(`^${escapeRegExp(title)}$`),
-        });
-        return titleLocator.first().locator('xpath=ancestor::*[@role="tab"][1]');
+        return this.getTabTitleLocator(title).locator('xpath=ancestor::*[@role="tab"][1]');
+    }
+
+    private getTabTitleLocator(title: string) {
+        return this.root
+            .locator('.editor-tab-item__tab-title')
+            .filter({
+                hasText: new RegExp(`^${escapeRegExp(title)}$`),
+            })
+            .first();
     }
 }
