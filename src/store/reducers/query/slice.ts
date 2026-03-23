@@ -12,6 +12,8 @@ import {
 } from './streaming/reducers';
 import type {QueryResult, QueryState, QueryTabState} from './types';
 import {
+    applyQueryContentToTab,
+    createDefaultTabState,
     getUniqueTabTitle,
     isQueryTabsDirtyPersistedState,
     isQueryTabsPersistedState,
@@ -54,28 +56,6 @@ function persistDirtyStateToSessionStorage(state: QueryState) {
         persistedDirty[tabId] = tab.isDirty;
     }
     saveToSessionStorage(QUERY_EDITOR_DIRTY_KEY, persistedDirty);
-}
-
-function createDefaultTabState({
-    tabId,
-    title = '',
-    input = '',
-}: {
-    tabId: string;
-    title?: string;
-    input?: string;
-}): QueryTabState {
-    const now = Date.now();
-    return {
-        id: tabId,
-        title,
-        isTitleUserDefined: false,
-        input,
-        savedInput: input,
-        isDirty: false,
-        createdAt: now,
-        updatedAt: now,
-    };
 }
 
 function createTabStateFromPersisted({
@@ -348,19 +328,13 @@ const slice = createSlice({
                 return;
             }
 
-            const now = Date.now();
-            state.tabsById[tabId] = {
-                id: tabId,
+            state.tabsById[tabId] = createDefaultTabState({
+                tabId,
                 title,
-                isTitleUserDefined: false,
                 input,
-                savedInput: input,
-                isDirty: false,
-                createdAt: now,
-                updatedAt: now,
                 pendingSnippet,
                 savedQueryName,
-            };
+            });
             state.tabsOrder.push(tabId);
 
             if (makeActive) {
@@ -402,31 +376,21 @@ const slice = createSlice({
             });
 
             if (activeTab && !activeTab.isTouched) {
-                activeTab.title = nextTitle;
-                activeTab.isTitleUserDefined = false;
-                activeTab.isTouched = undefined;
-                activeTab.input = input;
-                activeTab.savedInput = input;
-                activeTab.isDirty = false;
-                activeTab.result = undefined;
-                activeTab.lastExecutedQueryText = undefined;
-                activeTab.pendingSnippet = pendingSnippet;
-                activeTab.savedQueryName = savedQueryName;
-                activeTab.updatedAt = Date.now();
-            } else {
-                const now = Date.now();
-                state.tabsById[tabId] = {
-                    id: tabId,
+                state.tabsById[activeTab.id] = applyQueryContentToTab({
+                    tab: activeTab,
                     title: nextTitle,
-                    isTitleUserDefined: false,
                     input,
-                    savedInput: input,
-                    isDirty: false,
-                    createdAt: now,
-                    updatedAt: now,
                     pendingSnippet,
                     savedQueryName,
-                };
+                });
+            } else {
+                state.tabsById[tabId] = createDefaultTabState({
+                    tabId,
+                    title: nextTitle,
+                    input,
+                    pendingSnippet,
+                    savedQueryName,
+                });
                 state.tabsOrder.push(tabId);
                 state.activeTabId = tabId;
             }
@@ -434,26 +398,21 @@ const slice = createSlice({
             persistTabsStateToSessionStorage(state);
             persistDirtyStateToSessionStorage(state);
         },
-        applySavedQueryToActiveTab: (
+        applyExternalQueryToActiveTab: (
             state,
-            action: PayloadAction<{title: string; input: string; savedQueryName: string}>,
+            action: PayloadAction<{title: string; input: string; savedQueryName?: string}>,
         ) => {
             const activeTab = getActiveTab(state);
             if (!activeTab) {
                 return;
             }
 
-            activeTab.title = action.payload.title;
-            activeTab.isTitleUserDefined = false;
-            activeTab.isTouched = undefined;
-            activeTab.input = action.payload.input;
-            activeTab.savedInput = action.payload.input;
-            activeTab.isDirty = false;
-            activeTab.result = undefined;
-            activeTab.lastExecutedQueryText = undefined;
-            activeTab.pendingSnippet = undefined;
-            activeTab.savedQueryName = action.payload.savedQueryName;
-            activeTab.updatedAt = Date.now();
+            state.tabsById[activeTab.id] = applyQueryContentToTab({
+                tab: activeTab,
+                title: action.payload.title,
+                input: action.payload.input,
+                savedQueryName: action.payload.savedQueryName,
+            });
 
             persistTabsStateToSessionStorage(state);
             persistDirtyStateToSessionStorage(state);
@@ -618,7 +577,7 @@ export const {
     setLastExecutedQueryText,
     addQueryTab,
     setQueryTabContent,
-    applySavedQueryToActiveTab,
+    applyExternalQueryToActiveTab,
     closeQueryTab,
     renameQueryTab,
     syncSavedQueryTab,

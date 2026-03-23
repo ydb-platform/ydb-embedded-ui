@@ -4,7 +4,6 @@ import {Pencil, TrashBin} from '@gravity-ui/icons';
 import type {Column} from '@gravity-ui/react-data-table';
 import DataTable from '@gravity-ui/react-data-table';
 import {ActionTooltip, Button, Dialog, Icon} from '@gravity-ui/uikit';
-import {v4 as uuidv4} from 'uuid';
 
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
@@ -12,21 +11,15 @@ import {TableWithControlsLayout} from '../../../../components/TableWithControlsL
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
 import {useMultiTabQueryEditorEnabled} from '../../../../store/reducers/capabilities/hooks';
 import {
-    applySavedQueryToActiveTab,
-    setIsDirty,
-    setQueryTabContent,
-} from '../../../../store/reducers/query/query';
-import {
     selectSavedQueriesFilter,
     setSavedQueriesFilter,
 } from '../../../../store/reducers/queryActions/queryActions';
-import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
-import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import type {SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
+import {useOpenExternalQueryInEditor} from '../hooks/useOpenExternalQueryInEditor';
 import i18n from '../i18n';
 import {useSavedQueries} from '../utils/useSavedQueries';
 
@@ -72,6 +65,7 @@ export const SavedQueries = () => {
     const dispatch = useTypedDispatch();
     const filter = useTypedSelector(selectSavedQueriesFilter);
     const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
+    const openExternalQueryInEditor = useOpenExternalQueryInEditor();
 
     const [isDeleteDialogVisible, setIsDeleteDialogVisible] = React.useState(false);
     const [queryNameToDelete, setQueryNameToDelete] = React.useState<string>('');
@@ -93,29 +87,13 @@ export const SavedQueries = () => {
 
     const applyQueryClick = React.useCallback(
         ({queryText, queryName}: {queryText: string; queryName: string}) => {
-            if (isMultiTabEnabled) {
-                dispatch(
-                    setQueryTabContent({
-                        tabId: uuidv4(),
-                        title: queryName,
-                        input: queryText,
-                        savedQueryName: queryName,
-                    }),
-                );
-                dispatch(setIsDirty(false));
-                dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
-            } else {
-                dispatch(
-                    applySavedQueryToActiveTab({
-                        title: queryName,
-                        input: queryText,
-                        savedQueryName: queryName,
-                    }),
-                );
-                dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
-            }
+            openExternalQueryInEditor({
+                title: queryName,
+                input: queryText,
+                savedQueryName: queryName,
+            });
         },
-        [dispatch, isMultiTabEnabled],
+        [openExternalQueryInEditor],
     );
 
     const onQueryClick = useChangeInputWithConfirmation(applyQueryClick, isMultiTabEnabled);

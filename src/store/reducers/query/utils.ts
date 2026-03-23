@@ -10,7 +10,12 @@ import type {
 } from '../../../types/store/streaming';
 import {valueIsDefined} from '../../../utils';
 
-import type {QueryExecutionStatusType, QueryInHistory, RawQueryInHistory} from './types';
+import type {
+    QueryExecutionStatusType,
+    QueryInHistory,
+    QueryTabState,
+    RawQueryInHistory,
+} from './types';
 
 export function getActionAndSyntaxFromQueryMode(
     baseAction: QueryAction = 'execute',
@@ -204,4 +209,63 @@ export function getUniqueTabTitle(
         counter++;
     }
     return `${baseTitle} ${counter}`;
+}
+
+export function createDefaultTabState({
+    tabId,
+    title = '',
+    input = '',
+    pendingSnippet,
+    savedQueryName,
+    isTitleUserDefined = false,
+}: {
+    tabId: string;
+    title?: string;
+    input?: string;
+    pendingSnippet?: string;
+    savedQueryName?: string;
+    isTitleUserDefined?: boolean;
+}): QueryTabState {
+    const now = Date.now();
+    return {
+        id: tabId,
+        title,
+        isTitleUserDefined,
+        input,
+        savedInput: input,
+        isDirty: false,
+        createdAt: now,
+        updatedAt: now,
+        pendingSnippet,
+        savedQueryName,
+    };
+}
+
+export function applyQueryContentToTab({
+    tab,
+    title,
+    input,
+    pendingSnippet,
+    savedQueryName,
+}: {
+    tab: QueryTabState;
+    title: string;
+    input: string;
+    pendingSnippet?: string;
+    savedQueryName?: string;
+}): QueryTabState {
+    return {
+        ...tab,
+        title,
+        isTitleUserDefined: false,
+        isTouched: undefined,
+        input,
+        savedInput: input,
+        isDirty: false,
+        result: undefined,
+        lastExecutedQueryText: undefined,
+        pendingSnippet,
+        savedQueryName,
+        updatedAt: Date.now(),
+    };
 }
