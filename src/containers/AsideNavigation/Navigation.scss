@@ -185,4 +185,18 @@
             --ydb-nav-button-bg: var(--ydb-nav-green);
         }
     }
+
+    &__popover {
+        --g-popup-background-color: #1e94f9;
+        color: var(--g-color-text-brand-contrast);
+
+        // Replace default secondary color to match background and text color in light theme
+        svg {
+            opacity: 0.85;
+            color: var(--g-color-text-brand-contrast);
+        }
+    }
+    &__alert-button {
+        width: 128px;
+    }
 }
