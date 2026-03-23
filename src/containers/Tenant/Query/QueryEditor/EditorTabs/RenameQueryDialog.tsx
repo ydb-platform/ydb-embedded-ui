@@ -16,6 +16,7 @@ const b = cn('ydb-rename-query-dialog');
 export interface RenameQueryDialogNiceModalProps {
     title: string;
     onRename: (title: string) => void;
+    onClose?: VoidFunction;
 }
 
 function RenameQueryDialog({
@@ -100,9 +101,10 @@ export const RenameQueryDialogNiceModal = NiceModal.create(
         const modal = NiceModal.useModal();
 
         const handleClose = React.useCallback(() => {
+            props.onClose?.();
             modal.hide();
             modal.remove();
-        }, [modal]);
+        }, [modal, props]);
 
         return <RenameQueryDialog {...props} open={modal.visible} onClose={handleClose} />;
     },
