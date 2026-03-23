@@ -106,9 +106,7 @@ export function EditorTabs() {
                         onClick={handleNewTabClick}
                         aria-label={i18n('editor-tabs.action.new-tab')}
                     >
-                        <Button.Icon>
-                            <Icon data={Plus} size={12} />
-                        </Button.Icon>
+                        <Icon data={Plus} size={12} />
                     </Button>
                 </ActionTooltip>
             </div>
