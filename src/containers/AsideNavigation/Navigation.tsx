@@ -8,8 +8,9 @@ import {useComponent} from '../../components/ComponentsProvider/ComponentsProvid
 import routes from '../../routes';
 import {selectUser} from '../../store/reducers/authentication/authentication';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
+import {useSetting} from '../../store/reducers/settings/useSetting';
 import {cn} from '../../utils/cn';
-import {useSetting, useTypedSelector} from '../../utils/hooks';
+import {useTypedSelector} from '../../utils/hooks';
 import {useTenantNavigation} from '../Tenant/TenantNavigation/useTenantNavigation';
 import {useNavigationV2Enabled} from '../Tenant/utils/useNavigationV2Enabled';
 import {UserSettings} from '../UserSettings/UserSettings';
@@ -35,13 +36,16 @@ export function Navigation({children, userSettings}: NavigationProps) {
 
     const tenantNavigationItems = useTenantNavigation();
     const isV2Enabled = useNavigationV2Enabled();
-    const [isV2NavigationAlertSeen, setIsV2NavigationShown] = useSetting(
-        SETTING_KEYS.IS_V2_NAVIGATION_ALERT_SEEN,
-    );
+    const {
+        value: isV2NavigationAlertSeen,
+        saveValue: setIsV2NavigationAlertSeen,
+        isLoading: isNotificationSettingLoading,
+    } = useSetting(SETTING_KEYS.IS_V2_NAVIGATION_ALERT_SEEN);
 
     const ydbUser = useTypedSelector(selectUser);
 
-    const shouldShowNewNavAlert = isV2Enabled && !isV2NavigationAlertSeen;
+    const shouldShowNewNavAlert =
+        isV2Enabled && !isV2NavigationAlertSeen && !isNotificationSettingLoading;
     const [isNewNavAlertReady, setIsNewNavAlertReady] = React.useState(false);
 
     React.useEffect(() => {
@@ -62,8 +66,8 @@ export function Navigation({children, userSettings}: NavigationProps) {
     const isNewNavAlertShown = shouldShowNewNavAlert && isNewNavAlertReady;
 
     const handleNewNavAlertClose = React.useCallback(() => {
-        setIsV2NavigationShown(true);
-    }, [setIsV2NavigationShown]);
+        setIsV2NavigationAlertSeen(true);
+    }, [setIsV2NavigationAlertSeen]);
 
     const menuItems = React.useMemo(() => {
         if (!isDatabasePage || !isV2Enabled) {
