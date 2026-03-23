@@ -11,7 +11,7 @@ import {
 import {QueryTabs} from '../queryEditor/models/QueryEditor';
 import {RenameQueryDialog} from '../queryEditor/models/RenameQueryDialog';
 
-test.describe.only('Saved Queries', () => {
+test.describe('Saved Queries', () => {
     let tenantPage: TenantPage;
 
     test.beforeEach(async ({page}) => {

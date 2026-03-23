@@ -16,7 +16,7 @@ import {RunningQueryDialog} from './models/RunningQueryDialog';
 import {SaveChangesDialog} from './models/SaveChangesDialog';
 import {SaveQueryDialog} from './models/SaveQueryDialog';
 
-test.describe.only('Editor tabs', () => {
+test.describe('Editor tabs', () => {
     let tenantPage: TenantPage;
     let queryEditor: QueryEditor;
 

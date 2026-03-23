@@ -1,6 +1,6 @@
 import {v4 as uuidv4} from 'uuid';
 
-import {store} from '../../../store/defaultStore';
+import type {AppDispatch} from '../../../store';
 import {setQueryTabContent} from '../../../store/reducers/query/query';
 import i18n from '../Query/NewSQL/i18n';
 
@@ -44,6 +44,7 @@ import {
 } from './schemaQueryTemplates';
 
 export const bindActions = (
+    dispatch: AppDispatch,
     changeUserInput: (input: string) => void,
     isMultiTabEnabled: boolean,
 ) => {
@@ -51,7 +52,7 @@ export const bindActions = (
         const snippet = query();
 
         if (isMultiTabEnabled && tabTitle) {
-            store.dispatch(
+            dispatch(
                 setQueryTabContent({
                     tabId: uuidv4(),
                     title: tabTitle,
