@@ -74,24 +74,44 @@ export function useQueryTabsActions() {
 
     const handleCloseTab = React.useCallback(
         async (tabId: string) => {
-            const tab = getCurrentTab(tabId);
-            if (tab?.result?.isLoading) {
+            const targetTab = getCurrentTab(tabId);
+            if (!targetTab) {
+                return;
+            }
+
+            const shouldActivateBeforeConfirm =
+                tabId !== activeTabId &&
+                (targetTab.isDirty || Boolean(targetTab.result?.isLoading));
+
+            if (shouldActivateBeforeConfirm) {
+                await activateTabAndWait(dispatch, tabId);
+            }
+
+            if (targetTab.result?.isLoading) {
                 const confirmed = await getRunningQueryConfirmation();
                 if (!confirmed) {
                     return;
                 }
             }
-            const currentTab = getCurrentTab(tabId);
-            if (currentTab?.isDirty) {
-                const confirmed = await getDirtyConfirmation(currentTab);
+
+            if (targetTab.isDirty) {
+                const confirmed = await getDirtyConfirmation(targetTab);
                 if (!confirmed) {
                     return;
                 }
             }
+
             reachMetricaGoal('closeQueryTab', {type: 'single', tabsCount: tabsOrder.length});
             closeTabImmediate(tabId);
         },
-        [closeTabImmediate, getCurrentTab, getDirtyConfirmation, tabsOrder.length],
+        [
+            activeTabId,
+            closeTabImmediate,
+            dispatch,
+            getCurrentTab,
+            getDirtyConfirmation,
+            tabsOrder.length,
+        ],
     );
 
     const handleCloseActiveTab = React.useCallback(() => {

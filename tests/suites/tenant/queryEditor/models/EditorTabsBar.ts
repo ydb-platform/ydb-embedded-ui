@@ -60,6 +60,16 @@ export class EditorTabsBar {
         await this.clickTabMainArea(tab);
     }
 
+    async hoverTab(title: string) {
+        const tab = this.getTabByTitle(title);
+        await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await tab.hover();
+    }
+
+    getTabCloseIcon(title: string): Locator {
+        return this.getTabByTitle(title).locator('.ydb-editor-tab-item__tab-action_close');
+    }
+
     async isTabSelected(title: string) {
         const tab = this.getTabByTitle(title);
         await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
@@ -68,8 +78,7 @@ export class EditorTabsBar {
 
     async closeTab(title: string) {
         const tab = this.getTabByTitle(title);
-        await this.clickTabMainArea(tab);
-        await tab.locator('.ydb-editor-tab-item__tab-action_close').click();
+        await this.clickCloseIcon(tab);
     }
 
     async openTabMenu(title: string) {
@@ -126,10 +135,15 @@ export class EditorTabsBar {
         await this.clickTabMainArea(tab);
     }
 
+    async hoverTabById(tabId: string) {
+        const tab = this.getTabById(tabId);
+        await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await tab.hover();
+    }
+
     async closeTabById(tabId: string) {
         const tab = this.getTabById(tabId);
-        await this.clickTabMainArea(tab);
-        await tab.locator('.ydb-editor-tab-item__tab-action_close').click();
+        await this.clickCloseIcon(tab);
     }
 
     async openTabMenuById(tabId: string) {
@@ -157,6 +171,11 @@ export class EditorTabsBar {
         const clickY = boundingBox ? Math.max(1, Math.floor(boundingBox.height / 2)) : 8;
 
         await tab.click({position: {x: SAFE_TAB_CLICK_OFFSET_X, y: clickY}});
+    }
+
+    private async clickCloseIcon(tab: Locator) {
+        await tab.waitFor({state: 'visible', timeout: VISIBILITY_TIMEOUT});
+        await tab.locator('.ydb-editor-tab-item__tab-action_close').click();
     }
 
     private extractTabId(dataQa: string | null): string | null {

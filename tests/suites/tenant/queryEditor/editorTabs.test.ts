@@ -57,6 +57,10 @@ test.describe('Editor tabs', () => {
         await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query 1');
     });
 
+    test('Close icon is hidden by default', async () => {
+        await expect(queryEditor.editorTabs.getTabCloseIcon('New Query')).toBeHidden();
+    });
+
     test('Hotkey closes a clean active tab', async ({page}) => {
         await queryEditor.editorTabs.clickAddTab();
         await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query 1');
@@ -181,10 +185,22 @@ test.describe('Editor tabs', () => {
     test('Closes a clean active tab and activates the adjacent one', async () => {
         await queryEditor.editorTabs.clickAddTab();
 
+        await queryEditor.editorTabs.hoverTab('New Query 1');
         await queryEditor.editorTabs.closeTab('New Query 1');
 
         await expect(queryEditor.editorTabs.waitForTabCount(1)).resolves.toBe(true);
         await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query');
+    });
+
+    test('Closing a clean inactive tab by cross keeps the current tab active', async () => {
+        await queryEditor.editorTabs.clickAddTab();
+        await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query 1');
+
+        await queryEditor.editorTabs.hoverTab('New Query');
+        await queryEditor.editorTabs.closeTab('New Query');
+
+        await expect(queryEditor.editorTabs.waitForTabCount(1)).resolves.toBe(true);
+        await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query 1');
     });
 
     test('Save query dialog uses the current tab title as the default query name', async ({
@@ -389,6 +405,7 @@ test.describe('Editor tabs', () => {
         await queryEditor.editorTabs.clickAddTab();
         await queryEditor.setQuery('SELECT 1;');
 
+        await queryEditor.editorTabs.hoverTab('New Query 1');
         await queryEditor.editorTabs.closeTab('New Query 1');
         await expect(saveChangesDialog.isVisible()).resolves.toBe(true);
         await saveChangesDialog.clickCancel();
@@ -396,6 +413,7 @@ test.describe('Editor tabs', () => {
         await expect(queryEditor.editorTabs.getTabCount()).resolves.toBe(2);
         await expect(queryEditor.editorTabs.isTabSelected('New Query 1')).resolves.toBe(true);
 
+        await queryEditor.editorTabs.hoverTab('New Query 1');
         await queryEditor.editorTabs.closeTab('New Query 1');
         await expect(saveChangesDialog.isVisible()).resolves.toBe(true);
         await saveChangesDialog.clickDontSave();
@@ -411,6 +429,7 @@ test.describe('Editor tabs', () => {
         await queryEditor.editorTabs.clickAddTab();
         await queryEditor.editorTabs.selectTab('New Query');
 
+        await queryEditor.editorTabs.hoverTab('New Query');
         await queryEditor.editorTabs.closeTab('New Query');
         await expect(saveChangesDialog.isVisible()).resolves.toBe(true);
         await saveChangesDialog.clickCancel();
@@ -418,12 +437,53 @@ test.describe('Editor tabs', () => {
         await expect(queryEditor.editorTabs.getTabCount()).resolves.toBe(2);
         await expect(queryEditor.editorTabs.isTabSelected('New Query')).resolves.toBe(true);
 
+        await queryEditor.editorTabs.hoverTab('New Query');
         await queryEditor.editorTabs.closeTab('New Query');
         await expect(saveChangesDialog.isVisible()).resolves.toBe(true);
         await saveChangesDialog.clickDontSave();
 
         await expect(queryEditor.editorTabs.waitForTabCount(1)).resolves.toBe(true);
         await expect(queryEditor.editorTabs.isTabSelected('New Query 1')).resolves.toBe(true);
+    });
+
+    test('Closing a dirty inactive tab by cross activates it before save dialog', async ({
+        page,
+    }) => {
+        const saveChangesDialog = new SaveChangesDialog(page);
+
+        await queryEditor.setQuery('SELECT 1;');
+        await queryEditor.editorTabs.clickAddTab();
+        await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query 1');
+
+        await queryEditor.editorTabs.hoverTab('New Query');
+        await queryEditor.editorTabs.closeTab('New Query');
+
+        await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query');
+        await expect(saveChangesDialog.isVisible()).resolves.toBe(true);
+        await saveChangesDialog.clickCancel();
+
+        await expect(queryEditor.editorTabs.getTabCount()).resolves.toBe(2);
+        await expect(queryEditor.editorTabs.isTabSelected('New Query')).resolves.toBe(true);
+    });
+
+    test('Close tab from menu activates a dirty inactive tab before save dialog', async ({
+        page,
+    }) => {
+        const saveChangesDialog = new SaveChangesDialog(page);
+
+        await queryEditor.setQuery('SELECT 1;');
+        await queryEditor.editorTabs.clickAddTab();
+        await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query 1');
+
+        await queryEditor.editorTabs.openTabMenu('New Query');
+        await queryEditor.editorTabs.clickMenuAction('Close tab');
+
+        await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query');
+        await expect(saveChangesDialog.isVisible()).resolves.toBe(true);
+        await saveChangesDialog.clickCancel();
+
+        await expect(queryEditor.editorTabs.getTabCount()).resolves.toBe(2);
+        await expect(queryEditor.editorTabs.isTabSelected('New Query')).resolves.toBe(true);
     });
 
     test('Shows save changes dialog when closing a dirty user-renamed tab', async ({page}) => {
@@ -441,6 +501,7 @@ test.describe('Editor tabs', () => {
         await renameQueryDialog.clickApply();
         await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe(nextTitle);
 
+        await queryEditor.editorTabs.hoverTab(nextTitle);
         await queryEditor.editorTabs.closeTab(nextTitle);
         await expect(saveChangesDialog.isVisible()).resolves.toBe(true);
         await saveChangesDialog.clickCancel();
@@ -462,18 +523,45 @@ test.describe('Editor tabs', () => {
         await queryEditor.clickRunButton();
         await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
 
+        await queryEditor.editorTabs.hoverTab('New Query');
         await queryEditor.editorTabs.closeTab('New Query');
         await expect(runningQueryDialog.isVisible()).resolves.toBe(true);
         await runningQueryDialog.clickCancel();
 
         await expect(queryEditor.editorTabs.getTabCount()).resolves.toBe(2);
 
+        await queryEditor.editorTabs.hoverTab('New Query');
         await queryEditor.editorTabs.closeTab('New Query');
         await expect(runningQueryDialog.isVisible()).resolves.toBe(true);
         await runningQueryDialog.clickStopAndClose();
 
         await expect(queryEditor.editorTabs.waitForTabCount(1)).resolves.toBe(true);
         await expect(queryEditor.editorTabs.isTabSelected('New Query 1')).resolves.toBe(true);
+    });
+
+    test('Close tab from menu activates a running inactive tab before confirmation', async ({
+        page,
+    }) => {
+        const runningQueryDialog = new RunningQueryDialog(page);
+        await toggleExperiment(page, 'on', 'Query Streaming');
+        await setupMockStreamingFetch(page, {chunkIntervalMs: 1000});
+
+        await queryEditor.setQuery(longRunningStreamQuery);
+        await queryEditor.clickRunButton();
+        await expect(queryEditor.isStopButtonVisible()).resolves.toBe(true);
+
+        await queryEditor.editorTabs.clickAddTab();
+        await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query 1');
+
+        await queryEditor.editorTabs.openTabMenu('New Query');
+        await queryEditor.editorTabs.clickMenuAction('Close tab');
+
+        await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('New Query');
+        await expect(runningQueryDialog.isVisible()).resolves.toBe(true);
+        await runningQueryDialog.clickCancel();
+
+        await expect(queryEditor.editorTabs.getTabCount()).resolves.toBe(2);
+        await expect(queryEditor.editorTabs.isTabSelected('New Query')).resolves.toBe(true);
     });
 
     test('Close other tabs closes clean tabs immediately and stops on save changes cancel', async ({
