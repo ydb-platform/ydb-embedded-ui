@@ -16,10 +16,9 @@
     }
 
     &__controls-wrapper {
-        $padding-top: var(--ydb-table-with-controls-layout-controls-padding-top, 0px);
         z-index: 3;
 
-        align-items: if($padding-top == 0px, flex-start, center);
+        align-items: var(--ydb-table-with-controls-layout-controls-align-items, center);
 
         box-sizing: border-box;
         width: 100%;
