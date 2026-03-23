@@ -27,6 +27,7 @@ import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfir
 import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import {SAVE_QUERY_DIALOG} from '../SaveQuery/SaveQuery';
 import i18n from '../i18n';
+import {getQueryTextTabTitle} from '../utils/queryTabTitles';
 import {useSavedQueries} from '../utils/useSavedQueries';
 
 import {getColumns, getQueryInfoItems} from './columns';
@@ -70,12 +71,10 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
     const applyQueryClick = React.useCallback(
         (query: QueryInHistory) => {
             if (isMultiTabEnabled) {
-                const firstLine = query.queryText.trim().split('\n')[0] || query.queryText;
-
                 dispatch(
                     setQueryTabContent({
                         tabId: uuidv4(),
-                        title: firstLine,
+                        title: getQueryTextTabTitle(query.queryText),
                         input: query.queryText,
                     }),
                 );

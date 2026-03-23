@@ -1,11 +1,26 @@
 import type {QueryTabState} from '../../../../store/reducers/query/types';
 import i18n from '../i18n';
 
+const QUERY_TEXT_TAB_TITLE_MAX_LENGTH = 60;
+
 export function getNewQueryTitle(counter: number): string {
     if (counter === 0) {
         return i18n('editor-tabs.default-title');
     }
     return i18n('editor-tabs.default-title-indexed', {index: counter});
+}
+
+export function getQueryTextTabTitle(queryText: string): string {
+    const firstNonEmptyLine = queryText
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .find(Boolean);
+
+    if (!firstNonEmptyLine) {
+        return i18n('editor-tabs.default-title');
+    }
+
+    return firstNonEmptyLine.slice(0, QUERY_TEXT_TAB_TITLE_MAX_LENGTH);
 }
 
 export function isDefaultNewQueryTitle(title: string): boolean {

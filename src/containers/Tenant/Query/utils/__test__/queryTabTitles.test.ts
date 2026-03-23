@@ -1,5 +1,10 @@
 import type {QueryTabState} from '../../../../../store/reducers/query/types';
-import {getNewQueryTitle, getTabTitleForSave, isDefaultNewQueryTitle} from '../queryTabTitles';
+import {
+    getNewQueryTitle,
+    getQueryTextTabTitle,
+    getTabTitleForSave,
+    isDefaultNewQueryTitle,
+} from '../queryTabTitles';
 
 function createTab(overrides: Partial<QueryTabState> = {}): QueryTabState {
     return {
@@ -21,6 +26,24 @@ describe('getNewQueryTitle', () => {
     test('returns indexed title for counter > 0', () => {
         expect(getNewQueryTitle(1)).toBe('New Query 1');
         expect(getNewQueryTitle(5)).toBe('New Query 5');
+    });
+});
+
+describe('getQueryTextTabTitle', () => {
+    test('returns default title for whitespace-only query text', () => {
+        expect(getQueryTextTabTitle('  \n\t  \n  ')).toBe('New Query');
+    });
+
+    test('returns first non-empty trimmed line for multiline query text', () => {
+        expect(
+            getQueryTextTabTitle('\n\n   SELECT * FROM test_table\nDELETE FROM test_table;'),
+        ).toBe('SELECT * FROM test_table');
+    });
+
+    test('truncates first non-empty line to 60 characters', () => {
+        const longLine = 'a'.repeat(70);
+
+        expect(getQueryTextTabTitle(longLine)).toBe('a'.repeat(60));
     });
 });
 

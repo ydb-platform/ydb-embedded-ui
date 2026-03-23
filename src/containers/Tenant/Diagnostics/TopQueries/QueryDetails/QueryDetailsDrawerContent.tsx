@@ -18,6 +18,7 @@ import {
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {uiFactory} from '../../../../../uiFactory/uiFactory';
 import {useTypedDispatch} from '../../../../../utils/hooks';
+import {getQueryTextTabTitle} from '../../../Query/utils/queryTabTitles';
 import {TenantTabsGroups} from '../../../TenantPages';
 import {createQueryInfoItems} from '../utils';
 
@@ -43,11 +44,10 @@ export const QueryDetailsDrawerContent = ({row, onClose}: QueryDetailsDrawerCont
             const input = row.QueryText as string;
 
             if (isMultiTabEnabled) {
-                const firstLine = input.trim().split('\n')[0];
                 dispatch(
                     setQueryTabContent({
                         tabId: uuidv4(),
-                        title: firstLine,
+                        title: getQueryTextTabTitle(input),
                         input,
                     }),
                 );
