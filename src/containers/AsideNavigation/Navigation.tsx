@@ -29,7 +29,10 @@ interface NavigationProps {
 
 export function Navigation({children, userSettings}: NavigationProps) {
     const AsideNavigation = useComponent('AsideNavigation');
+
     const match = useRouteMatch(routes.tenant);
+    const isDatabasePage = Boolean(match);
+
     const tenantNavigationItems = useTenantNavigation();
     const isV2Enabled = useNavigationV2Enabled();
     const [isV2NavigationAlertSeen, setIsV2NavigationShown] = useSetting(
@@ -42,7 +45,7 @@ export function Navigation({children, userSettings}: NavigationProps) {
     const [isNewNavAlertReady, setIsNewNavAlertReady] = React.useState(false);
 
     React.useEffect(() => {
-        if (!shouldShowNewNavAlert || !match) {
+        if (!isDatabasePage || !shouldShowNewNavAlert) {
             setIsNewNavAlertReady(false);
             return undefined;
         }
@@ -54,7 +57,7 @@ export function Navigation({children, userSettings}: NavigationProps) {
         return () => {
             window.clearTimeout(timerId);
         };
-    }, [match, shouldShowNewNavAlert]);
+    }, [isDatabasePage, shouldShowNewNavAlert]);
 
     const isNewNavAlertShown = shouldShowNewNavAlert && isNewNavAlertReady;
 
@@ -63,7 +66,7 @@ export function Navigation({children, userSettings}: NavigationProps) {
     }, [setIsV2NavigationShown]);
 
     const menuItems = React.useMemo(() => {
-        if (!match || !isV2Enabled) {
+        if (!isDatabasePage || !isV2Enabled) {
             return undefined;
         }
 
@@ -174,7 +177,13 @@ export function Navigation({children, userSettings}: NavigationProps) {
 
             return navigationItem;
         });
-    }, [match, isV2Enabled, isNewNavAlertShown, tenantNavigationItems, handleNewNavAlertClose]);
+    }, [
+        isDatabasePage,
+        isV2Enabled,
+        isNewNavAlertShown,
+        tenantNavigationItems,
+        handleNewNavAlertClose,
+    ]);
 
     return (
         <AsideNavigation
