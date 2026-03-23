@@ -15,7 +15,6 @@ import {
 import {setDiagnosticsTab, setQueryTab} from '../../../store/reducers/tenant/tenant';
 import type {TenantPage} from '../../../store/reducers/tenant/types';
 import type {IQueryResult} from '../../../types/store/query';
-import {uiFactory} from '../../../uiFactory/uiFactory';
 import createToast from '../../../utils/createToast';
 import {insertSnippetToEditor} from '../../../utils/monaco/insertSnippet';
 import {transformPath} from '../ObjectSummary/transformPath';
@@ -67,6 +66,7 @@ function stripEllipsis(text: string): string {
 interface ActionsAdditionalParams {
     setActivePath: (path: string) => void;
     setTenantPage: (page: TenantPage) => void;
+    isMultiTabEnabled?: boolean;
     showCreateDirectoryDialog?: (path: string) => void;
     getConfirmation?: () => Promise<boolean>;
     getConnectToDBDialog?: (params: SnippetParams) => Promise<boolean>;
@@ -95,6 +95,7 @@ const bindActions = (
     const {
         setActivePath,
         setTenantPage,
+        isMultiTabEnabled,
         showCreateDirectoryDialog,
         getConfirmation,
         getConnectToDBDialog,
@@ -102,8 +103,6 @@ const bindActions = (
         streamingQueryData,
         showCreateTableData,
     } = additionalEffects;
-
-    const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
 
     const inputQuery = (tmpl: TemplateFn, templateName?: string) => () => {
         const snippet = tmpl({

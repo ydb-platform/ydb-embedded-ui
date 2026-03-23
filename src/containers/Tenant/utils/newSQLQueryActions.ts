@@ -2,7 +2,6 @@ import {v4 as uuidv4} from 'uuid';
 
 import {store} from '../../../store/defaultStore';
 import {setQueryTabContent} from '../../../store/reducers/query/query';
-import {uiFactory} from '../../../uiFactory/uiFactory';
 import i18n from '../Query/NewSQL/i18n';
 
 import {
@@ -44,9 +43,10 @@ import {
     upsertQueryTemplate,
 } from './schemaQueryTemplates';
 
-export const bindActions = (changeUserInput: (input: string) => void) => {
-    const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
-
+export const bindActions = (
+    changeUserInput: (input: string) => void,
+    isMultiTabEnabled: boolean,
+) => {
     const inputQuery = (query: () => string, tabTitle?: string) => () => {
         const snippet = query();
 

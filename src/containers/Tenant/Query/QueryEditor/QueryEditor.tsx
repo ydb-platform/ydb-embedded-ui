@@ -8,6 +8,7 @@ import {v4 as uuidv4} from 'uuid';
 
 import SplitPane from '../../../../components/SplitPane';
 import {
+    useMultiTabQueryEditorEnabled,
     useStreamingAvailable,
     useTracingLevelOptionAvailable,
 } from '../../../../store/reducers/capabilities/hooks';
@@ -30,7 +31,6 @@ import {selectShowPreview, setShowPreview} from '../../../../store/reducers/sche
 import {SETTING_KEYS} from '../../../../store/reducers/settings/constants';
 import type {EPathSubType, EPathType} from '../../../../types/api/schema';
 import type {QueryAction} from '../../../../types/store/query';
-import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {cn} from '../../../../utils/cn';
 import {DEFAULT_SIZE_RESULT_PANE_KEY} from '../../../../utils/constants';
 import {
@@ -141,7 +141,7 @@ export default function QueryEditor({theme, changeUserInput, queriesHistory}: Qu
     const [sendQuery] = queryApi.useUseSendQueryMutation();
     const [streamQuery] = queryApi.useUseStreamQueryMutation();
 
-    const isMultiTabQueryEditorEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
+    const isMultiTabQueryEditorEnabled = useMultiTabQueryEditorEnabled();
 
     const {
         activeTabId: tabsActiveTabId,

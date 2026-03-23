@@ -5,6 +5,7 @@ import {v4 as uuidv4} from 'uuid';
 
 import {QueryDetails} from '../../../../../components/QueryDetails/QueryDetails';
 import {getTenantPath, parseQuery} from '../../../../../routes';
+import {useMultiTabQueryEditorEnabled} from '../../../../../store/reducers/capabilities/hooks';
 import {
     changeUserInput,
     setIsDirty,
@@ -16,7 +17,6 @@ import {
     TENANT_QUERY_TABS_ID,
 } from '../../../../../store/reducers/tenant/constants';
 import type {KeyValueRow} from '../../../../../types/api/query';
-import {uiFactory} from '../../../../../uiFactory/uiFactory';
 import {useTypedDispatch} from '../../../../../utils/hooks';
 import {getQueryTextTabTitle} from '../../../Query/utils/queryTabTitles';
 import {TenantTabsGroups} from '../../../TenantPages';
@@ -37,7 +37,7 @@ export const QueryDetailsDrawerContent = ({row, onClose}: QueryDetailsDrawerCont
     const dispatch = useTypedDispatch();
     const location = useLocation();
     const history = useHistory();
-    const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
+    const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
 
     const handleOpenInEditor = React.useCallback(() => {
         if (row) {

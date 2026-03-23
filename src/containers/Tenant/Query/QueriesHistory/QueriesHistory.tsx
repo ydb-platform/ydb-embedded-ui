@@ -9,6 +9,7 @@ import {QueryDetails} from '../../../../components/QueryDetails/QueryDetails';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
+import {useMultiTabQueryEditorEnabled} from '../../../../store/reducers/capabilities/hooks';
 import type {useQueriesHistory} from '../../../../store/reducers/query/hooks';
 import {
     selectQueriesHistoryFilter,
@@ -20,7 +21,6 @@ import {
 import type {QueryInHistory} from '../../../../store/reducers/query/types';
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
-import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {valueIsDefined} from '../../../../utils';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
@@ -47,7 +47,7 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
     const [showQueryPreview, setShowQueryPreview] = React.useState(false);
     const [selectedId, setSelectedId] = React.useState<string | null>(null);
     const {savedQueries, saveQuery} = useSavedQueries();
-    const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
+    const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
 
     const sortedHistory = React.useMemo(() => {
         return queriesHistory.filteredHistoryQueries.toReversed().toSorted((a, b) => {

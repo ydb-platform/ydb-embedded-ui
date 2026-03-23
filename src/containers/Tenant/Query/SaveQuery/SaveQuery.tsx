@@ -4,6 +4,7 @@ import NiceModal from '@ebay/nice-modal-react';
 import type {ButtonButtonProps, ButtonProps} from '@gravity-ui/uikit';
 import {Button, Dialog, DropdownMenu, TextInput} from '@gravity-ui/uikit';
 
+import {useMultiTabQueryEditorEnabled} from '../../../../store/reducers/capabilities/hooks';
 import {
     renameQueryTab,
     selectActiveTab,
@@ -19,7 +20,6 @@ import {
     setQueryNameToEdit,
 } from '../../../../store/reducers/queryActions/queryActions';
 import type {SavedQuery} from '../../../../types/store/query';
-import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {getTabTitleForSave} from '../utils/queryTabTitles';
@@ -41,7 +41,7 @@ export function useSaveQueryWithTabSync() {
     const dispatch = useTypedDispatch();
     const {saveQuery} = useSavedQueries();
     const activeTab = useTypedSelector(selectActiveTab);
-    const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
+    const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
 
     return React.useCallback(
         (queryName: string | null, queryBody: string) => {
@@ -64,7 +64,7 @@ function useSaveQueryHandler(dialogProps: SaveQueryDialogCommonProps) {
     const {savedQueries} = useSavedQueries();
     const activeTab = useTypedSelector(selectActiveTab);
     const dispatch = useTypedDispatch();
-    const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
+    const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
     const handleSaveQuery = useSaveQueryWithTabSync();
 
     const onSaveQueryClick = React.useCallback(() => {
@@ -99,7 +99,7 @@ export function SaveQueryButton({dialogProps, children, ...buttonProps}: SaveQue
 
 export function SaveQuery({buttonProps = {}}: SaveQueryProps) {
     const dispatch = useTypedDispatch();
-    const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
+    const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
     const activeTabSavedQueryName = useTypedSelector(selectActiveTabSavedQueryName);
     const queryNameToEdit = useTypedSelector(selectQueryName);
     const currentInput = useTypedSelector(selectUserInput);

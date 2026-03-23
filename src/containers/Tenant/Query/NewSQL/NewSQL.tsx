@@ -11,7 +11,7 @@ import {
     TransferIcon,
 } from 'ydb-ui-components';
 
-import {uiFactory} from '../../../../uiFactory/uiFactory';
+import {useMultiTabQueryEditorEnabled} from '../../../../store/reducers/capabilities/hooks';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {insertSnippetToEditor} from '../../../../utils/monaco/insertSnippet';
 import {bindActions} from '../../utils/newSQLQueryActions';
@@ -19,7 +19,7 @@ import {bindActions} from '../../utils/newSQLQueryActions';
 import i18n from './i18n';
 
 export function NewSQL() {
-    const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
+    const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
 
     const insertTemplate = React.useCallback((input: string) => {
         insertSnippetToEditor(input);
@@ -27,7 +27,7 @@ export function NewSQL() {
 
     const onTemplateClick = useChangeInputWithConfirmation(insertTemplate, isMultiTabEnabled);
 
-    const actions = bindActions(onTemplateClick);
+    const actions = bindActions(onTemplateClick, isMultiTabEnabled);
 
     const items: DropdownMenuItem[] = [
         {

@@ -168,6 +168,10 @@ export const useMetaEnvironmentsAvailable = () => {
     return Boolean(uiFactory.databasesEnvironmentsConfig);
 };
 
+export const useMultiTabQueryEditorEnabled = () => {
+    return Boolean(uiFactory.enableMultiTabQueryEditor);
+};
+
 export const useEmMetaAvailable = () => {
     return Boolean(uiFactory.emMetaAvailable);
 };

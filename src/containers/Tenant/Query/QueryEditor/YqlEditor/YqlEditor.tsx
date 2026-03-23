@@ -6,6 +6,7 @@ import throttle from 'lodash/throttle';
 import type Monaco from 'monaco-editor';
 
 import {MonacoEditor} from '../../../../../components/MonacoEditor/MonacoEditor';
+import {useMultiTabQueryEditorEnabled} from '../../../../../store/reducers/capabilities/hooks';
 import {
     clearPendingSnippet,
     renameQueryTab,
@@ -17,7 +18,6 @@ import {
 import type {QueryInHistory} from '../../../../../store/reducers/query/types';
 import {SETTING_KEYS} from '../../../../../store/reducers/settings/constants';
 import type {QueryAction} from '../../../../../types/store/query';
-import {uiFactory} from '../../../../../uiFactory/uiFactory';
 import {
     useEventHandler,
     useSetting,
@@ -103,7 +103,7 @@ export function YqlEditor({
     const monacoRef = React.useRef<typeof Monaco | null>(null);
     const tabsManagerRef = React.useRef(new TabsManager());
 
-    const isMultiTabQueryEditorEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
+    const isMultiTabQueryEditorEnabled = useMultiTabQueryEditorEnabled();
 
     React.useEffect(() => {
         if (!isMultiTabQueryEditorEnabled) {

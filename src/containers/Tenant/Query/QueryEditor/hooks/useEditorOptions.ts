@@ -2,8 +2,8 @@ import React from 'react';
 
 import type Monaco from 'monaco-editor';
 
+import {useMultiTabQueryEditorEnabled} from '../../../../../store/reducers/capabilities/hooks';
 import {SETTING_KEYS} from '../../../../../store/reducers/settings/constants';
-import {uiFactory} from '../../../../../uiFactory/uiFactory';
 import {useSetting} from '../../../../../utils/hooks';
 
 export type EditorOptions = Monaco.editor.IEditorOptions & Monaco.editor.IGlobalEditorOptions;
@@ -22,7 +22,7 @@ const EDITOR_OPTIONS: EditorOptions = {
 export function useEditorOptions() {
     const [enableAutocomplete] = useSetting(SETTING_KEYS.ENABLE_AUTOCOMPLETE);
     const [autocompleteOnEnter] = useSetting(SETTING_KEYS.AUTOCOMPLETE_ON_ENTER);
-    const isMultiTabQueryEditorEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
+    const isMultiTabQueryEditorEnabled = useMultiTabQueryEditorEnabled();
 
     const options = React.useMemo<EditorOptions>(() => {
         const useAutocomplete = Boolean(enableAutocomplete);

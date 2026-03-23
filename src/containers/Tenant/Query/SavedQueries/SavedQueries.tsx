@@ -10,6 +10,7 @@ import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/Re
 import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
+import {useMultiTabQueryEditorEnabled} from '../../../../store/reducers/capabilities/hooks';
 import {setIsDirty, setQueryTabContent} from '../../../../store/reducers/query/query';
 import {
     selectSavedQueriesFilter,
@@ -19,7 +20,6 @@ import {
 import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
 import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import type {SavedQuery} from '../../../../types/store/query';
-import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
@@ -72,7 +72,7 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
     const {filteredSavedQueries, deleteSavedQuery} = useSavedQueries();
     const dispatch = useTypedDispatch();
     const filter = useTypedSelector(selectSavedQueriesFilter);
-    const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
+    const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
 
     const [isDeleteDialogVisible, setIsDeleteDialogVisible] = React.useState(false);
     const [queryNameToDelete, setQueryNameToDelete] = React.useState<string>('');

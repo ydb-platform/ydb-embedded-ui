@@ -8,6 +8,7 @@ import {NavigationTree} from 'ydb-ui-components';
 import {getConnectToDBDialog} from '../../../../components/ConnectToDB/ConnectToDBDialog';
 import {
     useCreateDirectoryFeatureAvailable,
+    useMultiTabQueryEditorEnabled,
     useTopicDataAvailable,
 } from '../../../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo, useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
@@ -18,7 +19,6 @@ import {streamingQueriesApi} from '../../../../store/reducers/streamingQuery/str
 import {tableSchemaDataApi} from '../../../../store/reducers/tableSchemaData';
 import {useTenantBaseInfo} from '../../../../store/reducers/tenant/tenant';
 import type {EPathType, TEvDescribeSchemeResult} from '../../../../types/api/schema';
-import {uiFactory} from '../../../../uiFactory/uiFactory';
 import {valueIsDefined} from '../../../../utils';
 import {getStringifiedData} from '../../../../utils/dataFormatters/dataFormatters';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
@@ -53,7 +53,7 @@ export function SchemaTree(props: SchemaTreeProps) {
     const {rootName, rootType, currentPath, onActivePathUpdate, databaseFullPath, database} = props;
     const dispatch = useTypedDispatch();
     const useMetaProxy = useClusterWithProxy();
-    const isMultiTabEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
+    const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
     const input = useTypedSelector(selectUserInput);
     const isDirty = useTypedSelector(selectIsDirty);
     const [
@@ -166,6 +166,7 @@ export function SchemaTree(props: SchemaTreeProps) {
                 showCreateDirectoryDialog: createDirectoryFeatureAvailable
                     ? handleOpenCreateDirectoryDialog
                     : undefined,
+                isMultiTabEnabled,
                 getConfirmation:
                     input && isDirty && !isMultiTabEnabled ? getConfirmation : undefined,
                 getConnectToDBDialog,

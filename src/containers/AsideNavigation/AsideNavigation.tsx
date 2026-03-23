@@ -6,8 +6,8 @@ import {AsideHeader, FooterItem} from '@gravity-ui/navigation';
 import type {IconData} from '@gravity-ui/uikit';
 import {useHistory} from 'react-router-dom';
 
+import {useMultiTabQueryEditorEnabled} from '../../store/reducers/capabilities/hooks';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
-import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {useSetting} from '../../utils/hooks';
 
@@ -97,7 +97,9 @@ export function AsideNavigation(props: AsideNavigationProps) {
         setVisiblePanel(undefined);
     }, []);
 
-    const hotkeyGroups = uiFactory.enableMultiTabQueryEditor
+    const isMultiTabQueryEditorEnabled = useMultiTabQueryEditorEnabled();
+
+    const hotkeyGroups = isMultiTabQueryEditorEnabled
         ? [...DEFAULT_HOTKEY_GROUPS, EDITOR_TABS_HOTKEY_GROUP]
         : DEFAULT_HOTKEY_GROUPS;
 
