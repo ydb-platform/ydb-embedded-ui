@@ -1,5 +1,21 @@
 # Changelog
 
+## [14.13.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.12.1...v14.13.0) (2026-03-20)
+
+
+### Features
+
+* **Clusters:** show compute and storage nodes versions ([#3664](https://github.com/ydb-platform/ydb-embedded-ui/issues/3664)) ([f5dd98f](https://github.com/ydb-platform/ydb-embedded-ui/commit/f5dd98fb0df491d97543553c05e568f9f738c73d))
+* use settings for new db navigation ([#3642](https://github.com/ydb-platform/ydb-embedded-ui/issues/3642)) ([970c572](https://github.com/ydb-platform/ydb-embedded-ui/commit/970c5726af6b8fa8bad35574cfbf47e72e07dd27))
+
+
+### Bug Fixes
+
+* **Authentication:** do not pass database if empty string ([#3636](https://github.com/ydb-platform/ydb-embedded-ui/issues/3636)) ([4d40d7c](https://github.com/ydb-platform/ydb-embedded-ui/commit/4d40d7c76991308ed002c073912287b22179d727))
+* **PDiskSpaceDistribution:** use NumActiveSlots for empty slots ([#3645](https://github.com/ydb-platform/ydb-embedded-ui/issues/3645)) ([48158e3](https://github.com/ydb-platform/ydb-embedded-ui/commit/48158e356cb9b7107c594513dcdf3cf0a4a4ebed))
+* **Query:** fix height with new nav ([#3626](https://github.com/ydb-platform/ydb-embedded-ui/issues/3626)) ([fdc51e5](https://github.com/ydb-platform/ydb-embedded-ui/commit/fdc51e5c59c201a4daf67da0102361a9100065d3))
+* reload page on NEED_RESET ([#3614](https://github.com/ydb-platform/ydb-embedded-ui/issues/3614)) ([58cf2f9](https://github.com/ydb-platform/ydb-embedded-ui/commit/58cf2f9f3d9ad14c9c73f9d4ee350aa778cb8e2d))
+
 ## [14.12.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.12.0...v14.12.1) (2026-03-18)
 
 
