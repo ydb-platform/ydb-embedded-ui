@@ -5,7 +5,7 @@
 
     // Allow table cell to be more than default 40px
     // It is needed to properly display long operation names (with many columns) in Firefox
-    --ydb-table-cell-height: unset !important;
+    --ydb-table-cell-height: unset;
     overflow: auto;
 
     width: 100%;
