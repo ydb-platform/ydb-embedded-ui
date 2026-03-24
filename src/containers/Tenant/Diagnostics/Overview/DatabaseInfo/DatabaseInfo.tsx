@@ -126,10 +126,10 @@ function DBInfoStatsCard({
     title: string;
     description: string;
 }) {
-    const usage = React.useMemo(() => {
-        const numValue = Number(value);
-        const numLimit = Number(limit);
+    const numValue = Number(value) || 0;
+    const numLimit = Number(limit) || 0;
 
+    const usage = React.useMemo(() => {
         if (!numValue || !numLimit || numValue < 0) {
             return 0;
         }
@@ -143,7 +143,14 @@ function DBInfoStatsCard({
             return Math.round(percentUsed * 10) / 10;
         }
         return Math.round(percentUsed);
-    }, [value, limit]);
+    }, [numValue, numLimit]);
+
+    const labelEnd = numLimit
+        ? dbInfoKeyset('text_count', {
+              count: formatNumber(numValue),
+              limit: formatNumber(numLimit),
+          })
+        : String(numValue);
 
     return (
         <Card className={b('card')} view="filled">
@@ -153,13 +160,10 @@ function DBInfoStatsCard({
                     <Text color="secondary">{description}</Text>
                 </Flex>
                 <SegmentedProgress
-                    value={Number(value ?? 0)}
-                    total={Number(limit ?? 0)}
+                    value={numValue}
+                    total={numLimit}
                     labelStart={`${usage}%`}
-                    labelEnd={dbInfoKeyset('text_count', {
-                        count: formatNumber(value ?? 0),
-                        limit: formatNumber(limit ?? 0),
-                    })}
+                    labelEnd={labelEnd}
                 />
             </Flex>
         </Card>
