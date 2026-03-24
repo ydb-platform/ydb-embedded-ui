@@ -108,7 +108,7 @@ describe('extractErrorDetails', () => {
             status: 429,
             statusText: 'Too Many Requests',
             headers: {
-                'x-proxy-name': 'https://ydb-em-2-vm-preprod.ydb.mdb.cloud-preprod.yandex.net:443',
+                'x-proxy-name': 'https://proxy-preprod.example.test:443',
                 'x-worker-name': 'proxy-worker-preprod.example.test:8765',
                 'x-request-id': 'ba767b14-d97b-45e6-889b-4bcccf5c9e46',
             },
