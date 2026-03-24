@@ -2,6 +2,7 @@
 
 .ydb-table {
     $block: &;
+    --ydb-table-row-height: 40px;
     --ydb-table-cell-height: 40px;
     &__table-header-content {
         display: inline-flex;
@@ -25,6 +26,11 @@
         tr:nth-of-type(2n + 1) {
             background-color: var(--g-color-base-generic-ultralight);
         }
+    }
+    &__row {
+        // Ensure row height even when cell height is different.
+        // Cell could be bigger than row, this height should be considered as `min-height`
+        height: var(--ydb-table-row-height) !important;
     }
     &__table_width_max {
         width: 100%;
