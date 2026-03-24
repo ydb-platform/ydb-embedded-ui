@@ -2,6 +2,10 @@
 
 .ydb-query-simplified-plan {
     $block: &;
+
+    // Allow table cell to be more than default 40px
+    // It is needed to properly display long operation names (with many columns) in Firefox
+    --ydb-table-cell-height: unset;
     overflow: auto;
 
     width: 100%;
@@ -24,13 +28,12 @@
         color: var(--g-color-text-secondary);
     }
     &__operation-name {
-        font-weight: 500;
-    }
-    &__operation-name {
         position: relative;
 
         max-width: 100%;
         height: 100%;
+
+        font-weight: 500;
     }
 
     &__divider {

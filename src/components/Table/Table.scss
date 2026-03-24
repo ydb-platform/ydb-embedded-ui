@@ -2,7 +2,10 @@
 
 .ydb-table {
     $block: &;
+    --ydb-table-row-height: 40px;
+    --ydb-table-head-cell-height: 40px;
     --ydb-table-cell-height: 40px;
+
     &__table-header-content {
         display: inline-flex;
         align-items: center;
@@ -26,11 +29,16 @@
             background-color: var(--g-color-base-generic-ultralight);
         }
     }
+    &__row {
+        // Ensure row height even when cell height is different.
+        // Cell could be bigger than row, this height should be considered as `min-height`
+        height: var(--ydb-table-row-height) !important;
+    }
     &__table_width_max {
         width: 100%;
     }
     &__table-header-cell {
-        height: var(--ydb-table-cell-height) !important;
+        height: var(--ydb-table-head-cell-height) !important;
         padding: 0;
 
         text-align: left;

@@ -34,6 +34,7 @@ export function Table<TData>({className, width, wrapperClassName, ...props}: Tab
                     const verticalAlign = cell?.column.columnDef.meta?.verticalAlign;
                     return block('table-cell', {align, 'vertical-align': verticalAlign});
                 }}
+                rowClassName={block('row')}
                 className={block('table', {width}, className)}
                 {...props}
             />
