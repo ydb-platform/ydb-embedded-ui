@@ -10,7 +10,7 @@ import {selectUser} from '../../store/reducers/authentication/authentication';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {useSetting} from '../../store/reducers/settings/useSetting';
 import {cn} from '../../utils/cn';
-import {useTypedSelector} from '../../utils/hooks';
+import {useDelayed, useTypedSelector} from '../../utils/hooks';
 import {useTenantNavigation} from '../Tenant/TenantNavigation/useTenantNavigation';
 import {useNavigationV2Enabled} from '../Tenant/utils/useNavigationV2Enabled';
 import {UserSettings} from '../UserSettings/UserSettings';
@@ -45,23 +45,8 @@ export function Navigation({children, userSettings}: NavigationProps) {
     const ydbUser = useTypedSelector(selectUser);
 
     const shouldShowNewNavAlert =
-        isV2Enabled && !isV2NavigationAlertSeen && !isNotificationSettingLoading;
-    const [isNewNavAlertReady, setIsNewNavAlertReady] = React.useState(false);
-
-    React.useEffect(() => {
-        if (!isDatabasePage || !shouldShowNewNavAlert) {
-            setIsNewNavAlertReady(false);
-            return undefined;
-        }
-
-        const timerId = window.setTimeout(() => {
-            setIsNewNavAlertReady(true);
-        }, 2_000);
-
-        return () => {
-            window.clearTimeout(timerId);
-        };
-    }, [isDatabasePage, shouldShowNewNavAlert]);
+        isV2Enabled && isDatabasePage && !isV2NavigationAlertSeen && !isNotificationSettingLoading;
+    const [isNewNavAlertReady] = useDelayed(2_000, shouldShowNewNavAlert);
 
     const isNewNavAlertShown = shouldShowNewNavAlert && isNewNavAlertReady;
 
