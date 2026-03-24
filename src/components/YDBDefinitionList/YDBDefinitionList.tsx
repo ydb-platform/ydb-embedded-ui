@@ -73,7 +73,9 @@ export function YDBDefinitionList({
             >
                 {title && (
                     <Flex gap="1" alignItems="center">
-                        <InfoViewerTitle className={titleClassname}>{title}</InfoViewerTitle>
+                        <InfoViewerTitle className={b('title', titleClassname)}>
+                            {title}
+                        </InfoViewerTitle>
                         {titleSuffix && (
                             <React.Fragment>
                                 <div className={b('title-suffix')}>{titleSeparator}</div>
