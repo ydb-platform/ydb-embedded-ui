@@ -1,5 +1,6 @@
 import React from 'react';
 
+import {skipToken} from '@reduxjs/toolkit/query';
 import {connect} from 'react-redux';
 import type {RedirectProps} from 'react-router-dom';
 import {Redirect, Route, Switch} from 'react-router-dom';
@@ -18,10 +19,15 @@ import {
     useClusterWithoutAuthInUI,
     useMetaCapabilitiesLoaded,
     useMetaCapabilitiesQuery,
+    useMetaEnvironmentsAvailable,
 } from '../../store/reducers/capabilities/hooks';
+import {clusterApi} from '../../store/reducers/cluster/cluster';
 import {nodesListApi} from '../../store/reducers/nodesList';
 import {cn} from '../../utils/cn';
-import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
+import {
+    useClusterNameFromQuery,
+    useDatabaseFromQuery,
+} from '../../utils/hooks/useDatabaseFromQuery';
 import {useMetaAuthUnavailable} from '../../utils/hooks/useMetaAuth';
 import {lazyComponent} from '../../utils/lazyComponent';
 import {isForbiddenError, isRedirectToAuth, isUnauthenticatedError} from '../../utils/response';
@@ -41,6 +47,10 @@ import {
     TenantSlot,
     VDiskPageSlot,
 } from './appSlots';
+import {
+    getInvalidClusterRedirectPath,
+    isInvalidClusterRouteState,
+} from './utils/invalidClusterRedirect';
 
 import './App.scss';
 
@@ -53,6 +63,7 @@ type RouteSlot = {
     wrapper?: React.ComponentType<any>;
     exact?: boolean;
 };
+
 const routesSlots: RouteSlot[] = [
     {
         path: routes.cluster,
@@ -158,27 +169,94 @@ export function Content(props: ContentProps) {
         <Switch>
             {additionalRoutes?.rendered}
             <Route>
-                <Header />
                 <Switch>
-                    {singleClusterMode
-                        ? null
-                        : multiClusterRoutes.map((route) => {
-                              return renderRouteSlot(slots, route);
-                          })}
-                    {/* Single cluster routes */}
-                    {routesSlots.map((route) => {
-                        return renderRouteSlot(slots, route);
-                    })}
-                    <Route
-                        path={redirectProps.from || redirectProps.path}
-                        exact={redirectProps.exact}
-                        strict={redirectProps.strict}
-                        render={() => <Redirect to={redirectProps.to} push={redirectProps.push} />}
-                    />
+                    <Route path={routes.tenant}>
+                        <TenantRouteGuard singleClusterMode={singleClusterMode}>
+                            <MainContent
+                                redirectProps={redirectProps}
+                                singleClusterMode={singleClusterMode}
+                                slots={slots}
+                            />
+                        </TenantRouteGuard>
+                    </Route>
+                    <Route>
+                        <MainContent
+                            redirectProps={redirectProps}
+                            singleClusterMode={singleClusterMode}
+                            slots={slots}
+                        />
+                    </Route>
                 </Switch>
             </Route>
         </Switch>
     );
+}
+
+function MainContent({
+    redirectProps,
+    singleClusterMode,
+    slots,
+}: {
+    redirectProps: RedirectProps;
+    singleClusterMode: boolean;
+    slots: SlotMap;
+}) {
+    return (
+        <React.Fragment>
+            <Header />
+            <Switch>
+                {singleClusterMode
+                    ? null
+                    : multiClusterRoutes.map((route) => {
+                          return renderRouteSlot(slots, route);
+                      })}
+                {/* Single cluster routes */}
+                {routesSlots.map((route) => {
+                    return renderRouteSlot(slots, route);
+                })}
+                <Route
+                    path={redirectProps.from || redirectProps.path}
+                    exact={redirectProps.exact}
+                    strict={redirectProps.strict}
+                    render={() => <Redirect to={redirectProps.to} push={redirectProps.push} />}
+                />
+            </Switch>
+        </React.Fragment>
+    );
+}
+
+function TenantRouteGuard({
+    children,
+    singleClusterMode,
+}: {
+    children: React.ReactNode;
+    singleClusterMode: boolean;
+}) {
+    const clusterName = useClusterNameFromQuery();
+    const databasesPageAvailable = useMetaEnvironmentsAvailable();
+
+    const {currentData, error, isLoading, isSuccess} = clusterApi.useGetClusterBaseInfoQuery(
+        clusterName || skipToken,
+        {
+            skip: singleClusterMode || !clusterName || !window.api.meta,
+        },
+    );
+
+    if (isLoading) {
+        return (
+            <main className={b('main')}>
+                <LoaderWrapper loading={true} size="l">
+                    {null}
+                </LoaderWrapper>
+            </main>
+        );
+    }
+
+    if (isInvalidClusterRouteState({currentData, error, isSuccess})) {
+        return <Redirect to={getInvalidClusterRedirectPath(databasesPageAvailable)} />;
+    }
+
+    return children;
 }
 
 function DataWrapper({children}: {children: React.ReactNode}) {
