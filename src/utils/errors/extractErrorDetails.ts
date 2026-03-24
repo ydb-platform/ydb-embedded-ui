@@ -14,6 +14,10 @@ export interface ErrorDetails {
     requestId?: string;
     proxyName?: string;
     workerName?: string;
+    proxyTraceId?: string;
+    proxyRequestId?: string;
+    proxyRewrittenPath?: string;
+    proxyTarget?: string;
     requestUrl?: string;
     method?: string;
     errorCode?: string;
@@ -35,9 +39,45 @@ export const USEFUL_HEADERS = [
     {header: 'x-worker-name', key: 'workerName', transform: undefined},
 ] as const;
 
+const PROXY_HEADERS = [
+    {header: 'x-ydb-ui-proxy-trace-id', key: 'proxyTraceId'},
+    {header: 'x-ydb-ui-proxy-request-id', key: 'proxyRequestId'},
+    {header: 'x-ydb-ui-proxy-rewritten-path', key: 'proxyRewrittenPath'},
+    {header: 'x-ydb-ui-proxy-target', key: 'proxyTarget'},
+] as const;
+
+const PROXY_BODY_FIELDS = [
+    {key: 'proxyTraceId', sourceKeys: ['proxyTraceId', 'traceId', 'x-ydb-ui-proxy-trace-id']},
+    {
+        key: 'proxyRequestId',
+        sourceKeys: ['proxyRequestId', 'requestId', 'x-ydb-ui-proxy-request-id'],
+    },
+    {
+        key: 'proxyRewrittenPath',
+        sourceKeys: ['proxyRewrittenPath', 'rewrittenPath', 'x-ydb-ui-proxy-rewritten-path'],
+    },
+    {key: 'proxyTarget', sourceKeys: ['proxyTarget', 'target', 'x-ydb-ui-proxy-target']},
+] as const;
+
+type ProxyDetailsKey = (typeof PROXY_HEADERS)[number]['key'];
+
+interface ProxyBodyFieldDefinition {
+    key: ProxyDetailsKey;
+    sourceKeys: readonly string[];
+}
+
 function extractTraceIdFromTraceresponse(value: string): string {
     const parts = value.split('-');
     return parts.length >= 2 ? parts[1] : value;
+}
+
+function normalizeStringValue(value: unknown): string | undefined {
+    if (typeof value !== 'string') {
+        return undefined;
+    }
+
+    const trimmedValue = value.trim();
+    return trimmedValue || undefined;
 }
 
 function hasStatus(error: Record<string, unknown>): boolean {
@@ -125,6 +165,74 @@ function extractHeaders(headers: unknown): Partial<ErrorDetails> {
     }
 
     return result;
+}
+
+function extractProxyHeaders(headers: unknown): Partial<Pick<ErrorDetails, ProxyDetailsKey>> {
+    if (!headers || typeof headers !== 'object') {
+        return {};
+    }
+
+    const headersRecord = headers as Record<string, unknown>;
+    const result: Partial<Pick<ErrorDetails, ProxyDetailsKey>> = {};
+
+    for (const {header, key} of PROXY_HEADERS) {
+        const value = normalizeStringValue(headersRecord[header]);
+        if (value) {
+            result[key] = value;
+        }
+    }
+
+    return result;
+}
+
+function extractProxyBodyField(
+    source: Record<string, unknown>,
+    field: ProxyBodyFieldDefinition,
+): string | undefined {
+    for (const sourceKey of field.sourceKeys) {
+        const value = normalizeStringValue(source[sourceKey]);
+        if (value) {
+            return value;
+        }
+    }
+
+    return undefined;
+}
+
+function extractProxyBody(data: unknown): Partial<Pick<ErrorDetails, ProxyDetailsKey>> {
+    if (!data || typeof data !== 'object' || !('proxyDiagnostics' in data)) {
+        return {};
+    }
+
+    const proxyDiagnostics = (data as Record<string, unknown>).proxyDiagnostics;
+    if (!proxyDiagnostics || typeof proxyDiagnostics !== 'object') {
+        return {};
+    }
+
+    const proxyRecord = proxyDiagnostics as Record<string, unknown>;
+    const result: Partial<Pick<ErrorDetails, ProxyDetailsKey>> = {};
+
+    for (const field of PROXY_BODY_FIELDS) {
+        const value = extractProxyBodyField(proxyRecord, field);
+        if (value) {
+            result[field.key] = value;
+        }
+    }
+
+    return result;
+}
+
+function extractProxyDiagnostics(
+    headers: unknown,
+    data: unknown,
+): Partial<Pick<ErrorDetails, ProxyDetailsKey>> {
+    const bodyDiagnostics = extractProxyBody(data);
+    const headerDiagnostics = extractProxyHeaders(headers);
+
+    return {
+        ...bodyDiagnostics,
+        ...headerDiagnostics,
+    };
 }
 
 function buildUrlWithParams(baseUrl: string, params: unknown): string {
@@ -385,6 +493,8 @@ export function extractErrorDetails(error: unknown): ErrorDetails | null {
     if ('headers' in normalizedError) {
         Object.assign(details, extractHeaders(normalizedError.headers));
     }
+
+    Object.assign(details, extractProxyDiagnostics(normalizedError.headers, normalizedError.data));
 
     if ('config' in normalizedError) {
         const {url, method} = extractConfig(normalizedError.config);

@@ -14,6 +14,7 @@ import {ErrorDisplayModel} from './ErrorDisplayModel';
 import {
     setupCapabilities401Mock,
     setupCluster400PlainTextMock,
+    setupCluster503ProxyHeadersMock,
     setupDescribe403Mock,
     setupNodeNetworkErrorMock,
     setupPDisk503EmptyBodyMock,
@@ -28,6 +29,8 @@ import {
     setupWhoami401NeedResetMock,
     setupWhoami500Mock,
     setupWhoami502HtmlMock,
+    setupWhoami503ProxyBodyMock,
+    setupWhoami503ProxyHeadersOverrideBodyMock,
     setupWhoami503TextMock,
     setupWhoamiHybridNetworkErrorMock,
     setupWhoamiNetworkErrorMock,
@@ -108,6 +111,38 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
             path: `${FULL_PAGE_DIR}/full-node-network.png`,
             fullPage: true,
         });
+    });
+
+    test('Cluster — proxy diagnostics from headers show proxy ids, rewritten path and target', async ({
+        page,
+    }) => {
+        await setupCluster503ProxyHeadersMock(page);
+
+        const clusterPage = new ClusterPage(page);
+        await clusterPage.goto();
+
+        const errorDisplay = new ErrorDisplayModel(page);
+        await errorDisplay.waitForResponseError();
+
+        expect(await errorDisplay.isFieldsVisible()).toBe(true);
+
+        const requestId = await errorDisplay.getDetailValue('Request-ID');
+        expect(requestId).toBe('generic-request-id-cluster-503');
+
+        const proxyTraceId = await errorDisplay.getDetailValue('Proxy Trace-ID');
+        expect(proxyTraceId).toBe('proxy-trace-id-cluster-503');
+
+        const proxyRequestId = await errorDisplay.getDetailValue('Proxy Request-ID');
+        expect(proxyRequestId).toBe('proxy-request-id-cluster-503');
+
+        const target = await errorDisplay.getDetailValue('Proxy Target');
+        expect(target).toBe(
+            'http://meta-upstream.example.test:8780/meta/cp_databases?cluster_name=test-cluster',
+        );
+
+        await expect(errorDisplay.getResponseErrorLocator()).toHaveScreenshot(
+            'error-cluster-503-proxy-headers.png',
+        );
     });
 
     test('PDisk — 503 empty body with x-worker-name', async ({page}) => {
@@ -375,6 +410,56 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
             path: `${FULL_PAGE_DIR}/full-whoami-503-text.png`,
             fullPage: true,
         });
+    });
+
+    test('Full-page — whoami 503 JSON body shows proxy diagnostics from proxyDiagnostics', async ({
+        page,
+    }) => {
+        await setupWhoami503ProxyBodyMock(page);
+
+        const clusterPage = new ClusterPage(page);
+        await clusterPage.goto();
+
+        const errorDisplay = new ErrorDisplayModel(page);
+        await errorDisplay.waitForPageError();
+
+        expect(await errorDisplay.isPageErrorFieldsVisible()).toBe(true);
+
+        const proxyTraceId = await errorDisplay.getPageErrorDetailValue('Proxy Trace-ID');
+        expect(proxyTraceId).toBe('proxy-trace-id-body-503');
+
+        const proxyRequestId = await errorDisplay.getPageErrorDetailValue('Proxy Request-ID');
+        expect(proxyRequestId).toBe('proxy-request-id-body-503');
+
+        const target = await errorDisplay.getPageErrorDetailValue('Proxy Target');
+        expect(target).toBe(
+            'http://meta-body.example.test:8780/meta/cp_databases?cluster_name=body-cluster',
+        );
+
+        await expect(errorDisplay.getPageErrorLocator()).toHaveScreenshot(
+            'error-full-page-whoami-503-proxy-body.png',
+        );
+    });
+
+    test('Full-page — whoami proxy headers override proxyDiagnostics body values', async ({
+        page,
+    }) => {
+        await setupWhoami503ProxyHeadersOverrideBodyMock(page);
+
+        const clusterPage = new ClusterPage(page);
+        await clusterPage.goto();
+
+        const errorDisplay = new ErrorDisplayModel(page);
+        await errorDisplay.waitForPageError();
+
+        const proxyTraceId = await errorDisplay.getPageErrorDetailValue('Proxy Trace-ID');
+        expect(proxyTraceId).toBe('proxy-trace-id-header-override');
+
+        const proxyRequestId = await errorDisplay.getPageErrorDetailValue('Proxy Request-ID');
+        expect(proxyRequestId).toBe('proxy-request-id-header-override');
+
+        const target = await errorDisplay.getPageErrorDetailValue('Proxy Target');
+        expect(target).toBe('http://meta-header-override.example.test:8780/meta/header-override');
     });
 
     test('Full-page — whoami network error blocks entire page', async ({page}) => {
