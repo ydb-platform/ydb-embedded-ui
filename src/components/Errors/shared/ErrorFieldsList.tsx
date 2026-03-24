@@ -99,12 +99,18 @@ export function ErrorFieldsList({
                 </DefinitionList.Item>
             )}
             {errorOrigin && (
-                <DefinitionList.Item name={i18n('error-details.label_error-origin')}>
+                <DefinitionList.Item
+                    name={i18n('error-details.label_error-origin')}
+                    copyText={errorOrigin}
+                >
                     <span className={valueClassName}>{errorOrigin}</span>
                 </DefinitionList.Item>
             )}
             {errorStage && (
-                <DefinitionList.Item name={i18n('error-details.label_error-stage')}>
+                <DefinitionList.Item
+                    name={i18n('error-details.label_error-stage')}
+                    copyText={errorStage}
+                >
                     <span className={valueClassName}>{errorStage}</span>
                 </DefinitionList.Item>
             )}

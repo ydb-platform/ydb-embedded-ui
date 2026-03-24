@@ -53,7 +53,7 @@ const FULL_PAGE_DIR = 'playwright-artifacts/full-page-screenshots';
 //   Access:    Tenant → 403 AccessDenied
 //   Access:    Capabilities → 401 Unauthenticated
 
-test.describe.only('Error Display — ResponseError and PageError across pages', () => {
+test.describe('Error Display — ResponseError and PageError across pages', () => {
     // --- Inline ResponseError (one per navigable page, each a different error type) ---
 
     test('Cluster — 400 plain text with traceresponse and x-request-id', async ({page}) => {

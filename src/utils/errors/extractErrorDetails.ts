@@ -300,13 +300,25 @@ function extractErrorMarkerHeaders(headers: unknown): Partial<Pick<ErrorDetails,
     }
 
     const headersRecord = headers as Record<string, unknown>;
-    const errorOrigin = normalizeErrorOrigin(headersRecord['x-ydb-ui-error-origin']);
-    const errorStage = normalizeStringValue(headersRecord['x-ydb-ui-error-stage']);
+    const result: Partial<Pick<ErrorDetails, ErrorMarkerKey>> = {};
 
-    return {
-        ...(errorOrigin ? {errorOrigin} : {}),
-        ...(errorStage ? {errorStage} : {}),
-    };
+    for (const {header, key} of ERROR_MARKER_HEADERS) {
+        const rawValue = headersRecord[header];
+        if (key === 'errorOrigin') {
+            const errorOrigin = normalizeErrorOrigin(rawValue);
+            if (errorOrigin) {
+                result.errorOrigin = errorOrigin;
+            }
+            continue;
+        }
+
+        const errorStage = normalizeStringValue(rawValue);
+        if (errorStage) {
+            result.errorStage = errorStage;
+        }
+    }
+
+    return result;
 }
 
 function extractErrorMarkerFields(
