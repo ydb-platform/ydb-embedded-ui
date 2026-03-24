@@ -457,6 +457,104 @@ describe('extractErrorDetails', () => {
         expect(details?.proxyTarget).toBe('http://meta-header.example.test:8780/');
     });
 
+    test('should extract error origin and stage from headers', () => {
+        const error = {
+            status: 503,
+            headers: {
+                'x-ydb-ui-error-origin': 'upstream',
+                'x-ydb-ui-error-stage': 'upstream-response',
+            },
+        };
+        const details = extractErrorDetails(error);
+
+        expect(details?.errorOrigin).toBe('upstream');
+        expect(details?.errorStage).toBe('upstream-response');
+    });
+
+    test('should extract error origin and stage from top-level body', () => {
+        const error = {
+            status: 503,
+            data: {
+                errorOrigin: 'proxy',
+                errorStage: 'connect',
+            },
+        };
+        const details = extractErrorDetails(error);
+
+        expect(details?.errorOrigin).toBe('proxy');
+        expect(details?.errorStage).toBe('connect');
+    });
+
+    test('should extract error origin and stage from proxyDiagnostics body', () => {
+        const error = {
+            status: 503,
+            data: {
+                proxyDiagnostics: {
+                    origin: 'app',
+                    stage: 'before-proxy',
+                },
+            },
+        };
+        const details = extractErrorDetails(error);
+
+        expect(details?.errorOrigin).toBe('app');
+        expect(details?.errorStage).toBe('before-proxy');
+    });
+
+    test('should prefer error marker headers over body values', () => {
+        const error = {
+            status: 503,
+            headers: {
+                'x-ydb-ui-error-origin': 'upstream',
+                'x-ydb-ui-error-stage': 'upstream-response',
+            },
+            data: {
+                errorOrigin: 'proxy',
+                errorStage: 'connect',
+            },
+        };
+        const details = extractErrorDetails(error);
+
+        expect(details?.errorOrigin).toBe('upstream');
+        expect(details?.errorStage).toBe('upstream-response');
+    });
+
+    test('should ignore unknown error origin values', () => {
+        const error = {
+            status: 503,
+            headers: {
+                'x-ydb-ui-error-origin': 'unknown-origin',
+                'x-ydb-ui-error-stage': 'dns',
+            },
+        };
+        const details = extractErrorDetails(error);
+
+        expect(details?.errorOrigin).toBeUndefined();
+        expect(details?.errorStage).toBe('dns');
+    });
+
+    test('should keep error origin independent from proxy diagnostics fields', () => {
+        const error = {
+            status: 503,
+            headers: {
+                'x-ydb-ui-error-origin': 'proxy',
+                'x-ydb-ui-proxy-request-id': 'proxy-request-id-header',
+                'x-ydb-ui-proxy-target': 'http://meta-header.example.test:8780/',
+            },
+            data: {
+                proxyDiagnostics: {
+                    requestId: 'proxy-request-id-body',
+                    target: 'http://meta-body.example.test:8780/',
+                },
+            },
+        };
+        const details = extractErrorDetails(error);
+
+        expect(details?.errorOrigin).toBe('proxy');
+        expect(details?.proxyRequestId).toBe('proxy-request-id-header');
+        expect(details?.proxyTarget).toBe('http://meta-header.example.test:8780/');
+    });
+
     test('should keep generic Request-ID and Proxy Request-ID separately', () => {
         const error = {
             status: 503,

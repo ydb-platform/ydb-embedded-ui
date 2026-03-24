@@ -60,6 +60,8 @@ export function ErrorFieldsList({
         method,
         errorCode,
         message,
+        errorOrigin,
+        errorStage,
         traceId,
         requestId,
         proxyTraceId,
@@ -94,6 +96,16 @@ export function ErrorFieldsList({
             {showMessage && (
                 <DefinitionList.Item name={i18n('error-details.label_message')} copyText={message}>
                     <span className={valueClassName}>{message}</span>
+                </DefinitionList.Item>
+            )}
+            {errorOrigin && (
+                <DefinitionList.Item name={i18n('error-details.label_error-origin')}>
+                    <span className={valueClassName}>{errorOrigin}</span>
+                </DefinitionList.Item>
+            )}
+            {errorStage && (
+                <DefinitionList.Item name={i18n('error-details.label_error-stage')}>
+                    <span className={valueClassName}>{errorStage}</span>
                 </DefinitionList.Item>
             )}
             {errorPhase && (
@@ -169,6 +181,8 @@ export function hasVisibleFields(details: ErrorDetails, renderedTitle?: string):
     const {
         requestUrl,
         errorCode,
+        errorOrigin,
+        errorStage,
         traceId,
         requestId,
         proxyTraceId,
@@ -187,6 +201,8 @@ export function hasVisibleFields(details: ErrorDetails, renderedTitle?: string):
         requestUrl ||
             errorCode ||
             showMessage ||
+            errorOrigin ||
+            errorStage ||
             errorPhase ||
             networkEffectiveType ||
             traceId ||

@@ -53,7 +53,7 @@ const FULL_PAGE_DIR = 'playwright-artifacts/full-page-screenshots';
 //   Access:    Tenant → 403 AccessDenied
 //   Access:    Capabilities → 401 Unauthenticated
 
-test.describe('Error Display — ResponseError and PageError across pages', () => {
+test.describe.only('Error Display — ResponseError and PageError across pages', () => {
     // --- Inline ResponseError (one per navigable page, each a different error type) ---
 
     test('Cluster — 400 plain text with traceresponse and x-request-id', async ({page}) => {
@@ -134,6 +134,12 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
 
         const proxyRequestId = await errorDisplay.getDetailValue('Proxy Request-ID');
         expect(proxyRequestId).toBe('proxy-request-id-cluster-503');
+
+        const errorOrigin = await errorDisplay.getDetailValue('Error origin');
+        expect(errorOrigin).toBe('upstream');
+
+        const errorStage = await errorDisplay.getDetailValue('Error stage');
+        expect(errorStage).toBe('upstream-response');
 
         const target = await errorDisplay.getDetailValue('Proxy Target');
         expect(target).toBe(
@@ -431,6 +437,12 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         const proxyRequestId = await errorDisplay.getPageErrorDetailValue('Proxy Request-ID');
         expect(proxyRequestId).toBe('proxy-request-id-body-503');
 
+        const errorOrigin = await errorDisplay.getPageErrorDetailValue('Error origin');
+        expect(errorOrigin).toBe('app');
+
+        const errorStage = await errorDisplay.getPageErrorDetailValue('Error stage');
+        expect(errorStage).toBe('before-proxy');
+
         const target = await errorDisplay.getPageErrorDetailValue('Proxy Target');
         expect(target).toBe(
             'http://meta-body.example.test:8780/meta/cp_databases?cluster_name=body-cluster',
@@ -457,6 +469,12 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
 
         const proxyRequestId = await errorDisplay.getPageErrorDetailValue('Proxy Request-ID');
         expect(proxyRequestId).toBe('proxy-request-id-header-override');
+
+        const errorOrigin = await errorDisplay.getPageErrorDetailValue('Error origin');
+        expect(errorOrigin).toBe('upstream');
+
+        const errorStage = await errorDisplay.getPageErrorDetailValue('Error stage');
+        expect(errorStage).toBe('upstream-response');
 
         const target = await errorDisplay.getPageErrorDetailValue('Proxy Target');
         expect(target).toBe('http://meta-header-override.example.test:8780/meta/header-override');
@@ -749,6 +767,12 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
 
         const workerName = await errorDisplay.getDetailValue('x-worker-name');
         expect(workerName).toContain('stream-worker-02');
+
+        const errorOrigin = await errorDisplay.getDetailValue('Error origin');
+        expect(errorOrigin).toBe('proxy');
+
+        const errorStage = await errorDisplay.getDetailValue('Error stage');
+        expect(errorStage).toBe('stream');
 
         await expect(errorDisplay.getResponseErrorLocator()).toHaveScreenshot(
             'error-streaming-query-500.png',

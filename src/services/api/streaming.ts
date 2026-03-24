@@ -17,7 +17,7 @@ import type {
     StreamingChunk,
 } from '../../types/store/streaming';
 import {DEV_ENABLE_TRACING_FOR_ALL_REQUESTS} from '../../utils/constants';
-import {USEFUL_HEADERS} from '../../utils/errors/extractErrorDetails';
+import {EXTRACTABLE_RESPONSE_HEADERS} from '../../utils/errors/extractErrorDetails';
 import {isRedirectToAuth} from '../../utils/response';
 
 import {BaseYdbAPI} from './base';
@@ -30,8 +30,7 @@ import {isNeedResetResponse, processNeedReset} from './utils/needReset';
  */
 function extractResponseHeaders(response: Response): Record<string, string> {
     const result: Record<string, string> = {};
-    const headerNames = USEFUL_HEADERS.map(({header}) => header);
-    for (const name of headerNames) {
+    for (const name of EXTRACTABLE_RESPONSE_HEADERS) {
         const value = response.headers.get(name);
         if (value) {
             result[name] = value;

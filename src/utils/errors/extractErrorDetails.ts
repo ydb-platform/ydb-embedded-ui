@@ -18,6 +18,8 @@ export interface ErrorDetails {
     proxyRequestId?: string;
     proxyRewrittenPath?: string;
     proxyTarget?: string;
+    errorOrigin?: 'app' | 'proxy' | 'upstream';
+    errorStage?: string;
     requestUrl?: string;
     method?: string;
     errorCode?: string;
@@ -46,6 +48,11 @@ const PROXY_HEADERS = [
     {header: 'x-ydb-ui-proxy-target', key: 'proxyTarget'},
 ] as const;
 
+const ERROR_MARKER_HEADERS = [
+    {header: 'x-ydb-ui-error-origin', key: 'errorOrigin'},
+    {header: 'x-ydb-ui-error-stage', key: 'errorStage'},
+] as const;
+
 const PROXY_BODY_FIELDS = [
     {key: 'proxyTraceId', sourceKeys: ['proxyTraceId', 'traceId', 'x-ydb-ui-proxy-trace-id']},
     {
@@ -59,12 +66,40 @@ const PROXY_BODY_FIELDS = [
     {key: 'proxyTarget', sourceKeys: ['proxyTarget', 'target', 'x-ydb-ui-proxy-target']},
 ] as const;
 
+const ERROR_MARKER_BODY_FIELDS = [
+    {key: 'errorOrigin', sourceKeys: ['errorOrigin']},
+    {key: 'errorStage', sourceKeys: ['errorStage']},
+] as const;
+
+const ERROR_MARKER_PROXY_BODY_FIELDS = [
+    {key: 'errorOrigin', sourceKeys: ['errorOrigin', 'origin']},
+    {key: 'errorStage', sourceKeys: ['errorStage', 'stage']},
+] as const;
+
 type ProxyDetailsKey = (typeof PROXY_HEADERS)[number]['key'];
+type ErrorMarkerKey = (typeof ERROR_MARKER_HEADERS)[number]['key'];
+type ExtractableResponseHeader =
+    | (typeof USEFUL_HEADERS)[number]['header']
+    | (typeof PROXY_HEADERS)[number]['header']
+    | (typeof ERROR_MARKER_HEADERS)[number]['header'];
 
 interface ProxyBodyFieldDefinition {
     key: ProxyDetailsKey;
     sourceKeys: readonly string[];
 }
+
+interface ErrorMarkerBodyFieldDefinition {
+    key: ErrorMarkerKey;
+    sourceKeys: readonly string[];
+}
+
+const ERROR_ORIGIN_VALUES = ['app', 'proxy', 'upstream'] as const;
+
+export const EXTRACTABLE_RESPONSE_HEADERS: ExtractableResponseHeader[] = [
+    ...USEFUL_HEADERS.map(({header}) => header),
+    ...PROXY_HEADERS.map(({header}) => header),
+    ...ERROR_MARKER_HEADERS.map(({header}) => header),
+];
 
 function extractTraceIdFromTraceresponse(value: string): string {
     const parts = value.split('-');
@@ -78,6 +113,16 @@ function normalizeStringValue(value: unknown): string | undefined {
 
     const trimmedValue = value.trim();
     return trimmedValue || undefined;
+}
+
+function normalizeErrorOrigin(value: unknown): ErrorDetails['errorOrigin'] | undefined {
+    const normalizedValue = normalizeStringValue(value);
+
+    if (!normalizedValue) {
+        return undefined;
+    }
+
+    return ERROR_ORIGIN_VALUES.find((allowedValue) => allowedValue === normalizedValue);
 }
 
 function hasStatus(error: Record<string, unknown>): boolean {
@@ -199,6 +244,20 @@ function extractProxyBodyField(
     return undefined;
 }
 
+function extractErrorMarkerBodyField(
+    source: Record<string, unknown>,
+    field: ErrorMarkerBodyFieldDefinition,
+): string | undefined {
+    for (const sourceKey of field.sourceKeys) {
+        const value = normalizeStringValue(source[sourceKey]);
+        if (value) {
+            return value;
+        }
+    }
+
+    return undefined;
+}
+
 function extractProxyBody(data: unknown): Partial<Pick<ErrorDetails, ProxyDetailsKey>> {
     if (!data || typeof data !== 'object' || !('proxyDiagnostics' in data)) {
         return {};
@@ -232,6 +291,87 @@ function extractProxyDiagnostics(
     return {
         ...bodyDiagnostics,
         ...headerDiagnostics,
+    };
+}
+
+function extractErrorMarkerHeaders(headers: unknown): Partial<Pick<ErrorDetails, ErrorMarkerKey>> {
+    if (!headers || typeof headers !== 'object') {
+        return {};
+    }
+
+    const headersRecord = headers as Record<string, unknown>;
+    const errorOrigin = normalizeErrorOrigin(headersRecord['x-ydb-ui-error-origin']);
+    const errorStage = normalizeStringValue(headersRecord['x-ydb-ui-error-stage']);
+
+    return {
+        ...(errorOrigin ? {errorOrigin} : {}),
+        ...(errorStage ? {errorStage} : {}),
+    };
+}
+
+function extractErrorMarkerFields(
+    source: Record<string, unknown>,
+    fields: readonly ErrorMarkerBodyFieldDefinition[],
+): Partial<Pick<ErrorDetails, ErrorMarkerKey>> {
+    const result: Partial<Pick<ErrorDetails, ErrorMarkerKey>> = {};
+
+    for (const field of fields) {
+        const value = extractErrorMarkerBodyField(source, field);
+
+        if (!value) {
+            continue;
+        }
+
+        if (field.key === 'errorOrigin') {
+            const errorOrigin = normalizeErrorOrigin(value);
+            if (errorOrigin) {
+                result.errorOrigin = errorOrigin;
+            }
+            continue;
+        }
+
+        result[field.key] = value;
+    }
+
+    return result;
+}
+
+function extractErrorMarkerBody(data: unknown): Partial<Pick<ErrorDetails, ErrorMarkerKey>> {
+    if (!data || typeof data !== 'object') {
+        return {};
+    }
+
+    const dataRecord = data as Record<string, unknown>;
+    const result = extractErrorMarkerFields(dataRecord, ERROR_MARKER_BODY_FIELDS);
+
+    if (!('proxyDiagnostics' in dataRecord)) {
+        return result;
+    }
+
+    const proxyDiagnostics = dataRecord.proxyDiagnostics;
+    if (!proxyDiagnostics || typeof proxyDiagnostics !== 'object') {
+        return result;
+    }
+
+    return {
+        ...extractErrorMarkerFields(
+            proxyDiagnostics as Record<string, unknown>,
+            ERROR_MARKER_PROXY_BODY_FIELDS,
+        ),
+        ...result,
+    };
+}
+
+function extractErrorMarkers(
+    headers: unknown,
+    data: unknown,
+): Partial<Pick<ErrorDetails, ErrorMarkerKey>> {
+    const bodyMarkers = extractErrorMarkerBody(data);
+    const headerMarkers = extractErrorMarkerHeaders(headers);
+
+    return {
+        ...bodyMarkers,
+        ...headerMarkers,
     };
 }
 
@@ -495,6 +635,7 @@ export function extractErrorDetails(error: unknown): ErrorDetails | null {
     }
 
     Object.assign(details, extractProxyDiagnostics(normalizedError.headers, normalizedError.data));
+    Object.assign(details, extractErrorMarkers(normalizedError.headers, normalizedError.data));
 
     if ('config' in normalizedError) {
         const {url, method} = extractConfig(normalizedError.config);
