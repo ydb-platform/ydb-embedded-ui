@@ -19,8 +19,11 @@ function formatProxyTargetLine(
 ): string | undefined {
     if (proxyTarget && proxyRewrittenPath) {
         const normalizedTarget = proxyTarget.endsWith('/') ? proxyTarget.slice(0, -1) : proxyTarget;
+        const normalizedPath = proxyRewrittenPath.startsWith('/')
+            ? proxyRewrittenPath
+            : `/${proxyRewrittenPath}`;
 
-        return `${normalizedTarget}${proxyRewrittenPath}`;
+        return `${normalizedTarget}${normalizedPath}`;
     }
 
     return proxyTarget || proxyRewrittenPath;
