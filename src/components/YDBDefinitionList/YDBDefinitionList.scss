@@ -4,10 +4,6 @@
     $block: &;
     @include mixins.flex-container();
 
-    &__title {
-        @include mixins.info-viewer-title();
-    }
-
     &__title-suffix {
         color: var(--g-color-text-secondary);
     }

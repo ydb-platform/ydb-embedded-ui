@@ -48,6 +48,7 @@ import {
     paneVisibilityToggleReducer,
 } from '../utils/paneVisibilityToggleHelpers';
 import {isTableType} from '../utils/schema';
+import {useNavigationV2Enabled} from '../utils/useNavigationV2Enabled';
 
 import {ObjectTree} from './ObjectTree';
 import {SchemaActions} from './SchemaActions';
@@ -78,6 +79,8 @@ export function ObjectSummary({
         DEFAULT_IS_TENANT_COMMON_INFO_COLLAPSED,
         false,
     );
+    const isV2Navigation = useNavigationV2Enabled();
+
     const [commonInfoVisibilityState, dispatchCommonInfoVisibilityState] = React.useReducer(
         paneVisibilityToggleReducer,
         undefined,
@@ -244,9 +247,9 @@ export function ObjectSummary({
                     content: prepareSystemViewType(PathDescription?.SysViewDescription?.Type),
                 },
             ],
-            [EPathType.EPathTypeSubDomain]: getDatabaseOverview,
+            [EPathType.EPathTypeSubDomain]: isV2Navigation ? undefined : getDatabaseOverview,
             [EPathType.EPathTypeTableIndex]: undefined,
-            [EPathType.EPathTypeExtSubDomain]: getDatabaseOverview,
+            [EPathType.EPathTypeExtSubDomain]: isV2Navigation ? undefined : getDatabaseOverview,
             [EPathType.EPathTypeColumnStore]: () => [
                 {
                     name: i18n('field_partitions'),
