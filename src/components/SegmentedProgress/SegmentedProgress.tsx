@@ -8,6 +8,8 @@ import './SegmentedProgress.scss';
 
 const b = cn('ydb-segmented-progress');
 
+type DisplayNoLimit = 'empty' | 'filled';
+
 export interface SegmentedProgressProps {
     value: number;
     total: number;
@@ -15,6 +17,7 @@ export interface SegmentedProgressProps {
     labelStart?: string;
     labelEnd?: string;
     ariaLabel?: string;
+    displayNoLimit?: DisplayNoLimit;
 }
 
 export function SegmentedProgress({
@@ -24,6 +27,7 @@ export function SegmentedProgress({
     labelStart,
     labelEnd,
     ariaLabel,
+    displayNoLimit = 'empty',
 }: SegmentedProgressProps) {
     const percentUsed = total > 0 ? (value / total) * 100 : 0;
     const normalizedUsed = React.useMemo(() => {
@@ -38,6 +42,17 @@ export function SegmentedProgress({
         }
         return Math.round(percentUsed);
     }, [percentUsed]);
+
+    const fillWidth = React.useMemo(() => {
+        if (!total) {
+            if (displayNoLimit === 'filled') {
+                return 100;
+            }
+            return 0;
+        }
+        return normalizedUsed;
+    }, [total, normalizedUsed, displayNoLimit]);
+
     return (
         <Flex direction="column" gap={1}>
             <Flex
@@ -51,13 +66,10 @@ export function SegmentedProgress({
                 aria-valuemax={100}
                 aria-valuenow={normalizedUsed}
             >
-                {normalizedUsed > 0 && (
-                    <div
-                        className={b('section', {used: true})}
-                        style={{width: `${normalizedUsed}%`}}
-                    />
+                {fillWidth > 0 && (
+                    <div className={b('section', {used: true})} style={{width: `${fillWidth}%`}} />
                 )}
-                {100 - normalizedUsed > 0 && <div className={b('section')} style={{flexGrow: 1}} />}
+                {100 - fillWidth > 0 && <div className={b('section')} style={{flexGrow: 1}} />}
             </Flex>
             <Flex width="100%">
                 {labelStart && <Text color="secondary">{labelStart}</Text>}

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Card, Flex, HelpMark, Label, Text} from '@gravity-ui/uikit';
+import {Alert, Card, Flex, HelpMark, Label, Text} from '@gravity-ui/uikit';
 
 import {InfoViewerTitle} from '../../../../../components/InfoViewerTitle/InfoViewerTitle';
 import {SegmentedProgress} from '../../../../../components/SegmentedProgress/SegmentedProgress';
@@ -152,6 +152,21 @@ function DBInfoStatsCard({
           })
         : String(numValue);
 
+    const usageLabel = numLimit ? `${usage}%` : `N/A %`;
+
+    const renderNoLimitAlert = () => {
+        if (numLimit) {
+            return null;
+        }
+        return (
+            <Alert
+                className={b('alert')}
+                theme="warning"
+                message={dbInfoKeyset('alert_no-limit')}
+            />
+        );
+    };
+
     return (
         <Card className={b('card')} view="filled">
             <Flex gap={2} direction={'column'}>
@@ -162,9 +177,11 @@ function DBInfoStatsCard({
                 <SegmentedProgress
                     value={numValue}
                     total={numLimit}
-                    labelStart={`${usage}%`}
+                    labelStart={usageLabel}
                     labelEnd={labelEnd}
+                    displayNoLimit="filled"
                 />
+                {renderNoLimitAlert()}
             </Flex>
         </Card>
     );

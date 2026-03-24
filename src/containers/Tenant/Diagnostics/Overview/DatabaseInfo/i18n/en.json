@@ -13,5 +13,6 @@
   "title_shards": "Shards",
   "description_paths": "Total number of schema objects (tables, directories, indexes, views, etc.)",
   "description_shards": "Number of data shards (tablets) currently used by tables in this database",
-  "text_count": "{{count}} of {{limit}}"
+  "text_count": "{{count}} of {{limit}}",
+  "alert_no-limit": "Failed to load limit data. Usage percentage cannot be calculated."
 }

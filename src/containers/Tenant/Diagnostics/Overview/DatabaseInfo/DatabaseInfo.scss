@@ -1,3 +1,5 @@
+@use '../../../../../styles/mixins.scss';
+
 .ydb-diagnostics-database-info {
     &__wrapper {
         margin-top: var(--g-spacing-2);
@@ -14,6 +16,11 @@
     &__card {
         --g-card-border-radius: var(--g-border-radius-s);
         width: 500px;
-        padding: var(--g-spacing-3) var(--g-spacing-4);
+        padding: var(--g-spacing-3) var(--g-spacing-4) var(--g-spacing-4);
+    }
+
+    &__alert {
+        //body-1 mixin to match with other card values
+        @include mixins.body-1-typography();
     }
 }
