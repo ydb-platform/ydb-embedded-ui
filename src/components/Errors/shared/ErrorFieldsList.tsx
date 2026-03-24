@@ -13,6 +13,19 @@ function formatUrlLine(method?: string, requestUrl?: string): string | undefined
     return requestUrl;
 }
 
+function formatProxyTargetLine(
+    proxyTarget?: string,
+    proxyRewrittenPath?: string,
+): string | undefined {
+    if (proxyTarget && proxyRewrittenPath) {
+        const normalizedTarget = proxyTarget.endsWith('/') ? proxyTarget.slice(0, -1) : proxyTarget;
+
+        return `${normalizedTarget}${proxyRewrittenPath}`;
+    }
+
+    return proxyTarget || proxyRewrittenPath;
+}
+
 function isUniqueMessage(
     message: string | undefined,
     details: ErrorDetails,
@@ -46,6 +59,10 @@ export function ErrorFieldsList({
         message,
         traceId,
         requestId,
+        proxyTraceId,
+        proxyRequestId,
+        proxyRewrittenPath,
+        proxyTarget,
         proxyName,
         workerName,
         errorPhase,
@@ -53,6 +70,7 @@ export function ErrorFieldsList({
     } = details;
 
     const urlLine = formatUrlLine(method, requestUrl);
+    const proxyTargetLine = formatProxyTargetLine(proxyTarget, proxyRewrittenPath);
     const showMessage = isUniqueMessage(message, details, renderedTitle);
 
     return (
@@ -100,6 +118,30 @@ export function ErrorFieldsList({
                     <span className={valueClassName}>{requestId}</span>
                 </DefinitionList.Item>
             )}
+            {proxyTraceId && (
+                <DefinitionList.Item
+                    name={i18n('error-details.label_proxy-trace-id')}
+                    copyText={proxyTraceId}
+                >
+                    <span className={valueClassName}>{proxyTraceId}</span>
+                </DefinitionList.Item>
+            )}
+            {proxyRequestId && (
+                <DefinitionList.Item
+                    name={i18n('error-details.label_proxy-request-id')}
+                    copyText={proxyRequestId}
+                >
+                    <span className={valueClassName}>{proxyRequestId}</span>
+                </DefinitionList.Item>
+            )}
+            {proxyTargetLine && (
+                <DefinitionList.Item
+                    name={i18n('error-details.label_proxy-target')}
+                    copyText={proxyTargetLine}
+                >
+                    <span className={valueClassName}>{proxyTargetLine}</span>
+                </DefinitionList.Item>
+            )}
             {proxyName && (
                 <DefinitionList.Item
                     name={i18n('error-details.label_proxy-name')}
@@ -126,11 +168,16 @@ export function hasVisibleFields(details: ErrorDetails, renderedTitle?: string):
         errorCode,
         traceId,
         requestId,
+        proxyTraceId,
+        proxyRequestId,
+        proxyRewrittenPath,
+        proxyTarget,
         proxyName,
         workerName,
         errorPhase,
         networkEffectiveType,
     } = details;
+    const proxyTargetLine = formatProxyTargetLine(proxyTarget, proxyRewrittenPath);
     const showMessage = isUniqueMessage(details.message, details, renderedTitle);
 
     return Boolean(
@@ -141,6 +188,9 @@ export function hasVisibleFields(details: ErrorDetails, renderedTitle?: string):
             networkEffectiveType ||
             traceId ||
             requestId ||
+            proxyTraceId ||
+            proxyRequestId ||
+            proxyTargetLine ||
             proxyName ||
             workerName,
     );

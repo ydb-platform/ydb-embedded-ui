@@ -11,6 +11,10 @@ const EXPOSED_HEADERS = [
     'x-request-id',
     'x-proxy-name',
     'x-worker-name',
+    'x-ydb-ui-proxy-trace-id',
+    'x-ydb-ui-proxy-request-id',
+    'x-ydb-ui-proxy-rewritten-path',
+    'x-ydb-ui-proxy-target',
 ].join(', ');
 
 // API routes per page (matched by Playwright page.route)
@@ -67,6 +71,22 @@ export async function setupCluster400PlainTextMock(page: Page) {
         headers: {
             traceresponse: '00-aabbccdd11223344aabbccdd11223344-1122334455667788-00',
             'x-request-id': 'test-req-id-e2e-400',
+        },
+    });
+}
+
+export async function setupCluster503ProxyHeadersMock(page: Page) {
+    await mockRoute(page, ROUTES.cluster, {
+        status: 503,
+        contentType: 'application/json',
+        body: JSON.stringify({error: 'Meta upstream unavailable'}),
+        headers: {
+            traceresponse: '00-clustertrace00112233445566778899aa-bbccddeeff001122-00',
+            'x-request-id': 'generic-request-id-cluster-503',
+            'x-ydb-ui-proxy-trace-id': 'proxy-trace-id-cluster-503',
+            'x-ydb-ui-proxy-request-id': 'proxy-request-id-cluster-503',
+            'x-ydb-ui-proxy-rewritten-path': '/meta/cp_databases?cluster_name=test-cluster',
+            'x-ydb-ui-proxy-target': 'http://meta-upstream.example.test:8780/',
         },
     });
 }
@@ -146,6 +166,44 @@ export async function setupWhoami503TextMock(page: Page) {
         body: 'Database connection pool exhausted',
         headers: {
             'x-worker-name': 'auth-worker-03.example.net:8765',
+        },
+    });
+}
+
+export async function setupWhoami503ProxyBodyMock(page: Page) {
+    await mockRoute(page, ROUTES.whoami, {
+        status: 503,
+        contentType: 'application/json',
+        body: JSON.stringify({
+            message: 'Meta upstream unavailable',
+            proxyDiagnostics: {
+                traceId: 'proxy-trace-id-body-503',
+                requestId: 'proxy-request-id-body-503',
+                rewrittenPath: '/meta/cp_databases?cluster_name=body-cluster',
+                target: 'http://meta-body.example.test:8780/',
+            },
+        }),
+    });
+}
+
+export async function setupWhoami503ProxyHeadersOverrideBodyMock(page: Page) {
+    await mockRoute(page, ROUTES.whoami, {
+        status: 503,
+        contentType: 'application/json',
+        body: JSON.stringify({
+            message: 'Meta upstream unavailable',
+            proxyDiagnostics: {
+                traceId: 'proxy-trace-id-body-override',
+                requestId: 'proxy-request-id-body-override',
+                rewrittenPath: '/meta/body-override',
+                target: 'http://meta-body-override.example.test:8780/',
+            },
+        }),
+        headers: {
+            'x-ydb-ui-proxy-trace-id': 'proxy-trace-id-header-override',
+            'x-ydb-ui-proxy-request-id': 'proxy-request-id-header-override',
+            'x-ydb-ui-proxy-rewritten-path': '/meta/header-override',
+            'x-ydb-ui-proxy-target': 'http://meta-header-override.example.test:8780/',
         },
     });
 }

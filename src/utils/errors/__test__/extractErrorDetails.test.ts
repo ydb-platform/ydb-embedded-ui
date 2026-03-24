@@ -109,8 +109,7 @@ describe('extractErrorDetails', () => {
             statusText: 'Too Many Requests',
             headers: {
                 'x-proxy-name': 'https://ydb-em-2-vm-preprod.ydb.mdb.cloud-preprod.yandex.net:443',
-                'x-worker-name':
-                    'vm-cc8gh9uqq4hkr3anjmh3-ru-central1-a-wfdp-ypar.cc8gh9uqq4hkr3anjmh3.ydb.mdb.cloud-preprod.yandex.net:8765',
+                'x-worker-name': 'proxy-worker-preprod.example.test:8765',
                 'x-request-id': 'ba767b14-d97b-45e6-889b-4bcccf5c9e46',
             },
         };
@@ -118,10 +117,32 @@ describe('extractErrorDetails', () => {
 
         expect(details).toEqual(
             expect.objectContaining({
-                proxyName: 'https://ydb-em-2-vm-preprod.ydb.mdb.cloud-preprod.yandex.net:443',
-                workerName:
-                    'vm-cc8gh9uqq4hkr3anjmh3-ru-central1-a-wfdp-ypar.cc8gh9uqq4hkr3anjmh3.ydb.mdb.cloud-preprod.yandex.net:8765',
+                proxyName: 'https://proxy-preprod.example.test:443',
+                workerName: 'proxy-worker-preprod.example.test:8765',
                 requestId: 'ba767b14-d97b-45e6-889b-4bcccf5c9e46',
+            }),
+        );
+    });
+
+    test('should extract proxy diagnostics from headers', () => {
+        const error = {
+            status: 503,
+            statusText: 'Service Unavailable',
+            headers: {
+                'x-ydb-ui-proxy-trace-id': 'proxy-trace-id-123',
+                'x-ydb-ui-proxy-request-id': 'proxy-request-id-456',
+                'x-ydb-ui-proxy-rewritten-path': '/meta/cp_databases?cluster_name=test',
+                'x-ydb-ui-proxy-target': 'http://meta-upstream.example.test:8780/',
+            },
+        };
+        const details = extractErrorDetails(error);
+
+        expect(details).toEqual(
+            expect.objectContaining({
+                proxyTraceId: 'proxy-trace-id-123',
+                proxyRequestId: 'proxy-request-id-456',
+                proxyRewrittenPath: '/meta/cp_databases?cluster_name=test',
+                proxyTarget: 'http://meta-upstream.example.test:8780/',
             }),
         );
     });
@@ -362,6 +383,114 @@ describe('extractErrorDetails', () => {
         expect(details?.dataMessage).toBe('Rate limit exceeded');
     });
 
+    test('should extract proxy diagnostics from body', () => {
+        const error = {
+            status: 503,
+            statusText: 'Service Unavailable',
+            data: {
+                message: 'Meta upstream unavailable',
+                proxyDiagnostics: {
+                    traceId: 'proxy-trace-id-body',
+                    requestId: 'proxy-request-id-body',
+                    rewrittenPath: '/meta/cp_databases?cluster_name=body',
+                    target: 'http://meta-body.example.test:8780/',
+                },
+            },
+        };
+        const details = extractErrorDetails(error);
+
+        expect(details).toEqual(
+            expect.objectContaining({
+                proxyTraceId: 'proxy-trace-id-body',
+                proxyRequestId: 'proxy-request-id-body',
+                proxyRewrittenPath: '/meta/cp_databases?cluster_name=body',
+                proxyTarget: 'http://meta-body.example.test:8780/',
+            }),
+        );
+    });
+
+    test('should merge proxy diagnostics from headers and body with per-field fallback', () => {
+        const error = {
+            status: 503,
+            headers: {
+                'x-ydb-ui-proxy-trace-id': 'proxy-trace-id-header',
+                'x-ydb-ui-proxy-rewritten-path': '/meta/from-header',
+            },
+            data: {
+                proxyDiagnostics: {
+                    traceId: 'proxy-trace-id-body',
+                    requestId: 'proxy-request-id-body',
+                    rewrittenPath: '/meta/from-body',
+                    target: 'http://meta-body.example.test:8780/',
+                },
+            },
+        };
+        const details = extractErrorDetails(error);
+
+        expect(details).toEqual(
+            expect.objectContaining({
+                proxyTraceId: 'proxy-trace-id-header',
+                proxyRequestId: 'proxy-request-id-body',
+                proxyRewrittenPath: '/meta/from-header',
+                proxyTarget: 'http://meta-body.example.test:8780/',
+            }),
+        );
+    });
+
+    test('should prefer proxy headers over body for the same field', () => {
+        const error = {
+            status: 503,
+            headers: {
+                'x-ydb-ui-proxy-request-id': 'proxy-request-id-header',
+                'x-ydb-ui-proxy-target': 'http://meta-header.example.test:8780/',
+            },
+            data: {
+                proxyDiagnostics: {
+                    requestId: 'proxy-request-id-body',
+                    target: 'http://meta-body.example.test:8780/',
+                },
+            },
+        };
+        const details = extractErrorDetails(error);
+
+        expect(details?.proxyRequestId).toBe('proxy-request-id-header');
+        expect(details?.proxyTarget).toBe('http://meta-header.example.test:8780/');
+    });
+
+    test('should keep generic Request-ID and Proxy Request-ID separately', () => {
+        const error = {
+            status: 503,
+            headers: {
+                'x-request-id': 'generic-request-id',
+                'x-ydb-ui-proxy-request-id': 'proxy-request-id',
+            },
+        };
+        const details = extractErrorDetails(error);
+
+        expect(details?.requestId).toBe('generic-request-id');
+        expect(details?.proxyRequestId).toBe('proxy-request-id');
+    });
+
+    test('should ignore invalid proxy diagnostics fields independently', () => {
+        const error = {
+            status: 503,
+            data: {
+                proxyDiagnostics: {
+                    traceId: 123,
+                    requestId: 'proxy-request-id-body',
+                    rewrittenPath: '/meta/cp_databases?cluster_name=body',
+                    target: false,
+                },
+            },
+        };
+        const details = extractErrorDetails(error);
+
+        expect(details?.proxyTraceId).toBeUndefined();
+        expect(details?.proxyRequestId).toBe('proxy-request-id-body');
+        expect(details?.proxyRewrittenPath).toBe('/meta/cp_databases?cluster_name=body');
+        expect(details?.proxyTarget).toBeUndefined();
+    });
+
     test('should extract dataMessage from short string data', () => {
         const error = {status: 400, data: 'Cluster not found'};
         const details = extractErrorDetails(error);
@@ -417,7 +546,7 @@ describe('extractErrorDetails', () => {
             statusText: 'Service Unavailable',
             data: '',
             headers: {
-                'x-worker-name': 'ydb-ru-sas-1109.search.yandex.net:8765',
+                'x-worker-name': 'worker-nginx.example.test:8765',
                 server: 'nginx/1.18.0',
             },
             config: {
@@ -431,7 +560,7 @@ describe('extractErrorDetails', () => {
             expect.objectContaining({
                 status: 503,
                 statusText: 'Service Unavailable',
-                workerName: 'ydb-ru-sas-1109.search.yandex.net:8765',
+                workerName: 'worker-nginx.example.test:8765',
                 requestUrl: '/node/559390/viewer/json/whoami',
                 method: 'OPTIONS',
             }),
