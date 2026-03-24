@@ -135,8 +135,11 @@ export function Navigation({children, userSettings}: NavigationProps) {
                                 className={b('popover')}
                                 hasArrow
                                 placement={['right-start']}
-                                onOpenChange={(open) => {
-                                    if (!open) {
+                                onOpenChange={(open, _, reason) => {
+                                    const isValidCloseReason =
+                                        reason === 'outside-press' || reason === 'escape-key';
+
+                                    if (!open && isValidCloseReason) {
                                         handleNewNavAlertClose();
                                     }
                                 }}
