@@ -1,7 +1,7 @@
 import {expect, test} from '@playwright/test';
 
 import {database} from '../../../utils/constants';
-import {TenantPage} from '../TenantPage';
+import {QueryEditorMode, TenantPage} from '../TenantPage';
 import {SavedQueriesTable} from '../savedQueries/models/SavedQueriesTable';
 import {ObjectSummary} from '../summary/ObjectSummary';
 import {RowTableAction} from '../summary/types';
@@ -14,17 +14,15 @@ import {
 } from './models/NewSqlDropdownMenu';
 import {QueryEditor, QueryTabs} from './models/QueryEditor';
 import {SaveQueryDialog} from './models/SaveQueryDialog';
-import {UnsavedChangesModal} from './models/UnsavedChangesModal';
 
 test.describe('Query Templates', () => {
     test.beforeEach(async ({page}) => {
-        const pageQueryParams = {
+        const tenantPage = new TenantPage(page);
+        await tenantPage.gotoQueryEditor({
             schema: database,
             database,
-            tenantPage: 'query',
-        };
-        const tenantPage = new TenantPage(page);
-        await tenantPage.goto(pageQueryParams);
+            mode: QueryEditorMode.MultiTab,
+        });
     });
 
     test('Update table template should not run successfully', async ({page}) => {
@@ -82,34 +80,9 @@ test.describe('Query Templates', () => {
         }
     });
 
-    test('Unsaved changes modal appears when switching between templates if query was edited', async ({
-        page,
-    }) => {
+    test('Switching between schema templates after manual edit opens a new tab', async ({page}) => {
         const objectSummary = new ObjectSummary(page);
-        const unsavedChangesModal = new UnsavedChangesModal(page);
-        const queryEditor = new QueryEditor(page);
-
-        const tableName = await queryEditor.createNewFakeTable();
-        await objectSummary.clickRefreshButton();
-
-        // First action - Add index
-        await objectSummary.clickActionMenuItem(tableName, RowTableAction.AddIndex);
-        await page.waitForTimeout(500);
-
-        // First set some content
-        await queryEditor.setQuery('SELECT 1;');
-
-        // Try to switch to Select query
-        await objectSummary.clickActionMenuItem(tableName, RowTableAction.SelectQuery);
-        await page.waitForTimeout(500);
-
-        // Verify unsaved changes modal appears
-        await expect(unsavedChangesModal.isVisible()).resolves.toBe(true);
-    });
-
-    test('Cancel button in unsaved changes modal preserves editor content', async ({page}) => {
-        const objectSummary = new ObjectSummary(page);
-        const unsavedChangesModal = new UnsavedChangesModal(page);
+        const tenantPage = new TenantPage(page);
         const queryEditor = new QueryEditor(page);
 
         const tableName = await queryEditor.createNewFakeTable();
@@ -120,50 +93,28 @@ test.describe('Query Templates', () => {
         await page.waitForTimeout(500);
 
         await queryEditor.setQuery('SELECT 1;');
+        const initialTabId = await queryEditor.editorTabs.getActiveTabId();
+        const initialTabCount = await queryEditor.editorTabs.getTabCount();
 
         // Try to switch to Select query
         await objectSummary.clickActionMenuItem(tableName, RowTableAction.SelectQuery);
         await page.waitForTimeout(500);
 
-        // Click Cancel in the modal
-        await unsavedChangesModal.clickCancel();
+        const isModalHidden = await tenantPage.isUnsavedChangesModalHidden();
+        expect(isModalHidden).toBe(true);
+        await expect(queryEditor.editorTabs.waitForTabCount(initialTabCount + 1)).resolves.toBe(
+            true,
+        );
 
-        // Verify editor content remains unchanged
-        await expect(queryEditor.editorTextArea).toHaveValue('SELECT 1;');
-    });
+        const nextTabId = await queryEditor.editorTabs.getActiveTabId();
+        expect(nextTabId).not.toBe(initialTabId);
 
-    test('Dont save button in unsaved changes modal allows to change text', async ({page}) => {
-        const objectSummary = new ObjectSummary(page);
-        const unsavedChangesModal = new UnsavedChangesModal(page);
-        const queryEditor = new QueryEditor(page);
-
-        const tableName = await queryEditor.createNewFakeTable();
-        await objectSummary.clickRefreshButton();
-
-        // First action - Add index
-        await objectSummary.clickActionMenuItem(tableName, RowTableAction.AddIndex);
-        await page.waitForTimeout(500);
-
-        await queryEditor.setQuery('SELECT 1;');
-        // Store initial editor content
-        const initialContent = await queryEditor.editorTextArea.inputValue();
-
-        // Try to switch to Select query
-        await objectSummary.clickActionMenuItem(tableName, RowTableAction.SelectQuery);
-        await page.waitForTimeout(500);
-
-        // Click Don't save in the modal
-        await unsavedChangesModal.clickDontSave();
-
-        // Verify editor content has changed
-        const newContent = await queryEditor.editorTextArea.inputValue();
-        expect(newContent).not.toBe(initialContent);
-        expect(newContent).not.toBe('');
+        await queryEditor.editorTabs.selectTabById(initialTabId!);
+        await expect.poll(() => queryEditor.getEditorContent(), {timeout: 5000}).toBe('SELECT 1;');
     });
 
     test('Save query flow saves query and shows it in Saved tab', async ({page}) => {
         const objectSummary = new ObjectSummary(page);
-        const unsavedChangesModal = new UnsavedChangesModal(page);
         const queryEditor = new QueryEditor(page);
         const saveQueryDialog = new SaveQueryDialog(page);
         const savedQueriesTable = new SavedQueriesTable(page);
@@ -176,13 +127,7 @@ test.describe('Query Templates', () => {
         await page.waitForTimeout(500);
 
         await queryEditor.setQuery('SELECT 1;');
-
-        // Try to switch to Select query
-        await objectSummary.clickActionMenuItem(tableName, RowTableAction.SelectQuery);
-        await page.waitForTimeout(500);
-
-        // Click Save query in the modal
-        await unsavedChangesModal.clickSaveQuery();
+        await queryEditor.clickSaveButton();
 
         // Verify save query dialog appears and fill the name
         await expect(saveQueryDialog.isVisible()).resolves.toBe(true);
@@ -215,26 +160,9 @@ test.describe('Query Templates', () => {
 
         expect(queryEditor.editorTextArea).not.toBeEmpty();
     });
-
-    test('Template selection shows unsaved changes warning when editor has content', async ({
+    test('Switching between untouched schema templates reuses the current template tab', async ({
         page,
     }) => {
-        const newSqlDropdown = new NewSqlDropdownMenu(page);
-        const queryEditor = new QueryEditor(page);
-        const unsavedChangesModal = new UnsavedChangesModal(page);
-
-        // First set some content
-        await queryEditor.setQuery('SELECT 1;');
-
-        // Try to select a template
-        await newSqlDropdown.clickNewSqlButton();
-        await newSqlDropdown.hoverCategory(TemplateCategory.AsyncReplication);
-        await newSqlDropdown.selectTemplate(AsyncReplicationTemplates.Create);
-
-        // Verify unsaved changes modal appears
-        await expect(unsavedChangesModal.isVisible()).resolves.toBe(true);
-    });
-    test('Switching between templates does not trigger unsaved changes modal', async ({page}) => {
         const objectSummary = new ObjectSummary(page);
         const tenantPage = new TenantPage(page);
         const queryEditor = new QueryEditor(page);
@@ -245,17 +173,22 @@ test.describe('Query Templates', () => {
         // First select a template (Add Index)
         await objectSummary.clickActionMenuItem(tableName, RowTableAction.AddIndex);
         await page.waitForTimeout(500);
+        const initialTabId = await queryEditor.editorTabs.getActiveTabId();
+        const initialTabCount = await queryEditor.editorTabs.getTabCount();
 
         // Without editing the template, switch to another template (Select Query)
         await objectSummary.clickActionMenuItem(tableName, RowTableAction.SelectQuery);
         await page.waitForTimeout(500);
 
-        // Verify unsaved changes modal does not appear
+        // Verify unsaved changes modal does not appear and the untouched tab is reused
         const isModalHidden = await tenantPage.isUnsavedChangesModalHidden();
         expect(isModalHidden).toBe(true);
+        await expect(queryEditor.editorTabs.waitForTabCount(initialTabCount)).resolves.toBe(true);
+        const nextTabId = await queryEditor.editorTabs.getActiveTabId();
+        expect(nextTabId).toBe(initialTabId);
     });
 
-    test('Selecting a template and then opening history query does not trigger unsaved changes modal', async ({
+    test('Selecting a template and then opening history query reuses the untouched tab', async ({
         page,
     }) => {
         const objectSummary = new ObjectSummary(page);
@@ -269,11 +202,13 @@ test.describe('Query Templates', () => {
         const testQuery = 'SELECT 1 AS test_column;';
         await queryEditor.setQuery(testQuery);
         await queryEditor.clickRunButton();
-        await page.waitForTimeout(1000); // Wait for the query to complete
+        await page.waitForTimeout(1000);
 
         // Next, select a template
         await objectSummary.clickActionMenuItem(tableName, RowTableAction.AddIndex);
         await page.waitForTimeout(500);
+        await expect(queryEditor.editorTabs.waitForTabCount(2)).resolves.toBe(true);
+        const templateTabId = await queryEditor.editorTabs.getActiveTabId();
 
         // Navigate to history tab
         await queryEditor.queryTabs.selectTab(QueryTabs.History);
@@ -283,9 +218,13 @@ test.describe('Query Templates', () => {
         await queryEditor.historyQueries.selectQuery(testQuery);
         await page.waitForTimeout(500);
 
-        // Verify no unsaved changes modal appeared
+        // Verify no unsaved changes modal appeared and tab was reused
         const isModalHidden = await tenantPage.isUnsavedChangesModalHidden();
         expect(isModalHidden).toBe(true);
+        await expect(queryEditor.editorTabs.waitForTabCount(2)).resolves.toBe(true);
+        const afterTabId = await queryEditor.editorTabs.getActiveTabId();
+        expect(afterTabId).toBe(templateTabId);
+        await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe(testQuery);
 
         // Verify the query was loaded into the editor
         const editorValue = await queryEditor.editorTextArea.inputValue();

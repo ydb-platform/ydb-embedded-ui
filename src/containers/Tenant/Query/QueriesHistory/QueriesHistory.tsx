@@ -8,22 +8,22 @@ import {QueryDetails} from '../../../../components/QueryDetails/QueryDetails';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
 import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
+import {useMultiTabQueryEditorEnabled} from '../../../../store/reducers/capabilities/hooks';
 import type {useQueriesHistory} from '../../../../store/reducers/query/hooks';
 import {
     selectQueriesHistoryFilter,
     setHistoryCurrentQueryId,
-    setIsDirty,
     setQueryHistoryFilter,
 } from '../../../../store/reducers/query/query';
 import type {QueryInHistory} from '../../../../store/reducers/query/types';
-import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
-import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import {valueIsDefined} from '../../../../utils';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {QUERY_TABLE_SETTINGS} from '../../utils/constants';
 import {SAVE_QUERY_DIALOG} from '../SaveQuery/SaveQuery';
+import {useOpenExternalQueryInEditor} from '../hooks/useOpenExternalQueryInEditor';
 import i18n from '../i18n';
+import {getQueryTextTabTitle} from '../utils/queryTabTitles';
 import {useSavedQueries} from '../utils/useSavedQueries';
 
 import {getColumns, getQueryInfoItems} from './columns';
@@ -34,25 +34,26 @@ import './QueriesHistory.scss';
 const QUERIES_HISTORY_COLUMNS_WIDTH_LS_KEY = 'queriesHistoryTableColumnsWidth';
 
 interface QueriesHistoryProps {
-    changeUserInput: (value: {input: string}) => void;
     queriesHistory: ReturnType<typeof useQueriesHistory>;
 }
 
-function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) {
+function QueriesHistory({queriesHistory}: QueriesHistoryProps) {
     const dispatch = useTypedDispatch();
     const [showQueryPreview, setShowQueryPreview] = React.useState(false);
     const [selectedId, setSelectedId] = React.useState<string | null>(null);
     const {savedQueries, saveQuery} = useSavedQueries();
+    const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
+    const openExternalQueryInEditor = useOpenExternalQueryInEditor();
 
     const sortedHistory = React.useMemo(() => {
-        return queriesHistory.filteredHistoryQueries.toReversed().toSorted((a, b) => {
-            if (valueIsDefined(a.startTime) && valueIsDefined(b.startTime)) {
-                return b.startTime - a.startTime;
+        return queriesHistory.filteredHistoryQueries.toReversed().toSorted((a, historyItem) => {
+            if (valueIsDefined(a.startTime) && valueIsDefined(historyItem.startTime)) {
+                return historyItem.startTime - a.startTime;
             }
             if (valueIsDefined(a.startTime)) {
                 return -1;
             }
-            if (valueIsDefined(b.startTime)) {
+            if (valueIsDefined(historyItem.startTime)) {
                 return 1;
             }
             return 0;
@@ -65,12 +66,15 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
 
     const applyQueryClick = React.useCallback(
         (query: QueryInHistory) => {
-            changeUserInput({input: query.queryText});
-            dispatch(setIsDirty(false));
-            dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
-            dispatch(setHistoryCurrentQueryId(query.queryId));
+            openExternalQueryInEditor({
+                title: getQueryTextTabTitle(query.queryText),
+                input: query.queryText,
+                onAfterOpen: () => {
+                    dispatch(setHistoryCurrentQueryId(query.queryId));
+                },
+            });
         },
-        [changeUserInput, dispatch],
+        [dispatch, openExternalQueryInEditor],
     );
 
     const handleSaveQuery = React.useCallback(
@@ -94,7 +98,7 @@ function QueriesHistory({changeUserInput, queriesHistory}: QueriesHistoryProps) 
         [],
     );
 
-    const onQueryClick = useChangeInputWithConfirmation(applyQueryClick);
+    const onQueryClick = useChangeInputWithConfirmation(applyQueryClick, isMultiTabEnabled);
 
     const onChangeFilter = (value: string) => {
         dispatch(setQueryHistoryFilter(value));

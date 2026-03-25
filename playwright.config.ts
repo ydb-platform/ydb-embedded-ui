@@ -29,6 +29,7 @@ const config: PlaywrightTestConfig = {
               command: 'npm run dev',
               env: {
                   REACT_APP_DISABLE_CHECKS: 'true',
+                  REACT_APP_E2E_UI_OVERRIDES: 'true',
               },
               port: 3000,
               reuseExistingServer: !process.env.CI,

@@ -322,6 +322,8 @@ API endpoints are injected using RTK Query's `injectEndpoints` pattern. Queries 
 
 Uses BEM naming convention with `cn()` utility from `utils/cn` (wraps `@bem-react/classname`). Create a block function with component name and use it for element and modifier classes.
 
+- **ALWAYS** prefix new SCSS root blocks and new `cn()` block names with `ydb-` (for example, `cn('ydb-query-editor')`) unless the surrounding feature already uses an established local naming convention that must be preserved for compatibility.
+
 ### Type Naming Convention
 
 - API Types: Prefixed with 'T' (e.g., `TTenantInfo`, `TClusterInfo`)

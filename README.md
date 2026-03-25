@@ -100,6 +100,18 @@ Run tests. If `PLAYWRIGHT_BASE_URL` is provided, tests run on this url, otherwis
 npm run test:e2e
 ```
 
+Run tests in Playwright Docker.
+
+```
+npm run test:e2e:docker
+```
+
+Run tests in Playwright Docker and then serve the generated HTML report locally at `http://127.0.0.1:9323`. You can override host and port with `PLAYWRIGHT_HTML_HOST` and `PLAYWRIGHT_HTML_PORT`.
+
+```
+npm run test:e2e:docker:report
+```
+
 ### CI
 
 E2E tests are run in CI in `e2e_tests` job. Tests run on Playwright `webServer` (it is started with `npm run dev`), `webServer` uses docker container `ghcr.io/ydb-platform/local-ydb:nightly` as backend.

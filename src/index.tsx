@@ -3,10 +3,29 @@ import ReactDOM from 'react-dom/client';
 import {ErrorBoundary} from './lib';
 import reportWebVitals from './reportWebVitals';
 import {history, store} from './store/defaultStore';
+import {configureUIFactory} from './uiFactory/uiFactory';
 
 import './styles/index.scss';
 
+const E2E_UI_OVERRIDES_ENABLED = process.env.REACT_APP_E2E_UI_OVERRIDES === 'true';
+
+function applyE2EQueryEditorModeOverride() {
+    if (!E2E_UI_OVERRIDES_ENABLED) {
+        return;
+    }
+
+    const mode = window['e2eQueryEditorMode'];
+
+    if (mode === 'single-tab') {
+        configureUIFactory({enableMultiTabQueryEditor: false});
+    } else if (mode === 'multi-tab') {
+        configureUIFactory({enableMultiTabQueryEditor: true});
+    }
+}
+
 async function render() {
+    applyE2EQueryEditorModeOverride();
+
     let App;
     if (
         process.env.REACT_APP_META_BACKEND === undefined ||

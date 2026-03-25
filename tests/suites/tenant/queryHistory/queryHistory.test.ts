@@ -3,11 +3,18 @@ import {expect, test} from '@playwright/test';
 import {QUERY_MODES} from '../../../../src/utils/query';
 import {database} from '../../../utils/constants';
 import {executeQueryWithKeybinding} from '../../../utils/queryHotkeys';
-import {TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
+import {QueryEditorMode, TenantPage, VISIBILITY_TIMEOUT} from '../TenantPage';
 import {QueryEditor, QueryTabs} from '../queryEditor/models/QueryEditor';
 import {SaveQueryDialog} from '../queryEditor/models/SaveQueryDialog';
 import {SavedQueriesTable} from '../savedQueries/models/SavedQueriesTable';
 
+async function openQueryEditorInMode(tenantPage: TenantPage, mode: QueryEditorMode) {
+    await tenantPage.gotoQueryEditor({
+        schema: database,
+        database,
+        mode,
+    });
+}
 test.describe('Query History', () => {
     let tenantPage: TenantPage;
     let queryEditor: QueryEditor;
@@ -214,7 +221,9 @@ test.describe('Query History', () => {
         expect(editorValue.trim()).toBe(firstQuery.trim());
     });
 
-    test('Unsaved changes modal appears when modifying a query and selecting from history', async () => {
+    test('Single-tab asks for confirmation when modifying a query and selecting from history', async () => {
+        await openQueryEditorInMode(tenantPage, QueryEditorMode.SingleTab);
+
         // Run a query
         const originalQuery = 'SELECT 30 AS original_history_query;';
         await queryEditor.run(originalQuery, QUERY_MODES.script);
@@ -240,6 +249,46 @@ test.describe('Query History', () => {
 
         // Dismiss the modal
         await tenantPage.unsavedChangesModal.clickCancel();
+    });
+
+    test('Multi-tab opens a new tab when modifying a query and selecting from history', async () => {
+        await openQueryEditorInMode(tenantPage, QueryEditorMode.MultiTab);
+
+        // Run a query
+        const originalQuery = 'SELECT 30 AS original_history_query;';
+        await queryEditor.run(originalQuery, QUERY_MODES.script);
+
+        // Run another query to have something in history
+        const historyQuery = 'SELECT 40 AS history_query_for_selection;';
+        await queryEditor.run(historyQuery, QUERY_MODES.script);
+
+        // Modify the current query without running it
+        const modifiedQuery = 'SELECT 50 AS modified_unsaved_query;';
+        await queryEditor.setQuery(modifiedQuery);
+        const initialTabCount = await queryEditor.editorTabs.getTabCount();
+        const modifiedTabId = await queryEditor.editorTabs.getActiveTabId();
+
+        // Navigate to history tab
+        await queryEditor.queryTabs.selectTab(QueryTabs.History);
+        await queryEditor.historyQueries.isVisible();
+
+        // Select a query from history - should open in a new tab without confirmation
+        await queryEditor.historyQueries.selectQuery(historyQuery);
+
+        const isModalHidden = await tenantPage.isUnsavedChangesModalHidden();
+        expect(isModalHidden).toBe(true);
+        await expect(queryEditor.editorTabs.waitForTabCount(initialTabCount + 1)).resolves.toBe(
+            true,
+        );
+
+        const nextTabId = await queryEditor.editorTabs.getActiveTabId();
+        expect(nextTabId).not.toBe(modifiedTabId);
+        await expect.poll(() => queryEditor.getEditorContent(), {timeout: 5000}).toBe(historyQuery);
+
+        await queryEditor.editorTabs.selectTabById(modifiedTabId!);
+        await expect
+            .poll(() => queryEditor.getEditorContent(), {timeout: 5000})
+            .toBe(modifiedQuery);
     });
 
     test('No unsaved changes modal when selecting from history after saving a query', async () => {

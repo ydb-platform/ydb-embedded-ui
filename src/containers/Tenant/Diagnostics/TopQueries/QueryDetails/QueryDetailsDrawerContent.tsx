@@ -1,10 +1,16 @@
 import React from 'react';
 
 import {useHistory, useLocation} from 'react-router-dom';
+import {v4 as uuidv4} from 'uuid';
 
 import {QueryDetails} from '../../../../../components/QueryDetails/QueryDetails';
 import {getTenantPath, parseQuery} from '../../../../../routes';
-import {changeUserInput, setIsDirty} from '../../../../../store/reducers/query/query';
+import {useMultiTabQueryEditorEnabled} from '../../../../../store/reducers/capabilities/hooks';
+import {
+    changeUserInput,
+    setIsDirty,
+    setQueryTabContent,
+} from '../../../../../store/reducers/query/query';
 import {
     TENANT_PAGE,
     TENANT_PAGES_IDS,
@@ -12,6 +18,7 @@ import {
 } from '../../../../../store/reducers/tenant/constants';
 import type {KeyValueRow} from '../../../../../types/api/query';
 import {useTypedDispatch} from '../../../../../utils/hooks';
+import {getQueryTextTabTitle} from '../../../Query/utils/queryTabTitles';
 import {TenantTabsGroups} from '../../../TenantPages';
 import {createQueryInfoItems} from '../utils';
 
@@ -30,12 +37,25 @@ export const QueryDetailsDrawerContent = ({row, onClose}: QueryDetailsDrawerCont
     const dispatch = useTypedDispatch();
     const location = useLocation();
     const history = useHistory();
+    const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
 
     const handleOpenInEditor = React.useCallback(() => {
         if (row) {
             const input = row.QueryText as string;
-            dispatch(changeUserInput({input}));
-            dispatch(setIsDirty(false));
+
+            if (isMultiTabEnabled) {
+                dispatch(
+                    setQueryTabContent({
+                        tabId: uuidv4(),
+                        title: getQueryTextTabTitle(input),
+                        input,
+                    }),
+                );
+                dispatch(setIsDirty(false));
+            } else {
+                dispatch(changeUserInput({input}));
+                dispatch(setIsDirty(false));
+            }
 
             const queryParams = parseQuery(location);
 
@@ -47,7 +67,7 @@ export const QueryDetailsDrawerContent = ({row, onClose}: QueryDetailsDrawerCont
 
             history.push(queryPath);
         }
-    }, [dispatch, history, location, row]);
+    }, [dispatch, history, isMultiTabEnabled, location, row]);
 
     if (row) {
         return (

@@ -79,6 +79,7 @@ const handleInputChange = useCallback(
 ### Component Patterns
 
 - Use BEM naming with `cn()` utility: `const b = cn('component-name')`
+- Prefix new SCSS root blocks and new `cn()` block names with `ydb-` unless the surrounding feature already has an established local naming convention that must be preserved for compatibility
 - Use `PaginatedTable` component for all data tables
 - Tables require: columns, fetchData function, and unique tableName
 - Use virtual scrolling for large datasets

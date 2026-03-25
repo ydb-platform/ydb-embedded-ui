@@ -1,5 +1,6 @@
 import {
     getActionAndSyntaxFromQueryMode,
+    getUniqueTabTitle,
     isQueryTabsDirtyPersistedState,
     isQueryTabsPersistedState,
 } from '../utils';
@@ -130,5 +131,42 @@ describe('isQueryTabsDirtyPersistedState', () => {
         expect(isQueryTabsDirtyPersistedState(123)).toBe(false);
         expect(isQueryTabsDirtyPersistedState(() => null)).toBe(false);
         expect(isQueryTabsDirtyPersistedState({'tab-1': 'true'})).toBe(false);
+    });
+});
+
+describe('getUniqueTabTitle', () => {
+    test('returns baseTitle when no tabs exist', () => {
+        expect(getUniqueTabTitle({}, 'Select query')).toBe('Select query');
+    });
+
+    test('returns baseTitle when no conflict', () => {
+        const tabsById = {
+            'tab-1': {title: 'Other query'},
+        };
+        expect(getUniqueTabTitle(tabsById, 'Select query')).toBe('Select query');
+    });
+
+    test('appends counter when baseTitle is taken', () => {
+        const tabsById = {
+            'tab-1': {title: 'Select query'},
+        };
+        expect(getUniqueTabTitle(tabsById, 'Select query')).toBe('Select query 2');
+    });
+
+    test('increments counter to find first available', () => {
+        const tabsById = {
+            'tab-1': {title: 'Select query'},
+            'tab-2': {title: 'Select query 2'},
+            'tab-3': {title: 'Select query 3'},
+        };
+        expect(getUniqueTabTitle(tabsById, 'Select query')).toBe('Select query 4');
+    });
+
+    test('handles gaps in counter sequence', () => {
+        const tabsById = {
+            'tab-1': {title: 'Select query'},
+            'tab-3': {title: 'Select query 3'},
+        };
+        expect(getUniqueTabTitle(tabsById, 'Select query')).toBe('Select query 2');
     });
 });

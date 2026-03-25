@@ -10,7 +10,12 @@ import type {
 } from '../../../types/store/streaming';
 import {valueIsDefined} from '../../../utils';
 
-import type {QueryExecutionStatusType, QueryInHistory, RawQueryInHistory} from './types';
+import type {
+    QueryExecutionStatusType,
+    QueryInHistory,
+    QueryTabState,
+    RawQueryInHistory,
+} from './types';
 
 export function getActionAndSyntaxFromQueryMode(
     baseAction: QueryAction = 'execute',
@@ -118,7 +123,10 @@ export interface QueryTabPersistedState {
     id: string;
     title: string;
     isTitleUserDefined?: boolean;
+    isTouched?: boolean;
     input: string;
+    savedInput?: string;
+    savedQueryName?: string;
     createdAt: number;
     updatedAt: number;
 }
@@ -127,6 +135,7 @@ export interface QueryTabsPersistedState {
     activeTabId: string;
     tabsOrder: string[];
     tabsById: Record<string, QueryTabPersistedState>;
+    newTabCounter?: number;
 }
 
 export type QueryTabsDirtyPersistedState = Record<string, boolean>;
@@ -137,6 +146,18 @@ function isQueryTabPersistedState(value: unknown): value is QueryTabPersistedSta
     }
 
     if ('isTitleUserDefined' in value && typeof value.isTitleUserDefined !== 'boolean') {
+        return false;
+    }
+
+    if ('isTouched' in value && typeof value.isTouched !== 'boolean') {
+        return false;
+    }
+
+    if ('savedInput' in value && typeof value.savedInput !== 'string') {
+        return false;
+    }
+
+    if ('savedQueryName' in value && typeof value.savedQueryName !== 'string') {
         return false;
     }
 
@@ -173,4 +194,78 @@ export function isQueryTabsDirtyPersistedState(
     }
 
     return Object.values(value).every((item) => typeof item === 'boolean');
+}
+
+export function getUniqueTabTitle(
+    tabsById: Record<string, {title: string}>,
+    baseTitle: string,
+): string {
+    const existingTitles = new Set(Object.values(tabsById).map((tab) => tab.title));
+    if (!existingTitles.has(baseTitle)) {
+        return baseTitle;
+    }
+    let counter = 2;
+    while (existingTitles.has(`${baseTitle} ${counter}`)) {
+        counter++;
+    }
+    return `${baseTitle} ${counter}`;
+}
+
+export function createDefaultTabState({
+    tabId,
+    title = '',
+    input = '',
+    pendingSnippet,
+    savedQueryName,
+    isTitleUserDefined = false,
+}: {
+    tabId: string;
+    title?: string;
+    input?: string;
+    pendingSnippet?: string;
+    savedQueryName?: string;
+    isTitleUserDefined?: boolean;
+}): QueryTabState {
+    const now = Date.now();
+    return {
+        id: tabId,
+        title,
+        isTitleUserDefined,
+        input,
+        savedInput: input,
+        isDirty: false,
+        createdAt: now,
+        updatedAt: now,
+        pendingSnippet,
+        savedQueryName,
+    };
+}
+
+export function applyQueryContentToTab({
+    tab,
+    title,
+    input,
+    pendingSnippet,
+    savedQueryName,
+}: {
+    tab: QueryTabState;
+    title: string;
+    input: string;
+    pendingSnippet?: string;
+    savedQueryName?: string;
+}): QueryTabState {
+    return {
+        ...tab,
+        title,
+        isTitleUserDefined: false,
+        isTouched: undefined,
+        input,
+        savedInput: input,
+        isDirty: false,
+        result: undefined,
+        lastExecutedQueryText: undefined,
+        pendingSnippet,
+        savedQueryName,
+        updatedAt: Date.now(),
+    };
 }

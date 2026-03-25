@@ -6,17 +6,18 @@ import throttle from 'lodash/throttle';
 import type Monaco from 'monaco-editor';
 
 import {MonacoEditor} from '../../../../../components/MonacoEditor/MonacoEditor';
+import {useMultiTabQueryEditorEnabled} from '../../../../../store/reducers/capabilities/hooks';
 import {
-    closeQueryTab,
+    clearPendingSnippet,
     renameQueryTab,
     selectActiveTab,
+    selectActiveTabPendingSnippet,
     selectUserInput,
     setIsDirty,
 } from '../../../../../store/reducers/query/query';
 import type {QueryInHistory} from '../../../../../store/reducers/query/types';
 import {SETTING_KEYS} from '../../../../../store/reducers/settings/constants';
 import type {QueryAction} from '../../../../../types/store/query';
-import {uiFactory} from '../../../../../uiFactory/uiFactory';
 import {
     useEventHandler,
     useSetting,
@@ -26,14 +27,14 @@ import {
 import {YQL_LANGUAGE_ID} from '../../../../../utils/monaco/constats';
 import {useUpdateErrorsHighlighting} from '../../../../../utils/monaco/highlightErrors';
 import {QUERY_ACTIONS} from '../../../../../utils/query';
-import {SAVE_QUERY_DIALOG} from '../../SaveQuery/SaveQuery';
+import {SAVE_QUERY_DIALOG, useSaveQueryWithTabSync} from '../../SaveQuery/SaveQuery';
 import i18n from '../../i18n';
+import {getTabTitleForSave} from '../../utils/queryTabTitles';
 import {useSavedQueries} from '../../utils/useSavedQueries';
-import {RENAME_TAB_DIALOG} from '../EditorTabs/RenameTabDialog';
+import {RENAME_QUERY_DIALOG} from '../EditorTabs/RenameQueryDialog';
 import {useCodeAssistHelpers} from '../hooks/useCodeAssistHelpers';
 import {useEditorOptions} from '../hooks/useEditorOptions';
 import {useQueryTabsActions} from '../hooks/useQueryTabsActions';
-import {queryExecutionManagerInstance} from '../utils/queryExecutionManager';
 import {TabsManager} from '../utils/tabsManager';
 
 import {getKeyBindings} from './keybindings';
@@ -61,6 +62,7 @@ interface YqlEditorProps {
     historyQueries: QueryInHistory[];
     goToPreviousQuery: () => void;
     goToNextQuery: () => void;
+    onEditorReady?: () => void;
 }
 
 export function YqlEditor({
@@ -71,15 +73,21 @@ export function YqlEditor({
     historyQueries,
     goToPreviousQuery,
     goToNextQuery,
+    onEditorReady,
 }: YqlEditorProps) {
     const input = useTypedSelector(selectUserInput);
     const activeTab = useTypedSelector(selectActiveTab);
-    const {savedQueries, saveQuery} = useSavedQueries();
+    const pendingSnippet = useTypedSelector(selectActiveTabPendingSnippet);
+    const {savedQueries} = useSavedQueries();
+    const createSaveQueryHandler = useSaveQueryWithTabSync();
     const {
         activeTabId,
         tabsOrder,
         handleNewTabClick,
         handleCloseActiveTab,
+        handleCloseOtherTabs,
+        handleCloseAllTabs,
+        handleDuplicateTab,
         handleNextTab,
         handlePreviousTab,
     } = useQueryTabsActions();
@@ -95,7 +103,7 @@ export function YqlEditor({
     const monacoRef = React.useRef<typeof Monaco | null>(null);
     const tabsManagerRef = React.useRef(new TabsManager());
 
-    const isMultiTabQueryEditorEnabled = Boolean(uiFactory.enableMultiTabQueryEditor);
+    const isMultiTabQueryEditorEnabled = useMultiTabQueryEditorEnabled();
 
     React.useEffect(() => {
         if (!isMultiTabQueryEditorEnabled) {
@@ -123,6 +131,28 @@ export function YqlEditor({
 
         tabsManagerRef.current.disposeRemovedTabs(tabsOrder);
     }, [isMultiTabQueryEditorEnabled, tabsOrder]);
+
+    React.useEffect(() => {
+        if (!isMultiTabQueryEditorEnabled || !pendingSnippet) {
+            return;
+        }
+
+        const editor = editorRef.current;
+        if (!editor) {
+            return;
+        }
+
+        const contribution =
+            editor.getContribution<Monaco.editor.IEditorContribution>('snippetController2');
+        if (isSnippetController(contribution)) {
+            editor.focus();
+            editor.setValue('');
+            contribution.insert(pendingSnippet);
+            dispatch(setIsDirty(false));
+        }
+
+        dispatch(clearPendingSnippet({tabId: activeTabId}));
+    }, [activeTabId, pendingSnippet, isMultiTabQueryEditorEnabled, dispatch]);
 
     const [lastUsedQueryAction] = useSetting<QueryAction>(SETTING_KEYS.LAST_USED_QUERY_ACTION);
 
@@ -157,25 +187,21 @@ export function YqlEditor({
         handlePreviousTab();
     });
 
-    const closeTabById = React.useCallback(
-        (tabId: string) => {
-            queryExecutionManagerInstance.abortQuery(tabId);
-            dispatch(closeQueryTab({tabId}));
-        },
-        [dispatch],
-    );
+    const handleDuplicateActiveTabAction = useEventHandler(() => {
+        handleDuplicateTab(activeTabId);
+    });
 
     const handleCloseOtherTabsAction = useEventHandler(() => {
-        tabsOrder.filter((tabId) => tabId !== activeTabId).forEach(closeTabById);
+        handleCloseOtherTabs(activeTabId);
     });
 
     const handleCloseAllTabsAction = useEventHandler(() => {
-        tabsOrder.forEach(closeTabById);
+        handleCloseAllTabs();
     });
 
     const handleRenameTabAction = useEventHandler(() => {
         const tabIdToRename = activeTabId;
-        NiceModal.show(RENAME_TAB_DIALOG, {
+        NiceModal.show(RENAME_QUERY_DIALOG, {
             title: activeTab?.title || '',
             onRename: (title: string) => {
                 dispatch(renameQueryTab({tabId: tabIdToRename, title}));
@@ -184,16 +210,14 @@ export function YqlEditor({
     });
 
     const handleSaveQueryAsAction = useEventHandler(() => {
-        const commonModalProps = {savedQueries, onSaveQuery: saveQuery, queryBody: input} as const;
-        if (activeTab?.isTitleUserDefined) {
-            NiceModal.show(SAVE_QUERY_DIALOG, {
-                ...commonModalProps,
-                defaultQueryName: activeTab.title,
-            });
-            return;
-        }
+        const defaultQueryName = getTabTitleForSave(activeTab);
 
-        NiceModal.show(SAVE_QUERY_DIALOG, commonModalProps);
+        NiceModal.show(SAVE_QUERY_DIALOG, {
+            savedQueries,
+            onSaveQuery: createSaveQueryHandler(activeTab?.id),
+            queryBody: input,
+            defaultQueryName,
+        });
     });
 
     const editorWillUnmount = () => {
@@ -247,7 +271,9 @@ export function YqlEditor({
         }
 
         initResizeHandler(editor);
-        initUserPrompt(editor, getLastQueryText);
+        if (!isMultiTabQueryEditorEnabled) {
+            initUserPrompt(editor, getLastQueryText);
+        }
         editor.focus();
         editor.addAction({
             id: 'sendQuery',
@@ -346,9 +372,15 @@ export function YqlEditor({
             });
             editor.addAction({
                 id: 'renameEditorTab',
-                label: i18n('editor-tabs.rename'),
+                label: i18n('editor-tabs.rename-query'),
                 keybindings: [keybindings.renameTab],
                 run: () => handleRenameTabAction(),
+            });
+            editor.addAction({
+                id: 'duplicateEditorTab',
+                label: i18n('editor-tabs.duplicate'),
+                keybindings: [keybindings.duplicateTab],
+                run: () => handleDuplicateActiveTabAction(),
             });
             editor.addAction({
                 id: 'nextEditorTab',
@@ -381,12 +413,13 @@ export function YqlEditor({
                 run: () => handleSaveQueryAsAction(),
             });
         }
+
+        onEditorReady?.();
     };
 
     const onChange = (newValue: string) => {
         updateErrorsHighlighting();
         changeUserInput({input: newValue});
-        dispatch(setIsDirty(true));
     };
     return (
         <MonacoEditor

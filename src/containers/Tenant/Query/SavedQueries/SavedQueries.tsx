@@ -9,19 +9,17 @@ import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/Re
 import {Search} from '../../../../components/Search';
 import {TableWithControlsLayout} from '../../../../components/TableWithControlsLayout/TableWithControlsLayout';
 import {TruncatedQuery} from '../../../../components/TruncatedQuery/TruncatedQuery';
-import {setIsDirty} from '../../../../store/reducers/query/query';
+import {useMultiTabQueryEditorEnabled} from '../../../../store/reducers/capabilities/hooks';
 import {
     selectSavedQueriesFilter,
-    setQueryNameToEdit,
     setSavedQueriesFilter,
 } from '../../../../store/reducers/queryActions/queryActions';
-import {TENANT_QUERY_TABS_ID} from '../../../../store/reducers/tenant/constants';
-import {setQueryTab} from '../../../../store/reducers/tenant/tenant';
 import type {SavedQuery} from '../../../../types/store/query';
 import {cn} from '../../../../utils/cn';
 import {useTypedDispatch, useTypedSelector} from '../../../../utils/hooks';
 import {useChangeInputWithConfirmation} from '../../../../utils/hooks/withConfirmation/useChangeInputWithConfirmation';
 import {MAX_QUERY_HEIGHT, QUERY_TABLE_SETTINGS} from '../../utils/constants';
+import {useOpenExternalQueryInEditor} from '../hooks/useOpenExternalQueryInEditor';
 import i18n from '../i18n';
 import {useSavedQueries} from '../utils/useSavedQueries';
 
@@ -62,14 +60,12 @@ const DeleteDialog = ({visible, queryName, onCancelClick, onConfirmClick}: Delet
 
 const SAVED_QUERIES_COLUMNS_WIDTH_LS_KEY = 'savedQueriesTableColumnsWidth';
 
-interface SavedQueriesProps {
-    changeUserInput: (value: {input: string}) => void;
-}
-
-export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
+export const SavedQueries = () => {
     const {filteredSavedQueries, deleteSavedQuery} = useSavedQueries();
     const dispatch = useTypedDispatch();
     const filter = useTypedSelector(selectSavedQueriesFilter);
+    const isMultiTabEnabled = useMultiTabQueryEditorEnabled();
+    const openExternalQueryInEditor = useOpenExternalQueryInEditor();
 
     const [isDeleteDialogVisible, setIsDeleteDialogVisible] = React.useState(false);
     const [queryNameToDelete, setQueryNameToDelete] = React.useState<string>('');
@@ -91,15 +87,16 @@ export const SavedQueries = ({changeUserInput}: SavedQueriesProps) => {
 
     const applyQueryClick = React.useCallback(
         ({queryText, queryName}: {queryText: string; queryName: string}) => {
-            changeUserInput({input: queryText});
-            dispatch(setIsDirty(false));
-            dispatch(setQueryNameToEdit(queryName));
-            dispatch(setQueryTab(TENANT_QUERY_TABS_ID.newQuery));
+            openExternalQueryInEditor({
+                title: queryName,
+                input: queryText,
+                savedQueryName: queryName,
+            });
         },
-        [changeUserInput, dispatch],
+        [openExternalQueryInEditor],
     );
 
-    const onQueryClick = useChangeInputWithConfirmation(applyQueryClick);
+    const onQueryClick = useChangeInputWithConfirmation(applyQueryClick, isMultiTabEnabled);
 
     const onDeleteQueryClick = (queryName: string) => {
         return (event: React.MouseEvent) => {

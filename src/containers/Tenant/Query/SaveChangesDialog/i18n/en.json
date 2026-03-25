@@ -1,0 +1,10 @@
+{
+  "title": "Save changes to query?",
+  "description": "Your changes will be lost if you don't save them. Give it a meaningful name.",
+  "action.dont-save": "Don't Save",
+  "action.cancel": "Cancel",
+  "action.save": "Save",
+  "error.name-not-empty": "Name should not be empty",
+  "error.name-min-length": "Name must be at least 3 characters",
+  "error.name-exists": "This name already exists"
+}
