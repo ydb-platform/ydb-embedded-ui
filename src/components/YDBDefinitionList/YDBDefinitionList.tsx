@@ -1,7 +1,7 @@
 import React from 'react';
 
 import type {DefinitionListProps, IconData, LabelProps} from '@gravity-ui/uikit';
-import {DefinitionList, Flex, Icon, Label} from '@gravity-ui/uikit';
+import {ClipboardButton, DefinitionList, Flex, Icon, Label, Text} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
 import {InfoViewerTitle} from '../InfoViewerTitle/InfoViewerTitle';
@@ -27,7 +27,7 @@ export interface YDBDefinitionListHeaderLabel {
 
 interface YDBDefinitionListProps extends Omit<DefinitionListProps, 'children' | 'nameMaxWidth'> {
     title?: React.ReactNode;
-    titleSuffix?: React.ReactNode;
+    titleSuffix?: {title: React.ReactNode; copyText?: string};
     titleSeparator?: React.ReactNode;
     titleClassname?: string;
     items: YDBDefinitionListItem[];
@@ -78,8 +78,17 @@ export function YDBDefinitionList({
                         </InfoViewerTitle>
                         {titleSuffix && (
                             <React.Fragment>
-                                <div className={b('title-suffix')}>{titleSeparator}</div>
-                                <div className={b('title-suffix')}>{titleSuffix}</div>
+                                <Text color="secondary">{titleSeparator}</Text>
+                                <Flex gap={0.5} alignItems="center">
+                                    <Text color="secondary">{titleSuffix.title}</Text>
+                                    {titleSuffix.copyText && (
+                                        <ClipboardButton
+                                            text={titleSuffix.copyText}
+                                            size="xs"
+                                            view="flat-secondary"
+                                        />
+                                    )}
+                                </Flex>
                             </React.Fragment>
                         )}
                     </Flex>

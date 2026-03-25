@@ -59,7 +59,7 @@ export function DiskStateProgressBar({
     if (isDonor) {
         mods[DONOR_COLOR.toLocaleLowerCase()] = true;
     } else {
-        const color = severity !== undefined && getSeverityColor(severity);
+        const color = getSeverityColor(severity);
         if (color) {
             mods[color.toLocaleLowerCase()] = true;
         }
@@ -69,7 +69,7 @@ export function DiskStateProgressBar({
 
     const renderAllocatedPercent = () => {
         if (compact) {
-            return <div className={b('fill-bar', mods)} style={{width: '100%'}} />;
+            return null;
         }
 
         if (!hasAllocatedPercent) {
@@ -95,7 +95,11 @@ export function DiskStateProgressBar({
         }
 
         if (!compact && !hasAllocatedPercent && noDataPlaceholder) {
-            return <div className={b('title')}>{noDataPlaceholder}</div>;
+            return <div className={b('title', {text: true})}>{noDataPlaceholder}</div>;
+        }
+
+        if (compact && severity === 0 && noDataPlaceholder) {
+            return <div className={b('title', {compact: true})}>{noDataPlaceholder}</div>;
         }
 
         return null;

@@ -7,6 +7,8 @@ import {HoverPopup} from '../HoverPopup/HoverPopup';
 import {InternalLink} from '../InternalLink';
 import {VDiskPopup} from '../VDiskPopup/VDiskPopup';
 
+import {i18n} from './i18n';
+
 import './VDisk.scss';
 
 const b = cn('ydb-vdisk-component');
@@ -69,6 +71,7 @@ export const VDisk = ({
                         className={progressBarClassName}
                         withIcon={withIcon}
                         highlighted={highlighted}
+                        noDataPlaceholder={i18n('context_no-data')}
                     />
                 </InternalLink>
             </div>

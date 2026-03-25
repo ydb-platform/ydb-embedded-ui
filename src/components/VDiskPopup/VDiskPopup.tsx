@@ -14,7 +14,7 @@ import {createVDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/develop
 import {getStateSeverity} from '../../utils/disks/calculateVDiskSeverity';
 import {
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
-    ERROR_SEVERITY,
+    NOT_AVAILABLE_SEVERITY,
     NUMERIC_SEVERITY_TO_LABEL_VIEW,
     VDISK_LABEL_CONFIG,
 } from '../../utils/disks/constants';
@@ -240,7 +240,7 @@ const prepareVDiskData = (
         });
     }
 
-    if (Replicated === false && VDiskState === EVDiskState.OK) {
+    if (Replicated === false && VDiskState === EVDiskState.OK && !DonorMode) {
         vdiskData.push({name: vDiskPopupKeyset('label_replicated'), content: 'NO'});
 
         // Only show replication progress and time remaining when disk is not replicated and state is OK
@@ -380,11 +380,11 @@ const prepareHeaderLabels = (data: PreparedVDisk): YDBDefinitionListHeaderLabel[
         });
     }
 
-    const severity = VDiskState ? getStateSeverity(VDiskState) : ERROR_SEVERITY;
+    const severity = VDiskState ? getStateSeverity(VDiskState) : NOT_AVAILABLE_SEVERITY;
 
     const {theme: stateTheme, icon: stateIcon} = NUMERIC_SEVERITY_TO_LABEL_VIEW[severity];
 
-    const value = VDiskState ?? vDiskPopupKeyset('label_no-data');
+    const value = VDiskState ?? vDiskPopupKeyset('context_not-available');
 
     labels.push({
         id: 'state',
@@ -452,7 +452,7 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
             <YDBDefinitionList
                 compact
                 title="VDisk"
-                titleSuffix={vdiskId ?? EMPTY_DATA_PLACEHOLDER}
+                titleSuffix={{title: vdiskId ?? EMPTY_DATA_PLACEHOLDER, copyText: vdiskId}}
                 items={vdiskInfo}
                 headerLabels={vdiskHeaderLabels}
                 nameMaxWidth={100}
@@ -464,7 +464,7 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
                     <YDBDefinitionList
                         compact
                         title="PDisk"
-                        titleSuffix={pdiskId ?? EMPTY_DATA_PLACEHOLDER}
+                        titleSuffix={{title: pdiskId ?? EMPTY_DATA_PLACEHOLDER, copyText: pdiskId}}
                         items={pdiskInfo}
                         headerLabels={pdiskHeaderLabels}
                         footer={pdiskFooter}

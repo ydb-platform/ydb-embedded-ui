@@ -4,8 +4,8 @@
     $block: &;
     @include mixins.flex-container();
 
-    &__title-suffix {
-        color: var(--g-color-text-secondary);
+    &__title {
+        @include mixins.info-viewer-title();
     }
 
     &__footer {

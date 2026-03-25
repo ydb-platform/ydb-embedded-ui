@@ -248,12 +248,12 @@
 
     &_green {
         --entity-state-font-color: var(--g-color-text-positive);
-        --entity-state-border-color: var(--g-color-base-positive-medium);
+        --entity-state-border-color: unset;
         --entity-state-background-color: var(--g-color-base-positive-light);
         --entity-state-fill-color: var(--g-color-base-positive-medium);
 
         &#{$block}_highlighted {
-            --entity-state-border-color: var(--g-color-base-positive-medium-hover);
+            --entity-state-border-color: unset;
             --entity-state-background-color: var(--g-color-base-positive-light-hover);
             --entity-state-fill-color: var(--g-color-base-positive-heavy);
         }
@@ -261,13 +261,13 @@
 
     &_blue {
         --entity-state-font-color: var(--g-color-text-info);
-        --entity-state-border-color: var(--g-color-base-info-heavy);
+        --entity-state-border-color: unset;
         --entity-state-shadow-color: var(--g-color-base-info-medium);
         --entity-state-background-color: var(--g-color-base-info-light);
         --entity-state-fill-color: var(--g-color-base-info-medium);
 
         &#{$block}_highlighted {
-            --entity-state-border-color: var(--g-color-base-info-heavy-hover);
+            --entity-state-border-color: unset;
             --entity-state-shadow-color: var(--g-color-base-info-heavy);
             --entity-state-background-color: var(--g-color-base-info-light-hover);
             --entity-state-fill-color: var(--g-color-base-info-medium-hover);
@@ -276,12 +276,12 @@
 
     &_yellow {
         --entity-state-font-color: var(--g-color-text-warning);
-        --entity-state-border-color: var(--g-color-base-warning-medium);
+        --entity-state-border-color: unset;
         --entity-state-background-color: var(--g-color-base-warning-light);
         --entity-state-fill-color: var(--g-color-base-warning-medium);
 
         &#{$block}_highlighted {
-            --entity-state-border-color: var(--g-color-base-warning-medium-hover);
+            --entity-state-border-color: unset;
             --entity-state-background-color: var(--g-color-base-warning-light-hover);
             --entity-state-fill-color: var(--g-color-base-warning-medium-hover);
         }
@@ -289,19 +289,21 @@
 
     &_orange {
         --entity-state-font-color: var(--g-color-private-orange-500);
-        --entity-state-border-color: var(--ydb-color-status-orange);
+        --entity-state-border-color: unset;
         --entity-state-background-color: var(--g-color-private-orange-100);
         --entity-state-fill-color: var(--g-color-private-orange-300);
     }
 
     &_red {
         --entity-state-font-color: var(--g-color-text-danger);
-        --entity-state-border-color: var(--g-color-base-danger-heavy);
+        --entity-state-border-color: var(--g-color-base-danger-heavy-hover);
         --entity-state-background-color: var(--g-color-base-danger-light);
         --entity-state-fill-color: var(--g-color-base-danger-medium);
+        --entity-state-icon-color: var(--g-color-base-danger-heavy);
 
         &#{$block}_highlighted {
             --entity-state-border-color: var(--g-color-base-danger-heavy-hover);
+            --entity-state-icon-color: var(--g-color-base-danger-heavy-hover);
             --entity-state-background-color: var(--g-color-base-danger-light);
             --entity-state-fill-color: var(--g-color-base-danger-medium-hover);
         }
@@ -309,13 +311,13 @@
 
     &_darkgrey {
         --entity-state-font-color: var(--g-color-text-secondary);
-        --entity-state-border-color: var(--g-color-base-neutral-heavy);
+        --entity-state-border-color: unset;
         --entity-state-shadow-color: var(--g-color-base-neutral-light);
         --entity-state-fill-color: var(--g-color-base-neutral-light);
         --entity-state-background-color: transparent;
 
         &#{$block}_highlighted {
-            --entity-state-border-color: var(--g-color-base-neutral-heavy-hover);
+            --entity-state-border-color: unset;
             --entity-state-shadow-color: var(--g-color-base-neutral-light-hover);
             --entity-state-fill-color: var(--g-color-base-neutral-light-hover);
             --entity-state-background-color: transparent;
@@ -323,13 +325,15 @@
     }
 
     &_grey {
-        --entity-state-font-color: var(--g-color-text-secondary);
-        --entity-state-background-color: var(--g-color-base-neutral-light-hover);
-        --entity-state-fill-color: transparent;
-        --entity-state-border-color: transparent;
+        --entity-state-background-color: var(--g-color-text-dark-hint);
+        --entity-state-compact-background-color: var(--g-color-text-dark-hint);
+        --entity-state-fill-color: var(--g-color-text-dark-secondary);
+        --entity-state-border-color: unset;
 
         &#{$block}_highlighted {
-            --entity-state-background-color: var(--g-color-base-neutral-medium);
+            --entity-state-background-color: var(--g-color-text-dark-hint);
+            --entity-state-fill-color: var(--g-color-text-dark-complementary);
+            --entity-state-compact-background-color: var(--g-color-text-dark-secondary);
         }
     }
 }

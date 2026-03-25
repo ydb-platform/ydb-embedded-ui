@@ -72,6 +72,7 @@ export function PDiskSpaceDistribution({data}: PDiskSpaceDistributionProps) {
                 diskAllocatedPercent={data.AllocatedPercent}
                 content={renderSlots()}
                 faded={true}
+                noDataPlaceholder={pDiskPageKeyset('no-slots-data')}
             />
         </div>
     );
