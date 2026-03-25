@@ -10,6 +10,8 @@ export type Metric =
     | 'resources.memory.used_bytes'
     | 'resources.storage.used_bytes'
     | 'resources.cpu.usage'
+    | 'resources.network.sent_bytes'
+    | 'resources.network.received_bytes'
     | PoolUsageMetric
     | QueriesLatenciesMetric;
 

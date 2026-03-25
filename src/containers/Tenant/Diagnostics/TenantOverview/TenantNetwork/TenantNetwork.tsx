@@ -7,10 +7,12 @@ import {cn} from '../../../../../utils/cn';
 import {useSearchQuery, useSetting} from '../../../../../utils/hooks';
 import {TenantTabsGroups} from '../../../TenantPages';
 import {StatsWrapper} from '../StatsWrapper/StatsWrapper';
+import {TenantDashboard} from '../TenantDashboard/TenantDashboard';
 import i18n from '../i18n';
 
 import {TopNodesByPing} from './TopNodesByPing';
 import {TopNodesBySkew} from './TopNodesBySkew';
+import {networkDashboardConfig} from './networkDashboardConfig';
 
 import './TenantNetwork.scss';
 
@@ -35,6 +37,7 @@ export function TenantNetwork({database}: TenantNetworkProps) {
 
     return (
         <Flex direction="column" gap={4} className={b()}>
+            <TenantDashboard database={database} charts={networkDashboardConfig} />
             <StatsWrapper title={i18n('title_nodes-by-ping')} allEntitiesLink={allNodesLink}>
                 <TopNodesByPing database={database} />
             </StatsWrapper>
