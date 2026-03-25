@@ -8,6 +8,8 @@
   "error-details.label_url": "URL",
   "error-details.label_error-code": "Code",
   "error-details.label_message": "Message",
+  "error-details.label_error-origin": "Error origin",
+  "error-details.label_error-stage": "Error stage",
   "error-details.label_error-phase": "Phase",
   "error-details.phase_connection": "Connection failed",
   "error-details.phase_stream": "Connection interrupted during data transfer",

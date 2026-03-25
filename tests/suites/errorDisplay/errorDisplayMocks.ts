@@ -15,6 +15,8 @@ const EXPOSED_HEADERS = [
     'x-ydb-ui-proxy-request-id',
     'x-ydb-ui-proxy-rewritten-path',
     'x-ydb-ui-proxy-target',
+    'x-ydb-ui-error-origin',
+    'x-ydb-ui-error-stage',
 ].join(', ');
 
 // API routes per page (matched by Playwright page.route)
@@ -87,6 +89,8 @@ export async function setupCluster503ProxyHeadersMock(page: Page) {
             'x-ydb-ui-proxy-request-id': 'proxy-request-id-cluster-503',
             'x-ydb-ui-proxy-rewritten-path': '/meta/cp_databases?cluster_name=test-cluster',
             'x-ydb-ui-proxy-target': 'http://meta-upstream.example.test:8780/',
+            'x-ydb-ui-error-origin': 'upstream',
+            'x-ydb-ui-error-stage': 'upstream-response',
         },
     });
 }
@@ -176,6 +180,8 @@ export async function setupWhoami503ProxyBodyMock(page: Page) {
         contentType: 'application/json',
         body: JSON.stringify({
             message: 'Meta upstream unavailable',
+            errorOrigin: 'app',
+            errorStage: 'before-proxy',
             proxyDiagnostics: {
                 traceId: 'proxy-trace-id-body-503',
                 requestId: 'proxy-request-id-body-503',
@@ -192,6 +198,8 @@ export async function setupWhoami503ProxyHeadersOverrideBodyMock(page: Page) {
         contentType: 'application/json',
         body: JSON.stringify({
             message: 'Meta upstream unavailable',
+            errorOrigin: 'proxy',
+            errorStage: 'connect',
             proxyDiagnostics: {
                 traceId: 'proxy-trace-id-body-override',
                 requestId: 'proxy-request-id-body-override',
@@ -204,6 +212,8 @@ export async function setupWhoami503ProxyHeadersOverrideBodyMock(page: Page) {
             'x-ydb-ui-proxy-request-id': 'proxy-request-id-header-override',
             'x-ydb-ui-proxy-rewritten-path': '/meta/header-override',
             'x-ydb-ui-proxy-target': 'http://meta-header-override.example.test:8780/',
+            'x-ydb-ui-error-origin': 'upstream',
+            'x-ydb-ui-error-stage': 'upstream-response',
         },
     });
 }
@@ -383,6 +393,8 @@ export async function setupStreamingQuery500Mock(page: Page) {
             traceresponse: '00-streamtr0011223344556677889900-aabb112233445566-00',
             'x-request-id': 'test-req-id-e2e-stream-500',
             'x-worker-name': 'stream-worker-02.example.net:8765',
+            'x-ydb-ui-error-origin': 'proxy',
+            'x-ydb-ui-error-stage': 'stream',
         },
     });
 }
