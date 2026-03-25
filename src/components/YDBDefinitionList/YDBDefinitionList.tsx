@@ -72,7 +72,7 @@ export function YDBDefinitionList({
                 alignItems="center"
             >
                 {title && (
-                    <Flex gap="1" alignItems="center">
+                    <Flex gap="1" alignItems="baseline">
                         <InfoViewerTitle className={b('title', titleClassname)}>
                             {title}
                         </InfoViewerTitle>
