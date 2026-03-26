@@ -49,7 +49,16 @@ const mapPageToTitle2: Record<TenantPage, string> = {
     },
 };
 
-export function useTenantNavigation() {
+interface TenantNavigationItem {
+    id: string;
+    title?: string;
+    icon?: IconData;
+    path: string;
+    current: boolean;
+    onForward: () => void;
+}
+
+export function useTenantNavigation(): TenantNavigationItem[] {
     const location = useLocation();
     const queryParams = parseQuery(location);
     const match = useRouteMatch(routes.tenant);
@@ -57,7 +66,7 @@ export function useTenantNavigation() {
 
     const {tenantPage, handleTenantPageChange} = useTenantPage();
 
-    const menuItems = React.useMemo(() => {
+    const menuItems = React.useMemo<TenantNavigationItem[]>(() => {
         if (!match) {
             return [];
         }
