@@ -14,7 +14,7 @@ type MenuItem = ReturnType<typeof useTenantNavigation>[0];
 const transformItemToOption = ({id, title, icon}: MenuItem): SegmentedRadioGroupOptionProps => {
     const content = (
         <span className={b('item')}>
-            <Icon data={icon} size={16} className={b('icon')} />
+            {icon ? <Icon data={icon} size={16} className={b('icon')} /> : null}
             <span className={b('text')}>{title}</span>
         </span>
     );

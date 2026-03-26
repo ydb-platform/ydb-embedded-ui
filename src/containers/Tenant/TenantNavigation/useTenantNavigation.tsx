@@ -1,6 +1,7 @@
 import React from 'react';
 
 import {CircleTree, Code, Database, Pulse, Terminal} from '@gravity-ui/icons';
+import type {IconData} from '@gravity-ui/uikit';
 import {useLocation, useRouteMatch} from 'react-router-dom';
 import {StringParam, useQueryParams} from 'use-query-params';
 
@@ -13,20 +14,39 @@ import {useSetting} from '../../../utils/hooks';
 import i18n from '../i18n';
 import {useNavigationV2Enabled} from '../utils/useNavigationV2Enabled';
 
-type TenantPages = keyof typeof TENANT_PAGES_IDS;
+const pagesList: Array<TenantPage> = ['query', 'diagnostics'];
+const pagesListV2: Array<TenantPage> = ['database', 'diagnostics', 'query'];
 
-const pagesList: Array<TenantPages> = ['query', 'diagnostics'];
-const pagesListV2: Array<TenantPages> = ['diagnostics', 'schema', 'query'];
-
-const mapPageToIcon = {
+const mapPageToIcon: Partial<Record<TenantPage, IconData>> = {
     query: Terminal,
     diagnostics: Pulse,
 };
 
-const mapPageToIcon2 = {
-    diagnostics: Database,
-    schema: CircleTree,
+const mapPageToTitle: Partial<Record<TenantPage, string>> = {
+    get query() {
+        return i18n('pages.query');
+    },
+    get diagnostics() {
+        return i18n('pages.diagnostics');
+    },
+};
+
+const mapPageToIcon2: Record<TenantPage, IconData> = {
+    database: Database,
+    diagnostics: CircleTree,
     query: Code,
+};
+
+const mapPageToTitle2: Record<TenantPage, string> = {
+    get database() {
+        return i18n('pages.database');
+    },
+    get diagnostics() {
+        return i18n('pages.diagnostics');
+    },
+    get query() {
+        return i18n('pages.editor');
+    },
 };
 
 export function useTenantNavigation() {
@@ -47,13 +67,12 @@ export function useTenantNavigation() {
         const items = pages.map((key) => {
             const pageId = TENANT_PAGES_IDS[key];
             const pagePath = getTenantPath({...queryParams, [TENANT_PAGE]: pageId});
-            const icon = isV2Enabled
-                ? mapPageToIcon2[key as keyof typeof mapPageToIcon2]
-                : mapPageToIcon[key as keyof typeof mapPageToIcon];
+            const icon = isV2Enabled ? mapPageToIcon2[key] : mapPageToIcon[key];
+            const title = isV2Enabled ? mapPageToTitle2[key] : mapPageToTitle[key];
 
             const nextItem = {
                 id: pageId,
-                title: i18n(`pages.${key}`),
+                title,
                 icon,
                 path: pagePath,
                 current: tenantPage === pageId,

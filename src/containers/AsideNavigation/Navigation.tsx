@@ -96,8 +96,8 @@ export function Navigation({children, userSettings}: NavigationProps) {
                     const baseCnParams = {
                         compact: options.compact,
                         expanded: !options.compact,
+                        database: item.id === 'database',
                         diagnostics: item.id === 'diagnostics',
-                        schema: item.id === 'schema',
                         query: item.id === 'query',
                     };
 
@@ -113,7 +113,7 @@ export function Navigation({children, userSettings}: NavigationProps) {
                         active: item.current,
                     };
 
-                    if (item.id === 'diagnostics') {
+                    if (item.id === 'database') {
                         return (
                             <Popover
                                 open={isNewNavAlertShown}

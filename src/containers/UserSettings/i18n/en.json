@@ -59,5 +59,5 @@
   "settings.enableBlobStorageCapacityMetrics.title": "Blob storage capacity metrics",
 
   "settings.enableTenantNavigationV2.title": "New database navigation",
-  "settings.enableTenantNavigationV2.description": "Puts navigation buttons in the left panel and spreads database tabs between diagnostics page and schema page."
+  "settings.enableTenantNavigationV2.description": "Puts navigation buttons in the left panel and spreads database tabs between database and diagnostics pages."
 }

@@ -30,7 +30,7 @@ function ObjectGeneral({additionalTenantProps}: ObjectGeneralProps) {
             case TENANT_PAGES_IDS.query: {
                 return <Query theme={theme} />;
             }
-            case TENANT_PAGES_IDS.schema:
+            case TENANT_PAGES_IDS.database:
             case TENANT_PAGES_IDS.diagnostics:
             default: {
                 return (
@@ -41,7 +41,7 @@ function ObjectGeneral({additionalTenantProps}: ObjectGeneralProps) {
                         subType={subType}
                         databaseFullPath={databaseFullPath}
                         additionalTenantProps={additionalTenantProps}
-                        databasePagesDisplay={isV2Enabled ? 'schema' : 'all'}
+                        databasePagesDisplay={isV2Enabled ? 'diagnostics' : 'all'}
                     />
                 );
             }
