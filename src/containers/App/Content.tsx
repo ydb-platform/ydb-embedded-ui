@@ -27,7 +27,7 @@ import {lazyComponent} from '../../utils/lazyComponent';
 import {isForbiddenError, isRedirectToAuth, isUnauthenticatedError} from '../../utils/response';
 import Authentication from '../Authentication/Authentication';
 import {GetUser} from '../GetUserWrapper/GetUserWrapper';
-import Header from '../Header/Header';
+import {Header} from '../Header/Header';
 
 import {
     ClusterSlot,

@@ -1,14 +1,16 @@
 import React from 'react';
 
+import {Text} from '@gravity-ui/uikit';
 import {Helmet} from 'react-helmet-async';
 
 import {DrawerContextProvider} from '../../../components/Drawer/DrawerContext';
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
-import {setDiagnosticsTab} from '../../../store/reducers/tenant/tenant';
+import {setDiagnosticsTab, useTenantBaseInfo} from '../../../store/reducers/tenant/tenant';
 import type {AdditionalTenantsProps} from '../../../types/additionalProps';
 import type {EPathSubType, EPathType} from '../../../types/api/schema';
 import {cn} from '../../../utils/cn';
 import {useScrollPosition, useTypedDispatch, useTypedSelector} from '../../../utils/hooks';
+import {useNavigationV2Enabled} from '../utils/useNavigationV2Enabled';
 
 import type {DatabasePagesDisplay} from './DiagnosticsPages';
 import {DiagnosticsTabs} from './DiagnosticsTabs/DiagnosticsTabs';
@@ -44,6 +46,10 @@ function Diagnostics({
     const {diagnosticsTab = TENANT_DIAGNOSTICS_TABS_IDS.overview} = useTypedSelector(
         (state) => state.tenant,
     );
+
+    const isV2NavigationEnabled = useNavigationV2Enabled();
+
+    const {name} = useTenantBaseInfo(database);
 
     const pages = useDiagnosticsPages({
         path,
@@ -88,6 +94,19 @@ function Diagnostics({
         activeTab?.id === TENANT_DIAGNOSTICS_TABS_IDS.overview,
     );
 
+    const renderDBName = () => {
+        // TODO: Replace `diagnostics` to `database` after https://github.com/ydb-platform/ydb-embedded-ui/pull/3692
+        if (isV2NavigationEnabled && databasePagesDisplay === 'diagnostics') {
+            return (
+                <Text variant="header-1" className={b('db-name')}>
+                    {name}
+                </Text>
+            );
+        }
+
+        return null;
+    };
+
     return (
         <div className={b()}>
             {activeTab ? (
@@ -95,6 +114,7 @@ function Diagnostics({
                     <title>{activeTab.title}</title>
                 </Helmet>
             ) : null}
+            {renderDBName()}
             <DiagnosticsTabs activeTab={activeTab} tabs={pages} />
             <DrawerContextProvider>
                 <div className={b('page-wrapper')} ref={containerRef}>

@@ -53,8 +53,6 @@
   "context_capacity-usage": "{{value}} of {{capacity}}",
   "title_network-stats-unavailable": "Network Statistics Unavailable",
   "context_network-stats-unavailable": "Network ping and clock skew statistics require a newer backend version. Please upgrade your YDB installation to access these features.",
-  "value_serverless": "Serverless",
-  "context_serverless-tooltip": "Some metrics are hidden in Serverless mode — resources scale automatically based on workload",
   "context_serverless-autoscaled": "Auto-Scaled Resources",
   "context_serverless-storage-subtitle": "{{legend}} | {{groups}} groups"
 }

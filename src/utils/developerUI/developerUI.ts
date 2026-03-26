@@ -69,5 +69,5 @@ export function createTabletDeveloperUIHref(
 export function useHasDeveloperUi() {
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const isDeveloperUiAllowed = uiFactory.hasDeveloperUi;
-    return isUserAllowedToMakeChanges && isDeveloperUiAllowed;
+    return Boolean(isUserAllowedToMakeChanges && isDeveloperUiAllowed);
 }
