@@ -8,4 +8,10 @@
         border-radius: var(--disk-border-radius); // to match interactive area with disk shape
         background: var(--g-color-base-background);
     }
+    &__content_compact {
+        border-radius: var(
+            --disk-border-radius-compact,
+            var(--g-border-radius-xs)
+        ); // to match interactive area with disk shape
+    }
 }

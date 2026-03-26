@@ -64,7 +64,7 @@ export const VDisk = ({
             placement={placement}
         >
             <div className={b()}>
-                <InternalLink to={vDiskPath} className={b('content')}>
+                <InternalLink to={vDiskPath} className={b('content', {compact})}>
                     <DiskStateProgressBar
                         diskAllocatedPercent={data.AllocatedPercent}
                         severity={severity}

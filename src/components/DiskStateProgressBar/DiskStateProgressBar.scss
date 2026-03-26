@@ -6,7 +6,7 @@
     $border-width: 1px;
     $outer-border-radius: var(--disk-border-radius, var(--g-border-radius-m));
     $inner-border-radius: $outer-border-radius - $border-width;
-    $outer-compact-border-radius: var(--g-border-radius-xs);
+    $outer-compact-border-radius: var(--disk-border-radius-compact, var(--g-border-radius-xs));
     $inner-compact-border-radius: $outer-compact-border-radius - $border-width;
 
     --progress-bar-full-height: var(--g-text-subheader-2-line-height);
