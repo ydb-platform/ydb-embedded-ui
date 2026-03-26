@@ -4,7 +4,7 @@ import {Flex, Icon} from '@gravity-ui/uikit';
 
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {cn} from '../../utils/cn';
-import {DONOR_COLOR} from '../../utils/disks/constants';
+import {DONOR_COLOR, NOT_AVAILABLE_SEVERITY} from '../../utils/disks/constants';
 import {getSeverityColor, getVDiskStatusIcon} from '../../utils/disks/helpers';
 import {useSetting} from '../../utils/hooks';
 import {isNumeric} from '../../utils/utils';
@@ -98,7 +98,7 @@ export function DiskStateProgressBar({
             return <div className={b('title', {text: true})}>{noDataPlaceholder}</div>;
         }
 
-        if (compact && severity === 0 && noDataPlaceholder) {
+        if (compact && severity === NOT_AVAILABLE_SEVERITY && noDataPlaceholder) {
             return <div className={b('title', {compact: true})}>{noDataPlaceholder}</div>;
         }
 

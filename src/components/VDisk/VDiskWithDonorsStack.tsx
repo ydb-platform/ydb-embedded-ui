@@ -1,5 +1,7 @@
 import React from 'react';
 
+import type {PopupPlacement} from '@gravity-ui/uikit';
+
 import {stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk} from '../../utils/disks/types';
@@ -17,6 +19,8 @@ interface VDiskWithDonorsStackProps extends VDiskProps {
     progressBarClassName?: string;
 }
 
+const diskInStackPlacement: PopupPlacement = ['left', 'right'];
+
 export function VDiskWithDonorsStack({
     data,
     className,
@@ -24,6 +28,10 @@ export function VDiskWithDonorsStack({
     withIcon,
     highlightedVDisk,
     setHighlightedVDisk,
+    showPopup: _showPopup,
+    onShowPopup: _onShowPopup,
+    onHidePopup: _onHidePopup,
+    highlighted: _highlighted,
     ...restProps
 }: VDiskWithDonorsStackProps) {
     const donors = data?.Donors;
@@ -41,25 +49,33 @@ export function VDiskWithDonorsStack({
         setHighlightedVDisk?.(undefined);
     }, [setHighlightedVDisk]);
 
+    // Spread restProps first, then explicitly override critical fields to prevent
+    // external code from breaking the stack's highlight/popup coordination.
     const mainVDiskProps: Partial<VDiskProps> = {
+        ...restProps,
         withIcon,
         showPopup: isHighlighted,
         highlighted: isHighlighted,
         onShowPopup: handleShowPopup,
         onHidePopup: handleHidePopup,
-        ...restProps,
     };
 
+    // Donor VDisks intentionally omit popup handlers (showPopup, onShowPopup, onHidePopup).
+    // Only the main VDisk acts as the hover target for the entire stack to avoid
+    // conflicting interactions when hovering over stacked elements.
+    // Popup-related props are destructured and excluded from restProps above.
     const donorVDiskProps: Partial<VDiskProps> = {
+        ...restProps,
         withIcon,
         highlighted: isHighlighted,
-        ...restProps,
     };
+
+    const mainDiskPlacement = donors?.length ? diskInStackPlacement : undefined;
 
     const content =
         donors && donors.length > 0 ? (
             <Stack className={stackClassName}>
-                <VDisk data={data} {...mainVDiskProps} />
+                <VDisk placement={mainDiskPlacement} data={data} {...mainVDiskProps} />
                 {donors.map((donor) => {
                     const isFullData = isFullVDiskData(donor);
 
@@ -67,6 +83,7 @@ export function VDiskWithDonorsStack({
                         <VDisk
                             key={stringifyVdiskId(isFullData ? donor.VDiskId : donor)}
                             data={donor}
+                            placement={diskInStackPlacement}
                             {...donorVDiskProps}
                         />
                     );

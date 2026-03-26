@@ -28,10 +28,6 @@ export function prepareVDiskDataResponse(
         for (const donor of preparedVDisk.Donors ?? []) {
             if (donor.StringifiedId === vDiskId) {
                 currentVDisk = donor;
-                currentVDisk.Recipient = {
-                    NodeId: preparedVDisk.NodeId,
-                    StringifiedId: preparedVDisk.StringifiedId,
-                };
                 break;
             }
         }

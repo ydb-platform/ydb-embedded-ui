@@ -230,7 +230,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
         const donorLinks = Donors.map((donor, index) => {
             const {StringifiedId: id, NodeId: dNodeId} = donor;
 
-            if (!id || !dNodeId) {
+            if (!id) {
                 return null;
             }
 
@@ -239,11 +239,11 @@ export function VDiskInfo<T extends PreparedVDisk>({
                 vDiskId: id,
             });
 
-            return (
+            return vDiskPath ? (
                 <InternalLink key={index} to={vDiskPath}>
                     {id}
                 </InternalLink>
-            );
+            ) : null;
         }).filter(Boolean);
 
         if (donorLinks.length) {
@@ -306,13 +306,17 @@ export function VDiskInfo<T extends PreparedVDisk>({
     // Display in two columns on page (row + wrap) and in one column in popups (column + nowrap)
     return (
         <Flex className={className} gap={2} direction={wrap ? 'row' : 'column'} wrap={wrap}>
-            <YDBDefinitionList
-                titleClassname={titleClassName}
-                title={title}
-                items={leftColumn}
-                className={b('info')}
-            />
-            <YDBDefinitionList items={rightColumn} className={b('info')} />
+            {leftColumn.length > 0 && (
+                <YDBDefinitionList
+                    titleClassname={titleClassName}
+                    title={title}
+                    items={leftColumn}
+                    className={b('info')}
+                />
+            )}
+            {rightColumn.length > 0 && (
+                <YDBDefinitionList items={rightColumn} className={b('info')} />
+            )}
         </Flex>
     );
 }

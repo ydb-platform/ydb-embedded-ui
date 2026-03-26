@@ -1,3 +1,5 @@
+import type {PopupPlacement} from '@gravity-ui/uikit';
+
 import {useVDiskPagePath} from '../../routes';
 import {cn} from '../../utils/cn';
 import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from '../../utils/disks/constants';
@@ -25,6 +27,7 @@ export interface VDiskProps {
     delayClose?: number;
     withIcon?: boolean;
     highlighted?: boolean;
+    placement?: PopupPlacement;
 }
 
 export const VDisk = ({
@@ -39,6 +42,7 @@ export const VDisk = ({
     delayOpen,
     withIcon,
     highlighted,
+    placement = ['top', 'bottom', 'left', 'right'],
 }: VDiskProps) => {
     const getVDiskLink = useVDiskPagePath();
     const vDiskPath = getVDiskLink({nodeId: data.NodeId, vDiskId: data.StringifiedId});
@@ -57,7 +61,7 @@ export const VDisk = ({
             delayClose={delayClose}
             delayOpen={delayOpen}
             // Allow all placement options, component should choose first available
-            placement={['top', 'bottom', 'left', 'right']}
+            placement={placement}
         >
             <div className={b()}>
                 <InternalLink to={vDiskPath} className={b('content')}>

@@ -106,7 +106,7 @@ interface VDiskLinkProps {
     nodeId?: string | number;
     stringifiedId?: string;
     getVDiskLinkFn?: (data: {
-        nodeId: string | number;
+        nodeId: string | number | undefined;
         vDiskId: string | undefined;
     }) => string | undefined;
 }
@@ -116,16 +116,14 @@ const VDiskLink = ({nodeId, stringifiedId, getVDiskLinkFn}: VDiskLinkProps) => {
         return <span>{EMPTY_DATA_PLACEHOLDER}</span>;
     }
 
-    if (isNil(nodeId)) {
-        return <span>{stringifiedId}</span>;
-    }
-
     const path = getVDiskLinkFn?.({nodeId, vDiskId: stringifiedId});
 
-    return (
+    return path ? (
         <InternalLink to={path}>
             {vDiskPopupKeyset('label_vdisk')} {stringifiedId}
         </InternalLink>
+    ) : (
+        <span>{stringifiedId}</span>
     );
 };
 
@@ -133,7 +131,7 @@ const VDiskLink = ({nodeId, stringifiedId, getVDiskLinkFn}: VDiskLinkProps) => {
 const prepareVDiskData = (
     data: PreparedVDisk,
     getVDiskLinkFn?: (data: {
-        nodeId: string | number;
+        nodeId: string | number | undefined;
         vDiskId: string | undefined;
     }) => string | undefined,
 ) => {
