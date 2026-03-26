@@ -1,4 +1,4 @@
-import type {BackendSortParam} from './common';
+import type {BackendSortParam, SchemaPathParam} from './common';
 import type {ECapacityAlert, EFlag} from './enums';
 import type {EDecommitStatus, EDriveStatus, TPDiskStateInfo} from './pdisk';
 import type {EVDiskStatus, TVDiskStateInfo} from './vdisk';
@@ -116,8 +116,14 @@ export interface StorageGroupsResponse {
     Version?: number;
     TotalGroups?: number;
     FoundGroups?: number;
-    FieldsAvailable?: number;
-    FieldsRequired?: number;
+    FieldsAvailable?: string;
+    FieldsRequired?: string;
+    NeedFilter?: boolean;
+    NeedGroup?: boolean;
+    NeedSort?: boolean;
+    NeedLimit?: boolean;
+    CachedDataMaxAge?: string;
+    Problems?: string[];
     StorageGroups?: TGroupsStorageGroupInfo[];
     StorageGroupGroups?: StorageGroupGroups[];
 }
@@ -234,6 +240,8 @@ export interface TStoragePDisk {
     DecommitStatus?: EDecommitStatus;
     /** uint64 */
     SlotSize?: string;
+    /** uint64 */
+    SlotCount?: string;
     Whiteboard?: TPDiskStateInfo;
 }
 
@@ -364,4 +372,60 @@ export interface GroupsRequestParams extends BaseStorageRequestParams {
      * 50% - BSC timeout
      */
     timeout?: number;
+}
+
+export type StorageStatsGroupBy = 'path' | 'tablet_type';
+
+interface TStorageStatsSizeEntry {
+    /** uint64 */
+    StorageSize?: number;
+    /** uint64 */
+    StorageCount?: number;
+    /** uint64 */
+    DataSize?: number;
+    /** uint64 */
+    IndexSize?: number;
+}
+
+export interface TStorageStatsGroupEntry extends TStorageStatsSizeEntry {
+    GroupId?: string;
+}
+
+export interface TStorageStatsMediaEntry extends TStorageStatsSizeEntry {
+    Kind?: string;
+}
+
+export interface TStorageStatsPathTabletEntry extends TStorageStatsSizeEntry {
+    TabletId?: string;
+    Type?: string;
+}
+
+export interface TStorageStatsPathEntry extends TStorageStatsSizeEntry {
+    Path?: string;
+    FullPath?: string;
+    Groups?: number | TStorageStatsGroupEntry[];
+    Media?: number | TStorageStatsMediaEntry[];
+    Tablets?: number | TStorageStatsPathTabletEntry[];
+}
+
+export interface TStorageStatsTabletTypeEntry extends TStorageStatsSizeEntry {
+    Type?: string;
+    TabletCount?: number;
+    Groups?: number | TStorageStatsGroupEntry[];
+    Media?: number | TStorageStatsMediaEntry[];
+}
+
+export interface StorageStatsResponse {
+    Paths?: TStorageStatsPathEntry[];
+    Tablets?: TStorageStatsTabletTypeEntry[];
+}
+
+export interface StorageStatsRequestParams {
+    database: string;
+    path: SchemaPathParam;
+    groupBy?: StorageStatsGroupBy;
+    everything?: boolean;
+    groups?: boolean;
+    tablets?: boolean;
+    media?: boolean;
 }

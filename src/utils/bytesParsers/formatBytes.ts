@@ -1,4 +1,4 @@
-import {GIGABYTE, KILOBYTE, MEGABYTE, TERABYTE, UNBREAKABLE_GAP} from '../constants';
+import {GIGABYTE, KILOBYTE, MEGABYTE, PETABYTE, TERABYTE, UNBREAKABLE_GAP} from '../constants';
 import type {FormatToSizeArgs, FormatValuesArgs} from '../dataFormatters/common';
 import {formatNumber, roundToPrecision} from '../dataFormatters/dataFormatters';
 import {isNumeric} from '../utils';
@@ -26,6 +26,10 @@ export const sizes = {
         value: TERABYTE,
         label: i18n('tb'),
     },
+    pb: {
+        value: PETABYTE,
+        label: i18n('pb'),
+    },
 } as const;
 
 export type BytesSizes = keyof typeof sizes;
@@ -44,6 +48,9 @@ export const getBytesSizeUnit = (value: number) => {
     }
     if (value >= sizes.tb.value) {
         size = 'tb';
+    }
+    if (value >= sizes.pb.value) {
+        size = 'pb';
     }
 
     return size;

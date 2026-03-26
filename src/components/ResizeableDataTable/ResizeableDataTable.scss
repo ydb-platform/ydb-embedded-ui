@@ -1,8 +1,10 @@
 .ydb-resizeable-data-table {
     width: max-content;
 
-    // padding for easier resize of the last column
-    padding-right: 20px;
+    &_reserve-resize-padding {
+        // padding for easier resize of the last column
+        padding-right: 20px;
+    }
 
     &__row-skeleton {
         width: 100%;

@@ -87,6 +87,11 @@ export const enableNetworkTable: SettingProps = {
     title: i18n('settings.enableNetworkTable.title'),
 };
 
+export const enableNewStorageViewSetting: SettingProps = {
+    settingKey: SETTING_KEYS.ENABLE_NEW_STORAGE_VIEW,
+    title: i18n('settings.enableNewStorageView.title'),
+};
+
 export const useShowPlanToSvgTables: SettingProps = {
     settingKey: SETTING_KEYS.USE_SHOW_PLAN_SVG,
     title: i18n('settings.useShowPlanToSvg.title'),
@@ -264,6 +269,7 @@ export const experimentsSection: SettingsSection = {
         showNetworkUtilizationSetting,
         enableBlobStorageCapacityMetricsSetting,
         enableTenantNavigationV2Setting,
+        enableNewStorageViewSetting,
     ],
 };
 

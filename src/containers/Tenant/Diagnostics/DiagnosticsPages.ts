@@ -30,6 +30,7 @@ export type DatabasePagesDisplay = 'all' | 'database' | 'diagnostics';
 interface GetPagesOptions {
     hasTopicData?: boolean;
     isDatabase?: boolean;
+    hasStorageUsage?: boolean;
     hasBackups?: boolean;
     hasConfigs?: boolean;
     hasAccess?: boolean;
@@ -79,6 +80,10 @@ const nodes = {
 const tablets = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.tablets,
     title: i18n('title_tablets'),
+};
+const storageUsage = {
+    id: TENANT_DIAGNOSTICS_TABS_IDS.storageUsage,
+    title: i18n('title_storage-usage'),
 };
 const storage = {
     id: TENANT_DIAGNOSTICS_TABS_IDS.storage,
@@ -177,8 +182,28 @@ const SERVERLESS_DB_PAGES = [database, monitoring, topQueries, configs, operatio
 
 const DIAGNOSTICS_SERVERLESS_DB_PAGES = [overview, topShards, tablets, describe];
 
-const TABLE_PAGES = [overview, schema, topShards, nodes, graph, tablets, hotKeys, describe, access];
-const COLUMN_TABLE_PAGES = [overview, schema, topShards, nodes, tablets, describe, access];
+const TABLE_PAGES = [
+    overview,
+    schema,
+    topShards,
+    nodes,
+    graph,
+    tablets,
+    storageUsage,
+    hotKeys,
+    describe,
+    access,
+];
+const COLUMN_TABLE_PAGES = [
+    overview,
+    schema,
+    topShards,
+    nodes,
+    tablets,
+    storageUsage,
+    describe,
+    access,
+];
 const SYSTEM_VIEW_PAGES = [overview, schema, nodes, describe, access];
 
 const DIR_PAGES = [overview, topShards, nodes, describe, access];
@@ -268,6 +293,9 @@ function applyFilters(pages: Page[], options: GetPagesOptions = {}) {
 
     if (!options.hasTopicData) {
         removals.push(TENANT_DIAGNOSTICS_TABS_IDS.topicData);
+    }
+    if (!options.hasStorageUsage) {
+        removals.push(TENANT_DIAGNOSTICS_TABS_IDS.storageUsage);
     }
     if (!options.hasBackups) {
         removals.push(TENANT_DIAGNOSTICS_TABS_IDS.backups);

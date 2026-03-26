@@ -10,7 +10,7 @@ import './StatsWrapper.scss';
 interface StatsWrapperProps {
     children: React.ReactNode;
     className?: string;
-    title: string;
+    title: React.ReactNode;
     description?: string;
     allEntitiesLink?: string;
     onAllEntitiesClick?: () => void;

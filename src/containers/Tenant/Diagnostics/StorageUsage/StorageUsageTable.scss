@@ -1,0 +1,87 @@
+@use '../../../../styles/mixins.scss';
+
+.ydb-storage-usage-table {
+    &__share-cell {
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+
+        min-width: 0;
+    }
+
+    &__share-progress {
+        --share-progress-fill-color: var(--g-color-base-info-heavy);
+        overflow: hidden;
+        flex: 0 0 132px;
+
+        height: 10px;
+        margin-top: var(--g-spacing-1);
+
+        border-radius: var(--g-border-radius-xs);
+        background-color: var(--g-color-base-info-light);
+    }
+
+    &__share-progress-fill {
+        min-width: 0;
+        height: 100%;
+
+        border-radius: var(--g-border-radius-xs) 0 0 var(--g-border-radius-xs);
+        background-color: var(--share-progress-fill-color);
+    }
+
+    &__share-value {
+        min-width: 34px;
+
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    &__media-chip {
+        text-transform: uppercase;
+    }
+
+    &__show-more {
+        justify-content: center;
+
+        width: 100%;
+        margin-top: var(--g-spacing-2);
+
+        color: var(--g-color-text-primary);
+        border-radius: var(--g-border-radius-s);
+        background-color: var(--g-color-base-generic);
+    }
+
+    &__title {
+        min-width: 0;
+    }
+
+    &__title-count {
+        white-space: nowrap;
+    }
+
+    &__wrapper {
+        --data-table-cell-align: top;
+        padding: var(--g-spacing-2) var(--g-spacing-4);
+
+        border-radius: var(--g-border-radius-xl);
+    }
+
+    &__wrapper .ydb-stats-wrapper__header {
+        display: none;
+    }
+
+    &__wrapper .ydb-resizeable-data-table {
+        width: 100%;
+    }
+
+    &__wrapper .data-table__th {
+        @include mixins.subheader-1-typography();
+    }
+
+    &__wrapper .data-table__row {
+        height: 56px;
+    }
+
+    &__wrapper .data-table__td {
+        padding-top: var(--g-spacing-2);
+    }
+}

@@ -1,6 +1,7 @@
 import type {TClusterInfoV2, TStorageStats} from '../../../types/api/cluster';
 import type {ExecuteQueryResponse, KeyValueRow} from '../../../types/api/query';
 import {QUERY_TECHNICAL_MARK} from '../../../utils/constants';
+import {normalizeMediaType} from '../../../utils/disks/normalizeMediaType';
 import {parseQueryAPIResponse} from '../../../utils/query';
 
 import type {ClusterGroupsStats} from './types';
@@ -25,12 +26,7 @@ const getDiskType = (rawTypeString: string) => {
 
     const diskType = rawTypeString.match(diskTypeRe)?.groups?.['type'];
 
-    if (diskType === 'ROT') {
-        // Display ROT as HDD
-        return 'HDD';
-    }
-
-    return diskType;
+    return diskType ? normalizeMediaType(diskType) : undefined;
 };
 
 function getGroupStats(data?: KeyValueRow[] | TStorageStats[]) {

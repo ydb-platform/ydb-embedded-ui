@@ -20,6 +20,7 @@ export const TENANT_DIAGNOSTICS_TABS_IDS = {
     topShards: 'topShards',
     nodes: 'nodes',
     tablets: 'tablets',
+    storageUsage: 'storageUsage',
     storage: 'storage',
     network: 'network',
     describe: 'describe',

@@ -63,6 +63,16 @@ export const useStorageGroupsHandlerAvailable = () => {
     return useGetFeatureVersion('/storage/groups') > 2;
 };
 
+export const useStorageStatsAvailable = () => {
+    return useGetFeatureVersion('/viewer/storage_stats') > 0;
+};
+
+export const useNewStorageViewEnabled = () => {
+    const [enabled] = useSetting(SETTING_KEYS.ENABLE_NEW_STORAGE_VIEW, false);
+
+    return enabled;
+};
+
 export const useBlobIndexStatWithVdiskId = () => {
     return useGetFeatureVersion('/vdisk/blobindexstat') > 1;
 };

@@ -10,18 +10,19 @@ import {VISIBILITY_TIMEOUT} from '../TenantPage';
 import {OperationsTable} from './tabs/OperationsModel';
 
 export enum DiagnosticsTab {
-    Info = 'Info',
-    Schema = 'Schema',
-    TopShards = 'Top shards',
-    Queries = 'Queries',
-    Nodes = 'Nodes',
-    Graph = 'Graph',
-    Tablets = 'Tablets',
-    HotKeys = 'Hot keys',
-    Describe = 'Describe',
-    Storage = 'Storage',
-    Operations = 'Operations',
-    Access = 'Access',
+    Info = 'overview',
+    Schema = 'schema',
+    TopShards = 'topShards',
+    Queries = 'topQueries',
+    Nodes = 'nodes',
+    Graph = 'graph',
+    Tablets = 'tablets',
+    StorageUsage = 'storageUsage',
+    HotKeys = 'hotKeys',
+    Describe = 'describe',
+    Storage = 'storage',
+    Operations = 'operations',
+    Access = 'access',
 }
 
 export class Table {
@@ -349,8 +350,12 @@ export class Diagnostics {
         return true;
     }
 
+    getTab(tabName: DiagnosticsTab): Locator {
+        return this.tabs.locator(`button[data-tab="${tabName}"]`);
+    }
+
     async clickTab(tabName: DiagnosticsTab): Promise<void> {
-        const tab = this.tabs.locator(`.g-tab:has-text("${tabName}")`);
+        const tab = this.getTab(tabName);
         await tab.click();
     }
 
