@@ -128,7 +128,7 @@ describe('prepareGroupsVDisk', () => {
             StringifiedId: '2181038134-22-0-0-0',
             NodeId: 224,
 
-            Severity: 5,
+            Severity: 0,
             DiskSpace: 'Green',
             Status: 'READY',
 
@@ -136,6 +136,10 @@ describe('prepareGroupsVDisk', () => {
             AvailableSize: 234461593600,
             SizeLimit: 265405071360,
             AllocatedPercent: 11,
+
+            Donors: undefined,
+            PDiskId: undefined,
+            VDiskId: undefined,
 
             PDisk: {
                 AllocatedPercent: NaN,
