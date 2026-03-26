@@ -34,6 +34,8 @@
   "charts.storage-usage": "Tablet storage usage",
   "charts.memory-usage": "Memory usage",
   "charts.network-utilization": "Network utilization",
+  "charts.network-sent-bytes": "Sent",
+  "charts.network-received-bytes": "Received",
   "title_storage-details": "Storage Details",
   "storage.tablet-storage-title": "Tablet storage",
   "storage.tablet-storage-description": "Size of user data and indexes stored in schema objects (tables, topics, etc.)",
