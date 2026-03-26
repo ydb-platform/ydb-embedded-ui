@@ -1,5 +1,23 @@
 # Changelog
 
+## [14.14.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.13.0...v14.14.0) (2026-03-26)
+
+
+### Features
+
+* add network graph to tenant network tab ([#3687](https://github.com/ydb-platform/ydb-embedded-ui/issues/3687)) ([132d518](https://github.com/ydb-platform/ydb-embedded-ui/commit/132d5186730d0c5117cf509b12c75b0e065e9ea1))
+* enrich meta errors ([#3683](https://github.com/ydb-platform/ydb-embedded-ui/issues/3683)) ([550c8da](https://github.com/ydb-platform/ydb-embedded-ui/commit/550c8da24546e814360a2ea19b093e3715f4c205))
+* error origin and stage ([#3685](https://github.com/ydb-platform/ydb-embedded-ui/issues/3685)) ([3e1a781](https://github.com/ydb-platform/ydb-embedded-ui/commit/3e1a78198f7c39f8752383af2c90b25a63439211))
+* **Navigation:** add v2 nav notification ([#3677](https://github.com/ydb-platform/ydb-embedded-ui/issues/3677)) ([66b37f0](https://github.com/ydb-platform/ydb-embedded-ui/commit/66b37f016068c44863b3c1a9edcf8e020e786d5f))
+* **Overview:** add DB info for v2 navigation ([#3643](https://github.com/ydb-platform/ydb-embedded-ui/issues/3643)) ([473cc9e](https://github.com/ydb-platform/ydb-embedded-ui/commit/473cc9e39fd5d578132818135324ec89bec01ad2))
+* tabs implementation ([#3631](https://github.com/ydb-platform/ydb-embedded-ui/issues/3631)) ([20a7690](https://github.com/ydb-platform/ydb-embedded-ui/commit/20a7690196e80b4ba0c6ac0e53d08d156078d675))
+
+
+### Bug Fixes
+
+* **Diagnostics:** align table header controls to top ([#3632](https://github.com/ydb-platform/ydb-embedded-ui/issues/3632)) ([c3adf98](https://github.com/ydb-platform/ydb-embedded-ui/commit/c3adf98d85b52bab7458b2a608e25d6c14aae1e4))
+* **SimplifiedPlan:** fix row overflow in Firefox ([#3684](https://github.com/ydb-platform/ydb-embedded-ui/issues/3684)) ([f916398](https://github.com/ydb-platform/ydb-embedded-ui/commit/f9163983d36257e3770e6fec95734b95d5737a28))
+
 ## [14.13.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.12.1...v14.13.0) (2026-03-20)
 
 
