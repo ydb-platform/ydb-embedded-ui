@@ -311,11 +311,11 @@ export function VDiskInfo<T extends PreparedVDisk>({
                     titleClassname={titleClassName}
                     title={title}
                     items={leftColumn}
-                    className={b('info')}
+                    wrapperClassName={b('info')}
                 />
             )}
             {rightColumn.length > 0 && (
-                <YDBDefinitionList items={rightColumn} className={b('info')} />
+                <YDBDefinitionList items={rightColumn} wrapperClassName={b('info')} />
             )}
         </Flex>
     );

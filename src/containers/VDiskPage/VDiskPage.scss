@@ -1,6 +1,7 @@
 @use '../../styles//mixins.scss';
 
 .ydb-vdisk-page {
+    --g-definition-list-item-gap: var(--g-spacing-3);
     position: relative;
 
     overflow: auto;
@@ -17,6 +18,10 @@
         left: 0;
 
         margin-bottom: 20px;
+    }
+
+    &__info {
+        @include mixins.body-2-typography();
     }
 
     &__meta {
