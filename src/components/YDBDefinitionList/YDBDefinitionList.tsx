@@ -84,7 +84,7 @@ export function YDBDefinitionList({
                                     {titleSuffix.copyText && (
                                         <ClipboardButton
                                             text={titleSuffix.copyText}
-                                            size="xs"
+                                            size="s"
                                             view="flat-secondary"
                                         />
                                     )}
