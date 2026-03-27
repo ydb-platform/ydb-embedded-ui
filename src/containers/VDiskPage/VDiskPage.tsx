@@ -255,7 +255,7 @@ export function VDiskPage() {
                             ? vDiskPageKeyset('evict-donor-vdisk')
                             : vDiskPageKeyset('evict-vdisk-not-allowed')
                     }
-                    popoverDisabled={isUserAllowedToMakeChanges}
+                    popoverDisabled={isUserAllowedToMakeChanges && !vDiskData?.DonorMode}
                 >
                     <Icon data={ArrowsOppositeToDots} />
                     {vDiskPageKeyset('evict-vdisk-button')}
