@@ -14,8 +14,8 @@ export enum EFlag {
 export enum ECapacityAlert {
     GREEN = 'GREEN',
     CYAN = 'CYAN',
-    LIGHTYELLOWMOVE = 'LIGHT_YELLOW',
-    YELLOWSTOP = 'YELLOW',
+    LIGHTYELLOW = 'LIGHT_YELLOW',
+    YELLOW = 'YELLOW',
     LIGHTORANGE = 'LIGHT_ORANGE',
     PREORANGE = 'PRE_ORANGE',
     ORANGE = 'ORANGE',

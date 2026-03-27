@@ -104,6 +104,15 @@ export function useStorageQueryParams() {
 
     React.useEffect(() => {
         if (blobMetricsEnabled) {
+            const patch: Record<string, string | undefined> = {};
+
+            if (queryParams.storageGroupsGroupBy === 'Usage') {
+                patch.storageGroupsGroupBy = undefined;
+            }
+
+            if (Object.keys(patch).length > 0) {
+                setQueryParams(patch, 'replaceIn');
+            }
             return;
         }
 

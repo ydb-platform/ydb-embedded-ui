@@ -1,9 +1,7 @@
 import type {LabelProps} from '@gravity-ui/uikit';
 
-import type {ECapacityAlert} from '../types/api/enums';
-
 export function getCapacityAlertTheme(capacityAlert?: string): LabelProps['theme'] {
-    switch (capacityAlert as ECapacityAlert) {
+    switch (capacityAlert) {
         case 'GREEN':
         case 'CYAN':
             return 'success';
