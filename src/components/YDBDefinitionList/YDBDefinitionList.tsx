@@ -73,7 +73,7 @@ export function YDBDefinitionList({
             >
                 {title && (
                     <Flex gap="1" alignItems="baseline">
-                        <InfoViewerTitle className={b('title', titleClassname)}>
+                        <InfoViewerTitle className={b(null, titleClassname)}>
                             {title}
                         </InfoViewerTitle>
                         {titleSuffix && (

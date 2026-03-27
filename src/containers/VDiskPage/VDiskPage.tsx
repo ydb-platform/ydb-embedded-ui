@@ -250,7 +250,11 @@ export function VDiskPage() {
                     dialogText={vDiskPageKeyset('evict-vdisk-dialog-text')}
                     retryButtonText={vDiskPageKeyset('force-evict-vdisk-button')}
                     withPopover
-                    popoverContent={vDiskPageKeyset('evict-vdisk-not-allowed')}
+                    popoverContent={
+                        vDiskData?.DonorMode
+                            ? vDiskPageKeyset('evict-donor-vdisk')
+                            : vDiskPageKeyset('evict-vdisk-not-allowed')
+                    }
                     popoverDisabled={isUserAllowedToMakeChanges}
                 >
                     <Icon data={ArrowsOppositeToDots} />
