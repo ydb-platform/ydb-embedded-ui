@@ -1,5 +1,12 @@
 # Changelog
 
+## [14.15.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.14.0...v14.15.0) (2026-03-30)
+
+
+### Features
+
+* **Storage:** improve disks view ([#3690](https://github.com/ydb-platform/ydb-embedded-ui/issues/3690)) ([ac75c94](https://github.com/ydb-platform/ydb-embedded-ui/commit/ac75c94a0ee1b80be3247227517eb7eea3880828))
+
 ## [14.14.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.13.0...v14.14.0) (2026-03-26)
 
 
