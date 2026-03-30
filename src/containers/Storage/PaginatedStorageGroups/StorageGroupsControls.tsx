@@ -60,6 +60,10 @@ export function StorageGroupsControls({
             skippedValues.push('CapacityAlert');
         }
 
+        if (blobMetricsEnabled) {
+            skippedValues.push('Usage');
+        }
+
         return STORAGE_GROUPS_GROUP_BY_OPTIONS.filter(
             (option) => !skippedValues.includes(option.value),
         );

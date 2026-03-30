@@ -45,6 +45,10 @@ export function useStorageGroupsSelectedColumns({
             skipped.push(...CAPACITY_METRICS_USER_SETTINGS_COLUMNS_IDS);
         }
 
+        if (blobMetricsEnabled) {
+            skipped.push(STORAGE_GROUPS_COLUMNS_IDS.Usage);
+        }
+
         if (!isUserAllowedToMakeChanges) {
             skipped.push(...MONITORING_USER_COLUMNS_IDS);
 
