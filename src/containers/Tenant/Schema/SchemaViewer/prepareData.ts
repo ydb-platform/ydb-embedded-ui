@@ -1,3 +1,5 @@
+import {isNil} from 'lodash';
+
 import type {ColumnType} from '../../../../types/api/query';
 import type {
     EPathType,
@@ -32,7 +34,7 @@ function prepareFamilies(data?: TTableDescription): Record<number, TFamilyDescri
     return (
         data?.PartitionConfig?.ColumnFamilies?.reduce<Record<number, TFamilyDescription>>(
             (acc, family) => {
-                if (family.Id) {
+                if (!isNil(family.Id)) {
                     return {
                         ...acc,
                         [family.Id]: family,
@@ -51,16 +53,24 @@ function prepareRowTableSchema(data: TTableDescription = {}): SchemaData[] {
     const {Columns, KeyColumnNames} = data;
 
     const preparedColumns = Columns?.map((column) => {
-        const {Id, Name, NotNull, Type, Family, DefaultFromSequence, DefaultFromLiteral} = column;
+        const {
+            Id,
+            Name,
+            NotNull,
+            Type,
+            Family,
+            FamilyName,
+            DefaultFromSequence,
+            DefaultFromLiteral,
+        } = column;
 
         const keyColumnIndex =
             KeyColumnNames?.findIndex((keyColumnName) => keyColumnName === Name) ?? -1;
 
-        const familyName = Family ? families[Family].Name : undefined;
-        const prefferedPoolKind = Family
-            ? families[Family].StorageConfig?.Data?.PreferredPoolKind
-            : undefined;
-        const columnCodec = Family ? formatColumnCodec(families[Family].ColumnCodec) : undefined;
+        const family = isNil(Family) ? undefined : families[Family];
+        const familyName = family?.Name ?? FamilyName;
+        const prefferedPoolKind = family?.StorageConfig?.Data?.PreferredPoolKind;
+        const columnCodec = formatColumnCodec(family?.ColumnCodec);
 
         return {
             id: Id,
