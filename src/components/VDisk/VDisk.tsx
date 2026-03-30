@@ -1,3 +1,5 @@
+import type {PopupPlacement} from '@gravity-ui/uikit';
+
 import {useVDiskPagePath} from '../../routes';
 import {cn} from '../../utils/cn';
 import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from '../../utils/disks/constants';
@@ -6,6 +8,8 @@ import {DiskStateProgressBar} from '../DiskStateProgressBar/DiskStateProgressBar
 import {HoverPopup} from '../HoverPopup/HoverPopup';
 import {InternalLink} from '../InternalLink';
 import {VDiskPopup} from '../VDiskPopup/VDiskPopup';
+
+import {i18n} from './i18n';
 
 import './VDisk.scss';
 
@@ -23,6 +27,7 @@ export interface VDiskProps {
     delayClose?: number;
     withIcon?: boolean;
     highlighted?: boolean;
+    placement?: PopupPlacement;
 }
 
 export const VDisk = ({
@@ -37,6 +42,7 @@ export const VDisk = ({
     delayOpen,
     withIcon,
     highlighted,
+    placement = ['top', 'bottom', 'left', 'right'],
 }: VDiskProps) => {
     const getVDiskLink = useVDiskPagePath();
     const vDiskPath = getVDiskLink({nodeId: data.NodeId, vDiskId: data.StringifiedId});
@@ -55,10 +61,10 @@ export const VDisk = ({
             delayClose={delayClose}
             delayOpen={delayOpen}
             // Allow all placement options, component should choose first available
-            placement={['top', 'bottom', 'left', 'right']}
+            placement={placement}
         >
             <div className={b()}>
-                <InternalLink to={vDiskPath} className={b('content')}>
+                <InternalLink to={vDiskPath} className={b('content', {compact})}>
                     <DiskStateProgressBar
                         diskAllocatedPercent={data.AllocatedPercent}
                         severity={severity}
@@ -69,6 +75,7 @@ export const VDisk = ({
                         className={progressBarClassName}
                         withIcon={withIcon}
                         highlighted={highlighted}
+                        noDataPlaceholder={i18n('context_no-data')}
                     />
                 </InternalLink>
             </div>

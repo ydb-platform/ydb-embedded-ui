@@ -1,11 +1,7 @@
 .ydb-vdisk-info {
     &__info {
-        width: 500px;
-    }
+        flex: unset;
 
-    &__title {
-        display: flex;
-        flex-direction: row;
-        gap: var(--g-spacing-2);
+        width: 500px;
     }
 }

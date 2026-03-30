@@ -298,4 +298,17 @@ describe('preparePDiskSizeFields', () => {
             AllocatedPercent: NaN,
         });
     });
+    test('Returns NaN for AllocatedPercent when TotalSize is 0', () => {
+        expect(
+            preparePDiskSizeFields({
+                AvailableSize: '0',
+                TotalSize: '0',
+            }),
+        ).toEqual({
+            AvailableSize: 0,
+            AllocatedSize: 0,
+            TotalSize: 0,
+            AllocatedPercent: NaN,
+        });
+    });
 });

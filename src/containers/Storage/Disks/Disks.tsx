@@ -2,7 +2,7 @@ import React from 'react';
 
 import {Flex, useLayoutContext} from '@gravity-ui/uikit';
 
-import {VDisk} from '../../../components/VDisk/VDisk';
+import {VDiskWithDonorsStack} from '../../../components/VDisk/VDiskWithDonorsStack';
 import type {Erasure} from '../../../types/api/storage';
 import {cn} from '../../../utils/cn';
 import type {PreparedVDisk} from '../../../utils/disks/types';
@@ -94,28 +94,22 @@ function VDiskItem({
     // Do not show PDisk popup for VDisk
     const vDiskToShow = {...vDisk, PDisk: undefined};
 
-    const vDiskId = vDisk.StringifiedId;
-
     // show vdisks without AllocatedSize as having average width (#1433)
     const minWidth = isNumeric(vDiskToShow.AllocatedSize) ? undefined : unavailableVDiskWidth;
     const flexGrow = Number(vDiskToShow.AllocatedSize) || 1;
 
-    const isHighlighted = highlightedVDisk === vDiskId;
-
     return (
         <div style={{flexGrow, minWidth}} className={b('vdisk-item')}>
-            <VDisk
+            <VDiskWithDonorsStack
                 data={vDiskToShow}
                 compact
                 withIcon={withIcon}
                 inactive={inactive}
-                showPopup={isHighlighted}
                 delayOpen={DISKS_POPUP_DEBOUNCE_TIMEOUT}
                 delayClose={DISKS_POPUP_DEBOUNCE_TIMEOUT}
-                onShowPopup={() => setHighlightedVDisk?.(vDiskId)}
-                onHidePopup={() => setHighlightedVDisk?.(undefined)}
+                highlightedVDisk={highlightedVDisk}
+                setHighlightedVDisk={setHighlightedVDisk}
                 progressBarClassName={b('vdisk-progress-bar')}
-                highlighted={isHighlighted}
             />
         </div>
     );

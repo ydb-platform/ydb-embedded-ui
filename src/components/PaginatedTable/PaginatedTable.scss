@@ -37,6 +37,12 @@
             background: var(--paginated-table-hover-color);
         }
 
+        // Elevate row z-index when a Stack inside it is hovered,
+        // so expanded donors appear above the next row
+        &:has(.stack:hover) {
+            z-index: 2;
+        }
+
         &_empty {
             &:hover {
                 background-color: initial;

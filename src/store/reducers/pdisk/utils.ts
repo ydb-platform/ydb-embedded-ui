@@ -1,6 +1,7 @@
 import type {TPDiskInfoResponse} from '../../../types/api/pdisk';
 import type {TEvSystemStateResponse} from '../../../types/api/systemState';
 import {getArray, valueIsDefined} from '../../../utils';
+import {calculateVDiskSeverity} from '../../../utils/disks/calculateVDiskSeverity';
 import {getSpaceSeverity} from '../../../utils/disks/helpers';
 import {
     prepareWhiteboardPDiskData,
@@ -64,12 +65,10 @@ export function preparePDiskDataResponse([pdiskResponse = {}, nodeResponse]: [
     preparedVDisks.sort((disk1, disk2) => Number(disk2.VDiskSlotId) - Number(disk1.VDiskSlotId));
 
     const vdisksSlots: SlotItem<'vDisk'>[] = preparedVDisks.map((preparedVDisk) => {
-        // Use only space severity for VDisks inside PDiskSpaceDistribution
-        // Motivation - PDiskSpaceDistribution is needed to see how PDisk space is distributed among slots
-        // Other vdisks statuses make distribution harder to read
-        // Moreover, slots are named with Group ID and pool name, so we don't know actual vdisk before hovering or clicking
+        // Use full VDisk severity calculation to match the coloring in Storage table columns
+        // This includes VDiskState, DiskSpace, FrontQueues, and Replicated status
         // VDisks with their full statuses can be seen in popup on hover, in Storage table and on vdisks pages
-        const slotSeverity = getSpaceSeverity(preparedVDisk.AllocatedPercent);
+        const slotSeverity = calculateVDiskSeverity(preparedVDisk);
 
         const used = Number(preparedVDisk.AllocatedSize);
         let total = Number(preparedVDisk.SizeLimit);

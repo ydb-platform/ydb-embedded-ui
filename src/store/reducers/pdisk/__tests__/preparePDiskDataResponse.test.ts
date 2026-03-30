@@ -201,6 +201,7 @@ describe('preparePDiskDataResponse', () => {
                         ...rawData.Whiteboard?.VDisks?.[0],
                         AllocatedSize: '90',
                         AvailableSize: '10',
+                        DiskSpace: EFlag.Yellow,
                     },
                 ],
             },
@@ -221,19 +222,21 @@ describe('preparePDiskDataResponse', () => {
                         ...rawData.Whiteboard?.VDisks?.[0],
                         AllocatedSize: '99',
                         AvailableSize: '1',
+                        DiskSpace: EFlag.Orange,
+                        VDiskState: EVDiskState.SyncGuidRecoveryError,
                     },
                 ],
             },
         };
         const preparedDataDanger = preparePDiskDataResponse([dataDanger, {}]);
 
-        // Red severity
+        // Red severity (VDiskState error gives severity 5)
         expect(
             preparedDataDanger.SlotItems?.find((slot) => slot.SlotType === 'vDisk')?.Severity,
         ).toEqual(5);
     });
 
-    test('Should not use VDisk statuses for severity calculation', () => {
+    test('Should use VDisk statuses for severity calculation', () => {
         const data: TPDiskInfoResponse = {
             ...rawData,
             Whiteboard: {
@@ -252,9 +255,9 @@ describe('preparePDiskDataResponse', () => {
         };
         const preparedData = preparePDiskDataResponse([data, {}]);
 
-        // Green severity
+        // Red severity because VDiskState is SyncGuidRecoveryError
         expect(preparedData.SlotItems?.find((slot) => slot.SlotType === 'vDisk')?.Severity).toEqual(
-            1,
+            5,
         );
     });
 

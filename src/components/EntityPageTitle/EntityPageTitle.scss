@@ -3,19 +3,14 @@
 .ydb-entity-page-title {
     display: flex;
     flex-flow: row nowrap;
-    align-items: baseline;
+    align-items: center;
+    gap: var(--g-spacing-2);
 
     text-wrap: nowrap;
 
     @include mixins.header-2-typography();
 
     &__prefix {
-        margin-right: 6px;
-
         color: var(--g-color-text-secondary);
-    }
-
-    &__icon {
-        margin-right: 8px;
     }
 }

@@ -168,7 +168,7 @@ export const PDiskPopup = ({data}: PDiskPopupProps) => {
         <YDBDefinitionList
             compact
             title="PDisk"
-            titleSuffix={pdiskId ?? EMPTY_DATA_PLACEHOLDER}
+            titleSuffix={{title: pdiskId ?? EMPTY_DATA_PLACEHOLDER, copyText: pdiskId}}
             items={info}
             headerLabels={headerLabels}
             footer={footer}

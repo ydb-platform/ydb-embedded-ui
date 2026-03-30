@@ -4,7 +4,7 @@ import {Flex, Icon} from '@gravity-ui/uikit';
 
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {cn} from '../../utils/cn';
-import {DONOR_COLOR} from '../../utils/disks/constants';
+import {DONOR_COLOR, NOT_AVAILABLE_SEVERITY} from '../../utils/disks/constants';
 import {getSeverityColor, getVDiskStatusIcon} from '../../utils/disks/helpers';
 import {useSetting} from '../../utils/hooks';
 import {isNumeric} from '../../utils/utils';
@@ -59,7 +59,7 @@ export function DiskStateProgressBar({
     if (isDonor) {
         mods[DONOR_COLOR.toLocaleLowerCase()] = true;
     } else {
-        const color = severity !== undefined && getSeverityColor(severity);
+        const color = getSeverityColor(severity);
         if (color) {
             mods[color.toLocaleLowerCase()] = true;
         }
@@ -69,7 +69,7 @@ export function DiskStateProgressBar({
 
     const renderAllocatedPercent = () => {
         if (compact) {
-            return <div className={b('fill-bar', mods)} style={{width: '100%'}} />;
+            return null;
         }
 
         if (!hasAllocatedPercent) {
@@ -95,7 +95,11 @@ export function DiskStateProgressBar({
         }
 
         if (!compact && !hasAllocatedPercent && noDataPlaceholder) {
-            return <div className={b('title')}>{noDataPlaceholder}</div>;
+            return <div className={b('title', {text: true})}>{noDataPlaceholder}</div>;
+        }
+
+        if (compact && severity === NOT_AVAILABLE_SEVERITY && noDataPlaceholder) {
+            return <div className={b('title', {compact: true})}>{noDataPlaceholder}</div>;
         }
 
         return null;

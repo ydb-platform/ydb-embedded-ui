@@ -1,6 +1,7 @@
 .ydb-storage-groups-columns {
     &__vdisks-column,
     &__disks-column {
+        --disk-border-radius-compact: var(--g-border-radius-m);
         overflow: visible; // to enable stacked disks overflow the row
     }
 

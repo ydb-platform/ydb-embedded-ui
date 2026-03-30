@@ -183,7 +183,8 @@ export function preparePDiskSizeFields({
     const available = Number(AvailableSize);
     const total = Number(TotalSize);
     const allocated = total - available;
-    const allocatedPercent = Math.floor((allocated * 100) / total);
+    // Return NaN if total is 0 or invalid to indicate no data
+    const allocatedPercent = total > 0 ? Math.floor((allocated * 100) / total) : NaN;
 
     return {
         AvailableSize: available,
