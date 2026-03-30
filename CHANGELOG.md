@@ -1,5 +1,12 @@
 # Changelog
 
+## [14.16.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.15.0...v14.16.0) (2026-03-30)
+
+
+### Features
+
+* **Storage:** update columns view ([#3693](https://github.com/ydb-platform/ydb-embedded-ui/issues/3693)) ([e14d426](https://github.com/ydb-platform/ydb-embedded-ui/commit/e14d4267e6c710704e4379e62d12493079b5771b))
+
 ## [14.15.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.14.0...v14.15.0) (2026-03-30)
 
 
