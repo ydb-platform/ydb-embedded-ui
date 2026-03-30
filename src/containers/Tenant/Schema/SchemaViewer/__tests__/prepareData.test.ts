@@ -87,8 +87,8 @@ describe('prepareSchemaData', () => {
                 notNull: false,
                 autoIncrement: false,
                 defaultValue: '-',
-                familyName: undefined,
-                prefferedPoolKind: undefined,
+                familyName: 'default',
+                prefferedPoolKind: 'ssd',
                 columnCodec: undefined,
             },
             {
@@ -99,8 +99,8 @@ describe('prepareSchemaData', () => {
                 notNull: true,
                 autoIncrement: false,
                 defaultValue: '-',
-                familyName: undefined,
-                prefferedPoolKind: undefined,
+                familyName: 'default',
+                prefferedPoolKind: 'ssd',
                 columnCodec: undefined,
             },
             {
@@ -111,8 +111,8 @@ describe('prepareSchemaData', () => {
                 notNull: true,
                 autoIncrement: false,
                 defaultValue: 'Ivan',
-                familyName: undefined,
-                prefferedPoolKind: undefined,
+                familyName: 'default',
+                prefferedPoolKind: 'ssd',
                 columnCodec: undefined,
             },
             {
@@ -123,8 +123,8 @@ describe('prepareSchemaData', () => {
                 notNull: false,
                 autoIncrement: false,
                 defaultValue: '-',
-                familyName: undefined,
-                prefferedPoolKind: undefined,
+                familyName: 'default',
+                prefferedPoolKind: 'ssd',
                 columnCodec: undefined,
             },
         ];
