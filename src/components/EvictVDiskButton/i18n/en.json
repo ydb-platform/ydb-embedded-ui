@@ -1,0 +1,8 @@
+{
+  "evict-vdisk-button": "Evict VDisk",
+  "force-evict-vdisk-button": "Evict anyway",
+  "evict-vdisk-dialog-header": "Evict VDisk",
+  "evict-vdisk-dialog-text": "VDisk will be evicted. Do you want to proceed?",
+  "evict-vdisk-not-allowed": "You don't have enough rights to evict VDisk",
+  "evict-donor-vdisk": "Evict VDisk in donor mode is impossible"
+}

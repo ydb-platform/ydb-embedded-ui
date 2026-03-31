@@ -15,6 +15,7 @@ interface ButtonWithConfirmDialogProps<T, K> {
     retryButtonText?: string;
     buttonDisabled?: ButtonProps['disabled'];
     buttonView?: ButtonProps['view'];
+    buttonWidth?: ButtonProps['width'];
     buttonClassName?: ButtonProps['className'];
     withPopover?: boolean;
     popoverContent?: PopoverProps['content'];
@@ -31,6 +32,7 @@ export function ButtonWithConfirmDialog<T, K>({
     retryButtonText,
     buttonDisabled = false,
     buttonView = 'action',
+    buttonWidth,
     buttonClassName,
     withPopover = false,
     popoverContent,
@@ -66,6 +68,7 @@ export function ButtonWithConfirmDialog<T, K>({
             <Button
                 onClick={() => setIsConfirmDialogVisible(true)}
                 view={buttonView}
+                width={buttonWidth}
                 disabled={buttonDisabled}
                 loading={!buttonDisabled && buttonLoading}
                 className={buttonClassName}

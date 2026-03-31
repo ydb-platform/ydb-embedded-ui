@@ -4,6 +4,7 @@ import {Divider, Flex} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
 import {useVDiskPagePath} from '../../routes';
+import {api} from '../../store/reducers/api';
 import {selectNodesMap} from '../../store/reducers/nodesList';
 import {EFlag} from '../../types/api/enums';
 import {EVDiskState} from '../../types/api/vdisk';
@@ -20,10 +21,11 @@ import {
 } from '../../utils/disks/constants';
 import {isFullVDiskData} from '../../utils/disks/helpers';
 import type {PreparedVDisk, UnavailableDonor} from '../../utils/disks/types';
-import {useTypedSelector} from '../../utils/hooks';
+import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToGB, bytesToSpeed} from '../../utils/utils';
+import {EvictVDiskButton} from '../EvictVDiskButton/EvictVDiskButton';
 import {InternalLink} from '../InternalLink';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {
@@ -303,50 +305,55 @@ const buildVDiskFooter = (
         nodeId: string | number;
         vDiskId: string | undefined;
     }) => string | undefined,
+    onSuccess?: () => void,
 ): React.ReactNode | null => {
-    if (!withDeveloperUILink) {
-        return null;
-    }
+    const {NodeId, PDiskId, VDiskSlotId, StringifiedId, VDiskId, DonorMode} = data;
 
-    const {NodeId, PDiskId, VDiskSlotId, StringifiedId} = data;
+    const vDiskInternalViewerPath =
+        withDeveloperUILink && !isNil(VDiskSlotId) && !isNil(NodeId) && !isNil(PDiskId)
+            ? createVDiskDeveloperUILink({
+                  nodeId: NodeId,
+                  pDiskId: PDiskId,
+                  vDiskSlotId: VDiskSlotId,
+              })
+            : undefined;
 
-    if (isNil(NodeId) || isNil(PDiskId) || (isNil(VDiskSlotId) && isNil(StringifiedId))) {
-        return null;
-    }
+    const vDiskPagePath =
+        withDeveloperUILink && !isNil(NodeId) && !isNil(StringifiedId)
+            ? getVDiskLinkFn?.({
+                  nodeId: NodeId,
+                  vDiskId: StringifiedId,
+              })
+            : undefined;
 
-    const vDiskInternalViewerPath = isNil(VDiskSlotId)
-        ? undefined
-        : createVDiskDeveloperUILink({
-              nodeId: NodeId,
-              pDiskId: PDiskId,
-              vDiskSlotId: VDiskSlotId,
-          });
-
-    const vDiskPagePath = getVDiskLinkFn?.({
-        nodeId: NodeId,
-        vDiskId: StringifiedId,
-    });
-
-    if (!vDiskPagePath) {
-        return null;
-    }
+    const hasLinks = vDiskPagePath || vDiskInternalViewerPath;
 
     return (
-        <Flex className={b('links')} wrap="wrap" gap={2}>
-            {vDiskPagePath && (
-                <LinkWithIcon
-                    key={vDiskPagePath}
-                    title={vDiskInfoKeyset('vdisk-page')}
-                    url={vDiskPagePath}
-                    external={false}
-                />
+        <Flex direction="column" gap={3}>
+            {hasLinks && (
+                <Flex className={b('links')} wrap="wrap" gap={2}>
+                    {vDiskPagePath && (
+                        <LinkWithIcon
+                            key={vDiskPagePath}
+                            title={vDiskInfoKeyset('vdisk-page')}
+                            url={vDiskPagePath}
+                            external={false}
+                        />
+                    )}
+                    {vDiskInternalViewerPath && (
+                        <LinkWithIcon
+                            title={vDiskInfoKeyset('developer-ui')}
+                            url={vDiskInternalViewerPath}
+                        />
+                    )}
+                </Flex>
             )}
-            {vDiskInternalViewerPath && (
-                <LinkWithIcon
-                    title={vDiskInfoKeyset('developer-ui')}
-                    url={vDiskInternalViewerPath}
-                />
-            )}
+            <EvictVDiskButton
+                vDiskId={VDiskId}
+                donorMode={DonorMode}
+                fullWidth
+                onSuccess={onSuccess}
+            />
         </Flex>
     );
 };
@@ -399,6 +406,7 @@ interface VDiskPopupProps {
 }
 
 export const VDiskPopup = ({data}: VDiskPopupProps) => {
+    const dispatch = useTypedDispatch();
     const isFullData = isFullVDiskData(data);
     const isViewerUser = useIsViewerUser();
 
@@ -406,6 +414,10 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
     const getVDiskLink = useVDiskPagePath();
 
     const database = useDatabaseFromQuery();
+
+    const handleAfterEvictVDisk = React.useCallback(() => {
+        dispatch(api.util.invalidateTags(['TableData']));
+    }, [dispatch]);
 
     const vdiskInfo = React.useMemo(
         () =>
@@ -421,9 +433,9 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
     const vdiskFooter = React.useMemo(
         () =>
             isFullData
-                ? buildVDiskFooter(data, hasDeveloperUi, getVDiskLink)
+                ? buildVDiskFooter(data, hasDeveloperUi, getVDiskLink, handleAfterEvictVDisk)
                 : buildUnavailableVDiskFooter(data, hasDeveloperUi),
-        [data, isFullData, hasDeveloperUi, getVDiskLink],
+        [data, isFullData, hasDeveloperUi, getVDiskLink, handleAfterEvictVDisk],
     );
 
     const nodesMap = useTypedSelector((state) => selectNodesMap(state, database));

@@ -1,6 +1,5 @@
 import React from 'react';
 
-import {ArrowsOppositeToDots} from '@gravity-ui/icons';
 import {Flex, Icon, Label, Tab, TabList, TabProvider} from '@gravity-ui/uikit';
 import {skipToken} from '@reduxjs/toolkit/query';
 import {isNil} from 'lodash';
@@ -8,25 +7,22 @@ import {Helmet} from 'react-helmet-async';
 import {StringParam, useQueryParams} from 'use-query-params';
 import {z} from 'zod';
 
-import {ButtonWithConfirmDialog} from '../../components/ButtonWithConfirmDialog/ButtonWithConfirmDialog';
 import {EntityPageTitle} from '../../components/EntityPageTitle/EntityPageTitle';
 import {ResponseError} from '../../components/Errors/ResponseError';
+import {EvictVDiskButton} from '../../components/EvictVDiskButton/EvictVDiskButton';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {InternalLink} from '../../components/InternalLink/InternalLink';
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import {VDiskInfo} from '../../components/VDiskInfo/VDiskInfo';
 import {useVDiskPagePath} from '../../routes';
 import {api} from '../../store/reducers/api';
-import {useDiskPagesAvailable} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
-import type {ModifyDiskResponse} from '../../types/api/modifyDisk';
 import type {TVDiskID} from '../../types/api/vdisk';
 import {cn} from '../../utils/cn';
 import {VDISK_LABEL_CONFIG} from '../../utils/disks/constants';
 import {getSeverityColor} from '../../utils/disks/helpers';
 import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
-import {useIsUserAllowedToMakeChanges} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {useAppTitle} from '../App/AppTitleContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 
@@ -64,8 +60,6 @@ export function VDiskPage() {
     const getVDiskPagePath = useVDiskPagePath();
 
     const containerRef = React.useRef<HTMLDivElement>(null);
-    const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
-    const newDiskApiAvailable = useDiskPagesAvailable();
 
     const [{nodeId, vDiskId: vDiskIdParam, activeTab, database: databaseParam}] = useQueryParams({
         nodeId: StringParam,
@@ -119,57 +113,9 @@ export function VDiskPage() {
         StringifiedId,
     } = vDiskData || {};
 
-    const {GroupID, GroupGeneration, Ring, Domain, VDisk} =
-        VDiskId || (!loading && getVDiskIdFromString(vDiskIdParam)) || {};
-    const vDiskIdParamsDefined =
-        !isNil(GroupID) &&
-        !isNil(GroupGeneration) &&
-        !isNil(Ring) &&
-        !isNil(Domain) &&
-        !isNil(VDisk);
-
-    const handleEvictVDisk = async (isRetry?: boolean) => {
-        if (vDiskIdParamsDefined) {
-            const requestParams = {
-                groupId: GroupID,
-                groupGeneration: GroupGeneration,
-                failRealmIdx: Ring,
-                failDomainIdx: Domain,
-                vDiskIdx: VDisk,
-                force: isRetry,
-            };
-
-            let response: ModifyDiskResponse;
-
-            if (newDiskApiAvailable) {
-                response = await window.api.vdisk.evictVDisk(requestParams);
-            } else {
-                response = await window.api.tablets.evictVDiskOld(requestParams);
-            }
-
-            if (response?.result === false) {
-                const err = {
-                    statusText: response.error,
-                    retryPossible: response.forceRetryPossible,
-                };
-                throw err;
-            }
-        }
-    };
+    const {GroupID} = VDiskId || (!loading && getVDiskIdFromString(vDiskIdParam)) || {};
 
     const vDiskId = vDiskData?.StringifiedId || (loading ? undefined : vDiskIdParam);
-
-    const handleAfterEvictVDisk = () => {
-        dispatch(
-            api.util.invalidateTags([
-                {
-                    type: 'VDiskData',
-                    id: vDiskId?.toString(),
-                },
-                'StorageData',
-            ]),
-        );
-    };
 
     const {appTitle} = useAppTitle();
 
@@ -236,30 +182,26 @@ export function VDiskPage() {
         );
     };
 
+    const handleAfterEvictVDisk = React.useCallback(() => {
+        dispatch(
+            api.util.invalidateTags([
+                {
+                    type: 'VDiskData',
+                    id: StringifiedId?.toString(),
+                },
+                'StorageData',
+            ]),
+        );
+    }, [dispatch, StringifiedId]);
+
     const renderControls = () => {
         return (
             <div className={vDiskPageCn('controls')}>
-                <ButtonWithConfirmDialog
-                    onConfirmAction={handleEvictVDisk}
-                    onConfirmActionSuccess={handleAfterEvictVDisk}
-                    buttonDisabled={
-                        !vDiskIdParamsDefined || !isUserAllowedToMakeChanges || vDiskData?.DonorMode
-                    }
-                    buttonView="normal"
-                    dialogHeader={vDiskPageKeyset('evict-vdisk-dialog-header')}
-                    dialogText={vDiskPageKeyset('evict-vdisk-dialog-text')}
-                    retryButtonText={vDiskPageKeyset('force-evict-vdisk-button')}
-                    withPopover
-                    popoverContent={
-                        vDiskData?.DonorMode
-                            ? vDiskPageKeyset('evict-donor-vdisk')
-                            : vDiskPageKeyset('evict-vdisk-not-allowed')
-                    }
-                    popoverDisabled={isUserAllowedToMakeChanges && !vDiskData?.DonorMode}
-                >
-                    <Icon data={ArrowsOppositeToDots} />
-                    {vDiskPageKeyset('evict-vdisk-button')}
-                </ButtonWithConfirmDialog>
+                <EvictVDiskButton
+                    vDiskId={VDiskId}
+                    donorMode={vDiskData?.DonorMode}
+                    onSuccess={handleAfterEvictVDisk}
+                />
             </div>
         );
     };
