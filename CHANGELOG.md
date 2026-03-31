@@ -1,5 +1,13 @@
 # Changelog
 
+## [14.16.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.16.0...v14.16.1) (2026-03-31)
+
+
+### Bug Fixes
+
+* **Schema:** default family may be zero ([#3708](https://github.com/ydb-platform/ydb-embedded-ui/issues/3708)) ([cca36aa](https://github.com/ydb-platform/ydb-embedded-ui/commit/cca36aa0d5d3f7ba1ac0ec24d538b3d56adca9a9))
+* tabs content from other pages ([#3711](https://github.com/ydb-platform/ydb-embedded-ui/issues/3711)) ([3b51098](https://github.com/ydb-platform/ydb-embedded-ui/commit/3b51098c3130f1a623cfd5cd63f14c34684d6daa))
+
 ## [14.16.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.15.0...v14.16.0) (2026-03-30)
 
 
