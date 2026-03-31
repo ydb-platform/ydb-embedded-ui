@@ -1,20 +1,56 @@
 import {expect, test} from '@playwright/test';
 
-import {database} from '../../../utils/constants';
+import {database, dsVslotsSchema, dsVslotsTableName} from '../../../utils/constants';
 import {
     cleanupMockStreamingFetch,
     setupMockStreamingFetch,
 } from '../../../utils/mockStreamingFetch';
 import {pressTabHotkey} from '../../../utils/queryHotkeys';
 import {toggleExperiment} from '../../../utils/toggleExperiment';
-import {QueryEditorMode, TenantPage} from '../TenantPage';
+import {NavigationTabs, QueryEditorMode, TenantPage} from '../TenantPage';
 import {longRunningStreamQuery} from '../constants';
+import {ObjectSummary} from '../summary/ObjectSummary';
+import {RowTableAction} from '../summary/types';
 
-import type {QueryEditor} from './models/QueryEditor';
+import {QueryEditor} from './models/QueryEditor';
 import {RenameQueryDialog} from './models/RenameQueryDialog';
 import {RunningQueryDialog} from './models/RunningQueryDialog';
 import {SaveChangesDialog} from './models/SaveChangesDialog';
 import {SaveQueryDialog} from './models/SaveQueryDialog';
+
+async function gotoDiagnosticsWithMultiTabMode(tenantPage: TenantPage) {
+    await tenantPage.page.addInitScript(
+        ({nextMode}) => {
+            if (nextMode) {
+                window.e2eQueryEditorMode = nextMode;
+            } else {
+                delete window.e2eQueryEditorMode;
+            }
+        },
+        {nextMode: QueryEditorMode.MultiTab},
+    );
+
+    await tenantPage.goto({
+        schema: dsVslotsSchema,
+        database,
+        tenantPage: 'diagnostics',
+    });
+}
+
+async function expectSelectQueryTemplateLoaded(queryEditor: QueryEditor) {
+    const expectedTablePath = dsVslotsSchema.replace(`${database}/`, '');
+
+    await expect(queryEditor.editorTabs.isVisible()).resolves.toBe(true);
+    await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('Select query');
+
+    await expect
+        .poll(() => queryEditor.getEditorContent(), {timeout: 5000})
+        .toContain(`FROM \`${expectedTablePath}\``);
+
+    const editorContent = await queryEditor.getEditorContent();
+    expect(editorContent).toContain('SELECT');
+    expect(editorContent).toContain('LIMIT');
+}
 
 test.describe('Editor tabs', () => {
     let tenantPage: TenantPage;
@@ -629,5 +665,42 @@ test.describe('Editor tabs', () => {
         await expect(saveChangesDialog.getValidationError()).resolves.toBe(
             'This name already exists',
         );
+    });
+});
+
+test.describe('Editor tabs from diagnostics', () => {
+    test('Select query template fills editor on cold start from diagnostics', async ({page}) => {
+        const tenantPage = new TenantPage(page);
+        const objectSummary = new ObjectSummary(page);
+        const queryEditor = new QueryEditor(page);
+
+        await gotoDiagnosticsWithMultiTabMode(tenantPage);
+        await expect(tenantPage.isDiagnosticsVisible()).resolves.toBe(true);
+
+        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.SelectQuery);
+
+        await expectSelectQueryTemplateLoaded(queryEditor);
+    });
+
+    test('Select query template still fills editor after returning from query page', async ({
+        page,
+    }) => {
+        const tenantPage = new TenantPage(page);
+        const objectSummary = new ObjectSummary(page);
+        const queryEditor = new QueryEditor(page);
+
+        await tenantPage.gotoQueryEditor({
+            schema: dsVslotsSchema,
+            database,
+            mode: QueryEditorMode.MultiTab,
+        });
+        await queryEditor.waitForEditorReady();
+
+        await tenantPage.selectNavigationTab(NavigationTabs.Diagnostics);
+        await expect(tenantPage.isDiagnosticsVisible()).resolves.toBe(true);
+
+        await objectSummary.clickActionMenuItem(dsVslotsTableName, RowTableAction.SelectQuery);
+
+        await expectSelectQueryTemplateLoaded(queryEditor);
     });
 });
