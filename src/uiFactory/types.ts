@@ -90,6 +90,10 @@ export interface UIFactory<H extends string = CommonIssueType, T extends string 
     getReportProblemUrl?: GetReportProblemUrl;
 
     illustrations?: Partial<Record<IllustrationName, IllustrationComponent>>;
+
+    hideNewFeaturesNotifications?: {
+        navigationV2?: boolean;
+    };
 }
 
 export type HandleCreateDB = (params: {clusterName: string}) => Promise<boolean>;

@@ -9,6 +9,7 @@ import routes from '../../routes';
 import {selectUser} from '../../store/reducers/authentication/authentication';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import {useSetting} from '../../store/reducers/settings/useSetting';
+import {uiFactory} from '../../uiFactory/uiFactory';
 import {cn} from '../../utils/cn';
 import {useDelayed, useTypedSelector} from '../../utils/hooks';
 import {useTenantNavigation} from '../Tenant/TenantNavigation/useTenantNavigation';
@@ -44,8 +45,14 @@ export function Navigation({children, userSettings}: NavigationProps) {
 
     const ydbUser = useTypedSelector(selectUser);
 
+    const shouldShowV2NavNotifications = !uiFactory.hideNewFeaturesNotifications?.navigationV2;
+
     const shouldShowNewNavAlert =
-        isV2Enabled && isDatabasePage && !isV2NavigationAlertSeen && !isNotificationSettingLoading;
+        shouldShowV2NavNotifications &&
+        isV2Enabled &&
+        isDatabasePage &&
+        !isV2NavigationAlertSeen &&
+        !isNotificationSettingLoading;
     const [isNewNavAlertReady] = useDelayed(2_000, shouldShowNewNavAlert);
 
     const isNewNavAlertShown = shouldShowNewNavAlert && isNewNavAlertReady;
@@ -103,10 +110,7 @@ export function Navigation({children, userSettings}: NavigationProps) {
 
                     const wrapperCnParams = {
                         ...baseCnParams,
-                        // TODO: animation should be shown for two weeks after a release
-                        // Probably should be sync with new navigation notification when it is added
-                        // https://github.com/ydb-platform/ydb-embedded-ui/issues/3587
-                        ['with-animation']: true,
+                        ['with-animation']: shouldShowV2NavNotifications,
                     };
                     const buttonCnParams = {
                         ...baseCnParams,
