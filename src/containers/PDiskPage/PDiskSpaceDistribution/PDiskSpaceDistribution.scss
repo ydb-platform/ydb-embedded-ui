@@ -59,10 +59,6 @@
         font-weight: 600;
     }
 
-    &__info-title {
-        margin-top: 0;
-    }
-
     &__vdisk-popup {
         --g-definition-list-item-gap: var(--g-spacing-2);
         @include mixins.body-2-typography();

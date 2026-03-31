@@ -4,7 +4,6 @@ import type {DefinitionListProps, IconData, LabelProps} from '@gravity-ui/uikit'
 import {ClipboardButton, DefinitionList, Flex, Icon, Label, Text} from '@gravity-ui/uikit';
 
 import {cn} from '../../utils/cn';
-import {InfoViewerTitle} from '../InfoViewerTitle/InfoViewerTitle';
 
 import i18n from './i18n';
 
@@ -73,9 +72,7 @@ export function YDBDefinitionList({
             >
                 {title && (
                     <Flex gap="1" alignItems="baseline">
-                        <InfoViewerTitle className={b(null, titleClassname)}>
-                            {title}
-                        </InfoViewerTitle>
+                        <div className={b(null, titleClassname)}>{title}</div>
                         {titleSuffix && (
                             <React.Fragment>
                                 <Text color="secondary">{titleSeparator}</Text>
@@ -159,10 +156,10 @@ export function YDBDefinitionList({
     };
 
     return (
-        <div className={b({compact}, wrapperClassName)}>
+        <Flex gap={3} direction="column" className={b({compact}, wrapperClassName)}>
             {renderHeader()}
             {renderContent()}
             {renderFooter()}
-        </div>
+        </Flex>
     );
 }

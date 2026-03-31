@@ -123,7 +123,6 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
                             responsive
                             className={b('info-block')}
                             items={generalInfoLeft}
-                            titleClassname={b('info-title')}
                         />
                     ) : null}
                 </div>
@@ -134,7 +133,6 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
                             responsive
                             className={b('info-block')}
                             items={generalInfoRight}
-                            titleClassname={b('info-title')}
                         />
                     ) : null}
                 </div>
@@ -149,7 +147,6 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
                             className={b('info-block')}
                             nameMaxWidth="auto"
                             responsive
-                            titleClassname={b('info-title')}
                         />
                     ) : null}
                 </div>
@@ -162,7 +159,6 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
                             className={b('info-block')}
                             nameMaxWidth="auto"
                             responsive
-                            titleClassname={b('info-title')}
                         />
                     ) : null}
                 </div>
@@ -215,7 +211,6 @@ export const TableInfo = ({data, type, database, path}: TableInfoProps) => {
                                         className={b('info-block')}
                                         nameMaxWidth="auto"
                                         responsive
-                                        titleClassname={b('info-title')}
                                     />
                                 ) : null}
                             </div>

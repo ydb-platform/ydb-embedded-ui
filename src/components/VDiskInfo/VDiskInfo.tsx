@@ -32,7 +32,6 @@ interface VDiskInfoProps<T extends PreparedVDisk> {
     withVDiskPageLink?: boolean;
     withTitle?: boolean;
     className?: string;
-    titleClassName?: string;
     wrap?: true;
 }
 
@@ -43,7 +42,6 @@ export function VDiskInfo<T extends PreparedVDisk>({
     withTitle,
     className,
     wrap,
-    titleClassName,
 }: VDiskInfoProps<T>) {
     const hasDeveloperUi = useHasDeveloperUi();
 
@@ -307,12 +305,7 @@ export function VDiskInfo<T extends PreparedVDisk>({
     return (
         <Flex className={className} gap={2} direction={wrap ? 'row' : 'column'} wrap={wrap}>
             {leftColumn.length > 0 && (
-                <YDBDefinitionList
-                    titleClassname={titleClassName}
-                    title={title}
-                    items={leftColumn}
-                    wrapperClassName={b('info')}
-                />
+                <YDBDefinitionList title={title} items={leftColumn} wrapperClassName={b('info')} />
             )}
             {rightColumn.length > 0 && (
                 <YDBDefinitionList items={rightColumn} wrapperClassName={b('info')} />
