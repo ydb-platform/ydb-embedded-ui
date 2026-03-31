@@ -103,7 +103,7 @@ export function useTenantBaseInfo(database: string) {
     const clusterNameFromQuery = useClusterNameFromQuery();
     const isMetaDatabasesAvailable = useDatabasesV2();
 
-    const {currentData, isLoading, isError} = tenantApi.useGetTenantInfoQuery(
+    const {currentData, isLoading, isError, error} = tenantApi.useGetTenantInfoQuery(
         {
             database,
             clusterName: clusterNameFromQuery,
@@ -121,5 +121,6 @@ export function useTenantBaseInfo(database: string) {
         databaseType: Type,
         isLoading,
         isError,
+        error,
     };
 }

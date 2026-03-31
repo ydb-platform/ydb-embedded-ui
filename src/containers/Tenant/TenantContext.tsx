@@ -1,13 +1,9 @@
 import React from 'react';
 
-import type {EPathSubType, EPathType} from '../../types/api/schema';
-
 export interface TenantContextType {
     path: string;
     database: string;
     databaseFullPath: string;
-    type?: EPathType;
-    subType?: EPathSubType;
 }
 
 const SchemaContext = React.createContext<TenantContextType | undefined>(undefined);
@@ -17,27 +13,21 @@ interface TenantContextProviderProps {
     path: string;
     database: string;
     databaseFullPath: string;
-    type?: EPathType;
-    subType?: EPathSubType;
 }
 
 export const TenantContextProvider = ({
     children,
     path,
     database,
-    type,
-    subType,
     databaseFullPath,
 }: TenantContextProviderProps) => {
     const value = React.useMemo(
         () => ({
             path,
             database,
-            type,
-            subType,
             databaseFullPath,
         }),
-        [path, database, type, subType, databaseFullPath],
+        [path, database, databaseFullPath],
     );
 
     return <SchemaContext.Provider value={value}>{children}</SchemaContext.Provider>;

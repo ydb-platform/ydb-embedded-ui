@@ -1,7 +1,7 @@
 import {TENANT_DIAGNOSTICS_TABS_IDS} from '../../../store/reducers/tenant/constants';
 import type {TenantDiagnosticsTab} from '../../../store/reducers/tenant/types';
 import type {AdditionalTenantsProps} from '../../../types/additionalProps';
-import type {EPathSubType, EPathType} from '../../../types/api/schema';
+import type {EPathType} from '../../../types/api/schema';
 import {uiFactory} from '../../../uiFactory/uiFactory';
 import {Configs} from '../../Configs/Configs';
 import {Heatmap} from '../../Heatmap/Heatmap';
@@ -27,7 +27,6 @@ import i18n from './i18n';
 interface DiagnosticsTabContentOptions {
     activeTabId: TenantDiagnosticsTab;
     type?: EPathType;
-    subType?: EPathSubType;
     database: string;
     path: string;
     databaseFullPath: string;
@@ -38,7 +37,6 @@ interface DiagnosticsTabContentOptions {
 export function renderDiagnosticsTabContent({
     activeTabId,
     type,
-    subType,
     database,
     path,
     databaseFullPath,
@@ -177,13 +175,8 @@ export function renderDiagnosticsTabContent({
         }
         case TENANT_DIAGNOSTICS_TABS_IDS.monitoring: {
             return uiFactory.renderMonitoring?.({
-                type,
-                subType,
                 database,
-                path,
                 databaseFullPath,
-                additionalTenantProps,
-                scrollContainerRef,
             });
         }
         default: {

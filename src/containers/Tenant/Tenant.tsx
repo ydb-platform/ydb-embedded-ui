@@ -42,26 +42,12 @@ interface TenantProps {
     additionalTenantProps?: AdditionalTenantsProps;
 }
 
-// eslint-disable-next-line complexity
 export function Tenant({additionalTenantProps}: TenantProps) {
-    const [isSummaryCollapsed, setIsSummaryCollapsed] = useSetting<boolean>(
-        DEFAULT_IS_TENANT_SUMMARY_COLLAPSED,
-        false,
-    );
     const useMetaProxy = useClusterWithProxy();
-    const [summaryVisibilityState, dispatchSummaryVisibilityAction] = React.useReducer(
-        paneVisibilityToggleReducer,
-        undefined,
-        () => ({
-            triggerExpand: false,
-            triggerCollapse: false,
-            collapsed: isSummaryCollapsed,
-        }),
-    );
 
     const {database, schema} = useTenantQueryParams();
 
-    const {name, isLoading: tenantBaseInfoLoading} = useTenantBaseInfo(database ?? '');
+    const {name, isLoading, error} = useTenantBaseInfo(database ?? '');
 
     if (!database) {
         throw new Error('Tenant name is not defined');
@@ -85,56 +71,13 @@ export function Tenant({additionalTenantProps}: TenantProps) {
 
     const path = schema ?? databaseName;
 
-    const {
-        currentData: currentItem,
-        error,
-        isLoading,
-    } = overviewApi.useGetOverviewQuery({
-        path,
-        database,
-        databaseFullPath: databaseName,
-        useMetaProxy,
-    });
-
     const dispatch = useTypedDispatch();
     React.useEffect(() => {
         dispatch(setHeaderBreadcrumbs('tenant', {databaseName, database}));
     }, [databaseName, database, dispatch]);
 
-    const preloadedData = useTypedSelector((state) =>
-        selectSchemaObjectData(state, path, database, databaseName, useMetaProxy),
-    );
-
-    // Use preloaded data if there is no current item data yet
-    const currentPathType =
-        currentItem?.PathDescription?.Self?.PathType ??
-        preloadedData?.PathDescription?.Self?.PathType;
-    const currentPathSubType =
-        currentItem?.PathDescription?.Self?.PathSubType ??
-        preloadedData?.PathDescription?.Self?.PathSubType;
-
     const showBlockingError = isAccessError(error);
-
     const errorProps = showBlockingError ? uiFactory.clusterOrDatabaseAccessError : undefined;
-
-    const onCollapseSummaryHandler = () => {
-        setIsSummaryCollapsed(true);
-        dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.triggerCollapse);
-    };
-    const onExpandSummaryHandler = () => {
-        setIsSummaryCollapsed(false);
-        dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.triggerExpand);
-    };
-
-    const onSplitStartDragAdditional = () => {
-        setIsSummaryCollapsed(false);
-        dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.clear);
-    };
-
-    const [initialLoading, setInitialLoading] = React.useState(true);
-    if (initialLoading && !isLoading && !tenantBaseInfoLoading) {
-        setInitialLoading(false);
-    }
 
     const isV2Enabled = useNavigationV2Enabled();
     const {tenantPage} = useTenantPage();
@@ -159,23 +102,13 @@ export function Tenant({additionalTenantProps}: TenantProps) {
         }
 
         return (
-            <SplitPane
-                defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
-                defaultSizes={[25, 75]}
-                triggerCollapse={summaryVisibilityState.triggerCollapse}
-                triggerExpand={summaryVisibilityState.triggerExpand}
-                minSize={[36, 200]}
-                onSplitStartDragAdditional={onSplitStartDragAdditional}
-            >
-                <ObjectSummary
-                    onCollapseSummary={onCollapseSummaryHandler}
-                    onExpandSummary={onExpandSummaryHandler}
-                    isCollapsed={summaryVisibilityState.collapsed}
-                />
-                <div className={b('main')}>
-                    <ObjectGeneral additionalTenantProps={additionalTenantProps} />
-                </div>
-            </SplitPane>
+            <TreePagesContent
+                path={path}
+                database={database}
+                databaseName={databaseName}
+                useMetaProxy={useMetaProxy}
+                additionalTenantProps={additionalTenantProps}
+            />
         );
     };
 
@@ -185,7 +118,7 @@ export function Tenant({additionalTenantProps}: TenantProps) {
                 defaultTitle={`${title} — ${appTitle}`}
                 titleTemplate={`%s — ${title} — ${appTitle}`}
             />
-            <LoaderWrapper loading={initialLoading}>
+            <LoaderWrapper loading={isLoading}>
                 <PageError
                     error={showBlockingError ? error : undefined}
                     {...errorProps}
@@ -195,8 +128,6 @@ export function Tenant({additionalTenantProps}: TenantProps) {
                     <TenantContextProvider
                         database={database}
                         path={path}
-                        type={currentPathType}
-                        subType={currentPathSubType}
                         databaseFullPath={databaseName}
                     >
                         <TenantDrawerWrapper>{renderContent()}</TenantDrawerWrapper>
@@ -204,5 +135,115 @@ export function Tenant({additionalTenantProps}: TenantProps) {
                 </PageError>
             </LoaderWrapper>
         </div>
+    );
+}
+
+function TreePagesContent({
+    path,
+    database,
+    databaseName,
+    useMetaProxy,
+    additionalTenantProps,
+}: {
+    path: string;
+    database: string;
+    databaseName: string;
+    useMetaProxy?: boolean;
+    additionalTenantProps?: AdditionalTenantsProps;
+}) {
+    const {
+        currentData: currentItem,
+        error,
+        isLoading,
+    } = overviewApi.useGetOverviewQuery({
+        path,
+        database,
+        databaseFullPath: databaseName,
+        useMetaProxy,
+    });
+
+    const [isSummaryCollapsed, setIsSummaryCollapsed] = useSetting<boolean>(
+        DEFAULT_IS_TENANT_SUMMARY_COLLAPSED,
+        false,
+    );
+    const [summaryVisibilityState, dispatchSummaryVisibilityAction] = React.useReducer(
+        paneVisibilityToggleReducer,
+        undefined,
+        () => ({
+            triggerExpand: false,
+            triggerCollapse: false,
+            collapsed: isSummaryCollapsed,
+        }),
+    );
+
+    const onCollapseSummaryHandler = () => {
+        setIsSummaryCollapsed(true);
+        dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.triggerCollapse);
+    };
+    const onExpandSummaryHandler = () => {
+        setIsSummaryCollapsed(false);
+        dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.triggerExpand);
+    };
+
+    const onSplitStartDragAdditional = () => {
+        setIsSummaryCollapsed(false);
+        dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.clear);
+    };
+
+    // Prevent loader when changing shema objects
+    // Query is called here to check user rights
+    // Once they are checked, we can show content
+    const [initialLoading, setInitialLoading] = React.useState(true);
+    if (initialLoading && !isLoading) {
+        setInitialLoading(false);
+    }
+
+    const preloadedData = useTypedSelector((state) =>
+        selectSchemaObjectData(state, path, database, databaseName, useMetaProxy),
+    );
+
+    const showBlockingError = isAccessError(error);
+    const errorProps = showBlockingError ? uiFactory.clusterOrDatabaseAccessError : undefined;
+
+    // Use preloaded data if there is no current item data yet
+    const currentPathType =
+        currentItem?.PathDescription?.Self?.PathType ??
+        preloadedData?.PathDescription?.Self?.PathType;
+    const currentPathSubType =
+        currentItem?.PathDescription?.Self?.PathSubType ??
+        preloadedData?.PathDescription?.Self?.PathSubType;
+
+    return (
+        <LoaderWrapper loading={initialLoading}>
+            <PageError
+                error={showBlockingError ? error : undefined}
+                {...errorProps}
+                size="l"
+                illustrationSize="m"
+            >
+                <SplitPane
+                    defaultSizePaneKey={DEFAULT_SIZE_TENANT_KEY}
+                    defaultSizes={[25, 75]}
+                    triggerCollapse={summaryVisibilityState.triggerCollapse}
+                    triggerExpand={summaryVisibilityState.triggerExpand}
+                    minSize={[36, 200]}
+                    onSplitStartDragAdditional={onSplitStartDragAdditional}
+                >
+                    <ObjectSummary
+                        type={currentPathType}
+                        onCollapseSummary={onCollapseSummaryHandler}
+                        onExpandSummary={onExpandSummaryHandler}
+                        isCollapsed={summaryVisibilityState.collapsed}
+                    />
+                    <div className={b('main')}>
+                        <ObjectGeneral
+                            additionalTenantProps={additionalTenantProps}
+                            type={currentPathType}
+                            subType={currentPathSubType}
+                        />
+                    </div>
+                </SplitPane>
+            </PageError>
+        </LoaderWrapper>
     );
 }
