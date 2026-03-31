@@ -58,9 +58,8 @@ export function DBHeaderActionsMenu({
                 linksItems.push({
                     text: link.title,
                     iconStart: <Icon data={link.icon} />,
-                    action: () => {
-                        history.push(link.url);
-                    },
+                    href: link.url,
+                    target: '_blank',
                 });
             }
 
@@ -114,7 +113,16 @@ export function DBHeaderActionsMenu({
         }
 
         return menuItems;
-    }, [database, clusterName, databaseData, additionalTenantProps]);
+    }, [
+        database,
+        clusterName,
+        databaseData,
+        additionalTenantProps,
+        isV2NavigationEnabled,
+        history,
+        isEditDBAvailable,
+        isDeleteDBAvailable,
+    ]);
 
     const renderSwitcher: DropdownMenuProps<unknown>['renderSwitcher'] = (props) => {
         return (
