@@ -179,6 +179,7 @@ export function Navigation({children, userSettings}: NavigationProps) {
         isNewNavAlertShown,
         tenantNavigationItems,
         handleNewNavAlertClose,
+        shouldShowV2NavNotifications,
     ]);
 
     return (
