@@ -95,8 +95,7 @@ function Diagnostics({
     );
 
     const renderDBName = () => {
-        // TODO: Replace `diagnostics` to `database` after https://github.com/ydb-platform/ydb-embedded-ui/pull/3692
-        if (isV2NavigationEnabled && databasePagesDisplay === 'diagnostics') {
+        if (isV2NavigationEnabled && databasePagesDisplay === 'database') {
             return (
                 <Text variant="header-1" className={b('db-name')}>
                     {name}
