@@ -27,7 +27,7 @@ The project serves dual purposes:
 - **Split Panes**: `react-split`
 - **Testing**: Jest 30 + React Testing Library (unit), Playwright 1.x (E2E)
 - **Package Manager**: npm
-- **Node Version**: 22+ required (`engines` field enforces `>=22.0`)
+- **Node Version**: 24+ required (`engines` field enforces `>=24.0`)
 
 ## Essential Development Commands
 
