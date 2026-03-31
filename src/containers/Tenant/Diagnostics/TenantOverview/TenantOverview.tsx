@@ -1,9 +1,12 @@
+import React from 'react';
+
 import {ChartAreaStacked} from '@gravity-ui/icons';
-import {Button, Flex, HelpMark, Icon, Label} from '@gravity-ui/uikit';
+import {Button, Flex, Icon} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueriesActivityBar} from '../../../../components/QueriesActivityBar/QueriesActivityBar';
+import {ServerlessDBLabel} from '../../../../components/ServerlessDBLabel/ServerlessDBLabel';
 import {useClusterBaseInfo, useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
 import {
@@ -22,6 +25,7 @@ import {useDatabasesV2} from '../../../../utils/hooks/useDatabasesV2';
 import {canShowTenantMonitoringTab} from '../../../../utils/monitoringVisibility';
 import {useTenantPage} from '../../TenantNavigation/useTenantNavigation';
 import {mapDatabaseTypeToDBName} from '../../utils/schema';
+import {useNavigationV2Enabled} from '../../utils/useNavigationV2Enabled';
 
 import {HealthcheckPreview} from './Healthcheck/HealthcheckPreview';
 import {MetricsTabs} from './MetricsTabs/MetricsTabs';
@@ -50,6 +54,7 @@ export function TenantOverview({
     const clusterName = useClusterNameFromQuery();
     const useMetaProxy = useClusterWithProxy();
     const dispatch = useTypedDispatch();
+    const isV2NavigationEnabled = useNavigationV2Enabled();
 
     const {handleTenantPageChange} = useTenantPage();
 
@@ -136,18 +141,7 @@ export function TenantOverview({
                     hasClipboardButton={Boolean(tenant)}
                     clipboardButtonAlwaysVisible
                 />
-                {isServerless ? (
-                    <div className={b('serverless-tag')}>
-                        <Label theme="clear" size="s" className={b('serverless-tag-label')}>
-                            <Flex alignItems="center" gap="2">
-                                {i18n('value_serverless')}
-                                <HelpMark iconSize="s" className={b('serverless-tag-tooltip')}>
-                                    {i18n('context_serverless-tooltip')}
-                                </HelpMark>
-                            </Flex>
-                        </Label>
-                    </div>
-                ) : null}
+                {isServerless ? <ServerlessDBLabel className={b('serverless-tag')} /> : null}
             </Flex>
         );
     };
@@ -203,39 +197,52 @@ export function TenantOverview({
         dispatch(setDiagnosticsTab(TENANT_DIAGNOSTICS_TABS_IDS.monitoring));
     };
 
+    const renderOverviewHead = () => {
+        if (isV2NavigationEnabled) {
+            return null;
+        }
+        return (
+            <React.Fragment>
+                <Flex alignItems="center" gap="2" className={b('top-label')}>
+                    {tenantType}
+                    {monitoringTabAvailable && (
+                        <Button view="normal" onClick={handleOpenMonitoring}>
+                            <Icon data={ChartAreaStacked} size={16} />
+                            {i18n('action_open-monitoring')}
+                        </Button>
+                    )}
+                </Flex>
+                <Flex alignItems="center" gap="1" className={b('top')}>
+                    {renderName()}
+                    {links.length > 0 && (
+                        <Flex gap="2">
+                            {links.map(({title, url, icon}) => (
+                                <Button
+                                    key={title}
+                                    href={url}
+                                    target="_blank"
+                                    size="xs"
+                                    title={title}
+                                >
+                                    <Icon data={icon} />
+                                </Button>
+                            ))}
+                        </Flex>
+                    )}
+                </Flex>
+            </React.Fragment>
+        );
+    };
+
     return (
         <LoaderWrapper loading={tenantLoading}>
             <div className={b()}>
                 <div className={b('info')}>
-                    <Flex alignItems="center" gap="2" className={b('top-label')}>
-                        {tenantType}
-                        {monitoringTabAvailable && (
-                            <Button view="normal" onClick={handleOpenMonitoring}>
-                                <Icon data={ChartAreaStacked} size={16} />
-                                {i18n('action_open-monitoring')}
-                            </Button>
-                        )}
-                    </Flex>
-                    <Flex alignItems="center" gap="1" className={b('top')}>
-                        {renderName()}
-                        {links.length > 0 && (
-                            <Flex gap="2">
-                                {links.map(({title, url, icon}) => (
-                                    <Button
-                                        key={title}
-                                        href={url}
-                                        target="_blank"
-                                        size="xs"
-                                        title={title}
-                                    >
-                                        <Icon data={icon} />
-                                    </Button>
-                                ))}
-                            </Flex>
-                        )}
-                    </Flex>
+                    {renderOverviewHead()}
                     <Flex direction="column" gap={4}>
-                        {!isServerless && <HealthcheckPreview database={database} />}
+                        {!isServerless && !isV2NavigationEnabled && (
+                            <HealthcheckPreview database={database} />
+                        )}
                         <QueriesActivityBar database={database} />
                         <MetricsTabs
                             poolsCpuStats={poolsStats}

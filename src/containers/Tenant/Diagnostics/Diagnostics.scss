@@ -8,6 +8,12 @@
 
     height: 100%;
 
+    &__db-name {
+        margin-top: var(--g-spacing-2);
+        margin-bottom: var(--g-spacing-2);
+        padding: 0 var(--g-spacing-5);
+    }
+
     &__page-wrapper {
         --ydb-configs-controls-height: 46px;
         --ydb-configs-container-height: 100cqh;

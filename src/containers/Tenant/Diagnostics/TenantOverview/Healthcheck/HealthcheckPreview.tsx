@@ -1,5 +1,6 @@
+import {ChevronRight} from '@gravity-ui/icons';
 import type {AlertProps} from '@gravity-ui/uikit';
-import {Alert, Button, Flex, Icon, Skeleton} from '@gravity-ui/uikit';
+import {Alert, Button, Flex, Icon, Label, Skeleton} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../../../../components/Errors/ResponseError';
 import {healthcheckApi} from '../../../../../store/reducers/healthcheckInfo/healthcheckInfo';
@@ -17,6 +18,7 @@ const b = cn('ydb-healthcheck-preview');
 
 interface HealthcheckPreviewProps {
     database: string;
+    compact?: boolean;
 }
 
 const checkResultToAlertTheme: Record<SelfCheckResult, AlertProps['theme']> = {
@@ -50,16 +52,47 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
 
     const modifier = selfCheckResult.toLowerCase();
 
-    if (loading) {
+    if (!props.compact && loading) {
         return <Skeleton className={b('skeleton')} />;
     }
 
-    const issuesCount = data?.issue_log?.filter((issue) => !issue.reason).length;
+    const issuesCount = data?.issue_log?.filter((issue) => !issue.reason).length ?? 0;
 
     const issuesText = issuesCount ? i18n('description_problems', {count: issuesCount}) : '';
 
-    if (selfCheckResult === 'GOOD' && !issuesCount && !loading) {
+    if (!props.compact && selfCheckResult === 'GOOD' && !issuesCount && !loading) {
         return null;
+    }
+
+    if (props.compact) {
+        if (loading) {
+            return null;
+        }
+
+        const rawStatus =
+            selfCheckResult.charAt(0).toUpperCase() + selfCheckResult.slice(1).toLowerCase();
+        const preparedStatus = rawStatus.replaceAll('_', ' ');
+
+        return (
+            <Label
+                theme={checkResultToAlertTheme[selfCheckResult]}
+                icon={
+                    <Icon
+                        size={12}
+                        data={HEALTHCHECK_RESULT_TO_ICON[selfCheckResult]}
+                        className={b('icon', {[modifier]: true})}
+                    />
+                }
+                onClick={() => {
+                    handleShowHealthcheckChange(true);
+                }}
+            >
+                <Flex alignItems={'center'} gap={1}>
+                    {preparedStatus}: {i18n('issues-count', {count: issuesCount})}
+                    <Icon data={ChevronRight} size={12} />
+                </Flex>
+            </Label>
+        );
     }
 
     const renderAlertMessage = () => {

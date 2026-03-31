@@ -47,7 +47,11 @@ export interface RawBreadcrumbItem {
 
 interface GetBreadcrumbs<T, U = AnyRecord> {
     (
-        options: T & {singleClusterMode: boolean; isViewerUser?: boolean},
+        options: T & {
+            singleClusterMode: boolean;
+            isViewerUser?: boolean;
+            isV2NavigationEnabled?: boolean;
+        },
         query?: U,
     ): RawBreadcrumbItem[];
 }
@@ -99,7 +103,14 @@ const getHomePageBreadcrumbs: GetBreadcrumbs<HomePageBreadcrumbsOptions> = (opti
 };
 
 const getClusterBreadcrumbs: GetBreadcrumbs<ClusterBreadcrumbsOptions> = (options, query = {}) => {
-    const {clusterName, clusterTab, singleClusterMode, isViewerUser, environment} = options;
+    const {
+        clusterName,
+        clusterTab,
+        singleClusterMode,
+        isViewerUser,
+        environment,
+        isV2NavigationEnabled,
+    } = options;
 
     if (!isViewerUser) {
         if (singleClusterMode) {
@@ -118,28 +129,33 @@ const getClusterBreadcrumbs: GetBreadcrumbs<ClusterBreadcrumbsOptions> = (option
     breadcrumbs.push({
         text: clusterName || CLUSTER_DEFAULT_TITLE,
         link: getClusterPath({activeTab: clusterTab, environment}, query),
-        icon: <ClusterIcon />,
+        icon: isV2NavigationEnabled ? undefined : <ClusterIcon />,
     });
 
     return breadcrumbs;
 };
 
 const getTenantBreadcrumbs: GetBreadcrumbs<TenantBreadcrumbsOptions> = (options, query = {}) => {
-    const {databaseName, database} = options;
+    const {databaseName, database, isV2NavigationEnabled} = options;
 
     const breadcrumbs = getClusterBreadcrumbs(options, query);
 
-    const text = databaseName || headerKeyset('breadcrumbs.tenant');
+    const preparedDBName = databaseName?.startsWith('/') ? databaseName.slice(1) : databaseName;
+    const text = preparedDBName || headerKeyset('breadcrumbs.tenant');
     const link = database ? getTenantPath({...query, database}) : undefined;
 
-    const lastItem = {text, link, icon: <DatabaseIcon />};
+    const lastItem = {
+        text,
+        link,
+        icon: isV2NavigationEnabled ? undefined : <DatabaseIcon />,
+    };
     breadcrumbs.push(lastItem);
 
     return breadcrumbs;
 };
 
 const getNodeBreadcrumbs: GetBreadcrumbs<NodeBreadcrumbsOptions> = (options, query = {}) => {
-    const {nodeId, nodeRole, nodeActiveTab, database} = options;
+    const {nodeId, nodeRole, nodeActiveTab, database, isV2NavigationEnabled} = options;
 
     const tenantQuery = getQueryForTenant(nodeActiveTab === 'tablets' ? 'tablets' : 'nodes');
 
@@ -157,7 +173,7 @@ const getNodeBreadcrumbs: GetBreadcrumbs<NodeBreadcrumbsOptions> = (options, que
         link: nodeId
             ? getDefaultNodePath({id: nodeId, activeTab: nodeActiveTab}, {database, ...query})
             : undefined,
-        icon: getNodeIcon(nodeRole),
+        icon: isV2NavigationEnabled ? undefined : getNodeIcon(nodeRole),
     };
 
     breadcrumbs.push(lastItem);
@@ -247,7 +263,7 @@ const getVDiskBreadcrumbs: GetBreadcrumbs<VDiskBreadcrumbsOptions> = (options, q
 };
 
 const getTabletBreadcrumbs: GetBreadcrumbs<TabletBreadcrumbsOptions> = (options, query = {}) => {
-    const {tabletId, tabletType, database} = options;
+    const {tabletId, tabletType, database, isV2NavigationEnabled} = options;
 
     const breadcrumbs = database
         ? getTenantBreadcrumbs(options, query)
@@ -255,7 +271,7 @@ const getTabletBreadcrumbs: GetBreadcrumbs<TabletBreadcrumbsOptions> = (options,
 
     const lastItem = {
         text: tabletId || headerKeyset('breadcrumbs.tablet'),
-        icon: <TabletIcon text={getTabletLabel(tabletType)} />,
+        icon: isV2NavigationEnabled ? undefined : <TabletIcon text={getTabletLabel(tabletType)} />,
     };
 
     breadcrumbs.push(lastItem);
@@ -276,7 +292,11 @@ const mapPageToGetter = {
 
 export const getBreadcrumbs = (
     page: Page,
-    options: BreadcrumbsOptions & {singleClusterMode: boolean; isViewerUser?: boolean},
+    options: BreadcrumbsOptions & {
+        singleClusterMode: boolean;
+        isViewerUser?: boolean;
+        isV2NavigationEnabled?: boolean;
+    },
     rawBreadcrumbs: RawBreadcrumbItem[] = [],
     query = {},
 ) => {

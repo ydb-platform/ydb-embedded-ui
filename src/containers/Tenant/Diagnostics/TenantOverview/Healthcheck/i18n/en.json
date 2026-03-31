@@ -5,6 +5,7 @@
     "There are {{count}} issues.",
     "There are {{count}} issues."
   ],
+  "issues-count": ["{{count}} issue", "{{count}} issues", "{{count}} issues", "{{count}} issues"],
   "action_review-issues": "Review issues",
   "description_no-data": "No healthcheck data"
 }

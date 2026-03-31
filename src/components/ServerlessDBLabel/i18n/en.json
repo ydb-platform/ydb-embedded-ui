@@ -1,0 +1,4 @@
+{
+  "value_serverless": "Serverless",
+  "context_serverless-tooltip": "Some metrics are hidden in Serverless mode — resources scale automatically based on workload"
+}
