@@ -1,5 +1,14 @@
 # Changelog
 
+## [14.17.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.16.1...v14.17.0) (2026-03-31)
+
+
+### Features
+
+* **Header:** rework db controls ([#3696](https://github.com/ydb-platform/ydb-embedded-ui/issues/3696)) ([cb6a002](https://github.com/ydb-platform/ydb-embedded-ui/commit/cb6a0026ce4d074366d48eb1c2edf273f77dc40c))
+* **Navigation:** rename v2 nav pages ([#3692](https://github.com/ydb-platform/ydb-embedded-ui/issues/3692)) ([f8af0e1](https://github.com/ydb-platform/ydb-embedded-ui/commit/f8af0e183c33dcc07b07b655446844564172bbec))
+* **uiFactory:** allow hide new features notifications ([#3714](https://github.com/ydb-platform/ydb-embedded-ui/issues/3714)) ([f6b9a0c](https://github.com/ydb-platform/ydb-embedded-ui/commit/f6b9a0cef55d3de62759f2f9caafecdd91ce327f))
+
 ## [14.16.1](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.16.0...v14.16.1) (2026-03-31)
 
 
