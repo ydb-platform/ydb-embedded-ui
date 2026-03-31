@@ -75,19 +75,19 @@ export const EvictVDiskButton = ({
             buttonDisabled={!isUserAllowedToMakeChanges || donorMode}
             buttonView="normal"
             buttonWidth={fullWidth ? 'max' : undefined}
-            dialogHeader={evictVDiskButtonKeyset('evict-vdisk-dialog-header')}
-            dialogText={evictVDiskButtonKeyset('evict-vdisk-dialog-text')}
-            retryButtonText={evictVDiskButtonKeyset('force-evict-vdisk-button')}
+            dialogHeader={evictVDiskButtonKeyset('title_evict-dialog')}
+            dialogText={evictVDiskButtonKeyset('confirm_evict')}
+            retryButtonText={evictVDiskButtonKeyset('action_force-evict')}
             withPopover
             popoverContent={
                 donorMode
-                    ? evictVDiskButtonKeyset('evict-donor-vdisk')
-                    : evictVDiskButtonKeyset('evict-vdisk-not-allowed')
+                    ? evictVDiskButtonKeyset('alert_donor-mode-impossible')
+                    : evictVDiskButtonKeyset('alert_not-allowed')
             }
             popoverDisabled={isUserAllowedToMakeChanges && !donorMode}
         >
             <Icon data={ArrowsOppositeToDots} />
-            {evictVDiskButtonKeyset('evict-vdisk-button')}
+            {evictVDiskButtonKeyset('action_evict')}
         </ButtonWithConfirmDialog>
     );
 };
