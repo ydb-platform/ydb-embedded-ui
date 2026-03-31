@@ -190,13 +190,15 @@ function TreePagesContent({
         dispatchSummaryVisibilityAction(PaneVisibilityActionTypes.clear);
     };
 
-    // Prevent loader when changing shema objects
+    // Prevent loader when changing schema objects
     // Query is called here to check user rights
     // Once they are checked, we can show content
     const [initialLoading, setInitialLoading] = React.useState(true);
-    if (initialLoading && !isLoading) {
-        setInitialLoading(false);
-    }
+    React.useEffect(() => {
+        if (!isLoading) {
+            setInitialLoading(false);
+        }
+    }, [isLoading]);
 
     const preloadedData = useTypedSelector((state) =>
         selectSchemaObjectData(state, path, database, databaseName, useMetaProxy),
