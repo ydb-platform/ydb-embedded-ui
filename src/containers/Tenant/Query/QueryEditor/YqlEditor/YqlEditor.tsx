@@ -42,6 +42,7 @@ import {getKeyBindings} from './keybindings';
 const CONTEXT_MENU_GROUP_ID = 'navigation';
 
 type SnippetController = {insert: (snippet: string) => void};
+type PendingSnippetKey = {tabId: string; snippet: string};
 
 function isRecord(value: unknown): value is Record<string, unknown> {
     return typeof value === 'object' && value !== null;
@@ -102,8 +103,37 @@ export function YqlEditor({
     const editorRef = React.useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
     const monacoRef = React.useRef<typeof Monaco | null>(null);
     const tabsManagerRef = React.useRef(new TabsManager());
+    const appliedPendingSnippetRef = React.useRef<PendingSnippetKey | null>(null);
+    const [editorMountVersion, setEditorMountVersion] = React.useState(0);
 
     const isMultiTabQueryEditorEnabled = useMultiTabQueryEditorEnabled();
+
+    const applyPendingSnippet = React.useCallback(
+        (editor: Monaco.editor.IStandaloneCodeEditor, tabId: string, snippet: string): boolean => {
+            const alreadyApplied =
+                appliedPendingSnippetRef.current?.tabId === tabId &&
+                appliedPendingSnippetRef.current?.snippet === snippet;
+            if (alreadyApplied) {
+                return false;
+            }
+
+            const contribution =
+                editor.getContribution<Monaco.editor.IEditorContribution>('snippetController2');
+            if (!isSnippetController(contribution)) {
+                return false;
+            }
+
+            editor.focus();
+            editor.setValue('');
+            contribution.insert(snippet);
+            appliedPendingSnippetRef.current = {tabId, snippet};
+            dispatch(setIsDirty(false));
+            dispatch(clearPendingSnippet({tabId}));
+
+            return true;
+        },
+        [dispatch],
+    );
 
     React.useEffect(() => {
         if (!isMultiTabQueryEditorEnabled) {
@@ -133,7 +163,10 @@ export function YqlEditor({
     }, [isMultiTabQueryEditorEnabled, tabsOrder]);
 
     React.useEffect(() => {
-        if (!isMultiTabQueryEditorEnabled || !pendingSnippet) {
+        if (!isMultiTabQueryEditorEnabled || !pendingSnippet || !editorMountVersion) {
+            if (!pendingSnippet) {
+                appliedPendingSnippetRef.current = null;
+            }
             return;
         }
 
@@ -142,17 +175,14 @@ export function YqlEditor({
             return;
         }
 
-        const contribution =
-            editor.getContribution<Monaco.editor.IEditorContribution>('snippetController2');
-        if (isSnippetController(contribution)) {
-            editor.focus();
-            editor.setValue('');
-            contribution.insert(pendingSnippet);
-            dispatch(setIsDirty(false));
-        }
-
-        dispatch(clearPendingSnippet({tabId: activeTabId}));
-    }, [activeTabId, pendingSnippet, isMultiTabQueryEditorEnabled, dispatch]);
+        applyPendingSnippet(editor, activeTabId, pendingSnippet);
+    }, [
+        activeTabId,
+        applyPendingSnippet,
+        editorMountVersion,
+        pendingSnippet,
+        isMultiTabQueryEditorEnabled,
+    ]);
 
     const [lastUsedQueryAction] = useSetting<QueryAction>(SETTING_KEYS.LAST_USED_QUERY_ACTION);
 
@@ -225,6 +255,7 @@ export function YqlEditor({
         tabsManagerRef.current.disposeAll();
         editorRef.current = null;
         monacoRef.current = null;
+        appliedPendingSnippetRef.current = null;
     };
 
     const {monacoGhostConfig, prepareUserQueriesCache} = useCodeAssistHelpers(historyQueries);
@@ -243,6 +274,7 @@ export function YqlEditor({
         window.ydbEditor = editor;
         editorRef.current = editor;
         monacoRef.current = monaco;
+        setEditorMountVersion((version) => version + 1);
 
         if (isMultiTabQueryEditorEnabled) {
             tabsManagerRef.current.setActiveTabModel({
