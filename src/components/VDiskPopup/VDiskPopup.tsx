@@ -25,7 +25,7 @@ import {useTypedDispatch, useTypedSelector} from '../../utils/hooks';
 import {useDatabaseFromQuery} from '../../utils/hooks/useDatabaseFromQuery';
 import {useIsViewerUser} from '../../utils/hooks/useIsUserAllowedToMakeChanges';
 import {bytesToGB, bytesToSpeed} from '../../utils/utils';
-import {EvictVDiskButton} from '../EvictVDiskButton/EvictVDiskButton';
+import {EvictVDiskButton, isAllVdiskParamsDefined} from '../EvictVDiskButton/EvictVDiskButton';
 import {InternalLink} from '../InternalLink';
 import {LinkWithIcon} from '../LinkWithIcon/LinkWithIcon';
 import {
@@ -328,6 +328,12 @@ const buildVDiskFooter = (
 
     const hasLinks = vDiskPagePath || vDiskInternalViewerPath;
 
+    const isVDiskParamsDefined = isAllVdiskParamsDefined(VDiskId);
+
+    if (!hasLinks && !isVDiskParamsDefined) {
+        return null;
+    }
+
     return (
         <Flex direction="column" gap={3}>
             {hasLinks && (
@@ -348,12 +354,14 @@ const buildVDiskFooter = (
                     )}
                 </Flex>
             )}
-            <EvictVDiskButton
-                vDiskId={VDiskId}
-                donorMode={DonorMode}
-                fullWidth
-                onSuccess={onSuccess}
-            />
+            {isVDiskParamsDefined && (
+                <EvictVDiskButton
+                    vDiskId={VDiskId}
+                    donorMode={DonorMode}
+                    fullWidth
+                    onSuccess={onSuccess}
+                />
+            )}
         </Flex>
     );
 };

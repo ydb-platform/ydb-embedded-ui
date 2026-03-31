@@ -9,7 +9,10 @@ import {z} from 'zod';
 
 import {EntityPageTitle} from '../../components/EntityPageTitle/EntityPageTitle';
 import {ResponseError} from '../../components/Errors/ResponseError';
-import {EvictVDiskButton} from '../../components/EvictVDiskButton/EvictVDiskButton';
+import {
+    EvictVDiskButton,
+    isAllVdiskParamsDefined,
+} from '../../components/EvictVDiskButton/EvictVDiskButton';
 import {InfoViewerSkeleton} from '../../components/InfoViewerSkeleton/InfoViewerSkeleton';
 import {InternalLink} from '../../components/InternalLink/InternalLink';
 import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
@@ -195,6 +198,10 @@ export function VDiskPage() {
     }, [dispatch, StringifiedId]);
 
     const renderControls = () => {
+        const isVDiskParamsDefined = isAllVdiskParamsDefined(VDiskId);
+        if (!isVDiskParamsDefined) {
+            return null;
+        }
         return (
             <div className={vDiskPageCn('controls')}>
                 <EvictVDiskButton

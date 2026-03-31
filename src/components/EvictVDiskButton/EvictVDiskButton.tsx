@@ -13,10 +13,20 @@ import {ButtonWithConfirmDialog} from '../ButtonWithConfirmDialog/ButtonWithConf
 import {evictVDiskButtonKeyset} from './i18n';
 
 interface EvictVDiskButtonProps {
-    vDiskId?: TVDiskID;
+    vDiskId: Required<TVDiskID>;
     donorMode?: boolean;
     fullWidth?: boolean;
     onSuccess?: () => void;
+}
+
+export function isAllVdiskParamsDefined(vDiskId?: TVDiskID): vDiskId is Required<TVDiskID> {
+    return (
+        !isNil(vDiskId?.GroupID) &&
+        !isNil(vDiskId?.GroupGeneration) &&
+        !isNil(vDiskId?.Ring) &&
+        !isNil(vDiskId?.Domain) &&
+        !isNil(vDiskId?.VDisk)
+    );
 }
 
 export const EvictVDiskButton = ({
@@ -28,48 +38,35 @@ export const EvictVDiskButton = ({
     const isUserAllowedToMakeChanges = useIsUserAllowedToMakeChanges();
     const newDiskApiAvailable = useDiskPagesAvailable();
 
-    const vDiskIdParamsDefined =
-        !isNil(vDiskId?.GroupID) &&
-        !isNil(vDiskId?.GroupGeneration) &&
-        !isNil(vDiskId?.Ring) &&
-        !isNil(vDiskId?.Domain) &&
-        !isNil(vDiskId?.VDisk);
-
     const handleEvictVDisk = React.useCallback(
         async (isRetry?: boolean) => {
-            if (vDiskIdParamsDefined && vDiskId) {
-                const requestParams = {
-                    groupId: vDiskId.GroupID!,
-                    groupGeneration: vDiskId.GroupGeneration!,
-                    failRealmIdx: vDiskId.Ring!,
-                    failDomainIdx: vDiskId.Domain!,
-                    vDiskIdx: vDiskId.VDisk!,
-                    force: isRetry,
+            const requestParams = {
+                groupId: vDiskId.GroupID,
+                groupGeneration: vDiskId.GroupGeneration,
+                failRealmIdx: vDiskId.Ring,
+                failDomainIdx: vDiskId.Domain,
+                vDiskIdx: vDiskId.VDisk,
+                force: isRetry,
+            };
+
+            let response: ModifyDiskResponse;
+
+            if (newDiskApiAvailable) {
+                response = await window.api.vdisk.evictVDisk(requestParams);
+            } else {
+                response = await window.api.tablets.evictVDiskOld(requestParams);
+            }
+
+            if (response?.result === false) {
+                const err = {
+                    statusText: response.error,
+                    retryPossible: response.forceRetryPossible,
                 };
-
-                let response: ModifyDiskResponse;
-
-                if (newDiskApiAvailable) {
-                    response = await window.api.vdisk.evictVDisk(requestParams);
-                } else {
-                    response = await window.api.tablets.evictVDiskOld(requestParams);
-                }
-
-                if (response?.result === false) {
-                    const err = {
-                        statusText: response.error,
-                        retryPossible: response.forceRetryPossible,
-                    };
-                    throw err;
-                }
+                throw err;
             }
         },
-        [vDiskIdParamsDefined, vDiskId, newDiskApiAvailable],
+        [vDiskId, newDiskApiAvailable],
     );
-
-    if (!vDiskIdParamsDefined) {
-        return null;
-    }
 
     return (
         <ButtonWithConfirmDialog
