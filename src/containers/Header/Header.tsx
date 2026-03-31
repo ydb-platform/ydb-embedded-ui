@@ -271,7 +271,7 @@ function DBLeftControls({database, databaseData, isDatabaseDataLoading}: DBLeftC
             return null;
         }
         return <HealthcheckPreview database={database} compact />;
-    }, [databaseData]);
+    }, [database, databaseData, isDatabaseDataLoading]);
 
     return (
         <Flex direction="row" alignItems={'center'} gap={2} className={b('left-controls')}>
