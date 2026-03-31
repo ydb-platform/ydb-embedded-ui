@@ -104,7 +104,7 @@ export function YqlEditor({
     const monacoRef = React.useRef<typeof Monaco | null>(null);
     const tabsManagerRef = React.useRef(new TabsManager());
     const appliedPendingSnippetRef = React.useRef<PendingSnippetKey | null>(null);
-    const [editorMountVersion, setEditorMountVersion] = React.useState(0);
+    const [isEditorMounted, setIsEditorMounted] = React.useState(false);
 
     const isMultiTabQueryEditorEnabled = useMultiTabQueryEditorEnabled();
 
@@ -163,7 +163,7 @@ export function YqlEditor({
     }, [isMultiTabQueryEditorEnabled, tabsOrder]);
 
     React.useEffect(() => {
-        if (!isMultiTabQueryEditorEnabled || !pendingSnippet || !editorMountVersion) {
+        if (!isMultiTabQueryEditorEnabled || !pendingSnippet || !isEditorMounted) {
             if (!pendingSnippet) {
                 appliedPendingSnippetRef.current = null;
             }
@@ -179,7 +179,7 @@ export function YqlEditor({
     }, [
         activeTabId,
         applyPendingSnippet,
-        editorMountVersion,
+        isEditorMounted,
         pendingSnippet,
         isMultiTabQueryEditorEnabled,
     ]);
@@ -256,6 +256,7 @@ export function YqlEditor({
         editorRef.current = null;
         monacoRef.current = null;
         appliedPendingSnippetRef.current = null;
+        setIsEditorMounted(false);
     };
 
     const {monacoGhostConfig, prepareUserQueriesCache} = useCodeAssistHelpers(historyQueries);
@@ -274,7 +275,7 @@ export function YqlEditor({
         window.ydbEditor = editor;
         editorRef.current = editor;
         monacoRef.current = monaco;
-        setEditorMountVersion((version) => version + 1);
+        setIsEditorMounted(true);
 
         if (isMultiTabQueryEditorEnabled) {
             tabsManagerRef.current.setActiveTabModel({
