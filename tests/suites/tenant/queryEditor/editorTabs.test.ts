@@ -38,12 +38,14 @@ async function gotoDiagnosticsWithMultiTabMode(tenantPage: TenantPage) {
 }
 
 async function expectSelectQueryTemplateLoaded(queryEditor: QueryEditor) {
+    const expectedTablePath = dsVslotsSchema.replace(`${database}/`, '');
+
     await expect(queryEditor.editorTabs.isVisible()).resolves.toBe(true);
     await expect(queryEditor.editorTabs.getActiveTabTitle()).resolves.toBe('Select query');
 
     await expect
         .poll(() => queryEditor.getEditorContent(), {timeout: 5000})
-        .toContain('FROM `ds_vslots`');
+        .toContain(`FROM \`${expectedTablePath}\``);
 
     const editorContent = await queryEditor.getEditorContent();
     expect(editorContent).toContain('SELECT');
