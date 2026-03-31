@@ -102,13 +102,7 @@ function Slot<T extends SlotItemType>({item, nodeId, getVDiskPagePath}: SlotProp
 
             return (
                 <HoverPopup
-                    renderPopupContent={() => (
-                        <VDiskInfo
-                            data={item.SlotData}
-                            withTitle
-                            titleClassName={b('info-title')}
-                        />
-                    )}
+                    renderPopupContent={() => <VDiskInfo data={item.SlotData} withTitle />}
                     contentClassName={b('vdisk-popup')}
                     placement={['right', 'top']}
                 >
