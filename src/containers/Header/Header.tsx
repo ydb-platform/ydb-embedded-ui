@@ -166,7 +166,13 @@ export function Header() {
 
     const renderLeftControls = () => {
         if (database && isDatabasePage && isV2NavigationEnabled) {
-            return <DBLeftControls database={database} databaseData={databaseData} />;
+            return (
+                <DBLeftControls
+                    database={database}
+                    databaseData={databaseData}
+                    isDatabaseDataLoading={isDatabaseDataLoading}
+                />
+            );
         }
 
         return null;
@@ -221,9 +227,10 @@ export function Header() {
 interface DBLeftControlsProps {
     database: string;
     databaseData?: PreparedTenant;
+    isDatabaseDataLoading: boolean;
 }
 
-function DBLeftControls({database, databaseData}: DBLeftControlsProps) {
+function DBLeftControls({database, databaseData, isDatabaseDataLoading}: DBLeftControlsProps) {
     const renderCopyButton = React.useCallback(() => {
         if (databaseData?.Name) {
             return (
@@ -259,6 +266,13 @@ function DBLeftControls({database, databaseData}: DBLeftControlsProps) {
         return null;
     }, [databaseData]);
 
+    const renderHealthcheckPreview = React.useCallback(() => {
+        if (databaseData?.Type === 'Serverless' || isDatabaseDataLoading) {
+            return null;
+        }
+        return <HealthcheckPreview database={database} compact />;
+    }, [databaseData]);
+
     return (
         <Flex direction="row" alignItems={'center'} gap={2} className={b('left-controls')}>
             <Flex direction="row" alignItems={'center'}>
@@ -267,7 +281,7 @@ function DBLeftControls({database, databaseData}: DBLeftControlsProps) {
             </Flex>
             <Flex direction="row" alignItems={'center'} gap={2}>
                 {renderServerlessLabel()}
-                <HealthcheckPreview database={database} compact />
+                {renderHealthcheckPreview()}
             </Flex>
         </Flex>
     );

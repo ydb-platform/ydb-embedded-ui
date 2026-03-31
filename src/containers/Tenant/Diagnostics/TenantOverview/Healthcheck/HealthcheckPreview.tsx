@@ -65,6 +65,10 @@ export function HealthcheckPreview(props: HealthcheckPreviewProps) {
     }
 
     if (props.compact) {
+        if (loading) {
+            return null;
+        }
+
         const rawStatus =
             selfCheckResult.charAt(0).toUpperCase() + selfCheckResult.slice(1).toLowerCase();
         const preparedStatus = rawStatus.replaceAll('_', ' ');

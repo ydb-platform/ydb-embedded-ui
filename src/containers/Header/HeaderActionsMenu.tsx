@@ -66,7 +66,7 @@ export function DBHeaderActionsMenu({
             menuItems.push(linksItems);
         }
 
-        // In v1 navigation `Сonnect` is displayed as a separate button
+        // In v1 navigation `Connect` is displayed as a separate button
         if (isV2NavigationEnabled) {
             menuItems.push([
                 {
