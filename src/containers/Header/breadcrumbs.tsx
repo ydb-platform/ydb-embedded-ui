@@ -140,7 +140,8 @@ const getTenantBreadcrumbs: GetBreadcrumbs<TenantBreadcrumbsOptions> = (options,
 
     const breadcrumbs = getClusterBreadcrumbs(options, query);
 
-    const text = databaseName || headerKeyset('breadcrumbs.tenant');
+    const preparedDBName = databaseName?.startsWith('/') ? databaseName.slice(1) : databaseName;
+    const text = preparedDBName || headerKeyset('breadcrumbs.tenant');
     const link = database ? getTenantPath({...query, database}) : undefined;
 
     const lastItem = {
