@@ -315,7 +315,7 @@ function RightControls({
     const renderMonitoringButton = React.useCallback(() => {
         if (isDatabasePage && database && monitoringLinkUrl) {
             return (
-                <ActionTooltip title={headerKeyset('description_connect-to-db')}>
+                <ActionTooltip title={headerKeyset('description_monitoring')}>
                     <Button view="flat" href={monitoringLinkUrl} target="_blank">
                         <Icon data={ChartAreaStacked} />
                         {MONITORING_UI_TITLE}
