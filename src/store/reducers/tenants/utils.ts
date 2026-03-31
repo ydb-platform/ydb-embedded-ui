@@ -85,10 +85,11 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
 
     const poolsStats = calculatePoolsStats(PoolStats);
 
-    const tabletStorage = TablesStorage?.reduce((sum, storageType) => {
-        const size = Number(storageType.Size) || 0;
-        return sum + size;
-    }, 0);
+    const tabletStorage =
+        TablesStorage?.reduce((sum, storageType) => {
+            const size = Number(storageType.Size) || 0;
+            return sum + size;
+        }, 0) ?? 0;
 
     let blobStorageStats: TenantStorageStats[];
     let tabletStorageStats: TenantStorageStats[] | undefined;
