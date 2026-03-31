@@ -240,9 +240,15 @@ function DBLeftControls({database, databaseData}: DBLeftControlsProps) {
 
     const renderConnectToDBButton = React.useCallback(() => {
         return (
-            <Button view="flat-secondary" size="s" onClick={() => getConnectToDBDialog({database})}>
-                <Icon data={PlugConnection} />
-            </Button>
+            <ActionTooltip title={headerKeyset('description_connect-to-db')}>
+                <Button
+                    view="flat-secondary"
+                    size="s"
+                    onClick={() => getConnectToDBDialog({database})}
+                >
+                    <Icon data={PlugConnection} />
+                </Button>
+            </ActionTooltip>
         );
     }, [database]);
 
@@ -254,7 +260,7 @@ function DBLeftControls({database, databaseData}: DBLeftControlsProps) {
     }, [databaseData]);
 
     return (
-        <Flex direction="row" alignItems={'center'} gap={4} className={b('left-controls')}>
+        <Flex direction="row" alignItems={'center'} gap={2} className={b('left-controls')}>
             <Flex direction="row" alignItems={'center'}>
                 {renderCopyButton()}
                 {renderConnectToDBButton()}
@@ -297,9 +303,9 @@ function RightControls({
     const renderAddClusterButton = React.useCallback(() => {
         if (isClustersHomePage && isAddClusterAvailable) {
             return (
-                <Button onClick={() => uiFactory.onAddCluster?.()}>
+                <Button view="flat" onClick={() => uiFactory.onAddCluster?.()}>
                     <Icon data={CirclePlus} />
-                    {headerKeyset('add-cluster')}
+                    {headerKeyset('title_add-cluster')}
                 </Button>
             );
         }
@@ -309,10 +315,12 @@ function RightControls({
     const renderMonitoringButton = React.useCallback(() => {
         if (isDatabasePage && database && monitoringLinkUrl) {
             return (
-                <Button href={monitoringLinkUrl} target="_blank">
-                    <Icon data={ChartAreaStacked} />
-                    {MONITORING_UI_TITLE}
-                </Button>
+                <ActionTooltip title={headerKeyset('description_connect-to-db')}>
+                    <Button view="flat" href={monitoringLinkUrl} target="_blank">
+                        <Icon data={ChartAreaStacked} />
+                        {MONITORING_UI_TITLE}
+                    </Button>
+                </ActionTooltip>
             );
         }
         return null;
@@ -321,10 +329,12 @@ function RightControls({
     const renderConnectToDBButton = React.useCallback(() => {
         if (isDatabasePage && database && !isV2NavigationEnabled) {
             return (
-                <Button onClick={() => getConnectToDBDialog({database})}>
-                    <Icon data={PlugConnection} />
-                    {headerKeyset('connect')}
-                </Button>
+                <ActionTooltip title={headerKeyset('description_connect-to-db')}>
+                    <Button view="flat" onClick={() => getConnectToDBDialog({database})}>
+                        <Icon data={PlugConnection} />
+                        {headerKeyset('title_connect')}
+                    </Button>
+                </ActionTooltip>
             );
         }
         return null;
@@ -334,7 +344,7 @@ function RightControls({
         if (!isHomePage && hasDeveloperUi) {
             return (
                 <ActionTooltip title={headerKeyset('description_admin-ui')}>
-                    <Button href={createDeveloperUIInternalPageHref()} target="_blank">
+                    <Button view="flat" href={createDeveloperUIInternalPageHref()} target="_blank">
                         <Icon data={ArrowUpRightFromSquare} />
                         {headerKeyset('title_admin-ui')}
                     </Button>

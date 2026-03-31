@@ -71,7 +71,7 @@ export function DBHeaderActionsMenu({
         if (isV2NavigationEnabled) {
             menuItems.push([
                 {
-                    text: headerKeyset('connect'),
+                    text: headerKeyset('action_connect-to-db'),
                     iconStart: <PlugConnection />,
                     action: () => getConnectToDBDialog({database}),
                 },
@@ -118,7 +118,7 @@ export function DBHeaderActionsMenu({
 
     const renderSwitcher: DropdownMenuProps<unknown>['renderSwitcher'] = (props) => {
         return (
-            <Button {...props} loading={isDatabaseDataLoading} size="m">
+            <Button {...props} view="flat" loading={isDatabaseDataLoading} size="m">
                 <Icon data={Ellipsis} />
             </Button>
         );
