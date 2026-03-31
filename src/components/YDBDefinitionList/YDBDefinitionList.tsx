@@ -28,7 +28,6 @@ interface YDBDefinitionListProps extends Omit<DefinitionListProps, 'children' | 
     title?: React.ReactNode;
     titleSuffix?: {title: React.ReactNode; copyText?: string};
     titleSeparator?: React.ReactNode;
-    titleClassname?: string;
     items: YDBDefinitionListItem[];
     headerLabels?: YDBDefinitionListHeaderLabel[];
     iconSize?: number;
@@ -52,7 +51,6 @@ export function YDBDefinitionList({
     compact,
     nameMaxWidth = 220,
     className,
-    titleClassname,
     wrapperClassName,
     ...restProps
 }: YDBDefinitionListProps) {
@@ -72,7 +70,7 @@ export function YDBDefinitionList({
             >
                 {title && (
                     <Flex gap="1" alignItems="baseline">
-                        <div className={b(null, titleClassname)}>{title}</div>
+                        {title}
                         {titleSuffix && (
                             <React.Fragment>
                                 <Text color="secondary">{titleSeparator}</Text>
