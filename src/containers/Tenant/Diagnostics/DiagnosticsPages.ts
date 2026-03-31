@@ -26,7 +26,7 @@ export type Page = {
     badge?: Badge;
 };
 
-export type DatabasePagesDisplay = 'all' | 'diagnostics' | 'schema';
+export type DatabasePagesDisplay = 'all' | 'database' | 'diagnostics';
 
 interface GetPagesOptions {
     hasTopicData?: boolean;
@@ -159,18 +159,9 @@ const ALL_DB_PAGES = [
     backups,
 ];
 
-const SCHEMA_DB_PAGES = [overview, topShards, nodes, tablets, describe, access];
+const DB_PAGES = [database, monitoring, topQueries, storage, network, configs, operations, backups];
 
-const DIAGNOSTICS_DB_PAGES = [
-    database,
-    monitoring,
-    topQueries,
-    storage,
-    network,
-    configs,
-    operations,
-    backups,
-];
+const DIAGNOSTICS_DB_PAGES = [overview, topShards, nodes, tablets, describe, access];
 
 const ALL_SERVERLESS_DB_PAGES = [
     overview,
@@ -183,9 +174,9 @@ const ALL_SERVERLESS_DB_PAGES = [
     operations,
 ];
 
-const SCHEMA_SERVERLESS_DB_PAGES = [overview, topShards, tablets, describe];
+const SERVERLESS_DB_PAGES = [database, monitoring, topQueries, configs, operations];
 
-const DIAGNOSTICS_SERVERLESS_DB_PAGES = [database, monitoring, topQueries, configs, operations];
+const DIAGNOSTICS_SERVERLESS_DB_PAGES = [overview, topShards, tablets, describe];
 
 const TABLE_PAGES = [overview, schema, topShards, nodes, graph, tablets, hotKeys, describe, access];
 const COLUMN_TABLE_PAGES = [overview, schema, topShards, nodes, tablets, describe, access];
@@ -256,8 +247,8 @@ function getDatabasePages(databaseType?: ETenantType, databasePagesDisplay?: Dat
         if (databasePagesDisplay === 'diagnostics') {
             return DIAGNOSTICS_SERVERLESS_DB_PAGES;
         }
-        if (databasePagesDisplay === 'schema') {
-            return SCHEMA_SERVERLESS_DB_PAGES;
+        if (databasePagesDisplay === 'database') {
+            return SERVERLESS_DB_PAGES;
         }
         return ALL_SERVERLESS_DB_PAGES;
     }
@@ -265,8 +256,8 @@ function getDatabasePages(databaseType?: ETenantType, databasePagesDisplay?: Dat
     if (databasePagesDisplay === 'diagnostics') {
         return DIAGNOSTICS_DB_PAGES;
     }
-    if (databasePagesDisplay === 'schema') {
-        return SCHEMA_DB_PAGES;
+    if (databasePagesDisplay === 'database') {
+        return DB_PAGES;
     }
     return ALL_DB_PAGES;
 }

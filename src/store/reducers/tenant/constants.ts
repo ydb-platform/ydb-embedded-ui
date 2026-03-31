@@ -3,7 +3,7 @@ export const TENANT_PAGE = 'tenantPage';
 export const TENANT_PAGES_IDS = {
     query: 'query',
     diagnostics: 'diagnostics',
-    schema: 'schema',
+    database: 'database',
 } as const;
 
 export const TENANT_QUERY_TABS_ID = {

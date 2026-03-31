@@ -138,7 +138,7 @@ export function Tenant({additionalTenantProps}: TenantProps) {
 
     const isV2Enabled = useNavigationV2Enabled();
     const {tenantPage} = useTenantPage();
-    const showDatabaseDiagnostics = isV2Enabled && tenantPage === TENANT_PAGES_IDS.diagnostics;
+    const showDatabaseDiagnostics = isV2Enabled && tenantPage === TENANT_PAGES_IDS.database;
 
     const title = path || i18n('page.title');
     const {appTitle} = useAppTitle();
@@ -151,7 +151,7 @@ export function Tenant({additionalTenantProps}: TenantProps) {
                         database={database}
                         path={databaseName}
                         databaseFullPath={databaseName}
-                        databasePagesDisplay="diagnostics"
+                        databasePagesDisplay="database"
                         additionalTenantProps={additionalTenantProps}
                     />
                 </div>

@@ -88,10 +88,10 @@
             }
         }
 
-        &_diagnostics {
+        &_database {
             border-radius: var(--ydb-nav-bg-radius) var(--ydb-nav-bg-radius) 0 0;
         }
-        &_diagnostics#{&}_with-animation {
+        &_database#{&}_with-animation {
             margin-top: var(
                 --ydb-nav-animation-size
             ); /* add space at the top for proper shadow animation */
@@ -101,7 +101,7 @@
             }
         }
 
-        &_schema#{&}_with-animation {
+        &_diagnostics#{&}_with-animation {
             &::before {
                 top: calc(
                     -1 * var(--ydb-nav-animation-size)
@@ -172,12 +172,11 @@
                 background: var(--ydb-nav-button-bg);
             }
         }
-
-        &_diagnostics {
+        &_database {
             --ydb-nav-button-bg: var(--ydb-nav-blue);
         }
 
-        &_schema {
+        &_diagnostics {
             --ydb-nav-button-bg: var(--ydb-nav-orange);
         }
 
