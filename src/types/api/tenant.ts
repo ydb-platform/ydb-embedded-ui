@@ -64,6 +64,7 @@ export interface TTenant {
 
     StorageUsage?: TStorageUsage[];
     QuotaUsage?: TStorageUsage[];
+    TablesStorage?: TStorageUsage[];
 
     /** value is float */
     NetworkUtilization?: number;

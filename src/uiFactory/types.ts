@@ -9,9 +9,8 @@ import type {
 import type {ClusterInfo} from '../store/reducers/cluster/cluster';
 import type {IssuesTree} from '../store/reducers/healthcheckInfo/types';
 import type {PreparedTenant} from '../store/reducers/tenants/types';
-import type {AdditionalTenantsProps, ClusterLink, DatabaseLink} from '../types/additionalProps';
+import type {ClusterLink, DatabaseLink} from '../types/additionalProps';
 import type {MetaBaseClusterInfo} from '../types/api/meta';
-import type {EPathSubType, EPathType} from '../types/api/schema/schema';
 import type {ETenantType} from '../types/api/tenant';
 import type {GetLogsLink} from '../utils/logs';
 import type {GetMonitoringClusterLink, GetMonitoringLink} from '../utils/monitoring';
@@ -132,15 +131,10 @@ export type RenderEvents = (props: {
 }) => React.ReactNode;
 
 export type RenderMonitoring = (props: {
-    type?: EPathType;
-    subType?: EPathSubType;
     database: string;
-    path: string;
     databaseFullPath?: string;
-    useMetaProxy?: boolean;
-    additionalTenantProps?: AdditionalTenantsProps;
-    scrollContainerRef: React.RefObject<HTMLDivElement>;
 }) => React.ReactNode;
+
 export interface UiMetricaGoals {
     runQuery?: string;
     stopQuery?: string;

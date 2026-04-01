@@ -7,8 +7,7 @@ import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueriesActivityBar} from '../../../../components/QueriesActivityBar/QueriesActivityBar';
 import {ServerlessDBLabel} from '../../../../components/ServerlessDBLabel/ServerlessDBLabel';
-import {useClusterBaseInfo, useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
-import {overviewApi} from '../../../../store/reducers/overview/overview';
+import {useClusterBaseInfo} from '../../../../store/reducers/cluster/cluster';
 import {
     TENANT_DIAGNOSTICS_TABS_IDS,
     TENANT_METRICS_TABS_IDS,
@@ -52,7 +51,6 @@ export function TenantOverview({
     const {metricsTab} = useTypedSelector((state) => state.tenant);
     const [autoRefreshInterval] = useAutoRefreshInterval();
     const clusterName = useClusterNameFromQuery();
-    const useMetaProxy = useClusterWithProxy();
     const dispatch = useTypedDispatch();
     const isV2NavigationEnabled = useNavigationV2Enabled();
 
@@ -77,38 +75,6 @@ export function TenantOverview({
     const controlPlaneNodesCount = ControlPlane?.scale_policy?.fixed_scale?.size;
 
     const tenantType = mapDatabaseTypeToDBName(Type);
-    // FIXME: remove after correct data is added to tenantInfo
-    const {currentData: tenantSchemaData} = overviewApi.useGetOverviewQuery(
-        {
-            path: databaseFullPath,
-            database,
-            databaseFullPath,
-            useMetaProxy,
-        },
-        {
-            pollingInterval: autoRefreshInterval,
-        },
-    );
-    const {Tables, Topics} =
-        tenantSchemaData?.PathDescription?.DomainDescription?.DiskSpaceUsage || {};
-
-    const usedTabletStorage = [Tables?.TotalSize, Topics?.DataSize].reduce((sum, current) => {
-        if (current) {
-            return sum + Number(current);
-        }
-
-        return sum;
-    }, 0);
-
-    const tenantData = {
-        ...tenant,
-        Metrics: {
-            ...tenant?.Metrics,
-            // Replace incorrect tenant metric with correct value
-            Storage: String(usedTabletStorage),
-        },
-    };
-    // === === ===
 
     const {
         blobStorage,
@@ -122,7 +88,7 @@ export function TenantOverview({
         tabletStorageStats,
         networkUtilization,
         networkThroughput,
-    } = calculateTenantMetrics(tenantData);
+    } = calculateTenantMetrics(tenant);
 
     const storageMetrics = {
         blobStorageUsed: blobStorage,
@@ -170,9 +136,9 @@ export function TenantOverview({
                 return (
                     <TenantMemory
                         database={database}
-                        memoryUsed={tenantData.MemoryUsed}
-                        memoryLimit={tenantData.MemoryLimit}
-                        memoryStats={tenantData.MemoryStats}
+                        memoryUsed={tenant?.MemoryUsed}
+                        memoryLimit={tenant?.MemoryLimit}
+                        memoryStats={tenant?.MemoryStats}
                     />
                 );
             }
@@ -252,9 +218,7 @@ export function TenantOverview({
                             networkUtilization={networkUtilization}
                             networkThroughput={networkThroughput}
                             storageGroupsCount={
-                                tenantData.StorageGroups
-                                    ? Number(tenantData.StorageGroups)
-                                    : undefined
+                                tenant?.StorageGroups ? Number(tenant?.StorageGroups) : undefined
                             }
                             controlPlaneNodesCount={controlPlaneNodesCount}
                             coresTotal={CoresTotal}

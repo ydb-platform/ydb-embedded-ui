@@ -88,11 +88,19 @@ interface QueryEditorProps {
     changeUserInput: (arg: {input: string}) => void;
     theme: string;
     queriesHistory: ReturnType<typeof useQueriesHistory>;
+    type: EPathType | undefined;
+    subType: EPathSubType | undefined;
 }
 
-export default function QueryEditor({theme, changeUserInput, queriesHistory}: QueryEditorProps) {
+export default function QueryEditor({
+    theme,
+    changeUserInput,
+    queriesHistory,
+    type,
+    subType,
+}: QueryEditorProps) {
     const dispatch = useTypedDispatch();
-    const {database, path, type, subType, databaseFullPath} = useCurrentSchema();
+    const {database, path, databaseFullPath} = useCurrentSchema();
     const savedPath = useTypedSelector(selectTenantPath);
     const activeTabId = useTypedSelector(selectActiveTabId);
     const result = useTypedSelector(selectResult);

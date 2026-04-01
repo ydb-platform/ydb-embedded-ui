@@ -62,10 +62,10 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
         MemoryLimit,
         StorageAllocatedLimit,
         PoolStats,
-        Metrics = {},
         DatabaseQuotas = {},
         StorageUsage,
         QuotaUsage,
+        TablesStorage,
         NetworkUtilization,
         NetworkWriteThroughput,
     } = tenant;
@@ -74,7 +74,6 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
 
     const memory = Number(MemoryUsed) || 0;
     const blobStorage = Number(StorageAllocatedSize) || 0;
-    const tabletStorage = Number(Metrics.Storage) || 0;
 
     const memoryLimit = isNumeric(MemoryLimit) ? Number(MemoryLimit) : undefined;
     const blobStorageLimit = isNumeric(StorageAllocatedLimit)
@@ -85,6 +84,12 @@ export const calculateTenantMetrics = (tenant: TTenant = {}) => {
         : undefined;
 
     const poolsStats = calculatePoolsStats(PoolStats);
+
+    const tabletStorage =
+        TablesStorage?.reduce((sum, storageType) => {
+            const size = Number(storageType.Size) || 0;
+            return sum + size;
+        }, 0) ?? 0;
 
     let blobStorageStats: TenantStorageStats[];
     let tabletStorageStats: TenantStorageStats[] | undefined;

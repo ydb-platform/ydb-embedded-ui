@@ -64,14 +64,16 @@ interface ObjectSummaryProps {
     onCollapseSummary: VoidFunction;
     onExpandSummary: VoidFunction;
     isCollapsed: boolean;
+    type: EPathType | undefined;
 }
 
 export function ObjectSummary({
     onCollapseSummary,
     onExpandSummary,
     isCollapsed,
+    type,
 }: ObjectSummaryProps) {
-    const {path, database, type, databaseFullPath} = useCurrentSchema();
+    const {path, database, databaseFullPath} = useCurrentSchema();
     const useMetaProxy = useClusterWithProxy();
     const dispatch = useTypedDispatch();
     const {handleSchemaChange} = useTenantQueryParams();

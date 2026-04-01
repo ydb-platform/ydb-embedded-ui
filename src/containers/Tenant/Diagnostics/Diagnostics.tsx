@@ -79,7 +79,6 @@ function Diagnostics({
         return renderDiagnosticsTabContent({
             activeTabId: activeTab.id,
             type,
-            subType,
             database,
             path,
             databaseFullPath,
