@@ -32,9 +32,9 @@ export function useDiagnosticsPages({
     subType,
     databasePagesDisplay,
 }: UseDiagnosticsPagesParams): Page[] {
-    const {controlPlane, databaseType} = useTenantBaseInfo(
-        isDatabaseEntityType(type) ? database : '',
-    );
+    const isDatabase = isDatabaseEntityType(type) || path === databaseFullPath;
+
+    const {controlPlane, databaseType} = useTenantBaseInfo(isDatabase ? database : '');
     const {monitoring: clusterMonitoring} = useClusterBaseInfo();
 
     const hasConfigs = useConfigAvailable();
@@ -44,7 +44,7 @@ export function useDiagnosticsPages({
     return React.useMemo(() => {
         return getPagesByType(type, subType, {
             hasTopicData,
-            isTopLevel: path === databaseFullPath,
+            isDatabase,
             hasBackups: typeof uiFactory.renderBackups === 'function' && Boolean(controlPlane),
             hasConfigs: isViewerUser && hasConfigs,
             hasAccess: uiFactory.hasAccess,

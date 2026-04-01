@@ -10,7 +10,6 @@ import {EPathSubType, EPathType} from '../../../types/api/schema';
 import type {ETenantType} from '../../../types/api/tenant';
 import type {TenantQuery} from '../TenantPages';
 import {TenantTabsGroups} from '../TenantPages';
-import {isDatabaseEntityType} from '../utils/schema';
 
 import i18n from './i18n';
 
@@ -30,7 +29,7 @@ export type DatabasePagesDisplay = 'all' | 'database' | 'diagnostics';
 
 interface GetPagesOptions {
     hasTopicData?: boolean;
-    isTopLevel?: boolean;
+    isDatabase?: boolean;
     hasBackups?: boolean;
     hasConfigs?: boolean;
     hasAccess?: boolean;
@@ -292,8 +291,7 @@ export const getPagesByType = (
     options?: GetPagesOptions,
 ) => {
     const base = computeInitialPages(type, subType);
-    const dbContext = isDatabaseEntityType(type) || options?.isTopLevel;
-    const seeded = dbContext
+    const seeded = options?.isDatabase
         ? getDatabasePages(options?.databaseType, options?.databasePagesDisplay)
         : base;
 
