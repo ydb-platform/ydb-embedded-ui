@@ -116,7 +116,9 @@ export function VDiskPage() {
         StringifiedId,
     } = vDiskData || {};
 
-    const {GroupID} = VDiskId || (!loading && getVDiskIdFromString(vDiskIdParam)) || {};
+    const resolvedVDiskId =
+        VDiskId || (!loading && getVDiskIdFromString(vDiskIdParam)) || undefined;
+    const {GroupID} = resolvedVDiskId || {};
 
     const vDiskId = vDiskData?.StringifiedId || (loading ? undefined : vDiskIdParam);
 
@@ -190,22 +192,21 @@ export function VDiskPage() {
             api.util.invalidateTags([
                 {
                     type: 'VDiskData',
-                    id: StringifiedId?.toString(),
+                    id: vDiskId?.toString(),
                 },
                 'StorageData',
             ]),
         );
-    }, [dispatch, StringifiedId]);
+    }, [dispatch, vDiskId]);
 
     const renderControls = () => {
-        const isVDiskParamsDefined = isAllVdiskParamsDefined(VDiskId);
-        if (!isVDiskParamsDefined) {
+        if (!isAllVdiskParamsDefined(resolvedVDiskId)) {
             return null;
         }
         return (
             <div className={vDiskPageCn('controls')}>
                 <EvictVDiskButton
-                    vDiskId={VDiskId}
+                    vDiskId={resolvedVDiskId}
                     donorMode={vDiskData?.DonorMode}
                     onSuccess={handleAfterEvictVDisk}
                 />

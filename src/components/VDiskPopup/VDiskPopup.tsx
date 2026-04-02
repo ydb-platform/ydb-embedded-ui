@@ -10,7 +10,7 @@ import {EFlag} from '../../types/api/enums';
 import {EVDiskState} from '../../types/api/vdisk';
 import {cn} from '../../utils/cn';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
-import {formatDurationSeconds} from '../../utils/dataFormatters/dataFormatters';
+import {formatDurationSeconds, stringifyVdiskId} from '../../utils/dataFormatters/dataFormatters';
 import {createVDiskDeveloperUILink, useHasDeveloperUi} from '../../utils/developerUI/developerUI';
 import {getStateSeverity} from '../../utils/disks/calculateVDiskSeverity';
 import {
@@ -423,15 +423,25 @@ export const VDiskPopup = ({data}: VDiskPopupProps) => {
 
     const database = useDatabaseFromQuery();
 
-    const handleAfterEvictVDisk = React.useCallback(() => {
-        dispatch(api.util.invalidateTags(['TableData']));
-    }, [dispatch]);
-
     const vdiskInfo = React.useMemo(
         () =>
             isFullData ? prepareVDiskData(data, getVDiskLink) : prepareUnavailableVDiskData(data),
         [data, isFullData, getVDiskLink],
     );
+
+    const handleAfterEvictVDisk = React.useCallback(() => {
+        const vDiskId = 'VDiskId' in data ? stringifyVdiskId(data.VDiskId) : undefined;
+        dispatch(
+            api.util.invalidateTags([
+                'TableData',
+                'StorageData',
+                {
+                    type: 'VDiskData',
+                    id: vDiskId,
+                },
+            ]),
+        );
+    }, [dispatch, data]);
 
     const vdiskHeaderLabels: YDBDefinitionListHeaderLabel[] = React.useMemo(
         () => (isFullData ? prepareHeaderLabels(data) : []),
