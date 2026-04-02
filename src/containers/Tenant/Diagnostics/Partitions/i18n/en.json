@@ -22,7 +22,7 @@
   "action_to-end": "To the end",
   "action_skip-message": "Skip 1 message",
   "confirm_skip-message": "Are you sure you want to skip 1 message moving the partition \"{{partitionId}}\" offset forward for the consumer \"{{consumer}}\"?",
-  "action_specify-partition": "Specify partition...",
+  "action_specify-offset": "Specify offset...",
   "title_specify-offset": "Specify Committed Offset",
   "confirm_specify-offset": "Enter the offset value for the partition \"{{partitionId}}\" for the consumer \"{{consumer}}\":",
   "context_offset": "Offset:",

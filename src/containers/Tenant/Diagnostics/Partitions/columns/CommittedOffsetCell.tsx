@@ -146,7 +146,7 @@ export function CommittedOffsetCell({
                             });
                         }
                     },
-                    text: i18n('action_specify-partition'),
+                    text: i18n('action_specify-offset'),
                     iconStart: <Icon data={PencilToLine} size={14} />,
                 },
             ],
