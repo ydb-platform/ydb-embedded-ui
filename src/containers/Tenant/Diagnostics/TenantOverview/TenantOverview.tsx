@@ -209,7 +209,6 @@ export function TenantOverview({
     return (
         <LoaderWrapper loading={tenantLoading}>
             {error ? <ResponseError error={error} /> : null}
-
             <div className={b()}>
                 <div className={b('info')}>
                     {renderOverviewHead()}
