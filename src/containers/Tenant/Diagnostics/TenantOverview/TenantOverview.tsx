@@ -68,14 +68,7 @@ export function TenantOverview({
         {pollingInterval: autoRefreshInterval},
     );
 
-    const [initialLoading, setInitialLoading] = React.useState(true);
-    React.useEffect(() => {
-        if (!isFetching) {
-            setInitialLoading(false);
-        }
-    }, [isFetching]);
-
-    const tenantLoading = initialLoading;
+    const tenantLoading = isFetching && tenant === undefined && !error;
     const {Name, Type, Overall, ControlPlane, CoresTotal} = tenant || {};
     const isServerless = Type === 'Serverless';
     const activeMetricsTab =
@@ -215,34 +208,39 @@ export function TenantOverview({
 
     return (
         <LoaderWrapper loading={tenantLoading}>
-            {error ? <ResponseError error={error} /> : null}
-            <div className={b()}>
-                <div className={b('info')}>
-                    {renderOverviewHead()}
-                    <Flex direction="column" gap={4}>
-                        {!isServerless && !isV2NavigationEnabled && (
-                            <HealthcheckPreview database={database} />
-                        )}
-                        <QueriesActivityBar database={database} />
-                        <MetricsTabs
-                            poolsCpuStats={poolsStats}
-                            memoryStats={memoryStats}
-                            blobStorageStats={blobStorageStats}
-                            tabletStorageStats={tabletStorageStats}
-                            networkUtilization={networkUtilization}
-                            networkThroughput={networkThroughput}
-                            storageGroupsCount={
-                                tenant?.StorageGroups ? Number(tenant?.StorageGroups) : undefined
-                            }
-                            controlPlaneNodesCount={controlPlaneNodesCount}
-                            coresTotal={CoresTotal}
-                            databaseType={Type}
-                            activeTab={activeMetricsTab}
-                        />
-                    </Flex>
+            {error ? (
+                <ResponseError error={error} />
+            ) : (
+                <div className={b()}>
+                    <div className={b('info')}>
+                        {renderOverviewHead()}
+                        <Flex direction="column" gap={4}>
+                            {!isServerless && !isV2NavigationEnabled && (
+                                <HealthcheckPreview database={database} />
+                            )}
+                            <QueriesActivityBar database={database} />
+                            <MetricsTabs
+                                poolsCpuStats={poolsStats}
+                                memoryStats={memoryStats}
+                                blobStorageStats={blobStorageStats}
+                                tabletStorageStats={tabletStorageStats}
+                                networkUtilization={networkUtilization}
+                                networkThroughput={networkThroughput}
+                                storageGroupsCount={
+                                    tenant?.StorageGroups
+                                        ? Number(tenant?.StorageGroups)
+                                        : undefined
+                                }
+                                controlPlaneNodesCount={controlPlaneNodesCount}
+                                coresTotal={CoresTotal}
+                                databaseType={Type}
+                                activeTab={activeMetricsTab}
+                            />
+                        </Flex>
+                    </div>
+                    <div className={b('tab-content')}>{renderTabContent()}</div>
                 </div>
-                <div className={b('tab-content')}>{renderTabContent()}</div>
-            </div>
+            )}
         </LoaderWrapper>
     );
 }
