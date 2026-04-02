@@ -2,6 +2,7 @@ import React from 'react';
 
 import DataTable from '@gravity-ui/react-data-table';
 import type {Column, Settings} from '@gravity-ui/react-data-table';
+import {ClipboardButton} from '@gravity-ui/uikit';
 
 import type {ColumnType, KeyValueRow} from '../../types/api/query';
 import {cn} from '../../utils/cn';
@@ -28,6 +29,25 @@ export const b = cn('ydb-query-result-table');
 
 const WIDTH_PREDICTION_ROWS_COUNT = 100;
 
+//helper function to convert a row to TSV format for copying to clipboard
+const rowToTsv = (row: KeyValueRow) =>
+    Object.values(row)
+        .map((v) => (typeof v === 'object' ? JSON.stringify(v) : String(v)))
+        .join('\t');
+
+const copyColumn: Column<KeyValueRow> = {
+    name: '__copy_action__',
+    header: '',
+    width: 40,
+    render: ({row}) => (
+        <ClipboardButton
+            text={rowToTsv(row)}
+            view="flat-secondary"
+            size="s"
+            title={i18n('action.copy-row')}
+        />
+    ),
+};
 const prepareTypedColumns = (columns: ColumnType[], data: KeyValueRow[] | undefined) => {
     if (!columns.length) {
         return [];
@@ -35,7 +55,7 @@ const prepareTypedColumns = (columns: ColumnType[], data: KeyValueRow[] | undefi
 
     const dataSlice = data?.slice(0, WIDTH_PREDICTION_ROWS_COUNT);
 
-    return columns.map(({name, type}) => {
+    const dataColumns = columns.map(({name, type}) => {
         const columnType = getColumnType(type);
 
         const column: Column<KeyValueRow> = {
@@ -43,17 +63,19 @@ const prepareTypedColumns = (columns: ColumnType[], data: KeyValueRow[] | undefi
             width: getColumnWidth({data: dataSlice, name}),
             align: columnType === 'number' ? DataTable.RIGHT : DataTable.LEFT,
             render: ({row}) => {
-                const data = row[name];
+                const rowData = row[name];
                 const normalizedData =
-                    columnType === 'binary-string' && typeof data === 'string'
-                        ? JSON.stringify(data).slice(1, -1)
-                        : String(data);
+                    columnType === 'binary-string' && typeof rowData === 'string'
+                        ? JSON.stringify(rowData).slice(1, -1)
+                        : String(rowData);
                 return <Cell value={normalizedData} />;
             },
         };
 
         return column;
     });
+
+    return [...dataColumns, copyColumn];
 };
 
 const prepareGenericColumns = (data: KeyValueRow[] | undefined) => {
@@ -63,7 +85,7 @@ const prepareGenericColumns = (data: KeyValueRow[] | undefined) => {
 
     const dataSlice = data?.slice(0, WIDTH_PREDICTION_ROWS_COUNT);
 
-    return Object.keys(data[0]).map((name) => {
+    const dataColumns = Object.keys(data[0]).map((name) => {
         const column: Column<KeyValueRow> = {
             name,
             width: getColumnWidth({data: dataSlice, name}),
@@ -73,6 +95,7 @@ const prepareGenericColumns = (data: KeyValueRow[] | undefined) => {
 
         return column;
     });
+    return [...dataColumns, copyColumn];
 };
 
 const getRowIndex = (_: unknown, index: number) => index;
