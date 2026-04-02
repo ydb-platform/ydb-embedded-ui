@@ -2,7 +2,6 @@ import React from 'react';
 
 import {Alert, Card, Flex, HelpMark, Label, Text} from '@gravity-ui/uikit';
 
-import {InfoViewerTitle} from '../../../../../components/InfoViewerTitle/InfoViewerTitle';
 import {SegmentedProgress} from '../../../../../components/SegmentedProgress/SegmentedProgress';
 import type {YDBDefinitionListItem} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
 import {YDBDefinitionList} from '../../../../../components/YDBDefinitionList/YDBDefinitionList';
@@ -33,9 +32,9 @@ export function DatabaseInfo({data, path}: DBInfoProps) {
     return (
         <Flex direction={'column'} className={b('wrapper')}>
             <YDBDefinitionList items={items} />
-            <InfoViewerTitle className={b('title')}>
+            <Text as="div" variant="subheader-2" className={b('title')}>
                 {dbInfoKeyset('title_limits-and-usage')}
-            </InfoViewerTitle>
+            </Text>
             <Flex gap={3} direction={'column'}>
                 <DBInfoStatsCard
                     value={PathsInside}
