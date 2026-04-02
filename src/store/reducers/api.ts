@@ -17,6 +17,7 @@ export const api = createApi({
         'PreviewData',
         'SchemaTree',
         'StorageData',
+        'TableData',
         'Tablet',
         'UserData',
         'VDiskData',

@@ -2,23 +2,8 @@
 
 .ydb-definition-list {
     $block: &;
-    @include mixins.flex-container();
-
-    &__footer {
-        margin-top: var(--g-spacing-3);
-    }
 
     &_compact {
-        #{$block}__title {
-            margin: 0;
-
-            font-weight: 500;
-        }
-
-        #{$block}__header {
-            margin-bottom: var(--g-spacing-3);
-        }
-
         #{$block}__properties-list {
             --g-definition-list-item-gap: var(--g-spacing-2);
         }

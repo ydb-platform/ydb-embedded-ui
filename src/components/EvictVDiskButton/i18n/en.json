@@ -1,0 +1,8 @@
+{
+  "action_evict": "Evict VDisk",
+  "action_force-evict": "Evict anyway",
+  "title_evict-dialog": "Evict VDisk",
+  "confirm_evict": "VDisk will be evicted. Do you want to proceed?",
+  "alert_not-allowed": "You don't have enough rights to evict VDisk",
+  "alert_donor-mode-impossible": "Evicting a donor VDisk is not possible"
+}

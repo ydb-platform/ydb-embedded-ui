@@ -60,7 +60,7 @@ function endpoints<T, F>(build: EndpointBuilder<BaseQueryFn, string, string>) {
                     return {error: error};
                 }
             },
-            providesTags: ['All'],
+            providesTags: ['All', 'TableData'],
         }),
     };
 }

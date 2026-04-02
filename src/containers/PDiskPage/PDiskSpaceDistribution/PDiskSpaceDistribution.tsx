@@ -102,13 +102,7 @@ function Slot<T extends SlotItemType>({item, nodeId, getVDiskPagePath}: SlotProp
 
             return (
                 <HoverPopup
-                    renderPopupContent={() => (
-                        <VDiskInfo
-                            data={item.SlotData}
-                            withTitle
-                            titleClassName={b('info-title')}
-                        />
-                    )}
+                    renderPopupContent={() => <VDiskInfo data={item.SlotData} withTitle />}
                     contentClassName={b('vdisk-popup')}
                     placement={['right', 'top']}
                 >
@@ -244,13 +238,7 @@ function LogInfo({data}: LogInfoProps) {
         });
     }
 
-    return (
-        <YDBDefinitionList
-            titleClassname={b('info-title')}
-            title={pDiskPageKeyset('log')}
-            items={items}
-        />
-    );
+    return <YDBDefinitionList title={pDiskPageKeyset('log')} items={items} />;
 }
 
 interface EmptySlotInfoProps {
@@ -267,11 +255,5 @@ function EmptySlotInfo({data}: EmptySlotInfoProps) {
         },
     ];
 
-    return (
-        <YDBDefinitionList
-            titleClassname={b('info-title')}
-            title={pDiskPageKeyset('empty-slot')}
-            items={items}
-        />
-    );
+    return <YDBDefinitionList title={pDiskPageKeyset('empty-slot')} items={items} />;
 }
