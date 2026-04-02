@@ -48,7 +48,17 @@ export function useTopicProbeQuery({
         return params;
     }, [selectedPartition, selectedOffset, startTimestamp, database, path]);
 
+    const isProbeSkipped = queryParams === skipToken;
+
     const {currentData, error, isFetching} = topicApi.useGetTopicDataQuery(queryParams);
+
+    // Reset emptyData when the probe query is skipped (e.g. filters cleared via "show all")
+    // to prevent stale isEmpty flag from blocking the table fetch
+    React.useEffect(() => {
+        if (isProbeSkipped) {
+            setEmptyData(false);
+        }
+    }, [isProbeSkipped]);
 
     React.useEffect(() => {
         // values should be recalculated only when data is fetched
