@@ -31,7 +31,7 @@ export const chartApi = api.injectEndpoints({
                 }
             },
             providesTags: ['All'],
-            keepUnusedDataFor: 0,
+            keepUnusedDataFor: 5,
         }),
     }),
     overrideExisting: 'throw',
