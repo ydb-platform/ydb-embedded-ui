@@ -30,6 +30,8 @@ import {
 } from '../utils/constants';
 import type {PreparedPartitionDataWithHosts} from '../utils/types';
 
+import {CommittedOffsetCell} from './CommittedOffsetCell';
+
 import './Columns.scss';
 
 const b = cn('ydb-diagnostics-partitions-columns');
@@ -149,7 +151,6 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
             />
         ),
         sortAccessor: (row) => isNumeric(row.startOffset) && Number(row.startOffset),
-        align: DataTable.RIGHT,
         render: ({row}) => row.startOffset,
     },
     {
@@ -160,7 +161,6 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
             />
         ),
         sortAccessor: (row) => isNumeric(row.endOffset) && Number(row.endOffset),
-        align: DataTable.RIGHT,
         render: ({row}) => row.endOffset,
     },
     {
@@ -171,8 +171,15 @@ export const allColumns: Column<PreparedPartitionDataWithHosts>[] = [
             />
         ),
         sortAccessor: (row) => isNumeric(row.commitedOffset) && Number(row.commitedOffset),
-        align: DataTable.RIGHT,
-        render: ({row}) => row.commitedOffset,
+        render: ({row}) => (
+            <CommittedOffsetCell
+                value={row.commitedOffset}
+                startOffset={row.startOffset}
+                endOffset={row.endOffset}
+                partitionId={row.partitionId}
+                readSessionId={row.readSessionId}
+            />
+        ),
     },
     {
         name: PARTITIONS_COLUMNS_IDS.READ_SESSION_ID,

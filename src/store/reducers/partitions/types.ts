@@ -28,3 +28,12 @@ export interface PreparedPartitionData {
     partitionNodeId: number;
     connectionNodeId?: number;
 }
+
+export interface CommitOffsetParams {
+    database: string;
+    path: string;
+    consumer: string;
+    partitionId: number;
+    offset: number;
+    readSessionId?: string;
+}

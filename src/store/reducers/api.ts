@@ -18,6 +18,7 @@ export const api = createApi({
         'SchemaTree',
         'StorageData',
         'TableData',
+        'Partitions',
         'Tablet',
         'UserData',
         'VDiskData',

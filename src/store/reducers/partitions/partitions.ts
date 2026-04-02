@@ -3,6 +3,7 @@ import type {PayloadAction} from '@reduxjs/toolkit';
 
 import {api} from '../api';
 
+import type {CommitOffsetParams} from './types';
 import {prepareConsumerPartitions, prepareTopicPartitions} from './utils';
 
 const initialState: {
@@ -67,7 +68,31 @@ export const partitionsApi = api.injectEndpoints({
                     return {error};
                 }
             },
-            providesTags: ['All'],
+            providesTags: ['All', 'Partitions'],
+        }),
+        commitOffset: build.mutation({
+            queryFn: async (
+                {database, path, consumer, partitionId, offset, readSessionId}: CommitOffsetParams,
+                {signal},
+            ) => {
+                try {
+                    const data = await window.api.viewer.commitOffset(
+                        {
+                            database,
+                            path,
+                            consumer,
+                            partitionId,
+                            offset,
+                            readSessionId,
+                        },
+                        {signal},
+                    );
+                    return {data};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            invalidatesTags: ['Partitions'],
         }),
     }),
     overrideExisting: 'throw',
