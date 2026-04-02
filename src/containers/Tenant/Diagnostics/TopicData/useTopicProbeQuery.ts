@@ -48,15 +48,31 @@ export function useTopicProbeQuery({
         return params;
     }, [selectedPartition, selectedOffset, startTimestamp, database, path]);
 
+    const isProbeSkipped = queryParams === skipToken;
+
     const {currentData, error, isFetching} = topicApi.useGetTopicDataQuery(queryParams);
+
+    // Reset emptyData when the probe query is skipped (e.g. filters cleared via "show all")
+    // to prevent stale isEmpty flag from blocking the table fetch
+    React.useEffect(() => {
+        if (isProbeSkipped) {
+            setEmptyData(false);
+        }
+    }, [isProbeSkipped]);
 
     React.useEffect(() => {
         // values should be recalculated only when data is fetched
         if (isFetching || (!currentData && !error)) {
             return;
         }
+        // When there's an error (e.g. 403), don't mark as empty —
+        // let the table fetch data itself so it can display the error properly
+        if (error) {
+            setEmptyData(false);
+            return;
+        }
         const hasMessages = Boolean(currentData?.Messages?.length);
-        setEmptyData(!hasMessages || Boolean(error));
+        setEmptyData(!hasMessages);
         if (currentData) {
             setBoundOffsets({
                 startOffset: safeParseNumber(currentData.StartOffset),
