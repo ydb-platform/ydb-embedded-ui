@@ -137,10 +137,10 @@ const RUNNING_QUERIES_COLUMNS_TO_SORT_FIELDS: Record<QueriesColumnId, string | u
     QueryStartAt: 'QueryStartAt',
     ApplicationName: 'ApplicationName',
     RequestUnits: undefined,
-    WmPoolId: 'WmPoolId',
-    WmState: 'WmState',
-    WmEnterTime: 'WmEnterTime',
-    WmExitTime: 'WmExitTime',
+    WmPoolId: undefined,
+    WmState: undefined,
+    WmEnterTime: undefined,
+    WmExitTime: undefined,
 } as const;
 export function getTopQueriesColumnSortField(columnId?: string) {
     return TOP_QUERIES_COLUMNS_TO_SORT_FIELDS[columnId as QueriesColumnId];

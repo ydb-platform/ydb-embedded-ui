@@ -94,6 +94,14 @@ AND QueryStartAt is not null ${orderBy}
 LIMIT ${limit || 100}`;
 }
 
+function getRunningQueriesOverviewText() {
+    return `${QUERY_TECHNICAL_MARK}
+SELECT UserSID, ApplicationName
+FROM \`.sys/query_sessions\`
+WHERE Query NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
+AND QueryStartAt is not null`;
+}
+
 interface QueriesRequestParams {
     database: string;
     filters?: TopQueriesFilters;
@@ -176,7 +184,8 @@ export const topQueriesApi = api.injectEndpoints({
                     const parsed = parseQueryAPIResponse(response);
 
                     // SELECT * returns the original column name 'Query',
-                    // but the UI uses 'QueryText' — map it immutably for consistency
+                    // but the UI uses 'QueryText' — map it immutably for consistency.
+                    // Drop the original 'Query' key to avoid carrying duplicate data.
                     const data = parsed.resultSets?.[0]?.result
                         ? {
                               ...parsed,
@@ -184,18 +193,50 @@ export const topQueriesApi = api.injectEndpoints({
                                   index === 0 && resultSet.result
                                       ? {
                                             ...resultSet,
-                                            result: resultSet.result.map((row) =>
-                                                row.Query !== undefined &&
-                                                row.QueryText === undefined
-                                                    ? {...row, QueryText: row.Query}
-                                                    : row,
-                                            ),
+                                            result: resultSet.result.map((row) => {
+                                                if (
+                                                    row.Query !== undefined &&
+                                                    row.QueryText === undefined
+                                                ) {
+                                                    const {Query, ...rest} = row;
+                                                    return {...rest, QueryText: Query};
+                                                }
+                                                return row;
+                                            }),
                                         }
                                       : resultSet,
                               ),
                           }
                         : parsed;
 
+                    return {data};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            forceRefetch() {
+                return true;
+            },
+            providesTags: ['All'],
+        }),
+        getRunningQueriesOverview: build.query({
+            queryFn: async ({database}: {database: string}, {signal}) => {
+                try {
+                    const response = await window.api.viewer.sendQuery(
+                        {
+                            query: getRunningQueriesOverviewText(),
+                            database,
+                            action: 'execute-query',
+                            internal_call: true,
+                        },
+                        {signal, withRetries: true},
+                    );
+
+                    if (isQueryErrorResponse(response)) {
+                        throw response;
+                    }
+
+                    const data = parseQueryAPIResponse(response);
                     return {data};
                 } catch (error) {
                     return {error};

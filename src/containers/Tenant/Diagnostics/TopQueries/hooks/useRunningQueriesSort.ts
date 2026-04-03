@@ -14,10 +14,6 @@ export const runningQueriesSortColumnSchema = z
         QUERIES_COLUMNS_IDS.QueryStartAt,
         QUERIES_COLUMNS_IDS.UserSID,
         QUERIES_COLUMNS_IDS.ApplicationName,
-        QUERIES_COLUMNS_IDS.WmPoolId,
-        QUERIES_COLUMNS_IDS.WmState,
-        QUERIES_COLUMNS_IDS.WmEnterTime,
-        QUERIES_COLUMNS_IDS.WmExitTime,
     ])
     .catch(QUERIES_COLUMNS_IDS.QueryStartAt);
 

@@ -32,10 +32,9 @@ export function useQueriesActivityData(database: string): UseQueriesActivityData
     const graphShardExists = useTypedSelector((state) => selectGraphShardExists(state, database));
     const skipCharts = graphShardExists === false;
 
-    const {data: runningQueriesData} = topQueriesApi.useGetRunningQueriesQuery(
+    const {data: runningQueriesData} = topQueriesApi.useGetRunningQueriesOverviewQuery(
         {
             database,
-            filters: {},
         },
         {pollingInterval: shouldRefresh},
     );
