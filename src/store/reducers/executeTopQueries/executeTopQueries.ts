@@ -10,7 +10,7 @@ import {api} from '../api';
 
 import {TOP_QUERIES_TABLES} from './constants';
 import type {TimeFrame, TopQueriesFilters} from './types';
-import {getFiltersConditions} from './utils';
+import {getFiltersConditions, normalizeQueryResult} from './utils';
 
 const initialState: TopQueriesFilters = {};
 
@@ -183,33 +183,7 @@ export const topQueriesApi = api.injectEndpoints({
 
                     const parsed = parseQueryAPIResponse(response);
 
-                    // SELECT * returns the original column name 'Query',
-                    // but the UI uses 'QueryText' — map it immutably for consistency.
-                    // Drop the original 'Query' key to avoid carrying duplicate data.
-                    const data = parsed.resultSets?.[0]?.result
-                        ? {
-                              ...parsed,
-                              resultSets: parsed.resultSets.map((resultSet, index) =>
-                                  index === 0 && resultSet.result
-                                      ? {
-                                            ...resultSet,
-                                            result: resultSet.result.map((row) => {
-                                                if (
-                                                    row.Query !== undefined &&
-                                                    row.QueryText === undefined
-                                                ) {
-                                                    const {Query, ...rest} = row;
-                                                    return {...rest, QueryText: Query};
-                                                }
-                                                return row;
-                                            }),
-                                        }
-                                      : resultSet,
-                              ),
-                          }
-                        : parsed;
-
-                    return {data};
+                    return {data: normalizeQueryResult(parsed)};
                 } catch (error) {
                     return {error};
                 }
