@@ -118,7 +118,7 @@ export function CommittedOffsetCell({
             [
                 {
                     action: () => {
-                        if (selectedConsumer) {
+                        if (selectedConsumer && value !== undefined) {
                             showMoveOffsetConfirmation({
                                 confirmMessage: i18n('confirm_skip-message', {
                                     partitionId: String(partitionId),
@@ -133,6 +133,7 @@ export function CommittedOffsetCell({
                     },
                     text: i18n('action_skip-message'),
                     iconStart: <Icon data={ChevronsRight} size={14} />,
+                    disabled: value === undefined,
                 },
             ],
             [
