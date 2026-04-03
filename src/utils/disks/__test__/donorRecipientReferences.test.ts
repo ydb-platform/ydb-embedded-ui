@@ -270,4 +270,36 @@ describe('setDonorRecipientReferences', () => {
         expect(acceptor.Donors?.[0].StringifiedId).toBe('donor-1-real');
         expect(acceptor.Donors?.[1].StringifiedId).toBe('donor-2-real');
     });
+
+    test('Should skip donor processing when acceptor VDisk is already Replicated', () => {
+        const donor = makeVDisk({
+            NodeId: 10,
+            PDiskId: 20,
+            VDiskSlotId: 30,
+            StringifiedId: 'donor-real-id',
+        });
+
+        const donorRef = makeVDisk({
+            NodeId: 10,
+            PDiskId: 20,
+            VDiskSlotId: 30,
+            StringifiedId: 'donor-local-id',
+        });
+
+        const acceptor = makeVDisk({
+            NodeId: 1,
+            PDiskId: 2,
+            VDiskSlotId: 3,
+            StringifiedId: 'acceptor-id',
+            Replicated: true,
+            Donors: [donorRef],
+        });
+
+        setDonorRecipientReferences(forEachFromArray([donor, acceptor]));
+
+        // Donor should NOT get a Recipient because the acceptor is already Replicated
+        expect(donor.Recipient).toBeUndefined();
+        // Donor ref StringifiedId should remain unchanged
+        expect(donorRef.StringifiedId).toBe('donor-local-id');
+    });
 });

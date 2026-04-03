@@ -380,8 +380,10 @@ describe('preparePDiskDataResponse', () => {
         };
 
         // Acceptor VDisk at slot 1001 — references the donor via Donors array
+        // Replicated must be false so that setDonorRecipientReferences processes its Donors
         const acceptorVDisk = {
             ...rawData.Whiteboard?.VDisks?.[0],
+            Replicated: false,
             Donors: [
                 // TVSlotId pointing to the donor's physical location
                 {NodeId: 1, PDiskId: 1, VSlotId: 1002},
@@ -434,5 +436,69 @@ describe('preparePDiskDataResponse', () => {
         const donorEntry = acceptorSlot?.SlotData.Donors?.[0];
         expect(donorEntry).toBeDefined();
         expect(donorEntry?.StringifiedId).toEqual(donorSlot?.SlotData.StringifiedId);
+    });
+
+    test('Should not set Recipient on donor VDisk when acceptor is already Replicated', () => {
+        // Donor VDisk at slot 1002
+        const donorVDisk = {
+            VDiskId: {
+                GroupID: 2181038080,
+                GroupGeneration: 1,
+                Ring: 0,
+                Domain: 0,
+                VDisk: 0,
+            },
+            PDiskId: 1,
+            VDiskSlotId: 1002,
+            VDiskState: EVDiskState.OK,
+            DiskSpace: EFlag.Green,
+            FrontQueues: EFlag.Green,
+            Replicated: true,
+            DonorMode: true,
+            AllocatedSize: '1000000000',
+            AvailableSize: '19000000000',
+            HasUnreadableBlobs: false,
+        };
+
+        // Acceptor VDisk at slot 1001 — already Replicated, so donors should not be processed
+        const acceptorVDisk = {
+            ...rawData.Whiteboard?.VDisks?.[0],
+            Replicated: true,
+            Donors: [{NodeId: 1, PDiskId: 1, VSlotId: 1002}],
+        };
+
+        const dataWithDonors: TPDiskInfoResponse = {
+            ...rawData,
+            Whiteboard: {
+                ...rawData.Whiteboard,
+                PDisk: {
+                    ...rawData.Whiteboard?.PDisk,
+                    NodeId: 1,
+                    NumActiveSlots: 2,
+                },
+                VDisks: [acceptorVDisk, donorVDisk],
+            },
+            BSC: {
+                ...rawData.BSC,
+                PDisk: {
+                    ...rawData.BSC?.PDisk,
+                    NumActiveSlots: 2,
+                },
+            },
+        };
+
+        const preparedData = preparePDiskDataResponse([dataWithDonors, {}]);
+
+        const vDiskSlots = preparedData.SlotItems?.filter((slot) => slot.SlotType === 'vDisk');
+        expect(vDiskSlots?.length).toEqual(2);
+
+        // Find the donor slot by its VDiskSlotId
+        const donorSlot = vDiskSlots?.find(
+            (slot) => slot.SlotType === 'vDisk' && slot.SlotData.VDiskSlotId === 1002,
+        );
+        expect(donorSlot).toBeDefined();
+
+        // The donor should NOT have a Recipient because the acceptor is already Replicated
+        expect(donorSlot?.SlotData.Recipient).toBeUndefined();
     });
 });
