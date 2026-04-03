@@ -103,7 +103,7 @@ export function makeVDiskLocationKey(
 /**
  * Set Recipient references on donor VDisks pointing back to their acceptor VDisk.
  *
- * For every VDisk that has a non-empty Donors array, each donor is matched to a
+ * For every VDisk that has a non-empty Donors array and is NOT Replicated, each donor is matched to a
  * top-level VDisk by its physical location (NodeId, PDiskId, VDiskSlotId). When a
  * match is found the top-level donor receives a Recipient reference and its
  * StringifiedId is kept in sync with the nested donor entry.
@@ -127,7 +127,7 @@ export function setDonorRecipientReferences(
     });
 
     forEachVDisk((vDisk) => {
-        if (!vDisk.Donors?.length) {
+        if (!vDisk.Donors?.length || vDisk.Replicated) {
             return;
         }
 
