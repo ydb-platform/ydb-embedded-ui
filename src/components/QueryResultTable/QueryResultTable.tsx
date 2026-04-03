@@ -4,6 +4,7 @@ import DataTable from '@gravity-ui/react-data-table';
 import type {Column, Settings} from '@gravity-ui/react-data-table';
 import {ClipboardButton} from '@gravity-ui/uikit';
 
+import {buildTsvBlobParts} from '../../containers/Tenant/Query/utils/getPreparedResult';
 import type {ColumnType, KeyValueRow} from '../../types/api/query';
 import {cn} from '../../utils/cn';
 import {DEFAULT_TABLE_SETTINGS} from '../../utils/constants';
@@ -29,11 +30,8 @@ export const b = cn('ydb-query-result-table');
 
 const WIDTH_PREDICTION_ROWS_COUNT = 100;
 
-//helper function to convert a row to TSV format for copying to clipboard
-const rowToTsv = (row: KeyValueRow) =>
-    Object.values(row)
-        .map((v) => (typeof v === 'object' ? JSON.stringify(v) : String(v)))
-        .join('\t');
+//used buildTsvBlobParts to convert row to tsv format for copying, so that copied value is the same as when user exports data to tsv
+const rowToTsv = (row: KeyValueRow) => buildTsvBlobParts([row]).join('');
 
 const copyColumn: Column<KeyValueRow> = {
     name: '__copy_action__',
@@ -75,7 +73,7 @@ const prepareTypedColumns = (columns: ColumnType[], data: KeyValueRow[] | undefi
         return column;
     });
 
-    return [...dataColumns, copyColumn];
+    return dataColumns;
 };
 
 const prepareGenericColumns = (data: KeyValueRow[] | undefined) => {
@@ -95,7 +93,7 @@ const prepareGenericColumns = (data: KeyValueRow[] | undefined) => {
 
         return column;
     });
-    return [...dataColumns, copyColumn];
+    return dataColumns;
 };
 
 const getRowIndex = (_: unknown, index: number) => index;
@@ -114,7 +112,17 @@ export const QueryResultTable = (props: QueryResultTableProps) => {
     const {columns, data, settings: propsSettings} = props;
 
     const preparedColumns = React.useMemo(() => {
-        return columns ? prepareTypedColumns(columns, data) : prepareGenericColumns(data);
+        const dataColumns = columns
+            ? prepareTypedColumns(columns, data)
+            : prepareGenericColumns(data);
+
+        const existingNames = new Set(dataColumns.map((col) => col.name));
+        let copyColumnName = 'copy';
+        while (existingNames.has(copyColumnName)) {
+            copyColumnName = `_${copyColumnName}_`;
+        }
+
+        return [...dataColumns, {...copyColumn, name: copyColumnName}];
     }, [columns, data]);
 
     const settings = React.useMemo(() => {
