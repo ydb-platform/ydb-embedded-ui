@@ -116,6 +116,9 @@ export const QueryResultTable = (props: QueryResultTableProps) => {
             ? prepareTypedColumns(columns, data)
             : prepareGenericColumns(data);
 
+        if (!dataColumns.length) {
+            return dataColumns;
+        }
         const existingNames = new Set(dataColumns.map((col) => col.name));
         let copyColumnName = 'copy';
         while (existingNames.has(copyColumnName)) {
