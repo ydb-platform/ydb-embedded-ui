@@ -73,6 +73,8 @@ type StorageUsageQueryResult =
           error: unknown;
       };
 
+const STORAGE_GROUPS_BATCH_SIZE = 100;
+
 function getRelativeStorageStatsPath({path, databaseFullPath, useMetaProxy}: PathStatsMatchParams) {
     if (!useMetaProxy || !databaseFullPath) {
         return undefined;
@@ -167,19 +169,48 @@ function buildMediaStatsByType(
         const mediaKey = normalizeMediaType(mediaEntry.Kind);
         const existingStats = statsByType[mediaKey];
 
-        statsByType[mediaKey] = {
-            dataSize:
-                dataSize === undefined
-                    ? existingStats?.dataSize
-                    : (existingStats?.dataSize ?? 0) + dataSize,
-            diskUsage:
-                diskUsage === undefined
-                    ? existingStats?.diskUsage
-                    : (existingStats?.diskUsage ?? 0) + diskUsage,
+        return {
+            ...statsByType,
+            [mediaKey]: {
+                dataSize:
+                    dataSize === undefined
+                        ? existingStats?.dataSize
+                        : (existingStats?.dataSize ?? 0) + dataSize,
+                diskUsage:
+                    diskUsage === undefined
+                        ? existingStats?.diskUsage
+                        : (existingStats?.diskUsage ?? 0) + diskUsage,
+            },
         };
-
-        return statsByType;
     }, {});
+}
+
+async function fetchStorageGroupsByIds({
+    database,
+    groupIds,
+    signal,
+}: {
+    database: string;
+    groupIds: string[];
+    signal?: AbortSignal;
+}) {
+    const storageGroups: TGroupsStorageGroupInfo[] = [];
+
+    for (let index = 0; index < groupIds.length; index += STORAGE_GROUPS_BATCH_SIZE) {
+        const groupIdsBatch = groupIds.slice(index, index + STORAGE_GROUPS_BATCH_SIZE);
+        const groupsInfo = await window.api.storage.getStorageGroups(
+            {
+                database,
+                groupId: groupIdsBatch,
+                fieldsRequired: ['GroupId', 'Limit', 'PoolName', 'MediaType', 'Erasure'],
+            },
+            {signal},
+        );
+
+        storageGroups.push(...(groupsInfo.StorageGroups ?? []));
+    }
+
+    return storageGroups;
 }
 
 export function buildStorageUsageRows(
@@ -305,17 +336,10 @@ export async function fetchStorageUsageData(
         let groupsById = new Map<string, TGroupsStorageGroupInfo>();
 
         if (groupIds.length > 0) {
-            const groupsInfo = await window.api.storage.getStorageGroups(
-                {
-                    database,
-                    groupId: groupIds,
-                    fieldsRequired: ['GroupId', 'Limit', 'PoolName', 'MediaType', 'Erasure'],
-                },
-                {signal},
-            );
+            const storageGroups = await fetchStorageGroupsByIds({database, groupIds, signal});
 
             groupsById = new Map(
-                (groupsInfo.StorageGroups ?? [])
+                storageGroups
                     .filter(
                         (group): group is TGroupsStorageGroupInfo & {GroupId: string} =>
                             typeof group.GroupId === 'string',

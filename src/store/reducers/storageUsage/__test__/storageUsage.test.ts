@@ -11,6 +11,7 @@ import {
 
 describe('storageUsage helpers', () => {
     const originalApi = window.api;
+    const storageGroupsBatchSize = 100;
 
     afterEach(() => {
         window.api = originalApi;
@@ -154,6 +155,168 @@ describe('storageUsage helpers', () => {
 
         expect(getStorageStats).toHaveBeenCalledTimes(1);
         expect(getStorageGroups).toHaveBeenCalledTimes(1);
+        expect(result).toEqual({error: storageGroupsError});
+    });
+
+    test('fetchStorageUsageData requests storage groups in a single batch for small tables', async () => {
+        const groupIds = ['2181038080', '2181038081', '2181038082'];
+        const getStorageStats = jest.fn().mockResolvedValue({
+            Paths: [
+                {
+                    Path: '/local/table',
+                    FullPath: '/local/table',
+                    StorageSize: 6000,
+                    Groups: groupIds.map((groupId, index) => ({
+                        GroupId: groupId,
+                        StorageSize: (index + 1) * 1000,
+                        StorageCount: index + 1,
+                    })),
+                },
+            ],
+        });
+        const getStorageGroups = jest.fn().mockResolvedValue({
+            StorageGroups: groupIds.map((groupId, index) => ({
+                GroupId: groupId,
+                Limit: String((index + 1) * 4000),
+                MediaType: 'SSD,Kind:0',
+                ErasureSpecies: 'mirror-3-dc',
+            })),
+        });
+
+        window.api = {
+            viewer: {getStorageStats},
+            storage: {getStorageGroups},
+        } as unknown as YdbEmbeddedAPI;
+
+        const result = await fetchStorageUsageData({
+            path: '/local/table',
+            database: '/local',
+            databaseFullPath: '/local',
+        });
+
+        expect(getStorageGroups).toHaveBeenCalledTimes(1);
+        expect(getStorageGroups).toHaveBeenCalledWith(
+            {
+                database: '/local',
+                groupId: groupIds,
+                fieldsRequired: ['GroupId', 'Limit', 'PoolName', 'MediaType', 'Erasure'],
+            },
+            {signal: undefined},
+        );
+        expect(result).toMatchObject({
+            data: {
+                storageGroupsCount: groupIds.length,
+            },
+        });
+    });
+
+    test('fetchStorageUsageData batches storage group requests for large tables', async () => {
+        const totalGroups = storageGroupsBatchSize + 5;
+        const groupIds = Array.from({length: totalGroups}, (_, index) => `2181038${index}`);
+        const getStorageStats = jest.fn().mockResolvedValue({
+            Paths: [
+                {
+                    Path: '/local/table',
+                    FullPath: '/local/table',
+                    StorageSize: totalGroups * 1000,
+                    Groups: groupIds.map((groupId, index) => ({
+                        GroupId: groupId,
+                        StorageSize: (totalGroups - index) * 1000,
+                        StorageCount: index + 1,
+                    })),
+                },
+            ],
+        });
+        const getStorageGroups = jest.fn().mockImplementation(({groupId}: {groupId: string[]}) => {
+            return Promise.resolve({
+                StorageGroups: groupId.map((id, index) => ({
+                    GroupId: id,
+                    Limit: '10000',
+                    PoolName: `pool-${index}`,
+                    MediaType: 'SSD,Kind:0',
+                    ErasureSpecies:
+                        id === groupIds[storageGroupsBatchSize] ? 'mirror-3-dc' : 'none',
+                })),
+            });
+        });
+
+        window.api = {
+            viewer: {getStorageStats},
+            storage: {getStorageGroups},
+        } as unknown as YdbEmbeddedAPI;
+
+        const result = await fetchStorageUsageData({
+            path: '/local/table',
+            database: '/local',
+            databaseFullPath: '/local',
+        });
+
+        expect(getStorageGroups).toHaveBeenCalledTimes(2);
+        expect(getStorageGroups.mock.calls[0]?.[0]).toMatchObject({
+            database: '/local',
+            groupId: groupIds.slice(0, storageGroupsBatchSize),
+            fieldsRequired: ['GroupId', 'Limit', 'PoolName', 'MediaType', 'Erasure'],
+        });
+        expect(getStorageGroups.mock.calls[1]?.[0]).toMatchObject({
+            database: '/local',
+            groupId: groupIds.slice(storageGroupsBatchSize),
+            fieldsRequired: ['GroupId', 'Limit', 'PoolName', 'MediaType', 'Erasure'],
+        });
+
+        if (!('data' in result)) {
+            throw new Error('Expected storage usage request to succeed for batched lookup');
+        }
+
+        expect(
+            result.data.rows.find((row) => row.groupId === groupIds[storageGroupsBatchSize]),
+        ).toMatchObject({
+            erasure: 'mirror-3-dc',
+            limit: 10000,
+            mediaType: 'SSD',
+        });
+    });
+
+    test('fetchStorageUsageData returns error when one storage groups batch fails', async () => {
+        const storageGroupsError = new Error('storage groups batch failed');
+        const totalGroups = storageGroupsBatchSize + 1;
+        const groupIds = Array.from({length: totalGroups}, (_, index) => `3181038${index}`);
+        const getStorageStats = jest.fn().mockResolvedValue({
+            Paths: [
+                {
+                    Path: '/local/table',
+                    FullPath: '/local/table',
+                    StorageSize: totalGroups * 1000,
+                    Groups: groupIds.map((groupId, index) => ({
+                        GroupId: groupId,
+                        StorageSize: (index + 1) * 1000,
+                        StorageCount: index + 1,
+                    })),
+                },
+            ],
+        });
+        const getStorageGroups = jest
+            .fn()
+            .mockResolvedValueOnce({
+                StorageGroups: groupIds.slice(0, storageGroupsBatchSize).map((groupId) => ({
+                    GroupId: groupId,
+                    Limit: '10000',
+                    MediaType: 'SSD,Kind:0',
+                })),
+            })
+            .mockRejectedValueOnce(storageGroupsError);
+
+        window.api = {
+            viewer: {getStorageStats},
+            storage: {getStorageGroups},
+        } as unknown as YdbEmbeddedAPI;
+
+        const result = await fetchStorageUsageData({
+            path: '/local/table',
+            database: '/local',
+            databaseFullPath: '/local',
+        });
+
+        expect(getStorageGroups).toHaveBeenCalledTimes(2);
         expect(result).toEqual({error: storageGroupsError});
     });
 

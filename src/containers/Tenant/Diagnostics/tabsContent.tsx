@@ -108,12 +108,7 @@ const diagnosticsTabRenderers: Record<TenantDiagnosticsTab, DiagnosticsTabRender
         />
     ),
     [TENANT_DIAGNOSTICS_TABS_IDS.storageUsage]: ({path, database, databaseFullPath}) => (
-        <StorageUsage
-            key={path}
-            path={path}
-            database={database}
-            databaseFullPath={databaseFullPath}
-        />
+        <StorageUsage path={path} database={database} databaseFullPath={databaseFullPath} />
     ),
     [TENANT_DIAGNOSTICS_TABS_IDS.storage]: ({database, scrollContainerRef}) => (
         <PaginatedStorage database={database} scrollContainerRef={scrollContainerRef} />
@@ -186,27 +181,8 @@ const diagnosticsTabRenderers: Record<TenantDiagnosticsTab, DiagnosticsTabRender
             database,
             scrollContainerRef,
         }),
-    [TENANT_DIAGNOSTICS_TABS_IDS.monitoring]: ({
-        type,
-        subType,
-        database,
-        path,
-        databaseFullPath,
-        additionalTenantProps,
-        scrollContainerRef,
-    }) => {
-        const monitoringProps = {
-            type,
-            subType,
-            database,
-            path,
-            databaseFullPath,
-            additionalTenantProps,
-            scrollContainerRef,
-        };
-
-        return uiFactory.renderMonitoring?.(monitoringProps);
-    },
+    [TENANT_DIAGNOSTICS_TABS_IDS.monitoring]: ({database, databaseFullPath}) =>
+        uiFactory.renderMonitoring?.({database, databaseFullPath}),
 };
 
 export function renderDiagnosticsTabContent({

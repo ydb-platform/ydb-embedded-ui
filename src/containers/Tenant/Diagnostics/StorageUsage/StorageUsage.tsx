@@ -38,11 +38,17 @@ interface StorageUsageProps {
     databaseFullPath: string;
 }
 
+interface VisibleRowsState {
+    path: string;
+    visibleRowsCount: number;
+}
+
 function StorageUsage({path, database, databaseFullPath}: StorageUsageProps) {
     const [autoRefreshInterval] = useAutoRefreshInterval();
-    const [visibleRowsCount, setVisibleRowsCount] = React.useState(
-        STORAGE_USAGE_INITIAL_ROWS_COUNT,
-    );
+    const [visibleRowsState, setVisibleRowsState] = React.useState<VisibleRowsState>({
+        path,
+        visibleRowsCount: STORAGE_USAGE_INITIAL_ROWS_COUNT,
+    });
     const useMetaProxy = useClusterWithProxy();
     const getStorageGroupPath = useStorageGroupPath();
 
@@ -78,14 +84,26 @@ function StorageUsage({path, database, databaseFullPath}: StorageUsageProps) {
     const hasMultipleMediaTypes = React.useMemo(() => {
         return new Set(rows.map((row) => normalizeMediaType(row.mediaType))).size > 1;
     }, [rows]);
+    const visibleRowsCount =
+        visibleRowsState.path === path
+            ? visibleRowsState.visibleRowsCount
+            : STORAGE_USAGE_INITIAL_ROWS_COUNT;
     const visibleRows = rows.slice(0, visibleRowsCount);
     const hiddenRowsCount = Math.max(rows.length - visibleRows.length, 0);
     const hasStorageUsageError = Boolean(storageUsageError && !storageUsageData);
     const handleShowMore = React.useCallback(() => {
-        setVisibleRowsCount((currentVisibleRowsCount) => {
-            return currentVisibleRowsCount + STORAGE_USAGE_INITIAL_ROWS_COUNT;
+        setVisibleRowsState((currentState) => {
+            const currentVisibleRowsCount =
+                currentState.path === path
+                    ? currentState.visibleRowsCount
+                    : STORAGE_USAGE_INITIAL_ROWS_COUNT;
+
+            return {
+                path,
+                visibleRowsCount: currentVisibleRowsCount + STORAGE_USAGE_INITIAL_ROWS_COUNT,
+            };
         });
-    }, []);
+    }, [path]);
 
     if (loading) {
         return <Loader size="m" />;
