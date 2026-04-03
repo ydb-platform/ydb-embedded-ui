@@ -177,27 +177,24 @@ export const topQueriesApi = api.injectEndpoints({
 
                     // SELECT * returns the original column name 'Query',
                     // but the UI uses 'QueryText' — map it immutably for consistency
-                    const resultSets = parsed.resultSets;
-                    const firstResult = resultSets?.[0]?.result;
-                    const data =
-                        firstResult && resultSets
-                            ? {
-                                  ...parsed,
-                                  resultSets: resultSets.map((resultSet, index) =>
-                                      index === 0 && resultSet.result
-                                          ? {
-                                                ...resultSet,
-                                                result: resultSet.result.map((row) =>
-                                                    row.Query !== undefined &&
-                                                    row.QueryText === undefined
-                                                        ? {...row, QueryText: row.Query}
-                                                        : row,
-                                                ),
-                                            }
-                                          : resultSet,
-                                  ),
-                              }
-                            : parsed;
+                    const data = parsed.resultSets?.[0]?.result
+                        ? {
+                              ...parsed,
+                              resultSets: parsed.resultSets.map((resultSet, index) =>
+                                  index === 0 && resultSet.result
+                                      ? {
+                                            ...resultSet,
+                                            result: resultSet.result.map((row) =>
+                                                row.Query !== undefined &&
+                                                row.QueryText === undefined
+                                                    ? {...row, QueryText: row.Query}
+                                                    : row,
+                                            ),
+                                        }
+                                      : resultSet,
+                              ),
+                          }
+                        : parsed;
 
                     return {data};
                 } catch (error) {

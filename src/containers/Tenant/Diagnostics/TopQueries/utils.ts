@@ -19,70 +19,70 @@ export const TOP_QUERIES_TABLE_SETTINGS: Settings = {
 export function createQueryInfoItems(data: KeyValueRow): YDBDefinitionListItem[] {
     const items: YDBDefinitionListItem[] = [];
 
-    if (data.QueryText) {
+    if (data.QueryText !== null && data.QueryText !== undefined) {
         items.push({
             name: columnsI18n('query-hash'),
             content: generateHash(String(data.QueryText)),
         });
     }
 
-    if (data.CPUTimeUs !== undefined) {
+    if (data.CPUTimeUs !== null && data.CPUTimeUs !== undefined) {
         items.push({
             name: columnsI18n('cpu-time'),
             content: formatToMs(parseUsToMs(data.CPUTimeUs ?? undefined)),
         });
     }
 
-    if (data.Duration !== undefined) {
+    if (data.Duration !== null && data.Duration !== undefined) {
         items.push({
             name: columnsI18n('duration'),
             content: formatToMs(parseUsToMs(data.Duration ?? undefined)),
         });
     }
 
-    if (data.ReadBytes !== undefined) {
+    if (data.ReadBytes !== null && data.ReadBytes !== undefined) {
         items.push({
             name: columnsI18n('read-bytes'),
             content: formatNumber(data.ReadBytes),
         });
     }
 
-    if (data.RequestUnits !== undefined) {
+    if (data.RequestUnits !== null && data.RequestUnits !== undefined) {
         items.push({
             name: columnsI18n('request-units'),
             content: formatNumber(data.RequestUnits),
         });
     }
 
-    if (data.EndTime) {
+    if (data.EndTime !== null && data.EndTime !== undefined) {
         items.push({
             name: columnsI18n('end-time'),
             content: formatDateTime(new Date(data.EndTime as string).getTime()),
         });
     }
 
-    if (data.ReadRows !== undefined) {
+    if (data.ReadRows !== null && data.ReadRows !== undefined) {
         items.push({
             name: columnsI18n('read-rows'),
             content: formatNumber(data.ReadRows),
         });
     }
 
-    if (data.UserSID) {
+    if (data.UserSID !== null && data.UserSID !== undefined) {
         items.push({
             name: columnsI18n('user'),
             content: data.UserSID,
         });
     }
 
-    if (data.ApplicationName) {
+    if (data.ApplicationName !== null && data.ApplicationName !== undefined) {
         items.push({
             name: columnsI18n('application'),
             content: data.ApplicationName,
         });
     }
 
-    if (data.QueryStartAt) {
+    if (data.QueryStartAt !== null && data.QueryStartAt !== undefined) {
         items.push({
             name: columnsI18n('start-time'),
             content: formatDateTime(new Date(data.QueryStartAt as string).getTime()),
