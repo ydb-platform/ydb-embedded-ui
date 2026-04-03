@@ -87,16 +87,7 @@ function getRunningQueriesText(
     const orderBy = prepareOrderByFromTableSort(sortOrder);
 
     return `${QUERY_TECHNICAL_MARK}
-SELECT
-    UserSID, 
-    QueryStartAt, 
-    Query as QueryText, 
-    ApplicationName,
-    SessionId,
-    WmPoolId,
-    WmState,
-    WmEnterTime,
-    WmExitTime
+SELECT *
 FROM \`.sys/query_sessions\`
 WHERE ${filterConditions || 'true'} AND Query NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
 AND QueryStartAt is not null ${orderBy}
@@ -183,6 +174,16 @@ export const topQueriesApi = api.injectEndpoints({
                     }
 
                     const data = parseQueryAPIResponse(response);
+
+                    // SELECT * returns the original column name 'Query',
+                    // but the UI uses 'QueryText' — map it for consistency
+                    if (data.resultSets?.[0]?.result) {
+                        for (const row of data.resultSets[0].result) {
+                            if (row.Query !== undefined && row.QueryText === undefined) {
+                                row.QueryText = row.Query;
+                            }
+                        }
+                    }
 
                     return {data};
                 } catch (error) {
