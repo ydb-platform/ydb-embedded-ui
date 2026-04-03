@@ -75,12 +75,16 @@ export function CommittedOffsetCell({
         [commitOffset, database, path, selectedConsumer, partitionId, readSessionId],
     );
 
-    const committedOffsetMenuItems: DropdownMenuItem[][] = React.useMemo(
-        () => [
+    const committedOffsetMenuItems: DropdownMenuItem[][] = React.useMemo(() => {
+        const isStartOffsetInteger = Number.isInteger(Number(startOffset));
+        const isEndOffsetInteger = Number.isInteger(Number(endOffset));
+        const isCommitedOffsetInteger = Number.isInteger(Number(value));
+
+        return [
             [
                 {
                     action: () => {
-                        if (selectedConsumer) {
+                        if (selectedConsumer && isStartOffsetInteger) {
                             showMoveOffsetConfirmation({
                                 confirmMessage: i18n('confirm_move-offset-to-start', {
                                     partitionId: String(partitionId),
@@ -95,10 +99,11 @@ export function CommittedOffsetCell({
                     },
                     text: i18n('action_to-start'),
                     iconStart: <Icon data={ArrowLeftToLine} size={14} />,
+                    disabled: !isStartOffsetInteger,
                 },
                 {
                     action: () => {
-                        if (selectedConsumer) {
+                        if (selectedConsumer && isEndOffsetInteger) {
                             showMoveOffsetConfirmation({
                                 confirmMessage: i18n('confirm_move-offset-to-end', {
                                     partitionId: String(partitionId),
@@ -113,12 +118,13 @@ export function CommittedOffsetCell({
                     },
                     text: i18n('action_to-end'),
                     iconStart: <Icon data={ArrowRightToLine} size={14} />,
+                    disabled: !isEndOffsetInteger,
                 },
             ],
             [
                 {
                     action: () => {
-                        if (selectedConsumer && value !== undefined) {
+                        if (selectedConsumer && isCommitedOffsetInteger) {
                             showMoveOffsetConfirmation({
                                 confirmMessage: i18n('confirm_skip-message', {
                                     partitionId: String(partitionId),
@@ -133,7 +139,7 @@ export function CommittedOffsetCell({
                     },
                     text: i18n('action_skip-message'),
                     iconStart: <Icon data={ChevronsRight} size={14} />,
-                    disabled: value === undefined,
+                    disabled: !isCommitedOffsetInteger,
                 },
             ],
             [
@@ -151,9 +157,8 @@ export function CommittedOffsetCell({
                     iconStart: <Icon data={PencilToLine} size={14} />,
                 },
             ],
-        ],
-        [handleCommitOffset, selectedConsumer, partitionId, startOffset, endOffset, value],
-    );
+        ];
+    }, [handleCommitOffset, selectedConsumer, partitionId, startOffset, endOffset, value]);
 
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 

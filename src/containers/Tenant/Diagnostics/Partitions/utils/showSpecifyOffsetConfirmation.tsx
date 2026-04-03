@@ -36,7 +36,7 @@ function SpecifyOffsetDialog({
     }, []);
 
     const handleConfirm = React.useCallback(() => {
-        const numericOffset = Number(offsetValue);
+        const numericOffset = Number(offsetValue.trim());
 
         if (!offsetValue || isNaN(numericOffset)) {
             setValidationError(i18n('error_invalid-offset'));
@@ -76,7 +76,6 @@ function SpecifyOffsetDialog({
                         label={i18n('context_offset')}
                         autoFocus
                         hasClear
-                        autoComplete={false}
                         validationState={validationError ? 'invalid' : undefined}
                         errorMessage={validationError}
                     />
