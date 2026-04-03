@@ -25,6 +25,7 @@ import {
     setupStreamingQueryMidStreamErrorMock,
     setupStreamingQueryNetworkErrorMock,
     setupTablet400JsonCodeOnlyMock,
+    setupTenantInfo400Mock,
     setupVDisk429WithIssuesMock,
     setupWhoami401NeedResetMock,
     setupWhoami500Mock,
@@ -585,6 +586,29 @@ test.describe('Error Display — ResponseError and PageError across pages', () =
         );
         await page.screenshot({
             path: `${FULL_PAGE_DIR}/full-whoami-502-html.png`,
+            fullPage: true,
+        });
+    });
+
+    // --- Tenant Overview (Database page) ---
+
+    test('TenantOverview — 400 tenant info shows ResponseError', async ({page}) => {
+        await setupTenantInfo400Mock(page);
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({database, tenantPage: 'diagnostics'});
+
+        const errorDisplay = new ErrorDisplayModel(page);
+        await errorDisplay.waitForResponseError();
+
+        const errorText = await errorDisplay.getResponseErrorText();
+        expect(errorText).toContain('Cluster not found');
+
+        await expect(errorDisplay.getResponseErrorLocator()).toHaveScreenshot(
+            'error-tenant-overview-400.png',
+        );
+        await page.screenshot({
+            path: `${FULL_PAGE_DIR}/full-tenant-overview-400.png`,
             fullPage: true,
         });
     });

@@ -28,6 +28,7 @@ const ROUTES = {
     storageInfo: `${backend}/viewer/json/storage*`,
     tabletInfo: `${backend}/viewer/json/tabletinfo*`,
     describe: `${backend}/viewer/json/describe*`,
+    tenantInfo: `${backend}/viewer/json/tenantinfo*`,
     whoami: `${backend}/viewer/json/whoami*`,
     capabilities: `${backend}/viewer/capabilities*`,
 } as const;
@@ -305,6 +306,14 @@ export async function setupWhoami502HtmlMock(page: Page) {
 export async function setupDescribe403Mock(page: Page) {
     await page.route(ROUTES.describe, async (route: Route) => {
         await route.fulfill({status: 403});
+    });
+}
+
+export async function setupTenantInfo400Mock(page: Page) {
+    await mockRoute(page, ROUTES.tenantInfo, {
+        status: 400,
+        contentType: 'text/plain',
+        body: 'Cluster not found',
     });
 }
 

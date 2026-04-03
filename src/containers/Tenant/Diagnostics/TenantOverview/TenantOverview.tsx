@@ -4,6 +4,7 @@ import {ChartAreaStacked} from '@gravity-ui/icons';
 import {Button, Flex, Icon} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
+import {ResponseError} from '../../../../components/Errors/ResponseError';
 import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {QueriesActivityBar} from '../../../../components/QueriesActivityBar/QueriesActivityBar';
 import {ServerlessDBLabel} from '../../../../components/ServerlessDBLabel/ServerlessDBLabel';
@@ -58,11 +59,16 @@ export function TenantOverview({
 
     const isMetaDatabasesAvailable = useDatabasesV2();
 
-    const {currentData: tenant, isFetching} = tenantApi.useGetTenantInfoQuery(
+    const {
+        currentData: tenant,
+        isFetching,
+        error,
+    } = tenantApi.useGetTenantInfoQuery(
         {database, clusterName, isMetaDatabasesAvailable},
         {pollingInterval: autoRefreshInterval},
     );
-    const tenantLoading = isFetching && tenant === undefined;
+
+    const tenantLoading = isFetching && tenant === undefined && !error;
     const {Name, Type, Overall, ControlPlane, CoresTotal} = tenant || {};
     const isServerless = Type === 'Serverless';
     const activeMetricsTab =
@@ -202,6 +208,7 @@ export function TenantOverview({
 
     return (
         <LoaderWrapper loading={tenantLoading}>
+            {error ? <ResponseError error={error} /> : null}
             <div className={b()}>
                 <div className={b('info')}>
                     {renderOverviewHead()}
