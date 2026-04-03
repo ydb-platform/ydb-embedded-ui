@@ -178,11 +178,11 @@ export const topQueriesApi = api.injectEndpoints({
                     // SELECT * returns the original column name 'Query',
                     // but the UI uses 'QueryText' — map it for consistency
                     if (data.resultSets?.[0]?.result) {
-                        for (const row of data.resultSets[0].result) {
-                            if (row.Query !== undefined && row.QueryText === undefined) {
-                                row.QueryText = row.Query;
-                            }
-                        }
+                        data.resultSets[0].result = data.resultSets[0].result.map((row) =>
+                            row.Query !== undefined && row.QueryText === undefined
+                                ? {...row, QueryText: row.Query}
+                                : row,
+                        );
                     }
 
                     return {data};
