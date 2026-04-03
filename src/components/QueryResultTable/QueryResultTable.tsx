@@ -31,10 +31,10 @@ export const b = cn('ydb-query-result-table');
 const WIDTH_PREDICTION_ROWS_COUNT = 100;
 
 //used buildTsvBlobParts to convert row to tsv format for copying, so that copied value is the same as when user exports data to tsv
-const rowToTsv = (row: KeyValueRow) => buildTsvBlobParts([row]).join('');
+const rowToTsv = (row: KeyValueRow) => buildTsvBlobParts([row]).slice(2).join('');
 
 const copyColumn: Column<KeyValueRow> = {
-    name: '__copy_action__',
+    name: 'copy',
     header: '',
     width: 40,
     render: ({row}) => (
