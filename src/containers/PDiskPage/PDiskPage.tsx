@@ -187,7 +187,7 @@ export function PDiskPage() {
                     buttonDisabled={!pDiskParamsDefined || !isUserAllowedToMakeChanges}
                     buttonView="normal"
                     dialogHeader={pDiskPageKeyset('restart-pdisk-dialog-header')}
-                    dialogText={pDiskPageKeyset('restart-pdisk-dialog-text')}
+                    dialogWarning={pDiskPageKeyset('restart-pdisk-dialog-text')}
                     retryButtonText={pDiskPageKeyset('force-restart-pdisk-button')}
                     withPopover
                     popoverContent={pDiskPageKeyset('restart-pdisk-not-allowed')}

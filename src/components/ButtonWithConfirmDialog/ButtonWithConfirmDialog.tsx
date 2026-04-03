@@ -11,10 +11,13 @@ interface ButtonWithConfirmDialogProps<T, K> {
     onConfirmAction: (isRetry?: boolean) => Promise<T>;
     onConfirmActionSuccess?: (() => Promise<K>) | VoidFunction;
     dialogHeader: string;
-    dialogText: string;
+    dialogText?: string;
+    dialogWarning?: string;
     retryButtonText?: string;
+    applyButtonText?: string;
     buttonDisabled?: ButtonProps['disabled'];
     buttonView?: ButtonProps['view'];
+    applyButtonView?: ButtonProps['view'];
     buttonWidth?: ButtonProps['width'];
     buttonClassName?: ButtonProps['className'];
     withPopover?: boolean;
@@ -29,6 +32,8 @@ export function ButtonWithConfirmDialog<T, K>({
     onConfirmActionSuccess,
     dialogHeader,
     dialogText,
+    dialogWarning,
+    applyButtonText,
     retryButtonText,
     buttonDisabled = false,
     buttonView = 'action',
@@ -38,6 +43,7 @@ export function ButtonWithConfirmDialog<T, K>({
     popoverContent,
     popoverPlacement = 'right',
     popoverDisabled = true,
+    applyButtonView,
 }: ButtonWithConfirmDialogProps<T, K>) {
     const [isConfirmDialogVisible, setIsConfirmDialogVisible] = React.useState(false);
     const [buttonLoading, setButtonLoading] = React.useState(false);
@@ -100,10 +106,13 @@ export function ButtonWithConfirmDialog<T, K>({
             <CriticalActionDialog
                 visible={isConfirmDialogVisible}
                 header={dialogHeader}
-                text={dialogText}
+                description={dialogText}
+                warningText={dialogWarning}
+                applyButtonText={applyButtonText}
                 withRetry={withRetry}
                 retryButtonText={retryButtonText}
                 onConfirm={handleConfirmAction}
+                applyButtonView={applyButtonView}
                 onConfirmActionSuccess={handleConfirmActionSuccess}
                 onConfirmActionError={handleConfirmActionError}
                 onClose={() => {

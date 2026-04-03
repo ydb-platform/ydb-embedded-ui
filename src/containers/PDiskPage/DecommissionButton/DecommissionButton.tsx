@@ -136,7 +136,7 @@ export function DecommissionButton({
             <CriticalActionDialog
                 visible={Boolean(newDecommission)}
                 header={pDiskPageKeyset('decommission-dialog-title')}
-                text={getDecommissionWarningText(newDecommission)}
+                warningText={getDecommissionWarningText(newDecommission)}
                 withRetry={withRetry}
                 withCheckBox
                 retryButtonText={pDiskPageKeyset('decommission-dialog-force-change')}

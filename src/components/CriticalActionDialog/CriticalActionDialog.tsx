@@ -1,7 +1,7 @@
 import React from 'react';
 
-import {CircleXmarkFill, TriangleExclamationFill} from '@gravity-ui/icons';
-import {Checkbox, Dialog, Icon} from '@gravity-ui/uikit';
+import {Alert, Checkbox, Dialog, Flex, Text} from '@gravity-ui/uikit';
+import type {ButtonView} from '@gravity-ui/uikit';
 
 import {ResultIssues} from '../../containers/Tenant/Query/Issues/Issues';
 import type {IResponseError} from '../../types/api/error';
@@ -36,9 +36,12 @@ const parseError = (error: unknown) => {
 interface CriticalActionDialogProps<T> {
     visible: boolean;
     header?: React.ReactNode;
-    text?: string;
+    description?: string;
+    warningText?: string;
     withRetry?: boolean;
     retryButtonText?: string;
+    applyButtonText?: string;
+    applyButtonView?: ButtonView;
     withCheckBox?: boolean;
     onClose: VoidFunction;
     onConfirm: (isRetry?: boolean) => Promise<T>;
@@ -49,9 +52,12 @@ interface CriticalActionDialogProps<T> {
 export function CriticalActionDialog<T>({
     visible,
     header,
-    text,
+    description,
+    warningText,
     withRetry,
     retryButtonText,
+    applyButtonText = criticalActionDialogKeyset('button-confirm'),
+    applyButtonView,
     withCheckBox,
     onClose,
     onConfirm,
@@ -101,13 +107,8 @@ export function CriticalActionDialog<T>({
             return (
                 <React.Fragment>
                     <Dialog.Header caption={header} />
-                    <Dialog.Body className={b('body')}>
-                        <div className={b('body-message', {error: true})}>
-                            <span className={b('error-icon')}>
-                                <CircleXmarkFill width="24" height="22" />
-                            </span>
-                            {parseError(error)}
-                        </div>
+                    <Dialog.Body>
+                        <Alert theme="danger" message={parseError(error)} view="outlined" />
                     </Dialog.Body>
 
                     <Dialog.Footer
@@ -130,23 +131,24 @@ export function CriticalActionDialog<T>({
             <React.Fragment>
                 <Dialog.Header caption={header} />
 
-                <Dialog.Body className={b('body')}>
-                    <div className={b('body-message', {warning: true})}>
-                        <span className={b('warning-icon')}>
-                            <Icon data={TriangleExclamationFill} size={24} />
-                        </span>
-                        {text}
-                    </div>
-
-                    {renderCheckBox()}
+                <Dialog.Body>
+                    <Flex direction="column" gap={4}>
+                        {description && <Text as="div">{description}</Text>}
+                        {warningText && <Alert theme="warning" message={warningText} />}
+                        {renderCheckBox()}
+                    </Flex>
                 </Dialog.Body>
 
                 <Dialog.Footer
                     loading={isLoading}
                     preset="default"
-                    textButtonApply={criticalActionDialogKeyset('button-confirm')}
+                    textButtonApply={applyButtonText}
                     textButtonCancel={criticalActionDialogKeyset('button-cancel')}
-                    propsButtonApply={{type: 'submit', disabled: withCheckBox && !checkBoxChecked}}
+                    propsButtonApply={{
+                        type: 'submit',
+                        disabled: withCheckBox && !checkBoxChecked,
+                        view: applyButtonView,
+                    }}
                     onClickButtonCancel={onClose}
                     onClickButtonApply={() => onApply()}
                 />
