@@ -126,6 +126,42 @@ const applicationColumn: Column<KeyValueRow> = {
     ),
 };
 
+const wmPoolIdColumn: Column<KeyValueRow> = {
+    name: QUERIES_COLUMNS_IDS.WmPoolId,
+    header: QUERIES_COLUMNS_TITLES.WmPoolId,
+    render: ({row}) => (
+        <div className={b('user-sid')}>{row.WmPoolId || EMPTY_DATA_PLACEHOLDER}</div>
+    ),
+    width: 150,
+};
+
+const wmStateColumn: Column<KeyValueRow> = {
+    name: QUERIES_COLUMNS_IDS.WmState,
+    header: QUERIES_COLUMNS_TITLES.WmState,
+    render: ({row}) => <div className={b('user-sid')}>{row.WmState || EMPTY_DATA_PLACEHOLDER}</div>,
+    width: 120,
+};
+
+const wmEnterTimeColumn: Column<KeyValueRow> = {
+    name: QUERIES_COLUMNS_IDS.WmEnterTime,
+    header: QUERIES_COLUMNS_TITLES.WmEnterTime,
+    render: ({row}) =>
+        row.WmEnterTime
+            ? formatDateTime(new Date(row.WmEnterTime as string).getTime())
+            : EMPTY_DATA_PLACEHOLDER,
+    width: 200,
+};
+
+const wmExitTimeColumn: Column<KeyValueRow> = {
+    name: QUERIES_COLUMNS_IDS.WmExitTime,
+    header: QUERIES_COLUMNS_TITLES.WmExitTime,
+    render: ({row}) =>
+        row.WmExitTime
+            ? formatDateTime(new Date(row.WmExitTime as string).getTime())
+            : EMPTY_DATA_PLACEHOLDER,
+    width: 200,
+};
+
 export function getTopQueriesColumns() {
     const columns = [
         queryHashColumn,
@@ -156,6 +192,10 @@ export function getRunningQueriesColumns() {
         queryStartColumn,
         queryTextColumn,
         applicationColumn,
+        wmPoolIdColumn,
+        wmStateColumn,
+        wmEnterTimeColumn,
+        wmExitTimeColumn,
     ];
 
     return columns.map((column) => ({
