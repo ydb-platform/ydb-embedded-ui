@@ -29,14 +29,14 @@ export function createQueryInfoItems(data: KeyValueRow): YDBDefinitionListItem[]
     if (data.CPUTimeUs !== null && data.CPUTimeUs !== undefined) {
         items.push({
             name: columnsI18n('cpu-time'),
-            content: formatToMs(parseUsToMs(data.CPUTimeUs ?? undefined)),
+            content: formatToMs(parseUsToMs(data.CPUTimeUs)),
         });
     }
 
     if (data.Duration !== null && data.Duration !== undefined) {
         items.push({
             name: columnsI18n('duration'),
-            content: formatToMs(parseUsToMs(data.Duration ?? undefined)),
+            content: formatToMs(parseUsToMs(data.Duration)),
         });
     }
 
