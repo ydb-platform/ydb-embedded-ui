@@ -89,56 +89,56 @@ export function createQueryInfoItems(data: KeyValueRow): YDBDefinitionListItem[]
         });
     }
 
-    if (data.WmPoolId) {
+    if (data.WmPoolId !== null && data.WmPoolId !== undefined) {
         items.push({
             name: columnsI18n('wm-pool-id'),
             content: data.WmPoolId,
         });
     }
 
-    if (data.WmState) {
+    if (data.WmState !== null && data.WmState !== undefined) {
         items.push({
             name: columnsI18n('wm-state'),
             content: data.WmState,
         });
     }
 
-    if (data.WmEnterTime) {
+    if (data.WmEnterTime !== null && data.WmEnterTime !== undefined) {
         items.push({
             name: columnsI18n('wm-enter-time'),
             content: formatDateTime(new Date(data.WmEnterTime as string).getTime()),
         });
     }
 
-    if (data.WmExitTime) {
+    if (data.WmExitTime !== null && data.WmExitTime !== undefined) {
         items.push({
             name: columnsI18n('wm-exit-time'),
             content: formatDateTime(new Date(data.WmExitTime as string).getTime()),
         });
     }
 
-    if (data.ClientAddress) {
+    if (data.ClientAddress !== null && data.ClientAddress !== undefined) {
         items.push({
             name: columnsI18n('client-address'),
             content: data.ClientAddress,
         });
     }
 
-    if (data.ClientPID) {
+    if (data.ClientPID !== null && data.ClientPID !== undefined) {
         items.push({
             name: columnsI18n('client-pid'),
             content: data.ClientPID,
         });
     }
 
-    if (data.ClientUserAgent) {
+    if (data.ClientUserAgent !== null && data.ClientUserAgent !== undefined) {
         items.push({
             name: columnsI18n('client-user-agent'),
             content: data.ClientUserAgent,
         });
     }
 
-    if (data.ClientSdkBuildInfo) {
+    if (data.ClientSdkBuildInfo !== null && data.ClientSdkBuildInfo !== undefined) {
         items.push({
             name: columnsI18n('client-sdk-build-info'),
             content: data.ClientSdkBuildInfo,
