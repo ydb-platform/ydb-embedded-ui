@@ -117,5 +117,33 @@ export function createQueryInfoItems(data: KeyValueRow): YDBDefinitionListItem[]
         });
     }
 
+    if (data.ClientAddress) {
+        items.push({
+            name: columnsI18n('client-address'),
+            content: data.ClientAddress,
+        });
+    }
+
+    if (data.ClientPID) {
+        items.push({
+            name: columnsI18n('client-pid'),
+            content: data.ClientPID,
+        });
+    }
+
+    if (data.ClientUserAgent) {
+        items.push({
+            name: columnsI18n('client-user-agent'),
+            content: data.ClientUserAgent,
+        });
+    }
+
+    if (data.ClientSdkBuildInfo) {
+        items.push({
+            name: columnsI18n('client-sdk-build-info'),
+            content: data.ClientSdkBuildInfo,
+        });
+    }
+
     return items;
 }
