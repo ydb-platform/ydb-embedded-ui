@@ -9,5 +9,9 @@
   "duration": "Duration",
   "query-text": "Query text",
   "application": "Application",
-  "request-units": "Request Units"
+  "request-units": "Request Units",
+  "wm-pool-id": "WM Pool ID",
+  "wm-state": "WM State",
+  "wm-enter-time": "WM Enter Time",
+  "wm-exit-time": "WM Exit Time"
 }

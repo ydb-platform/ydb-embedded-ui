@@ -92,7 +92,11 @@ SELECT
     QueryStartAt, 
     Query as QueryText, 
     ApplicationName,
-    SessionId
+    SessionId,
+    WmPoolId,
+    WmState,
+    WmEnterTime,
+    WmExitTime
 FROM \`.sys/query_sessions\`
 WHERE ${filterConditions || 'true'} AND Query NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
 AND QueryStartAt is not null ${orderBy}

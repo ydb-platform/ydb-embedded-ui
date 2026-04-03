@@ -89,5 +89,33 @@ export function createQueryInfoItems(data: KeyValueRow): YDBDefinitionListItem[]
         });
     }
 
+    if (data.WmPoolId) {
+        items.push({
+            name: columnsI18n('wm-pool-id'),
+            content: data.WmPoolId,
+        });
+    }
+
+    if (data.WmState) {
+        items.push({
+            name: columnsI18n('wm-state'),
+            content: data.WmState,
+        });
+    }
+
+    if (data.WmEnterTime) {
+        items.push({
+            name: columnsI18n('wm-enter-time'),
+            content: formatDateTime(new Date(data.WmEnterTime as string).getTime()),
+        });
+    }
+
+    if (data.WmExitTime) {
+        items.push({
+            name: columnsI18n('wm-exit-time'),
+            content: formatDateTime(new Date(data.WmExitTime as string).getTime()),
+        });
+    }
+
     return items;
 }
