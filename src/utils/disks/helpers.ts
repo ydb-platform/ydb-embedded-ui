@@ -4,6 +4,7 @@ import {isNil} from 'lodash';
 import type {VDiskBlobIndexStatParams} from '../../store/reducers/vdisk/vdisk';
 import {EFlag} from '../../types/api/enums';
 import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
+import {stringifyVdiskId} from '../dataFormatters/dataFormatters';
 import {generateEvaluator} from '../generateEvaluator';
 
 import {
@@ -77,4 +78,85 @@ export function getVDiskStatusIcon(severity?: number, isDonor?: boolean): IconDa
     }
 
     return undefined;
+}
+
+/**
+ * Build a location key for a VDisk using its physical slot coordinates.
+ * Returns undefined when any coordinate is missing.
+ */
+export function makeVDiskLocationKey(
+    nodeId?: number,
+    pDiskId?: number,
+    vDiskSlotId?: number,
+): string | undefined {
+    if (isNil(nodeId) || isNil(pDiskId) || isNil(vDiskSlotId)) {
+        return undefined;
+    }
+
+    return stringifyVdiskId({
+        NodeId: nodeId,
+        PDiskId: pDiskId,
+        VSlotId: vDiskSlotId,
+    });
+}
+
+/**
+ * Set Recipient references on donor VDisks pointing back to their acceptor VDisk.
+ *
+ * For every VDisk that has a non-empty Donors array and is NOT Replicated, each donor is matched to a
+ * top-level VDisk by its physical location (NodeId, PDiskId, VDiskSlotId). When a
+ * match is found the top-level donor receives a Recipient reference and its
+ * StringifiedId is kept in sync with the nested donor entry.
+ *
+ * Accepts a callback that iterates over all VDisks to avoid creating intermediate
+ * flat copies. The callback is invoked twice: once to build the location index and
+ * once to resolve donor→recipient links.
+ *
+ * Mutates the VDisks in place.
+ */
+export function setDonorRecipientReferences(
+    forEachVDisk: (cb: (vDisk: PreparedVDisk) => void) => void,
+) {
+    const vDiskByLocation = new Map<string, PreparedVDisk>();
+
+    forEachVDisk((vDisk) => {
+        const key = makeVDiskLocationKey(vDisk.NodeId, vDisk.PDiskId, vDisk.VDiskSlotId);
+        if (key) {
+            vDiskByLocation.set(key, vDisk);
+        }
+    });
+
+    forEachVDisk((vDisk) => {
+        if (!vDisk.Donors?.length || vDisk.Replicated) {
+            return;
+        }
+
+        for (const donorRef of vDisk.Donors) {
+            const key = makeVDiskLocationKey(
+                donorRef.NodeId,
+                donorRef.PDiskId,
+                donorRef.VDiskSlotId,
+            );
+
+            if (!key) {
+                continue;
+            }
+
+            const donor = vDiskByLocation.get(key);
+            if (!donor) {
+                continue;
+            }
+
+            donor.Recipient = {
+                NodeId: vDisk.NodeId,
+                StringifiedId: vDisk.StringifiedId,
+            };
+
+            // Keep the Donors item in sync with the real donor VDisk:
+            // reuse its StringifiedId instead of the local slot-based id
+            if (donorRef.StringifiedId !== donor.StringifiedId) {
+                donorRef.StringifiedId = donor.StringifiedId;
+            }
+        }
+    });
 }
