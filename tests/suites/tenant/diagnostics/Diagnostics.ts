@@ -351,7 +351,7 @@ export class Diagnostics {
     }
 
     getTab(tabName: DiagnosticsTab): Locator {
-        return this.tabs.locator(`button[data-tab="${tabName}"]`);
+        return this.tabs.locator(`a[data-tab="${tabName}"]`);
     }
 
     async clickTab(tabName: DiagnosticsTab): Promise<void> {

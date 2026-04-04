@@ -415,6 +415,37 @@ test.describe('Diagnostics Storage usage tab', async () => {
         await expect(storageUsageSections.getByText('5x', {exact: true})).toHaveCount(0);
     });
 
+    test('Storage usage shows zero data size when table stats report 0 bytes', async ({page}) => {
+        await setupStorageUsageMocks({
+            page,
+            path: MOCK_STORAGE_USAGE_MEDIA_STATS_PATH,
+            dataSize: '0',
+            storageSize: 100000000000,
+            rows: [{GroupId: '2181040008', StorageSize: 100000000000, StorageCount: 10}],
+            groups: [
+                {
+                    GroupId: '2181040008',
+                    Limit: '2000000000000',
+                    MediaType: 'SSD',
+                    ErasureSpecies: 'mirror-3-dc',
+                },
+            ],
+        });
+
+        const tenantPage = new TenantPage(page);
+        await tenantPage.goto({
+            schema: MOCK_STORAGE_USAGE_MEDIA_STATS_PATH,
+            database,
+            tenantPage: 'diagnostics',
+            diagnosticsTab: 'storageUsage',
+        });
+
+        const storageUsage = page.locator('.ydb-storage-usage');
+
+        await expect(storageUsage).toBeVisible();
+        await expect(storageUsage.getByText(/^0\s*GB$/, {exact: true})).toBeVisible();
+    });
+
     test('Storage usage shows response error when storage groups request fails', async ({page}) => {
         await setupStorageUsageMocks({
             page,

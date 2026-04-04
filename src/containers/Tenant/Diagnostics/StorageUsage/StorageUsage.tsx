@@ -74,7 +74,7 @@ function StorageUsage({path, database, databaseFullPath}: StorageUsageProps) {
     const rows = storageUsageData?.rows ?? EMPTY_STORAGE_USAGE_ROWS;
     const normalizedDataSize = Number(dataSize);
     const sectionDataSize =
-        Number.isFinite(normalizedDataSize) && normalizedDataSize > 0
+        Number.isFinite(normalizedDataSize) && normalizedDataSize >= 0
             ? normalizedDataSize
             : undefined;
 
