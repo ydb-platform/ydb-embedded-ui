@@ -103,8 +103,8 @@ function getRunningQueriesCountText() {
     return `${QUERY_TECHNICAL_MARK}
 SELECT
     COUNT(*) as RunningQueriesCount,
-    COUNT(DISTINCT ApplicationName) as UniqueApplications,
-    COUNT(DISTINCT UserSID) as UniqueUsers
+    COUNT(DISTINCT CASE WHEN ApplicationName = '' THEN NULL ELSE ApplicationName END) as UniqueApplications,
+    COUNT(DISTINCT CASE WHEN UserSID = '' THEN NULL ELSE UserSID END) as UniqueUsers
 FROM \`.sys/query_sessions\`
 WHERE Query NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
 AND QueryStartAt is not null`;
