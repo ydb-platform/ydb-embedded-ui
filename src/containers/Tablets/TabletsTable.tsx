@@ -179,17 +179,17 @@ function TabletActions(tablet: TTabletStateInfo) {
 
     if (isFollower) {
         popoverContent = i18n('controls.kill-impossible-follower');
-    } else if (!isUserAllowedToMakeChanges) {
-        popoverContent = i18n('controls.kill-not-allowed');
-    } else {
+    } else if (isUserAllowedToMakeChanges) {
         popoverContent = i18n('dialog.kill-header');
+    } else {
+        popoverContent = i18n('controls.kill-not-allowed');
     }
 
     return (
         <ButtonWithConfirmDialog
             buttonView="outlined"
             dialogHeader={i18n('dialog.kill-header')}
-            dialogText={i18n('dialog.kill-text')}
+            dialogWarning={i18n('dialog.kill-text')}
             onConfirmAction={() => {
                 return killTablet({id}).unwrap();
             }}

@@ -42,7 +42,7 @@ export const TabletControls = ({tablet}: TabletControlsProps) => {
         <Flex gap={2} wrap="nowrap">
             <ButtonWithConfirmDialog
                 dialogHeader={i18n('dialog.kill-header')}
-                dialogText={i18n('dialog.kill-text')}
+                dialogWarning={i18n('dialog.kill-text')}
                 onConfirmAction={() => killTablet({id: TabletId}).unwrap()}
                 buttonDisabled={isDisabledRestart || !isUserAllowedToMakeChanges}
                 withPopover

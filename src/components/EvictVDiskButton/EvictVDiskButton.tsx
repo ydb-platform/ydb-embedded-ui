@@ -77,6 +77,9 @@ export const EvictVDiskButton = ({
             buttonWidth={fullWidth ? 'max' : undefined}
             dialogHeader={evictVDiskButtonKeyset('title_evict-dialog')}
             dialogText={evictVDiskButtonKeyset('confirm_evict')}
+            dialogWarning={evictVDiskButtonKeyset('alert_evict')}
+            applyButtonText={evictVDiskButtonKeyset('action_evict-short')}
+            applyButtonView="outlined-danger"
             retryButtonText={evictVDiskButtonKeyset('action_force-evict')}
             withPopover
             popoverContent={
