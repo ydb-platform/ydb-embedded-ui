@@ -82,7 +82,9 @@ const readBytesColumn: Column<KeyValueRow> = {
 const userSIDColumn: Column<KeyValueRow> = {
     name: QUERIES_COLUMNS_IDS.UserSID,
     header: QUERIES_COLUMNS_TITLES.UserSID,
-    render: ({row}) => <div className={b('user-sid')}>{row.UserSID || EMPTY_DATA_PLACEHOLDER}</div>,
+    render: ({row}) => (
+        <div className={b('text-cell')}>{row.UserSID || EMPTY_DATA_PLACEHOLDER}</div>
+    ),
     align: DataTable.LEFT,
     width: 120,
 };
@@ -122,7 +124,7 @@ const applicationColumn: Column<KeyValueRow> = {
     name: QUERIES_COLUMNS_IDS.ApplicationName,
     header: QUERIES_COLUMNS_TITLES.ApplicationName,
     render: ({row}) => (
-        <div className={b('user-sid')}>{row.ApplicationName || EMPTY_DATA_PLACEHOLDER}</div>
+        <div className={b('text-cell')}>{row.ApplicationName || EMPTY_DATA_PLACEHOLDER}</div>
     ),
 };
 
@@ -130,7 +132,7 @@ const wmPoolIdColumn: Column<KeyValueRow> = {
     name: QUERIES_COLUMNS_IDS.WmPoolId,
     header: QUERIES_COLUMNS_TITLES.WmPoolId,
     render: ({row}) => (
-        <div className={b('user-sid')}>{row.WmPoolId ?? EMPTY_DATA_PLACEHOLDER}</div>
+        <div className={b('text-cell')}>{row.WmPoolId ?? EMPTY_DATA_PLACEHOLDER}</div>
     ),
     width: 150,
 };
@@ -138,7 +140,9 @@ const wmPoolIdColumn: Column<KeyValueRow> = {
 const wmStateColumn: Column<KeyValueRow> = {
     name: QUERIES_COLUMNS_IDS.WmState,
     header: QUERIES_COLUMNS_TITLES.WmState,
-    render: ({row}) => <div className={b('user-sid')}>{row.WmState ?? EMPTY_DATA_PLACEHOLDER}</div>,
+    render: ({row}) => (
+        <div className={b('text-cell')}>{row.WmState ?? EMPTY_DATA_PLACEHOLDER}</div>
+    ),
     width: 120,
 };
 
