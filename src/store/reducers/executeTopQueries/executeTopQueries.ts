@@ -94,12 +94,13 @@ AND QueryStartAt is not null ${orderBy}
 LIMIT ${limit || 100}`;
 }
 
-function getRunningQueriesOverviewText() {
+function getRunningQueriesOverviewText(limit = 1000) {
     return `${QUERY_TECHNICAL_MARK}
 SELECT UserSID, ApplicationName
 FROM \`.sys/query_sessions\`
 WHERE Query NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
-AND QueryStartAt is not null`;
+AND QueryStartAt is not null
+LIMIT ${limit}`;
 }
 
 interface QueriesRequestParams {
