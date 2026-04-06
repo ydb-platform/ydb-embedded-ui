@@ -53,7 +53,7 @@ export function getFiltersConditions(tableName: string, filters?: TopQueriesFilt
  * SELECT * returns 'Query', but the UI uses 'QueryText'.
  */
 function normalizeQueryToQueryText(row: KeyValueRow): KeyValueRow {
-    if (row.Query !== undefined && row.QueryText === undefined) {
+    if (row.Query !== undefined && !row.QueryText) {
         const {Query, ...rest} = row;
         return {...rest, QueryText: Query};
     }

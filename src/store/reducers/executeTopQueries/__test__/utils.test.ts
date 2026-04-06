@@ -40,6 +40,34 @@ describe('normalizeQueryResult', () => {
         });
     });
 
+    it('should remap when QueryText is null', () => {
+        const input: IQueryResult = {
+            resultSets: [
+                {
+                    result: [{Query: 'SELECT 1', QueryText: null}],
+                },
+            ],
+        };
+
+        const result = normalizeQueryResult(input);
+
+        expect(result.resultSets?.[0]?.result?.[0]).toEqual({QueryText: 'SELECT 1'});
+    });
+
+    it('should remap when QueryText is empty string', () => {
+        const input: IQueryResult = {
+            resultSets: [
+                {
+                    result: [{Query: 'SELECT 1', QueryText: ''}],
+                },
+            ],
+        };
+
+        const result = normalizeQueryResult(input);
+
+        expect(result.resultSets?.[0]?.result?.[0]).toEqual({QueryText: 'SELECT 1'});
+    });
+
     it('should handle rows without Query field', () => {
         const input: IQueryResult = {
             resultSets: [

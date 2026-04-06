@@ -93,35 +93,39 @@ export function createQueryInfoItems(data: KeyValueRow): YDBDefinitionListItem[]
         });
     }
 
-    if (data.WmPoolId !== null && data.WmPoolId !== undefined) {
+    if (data.WmPoolId !== null && data.WmPoolId !== undefined && data.WmPoolId !== '') {
         items.push({
             name: columnsI18n('wm-pool-id'),
             content: data.WmPoolId,
         });
     }
 
-    if (data.WmState !== null && data.WmState !== undefined) {
+    if (data.WmState !== null && data.WmState !== undefined && data.WmState !== '') {
         items.push({
             name: columnsI18n('wm-state'),
             content: data.WmState,
         });
     }
 
-    if (data.WmEnterTime !== null && data.WmEnterTime !== undefined) {
+    if (data.WmEnterTime !== null && data.WmEnterTime !== undefined && data.WmEnterTime !== '') {
         items.push({
             name: columnsI18n('wm-enter-time'),
             content: formatDateTime(new Date(data.WmEnterTime as string).getTime()),
         });
     }
 
-    if (data.WmExitTime !== null && data.WmExitTime !== undefined) {
+    if (data.WmExitTime !== null && data.WmExitTime !== undefined && data.WmExitTime !== '') {
         items.push({
             name: columnsI18n('wm-exit-time'),
             content: formatDateTime(new Date(data.WmExitTime as string).getTime()),
         });
     }
 
-    if (data.ClientAddress !== null && data.ClientAddress !== undefined) {
+    if (
+        data.ClientAddress !== null &&
+        data.ClientAddress !== undefined &&
+        data.ClientAddress !== ''
+    ) {
         items.push({
             name: columnsI18n('client-address'),
             content: data.ClientAddress,
@@ -135,14 +139,22 @@ export function createQueryInfoItems(data: KeyValueRow): YDBDefinitionListItem[]
         });
     }
 
-    if (data.ClientUserAgent !== null && data.ClientUserAgent !== undefined) {
+    if (
+        data.ClientUserAgent !== null &&
+        data.ClientUserAgent !== undefined &&
+        data.ClientUserAgent !== ''
+    ) {
         items.push({
             name: columnsI18n('client-user-agent'),
             content: data.ClientUserAgent,
         });
     }
 
-    if (data.ClientSdkBuildInfo !== null && data.ClientSdkBuildInfo !== undefined) {
+    if (
+        data.ClientSdkBuildInfo !== null &&
+        data.ClientSdkBuildInfo !== undefined &&
+        data.ClientSdkBuildInfo !== ''
+    ) {
         items.push({
             name: columnsI18n('client-sdk-build-info'),
             content: data.ClientSdkBuildInfo,

@@ -68,11 +68,23 @@ describe('createQueryInfoItems', () => {
         expect(wmItem?.content).toBe(0);
     });
 
+    it('should skip WmPoolId when empty string', () => {
+        const result = createQueryInfoItems({WmPoolId: ''});
+        const wmItem = result.find((item) => item.name === 'WM Pool ID');
+        expect(wmItem).toBeUndefined();
+    });
+
     it('should include WmState when present', () => {
         const result = createQueryInfoItems({WmState: 'Running'});
         const wmItem = result.find((item) => item.name === 'WM State');
         expect(wmItem).toBeDefined();
         expect(wmItem?.content).toBe('Running');
+    });
+
+    it('should skip WmState when empty string', () => {
+        const result = createQueryInfoItems({WmState: ''});
+        const wmItem = result.find((item) => item.name === 'WM State');
+        expect(wmItem).toBeUndefined();
     });
 
     it('should include WmEnterTime when present', () => {
@@ -82,6 +94,12 @@ describe('createQueryInfoItems', () => {
         expect(wmItem?.content).toBeTruthy();
     });
 
+    it('should skip WmEnterTime when empty string', () => {
+        const result = createQueryInfoItems({WmEnterTime: ''});
+        const wmItem = result.find((item) => item.name === 'WM Enter Time');
+        expect(wmItem).toBeUndefined();
+    });
+
     it('should include WmExitTime when present', () => {
         const result = createQueryInfoItems({WmExitTime: '2024-01-01T00:00:00Z'});
         const wmItem = result.find((item) => item.name === 'WM Exit Time');
@@ -89,11 +107,23 @@ describe('createQueryInfoItems', () => {
         expect(wmItem?.content).toBeTruthy();
     });
 
+    it('should skip WmExitTime when empty string', () => {
+        const result = createQueryInfoItems({WmExitTime: ''});
+        const wmItem = result.find((item) => item.name === 'WM Exit Time');
+        expect(wmItem).toBeUndefined();
+    });
+
     it('should include ClientAddress when present', () => {
         const result = createQueryInfoItems({ClientAddress: '192.168.1.1'});
         const item = result.find((item) => item.name === 'Client Address');
         expect(item).toBeDefined();
         expect(item?.content).toBe('192.168.1.1');
+    });
+
+    it('should skip ClientAddress when empty string', () => {
+        const result = createQueryInfoItems({ClientAddress: ''});
+        const item = result.find((item) => item.name === 'Client Address');
+        expect(item).toBeUndefined();
     });
 
     it('should include ClientPID with falsy value 0', () => {
@@ -110,11 +140,23 @@ describe('createQueryInfoItems', () => {
         expect(item?.content).toBe('ydb-go-sdk/3.0');
     });
 
+    it('should skip ClientUserAgent when empty string', () => {
+        const result = createQueryInfoItems({ClientUserAgent: ''});
+        const item = result.find((item) => item.name === 'Client User Agent');
+        expect(item).toBeUndefined();
+    });
+
     it('should include ClientSdkBuildInfo when present', () => {
         const result = createQueryInfoItems({ClientSdkBuildInfo: 'v1.2.3'});
         const item = result.find((item) => item.name === 'Client SDK Build Info');
         expect(item).toBeDefined();
         expect(item?.content).toBe('v1.2.3');
+    });
+
+    it('should skip ClientSdkBuildInfo when empty string', () => {
+        const result = createQueryInfoItems({ClientSdkBuildInfo: ''});
+        const item = result.find((item) => item.name === 'Client SDK Build Info');
+        expect(item).toBeUndefined();
     });
 
     it('should include all fields when all are present', () => {

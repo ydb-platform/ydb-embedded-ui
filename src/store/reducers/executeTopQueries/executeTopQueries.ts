@@ -81,7 +81,7 @@ function getRunningQueriesText(
     limit?: number,
 ) {
     const filterConditions = filters?.text
-        ? `Query ILIKE '%${filters.text}%' OR UserSID ILIKE '%${filters.text}%'`
+        ? `(Query ILIKE '%${filters.text}%' OR UserSID ILIKE '%${filters.text}%')`
         : '';
 
     const orderBy = prepareOrderByFromTableSort(sortOrder);
