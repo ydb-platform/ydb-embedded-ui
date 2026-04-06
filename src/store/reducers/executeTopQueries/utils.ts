@@ -1,8 +1,5 @@
 import {dateTimeParse} from '@gravity-ui/date-utils';
 
-import type {KeyValueRow} from '../../../types/api/query';
-import type {IQueryResult} from '../../../types/store/query';
-
 import type {TopQueriesFilters} from './types';
 
 const endTimeColumn = 'EndTime';
@@ -46,34 +43,4 @@ export function getFiltersConditions(tableName: string, filters?: TopQueriesFilt
     }
 
     return conditions.join(' AND ');
-}
-
-/**
- * Remap 'Query' → 'QueryText' in each row, dropping the original key.
- * SELECT * returns 'Query', but the UI uses 'QueryText'.
- */
-function normalizeQueryToQueryText(row: KeyValueRow): KeyValueRow {
-    if (row.Query !== undefined && !row.QueryText) {
-        const {Query, ...rest} = row;
-        return {...rest, QueryText: Query};
-    }
-    return row;
-}
-
-/** Normalize a parsed query response so the first result set uses 'QueryText'. */
-export function normalizeQueryResult(parsed: IQueryResult): IQueryResult {
-    const rows = parsed.resultSets?.[0]?.result;
-
-    if (!rows) {
-        return parsed;
-    }
-
-    return {
-        ...parsed,
-        resultSets: parsed.resultSets!.map((resultSet, index) =>
-            index === 0 && resultSet.result
-                ? {...resultSet, result: resultSet.result.map(normalizeQueryToQueryText)}
-                : resultSet,
-        ),
-    };
 }

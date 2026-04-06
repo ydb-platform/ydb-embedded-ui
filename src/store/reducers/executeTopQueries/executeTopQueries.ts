@@ -10,7 +10,7 @@ import {api} from '../api';
 
 import {TOP_QUERIES_TABLES} from './constants';
 import type {TimeFrame, TopQueriesFilters} from './types';
-import {getFiltersConditions, normalizeQueryResult} from './utils';
+import {getFiltersConditions} from './utils';
 
 const initialState: TopQueriesFilters = {};
 
@@ -87,7 +87,19 @@ function getRunningQueriesText(
     const orderBy = prepareOrderByFromTableSort(sortOrder);
 
     return `${QUERY_TECHNICAL_MARK}
-SELECT *
+SELECT
+    Query as QueryText,
+    UserSID,
+    QueryStartAt,
+    ApplicationName,
+    WmPoolId,
+    WmState,
+    WmEnterTime,
+    WmExitTime,
+    ClientAddress,
+    ClientPID,
+    ClientUserAgent,
+    ClientSdkBuildInfo
 FROM \`.sys/query_sessions\`
 WHERE ${filterConditions || 'true'} AND Query NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
 AND QueryStartAt is not null ${orderBy}
@@ -184,9 +196,9 @@ export const topQueriesApi = api.injectEndpoints({
                         throw response;
                     }
 
-                    const parsed = parseQueryAPIResponse(response);
+                    const data = parseQueryAPIResponse(response);
 
-                    return {data: normalizeQueryResult(parsed)};
+                    return {data};
                 } catch (error) {
                     return {error};
                 }
