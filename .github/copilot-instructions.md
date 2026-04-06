@@ -10,10 +10,10 @@ Use existing repository patterns and prefer minimal, behavior-preserving changes
 
 ## React and TypeScript
 
-- Use `import React from 'react'`.
+- Use `import React from 'react'` in TSX and component files; use `import type React from 'react'` when only React types are needed.
 - Use `React.Fragment` instead of fragment shorthand.
 - Use separate top-level `import type`.
-- Do not use `React.FC`.
+- Do not use `React.FC` for component typing.
 - This repo uses React Router v5, not v6; prefer v5 hooks such as `useHistory` and `useParams`.
 - Avoid unnecessary `useEffect`; prefer direct handlers and derived state when possible.
 - Keep BEM names semantic. Prefix new SCSS root blocks and new `cn()` block names with `ydb-` unless the surrounding feature already uses an established local convention.
@@ -22,7 +22,6 @@ Use existing repository patterns and prefer minimal, behavior-preserving changes
 
 - Never call APIs directly; use `window.api.module.method()`.
 - RTK Query endpoints must use `injectEndpoints()` and `queryFn`.
-- Do not mutate RTK Query state.
 - Clear form errors on user input and always handle loading states.
 
 ## Tables and URL Params
