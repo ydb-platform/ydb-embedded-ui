@@ -7,6 +7,7 @@ import type {KeyValueRow} from '../../../../../types/api/query';
 import {cn} from '../../../../../utils/cn';
 import {formatDateTime, formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {generateHash} from '../../../../../utils/generateHash';
+import {isNonEmptyValue} from '../../../../../utils/index';
 import {formatToMs, parseUsToMs} from '../../../../../utils/timeParsers';
 
 import {
@@ -132,7 +133,9 @@ const wmPoolIdColumn: Column<KeyValueRow> = {
     name: QUERIES_COLUMNS_IDS.WmPoolId,
     header: QUERIES_COLUMNS_TITLES.WmPoolId,
     render: ({row}) => (
-        <div className={b('text-cell')}>{row.WmPoolId || EMPTY_DATA_PLACEHOLDER}</div>
+        <div className={b('text-cell')}>
+            {isNonEmptyValue(row.WmPoolId) ? row.WmPoolId : EMPTY_DATA_PLACEHOLDER}
+        </div>
     ),
     width: 150,
 };
@@ -141,7 +144,9 @@ const wmStateColumn: Column<KeyValueRow> = {
     name: QUERIES_COLUMNS_IDS.WmState,
     header: QUERIES_COLUMNS_TITLES.WmState,
     render: ({row}) => (
-        <div className={b('text-cell')}>{row.WmState || EMPTY_DATA_PLACEHOLDER}</div>
+        <div className={b('text-cell')}>
+            {isNonEmptyValue(row.WmState) ? row.WmState : EMPTY_DATA_PLACEHOLDER}
+        </div>
     ),
     width: 120,
 };
@@ -150,7 +155,7 @@ const wmEnterTimeColumn: Column<KeyValueRow> = {
     name: QUERIES_COLUMNS_IDS.WmEnterTime,
     header: QUERIES_COLUMNS_TITLES.WmEnterTime,
     render: ({row}) =>
-        row.WmEnterTime !== null && row.WmEnterTime !== undefined && row.WmEnterTime !== ''
+        isNonEmptyValue(row.WmEnterTime)
             ? formatDateTime(new Date(row.WmEnterTime as string).getTime())
             : EMPTY_DATA_PLACEHOLDER,
     width: 200,
@@ -160,7 +165,7 @@ const wmExitTimeColumn: Column<KeyValueRow> = {
     name: QUERIES_COLUMNS_IDS.WmExitTime,
     header: QUERIES_COLUMNS_TITLES.WmExitTime,
     render: ({row}) =>
-        row.WmExitTime !== null && row.WmExitTime !== undefined && row.WmExitTime !== ''
+        isNonEmptyValue(row.WmExitTime)
             ? formatDateTime(new Date(row.WmExitTime as string).getTime())
             : EMPTY_DATA_PLACEHOLDER,
     width: 200,
