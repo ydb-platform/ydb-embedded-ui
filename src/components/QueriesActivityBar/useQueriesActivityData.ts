@@ -2,7 +2,6 @@ import React from 'react';
 
 import {selectGraphShardExists} from '../../store/reducers/capabilities/capabilities';
 import {topQueriesApi} from '../../store/reducers/executeTopQueries/executeTopQueries';
-import type {KeyValueRow} from '../../types/api/query';
 import {useAutoRefreshInterval} from '../../utils/hooks';
 import {useTypedSelector} from '../../utils/hooks/useTypedSelector';
 import type {TimeFrame} from '../../utils/timeframes';
@@ -32,7 +31,7 @@ export function useQueriesActivityData(database: string): UseQueriesActivityData
     const graphShardExists = useTypedSelector((state) => selectGraphShardExists(state, database));
     const skipCharts = graphShardExists === false;
 
-    const {data: runningQueriesData} = topQueriesApi.useGetRunningQueriesOverviewQuery(
+    const {data: runningQueriesCountData} = topQueriesApi.useGetRunningQueriesCountQuery(
         {
             database,
         },
@@ -63,7 +62,9 @@ export function useQueriesActivityData(database: string): UseQueriesActivityData
         {pollingInterval: shouldRefresh, skip: skipCharts},
     );
 
-    const runningQueriesCount = runningQueriesData?.resultSets?.[0]?.result?.length || 0;
+    const runningQueriesCount = runningQueriesCountData?.runningQueriesCount ?? 0;
+    const uniqueApplications = runningQueriesCountData?.uniqueApplications ?? 0;
+    const uniqueUsers = runningQueriesCountData?.uniqueUsers ?? 0;
 
     // Determine chart availability from queries API success/error state
     const areChartsAvailable = React.useMemo(() => {
@@ -88,26 +89,6 @@ export function useQueriesActivityData(database: string): UseQueriesActivityData
         () => calculateLatency(latencyData?.metrics?.[0]?.data),
         [latencyData?.metrics?.[0]?.data],
     );
-
-    const uniqueApplications = React.useMemo(() => {
-        const apps = new Set<string>();
-        runningQueriesData?.resultSets?.[0]?.result?.forEach((row: KeyValueRow) => {
-            if (row.ApplicationName) {
-                apps.add(String(row.ApplicationName));
-            }
-        });
-        return apps.size;
-    }, [runningQueriesData]);
-
-    const uniqueUsers = React.useMemo(() => {
-        const users = new Set<string>();
-        runningQueriesData?.resultSets?.[0]?.result?.forEach((row: KeyValueRow) => {
-            if (row.UserSID) {
-                users.add(String(row.UserSID));
-            }
-        });
-        return users.size;
-    }, [runningQueriesData]);
 
     return {
         runningQueriesCount,
