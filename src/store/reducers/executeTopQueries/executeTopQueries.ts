@@ -99,6 +99,17 @@ AND QueryStartAt is not null ${orderBy}
 LIMIT ${limit || 100}`;
 }
 
+function getRunningQueriesCountText() {
+    return `${QUERY_TECHNICAL_MARK}
+SELECT
+    COUNT(*) as RunningQueriesCount,
+    COUNT(DISTINCT CASE WHEN ApplicationName = '' THEN NULL ELSE ApplicationName END) as UniqueApplications,
+    COUNT(DISTINCT CASE WHEN UserSID = '' THEN NULL ELSE UserSID END) as UniqueUsers
+FROM \`.sys/query_sessions\`
+WHERE Query NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
+AND QueryStartAt is not null`;
+}
+
 interface QueriesRequestParams {
     database: string;
     filters?: TopQueriesFilters;
@@ -181,6 +192,42 @@ export const topQueriesApi = api.injectEndpoints({
                     const data = parseQueryAPIResponse(response);
 
                     return {data};
+                } catch (error) {
+                    return {error};
+                }
+            },
+            forceRefetch() {
+                return true;
+            },
+            providesTags: ['All'],
+        }),
+        getRunningQueriesCount: build.query({
+            queryFn: async ({database}: {database: string}, {signal}) => {
+                try {
+                    const response = await window.api.viewer.sendQuery(
+                        {
+                            query: getRunningQueriesCountText(),
+                            database,
+                            action: 'execute-query',
+                            internal_call: true,
+                        },
+                        {signal, withRetries: true},
+                    );
+
+                    if (isQueryErrorResponse(response)) {
+                        throw response;
+                    }
+
+                    const data = parseQueryAPIResponse(response);
+                    const row = data?.resultSets?.[0]?.result?.[0];
+
+                    return {
+                        data: {
+                            runningQueriesCount: Number(row?.RunningQueriesCount) || 0,
+                            uniqueApplications: Number(row?.UniqueApplications) || 0,
+                            uniqueUsers: Number(row?.UniqueUsers) || 0,
+                        },
+                    };
                 } catch (error) {
                     return {error};
                 }
