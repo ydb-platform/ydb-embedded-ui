@@ -11,6 +11,12 @@ The project serves dual purposes:
 - **Standalone application**: Built and deployed as a web UI (embedded into YDB servers or served independently)
 - **Distributable library**: Published as an npm package (`src/lib.ts` exports) for embedding into other applications via `npm run package`
 
+### Editing Agent Docs
+
+- Before changing `AGENTS.md`, Copilot instructions, or related agent docs, read the current file first and compare it against actual repository conventions.
+- Do not regenerate agent docs from a generic template when a project-specific file already exists.
+- Keep repo-specific rules in repo docs; keep global tool/runtime preferences out of repo docs.
+
 ## Tech Stack
 
 - **Framework**: React 18.3 with TypeScript 5.x
@@ -60,13 +66,20 @@ npm run unused      # Find unused code (uses knip)
 ### Testing
 
 ```bash
-npm test                       # Run unit tests (Jest 30)
-npm test -- --watch           # Run tests in watch mode
+npm test                                     # Run unit tests (Jest 30)
+npm test -- --watch                          # Run tests in watch mode
+npm test -- path/to/file                     # Run a single test file
 npm run test:e2e                             # Run Playwright E2E tests
 npm run test:e2e:update-snapshots            # Update E2E snapshots (local browsers)
 npm run test:e2e:docker                      # Run E2E tests in Docker
 npm run test:e2e:docker:update-snapshots     # Update E2E snapshots in Docker
 npm run test:e2e:local                       # Run E2E against local dev server
+```
+
+### Local Verification Chain (run before committing)
+
+```bash
+npm run typecheck && npm run lint && npm test
 ```
 
 ## Architecture Overview
@@ -137,27 +150,13 @@ src/
 - **PREFER** direct event handlers and callbacks over useEffect for user interactions
 
 ```typescript
-// ✅ REQUIRED patterns — real examples from the codebase
+// ✅ Memoize computed data
+const columns = React.useMemo(
+  () => getColumns(columnsIds, overrideColumns),
+  [columnsIds, overrideColumns],
+);
 
-// Memoize computed data (src/components/ShardsTable/ShardsTable.tsx)
-const columns = React.useMemo(() => {
-  return columnsIds
-    .filter((id) => id in shardsColumnIdToGetColumn)
-    .map((id) => {
-      const overridedColumn = overrideColumns.find((column) => column.name === id);
-      if (overridedColumn) {
-        return overridedColumn;
-      }
-      const column = shardsColumnIdToGetColumn[id]({databaseFullPath});
-      return {
-        ...column,
-        sortable: isSortableTopShardsColumn(column.name),
-      };
-    });
-}, [columnsIds, overrideColumns, databaseFullPath]);
-
-// ✅ PREFER direct callbacks over useEffect — clears error on input change
-// (src/containers/Tenant/Query/QueryEditor/EditorTabs/RenameTabDialog.tsx)
+// ✅ Direct callback instead of useEffect to clear error on input
 const handleTitleChange = React.useCallback((value: string) => {
   setNextTitle(value);
   setErrorMessage(undefined);
@@ -169,6 +168,14 @@ const handleTitleChange = React.useCallback((value: string) => {
 - **ALWAYS** provide fallback values: `Number(value) || 0`
 - **NEVER** allow division by zero: `capacity > 0 ? value/capacity : 0`
 - **ALWAYS** handle null/undefined data gracefully
+
+### Data Edge Cases
+
+- **ALWAYS** use `EMPTY_DATA_PLACEHOLDER` for empty UI values. Do not hardcode em dashes `—` or en dashes `–` as placeholders. Hyphen `-` and dashes may be used as separators in titles/ranges. Before submitting, grep the code for `—`/`–` and ensure placeholders use `EMPTY_DATA_PLACEHOLDER` from `src/utils/constants.ts`.
+- Treat empty strings `''` as missing UI values unless the feature explicitly distinguishes empty string from absence.
+- Keep `''`, `null`, and `undefined` behavior consistent across table cells, drawers, detail lists, and badges.
+- Do not pass unchecked values into date/time formatters. Guard against `''`, invalid parse results, and `NaN` before formatting.
+- When a value is absent, either omit the field or render the shared placeholder consistently with nearby UI.
 
 ### Security & Input Validation
 
@@ -209,6 +216,12 @@ REACT_APP_BACKEND=http://your-cluster:8765  # Single cluster mode
 - Commit messages must follow conventional commit format (enforced by commitlint)
 - PR titles must also follow conventional commit format with lowercase subjects, max 72 characters (e.g., `fix: update api endpoints`, `feat: add new component`)
 - Always run `npm run lint` and `npm run typecheck` to catch issues early
+
+### CI and Workflow Edits
+
+- Do not introduce runtime installs of unpinned latest tool versions in CI when another job or the lockfile defines the expected version.
+- Prefer deriving tool versions from `package-lock.json` or `package.json` when reproducibility matters.
+- Avoid commands that may rewrite repo-tracked manifests or lockfiles in CI unless that is the explicit goal.
 
 ### CI Pipeline
 
@@ -312,6 +325,13 @@ Use `PaginatedTable` component for data grids with virtual scrolling. Tables req
 
 API endpoints are injected using RTK Query's `injectEndpoints` pattern. Queries wrap `window.api` calls and provide hooks with loading states, error handling, and caching. The base API uses `fakeBaseQuery` — all endpoints must use `queryFn`.
 
+### Query Safety and Compatibility
+
+- Do not interpolate raw user input into SQL/YQL without escaping.
+- Parenthesize mixed `OR` expressions before combining them with `AND` conditions.
+- When backend schema differs across YDB versions, prefer compatibility-safe query shapes and normalize the response in code.
+- If a feature depends on newly added backend fields, verify behavior on older clusters and keep a clear fallback path.
+
 ### Common UI Components
 
 - **Notifications**: Use `createToast` utility for user notifications
@@ -323,6 +343,7 @@ API endpoints are injected using RTK Query's `injectEndpoints` pattern. Queries 
 Uses BEM naming convention with `cn()` utility from `utils/cn` (wraps `@bem-react/classname`). Create a block function with component name and use it for element and modifier classes.
 
 - **ALWAYS** prefix new SCSS root blocks and new `cn()` block names with `ydb-` (for example, `cn('ydb-query-editor')`) unless the surrounding feature already uses an established local naming convention that must be preserved for compatibility.
+- Do not reuse semantically narrow BEM element names for unrelated content just to share visual styles; introduce a generic element or modifier instead.
 
 ### Type Naming Convention
 
@@ -383,6 +404,16 @@ Uses React Router v5 hooks (`useHistory`, `useParams`, etc.). Always validate ro
 - Use custom `QueryParamConfig` objects for encoding/decoding complex parameters
 - Use `z.enum([...]).catch(defaultValue)` pattern for safe parsing with fallbacks
 
+### Table Change Propagation
+
+- When adding or changing table columns, filters, or sorting, update all connected surfaces:
+  - URL/query-param schema
+  - sort whitelist and persistence
+  - shareable links and restored state
+  - drawer/details rendering
+  - i18n keys
+  - unit and E2E coverage where behavior is user-visible
+
 ```typescript
 // ✅ Zod schema with fallback (src/containers/Versions/Versions.tsx)
 const groupByValueSchema = z.nativeEnum(GroupByValue).catch(GroupByValue.VERSION);
@@ -414,28 +445,16 @@ const [urlSortParam, setUrlSortParam] = useQueryParam<SortOrder[]>(paramName, So
 
 The `uiFactory` in `src/uiFactory/uiFactory.ts` provides an extensibility layer for customizing the UI when using the project as a library. Use `configureUIFactory()` to override defaults like monitoring links, healthcheck views, feature flags, and access control.
 
-### Critical Rules
-
-- **NEVER** call APIs directly - use `window.api.module.method()`
-- **NEVER** mutate state in RTK Query - return new objects/arrays
-- **NEVER** hardcode user-facing strings - use i18n
-- **ALWAYS** use `EMPTY_DATA_PLACEHOLDER` for empty UI values. Do not hardcode em dashes `—` or en dashes `–` as placeholders. Hyphen `-` and dashes may be used as separators in titles/ranges. Before submitting, grep the code for `—`/`–` and ensure placeholders use `EMPTY_DATA_PLACEHOLDER` from `src/utils/constants.ts`.
-- **ALWAYS** use `cn()` for classNames: `const b = cn('component-name')`
-- **ALWAYS** clear errors on user input
-- **ALWAYS** handle loading states in UI
-- **ALWAYS** validate route params exist before use
-- **ALWAYS** follow i18n naming rules from `i18n-naming-ruleset.md`
-- **ALWAYS** use Zod schemas for URL parameter validation with fallbacks
-- **ALWAYS** use separate `import type` for type-only imports
-- **ALWAYS** use `import React from 'react'` (not named imports from react)
-- **ALWAYS** use `React.Fragment` instead of `<></>`
-- **PREFER** `use-query-params` over `redux-location-state` for new URL parameter handling
-
 ### Debugging Tips
 
 - `window.api` - Access API methods in browser console
 - `window.ydbEditor` - Monaco editor instance
 - Enable request tracing with `DEV_ENABLE_TRACING_FOR_ALL_REQUESTS`
+
+### Frontend Diagnostics
+
+- For CSS and layout bugs, verify actual DOM ownership, selector specificity, computed sizing, and overflow behavior before explaining the cause.
+- Do not attribute layout issues to specificity or style-order conflicts unless the selectors and computed styles confirm it.
 
 ## Deployment Configuration
 
@@ -462,37 +481,9 @@ Build artifacts are placed in `/build` directory. For embedded deployments, file
 - `REACT_APP_META_BACKEND` - Meta backend URL for multi-cluster mode
 - `GENERATE_SOURCEMAP` - Set to `false` for production builds
 
-## Common Issues & Troubleshooting
-
-### Development Issues
-
-1. **Port 3000 already in use**: Kill the process using the port or change the PORT env variable
-2. **Docker connection issues**: Ensure Docker is running and port 8765 is not blocked
-3. **TypeScript errors on build**: Run `npm run typecheck` to identify issues before building
-4. **Lint errors blocking commit**: Run `npm run lint` to fix auto-fixable issues
-
-### API Connection Issues
-
-1. **CORS errors**: Check if backend allows localhost:3000 origin in development
-2. **Authentication failures**: Verify credentials and authentication method
-3. **Network timeouts**: Check backend availability and network configuration
-
-### Performance Issues
-
-1. **Large table rendering**: Tables use virtual scrolling - ensure `PaginatedTable` is used
-2. **Bundle size**: Run `npm run analyze` to identify large dependencies
-3. **Memory leaks**: Check for missing cleanup in useEffect hooks
-
 ## Reference Resources
-
-- **YDB Documentation**: https://ydb.tech/en/docs/
-- **Gravity UI Components**: https://gravity-ui.com/
-- **Redux Toolkit**: https://redux-toolkit.js.org/
-- **React Router v5**: https://v5.reactrouter.com/
-- **Monaco Editor**: https://microsoft.github.io/monaco-editor/
-
-### Internal Resources
 
 - **Swagger API**: Available at http://localhost:8765/viewer/api/ in development
 - **YDB Monitoring Docs**: https://ydb.tech/en/docs/maintenance/embedded_monitoring/ydb_monitoring
+- **Gravity UI Components**: https://gravity-ui.com/
 - **Project Roadmap**: See ROADMAP.md in repository root
