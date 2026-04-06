@@ -68,14 +68,18 @@ export function createQueryInfoItems(data: KeyValueRow): YDBDefinitionListItem[]
         });
     }
 
-    if (data.UserSID !== null && data.UserSID !== undefined) {
+    if (data.UserSID !== null && data.UserSID !== undefined && data.UserSID !== '') {
         items.push({
             name: columnsI18n('user'),
             content: data.UserSID,
         });
     }
 
-    if (data.ApplicationName !== null && data.ApplicationName !== undefined) {
+    if (
+        data.ApplicationName !== null &&
+        data.ApplicationName !== undefined &&
+        data.ApplicationName !== ''
+    ) {
         items.push({
             name: columnsI18n('application'),
             content: data.ApplicationName,
