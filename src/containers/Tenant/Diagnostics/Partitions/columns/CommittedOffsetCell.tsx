@@ -10,6 +10,7 @@ import {
 import type {DropdownMenuItem} from '@gravity-ui/uikit';
 import {ActionTooltip, Button, DropdownMenu, Icon} from '@gravity-ui/uikit';
 
+import {useClusterWithProxy} from '../../../../../store/reducers/cluster/cluster';
 import {partitionsApi} from '../../../../../store/reducers/partitions/partitions';
 import {cn} from '../../../../../utils/cn';
 import createToast from '../../../../../utils/createToast';
@@ -37,7 +38,8 @@ export function CommittedOffsetCell({
     partitionId,
     readSessionId,
 }: CommittedOffsetCellProps) {
-    const {path, database} = useCurrentSchema();
+    const {path, database, databaseFullPath} = useCurrentSchema();
+    const useMetaProxy = useClusterWithProxy();
     const {selectedConsumer} = useTypedSelector((state) => state.partitions);
     const [commitOffset] = partitionsApi.useCommitOffsetMutation();
 
@@ -48,7 +50,7 @@ export function CommittedOffsetCell({
             }
             commitOffset({
                 database,
-                path,
+                path: {path, databaseFullPath, useMetaProxy},
                 consumer: selectedConsumer,
                 partitionId: Number(partitionId),
                 offset,
@@ -65,14 +67,23 @@ export function CommittedOffsetCell({
                 })
                 .catch((err: unknown) => {
                     createToast({
-                        name: 'commitOffset',
+                        name: `commitOffset-${offset}-${partitionId}`,
                         title: i18n('alert_offset-error'),
                         content: prepareCommonErrorMessage(err),
                         theme: 'danger',
                     });
                 });
         },
-        [commitOffset, database, path, selectedConsumer, partitionId, readSessionId],
+        [
+            commitOffset,
+            database,
+            path,
+            databaseFullPath,
+            useMetaProxy,
+            selectedConsumer,
+            partitionId,
+            readSessionId,
+        ],
     );
 
     const committedOffsetMenuItems: DropdownMenuItem[][] = React.useMemo(() => {
@@ -147,9 +158,11 @@ export function CommittedOffsetCell({
                     action: () => {
                         if (selectedConsumer) {
                             showSpecifyOffsetConfirmation({
-                                partitionId,
+                                database,
+                                path: {path, databaseFullPath, useMetaProxy},
                                 consumer: selectedConsumer,
-                                onConfirm: handleCommitOffset,
+                                partitionId: Number(partitionId),
+                                readSessionId,
                             });
                         }
                     },
@@ -158,7 +171,19 @@ export function CommittedOffsetCell({
                 },
             ],
         ];
-    }, [handleCommitOffset, selectedConsumer, partitionId, startOffset, endOffset, value]);
+    }, [
+        handleCommitOffset,
+        selectedConsumer,
+        partitionId,
+        startOffset,
+        endOffset,
+        value,
+        database,
+        path,
+        databaseFullPath,
+        useMetaProxy,
+        readSessionId,
+    ]);
 
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 

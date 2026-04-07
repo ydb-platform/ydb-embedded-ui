@@ -3,30 +3,39 @@ import React from 'react';
 import * as NiceModal from '@ebay/nice-modal-react';
 import {Alert, Dialog, Flex, TextInput} from '@gravity-ui/uikit';
 
+import {partitionsApi} from '../../../../../store/reducers/partitions/partitions';
+import type {CommitOffsetParams} from '../../../../../store/reducers/partitions/types';
 import {cn} from '../../../../../utils/cn';
+import createToast from '../../../../../utils/createToast';
+import {prepareCommonErrorMessage} from '../../../../../utils/errors';
 import i18n from '../i18n';
 
 const b = cn('ydb-specify-offset-dialog');
 
 const SPECIFY_OFFSET_DIALOG = 'specify-offset-dialog';
 
-interface SpecifyOffsetDialogProps {
-    partitionId: string | number;
-    consumer: string;
-    onConfirm: (offset: number) => void;
+type CommitOffsetParamsWithoutOffset = Omit<CommitOffsetParams, 'offset'>;
+
+interface SpecifyOffsetDialogProps extends CommitOffsetParamsWithoutOffset {
     onClose: () => void;
+    onSuccess: () => void;
     open: boolean;
 }
 
 function SpecifyOffsetDialog({
-    partitionId,
+    database,
+    path,
     consumer,
-    onConfirm,
+    partitionId,
+    readSessionId,
     onClose,
+    onSuccess,
     open,
 }: SpecifyOffsetDialogProps) {
     const [offsetValue, setOffsetValue] = React.useState('');
     const [validationError, setValidationError] = React.useState<string>();
+
+    const [commitOffset, {isLoading, error}] = partitionsApi.useCommitOffsetMutation();
 
     const inputRef = React.useRef<HTMLInputElement>(null);
 
@@ -35,7 +44,7 @@ function SpecifyOffsetDialog({
         setValidationError(undefined);
     }, []);
 
-    const handleConfirm = React.useCallback(() => {
+    const handleConfirm = React.useCallback(async () => {
         const numericOffset = Number(offsetValue.trim());
 
         if (!offsetValue || isNaN(numericOffset)) {
@@ -43,13 +52,37 @@ function SpecifyOffsetDialog({
             return;
         }
 
-        if (!Number.isInteger(numericOffset) || numericOffset < 0) {
-            setValidationError(i18n('error_invalid-offset'));
-            return;
-        }
+        try {
+            await commitOffset({
+                database,
+                path,
+                consumer,
+                partitionId,
+                offset: numericOffset,
+                readSessionId,
+            }).unwrap();
 
-        onConfirm(numericOffset);
-    }, [offsetValue, onConfirm]);
+            createToast({
+                name: 'commitOffset',
+                content: i18n('alert_offset-moved'),
+                theme: 'success',
+                title: '',
+            });
+
+            onSuccess();
+        } catch {
+            // error is captured by the mutation hook state
+        }
+    }, [
+        offsetValue,
+        commitOffset,
+        database,
+        path,
+        consumer,
+        partitionId,
+        readSessionId,
+        onSuccess,
+    ]);
 
     return (
         <Dialog
@@ -80,9 +113,13 @@ function SpecifyOffsetDialog({
                         errorMessage={validationError}
                     />
                     <Alert theme="warning" message={i18n('alert_move-offset-forward')} />
+                    {error ? (
+                        <Alert theme="danger" message={prepareCommonErrorMessage(error)} />
+                    ) : null}
                 </Flex>
             </Dialog.Body>
             <Dialog.Footer
+                loading={isLoading}
                 onClickButtonApply={handleConfirm}
                 propsButtonApply={{view: 'action', disabled: !offsetValue}}
                 textButtonApply={i18n('action_move-offset')}
@@ -93,11 +130,7 @@ function SpecifyOffsetDialog({
     );
 }
 
-interface ShowSpecifyOffsetConfirmationParams {
-    partitionId: string | number;
-    consumer: string;
-    onConfirm: (offset: number) => void;
-}
+type ShowSpecifyOffsetConfirmationParams = CommitOffsetParamsWithoutOffset;
 
 const SpecifyOffsetDialogNiceModal = NiceModal.create(
     (props: ShowSpecifyOffsetConfirmationParams) => {
@@ -108,19 +141,15 @@ const SpecifyOffsetDialogNiceModal = NiceModal.create(
             modal.remove();
         }, [modal]);
 
-        const handleConfirm = React.useCallback(
-            (offset: number) => {
-                props.onConfirm(offset);
-                modal.resolve(true);
-                handleClose();
-            },
-            [props, modal, handleClose],
-        );
+        const handleSuccess = React.useCallback(() => {
+            modal.resolve(true);
+            handleClose();
+        }, [modal, handleClose]);
 
         return (
             <SpecifyOffsetDialog
                 {...props}
-                onConfirm={handleConfirm}
+                onSuccess={handleSuccess}
                 onClose={handleClose}
                 open={modal.visible}
             />

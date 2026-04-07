@@ -637,7 +637,7 @@ export class ViewerAPI extends BaseYdbAPI {
             this.getPath('/viewer/commit_offset'),
             {
                 database,
-                path,
+                path: this.getSchemaPath(path),
                 consumer,
                 partition_id: partitionId,
                 offset,

@@ -1,3 +1,4 @@
+import type {SchemaPathParam} from '../../../types/api/common';
 import type {ProcessSpeedStats} from '../../../utils/bytesParsers';
 
 // Fields that could be undefined corresponds to partitions without consumers
@@ -18,9 +19,9 @@ export interface PreparedPartitionData {
     uncommitedMessages?: number;
     unreadMessages?: number;
 
-    startOffset: string;
-    endOffset: string;
-    commitedOffset?: string;
+    startOffset: number;
+    endOffset: number;
+    commitedOffset?: number;
 
     readSessionId?: string;
     readerName?: string;
@@ -31,7 +32,7 @@ export interface PreparedPartitionData {
 
 export interface CommitOffsetParams {
     database: string;
-    path: string;
+    path: SchemaPathParam;
     consumer: string;
     partitionId: number;
     offset: number;
