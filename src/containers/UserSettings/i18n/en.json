@@ -37,6 +37,7 @@
   "settings.invertedDisks.title": "Inverted disks space indicators",
 
   "settings.enableNetworkTable.title": "Enable network table",
+  "settings.enableNewStorageView.title": "New storage view",
 
   "settings.showNetworkUtilization.title": "Show network utilization",
 

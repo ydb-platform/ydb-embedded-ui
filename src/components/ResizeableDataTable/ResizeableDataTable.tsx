@@ -14,6 +14,7 @@ const b = cn('ydb-resizeable-data-table');
 
 export interface ResizeableDataTableProps<T> extends Omit<DataTableProps<T>, 'theme' | 'onResize'> {
     columnsWidthLSKey?: string;
+    reserveResizePadding?: boolean;
     wrapperClassName?: string;
 
     /**
@@ -35,6 +36,7 @@ export function ResizeableDataTable<T>({
     columnsWidthLSKey,
     columns,
     settings,
+    reserveResizePadding = true,
     wrapperClassName,
     isLoading,
     isFetching,
@@ -88,7 +90,7 @@ export function ResizeableDataTable<T>({
     }
 
     return (
-        <div className={b(null, wrapperClassName)}>
+        <div className={b({'reserve-resize-padding': reserveResizePadding}, wrapperClassName)}>
             <DataTable
                 theme="yandex-cloud"
                 columns={updatedColumns}

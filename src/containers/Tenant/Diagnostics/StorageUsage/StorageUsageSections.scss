@@ -1,0 +1,9 @@
+.ydb-storage-usage-sections {
+    &__section {
+        width: 100%;
+    }
+
+    &__empty {
+        margin-top: var(--g-spacing-2);
+    }
+}

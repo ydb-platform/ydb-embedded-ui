@@ -1,4 +1,5 @@
 import {DoughnutMetrics} from '../../../../components/DoughnutMetrics/DoughnutMetrics';
+import {normalizeMediaType} from '../../../../utils/disks/normalizeMediaType';
 import {formatStorageLegend} from '../../../../utils/metrics/formatMetricLegend';
 import i18n from '../../i18n';
 import type {ClusterMetricsCommonProps} from '../shared';
@@ -24,7 +25,7 @@ export function ClusterMetricsStorage({
         ...rest,
     });
 
-    const normalizedType = type === 'ROT' ? 'HDD' : type;
+    const normalizedType = type ? normalizeMediaType(type) : type;
 
     const title = type
         ? i18n('title_storage-by-type', {type: normalizedType})

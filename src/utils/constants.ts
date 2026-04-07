@@ -10,6 +10,7 @@ export const KILOBYTE = 1_000;
 export const MEGABYTE = 1_000_000;
 export const GIGABYTE = 1_000_000_000;
 export const TERABYTE = 1_000_000_000_000;
+export const PETABYTE = 1_000_000_000_000_000;
 
 export const SECOND_IN_MS = 1000;
 export const MINUTE_IN_SECONDS = 60;

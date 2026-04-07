@@ -47,7 +47,7 @@ interface DiagnosticsTabItemProps extends Page {
 function DiagnosticsTabItem({id, title, linkPath, badge}: DiagnosticsTabItemProps) {
     return (
         <Tab key={id} value={id}>
-            <InternalLink to={linkPath} as="tab">
+            <InternalLink to={linkPath} as="tab" data-tab={id}>
                 {title}
                 {badge && (
                     <Label className={b('tab-badge')} theme={badge.theme} size={badge.size}>

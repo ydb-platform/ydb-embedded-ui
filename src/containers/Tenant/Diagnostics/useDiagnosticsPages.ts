@@ -1,7 +1,11 @@
 import React from 'react';
 
 import {
+    useCapabilitiesLoaded,
     useConfigAvailable,
+    useNewStorageViewEnabled,
+    useStorageGroupsHandlerAvailable,
+    useStorageStatsAvailable,
     useTopicDataAvailable,
 } from '../../../store/reducers/capabilities/hooks';
 import {useClusterBaseInfo} from '../../../store/reducers/cluster/cluster';
@@ -38,6 +42,13 @@ export function useDiagnosticsPages({
     const {monitoring: clusterMonitoring} = useClusterBaseInfo();
 
     const hasConfigs = useConfigAvailable();
+    const capabilitiesLoaded = useCapabilitiesLoaded();
+    const newStorageViewEnabled = useNewStorageViewEnabled();
+    const storageGroupsAvailable = useStorageGroupsHandlerAvailable();
+    const storageStatsAvailable = useStorageStatsAvailable();
+    const hasStorageUsageCapabilities =
+        !capabilitiesLoaded || (storageGroupsAvailable && storageStatsAvailable);
+    const hasStorageUsage = newStorageViewEnabled && hasStorageUsageCapabilities;
     const hasTopicData = useTopicDataAvailable();
     const isViewerUser = useIsViewerUser();
 
@@ -45,6 +56,7 @@ export function useDiagnosticsPages({
         return getPagesByType(type, subType, {
             hasTopicData,
             isDatabase,
+            hasStorageUsage,
             hasBackups: typeof uiFactory.renderBackups === 'function' && Boolean(controlPlane),
             hasConfigs: isViewerUser && hasConfigs,
             hasAccess: uiFactory.hasAccess,
@@ -53,16 +65,16 @@ export function useDiagnosticsPages({
             databasePagesDisplay,
         });
     }, [
-        databasePagesDisplay,
         type,
         subType,
-        path,
-        databaseFullPath,
-        controlPlane,
-        databaseType,
-        clusterMonitoring,
-        hasConfigs,
         hasTopicData,
+        isDatabase,
+        hasStorageUsage,
+        controlPlane,
         isViewerUser,
+        hasConfigs,
+        clusterMonitoring,
+        databaseType,
+        databasePagesDisplay,
     ]);
 }

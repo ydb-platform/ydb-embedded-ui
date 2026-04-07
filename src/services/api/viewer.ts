@@ -27,7 +27,12 @@ import type {
 import type {JsonRenderRequestParams, JsonRenderResponse} from '../../types/api/render';
 import type {DescribeReplicationResult} from '../../types/api/replication';
 import type {TEvDescribeSchemeResult} from '../../types/api/schema';
-import type {StorageRequestParams, TStorageInfo} from '../../types/api/storage';
+import type {
+    StorageRequestParams,
+    StorageStatsRequestParams,
+    StorageStatsResponse,
+    TStorageInfo,
+} from '../../types/api/storage';
 import type {TEvSystemStateResponse} from '../../types/api/systemState';
 import type {
     TDomainKey,
@@ -502,6 +507,33 @@ export class ViewerAPI extends BaseYdbAPI {
                 // Do not send empty string
                 filter: filter || undefined,
                 ...params,
+            },
+            {concurrentId, requestConfig: {signal}},
+        );
+    }
+
+    getStorageStats(
+        {
+            database,
+            path,
+            groupBy = 'path',
+            everything,
+            groups,
+            tablets,
+            media,
+        }: StorageStatsRequestParams,
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
+        return this.get<StorageStatsResponse>(
+            this.getPath('/viewer/storage_stats'),
+            {
+                database,
+                path: this.getSchemaPath(path),
+                group_by: groupBy,
+                everything,
+                groups,
+                tablets,
+                media,
             },
             {concurrentId, requestConfig: {signal}},
         );

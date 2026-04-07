@@ -19,6 +19,7 @@ export type Capability =
     | '/pdisk/info'
     | '/scheme/directory'
     | '/storage/groups'
+    | '/viewer/storage_stats'
     | '/viewer/query'
     | '/viewer/feature_flags'
     | '/viewer/config'
