@@ -9,5 +9,13 @@
   "duration": "Duration",
   "query-text": "Query text",
   "application": "Application",
-  "request-units": "Request Units"
+  "request-units": "Request Units",
+  "wm-pool-id": "WM Pool ID",
+  "wm-state": "WM State",
+  "wm-enter-time": "WM Enter Time",
+  "wm-exit-time": "WM Exit Time",
+  "client-address": "Client Address",
+  "client-pid": "Client PID",
+  "client-user-agent": "Client User Agent",
+  "client-sdk-build-info": "Client SDK Build Info"
 }

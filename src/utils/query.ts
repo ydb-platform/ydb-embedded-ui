@@ -34,7 +34,7 @@ export const TRANSACTION_MODES = {
 export const TRANSACTION_MODES_TITLES: Record<TransactionMode, string> = {
     [TRANSACTION_MODES.serializable]: 'Serializable',
     [TRANSACTION_MODES.stalero]: 'Stale Read-Only',
-    [TRANSACTION_MODES.onlinero]: 'Online Read-Only',
+    [TRANSACTION_MODES.onlinero]: 'Online Read-Only (obsolete)',
     [TRANSACTION_MODES.snapshot]: 'Snapshot Read-Only',
     [TRANSACTION_MODES.snapshotrw]: 'Snapshot Read-Write',
     [TRANSACTION_MODES.implicit]: 'Implicit',

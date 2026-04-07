@@ -6,6 +6,11 @@ export function valueIsDefined<T>(value: T | null | undefined): value is T {
     return value !== null && value !== undefined;
 }
 
+/** Like `valueIsDefined`, but also treats empty strings as absent. */
+export function isNonEmptyValue(value: unknown): boolean {
+    return value !== null && value !== undefined && value !== '';
+}
+
 export async function wait<T = unknown>(time: number, value?: T): Promise<T | undefined> {
     return new Promise((resolve) => {
         setTimeout(() => resolve(value), time);
