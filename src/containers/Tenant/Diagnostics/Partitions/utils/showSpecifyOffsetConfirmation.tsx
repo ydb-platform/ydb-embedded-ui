@@ -46,8 +46,7 @@ function SpecifyOffsetDialog({
 
     const handleConfirm = React.useCallback(async () => {
         const numericOffset = Number(offsetValue.trim());
-
-        if (!offsetValue || isNaN(numericOffset)) {
+        if (!offsetValue || !Number.isInteger(numericOffset) || numericOffset < 0) {
             setValidationError(i18n('error_invalid-offset'));
             return;
         }
