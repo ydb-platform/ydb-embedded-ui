@@ -139,8 +139,8 @@ export function createCombinedTopPartitionsHistoryQuery(options: {
     const toTime = dateTimeParse(Number(to) || to)?.valueOf();
     const currentHourStart = getCurrentHourStart();
 
-    const needsMinuteTable = !toTime || toTime > currentHourStart;
-    const needsHourTable = !fromTime || fromTime < currentHourStart;
+    const needsMinuteTable = toTime === undefined || toTime > currentHourStart;
+    const needsHourTable = fromTime === undefined || fromTime < currentHourStart;
 
     if (needsMinuteTable && needsHourTable) {
         return createUnionTopPartitionsQuery({
