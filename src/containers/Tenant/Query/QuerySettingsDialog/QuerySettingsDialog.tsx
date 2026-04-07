@@ -4,7 +4,10 @@ import {Button, Dialog, Flex, TextArea, TextInput, Tooltip} from '@gravity-ui/ui
 import {zodResolver} from '@hookform/resolvers/zod';
 import {Controller, useForm} from 'react-hook-form';
 
-import {useTracingLevelOptionAvailable} from '../../../../store/reducers/capabilities/hooks';
+import {
+    useSnapshotReadWriteAvailable,
+    useTracingLevelOptionAvailable,
+} from '../../../../store/reducers/capabilities/hooks';
 import {
     selectQueryAction,
     setQueryAction,
@@ -24,6 +27,7 @@ import type {ResourcePoolValue} from '../../../../utils/query';
 import {
     RESOURCE_POOL_NO_OVERRIDE_VALUE,
     STATISTICS_MODES_WITH_SVG,
+    TRANSACTION_MODES,
     isStreamingSupportedForMode,
     querySettingsValidationSchema,
 } from '../../../../utils/query';
@@ -93,6 +97,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
 
     const [useShowPlanToSvg] = useSetting<boolean>(SETTING_KEYS.USE_SHOW_PLAN_SVG);
     const enableTracingLevel = useTracingLevelOptionAvailable();
+    const enableSnapshotReadWrite = useSnapshotReadWriteAvailable();
     const [isQueryStreamingEnabled] = useQueryStreamingSetting();
     const {database} = useCurrentSchema();
     const {resourcePools, isLoading: isResourcePoolsLoading} = useResourcePools(
@@ -141,6 +146,15 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
             return {...option, disabled: isDisabled};
         });
     }, [useShowPlanToSvg]);
+
+    const transactionModeOptions = React.useMemo(() => {
+        return QUERY_SETTINGS_FIELD_SETTINGS.transactionMode.options.filter((option) => {
+            if (option.value === TRANSACTION_MODES.snapshotrw) {
+                return enableSnapshotReadWrite;
+            }
+            return true;
+        });
+    }, [enableSnapshotReadWrite]);
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -208,9 +222,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
                                     id="transactionMode"
                                     setting={field.value}
                                     onUpdateSetting={field.onChange}
-                                    settingOptions={
-                                        QUERY_SETTINGS_FIELD_SETTINGS.transactionMode.options
-                                    }
+                                    settingOptions={transactionModeOptions}
                                 />
                             )}
                         />

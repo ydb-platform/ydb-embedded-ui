@@ -101,6 +101,10 @@ export const useClusterDashboardAvailable = () => {
     return useGetFeatureVersion('/viewer/cluster') > 4;
 };
 
+export const useSnapshotReadWriteAvailable = () => {
+    return useGetFeatureVersion('/viewer/query') >= 11;
+};
+
 export const useStreamingAvailable = () => {
     return useGetFeatureVersion('/viewer/query') >= 8;
 };
