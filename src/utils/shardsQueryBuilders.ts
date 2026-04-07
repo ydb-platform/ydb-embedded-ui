@@ -135,8 +135,8 @@ export function createCombinedTopPartitionsHistoryQuery(options: {
 }): string {
     const {databaseFullPath, path, from, to, sortOrder, limit = 20} = options;
 
-    const fromTime = dateTimeParse(Number(from) || from)?.valueOf();
-    const toTime = dateTimeParse(Number(to) || to)?.valueOf();
+    const fromTime = parseDateTimeValue(from);
+    const toTime = parseDateTimeValue(to);
     const currentHourStart = getCurrentHourStart();
 
     const needsMinuteTable = toTime === undefined || toTime > currentHourStart;
@@ -170,6 +170,11 @@ export function createCombinedTopPartitionsHistoryQuery(options: {
         sortOrder,
         limit,
     });
+}
+
+function parseDateTimeValue(value?: string | number): number | undefined {
+    const parsedTime = dateTimeParse(Number(value) || value)?.valueOf();
+    return Number.isFinite(parsedTime) ? parsedTime : undefined;
 }
 
 function getCurrentHourStart(): number {

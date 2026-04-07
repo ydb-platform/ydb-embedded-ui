@@ -216,4 +216,18 @@ describe('createCombinedTopPartitionsHistoryQuery', () => {
 
         expect(query).toEqual(legacyQuery);
     });
+
+    it('treats invalid to value as undefined and keeps minute data in selection', () => {
+        jest.setSystemTime(new Date('2024-01-15T14:30:00Z'));
+
+        const query = createCombinedTopPartitionsHistoryQuery({
+            databaseFullPath: '/Root/db',
+            from: new Date('2024-01-15T12:00:00Z').getTime(),
+            to: 'invalid-date',
+        });
+
+        expect(query).toContain('.sys/top_partitions_one_hour');
+        expect(query).toContain('.sys/top_partitions_one_minute');
+        expect(query).toContain('UNION ALL');
+    });
 });
