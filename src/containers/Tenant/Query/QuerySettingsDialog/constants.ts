@@ -35,6 +35,11 @@ const TRANSACTION_MODE_SELECT_OPTIONS = [
         text: i18n('transaction-mode-description.snapshot'),
     },
     {
+        value: TRANSACTION_MODES.snapshotrw,
+        content: TRANSACTION_MODES_TITLES[TRANSACTION_MODES.snapshotrw],
+        text: i18n('transaction-mode-description.snapshotrw'),
+    },
+    {
         value: TRANSACTION_MODES.onlinero,
         content: TRANSACTION_MODES_TITLES[TRANSACTION_MODES.onlinero],
         text: i18n('transaction-mode-description.onlinero'),

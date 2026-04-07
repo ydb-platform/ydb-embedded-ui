@@ -27,6 +27,7 @@
   "transaction-mode-description.onlinero": "Each read operation in the transaction is reading the data that is most recent at execution time",
   "transaction-mode-description.stalero": "Read operations within a transaction may return results that are slightly out-of-date (lagging by fractions of a second)",
   "transaction-mode-description.snapshot": "All the read operations within a transaction access the database snapshot. All the data reads are consistent",
+  "transaction-mode-description.snapshotrw": "All the operations within a transaction access the database snapshot. All the data reads are consistent and writes are applied atomically",
   "transaction-mode-description.implicit": "No transaction",
 
   "tracing-level-description.basic": "Spans of main component operations",
