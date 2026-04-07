@@ -40,7 +40,12 @@ export function createPartitionStatsQuery(options: {
     const pathCondition = createPathWhereCondition(path);
     const orderBy = prepareOrderByFromTableSort(sortOrder);
 
-    const whereClause = pathCondition ? `WHERE ${pathCondition}` : '';
+    const conditions: string[] = [];
+    conditions.push('TabletId != 0');
+    if (pathCondition) {
+        conditions.push(`(${pathCondition})`);
+    }
+    const whereClause = `WHERE ${conditions.join(' AND ')}`;
     const fields = selectFields.includes('*')
         ? `${pathSelect}, \`.sys/partition_stats\`.*`
         : `${pathSelect}, ${selectFields.join(', ')}`;
