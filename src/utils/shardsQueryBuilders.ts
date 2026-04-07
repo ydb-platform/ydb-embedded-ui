@@ -173,8 +173,7 @@ export function createCombinedTopPartitionsHistoryQuery(options: {
 }
 
 function getCurrentHourStart(): number {
-    const now = new Date();
-    return new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours()).getTime();
+    return Math.floor(Date.now() / 3600000) * 3600000;
 }
 
 function createUnionTopPartitionsQuery(options: {
