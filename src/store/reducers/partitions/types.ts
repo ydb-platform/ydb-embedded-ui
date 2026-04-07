@@ -19,9 +19,9 @@ export interface PreparedPartitionData {
     uncommitedMessages?: number;
     unreadMessages?: number;
 
-    startOffset: number;
-    endOffset: number;
-    commitedOffset?: number;
+    startOffset: string;
+    endOffset: string;
+    commitedOffset?: string;
 
     readSessionId?: string;
     readerName?: string;
