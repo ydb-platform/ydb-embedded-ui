@@ -3,7 +3,7 @@ import React from 'react';
 import {Flex} from '@gravity-ui/uikit';
 
 import {ResponseError} from '../../../../components/Errors/ResponseError';
-import {Loader} from '../../../../components/Loader';
+import {LoaderWrapper} from '../../../../components/LoaderWrapper/LoaderWrapper';
 import {useStorageGroupPath} from '../../../../routes';
 import {useClusterWithProxy} from '../../../../store/reducers/cluster/cluster';
 import {overviewApi} from '../../../../store/reducers/overview/overview';
@@ -105,33 +105,31 @@ function StorageUsage({path, database, databaseFullPath}: StorageUsageProps) {
         });
     }, [path]);
 
-    if (loading) {
-        return <Loader size="m" />;
-    }
-
     return (
-        <Flex direction="column" gap={4} className={b()}>
-            {hasStorageUsageError ? <ResponseError error={storageUsageError} /> : null}
-            {overviewError ? <ResponseError error={overviewError} /> : null}
-            {hasStorageUsageError ? null : (
-                <React.Fragment>
-                    <StorageUsageSections
-                        hasMultipleMediaTypes={hasMultipleMediaTypes}
-                        sections={sections}
-                        isStorageUsageFetching={isStorageUsageFetching}
-                    />
-                    <StorageUsageTable
-                        getStorageGroupPath={getStorageGroupPath}
-                        hasMultipleMediaTypes={hasMultipleMediaTypes}
-                        hiddenRowsCount={hiddenRowsCount}
-                        onShowMore={handleShowMore}
-                        rows={rows}
-                        storageGroupsCount={storageUsageData?.storageGroupsCount}
-                        visibleRows={visibleRows}
-                    />
-                </React.Fragment>
-            )}
-        </Flex>
+        <LoaderWrapper loading={loading}>
+            <Flex direction="column" gap={4} className={b()}>
+                {hasStorageUsageError ? <ResponseError error={storageUsageError} /> : null}
+                {overviewError ? <ResponseError error={overviewError} /> : null}
+                {hasStorageUsageError ? null : (
+                    <React.Fragment>
+                        <StorageUsageSections
+                            hasMultipleMediaTypes={hasMultipleMediaTypes}
+                            sections={sections}
+                            isStorageUsageFetching={isStorageUsageFetching}
+                        />
+                        <StorageUsageTable
+                            getStorageGroupPath={getStorageGroupPath}
+                            hasMultipleMediaTypes={hasMultipleMediaTypes}
+                            hiddenRowsCount={hiddenRowsCount}
+                            onShowMore={handleShowMore}
+                            rows={rows}
+                            storageGroupsCount={storageUsageData?.storageGroupsCount}
+                            visibleRows={visibleRows}
+                        />
+                    </React.Fragment>
+                )}
+            </Flex>
+        </LoaderWrapper>
     );
 }
 
