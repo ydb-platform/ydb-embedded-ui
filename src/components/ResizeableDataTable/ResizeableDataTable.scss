@@ -3,7 +3,7 @@
 
     &_reserve-resize-padding {
         // padding for easier resize of the last column
-        padding-right: 20px;
+        padding-right: var(--g-spacing-5);
     }
 
     &__row-skeleton {

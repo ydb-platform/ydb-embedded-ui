@@ -46,9 +46,9 @@ export function useDiagnosticsPages({
     const newStorageViewEnabled = useNewStorageViewEnabled();
     const storageGroupsAvailable = useStorageGroupsHandlerAvailable();
     const storageStatsAvailable = useStorageStatsAvailable();
-    const hasStorageUsage =
-        newStorageViewEnabled &&
-        (capabilitiesLoaded ? storageGroupsAvailable && storageStatsAvailable : true);
+    const hasStorageUsageCapabilities =
+        !capabilitiesLoaded || (storageGroupsAvailable && storageStatsAvailable);
+    const hasStorageUsage = newStorageViewEnabled && hasStorageUsageCapabilities;
     const hasTopicData = useTopicDataAvailable();
     const isViewerUser = useIsViewerUser();
 

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import DataTable from '@gravity-ui/react-data-table';
-import {Button, Flex, HelpMark, Label, Text} from '@gravity-ui/uikit';
+import {Button, Flex, HelpMark, Label, Progress, Text} from '@gravity-ui/uikit';
 
 import {EntityStatus} from '../../../../components/EntityStatus/EntityStatus';
 import {ResizeableDataTable} from '../../../../components/ResizeableDataTable/ResizeableDataTable';
@@ -109,7 +109,6 @@ function StorageGroupCell({
 
 function ShareCell({share}: Pick<StorageUsageGroupRow, 'share'>) {
     const sharePercent = getSharePercent(share);
-    const progressWidth = `${sharePercent}%`;
 
     return (
         <Flex alignItems="center" gap="2" className={b('share-cell')}>
@@ -120,7 +119,7 @@ function ShareCell({share}: Pick<StorageUsageGroupRow, 'share'>) {
                 aria-valuemax={100}
                 aria-valuenow={sharePercent}
             >
-                <div className={b('share-progress-fill')} style={{width: progressWidth}} />
+                <Progress value={sharePercent} size="s" className={b('share-progress-bar')} />
             </div>
             <Text className={b('share-value')}>{formatShare(share)}</Text>
         </Flex>

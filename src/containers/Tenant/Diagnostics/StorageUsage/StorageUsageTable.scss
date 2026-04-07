@@ -9,23 +9,24 @@
     }
 
     &__share-progress {
-        --share-progress-fill-color: var(--g-color-base-info-heavy);
-        overflow: hidden;
         flex: 0 0 132px;
 
-        height: 10px;
         margin-top: var(--g-spacing-1);
-
-        border-radius: var(--g-border-radius-xs);
-        background-color: var(--g-color-base-info-light);
     }
 
-    &__share-progress-fill {
-        min-width: 0;
-        height: 100%;
+    &__share-progress-bar {
+        --g-progress-filled-background-color: var(--g-color-base-info-heavy);
+        --g-progress-empty-background-color: var(--g-color-base-info-light);
 
+        height: 10px;
+
+        border-radius: var(--g-border-radius-xs);
+    }
+
+    &__share-progress-bar .g-progress__item {
         border-radius: var(--g-border-radius-xs) 0 0 var(--g-border-radius-xs);
-        background-color: var(--share-progress-fill-color);
+
+        transition: none;
     }
 
     &__share-value {
