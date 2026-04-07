@@ -1,7 +1,7 @@
 import {dateTimeParse} from '@gravity-ui/date-utils';
 import type {SortOrder} from '@gravity-ui/react-data-table';
 
-import {QUERY_TECHNICAL_MARK} from './constants';
+import {HOUR_IN_SECONDS, QUERY_TECHNICAL_MARK, SECOND_IN_MS} from './constants';
 import {prepareOrderByFromTableSort} from './hooks/useTableSort';
 
 export function createTimeConditions(from?: string | number, to?: string | number): string {
@@ -173,30 +173,17 @@ export function createCombinedTopPartitionsHistoryQuery(options: {
 }
 
 function parseDateTimeValue(value?: string | number): number | undefined {
-    const normalizedValue = normalizeDateTimeInput(value);
-    if (normalizedValue === undefined) {
-        return undefined;
-    }
-
-    const parsedTime = dateTimeParse(normalizedValue)?.valueOf();
-    return Number.isFinite(parsedTime) ? parsedTime : undefined;
-}
-
-function normalizeDateTimeInput(value?: string | number | null): string | number | undefined {
     if (value === undefined || value === null) {
         return undefined;
     }
 
-    if (typeof value === 'string' && value.trim() === '') {
-        return undefined;
-    }
-
-    const numericValue = Number(value);
-    return Number.isNaN(numericValue) ? value : numericValue;
+    const parsedTime = dateTimeParse(Number(value) || value)?.valueOf();
+    return Number.isFinite(parsedTime) ? parsedTime : undefined;
 }
 
 function getCurrentHourStart(): number {
-    return Math.floor(Date.now() / 3600000) * 3600000;
+    const hourInMs = HOUR_IN_SECONDS * SECOND_IN_MS;
+    return Math.floor(Date.now() / hourInMs) * hourInMs;
 }
 
 function createUnionTopPartitionsQuery(options: {
