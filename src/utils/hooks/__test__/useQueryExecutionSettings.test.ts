@@ -2,9 +2,11 @@ import React from 'react';
 
 import {renderHook} from '@testing-library/react';
 
+import {useSnapshotReadWriteAvailable} from '../../../store/reducers/capabilities/hooks';
 import {SETTING_KEYS} from '../../../store/reducers/settings/constants';
 import type {QuerySettings} from '../../../types/store/query';
 import {
+    DEFAULT_QUERY_SETTINGS,
     QUERY_MODES,
     RESOURCE_POOL_NO_OVERRIDE_VALUE,
     STATISTICS_MODES,
@@ -19,6 +21,8 @@ jest.mock('../../../store/reducers/capabilities/hooks', () => ({
     useTracingLevelOptionAvailable: jest.fn(() => true),
     useSnapshotReadWriteAvailable: jest.fn(() => true),
 }));
+
+const mockUseSnapshotReadWriteAvailable = jest.mocked(useSnapshotReadWriteAvailable);
 
 jest.mock('../useQueryStreamingSetting', () => ({
     useQueryStreamingSetting: jest.fn(() => [false]),
@@ -318,6 +322,68 @@ describe('useQueryExecutionSettings', () => {
 
             // Callback should be the same reference (stable)
             expect(firstCallback).toBe(secondCallback);
+        });
+    });
+
+    describe('snapshot read-write capability fallback', () => {
+        it('should reset transactionMode to implicit when snapshotrw capability is unavailable', () => {
+            mockUseSnapshotReadWriteAvailable.mockReturnValue(false);
+
+            const storageSettings: QuerySettings = {
+                queryMode: QUERY_MODES.query,
+                timeout: 60000,
+                limitRows: 1000,
+                statisticsMode: STATISTICS_MODES.none,
+                transactionMode: TRANSACTION_MODES.snapshotrw,
+                tracingLevel: TRACING_LEVELS.off,
+                pragmas: 'PRAGMA OrderedColumns;',
+                resourcePool: RESOURCE_POOL_NO_OVERRIDE_VALUE,
+            };
+
+            mockUseSetting.mockImplementation((key: string) => {
+                if (key === SETTING_KEYS.QUERY_EXECUTION_SETTINGS) {
+                    return [storageSettings, mockSetSettings];
+                }
+                if (key === SETTING_KEYS.USE_SHOW_PLAN_SVG) {
+                    return [false];
+                }
+                return [undefined];
+            });
+
+            const {result} = renderHook(() => useQueryExecutionSettings());
+            const [settings] = result.current;
+
+            expect(settings.transactionMode).toBe(DEFAULT_QUERY_SETTINGS.transactionMode);
+        });
+
+        it('should keep snapshotrw transactionMode when capability is available', () => {
+            mockUseSnapshotReadWriteAvailable.mockReturnValue(true);
+
+            const storageSettings: QuerySettings = {
+                queryMode: QUERY_MODES.query,
+                timeout: 60000,
+                limitRows: 1000,
+                statisticsMode: STATISTICS_MODES.none,
+                transactionMode: TRANSACTION_MODES.snapshotrw,
+                tracingLevel: TRACING_LEVELS.off,
+                pragmas: 'PRAGMA OrderedColumns;',
+                resourcePool: RESOURCE_POOL_NO_OVERRIDE_VALUE,
+            };
+
+            mockUseSetting.mockImplementation((key: string) => {
+                if (key === SETTING_KEYS.QUERY_EXECUTION_SETTINGS) {
+                    return [storageSettings, mockSetSettings];
+                }
+                if (key === SETTING_KEYS.USE_SHOW_PLAN_SVG) {
+                    return [false];
+                }
+                return [undefined];
+            });
+
+            const {result} = renderHook(() => useQueryExecutionSettings());
+            const [settings] = result.current;
+
+            expect(settings.transactionMode).toBe(TRANSACTION_MODES.snapshotrw);
         });
     });
 });
