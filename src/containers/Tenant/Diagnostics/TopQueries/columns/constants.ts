@@ -20,6 +20,10 @@ export const QUERIES_COLUMNS_IDS = {
     QueryStartAt: 'QueryStartAt',
     ApplicationName: 'ApplicationName',
     RequestUnits: 'RequestUnits',
+    WmPoolId: 'WmPoolId',
+    WmState: 'WmState',
+    WmEnterTime: 'WmEnterTime',
+    WmExitTime: 'WmExitTime',
 } as const;
 export type QueriesColumnId = ValueOf<typeof QUERIES_COLUMNS_IDS>;
 
@@ -42,6 +46,8 @@ export const DEFAULT_RUNNING_QUERIES_COLUMNS: QueriesColumnId[] = [
     'QueryStartAt',
     'QueryText',
     'ApplicationName',
+    'WmPoolId',
+    'WmState',
 ];
 
 // Required columns that must always be displayed for running queries
@@ -84,6 +90,18 @@ export const QUERIES_COLUMNS_TITLES: Record<QueriesColumnId, string> = {
     get RequestUnits() {
         return i18n('request-units');
     },
+    get WmPoolId() {
+        return i18n('wm-pool-id');
+    },
+    get WmState() {
+        return i18n('wm-state');
+    },
+    get WmEnterTime() {
+        return i18n('wm-enter-time');
+    },
+    get WmExitTime() {
+        return i18n('wm-exit-time');
+    },
 } as const;
 
 const TOP_QUERIES_COLUMNS_TO_SORT_FIELDS: Record<QueriesColumnId, string | undefined> = {
@@ -99,6 +117,10 @@ const TOP_QUERIES_COLUMNS_TO_SORT_FIELDS: Record<QueriesColumnId, string | undef
     QueryStartAt: undefined,
     ApplicationName: undefined,
     RequestUnits: 'RequestUnits',
+    WmPoolId: undefined,
+    WmState: undefined,
+    WmEnterTime: undefined,
+    WmExitTime: undefined,
 } as const;
 
 // Define sort fields specifically for running queries
@@ -115,6 +137,10 @@ const RUNNING_QUERIES_COLUMNS_TO_SORT_FIELDS: Record<QueriesColumnId, string | u
     QueryStartAt: 'QueryStartAt',
     ApplicationName: 'ApplicationName',
     RequestUnits: undefined,
+    WmPoolId: undefined,
+    WmState: undefined,
+    WmEnterTime: undefined,
+    WmExitTime: undefined,
 } as const;
 export function getTopQueriesColumnSortField(columnId?: string) {
     return TOP_QUERIES_COLUMNS_TO_SORT_FIELDS[columnId as QueriesColumnId];

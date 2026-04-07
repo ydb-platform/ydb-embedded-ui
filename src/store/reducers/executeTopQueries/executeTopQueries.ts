@@ -10,7 +10,7 @@ import {api} from '../api';
 
 import {TOP_QUERIES_TABLES} from './constants';
 import type {TimeFrame, TopQueriesFilters} from './types';
-import {getFiltersConditions} from './utils';
+import {getFiltersConditions, normalizeQueryResult} from './utils';
 
 const initialState: TopQueriesFilters = {};
 
@@ -81,18 +81,13 @@ function getRunningQueriesText(
     limit?: number,
 ) {
     const filterConditions = filters?.text
-        ? `Query ILIKE '%${filters.text}%' OR UserSID ILIKE '%${filters.text}%'`
+        ? `(Query ILIKE '%${filters.text}%' OR UserSID ILIKE '%${filters.text}%')`
         : '';
 
     const orderBy = prepareOrderByFromTableSort(sortOrder);
 
     return `${QUERY_TECHNICAL_MARK}
-SELECT
-    UserSID, 
-    QueryStartAt, 
-    Query as QueryText, 
-    ApplicationName,
-    SessionId
+SELECT *
 FROM \`.sys/query_sessions\`
 WHERE ${filterConditions || 'true'} AND Query NOT LIKE '%${QUERY_TECHNICAL_MARK}%'
 AND QueryStartAt is not null ${orderBy}
@@ -189,7 +184,7 @@ export const topQueriesApi = api.injectEndpoints({
                         throw response;
                     }
 
-                    const data = parseQueryAPIResponse(response);
+                    const data = normalizeQueryResult(parseQueryAPIResponse(response));
 
                     return {data};
                 } catch (error) {

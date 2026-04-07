@@ -1,5 +1,8 @@
 import {dateTimeParse} from '@gravity-ui/date-utils';
 
+import type {KeyValueRow} from '../../../types/api/query';
+import type {IQueryResult} from '../../../types/store/query';
+
 import type {TopQueriesFilters} from './types';
 
 const endTimeColumn = 'EndTime';
@@ -43,4 +46,35 @@ export function getFiltersConditions(tableName: string, filters?: TopQueriesFilt
     }
 
     return conditions.join(' AND ');
+}
+
+function normalizeQueryToQueryText(row: KeyValueRow): KeyValueRow {
+    if (
+        row.Query !== undefined &&
+        (row.QueryText === undefined || row.QueryText === null || row.QueryText === '')
+    ) {
+        const {Query, ...rest} = row;
+        return {...rest, QueryText: Query};
+    }
+    return row;
+}
+
+export function normalizeQueryResult(parsed: IQueryResult): IQueryResult {
+    const firstResult = parsed.resultSets?.[0]?.result;
+    if (!firstResult) {
+        return parsed;
+    }
+
+    return {
+        ...parsed,
+        resultSets: (parsed.resultSets ?? []).map((resultSet, index) => {
+            if (index !== 0 || !resultSet.result) {
+                return resultSet;
+            }
+            return {
+                ...resultSet,
+                result: resultSet.result.map(normalizeQueryToQueryText),
+            };
+        }),
+    };
 }

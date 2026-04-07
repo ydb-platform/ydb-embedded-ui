@@ -7,6 +7,7 @@ import type {KeyValueRow} from '../../../../../types/api/query';
 import {cn} from '../../../../../utils/cn';
 import {formatDateTime, formatNumber} from '../../../../../utils/dataFormatters/dataFormatters';
 import {generateHash} from '../../../../../utils/generateHash';
+import {isNonEmptyValue} from '../../../../../utils/index';
 import {formatToMs, parseUsToMs} from '../../../../../utils/timeParsers';
 
 import {
@@ -82,7 +83,9 @@ const readBytesColumn: Column<KeyValueRow> = {
 const userSIDColumn: Column<KeyValueRow> = {
     name: QUERIES_COLUMNS_IDS.UserSID,
     header: QUERIES_COLUMNS_TITLES.UserSID,
-    render: ({row}) => <div className={b('user-sid')}>{row.UserSID || EMPTY_DATA_PLACEHOLDER}</div>,
+    render: ({row}) => (
+        <div className={b('text-cell')}>{row.UserSID || EMPTY_DATA_PLACEHOLDER}</div>
+    ),
     align: DataTable.LEFT,
     width: 120,
 };
@@ -122,8 +125,50 @@ const applicationColumn: Column<KeyValueRow> = {
     name: QUERIES_COLUMNS_IDS.ApplicationName,
     header: QUERIES_COLUMNS_TITLES.ApplicationName,
     render: ({row}) => (
-        <div className={b('user-sid')}>{row.ApplicationName || EMPTY_DATA_PLACEHOLDER}</div>
+        <div className={b('text-cell')}>{row.ApplicationName || EMPTY_DATA_PLACEHOLDER}</div>
     ),
+};
+
+const wmPoolIdColumn: Column<KeyValueRow> = {
+    name: QUERIES_COLUMNS_IDS.WmPoolId,
+    header: QUERIES_COLUMNS_TITLES.WmPoolId,
+    render: ({row}) => (
+        <div className={b('text-cell')}>
+            {isNonEmptyValue(row.WmPoolId) ? row.WmPoolId : EMPTY_DATA_PLACEHOLDER}
+        </div>
+    ),
+    width: 150,
+};
+
+const wmStateColumn: Column<KeyValueRow> = {
+    name: QUERIES_COLUMNS_IDS.WmState,
+    header: QUERIES_COLUMNS_TITLES.WmState,
+    render: ({row}) => (
+        <div className={b('text-cell')}>
+            {isNonEmptyValue(row.WmState) ? row.WmState : EMPTY_DATA_PLACEHOLDER}
+        </div>
+    ),
+    width: 120,
+};
+
+const wmEnterTimeColumn: Column<KeyValueRow> = {
+    name: QUERIES_COLUMNS_IDS.WmEnterTime,
+    header: QUERIES_COLUMNS_TITLES.WmEnterTime,
+    render: ({row}) =>
+        isNonEmptyValue(row.WmEnterTime)
+            ? formatDateTime(new Date(row.WmEnterTime as string).getTime())
+            : EMPTY_DATA_PLACEHOLDER,
+    width: 200,
+};
+
+const wmExitTimeColumn: Column<KeyValueRow> = {
+    name: QUERIES_COLUMNS_IDS.WmExitTime,
+    header: QUERIES_COLUMNS_TITLES.WmExitTime,
+    render: ({row}) =>
+        isNonEmptyValue(row.WmExitTime)
+            ? formatDateTime(new Date(row.WmExitTime as string).getTime())
+            : EMPTY_DATA_PLACEHOLDER,
+    width: 200,
 };
 
 export function getTopQueriesColumns() {
@@ -156,6 +201,10 @@ export function getRunningQueriesColumns() {
         queryStartColumn,
         queryTextColumn,
         applicationColumn,
+        wmPoolIdColumn,
+        wmStateColumn,
+        wmEnterTimeColumn,
+        wmExitTimeColumn,
     ];
 
     return columns.map((column) => ({
