@@ -98,4 +98,15 @@ describe('normalizeQueryResult', () => {
         const result = normalizeQueryResult(input);
         expect(result.resultSets?.[0]?.result?.[0]).toEqual({QueryText: 0});
     });
+
+    it('should not overwrite falsy-but-valid QueryText like 0', () => {
+        const input: IQueryResult = {
+            resultSets: [{result: [{Query: 'SELECT 1', QueryText: 0}]}],
+        };
+        const result = normalizeQueryResult(input);
+        expect(result.resultSets?.[0]?.result?.[0]).toEqual({
+            Query: 'SELECT 1',
+            QueryText: 0,
+        });
+    });
 });

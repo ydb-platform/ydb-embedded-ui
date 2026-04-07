@@ -49,7 +49,10 @@ export function getFiltersConditions(tableName: string, filters?: TopQueriesFilt
 }
 
 function normalizeQueryToQueryText(row: KeyValueRow): KeyValueRow {
-    if (row.Query !== undefined && !row.QueryText) {
+    if (
+        row.Query !== undefined &&
+        (row.QueryText === undefined || row.QueryText === null || row.QueryText === '')
+    ) {
         const {Query, ...rest} = row;
         return {...rest, QueryText: Query};
     }
@@ -64,7 +67,7 @@ export function normalizeQueryResult(parsed: IQueryResult): IQueryResult {
 
     return {
         ...parsed,
-        resultSets: parsed.resultSets!.map((resultSet, index) => {
+        resultSets: (parsed.resultSets ?? []).map((resultSet, index) => {
             if (index !== 0 || !resultSet.result) {
                 return resultSet;
             }
