@@ -39,8 +39,8 @@ export const ERROR_SEVERITY = DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red;
 export const VDISK_STATE_SEVERITY: Record<EVDiskState, number> = {
     [EVDiskState.OK]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green,
 
-    [EVDiskState.Initial]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
-    [EVDiskState.SyncGuidRecovery]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
+    [EVDiskState.Initial]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
+    [EVDiskState.SyncGuidRecovery]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
 
     [EVDiskState.LocalRecoveryError]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,
     [EVDiskState.SyncGuidRecoveryError]: DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red,

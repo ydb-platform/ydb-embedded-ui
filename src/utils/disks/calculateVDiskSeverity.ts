@@ -1,5 +1,7 @@
+import type {ECapacityAlert} from '../../types/api/enums';
 import {EFlag} from '../../types/api/enums';
 import type {EVDiskState} from '../../types/api/vdisk';
+import {getCapacityAlertSeverity} from '../capacityAlerts';
 
 import {
     DISK_COLOR_STATE_TO_NUMERIC_SEVERITY,
@@ -13,26 +15,36 @@ export function calculateVDiskSeverity<
         VDiskState?: EVDiskState;
         FrontQueues?: EFlag;
         Replicated?: boolean;
+        DonorMode?: boolean;
+        CapacityAlert?: ECapacityAlert;
     },
 >(vDisk: T) {
-    const {DiskSpace, VDiskState, FrontQueues, Replicated} = vDisk;
+    const {DiskSpace, VDiskState, FrontQueues, Replicated, CapacityAlert} = vDisk;
 
     // if the VDisk is not available, we display it as not available
     if (!VDiskState) {
         return NOT_AVAILABLE_SEVERITY;
     }
 
+    const VDiskStateSeverity = getStateSeverity(VDiskState);
     const DiskSpaceSeverity = Math.min(
         DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
         getColorSeverity(DiskSpace),
     );
-    const VDiskStateSeverity = getStateSeverity(VDiskState);
+    const VDiskSpaceSeverity = CapacityAlert
+        ? getCapacityAlertSeverity(CapacityAlert)
+        : getDiskSpaceSeverity(DiskSpace);
     const FrontQueuesSeverity = Math.min(
         DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
         getColorSeverity(FrontQueues),
     );
 
-    let severity = Math.max(DiskSpaceSeverity, VDiskStateSeverity, FrontQueuesSeverity);
+    let severity = Math.max(
+        VDiskStateSeverity,
+        DiskSpaceSeverity,
+        VDiskSpaceSeverity,
+        FrontQueuesSeverity,
+    );
 
     // donors are always in the not replicated state since they are leftovers
     if (Replicated === false && severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green) {
@@ -51,6 +63,17 @@ export function getStateSeverity(vDiskState?: EVDiskState) {
     // If some strange value arrives that isn't in the map,
     // we consider it "not available" and color it gray
     return VDISK_STATE_SEVERITY[vDiskState] ?? NOT_AVAILABLE_SEVERITY;
+}
+
+function getDiskSpaceSeverity(diskSpace?: EFlag) {
+    const colorSeverity = getColorSeverity(diskSpace);
+
+    // DiskSpace Orange and Red indicate critical disk space issues and should be displayed as Red
+    if (diskSpace === EFlag.Orange || diskSpace === EFlag.Red) {
+        return DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red;
+    }
+
+    return Math.min(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow, colorSeverity);
 }
 
 function getColorSeverity(color?: EFlag) {

@@ -1,4 +1,4 @@
-import {EFlag} from '../../../types/api/enums';
+import {ECapacityAlert, EFlag} from '../../../types/api/enums';
 import {EVDiskState} from '../../../types/api/vdisk';
 import {calculateVDiskSeverity} from '../calculateVDiskSeverity';
 import {DISK_COLOR_STATE_TO_NUMERIC_SEVERITY} from '../constants';
@@ -18,7 +18,7 @@ describe('VDisk state', () => {
         const severity3 = calculateVDiskSeverity({
             VDiskState: EVDiskState.OK, // severity 1, green
             DiskSpace: EFlag.Yellow, // severity 3, yellow
-            FrontQueues: EFlag.Orange, // severity 4, orange
+            FrontQueues: EFlag.Orange, // severity 4, orange — but capped at yellow (3)
         });
 
         expect(severity1).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow);
@@ -30,16 +30,34 @@ describe('VDisk state', () => {
         const severity1 = calculateVDiskSeverity({
             VDiskState: EVDiskState.OK, // severity 1, green
             DiskSpace: EFlag.Green, // severity 1, green
-            FrontQueues: EFlag.Red, // severity 5, red
-        });
-        const severity2 = calculateVDiskSeverity({
-            VDiskState: EVDiskState.OK, // severity 1, green
-            DiskSpace: EFlag.Red, // severity 5, red
-            FrontQueues: EFlag.Red, // severity 5, red
+            FrontQueues: EFlag.Red, // severity 5, red — but capped at yellow
         });
 
         expect(severity1).not.toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
-        expect(severity2).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow);
+    });
+
+    test('Should display DiskSpace Orange as Red severity', () => {
+        const severity = calculateVDiskSeverity({
+            VDiskState: EVDiskState.OK,
+            DiskSpace: EFlag.Orange,
+        });
+
+        expect(severity).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
+    });
+
+    test('Should display DiskSpace Red as Red severity', () => {
+        const severity1 = calculateVDiskSeverity({
+            VDiskState: EVDiskState.OK,
+            DiskSpace: EFlag.Red,
+        });
+        const severity2 = calculateVDiskSeverity({
+            VDiskState: EVDiskState.OK,
+            DiskSpace: EFlag.Red,
+            FrontQueues: EFlag.Red,
+        });
+
+        expect(severity1).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
+        expect(severity2).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
     });
 
     // prettier-ignore
@@ -127,7 +145,7 @@ describe('VDisk state', () => {
 
     test('Should display replicating VDisks in a not-OK state with a regular color', () => {
         const severity1 = calculateVDiskSeverity({
-            VDiskState: EVDiskState.Initial, // severity 3, yellow
+            VDiskState: EVDiskState.Initial, // severity 5, red
             Replicated: false,
         });
         const severity2 = calculateVDiskSeverity({
@@ -135,7 +153,7 @@ describe('VDisk state', () => {
             Replicated: false,
         });
 
-        expect(severity1).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow);
+        expect(severity1).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
         expect(severity2).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
     });
 
@@ -146,7 +164,7 @@ describe('VDisk state', () => {
             DonorMode: true,
         });
         const severity2 = calculateVDiskSeverity({
-            VDiskState: EVDiskState.Initial, // severity 3, yellow
+            VDiskState: EVDiskState.Initial, // severity 5, red
             Replicated: false,
             DonorMode: true,
         });
@@ -157,7 +175,77 @@ describe('VDisk state', () => {
         });
 
         expect(severity1).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Blue);
-        expect(severity2).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow);
+        expect(severity2).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
         expect(severity3).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
+    });
+});
+
+describe('VDisk CapacityAlert', () => {
+    test('Should use CapacityAlert instead of DiskSpace when CapacityAlert is present', () => {
+        const severity = calculateVDiskSeverity({
+            VDiskState: EVDiskState.OK,
+            DiskSpace: EFlag.Red,
+            FrontQueues: EFlag.Orange,
+            CapacityAlert: ECapacityAlert.GREEN,
+        });
+
+        // CapacityAlert GREEN maps to Green severity
+        // DiskSpaceSeverity is capped at Yellow (3), FrontQueuesSeverity is capped at Yellow (3)
+        // VDiskStateSeverity is Green (1), VDiskSpaceSeverity is Green (1) from CapacityAlert
+        // max(1, 3, 1, 3) = Yellow
+        expect(severity).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow);
+    });
+
+    test('Should return Green severity for GREEN and CYAN CapacityAlert', () => {
+        expect(
+            calculateVDiskSeverity({
+                VDiskState: EVDiskState.OK,
+                CapacityAlert: ECapacityAlert.GREEN,
+            }),
+        ).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green);
+
+        expect(
+            calculateVDiskSeverity({
+                VDiskState: EVDiskState.OK,
+                CapacityAlert: ECapacityAlert.CYAN,
+            }),
+        ).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green);
+    });
+
+    test('Should return Yellow severity for LIGHT_YELLOW CapacityAlert', () => {
+        expect(
+            calculateVDiskSeverity({
+                VDiskState: EVDiskState.OK,
+                CapacityAlert: ECapacityAlert.LIGHTYELLOW,
+            }),
+        ).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow);
+    });
+
+    test('Should return Red severity for danger-level CapacityAlert values', () => {
+        const dangerAlerts = [
+            ECapacityAlert.YELLOW,
+            ECapacityAlert.LIGHTORANGE,
+            ECapacityAlert.PREORANGE,
+            ECapacityAlert.ORANGE,
+            ECapacityAlert.RED,
+            ECapacityAlert.BLACK,
+        ];
+
+        for (const alert of dangerAlerts) {
+            expect(
+                calculateVDiskSeverity({
+                    VDiskState: EVDiskState.OK,
+                    CapacityAlert: alert,
+                }),
+            ).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Red);
+        }
+    });
+
+    test('Should still display as unavailable when no VDiskState even with CapacityAlert', () => {
+        const severity = calculateVDiskSeverity({
+            CapacityAlert: ECapacityAlert.RED,
+        });
+
+        expect(severity).toEqual(DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Grey);
     });
 });
