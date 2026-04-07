@@ -17,6 +17,7 @@ import * as useSettingModule from '../useSetting';
 // Mock dependencies
 jest.mock('../../../store/reducers/capabilities/hooks', () => ({
     useTracingLevelOptionAvailable: jest.fn(() => true),
+    useSnapshotReadWriteAvailable: jest.fn(() => true),
 }));
 
 jest.mock('../useQueryStreamingSetting', () => ({

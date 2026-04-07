@@ -1,12 +1,16 @@
 import React from 'react';
 
-import {useTracingLevelOptionAvailable} from '../../store/reducers/capabilities/hooks';
+import {
+    useSnapshotReadWriteAvailable,
+    useTracingLevelOptionAvailable,
+} from '../../store/reducers/capabilities/hooks';
 import {SETTING_KEYS} from '../../store/reducers/settings/constants';
 import type {QuerySettings, StatisticsMode} from '../../types/store/query';
 import {
     DEFAULT_QUERY_SETTINGS,
     STATISTICS_MODES,
     STATISTICS_MODES_WITH_SVG,
+    TRANSACTION_MODES,
     isStreamingSupportedForMode,
     querySettingsRestoreSchema,
 } from '../query';
@@ -20,6 +24,7 @@ function getSvgStatisticsMode(mode: StatisticsMode): StatisticsMode {
 
 export const useQueryExecutionSettings = () => {
     const enableTracingLevel = useTracingLevelOptionAvailable();
+    const enableSnapshotReadWrite = useSnapshotReadWriteAvailable();
     const [storageSettings, setSettings] = useSetting<QuerySettings>(
         SETTING_KEYS.QUERY_EXECUTION_SETTINGS,
     );
@@ -52,6 +57,11 @@ export const useQueryExecutionSettings = () => {
         tracingLevel: enableTracingLevel
             ? validatedSettings.tracingLevel
             : DEFAULT_QUERY_SETTINGS.tracingLevel,
+        transactionMode:
+            !enableSnapshotReadWrite &&
+            validatedSettings.transactionMode === TRANSACTION_MODES.snapshotrw
+                ? DEFAULT_QUERY_SETTINGS.transactionMode
+                : validatedSettings.transactionMode,
     };
 
     return [settings, setQueryExecutionSettings] as const;

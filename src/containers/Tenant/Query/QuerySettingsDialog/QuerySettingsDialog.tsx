@@ -122,6 +122,7 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
     const timeout = watch('timeout');
     const resourcePool = watch('resourcePool');
     const queryMode = watch('queryMode');
+    const transactionMode = watch('transactionMode');
 
     React.useEffect(() => {
         if (isResourcePoolsLoading) {
@@ -136,6 +137,12 @@ function QuerySettingsForm({initialValues, onSubmit, onClose}: QuerySettingsForm
             setValue('resourcePool', RESOURCE_POOL_NO_OVERRIDE_VALUE);
         }
     }, [isResourcePoolsLoading, resourcePools, resourcePool, setValue]);
+
+    React.useEffect(() => {
+        if (!enableSnapshotReadWrite && transactionMode === TRANSACTION_MODES.snapshotrw) {
+            setValue('transactionMode', TRANSACTION_MODES.implicit);
+        }
+    }, [enableSnapshotReadWrite, transactionMode, setValue]);
 
     const queryStatisticsOptions = React.useMemo(() => {
         return QUERY_SETTINGS_FIELD_SETTINGS.statisticsMode.options.map((option) => {
