@@ -1,5 +1,6 @@
 import {
     createCombinedTopPartitionsHistoryQuery,
+    createPartitionStatsQuery,
     createTimeConditions,
     createTopPartitionsHistoryQuery,
     createTopPartitionsOneMinuteQuery,
@@ -35,6 +36,26 @@ describe('createTimeConditions', () => {
 
     it('throws when from is greater than to', () => {
         expect(() => createTimeConditions(1, 0)).toThrow('Invalid date range');
+    });
+});
+
+describe('createPartitionStatsQuery', () => {
+    it('filters out deleted shards with TabletId = 0', () => {
+        const query = createPartitionStatsQuery({
+            databaseFullPath: '/Root/db',
+        });
+
+        expect(query).toContain('TabletId != 0');
+    });
+
+    it('includes TabletId filter together with path condition', () => {
+        const query = createPartitionStatsQuery({
+            databaseFullPath: '/Root/db',
+            path: '/Root/db/myTable',
+        });
+
+        expect(query).toContain('TabletId != 0');
+        expect(query).toContain("Path='/Root/db/myTable'");
     });
 });
 
