@@ -5,6 +5,39 @@ import {
     createTopPartitionsOneMinuteQuery,
 } from '../shardsQueryBuilders';
 
+describe('createTimeConditions', () => {
+    it('preserves zero in from condition', () => {
+        const timeConditions = createTimeConditions(0, undefined);
+
+        expect(timeConditions).toContain("IntervalEnd > Timestamp('1970-01-01T00:00:00.000Z')");
+        expect(timeConditions).not.toContain('<= Timestamp');
+    });
+
+    it('preserves zero in to condition', () => {
+        const timeConditions = createTimeConditions(undefined, 0);
+
+        expect(timeConditions).toBe("IntervalEnd <= Timestamp('1970-01-01T00:00:00.000Z')");
+    });
+
+    it('uses epoch only when zero was explicitly provided', () => {
+        const timeConditions = createTimeConditions(0, 0);
+
+        expect(timeConditions).toContain("IntervalEnd >= Timestamp('1970-01-01T00:00:00.000Z')");
+        expect(timeConditions).toContain("IntervalEnd <= Timestamp('1970-01-01T00:00:00.000Z')");
+    });
+
+    it('ignores invalid string values', () => {
+        const timeConditions = createTimeConditions('invalid-date', undefined);
+
+        expect(timeConditions).toBe('');
+        expect(timeConditions).not.toContain('1970-01-01T00:00:00.000Z');
+    });
+
+    it('throws when from is greater than to', () => {
+        expect(() => createTimeConditions(1, 0)).toThrow('Invalid date range');
+    });
+});
+
 describe('createTopPartitionsOneMinuteQuery', () => {
     it('queries top_partitions_one_minute table', () => {
         const query = createTopPartitionsOneMinuteQuery({
@@ -229,5 +262,6 @@ describe('createCombinedTopPartitionsHistoryQuery', () => {
         expect(query).toContain('.sys/top_partitions_one_hour');
         expect(query).toContain('.sys/top_partitions_one_minute');
         expect(query).toContain('UNION ALL');
+        expect(query).not.toContain("1970-01-01T00:00:00.000Z'");
     });
 });

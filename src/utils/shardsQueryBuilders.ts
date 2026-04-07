@@ -6,21 +6,21 @@ import {prepareOrderByFromTableSort} from './hooks/useTableSort';
 
 export function createTimeConditions(from?: string | number, to?: string | number): string {
     const conditions: string[] = [];
-    const toTime = dateTimeParse(Number(to) || to)?.valueOf();
-    const fromTime = dateTimeParse(Number(from) || from)?.valueOf();
+    const toTime = parseDateTimeValue(to);
+    const fromTime = parseDateTimeValue(from);
 
-    if (fromTime && toTime && fromTime > toTime) {
+    if (fromTime !== undefined && toTime !== undefined && fromTime > toTime) {
         throw new Error('Invalid date range');
     }
 
-    if (fromTime) {
+    if (fromTime !== undefined) {
         // matching `from` & `to` is an edge case
         // other cases should not include the starting point, since intervals are stored using the ending time
         const gt = toTime === fromTime ? '>=' : '>';
         conditions.push(`IntervalEnd ${gt} Timestamp('${new Date(fromTime).toISOString()}')`);
     }
 
-    if (toTime) {
+    if (toTime !== undefined) {
         conditions.push(`IntervalEnd <= Timestamp('${new Date(toTime).toISOString()}')`);
     }
 
@@ -173,8 +173,26 @@ export function createCombinedTopPartitionsHistoryQuery(options: {
 }
 
 function parseDateTimeValue(value?: string | number): number | undefined {
-    const parsedTime = dateTimeParse(Number(value) || value)?.valueOf();
+    const normalizedValue = normalizeDateTimeInput(value);
+    if (normalizedValue === undefined) {
+        return undefined;
+    }
+
+    const parsedTime = dateTimeParse(normalizedValue)?.valueOf();
     return Number.isFinite(parsedTime) ? parsedTime : undefined;
+}
+
+function normalizeDateTimeInput(value?: string | number | null): string | number | undefined {
+    if (value === undefined || value === null) {
+        return undefined;
+    }
+
+    if (typeof value === 'string' && value.trim() === '') {
+        return undefined;
+    }
+
+    const numericValue = Number(value);
+    return Number.isNaN(numericValue) ? value : numericValue;
 }
 
 function getCurrentHourStart(): number {
