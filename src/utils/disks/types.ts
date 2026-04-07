@@ -1,4 +1,3 @@
-import type {ECapacityAlert} from '../../types/api/enums';
 import type {TPDiskInfo, TPDiskStateInfo} from '../../types/api/pdisk';
 import type {TVDiskStateInfo, TVSlotId} from '../../types/api/vdisk';
 import type {ValueOf} from '../../types/common';
@@ -41,8 +40,6 @@ export interface PreparedVDisk
     Donors?: PreparedVDisk[];
 
     Recipient?: VDiskRecipientRef;
-
-    CapacityAlert?: ECapacityAlert;
 }
 
 export type PDiskType = ValueOf<typeof PDISK_TYPES>;

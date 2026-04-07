@@ -82,6 +82,7 @@ export interface TVDiskStateInfo {
      * Write bytes per second to PDisk for TEvVPut blobs and replication bytes only
      */
     WriteThroughput?: string;
+
     CapacityAlert?: ECapacityAlert;
 }
 

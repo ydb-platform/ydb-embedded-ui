@@ -27,10 +27,6 @@ export function calculateVDiskSeverity<
     }
 
     const VDiskStateSeverity = getStateSeverity(VDiskState);
-    const DiskSpaceSeverity = Math.min(
-        DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
-        getColorSeverity(DiskSpace),
-    );
     const VDiskSpaceSeverity = CapacityAlert
         ? getCapacityAlertSeverity(CapacityAlert)
         : getDiskSpaceSeverity(DiskSpace);
@@ -39,12 +35,7 @@ export function calculateVDiskSeverity<
         getColorSeverity(FrontQueues),
     );
 
-    let severity = Math.max(
-        VDiskStateSeverity,
-        DiskSpaceSeverity,
-        VDiskSpaceSeverity,
-        FrontQueuesSeverity,
-    );
+    let severity = Math.max(VDiskStateSeverity, VDiskSpaceSeverity, FrontQueuesSeverity);
 
     // donors are always in the not replicated state since they are leftovers
     if (Replicated === false && severity === DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Green) {
