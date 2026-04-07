@@ -5,9 +5,8 @@ import type {PayloadAction} from '@reduxjs/toolkit';
 
 import {isQueryErrorResponse, parseQueryAPIResponse} from '../../../utils/query';
 import {
+    createCombinedTopPartitionsHistoryQuery,
     createPartitionStatsQuery,
-    createTimeConditions,
-    createTopPartitionsHistoryQuery,
 } from '../../../utils/shardsQueryBuilders';
 import {api} from '../api';
 
@@ -22,12 +21,11 @@ function createShardQueryHistorical(
     filters?: ShardsWorkloadFilters,
     sortOrder?: SortOrder[],
 ) {
-    const timeConditions = createTimeConditions(filters?.from, filters?.to);
-
-    return createTopPartitionsHistoryQuery({
+    return createCombinedTopPartitionsHistoryQuery({
         databaseFullPath,
         path,
-        timeConditions,
+        from: filters?.from,
+        to: filters?.to,
         sortOrder,
         limit: 20,
     });
