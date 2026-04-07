@@ -1,3 +1,4 @@
+import type {CommitOffsetParams} from '../../store/reducers/partitions/types';
 import type {PlanToSvgQueryParams} from '../../store/reducers/planToSvg';
 import type {VDiskBlobIndexStatParams} from '../../store/reducers/vdisk/vdisk';
 import type {
@@ -656,6 +657,25 @@ export class ViewerAPI extends BaseYdbAPI {
         return this.get<HealthCheckAPIResponse>(
             this.getPath('/viewer/json/healthcheck?merge_records=true'),
             {database, max_level: maxLevel},
+            {concurrentId, requestConfig: {signal}},
+        );
+    }
+
+    commitOffset(
+        {database, path, consumer, partitionId, offset, readSessionId}: CommitOffsetParams,
+        {concurrentId, signal}: AxiosOptions = {},
+    ) {
+        return this.post(
+            this.getPath('/viewer/commit_offset'),
+            {
+                database,
+                path: this.getSchemaPath(path),
+                consumer,
+                partition_id: partitionId,
+                offset,
+                read_session_id: readSessionId,
+            },
+            {},
             {concurrentId, requestConfig: {signal}},
         );
     }

@@ -33,6 +33,7 @@ interface ConfirmationDialogProps extends CommonDialogProps, DialogFooterProps {
     onClose: () => void;
     open: boolean;
     children?: React.ReactNode;
+    confirmOnEnter?: boolean;
 }
 
 export const CONFIRMATION_DIALOG = 'confirmation-dialog';
@@ -48,6 +49,7 @@ function ConfirmationDialog({
     className,
     renderButtons,
     open,
+    confirmOnEnter,
 }: ConfirmationDialogProps) {
     return (
         <Dialog
@@ -56,6 +58,7 @@ function ConfirmationDialog({
             onClose={onClose}
             disableOutsideClick
             open={open}
+            onEnterKeyDown={confirmOnEnter ? onConfirm : undefined}
         >
             <Dialog.Header caption={<span className={block('caption')}>{caption}</span>} />
             <Dialog.Body>{children}</Dialog.Body>
