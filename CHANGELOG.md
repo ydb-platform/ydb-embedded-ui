@@ -1,5 +1,33 @@
 # Changelog
 
+## [15.0.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.17.0...v15.0.0) (2026-04-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* do not call describe on DB page, update uiFactory ([#3718](https://github.com/ydb-platform/ydb-embedded-ui/issues/3718))
+
+### Features
+
+* add snapshot read-write transaction mode ([#3763](https://github.com/ydb-platform/ydb-embedded-ui/issues/3763)) ([bec4acc](https://github.com/ydb-platform/ydb-embedded-ui/commit/bec4acc9edca397085c74a5a67601594d1a681f5))
+* do not call describe on DB page, update uiFactory ([#3718](https://github.com/ydb-platform/ydb-embedded-ui/issues/3718)) ([65190d8](https://github.com/ydb-platform/ydb-embedded-ui/commit/65190d86ee5c7c77080c35454de116d53f3a5418))
+* include top_partitions_one_minute data for the cur... ([#3765](https://github.com/ydb-platform/ydb-embedded-ui/issues/3765)) ([75cdda1](https://github.com/ydb-platform/ydb-embedded-ui/commit/75cdda1acd6540b04b46215662647febf3993aca))
+* mark "Online Read-Only" transaction mode as obsolete ([#3764](https://github.com/ydb-platform/ydb-embedded-ui/issues/3764)) ([c221d0c](https://github.com/ydb-platform/ydb-embedded-ui/commit/c221d0cc1c4567dda8ed026487fcdd4870246b26))
+* **Partitions:** shift partition offset ([#3735](https://github.com/ydb-platform/ydb-embedded-ui/issues/3735)) ([b115c0f](https://github.com/ydb-platform/ydb-embedded-ui/commit/b115c0f6ccd713236564a2c42d0b40cfb340c7b7))
+* support wm state columns and client info in running queries ([#3742](https://github.com/ydb-platform/ydb-embedded-ui/issues/3742)) ([c8b5acb](https://github.com/ydb-platform/ydb-embedded-ui/commit/c8b5acb7db1752e01c6ffde7c9706b75b46edd39))
+* table page additions ([#3694](https://github.com/ydb-platform/ydb-embedded-ui/issues/3694)) ([015fb38](https://github.com/ydb-platform/ydb-embedded-ui/commit/015fb38e735a9ef94bb2a047f0e4d40f2d590766))
+* **VDiskPopup:** add eviction ([#3713](https://github.com/ydb-platform/ydb-embedded-ui/issues/3713)) ([7cb2202](https://github.com/ydb-platform/ydb-embedded-ui/commit/7cb220250ea9803452b9cf0e669ce7bf02d8c403))
+
+
+### Bug Fixes
+
+* **CriticalActionDialog:** change layout ([#3746](https://github.com/ydb-platform/ydb-embedded-ui/issues/3746)) ([5b825ff](https://github.com/ydb-platform/ydb-embedded-ui/commit/5b825ff035144d330215470b98dac8a3506e89fe))
+* filter out deleted shards (TabletId = 0) from partition_stats query ([#3768](https://github.com/ydb-platform/ydb-embedded-ui/issues/3768)) ([79ac647](https://github.com/ydb-platform/ydb-embedded-ui/commit/79ac647e1a4cce13be2b265fbce583462b7b37e0))
+* opening database in non-existing cluster leads to errors and int… ([#3740](https://github.com/ydb-platform/ydb-embedded-ui/issues/3740)) ([edaf140](https://github.com/ydb-platform/ydb-embedded-ui/commit/edaf140a84494ead0d7c7a698928830719863c9a))
+* **TopicData:** show error if probe query fails ([#3728](https://github.com/ydb-platform/ydb-embedded-ui/issues/3728)) ([f3906cc](https://github.com/ydb-platform/ydb-embedded-ui/commit/f3906cc47a2066d2b331cd1260d2f3225831487c))
+* use count query for...bar instead of limit 100 ([#3756](https://github.com/ydb-platform/ydb-embedded-ui/issues/3756)) ([db81235](https://github.com/ydb-platform/ydb-embedded-ui/commit/db812359cefcc960d03c731f73bed2176f1dad4a))
+* **VDiskInfo:** show lost donors ([#3743](https://github.com/ydb-platform/ydb-embedded-ui/issues/3743)) ([fc704cf](https://github.com/ydb-platform/ydb-embedded-ui/commit/fc704cf5e437312259b3ac707f64c7806a0d69c5))
+
 ## [14.17.0](https://github.com/ydb-platform/ydb-embedded-ui/compare/v14.16.1...v14.17.0) (2026-03-31)
 
 
