@@ -1,4 +1,4 @@
-import type {EFlag} from './enums';
+import type {ECapacityAlert, EFlag} from './enums';
 import type {TPDiskStateInfo} from './pdisk';
 /**
  * Node whiteboard VDisk data
@@ -82,6 +82,7 @@ export interface TVDiskStateInfo {
      * Write bytes per second to PDisk for TEvVPut blobs and replication bytes only
      */
     WriteThroughput?: string;
+    CapacityAlert?: ECapacityAlert | string;
 }
 
 export interface TVSlotId {

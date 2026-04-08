@@ -42,7 +42,7 @@ export interface PreparedStorageNode
 
     MaxPDiskUsage?: number;
     MaxVDiskSlotUsage?: number;
-    CapacityAlert?: ECapacityAlert;
+    CapacityAlert?: ECapacityAlert | string;
 }
 
 export interface PreparedStorageGroupFilters {
@@ -106,7 +106,7 @@ export interface PreparedStorageGroup {
     MaxVDiskSlotUsage?: number;
     MaxVDiskRawUsage?: number;
     MaxNormalizedOccupancy?: number;
-    CapacityAlert?: ECapacityAlert;
+    CapacityAlert?: ECapacityAlert | string;
 }
 
 export type TableGroup = {

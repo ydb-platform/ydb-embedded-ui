@@ -75,7 +75,7 @@ export interface TNodeInfo {
     // Capacity metrics experiment
     MaxPDiskUsage?: number;
     MaxVDiskSlotUsage?: number;
-    CapacityAlert?: ECapacityAlert;
+    CapacityAlert?: ECapacityAlert | string;
 }
 
 export interface TNodesGroup {

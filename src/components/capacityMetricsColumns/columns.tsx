@@ -1,7 +1,9 @@
 import DataTable from '@gravity-ui/react-data-table';
+import type {LabelProps} from '@gravity-ui/uikit';
 import {Label} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
+import {isCapacityAlert} from '../../types/api/enums';
 import {getCapacityAlertTheme} from '../../utils/capacityAlerts';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatPercent} from '../../utils/dataFormatters/dataFormatters';
@@ -32,7 +34,9 @@ export function getVDiskSlotUsageColumn<
         header: CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskSlotUsage,
         width: 180,
         render: ({row}) => {
-            const theme = getCapacityAlertTheme(row.CapacityAlert);
+            const theme: LabelProps['theme'] = isCapacityAlert(row.CapacityAlert)
+                ? getCapacityAlertTheme(row.CapacityAlert)
+                : 'normal';
 
             return isNumeric(row.MaxVDiskSlotUsage) ? (
                 <Label theme={theme}>

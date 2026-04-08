@@ -201,7 +201,7 @@ export interface TGroupsStorageGroupInfo {
     MaxVDiskSlotUsage?: number;
     MaxVDiskRawUsage?: number;
     MaxNormalizedOccupancy?: number;
-    CapacityAlert?: ECapacityAlert;
+    CapacityAlert?: ECapacityAlert | string;
 }
 
 /**
