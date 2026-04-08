@@ -1,5 +1,4 @@
-import type {ECapacityAlert} from '../../types/api/enums';
-import {EFlag} from '../../types/api/enums';
+import {EFlag, isCapacityAlert} from '../../types/api/enums';
 import type {EVDiskState} from '../../types/api/vdisk';
 import {getCapacityAlertSeverity} from '../capacityAlerts';
 
@@ -16,7 +15,7 @@ export function calculateVDiskSeverity<
         FrontQueues?: EFlag;
         Replicated?: boolean;
         DonorMode?: boolean;
-        CapacityAlert?: ECapacityAlert;
+        CapacityAlert?: string;
     },
 >(vDisk: T) {
     const {DiskSpace, VDiskState, FrontQueues, Replicated, CapacityAlert} = vDisk;
@@ -27,9 +26,10 @@ export function calculateVDiskSeverity<
     }
 
     const VDiskStateSeverity = getStateSeverity(VDiskState);
-    const VDiskSpaceSeverity = CapacityAlert
-        ? getCapacityAlertSeverity(CapacityAlert)
-        : getDiskSpaceSeverity(DiskSpace);
+    const VDiskSpaceSeverity =
+        CapacityAlert && isCapacityAlert(CapacityAlert)
+            ? getCapacityAlertSeverity(CapacityAlert)
+            : getDiskSpaceSeverity(DiskSpace);
     const FrontQueuesSeverity = Math.min(
         DISK_COLOR_STATE_TO_NUMERIC_SEVERITY.Yellow,
         getColorSeverity(FrontQueues),

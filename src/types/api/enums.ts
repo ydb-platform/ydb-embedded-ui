@@ -22,3 +22,12 @@ export enum ECapacityAlert {
     RED = 'RED',
     BLACK = 'BLACK',
 }
+
+const capacityAlertValues = new Set<string>(Object.values(ECapacityAlert));
+
+export function isCapacityAlert(value?: string): value is ECapacityAlert {
+    if (!value) {
+        return false;
+    }
+    return capacityAlertValues.has(value);
+}

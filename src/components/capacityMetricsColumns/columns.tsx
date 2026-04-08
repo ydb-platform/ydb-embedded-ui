@@ -1,8 +1,9 @@
 import DataTable from '@gravity-ui/react-data-table';
+import type {LabelProps} from '@gravity-ui/uikit';
 import {Label} from '@gravity-ui/uikit';
 import {isNil} from 'lodash';
 
-import type {ECapacityAlert} from '../../types/api/enums';
+import {isCapacityAlert} from '../../types/api/enums';
 import {getCapacityAlertTheme} from '../../utils/capacityAlerts';
 import {EMPTY_DATA_PLACEHOLDER} from '../../utils/constants';
 import {formatPercent} from '../../utils/dataFormatters/dataFormatters';
@@ -26,14 +27,16 @@ export function getPDiskUsageColumn<T extends {MaxPDiskUsage?: number}>(): Colum
 }
 
 export function getVDiskSlotUsageColumn<
-    T extends {MaxVDiskSlotUsage?: number; CapacityAlert?: ECapacityAlert},
+    T extends {MaxVDiskSlotUsage?: number; CapacityAlert?: string},
 >(): Column<T> {
     return {
         name: CAPACITY_METRICS_COLUMN_IDS.MaxVDiskSlotUsage,
         header: CAPACITY_METRICS_COLUMN_TITLES.MaxVDiskSlotUsage,
         width: 180,
         render: ({row}) => {
-            const theme = getCapacityAlertTheme(row.CapacityAlert);
+            const theme: LabelProps['theme'] = isCapacityAlert(row.CapacityAlert)
+                ? getCapacityAlertTheme(row.CapacityAlert)
+                : 'normal';
 
             return isNumeric(row.MaxVDiskSlotUsage) ? (
                 <Label theme={theme}>
@@ -47,7 +50,7 @@ export function getVDiskSlotUsageColumn<
     };
 }
 
-export function getCapacityAlertColumn<T extends {CapacityAlert?: ECapacityAlert}>(): Column<T> {
+export function getCapacityAlertColumn<T extends {CapacityAlert?: string}>(): Column<T> {
     return {
         name: CAPACITY_METRICS_COLUMN_IDS.CapacityAlert,
         header: CAPACITY_METRICS_COLUMN_TITLES.CapacityAlert,
