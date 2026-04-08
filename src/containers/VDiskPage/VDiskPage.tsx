@@ -19,6 +19,7 @@ import {PageMetaWithAutorefresh} from '../../components/PageMeta/PageMeta';
 import {VDiskInfo} from '../../components/VDiskInfo/VDiskInfo';
 import {useVDiskPagePath} from '../../routes';
 import {api} from '../../store/reducers/api';
+import {useNewStorageViewEnabled} from '../../store/reducers/capabilities/hooks';
 import {setHeaderBreadcrumbs} from '../../store/reducers/header/header';
 import {vDiskApi} from '../../store/reducers/vdisk/vdisk';
 import type {TVDiskID} from '../../types/api/vdisk';
@@ -29,6 +30,7 @@ import {useAutoRefreshInterval, useTypedDispatch} from '../../utils/hooks';
 import {useAppTitle} from '../App/AppTitleContext';
 import {PaginatedStorage} from '../Storage/PaginatedStorage';
 
+import {VDiskStorageDetails} from './VDiskStorageDetails';
 import {VDiskTablets} from './VDiskTablets';
 import {vDiskPageKeyset} from './i18n';
 
@@ -73,6 +75,7 @@ export function VDiskPage() {
     const database = databaseParam ?? undefined;
 
     const vDiskTab = vDiskTabSchema.parse(activeTab);
+    const newStorageViewEnabled = useNewStorageViewEnabled();
 
     const [autoRefreshInterval] = useAutoRefreshInterval();
 
@@ -218,6 +221,14 @@ export function VDiskPage() {
         return <VDiskInfo data={vDiskData} className={vDiskPageCn('info')} wrap />;
     };
 
+    const renderStorageDetails = () => {
+        if (!newStorageViewEnabled) {
+            return null;
+        }
+
+        return <VDiskStorageDetails data={vDiskData} className={vDiskPageCn('storage-details')} />;
+    };
+
     const renderTabs = () => {
         return (
             <div className={vDiskPageCn('tabs')}>
@@ -246,28 +257,6 @@ export function VDiskPage() {
         );
     };
 
-    const renderTabsContent = () => {
-        switch (vDiskTab) {
-            case 'storage': {
-                return renderStorageInfo();
-            }
-            case 'tablets': {
-                return (
-                    <VDiskTablets
-                        scrollContainerRef={containerRef}
-                        nodeId={nodeId ?? undefined}
-                        pDiskId={PDiskId}
-                        vDiskSlotId={vDiskSlotId ?? undefined}
-                        vDiskId={StringifiedId}
-                        className={vDiskPageCn('tablets-content')}
-                    />
-                );
-            }
-            default:
-                return null;
-        }
-    };
-
     const renderStorageInfo = () => {
         if (!isNil(GroupID)) {
             return (
@@ -290,6 +279,28 @@ export function VDiskPage() {
         return null;
     };
 
+    const renderTabsContent = () => {
+        switch (vDiskTab) {
+            case 'storage': {
+                return renderStorageInfo();
+            }
+            case 'tablets': {
+                return (
+                    <VDiskTablets
+                        scrollContainerRef={containerRef}
+                        nodeId={nodeId ?? undefined}
+                        pDiskId={PDiskId}
+                        vDiskSlotId={vDiskSlotId ?? undefined}
+                        vDiskId={StringifiedId}
+                        className={vDiskPageCn('tablets-content')}
+                    />
+                );
+            }
+            default:
+                return null;
+        }
+    };
+
     const renderContent = () => {
         if (loading) {
             return <InfoViewerSkeleton rows={9} />;
@@ -299,6 +310,7 @@ export function VDiskPage() {
             <React.Fragment>
                 {error ? <ResponseError error={error} /> : null}
                 {renderInfo()}
+                {renderStorageDetails()}
                 {renderTabs()}
                 {renderTabsContent()}
             </React.Fragment>

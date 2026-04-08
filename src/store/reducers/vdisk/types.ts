@@ -5,6 +5,7 @@ export interface VDiskData extends PreparedVDisk {
     NodeHost?: string;
     NodeType?: string;
     NodeDC?: string;
+    NodeRack?: string;
 
     PDiskId?: number;
     PDiskType?: string;
