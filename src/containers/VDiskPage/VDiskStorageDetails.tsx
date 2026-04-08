@@ -57,27 +57,6 @@ function formatUsage(value?: number) {
     return formattedValue ? `${formattedValue}%` : EMPTY_DATA_PLACEHOLDER;
 }
 
-function getFreeSize(availableSize?: number, sizeLimit?: number, allocatedSize?: number) {
-    const normalizedAvailableSize = Number(availableSize);
-
-    if (Number.isFinite(normalizedAvailableSize) && normalizedAvailableSize >= 0) {
-        return normalizedAvailableSize;
-    }
-
-    const normalizedSizeLimit = Number(sizeLimit);
-    const normalizedAllocatedSize = Number(allocatedSize);
-
-    if (!Number.isFinite(normalizedSizeLimit) || normalizedSizeLimit < 0) {
-        return undefined;
-    }
-
-    if (!Number.isFinite(normalizedAllocatedSize) || normalizedAllocatedSize < 0) {
-        return normalizedSizeLimit;
-    }
-
-    return Math.max(normalizedSizeLimit - normalizedAllocatedSize, 0);
-}
-
 function MetricItem({title, value, isUsage}: MetricItemProps) {
     return (
         <div className={b('metric', {usage: isUsage})}>
@@ -160,7 +139,7 @@ export function VDiskStorageDetails({className, data}: VDiskStorageDetailsProps)
     const used = Number(data?.AllocatedSize);
     const total = Number(data?.SizeLimit);
     const usage = Number(data?.AllocatedPercent);
-    const free = getFreeSize(data?.AvailableSize, data?.SizeLimit, data?.AllocatedSize);
+    const free = Number(data?.FreeSize);
 
     const {NodeDC, NodeRack, NodeHost, NodeId, PDiskId} = data || {};
 

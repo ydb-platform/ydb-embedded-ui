@@ -92,6 +92,7 @@ describe('prepareGroupsVDisk', () => {
             AllocatedSize: 30943477760,
             AvailableSize: 234461593600,
             SizeLimit: 265405071360,
+            FreeSize: 234461593600,
             AllocatedPercent: 11,
 
             Donors: undefined,
@@ -135,6 +136,7 @@ describe('prepareGroupsVDisk', () => {
             AllocatedSize: 30943477760,
             AvailableSize: 234461593600,
             SizeLimit: 265405071360,
+            FreeSize: 234461593600,
             AllocatedPercent: 11,
 
             Donors: undefined,
@@ -241,6 +243,7 @@ describe('prepareGroupsVDisk', () => {
             AllocatedSize: 30943477760,
             AvailableSize: 234461593600,
             SizeLimit: 265405071360,
+            FreeSize: 234461593600,
             AllocatedPercent: 11,
 
             Donors: undefined,
@@ -262,6 +265,24 @@ describe('prepareGroupsVDisk', () => {
         const preparedData = prepareGroupsVDisk(vDiksDataWithoutPDisk);
 
         expect(preparedData).toEqual(expectedResult);
+    });
+
+    test('Should derive FreeSize from PDisk slot size fallback when AvailableSize is 0', () => {
+        const vDiskData = {
+            VDiskId: '2181038134-22-0-0-0',
+            NodeId: 224,
+            AllocatedSize: '300',
+            AvailableSize: '0',
+            PDisk: {
+                SlotSize: '500',
+            },
+        } as const as TStorageVDisk;
+
+        const preparedData = prepareGroupsVDisk(vDiskData);
+
+        expect(preparedData.SizeLimit).toBe(500);
+        expect(preparedData.FreeSize).toBe(200);
+        expect(preparedData.AllocatedPercent).toBe(60);
     });
 });
 

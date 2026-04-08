@@ -91,6 +91,7 @@ describe('prepareWhiteboardVDiskData', () => {
             AvailableSize: 188523479040,
             AllocatedSize: 8996782080,
             SizeLimit: 197520261120,
+            FreeSize: 188523479040,
             AllocatedPercent: 4,
         };
 
@@ -191,6 +192,7 @@ describe('prepareVDiskSizeFields', () => {
             AvailableSize: 400,
             AllocatedSize: 100,
             SizeLimit: 500, // allocated (100) + available (400) = 500
+            FreeSize: 400,
             AllocatedPercent: 20, // 100 / 500 * 100 = 20%
         });
     });
@@ -206,6 +208,7 @@ describe('prepareVDiskSizeFields', () => {
             AvailableSize: 0,
             AllocatedSize: 500,
             SizeLimit: 500, // SlotSize is used when available is 0
+            FreeSize: 0,
             AllocatedPercent: 100, // 500 / 500 * 100 = 100%
         });
     });
@@ -221,7 +224,24 @@ describe('prepareVDiskSizeFields', () => {
             AvailableSize: 0,
             AllocatedSize: 300,
             SizeLimit: 500, // SlotSize is used when available is undefined
+            FreeSize: 200,
             AllocatedPercent: 60, // 300 / 500 * 100 = 60%
+        });
+    });
+
+    test('Should derive free size from slot size fallback when AvailableSize is 0', () => {
+        expect(
+            prepareVDiskSizeFields({
+                AvailableSize: '0',
+                AllocatedSize: '300',
+                SlotSize: '500',
+            }),
+        ).toEqual({
+            AvailableSize: 0,
+            AllocatedSize: 300,
+            SizeLimit: 500,
+            FreeSize: 200,
+            AllocatedPercent: 60,
         });
     });
 
@@ -236,6 +256,7 @@ describe('prepareVDiskSizeFields', () => {
             AvailableSize: 0,
             AllocatedSize: 500,
             SizeLimit: 500, // allocated (500)
+            FreeSize: 0,
             AllocatedPercent: 100, // 500 / 500 * 100 = 100%
         });
     });
@@ -251,6 +272,7 @@ describe('prepareVDiskSizeFields', () => {
             AvailableSize: 0,
             AllocatedSize: 800,
             SizeLimit: 500, // SlotSize is used as limit
+            FreeSize: 0,
             AllocatedPercent: 160, // 800 / 500 * 100 = 160%
         });
     });
@@ -266,6 +288,7 @@ describe('prepareVDiskSizeFields', () => {
             AvailableSize: 0,
             AllocatedSize: NaN,
             SizeLimit: NaN,
+            FreeSize: NaN,
             AllocatedPercent: NaN,
         });
     });
