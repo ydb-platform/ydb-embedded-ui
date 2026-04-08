@@ -245,7 +245,7 @@ async function enableNewStorageView(page: Page) {
     });
 }
 
-test.describe.only('VDisk page storage details', () => {
+test.describe('VDisk page storage details', () => {
     test('does not render storage details when experiment is disabled', async ({page}) => {
         await setupVDiskPageMocks(page);
 
