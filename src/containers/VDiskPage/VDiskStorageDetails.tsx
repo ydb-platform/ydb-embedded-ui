@@ -166,7 +166,7 @@ export function VDiskStorageDetails({className, data}: VDiskStorageDetailsProps)
 
     const pDiskPath =
         NodeId !== undefined && PDiskId !== undefined
-            ? getPDiskPagePath(PDiskId, NodeId)
+            ? getPDiskPagePath(PDiskId, NodeId, undefined, {withBasename: true})
             : undefined;
 
     return (
